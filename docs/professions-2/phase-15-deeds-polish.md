@@ -23,7 +23,7 @@ be judged against the live system, and the wiki can tell the truth.
 - `tests/deeds_content.test.ts` and `tests/deeds.test.ts`: the catalog pin (append-only proof)
   and trigger behavior suites.
 - Tuning constant homes named in `state.md`: the masterwork proc constants (Phase 2), the
-  pristine vein cadence (Phase 4), the training fees (Phase 9), and the #1301 craft fee and
+  rare-event cadence (Phase 4, one shared knob), the training fees (Phase 9), and the #1301 craft fee and
   throttle constants in the crafting resolver path.
 - `src/guide/pages/professions.ts` plus the wiki content generator (`npm run wiki:content`,
   freshness-gated by `tests/guide.test.ts`); conventions in `src/guide/CLAUDE.md`.
@@ -59,7 +59,7 @@ Spawn one Explore agent to read and summarize:
 - docs/design/deeds.md, src/sim/content/deeds.ts, src/sim/deeds.ts,
   tests/deeds_content.test.ts, tests/deeds.test.ts.
 - The tuning constant files named in state.md's "New surfaces per phase" appendix (masterwork
-  proc, pristine vein cadence, training fees, the #1301 fee and throttle).
+  proc, rare-event cadence, training fees, the #1301 fee and throttle).
 - src/guide/pages/professions.ts and the wiki generator path, plus src/guide/CLAUDE.md,
   src/sim/CLAUDE.md, and tests/CLAUDE.md.
 The summary must return: the locked deed scope and tuning targets verbatim from state.md; the
@@ -77,8 +77,16 @@ matrix (see STEP 3).
 Agent deeds deliverables:
 - Register the basic universal profession deeds in src/sim/content/deeds.ts with triggers wired
   in src/sim/deeds.ts: first craft, first masterwork, first attunement, per-craft tier
-  milestones (rare tier), and the pristine vein find. The rare fish deed already exists: verify
+  milestones (rare tier), the Specialist deed at the 75-skill specialization threshold, and
+  the rare-find deeds for the Phase 4 event flavors (pristine vein, ancient heartwood,
+  moonlit bloom) plus the Phase 10 perfect specimen. The rare fish deed already exists: verify
   it, do not duplicate it.
+- Notability through the deeds pipeline (the 2026-07-17 ruling): first attunement and first
+  masterwork carry TITLE rewards and marquee-tier renown (>= 25) so the existing pipeline
+  fires in full: nameplate title, banner, fireworks gate, celebration sound,
+  guild-and-friends marquee broadcast, Renown board. Deed titles are the nameplate surface
+  (archetype titles do not render on nameplates; the Phase 1 QA drift note). Still
+  cosmetic-only, still append-only.
 - Icons via the category crest fallback (no bespoke art required; note any bespoke-worthy slot
   in asset-manifest.json instead).
 - Deed i18n added English-only by deed id per the deeds recipe; catalog pins in
@@ -87,16 +95,25 @@ Agent deeds deliverables:
 - A scripted playthrough test (Vitest driving the real Sim) that unlocks every new deed.
 
 Agent tuning deliverables:
-- Review masterwork proc bounds, training fees, pristine vein cadence, and the #1301 craft fee
-  and throttle against the state.md tuning targets, applying the maintainer's numbers. If a
+- Review masterwork proc bounds, training fees, teach tiers, work-order rewards, the
+  rare-event cadence, and the #1301 craft fee
+  and throttle against the state.md tuning targets, applying the maintainer's numbers. The
+  rare-event cadence review decides per FAMILY: the Phase 4 shared knob may split into
+  per-flavor cadences (vein, heartwood, bloom) with maintainer numbers if live data says
+  the families need different rhythms. If a
   maintainer number is missing for any constant, stop and ask; never invent balance numbers.
 - Every constant is a NAMED export in its owning module; none inline at a call site. Pin each
   final value in the matching test.
+- Faucet-vs-sink review (the 2026-07-17 amendment): with live data, weigh the material and
+  gold faucets (gathering, work-order rewards, quest gold) against the sinks (consumables,
+  crafting inputs, salvage and disenchant destruction, training and craft fees) and record
+  the balance with evidence in the phase notes; revisit the commissions (#1298) wave
+  assignment with that evidence and file the follow-up on epic #1866.
 
 Agent guide deliverables:
 - Rewrite the guide/wiki professions page (src/guide/pages/professions.ts) to describe the
   SHIPPED system: archetypes and attunement, masterworks, stations and masters, training,
-  gathering and pristine veins, fishing, enchanting reach, and the deeds. Recipe and station
+  gathering and the rare events, fishing, enchanting reach, salvage, and the deeds. Recipe and station
   data must feed the page from src/sim/ content, not hand-copied tables.
 - npm run wiki:content regenerated and the freshness gate (tests/guide.test.ts) green; any new
   guide.* prose keys added English-only.
@@ -125,7 +142,8 @@ INVARIANTS THIS PHASE MUST KEEP:
 
 Out of scope (do NOT do in this phase):
 - Anything wave 2: market/mail instance carriage (#1146), commissions and boundTo (#1298),
-  Jack of All Trades (#1296), monster-harvest proficiency, salvage UI, battlefield experience
+  Jack of All Trades (#1296), monster-harvest proficiency, batch salvage UI (single-item
+  salvage landed in Phase 13), battlefield experience
   expansion, item biographies, tool effects (parked and dormant), jewelcrafting or inscription
   depth.
 - No new deed UI systems; the deeds window and celebration pipeline already exist.
@@ -161,8 +179,12 @@ sentences on what changed and why), Conventional Commits with a scope:
 
 STEP 5 - ACCEPTANCE CRITERIA (do not mark complete until all check):
 - [ ] Every deed in the packet is unlockable in a scripted playthrough (the Vitest run proves
-      first craft, first masterwork, first attunement, rare-tier milestones, the rare fish, and
-      the pristine vein find all unlock).
+      first craft, first masterwork, first attunement, rare-tier milestones, the Specialist,
+      the rare fish, and every rare-find deed all unlock).
+- [ ] First attunement and first masterwork deeds carry titles and marquee-tier renown; the
+      scripted playthrough proves the nameplate title, banner, and marquee broadcast fire.
+- [ ] The faucet-vs-sink review is recorded with evidence and the commissions follow-up
+      filed on epic #1866.
 - [ ] tests/deeds_content.test.ts pins the catalog append-only; all pre-packet deeds unchanged.
 - [ ] Every tuning constant is named, exported, pinned, and matches the maintainer's numbers.
 - [ ] The wiki professions page describes the shipped system; npm run wiki:content freshness

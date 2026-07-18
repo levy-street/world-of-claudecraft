@@ -582,7 +582,7 @@ export const SFX = [
     prompt: 'A soft muffled snowy wind, quiet and cold. Seamless loop, no music.',
   },
 
-  // --- Quest events (custom recordings, not ElevenLabs) --------------------
+  // --- Custom recordings (not ElevenLabs) ----------------------------------
   { key: 'quest_accept', custom: true },
   { key: 'quest_ready', custom: true },
   { key: 'quest_complete', custom: true },
@@ -624,6 +624,7 @@ export const SFX = [
   // sound fired for both real level-ups and every achievement, wearing thin
   // fast. See handleDeedUnlocks in src/ui/hud.ts.
   { key: 'ui_achievement', custom: true },
+  { key: 'temporal_clock', custom: true },
 
   // Group ready-check three-note prompt (custom recording, not
   // ElevenLabs/generated). Replaces the hardcoded three-oscillator procedural

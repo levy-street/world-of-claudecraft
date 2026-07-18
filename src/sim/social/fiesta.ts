@@ -35,7 +35,6 @@ import {
   computeTalentModifiers,
   defaultBuild,
   type TalentModifiers,
-  talentPointsAtLevel,
 } from '../content/talents';
 import { abilitiesKnownAt, arenaOrigin } from '../data';
 import * as deedsMod from '../deeds';
@@ -113,6 +112,7 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
     global: { ...base.global },
     abilities: {},
     grants: [...base.grants],
+    procs: [...base.procs],
   };
   for (const k in base.abilities) m.abilities[k] = { ...base.abilities[k] };
   for (const id of augIds) {
@@ -152,12 +152,17 @@ export function mergeAugmentMods(base: TalentModifiers, augIds: string[]): Talen
       if (!m.abilities[am.ability]) {
         m.abilities[am.ability] = {
           dmgPct: 0,
+          dmgPctVsDotted: 0,
           flatDmg: 0,
           costPct: 0,
           cooldownPct: 0,
+          critPct: 0,
+          cooldownFlat: 0,
           castPct: 0,
           buffPct: 0,
           castWhileMoving: false,
+          damagePushbackImmune: false,
+          bonusCharges: 0,
           addEffects: [],
         };
       }
@@ -220,7 +225,9 @@ export function fiestaStandardize(ctx: SimContext, meta: PlayerMeta, e: Entity):
   if (meta.fiestaRestore) return;
   meta.fiestaRestore = { level: e.level, xp: meta.xp, talents: cloneAllocation(meta.talents) };
   e.level = FIESTA_STANDARD_LEVEL;
-  meta.talents = defaultBuild(meta.cls, talentPointsAtLevel(FIESTA_STANDARD_LEVEL));
+  // A standardized default build (spec + first-option rows) so every fighter
+  // enters equal; the player's real allocation returns with fiestaRestoreChar.
+  meta.talents = defaultBuild(meta.cls, FIESTA_STANDARD_LEVEL);
   meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, e.level);
   meta.known = abilitiesKnownAt(meta.cls, e.level, ctx.playerMods(meta));
   meta.wireRev++; // talents/loadouts swapped for the bout, refresh the wire promptly
@@ -298,6 +305,7 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   e.autoAttack = false;
   e.queuedOnSwing = null;
   delete e.queuedOnSwingFree;
+  delete e.queuedOnSwingCostMultiplier;
   e.queuedCastAbility = null;
   e.queuedCastAim = null;
   e.comboPoints = 0;
@@ -307,6 +315,7 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   e.sitting = false;
   e.chargeTargetId = null;
   e.chargePath = [];
+  if (e.leap !== undefined) e.leap = null;
   e.followTargetId = null;
   e.targetId = null;
   const meta = ctx.players.get(e.id);

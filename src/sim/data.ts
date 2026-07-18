@@ -44,6 +44,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
+import { MAGE_PET_MOBS } from './content/mage_pets';
 import {
   ALL_RECIPES as ALL_RECIPES_CONTENT,
   COMMON_RECIPES as COMMON_RECIPES_CONTENT,
@@ -179,6 +180,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...ZONE3_MOBS,
   ...DUNGEON_MOBS,
   ...WARLOCK_PET_MOBS,
+  ...MAGE_PET_MOBS,
   ...TEMPLE_MOBS,
   ...TEMPLE_DUNGEON_MOBS,
   ...DELVE_MOBS,

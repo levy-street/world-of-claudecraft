@@ -36,9 +36,9 @@ const browser = await puppeteer.launch({
 });
 const page = await browser.newPage();
 const errors = [];
-page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
+page.on('pageerror', (e) => errors.push(`PAGEERROR: ${e.message}`));
 page.on('console', (msg) => {
-  if (msg.type() === 'error') errors.push('CONSOLE: ' + msg.text());
+  if (msg.type() === 'error') errors.push(`CONSOLE: ${msg.text()}`);
 });
 
 // Pre-set the first-run flags the real client honors, so the camera-mode-choice

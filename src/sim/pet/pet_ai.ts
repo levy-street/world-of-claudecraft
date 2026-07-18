@@ -32,6 +32,7 @@
 
 import { lineOfSightClear } from '../colliders';
 import { MOBS } from '../data';
+import { pctValue } from '../entity';
 import { isTrivialTo } from '../mob/targeting';
 import { findPlayerPath, PLAYER_BODY_RADIUS } from '../pathfind';
 import { scheduleProjectile } from '../projectile_travel';
@@ -75,6 +76,7 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
     ctx.despawnPersistentPet(pet);
     return;
   }
+  if (updateWaterJetChannel(ctx, pet)) return;
   if (ctx.isStunned(pet)) return;
   ctx.syncPetAspect(pet, owner);
   pet.petTauntTimer = Math.max(0, pet.petTauntTimer - DT);
@@ -119,6 +121,14 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
         pet.petManualTauntPending = false;
         pet.petTauntTimer = PET_GROWL_INTERVAL;
       }
+      // Water Elemental: auto-cast Water Jet on cooldown when the owner armed its
+      // autocast (right-click), the same idiom as the Growl autocast above. The jet
+      // reuses petTauntTimer as its cooldown; startWaterJet begins the channel and
+      // updateWaterJetChannel (top of tick) owns the pet until it finishes.
+      if (ranged?.jet && pet.petAutoWaterJet && pet.petTauntTimer <= 0 && !pet.castingAbility) {
+        startWaterJet(ctx, pet, target, ranged.jet);
+        return;
+      }
       pet.swingTimer -= DT;
       if (pet.swingTimer <= 0) {
         if (ranged) petRangedAttack(ctx, pet, target, ranged);
@@ -133,6 +143,52 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
   // heel
   pet.swingTimer = Math.max(0, pet.swingTimer - DT);
   petFollow(ctx, pet, owner);
+}
+
+function clearWaterJetChannel(ctx: SimContext, pet: Entity, canceled: boolean): void {
+  const target = pet.castTargetId !== null ? ctx.entities.get(pet.castTargetId) : null;
+  if (canceled && target) {
+    target.auras = target.auras.filter(
+      (a) => a.sourceId !== pet.id || (a.id !== 'water_jet' && a.id !== 'water_jet_slow'),
+    );
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: pet.id,
+      targetId: target.id,
+      school: 'frost',
+      fx: 'bubbleBeam',
+      ability: 'water_jet',
+      duration: 0,
+    });
+  }
+  pet.castingAbility = null;
+  pet.castRemaining = 0;
+  pet.castTotal = 0;
+  pet.castTargetId = null;
+  pet.channeling = false;
+}
+
+/** Locks the elemental into its real Water Jet channel and cancels the attached
+ * damage/slow when the connection is broken. Returns true while this tick is
+ * consumed by the channel (including its completion/cancel tick). */
+function updateWaterJetChannel(ctx: SimContext, pet: Entity): boolean {
+  if (pet.castingAbility !== 'water_jet' || !pet.channeling) return false;
+  const target = pet.castTargetId !== null ? (ctx.entities.get(pet.castTargetId) ?? null) : null;
+  const range = MOBS[pet.templateId]?.petRanged?.range ?? 0;
+  const canceled =
+    ctx.isStunned(pet) ||
+    !target ||
+    target.dead ||
+    !ctx.isHostileTo(pet, target) ||
+    dist2d(pet.pos, target.pos) > range;
+  if (canceled) {
+    clearWaterJetChannel(ctx, pet, true);
+    return true;
+  }
+  pet.facing = steadyAngleTo(pet.pos, target.pos, pet.facing);
+  pet.castRemaining = Math.max(0, pet.castRemaining - DT);
+  if (pet.castRemaining <= 0) clearWaterJetChannel(ctx, pet, false);
+  return true;
 }
 
 // A pet standing inside an idle wild mob's detection radius pulls it, exactly as its
@@ -223,7 +279,7 @@ function petDamageMult(ctx: SimContext, pet: Entity): number {
   if (pet.ownerId === null) return 1;
   let mult = 1;
   for (const a of pet.auras) {
-    if (a.kind === 'pet_damage_pct') mult += a.value > 1 ? a.value / 100 : a.value;
+    if (a.kind === 'pet_damage_pct') mult += pctValue(a.value);
   }
   const ownerMeta = ctx.players.get(pet.ownerId);
   if (ownerMeta) mult *= 1 + ctx.playerMods(ownerMeta).global.petDmgPct;
@@ -245,7 +301,17 @@ export function petRangedAttack(
   ctx: SimContext,
   pet: Entity,
   target: Entity,
-  ranged: { range: number; school: Aura['school'] },
+  ranged: {
+    range: number;
+    school: Aura['school'];
+    jet?: {
+      total: number;
+      duration: number;
+      interval: number;
+      slow: number;
+      cooldown: number;
+    };
+  },
 ): void {
   ctx.emit({
     type: 'spellfx',
@@ -265,6 +331,52 @@ export function petRangedAttack(
     dmg *= petDamageMult(ctx, src);
     ctx.dealDamage(src, tgt, Math.max(1, Math.round(dmg)), crit, ranged.school, null, 'hit');
   });
+}
+
+export function startWaterJet(
+  ctx: SimContext,
+  pet: Entity,
+  target: Entity,
+  jet: NonNullable<NonNullable<(typeof MOBS)[string]['petRanged']>['jet']>,
+): void {
+  const perTick = Math.max(1, Math.round(jet.total / (jet.duration / jet.interval)));
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: pet.id,
+    targetId: target.id,
+    school: 'frost',
+    fx: 'bubbleBeam',
+    ability: 'water_jet',
+    duration: jet.duration,
+  });
+  ctx.applyAura(target, {
+    id: 'water_jet',
+    name: 'Water Jet',
+    kind: 'dot',
+    value: perTick,
+    remaining: jet.duration,
+    duration: jet.duration,
+    tickInterval: jet.interval,
+    tickTimer: jet.interval,
+    sourceId: pet.id,
+    school: 'frost',
+  });
+  ctx.applyAura(target, {
+    id: 'water_jet_slow',
+    name: 'Water Jet',
+    kind: 'slow',
+    value: jet.slow,
+    remaining: jet.duration,
+    duration: jet.duration,
+    sourceId: pet.id,
+    school: 'frost',
+  });
+  pet.castingAbility = 'water_jet';
+  pet.castRemaining = jet.duration;
+  pet.castTotal = jet.duration;
+  pet.castTargetId = target.id;
+  pet.channeling = true;
+  pet.petTauntTimer = jet.cooldown;
 }
 
 export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Entity | null {

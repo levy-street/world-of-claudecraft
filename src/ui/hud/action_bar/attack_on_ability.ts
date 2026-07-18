@@ -12,7 +12,7 @@ import type { AbilityEffect, Entity } from '../../../sim/types';
 //   'damage'  - deals damage to a target, so the ability is an "attack" (Sinister Strike,
 //               Fireball, Mortal Strike, Eviscerate, the AOEs) and should start auto-attack.
 //   'breakCC' - crowd control that BREAKS when the target takes damage. The sim flags these
-//               auras `breaksOnDamage` at their emit sites (`incapacitate`/`polymorph` in
+//               auras `breaksOnDamage` at their emit sites (`incapacitate`/`polymorph`/`aoeFear` in
 //               combat/effect_dispatch.ts); a swing would shatter the CC, so an ability
 //               applying one must NEVER start auto-attack even when it also deals damage
 //               (gouge does both). A future break-on-damage CC effect MUST be classified
@@ -25,43 +25,81 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   weaponStrike: 'damage',
   directDamage: 'damage',
   interrupt: 'other',
+  dispel: 'other',
+  // Silence locks the school but does not break on damage, so it never blocks the engage.
+  silence: 'other',
+  aoeFear: 'breakCC',
+  clearCooldowns: 'other',
+  aoeAllyAbsorb: 'other',
+  greaterInvisibility: 'other',
+  breakControl: 'other',
+  cleanseSelf: 'other',
+  repositionToAim: 'other',
+  blinkForward: 'other',
   finisherDamage: 'damage',
   dot: 'damage',
+  extendDot: 'other',
+  // Detonate-style: the consumed DoT's remaining damage lands immediately.
+  consumeDot: 'damage',
   aoeDamage: 'damage',
   chainDamage: 'damage',
   aoeHeal: 'other',
   chainHeal: 'other',
   groundAoE: 'damage',
+  frozenOrb: 'damage',
   aoeRoot: 'damage',
+  empoweredCone: 'damage',
   consumeAura: 'other',
   drainTick: 'damage',
   judgement: 'damage',
   incapacitate: 'breakCC',
   polymorph: 'breakCC',
   heal: 'other',
+  // Chronomancy Temporal Echo: places a friendly mark (its Arcane-damage-to-heal
+  // conversion is separate); the ability itself deals no damage and breaks no CC.
+  temporalEcho: 'other',
+  massTemporalEcho: 'other',
+  resurrectAlly: 'other',
+  massResurrectGroup: 'other',
+  perfectMoment: 'other',
+  temporalHourglass: 'breakCC',
+  rewind: 'other',
   feralCharge: 'other',
   hot: 'other',
   absorb: 'other',
   imbue: 'other',
   lifeTap: 'other',
   buffTarget: 'other',
+  debuffTargetSource: 'other',
   slow: 'other',
   root: 'other',
   stun: 'other',
   aoeAttackSpeed: 'other',
   aoeAttackPower: 'other',
+  // Choice-row talents: an AoE slow is a non-breaking snare.
+  aoeSlow: 'other',
   aoeAllyAttackPower: 'other',
   aoeAllyHaste: 'other',
+  aoeAllySureCrit: 'other',
+  aoeKnockback: 'other',
+  aoeAllyDamage: 'other',
   selfBuff: 'other',
   petBuff: 'other',
   applyDebuff: 'other',
   finisherHaste: 'other',
+  enrageChance: 'other',
   finisherStun: 'other',
   gainResource: 'other',
   selfDamagePctMax: 'other',
+  selfHealPctMax: 'other',
+  selfHotPctMax: 'other',
+  aoeAllyMaxHp: 'other',
+  partyMeleeBuff: 'other',
   charge: 'other',
   sunder: 'other',
   faerieFire: 'other',
+  absorbSpentResource: 'other',
+  aoeTaunt: 'other',
   taunt: 'other',
   tamePet: 'other',
   dismissPet: 'other',
@@ -89,7 +127,13 @@ export function abilityStartsAutoAttack(effects: AbilityEffect[]): boolean {
   for (const e of effects) {
     const cls = EFFECT_CLASS[e.type];
     if (cls === 'breakCC') return false;
-    if (cls === 'damage' || (e.type === 'consumeAura' && e.deal !== undefined)) damaging = true;
+    if (
+      cls === 'damage' ||
+      (e.type === 'consumeAura' && e.deal !== undefined) ||
+      (e.type === 'repositionToAim' && e.landingAoe !== undefined)
+    ) {
+      damaging = true;
+    }
   }
   return damaging;
 }

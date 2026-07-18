@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_card_duel_first_win: {
+    name: 'Aturan Sendiri',
+    desc: 'Menangkan Duel Kartu di hadapan Ahli Kartu.',
+  },
   prog_first_steps: {
     name: 'Langkah Pertama',
     desc: 'Capai level 2 dan ayunkan langkah pertamamu di jalan yang masih panjang.',
@@ -35,8 +39,8 @@ export const table: DeedLocaleTable = {
     desc: 'Gunakan satu poin talenta pada talenta di baris terakhir.',
   },
   prog_full_build: {
-    name: 'Sebelas Penuh',
-    desc: 'Habiskan seluruh sebelas poin talenta pada satu build.',
+    name: 'Enam Lengkap',
+    desc: 'Pilih satu opsi pada keenam baris talenta dalam satu build.',
   },
   prog_veteran: {
     name: 'Veteran',

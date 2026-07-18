@@ -41,13 +41,16 @@ describe('party frame aura relevance', () => {
     expect(partyFrameAuraIsRelevant({ id: 'imbue', kind: 'imbue' })).toBe(false);
     expect(partyFrameAuraIsRelevant({ id: 'arcane_intellect', kind: 'buff_int_pct' })).toBe(false);
     expect(partyFrameAuraIsRelevant({ id: 'sacred_shield', kind: 'cast_shield' })).toBe(true);
+    expect(partyFrameAuraIsRelevant({ id: 'temporal_echo', kind: 'temporal_echo' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'renew', kind: 'hot' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'power_word_shield', kind: 'absorb' })).toBe(true);
+    expect(partyFrameAuraIsRelevant({ id: 'ice_block', kind: 'stasis' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'blessing_of_might', kind: 'buff_ap' })).toBe(false);
     expect(partyFrameAuraIsRelevant({ id: 'evasion', kind: 'buff_dodge' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'aspect_of_the_monkey', kind: 'buff_dodge' })).toBe(
       false,
     );
+    expect(partyFrameAuraIsRelevant({ id: 'temporal_exhaustion', kind: 'sated' })).toBe(false);
     expect(partyFrameAuraIsRelevant({ id: 'well_fed', kind: 'buff_sta' })).toBe(false);
     expect(partyFrameAuraIsRelevant({ id: 'rend', kind: 'dot' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'wither', kind: 'buff_ap', neg: 1 })).toBe(true);

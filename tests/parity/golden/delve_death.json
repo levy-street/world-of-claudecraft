@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 410,
-      "state": "0d8c6007",
+      "state": "8f620cf2",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -55,7 +55,8 @@
           "entityId": 409,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -69,8 +70,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -84,6 +84,7 @@
           "critChance": 0.0625,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
+          "dualWielding": true,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
@@ -94,6 +95,13 @@
           "maxHp": 62,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -133,7 +141,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 420,
-      "state": "906a2d9c",
+      "state": "7ffbff0f",
       "events": "090368ca",
       "rng": {
         "draws": 1,
@@ -173,7 +181,8 @@
           "entityId": 409,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -188,8 +197,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -203,6 +211,7 @@
           "critChance": 0.0715,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
+          "dualWielding": true,
           "fallStartY": 2.077747,
           "fiveSecondRule": 99,
           "hp": 93,
@@ -213,6 +222,13 @@
           "maxHp": 185,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -251,7 +267,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 420,
-      "state": "c8887b69",
+      "state": "a8aa9e58",
       "events": "5f649f0a",
       "rng": {
         "draws": 1,
@@ -301,7 +317,8 @@
           "entityId": 409,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -317,8 +334,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 10,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -332,6 +348,7 @@
           "critChance": 0.0715,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
+          "dualWielding": true,
           "fallStartY": 2.353205,
           "fiveSecondRule": 99.1,
           "hp": 185,
@@ -342,6 +359,13 @@
           "maxHp": 185,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -381,7 +405,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 420,
-      "state": "c8887b69",
+      "state": "a8aa9e58",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -431,7 +455,8 @@
           "entityId": 409,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -447,8 +472,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 10,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -462,6 +486,7 @@
           "critChance": 0.0715,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
+          "dualWielding": true,
           "fallStartY": 2.353205,
           "fiveSecondRule": 99.1,
           "hp": 185,
@@ -472,6 +497,13 @@
           "maxHp": 185,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",

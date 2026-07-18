@@ -236,6 +236,15 @@ export function handleDevChat(
     return null;
   }
 
+  if (/^\/(?:dev\s+vendor|devvendor)\s*$/i.test(raw)) {
+    const vendorId = ctx.spawnDevVendor(pid);
+    if (vendorId < 0) ctx.error(pid, '[dev] Could not spawn the test vendor.');
+    else {
+      emitDevLog(ctx, pid, '[dev] Spawned the Test Quartermaster (free epic gear) next to you.');
+    }
+    return null;
+  }
+
   const lfgMatch = /^\/(?:dev\s+lfg|devlfg)(?:\s+(\S+))?\s*$/i.exec(raw);
   if (lfgMatch) {
     const mode = (lfgMatch[1] ?? 'queue').toLowerCase();
@@ -257,6 +266,29 @@ export function handleDevChat(
 
   if (/^\/(?:dev\s+attune|devattune)\s*$/i.test(raw)) {
     completeAllQuestsForDev(ctx, pid);
+    return null;
+  }
+
+  if (/^\/(?:dev\s+cascade|devcascade)\s*$/i.test(raw)) {
+    // [dev] Controlled Cascada temporal playtest: a non-offensive training dummy plus
+    // raid allies at known distances, with a per-cast metrics readout. Dev realms only.
+    ctx.startCascadePlaytest(pid);
+    emitDevLog(
+      ctx,
+      pid,
+      '[dev] Cascade scenario ready: training dummy + raid allies (one beyond 15 yd). Target the center, cast Temporal Cascade, then hit the dummy with Arcane spells for the per-cast readout.',
+    );
+    return null;
+  }
+  if (/^\/(?:dev\s+sandbox|devsandbox)\s*$/i.test(raw)) {
+    // [dev] A generic practice scenario: a non-offensive training dummy plus a raid of
+    // regen-frozen friendly bots (10k pool) for testing any ability threat-free.
+    const allies = ctx.startDevSandbox(pid);
+    emitDevLog(
+      ctx,
+      pid,
+      `[dev] Sandbox ready: a training dummy plus ${allies} raid allies (10k HP, started low, regen frozen). Attack the dummy, then practice heals or AoE on the allies threat-free. Re-run /dev sandbox to reset.`,
+    );
     return null;
   }
 
@@ -348,7 +380,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev gold, /dev quest, /dev quests, /dev attune, /dev gather, /dev bot, /dev lfg, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev gold, /dev quest, /dev quests, /dev attune, /dev gather, /dev bot, /dev vendor, /dev lfg, /dev cascade, /dev sandbox, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

@@ -11,6 +11,7 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { NameplatePainter } from '../src/render/nameplate_painter';
+import { FRIENDLY } from '../src/render/reaction';
 import type { EntityView } from '../src/render/renderer';
 import type { Entity } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
@@ -56,6 +57,9 @@ function view(): EntityView {
   const nameplate = div('nameplate');
   const aiEl = document.createElement('span');
   aiEl.className = 'np-ai';
+  const levelEl = document.createElement('span');
+  levelEl.className = 'np-level';
+  levelEl.style.display = 'none';
   const group = new THREE.Group();
   group.position.set(0, 0, 0);
   return {
@@ -81,6 +85,7 @@ function view(): EntityView {
     devTierEl: img(),
     discordEl: img(),
     aiEl,
+    levelEl,
     nameplateDisplay: 'none',
     nameplateTransform: '',
     nameplateSig: '',
@@ -92,12 +97,24 @@ function view(): EntityView {
     tierValue: 0,
     devTierValue: 0,
     discordAvatarSig: '',
+    levelSig: '',
   } as unknown as EntityView;
 }
 
 /** A painter looking straight at a target standing next to the viewer. */
-function harness(target: Entity) {
-  const me = entity({ id: 1, name: 'Me', pos: { x: 0, y: 0, z: 3 } as Entity['pos'] });
+function harness(
+  target: Entity,
+  options: {
+    me?: Partial<Entity>;
+    isHostilePlayer?: (e: Entity) => boolean;
+  } = {},
+) {
+  const me = entity({
+    id: 1,
+    name: 'Me',
+    pos: { x: 0, y: 0, z: 3 } as Entity['pos'],
+    ...options.me,
+  });
   const views = new Map<number, EntityView>();
   const v = view();
   views.set(target.id, v);
@@ -122,7 +139,7 @@ function harness(target: Entity) {
     showNameplates: () => true,
     showDevBadges: () => true,
     showOwnNameplate: () => false,
-    isHostilePlayer: () => false,
+    isHostilePlayer: options.isHostilePlayer ?? (() => false),
   });
   return { painter, v };
 }
@@ -180,5 +197,75 @@ describe('nameplate [AI] account tag', () => {
     expect(v.nameEl.textContent).toContain('Streamer');
     expect(v.aiEl).not.toBe(v.nameEl);
     expect(v.aiEl.classList.contains('ai-tag')).toBe(true);
+  });
+});
+
+describe('nameplate state classes', () => {
+  it('toggles combat-state classes for a targeted hostile dead lootable enemy', () => {
+    const target = entity({
+      id: 2,
+      kind: 'mob',
+      templateId: 'wolf',
+      dead: true,
+      lootable: true,
+      hostile: true,
+      aggroTargetId: 1,
+    });
+    const { painter, v } = harness(target, { me: { targetId: 2 } });
+    painter.update(true);
+
+    expect(v.nameplate.classList.contains('np-current-target')).toBe(true);
+    expect(v.nameplate.classList.contains('np-hostile')).toBe(true);
+    expect(v.nameplate.classList.contains('np-dead-enemy')).toBe(true);
+    expect(v.nameplate.classList.contains('np-aggroed-on-me')).toBe(true);
+    expect(v.nameplate.classList.contains('np-my-pet')).toBe(false);
+    expect(v.nameplate.classList.contains('np-friendly-pet')).toBe(false);
+  });
+
+  it('toggles pet-state classes for your friendly pet', () => {
+    const target = entity({
+      id: 2,
+      kind: 'mob',
+      templateId: 'wolf',
+      ownerId: 1,
+      hostile: false,
+    });
+    const { painter, v } = harness(target);
+    painter.update(true);
+
+    expect(v.nameplate.classList.contains('np-my-pet')).toBe(true);
+    expect(v.nameplate.classList.contains('np-friendly-pet')).toBe(true);
+    expect(v.nameplate.classList.contains('np-hostile')).toBe(false);
+  });
+});
+
+describe('nameplate level badge', () => {
+  it('shows, hides, and recolors the level badge as mob state changes', () => {
+    const target = entity({
+      id: 2,
+      kind: 'mob',
+      templateId: 'wolf',
+      level: 13,
+      hostile: true,
+    });
+    const { painter, v } = harness(target);
+
+    painter.update(true);
+    expect(v.levelEl.textContent).toBe('13');
+    expect(v.levelEl.style.display).toBe('');
+    expect(v.levelSig).toBe('13|#ff4444');
+
+    target.dead = true;
+    target.lootable = true;
+    painter.update(true);
+    expect(v.levelEl.style.display).toBe('none');
+
+    target.dead = false;
+    target.hostile = false;
+    target.ownerId = 1;
+    painter.update(true);
+    expect(v.levelEl.textContent).toBe('13');
+    expect(v.levelEl.style.display).toBe('');
+    expect(v.levelSig).toBe(`13|${FRIENDLY}`);
   });
 });

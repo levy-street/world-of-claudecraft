@@ -1,9 +1,11 @@
 import {
   ALL_CLASSES,
+  type ArmorItemDef,
   type ArmorType,
   type EquipSlot,
   type ItemDef,
   type PlayerClass,
+  type WeaponItemDef,
 } from './types';
 
 type WeaponArchetype = 'warrior' | 'caster' | 'rogue';
@@ -42,6 +44,10 @@ export function armorTypeForItem(item: ItemDef): ArmorType | null {
   if (item.kind !== 'armor') return null;
   // Jewelry (neck/ring) is kind 'armor' with no armor class.
   return item.armorType ?? null;
+}
+
+export function isShieldItem(item: ItemDef | undefined): item is ArmorItemDef {
+  return item?.kind === 'armor' && item.slot === 'offhand' && item.shield === true;
 }
 
 // Resolve the concrete equipment key an item equips into. Rings declare the
@@ -102,13 +108,57 @@ export function classesThatCanEquipArmorType(armorType: ArmorType): PlayerClass[
   return ALL_CLASSES.filter((cls) => ARMOR_RANK[maxArmorTypeForClass(cls)] >= rank);
 }
 
+export function canDualWield(cls: PlayerClass, spec?: string | null): boolean {
+  return cls === 'rogue' || (cls === 'warrior' && spec === 'fury');
+}
+
+export function canDualWieldTwoHand(cls: PlayerClass, spec?: string | null): boolean {
+  return cls === 'warrior' && spec === 'fury';
+}
+
+export function weaponHand(item: WeaponItemDef): WeaponItemDef['hand'] {
+  return item.hand ?? 'onehand';
+}
+
 export function canEquipItem(cls: PlayerClass, item: ItemDef): boolean {
+  if (isShieldItem(item)) {
+    return !item.requiredClass || item.requiredClass.includes(cls);
+  }
+  // Held offhands (caster orbs/tomes) carry no armor class or weapon proficiency:
+  // the literal requiredClass list is the whole rule, like shields.
+  if (item.kind === 'held_offhand') {
+    return !item.requiredClass || item.requiredClass.includes(cls);
+  }
   const armorType = armorTypeForItem(item);
   if (armorType) return ARMOR_RANK[armorType] <= ARMOR_RANK[maxArmorTypeForClass(cls)];
+  // Rogues may dual wield one-handed weapons, but can never equip a two-hander.
+  // Keep this at the equipment boundary so future items cannot bypass it through
+  // a missing or overly broad requiredClass list.
+  if (cls === 'rogue' && item.kind === 'weapon' && weaponHand(item) === 'twohand') {
+    return false;
+  }
   const weaponArchetype = weaponArchetypeForItem(item);
   if (weaponArchetype === 'warrior') return WARRIOR_WEAPON_CLASSES.has(cls);
   if (weaponArchetype === 'caster') return CASTER_WEAPON_CLASSES.has(cls);
   if (weaponArchetype === 'rogue') return ROGUE_WEAPON_CLASSES.has(cls);
   if (item.requiredClass) return item.requiredClass.includes(cls);
   return true;
+}
+
+export function canEquipItemInSlot(
+  cls: PlayerClass,
+  item: ItemDef,
+  slot: EquipSlot,
+  spec?: string | null,
+): boolean {
+  if (!canEquipItem(cls, item)) return false;
+  if (item.kind === 'armor') {
+    if (item.slot === 'ring') return slot === 'ring1' || slot === 'ring2';
+    return item.slot === slot;
+  }
+  if (item.kind !== 'weapon') return item.slot === slot;
+  const hand = weaponHand(item);
+  if (slot === 'mainhand') return true;
+  if (slot !== 'offhand' || !canDualWield(cls, spec)) return false;
+  return hand === 'onehand' || (hand === 'twohand' && canDualWieldTwoHand(cls, spec));
 }

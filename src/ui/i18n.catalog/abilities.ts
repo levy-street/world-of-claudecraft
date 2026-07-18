@@ -7,6 +7,8 @@ const abilityStringsEn = {
     actionBar: {
       attackName: 'Attack',
       attackTooltip: 'Toggle auto-attack on your target. Right-clicking an enemy also attacks.',
+      // Shown under the Attack tooltip: right-click removes the button from the bar,
+      // freeing the slot (and its key) for a normal action. Restored in Options.
       attackRemoveHint: 'Right-click to remove it from the bar and free the slot.',
       emptySlot: 'Empty slot',
       slotAria: 'Action slot {slot}: {ability}',
@@ -615,7 +617,7 @@ const classAbilityNamesEn = {
       ],
       [
         'hurricane',
-        'Hurricane',
+        'Galeheart',
         'Calls a hurricane onto the target area for 6 sec, battering enemies for {damage} Nature damage each second.',
       ],
       [
@@ -631,23 +633,17 @@ const classAbilityNamesEn = {
       [
         'battle_shout',
         'Iron Bellow',
-        'A shout that increases the attack power of all party members by {buff}% for 2 min.',
+        'A shout that increases the attack power of all party members by {buff}% for 30 min.',
       ],
-      ['commanding_shout', 'Bolstering Cry', 'Increases your Stamina by {buff} for 2 min.'],
       [
         'demoralizing_shout',
         'Direhowl',
-        'Lets out a fearsome shout, reducing the attack power of all nearby enemies by {buff} for 30 sec.',
+        'Lets out a fearsome shout, reducing the damage dealt by all nearby enemies by {buff}% for 20 sec.',
       ],
       [
         'charge',
         'Onrush',
-        'Charges an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range.',
-      ],
-      [
-        'rend',
-        'Deep Gash',
-        'Wounds the target, causing them to bleed for {damage} damage over {duration} sec.',
+        'Rushes an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range.',
       ],
       [
         'thunder_clap',
@@ -689,12 +685,17 @@ const classAbilityNamesEn = {
       [
         'taunt',
         'Goad',
-        'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
+        'Goads the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
       ],
       [
         'fireball',
         'Cinderbolt',
         'Hurls a fiery ball that causes {damage} Fire damage plus additional damage over time.',
+      ],
+      [
+        'fireball_form',
+        'Ember Form',
+        'Transform into a blazing ember, increasing movement speed by {buff}%. You cannot attack or cast spells while transformed. Recast to return to your normal form.',
       ],
       [
         'frost_armor',
@@ -710,6 +711,116 @@ const classAbilityNamesEn = {
         'frostbolt',
         'Rimelance',
         'Launches a bolt of frost, causing {damage} Frost damage and slowing movement by 40%.',
+      ],
+      [
+        'blazing_barrier',
+        'Blazing Barrier',
+        'Wreathe yourself in flame, absorbing 130 damage for 60 sec. (Fire)',
+      ],
+      [
+        'cold_snap',
+        "Winter's Recall",
+        'Finishes the cooldown on Flickerstep, Frostveil, and Greater Invisibility. (Mage talent)',
+      ],
+      [
+        'greater_invisibility',
+        'Greater Invisibility',
+        'Vanish for 20 sec: removes 2 damage-over-time effects and you take 90% less damage while invisible and shortly after. (Mage talent)',
+      ],
+      [
+        'hot_streak',
+        'Hot Streak',
+        'Passive: two critical strikes in a row with your Fire spells (Cinderbolt, Cinderfall, Scald, Pyrelance or Flamestrike) make your next Pyrelance or Flamestrike instant and free. The spenders count toward the NEXT streak, free casts included; a Flamestrike counts once however many enemies it strikes, and only the initial impact ever counts. (Fire)',
+      ],
+      [
+        'ice_floes',
+        'Ice Floes',
+        'Your next two spells with a cast time can be cast while moving. Lasts 15 sec. (Mage talent)',
+      ],
+      [
+        'ignition',
+        'Ignition',
+        'Passive: your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. (Fire mastery)',
+      ],
+      [
+        'mass_barrier',
+        'Mass Barrier',
+        'Shields you and up to 4 nearby allies within 30 yd, each absorbing 130 damage for 60 sec. (Mage talent)',
+      ],
+      [
+        'overload',
+        'Overload',
+        'Your next spell is amplified by 40% but costs 50% more mana. Lasts 10 sec. (Mage talent)',
+      ],
+      [
+        'power_echo',
+        'Power Echo',
+        'Your next direct spell repeats at 50% power on the same target. Lasts 10 sec. (Mage talent)',
+      ],
+      [
+        'rings_of_frost',
+        'Ring of Frost',
+        'Summons a ring for 10 sec. Enemies crossing its perimeter are frozen for 4 sec. (Mage talent)',
+      ],
+      [
+        'rune_of_power',
+        'Rune of Power',
+        'Inscribe a rune of power at your feet for 15 sec: allies standing within 8 yd deal 10% more damage. (Mage talent)',
+      ],
+      [
+        'summon_water_elemental',
+        'Summon Water Elemental',
+        'Summon a Water Elemental to fight beside you, hurling Waterbolts at your target and channeling Water Jet. (Frost)',
+      ],
+      [
+        'ice_lance',
+        'Ice Lance',
+        "Hurl a shard of ice, dealing {damage} Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)",
+      ],
+      [
+        'flurry',
+        'Winterlash',
+        "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant, 30% harder, and skips its cooldown. (Frost)",
+      ],
+      [
+        'frozen_orb',
+        'Frozen Orb',
+        'Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)',
+      ],
+      [
+        'blizzard',
+        'Blizzard',
+        'Calls an ice storm onto the target area for 6 sec, dealing {damage} Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)',
+      ],
+      [
+        'glacial_spike',
+        'Glacial Spike',
+        'Conjure a massive spike of ice, consuming 5 Icicles to deal {damage} Frost damage and freeze the target in place for 4 sec. (Frost)',
+      ],
+      [
+        'glacial_front',
+        'Glacial Front',
+        'Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)',
+      ],
+      [
+        'dragons_breath',
+        "Dragon's Breath",
+        'Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)',
+      ],
+      [
+        'fingers_of_frost',
+        'Fingers of Frost',
+        'Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)',
+      ],
+      [
+        'brain_freeze',
+        'Brain Freeze',
+        'Rimelance has a 20% chance to make your next Winterlash instant, 30% harder, and free of its cooldown. (Frost)',
+      ],
+      [
+        'shatter',
+        'Brittle Ruin',
+        "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)",
       ],
       [
         'conjure_water',
@@ -742,7 +853,7 @@ const classAbilityNamesEn = {
         'Aetherburst',
         'A burst of Arcane energy hits all nearby enemies for {damage} Arcane damage.',
       ],
-      ['scorch', 'Scald', 'Scorches the enemy for {damage} Fire damage. Quick to cast.'],
+      ['scorch', 'Scald', 'Scalds the enemy for {damage} Fire damage. Quick to cast.'],
       [
         'pyroblast',
         'Pyrelance',
@@ -758,7 +869,7 @@ const classAbilityNamesEn = {
       [
         'backstab',
         'Craven Thrust',
-        'Backstab the target for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.',
+        "Drive your dagger into the target's back for 150% weapon damage plus {damage}. Must be behind the target. Requires a dagger. Awards 1 combo point.",
       ],
       [
         'gouge',
@@ -780,7 +891,7 @@ const classAbilityNamesEn = {
       [
         'ambush',
         "Lurker's Strike",
-        'Ambush the target for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.',
+        'Strike from the shadows for 250% weapon damage plus {damage}. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.',
       ],
       [
         'stealth',
@@ -791,7 +902,7 @@ const classAbilityNamesEn = {
       [
         'garrote',
         'Throat Wire',
-        'Garrote the enemy, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.',
+        "Loop a wire around the enemy's throat, causing {damage} damage now and bleeding it for {overTime} over 18 sec. Must be stealthed. Awards 1 combo point.",
       ],
       [
         'cheap_shot',
@@ -821,7 +932,7 @@ const classAbilityNamesEn = {
       [
         'vanish',
         'Smokestep',
-        'Vanish from sight, entering Duskveil even in combat. You move 50% slower while hidden. Lasts up to 10 sec.',
+        'Melt from sight, entering Duskveil even in combat. You move 50% slower while hidden. Lasts up to 10 sec.',
       ],
       [
         'instant_poison',
@@ -836,7 +947,7 @@ const classAbilityNamesEn = {
       [
         'blind',
         'Dirt Toss',
-        'Blinds the target, causing it to wander disoriented for 8 sec. Any damage breaks the effect.',
+        "Tosses dirt into the target's eyes, causing it to wander disoriented for 8 sec. Any damage breaks the effect.",
       ],
       [
         'seal_of_righteousness',
@@ -873,7 +984,7 @@ const classAbilityNamesEn = {
       [
         'holy_taunt',
         'Sacred Goad',
-        'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
+        'Goads the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
       ],
       [
         'flash_of_light',
@@ -1100,7 +1211,7 @@ const classAbilityNamesEn = {
       [
         'growl',
         'Menace',
-        'Growls at the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec. Bruin Form only.',
+        'Menaces the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec. Bruin Form only.',
       ],
       [
         'cat_form',
@@ -1116,7 +1227,7 @@ const classAbilityNamesEn = {
       [
         'swipe',
         'Sweeping Claws',
-        'Swipe nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.',
+        'Sweep your claws through nearby enemies for {damage} damage. Causes extra threat. Bruin Form only.',
       ],
       [
         'regrowth',
@@ -1124,12 +1235,7 @@ const classAbilityNamesEn = {
         'Heals a friendly target for {damage} and an additional amount over 21 sec.',
       ],
       ['barkskin', 'Oakhide', 'Your skin hardens like bark, increasing armor by 150 for 15 sec.'],
-      // Tank defensive cooldowns (warrior / paladin / druid), one distinct mechanic each.
-      [
-        'ironhold',
-        'Ironhold',
-        'Brace behind your guard, reducing all damage taken by 40% for 8 sec.',
-      ],
+      // Tank defensive cooldowns (paladin / druid), one distinct mechanic each.
       [
         'sacred_bulwark',
         'Sacred Bulwark',
@@ -1216,7 +1322,7 @@ const classAbilityNamesEn = {
       [
         'chain_heal',
         'Chain Heal',
-        'Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)',
+        'Heals a friendly target for 120 to 145, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)',
       ],
       [
         'metamorphosis',
@@ -1229,9 +1335,14 @@ const classAbilityNamesEn = {
         'Shocks a friendly target with Holy energy to heal them, or an enemy for {damage} Holy damage. (Holy signature)',
       ],
       [
+        'aura_surge',
+        'Dawnward Ricochet',
+        'Hurl a dawnforged shield for {damage} Holy damage and silence the primary target for 2 sec. It bounces to up to 2 additional enemies within 10 yd for 75% damage per bounce. (Paladin talent)',
+      ],
+      [
         'holy_shield',
         'Hallowed Wall',
-        'Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)',
+        'Hurls a radiant aegis at an enemy for 90 to 110 Holy damage, then bounces to 2 nearby enemies for 60 to 75 Holy damage each. (Protection signature)',
       ],
       [
         'bestial_wrath',
@@ -1255,8 +1366,8 @@ const classAbilityNamesEn = {
       ],
       [
         'combustion',
-        'Flashfire',
-        'Increases spell critical chance by 50% for 15 sec. (Fire signature)',
+        'Phoenix Trance',
+        'Combust: for 10 sec your Fire spells always critically strike. These guaranteed crits do not build Hot Streak. (Fire signature)',
       ],
       [
         'icy_veins',
@@ -1306,7 +1417,7 @@ const classAbilityNamesEn = {
       [
         'conflagrate',
         'Conflagrate',
-        'Consumes your Immolate on the enemy to ignite them for {damage} Fire damage. (Destruction signature)',
+        'Consumes your Burning Pact on the enemy to ignite them for {damage} Fire damage. (Destruction signature)',
       ],
       [
         'moonkin_form',
@@ -1358,6 +1469,290 @@ const classAbilityNamesEn = {
         'Summon Wraithborn',
         'Binds a Wraithborn to your will — an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time.',
       ],
+      [
+        'battle_stance',
+        'Battle Stance',
+        'An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection.',
+      ],
+      [
+        'berserker_stance',
+        'Berserker Stance',
+        'A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance.',
+      ],
+      [
+        'sweeping_strikes',
+        'Widening Arc',
+        'For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)',
+      ],
+      [
+        'deep_wounds',
+        'Gaping Wounds',
+        'Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)',
+      ],
+      [
+        'enrage_passive',
+        'Mayhem',
+        'Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)',
+      ],
+      [
+        'raging_gale',
+        'Twinstrike',
+        'Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus {damage}, and generate 8 rage. Stores up to 2 charges. (Fury)',
+      ],
+      [
+        'red_harvest',
+        'Red Harvest',
+        'Spend everything: strike three times in a frenzy for 65% weapon damage plus {damage} each, always Enraging you. (Fury)',
+      ],
+      [
+        'furious_mending',
+        'Furious Mending',
+        'For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)',
+      ],
+      [
+        'emboldening_roar',
+        'Emboldening Roar',
+        'Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)',
+      ],
+      [
+        'raised_guard',
+        'Raised Guard',
+        'Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)',
+      ],
+      [
+        'iron_resolve',
+        'Iron Resolve',
+        'Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)',
+      ],
+      [
+        'faultline',
+        'Faultline',
+        'Send a shockwave through the ground: enemies in front of you within 8 yards take {damage} damage and are stunned for 3 sec. (Protection)',
+      ],
+      [
+        'defiant_bellow',
+        'Defiant Bellow',
+        'A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)',
+      ],
+      [
+        'breachmaker',
+        'Breachmaker',
+        'Batter the target for weapon damage plus {damage} and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)',
+      ],
+      [
+        'measured_fury',
+        'Measured Fury',
+        'Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)',
+      ],
+      [
+        'seasoned_soldier',
+        'Seasoned Soldier',
+        'Your critical auto-attacks generate 10% more rage. (Arms)',
+      ],
+      [
+        'diabolical_twinstrike',
+        'Diabolical Twinstrike',
+        'While Enraged, your Twinstrike deals 15% more damage. (Fury)',
+      ],
+      [
+        'cleaving_blows',
+        'Cleaving Blows',
+        'Red Harvest always refunds a charge of Twinstrike. (Fury)',
+      ],
+      [
+        'sudden_death',
+        'Sudden Death',
+        'Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)',
+      ],
+      [
+        'storm_bolt',
+        'Storm Bolt',
+        'Hurl your weapon at the target for {damage}, stunning it for 3 sec.',
+      ],
+      [
+        'piercing_howl',
+        'Piercing Howl',
+        'A piercing shout that slows all enemies within 15 yards by 50% for 8 sec.',
+      ],
+      [
+        'die_by_sword',
+        'Die by the Sword',
+        'Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks.',
+      ],
+      [
+        'recklessness',
+        'Recklessness',
+        'Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec.',
+      ],
+      [
+        'sanguine_aura',
+        'Sanguine Aura',
+        'Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec.',
+      ],
+      [
+        'victory_rush',
+        'Victory Rush',
+        'Strike for weapon damage plus {damage} and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy.',
+      ],
+      [
+        'intimidating_shout',
+        'Intimidating Shout',
+        'A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect.',
+      ],
+      [
+        'revenge',
+        'Revenge',
+        'Attack in a wide arc, dealing 18 to 24 Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)',
+      ],
+      [
+        'heroic_leap',
+        'Heroic Leap',
+        'Leap to the target area, dealing {damage} damage to nearby enemies on landing.',
+      ],
+      [
+        'rallying_cry',
+        'Valor Roar',
+        'Lets loose a valorous roar, granting you and party members within 40 yards 20% additional maximum health for 10 sec. Protection: they also take 5% less damage for the duration.',
+      ],
+      [
+        'aspect_of_the_wild',
+        'Wildfang Rally',
+        'Inspires allies within 30 yd with wild strength, increasing attack power by 45 and attack speed by 5% for 5 min. (Hunter talent)',
+      ],
+      [
+        'avatar',
+        'Avatar',
+        'Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%.',
+      ],
+      [
+        'avenging_wrath',
+        'Wrathwing',
+        'Calls down avenging power, increasing attack power by 60 and spell power by 30 for 20 sec. (Paladin talent)',
+      ],
+      ['berserk', 'Red Haze', 'Increases attack power by 70 for 15 sec. (Druid talent)'],
+      [
+        'bladestorm',
+        'Bladestorm',
+        'Become a whirling storm of steel, striking all enemies within 6 yards for {damage} every second for 4 sec.',
+      ],
+      ['blink', 'Flickerstep', 'Teleports you 15 yd forward and breaks roots. (Mage talent)'],
+      [
+        'bloodlust',
+        'Storm Chorus',
+        'Whips your group or raid into a frenzy, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Storm Chorus or Temporal Acceleration are too exhausted to benefit. (Shaman talent)',
+      ],
+      [
+        'chain_lightning',
+        'Skybranch',
+        'Hurls lightning at the target area, damaging nearby enemies for {damage}. (Shaman talent)',
+      ],
+      [
+        'chaos_bolt',
+        'Ruinbolt',
+        'Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)',
+      ],
+      [
+        'cleansing_verdict',
+        'Cleansing Verdict',
+        'Purges a harmful magic effect from a friendly target and heals them for {damage} Holy.',
+      ],
+      [
+        'cloak_of_shadows',
+        'Shadecloak',
+        'Wraps you in shadows, absorbing 420 damage for 5 sec. (Rogue talent)',
+      ],
+      [
+        'cone_of_cold',
+        'Frostsweep',
+        'Blasts nearby enemies with frost for {damage} Frost damage. (Mage talent)',
+      ],
+      [
+        'counterspell',
+        'Spellbreak',
+        'Counters enemy spellcasting, preventing any spell in that school from being cast for 6 sec. (Mage talent)',
+      ],
+      [
+        'curse_of_exhaustion',
+        'Leaden Hex',
+        'Curses the target, slowing movement by 30% for 12 sec. (Warlock talent)',
+      ],
+      [
+        'death_coil',
+        'Morrowlash',
+        'Strikes the enemy for {damage} Shadow damage, then horrifies them for 3 sec. (Warlock talent)',
+      ],
+      [
+        'deep_freeze',
+        'Deadfrost',
+        'Deep freezes the target, dealing {damage} Frost damage and stunning it for 4 sec. (Mage talent)',
+      ],
+      ['desperate_prayer', 'Last Prayer', 'Instantly heals you for {damage}. (Priest talent)'],
+      [
+        'deterrence',
+        'Bristleguard',
+        'Increases your dodge chance by 25 percentage points and reduces all damage taken by 30% for 10 sec. (Hunter talent)',
+      ],
+      [
+        'divine_shield',
+        'Lightward',
+        'Shields you with holy power, absorbing 900 damage for 8 sec. (Paladin talent)',
+      ],
+      [
+        'earthbind',
+        'Gripping Earth',
+        'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
+      ],
+      [
+        'evocation',
+        'Aetherwell',
+        'Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel. (Mage talent)',
+      ],
+      [
+        'frenzied_regeneration',
+        'Savage Mending',
+        'Restores 180 health over 10 sec. Bruin Form only. (Druid talent)',
+      ],
+      [
+        'frost_trap',
+        'Rime Snare',
+        'Places a frost trap at your feet that arms after 1.5 sec. The first enemy to touch it is frozen for 3 sec, unable to move or act. One trap at a time. Lasts 60 sec. (Hunter talent)',
+      ],
+      [
+        'ghostly_strike',
+        'Wraith Strike',
+        'Strikes the enemy for weapon damage plus {damage} and briefly increases dodge. Awards 1 combo point. (Rogue talent)',
+      ],
+      [
+        'hammer_of_wrath',
+        'Tolling Hammer',
+        'Hurls a holy hammer at a wounded enemy for {damage} Holy damage. Only usable below 20% health. (Paladin talent)',
+      ],
+      [
+        'healing_stream',
+        'Springwell',
+        'Restores 120 health to a friendly target over 12 sec. (Shaman talent)',
+      ],
+      [
+        'holy_wrath',
+        "Saint's Ire",
+        'Unleashes holy power, damaging nearby enemies for {damage}. (Paladin talent)',
+      ],
+      [
+        'howl_of_terror',
+        'Dread Chorus',
+        'Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)',
+      ],
+      [
+        'ice_block',
+        'Cold Coffin',
+        'Encases you in ice, absorbing a massive amount of damage for 8 sec. (Mage talent)',
+      ],
+      ['inner_focus', 'Stilled Mind', 'Makes your next spell free. Lasts 60 sec. (Priest talent)'],
+      [
+        'innervate',
+        'Lifesap',
+        'Living sap wells up in you for 10 sec, restoring 20 of your current resource in waves: mana, Rage, or Energy, and shifting forms does not break it. Sleep, stun, or stasis stills the sap. (Druid talent)',
+      ],
       // Baseline class interrupts.
       [
         'pummel',
@@ -1369,10 +1764,92 @@ const classAbilityNamesEn = {
         'Boot',
         "Interrupts the target's spellcast and prevents casting from that school for 4 sec.",
       ],
+      ['mend_pet', 'Patch Up', 'Heals a friendly target for {damage} over 15 sec. (Hunter talent)'],
       [
-        'counterspell',
-        'Spellbreak',
-        "Counters the target's spellcast and prevents casting from that school for 6 sec.",
+        'meteor',
+        'Skystone',
+        'Calls down a meteor at the target area, dealing {damage} Fire damage and burning the ground. (Mage talent)',
+      ],
+      [
+        'temporal_mend',
+        'Temporal Mend',
+        'Draws an ally a moment forward in time, mending {damage} health as the body settles into its healthier future self. (Chronomancy signature)',
+      ],
+      [
+        'temporal_barrier',
+        'Temporal Barrier',
+        'Shifts the target a heartbeat out of the present, a temporal shell absorbing {damage} damage for 10 sec before the timeline snaps back.',
+      ],
+      [
+        'temporal_echo',
+        'Temporal Echo',
+        'Marks an ally with an echo of a healthier moment, mending {damage} health at once. For {duration} sec, part of the Arcane damage you deal is drawn back through the echo to heal them.',
+      ],
+      [
+        'temporal_cascade',
+        'Temporal Cascade',
+        'Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for {duration} sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)',
+      ],
+      [
+        'temporal_reversal',
+        'Temporal Reversal',
+        "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)",
+      ],
+      [
+        'collective_reversal',
+        'Collective Reversal',
+        'Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)',
+      ],
+      [
+        'temporal_rewind',
+        'Rewind',
+        'Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)',
+      ],
+      [
+        'temporal_hourglass',
+        'Hourglass of Suspension',
+        'Place a temporal hourglass at the selected location. Beneath an enemy, it suspends them for {hostilePveDuration} sec in PvE or {hostilePvpDuration} sec in PvP and prevents all actions; damage breaks the effect. At your feet or beneath a group ally, it grants stasis for {duration} sec, prevents damage and actions, restores {healing}% of maximum health, and makes cooldowns recover {selfCooldownRecovery}% faster for you or {allyCooldownRecovery}% faster for an ally. On empty ground, the hourglass waits for {groundDuration} sec and affects the first valid unit to step on it. The beneficial aura can be removed manually.',
+      ],
+      [
+        'temporal_acceleration',
+        'Temporal Acceleration',
+        'Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Storm Chorus are too exhausted to benefit. (Chronomancy)',
+      ],
+      [
+        'perfect_moment',
+        'Perfect Moment',
+        'Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)',
+      ],
+      [
+        'arcane_surge',
+        'Aether Surge',
+        "Draws a surge of raw aether through the enemy for {damage} damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast.",
+      ],
+      [
+        'mind_sear',
+        'Thoughtburn',
+        'Channels shadow energy at the target area, damaging nearby enemies each second for {damage}. (Priest talent)',
+      ],
+      [
+        'multi_shot',
+        'Splitshot',
+        'Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)',
+      ],
+      ['prayer_of_healing', 'Choirmend', 'Heals nearby allies for {damage}. (Priest talent)'],
+      [
+        'preparation',
+        'Contingency',
+        'Finishes the cooldown on Swift Heels, Ghostfoot, and Smokestep. (Rogue talent)',
+      ],
+      [
+        'presence_of_mind',
+        'Racing Mind',
+        'Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)',
+      ],
+      [
+        'psychic_scream',
+        'Terror Canticle',
+        'Frightens nearby enemies for up to 4 sec. Damage may break the effect. (Priest talent)',
       ],
       [
         'counter_shot',
@@ -1385,6 +1862,27 @@ const classAbilityNamesEn = {
         "Interrupts the target's spellcast and prevents casting from that school for 4 sec.",
       ],
       [
+        'shadowstep',
+        'Shadeslip',
+        'Steps through the shadows toward your target without breaking Duskveil. (Rogue talent)',
+      ],
+      ['silence', 'Hushword', 'Silences the target for 4 sec. (Priest talent)'],
+      [
+        'smoke_screen',
+        'Smoke Screen',
+        'Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec.',
+      ],
+      [
+        'spellsteal',
+        'Spellsteal',
+        'Steals a beneficial magic effect from an enemy, transferring it to yourself.',
+      ],
+      [
+        'startle_shot',
+        'Startle Shot',
+        'A wild shot that disorients the target for {duration} sec. Any damage breaks the effect.',
+      ],
+      [
         'skull_bash',
         'Headbutt',
         "A lunging headbutt that interrupts the target's spellcast and locks that school for 4 sec.",
@@ -1393,6 +1891,21 @@ const classAbilityNamesEn = {
         'spell_lock',
         'Gag Order',
         'Silences the target mid-cast and prevents casting from that school for 5 sec.',
+      ],
+      [
+        'tranquility',
+        'Gladesong',
+        'Channels restorative energy for 4 sec, healing allies within 30 yd for 42 to 52 each second. (Druid talent)',
+      ],
+      [
+        'typhoon',
+        'Typhoon',
+        'A blast of wind knocks back all enemies within 8 yd and dazes them, slowing their movement by 50% for 4 sec.',
+      ],
+      [
+        'voidfeast',
+        'Voidfeast',
+        'Devours a magic effect (a beneficial one from an enemy, or a harmful one from an ally) and heals you for 6% of your maximum health. Only usable when there is an effect to devour.',
       ],
     ]),
   },
@@ -1414,7 +1927,6 @@ export const classAbilityNames = {
           'Un ataque poderoso que aumenta el daño cuerpo a cuerpo en {damage}. Se activa en tu siguiente golpe.',
         ],
         ['battle_shout', 'Grito de batalla', 'Aumenta tu poder de ataque en 20 durante 2 min.'],
-        ['commanding_shout', 'Grito de mando', 'Aumenta tu Aguante en 6 durante 2 min.'],
         [
           'demoralizing_shout',
           'Grito desmoralizador',
@@ -1424,11 +1936,6 @@ export const classAbilityNames = {
           'charge',
           'Cargar',
           'Carga contra un enemigo, genera 9 de ira y lo aturde durante 1 s. Alcance de 8-25 m.',
-        ],
-        [
-          'rend',
-          'Desgarrar',
-          'Hiere al objetivo y le hace sangrar por {damage} de daño durante 9 s.',
         ],
         [
           'thunder_clap',
@@ -1662,7 +2169,7 @@ export const classAbilityNames = {
         [
           'holy_taunt',
           'Sacred Goad',
-          'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
+          'Goads the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
         ],
         [
           'flash_of_light',
@@ -2054,7 +2561,12 @@ export const classAbilityNames = {
         [
           'combustion',
           'Combustión',
-          'Aumenta la probabilidad de golpe crítico con hechizos un 50% durante 15 s. (habilidad distintiva de Fuego)',
+          'Combustiona: durante 10 s tus hechizos de Fuego siempre golpean de crítico. Estos críticos garantizados no generan Buena Racha. (habilidad distintiva de Fuego)',
+        ],
+        [
+          'icy_veins',
+          'Venas heladas',
+          'Aumenta la celeridad con hechizos un 30% e impide interrupciones y retroceso de lanzamiento durante 10 s. (habilidad distintiva de Escarcha)',
         ],
         [
           'icy_veins',
@@ -2158,7 +2670,6 @@ export const classAbilityNames = {
           'Cri de guerre',
           "Augmente votre puissance d'attaque de 20 pendant 2 min.",
         ],
-        ['commanding_shout', 'Cri de commandement', 'Augmente votre Endurance de 6 pendant 2 min.'],
         [
           'demoralizing_shout',
           'Cri démoralisant',
@@ -2168,11 +2679,6 @@ export const classAbilityNames = {
           'charge',
           'Charge',
           "Charge un ennemi, génère 9 rage et l'étourdit pendant 1 s. Portée de 8-25 m.",
-        ],
-        [
-          'rend',
-          'Pourfendre',
-          'Blesse la cible et la fait saigner pour {damage} points de dégâts en 9 s.',
         ],
         [
           'thunder_clap',
@@ -2460,7 +2966,7 @@ export const classAbilityNames = {
         [
           'holy_taunt',
           'Sacred Goad',
-          'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
+          'Goads the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
         ],
         [
           'flash_of_light',
@@ -2856,6 +3362,11 @@ export const classAbilityNames = {
           'Augmente la hâte des sorts de 30% et empêche l’interruption et le recul des incantations pendant 10 s. (signature Givre)',
         ],
         [
+          'icy_veins',
+          'Veines glaciales',
+          'Augmente la hâte des sorts de 30% et empêche l’interruption et le recul des incantations pendant 10 s. (signature Givre)',
+        ],
+        [
           'cold_blood',
           'Sang froid',
           'Concentre votre intention meurtrière afin que votre prochaine attaque soit un coup critique. (signature Assassinat)',
@@ -2949,7 +3460,6 @@ export const classAbilityNames = {
           'Un attacco potente che aumenta i danni in mischia di {damage}. Si attiva al tuo prossimo colpo.',
         ],
         ['battle_shout', 'Urlo di Battaglia', "Aumenta la tua potenza d'attacco di 20 per 2 min."],
-        ['commanding_shout', 'Urlo di Comando', 'Aumenta la tua Resistenza di 6 per 2 min.'],
         [
           'demoralizing_shout',
           'Urlo Demoralizzante',
@@ -2960,7 +3470,6 @@ export const classAbilityNames = {
           'Carica',
           'Carica un nemico, genera 9 rabbia e lo stordisce per 1 s. Portata 8-25 m.',
         ],
-        ['rend', 'Squarcio', 'Ferisce il bersaglio e lo fa sanguinare per {damage} danni in 9 s.'],
         [
           'thunder_clap',
           'Boato Tonante',
@@ -3185,7 +3694,7 @@ export const classAbilityNames = {
         [
           'holy_taunt',
           'Sacred Goad',
-          'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
+          'Goads the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
         ],
         [
           'flash_of_light',
@@ -3573,6 +4082,11 @@ export const classAbilityNames = {
           'Aumenta la celerità magica del 30% e impedisce l’interruzione e il contraccolpo dei lanci per 10 s. (firma Gelo)',
         ],
         [
+          'icy_veins',
+          'Vene Gelide',
+          'Aumenta la celerità magica del 30% e impedisce l’interruzione e il contraccolpo dei lanci per 10 s. (firma Gelo)',
+        ],
+        [
           'cold_blood',
           'Sangue Freddo',
           'Concentra il tuo intento omicida, così il tuo prossimo attacco è un colpo critico. (firma Assassinio)',
@@ -3664,7 +4178,6 @@ export const classAbilityNames = {
           'Ein mächtiger Angriff, der den Nahkampfschaden um {damage} erhöht. Wird bei eurem nächsten Schwung ausgelöst.',
         ],
         ['battle_shout', 'Schlachtruf', 'Erhöht eure Angriffskraft 2 Min. lang um 20.'],
-        ['commanding_shout', 'Befehlsruf', 'Erhöht eure Ausdauer 2 Min. lang um 6.'],
         [
           'demoralizing_shout',
           'Demoralisierender Ruf',
@@ -3674,11 +4187,6 @@ export const classAbilityNames = {
           'charge',
           'Sturmangriff',
           'Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn 1 Sek. lang. Reichweite 8-25 m.',
-        ],
-        [
-          'rend',
-          'Verwunden',
-          'Verwundet das Ziel und lässt es über 9 Sek. für {damage} Schaden bluten.',
         ],
         [
           'thunder_clap',
@@ -3908,7 +4416,7 @@ export const classAbilityNames = {
         [
           'holy_taunt',
           'Sacred Goad',
-          'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
+          'Goads the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
         ],
         [
           'flash_of_light',
@@ -4296,6 +4804,11 @@ export const classAbilityNames = {
           'Erhöht das Zaubertempo 10 Sek. lang um 30% und verhindert Unterbrechung sowie Zauberzeitverlust. (Frost-Signatur)',
         ],
         [
+          'icy_veins',
+          'Eisige Adern',
+          'Erhöht das Zaubertempo 10 Sek. lang um 30% und verhindert Unterbrechung sowie Zauberzeitverlust. (Frost-Signatur)',
+        ],
+        [
           'cold_blood',
           'Kaltblütigkeit',
           'Bündelt Eure Mordlust, sodass Euer nächster Angriff ein kritischer Treffer ist. (Meucheln-Signatur)',
@@ -4387,14 +4900,12 @@ export const classAbilityNames = {
           '一次强力攻击，使近战伤害提高 {damage}。在你的下一次挥击时触发。',
         ],
         ['battle_shout', '战斗怒吼', '使你的攻击强度提高 20，持续 2 分钟。'],
-        ['commanding_shout', '命令怒吼', '使你的耐力提高 6，持续 2 分钟。'],
         [
           'demoralizing_shout',
           '挫志怒吼',
           '发出可怕的怒吼，使附近所有敌人的攻击强度降低 30，持续 30 秒。',
         ],
         ['charge', '冲锋', '向一名敌人冲锋，产生 9 点怒气并使其昏迷 1 秒。8-25 码距离。'],
-        ['rend', '撕裂', '撕裂目标，使其在 9 秒内流血并受到 {damage} 点伤害。'],
         [
           'thunder_clap',
           '雷霆一击',
@@ -4421,6 +4932,12 @@ export const classAbilityNames = {
           '撕裂目标的护甲，每次使其降低 {damage}。最多叠加 5 次。产生大量威胁值。',
         ],
         ['taunt', '嘲讽', '嘲讽目标：你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。'],
+        ['avatar', '巨像化身', '解除控制效果并化为巨像，使造成的伤害提高 20%，持续 20 秒。'],
+        ['bladestorm', '钢铁旋风', '化为钢铁旋风，每秒攻击附近敌人，造成 {damage} 点伤害。'],
+        ['razor_howl', '锐刃怒吼', '使 15 码内的敌人减速 50%，持续 8 秒。'],
+        ['stormthrow', '风暴投掷', '投掷武器，使目标昏迷 3 秒。'],
+        ['reckless_vow', '鲁莽誓言', '所有怒气生成提高 50%，暴击几率提高 20%，持续 12 秒。'],
+        ['red_banner', '赤红战旗', '你和附近盟友的攻击速度提高 10%，伤害提高 10%，持续 20 秒。'],
         ['fireball', '火球术', '投掷一团火球，造成 {damage} 点火焰伤害，并附加持续伤害。'],
         ['frost_armor', '霜甲术', '以寒霜包裹自身，使护甲提高 30，持续 30 分钟。'],
         ['arcane_intellect', '奥术智慧', '使智力提高 2，持续 30 分钟。'],
@@ -4718,6 +5235,7 @@ export const classAbilityNames = {
           '冰冷血脉',
           '法术急速提高30%，并防止施法被打断或受到退条，持续10秒。（冰霜专精招牌）',
         ],
+        ['cone_of_cold', '冰锥术', '以寒冰冲击附近敌人，造成{damage}点冰霜伤害。（冰霜专精招牌）'],
         ['cold_blood', '冷血', '集中你的杀意，使下一次攻击造成暴击。（刺杀专精招牌）'],
         ['blade_flurry', '剑刃乱舞', '释放剑刃乱舞，攻击速度提高20%，持续12秒。（战斗专精招牌）'],
         [
@@ -4767,6 +5285,11 @@ export const classAbilityNames = {
           '吞噬友方目标身上的持续治疗效果，为其恢复{damage}点生命值。（恢复专精招牌）',
         ],
         [
+          'pummel',
+          '拳击',
+          '打断施法，并使该系法术在 4 秒内无法施放。成功打断施法时产生 10 点怒气。',
+        ],
+        [
           'summon_imp',
           '召唤小鬼',
           '召唤一只听从术士命令的小鬼。小鬼会从远处向你的敌人投掷火焰箭。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。',
@@ -4798,14 +5321,12 @@ export const classAbilityNames = {
           '一次強力攻擊，使近戰傷害提高 {damage}。在你的下一次揮擊時觸發。',
         ],
         ['battle_shout', '戰鬥怒吼', '使你的攻擊強度提高 20，持續 2 分鐘。'],
-        ['commanding_shout', '命令怒吼', '使你的耐力提高 6，持續 2 分鐘。'],
         [
           'demoralizing_shout',
           '挫志怒吼',
           '發出可怕的怒吼，使附近所有敵人的攻擊強度降低 30，持續 30 秒。',
         ],
         ['charge', '衝鋒', '向一名敵人衝鋒，產生 9 點怒氣並使其昏迷 1 秒。8-25 碼距離。'],
-        ['rend', '撕裂', '撕裂目標，使其在 9 秒內流血並受到 {damage} 點傷害。'],
         [
           'thunder_clap',
           '雷霆一擊',
@@ -4832,6 +5353,12 @@ export const classAbilityNames = {
           '撕裂目標的護甲，每次使其降低 {damage}。最多疊加 5 次。產生大量威脅值。',
         ],
         ['taunt', '嘲諷', '嘲諷目標：你的威脅值提高到其最仇恨敵人的水平，並強迫其攻擊你 3 秒。'],
+        ['avatar', '巨像化身', '解除控制效果並化為巨像，使造成的傷害提高 20%，持續 20 秒。'],
+        ['bladestorm', '鋼鐵旋風', '化為鋼鐵旋風，每秒攻擊附近敵人，造成 {damage} 點傷害。'],
+        ['razor_howl', '銳刃怒吼', '使 15 碼內的敵人減速 50%，持續 8 秒。'],
+        ['stormthrow', '風暴投擲', '投擲武器，使目標昏迷 3 秒。'],
+        ['reckless_vow', '魯莽誓言', '所有怒氣生成提高 50%，暴擊機率提高 20%，持續 12 秒。'],
+        ['red_banner', '赤紅戰旗', '你和附近盟友的攻擊速度提高 10%，傷害提高 10%，持續 20 秒。'],
         ['fireball', '火球術', '投擲一團火球，造成 {damage} 點火焰傷害，並附加持續傷害。'],
         ['frost_armor', '霜甲術', '以寒霜包裹自身，使護甲提高 30，持續 30 分鐘。'],
         ['arcane_intellect', '秘法智慧', '使智力提高 2，持續 30 分鐘。'],
@@ -5129,6 +5656,7 @@ export const classAbilityNames = {
           '冰冷血脈',
           '法術加速提高30%，並防止施法被打斷或受到延遲，持續10秒。（冰霜專精招牌）',
         ],
+        ['cone_of_cold', '冰錐術', '以寒冰衝擊附近敵人，造成{damage}點冰霜傷害。（冰霜專精招牌）'],
         ['cold_blood', '冷血', '集中你的殺意，使下一次攻擊造成致命一擊。（刺殺專精招牌）'],
         ['blade_flurry', '劍刃亂舞', '釋放劍刃亂舞，攻擊速度提高20%，持續12秒。（戰鬥專精招牌）'],
         [
@@ -5178,6 +5706,11 @@ export const classAbilityNames = {
           '吞噬友方目標身上的持續治療效果，為其恢復{damage}點生命值。（恢復專精招牌）',
         ],
         [
+          'pummel',
+          '拳擊',
+          '打斷施法，並使該系法術在 4 秒內無法施放。成功打斷施法時產生 10 點怒氣。',
+        ],
+        [
           'summon_imp',
           '召喚小鬼',
           '召喚一隻聽從術士命令的小鬼。小鬼會從遠處向你的敵人投擲火焰箭。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。',
@@ -5209,7 +5742,6 @@ export const classAbilityNames = {
           '강력한 공격으로 근접 피해가 {damage}만큼 증가합니다. 다음 무기 공격 시 발동됩니다.',
         ],
         ['battle_shout', '전투의 외침', '2분 동안 전투력이 20만큼 증가합니다.'],
-        ['commanding_shout', '지휘의 외침', '2분 동안 체력이 6만큼 증가합니다.'],
         [
           'demoralizing_shout',
           '사기의 외침',
@@ -5220,7 +5752,6 @@ export const classAbilityNames = {
           '돌진',
           '적에게 돌진하여 분노 9를 생성하고 1초 동안 기절시킵니다. 사거리 8-25yd.',
         ],
-        ['rend', '분쇄', '대상을 상처 입혀 9초에 걸쳐 {damage}의 출혈 피해를 입힙니다.'],
         [
           'thunder_clap',
           '천둥벼락',
@@ -5258,6 +5789,28 @@ export const classAbilityNames = {
           'taunt',
           '도발',
           '대상을 도발합니다. 자신의 위협 수준이 대상이 가장 증오하는 적과 같아지며, 3초 동안 자신을 공격하게 만듭니다.',
+        ],
+        [
+          'avatar',
+          '거상화',
+          '제어 효과를 해제하고 거상이 되어 20초 동안 주는 피해가 20% 증가합니다.',
+        ],
+        [
+          'bladestorm',
+          '강철 회오리',
+          '강철 회오리가 되어 매초 주위 적을 공격해 {damage}의 피해를 입힙니다.',
+        ],
+        ['razor_howl', '칼날 포효', '15미터 안의 적을 8초 동안 50% 느려지게 합니다.'],
+        ['stormthrow', '폭풍 투척', '무기를 던져 대상을 3초 동안 기절시킵니다.'],
+        [
+          'reckless_vow',
+          '무모한 맹세',
+          '12초 동안 모든 분노 생성이 50%, 치명타 확률이 20% 증가합니다.',
+        ],
+        [
+          'red_banner',
+          '붉은 깃발',
+          '20초 동안 자신과 주위 아군의 공격 속도와 피해가 각각 10% 증가합니다.',
         ],
         ['fireball', '화염구', '불덩이를 날려 {damage}의 화염 피해와 추가 지속 피해를 입힙니다.'],
         ['frost_armor', '냉기 갑옷', '자신을 냉기로 감싸 30분 동안 방어도를 30만큼 증가시킵니다.'],
@@ -5728,6 +6281,11 @@ export const classAbilityNames = {
         ],
         ['combustion', '발화', '15초 동안 주문 치명타율이 50% 증가합니다. (화염 전문화 상징)'],
         [
+          'cone_of_cold',
+          '냉기 돌풍',
+          '주위 적에게 냉기를 내뿜어 {damage}의 냉기 피해를 줍니다. (냉기 전문화 상징)',
+        ],
+        [
           'icy_veins',
           '얼음 핏줄',
           '10초 동안 주문 가속이 30% 증가하고 시전 방해와 밀림을 막습니다. (냉기 전문화 상징)',
@@ -5793,6 +6351,11 @@ export const classAbilityNames = {
           '아군 대상의 지속 치유 효과를 소모하여 생명력을 {damage}만큼 회복시킵니다. (복원 전문화 상징)',
         ],
         [
+          'pummel',
+          '자루 공격',
+          '시전을 방해하고 해당 계열 주문을 4초 동안 시전할 수 없게 합니다. 시전을 끊으면 분노 10을 생성합니다.',
+        ],
+        [
           'summon_imp',
           '임프 소환',
           '흑마법사의 명령을 따르는 임프를 소환합니다. 임프는 멀리서 적에게 화염 화살을 날립니다. 새로운 악마를 소환하면 현재 악마는 사라집니다. 한 번에 하나의 악마만 부릴 수 있습니다.',
@@ -5824,14 +6387,12 @@ export const classAbilityNames = {
           '強力な攻撃で近接ダメージが {damage} 増加します。次のスイングで発動します。',
         ],
         ['battle_shout', 'バトルシャウト', '2分間、攻撃力が20増加します。'],
-        ['commanding_shout', 'コマンディングシャウト', '2分間、スタミナが6増加します。'],
         [
           'demoralizing_shout',
           'デモラライジングシャウト',
           '恐ろしい雄叫びを上げ、30秒間、周囲の敵すべての攻撃力を30減少させます。',
         ],
         ['charge', 'チャージ', '敵に突撃し、怒りを9生成して1秒間スタンさせます。射程8-25yd。'],
-        ['rend', 'レンド', '対象を負傷させ、9秒間で {damage} の出血ダメージを与えます。'],
         [
           'thunder_clap',
           'サンダークラップ',
@@ -5873,6 +6434,24 @@ export const classAbilityNames = {
           'taunt',
           '挑発',
           '対象を挑発します。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。',
+        ],
+        [
+          'avatar',
+          '巨像化',
+          '操作不能効果を解除して巨像となり、20秒間、与えるダメージが20%増加します。',
+        ],
+        [
+          'bladestorm',
+          '鋼の旋風',
+          '鋼の旋風となり、毎秒周囲の敵を攻撃して {damage} のダメージを与えます。',
+        ],
+        ['razor_howl', '刃の咆哮', '15メートル以内の敵を8秒間50%遅くします。'],
+        ['stormthrow', '嵐投げ', '武器を投げ、対象を3秒間スタンさせます。'],
+        ['reckless_vow', '無謀の誓い', '12秒間、怒り生成が50%、クリティカル率が20%増加します。'],
+        [
+          'red_banner',
+          '赤旗',
+          '20秒間、自分と周囲の味方の攻撃速度とダメージがそれぞれ10%増加します。',
         ],
         [
           'fireball',
@@ -6388,6 +6967,11 @@ export const classAbilityNames = {
           '10秒間、呪文ヘイストが30%上がり、詠唱の中断と遅延を防ぎます。（フロスト特性のシグネチャ）',
         ],
         [
+          'icy_veins',
+          'アイシーヴェインズ',
+          '10秒間、呪文ヘイストが30%上がり、詠唱の中断と遅延を防ぎます。（フロスト特性のシグネチャ）',
+        ],
+        [
           'cold_blood',
           'コールドブラッド',
           '殺意を集中し、次の攻撃をクリティカルにします。（アサシネーション特性のシグネチャ）',
@@ -6448,6 +7032,11 @@ export const classAbilityNames = {
           '味方にかかった継続回復効果を消費し、体力を{damage}回復します。（レストレーション特性のシグネチャ）',
         ],
         [
+          'pummel',
+          'パンメル',
+          '詠唱を妨害し、その系統の呪文を4秒間詠唱不能にします。詠唱を止めると怒りを10生成します。',
+        ],
+        [
           'summon_imp',
           'インプの召喚',
           'ウォーロックの命令に従うインプを召喚します。インプは遠くから敵にファイアボルトを放ちます。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。',
@@ -6479,7 +7068,6 @@ export const classAbilityNames = {
           'Um ataque forte que aumenta o dano corpo a corpo em {damage}. Ativa no seu próximo golpe.',
         ],
         ['battle_shout', 'Grito de Batalha', 'Aumenta seu poder de ataque em 20 por 2 min.'],
-        ['commanding_shout', 'Grito de Comando', 'Aumenta sua Vitalidade em 6 por 2 min.'],
         [
           'demoralizing_shout',
           'Grito Desmoralizante',
@@ -6490,7 +7078,6 @@ export const classAbilityNames = {
           'Investida',
           'Investe contra um inimigo, gera 9 de raiva e o atordoa por 1 s. Alcance de 8-25 m.',
         ],
-        ['rend', 'Rasgar', 'Fere o alvo, fazendo-o sangrar por {damage} de dano ao longo de 9 s.'],
         [
           'thunder_clap',
           'Trovoada',
@@ -6719,7 +7306,7 @@ export const classAbilityNames = {
         [
           'holy_taunt',
           'Sacred Goad',
-          'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
+          'Goads the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
         ],
         [
           'flash_of_light',
@@ -7087,6 +7674,11 @@ export const classAbilityNames = {
           'Aumenta a aceleração de feitiços em 30% e impede interrupção e recuo de conjuração por 10 s. (assinatura Gelo)',
         ],
         [
+          'icy_veins',
+          'Veias Gélidas',
+          'Aumenta a aceleração de feitiços em 30% e impede interrupção e recuo de conjuração por 10 s. (assinatura Gelo)',
+        ],
+        [
           'cold_blood',
           'Sangue Frio',
           'Concentra sua intenção assassina para que seu próximo ataque seja um acerto crítico. (assinatura Assassinato)',
@@ -7178,7 +7770,6 @@ export const classAbilityNames = {
           'Мощная атака, увеличивающая урон в ближнем бою на {damage}. Срабатывает при следующем взмахе оружием.',
         ],
         ['battle_shout', 'Боевой крик', 'Повышает вашу силу атаки на 20 на 2 мин.'],
-        ['commanding_shout', 'Командный крик', 'Повышает вашу выносливость на 6 на 2 мин.'],
         [
           'demoralizing_shout',
           'Деморализующий крик',
@@ -7188,11 +7779,6 @@ export const classAbilityNames = {
           'charge',
           'Рывок',
           'Вы бросаетесь к врагу, накапливаете 9 ярости и оглушаете его на 1 сек. Дальность 8-25 м.',
-        ],
-        [
-          'rend',
-          'Кровопускание',
-          'Ранит цель, вызывая кровотечение на {damage} ед. урона за 9 сек.',
         ],
         [
           'thunder_clap',
@@ -7235,6 +7821,28 @@ export const classAbilityNames = {
           'taunt',
           'Провокация',
           'Провоцирует цель: ваша угроза повышается до уровня самого ненавистного ей врага, и она вынуждена атаковать вас 3 сек.',
+        ],
+        [
+          'avatar',
+          'Облик колосса',
+          'Снимает эффекты контроля и превращает вас в колосса, повышая наносимый урон на 20% на 20 сек.',
+        ],
+        [
+          'bladestorm',
+          'Стальной вихрь',
+          'Вы становитесь стальным вихрем и каждую секунду поражаете ближайших врагов на {damage} ед. урона.',
+        ],
+        ['razor_howl', 'Бритвенный рев', 'Замедляет врагов в радиусе 15 м на 50% на 8 сек.'],
+        ['stormthrow', 'Штормовой бросок', 'Бросает оружие и оглушает цель на 3 сек.'],
+        [
+          'reckless_vow',
+          'Безрассудная клятва',
+          'Повышает весь прирост ярости на 50%, а шанс критического удара на 20% на 12 сек.',
+        ],
+        [
+          'red_banner',
+          'Красное знамя',
+          'Вы и ближайшие союзники получаете на 10% больше скорости атаки и урона на 20 сек.',
         ],
         [
           'fireball',
@@ -7810,6 +8418,11 @@ export const classAbilityNames = {
           'Повышает скорость заклинаний на 30% и предотвращает прерывание и задержку произнесения на 10 сек. (знаковое умение Льда)',
         ],
         [
+          'icy_veins',
+          'Ледяные жилы',
+          'Повышает скорость заклинаний на 30% и предотвращает прерывание и задержку произнесения на 10 сек. (знаковое умение Льда)',
+        ],
+        [
           'cold_blood',
           'Хладнокровие',
           'Сосредоточивает убийственное намерение, чтобы следующая атака стала критической. (знаковое умение Ликвидации)',
@@ -7868,6 +8481,11 @@ export const classAbilityNames = {
           'swiftmend',
           'Быстрое восстановление',
           'Поглощает эффект периодического исцеления на дружественной цели и исцеляет ее на {damage}. (знаковое умение Исцеления)',
+        ],
+        [
+          'pummel',
+          'Зуботычина',
+          'Прерывает произнесение заклинания и блокирует эту школу магии на 4 сек. Дает 10 ед. ярости, если заклинание было прервано.',
         ],
         [
           'summon_imp',

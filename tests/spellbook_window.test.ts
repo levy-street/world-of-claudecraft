@@ -38,6 +38,10 @@ describe('spellbook_window: WCAG chrome (rows + toggles + focus-return)', () => 
     expect(code).toContain('this.deps.addToBar(id)');
   });
 
+  it('keeps passive spellbook rows informational, without add or drag affordances', () => {
+    expect(code).toContain('known && isAbilityActionBarEligible(def)');
+  });
+
   it('keeps the reset-bar button gated on the form-bars flag', () => {
     expect(code).toContain('const resetBtnHtml = view.hasFormBars');
     expect(code).toContain('data-reset-bar');
@@ -59,6 +63,32 @@ describe('spellbook_window: WCAG chrome (rows + toggles + focus-return)', () => 
   });
 });
 
+describe('spellbook_window: the pinned Attack row', () => {
+  it('renders the Attack row first, from the pure view attackOnBar state', () => {
+    expect(code).toContain('this.appendAttackRow(list, view.attackOnBar)');
+    expect(code.indexOf('this.appendAttackRow(list')).toBeLessThan(
+      code.indexOf('for (const row of view.rows) this.appendRow(list, row)'),
+    );
+    expect(code).toContain('attackOnBar: this.deps.attackOnBar()');
+  });
+
+  it('reuses the existing Attack name/tooltip keys (no new player strings)', () => {
+    expect(code).toContain("t('abilityUi.actionBar.attackName')");
+    expect(code).toContain("t('abilityUi.actionBar.attackTooltip')");
+    expect(code).toContain("iconDataUrl('ability', 'attack')");
+  });
+
+  it('routes the toggle through setAttackOnBar with aria-pressed state', () => {
+    expect(code).toContain('this.deps.setAttackOnBar(!this.deps.attackOnBar())');
+    expect(code).toContain("toggle.dataset.attackToggle = '1'");
+  });
+
+  it('keeps the per-frame refresh syncing the Attack toggle (options can flip it)', () => {
+    expect(code).toContain("querySelector<HTMLButtonElement>('[data-attack-toggle]')");
+    expect(code).toContain("attackBtn.setAttribute('aria-pressed'");
+  });
+});
+
 describe('spellbook_window: mobile action-ring page label (Phase 4, touch-only)', () => {
   it('feeds abilityIdByBarSlot through to the pure view core', () => {
     expect(code).toContain('abilityIdByBarSlot: this.deps.abilityIdByBarSlot()');
@@ -71,6 +101,10 @@ describe('spellbook_window: mobile action-ring page label (Phase 4, touch-only)'
 
   it('renders the label through t() with the localized page-label key', () => {
     expect(code).toContain("t('hudChrome.mobile.spellbookPageLabel'");
+  });
+
+  it('converts the zero-indexed view page to a one-indexed user-facing label', () => {
+    expect(code).toContain('page: this.formatAbilityNumber(row.mobilePage + 1)');
   });
 });
 

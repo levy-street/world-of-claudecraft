@@ -150,6 +150,13 @@ export class NameplatePainter {
         v.nameplate.style.display = '';
         v.nameplateDisplay = '';
       }
+      const isCurrentTarget = id === p.targetId;
+      const deadEnemy = e.dead && (e.hostile || (e.kind === 'player' && this.isHostilePlayer(e)));
+      v.nameplate.classList.toggle('np-current-target', isCurrentTarget);
+      v.nameplate.classList.toggle('np-hostile', e.hostile);
+      v.nameplate.classList.toggle('np-dead-enemy', deadEnemy);
+      v.nameplate.classList.toggle('np-my-pet', e.ownerId === p.id);
+      v.nameplate.classList.toggle('np-aggroed-on-me', e.aggroTargetId === p.id);
       if (!fullPass && !plan.urgent) continue;
       const isSelf = id === p.id;
       v.nameplate.classList.toggle('has-emote', plan.hasOverheadEmote);
@@ -193,6 +200,7 @@ export class NameplatePainter {
           'np-marker',
           '1',
         );
+        this.setNameplateLevel(v, '', '');
       } else if (e.kind === 'player') {
         // Players: friendly blue with an hp bar; <Guild> tag under the name. Your
         // OWN plate is normally suppressed (suppressSelf), but with the "Show My
@@ -220,9 +228,9 @@ export class NameplatePainter {
         const isAi = !suppressSelf && e.aiAccount === true;
         this.setNameplateStatic(
           v,
-          `player|${displayName}|${roleColor ?? ''}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}|${devOutline ?? ''}|${isAi ? 1 : 0}`,
+          `player|${displayName}|${roleColor ?? ''}|${guild}|${nameDisplay}|${hpDisplay}|${opacity}|${devOutline ?? ''}|${isAi ? 1 : 0}|${deadEnemy ? 1 : 0}`,
           displayName,
-          roleColor ?? '#7fb8ff',
+          deadEnemy ? null : (roleColor ?? '#7fb8ff'),
           hpDisplay,
           '',
           'np-marker',
@@ -242,6 +250,7 @@ export class NameplatePainter {
         // Book of Deeds title subtitle (the `title` wire field, a deed id).
         this.setNameplateTitle(v, suppressSelf ? undefined : e.title);
         this.setNameplateHp(v, e);
+        this.setNameplateLevel(v, '', '');
       } else if (e.kind === 'npc' || (!e.hostile && e.questIds.length > 0)) {
         const npcName =
           e.kind === 'npc'
@@ -279,6 +288,8 @@ export class NameplatePainter {
           markerClass,
           '1',
         );
+        this.setNameplateLevel(v, '', '');
+        v.nameplate.classList.remove('np-friendly-pet');
       } else {
         const diff = e.level - p.level;
         const template = MOBS[e.templateId];
@@ -288,13 +299,14 @@ export class NameplatePainter {
         // classic level-difference ("con") color.
         const friendlyPet = isFriendlyPet(e, world.entities, this.isHostilePlayer);
         const color = mobNameColor(diff, e.dead, friendlyPet);
+        v.nameplate.classList.toggle('np-friendly-pet', friendlyPet);
         const mobName = e.ownerId !== null ? e.name : mobDisplayName(e.templateId);
-        const name = e.dead
-          ? t('worldContent.corpseName', { name: mobName })
-          : t(elite ? 'hudChrome.nameplate.mobElite' : 'hudChrome.nameplate.mob', {
+        const levelText = e.dead
+          ? ''
+          : t(elite ? 'hudChrome.nameplate.mobEliteLevel' : 'hudChrome.nameplate.mobLevel', {
               level: formatNumber(e.level, { maximumFractionDigits: 0 }),
-              name: mobName,
             });
+        const displayName = e.dead ? t('worldContent.corpseName', { name: mobName }) : mobName;
         const hpDisplay = e.dead ? 'none' : '';
         // Quest-target marking lives in the mob's hover tooltip (Questie-style
         // quest + progress lines), not as an overhead glyph: the marker slot
@@ -304,15 +316,16 @@ export class NameplatePainter {
         const frame = e.dead ? '' : boss ? 'boss' : elite ? 'elite' : '';
         this.setNameplateStatic(
           v,
-          `mob|${name}|${color}|${hpDisplay}|${marker}|${frame}`,
-          name,
-          color,
+          `mob|${displayName}|${levelText}|${color}|${hpDisplay}|${marker}|${frame}`,
+          displayName,
+          deadEnemy ? null : '#fff',
           hpDisplay,
           marker,
           'np-marker loot',
           '1',
           frame,
         );
+        this.setNameplateLevel(v, levelText, color);
         this.setNameplateHp(v, e);
         // threat plate: tint the bar red when this mob is aggroed on me
         v.nameplate.classList.toggle('np-threat', plan.threat);
@@ -344,13 +357,19 @@ export class NameplatePainter {
       v.nameplate.style.display = 'none';
       v.nameplateDisplay = 'none';
     }
+    v.nameplate.classList.remove('np-current-target');
+    v.nameplate.classList.remove('np-hostile');
+    v.nameplate.classList.remove('np-dead-enemy');
+    v.nameplate.classList.remove('np-my-pet');
+    v.nameplate.classList.remove('np-aggroed-on-me');
+    v.nameplate.classList.remove('np-friendly-pet');
   }
 
   private setNameplateStatic(
     v: EntityView,
     sig: string,
     name: string,
-    color: string,
+    color: string | null,
     hpDisplay: string,
     marker: string,
     markerClass: string,
@@ -363,7 +382,11 @@ export class NameplatePainter {
     if (sig === v.nameplateSig) return;
     v.nameplateSig = sig;
     v.nameEl.textContent = name;
-    v.nameEl.style.color = color;
+    if (color === null) {
+      v.nameEl.style.removeProperty('color');
+    } else {
+      v.nameEl.style.color = color;
+    }
     v.hpBar.style.display = hpDisplay;
     v.hpBar.classList.toggle('elite', frame === 'elite');
     v.hpBar.classList.toggle('boss', frame === 'boss');
@@ -473,6 +496,22 @@ export class NameplatePainter {
     if (width === v.nameplateHpWidth) return;
     v.nameplateHpWidth = width;
     v.hpFill.style.width = width;
+  }
+
+  // Show/hide the mob level badge (e.g. "[5]" / "[5+]") in its own element.
+  // levelText='' hides the element (used for players, NPCs, objects, and dead mobs).
+  // Cheap-diffed on (levelText|color) so no DOM write on unchanged entities.
+  private setNameplateLevel(v: EntityView, levelText: string, color: string): void {
+    const sig = `${levelText}|${color}`;
+    if (sig === v.levelSig) return;
+    v.levelSig = sig;
+    if (levelText) {
+      v.levelEl.textContent = levelText;
+      v.levelEl.style.color = color;
+      v.levelEl.style.display = '';
+    } else {
+      v.levelEl.style.display = 'none';
+    }
   }
 
   // Light `count` of the COMBO_PIP_MAX pips over this nameplate; hide the row

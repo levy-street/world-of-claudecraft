@@ -1,4 +1,6 @@
+import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
+import { fireMageOnSpellHit } from './fire_mage';
 
 export function spellCritBonusFromAuras(p: Entity): number {
   let bonus = 0;
@@ -35,6 +37,9 @@ export function hasCastShield(p: Entity): boolean {
   return p.auras.some((aura) => aura.kind === 'cast_shield');
 }
 
-export function noteSpellHit(..._args: unknown[]): void {
-  // Hot Streak state is not present in this target branch.
+export function noteSpellHit(ctx: SimContext, p: Entity, crit: boolean, abilityId?: string): void {
+  // The Hot Streak feed (combat/fire_mage.ts): every resolved spell hit flows
+  // through here, so the fire mage's streak counter READS crits already rolled
+  // and never draws dice of its own.
+  fireMageOnSpellHit(ctx, p, abilityId, crit);
 }

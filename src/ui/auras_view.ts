@@ -15,11 +15,11 @@
 // tests/util/alloc_probe.ts). Two modes yield two independent views (the buff bar and
 // the target debuffs are two instances, not a code fork).
 //
-// The DEBUFF allowlist lives HERE (it is presentation/domain classification, lifted
-// out of the old painter-side branch). The core stays DOM-free and i18n-MECHANISM-free
-// (no i18n runtime import): the localized aura name + the formatted stack count are
-// produced by INJECTED deps each frame (so the i18n keys keep firing and the painter
-// never concats), while the icon identity and the duration text are pure.
+// The DEBUFF allowlist lives in the host-agnostic sim/aura_classify leaf shared by
+// the view, chat readouts, and player cancellation. This core stays DOM-free and
+// i18n-MECHANISM-free (no i18n runtime import): the localized aura name + the
+// formatted stack count are produced by INJECTED deps each frame (so the i18n keys
+// keep firing and the painter never concats), while icon identity and duration are pure.
 //
 // Parity: the input is a structural subset of IWorld's Entity.auras that
 // BOTH the offline Sim and the online ClientWorld mirror expose. Aura.stacks is
@@ -27,40 +27,14 @@
 // same as 1 (no stacks badge), and a Sim-shaped aura {stacks:1} and a ClientWorld
 // mirror aura {stacks:undefined} derive identical output.
 
+import { isDebuffAura as classifyDebuffAura, DEBUFF_AURA_KINDS } from '../sim/aura_classify';
 import type { AuraKind } from '../sim/types';
 import type { AuraSchool } from './aura_effect';
 
-// The aura kinds that read as a DEBUFF even when they reuse a buff_* kind is handled
-// separately below. Lifted verbatim from the old inline `renderAuras` allowlist; a
-// Set so the per-frame classification is O(1) and the table is built once at load, not
-// per aura. A negative-value stat aura (a mob's attack-power sap, an intellect-draining
-// curse) is also a debuff (see isAuraDebuff).
-export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
-  'dot',
-  'slow',
-  'root',
-  'stun',
-  'incapacitate',
-  'polymorph',
-  'attackspeed',
-  'debuff_ap',
-  'sunder',
-  'corrode',
-  'faerie_fire',
-  'mortal_wound',
-  'silence',
-  'disarm',
-  'blind',
-  'expose',
-  'spellvuln',
-  'lockout',
-  'vulnerability',
-  'hex',
-  'tongues',
-  'cost_tax',
-  'heal_absorb',
-  'critvuln',
-]);
+// Re-export the shared set for the view contract and its exact-set regression test.
+// Classification itself stays in the sim leaf so the HUD, chat readouts, and aura
+// cancellation cannot drift apart.
+export { DEBUFF_AURA_KINDS };
 
 // Toggle auras (cast again to cancel: stealth, the druid forms, stances, Ghost
 // Wolf) read as MODES, not timed effects: WoW shows no countdown under them, so
@@ -71,12 +45,22 @@ const TOGGLE_KINDS: ReadonlySet<AuraKind> = new Set([
   'stealth',
   'form_bear',
   'form_cat',
+  'form_moonkin',
+  'form_shadow',
   'form_travel',
+  'form_fireball',
+  'battle_stance',
+  'berserker_stance',
   'defensive_stance',
 ]);
 // Ghost Wolf toggles too, but its aura rides the generic buff_speed kind (which
 // Sprint also uses, 15s and very much worth a countdown), so it hides by id.
 const TOGGLE_IDS: ReadonlySet<string> = new Set(['ghost_wolf']);
+// The inverse override: an aura that rides a TOGGLE_KIND but is a genuine timed
+// buff worth a countdown. Greater Invisibility reuses the rogue-stealth machinery
+// for its vanish (kind 'stealth' with full move speed), but it is a fixed 20s
+// buff, not a toggle, so it must show its remaining time like any other buff.
+const TIMED_IDS: ReadonlySet<string> = new Set(['greater_invisibility']);
 
 /** The localized single-letter unit suffixes the compact duration label uses. */
 export interface DurationUnits {
@@ -235,7 +219,7 @@ export interface AurasView {
  *  in both worlds (the kind is on the wire). The end-to-end encode/decode round trip is
  *  pinned in tests/snapshots.test.ts. */
 export function isAuraDebuff(aura: AuraInput): boolean {
-  return DEBUFF_AURA_KINDS.has(aura.kind) || (aura.kind.startsWith('buff_') && aura.value < 0);
+  return classifyDebuffAura(aura.kind, aura.value);
 }
 
 function makeSlotState(): AuraSlotState {
@@ -283,6 +267,16 @@ export function createAurasView(
       // so an in-game language switch lands on the next tick).
       const units = deps.durationUnits();
       const fill = (a: AuraInput, own: boolean): void => {
+        // Temporal Echo marks are shown only to the chronomancer who placed them
+        // (owner 2026-07-12): another caster's echo still heals in the sim but never
+        // appears in this viewer's target/focus frame. ONLY the ownFirst views (the
+        // target/focus strip) carry a real sourceId and a meaningful deps.isOwn, so the
+        // filter is scoped to them. The party/raid mini-strips are ownFirst:false with a
+        // sourceId-less PartyMemberAura (isOwn is always false there); their foreign
+        // echoes are already filtered upstream in Sim.partyInfo / the server partyWire
+        // via echoVisibleTo, so re-filtering here would wrongly hide the viewer's OWN
+        // marks too.
+        if (ownFirst && a.kind === 'temporal_echo' && !deps.isOwn(a)) return;
         const debuff = isAuraDebuff(a);
         if (mode === 'debuffs' && !debuff) return;
         if (mode === 'buffs' && debuff) return;
@@ -294,7 +288,7 @@ export function createAurasView(
         slot.isDebuff = debuff;
         slot.school = debuff ? (a.school ?? 'physical') : '';
         slot.durationText =
-          TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)
+          (TOGGLE_KINDS.has(a.kind) || TOGGLE_IDS.has(a.id)) && !TIMED_IDS.has(a.id)
             ? ''
             : compactAuraDuration(a.remaining, units);
         // A charge-limited aura badges its remaining charges (shown even at 1); otherwise the

@@ -43,8 +43,6 @@ export interface ProfessionRecipeRecord {
   resultCount: number;
   reagents: readonly ProfessionReagent[];
   skillReq: number;
-  // Skill at which the recipe stops granting skill-ups ("grey"/trivial).
-  trivialAt: number;
   // Base item-level budget this recipe's output is balanced against (issue
   // #1127). Informational for now: the higher-tier gating (P4), the wheel
   // (P5), and archetype-exclusive combos (P8) read this later to scale the

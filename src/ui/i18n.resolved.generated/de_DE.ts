@@ -233,6 +233,9 @@ export const de_DE: EnTranslations = {
       "title": "Talente",
       "classTab": "Klasse",
       "specTab": "Spezialisierung",
+      "choicesTab": "Entscheidungen",
+      "rowUnlockToast": "Neue Talentwahl verfügbar!",
+      "rowUnlocks": "Wird auf Stufe {level} freigeschaltet",
       "available": "Verfügbar",
       "spent": "Ausgegeben",
       "pointSource": "Ihr erhaltet pro Stufe von {first} bis {cap} 1 Talentpunkt. Steigt auf, um mehr Punkte zu bekommen.",
@@ -291,6 +294,7 @@ export const de_DE: EnTranslations = {
         "noTree": "Eure Klasse hat noch keinen Talentbaum.",
         "locked": "Ihr habt die Talente noch nicht freigeschaltet; sie beginnen auf Stufe {level}.",
         "noSpec": "keine Spezialisierung",
+        "rowsSummary": "Talente: {head}, {picked}/{unlocked} Entscheidungsreihen gewählt.",
         "summary": "Talente: {head} — {spent}/{total} Punkte ausgegeben ({breakdown}).",
         "breakdownClass": "Klasse {classPts}",
         "breakdownSpec": "Klasse {classPts}, {spec} {specPts}",
@@ -314,6 +318,10 @@ export const de_DE: EnTranslations = {
       "resurrectAtCorpse": "Am Leichnam wiederbeleben",
       "resurrectAtHealer": "Der Bleiche Hüter (Zoll des Hüters)",
       "spiritHealerAlive": "Der Bleiche Hüter wacht über die Toten. Du weilst noch unter den Lebenden."
+    },
+    "fct": {
+      "absorbed": "{amount} absorbiert",
+      "cheap": "Günstiger!"
     },
     "emotes": {
       "wave": "Winken",
@@ -416,6 +424,18 @@ export const de_DE: EnTranslations = {
       "armoryEyebrow": "Saison 1",
       "armoryTitle": "Die Waffenkammer",
       "armoryBody": "Limitierte Waffenskins aus der Waffenkammer von Saison 1. Accountweit, rein kosmetisch und für alle in deiner Umgebung sichtbar.",
+      "wallet": {
+        "title": "Solana-Wallet",
+        "unlinked": "Verbinde eine Wallet-App und unterschreibe einmal, um ihre öffentliche Adresse mit deinem WoC-Konto zu verknüpfen. Wir erhalten niemals deine Wiederherstellungsphrase oder deinen privaten Schlüssel.",
+        "connectedUnlinked": "Die Wallet-App ist mit diesem Browser verbunden, aber ihre öffentliche Adresse ist noch nicht mit deinem WoC-Konto verknüpft.",
+        "linkedDisconnected": "Deine öffentliche Adresse ist verknüpft. Verbinde diese Wallet-App erneut, wenn du mit SOL oder WOC bezahlen möchtest.",
+        "linkedConnected": "Deine verknüpfte Wallet-App ist verbunden und bereit für SOL- oder WOC-Käufe.",
+        "mismatched": "Eine andere Wallet ist verbunden. Verifiziere sie, um die verknüpfte Adresse zu ersetzen, oder verbinde die verknüpfte Wallet erneut.",
+        "connect": "Wallet verbinden",
+        "verify": "Verifizieren und verknüpfen",
+        "reconnect": "Wallet erneut verbinden",
+        "manage": "Wallet verwalten"
+      },
       "collectionLine": "Kollektion: {collection}",
       "collections": {
         "guildmark": "Gildenzeichen",
@@ -709,6 +729,7 @@ export const de_DE: EnTranslations = {
       "playerLabel": "Euer Charakter",
       "targetLabel": "Euer Ziel",
       "targetAnnounce": "Ziel: {name}",
+      "targetOfTargetLabel": "Ziel des Ziels",
       "partyLabel": "Eure Gruppe",
       "partyChip": "Gruppe",
       "partyGroup": "Gruppe {n}",
@@ -1011,16 +1032,39 @@ export const de_DE: EnTranslations = {
       "aurasOnPlayerFrame": "Stärkungszauber am Spielerfenster",
       "highContrastBackground": "Hintergrund mit hohem Kontrast",
       "startAttackOnAbility": "Auto-Angriff bei Fähigkeitseinsatz",
-      "showAttackButton": "Angriffs-Schaltflache anzeigen",
       "walkByAutoloot": "Plündern im Vorbeigehen",
       "groundReticle": "Bodenziel-Fadenkreuz",
+      "mouseoverCast": "Mouseover-Wirken auf Gruppenfenstern",
       "showItemLevel": "Gegenstandsstufe anzeigen",
       "itemLevelLine": "Gegenstandsstufe {level}",
       "itemScoreLine": "Wertung {score}",
       "showSecondaryActionBar": "Zweite Aktionsleiste anzeigen",
+      "showTargetOfTarget": "Ziel des Ziels anzeigen",
+      "showAttackButton": "Angriffs-Schaltflache anzeigen",
       "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen",
       "mobileCameraJoystick": "Kamera-Joystick",
       "mobileLeftHanded": "Linkshänder-Layout"
+    },
+    "talentRows": {
+      "tab": "Auswahl",
+      "defaultLoadout": "Standardkonfiguration",
+      "comingSoon": "Demnächst",
+      "readoutSummary": "Talente: {head}, {spent}/{total} Reihen ausgewählt."
+    },
+    "abilityError": {
+      "shieldRequired": "Ihr müsst einen Schild ausgerüstet haben."
+    },
+    "specPanel": {
+      "primaryAttr": "Primärattribut",
+      "complexity": "Komplexität",
+      "complexityLow": "Niedrig",
+      "complexityMedium": "Mittel",
+      "complexityHigh": "Hoch",
+      "exampleAbilities": "Beispielfähigkeiten",
+      "viewTalents": "Talente anzeigen",
+      "selectSpec": "Spezialisierung wählen",
+      "specUnlockBanner": "Spezialisierung freigeschaltet!",
+      "specUnlockHint": "Drücke N, um deine Spezialisierung zu wählen."
     },
     "controller": {
       "title": "Controller",
@@ -1133,6 +1177,7 @@ export const de_DE: EnTranslations = {
         "spellPower": "Zaubermacht",
         "critRating": "Kritische Trefferwertung",
         "hasteRating": "Tempowertung",
+        "parry": "Parieren",
         "hitRating": "Trefferwertung",
         "warfare": "Kriegsführung"
       },
@@ -1151,6 +1196,7 @@ export const de_DE: EnTranslations = {
         "dodge": "Deine Chance, einem eingehenden Nahkampfangriff vollständig auszuweichen und keinen Schaden zu erleiden.",
         "critRating": "Kritische Trefferwertung aus deiner Ausrüstung und deinen Setboni, die deine kritische Trefferchance erhöht. Etwa 10 Wertung gewähren 1% kritische Trefferchance.",
         "hasteRating": "Tempowertung aus deiner Ausrüstung und deinen Setboni, die deine Angriffe und dein Zaubern beschleunigt. Etwa 10 Wertung gewähren 1% Tempo.",
+        "parry": "Deine Chance, einen frontalen Nahkampfangriff vollständig zu parieren und keinen Schaden zu erleiden. Ein Schlag von hinten kann nicht pariert werden.",
         "hitRating": "Trefferwertung aus deiner Ausrustung und Setboni, die verringert, wie oft deine Angriffe verfehlen und deine Zauber widerstanden werden, besonders gegen hoher stufige Feinde. Etwa 10 Wertung verleihen 1% Treffer.",
         "warfare": "Erhöht den Spielern zugefügten Schaden um {increase}% und verringert von Spielern erlittenen Schaden um {reduction}%."
       },
@@ -1501,9 +1547,35 @@ export const de_DE: EnTranslations = {
       "attackSpeedSlow": "Verlangsamt Angriffstempo um {pct}%",
       "attackSpeedFast": "Erhöht Angriffstempo um {pct}%",
       "haste": "Erhöht Angriffs- und Zaubertempo um {pct}%",
+      "dmgDone": "Erhöht den verursachten Schaden um {pct}%",
+      "dmgDoneReduce": "Verringert den verursachten Schaden um {pct}%",
+      "heatingUp": "Dein nächster aufeinanderfolgender kritischer Feuer-Builderstreffer gewährt Heiße Serie; ein nicht-kritischer Builder entfernt Aufheizen",
+      "elementalConvergencePrimed": "Dein nächster Zauber der anderen Elementarschule gewährt Elementarkonvergenz",
+      "battleStance": "Kampfhaltung: 10% mehr Wuterzeugung",
+      "berserkerStance": "Berserkerhaltung: Kritische Treffer gelingen 3% öfter und treffen 3% härter",
+      "crit": "Erhöht kritische Trefferchance um {pct}%",
+      "rageGen": "Erhöht Wuterzeugung um {pct}%",
+      "reckless": "Erhöht kritische Trefferchance um {pct}% und Wuterzeugung um {ragePct}%",
+      "avatar": "Koloss: Verursachter Schaden um {pct}% erhöht",
+      "bloodbath": "Erhöht kritische Trefferchance und verursachten Schaden um {pct}%",
+      "dieBySword": "Verringert erlittenen Schaden um {pct}%",
+      "sanguine": "Erhöht Angriffstempo um {hastePct}% und verursachten Schaden um {dmgPct}%",
+      "battleTrance": "Euer nächster Reaver-Hieb oder Verstümmelnder Hieb kostet keine Wut",
+      "revengeFree": "Eure nächste Rache kostet keine Wut",
+      "victoryRush": "Siegesrausch ist bereit",
+      "maxHpPct": "Erhöht maximale Gesundheit um {pct}%",
+      "temporalHourglass": "Immun und handlungsunfähig; stellt Gesundheit wieder her und beschleunigt die Abklingzeit-Regeneration. Rechtsklick zum Abbrechen.",
       "tongues": "Erhöht Zauberzeit um {pct}%",
+      "combustionCrit": "Deine Feuerzauber treffen immer kritisch",
+      "overloadNext": "Dein nächster Zauber wird um {pct}% verstärkt, kostet aber 50% mehr Mana",
+      "powerEchoNext": "Dein nächster direkter Zauber wiederholt sich mit {pct}% Kraft auf dasselbe Ziel",
+      "iceFloesCasts": "Deine nächsten {n} Zauber mit Zauberzeit können beim Bewegen gewirkt werden",
+      "freeCast": "Dein nächster Zauber ist kostenlos",
+      "instantCast": "Dein nächster Zauber mit Zauberzeit ist sofort",
+      "cheapCast": "Dein nächster Zauber kostet {pct}% weniger",
       "increase": {
         "ap": "Erhöht Angriffskraft um {value}",
+        "sp": "Erhöht die Zaubermacht um {value}",
         "armor": "Erhöht Rüstung um {value}",
         "int": "Erhöht Intelligenz um {value}",
         "agi": "Erhöht Beweglichkeit um {value}",
@@ -1557,6 +1629,7 @@ export const de_DE: EnTranslations = {
       "formBear": "Bruin Form: Gesundheit und Rüstung erhöht",
       "formCat": "Katzengestalt: Nahkampfschaden und Energie",
       "formTravel": "Fleet Form: Bewegungstempo um {pct}% erhöht",
+      "formFireball": "Glutgestalt: Bewegungsgeschwindigkeit um {pct}% erhöht; Angriffe und Zauber deaktiviert",
       "defensiveStance": "Wehrhafte Haltung: weniger erlittener Schaden, mehr Bedrohung",
       "righteousFury": "Brennender Eid: stark erhöhte Bedrohung durch Heiligschaden",
       "scale": "Größe um {pct}% erhöht",
@@ -1603,8 +1676,8 @@ export const de_DE: EnTranslations = {
       "removeFromBarAria": "{name} von der Aktionsleiste entfernen"
     },
     "nameplate": {
-      "mob": "[{level}] {name}",
-      "mobElite": "[{level}+] {name}"
+      "mobLevel": "{level}",
+      "mobEliteLevel": "{level}+"
     },
     "mobTooltip": {
       "levelFamily": "Stufe {level} {family}",
@@ -2014,17 +2087,31 @@ export const de_DE: EnTranslations = {
     "archetypeTitle": {
       "label": "Titel",
       "none": "Keiner",
-      "hobbyLabel": "Freizeit",
-      "armorcrafting": "Rüstungsschmied",
-      "weaponcrafting": "Waffenschmied",
-      "jewelcrafting": "Juwelier",
-      "alchemy": "Alchemist",
-      "engineering": "Ingenieur",
-      "cooking": "Koch",
-      "inscription": "Schreiber",
-      "enchanting": "Verzauberer",
-      "tailoring": "Schneider",
-      "leatherworking": "Gerber"
+      "hobbyLabel": "Freizeit"
+    },
+    "archetypePair": {
+      "engineering+alchemy": "Bombardier",
+      "alchemy+cooking": "Apotheker",
+      "cooking+leatherworking": "Fallensteller",
+      "leatherworking+tailoring": "Ausrüster",
+      "tailoring+inscription": "Zauberweber",
+      "inscription+enchanting": "Arkanist",
+      "enchanting+jewelcrafting": "Edelsteinbinder",
+      "jewelcrafting+weaponcrafting": "Klingenschmied",
+      "weaponcrafting+armorcrafting": "Schmied",
+      "armorcrafting+engineering": "Technikschmied"
+    },
+    "craftName": {
+      "armorcrafting": "Rüstungsherstellung",
+      "weaponcrafting": "Waffenherstellung",
+      "jewelcrafting": "Juwelenkunde",
+      "alchemy": "Alchemie",
+      "engineering": "Ingenieurskunst",
+      "cooking": "Kochen",
+      "inscription": "Inschriftenkunde",
+      "enchanting": "Verzauberung",
+      "tailoring": "Schneiderei",
+      "leatherworking": "Lederverarbeitung"
     },
     "crafting": {
       "title": "Basteln",
@@ -2038,6 +2125,42 @@ export const de_DE: EnTranslations = {
       "insufficientMaterials": "Dafür fehlen Ihnen die Materialien.",
       "unknownRecipe": "Dieses Rezept existiert nicht.",
       "comboRequirementUnmet": "Ihr besitzt nicht beide erforderlichen Berufe auf der nötigen Stufe für dieses Rezept.",
+      "comboRequires": "Abstimmung: {craftA} + {craftB}, Stufe {tier}.",
+      "comboMet": "Bereit.",
+      "comboSyncing": "Reichs-Abstimmung wird überprüft.",
+      "comboNotAttuned": "Wähle zuerst ein Archetyp-Paar.",
+      "comboWrongPair": "Aktiviere genau dieses Paar, um es herzustellen.",
+      "comboTierUnmet": "Bringe beide Hauptberufe auf die erforderliche Stufe.",
+      "professionChoice": "Berufswahl",
+      "noProfessionChoice": "Derzeit ist keine gültige Berufswahl verfügbar.",
+      "pairOptionLabel": "{pair} ({craftA} + {craftB})",
+      "attunementPreview": "Ergebnis: Titel {title}; {majorA} und {majorB} werden zu unbegrenzten Hauptberufen; {hobby} wird zum selten-begrenzten Hobby; alle anderen Fertigkeitskenntnisse bleiben erhalten, sind aber auf Gewöhnlich begrenzt, solange sie inaktiv sind.",
+      "hobbyPreview": "Ergebnis: {hobby} wird zum selten-begrenzten Hobby. Beide Hauptberufe und alle beibehaltenen Fertigkeitswerte bleiben unverändert.",
+      "identity": {
+        "title": "Handwerksidentität",
+        "syncing": "Warte auf deine Handwerksidentität vom Reich.",
+        "unattuned": "Kein Archetyp-Paar ist aktiv. Deine Kenntnisse bleiben erhalten, aber Kombo-Rezepte erfordern ein abgestimmtes Paar.",
+        "titleLabel": "Titel",
+        "majorsLabel": "Hauptberufe",
+        "hobbyLabel": "Hobby",
+        "historyLabel": "Verlauf",
+        "history": "{pairs} Paare entdeckt, {returns} Rückkehr abgeschlossen",
+        "roleMajor": "Hauptberuf",
+        "roleHobby": "Hobby",
+        "roleDormant": "Inaktive Kenntnisse",
+        "roleUnattuned": "Nicht abgestimmt",
+        "ceilingUnlimited": "Keine Verbesserungsgrenze",
+        "ceilingRare": "Seltene Grenze",
+        "ceilingCommon": "Gewöhnliche Grenze",
+        "skillAria": "{craft}, Fertigkeit {skill}, Stufe {tier}, {role}, {ceiling}",
+        "colCraft": "Beruf",
+        "colSkill": "Fertigkeit",
+        "colRole": "Rolle",
+        "colCap": "Grenze",
+        "tutorial": "Erste Stufe: Erreiche Fertigkeit {skill} in einem Beruf. Erfolgreiche Rezepte verbessern diesen Beruf, ohne Kenntnisse anderswo zu löschen.",
+        "nearTier": "{craft} ist {points} Fertigkeitspunkte von der nächsten Stufe entfernt.",
+        "dormantKnowledge": "Kenntnisse in {craft} bleiben erhalten, sind aber inaktiv, bis sein Paar oder Hobby aktiv ist."
+      },
       "notAtHub": "Ihr müsst Euch am Handwerksplatz und auf der erforderlichen Stufe befinden, um das herzustellen.",
       "throttled": "Ihr stellt zu schnell her. Wartet einen Moment und versucht es erneut.",
       "recipeNotLearned": "Ihr habt dieses Rezept noch nicht erlernt."
@@ -2201,9 +2324,9 @@ export const de_DE: EnTranslations = {
       "charOpenBook": "Buch der Taten",
       "lbTab": "Ansehen",
       "lbTitleCol": "Titel",
-      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
-      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
-      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
+      "lbScopeNote": "Konten werden nach lebenslangem Ansehen bewertet. Jede Tat zählt einmal über alle Charaktere eines Kontos.",
+      "lbSelfAccount": "Dein Konto: Rang {rank}, top {percent} Prozent, {renown} Ansehen",
+      "lbSelfRank": "Dein Konto: Rang {rank}, top {percent} Prozent",
       "lbEmpty": "Noch keine platzierten Chronisten.",
       "broadcastsLabel": "Errungene Taten mit Gilde und Freunden teilen",
       "titledName": "{name} [{title}]"
@@ -2307,6 +2430,9 @@ export const de_DE: EnTranslations = {
       "already_linked": "Dein Konto ist bereits mit einem Steam-Konto verknüpft.",
       "account_taken": "Dieses Steam-Konto ist bereits mit einem anderen Konto verknüpft.",
       "upstream": "Steam hat nicht geantwortet. Versuch es gleich noch einmal."
+    },
+    "wallet": {
+      "handoff_invalid": "Diese Wallet-Autorisierung ist abgelaufen oder konnte nicht verifiziert werden. Bitte versuche es erneut."
     },
     "welcome": {
       "invalid_input": "Ungültige Eingabe."
@@ -2767,10 +2893,10 @@ export const de_DE: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Reiht einen schwereren Schwung ein, der bei deinem nächsten Treffer Wut verbraucht.",
+      "revenge": "Trifft Gegner vor Euch und kann nach einem Ausweichen oder Parieren kostenlos werden.",
+      "hamstring": "Beeinträchtigt die Bewegung eines Gegners, damit er nicht entkommen kann.",
       "battle_shout": "Ein aufrüttelnder Ruf, der die Angriffskraft der Gruppe erhöht.",
-      "commanding_shout": "Stärkt die Ausdauer, damit alle in einem Kampf länger durchhalten.",
       "charge": "Stürmt auf einen entfernten Gegner zu und eröffnet den Kampf mit einer kurzen Betäubung.",
-      "rend": "Eröffnet eine Blutung, die das Ziel über Zeit zermürbt.",
       "thunder_clap": "Trifft alles um dich herum und verlangsamt deren Angriffe.",
       "seal_of_righteousness": "Verzaubert deine Schwünge mit heiligem Schaden, den du dann mit Verdict verbrauchst.",
       "holy_light": "Eine stetige, ansehnliche Heilung, um einen Verbündeten oder dich selbst aufzufüllen.",
@@ -2803,9 +2929,18 @@ export const de_DE: EnTranslations = {
       "lightning_shield": "Lädt dich auf, sodass Angreifer Naturschaden erleiden, wenn sie dich treffen.",
       "flame_shock": "Ein sofortiger Brand, der zu Beginn trifft und mit der Zeit weiter versengt.",
       "fireball": "Dein wichtigster Feuerzauber, landet einen Treffer und lässt das Ziel brennen.",
+      "fireball_form": "Werde zu einer lebendigen Glut und überquere offenes Gelände mit hoher Geschwindigkeit.",
       "frost_armor": "Eine anhaltende Selbststärkung, die deine Rüstung vor einem Kampf härtet.",
       "arcane_intellect": "Hebt die Intelligenz, um den Manavorrat eines Verbündeten zu vertiefen. Wirke es vor dem Pull.",
       "frostbolt": "Trifft aus der Distanz und verlangsamt das Ziel, sodass es nicht zu dir aufschließen kann.",
+      "ice_lance": "Ein sofortiger Splitter zum Verbrauchen von Frostprocs; trifft eingefrorene Ziele weit stärker.",
+      "flurry": "Drei schnelle Geschosse, die das Ziel kühlen, sodass deine nächsten Frosttreffer landen, als wäre es eingefroren.",
+      "fingers_of_frost": "Deine Frostgeschosse stärken manchmal ein Ice Lance, als ob das Ziel eingefroren wäre.",
+      "brain_freeze": "Deine Frostgeschosse lassen das nächste Winterlash manchmal sofort und stärker zuschlagen.",
+      "shatter": "Deine Zauber treffen eingefrorene Ziele weit öfter kritisch.",
+      "frozen_orb": "Rollt eine langsame Kugel durch die Gruppe, die alles kühlt und deine Frostprocs füttert.",
+      "blizzard": "Bedeckt ein Gebiet mit Eis, um eine ganze Gruppe zu schwächen und zu verlangsamen.",
+      "blink": "Teleportiert dich eine kurze Strecke vorwärts und bricht dabei Verwurzelungen.",
       "conjure_water": "Zaubert Getränke herbei, die Mana wiederherstellen, damit du zwischen den Pulls auffüllen kannst.",
       "conjure_food": "Zaubert Nahrung herbei, die Gesundheit wiederherstellt, wenn du dich zum Essen hinsetzt.",
       "shadow_bolt": "Ein Schattenblitz, den du auf ein Ziel wirkst, dein erster Schadenszauber.",
@@ -3102,7 +3237,7 @@ export const de_DE: EnTranslations = {
       "howHeading": "So funktionieren Taten",
       "howBody": "Taten werden mit jeweils einem Charakter errungen und behalten, sodass jeder Held, den du spielst, ein eigenes Buch aufbaut; erst die Bestenliste des Reiches sammelt dein Ansehen über alle Charaktere hinweg, die du spielst, und zählt jede Tat nur ein einziges Mal. Jede Tat benennt klar und deutlich, was sie von dir verlangt, direkt im Buch der Taten im Spiel, sodass du immer weißt, was es zu erjagen gilt; und die Taten, hinter denen du her bist, kannst du verfolgen, um sie beim Spielen im Blick zu behalten. Einige wenige bleiben geheim und geben sich erst zu erkennen, wenn du sie errungen hast. Das Buch hält sich auch selbst ehrlich: Was immer deine bisherige Bilanz belegen kann, schreibt es dir sofort gut, sodass ein Veteran es nie mit leerer Seite aufschlägt; nur die zählenden Taten beginnen ihre Zählung von neuem.",
       "renownHeading": "Ansehen",
-      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
+      "renownBody": "Ansehen ist die Wertung hinter dem Buch. Jede Tat, die du erringst, ist eine feste Menge wert, und dein Gesamtwert steigt nur, sodass eine ruhige Woche dir keinen Boden kostet. Eine Handvoll Taten hängen eher vom Glück als vom Können ab, und Heldentaten sind eine Ehrung für sich, daher zählen beide nicht für das Ansehen. Taten ohne Ansehen zählen dennoch für die Vollständigkeit in deinem Buch; sie ergeben nur keine Punkte.",
       "rewardsHeading": "Titel und Rahmen",
       "rewardsBody": "Die Belohnungen sind reine Zierde, und genau das ist der Sinn. Manche Taten verleihen einen Titel, den du tragen kannst, oder einen Rahmen für deinen Namen, aber niemals etwas, das deinen Helden stärker macht. Wähle im Buch der Taten den Titel, der dir gefällt, und er begleitet dich auf deinem Namensschild, im Chat und auf den Ranglisten, für alle sichtbar.",
       "chroniclesHeading": "Chroniken",
@@ -3111,7 +3246,7 @@ export const de_DE: EnTranslations = {
       "featsBody": "Heldentaten stehen auf einem eigenen Regal: Zeugnisse vergangener Zeiten und Welterster, Taten, die an eine vergangene Ära oder einen Moment gebunden sind, der nur ein einziges Mal geschieht. Sie bringen kein Ansehen und fließen nicht in die Abschlusszählung ein, sondern bleiben für immer als Erinnerung an das Vollbrachte erhalten.",
       "catalogHeading": "Das vollständige Tatenverzeichnis",
       "catalogBody": "Hier steht jede Tat, die das Buch fassen kann, geordnet nach Kategorie. Die geheimen fehlen mit Absicht; sie warten darauf, dass du sie findest. Öffne das Buch der Taten im Spiel, um genau zu sehen, was jede einzelne verlangt.",
-      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
+      "standingsNote": "Die Reiche führen eine laufende Ansehenstabelle über alle Konten: Die Tabelle bewertet ganze Konten nach dem lebenslangen Ansehen, zählt jede Tat einmal über alle deine Charaktere hinweg, und zeigt nur das Ansehen, sodass Taten ohne Ansehen die Tabelle nie bewegen, auch wenn sie in deinem Buch zählen. Um zu sehen, wer wo steht, öffne die Bestenliste im Spiel und wechsle zu ihrer Ansehen-Registerkarte; die Tabelle lebt dort, nicht im Wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Tat",
       "colRenown": "Ansehen",
@@ -4027,6 +4162,9 @@ export const de_DE: EnTranslations = {
     "balancePreviewTitle": "Vorschau auf das $WOC-Guthaben des verbundenen Wallets",
     "balancePreviewAria": "Vorschau auf das Guthaben des verbundenen Wallets: {balance}. Verknüpft das Wallet, um das Inhaber-Flair zu verifizieren.",
     "balanceAmount": "{amount} $WOC",
+    "bagConnect": "Wallet verknüpfen",
+    "bagLink": "Wallet verifizieren",
+    "bagReconnect": "Wallet erneut verbinden",
     "connected": "Verbunden: {address}",
     "connectedWithBalance": "Verbunden: {balance} - {address}",
     "connectedLinked": "Verifiziert: {address}",
@@ -4041,12 +4179,37 @@ export const de_DE: EnTranslations = {
     "helpLinkedDisconnected": "Inhaberboni sind aktiv. Verbindet die App, wenn Ihr unterschreiben oder ausgeben müsst.",
     "helpLinkedDisconnectedWithBalance": "Inhaberboni sind aktiv. Verbindet die App, wenn Ihr unterschreiben oder ausgeben müsst.",
     "extensionHelp": "Damit hier eine Wallet erscheint, halte eine Browser-Wallet-Erweiterung wie Solflare Wallet aktiv.",
+    "mobileAppHelp": "Wähle Phantom oder Solflare. Deine Wallet-App wird um Genehmigung bitten. Halte dieses Spiel geöffnet und kehre zu ihm zurück, wenn du fertig bist.",
+    "standaloneAppHelp": "Wallet-Verbindungen sind in der Startbildschirm-App noch nicht verfügbar. Öffne World of ClaudeCraft in Safari oder Chrome, um Phantom oder Solflare zu nutzen.",
+    "openAppTitle": "Weiter in {wallet}",
+    "openAppHelp": "Öffne {wallet}, um diese Anfrage zu prüfen. Halte diesen Spieltab geöffnet, während die Wallet-App aktiv ist.",
+    "openAppButton": "{wallet} öffnen",
+    "manualReturnBrowserHelp": "Kehre nach der Genehmigung zu diesem Spieltab zurück. Falls iOS einen anderen Browser öffnet, schließe ihn und kehre manuell zum ursprünglichen Browser zurück.",
+    "manualReturnStandaloneHelp": "Kehre nach der Genehmigung von deinem Startbildschirm zu World of ClaudeCraft zurück. Falls iOS einen Browser öffnet, schließe ihn und öffne die Startbildschirm-App manuell erneut.",
+    "preparingAppButton": "{wallet} wird vorbereitet...",
+    "walletAppUnavailable": "{wallet} konnte nicht vorbereitet werden. Schließe dieses Fenster und versuche es erneut.",
     "flowConnect": "Wählt ein Wallet. Die Verifizierung läuft automatisch weiter.",
     "flowSign": "Unterschreibt die Verifizierungsnachricht in Eurer Wallet-App. Keine Transaktion und kein SOL erforderlich.",
     "flowVerify": "Wallet-Besitz wird verifiziert...",
     "linkFailed": "Wallet-Verifizierung fehlgeschlagen.",
     "verifyFailed": "Wallet-Verifizierung fehlgeschlagen.",
     "unlinkFailed": "Wallet konnte nicht getrennt werden.",
+    "browser": {
+      "eyebrow": "Desktop-Wallet-Autorisierung",
+      "title": "Solana-Wallet verbinden",
+      "linkBody": "Wähle eine Wallet-Erweiterung in diesem Browser. Du wirst eine Verifizierungsnachricht unterschreiben und dann zur Desktop-App zurückkehren.",
+      "paymentBody": "Wähle die mit deinem Konto verknüpfte Wallet und genehmige die Transaktion in diesem Browser.",
+      "extensionHelp": "Es wurde keine kompatible Wallet-Erweiterung gefunden. Installiere oder entsperre Phantom, Solflare oder eine andere Solana-Browser-Wallet und versuche es erneut.",
+      "safety": "World of ClaudeCraft fragt niemals nach deiner Wiederherstellungsphrase oder deinem privaten Schlüssel.",
+      "continueWith": "Weiter mit {wallet}",
+      "reviewTitle": "In deiner Wallet prüfen",
+      "reviewBody": "Folge der Aufforderung von {wallet}. Halte diese Browserseite offen.",
+      "completeTitle": "Wallet-Autorisierung abgeschlossen",
+      "completeBody": "Du kannst zur World of ClaudeCraft Desktop-App zurückkehren.",
+      "returnButton": "Zur Desktop-App zurückkehren",
+      "failed": "Wallet-Autorisierung fehlgeschlagen oder abgelaufen. Kehre zur Desktop-App zurück und versuche es erneut.",
+      "retry": "Erneut versuchen"
+    },
     "holder": "$WOC-Inhaber",
     "holderTierTitle": "$WOC-Inhaber mit Rang {tier}",
     "holderTiers": {
@@ -4369,22 +4532,22 @@ export const de_DE: EnTranslations = {
     "buyAria": "{item} für {marks} Heroische Marken kaufen"
   },
   "cardDuel": {
-    "title": "Card Duel",
-    "close": "Close",
-    "join": "Join Queue",
-    "joinAria": "Join the Card Duel queue",
-    "leave": "Leave Queue",
-    "leaveAria": "Leave the Card Duel queue",
-    "forfeit": "Forfeit",
-    "forfeitAria": "Forfeit the Card Duel",
-    "queued": "Waiting for an opponent...",
-    "unavailable": "Card Duel requires another player online.",
-    "vsOpponent": "vs {name}",
-    "round": "Round score: {mine} - {theirs}",
-    "counts": "Deck: {deck} · Discard: {discard}",
-    "playCardAria": "Play the {value} card",
-    "waitingOnOpponent": "Waiting on your opponent's card...",
-    "yourTurn": "Play a card"
+    "title": "Kartenkampf",
+    "close": "Schließen",
+    "join": "Warteschlange beitreten",
+    "joinAria": "Der Warteschlange für den Kartenkampf beitreten",
+    "leave": "Warteschlange verlassen",
+    "leaveAria": "Die Warteschlange für den Kartenkampf verlassen",
+    "forfeit": "Aufgeben",
+    "forfeitAria": "Den Kartenkampf aufgeben",
+    "queued": "Warte auf einen Gegner...",
+    "unavailable": "Für den Kartenkampf wird ein weiterer Online-Spieler benötigt.",
+    "vsOpponent": "gegen {name}",
+    "round": "Rundenpunkte: {mine} - {theirs}",
+    "counts": "Deck: {deck} · Ablagestapel: {discard}",
+    "playCardAria": "Die Karte {value} ausspielen",
+    "waitingOnOpponent": "Warte auf die Karte deines Gegners...",
+    "yourTurn": "Karte ausspielen"
   },
   "delveUi": {
     "board": {
@@ -4886,9 +5049,9 @@ export const de_DE: EnTranslations = {
     }
   },
   "gpuNotice": {
-    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
-    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
-    "dismiss": "Dismiss"
+    "bodyDesktop": "Das Spiel läuft ohne GPU-Beschleunigung und wird langsam sein. Aktualisiere deine Grafiktreiber und starte das Spiel neu. Unter Windows stelle das Spiel außerdem unter Einstellungen > System > Anzeige > Grafik auf Hohe Leistung ein.",
+    "bodyWeb": "Das Spiel läuft ohne GPU-Beschleunigung und wird langsam sein. Aktiviere die Hardwarebeschleunigung in deinen Browsereinstellungen, aktualisiere deine Grafiktreiber und starte deinen Browser neu.",
+    "dismiss": "Schließen"
   },
   "realm": {
     "noRealms": "Keine Welten verfügbar.",
@@ -5311,11 +5474,14 @@ export const de_DE: EnTranslations = {
       "openTrade": "Handel öffnen",
       "duelRequest": "{name} hat Euch zu einem Duell herausgefordert!",
       "acceptDuel": "Duell annehmen",
+      "resurrectionOffer": "{name} möchte dich ins Leben zurückrufen. Nimmst du an?",
+      "acceptResurrection": "Auferstehung annehmen",
       "decline": "Ablehnen"
     },
     "combat": {
       "floatingMiss": "Verfehlt",
       "floatingDodge": "Ausgewichen",
+      "floatingParry": "Pariert",
       "floatingResist": "Widerstand",
       "cannotMove": "Bewegungsunfähig!",
       "attack": "Angriff",
@@ -5325,6 +5491,7 @@ export const de_DE: EnTranslations = {
       "damageTakenCrit": "{source} trifft Euch kritisch für {amount}.",
       "miss": "Euer {ability} verfehlt {target}.",
       "dodged": "{target} weicht Eurem {ability} aus.",
+      "parried": "Deine {ability} wird von {target} pariert.",
       "resisted": "{target} widersteht Eurem {ability}.",
       "healSelf": "Euer {ability} heilt Euch um {amount}.",
       "healSelfCrit": "Euer {ability} heilt Euch kritisch um {amount}.",
@@ -5485,6 +5652,7 @@ export const de_DE: EnTranslations = {
     },
     "pet": {
       "attack": "Angreifen",
+      "waterJet": "Wasserstrahl",
       "taunt": "Spotten",
       "healDemon": "Dämon heilen",
       "healPet": "Begleiter heilen",
@@ -5493,6 +5661,8 @@ export const de_DE: EnTranslations = {
       "aggressive": "Aggressiv",
       "petAttackTitle": "Begleiterangriff",
       "petAttackDesc": "Befiehlt deinem Begleiter, dein aktuelles feindliches Ziel anzugreifen.",
+      "waterJetTitle": "Wasserstrahl",
+      "waterJetDesc": "Befiehlt deinem Wasserelementar, 3 Sek. lang einen verlangsamenden Strahl zu kanalisieren. 8 Sek. Abklingzeit. Rechtsklick, um ihn automatisch einzusetzen, sobald er verfügbar ist.",
       "petTauntTitle": "Begleiterspott",
       "petTauntDesc": "Befiehlt deinem Begleiter, anzugreifen und in Reichweite Knurren einzusetzen. 10 Sekunden Abklingzeit.",
       "healDemonDesc": "Verbraucht Mana, um 5 Sekunden lang Heilung in deinen Dämon zu kanalisieren.",
@@ -5503,7 +5673,7 @@ export const de_DE: EnTranslations = {
       "defensiveDesc": "Greift Gegner an, die dich oder deinen Begleiter verletzen.",
       "aggressiveDesc": "Greift nahe feindliche Gegner an.",
       "rename": "Begleiter umbenennen",
-      "revive": "Begleiter wiederbeleben",
+      "revive": "Zusammenflicken",
       "abandon": "Begleiter aufgeben",
       "cancel": "Abbrechen",
       "renameLabel": "Wähle einen neuen Begleiternamen.",
@@ -5759,6 +5929,8 @@ export const de_DE: EnTranslations = {
     },
     "slots": {
       "mainhand": "Waffenhand",
+      "twoHand": "Zweihändig",
+      "offhand": "Nebenhand",
       "helmet": "Kopf",
       "neck": "Hals",
       "shoulder": "Schultern",
@@ -5799,7 +5971,8 @@ export const de_DE: EnTranslations = {
       "attackPower": "Angriffskraft",
       "dps": "Schaden/Sek.",
       "critChance": "Krit. Chance",
-      "dodge": "Ausweichen"
+      "dodge": "Ausweichen",
+      "parry": "Parieren"
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",
@@ -6038,23 +6211,15 @@ export const de_DE: EnTranslations = {
       },
       "battle_shout": {
         "name": "Eisernes Gebrüll",
-        "description": "Erhöht eure Angriffskraft 2 Min. lang um {buff}."
-      },
-      "commanding_shout": {
-        "name": "Stärkender Ruf",
-        "description": "Erhöht eure Ausdauer 2 Min. lang um {buff}."
+        "description": "Ein Ruf, der die Angriffskraft aller Gruppenmitglieder 30 Min. lang um {buff}% erhöht."
       },
       "demoralizing_shout": {
         "name": "Direhowl",
-        "description": "Stößt einen furchterregenden Ruf aus und verringert die Angriffskraft aller nahen Gegner 30 Sek. lang um {buff}."
+        "description": "Stößt einen furchterregenden Ruf aus und verringert den verursachten Schaden aller nahen Gegner 20 Sek. lang um {buff}%."
       },
       "charge": {
         "name": "Vorpreschen",
         "description": "Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn 1 Sek. lang. Reichweite 8-25 m."
-      },
-      "rend": {
-        "name": "Tiefe Wunde",
-        "description": "Verwundet das Ziel und lässt es über {duration} Sek. für {damage} Schaden bluten."
       },
       "thunder_clap": {
         "name": "Bebender Schlag",
@@ -6100,6 +6265,10 @@ export const de_DE: EnTranslations = {
         "name": "Feuerball",
         "description": "Schleudert einen feurigen Ball, der {damage} Feuerschaden sowie zusätzlichen Schaden über Zeit verursacht."
       },
+      "fireball_form": {
+        "name": "Glutgestalt",
+        "description": "Verwandelt dich in eine lodernde Glut und erhöht die Bewegungsgeschwindigkeit um {buff}%. Während der Verwandlung kannst du weder angreifen noch Zauber wirken. Erneut wirken, um zur normalen Gestalt zurückzukehren."
+      },
       "frost_armor": {
         "name": "Raureifmantel",
         "description": "Hüllt euch in Frost und erhöht die Rüstung 30 Min. lang um {buff}."
@@ -6111,6 +6280,94 @@ export const de_DE: EnTranslations = {
       "frostbolt": {
         "name": "Rimelance",
         "description": "Schleudert einen Frostblitz, verursacht {damage} Frostschaden und verlangsamt die Bewegung um 40%."
+      },
+      "blazing_barrier": {
+        "name": "Flammende Barriere",
+        "description": "Hüllt Euch in Flammen und absorbiert 60 Sek. lang 130 Schaden. (Feuer)"
+      },
+      "cold_snap": {
+        "name": "Ruf des Winters",
+        "description": "Beendet die Abklingzeit von Flimmerschritt, Frostschleier und Großer Unsichtbarkeit. (Magiertalent)"
+      },
+      "greater_invisibility": {
+        "name": "Große Unsichtbarkeit",
+        "description": "Ihr verschwindet 20 Sek. lang: Entfernt 2 Effekte mit regelmäßigem Schaden und verringert Euren erlittenen Schaden während der Unsichtbarkeit und kurz danach um 90%. (Magiertalent)"
+      },
+      "hot_streak": {
+        "name": "Heiße Serie",
+        "description": "Passiv: Zwei aufeinanderfolgende kritische Treffer mit Euren Feuerzaubern (Feuerball, Feuerschlag, Versengen, Pyroschlag oder Flammenstoß) machen Euren nächsten Pyroschlag oder Flammenstoß zu einem kostenlosen Spontanzauber. Die verbrauchenden Zauber zählen für die NÄCHSTE Serie, auch kostenlose Einsätze; Flammenstoß zählt unabhängig von der Zahl getroffener Gegner nur einmal, und nur der erste Einschlag kann zählen. (Feuer)"
+      },
+      "ice_floes": {
+        "name": "Eisschollen",
+        "description": "Eure nächsten zwei Zauber mit Zauberzeit können aus der Bewegung gewirkt werden. Hält 15 Sek. lang an. (Magiertalent)"
+      },
+      "ignition": {
+        "name": "Entzündung",
+        "description": "Passiv: Kritische Treffer Eurer Zauber verbrennen das Ziel und verursachen im Verlauf von 6 Sek. 40% des verursachten Schadens; stapelbar. (Feuermeisterschaft)"
+      },
+      "mass_barrier": {
+        "name": "Massenbarriere",
+        "description": "Schützt Euch und bis zu 4 Verbündete im Umkreis von 30 m; jeder Schild absorbiert 60 Sek. lang 130 Schaden. (Magiertalent)"
+      },
+      "overload": {
+        "name": "Überladung",
+        "description": "Euer nächster Zauber wird um 40% verstärkt, kostet aber 50% mehr Mana. Hält 10 Sek. lang an. (Magiertalent)"
+      },
+      "power_echo": {
+        "name": "Machtecho",
+        "description": "Euer nächster direkter Zauber wiederholt sich mit 50% seiner Stärke auf demselben Ziel. Hält 10 Sek. lang an. (Magiertalent)"
+      },
+      "rings_of_frost": {
+        "name": "Frostring",
+        "description": "Beschwört 10 Sek. lang einen Ring. Gegner, die seinen Rand überqueren, werden 4 Sek. lang eingefroren. (Magiertalent)"
+      },
+      "rune_of_power": {
+        "name": "Rune der Macht",
+        "description": "Schreibt 15 Sek. lang eine Rune der Macht zu Euren Füßen: Verbündete im Umkreis von 8 m verursachen 10% mehr Schaden. (Magiertalent)"
+      },
+      "summon_water_elemental": {
+        "name": "Wasserelementar beschwören",
+        "description": "Beschwört einen Wasserelementar, der an Eurer Seite kämpft, Wasserblitze auf Euer Ziel schleudert und Wasserstrahl kanalisiert. (Frost)"
+      },
+      "ice_lance": {
+        "name": "Ice Lance",
+        "description": "Schleudert einen Eissplitter und verursacht {damage} Frostschaden, dreifach gegen ein eingefrorenes Ziel. Verbraucht Fingers of Frost oder eine Ladung Winterskälte, um das Ziel als eingefroren zu behandeln. (Frost)"
+      },
+      "flurry": {
+        "name": "Winterlash",
+        "description": "Schießt drei eisige Geschosse ab, die jeweils {damage} Frostschaden verursachen, und legt Winterskälte auf das Ziel: dessen nächste 2 eintreffende kompatible Zauber behandeln es als eingefroren. Brain Freeze macht Winterlash sofort, 30% stärker und lässt seine Abklingzeit entfallen. (Frost)"
+      },
+      "frozen_orb": {
+        "name": "Frozen Orb",
+        "description": "Entfesselt eine Kugel wirbelnden Frosts, die 8 Sek. lang vorwärtsdriftet, nahegelegenen Feinden pro Sekunde {damage} Frostschaden zufügt und sie um 30% verlangsamt. Ihre Treffer erzeugen Fingers of Frost. (Frost)"
+      },
+      "blizzard": {
+        "name": "Blizzard",
+        "description": "Ruft 6 Sek. lang einen Eissturm auf das Zielgebiet, der pro Sekunde {damage} Frostschaden verursacht und Feinde um 40% verlangsamt. Jeder getroffene Feind verkürzt Frozen Orb um 0,5 Sek., bis zu 3 Sek. pro Einsatz. (Frost)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Beschwört einen mächtigen Eiszapfen und verbraucht 5 Eiszapfen, um {damage} Frostschaden zu verursachen und das Ziel 4 Sek. lang einzufrieren. (Frost)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Halte gedrückt, um eine sich ausbreitende Frostfront aufzuladen, und lass sie dann als Kegel los. Längere Aufladungen reichen weiter und verursachen mehr Schaden. Alle getroffenen Feinde werden 4 Sek. lang um 50% verlangsamt; maximale Aufladung verwurzelt sie zusätzlich 1 Sek. lang. (Frost)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Halte gedrückt, um einen sich ausbreitenden Flammenodem aufzuladen, und lass ihn dann als Kegel los. Längere Aufladungen reichen weiter und verursachen mehr Schaden. Getroffene Feinde werden desorientiert, und Schaden bricht den Effekt; maximale Aufladung trifft immer kritisch und zählt einmal für Heiße Serie. (Feuer)"
+      },
+      "fingers_of_frost": {
+        "name": "Fingers of Frost",
+        "description": "Rimelance hat eine 15% Chance, Fingers of Frost zu gewähren, bis zu 2 Ladungen: dein nächstes Ice Lance behandelt das Ziel als eingefroren. (Frost)"
+      },
+      "brain_freeze": {
+        "name": "Brain Freeze",
+        "description": "Rimelance hat eine 20% Chance, deinen nächsten Winterlash sofort, 30% stärker und ohne Abklingzeit werden zu lassen. (Frost)"
+      },
+      "shatter": {
+        "name": "Brittle Ruin",
+        "description": "Deine Zauber erhalten 50% kritische Trefferchance gegen eingefrorene Ziele, und diese kritischen Treffer verursachen 20% mehr Schaden. Fingers of Frost und Winterskälte zählen als eingefroren. (Frost)"
       },
       "conjure_water": {
         "name": "Waterbind",
@@ -6532,10 +6789,6 @@ export const de_DE: EnTranslations = {
         "name": "Eichenhaut",
         "description": "Eure Haut härtet wie Rinde und erhöht die Rüstung 15 Sek. lang um 150."
       },
-      "ironhold": {
-        "name": "Eisenbastion",
-        "description": "Du verschanzt dich hinter deiner Deckung und verringerst allen erlittenen Schaden um 40% fur 8 Sek."
-      },
       "sacred_bulwark": {
         "name": "Heiliges Bollwerk",
         "description": "Fur {duration} Sek. wird der naechste feindliche Treffer, der dich toeten wurde, abgewehrt und stellt stattdessen 35% deiner Gesundheit wieder her."
@@ -6624,6 +6877,10 @@ export const de_DE: EnTranslations = {
         "name": "Heiliger Schock",
         "description": "Schockt ein freundliches Ziel mit Heiliger Energie und heilt es um {damage}. (Heilig-Signatur)"
       },
+      "aura_surge": {
+        "name": "Dämmerprall",
+        "description": "Schleudert einen dämmergeschmiedeten Schild für {damage} Heiligschaden, bringt das Primärziel 2 Sek. zum Schweigen und springt dann auf bis zu 2 weitere Gegner innerhalb von 10 Metern über, wobei jeder Sprung 75% Schaden verursacht. (Paladintalent)"
+      },
       "holy_shield": {
         "name": "Heiliger Schild",
         "description": "Schützt Euch 10 Sek. lang mit Heiliger Macht, erhöht die Rüstung um 90 und trifft Nahkampfangreifer mit 12 Heiligschaden. (Schutz-Signatur)"
@@ -6645,7 +6902,7 @@ export const de_DE: EnTranslations = {
         "description": "Erhöht Zauberschaden um 20% und Zaubertempo um 10% für 10 Sek. (Arkan-Signatur)"
       },
       "combustion": {
-        "name": "Verbrennung",
+        "name": "Phönix-Trance",
         "description": "Erhöht die kritische Zaubertrefferchance 15 Sek. lang um 50%. (Feuer-Signatur)"
       },
       "icy_veins": {
@@ -6728,6 +6985,246 @@ export const de_DE: EnTranslations = {
         "name": "Wraithborn beschwören",
         "description": "Bindet einen Wraithborn an Euren Willen, einen Elitedämon, der aus der Ferne schweren Schattenschaden niederregnen lässt. Eine lange Abklingzeit zügelt seine verheerende Kraft. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben."
       },
+      "battle_stance": {
+        "name": "Kampfhaltung",
+        "description": "Eine aggressive Kampfhaltung: Ihr erzeugt 10% mehr Wut. Die Standardhaltung für Waffen und Schutz."
+      },
+      "berserker_stance": {
+        "name": "Berserkerhaltung",
+        "description": "Eine tollkühne Kampfhaltung: Eure kritischen Treffer gelingen 3% öfter und treffen 3% härter. Der Furor-Krieger kämpft stets in dieser Haltung."
+      },
+      "sweeping_strikes": {
+        "name": "Ausladender Bogen",
+        "description": "12 Sek. lang treffen Eure Einzelzielangriffe zusätzlich 1 nahen Gegner mit vollem Schaden. (Waffen)"
+      },
+      "deep_wounds": {
+        "name": "Klaffende Wunden",
+        "description": "Passiv: Euer Verstümmelnder Hieb lässt das Ziel bluten und verursacht über 6 Sek. physischen Schaden. (Waffen)"
+      },
+      "enrage_passive": {
+        "name": "Gemetzel",
+        "description": "Passiv: Solange Ihr wutentbrannt seid, verursacht Ihr 4 Sek. lang 7% mehr Schaden, greift 25% schneller an und bewegt Euch 10% schneller. Aderlass hat eine Chance von 30%, Euch wutentbrannt zu machen; Rote Ernte tut es immer. (Furor)"
+      },
+      "raging_gale": {
+        "name": "Zwillingsschlag",
+        "description": "Schlagt sofort zweimal mit Eurer Waffe zu, jeder Treffer verursacht 40% Waffenschaden plus {damage}, und erzeugt 8 Wut. Speichert bis zu 2 Aufladungen. (Furor)"
+      },
+      "red_harvest": {
+        "name": "Rote Ernte",
+        "description": "Setzt alles ein: Schlagt dreimal in Raserei zu, jeder Treffer verursacht 65% Waffenschaden plus {damage}, und werdet dabei immer wutentbrannt. (Furor)"
+      },
+      "furious_mending": {
+        "name": "Rasende Heilung",
+        "description": "10 Sek. lang erleidet Ihr 20% weniger Schaden, und solange der Effekt anhält, heilt Euch Euer Aderlass um 20% Eurer maximalen Gesundheit. (Furor)"
+      },
+      "emboldening_roar": {
+        "name": "Ermutigendes Gebrüll",
+        "description": "Stößt ein ermutigendes Gebrüll aus: Ihr und freundliche Spieler im Umkreis von 40 m erhaltet Ermutigung, und Eure nächsten 3 Fähigkeiten treffen garantiert kritisch. (Furor)"
+      },
+      "raised_guard": {
+        "name": "Erhobene Deckung",
+        "description": "Verschanzt Euch hinter Eurem Schild: Ihr erleidet 6 Sek. lang 50% weniger physischen Schaden. Speichert bis zu 2 Aufladungen. (Schutz)"
+      },
+      "iron_resolve": {
+        "name": "Eiserne Entschlossenheit",
+        "description": "Beißt die Zähne zusammen und ignoriert den Schmerz: Verbraucht bis zu 40 Wut (mindestens 20), um pro verbrauchtem Wutpunkt 4 Schaden zu absorbieren. Hält bis zu 10 Sek. an. (Schutz)"
+      },
+      "faultline": {
+        "name": "Bruchlinie",
+        "description": "Schickt eine Schockwelle durch den Boden: Gegner vor Euch im Umkreis von 8 m erleiden {damage} Schaden und werden 3 Sek. lang betäubt. (Schutz)"
+      },
+      "defiant_bellow": {
+        "name": "Trotziges Gebrüll",
+        "description": "Ein trotziges Gebrüll: Jeder Gegner im Umkreis von 10 m wird verspottet und 3 Sek. lang gezwungen, Euch anzugreifen. (Schutz)"
+      },
+      "breachmaker": {
+        "name": "Breschenbrecher",
+        "description": "Prügelt auf das Ziel ein für Waffenschaden plus {damage} und brecht seine Deckung: Eure eigenen Angriffe gegen das Ziel verursachen 8 Sek. lang 20% mehr Schaden. (Waffen)"
+      },
+      "measured_fury": {
+        "name": "Maßvoller Zorn",
+        "description": "Euer maßvoller Zorn lehrt Euch Sparsamkeit: Eure Fähigkeiten kosten 10% weniger Wut. (Waffen)"
+      },
+      "seasoned_soldier": {
+        "name": "Kampferprobter Soldat",
+        "description": "Eure kritischen Auto-Angriffe erzeugen 10% mehr Wut. (Waffen)"
+      },
+      "diabolical_twinstrike": {
+        "name": "Diabolischer Zwillingsschlag",
+        "description": "Solange Ihr wutentbrannt seid, verursacht Euer Zwillingsschlag 15% mehr Schaden. (Furor)"
+      },
+      "cleaving_blows": {
+        "name": "Spaltende Hiebe",
+        "description": "Rote Ernte erstattet immer eine Aufladung von Zwillingsschlag zurück. (Furor)"
+      },
+      "sudden_death": {
+        "name": "Plötzlicher Tod",
+        "description": "Eure Auto-Angriffe haben eine Chance, Euch Frühes Grab auf ein Ziel mit beliebiger Gesundheit wirken zu lassen, ohne Wut zu kosten. (Waffen)"
+      },
+      "storm_bolt": {
+        "name": "Sturmblitz",
+        "description": "Schleudert Eure Waffe für {damage} auf das Ziel und betäubt es 3 Sek. lang."
+      },
+      "piercing_howl": {
+        "name": "Durchdringendes Heulen",
+        "description": "Ein durchdringender Schrei, der alle Gegner im Umkreis von 15 m 8 Sek. lang um 50% verlangsamt."
+      },
+      "die_by_sword": {
+        "name": "Tod durch das Schwert",
+        "description": "Defensive Abklingzeit: 8 Sek. lang erleidet Ihr 30% weniger Schaden und weicht weit mehr Angriffen aus."
+      },
+      "recklessness": {
+        "name": "Tollkühnheit",
+        "description": "Wutausbruch: Eure Wuterzeugung erhöht sich 12 Sek. lang um 50% und Eure kritische Trefferchance um 20%."
+      },
+      "sanguine_aura": {
+        "name": "Blutrote Aura",
+        "description": "Erfüllt Eure Waffe mit dem Blut Eurer Feinde: Ihr und Eure Nahkampfverbündeten erhaltet 20 Sek. lang 10% Angriffstempo und 10% Schaden."
+      },
+      "victory_rush": {
+        "name": "Siegesrausch",
+        "description": "Schlagt für Waffenschaden plus {damage} zu und heilt 20% Eurer maximalen Gesundheit. Nur innerhalb von 20 Sek. nach dem Töten eines Gegners einsetzbar."
+      },
+      "intimidating_shout": {
+        "name": "Drohruf",
+        "description": "Ein furchteinflößender Schrei, der bis zu 5 Gegner im Umkreis von 8 m 8 Sek. lang in Furcht davonlaufen lässt. Schaden kann den Effekt brechen."
+      },
+      "revenge": {
+        "name": "Rache",
+        "description": "Greift in einem weiten Bogen an und verursacht physischen Schaden an allen Gegnern vor Euch. Bei mehr als 5 Zielen ist der Schaden verringert. Wenn Ihr ausweicht oder pariert, kann Eure nächste Rache keine Wut kosten. (Protection)"
+      },
+      "heroic_leap": {
+        "name": "Kriegssprung",
+        "description": "Springt zum Zielgebiet und verursacht bei der Landung {damage} Schaden an Gegnern in der Nähe."
+      },
+      "rallying_cry": {
+        "name": "Ruf der Tapferkeit",
+        "description": "Stoßt einen tapferen Ruf aus, der Euch und Gruppenmitgliedern im Umkreis von 40 Metern 10 Sek. lang 20% zusätzliche maximale Gesundheit gewährt. Schutz: Sie erleiden währenddessen außerdem 5% weniger Schaden."
+      },
+      "aspect_of_the_wild": {
+        "name": "Wildfanggewand",
+        "description": "Inspiriert Verbündete im Umkreis von 30 m mit wilder Kraft und erhöht ihre Angriffskraft 5 Min. lang um 45 und ihr Angriffstempo um 5 %. (Jägertalent)"
+      },
+      "avatar": {
+        "name": "Avatar",
+        "description": "Verwandelt Euch 20 Sek. lang in einen Koloss, brecht alle Kontrolleffekte auf Euch und erhöht Euren verursachten Schaden um 20%."
+      },
+      "avenging_wrath": {
+        "name": "Zornschwinge",
+        "description": "Ruft rächende Macht herbei und erhöht Eure Angriffskraft 20 Sek. lang um 60 und Eure Zaubermacht um 30. (Paladintalent)"
+      },
+      "berserk": {
+        "name": "Roter Dunst",
+        "description": "Erhöht Eure Angriffskraft 15 Sek. lang um 70. (Druidentalent)"
+      },
+      "bladestorm": {
+        "name": "Klingensturm",
+        "description": "Werdet zu einem wirbelnden Sturm aus Stahl und trefft 4 Sek. lang jede Sekunde alle Gegner im Umkreis von 6 Metern für {damage} Schaden."
+      },
+      "blink": {
+        "name": "Flimmerschritt",
+        "description": "Teleportiert Euch 15 m nach vorn und löst Bewegungsunfähigkeitseffekte. (Magiertalent)"
+      },
+      "bloodlust": {
+        "name": "Kriegstrommeln",
+        "description": "Versetzt Verbündete im Umkreis von 30 m in Raserei und erhöht ihr Angriffstempo 15 Sek. lang um 30 %. (Schamanentalent)"
+      },
+      "chain_lightning": {
+        "name": "Gabelblitz",
+        "description": "Schleudert einen Blitz auf das Zielgebiet und fügt Gegnern in der Nähe {damage} Schaden zu. (Schamanentalent)"
+      },
+      "chaos_bolt": {
+        "name": "Verderbensblitz",
+        "description": "Schleudert einen chaotischen Feuerblitz, der {damage} Feuerschaden verursacht. (Hexenmeistertalent)"
+      },
+      "cleansing_verdict": {
+        "name": "Läuterndes Urteil",
+        "description": "Entfernt einen schädlichen magischen Effekt von einem verbündeten Ziel und heilt es mit heiliger Magie um {damage}."
+      },
+      "cloak_of_shadows": {
+        "name": "Schattenmantel",
+        "description": "Hüllt Euch in Schatten und absorbiert 5 Sek. lang 420 Schaden. (Schurkentalent)"
+      },
+      "cone_of_cold": {
+        "name": "Frostfeger",
+        "description": "Golpea a nahe Gegner con escarcha e inflige {damage} de daño de Frost. (Magier-Talent)"
+      },
+      "counterspell": {
+        "name": "Spellbreak",
+        "description": "Kontert das Zauberwirken des Ziels und hindert es 6 Sek. lang daran, Zauber dieser Schule zu wirken."
+      },
+      "curse_of_exhaustion": {
+        "name": "Bleierner Fluch",
+        "description": "Verflucht das Ziel und verringert sein Bewegungstempo 12 Sek. lang um 30 %. (Hexenmeistertalent)"
+      },
+      "death_coil": {
+        "name": "Grabspirale",
+        "description": "Trifft den Gegner für {damage} Schattenschaden und versetzt ihn anschließend 3 Sek. lang in Entsetzen. (Hexenmeistertalent)"
+      },
+      "deep_freeze": {
+        "name": "Totenfrost",
+        "description": "Congela profundamente a Ziel, inflige {damage} de daño de Frost y lo aturde durante 4 Sek.. (Magier-Talent)"
+      },
+      "desperate_prayer": {
+        "name": "Letztes Gebet",
+        "description": "Heilt Euch sofort um {damage}. (Priestertalent)"
+      },
+      "deterrence": {
+        "name": "Borstenwacht",
+        "description": "Erhöht Eure Ausweichchance 10 Sek. lang um 50 Prozentpunkte. (Jägertalent)"
+      },
+      "divine_shield": {
+        "name": "Lichtwacht",
+        "description": "Schützt Euch mit heiliger Macht, die 8 Sek. lang 900 Schaden absorbiert. (Paladintalent)"
+      },
+      "earthbind": {
+        "name": "Greifende Erde",
+        "description": "Bindet Gegner in der Nähe an die Erde und macht sie 2 Sek. lang bewegungsunfähig. (Schamanentalent)"
+      },
+      "evocation": {
+        "name": "Ätherbrunnen",
+        "description": "Restaura Mana rápidamente. (Magier-Talent)"
+      },
+      "frenzied_regeneration": {
+        "name": "Wilde Heilung",
+        "description": "Stellt im Verlauf von 10 Sek. 180 Gesundheit wieder her. Nur in Bärengestalt. (Druidentalent)"
+      },
+      "frost_trap": {
+        "name": "Reifschlinge",
+        "description": "Friert Gegner im Zielgebiet 3 Sek. lang ein, sodass sie sich weder bewegen noch handeln können. (Jägertalent)"
+      },
+      "ghostly_strike": {
+        "name": "Geisterschlag",
+        "description": "Trifft den Gegner für Waffenschaden plus {damage}, erhöht kurzzeitig die Ausweichchance und gewährt 1 Combopunkt. (Schurkentalent)"
+      },
+      "hammer_of_wrath": {
+        "name": "Läutender Hammer",
+        "description": "Schleudert einen heiligen Hammer auf einen verwundeten Gegner und verursacht {damage} Heiligschaden. Nur unter 20 % Gesundheit einsetzbar. (Paladintalent)"
+      },
+      "healing_stream": {
+        "name": "Quellbrunnen",
+        "description": "Stellt bei einem verbündeten Ziel im Verlauf von 12 Sek. 120 Gesundheit wieder her. (Schamanentalent)"
+      },
+      "holy_wrath": {
+        "name": "Heiligenzorn",
+        "description": "Entfesselt heilige Macht und fügt Gegnern in der Nähe {damage} Schaden zu. (Paladintalent)"
+      },
+      "howl_of_terror": {
+        "name": "Schreckensheulen",
+        "description": "Versetzt Gegner in der Nähe bis zu 3 Sek. lang in Furcht. Schaden kann den Effekt aufheben. (Hexenmeistertalent)"
+      },
+      "ice_block": {
+        "name": "Kalter Sarg",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 Sek.. (Magier-Talent)"
+      },
+      "inner_focus": {
+        "name": "Stiller Geist",
+        "description": "Euer nächster Zauber kostet nichts. Hält 60 Sek. lang an. (Priestertalent)"
+      },
+      "innervate": {
+        "name": "Lebenssaft",
+        "description": "Lebendiger Pflanzensaft quillt 10 Sek. lang in Euch auf und stellt in Wellen 20 Eurer aktuellen Ressource wieder her: Mana, Wut oder Energie. Gestaltwandel unterbricht ihn nicht. Schlaf, Betäubung oder Stasis bringen den Saft zum Stillstand. (Druidentalent)"
+      },
       "pummel": {
         "name": "Jawcrack",
         "description": "Unterbricht das Zauberwirken des Ziels und hindert es 4 Sek. lang daran, Zauber dieser Schule zu wirken."
@@ -6736,9 +7233,81 @@ export const de_DE: EnTranslations = {
         "name": "Boot",
         "description": "Unterbricht das Zauberwirken des Ziels und hindert es 4 Sek. lang daran, Zauber dieser Schule zu wirken."
       },
-      "counterspell": {
-        "name": "Spellbreak",
-        "description": "Kontert das Zauberwirken des Ziels und hindert es 6 Sek. lang daran, Zauber dieser Schule zu wirken."
+      "mend_pet": {
+        "name": "Zusammenflicken",
+        "description": "Sana a freundliches Ziel por {damage} durante 15 Sek.. (Jäger-Talent)"
+      },
+      "meteor": {
+        "name": "Himmelsstein",
+        "description": "Ruft einen Meteor auf das Zielgebiet herab, der {damage} Feuerschaden verursacht. Anschließend erleiden Gegner dort 6 Sek. lang alle 2 Sek. 12 bis 18 Feuerschaden. (Magiertalent)"
+      },
+      "temporal_mend": {
+        "name": "Temporale Heilung",
+        "description": "Zieht einen Verbündeten einen Moment in die Zukunft und heilt {damage} Gesundheit, während der Körper in sein gesünderes zukünftiges Selbst eingeht. (Chronomantie-Signatur)"
+      },
+      "temporal_barrier": {
+        "name": "Temporale Barriere",
+        "description": "Versetzt das Ziel um einen Herzschlag aus der Gegenwart; eine zeitliche Hülle absorbiert 10 Sek. lang {damage} Schaden, bevor der Zeitstrang zurückschnappt."
+      },
+      "temporal_echo": {
+        "name": "Temporales Echo",
+        "description": "Markiert einen Verbündeten mit dem Echo eines gesünderen Augenblicks und heilt sofort {damage} Gesundheit. Für {duration} Sek. wird ein Teil des Arkanen Schadens, den du verursachst, durch das Echo zurückgeleitet und heilt ihn."
+      },
+      "temporal_cascade": {
+        "name": "Temporale Kaskade",
+        "description": "Sendet ein Echo durch deine Gruppe: Das Ziel und bis zu vier seiner nächsten Verbündeten werden sofort geheilt und jeweils {duration} Sek. lang markiert, wodurch ein Teil des Arkanen Schadens, den du verursachst, durch ihre Echos zurückgeleitet wird und sie heilt. (Chronomantie)"
+      },
+      "temporal_reversal": {
+        "name": "Temporale Umkehr",
+        "description": "Spult den Zeitstrang eines gefallenen Verbündeten zurück und erweckt ihn an seinem Körper mit einem Teil seiner Gesundheit und seines Manas, selbst mitten im Kampf. (Chronomantie)"
+      },
+      "collective_reversal": {
+        "name": "Kollektive Umkehr",
+        "description": "Spult die Zeitlinie jedes gefallenen Mitglieds eurer Gruppe oder Schlachtgruppe zurück und erweckt es bei seinem Körper mit 30% Gesundheit und Mana wieder. Kann nicht im Kampf gewirkt werden. (Chronomantie)"
+      },
+      "temporal_rewind": {
+        "name": "Rewind",
+        "description": "Sendet eine arkane Welle durch deine Gruppe oder deinen Schlachtzug und dreht die Zeit zurück, um 30% des Schadens wiederherzustellen, den jeder Verbündete innerhalb von 40 Metern in den letzten 5 Sekunden erlitten hat (bis zu 35% seiner maximalen Gesundheit). Kann kein kritischer Effekt sein. (Chronomantie)"
+      },
+      "temporal_hourglass": {
+        "name": "Sanduhr der Schwebe",
+        "description": "Platziert eine temporale Sanduhr am gewählten Ort. Unter einem Feind suspendiert sie diesen im PvE für {hostilePveDuration} Sek. oder im PvP für {hostilePvpDuration} Sek. und verhindert alle Aktionen; Schaden bricht den Effekt. Unter deinen Füßen oder unter einem Gruppenverbündeten gewährt sie {duration} Sek. lang Stasis, verhindert Schaden und Aktionen, stellt {healing}% der maximalen Gesundheit wieder her und lässt Abklingzeiten {selfCooldownRecovery}% schneller für dich oder {allyCooldownRecovery}% schneller für einen Verbündeten regenerieren. Auf leerem Boden wartet die Sanduhr {groundDuration} Sek. und wirkt auf die erste gültige Einheit, die sie betritt. Der vorteilhafte Effekt kann manuell entfernt werden."
+      },
+      "temporal_acceleration": {
+        "name": "Temporale Beschleunigung",
+        "description": "Beschleunigt den Zeitfluss für deine Gruppe oder deinen Schlachtzug und erhöht Angriffs-, Zauber- und Kanalisierungsgeschwindigkeit 15 Sek. lang um 30%. Verbündete, die kürzlich von Temporaler Beschleunigung oder Kriegstrommeln betroffen waren, sind zu erschöpft, um davon zu profitieren. (Chronomantie)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Nutze deinen perfekten Moment: Gewinne sofort 4 Arkane Ladungen, und für 10 Sek. verbraucht Aether-Pfeile diese nicht. (Chronomantie)"
+      },
+      "arcane_surge": {
+        "name": "Aether Surge",
+        "description": "Zieht eine Woge rohen Äthers durch den Feind und verursacht {damage} Schaden. Jeder Einsatz hinterlässt eine Arkane Ladung, die Schaden und Zaubertempo des nächsten Aether Surge erhöhen (jeweils 5% schneller), aber seine Manakosten stark erhöht, bis zu 4 Stapel; Aether-Pfeile verbraucht die Ladungen. Jeder Einsatz kann außerdem Ätheransturm auslösen, sodass dein nächster Aether Surge kostenlos und doppelt so schnell ist."
+      },
+      "mind_sear": {
+        "name": "Gedankenbrand",
+        "description": "Kanalisiert Schattenenergie auf das Zielgebiet und fügt Gegnern in der Nähe jede Sekunde {damage} Schaden zu. (Priestertalent)"
+      },
+      "multi_shot": {
+        "name": "Spaltschuss",
+        "description": "Feuert einen Geschosshagel auf das Zielgebiet ab und fügt Gegnern im Umkreis von 8 m {damage} körperlichen Schaden zu. (Jägertalent)"
+      },
+      "prayer_of_healing": {
+        "name": "Chorheilung",
+        "description": "Heilt Verbündete in der Nähe um {damage}. (Priestertalent)"
+      },
+      "preparation": {
+        "name": "Notfallplan",
+        "description": "Schließt die Abklingzeiten von Sprint, Entrinnen und Verschwinden ab. (Schurkentalent)"
+      },
+      "presence_of_mind": {
+        "name": "Rasender Geist",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 Sek.. (Magier-Talent)"
+      },
+      "psychic_scream": {
+        "name": "Schreckensschrei",
+        "description": "Versetzt Gegner in der Nähe bis zu 4 Sek. lang in Furcht. Schaden kann den Effekt aufheben. (Priestertalent)"
       },
       "counter_shot": {
         "name": "Hushing Shot",
@@ -6748,6 +7317,26 @@ export const de_DE: EnTranslations = {
         "name": "Reproach",
         "description": "Unterbricht das Zauberwirken des Ziels und hindert es 4 Sek. lang daran, Zauber dieser Schule zu wirken."
       },
+      "shadowstep": {
+        "name": "Schattengleiten",
+        "description": "Tretet durch die Schatten auf Euer Ziel zu. (Schurkentalent)"
+      },
+      "silence": {
+        "name": "Stille",
+        "description": "Bringt das Ziel 4 Sek. lang zum Schweigen. (Priestertalent)"
+      },
+      "smoke_screen": {
+        "name": "Rauchvorhang",
+        "description": "Ihr verschwindet in einer Rauchwolke, wodurch sich Eure Ausweichchance 8 Sek. lang um 30 % erhöht."
+      },
+      "spellsteal": {
+        "name": "Zauberraub",
+        "description": "Stiehlt einem Gegner einen vorteilhaften magischen Effekt und überträgt ihn auf Euch."
+      },
+      "startle_shot": {
+        "name": "Schreckschuss",
+        "description": "Ein wilder Schuss, der das Ziel {duration} Sek. lang desorientiert. Jeglicher Schaden bricht den Effekt."
+      },
       "skull_bash": {
         "name": "Headbutt",
         "description": "Ein vorstoßender Kopfstoß, der das Zauberwirken des Ziels unterbricht und es 4 Sek. lang daran hindert, Zauber dieser Schule zu wirken."
@@ -6755,6 +7344,18 @@ export const de_DE: EnTranslations = {
       "spell_lock": {
         "name": "Gag Order",
         "description": "Bringt das Ziel mitten im Zauberwirken zum Schweigen und hindert es 5 Sek. lang daran, Zauber dieser Schule zu wirken."
+      },
+      "tranquility": {
+        "name": "Hainlied",
+        "description": "Kanalisiert 4 Sek. lang heilende Energie und heilt Verbündete im Umkreis von 30 m jede Sekunde um 42 bis 52. (Druidentalent)"
+      },
+      "typhoon": {
+        "name": "Taifun",
+        "description": "Eine Windböe stößt alle Gegner im Umkreis von 8 m zurück und macht sie benommen, wodurch ihr Bewegungstempo 4 Sek. lang um 50 % verringert wird."
+      },
+      "voidfeast": {
+        "name": "Leerenmahl",
+        "description": "Verschlingt einen magischen Effekt (einen vorteilhaften von einem Gegner oder einen schädlichen von einem Verbündeten) und heilt Euch um 6 % Eurer maximalen Gesundheit."
       },
       "bear_charge": {
         "name": "Bruin-Ansturm",
@@ -6773,8 +7374,8 @@ export const de_DE: EnTranslations = {
         "description": "Ein Schleicheröffner, der den Gegner für Waffenschaden plus {damage} aufreißt und über 9 Sek. Blutungsschaden verursacht. Gewährt 1 Combopunkt. Nur in Wolfsgestalt."
       },
       "revive_pet": {
-        "name": "Begleiter wiederbeleben",
-        "description": "Belebt deinen toten Begleiter wieder und ruft ihn an deine Seite zurück."
+        "name": "Zusammenflicken",
+        "description": "Flickt deinen Begleiter zusammen und stellt ihm, solange er lebt, im Verlauf von 12 Sek. alle 3 Sek. insgesamt {overTime} Gesundheit wieder her. Ist er tot, wird er mit 35 % Gesundheit wiederbelebt."
       }
     },
     "items": {
@@ -7537,6 +8138,12 @@ export const de_DE: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Glutglas-Kriegsstab"
       },
+      "conjured_water4": {
+        "name": "Herbeigezaubertes Quellwasser"
+      },
+      "conjured_bread4": {
+        "name": "Herbeigezauberter Festschmauslaib"
+      },
       "bristleback_maul": {
         "name": "Gallowglass-Hammer"
       },
@@ -8005,6 +8612,18 @@ export const de_DE: EnTranslations = {
       "heroic_mark": {
         "name": "Heroische Marke"
       },
+      "eastbrook_buckler": {
+        "name": "Eastbrook-Faustschild"
+      },
+      "eastbrook_greatsword": {
+        "name": "Eastbrook-Großschwert"
+      },
+      "highwatch_greatsword": {
+        "name": "Highwatch-Großschwert"
+      },
+      "highwatch_wallshield": {
+        "name": "Highwatch-Mauerschild"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Morthens gruftgeschmiedetes Kettenhemd"
       },
@@ -8157,6 +8776,18 @@ export const de_DE: EnTranslations = {
       },
       "stormcallers_spaulders": {
         "name": "Galecall-Schulterplatten"
+      },
+      "bonewrought_greatsword": {
+        "name": "Bonewrought-Großschwert"
+      },
+      "direfang_greatblade": {
+        "name": "Direfang-Großklinge"
+      },
+      "bonewrought_bulwark": {
+        "name": "Bonewrought-Bollwerk"
+      },
+      "wraithfire_orb": {
+        "name": "Wraithfire-Kugel"
       },
       "unknown_alien_weaponry": {
         "name": "Unbekannte Alien-Waffen"
@@ -8406,9 +9037,6 @@ export const de_DE: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "Auferstandene Königswache"
       },
-      "nythraxis_scourge_of_thornpeak": {
-        "name": "Nythraxis, Geißel von Thornpeak"
-      },
       "nythraxis_heroic_warrior_add": {
         "name": "Aldren, Todlose Kriegswache"
       },
@@ -8417,6 +9045,9 @@ export const de_DE: EnTranslations = {
       },
       "nythraxis_heroic_rogue_add": {
         "name": "Voss, Todlose Klinge"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "Nythraxis, Geißel von Thornpeak"
       },
       "reliquary_ledger_wraith": {
         "name": "Verzeichnisgespenst"
@@ -8588,6 +9219,9 @@ export const de_DE: EnTranslations = {
       },
       "ysolei": {
         "name": "Ysolei, Avatar des Ertränkten Mondes"
+      },
+      "water_elemental": {
+        "name": "Wasserelementar"
       }
     },
     "npcs": {
@@ -8707,9 +9341,9 @@ export const de_DE: EnTranslations = {
         "greeting": "Willkommen bei der Vergoldeten Schatulle. Deine Waren ruhen sicher hinter unseren Schlössern."
       },
       "card_master": {
-        "name": "Card Master",
-        "title": "Dealer of Chance",
-        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+        "name": "Kartenmeister",
+        "title": "Händler des Zufalls",
+        "greeting": "Lust auf einen Kartenkampf? Wer zwei von drei Runden gewinnt, darf sich brüsten."
       },
       "bursar_petra_vell": {
         "name": "Kämmerin Petra Vell",
@@ -8770,11 +9404,11 @@ export const de_DE: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Ein Handwerk für jede Hand",
-        "text": "Jeder in Eastbrook übt neben dem Schwert ein Handwerk aus, {playerName}. Rund um die Stadt gibt es Erzadern, also schwing die Spitzhacke und bring mir 5 Brocken. Bau sie selbst ab, wohlgemerkt; ich werde den Unterschied erkennen.",
-        "completion": "Siehst du? Erz in deinem Rucksack und Schwielen an deinen Händen. Bleib beim Bergbau, Holzfällen und Kräutersammeln, während du die Straßen bereist. Wenn du wieder in der Stadt bist, wirf einen Blick auf die Stadtfokus-Tafel am Markt und die Werkbank in der Nähe. In all dem wartet ein ehrlicher Verdienst, wenn du ihn willst.",
+        "text": "Jede Seele in Eastbrook betreibt neben dem Schwert noch ein Handwerk, {playerName}. Im Gestein rund um die Kupferschürfe südwestlich der Stadt gibt es Erzadern. Geh selbst mit der Spitzhacke ran und bearbeite 5 davon; ich werde den Unterschied merken.",
+        "completion": "Siehst du? Erz gesammelt und Schwielen an den Händen. Betreibe Bergbau, Holzfällen und Kräutersammeln weiter auf deinen Reisen, und wenn du wieder in der Stadt bist, schau auf das Stadtfokus-Brett beim Markt und die Werkbank in der Nähe. Da steckt ein fairer Handel drin, wenn du ihn willst.",
         "objectives": {
           "0": {
-            "label": "Erzbrocken"
+            "label": "Erzader abgebaut"
           }
         }
       },
@@ -9562,21 +10196,31 @@ export const de_DE: EnTranslations = {
       },
       "q_archetype_acceptance": {
         "title": "Ein Handwerk, das Sie Ihr Eigen nennen können",
-        "text": "Jeder Kunsthandwerker aus Eastbrook entscheidet sich schließlich für ein Handwerk, das er sein Eigen nennen kann. Beweisen Sie sich mit einer einzigen Tat, {playerName}, und erklären Sie Ihren Weg.",
-        "completion": "Dein Weg ist gewählt; geh gut damit.",
+        "text": "Können ist Wissen, {playerName}, doch Abstimmung ist ein Versprechen. Wähle zwei benachbarte Handwerke, deren Methoden du als deine Hauptberufe trägst, und bring mir dann Erz, das du im Tal mit eigenen Händen bearbeitet hast.",
+        "completion": "Das Versprechen gilt. Diese beiden Handwerke sind nun deine Hauptberufe, und das Wissen auf der anderen Seite wird zu deinem Hobby.",
+        "objectives": {
+          "0": {
+            "label": "Erzader abgebaut"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "Wiedergutmachung leisten",
+        "text": "Du hast dieses Paar bereits getragen, {playerName}. Zurückzukehren ist kein neues Gelöbnis. Hilf, den Weg durch das Tal freizuhalten, und die Arbeit wird deinen Händen in Erinnerung rufen, was sie einst kannten.",
+        "completion": "Der alte Rhythmus kehrt zurück. Dein früheres Paar ist wieder aktiv.",
         "objectives": {
           "0": {
             "label": "Waldwolf getötet"
           }
         }
       },
-      "q_prof_make_amends": {
-        "title": "Wiedergutmachung leisten",
-        "text": "Um ein Handwerk einem anderen zu überlassen, muss ein Handwerker zunächst den nicht gegangenen Weg wiedergutmachen, {playerName}.",
-        "completion": "Änderungen vorgenommen; ein neuer Weg steht dir offen.",
+      "q_prof_hobby_switch": {
+        "title": "Eine andere Freizeitbeschäftigung",
+        "text": "Hauptberufe erfordern ein Gelöbnis. Ein Hobby fragt nur, wohin deine Neugier wandert, {playerName}. Sammle ein paar Kräuter und entscheide, welches Handwerk dem deiner Hauptberufe gegenüber du verfolgen möchtest.",
+        "completion": "Eine leichtere Wahl, aber eine nützliche. Folge dieser Neugier, so weit sie seltene Arbeit trägt.",
         "objectives": {
           "0": {
-            "label": "Waldwolf getötet"
+            "label": "Kräuterpflanze geerntet"
           }
         }
       },
@@ -9845,7 +10489,7 @@ export const de_DE: EnTranslations = {
       },
       "necromancers": {
         "name": "Mournweave-Gewänder",
-        "bonus2": "Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).",
+        "bonus2": "Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).",
         "bonus3": "Erhöht Intelligenz um 10 und Ausdauer um 10.",
         "bonus4": "Eure Zauber haben eine Chance von 10%, Klarsicht zu gewähren, wodurch euer nächster Zauber kostenlos wird."
       },
@@ -9857,13 +10501,13 @@ export const de_DE: EnTranslations = {
       },
       "soulflame": {
         "name": "Wraithfire-Gewänder",
-        "bonus2": "Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).",
+        "bonus2": "Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).",
         "bonus3": "Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.",
         "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht."
       },
       "stormcallers": {
         "name": "Galecall-Gewänder",
-        "bonus2": "Ihr könnt nicht zurückgestoßen werden (100% Rückstoßwiderstand).",
+        "bonus2": "Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).",
         "bonus3": "Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.",
         "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht."
       },

@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_card_duel_first_win: {
+    name: '以牌为规',
+    desc: '在牌局大师处赢得一场纸牌对决。',
+  },
   prog_first_steps: { name: '千里之行', desc: '达到2级，在漫漫长路上迈出你的第一步。' },
   prog_finding_your_feet: { name: '站稳脚跟', desc: '达到5级；荒野看上去已经小了一些。' },
   prog_double_digits: { name: '迈入两位数', desc: '达到10级，解锁你的天赋。' },
@@ -16,7 +20,10 @@ export const table: DeedLocaleTable = {
   prog_talented: { name: '花得其所', desc: '花费你的第一点天赋点。' },
   prog_specialized: { name: '志向已定', desc: '选择一门专精，并习得它的招牌技能。' },
   prog_deep_roots: { name: '根深蒂固', desc: '将一点天赋点投入最后一排的天赋。' },
-  prog_full_build: { name: '满打满算', desc: '将全部十一点天赋点投入同一套天赋配置。' },
+  prog_full_build: {
+    name: '六行俱全',
+    desc: '在同一套配置的六行天赋中各选择一个选项。',
+  },
   prog_veteran: { name: '老兵', desc: '生涯累计获得250,000点经验。', title: '老兵' },
   prog_champion: { name: '冠军', desc: '生涯累计获得500,000点经验。', title: '冠军' },
   prog_paragon: { name: '典范', desc: '生涯累计获得1,000,000点经验。', title: '典范' },

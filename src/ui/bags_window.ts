@@ -117,6 +117,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   /** Localized launcher for the Claudium store, empty when the feature is not available. */
   claudiumLauncherHtml(): string;
   openClaudium(): void;
+  openWallet(): void;
   hideTooltip(): void;
   /** True when this click is the release of a long-press tooltip peek, so the
    *  stack's action (use / sell / deposit / feed) must be SUPPRESSED. Wired to the
@@ -256,6 +257,9 @@ export class BagsWindow {
     el.appendChild(moneyRow);
     moneyRow.querySelector('[data-claudium-launcher]')?.addEventListener('click', () => {
       this.deps.openClaudium();
+    });
+    moneyRow.querySelector('[data-wallet-action]')?.addEventListener('click', () => {
+      this.deps.openWallet();
     });
     el.querySelector('[data-close]')?.addEventListener('click', () => {
       // On touch the vendor / bank clusters hide their LEFT panel's own x-btn, so

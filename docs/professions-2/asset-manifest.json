@@ -324,6 +324,18 @@
           "name": "Tier milestone set (per-craft, count lands Phase 15)",
           "deferred": true,
           "priority": 3
+        },
+        {
+          "id": "deed_prof_specialist",
+          "name": "Specialist (first 75-skill specialization, any craft)",
+          "description": "A masterfully kept tool resting on a velvet cloth",
+          "priority": 3
+        },
+        {
+          "id": "deed_prof_rare_finds",
+          "name": "Rare find set (pristine vein, ancient heartwood, moonlit bloom, perfect specimen)",
+          "deferred": true,
+          "priority": 3
         }
       ],
       "size": "512px source PNG, served 128px WebP"
@@ -341,7 +353,19 @@
         {
           "id": "marker_pristine_vein",
           "name": "Pristine vein marker",
-          "description": "The existing gather-node marker with a brief glint accent (reduced-motion aware)",
+          "description": "The existing gather-node marker with a brief glint accent (reduced-motion aware); the ore flavor of the rare-event marker family",
+          "priority": 2
+        },
+        {
+          "id": "marker_ancient_heartwood",
+          "name": "Ancient heartwood marker",
+          "description": "The wood flavor of the rare-event marker family, same glint treatment as the pristine vein",
+          "priority": 2
+        },
+        {
+          "id": "marker_moonlit_bloom",
+          "name": "Moonlit bloom marker",
+          "description": "The herb flavor of the rare-event marker family, same glint treatment as the pristine vein",
           "priority": 2
         }
       ]

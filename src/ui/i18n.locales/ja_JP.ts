@@ -13,8 +13,173 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.crafting.identity.ceilingRare': 'レア上限',
+  'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
+  'hudChrome.nameplate.mobEliteLevel': '{level}+',
+  'hudChrome.nameplate.mobLevel': '{level}',
   'hudChrome.discord.roleTag.legend': 'レジェンド',
   'hudChrome.discord.roleTag.shill': 'サポーター',
+  'entities.items.eastbrook_greatsword.name': 'イーストブルックの大剣',
+  'entities.items.highwatch_greatsword.name': 'ハイウォッチの大剣',
+  'entities.items.highwatch_wallshield.name': 'ハイウォッチの壁盾',
+  'entities.items.eastbrook_buckler.name': 'イーストブルックのバックラー',
+  'entities.abilities.avatar.name': '化身',
+  'entities.abilities.avatar.description':
+    '20秒間コロッサスに変身し、あらゆる行動妨害を解除し、与えるダメージが20%増加します。',
+  'entities.abilities.bladestorm.name': '剣の嵐',
+  'entities.abilities.battle_stance.description':
+    '攻撃的な戦闘スタンスです。怒りの生成量が10%増加します。武器と防御の基本スタンスです。',
+  'entities.abilities.battle_stance.name': 'バトルスタンス',
+  'entities.abilities.berserker_stance.description':
+    '無謀な戦闘スタンスです。クリティカルの発生率が3%上昇し、ダメージが3%増加します。狂怒ウォリアーは常にこのスタンスで戦います。',
+  'entities.abilities.berserker_stance.name': 'バーサーカースタンス',
+  'entities.abilities.breachmaker.description':
+    '対象を打ち据えて武器ダメージに{damage}を加えたダメージを与え、その守りを崩します。8秒間、あなたがその対象に与えるダメージが20%増加します。（武器）',
+  'entities.abilities.breachmaker.name': '崩し手',
+  'entities.abilities.cleaving_blows.description':
+    '赤い収穫は必ず双撃のチャージを1つ回復します。（狂怒）',
+  'entities.abilities.cleaving_blows.name': '切り裂く連撃',
+  'entities.abilities.deep_wounds.description':
+    'パッシブ: あなたの重傷の一撃が対象に出血を残し、6秒かけて物理ダメージを与えます。（武器）',
+  'entities.abilities.deep_wounds.name': '抉れた傷',
+  'entities.abilities.defiant_bellow.description':
+    '不屈の雄叫びを上げ、10yd以内のすべての敵を挑発し、3秒間あなたを攻撃するよう強制します。（防御）',
+  'entities.abilities.defiant_bellow.name': '不屈の雄叫び',
+  'entities.abilities.diabolical_twinstrike.description':
+    '激昂している間、双撃のダメージが15%増加します。（狂怒）',
+  'entities.abilities.diabolical_twinstrike.name': '極悪の双撃',
+  'entities.abilities.die_by_sword.description':
+    '防御的クールダウン。8秒間、受けるダメージが30%減少し、攻撃を回避する確率が大幅に上昇します。',
+  'entities.abilities.die_by_sword.name': '剣に死す',
+  'entities.abilities.emboldening_roar.description':
+    '奮い立たせる咆哮を上げ、40yd以内の自分と味方プレイヤーを鼓舞します。次の3回のアビリティが必ずクリティカルになります。（狂怒）',
+  'entities.abilities.emboldening_roar.name': '奮起の咆哮',
+  'entities.abilities.enrage_passive.description':
+    'パッシブ: 激昂している間、与えるダメージが7%増加し、攻撃速度が25%、移動速度が10%上昇します（4秒間）。瀉血には30%の確率で激昂させる効果があり、赤い収穫は必ず激昂させます。（狂怒）',
+  'entities.abilities.enrage_passive.name': '狂乱',
+  'entities.abilities.faultline.description':
+    '地面に衝撃波を走らせ、前方8yd以内の敵に{damage}のダメージを与え、3秒間スタンさせます。（防御）',
+  'entities.abilities.faultline.name': '断層',
+  'entities.abilities.furious_mending.description':
+    '10秒間、受けるダメージが20%減少し、効果中は瀉血が最大体力の20%を回復します。（狂怒）',
+  'entities.abilities.furious_mending.name': '憤怒の癒し',
+  'entities.abilities.heroic_leap.description':
+    '対象地点へ跳躍し、着地時に周囲の敵へ{damage}のダメージを与えます。',
+  'entities.abilities.heroic_leap.name': '英雄的跳躍',
+  'entities.abilities.intimidating_shout.description':
+    '恐ろしい叫びを上げ、8yd以内の最大5体の敵を8秒間、恐怖で逃げ惑わせます。ダメージを受けると効果が解除されることがあります。',
+  'entities.abilities.intimidating_shout.name': '威圧の雄叫び',
+  'entities.abilities.iron_resolve.description':
+    '歯を食いしばって痛みを堪え、最大40の怒り（最低20）を消費し、消費した怒り1につき4のダメージを吸収します。最大10秒間持続します。（防御）',
+  'entities.abilities.iron_resolve.name': '鉄の決意',
+  'entities.abilities.measured_fury.description':
+    '制御された怒りが効率を高め、アビリティの怒りコストが10%減少します。（武器）',
+  'entities.abilities.measured_fury.name': '制御された怒り',
+  'entities.abilities.piercing_howl.description':
+    '劈くような叫びを上げ、15yd以内のすべての敵の移動速度を8秒間、50%低下させます。',
+  'entities.abilities.piercing_howl.name': '貫く咆哮',
+  'entities.abilities.raging_gale.description':
+    '武器で即座に2回攻撃し、それぞれ武器ダメージの40%に{damage}を加えたダメージを与え、怒りを8生成します。最大2チャージまで蓄積します。（狂怒）',
+  'entities.abilities.raging_gale.name': '双撃',
+  'entities.abilities.raised_guard.description':
+    '盾の陰に身を構え、6秒間、受ける物理ダメージが50%減少します。最大2チャージまで蓄積します。（防御）',
+  'entities.abilities.raised_guard.name': '守りの構え',
+  'entities.abilities.rallying_cry.description':
+    '勇壮な雄叫びを上げ、自分と40ヤード以内のパーティメンバーの最大体力を10秒間20%増加させます。防御の対象は、効果中に受けるダメージも5%減少します。',
+  'entities.abilities.rallying_cry.name': '勇気の雄叫び',
+  'entities.abilities.recklessness.description':
+    '激昂。12秒間、怒りの生成量が50%、クリティカル率が20%増加します。',
+  'entities.abilities.recklessness.name': '無謀',
+  'entities.abilities.red_harvest.description':
+    'すべてを注ぎ込み、狂乱のうちに3回攻撃し、それぞれ武器ダメージの65%に{damage}を加えたダメージを与え、必ず激怒状態になります。（狂怒）',
+  'entities.abilities.red_harvest.name': '赤い収穫',
+  'entities.abilities.revenge.description':
+    '大きく弧を描いて攻撃し、前方のすべての敵に物理ダメージを与えます。対象が5体を超えるとダメージが減少します。回避または受け流しに成功すると、次の意趣返しの怒りコストが0になることがあります。 (Protection)',
+  'entities.abilities.revenge.name': '意趣返し',
+  'entities.abilities.sanguine_aura.description':
+    '武器に敵の血を宿し、20秒間、自分と近接の味方の攻撃速度が10%、ダメージが10%増加します。',
+  'entities.abilities.sanguine_aura.name': '血のオーラ',
+  'entities.abilities.seasoned_soldier.description':
+    'クリティカルの通常攻撃が生成する怒りが10%増加します。（武器）',
+  'entities.abilities.seasoned_soldier.name': '歴戦の兵',
+  'entities.abilities.storm_bolt.description':
+    '武器を対象に投げつけて{damage}のダメージを与え、3秒間スタンさせます。',
+  'entities.abilities.storm_bolt.name': '嵐の一投',
+  'entities.abilities.sudden_death.description':
+    '通常攻撃に、体力に関係なく早すぎる墓を怒りコストなしで使用できるようになる確率があります。（武器）',
+  'entities.abilities.sudden_death.name': '突然死',
+  'entities.abilities.sweeping_strikes.description':
+    '12秒間、単体攻撃が近くの敵1体にも100%のダメージで命中します。（武器）',
+  'entities.abilities.sweeping_strikes.name': '広がる弧',
+  'entities.abilities.victory_rush.description':
+    '武器ダメージに{damage}を加えたダメージを与え、最大体力の20%を回復します。敵を倒してから20秒以内にのみ使用できます。',
+  'entities.abilities.victory_rush.name': '勝利の追撃',
+  'hudChrome.specPanel.complexity': '複雑さ',
+  'hudChrome.specPanel.complexityHigh': '高',
+  'hudChrome.specPanel.complexityLow': '低',
+  'hudChrome.specPanel.complexityMedium': '中',
+  'hudChrome.specPanel.exampleAbilities': '代表的なアビリティ',
+  'hudChrome.specPanel.primaryAttr': '主要能力値',
+  'hudChrome.specPanel.selectSpec': 'スペシャライゼーションを選択',
+  'hudChrome.specPanel.viewTalents': 'タレントを見る',
+  'hudChrome.talentRows.comingSoon': '近日公開',
+  'hudChrome.talentRows.defaultLoadout': 'デフォルト構成',
+  'hudChrome.talentRows.tab': '選択',
+  'hudChrome.talentRows.readoutSummary': 'タレント：{head}、{spent}/{total}行を選択済み。',
+  'entities.abilities.aspect_of_the_wild.name': '野牙の装い',
+  'entities.abilities.avenging_wrath.name': '復讐の翼',
+  'entities.abilities.berserk.name': '赤き霞',
+  'entities.abilities.blink.name': '瞬き歩み',
+  'entities.abilities.bloodlust.name': '戦の太鼓',
+  'entities.abilities.chain_lightning.name': '枝分かれの稲妻',
+  'entities.abilities.chaos_bolt.name': '破滅の矢',
+  'entities.abilities.cleansing_verdict.name': '浄化の裁定',
+  'entities.abilities.cleansing_verdict.description':
+    '味方1体の有害な魔法効果を解除し、{damage}の体力を回復する。',
+  'entities.abilities.cloak_of_shadows.name': '影まとい',
+  'entities.abilities.cone_of_cold.name': '霜払い',
+  'entities.abilities.curse_of_exhaustion.name': '鉛の呪い',
+  'entities.abilities.death_coil.name': '墓所の螺旋',
+  'entities.abilities.deep_freeze.name': '死霜',
+  'entities.abilities.desperate_prayer.name': '最後の祈り',
+  'entities.abilities.deterrence.name': '針毛の守り',
+  'entities.abilities.divine_shield.name': '光の護り',
+  'entities.abilities.earthbind.name': '大地の縛り',
+  'entities.abilities.evocation.name': 'エーテルの井戸',
+  'entities.abilities.frenzied_regeneration.name': '野生の癒し',
+  'entities.abilities.frost_trap.name': '霧氷の罠',
+  'entities.abilities.ghostly_strike.name': '亡霊の一撃',
+  'entities.abilities.hammer_of_wrath.name': '鐘鳴りの槌',
+  'entities.abilities.healing_stream.name': '湧き水',
+  'entities.abilities.holy_wrath.name': '聖者の怒り',
+  'entities.abilities.howl_of_terror.name': '恐怖の遠吠え',
+  'entities.abilities.ice_block.name': '冷たき棺',
+  'entities.abilities.inner_focus.name': '静まる心',
+  'entities.abilities.innervate.name': '生命の樹液',
+  'entities.abilities.meteor.name': '天の石',
+  'entities.abilities.mind_sear.name': '思念焼き',
+  'entities.abilities.multi_shot.name': '分裂射撃',
+  'entities.abilities.prayer_of_healing.name': '聖歌の癒し',
+  'entities.abilities.preparation.name': '備え',
+  'entities.abilities.presence_of_mind.name': '駆ける心',
+  'entities.abilities.psychic_scream.name': '精神の絶叫',
+  'entities.abilities.shadowstep.name': '影すべり',
+  'entities.abilities.silence.name': '沈黙',
+  'entities.abilities.smoke_screen.name': 'スモークスクリーン',
+  'entities.abilities.smoke_screen.description': '煙幕に紛れ、8秒間、回避率を30%上昇させる。',
+  'entities.abilities.spellsteal.name': '魔法奪取',
+  'entities.abilities.spellsteal.description': '敵の有益な魔法効果を1つ奪い、自分へ移す。',
+  'entities.abilities.startle_shot.name': '驚愕射撃',
+  'entities.abilities.startle_shot.description':
+    '荒々しい一射で対象を{duration}秒間混乱させる。ダメージを受けると解除される。',
+  'entities.abilities.tranquility.name': '木立の歌',
+  'entities.abilities.typhoon.name': 'タイフーン',
+  'entities.abilities.typhoon.description':
+    '突風で8ヤード以内のすべての敵を吹き飛ばしてよろめかせ、4秒間、移動速度を50%低下させる。',
+  'entities.abilities.voidfeast.name': '虚無の饗宴',
+  'entities.abilities.voidfeast.description':
+    '魔法効果（敵の有益効果または味方の有害効果）を貪り、自分の最大体力の6%を回復する。',
+  'hudChrome.abilityError.shieldRequired': '盾を装備する必要があります。',
   'hudChrome.wocStore.title': 'WOCストア',
   'hudChrome.wocStore.close': 'WOCストアを閉じる',
   'hudChrome.wocStore.tabsLabel': 'WOCストアのセクション',
@@ -37,6 +202,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.armoryTitle': '武器庫',
   'hudChrome.wocStore.armoryBody':
     'シーズン1武器庫の限定武器スキン。アカウント共有の純粋な装飾で、周囲のプレイヤー全員に表示されます。',
+  'hudChrome.wocStore.wallet.title': 'Solanaウォレット',
+  'hudChrome.wocStore.wallet.unlinked':
+    'ウォレットアプリを接続し、一度署名して公開アドレスをWoCアカウントにリンクしてください。リカバリーフレーズや秘密鍵を受け取ることはありません。',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    'ウォレットアプリはこのブラウザに接続されていますが、公開アドレスはまだWoCアカウントにリンクされていません。',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    '公開アドレスはリンク済みです。SOLまたはWOCで支払うときに、そのウォレットアプリを再接続してください。',
+  'hudChrome.wocStore.wallet.linkedConnected':
+    'リンク済みのウォレットアプリが接続され、SOLまたはWOCで購入できます。',
+  'hudChrome.wocStore.wallet.mismatched':
+    '別のウォレットが接続されています。認証してリンク済みアドレスを置き換えるか、リンク済みウォレットを再接続してください。',
+  'hudChrome.wocStore.wallet.connect': 'ウォレットを接続',
+  'hudChrome.wocStore.wallet.verify': '認証してリンク',
+  'hudChrome.wocStore.wallet.reconnect': 'ウォレットを再接続',
+  'hudChrome.wocStore.wallet.manage': 'ウォレットを管理',
+  'wallet.bagConnect': 'ウォレットをリンク',
+  'wallet.bagLink': 'ウォレットを認証',
+  'wallet.bagReconnect': 'ウォレットを再接続',
   'hudChrome.wocStore.collectionLine': '{collection}コレクション',
   'hudChrome.wocStore.collections.guildmark': 'ギルドマーク',
   'hudChrome.wocStore.collections.emberwrought': '残り火鍛造',
@@ -268,6 +451,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     '準備確認を開始するにはパーティーに参加している必要があります。',
   'hudChrome.readyCheck.inProgressError': '準備確認はすでに進行中です。',
+  'entities.abilities.collective_reversal.name': '集団逆行',
+  'entities.abilities.collective_reversal.description':
+    'グループまたはレイドの死亡した全メンバーの時間軸を巻き戻し、遺体のそばで体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（時間魔法）',
+  'entities.abilities.temporal_hourglass.name': '停止の砂時計',
+  'entities.abilities.temporal_hourglass.description':
+    '選択地点に時の砂時計を置きます。敵の足元では PvE で {hostilePveDuration} 秒、PvP で {hostilePvpDuration} 秒間停止させ、ダメージを受けると解除されます。自分またはパーティの味方の足元では {duration} 秒間の停滞となり、ダメージを受けず行動不能になり、最大体力の {healing}% を回復します。自分のクールダウンは {selfCooldownRecovery}%、味方は {allyCooldownRecovery}% 速く回復します。空の地面に置くと {groundDuration} 秒間待機し、最初に踏んだ有効な対象へ効果を与えます。強化効果は手動で解除できます。',
+  'hudChrome.auraEffect.temporalHourglass':
+    'ダメージを受けず行動不能になります。体力を回復し、クールダウンを加速します。右クリックで解除できます。',
   'hudChrome.auth.appleLoginCta': 'Appleで続ける',
   'hudChrome.auth.appleError': 'Appleでサインインできませんでした。もう一度お試しください。',
   'hudChrome.auth.appleChoiceIntro':
@@ -381,8 +572,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemTooltip.requiresLevel': '必要レベル {level}',
   'hudChrome.spellbook.addToBarAria': '{name}をアクションバーに追加',
   'hudChrome.spellbook.removeFromBarAria': '{name}をアクションバーから削除',
-  'hudChrome.nameplate.mob': '[{level}] {name}',
-  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
   'hudChrome.mobTooltip.familyDemon': 'デーモン',
   'hudChrome.mobTooltip.levelFamily': 'レベル{level} {family}',
   'hudChrome.mobTooltip.hostile': '敵対',
@@ -619,6 +808,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.names.spellPower': '呪文威力',
   'hudChrome.statInfo.names.critRating': 'クリティカルレーティング',
   'hudChrome.statInfo.names.hasteRating': 'ヘイストレーティング',
+  'hudChrome.statInfo.names.parry': '受け流し',
+  'hudChrome.statInfo.desc.parry':
+    '前方からの近接攻撃を完全に受け流し、ダメージを受けない確率です。背後からの一撃は受け流せません。',
   'hudChrome.statInfo.names.hitRating': '命中レーティング',
   'hudChrome.statInfo.desc.hitRating':
     '装備とセットボーナスによる命中レーティング。攻撃がミスする頻度と呪文が抵抗される頻度を減らし、特に高レベルの敵に有効です。約10レーティングで1%命中。',
@@ -1066,12 +1258,47 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ホルダー特典が有効です。署名や支払いが必要なときはアプリを接続してください。',
   'wallet.extensionHelp':
     'ここにウォレットを表示するには、Solflare Wallet などのブラウザ用ウォレット拡張機能を有効にしておいてください。',
+  'wallet.mobileAppHelp':
+    'Phantom または Solflare を選択してください。ウォレットアプリで承認を求められます。ゲームを開いたままにし、完了後に戻ってください。',
+  'wallet.standaloneAppHelp':
+    'ホーム画面アプリでは、まだウォレットに接続できません。Phantom または Solflare を使用するには、Safari か Chrome で World of ClaudeCraft を開いてください。',
+  'wallet.openAppTitle': '{wallet} で続行',
+  'wallet.openAppHelp':
+    '{wallet} を開いてこのリクエストを確認してください。ウォレットアプリの使用中も、このゲームタブを開いたままにしてください。',
+  'wallet.openAppButton': '{wallet} を開く',
+  'wallet.manualReturnBrowserHelp':
+    '承認後、このゲームタブに戻ってください。iOS で別のブラウザが開いた場合は閉じ、元のブラウザに手動で戻ってください。',
+  'wallet.manualReturnStandaloneHelp':
+    '承認後、ホーム画面から World of ClaudeCraft に戻ってください。iOS でブラウザが開いた場合は閉じ、ホーム画面のアプリをもう一度開いてください。',
+  'wallet.preparingAppButton': '{wallet} を準備中...',
+  'wallet.walletAppUnavailable':
+    '{wallet} を準備できませんでした。このウィンドウを閉じて、もう一度お試しください。',
   'wallet.flowConnect': 'ウォレットを選択してください。認証は自動的に続行されます。',
   'wallet.flowSign':
     'ウォレットアプリで認証メッセージに署名してください。トランザクションや SOL は不要です。',
   'wallet.flowVerify': 'ウォレット所有権を認証中...',
   'wallet.linkFailed': 'ウォレット認証に失敗しました。',
   'wallet.verifyFailed': 'ウォレット認証に失敗しました。',
+  'wallet.browser.eyebrow': 'デスクトップウォレット認証',
+  'wallet.browser.title': 'Solanaウォレットを接続',
+  'wallet.browser.linkBody':
+    'このブラウザでウォレット拡張機能を選択してください。確認メッセージに署名した後、デスクトップアプリに戻ります。',
+  'wallet.browser.paymentBody':
+    'アカウントにリンクされたウォレットを選択し、このブラウザで取引を承認してください。',
+  'wallet.browser.extensionHelp':
+    '対応するウォレット拡張機能が見つかりません。Phantom、Solflare、または別のSolanaブラウザウォレットをインストールまたはロック解除して、再試行してください。',
+  'wallet.browser.safety':
+    'World of ClaudeCraftがリカバリーフレーズや秘密鍵を求めることはありません。',
+  'wallet.browser.continueWith': '{wallet}で続行',
+  'wallet.browser.reviewTitle': 'ウォレットで確認',
+  'wallet.browser.reviewBody':
+    '{wallet}の指示に従ってください。このブラウザページは開いたままにしてください。',
+  'wallet.browser.completeTitle': 'ウォレット認証が完了しました',
+  'wallet.browser.completeBody': 'World of ClaudeCraftデスクトップアプリに戻れます。',
+  'wallet.browser.returnButton': 'デスクトップアプリに戻る',
+  'wallet.browser.failed':
+    'ウォレット認証に失敗したか期限切れです。デスクトップアプリに戻って再試行してください。',
+  'wallet.browser.retry': '再試行',
   'wallet.unlinkFailed': 'ウォレット連携を解除できませんでした。',
   'wallet.holder': '$WOCホルダー',
   'wallet.holderTierTitle': '{tier} $WOCホルダー',
@@ -1604,6 +1831,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.openTrade': '取引を開く',
   'hud.prompts.duelRequest': '{name}があなたに決闘を申し込みました！',
   'hud.prompts.acceptDuel': '決闘を受ける',
+  'hud.prompts.resurrectionOffer': '{name}があなたを蘇生しようとしています。受け入れますか？',
+  'hud.prompts.acceptResurrection': '蘇生を受け入れる',
   'hud.prompts.decline': '断る',
   'hud.combat.floatingMiss': 'ミス',
   'hud.combat.floatingDodge': '回避',
@@ -1768,7 +1997,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.pet.defensiveDesc': 'あなたまたはペットを傷つけた敵を攻撃します。',
   'hud.pet.aggressiveDesc': '近くの敵対的な敵を攻撃します。',
   'hud.pet.rename': 'ペット名変更',
-  'hud.pet.revive': 'ペット蘇生',
+  'hud.pet.revive': '応急処置',
   'hud.pet.abandon': 'ペット放棄',
   'hud.pet.cancel': 'キャンセル',
   'hud.pet.renameLabel': '新しいペット名を選んでください。',
@@ -1974,6 +2203,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.money.silver': '銀貨',
   'itemUi.money.copper': '銅貨',
   'itemUi.slots.mainhand': 'メインハンド',
+  'itemUi.slots.twoHand': '両手',
+  'itemUi.slots.offhand': 'オフハンド',
   'itemUi.slots.chest': '胸',
   'itemUi.slots.legs': '脚',
   'itemUi.slots.feet': '足',
@@ -2009,6 +2240,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.dps': '秒間ダメージ',
   'itemUi.stats.critChance': 'クリティカル率',
   'itemUi.stats.dodge': '回避',
+  'itemUi.stats.parry': '受け流し',
   'itemUi.tooltip.qualityKind': '{quality} {kind}',
   'itemUi.tooltip.currentlyEquipped': '現在の装備',
   'itemUi.tooltip.ifYouEquip': 'これを装備すると',
@@ -2172,18 +2404,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.heroic_strike.description':
     '強力な攻撃で近接ダメージが {damage} 増加します。次のスイングで発動します。',
   'entities.abilities.battle_shout.name': '鉄の咆哮',
-  'entities.abilities.battle_shout.description': '2分間、攻撃力が{buff}増加します。',
-  'entities.abilities.commanding_shout.name': '鼓舞の号令',
-  'entities.abilities.commanding_shout.description': '2分間、スタミナが{buff}増加します。',
+  'entities.abilities.battle_shout.description':
+    '雄叫びを上げ、30分間、パーティメンバー全員の攻撃力を{buff}%増加させます。',
   'entities.abilities.demoralizing_shout.name': '戦慄の遠吠え',
   'entities.abilities.demoralizing_shout.description':
-    '恐ろしい雄叫びを上げ、30秒間、周囲の敵すべての攻撃力を{buff}低下させます。',
+    '恐ろしい雄叫びを上げ、20秒間、周囲の敵すべてが与えるダメージを{buff}%低下させます。',
   'entities.abilities.charge.name': '突撃',
   'entities.abilities.charge.description':
     '敵に突撃し、怒りを9生成して1秒間スタンさせます。射程8-25yd。',
-  'entities.abilities.rend.name': '深き裂傷',
-  'entities.abilities.rend.description':
-    '対象を負傷させ、{duration}秒かけて{damage}の出血ダメージを与えます。',
   'entities.abilities.thunder_clap.name': '震撼の一撃',
   'entities.abilities.thunder_clap.description':
     '周囲の敵に {damage} のダメージを与え、10秒間、攻撃速度を10%低下させます。',
@@ -2214,6 +2442,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.taunt.description':
     '対象を挑発します。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。',
   'entities.abilities.fireball.name': '灰燼の矢',
+  'entities.abilities.fireball_form.name': '火球形態',
+  'entities.abilities.fireball_form.description':
+    '燃え盛る火球に変身し、移動速度が {buff}% 上昇します。変身中は攻撃や呪文の詠唱ができません。再使用すると元の姿に戻ります。',
   'entities.abilities.rain_of_fire.name': '火炎の雨',
   'entities.abilities.rain_of_fire.description':
     '対象地点に4秒間、火の雨を降らせ、敵を焼いて毎秒{damage}の火炎ダメージを与えます。',
@@ -2539,9 +2770,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': '樫の肌',
   'entities.abilities.barkskin.description':
     '肌が樹皮のように硬くなり、15秒間アーマーが150増加します。',
-  'entities.abilities.ironhold.name': '鉄壁',
-  'entities.abilities.ironhold.description':
-    '堅固な守りで身を固め、8秒間、受けるすべてのダメージを40%軽減します。',
   'entities.abilities.sacred_bulwark.name': '聖なる防壁',
   'entities.abilities.sacred_bulwark.description':
     '{duration}秒間、次に敵から受ける致命的な一撃を無効化し、代わりに体力を最大値の35%まで回復します。',
@@ -2627,8 +2855,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rake.name': '皮剥ぎ',
   'entities.abilities.rake.description':
     'ステルス状態からの先制攻撃で、武器ダメージに加えて{damage}のダメージを与え、9秒かけて出血ダメージを与える。コンボポイントを1獲得する。ウルフフォーム時のみ使用可能。',
-  'entities.abilities.revive_pet.name': 'ペット蘇生',
-  'entities.abilities.revive_pet.description': '死んだペットを蘇生させ、自分のそばに呼び戻す。',
+  'entities.abilities.revive_pet.name': '応急処置',
+  'entities.abilities.revive_pet.description':
+    'ペットを応急処置する。生存している場合は12秒間、3秒ごとに回復し、合計{overTime}の体力を回復する。死亡している場合は体力35%で蘇生する。',
   'entities.abilities.holy_shock.name': 'ホーリーショック',
   'entities.abilities.holy_shock.description':
     '聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）',
@@ -2647,7 +2876,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_power.name': 'アーケインパワー',
   'entities.abilities.arcane_power.description':
     '10秒間、呪文ダメージが20%、呪文ヘイストが10%上がります。（アーケイン特性のシグネチャ）',
-  'entities.abilities.combustion.name': 'コンバッション',
+  'entities.abilities.combustion.name': '不死鳥のトランス',
   'entities.abilities.combustion.description':
     '15秒間、呪文クリティカル率が50%上がります。（ファイア特性のシグネチャ）',
   'entities.abilities.icy_veins.name': 'アイシーヴェインズ',
@@ -3171,10 +3400,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'この沼は月光を飲み干し、{className}よ、溺れし者を吐き返すのだ。私はあの門を三十夜も見張ってきた——そして今宵、門は開いている。',
   'entities.quests.q_prof_intro.title': '剣以外にも稼ぎはある',
   'entities.quests.q_prof_intro.text':
-    'イーストブルックの誰もが剣以外の生業を持っているものだ、{playerName}。町の周りに鉱脈が散らばっている。つるはしを振るって鉱石を5個持ってきてくれ。自分で採掘するんだぞ、見ればわかる。',
+    'イーストブルックでは誰もが剣のほかに生業を持つ、{playerName}。町の南西、カッパー・ディグ周辺の岩場には鉱脈がある。つるはしを振るい、自分の手で5か所採掘してこい。ごまかしても分かるぞ。',
   'entities.quests.q_prof_intro.completion':
-    'どうだ？鞄には鉱石、手にはマメだ。旅の道中も採掘、伐採、薬草採取を続けるといい。町に戻ったら、市場そばのタウンフォーカス掲示板と近くの製作台も気にかけてくれ。その気があれば、どれも実入りのいい仕事になる。',
-  'entities.quests.q_prof_intro.objectives.0.label': '鉱石のかけら',
+    'どうだ？ 鉱石を採り、手にはまめができた。旅の途中でも採掘、伐採、薬草採集を続けるんだ。町へ戻ったら、市場そばのタウンフォーカス掲示板と近くの製作台も忘れるな。望むなら、どの仕事にもまっとうな稼ぎが待っている。',
+  'entities.quests.q_prof_intro.objectives.0.label': '鉱脈を採掘',
   'entities.quests.q_wolves.title': '戸口の狼',
   'entities.quests.q_wolves.text':
     '森の狼が北の道で旅人に牙をむけています、{playerName}。8頭を討ち、イーストブルックに息をつかせてください。',
@@ -3580,16 +3809,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_mogger.objectives.0.label': 'モガーを討伐',
   'entities.quests.q_archetype_acceptance.title': '己が選ぶべき技',
   'entities.quests.q_archetype_acceptance.text':
-    'イーストブルックの職人は皆いずれ、己が選ぶべき一つの技に落ち着く。{playerName}よ、一つの行いで己を証明し、進むべき道を宣言せよ。',
+    '技とは知識だ、{playerName}。だが調律は誓いだ。隣り合う二つの技を主専攻として選び、谷で自ら採掘した鉱石を持ってこい。',
   'entities.quests.q_archetype_acceptance.completion':
-    'あなたの道は定まった。その道をしかと歩むがいい。',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'フォレストウルフを討伐',
+    '誓いは結ばれた。この二つの技が今やお前の主専攻となり、その反対側の知識が趣味となる。',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': '鉱脈を採掘',
   'entities.quests.q_prof_make_amends.title': '償い',
   'entities.quests.q_prof_make_amends.text':
-    '一つの技を捨て、別の技へと移るには、職人はまず歩まなかった道への償いを果たさねばならぬ、{playerName}よ。',
+    'その組み合わせは以前にも身につけていたな、{playerName}。戻ることは新たな誓いではない。谷の道の安全を守り、かつて手が覚えていた感覚を働きながら取り戻せ。',
   'entities.quests.q_prof_make_amends.completion':
-    '償いは果たされた。新たな道があなたに開かれている。',
+    '昔の感覚が戻った。以前の組み合わせが再び有効になった。',
   'entities.quests.q_prof_make_amends.objectives.0.label': 'フォレストウルフを討伐',
+  'entities.quests.q_prof_hobby_switch.title': '別の嗜み',
+  'entities.quests.q_prof_hobby_switch.text':
+    '主専攻には誓いが要る。趣味が問うのは、好奇心がどこへ向かうかだけだ、{playerName}。薬草をいくつか採集し、二つの主専攻の反対側にある技のうち、どちらを磨くか決めるのだ。',
+  'entities.quests.q_prof_hobby_switch.completion':
+    '気軽な選択だが、役には立つ。その好奇心を、レア品質の仕事に届くところまで追いかけるといい。',
+  'entities.quests.q_prof_hobby_switch.objectives.0.label': '薬草の群生地を採集',
   'entities.quests.q_drowned_choir.title': '溺れし聖歌隊',
   'entities.quests.q_drowned_choir.text':
     '渡り手どもは独りで動いているのではない。その中に溺れし信徒たちが歩いている——神殿とともに沈んだ教団だ。腐った祭服をまとったまま、岸の岩場から祈りを歌い続けている。八体を沈黙させ、奴らが携える供物を六つ持ち帰れ。奴らが女神に何を捧げようとしているのか、私は知りたいのだ。',
@@ -4217,6 +4452,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_stormling.name': '目覚めた嵐の精',
   'hudChrome.worldBoss.spawn': '{name}がソーンピーク高地に立ち上がった！',
   'entities.items.stormcallers_spaulders.name': 'ゲイルコールの肩当て',
+  'entities.items.bonewrought_greatsword.name': 'ボーンロートの大剣',
+  'entities.items.direfang_greatblade.name': 'ダイアファングの大刀',
+  'entities.items.bonewrought_bulwark.name': 'ボーンロートの大盾',
+  'entities.items.wraithfire_orb.name': 'レイスファイアのオーブ',
   'hud.chat.context.convertToRaid': 'レイドに変換',
   'hud.chat.context.convertToParty': 'パーティに変換',
   'hudChrome.raidConvert.leaderOnly': 'パーティに変換できるのはレイドリーダーだけです。',
@@ -4896,8 +5135,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.charge': '離れた敵に突進し、短いスタンで戦闘の口火を切ります。',
   'guide.abilityHook.cheap_shot':
     'ステルスから仕掛け、スタンとコンボポイントの先取りで先手を取ります。',
-  'guide.abilityHook.commanding_shout':
-    '持久力を底上げし、長い戦いでも全員が粘り強く戦えるようにします。',
   'guide.abilityHook.concussive_shot': '標的をふらつかせて減速させ、こちらに近づけなくします。',
   'guide.abilityHook.conjure_food': '座って食べると体力を回復する食料を作り出します。',
   'guide.abilityHook.conjure_water': 'マナを回復する飲み物を作り出し、プルの合間に補充できます。',
@@ -4912,6 +5149,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.eviscerate':
     'コンボポイントを消費し、標的を一気に仕留めるフィニッシャーです。',
   'guide.abilityHook.fireball': '主力のファイア火力。一撃を当て、標的を燃焼させ続けます。',
+  'guide.abilityHook.fireball_form': '生きた火球へと姿を変え、開けた場所を高速で駆け抜けます。',
   'guide.abilityHook.flame_shock': '前面に一撃を与え、その後も継続して焼き続ける即時の燃焼です。',
   'guide.abilityHook.frost_armor': '戦闘の前にアーマーを固める、持続する自己強化です。',
   'guide.abilityHook.frostbolt': '遠距離から攻撃し、標的を減速させて近づけなくします。',
@@ -4939,7 +5177,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.raptor_strike': '敵に距離を詰められたときに使う、重い近接の一撃です。',
   'guide.abilityHook.rejuvenation':
     '即座に唱えられ、味方を継続的に回復するので、行動を続けられます。',
-  'guide.abilityHook.rend': '出血を与え、時間をかけて標的を削っていきます。',
   'guide.abilityHook.renew': '継続して回復するヒールで、唱えてから移動を続けるのに向いています。',
   'guide.abilityHook.rockbiter_weapon': '武器に付与し、近接の一振りごとに重い一撃を与えます。',
   'guide.abilityHook.seal_of_righteousness':
@@ -5778,9 +6015,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.thorns': '攻撃者に{value}の{school}ダメージを与える',
   'hudChrome.auraEffect.slow': '移動速度を{pct}%低下させる',
   'hudChrome.auraEffect.speed': '移動速度を{pct}%上昇させる',
+  'hudChrome.auraEffect.formFireball': '火球形態：移動速度が{pct}%上昇、攻撃と呪文は使用不可',
   'hudChrome.auraEffect.attackSpeedSlow': '攻撃速度を{pct}%低下させる',
   'hudChrome.auraEffect.attackSpeedFast': '攻撃速度を{pct}%上昇させる',
   'hudChrome.auraEffect.haste': '攻撃速度と詠唱速度を{pct}%上昇させる',
+  'hudChrome.auraEffect.dmgDone': '与えるダメージを{pct}%上昇させる',
+  'hudChrome.auraEffect.dmgDoneReduce': '与えるダメージを{pct}%低下させる',
+  'hudChrome.auraEffect.elementalConvergencePrimed':
+    '次に異なる属性の呪文を唱えると、エレメンタル・コンバージェンスが発動します',
+  'hudChrome.auraEffect.heatingUp':
+    '次の炎系ビルダーが連続でクリティカルになるとホットストリークを獲得し、クリティカルでなければヒーティングアップが解除されます',
   'hudChrome.auraEffect.tongues': '詠唱時間を{pct}%増加させる',
   'hudChrome.auraEffect.damageReduction': '受けるすべてのダメージを{pct}%軽減する',
   'hudChrome.auraEffect.guardianWard':
@@ -5860,7 +6104,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.name': 'グレイジョーの追跡者の装備',
   'entities.itemSets.greyjaw_stalker.bonus3': '攻撃速度と詠唱速度が15%上昇します。',
   'entities.itemSets.necromancers.name': 'モーンウィーヴの法衣',
-  'entities.itemSets.necromancers.bonus2': 'ノックバックされなくなります（ノックバック耐性100%）。',
+  'entities.itemSets.necromancers.bonus2':
+    '呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。',
   'entities.itemSets.necromancers.bonus3': '知力が10、スタミナが10上昇します。',
   'entities.itemSets.necromancers.bonus4':
     '呪文に10%の確率で「クリアキャスティング」が発動し、次の呪文が無償になります。',
@@ -5871,13 +6116,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.nighttalon.bonus4':
     '武器のクリティカルヒットで「裂けた傷」を与え、対象に2秒ごとに6ダメージの出血を12秒間与えます。最大3回まで累積します。',
   'entities.itemSets.soulflame.name': 'レイスファイアの法衣',
-  'entities.itemSets.soulflame.bonus2': 'ノックバックされなくなります（ノックバック耐性100%）。',
+  'entities.itemSets.soulflame.bonus2':
+    '呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。',
   'entities.itemSets.soulflame.bonus3':
     '知力が15、精神力が15上昇し、攻撃速度と詠唱速度が15%上昇します。',
   'entities.itemSets.soulflame.bonus4':
     '呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間40上昇します。',
   'entities.itemSets.stormcallers.name': 'ゲイルコールの法衣',
-  'entities.itemSets.stormcallers.bonus2': 'ノックバックされなくなります（ノックバック耐性100%）。',
+  'entities.itemSets.stormcallers.bonus2':
+    '呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。',
   'entities.itemSets.stormcallers.bonus3':
     '知力が15、精神力が15上昇し、攻撃速度と詠唱速度が15%上昇します。',
   'entities.itemSets.stormcallers.bonus4':
@@ -6020,6 +6267,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.voice.channel': '{channel}に参加中',
   'hudChrome.discord.swag.title': 'グッズ',
   'hudChrome.discord.swag.free': '無料',
+  'hudChrome.fct.cheap': '低コスト!',
   'hudChrome.discord.swag.cost': '{points} pt',
   'hudChrome.discord.relay.wts.label': '売却希望',
   'hudChrome.discord.relay.wtb.label': '購入希望',
@@ -6033,6 +6281,44 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.craftedToast': '製作しました:{name}',
   'hudChrome.crafting.insufficientMaterials': '材料が不足しています。',
   'hudChrome.crafting.unknownRecipe': 'そのレシピは存在しません。',
+  'hudChrome.crafting.comboRequires': '調律条件：{craftA} + {craftB}、ティア {tier}。',
+  'hudChrome.crafting.comboMet': '準備完了。',
+  'hudChrome.crafting.comboSyncing': 'サーバーの調律状態を確認しています。',
+  'hudChrome.crafting.comboNotAttuned': '先にアーキタイプの組み合わせを選んでください。',
+  'hudChrome.crafting.comboWrongPair': '製作するには、この組み合わせを有効にしてください。',
+  'hudChrome.crafting.comboTierUnmet': '両方の主専攻を必要ティアまで上げてください。',
+  'hudChrome.crafting.professionChoice': '職業の選択',
+  'hudChrome.crafting.noProfessionChoice': '現在選択できる職業はありません。',
+  'hudChrome.crafting.attunementPreview':
+    '結果：{title}の称号を獲得し、{majorA}と{majorB}が上限なしの主専攻になります。{hobby}はレア上限の趣味になります。他の技能知識はすべて保持されますが、休眠中はコモン上限です。',
+  'hudChrome.crafting.hobbyPreview':
+    '結果：{hobby}がレア上限の趣味になります。二つの主専攻と保持済みの技能値は変わりません。',
+  'hudChrome.crafting.identity.title': '製作の専門性',
+  'hudChrome.crafting.identity.syncing': 'サーバーから製作の専門性を受信しています。',
+  'hudChrome.crafting.identity.unattuned':
+    '有効なアーキタイプの組み合わせがありません。知識は保持されますが、コンボレシピには調律済みの組み合わせが必要です。',
+  'hudChrome.crafting.identity.titleLabel': '称号',
+  'hudChrome.crafting.identity.majorsLabel': '主専攻',
+  'hudChrome.crafting.identity.hobbyLabel': '趣味',
+  'hudChrome.crafting.identity.historyLabel': '履歴',
+  'hudChrome.crafting.identity.history': '発見した組み合わせ：{pairs}、完了した復帰：{returns}',
+  'hudChrome.crafting.identity.roleMajor': '主専攻',
+  'hudChrome.crafting.identity.roleHobby': '趣味',
+  'hudChrome.crafting.identity.roleDormant': '休眠中の知識',
+  'hudChrome.crafting.identity.roleUnattuned': '未調律',
+  'hudChrome.crafting.identity.ceilingUnlimited': '強化上限なし',
+  'hudChrome.crafting.identity.ceilingCommon': 'コモン上限',
+  'hudChrome.crafting.identity.skillAria':
+    '{craft}、技能 {skill}、ティア {tier}、{role}、{ceiling}',
+  'hudChrome.crafting.identity.colCraft': '職種',
+  'hudChrome.crafting.identity.colSkill': '技能',
+  'hudChrome.crafting.identity.colRole': '役割',
+  'hudChrome.crafting.identity.colCap': '上限',
+  'hudChrome.crafting.identity.tutorial':
+    '最初のティア：いずれかの技を技能 {skill} まで上げます。レシピの成功は他の知識を消さず、その技を成長させます。',
+  'hudChrome.crafting.identity.nearTier': '{craft}は次のティアまであと技能 {points} です。',
+  'hudChrome.crafting.identity.dormantKnowledge':
+    '{craft}の知識は保持されていますが、その組み合わせか趣味が有効になるまで休眠します。',
   'hudChrome.devBadge.title': '開発者',
   'hudChrome.devBadge.tiers.tinkerer': '修繕屋',
   'hudChrome.devBadge.tiers.artificer': '工匠',
@@ -6655,6 +6941,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.body.unsupported_media_type': 'サポートされていないリクエスト形式です。',
   'apiError.deeds.invalid_input': '入力が無効です。',
   'apiError.steam.disabled': 'Steam連携は現在利用できません。',
+  'apiError.wallet.handoff_invalid':
+    'ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。',
   'apiError.steam.invalid_ticket':
     'Steamがこの連携リクエストを確認できませんでした。デスクトップアプリからもう一度お試しください。',
   'apiError.steam.banned': 'そのSteamアカウントは連携できません。',
@@ -6840,16 +7128,26 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.archetypeTitle.label': '称号',
   'hudChrome.archetypeTitle.none': 'なし',
   'hudChrome.archetypeTitle.hobbyLabel': '趣味',
-  'hudChrome.archetypeTitle.armorcrafting': '防具鍛冶師',
-  'hudChrome.archetypeTitle.weaponcrafting': '武器鍛冶師',
-  'hudChrome.archetypeTitle.jewelcrafting': '宝石職人',
-  'hudChrome.archetypeTitle.alchemy': '錬金術師',
-  'hudChrome.archetypeTitle.engineering': '工作師',
-  'hudChrome.archetypeTitle.cooking': '料理人',
-  'hudChrome.archetypeTitle.inscription': '銘文師',
-  'hudChrome.archetypeTitle.enchanting': 'エンチャンター',
-  'hudChrome.archetypeTitle.tailoring': '仕立て屋',
-  'hudChrome.archetypeTitle.leatherworking': '皮革職人',
+  'hudChrome.archetypePair.engineering+alchemy': '爆破師',
+  'hudChrome.archetypePair.alchemy+cooking': '薬師',
+  'hudChrome.archetypePair.cooking+leatherworking': '罠師',
+  'hudChrome.archetypePair.leatherworking+tailoring': '装具師',
+  'hudChrome.archetypePair.tailoring+inscription': '魔織師',
+  'hudChrome.archetypePair.inscription+enchanting': '秘術師',
+  'hudChrome.archetypePair.enchanting+jewelcrafting': '宝石付与師',
+  'hudChrome.archetypePair.jewelcrafting+weaponcrafting': '刃鍛冶',
+  'hudChrome.archetypePair.weaponcrafting+armorcrafting': '鍛冶師',
+  'hudChrome.archetypePair.armorcrafting+engineering': '歯車鍛冶',
+  'hudChrome.craftName.armorcrafting': '防具鍛冶',
+  'hudChrome.craftName.weaponcrafting': '武器鍛冶',
+  'hudChrome.craftName.jewelcrafting': '宝石細工',
+  'hudChrome.craftName.alchemy': '錬金術',
+  'hudChrome.craftName.engineering': '工作',
+  'hudChrome.craftName.cooking': '料理',
+  'hudChrome.craftName.inscription': '銘文',
+  'hudChrome.craftName.enchanting': 'エンチャント',
+  'hudChrome.craftName.tailoring': '裁縫',
+  'hudChrome.craftName.leatherworking': '皮革加工',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Protect Yumiのバーを折りたたむ',
@@ -7463,6 +7761,217 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.social.slashBody':
     '日々使う便利なコマンドをいくつか覚えておくとよいでしょう。/w 名前 でウィスパーを送り、/r で最後に受け取ったウィスパーに返信します。/invite で誰かをパーティに誘い、/follow で仲間の後ろについて歩き、/roll でグループの全員に見えるサイコロを振り、/who でオンラインの相手を確認し、/afk で離席中を示します。全一覧はゲーム内で /help と打てば見られます。',
   'guide.social.slashHeading': '便利なスラッシュコマンド',
+  'guide.abilityHook.revenge':
+    '前方の敵を薙ぎ払い、回避または受け流しの後に消費なしで使えることがある。',
+  'guide.abilityHook.hamstring': '敵の移動を妨げ、逃走を阻止する。',
+  'game.talents.choicesTab': '選択',
+  'game.talents.readout.rowsSummary': 'タレント: {head}、選択済み行 {picked}/{unlocked}。',
+  'game.talents.rowUnlockToast': '新しいタレント選択が解放されました!',
+  'game.talents.rowUnlocks': 'レベル{level}で解放',
+  'hudChrome.fct.absorbed': '{amount} 吸収',
+  'entities.abilities.temporal_mend.name': '時の繕い',
+  'entities.abilities.temporal_mend.description':
+    '味方を一瞬だけ未来へ進め、より健やかな未来の体に馴染む間に体力を{damage}回復する。(クロノマンシーの特性)',
+  'entities.abilities.temporal_barrier.name': '時の障壁',
+  'entities.abilities.temporal_barrier.description':
+    '対象を現在から一拍だけずらし、時の殻が10秒間、{damage}のダメージを吸収してから時間軸が元に戻る。',
+  'entities.abilities.temporal_echo.name': '時の残響',
+  'entities.abilities.temporal_echo.description':
+    'より健やかだった瞬間の残響で味方に刻印し、即座に{damage}の体力を回復する。{duration}秒間、与えた秘術ダメージの一部が残響を通じてその味方を癒やす。',
+  'entities.abilities.aura_surge.name': '曙光の跳弾',
+  'entities.abilities.aura_surge.description':
+    '曙光で鍛えた盾を投げて{damage}の聖属性ダメージを与え、最初の対象を2秒間沈黙させる。その後、10ヤード以内の追加の敵最大2体へ跳ね返り、1回ごとに75%のダメージを与える。（パラディンのタレント）',
+  'entities.abilities.aspect_of_the_wild.description':
+    '30ヤード以内の味方を野生の力で鼓舞し、攻撃力を45、攻撃速度を5%上昇させる。効果時間5分。（ハンターのタレント）',
+  'entities.abilities.avenging_wrath.description':
+    '復讐の力を呼び起こし、攻撃力を60、魔力を30上昇させる。効果時間20秒。（パラディンのタレント）',
+  'entities.abilities.berserk.description':
+    '攻撃力を70上昇させる。効果時間15秒。（ドルイドのタレント）',
+  'entities.abilities.blink.description':
+    '前方15ヤードへ瞬間移動し、移動不能効果を解除する。（メイジのタレント）',
+  'entities.abilities.bloodlust.description':
+    '30ヤード以内の味方を狂乱させ、攻撃速度を30%上昇させる。効果時間15秒。（シャーマンのタレント）',
+  'entities.abilities.chain_lightning.description':
+    '対象地点へ雷を放ち、周囲の敵に{damage}のダメージを与える。（シャーマンのタレント）',
+  'entities.abilities.chaos_bolt.description':
+    '混沌の炎を放ち、{damage}の火属性ダメージを与える。（ウォーロックのタレント）',
+  'entities.abilities.cloak_of_shadows.description':
+    '影で身を包み、5秒間に420のダメージを吸収する。（ローグのタレント）',
+  'entities.abilities.curse_of_exhaustion.description':
+    '対象を呪い、移動速度を30%低下させる。効果時間12秒。（ウォーロックのタレント）',
+  'entities.abilities.death_coil.description':
+    '敵に{damage}の闇属性ダメージを与え、その後3秒間恐怖状態にする。（ウォーロックのタレント）',
+  'entities.abilities.deep_freeze.description':
+    '対象を深く凍らせ、{damage} の冷気ダメージを与えて 4 秒間気絶させる。（メイジタレント）',
+  'entities.abilities.desperate_prayer.description':
+    '自分の体力を即座に{damage}回復する。（プリーストのタレント）',
+  'entities.abilities.deterrence.description':
+    '回避率を50パーセントポイント上昇させる。効果時間10秒。（ハンターのタレント）',
+  'entities.abilities.divine_shield.description':
+    '聖なる力で身を守り、8秒間に900のダメージを吸収する。（パラディンのタレント）',
+  'entities.abilities.earthbind.description':
+    '周囲の敵を大地に縛り、2秒間移動不能にする。（シャーマンのタレント）',
+  'entities.abilities.evocation.description': 'マナを急速に回復する。（メイジタレント）',
+  'entities.abilities.frenzied_regeneration.description':
+    '10秒かけて体力を180回復する。熊形態でのみ使用可能。（ドルイドのタレント）',
+  'entities.abilities.frost_trap.description':
+    '対象地点の敵を3秒間凍結させ、移動と行動を封じる。（ハンターのタレント）',
+  'entities.abilities.ghostly_strike.description':
+    '敵に武器ダメージと{damage}の追加ダメージを与え、短時間、回避率を上昇させる。コンボポイントを1獲得する。（ローグのタレント）',
+  'entities.abilities.hammer_of_wrath.description':
+    '傷ついた敵に聖なるハンマーを投げ、{damage}の聖属性ダメージを与える。体力が20%未満の対象にのみ使用可能。（パラディンのタレント）',
+  'entities.abilities.healing_stream.description':
+    '味方1体の体力を12秒かけて120回復する。（シャーマンのタレント）',
+  'entities.abilities.holy_wrath.description':
+    '聖なる力を解き放ち、周囲の敵に{damage}のダメージを与える。（パラディンのタレント）',
+  'entities.abilities.howl_of_terror.description':
+    '周囲の敵を最大3秒間恐怖状態にする。ダメージを受けると解除されることがある。（ウォーロックのタレント）',
+  'entities.abilities.ice_block.description':
+    '自身を氷に封じ、大量のダメージを吸収する。効果時間 8 秒。（メイジタレント）',
+  'entities.abilities.inner_focus.description':
+    '次に使用するスペルの消費をなくす。効果時間60秒。（プリーストのタレント）',
+  'entities.abilities.innervate.description':
+    '生命の樹液が10秒間あふれ、現在のリソースを波状に20回復する。マナ、怒り、エナジーに対応し、変身しても中断されない。睡眠、スタン、ステイシス中は樹液が止まる。（ドルイドのタレント）',
+  'entities.abilities.mend_pet.name': '手当て',
+  'entities.abilities.mend_pet.description':
+    '15 秒かけて味方対象を {damage} 回復する。（ハンタータレント）',
+  'entities.abilities.meteor.description':
+    '対象地点へ隕石を落とし、{damage}の火属性ダメージを与える。その後6秒間、その場の敵に2秒ごとに12から18の火属性ダメージを与える。（メイジのタレント）',
+  'entities.abilities.mind_sear.description':
+    '対象地点へ闇のエネルギーをチャネリングし、周囲の敵に毎秒{damage}のダメージを与える。（プリーストのタレント）',
+  'entities.abilities.multi_shot.description':
+    '対象地点へ矢の一斉射撃を放ち、8ヤード以内の敵に{damage}の物理ダメージを与える。（ハンターのタレント）',
+  'entities.abilities.prayer_of_healing.description':
+    '周囲の味方の体力を{damage}回復する。（プリーストのタレント）',
+  'entities.abilities.preparation.description':
+    'スプリント、回避、バニッシュのクールダウンを完了させる。（ローグのタレント）',
+  'entities.abilities.presence_of_mind.description':
+    '次の詠唱時間のある呪文を即時詠唱にする。効果時間 60 秒。（メイジタレント）',
+  'entities.abilities.psychic_scream.description':
+    '周囲の敵を最大4秒間恐怖状態にする。ダメージを受けると解除されることがある。（プリーストのタレント）',
+  'entities.abilities.shadowstep.description': '影を通り抜けて対象へ近づく。（ローグのタレント）',
+  'entities.abilities.silence.description': '対象を4秒間沈黙させる。（プリーストのタレント）',
+  'entities.abilities.tranquility.description':
+    '4秒間、回復エネルギーをチャネリングし、30ヤード以内の味方の体力を毎秒42から52回復する。（ドルイドのタレント）',
+  'hudChrome.auraEffect.combustionCrit': '火炎呪文が必ずクリティカルになる',
+  'hudChrome.auraEffect.overloadNext': '次の呪文の効果が{pct}%増加するが、マナ消費が50%増える',
+  'hudChrome.auraEffect.powerEchoNext': '次の直接呪文が同じ対象に{pct}%の威力で再発動する',
+  'hudChrome.auraEffect.iceFloesCasts': '次の{n}回の詠唱呪文を移動しながら唱えられる',
+  'hudChrome.auraEffect.freeCast': '次の詠唱のコストがゼロになる',
+  'hudChrome.auraEffect.instantCast': '次の詠唱時間のある呪文が即時発動になる',
+  'hudChrome.auraEffect.cheapCast': '次の呪文のコストが{pct}%減少する',
+  'hudChrome.auraEffect.increase.sp': '呪文の威力を{value}上昇させる',
+  'hudChrome.specPanel.specUnlockBanner': 'スペシャライゼーション解放！',
+  'hudChrome.specPanel.specUnlockHint': 'Nキーを押してスペシャライゼーションを選択してください。',
+  'entities.abilities.cone_of_cold.description':
+    '周囲の敵を冷気で撃ち、{damage}の氷ダメージを与えます。（氷シグネチャー）',
+  'entities.abilities.bladestorm.description':
+    '鋼の嵐と化し、4秒間、6ヤード以内のすべての敵に毎秒{damage}のダメージを与えます。',
+  'guide.abilityHook.ice_lance':
+    '氷の効果を消費する即時発動の氷片。凍結した対象には大幅に高いダメージを与えます。',
+  'guide.abilityHook.flurry':
+    '3発の氷弾を素早く放ち、次の氷系攻撃が対象を凍結状態として扱うようにします。',
+  'guide.abilityHook.fingers_of_frost':
+    '氷の矢が、ときどき次のアイスランスに対象を凍結状態として扱う力を与えます。',
+  'guide.abilityHook.brain_freeze':
+    '氷の矢が、ときどき次のウィンターラッシュを即時発動にして威力を高めます。',
+  'guide.abilityHook.shatter': '凍結した対象に対する呪文のクリティカル率が大幅に上昇します。',
+  'guide.abilityHook.frozen_orb':
+    'ゆっくり進む氷球を敵の群れへ放ち、周囲を冷やして氷の効果を発生させます。',
+  'guide.abilityHook.blizzard':
+    '一帯を氷で覆い、敵の群れにダメージを与えながら移動速度を低下させます。',
+  'guide.abilityHook.blink': '短い距離を前方へ瞬間移動し、移動不能効果を解除します。',
+  'hud.pet.waterJet': 'ウォータージェット',
+  'hud.pet.waterJetTitle': 'ウォータージェット',
+  'hud.pet.waterJetDesc':
+    'ウォーターエレメンタルに、3秒間敵を減速させる水流を放つよう命令します。クールダウン8秒。右クリックすると、使用可能になるたびに自動で発動します。',
+  'entities.abilities.ice_lance.name': 'アイスランス',
+  'entities.abilities.ice_lance.description':
+    '氷の槍を投げ、{damage}の氷ダメージを与えます。凍結した対象には3倍のダメージを与えます。フィンガーズ・オブ・フロストまたはウィンターズ・チルを1チャージ消費すると、対象を凍結状態として扱います。（氷）',
+  'entities.abilities.flurry.name': 'ウィンターラッシュ',
+  'entities.abilities.flurry.description':
+    '3発の氷弾を放ち、それぞれ{damage}の氷ダメージを与え、対象にウィンターズ・チルを付与します。次に命中する対応呪文2回は対象を凍結状態として扱います。ブレインフリーズ発動時は即時発動となり、威力が30%上昇してクールダウンを無視します。（氷）',
+  'entities.abilities.frozen_orb.name': 'フローズンオーブ',
+  'entities.abilities.frozen_orb.description':
+    '渦巻く氷球を放ち、8秒間前方へ漂わせます。周囲の敵に毎秒{damage}の氷ダメージを与え、移動速度を30%低下させます。命中するとフィンガーズ・オブ・フロストを生成します。（氷）',
+  'entities.abilities.blizzard.name': 'ブリザード',
+  'entities.abilities.blizzard.description':
+    '対象地点に6秒間吹雪を呼び、毎秒{damage}の氷ダメージを与えて敵の移動速度を40%低下させます。敵1体に命中するたび、フローズンオーブのクールダウンを0.5秒、1回の発動につき最大3秒短縮します。（氷）',
+  'entities.abilities.glacial_spike.name': 'グレイシャルスパイク',
+  'entities.abilities.glacial_spike.description':
+    '巨大な氷の槍を作り、アイシクルを5個消費して{damage}の氷ダメージを与え、対象を4秒間その場で凍結させます。（氷）',
+  'entities.abilities.glacial_front.name': '氷河の前線',
+  'entities.abilities.glacial_front.description':
+    '長押しして広がる冷気を蓄え、円錐状に放出します。チャージが長いほど遠くまで届き、ダメージが増加します。命中したすべての敵の移動速度を4秒間50%低下させ、最大チャージ時はさらに1秒間移動不能にします。（氷）',
+  'entities.abilities.dragons_breath.name': 'ドラゴンズブレス',
+  'entities.abilities.dragons_breath.description':
+    '長押しして広がる炎の息を蓄え、円錐状に放出します。チャージが長いほど遠くまで届き、ダメージが増加します。命中した敵は混乱し、ダメージを受けると効果が解除されます。最大チャージ時は必ずクリティカルとなり、ホットストリークの条件に1回分加算されます。（火）',
+  'entities.abilities.fingers_of_frost.name': 'フィンガーズ・オブ・フロスト',
+  'entities.abilities.fingers_of_frost.description':
+    'ライムランスが15%の確率でフィンガーズ・オブ・フロストを1チャージ付与します（最大2チャージ）。次のアイスランスは対象を凍結状態として扱います。（氷）',
+  'entities.abilities.brain_freeze.name': 'ブレインフリーズ',
+  'entities.abilities.brain_freeze.description':
+    'ライムランスが20%の確率で、次のウィンターラッシュを即時発動にし、威力を30%上昇させ、クールダウンを無視させます。（氷）',
+  'entities.abilities.shatter.name': '脆き破滅',
+  'entities.abilities.shatter.description':
+    '凍結した対象に対する呪文のクリティカル率が50%上昇し、そのクリティカルダメージが20%上昇します。フィンガーズ・オブ・フロストとウィンターズ・チルも対象を凍結状態として扱います。（氷）',
+  'entities.abilities.temporal_cascade.name': '時の連鎖',
+  'entities.abilities.temporal_cascade.description':
+    '時の残響をパーティ内に連鎖させ、対象と最も近い味方最大4人を即座に回復し、それぞれに{duration}秒間印を付けます。あなたが与えた秘術ダメージの一部が残響を通じて戻り、印のついた味方を回復します。（クロノマンシー）',
+  'entities.abilities.temporal_reversal.name': '時の逆転',
+  'entities.abilities.temporal_reversal.description':
+    '倒れた味方の時間軸を巻き戻し、戦闘中でも、その遺体の場所で体力とマナの一部を持った状態で蘇生します。（クロノマンシー）',
+  'entities.abilities.temporal_rewind.name': '巻き戻し',
+  'entities.abilities.temporal_rewind.description':
+    'パーティまたはレイドに秘術の波を送り、時間を巻き戻します。40ヤード以内の各味方が過去5秒間に受けたダメージの30%を回復します（最大体力の35%まで）。この効果はクリティカルになりません。（クロノマンシー）',
+  'entities.abilities.temporal_acceleration.name': '時間加速',
+  'entities.abilities.temporal_acceleration.description':
+    'パーティまたはレイドの時間の流れを加速し、15秒間、攻撃、詠唱、チャネリング速度を30%上昇させます。直近に時間加速またはブラッドラストの影響を受けた味方は疲労しており、効果を得られません。（クロノマンシー）',
+  'entities.abilities.perfect_moment.name': '完璧な瞬間',
+  'entities.abilities.perfect_moment.description':
+    '完璧な瞬間をつかみ、秘術チャージを即座に4つ獲得します。10秒間、エーテルダーツはチャージを消費しません。（クロノマンシー）',
+  'entities.abilities.arcane_surge.name': 'エーテルサージ',
+  'entities.abilities.arcane_surge.description':
+    '生の秘術エネルギーを敵に流し込み、{damage}のダメージを与えます。発動するたびに秘術チャージが残り、次のエーテルサージのダメージと詠唱速度が上昇します（1つにつき5%高速化）が、マナ消費も大幅に増えます。最大4チャージ。エーテルダーツはチャージを消費します。また発動時にエーテルラッシュが準備されることがあり、次のエーテルサージのマナ消費がなくなり、詠唱速度が2倍になります。',
+  'entities.items.conjured_bread4.name': '魔法の祝宴パン',
+  'entities.items.conjured_water4.name': '魔法の湧き水',
+  'entities.abilities.blazing_barrier.name': 'ブレイジングバリア',
+  'entities.abilities.blazing_barrier.description':
+    '自身を炎で包み、130ダメージを吸収します。60秒間持続します。（火）',
+  'entities.abilities.cold_snap.name': '冬の呼び戻し',
+  'entities.abilities.cold_snap.description':
+    'フリッカーステップ、フロストヴェール、グレーターインビジビリティのクールダウンを完了させます。（メイジタレント）',
+  'entities.abilities.greater_invisibility.name': 'グレーターインビジビリティ',
+  'entities.abilities.greater_invisibility.description':
+    '20秒間姿を消します。継続ダメージ効果を2個解除し、透明状態の間と解除直後は受けるダメージが90%減少します。（メイジタレント）',
+  'entities.abilities.hot_streak.name': 'ホットストリーク',
+  'entities.abilities.hot_streak.description':
+    'パッシブ：火系呪文（ファイアボール、ファイアブラスト、スコーチ、パイロブラスト、フレイムストライク）で2回連続してクリティカルを出すと、次のパイロブラストまたはフレイムストライクが即時発動となり、コストがなくなります。消費呪文は無料発動も含めて次の連続判定に加算されます。フレイムストライクは命中した敵の数にかかわらず1回のみ加算され、最初の着弾だけが判定されます。（火）',
+  'entities.abilities.ice_floes.name': 'アイスフロー',
+  'entities.abilities.ice_floes.description':
+    '次の詠唱時間のある呪文2回を移動しながら発動できます。15秒間持続します。（メイジタレント）',
+  'entities.abilities.ignition.name': 'イグニッション',
+  'entities.abilities.ignition.description':
+    'パッシブ：呪文のクリティカルが対象を燃焼させ、与えたダメージの40%を6秒かけて与えます。効果は累積します。（火のマスタリー）',
+  'entities.abilities.mass_barrier.name': 'マスバリア',
+  'entities.abilities.mass_barrier.description':
+    '自身と30メートル以内にいる近くの味方最大4人に、それぞれ130ダメージを吸収するシールドを60秒間付与します。（メイジタレント）',
+  'entities.abilities.overload.name': 'オーバーロード',
+  'entities.abilities.overload.description':
+    '次の呪文の効果が40%増幅されますが、マナ消費が50%増加します。10秒間持続します。（メイジタレント）',
+  'entities.abilities.power_echo.name': 'パワーエコー',
+  'entities.abilities.power_echo.description':
+    '次の直接呪文が同じ対象に50%の威力でもう一度発動します。10秒間持続します。（メイジタレント）',
+  'entities.abilities.rings_of_frost.name': 'リング・オブ・フロスト',
+  'entities.abilities.rings_of_frost.description':
+    '10秒間持続する氷の輪を召喚します。輪の境界を越えた敵は4秒間凍結します。（メイジタレント）',
+  'entities.abilities.rune_of_power.name': 'ルーン・オブ・パワー',
+  'entities.abilities.rune_of_power.description':
+    '足元に15秒間持続する力のルーンを刻みます。8メートル以内に立つ味方が与えるダメージが10%増加します。（メイジタレント）',
+  'entities.abilities.summon_water_elemental.name': 'ウォーターエレメンタル召喚',
+  'entities.abilities.summon_water_elemental.description':
+    '共に戦うウォーターエレメンタルを召喚します。対象へウォーターボルトを投げ、ウォータージェットを放ちます。（氷）',
+  'entities.mobs.water_elemental.name': 'ウォーターエレメンタル',
   'devCommand.actions.attune.description': 'すべての前提条件を完了済みにします。',
   'devCommand.actions.attune.label': '前提条件を解除',
   'devCommand.actions.bot.description': 'ウィスパー可能な静止プレイヤーを作成します。',
@@ -7571,4 +8080,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'welcome.armory.cta': '武器庫を見に行く',
   'welcome.news.new': '新着',
   'welcome.news.viewAll': 'GitHubですべての更新を見る',
+  'hudChrome.auraEffect.battleStance': 'バトルスタンス: 怒りの生成量が10%増加',
+  'hudChrome.auraEffect.berserkerStance':
+    'バーサーカースタンス: クリティカル率が3%上昇し、与えるダメージが3%増加',
+  'hudChrome.auraEffect.crit': 'クリティカル率を{pct}%上昇させる',
+  'hudChrome.auraEffect.rageGen': '怒りの生成量を{pct}%上昇させる',
+  'hudChrome.auraEffect.reckless': 'クリティカル率を{pct}%、怒りの生成量を{ragePct}%上昇させる',
+  'hudChrome.auraEffect.avatar': 'コロッサス: 与えるダメージが{pct}%増加',
+  'hudChrome.auraEffect.bloodbath': 'クリティカル率と与えるダメージを{pct}%上昇させる',
+  'hudChrome.auraEffect.dieBySword': '受けるダメージを{pct}%軽減する',
+  'hudChrome.auraEffect.sanguine': '攻撃速度を{hastePct}%、与えるダメージを{dmgPct}%上昇させる',
+  'hudChrome.auraEffect.battleTrance':
+    '次のレイヴァーストライクまたは重傷の一撃の怒りコストが0になる',
+  'hudChrome.auraEffect.revengeFree': '次の意趣返しの怒りコストが0になる',
+  'hudChrome.auraEffect.victoryRush': '勝利の追撃が使用可能',
+  'hudChrome.auraEffect.maxHpPct': '最大体力を{pct}%上昇させる',
+  'hud.combat.floatingParry': '受け流し',
+  'hud.combat.parried': '{target}は{ability}を受け流しました。',
+  'hudChrome.options.mouseoverCast': 'パーティフレームでマウスオーバーキャスト',
+  'hudChrome.options.showTargetOfTarget': 'ターゲットのターゲットを表示',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'ターゲットのターゲット',
 };

@@ -37,6 +37,7 @@ function ent(id: number, over: Partial<Entity> = {}): Entity {
     aggroTargetId: null,
     forcedTargetId: null,
     forcedTargetTimer: 0,
+    shuffleTargetTimer: 0,
     threat: new Map<number, number>(),
     ...over,
   } as unknown as Entity;
@@ -46,11 +47,12 @@ function ent(id: number, over: Partial<Entity> = {}): Entity {
 // two Nythraxis helpers.
 function fakeCtx(
   entities: Map<number, Entity>,
-  opts: { fallback?: Entity | null; despawn?: boolean } = {},
+  opts: { fallback?: Entity | null; despawn?: boolean; rngInt?: number } = {},
 ): SimContext {
   return {
     entities,
     mobScanCounters: createMobScanCounters(),
+    rng: { int: () => opts.rngInt ?? 0 },
     nythraxisAddFallbackTarget: () => opts.fallback ?? null,
     scheduleNythraxisAddDespawnIfBossReset: () => opts.despawn ?? false,
   } as unknown as SimContext;
@@ -301,6 +303,37 @@ describe('mob/targeting: updateMobTarget forced-target/taunt', () => {
     updateMobTarget(ctx, mob);
     expect(mob.forcedTargetId).toBe(null);
     expect(mob.aggroTargetId).toBe(1);
+  });
+
+  it('lets Voss ignore taunt and prefer a mana-user threat target', () => {
+    const tank = ent(1, { kind: 'player', templateId: 'warrior' } as Partial<Entity>);
+    const mage = ent(2, { kind: 'player', templateId: 'mage' } as Partial<Entity>);
+    const hunter = ent(3, { kind: 'player', templateId: 'hunter' } as Partial<Entity>);
+    const ctx = fakeCtx(
+      new Map([
+        [1, tank],
+        [2, mage],
+        [3, hunter],
+      ]),
+    );
+    const mob = ent(10, {
+      templateId: 'nythraxis_heroic_rogue_add',
+      aggroTargetId: 1,
+      forcedTargetId: 1,
+      forcedTargetTimer: 3,
+      threat: new Map([
+        [1, 1000],
+        [2, 10],
+        [3, 900],
+      ]),
+    });
+
+    updateMobTarget(ctx, mob);
+
+    expect(mob.aggroTargetId).toBe(mage.id);
+    expect(mob.forcedTargetId).toBeNull();
+    expect(mob.forcedTargetTimer).toBe(0);
+    expect(mob.shuffleTargetTimer).toBe(3);
   });
 });
 

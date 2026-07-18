@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Hud } from '../src/ui/hud';
 
@@ -12,6 +13,11 @@ vi.mock('../src/render/characters/portrait', () => ({
 afterEach(() => vi.unstubAllGlobals());
 
 describe('Hud action-bar facade', () => {
+  it('checks drag eligibility before normal-bar and configurable slot 0 drops', () => {
+    const source = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    expect(source.match(/actionBarController\.isAssignableAction\(/g)).toHaveLength(4);
+  });
+
   it('cancels a mobile drag before exposing a newly loaded form page', () => {
     const clearTimeout = vi.fn();
     vi.stubGlobal('window', { clearTimeout });

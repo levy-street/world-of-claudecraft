@@ -34,7 +34,7 @@ export const BAG_SOCKETS = 4;
 const DEFAULT_STACK = 20;
 
 /** Kinds that never stack: each copy occupies its own slot, classic style. */
-const UNSTACKED_KINDS = new Set(['weapon', 'armor', 'bag', 'tool']);
+const UNSTACKED_KINDS = new Set(['weapon', 'armor', 'held_offhand', 'bag', 'tool']);
 
 /** Max copies of an item per inventory slot. Explicit `stackSize` wins;
  *  gear/bags/tools default to 1, everything else to 20. */

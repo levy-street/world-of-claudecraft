@@ -45,6 +45,7 @@ export const PAPERDOLL_RIGHT_SLOTS: readonly EquipSlot[] = [
   'feet',
   'ring1',
   'ring2',
+  'offhand',
 ];
 
 /**

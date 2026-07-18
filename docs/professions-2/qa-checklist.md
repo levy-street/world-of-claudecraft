@@ -16,16 +16,16 @@ or screenshot path), not vibes.
 - [ ] Wire suites green: `npx vitest run tests/snapshots.test.ts tests/env_protocol.test.ts tests/bandwidth.test.ts`.
 
 ## Determinism
-- [ ] All new randomness (masterwork proc, pristine vein spawns, node rarity,
+- [ ] All new randomness (masterwork proc, rare gather events, node rarity,
       fishing catches) draws through `Rng` with pinned draw-order tests; no
       `Math.random` / `Date.now` / `performance.now` anywhere in `src/sim/`.
 - [ ] `npx vitest run tests/architecture.test.ts` green.
 - [ ] Same-seed determinism test covers a full gather-craft-masterwork sequence.
 
 ## Server authority
-- [ ] Every new command (train recipe, disenchant, enchant apply, quest
-      advance) validates server-side; the client never decides craft outcomes,
-      masterwork procs, harvest rewards, or quest credit.
+- [ ] Every new command (train recipe, disenchant, enchant apply, salvage,
+      quest advance) validates server-side; the client never decides craft
+      outcomes, masterwork procs, harvest rewards, or quest credit.
 - [ ] Invalid or replayed commands cannot duplicate rewards, recipes, or skill.
 
 ## Persistence
@@ -42,6 +42,12 @@ or screenshot path), not vibes.
       shops never buy crafted goods above trivial value.
 - [ ] Masterwork power stays within the tuning bounds in `state.md` (below the
       raid floor); baseline crafted gear sits below dungeon best-in-slot.
+- [ ] Recurring destruction is live: consumables at every cooking/alchemy
+      tier, salvage and disenchant, and the cadence-capped work orders all
+      consume materials or items in play; the Phase 15 faucet-vs-sink review
+      is recorded with evidence.
+- [ ] The masterwork signed-reagent term counts ANY player's signature
+      (buying a gatherer's signed materials works; the count-1 case works).
 
 ## i18n completeness
 - [ ] Every new player-visible string (window chrome, recipe rows, station
@@ -64,6 +70,8 @@ or screenshot path), not vibes.
       and committed under `docs/screenshots`, referenced from the PR body.
 - [ ] Tap targets comfortable; no hover-only information; safe areas respected.
 - [ ] Graphics-settings fairness: no preset hides actionable profession info.
+- [ ] The eight-step journey (the Phase 7 vertical-slice checkpoint)
+      re-verified end to end on the finished packet, desktop and mobile.
 
 ## Content integrity
 - [ ] Placement-safety test green: no profession NPC or station within
@@ -72,8 +80,18 @@ or screenshot path), not vibes.
       obtainable in-world; referential integrity tests green.
 - [ ] Corpse component rewards no longer grant unrelated quest credit; every
       mapped tag yields a real item.
+- [ ] Every gathering family has its rare-event fantasy and each fires,
+      localizes, and celebrates: pristine vein (ore), ancient heartwood
+      (wood), moonlit bloom (herb), the glimmerfin catch (fishing), the
+      perfect specimen (corpse harvesting).
+- [ ] The visible ladder holds end to end: locked Train rows name their tier
+      requirement, the wheel window's next-unlock and switch-cost lines
+      render, tier crossings toast (and mail for attuned majors), and a known
+      recipe is NEVER use-gated (the no-admission-gate rule).
 - [ ] All existing deeds remain earnable; new profession deeds registered and
-      pinned in `tests/deeds_content.test.ts`.
+      pinned in `tests/deeds_content.test.ts`; first attunement and first
+      masterwork carry titles and marquee-tier renown and the pipeline fires
+      (nameplate, banner, marquee broadcast).
 
 ## Classic fidelity and copy
 - [ ] No invented balance formulas where a classic-era reference exists; XP and

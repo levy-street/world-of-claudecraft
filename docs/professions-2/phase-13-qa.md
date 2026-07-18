@@ -1,7 +1,7 @@
 # Phase 13 QA: Verify Enchanting reachable
 
-Audits the Phase 13 diff: enchanting reachable in both hosts, replay-safe destruction, live
-`ClientWorld` result mirroring, and complete tests and i18n for this phase.
+Audits the Phase 13 diff: enchanting AND salvage reachable in both hosts, replay-safe
+destruction, live `ClientWorld` result mirroring, and complete tests and i18n for this phase.
 
 ## QA Starter Prompt
 
@@ -30,7 +30,8 @@ STEP 2 - QA AUDIT: spawn three parallel agents, each given ONLY the Explore summ
   tests/env_protocol.test.ts tests/bandwidth.test.ts tests/world_api_parity.test.ts; npx vitest
   run tests/professions_enchanting.test.ts plus the phase's new test files; npm run i18n:gen
   then npx vitest run tests/i18n_completeness.test.ts tests/localization_fixes.test.ts; npx tsc
-  --noEmit); exercise the REAL behavior: actually disenchant an item and apply an enchant in the
+  --noEmit); exercise the REAL behavior: actually disenchant an item, apply an enchant, and
+  salvage a crafted item in the
   offline sim and against a running server, not just through the tests.
 - Test coverage agent: find untested paths (server rejection branches, the signed/masterwork
   warning path, ClientWorld result mirroring, duplicate-command handling); add missing tests,
@@ -47,17 +48,21 @@ If any agent's output is truncated, re-spawn it to resume from its last complete
 restart finished work.
 
 PHASE-SPECIFIC QA EMPHASIS (probe these directly, not just by reading):
-- Replay and race safety on destruction: fire the same disenchant command twice (duplicate and
-  replay) and prove exactly one destruction and one grant; race a disenchant against a
+- Replay and race safety on destruction: fire the same disenchant and salvage commands twice
+  (duplicate and
+  replay) and prove exactly one destruction and one grant; race each against a
   concurrent move or trade of the same item and prove no dupe or double-destroy.
-- ClientWorld last-result mirroring: confirm the lastDisenchantResult/lastEnchantResult reads
+- ClientWorld last-result mirroring: confirm the
+  lastDisenchantResult/lastEnchantResult/lastSalvageResult reads
   are LIVE in ClientWorld (values actually arrive over the wire and update after each command),
-  not shape-only stubs (the #2033 trap).
+  not shape-only stubs (the #2033 trap). lastSalvageResult is the one brand-new read: probe it
+  hardest.
 - Confirm-dialog focus trap: keyboard focus stays inside the confirm dialog, Escape cancels,
   and Enter cannot silently destroy a signed or masterwork instance without the explicit
   warning path.
 - Prime directive spot check: no existing bags, trade, equip, or bank flow changed behavior
-  unless the player invokes the new actions; salvage remains unwired and marked deliberate.
+  unless the player invokes the new actions; salvage carries the same replay-safety and
+  warning guarantees as disenchant (probe it with the same duplicate/race protocol).
 
 STEP 3 - FIX: apply every BLOCKING and SHOULD-FIX finding; rerun the failed validation rows
 until green; commit with explicit paths (never git add -A), Conventional Commits with a body.

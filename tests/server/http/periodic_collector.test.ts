@@ -4,8 +4,12 @@
 // snapshot rather than throwing into the timer. These are the caching + resilience
 // guarantees both the business and client-perf collectors rely on.
 
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { PeriodicCollector } from '../../../server/http/periodic_collector';
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 describe('PeriodicCollector', () => {
   it('starts null and caches the result of a refresh', async () => {
@@ -13,8 +17,10 @@ describe('PeriodicCollector', () => {
     const collector = new PeriodicCollector(query, 60_000);
 
     expect(collector.current()).toBeNull();
+    expect(collector.lastSuccessfulRefreshAtMs()).toBeNull();
     await collector.refresh();
     expect(collector.current()).toBe(7);
+    expect(collector.lastSuccessfulRefreshAtMs()).not.toBeNull();
   });
 
   it('re-runs the query on each refresh and publishes the newest value', async () => {
@@ -97,5 +103,18 @@ describe('PeriodicCollector', () => {
     resolve(4);
     await stopping;
     expect(stopped).toBe(true);
+  });
+
+  it('can phase the initial refresh and cancel it before it starts', async () => {
+    vi.useFakeTimers();
+    const query = vi.fn(async () => 5);
+    const collector = new PeriodicCollector(query, 60_000);
+
+    collector.start(5_000);
+    await vi.advanceTimersByTimeAsync(4_999);
+    expect(query).not.toHaveBeenCalled();
+    await collector.stop();
+    await vi.advanceTimersByTimeAsync(1);
+    expect(query).not.toHaveBeenCalled();
   });
 });

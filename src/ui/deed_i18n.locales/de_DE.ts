@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_card_duel_first_win: {
+    name: 'Nach eigenen Regeln',
+    desc: 'Gewinne einen Kartenkampf beim Kartenmeister.',
+  },
   prog_first_steps: {
     name: 'Erste Schritte',
     desc: 'Erreiche Stufe 2 und mache den ersten Schritt auf einem langen Weg.',
@@ -35,8 +39,8 @@ export const table: DeedLocaleTable = {
     desc: 'Verteile einen Talentpunkt auf ein Talent der letzten Reihe.',
   },
   prog_full_build: {
-    name: 'Die volle Elf',
-    desc: 'Verteile alle elf Talentpunkte auf eine einzige Skillung.',
+    name: 'Die vollen Sechs',
+    desc: 'Wähle in allen sechs Talentreihen einer einzigen Skillung jeweils eine Option.',
   },
   prog_veteran: { name: 'Veteran', desc: 'Sammle insgesamt 250.000 Erfahrung.', title: 'Veteran' },
   prog_champion: {

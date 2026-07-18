@@ -15,6 +15,16 @@ completeness for this phase.
 - Backfill single-fire proof: a legacy character loaded already far past the threshold gets
   exactly one letter on first evaluation and never another on later loads, logins, or skill
   changes; no burst across multiple qualifying pairs.
+- The vertical-slice checkpoint (2026-07-17 amendment): this QA session is the kernel
+  exit. Drive the eight-step journey end to end in one seeded run: gather until a rare
+  event fires, craft, watch skill and the next-unlock line move, receive the Guild letter,
+  visit the letter's named quest giver and attune via the quest flow (the Phase 8 master
+  NPCs do not exist yet at this checkpoint; smith_haldren and the 2039 intro-quest givers
+  stand in, and the letter must name a giver that actually exists), proc and celebrate a
+  masterwork (toast plus the zone-visible broadcast, if Phase 6 has landed; the personal
+  toast alone if not), and trade the result. A step that is mechanically present but
+  experientially broken (silent, illegible, or celebration-free) is a SHOULD-FIX at
+  minimum, never a pass.
 
 ## QA Starter Prompt
 
@@ -69,6 +79,10 @@ Agent correctness:
 - Prove offline vs online delivery parity: the letter reaches the player identically via the
   offline Sim and the server-authoritative online path; confirm the online mail surface is
   live, not a stub default (the 2033 trap).
+- Play the vertical slice (the kernel-exit checkpoint from the QA emphasis above): the
+  eight-step journey in one seeded run, recording where each beat surfaces (loot line,
+  toast, mail, broadcast, title). Report the experiential gaps, not just the mechanical
+  ones; they are findings like any other.
 
 Agent test coverage:
 - Find untested paths: threshold boundary values, adjacency and tie-breaking between pairs,

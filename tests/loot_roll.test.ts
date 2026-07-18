@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import {
@@ -8,13 +9,15 @@ import {
   lootRollGroupStatus,
   lootSlotVisibleTo,
   partyLootCandidatesForMob,
+  pickRollGroupWinner,
   pruneCorpseLoot,
   rollLoot,
   submitLootRoll,
 } from '../src/sim/loot/loot_roll';
+import { Rng } from '../src/sim/rng';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { Entity, LootSlot, SimEvent } from '../src/sim/types';
+import type { Entity, LootEntry, LootSlot, SimEvent } from '../src/sim/types';
 
 // Direct unit tests for the extracted loot-distribution module (L1). These drive the
 // module's exported `(ctx, ...)` functions through `sim.ctx` (the real SimContext
@@ -93,6 +96,75 @@ describe('loot_roll: rollLoot producer (drop-rate determinism)', () => {
     const rate = dropRate(1234, 'bastion_revenant', 'mistveil_cord', 8000);
     expect(rate).toBeGreaterThan(0.04);
     expect(rate).toBeLessThan(0.08);
+  });
+
+  // Reproduces the raid-loot duplicate bug: Nythraxis has 4 independent rollGroups
+  // (2 helm slots, 2 shoulder slots) and several items (e.g. soulflame_mantle,
+  // crownforged_dreadhelm, nighttalon_crown/shoulderguards) appear in every one of
+  // them. With no cross-group duplicate guard, a single kill can hand out the same
+  // piece twice (or more), so a 9-person raid's 4 drops can collapse to 2-3 distinct
+  // items instead of a spread. This must never happen: every item awarded by one
+  // rollLoot call is unique.
+  it('never awards the same item id twice from one kill (raid boss, cross-group dedup)', () => {
+    // Reuse one Sim/player and re-seed only the rng between draws (constructing a
+    // fresh Sim per iteration is what pushed this over the shared-runner default
+    // test timeout in CI). 60 independent draws is already far past the ~57%
+    // per-kill duplicate rate the unfixed table produced.
+    const template = MOBS.nythraxis_scourge_of_thornpeak;
+    const sim = makeSim(0);
+    const pid = sim.addPlayer('warrior', 'Looter');
+    const meta = playerMeta(sim, pid);
+    for (let seed = 0; seed < 60; seed++) {
+      sim.rng = new Rng(seed);
+      const mob = createMob(-1, template, template.minLevel, { x: 0, y: 0, z: 0 });
+      rollLoot(sim.ctx, mob, meta);
+      const ids = (mob.loot?.items ?? []).map((s) => s.itemId);
+      // Every one of the 4 groups sums to 100% chance, so a kill must never come
+      // up empty; asserting this keeps the uniqueness check below from passing
+      // vacuously against a 0-item corpse.
+      expect(ids.length).toBeGreaterThan(0);
+      expect(new Set(ids).size).toBe(ids.length);
+    }
+  });
+});
+
+describe('loot_roll: pickRollGroupWinner (cross-group fall-forward)', () => {
+  it('returns the plain partition winner when nothing in the group was awarded yet', () => {
+    const group: LootEntry[] = [
+      { itemId: 'a', chance: 0.5 },
+      { itemId: 'b', chance: 0.5 },
+    ];
+    expect(pickRollGroupWinner(0.1, group, new Set())?.itemId).toBe('a');
+    expect(pickRollGroupWinner(0.6, group, new Set())?.itemId).toBe('b');
+  });
+
+  it('falls forward to the next entry in the SAME group on a collision, preserving the drop', () => {
+    const group = [
+      { itemId: 'a', chance: 0.5 },
+      { itemId: 'b', chance: 0.5 },
+    ];
+    // roll=0.1 partitions to 'a'; 'a' is already awarded elsewhere this kill, so
+    // the slot must still produce 'b' rather than dropping nothing.
+    expect(pickRollGroupWinner(0.1, group, new Set(['a']))?.itemId).toBe('b');
+  });
+
+  it('wraps around the group when the collision is near the end', () => {
+    const group = [
+      { itemId: 'a', chance: 0.34 },
+      { itemId: 'b', chance: 0.33 },
+      { itemId: 'c', chance: 0.33 },
+    ];
+    // roll=0.9 partitions to 'c'; both 'c' and 'a' are already awarded, so the
+    // wraparound scan must land on 'b'.
+    expect(pickRollGroupWinner(0.9, group, new Set(['c', 'a']))?.itemId).toBe('b');
+  });
+
+  it('returns null only when every entry in the group is already awarded', () => {
+    const group = [
+      { itemId: 'a', chance: 0.5 },
+      { itemId: 'b', chance: 0.5 },
+    ];
+    expect(pickRollGroupWinner(0.1, group, new Set(['a', 'b']))).toBeNull();
   });
 });
 
@@ -458,5 +530,94 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
     const ids = partyLootCandidatesForMob(sim.ctx, mob).map((m) => m.entityId);
     expect(ids).toEqual([a, c]);
     expect(ids).not.toContain(b);
+  });
+});
+
+describe('loot_roll: heroic-append cross-group dedup arm', () => {
+  // The heroic-append branch in rollLoot shares pickRollGroupWinner and
+  // awardedItemIds with the base-table branch, and this is exercised directly
+  // above. What is NOT covered by real content is the case that arm exists to
+  // guard: a heroic table sharing an item id with the base table (or with
+  // itself across a rollGroup) for the SAME mob. Today no such overlap exists,
+  // which is exactly why a future content edit could silently reintroduce a
+  // duplicate award with zero coverage; pin the disjointness invariant so any
+  // future edit that breaks it fails loudly here instead.
+  it('never shares an item id across a mob’s own heroic rollGroups', () => {
+    const problems: string[] = [];
+    for (const [mobId, entries] of Object.entries(HEROIC_BOSS_LOOT)) {
+      const seenPerGroup = new Map<string, Set<string>>();
+      for (const entry of entries) {
+        if (!entry.rollGroup || !entry.itemId) continue;
+        for (const [otherGroup, ids] of seenPerGroup) {
+          if (otherGroup === entry.rollGroup) continue;
+          if (ids.has(entry.itemId)) {
+            problems.push(
+              `${mobId}: ${entry.itemId} appears in both ${otherGroup} and ${entry.rollGroup}`,
+            );
+          }
+        }
+        const set = seenPerGroup.get(entry.rollGroup) ?? new Set<string>();
+        set.add(entry.itemId);
+        seenPerGroup.set(entry.rollGroup, set);
+      }
+    }
+    expect(problems).toEqual([]);
+  });
+
+  it('never shares an item id with the same mob’s base loot table', () => {
+    const problems: string[] = [];
+    for (const [mobId, heroicEntries] of Object.entries(HEROIC_BOSS_LOOT)) {
+      const template = MOBS[mobId];
+      if (!template) continue;
+      const baseIds = new Set(
+        template.loot.flatMap((entry: LootEntry) => (entry.itemId ? [entry.itemId] : [])),
+      );
+      for (const entry of heroicEntries) {
+        if (entry.itemId && baseIds.has(entry.itemId)) {
+          problems.push(`${mobId}: heroic entry ${entry.itemId} also appears in the base table`);
+        }
+      }
+    }
+    expect(problems).toEqual([]);
+  });
+
+  // Direct exercise of the heroic-append arm's dedup path (should-fix from
+  // review: the arm was reachable in code but untested, since no real heroic
+  // table currently collides -- confirmed by the disjointness pins above).
+  // Temporarily substitutes a synthetic two-group heroic table for one real
+  // boss id, engineered to collide by construction, so the SAME code path
+  // rollLoot runs against real content is proven to fall forward here too.
+  it('falls forward inside the heroic-append branch on a forced collision', () => {
+    const template = MOBS.morthen;
+    const original = HEROIC_BOSS_LOOT.morthen;
+    HEROIC_BOSS_LOOT.morthen = [
+      { itemId: 'collision_item', chance: 1, rollGroup: 'heroic_test_1' },
+      { itemId: 'collision_item', chance: 0.5, rollGroup: 'heroic_test_2' },
+      { itemId: 'other_item', chance: 0.5, rollGroup: 'heroic_test_2' },
+    ];
+    try {
+      const sim = makeSim(0);
+      const pid = sim.addPlayer('warrior', 'Looter');
+      const meta = playerMeta(sim, pid);
+      const mob = createMob(-1, template, template.minLevel, { x: 0, y: 0, z: 0 });
+      sim.ctx.instances.push({
+        id: -1,
+        dungeonId: 'hollow_crypt',
+        difficulty: 'heroic',
+        partyKey: 'test-party',
+        mobIds: [mob.id],
+      } as unknown as (typeof sim.ctx.instances)[number]);
+      // heroic_test_1's single entry always wins (chance 1); heroic_test_2's
+      // roll of 0.1 partitions to its own collision_item entry (index 0,
+      // chance 0.5), which is already awarded by heroic_test_1, so it must
+      // fall forward to other_item rather than dropping nothing.
+      vi.spyOn(sim.ctx.rng, 'next').mockReturnValue(0.1);
+      rollLoot(sim.ctx, mob, meta);
+      const ids = (mob.loot?.items ?? []).map((s) => s.itemId);
+      expect(ids.filter((id) => id === 'collision_item').length).toBe(1);
+      expect(ids).toContain('other_item');
+    } finally {
+      HEROIC_BOSS_LOOT.morthen = original;
+    }
   });
 });

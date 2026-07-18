@@ -19,7 +19,6 @@ const IMAGE_AURA_IDS = [
   'curse_of_agony',
   'immolate', // warlock DoTs
   'serpent_sting', // hunter DoT
-  'rend', // warrior DoT
   'moonfire',
   'insect_swarm',
   'rip', // druid DoTs

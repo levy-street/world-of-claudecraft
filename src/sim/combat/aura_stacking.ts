@@ -12,7 +12,12 @@ const SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS = new Set([
   'devotion_aura',
   'mark_of_the_wild',
   'power_word_fortitude',
+  'rallying_cry_dr',
+  'rallying_cry_hp',
+  'rune_of_power',
+  'sanguine_aura',
   'trueshot_aura_ap', // Sureflight Aura (hunter aoeAllyAttackPower)
+  'temporal_hourglass',
 ]);
 
 export function auraReplacementConflicts(auras: readonly Aura[], aura: Aura): number[] {

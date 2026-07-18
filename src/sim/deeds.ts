@@ -27,7 +27,7 @@
 
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
-import { pointsSpent, talentsFor } from './content/talents';
+import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, ZONES, zoneAt } from './data';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
 import type { ArenaMatch, InstanceSlot, PlayerMeta } from './sim';
@@ -45,7 +45,6 @@ import {
   type ItemDef,
   MAX_LEVEL,
   NYTHRAXIS_ROOM_RADIUS,
-  type PlayerClass,
 } from './types';
 
 // ---------------------------------------------------------------------------
@@ -69,6 +68,43 @@ export const MILESTONE_DEED_TO_LEGACY: Record<string, string> = {
 const LEGACY_MILESTONE_TO_DEED: Record<string, string> = Object.fromEntries(
   Object.entries(MILESTONE_DEED_TO_LEGACY).map(([deed, legacy]) => [legacy, deed]),
 );
+
+// Quests whose collect objective can ONLY be satisfied through the ground
+// pickup path: the item is a ground-object spawn (a sparkle) with no mob
+// loot, vendor, trade, mail, or market source, so the quest sitting in
+// questsDone proves at least one successful pickup happened before the
+// groundObjectsLooted counter existed. Interact-objective quests (the Royal
+// Graves, the crypt ritual circle) and the crypt relic chain are deliberately
+// absent: those interaction routes return before the counter bump, so they
+// prove nothing about it. PINNED like the sibling literals; the
+// content-integrity test re-derives this exact set from the live tables.
+export const GROUND_PICKUP_PROVING_QUESTS: readonly string[] = [
+  'q_supplies',
+  'q_whispers',
+  'q_names_of_the_dead',
+  'q_gravecallers_trail',
+  'q_fenbridge_muster',
+  'q_fen_supplies',
+  'q_drowned_censers',
+  'q_bastion_door',
+  'q_aldrics_fallen_star',
+  'q_highwatch_summons',
+  'q_ogre_totems',
+  'q_wyrm_sigils',
+  'q_sanctum_gate',
+  'q_glimmermere_light',
+];
+
+// The highest level any giantslayer-creditable mob can ever spawn at: heroic
+// instances pin every mob to 22 (content/dungeon_difficulty.ts), two above
+// the player cap, and nothing outside heroic exceeds the cap itself (dummies,
+// the world boss, and owned pets are excluded from the killing-blow credit).
+// cmb_giantslayer needs a blow five levels up, so past this ceiling minus
+// five the deed is permanently out of reach for the character. PINNED:
+// shipping a higher-level creditable mob is a conscious re-decision of the
+// stranded threshold (the content-integrity test cross-checks the ceiling
+// against the real tables).
+export const MAX_CREDITABLE_MOB_LEVEL = 22;
 
 // Dungeon final bosses whose kill credit bumps deedStats.dungeonClears (keys
 // '<dungeonId>' and '<dungeonId>:heroic') and the dungeonFinalBossKills
@@ -645,20 +681,6 @@ function deedListForKeys(keys: ReadonlySet<string>): readonly string[] {
   return ids;
 }
 
-// pointsGate-8 node ids per class (the bottom row of every tree), computed
-// once from the static talent registry so prog_deep_roots never walks the
-// tree per evaluation.
-const capstoneNodeCache = new Map<PlayerClass, ReadonlySet<string>>();
-function capstoneNodes(cls: PlayerClass): ReadonlySet<string> {
-  let set = capstoneNodeCache.get(cls);
-  if (!set) {
-    const tree = talentsFor(cls);
-    set = new Set((tree?.nodes ?? []).filter((n) => n.pointsGate === 8).map((n) => n.id));
-    capstoneNodeCache.set(cls, set);
-  }
-  return set;
-}
-
 const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   prestigeRank: (m) => m.prestigeRank,
   talentPoints: (m) => pointsSpent(m.talents),
@@ -694,14 +716,7 @@ const MARK_CIRCUIT_DUNGEONS = [
 
 const FLAGS: Record<DeedFlagId, (meta: PlayerMeta, e: Entity) => boolean> = {
   talentSpecChosen: (m) => m.talents.spec !== null,
-  talentCapstone: (m) => {
-    const nodes = capstoneNodes(m.cls);
-    // Allocation-free walk (tick-tail predicate: no Object.entries tuples).
-    for (const nodeId in m.talents.ranks) {
-      if (m.talents.ranks[nodeId] > 0 && nodes.has(nodeId)) return true;
-    }
-    return false;
-  },
+  talentCapstone: (m) => typeof m.talents.rows[20] === 'string',
   hasRestedXp: (m) => m.restedXp > 0,
   // Guild membership is server-stamped onto the entity; offline it stays ''
   // (never satisfiable there, matching the offline-sandbox model).
@@ -1044,15 +1059,48 @@ export function seedItemDiscovery(ctx: SimContext, meta: PlayerMeta): void {
   }
 }
 
-/** Retro grants that a state predicate cannot express: every craft skill
- *  except enchanting only ever comes from successful crafts, so a positive
- *  value on any other craft proves the first craft happened before the
- *  counter existed. Enchanting is excluded because disenchant and
- *  apply-enchant (professions/enchanting.ts) gain that skill without any
- *  craft, and it has no recipes, so its value can never prove one. */
-export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta): void {
+/** Retro grants that a state predicate cannot express, in two shapes, both
+ *  idempotent and re-run on every world join:
+ *  - PROOF inferences: persisted state proves the action happened before its
+ *    counter existed, so the deed is back-credited exactly like the rollout's
+ *    retro pass did for state predicates.
+ *  - STRANDED heals: the earning action has become permanently impossible for
+ *    THIS character (no earn path can ever exist again), so leaving the deed
+ *    visible-but-unearnable would violate the no-permanently-missable rule
+ *    (docs/design/deeds.md rule 5) and dead-end feat_book_complete. The deed
+ *    is granted rather than left stranded. */
+export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta, player: Entity): void {
+  // Proof: every craft skill except enchanting only ever comes from
+  // successful crafts, so a positive value on any other craft proves the
+  // first craft happened before the counter existed. Enchanting is excluded
+  // because disenchant and apply-enchant (professions/enchanting.ts) gain
+  // that skill without any craft, and it has no recipes, so its value can
+  // never prove one.
   if (Object.entries(meta.craftSkills).some(([craftId, v]) => craftId !== 'enchanting' && v > 0)) {
     grantDeed(ctx, meta, 'prog_first_craft', { retro: true });
+  }
+  // Proof: every ground object is a quest item whose pickup is denied unless
+  // its quest is active (interaction.ts), so a done proving quest can only
+  // have been completed through the pickup path. The counter itself stays
+  // honest at whatever the character actually accrued since the rollout.
+  if (GROUND_PICKUP_PROVING_QUESTS.some((q) => meta.questsDone.has(q))) {
+    grantDeed(ctx, meta, 'exp_something_shiny', { retro: true });
+  }
+  // Stranded: once no creditable mob can sit five levels up (the heroic pin
+  // is the ceiling), the killing blow is permanently out of reach; a level
+  // never goes back down (prestige is cosmetic), so past the window the deed
+  // strands for the character's whole future. Below the threshold the live
+  // kill site stays the only grant path.
+  if (player.level + 5 > MAX_CREDITABLE_MOB_LEVEL) {
+    grantDeed(ctx, meta, 'cmb_giantslayer', { retro: true });
+  }
+  // Stranded: rested XP neither accrues nor drains at the cap (the accrual
+  // gate in progression/xp.ts and the fromKill drain gate in
+  // combat/damage.ts), so a capped character with an empty pool can never
+  // flip the hasRestedXp flag; a nonzero frozen pool already retro-grants
+  // through the flag predicate on this same join.
+  if (player.level >= MAX_LEVEL && meta.restedXp <= 0) {
+    grantDeed(ctx, meta, 'prog_well_rested', { retro: true });
   }
 }
 

@@ -86,6 +86,59 @@ describe('combat/damage dealDamage (post-mitigation)', () => {
     expect(mob.auras.some((a) => a.kind === 'absorb')).toBe(false); // shield fully consumed + spliced
   });
 
+  it('emits the absorbed amount on the damage event without changing landed damage', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(10);
+    const p = sim.player as AnyEntity;
+    const mob = spawnHostileMob(sim, 'forest_wolf', 5);
+    mob.maxHp = 5000;
+    mob.hp = 5000;
+    mob.auras.push({
+      id: 'a',
+      name: 'Shield',
+      kind: 'absorb',
+      remaining: 9,
+      duration: 9,
+      value: 30,
+      sourceId: mob.id,
+      school: 'physical',
+    } as Aura);
+    sim.drainEvents();
+
+    dealDamage(sim.ctx, p, mob, 100, false, 'physical', null, 'hit');
+
+    const dmg = sim.drainEvents().find((e) => e.type === 'damage' && e.targetId === mob.id);
+    expect(dmg).toMatchObject({ type: 'damage', amount: 70, absorbed: 30 });
+    expect(mob.hp).toBe(4930);
+  });
+
+  it('emits the cheat-death save moment when a killing blow is prevented', () => {
+    const sim = makeSim();
+    const p = sim.player as AnyEntity;
+    p.hp = 20;
+    sim.drainEvents();
+
+    const ctx = sim.ctx as typeof sim.ctx & {
+      playerMods: typeof sim.ctx.playerMods;
+    };
+    const originalPlayerMods = ctx.playerMods;
+    ctx.playerMods = ((meta) => {
+      const mods = originalPlayerMods.call(ctx, meta);
+      return { ...mods, global: { ...mods.global, cheatDeathIcd: 90 } };
+    }) as typeof sim.ctx.playerMods;
+
+    dealDamage(ctx, null, p, 50, false, 'physical', null, 'hit');
+
+    expect(p.hp).toBe(1);
+    const events = sim.drainEvents();
+    expect(
+      events.some((e) => e.type === 'spellfx' && e.fx === 'wardBloom' && e.targetId === p.id),
+    ).toBe(true);
+    expect(
+      events.some((e) => e.type === 'log' && e.pid === p.id && e.text === 'A deathward saves you!'),
+    ).toBe(true);
+  });
+
   it('routes a lethal blow into handleDeath (mob dies, death event)', () => {
     const sim = makeSim();
     sim.setPlayerLevel(10);

@@ -72,6 +72,22 @@ describe('ActionBarController form persistence', () => {
     expect(ACTION_BAR_ABILITY_SLOTS).toBe(22);
   });
 
+  it('round-trips source slot 20 through the existing 22-slot storage model', () => {
+    const storage = new MemoryStorage();
+    const slot20Bar = bar();
+    slot20Bar[19] = { type: 'ability', id: 'sinister_strike' };
+    const writer = makeHarness('rogue', ['sinister_strike'], slot20Bar, storage);
+    writer.controller.saveActions();
+
+    const reader = makeHarness('rogue', ['sinister_strike'], bar(), storage);
+    reader.controller.init();
+
+    expect(reader.controller.actions).toHaveLength(ACTION_BAR_ABILITY_SLOTS);
+    expect(reader.controller.actions[19]).toEqual({ type: 'ability', id: 'sinister_strike' });
+    expect(reader.controller.actions[20]).toBeNull();
+    expect(reader.controller.actions[21]).toBeNull();
+  });
+
   it('keeps Rogue normal and stealth pages independently editable', () => {
     const normal = bar('sinister_strike', 'stealth');
     const stealth = bar('ambush', 'garrote', 'stealth');
@@ -328,5 +344,85 @@ describe('ActionBarController attack slot', () => {
     harness.state.auras = ['form_bear'];
     harness.controller.syncActiveForm();
     expect(harness.controller.actionForSlot(0)).toEqual({ type: 'ability', id: 'claw' });
+  });
+});
+
+describe('ActionBarController: passives never occupy an action slot', () => {
+  it('rejects adding a passive ability (measured_fury), leaving the bar empty', () => {
+    const { controller } = makeHarness('warrior', ['measured_fury'], bar());
+    expect(controller.addAbility('measured_fury')).toBe(false);
+    expect(controller.actions).toEqual(bar());
+  });
+
+  it('sweeps a passive left on the bar by an older build when abilities sync', () => {
+    // sunder_armor is castable, measured_fury is passive: only the passive is cleared.
+    const { controller } = makeHarness(
+      'warrior',
+      ['sunder_armor', 'measured_fury'],
+      bar('sunder_armor', 'measured_fury'),
+    );
+    controller.syncKnownAbilities();
+    expect(controller.actions).toEqual(bar('sunder_armor'));
+  });
+
+  it('rejects every warrior passive through direct normal-bar replacement', () => {
+    const passives = [
+      'diabolical_twinstrike',
+      'cleaving_blows',
+      'enrage_passive',
+      'measured_fury',
+      'seasoned_soldier',
+      'sudden_death',
+      'deep_wounds',
+    ];
+    const { controller } = makeHarness('warrior', passives, bar());
+
+    controller.replaceActions(bar(...passives));
+
+    expect(controller.actions).toEqual(bar());
+  });
+
+  it('cleans and persists a passive from an old saved normal bar during init', () => {
+    const storage = new MemoryStorage();
+    const key = 'woc_hotbar_warrior_ActionbarTester';
+    storage.setItem(key, JSON.stringify(bar('sunder_armor', 'measured_fury')));
+    const { controller } = makeHarness(
+      'warrior',
+      ['sunder_armor', 'measured_fury'],
+      bar(),
+      storage,
+    );
+
+    controller.init();
+
+    expect(controller.actions).toEqual(bar('sunder_armor'));
+    expect(JSON.parse(storage.getItem(key) ?? 'null')).toEqual(bar('sunder_armor'));
+  });
+
+  it('rejects direct slot 0 assignment of a passive', () => {
+    const { controller } = makeHarness('warrior', ['measured_fury'], bar());
+
+    controller.replaceAttackAction({ type: 'ability', id: 'measured_fury' });
+
+    expect(controller.attackAction).toBeNull();
+  });
+
+  it('rejects passive drag payloads for both normal and configurable slot 0 drops', () => {
+    const { controller } = makeHarness('warrior', ['measured_fury', 'sunder_armor'], bar());
+
+    expect(controller.isAssignableAction({ type: 'ability', id: 'measured_fury' })).toBe(false);
+    expect(controller.isAssignableAction({ type: 'ability', id: 'sunder_armor' })).toBe(true);
+  });
+
+  it('cleans a passive persisted in configurable slot 0 during init', () => {
+    const storage = new MemoryStorage();
+    const key = 'woc_hotbar_warrior_ActionbarTester:s0';
+    storage.setItem(key, JSON.stringify({ type: 'ability', id: 'measured_fury' }));
+    const { controller } = makeHarness('warrior', ['measured_fury'], bar(), storage);
+
+    controller.init();
+
+    expect(controller.attackAction).toBeNull();
+    expect(storage.getItem(key)).toBeNull();
   });
 });

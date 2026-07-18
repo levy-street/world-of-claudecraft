@@ -210,6 +210,15 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     document.body.appendChild(zoom);
     expectAtLeastFloor(zoom, '.map-zoom-btn');
   });
+
+  it('the profession quest selection control', () => {
+    const label = el('label', { class: 'qd-profession-choice' });
+    const select = el('select') as HTMLSelectElement;
+    select.appendChild(document.createElement('option'));
+    label.appendChild(select);
+    document.body.appendChild(label);
+    expectAtLeastFloor(select, '.qd-profession-choice select');
+  });
 });
 
 // Desktop (fine-pointer, non-mobile) target-size: the dense list controls the WCAG row

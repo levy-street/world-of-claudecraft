@@ -1,11 +1,21 @@
-import type {
-  AbilityDef,
-  AbilityEffect,
-  AuraKind,
-  CoreStats,
-  PlayerClass,
-  WeaponInfo,
+import {
+  type AbilityDef,
+  type AbilityEffect,
+  type AuraKind,
+  type CoreStats,
+  type PlayerClass,
+  TEMPORAL_HOURGLASS_ALLY_COOLDOWN_RATE,
+  TEMPORAL_HOURGLASS_CAPTURE_RADIUS,
+  TEMPORAL_HOURGLASS_DURATION,
+  TEMPORAL_HOURGLASS_GROUND_DURATION,
+  TEMPORAL_HOURGLASS_HEAL_FRACTION,
+  TEMPORAL_HOURGLASS_HOSTILE_PVE_DURATION,
+  TEMPORAL_HOURGLASS_HOSTILE_PVP_DURATION,
+  TEMPORAL_HOURGLASS_SELF_COOLDOWN_RATE,
+  TEMPORAL_HOURGLASS_SELF_RADIUS,
+  type WeaponInfo,
 } from '../types';
+import { TALENT_ABILITIES_V2 } from './talent_abilities_v2';
 import type { TalentModifiers } from './talents';
 import { SPORT_ABILITIES } from './vale_cup';
 
@@ -26,6 +36,7 @@ export interface ClassDef {
   manaPerLevel: number;
   resourceType: 'rage' | 'mana' | 'energy';
   startWeapon: string;
+  startOffhand?: string;
   startChest: string;
   // Consumables in a fresh character's bags: every class carries food; the
   // mana classes also carry water. Saved characters load their own bags.
@@ -62,27 +73,51 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     manaPerLevel: 0,
     resourceType: 'rage',
     startWeapon: 'worn_sword',
+    startOffhand: 'eastbrook_buckler',
     startChest: 'recruit_tunic',
     startItems: START_RATIONS,
     abilities: [
       'heroic_strike',
+      'revenge',
       'battle_shout',
-      'commanding_shout',
       'charge',
-      'rend',
       'thunder_clap',
       'hamstring',
       'bloodrage',
       'overpower',
+      'raging_gale',
+      'raised_guard',
+      'pummel',
       'execute',
+      'furious_mending',
+      'iron_resolve',
       'slam',
+      'red_harvest',
+      'whirlwind',
+      'faultline',
+      'heroic_leap',
       'cleave',
+      'rallying_cry',
+      'emboldening_roar',
+      'defiant_bellow',
+      'battle_stance',
+      'berserker_stance',
       'defensive_stance',
       'demoralizing_shout',
+      'intimidating_shout',
       'sunder_armor',
       'taunt',
-      'pummel',
-      'ironhold',
+      'measured_fury',
+      'seasoned_soldier',
+      'sudden_death',
+      'diabolical_twinstrike',
+      'cleaving_blows',
+      'breachmaker',
+      // Arms restructure 2026-07-08: a cleave window and the Deep Wounds bleed
+      // passive (replacing the retired Deep Gash). Die by the Sword is row-granted.
+      'sweeping_strikes',
+      'deep_wounds',
+      'enrage_passive',
     ],
     color: 0xc79c6e,
   },
@@ -106,17 +141,71 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'arcane_intellect',
       'frostbolt',
       'conjure_water',
+      // Blink joins the BASE kit at 5 (owner core-kit decision 2026-07-11):
+      // two level-5 choice-row options modify it, so it can no longer live
+      // behind a row grant of its own.
+      'blink',
+      // Ice Block joins the BASE kit (owner 2026-07-13): a key mage escape/immunity
+      // every spec gets. No specs gate; Frost carries a second charge (resolvedAbility).
+      'ice_block',
+      // Fire spec kit (owner design 2026-07-11, `specs: ['fire']` gated):
+      // the Ignition mastery + Hot Streak passives at the pick, Blazing
+      // Barrier at 10, Meteor at 17. Phoenix Trance is the shared signature slot.
+      'ignition',
+      'hot_streak',
+      'blazing_barrier',
+      'meteor',
+      'combustion',
+      // Frost spec kit (owner design 2026-07-11, `specs: ['frost']` gated):
+      // Ice Lance + its three spec passives at the spec pick, Winterlash at 8,
+      // the Water Elemental at 12.
+      'summon_water_elemental',
+      'ice_lance',
+      'fingers_of_frost',
+      'brain_freeze',
+      'shatter',
       'conjure_food',
+      'counterspell',
       'fire_blast',
       'arcane_missiles',
+      'flurry',
       'polymorph',
       'frost_nova',
+      'frozen_orb',
+      'blizzard',
+      'icy_veins',
+      'glacial_spike',
+      'glacial_front',
+      'dragons_breath',
       'arcane_explosion',
       'scorch',
       'ice_barrier',
       'pyroblast',
       'flamestrike',
-      'counterspell',
+      // Chronomancy healer kit (docs/prd/mage-chronomancy.md, `specs: ['arcane']`
+      // gated): the single-target shield (Phase 1) and Temporal Echo (Phase 2, the
+      // Arcane-damage-to-healing mark). Temporal Mend is the spec signature,
+      // granted at the pick like Phoenix Trance.
+      'temporal_barrier',
+      'temporal_echo',
+      // Phase 3: the single-target Arcane spender (charges) that drives the
+      // offensive heal rotation (docs/prd/mage-chronomancy.md sections 13.4 / 14).
+      'arcane_surge',
+      // Phase 4: the group version of Temporal Echo (marks up to five allies with a
+      // reduced group echo), docs/prd/mage-chronomancy.md Phase 4.
+      'temporal_cascade',
+      // Combat resurrection: rewind a dead group/raid member back to life.
+      'temporal_reversal',
+      // Out-of-combat mass resurrection for the whole group or raid.
+      'collective_reversal',
+      // "Correct" pillar raid cooldown: restore recent group/raid damage (Rewind).
+      'temporal_rewind',
+      'temporal_hourglass',
+      // Group haste cooldown (the Chronomancer's Bloodlust): +30% full haste, shares
+      // the Bloodlust exhaustion.
+      'temporal_acceleration',
+      'perfect_moment',
+      'fireball_form',
     ],
     color: 0x69ccf0,
   },
@@ -131,6 +220,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     manaPerLevel: 0,
     resourceType: 'energy',
     startWeapon: 'rusty_dagger',
+    startOffhand: 'rusty_dagger',
     startChest: 'footpad_jerkin',
     startItems: START_RATIONS,
     abilities: [
@@ -396,6 +486,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     onNextSwing: true,
     offGcd: true,
+    // Reaver Strike is the NO-SPEC (pre-specialization) filler only: Protection
+    // replaces it with Revenge, Arms (owner restructure 2026-07-08) leans on
+    // Maiming Strike + Brute Swing, and Fury (owner 2026-07-08) dropped it too
+    // in favour of Bloodletting / Twinstrike. All three committed specs exclude it.
+    excludeSpecs: ['prot', 'arms', 'fury'],
     threat: { flat: 20 }, // classic per-rank values: 20/39/59/78
     effects: [{ type: 'weaponDamage', bonus: 11 }],
     ranks: [
@@ -425,70 +520,47 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   battle_shout: {
     id: 'battle_shout',
+    castFx: 'shout',
     name: 'Iron Bellow',
     class: 'warrior',
     learnLevel: 1,
-    cost: 10,
+    cost: 0,
     castTime: 0,
     cooldown: 0,
     range: 0,
     school: 'physical',
     requiresTarget: false,
     exclusiveGroup: 'warrior_shout',
-    effects: [{ type: 'buffTarget', kind: 'buff_ap_pct', value: 10, duration: 120, party: true }],
-    description: 'A shout that increases the attack power of all party members by $b% for 2 min.',
-  },
-  commanding_shout: {
-    id: 'commanding_shout',
-    name: 'Bolstering Cry',
-    class: 'warrior',
-    learnLevel: 14,
-    cost: 10,
-    castTime: 0,
-    cooldown: 0,
-    range: 0,
-    school: 'physical',
-    requiresTarget: false,
-    exclusiveGroup: 'warrior_shout',
-    effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 6, duration: 120 }],
-    ranks: [
-      {
-        rank: 2,
-        level: 24,
-        cost: 10,
-        effects: [{ type: 'selfBuff', kind: 'buff_sta', value: 11, duration: 120 }],
-      },
-    ],
-    description: 'Increases your Stamina by $b for 2 min.',
+    // 1800s matches the other five standardized class raid buffs (int, armor,
+    // AP, stamina, stats all run 30 min); 120s was the odd one out.
+    effects: [{ type: 'buffTarget', kind: 'buff_ap_pct', value: 10, duration: 1800, party: true }],
+    description: 'A shout that increases the attack power of all party members by $b% for 30 min.',
   },
   demoralizing_shout: {
     id: 'demoralizing_shout',
+    castFx: 'shout',
     name: 'Direhowl',
     class: 'warrior',
-    learnLevel: 14,
+    learnLevel: 12,
+    specs: ['prot'],
     cost: 10,
     castTime: 0,
-    cooldown: 0,
+    // Owner rework: a real defensive cooldown instead of a spammable flat AP
+    // drain (which barely dented mobs, whose damage rides the weapon roll):
+    // 45s cd, every nearby enemy deals 20% less damage for 20s (pct form).
+    cooldown: 45,
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    effects: [{ type: 'aoeAttackPower', amount: 30, duration: 30, radius: 10 }],
-    ranks: [
-      {
-        rank: 2,
-        level: 20,
-        cost: 10,
-        effects: [{ type: 'aoeAttackPower', amount: 45, duration: 30, radius: 10 }],
-      },
-    ],
+    effects: [{ type: 'aoeAttackPower', amount: 0, pct: 0.2, duration: 20, radius: 10 }],
     description:
-      'Lets out a fearsome shout, reducing the attack power of all nearby enemies by $b for 30 sec.',
+      'Lets out a fearsome shout, reducing the damage dealt by all nearby enemies by 20% for 20 sec.',
   },
   charge: {
     id: 'charge',
     name: 'Onrush',
     class: 'warrior',
-    learnLevel: 4,
+    learnLevel: 3,
     cost: 0,
     castTime: 0,
     cooldown: 15,
@@ -498,41 +570,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     offGcd: true,
     effects: [{ type: 'charge' }, { type: 'stun', duration: 1 }],
-    description: 'Charges an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range.',
-  },
-  rend: {
-    id: 'rend',
-    name: 'Deep Gash',
-    class: 'warrior',
-    learnLevel: 4,
-    cost: 10,
-    castTime: 0,
-    cooldown: 0,
-    range: 0,
-    school: 'physical',
-    requiresTarget: true,
-    effects: [{ type: 'dot', total: 15, duration: 9, interval: 3 }],
-    ranks: [
-      {
-        rank: 2,
-        level: 10,
-        cost: 10,
-        effects: [{ type: 'dot', total: 21, duration: 9, interval: 3 }],
-      },
-      {
-        rank: 3,
-        level: 16,
-        cost: 10,
-        effects: [{ type: 'dot', total: 36, duration: 12, interval: 3 }],
-      },
-    ],
-    description: 'Wounds the target, causing them to bleed for $d damage over $t sec.',
+    description: 'Rushes an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range.',
   },
   thunder_clap: {
     id: 'thunder_clap',
     name: 'Quaking Blow',
     class: 'warrior',
-    learnLevel: 6,
+    learnLevel: 5,
+    // Protection-only now (owner restructure 2026-07-08): the seismic AoE belongs
+    // to the tank; Arms dropped it to declutter its bar.
+    specs: ['prot'],
     cost: 20,
     castTime: 0,
     cooldown: 4,
@@ -570,7 +617,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'hamstring',
     name: 'Hobbling Cut',
     class: 'warrior',
-    learnLevel: 8,
+    learnLevel: 5,
     cost: 10,
     castTime: 0,
     cooldown: 0,
@@ -598,7 +645,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'bloodrage',
     name: 'Blood Toll',
     class: 'warrior',
-    learnLevel: 10,
+    learnLevel: 6,
+    specs: ['arms', 'prot'],
     cost: 0,
     castTime: 0,
     cooldown: 60,
@@ -610,37 +658,90 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'selfDamagePctMax', pct: 0.08 },
       { type: 'gainResource', amount: 10 },
     ],
+    // The sim-source fallback hardcodes the base gainResource amount (10); the
+    // translated catalog uses the {rage} splice so the Blood Offering talent's
+    // upgraded amount shows live in the rendered tooltip.
     description: 'Generates 10 rage at the cost of health.',
   },
   overpower: {
     id: 'overpower',
     name: 'Redhand',
     class: 'warrior',
-    learnLevel: 10,
-    cost: 5,
+    learnLevel: 2,
+    cost: 15,
     castTime: 0,
     cooldown: 5,
+    // Two charges (owner 2026-07-08, like Twinstrike): usable twice back to back,
+    // each charge recharging on the cooldown, and each use stacking its empower.
+    maxCharges: 2,
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    requiresDodgeProc: true,
-    effects: [{ type: 'weaponStrike', bonus: 5, cannotBeDodged: true }],
+    // Owner decision 2026-07-09: baseline early rage SPENDER (learned at level 2),
+    // costing 15 rage per use. The classic dodge-proc gate stays gone (too RNG);
+    // the requiresDodgeProc machinery itself remains for hunter mongoose_bite.
+    // Fury AND Prot hand it off at 10 (owner 2026-07-10): it stays the early
+    // rage spender through 5-9, then retires when each spec's own kit fills
+    // out (Fury: Red Harvest takes the rage-dump role at 10; Prot: its empower
+    // rider feeds the Arms-granted Maiming Strike, a dead rider beside
+    // Shieldcrack/Revenge, review round 2 item on Prot coherence). Arms keeps
+    // it: the Maiming Strike empower is its whole point.
+    excludeSpecs: ['fury', 'prot'],
+    excludeSpecsAtLevel: 10,
+    effects: [
+      { type: 'weaponStrike', bonus: 5, cannotBeDodged: true },
+      // Empowers the next Maiming Strike (+20% per stack, up to 2), consumed in
+      // effect_dispatch's weaponStrike case. Only Arms owns Maiming Strike, so the
+      // stack is a no-op for other specs (harmless).
+      { type: 'selfBuff', kind: 'overpower_charge', value: 0.2, duration: 15 },
+    ],
     ranks: [
       {
         rank: 2,
         level: 16,
-        cost: 5,
-        effects: [{ type: 'weaponStrike', bonus: 15, cannotBeDodged: true }],
+        cost: 15,
+        effects: [
+          { type: 'weaponStrike', bonus: 15, cannotBeDodged: true },
+          { type: 'selfBuff', kind: 'overpower_charge', value: 0.2, duration: 15 },
+        ],
       },
     ],
     description:
-      'Instant attack for weapon damage plus $d. Only usable after the target dodges. Cannot be dodged.',
+      'Instant attack (2 charges) for weapon damage plus $d that empowers your next Maiming Strike by 20% (stacks twice). Cannot be dodged.',
+  },
+  // Fury's active rage builder (operator design, Arremetida Enfurecida): two
+  // 60%-weapon hits so the pair lands slightly more than one signature
+  // Bloodletting swing, plus a rage kick. First BASE-KIT user of the
+  // multi-charge cooldown flow (maxCharges; the Double Charge talent row
+  // pioneered the Entity.charges machinery).
+  raging_gale: {
+    id: 'raging_gale',
+    name: 'Twinstrike',
+    class: 'warrior',
+    learnLevel: 7,
+    specs: ['fury'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 8,
+    maxCharges: 2,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    effects: [
+      // Balance pass 2026-07-10: was 0.6 weapon + 24 per hit (too efficient for a
+      // free, rage-generating, 2-charge spell); retuned to 0.45 weapon + 16.
+      { type: 'weaponStrike', bonus: 14, weaponMult: 0.4 },
+      { type: 'weaponStrike', bonus: 14, weaponMult: 0.4 },
+      { type: 'gainResource', amount: 8 },
+    ],
+    description:
+      'Instantly strike with your weapon twice, each hit dealing 40% weapon damage plus $d, and generate 8 rage. Stores up to 2 charges. (Fury)',
   },
   execute: {
     id: 'execute',
     name: 'Early Grave',
     class: 'warrior',
-    learnLevel: 14,
+    learnLevel: 12,
     cost: 15,
     castTime: 0,
     cooldown: 0,
@@ -656,36 +757,440 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'slam',
     name: 'Brute Swing',
     class: 'warrior',
-    learnLevel: 16,
-    cost: 15,
-    castTime: 1.5,
+    learnLevel: 5,
+    // Arms-only (owner 2026-07-08): Protection dropped Brute Swing since Revenge
+    // is already its filler; a generic mandoble adds nothing for a tank.
+    specs: ['arms'],
+    // Redesigned 2026-07-10 (owner): from a 15-rage spender into the Arms rage
+    // BUILDER (free, generates 8 rage, 4s cooldown, stays on the GCD). Dropped
+    // from Battle Trance's free-cost scope in the same change: a 0-cost ability
+    // can never spend a free-cost proc (see empower_next.ts).
+    cost: 0,
+    // Instant by owner decision (MoP-era Slam): a timed cast on a rage melee
+    // felt wrong in play. Deliberate divergence from the classic 1.5s cast.
+    castTime: 0,
+    cooldown: 4,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    effects: [
+      { type: 'weaponStrike', bonus: 15, weaponMult: 0.5 },
+      { type: 'gainResource', amount: 8 },
+    ],
+    description:
+      'Swings brutally at the opponent for 50% weapon damage plus $d, generating 8 rage.',
+  },
+  // Fury's dump-everything spender (operator design, Desenfreno): three full
+  // weapon hits, each carrying a Maiming Strike-scale bonus (era table:
+  // docs/design/spell-ranks.md), for the whole 80-rage bar. GCD only.
+  red_harvest: {
+    id: 'red_harvest',
+    name: 'Red Harvest',
+    class: 'warrior',
+    learnLevel: 10,
+    specs: ['fury'],
+    cost: 80,
+    castTime: 0,
     cooldown: 0,
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    effects: [{ type: 'weaponStrike', bonus: 25 }],
-    description: 'Slams the opponent for weapon damage plus $d.',
+    effects: [
+      // Balance pass 2026-07-10: was 3x full-weapon + 55 each (=165 bonus), far
+      // too much for a 5x/min spender; retuned to 0.65 weapon + 25 each.
+      { type: 'weaponStrike', bonus: 25, weaponMult: 0.65 },
+      { type: 'weaponStrike', bonus: 25, weaponMult: 0.65 },
+      { type: 'weaponStrike', bonus: 25, weaponMult: 0.65 },
+      // Always Enrages for 4 sec (Rampage / Desenfreno, the guaranteed proc).
+      { type: 'enrageChance', chance: 1, duration: 4 },
+    ],
+    description:
+      'Spend everything: strike three times in a frenzy for 65% weapon damage plus $d each, always Enraging you. (Fury)',
+  },
+  // Spellbook-only passive trait (owner 2026-07-08): documents the Enrage buff
+  // that Bloodletting / Red Harvest apply (the actual mechanic is the enrageChance
+  // effect + the 'enrage' aura). No effects of its own; never castable.
+  enrage_passive: {
+    id: 'enrage_passive',
+    name: 'Mayhem',
+    class: 'warrior',
+    learnLevel: 5,
+    specs: ['fury'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Passive: while Enraged you deal 7% more damage, attack 25% faster and move 10% faster for 4 sec. Bloodletting has a 30% chance to Enrage you; Red Harvest always does. (Fury)',
+  },
+  // Fury's defensive cooldown (operator correction 2026-07-07, Regeneracion
+  // Enfurecida): a 10s / 20% damage-taken cut (the buff_dr aura read by
+  // combat/damage.ts), NOT a flat heal-over-time. The healing is delivered
+  // through Bloodletting: while this aura (detectable id 'furious_mending') is
+  // up, bloodthirst's selfHealPctMax jumps from 3% to 20% of max health
+  // (combat/effect_dispatch.ts).
+  furious_mending: {
+    id: 'furious_mending',
+    name: 'Furious Mending',
+    class: 'warrior',
+    learnLevel: 10,
+    specs: ['fury'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [
+      {
+        type: 'selfBuff',
+        kind: 'buff_dr',
+        value: 0.2,
+        duration: 10,
+        auraId: 'furious_mending',
+        auraName: 'Furious Mending',
+      },
+    ],
+    description:
+      'For 10 sec you take 20% reduced damage, and while it lasts your Bloodletting heals you for 20% of your maximum health. (Fury)',
+  },
+  // Fury's support offensive cooldown (operator design, Grito Alentador): the
+  // caster and friendly players within 40 yd are Emboldened, their next 3
+  // damaging ability CASTS guaranteed critical strikes (aura kind 'sure_crit',
+  // overridden-not-skipped crit rolls; combat/sure_crit.ts).
+  emboldening_roar: {
+    id: 'emboldening_roar',
+    castFx: 'shout',
+    name: 'Emboldening Roar',
+    class: 'warrior',
+    learnLevel: 16,
+    specs: ['fury'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 180,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [{ type: 'aoeAllySureCrit', charges: 3, duration: 20, radius: 40 }],
+    description:
+      'Lets loose an emboldening roar: you and friendly players within 40 yards are Emboldened, and your next 3 abilities are guaranteed critical strikes. (Fury)',
+  },
+  // Protection's active shield block (operator design, Bloquear con Escudo):
+  // an off-GCD 6 sec self buff cutting PHYSICAL damage taken in half (the
+  // 'buff_dr_phys' sibling of Furious Mending's buff_dr, read at the same
+  // combat/damage.ts fold but gated on the school being physical).
+  raised_guard: {
+    id: 'raised_guard',
+    castFx: 'flourish',
+    name: 'Raised Guard',
+    class: 'warrior',
+    learnLevel: 8,
+    specs: ['prot'],
+    requiresShield: true,
+    cost: 15,
+    castTime: 0,
+    cooldown: 12,
+    maxCharges: 2,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [
+      {
+        type: 'selfBuff',
+        kind: 'buff_dr_phys',
+        value: 0.5,
+        duration: 6,
+        auraId: 'raised_guard_dr',
+        auraName: 'Raised Guard',
+      },
+    ],
+    description:
+      'Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)',
+  },
+  // Protection's rage-dump survival wall (operator design, Ignorar Dolor): the
+  // FIRST spendsAllResource ability. `cost` is the 20-rage minimum gate; casting
+  // spends up to spendResourceCap (40) rage from the bar and grants a damage-absorb
+  // shield (the priest-style 'absorb' aura kind, drained by dealDamage and read by
+  // the HUD absorb bar) soaking 4 damage per rage actually spent, up to 10 sec.
+  iron_resolve: {
+    id: 'iron_resolve',
+    name: 'Iron Resolve',
+    class: 'warrior',
+    learnLevel: 14,
+    specs: ['prot'],
+    cost: 20,
+    spendsAllResource: true,
+    spendResourceCap: 40,
+    castTime: 0,
+    cooldown: 15,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [{ type: 'absorbSpentResource', mult: 4, duration: 10 }],
+    description:
+      'Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)',
+  },
+  // Protection's frontal control slam (operator design, Ola de Choque): modest
+  // aoe damage plus a 3 sec stun, restricted to enemies in the MELEE_ARC
+  // frontal arc (the aoeDamage `frontal` flag) within 8 yd.
+  faultline: {
+    id: 'faultline',
+    name: 'Faultline',
+    class: 'warrior',
+    learnLevel: 14,
+    specs: ['prot'],
+    cost: 15,
+    castTime: 0,
+    cooldown: 30,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [{ type: 'aoeDamage', min: 15, max: 20, radius: 8, frontal: true, stunSec: 3 }],
+    description:
+      'Send a shockwave through the ground: enemies in front of you within 8 yards take $d damage and are stunned for 3 sec. (Protection)',
+  },
+  // Protection's aoe taunt (operator design, Grito Desafiante): every hostile
+  // mob within 10 yd goes through the SHARED applyTaunt entry (threat lifted
+  // to the top of its table + forced onto the caster), the fan-out of Goad.
+  defiant_bellow: {
+    id: 'defiant_bellow',
+    castFx: 'shout',
+    name: 'Defiant Bellow',
+    class: 'warrior',
+    learnLevel: 12,
+    specs: ['prot'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 60,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [{ type: 'aoeTaunt', radius: 10 }],
+    description:
+      'A defiant bellow: every enemy within 10 yards is taunted, compelled to attack you for 3 sec. (Protection)',
+  },
+  // Arms's damage-amplifier (operator design, Aplastar Coloso): a modest weapon
+  // strike that also stamps a SOURCE-SCOPED vulnerability (vuln_source) on the
+  // target, so only YOUR hits on that target land 20% harder for 8 sec. The aura
+  // carries the caster's id (debuffTargetSource), so it never buffs other
+  // attackers, unlike the raid-wide 'vulnerability' curse.
+  breachmaker: {
+    id: 'breachmaker',
+    name: 'Breachmaker',
+    class: 'warrior',
+    learnLevel: 12,
+    specs: ['arms'],
+    cost: 10,
+    castTime: 0,
+    cooldown: 45,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    effects: [
+      { type: 'weaponStrike', bonus: 15 },
+      {
+        type: 'debuffTargetSource',
+        kind: 'vuln_source',
+        value: 0.2,
+        duration: 8,
+        auraId: 'breachmaker_vuln',
+        auraName: 'Breachmaker',
+      },
+    ],
+    description:
+      'Batter the target for weapon damage plus $d and crack its guard: your own attacks against it deal 20% more damage for 8 sec. (Arms)',
+  },
+  // Arms's rage-economy passive (operator design, Intrepidez): a calm, measured
+  // fury makes every one of your abilities cost 10% less rage. Never castable and
+  // never on the action bar; the discount folds at the resolvedAbility cost choke
+  // point while the passive is in the known list (spec-gated to arms).
+  measured_fury: {
+    id: 'measured_fury',
+    name: 'Measured Fury',
+    class: 'warrior',
+    learnLevel: 5,
+    specs: ['arms'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Your measured fury sharpens your economy: your abilities cost 10% less rage. (Arms)',
+  },
+  // Seasoned Soldier (Arms passive, owner 2026-07-09): critical auto-attacks mint
+  // 10% more rage. Wired in combat/damage.ts's auto-attack rage block, gated on the
+  // passive being known AND committed arms (mirrors Measured Fury's cost hook).
+  seasoned_soldier: {
+    id: 'seasoned_soldier',
+    name: 'Seasoned Soldier',
+    class: 'warrior',
+    learnLevel: 5,
+    specs: ['arms'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [],
+    description: 'Your critical auto-attacks generate 10% more rage. (Arms)',
+  },
+  // Diabolical Twinstrike (Fury passive, owner 2026-07-09): Twinstrike hits 15%
+  // harder while Enraged. Wired in effect_dispatch's weaponStrike case.
+  diabolical_twinstrike: {
+    id: 'diabolical_twinstrike',
+    name: 'Diabolical Twinstrike',
+    class: 'warrior',
+    learnLevel: 5,
+    specs: ['fury'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [],
+    description: 'While Enraged, your Twinstrike deals 15% more damage. (Fury)',
+  },
+  // Cleaving Blows (Fury passive, owner 2026-07-09): Red Harvest always refunds a
+  // charge of Twinstrike. Wired in effect_dispatch's runEffects red_harvest path.
+  cleaving_blows: {
+    id: 'cleaving_blows',
+    name: 'Cleaving Blows',
+    class: 'warrior',
+    learnLevel: 5,
+    specs: ['fury'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [],
+    description: 'Red Harvest always refunds a charge of Twinstrike. (Fury)',
+  },
+  // Sudden Death (Arms passive, owner 2026-07-09): a connected auto swing has a
+  // chance to let you cast Early Grave on a target at ANY health, for no rage.
+  // Proc in auto_attack.ts; the free cost + HP-gate bypass ride the 'sudden_death'
+  // aura (empower_next.ts + casting_lifecycle).
+  sudden_death: {
+    id: 'sudden_death',
+    name: 'Sudden Death',
+    class: 'warrior',
+    learnLevel: 5,
+    specs: ['arms'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Your auto-attacks have a chance to let you cast Early Grave on a target at any health, costing no rage. (Arms)',
+  },
+  // Arms restructure 2026-07-08. Sweeping Strikes: a 12s window where your
+  // single-target strikes also clip one nearby enemy at full damage. Deep Wounds: a
+  // passive marker; the bleed itself rides Maiming Strike's effects.
+  sweeping_strikes: {
+    id: 'sweeping_strikes',
+    name: 'Widening Arc',
+    class: 'warrior',
+    learnLevel: 18,
+    specs: ['arms'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 30,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [{ type: 'selfBuff', kind: 'sweeping_strikes', value: 1, duration: 12 }],
+    description:
+      'For 12 sec your single-target attacks also strike 1 nearby enemy for full damage. (Arms)',
+  },
+  deep_wounds: {
+    id: 'deep_wounds',
+    name: 'Gaping Wounds',
+    class: 'warrior',
+    learnLevel: 9,
+    specs: ['arms'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Passive: your Maiming Strike leaves the target bleeding for Physical damage over 6 sec. (Arms)',
   },
   cleave: {
     id: 'cleave',
     name: 'Reaping Arc',
     class: 'warrior',
-    learnLevel: 18,
-    cost: 20,
+    learnLevel: 14,
+    specs: ['arms'],
+    // Balance pass 2026-07-10 (Arms buff round): 20 rage / 20-26 -> 15 rage /
+    // 30-38, soft-capped at 5 targets (the Revenge mechanism: above 5 the
+    // total holds at 5x per-target, scaling already-rolled hits, no rng moved).
+    cost: 15,
     castTime: 0,
     cooldown: 0,
     range: 0,
     school: 'physical',
     requiresTarget: false,
     threat: { flat: 30 }, // classic 100 at rank 5/level 58, scaled to the 1-20 band
-    effects: [{ type: 'aoeDamage', min: 20, max: 26, radius: 5 }],
+    effects: [{ type: 'aoeDamage', min: 30, max: 38, radius: 5, softCap: 5 }],
     description: 'A sweeping strike that hits all enemies in front of you for $d damage.',
   },
-  defensive_stance: {
-    id: 'defensive_stance',
-    name: 'Guarded Stance',
+  // Protection's frontal-arc filler, replacing Reaver Strike for committed prot
+  // (heroic_strike excludeSpecs ['prot'] + this specs ['prot']). Hits every enemy
+  // in the melee facing arc; a soft cap (softCap 5) holds the TOTAL to 5x per-
+  // target above 5 enemies. A dodge or parry against the warrior has a chance to
+  // make the next cast free (the revenge_free proc, applied in mobSwing).
+  revenge: {
+    id: 'revenge',
+    name: 'Revenge',
     class: 'warrior',
-    learnLevel: 10,
+    learnLevel: 7,
+    specs: ['prot'],
+    cost: 20,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    threat: { flat: 30 },
+    effects: [{ type: 'aoeDamage', min: 18, max: 24, radius: 8, frontal: true, softCap: 5 }],
+    description:
+      'Attack in a wide arc, dealing 18 to 24 Physical damage to all enemies in front of you. Above 5 targets the damage is reduced. When you dodge or parry, your next Revenge may cost no rage. (Protection)',
+  },
+  // Warrior combat stances. All three share exclusiveGroup 'warrior_stance', so
+  // casting one swaps the sibling and a warrior is never stanceless (the default
+  // for the spec is also auto-applied by combat/warrior_stances.ts). Gating:
+  // Battle is for Arms/Prot/no-spec (excludeSpecs Fury), Guarded for Arms/Prot,
+  // Berserker for Fury only.
+  battle_stance: {
+    id: 'battle_stance',
+    name: 'Battle Stance',
+    class: 'warrior',
+    learnLevel: 1,
+    excludeSpecs: ['fury'],
     cost: 0,
     castTime: 0,
     cooldown: 1,
@@ -693,33 +1198,55 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'defensive_stance', value: 0.9, duration: 3600 }],
+    exclusiveGroup: 'warrior_stance',
+    effects: [{ type: 'selfBuff', kind: 'battle_stance', value: 0, duration: 3600 }],
     description:
-      'A defensive combat stance: you generate 30% more threat but deal and take 10% less damage. Cast again to leave the stance.',
+      'An aggressive combat stance: you generate 10% more rage. The default stance for Arms and Protection.',
   },
-  // Warrior tank cooldown: a flat mitigation wall (the `shield_wall` aura, read in
-  // damage.ts). One of three distinct tank cooldowns (paladin Sacred Bulwark is a
-  // cheat-death, druid Primal Reflexes is dodge-based).
-  ironhold: {
-    id: 'ironhold',
-    name: 'Ironhold',
+  berserker_stance: {
+    id: 'berserker_stance',
+    name: 'Berserker Stance',
     class: 'warrior',
-    learnLevel: 20,
-    cost: 10,
+    learnLevel: 5,
+    specs: ['fury'],
+    cost: 0,
     castTime: 0,
-    cooldown: 180,
+    cooldown: 1,
     range: 0,
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'shield_wall', value: 0.4, duration: 8 }],
-    description: 'Brace behind your guard, reducing all damage taken by 40% for 8 sec.',
+    exclusiveGroup: 'warrior_stance',
+    effects: [{ type: 'selfBuff', kind: 'berserker_stance', value: 0, duration: 3600 }],
+    description:
+      'A reckless combat stance: your critical strikes land 3% more often and hit for 3% more. The Fury warrior always fights in this stance.',
+  },
+  defensive_stance: {
+    id: 'defensive_stance',
+    name: 'Guarded Stance',
+    class: 'warrior',
+    learnLevel: 5,
+    specs: ['arms', 'prot'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 1,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    exclusiveGroup: 'warrior_stance',
+    effects: [{ type: 'selfBuff', kind: 'defensive_stance', value: 0.9, duration: 3600 }],
+    description:
+      'A defensive combat stance: you generate 30% more threat but deal and take 10% less damage. Cast Battle Stance to return to the offensive.',
   },
   sunder_armor: {
     id: 'sunder_armor',
     name: 'Armor Shear',
     class: 'warrior',
-    learnLevel: 10,
+    learnLevel: 5,
+    // Protection-only now (owner restructure 2026-07-08): Arms dropped armor
+    // shred to declutter its bar.
+    specs: ['prot'],
     cost: 15,
     castTime: 0,
     cooldown: 0,
@@ -744,7 +1271,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'taunt',
     name: 'Goad',
     class: 'warrior',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 0,
     castTime: 0,
     cooldown: 10,
@@ -754,7 +1281,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'taunt' }],
     description:
-      'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
+      'Goads the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
   },
 
   // ====================== MAGE ======================
@@ -807,11 +1334,30 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description: 'Hurls a fiery ball that causes $d Fire damage plus additional damage over time.',
   },
+  fireball_form: {
+    id: 'fireball_form',
+    name: 'Ember Form',
+    class: 'mage',
+    learnLevel: 11,
+    cost: 50,
+    castTime: 2,
+    cooldown: 10,
+    range: 0,
+    school: 'fire',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'form_fireball', value: 1.4, duration: 3600 }],
+    description:
+      'Transform into a blazing ember, increasing movement speed by $b%. You cannot attack or cast spells while transformed. Recast to return to your normal form.',
+  },
   frost_armor: {
     id: 'frost_armor',
     name: 'Hoarfrost Mantle',
     class: 'mage',
     learnLevel: 1,
+    // Frost identity (owner 2026-07-14 spec split): committing to Fire or
+    // Chronomancy hands the armor off (excludeSpecs, the Reaver Strike idiom),
+    // while the level 1-4 pre-spec mage keeps its starter armor.
+    excludeSpecs: ['fire', 'arcane'],
     cost: 20,
     castTime: 0,
     cooldown: 0,
@@ -839,7 +1385,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'arcane_intellect',
     name: 'Aether Insight',
     class: 'mage',
-    learnLevel: 1,
+    learnLevel: 3,
     cost: 25,
     castTime: 0,
     cooldown: 0,
@@ -898,6 +1444,306 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description: 'Launches a bolt of frost, causing $d Frost damage and slowing movement by 40%.',
   },
+  // Frost mage spec kit (owner design 2026-07-11; combat/frost_mage.ts owns
+  // the proc engine these feed). Ice Lance: the instant proc spender. Its 3x
+  // against frozen-counting targets lives in the per-cast frozen resolution
+  // (effect_dispatch reads FrozenCastState), not here in the data.
+  ice_lance: {
+    id: 'ice_lance',
+    name: 'Ice Lance',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['frost'],
+    cost: 10,
+    castTime: 0,
+    cooldown: 0,
+    range: 30,
+    school: 'frost',
+    requiresTarget: true,
+    effects: [{ type: 'directDamage', min: 10, max: 12 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 12,
+        cost: 15,
+        effects: [{ type: 'directDamage', min: 20, max: 24 }],
+      },
+      {
+        rank: 3,
+        level: 18,
+        cost: 20,
+        effects: [{ type: 'directDamage', min: 30, max: 35 }],
+      },
+    ],
+    description:
+      "Hurl a shard of ice, dealing $d Frost damage, tripled against a frozen target. Spends Fingers of Frost, or a charge of Winter's Chill, to treat the target as frozen. (Frost)",
+  },
+  // Winterlash: the Winter's Chill planter. Its three bolts resolve on one
+  // projectile arrival; the debuff rider lands in frostMageAfterCast so the
+  // bolts themselves can never eat the charges they just applied. Brain
+  // Freeze's instant/harder/no-cooldown override is applyBrainFreezeOverride.
+  flurry: {
+    id: 'flurry',
+    name: 'Winterlash',
+    class: 'mage',
+    learnLevel: 8,
+    specs: ['frost'],
+    cost: 30,
+    castTime: 1.5,
+    cooldown: 10,
+    range: 30,
+    school: 'frost',
+    requiresTarget: true,
+    effects: [
+      { type: 'directDamage', min: 7, max: 9 },
+      { type: 'directDamage', min: 7, max: 9 },
+      { type: 'directDamage', min: 7, max: 9 },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 16,
+        cost: 45,
+        effects: [
+          { type: 'directDamage', min: 14, max: 17 },
+          { type: 'directDamage', min: 14, max: 17 },
+          { type: 'directDamage', min: 14, max: 17 },
+        ],
+      },
+    ],
+    description:
+      "Loose three icy bolts for $d Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant, 30% harder, and skips its cooldown. (Frost)",
+  },
+  // Frozen Orb: the roaming proc generator (combat/frozen_orb.ts). Instant,
+  // 30s cooldown; the orb drifts forward pulsing frost damage + a 30% snare
+  // once per second for 8s. First strike guarantees a Fingers of Frost stack,
+  // then 20% per striking pulse. Blizzard shortens its cooldown (below).
+  frozen_orb: {
+    id: 'frozen_orb',
+    name: 'Frozen Orb',
+    class: 'mage',
+    learnLevel: 12,
+    specs: ['frost'],
+    cost: 50,
+    castTime: 0,
+    cooldown: 30,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    effects: [{ type: 'frozenOrb', min: 8, max: 11, radius: 6, duration: 8, interval: 1 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 18,
+        cost: 70,
+        effects: [{ type: 'frozenOrb', min: 14, max: 18, radius: 6, duration: 8, interval: 1 }],
+      },
+    ],
+    description:
+      'Release an orb of swirling frost that drifts forward for 8 sec, dealing $d Frost damage each second to nearby enemies and slowing them by 30%. Its strikes generate Fingers of Frost. (Frost)',
+  },
+  // Glacial Spike: the frost spec's slow, heavy spender. Gated on a FULL Icicles
+  // stack (requiresAuraStacks 5), which the cast consumes; it lands a big frost
+  // hit and freezes the target with a short root, so the follow-up Ice Lance and
+  // spells Brittle Ruin even where the target was not already frozen. The Icicles
+  // build-up lives in combat/frost_mage.ts (fed by Rimelance impacts + Frozen Orb
+  // pulses); the freeze reuses the shared root effect so isRooted counts it.
+  glacial_spike: {
+    id: 'glacial_spike',
+    name: 'Glacial Spike',
+    class: 'mage',
+    learnLevel: 16,
+    specs: ['frost'],
+    cost: 50,
+    castTime: 2.7,
+    cooldown: 0,
+    range: 30,
+    school: 'frost',
+    requiresTarget: true,
+    requiresAuraKind: 'icicles',
+    requiresAuraStacks: 5,
+    effects: [
+      { type: 'directDamage', min: 90, max: 105 },
+      { type: 'root', duration: 4 },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 20,
+        cost: 65,
+        effects: [
+          { type: 'directDamage', min: 140, max: 160 },
+          { type: 'root', duration: 4 },
+        ],
+      },
+    ],
+    description:
+      'Conjure a massive spike of ice, consuming 5 Icicles to deal $d Frost damage and freeze the target in place for 4 sec. (Frost)',
+  },
+  // Blizzard: the frost AoE workhorse, a ground-aimed channel on the
+  // rain_of_fire template plus a snare rider (the position-channel aoeSlow
+  // pulse) and the Frozen Orb refund (frostMageChannelPulse, 0.5s per enemy
+  // struck, at most 3s per cast).
+  blizzard: {
+    id: 'blizzard',
+    name: 'Blizzard',
+    class: 'mage',
+    learnLevel: 10,
+    specs: ['frost'],
+    cost: 70,
+    cooldown: 8,
+    range: 30,
+    school: 'frost',
+    requiresTarget: false,
+    targetMode: 'position',
+    // Owner playtest 2026-07-11: no longer a channel. A 2 sec cast places the
+    // storm, which then pulses on its own for 6 sec (a groundAoE with the
+    // snare + Frozen Orb refund riders; delayed skips the on-cast pulse so
+    // the first wave lands as the storm visibly forms).
+    castTime: 2,
+    effects: [
+      {
+        type: 'groundAoE',
+        min: 12,
+        max: 16,
+        radius: 7,
+        // 6 one-second waves; the extra half second keeps the LAST wave from
+        // dying on the zone clock's exact edge (delayed drops the on-cast one).
+        duration: 6.5,
+        interval: 1,
+        delayed: true,
+        slowMult: 0.6,
+        slowDuration: 2,
+        orbCdr: true,
+      },
+    ],
+    description:
+      'Conjures an ice storm at the target area: after a 2 sec cast it rages for 6 sec, dealing 12 to 16 Frost damage each second and slowing enemies by 40%. Each enemy struck shaves 0.5 sec off Frozen Orb, up to 3 sec per cast. (Frost)',
+  },
+  // Frente Glacial: Frost's hold-to-charge cone. The 2.4 sec cast is the
+  // authoritative maximum charge clock; releasing earlier selects one of the
+  // four range/damage stages. The preview grows continuously, but gameplay
+  // changes only at the deterministic quarter thresholds.
+  glacial_front: {
+    id: 'glacial_front',
+    name: 'Glacial Front',
+    class: 'mage',
+    learnLevel: 17,
+    specs: ['frost'],
+    cost: 80,
+    castTime: 2.4,
+    empowerStages: 4,
+    cooldown: 12,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    projectile: false,
+    effects: [
+      {
+        type: 'empoweredCone',
+        angle: 70,
+        slowMult: 0.5,
+        slowDuration: 4,
+        stages: [
+          { range: 7, min: 35, max: 42 },
+          { range: 10, min: 50, max: 60 },
+          { range: 13, min: 68, max: 80 },
+          { range: 16, min: 88, max: 104, rootDuration: 1 },
+        ],
+      },
+    ],
+    description:
+      'Hold to gather a widening front of frost, then release it in a cone. Longer charges reach farther and deal more damage. All enemies hit are slowed by 50% for 4 sec; maximum charge also roots them for 1 sec. (Frost)',
+  },
+  // Aliento de dragón: Fire's hold-to-charge frontal breath. The server owns
+  // the live 2.4 second clock; each release resolves one deterministic range,
+  // angle, damage, and breakable disorientation stage.
+  dragons_breath: {
+    id: 'dragons_breath',
+    name: "Dragon's Breath",
+    class: 'mage',
+    learnLevel: 14,
+    specs: ['fire'],
+    cost: 90,
+    castTime: 2.4,
+    empowerStages: 4,
+    cooldown: 20,
+    range: 0,
+    school: 'fire',
+    requiresTarget: false,
+    projectile: false,
+    effects: [
+      {
+        type: 'empoweredCone',
+        angle: 90,
+        fx: 'fireCone',
+        guaranteedCritLevel: 4,
+        hotStreakOnce: true,
+        stages: [
+          { range: 6, angle: 55, min: 32, max: 40, incapacitateDuration: 1 },
+          { range: 8, angle: 65, min: 48, max: 60, incapacitateDuration: 1.5 },
+          { range: 10, angle: 78, min: 68, max: 82, incapacitateDuration: 2 },
+          { range: 12, angle: 90, min: 90, max: 110, incapacitateDuration: 3 },
+        ],
+      },
+    ],
+    description:
+      'Hold to gather a widening breath of flame, then release it in a cone. Longer charges reach farther and deal more damage. Enemies hit are disoriented and damage breaks the effect; maximum charge always critically strikes and counts once toward Hot Streak. (Fire)',
+  },
+  // The three frost spec passives: spellbook/spec-screen documentation of the
+  // proc engine (combat/frost_mage.ts owns the mechanics; these carry no
+  // effects, the seasoned_soldier idiom).
+  fingers_of_frost: {
+    id: 'fingers_of_frost',
+    name: 'Fingers of Frost',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['frost'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Rimelance has a 15% chance to grant Fingers of Frost, up to 2 charges: your next Ice Lance treats its target as frozen. (Frost)',
+  },
+  brain_freeze: {
+    id: 'brain_freeze',
+    name: 'Brain Freeze',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['frost'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Rimelance has a 20% chance to make your next Winterlash instant, 30% harder, and free of its cooldown. (Frost)',
+  },
+  shatter: {
+    id: 'shatter',
+    name: 'Brittle Ruin',
+    class: 'mage',
+    learnLevel: 10,
+    specs: ['frost'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    effects: [],
+    description:
+      "Your spells gain 50% critical strike chance against frozen targets, and those critical strikes deal 20% more damage. Fingers of Frost and Winter's Chill count as frozen. (Frost)",
+  },
   conjure_water: {
     id: 'conjure_water',
     name: 'Waterbind',
@@ -910,9 +1756,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'arcane',
     requiresTarget: false,
     effects: [], // special-cased: creates conjured_water{rank} in bags
+    // Rank ladder per the owner's leveling pass (2026-07-14): 4 / 8 / 12 / 16.
     ranks: [
-      { rank: 2, level: 10, cost: 70, effects: [] },
-      { rank: 3, level: 16, cost: 110, effects: [] },
+      { rank: 2, level: 8, cost: 70, effects: [] },
+      { rank: 3, level: 12, cost: 110, effects: [] },
+      { rank: 4, level: 16, cost: 150, effects: [] },
     ],
     description:
       'Conjures 2 bottles of water, restoring mana when drunk. Higher ranks conjure purer water.',
@@ -921,7 +1769,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'conjure_food',
     name: 'Breadbind',
     class: 'mage',
-    learnLevel: 6,
+    learnLevel: 5,
     cost: 45,
     castTime: 3,
     cooldown: 0,
@@ -929,24 +1777,38 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'arcane',
     requiresTarget: false,
     effects: [], // special-cased: creates conjured_bread{rank} in bags
+    // Rank ladder per the owner's leveling pass (2026-07-14): 5 / 10 / 15 / 20.
     ranks: [
-      { rank: 2, level: 12, cost: 75, effects: [] },
-      { rank: 3, level: 18, cost: 115, effects: [] },
+      { rank: 2, level: 10, cost: 75, effects: [] },
+      { rank: 3, level: 15, cost: 115, effects: [] },
+      { rank: 4, level: 20, cost: 155, effects: [] },
     ],
     description:
       'Conjures 2 servings of bread, restoring health when eaten. Higher ranks conjure heartier fare.',
   },
   fire_blast: {
     id: 'fire_blast',
+    // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
+    // both damage specs keep it exactly as before; the healer does not.
+    specs: ['fire'],
     name: 'Cinderfall',
     class: 'mage',
-    learnLevel: 6,
+    learnLevel: 5,
     cost: 40,
     castTime: 0,
     cooldown: 8,
     range: 20,
     school: 'fire',
     requiresTarget: true,
+    // Owner playtest 2026-07-11: pressable in the middle of another cast.
+    usableWhileCasting: true,
+    // Owner rule (round five): fully off the GCD, like Phoenix Trance: castable
+    // during one and it never arms one for the other abilities.
+    offGcd: true,
+    // Owner playtest 2026-07-13: three stored charges (was two), back to back if banked.
+    maxCharges: 3,
+    // Owner playtest round four: no bolt, the embers bite the moment you press.
+    projectile: false,
     effects: [{ type: 'directDamage', min: 27, max: 35 }],
     ranks: [
       { rank: 2, level: 12, cost: 60, effects: [{ type: 'directDamage', min: 44, max: 54 }] },
@@ -958,7 +1820,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'arcane_missiles',
     name: 'Aether Darts',
     class: 'mage',
-    learnLevel: 8,
+    learnLevel: 5,
+    specs: ['arcane'],
     cost: 50,
     castTime: 0,
     channel: { duration: 3, ticks: 3 },
@@ -978,7 +1841,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'polymorph',
     name: 'Bewitch',
     class: 'mage',
-    learnLevel: 8,
+    learnLevel: 7,
     cost: 50,
     castTime: 1.5,
     cooldown: 0,
@@ -994,7 +1857,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'frost_nova',
     name: 'Icebind',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 35,
     castTime: 0,
     cooldown: 22,
@@ -1016,7 +1879,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'arcane_explosion',
     name: 'Aetherburst',
     class: 'mage',
-    learnLevel: 14,
+    learnLevel: 7,
+    specs: ['arcane'],
     cost: 60,
     castTime: 0,
     cooldown: 0,
@@ -1031,19 +1895,26 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // spell built on the ground-target cast primitive (docs/design/arpg-spell-mechanics.md).
   flamestrike: {
     id: 'flamestrike',
+    // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
+    // both damage specs keep it exactly as before; the healer does not.
+    specs: ['fire'],
     name: 'Flamestrike',
     class: 'mage',
-    learnLevel: 20,
+    learnLevel: 12,
     cost: 80,
-    castTime: 0,
+    // Owner rule 2026-07-11: a real cast, EXCEPT under Hot Streak, whose
+    // next_cast_instant makes it instant and free (the spender machinery).
+    castTime: 2,
     cooldown: 12,
     range: 30,
     school: 'fire',
     requiresTarget: false,
     targetMode: 'position',
-    effects: [{ type: 'aoeDamage', min: 34, max: 44, radius: 7 }],
+    // canCrit: the initial blast rolls ONE crit for the whole cast (owner rule:
+    // a Flamestrike is a single Hot Streak crit however many enemies it hits).
+    effects: [{ type: 'aoeDamage', min: 34, max: 44, radius: 7, canCrit: true }],
     description:
-      'Calls down a burst of flame at the target area, dealing $d Fire damage to enemies caught in the blast.',
+      'Calls down a burst of flame at the target area, dealing $d Fire damage to enemies caught in the blast. Can critically strike (one strike for the whole blast).',
   },
   // Ground-targeted thematic spells (targetMode 'position'), one per caster/ranged
   // class, all built on the ground-target cast primitive (docs/design/arpg-spell-mechanics.md).
@@ -1068,7 +1939,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'volley',
     name: 'Volley',
     class: 'hunter',
-    learnLevel: 18,
+    learnLevel: 11,
     cost: 60,
     castTime: 0,
     cooldown: 8,
@@ -1084,7 +1955,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   hurricane: {
     id: 'hurricane',
-    name: 'Hurricane',
+    name: 'Galeheart',
     class: 'druid',
     learnLevel: 18,
     cost: 90,
@@ -1117,29 +1988,47 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   scorch: {
     id: 'scorch',
+    // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
+    // both damage specs keep it exactly as before; the healer does not.
+    specs: ['fire'],
     name: 'Scald',
     class: 'mage',
-    learnLevel: 16,
+    learnLevel: 10,
     cost: 35,
     castTime: 1.5,
     cooldown: 0,
     range: 30,
     school: 'fire',
     requiresTarget: true,
-    effects: [{ type: 'directDamage', min: 32, max: 40 }],
-    description: 'Scorches the enemy for $d Fire damage. Quick to cast.',
+    // Owner playtest 2026-07-13: Scald lands instantly, no traveling bolt (projectile
+    // false), so the damage resolves the moment the cast finishes.
+    projectile: false,
+    // Owner playtest 2026-07-11: casting it also quickens your feet; round
+    // four made the cast itself mobile (the fire mage's on-the-run filler).
+    castWhileMoving: true,
+    effects: [
+      { type: 'directDamage', min: 32, max: 40 },
+      { type: 'selfBuff', kind: 'buff_speed', value: 1.2, duration: 3 },
+    ],
+    description:
+      'Scalds the enemy for $d Fire damage and quickens you by 20% for 3 sec. Quick to cast, and castable while moving.',
   },
   pyroblast: {
     id: 'pyroblast',
+    // DPS-spec kit (Chronomancy gating, docs/prd/mage-chronomancy.md Phase 1):
+    // both damage specs keep it exactly as before; the healer does not.
+    specs: ['fire'],
     name: 'Pyrelance',
     class: 'mage',
-    learnLevel: 20,
+    learnLevel: 5,
     cost: 125,
     castTime: 6.0,
     cooldown: 0,
     range: 30,
     school: 'fire',
     requiresTarget: true,
+    // The kit's hardest hit flies as the visibly heavier bolt (render-only).
+    projectileFx: 'heavyBolt',
     effects: [
       { type: 'directDamage', min: 170, max: 225 },
       { type: 'dot', total: 48, duration: 12, interval: 2 },
@@ -1147,11 +2036,365 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Hurls an immense fiery boulder that causes $d Fire damage plus additional damage over time.',
   },
-  ice_barrier: {
-    id: 'ice_barrier',
-    name: 'Frostveil',
+  // ---- Chronomancy (healer) Phase 1 kit, docs/prd/mage-chronomancy.md ----
+  temporal_mend: {
+    id: 'temporal_mend',
+    name: 'Temporal Mend',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['arcane'],
+    cost: 45,
+    // The reliable efficient heal (owner spec: ~2s): quicker than the priest
+    // and paladin big heals (2.5s), paying for the speed with a slightly
+    // lower top-end roll. Values are PLAYTEST-provisional (PRD section 14).
+    castTime: 2,
+    cooldown: 0,
+    range: 30,
+    school: 'arcane',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [{ type: 'heal', min: 62, max: 74 }],
+    ranks: [
+      { rank: 2, level: 12, cost: 70, effects: [{ type: 'heal', min: 105, max: 125 }] },
+      { rank: 3, level: 18, cost: 95, effects: [{ type: 'heal', min: 150, max: 178 }] },
+    ],
+    description:
+      'Draws an ally a moment forward in time, mending $d health as the body settles into its healthier future self. (Chronomancy signature)',
+  },
+  temporal_barrier: {
+    id: 'temporal_barrier',
+    name: 'Temporal Barrier',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['arcane'],
+    cost: 50,
+    castTime: 0,
+    // Instant, on the GCD, 12s cooldown (owner spec). Sized against the
+    // priest Psalm of Warding (145 absorb, 6s cd, 30s window): a bigger chunk
+    // on half the cadence and a much shorter 10s window. PLAYTEST values.
+    cooldown: 12,
+    range: 30,
+    school: 'arcane',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [{ type: 'absorb', amount: 55, duration: 10 }],
+    ranks: [
+      { rank: 2, level: 12, cost: 75, effects: [{ type: 'absorb', amount: 100, duration: 10 }] },
+      { rank: 3, level: 18, cost: 105, effects: [{ type: 'absorb', amount: 160, duration: 10 }] },
+    ],
+    description:
+      'Shifts the target a heartbeat out of the present, a temporal shell absorbing $d damage for 10 sec before the timeline snaps back.',
+  },
+  // ---- Chronomancy (healer) Phase 2: Temporal Echo, docs/prd/mage-chronomancy.md
+  // section 13. Instant, on the GCD, no cooldown. A small initial heal (the sibling
+  // `heal` effect, feeds $d) plus the per-caster mark (the `temporalEcho` effect,
+  // feeds $t). While marked, 35% of the mage's single-target Arcane damage and 15%
+  // of area Arcane damage heals the ally (combat/chronomancy.ts). Re-casting MOVES
+  // the mark. Values are PLAYTEST-provisional (PRD section 13.14 / 14).
+  temporal_echo: {
+    id: 'temporal_echo',
+    name: 'Temporal Echo',
+    class: 'mage',
+    learnLevel: 8,
+    specs: ['arcane'],
+    cost: 40,
+    castTime: 0,
+    cooldown: 0,
+    range: 30,
+    school: 'arcane',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [
+      { type: 'heal', min: 24, max: 30 },
+      { type: 'temporalEcho', duration: 15 },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 12,
+        cost: 60,
+        effects: [
+          { type: 'heal', min: 40, max: 50 },
+          { type: 'temporalEcho', duration: 15 },
+        ],
+      },
+      {
+        rank: 3,
+        level: 18,
+        cost: 85,
+        effects: [
+          { type: 'heal', min: 58, max: 70 },
+          { type: 'temporalEcho', duration: 15 },
+        ],
+      },
+    ],
+    description:
+      'Marks an ally with an echo of a healthier moment, mending $d health at once. For $t sec, part of the Arcane damage you deal is drawn back through the echo to heal them.',
+  },
+  // ---- Chronomancy (healer) Phase 4: Cascada temporal (Temporal Cascade),
+  // docs/prd/mage-chronomancy.md Phase 4. The GROUP version of Temporal Echo: a 2s
+  // cast that centers on the friendly target (which must be the caster or a living
+  // group/raid member and is ALWAYS included) and marks the nearest allies within
+  // 15 yd of it, up to five total. Each takes a small initial heal and a REDUCED
+  // group echo (13% single / 6% area conversion, combat/chronomancy.ts) for 8 sec.
+  // The 15s cooldown plus the 8s window keep five echoes from ever being sustained.
+  // A pre-existing individual echo on a target is kept at 35% (never downgraded),
+  // still initial-healed, and counts within the five. PLAYTEST-provisional values
+  // (owner 2026-07-12), gated by tests/chronomancy_balance.test.ts.
+  temporal_cascade: {
+    id: 'temporal_cascade',
+    name: 'Temporal Cascade',
+    class: 'mage',
+    learnLevel: 12,
+    specs: ['arcane'],
+    cost: 90,
+    castTime: 2,
+    cooldown: 17,
+    range: 30,
+    school: 'arcane',
+    requiresTarget: true,
+    targetType: 'friendly',
+    // Group/raid-only: the cast is refused (no cost/cooldown) on a friendly that is
+    // not the caster or a party/raid member, so an out-of-group target never wastes it.
+    partyOnlyTarget: true,
+    effects: [
+      {
+        type: 'massTemporalEcho',
+        duration: 10,
+        radius: 15,
+        maxTargets: 5,
+        heal: { min: 14, max: 18 },
+      },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 16,
+        cost: 130,
+        effects: [
+          {
+            type: 'massTemporalEcho',
+            duration: 10,
+            radius: 15,
+            maxTargets: 5,
+            heal: { min: 22, max: 28 },
+          },
+        ],
+      },
+      {
+        rank: 3,
+        level: 20,
+        cost: 170,
+        effects: [
+          {
+            type: 'massTemporalEcho',
+            duration: 10,
+            radius: 15,
+            maxTargets: 5,
+            heal: { min: 28, max: 36 },
+          },
+        ],
+      },
+    ],
+    description:
+      'Sends an echo cascading through your group: the target and up to four of their nearest allies are mended at once and each marked for $t sec, drawing part of the Arcane damage you deal back through their echoes to heal them. (Chronomancy)',
+  },
+  // ---- Chronomancy combat resurrection: Temporal Reversal. Rewinds a DEAD group/raid
+  // member's timeline back to life at their corpse, IN COMBAT, with a fraction of their
+  // pools and no resurrection sickness (targetsDead + the resurrectAlly effect, reusing
+  // spirit.ts revivePlayerAt). The ten-minute cooldown keeps a death costly.
+  temporal_reversal: {
+    id: 'temporal_reversal',
+    name: 'Temporal Reversal',
+    class: 'mage',
+    learnLevel: 16,
+    specs: ['arcane'],
+    cost: 60,
+    castTime: 2,
+    cooldown: 600,
+    range: 30,
+    school: 'arcane',
+    requiresTarget: true,
+    targetType: 'friendly',
+    targetsDead: true,
+    effects: [{ type: 'resurrectAlly', hpFrac: 0.35 }],
+    description:
+      "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)",
+  },
+  // ---- Chronomancy out-of-combat mass resurrection. The base seven-second cast
+  // and mana cost are provisional playtest values. It has no target and rewinds all
+  // dead members on the authoritative group or raid roster at cast completion.
+  collective_reversal: {
+    id: 'collective_reversal',
+    name: 'Collective Reversal',
+    class: 'mage',
+    learnLevel: 8,
+    specs: ['arcane'],
+    cost: 250,
+    castTime: 7,
+    cooldown: 0,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    requiresOutOfCombat: true,
+    projectile: false,
+    effects: [{ type: 'massResurrectGroup', hpFrac: 0.3 }],
+    description:
+      'Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)',
+  },
+  // ---- Chronomancy (healer) "Correct" pillar: Rewind (Rebobinar), the raid
+  // cooldown. docs/prd/mage-chronomancy.md. Instant, no target, self-centered 40 yd
+  // AoE on the caster's group/raid. Restores 30% of the REAL damage each living
+  // member took in the last 5s, capped at 35% of their max HP and their missing HP;
+  // never crits, applies no Echo, does not touch the Arcane conversion, and generates
+  // normal heal threat. Runs entirely through combat/rewind.ts + the 5s damage ring
+  // (combat/damage_history.ts). PLAYTEST-provisional cost (150) and 120s cooldown.
+  temporal_rewind: {
+    id: 'temporal_rewind',
+    name: 'Rewind',
+    class: 'mage',
+    learnLevel: 14,
+    specs: ['arcane'],
+    cost: 150,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false, // instant, self-centered: no target needed
+    effects: [{ type: 'rewind', fraction: 0.3, maxHpFraction: 0.35, windowSec: 5, radius: 40 }],
+    description:
+      'Sends an arcane wave through your group or raid, rewinding time to restore 30% of the damage each ally within 40 yards took over the last 5 seconds (up to 35% of their maximum health). Cannot be a critical effect. (Chronomancy)',
+  },
+  // Hourglass of Suspension: a ground-targeted Chronomancy control and rescue
+  // tool. All tuning below is PLAYTEST-provisional. A point at the caster's feet
+  // selects self, then a living party or raid ally is preferred over one hostile
+  // in the small capture radius. The shared combat module owns exact behavior.
+  temporal_hourglass: {
+    id: 'temporal_hourglass',
+    name: 'Hourglass of Suspension',
+    class: 'mage',
+    learnLevel: 14,
+    specs: ['arcane'],
+    cost: 110,
+    castTime: 0,
+    cooldown: 50,
+    range: 28,
+    school: 'arcane',
+    requiresTarget: false,
+    targetMode: 'position',
+    projectile: false,
+    effects: [
+      {
+        type: 'temporalHourglass',
+        duration: TEMPORAL_HOURGLASS_DURATION,
+        hostilePveDuration: TEMPORAL_HOURGLASS_HOSTILE_PVE_DURATION,
+        hostilePvpDuration: TEMPORAL_HOURGLASS_HOSTILE_PVP_DURATION,
+        groundDuration: TEMPORAL_HOURGLASS_GROUND_DURATION,
+        selfRadius: TEMPORAL_HOURGLASS_SELF_RADIUS,
+        captureRadius: TEMPORAL_HOURGLASS_CAPTURE_RADIUS,
+        healMaxHpPct: TEMPORAL_HOURGLASS_HEAL_FRACTION,
+        selfCooldownRate: TEMPORAL_HOURGLASS_SELF_COOLDOWN_RATE,
+        allyCooldownRate: TEMPORAL_HOURGLASS_ALLY_COOLDOWN_RATE,
+      },
+    ],
+    description:
+      'Place a temporal hourglass at the selected location. Beneath an enemy, it suspends them for $e sec in PvE or $p sec in PvP and prevents all actions; damage breaks the effect. At your feet or beneath a group ally, it grants stasis for $t sec, prevents damage and actions, restores $h% of maximum health, and makes cooldowns recover $s% faster for you or $a% faster for an ally. On empty ground, the hourglass waits for $g sec and affects the first valid unit to step on it. The beneficial aura can be removed manually.',
+  },
+  // ---- Chronomancy (healer) group haste cooldown: Temporal Acceleration, the
+  // Chronomancer's equivalent of the Shaman's Bloodlust. A BASE ability (owner
+  // directive 2026-07-13: not a talent). Instant, no target, 40 yd group/raid, +30%
+  // FULL haste (attack + cast + channel) for 15s on a 5 min cooldown, sharing the
+  // `sated` exhaustion with Bloodlust so the two can never be chained. Runs through
+  // the same aoeAllyHaste effect + combat/haste_burst.ts.
+  // Perfect Moment: the Chronomancer's offensive cooldown (owner design
+  // 2026-07-14). Instantly grants FOUR Arcane Charges and freezes them for 10
+  // sec: Aether Darts fires its full-charge five-missile barrage without
+  // spending the stack (combat/chronomancy.ts applyPerfectMoment +
+  // aetherDartsBoltBonus's window guard). Off the GCD, like Phoenix Trance.
+  perfect_moment: {
+    id: 'perfect_moment',
+    name: 'Perfect Moment',
+    class: 'mage',
+    learnLevel: 10,
+    specs: ['arcane'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    offGcd: true,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    effects: [{ type: 'perfectMoment' }],
+    description:
+      'Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancer)',
+  },
+  temporal_acceleration: {
+    id: 'temporal_acceleration',
+    name: 'Temporal Acceleration',
     class: 'mage',
     learnLevel: 20,
+    specs: ['arcane'],
+    cost: 120,
+    castTime: 0,
+    cooldown: 300,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    effects: [
+      {
+        type: 'aoeAllyHaste',
+        mult: 1.3,
+        duration: 15,
+        radius: 40,
+        spell: true,
+        exhaust: true,
+        groupOnly: true,
+      },
+    ],
+    description:
+      'Accelerates the flow of time for your group or raid, increasing attack, casting, and channeling speed by 30% for 15 sec. Allies recently affected by Temporal Acceleration or Storm Chorus are too exhausted to benefit. (Chronomancy)',
+  },
+  // ---- Chronomancy (healer) Phase 3: Aether Surge, docs/prd/mage-chronomancy.md
+  // sections 13.4 / 14. The single-target Arcane spender that drives the offensive
+  // heal rotation. `projectile: false` so cost, damage and the +1 charge all
+  // resolve at cast completion in one controlled order (cost reads N charges,
+  // damage reads N, then banks N+1); a traveling bolt would race a back-to-back
+  // recast. Each held Arcane Charge scales damage (+30%) and cost (x1.9, steep)
+  // via combat/chronomancy.ts; Aether Darts consumes the charges. PLAYTEST-
+  // provisional: the base cost is DERIVED by tests/chronomancy_balance.test.ts to
+  // land the conservative rotation near 70-80s to OOM at the level-20 pool.
+  arcane_surge: {
+    id: 'arcane_surge',
+    name: 'Aether Surge',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['arcane'],
+    cost: 16,
+    castTime: 2,
+    cooldown: 0,
+    range: 30,
+    school: 'arcane',
+    requiresTarget: true,
+    // Instant impact at cast completion (no traveling bolt): keeps the charge
+    // read/write in one deterministic order, see combat/chronomancy.ts.
+    projectile: false,
+    // (base cost is `cost: 16` above; DERIVED via the balance harness so the
+    // targets hold WITH the 25% free-cast proc's mana relief.)
+    // Low base damage (DERIVED via tests/chronomancy_balance.test.ts): the
+    // conservative rotation must sustain clearly under Piro/Cryo (>=35% below);
+    // the payoff is ramping it with charges (and the Echo healing it feeds).
+    effects: [{ type: 'directDamage', min: 10, max: 13 }],
+    description:
+      "Draws a surge of raw aether through the enemy for $d damage. Each cast leaves an Arcane Charge that raises your next Aether Surge's damage and cast speed (5% faster each) but sharply raises its mana cost, stacking up to 4; Aether Darts spends the charges. Each cast can also arm Aether Rush, making your next Aether Surge free and twice as fast to cast.",
+  },
+  ice_barrier: {
+    id: 'ice_barrier',
+    // Frost's personal barrier (owner leveling pass 2026-07-14): Fire gets its
+    // own Blazing Barrier at the spec pick, so the shared Frostveil is gone.
+    specs: ['frost'],
+    name: 'Frostveil',
+    class: 'mage',
+    learnLevel: 5,
     cost: 90,
     castTime: 0,
     cooldown: 30,
@@ -1240,7 +2483,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Backstab the target for 150% weapon damage plus $d. Must be behind the target. Requires a dagger. Awards 1 combo point.',
+      "Drive your dagger into the target's back for 150% weapon damage plus $d. Must be behind the target. Requires a dagger. Awards 1 combo point.",
   },
   gouge: {
     id: 'gouge',
@@ -1322,7 +2565,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'kidney_shot',
     name: 'Low Blow',
     class: 'rogue',
-    learnLevel: 14,
+    learnLevel: 8,
     cost: 25,
     castTime: 0,
     cooldown: 20,
@@ -1337,7 +2580,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'ambush',
     name: "Lurker's Strike",
     class: 'rogue',
-    learnLevel: 16,
+    learnLevel: 5,
     cost: 60,
     castTime: 0,
     cooldown: 0,
@@ -1348,7 +2591,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresStealth: true,
     effects: [{ type: 'weaponStrike', bonus: 28, requiresBehind: true, weaponMult: 2.5 }],
     description:
-      'Ambush the target for 250% weapon damage plus $d. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.',
+      'Strike from the shadows for 250% weapon damage plus $d. Must be stealthed and behind the target. Requires a dagger. Awards 1 combo point.',
   },
   stealth: {
     id: 'stealth',
@@ -1411,7 +2654,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Garrote the enemy, causing $d damage now and bleeding it for $o over 18 sec. Must be stealthed. Awards 1 combo point.',
+      "Loop a wire around the enemy's throat, causing $d damage now and bleeding it for $o over 18 sec. Must be stealthed. Awards 1 combo point.",
   },
   cheap_shot: {
     id: 'cheap_shot',
@@ -1488,7 +2731,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'rupture',
     name: 'Bleed Out',
     class: 'rogue',
-    learnLevel: 16,
+    learnLevel: 14,
     cost: 25,
     castTime: 0,
     cooldown: 0,
@@ -1513,13 +2756,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.5, duration: 10 }],
     description:
-      'Vanish from sight, entering Duskveil even in combat. You move 50% slower while hidden. Lasts up to 10 sec.',
+      'Melt from sight, entering Duskveil even in combat. You move 50% slower while hidden. Lasts up to 10 sec.',
   },
   instant_poison: {
     id: 'instant_poison',
     name: "Adder's Bite",
     class: 'rogue',
-    learnLevel: 18,
+    learnLevel: 14,
     cost: 40,
     castTime: 0,
     cooldown: 0,
@@ -1534,7 +2777,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'deadly_poison',
     name: 'Festering Venom',
     class: 'rogue',
-    learnLevel: 20,
+    learnLevel: 14,
     cost: 40,
     castTime: 0,
     cooldown: 0,
@@ -1558,7 +2801,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'incapacitate', duration: 8 }],
     description:
-      'Blinds the target, causing it to wander disoriented for 8 sec. Any damage breaks the effect.',
+      "Tosses dirt into the target's eyes, causing it to wander disoriented for 8 sec. Any damage breaks the effect.",
   },
 
   // ====================== PALADIN ======================
@@ -1741,7 +2984,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'taunt' }],
     description:
-      'Taunts the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
+      'Goads the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec.',
   },
   flash_of_light: {
     id: 'flash_of_light',
@@ -1762,7 +3005,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'exorcism',
     name: 'Rite of Expulsion',
     class: 'paladin',
-    learnLevel: 14,
+    learnLevel: 5,
     cost: 55,
     castTime: 0,
     cooldown: 15,
@@ -1776,7 +3019,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'consecration',
     name: 'Holy Ground',
     class: 'paladin',
-    learnLevel: 18,
+    learnLevel: 8,
     cost: 60,
     castTime: 0,
     cooldown: 8,
@@ -1851,7 +3094,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   revive_pet: {
     id: 'revive_pet',
-    name: 'Revive Pet',
+    name: 'Patch Up',
     class: 'hunter',
     learnLevel: 10,
     cost: 45,
@@ -1860,8 +3103,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [],
-    description: 'Revives your dead pet and returns it to your side.',
+    effects: [{ type: 'hot', total: 240, duration: 12, interval: 3 }],
+    description:
+      'Patch up your companion, restoring 240 health over 12 sec if it is alive. If it is dead, revive it at 35% health.',
   },
   raptor_strike: {
     id: 'raptor_strike',
@@ -1947,7 +3191,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'arcane_shot',
     name: 'Fell Shot',
     class: 'hunter',
-    learnLevel: 6,
+    learnLevel: 5,
     cost: 25,
     castTime: 0,
     cooldown: 6,
@@ -2030,7 +3274,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'aspect_of_the_monkey',
     name: "Marten's Guise",
     class: 'hunter',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 20,
     castTime: 0,
     cooldown: 0,
@@ -2060,7 +3304,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'aimed_shot',
     name: 'Long Draw',
     class: 'hunter',
-    learnLevel: 16,
+    learnLevel: 11,
     cost: 50,
     castTime: 3.0,
     cooldown: 6,
@@ -2235,7 +3479,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'mind_blast',
     name: 'Mindfracture',
     class: 'priest',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 50,
     castTime: 1.5,
     cooldown: 8,
@@ -2269,7 +3513,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'mind_flay',
     name: 'Litany of Woe',
     class: 'priest',
-    learnLevel: 16,
+    learnLevel: 14,
     cost: 45,
     castTime: 0,
     channel: { duration: 3, ticks: 3 },
@@ -2372,7 +3616,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetType: 'friendly',
     effects: [{ type: 'chainHeal', min: 120, max: 145, jumps: 2, falloff: 0.5, radius: 12 }],
     description:
-      'Heals a friendly target for a large amount, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)',
+      'Heals a friendly target for 120 to 145, then jumps to up to 2 additional nearby allies, healing for 50% less with each jump. (Restoration signature)',
   },
   healing_wave: {
     id: 'healing_wave',
@@ -2428,7 +3672,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'lightning_shield',
     name: 'Thunder Ward',
     class: 'shaman',
-    learnLevel: 8,
+    learnLevel: 5,
     cost: 25,
     castTime: 0,
     cooldown: 0,
@@ -2484,7 +3728,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'flame_shock',
     name: 'Cinder Jolt',
     class: 'shaman',
-    learnLevel: 10,
+    learnLevel: 8,
     cost: 35,
     castTime: 0,
     cooldown: 6,
@@ -2512,7 +3756,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'flametongue_weapon',
     name: 'Pyrebrand Weapon',
     class: 'shaman',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 25,
     castTime: 0,
     cooldown: 0,
@@ -2530,7 +3774,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'frost_shock',
     name: 'Rime Jolt',
     class: 'shaman',
-    learnLevel: 14,
+    learnLevel: 8,
     cost: 50,
     castTime: 0,
     cooldown: 6,
@@ -2548,7 +3792,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'frostbrand_weapon',
     name: 'Rimebound Weapon',
     class: 'shaman',
-    learnLevel: 12,
+    learnLevel: 5,
     cost: 25,
     castTime: 0,
     cooldown: 0,
@@ -2810,6 +4054,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 20,
     school: 'shadow',
     requiresTarget: true,
+    fearDr: true,
     effects: [{ type: 'incapacitate', duration: 8 }],
     description:
       'Strikes terror into the enemy, leaving it cowering for up to 8 sec. Any damage breaks the effect.',
@@ -2818,7 +4063,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'searing_pain',
     name: 'Sear',
     class: 'warlock',
-    learnLevel: 16,
+    learnLevel: 14,
     cost: 35,
     castTime: 1.5,
     cooldown: 0,
@@ -2832,7 +4077,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'shadowburn',
     name: 'Duskfire',
     class: 'warlock',
-    learnLevel: 20,
+    learnLevel: 14,
     cost: 70,
     castTime: 0,
     cooldown: 15,
@@ -3142,7 +4387,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'bear_form',
     name: 'Bruin Form',
     class: 'druid',
-    learnLevel: 10,
+    learnLevel: 8,
     cost: 30,
     castTime: 0,
     cooldown: 0,
@@ -3169,7 +4414,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresForm: 'bear',
     effects: [{ type: 'charge' }, { type: 'stun', duration: 1 }],
     description:
-      'Charge an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range. Bruin Form only.',
+      'Rush an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range. Bruin Form only.',
   },
   maul: {
     id: 'maul',
@@ -3214,7 +4459,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresForm: 'bear',
     effects: [{ type: 'taunt' }],
     description:
-      'Growls at the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec. Bruin Form only.',
+      'Menaces the target: your threat rises to match its most hated enemy and it is compelled to attack you for 3 sec. Bruin Form only.',
   },
   demoralizing_roar: {
     id: 'demoralizing_roar',
@@ -3244,7 +4489,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'cat_form',
     name: 'Wolf Form',
     class: 'druid',
-    learnLevel: 12,
+    learnLevel: 5,
     cost: 30,
     castTime: 0,
     cooldown: 0,
@@ -3259,7 +4504,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'prowl',
     name: 'Stalk',
     class: 'druid',
-    learnLevel: 12,
+    learnLevel: 5,
     cost: 0,
     castTime: 0,
     cooldown: 0,
@@ -3275,7 +4520,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'rake',
     name: 'Flense',
     class: 'druid',
-    learnLevel: 12,
+    learnLevel: 5,
     cost: 35,
     castTime: 0,
     cooldown: 0,
@@ -3307,7 +4552,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'claw',
     name: 'Claw',
     class: 'druid',
-    learnLevel: 12,
+    learnLevel: 5,
     cost: 45,
     castTime: 0,
     cooldown: 0,
@@ -3350,7 +4595,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresForm: 'bear',
     threat: { mult: 1.75 }, // classic: swipe damage causes 1.75x threat
     effects: [{ type: 'aoeDamage', min: 12, max: 15, radius: 5 }],
-    description: 'Swipe nearby enemies for $d damage. Causes extra threat. Bruin Form only.',
+    description:
+      'Sweep your claws through nearby enemies for $d damage. Causes extra threat. Bruin Form only.',
   },
   regrowth: {
     id: 'regrowth',
@@ -3411,7 +4657,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'starfire',
     name: 'Skyfall',
     class: 'druid',
-    learnLevel: 18,
+    learnLevel: 14,
     cost: 80,
     castTime: 3.0,
     cooldown: 0,
@@ -3425,7 +4671,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'travel_form',
     name: 'Fleet Form',
     class: 'druid',
-    learnLevel: 16,
+    learnLevel: 11,
     cost: 30,
     castTime: 0,
     cooldown: 0,
@@ -3456,7 +4702,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'bash',
     name: 'Concuss',
     class: 'druid',
-    learnLevel: 16,
+    learnLevel: 8,
     cost: 10,
     castTime: 0,
     cooldown: 60,
@@ -3550,7 +4796,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 20,
     cost: 30,
     castTime: 0,
-    cooldown: 0,
+    cooldown: 30, // balance pass: was 0 (spammable permanent +40 AP)
     range: 0,
     school: 'physical',
     requiresTarget: false,
@@ -3562,7 +4808,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'rip',
     name: 'Rip',
     class: 'druid',
-    learnLevel: 20,
+    learnLevel: 14,
     cost: 30,
     castTime: 0,
     cooldown: 0,
@@ -3577,13 +4823,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
 
   // ============== TALENT-GRANTED (Warrior) ==============
-  // Not in CLASSES.warrior.abilities — unlocked only via talent grants (spec
+  // Not in CLASSES.warrior.abilities - unlocked only via talent grants (spec
   // signatures + active nodes), so abilitiesKnownAt adds them by `mods.grants`.
   mortal_strike: {
     id: 'mortal_strike',
     name: 'Maiming Strike',
     class: 'warrior',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 30,
     castTime: 0,
     cooldown: 6,
@@ -3591,53 +4837,104 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     threat: { mult: 1.2 },
-    effects: [{ type: 'weaponStrike', bonus: 40 }],
-    description: 'A vicious strike dealing weapon damage plus $d. (Arms signature)',
+    effects: [
+      // Balance 2026-07-10 (owner): 40 -> 50 bonus and the bleed 24 -> 30, the
+      // Arms round-3 buff after Brute Swing became the free builder.
+      { type: 'weaponStrike', bonus: 50 },
+      { type: 'buffTarget', kind: 'mortal_wound', value: 0.5, duration: 10 },
+      // Deep Wounds passive (Arms restructure 2026-07-08): Maiming Strike leaves
+      // a bleed. Arms-scoped naturally (mortal_strike is Arms-granted). A distinct
+      // auraId keeps it from overwriting the mortal_wound healing debuff above.
+      { type: 'dot', total: 30, duration: 6, interval: 3, auraId: 'deep_wounds' },
+    ],
+    description:
+      'A vicious strike dealing weapon damage plus $d and reducing healing the target receives by 50% for 10 sec. Applies Gaping Wounds (bleed). (Arms signature)',
   },
   bloodthirst: {
     id: 'bloodthirst',
     name: 'Bloodletting',
     class: 'warrior',
-    learnLevel: 10,
-    cost: 30,
+    learnLevel: 5,
+    cost: 0,
     castTime: 0,
     cooldown: 6,
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    effects: [{ type: 'weaponStrike', bonus: 35, weaponMult: 0.6 }],
+    effects: [
+      { type: 'weaponStrike', bonus: 30, weaponMult: 0.5 },
+      { type: 'selfHealPctMax', pct: 0.03 },
+      { type: 'gainResource', amount: 12 },
+      // 30% chance to Enrage for 4 sec (the classic Bloodthirst proc).
+      { type: 'enrageChance', chance: 0.3, duration: 4 },
+    ],
     description:
-      'Instantly attack in a blood frenzy for 60% weapon damage plus $d. (Fury signature)',
+      'Instantly attack in a blood frenzy for $d, healing you for 3% of your maximum health and generating 12 rage. Has a 30% chance to Enrage you. (Fury signature)',
   },
   shield_slam: {
     id: 'shield_slam',
     name: 'Shieldcrack',
     class: 'warrior',
-    learnLevel: 10,
-    cost: 20,
+    learnLevel: 5,
+    requiresShield: true,
+    // Protection's active rage BUILDER (owner 2026-07-08): no cost, and it
+    // GENERATES 15 rage on a short cooldown, so the tank loop is take-hits +
+    // Shieldcrack to build, then spend on Revenge / Armor Shear. Prot-only
+    // (spec signature), so no per-spec gate is needed on the rage grant.
+    cost: 0,
     castTime: 0,
     cooldown: 6,
     range: 0,
     school: 'physical',
     requiresTarget: true,
     threat: { flat: 110 },
-    effects: [{ type: 'weaponStrike', bonus: 30, weaponMult: 0.5 }],
+    effects: [
+      { type: 'weaponStrike', bonus: 30, weaponMult: 0.5 },
+      { type: 'gainResource', amount: 15 },
+    ],
     description:
-      'Slam the target with your shield for 50% weapon damage plus $d and massive threat. (Protection signature)',
+      'Slam the target with your shield for $d and massive threat, generating 15 rage. (Protection signature)',
   },
   whirlwind: {
     id: 'whirlwind',
     name: 'Bladed Gyre',
     class: 'warrior',
     learnLevel: 10,
-    cost: 25,
+    // Fury-only (balance pass 2026-07-10): Fury had no baseline AoE, so it gets
+    // Bladed Gyre back as its spec AoE tool. Arms/Prot keep their own AoE
+    // (Reaping Arc / Quaking Blow); no-spec never learns it.
+    specs: ['fury'],
+    // Bladed Gyre GENERATES rage instead of costing it (operator, Batch
+    // 2026-07-08): cost 0, and the aoeDamage's rageOnHit grants 5 rage plus 1
+    // per enemy struck (capped at +5), so 5 to 10 rage per spin.
+    cost: 0,
     castTime: 0,
     cooldown: 10,
     range: 0,
     school: 'physical',
     requiresTarget: true,
-    effects: [{ type: 'aoeDamage', min: 30, max: 42, radius: 8 }],
-    description: 'Spin in a deadly arc, striking all nearby enemies for $d. (Fury talent)',
+    effects: [
+      {
+        type: 'aoeDamage',
+        min: 30,
+        max: 42,
+        radius: 8,
+        rageOnHit: { base: 5, perTarget: 1, capTargets: 5 },
+      },
+      // Bladed Echo: arms the caster for 2 echoing casts (combat/area_echo.ts).
+      // Its own aoeDamage disqualifies whirlwind from consuming the charge.
+      {
+        type: 'selfBuff',
+        kind: 'aoe_echo',
+        value: 0,
+        duration: 12,
+        charges: 2,
+        auraId: 'bladed_echo',
+        auraName: 'Bladed Echo',
+      },
+    ],
+    description:
+      'Spin in a deadly arc, striking all nearby enemies for $d and generating rage for each foe struck instead of costing any. Your next 2 single-target abilities also strike enemies near their target. (Fury talent)',
   },
   berserker_rage: {
     id: 'berserker_rage',
@@ -3654,6 +4951,238 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'gainResource', amount: 20 }],
     description: 'Enter a berserker rage, generating 20 rage. (Warrior talent)',
   },
+  // ------ Base-kit rescues from PR #1348 (owner ruling: these three are BASE
+  // warrior abilities, not talents) ------
+  pummel: {
+    id: 'pummel',
+    name: 'Jawcrack',
+    class: 'warrior',
+    learnLevel: 8,
+    // Owner design: free, and stopping a cast GENERATES 10 rage (the reward
+    // makes the interrupt a play, not a tax).
+    cost: 0,
+    castTime: 0,
+    cooldown: 10,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    offGcd: true,
+    effects: [{ type: 'interrupt', lockout: 4, rageOnInterrupt: 10 }],
+    description:
+      'Interrupts spellcasting, preventing any spell in that school from being cast for 4 sec. Generates 10 rage when it stops a cast.',
+  },
+  heroic_leap: {
+    id: 'heroic_leap',
+    name: 'Heroic Leap',
+    class: 'warrior',
+    learnLevel: 6,
+    cost: 0,
+    castTime: 0,
+    cooldown: 20,
+    range: 30,
+    school: 'physical',
+    requiresTarget: false,
+    targetMode: 'position',
+    effects: [{ type: 'repositionToAim', landingAoe: { min: 24, max: 32, radius: 6 } }],
+    description: 'Leap to the target area, dealing $d damage to nearby enemies on landing.',
+  },
+  rallying_cry: {
+    id: 'rallying_cry',
+    castFx: 'shout',
+    name: 'Valor Roar',
+    class: 'warrior',
+    learnLevel: 18,
+    cost: 0,
+    castTime: 0,
+    cooldown: 180,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    // Owner rework: the WoW-style defensive raid horn (+20% temporary maximum
+    // health), 40yd (the classic raid-buff reach).
+    effects: [{ type: 'aoeAllyMaxHp', pct: 0.2, duration: 10, radius: 40 }],
+    description:
+      'Lets loose a valorous roar, granting you and party members within 40 yards 20% additional maximum health for 10 sec. Protection: they also take 5% less damage for the duration.',
+  },
+  // ------ Choice-row talents (warrior_rows.ts grants; numbers are the owner's
+  // design draft, tune VALUE not SHAPE) ------
+  storm_bolt: {
+    id: 'storm_bolt',
+    name: 'Storm Bolt',
+    class: 'warrior',
+    learnLevel: 11,
+    cost: 10,
+    castTime: 0,
+    cooldown: 30,
+    range: 20,
+    school: 'physical',
+    requiresTarget: true,
+    projectile: true,
+    effects: [
+      { type: 'directDamage', min: 18, max: 26 },
+      { type: 'stun', duration: 3 },
+    ],
+    description: 'Hurl your weapon at the target for $d, stunning it for 3 sec.',
+  },
+  intimidating_shout: {
+    id: 'intimidating_shout',
+    castFx: 'shout',
+    name: 'Intimidating Shout',
+    class: 'warrior',
+    learnLevel: 14,
+    // Free in every spec (owner 2026-07-08): the panic/CC horn should never be
+    // gated behind rage you may not have when you need to break off.
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    // Classic-era shape (25 rage / 3 min / 5 targets / 8 yd / 8 sec) scaled to
+    // the 1-20 band: cost and cooldown tuned down, the fear itself unchanged.
+    effects: [{ type: 'aoeFear', duration: 8, radius: 8, maxTargets: 5 }],
+    description:
+      'A terrifying shout that sends up to 5 enemies within 8 yards fleeing in fear for 8 sec. Damage may break the effect.',
+  },
+  bladestorm: {
+    id: 'bladestorm',
+    name: 'Bladestorm',
+    class: 'warrior',
+    learnLevel: 20,
+    cost: 25,
+    castTime: 0,
+    cooldown: 90,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    // A self-centered position channel: each tick pulses the aoeDamage at the
+    // caster's LIVE position (no ground-aim reticle), so the storm moves with
+    // you for its full duration. Owner ruling: the channel runs its FULL 4s
+    // no matter what, so it ignores pushback (uninterruptible) and survives
+    // the caster's own movement (you spin while running, like WoW).
+    targetMode: 'position',
+    selfCentered: true,
+    uninterruptible: true,
+    castWhileMoving: true,
+    channel: { duration: 4, ticks: 4 },
+    effects: [{ type: 'aoeDamage', min: 16, max: 22, radius: 6 }],
+    description:
+      'Become a whirling storm of steel, striking all enemies within 6 yards for $d every second for 4 sec.',
+  },
+  victory_rush: {
+    id: 'victory_rush',
+    name: 'Victory Rush',
+    class: 'warrior',
+    learnLevel: 8,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: true,
+    // Usable only inside the on-kill window aura handleDeath opens; the cast
+    // consumes it (runEffects), so one kill funds one strike.
+    requiresAuraKind: 'victory_rush',
+    effects: [
+      { type: 'weaponStrike', bonus: 10 },
+      { type: 'selfHealPctMax', pct: 0.2 },
+    ],
+    description:
+      'Strike for weapon damage plus $d and heal 20% of your maximum health. Only usable within 20 sec of killing an enemy.',
+  },
+  piercing_howl: {
+    id: 'piercing_howl',
+    name: 'Piercing Howl',
+    class: 'warrior',
+    learnLevel: 11,
+    cost: 10,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    // Slow shortened 15s to 8s after the owner's playtest (a near-permanent
+    // AoE snare on a no-cooldown shout was too strong).
+    effects: [{ type: 'aoeSlow', mult: 0.5, duration: 8, radius: 15 }],
+    description: 'A piercing shout that slows all enemies within 15 yards by 50% for 8 sec.',
+  },
+  die_by_sword: {
+    id: 'die_by_sword',
+    name: 'Die by the Sword',
+    class: 'warrior',
+    learnLevel: 8,
+    // Arms base-kit defensive cooldown (owner restructure 2026-07-08): Arms had
+    // no defensive of its own. Also still reachable as a choice-row grant. No
+    // shield gate: the "sword" IS the defense (Arms wields a two-hander).
+    specs: ['arms'],
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [{ type: 'selfBuff', kind: 'die_by_sword', value: 0.3, duration: 8 }],
+    description:
+      'Defensive cooldown: for 8 sec you take 30% less damage and dodge far more attacks.',
+  },
+  recklessness: {
+    id: 'recklessness',
+    name: 'Recklessness',
+    class: 'warrior',
+    learnLevel: 17,
+    cost: 0,
+    castTime: 0,
+    cooldown: 180,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [{ type: 'selfBuff', kind: 'buff_reckless', value: 0.2, duration: 12 }],
+    description:
+      'Enrage: your rage generation increases by 50% and your critical strike chance by 20% for 12 sec.',
+  },
+  avatar: {
+    id: 'avatar',
+    name: 'Avatar',
+    class: 'warrior',
+    learnLevel: 17,
+    cost: 0,
+    castTime: 0,
+    cooldown: 180,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [
+      { type: 'breakControl' },
+      // ONE aura for both halves (value = damage amp; the body scale is the
+      // fixed AVATAR_SCALE): two selfBuffs would overwrite each other, since
+      // applyAura replaces by aura id and both would be 'avatar'.
+      { type: 'selfBuff', kind: 'buff_avatar', value: 0.2, duration: 20 },
+    ],
+    description:
+      'Transform into a colossus for 20 sec, breaking all control on you and increasing your damage dealt by 20%.',
+  },
+  sanguine_aura: {
+    id: 'sanguine_aura',
+    castFx: 'weaponAura',
+    name: 'Sanguine Aura',
+    class: 'warrior',
+    learnLevel: 20,
+    cost: 0,
+    castTime: 0,
+    cooldown: 180,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    effects: [{ type: 'partyMeleeBuff', attackSpeedMult: 1 / 1.1, dmgPct: 0.1, duration: 20 }],
+    description:
+      'Imbue your weapon with the blood of your foes: you and your melee allies gain 10% attack speed and 10% damage for 20 sec.',
+  },
+
+  // ============== TALENT-GRANTED (Classic specs) ==============
+  // Not in CLASSES.*.abilities. Unlocked only via spec grants.
   crusader_strike: {
     id: 'crusader_strike',
     name: 'Crusader Strike',
@@ -3724,7 +5253,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'chainDamage', min: 60, max: 75, jumps: 2, falloff: 1, radius: 10 },
     ],
     description:
-      'Hurls a radiant aegis at an enemy, dealing Holy damage and bouncing to 2 nearby enemies. (Protection signature)',
+      'Hurls a radiant aegis at an enemy for 90 to 110 Holy damage, then bounces to 2 nearby enemies for 60 to 75 Holy damage each. (Protection signature)',
   },
   bestial_wrath: {
     id: 'bestial_wrath',
@@ -3780,7 +5309,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'arcane_power',
     name: 'Aether Surge',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 5,
     cost: 0,
     castTime: 0,
     cooldown: 90,
@@ -3796,23 +5325,48 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   combustion: {
     id: 'combustion',
-    name: 'Flashfire',
+    specs: ['fire'],
+    name: 'Phoenix Trance',
     class: 'mage',
-    learnLevel: 10,
-    cost: 0,
+    learnLevel: 12,
+    cost: 100,
     castTime: 0,
     cooldown: 120,
     range: 0,
     school: 'fire',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'buff_spellcrit', value: 0.5, duration: 15 }],
-    description: 'Increases spell critical chance by 50% for 15 sec. (Fire signature)',
+    usableWhileCasting: true,
+    // Owner playtest round four: a burst button rides no GCD.
+    offGcd: true,
+    // Owner decision 2026-07-11: the NEW Phoenix Trance replaces the old +50% crit
+    // Flashfire. While worn every Fire spell critically strikes (the crit roll
+    // outcome is overridden in combat/fire_mage.ts, the roll still drawn), and
+    // those guaranteed crits BUILD Hot Streak like any other (owner reversal
+    // same day: the Phoenix Trance window is meant to chain free Pyroblasts).
+    effects: [{ type: 'selfBuff', kind: 'combustion', value: 0, duration: 10 }],
+    description:
+      'Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These crits build Hot Streak like any other. (Fire signature)',
+  },
+  cone_of_cold: {
+    id: 'cone_of_cold',
+    name: 'Frostsweep',
+    class: 'mage',
+    learnLevel: 10,
+    cost: 60,
+    castTime: 0,
+    cooldown: 20,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    effects: [{ type: 'aoeDamage', min: 28, max: 36, radius: 8 }],
+    description: 'Blasts nearby enemies with frost for $d Frost damage. (Frost signature)',
   },
   icy_veins: {
     id: 'icy_veins',
+    specs: ['frost'],
     name: 'Icy Veins',
     class: 'mage',
-    learnLevel: 10,
+    learnLevel: 12,
     cost: 0,
     castTime: 0,
     cooldown: 180,
@@ -3908,11 +5462,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'aoeDamage', min: 24, max: 30, radius: 10 },
     ],
     description:
-      'Causes an explosion of holy radiance, healing nearby allies for $d and damaging nearby enemies. (Holy signature)',
+      'Causes an explosion of Mending Light, healing nearby allies for $d and damaging nearby enemies. (Holy signature)',
   },
   shadowform: {
     id: 'shadowform',
-    name: 'Gloamveil Form',
+    name: 'Gloamveil',
     class: 'priest',
     learnLevel: 10,
     cost: 60,
@@ -3923,7 +5477,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'form_shadow', value: 15, duration: 3600 }],
     description:
-      'Assume a Shadowform, increasing your Shadow damage by 15% until you shift back. Casting a healing spell ends the form. Cast again to return to normal form. (Shadow signature)',
+      'Assume a Gloamveil, empowering shadow magic until you shift back. Cast again to return to normal form. (Shadow signature)',
   },
   elemental_mastery: {
     id: 'elemental_mastery',
@@ -3937,7 +5491,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'nature',
     requiresTarget: false,
     effects: [{ type: 'selfBuff', kind: 'next_cast_instant', value: 1, duration: 60 }],
-    description: 'Calls on the storm, making your next spell instant. (Elemental signature)',
+    description: 'Calls on primal mastery, making your next spell instant. (Elemental signature)',
   },
   siphon_life: {
     id: 'siphon_life',
@@ -3967,7 +5521,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'consumeAura', auraIds: ['immolate'], deal: { min: 54, max: 64 } }],
     description:
-      'Consumes your Immolate on the enemy to ignite them for $d Fire damage. (Destruction signature)',
+      'Consumes your Burning Pact on the enemy to ignite them for $d Fire damage. (Destruction signature)',
   },
   moonkin_form: {
     id: 'moonkin_form',
@@ -4021,21 +5575,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // Baseline class interrupts: every caster-pressuring class trains a short-cooldown
   // spell-kick that stops the target's cast and locks that spell school for a few sec.
   // Core kit (learned outright), not a talent choice.
-  pummel: {
-    id: 'pummel',
-    name: 'Jawcrack',
-    class: 'warrior',
-    learnLevel: 10,
-    cost: 10,
-    castTime: 0,
-    cooldown: 10,
-    range: 0,
-    school: 'physical',
-    requiresTarget: true,
-    effects: [{ type: 'interrupt', lockout: 4 }],
-    description:
-      "Interrupts the target's spellcast and prevents casting from that school for 4 sec.",
-  },
   kick: {
     id: 'kick',
     name: 'Boot',
@@ -4051,19 +5590,21 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       "Interrupts the target's spellcast and prevents casting from that school for 4 sec.",
   },
-  counterspell: {
-    id: 'counterspell',
-    name: 'Spellbreak',
+  blink: {
+    id: 'blink',
+    name: 'Flickerstep',
     class: 'mage',
-    learnLevel: 10,
-    cost: 45,
+    // Joins the base kit at 5 (see the 'blink' entry in the mage kit list): two
+    // level-5 choice-row options modify it, so it must exist by then, not at 10.
+    learnLevel: 5,
+    cost: 40,
     castTime: 0,
-    cooldown: 24,
-    range: 30,
-    school: 'physical',
-    requiresTarget: true,
-    effects: [{ type: 'interrupt', lockout: 6 }],
-    description: "Counters the target's spellcast and prevents casting from that school for 6 sec.",
+    cooldown: 15,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    effects: [{ type: 'blinkForward', distance: 15, breakRoots: true }],
+    description: 'Teleports you 15 yd forward and breaks roots. (Mage talent)',
   },
   counter_shot: {
     id: 'counter_shot',
@@ -4080,7 +5621,370 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'interrupt', lockout: 4 }],
     description:
-      "A snap shot that interrupts the target's spellcast and locks that school for 4 sec.",
+      'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Hunter talent)',
+  },
+  counterspell: {
+    id: 'counterspell',
+    name: 'Spellbreak',
+    class: 'mage',
+    learnLevel: 5,
+    cost: 45,
+    castTime: 0,
+    cooldown: 24,
+    range: 30,
+    school: 'physical',
+    requiresTarget: true,
+    effects: [{ type: 'interrupt', lockout: 6 }],
+    description:
+      'Counters enemy spellcasting, preventing any spell in that school from being cast for 6 sec. (Mage talent)',
+  },
+  deep_freeze: {
+    id: 'deep_freeze',
+    name: 'Deadfrost',
+    class: 'mage',
+    learnLevel: 5,
+    cost: 60,
+    castTime: 0,
+    cooldown: 30,
+    range: 30,
+    school: 'frost',
+    requiresTarget: true,
+    effects: [
+      { type: 'directDamage', min: 92, max: 116 },
+      { type: 'stun', duration: 4 },
+    ],
+    description:
+      'Deep freezes the target, dealing $d Frost damage and stunning it for 4 sec. (Mage talent)',
+  },
+  evocation: {
+    id: 'evocation',
+    name: 'Aetherwell',
+    class: 'mage',
+    learnLevel: 5,
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    // Owner design (playtest 2026-07-11): a CHANNEL that restores mana every
+    // second AND builds stacking spell power the longer you keep channeling
+    // (the buff lingers after the channel ends).
+    channel: { duration: 6, ticks: 6 },
+    effects: [
+      { type: 'gainResource', amount: 100 },
+      { type: 'selfBuff', kind: 'buff_spellpower', value: 8, duration: 15 },
+    ],
+    description:
+      'Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel and lasting 15 sec. (Mage talent)',
+  },
+  ice_block: {
+    id: 'ice_block',
+    name: 'Cold Coffin',
+    class: 'mage',
+    learnLevel: 12,
+    cost: 15,
+    castTime: 0,
+    cooldown: 240,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    // Owner 2026-07-13: usable while stunned/polymorphed/silenced (it always frees
+    // you); grants TOTAL immunity (the stasis check in dealDamage) and strips every
+    // debuff on cast (cleanseSelf). Frost carries a second charge (resolvedAbility).
+    usableWhileControlled: true,
+    effects: [{ type: 'cleanseSelf' }, { type: 'selfBuff', kind: 'stasis', value: 0, duration: 8 }],
+    description:
+      'Encases you in solid ice for 8 sec, becoming immune to all damage and effects and removing every harmful effect. Usable while stunned or polymorphed. You cannot act while encased. Recast to cancel. (Mage)',
+  },
+  mend_pet: {
+    id: 'mend_pet',
+    name: 'Patch Up',
+    class: 'hunter',
+    learnLevel: 10,
+    cost: 45,
+    castTime: 0,
+    cooldown: 0,
+    range: 30,
+    school: 'nature',
+    requiresTarget: true,
+    targetType: 'friendly',
+    effects: [{ type: 'hot', total: 135, duration: 15, interval: 3 }],
+    description: 'Heals a friendly target for $d over 15 sec. (Hunter talent)',
+  },
+  meteor: {
+    id: 'meteor',
+    name: 'Meteor',
+    class: 'mage',
+    learnLevel: 16,
+    specs: ['fire'],
+    cost: 120,
+    castTime: 0,
+    cooldown: 45,
+    range: 30,
+    school: 'fire',
+    requiresTarget: false,
+    targetMode: 'position',
+    // Owner design: aimed at the ground with a FALL DELAY, then one impact
+    // that Ignites everything it strikes (a single delayed groundAoE pulse at
+    // interval; igniteFrac copies each target's resolved damage into its burn).
+    effects: [
+      {
+        type: 'groundAoE',
+        min: 90,
+        max: 120,
+        radius: 8,
+        duration: 2.5,
+        interval: 2,
+        igniteFrac: 0.4,
+        delayed: true,
+      },
+    ],
+    description:
+      'Calls a meteor down on the target area: after a 2 sec fall it deals 90 to 120 Fire damage and Ignites everything it strikes. (Fire)',
+  },
+  presence_of_mind: {
+    id: 'presence_of_mind',
+    name: 'Racing Mind',
+    class: 'mage',
+    learnLevel: 5,
+    cost: 0,
+    castTime: 0,
+    cooldown: 60,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    offGcd: true, // owner 2026-07-13: fire it without spending the global cooldown
+    effects: [{ type: 'selfBuff', kind: 'next_cast_instant', value: 1, duration: 60 }],
+    description: 'Makes your next spell with a cast time instant. Lasts 60 sec. (Mage talent)',
+  },
+  // --- Mage choice-row actives (owner tree, Artifact calculator 2026-07-11).
+  // WoW development names, renamed with the final localization pass like the
+  // frost spec kit. Numbers are the calculator's provisional values.
+  ice_floes: {
+    id: 'ice_floes',
+    name: 'Ice Floes',
+    class: 'mage',
+    learnLevel: 5,
+    cost: 0,
+    castTime: 0,
+    cooldown: 25,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    offGcd: true,
+    // value = protected casts left; player_motion skips its cast-cancel while
+    // worn and finishing a hard cast decrements it (casting_lifecycle).
+    effects: [{ type: 'selfBuff', kind: 'ice_floes', value: 2, duration: 15 }],
+    description:
+      'Your next two spells with a cast time can be cast while moving. Lasts 15 sec. (Mage talent)',
+  },
+  greater_invisibility: {
+    id: 'greater_invisibility',
+    name: 'Greater Invisibility',
+    class: 'mage',
+    learnLevel: 8,
+    cost: 60,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    // One dispatch applies the vanish, the damage cut (duration + linger so it
+    // survives an early break), and strips up to two DoTs (effect_dispatch).
+    effects: [
+      { type: 'greaterInvisibility', duration: 20, drValue: 0.9, linger: 3, removeDotCount: 2 },
+    ],
+    description:
+      'Vanish for 20 sec: removes 2 damage-over-time effects and you take 90% less damage while invisible and shortly after. (Mage talent)',
+  },
+  rings_of_frost: {
+    id: 'rings_of_frost',
+    name: 'Ring of Frost',
+    class: 'mage',
+    learnLevel: 11,
+    cost: 60,
+    castTime: 1.5,
+    cooldown: 30,
+    range: 25,
+    school: 'frost',
+    requiresTarget: false,
+    // Aimed at the ground; the cast time is the arming delay. The center stays
+    // safe, while enemies touching the persistent perimeter trigger it once.
+    targetMode: 'position',
+    effects: [
+      {
+        type: 'aoeRoot',
+        duration: 4,
+        radius: 6,
+        min: 0,
+        max: 0,
+        ring: { duration: 10, innerRadius: 4.5 },
+      },
+    ],
+    description:
+      'Summons a ring for 10 sec. Enemies crossing its perimeter are frozen for 4 sec. (Mage talent)',
+  },
+  cold_snap: {
+    id: 'cold_snap',
+    name: "Winter's Recall",
+    class: 'mage',
+    learnLevel: 17,
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [
+      {
+        type: 'clearCooldowns',
+        abilities: [
+          'blink',
+          'ice_barrier',
+          'blazing_barrier',
+          'temporal_barrier',
+          'greater_invisibility',
+        ],
+      },
+    ],
+    description:
+      'Finishes the cooldown on Flickerstep, Frostveil, and Greater Invisibility. (Mage talent)',
+  },
+  mass_barrier: {
+    id: 'mass_barrier',
+    name: 'Mass Barrier',
+    class: 'mage',
+    learnLevel: 17,
+    cost: 150,
+    castTime: 0,
+    cooldown: 90,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    effects: [{ type: 'aoeAllyAbsorb', amount: 130, duration: 60, radius: 30, maxTargets: 5 }],
+    description:
+      'Shields you and up to 4 nearby allies within 30 yd, each absorbing 130 damage for 60 sec. (Mage talent)',
+  },
+  overload: {
+    id: 'overload',
+    name: 'Overload',
+    class: 'mage',
+    learnLevel: 14,
+    cost: 0,
+    castTime: 0,
+    cooldown: 30,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [{ type: 'selfBuff', kind: 'overload', value: 0.4, duration: 10 }],
+    description:
+      'Your next spell is amplified by 40% but costs 50% more mana. Lasts 10 sec. (Mage talent)',
+  },
+  power_echo: {
+    id: 'power_echo',
+    name: 'Power Echo',
+    class: 'mage',
+    learnLevel: 14,
+    cost: 0,
+    castTime: 0,
+    cooldown: 30,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [{ type: 'selfBuff', kind: 'power_echo', value: 0.5, duration: 10 }],
+    description:
+      'Your next direct spell repeats at 50% power on the same target. Lasts 10 sec. (Mage talent)',
+  },
+  rune_of_power: {
+    id: 'rune_of_power',
+    name: 'Rune of Power',
+    class: 'mage',
+    learnLevel: 20,
+    cost: 100,
+    // Owner rule 2026-07-11: inscribing the rune is a deliberate cast too.
+    castTime: 1.5,
+    cooldown: 45,
+    range: 0,
+    school: 'arcane',
+    requiresTarget: false,
+    // A FRIENDLY ground zone at the caster's feet: each pulse buffs allies
+    // standing inside (the groundAoE allyBuffPct rider; no damage, no rng).
+    effects: [
+      { type: 'groundAoE', min: 0, max: 0, radius: 8, duration: 15, interval: 2, allyBuffPct: 0.1 },
+    ],
+    description:
+      'Inscribe a rune of power at your feet for 15 sec: allies standing within 8 yd deal 10% more damage. (Mage talent)',
+  },
+  blazing_barrier: {
+    id: 'blazing_barrier',
+    name: 'Blazing Barrier',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['fire'],
+    cost: 90,
+    castTime: 0,
+    cooldown: 30,
+    range: 0,
+    school: 'fire',
+    requiresTarget: false,
+    // The fire spec's PERSONAL BARRIER slot (Frost carries Frostveil): the
+    // shared row talents hook either id via PERSONAL_BARRIER_IDS.
+    effects: [{ type: 'absorb', amount: 130, duration: 60 }],
+    description: 'Wreathe yourself in flame, absorbing 130 damage for 60 sec. (Fire)',
+  },
+  ignition: {
+    id: 'ignition',
+    name: 'Ignition',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['fire'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'fire',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Passive: your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. (Fire mastery)',
+  },
+  hot_streak: {
+    id: 'hot_streak',
+    name: 'Hot Streak',
+    class: 'mage',
+    learnLevel: 5,
+    specs: ['fire'],
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'fire',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Passive: two critical strikes in a row with your Fire spells (Cinderbolt, Cinderfall, Scald, Pyrelance or Flamestrike) make your next Pyrelance or Flamestrike instant and free. The spenders count toward the NEXT streak, free casts included; a Flamestrike counts once however many enemies it strikes, and only the initial impact ever counts. (Fire)',
+  },
+  summon_water_elemental: {
+    id: 'summon_water_elemental',
+    name: 'Summon Water Elemental',
+    class: 'mage',
+    learnLevel: 12,
+    specs: ['frost'],
+    cost: 150,
+    castTime: 2,
+    cooldown: 0,
+    range: 0,
+    school: 'frost',
+    requiresTarget: false,
+    effects: [{ type: 'summonDemon', mobId: 'water_elemental' }],
+    description:
+      'Summon a Water Elemental to fight beside you, hurling Waterbolts at your target and channeling Water Jet. (Frost)',
   },
   rebuke: {
     id: 'rebuke',
@@ -4095,7 +5999,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'interrupt', lockout: 4 }],
     description:
-      "Interrupts the target's spellcast and prevents casting from that school for 4 sec.",
+      'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Paladin talent)',
   },
   skull_bash: {
     id: 'skull_bash',
@@ -4110,7 +6014,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'interrupt', lockout: 4 }],
     description:
-      "A lunging headbutt that interrupts the target's spellcast and locks that school for 4 sec.",
+      'Interrupts spellcasting and prevents any spell in that school from being cast for 4 sec. (Druid talent)',
   },
   spell_lock: {
     id: 'spell_lock',
@@ -4124,8 +6028,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     effects: [{ type: 'interrupt', lockout: 5 }],
-    description: 'Silences the target mid-cast and prevents casting from that school for 5 sec.',
+    description:
+      'Interrupts spellcasting and prevents any spell in that school from being cast for 5 sec. (Warlock talent)',
   },
+
+  // Canonical Talents V2 active grants. These are absent from baseline class kits
+  // and become known only through the selected row's `grant` effect.
+  ...TALENT_ABILITIES_V2,
 
   // The Vale Cup sport kit (class-agnostic; docs/prd/vale-cup.md). Merged here
   // so every ABILITIES consumer (casting, icons, hotbar validation, tooltips)
@@ -4136,7 +6045,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
 
 // A class ability resolved to a concrete rank, with talent modifiers already
 // folded into its cost / cast / cooldown / effects. The combat path reads only
-// these flat numbers — it never consults the talent tree. Structurally matches
+// these flat numbers - it never consults the talent tree. Structurally matches
 // sim's ResolvedAbility.
 export interface KnownAbility {
   def: AbilityDef;
@@ -4148,28 +6057,49 @@ export interface KnownAbility {
   threatFlat: number;
   threatMult: number;
   castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
+  damagePushbackImmune?: boolean;
+  charges?: number; // resolved total uses; undefined means one use
+  bonusCharges?: number; // +N stored uses resolved from def/talents; drives the abilityCharges recharge model
 }
 
-// The buff kinds whose value is a flat MAGNITUDE (armor, attack power, a flat primary
-// stat, spell power) and so scales with an ability/global damage-power mod. Every other
-// selfBuff/buffTarget kind is a rate, multiplier, percent, or a locked caster-form value
-// and passes through scaleEffect untouched (see the selfBuff/buffTarget arm).
-const SCALABLE_BUFF_KINDS = new Set<AuraKind>([
+// Scale one effect's damage/heal magnitudes, returning a NEW effect object - the
+// base content arrays are shared module data and must never be mutated. `flat`
+// is added once to the effect's primary magnitude.
+// Buff-value kinds whose magnitude is an INTEGER count (attack power, armor,
+// stats, spellpower, thorns). buffPct scaling rounds these; every other buff kind
+// carries a fractional RATE (haste/dodge/spell-haste multipliers) that must scale
+// without rounding, or a sub-1.0 bonus floors to zero.
+const INTEGRAL_BUFF_KINDS: ReadonlySet<AuraKind> = new Set([
+  'buff_ap',
+  'buff_armor',
+  'buff_int',
+  'buff_agi',
+  'buff_sta',
+  'buff_allstats',
+  'buff_spellpower',
+  'thorns',
+]);
+
+function scaleBuffValue(kind: AuraKind, value: number, mul: number): number {
+  const scaled = value * mul;
+  return INTEGRAL_BUFF_KINDS.has(kind) ? Math.round(scaled) : scaled;
+}
+
+// The buff kinds whose value is a flat MAGNITUDE and so scales with an
+// ability/global damage-power mod in scaleEffect. Every other selfBuff/buffTarget
+// kind passes through untouched (see the selfBuff/buffTarget arm below).
+const SCALABLE_BUFF_KINDS: ReadonlySet<AuraKind> = new Set([
   'buff_ap',
   'buff_armor',
   'buff_int',
   'buff_agi',
   'buff_spi',
   'buff_sta',
+  'buff_allstats',
   'buff_spellpower',
-  // Thorns is flat reflect DAMAGE (Retribution Aura, thornshield), so it scales with a
-  // damage-power mod exactly like the other flat magnitudes above.
   'thorns',
 ]);
 
-// Scale one effect's damage/heal magnitudes, returning a NEW effect object — the
-// base content arrays are shared module data and must never be mutated. `flat`
-// is added once to the effect's primary magnitude.
 function scaleEffect(
   eff: AbilityEffect,
   dmgMult: number,
@@ -4183,7 +6113,11 @@ function scaleEffect(
     case 'weaponDamage':
       return { ...eff, bonus: Math.round(eff.bonus * dmgMult + flat) };
     case 'weaponStrike':
-      return { ...eff, bonus: Math.round(eff.bonus * dmgMult + flat) };
+      return {
+        ...eff,
+        bonus: Math.round(eff.bonus * dmgMult + flat),
+        weaponMult: (eff.weaponMult ?? 1) * dmgMult,
+      };
     case 'directDamage':
       return {
         ...eff,
@@ -4191,36 +6125,17 @@ function scaleEffect(
         max: Math.round(eff.max * dmgMult + flat),
       };
     case 'dot':
-      return { ...eff, total: Math.round(eff.total * dmgMult * dotMult + flat) };
+      // A directPct rider snapshots an already-scaled direct hit; scaling the
+      // fraction again would double-apply the talent/global damage modifier.
+      return eff.directPct
+        ? { ...eff }
+        : { ...eff, total: Math.round(eff.total * dmgMult * dotMult + flat) };
     case 'aoeDamage':
-      return {
-        ...eff,
-        min: Math.round(eff.min * dmgMult + flat),
-        max: Math.round(eff.max * dmgMult + flat),
-      };
-    case 'chainDamage':
-      // Bounce damage (Hallowed Wall): a damage effect, scale by the damage mult like
-      // aoeDamage so the Protection mastery / talent dmg mods reach the bounces too.
-      return {
-        ...eff,
-        min: Math.round(eff.min * dmgMult + flat),
-        max: Math.round(eff.max * dmgMult + flat),
-      };
-    case 'groundAoE':
-      // Ground-persisted AoE damage (Consecration, Earthquake): scale the per-tick
-      // magnitude by the damage mult so the Retribution / Elemental masteries reach it.
-      return {
-        ...eff,
-        min: Math.round(eff.min * dmgMult + flat),
-        max: Math.round(eff.max * dmgMult + flat),
-      };
     case 'aoeHeal':
-      // AoE heal (Holy Nova, Tranquility): scale by the heal mult so the Holy / heal
-      // masteries reach it, mirroring the single-target heal case below.
       return {
         ...eff,
-        min: Math.round(eff.min * healMult + flat),
-        max: Math.round(eff.max * healMult + flat),
+        min: Math.round(eff.min * (eff.type === 'aoeHeal' ? healMult : dmgMult) + flat),
+        max: Math.round(eff.max * (eff.type === 'aoeHeal' ? healMult : dmgMult) + flat),
       };
     case 'aoeRoot':
       return { ...eff, min: Math.round(eff.min * dmgMult), max: Math.round(eff.max * dmgMult) };
@@ -4241,7 +6156,19 @@ function scaleEffect(
         judgeMax:
           eff.judgeMax === undefined ? undefined : Math.round(eff.judgeMax * dmgMult + flat),
       };
+    case 'judgement':
+      return {
+        ...eff,
+        dmgMult: (eff.dmgMult ?? 1) * dmgMult,
+        flat: (eff.flat ?? 0) + flat,
+      };
     case 'heal':
+      return {
+        ...eff,
+        min: Math.round(eff.min * healMult + flat),
+        max: Math.round(eff.max * healMult + flat),
+      };
+    case 'chainHeal':
       return {
         ...eff,
         min: Math.round(eff.min * healMult + flat),
@@ -4249,24 +6176,43 @@ function scaleEffect(
       };
     case 'hot':
       return { ...eff, total: Math.round(eff.total * healMult * hotMult + flat) };
+    case 'consumeAura':
+      // `flat` is added once, to the PRIMARY magnitude only: deal when present,
+      // else heal (a dual deal+heal def must not double-apply a flat talent mod).
+      return {
+        ...eff,
+        deal: eff.deal
+          ? {
+              min: Math.round(eff.deal.min * dmgMult + flat),
+              max: Math.round(eff.deal.max * dmgMult + flat),
+            }
+          : undefined,
+        heal: eff.heal
+          ? {
+              min: Math.round(eff.heal.min * healMult + (eff.deal ? 0 : flat)),
+              max: Math.round(eff.heal.max * healMult + (eff.deal ? 0 : flat)),
+            }
+          : undefined,
+      };
     case 'absorb':
       return { ...eff, amount: Math.round(eff.amount * healMult * absorbMult + flat) };
-    // A flat-MAGNITUDE buff (armor, attack power, a flat stat, spell power) DOES scale
-    // with an ability/global damage-power mod, e.g. the Demonic Skin talent hardening
-    // Demon Skin's armor. But a RATE / MULTIPLIER / PERCENT buff (haste, move speed, any
-    // `_pct` buff) and the caster-form SP grants (Gloamveil / Moonkin, locked values)
-    // must NOT: scaling a 1.2 haste or 1.4 speed multiplier and rounding corrupted it
-    // (1.2 -> 1, 1.4 -> 2), and a whole-number percent (buff_ap_pct 20) would be inflated.
-    // The old `value < 1` heuristic mislabeled every rate stored at >= 1; gate on the
-    // KIND instead. Intentional per-ability buff scaling still also rides the separate
-    // buffPct pass in applyTalentMods.
+    // Only the buff kinds whose value is a flat MAGNITUDE (armor, attack power, a flat
+    // primary stat, spell power, thorns damage) scale with a damage-power mod. Every
+    // other selfBuff/buffTarget kind is a rate, multiplier, percent, or a locked
+    // caster-form value and passes through untouched: scaling a 1.2 haste or 1.4 speed
+    // multiplier and rounding corrupts it (1.2 -> 1 = zero haste, 1.4 -> 1 = no speed),
+    // and a sub-1 rate (a 0.2 crit fraction) floors to 0 (this silently zeroed Aether
+    // Surge's haste for an Arcane mage). Gate on the KIND, never a value heuristic.
+    // Intentional buff scaling still rides the per-ability buffPct in applyTalentMods.
     case 'buffTarget':
     case 'selfBuff':
       return SCALABLE_BUFF_KINDS.has(eff.kind)
         ? { ...eff, value: Math.round(eff.value * dmgMult + flat) }
         : eff;
-    // lifeTap / gainResource fall through: a damage/heal mod must not inflate a mana or
-    // resource gain.
+    case 'lifeTap':
+      return { ...eff, mana: Math.round(eff.mana * dmgMult + flat) };
+    case 'gainResource':
+      return { ...eff, amount: Math.round(eff.amount * dmgMult + flat) };
     default:
       return eff;
   }
@@ -4306,15 +6252,35 @@ function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
     if (am.costPct) entry.cost = Math.max(0, Math.round(entry.cost * (1 + am.costPct)));
     if (am.castPct) entry.castTime = Math.max(0, entry.castTime * (1 + am.castPct));
     if (am.cooldownPct) entry.cooldown = Math.max(0, entry.cooldown * (1 + am.cooldownPct));
+    // Flat cooldown ADD (seconds), after the percent: Snap Bewitch turns a
+    // cooldown-less cast instant by trading in a real cooldown.
+    if (am.cooldownFlat) entry.cooldown = Math.max(0, entry.cooldown + am.cooldownFlat);
     if (am.castWhileMoving) entry.castWhileMoving = true;
+    if (am.damagePushbackImmune) entry.damagePushbackImmune = true;
+    // Stored uses (Double Charge): base 1 unless the def itself is
+    // charge-limited (maxCharges, already resolved onto entry.charges); the
+    // combat gate + recharge live in casting_lifecycle / updateTimers, keyed
+    // off this resolved max.
+    if (am.bonusCharges) {
+      entry.bonusCharges = (entry.bonusCharges ?? 0) + am.bonusCharges;
+      entry.charges = (entry.charges ?? 1) + am.bonusCharges;
+    }
     // buffPct strengthens the value of a (self/target) buff, e.g. Improved Devotion Aura
     // giving more armor. Only the buff effects scale; damage on the same ability does not.
+    // Multiplier-shaped values (buff_haste/scale/jump/mortal_wound) are exempt like in
+    // scaleEffect.
     if (am.buffPct) {
       const mul = 1 + am.buffPct;
       entry.effects = entry.effects.map((e) =>
-        (e.type === 'selfBuff' || e.type === 'buffTarget') && Math.abs(e.value) >= 1
-          ? { ...e, value: Math.round(e.value * mul) }
-          : e,
+        e.type === 'selfBuff' || e.type === 'buffTarget'
+          ? { ...e, value: scaleBuffValue(e.kind, e.value, mul) }
+          : e.type === 'finisherHaste'
+            ? { ...e, mult: 1 + (e.mult - 1) * mul }
+            : // Weapon coats scale their per-swing rider (Redhanded's poison
+              // damage; a re-coat picks up the new value).
+              e.type === 'imbue'
+              ? { ...e, bonus: Math.round(e.bonus * mul) }
+              : e,
       );
     }
   }
@@ -4339,6 +6305,25 @@ export function abilitiesKnownAt(
     if (!def) continue;
     const granted = grantIds.has(id) || !baseIds.includes(id);
     if (!granted && def.learnLevel > level) continue; // class kit is level-gated; grants bypass it
+    // Spec-gated kit: a spec-restricted ability is shown ONLY when the player's
+    // committed spec is in its `specs` list. With no spec chosen the shared base
+    // kit stays but every spec-exclusive drops out, so exclusivity is visible
+    // before committing. Grants bypass entirely (already spec-scoped).
+    if (!granted && def.specs && (!mods?.spec || !def.specs.includes(mods.spec))) continue;
+    // Spec EXCLUSION: an otherwise-ungated ability drops out for a committed spec
+    // in its `excludeSpecs` list (Reaver Strike hides for Protection, which uses
+    // Revenge instead). A no-spec player and non-listed specs keep it; grants
+    // bypass entirely (already spec-scoped). With excludeSpecsAtLevel set the
+    // drop waits for that player level (a kit hand-off, e.g. Redhand serves
+    // Fury until Red Harvest arrives at 10).
+    if (
+      !granted &&
+      def.excludeSpecs &&
+      mods?.spec &&
+      def.excludeSpecs.includes(mods.spec) &&
+      level >= (def.excludeSpecsAtLevel ?? 0)
+    )
+      continue;
 
     let rank = 1,
       cost = def.cost,
@@ -4355,16 +6340,45 @@ export function abilitiesKnownAt(
         if (r.threatFlat !== undefined) threatFlat = r.threatFlat;
       }
     }
+    let cooldown = def.cooldown;
+    if (id === 'execute' && mods?.spec === 'arms') {
+      cost = 10;
+    }
+    // Fury's execute is a rage BUILDER, not a spender (owner 2026-07-08):
+    // for a committed Fury warrior it costs nothing and MINTS 20 rage instead of
+    // the shared finisher cost. Arms, Protection and no-spec keep the classic
+    // rage-costing execute. Resolved here (not via a talent mod) so the
+    // cast-time cost gate sees 0 and the appended gainResource flows through the
+    // normal dispatch scaling (abilityRagePct / rage-gen auras).
+    if (id === 'execute' && mods?.spec === 'fury') {
+      cost = 0;
+      effects = [...effects, { type: 'gainResource', amount: 20 }];
+      cooldown = 6;
+    }
     const entry: KnownAbility = {
       def,
       rank,
       cost,
       castTime,
-      cooldown: def.cooldown,
+      cooldown,
       effects,
       threatFlat,
       threatMult,
+      bonusCharges: 0,
     };
+    // Charge-limited base kit (Twinstrike): the def's stored-use max resolves
+    // exactly like the Double Charge talent's, so casting_lifecycle's charge
+    // gate + updateTimers' recharge refund need no new path. Talent
+    // bonusCharges (applyTalentMods) stacks on top of this base.
+    if (def.maxCharges !== undefined) {
+      entry.charges = def.maxCharges;
+      entry.bonusCharges = Math.max(0, def.maxCharges - 1);
+    }
+    // Frost mages carry a SECOND Ice Block charge (owner 2026-07-13: "doble cubo"),
+    // on the abilityCharges recharge model. Resolved HERE (the shared known-list
+    // builder) so BOTH worlds see it: the offline Sim's meta.known and the
+    // ClientWorld's locally recomputed list, which is what the action bar badges.
+    if (id === 'ice_block' && mods?.spec === 'frost') entry.bonusCharges = 1;
     if (mods) applyTalentMods(entry, mods);
     out.push(entry);
   }

@@ -2,9 +2,285 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const nl_NL: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.ironhold.description':
-    'Verschans je achter je schild en verminder alle schade die je oploopt met 40% gedurende 8 sec.',
-  'entities.abilities.ironhold.name': 'IJzeren Bolwerk',
+  'hud.pet.waterJet': 'Waterstraal',
+  'hud.pet.waterJetDesc':
+    'Beveelt je Waterelementaal om gedurende 3 seconden een vertragend straalwater te kanaliseren. 8 seconden afkoeltijd. Klik met rechts om het automatisch te activeren zodra de afkoeltijd voorbij is.',
+  'hud.pet.waterJetTitle': 'Waterstraal',
+  'hud.prompts.acceptResurrection': 'Opstanding Aanvaarden',
+  'hud.prompts.resurrectionOffer': '{name} wil je terugbrengen tot leven. Aanvaarden?',
+  'itemUi.stats.parry': 'Pareren',
+  'apiError.wallet.handoff_invalid':
+    'Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw.',
+  'cardDuel.close': 'Sluiten',
+  'cardDuel.counts': 'Deck: {deck} - Aflegstapel: {discard}',
+  'cardDuel.forfeit': 'Opgeven',
+  'cardDuel.forfeitAria': 'Het Kaartduel opgeven',
+  'cardDuel.join': 'Wachtrij Betreden',
+  'cardDuel.joinAria': 'De Kaartduelwachtrij betreden',
+  'cardDuel.leave': 'Wachtrij Verlaten',
+  'cardDuel.leaveAria': 'De Kaartduelwachtrij verlaten',
+  'cardDuel.playCardAria': 'De kaart {value} spelen',
+  'cardDuel.queued': 'Wachten op een tegenstander...',
+  'cardDuel.round': 'Rondescore: {mine} - {theirs}',
+  'cardDuel.title': 'Kaartduel',
+  'cardDuel.unavailable': 'Kaartduel vereist een andere speler die online is.',
+  'cardDuel.vsOpponent': 'tegen {name}',
+  'cardDuel.waitingOnOpponent': 'Wachten op de kaart van je tegenstander...',
+  'cardDuel.yourTurn': 'Speel een kaart',
+  'entities.abilities.arcane_surge.description':
+    'Trekt een golf rauwe aether door de vijand voor {damage} schade. Elke worp laat een Arcanelading achter die de schade en werpsnelheid van je volgende Aether Surge vergroot (5% sneller per lading), maar de manakosten sterk verhoogt, tot maximaal 4 ladingen; Aetherpijlen verbruikt de ladingen. Elke worp kan ook Aetherhaast activeren, waardoor je volgende Aether Surge gratis is en twee keer zo snel te werpen.',
+  'entities.abilities.arcane_surge.name': 'Aether Surge',
+  'entities.abilities.blizzard.description':
+    'Roept een ijsstorm op over het doelgebied gedurende 6 sec, die {damage} Vorstschade per seconde toebrengt en vijanden met 40% vertraagt. Elk getroffen vijand haalt 0,5 sec af van Frozen Orb, tot 3 sec per worp. (Vorst)',
+  'entities.abilities.blizzard.name': 'Blizzard',
+  'entities.abilities.brain_freeze.description':
+    'Rijplans heeft 20% kans om je volgende Winterlash direct, 30% harder en vrij van zijn afkoeltijd te maken. (Vorst)',
+  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.dragons_breath.description':
+    'Houd ingedrukt om een brede vuurstroom op te laden en laat hem los in een kegel. Langere ladingen reiken verder en richten meer schade aan. Getroffen vijanden raken gedesoriënteerd en schade verbreekt het effect; maximale lading treft altijd kritiek en telt eenmaal mee voor Hete reeks. (Vuur)',
+  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.fingers_of_frost.description':
+    'Rijplans heeft 15% kans om Fingers of Frost te verlenen, tot 2 ladingen: je volgende Ice Lance behandelt het doelwit als bevroren. (Vorst)',
+  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fireball_form.description':
+    'Verander in een vlammende sintel, waardoor je bewegingssnelheid met {buff}% toeneemt. Je kunt niet aanvallen of spreuken uitspreken terwijl je getransformeerd bent. Heractiveer om terug te keren naar je normale gedaante.',
+  'entities.abilities.fireball_form.name': 'Ember Form',
+  'entities.abilities.flurry.description':
+    'Schiet drie ijsboutten af die elk {damage} Vorstschade toebrengen en Winterskil op het doelwit leggen: de volgende 2 binnenkomende compatibele spreuken behandelen het als bevroren. Brain Freeze maakt Winterlash direct, 30% harder, en slaat de afkoeltijd over. (Vorst)',
+  'entities.abilities.flurry.name': 'Winterlash',
+  'entities.abilities.frozen_orb.description':
+    'Laat een bol van wervelende vorst los die 8 sec naar voren drijft, per seconde {damage} Vorstschade toebrengt aan nabije vijanden en ze 30% vertraagt. Zijn treffers genereren Fingers of Frost. (Vorst)',
+  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.glacial_front.description':
+    'Houd ingedrukt om een brede vorstgolf op te laden en laat hem los in een kegel. Langere ladingen reiken verder en richten meer schade aan. Alle getroffen vijanden worden gedurende 4 sec met 50% vertraagd; maximale lading wortelt ze ook 1 sec vast. (Vorst)',
+  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_spike.description':
+    'Bezweer een massieve ijspiek die 5 IJsschilfers verbruikt om {damage} Vorstschade toe te brengen en het doelwit 4 sec op zijn plek te bevriezen. (Vorst)',
+  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.ice_lance.description':
+    'Slingert een ijsscherf die {damage} Vorstschade toebrengt, verdrievoudigd tegen een bevroren doelwit. Verbruikt Fingers of Frost of een lading Winterskil om het doelwit als bevroren te behandelen. (Vorst)',
+  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.perfect_moment.description':
+    'Grijp je perfecte moment: ontvang direct 4 Arcaneladingen, en gedurende 10 sec verbruikt Aetherpijlen ze niet. (Chronomantie)',
+  'entities.abilities.perfect_moment.name': 'Perfect Moment',
+  'entities.abilities.shatter.description':
+    'Je spreuken krijgen 50% kritieke trefkans tegen bevroren doelwitten, en die kritieke treffers brengen 20% meer schade toe. Fingers of Frost en Winterskil tellen als bevroren. (Vorst)',
+  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.temporal_acceleration.description':
+    'Versnelt de tijdstroom voor je groep of raid, waardoor aanvals-, bezwerings- en kanalisatiesnelheid gedurende 15 sec met 30% toeneemt. Bondgenoten die recentelijk door Temporal Acceleration of Oorlogstrommen zijn getroffen, zijn te uitgeput om ervan te profiteren. (Chronomantie)',
+  'entities.abilities.temporal_acceleration.name': 'Temporal Acceleration',
+  'entities.abilities.temporal_barrier.description':
+    'Verschuift het doelwit een hartslag buiten het heden: een tijdschild absorbeert {damage} schade gedurende 10 sec voordat de tijdlijn terugknalt.',
+  'entities.abilities.temporal_barrier.name': 'Temporal Barrier',
+  'entities.abilities.temporal_cascade.description':
+    'Stuurt een echo door je groep: het doelwit en tot vier van hun naaste bondgenoten worden tegelijk hersteld en elk gedurende {duration} sec gemarkeerd, waarbij een deel van de Arcaneschade die je aanricht terugstroomt door hun echo om hen te genezen. (Chronomantie)',
+  'entities.abilities.temporal_cascade.name': 'Temporal Cascade',
+  'entities.abilities.temporal_echo.description':
+    'Markeert een bondgenoot met de echo van een gezonder moment, en herstelt direct {damage} gezondheid. Gedurende {duration} sec stroomt een deel van de Arcaneschade die je aanricht terug door de echo om hen te genezen.',
+  'entities.abilities.temporal_echo.name': 'Temporal Echo',
+  'entities.abilities.temporal_hourglass.description':
+    'Plaatst een tijdzandloper op de geselecteerde locatie. Onder een vijand schorst het hen {hostilePveDuration} sec in PvE of {hostilePvpDuration} sec in PvP en verhindert alle acties; schade verbreekt het effect. Aan je voeten of onder een groepsbondgenoot verleent het {duration} sec stasis, verhindert schade en acties, herstelt {healing}% van maximale gezondheid, en laat afkoeltijden {selfCooldownRecovery}% sneller herstellen voor jezelf of {allyCooldownRecovery}% sneller voor een bondgenoot. Op leeg terrein wacht de zandloper {groundDuration} sec en treft de eerste geldige eenheid die erop stapt. De heilzame aura kan handmatig worden verwijderd.',
+  'entities.abilities.temporal_hourglass.name': 'Hourglass of Suspension',
+  'entities.abilities.temporal_mend.description':
+    'Trekt een bondgenoot een moment vooruit in de tijd, waarbij {damage} gezondheid wordt hersteld terwijl het lichaam zijn gezondere toekomstige zelf vindt. (Chronomantie-handtekening)',
+  'entities.abilities.temporal_mend.name': 'Temporal Mend',
+  'entities.abilities.temporal_reversal.description':
+    'Spoelt de tijdlijn van een gevallen bondgenoot terug en brengt hem bij zijn lichaam tot leven met een deel van zijn gezondheid en mana, zelfs middenin een gevecht. (Chronomantie)',
+  'entities.abilities.temporal_reversal.name': 'Temporal Reversal',
+  'entities.abilities.temporal_rewind.description':
+    'Stuurt een arcanegolf door je groep of raid en spoelt de tijd terug om 30% van de schade te herstellen die elke bondgenoot binnen 40 meter de afgelopen 5 seconden heeft opgelopen (tot 35% van hun maximale gezondheid). Kan geen kritiek effect zijn. (Chronomantie)',
+  'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.npcs.card_master.greeting':
+    'Zin in een Kaartduel? Beste van drie, de winnaar pakt de praatrechten.',
+  'entities.npcs.card_master.name': 'Kaartmeester',
+  'entities.npcs.card_master.title': 'Verdeler van het Lot',
+  'entities.quests.q_archetype_acceptance.completion':
+    'De belofte staat. Deze twee ambachten zijn nu je hoofdambachten, en de kennis die er tegenover staat wordt je liefhebberij.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Ertsslagader geoogst',
+  'entities.quests.q_archetype_acceptance.text':
+    'Vaardigheid is kennis, {playerName}, maar afstemming is een belofte. Kies twee naburige ambachten waarvan je de methoden als je hoofdambachten zult dragen, en breng me dan erts dat je zelf met je eigen handen uit het Dal hebt gewonnen.',
+  'entities.quests.q_prof_hobby_switch.completion':
+    'Een lichtere keuze, maar een nuttige. Volg die nieuwsgierigheid zo ver als zeldzaam werk haar draagt.',
+  'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Kruidenveld geoogst',
+  'entities.quests.q_prof_hobby_switch.text':
+    'Hoofdambachten vragen een gelofte. Een liefhebberij vraagt alleen waar je nieuwsgierigheid ronddwaalt, {playerName}. Pluk een paar kruiden en beslis welk ambacht tegenover je hoofdambachten je wilt beoefenen.',
+  'entities.quests.q_prof_hobby_switch.title': 'Een Andere Tijdverdrijf',
+  'entities.quests.q_prof_intro.completion':
+    'Zie je? Erts verzameld en eelt op je handen. Ga door met het mijnen, houtkappen en kruidenplukken terwijl je de wegen afloopt, en als je terug in de stad bent, let dan op het Stadsfocusbord bij de markt en de nabijgelegen knutselbank. Er zit een eerlijke handel in dit alles, als je dat wilt.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Ertsslagader geoogst',
+  'entities.quests.q_prof_intro.text':
+    'Elke ziel in Oostbeekdal beoefent een ambacht naast het zwaard, {playerName}. Er zijn ertsslagaders in de rotsen rond de Kopergat, ten zuidwesten van de stad. Ga zelf een houweel zwaaien en bewerk er 5; ik zie het verschil.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Het oude ritme keert terug. Je vroegere ambachtspaar is opnieuw actief.',
+  'entities.quests.q_prof_make_amends.text':
+    'Je hebt dat paar eerder gedragen, {playerName}. Terugkeren is geen nieuwe gelofte. Help de Dalweg vrijhouden, en het werk zal je handen herinneren wat ze ooit kenden.',
+  'gpuNotice.bodyDesktop':
+    "Het spel draait zonder GPU-versnelling en zal traag zijn. Werk je grafische stuurprogramma's bij en herstart het spel. Stel op Windows ook het spel in op Hoge prestaties via Instellingen, Systeem, Beeldscherm, Afbeeldingen.",
+  'gpuNotice.bodyWeb':
+    "Het spel draait zonder GPU-versnelling en zal traag zijn. Schakel hardwareversnelling in je browserinstellingen in, werk je grafische stuurprogramma's bij en herstart je browser.",
+  'gpuNotice.dismiss': 'Sluiten',
+  'guide.abilityHook.blink':
+    'Teleporteert je een korte afstand vooruit en verbreekt onderweg wortels.',
+  'guide.abilityHook.blizzard':
+    'Bedekt een gebied met ijs om een heel roedel te slijten en te vertragen.',
+  'guide.abilityHook.brain_freeze':
+    'Je vorstboutten maken de volgende Winterlash soms direct en harder rakend.',
+  'guide.abilityHook.fingers_of_frost':
+    'Je vorstboutten geven een Ice Lance soms de kracht om te treffen alsof het doelwit bevroren is.',
+  'guide.abilityHook.fireball_form': 'Word een levende sintel om open terrein snel te doorkruisen.',
+  'guide.abilityHook.flurry':
+    'Drie snelle boutten die het doelwit koelen zodat je volgende vorsttreffers landen alsof het bevroren is.',
+  'guide.abilityHook.frozen_orb':
+    'Rolt een langzame bol door de troep die alles verkilt en je vorstprocs voedt.',
+  'guide.abilityHook.ice_lance':
+    'Een directe scherf om vorstprocs mee te verbruiken, raakt veel harder op een bevroren doelwit.',
+  'guide.abilityHook.shatter': 'Je spreuken criten veel vaker tegen bevroren doelwitten.',
+  'guide.deedsPage.renownBody':
+    'Roem is de score achter het Boek. Elke daad die je behaalt is een vast bedrag waard, en je totaal stijgt altijd, dus een rustige week kost je nooit terrein. Een handvol daden draait op geluk in plaats van vaardigheid, en Wapenfeiten zijn een eigen eer, dus beide leveren geen Roem op. Daden zonder Roem tellen nog steeds mee voor voltooiing in je Boek; ze scoren gewoonweg nooit.',
+  'guide.deedsPage.standingsNote':
+    'De rijken houden een doorlopende telling van Roem bij over elk account: het bord rangschikt hele accounts op levenslange Roem en telt elke daad eenmaal over al je personages, en het toont alleen Roem, dus daden die geen Roem dragen verplaatsen de stand nooit, ook al tellen ze in je Boek. Om te zien wie waar staat, open je het Klassement in het spel en ga je naar het tabblad Roem; de standen staan daar, niet op de wiki.',
+  'hudChrome.archetypePair.alchemy+cooking': 'Apotheker',
+  'hudChrome.archetypePair.armorcrafting+engineering': 'Radsmid',
+  'hudChrome.archetypePair.cooking+leatherworking': 'Jager',
+  'hudChrome.archetypePair.enchanting+jewelcrafting': 'Edelsteenbezweerder',
+  'hudChrome.archetypePair.engineering+alchemy': 'Bommenwerper',
+  'hudChrome.archetypePair.inscription+enchanting': 'Arcaneschrijver',
+  'hudChrome.archetypePair.jewelcrafting+weaponcrafting': 'Wapensmid',
+  'hudChrome.archetypePair.leatherworking+tailoring': 'Uitrusser',
+  'hudChrome.archetypePair.tailoring+inscription': 'Magiërswerker',
+  'hudChrome.archetypePair.weaponcrafting+armorcrafting': 'Smid',
+  'hudChrome.auraEffect.cheapCast': 'Je volgende spreuk kost {pct}% minder',
+  'hudChrome.auraEffect.combustionCrit': 'Je Vuurspreuken treffen altijd kritiek',
+  'hudChrome.auraEffect.dmgDone': 'Verhoogt aangerichte schade met {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Vermindert aangerichte schade met {pct}%',
+  'hudChrome.auraEffect.elementalConvergencePrimed':
+    'Je volgende spreuk van de andere elementaire school verleent Elementaire Convergentie',
+  'hudChrome.auraEffect.formFireball':
+    'Ember Form: bewegingssnelheid verhoogd met {pct}%; aanvallen en spreuken zijn uitgeschakeld',
+  'hudChrome.auraEffect.freeCast': 'Je volgende bezwering kost niets',
+  'hudChrome.auraEffect.heatingUp':
+    'Je volgende opeenvolgende kritieke treffer van een Vuur-opbouwer verleent Hete reeks; een niet-kritieke opbouwer verwijdert Opwarmen',
+  'hudChrome.auraEffect.iceFloesCasts':
+    'Je volgende {n} spreuken met een bezweringstijd kunnen worden uitgesproken terwijl je beweegt',
+  'hudChrome.auraEffect.increase.sp': 'Verhoogt spreukkracht met {value}',
+  'hudChrome.auraEffect.instantCast': 'Je volgende spreuk met een bezweringstijd is direct',
+  'hudChrome.auraEffect.overloadNext':
+    'Je volgende spreuk wordt met {pct}% versterkt maar kost 50% meer mana',
+  'hudChrome.auraEffect.powerEchoNext':
+    'Je volgende directe spreuk herhaalt zich op {pct}% kracht op hetzelfde doelwit',
+  'hudChrome.auraEffect.temporalHourglass':
+    'Immuun en niet in staat te handelen; herstelt gezondheid en versnelt afkoeltijdherstel. Klik met rechts om te annuleren.',
+  'hudChrome.craftName.alchemy': 'Alchemie',
+  'hudChrome.craftName.armorcrafting': 'Harnasmaken',
+  'hudChrome.craftName.cooking': 'Koken',
+  'hudChrome.craftName.enchanting': 'Betovering',
+  'hudChrome.craftName.engineering': 'Knutselwerk',
+  'hudChrome.craftName.inscription': 'Inscriptie',
+  'hudChrome.craftName.jewelcrafting': 'Juwelenmaken',
+  'hudChrome.craftName.leatherworking': 'Leerbewerken',
+  'hudChrome.craftName.tailoring': 'Kleermaken',
+  'hudChrome.craftName.weaponcrafting': 'Wapensmeden',
+  'hudChrome.crafting.attunementPreview':
+    'Resultaat: titel {title}; {majorA} en {majorB} worden ongelimiteerde hoofdambachten; {hobby} wordt de zeldzaam-begrensde liefhebberij; alle andere vakkennis wordt behouden maar begrensd op gewoon zolang het slapend is.',
+  'hudChrome.crafting.comboMet': 'Gereed.',
+  'hudChrome.crafting.comboNotAttuned': 'Kies eerst een archetype-paar.',
+  'hudChrome.crafting.comboRequires': 'Afstemming: {craftA} + {craftB}, rang {tier}.',
+  'hudChrome.crafting.comboSyncing': 'Rijksafstemming controleren.',
+  'hudChrome.crafting.comboTierUnmet': 'Breng beide hoofdambachten naar de vereiste rang.',
+  'hudChrome.crafting.comboWrongPair': 'Activeer precies dit paar om het te maken.',
+  'hudChrome.crafting.hobbyPreview':
+    'Resultaat: {hobby} wordt de zeldzaam-begrensde liefhebberij. Beide hoofdambachten en alle behouden vaardigheidswaarden blijven ongewijzigd.',
+  'hudChrome.crafting.identity.ceilingCommon': 'Gewone begrenzing',
+  'hudChrome.crafting.identity.ceilingRare': 'Zeldzame begrenzing',
+  'hudChrome.crafting.identity.ceilingUnlimited': 'Geen versterkingsbegrenzing',
+  'hudChrome.crafting.identity.colCap': 'Begrenzing',
+  'hudChrome.crafting.identity.colCraft': 'Ambacht',
+  'hudChrome.crafting.identity.colRole': 'Rol',
+  'hudChrome.crafting.identity.colSkill': 'Vaardigheid',
+  'hudChrome.crafting.identity.dormantKnowledge':
+    '{craft}-kennis wordt behouden maar is slapend tot zijn paar of liefhebberij actief is.',
+  'hudChrome.crafting.identity.history': '{pairs} paren ontdekt, {returns} terugkeren voltooid',
+  'hudChrome.crafting.identity.historyLabel': 'Geschiedenis',
+  'hudChrome.crafting.identity.hobbyLabel': 'Liefhebberij',
+  'hudChrome.crafting.identity.majorsLabel': 'Hoofdambachten',
+  'hudChrome.crafting.identity.nearTier':
+    '{craft} mist {points} vaardigheid voor zijn volgende rang.',
+  'hudChrome.crafting.identity.roleDormant': 'Slapende kennis',
+  'hudChrome.crafting.identity.roleHobby': 'Liefhebberij',
+  'hudChrome.crafting.identity.roleMajor': 'Hoofdambacht',
+  'hudChrome.crafting.identity.roleUnattuned': 'Niet afgestemd',
+  'hudChrome.crafting.identity.skillAria':
+    '{craft}, vaardigheid {skill}, rang {tier}, {role}, {ceiling}',
+  'hudChrome.crafting.identity.syncing': 'Wachten op je ambachtsidentiteit van het rijk.',
+  'hudChrome.crafting.identity.title': 'Ambachtsidentiteit',
+  'hudChrome.crafting.identity.titleLabel': 'Titel',
+  'hudChrome.crafting.identity.tutorial':
+    'Eerste rang: bereik vaardigheid {skill} in een ambacht. Geslaagde recepten verhogen dat ambacht zonder kennis elders te wissen.',
+  'hudChrome.crafting.identity.unattuned':
+    'Er is geen archetype-paar actief. Je kennis wordt behouden, maar combinatierecepten vereisen een afgestemd paar.',
+  'hudChrome.crafting.noProfessionChoice': 'Er is momenteel geen geldige beroepskeuze beschikbaar.',
+  'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
+  'hudChrome.crafting.professionChoice': 'Beroepskeuze',
+  'hudChrome.deeds.lbScopeNote':
+    'Accounts gerangschikt op levenslange Roem. Elke daad telt eenmaal over alle personages op een account.',
+  'hudChrome.deeds.lbSelfAccount':
+    'Jouw account: rang {rank}, top {percent} procent, {renown} Roem',
+  'hudChrome.deeds.lbSelfRank': 'Jouw account: rang {rank}, top {percent} procent',
+  'hudChrome.nameplate.mobEliteLevel': '{level}+',
+  'hudChrome.nameplate.mobLevel': '{level}',
+  'hudChrome.specPanel.specUnlockBanner': 'Specialisatie Ontgrendeld!',
+  'hudChrome.specPanel.specUnlockHint': 'Druk op N om je specialisatie te kiezen.',
+  'hudChrome.wocStore.wallet.connect': 'Portemonnee koppelen',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    'De portemonnee-app is verbonden met deze browser, maar het openbare adres is nog niet gekoppeld aan je WoC-account.',
+  'hudChrome.wocStore.wallet.linkedConnected':
+    'Je gekoppelde portemonnee-app is verbonden en klaar voor SOL- of WOC-aankopen.',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    'Je openbare adres is gekoppeld. Verbind die portemonnee-app opnieuw wanneer je met SOL of WOC wilt betalen.',
+  'hudChrome.wocStore.wallet.manage': 'Portemonnee beheren',
+  'hudChrome.wocStore.wallet.mismatched':
+    'Er is een andere portemonnee verbonden. Verifieer hem om het gekoppelde adres te vervangen, of verbind de gekoppelde portemonnee opnieuw.',
+  'hudChrome.wocStore.wallet.reconnect': 'Portemonnee opnieuw verbinden',
+  'hudChrome.wocStore.wallet.title': 'Solana-portemonnee',
+  'hudChrome.wocStore.wallet.unlinked':
+    'Verbind een portemonnee-app en teken eenmaal om het openbare adres aan je WoC-account te koppelen. We ontvangen nooit je herstelzin of privésleutel.',
+  'hudChrome.wocStore.wallet.verify': 'Verifiëren en koppelen',
+  'wallet.bagConnect': 'Portemonnee koppelen',
+  'wallet.bagLink': 'Portemonnee verifiëren',
+  'wallet.bagReconnect': 'Portemonnee opnieuw verbinden',
+  'wallet.browser.completeBody': 'Je kunt terugkeren naar de World of ClaudeCraft desktop-app.',
+  'wallet.browser.completeTitle': 'Portemonnee-autorisatie voltooid',
+  'wallet.browser.continueWith': 'Doorgaan met {wallet}',
+  'wallet.browser.extensionHelp':
+    'Geen compatibele portemonnee-extensie gevonden. Installeer of ontgrendel Phantom, Solflare of een andere Solana-browserportemonnee en probeer het opnieuw.',
+  'wallet.browser.eyebrow': 'Desktop-portemonnee-autorisatie',
+  'wallet.browser.failed':
+    'Portemonnee-autorisatie mislukt of verlopen. Keer terug naar de desktop-app en probeer het opnieuw.',
+  'wallet.browser.linkBody':
+    'Kies een portemonnee-extensie in deze browser. Je tekent een verificatiebericht en keert dan terug naar de desktop-app.',
+  'wallet.browser.paymentBody':
+    'Kies de aan je account gekoppelde portemonnee en keur de transactie goed in deze browser.',
+  'wallet.browser.retry': 'Opnieuw proberen',
+  'wallet.browser.returnButton': 'Terug naar desktop-app',
+  'wallet.browser.reviewBody': 'Volg de aanwijzing van {wallet}. Houd deze browserpagina open.',
+  'wallet.browser.reviewTitle': 'Bekijken in je portemonnee',
+  'wallet.browser.safety': 'World of ClaudeCraft vraagt nooit naar je herstelzin of privésleutel.',
+  'wallet.browser.title': 'Een Solana-portemonnee verbinden',
+  'wallet.manualReturnBrowserHelp':
+    'Keer na goedkeuring terug naar dit speltabblad. Als iOS een andere browser opent, sluit die dan en keer handmatig terug naar de oorspronkelijke browser.',
+  'wallet.manualReturnStandaloneHelp':
+    'Keer na goedkeuring terug naar World of ClaudeCraft via je beginscherm. Als iOS een browser opent, sluit die dan en open de beginscherm-app handmatig opnieuw.',
+  'wallet.mobileAppHelp':
+    'Kies Phantom of Solflare. Je portemonnee-app vraagt om goedkeuring. Houd dit spel open en keer ernaar terug wanneer je klaar bent.',
+  'wallet.openAppButton': 'Open {wallet}',
+  'wallet.openAppHelp':
+    'Open {wallet} om dit verzoek te bekijken. Houd dit speltabblad open terwijl de portemonnee-app actief is.',
+  'wallet.openAppTitle': 'Doorgaan in {wallet}',
+  'wallet.preparingAppButton': '{wallet} voorbereiden...',
+  'wallet.standaloneAppHelp':
+    'Portemonneeverbindingen zijn nog niet beschikbaar in de beginscherm-app. Open World of ClaudeCraft in Safari of Chrome om Phantom of Solflare te gebruiken.',
+  'wallet.walletAppUnavailable':
+    '{wallet} kon niet worden voorbereid. Sluit dit venster en probeer het opnieuw.',
   'entities.abilities.primal_reflexes.description':
     'Je instincten verscherpen, waardoor je kans om aan te wijken met 50% stijgt gedurende 6 sec.',
   'entities.abilities.primal_reflexes.name': 'Oerreflexen',
@@ -156,6 +432,168 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Deze wereld is op dit moment vol. Probeer het over een paar minuten opnieuw.',
   'loading.tooManyConnections':
     'Er komen te veel verbindingen naar deze wereld vanuit jouw netwerk. Sluit extra spelvensters of probeer het over een paar minuten opnieuw.',
+  'entities.items.eastbrook_greatsword.name': 'Oostbeek-Grootzwaard',
+  'entities.items.highwatch_greatsword.name': 'Hoogwacht-Grootzwaard',
+  'entities.items.highwatch_wallshield.name': 'Hoogwacht-Muurschild',
+  'entities.items.eastbrook_buckler.name': 'Oostbeek-Beukelaar',
+  'entities.abilities.battle_stance.description':
+    'Een agressieve gevechtshouding: je genereert 10% meer woede. De standaardhouding voor Wapens en Protectie.',
+  'entities.abilities.battle_stance.name': 'Strijdhouding',
+  'entities.abilities.berserker_stance.description':
+    'Een roekeloze gevechtshouding: je kritieke treffers landen 3% vaker en raken 3% harder. De Razernij-krijger vecht altijd in deze houding.',
+  'entities.abilities.berserker_stance.name': 'Berserkerhouding',
+  'entities.abilities.breachmaker.description':
+    'Beuk het doelwit voor wapenschade plus {damage} en breek zijn dekking open: je eigen aanvallen op dat doelwit brengen gedurende 8 sec 20% meer schade toe. (Wapens)',
+  'entities.abilities.breachmaker.name': 'Bresmaker',
+  'entities.abilities.cleaving_blows.description':
+    'Rode Oogst geeft altijd een lading Dubbelslag terug. (Razernij)',
+  'entities.abilities.cleaving_blows.name': 'Klievende Slagen',
+  'entities.abilities.deep_wounds.description':
+    'Passief: je Verminkende Slag laat het doelwit bloeden voor Fysieke schade gedurende 6 sec. (Wapens)',
+  'entities.abilities.deep_wounds.name': 'Gapende Wonden',
+  'entities.abilities.defiant_bellow.description':
+    'Een tartend gebrul: elke vijand binnen 10 m wordt geprovoceerd en gedwongen jou gedurende 3 sec aan te vallen. (Protectie)',
+  'entities.abilities.defiant_bellow.name': 'Tartend Gebrul',
+  'entities.abilities.diabolical_twinstrike.description':
+    'Terwijl je Razend bent, brengt je Dubbelslag 15% meer schade toe. (Razernij)',
+  'entities.abilities.diabolical_twinstrike.name': 'Diabolische Dubbelslag',
+  'entities.abilities.die_by_sword.description':
+    'Defensieve afkoeltijd: gedurende 8 sec loop je 30% minder schade op en ontwijk je veel meer aanvallen.',
+  'entities.abilities.die_by_sword.name': 'Door het Zwaard',
+  'entities.abilities.emboldening_roar.description':
+    'Laat een bezielend gebrul los: jij en bevriende spelers binnen 40 m worden Bezield, en je volgende 3 vaardigheden zijn gegarandeerd kritieke treffers. (Razernij)',
+  'entities.abilities.emboldening_roar.name': 'Bezielend Gebrul',
+  'entities.abilities.enrage_passive.description':
+    'Passief: terwijl je Razend bent, breng je 7% meer schade toe, val je 25% sneller aan en beweeg je 10% sneller gedurende 4 sec. Aderlating heeft 30% kans om je Razend te maken; Rode Oogst doet dat altijd. (Razernij)',
+  'entities.abilities.enrage_passive.name': 'Amok',
+  'entities.abilities.faultline.description':
+    'Stuur een schokgolf door de grond: vijanden voor je binnen 8 m lopen {damage} schade op en worden gedurende 3 sec verdoofd. (Protectie)',
+  'entities.abilities.faultline.name': 'Breuklijn',
+  'entities.abilities.furious_mending.description':
+    'Gedurende 10 sec loop je 20% minder schade op, en zolang het duurt geneest je Aderlating je voor 20% van je maximale gezondheid. (Razernij)',
+  'entities.abilities.furious_mending.name': 'Woedend Herstel',
+  'entities.abilities.heroic_leap.description':
+    'Spring naar het doelgebied en breng bij de landing {damage} schade toe aan vijanden in de buurt.',
+  'entities.abilities.heroic_leap.name': 'Oorlogssprong',
+  'entities.abilities.intimidating_shout.description':
+    'Een angstaanjagende schreeuw die tot 5 vijanden binnen 8 m gedurende 8 sec in angst laat vluchten. Schade kan het effect verbreken.',
+  'entities.abilities.intimidating_shout.name': 'Intimiderende Schreeuw',
+  'entities.abilities.iron_resolve.description':
+    'Bijt op je tanden en negeer de pijn: verbruikt maximaal 40 woede (minimaal 20) om 4 schade per verbruikt woedepunt te absorberen, tot 10 sec. lang. (Protectie)',
+  'entities.abilities.iron_resolve.name': 'IJzeren Vastberadenheid',
+  'entities.abilities.measured_fury.description':
+    'Je beheerste woede scherpt je zuinigheid aan: je vaardigheden kosten 10% minder woede. (Wapens)',
+  'entities.abilities.measured_fury.name': 'Beheerste Woede',
+  'entities.abilities.piercing_howl.description':
+    'Een doordringende schreeuw die alle vijanden binnen 15 m gedurende 8 sec met 50% vertraagt.',
+  'entities.abilities.piercing_howl.name': 'Doordringend Gehuil',
+  'entities.abilities.raging_gale.description':
+    'Sla onmiddellijk tweemaal toe met je wapen, waarbij elke treffer 40% wapenschade plus {damage} toebrengt, en genereer 8 woede. Slaat maximaal 2 ladingen op. (Razernij)',
+  'entities.abilities.raging_gale.name': 'Dubbelslag',
+  'entities.abilities.raised_guard.description':
+    'Zet je schrap achter je schild: je loopt gedurende 6 sec 50% minder Fysieke schade op. Slaat maximaal 2 ladingen op. (Protectie)',
+  'entities.abilities.raised_guard.name': 'Geheven Schild',
+  'entities.abilities.rallying_cry.description':
+    'Slaak een moedig gebrul dat jou en groepsleden binnen 40 meter 10 sec. lang 20% extra maximale gezondheid geeft. Protectie: zij lopen gedurende die tijd ook 5% minder schade op.',
+  'entities.abilities.rallying_cry.name': 'Moedsbrul',
+  'entities.abilities.recklessness.description':
+    'Maakt je Razend: gedurende 12 sec neemt je woedeopbouw met 50% toe en je kans op kritieke treffers met 20%.',
+  'entities.abilities.recklessness.name': 'Roekeloosheid',
+  'entities.abilities.red_harvest.description':
+    'Zet alles in: sla driemaal woest toe voor telkens 65% wapenschade plus {damage}, en word altijd Razend. (Razernij)',
+  'entities.abilities.red_harvest.name': 'Rode Oogst',
+  'entities.abilities.revenge.description':
+    'Val aan in een brede boog en breng Fysieke schade toe aan alle vijanden voor je. Boven de 5 doelwitten wordt de schade verminderd. Wanneer je ontwijkt of pareert, kan je volgende Wraak geen woede kosten. (Protection)',
+  'entities.abilities.revenge.name': 'Wraak',
+  'entities.abilities.sanguine_aura.description':
+    'Doordring je wapen met het bloed van je vijanden: jij en je melee-bondgenoten krijgen gedurende 20 sec 10% aanvalssnelheid en 10% schade.',
+  'entities.abilities.sanguine_aura.name': 'Bloedrode Aura',
+  'entities.abilities.seasoned_soldier.description':
+    'Je kritieke auto-aanvallen genereren 10% meer woede. (Wapens)',
+  'entities.abilities.seasoned_soldier.name': 'Doorgewinterde Soldaat',
+  'entities.abilities.storm_bolt.description':
+    'Slinger je wapen naar het doelwit voor {damage} en verdoof het gedurende 3 sec.',
+  'entities.abilities.storm_bolt.name': 'Stormbout',
+  'entities.abilities.sudden_death.description':
+    'Je auto-aanvallen hebben een kans om je Vroeg Graf te laten inzetten op een doelwit ongeacht zijn gezondheid, zonder woedekosten. (Wapens)',
+  'entities.abilities.sudden_death.name': 'Plotse Dood',
+  'entities.abilities.sweeping_strikes.description':
+    'Gedurende 12 sec raken je aanvallen op een enkel doelwit ook 1 nabije vijand voor volledige schade. (Wapens)',
+  'entities.abilities.sweeping_strikes.name': 'Verbredende Boog',
+  'entities.abilities.victory_rush.description':
+    'Sla toe voor wapenschade plus {damage} en genees 20% van je maximale gezondheid. Alleen bruikbaar binnen 20 sec na het doden van een vijand.',
+  'entities.abilities.victory_rush.name': 'Overwinningsroes',
+  'hudChrome.specPanel.complexity': 'Complexiteit',
+  'hudChrome.specPanel.complexityHigh': 'Hoog',
+  'hudChrome.specPanel.complexityLow': 'Laag',
+  'hudChrome.specPanel.complexityMedium': 'Gemiddeld',
+  'hudChrome.specPanel.exampleAbilities': 'Voorbeeldvaardigheden',
+  'hudChrome.specPanel.primaryAttr': 'Primaire eigenschap',
+  'hudChrome.specPanel.selectSpec': 'Specialisatie kiezen',
+  'hudChrome.specPanel.viewTalents': 'Talenten bekijken',
+  'hudChrome.talentRows.comingSoon': 'Binnenkort',
+  'hudChrome.talentRows.defaultLoadout': 'Standaardopstelling',
+  'hudChrome.talentRows.tab': 'Keuzes',
+  'hudChrome.talentRows.readoutSummary': 'Talenten: {head}, {spent}/{total} rijen geselecteerd.',
+  'entities.abilities.aspect_of_the_wild.name': 'Wildtandgedaante',
+  'entities.abilities.avenging_wrath.name': 'Wraakvleugel',
+  'entities.abilities.berserk.name': 'Rode nevel',
+  'entities.abilities.blink.name': 'Flikkerstap',
+  'entities.abilities.bloodlust.name': 'Oorlogstrommen',
+  'entities.abilities.chain_lightning.name': 'Gevorkte bliksem',
+  'entities.abilities.chaos_bolt.name': 'Ruinenschicht',
+  'entities.abilities.cloak_of_shadows.name': 'Schaduwmantel',
+  'entities.abilities.cone_of_cold.name': 'Vorstveeg',
+  'entities.abilities.curse_of_exhaustion.name': 'Loden vloek',
+  'entities.abilities.death_coil.name': 'Grafspiraal',
+  'entities.abilities.deep_freeze.name': 'Doodsvorst',
+  'entities.abilities.desperate_prayer.name': 'Laatste gebed',
+  'entities.abilities.deterrence.name': 'Borstelwacht',
+  'entities.abilities.divine_shield.name': 'Lichtwacht',
+  'entities.abilities.earthbind.name': 'Grijpende aarde',
+  'entities.abilities.evocation.name': 'Etherbron',
+  'entities.abilities.frenzied_regeneration.name': 'Wilde genezing',
+  'entities.abilities.frost_trap.name': 'Rijpval',
+  'entities.abilities.ghostly_strike.name': 'Spookslag',
+  'entities.abilities.hammer_of_wrath.name': 'Klinkende hamer',
+  'entities.abilities.healing_stream.name': 'Bronwel',
+  'entities.abilities.holy_wrath.name': 'Heiligenwoede',
+  'entities.abilities.howl_of_terror.name': 'Huiveringwekkende huil',
+  'entities.abilities.ice_block.name': 'Koude kist',
+  'entities.abilities.inner_focus.name': 'Gestilde geest',
+  'entities.abilities.innervate.name': 'Levenssap',
+  'entities.abilities.meteor.name': 'Hemelsteen',
+  'entities.abilities.mind_sear.name': 'Gedachtenbrand',
+  'entities.abilities.multi_shot.name': 'Splijtschot',
+  'entities.abilities.prayer_of_healing.name': 'Koorherstel',
+  'entities.abilities.preparation.name': 'Noodplan',
+  'entities.abilities.presence_of_mind.name': 'Razende geest',
+  'entities.abilities.psychic_scream.name': 'Psychische schreeuw',
+  'entities.abilities.shadowstep.name': 'Schaduwglip',
+  'entities.abilities.silence.name': 'Stilte',
+  'entities.abilities.tranquility.name': 'Woudlied',
+  'entities.abilities.cleansing_verdict.name': 'Zuiverend Vonnis',
+  'entities.abilities.cleansing_verdict.description':
+    'Verwijdert een schadelijk magisch effect van een bevriend doelwit en geneest het met Heilige magie voor {damage}.',
+  'entities.abilities.smoke_screen.name': 'Rookgordijn',
+  'entities.abilities.smoke_screen.description':
+    'Je verdwijnt in een rookwolk, waardoor je ontwijkingskans 8 sec. lang met 30% toeneemt.',
+  'entities.abilities.spellsteal.name': 'Spreukroof',
+  'entities.abilities.spellsteal.description':
+    'Steelt een gunstig magisch effect van een vijand en draagt het op jou over.',
+  'entities.abilities.startle_shot.name': 'Schrikschot',
+  'entities.abilities.startle_shot.description':
+    'Een wild schot dat het doelwit {duration} sec. desoriënteert. Elke vorm van schade verbreekt het effect.',
+  'entities.abilities.typhoon.name': 'Tyfoon',
+  'entities.abilities.typhoon.description':
+    'Een windvlaag stoot alle vijanden binnen 8 m terug en versuft ze, waardoor hun bewegingssnelheid 4 sec. lang met 50% afneemt.',
+  'entities.abilities.voidfeast.name': 'Leegtefeest',
+  'entities.abilities.voidfeast.description':
+    'Verslindt een magisch effect (een gunstig effect van een vijand of een schadelijk effect van een bondgenoot) en geneest je voor 6% van je maximale gezondheid.',
+  'hudChrome.abilityError.shieldRequired': 'Je moet een schild hebben uitgerust.',
+  'entities.abilities.collective_reversal.name': 'Collectieve omkering',
+  'entities.abilities.collective_reversal.description':
+    'Spoelt de tijdlijn van elk gesneuveld lid van je groep of raid terug en brengt hen bij hun lichaam tot leven met 30% gezondheid en mana. Kan niet tijdens een gevecht worden gebruikt. (Chronomantie)',
   'entities.abilities.sport_boot.description':
     'Een lange, hoge uithaal richting het richtpunt. Het publiek smult ervan.',
   'entities.abilities.sport_boot.name': 'Grote Uithaal',
@@ -415,16 +853,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.walkUp': 'Loop naar het Zeugveld om toe te kijken vanaf de tribunes.',
   'hudChrome.archetypeTitle.label': 'Titel',
   'hudChrome.archetypeTitle.none': 'Geen',
-  'hudChrome.archetypeTitle.armorcrafting': 'Harnasmaker',
-  'hudChrome.archetypeTitle.weaponcrafting': 'Wapensmid',
-  'hudChrome.archetypeTitle.jewelcrafting': 'Juwelier',
-  'hudChrome.archetypeTitle.alchemy': 'Alchemist',
-  'hudChrome.archetypeTitle.engineering': 'Knutselaar',
-  'hudChrome.archetypeTitle.cooking': 'Kok',
-  'hudChrome.archetypeTitle.inscription': 'Schrijver',
-  'hudChrome.archetypeTitle.enchanting': 'Betoveraar',
-  'hudChrome.archetypeTitle.tailoring': 'Kleermaker',
-  'hudChrome.archetypeTitle.leatherworking': 'Leerbewerker',
   'entities.itemSets.crownforged.bonus4':
     'Je kritieke wapentreffers splinteren het doelwit met Beensplinter, waardoor het 8 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer.',
   'entities.itemSets.deathlord.bonus4':
@@ -1739,7 +2167,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verdooft het doelwit gedurende 2 sec. Alleen in Bruingedaante.',
   'entities.abilities.bash.name': 'Bedwelmen',
   'entities.abilities.battle_shout.description':
-    'Verhoogt je aanvalskracht met {buff} gedurende 2 min.',
+    'Een kreet die de aanvalskracht van alle groepsleden met {buff}% verhoogt gedurende 30 min.',
   'entities.abilities.battle_shout.name': 'IJzeren Gebrul',
   'entities.abilities.bear_charge.description':
     'Storm op een vijand af, genereer 9 woede en verdoof hem gedurende 1 sec. Bereik 8-25 m. Alleen in Bruingedaante.',
@@ -1776,9 +2204,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleave.description':
     'Een vegende slag die alle vijanden voor je raakt voor {damage} schade.',
   'entities.abilities.cleave.name': 'Maaiboog',
-  'entities.abilities.commanding_shout.description':
-    'Verhoogt je Uithoudingsvermogen met {buff} gedurende 2 min.',
-  'entities.abilities.commanding_shout.name': 'Versterkende Kreet',
   'entities.abilities.concussive_shot.description':
     'Versuft het doelwit voor {damage} schade, waardoor de beweging met 50% wordt vertraagd gedurende 4 sec.',
   'entities.abilities.concussive_shot.name': 'Ratelend Schot',
@@ -1816,7 +2241,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Demoraliseert nabije vijanden en verlaagt hun aanvalskracht met 20 gedurende 20 sec. Alleen in Bruingedaante.',
   'entities.abilities.demoralizing_roar.name': 'Laf Gebrul',
   'entities.abilities.demoralizing_shout.description':
-    'Slaakt een angstaanjagende kreet die de aanvalskracht van alle nabije vijanden met {buff} verlaagt gedurende 30 sec.',
+    'Slaakt een angstaanjagende kreet die de schade die alle nabije vijanden aanrichten met {buff}% verlaagt gedurende 20 sec.',
   'entities.abilities.demoralizing_shout.name': 'Grimmig Gehuil',
   'entities.abilities.devotion_aura.description':
     'Verhoogt je pantser met {buff} gedurende 30 min.',
@@ -2029,17 +2454,14 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.description':
     'Geneest het doelwit voor {damage} gedurende 12 sec.',
   'entities.abilities.rejuvenation.name': 'Wildbloei',
-  'entities.abilities.rend.description':
-    'Verwondt het doelwit, waardoor het {damage} schade bloedt gedurende {duration} sec.',
-  'entities.abilities.rend.name': 'Diepe Snee',
   'entities.abilities.renew.description': 'Geneest het doelwit voor {damage} gedurende 15 sec.',
   'entities.abilities.renew.name': 'Aanhoudende Genade',
   'entities.abilities.retribution_aura.description':
     'Omhult je 30 min lang met heilige energie en brengt 5 Heilige schade toe aan elke vijand die je in het melee aanvalt.',
   'entities.abilities.retribution_aura.name': 'Aura van Vergelding',
   'entities.abilities.revive_pet.description':
-    'Doet je dode huisdier herleven en brengt het terug aan je zijde.',
-  'entities.abilities.revive_pet.name': 'Huisdier Herleven',
+    'Lapt je huisdier op. Als het leeft, herstelt het in totaal {overTime} gezondheid gedurende 12 sec., met elke 3 sec. een tik. Als het dood is, wordt het met 35% gezondheid tot leven gewekt.',
+  'entities.abilities.revive_pet.name': 'Oplappen',
   'entities.abilities.righteous_fury.description':
     'Verhoogt de dreiging die je Heilige schade opwekt met 60% gedurende 30 min. De hoeksteen van de tankende paladijn.',
   'entities.abilities.righteous_fury.name': 'Brandende Eed',
@@ -2175,7 +2597,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_power.name': 'Arcanekracht',
   'entities.abilities.arcane_power.description':
     'Verhoogt spreukschade met 20% en spreukhaast met 10% gedurende 10 sec. (Arcane-signatuur)',
-  'entities.abilities.combustion.name': 'Verbranding',
+  'entities.abilities.combustion.name': 'Feniks-trance',
   'entities.abilities.combustion.description':
     'Verhoogt de kritieke kans van spreuken met 50% gedurende 15 sec. (Fire-signatuur)',
   'entities.abilities.icy_veins.name': 'IJzige Aders',
@@ -2567,6 +2989,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cord.name': 'Zielsvlam-Koord',
   'entities.items.stormcallers_waistguard.name': 'Lendenbescherming van de Stormroeper',
   'entities.items.stormcallers_spaulders.name': 'Galecall-Schouderstukken',
+  'entities.items.bonewrought_greatsword.name': 'Bonewrought-Grootzwaard',
+  'entities.items.direfang_greatblade.name': 'Direfang-Grootkling',
+  'entities.items.bonewrought_bulwark.name': 'Bonewrought-Bolwerk',
+  'entities.items.wraithfire_orb.name': 'Wraithfire-Orb',
   'entities.items.stormshard_leggings.name': 'Stormscherf-Beenbescherming',
   'entities.items.sturdy_belt.name': 'Stevige Reizigersgordel',
   'entities.items.supply_crate.name': 'Gestolen Voorradenkist',
@@ -3607,8 +4033,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Stormt op een verre vijand af om het gevecht te openen met een korte verdoving.',
   'guide.abilityHook.cheap_shot':
     'Open vanuit sluiptocht met een verdoving en een voorsprong op combopunten.',
-  'guide.abilityHook.commanding_shout':
-    'Versterkt uithoudingsvermogen zodat iedereen meer staande blijft in een gevecht.',
   'guide.abilityHook.concussive_shot':
     'Verdooft het doelwit en vertraagt het zodat het je niet kan bereiken.',
   'guide.abilityHook.conjure_food':
@@ -3673,7 +4097,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een harde uithaal van dichtbij voor wanneer iets de afstand met je overbrugt.',
   'guide.abilityHook.rejuvenation':
     'Wordt direct uitgesproken en geneest een bondgenoot na verloop van tijd, zodat je kunt blijven handelen.',
-  'guide.abilityHook.rend': 'Opent een bloeding die het doelwit na verloop van tijd uitput.',
   'guide.abilityHook.renew':
     'Een genezing die tikt na verloop van tijd, goed om uit te spreken en te blijven bewegen.',
   'guide.abilityHook.rockbiter_weapon':
@@ -4992,7 +5415,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.pet.rename': 'Huisdier hernoemen',
   'hud.pet.renameConfirm': 'Hernoemen',
   'hud.pet.renameLabel': 'Kies een nieuwe naam voor je huisdier.',
-  'hud.pet.revive': 'Huisdier herleven',
+  'hud.pet.revive': 'Oplappen',
   'hud.pet.stanceDesc': 'Klik om Passief, Verdedigend of Agressief te kiezen.',
   'hud.pet.stanceTitle': 'Huisdierhouding',
   'hud.pet.taunt': 'Provoceren',
@@ -5334,8 +5757,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.leaderboard': 'Ranglijst',
   'hudChrome.mobile.nameplates': 'Namen',
   'hudChrome.mobile.toggleHaptics': 'Haptiek aan/uit',
-  'hudChrome.nameplate.mob': '[{level}] {name}',
-  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
   'hudChrome.options.browserEffects': 'Browsereffecten',
   'hudChrome.options.browserEffectsAuto': 'Automatisch',
   'hudChrome.options.browserEffectsFull': 'Volledig',
@@ -5697,6 +6118,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.helmet': 'Helm',
   'itemUi.slots.legs': 'Benen',
   'itemUi.slots.mainhand': 'Hoofdhand',
+  'itemUi.slots.twoHand': 'Tweehandig',
+  'itemUi.slots.offhand': 'Bijhand',
   'itemUi.slots.shoulder': 'Schouder',
   'itemUi.slots.waist': 'Middel',
   'itemUi.stats.agi': 'Behendigheid',
@@ -6338,7 +6761,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.bonus3': 'Verhoogt aanvals- en spreuksnelheid met 15%.',
   'entities.itemSets.necromancers.name': 'Mournweave-Gewaden',
   'entities.itemSets.necromancers.bonus2':
-    'Je kunt niet worden teruggeslagen (100% terugslagweerstand).',
+    'Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).',
   'entities.itemSets.necromancers.bonus3':
     'Verhoogt intellect met 10 en uithoudingsvermogen met 10.',
   'entities.itemSets.nighttalon.name': 'Direfang-Pels',
@@ -6347,12 +6770,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verhoogt behendigheid met 15, kritieke kans met 2% en aanvals- en spreuksnelheid met 15%.',
   'entities.itemSets.soulflame.name': 'Wraithfire-Regalia',
   'entities.itemSets.soulflame.bonus2':
-    'Je kunt niet worden teruggeslagen (100% terugslagweerstand).',
+    'Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).',
   'entities.itemSets.soulflame.bonus3':
     'Verhoogt intellect met 15, geest met 15 en aanvals- en spreuksnelheid met 15%.',
   'entities.itemSets.stormcallers.name': 'Galecall-Gewaden',
   'entities.itemSets.stormcallers.bonus2':
-    'Je kunt niet worden teruggeslagen (100% terugslagweerstand).',
+    'Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).',
   'entities.itemSets.stormcallers.bonus3':
     'Verhoogt intellect met 15, geest met 15 en aanvals- en spreuksnelheid met 15%.',
   'entities.itemSets.vale_arcanist.name': 'Gewaden van de Dal-arcanist',
@@ -6469,6 +6892,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.swag.claimed': 'Geclaimd',
   'hudChrome.discord.swag.locked': 'Vergrendeld',
   'hudChrome.discord.swag.free': 'Gratis',
+  'hudChrome.fct.cheap': 'Goedkoper!',
   'hudChrome.discord.swag.cost': '{points} ptn',
   'hudChrome.discord.swag.needTier': 'Bereik een hogere rang om dit te claimen.',
   'hudChrome.discord.swag.needPoints': 'Niet genoeg punten.',
@@ -6776,15 +7200,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.mobileCameraJoystick': 'Camerajoystick',
   'hudChrome.options.mobileLeftHanded': 'Linkshandige indeling',
   'entities.quests.q_archetype_acceptance.title': 'Een ambacht dat u het uwe kunt noemen',
-  'entities.quests.q_archetype_acceptance.text':
-    'Elke ambachtsman van Eastbrook kiest uiteindelijk voor één ambacht dat hij zijn eigen ambacht noemt. Bewijs jezelf met één enkele daad, {playerName}, en geef je pad aan.',
-  'entities.quests.q_archetype_acceptance.completion': 'Jouw pad is gekozen; loop er goed mee.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Boswolf gedood',
   'entities.quests.q_prof_make_amends.title': 'Het goedmaken',
-  'entities.quests.q_prof_make_amends.text':
-    'Om het ene vaartuig voor het andere opzij te zetten, moet een ambachtsman eerst het niet bewandelde pad goedmaken, {playerName}.',
-  'entities.quests.q_prof_make_amends.completion':
-    'Wijzigingen aangebracht; er ligt een nieuw pad voor je open.',
   'entities.quests.q_prof_make_amends.objectives.0.label': 'Boswolf gedood',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Elke kist, koffer en snuisterij is veilig bij de Vergulde Geldkist.',
@@ -7039,11 +7455,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.steam.title': 'Steam',
   'hudChrome.steam.unlink': 'Steam ontkoppelen',
   'entities.items.chunk_of_ore.name': 'Brok erts',
-  'entities.quests.q_prof_intro.completion':
-    'Zie je? Erts in je tas en eelt op je handen. Blijf mijnen, houthakken en kruiden plukken terwijl je over de wegen reist. Wanneer je terug in de stad bent, kijk dan naar het bord met de Stadsfocus bij de markt en de werkbank ernaast. Er valt met alles een eerlijke boterham te verdienen, als je dat wilt.',
-  'entities.quests.q_prof_intro.objectives.0.label': 'Brok erts',
-  'entities.quests.q_prof_intro.text':
-    'Iedereen in Oostbeek beoefent naast het zwaard een ambacht, {playerName}. Er liggen ertsaders rond de stad, dus zwaai met een pikhouweel en breng me 5 brokken. Delf ze zelf, hoor; ik merk het verschil.',
   'entities.quests.q_prof_intro.title': 'Een ambacht voor iedere hand',
   'hudChrome.auth.appleChoiceExpired':
     'Deze aanmelding bij Apple is verlopen. Meld je opnieuw aan met Apple.',
@@ -7579,6 +7990,139 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.staff': 'Staf',
   'hudChrome.wocStore.wtype.sword': 'Zwaard',
   'hudChrome.wocStore.wtype.wand': 'Toverstaf',
+  'guide.abilityHook.revenge':
+    'Raakt vijanden voor je en kan gratis worden na een ontwijking of parering.',
+  'guide.abilityHook.hamstring':
+    'Belemmert de beweging van een vijand zodat die niet kan ontsnappen.',
+  'entities.abilities.aura_surge.name': 'Dageraadskets',
+  'entities.abilities.aura_surge.description':
+    'Slingert een bij dageraad gesmeed schild voor {damage} Heilige schade, legt het hoofddoel 2 sec. het zwijgen op en stuitert daarna naar maximaal 2 extra vijanden binnen 10 meter voor 75% schade per stuiter. (Paladijntalent)',
+  'entities.abilities.aspect_of_the_wild.description':
+    'Inspireert bondgenoten binnen 30 m met wilde kracht en verhoogt hun aanvalskracht met 45 en aanvalssnelheid met 5% gedurende 5 min. (jagertalent)',
+  'entities.abilities.avatar.name': 'Avatar',
+  'entities.abilities.avatar.description':
+    'Verander 20 sec. lang in een kolos, verbreek alle controle-effecten op jezelf en verhoog je toegebrachte schade met 20%.',
+  'entities.abilities.avenging_wrath.description':
+    'Roept wrekende kracht op en verhoogt je aanvalskracht met 60 en spreukkracht met 30 gedurende 20 sec. (paladijntalent)',
+  'entities.abilities.berserk.description':
+    'Verhoogt je aanvalskracht met 70 gedurende 15 sec. (druïdetalent)',
+  'entities.abilities.bladestorm.name': 'Messenstorm',
+  'entities.abilities.bladestorm.description':
+    'Word een wervelende storm van staal en tref 4 sec. lang elke seconde alle vijanden binnen 6 meter voor {damage} schade.',
+  'entities.abilities.blink.description':
+    'Teleporteert je 15 m vooruit en verbreekt worteleffecten. (magiërtalent)',
+  'entities.abilities.bloodlust.description':
+    'Jaagt bondgenoten binnen 30 m tot razernij en verhoogt hun aanvalssnelheid met 30% gedurende 15 sec. (sjamaantalent)',
+  'entities.abilities.chain_lightning.description':
+    'Slingert bliksem naar het doelgebied en brengt nabije vijanden {damage} schade toe. (sjamaantalent)',
+  'entities.abilities.chaos_bolt.description':
+    'Slingert een chaotische vuurstraal die {damage} Vuurschade toebrengt. (tovenaarstalent)',
+  'entities.abilities.cloak_of_shadows.description':
+    'Hult je in schaduwen en absorbeert 420 schade gedurende 5 sec. (schurkentalent)',
+  'entities.abilities.cone_of_cold.description':
+    'Golpea a nabije vijanden con escarcha e inflige {damage} de daño de Vorst. (magiertalent)',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Vervloekt het doelwit en vermindert de bewegingssnelheid met 30% gedurende 12 sec. (tovenaarstalent)',
+  'entities.abilities.death_coil.description':
+    'Treft de vijand voor {damage} Schaduwschade en vervult hem daarna 3 sec. met afgrijzen. (tovenaarstalent)',
+  'entities.abilities.deep_freeze.description':
+    'Congela profundamente a doelwit, inflige {damage} de daño de Vorst y lo aturde durante 4 sec. (magiertalent)',
+  'entities.abilities.desperate_prayer.description':
+    'Geneest je direct voor {damage}. (priestertalent)',
+  'entities.abilities.deterrence.description':
+    'Verhoogt je ontwijkingskans met 50 procentpunten gedurende 10 sec. (jagertalent)',
+  'entities.abilities.divine_shield.description':
+    'Beschermt je met heilige kracht en absorbeert 900 schade gedurende 8 sec. (paladijntalent)',
+  'entities.abilities.earthbind.description':
+    'Bindt nabije vijanden aan de aarde en wortelt ze 2 sec. (sjamaantalent)',
+  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magiertalent)',
+  'entities.abilities.frenzied_regeneration.description':
+    'Herstelt 180 gezondheid gedurende 10 sec. Alleen in Berenvorm. (druïdetalent)',
+  'entities.abilities.frost_trap.description':
+    'Bevriest vijanden in het doelgebied 3 sec. en verhindert dat ze bewegen of handelen. (jagertalent)',
+  'entities.abilities.ghostly_strike.description':
+    'Treft de vijand voor wapenschade plus {damage}, verhoogt kort de ontwijking en kent 1 combinatiepunt toe. (schurkentalent)',
+  'entities.abilities.hammer_of_wrath.description':
+    'Slingert een heilige hamer naar een gewonde vijand en brengt {damage} Heilige schade toe. Alleen bruikbaar onder 20% gezondheid. (paladijntalent)',
+  'entities.abilities.healing_stream.description':
+    'Herstelt 120 gezondheid van een bevriend doelwit gedurende 12 sec. (sjamaantalent)',
+  'entities.abilities.holy_wrath.description':
+    'Ontketent heilige kracht en brengt nabije vijanden {damage} schade toe. (paladijntalent)',
+  'entities.abilities.howl_of_terror.description':
+    'Jaagt nabije vijanden tot 3 sec. angst aan. Schade kan het effect verbreken. (tovenaarstalent)',
+  'entities.abilities.ice_block.description':
+    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sec. (magiertalent)',
+  'entities.abilities.inner_focus.description':
+    'Maakt je volgende spreuk gratis. Duurt 60 sec. (priestertalent)',
+  'entities.abilities.innervate.description':
+    'Levend sap welt 10 sec. in je op en herstelt in golven 20 van je huidige hulpbron: mana, woede of energie. Van gedaante wisselen onderbreekt het niet. Slaap, verdoving of stasis brengt het sap tot stilstand. (druïdetalent)',
+  'entities.abilities.mend_pet.name': 'Oplappen',
+  'entities.abilities.mend_pet.description':
+    'Sana a vriendelijk doelwit por {damage} durante 15 sec. (jagertalent)',
+  'entities.abilities.meteor.description':
+    'Roept een meteoor neer op het doelgebied en brengt {damage} Vuurschade toe. Daarna lijden vijanden daar 6 sec. lang elke 2 sec. 12 tot 18 Vuurschade. (magiërtalent)',
+  'entities.abilities.mind_sear.description':
+    'Kanaliseert Schaduwenergie naar het doelgebied en brengt nabije vijanden elke seconde {damage} schade toe. (priestertalent)',
+  'entities.abilities.multi_shot.description':
+    'Vuurt een salvo af op het doelgebied en brengt vijanden binnen een straal van 8 m {damage} Fysieke schade toe. (jagertalent)',
+  'entities.abilities.prayer_of_healing.description':
+    'Geneest nabije bondgenoten voor {damage}. (priestertalent)',
+  'entities.abilities.preparation.description':
+    'Beëindigt de afkoeltijd van Sprint, Ontwijking en Verdwijning. (schurkentalent)',
+  'entities.abilities.presence_of_mind.description':
+    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sec. (magiertalent)',
+  'entities.abilities.psychic_scream.description':
+    'Jaagt nabije vijanden tot 4 sec. angst aan. Schade kan het effect verbreken. (priestertalent)',
+  'entities.abilities.shadowstep.description':
+    'Stapt door de schaduwen naar je doelwit. (schurkentalent)',
+  'entities.abilities.silence.description':
+    'Legt het doelwit 4 sec. het zwijgen op. (priestertalent)',
+  'entities.abilities.tranquility.description':
+    'Kanaliseert 4 sec. herstellende energie en geneest bondgenoten binnen 30 m elke seconde voor 42 tot 52. (druïdetalent)',
+  'game.talents.readout.rowsSummary': 'Talenten: {head}, {picked}/{unlocked} keuzerijen gekozen.',
+  'hudChrome.fct.absorbed': '{amount} geabsorbeerd',
+  'game.talents.choicesTab': 'Keuzes',
+  'game.talents.rowUnlockToast': 'Een nieuwe talentkeuze is ontgrendeld!',
+  'game.talents.rowUnlocks': 'Wordt ontgrendeld op niveau {level}',
+  'entities.abilities.blazing_barrier.name': 'Vlammende barrière',
+  'entities.abilities.blazing_barrier.description':
+    'Omhul jezelf met vlammen en absorbeer 130 schade gedurende 60 sec. (Vuur)',
+  'entities.abilities.cold_snap.name': 'Roep van de winter',
+  'entities.abilities.cold_snap.description':
+    'Voltooit de afkoeltijd van Flitsstap, Vorstsluier en Grotere onzichtbaarheid. (magiërstalent)',
+  'entities.abilities.greater_invisibility.name': 'Grotere onzichtbaarheid',
+  'entities.abilities.greater_invisibility.description':
+    'Verdwijn gedurende 20 sec.: verwijdert 2 effecten met schade over tijd en je loopt 90% minder schade op terwijl je onzichtbaar bent en kort daarna. (magiërstalent)',
+  'entities.abilities.hot_streak.name': 'Hete reeks',
+  'entities.abilities.hot_streak.description':
+    'Passief: twee kritieke treffers achter elkaar met je Vuurspreuken (Sintelbout, Sintelval, Blakeren, Pyrelans of Vlammenslag) maken je volgende Pyrelans of Vlammenslag onmiddellijk en gratis. De verbruikers tellen mee voor de VOLGENDE reeks, inclusief gratis spreuken; Vlammenslag telt één keer, hoeveel vijanden hij ook raakt, en alleen de eerste inslag telt ooit mee. (Vuur)',
+  'entities.abilities.ice_floes.name': 'IJsschotsen',
+  'entities.abilities.ice_floes.description':
+    'Je volgende twee spreuken met een casttijd kunnen tijdens het bewegen worden uitgesproken. Duurt 15 sec. (magiërstalent)',
+  'entities.abilities.ignition.name': 'Ontbranding',
+  'entities.abilities.ignition.description':
+    'Passief: kritieke treffers van je spreuken verbranden het doelwit voor 40% van de toegebrachte schade gedurende 6 sec. en stapelen. (Vuurmeesterschap)',
+  'entities.abilities.mass_barrier.name': 'Massabarrière',
+  'entities.abilities.mass_barrier.description':
+    'Beschermt jou en maximaal 4 nabije bondgenoten binnen 30 m; elke barrière absorbeert 130 schade gedurende 60 sec. (magiërstalent)',
+  'entities.abilities.overload.name': 'Overbelasting',
+  'entities.abilities.overload.description':
+    'Je volgende spreuk wordt met 40% versterkt, maar kost 50% meer mana. Duurt 10 sec. (magiërstalent)',
+  'entities.abilities.power_echo.name': 'Krachtsecho',
+  'entities.abilities.power_echo.description':
+    'Je volgende directe spreuk herhaalt zich met 50% kracht op hetzelfde doelwit. Duurt 10 sec. (magiërstalent)',
+  'entities.abilities.rings_of_frost.name': 'Ring van vorst',
+  'entities.abilities.rings_of_frost.description':
+    'Roept gedurende 10 sec. een ring op. Vijanden die de rand oversteken, worden 4 sec. bevroren. (magiërstalent)',
+  'entities.abilities.rune_of_power.name': 'Krachtrune',
+  'entities.abilities.rune_of_power.description':
+    'Teken gedurende 15 sec. een krachtrune aan je voeten: bondgenoten binnen 8 m brengen 10% meer schade toe. (magiërstalent)',
+  'entities.abilities.summon_water_elemental.name': 'Waterelementaal oproepen',
+  'entities.abilities.summon_water_elemental.description':
+    'Roep een Waterelementaal op om naast je te vechten, Waterbouten naar je doelwit te slingeren en Waterstraal te kanaliseren. (Vorst)',
+  'entities.mobs.water_elemental.name': 'Waterelementaal',
+  'entities.items.conjured_bread4.name': 'Getoverd feestbrood',
+  'entities.items.conjured_water4.name': 'Getoverd bronwater',
   'devCommand.actions.attune.description': 'Markeer alle afstemmingsvereisten als voltooid.',
   'devCommand.actions.attune.label': 'Afstemmingen ontgrendelen',
   'devCommand.actions.bot.description':
@@ -7736,4 +8280,30 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Open het Vervaardigingsvenster (standaardtoets T) om al je bekende recepten, hun benodigdheden en je voorraad te zien; als de materialen er zijn, volstaat één klik. Gewone recepten kunnen overal worden gemaakt. Enkele geavanceerde recepten, waaronder hoogwaardig gereedschap en zeldzaam pantser voor magiërs, vereisen het vervaardigingscentrum in Highwatch.',
   'guide.gear.qualityBody':
     'Elk voorwerp heeft een kwaliteit en de naam krijgt de bijbehorende kleur, zodat je de waarde in één oogopslag ziet. Van gewoon tot kostbaar:',
+  'hudChrome.auraEffect.battleStance': 'Strijdhouding: 10% meer woedeopbouw',
+  'hudChrome.auraEffect.berserkerStance':
+    'Berserkerhouding: kritieke treffers landen 3% vaker en raken 3% harder',
+  'hudChrome.auraEffect.crit': 'Verhoogt kans op kritieke treffers met {pct}%',
+  'hudChrome.auraEffect.rageGen': 'Verhoogt woedeopbouw met {pct}%',
+  'hudChrome.auraEffect.reckless':
+    'Verhoogt kans op kritieke treffers met {pct}% en woedeopbouw met {ragePct}%',
+  'hudChrome.auraEffect.avatar': 'Kolossus: toegebrachte schade verhoogd met {pct}%',
+  'hudChrome.auraEffect.bloodbath':
+    'Verhoogt kans op kritieke treffers en toegebrachte schade met {pct}%',
+  'hudChrome.auraEffect.dieBySword': 'Vermindert opgelopen schade met {pct}%',
+  'hudChrome.auraEffect.sanguine':
+    'Verhoogt aanvalssnelheid met {hastePct}% en toegebrachte schade met {dmgPct}%',
+  'hudChrome.auraEffect.battleTrance':
+    'Je volgende Plunderaarsslag of Verminkende Slag kost geen woede',
+  'hudChrome.auraEffect.revengeFree': 'Je volgende Wraak kost geen woede',
+  'hudChrome.auraEffect.victoryRush': 'Overwinningsroes is gereed',
+  'hudChrome.auraEffect.maxHpPct': 'Verhoogt maximale gezondheid met {pct}%',
+  'hudChrome.statInfo.names.parry': 'Parering',
+  'hudChrome.statInfo.desc.parry':
+    'Je kans om een frontale melee-aanval volledig te pareren, zodat je geen schade oploopt. Een klap van achteren kan niet worden gepareerd.',
+  'hud.combat.floatingParry': 'Parering',
+  'hud.combat.parried': 'Je {ability} wordt gepareerd door {target}.',
+  'hudChrome.options.mouseoverCast': 'Mouseover-bezwering op groepsframes',
+  'hudChrome.options.showTargetOfTarget': 'Doelwit van doelwit tonen',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Doelwit van het doelwit',
 };

@@ -33,13 +33,6 @@ export const TARGETS = [
     when: ['tests/tank_defensive_cds.test.ts'],
     variants: [
       {
-        key: 'warrior-desktop',
-        charClass: 'warrior',
-        charName: 'Ironward',
-        abilityId: 'ironhold',
-        nearbyAbilityId: 'defensive_stance',
-      },
-      {
         key: 'paladin-desktop',
         charClass: 'paladin',
         charName: 'Dawnward',

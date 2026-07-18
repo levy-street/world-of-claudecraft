@@ -77,12 +77,13 @@ describe('hunter aspect mutual exclusion', () => {
   });
 });
 
-describe('classic self-buff mutual exclusion groups', () => {
-  it('marks paladin auras and warrior shouts with their own exclusive groups', () => {
+describe('class self-buff mutual exclusion groups', () => {
+  it('marks paladin auras and warrior stances with their own exclusive groups', () => {
     expect(ABILITIES.devotion_aura.exclusiveGroup).toBe('paladin_aura');
     expect(ABILITIES.retribution_aura.exclusiveGroup).toBe('paladin_aura');
-    expect(ABILITIES.battle_shout.exclusiveGroup).toBe('warrior_shout');
-    expect(ABILITIES.commanding_shout.exclusiveGroup).toBe('warrior_shout');
+    expect(ABILITIES.battle_stance.exclusiveGroup).toBe('warrior_stance');
+    expect(ABILITIES.defensive_stance.exclusiveGroup).toBe('warrior_stance');
+    expect(ABILITIES.berserker_stance.exclusiveGroup).toBe('warrior_stance');
   });
 
   it('keeps only one paladin aura active', () => {
@@ -100,20 +101,19 @@ describe('classic self-buff mutual exclusion groups', () => {
     ]);
   });
 
-  it('keeps only one self-applied warrior shout active', () => {
+  it('keeps only one self-applied warrior stance active', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
-    sim.setPlayerLevel(14); // battle(1) + commanding(14) known
-    const baseAp = sim.player.attackPower;
+    sim.setPlayerLevel(14);
+    expect(sim.setSpec('arms')).toBe(true);
 
-    sim.player.resource = 100;
-    castSelfBuff(sim, 'battle_shout');
-    expect(sim.player.attackPower).toBeGreaterThan(baseAp);
-
-    sim.player.resource = 100;
-    castSelfBuff(sim, 'commanding_shout');
-    expect(sim.player.auras.filter((a) => a.id.endsWith('_shout')).map((a) => a.id)).toEqual([
-      'commanding_shout',
+    castSelfBuff(sim, 'battle_stance');
+    expect(sim.player.auras.filter((a) => a.id.endsWith('_stance')).map((a) => a.id)).toEqual([
+      'battle_stance',
     ]);
-    expect(sim.player.attackPower).toBe(baseAp);
+
+    castSelfBuff(sim, 'defensive_stance');
+    expect(sim.player.auras.filter((a) => a.id.endsWith('_stance')).map((a) => a.id)).toEqual([
+      'defensive_stance',
+    ]);
   });
 });

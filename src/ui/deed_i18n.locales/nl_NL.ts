@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_card_duel_first_win: {
+    name: 'Eigen Spelregels',
+    desc: 'Win een Kaartduel bij de Kaartmeester.',
+  },
   prog_first_steps: {
     name: 'Eerste Stappen',
     desc: 'Bereik level 2 en zet je eerste stap op een lange weg.',
@@ -38,8 +42,8 @@ export const table: DeedLocaleTable = {
     desc: 'Besteed een talentpunt aan een talent uit de onderste rij.',
   },
   prog_full_build: {
-    name: 'Het Volle Elftal',
-    desc: 'Besteed alle elf talentpunten binnen één build.',
+    name: 'Het Volle Zestal',
+    desc: 'Kies binnen één build één optie in alle zes talentrijen.',
   },
   prog_veteran: {
     name: 'Veteraan',

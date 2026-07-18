@@ -2,38 +2,23 @@
 //
 // Per the #107 decision (see the maintainer comment on #1129), the conserved-mass
 // budget / opposite-craft-drain model this issue originally described was dropped.
-// Knowledge in all ten crafts (see wheel.ts) stays flat and purely additive: this
-// module never reads or writes CraftSkills, and archetype selection/switching NEVER
-// touches any craft skill value.
+// Knowledge in all ten crafts (see wheel.ts) stays flat and purely additive.
+// Archetype selection may read skills to choose a deterministic hobby default,
+// but it never mutates any craft skill value.
 //
 // Per #1129's actual text ("an adjacent pair, the two majors"), an archetype is
-// NOT a single craft: it is `activeArchetype` (the craft the acceptance/title
-// quest names, see getArchetypeTitle) PLUS `pairedMajor`, its ring-adjacent
+// NOT a single craft: it is `activeArchetype` (the craft the acceptance quest
+// names; the granted TITLE is per pair, see getArchetypeTitle) PLUS `pairedMajor`, its ring-adjacent
 // neighbor (content/professions.ts adjacentCrafts), together the two majors
-// empowered past rare. Both start unset (null). Which of the two ring-adjacent
-// neighbors becomes the pair is not yet a player choice (the acceptance quest
-// is a content stub, like the rest of this module); acceptArchetypeQuest/
-// switchArchetype default it deterministically via defaultPairedMajor below,
-// preferring the neighbor a content combo recipe already pairs the craft with
-// so no attunement choice strands its own themed combo. A real quest choosing
-// the neighbor, and #1293's later hobby-flip, are both future content work
-// over this same state shape.
+// empowered past rare. Both start unset (null). Live profession quests select
+// an exact adjacent pair through attuneArchetypePair. The legacy direct helpers
+// acceptArchetypeQuest/switchArchetype retain their deterministic single-craft
+// fallback for compatibility with older callers and saves.
 //
-// The active archetype is set for the first time by a zone-1 acceptance lore quest,
-// and can only be changed afterward by first completing a repeatable, escalating
-// "make amends" quest. Each successful switch increments a persisted per-character
-// switchCount, and the amount of amends-quest progress required to switch again
-// scales with that count (see requiredAmendsProgress below).
-//
-// STUB, documented explicitly: this module implements the full state machine (the
-// interesting, testable logic), but the two quests themselves are content stubs.
-// Real quest giver/turn-in NPC placement and dialogue authoring for a zone-1 lore
-// quest, plus a genuinely repeatable turn-in flow (the existing quest engine in
-// src/sim/quests/ is one-time only: turnInQuestCore adds the quest id to
-// `questsDone` and there is no re-accept path), are out of scope for this change.
-// Instead, acceptArchetypeQuest/advanceAmendsProgress are the direct entry points a
-// (future) quest-completion hook calls; see content/zone1.ts for the placeholder
-// QuestDef records these stand in for.
+// The active pair is set first by the zone-1 acceptance lore quest. New pairs
+// use that repeatable quest, previously held pairs use the escalating make-amends
+// quest, and hobby changes use their own repeatable quest. Quest effects validate
+// the selected target at accept and turn-in before calling the transitions here.
 //
 // This module is `src/sim`-pure (see src/sim/CLAUDE.md): no DOM/render/ui/game/net
 // imports, no Math.random/Date.now, host-agnostic so it runs offline, on the
@@ -54,6 +39,14 @@ export interface ArchetypeState {
   // adjacentCrafts), together the "two majors" #1129 empowers past rare. Null
   // exactly when activeArchetype is null.
   pairedMajor: string | null;
+  // Explicit rare-capped hobby. For an active pair this is one of the two
+  // crafts opposite its majors. Persisting it lets the hobby-switch quest
+  // change the choice without changing either major.
+  hobbyCraft: string | null;
+  // Canonical unordered ids for every adjacent pair this character has held.
+  // This distinguishes first-time lore attunement from a return that requires
+  // make-amends.
+  attunedPairs: string[];
   // Total number of successful archetype switches this character has ever made.
   switchCount: number;
   // Progress toward the CURRENT switch's amends requirement (see
@@ -63,7 +56,14 @@ export interface ArchetypeState {
 
 /** A fresh character: no archetype chosen yet, never switched. */
 export function emptyArchetypeState(): ArchetypeState {
-  return { activeArchetype: null, pairedMajor: null, switchCount: 0, amendsProgress: 0 };
+  return {
+    activeArchetype: null,
+    pairedMajor: null,
+    hobbyCraft: null,
+    attunedPairs: [],
+    switchCount: 0,
+    amendsProgress: 0,
+  };
 }
 
 /** Backfill a persisted/partial record so an older save (predating this field, or
@@ -73,6 +73,7 @@ export function emptyArchetypeState(): ArchetypeState {
  *  archetype set under the old single-craft model still gets a real pair. */
 export function normalizeArchetypeState(
   saved: Partial<ArchetypeState> | undefined | null,
+  skills: CraftSkills = {},
 ): ArchetypeState {
   const state = emptyArchetypeState();
   if (!saved) return state;
@@ -80,12 +81,39 @@ export function normalizeArchetypeState(
     state.activeArchetype = saved.activeArchetype;
   }
   if (state.activeArchetype !== null) {
+    // The isAdjacent-or-redefault repair below CAN change pairedMajor when the
+    // ring order changes between releases (v0.26.0 shipped this field, and the
+    // Professions 2.0 reorder breaks 3 of the 10 old default pairs). That never
+    // fires on a real save today for one reason only: every shipped build kept
+    // the acceptance quests retired, so no production save holds a non-null
+    // activeArchetype. THE INVARIANT THAT KEEPS THIS SAFE: the ring order and
+    // the live quest wiring ship together (both land in PR 2039); never wire
+    // the quests live in a release whose ring a later change intends to reorder.
     state.pairedMajor =
       typeof saved.pairedMajor === 'string' &&
       isCraftId(saved.pairedMajor) &&
       isAdjacent(state.activeArchetype, saved.pairedMajor)
         ? saved.pairedMajor
         : defaultPairedMajor(state.activeArchetype);
+    const currentPairId = archetypePairId(state.activeArchetype, state.pairedMajor);
+    const savedHistory = Array.isArray(saved.attunedPairs) ? saved.attunedPairs : [];
+    // Drop-by-design: any saved pair id not in the CURRENT ARCHETYPE_PAIR_TARGETS
+    // is silently discarded here. Safe for the same reason as pairedMajor above:
+    // attunedPairs first ships WITH the reordered ring (and retired quests mean
+    // no shipped save carries profession state at all), so a pre-reorder
+    // canonical id cannot exist in production saves; anything unrecognized is a
+    // hand-edited or corrupt value, and losing it is the intended behavior.
+    // The current pair is re-derived and re-appended below, so an ACTIVE
+    // attunement is never lost, only unrecognized history entries.
+    state.attunedPairs = [...new Set(savedHistory.filter(isAdjacentPairTarget))];
+    if (currentPairId && !state.attunedPairs.includes(currentPairId)) {
+      state.attunedPairs.push(currentPairId);
+    }
+    const hobbyCandidates = hobbyCandidatesForPair(state.activeArchetype, state.pairedMajor);
+    state.hobbyCraft =
+      typeof saved.hobbyCraft === 'string' && hobbyCandidates.includes(saved.hobbyCraft)
+        ? saved.hobbyCraft
+        : defaultHobbyForPair(state.activeArchetype, state.pairedMajor, skills);
   }
   if (
     typeof saved.switchCount === 'number' &&
@@ -106,6 +134,33 @@ export function normalizeArchetypeState(
 
 function isCraftId(id: string): boolean {
   return CRAFT_RING.some((craft) => craft.id === id);
+}
+
+/** Stable unordered id for one adjacent pair. The order follows CRAFT_RING so
+ * the same pair has one persisted/wire representation. */
+export function archetypePairId(craftA: string, craftB: string | null): string | null {
+  if (!craftB || !isCraftId(craftA) || !isCraftId(craftB) || !isAdjacent(craftA, craftB)) {
+    return null;
+  }
+  const a = CRAFT_RING.findIndex((craft) => craft.id === craftA);
+  const b = CRAFT_RING.findIndex((craft) => craft.id === craftB);
+  if ((a + 1) % CRAFT_RING.length === b) return `${craftA}+${craftB}`;
+  return `${craftB}+${craftA}`;
+}
+
+/** The ten selectable adjacent pair ids, in ring order. */
+export const ARCHETYPE_PAIR_TARGETS: readonly string[] = CRAFT_RING.map(
+  (craft, index) => `${craft.id}+${CRAFT_RING[(index + 1) % CRAFT_RING.length].id}`,
+);
+
+export function isAdjacentPairTarget(target: string): boolean {
+  return ARCHETYPE_PAIR_TARGETS.includes(target);
+}
+
+export function craftsForPairTarget(target: string): [string, string] | null {
+  if (!isAdjacentPairTarget(target)) return null;
+  const [craftA, craftB] = target.split('+');
+  return craftA && craftB ? [craftA, craftB] : null;
 }
 
 /** Whether `b` is one of `a`'s two ring-adjacent neighbors. */
@@ -141,6 +196,36 @@ function defaultPairedMajor(activeArchetype: string): string {
   return (match ?? neighbors[0]).id;
 }
 
+export function hobbyCandidatesForPair(activeArchetype: string, pairedMajor: string): string[] {
+  if (
+    !isCraftId(activeArchetype) ||
+    !isCraftId(pairedMajor) ||
+    !isAdjacent(activeArchetype, pairedMajor)
+  ) {
+    return [];
+  }
+  return [oppositeCraft(activeArchetype).id, oppositeCraft(pairedMajor).id];
+}
+
+/** Choose the higher retained-skill hobby, with ring order as the stable tie
+ * break. This is used for first attunement and old-save backfill. */
+export function defaultHobbyForPair(
+  activeArchetype: string,
+  pairedMajor: string,
+  skills: CraftSkills = {},
+): string | null {
+  const candidates = hobbyCandidatesForPair(activeArchetype, pairedMajor);
+  if (candidates.length === 0) return null;
+  return [...candidates].sort((a, b) => {
+    const skillDelta = (skills[b] ?? 0) - (skills[a] ?? 0);
+    if (skillDelta !== 0) return skillDelta;
+    return (
+      CRAFT_RING.findIndex((craft) => craft.id === a) -
+      CRAFT_RING.findIndex((craft) => craft.id === b)
+    );
+  })[0];
+}
+
 // Escalation formula for the repeatable "make amends" quest: a modest linear
 // ramp, base 5 (matching the typical zone-1 kill/collect objective count seen in
 // content/zone1.ts) plus 3 more per prior switch, so switching gets meaningfully
@@ -156,52 +241,56 @@ export function requiredAmendsProgress(switchCount: number): number {
  *  `activeArchetype`/`archetypeSwitchCount` reads (professions facet). */
 export function archetypeStateFor(ctx: SimContext, pid: number): ArchetypeState {
   const meta = ctx.players.get(pid);
-  return meta ? { ...meta.archetype } : emptyArchetypeState();
+  return meta
+    ? { ...meta.archetype, attunedPairs: [...meta.archetype.attunedPairs] }
+    : emptyArchetypeState();
 }
 
-// Issue #1130 (re-scoped per the comment on the live issue, superseding its stale
-// two-crafts-at-rare title/body): a player's CURRENTLY-ACTIVE archetype grants the
-// named title for that craft. There is no "Jack of All Trades" fallback under this
-// model, since a character always has at most one active archetype at a time; the
-// natural analog of the old "below rare grants no title" rule is the pre-acceptance
-// state (activeArchetype === null), which grants no title at all.
+// Issue #1130 (re-scoped per the comment on the live issue, then pair-named
+// under the Professions 2.0 Phase 1 blueprint): a player's CURRENTLY-ACTIVE
+// adjacent-pair attunement grants one named archetype title for that PAIR
+// (Smith for weaponcrafting+armorcrafting, Bombardier for engineering+alchemy,
+// and so on). There is no "Jack of All Trades" fallback under this model, since
+// a character always has at most one active pair at a time; the natural analog
+// of the old "below rare grants no title" rule is the pre-acceptance state
+// (activeArchetype === null), which grants no title at all.
 //
-// `getArchetypeTitle` returns the TITLE'S IDENTIFIER, which is simply the active
-// craft id itself: the ten named titles are a strict one-to-one mapping onto the
-// ten crafts on the ring (see content/professions.ts CRAFT_RING), so the craft id
-// already uniquely identifies which title is granted. Keeping this an identifier
-// (never localized English prose) matches the "IWorld is a string-free seam" rule
-// (src/CLAUDE.md): the actual title WORDS are English-source, localized-at-client
-// data, defined per craft id in src/ui/i18n.catalog/hud_chrome.ts under
-// `archetypeTitle.<craftId>` (see that file for the ten title names chosen).
+// `getArchetypeTitle` returns the TITLE'S IDENTIFIER, which is the active pair's
+// CANONICAL PAIR ID (archetypePairId): the ten named titles are a strict
+// one-to-one mapping onto the ten selectable adjacent pairs
+// (ARCHETYPE_PAIR_TARGETS), so the pair id already uniquely identifies which
+// title is granted. Keeping this an identifier (never localized English prose)
+// matches the "IWorld is a string-free seam" rule (src/CLAUDE.md): the actual
+// title WORDS are English-source, localized-at-client data, defined per pair id
+// in src/ui/i18n.catalog/hud_chrome.ts under `archetypePair.<pairId>` (see that
+// file for the ten title names chosen).
 
-/** The granted title's identifier for a given active archetype: the craft id
- *  itself when one is set and valid, or null before the acceptance quest (or for
- *  a malformed/unknown craft id, which should never happen for real state). */
-export function getArchetypeTitle(activeArchetype: string | null): string | null {
+/** The granted title's identifier for a given active pair: the canonical pair
+ *  id (archetypePairId) when a valid adjacent pair is set, or null before the
+ *  acceptance quest (or for a malformed/non-adjacent pair, which should never
+ *  happen for state that went through normalizeArchetypeState). */
+export function getArchetypeTitle(
+  activeArchetype: string | null,
+  pairedMajor: string | null,
+): string | null {
   if (activeArchetype === null) return null;
-  return isCraftId(activeArchetype) ? activeArchetype : null;
+  return archetypePairId(activeArchetype, pairedMajor);
 }
 
 /** Read surface: the granted title identifier for a player's CURRENT active
- *  archetype. Backs the IWorld `archetypeTitle` read (professions facet). Updates
- *  immediately when switchArchetype changes the active archetype. */
+ *  pair. Backs the IWorld `archetypeTitle` read (professions facet). Updates
+ *  immediately when a pair transition changes the active archetype. */
 export function archetypeTitleFor(ctx: SimContext, pid: number): string | null {
-  return getArchetypeTitle(archetypeStateFor(ctx, pid).activeArchetype);
+  const state = archetypeStateFor(ctx, pid);
+  return getArchetypeTitle(state.activeArchetype, state.pairedMajor);
 }
 
 // Issue #1294 (the hobby): one opposite craft, empowered up to rare, is the
-// player's "hobby" alongside their active archetype's two majors. Under the
-// pair model each major has its own opposite craft, so there are two
-// candidate hobby crafts (this is exactly what makes #1293's later hobby-flip
-// quest meaningful: it would let a player pick between them). Which one is
-// live today is not yet a player choice, so this deterministically picks the
-// opposite of `activeArchetype` (the title-quest major), not `pairedMajor`.
+// player's explicit hobby alongside the two majors. Under the pair model each
+// major has its own opposite craft, so a quest can switch between two candidates.
 
-/** The player's current hobby craft id: the opposite craft on CRAFT_RING from
- *  their active archetype, empowered up to rare per `archetypeCeilingFor`.
- *  `null` before any archetype has ever been chosen (there is no hobby
- *  without a major to be opposite of). */
+/** Legacy deterministic hobby fallback for saves/callers that only carry an
+ *  active craft. Live identity reads use ArchetypeState.hobbyCraft. */
 export function getHobbyCraft(activeArchetype: string | null): string | null {
   if (activeArchetype === null || !isCraftId(activeArchetype)) return null;
   return oppositeCraft(activeArchetype).id;
@@ -211,7 +300,7 @@ export function getHobbyCraft(activeArchetype: string | null): string | null {
  *  Backs the IWorld `hobbyCraft` read (professions facet). Updates
  *  immediately when switchArchetype changes the active archetype. */
 export function hobbyCraftFor(ctx: SimContext, pid: number): string | null {
-  return getHobbyCraft(archetypeStateFor(ctx, pid).activeArchetype);
+  return archetypeStateFor(ctx, pid).hobbyCraft;
 }
 
 // #1129/#1203 empowerment ceiling: this is the composition point that makes the
@@ -252,10 +341,11 @@ export function archetypeCeilingFor(
   activeArchetype: string | null,
   pairedMajor: string | null,
   craftId: string,
+  hobbyCraft: string | null = getHobbyCraft(activeArchetype),
 ): number {
   if (activeArchetype === null) return RARE_CEILING_TIER;
   if (craftId === activeArchetype || craftId === pairedMajor) return Infinity;
-  if (craftId === oppositeCraft(activeArchetype).id) return RARE_CEILING_TIER;
+  if (craftId === hobbyCraft) return RARE_CEILING_TIER;
   return COMMON_CEILING_TIER;
 }
 
@@ -269,14 +359,15 @@ export function craftCeiling(
   activeArchetype: string | null,
   pairedMajor: string | null,
   craftId: string,
+  hobbyCraft: string | null = getHobbyCraft(activeArchetype),
 ): number {
   return Math.min(
     tierCapability(skills, craftId),
-    archetypeCeilingFor(activeArchetype, pairedMajor, craftId),
+    archetypeCeilingFor(activeArchetype, pairedMajor, craftId, hobbyCraft),
   );
 }
 
-/** The zone-1 acceptance quest's stubbed completion hook: on FIRST completion only,
+/** Legacy single-craft acceptance hook: on FIRST completion only,
  *  sets the chosen craft as the character's active archetype. A no-op (does not
  *  re-trigger, does not change the archetype) if one is already set, since the
  *  acceptance quest exists once per character; changing an existing archetype
@@ -288,10 +379,69 @@ export function acceptArchetypeQuest(ctx: SimContext, pid: number, craftId: stri
   if (meta.archetype.activeArchetype !== null) return false;
   meta.archetype.activeArchetype = craftId;
   meta.archetype.pairedMajor = defaultPairedMajor(craftId);
+  meta.archetype.hobbyCraft = defaultHobbyForPair(
+    craftId,
+    meta.archetype.pairedMajor,
+    meta.craftSkills,
+  );
+  const pairId = archetypePairId(craftId, meta.archetype.pairedMajor);
+  if (pairId) meta.archetype.attunedPairs = [pairId];
   return true;
 }
 
-/** The repeatable "make amends" quest's stubbed per-completion credit: advances
+export type AttunementMode = 'new' | 'return';
+
+/** Apply a quest-validated pair transition. New pairs do not raise the return
+ * escalation counter. Returning to a held pair does. */
+export function attuneArchetypePair(
+  ctx: SimContext,
+  pid: number,
+  target: string,
+  mode: AttunementMode,
+): boolean {
+  const meta = ctx.players.get(pid);
+  const pair = craftsForPairTarget(target);
+  if (!meta || !pair) return false;
+  const [activeArchetype, pairedMajor] = pair;
+  const state = meta.archetype;
+  const current = archetypePairId(state.activeArchetype ?? '', state.pairedMajor);
+  if (current === target) return false;
+  const seen = state.attunedPairs.includes(target);
+  if ((mode === 'new' && seen) || (mode === 'return' && !seen)) return false;
+
+  state.activeArchetype = activeArchetype;
+  state.pairedMajor = pairedMajor;
+  state.hobbyCraft = defaultHobbyForPair(activeArchetype, pairedMajor, meta.craftSkills);
+  if (!seen) state.attunedPairs.push(target);
+  if (mode === 'return') state.switchCount += 1;
+  state.amendsProgress = 0;
+  return true;
+}
+
+export function canAttuneArchetypePair(
+  state: ArchetypeState,
+  target: string,
+  mode: AttunementMode,
+): boolean {
+  if (!isAdjacentPairTarget(target)) return false;
+  if (archetypePairId(state.activeArchetype ?? '', state.pairedMajor) === target) return false;
+  const seen = state.attunedPairs.includes(target);
+  return mode === 'new' ? !seen : seen;
+}
+
+export function canSwitchHobby(state: ArchetypeState, target: string): boolean {
+  if (!state.activeArchetype || !state.pairedMajor || target === state.hobbyCraft) return false;
+  return hobbyCandidatesForPair(state.activeArchetype, state.pairedMajor).includes(target);
+}
+
+export function switchHobby(ctx: SimContext, pid: number, target: string): boolean {
+  const meta = ctx.players.get(pid);
+  if (!meta || !canSwitchHobby(meta.archetype, target)) return false;
+  meta.archetype.hobbyCraft = target;
+  return true;
+}
+
+/** Legacy direct make-amends credit helper: advances
  *  progress toward the currently required threshold by one. A no-op before an
  *  archetype has ever been chosen (there is nothing to switch away from yet). */
 export function advanceAmendsProgress(ctx: SimContext, pid: number): void {
@@ -315,6 +465,9 @@ export function switchArchetype(ctx: SimContext, pid: number, craftId: string): 
   if (state.amendsProgress < requiredAmendsProgress(state.switchCount)) return false;
   state.activeArchetype = craftId;
   state.pairedMajor = defaultPairedMajor(craftId);
+  state.hobbyCraft = defaultHobbyForPair(craftId, state.pairedMajor, meta.craftSkills);
+  const pairId = archetypePairId(craftId, state.pairedMajor);
+  if (pairId && !state.attunedPairs.includes(pairId)) state.attunedPairs.push(pairId);
   state.switchCount += 1;
   state.amendsProgress = 0;
   return true;

@@ -89,31 +89,35 @@ export function lootCorpse(
   pid?: number,
   honorFfa = true,
   quiet = false,
-): void {
+): boolean {
   const r = ctx.resolve(pid);
-  if (!r) return;
+  if (!r) return false;
   const { meta, e: p } = r;
   // Dead players (released ghosts included) cannot loot; the same rejection the
   // item family uses (src/sim/items.ts). The walk-by autoLootForParty path never
   // reaches this: it silently drops a dead trigger before delegating here.
   if (p.dead) {
     ctx.error(meta.entityId, "You can't do that while dead.");
-    return;
+    return false;
   }
   const mob = ctx.entities.get(mobId);
-  if (!mob?.lootable || !mob.loot) return;
+  if (!mob?.lootable || !mob.loot) return false;
   // owner-lock lapses LOOT_FFA_DELAY after the corpse became lootable: then anyone may loot.
   const ffaUnlocked = honorFfa && lootHasGoneFfa(mob.lootFfaTimer);
   const rights = corpseLootRights(ctx, mob, meta.entityId, ffaUnlocked);
   if (!rights.shared && !rights.personal && !rights.open) {
     ctx.error(meta.entityId, "You don't have permission to loot that.");
-    return;
+    return false;
   }
   if (dist2d(p.pos, mob.pos) > INTERACT_RANGE) {
     ctx.error(meta.entityId, 'Too far away.');
-    return;
+    return false;
   }
-  if (rights.shared) distributeLootCopper(ctx, mob, meta);
+  let didLoot = false;
+  if (rights.shared && mob.loot.copper > 0) {
+    distributeLootCopper(ctx, mob, meta);
+    didLoot = true;
+  }
   // Capacity gate: an item that doesn't fit the looter's bags STAYS on the
   // corpse (classic behavior), with one "bags are full" toast per loot action.
   let bagsFull = false;
@@ -124,6 +128,7 @@ export function lootCorpse(
       while (s.count > 0 && ctx.canAddItem(s.itemId, 1, meta.entityId)) {
         ctx.addItem(s.itemId, 1, meta.entityId);
         s.count--;
+        didLoot = true;
       }
       if (s.count > 0) bagsFull = true;
       continue;
@@ -136,11 +141,13 @@ export function lootCorpse(
       ctx.addItem(s.itemId, 1, meta.entityId);
       s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
       tookPersonal = true;
+      didLoot = true;
       continue;
     }
     if (!rights.shared) continue;
     while (s.count > 0 && awardSharedLootItem(ctx, s.itemId, mob, meta)) {
       s.count--;
+      didLoot = true;
     }
     if (s.count > 0) bagsFull = true;
   }
@@ -157,6 +164,7 @@ export function lootCorpse(
   }
   pruneCorpseLoot(ctx, mob);
   if (p.targetId === mobId) p.targetId = null;
+  return didLoot;
 }
 
 // Walk-by autoloot: a silent eligibility pre-check, then a delegate to the existing
@@ -303,30 +311,45 @@ function focusedHarvestQuantity(
   return Math.round(applyFocusBonus(harvestTierQuantity(tier), component, focus));
 }
 
-export function pickUpObject(ctx: SimContext, objId: number, pid?: number): void {
+export function pickUpObject(ctx: SimContext, objId: number, pid?: number): boolean {
   const r = ctx.resolve(pid);
-  if (!r) return;
+  if (!r) return false;
   const { meta, e: p } = r;
   // Dead players (released ghosts included) cannot pick up world objects.
   if (p.dead) {
     ctx.error(meta.entityId, "You can't do that while dead.");
-    return;
+    return false;
   }
   const obj = ctx.entities.get(objId);
-  if (obj?.kind !== 'object' || !obj.lootable || !obj.objectItemId) return;
+  if (obj?.kind !== 'object' || !obj.lootable || !obj.objectItemId) return false;
   if (dist2d(p.pos, obj.pos) > INTERACT_RANGE) {
     ctx.error(meta.entityId, 'Too far away.');
-    return;
+    return false;
   }
-  if (tryStartNythraxisWardChannel(ctx, obj, p)) return;
-  if (activateNythraxisRelic(ctx, obj, meta)) return;
-  if (interactObjectForQuests(ctx, obj, meta)) return;
+  const beforeCastingAbility = p.castingAbility;
+  const beforeChanneling = p.channeling;
+  if (tryStartNythraxisWardChannel(ctx, obj, p)) {
+    return (
+      p.castingAbility === 'nythraxis_ward_channel' &&
+      (beforeCastingAbility !== p.castingAbility || beforeChanneling !== p.channeling)
+    );
+  }
+  const beforeRelicLootable = obj.lootable;
+  const beforeRelicNextId = ctx.nextId;
+  if (activateNythraxisRelic(ctx, obj, meta)) {
+    return obj.lootable !== beforeRelicLootable || ctx.nextId !== beforeRelicNextId;
+  }
+  const beforeQuestProgress = meta.counters.questProgress;
+  const beforeQuestNextId = ctx.nextId;
+  if (interactObjectForQuests(ctx, obj, meta)) {
+    return meta.counters.questProgress !== beforeQuestProgress || ctx.nextId !== beforeQuestNextId;
+  }
   const def = ITEMS[obj.objectItemId];
   if (def?.questId) {
     const qp = meta.questLog.get(def.questId);
     if (!qp || (qp.state !== 'active' && qp.state !== 'ready')) {
       ctx.error(meta.entityId, def.pickupDeny ?? `You cannot take the ${def.name} yet.`);
-      return;
+      return false;
     }
     const quest = QUESTS[def.questId];
     const objIdx = quest.objectives.findIndex(
@@ -334,25 +357,26 @@ export function pickUpObject(ctx: SimContext, objId: number, pid?: number): void
     );
     if (objIdx < 0) {
       ctx.error(meta.entityId, def.pickupEnough ?? `${def.name} offers nothing more.`);
-      return;
+      return false;
     }
     if (
       objIdx >= 0 &&
       ctx.countItem(obj.objectItemId, meta.entityId) >= quest.objectives[objIdx].count
     ) {
       ctx.error(meta.entityId, def.pickupEnough ?? 'You have enough of those.');
-      return;
+      return false;
     }
   }
   if (!ctx.canAddItem(obj.objectItemId, 1, meta.entityId)) {
     ctx.error(meta.entityId, 'Your bags are full.');
-    return;
+    return false;
   }
   ctx.addItem(obj.objectItemId, 1, meta.entityId);
   obj.lootable = false;
   obj.respawnTimer = OBJECT_RESPAWN;
   // Success only: a capacity-refused attempt returned above and never counts.
   ctx.bumpDeedStat(meta, 'groundObjectsLooted', 1);
+  return true;
 }
 
 export function interact(ctx: SimContext, pid?: number): void {

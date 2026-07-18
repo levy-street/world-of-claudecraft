@@ -152,6 +152,12 @@ export interface MobileControlCallbacks {
   onMusic(): boolean;
   /** Double-tap the camera joystick: snap the camera back behind the character. */
   onRecenterCamera(): void;
+  /** Move an active ground-target reticle to this canvas point. Returns true when
+   * targeting owns the pointer, so the same drag never rotates the camera. */
+  onGroundAimMove(x: number, y: number): boolean;
+  /** Commit an active ground-target spell when the finger is released. Returns
+   * true when targeting consumed the gesture, so it cannot also recenter camera. */
+  onGroundAimTap(x: number, y: number): boolean;
 }
 
 /**
@@ -1015,7 +1021,8 @@ export class MobileControls {
     const target = e.target as unknown as TouchRouterTarget | null;
     const menuOpen = document.body.classList.contains('mobile-window-open');
     if (!isCameraDragAllowedAt(target, menuOpen)) return;
-    this.touchOwners.set(e.pointerId, 'camera');
+    const groundAimOwnsPointer = this.callbacks.onGroundAimMove(e.clientX, e.clientY);
+    this.touchOwners.set(e.pointerId, groundAimOwnsPointer ? 'groundAim' : 'camera');
     this.swipeLookPointer = e.pointerId;
     this.swipeLookStartX = e.clientX;
     this.swipeLookStartY = e.clientY;
@@ -1031,6 +1038,19 @@ export class MobileControls {
   }
 
   private onSwipeLookMove(e: PointerEvent): void {
+    if (
+      this.active &&
+      e.pointerId === this.swipeLookPointer &&
+      this.touchOwners.get(e.pointerId) === 'groundAim'
+    ) {
+      if (document.body.classList.contains('mobile-window-open')) {
+        this.releaseSwipeLook();
+        return;
+      }
+      this.callbacks.onGroundAimMove(e.clientX, e.clientY);
+      e.preventDefault();
+      return;
+    }
     if (
       !this.active ||
       e.pointerId !== this.swipeLookPointer ||
@@ -1060,8 +1080,16 @@ export class MobileControls {
   }
 
   private onSwipeLookEnd(e: PointerEvent): void {
+    const owner = this.touchOwners.get(e.pointerId);
     this.touchOwners.release(e.pointerId);
     if (e.pointerId !== this.swipeLookPointer) return;
+    if (owner === 'groundAim') {
+      e.preventDefault();
+      if (e.type === 'pointerup') this.callbacks.onGroundAimTap(e.clientX, e.clientY);
+      this.lastSwipeTapAt = 0;
+      this.releaseSwipeLook();
+      return;
+    }
     if (this.swipeLookActive) e.preventDefault();
     // Double-tap-to-recenter on the swipe-look path: the camera joystick is
     // opt-in (hidden by default, settings.mobileCameraJoystick), so this is
@@ -1070,6 +1098,11 @@ export class MobileControls {
     // quick succession recenter the camera, mirroring the joystick logic.
     const now = this.now();
     const quickTap = !this.swipeLookActive && now - this.swipeLookDownAt <= RECENTER_DOUBLE_TAP_MS;
+    if (quickTap && this.callbacks.onGroundAimTap(e.clientX, e.clientY)) {
+      this.lastSwipeTapAt = 0;
+      this.releaseSwipeLook();
+      return;
+    }
     if (quickTap && isRecenterDoubleTap(this.lastSwipeTapAt, now, this.swipeLookActive)) {
       this.callbacks.onRecenterCamera();
       this.lastSwipeTapAt = 0;

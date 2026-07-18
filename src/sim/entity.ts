@@ -1,6 +1,8 @@
+import { BATTLE_STANCE, buildStanceAura } from './combat/warrior_stances';
 import type { TalentModifiers } from './content/talents';
 import { resolveActiveWeaponSkin } from './content/weapon_skin_rules';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
+import { canDualWield, isShieldItem } from './equipment_rules';
 import { meetsLevelRequirement } from './item_level_req';
 import { pvpFractionsFromRatings } from './pvp';
 import type {
@@ -13,11 +15,15 @@ import type {
   Vec3,
 } from './types';
 import {
+  ALL_EQUIP_SLOTS,
+  AVATAR_SCALE,
+  BERSERKER_CRIT_CHANCE,
   cloneItemInstancePayload,
   critFractionFromRating,
-  EQUIP_SLOTS,
+  ENRAGE_HASTE_PCT,
   hasteFractionFromRating,
   hitFractionFromRating,
+  SHIELD_BLOCK_BASE,
   SPELL_POWER_PER_INT,
 } from './types';
 
@@ -57,6 +63,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
       pvpDefense: 0,
     },
     weapon: { min: 1, max: 2, speed: 2 },
+    offhandWeapon: null,
     attackPower: 0,
     rangedPower: 0,
     spellPower: 0,
@@ -66,6 +73,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     setProcs: [],
     procReadyAt: undefined as unknown as Record<string, number>,
     critChance: 0.05,
+    sharedCritBonus: 0,
     critRating: 0,
     hasteRating: 0,
     hitRating: 0,
@@ -74,6 +82,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     critDmgPhysBonus: 0,
     critDmgHealBonus: 0,
     dodgeChance: 0.05,
+    blockChance: 0,
+    blockValue: 0,
     castPushbackReduction: 0,
     knockbackResistance: 0,
     moveSpeed: 7,
@@ -81,6 +91,8 @@ function baseEntity(id: number, pos: Vec3): Entity {
     targetId: null,
     autoAttack: false,
     swingTimer: 0,
+    offhandSwingTimer: 0,
+    dualWielding: false,
     inCombat: false,
     combatTimer: 99,
     auras: [],
@@ -94,6 +106,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     channeling: false,
     channelTickTimer: 0,
     channelTickEvery: 0,
+    channelTicksLeft: 0,
     gcdRemaining: 0,
     cooldowns: new Map(),
     queuedOnSwing: null,
@@ -140,6 +153,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     bossDamagers: new Set(),
     forcedTargetId: null,
     forcedTargetTimer: 0,
+    shuffleTargetTimer: 0,
     ownerId: null,
     petMode: 'defensive',
     petTauntTimer: 0,
@@ -174,6 +188,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     skinCatalog: 'class',
     skin: 0,
     mainhandItemId: null,
+    offhandItemId: null,
     weaponSkinLoadout: {},
     weaponSkinId: null,
     equippedItems: {},
@@ -192,6 +207,12 @@ export function createPlayer(id: number, cls: PlayerClass, pos: Vec3, name: stri
   e.level = 1;
   e.resourceType = def.resourceType;
   e.color = def.color;
+  // Warriors begin in the spec-agnostic default. The tick reconciliation moves
+  // Fury to Berserker Stance after a spec is committed.
+  if (cls === 'warrior') {
+    const stance = buildStanceAura(BATTLE_STANCE, id);
+    if (stance) e.auras.push(stance);
+  }
   return e;
 }
 
@@ -210,6 +231,10 @@ function manaFromIntellect(int: number): number {
   // the mana pool below its level-based base into negative territory.
   const i = Math.max(0, int);
   return Math.min(i, 20) + Math.max(0, i - 20) * 15;
+}
+
+export function pctValue(value: number): number {
+  return value > 1 ? value / 100 : value;
 }
 
 // Recompute all derived stats for the player from class, level, gear, buffs, and
@@ -241,7 +266,7 @@ export function recalcPlayerStats(
   let bonusHitRating = 0;
   let bonusPvpOffenseRating = 0;
   let bonusPvpDefenseRating = 0;
-  for (const slot of EQUIP_SLOTS) {
+  for (const slot of ALL_EQUIP_SLOTS) {
     const itemId = equipment[slot];
     if (!itemId) continue;
     const item = ITEMS[itemId];
@@ -267,10 +292,13 @@ export function recalcPlayerStats(
       s.spi += item.stats.spi ?? 0;
       s.armor += item.stats.armor ?? 0;
     }
-    // Enchant bonus (Enchanting profession): additive on top of the item's own
-    // base stats, from this specific instance's rolled.stats (see
-    // src/sim/professions/enchanting.ts applyEnchant). A plain, unenchanted
-    // piece has no entry here, so this is a no-op for the common case.
+    // Instance stat bonus: additive on top of the item's own base stats, from
+    // this specific instance's rolled.stats: an enchant's bonus
+    // (src/sim/professions/enchanting.ts applyEnchant), a Phase 2 masterwork
+    // copy's baked tier-delta bonus (src/sim/professions/masterwork.ts), or
+    // both merged. The equip path carries the consumed inventory instance into
+    // equipmentInstance (items.ts equipItem), so either applies on equip. A
+    // plain piece has no entry here, so this is a no-op for the common case.
     const enchantStats = equipmentInstance?.[slot]?.rolled?.stats;
     if (enchantStats) {
       s.str += enchantStats.str ?? 0;
@@ -294,6 +322,8 @@ export function recalcPlayerStats(
   // Buff auras
   let bonusAp = setEff.ap;
   let bonusDodge = 0;
+  let bonusCrit = 0;
+  let bonusHaste = 0;
   let bearForm = false;
   let catForm = false;
   let moonkinForm = false;
@@ -306,6 +336,7 @@ export function recalcPlayerStats(
   let staPct = 0;
   let buffArmorPct = 0;
   let buffApPct = 0;
+  let maxHpPctAura = 0;
   for (const a of e.auras) {
     if (a.kind === 'buff_ap') bonusAp += a.value;
     // Attack-power debuff (Demoralizing Shout/Roar). Mobs fold this live in
@@ -324,6 +355,11 @@ export function recalcPlayerStats(
       s.int += a.value;
       s.spi += a.value;
     } else if (a.kind === 'buff_spellpower') bonusSp += a.value;
+    else if (a.kind === 'buff_crit' || a.kind === 'buff_reckless' || a.kind === 'bloodbath')
+      bonusCrit += a.value;
+    else if (a.kind === 'die_by_sword') bonusDodge += a.value;
+    else if (a.kind === 'enrage') bonusHaste += ENRAGE_HASTE_PCT;
+    else if (a.kind === 'buff_maxhp_pct') maxHpPctAura += a.value;
     else if (a.kind === 'buff_allstats_pct') {
       // Percentage drain on the whole stat block (Resurrection Sickness: value
       // -0.75 leaves stats at 25%). Applied to the base + gear total gathered so
@@ -346,6 +382,9 @@ export function recalcPlayerStats(
     else if (a.kind === 'buff_sta_pct') staPct += a.value / 100;
     else if (a.kind === 'buff_armor_pct') buffArmorPct += a.value / 100;
     else if (a.kind === 'buff_ap_pct') buffApPct += a.value / 100;
+    // Avatar: the colossus transform grows the body by the fixed scale (its
+    // aura value carries the damage amp, consumed in dealDamage).
+    else if (a.kind === 'buff_avatar') scaleMul *= AVATAR_SCALE;
     else if (a.kind === 'form_bear') bearForm = true;
     else if (a.kind === 'form_cat') catForm = true;
     // Moonkin Form carries its Spell Power bonus in the form aura's value, so it lives and
@@ -403,6 +442,9 @@ export function recalcPlayerStats(
   // Moonkin Form: a hardy caster form that adds 50% armor (its +20% spell damage rides a
   // separate buff_spelldmg aura the form applies).
   if (moonkinForm) s.armor = Math.round(s.armor * 1.5);
+  // Protection's Vanguard: bonus armor from Strength, added (on the fully-summed
+  // Strength) before the armor multiplier so armorPct amplifies it too.
+  if (mods?.stats.armorFromStrPct) s.armor += Math.round(s.str * mods.stats.armorFromStrPct);
   if (mods?.stats.armorPct) s.armor = Math.round(s.armor * (1 + mods.stats.armorPct));
   if (buffArmorPct) s.armor = Math.round(s.armor * (1 + buffArmorPct)); // Devotion Aura
   // Floor Spirit at 0 so a Spirit-siphoning debuff (negative buff_spi) can never
@@ -423,6 +465,19 @@ export function recalcPlayerStats(
       ? mainhand.weapon
       : { min: 1, max: 2, speed: 2 };
   e.weapon = weapon;
+  const offhand = equipment.offhand ? ITEMS[equipment.offhand] : undefined;
+  const offhandWeapon =
+    canDualWield(cls, mods?.spec) &&
+    offhand?.kind === 'weapon' &&
+    meetsLevelRequirement(lvl, offhand)
+      ? offhand.weapon
+      : null;
+  e.offhandWeapon = offhandWeapon;
+  e.dualWielding = offhandWeapon !== null;
+  const activeShield =
+    cls === 'warrior' && isShieldItem(offhand) && meetsLevelRequirement(lvl, offhand);
+  e.blockChance = activeShield ? SHIELD_BLOCK_BASE : 0;
+  e.blockValue = activeShield ? (offhand.blockValue ?? 0) : 0;
   // The equipped mainhand item id: drives the held weapon model on the client
   // (mapped via ITEM_WEAPON_VARIANTS) AND legendary weapon procs in combat
   // (combat/equip_procs.ts, which re-applies the level gate above so an inert
@@ -431,6 +486,13 @@ export function recalcPlayerStats(
   // were one ever stored, never resolves to a held model).
   e.mainhandItemId =
     equipment.mainhand && ITEMS[equipment.mainhand]?.weapon ? equipment.mainhand : null;
+  e.offhandItemId =
+    equipment.offhand &&
+    (ITEMS[equipment.offhand]?.kind === 'weapon' ||
+      ITEMS[equipment.offhand]?.kind === 'held_offhand' ||
+      isShieldItem(ITEMS[equipment.offhand]))
+      ? equipment.offhand
+      : null;
   // Resolve the active weapon-skin cosmetic against the (possibly changed)
   // mainhand: swapping to a different weapon type drops a non-matching skin and
   // re-shows the matching one automatically. Cosmetic only; never feeds stats.
@@ -486,22 +548,29 @@ export function recalcPlayerStats(
   // AND shorter spell casts/channels.
   // Union of the rating system (#1471) and the spec masteries (#1543): ratings and
   // set haste feed hasteFrac; a spec mastery's passive haste adds on its channel.
-  e.meleeHaste = hasteFrac + (mods?.global.meleeHastePct ?? 0);
-  e.rangedHaste = hasteFrac;
+  e.meleeHaste = hasteFrac + bonusHaste + (mods?.global.meleeHastePct ?? 0);
+  e.rangedHaste = hasteFrac + bonusHaste;
   // Spell haste also folds in a spec mastery's passive haste (spellHastePct), so a
   // caster spec can shorten every cast; the cast-time tooltips read the same total.
-  e.spellHaste = hasteFrac + (mods?.global.spellHastePct ?? 0);
+  e.spellHaste = hasteFrac + bonusHaste + (mods?.global.spellHastePct ?? 0);
   e.setProcs = setEff.procs;
   if (e.setProcs.length > 0 && !e.procReadyAt) e.procReadyAt = {};
+  // The class-agnostic crit core (rating + talent/set crit + flat crit auras).
+  // Both hit tables read it: melee adds Agility on top, spells add Intellect
+  // (the community-found gap: spell crit read ONLY Intellect, so crit gear and
+  // crit talents were dead weight to casters).
+  e.sharedCritBonus =
+    bonusCrit + (mods?.stats.crit ?? 0) + setEff.crit + critFractionFromRating(e.critRating);
   // Crit: ~1% per 20 agi at low level
   e.critChance =
     0.05 +
     s.agi * 0.0005 +
-    (mods?.stats.crit ?? 0) +
-    setEff.crit +
-    critFractionFromRating(e.critRating);
+    e.sharedCritBonus +
+    (e.auras.some((a) => a.kind === 'berserker_stance') ? BERSERKER_CRIT_CHANCE : 0);
   // Extra crit damage from a spec mastery, per output channel (e.g. Fire mage: SPELL
-  // crits deal more; Holy paladin: HEAL crits; Subtlety/Arms: PHYSICAL crits).
+  // crits deal more; Holy paladin: HEAL crits; Subtlety/Arms: PHYSICAL crits). Each
+  // channel bonus is added at its matching crit site (spell base 1.5, phys base 2,
+  // heal base 1.5).
   e.critDmgSpellBonus = mods?.global.critDmgSpellPct ?? 0;
   e.critDmgPhysBonus = mods?.global.critDmgPhysPct ?? 0;
   e.critDmgHealBonus = mods?.global.critDmgHealPct ?? 0;
@@ -514,6 +583,7 @@ export function recalcPlayerStats(
   e.maxHp = def.baseHp + def.hpPerLevel * (lvl - 1) + hpFromStamina(s.sta);
   if (bearForm) e.maxHp = Math.round(e.maxHp * 1.15);
   if (mods?.stats.maxHpPct) e.maxHp = Math.round(e.maxHp * (1 + mods.stats.maxHpPct));
+  if (maxHpPctAura !== 0) e.maxHp = Math.max(1, Math.round(e.maxHp * (1 + maxHpPctAura)));
   // Fiesta "Colossus"-style buffs: growing bigger also makes you tankier.
   if (scaleMul > 1) e.maxHp = Math.round(e.maxHp * scaleMul);
   e.hp = Math.max(1, Math.round(e.maxHp * hpFrac));
@@ -534,7 +604,10 @@ export function recalcPlayerStats(
     const cameFromForm = e.resourceType !== 'mana';
     const manaFrac = e.maxResource > 0 ? e.resource / e.maxResource : 1;
     e.resourceType = 'mana';
-    e.maxResource = def.baseMana + def.manaPerLevel * (lvl - 1) + manaFromIntellect(s.int);
+    e.maxResource = Math.round(
+      (def.baseMana + def.manaPerLevel * (lvl - 1) + manaFromIntellect(s.int)) *
+        (1 + (mods?.global.manaPct ?? 0)),
+    );
     e.resource = cameFromForm
       ? Math.min(e.savedMana, e.maxResource)
       : Math.round(e.maxResource * manaFrac);
@@ -641,6 +714,7 @@ export function createNpc(id: number, def: NpcDef, pos: Vec3): Entity {
   e.color = def.color;
   e.questIds = [...def.questIds];
   e.vendorItems = [...(def.vendorItems ?? [])];
+  e.devVendor = def.devVendor ?? false;
   return e;
 }
 

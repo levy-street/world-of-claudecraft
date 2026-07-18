@@ -5,6 +5,8 @@ import { dungeonDaisHasRaisedPlatform } from '../src/render/dungeon';
 import { isBlocked } from '../src/sim/colliders';
 import { DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
 import { NYTHRAXIS_LAYOUT } from '../src/sim/dungeon_layout';
+import { isShieldItem } from '../src/sim/equipment_rules';
+import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
 import { type Aura, dist2d, type Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -226,6 +228,15 @@ describe('Nythraxis raid encounter', () => {
     expect(boss.weapon.min).toBe(325);
     expect(boss.weapon.max).toBe(507);
     expect(visualKeyFor(boss)).toBe('skel_golem');
+    expect(
+      visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_warrior_add' } as Entity),
+    ).toBe('skel_warrior');
+    expect(visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_priest_add' } as Entity)).toBe(
+      'skel_necromancer',
+    );
+    expect(visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_rogue_add' } as Entity)).toBe(
+      'skel_rogue',
+    );
     expect(boss.scale).toBeGreaterThanOrEqual(3);
     expect(boss.facing).toBe(Math.PI);
     const wards = objects(sim, 'bastion_ward_stone', origin);
@@ -321,6 +332,51 @@ describe('Nythraxis raid encounter', () => {
     expect(ITEMS.stormcallers_spaulders.requiredClass).toEqual(['shaman']);
   });
 
+  it('drops the offhand-slot and two-hander epics at item level 29 (raid source)', () => {
+    const loot = MOBS.nythraxis_scourge_of_thornpeak.loot;
+    for (const id of [
+      'bonewrought_greatsword',
+      'direfang_greatblade',
+      'bonewrought_bulwark',
+      'wraithfire_orb',
+    ]) {
+      const item = ITEMS[id];
+      expect(item.quality, id).toBe('epic');
+      // Raid source: 20 (boss level) + 6 (epic) + 3 (raid bonus) = item level 29,
+      // with the realized primary stats exactly on that tier's budget (the 2H
+      // weapons carry the doubled TWOHAND_STAT_MULT mainhand budget).
+      expect(itemLevel(item), id).toBe(29);
+      expect(primaryStatSum(item), id).toBe(expectedStatBudget(item));
+      expect(
+        loot.some((entry) => entry.itemId === id),
+        id,
+      ).toBe(true);
+    }
+    // The two-handers occupy both hands; the offhand pieces fill the slot the
+    // set never covered. The bulwark uses the v0.26 shield idiom (kind 'armor'
+    // + shield marker), the orb the held_offhand kind.
+    expect(ITEMS.bonewrought_greatsword).toMatchObject({ hand: 'twohand', slot: 'mainhand' });
+    expect(ITEMS.direfang_greatblade).toMatchObject({ hand: 'twohand', slot: 'mainhand' });
+    // A bespoke hunter lock: the agi 2H must never reach the rogue group.
+    expect(ITEMS.direfang_greatblade.requiredClass).toEqual(['hunter']);
+    expect(isShieldItem(ITEMS.bonewrought_bulwark)).toBe(true);
+    expect(ITEMS.bonewrought_bulwark).toMatchObject({
+      kind: 'armor',
+      armorType: 'mail',
+      slot: 'offhand',
+      shield: true,
+      blockValue: 30,
+    });
+    expect(ITEMS.wraithfire_orb).toMatchObject({ kind: 'held_offhand', slot: 'offhand' });
+    // The ilvl-29 raid seed rating (one rating at 20): Hit for the physical
+    // pieces, crit (never Hit) for the healer-inclusive caster orb.
+    expect(ITEMS.bonewrought_greatsword.hitRating).toBe(20);
+    expect(ITEMS.direfang_greatblade.hitRating).toBe(20);
+    expect(ITEMS.bonewrought_bulwark.hitRating).toBe(20);
+    expect(ITEMS.wraithfire_orb.critRating).toBe(20);
+    expect(ITEMS.wraithfire_orb.hitRating ?? 0).toBe(0);
+  });
+
   it('keeps Nythraxis fixed at his throne facing the entrance before pull', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Tank');
@@ -356,7 +412,7 @@ describe('Nythraxis raid encounter', () => {
       const relic = objects(sim, itemId, origin)[0];
       expect(relic, itemId).toBeTruthy();
       teleport(sim, pid, relic.pos.x, relic.pos.z);
-      sim.pickUpObject(relic.id, pid);
+      expect(sim.pickUpObject(relic.id, pid)).toBe(true);
       expect(mob(sim, summonId), summonId).toBeTruthy();
     }
   });
@@ -2343,7 +2399,7 @@ describe('Nythraxis raid encounter', () => {
     const ward = objects(sim, 'bastion_ward_stone', origin)[0];
     const pid = sim.addPlayer('priest', 'Clicker');
     teleport(sim, pid, ward.pos.x, ward.pos.z);
-    sim.pickUpObject(ward.id, pid);
+    expect(sim.pickUpObject(ward.id, pid)).toBe(true);
 
     const channel = boss.nythraxis!.wardChannels.find((c) => c.objectId === ward.id)!;
     expect(channel.playerId).toBe(pid);
@@ -2352,6 +2408,7 @@ describe('Nythraxis raid encounter', () => {
     expect(
       sim.players.get(pid)!.inventory.some((slot) => slot?.itemId === 'bastion_ward_stone'),
     ).toBe(false);
+    expect(sim.pickUpObject(ward.id, pid)).toBe(false);
   });
 
   it('never leashes/resets when kited — keeps chasing instead of evading home', () => {

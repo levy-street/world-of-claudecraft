@@ -1,0 +1,108 @@
+{
+  "provenance": {
+    "kind": "synthetic-production-shape",
+    "release": "v0.25.0",
+    "class": "warrior",
+    "note": "Pinned representative stable-Warrior JSONB save; contains no account or player PII."
+  },
+  "state": {
+    "level": 20,
+    "xp": 173,
+    "lifetimeXp": 44673,
+    "honor": 321,
+    "lifetimeHonor": 654,
+    "prestigeRank": 2,
+    "unlockedMilestones": ["m_first", "m_second"],
+    "restedXp": 246,
+    "totalPlayedSeconds": 9876.5,
+    "professions": { "mining": 41, "herbalism": 12 },
+    "gatheringProficiency": { "mining": 41, "herbalism": 12 },
+    "copper": 9876,
+    "hp": 517,
+    "resource": 44,
+    "pos": { "x": 123, "z": -42 },
+    "facing": 1.25,
+    "equipment": {
+      "mainhand": "worn_sword",
+      "chest": "recruit_tunic"
+    },
+    "inventory": [
+      { "itemId": "baked_bread", "count": 4 },
+      { "itemId": "wolf_fang", "count": 9, "instance": { "signer": "Fixture" } }
+    ],
+    "bags": [null, null, null, null],
+    "bank": {
+      "inventory": [{ "itemId": "linen_scrap", "count": 7 }],
+      "purchasedSlots": 6,
+      "bonusSlots": 2
+    },
+    "vendorBuyback": [{ "itemId": "baked_bread", "count": 1 }],
+    "questLog": [
+      { "questId": "q_fixture_active", "counts": [3, 1], "state": "active" },
+      { "questId": "q_fixture_ready", "counts": [5], "state": "ready" }
+    ],
+    "questsDone": ["q_fixture_done"],
+    "arenaRating": 1650,
+    "arenaWins": 7,
+    "arenaLosses": 3,
+    "arena1v1Rating": 1650,
+    "arena1v1Wins": 7,
+    "arena1v1Losses": 3,
+    "arena2v2Rating": 1880,
+    "arena2v2Wins": 11,
+    "arena2v2Losses": 4,
+    "talents": {
+      "spec": "fury",
+      "ranks": {
+        "old_warrior_damage_node": 3,
+        "old_warrior_rage_node": 2
+      },
+      "choices": {
+        "old_warrior_choice_row": "old_warrior_choice"
+      }
+    },
+    "loadouts": [
+      {
+        "name": "Legacy Fury",
+        "alloc": {
+          "spec": "fury",
+          "ranks": { "old_warrior_damage_node": 3 },
+          "choices": { "old_warrior_choice_row": "old_warrior_choice" }
+        },
+        "bar": [
+          "battle_shout",
+          "deleted_warrior_spell",
+          "bloodthirst",
+          "bloodthirst",
+          "enrage_passive",
+          "battle_stance",
+          null
+        ]
+      },
+      {
+        "name": "Broken Build",
+        "alloc": {
+          "spec": "retired_spec",
+          "ranks": { "retired_node": 99 }
+        },
+        "bar": ["deleted_warrior_spell"]
+      }
+    ],
+    "activeLoadout": 0,
+    "cooldowns": {
+      "abilities": { "bloodrage": 13.5 },
+      "potion": 41
+    },
+    "skin": 3,
+    "skinCatalog": "class",
+    "craftSkills": { "blacksmithing": 17 },
+    "knownRecipes": ["recipe_copper_ring"],
+    "archetype": { "path": "guardian", "points": 2 },
+    "delveMarks": 17,
+    "delveClears": { "crypt": 4 },
+    "companionUpgrades": { "tessa": 2 },
+    "delveLoreUnlocked": ["lore_1"],
+    "townFocus": { "eastbrook": 4 },
+    "renown": 9
+  }
+}

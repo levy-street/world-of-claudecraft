@@ -1,8 +1,10 @@
 # Phase 04: Node materials and pristine veins
 
 This phase makes node gathering yield real materials: per-node-type tables keyed by rolled
-rarity replace the placeholder junk grants, rare+ yields are signed like corpse yields, one
-rare event (the pristine vein) lands, and the long-dormant `gatherResult` event finally gets
+rarity replace the placeholder junk grants, rare+ yields are signed like corpse yields, the
+per-node-type rare events land (pristine vein for ore, ancient heartwood for wood, moonlit
+bloom for herbs; the 2026-07-17 amendment, so every node family gets its own jackpot
+fantasy), and the long-dormant `gatherResult` event finally gets
 visible feedback (SFX cue plus a rarity-colored loot line). It is its own slice because it
 closes the gathering input loop end to end, on top of the Phase 2 signing model and ahead of
 recipe consumption (Phase 10) and tier gating (Phase 12), so materials exist and feel
@@ -11,8 +13,9 @@ rewarding before anything spends them.
 ## Context pointers
 
 - `docs/professions-2/state.md`: locked decisions (RNG in, determinism out; prime directive;
-  zone-1 stockpiling mitigation), the pristine vein tuning target (roughly 1 per zone per
-  20 minutes, 5x yield, always signed), the validation matrix, and the "Gathering" row under
+  zone-1 stockpiling mitigation; the 2026-07-17 per-node-type rare-event amendment), the
+  rare-event tuning target (roughly 1 per zone per 20 minutes, 5x yield, always signed; one
+  shared cadence knob), the validation matrix, and the "Gathering" row under
   key existing surfaces.
 - `docs/professions-2/progress.md`: status table and the Phase 4 deliverable checklist.
 - `docs/professions-2/implementation-plan.md`: team workflow, the Review Dispatch Matrix,
@@ -35,8 +38,9 @@ This is Phase 04 of the Professions 2.0 feature: Node materials and pristine vei
 
 Model: Opus 4.8, xhigh effort. Harness: Claude Code.
 
-Goal: make node gathering yield real materials with rarity, signed rare+ yields, one rare
-event (the pristine vein), and visible feedback for every harvest.
+Goal: make node gathering yield real materials with rarity, signed rare+ yields, the
+per-node-type rare events (pristine vein, ancient heartwood, moonlit bloom), and visible
+feedback for every harvest.
 
 STEP 0 - PRE-FLIGHT:
 - Sync with the LATEST release branch FIRST: git fetch origin "+refs/heads/release/*:refs/remotes/origin/release/*"; pick
@@ -62,7 +66,7 @@ The summary must return: the NODE_HARVEST_TABLE shape and where the placeholder 
 live; the resolveHarvest flow and its exact Rng draw order; the gatherResult event payload
 and the absence of consumers; how corpse yields get signed in interaction.ts (the precedent
 to copy); ItemDef catalog conventions (fields, English names, procedural icon fallback); the
-quality token family used for rarity colors; the pristine vein tuning target from state.md;
+quality token family used for rarity colors; the rare-event tuning target from state.md;
 the validation matrix rows for sim-only and content-only changes; and any locked decision
 that constrains this phase (zone-1 stockpiling mitigation, prime directive, RNG model).
 
@@ -86,25 +90,31 @@ Agent sim/content deliverables:
   Players hold them; only their node sources go away (prime directive).
 
 Agent event/feedback deliverables:
-- Pristine vein: a rare per-player node state rolled through Rng at the state.md tuning
-  cadence (roughly 1 per zone per 20 minutes), five-fold yield, always signed. Land it as
-  its own small module behind the SimContext seam (module-first), never a method cluster on
-  a coordinator, called from the resolveHarvest path.
-- The vein emits an id-based soft zone broadcast: sim/server stays language-agnostic (stable
-  id plus values); add the client matcher rows in the SAME change (S3 guard).
-- Leave a named deed-mark hook at the vein resolution site; deed registration is deferred to
-  Phase 15. Do not author any deed records now.
+- The rare-event module: ONE small module behind the SimContext seam (module-first, called
+  from the resolveHarvest path, never a method cluster on a coordinator) carrying a
+  per-node-type flavor: pristine vein (ore), ancient heartwood (wood), moonlit bloom (herb).
+  Each flavor is a rare per-player node state rolled through Rng at the shared state.md
+  tuning cadence (roughly 1 per zone per 20 minutes), five-fold yield, always signed. The
+  node's type decides the flavor; one shared cadence knob until Phase 15 tunes per family.
+- Each flavor emits its own id-based soft zone broadcast (three additive ids): sim/server
+  stays language-agnostic (stable id plus values); add the client matcher rows for all
+  three in the SAME change (S3 guard).
+- Leave a named per-flavor deed-mark hook at the event resolution site; deed registration is
+  deferred to Phase 15. Do not author any deed records now.
 - Consume gatherResult in the client: play the SFX cue and append a rarity-colored loot line
   to the HUD log. Colors come from the existing quality token family only; the feedback is
   identical on every graphics tier (fairness invariant). New player strings are English-only
   t() keys in the matching src/ui/i18n.catalog/ module.
 
 Agent tests deliverables:
-- Determinism pin: the Rng draw order through resolveHarvest INCLUDING the new vein roll;
-  same seed gives the same yields. If the extra roll changes existing pinned draws, re-pin
-  deliberately and say so in the commit body.
+- Determinism pin: the Rng draw order through resolveHarvest INCLUDING the new rare-event
+  roll; same seed gives the same yields. If the extra roll changes existing pinned draws,
+  re-pin deliberately and say so in the commit body.
+- Flavor mapping test: an event on an ore node is a pristine vein, on a wood node an
+  ancient heartwood, on an herb node a moonlit bloom; each emits its own broadcast id.
 - Rarity distribution test against the pinned roll (tests/professions_rarity_roll.test.ts).
-- Signing tests: rare+ yields carry a signer; pristine vein yields are always signed.
+- Signing tests: rare+ yields carry a signer; rare-event yields (all three flavors) are
+  always signed.
 - Zone-1 cap test: zone 1 node tables can only produce common/low-tier materials.
 - Acceptance test: no node grants bone_fragments, linen_scrap, or spider_leg anymore, while
   those ItemDefs remain defined in the catalog.
@@ -112,9 +122,9 @@ Agent tests deliverables:
 
 INVARIANTS THIS PHASE MUST KEEP:
 - Determinism: all randomness through Rng (never Math.random, Date.now, performance.now in
-  sim logic); the vein roll's draw order is pinned by a test.
+  sim logic); the rare-event roll's draw order is pinned by a test.
 - Sim purity: src/sim/ gains zero DOM/Three imports and never imports render/ui/game/net.
-- Server authority: yields, rarity, signing, and vein rolls resolve in the sim on the
+- Server authority: yields, rarity, signing, and rare-event rolls resolve in the sim on the
   server; the client only renders gatherResult and the broadcast.
 - IWorld both worlds: if any new read or event crosses the render/ui seam, add it to the
   matching facet file (src/world_api/<domain>.ts), implement it in BOTH Sim and ClientWorld,
@@ -131,8 +141,10 @@ INVARIANTS THIS PHASE MUST KEEP:
 Out of scope (do NOT do in this phase):
 - Node TIER gating (Phase 12).
 - Recipe consumption of these materials (Phase 10).
-- Fishing (Phase 11).
-- Pristine vein deed authoring or registration (Phase 15; leave only the named hook).
+- Fishing (Phase 11; the glimmerfin rare catch already covers its jackpot).
+- The corpse-harvest perfect specimen component (Phase 10).
+- Rare-event deed authoring or registration (Phase 15; leave only the named per-flavor
+  hooks).
 
 STEP 3 - VALIDATION + MULTI-AGENT REVIEW:
 - Run the state.md validation matrix rows for sim-only and content-only changes:
@@ -157,8 +169,9 @@ Three commits, in this order, each staging explicit paths (never git add -A; the
 may be shared) and each carrying a body (what changed and why, 1 to 4 sentences):
 - feat(professions): real node material tables
   (gathering.ts tables, gather_nodes.ts, items.ts material defs, table tests)
-- feat(professions): pristine veins
-  (vein module, rare+ signing, broadcast id, deed hook, determinism re-pin if any)
+- feat(professions): per-node-type rare events
+  (event module with the three flavors, rare+ signing, broadcast ids, deed hooks,
+  determinism re-pin if any)
 - feat(ui): gather feedback line and cue
   (gatherResult consumers, loot line, SFX cue, matcher rows, i18n catalog keys)
 
@@ -168,9 +181,10 @@ STEP 5 - ACCEPTANCE CRITERIA (do not mark complete until all check):
 - [ ] Rarity distribution matches the pinned roll (tests/professions_rarity_roll.test.ts
       green against the new tables).
 - [ ] Rare+ node yields are signed instances, matching the corpse signing precedent.
-- [ ] Pristine vein: rolled through Rng at the state.md cadence, five-fold yield, always
-      signed, id-based soft zone broadcast emitted and matcher-localized; named deed hook
-      left dormant.
+- [ ] The rare events: rolled through Rng at the shared state.md cadence, five-fold yield,
+      always signed, with the flavor decided by node type (pristine vein / ancient
+      heartwood / moonlit bloom), per-flavor id-based soft zone broadcasts emitted and
+      matcher-localized; named per-flavor deed hooks left dormant.
 - [ ] gatherResult consumed: SFX cue plus rarity-colored loot line in the HUD log, colors
       from the quality token family, identical on every graphics tier.
 - [ ] Loot line and broadcast fully localized (English catalog keys plus matcher rows; the
@@ -183,8 +197,8 @@ STEP 6 - DOC UPDATES + MEMORY:
   acceptance boxes, note the phase-start and phase-end commit hashes and any deferrals.
 - Update docs/professions-2/state.md: replace the planned "Phase 4" row under "New surfaces
   per phase" with what actually landed: the material table symbol names, the new material
-  ItemDef id namespace, the pristine vein module path and its SimEvent/broadcast id, the
-  deed-mark hook location, and the gather feedback i18n key namespace.
+  ItemDef id namespace, the rare-event module path and its per-flavor SimEvent/broadcast
+  ids, the deed-mark hook locations, and the gather feedback i18n key namespace.
 - Record any surprises (draw-order re-pins, matcher quirks) to Claude Code memory.
 
 STEP 7 - FINAL RESPONSE FORMAT:

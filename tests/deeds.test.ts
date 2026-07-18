@@ -611,6 +611,52 @@ describe('retro on join', () => {
     expect(meta.deedsEarned.has('col_first_rare')).toBe(true);
   });
 
+  it('a masterwork bag instance seeds at the item DEF quality on join (no bump inflation)', () => {
+    // Professions 2.0 Phase 2: a masterwork copy carries rolled.masterwork +
+    // rolled.stats and NO rolled.quality, so the join seed reads the def
+    // quality. eastbrook_ritual_vestments' def is uncommon: the gameplay bump
+    // to rare is a stat-budget fact, never a discovery fact.
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'MasterVet', {
+      state: {
+        ...veteranState(),
+        inventory: [
+          {
+            itemId: 'eastbrook_ritual_vestments',
+            count: 1,
+            instance: {
+              signer: 'MasterVet',
+              rolled: { masterwork: true, stats: { int: 1, spi: 1 } },
+            },
+          },
+        ],
+      },
+    });
+    const meta = sim.players.get(pid)!;
+    expect(meta.deedStats.itemsDiscovered.has('eastbrook_ritual_vestments')).toBe(true);
+    expect(meta.deedStats.visited.has('quality:rare')).toBe(false);
+    expect(meta.deedsEarned.has('col_first_rare')).toBe(false);
+  });
+
+  it('a legacy bag instance with rolled.quality rare still seeds the quality:rare mark on join', () => {
+    // Legacy crafted instances (pre-Phase 2) persist rolled.quality; their
+    // exact old read is unchanged: the rolled quality beats the def.
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'LegacyVet', {
+      state: {
+        ...veteranState(),
+        inventory: [
+          { itemId: 'redbrook_blade', count: 1, instance: { rolled: { quality: 'rare' } } },
+        ],
+      },
+    });
+    const meta = sim.players.get(pid)!;
+    expect(meta.deedStats.itemsDiscovered.has('redbrook_blade')).toBe(true);
+    expect(meta.deedStats.visited.has('quality:rare')).toBe(true);
+    expect(meta.deedsEarned.has('col_first_rare')).toBe(true);
+    expect(meta.deedsEarned.has('col_first_epic')).toBe(false);
+  });
+
   it('the retro pass is a pure function of the loaded state and the catalog', () => {
     const a = new Sim({ seed: 7, playerClass: 'mage' });
     const b = new Sim({ seed: 7, playerClass: 'mage' });
@@ -619,6 +665,146 @@ describe('retro on join', () => {
     expect([...a.players.get(pa)!.deedsEarned.keys()].sort()).toEqual(
       [...b.players.get(pb)!.deedsEarned.keys()].sort(),
     );
+  });
+
+  it('a done ground-pickup quest proves the sparkle and heals Something Shiny', () => {
+    // Every ground object is a quest item whose pickup is denied once its
+    // quest is done, so an all-quests-done veteran can never bump the counter
+    // again; the done proving quest is itself the evidence the pickup
+    // happened before the counter existed.
+    const sim = makeSim();
+    const state = veteranState();
+    state.questsDone = ['q_supplies'];
+    const pid = sim.addPlayer('warrior', 'Supplier', { state });
+    const meta = sim.players.get(pid)!;
+    expect(meta.deedsEarned.has('exp_something_shiny')).toBe(true);
+    // The heal grants the deed; the lifetime counter stays honest at zero.
+    expect(meta.deedStats.counters.groundObjectsLooted).toBe(0);
+    const evs = deedEvents(sim.tick());
+    const ev = evs.find((e) => e.deedId === 'exp_something_shiny');
+    expect(ev?.retro).toBe(true);
+    expect(ev?.pid).toBe(pid);
+
+    // Interact-objective chains and mob-drop collect chains prove nothing:
+    // those routes return before the counter bump, so they must not heal.
+    const sim2 = makeSim();
+    const s2 = veteranState();
+    s2.questsDone = ['q_nythraxis_graves', 'q_nythraxis_sealed_crypt', 'q_the_codfather'];
+    const pid2 = sim2.addPlayer('warrior', 'Interactor', { state: s2 });
+    expect(sim2.players.get(pid2)!.deedsEarned.has('exp_something_shiny')).toBe(false);
+  });
+
+  it('Giantslayer heals exactly where no mob can sit five levels up', () => {
+    // The heroic pin (level 22) is the highest creditable spawn in the game,
+    // so level 18 is the first permanently stranded level and 17 the last
+    // one where the live kill site can still fire.
+    const sim = makeSim();
+    const capped = sim.addPlayer('warrior', 'Capped', {
+      state: { ...veteranState(), level: 20 },
+    });
+    expect(sim.players.get(capped)!.deedsEarned.has('cmb_giantslayer')).toBe(true);
+    const edge = sim.addPlayer('warrior', 'Edge', { state: { ...veteranState(), level: 18 } });
+    expect(sim.players.get(edge)!.deedsEarned.has('cmb_giantslayer')).toBe(true);
+    const leveler = sim.addPlayer('warrior', 'Leveler', {
+      state: { ...veteranState(), level: 17 },
+    });
+    expect(sim.players.get(leveler)!.deedsEarned.has('cmb_giantslayer')).toBe(false);
+    // The heal is a retro grant: flagged on the event, delivered to the
+    // healed player only.
+    const evs = deedEvents(sim.tick());
+    const ev = evs.find((e) => e.deedId === 'cmb_giantslayer' && e.pid === capped);
+    expect(ev?.retro).toBe(true);
+  });
+
+  it('the heals unlock feat_book_complete in the same join for an otherwise complete book', () => {
+    // The motivating payoff: when the three healed deeds were the last holes
+    // in a veteran's book, the meta pass that runs right after the fallback
+    // arms must complete the feat on the SAME login, not one login later.
+    const healed = ['exp_something_shiny', 'cmb_giantslayer', 'prog_well_rested'];
+    const bookIds = (DEEDS.feat_book_complete.trigger as { deedIds: string[] }).deedIds;
+    const deeds: Record<string, string> = {};
+    for (const id of bookIds) {
+      if (!healed.includes(id)) deeds[id] = '2026-07-01';
+    }
+    const sim = makeSim();
+    const state: CharacterState = {
+      ...veteranState(),
+      level: MAX_LEVEL,
+      restedXp: 0,
+      questsDone: ['q_supplies'],
+      deeds,
+    };
+    const pid = sim.addPlayer('warrior', 'Completionist', { state });
+    const meta = sim.players.get(pid)!;
+    for (const id of healed) expect(meta.deedsEarned.has(id), id).toBe(true);
+    expect(meta.deedsEarned.has('feat_book_complete')).toBe(true);
+  });
+
+  it('Well Rested heals only at the cap where the pool is frozen', () => {
+    // Rested XP neither accrues nor drains at MAX_LEVEL, so a capped save
+    // with an empty pool is permanently stranded; below the cap the pool can
+    // still accrue and the deed must stay earned-by-play.
+    const sim = makeSim();
+    const dry = sim.addPlayer('warrior', 'CappedDry', {
+      state: { ...veteranState(), level: MAX_LEVEL, restedXp: 0 },
+    });
+    expect(sim.players.get(dry)!.deedsEarned.has('prog_well_rested')).toBe(true);
+    const leveling = sim.addPlayer('warrior', 'StillRests', {
+      state: { ...veteranState(), level: MAX_LEVEL - 1, restedXp: 0 },
+    });
+    expect(sim.players.get(leveling)!.deedsEarned.has('prog_well_rested')).toBe(false);
+    // A frozen nonzero pool retro-grants through the flag predicate already;
+    // the heal must not be the only path that covers it.
+    const banked = sim.addPlayer('warrior', 'Banked', {
+      state: { ...veteranState(), level: MAX_LEVEL, restedXp: 50 },
+    });
+    expect(sim.players.get(banked)!.deedsEarned.has('prog_well_rested')).toBe(true);
+  });
+});
+
+// Professions 2.0 Phase 2: a live masterwork grant (sim.addItemInstance, the
+// exact hub the craft path's masterwork arm calls) carries rolled.masterwork
+// and NO rolled.quality, so the discovery ledger reads the item DEF quality,
+// identical to a plain grant of the same item; the one-tier gameplay bump
+// never inflates the quality-first marks.
+describe('masterwork instance discovery (Professions 2.0 Phase 2)', () => {
+  it('a rare-DEF masterwork instance marks discovery exactly like a plain grant of the item', () => {
+    // Rare DEF (boundstone_helm): the def quality itself lands quality:rare on
+    // both paths, and the masterwork bump (rare to epic in stats) lands epic
+    // on NEITHER.
+    const viaMasterwork = makeSim();
+    const { meta: mwMeta } = primary(viaMasterwork);
+    viaMasterwork.addItemInstance(
+      'boundstone_helm',
+      { signer: mwMeta.name, rolled: { masterwork: true, stats: { sta: 2, str: 1 } } },
+      viaMasterwork.playerId,
+    );
+    viaMasterwork.tick();
+    const viaPlain = makeSim();
+    const { meta: plainMeta } = primary(viaPlain);
+    viaPlain.addItem('boundstone_helm', 1, viaPlain.playerId);
+    viaPlain.tick();
+    for (const meta of [mwMeta, plainMeta]) {
+      expect(meta.deedStats.itemsDiscovered.has('boundstone_helm')).toBe(true);
+      expect(meta.deedStats.visited.has('quality:rare')).toBe(true);
+      expect(meta.deedStats.visited.has('quality:epic')).toBe(false);
+      expect(meta.deedsEarned.has('col_first_rare')).toBe(true);
+      expect(meta.deedsEarned.has('col_first_epic')).toBe(false);
+    }
+  });
+
+  it('an uncommon-DEF masterwork instance never lands the bumped rare mark', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    sim.addItemInstance(
+      'eastbrook_ritual_vestments',
+      { signer: meta.name, rolled: { masterwork: true, stats: { int: 1, spi: 1 } } },
+      sim.playerId,
+    );
+    sim.tick();
+    expect(meta.deedStats.itemsDiscovered.has('eastbrook_ritual_vestments')).toBe(true);
+    expect(meta.deedStats.visited.has('quality:rare')).toBe(false);
+    expect(meta.deedsEarned.has('col_first_rare')).toBe(false);
   });
 });
 
@@ -1106,11 +1292,11 @@ describe('flag triggers (one negative and one positive per predicate)', () => {
     check('prog_specialized', false, 'no spec chosen yet');
     meta.talents.spec = 'arms';
     check('prog_specialized', true, 'spec chosen');
-    // talentCapstone: a non-capstone rank does nothing; a pointsGate-8 node grants
-    meta.talents.ranks = { war_toughness: 1 };
-    check('prog_deep_roots', false, 'non-capstone rank');
-    meta.talents.ranks = { war_berserker_rage: 1 };
-    check('prog_deep_roots', true, 'capstone rank');
+    // talentCapstone: a lower row does nothing; selecting the level-20 row grants.
+    meta.talents.rows = { 5: 'war_row_double_charge' };
+    check('prog_deep_roots', false, 'lower-row choice');
+    meta.talents.rows = { 20: 'war_row_colossal_might' };
+    check('prog_deep_roots', true, 'final-row choice');
     // guildMember (server-stamped entity field)
     check('soc_guild_joined', false, 'guildless');
     sim.setPlayerGuild(meta.entityId, 'The Levy');
@@ -1516,15 +1702,12 @@ describe('live sites grant in the same run (retro cannot mask a broken site)', (
     const { meta } = primary(sim);
     const quest = QUESTS.q_prof_intro; // prog_callused_hands, {kind:'quest'}
     expect(quest).toBeDefined();
-    sim.ctx.addItem('chunk_of_ore', 5, meta.entityId); // the collect objective hand-in
     meta.questLog.set('q_prof_intro', { questId: 'q_prof_intro', counts: [5], state: 'ready' });
-    // Consume the addItem dirty mark on its own tick first, so the final
-    // tick's only marks come from the turn-in itself. The live turn-in path
+    // The live turn-in path
     // carries two independent full marks (grantXp marks on every xp grant,
     // and turnInQuestCore marks explicitly for xp-less future quests); this
     // test guards the path as a whole, so it reds only when the in-the-moment
     // grant is actually broken, never on a refactor that keeps either mark.
-    sim.tick();
     expect(meta.deedsEarned.has('prog_callused_hands')).toBe(false);
     turnInQuestCore(sim.ctx, 'q_prof_intro', quest, meta);
     expect(meta.questsDone.has('q_prof_intro')).toBe(true);
@@ -1567,25 +1750,25 @@ describe('live sites grant in the same run (retro cannot mask a broken site)', (
     expect(meta.deedsEarned.has('cmb_heavy_hitter')).toBe(true);
   });
 
-  // A valid eleven-point warrior build: a spec, a pointsGate-8 capstone
-  // (war_berserker_rage, requires war_imp_heroic_strike and eight points spent
-  // above it), and eleven points spent in total, so it satisfies the spec, the
-  // capstone, the first-point, and the full-build deeds at once.
+  // A valid six-row warrior build: a spec and one choice in every canonical row,
+  // including the level-20 capstone, so it satisfies the spec, capstone,
+  // first-choice, and full-build deeds at once.
   const warriorSpecCapstoneBuild = (): TalentAllocation => ({
     ...emptyAllocation(),
     spec: 'arms',
-    ranks: {
-      war_toughness: 3,
-      war_cruelty: 3,
-      war_imp_heroic_strike: 2,
-      war_berserker_rage: 1,
-      arms_imp_overpower: 2,
+    rows: {
+      5: 'war_row_double_charge',
+      8: 'war_row_die_by_the_sword',
+      11: 'war_row_storm_bolt',
+      14: 'war_row_blood_offering',
+      17: 'war_row_avatar',
+      20: 'war_row_colossal_might',
     },
   });
 
   it('saveLoadout: applying a staged spec+capstone build makes the talent deeds land in-tick', () => {
     const sim = makeSim();
-    sim.setPlayerLevel(MAX_LEVEL); // the full eleven-point budget
+    sim.setPlayerLevel(MAX_LEVEL); // all six rows unlocked
     const { meta } = primary(sim);
     // Drain the setPlayerLevel dirty mark on its own tick so the final tick's
     // only mark can come from saveLoadout itself.
@@ -1612,7 +1795,7 @@ describe('live sites grant in the same run (retro cannot mask a broken site)', (
     const plainBuild: TalentAllocation = {
       ...emptyAllocation(),
       spec: null,
-      ranks: { war_toughness: 1 },
+      rows: { 5: 'war_row_pursuit' },
     };
     // Save the spec+capstone build first (slot 0), then a spec-less build (slot
     // 1) which becomes active and live. No tick runs between the two saves, so

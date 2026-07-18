@@ -126,6 +126,7 @@ export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
   p.autoAttack = false;
   p.queuedOnSwing = null;
   delete p.queuedOnSwingFree;
+  delete p.queuedOnSwingCostMultiplier;
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
   p.combatTimer = 99;
@@ -148,16 +149,17 @@ export function resurrectAtCorpse(ctx: SimContext, pid?: number): void {
 }
 
 // Resurrect at the Spirit Healer: instant, in place, but with Resurrection Sickness.
-export function resurrectAtSpiritHealer(ctx: SimContext, pid?: number): void {
+export function resurrectAtSpiritHealer(ctx: SimContext, pid?: number): boolean {
   const r = ctx.resolve(pid);
-  if (!r) return;
+  if (!r) return false;
   const { meta, e: p } = r;
-  if (!p.dead || !p.ghost) return;
-  if (!spiritHealerInRange(ctx, p)) return;
+  if (!p.dead || !p.ghost) return false;
+  if (!spiritHealerInRange(ctx, p)) return false;
   // The Spirit Healer always inflicts Resurrection Sickness and returns you at only
   // RES_HEALER_HP_FRACTION of your pools (the corpse run is the penalty-free choice).
   reviveAt(ctx, meta, p, p.pos, RES_HEALER_HP_FRACTION, true);
   ctx.emit({ type: 'respawn', pid: meta.entityId });
+  return true;
 }
 
 // Resurrect a ghost that ran its spirit back and re-entered its instance: penalty-free,

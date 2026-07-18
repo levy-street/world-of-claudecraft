@@ -1,3 +1,6 @@
+// FIRST import on purpose: loads .env before realm.ts (or any other module
+// with an import-time process.env read) evaluates. See server/env.ts.
+import './env';
 import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
@@ -243,6 +246,7 @@ import {
   recordAuthFailure,
   requestIp,
   setRateLimitTier2Store,
+  walletLinkRateLimited,
   wocBalanceRateLimited,
 } from './ratelimit';
 import { createPgRateLimitStore } from './ratelimit_db';
@@ -273,6 +277,10 @@ import {
 } from './user_assets_routes';
 import {
   configureWalletRuntime,
+  handleDesktopWalletHandoffClaim,
+  handleDesktopWalletHandoffComplete,
+  handleDesktopWalletHandoffCreate,
+  handleDesktopWalletHandoffResult,
   handleWalletChallenge,
   handleWalletGet,
   handleWalletLink,
@@ -329,6 +337,8 @@ const STATIC_PAGE_ALIASES = new Map([
   ['/social-media-links/', '/links.html'],
   ['/play', '/play.html'],
   ['/play/', '/play.html'],
+  ['/wallet-handoff', '/wallet-handoff.html'],
+  ['/wallet-handoff/', '/wallet-handoff.html'],
   ['/privacy', '/privacy.html'],
   ['/privacy/', '/privacy.html'],
   ['/terms', '/terms.html'],
@@ -741,6 +751,7 @@ function characterListPayload(chars: CharacterRow[]): {
     playtimeSeconds: number;
     skinCatalog: 'class' | 'mech';
     mainhandItemId: string | null;
+    offhandItemId: string | null;
   }[];
 } {
   return {
@@ -756,9 +767,10 @@ function characterListPayload(chars: CharacterRow[]): {
       lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
       playtimeSeconds: Number(c.playtime_seconds ?? 0),
       // Real appearance for the char-select 3D preview (the client renders the
-      // Combat Mech cosmetic body and the equipped mainhand, matching the world).
+      // Combat Mech cosmetic body and both equipped hands, matching the world).
       skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
       mainhandItemId: c.state?.equipment?.mainhand ?? null,
+      offhandItemId: c.state?.equipment?.offhand ?? null,
     })),
   };
 }
@@ -1890,6 +1902,27 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return handleEmailUnsubscribe(res, token);
     }
     // Non-custodial Solana wallet linking, all account-scoped.
+    if (req.method === 'POST' && url === '/api/desktop-wallet/create') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      if (!walletLinkRateLimited(req, accountId).allowed) {
+        return json(res, 429, { error: 'rate limited' });
+      }
+      return handleDesktopWalletHandoffCreate(req, res, accountId);
+    }
+    if (req.method === 'POST' && url === '/api/desktop-wallet/claim') {
+      if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate_limited' });
+      return handleDesktopWalletHandoffClaim(req, res);
+    }
+    if (req.method === 'POST' && url === '/api/desktop-wallet/complete') {
+      if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate_limited' });
+      return handleDesktopWalletHandoffComplete(req, res);
+    }
+    if (req.method === 'POST' && url === '/api/desktop-wallet/result') {
+      const accountId = await bearerActiveAccount(req, res);
+      if (accountId === null) return;
+      return handleDesktopWalletHandoffResult(req, res, accountId);
+    }
     if (req.method === 'POST' && url === '/api/wallet/link/challenge') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
@@ -2752,10 +2785,10 @@ export async function startServer(): Promise<http.Server> {
   // tests/server/game_boot_order.test.ts pins against).
   registerLivenessSource(gameStateSource);
 
-  // Business gauges run one bounded, timeout-protected fact query every 15 minutes.
-  // Scrapes publish only the cached snapshot and never query Postgres. Client FPS
-  // stays available in the admin tooling but is intentionally not polled for the
-  // business dashboard.
+  // Business gauges use isolated, staggered, timeout-protected engagement and
+  // funnel snapshots every 15 minutes. Scrapes publish only cached data and never
+  // query Postgres. Client FPS stays available in the admin tooling but is
+  // intentionally not polled for the business dashboard.
   const businessMetrics = registerBusinessMetrics(httpMetrics.registry);
   businessMetrics.start();
 

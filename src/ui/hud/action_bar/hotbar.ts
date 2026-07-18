@@ -1,6 +1,6 @@
 import { computeTalentModifiers, type TalentAllocation } from '../../../sim/content/talents';
 import { abilitiesKnownAt } from '../../../sim/data';
-import type { PlayerClass } from '../../../sim/types';
+import type { AbilityDef, PlayerClass } from '../../../sim/types';
 
 export type HotbarAction = { type: 'ability'; id: string } | { type: 'item'; id: string } | null;
 
@@ -11,6 +11,42 @@ export interface HotbarStorage {
 }
 
 export const HOTBAR_ACTION_MIME = 'application/x-woc-hotbar-action';
+
+/** One rule for every action-bar entry point: passive abilities are informational only. */
+export function isAbilityActionBarEligible(
+  ability: Pick<AbilityDef, 'passive'> | null | undefined,
+): boolean {
+  return ability !== null && ability !== undefined && ability.passive !== true;
+}
+
+export function sanitizeHotbarAction(
+  action: HotbarAction,
+  isAbilityEligible: (id: string) => boolean,
+): HotbarAction {
+  return action?.type === 'ability' && !isAbilityEligible(action.id) ? null : action;
+}
+
+export function sanitizeHotbarActions(
+  actions: readonly HotbarAction[],
+  isAbilityEligible: (id: string) => boolean,
+): HotbarAction[] {
+  return actions.map((action) => sanitizeHotbarAction(action, isAbilityEligible));
+}
+
+export function storedHotbarHasIneligibleAbility(
+  value: unknown,
+  isAbilityEligible: (id: string) => boolean,
+): boolean {
+  if (!Array.isArray(value)) return false;
+  return value.some((entry) => {
+    if (typeof entry === 'string') return !isAbilityEligible(entry);
+    if (!entry || typeof entry !== 'object') return false;
+    const action = entry as { type?: unknown; id?: unknown };
+    return (
+      action.type === 'ability' && typeof action.id === 'string' && !isAbilityEligible(action.id)
+    );
+  });
+}
 
 export function encodeHotbarAction(action: Exclude<HotbarAction, null>): string {
   return JSON.stringify(action);
@@ -242,7 +278,8 @@ export function shouldSeedFormBar(
   return hotbarActionsEqual(parsedForm, parsedNormal);
 }
 
-// Ability ids the loadout's OWN talent allocation actually grants, independent of
+// Castable ability ids the loadout's OWN talent allocation actually grants,
+// independent of
 // whichever build happens to be active client-side right now. `applyLoadoutBar`'s
 // `abilityExists` predicate must be built from this, never from "does the id exist
 // anywhere in ABILITIES": two builds on the same class can grant disjoint ability
@@ -258,7 +295,11 @@ export function loadoutKnownAbilityIds(
   level: number,
 ): Set<string> {
   const mods = computeTalentModifiers(cls, alloc, level);
-  return new Set(abilitiesKnownAt(cls, level, mods).map((k) => k.def.id));
+  return new Set(
+    abilitiesKnownAt(cls, level, mods)
+      .filter((known) => isAbilityActionBarEligible(known.def))
+      .map((known) => known.def.id),
+  );
 }
 
 // Rebuild the bar for a switched talent loadout. A `SavedLoadout.bar` only ever
@@ -285,13 +326,18 @@ export function syncHotbarActions(
   actions: readonly HotbarAction[],
   knownAbilityIds: readonly string[],
   autoPlaceAbilityIds: ReadonlySet<string>,
+  // A passive ability is never castable, so it must never occupy an action slot:
+  // this sweeps a passive left on a bar saved by an older build (and, with the
+  // auto-place set already excluding passives, blocks it from ever re-landing).
+  isPassive: (id: string) => boolean = () => false,
 ): { actions: HotbarAction[]; changed: boolean } {
   const known = new Set(knownAbilityIds);
   const next = actions.map((action) =>
-    action?.type === 'ability' && !known.has(action.id) ? null : action,
+    action?.type === 'ability' && (!known.has(action.id) || isPassive(action.id)) ? null : action,
   );
   let changed = next.some((action, i) => action !== actions[i]);
   for (const id of knownAbilityIds) {
+    if (isPassive(id)) continue;
     if (next.some((action) => action?.type === 'ability' && action.id === id)) continue;
     if (!autoPlaceAbilityIds.has(id)) continue;
     const empty = next.indexOf(null);

@@ -231,8 +231,25 @@ new contributors are always welcome.
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the
-project's [MIT License](LICENSE), the same license that covers the project.
+By contributing code, you agree that your code contributions will be licensed
+under the project's [MIT License](LICENSE), the same license that covers the
+project.
+
+Original creative assets (sound recordings, music, art, and similar authored
+works) are the exception. If you contribute an original asset you created, you
+may instead keep copyright and contribute it under a license of your choice
+(for example CC BY-NC 4.0), provided that:
+
+- the license, the asset paths it covers, and your attribution are recorded in
+  the license table in [CREDITS.md](CREDITS.md) as part of the same pull
+  request, and
+- it includes at minimum a perpetual, royalty-free grant to Levy Street to use
+  the assets commercially in World of ClaudeCraft, including official releases
+  and the in-game store.
+
+For assets listed in the CREDITS.md table, that recorded license controls over
+the project's default MIT license. Asset contributions without a CREDITS.md
+entry are MIT like everything else.
 
 ---
 

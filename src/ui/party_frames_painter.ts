@@ -382,12 +382,16 @@ export class PartyFramesPainter {
         levelText: String(m.level),
         name: m.name,
         portraitKey: `${PARTY_CREST_KEY_PREFIX}${m.cls}`,
-        absorb: config?.showAbsorbs === false ? null : { hp: m.hp, maxHp: m.mhp, total: m.absorb },
+        absorb:
+          config?.showAbsorbs === false ? null : { hp: m.hp, maxHp: m.mhp, total: m.absorb ?? 0 },
         dead: !!m.dead,
         outOfRange: m.oor,
       }),
     );
     const hpFrac = Math.max(0, Math.min(1, m.hp / Math.max(1, m.mhp)));
+    const rewindFrac = Math.max(0, Math.min(1 - hpFrac, (m.rewind ?? 0) / Math.max(1, m.mhp)));
+    this.writers.setStyleProp(row.rewind, '--rewind-start', `${(hpFrac * 100).toFixed(1)}%`);
+    this.writers.setWidth(row.rewind, `${(rewindFrac * 100).toFixed(1)}%`);
     const incomingFrac = Math.max(
       0,
       Math.min(1 - hpFrac, (m.incomingHeal ?? 0) / Math.max(1, m.mhp)),

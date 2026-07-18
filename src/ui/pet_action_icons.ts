@@ -10,6 +10,7 @@
 export const PET_ACTION_ICONS = {
   attack: 'pet_attack',
   taunt: 'pet_growl',
+  waterJet: 'pet_water_jet',
   feed: 'pet_feed', // hunter: feed food to heal the pet (not magic)
   healDemon: 'pet_mend', // warlock: mend the demon
   passive: 'pet_passive',

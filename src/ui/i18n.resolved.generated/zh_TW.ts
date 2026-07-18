@@ -233,6 +233,9 @@ export const zh_TW: EnTranslations = {
       "title": "天賦",
       "classTab": "職業",
       "specTab": "專精",
+      "choicesTab": "抉擇",
+      "rowUnlockToast": "新的天賦抉擇已解鎖！",
+      "rowUnlocks": "在 {level} 級解鎖",
       "available": "可用",
       "spent": "已用",
       "pointSource": "從 {first} 級到 {cap} 級，每升一級獲得 1 點天賦點。繼續升級可獲得更多點數。",
@@ -291,6 +294,7 @@ export const zh_TW: EnTranslations = {
         "noTree": "你的職業尚無天賦樹。",
         "locked": "你尚未解鎖天賦，天賦將在 {level} 級開啟。",
         "noSpec": "未選擇專精",
+        "rowsSummary": "天賦：{head}，已選擇 {picked}/{unlocked} 列選項。",
         "summary": "天賦：{head} — 已用 {spent}/{total} 點（{breakdown}）。",
         "breakdownClass": "職業 {classPts}",
         "breakdownSpec": "職業 {classPts}，{spec} {specPts}",
@@ -314,6 +318,10 @@ export const zh_TW: EnTranslations = {
       "resurrectAtCorpse": "在屍體旁復活",
       "resurrectAtHealer": "靈魂醫者（復活虛弱）",
       "spiritHealerAlive": "靈魂醫者只看護逝者。你仍是生者。"
+    },
+    "fct": {
+      "absorbed": "吸收 {amount}",
+      "cheap": "費用降低!"
     },
     "emotes": {
       "wave": "揮手",
@@ -416,6 +424,18 @@ export const zh_TW: EnTranslations = {
       "armoryEyebrow": "第一賽季",
       "armoryTitle": "兵器庫",
       "armoryBody": "第一賽季兵器庫限定武器外觀。全帳號通用，純裝飾性，周圍所有玩家都能看到。",
+      "wallet": {
+        "title": "Solana 錢包",
+        "unlinked": "連接錢包應用程式，然後簽署一次，將其公開地址綁定到你的 WoC 帳號。我們絕不會取得你的復原短語或私鑰。",
+        "connectedUnlinked": "錢包應用程式已連接到此瀏覽器，但其公開地址尚未綁定到你的 WoC 帳號。",
+        "linkedDisconnected": "你的公開地址已綁定。需要使用 SOL 或 WOC 付款時，請重新連接該錢包應用程式。",
+        "linkedConnected": "已綁定的錢包應用程式已連接，可以使用 SOL 或 WOC 購買。",
+        "mismatched": "目前連接的是另一個錢包。驗證它即可取代已綁定的地址，或重新連接原先綁定的錢包。",
+        "connect": "連接錢包",
+        "verify": "驗證並綁定",
+        "reconnect": "重新連接錢包",
+        "manage": "管理錢包"
+      },
       "collectionLine": "{collection}系列",
       "collections": {
         "guildmark": "公會印記",
@@ -709,6 +729,7 @@ export const zh_TW: EnTranslations = {
       "playerLabel": "你的角色",
       "targetLabel": "你的目標",
       "targetAnnounce": "目標：{name}",
+      "targetOfTargetLabel": "目標的目標",
       "partyLabel": "你的隊伍",
       "partyChip": "隊伍",
       "partyGroup": "小隊 {n}",
@@ -1011,16 +1032,39 @@ export const zh_TW: EnTranslations = {
       "aurasOnPlayerFrame": "增益顯示在玩家框",
       "highContrastBackground": "高對比度背景",
       "startAttackOnAbility": "使用技能時自動攻擊",
-      "showAttackButton": "顯示攻擊按鈕",
       "walkByAutoloot": "路過自動拾取",
       "groundReticle": "地面瞄準指示圈",
+      "mouseoverCast": "對隊伍框架滑鼠指向施法",
       "showItemLevel": "顯示物品等級",
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",
       "showSecondaryActionBar": "顯示副動作列",
+      "showTargetOfTarget": "顯示目標的目標",
+      "showAttackButton": "顯示攻擊按鈕",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",
       "mobileCameraJoystick": "攝影機搖桿",
       "mobileLeftHanded": "左手配置"
+    },
+    "talentRows": {
+      "tab": "抉擇",
+      "defaultLoadout": "預設配置",
+      "comingSoon": "敬請期待",
+      "readoutSummary": "天賦：{head}，已選擇 {spent}/{total} 列。"
+    },
+    "abilityError": {
+      "shieldRequired": "你必須裝備盾牌。"
+    },
+    "specPanel": {
+      "primaryAttr": "主要屬性",
+      "complexity": "複雜度",
+      "complexityLow": "低",
+      "complexityMedium": "中等",
+      "complexityHigh": "高",
+      "exampleAbilities": "範例技能",
+      "viewTalents": "檢視天賦",
+      "selectSpec": "選擇專精",
+      "specUnlockBanner": "專精已解鎖！",
+      "specUnlockHint": "按 N 選擇你的專精。"
     },
     "controller": {
       "title": "手把",
@@ -1133,6 +1177,7 @@ export const zh_TW: EnTranslations = {
         "spellPower": "法術強度",
         "critRating": "暴擊等級",
         "hasteRating": "急速等級",
+        "parry": "招架",
         "hitRating": "命中等級",
         "warfare": "戰爭"
       },
@@ -1151,6 +1196,7 @@ export const zh_TW: EnTranslations = {
         "dodge": "你完全閃躲受到的近戰攻擊、不受任何傷害的機率。",
         "critRating": "來自裝備和套裝加成的暴擊等級，提升你的暴擊機率。約每10點等級提供1%暴擊。",
         "hasteRating": "來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。",
+        "parry": "你招架正面近戰攻擊、完全不受傷害的機率。來自背後的攻擊無法招架。",
         "hitRating": "來自裝備和套裝獎勵的命中等級，降低你的攻擊被閃避和法術被抵抗的機率，對更高等級的敵人尤其有效。約每10點等級提供1%命中。",
         "warfare": "對玩家造成的傷害提高 {increase}%，受到玩家造成的傷害降低 {reduction}%。"
       },
@@ -1501,9 +1547,35 @@ export const zh_TW: EnTranslations = {
       "attackSpeedSlow": "攻擊速度減慢 {pct}%",
       "attackSpeedFast": "攻擊速度提高 {pct}%",
       "haste": "攻擊與施法速度提高 {pct}%",
+      "dmgDone": "造成的傷害提高 {pct}%",
+      "dmgDoneReduce": "造成的傷害降低 {pct}%",
+      "heatingUp": "你的下一個火焰生成技能若連續造成致命一擊，會獲得熾熱連擊；未造成致命一擊則移除熱力迸發",
+      "elementalConvergencePrimed": "你的下一個不同元素學派法術將觸發元素匯聚",
+      "battleStance": "戰鬥姿態：怒氣產生提高 10%",
+      "berserkerStance": "狂暴姿態：暴擊機率提高 3%，暴擊傷害提高 3%",
+      "crit": "暴擊機率提高 {pct}%",
+      "rageGen": "怒氣產生提高 {pct}%",
+      "reckless": "暴擊機率提高 {pct}%，怒氣產生提高 {ragePct}%",
+      "avatar": "巨像：造成的傷害提高 {pct}%",
+      "bloodbath": "暴擊機率與造成的傷害提高 {pct}%",
+      "dieBySword": "受到的傷害降低 {pct}%",
+      "sanguine": "攻擊速度提高 {hastePct}%，造成的傷害提高 {dmgPct}%",
+      "battleTrance": "你的下一次劫掠打擊或致殘打擊不消耗怒氣",
+      "revengeFree": "你的下一次復仇不消耗怒氣",
+      "victoryRush": "乘勝追擊已就緒",
+      "maxHpPct": "最大生命值提高 {pct}%",
+      "temporalHourglass": "免疫傷害且無法行動；恢復生命並加速冷卻。按右鍵可取消。",
       "tongues": "施法時間增加 {pct}%",
+      "combustionCrit": "你的火焰法術必定造成致命一擊",
+      "overloadNext": "下一個法術效果提高{pct}%，但法力消耗增加50%",
+      "powerEchoNext": "下一個直接法術以{pct}%的威力對同一目標重複施放",
+      "iceFloesCasts": "接下來{n}個有施法時間的法術可在移動中施放",
+      "freeCast": "下一次施法不消耗任何資源",
+      "instantCast": "下一個有施法時間的法術變為瞬發",
+      "cheapCast": "下一個法術消耗降低{pct}%",
       "increase": {
         "ap": "攻擊強度提高 {value}",
+        "sp": "法術強度提高 {value}",
         "armor": "護甲提高 {value}",
         "int": "智力提高 {value}",
         "agi": "敏捷提高 {value}",
@@ -1557,6 +1629,7 @@ export const zh_TW: EnTranslations = {
       "formBear": "巨熊形態：生命值與護甲提高",
       "formCat": "貓形態：近戰傷害與能量",
       "formTravel": "迅捷形態：移動速度提高 {pct}%",
+      "formFireball": "火球形態：移動速度提高 {pct}%；無法攻擊或施法",
       "defensiveStance": "戒備姿態：受到的傷害降低，威脅值提高",
       "righteousFury": "燃燒誓言：神聖傷害產生的威脅值大幅提高",
       "scale": "體型增大 {pct}%",
@@ -1603,8 +1676,8 @@ export const zh_TW: EnTranslations = {
       "removeFromBarAria": "將 {name} 從動作列移除"
     },
     "nameplate": {
-      "mob": "[{level}] {name}",
-      "mobElite": "[{level}+] {name}"
+      "mobLevel": "{level}",
+      "mobEliteLevel": "{level}+"
     },
     "mobTooltip": {
       "levelFamily": "等級 {level} {family}",
@@ -2014,17 +2087,31 @@ export const zh_TW: EnTranslations = {
     "archetypeTitle": {
       "label": "稱號",
       "none": "無",
-      "hobbyLabel": "愛好",
-      "armorcrafting": "鍛甲師",
-      "weaponcrafting": "武器匠",
-      "jewelcrafting": "珠寶匠",
-      "alchemy": "煉金師",
-      "engineering": "工程師",
-      "cooking": "廚師",
-      "inscription": "銘文師",
-      "enchanting": "附魔師",
+      "hobbyLabel": "愛好"
+    },
+    "archetypePair": {
+      "engineering+alchemy": "爆破師",
+      "alchemy+cooking": "藥劑師",
+      "cooking+leatherworking": "捕獸人",
+      "leatherworking+tailoring": "製裝師",
+      "tailoring+inscription": "織法師",
+      "inscription+enchanting": "秘法師",
+      "enchanting+jewelcrafting": "縛晶師",
+      "jewelcrafting+weaponcrafting": "鑄刃師",
+      "weaponcrafting+armorcrafting": "鐵匠",
+      "armorcrafting+engineering": "齒輪匠"
+    },
+    "craftName": {
+      "armorcrafting": "護甲鍛造",
+      "weaponcrafting": "武器鍛造",
+      "jewelcrafting": "珠寶設計",
+      "alchemy": "鍊金術",
+      "engineering": "工程學",
+      "cooking": "烹飪",
+      "inscription": "銘文學",
+      "enchanting": "附魔",
       "tailoring": "裁縫",
-      "leatherworking": "製皮師"
+      "leatherworking": "製皮"
     },
     "crafting": {
       "title": "製作",
@@ -2038,6 +2125,42 @@ export const zh_TW: EnTranslations = {
       "insufficientMaterials": "你沒有足夠的材料。",
       "unknownRecipe": "該配方不存在。",
       "comboRequirementUnmet": "你尚未達到該配方所需組合的兩項製造技能等級。",
+      "comboRequires": "調諧要求：{craftA} + {craftB}，階級 {tier}。",
+      "comboMet": "已就緒。",
+      "comboSyncing": "正在檢查伺服器調諧狀態。",
+      "comboNotAttuned": "請先選擇一個原型組合。",
+      "comboWrongPair": "啟用這個確切組合才能製作。",
+      "comboTierUnmet": "將兩項主修技藝提升到所需階級。",
+      "professionChoice": "專業選擇",
+      "noProfessionChoice": "目前沒有可用的專業選擇。",
+      "pairOptionLabel": "{pair}（{craftA} + {craftB}）",
+      "attunementPreview": "結果：獲得{title}稱號；{majorA}和{majorB}成為無上限主修技藝；{hobby}成為上限為稀有品質的嗜好技藝；所有其他技能知識都會保留，但休眠時上限為普通品質。",
+      "hobbyPreview": "結果：{hobby}成為上限為稀有品質的嗜好技藝。兩項主修技藝和所有已保留的技能數值維持不變。",
+      "identity": {
+        "title": "製作身分",
+        "syncing": "正在等待伺服器傳送你的製作身分。",
+        "unattuned": "目前未啟用任何原型組合。你的知識會被保留，但組合配方需要先完成調諧。",
+        "titleLabel": "稱號",
+        "majorsLabel": "主修技藝",
+        "hobbyLabel": "嗜好",
+        "historyLabel": "歷史",
+        "history": "已發現 {pairs} 個組合，已完成 {returns} 次回歸",
+        "roleMajor": "主修",
+        "roleHobby": "嗜好",
+        "roleDormant": "休眠知識",
+        "roleUnattuned": "未調諧",
+        "ceilingUnlimited": "無強化上限",
+        "ceilingRare": "精良品質上限",
+        "ceilingCommon": "普通品質上限",
+        "skillAria": "{craft}，技能 {skill}，階級 {tier}，{role}，{ceiling}",
+        "colCraft": "專業",
+        "colSkill": "技能",
+        "colRole": "定位",
+        "colCap": "上限",
+        "tutorial": "第一個階級：將一門技藝提升到技能 {skill}。成功完成配方會提升對應技藝，且不會抹去其他知識。",
+        "nearTier": "{craft}距離下一階級還差 {points} 點技能。",
+        "dormantKnowledge": "{craft}知識已保留，但在其組合或嗜好未啟用時處於休眠狀態。"
+      },
       "notAtHub": "必須達到所需等級並位於製作站，才能製作該物品。",
       "throttled": "你製作得太快了，請稍等片刻後再試。",
       "recipeNotLearned": "你還沒有學會這個配方。"
@@ -2307,6 +2430,9 @@ export const zh_TW: EnTranslations = {
       "already_linked": "你的帳號已連結一個 Steam 帳號。",
       "account_taken": "該 Steam 帳號已連結到另一個帳號。",
       "upstream": "Steam 未回應。請稍後重試。"
+    },
+    "wallet": {
+      "handoff_invalid": "錢包授權已過期或無法驗證。請再試一次。"
     },
     "welcome": {
       "invalid_input": "輸入無效。"
@@ -2767,10 +2893,10 @@ export const zh_TW: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "預備一記更沉重的揮擊，在你的下一擊消耗怒氣。",
+      "revenge": "橫掃你前方的敵人，並可能在閃躲或招架後不消耗資源。",
+      "hamstring": "妨礙敵人的移動，使其無法逃脫。",
       "battle_shout": "鼓舞士氣的怒吼，提升隊伍的攻擊強度。",
-      "commanding_shout": "提升耐力，讓所有人在戰鬥中更有續航力。",
       "charge": "衝向遠處的敵人，以短暫昏迷揭開戰鬥序幕。",
-      "rend": "施加流血，隨時間慢慢磨耗目標。",
       "thunder_clap": "打擊你周遭的一切並降低它們的攻擊速度。",
       "seal_of_righteousness": "為你的攻擊附加神聖傷害，再以裁決將其釋放消耗。",
       "holy_light": "穩定而可觀的治療，用來把友方或自己補滿。",
@@ -2803,9 +2929,18 @@ export const zh_TW: EnTranslations = {
       "lightning_shield": "為自己充能，攻擊者打中你時會受到自然傷害。",
       "flame_shock": "瞬發灼燒，先給予一記前置傷害並持續灼燒。",
       "fireball": "你主要的火焰核彈，命中後讓目標持續燃燒。",
+      "fireball_form": "化身為活體火球，高速穿越開闊地帶。",
       "frost_armor": "持續的自我增益，在戰鬥前強化你的護甲。",
       "arcane_intellect": "提升智力以擴大友方的法力上限，開怪前先施放。",
       "frostbolt": "從遠處攻擊並使目標減速，讓它無法逼近你。",
+      "ice_lance": "用來消耗冰霜觸發效果的瞬發冰刺，對凍結目標造成的傷害大幅提高。",
+      "flurry": "快速射出三枚冰彈，使目標寒冷，讓你接下來的冰霜法術視其為已凍結。",
+      "fingers_of_frost": "你的冰霜箭有時會強化一次冰槍術，使其命中時將目標視為已凍結。",
+      "brain_freeze": "你的冰霜箭有時會使下一次凜冬之鞭瞬發且造成更高傷害。",
+      "shatter": "你的法術對凍結目標的致命一擊機率大幅提高。",
+      "frozen_orb": "讓一顆緩慢的冰球穿過敵群，冰凍沿途的一切並觸發你的冰霜效果。",
+      "blizzard": "以冰雪覆蓋一片區域，持續傷害並緩速整群敵人。",
+      "blink": "向前瞬移一小段距離，並在離開時解除定身。",
       "conjure_water": "製造飲品以恢復法力，讓你能在每次開怪之間補滿。",
       "conjure_food": "製造食物，坐下進食時可恢復生命。",
       "shadow_bolt": "向目標施放一道暗影箭，是你慣用的核彈。",
@@ -4027,6 +4162,9 @@ export const zh_TW: EnTranslations = {
     "balancePreviewTitle": "已連線錢包的 $WOC 餘額預覽",
     "balancePreviewAria": "已連線錢包餘額預覽：{balance}。綁定錢包即可驗證持有者標識。",
     "balanceAmount": "{amount} $WOC",
+    "bagConnect": "綁定錢包",
+    "bagLink": "驗證錢包",
+    "bagReconnect": "重新連接錢包",
     "connected": "已連線：{address}",
     "connectedWithBalance": "已連線：{balance} - {address}",
     "connectedLinked": "已驗證：{address}",
@@ -4041,12 +4179,37 @@ export const zh_TW: EnTranslations = {
     "helpLinkedDisconnected": "持有者特權已啟用。需要簽名或花費時請連接應用程式。",
     "helpLinkedDisconnectedWithBalance": "持有者特權已啟用。需要簽名或花費時請連接應用程式。",
     "extensionHelp": "若要在此處看到錢包，請保持 Solflare Wallet 等瀏覽器錢包擴充功能處於啟用狀態。",
+    "mobileAppHelp": "選擇 Phantom 或 Solflare。錢包應用程式會要求核准。請保持遊戲開啟，完成後返回遊戲。",
+    "standaloneAppHelp": "主畫面應用程式目前尚不支援連接錢包。若要使用 Phantom 或 Solflare，請在 Safari 或 Chrome 中開啟 World of ClaudeCraft。",
+    "openAppTitle": "在 {wallet} 中繼續",
+    "openAppHelp": "開啟 {wallet} 檢視此請求。錢包應用程式啟用時，請保持此遊戲分頁開啟。",
+    "openAppButton": "開啟 {wallet}",
+    "manualReturnBrowserHelp": "核准後請返回此遊戲分頁。如果 iOS 開啟了其他瀏覽器，請將其關閉並手動返回原本的瀏覽器。",
+    "manualReturnStandaloneHelp": "核准後請從主畫面返回 World of ClaudeCraft。如果 iOS 開啟了瀏覽器，請將其關閉並重新開啟主畫面 App。",
+    "preparingAppButton": "正在準備 {wallet}...",
+    "walletAppUnavailable": "無法準備 {wallet}。請關閉此視窗並重試。",
     "flowConnect": "選擇一個錢包。驗證會自動繼續。",
     "flowSign": "在錢包應用程式中簽署驗證訊息。無需交易或 SOL。",
     "flowVerify": "正在驗證錢包所有權...",
     "linkFailed": "錢包驗證失敗。",
     "verifyFailed": "錢包驗證失敗。",
     "unlinkFailed": "無法解除錢包綁定。",
+    "browser": {
+      "eyebrow": "桌面錢包授權",
+      "title": "連接 Solana 錢包",
+      "linkBody": "在此瀏覽器中選擇錢包擴充功能。簽署驗證訊息後返回桌面應用程式。",
+      "paymentBody": "選擇已連結至帳號的錢包，並在此瀏覽器中核准交易。",
+      "extensionHelp": "找不到相容的錢包擴充功能。請安裝或解鎖 Phantom、Solflare 或其他 Solana 瀏覽器錢包，然後再試一次。",
+      "safety": "World of ClaudeCraft 絕不會要求復原短語或私鑰。",
+      "continueWith": "使用 {wallet} 繼續",
+      "reviewTitle": "在錢包中檢視",
+      "reviewBody": "按照 {wallet} 的提示操作。請保持此瀏覽器頁面開啟。",
+      "completeTitle": "錢包授權完成",
+      "completeBody": "現在可以返回 World of ClaudeCraft 桌面應用程式。",
+      "returnButton": "返回桌面應用程式",
+      "failed": "錢包授權失敗或已過期。請返回桌面應用程式並再試一次。",
+      "retry": "再試一次"
+    },
     "holder": "$WOC 持有者",
     "holderTierTitle": "{tier} $WOC 持有者",
     "holderTiers": {
@@ -5311,11 +5474,14 @@ export const zh_TW: EnTranslations = {
       "openTrade": "開啟交易",
       "duelRequest": "{name} 向你發起了決鬥挑戰！",
       "acceptDuel": "接受決鬥",
+      "resurrectionOffer": "{name}想讓你復活。是否接受？",
+      "acceptResurrection": "接受復活",
       "decline": "拒絕"
     },
     "combat": {
       "floatingMiss": "未命中",
       "floatingDodge": "閃避",
+      "floatingParry": "招架",
       "floatingResist": "抵抗",
       "cannotMove": "無法移動！",
       "attack": "攻擊",
@@ -5325,6 +5491,7 @@ export const zh_TW: EnTranslations = {
       "damageTakenCrit": "{source}對你造成致命一擊，造成 {amount} 點傷害。",
       "miss": "你的{ability}未命中{target}。",
       "dodged": "{target}閃避了你的{ability}。",
+      "parried": "你的{ability}被{target}招架了。",
       "resisted": "{target}抵抗了你的{ability}。",
       "healSelf": "你的{ability}為你恢復 {amount} 點生命。",
       "healSelfCrit": "你的{ability}對你造成暴擊治療，恢復 {amount} 點生命。",
@@ -5485,6 +5652,7 @@ export const zh_TW: EnTranslations = {
     },
     "pet": {
       "attack": "攻擊",
+      "waterJet": "水流噴射",
       "taunt": "嘲諷",
       "healDemon": "治療惡魔",
       "healPet": "治療寵物",
@@ -5493,6 +5661,8 @@ export const zh_TW: EnTranslations = {
       "aggressive": "攻擊",
       "petAttackTitle": "寵物攻擊",
       "petAttackDesc": "命令你的寵物攻擊目前敵對目標。",
+      "waterJetTitle": "水流噴射",
+      "waterJetDesc": "命令你的水元素引導緩速水流，持續 3 秒。冷卻時間 8 秒。按右鍵可在冷卻結束後自動施放。",
       "petTauntTitle": "寵物嘲諷",
       "petTauntDesc": "命令你的寵物接戰，並在進入範圍時使用低吼。10 秒冷卻。",
       "healDemonDesc": "消耗法力，在 5 秒內向你的惡魔引導治療。",
@@ -5503,7 +5673,7 @@ export const zh_TW: EnTranslations = {
       "defensiveDesc": "攻擊傷害你或你寵物的敵人。",
       "aggressiveDesc": "攻擊附近的敵對敵人。",
       "rename": "重新命名寵物",
-      "revive": "復活寵物",
+      "revive": "修補",
       "abandon": "放棄寵物",
       "cancel": "取消",
       "renameLabel": "選擇一個新的寵物名稱。",
@@ -5759,6 +5929,8 @@ export const zh_TW: EnTranslations = {
     },
     "slots": {
       "mainhand": "主手",
+      "twoHand": "雙手",
+      "offhand": "副手",
       "helmet": "頭部",
       "neck": "頸部",
       "shoulder": "肩部",
@@ -5799,7 +5971,8 @@ export const zh_TW: EnTranslations = {
       "attackPower": "攻擊強度",
       "dps": "每秒傷害",
       "critChance": "暴擊機率",
-      "dodge": "閃躲"
+      "dodge": "閃躲",
+      "parry": "招架"
     },
     "tooltip": {
       "qualityKind": "{quality}{kind}",
@@ -6038,23 +6211,15 @@ export const zh_TW: EnTranslations = {
       },
       "battle_shout": {
         "name": "鐵嗓怒吼",
-        "description": "使你的攻擊強度提高 {buff}，持續 2 分鐘。"
-      },
-      "commanding_shout": {
-        "name": "激勵吶喊",
-        "description": "使你的耐力提高 {buff}，持續 2 分鐘。"
+        "description": "發出一聲怒吼，使所有隊伍成員的攻擊強度提高 {buff}%，持續 30 分鐘。"
       },
       "demoralizing_shout": {
         "name": "厲嚎",
-        "description": "發出可怕的怒吼，使附近所有敵人的攻擊強度降低 {buff}，持續 30 秒。"
+        "description": "發出可怕的怒吼，使附近所有敵人造成的傷害降低 {buff}%，持續 20 秒。"
       },
       "charge": {
         "name": "猛衝",
         "description": "向一名敵人衝鋒，產生 9 點怒氣並使其昏迷 1 秒。8-25 碼距離。"
-      },
-      "rend": {
-        "name": "深切裂傷",
-        "description": "撕裂目標，使其在 {duration} 秒內流血並受到 {damage} 點傷害。"
       },
       "thunder_clap": {
         "name": "撼地一擊",
@@ -6100,6 +6265,10 @@ export const zh_TW: EnTranslations = {
         "name": "燼焰彈",
         "description": "投擲一團火球，造成 {damage} 點火焰傷害，並附加持續傷害。"
       },
+      "fireball_form": {
+        "name": "火球形態",
+        "description": "化身為熾烈火球，移動速度提高 {buff}%。變形期間無法攻擊或施放法術。再次施放可恢復正常形態。"
+      },
       "frost_armor": {
         "name": "白霜披風",
         "description": "以寒霜包裹自身，使護甲提高 {buff}，持續 30 分鐘。"
@@ -6111,6 +6280,94 @@ export const zh_TW: EnTranslations = {
       "frostbolt": {
         "name": "凜霜矛",
         "description": "發射一支寒冰箭，造成 {damage} 點冰霜傷害，並使移動速度降低 40%。"
+      },
+      "blazing_barrier": {
+        "name": "烈焰屏障",
+        "description": "以烈焰環繞自身，吸收 130 點傷害，持續 60 秒。（火焰）"
+      },
+      "cold_snap": {
+        "name": "冬之召還",
+        "description": "立即結束閃爍步、霜幕與強效隱形術的冷卻時間。（法師天賦）"
+      },
+      "greater_invisibility": {
+        "name": "強效隱形術",
+        "description": "消失 20 秒：移除 2 個持續傷害效果，並使你在隱形期間及結束後短時間內受到的傷害降低 90%。（法師天賦）"
+      },
+      "hot_streak": {
+        "name": "熾熱連擊",
+        "description": "被動：你的火焰法術（火球術、火焰衝擊、灼燒、炎爆術或烈焰風暴）連續造成兩次致命一擊後，下一次炎爆術或烈焰風暴變為瞬發且不消耗法力。消耗技能會計入下一次連擊，包括免費施法；烈焰風暴無論命中多少敵人都只計一次，且只有首次衝擊會被計入。（火焰）"
+      },
+      "ice_floes": {
+        "name": "浮冰",
+        "description": "你接下來兩個有施法時間的法術可以在移動中施放。持續 15 秒。（法師天賦）"
+      },
+      "ignition": {
+        "name": "點燃",
+        "description": "被動：你的法術致命一擊會灼燒目標，在 6 秒內造成相當於該次傷害 40% 的傷害，可堆疊。（火焰精通）"
+      },
+      "mass_barrier": {
+        "name": "群體屏障",
+        "description": "為你與 30 公尺內至多 4 名附近盟友施加護盾，每個護盾吸收 130 點傷害，持續 60 秒。（法師天賦）"
+      },
+      "overload": {
+        "name": "超載",
+        "description": "你的下一個法術效果提高 40%，但法力消耗提高 50%。持續 10 秒。（法師天賦）"
+      },
+      "power_echo": {
+        "name": "力量回音",
+        "description": "你的下一個直接法術會以 50% 的威力對同一目標重複施放。持續 10 秒。（法師天賦）"
+      },
+      "rings_of_frost": {
+        "name": "冰霜之環",
+        "description": "召喚一個持續 10 秒的冰霜之環。穿過邊緣的敵人會被凍結 4 秒。（法師天賦）"
+      },
+      "rune_of_power": {
+        "name": "能量符文",
+        "description": "在腳下銘刻一個持續 15 秒的能量符文：站在 8 公尺範圍內的盟友造成的傷害提高 10%。（法師天賦）"
+      },
+      "summon_water_elemental": {
+        "name": "召喚水元素",
+        "description": "召喚一個水元素與你並肩作戰，向你的目標投擲水箭並引導水流噴射。（冰霜）"
+      },
+      "ice_lance": {
+        "name": "冰槍術",
+        "description": "投擲一枚冰刺，造成 {damage} 點冰霜傷害；對凍結目標造成三倍傷害。消耗寒冰指或一層凜冬之寒，使目標視為已凍結。（冰霜）"
+      },
+      "flurry": {
+        "name": "凜冬之鞭",
+        "description": "連續射出三枚冰彈，每枚造成 {damage} 點冰霜傷害，並對目標施加凜冬之寒：接下來 2 個相容法術會將其視為已凍結。思維凍結會使凜冬之鞭瞬發、傷害提高 30%，並跳過冷卻時間。（冰霜）"
+      },
+      "frozen_orb": {
+        "name": "寒冰寶珠",
+        "description": "釋放一顆旋轉的寒冰寶珠，向前飄移 8 秒，每秒對附近敵人造成 {damage} 點冰霜傷害並使其緩速 30%。寶珠命中時會產生寒冰指。（冰霜）"
+      },
+      "blizzard": {
+        "name": "暴風雪",
+        "description": "在目標區域召喚持續 6 秒的冰風暴，每秒造成 {damage} 點冰霜傷害並使敵人緩速 40%。每命中一名敵人，寒冰寶珠的冷卻時間縮短 0.5 秒，每次施法最多縮短 3 秒。（冰霜）"
+      },
+      "glacial_spike": {
+        "name": "冰川尖刺",
+        "description": "凝聚一根巨大的冰刺，消耗 5 枚冰柱，造成 {damage} 點冰霜傷害，並將目標凍結在原地 4 秒。（冰霜）"
+      },
+      "glacial_front": {
+        "name": "冰川鋒線",
+        "description": "按住以積聚逐漸擴大的冰霜鋒線，隨後以錐形釋放。蓄力越久，距離越遠、傷害越高。所有命中的敵人緩速 50%，持續 4 秒；蓄力至最大還會將其定身 1 秒。（冰霜）"
+      },
+      "dragons_breath": {
+        "name": "龍之吐息",
+        "description": "按住以積聚逐漸擴大的烈焰吐息，隨後以錐形釋放。蓄力越久，距離越遠、傷害越高。命中的敵人會迷惑，受到傷害時效果解除；蓄力至最大必定造成致命一擊，並計為一次熾熱連擊。（火焰）"
+      },
+      "fingers_of_frost": {
+        "name": "寒冰指",
+        "description": "霜緣之矛有 15% 機率賦予寒冰指，最多 2 層：你的下一次冰槍術會將目標視為已凍結。（冰霜）"
+      },
+      "brain_freeze": {
+        "name": "思維凍結",
+        "description": "霜緣之矛有 20% 機率使你的下一次凜冬之鞭變為瞬發、傷害提高 30%，並且不受冷卻時間限制。（冰霜）"
+      },
+      "shatter": {
+        "name": "脆碎之殤",
+        "description": "你的法術對凍結目標的致命一擊機率提高 50%，這些致命一擊造成的傷害提高 20%。寒冰指和凜冬之寒會將目標視為已凍結。（冰霜）"
       },
       "conjure_water": {
         "name": "縛水術",
@@ -6532,10 +6789,6 @@ export const zh_TW: EnTranslations = {
         "name": "橡樹皮術",
         "description": "你的皮膚硬化如樹皮，使護甲提高 150，持續 15 秒。"
       },
-      "ironhold": {
-        "name": "鐵壁",
-        "description": "以堅固的防禦自守，使受到的所有傷害降低 40%，持續 8 秒。"
-      },
       "sacred_bulwark": {
         "name": "神聖壁壘",
         "description": "在 {duration} 秒內，下一次會殺死你的敵人攻擊將被抵消，轉而將你恢復至 35% 生命值。"
@@ -6624,6 +6877,10 @@ export const zh_TW: EnTranslations = {
         "name": "神聖震擊",
         "description": "以神聖能量震擊一名友方目標，為其恢復{damage}點生命值。（神聖專精招牌）"
       },
+      "aura_surge": {
+        "name": "曙光彈射",
+        "description": "擲出曙光鑄造的盾牌，造成{damage}點神聖傷害並使主要目標沉默2秒，隨後彈射至10碼內最多2個額外敵人，每次彈射造成75%傷害。（聖騎士天賦）"
+      },
       "holy_shield": {
         "name": "神聖之盾",
         "description": "以神聖之力保護你10秒，護甲提高90，並對近戰攻擊者造成12點神聖傷害。（防護專精招牌）"
@@ -6645,7 +6902,7 @@ export const zh_TW: EnTranslations = {
         "description": "法術傷害提高20%，法術加速提高10%，持續10秒。（祕法專精招牌）"
       },
       "combustion": {
-        "name": "燃燒",
+        "name": "鳳凰出神",
         "description": "法術致命一擊機率提高50%，持續15秒。（火焰專精招牌）"
       },
       "icy_veins": {
@@ -6728,6 +6985,246 @@ export const zh_TW: EnTranslations = {
         "name": "召喚怨魂裔",
         "description": "將一隻怨魂裔束縛於你的意志之下，這是一種精英惡魔，會從遠處降下沉重的暗影傷害。漫長的冷卻時間限制了牠的毀滅性力量。召喚新的惡魔會驅散你目前的惡魔。你同時只能擁有一隻惡魔。"
       },
+      "battle_stance": {
+        "name": "戰鬥姿態",
+        "description": "一種進攻性的戰鬥姿態：你產生的怒氣提高 10%。這是武器與防護的預設姿態。"
+      },
+      "berserker_stance": {
+        "name": "狂暴姿態",
+        "description": "一種魯莽的戰鬥姿態：你的暴擊機率提高 3%，暴擊傷害提高 3%。狂怒戰士總是以這個姿態作戰。"
+      },
+      "sweeping_strikes": {
+        "name": "擴弧斬",
+        "description": "持續 12 秒，你的單體攻擊還會以全額傷害額外打擊 1 名附近的敵人。（武器）"
+      },
+      "deep_wounds": {
+        "name": "撕裂創傷",
+        "description": "被動：你的致殘打擊使目標在 6 秒內流血並受到物理傷害。（武器）"
+      },
+      "enrage_passive": {
+        "name": "狂亂",
+        "description": "被動：處於激怒狀態時，你造成的傷害提高 7%、攻擊速度提高 25%、移動速度提高 10%，持續 4 秒。深切裂傷有 30% 機率使你激怒；血色收割則必定使你激怒。（狂怒）"
+      },
+      "raging_gale": {
+        "name": "雙擊",
+        "description": "立即以武器攻擊兩次，每擊造成 40% 武器傷害外加 {damage}，並產生 8 點怒氣。最多儲存 2 次充能。（狂怒）"
+      },
+      "red_harvest": {
+        "name": "血色收割",
+        "description": "傾盡所有：在狂亂中攻擊三次，每擊造成65%武器傷害外加 {damage}，並必定使你激怒。（狂怒）"
+      },
+      "furious_mending": {
+        "name": "狂怒療傷",
+        "description": "持續 10 秒，你受到的傷害降低 20%，且在效果持續期間，你的深切裂傷會治療你 20% 的最大生命值。（狂怒）"
+      },
+      "emboldening_roar": {
+        "name": "壯膽怒吼",
+        "description": "發出壯膽的怒吼：你與 40 碼內的友方玩家獲得壯膽效果，且你接下來的 3 個技能必定是暴擊。（狂怒）"
+      },
+      "raised_guard": {
+        "name": "舉盾防禦",
+        "description": "舉盾防禦：你受到的物理傷害降低 50%，持續 6 秒。最多儲存 2 次充能。（防護）"
+      },
+      "iron_resolve": {
+        "name": "鋼鐵意志",
+        "description": "咬緊牙關、無視疼痛：消耗最多 40 點怒氣（至少 20 點），每消耗 1 點怒氣可吸收 4 點傷害，持續最多 10 秒。（防護）"
+      },
+      "faultline": {
+        "name": "斷層",
+        "description": "沿地面送出一道衝擊波：你正面 8 碼內的敵人受到 {damage} 點傷害並昏迷 3 秒。（防護）"
+      },
+      "defiant_bellow": {
+        "name": "挑釁怒吼",
+        "description": "一聲挑釁的怒吼：10 碼內的每個敵人都被嘲諷，被迫攻擊你 3 秒。（防護）"
+      },
+      "breachmaker": {
+        "name": "破防者",
+        "description": "重擊目標，造成武器傷害外加 {damage}，並破開它的防禦：你對它的攻擊在 8 秒內造成的傷害提高 20%。（武器）"
+      },
+      "measured_fury": {
+        "name": "節制之怒",
+        "description": "你節制的怒火磨利了你的資源運用：你的技能消耗的怒氣降低 10%。（武器）"
+      },
+      "seasoned_soldier": {
+        "name": "沙場老兵",
+        "description": "你的自動攻擊暴擊時多產生 10% 的怒氣。（武器）"
+      },
+      "diabolical_twinstrike": {
+        "name": "邪惡雙擊",
+        "description": "處於激怒狀態時，你的雙擊造成的傷害提高 15%。（狂怒）"
+      },
+      "cleaving_blows": {
+        "name": "順劈連擊",
+        "description": "血色收割必定返還一次雙擊的充能。（狂怒）"
+      },
+      "sudden_death": {
+        "name": "猝死",
+        "description": "你的自動攻擊有機率讓你能對任何生命值的目標施放提早入土，且不消耗怒氣。（武器）"
+      },
+      "storm_bolt": {
+        "name": "風暴之錘",
+        "description": "將你的武器擲向目標，造成 {damage} 點傷害，並使其昏迷 3 秒。"
+      },
+      "piercing_howl": {
+        "name": "穿刺怒吼",
+        "description": "一聲穿刺的吼叫，使 15 碼內的所有敵人減速 50%，持續 8 秒。"
+      },
+      "die_by_sword": {
+        "name": "劍在人在",
+        "description": "防禦性冷卻技：持續 8 秒，你受到的傷害降低 30%，並大幅提高閃躲攻擊的機率。"
+      },
+      "recklessness": {
+        "name": "魯莽",
+        "description": "激怒：你的怒氣產生提高 50%，暴擊機率提高 20%，持續 12 秒。"
+      },
+      "sanguine_aura": {
+        "name": "血色光環",
+        "description": "以敵人的鮮血浸染你的武器：你與你的近戰盟友獲得 10% 攻擊速度與 10% 傷害，持續 20 秒。"
+      },
+      "victory_rush": {
+        "name": "乘勝追擊",
+        "description": "攻擊造成武器傷害外加 {damage}，並治療你 20% 的最大生命值。只能在擊殺敵人後的 20 秒內使用。"
+      },
+      "intimidating_shout": {
+        "name": "破膽怒吼",
+        "description": "一聲駭人的怒吼，使 8 碼內最多 5 個敵人陷入恐懼而逃竄，持續 8 秒。傷害可能會打破效果。"
+      },
+      "revenge": {
+        "name": "復仇",
+        "description": "以大幅弧線攻擊，對你正面的所有敵人造成物理傷害。超過 5 個目標時傷害會降低。當你閃躲或招架時，你的下一次復仇可能不消耗怒氣。 (Protection)"
+      },
+      "heroic_leap": {
+        "name": "英勇飛躍",
+        "description": "躍向目標區域，落地時對附近的敵人造成 {damage} 點傷害。"
+      },
+      "rallying_cry": {
+        "name": "英勇怒吼",
+        "description": "發出英勇怒吼，使你與 40 碼內的隊伍成員最大生命值提高 20%，持續 10 秒。防護專精的受益者在此期間受到的傷害還會降低 5%。"
+      },
+      "aspect_of_the_wild": {
+        "name": "野牙偽裝",
+        "description": "以野性力量激勵30碼內的盟友，使其攻擊強度提高45、攻擊速度提高5%，持續5分鐘。（獵人天賦）"
+      },
+      "avatar": {
+        "name": "戰爭化身",
+        "description": "化身為巨像，持續 20 秒，解除你身上所有的控制效果，並使你造成的傷害提高 20%。"
+      },
+      "avenging_wrath": {
+        "name": "復仇之翼",
+        "description": "召喚復仇之力，使你的攻擊強度提高60、法術強度提高30，持續20秒。（聖騎士天賦）"
+      },
+      "berserk": {
+        "name": "赤紅迷霧",
+        "description": "使你的攻擊強度提高70，持續15秒。（德魯伊天賦）"
+      },
+      "bladestorm": {
+        "name": "劍刃風暴",
+        "description": "化為一陣旋轉的鋼鐵風暴，每秒對 6 碼內的所有敵人造成 {damage} 點傷害，持續 4 秒。"
+      },
+      "blink": {
+        "name": "閃爍步",
+        "description": "使你向前傳送15碼並解除定身效果。（法師天賦）"
+      },
+      "bloodlust": {
+        "name": "戰鼓",
+        "description": "使30碼內的盟友陷入狂亂，攻擊速度提高30%，持續15秒。（薩滿天賦）"
+      },
+      "chain_lightning": {
+        "name": "叉狀閃電",
+        "description": "向目標區域投擲閃電，對附近的敵人造成{damage}點傷害。（薩滿天賦）"
+      },
+      "chaos_bolt": {
+        "name": "毀滅箭",
+        "description": "投擲一枚混沌火焰彈，造成{damage}點火焰傷害。（術士天賦）"
+      },
+      "cleansing_verdict": {
+        "name": "淨化裁決",
+        "description": "淨化一個友方目標身上的有害魔法效果，並為其恢復{damage}點生命值。"
+      },
+      "cloak_of_shadows": {
+        "name": "暗影斗篷",
+        "description": "以暗影包裹你，在5秒內吸收420點傷害。（潛行者天賦）"
+      },
+      "cone_of_cold": {
+        "name": "寒霜橫掃",
+        "description": "以冰霜轟擊附近的敵人，造成 {damage} 點冰霜傷害。（冰霜專精標誌技能）"
+      },
+      "counterspell": {
+        "name": "破法",
+        "description": "反制目標的施法，並在6秒內封鎖該法術學派。"
+      },
+      "curse_of_exhaustion": {
+        "name": "鉛沉妖咒",
+        "description": "詛咒目標，使其移動速度降低30%，持續12秒。（術士天賦）"
+      },
+      "death_coil": {
+        "name": "墓穴纏卷",
+        "description": "攻擊敵人並造成{damage}點暗影傷害，隨後使其恐懼3秒。（術士天賦）"
+      },
+      "deep_freeze": {
+        "name": "死霜",
+        "description": "將目標深度凍結，造成 {damage} 點冰霜傷害並使其昏迷 4 秒。（法師天賦）"
+      },
+      "desperate_prayer": {
+        "name": "最後祈禱",
+        "description": "立即為你恢復{damage}點生命值。（牧師天賦）"
+      },
+      "deterrence": {
+        "name": "鬃刺守衛",
+        "description": "使你的閃躲幾率提高50個百分點，持續10秒。（獵人天賦）"
+      },
+      "divine_shield": {
+        "name": "聖光守護",
+        "description": "以神聖之力保護你，在8秒內吸收900點傷害。（聖騎士天賦）"
+      },
+      "earthbind": {
+        "name": "攫握大地",
+        "description": "將附近的敵人束縛於大地，使其定身2秒。（薩滿天賦）"
+      },
+      "evocation": {
+        "name": "乙太之井",
+        "description": "快速恢復法力。（法師天賦）"
+      },
+      "frenzied_regeneration": {
+        "name": "野性癒合",
+        "description": "在10秒內恢復180點生命值。只能在熊形態下使用。（德魯伊天賦）"
+      },
+      "frost_trap": {
+        "name": "霜紋陷阱",
+        "description": "凍結目標區域內的敵人3秒，使其無法移動或行動。（獵人天賦）"
+      },
+      "ghostly_strike": {
+        "name": "幽魂打擊",
+        "description": "攻擊敵人，造成武器傷害加{damage}點傷害，短暫提高閃躲並獲得1個連擊點。（潛行者天賦）"
+      },
+      "hammer_of_wrath": {
+        "name": "鳴鐘之錘",
+        "description": "向受傷的敵人投擲神聖之錘，造成{damage}點神聖傷害。只能對生命值低於20%的目標使用。（聖騎士天賦）"
+      },
+      "healing_stream": {
+        "name": "泉湧",
+        "description": "在12秒內為一個友方目標恢復120點生命值。（薩滿天賦）"
+      },
+      "holy_wrath": {
+        "name": "聖徒之怒",
+        "description": "釋放神聖之力，對附近的敵人造成{damage}點傷害。（聖騎士天賦）"
+      },
+      "howl_of_terror": {
+        "name": "恐懼嚎叫",
+        "description": "使附近的敵人恐懼，最多持續3秒。受到傷害可能打破該效果。（術士天賦）"
+      },
+      "ice_block": {
+        "name": "寒冰棺",
+        "description": "將你封入寒冰之中，吸收大量傷害，持續 8 秒。（法師天賦）"
+      },
+      "inner_focus": {
+        "name": "靜心",
+        "description": "使你的下一個法術不消耗資源。持續60秒。（牧師天賦）"
+      },
+      "innervate": {
+        "name": "生命樹液",
+        "description": "生命樹液在你體內湧動10秒，分波恢復20點當前資源，可恢復法力、怒氣或能量。變形不會中斷效果。睡眠、昏迷或停滯會使樹液停止湧動。（德魯伊天賦）"
+      },
       "pummel": {
         "name": "碎顎擊",
         "description": "打斷目標的施法，並在4秒內封鎖該法術學派。"
@@ -6736,9 +7233,81 @@ export const zh_TW: EnTranslations = {
         "name": "飛踢",
         "description": "打斷目標的施法，並在4秒內封鎖該法術學派。"
       },
-      "counterspell": {
-        "name": "破法",
-        "description": "反制目標的施法，並在6秒內封鎖該法術學派。"
+      "mend_pet": {
+        "name": "修補",
+        "description": "在 15 秒內為友方目標治療 {damage} 點生命值。（獵人天賦）"
+      },
+      "meteor": {
+        "name": "天石",
+        "description": "在目標區域召喚一顆隕石，造成{damage}點火焰傷害，隨後使區域內的敵人在6秒內每2秒受到12至18點火焰傷害。（法師天賦）"
+      },
+      "temporal_mend": {
+        "name": "時光縫合",
+        "description": "將盟友向前拉動一瞬，在身體安定於更健康的未來形態時治療{damage}點生命值。(時光術特色技能)"
+      },
+      "temporal_barrier": {
+        "name": "時光屏障",
+        "description": "將目標移出當下一瞬:時光之殼在10秒內吸收{damage}點傷害，隨後時間線彈回原位。"
+      },
+      "temporal_echo": {
+        "name": "時光迴響",
+        "description": "以更健康時刻的迴響標記一名盟友，立即恢復{damage}點生命值。{duration}秒內，你造成的秘法傷害有一部分會透過迴響轉化為對其的治療。"
+      },
+      "temporal_cascade": {
+        "name": "時光奔流",
+        "description": "讓一道回音在隊伍中奔流：立即治療目標及其至多四名最近的盟友，並為每人施加持續 {duration} 秒的印記；你造成的部分秘法傷害會透過回音轉化為對他們的治療。（時光術）"
+      },
+      "temporal_reversal": {
+        "name": "時光逆轉",
+        "description": "倒轉一名陣亡盟友的時間線，使其在遺體處以部分生命值與法力值復活，即使正在激烈戰鬥中也能使用。（時光術）"
+      },
+      "collective_reversal": {
+        "name": "集體逆轉",
+        "description": "倒轉隊伍或團隊中每位陣亡成員的時間線，使其在遺體旁以30%生命值和法力值復活。無法在戰鬥中施放。（時空魔法）"
+      },
+      "temporal_rewind": {
+        "name": "回溯",
+        "description": "向隊伍或團隊發出一道秘法波，回溯時間，為 40 碼內每名盟友恢復其過去 5 秒所受傷害的 30%（最多為其最大生命值的 35%）。此效果無法造成致命一擊。（時光術）"
+      },
+      "temporal_hourglass": {
+        "name": "懸停沙漏",
+        "description": "在選定位置放置一個時間沙漏。置於敵人腳下時，在 PvE 中使其懸停 {hostilePveDuration} 秒，在 PvP 中懸停 {hostilePvpDuration} 秒；受到任何傷害都會解除效果。置於自己或隊伍盟友腳下時，進入 {duration} 秒的停滯，免疫傷害且無法行動，恢復 {healing}% 最大生命值，並使自己的冷卻恢復速度提高 {selfCooldownRecovery}%，盟友提高 {allyCooldownRecovery}%。若位置為空，沙漏會等待 {groundDuration} 秒並影響第一個踩上去的有效單位。增益光環可手動移除。"
+      },
+      "temporal_acceleration": {
+        "name": "時間加速",
+        "description": "加快隊伍或團隊的時間流速，使攻擊、施法與引導速度提高 30%，持續 15 秒。近期受到時間加速或嗜血影響的盟友過於疲憊，無法再次受益。（時光術）"
+      },
+      "perfect_moment": {
+        "name": "完美時刻",
+        "description": "抓住完美時刻：立即獲得 4 層秘法充能，並且在 10 秒內，以太飛矢不會消耗這些充能。（時光術）"
+      },
+      "arcane_surge": {
+        "name": "以太湧動",
+        "description": "以原始秘法能量衝擊敵人，造成 {damage} 點傷害。每次施放都會留下秘法充能，使你的下一次以太湧動傷害提高、施法加快（每層快 5%），但法力消耗也會急遽提高，最多堆疊 4 層；以太飛矢會消耗這些充能。每次施放還有機會觸發以太奔流，使你的下一次以太湧動不消耗法力且施法速度加倍。"
+      },
+      "mind_sear": {
+        "name": "灼思",
+        "description": "在目標區域引導暗影能量，每秒對附近的敵人造成{damage}點傷害。（牧師天賦）"
+      },
+      "multi_shot": {
+        "name": "分裂射擊",
+        "description": "向目標區域射出散射箭，對8碼內的敵人造成{damage}點物理傷害。（獵人天賦）"
+      },
+      "prayer_of_healing": {
+        "name": "聖歌癒療",
+        "description": "為附近的盟友恢復{damage}點生命值。（牧師天賦）"
+      },
+      "preparation": {
+        "name": "應變",
+        "description": "結束疾跑、閃避和消失的冷卻時間。（潛行者天賦）"
+      },
+      "presence_of_mind": {
+        "name": "疾思",
+        "description": "使你的下一個有施法時間的法術立即完成。持續 60 秒。（法師天賦）"
+      },
+      "psychic_scream": {
+        "name": "心靈尖嘯",
+        "description": "使附近的敵人恐懼，最多持續4秒。受到傷害可能打破該效果。（牧師天賦）"
       },
       "counter_shot": {
         "name": "靜默射擊",
@@ -6748,6 +7317,26 @@ export const zh_TW: EnTranslations = {
         "name": "譴喝",
         "description": "打斷目標的施法，並在4秒內封鎖該法術學派。"
       },
+      "shadowstep": {
+        "name": "影步",
+        "description": "穿過暗影，向你的目標邁進。（潛行者天賦）"
+      },
+      "silence": {
+        "name": "沉默",
+        "description": "使目標沉默4秒。（牧師天賦）"
+      },
+      "smoke_screen": {
+        "name": "煙幕",
+        "description": "遁入煙霧之中，使你的閃躲幾率提高30%，持續8秒。"
+      },
+      "spellsteal": {
+        "name": "奪法",
+        "description": "從敵人身上竊取一個有益魔法效果並轉移到自己身上。"
+      },
+      "startle_shot": {
+        "name": "驚擾射擊",
+        "description": "狂野射擊使目標迷惑{duration}秒。受到任何傷害都會打破此效果。"
+      },
       "skull_bash": {
         "name": "頭槌",
         "description": "猛然頭槌，打斷目標的施法，並在4秒內封鎖該學派。"
@@ -6755,6 +7344,18 @@ export const zh_TW: EnTranslations = {
       "spell_lock": {
         "name": "封口令",
         "description": "在施法中沉默目標，並在5秒內封鎖該法術學派。"
+      },
+      "tranquility": {
+        "name": "林地之歌",
+        "description": "引導恢復能量4秒，每秒為30碼內的盟友恢復42至52點生命值。（德魯伊天賦）"
+      },
+      "typhoon": {
+        "name": "颱風",
+        "description": "一陣狂風將8碼內的所有敵人擊退並使其昏亂，使其移動速度降低50%，持續4秒。"
+      },
+      "voidfeast": {
+        "name": "虛空盛宴",
+        "description": "吞噬一個魔法效果（敵人的增益或盟友的減益），並恢復你最大生命值的6%。"
       },
       "bear_charge": {
         "name": "巨熊衝鋒",
@@ -6773,8 +7374,8 @@ export const zh_TW: EnTranslations = {
         "description": "一招隱匿起手技，以武器傷害外加 {damage} 撕裂敵人，並造成持續 9 秒的流血傷害。給予 1 點連擊點數。僅限狼形態。"
       },
       "revive_pet": {
-        "name": "復活寵物",
-        "description": "復活你已死亡的寵物，並使其重回你身邊。"
+        "name": "修補",
+        "description": "修補你的寵物。若其存活，在 12 秒內每 3 秒恢復一次生命值，共恢復 {overTime} 點；若其死亡，則以 35% 生命值將其復活。"
       }
     },
     "items": {
@@ -7537,6 +8138,12 @@ export const zh_TW: EnTranslations = {
       "emberglass_warstaff": {
         "name": "燼晶戰杖"
       },
+      "conjured_water4": {
+        "name": "魔法泉水"
+      },
+      "conjured_bread4": {
+        "name": "魔法盛宴麵包"
+      },
       "bristleback_maul": {
         "name": "加洛格拉斯戰錘"
       },
@@ -8005,6 +8612,18 @@ export const zh_TW: EnTranslations = {
       "heroic_mark": {
         "name": "英雄徽記"
       },
+      "eastbrook_buckler": {
+        "name": "東溪小圓盾"
+      },
+      "eastbrook_greatsword": {
+        "name": "東溪巨劍"
+      },
+      "highwatch_greatsword": {
+        "name": "高望巨劍"
+      },
+      "highwatch_wallshield": {
+        "name": "高望壁盾"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "莫爾森的墓鑄鎖甲"
       },
@@ -8157,6 +8776,18 @@ export const zh_TW: EnTranslations = {
       },
       "stormcallers_spaulders": {
         "name": "喚風肩甲"
+      },
+      "bonewrought_greatsword": {
+        "name": "骨鑄巨劍"
+      },
+      "direfang_greatblade": {
+        "name": "厲牙巨刃"
+      },
+      "bonewrought_bulwark": {
+        "name": "骨鑄壁壘"
+      },
+      "wraithfire_orb": {
+        "name": "怨焰寶珠"
       },
       "unknown_alien_weaponry": {
         "name": "未知異星武器"
@@ -8406,9 +9037,6 @@ export const zh_TW: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "復甦王室衛兵"
       },
-      "nythraxis_scourge_of_thornpeak": {
-        "name": "尼思拉克西斯，荊峰之災"
-      },
       "nythraxis_heroic_warrior_add": {
         "name": "奧德倫，亡魂戰衛"
       },
@@ -8417,6 +9045,9 @@ export const zh_TW: EnTranslations = {
       },
       "nythraxis_heroic_rogue_add": {
         "name": "沃斯，亡魂之刃"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "尼思拉克西斯，荊峰之災"
       },
       "reliquary_ledger_wraith": {
         "name": "名冊幽靈"
@@ -8588,6 +9219,9 @@ export const zh_TW: EnTranslations = {
       },
       "ysolei": {
         "name": "伊索蕾，溺月化身"
+      },
+      "water_elemental": {
+        "name": "水元素"
       }
     },
     "npcs": {
@@ -8770,11 +9404,11 @@ export const zh_TW: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "人人都有一技之長",
-        "text": "伊斯特布魯克的每個人都有除了劍術之外的手藝，{playerName}。鎮子周圍散落著礦脈，去揮鎬採上5塊礦石帶給我。要親自採，別耍花招，我看得出來。",
-        "completion": "看到了吧？礦石進了包裡，手上也磨出了繭子。繼續在路上採礦、伐木、採藥，回到鎮上時，留意市場旁的城鎮專注面板和附近的製作台。只要你願意，靠這些都能正經謀生。",
+        "text": "東溪人人除了舞刀弄劍，還得有門手藝，{playerName}。鎮子西南的銅礦坑周圍岩石裡有礦脈。拿起礦鎬，親手開採5處；別想蒙我，我看得出差別。",
+        "completion": "看吧？礦石採到了，手上也磨出了繭。趕路時繼續採礦、伐木和採藥；回城後，別忘了市場旁的城鎮專注告示板和附近的製作台。只要你願意，這些手藝都能換來公道的生計。",
         "objectives": {
           "0": {
-            "label": "礦石塊"
+            "label": "已開採礦脈"
           }
         }
       },
@@ -9562,21 +10196,31 @@ export const zh_TW: EnTranslations = {
       },
       "q_archetype_acceptance": {
         "title": "屬於你自己的技藝",
-        "text": "東溪的每一位工匠最終都會選定一門屬於自己的技藝。用一件事證明自己吧，{playerName}，宣告你的道路。",
-        "completion": "你的道路已經選定；願你走得穩當。",
+        "text": "技藝是學識，{playerName}，而調諧是一份承諾。選擇兩門相鄰的技藝作為你的主修，再把你親手從谷地礦脈中採出的礦石帶給我。",
+        "completion": "承諾已經立下。這兩門技藝現為你的主修，與它們相對的技藝則成為你的嗜好。",
+        "objectives": {
+          "0": {
+            "label": "已開採礦脈"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "彌補",
+        "text": "你曾掌握過這組技藝，{playerName}。重拾舊途並非新的誓言。去幫忙清理谷地道路，讓勞作喚醒雙手曾經熟悉的節奏。",
+        "completion": "昔日的節奏回來了。你曾經的那組技藝再次生效。",
         "objectives": {
           "0": {
             "label": "擊敗森林之狼"
           }
         }
       },
-      "q_prof_make_amends": {
-        "title": "彌補",
-        "text": "若要放下一門技藝、轉投另一門，工匠必須先為放棄的道路做出彌補，{playerName}。",
-        "completion": "彌補已經完成；一條新的道路已向你敞開。",
+      "q_prof_hobby_switch": {
+        "title": "別樣消遣",
+        "text": "主修技藝需要誓言。嗜好只問你的好奇心將去往何處，{playerName}。採集一些草藥，然後決定要鑽研哪一門與主修技藝相對的手藝。",
+        "completion": "這是個輕鬆些卻很實用的選擇。追隨這份好奇心，直到稀有品質的作品所能抵達之處。",
         "objectives": {
           "0": {
-            "label": "擊敗森林之狼"
+            "label": "採集草藥叢"
           }
         }
       },
@@ -9845,7 +10489,7 @@ export const zh_TW: EnTranslations = {
       },
       "necromancers": {
         "name": "哀織法衣",
-        "bonus2": "你不會被擊退（擊退抗性 100%）。",
+        "bonus2": "法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。",
         "bonus3": "智力提高 10 點，耐力提高 10 點。",
         "bonus4": "你的法術有 10% 的機率觸發「清晰施法」，使你的下一個法術免費施放。"
       },
@@ -9857,13 +10501,13 @@ export const zh_TW: EnTranslations = {
       },
       "soulflame": {
         "name": "怨焰法衣",
-        "bonus2": "你不會被擊退（擊退抗性 100%）。",
+        "bonus2": "法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。",
         "bonus3": "智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。",
         "bonus4": "你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。"
       },
       "stormcallers": {
         "name": "喚風法衣",
-        "bonus2": "你不會被擊退（擊退抗性 100%）。",
+        "bonus2": "法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。",
         "bonus3": "智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。",
         "bonus4": "你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。"
       },

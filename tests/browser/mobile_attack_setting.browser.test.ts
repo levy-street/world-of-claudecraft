@@ -40,6 +40,8 @@ function slot(kind: ActionBarSlotState['kind']): ActionBarSlotState {
     usable: true,
     outOfRange: false,
     queued: false,
+    procGlow: false,
+    empowered: false,
     ariaLabel: kind,
     keybindLabel: '',
   };

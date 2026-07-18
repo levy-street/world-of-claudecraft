@@ -118,11 +118,13 @@ const simFiles = walk(simRoot);
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/proc_overlay_view.ts',
   'src/ui/camera_prompt_core.ts',
   'src/ui/chat_ignore_core.ts',
   'src/ui/char_bags_pairing_core.ts',
   'src/ui/equip_drop_core.ts',
   'src/ui/log_event_route.ts',
+  'src/ui/mob_idle_sfx.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
@@ -154,9 +156,11 @@ const UI_PURE_CORES = [
   'src/ui/card_duel_view.ts',
   'src/ui/claudium_view.ts',
   'src/ui/woc_store_view.ts',
+  'src/ui/wallet_connection_view.ts',
   'src/ui/hud/loot/loot_roll_status_view.ts',
   'src/ui/hud/loot/loot_settings_view.ts',
   'src/ui/crafting_view.ts',
+  'src/ui/profession_identity_view.ts',
   'src/ui/market_view.ts',
   'src/ui/mailbox_view.ts',
   'src/ui/calendar_view.ts',
@@ -184,6 +188,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/questlog_view.ts',
   'src/ui/swing_timer.ts',
   'src/ui/unit_frame.ts',
+  'src/ui/stance_bar_view.ts',
   'src/ui/hud/action_bar/action_bar_view.ts',
   'src/ui/hud/action_bar/mobile_action_page_view.ts',
   'src/ui/hud/action_bar/consumable_bar_view.ts',
@@ -225,6 +230,8 @@ const RENDER_PURE_CORES = [
   'src/render/net_interp_core.ts',
   'src/render/terrain_region_core.ts',
   'src/render/water_core.ts',
+  'src/render/warrior_cast_fx_core.ts',
+  'src/render/characters/weapon_attack_style_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)
@@ -236,6 +243,7 @@ const RENDER_PURE_CORES = [
 // updating this list) fails the cross-check instead of silently escaping the
 // reverse-completeness guard.
 const BARE_NAMED = [
+  'src/ui/mob_idle_sfx.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',

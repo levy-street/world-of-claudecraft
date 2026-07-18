@@ -899,4 +899,77 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(tankMeta.raidLockouts.has('nythraxis_boss_arena')).toBe(true);
     expect(chats.some((e) => e.text === 'Malric...')).toBe(true);
   });
+
+  it('warrior_row_capstones: double charge, thresholded fear, victory rush heal, bladestorm ticks', () => {
+    const rec = run('warrior_row_capstones');
+    const sim = rec.sim as any;
+    const pid = sim.playerId;
+    const ev = rec.allEvents as Ev[];
+    // Double Charge: BOTH stored uses were spent while one recharge timer ran;
+    // the classic single-cooldown gate would have blocked cast #2.
+    expect(rec.notes.chargeSpent).toBe(2);
+    expect(rec.notes.chargeRecharging).toBe(true);
+    // Intimidating Shout feared a wolf; Lingering Dread armed its threshold.
+    const feared = entities(rec).find((e) =>
+      e.auras?.some((a: any) => a.id === 'fear_incap'),
+    ) as any;
+    expect(feared).toBeTruthy();
+    const fear = feared.auras.find((a: any) => a.id === 'fear_incap');
+    expect(fear.breaksOnDamage).toBe(true);
+    expect(fear.breakThreshold).toBeGreaterThan(0);
+    // Victory Rush: the on-kill strike healed the player.
+    expect(ev.some((e) => (e.type === 'heal' || e.type === 'heal2') && e.targetId === pid)).toBe(
+      true,
+    );
+    // Bladestorm: the self-centered channel pulsed damage.
+    expect(ev.some((e) => e.type === 'damage' && e.ability === 'Bladestorm')).toBe(true);
+  });
+
+  it('professions_craft: denial draws nothing, each craft draws once, and the vestments proc mints + surfaces a masterwork', () => {
+    const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'professions_craft')!);
+    const ev = rec.allEvents as Ev[];
+    const pid = rec.notes.pid as number;
+    const crafts = ev.filter((e) => e.type === 'craftResult');
+
+    // Phase 1 denial: an ok:false craftResult with the insufficient_materials reason.
+    expect(crafts.some((e) => e.ok === false && e.reason === 'insufficient_materials')).toBe(true);
+    // Phase 2/4 plain crafts (consumable def): ok:true, def quality common, no masterwork flag.
+    expect(
+      crafts.some((e) => e.ok === true && e.quality === 'common' && e.masterwork === undefined),
+    ).toBe(true);
+
+    // Phase 3 masterwork proc: the personal masterwork SimEvent (ids only).
+    const mw = ev.find((e) => e.type === 'masterwork');
+    expect(mw, 'masterwork event did not fire (proc missed for the pinned seed)').toBeTruthy();
+    expect(mw!.recipeId).toBe('recipe_eastbrook_ritual_vestments');
+    expect(mw!.itemId).toBe('eastbrook_ritual_vestments');
+    expect(mw!.crafter).toBe(pid);
+    expect(mw!.pid).toBe(pid);
+    // The craftResult mirror carries the proc: masterwork true, output DEF quality (uncommon).
+    expect(
+      crafts.some(
+        (e) =>
+          e.ok === true &&
+          e.itemId === 'eastbrook_ritual_vestments' &&
+          e.quality === 'uncommon' &&
+          e.masterwork === true,
+      ),
+    ).toBe(true);
+
+    // The minted copy is one signed instance carrying the masterwork marker, and the
+    // per-player read surface reflects the proc.
+    const meta = (rec.sim as any).players.get(pid);
+    const slots = meta.inventory.filter((s: any) => s.itemId === 'eastbrook_ritual_vestments');
+    expect(slots.length).toBe(1);
+    expect(slots[0].instance?.rolled?.masterwork).toBe(true);
+    expect(meta.lastMasterwork).toMatchObject({
+      recipeId: 'recipe_eastbrook_ritual_vestments',
+      itemId: 'eastbrook_ritual_vestments',
+      crafter: pid,
+    });
+
+    // Draw contract: the denial draws zero and each of the three successful crafts
+    // draws exactly the single masterwork proc roll (0 + 3 = 3 across the whole run).
+    expect(trace.draws).toBe(3);
+  });
 });

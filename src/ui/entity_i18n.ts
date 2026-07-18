@@ -197,7 +197,13 @@ function interpolateSource(source: string, values?: InterpolationValues): string
     // timed effect's resolved duration ($t); hud.ts supplies all three.
     .replace(/\$o/g, String(values.overTime ?? '$o'))
     .replace(/\$b/g, String(values.buff ?? '$b'))
-    .replace(/\$t/g, String(values.duration ?? '$t'));
+    .replace(/\$t/g, String(values.duration ?? '$t'))
+    .replace(/\$h/g, String(values.healing ?? '$h'))
+    .replace(/\$e/g, String(values.hostilePveDuration ?? '$e'))
+    .replace(/\$p/g, String(values.hostilePvpDuration ?? '$p'))
+    .replace(/\$g/g, String(values.groundDuration ?? '$g'))
+    .replace(/\$s/g, String(values.selfCooldownRecovery ?? '$s'))
+    .replace(/\$a/g, String(values.allyCooldownRecovery ?? '$a'));
   return legacy.replace(/\{([A-Za-z0-9_]+)\}/g, (match, name: string) => {
     const value = values[name];
     return value === undefined ? match : String(value);

@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import {
   BATTLEFIELD_XP_TRICKLE,
   battlefieldExperienceTrickle,
@@ -61,7 +62,7 @@ describe('battlefieldExperienceTrickle (#1149, self-observation)', () => {
     }
   });
 
-  it('grants zero for an unrolled or absent instance (never signed)', () => {
+  it('grants zero for an absent instance, or a signed one whose def-quality fallback reads common', () => {
     const skills = emptyCraftSkills();
     expect(
       battlefieldExperienceTrickle(skills, {
@@ -73,8 +74,10 @@ describe('battlefieldExperienceTrickle (#1149, self-observation)', () => {
     ).toBe(0);
     expect(
       battlefieldExperienceTrickle(skills, {
+        // No rolled.quality at all (the Phase 2 crafted shape): the rarity
+        // gate falls back to the item def's static quality, common here.
         itemId: 'minor_healing_potion',
-        instance: { signer: 'Aria' }, // no rolled quality at all
+        instance: { signer: 'Aria' },
         observerName: 'Aria',
         observerActiveArchetype: 'alchemy',
       }),
@@ -120,6 +123,98 @@ describe('battlefieldExperienceTrickle (#1149, self-observation)', () => {
   });
 });
 
+// Phase 2 (Professions 2.0 masterwork model): deterministic crafts sign a
+// rare-plus-DEF output WITHOUT writing rolled.quality, so the trickle's
+// rarity gate falls back to the item def's static quality when the instance
+// carries none, and a legacy instance's own rolled.quality wins whenever it
+// is present, in BOTH directions. No shipped COMMON_RECIPES output has a
+// rare-plus def today, so the rare-def arm temporarily re-points the potion's
+// def quality (content-driven read, same mutate-and-restore idiom
+// tests/professions_perks.test.ts uses on PERK_THRESHOLDS).
+describe('battlefieldExperienceTrickle def-quality fallback (Phase 2)', () => {
+  it('a new crafted rare-def instance (signer only, no rolled.quality) still triggers the trickle', () => {
+    const def = ITEMS.minor_healing_potion;
+    const originalQuality = def.quality;
+    def.quality = 'rare';
+    try {
+      const skills = emptyCraftSkills();
+      const amount = battlefieldExperienceTrickle(skills, {
+        itemId: 'minor_healing_potion',
+        // The exact Phase 2 crafted rare-def shape: signer, no rolled at all.
+        instance: { signer: 'Aria' },
+        observerName: 'Aria',
+        observerActiveArchetype: 'alchemy',
+      });
+      expect(amount).toBe(BATTLEFIELD_XP_TRICKLE);
+      expect(skills.alchemy).toBe(BATTLEFIELD_XP_TRICKLE);
+    } finally {
+      def.quality = originalQuality;
+    }
+  });
+
+  it('a legacy instance rolled rare still triggers on a common-def item (rolled wins upward)', () => {
+    // The def is common (pinned here so a content re-tune reddens this test
+    // instead of silently flipping which arm it exercises): only the legacy
+    // rolled.quality read can pass the gate.
+    expect(ITEMS.minor_healing_potion.quality).toBe('common');
+    const skills = emptyCraftSkills();
+    const amount = battlefieldExperienceTrickle(skills, {
+      itemId: 'minor_healing_potion',
+      instance: { signer: 'Aria', rolled: { quality: 'rare' } },
+      observerName: 'Aria',
+      observerActiveArchetype: 'alchemy',
+    });
+    expect(amount).toBe(BATTLEFIELD_XP_TRICKLE);
+    expect(skills.alchemy).toBe(BATTLEFIELD_XP_TRICKLE);
+  });
+
+  it('a legacy instance rolled common grants nothing on a rare-def item (rolled wins downward too)', () => {
+    // Precedence pin: the instance's own legacy rolled.quality is the exact
+    // read whenever present, even when the def fallback would be HIGHER. A
+    // regression that switched to max(rolled, def) would pass every other
+    // case in this file but fail here.
+    const def = ITEMS.minor_healing_potion;
+    const originalQuality = def.quality;
+    def.quality = 'rare';
+    try {
+      const skills = emptyCraftSkills();
+      const amount = battlefieldExperienceTrickle(skills, {
+        itemId: 'minor_healing_potion',
+        instance: { signer: 'Aria', rolled: { quality: 'common' } },
+        observerName: 'Aria',
+        observerActiveArchetype: 'alchemy',
+      });
+      expect(amount).toBe(0);
+      expect(skills.alchemy).toBe(0);
+    } finally {
+      def.quality = originalQuality;
+    }
+  });
+
+  it('end to end: a signer-only rare-def potion drunk by its signer trickles through useItem', () => {
+    const def = ITEMS.minor_healing_potion;
+    const originalQuality = def.quality;
+    def.quality = 'rare';
+    try {
+      const sim = makeSim();
+      const pid = sim.playerId;
+      const meta = (sim as any).players.get(pid);
+      meta.archetype.activeArchetype = 'alchemy';
+      // The Phase 2 crafted grant shape (crafting.ts signs rare-plus-def
+      // outputs with { signer } alone, never rolled.quality).
+      sim.addItemInstance('minor_healing_potion', { signer: meta.name }, pid);
+      const entity = (sim as any).entities.get(pid);
+      entity.hp = 1;
+
+      sim.useItem('minor_healing_potion', pid);
+
+      expect(meta.craftSkills.alchemy).toBe(BATTLEFIELD_XP_TRICKLE);
+    } finally {
+      def.quality = originalQuality;
+    }
+  });
+});
+
 // #1149/#1205: the manifesto's "active specialty only" anti alt/breadth
 // lever, a BINARY gate (unlike the three-tier common/rare/unlimited
 // archetype.ts craftCeiling ordinary crafting composes): the trickle only
@@ -158,7 +253,7 @@ describe('battlefieldExperienceTrickle active-specialty gate (#1149/#1205)', () 
       itemId: 'minor_healing_potion', // -> alchemy
       instance: { signer: 'Aria', rolled: { quality: 'rare' } },
       observerName: 'Aria',
-      observerActiveArchetype: 'tailoring', // alchemy's opposite on CRAFT_RING
+      observerActiveArchetype: 'enchanting', // alchemy's opposite on CRAFT_RING
     });
     expect(amount).toBe(0);
     expect(skills.alchemy).toBe(0);

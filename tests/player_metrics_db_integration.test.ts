@@ -6,11 +6,13 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import {
   closePlayerSession,
   openPlayerSession,
+  PLAYER_FUNNEL_SNAPSHOT_SQL,
   PLAYER_METRICS_CONCURRENT_INDEX_SQL,
   PLAYER_METRICS_INVALID_INDEX_CHECK_SQL,
   PLAYER_METRICS_INVALID_INDEX_DROP_SQL,
   PLAYER_METRICS_SCHEMA,
   playerBusinessSnapshot,
+  playerFunnelSnapshot,
   recordCharacterCreation,
 } from '../server/player_metrics_db';
 
@@ -154,16 +156,19 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
     }
 
     const snapshot = await playerBusinessSnapshot(scopedPool(), 'eastbrook');
+    const funnelSnapshot = await playerFunnelSnapshot(scopedPool(), 'eastbrook');
     const today = snapshot.days.find((day) => day.period === 'today');
     expect(today).toMatchObject({
-      accountsCreated: 1,
       charactersCreated: 1,
       firstCharacterAccounts: 1,
-      firstWorldEntryRate: 1,
       activeNew: 1,
       activeReturning: 0,
       firstSessionLevel2Rate: 1,
       firstSessionLevel5Rate: 1,
+    });
+    expect(funnelSnapshot.days.find((day) => day.period === 'today')).toMatchObject({
+      accountsCreated: 1,
+      firstWorldEntryRate: 1,
       dayOneFunnelAccounts: {
         created: 1,
         first_character: 1,
@@ -188,14 +193,6 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
     expect(bucketTotal).toBe(today?.activeNew);
     const yesterday = snapshot.days.find((day) => day.period === 'yesterday');
     expect(yesterday).toMatchObject({
-      dayOneFunnelAccounts: {
-        created: 0,
-        first_character: 0,
-        entered_world: 0,
-        played_10m: 0,
-        reached_level_2: 0,
-        reached_level_5: 0,
-      },
       firstDayPlaytimeP50Seconds: null,
       firstDaySessionsMedian: null,
       firstDayPlaytimeAccounts: {
@@ -204,6 +201,18 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
         '30m_1h': 0,
         '1h_3h': 0,
         gte_3h: 0,
+      },
+    });
+    expect(funnelSnapshot.days.find((day) => day.period === 'yesterday')).toMatchObject({
+      accountsCreated: 0,
+      firstWorldEntryRate: null,
+      dayOneFunnelAccounts: {
+        created: 0,
+        first_character: 0,
+        entered_world: 0,
+        played_10m: 0,
+        reached_level_2: 0,
+        reached_level_5: 0,
       },
     });
     expect(snapshot.retention).toEqual([
@@ -263,11 +272,10 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
     }
 
     const snapshot = await playerBusinessSnapshot(scopedPool(), 'eastbrook');
+    const funnelSnapshot = await playerFunnelSnapshot(scopedPool(), 'eastbrook');
     const today = snapshot.days.find((day) => day.period === 'today');
     expect(today).toMatchObject({
-      accountsCreated: 5,
       firstCharacterAccounts: 4,
-      firstWorldEntryRate: 0.4,
       activeNew: 3,
       firstDaySessionsMedian: 1,
       firstDayPlaytimeAccounts: {
@@ -277,6 +285,11 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
         '1h_3h': 1,
         gte_3h: 0,
       },
+    });
+    const funnelToday = funnelSnapshot.days.find((day) => day.period === 'today');
+    expect(funnelToday).toMatchObject({
+      accountsCreated: 5,
+      firstWorldEntryRate: 0.4,
       dayOneFunnelAccounts: {
         created: 5,
         first_character: 3,
@@ -286,7 +299,7 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
         reached_level_5: 1,
       },
     });
-    const funnel = today?.dayOneFunnelAccounts;
+    const funnel = funnelToday?.dayOneFunnelAccounts;
     expect(funnel?.created).toBeGreaterThanOrEqual(funnel?.first_character ?? 0);
     expect(funnel?.first_character).toBeGreaterThanOrEqual(funnel?.entered_world ?? 0);
     expect(funnel?.entered_world).toBeGreaterThanOrEqual(funnel?.played_10m ?? 0);
@@ -294,6 +307,139 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
     expect(funnel?.reached_level_2).toBeGreaterThanOrEqual(funnel?.reached_level_5 ?? 0);
     expect(today?.firstDayPlaytimeP90Seconds).toBeGreaterThan(1200);
   });
+
+  it('keeps a launch-day factless signup spike set-based and inside the production timeout', async () => {
+    const db = await scopedClient();
+    try {
+      await db.query(
+        `INSERT INTO accounts (created_at)
+         SELECT CASE
+                  WHEN n <= 250000 THEN current_date + interval '1 hour'
+                  ELSE current_date - 1 + interval '1 hour'
+                END
+           FROM generate_series(1, 500000) AS generated(n)`,
+      );
+      await db.query(
+        `INSERT INTO player_account_facts (
+           realm, account_id, account_created_at, first_character_at, first_play_at
+         )
+         SELECT 'eastbrook', id, created_at,
+                created_at + interval '1 hour', created_at + interval '2 hours'
+           FROM (
+             (SELECT id, created_at
+                FROM accounts
+               WHERE created_at >= current_date
+               ORDER BY id
+               LIMIT 100)
+             UNION ALL
+             (SELECT id, created_at
+                FROM accounts
+               WHERE created_at >= current_date - 1
+                 AND created_at < current_date
+               ORDER BY id
+               LIMIT 100)
+           ) AS selected`,
+      );
+      await db.query(
+        `INSERT INTO player_account_facts (
+           realm, account_id, account_created_at, first_character_at, first_play_at
+         )
+         SELECT 'other', id, created_at,
+                created_at + interval '1 hour', created_at + interval '2 hours'
+           FROM accounts
+          ORDER BY id
+          LIMIT 10000`,
+      );
+      await db.query(
+        `INSERT INTO player_activity_daily (
+           realm, day, account_id, sessions, playtime_seconds, max_level
+         )
+         SELECT realm, account_created_at::date, account_id, 1, 1200, 5
+           FROM player_account_facts`,
+      );
+      await db.query('ANALYZE accounts');
+      await db.query('ANALYZE player_account_facts');
+      await db.query('ANALYZE player_activity_daily');
+    } finally {
+      db.release();
+    }
+
+    const snapshot = await playerFunnelSnapshot(scopedPool(), 'eastbrook');
+    expect(snapshot.days).toEqual([
+      {
+        period: 'today',
+        accountsCreated: 250000,
+        firstWorldEntryRate: 100 / 250000,
+        dayOneFunnelAccounts: {
+          created: 250000,
+          first_character: 100,
+          entered_world: 100,
+          played_10m: 100,
+          reached_level_2: 100,
+          reached_level_5: 100,
+        },
+      },
+      {
+        period: 'yesterday',
+        accountsCreated: 250000,
+        firstWorldEntryRate: 100 / 250000,
+        dayOneFunnelAccounts: {
+          created: 250000,
+          first_character: 100,
+          entered_world: 100,
+          played_10m: 100,
+          reached_level_2: 100,
+          reached_level_5: 100,
+        },
+      },
+    ]);
+
+    const planDb = await scopedClient();
+    try {
+      await planDb.query('BEGIN READ ONLY');
+      await planDb.query("SET LOCAL statement_timeout = '2000ms'");
+      await planDb.query("SET LOCAL work_mem = '4MB'");
+      const explained = await planDb.query(
+        `EXPLAIN (ANALYZE, BUFFERS, WAL, SETTINGS, FORMAT JSON)
+         ${PLAYER_FUNNEL_SNAPSHOT_SQL}`,
+        ['eastbrook'],
+      );
+      const root = explained.rows[0]['QUERY PLAN'][0] as Record<string, unknown>;
+      const nodes: Record<string, unknown>[] = [];
+      const visit = (node: Record<string, unknown>) => {
+        nodes.push(node);
+        for (const child of (node.Plans as Record<string, unknown>[] | undefined) ?? []) {
+          visit(child);
+        }
+      };
+      visit(root.Plan as Record<string, unknown>);
+
+      const factOrActivityScans = nodes.filter((node) =>
+        ['player_account_facts', 'player_activity_daily'].includes(String(node['Relation Name'])),
+      );
+      expect(factOrActivityScans.every((node) => Number(node['Actual Loops'] ?? 0) <= 200)).toBe(
+        true,
+      );
+      expect(nodes.some((node) => node['Index Name'] === 'accounts_created_at')).toBe(true);
+      expect(
+        nodes.some((node) => node['Index Name'] === 'player_account_facts_first_character'),
+      ).toBe(true);
+      expect(nodes.some((node) => node['Index Name'] === 'player_account_facts_first_play')).toBe(
+        true,
+      );
+      expect(nodes.some((node) => node['Index Name'] === 'player_activity_daily_pkey')).toBe(true);
+      expect(Number(root['Execution Time'])).toBeLessThan(2_000);
+      expect(nodes.reduce((total, node) => total + Number(node['Temp Read Blocks'] ?? 0), 0)).toBe(
+        0,
+      );
+      expect(
+        nodes.reduce((total, node) => total + Number(node['Temp Written Blocks'] ?? 0), 0),
+      ).toBe(0);
+    } finally {
+      await planDb.query('ROLLBACK').catch(() => {});
+      planDb.release();
+    }
+  }, 120_000);
 
   it('assigns exact first-day playtime boundaries to one bucket each', async () => {
     const db = await scopedClient();

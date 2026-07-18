@@ -5,7 +5,7 @@ FROM node:22-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
-COPY .browserslistrc tsconfig.json vite.config.ts svelte.config.js index.html admin.html play.html guide.html editor.html ./
+COPY .browserslistrc tsconfig.json vite.config.ts svelte.config.js index.html admin.html play.html guide.html editor.html wallet-handoff.html ./
 COPY src ./src
 COPY server ./server
 COPY bot ./bot
@@ -17,12 +17,14 @@ COPY public ./public
 # private bot detector into private/bot_detector before this Docker build.
 COPY private ./private
 # Public client config is inlined into the bundle at build time (Vite reads
-# VITE_* from the environment). Empty defaults keep optional UI disabled:
-# Turnstile widget off; wallet UI enabled unless explicitly disabled.
+# VITE_* from the environment). Empty defaults keep Turnstile and external
+# wallet handoff off; injected wallet UI stays enabled unless explicitly disabled.
 # Passed through from compose build args.
 ARG VITE_TURNSTILE_SITEKEY=""
+ARG VITE_REOWN_PROJECT_ID=""
 ARG VITE_WALLET_DISABLED=""
 RUN VITE_TURNSTILE_SITEKEY="$VITE_TURNSTILE_SITEKEY" \
+    VITE_REOWN_PROJECT_ID="$VITE_REOWN_PROJECT_ID" \
     VITE_WALLET_DISABLED="$VITE_WALLET_DISABLED" \
     npm run build && cp -a dist/media ./media-build && rm -rf dist/media && npm run build:server && npm run build:bot
 

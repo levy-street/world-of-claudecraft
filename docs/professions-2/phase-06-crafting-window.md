@@ -1,12 +1,17 @@
 # Phase 06: Crafting window upgrades and celebrations
 
 This phase makes the crafting window legible (profession, required skill, combo requirement,
-station binding) and makes a masterwork craft a celebrated moment (toast, zone-chat broadcast,
-tooltip seal, maker's mark). It is its own slice because it is pure presentation over surfaces
-earlier phases already shipped: Phase 2's masterwork SimEvent and instance flag, PR 2039's shared
-`combo_eligibility` rule, and today's `requiresHubStation` station gate. Nothing here touches sim
-behavior or the wire; it renders what already exists, so it can land and be verified visually on
-its own.
+station binding) and makes progress a celebrated moment: the masterwork toast, a zone-visible
+masterwork broadcast, tier-up toasts at every skill-tier crossing, the tooltip seal, and the
+maker's mark. It builds on surfaces earlier phases already shipped: Phase 2's masterwork
+SimEvent and instance flag, PR 2039's shared `combo_eligibility` rule, and today's
+`requiresHubStation` station gate. It is ALMOST pure presentation; the 2026-07-17 amendments
+sanction exactly two seam touches: (1) the zone-visible masterwork broadcast (the Phase 2
+SimEvent is PERSONAL, pid = crafter, so the zone audience rides the Phase 4
+soft-zone-broadcast mechanism via a small deliberate emit at the craft site) and (2) the
+identity-wire extension that makes another player's masterwork and enchant stats inspectable
+online (the Phase 2 QA drift decision resolves as EXTEND). Everything else renders what
+already exists.
 
 ## Context pointers
 
@@ -40,8 +45,9 @@ Model: Opus 4.8, xhigh effort (reserve max for genuinely frontier problems), 1m 
 variant where the file load demands it.
 Harness: Claude Code.
 
-Goal: make the crafting window legible (skill, combo, station) and make masterworks a
-celebrated moment.
+Goal: make the crafting window legible (skill, combo, station) and make progress a
+celebrated moment: masterworks (toast + zone-visible broadcast + inspectable seal) and
+skill-tier crossings (tier-up toasts).
 
 STEP 0 - PRE-FLIGHT:
 - Sync with the LATEST release branch FIRST: git fetch origin "+refs/heads/release/*:refs/remotes/origin/release/*"; pick
@@ -79,9 +85,9 @@ sim_i18n matcher rule pattern; and the design-language guardrails in play (token
 DESIGN.md phase vocabulary, mobile rules).
 
 STEP 2 - CHOOSE ORCHESTRATION + EXECUTE:
-Spawn three agents in parallel (request the fan-out explicitly; Opus 4.8 will not
+Spawn four agents in parallel (request the fan-out explicitly; Opus 4.8 will not
 self-initiate it). Give each ONLY the Explore summary, not raw planning docs. Never
-`mode: "plan"` on teammates. The three own disjoint files, so no worktree isolation is
+`mode: "plan"` on teammates. The four own disjoint files, so no worktree isolation is
 needed; the presentation agent consumes the rows-model contract stated in the summary.
 
 Agent view (rows model; owns src/ui/crafting_view.ts and its tests) deliverables:
@@ -105,8 +111,14 @@ touch points in src/ui/hud.ts) deliverables:
 - Masterwork celebration: the craft toast shows the masterwork state; the celebration gate
   is a pure, reduced-motion-aware module in the deed-fireworks style (new logic in a
   sibling module, hud.ts stays a thin consumer).
-- The zone-chat broadcast row renders from the Phase 2 masterwork SimEvent (id-based; text
-  resolves through the sim_i18n matcher, coordinate the rule with the i18n agent).
+- The crafter's own toast renders from the Phase 2 masterwork SimEvent (personal,
+  pid = crafter). The ZONE-visible broadcast row renders the seam agent's emit (the Phase
+  4 soft-zone-broadcast mechanism, id-based; text resolves through the sim_i18n matcher,
+  coordinate the rule with the i18n agent); this agent owns only the rendering side.
+- Tier-up celebration: a toast at every TIER_SKILL_STEP crossing (25/50/75), derived
+  CLIENT-side from craftSkills transitions on craft results (both hosts read identical
+  data; no wire change); it reuses the same toast pipeline and celebration gate as the
+  masterwork toast, reduced-motion aware.
 - Item tooltips gain the maker's mark line (Crafted by {name}) and the masterwork seal
   overlay for flagged instances, sourced from the inv-wire ItemInstancePayload. Legacy
   signed instances without a masterwork flag keep a correct tooltip (mark line, no seal).
@@ -114,22 +126,45 @@ touch points in src/ui/hud.ts) deliverables:
   outside tokens.css/theme.ts, the mobile rules for the crafting window (40px tap floor)
   respected.
 
+Agent seam (owns BOTH sanctioned seam touches: the identity/inspect wire touch points in
+src/net/online.ts, server/game.ts, and the matching world_api facet, PLUS the
+zone-broadcast emit module in src/sim/ that the presentation agent's broadcast row
+consumes) deliverables:
+- The masterwork zone-broadcast emit: a small module beside the Phase 4 event broadcasts
+  (module-first, called at the craft site), emitting the id-based soft-zone broadcast the
+  presentation agent renders. It draws NO rng and must leave the Phase 2 drawCounts pins
+  green.
+- Extend the online identity/inspect surface so another player's equipped items carry
+  their ItemInstancePayload (masterwork flag, enchant, signer): the offline render mirror
+  already builds them; the online inspect path gains the payloads so the tooltip seal and
+  maker's mark work on OTHER players' gear (the 2026-07-17 resolution of the Phase 2 QA
+  drift decision: extend, do not accept the limitation).
+- Both-worlds parity: the inspect read renders identically from Sim- and
+  ClientWorld-shaped inputs; parity and wire pins updated in the same change; verify
+  liveness, not shape (the 2033 stub trap).
+- Server authority: the payloads are server-minted rows mirrored outward; no wire command
+  may ingest a client-supplied ItemInstancePayload (the standing Phase 2 security
+  invariant; re-assert it in a test if the surface makes it expressible).
+
 Agent i18n/matcher (owns src/ui/i18n.catalog/hud_chrome.ts and src/ui/sim_i18n.ts)
 deliverables:
 - Every new player string is an English-only t() key in the hud_chrome catalog module
   (M16: a wordy new English value also needs its five non-Latin fills in the same change).
   This covers the skill line, the difficulty tint labels, all three combo reasons, the
-  station badge and disable reason, the toast masterwork text, the broadcast row, the
-  maker's mark line, and the seal label.
+  station badge and disable reason, the toast masterwork text, the tier-up toast text, the
+  broadcast row, the maker's mark line, and the seal label.
 - A matcher rule in src/ui/sim_i18n.ts for the id-based masterwork broadcast so the S3
   guard (tests/localization_fixes.test.ts) passes.
 - Values interpolate through the placeholder contract ({name}, {crafts}); never
   concatenate; numbers through the formatters.
 
 INVARIANTS THIS PHASE MUST KEEP:
-- Determinism: this phase should not touch src/sim/ at all; if any sim file must change,
-  all randomness goes through Rng (never Math.random, Date.now, or performance.now) and
-  tests/architecture.test.ts must stay green.
+- Determinism: the only sanctioned sim BEHAVIOR change is the zone-broadcast emit (a
+  Sim-side facet-member implementation required by the inspect seam touch is part of that
+  touch, not a third change); neither draws ANY rng nor perturbs the craft path draw
+  order (the Phase 2 drawCounts pins stay green); all randomness goes through Rng (never
+  Math.random, Date.now, or performance.now) and tests/architecture.test.ts must stay
+  green.
 - Seam: this phase renders existing IWorld data (craftingIdentity, inventory instances,
   craftResult); if a new IWorld member becomes necessary, add it to the matching facet
   file, implement it in BOTH Sim and ClientWorld, and re-pin
@@ -166,10 +201,16 @@ STEP 3 - VALIDATION + MULTI-AGENT REVIEW:
     tests/localization_fixes.test.ts
   - a mobile screenshot of the crafting window (pr-screenshots skill; desktop and mobile,
     committed under docs/screenshots).
+- The seam touches add validation rows: the net/wire row (npx vitest run
+  tests/snapshots.test.ts tests/env_protocol.test.ts tests/bandwidth.test.ts
+  tests/world_api_parity.test.ts) and the sim rows (npx vitest run
+  tests/architecture.test.ts tests/professions_masterwork.test.ts
+  tests/professions_crafting.test.ts; the drawCounts pins must stay green).
 - Spawn review agents per the Review Dispatch Matrix in
   docs/professions-2/implementation-plan.md; check `git diff --name-only` against the
   phase-start commit and spawn ONLY matching rows (expected here: frontend-seam-reviewer
-  for the src/ui/ surface, cross-platform-sync because src/ui/sim_i18n.ts changed, and
+  for the src/ui/ surface, cross-platform-sync for the sim_i18n matcher, the SimEvent
+  emit, and the identity-wire extension, architecture-reviewer for the sim touch, and
   qa-checklist once the deliverable set is complete; if no row matches a part of the diff,
   spawn nothing extra).
 - Prompt each review agent you spawn for COVERAGE not filtering: report every issue
@@ -180,14 +221,17 @@ STEP 3 - VALIDATION + MULTI-AGENT REVIEW:
 - Do not commit while any BLOCKING finding stands.
 
 STEP 4 - COMMIT CADENCE:
-Aim for 2 commits with these headlines (Conventional Commits with a scope; EXPLICIT paths,
+Aim for 3 commits with these headlines (Conventional Commits with a scope; EXPLICIT paths,
 never `git add -A`; every commit carries a body; no em dashes or emojis):
 - feat(ui): recipe skill and requirement legibility
   (src/ui/crafting_view.ts, src/ui/crafting_window.ts, src/ui/i18n.catalog/hud_chrome.ts,
   tests/crafting_view.test.ts and the window tests)
-- feat(ui): masterwork celebrations and maker's mark
+- feat(ui): masterwork and tier-up celebrations and maker's mark
   (the hud.ts toast arm and tooltip touch points, the celebration gate module,
   src/ui/sim_i18n.ts, remaining hud_chrome keys, tests, docs/screenshots)
+- feat(professions): masterwork zone broadcast and inspectable instances
+  (the sim emit module, the identity wire extension, parity and snapshot pins, liveness
+  tests)
 
 STEP 5 - ACCEPTANCE CRITERIA (do not mark complete until all check):
 - [ ] #2037's scope is closed: recipe rows show profession, required skill, and the
@@ -199,8 +243,14 @@ STEP 5 - ACCEPTANCE CRITERIA (do not mark complete until all check):
 - [ ] Station-bound rows show the badge; out-of-range rows show the inline disable reason
       (requiresHubStation joined RecipeDefLike)
 - [ ] No eligibility state renders as a bare disabled button anywhere in the window
-- [ ] A masterwork craft produces the toast, the zone-chat broadcast row, and the tooltip
-      seal; the celebration gate is pure and reduced-motion aware
+- [ ] A masterwork craft produces the crafter's toast AND a zone-visible broadcast row for
+      nearby players (the Phase 4 soft-zone mechanism), plus the tooltip seal; the
+      celebration gate is pure and reduced-motion aware
+- [ ] Tier crossings (25/50/75) produce the tier-up toast in both hosts, client-derived
+      from craftSkills transitions, no wire change
+- [ ] Online inspect shows another player's masterwork seal, enchant, and maker's mark
+      (identity wire extended, parity pinned, liveness verified); no wire command ingests
+      a client-supplied ItemInstancePayload
 - [ ] Tooltips show the maker's mark (Crafted by {name}); legacy signed instances without
       a masterwork flag render correctly (mark line, no seal, no throw)
 - [ ] Craft button never lies: the window uses the same shared eligibility rule as the sim
@@ -215,7 +265,9 @@ STEP 6 - DOC UPDATES + MEMORY:
   any deferrals.
 - Update docs/professions-2/state.md, "New surfaces per phase" gains the Phase 6 entry:
   the hudChrome crafting key namespace added, the sim_i18n masterwork broadcast matcher
-  rule, requiresHubStation on RecipeDefLike, and the celebration gate module path.
+  rule, the zone-broadcast emit site, the tier-up toast module, requiresHubStation on
+  RecipeDefLike, the celebration gate module path, and the identity-wire inspect payload
+  extension with its parity pins.
 - If you use Claude Code memory, record any surprising rules or current-state notes for
   the next session.
 
@@ -224,9 +276,11 @@ End your turn with: phase status, files touched, validation results, review-agen
 verdicts, any deferred items, and a one-line handoff for the Phase 6 QA session.
 
 STOPPING RULES:
-- No phase-specific stopping rules. Packet defaults apply: stop and ask if git status is
-  dirty at pre-flight; stop and surface if the Phase 2 masterwork SimEvent or the
-  instance-payload masterwork flag is not actually available (this phase only renders
-  them); stop and ask if a deliverable turns out to require a sim, wire, or station-system
-  change beyond consuming what already exists (that is Phase 2 or Phase 8 scope).
+- Packet defaults apply: stop and ask if git status is dirty at pre-flight; stop and
+  surface if the Phase 2 masterwork SimEvent or the instance-payload masterwork flag is
+  not actually available; stop and ask if a deliverable turns out to require a sim, wire,
+  or station-system change beyond the TWO sanctioned seam touches (the zone-broadcast emit
+  and the inspect payload extension); station-system changes stay Phase 8 scope.
+- If Phase 4 has not landed its soft-zone-broadcast mechanism when this phase runs, stop
+  and surface the ordering problem instead of inventing a second broadcast path.
 ```

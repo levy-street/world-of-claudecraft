@@ -74,6 +74,11 @@ const BODY_RADIUS = PLAYER_BODY_RADIUS;
 // full (mirrors the player out-of-combat window, so combat exits cleanly while the
 // damage meter keeps the finished segment's DPS).
 const DUMMY_RESET_SECONDS = 5;
+const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
+  'nythraxis_heroic_warrior_add',
+  'nythraxis_heroic_priest_add',
+  'nythraxis_heroic_rogue_add',
+]);
 
 export function updateMob(ctx: SimContext, mob: Entity): void {
   if (mob.dead) {
@@ -119,6 +124,11 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     if (mob.combatTimer >= DUMMY_RESET_SECONDS) {
       mob.inCombat = false;
       mob.hp = mob.maxHp;
+      mob.aiState = 'idle';
+      mob.aggroTargetId = null;
+      mob.forcedTargetId = null;
+      mob.forcedTargetTimer = 0;
+      clearThreat(mob);
     } else {
       mob.inCombat = true;
     }
@@ -187,7 +197,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // non-hostile mob is therefore a leak — exactly the "immortal, invalid
   // target" wolves players hit. Restore hostility so no mob can ever be left
   // permanently untargetable, whatever path corrupted it.
-  if (mob.templateId === NYTHRAXIS_ADD_ID && mob.despawnTimer !== undefined) {
+  if (
+    (mob.templateId === NYTHRAXIS_ADD_ID || NYTHRAXIS_HEROIC_ADD_IDS.has(mob.templateId)) &&
+    mob.despawnTimer !== undefined
+  ) {
     mob.hostile = false;
     mob.aiState = 'idle';
     mob.inCombat = false;
@@ -204,7 +217,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       mob.nythraxis &&
       (mob.nythraxis.phase === 'transition' ||
         mob.nythraxis.deathlessCastRemaining > 0 ||
-        mob.nythraxis.deathlessStunRemaining > 0);
+        mob.nythraxis.deathlessStunRemaining > 0 ||
+        (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0);
     if (isNythraxis) {
       ctx.updateNythraxisEncounter(mob);
       if (
@@ -212,7 +226,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         (mob.nythraxis &&
           (mob.nythraxis.phase === 'transition' ||
             mob.nythraxis.deathlessCastRemaining > 0 ||
-            mob.nythraxis.deathlessStunRemaining > 0))
+            mob.nythraxis.deathlessStunRemaining > 0 ||
+            (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0))
       )
         return;
     } else {

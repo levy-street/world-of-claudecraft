@@ -2758,12 +2758,16 @@
     contain: paint;
     isolation: isolate;
   }
-  /* Promote these large layers only while they overlap. Keeping the promotion
-     conditional avoids permanently reserving two Retina-sized GPU surfaces. */
-  body.store-stack-open #daily-rewards-window,
-  body.store-stack-open #claudium-window {
-    will-change: transform;
-  }
+  /* Deliberately NO will-change promotion here, conditional or permanent. The
+     old body.store-stack-open rule dropped will-change in the same frame a
+     window's inline display flipped (the class recomputes from live window
+     visibility), racing Chromium's teardown of two Retina-sized promoted
+     layers at once; a layer stranded by that race composites as an opaque
+     near-black rectangle over the play area. Containment + isolation above
+     already scope invalidation, and a window drag promotes via its own live
+     transform, so the standing promotion bought nothing worth that risk.
+     body.store-stack-open itself is still maintained (hud.ts
+     syncAnyWindowOpenState) as the store-lifecycle diagnostic signal. */
   #claudium-window {
     width: min(940px, calc(100vw - 40px));
     max-height: calc(100vh - 40px);
@@ -2896,6 +2900,43 @@
     color: var(--color-text-muted);
     font-size: 11px;
     line-height: 1.35;
+  }
+  .cl-wallet-connect {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(160px, 220px);
+    grid-template-rows: auto auto;
+    gap: 5px 18px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    border: 1px solid #6f592d;
+    background: rgb(3 9 14 / 92%);
+  }
+  .cl-wallet-connect > strong {
+    color: #f3dfaa;
+    font-family: var(--title-font);
+    font-size: 13px;
+  }
+  .cl-wallet-connect p {
+    margin: 0;
+    color: #b9c3c9;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .cl-wallet-connect button {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    width: 100%;
+    min-height: 34px;
+    border: 1px solid #4f91ba;
+    background: linear-gradient(#27556f, #163447);
+    color: #dff5ff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .cl-wallet-connect button:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
   }
   .cl-notice {
     margin: 10px 0 0;
@@ -3218,14 +3259,23 @@
   }
 
   /* ---------- talents ---------- */
-  /* talents & specializations panel */
+  /* talents & specializations panel. Opens BIG (owner call: opening talents
+     should feel like an event): most of the viewport width plus a tall body,
+     WoW-frame style. Mobile keeps its own full-screen window treatment. */
   #talents-window {
-    width: min(600px, calc(100vw - 24px));
+    width: min(1160px, calc(100vw - 48px));
+  }
+  #talents-window #tal-body {
+    min-height: min(50vh, 540px);
   }
   .tal-tabs {
     display: flex;
     gap: 6px;
     margin: 8px 0 6px;
+  }
+  .tal-class-name {
+    color: var(--color-text-muted);
+    font-size: 11px;
   }
   .tal-tab {
     position: relative;
@@ -3276,6 +3326,115 @@
     border-radius: 9px;
     font-family: var(--body-font);
   }
+  /* Talents V2 choice rows: six level bands, each with three mutually exclusive
+     options. Desktop keeps every band readable in one view; narrow touch layouts
+     stack the options inside the existing full-screen talents window. */
+  .tal-rows {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: min(48vh, 520px);
+    gap: 8px;
+    margin: 8px 0 4px;
+  }
+  .tal-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 12px;
+    background: rgb(0 0 0 / 18%);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .tal-row-lv {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 50%;
+    color: var(--gold);
+    font-size: 13px;
+  }
+  .tal-row-lv.locked {
+    border-color: var(--border);
+    color: var(--color-text-muted);
+  }
+  .tal-row-opts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    flex: 1;
+    min-width: 0;
+    gap: 12px;
+  }
+  .tal-row.locked .tal-row-opts {
+    opacity: 0.45;
+  }
+  .tal-row-opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    min-height: 48px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--panel-bg);
+    color: var(--color-text-light);
+    font: inherit;
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  .tal-row-opt img {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+  }
+  .tal-row-opt b {
+    overflow: hidden;
+    font-size: 13px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tal-row-opt:hover:not(:disabled) {
+    border-color: var(--gold-dim);
+  }
+  .tal-row-opt:focus-visible,
+  .tal-spec:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .tal-row-opt.picked {
+    border-color: var(--gold);
+    box-shadow: inset 0 0 0 1px var(--gold-dim);
+  }
+  .tal-row-opt.picked b {
+    color: var(--gold);
+  }
+  .tal-row-opt:disabled {
+    cursor: var(--cursor-arrow);
+  }
+  .tal-row-opt.pending {
+    opacity: 0.55;
+  }
+  .tal-row-opt.pending img {
+    filter: grayscale(0.8);
+  }
+  .tal-soon {
+    flex: 0 0 auto;
+    margin-left: auto;
+    padding: 2px 6px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--color-text-muted);
+    font-size: 10px;
+    font-style: normal;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
   .tal-head {
     display: flex;
     justify-content: space-between;
@@ -3293,167 +3452,238 @@
     padding: 0 8px 8px;
     margin: 0 -8px;
   }
-  .tal-tree {
-    position: relative;
-    margin: 6px auto;
-  }
-  .tal-arrows {
-    position: absolute;
-    left: 0;
-    top: 0;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .tal-node {
-    position: absolute;
-    width: 46px;
-    height: 46px;
+  /* WoW-style specialization grid: all specs shown at once as full panels. */
+  .ts-specs-grid {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: var(--cursor-point);
-    background: #15110a;
-    border: 2px solid #5a4a22;
-    color: #e8dcb0;
-    user-select: none;
-    box-sizing: border-box;
-    z-index: 1;
+    gap: 8px;
+    margin: 10px 0;
+    align-items: stretch;
+    /* Fill the tall talents body so every sheet has room for its bottom action. */
+    min-height: min(50vh, 540px);
   }
-  .tal-node .tal-icon {
-    position: absolute;
-    inset: 2px;
-    display: block;
-    background-color: #15110a;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 1;
-  }
-  .tal-node.circle {
-    border-radius: 50%;
-  }
-  .tal-node.circle .tal-icon {
-    border-radius: 50%;
-  }
-  .tal-node.square {
-    border-radius: 7px;
-  }
-  .tal-node.square .tal-icon {
-    border-radius: 5px;
-  }
-  .tal-node.octagon {
+  .ts-panel {
+    flex: 1 1 0;
+    min-width: 0;
+    /* The desktop window is intentionally tall; let the sheets stretch to its
+       full height instead of clipping the mastery/examples and View talents action. */
+    aspect-ratio: auto;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 14px 12px;
+    border: 1px solid #463a1c;
     border-radius: 8px;
+    background: #1a1409;
+    cursor: var(--cursor-point);
+    overflow: hidden;
   }
-  .tal-node.octagon .tal-icon {
-    inset: 3px;
-    border-radius: 6px;
-    clip-path: polygon(24% 0, 76% 0, 100% 24%, 100% 76%, 76% 100%, 24% 100%, 0 76%, 0 24%);
+  .ts-class-description {
+    max-width: 820px;
+    margin: 5px auto 8px;
+    color: #c8b888;
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: center;
   }
-  .tal-node.avail {
-    border-color: #b98b27;
-    box-shadow:
-      0 0 0 1px #0b0804,
-      0 0 7px #9a772855;
-  }
-  .tal-node.avail::after {
-    content: "+";
-    position: absolute;
-    left: -6px;
-    top: -7px;
-    min-width: 15px;
-    height: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #120d04;
-    background: #f5c843;
-    border: 1px solid #332403;
-    border-radius: 50%;
-    font: 700 12px / 1 var(--body-font);
-    z-index: 3;
-  }
-  .tal-node.filled {
-    border-color: #f5c843;
-    color: #fff;
+  .ts-panel.sel {
+    border-color: #ffd100;
     background: #2c2410;
     box-shadow:
-      inset 0 0 0 2px #120d04,
-      0 0 10px #b8902a99;
+      inset 0 0 0 1px #ffd10055,
+      0 0 12px #b8902a55;
   }
-  .tal-node.filled::after,
-  .tal-node.maxed::after {
-    content: "✓";
-    position: absolute;
-    left: -6px;
-    top: -7px;
-    min-width: 16px;
-    height: 16px;
+  .ts-panel-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .ts-panel .ts-icon {
+    width: 48px;
+    height: 48px;
+    flex: none;
+    border-radius: 7px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #120d04;
-    background: #ffd100;
-    border: 1px solid #332403;
-    border-radius: 50%;
-    font: 700 11px / 1 var(--body-font);
-    z-index: 3;
+    background: #15110a;
+    color: #fff;
+    border: 1px solid #5a4a22;
+    font:
+      30px / 1 "Apple Color Emoji",
+      "Segoe UI Emoji",
+      var(--body-font);
+    text-shadow: 0 1px 2px #000;
   }
-  .tal-node.maxed {
-    border-color: #ffe27a;
-    box-shadow:
-      inset 0 0 0 2px #120d04,
-      0 0 13px #ffd100cc;
+  .ts-panel .ts-icon.ts-icon-art {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: transparent;
+    font-size: 0;
+    text-shadow: none;
   }
-  .tal-node.maxed::after {
-    content: "★";
-    font-size: 10px;
+  .ts-panel.sel .ts-icon {
+    border-color: #ffd100;
+    box-shadow: 0 0 8px #ffd10066;
   }
-  .tal-node.locked {
-    opacity: 0.48;
-    filter: grayscale(0.75) brightness(0.72);
-    cursor: not-allowed;
-  }
-  .tal-node.dormant {
-    border-color: #ff6d5a;
-    box-shadow:
-      inset 0 0 0 2px #2a0905,
-      0 0 10px #c0392bcc;
-  }
-  .tal-node.dormant::after {
-    content: "!";
-    position: absolute;
-    left: -6px;
-    top: -7px;
-    min-width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff6e8;
-    /* literal, NOT --color-debuff: the value matches but a dormant-node warning badge is not a
-       combat debuff, and its sibling .tal-node.dormant border / shadow reds are literals too,
-       so keep the hand-tuned dormant-red palette cohesive. */
-    background: #c0392b;
-    border: 1px solid #3a0803;
-    border-radius: 50%;
-    font: 800 11px / 1 var(--body-font);
-    z-index: 3;
-  }
-  .tal-rank {
-    position: absolute;
-    right: -6px;
-    bottom: -7px;
-    min-width: 20px;
+  .ts-panel-title {
     text-align: center;
+    min-width: 0;
+  }
+  .ts-panel .ts-name {
+    font-size: 15px;
+    color: #fff;
+    font-family: var(--title-font);
+  }
+  .ts-panel .ts-role {
     font-size: 10px;
-    color: #fff6d5;
-    background: #171006;
-    border: 1px solid #ffd100;
-    border-radius: 8px;
-    padding: 0 4px;
-    line-height: 14px;
-    z-index: 4;
-    box-shadow: 0 1px 4px #000a;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  /* Spec panel detail body (description, meta chips, mastery, example strip):
+     restored from the warrior-overhaul styling the #1757 revert deleted; the
+     panel DOM (talents_window.ts paintSpecTab) and the hud.mobile.css
+     overrides always kept these class names. */
+  .ts-det-desc {
+    font-size: 14px;
+    color: #e8d6a0;
+    line-height: 1.5;
+    margin-bottom: 11px;
+    text-align: center;
+  }
+  /* Compact meta: primary attribute as a small content-hugging chip, complexity as a
+     lone colored line (no heavy box), matching the WoW-style spec screen reference. */
+  .ts-det-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 11px;
+  }
+  .ts-det-attr {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 7px;
+    padding: 4px 10px;
+    border: 1px solid #5a4a22;
+    border-radius: 5px;
+    background: #191207;
+  }
+  .ts-det-attr-cap,
+  .ts-det-cx-cap {
+    font-size: 10px;
+    color: #9a8a5a;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 600;
+  }
+  .ts-det-attr-val {
+    font-size: 14px;
+    color: #ffd97a;
+    font-weight: 700;
+  }
+  .ts-det-cx {
+    font-size: 13px;
+    font-weight: 700;
+    padding-left: 2px;
+  }
+  .ts-cx-low {
+    color: #7fc77f;
+  }
+  .ts-cx-medium {
+    color: var(--gold);
+  }
+  .ts-cx-high {
+    color: #e07a5a;
+  }
+  /* Standalone section heading (the example-abilities strip). */
+  .ts-det-label {
+    font-size: 12px;
+    color: #9a8a5a;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .ts-det-mastery {
+    font-size: 11px;
+    color: #c8b888;
+    margin: 0 0 8px;
+    padding: 6px 8px;
+    border: 1px solid #463a1c;
+    border-radius: 4px;
+    background: #14100a;
+  }
+  .ts-det-mastery b {
+    color: var(--gold);
+  }
+  /* The example strip + the primary action are the card's bottom group: push them
+     together to the bottom (margin-top:auto on the block) so the empty space is one
+     gap ABOVE them, not a big gap between the examples and the button. Centered. */
+  .ts-ex-block {
+    margin-top: auto;
+    text-align: center;
+  }
+  .ts-ex-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 4px 0 10px;
+  }
+  .ts-ex {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 64px;
+    gap: 3px;
+    cursor: var(--cursor-point);
+    border-radius: 6px;
+    outline: none;
+  }
+  .ts-ex:focus-visible {
+    box-shadow: 0 0 0 2px var(--gold);
+  }
+  .ts-ex-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    border: 1px solid #5a4a22;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: #15110a;
+  }
+  .ts-ex:hover .ts-ex-icon,
+  .ts-ex:focus-visible .ts-ex-icon {
+    border-color: var(--gold);
+  }
+  .ts-ex:hover .ts-ex-name {
+    color: #fff;
+  }
+  .ts-ex-name {
+    font-size: 9px;
+    color: #b8a878;
+    text-align: center;
+    line-height: 1.15;
+  }
+  .ts-view-talents {
+    display: block;
+    width: 100%;
+    margin-top: auto;
+    margin-right: 0;
+  }
+  /* When the example strip is present it already pins the bottom group, so the button
+     sits directly under it instead of taking its own auto gap. */
+  .ts-view-talents.has-ex {
+    margin-top: 0;
+  }
+  /* The currently-selected spec's button reads as the primary/committed action. */
+  .ts-view-talents.primary {
+    background: linear-gradient(#b8902a, #8a6a1c 55%, #6a4f12);
+    color: #fff;
+    border-color: #ffd100;
   }
   .tal-specs {
     display: flex;
@@ -3469,6 +3699,8 @@
     background: #1a1409;
     cursor: var(--cursor-point);
     text-align: center;
+    color: inherit;
+    font: inherit;
   }
   .tal-spec.sel {
     border-color: #ffd100;
@@ -3510,21 +3742,37 @@
       var(--body-font);
     text-shadow: 0 1px 2px #000;
   }
+  .tal-spec .ts-icon.ts-icon-art {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
   .tal-spec.sel .ts-icon {
     border-color: #ffd100;
     box-shadow: 0 0 8px #ffd10066;
   }
   .tal-spec .ts-name {
+    display: block;
     font-size: 12px;
     color: #fff;
     font-family: var(--title-font);
     margin-top: 2px;
   }
   .tal-spec .ts-role {
+    display: block;
     font-size: 10px;
     color: var(--gold);
     text-transform: uppercase;
     letter-spacing: 0.4px;
+  }
+  .tal-spec .ts-action {
+    display: block;
+    margin-top: 6px;
+    color: var(--color-text-muted);
+    font-size: 10px;
+  }
+  .tal-spec.sel .ts-action {
+    color: var(--gold);
   }
   .tal-mastery {
     font-size: 11px;
@@ -3544,84 +3792,140 @@
     line-height: 1.35;
     color: #a99b76;
   }
+  /* The WoW-style loadout bar: one compact dropdown button, bottom-left; the
+     menu opens UPWARD (anchored above the button) with the saved builds and
+     the save/import/export/reset actions. */
   .tal-foot {
-    display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(170px, 0.9fr);
-    gap: 8px;
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
     margin-top: 10px;
     border-top: 1px solid #463a1c;
     padding-top: 8px;
   }
-  .tal-build-card {
-    display: grid;
-    gap: 6px;
-    align-content: start;
-    padding: 7px;
-    border: 1px solid #3f341a;
-    border-radius: 6px;
-    background: #120e08;
-    box-shadow: inset 0 0 0 1px #0008;
-  }
-  .tal-build-current {
-    background: #171208;
-    border-color: #59461d;
-  }
-  .tal-build-create {
-    background: #10120d;
-  }
-  .tal-build-head {
-    display: flex;
-    gap: 7px;
+  .tal-loadout-btn {
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
-    min-width: 0;
-    color: var(--gold);
-    font-family: var(--title-font);
-    font-size: 12px;
-  }
-  .tal-build-head .ui-dd {
-    min-width: 132px;
-    flex: 1 1 150px;
-    font-family: var(--body-font);
-  }
-  .tal-build-actions {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  .tal-build-help {
-    font-size: 11px;
-    line-height: 1.35;
-    color: #a99b76;
-  }
-  .tal-foot .btn {
-    padding: 5px 10px;
-    font-size: 12px;
-  }
-  .tal-foot .btn.tal-primary {
-    border-color: #8f7025;
+    gap: 9px;
+    max-width: 260px;
+    padding: 6px 12px;
+    font: inherit;
+    font-size: 12.5px;
     color: #ffe6a8;
-    background: linear-gradient(#7a5f21, #4d3810);
+    background: linear-gradient(#3a2e14, #241a0c);
+    border: 1px solid #8f7025;
+    border-radius: 6px;
+    cursor: pointer;
   }
-  .tal-foot .btn.tal-secondary {
-    color: var(--color-text-muted);
-    border-color: #4b3d1d;
-    background: #171208;
+  .tal-loadout-btn:hover {
+    border-color: var(--gold);
   }
-  .tal-foot .btn[disabled] {
-    opacity: 0.45;
-    pointer-events: none;
-    cursor: not-allowed;
+  .tal-loadout-btn:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
   }
-  .tal-foot select,
-  .tal-foot input {
-    background: #14100a;
+  .tal-loadout-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tal-loadout-caret {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 6px solid var(--gold);
+    flex: 0 0 auto;
+  }
+  .tal-loadout-menu {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 6px);
+    min-width: 240px;
+    max-width: 320px;
+    padding: 5px;
+    background: linear-gradient(#1d1710, #120e08);
+    border: 1px solid #59461d;
+    border-radius: 7px;
+    box-shadow: 0 10px 26px -8px #000;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .tal-lo-row {
+    display: flex;
+    align-items: stretch;
+    gap: 2px;
+  }
+  .tal-lo-row.active .tal-lo-pick {
+    color: var(--gold);
+    background: #241c0c;
+  }
+  .tal-lo-item,
+  .tal-lo-pick {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    padding: 6px 9px;
+    font: inherit;
+    font-size: 12px;
     color: #e8dcb0;
-    border: 1px solid #463a1c;
-    border-radius: 4px;
-    font-size: 11px;
-    padding: 4px;
+    background: none;
+    border: 0;
+    border-radius: 5px;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tal-lo-item:hover:not(:disabled),
+  .tal-lo-pick:hover {
+    background: #2a2110;
+    color: #ffe6a8;
+  }
+  .tal-lo-item:focus-visible,
+  .tal-lo-pick:focus-visible,
+  .tal-lo-del:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: -1px;
+  }
+  .tal-lo-item:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+  .tal-lo-new {
+    color: var(--gold);
+  }
+  .tal-lo-del {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 5px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+  }
+  .tal-lo-del:hover {
+    color: var(--color-hostile, #d8413f);
+    background: #2a1210;
+  }
+  .tal-lo-del svg {
+    width: 12px;
+    height: 12px;
+  }
+  .tal-lo-sep {
+    height: 1px;
+    margin: 4px 6px;
+    background: #463a1c;
+  }
+  .tal-lo-empty {
+    padding: 6px 9px;
+    font-size: 11.5px;
+    color: var(--color-text-muted);
   }
   .tal-spacer {
     flex: 1;
@@ -3670,6 +3974,13 @@
     }
     .tal-spec .ts-role {
       font-size: 9px;
+    }
+    .tal-row {
+      flex-wrap: wrap;
+    }
+    .tal-row-opts {
+      grid-template-columns: 1fr;
+      flex-basis: 100%;
     }
   }
 
@@ -3851,98 +4162,6 @@
     bottom: auto;
     top: calc(100% + 4px);
   }
-  /* Choice-node option flyout */
-  .tal-choice-pop {
-    position: fixed;
-    z-index: 90;
-    width: 252px;
-    background: #1a140a;
-    border: 1px solid var(--gold);
-    border-radius: 6px;
-    box-shadow:
-      0 10px 24px #000c,
-      inset 0 0 0 1px #ffd10022;
-    padding: 5px;
-  }
-  .tal-choice-pop::before {
-    content: "";
-    position: absolute;
-    left: var(--tal-choice-caret-left, 50%);
-    top: -6px;
-    width: 10px;
-    height: 10px;
-    background: #1a140a;
-    border-left: 1px solid var(--gold);
-    border-top: 1px solid var(--gold);
-    transform: translateX(-50%) rotate(45deg);
-  }
-  .tal-choice-opt {
-    position: relative;
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-    padding: 8px 28px 8px 8px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    cursor: var(--cursor-point);
-  }
-  .tal-choice-opt:hover,
-  .tal-choice-opt:focus-visible {
-    background: #ffffff10;
-    border-color: #6f5a2a;
-  }
-  /* The roving choice-menu option is the keyboard centerpiece, so the focused
-     option gets the same steady, tokenized outline ring the rest of the chrome draws
-     on :focus-visible, not just the hover tint, so keyboard roving is
-     clearly visible. Inset offset keeps the ring inside the popup's scroll edge. */
-  .tal-choice-opt:focus-visible {
-    outline: 2px solid var(--color-border-focus);
-    outline-offset: -2px;
-  }
-  .tal-choice-opt.sel {
-    background: #2c2410;
-    border-color: var(--gold);
-    box-shadow: inset 0 0 0 1px #ffd10033;
-  }
-  .tal-choice-opt.sel::after {
-    content: "✓";
-    position: absolute;
-    right: 8px;
-    top: 8px;
-    width: 15px;
-    height: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #120d04;
-    background: #ffd100;
-    border-radius: 50%;
-    font: 700 10px / 1 var(--body-font);
-  }
-  .tco-icon {
-    width: 28px;
-    height: 28px;
-    flex: none;
-    border-radius: 4px;
-    display: block;
-    background-color: #15110a;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    border: 1px solid #5a4a22;
-  }
-  .tco-text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    font-size: 11px;
-    color: #c8b888;
-  }
-  .tco-text b {
-    color: #fff;
-    font-size: 12px;
-  }
-
   /* generic confirm dialog (prestige) */
   #confirm-dialog {
     left: 50%;
@@ -4418,6 +4637,109 @@
     font-family: var(--title-font);
     font-size: 12px;
   }
+  .qd-profession-choice {
+    display: grid;
+    gap: 4px;
+    margin: 10px 0 6px;
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-size: 12px;
+  }
+  .qd-profession-choice select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 4px;
+    background: var(--color-bg-input);
+    color: var(--color-text-light);
+    font-family: var(--ui-font);
+  }
+  .qd-profession-preview {
+    margin-bottom: 8px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  .profession-identity-card {
+    margin: 8px 0 10px;
+    padding: 10px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 4px;
+    background: var(--color-bg-input);
+  }
+  .profession-identity-card h3 {
+    margin: 0 0 8px;
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-size: 13px;
+  }
+  .profession-identity-summary {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 3px 8px;
+    margin: 0 0 8px;
+    font-size: 11px;
+  }
+  .profession-identity-summary dt {
+    color: var(--color-text-muted);
+  }
+  .profession-identity-summary dd {
+    margin: 0;
+  }
+  .profession-skill-list,
+  .profession-identity-nudges {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* The list owns the column tracks and each row subgrids into them: auto-sized
+     role/cap columns would otherwise resize per row (each li its own grid), so
+     "Hobby" and "Major" rows drifted out of column with "Dormant knowledge". */
+  .profession-skill-list {
+    display: grid;
+    grid-template-columns: minmax(90px, 1fr) 38px minmax(72px, auto) minmax(88px, auto);
+    column-gap: 6px;
+  }
+  .profession-skill-row {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    padding: 3px 0;
+    font-size: 10px;
+  }
+  .profession-skill-header {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    padding: 2px 0 3px;
+    border-bottom: 1px solid var(--color-border-default);
+    color: var(--color-text-muted);
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .profession-skill-row.role-dormant {
+    opacity: 0.72;
+  }
+  .profession-identity-tutorial,
+  .profession-identity-nudges {
+    color: var(--color-text-muted);
+    font-size: 10px;
+    line-height: 1.35;
+  }
+  .crafting-recipe-item {
+    flex-wrap: wrap;
+  }
+  .crafting-recipe-item > .vendor-item {
+    flex: 1 0 100%;
+  }
+  .crafting-recipe-item > .crafting-combo-requirement {
+    flex: 1 0 100%;
+    margin-top: 3px;
+    color: var(--color-text-muted);
+    font-size: 10px;
+    line-height: 1.35;
+  }
   .vendor-empty {
     padding: 5px;
     font-size: 11px;
@@ -4482,6 +4804,20 @@
     color: var(--gold-dim);
     font-weight: 600;
     white-space: nowrap;
+  }
+  button.woc-balance {
+    min-height: 28px;
+    padding: 3px 7px;
+    border: 1px solid #6f592d;
+    border-radius: 4px;
+    background: rgb(200 163 74 / 10%);
+    font: inherit;
+    cursor: var(--cursor-pointer);
+  }
+  button.woc-balance:hover,
+  button.woc-balance:focus-visible {
+    border-color: #c8a34a;
+    color: #f3dfaa;
   }
   .woc-balance.is-preview {
     color: #b8a66f;
@@ -10271,10 +10607,15 @@
     display: none;
   }
   #welcome-screen::before {
-    /* ridge silhouettes along the bottom, same trick as the mock's .scene::before */
+    /* ridge silhouettes along the bottom, same trick as the mock's .scene::before.
+       Negative z: scene decor must paint BEHIND every panel and text run (it used
+       to sit above in the positioned-z-auto step and dimmed the footer chrome).
+       The 2px overscan stops device-pixel snapping at fractional zoom from
+       exposing a bare edge row. */
     content: "";
     position: fixed;
-    inset: auto 0 0 0;
+    z-index: -1;
+    inset: auto -2px -2px -2px;
     height: 46%;
     background:
       radial-gradient(58% 120% at 22% 128%, #050509 48%, transparent 50%),
@@ -10284,15 +10625,19 @@
   }
   #welcome-screen::after {
     /* soft vignette; an inset shadow leaves the center clear so it never
-       obscures panel content, only darkens the far edges. */
+       obscures panel content, only darkens the far edges. Kept behind content
+       (negative z) and gentle: the old 60px full-strength ring blacked out the
+       CTA valley at the bottom center. */
     content: "";
     position: fixed;
-    inset: 0;
-    box-shadow: inset 0 0 180px 60px rgba(0, 0, 0, 0.72);
+    z-index: -1;
+    inset: -2px;
+    box-shadow: inset 0 0 160px 24px rgba(0, 0, 0, 0.55);
     pointer-events: none;
   }
   .ws-stars {
     position: fixed;
+    z-index: -1;
     top: 26px;
     left: 18%;
     width: 2px;
@@ -10493,6 +10838,18 @@
     flex-direction: column;
     gap: 12px;
   }
+  /* An empty rail (armory promo off, chest not ready, no event) must not keep
+     its flex share: it silently squeezed the news column off-center on wide
+     desktops whenever every tile was gated off. */
+  .ws-rail:not(:has(> :not([hidden]))) {
+    display: none;
+  }
+  /* Character stage host: desktop-only centerpiece (the live char-select
+     CharacterPreview canvas is re-parented here while the welcome screen is
+     up); display: none outside the desktop composition. */
+  .ws-stage {
+    display: none;
+  }
   .ws-armory-card[hidden],
   .ws-chest-tile[hidden],
   .ws-event-slot[hidden] {
@@ -10673,6 +11030,10 @@
     text-align: center;
   }
   .ws-continue {
+    /* Warm-white focus ring: deliberate on the gilded gradient (see the
+       :focus-visible rule below); defined here so the outline declaration
+       stays token-driven for the focus_visible_guard scan. */
+    --ws-continue-ring: #fff6d8;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -10697,6 +11058,18 @@
     border-color: var(--color-border-default);
     box-shadow: none;
     cursor: default;
+  }
+  /* The CTA is autofocused by the welcome focus trap, so its ring shows on
+     every load: a warm-white ring reads as deliberate on the gilded gradient
+     where the generic .btn:focus-visible gold ring read as an artifact. The
+     !important mirrors that generic rule so the same-layer tie falls to this
+     later, equally specific declaration. */
+  .ws-continue:focus-visible {
+    outline: 2px solid var(--ws-continue-ring) !important;
+    outline-offset: 2px !important;
+    box-shadow:
+      0 4px 22px rgba(255, 209, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
   }
   .ws-continue-hint {
     font-size: 11.5px;
@@ -10776,6 +11149,327 @@
     .ws-continue-hint {
       font-size: 10px;
       margin-top: 4px;
+    }
+  }
+  /* Desktop launcher composition: the exact complement of the compact media
+     query above, so touch and short viewports keep the base flow untouched.
+     The mobile-first column markup is recomposed with grid + display: contents
+     into the AAA-launcher shape: a content-hugging glass news rail on the
+     left; on the right a cinematic stage with the player's live character
+     render as the centerpiece (the greeting above it, one dominant gilded
+     CTA below it, the Discord strip demoted to a slim bottom card); status
+     and version as corner chrome. Cold path (shown once per login), so the
+     entrance motion and star twinkle cost nothing per-frame in-world; both
+     respect prefers-reduced-motion. */
+  @media (min-width: 861px) and (pointer: fine) {
+    #welcome-screen {
+      display: grid;
+      grid-template-columns: minmax(430px, 33vw) minmax(0, 1fr);
+      grid-template-rows: auto minmax(0, 1fr) auto auto auto auto;
+      column-gap: clamp(36px, 4.5vw, 84px);
+      row-gap: 16px;
+      padding: clamp(28px, 4vh, 48px) clamp(32px, 5.5vw, 110px);
+      background:
+        radial-gradient(1400px 640px at 76% -12%, rgba(64, 52, 118, 0.6), transparent 64%),
+        radial-gradient(1500px 560px at 12% 116%, rgba(96, 66, 22, 0.55), transparent 62%),
+        radial-gradient(900px 420px at 88% 78%, rgba(38, 32, 78, 0.5), transparent 70%),
+        radial-gradient(1100px 380px at 62% 108%, rgba(214, 168, 46, 0.16), transparent 62%),
+        linear-gradient(180deg, #10121f 0%, #151329 42%, #1b1430 68%, #0a0912 100%);
+    }
+    .ws-body,
+    .ws-main,
+    .ws-footer {
+      display: contents;
+    }
+    /* Stage layering: the character canvas fills the whole right column
+       behind the greeting/CTA/Discord, which stack above it. */
+    .ws-stage {
+      display: block;
+      grid-column: 2;
+      grid-row: 1 / 6;
+      position: relative;
+      z-index: 0;
+      min-height: 0;
+      animation: ws-fade 0.7s ease-out backwards;
+    }
+    .ws-stage canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .ws-header,
+    .ws-rail,
+    .ws-discord-strip,
+    .ws-enter-wrap,
+    .ws-status,
+    .ws-version {
+      position: relative;
+      z-index: 1;
+    }
+    .ws-news-panel {
+      grid-column: 1;
+      grid-row: 1 / 6;
+      align-self: start;
+      max-height: 100%;
+      border-radius: 10px;
+      border-color: rgba(111, 90, 42, 0.85);
+      background: linear-gradient(180deg, rgba(19, 17, 30, 0.92), rgba(10, 9, 16, 0.94));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 209, 0, 0.1),
+        0 24px 64px rgba(0, 0, 0, 0.55);
+      padding: 20px 24px 14px;
+      animation: ws-rise 0.5s ease-out backwards;
+    }
+    .ws-panel-title {
+      letter-spacing: 0.18em;
+      font-size: 15px;
+    }
+    .ws-news-collapsed-summary {
+      font-size: 14px;
+    }
+    .ws-header {
+      grid-column: 2;
+      grid-row: 1;
+      align-self: start;
+      justify-self: center;
+      max-width: none;
+      margin: 0;
+      padding-top: clamp(4px, 2.5vh, 28px);
+      text-align: center;
+      animation: ws-rise 0.55s ease-out 0.05s backwards;
+    }
+    /* No live character render mounted (WebGL unavailable, /play, or assets
+       still warming): re-center the greeting across the hero space so the
+       stage reads as intentional, not abandoned. */
+    #welcome-screen:has(#ws-stage:empty) .ws-header {
+      grid-row: 1 / 3;
+      align-self: center;
+      padding-top: 0;
+    }
+    .ws-welcome-back {
+      font-size: clamp(38px, 3.6vw, 54px);
+      line-height: 1.1;
+      letter-spacing: 0.015em;
+      background: linear-gradient(180deg, #ffeaa8 8%, var(--gold) 55%, #b8942e 96%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: none;
+      filter: drop-shadow(0 3px 14px rgba(0, 0, 0, 0.85))
+        drop-shadow(0 0 26px rgba(255, 209, 0, 0.16));
+    }
+    .ws-header-meta {
+      margin-top: 12px;
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .ws-header::after {
+      content: "";
+      display: block;
+      height: 1px;
+      width: min(300px, 50%);
+      margin: 18px auto 0;
+      background: linear-gradient(90deg, transparent, rgba(199, 168, 87, 0.6), transparent);
+    }
+    .ws-rail {
+      grid-column: 2;
+      grid-row: 3;
+      justify-self: center;
+      width: min(420px, 100%);
+      max-width: 420px;
+      animation: ws-rise 0.55s ease-out 0.1s backwards;
+    }
+    .ws-enter-wrap {
+      grid-column: 2;
+      grid-row: 4;
+      align-self: end;
+      justify-self: center;
+      animation: ws-rise 0.55s ease-out 0.15s backwards;
+    }
+    .ws-continue {
+      position: relative;
+      overflow: hidden;
+      min-width: 320px;
+      min-height: 58px;
+      font-size: 24px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 8px;
+      padding: 14px 56px;
+      box-shadow:
+        0 6px 34px rgba(255, 209, 0, 0.38),
+        0 2px 8px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      transition:
+        transform 0.15s ease,
+        filter 0.15s ease,
+        box-shadow 0.15s ease;
+    }
+    .ws-continue:not(:disabled):hover {
+      transform: translateY(-1px);
+      filter: brightness(1.06);
+      box-shadow:
+        0 10px 44px rgba(255, 209, 0, 0.5),
+        0 2px 8px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+    .ws-continue:not(:disabled)::after {
+      content: "";
+      position: absolute;
+      inset: -40% auto;
+      left: -30%;
+      width: 24%;
+      transform: skewX(-18deg);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      animation: ws-sheen 4.5s ease-in-out 1.2s infinite;
+      pointer-events: none;
+    }
+    .ws-continue-hint {
+      margin-top: 10px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: var(--color-text-light);
+      opacity: 0.75;
+    }
+    /* Discord demoted to a slim, quiet card under the CTA: the strip must
+       never outweigh Enter World. */
+    .ws-discord-strip {
+      grid-column: 2;
+      grid-row: 5;
+      justify-self: center;
+      width: min(640px, 100%);
+      padding: 8px 12px;
+      gap: 12px;
+      border-color: rgba(88, 101, 242, 0.28);
+      background: linear-gradient(180deg, rgba(19, 17, 30, 0.72), rgba(10, 9, 16, 0.74));
+      box-shadow: none;
+      animation: ws-rise 0.55s ease-out 0.2s backwards;
+    }
+    .ws-discord-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 34% 46%, #fff 2.8px, transparent 3.4px),
+        radial-gradient(circle at 66% 46%, #fff 2.8px, transparent 3.4px), #5865f2;
+      box-shadow: none;
+    }
+    .ws-discord-title {
+      font-size: 13px;
+    }
+    .ws-discord-sub {
+      font-size: 11.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .btn-discord {
+      flex: none;
+      white-space: nowrap;
+      min-height: 34px;
+      padding: 6px 14px;
+      font-size: 12.5px;
+      box-shadow: none;
+    }
+    .ws-status {
+      grid-column: 1;
+      grid-row: 6;
+      align-self: end;
+      justify-content: flex-start;
+      text-align: left;
+    }
+    .ws-version {
+      grid-column: 2;
+      grid-row: 6;
+      align-self: end;
+      justify-self: end;
+      flex: none;
+      color: var(--color-text-muted);
+      pointer-events: none;
+    }
+    /* Denser two-layer starfield with a slow twinkle. */
+    .ws-stars {
+      box-shadow:
+        16vw 14px 0 -0.4px #b9bff3,
+        34vw 40px 0 -0.6px #9aa0d8,
+        48vw 22px 0 -0.4px #cfd3ff,
+        62vw 54px 0 -0.7px #8d93cc,
+        72vw 16px 0 -0.5px #b9bff3,
+        6vw 70px 0 -0.7px #8d93cc,
+        11vw 34px 0 -0.5px #cfd3ff,
+        26vw 8px 0 -0.7px #9aa0d8,
+        42vw 64px 0 -0.6px #b9bff3,
+        55vw 6px 0 -0.5px #cfd3ff,
+        68vw 78px 0 -0.8px #8d93cc,
+        79vw 44px 0 -0.5px #b9bff3,
+        87vw 12px 0 -0.6px #cfd3ff,
+        92vw 60px 0 -0.8px #9aa0d8;
+      animation: ws-twinkle 6s ease-in-out infinite alternate;
+    }
+    .ws-stars::after {
+      content: "";
+      position: fixed;
+      top: 120px;
+      left: 8%;
+      width: 1.6px;
+      height: 1.6px;
+      border-radius: 50%;
+      background: #9aa0d8;
+      box-shadow:
+        9vw 46px 0 -0.6px #8d93cc,
+        21vw 90px 0 -0.7px #b9bff3,
+        37vw 30px 0 -0.8px #9aa0d8,
+        52vw 74px 0 -0.6px #cfd3ff,
+        64vw 24px 0 -0.8px #8d93cc,
+        76vw 66px 0 -0.7px #9aa0d8,
+        85vw 96px 0 -0.6px #b9bff3;
+      opacity: 0.6;
+      animation: ws-twinkle 8s ease-in-out 2s infinite alternate;
+    }
+  }
+  @keyframes ws-rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+  @keyframes ws-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes ws-sheen {
+    0%,
+    62% {
+      left: -30%;
+    }
+    82%,
+    100% {
+      left: 128%;
+    }
+  }
+  @keyframes ws-twinkle {
+    from {
+      opacity: 0.55;
+    }
+    to {
+      opacity: 0.9;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ws-news-panel,
+    .ws-header,
+    .ws-rail,
+    .ws-stage,
+    .ws-discord-strip,
+    .ws-enter-wrap,
+    .ws-stars,
+    .ws-stars::after,
+    .ws-continue,
+    .ws-continue:not(:disabled)::after {
+      animation: none !important;
+      transition: none !important;
     }
   }
   /* ---------- developer command center ---------- */
@@ -10946,4 +11640,84 @@
     color: var(--color-text-muted);
     text-align: center;
   }
+}
+#talents-window .tal-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 4px;
+  overflow-y: auto;
+}
+#talents-window .tal-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+#talents-window .tal-row.locked {
+  opacity: 0.55;
+}
+#talents-window .tal-row-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 56px;
+  gap: 2px;
+}
+#talents-window .tal-row-lv {
+  font-family: var(--font-display, serif);
+  font-size: 18px;
+  color: var(--gold);
+}
+#talents-window .tal-row-lock {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+#talents-window .tal-row-opts {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+}
+#talents-window .tal-row-opt {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid var(--color-border, #6f5a2a);
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: var(--cursor-point);
+}
+#talents-window .tal-row-opt:hover:not(:disabled),
+#talents-window .tal-row-opt:focus-visible {
+  background: #ffffff10;
+  border-color: var(--gold);
+}
+#talents-window .tal-row-opt:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+#talents-window .tal-row-opt.picked {
+  background: #2c2410;
+  border-color: var(--gold);
+  box-shadow: inset 0 0 0 1px #ffd10033;
+}
+#talents-window .tal-row-opt:disabled {
+  cursor: default;
+}
+#talents-window .tal-row-opt img {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  object-fit: cover;
+  border-radius: 3px;
+}
+#talents-window .tal-row-opt b {
+  font-size: 12px;
+  line-height: 1.25;
+  font-weight: 600;
 }

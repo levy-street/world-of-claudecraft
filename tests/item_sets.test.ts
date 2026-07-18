@@ -30,6 +30,17 @@ function statsFor(cls: PlayerClass, level: number, equipment: Record<string, str
 const dist2d = (a: { x: number; z: number }, b: { x: number; z: number }) =>
   Math.hypot(a.x - b.x, a.z - b.z);
 
+describe('heroic set item identity', () => {
+  it('shares the normal set id and carries the heroic variant marker', () => {
+    // This line uses the auto-generated heroic_<base> variants (heroic_variants.ts),
+    // marked via heroicOf, not the PTR-era bespoke <base>_heroic pieces with a
+    // standalone heroic flag.
+    expect(ITEMS.heroic_crownforged_dreadhelm.set).toBe(ITEMS.crownforged_dreadhelm.set);
+    expect(ITEMS.heroic_crownforged_dreadhelm.set).toBe('crownforged');
+    expect(ITEMS.heroic_crownforged_dreadhelm.heroicOf).toBe('crownforged_dreadhelm');
+  });
+});
+
 describe('aggregateSetBonuses (pure resolver)', () => {
   it('grants nothing below the 2-piece threshold', () => {
     const eff = aggregateSetBonuses(counts({ [SET_DEATHLORD]: 1 }));
@@ -71,32 +82,36 @@ describe('aggregateSetBonuses (pure resolver)', () => {
     expect(three.critRating).toBe(SET_CRIT_3PC_RATING);
   });
 
-  it('caster sets: 2pc grants knockback resistance, 3pc grants tier stats', () => {
+  it('caster sets: 2pc grants full cast-pushback immunity, 3pc grants tier stats', () => {
+    // The caster 2-piece is SPELL pushback immunity (damage taken never delays
+    // a cast), never physical knockback resistance.
     const necro = aggregateSetBonuses(counts({ [SET_NECROMANCERS]: 3 }));
-    expect(necro.knockbackResistance).toBe(1);
+    expect(necro.castPushbackReduction).toBe(1);
     expect(necro.int).toBe(10);
     expect(necro.sta).toBe(10);
     expect(necro.spi).toBe(0);
-    expect(necro.castPushbackReduction).toBe(0);
+    expect(necro.knockbackResistance).toBe(0);
 
     const soulflame = aggregateSetBonuses(counts({ [SET_SOULFLAME]: 3 }));
-    expect(soulflame.knockbackResistance).toBe(1);
+    expect(soulflame.castPushbackReduction).toBe(1);
+    expect(soulflame.knockbackResistance).toBe(0);
     expect(soulflame.int).toBe(15);
     expect(soulflame.spi).toBe(15);
     expect(soulflame.sta).toBe(0);
 
     const stormcallers = aggregateSetBonuses(counts({ [SET_STORMCALLERS]: 3 }));
-    expect(stormcallers.knockbackResistance).toBe(1);
+    expect(stormcallers.castPushbackReduction).toBe(1);
+    expect(stormcallers.knockbackResistance).toBe(0);
     expect(stormcallers.int).toBe(15);
     expect(stormcallers.spi).toBe(15);
     expect(stormcallers.sta).toBe(0);
   });
 
-  it('knockback resistance max-combines across met tiers and clamps to 0..1', () => {
+  it('pushback reduction max-combines across met tiers and clamps to 0..1', () => {
     const twoCasterSets = aggregateSetBonuses(
       counts({ [SET_NECROMANCERS]: 2, [SET_SOULFLAME]: 2 }),
     );
-    expect(twoCasterSets.knockbackResistance).toBe(1);
+    expect(twoCasterSets.castPushbackReduction).toBe(1);
 
     const clampSetId = '__test_knockback_clamp';
     ITEM_SETS[clampSetId] = {
@@ -252,28 +267,28 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
     const mixed = statsFor('mage', 20, worn);
     const pieceInt = Object.values(worn).reduce((s, id) => s + (ITEMS[id].stats?.int ?? 0), 0);
     const pieceSpi = Object.values(worn).reduce((s, id) => s + (ITEMS[id].stats?.spi ?? 0), 0);
-    expect(mixed.knockbackResistance).toBe(1);
+    expect(mixed.castPushbackReduction).toBe(1);
     expect(mixed.stats.int).toBe(base.stats.int + pieceInt + 15); // +15 = 3pc Wraithfire int
     expect(mixed.stats.spi).toBe(base.stats.spi + pieceSpi + 15); // +15 = 3pc Wraithfire spi
   });
 
-  it("Necromancer's (t1 caster): knockback resistance at 2pc, int/sta added at 3pc", () => {
+  it("Necromancer's (t1 caster): cast-pushback immunity at 2pc, int/sta added at 3pc", () => {
     const base = statsFor('mage', 20, {});
     expect(statsFor('mage', 20, {}).castPushbackReduction).toBe(0);
     const two = statsFor('mage', 20, {
       chest: 'necromancers_starshroud',
       feet: 'necromancers_soulsteps',
     });
-    expect(two.castPushbackReduction).toBe(0);
-    expect(two.knockbackResistance).toBe(1);
+    expect(two.castPushbackReduction).toBe(1);
+    expect(two.knockbackResistance).toBe(0);
 
     const three = statsFor('mage', 20, {
       chest: 'necromancers_starshroud',
       feet: 'necromancers_soulsteps',
       legs: 'necromancers_legwraps',
     });
-    expect(three.castPushbackReduction).toBe(0);
-    expect(three.knockbackResistance).toBe(1);
+    expect(three.castPushbackReduction).toBe(1);
+    expect(three.knockbackResistance).toBe(0);
     expect(three.stats.int).toBe(base.stats.int + 11 + 8 + 13 + 10);
     expect(three.stats.sta).toBe(base.stats.sta + 10);
   });
@@ -285,7 +300,7 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
       shoulder: 'soulflame_mantle',
       gloves: 'soulflame_gloves',
     });
-    expect(soulflame.knockbackResistance).toBe(1);
+    expect(soulflame.castPushbackReduction).toBe(1);
     expect(soulflame.stats.int).toBe(mageBase.stats.int + 11 + 9 + 8 + 15);
     expect(soulflame.stats.spi).toBe(mageBase.stats.spi + 15);
 
@@ -295,7 +310,7 @@ describe('recalcPlayerStats applies equipped set bonuses (real raid/dungeon gear
       shoulder: 'stormcallers_spaulders',
       gloves: 'stormcallers_handguards',
     });
-    expect(stormcallers.knockbackResistance).toBe(1);
+    expect(stormcallers.castPushbackReduction).toBe(1);
     expect(stormcallers.stats.int).toBe(shamanBase.stats.int + 10 + 8 + 8 + 15);
     expect(stormcallers.stats.spi).toBe(shamanBase.stats.spi + 15);
   });
@@ -308,7 +323,8 @@ describe('pushbackCast honors castPushbackReduction', () => {
     p.channeling = channeling;
     p.castTotal = 3;
     p.castRemaining = 1.5;
-    // Synthetic coverage: no current item set grants cast-pushback reduction.
+    // Set directly to cover the partial-reduction curve; the caster 2-piece
+    // grants the full 1 (see the end-to-end suite below).
     p.castPushbackReduction = reduction;
     (sim as any).pushbackCast(p);
     return p;
@@ -333,8 +349,50 @@ describe('pushbackCast honors castPushbackReduction', () => {
   });
 });
 
-describe('knockback resistance from set bonuses', () => {
+describe('caster 2-piece: damage never delays a cast (end to end)', () => {
+  // Runs the REAL inbound path: dealDamage's spell-pushback block fires
+  // ctx.pushbackCast on every landed hit against a casting target, and the
+  // 2-piece Mournweave castPushbackReduction of 1 makes it a no-op.
+  const castThenHit = (equipSet: boolean) => {
+    const sim = new Sim({ seed: 77, playerClass: 'mage' });
+    sim.setPlayerLevel(20);
+    if (equipSet) {
+      for (const id of ['necromancers_starshroud', 'necromancers_soulsteps']) {
+        sim.addItem(id, 1);
+        sim.equipItem(id);
+      }
+    }
+    const p = sim.player;
+    expect(p.castPushbackReduction).toBe(equipSet ? 1 : 0);
+    const mob = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead)!;
+    mob.pos = { x: p.pos.x + 5, y: p.pos.y, z: p.pos.z };
+    mob.prevPos = { ...mob.pos };
+    (sim as any).rebucket(mob);
+    sim.targetEntity(mob.id);
+    p.resource = p.maxResource;
+    sim.castAbility('fireball');
+    expect(p.castingAbility).toBe('fireball');
+    const rem0 = p.castRemaining;
+    (sim as any).dealDamage(mob, p, 10, false, 'physical', 'Claw', 'hit', true);
+    return { p, rem0 };
+  };
+
+  it('with 2 Mournweave pieces the cast timer is untouched by a landed hit', () => {
+    const { p, rem0 } = castThenHit(true);
+    expect(p.castingAbility).toBe('fireball'); // still casting
+    expect(p.castRemaining).toBe(rem0); // and not delayed at all
+  });
+
+  it('without the set the same hit delays the cast (control)', () => {
+    const { p, rem0 } = castThenHit(false);
+    expect(p.castRemaining).toBeCloseTo(rem0 + CAST_PUSHBACK_SEC, 9);
+  });
+});
+
+describe('knockback resistance (the aggregate stat, set synthetically)', () => {
   it('prevents a forced mob knockback from displacing the player', () => {
+    // No shipped set grants knockbackResistance anymore (the caster 2-piece is
+    // cast-pushback immunity); this pins the engine mechanic behind the stat.
     const sim = new Sim({ seed: 5150, playerClass: 'mage' });
     const p = sim.entities.get(sim.playerId)!;
     p.maxHp = 100000;

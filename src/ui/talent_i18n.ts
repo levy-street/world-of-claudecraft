@@ -1,19 +1,29 @@
 import {
   type ClassTalents,
   type GlobalModEffect,
+  type ProcDef,
+  ROW_TREES,
   type Role,
+  rowTreeFor,
   type SpecDef,
   type StatModEffect,
   TALENTS,
-  type TalentChoiceOption,
   type TalentEffect,
-  type TalentNode,
+  type TalentRowOption,
 } from '../sim/content/talents';
-import { ABILITIES } from '../sim/data';
-import type { PlayerClass } from '../sim/types';
+import { ABILITIES, CLASSES } from '../sim/data';
+import type { AbilityEffect, PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
-import { getLanguage, languageTag, type SupportedLanguage, t } from './i18n';
-import { TALENT_NEW } from './talent_i18n.newlocales';
+import {
+  getLanguage,
+  type InterpolationValues,
+  languageTag,
+  type SupportedLanguage,
+  t,
+} from './i18n';
+import { TALENT_NEW, TALENT_NEW_TITLE_OVERRIDES } from './talent_i18n.newlocales';
+import { RETAINED_ROW_DESCRIPTION_OVERRIDES } from './talent_i18n.row_description_overrides';
+import { RETAINED_ROW_TITLE_OVERRIDES } from './talent_i18n.row_title_overrides';
 
 // Localized UI label for a spec's combat role (tank/healer/dps). Shared by the
 // talents window (spec cards) and the character sheet's spec summary so the role
@@ -27,12 +37,11 @@ export function roleLabel(role: Role): string {
       : t('game.talents.roleDps');
 }
 
-export type TalentTranslationKind = 'talentNode' | 'talentChoice' | 'talentSpec' | 'talentMastery';
+export type TalentTranslationKind = 'talentChoice' | 'talentSpec' | 'talentMastery';
 export type TalentTranslationField = 'name' | 'description';
 
 export type TalentTranslationRequest =
-  | { kind: 'talentNode'; node: TalentNode; field: TalentTranslationField }
-  | { kind: 'talentChoice'; choice: TalentChoiceOption; field: TalentTranslationField }
+  | { kind: 'talentChoice'; choice: TalentRowOption; field: TalentTranslationField }
   | { kind: 'talentSpec'; spec: SpecDef; field: TalentTranslationField }
   | { kind: 'talentMastery'; spec: SpecDef; field: TalentTranslationField };
 
@@ -47,13 +56,67 @@ export interface TalentTranslationManifestEntry {
 
 type StatKey = keyof StatModEffect;
 type GlobalKey = keyof GlobalModEffect;
-type DisplayGlobalKey = Exclude<GlobalKey, 'critVsRooted'>;
+type DisplayGlobalKey = Exclude<
+  GlobalKey,
+  | 'critVsRooted'
+  | 'moonwingPartyCritPct'
+  | 'autoRagePct'
+  | 'abilityRagePct'
+  | 'onKillSpeedPct'
+  | 'onKillSpeedDuration'
+  | 'secondWindPctPerSec'
+  | 'battleRhythm'
+  | 'bloodbathPct'
+  | 'bloodbathDuration'
+  | 'bloodbathMaxPct'
+  | 'cdrPerRage'
+  | 'stanceMastery'
+  | 'fearBreakPct'
+  | 'masteryTwoHandDmgPct'
+  | 'cheatDeathIcd'
+  | 'barrierDrPct'
+  | 'temporalRift'
+  | 'manaDefCdrPer10'
+  | 'blinkCast'
+  | 'convergence'
+  | 'ignitionPct'
+  | 'manaPct'
+  | 'manaRegenPct'
+>;
+
+const NON_DISPLAY_GLOBALS = new Set<GlobalKey>([
+  'critVsRooted',
+  'autoRagePct',
+  'abilityRagePct',
+  'onKillSpeedPct',
+  'onKillSpeedDuration',
+  'secondWindPctPerSec',
+  'battleRhythm',
+  'bloodbathPct',
+  'bloodbathDuration',
+  'bloodbathMaxPct',
+  'cdrPerRage',
+  'stanceMastery',
+  'fearBreakPct',
+  'masteryTwoHandDmgPct',
+  'cheatDeathIcd',
+  'barrierDrPct',
+  'temporalRift',
+  'manaDefCdrPer10',
+  'blinkCast',
+  'convergence',
+  'ignitionPct',
+  'manaPct',
+  'manaRegenPct',
+]);
 
 export interface TalentLocaleText {
   // Primary-attribute multipliers (strPct/agiPct/intPct/spiPct) reuse their base stat
-  // label ("+10% Agility"), so locales don't repeat them here.
+  // label ("+10% Agility"), so locales don't repeat them here. armorFromStrPct is
+  // likewise excluded: it appears only in the Protection mastery, which carries its
+  // own written description, so no auto-generated stat label is ever needed for it.
   statLabels: Record<
-    | Exclude<StatKey, 'strPct' | 'agiPct' | 'intPct' | 'spiPct'>
+    | Exclude<StatKey, 'strPct' | 'agiPct' | 'intPct' | 'spiPct' | 'armorFromStrPct'>
     | DisplayGlobalKey
     | 'damage'
     | 'cost'
@@ -66,6 +129,15 @@ export interface TalentLocaleText {
   noEffect: string;
   chooseOne: (name: string) => string;
   specDescription: (className: string, role: string, abilityName: string) => string;
+  // Hand-authored flavor prose per spec id, keyed exactly like the English
+  // SpecDef.description. Spec descriptions carry no numbers, so unlike node/mastery
+  // text they never drift from the effect and are safe to translate by hand. A locale
+  // that omits a spec id (or omits the map entirely) falls back to specDescription().
+  specDescriptions?: Record<string, string>;
+  // Hand-authored mastery prose per spec id, for masteries whose bonus is applied at
+  // runtime (e.g. Master Armorer's 2H-gated damage) so the effect object is empty and
+  // effectDescription() would otherwise fall back to the generic noEffect string.
+  masteryDescriptions?: Record<string, string>;
   grant: (abilityName: string) => string;
   increase: (target: string, amount: string, perRank: string) => string;
   reduce: (target: string, amount: string, perRank: string) => string;
@@ -73,6 +145,16 @@ export interface TalentLocaleText {
 
 const abilityIdByName = new Map(
   Object.values(ABILITIES).map((ability) => [ability.name, ability.id]),
+);
+const grantAbilityIdByTitle = new Map(
+  Object.values(ROW_TREES).flatMap((rows) =>
+    rows.flatMap((row) =>
+      row.options.flatMap((option) => {
+        const abilityId = option.effect.grant?.ability;
+        return abilityId ? ([[option.name, abilityId]] as const) : [];
+      }),
+    ),
+  ),
 );
 
 const enText: TalentLocaleText = {
@@ -102,6 +184,7 @@ const enText: TalentLocaleText = {
     hotHealPct: 'heal-over-time healing',
     absorbPct: 'absorption',
     meleeHastePct: 'melee haste',
+    extraAttackPct: 'extra attack chance',
     petDmgPct: 'pet damage',
     petDmgSharePct: 'damage redirected to pet',
     damage: 'damage',
@@ -112,6 +195,13 @@ const enText: TalentLocaleText = {
   roleLabels: { tank: 'tank', healer: 'healer', dps: 'damage' },
   perRank: ' per rank',
   noEffect: 'Provides a specialization benefit.',
+  specDescriptions: {
+    fire: 'A master of flame who chains critical strikes into devastating explosions. Fast, aggressive, and capable of igniting many enemies.',
+    frost:
+      'A spellcaster who controls the battlefield with ice, slows, and freezes. They build glacial power to destroy enemies with precise attacks.',
+    arcane:
+      'A mage who manipulates time and aether to protect allies. They can anticipate wounds, repeat healing, and reverse damage before it is too late.',
+  },
   chooseOne: (name) => `Choose one ${name} option.`,
   specDescription: (className, role, abilityName) =>
     `${className} specialization focused on ${role}. Signature ability: ${abilityName}.`,
@@ -152,6 +242,7 @@ const localeTextByBase = {
       hotHealPct: 'sanación en el tiempo',
       absorbPct: 'absorción',
       meleeHastePct: 'celeridad cuerpo a cuerpo',
+      extraAttackPct: 'probabilidad de ataque adicional',
       petDmgPct: 'daño de la mascota',
       petDmgSharePct: 'daño redirigido a la mascota',
       damage: 'daño',
@@ -165,11 +256,30 @@ const localeTextByBase = {
     chooseOne: (name) => `Elige una opción de ${name}.`,
     specDescription: (className, role, abilityName) =>
       `Especialización de ${className} centrada en ${role}. Habilidad distintiva: ${abilityName}.`,
+    specDescriptions: {
+      fire: 'Un maestro de las llamas que encadena golpes críticos y provoca explosiones devastadoras. Su estilo es rápido, agresivo y capaz de incendiar a numerosos enemigos.',
+      frost:
+        'Un hechicero que controla el campo de batalla mediante hielo, ralentizaciones y congelaciones. Acumula poder glacial para destrozar a sus enemigos con ataques precisos.',
+      arcane:
+        'Un mago que manipula el tiempo para proteger a sus aliados. Canaliza daño Arcano a través de ecos temporales que convierten sus hechizos en sanación, manteniendo a su grupo con vida mientras altera el curso de la batalla.',
+      arms: 'Un maestro de las armas que convierte la disciplina y la técnica en su mayor fortaleza. Cada golpe está calculado para romper la defensa del enemigo, explotar sus puntos débiles y preparar un remate devastador. Su combate es preciso, metódico y letal, recompensando a quienes dominan el ritmo de la batalla.',
+      fury: 'Un berserker que lucha con un arma en cada mano y deja que la rabia guíe cada movimiento. Cuanto más combate, mayor es su Enfurecimiento, desatando una lluvia incesante de ataques que apenas da respiro a sus enemigos. Un estilo frenético, salvaje y agresivo, donde la ofensiva nunca se detiene.',
+      prot: 'El guardián que lidera la primera línea del combate con un escudo en alto y una voluntad inquebrantable. Resiste el asalto de innumerables enemigos, protege a sus aliados y controla el campo de batalla con autoridad. Convierte cada golpe bloqueado en una oportunidad para responder con contundencia.',
+    },
+    masteryDescriptions: {
+      arms: 'Mientras empuñas un arma a dos manos, infliges un 10% más de daño.',
+      fire: 'Tus hechizos de Fuego que asestan golpes críticos aplican Ignición, que inflige un 40% del daño durante 6 s y se acumula. Aumenta además tu probabilidad de crítico un 2%.',
+      arcane:
+        'Aumenta toda la sanación que realizas un 15%, tu maná máximo un 5% y tu regeneración de maná un 20%.',
+    },
     grant: (abilityName) => `Otorga ${abilityName}.`,
     increase: (target, amount, perRank) => `Aumenta ${target} en ${amount}${perRank}.`,
     reduce: (target, amount, perRank) => `Reduce ${target} en ${amount}${perRank}.`,
   },
   fr_FR: {
+    masteryDescriptions: {
+      arms: 'Lorsque vous maniez une arme à deux mains, tous les dégâts que vous infligez sont augmentés de 10 %.',
+    },
     statLabels: {
       str: 'Force',
       agi: 'Agilité',
@@ -196,6 +306,7 @@ const localeTextByBase = {
       hotHealPct: 'soins sur la durée',
       absorbPct: 'absorption',
       meleeHastePct: 'hâte en mêlée',
+      extraAttackPct: "chance d'attaque supplémentaire",
       petDmgPct: 'dégâts du familier',
       petDmgSharePct: 'dégâts redirigés vers le familier',
       damage: 'dégâts',
@@ -214,6 +325,9 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `Réduit ${target} de ${amount}${perRank}.`,
   },
   it_IT: {
+    masteryDescriptions: {
+      arms: "Con un'arma a due mani in mano, tutti i danni che infliggi aumentano del 10%.",
+    },
     statLabels: {
       str: 'Forza',
       agi: 'Agilità',
@@ -240,6 +354,7 @@ const localeTextByBase = {
       hotHealPct: 'cure nel tempo',
       absorbPct: 'assorbimento',
       meleeHastePct: 'celerità in mischia',
+      extraAttackPct: 'probabilità di attacco extra',
       petDmgPct: 'danni della mascotte',
       petDmgSharePct: 'danni reindirizzati alla mascotte',
       damage: 'danni',
@@ -258,6 +373,9 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `Riduce ${target} di ${amount}${perRank}.`,
   },
   de_DE: {
+    masteryDescriptions: {
+      arms: 'Solange du eine Zweihandwaffe führst, erhöht sich dein verursachter Schaden um 10 %.',
+    },
     statLabels: {
       str: 'Stärke',
       agi: 'Beweglichkeit',
@@ -284,6 +402,7 @@ const localeTextByBase = {
       hotHealPct: 'Heilung über Zeit',
       absorbPct: 'Absorption',
       meleeHastePct: 'Nahkampftempo',
+      extraAttackPct: 'Chance auf Extraangriff',
       petDmgPct: 'Begleiterschaden',
       petDmgSharePct: 'auf den Begleiter umgeleiteten Schaden',
       damage: 'Schaden',
@@ -302,6 +421,7 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `Verringert ${target} um ${amount}${perRank}.`,
   },
   zh_CN: {
+    masteryDescriptions: { arms: '装备双手武器时，你造成的所有伤害提高 10%。' },
     statLabels: {
       str: '力量',
       agi: '敏捷',
@@ -328,6 +448,7 @@ const localeTextByBase = {
       hotHealPct: '持续治疗量',
       absorbPct: '吸收量',
       meleeHastePct: '近战急速',
+      extraAttackPct: '额外攻击几率',
       petDmgPct: '宠物伤害',
       petDmgSharePct: '转移给宠物的伤害',
       damage: '伤害',
@@ -346,6 +467,7 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `使${target}降低${amount}${perRank}。`,
   },
   zh_TW: {
+    masteryDescriptions: { arms: '揮舞雙手武器時，你造成的所有傷害提高10%。' },
     statLabels: {
       str: '力量',
       agi: '敏捷',
@@ -372,6 +494,7 @@ const localeTextByBase = {
       hotHealPct: '持續治療量',
       absorbPct: '吸收量',
       meleeHastePct: '近戰加速',
+      extraAttackPct: '額外攻擊機率',
       petDmgPct: '寵物傷害',
       petDmgSharePct: '轉移給寵物的傷害',
       damage: '傷害',
@@ -390,6 +513,7 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `使${target}降低${amount}${perRank}。`,
   },
   ko_KR: {
+    masteryDescriptions: { arms: '양손 무기를 장착하면 주는 피해가 10% 증가합니다.' },
     statLabels: {
       str: '힘',
       agi: '민첩',
@@ -416,6 +540,7 @@ const localeTextByBase = {
       hotHealPct: '지속 치유량',
       absorbPct: '피해 흡수량',
       meleeHastePct: '근접 가속',
+      extraAttackPct: '추가 공격 확률',
       petDmgPct: '소환수 피해',
       petDmgSharePct: '소환수에게 이전되는 피해',
       damage: '피해',
@@ -434,6 +559,9 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `${target}이 ${amount}${perRank} 감소합니다.`,
   },
   ja_JP: {
+    masteryDescriptions: {
+      arms: '両手武器を装備している間、与えるダメージがすべて10%増加します。',
+    },
     statLabels: {
       str: '筋力',
       agi: '敏捷性',
@@ -460,6 +588,7 @@ const localeTextByBase = {
       hotHealPct: '継続回復量',
       absorbPct: '吸収量',
       meleeHastePct: '近接ヘイスト',
+      extraAttackPct: '追加攻撃の確率',
       petDmgPct: 'ペットのダメージ',
       petDmgSharePct: 'ペットに転送されるダメージ',
       damage: 'ダメージ',
@@ -478,6 +607,9 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `${target}を${amount}${perRank}減少させます。`,
   },
   pt_BR: {
+    masteryDescriptions: {
+      arms: 'Enquanto empunha uma arma de duas mãos, o dano que você causa é aumentado em 10%.',
+    },
     statLabels: {
       str: 'Força',
       agi: 'Agilidade',
@@ -504,6 +636,7 @@ const localeTextByBase = {
       hotHealPct: 'cura ao longo do tempo',
       absorbPct: 'absorção',
       meleeHastePct: 'aceleração corpo a corpo',
+      extraAttackPct: 'chance de ataque extra',
       petDmgPct: 'dano do mascote',
       petDmgSharePct: 'dano redirecionado para o mascote',
       damage: 'dano',
@@ -522,6 +655,9 @@ const localeTextByBase = {
     reduce: (target, amount, perRank) => `Reduz ${target} em ${amount}${perRank}.`,
   },
   ru_RU: {
+    masteryDescriptions: {
+      arms: 'При использовании двуручного оружия весь наносимый вами урон увеличивается на 10%.',
+    },
     statLabels: {
       str: 'Сила',
       agi: 'Ловкость',
@@ -548,6 +684,7 @@ const localeTextByBase = {
       hotHealPct: 'периодическое исцеление',
       absorbPct: 'объём поглощения',
       meleeHastePct: 'скорость атак ближнего боя',
+      extraAttackPct: 'шанс дополнительной атаки',
       petDmgPct: 'урон питомца',
       petDmgSharePct: 'урон, перенаправляемый питомцу',
       damage: 'урон',
@@ -584,14 +721,95 @@ const localeText: Record<SupportedLanguage, TalentLocaleText> = {
 // locale — there is no secondary additions/corrections layer.
 const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>> = {
   es: {
+    'Adrenaline Junkie': 'Adicto a la adrenalina',
+    'Aspect Mastery': 'Maestría de aspectos',
+    'Aura Mastery': 'Maestría de auras',
+    'Battlemage Armor': 'Armadura de mago guerrero',
+    'Blessed Momentum': 'Impulso bendito',
+    'Blessed Recovery': 'Recuperación bendita',
+    'Brutal Bash': 'Porrazo brutal',
+    'Cheat Death': 'Burlar la muerte',
+    'Coldsnap Break': 'Ruptura de frío súbito',
+    'Commanding Presence': 'Presencia dominante',
+    'Concussive Clap': 'Palmada conmocionante',
+    'Consecrated Ground': 'Suelo consagrado',
+    'Crippling Blows': 'Golpes incapacitantes',
+    'Crippling Strikes': 'Ataques lisiadores',
+    "Crusader's Zeal": 'Celo del cruzado',
+    'Curse Mastery': 'Maestría de maldiciones',
+    'Deadly Brew': 'Brebaje mortal',
+    'Demon Armor': 'Armadura demoníaca',
+    'Divine Wisdom': 'Sabiduría divina',
+    'Elemental Attunement': 'Sintonía elemental',
+    'Elemental Warding': 'Resguardo elemental',
+    'Empowered Touch': 'Toque potenciado',
+    Endurance: 'Entereza',
+    Executioner: 'Verdugo',
+    Firestarter: 'Prendedor de llamas',
+    'Fist of Justice': 'Puño de justicia',
+    'Frost Bind': 'Atadura de escarcha',
+    'Furious Bloodrage': 'Ira sangrienta furiosa',
+    'Greater Blessing': 'Bendición superior',
+    'Greater Heal': 'Sanación superior',
+    'Grimoire of Carnage': 'Grimorio de carnicería',
+    "Guardian's Favor": 'Favor del guardián',
+    'Ice Nova': 'Nova de hielo',
+    'Imbue Mastery': 'Maestría de imbuir',
+    'Improved Backstab': 'Puñalada mejorada',
+    'Improved Barkskin': 'Piel de corteza mejorada',
+    'Improved Cinder Jolt': 'Sacudida de ceniza mejorada',
+    'Improved Concussive': 'Conmoción mejorada',
+    'Improved Cutthroat Tempo': 'Ritmo degollador mejorado',
+    'Improved Earthen Jolt': 'Sacudida terránea mejorada',
+    'Improved Evasion': 'Evasión mejorada',
+    'Improved Fear': 'Miedo mejorado',
+    'Improved Hurricane': 'Huracán mejorado',
+    'Improved Immolate': 'Inmolar mejorado',
+    'Improved Low Blow': 'Golpe bajo mejorado',
+    'Improved Mark': 'Marca mejorada',
+    'Improved Roots': 'Raíces mejoradas',
+    'Improved Shield': 'Escudo mejorado',
+    'Improved Venom Barb': 'Púa venenosa mejorada',
+    'Improved Volley': 'Salva mejorada',
+    Impulse: 'Ímpetu',
+    'Inner Fire': 'Fuego interior',
+    'Iron Hide': 'Piel de hierro',
+    Juggernaut: 'Coloso imparable',
+    'Mana Attunement': 'Sintonía de maná',
+    'Master Assassin': 'Maestro asesino',
+    'Master Tamer': 'Maestro domador',
+    'Mind Melt': 'Fusión mental',
+    Moonspite: 'Rencor lunar',
+    "Nature's Bounty": 'Abundancia de la naturaleza',
+    Netherwind: 'Viento abisal',
+    Opportunist: 'Oportunista',
+    'Pain and Suffering': 'Dolor y sufrimiento',
+    'Quick Shots': 'Disparos rápidos',
+    'Quick Wits': 'Ingenio rápido',
+    'Rapid Killing': 'Matanza rápida',
+    'Righteous Cause': 'Causa justa',
+    'Sacred Ward': 'Resguardo sagrado',
+    'Savage Fury': 'Furia salvaje',
+    'Searing Light': 'Luz abrasadora',
+    "Serpent's Venom": 'Veneno de serpiente',
+    'Shock Efficiency': 'Eficiencia de choque',
+    'Slow Burn': 'Combustión lenta',
+    'Sniper Training': 'Entrenamiento de francotirador',
+    'Survival of the Fittest': 'Supervivencia del más apto',
+    'Swift Verdicts': 'Veredictos veloces',
+    'Tidal Waves': 'Ondas de marea',
+    'Twisted Faith': 'Fe retorcida',
+    'Vengeful Exorcism': 'Exorcismo vengativo',
+    Warbringer: 'Portador de guerra',
+    'Weapon Fury': 'Furia de armas',
     'Aether Surge': 'Poder arcano',
     'Aetheric Aim': 'Foco arcano',
-    'Aetheric Flux': 'Inestabilidad arcana',
+    Chronoweave: 'Cronotejido',
     'Aetheric Mind': 'Mente arcana',
     'Aetheric Poise': 'Concentración arcana',
     'Aetheric Shell': 'Resiliencia arcana',
     'Aetheric Thesis': 'Tesis arcana',
-    Aethermancy: 'Arcano',
+    Chronomancy: 'Cronomancia',
     Afterflame: 'Inflamar',
     "Ancestor's Mercy": 'Sanación ancestral',
     'Ancient Lore': 'Conocimiento ancestral',
@@ -604,7 +822,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Baleful Rod': 'Especialización en varitas',
     Barbarity: 'Crueldad',
     'Battle Doctrine': 'Maestría táctica',
-    Battlecraft: 'Armas',
+    Battlecraft: 'Arte de Guerra',
     'Beast Tending': 'Reparar mascota mejorado',
     Beastpact: 'Vínculo bestial',
     Benison: 'Sagrado',
@@ -618,7 +836,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Blood Debt': 'Venganza',
     Bloodlather: 'Frenesí',
     Bloodletter: 'Sediento de sangre',
-    Bloodrush: 'Furia',
+    Bloodrush: 'Ímpetu Sanguíneo',
     Bonepiercer: 'Empalar',
     'Boundless Ire': 'Ira desenfrenada',
     Brackenstride: 'Abrecaminos',
@@ -764,7 +982,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Improved Wildbolt': 'Cólera mejorada',
     'Improved Wildward': 'Marca de lo Salvaje mejorada',
     'Iron Aim': 'Entrenamiento de disparo certero',
-    Ironguard: 'Protección',
+    Ironguard: 'Guardia de Hierro',
     Ironpelt: 'Piel gruesa',
     Ironsinew: 'Entrenamiento de aguante',
     "Killer's Calm": 'Sangre fría',
@@ -823,6 +1041,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Concentración espiritual',
     Quietude: 'Reflexión',
     'Racing Mind': 'Presencia mental',
+    Ignition: 'Ignición',
+    'Phoenix Trance': 'Trance del fénix',
+    'Ice Floes': 'Témpanos',
+    'Double Blink': 'Traslación doble',
+    'Blink While Casting': 'Traslación al lanzar',
+    Warded: 'Resguardo',
+    'Temporal Rift': 'Desfase temporal',
+    'Greater Invisibility': 'Invisibilidad superior',
+    'Ring of Frost': 'Anillo de escarcha',
+    'Snap Bewitch': 'Embrujo instantáneo',
+    'Twin Icebind': 'Atadura gemela',
+    'Power Echo': 'Eco de poder',
+    Overload: 'Sobrecarga',
+    'Elemental Convergence': 'Convergencia elemental',
+    "Winter's Recall": 'Llamada del invierno',
+    'Mass Barrier': 'Barrera en masa',
+    'Rune of Power': 'Runa de poder',
+    'Overflowing Power': 'Poder desbordado',
     'Rapid Blows': 'Frenesí',
     'Reaching Boughs': 'Alcance de la naturaleza',
     'Reaching Word': 'Alcance sagrado',
@@ -835,7 +1071,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Redhanded: 'Intención homicida',
     Redmaw: 'Ferocidad',
     Refuge: 'Santuario',
-    Requital: 'Reprensión',
+    Requital: 'Retribución',
     'Rolling Flame': 'Onda explosiva',
     Ruination: 'Destrucción',
     'Rushing Waters': 'Celeridad de la naturaleza',
@@ -849,7 +1085,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Concentración de mareas',
     Shadeslip: 'Paso de las Sombras',
     'Shared Quarry': 'Fuego concentrado',
-    'Sharpened Blades': 'Hojas afiladas',
     'Shattered Earth': 'Devastación elemental',
     Shieldbearer: 'Especialización en escudo',
     Shieldwright: 'Dominio de escudo',
@@ -927,14 +1162,95 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': 'Furia divina',
   },
   es_ES: {
+    'Adrenaline Junkie': 'Adicto a la adrenalina',
+    'Aspect Mastery': 'Maestría de aspectos',
+    'Aura Mastery': 'Maestría de auras',
+    'Battlemage Armor': 'Armadura de mago guerrero',
+    'Blessed Momentum': 'Impulso bendito',
+    'Blessed Recovery': 'Recuperación bendita',
+    'Brutal Bash': 'Porrazo brutal',
+    'Cheat Death': 'Burlar la muerte',
+    'Coldsnap Break': 'Ruptura de frío súbito',
+    'Commanding Presence': 'Presencia dominante',
+    'Concussive Clap': 'Palmada conmocionante',
+    'Consecrated Ground': 'Suelo consagrado',
+    'Crippling Blows': 'Golpes incapacitantes',
+    'Crippling Strikes': 'Ataques lisiadores',
+    "Crusader's Zeal": 'Celo del cruzado',
+    'Curse Mastery': 'Maestría de maldiciones',
+    'Deadly Brew': 'Brebaje mortal',
+    'Demon Armor': 'Armadura demoníaca',
+    'Divine Wisdom': 'Sabiduría divina',
+    'Elemental Attunement': 'Sintonía elemental',
+    'Elemental Warding': 'Resguardo elemental',
+    'Empowered Touch': 'Toque potenciado',
+    Endurance: 'Entereza',
+    Executioner: 'Verdugo',
+    Firestarter: 'Prendedor de llamas',
+    'Fist of Justice': 'Puño de justicia',
+    'Frost Bind': 'Atadura de escarcha',
+    'Furious Bloodrage': 'Ira sangrienta furiosa',
+    'Greater Blessing': 'Bendición superior',
+    'Greater Heal': 'Sanación superior',
+    'Grimoire of Carnage': 'Grimorio de carnicería',
+    "Guardian's Favor": 'Favor del guardián',
+    'Ice Nova': 'Nova de hielo',
+    'Imbue Mastery': 'Maestría de imbuir',
+    'Improved Backstab': 'Puñalada mejorada',
+    'Improved Barkskin': 'Piel de corteza mejorada',
+    'Improved Cinder Jolt': 'Sacudida de ceniza mejorada',
+    'Improved Concussive': 'Conmoción mejorada',
+    'Improved Cutthroat Tempo': 'Ritmo degollador mejorado',
+    'Improved Earthen Jolt': 'Sacudida terránea mejorada',
+    'Improved Evasion': 'Evasión mejorada',
+    'Improved Fear': 'Miedo mejorado',
+    'Improved Hurricane': 'Huracán mejorado',
+    'Improved Immolate': 'Inmolar mejorado',
+    'Improved Low Blow': 'Golpe bajo mejorado',
+    'Improved Mark': 'Marca mejorada',
+    'Improved Roots': 'Raíces mejoradas',
+    'Improved Shield': 'Escudo mejorado',
+    'Improved Venom Barb': 'Púa venenosa mejorada',
+    'Improved Volley': 'Salva mejorada',
+    Impulse: 'Ímpetu',
+    'Inner Fire': 'Fuego interior',
+    'Iron Hide': 'Piel de hierro',
+    Juggernaut: 'Coloso imparable',
+    'Mana Attunement': 'Sintonía de maná',
+    'Master Assassin': 'Maestro asesino',
+    'Master Tamer': 'Maestro domador',
+    'Mind Melt': 'Fusión mental',
+    Moonspite: 'Rencor lunar',
+    "Nature's Bounty": 'Abundancia de la naturaleza',
+    Netherwind: 'Viento abisal',
+    Opportunist: 'Oportunista',
+    'Pain and Suffering': 'Dolor y sufrimiento',
+    'Quick Shots': 'Disparos rápidos',
+    'Quick Wits': 'Ingenio rápido',
+    'Rapid Killing': 'Matanza rápida',
+    'Righteous Cause': 'Causa justa',
+    'Sacred Ward': 'Resguardo sagrado',
+    'Savage Fury': 'Furia salvaje',
+    'Searing Light': 'Luz abrasadora',
+    "Serpent's Venom": 'Veneno de serpiente',
+    'Shock Efficiency': 'Eficiencia de choque',
+    'Slow Burn': 'Combustión lenta',
+    'Sniper Training': 'Entrenamiento de francotirador',
+    'Survival of the Fittest': 'Supervivencia del más apto',
+    'Swift Verdicts': 'Veredictos veloces',
+    'Tidal Waves': 'Ondas de marea',
+    'Twisted Faith': 'Fe retorcida',
+    'Vengeful Exorcism': 'Exorcismo vengativo',
+    Warbringer: 'Portador de guerra',
+    'Weapon Fury': 'Furia de armas',
     'Aether Surge': 'Poder arcano',
     'Aetheric Aim': 'Enfoque arcano',
-    'Aetheric Flux': 'Inestabilidad arcana',
+    Chronoweave: 'Cronotejido',
     'Aetheric Mind': 'Mente arcana',
     'Aetheric Poise': 'Concentración arcana',
     'Aetheric Shell': 'Resiliencia arcana',
     'Aetheric Thesis': 'Tesis arcana',
-    Aethermancy: 'Arcano',
+    Chronomancy: 'Cronomancia',
     Afterflame: 'Incendiar',
     "Ancestor's Mercy": 'Sanación ancestral',
     'Ancient Lore': 'Conocimiento ancestral',
@@ -947,7 +1263,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Baleful Rod': 'Especialización con varitas',
     Barbarity: 'Crueldad',
     'Battle Doctrine': 'Maestría táctica',
-    Battlecraft: 'Armas',
+    Battlecraft: 'Arte de Guerra',
     'Beast Tending': 'Curar mascota mejorado',
     Beastpact: 'Vínculo bestial',
     Benison: 'Sagrado',
@@ -961,7 +1277,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Blood Debt': 'Venganza',
     Bloodlather: 'Frenesí',
     Bloodletter: 'Sediento de sangre',
-    Bloodrush: 'Furia',
+    Bloodrush: 'Ímpetu Sanguíneo',
     Bonepiercer: 'Empalar',
     'Boundless Ire': 'Ira desatada',
     Brackenstride: 'Pionero',
@@ -1107,7 +1423,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Improved Wildbolt': 'Cólera mejorada',
     'Improved Wildward': 'Marca de lo Salvaje mejorada',
     'Iron Aim': 'Entrenamiento de disparo certero',
-    Ironguard: 'Protección',
+    Ironguard: 'Guardia de Hierro',
     Ironpelt: 'Piel gruesa',
     Ironsinew: 'Entrenamiento de aguante',
     "Killer's Calm": 'Sangre fría',
@@ -1166,6 +1482,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Enfoque espiritual',
     Quietude: 'Reflexión',
     'Racing Mind': 'Presencia mental',
+    Ignition: 'Ignición',
+    'Phoenix Trance': 'Trance del fénix',
+    'Ice Floes': 'Témpanos',
+    'Double Blink': 'Traslación doble',
+    'Blink While Casting': 'Traslación al lanzar',
+    Warded: 'Resguardo',
+    'Temporal Rift': 'Desfase temporal',
+    'Greater Invisibility': 'Invisibilidad superior',
+    'Ring of Frost': 'Anillo de escarcha',
+    'Snap Bewitch': 'Embrujo instantáneo',
+    'Twin Icebind': 'Atadura gemela',
+    'Power Echo': 'Eco de poder',
+    Overload: 'Sobrecarga',
+    'Elemental Convergence': 'Convergencia elemental',
+    "Winter's Recall": 'Llamada del invierno',
+    'Mass Barrier': 'Barrera en masa',
+    'Rune of Power': 'Runa de poder',
+    'Overflowing Power': 'Poder desbordado',
     'Rapid Blows': 'Frenesí',
     'Reaching Boughs': 'Alcance de la naturaleza',
     'Reaching Word': 'Alcance sagrado',
@@ -1178,7 +1512,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Redhanded: 'Intención asesina',
     Redmaw: 'Ferocidad',
     Refuge: 'Santuario',
-    Requital: 'Reprensión',
+    Requital: 'Retribución',
     'Rolling Flame': 'Onda explosiva',
     Ruination: 'Destrucción',
     'Rushing Waters': 'Celeridad de la naturaleza',
@@ -1192,7 +1526,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Enfoque de marea',
     Shadeslip: 'Paso de las Sombras',
     'Shared Quarry': 'Fuego concentrado',
-    'Sharpened Blades': 'Hojas afiladas',
     'Shattered Earth': 'Devastación elemental',
     Shieldbearer: 'Especialización con escudo',
     Shieldwright: 'Maestría con escudo',
@@ -1270,14 +1603,95 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': 'Furia divina',
   },
   fr_FR: {
+    'Adrenaline Junkie': "Accro à l'adrénaline",
+    'Aspect Mastery': 'Maîtrise des aspects',
+    'Aura Mastery': 'Maîtrise des auras',
+    'Battlemage Armor': 'Armure de mage de bataille',
+    'Blessed Momentum': 'Élan béni',
+    'Blessed Recovery': 'Récupération bénie',
+    'Brutal Bash': 'Heurt brutal',
+    'Cheat Death': 'Trompe-la-mort',
+    'Coldsnap Break': 'Brisure de froid mordant',
+    'Commanding Presence': 'Présence de commandement',
+    'Concussive Clap': 'Claque commotionnante',
+    'Consecrated Ground': 'Sol consacré',
+    'Crippling Blows': 'Coups invalidants',
+    'Crippling Strikes': 'Frappes estropiantes',
+    "Crusader's Zeal": 'Zèle du croisé',
+    'Curse Mastery': 'Maîtrise des malédictions',
+    'Deadly Brew': 'Breuvage mortel',
+    'Demon Armor': 'Armure démoniaque',
+    'Divine Wisdom': 'Sagesse divine',
+    'Elemental Attunement': 'Harmonisation élémentaire',
+    'Elemental Warding': 'Garde élémentaire',
+    'Empowered Touch': 'Toucher renforcé',
+    Endurance: 'Endurance héroïque',
+    Executioner: 'Exécuteur',
+    Firestarter: 'Allume-feu',
+    'Fist of Justice': 'Poing de justice',
+    'Frost Bind': 'Lien de givre',
+    'Furious Bloodrage': 'Rage sanguinaire furieuse',
+    'Greater Blessing': 'Bénédiction supérieure',
+    'Greater Heal': 'Soin supérieur',
+    'Grimoire of Carnage': 'Grimoire du carnage',
+    "Guardian's Favor": 'Faveur du gardien',
+    'Ice Nova': 'Nova de glace',
+    'Imbue Mastery': "Maîtrise de l'imprégnation",
+    'Improved Backstab': 'Attaque sournoise améliorée',
+    'Improved Barkskin': 'Écorce améliorée',
+    'Improved Cinder Jolt': 'Secousse de braise améliorée',
+    'Improved Concussive': 'Commotion améliorée',
+    'Improved Cutthroat Tempo': 'Tempo égorgeur amélioré',
+    'Improved Earthen Jolt': 'Secousse terrestre améliorée',
+    'Improved Evasion': 'Évasion améliorée',
+    'Improved Fear': 'Peur améliorée',
+    'Improved Hurricane': 'Ouragan amélioré',
+    'Improved Immolate': 'Immolation améliorée',
+    'Improved Low Blow': 'Coup bas amélioré',
+    'Improved Mark': 'Marque améliorée',
+    'Improved Roots': 'Racines améliorées',
+    'Improved Shield': 'Bouclier amélioré',
+    'Improved Venom Barb': 'Barbillon venimeux amélioré',
+    'Improved Volley': 'Salve améliorée',
+    Impulse: 'Impulsion',
+    'Inner Fire': 'Feu intérieur',
+    'Iron Hide': 'Peau de fer',
+    Juggernaut: 'Colosse inexorable',
+    'Mana Attunement': 'Harmonisation du mana',
+    'Master Assassin': 'Maître assassin',
+    'Master Tamer': 'Maître dompteur',
+    'Mind Melt': 'Fonte mentale',
+    Moonspite: 'Rancune lunaire',
+    "Nature's Bounty": 'Abondance de la nature',
+    Netherwind: 'Vent du Néant',
+    Opportunist: 'Opportuniste',
+    'Pain and Suffering': 'Douleur et souffrance',
+    'Quick Shots': 'Tirs rapides',
+    'Quick Wits': 'Esprit vif',
+    'Rapid Killing': 'Mise à mort rapide',
+    'Righteous Cause': 'Cause vertueuse',
+    'Sacred Ward': 'Garde sacrée',
+    'Savage Fury': 'Fureur sauvage',
+    'Searing Light': 'Lumière ardente',
+    "Serpent's Venom": 'Venin du serpent',
+    'Shock Efficiency': 'Efficacité des horions',
+    'Slow Burn': 'Combustion lente',
+    'Sniper Training': 'Entraînement de tireur embusqué',
+    'Survival of the Fittest': 'Survie du plus apte',
+    'Swift Verdicts': 'Verdicts rapides',
+    'Tidal Waves': 'Vagues de marée',
+    'Twisted Faith': 'Foi distordue',
+    'Vengeful Exorcism': 'Exorcisme vengeur',
+    Warbringer: 'Porte-guerre',
+    'Weapon Fury': 'Fureur des armes',
     'Aether Surge': 'Puissance des arcanes',
     'Aetheric Aim': 'Focalisation des arcanes',
-    'Aetheric Flux': 'Instabilité des arcanes',
+    Chronoweave: 'Chronotissage',
     'Aetheric Mind': 'Esprit des arcanes',
     'Aetheric Poise': 'Concentration des arcanes',
     'Aetheric Shell': 'Résilience des arcanes',
     'Aetheric Thesis': 'Thèse des arcanes',
-    Aethermancy: 'Arcanes',
+    Chronomancy: 'Chronomancie',
     Afterflame: 'Embrasement',
     "Ancestor's Mercy": 'Soins ancestraux',
     'Ancient Lore': 'Savoir ancestral',
@@ -1509,6 +1923,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Concentration spirituelle',
     Quietude: 'Réflexion',
     'Racing Mind': "Présence d'esprit",
+    Ignition: 'Embrasement',
+    'Phoenix Trance': 'Transe du phénix',
+    'Ice Floes': 'Blocs de glace',
+    'Double Blink': 'Double transfert',
+    'Blink While Casting': 'Transfert en incantation',
+    Warded: 'Prémunition',
+    'Temporal Rift': 'Faille temporelle',
+    'Greater Invisibility': 'Invisibilité supérieure',
+    'Ring of Frost': 'Anneau de givre',
+    'Snap Bewitch': 'Ensorcellement éclair',
+    'Twin Icebind': 'Double Icebind',
+    'Power Echo': 'Écho de puissance',
+    Overload: 'Surcharge',
+    'Elemental Convergence': 'Convergence élémentaire',
+    "Winter's Recall": "Rappel de l'hiver",
+    'Mass Barrier': 'Barrière de masse',
+    'Rune of Power': 'Rune de puissance',
+    'Overflowing Power': 'Puissance débordante',
     'Rapid Blows': 'Déchaînement',
     'Reaching Boughs': 'Allonge de la nature',
     'Reaching Word': 'Allonge sacrée',
@@ -1535,7 +1967,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Concentration des marées',
     Shadeslip: "Pas de l'ombre",
     'Shared Quarry': 'Tir concentré',
-    'Sharpened Blades': 'Lames affûtées',
     'Shattered Earth': 'Dévastation élémentaire',
     Shieldbearer: 'Spécialisation bouclier',
     Shieldwright: 'Maîtrise du bouclier',
@@ -1613,14 +2044,95 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': 'Fureur divine',
   },
   fr_CA: {
+    'Adrenaline Junkie': "Accro à l'adrénaline",
+    'Aspect Mastery': 'Maîtrise des aspects',
+    'Aura Mastery': 'Maîtrise des auras',
+    'Battlemage Armor': 'Armure de mage de bataille',
+    'Blessed Momentum': 'Élan béni',
+    'Blessed Recovery': 'Récupération bénie',
+    'Brutal Bash': 'Heurt brutal',
+    'Cheat Death': 'Trompe-la-mort',
+    'Coldsnap Break': 'Brisure de froid mordant',
+    'Commanding Presence': 'Présence de commandement',
+    'Concussive Clap': 'Claque commotionnante',
+    'Consecrated Ground': 'Sol consacré',
+    'Crippling Blows': 'Coups invalidants',
+    'Crippling Strikes': 'Frappes estropiantes',
+    "Crusader's Zeal": 'Zèle du croisé',
+    'Curse Mastery': 'Maîtrise des malédictions',
+    'Deadly Brew': 'Breuvage mortel',
+    'Demon Armor': 'Armure démoniaque',
+    'Divine Wisdom': 'Sagesse divine',
+    'Elemental Attunement': 'Harmonisation élémentaire',
+    'Elemental Warding': 'Garde élémentaire',
+    'Empowered Touch': 'Toucher renforcé',
+    Endurance: 'Endurance héroïque',
+    Executioner: 'Exécuteur',
+    Firestarter: 'Allume-feu',
+    'Fist of Justice': 'Poing de justice',
+    'Frost Bind': 'Lien de givre',
+    'Furious Bloodrage': 'Rage sanguinaire furieuse',
+    'Greater Blessing': 'Bénédiction supérieure',
+    'Greater Heal': 'Soin supérieur',
+    'Grimoire of Carnage': 'Grimoire du carnage',
+    "Guardian's Favor": 'Faveur du gardien',
+    'Ice Nova': 'Nova de glace',
+    'Imbue Mastery': "Maîtrise de l'imprégnation",
+    'Improved Backstab': 'Attaque sournoise améliorée',
+    'Improved Barkskin': 'Écorce améliorée',
+    'Improved Cinder Jolt': 'Secousse de braise améliorée',
+    'Improved Concussive': 'Commotion améliorée',
+    'Improved Cutthroat Tempo': 'Tempo égorgeur amélioré',
+    'Improved Earthen Jolt': 'Secousse terrestre améliorée',
+    'Improved Evasion': 'Évasion améliorée',
+    'Improved Fear': 'Peur améliorée',
+    'Improved Hurricane': 'Ouragan amélioré',
+    'Improved Immolate': 'Immolation améliorée',
+    'Improved Low Blow': 'Coup bas amélioré',
+    'Improved Mark': 'Marque améliorée',
+    'Improved Roots': 'Racines améliorées',
+    'Improved Shield': 'Bouclier amélioré',
+    'Improved Venom Barb': 'Barbillon venimeux amélioré',
+    'Improved Volley': 'Salve améliorée',
+    Impulse: 'Impulsion',
+    'Inner Fire': 'Feu intérieur',
+    'Iron Hide': 'Peau de fer',
+    Juggernaut: 'Colosse inexorable',
+    'Mana Attunement': 'Harmonisation du mana',
+    'Master Assassin': 'Maître assassin',
+    'Master Tamer': 'Maître dompteur',
+    'Mind Melt': 'Fonte mentale',
+    Moonspite: 'Rancune lunaire',
+    "Nature's Bounty": 'Abondance de la nature',
+    Netherwind: 'Vent du Néant',
+    Opportunist: 'Opportuniste',
+    'Pain and Suffering': 'Douleur et souffrance',
+    'Quick Shots': 'Tirs rapides',
+    'Quick Wits': 'Esprit vif',
+    'Rapid Killing': 'Mise à mort rapide',
+    'Righteous Cause': 'Cause vertueuse',
+    'Sacred Ward': 'Garde sacrée',
+    'Savage Fury': 'Fureur sauvage',
+    'Searing Light': 'Lumière ardente',
+    "Serpent's Venom": 'Venin du serpent',
+    'Shock Efficiency': 'Efficacité des horions',
+    'Slow Burn': 'Combustion lente',
+    'Sniper Training': 'Entraînement de tireur embusqué',
+    'Survival of the Fittest': 'Survie du plus apte',
+    'Swift Verdicts': 'Verdicts rapides',
+    'Tidal Waves': 'Vagues de marée',
+    'Twisted Faith': 'Foi distordue',
+    'Vengeful Exorcism': 'Exorcisme vengeur',
+    Warbringer: 'Porte-guerre',
+    'Weapon Fury': 'Fureur des armes',
     'Aether Surge': 'Puissance des arcanes',
     'Aetheric Aim': 'Focalisation des arcanes',
-    'Aetheric Flux': 'Instabilité des arcanes',
+    Chronoweave: 'Chronotissage',
     'Aetheric Mind': 'Esprit des arcanes',
     'Aetheric Poise': 'Concentration des arcanes',
     'Aetheric Shell': 'Résilience des arcanes',
     'Aetheric Thesis': 'Thèse des arcanes',
-    Aethermancy: 'Arcanes',
+    Chronomancy: 'Chronomancie',
     Afterflame: 'Embrasement',
     "Ancestor's Mercy": 'Soins ancestraux',
     'Ancient Lore': 'Savoir ancestral',
@@ -1852,6 +2364,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Focalisation spirituelle',
     Quietude: 'Réflexion',
     'Racing Mind': "Présence d'esprit",
+    Ignition: 'Embrasement',
+    'Phoenix Trance': 'Transe du phénix',
+    'Ice Floes': 'Blocs de glace',
+    'Double Blink': 'Double transfert',
+    'Blink While Casting': 'Transfert en incantation',
+    Warded: 'Prémunition',
+    'Temporal Rift': 'Faille temporelle',
+    'Greater Invisibility': 'Invisibilité supérieure',
+    'Ring of Frost': 'Anneau de givre',
+    'Snap Bewitch': 'Ensorcellement éclair',
+    'Twin Icebind': 'Double Icebind',
+    'Power Echo': 'Écho de puissance',
+    Overload: 'Surcharge',
+    'Elemental Convergence': 'Convergence élémentaire',
+    "Winter's Recall": "Rappel de l'hiver",
+    'Mass Barrier': 'Barrière de masse',
+    'Rune of Power': 'Rune de puissance',
+    'Overflowing Power': 'Puissance débordante',
     'Rapid Blows': 'Rafale',
     'Reaching Boughs': 'Allonge de la nature',
     'Reaching Word': 'Allonge sacrée',
@@ -1878,7 +2408,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Focalisation des marées',
     Shadeslip: "Pas de l'ombre",
     'Shared Quarry': 'Tir concentré',
-    'Sharpened Blades': 'Lames aiguisées',
     'Shattered Earth': 'Dévastation élémentaire',
     Shieldbearer: 'Spécialisation du bouclier',
     Shieldwright: 'Maîtrise du bouclier',
@@ -1956,14 +2485,95 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': 'Fureur divine',
   },
   it_IT: {
+    'Adrenaline Junkie': "Dipendente dall'adrenalina",
+    'Aspect Mastery': 'Maestria degli aspetti',
+    'Aura Mastery': 'Maestria delle aure',
+    'Battlemage Armor': 'Armatura da mago guerriero',
+    'Blessed Momentum': 'Impeto benedetto',
+    'Blessed Recovery': 'Recupero benedetto',
+    'Brutal Bash': 'Colpo brutale',
+    'Cheat Death': 'Ingannare la morte',
+    'Coldsnap Break': 'Spezzagelo improvviso',
+    'Commanding Presence': 'Presenza autoritaria',
+    'Concussive Clap': 'Battito concussivo',
+    'Consecrated Ground': 'Terreno consacrato',
+    'Crippling Blows': 'Colpi invalidanti',
+    'Crippling Strikes': 'Assalti menomanti',
+    "Crusader's Zeal": 'Zelo del crociato',
+    'Curse Mastery': 'Maestria delle maledizioni',
+    'Deadly Brew': 'Intruglio letale',
+    'Demon Armor': 'Armatura demoniaca',
+    'Divine Wisdom': 'Saggezza divina',
+    'Elemental Attunement': 'Sintonia elementale',
+    'Elemental Warding': 'Protezione elementale',
+    'Empowered Touch': 'Tocco potenziato',
+    Endurance: 'Resistenza salda',
+    Executioner: 'Carnefice',
+    Firestarter: 'Innesco di fiamme',
+    'Fist of Justice': 'Pugno della giustizia',
+    'Frost Bind': 'Vincolo del gelo',
+    'Furious Bloodrage': 'Furia sanguigna furiosa',
+    'Greater Blessing': 'Benedizione superiore',
+    'Greater Heal': 'Guarigione superiore',
+    'Grimoire of Carnage': 'Grimorio della carneficina',
+    "Guardian's Favor": 'Favore del guardiano',
+    'Ice Nova': 'Nova di ghiaccio',
+    'Imbue Mastery': "Maestria dell'infusione",
+    'Improved Backstab': 'Pugnalata alle spalle migliorata',
+    'Improved Barkskin': 'Pelle di corteccia migliorata',
+    'Improved Cinder Jolt': 'Scossa di cenere migliorata',
+    'Improved Concussive': 'Concussione migliorata',
+    'Improved Cutthroat Tempo': 'Ritmo tagliagole migliorato',
+    'Improved Earthen Jolt': 'Scossa terrena migliorata',
+    'Improved Evasion': 'Evasione migliorata',
+    'Improved Fear': 'Paura migliorata',
+    'Improved Hurricane': 'Uragano migliorato',
+    'Improved Immolate': 'Immolazione migliorata',
+    'Improved Low Blow': 'Colpo basso migliorato',
+    'Improved Mark': 'Marchio migliorato',
+    'Improved Roots': 'Radici migliorate',
+    'Improved Shield': 'Scudo migliorato',
+    'Improved Venom Barb': 'Aculeo velenoso migliorato',
+    'Improved Volley': 'Raffica migliorata',
+    Impulse: 'Impulso',
+    'Inner Fire': 'Fuoco interiore',
+    'Iron Hide': 'Pelle di ferro',
+    Juggernaut: 'Colosso inarrestabile',
+    'Mana Attunement': 'Sintonia del mana',
+    'Master Assassin': 'Maestro assassino',
+    'Master Tamer': 'Maestro domatore',
+    'Mind Melt': 'Fusione mentale',
+    Moonspite: 'Rancore lunare',
+    "Nature's Bounty": 'Dono abbondante della natura',
+    Netherwind: 'Vento del vuoto',
+    Opportunist: 'Opportunista',
+    'Pain and Suffering': 'Dolore e sofferenza',
+    'Quick Shots': 'Tiri rapidi',
+    'Quick Wits': 'Prontezza mentale',
+    'Rapid Killing': 'Uccisione rapida',
+    'Righteous Cause': 'Causa retta',
+    'Sacred Ward': 'Sigillo sacro',
+    'Savage Fury': 'Furia selvaggia',
+    'Searing Light': 'Luce bruciante',
+    "Serpent's Venom": 'Veleno del serpente',
+    'Shock Efficiency': 'Efficienza degli shock',
+    'Slow Burn': 'Lenta combustione',
+    'Sniper Training': 'Addestramento da cecchino',
+    'Survival of the Fittest': 'Sopravvivenza del più adatto',
+    'Swift Verdicts': 'Verdetti rapidi',
+    'Tidal Waves': 'Onde di marea',
+    'Twisted Faith': 'Fede contorta',
+    'Vengeful Exorcism': 'Esorcismo vendicativo',
+    Warbringer: 'Araldo di guerra',
+    'Weapon Fury': 'Furia delle armi',
     'Aether Surge': 'Potere arcano',
     'Aetheric Aim': 'Focalizzazione arcana',
-    'Aetheric Flux': 'Instabilità arcana',
+    Chronoweave: 'Cronotessitura',
     'Aetheric Mind': 'Mente arcana',
     'Aetheric Poise': 'Concentrazione arcana',
     'Aetheric Shell': 'Resilienza arcana',
     'Aetheric Thesis': 'Tesi arcana',
-    Aethermancy: 'Arcano',
+    Chronomancy: 'Cronomanzia',
     Afterflame: 'Incenerimento',
     "Ancestor's Mercy": 'Guarigione ancestrale',
     'Ancient Lore': 'Conoscenza ancestrale',
@@ -2195,6 +2805,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Concentrazione spirituale',
     Quietude: 'Riflessione',
     'Racing Mind': 'Presenza di spirito',
+    Ignition: 'Ignizione',
+    'Phoenix Trance': 'Trance della fenice',
+    'Ice Floes': 'Lastre di ghiaccio',
+    'Double Blink': 'Doppio lampo',
+    'Blink While Casting': 'Lampo in lancio',
+    Warded: 'Salvaguardia',
+    'Temporal Rift': 'Squarcio temporale',
+    'Greater Invisibility': 'Invisibilità superiore',
+    'Ring of Frost': 'Anello di gelo',
+    'Snap Bewitch': 'Ammaliamento fulmineo',
+    'Twin Icebind': 'Doppio Vincolo di Ghiaccio',
+    'Power Echo': 'Eco di potere',
+    Overload: 'Sovraccarico',
+    'Elemental Convergence': 'Convergenza elementale',
+    "Winter's Recall": "Richiamo dell'inverno",
+    'Mass Barrier': 'Barriera di massa',
+    'Rune of Power': 'Runa del potere',
+    'Overflowing Power': 'Potere traboccante',
     'Rapid Blows': 'Raffica',
     'Reaching Boughs': 'Portata della natura',
     'Reaching Word': 'Portata sacra',
@@ -2221,7 +2849,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Concentrazione delle maree',
     Shadeslip: "Passo d'ombra",
     'Shared Quarry': 'Fuoco focalizzato',
-    'Sharpened Blades': 'Lame affilate',
     'Shattered Earth': 'Devastazione elementale',
     Shieldbearer: 'Specializzazione con scudo',
     Shieldwright: 'Maestria dello scudo',
@@ -2299,14 +2926,95 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': 'Furia divina',
   },
   de_DE: {
+    'Adrenaline Junkie': 'Adrenalinrausch',
+    'Aspect Mastery': 'Aspektmeisterschaft',
+    'Aura Mastery': 'Aurameisterschaft',
+    'Battlemage Armor': 'Kampfmagierpanzer',
+    'Blessed Momentum': 'Gesegneter Schwung',
+    'Blessed Recovery': 'Gesegnete Erholung',
+    'Brutal Bash': 'Brutaler Hieb',
+    'Cheat Death': 'Tod überlisten',
+    'Coldsnap Break': 'Kälteschnappbruch',
+    'Commanding Presence': 'Befehlende Präsenz',
+    'Concussive Clap': 'Erschütternder Klaps',
+    'Consecrated Ground': 'Geweihter Boden',
+    'Crippling Blows': 'Verkrüppelnde Hiebe',
+    'Crippling Strikes': 'Lähmende Schläge',
+    "Crusader's Zeal": 'Kreuzfahrereifer',
+    'Curse Mastery': 'Fluchmeisterschaft',
+    'Deadly Brew': 'Tödliches Gebräu',
+    'Demon Armor': 'Dämonenrüstung',
+    'Divine Wisdom': 'Göttliche Weisheit',
+    'Elemental Attunement': 'Elementare Einstimmung',
+    'Elemental Warding': 'Elementarer Schutz',
+    'Empowered Touch': 'Verstärkte Berührung',
+    Endurance: 'Standhafte Ausdauer',
+    Executioner: 'Scharfrichter',
+    Firestarter: 'Feuerzünder',
+    'Fist of Justice': 'Faust der Gerechtigkeit',
+    'Frost Bind': 'Frostfessel',
+    'Furious Bloodrage': 'Rasende Blutwut',
+    'Greater Blessing': 'Großer Segen',
+    'Greater Heal': 'Große Heilung',
+    'Grimoire of Carnage': 'Grimoire des Gemetzels',
+    "Guardian's Favor": 'Gunst des Wächters',
+    'Ice Nova': 'Eisnova',
+    'Imbue Mastery': 'Meisterschaft der Erfüllung',
+    'Improved Backstab': 'Verbesserter Meucheln',
+    'Improved Barkskin': 'Verbesserte Baumrinde',
+    'Improved Cinder Jolt': 'Verbesserter Aschenstoß',
+    'Improved Concussive': 'Verbesserte Erschütterung',
+    'Improved Cutthroat Tempo': 'Verbessertes Halsabschneidertempo',
+    'Improved Earthen Jolt': 'Verbesserter Erdstoß',
+    'Improved Evasion': 'Verbessertes Entrinnen',
+    'Improved Fear': 'Verbesserte Furcht',
+    'Improved Hurricane': 'Verbesserter Hurrikan',
+    'Improved Immolate': 'Verbessertes Feuerbrand',
+    'Improved Low Blow': 'Verbesserter Tiefschlag',
+    'Improved Mark': 'Verbessertes Mal',
+    'Improved Roots': 'Verbesserte Wurzeln',
+    'Improved Shield': 'Verbesserter Schild',
+    'Improved Venom Barb': 'Verbesserter Giftstachel',
+    'Improved Volley': 'Verbesserte Salve',
+    Impulse: 'Impuls',
+    'Inner Fire': 'Inneres Feuer',
+    'Iron Hide': 'Eiserne Haut',
+    Juggernaut: 'Unaufhaltsamer Koloss',
+    'Mana Attunement': 'Manaeinstimmung',
+    'Master Assassin': 'Meisterassassine',
+    'Master Tamer': 'Meisterbändiger',
+    'Mind Melt': 'Gedankenschmelze',
+    Moonspite: 'Mondgroll',
+    "Nature's Bounty": 'Fülle der Natur',
+    Netherwind: 'Jenseitswind',
+    Opportunist: 'Gelegenheitsjäger',
+    'Pain and Suffering': 'Schmerz und Leid',
+    'Quick Shots': 'Schnelle Schüsse',
+    'Quick Wits': 'Schneller Verstand',
+    'Rapid Killing': 'Rasche Tötung',
+    'Righteous Cause': 'Rechte Sache',
+    'Sacred Ward': 'Heilige Wacht',
+    'Savage Fury': 'Wilde Wut',
+    'Searing Light': 'Sengendes Licht',
+    "Serpent's Venom": 'Schlangengift',
+    'Shock Efficiency': 'Schockeffizienz',
+    'Slow Burn': 'Langsamer Brand',
+    'Sniper Training': 'Scharfschützenausbildung',
+    'Survival of the Fittest': 'Überleben des Stärkeren',
+    'Swift Verdicts': 'Schnelle Urteile',
+    'Tidal Waves': 'Gezeitenwellen',
+    'Twisted Faith': 'Verdrehter Glaube',
+    'Vengeful Exorcism': 'Rachsüchtiger Exorzismus',
+    Warbringer: 'Kriegsbringer',
+    'Weapon Fury': 'Waffenfuror',
     'Aether Surge': 'Arkane Macht',
     'Aetheric Aim': 'Arkaner Fokus',
-    'Aetheric Flux': 'Arkane Instabilität',
+    Chronoweave: 'Chronogewebe',
     'Aetheric Mind': 'Arkaner Geist',
     'Aetheric Poise': 'Arkane Konzentration',
     'Aetheric Shell': 'Arkane Widerstandskraft',
     'Aetheric Thesis': 'Arkane These',
-    Aethermancy: 'Arkan',
+    Chronomancy: 'Chronomantie',
     Afterflame: 'Entzünden',
     "Ancestor's Mercy": 'Heilung der Ahnen',
     'Ancient Lore': 'Wissen der Ahnen',
@@ -2538,6 +3246,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Spiritueller Fokus',
     Quietude: 'Reflexion',
     'Racing Mind': 'Geistesgegenwart',
+    Ignition: 'Entzündung',
+    'Phoenix Trance': 'Phönix-Trance',
+    'Ice Floes': 'Eisschollen',
+    'Double Blink': 'Doppelblinzeln',
+    'Blink While Casting': 'Blinzeln beim Zaubern',
+    Warded: 'Gewappnet',
+    'Temporal Rift': 'Zeitriss',
+    'Greater Invisibility': 'Verbesserte Unsichtbarkeit',
+    'Ring of Frost': 'Frostring',
+    'Snap Bewitch': 'Blitzbehexung',
+    'Twin Icebind': 'Doppeltes Icebind',
+    'Power Echo': 'Machtecho',
+    Overload: 'Überladung',
+    'Elemental Convergence': 'Elementare Konvergenz',
+    "Winter's Recall": 'Ruf des Winters',
+    'Mass Barrier': 'Massenbarriere',
+    'Rune of Power': 'Machtrune',
+    'Overflowing Power': 'Überschäumende Macht',
     'Rapid Blows': 'Schlaghagel',
     'Reaching Boughs': 'Reichweite der Natur',
     'Reaching Word': 'Heilige Reichweite',
@@ -2564,7 +3290,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Gezeitenfokus',
     Shadeslip: 'Schattenschritt',
     'Shared Quarry': 'Gebündeltes Feuer',
-    'Sharpened Blades': 'Geschärfte Klingen',
     'Shattered Earth': 'Elementare Verwüstung',
     Shieldbearer: 'Schildspezialisierung',
     Shieldwright: 'Schildbeherrschung',
@@ -2642,14 +3367,95 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': 'Göttlicher Furor',
   },
   zh_CN: {
+    'Adrenaline Junkie': '肾上腺狂徒',
+    'Aspect Mastery': '守护精通',
+    'Aura Mastery': '光环精通',
+    'Battlemage Armor': '战法护甲',
+    'Blessed Momentum': '圣佑疾势',
+    'Blessed Recovery': '圣佑复苏',
+    'Brutal Bash': '残暴猛击',
+    'Cheat Death': '死里逃生',
+    'Coldsnap Break': '急寒破',
+    'Commanding Presence': '统御威仪',
+    'Concussive Clap': '震荡拍击',
+    'Consecrated Ground': '奉圣之地',
+    'Crippling Blows': '致残重击',
+    'Crippling Strikes': '致残打击',
+    "Crusader's Zeal": '十字军热忱',
+    'Curse Mastery': '诅咒精通',
+    'Deadly Brew': '致命药酿',
+    'Demon Armor': '恶魔护甲',
+    'Divine Wisdom': '神圣智慧',
+    'Elemental Attunement': '元素调谐',
+    'Elemental Warding': '元素守护',
+    'Empowered Touch': '强能之触',
+    Endurance: '坚忍',
+    Executioner: '行刑者',
+    Firestarter: '引火者',
+    'Fist of Justice': '正义之拳',
+    'Frost Bind': '霜寒束缚',
+    'Furious Bloodrage': '狂怒血怒',
+    'Greater Blessing': '强效祝福',
+    'Greater Heal': '强效治疗',
+    'Grimoire of Carnage': '屠戮魔典',
+    "Guardian's Favor": '守护者恩惠',
+    'Ice Nova': '寒冰新星',
+    'Imbue Mastery': '灌注精通',
+    'Improved Backstab': '强化背刺',
+    'Improved Barkskin': '强化树皮术',
+    'Improved Cinder Jolt': '强化烬火震击',
+    'Improved Concussive': '强化震荡',
+    'Improved Cutthroat Tempo': '强化割喉节奏',
+    'Improved Earthen Jolt': '强化大地震击',
+    'Improved Evasion': '强化闪避',
+    'Improved Fear': '强化恐惧',
+    'Improved Hurricane': '强化飓风',
+    'Improved Immolate': '强化献祭',
+    'Improved Low Blow': '强化下段击',
+    'Improved Mark': '强化印记',
+    'Improved Roots': '强化缠根',
+    'Improved Shield': '强化护盾',
+    'Improved Venom Barb': '强化毒刺',
+    'Improved Volley': '强化乱射',
+    Impulse: '脉冲',
+    'Inner Fire': '心灵之火',
+    'Iron Hide': '铁皮',
+    Juggernaut: '无阻巨像',
+    'Mana Attunement': '法力调谐',
+    'Master Assassin': '刺杀大师',
+    'Master Tamer': '驯兽大师',
+    'Mind Melt': '心智熔蚀',
+    Moonspite: '月怨',
+    "Nature's Bounty": '自然馈赠',
+    Netherwind: '虚空之风',
+    Opportunist: '机会主义者',
+    'Pain and Suffering': '痛苦折磨',
+    'Quick Shots': '疾速射击',
+    'Quick Wits': '机敏才智',
+    'Rapid Killing': '迅捷杀戮',
+    'Righteous Cause': '正义使命',
+    'Sacred Ward': '神圣结界',
+    'Savage Fury': '野蛮狂怒',
+    'Searing Light': '灼热圣光',
+    "Serpent's Venom": '毒蛇之毒',
+    'Shock Efficiency': '震击效率',
+    'Slow Burn': '缓燃',
+    'Sniper Training': '狙击训练',
+    'Survival of the Fittest': '适者生存',
+    'Swift Verdicts': '迅捷裁决',
+    'Tidal Waves': '潮汐浪涌',
+    'Twisted Faith': '扭曲信仰',
+    'Vengeful Exorcism': '复仇驱邪',
+    Warbringer: '战争使者',
+    'Weapon Fury': '武器狂怒',
     'Aether Surge': '奥术强化',
     'Aetheric Aim': '奥术专注',
-    'Aetheric Flux': '奥术不稳定性',
+    Chronoweave: '时光织造',
     'Aetheric Mind': '奥术心智',
     'Aetheric Poise': '奥术集中',
     'Aetheric Shell': '奥术坚韧',
     'Aetheric Thesis': '奥术论述',
-    Aethermancy: '奥术',
+    Chronomancy: '时光术',
     Afterflame: '点燃',
     "Ancestor's Mercy": '先祖治疗',
     'Ancient Lore': '先祖知识',
@@ -2881,6 +3687,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': '精神专注',
     Quietude: '反射',
     'Racing Mind': '气定神闲',
+    Ignition: '点燃',
+    'Phoenix Trance': '凤凰出神',
+    'Ice Floes': '浮冰',
+    'Double Blink': '双重闪现',
+    'Blink While Casting': '施法闪现',
+    Warded: '屏障庇护',
+    'Temporal Rift': '时光裂隙',
+    'Greater Invisibility': '高等隐形术',
+    'Ring of Frost': '寒冰之环',
+    'Snap Bewitch': '瞬发蛊惑',
+    'Twin Icebind': '双重冰缚',
+    'Power Echo': '力量回响',
+    Overload: '过载',
+    'Elemental Convergence': '元素汇聚',
+    "Winter's Recall": '冬之召还',
+    'Mass Barrier': '群体屏障',
+    'Rune of Power': '能量符文',
+    'Overflowing Power': '力量涌流',
     'Rapid Blows': '乱舞',
     'Reaching Boughs': '自然延伸',
     'Reaching Word': '神圣延伸',
@@ -2907,7 +3731,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': '潮汐专注',
     Shadeslip: '暗影步',
     'Shared Quarry': '集中火力',
-    'Sharpened Blades': '利刃',
     'Shattered Earth': '元素毁灭',
     Shieldbearer: '盾牌专精',
     Shieldwright: '盾牌掌握',
@@ -2985,14 +3808,95 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': '神圣狂怒',
   },
   zh_TW: {
+    'Adrenaline Junkie': '腎上腺狂徒',
+    'Aspect Mastery': '守護精通',
+    'Aura Mastery': '光環精通',
+    'Battlemage Armor': '戰法護甲',
+    'Blessed Momentum': '聖佑疾勢',
+    'Blessed Recovery': '聖佑復甦',
+    'Brutal Bash': '殘暴猛擊',
+    'Cheat Death': '死裡逃生',
+    'Coldsnap Break': '急寒破',
+    'Commanding Presence': '統御威儀',
+    'Concussive Clap': '震盪拍擊',
+    'Consecrated Ground': '奉聖之地',
+    'Crippling Blows': '致殘重擊',
+    'Crippling Strikes': '致殘打擊',
+    "Crusader's Zeal": '十字軍熱忱',
+    'Curse Mastery': '詛咒精通',
+    'Deadly Brew': '致命藥釀',
+    'Demon Armor': '惡魔護甲',
+    'Divine Wisdom': '神聖智慧',
+    'Elemental Attunement': '元素調諧',
+    'Elemental Warding': '元素守護',
+    'Empowered Touch': '強能之觸',
+    Endurance: '堅忍',
+    Executioner: '行刑者',
+    Firestarter: '引火者',
+    'Fist of Justice': '正義之拳',
+    'Frost Bind': '霜寒束縛',
+    'Furious Bloodrage': '狂怒血怒',
+    'Greater Blessing': '強效祝福',
+    'Greater Heal': '強效治療',
+    'Grimoire of Carnage': '屠戮魔典',
+    "Guardian's Favor": '守護者恩惠',
+    'Ice Nova': '寒冰新星',
+    'Imbue Mastery': '灌注精通',
+    'Improved Backstab': '強化背刺',
+    'Improved Barkskin': '強化樹皮術',
+    'Improved Cinder Jolt': '強化燼火震擊',
+    'Improved Concussive': '強化震盪',
+    'Improved Cutthroat Tempo': '強化割喉節奏',
+    'Improved Earthen Jolt': '強化大地震擊',
+    'Improved Evasion': '強化閃避',
+    'Improved Fear': '強化恐懼',
+    'Improved Hurricane': '強化颶風',
+    'Improved Immolate': '強化獻祭',
+    'Improved Low Blow': '強化下段擊',
+    'Improved Mark': '強化印記',
+    'Improved Roots': '強化纏根',
+    'Improved Shield': '強化護盾',
+    'Improved Venom Barb': '強化毒刺',
+    'Improved Volley': '強化亂射',
+    Impulse: '脈衝',
+    'Inner Fire': '心靈之火',
+    'Iron Hide': '鐵皮',
+    Juggernaut: '無阻巨像',
+    'Mana Attunement': '法力調諧',
+    'Master Assassin': '刺殺大師',
+    'Master Tamer': '馴獸大師',
+    'Mind Melt': '心智熔蝕',
+    Moonspite: '月怨',
+    "Nature's Bounty": '自然饋贈',
+    Netherwind: '虛空之風',
+    Opportunist: '機會主義者',
+    'Pain and Suffering': '痛苦折磨',
+    'Quick Shots': '疾速射擊',
+    'Quick Wits': '機敏才智',
+    'Rapid Killing': '迅捷殺戮',
+    'Righteous Cause': '正義使命',
+    'Sacred Ward': '神聖結界',
+    'Savage Fury': '野蠻狂怒',
+    'Searing Light': '灼熱聖光',
+    "Serpent's Venom": '毒蛇之毒',
+    'Shock Efficiency': '震擊效率',
+    'Slow Burn': '緩燃',
+    'Sniper Training': '狙擊訓練',
+    'Survival of the Fittest': '適者生存',
+    'Swift Verdicts': '迅捷裁決',
+    'Tidal Waves': '潮汐浪湧',
+    'Twisted Faith': '扭曲信仰',
+    'Vengeful Exorcism': '復仇驅邪',
+    Warbringer: '戰爭使者',
+    'Weapon Fury': '武器狂怒',
     'Aether Surge': '秘法能量',
     'Aetheric Aim': '秘法專注',
-    'Aetheric Flux': '秘法失序',
+    Chronoweave: '時光織造',
     'Aetheric Mind': '秘法心智',
     'Aetheric Poise': '秘法集中',
     'Aetheric Shell': '秘法韌性',
     'Aetheric Thesis': '秘法論述',
-    Aethermancy: '秘法',
+    Chronomancy: '時光術',
     Afterflame: '點燃',
     "Ancestor's Mercy": '先祖治療',
     'Ancient Lore': '先祖知識',
@@ -3224,6 +4128,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': '精神專注',
     Quietude: '反射',
     'Racing Mind': '心靈專注',
+    Ignition: '點燃',
+    'Phoenix Trance': '鳳凰出神',
+    'Ice Floes': '浮冰',
+    'Double Blink': '雙重閃現',
+    'Blink While Casting': '施法閃現',
+    Warded: '屏障庇護',
+    'Temporal Rift': '時光裂隙',
+    'Greater Invisibility': '高等隱形術',
+    'Ring of Frost': '寒冰之環',
+    'Snap Bewitch': '瞬發蠱惑術',
+    'Twin Icebind': '雙重縛冰術',
+    'Power Echo': '力量迴響',
+    Overload: '超載',
+    'Elemental Convergence': '元素匯聚',
+    "Winter's Recall": '冬之召還',
+    'Mass Barrier': '群體屏障',
+    'Rune of Power': '能量符文',
+    'Overflowing Power': '力量湧流',
     'Rapid Blows': '亂舞',
     'Reaching Boughs': '自然延伸',
     'Reaching Word': '聖光延伸',
@@ -3250,7 +4172,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': '潮汐專注',
     Shadeslip: '暗影步',
     'Shared Quarry': '集中火力',
-    'Sharpened Blades': '利刃',
     'Shattered Earth': '元素摧殘',
     Shieldbearer: '盾牌專精',
     Shieldwright: '盾牌掌握',
@@ -3328,14 +4249,95 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': '神聖狂怒',
   },
   ko_KR: {
+    'Adrenaline Junkie': '아드레날린 광신자',
+    'Aspect Mastery': '상 숙련',
+    'Aura Mastery': '오라 숙련',
+    'Battlemage Armor': '전투마법사 갑옷',
+    'Blessed Momentum': '축복받은 기세',
+    'Blessed Recovery': '축복받은 회복',
+    'Brutal Bash': '잔혹한 강타',
+    'Cheat Death': '죽음 기만',
+    'Coldsnap Break': '한파 분쇄',
+    'Commanding Presence': '지휘의 위엄',
+    'Concussive Clap': '충격 손뼉',
+    'Consecrated Ground': '신성화된 대지',
+    'Crippling Blows': '무력화 일격',
+    'Crippling Strikes': '불구의 공격',
+    "Crusader's Zeal": '성전사의 열의',
+    'Curse Mastery': '저주 숙련',
+    'Deadly Brew': '치명적인 혼합주',
+    'Demon Armor': '악마 갑옷',
+    'Divine Wisdom': '신성한 지혜',
+    'Elemental Attunement': '원소 조율',
+    'Elemental Warding': '원소 수호',
+    'Empowered Touch': '강화된 손길',
+    Endurance: '강인한 인내',
+    Executioner: '처형자',
+    Firestarter: '불씨 점화자',
+    'Fist of Justice': '정의의 주먹',
+    'Frost Bind': '서리 결박',
+    'Furious Bloodrage': '광포한 피의 분노',
+    'Greater Blessing': '상급 축복',
+    'Greater Heal': '상급 치유',
+    'Grimoire of Carnage': '살육의 흑마서',
+    "Guardian's Favor": '수호자의 은총',
+    'Ice Nova': '얼음 회오리',
+    'Imbue Mastery': '주입 숙련',
+    'Improved Backstab': '향상된 기습',
+    'Improved Barkskin': '향상된 나무껍질',
+    'Improved Cinder Jolt': '향상된 잿불 충격',
+    'Improved Concussive': '향상된 충격',
+    'Improved Cutthroat Tempo': '향상된 암살자 박자',
+    'Improved Earthen Jolt': '향상된 대지 충격',
+    'Improved Evasion': '향상된 회피',
+    'Improved Fear': '향상된 공포',
+    'Improved Hurricane': '향상된 허리케인',
+    'Improved Immolate': '향상된 제물',
+    'Improved Low Blow': '향상된 비열한 일격',
+    'Improved Mark': '향상된 징표',
+    'Improved Roots': '향상된 뿌리묶기',
+    'Improved Shield': '향상된 보호막',
+    'Improved Venom Barb': '향상된 독가시',
+    'Improved Volley': '향상된 일제 사격',
+    Impulse: '충동',
+    'Inner Fire': '내면의 불꽃',
+    'Iron Hide': '무쇠 가죽',
+    Juggernaut: '불굴의 거상',
+    'Mana Attunement': '마나 조율',
+    'Master Assassin': '암살의 대가',
+    'Master Tamer': '조련의 대가',
+    'Mind Melt': '정신 융해',
+    Moonspite: '달의 원한',
+    "Nature's Bounty": '자연의 풍요',
+    Netherwind: '황천바람',
+    Opportunist: '기회주의자',
+    'Pain and Suffering': '고통과 괴로움',
+    'Quick Shots': '빠른 사격',
+    'Quick Wits': '빠른 재치',
+    'Rapid Killing': '신속한 처치',
+    'Righteous Cause': '정의로운 대의',
+    'Sacred Ward': '신성한 수호',
+    'Savage Fury': '야만의 격노',
+    'Searing Light': '타오르는 빛',
+    "Serpent's Venom": '뱀의 맹독',
+    'Shock Efficiency': '충격 효율',
+    'Slow Burn': '느린 연소',
+    'Sniper Training': '저격수 훈련',
+    'Survival of the Fittest': '적자생존',
+    'Swift Verdicts': '신속한 심판',
+    'Tidal Waves': '해일 파도',
+    'Twisted Faith': '뒤틀린 신앙',
+    'Vengeful Exorcism': '복수의 퇴마',
+    Warbringer: '전쟁인도자',
+    'Weapon Fury': '무기 격노',
     'Aether Surge': '비전력',
     'Aetheric Aim': '비전 집중',
-    'Aetheric Flux': '비전 불안정',
+    Chronoweave: '시간 직조',
     'Aetheric Mind': '비전 정신',
     'Aetheric Poise': '비전 집중력',
     'Aetheric Shell': '비전 탄력',
     'Aetheric Thesis': '비전 논제',
-    Aethermancy: '비전',
+    Chronomancy: '시간술',
     Afterflame: '점화',
     "Ancestor's Mercy": '선조의 치유',
     'Ancient Lore': '선조의 지식',
@@ -3567,6 +4569,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': '정신 집중',
     Quietude: '반사',
     'Racing Mind': '정신 집중',
+    Ignition: '점화',
+    'Phoenix Trance': '불사조의 무아지경',
+    'Ice Floes': '유빙',
+    'Double Blink': '이중 점멸',
+    'Blink While Casting': '시전 중 점멸',
+    Warded: '보호막 수호',
+    'Temporal Rift': '시간의 균열',
+    'Greater Invisibility': '상급 투명화',
+    'Ring of Frost': '서리 고리',
+    'Snap Bewitch': '즉시 홀리기',
+    'Twin Icebind': '이중 얼음 속박',
+    'Power Echo': '힘의 메아리',
+    Overload: '과부하',
+    'Elemental Convergence': '원소 융합',
+    "Winter's Recall": '겨울의 부름',
+    'Mass Barrier': '집단 보호막',
+    'Rune of Power': '힘의 룬',
+    'Overflowing Power': '넘치는 힘',
     'Rapid Blows': '연속 공격',
     'Reaching Boughs': '자연의 영역',
     'Reaching Word': '신성한 손길',
@@ -3593,7 +4613,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': '파도 집중',
     Shadeslip: '그림자 밟기',
     'Shared Quarry': '집중 사격',
-    'Sharpened Blades': '예리한 칼날',
     'Shattered Earth': '원소 파멸',
     Shieldbearer: '방패 전문화',
     Shieldwright: '방패 숙련',
@@ -3671,14 +4690,95 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': '신성한 분노',
   },
   ja_JP: {
+    'Adrenaline Junkie': '熱血中毒',
+    'Aspect Mastery': '相の極意',
+    'Aura Mastery': 'オーラの極意',
+    'Battlemage Armor': '戦魔の鎧',
+    'Blessed Momentum': '祝福の勢い',
+    'Blessed Recovery': '祝福の回復',
+    'Brutal Bash': '残虐な強打',
+    'Cheat Death': '死の欺き',
+    'Coldsnap Break': '急寒砕き',
+    'Commanding Presence': '統率の威容',
+    'Concussive Clap': '震撃の拍手',
+    'Consecrated Ground': '聖別の地',
+    'Crippling Blows': '壊しの打撃',
+    'Crippling Strikes': '足砕きの一撃',
+    "Crusader's Zeal": '聖戦士の熱意',
+    'Curse Mastery': '呪いの極意',
+    'Deadly Brew': '致死の秘薬',
+    'Demon Armor': '悪魔の鎧',
+    'Divine Wisdom': '神聖なる英知',
+    'Elemental Attunement': '元素同調',
+    'Elemental Warding': '元素守護',
+    'Empowered Touch': '強化の手触れ',
+    Endurance: '不屈の耐久',
+    Executioner: '処刑人',
+    Firestarter: '火付け役',
+    'Fist of Justice': '正義の拳',
+    'Frost Bind': '霜の縛め',
+    'Furious Bloodrage': '荒ぶる血怒',
+    'Greater Blessing': '上位祝福',
+    'Greater Heal': '上位治癒',
+    'Grimoire of Carnage': '殺戮の魔導書',
+    "Guardian's Favor": '守護者の恩寵',
+    'Ice Nova': '氷の新星',
+    'Imbue Mastery': '注入の極意',
+    'Improved Backstab': '背後刺し強化',
+    'Improved Barkskin': '樹皮肌強化',
+    'Improved Cinder Jolt': '燼火衝撃強化',
+    'Improved Concussive': '震撃強化',
+    'Improved Cutthroat Tempo': '喉裂き拍子強化',
+    'Improved Earthen Jolt': '大地衝撃強化',
+    'Improved Evasion': '回避強化',
+    'Improved Fear': '恐怖強化',
+    'Improved Hurricane': '暴風強化',
+    'Improved Immolate': '焼身強化',
+    'Improved Low Blow': '下段打ち強化',
+    'Improved Mark': '標識強化',
+    'Improved Roots': '根絡み強化',
+    'Improved Shield': '盾強化',
+    'Improved Venom Barb': '毒棘強化',
+    'Improved Volley': '斉射強化',
+    Impulse: '衝動',
+    'Inner Fire': '内なる炎',
+    'Iron Hide': '鉄の皮膚',
+    Juggernaut: '不倒の巨像',
+    'Mana Attunement': '魔力同調',
+    'Master Assassin': '暗殺の達人',
+    'Master Tamer': '調教の達人',
+    'Mind Melt': '精神融解',
+    Moonspite: '月の怨嗟',
+    "Nature's Bounty": '自然の恵み',
+    Netherwind: '冥界の風',
+    Opportunist: '好機の狩人',
+    'Pain and Suffering': '痛みと苦悶',
+    'Quick Shots': '速射',
+    'Quick Wits': '機転',
+    'Rapid Killing': '迅速な殺し',
+    'Righteous Cause': '正義の大義',
+    'Sacred Ward': '聖域結界',
+    'Savage Fury': '野性の憤怒',
+    'Searing Light': '灼熱の光',
+    "Serpent's Venom": '蛇の毒',
+    'Shock Efficiency': '衝撃効率',
+    'Slow Burn': '遅燃',
+    'Sniper Training': '狙撃訓練',
+    'Survival of the Fittest': '適者生存',
+    'Swift Verdicts': '迅速な裁き',
+    'Tidal Waves': '潮汐の波',
+    'Twisted Faith': '歪んだ信仰',
+    'Vengeful Exorcism': '復讐の祓魔',
+    Warbringer: '戦運び',
+    'Weapon Fury': '武器の憤怒',
     'Aether Surge': '秘術力',
     'Aetheric Aim': '秘術集中',
-    'Aetheric Flux': '秘術の不安定',
+    Chronoweave: '時の織り',
     'Aetheric Mind': '秘術精神',
     'Aetheric Poise': '秘術の集中',
     'Aetheric Shell': '秘術の弾力性',
     'Aetheric Thesis': '秘術の論文',
-    Aethermancy: '秘術',
+    Chronomancy: '時間術',
     Afterflame: 'イグナイト',
     "Ancestor's Mercy": '祖霊の癒し',
     'Ancient Lore': '祖霊の知識',
@@ -3910,6 +5010,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': '精神集中',
     Quietude: '反射',
     'Racing Mind': '明鏡止水',
+    Ignition: '発火',
+    'Phoenix Trance': '不死鳥のトランス',
+    'Ice Floes': '流氷',
+    'Double Blink': '二重ブリンク',
+    'Blink While Casting': '詠唱中ブリンク',
+    Warded: '障壁の加護',
+    'Temporal Rift': '時の裂け目',
+    'Greater Invisibility': '上位の透明化',
+    'Ring of Frost': '霜の輪',
+    'Snap Bewitch': '瞬速の呪化',
+    'Twin Icebind': '二重氷縛',
+    'Power Echo': '力の残響',
+    Overload: 'オーバーロード',
+    'Elemental Convergence': '元素収束',
+    "Winter's Recall": '冬の呼び戻し',
+    'Mass Barrier': '集団障壁',
+    'Rune of Power': '力のルーン',
+    'Overflowing Power': '溢れる魔力',
     'Rapid Blows': 'フラリー',
     'Reaching Boughs': '自然の到達',
     'Reaching Word': '聖なる射程',
@@ -3936,7 +5054,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': '潮流集中',
     Shadeslip: 'シャドウステップ',
     'Shared Quarry': '集中砲火',
-    'Sharpened Blades': '研ぎ澄まされた刃',
     'Shattered Earth': 'エレメンタル・デバステーション',
     Shieldbearer: '盾専門化',
     Shieldwright: '盾熟達',
@@ -4014,14 +5131,95 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': '神聖憤怒',
   },
   pt_BR: {
+    'Adrenaline Junkie': 'Viciado em adrenalina',
+    'Aspect Mastery': 'Maestria dos aspectos',
+    'Aura Mastery': 'Maestria das auras',
+    'Battlemage Armor': 'Armadura de mago de batalha',
+    'Blessed Momentum': 'Ímpeto abençoado',
+    'Blessed Recovery': 'Recuperação abençoada',
+    'Brutal Bash': 'Pancada brutal',
+    'Cheat Death': 'Enganar a morte',
+    'Coldsnap Break': 'Quebra de frio súbito',
+    'Commanding Presence': 'Presença comandante',
+    'Concussive Clap': 'Palma concussiva',
+    'Consecrated Ground': 'Solo consagrado',
+    'Crippling Blows': 'Golpes incapacitantes',
+    'Crippling Strikes': 'Ataques aleijantes',
+    "Crusader's Zeal": 'Zelo do cruzado',
+    'Curse Mastery': 'Maestria das maldições',
+    'Deadly Brew': 'Bebida mortal',
+    'Demon Armor': 'Armadura demoníaca',
+    'Divine Wisdom': 'Sabedoria divina',
+    'Elemental Attunement': 'Sintonização elemental',
+    'Elemental Warding': 'Proteção elemental',
+    'Empowered Touch': 'Toque fortalecido',
+    Endurance: 'Tenacidade',
+    Executioner: 'Executor',
+    Firestarter: 'Iniciador de chamas',
+    'Fist of Justice': 'Punho da justiça',
+    'Frost Bind': 'Vínculo gélido',
+    'Furious Bloodrage': 'Fúria sanguínea furiosa',
+    'Greater Blessing': 'Bênção maior',
+    'Greater Heal': 'Cura maior',
+    'Grimoire of Carnage': 'Grimório da carnificina',
+    "Guardian's Favor": 'Favor do guardião',
+    'Ice Nova': 'Nova de gelo',
+    'Imbue Mastery': 'Maestria de imbuir',
+    'Improved Backstab': 'Punhalada pelas costas aprimorada',
+    'Improved Barkskin': 'Casca de árvore aprimorada',
+    'Improved Cinder Jolt': 'Abalo de cinzas aprimorado',
+    'Improved Concussive': 'Concussão aprimorada',
+    'Improved Cutthroat Tempo': 'Ritmo degolador aprimorado',
+    'Improved Earthen Jolt': 'Abalo terreno aprimorado',
+    'Improved Evasion': 'Evasão aprimorada',
+    'Improved Fear': 'Medo aprimorado',
+    'Improved Hurricane': 'Furacão aprimorado',
+    'Improved Immolate': 'Imolar aprimorado',
+    'Improved Low Blow': 'Golpe baixo aprimorado',
+    'Improved Mark': 'Marca aprimorada',
+    'Improved Roots': 'Raízes aprimoradas',
+    'Improved Shield': 'Escudo aprimorado',
+    'Improved Venom Barb': 'Farpa venenosa aprimorada',
+    'Improved Volley': 'Saraivada aprimorada',
+    Impulse: 'Impulso',
+    'Inner Fire': 'Fogo interior',
+    'Iron Hide': 'Couro de ferro',
+    Juggernaut: 'Colosso imparável',
+    'Mana Attunement': 'Sintonização de mana',
+    'Master Assassin': 'Mestre assassino',
+    'Master Tamer': 'Mestre domador',
+    'Mind Melt': 'Derretimento mental',
+    Moonspite: 'Rancor lunar',
+    "Nature's Bounty": 'Dádiva da natureza',
+    Netherwind: 'Vento do caos',
+    Opportunist: 'Oportunista',
+    'Pain and Suffering': 'Dor e sofrimento',
+    'Quick Shots': 'Disparos rápidos',
+    'Quick Wits': 'Raciocínio rápido',
+    'Rapid Killing': 'Abate rápido',
+    'Righteous Cause': 'Causa justa',
+    'Sacred Ward': 'Proteção sagrada',
+    'Savage Fury': 'Fúria selvagem',
+    'Searing Light': 'Luz abrasadora',
+    "Serpent's Venom": 'Veneno da serpente',
+    'Shock Efficiency': 'Eficiência de choque',
+    'Slow Burn': 'Queima lenta',
+    'Sniper Training': 'Treinamento de atirador',
+    'Survival of the Fittest': 'Sobrevivência do mais apto',
+    'Swift Verdicts': 'Vereditos velozes',
+    'Tidal Waves': 'Ondas de maré',
+    'Twisted Faith': 'Fé distorcida',
+    'Vengeful Exorcism': 'Exorcismo vingativo',
+    Warbringer: 'Arauto da guerra',
+    'Weapon Fury': 'Fúria das armas',
     'Aether Surge': 'Poder Arcano',
     'Aetheric Aim': 'Foco Arcano',
-    'Aetheric Flux': 'Instabilidade Arcana',
+    Chronoweave: 'Cronotecelagem',
     'Aetheric Mind': 'Mente Arcana',
     'Aetheric Poise': 'Concentração Arcana',
     'Aetheric Shell': 'Resiliência Arcana',
     'Aetheric Thesis': 'Tese Arcana',
-    Aethermancy: 'Arcano',
+    Chronomancy: 'Cronomancia',
     Afterflame: 'Inflamar',
     "Ancestor's Mercy": 'Cura Ancestral',
     'Ancient Lore': 'Conhecimento Ancestral',
@@ -4253,6 +5451,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Foco Espiritual',
     Quietude: 'Reflexão',
     'Racing Mind': 'Presença de Espírito',
+    Ignition: 'Ignição',
+    'Phoenix Trance': 'Transe da Fênix',
+    'Ice Floes': 'Placas de Gelo',
+    'Double Blink': 'Piscada Dupla',
+    'Blink While Casting': 'Piscada ao Conjurar',
+    Warded: 'Resguardado',
+    'Temporal Rift': 'Fenda Temporal',
+    'Greater Invisibility': 'Invisibilidade Maior',
+    'Ring of Frost': 'Anel de Gelo',
+    'Snap Bewitch': 'Enfeitiçamento Instantâneo',
+    'Twin Icebind': 'Grilhão de Gelo Duplo',
+    'Power Echo': 'Eco de Poder',
+    Overload: 'Sobrecarga',
+    'Elemental Convergence': 'Convergência Elemental',
+    "Winter's Recall": 'Chamado do Inverno',
+    'Mass Barrier': 'Barreira em Massa',
+    'Rune of Power': 'Runa de Poder',
+    'Overflowing Power': 'Poder Transbordante',
     'Rapid Blows': 'Rajada',
     'Reaching Boughs': 'Alcance da Natureza',
     'Reaching Word': 'Alcance Sagrado',
@@ -4279,7 +5495,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Foco das Marés',
     Shadeslip: 'Passo Furtivo',
     'Shared Quarry': 'Fogo Concentrado',
-    'Sharpened Blades': 'Lâminas Afiadas',
     'Shattered Earth': 'Devastação Elemental',
     Shieldbearer: 'Especialização em Escudo',
     Shieldwright: 'Maestria de Escudo',
@@ -4357,14 +5572,95 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': 'Fúria Divina',
   },
   ru_RU: {
+    'Adrenaline Junkie': 'Адреналиновый фанатик',
+    'Aspect Mastery': 'Мастерство обликов',
+    'Aura Mastery': 'Мастерство аур',
+    'Battlemage Armor': 'Доспех боевого мага',
+    'Blessed Momentum': 'Благословенный порыв',
+    'Blessed Recovery': 'Благословенное восстановление',
+    'Brutal Bash': 'Жестокий удар',
+    'Cheat Death': 'Обман смерти',
+    'Coldsnap Break': 'Ломка резкого холода',
+    'Commanding Presence': 'Властное присутствие',
+    'Concussive Clap': 'Оглушающий хлопок',
+    'Consecrated Ground': 'Освященная земля',
+    'Crippling Blows': 'Калечащие удары',
+    'Crippling Strikes': 'Увечащие атаки',
+    "Crusader's Zeal": 'Рвение крестоносца',
+    'Curse Mastery': 'Мастерство проклятий',
+    'Deadly Brew': 'Смертельное варево',
+    'Demon Armor': 'Демонический доспех',
+    'Divine Wisdom': 'Божественная мудрость',
+    'Elemental Attunement': 'Настройка стихий',
+    'Elemental Warding': 'Стихийная защита',
+    'Empowered Touch': 'Усиленное касание',
+    Endurance: 'Стойкая выносливость',
+    Executioner: 'Палач',
+    Firestarter: 'Зажигатель',
+    'Fist of Justice': 'Кулак правосудия',
+    'Frost Bind': 'Морозные путы',
+    'Furious Bloodrage': 'Яростная кровавая злоба',
+    'Greater Blessing': 'Великое благословение',
+    'Greater Heal': 'Великое исцеление',
+    'Grimoire of Carnage': 'Гримуар резни',
+    "Guardian's Favor": 'Благоволение стража',
+    'Ice Nova': 'Ледяная вспышка',
+    'Imbue Mastery': 'Мастерство насыщения',
+    'Improved Backstab': 'Улучшенный удар в спину',
+    'Improved Barkskin': 'Улучшенная дубовая кожа',
+    'Improved Cinder Jolt': 'Улучшенный пепельный толчок',
+    'Improved Concussive': 'Улучшенное оглушение',
+    'Improved Cutthroat Tempo': 'Улучшенный темп душегуба',
+    'Improved Earthen Jolt': 'Улучшенный земляной толчок',
+    'Improved Evasion': 'Улучшенное уклонение',
+    'Improved Fear': 'Улучшенный страх',
+    'Improved Hurricane': 'Улучшенный ураган',
+    'Improved Immolate': 'Улучшенное жертвенное пламя',
+    'Improved Low Blow': 'Улучшенный подлый удар',
+    'Improved Mark': 'Улучшенная метка',
+    'Improved Roots': 'Улучшенные корни',
+    'Improved Shield': 'Улучшенный щит',
+    'Improved Venom Barb': 'Улучшенный ядовитый шип',
+    'Improved Volley': 'Улучшенный залп',
+    Impulse: 'Импульс',
+    'Inner Fire': 'Внутренний огонь',
+    'Iron Hide': 'Железная шкура',
+    Juggernaut: 'Неудержимый исполин',
+    'Mana Attunement': 'Настройка маны',
+    'Master Assassin': 'Мастер убийца',
+    'Master Tamer': 'Мастер укротитель',
+    'Mind Melt': 'Плавление разума',
+    Moonspite: 'Лунная злоба',
+    "Nature's Bounty": 'Щедрость природы',
+    Netherwind: 'Потусторонний ветер',
+    Opportunist: 'Искатель случая',
+    'Pain and Suffering': 'Боль и страдание',
+    'Quick Shots': 'Быстрые выстрелы',
+    'Quick Wits': 'Быстрый ум',
+    'Rapid Killing': 'Быстрое убийство',
+    'Righteous Cause': 'Праведное дело',
+    'Sacred Ward': 'Священный оберег',
+    'Savage Fury': 'Дикая ярость',
+    'Searing Light': 'Жгучий свет',
+    "Serpent's Venom": 'Змеиный яд',
+    'Shock Efficiency': 'Эффективность шока',
+    'Slow Burn': 'Медленное горение',
+    'Sniper Training': 'Подготовка снайпера',
+    'Survival of the Fittest': 'Выживание сильнейшего',
+    'Swift Verdicts': 'Быстрые приговоры',
+    'Tidal Waves': 'Приливные волны',
+    'Twisted Faith': 'Искаженная вера',
+    'Vengeful Exorcism': 'Мстительное изгнание',
+    Warbringer: 'Вестник войны',
+    'Weapon Fury': 'Ярость оружия',
     'Aether Surge': 'Тайная сила',
     'Aetheric Aim': 'Тайное сосредоточение',
-    'Aetheric Flux': 'Тайная нестабильность',
+    Chronoweave: 'Хроноплетение',
     'Aetheric Mind': 'Тайный разум',
     'Aetheric Poise': 'Тайная сосредоточенность',
     'Aetheric Shell': 'Тайная устойчивость',
     'Aetheric Thesis': 'Тайный трактат',
-    Aethermancy: 'Тайная магия',
+    Chronomancy: 'Хрономантия',
     Afterflame: 'Воспламенение',
     "Ancestor's Mercy": 'Исцеление предков',
     'Ancient Lore': 'Знания предков',
@@ -4596,6 +5892,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Духовное сосредоточение',
     Quietude: 'Отражение',
     'Racing Mind': 'Присутствие духа',
+    Ignition: 'Воспламенение',
+    'Phoenix Trance': 'Транс феникса',
+    'Ice Floes': 'Льдины',
+    'Double Blink': 'Двойной скачок',
+    'Blink While Casting': 'Скачок при чтении заклинаний',
+    Warded: 'Под защитой',
+    'Temporal Rift': 'Разлом времени',
+    'Greater Invisibility': 'Высшая невидимость',
+    'Ring of Frost': 'Кольцо льда',
+    'Snap Bewitch': 'Мгновенные чары',
+    'Twin Icebind': 'Двойные ледяные оковы',
+    'Power Echo': 'Эхо силы',
+    Overload: 'Перегрузка',
+    'Elemental Convergence': 'Слияние стихий',
+    "Winter's Recall": 'Зов зимы',
+    'Mass Barrier': 'Массовый барьер',
+    'Rune of Power': 'Руна силы',
+    'Overflowing Power': 'Переполняющая сила',
     'Rapid Blows': 'Шквал',
     'Reaching Boughs': 'Природная досягаемость',
     'Reaching Word': 'Длань Света',
@@ -4622,7 +5936,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Сосредоточение прилива',
     Shadeslip: 'Прыжок сквозь тень',
     'Shared Quarry': 'Сосредоточенный огонь',
-    'Sharpened Blades': 'Заточенные клинки',
     'Shattered Earth': 'Опустошение стихий',
     Shieldbearer: 'Специализация по щитам',
     Shieldwright: 'Мастерство владения щитом',
@@ -4700,14 +6013,15 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': 'Божественное неистовство',
   },
   cs_CZ: {
+    ...TALENT_NEW_TITLE_OVERRIDES.cs_CZ,
     'Aether Surge': 'Éterický příval',
     'Aetheric Aim': 'Éterická přesnost',
-    'Aetheric Flux': 'Éterický tok',
+    Chronoweave: 'Chronotkaní',
     'Aetheric Mind': 'Éterická mysl',
     'Aetheric Poise': 'Éterická vyrovnanost',
     'Aetheric Shell': 'Éterický štít',
     'Aetheric Thesis': 'Éterická teze',
-    Aethermancy: 'Éterická magie',
+    Chronomancy: 'Chronomancie',
     Afterflame: 'Dohořívání',
     "Ancestor's Mercy": 'Slitování předků',
     'Ancient Lore': 'Dávné vědění',
@@ -4939,6 +6253,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Tichá horlivost',
     Quietude: 'Poklid',
     'Racing Mind': 'Uhánějící mysl',
+    Ignition: 'Vznícení',
+    'Phoenix Trance': 'Fénixův trans',
+    'Ice Floes': 'Ledové kry',
+    'Double Blink': 'Dvojitý skok',
+    'Blink While Casting': 'Skok při sesílání',
+    Warded: 'Pod ochranou',
+    'Temporal Rift': 'Časová trhlina',
+    'Greater Invisibility': 'Vyšší neviditelnost',
+    'Ring of Frost': 'Mrazivý kruh',
+    'Snap Bewitch': 'Bleskové očarování',
+    'Twin Icebind': 'Dvojité ledové spoutání',
+    'Power Echo': 'Ozvěna moci',
+    Overload: 'Přetížení',
+    'Elemental Convergence': 'Souběh živlů',
+    "Winter's Recall": 'Volání zimy',
+    'Mass Barrier': 'Hromadná bariéra',
+    'Rune of Power': 'Runa moci',
+    'Overflowing Power': 'Přetékající moc',
     'Rapid Blows': 'Rychlé rány',
     'Reaching Boughs': 'Sahající větve',
     'Reaching Word': 'Dalekosáhlé slovo',
@@ -4965,7 +6297,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Klidné vody',
     Shadeslip: 'Stínový skluz',
     'Shared Quarry': 'Společná kořist',
-    'Sharpened Blades': 'Nabroušené čepele',
     'Shattered Earth': 'Roztříštěná zem',
     Shieldbearer: 'Štítonoš',
     Shieldwright: 'Mistr štítu',
@@ -5043,14 +6374,15 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': 'Hněvivý žalm',
   },
   nl_NL: {
+    ...TALENT_NEW_TITLE_OVERRIDES.nl_NL,
     'Aether Surge': 'Arcane Kracht',
     'Aetheric Aim': 'Arcane Brandpunt',
-    'Aetheric Flux': 'Arcane Instabiliteit',
+    Chronoweave: 'Chronoweefsel',
     'Aetheric Mind': 'Arcane Geest',
     'Aetheric Poise': 'Arcane Concentratie',
     'Aetheric Shell': 'Arcane Veerkracht',
     'Aetheric Thesis': 'Arcane Verhandeling',
-    Aethermancy: 'Arcaan',
+    Chronomancy: 'Chronomantie',
     Afterflame: 'Ontsteken',
     "Ancestor's Mercy": 'Voorouderlijke Genezing',
     'Ancient Lore': 'Voorouderlijke Kennis',
@@ -5282,6 +6614,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Spirituele Focus',
     Quietude: 'Weerkaatsing',
     'Racing Mind': 'Tegenwoordigheid van Geest',
+    Ignition: 'Ontbranding',
+    'Phoenix Trance': 'Feniks-trance',
+    'Ice Floes': 'IJsschotsen',
+    'Double Blink': 'Dubbele flits',
+    'Blink While Casting': 'Flitsen tijdens bezwering',
+    Warded: 'Beschut',
+    'Temporal Rift': 'Tijdscheur',
+    'Greater Invisibility': 'Grotere onzichtbaarheid',
+    'Ring of Frost': 'Vorstring',
+    'Snap Bewitch': 'Snelle beheksing',
+    'Twin Icebind': 'Dubbele ijsboei',
+    'Power Echo': 'Echo van kracht',
+    Overload: 'Overbelasting',
+    'Elemental Convergence': 'Elementaire samenkomst',
+    "Winter's Recall": 'Roep van de winter',
+    'Mass Barrier': 'Massabarrière',
+    'Rune of Power': 'Krachtrune',
+    'Overflowing Power': 'Overvloeiende kracht',
     'Rapid Blows': 'Slagenregen',
     'Reaching Boughs': 'Natuurbereik',
     'Reaching Word': 'Heilig Bereik',
@@ -5308,7 +6658,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Getijdenfocus',
     Shadeslip: 'Schaduwstap',
     'Shared Quarry': 'Gericht Vuur',
-    'Sharpened Blades': 'Geslepen Klingen',
     'Shattered Earth': 'Elementaire Verwoesting',
     Shieldbearer: 'Schildspecialisatie',
     Shieldwright: 'Schildmeesterschap',
@@ -5386,14 +6735,15 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': 'Goddelijke Furie',
   },
   pl_PL: {
+    ...TALENT_NEW_TITLE_OVERRIDES.pl_PL,
     'Aether Surge': 'Arkaniczna moc',
     'Aetheric Aim': 'Arkaniczne skupienie',
-    'Aetheric Flux': 'Arkaniczna niestabilność',
+    Chronoweave: 'Chronosplot',
     'Aetheric Mind': 'Arkaniczny umysł',
     'Aetheric Poise': 'Arkaniczna koncentracja',
     'Aetheric Shell': 'Arkaniczna odporność',
     'Aetheric Thesis': 'Arkaniczna teza',
-    Aethermancy: 'Tajemna magia',
+    Chronomancy: 'Chronomancja',
     Afterflame: 'Podpalenie',
     "Ancestor's Mercy": 'Uzdrawianie przodków',
     'Ancient Lore': 'Wiedza przodków',
@@ -5625,6 +6975,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Duchowe skupienie',
     Quietude: 'Odbicie',
     'Racing Mind': 'Przytomność umysłu',
+    Ignition: 'Zapłon',
+    'Phoenix Trance': 'Trans feniksa',
+    'Ice Floes': 'Kry lodowe',
+    'Double Blink': 'Podwójny skok',
+    'Blink While Casting': 'Skok w trakcie rzucania',
+    Warded: 'Osłonięty',
+    'Temporal Rift': 'Szczelina czasu',
+    'Greater Invisibility': 'Wyższa niewidzialność',
+    'Ring of Frost': 'Krąg mrozu',
+    'Snap Bewitch': 'Błyskawiczne zauroczenie',
+    'Twin Icebind': 'Podwójne lodowe okowy',
+    'Power Echo': 'Echo mocy',
+    Overload: 'Przeciążenie',
+    'Elemental Convergence': 'Zbieżność żywiołów',
+    "Winter's Recall": 'Zew zimy',
+    'Mass Barrier': 'Bariera zbiorowa',
+    'Rune of Power': 'Runa mocy',
+    'Overflowing Power': 'Przelewająca się moc',
     'Rapid Blows': 'Nawałnica',
     'Reaching Boughs': 'Zasięg natury',
     'Reaching Word': 'Święty zasięg',
@@ -5651,7 +7019,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Skupienie przypływu',
     Shadeslip: 'Cienisty krok',
     'Shared Quarry': 'Skupiony ogień',
-    'Sharpened Blades': 'Naostrzone ostrza',
     'Shattered Earth': 'Spustoszenie żywiołów',
     Shieldbearer: 'Specjalizacja w tarczy',
     Shieldwright: 'Władanie tarczą',
@@ -5729,14 +7096,15 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': 'Boska furia',
   },
   id_ID: {
+    ...TALENT_NEW_TITLE_OVERRIDES.id_ID,
     'Aether Surge': 'Kekuatan Arkana',
     'Aetheric Aim': 'Fokus Arkana',
-    'Aetheric Flux': 'Ketidakstabilan Arkana',
+    Chronoweave: 'Anyaman Waktu',
     'Aetheric Mind': 'Pikiran Arkana',
     'Aetheric Poise': 'Konsentrasi Arkana',
     'Aetheric Shell': 'Ketahanan Arkana',
     'Aetheric Thesis': 'Tesis Arkana',
-    Aethermancy: 'Arkana',
+    Chronomancy: 'Kronomansi',
     Afterflame: 'Penyulutan',
     "Ancestor's Mercy": 'Penyembuhan Leluhur',
     'Ancient Lore': 'Pengetahuan Leluhur',
@@ -5968,6 +7336,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Fokus Spiritual',
     Quietude: 'Pemantulan',
     'Racing Mind': 'Ketenangan Pikiran',
+    Ignition: 'Penyulutan',
+    'Phoenix Trance': 'Trans Feniks',
+    'Ice Floes': 'Bongkahan Es',
+    'Double Blink': 'Kelip Ganda',
+    'Blink While Casting': 'Kelip Saat Merapal',
+    Warded: 'Terlindungi',
+    'Temporal Rift': 'Celah Waktu',
+    'Greater Invisibility': 'Kasatmata Agung',
+    'Ring of Frost': 'Cincin Beku',
+    'Snap Bewitch': 'Guna-guna Kilat',
+    'Twin Icebind': 'Icebind Ganda',
+    'Power Echo': 'Gema Kekuatan',
+    Overload: 'Beban Lebih',
+    'Elemental Convergence': 'Pertemuan Elemen',
+    "Winter's Recall": 'Panggilan Musim Dingin',
+    'Mass Barrier': 'Penghalang Massal',
+    'Rune of Power': 'Rune Kekuatan',
+    'Overflowing Power': 'Kekuatan Meluap',
     'Rapid Blows': 'Badai Serangan',
     'Reaching Boughs': 'Jangkauan Alam',
     'Reaching Word': 'Jangkauan Suci',
@@ -5994,7 +7380,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Fokus Pasang',
     Shadeslip: 'Langkah Bayangan',
     'Shared Quarry': 'Api Terfokus',
-    'Sharpened Blades': 'Bilah Terasah',
     'Shattered Earth': 'Pemusnahan Elemental',
     Shieldbearer: 'Spesialisasi Perisai',
     Shieldwright: 'Penguasaan Perisai',
@@ -6072,14 +7457,15 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': 'Murka Ilahi',
   },
   tr_TR: {
+    ...TALENT_NEW_TITLE_OVERRIDES.tr_TR,
     'Aether Surge': 'Gizem Gücü',
     'Aetheric Aim': 'Gizem Odağı',
-    'Aetheric Flux': 'Gizem Kararsızlığı',
+    Chronoweave: 'Zaman Dokuması',
     'Aetheric Mind': 'Gizem Zihni',
     'Aetheric Poise': 'Gizem Odaklanması',
     'Aetheric Shell': 'Gizem Dayanıklılığı',
     'Aetheric Thesis': 'Gizem Tezi',
-    Aethermancy: 'Gizem',
+    Chronomancy: 'Kronomansi',
     Afterflame: 'Tutuşturma',
     "Ancestor's Mercy": 'Ata İyileştirmesi',
     'Ancient Lore': 'Ata Bilgisi',
@@ -6311,6 +7697,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Ruhani Odak',
     Quietude: 'Yansıtma',
     'Racing Mind': 'Zihin Açıklığı',
+    Ignition: 'Tutuşma',
+    'Phoenix Trance': 'Anka Transı',
+    'Ice Floes': 'Buz Kütleleri',
+    'Double Blink': 'Çifte Işınlanma',
+    'Blink While Casting': 'Büyü Sırasında Işınlanma',
+    Warded: 'Korunaklı',
+    'Temporal Rift': 'Zaman Yarığı',
+    'Greater Invisibility': 'Yüce Görünmezlik',
+    'Ring of Frost': 'Buz Halkası',
+    'Snap Bewitch': 'Anlık Büyüleme',
+    'Twin Icebind': 'Çifte Buz Bağı',
+    'Power Echo': 'Güç Yankısı',
+    Overload: 'Aşırı Yük',
+    'Elemental Convergence': 'Element Kavuşumu',
+    "Winter's Recall": 'Kışın Çağrısı',
+    'Mass Barrier': 'Kitlesel Bariyer',
+    'Rune of Power': 'Güç Rünü',
+    'Overflowing Power': 'Taşan Güç',
     'Rapid Blows': 'Sağanak',
     'Reaching Boughs': 'Doğa Erişimi',
     'Reaching Word': 'Kutsal Erişim',
@@ -6337,7 +7741,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Gelgit Odağı',
     Shadeslip: 'Gölge Adımı',
     'Shared Quarry': 'Odaklı Ateş',
-    'Sharpened Blades': 'Bilenmiş Bıçaklar',
     'Shattered Earth': 'Elementsel Tahribat',
     Shieldbearer: 'Kalkan Uzmanlığı',
     Shieldwright: 'Kalkan Hakimiyeti',
@@ -6415,14 +7818,15 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': 'Kutsal Hiddet',
   },
   sv_SE: {
+    ...TALENT_NEW_TITLE_OVERRIDES.sv_SE,
     'Aether Surge': 'Arkan kraft',
     'Aetheric Aim': 'Arkant fokus',
-    'Aetheric Flux': 'Arkan instabilitet',
+    Chronoweave: 'Kronoväv',
     'Aetheric Mind': 'Arkant sinne',
     'Aetheric Poise': 'Arkan koncentration',
     'Aetheric Shell': 'Arkan motståndskraft',
     'Aetheric Thesis': 'Arkan tes',
-    Aethermancy: 'Arkan',
+    Chronomancy: 'Kronomanti',
     Afterflame: 'Antänd',
     "Ancestor's Mercy": 'Förfäders läkning',
     'Ancient Lore': 'Förfäders kunskap',
@@ -6654,6 +8058,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Andligt fokus',
     Quietude: 'Reflektion',
     'Racing Mind': 'Sinnesnärvaro',
+    Ignition: 'Antändning',
+    'Phoenix Trance': 'Fenixtrans',
+    'Ice Floes': 'Isflak',
+    'Double Blink': 'Dubbelblink',
+    'Blink While Casting': 'Blink under besvärjelse',
+    Warded: 'Skyddad',
+    'Temporal Rift': 'Tidsreva',
+    'Greater Invisibility': 'Större osynlighet',
+    'Ring of Frost': 'Frostring',
+    'Snap Bewitch': 'Blixtförhäxning',
+    'Twin Icebind': 'Dubbel isbindning',
+    'Power Echo': 'Kraftens eko',
+    Overload: 'Överbelastning',
+    'Elemental Convergence': 'Elementär konvergens',
+    "Winter's Recall": 'Vinterns kallelse',
+    'Mass Barrier': 'Massbarriär',
+    'Rune of Power': 'Kraftruna',
+    'Overflowing Power': 'Översvallande kraft',
     'Rapid Blows': 'Slagskur',
     'Reaching Boughs': 'Naturens räckvidd',
     'Reaching Word': 'Helig räckvidd',
@@ -6680,7 +8102,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Tidvattenfokus',
     Shadeslip: 'Skuggsteg',
     'Shared Quarry': 'Fokuserad eld',
-    'Sharpened Blades': 'Vässade klingor',
     'Shattered Earth': 'Elementär förödelse',
     Shieldbearer: 'Sköldspecialisering',
     Shieldwright: 'Sköldbemästring',
@@ -6758,14 +8179,15 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': 'Gudomligt raseri',
   },
   vi_VN: {
+    ...TALENT_NEW_TITLE_OVERRIDES.vi_VN,
     'Aether Surge': 'Sức Mạnh Bí Thuật',
     'Aetheric Aim': 'Trọng Tâm Bí Thuật',
-    'Aetheric Flux': 'Bất Ổn Bí Thuật',
+    Chronoweave: 'Dệt Thời Gian',
     'Aetheric Mind': 'Tâm Trí Bí Thuật',
     'Aetheric Poise': 'Tập Trung Bí Thuật',
     'Aetheric Shell': 'Kiên Cường Bí Thuật',
     'Aetheric Thesis': 'Luận Thuyết Bí Thuật',
-    Aethermancy: 'Bí Thuật',
+    Chronomancy: 'Thời Thuật',
     Afterflame: 'Bắt Lửa',
     "Ancestor's Mercy": 'Trị Liệu Tổ Tiên',
     'Ancient Lore': 'Tri Thức Tổ Tiên',
@@ -6997,6 +8419,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Tập Trung Tâm Linh',
     Quietude: 'Phản Chiếu',
     'Racing Mind': 'Tĩnh Tâm',
+    Ignition: 'Bốc Cháy',
+    'Phoenix Trance': 'Phượng Hoàng Xuất Thần',
+    'Ice Floes': 'Tảng Băng Trôi',
+    'Double Blink': 'Dịch Chuyển Kép',
+    'Blink While Casting': 'Dịch Chuyển Khi Niệm Chú',
+    Warded: 'Được Che Chắn',
+    'Temporal Rift': 'Khe Nứt Thời Gian',
+    'Greater Invisibility': 'Tàng Hình Thượng Cấp',
+    'Ring of Frost': 'Vòng Băng Giá',
+    'Snap Bewitch': 'Mê Hoặc Tức Thì',
+    'Twin Icebind': 'Trói Băng Kép',
+    'Power Echo': 'Tiếng Vọng Sức Mạnh',
+    Overload: 'Quá Tải',
+    'Elemental Convergence': 'Hội Tụ Nguyên Tố',
+    "Winter's Recall": 'Tiếng Gọi Mùa Đông',
+    'Mass Barrier': 'Khiên Chắn Tập Thể',
+    'Rune of Power': 'Ấn Rune Sức Mạnh',
+    'Overflowing Power': 'Sức Mạnh Tràn Đầy',
     'Rapid Blows': 'Liên Hoàn',
     'Reaching Boughs': 'Tầm Với Tự Nhiên',
     'Reaching Word': 'Tầm Với Thần Thánh',
@@ -7023,7 +8463,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Tập Trung Thủy Triều',
     Shadeslip: 'Bước Bóng Tối',
     'Shared Quarry': 'Hỏa Lực Tập Trung',
-    'Sharpened Blades': 'Lưỡi Sắc Bén',
     'Shattered Earth': 'Tàn Phá Nguyên Tố',
     Shieldbearer: 'Chuyên Môn Khiên',
     Shieldwright: 'Tinh Thông Khiên',
@@ -7101,14 +8540,15 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Wrathful Psalm': 'Phẫn Nộ Thần Thánh',
   },
   da_DK: {
+    ...TALENT_NEW_TITLE_OVERRIDES.da_DK,
     'Aether Surge': 'Arkan Kraft',
     'Aetheric Aim': 'Arkan Fokus',
-    'Aetheric Flux': 'Arkan Ustabilitet',
+    Chronoweave: 'Kronovæv',
     'Aetheric Mind': 'Arkan Sind',
     'Aetheric Poise': 'Arkan Koncentration',
     'Aetheric Shell': 'Arkan Modstandskraft',
     'Aetheric Thesis': 'Arkan Afhandling',
-    Aethermancy: 'Arkan',
+    Chronomancy: 'Kronomanti',
     Afterflame: 'Antænd',
     "Ancestor's Mercy": 'Forfædres Helbredelse',
     'Ancient Lore': 'Forfædres Viden',
@@ -7340,6 +8780,24 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Quiet Fervor': 'Åndeligt Fokus',
     Quietude: 'Refleksion',
     'Racing Mind': 'Åndsnærværelse',
+    Ignition: 'Antændelse',
+    'Phoenix Trance': 'Føniks-trance',
+    'Ice Floes': 'Isflager',
+    'Double Blink': 'Dobbeltblink',
+    'Blink While Casting': 'Blink under besværgelse',
+    Warded: 'Skærmet',
+    'Temporal Rift': 'Tidsflænge',
+    'Greater Invisibility': 'Større usynlighed',
+    'Ring of Frost': 'Frostring',
+    'Snap Bewitch': 'Lynforheksning',
+    'Twin Icebind': 'Dobbelt isbinding',
+    'Power Echo': 'Kraftekko',
+    Overload: 'Overbelastning',
+    'Elemental Convergence': 'Elementernes sammenløb',
+    "Winter's Recall": 'Vinterens kalden',
+    'Mass Barrier': 'Massebarriere',
+    'Rune of Power': 'Kraftrune',
+    'Overflowing Power': 'Overstrømmende kraft',
     'Rapid Blows': 'Slagstorm',
     'Reaching Boughs': 'Naturens Rækkevidde',
     'Reaching Word': 'Hellig Rækkevidde',
@@ -7354,6 +8812,7 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     Refuge: 'Tilflugt',
     Requital: 'Gengældelse',
     'Rolling Flame': 'Trykbølge',
+    Ruinbolt: 'Ødelæggelseslyn',
     Ruination: 'Ødelæggelse',
     'Rushing Waters': 'Naturens Hurtighed',
     'Sablewind Focus': 'Nethervind-Fokus',
@@ -7366,7 +8825,6 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
     'Serene Waters': 'Tidevandsfokus',
     Shadeslip: 'Skyggeskridt',
     'Shared Quarry': 'Fokuseret Ild',
-    'Sharpened Blades': 'Skærpede Klinger',
     'Shattered Earth': 'Elementær Forødelse',
     Shieldbearer: 'Skjoldspecialisering',
     Shieldwright: 'Skjoldmestring',
@@ -7472,8 +8930,13 @@ function statAmount(stat: StatKey, value: number, lang: SupportedLanguage): stri
 
 function translateTitle(source: string, lang: SupportedLanguage): string {
   if (lang === 'en' || lang === 'en_CA') return source;
-  const abilityId = abilityIdByName.get(source);
-  if (abilityId) return tEntity({ kind: 'ability', id: abilityId, field: 'name' });
+  const abilityId = abilityIdByName.get(source) ?? grantAbilityIdByTitle.get(source);
+  if (abilityId) {
+    const abilityTitle = tEntity({ kind: 'ability', id: abilityId, field: 'name' });
+    if (abilityTitle !== source) return abilityTitle;
+  }
+  const retained = RETAINED_ROW_TITLE_OVERRIDES[lang]?.[source];
+  if (retained !== undefined) return retained;
   const override = titleOverrides[lang]?.[source];
   if (override !== undefined) return override;
   // Every shipped talent name has an explicit override (enforced by tests) or is an
@@ -7487,12 +8950,318 @@ function abilityName(id: string): string {
   return tEntity({ kind: 'ability', id, field: 'name' });
 }
 
+type GrantEffectShape = {
+  type: string;
+  min?: number;
+  max?: number;
+  amount?: number;
+  total?: number;
+  value?: number;
+  mult?: number;
+  duration?: number;
+  interval?: number;
+  radius?: number;
+  jumps?: number;
+  falloff?: number;
+  kind?: string;
+};
+
+function grantAmountRange(min: number, max: number, lang: SupportedLanguage): string {
+  const minText = formatNumber(min, lang);
+  const maxText = formatNumber(max, lang);
+  return min === max ? minText : t('abilityUi.tooltip.damageRange', { min: minText, max: maxText });
+}
+
+export function grantAbilityValues(id: string): InterpolationValues {
+  const def = ABILITIES[id];
+  const effects = (def?.effects ?? []) as GrantEffectShape[];
+  const lang = getLanguage();
+  const values: Record<string, string> = {};
+  const chain = effects.find((effect) => effect.type === 'chainDamage');
+  const direct = effects.find((effect) =>
+    ['directDamage', 'aoeDamage', 'heal', 'aoeHeal', 'drainTick', 'groundAoE'].includes(
+      effect.type,
+    ),
+  );
+  const ground = effects.find((effect) => effect.type === 'groundAoE');
+  const absorb = effects.find((effect) => effect.type === 'absorb');
+  const overTime = effects.find((effect) => effect.type === 'dot' || effect.type === 'hot');
+  const resource = effects.find((effect) => effect.type === 'gainResource');
+  const buff = effects.find((effect) => effect.type === 'selfBuff' || effect.type === 'buffTarget');
+  const allyAttackPower = effects.find((effect) => effect.type === 'aoeAllyAttackPower');
+  const allyHaste = effects.find((effect) => effect.type === 'aoeAllyHaste');
+  const timed = effects.find((effect) => typeof effect.duration === 'number');
+
+  if (chain?.min !== undefined && chain.max !== undefined) {
+    values.min = formatNumber(chain.min, lang);
+    values.max = formatNumber(chain.max, lang);
+    values.damage = grantAmountRange(chain.min, chain.max, lang);
+    if (chain.jumps !== undefined) values.jumps = formatNumber(chain.jumps, lang);
+    if (chain.falloff !== undefined) values.falloff = formatPercent(chain.falloff, lang);
+    if (chain.radius !== undefined) values.radius = formatNumber(chain.radius, lang);
+  } else if (direct?.min !== undefined && direct.max !== undefined) {
+    values.min = formatNumber(direct.min, lang);
+    values.max = formatNumber(direct.max, lang);
+    values.damage = grantAmountRange(direct.min, direct.max, lang);
+  }
+
+  if (absorb?.amount !== undefined) {
+    const amount = formatNumber(absorb.amount, lang);
+    values.amount = amount;
+    if (values.damage === undefined) values.damage = amount;
+  }
+  if (overTime?.total !== undefined) {
+    const total = formatNumber(overTime.total, lang);
+    values.overTime = total;
+    if (values.damage === undefined) values.damage = total;
+  }
+  if (ground?.min !== undefined && ground.max !== undefined) {
+    values.overTime = grantAmountRange(ground.min, ground.max, lang);
+  }
+  if (resource?.amount !== undefined) values.amount = formatNumber(resource.amount, lang);
+  if (buff?.value !== undefined) values.buff = formatNumber(buff.value, lang);
+  if (allyAttackPower?.amount !== undefined) {
+    values.buff = formatNumber(allyAttackPower.amount, lang);
+  }
+  if (allyHaste?.mult !== undefined && values.buff === undefined) {
+    values.buff = formatPercent(allyHaste.mult - 1, lang);
+  }
+  for (const effect of effects) {
+    if (effect.type !== 'selfBuff' || effect.value === undefined) continue;
+    if (effect.kind === 'buff_ap') values.attackPower = formatNumber(effect.value, lang);
+    if (effect.kind === 'buff_spellpower') values.spellPower = formatNumber(effect.value, lang);
+  }
+
+  const duration = timed?.duration ?? def?.channel?.duration;
+  if (duration !== undefined) values.duration = formatNumber(duration, lang);
+  const interval = ground?.interval ?? overTime?.interval;
+  if (interval !== undefined) values.interval = formatNumber(interval, lang);
+  const radius =
+    chain?.radius ??
+    ground?.radius ??
+    allyAttackPower?.radius ??
+    allyHaste?.radius ??
+    direct?.radius;
+  if (radius !== undefined) values.radius = formatNumber(radius, lang);
+  return values;
+}
+
+function grantResourceName(id: string): string | null {
+  const cls = ABILITIES[id]?.class;
+  const resource = cls ? CLASSES[cls]?.resourceType : null;
+  if (resource === 'mana') return t('abilityUi.resources.mana');
+  if (resource === 'rage') return t('abilityUi.resources.rage');
+  if (resource === 'energy') return t('abilityUi.resources.energy');
+  return null;
+}
+
+export function grantAbilityMetadata(id: string): string {
+  const def = ABILITIES[id];
+  if (!def) return '';
+  const lang = getLanguage();
+  const parts: string[] = [];
+  const resource = grantResourceName(id);
+  if (def.cost > 0 && resource) {
+    parts.push(t('abilityUi.tooltip.cost', { cost: formatNumber(def.cost, lang), resource }));
+  }
+  if (def.channel) {
+    parts.push(
+      t('abilityUi.tooltip.channeledSeconds', {
+        seconds: formatNumber(def.channel.duration, lang),
+      }),
+    );
+  } else if (def.castTime > 0) {
+    parts.push(t('abilityUi.tooltip.castSeconds', { seconds: formatNumber(def.castTime, lang) }));
+  } else {
+    parts.push(t('abilityUi.tooltip.instant'));
+  }
+  if (def.range > 0) {
+    parts.push(
+      def.minRange !== undefined
+        ? t('abilityUi.tooltip.rangeWithMin', {
+            min: formatNumber(def.minRange, lang),
+            max: formatNumber(def.range, lang),
+          })
+        : t('abilityUi.tooltip.range', { range: formatNumber(def.range, lang) }),
+    );
+  }
+  if (def.cooldown > 0) {
+    parts.push(
+      t('abilityUi.tooltip.cooldownSeconds', {
+        seconds: formatNumber(def.cooldown, lang),
+      }),
+    );
+  }
+  return parts.join(' · ');
+}
+
+function abilityDescription(id: string): string {
+  return tEntity({ kind: 'ability', id, field: 'description', values: grantAbilityValues(id) })
+    .replace(/\s*\([^)]*(?:talent|signature)[^)]*\)\.?\s*$/i, '')
+    .trim();
+}
+
+function authoredChoiceDescription(choice: TalentRowOption): string {
+  const grantId = choice.effect.grant?.ability;
+  if (!grantId) return choice.description;
+  return [abilityDescription(grantId), grantAbilityMetadata(grantId)].filter(Boolean).join(' ');
+}
+
+function seconds(value: number, lang: SupportedLanguage): string {
+  return `${formatNumber(value, lang)} s`;
+}
+
+function abilityList(ids: readonly string[] | undefined): string {
+  return ids && ids.length > 0 ? ids.map(abilityName).join(' / ') : '*';
+}
+
+function procTriggerDescription(
+  proc: ProcDef,
+  lang: SupportedLanguage,
+  text: TalentLocaleText,
+): string {
+  const trigger = proc.trigger;
+  switch (trigger.on) {
+    case 'castNth':
+      return `${abilityList(trigger.abilities)}${trigger.n > 1 ? ` x${trigger.n}` : ''}`;
+    case 'spellCrit':
+      return `${text.statLabels.crit}: ${abilityList(trigger.abilities)}`;
+    case 'shieldConsumed':
+      return `${abilityName(trigger.ability)}: ${t('hudChrome.auraEffect.absorb', { value: '0' })}`;
+    case 'hotExpired':
+      return `${abilityName(trigger.ability)}: 0 s`;
+    case 'bigHitTaken':
+      return `>= ${formatPercent(trigger.hpFrac, lang)} ${text.statLabels.maxHpPct} (${seconds(trigger.icd, lang)} ${text.statLabels.cooldown})`;
+    case 'meleeSwingWhile':
+      return `${text.statLabels.meleeDmgPct} @ ${t('hudChrome.auraEffect.imbue')}`;
+    case 'thornsReflect':
+      return `${abilityName(trigger.ability)}: ${t('guide.abilityHook.thorns')}`;
+  }
+}
+
+function procResponseDescription(
+  response: ProcDef['responses'][number],
+  lang: SupportedLanguage,
+  text: TalentLocaleText,
+): string {
+  switch (response.kind) {
+    case 'empowerNext': {
+      const name = abilityList(response.abilities);
+      const window = `(${seconds(response.duration, lang)})`;
+      if (response.aura === 'next_cast_instant') {
+        return `${name}: -${formatPercent(1, lang)} ${text.statLabels.castTime} ${window}`;
+      }
+      const reduction = response.aura === 'next_cast_free' ? 1 : (response.costPct ?? 0);
+      return `${name}: -${formatPercent(reduction, lang)} ${text.statLabels.cost} ${window}`;
+    }
+    case 'cooldownRefund':
+      return `${abilityName(response.ability)}: -${response.seconds === 'reset' ? formatPercent(1, lang) : seconds(response.seconds, lang)} ${text.statLabels.cooldown}`;
+    case 'resource':
+      return `+${formatNumber(response.amount, lang)} ${t('classDetails.labels.resource')}`;
+    case 'heal': {
+      const healValue =
+        response.amountPctMaxHp !== undefined
+          ? `${formatPercent(response.amountPctMaxHp, lang)} ${text.statLabels.maxHpPct}`
+          : formatNumber(response.amount ?? 0, lang);
+      return `+${healValue} ${t('hud.meters.healing')}`;
+    }
+    case 'absorb': {
+      const absorbValue =
+        response.amountPctMaxHp !== undefined
+          ? `${formatPercent(response.amountPctMaxHp, lang)} ${text.statLabels.maxHpPct}`
+          : formatNumber(response.amount ?? 0, lang);
+      return `${t('hudChrome.auraEffect.absorb', { value: absorbValue })} (${seconds(response.duration, lang)})`;
+    }
+    case 'aura': {
+      // Multiplier-shaped kinds (buff_speed 1.4 = +40%) render their delta;
+      // additive kinds render the raw fraction.
+      const multiplierShaped =
+        response.auraKind === 'buff_speed' || response.auraKind === 'buff_haste';
+      const fraction = multiplierShaped ? response.value - 1 : response.value;
+      return `+${formatPercent(fraction, lang)} (${seconds(response.duration, lang)})`;
+    }
+    case 'echo': {
+      const echoValue =
+        response.healPctMaxHp !== undefined
+          ? `${formatPercent(response.healPctMaxHp, lang)} ${text.statLabels.maxHpPct}`
+          : formatNumber(response.heal ?? 0, lang);
+      return `+${echoValue} ${t('hud.meters.healing')} @ <= ${formatPercent(response.belowFrac, lang)} ${text.statLabels.maxHpPct} (${seconds(response.window, lang)})`;
+    }
+  }
+}
+
+function procDescription(proc: ProcDef, lang: SupportedLanguage, text: TalentLocaleText): string {
+  const trigger = procTriggerDescription(proc, lang, text);
+  const responses = proc.responses
+    .map((response) => procResponseDescription(response, lang, text))
+    .join('; ');
+  return `${trigger} -> ${responses}.`;
+}
+
+type DescribedAddedEffect = Extract<
+  AbilityEffect,
+  {
+    type: 'root' | 'aoeRoot' | 'slow' | 'absorb' | 'dot' | 'extendDot' | 'interrupt' | 'consumeDot';
+  }
+>;
+
+function assertDescribedAddedEffect(effect: AbilityEffect): asserts effect is DescribedAddedEffect {
+  if (
+    effect.type !== 'root' &&
+    effect.type !== 'aoeRoot' &&
+    effect.type !== 'slow' &&
+    effect.type !== 'absorb' &&
+    effect.type !== 'dot' &&
+    effect.type !== 'extendDot' &&
+    effect.type !== 'interrupt' &&
+    effect.type !== 'consumeDot'
+  ) {
+    throw new Error(`Unsupported talent rider effect: ${effect.type}`);
+  }
+}
+
+function addedEffectDescription(
+  sourceAbility: string,
+  effect: AbilityEffect,
+  lang: SupportedLanguage,
+  text: TalentLocaleText,
+): string {
+  assertDescribedAddedEffect(effect);
+  const name = abilityName(sourceAbility);
+  switch (effect.type) {
+    case 'root':
+      return `${name}: ${t('hudChrome.auraEffect.root')} (${seconds(effect.duration, lang)}).`;
+    case 'aoeRoot':
+      return `${name}: ${t('hudChrome.auraEffect.root')} (${seconds(effect.duration, lang)}; r=${formatNumber(effect.radius, lang)}).`;
+    case 'slow':
+      return `${name}: ${t('hudChrome.auraEffect.slow', { pct: formatNumber((1 - effect.mult) * 100, lang) })} (${seconds(effect.duration, lang)}).`;
+    case 'absorb':
+      return `${name}: ${t('hudChrome.auraEffect.absorb', { value: formatNumber(effect.amount, lang) })} (${seconds(effect.duration, lang)}).`;
+    case 'dot': {
+      const leech = effect.leechPct
+        ? `; +${formatPercent(effect.leechPct, lang)} ${t('hud.meters.healing')}`
+        : '';
+      return `${name}: ${formatNumber(effect.total, lang)} ${text.statLabels.damage} / ${seconds(effect.duration, lang)} (${seconds(effect.interval, lang)}${leech}).`;
+    }
+    case 'extendDot':
+      return `${name} -> ${abilityName(effect.dot)}: +${seconds(effect.seconds, lang)} (<= +${seconds(effect.maxBonus, lang)}).`;
+    case 'interrupt':
+      return `${name}: ${t('hudChrome.auraEffect.lockout')} (${seconds(effect.lockout, lang)}).`;
+    case 'consumeDot':
+      return `${name} -> ${abilityName(effect.dot)}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s.`;
+  }
+}
+
 // True when a talent title has an explicit per-locale translation override. The
 // coverage test uses this to tell a deliberately-kept cognate (e.g. French
 // "Riposte", Spanish "Vigor") apart from a name that leaks English by accident
 // because the word-substitution dictionary does not cover its vocabulary.
 export function hasTalentTitleOverride(lang: SupportedLanguage, source: string): boolean {
-  return titleOverrides[lang]?.[source] !== undefined;
+  return (
+    RETAINED_ROW_TITLE_OVERRIDES[lang]?.[source] !== undefined ||
+    grantAbilityIdByTitle.has(source) ||
+    titleOverrides[lang]?.[source] !== undefined
+  );
 }
 
 // Public wrapper: localize a content title given its English source name. Resolves an
@@ -7516,7 +9285,13 @@ function effectDescription(
   const perRank = maxRank > 1 ? text.perRank : '';
   const parts: string[] = [];
 
-  if (effect.grant) parts.push(text.grant(abilityName(effect.grant.ability)));
+  if (effect.grant) {
+    parts.push(text.grant(abilityName(effect.grant.ability)));
+    const granted = abilityDescription(effect.grant.ability);
+    if (granted) parts.push(granted);
+    const metadata = grantAbilityMetadata(effect.grant.ability);
+    if (metadata) parts.push(metadata);
+  }
 
   const stats = effect.stats ?? {};
   const PRIMARY_PCT: Partial<Record<StatKey, 'str' | 'agi' | 'int' | 'spi'>> = {
@@ -7527,15 +9302,52 @@ function effectDescription(
   };
   for (const [key, value] of Object.entries(stats) as [StatKey, number][]) {
     if (value === undefined || value === 0) continue;
-    const label = text.statLabels[PRIMARY_PCT[key] ?? (key as keyof typeof text.statLabels)];
+    if (key === 'armorFromStrPct') continue;
+    const label: string | undefined =
+      text.statLabels[PRIMARY_PCT[key] ?? (key as keyof typeof text.statLabels)];
+    // Fail closed: a stat key with no localized label is skipped rather than rendered
+    // as the literal "undefined" (a new sim stat field can land before its label does).
+    if (label === undefined) continue;
     parts.push(text.increase(label, statAmount(key, value, lang), perRank));
   }
 
   const global = effect.global ?? {};
   for (const [key, value] of Object.entries(global) as [GlobalKey, number][]) {
     if (value === undefined || value === 0) continue;
-    if (key === 'critVsRooted') continue;
-    parts.push(text.increase(text.statLabels[key], formatPercent(value, lang), perRank));
+    if (NON_DISPLAY_GLOBALS.has(key)) continue;
+    // Fail closed here too: a global key missing from both NON_DISPLAY_GLOBALS and
+    // statLabels must never surface as "Increases undefined by 70%".
+    const label: string | undefined = text.statLabels[key as DisplayGlobalKey];
+    if (label === undefined) continue;
+    parts.push(text.increase(label, formatPercent(value, lang), perRank));
+  }
+  if (global.critVsRooted) {
+    parts.push(
+      `${text.statLabels.crit}: +${formatPercent(global.critVsRooted, lang)} @ ${t('hudChrome.auraEffect.root')}.`,
+    );
+  }
+  if (global.cheatDeathIcd) {
+    parts.push(
+      `0 HP -> 1 HP (${seconds(global.cheatDeathIcd, lang)} ${text.statLabels.cooldown}).`,
+    );
+  }
+  if (global.fearBreakPct) {
+    parts.push(`${formatPercent(global.fearBreakPct, lang)} ${text.statLabels.maxHpPct} -> 0 s.`);
+  }
+  if (global.onKillSpeedPct) {
+    parts.push(
+      `${t('hudChrome.auraEffect.speed', { pct: formatNumber(global.onKillSpeedPct * 100, lang) })} (${seconds(global.onKillSpeedDuration ?? 0, lang)}).`,
+    );
+  }
+  if (global.bloodbathPct) {
+    parts.push(
+      `${text.increase(text.statLabels.damage, formatPercent(global.bloodbathPct, lang), '')} <= ${formatPercent(global.bloodbathMaxPct ?? global.bloodbathPct, lang)} (${seconds(global.bloodbathDuration ?? 0, lang)}).`,
+    );
+  }
+  if (global.cdrPerRage) {
+    parts.push(
+      `-${seconds(global.cdrPerRage, lang)} ${text.statLabels.cooldown} / 1 ${t('classDetails.labels.resource')}.`,
+    );
   }
 
   for (const mod of effect.ability ?? []) {
@@ -7582,7 +9394,26 @@ function effectDescription(
       );
     // buffPct strengthens the named buff itself (e.g. "Increases Devotion Aura by 20%").
     if (mod.buffPct) parts.push(text.increase(name, formatPercent(mod.buffPct, lang), perRank));
+    if (mod.dmgPctVsDotted) {
+      parts.push(
+        `${text.increase(`${name} ${text.statLabels.damage}`, formatPercent(mod.dmgPctVsDotted, lang), perRank)} @ ${text.statLabels.dotDmgPct}.`,
+      );
+    }
+    if (mod.castWhileMoving) {
+      parts.push(
+        `${name}: ${text.statLabels.castTime} @ ${t('hud.keybinds.categories.movement')}.`,
+      );
+    }
+    if (mod.damagePushbackImmune) {
+      parts.push(`${name}: ${text.statLabels.castTime} @ 0.`);
+    }
+    if (mod.bonusCharges) parts.push(`${name}: +${formatNumber(mod.bonusCharges, lang)}x.`);
+    for (const addedEffect of mod.addEffects ?? []) {
+      parts.push(addedEffectDescription(mod.ability, addedEffect, lang, text));
+    }
   }
+
+  if (effect.proc) parts.push(procDescription(effect.proc, lang, text));
 
   return parts.length > 0 ? parts.join(' ') : text.noEffect;
 }
@@ -7595,42 +9426,65 @@ export function tTalent(request: TalentTranslationRequest): string {
   const lang = getLanguage();
   // English is the authored source of truth: the hand-written `description` strings carry
   // the real numbers (kept honest against the effect by tests/talent_tooltip_accuracy.ts).
-  // The other 12 locales GENERATE from the effect data (effectDescription), so they cannot
-  // drift and need no per-string translation.
+  // Release locales generate ordinary effects from data. The narrow retained-description
+  // table handles the four Warrior globals whose stance/resource prose cannot be expressed by
+  // the generic renderer without losing behavior.
   if (lang === 'en' || lang === 'en_CA') {
     if (request.kind === 'talentMastery') {
       return request.field === 'name'
         ? request.spec.mastery.name
         : request.spec.mastery.description;
     }
-    if (request.kind === 'talentSpec') return request.spec[request.field];
-    if (request.kind === 'talentChoice') return request.choice[request.field];
-    return request.node[request.field];
+    if (request.kind === 'talentSpec') {
+      // The description names the signature spell so the spec card tooltip always
+      // tells the player which spell picking this spec grants (parity with the
+      // localized specDescription arms, pinned by talent_tooltip_accuracy).
+      return request.field === 'name'
+        ? request.spec.name
+        : `${request.spec.description} Signature: ${abilityName(request.spec.signature)}.`;
+    }
+    if (request.kind === 'talentChoice') {
+      return request.field === 'name'
+        ? request.choice.name
+        : authoredChoiceDescription(request.choice);
+    }
+    const exhaustive: never = request;
+    return exhaustive;
   }
 
   if (request.kind === 'talentMastery') {
-    return request.field === 'name'
-      ? translateTitle(request.spec.mastery.name, lang)
-      : effectDescription(request.spec.mastery.effect, 1, lang);
+    if (request.field === 'name') return translateTitle(request.spec.mastery.name, lang);
+    const authored = localeText[lang].masteryDescriptions?.[request.spec.id];
+    if (authored !== undefined) return authored;
+    const generated = effectDescription(request.spec.mastery.effect, 1, lang);
+    // Fail closed like the talentChoice arm: when the effect yields nothing
+    // generatable (runtime-applied or unmapped fields), the authored English
+    // description beats the generic no-effect blurb.
+    return generated === localeText[lang].noEffect ? request.spec.mastery.description : generated;
   }
   if (request.kind === 'talentSpec') {
-    return request.field === 'name'
-      ? translateTitle(request.spec.name, lang)
-      : localeText[lang].specDescription(
-          className(request.spec.class),
-          localeText[lang].roleLabels[request.spec.role],
-          abilityName(request.spec.signature),
-        );
+    if (request.field === 'name') return translateTitle(request.spec.name, lang);
+    return (
+      localeText[lang].specDescriptions?.[request.spec.id] ??
+      localeText[lang].specDescription(
+        className(request.spec.class),
+        localeText[lang].roleLabels[request.spec.role],
+        abilityName(request.spec.signature),
+      )
+    );
   }
   if (request.kind === 'talentChoice') {
-    return request.field === 'name'
-      ? translateTitle(request.choice.name, lang)
-      : effectDescription(request.choice.effect, 1, lang);
+    if (request.field === 'name') return translateTitle(request.choice.name, lang);
+    const retainedDescriptions = RETAINED_ROW_DESCRIPTION_OVERRIDES[lang] as
+      | Readonly<Record<string, string>>
+      | undefined;
+    const retainedDescription = retainedDescriptions?.[request.choice.id];
+    if (retainedDescription !== undefined) return retainedDescription;
+    const generated = effectDescription(request.choice.effect, 1, lang);
+    return generated === localeText[lang].noEffect ? request.choice.description : generated;
   }
-  if (request.field === 'name') return translateTitle(request.node.name, lang);
-  if (request.node.kind === 'choice')
-    return localeText[lang].chooseOne(translateTitle(request.node.name, lang));
-  return effectDescription(request.node.effect, request.node.maxRank, lang);
+  const exhaustive: never = request;
+  return exhaustive;
 }
 
 export function talentTranslationManifest(): TalentTranslationManifestEntry[] {
@@ -7668,37 +9522,19 @@ export function talentTranslationManifest(): TalentTranslationManifestEntry[] {
         source: spec.mastery.description,
       });
     }
-    for (const node of ct.nodes) {
-      entries.push({
-        kind: 'talentNode',
-        id: node.id,
-        classId: ct.class,
-        specId: node.specId,
-        field: 'name',
-        source: node.name,
-      });
-      entries.push({
-        kind: 'talentNode',
-        id: node.id,
-        classId: ct.class,
-        specId: node.specId,
-        field: 'description',
-        source: node.description,
-      });
-      for (const choice of node.choices ?? []) {
+    for (const row of rowTreeFor(ct.class) ?? []) {
+      for (const choice of row.options) {
         entries.push({
           kind: 'talentChoice',
-          id: `${node.id}.${choice.id}`,
+          id: `${row.level}.${choice.id}`,
           classId: ct.class,
-          specId: node.specId,
           field: 'name',
           source: choice.name,
         });
         entries.push({
           kind: 'talentChoice',
-          id: `${node.id}.${choice.id}`,
+          id: `${row.level}.${choice.id}`,
           classId: ct.class,
-          specId: node.specId,
           field: 'description',
           source: choice.description,
         });
@@ -7718,13 +9554,10 @@ export function renderTalentManifestEntry(entry: TalentTranslationManifestEntry)
     if (!spec) return entry.source;
     return tTalent({ kind: entry.kind, spec, field: entry.field });
   }
-  const [nodeId, choiceId] = entry.id.split('.');
-  const node = ct.nodes.find((candidate) => candidate.id === nodeId);
-  if (!node) return entry.source;
-  if (entry.kind === 'talentChoice') {
-    const choice = node.choices?.find((candidate) => candidate.id === choiceId);
-    if (!choice) return entry.source;
-    return tTalent({ kind: 'talentChoice', choice, field: entry.field });
-  }
-  return tTalent({ kind: 'talentNode', node, field: entry.field });
+  const [, choiceId] = entry.id.split('.');
+  const choice = (rowTreeFor(entry.classId) ?? [])
+    .flatMap((row) => row.options)
+    .find((candidate) => candidate.id === choiceId);
+  if (!choice) return entry.source;
+  return tTalent({ kind: 'talentChoice', choice, field: entry.field });
 }

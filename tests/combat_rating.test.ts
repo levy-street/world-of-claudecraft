@@ -182,8 +182,10 @@ describe('combat-rating tier ladder', () => {
       expect(ratingCount(item), item.id).toBe(0);
     }
 
+    // The 8 Nythraxis set pieces plus the 4 offhand-slot / two-hander epics
+    // (bonewrought_greatsword/bulwark, direfang_greatblade, wraithfire_orb).
     const ilvl29 = allGear.filter((item) => itemLevel(item) === 29);
-    expect(ilvl29).toHaveLength(8);
+    expect(ilvl29).toHaveLength(12);
     for (const item of ilvl29) expect(ratingValues(item), item.id).toEqual([20]);
 
     const directHeroicRaidWeapons = new Set([
@@ -198,7 +200,9 @@ describe('combat-rating tier ladder', () => {
         (ilvl === 37 && item.heroicOf !== undefined)
       );
     });
-    expect(heroicRaidGear).toHaveLength(13);
+    // 13 pre-existing pieces plus the 4 generated heroic raid variants of the
+    // new normal-raid epics (greatsword, greatblade, bulwark, orb).
+    expect(heroicRaidGear).toHaveLength(17);
     for (const item of heroicRaidGear) {
       const ilvl = itemLevel(item);
       const expectedPrimary = ilvl === 37 ? 70 : item.weapon ? 65 : 55;

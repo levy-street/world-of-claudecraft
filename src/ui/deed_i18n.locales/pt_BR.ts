@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_card_duel_first_win: {
+    name: 'Regras da Casa',
+    desc: 'Vença um Duelo de Cartas no Mestre das Cartas.',
+  },
   prog_first_steps: {
     name: 'Primeiros Passos',
     desc: 'Alcance o nível 2 e dê o primeiro passo em uma longa estrada.',
@@ -35,8 +39,8 @@ export const table: DeedLocaleTable = {
     desc: 'Gaste um ponto de talento em um talento da fileira final.',
   },
   prog_full_build: {
-    name: 'O Onze Titular',
-    desc: 'Gaste todos os onze pontos de talento em uma única build.',
+    name: 'O Seis Completo',
+    desc: 'Selecione uma opção em cada uma das seis fileiras de talentos numa única configuração.',
   },
   prog_veteran: {
     name: 'Veterano',

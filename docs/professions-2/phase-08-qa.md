@@ -8,7 +8,15 @@ hands-vs-stations gate, and the placement-safety proof.
 
 - The nine hub recipes' migration to typed stations, with special attention to the three
   `CASTER_HUB_RECIPES`: crafting them at their station must behave exactly as it did under
-  `requiresHubStation` (no behavior regression in gate order, level rule, or proximity radius).
+  `requiresHubStation` in gate order and proximity radius. The LEVEL rule is the one
+  DELIBERATE change (the 2026-07-17 placement ruling): `CRAFTING_HUB_MIN_LEVEL` is retired
+  and no station gate reads player level; verify the retirement is complete AND that no
+  recipe strands for any character in the transition (do not report the level-gate removal
+  as a regression).
+- The multi-zone placement (2026-07-17 ruling): the placement-safety derivation runs PER
+  ZONE (the Fenbridge tannery checks zone 2 camps, the Highwatch apothecary zone 3 camps),
+  and the master-to-zone assignment pin (four archetype anchors in zone 1; tannery
+  Fenbridge; apothecary Highwatch) matches the state.md default as literals.
 - The deny reason localization: the sim emits a stable id, the `sim_i18n` matcher resolves it to
   a real English `t()` key, and the S3 guard (`tests/localization_fixes.test.ts`) actually covers
   the new emit site; no raw id or English concat ever reaches the player.

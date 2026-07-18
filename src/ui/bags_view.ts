@@ -218,7 +218,12 @@ export function bagTooltipHintKey(item: BagItemInfo, mode: BagMode): BagTooltipH
   if (mode.bankDeposit)
     return item.kind === 'quest' ? 'hudChrome.bank.cannotDeposit' : 'hudChrome.bank.depositHint';
   if (item.kind === 'quest') return 'itemUi.tooltip.clickDestroy';
-  if (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'bag')
+  if (
+    item.kind === 'weapon' ||
+    item.kind === 'armor' ||
+    item.kind === 'held_offhand' ||
+    item.kind === 'bag'
+  )
     return 'itemUi.tooltip.clickEquip';
   if (item.kind === 'food' || item.kind === 'drink') return 'itemUi.tooltip.clickConsume';
   if (item.kind === 'potion') return 'itemUi.tooltip.clickUseInstant';

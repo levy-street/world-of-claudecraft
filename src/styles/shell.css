@@ -659,6 +659,34 @@
     font-size: 11px;
     white-space: nowrap;
   }
+  .wallet-picker-disconnect {
+    justify-content: center;
+    width: 100%;
+    margin-top: 12px;
+  }
+  .wallet-picker-disconnect:hover,
+  .wallet-picker-disconnect:focus-visible {
+    color: var(--color-text-error);
+    border-color: var(--color-text-error);
+  }
+  .wallet-app-launch-button {
+    display: flex;
+    justify-content: center;
+    min-height: 48px;
+    font-weight: 700;
+    text-align: center;
+  }
+  .wallet-app-launch-actions {
+    display: grid;
+    gap: 8px;
+  }
+  .wallet-app-launch-status {
+    min-height: 18px;
+    margin-top: 8px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    text-align: center;
+  }
 
   @media (max-width: 720px) {
     .cs-wallet {
@@ -1654,6 +1682,14 @@
   .news-body::-webkit-scrollbar-thumb {
     background: var(--color-border-default);
     border-radius: 4px;
+  }
+  /* Welcome Screen news column: .ws-news already scrolls as a whole
+     (components.css), so the per-article 460px cap would nest a second
+     scrollbar inside it. */
+  .ws-news .news-body {
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
   }
   .news-body > :first-child {
     margin-top: 0;
@@ -3804,6 +3840,30 @@
     box-shadow: 0 0 10px rgba(255, 209, 0, 0.2);
     outline: none;
   }
+  /* The welcome screen's Enter World CTA keeps its gilded design mock. Its
+     .ws-continue rules live in the earlier components layer, so without this
+     re-assertion the generic dark .btn-primary arms above win the cascade and
+     the autofocused CTA renders as the plain dark button wearing the loud
+     offset focus ring (the reported green-ringed button). */
+  .ws-continue,
+  .ws-continue:hover,
+  .ws-continue:focus-visible {
+    color: #1a1608;
+    background: linear-gradient(180deg, #ffe066, var(--gold) 45%, #cfa400);
+    border: 1px solid #8a6f33;
+    box-shadow:
+      0 4px 22px rgba(255, 209, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+  .ws-continue:hover:not(:disabled) {
+    background: linear-gradient(180deg, #fff0a0, #ffdd33 45%, #d9ae00);
+  }
+  .ws-continue:disabled {
+    background: linear-gradient(180deg, #2a2a38, #1b1b26);
+    color: var(--color-text-muted);
+    border-color: var(--color-border-default);
+    box-shadow: none;
+  }
 
   .btn-secondary {
     background: linear-gradient(180deg, #1b1b26 0%, #0d0d14 100%);
@@ -5686,6 +5746,11 @@
   .panel-title.char-title-portrait .char-title-text {
     flex: 1 1 auto;
     min-width: 0;
+  }
+  .panel-title.char-title-portrait .char-honor-balance {
+    display: block;
+    color: var(--gold);
+    margin-top: var(--spacing-xs);
   }
   .panel-title.char-title-portrait .portrait-chip {
     flex: 0 0 auto;

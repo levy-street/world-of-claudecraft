@@ -257,6 +257,11 @@ function buildCharacterList(
       forceRename: c.force_rename,
       lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
       playtimeSeconds: Number(c.playtime_seconds ?? 0),
+      // Keep the migrated RouteDef byte-identical with the retained legacy arm:
+      // character select renders the same body and held items as the live world.
+      skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
+      mainhandItemId: c.state?.equipment?.mainhand ?? null,
+      offhandItemId: c.state?.equipment?.offhand ?? null,
     })),
   };
 }

@@ -46,6 +46,18 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
     player: { name: 'Ari', pos: { x: 0, y: 0, z: 0 } },
     questLog: new Map(),
     partyInfo: null,
+    craftingIdentity: {
+      version: 1,
+      synced: true,
+      craftSkills: {},
+      activeArchetype: null,
+      pairedMajor: null,
+      hobbyCraft: null,
+      attunedPairs: [],
+      switchCount: 0,
+      amendsProgress: 0,
+      amendsRequired: 5,
+    },
     questState: vi.fn(() => questState),
     targetEntity,
     interact,
@@ -208,6 +220,52 @@ describe('QuestDialogController', () => {
 
     expect(ready.turnInQuest).toHaveBeenCalledWith('q_wolves');
     expect(ready.reportTelemetry).toHaveBeenCalledWith('quest_turnin', { timeMs: 0 });
+  });
+
+  it('previews and dispatches the selected profession attunement target', () => {
+    const smith = npc(32, 'smith_haldren');
+    smith.questIds = ['q_archetype_acceptance'];
+    const test = harness(smith, 'available');
+    test.controller.open(smith.id);
+    test.element.querySelector<HTMLButtonElement>('[data-quest="q_archetype_acceptance"]')?.click();
+
+    const select = test.element.querySelector<HTMLSelectElement>('[data-profession-selection]');
+    const preview = test.element.querySelector<HTMLElement>('[data-profession-preview]');
+    expect(select?.options).toHaveLength(10);
+    expect(preview?.textContent).toBeTruthy();
+
+    if (!select) throw new Error('profession selector missing');
+    // The option labels lead with the pair archetype name and keep both craft
+    // names visible, e.g. "Bladewright (Jewelcrafting + Weaponcrafting)".
+    const option = [...select.options].find((o) => o.value === 'jewelcrafting+weaponcrafting');
+    expect(option?.textContent).toBe('Bladewright (Jewelcrafting + Weaponcrafting)');
+    select.value = 'jewelcrafting+weaponcrafting';
+    select.dispatchEvent(new Event('change'));
+    // The preview names the pair title and both major crafts.
+    expect(preview?.textContent).toContain('Bladewright');
+    expect(preview?.textContent).toContain('Jewelcrafting');
+    expect(preview?.textContent).toContain('Weaponcrafting');
+
+    test.element.querySelector<HTMLButtonElement>('.btn')?.click();
+    expect(test.acceptQuest).toHaveBeenCalledWith(
+      'q_archetype_acceptance',
+      'jewelcrafting+weaponcrafting',
+    );
+  });
+
+  it('keeps the accept action disabled when a profession quest has no target', () => {
+    const smith = npc(33, 'smith_haldren');
+    smith.questIds = ['q_prof_make_amends'];
+    const test = harness(smith, 'available');
+    test.controller.open(smith.id);
+    test.element.querySelector<HTMLButtonElement>('[data-quest="q_prof_make_amends"]')?.click();
+
+    const select = test.element.querySelector<HTMLSelectElement>('[data-profession-selection]');
+    const accept = test.element.querySelector<HTMLButtonElement>('.btn');
+    expect(select?.options).toHaveLength(0);
+    expect(accept?.disabled).toBe(true);
+    accept?.click();
+    expect(test.acceptQuest).not.toHaveBeenCalled();
   });
 
   it('closes gossip before opening every non-quest destination', () => {

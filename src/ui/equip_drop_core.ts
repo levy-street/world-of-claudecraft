@@ -32,7 +32,8 @@ export function paperdollDropAction(
 ): PaperdollDropAction {
   // Only real gear equips; a consumable or material declares no slot at all, and
   // a bag equips into its own bar socket, never the paperdoll.
-  if (item.kind !== 'weapon' && item.kind !== 'armor') return 'blockedSlot';
+  if (item.kind !== 'weapon' && item.kind !== 'armor' && item.kind !== 'held_offhand')
+    return 'blockedSlot';
   if (!slotAcceptsItem(item, slot)) return 'blockedSlot';
   if (!canEquipItem(cls, item)) return 'blockedClass';
   if (!meetsLevelRequirement(level, item)) return 'blockedLevel';
@@ -50,5 +51,7 @@ export function dropRequiredLevel(item: ItemDef): number {
  *  so a stack of cloth never advertises an equip it cannot do. Slot legality per
  *  socket is still paperdollDropAction's call. */
 export function isPaperdollDraggable(item: ItemDef): boolean {
-  return (item.kind === 'weapon' || item.kind === 'armor') && !!item.slot;
+  return (
+    (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'held_offhand') && !!item.slot
+  );
 }

@@ -263,13 +263,28 @@ For off-box safety, sync the directory to S3 occasionally:
     environment (dev vs prod). If the origin's nginx (in the `ansible-scripts` repo)
     sets a Content-Security-Policy, it must allow `script-src`/`frame-src
     https://challenges.cloudflare.com` or the widget won't load.
-- **Wallet linking**: the wallet UI uses injected Solana browser wallets and no
-  third-party wallet-connect project id. $WOC balance reads are server-side
-  only: set `SOLANA_RPC_URL` to a production Solana RPC endpoint and leave it
-  unprefixed so API keys are not bundled into the client. `WOC_MINT` defaults to
-  the canonical token mint and should only be overridden if that mint changes.
-  Set `PUBLIC_ORIGIN` in single-realm production so shared player-card pages
-  emit stable absolute Open Graph URLs.
+- **Wallet connection and linking**: injected Wallet Standard extensions and the
+  direct Phantom/Solflare iOS and Android web handoffs work without configuration.
+  To offer desktop website QR codes and handoff to Backpack, Jupiter, and other
+  external apps, create a Reown project at
+  `https://cloud.reown.com`, allow the production/staging/local website origins,
+  and set the public `VITE_REOWN_PROJECT_ID` while building the client. Connecting
+  authorizes the current browser session to ask the wallet app for signatures;
+  linking is the separate one-time signature that saves the public address to a
+  WoC account. The website Electron distribution instead opens the same deployed
+  origin in the normal browser, where an installed wallet extension authorizes a
+  short-lived link or purchase operation before returning through the app's custom
+  URL. This browser handoff needs no additional environment variable. The app never
+  receives a recovery phrase or private key. Wallet UI is enabled on website
+  desktop/mobile and the website Electron distribution,
+  and disabled on Capacitor iOS/Android and Steam. Reown AppKit 1.8 uses a
+  community license with commercial-use thresholds, so confirm the current terms
+  before production deployment. $WOC balance reads remain server-side only: set
+  `SOLANA_RPC_URL` to a production Solana RPC endpoint and leave it unprefixed so
+  API keys are not bundled into the client. `WOC_MINT` defaults to the canonical
+  token mint and should only be overridden if that mint changes. Set
+  `PUBLIC_ORIGIN` in single-realm production so shared player-card pages emit
+  stable absolute Open Graph URLs.
 - **Steam link + achievement mirror**: players can link a Steam account so
   their Book of Deeds achievements mirror to Steam (`server/steam/`). It is
   **off until configured**: with `STEAM_ENABLED` unset, every `/api/steam`

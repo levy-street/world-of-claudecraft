@@ -29,6 +29,7 @@ import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
 import type { Entity } from '../types';
 import { runWeaponProcs } from './equip_procs';
+import { onSpellCrit } from './talent_procs';
 
 // Combined incoming-healing multiplier from Mortal Wound debuffs (classic
 // Mortal Strike): each reduces healing the target receives; multiple stack
@@ -90,9 +91,22 @@ export function applyHeal(
   target: Entity,
   amount: number,
   ability: string,
-): void {
-  if (target.dead) return;
-  const crit = ctx.rng.chance(ctx.spellCrit(source));
+  abilityId: string | null = null,
+  // Some heals can never crit (e.g. Chronomancy Rewind, PRD "no puede hacer
+  // critico"). Passing false SKIPS the crit roll entirely, so it draws NO rng and
+  // keeps the shared stream in the same order as if the heal had not fired at all.
+  canCrit = true,
+  // Derived copies such as Power Echo must not behave like a second healing
+  // action for equipped-weapon procs. Keep this separate from canCrit: callers
+  // can suppress either source of rng independently without bypassing normal
+  // healing, threat, absorbs, or emitted combat text.
+  canTriggerWeaponProcs = true,
+  // Returns the effective heal applied (post-crit, post-mult, post-overheal-clamp,
+  // the same number emitted). Callers that ignore it are unaffected; Power Echo
+  // reads it to repeat a direct heal at a fraction of the resolved amount.
+): number {
+  if (target.dead) return 0;
+  const crit = canCrit ? ctx.rng.chance(ctx.spellCrit(source)) : false;
   let healed = Math.round(
     amount *
       (crit ? 1.5 + source.critDmgHealBonus : 1) *
@@ -111,9 +125,12 @@ export function applyHeal(
     ability,
   });
   healingThreat(ctx, source, target, healed);
+  // Talent procs listening for critical heals (deterministic, no rng draw).
+  if (crit && source.kind === 'player') onSpellCrit(ctx, source, abilityId, target);
   // Legendary on-heal weapon procs (e.g. Deathless Heartwood's Lifebloom). No-op
   // (no rng draw) unless the healer wields a proc weapon with a heal proc.
-  runWeaponProcs(ctx, source, target, 'heal');
+  if (canTriggerWeaponProcs) runWeaponProcs(ctx, source, target, 'heal');
+  return healed;
 }
 
 // Classic healing threat: 0.5 per point of EFFECTIVE healing (overheal is

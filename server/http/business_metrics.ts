@@ -1,15 +1,18 @@
-// Cached player and business gauges. The refresh reads only compact indexed
-// lifecycle facts through playerBusinessSnapshot(); Prometheus scrapes never
-// query Postgres, and the fixed period/segment/day labels bound cardinality.
+// Cached player and business gauges. Separate engagement and funnel refreshes
+// read compact indexed lifecycle facts; Prometheus scrapes never query Postgres,
+// and the fixed period/segment/day labels bound cardinality.
 
-import { Gauge, type Registry } from 'prom-client';
+import { Counter, Gauge, type Registry } from 'prom-client';
 import { pool } from '../db';
 import {
   DAY_ONE_FUNNEL_STAGES,
   FIRST_DAY_PLAYTIME_BUCKETS,
   type PlayerBusinessDay,
   type PlayerBusinessSnapshot,
+  type PlayerFunnelDay,
+  type PlayerFunnelSnapshot,
   playerBusinessSnapshot,
+  playerFunnelSnapshot,
 } from '../player_metrics_db';
 import { REALM } from '../realm';
 import { PeriodicCollector } from './periodic_collector';
@@ -27,18 +30,37 @@ export const WOC_PLAYER_FIRST_DAY_PLAYTIME_SECONDS = 'woc_player_first_day_playt
 export const WOC_PLAYER_FIRST_DAY_SESSIONS = 'woc_player_first_day_sessions';
 export const WOC_PLAYER_FIRST_DAY_PLAYTIME_ACCOUNTS = 'woc_player_first_day_playtime_accounts';
 export const WOC_PLAYER_FUNNEL_ACCOUNTS = 'woc_player_funnel_accounts';
+export const WOC_METRICS_COLLECTOR_REFRESH_FAILURES =
+  'woc_metrics_collector_refresh_failures_total';
+export const WOC_METRICS_COLLECTOR_SNAPSHOT_AGE_SECONDS =
+  'woc_metrics_collector_snapshot_age_seconds';
 
-/** Business data changes slowly; one bounded database sample every 15 minutes is enough. */
+/** Business data changes slowly; each bounded snapshot refreshes every 15 minutes. */
 export const BUSINESS_METRICS_REFRESH_MS = 15 * 60_000;
+/** Keep the two bounded snapshots from competing for a pooled client in one process. */
+export const FUNNEL_METRICS_INITIAL_DELAY_MS = 5_000;
 
 const PERIODS = ['today', 'yesterday'] as const;
 const PLAYTIME_SEGMENTS = ['all', 'new', 'level_20'] as const;
 const FIRST_SESSION_LEVELS = [2, 5] as const;
 const RETENTION_DAYS = [1, 7, 30] as const;
 
-export type BusinessMetricsCollector = PeriodicCollector<PlayerBusinessSnapshot>;
+export interface BusinessMetricQueries {
+  business: () => Promise<PlayerBusinessSnapshot>;
+  funnel: () => Promise<PlayerFunnelSnapshot>;
+}
+
+export interface BusinessMetricsCollector {
+  refresh(): Promise<void>;
+  start(): void;
+  stop(): Promise<void>;
+}
 
 function dayFor(snapshot: PlayerBusinessSnapshot, period: string): PlayerBusinessDay | undefined {
+  return snapshot.days.find((day) => day.period === period);
+}
+
+function funnelDayFor(snapshot: PlayerFunnelSnapshot, period: string): PlayerFunnelDay | undefined {
   return snapshot.days.find((day) => day.period === period);
 }
 
@@ -52,10 +74,47 @@ function setIfPresent(
 
 export function registerBusinessMetrics(
   registry: Registry,
-  query: () => Promise<PlayerBusinessSnapshot> = () => playerBusinessSnapshot(pool, REALM),
+  queries: BusinessMetricQueries = {
+    business: () => playerBusinessSnapshot(pool, REALM),
+    funnel: () => playerFunnelSnapshot(pool, REALM),
+  },
   intervalMs: number = BUSINESS_METRICS_REFRESH_MS,
+  funnelInitialDelayMs: number = FUNNEL_METRICS_INITIAL_DELAY_MS,
 ): BusinessMetricsCollector {
-  const collector = new PeriodicCollector(query, intervalMs);
+  const refreshFailures = new Counter({
+    name: WOC_METRICS_COLLECTOR_REFRESH_FAILURES,
+    help: 'Failed refresh attempts for a cached database-backed metrics collector.',
+    labelNames: ['collector'],
+    registers: [registry],
+  });
+  const onError = (collector: 'engagement' | 'funnel') => (err: unknown) => {
+    refreshFailures.inc({ collector });
+    console.error(`metrics collector refresh failed (${collector}):`, err);
+  };
+  const engagementCollector = new PeriodicCollector(
+    queries.business,
+    intervalMs,
+    onError('engagement'),
+  );
+  const funnelCollector = new PeriodicCollector(queries.funnel, intervalMs, onError('funnel'));
+
+  new Gauge({
+    name: WOC_METRICS_COLLECTOR_SNAPSHOT_AGE_SECONDS,
+    help: 'Age in seconds of the last successful cached database-backed metrics snapshot.',
+    labelNames: ['collector'],
+    registers: [registry],
+    collect() {
+      for (const [name, collector] of [
+        ['engagement', engagementCollector],
+        ['funnel', funnelCollector],
+      ] as const) {
+        const refreshedAt = collector.lastSuccessfulRefreshAtMs();
+        if (refreshedAt !== null) {
+          this.set({ collector: name }, Math.max(0, (Date.now() - refreshedAt) / 1_000));
+        }
+      }
+    },
+  });
 
   new Gauge({
     name: WOC_PLAYER_ACCOUNTS_CREATED,
@@ -64,10 +123,10 @@ export function registerBusinessMetrics(
     registers: [registry],
     collect() {
       this.reset();
-      const snapshot = collector.current();
+      const snapshot = funnelCollector.current();
       if (!snapshot) return;
       for (const period of PERIODS) {
-        const day = dayFor(snapshot, period);
+        const day = funnelDayFor(snapshot, period);
         if (day) this.set({ period }, day.accountsCreated);
       }
     },
@@ -80,7 +139,7 @@ export function registerBusinessMetrics(
     registers: [registry],
     collect() {
       this.reset();
-      const snapshot = collector.current();
+      const snapshot = engagementCollector.current();
       if (!snapshot) return;
       for (const period of PERIODS) {
         const day = dayFor(snapshot, period);
@@ -96,7 +155,7 @@ export function registerBusinessMetrics(
     registers: [registry],
     collect() {
       this.reset();
-      const snapshot = collector.current();
+      const snapshot = engagementCollector.current();
       if (!snapshot) return;
       for (const period of PERIODS) {
         const day = dayFor(snapshot, period);
@@ -112,10 +171,10 @@ export function registerBusinessMetrics(
     registers: [registry],
     collect() {
       this.reset();
-      const snapshot = collector.current();
+      const snapshot = funnelCollector.current();
       if (!snapshot) return;
       for (const period of PERIODS) {
-        const day = dayFor(snapshot, period);
+        const day = funnelDayFor(snapshot, period);
         if (day) setIfPresent(this, { period }, day.firstWorldEntryRate);
       }
     },
@@ -128,7 +187,7 @@ export function registerBusinessMetrics(
     registers: [registry],
     collect() {
       this.reset();
-      const snapshot = collector.current();
+      const snapshot = engagementCollector.current();
       if (!snapshot) return;
       for (const period of PERIODS) {
         const day = dayFor(snapshot, period);
@@ -146,7 +205,7 @@ export function registerBusinessMetrics(
     registers: [registry],
     collect() {
       this.reset();
-      const snapshot = collector.current();
+      const snapshot = engagementCollector.current();
       if (!snapshot) return;
       for (const period of PERIODS) {
         const day = dayFor(snapshot, period);
@@ -170,7 +229,7 @@ export function registerBusinessMetrics(
     registers: [registry],
     collect() {
       this.reset();
-      const snapshot = collector.current();
+      const snapshot = engagementCollector.current();
       if (!snapshot) return;
       for (const period of PERIODS) {
         const day = dayFor(snapshot, period);
@@ -186,7 +245,7 @@ export function registerBusinessMetrics(
     registers: [registry],
     collect() {
       this.reset();
-      const snapshot = collector.current();
+      const snapshot = engagementCollector.current();
       if (!snapshot) return;
       for (const period of PERIODS) {
         const day = dayFor(snapshot, period);
@@ -209,7 +268,7 @@ export function registerBusinessMetrics(
     registers: [registry],
     collect() {
       this.reset();
-      const snapshot = collector.current();
+      const snapshot = engagementCollector.current();
       if (!snapshot) return;
       for (const period of PERIODS) {
         for (const day of RETENTION_DAYS) {
@@ -229,7 +288,7 @@ export function registerBusinessMetrics(
     registers: [registry],
     collect() {
       this.reset();
-      const snapshot = collector.current();
+      const snapshot = engagementCollector.current();
       if (!snapshot) return;
       for (const period of PERIODS) {
         const day = dayFor(snapshot, period);
@@ -247,7 +306,7 @@ export function registerBusinessMetrics(
     registers: [registry],
     collect() {
       this.reset();
-      const snapshot = collector.current();
+      const snapshot = engagementCollector.current();
       if (!snapshot) return;
       for (const period of PERIODS) {
         const day = dayFor(snapshot, period);
@@ -263,7 +322,7 @@ export function registerBusinessMetrics(
     registers: [registry],
     collect() {
       this.reset();
-      const snapshot = collector.current();
+      const snapshot = engagementCollector.current();
       if (!snapshot) return;
       for (const period of PERIODS) {
         const day = dayFor(snapshot, period);
@@ -282,10 +341,10 @@ export function registerBusinessMetrics(
     registers: [registry],
     collect() {
       this.reset();
-      const snapshot = collector.current();
+      const snapshot = funnelCollector.current();
       if (!snapshot) return;
       for (const period of PERIODS) {
-        const day = dayFor(snapshot, period);
+        const day = funnelDayFor(snapshot, period);
         if (!day) continue;
         for (const stage of DAY_ONE_FUNNEL_STAGES) {
           this.set({ period, stage }, day.dayOneFunnelAccounts[stage]);
@@ -294,5 +353,20 @@ export function registerBusinessMetrics(
     },
   });
 
-  return collector;
+  return {
+    async refresh() {
+      await engagementCollector.refresh();
+      await funnelCollector.refresh();
+    },
+    start() {
+      engagementCollector.start();
+      funnelCollector.start(funnelInitialDelayMs);
+    },
+    async stop() {
+      const engagementStop = engagementCollector.stop();
+      const funnelStop = funnelCollector.stop();
+      await engagementStop;
+      await funnelStop;
+    },
+  };
 }

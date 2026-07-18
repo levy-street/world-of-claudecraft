@@ -464,6 +464,26 @@ describe('hotbar slot sync', () => {
       { type: 'ability', id: 'blink' },
     ]);
   });
+
+  it('sweeps a passive left on the bar by an older build, and never re-places it', () => {
+    const slots = [
+      { type: 'ability' as const, id: 'fireball' },
+      { type: 'ability' as const, id: 'measured_fury' }, // passive saved by an older build
+      { type: 'ability' as const, id: 'blink' },
+    ];
+    const known = ['fireball', 'measured_fury', 'blink'];
+    const isPassive = (id: string) => id === 'measured_fury';
+
+    // measured_fury is known but passive: its slot is cleared, and it is NOT
+    // re-added even if the auto-place set (defensively) contains it.
+    const synced = syncHotbarActions(slots, known, new Set(['measured_fury']), isPassive);
+    expect(synced.actions).toEqual([
+      { type: 'ability', id: 'fireball' },
+      null,
+      { type: 'ability', id: 'blink' },
+    ]);
+    expect(synced.changed).toBe(true);
+  });
 });
 
 describe('applying a saved talent loadout bar', () => {
@@ -529,6 +549,16 @@ describe('loadoutKnownAbilityIds', () => {
   it('still includes base class-kit abilities regardless of spec', () => {
     const known = loadoutKnownAbilityIds('shaman', { ...emptyAllocation(), spec: 'elemental' }, 20);
     expect(known.has('lightning_bolt')).toBe(true);
+  });
+
+  it('excludes passive traits from saved loadout action-bar eligibility', () => {
+    const armsKnown = loadoutKnownAbilityIds('warrior', { ...emptyAllocation(), spec: 'arms' }, 20);
+
+    expect(armsKnown.has('measured_fury')).toBe(false);
+    expect(armsKnown.has('seasoned_soldier')).toBe(false);
+    expect(armsKnown.has('sudden_death')).toBe(false);
+    expect(armsKnown.has('deep_wounds')).toBe(false);
+    expect(armsKnown.has('battle_shout')).toBe(true);
   });
 
   // Pins the actual applyLoadoutBar call site wiring, not just the predicate in

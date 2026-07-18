@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_card_duel_first_win: {
+    name: 'Ev Kuralları',
+    desc: "Kart Ustası'nın yanında bir Kart Düellosu kazan.",
+  },
   prog_first_steps: {
     name: 'İlk Adımlar',
     desc: '2. seviyeye ulaş ve uzun bir yolun ilk adımını at.',
@@ -32,8 +36,8 @@ export const table: DeedLocaleTable = {
   },
   prog_deep_roots: { name: 'Derin Kökler', desc: 'Son sıradaki bir yeteneğe yetenek puanı harca.' },
   prog_full_build: {
-    name: 'On Birin Tamamı',
-    desc: 'On bir yetenek puanının tamamını tek bir dizilişe harca.',
+    name: 'Altının Tamamı',
+    desc: 'Tek bir dizilimde altı yetenek sırasının her birinden bir seçenek seç.',
   },
   prog_veteran: {
     name: 'Kıdemli',

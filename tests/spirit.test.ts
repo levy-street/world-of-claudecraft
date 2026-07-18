@@ -180,7 +180,7 @@ describe('spirit: resurrect at the Spirit Healer', () => {
     p.dead = true;
     sim.releaseSpirit(); // ghost at a graveyard, an angel in reach
     expect(healerInRange(sim, p.pos)).toBe(true);
-    sim.resurrectAtSpiritHealer();
+    expect(sim.resurrectAtSpiritHealer()).toBe(true);
 
     expect(p.dead).toBe(false);
     expect(p.ghost).toBe(false);
@@ -215,7 +215,7 @@ describe('spirit: resurrect at the Spirit Healer', () => {
     p.prevPos = { ...p.pos };
     sim.rebucket(p);
     expect(healerInRange(sim, p.pos)).toBe(false);
-    sim.resurrectAtSpiritHealer();
+    expect(sim.resurrectAtSpiritHealer()).toBe(false);
     expect(p.dead).toBe(true);
     expect(p.ghost).toBe(true);
   });

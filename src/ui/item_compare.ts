@@ -4,7 +4,18 @@
 import type { CoreStats, ItemDef } from '../sim/types';
 
 // Stable stat identifier; the HUD maps it to a localized label via t().
-export type CompareStat = 'dps' | 'armor' | 'str' | 'agi' | 'sta' | 'int' | 'spi' | 'warfare';
+export type CompareStat =
+  | 'dps'
+  | 'armor'
+  | 'str'
+  | 'agi'
+  | 'sta'
+  | 'int'
+  | 'spi'
+  | 'warfare'
+  | 'hitRating'
+  | 'critRating'
+  | 'hasteRating';
 
 export interface StatDelta {
   stat: CompareStat;
@@ -35,6 +46,14 @@ export function itemStatDeltas(item: ItemDef, equipped: ItemDef): StatDelta[] {
   const warfareDelta = warfareRating(item) - warfareRating(equipped);
   if (Math.abs(warfareDelta) >= 0.5) {
     out.push({ stat: 'warfare', delta: warfareDelta, decimals: 0 });
+  }
+
+  // Combat ratings, in the base item tooltip's affix order. spellPower is
+  // deliberately absent: no content item carries it, so a row could never fire.
+  const ratings = ['hitRating', 'critRating', 'hasteRating'] as const;
+  for (const k of ratings) {
+    const delta = (item[k] ?? 0) - (equipped[k] ?? 0);
+    if (Math.abs(delta) >= 0.5) out.push({ stat: k, delta, decimals: 0 });
   }
   return out;
 }

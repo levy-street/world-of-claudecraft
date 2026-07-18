@@ -140,6 +140,7 @@ function mergeNameTranslations<TId extends string>(
 const mergePetHud = {
   en: {
     attack: 'Attack',
+    waterJet: 'Water Jet',
     taunt: 'Taunt',
     healDemon: 'Heal Demon',
     healPet: 'Feed Pet',
@@ -148,8 +149,12 @@ const mergePetHud = {
     aggressive: 'Aggressive',
     petAttackTitle: 'Pet Attack',
     petAttackDesc: 'Command your pet to attack your current hostile target.',
+    waterJetTitle: 'Water Jet',
+    waterJetDesc:
+      'Command your Water Elemental to channel a slowing stream for 3 seconds. 8 second cooldown. Right-click to auto-cast it whenever it is off cooldown.',
     petTauntTitle: 'Pet Taunt',
-    petTauntDesc: 'Command your pet to engage and Growl when in range. 10 second cooldown.',
+    petTauntDesc:
+      'Command your pet to engage and Growl when in range. 10 second cooldown. Right-click to auto-cast it whenever it is off cooldown.',
     healDemonDesc: 'Spend mana to channel healing into your demon over 5 seconds.',
     healPetDesc: 'Click, then click food in your bags to feed your pet, healing it over 5 seconds.',
     stanceTitle: 'Pet Stance',
@@ -158,7 +163,7 @@ const mergePetHud = {
     defensiveDesc: 'Attacks enemies that hurt you or your pet.',
     aggressiveDesc: 'Attacks nearby hostile enemies.',
     rename: 'Rename Pet',
-    revive: 'Revive Pet',
+    revive: 'Patch Up',
     abandon: 'Abandon Pet',
     cancel: 'Cancel',
     renameLabel: 'Choose a new pet name.',
@@ -171,6 +176,7 @@ const mergePetHud = {
   },
   es: {
     attack: 'Atacar',
+    waterJet: 'Chorro de agua',
     taunt: 'Provocar',
     healDemon: 'Sanar demonio',
     healPet: 'Sanar mascota',
@@ -179,9 +185,12 @@ const mergePetHud = {
     aggressive: 'Agresivo',
     petAttackTitle: 'Ataque de mascota',
     petAttackDesc: 'Ordena a tu mascota atacar a tu objetivo hostil actual.',
+    waterJetTitle: 'Chorro de agua',
+    waterJetDesc:
+      'Ordena a tu elemental de agua canalizar un chorro ralentizador durante 3 segundos. Reutilización de 8 segundos. Clic derecho para autolanzarlo cuando esté disponible.',
     petTauntTitle: 'Provocación de mascota',
     petTauntDesc:
-      'Ordena a tu mascota entrar en combate y usar Gruñido al estar en alcance. Reutilización de 10 segundos.',
+      'Ordena a tu mascota entrar en combate y usar Gruñido al estar en alcance. Reutilización de 10 segundos. Clic derecho para autolanzarlo cuando esté disponible.',
     healDemonDesc: 'Gasta maná para canalizar sanación hacia tu demonio durante 5 segundos.',
     healPetDesc:
       'Haz clic y luego haz clic en comida de tus bolsas para alimentar y sanar a tu mascota durante 5 segundos.',
@@ -191,7 +200,7 @@ const mergePetHud = {
     defensiveDesc: 'Ataca a enemigos que te dañen a ti o a tu mascota.',
     aggressiveDesc: 'Ataca a enemigos hostiles cercanos.',
     rename: 'Renombrar mascota',
-    revive: 'Revivir mascota',
+    revive: 'Remendar',
     abandon: 'Abandonar mascota',
     cancel: 'Cancelar',
     renameLabel: 'Elige un nuevo nombre para la mascota.',
@@ -224,7 +233,7 @@ const mergePetHud = {
     defensiveDesc: 'Attaque les ennemis qui vous blessent, vous ou votre familier.',
     aggressiveDesc: 'Attaque les ennemis hostiles proches.',
     rename: 'Renommer le familier',
-    revive: 'Ranimer le familier',
+    revive: 'Rafistoler',
     abandon: 'Abandonner le familier',
     cancel: 'Annuler',
     renameLabel: 'Choisissez un nouveau nom de familier.',
@@ -257,7 +266,7 @@ const mergePetHud = {
     defensiveDesc: 'Attacca i nemici che feriscono te o la tua mascotte.',
     aggressiveDesc: 'Attacca i nemici ostili vicini.',
     rename: 'Rinomina mascotte',
-    revive: 'Rianima mascotte',
+    revive: 'Rattoppare',
     abandon: 'Abbandona mascotte',
     cancel: 'Annulla',
     renameLabel: 'Scegli un nuovo nome per la mascotte.',
@@ -288,7 +297,7 @@ const mergePetHud = {
     defensiveDesc: 'Greift Gegner an, die dich oder deinen Begleiter verletzen.',
     aggressiveDesc: 'Greift nahe feindliche Gegner an.',
     rename: 'Begleiter umbenennen',
-    revive: 'Begleiter wiederbeleben',
+    revive: 'Zusammenflicken',
     abandon: 'Begleiter aufgeben',
     cancel: 'Abbrechen',
     renameLabel: 'Wähle einen neuen Begleiternamen.',
@@ -317,7 +326,7 @@ const mergePetHud = {
     defensiveDesc: '攻击伤害你或你宠物的敌人。',
     aggressiveDesc: '攻击附近的敌对敌人。',
     rename: '重命名宠物',
-    revive: '复活宠物',
+    revive: '修补',
     abandon: '放弃宠物',
     cancel: '取消',
     renameLabel: '选择一个新的宠物名称。',
@@ -346,7 +355,7 @@ const mergePetHud = {
     defensiveDesc: '攻擊傷害你或你寵物的敵人。',
     aggressiveDesc: '攻擊附近的敵對敵人。',
     rename: '重新命名寵物',
-    revive: '復活寵物',
+    revive: '修補',
     abandon: '放棄寵物',
     cancel: '取消',
     renameLabel: '選擇一個新的寵物名稱。',
@@ -376,7 +385,7 @@ const mergePetHud = {
     defensiveDesc: '당신이나 소환수를 해치는 적을 공격합니다.',
     aggressiveDesc: '근처의 적대적인 적을 공격합니다.',
     rename: '소환수 이름 변경',
-    revive: '소환수 되살리기',
+    revive: '응급 처치',
     abandon: '소환수 포기',
     cancel: '취소',
     renameLabel: '새 소환수 이름을 선택하세요.',
@@ -406,7 +415,7 @@ const mergePetHud = {
     defensiveDesc: 'あなたまたはペットを傷つけた敵を攻撃します。',
     aggressiveDesc: '近くの敵対的な敵を攻撃します。',
     rename: 'ペット名変更',
-    revive: 'ペット蘇生',
+    revive: '応急処置',
     abandon: 'ペット放棄',
     cancel: 'キャンセル',
     renameLabel: '新しいペット名を選んでください。',
@@ -437,7 +446,7 @@ const mergePetHud = {
     defensiveDesc: 'Ataca inimigos que ferem você ou seu mascote.',
     aggressiveDesc: 'Ataca inimigos hostis próximos.',
     rename: 'Renomear mascote',
-    revive: 'Reviver mascote',
+    revive: 'Remendar',
     abandon: 'Abandonar mascote',
     cancel: 'Cancelar',
     renameLabel: 'Escolha um novo nome para o mascote.',
@@ -468,7 +477,7 @@ const mergePetHud = {
     defensiveDesc: 'Атакует врагов, которые ранят вас или питомца.',
     aggressiveDesc: 'Атакует ближайших враждебных врагов.',
     rename: 'Переименовать питомца',
-    revive: 'Воскресить питомца',
+    revive: 'Подлатать',
     abandon: 'Оставить питомца',
     cancel: 'Отмена',
     renameLabel: 'Выберите новое имя питомца.',
@@ -3768,7 +3777,11 @@ const mergeExtraEn = {
       'Flense',
       'A stealth opener that rakes the enemy for weapon damage plus {damage} and causes bleeding damage over 9 sec. Awards 1 combo point. Wolf Form only.',
     ],
-    ['revive_pet', 'Revive Pet', 'Revives your dead pet and returns it to your side.'],
+    [
+      'revive_pet',
+      'Patch Up',
+      'Patch up your companion, restoring {overTime} health over 12 sec in 3-sec ticks while it is alive. If it is dead, revive it at 35% health.',
+    ],
   ]),
   items: {
     ...mergeNameTranslations(
@@ -3914,7 +3927,11 @@ export const mergeExtra = {
         'Zarpazo',
         'Una apertura sigilosa que desgarra al enemigo causando el daño del arma más {damage} y provoca daño por sangrado durante 9 s. Otorga 1 punto de combo. Solo en Forma de lobo.',
       ],
-      ['revive_pet', 'Revivir mascota', 'Revive a tu mascota muerta y la devuelve a tu lado.'],
+      [
+        'revive_pet',
+        'Remendar',
+        'Remienda a tu mascota y restaura {overTime} de salud durante 12 s en pulsos cada 3 s mientras esté viva. Si está muerta, la revive con un 35% de salud.',
+      ],
     ]),
     items: {
       ...mergeNameTranslations(
@@ -4057,7 +4074,11 @@ export const mergeExtra = {
         'Lacérer',
         "Une attaque d'ouverture en camouflage qui lacère l'ennemi pour les dégâts de l'arme plus {damage} et inflige des dégâts de saignement sur 9 sec. Octroie 1 point de combo. Forme de loup uniquement.",
       ],
-      ['revive_pet', 'Ranimer le familier', 'Ranime votre familier mort et le ramène à vos côtés.'],
+      [
+        'revive_pet',
+        'Rafistoler',
+        "Rafistole votre familier et lui rend {overTime} points de vie en 12 s, par pulsations toutes les 3 s, s'il est vivant. S'il est mort, le ranime avec 35 % de ses points de vie.",
+      ],
     ]),
     items: {
       ...mergeNameTranslations(
@@ -4205,8 +4226,8 @@ export const mergeExtra = {
       ],
       [
         'revive_pet',
-        'Rianima Famiglio',
-        'Rianima il tuo famiglio morto e lo richiama al tuo fianco.',
+        'Rattoppare',
+        'Rattoppa il tuo famiglio, ripristinando {overTime} salute in 12 sec con impulsi ogni 3 sec se è vivo. Se è morto, lo rianima con il 35% della salute.',
       ],
     ]),
     items: mergeNameTranslations(
@@ -4342,8 +4363,8 @@ export const mergeExtra = {
       ],
       [
         'revive_pet',
-        'Begleiter wiederbeleben',
-        'Belebt deinen toten Begleiter wieder und ruft ihn an deine Seite zurück.',
+        'Zusammenflicken',
+        'Flickt deinen Begleiter zusammen und stellt ihm, solange er lebt, im Verlauf von 12 Sek. alle 3 Sek. insgesamt {overTime} Gesundheit wieder her. Ist er tot, wird er mit 35 % Gesundheit wiederbelebt.',
       ],
     ]),
     items: mergeNameTranslations(
@@ -4473,7 +4494,11 @@ export const mergeExtra = {
         '撕抓',
         '一记潜行起手技，以武器伤害外加{damage}撕抓敌人，并造成持续9秒的流血伤害。获得1点连击点数。仅限狼形态使用。',
       ],
-      ['revive_pet', '复活宠物', '复活你死去的宠物，并将其召回身边。'],
+      [
+        'revive_pet',
+        '修补',
+        '修补你的宠物。若其存活，在12秒内每3秒恢复一次生命值，共恢复{overTime}点；若其死亡，则以35%生命值将其复活。',
+      ],
     ]),
     items: mergeNameTranslations(
       DROWNED_ITEM_IDS,
@@ -4598,7 +4623,11 @@ export const mergeExtra = {
         '撕裂',
         '一招隱匿起手技，以武器傷害外加 {damage} 撕裂敵人，並造成持續 9 秒的流血傷害。給予 1 點連擊點數。僅限狼形態。',
       ],
-      ['revive_pet', '復活寵物', '復活你已死亡的寵物，並使其重回你身邊。'],
+      [
+        'revive_pet',
+        '修補',
+        '修補你的寵物。若其存活，在 12 秒內每 3 秒恢復一次生命值，共恢復 {overTime} 點；若其死亡，則以 35% 生命值將其復活。',
+      ],
     ]),
     items: mergeNameTranslations(
       DROWNED_ITEM_IDS,
@@ -4723,7 +4752,11 @@ export const mergeExtra = {
         '할퀴기',
         '은신 상태에서 적을 할퀴어 무기 피해에 더해 {damage}의 피해를 입히고 9초에 걸쳐 출혈 피해를 줍니다. 연계 점수 1을 부여합니다. 늑대 변신 상태에서만 사용 가능.',
       ],
-      ['revive_pet', '소환수 소생', '죽은 소환수를 되살려 당신의 곁으로 되돌립니다.'],
+      [
+        'revive_pet',
+        '응급 처치',
+        '소환수를 응급 처치합니다. 살아 있으면 12초에 걸쳐 3초마다 생명력을 회복해 총 {overTime}의 생명력을 회복합니다. 죽어 있으면 35%의 생명력으로 되살립니다.',
+      ],
     ]),
     items: mergeNameTranslations(
       DROWNED_ITEM_IDS,
@@ -4849,7 +4882,11 @@ export const mergeExtra = {
         '切り裂き',
         'ステルス状態からの先制攻撃で、武器ダメージに加えて{damage}のダメージを与え、9秒かけて出血ダメージを与える。コンボポイントを1獲得する。ウルフフォーム時のみ使用可能。',
       ],
-      ['revive_pet', 'ペット蘇生', '死んだペットを蘇生させ、自分のそばに呼び戻す。'],
+      [
+        'revive_pet',
+        '応急処置',
+        'ペットを応急処置する。生存している場合は12秒間、3秒ごとに回復し、合計{overTime}の体力を回復する。死亡している場合は体力35%で蘇生する。',
+      ],
     ]),
     items: mergeNameTranslations(
       DROWNED_ITEM_IDS,
@@ -4979,7 +5016,11 @@ export const mergeExtra = {
         'Dilacerar',
         'Um golpe de abertura furtivo que dilacera o inimigo causando dano de arma mais {damage} e provoca sangramento ao longo de 9 seg. Concede 1 ponto de combo. Apenas na Forma de Lobo.',
       ],
-      ['revive_pet', 'Reviver Mascote', 'Revive seu mascote morto e o traz de volta ao seu lado.'],
+      [
+        'revive_pet',
+        'Remendar',
+        'Remenda seu mascote, restaurando {overTime} de vida ao longo de 12 s em pulsos a cada 3 s se ele estiver vivo. Se estiver morto, revive-o com 35% da vida.',
+      ],
     ]),
     items: mergeNameTranslations(
       DROWNED_ITEM_IDS,
@@ -5111,8 +5152,8 @@ export const mergeExtra = {
       ],
       [
         'revive_pet',
-        'Оживление питомца',
-        'Оживляет вашего павшего питомца и возвращает его к вам.',
+        'Подлатать',
+        'Подлечивает питомца: если он жив, восстанавливает ему {overTime} ед. здоровья за 12 сек. с шагом в 3 сек. Если питомец мёртв, воскрешает его с 35% здоровья.',
       ],
     ]),
     items: mergeNameTranslations(

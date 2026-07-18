@@ -562,8 +562,115 @@ function mobileCallbacks() {
     onNameplates: () => false,
     onMusic: () => true,
     onRecenterCamera: noop,
+    onGroundAimMove: () => false,
+    onGroundAimTap: () => false,
   };
 }
+
+describe('MobileControls ground placement tap', () => {
+  const inputWithoutLook = () =>
+    ({
+      setTouchMove: () => {},
+      clearTouchMove: () => {},
+      setTouchLook: () => {},
+      setTouchLookVector: () => {},
+      applyTouchLookDelta: () => {},
+      zoomBy: () => {},
+    }) as unknown as Input;
+
+  it('moves and commits an active reticle without turning the same drag into camera look', () => {
+    const { canvas } = installMobileControlDom();
+    const moves: Array<{ x: number; y: number }> = [];
+    const taps: Array<{ x: number; y: number }> = [];
+    const lookDeltas: Array<{ x: number; y: number }> = [];
+    const callbacks = {
+      ...mobileCallbacks(),
+      onGroundAimMove: (x: number, y: number) => {
+        moves.push({ x, y });
+        return true;
+      },
+      onGroundAimTap: (x: number, y: number) => {
+        taps.push({ x, y });
+        return true;
+      },
+    };
+    const input = inputWithoutLook();
+    input.applyTouchLookDelta = (x: number, y: number) => lookDeltas.push({ x, y });
+    new MobileControls(input, callbacks).start();
+
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 70,
+        pointerType: 'touch',
+        clientX: 320,
+        clientY: 180,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointerup', {
+        pointerId: 70,
+        pointerType: 'touch',
+        clientX: 322,
+        clientY: 181,
+      }),
+    );
+    expect(taps).toEqual([{ x: 322, y: 181 }]);
+    expect(moves).toEqual([{ x: 320, y: 180 }]);
+
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 71,
+        pointerType: 'touch',
+        clientX: 200,
+        clientY: 160,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointermove', {
+        pointerId: 71,
+        pointerType: 'touch',
+        clientX: 260,
+        clientY: 160,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointerup', {
+        pointerId: 71,
+        pointerType: 'touch',
+        clientX: 260,
+        clientY: 160,
+      }),
+    );
+    expect(moves).toEqual([
+      { x: 320, y: 180 },
+      { x: 200, y: 160 },
+      { x: 260, y: 160 },
+    ]);
+    expect(taps).toEqual([
+      { x: 322, y: 181 },
+      { x: 260, y: 160 },
+    ]);
+    expect(lookDeltas).toEqual([]);
+
+    canvas.dispatchEvent(
+      pointerEvent('pointerdown', {
+        pointerId: 72,
+        pointerType: 'touch',
+        clientX: 300,
+        clientY: 170,
+      }),
+    );
+    canvas.dispatchEvent(
+      pointerEvent('pointercancel', {
+        pointerId: 72,
+        pointerType: 'touch',
+        clientX: 340,
+        clientY: 170,
+      }),
+    );
+    expect(taps).toHaveLength(2);
+  });
+});
 
 describe('MobileControls setActive draft survival', () => {
   const noopInputForActive = () =>

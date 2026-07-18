@@ -112,3 +112,10 @@ STOPPING RULES:
   make-amends return cost all visible before commit, with no commit path that skips the preview.
 - Broadcast matcher coverage: the celebration zone broadcast and both nudge voices re-localize
   via the matchers; the S3 guard is green with `src/sim/quests/quest_commands.ts` in scope.
+- Work orders (the 2026-07-17 amendment): each master offers its repeatable work order; a
+  loop of immediate re-turn-ins is BOUNDED by the cadence cap and never gold-positive
+  against the input vendor value; the turn-in consumes the materials (a recurring sink,
+  not a faucet); probe the loop with a real repeated turn-in, not a formula read.
+- Tier-crossing mail (the 2026-07-17 amendment): exactly one letter per tier per major
+  craft, from the archetype's anchor master; re-crossings, hobby and dormant crossings,
+  unattuned characters, and repeated loads deliver none.

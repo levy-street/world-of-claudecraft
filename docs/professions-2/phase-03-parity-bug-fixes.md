@@ -1,5 +1,10 @@
 # Phase 03: Host-parity bug fixes
 
+PREMISE UPDATE (2026-07-17, Phase 1 session): the trade half of this phase is already done.
+Release PR 2045 landed the instance-preserving trade fix on release/v0.27.0 (regression test in
+`tests/trade.test.ts`) before this phase started, so the only remaining Phase 3 deliverable is the
+`harvestClaimedBy` mirror below. Re-verify against code at session start per the docs anchor rule.
+
 This phase fixes the two known host-parity data bugs so item instances and corpse claims are
 truthful in every host: trades currently strip `ItemInstancePayload` (the `removePreferFungible`
 return is discarded), and `harvestClaimedBy` is hardcoded `null` in `ClientWorld`, so the online
@@ -45,6 +50,11 @@ STEP 0 - PRE-FLIGHT:
   before proceeding. Never base work on main or an older release branch than the newest.
 - Verify `git status` is clean before starting. If not, ask the user (a concurrent session may
   share this checkout).
+- Verify the any-signed masterwork amendment (the 2026-07-17 design-review ruling in
+  state.md, shipped as its own pre-phase code change) has landed on the release branch:
+  grep for MASTERWORK_SIGNED_CHANCE in src/sim/professions/masterwork.ts. If it is absent,
+  the amendment PR is still open: land or merge it FIRST (never re-implement it inline),
+  then proceed.
 - Memory scan (if you use Claude Code memory): check your MEMORY.md index and any entries
   relevant to this phase's domain (suggested topics: combo-recipes-broken-online, the #2033
   ClientWorld stub trap; node25-breaks-jsdom-gate, run the gate under Node 24; PR 2039 state,

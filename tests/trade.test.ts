@@ -318,6 +318,56 @@ describe('trade module (direct, no Sim)', () => {
     expect(instanced?.instance).toEqual(instance);
   });
 
+  it('keeps full payloads (signer/charges/rolled/enchant/boundTo) for instances in both directions', () => {
+    // The phase acceptance criterion end to end: side A's offer mixes a plain
+    // copy with a fully-loaded instanced copy while side B offers a different
+    // instanced item in the SAME trade, so tradeConfirm's second transferOffer
+    // call (offerB, b to a) moves an instance too, and every payload field
+    // (signer, charges, rolled incl. the Phase 2 masterwork marker, the enchant
+    // marker, boundTo) must land intact on the right receiver's granted item.
+    const instA = {
+      signer: 'Ayla',
+      charges: { lifesteal: 2 },
+      rolled: { stats: { atk: 3 }, masterwork: true },
+      enchant: 'flame_weapon',
+      boundTo: 1,
+    };
+    const instB = {
+      signer: 'Borin',
+      charges: { warmth: 5 },
+      rolled: { stats: { sta: 2 }, masterwork: true },
+      enchant: 'hearth_ward',
+      boundTo: 2,
+    };
+    const { ctx, players } = makeInstancedTradeCtx(
+      [
+        { itemId: 'wolf_fang', count: 1 },
+        { itemId: 'wolf_fang', count: 1, instance: instA },
+      ],
+      [{ itemId: 'baked_bread', count: 1, instance: instB }],
+    );
+
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 2 }], 0, 1);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'baked_bread', count: 1 }], 0, 2);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+
+    // b to a: the instanced bread lands on A with its whole payload.
+    expect(players.get(1).inventory).toHaveLength(1);
+    expect(players.get(1).inventory[0].itemId).toBe('baked_bread');
+    expect(players.get(1).inventory[0].instance).toEqual(instB);
+    // a to b: one plain fang plus the instanced fang carrying instA, not instB.
+    expect(players.get(2).inventory).toHaveLength(2);
+    const plain = players.get(2).inventory.find((s: any) => !s.instance);
+    const instanced = players.get(2).inventory.find((s: any) => s.instance);
+    expect(plain?.itemId).toBe('wolf_fang');
+    expect(plain?.count).toBe(1);
+    expect(instanced?.itemId).toBe('wolf_fang');
+    expect(instanced?.instance).toEqual(instA);
+  });
+
   it('updateTradesAndInvites expires stale invites and cancels drifted trades', () => {
     const h = makeTradeCtx();
     h.addPlayer(1, 'Ayla', 0, 0);

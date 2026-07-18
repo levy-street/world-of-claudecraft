@@ -19,7 +19,15 @@
 import { addStacked, bagCapacity, bagsFullError, equipBag as equipBagCmd } from './bags';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
-import { canEquipItem, resolveEquipSlot, slotAcceptsItem } from './equipment_rules';
+import {
+  canDualWield,
+  canDualWieldTwoHand,
+  canEquipItem,
+  canEquipItemInSlot,
+  resolveEquipSlot,
+  slotAcceptsItem,
+  weaponHand,
+} from './equipment_rules';
 import { formatMoney } from './format_money';
 import { moveStackToCell } from './inventory_order';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
@@ -40,6 +48,42 @@ import {
 import { vendorStackSize } from './vendor_stack';
 
 const VENDOR_BUYBACK_LIMIT = 12;
+
+function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
+  const def = ITEMS[itemId];
+  if (!def?.slot) return null;
+  if (def.kind !== 'weapon') return resolveEquipSlot(def, meta.equipment);
+
+  const spec = meta.talents.spec;
+  const hand = weaponHand(def);
+  if (hand === 'mainhand') return 'mainhand';
+  if (hand === 'twohand') {
+    if (!canDualWieldTwoHand(meta.cls, spec)) return 'mainhand';
+    const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    if (
+      mainhand?.kind === 'weapon' &&
+      weaponHand(mainhand) === 'twohand' &&
+      !meta.equipment.offhand
+    ) {
+      return 'offhand';
+    }
+    return 'mainhand';
+  }
+
+  if (!meta.equipment.mainhand) return 'mainhand';
+  if (!canDualWield(meta.cls, spec)) return 'mainhand';
+  if (!canEquipItemInSlot(meta.cls, def, 'offhand', spec)) return 'mainhand';
+
+  const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+  if (
+    !canDualWieldTwoHand(meta.cls, spec) &&
+    mainhand?.kind === 'weapon' &&
+    weaponHand(mainhand) === 'twohand'
+  ) {
+    return 'mainhand';
+  }
+  return 'offhand';
+}
 
 // Fungible-preferring removal: consumes plain (non-instanced) copies first and
 // only reaches for an instanced copy (an enchanted or otherwise signed/rolled
@@ -113,7 +157,8 @@ export function equipItem(
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
-  if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor')) return;
+  if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor' && def.kind !== 'held_offhand'))
+    return;
   if (ctx.countItem(itemId, meta.entityId) <= 0) return;
   if (targetSlot && !slotAcceptsItem(def, targetSlot)) {
     ctx.error(meta.entityId, 'That does not go in that slot.');
@@ -130,10 +175,44 @@ export function equipItem(
   // Rings declare slot 'ring'; with no aimed slot the resolver picks ring1/ring2
   // (empty-first). An aimed slot is honored verbatim once validated above, so
   // dropping a ring on the ring2 socket fills ring2 even while ring1 is free.
-  const slot = targetSlot ?? resolveEquipSlot(def, meta.equipment);
+  // Warrior weapons additionally route between hands from the committed v0.26
+  // specialization (desiredEquipSlot), and the chosen slot, aimed or resolved,
+  // is re-validated against the spec-aware rules.
+  const spec = meta.talents.spec;
+  const slot = targetSlot ?? desiredEquipSlot(meta, itemId);
   if (!slot) return;
+  if (!canEquipItemInSlot(meta.cls, def, slot, spec)) {
+    ctx.error(meta.entityId, 'You cannot equip that.');
+    return;
+  }
   const old = meta.equipment[slot];
   const oldInstance = meta.equipmentInstance?.[slot];
+  // A two-hander and a shield cannot coexist. Fury's Titan Grip exemption is
+  // weapon-only: a valid Fury weapon pair may contain one or two two-handers.
+  let displacedSlot: EquipSlot | null = null;
+  if (slot === 'offhand') {
+    const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    const titanPair = def.kind === 'weapon' && canDualWieldTwoHand(meta.cls, spec);
+    if (mainhand?.kind === 'weapon' && weaponHand(mainhand) === 'twohand' && !titanPair) {
+      displacedSlot = 'mainhand';
+    }
+  } else if (slot === 'mainhand' && def.kind === 'weapon' && weaponHand(def) === 'twohand') {
+    const offhand = meta.equipment.offhand ? ITEMS[meta.equipment.offhand] : undefined;
+    const titanPair = offhand?.kind === 'weapon' && canDualWieldTwoHand(meta.cls, spec);
+    if (meta.equipment.offhand && !titanPair) displacedSlot = 'offhand';
+  }
+  const displacedId = displacedSlot ? meta.equipment[displacedSlot] : undefined;
+  const displacedInstance = displacedSlot ? meta.equipmentInstance?.[displacedSlot] : undefined;
+  if (displacedSlot && displacedId) {
+    // Removing the incoming item frees one bag slot. If this equip also returns
+    // the replaced item, the displaced other hand needs one additional slot.
+    if (old && !ctx.canAddItem(displacedId, 1, meta.entityId)) {
+      bagsFullError(ctx, meta.entityId);
+      return;
+    }
+    delete meta.equipment[displacedSlot];
+    if (meta.equipmentInstance) delete meta.equipmentInstance[displacedSlot];
+  }
   // removeItem scans from the highest inventory index down (sim.ts), so a
   // freshly-enchanted copy (pushed onto the end by addItemInstance,
   // src/sim/professions/enchanting.ts applyEnchant) is what this picks up first
@@ -150,6 +229,13 @@ export function equipItem(
     if (oldInstance) meta.inventory.push({ itemId: old, count: 1, instance: oldInstance });
     else addItemSilent(old, 1, meta);
   }
+  if (displacedId) {
+    if (displacedInstance) {
+      meta.inventory.push({ itemId: displacedId, count: 1, instance: displacedInstance });
+    } else {
+      addItemSilent(displacedId, 1, meta);
+    }
+  }
   meta.equipment[slot] = itemId;
   if (consumed[0]) {
     meta.equipmentInstance ??= {};
@@ -161,6 +247,34 @@ export function equipItem(
   ctx.markDeedsDirty(meta.entityId);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   ctx.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
+}
+
+// A committed spec is the only state transition that can make an already worn
+// offhand illegal. Bench it into bags without a capacity gate so a respec can
+// never destroy gear, and keep any per-instance enchant payload attached.
+export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const { meta, e: p } = r;
+  const offhandId = meta.equipment.offhand;
+  if (!offhandId) return;
+  const def = ITEMS[offhandId];
+  if (!def) return;
+  if (canEquipItemInSlot(meta.cls, def, 'offhand', meta.talents.spec)) return;
+
+  const instance = meta.equipmentInstance?.offhand;
+  delete meta.equipment.offhand;
+  if (meta.equipmentInstance) delete meta.equipmentInstance.offhand;
+  if (instance) meta.inventory.push({ itemId: offhandId, count: 1, instance });
+  else addItemSilent(offhandId, 1, meta);
+  ctx.markDeedsDirty(meta.entityId);
+  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+  ctx.emit({
+    type: 'log',
+    text: `Unequipped ${def.name}.`,
+    color: '#8f8',
+    pid: meta.entityId,
+  });
 }
 
 // Remove the piece in `slot` back to the bags, leaving the slot empty. Unlike
@@ -319,7 +433,7 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
       school: 'nature',
     });
     ctx.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
-  } else if (def.kind === 'weapon' || def.kind === 'armor') {
+  } else if (def.kind === 'weapon' || def.kind === 'armor' || def.kind === 'held_offhand') {
     equipItem(ctx, itemId, meta.entityId);
   } else if (def.kind === 'bag') {
     equipBagCmd(ctx, itemId, undefined, meta.entityId);
@@ -340,6 +454,9 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
     ctx.error(meta.entityId, 'That item is not sold here.');
     return;
   }
+  // Dev free-epic vendor: on a dev-command realm this vendor sells its whole
+  // epic stock for free, bypassing the price requirement below.
+  const freeVendor = ctx.devCommands && npc.devVendor === true;
   const copperUnitPrice =
     def?.buyValue !== undefined && Number.isFinite(def.buyValue) && def.buyValue > 0
       ? def.buyValue
@@ -350,7 +467,7 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
       : 0;
   const hasCopperPrice = copperUnitPrice > 0;
   const hasHonorPrice = honorPrice > 0;
-  if (!def || (!hasCopperPrice && !hasHonorPrice)) {
+  if (!def || (!freeVendor && !hasCopperPrice && !hasHonorPrice)) {
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
   }
@@ -368,8 +485,8 @@ export function buyItem(ctx: SimContext, npcId: number, itemId: string, pid?: nu
   // the per-unit buyValue for every unit, so the per-unit price stays classic and
   // vendor buy price stays above the per-unit sell value (no buy-low/sell-high loop).
   const qty = vendorStackSize(def);
-  const copperCost = copperUnitPrice * qty;
-  const honorCost = honorPrice;
+  const copperCost = freeVendor ? 0 : copperUnitPrice * qty;
+  const honorCost = freeVendor ? 0 : honorPrice;
   if (meta.copper < copperCost) {
     ctx.error(meta.entityId, 'Not enough money.');
     return;

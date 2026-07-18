@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 410,
-      "state": "92939a2c",
+      "state": "95530260",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -74,8 +74,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -138,8 +137,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 413,
-      "state": "538abfae",
-      "events": "c93c4c81",
+      "state": "0e4e93c2",
+      "events": "8bf1032d",
       "rng": {
         "draws": 10,
         "digest": "3a534bbe"
@@ -149,7 +148,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 413,
-      "state": "46afabb3",
+      "state": "636bd4e3",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -160,8 +159,8 @@
       "tick": 60,
       "time": 3,
       "nextId": 413,
-      "state": "80e19ee3",
-      "events": "abafb8d0",
+      "state": "4d387833",
+      "events": "41d08ee8",
       "rng": {
         "draws": 105,
         "digest": "aeef14bf"
@@ -171,7 +170,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 413,
-      "state": "16af000a",
+      "state": "1bd9ad56",
       "events": "741638a5",
       "rng": {
         "draws": 202,
@@ -182,8 +181,8 @@
       "tick": 100,
       "time": 5,
       "nextId": 413,
-      "state": "35610a85",
-      "events": "f44e6e72",
+      "state": "37f778ed",
+      "events": "5785beb6",
       "rng": {
         "draws": 303,
         "digest": "15399310"
@@ -193,7 +192,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 413,
-      "state": "ed8579d4",
+      "state": "7392ec28",
       "events": "741638a5",
       "rng": {
         "draws": 406,
@@ -204,7 +203,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 413,
-      "state": "ed8579d4",
+      "state": "7392ec28",
       "events": "741638a5",
       "rng": {
         "draws": 406,
@@ -287,8 +286,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 20,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }

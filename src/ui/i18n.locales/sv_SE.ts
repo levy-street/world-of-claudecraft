@@ -2,9 +2,285 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.ironhold.description':
-    'Forsar dig bakom ditt skydd och minskar all inkommande skada med 40% i 8 sek.',
-  'entities.abilities.ironhold.name': 'Järngrepp',
+  'hud.pet.waterJet': 'Vattenstråle',
+  'hud.pet.waterJetDesc':
+    'Beordra din Vattenelementar att kanalisera en bromsande stråle i 3 sekunder. 8 sekunders nedkylning. Högerklicka för att auto-kasta den så snart nedkylningen är över.',
+  'hud.pet.waterJetTitle': 'Vattenstråle',
+  'hud.prompts.acceptResurrection': 'Acceptera uppståndelse',
+  'hud.prompts.resurrectionOffer': '{name} vill återge dig livet. Accepterar du?',
+  'itemUi.stats.parry': 'Parering',
+  'apiError.wallet.handoff_invalid':
+    'Den plånboksbehörigheten har gått ut eller kunde inte verifieras. Försök igen.',
+  'cardDuel.close': 'Stäng',
+  'cardDuel.counts': 'Kortlek: {deck} · Kasserad: {discard}',
+  'cardDuel.forfeit': 'Ge upp',
+  'cardDuel.forfeitAria': 'Ge upp kortduellen',
+  'cardDuel.join': 'Gå med i kö',
+  'cardDuel.joinAria': 'Gå med i kortduellskön',
+  'cardDuel.leave': 'Lämna kön',
+  'cardDuel.leaveAria': 'Lämna kortduellskön',
+  'cardDuel.playCardAria': 'Spela {value}-kortet',
+  'cardDuel.queued': 'Väntar på en motståndare...',
+  'cardDuel.round': 'Omgångsresultat: {mine} - {theirs}',
+  'cardDuel.title': 'Kortduell',
+  'cardDuel.unavailable': 'Kortduell kräver en annan spelare online.',
+  'cardDuel.vsOpponent': 'mot {name}',
+  'cardDuel.waitingOnOpponent': 'Väntar på motståndarens kort...',
+  'cardDuel.yourTurn': 'Spela ett kort',
+  'entities.abilities.arcane_surge.description':
+    'Drar en våg av rå eter genom fienden och orsakar {damage} skada. Varje kast lämnar en Arkansk Laddning som höjer nästa Etersvalls skada och kasthastighet (5% snabbare för varje) men kraftigt höjer manakostnaden, upp till 4 i stapel; Eterpilar förbrukar laddningarna. Varje kast kan även aktivera Eterrus, vilket gör nästa Etersvall gratis och dubbelt så snabb att kasta.',
+  'entities.abilities.arcane_surge.name': 'Etersvall',
+  'entities.abilities.blizzard.description':
+    'Kallar en isstorm över målområdet i 6 sek, orsakar {damage} Frost-skada varje sekund och saktar ner fiender med 40%. Varje träffad fiende minskar Frozen Orbs nedkylning med 0,5 sek, upp till 3 sek per kast. (Frost)',
+  'entities.abilities.blizzard.name': 'Blizzard',
+  'entities.abilities.brain_freeze.description':
+    'Rimlans har 20% chans att göra nästa Winterlash omedelbar, 30% hårdare och fri från dess nedkylning. (Frost)',
+  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.dragons_breath.description':
+    'Håll intryckt för att samla en vidgande flammande andedräkt, släpp sedan för en kon. Längre laddningar når längre och gör mer skada. Träffade fiender desorienteras och skada bryter effekten; maximal laddning är alltid ett kritiskt slag och räknas en gång mot Het svit. (Eld)',
+  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.fingers_of_frost.description':
+    'Rimlans har 15% chans att ge Fingers of Frost, upp till 2 laddningar: nästa Ice Lance behandlar målet som fryst. (Frost)',
+  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fireball_form.description':
+    'Förvandlas till en glödande glöd och ökar rörelsehastigheten med {buff}%. Du kan inte attackera eller kasta besvärjelser under förvandlingen. Kasta om för att återgå till normal form.',
+  'entities.abilities.fireball_form.name': 'Ember Form',
+  'entities.abilities.flurry.description':
+    'Avfyrar tre isiga bultar för {damage} Frost-skada var och en och planterar Vinterkyla på målet: dess nästa 2 inkommande kompatibla besvärjelser behandlar det som fryst. Brain Freeze gör Winterlash omedelbar, 30% hårdare och hoppar över dess nedkylning. (Frost)',
+  'entities.abilities.flurry.name': 'Winterlash',
+  'entities.abilities.frozen_orb.description':
+    'Skjuter ut en kula av virvelande frost som glider framåt i 8 sek, orsakar {damage} Frost-skada varje sekund på närliggande fiender och saktar ner dem med 30%. Kulans slag ger Fingers of Frost. (Frost)',
+  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.glacial_front.description':
+    'Håll intryckt för att samla en vidgande frostfront, släpp sedan för en kon. Längre laddningar når längre och gör mer skada. Alla träffade fiender saktas ner med 50% i 4 sek; maximal laddning rotar dem också i 1 sek. (Frost)',
+  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_spike.description':
+    'Frammanar en massiv istagge och förbrukar 5 Istappar för att orsaka {damage} Frost-skada och frysa målet på plats i 4 sek. (Frost)',
+  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.ice_lance.description':
+    'Kastar en isbit som orsakar {damage} Frost-skada, trefaldigt mot ett fryst mål. Förbrukar Fingers of Frost, eller en laddning av Vinterkyla, för att behandla målet som fryst. (Frost)',
+  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.perfect_moment.description':
+    'Grip ditt perfekta ögonblick: vinn genast 4 Arkanska Laddningar, och under 10 sek förbrukar Eterpilar dem inte. (Kronomantik)',
+  'entities.abilities.perfect_moment.name': 'Perfect Moment',
+  'entities.abilities.shatter.description':
+    'Dina besvärjelser får 50% kritisk träffchans mot frysta mål, och dessa kritiska slag gör 20% mer skada. Fingers of Frost och Vinterkyla räknas som fryst. (Frost)',
+  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.temporal_acceleration.description':
+    'Accelererar tidens flöde för din grupp eller raid, ökar attack-, kast- och kanalisationshastighet med 30% i 15 sek. Allierade som nyligen påverkats av Temporal Acceleration eller Krigstrummor är för utmattade för att dra nytta av det. (Kronomantik)',
+  'entities.abilities.temporal_acceleration.name': 'Temporal Acceleration',
+  'entities.abilities.temporal_barrier.description':
+    'Förskjuter målet ett hjärtslag ur nuet; ett temporalt skal absorberar {damage} skada i 10 sek innan tidslinjen snäpper tillbaka.',
+  'entities.abilities.temporal_barrier.name': 'Temporal Barrier',
+  'entities.abilities.temporal_cascade.description':
+    'Skickar ett eko kaskaderande genom din grupp: målet och upp till fyra av deras närmaste allierade läks på en gång och märks var och en i {duration} sek, och drar en del av den Arkan skada du ger tillbaka genom deras ekon för att läka dem. (Kronomantik)',
+  'entities.abilities.temporal_cascade.name': 'Temporal Cascade',
+  'entities.abilities.temporal_echo.description':
+    'Märker en allierad med ett eko av ett friskare ögonblick och läker {damage} hälsa på en gång. Under {duration} sek dras en del av den Arkan skada du gör tillbaka genom ekoet för att läka dem.',
+  'entities.abilities.temporal_echo.name': 'Temporal Echo',
+  'entities.abilities.temporal_hourglass.description':
+    'Placerar ett temporalt timglas på vald plats. Under en fiende suspenderar det dem i {hostilePveDuration} sek i PvE eller {hostilePvpDuration} sek i PvP och hindrar alla handlingar; skada bryter effekten. Vid dina fötter eller under en gruppallierad ger det stasis i {duration} sek, förhindrar skada och handlingar, återställer {healing}% av maximala hälsan och låter nedkylningar återhämta sig {selfCooldownRecovery}% snabbare för dig eller {allyCooldownRecovery}% snabbare för en allierad. På tom mark väntar timglaset i {groundDuration} sek och påverkar den första giltiga enheten som kliver på det. Den gynnsamma auran kan avlägsnas manuellt.',
+  'entities.abilities.temporal_hourglass.name': 'Hourglass of Suspension',
+  'entities.abilities.temporal_mend.description':
+    'Drar en allierad ett ögonblick framåt i tid och läker {damage} hälsa när kroppen slår sig till ro i sitt friskare framtida jag. (Kronomantik-signatur)',
+  'entities.abilities.temporal_mend.name': 'Temporal Mend',
+  'entities.abilities.temporal_reversal.description':
+    'Spolar tillbaka en fallen allierades tidslinje och återupplivar dem vid kroppen med en del av deras hälsa och mana, även mitt i strid. (Kronomantik)',
+  'entities.abilities.temporal_reversal.name': 'Temporal Reversal',
+  'entities.abilities.temporal_rewind.description':
+    'Skickar en arkan våg genom din grupp eller raid och spolar tillbaka tiden för att återställa 30% av skadan varje allierad inom 40 yards tog under de senaste 5 sekunderna (upp till 35% av deras maximala hälsa). Kan inte vara ett kritiskt slag. (Kronomantik)',
+  'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.npcs.card_master.greeting':
+    'Hur är det med en kortduell? Bäst av tre, vinnaren tar skryträtten.',
+  'entities.npcs.card_master.name': 'Kortmästare',
+  'entities.npcs.card_master.title': 'Slumpmakare',
+  'entities.quests.q_archetype_acceptance.completion':
+    'Löftet håller. Dessa två hantverk är nu dina ämnen, och kunskapen om det motstående hantverket blir ditt hobby.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Malmåder skördad',
+  'entities.quests.q_archetype_acceptance.text':
+    'Skicklighet är kunskap, {playerName}, men inriktning är ett löfte. Välj två angränsande hantverk vars metoder du vill bära som dina ämnen, och ta sedan med mig malm bearbetad i Dalen med dina egna händer.',
+  'entities.quests.q_prof_hobby_switch.completion':
+    'Ett lättare val, men ett nyttigt sådant. Följ den nyfikenheten så långt sällsynt arbete kan bära den.',
+  'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Örtfläck skördad',
+  'entities.quests.q_prof_hobby_switch.text':
+    'Ämnen kräver ett löfte. Ett hobby frågar bara vart din nyfikenhet vandrar, {playerName}. Plocka några örter och bestäm vilket hantverk, det som är motsatt dina ämnen, du vill ägna dig åt.',
+  'entities.quests.q_prof_hobby_switch.title': 'Ett annorlunda tidsfördriv',
+  'entities.quests.q_prof_intro.completion':
+    'Ser du? Malm samlad och valkar på händerna. Håll på med gruvdrift, skogsavverkning och örtskörd när du reser längs vägarna, och när du är tillbaka i staden, håll koll på Stadsanslagstavlan vid marknaden och hantverksbordet i närheten. Det finns en rättvis handel i allt av det, om du vill ha det.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Malmåder skördad',
+  'entities.quests.q_prof_intro.text':
+    'Varje själ i Östbäck arbetar ett hantverk utöver svärdet, {playerName}. Det finns malmådrar i klipporna runt Koppargropen, sydväst om staden. Gå och sving en hacka och arbeta 5 av dem själv; jag ska kunna se skillnaden.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Den gamla rytmen återvänder. Ditt tidigare par är aktivt igen.',
+  'entities.quests.q_prof_make_amends.text':
+    'Du har burit det paret förut, {playerName}. Att återvända är inget nytt löfte. Hjälp till att hålla Dalsvägen fri, och arbetet ska påminna dina händer om vad de en gång visste.',
+  'gpuNotice.bodyDesktop':
+    'Spelet körs utan GPU-acceleration och kommer att vara långsamt. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.',
+  'gpuNotice.bodyWeb':
+    'Spelet körs utan GPU-acceleration och kommer att vara långsamt. Aktivera hårdvaruacceleration i din webbläsares inställningar, uppdatera dina grafikdrivrutiner och starta sedan om din webbläsare.',
+  'gpuNotice.dismiss': 'Stäng',
+  'guide.abilityHook.blink':
+    'Teleporterar dig ett kort stycke framåt och bryter rötter på vägen ut.',
+  'guide.abilityHook.blizzard': 'Täcker ett område med is för att nöta ner och sakta en hel flock.',
+  'guide.abilityHook.brain_freeze':
+    'Dina frostbultar gör ibland nästa Flurry omedelbar och hårdare träffande.',
+  'guide.abilityHook.fingers_of_frost':
+    'Dina frostbultar stärker ibland en Ice Lance att slå som om målet vore fryst.',
+  'guide.abilityHook.fireball_form':
+    'Bli en levande glöd för att ta dig över öppen mark med hög hastighet.',
+  'guide.abilityHook.flurry':
+    'Tre snabba bultar som kyler målet så dina nästa frostträffar landar som om det vore fryst.',
+  'guide.abilityHook.frozen_orb':
+    'Rullar en långsam kula genom flocken som kyler allt och matar dina frostprocsar.',
+  'guide.abilityHook.ice_lance':
+    'En omedelbar bit för att förbruka frostprocsar, träffar mycket hårdare på ett fryst mål.',
+  'guide.abilityHook.shatter': 'Dina besvärjelser kritikträffar mycket oftare mot frysta mål.',
+  'guide.deedsPage.renownBody':
+    'Ryktbarhet är poängen bakom Boken. Varje bedrift du fullbordar är värd ett fast belopp, och din totalsumma klättrar bara uppåt, så en lugn vecka kostar dig aldrig mark. En handfull bedrifter bygger på tur snarare än skicklighet, och Bragder är en heder för sig, så båda är värda noll Ryktbarhet. Bedrifter utan Ryktbarhet räknas fortfarande mot fullbordande i din Bok; de ger bara aldrig poäng.',
+  'guide.deedsPage.standingsNote':
+    'Riken håller löpande räkning på Ryktbarhet för varje konto: tavlan rankar hela konton efter livstids Ryktbarhet, räknar varje bedrift en gång över alla dina karaktärer, och den visar enbart Ryktbarhet, så bedrifter utan Ryktbarhet påverkar aldrig ställningen trots att de räknas i din Bok. För att se vem som står var, öppna Topplistan i spelet och välj dess Ryktbarhets-flik; ställningen finns där, inte på wikin.',
+  'hudChrome.archetypePair.alchemy+cooking': 'Apotekare',
+  'hudChrome.archetypePair.armorcrafting+engineering': 'Kugghjulssmed',
+  'hudChrome.archetypePair.cooking+leatherworking': 'Fångstman',
+  'hudChrome.archetypePair.enchanting+jewelcrafting': 'Stenbindare',
+  'hudChrome.archetypePair.engineering+alchemy': 'Bombbärare',
+  'hudChrome.archetypePair.inscription+enchanting': 'Arkanist',
+  'hudChrome.archetypePair.jewelcrafting+weaponcrafting': 'Klingasmed',
+  'hudChrome.archetypePair.leatherworking+tailoring': 'Utrustare',
+  'hudChrome.archetypePair.tailoring+inscription': 'Magivävare',
+  'hudChrome.archetypePair.weaponcrafting+armorcrafting': 'Smed',
+  'hudChrome.auraEffect.cheapCast': 'Din nästa besvärjelse kostar {pct}% mindre',
+  'hudChrome.auraEffect.combustionCrit': 'Dina Eld-besvärjelser kritikträffar alltid',
+  'hudChrome.auraEffect.dmgDone': 'Ökar orsakad skada med {pct}%',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Minskar orsakad skada med {pct}%',
+  'hudChrome.auraEffect.elementalConvergencePrimed':
+    'Din nästa besvärjelse från den andra elementarskolan ger Elementär konvergens',
+  'hudChrome.auraEffect.formFireball':
+    'Ember Form: rörelsehastigheten ökad med {pct}%; attacker och besvärjelser är inaktiverade',
+  'hudChrome.auraEffect.freeCast': 'Ditt nästa kast kostar ingenting',
+  'hudChrome.auraEffect.heatingUp':
+    'Ditt nästa på varandra följande kritiska Eld-byggarslag ger Het svit; ett icke-kritiskt byggarslag tar bort Värms upp',
+  'hudChrome.auraEffect.iceFloesCasts':
+    'Dina nästa {n} besvärjelser med kasttid kan kastas under rörelse',
+  'hudChrome.auraEffect.increase.sp': 'Ökar besvärjelsekraft med {value}',
+  'hudChrome.auraEffect.instantCast': 'Din nästa besvärjelse med kasttid är omedelbar',
+  'hudChrome.auraEffect.overloadNext':
+    'Din nästa besvärjelse förstärks med {pct}% men kostar 50% mer mana',
+  'hudChrome.auraEffect.powerEchoNext':
+    'Din nästa direkta besvärjelse upprepas med {pct}% kraft på samma mål',
+  'hudChrome.auraEffect.temporalHourglass':
+    'Immun och oförmögen att handla; återställer hälsa och accelererar nedkylningsåterhämtning. Högerklicka för att avbryta.',
+  'hudChrome.craftName.alchemy': 'Alkemi',
+  'hudChrome.craftName.armorcrafting': 'Rustningssmide',
+  'hudChrome.craftName.cooking': 'Matlagning',
+  'hudChrome.craftName.enchanting': 'Förtrollning',
+  'hudChrome.craftName.engineering': 'Ingenjörskonst',
+  'hudChrome.craftName.inscription': 'Inskription',
+  'hudChrome.craftName.jewelcrafting': 'Juveleringskonst',
+  'hudChrome.craftName.leatherworking': 'Läderhantverkeri',
+  'hudChrome.craftName.tailoring': 'Skrädderi',
+  'hudChrome.craftName.weaponcrafting': 'Vapensmide',
+  'hudChrome.crafting.attunementPreview':
+    'Resultat: titeln {title}; {majorA} och {majorB} blir obegränsade ämnen; {hobby} blir det sällsyntsbegränsade hobbyt; all övrig kunskapsbehållning bibehålls men begränsas till vanlig nivå när den är vilande.',
+  'hudChrome.crafting.comboMet': 'Redo.',
+  'hudChrome.crafting.comboNotAttuned': 'Välj ett arketyppar först.',
+  'hudChrome.crafting.comboRequires': 'Inriktning: {craftA} + {craftB}, nivå {tier}.',
+  'hudChrome.crafting.comboSyncing': 'Kontrollerar rikenas inriktning.',
+  'hudChrome.crafting.comboTierUnmet': 'Höj båda hantverksämnena till den krävda nivån.',
+  'hudChrome.crafting.comboWrongPair': 'Aktivera detta exakta par för att tillverka det.',
+  'hudChrome.crafting.hobbyPreview':
+    'Resultat: {hobby} blir det sällsyntsbegränsade hobbyt. Båda ämnena och alla bibehållna kunskapsvärden förblir oförändrade.',
+  'hudChrome.crafting.identity.ceilingCommon': 'Vanlig gräns',
+  'hudChrome.crafting.identity.ceilingRare': 'Sällsynt gräns',
+  'hudChrome.crafting.identity.ceilingUnlimited': 'Ingen förstärkningsgräns',
+  'hudChrome.crafting.identity.colCap': 'Gräns',
+  'hudChrome.crafting.identity.colCraft': 'Hantverk',
+  'hudChrome.crafting.identity.colRole': 'Roll',
+  'hudChrome.crafting.identity.colSkill': 'Färdighet',
+  'hudChrome.crafting.identity.dormantKnowledge':
+    '{craft}-kunskap bibehålls men är vilande tills dess par eller hobby är aktivt.',
+  'hudChrome.crafting.identity.history': '{pairs} par upptäckta, {returns} återkomster slutförda',
+  'hudChrome.crafting.identity.historyLabel': 'Historik',
+  'hudChrome.crafting.identity.hobbyLabel': 'Hobby',
+  'hudChrome.crafting.identity.majorsLabel': 'Ämnen',
+  'hudChrome.crafting.identity.nearTier': '{craft} är {points} färdighetspoäng från nästa nivå.',
+  'hudChrome.crafting.identity.roleDormant': 'Vilande kunskap',
+  'hudChrome.crafting.identity.roleHobby': 'Hobby',
+  'hudChrome.crafting.identity.roleMajor': 'Ämne',
+  'hudChrome.crafting.identity.roleUnattuned': 'Oinriktad',
+  'hudChrome.crafting.identity.skillAria':
+    '{craft}, färdighet {skill}, nivå {tier}, {role}, {ceiling}',
+  'hudChrome.crafting.identity.syncing': 'Väntar på din hantverksidentitet från riket.',
+  'hudChrome.crafting.identity.title': 'Hantverksidentitet',
+  'hudChrome.crafting.identity.titleLabel': 'Titel',
+  'hudChrome.crafting.identity.tutorial':
+    'Första nivån: nå färdighet {skill} i ett hantverk. Lyckade recept höjer det hantverket utan att radera kunskap på andra håll.',
+  'hudChrome.crafting.identity.unattuned':
+    'Inget arketyppar är aktivt. Din kunskap bibehålls, men kombinationsrecept kräver ett inriktat par.',
+  'hudChrome.crafting.noProfessionChoice': 'Inget giltigt yrkesval är för närvarande tillgängligt.',
+  'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
+  'hudChrome.crafting.professionChoice': 'Yrkesval',
+  'hudChrome.deeds.lbScopeNote':
+    'Konton rangordnade efter livstids Ryktbarhet. Varje bedrift räknas en gång för alla karaktärer på ett konto.',
+  'hudChrome.deeds.lbSelfAccount':
+    'Ditt konto: rank {rank}, topp {percent} procent, {renown} Ryktbarhet',
+  'hudChrome.deeds.lbSelfRank': 'Ditt konto: rank {rank}, topp {percent} procent',
+  'hudChrome.nameplate.mobEliteLevel': '{level}+',
+  'hudChrome.nameplate.mobLevel': '{level}',
+  'hudChrome.specPanel.specUnlockBanner': 'Specialisering upplåst!',
+  'hudChrome.specPanel.specUnlockHint': 'Tryck N för att välja din specialisering.',
+  'hudChrome.wocStore.wallet.connect': 'Anslut plånbok',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    'Plånboksappen är ansluten till denna webbläsare, men dess offentliga adress är ännu inte länkad till ditt WoC-konto.',
+  'hudChrome.wocStore.wallet.linkedConnected':
+    'Din länkade plånboksapp är ansluten och redo för SOL- eller WOC-köp.',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    'Din offentliga adress är länkad. Återanslut den plånboksappen när du vill betala med SOL eller WOC.',
+  'hudChrome.wocStore.wallet.manage': 'Hantera plånbok',
+  'hudChrome.wocStore.wallet.mismatched':
+    'En annan plånbok är ansluten. Verifiera den för att ersätta den länkade adressen, eller återanslut den länkade plånboken.',
+  'hudChrome.wocStore.wallet.reconnect': 'Återanslut plånbok',
+  'hudChrome.wocStore.wallet.title': 'Solana-plånbok',
+  'hudChrome.wocStore.wallet.unlinked':
+    'Anslut en plånboksapp och signera sedan en gång för att länka dess offentliga adress till ditt WoC-konto. Vi tar aldrig emot din återställningsfras eller privata nyckel.',
+  'hudChrome.wocStore.wallet.verify': 'Verifiera och länka',
+  'wallet.bagConnect': 'Länka plånbok',
+  'wallet.bagLink': 'Verifiera plånbok',
+  'wallet.bagReconnect': 'Återanslut plånbok',
+  'wallet.browser.completeBody': 'Du kan återvända till skrivbordsappen för World of ClaudeCraft.',
+  'wallet.browser.completeTitle': 'Plånboksbehörighet slutförd',
+  'wallet.browser.continueWith': 'Fortsätt med {wallet}',
+  'wallet.browser.extensionHelp':
+    'Inget kompatibelt plånbokstillägg hittades. Installera eller lås upp Phantom, Solflare eller en annan Solana-webbläsarplånbok och försök sedan igen.',
+  'wallet.browser.eyebrow': 'Skrivbordsplånboksbehörighet',
+  'wallet.browser.failed':
+    'Plånboksbehörighet misslyckades eller gick ut. Återgå till skrivbordsappen och försök igen.',
+  'wallet.browser.linkBody':
+    'Välj ett plånbokstillägg i denna webbläsare. Du signerar ett verifieringsmeddelande och återvänder sedan till skrivbordsappen.',
+  'wallet.browser.paymentBody':
+    'Välj plånboken länkad till ditt konto och godkänn transaktionen i denna webbläsare.',
+  'wallet.browser.retry': 'Försök igen',
+  'wallet.browser.returnButton': 'Återgå till skrivbordsappen',
+  'wallet.browser.reviewBody': 'Följ uppmaningen från {wallet}. Håll denna webbläsarsida öppen.',
+  'wallet.browser.reviewTitle': 'Granska i din plånbok',
+  'wallet.browser.safety':
+    'World of ClaudeCraft ber aldrig om din återställningsfras eller privata nyckel.',
+  'wallet.browser.title': 'Anslut en Solana-plånbok',
+  'wallet.manualReturnBrowserHelp':
+    'Efter godkännande, återgå till denna spelflik. Om iOS öppnar en annan webbläsare, stäng den och återgå till den ursprungliga webbläsaren manuellt.',
+  'wallet.manualReturnStandaloneHelp':
+    'Efter godkännande, återgå till World of ClaudeCraft från din hemskärm. Om iOS öppnar en webbläsare, stäng den och öppna hemskärmsappen manuellt igen.',
+  'wallet.mobileAppHelp':
+    'Välj Phantom eller Solflare. Din plånboksapp ber om godkännande. Håll det här spelet öppet och återgå till det när du är klar.',
+  'wallet.openAppButton': 'Öppna {wallet}',
+  'wallet.openAppHelp':
+    'Öppna {wallet} för att granska denna begäran. Håll denna spelflik öppen medan plånboksappen är aktiv.',
+  'wallet.openAppTitle': 'Fortsätt i {wallet}',
+  'wallet.preparingAppButton': 'Förbereder {wallet}...',
+  'wallet.standaloneAppHelp':
+    'Plånboksanslutningar är ännu inte tillgängliga i hemskärmsappen. Öppna World of ClaudeCraft i Safari eller Chrome för att använda Phantom eller Solflare.',
+  'wallet.walletAppUnavailable':
+    '{wallet} kunde inte förberedas. Stäng det här fönstret och försök igen.',
   'entities.abilities.primal_reflexes.description':
     'Dina instinkter skärps och ökar din chans att undvika anfall med 50% i 6 sek.',
   'entities.abilities.primal_reflexes.name': 'Ursinnesreflexer',
@@ -154,6 +430,168 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'loading.realmFull': 'Denna värld är full just nu. Försök igen om några minuter.',
   'loading.tooManyConnections':
     'För många anslutningar till denna värld kommer från ditt nätverk. Stäng extra spelfönster eller försök igen om några minuter.',
+  'entities.items.eastbrook_greatsword.name': 'Östbäcks storsvärd',
+  'entities.items.highwatch_greatsword.name': 'Högvakts storsvärd',
+  'entities.items.highwatch_wallshield.name': 'Högvakts mursköld',
+  'entities.items.eastbrook_buckler.name': 'Östbäcks rundsköld',
+  'entities.abilities.battle_stance.description':
+    'En aggressiv stridsställning: du genererar 10 % mer raseri. Standardställningen för Vapen och Beskydd.',
+  'entities.abilities.battle_stance.name': 'Stridsställning',
+  'entities.abilities.berserker_stance.description':
+    'En dumdristig stridsställning: dina kritiska träffar sker 3 % oftare och slår 3 % hårdare. Raserikrigaren strider alltid i den här ställningen.',
+  'entities.abilities.berserker_stance.name': 'Bärsärkaställning',
+  'entities.abilities.breachmaker.description':
+    'Slå målet för vapenskada plus {damage} och spräck dess gard: dina egna attacker mot det vållar 20 % mer skada i 8 sek. (Vapen)',
+  'entities.abilities.breachmaker.name': 'Bräschbrytare',
+  'entities.abilities.cleaving_blows.description':
+    'Röd skörd återger alltid en laddning av Tvillingslag. (Raseri)',
+  'entities.abilities.cleaving_blows.name': 'Klyvande hugg',
+  'entities.abilities.deep_wounds.description':
+    'Passiv: ditt Stympande hugg får målet att blöda för fysisk skada över 6 sek. (Vapen)',
+  'entities.abilities.deep_wounds.name': 'Gapande sår',
+  'entities.abilities.defiant_bellow.description':
+    'Ett trotsigt vrål: varje fiende inom 10 meter eggas och tvingas anfalla dig i 3 sek. (Beskydd)',
+  'entities.abilities.defiant_bellow.name': 'Trotsigt vrål',
+  'entities.abilities.diabolical_twinstrike.description':
+    'Medan du är rasande vållar ditt Tvillingslag 15 % mer skada. (Raseri)',
+  'entities.abilities.diabolical_twinstrike.name': 'Diaboliskt tvillingslag',
+  'entities.abilities.die_by_sword.description':
+    'Defensiv nedkylning: i 8 sek tar du 30 % mindre skada och väjer undan för långt fler attacker.',
+  'entities.abilities.die_by_sword.name': 'Dö för svärdet',
+  'entities.abilities.emboldening_roar.description':
+    'Släpper loss ett uppeldande vrål: du och vänligt sinnade spelare inom 40 meter blir uppeldade, och era nästa 3 förmågor blir garanterat kritiska träffar. (Raseri)',
+  'entities.abilities.emboldening_roar.name': 'Uppeldande vrål',
+  'entities.abilities.enrage_passive.description':
+    'Passiv: medan du är rasande vållar du 7 % mer skada, attackerar 25 % snabbare och rör dig 10 % snabbare i 4 sek. Åderlåtning har 30 % chans att göra dig rasande; Röd skörd gör det alltid. (Raseri)',
+  'entities.abilities.enrage_passive.name': 'Kalabalik',
+  'entities.abilities.faultline.description':
+    'Skicka en chockvåg genom marken: fiender framför dig inom 8 meter tar {damage} skada och bedövas i 3 sek. (Beskydd)',
+  'entities.abilities.faultline.name': 'Förkastningslinje',
+  'entities.abilities.furious_mending.description':
+    'I 10 sek tar du 20 % mindre skada, och medan det varar läker din Åderlåtning dig för 20 % av din maximala hälsa. (Raseri)',
+  'entities.abilities.furious_mending.name': 'Rasande läkning',
+  'entities.abilities.heroic_leap.description':
+    'Hoppa till målområdet och orsaka {damage} skada på närliggande fiender när du landar.',
+  'entities.abilities.heroic_leap.name': 'Krigssprång',
+  'entities.abilities.intimidating_shout.description':
+    'Ett skräckinjagande rop som får upp till 5 fiender inom 8 meter att fly i skräck i 8 sek. Skada kan bryta effekten.',
+  'entities.abilities.intimidating_shout.name': 'Skräckinjagande rop',
+  'entities.abilities.iron_resolve.description':
+    'Bit ihop och ignorera smärtan: förbrukar upp till 40 raseri (minst 20) för att absorbera 4 skada per förbrukad raseripoäng i upp till 10 sek. (Beskydd)',
+  'entities.abilities.iron_resolve.name': 'Järnvilja',
+  'entities.abilities.measured_fury.description':
+    'Ditt avmätta raseri skärper din hushållning: dina förmågor kostar 10 % mindre raseri. (Vapen)',
+  'entities.abilities.measured_fury.name': 'Avmätt raseri',
+  'entities.abilities.piercing_howl.description':
+    'Ett genomträngande rop som saktar ner alla fiender inom 15 meter med 50 % i 8 sek.',
+  'entities.abilities.piercing_howl.name': 'Genomträngande tjut',
+  'entities.abilities.raging_gale.description':
+    'Slå omedelbart två gånger med ditt vapen, där varje träff vållar 40 % vapenskada plus {damage}, och generera 8 raseri. Lagrar upp till 2 laddningar. (Raseri)',
+  'entities.abilities.raging_gale.name': 'Tvillingslag',
+  'entities.abilities.raised_guard.description':
+    'Förskansa dig bakom din sköld: du tar 50 % mindre fysisk skada i 6 sek. Lagrar upp till 2 laddningar. (Beskydd)',
+  'entities.abilities.raised_guard.name': 'Höjd gard',
+  'entities.abilities.rallying_cry.description':
+    'Släpp lös ett tappert vrål som ger dig och gruppmedlemmar inom 40 meter 20% extra maximal hälsa i 10 sek. Beskydd: de tar även 5% mindre skada under tiden.',
+  'entities.abilities.rallying_cry.name': 'Tapperhetsvrål',
+  'entities.abilities.recklessness.description':
+    'Försätter dig i raseri: din raserigenerering ökar med 50 % och din kritiska träffchans med 20 % i 12 sek.',
+  'entities.abilities.recklessness.name': 'Hänsynslöshet',
+  'entities.abilities.red_harvest.description':
+    'Satsa allt: slå tre gånger i vilt raseri för 65 % vapenskada plus {damage} vardera, vilket alltid gör dig rasande. (Raseri)',
+  'entities.abilities.red_harvest.name': 'Röd skörd',
+  'entities.abilities.revenge.description':
+    'Anfall i en vid båge och vålla fysisk skada mot alla fiender framför dig. Över 5 mål minskas skadan. När du väjer undan eller parerar kan din nästa Hämnd kosta inget raseri. (Protection)',
+  'entities.abilities.revenge.name': 'Hämnd',
+  'entities.abilities.sanguine_aura.description':
+    'Besjäla ditt vapen med dina fienders blod: du och dina närstridsallierade får 10 % attackhastighet och 10 % skada i 20 sek.',
+  'entities.abilities.sanguine_aura.name': 'Blodröd aura',
+  'entities.abilities.seasoned_soldier.description':
+    'Dina kritiska autoattacker genererar 10 % mer raseri. (Vapen)',
+  'entities.abilities.seasoned_soldier.name': 'Härdad soldat',
+  'entities.abilities.storm_bolt.description':
+    'Slunga ditt vapen mot målet för {damage} och bedöva det i 3 sek.',
+  'entities.abilities.storm_bolt.name': 'Stormbult',
+  'entities.abilities.sudden_death.description':
+    'Dina autoattacker har en chans att låta dig använda Tidig grav på ett mål oavsett hälsa, utan raserikostnad. (Vapen)',
+  'entities.abilities.sudden_death.name': 'Plötslig död',
+  'entities.abilities.sweeping_strikes.description':
+    'I 12 sek träffar dina enmålsattacker även 1 närliggande fiende för full skada. (Vapen)',
+  'entities.abilities.sweeping_strikes.name': 'Vidgande båge',
+  'entities.abilities.victory_rush.description':
+    'Slå för vapenskada plus {damage} och läk 20 % av din maximala hälsa. Kan endast användas inom 20 sek efter att du dödat en fiende.',
+  'entities.abilities.victory_rush.name': 'Segerrus',
+  'hudChrome.specPanel.complexity': 'Komplexitet',
+  'hudChrome.specPanel.complexityHigh': 'Hög',
+  'hudChrome.specPanel.complexityLow': 'Låg',
+  'hudChrome.specPanel.complexityMedium': 'Medel',
+  'hudChrome.specPanel.exampleAbilities': 'Exempelförmågor',
+  'hudChrome.specPanel.primaryAttr': 'Primärt attribut',
+  'hudChrome.specPanel.selectSpec': 'Välj specialisering',
+  'hudChrome.specPanel.viewTalents': 'Visa talanger',
+  'hudChrome.talentRows.comingSoon': 'Kommer snart',
+  'hudChrome.talentRows.defaultLoadout': 'Standarduppsättning',
+  'hudChrome.talentRows.tab': 'Val',
+  'hudChrome.talentRows.readoutSummary': 'Talanger: {head}, {spent}/{total} rader valda.',
+  'entities.abilities.aspect_of_the_wild.name': 'Vildtands skepnad',
+  'entities.abilities.avenging_wrath.name': 'Hämndvinge',
+  'entities.abilities.berserk.name': 'Röd dimma',
+  'entities.abilities.blink.name': 'Flimmersteg',
+  'entities.abilities.bloodlust.name': 'Krigstrummor',
+  'entities.abilities.chain_lightning.name': 'Gaffelblixt',
+  'entities.abilities.chaos_bolt.name': 'Fördärvsbult',
+  'entities.abilities.cloak_of_shadows.name': 'Skuggmantel',
+  'entities.abilities.cone_of_cold.name': 'Frostsvep',
+  'entities.abilities.curse_of_exhaustion.name': 'Blytung förbannelse',
+  'entities.abilities.death_coil.name': 'Gravspiral',
+  'entities.abilities.deep_freeze.name': 'Dödfrost',
+  'entities.abilities.desperate_prayer.name': 'Sista bön',
+  'entities.abilities.deterrence.name': 'Borstvakt',
+  'entities.abilities.divine_shield.name': 'Ljusvärn',
+  'entities.abilities.earthbind.name': 'Gripande jord',
+  'entities.abilities.evocation.name': 'Eterbrunn',
+  'entities.abilities.frenzied_regeneration.name': 'Vild läkning',
+  'entities.abilities.frost_trap.name': 'Rimfälla',
+  'entities.abilities.ghostly_strike.name': 'Vålnadsslag',
+  'entities.abilities.hammer_of_wrath.name': 'Klingande hammare',
+  'entities.abilities.healing_stream.name': 'Källbrunn',
+  'entities.abilities.holy_wrath.name': 'Helgonvrede',
+  'entities.abilities.howl_of_terror.name': 'Skräckyl',
+  'entities.abilities.ice_block.name': 'Kall kista',
+  'entities.abilities.inner_focus.name': 'Stillat sinne',
+  'entities.abilities.innervate.name': 'Livssav',
+  'entities.abilities.meteor.name': 'Himmelsten',
+  'entities.abilities.mind_sear.name': 'Tankebrand',
+  'entities.abilities.multi_shot.name': 'Splitterskott',
+  'entities.abilities.prayer_of_healing.name': 'Körläkning',
+  'entities.abilities.preparation.name': 'Reservplan',
+  'entities.abilities.presence_of_mind.name': 'Rusande sinne',
+  'entities.abilities.psychic_scream.name': 'Psykiskt skrik',
+  'entities.abilities.shadowstep.name': 'Skuggkliv',
+  'entities.abilities.silence.name': 'Tystnad',
+  'entities.abilities.tranquility.name': 'Gläntsång',
+  'entities.abilities.cleansing_verdict.name': 'Renande Domslut',
+  'entities.abilities.cleansing_verdict.description':
+    'Rensar bort en skadlig magisk effekt från ett vänligt mål och helar det med Helig magi för {damage}.',
+  'entities.abilities.smoke_screen.name': 'Rökridå',
+  'entities.abilities.smoke_screen.description':
+    'Du försvinner i ett rökmoln, vilket ökar din chans att undvika med 30 % i 8 sek.',
+  'entities.abilities.spellsteal.name': 'Besvärjelsestöld',
+  'entities.abilities.spellsteal.description':
+    'Stjäl en gynnsam magisk effekt från en fiende och överför den till dig.',
+  'entities.abilities.startle_shot.name': 'Skrämselskott',
+  'entities.abilities.startle_shot.description':
+    'Ett vilt skott som desorienterar målet i {duration} sek. All skada bryter effekten.',
+  'entities.abilities.typhoon.name': 'Tyfon',
+  'entities.abilities.typhoon.description':
+    'En vindstöt slår tillbaka alla fiender inom 8 m och omtöcknar dem, vilket minskar deras rörelsehastighet med 50 % i 4 sek.',
+  'entities.abilities.voidfeast.name': 'Tomhetsmåltid',
+  'entities.abilities.voidfeast.description':
+    'Slukar en magisk effekt (en gynnsam från en fiende eller en skadlig från en allierad) och helar dig med 6 % av din maximala hälsa.',
+  'hudChrome.abilityError.shieldRequired': 'Du måste ha en sköld utrustad.',
+  'entities.abilities.collective_reversal.name': 'Kollektiv återgång',
+  'entities.abilities.collective_reversal.description':
+    'Spolar tillbaka tidslinjen för varje fallen medlem i din grupp eller raid och återupplivar dem vid kroppen med 30% hälsa och mana. Kan inte användas i strid. (Kronomanti)',
   'entities.abilities.sport_boot.description':
     'En lång, hög spark mot siktpunkten. Publiken älskar den.',
   'entities.abilities.sport_boot.name': 'Storspark',
@@ -404,16 +842,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.walkUp': 'Gå fram till Suggfältet för att titta från läktarna.',
   'hudChrome.archetypeTitle.label': 'Titel',
   'hudChrome.archetypeTitle.none': 'Ingen',
-  'hudChrome.archetypeTitle.armorcrafting': 'Rustningssmed',
-  'hudChrome.archetypeTitle.weaponcrafting': 'Vapensmed',
-  'hudChrome.archetypeTitle.jewelcrafting': 'Juvelerare',
-  'hudChrome.archetypeTitle.alchemy': 'Alkemist',
-  'hudChrome.archetypeTitle.engineering': 'Ingenjör',
-  'hudChrome.archetypeTitle.cooking': 'Kock',
-  'hudChrome.archetypeTitle.inscription': 'Skrivare',
-  'hudChrome.archetypeTitle.enchanting': 'Förtrollare',
-  'hudChrome.archetypeTitle.tailoring': 'Skräddare',
-  'hudChrome.archetypeTitle.leatherworking': 'Garvare',
   'entities.itemSets.crownforged.bonus4':
     'Dina kritiska vapenträffar splittrar målet med Benflisa och får det att blöda för 8 skada var 2:e sek i 12 sek. Staplas upp till 3 gånger.',
   'entities.itemSets.deathlord.bonus4':
@@ -1707,7 +2135,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': 'Ekhud',
   'entities.abilities.bash.description': 'Bedövar målet i 2 sek. Endast i Bruinform.',
   'entities.abilities.bash.name': 'Omtumla',
-  'entities.abilities.battle_shout.description': 'Ökar din attackkraft med {buff} i 2 min.',
+  'entities.abilities.battle_shout.description':
+    'Ett rop som ökar attackkraften hos alla gruppmedlemmar med {buff}% i 30 min.',
   'entities.abilities.battle_shout.name': 'Järnvrål',
   'entities.abilities.bear_charge.description':
     'Storma en fiende, generera 9 raseri och bedöva den i 1 sek. 8-25 m räckvidd. Endast i Bruinform.',
@@ -1744,8 +2173,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleave.description':
     'Ett svepande hugg som träffar alla fiender framför dig för {damage} skada.',
   'entities.abilities.cleave.name': 'Skördebåge',
-  'entities.abilities.commanding_shout.description': 'Ökar din uthållighet med {buff} i 2 min.',
-  'entities.abilities.commanding_shout.name': 'Stärkande rop',
   'entities.abilities.concussive_shot.description':
     'Omtöcknar målet för {damage} skada och saktar förflyttningen med 50 % i 4 sek.',
   'entities.abilities.concussive_shot.name': 'Skakande skott',
@@ -1783,7 +2210,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Demoraliserar närliggande fiender och sänker deras anfallskraft med 20 i 20 sek. Endast i Bruinform.',
   'entities.abilities.demoralizing_roar.name': 'Fegt vrål',
   'entities.abilities.demoralizing_shout.description':
-    'Utstöter ett skräckinjagande rop som sänker anfallskraften hos alla närliggande fiender med {buff} i 30 sek.',
+    'Utstöter ett skräckinjagande rop som minskar skadan som alla närliggande fiender orsakar med {buff}% i 20 sek.',
   'entities.abilities.demoralizing_shout.name': 'Fasans tjut',
   'entities.abilities.devotion_aura.description': 'Ökar din rustning med {buff} i 30 min.',
   'entities.abilities.devotion_aura.name': 'Ståndaktig aura',
@@ -1988,17 +2415,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.regrowth.name': 'Andra blomningen',
   'entities.abilities.rejuvenation.description': 'Läker målet för {damage} över 12 sek.',
   'entities.abilities.rejuvenation.name': 'Vildblomning',
-  'entities.abilities.rend.description':
-    'Sårar målet och får det att blöda för {damage} skada över {duration} sek.',
-  'entities.abilities.rend.name': 'Djup skåra',
   'entities.abilities.renew.description': 'Läker målet för {damage} under 15 sek.',
   'entities.abilities.renew.name': 'Dröjande nåd',
   'entities.abilities.retribution_aura.description':
     'Omger dig med helig energi i 30 min och tillfogar 5 helig skada till varje fiende som slår dig i närstrid.',
   'entities.abilities.retribution_aura.name': 'Vedergällningsaura',
   'entities.abilities.revive_pet.description':
-    'Återupplivar ditt döda djur och kallar det till din sida.',
-  'entities.abilities.revive_pet.name': 'Återuppliva djur',
+    'Lappar ihop ditt husdjur. Om det lever återställer det totalt {overTime} hälsa under 12 sek. med läkning var 3:e sek. Om det är dött återupplivas det med 35 % hälsa.',
+  'entities.abilities.revive_pet.name': 'Lappa ihop',
   'entities.abilities.righteous_fury.description':
     'Ökar hotet som din heliga skada genererar med 60 % i 30 min. Hörnstenen för paladinen som tankar.',
   'entities.abilities.righteous_fury.name': 'Brinnande ed',
@@ -2131,7 +2555,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_power.name': 'Arkan kraft',
   'entities.abilities.arcane_power.description':
     'Ökar besvärjelseskada med 20% och besvärjelsehastighet med 10% i 10 sek. (Arkan signatur)',
-  'entities.abilities.combustion.name': 'Förbränning',
+  'entities.abilities.combustion.name': 'Fenixtrans',
   'entities.abilities.combustion.description':
     'Ökar kritisk chans med besvärjelser med 50% i 15 sek. (Eldsignatur)',
   'entities.abilities.icy_veins.name': 'Isiga Ådror',
@@ -2521,6 +2945,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cord.name': 'Själslågssnöre',
   'entities.items.stormcallers_waistguard.name': 'Stormkallarens midjeskydd',
   'entities.items.stormcallers_spaulders.name': 'Galecall-axelskydd',
+  'entities.items.bonewrought_greatsword.name': 'Bonewrought storsvärd',
+  'entities.items.direfang_greatblade.name': 'Direfang-storklinga',
+  'entities.items.bonewrought_bulwark.name': 'Bonewrought bålverk',
+  'entities.items.wraithfire_orb.name': 'Wraithfire-sfär',
   'entities.items.stormshard_leggings.name': 'Stormskärvebenkläder',
   'entities.items.sturdy_belt.name': 'Stadigt resenärsbälte',
   'entities.items.supply_crate.name': 'Stulen förrådslåda',
@@ -3552,8 +3980,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Stormar mot en avlägsen fiende för att öppna striden med en kort bedövning.',
   'guide.abilityHook.cheap_shot':
     'Öppna från smyg med en bedövning och ett försprång på komboanslag.',
-  'guide.abilityHook.commanding_shout':
-    'Stärker uthålligheten så alla har mer stryktålighet i en strid.',
   'guide.abilityHook.concussive_shot':
     'Förvirrar målet och saktar ner det så att det inte kan nå dig.',
   'guide.abilityHook.conjure_food':
@@ -3614,7 +4040,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ett hårt närstridssving för när något sluter avståndet till dig.',
   'guide.abilityHook.rejuvenation':
     'Kastas omedelbart och läker en allierad över tid, så du kan fortsätta agera.',
-  'guide.abilityHook.rend': 'Öppnar en blödning som sliter ner målet över tid.',
   'guide.abilityHook.renew':
     'En läkning som tickar över tid, bra att kasta och fortsätta röra dig.',
   'guide.abilityHook.rockbiter_weapon':
@@ -4926,7 +5351,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.pet.rename': 'Byt namn på djur',
   'hud.pet.renameConfirm': 'Byt namn',
   'hud.pet.renameLabel': 'Välj ett nytt namn på djuret.',
-  'hud.pet.revive': 'Återuppliva djur',
+  'hud.pet.revive': 'Lappa ihop',
   'hud.pet.stanceDesc': 'Klicka för att välja Passiv, Defensiv eller Aggressiv.',
   'hud.pet.stanceTitle': 'Djurets hållning',
   'hud.pet.taunt': 'Håna',
@@ -5265,8 +5690,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.leaderboard': 'Ranking',
   'hudChrome.mobile.nameplates': 'Namn',
   'hudChrome.mobile.toggleHaptics': 'Växla haptik',
-  'hudChrome.nameplate.mob': '[{level}] {name}',
-  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
   'hudChrome.options.browserEffects': 'Webbläsareffekter',
   'hudChrome.options.browserEffectsAuto': 'Auto',
   'hudChrome.options.browserEffectsFull': 'Fullständig',
@@ -5624,6 +6047,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.helmet': 'Hjälm',
   'itemUi.slots.legs': 'Ben',
   'itemUi.slots.mainhand': 'Främre hand',
+  'itemUi.slots.twoHand': 'Tvåhänt',
+  'itemUi.slots.offhand': 'Andra hand',
   'itemUi.slots.shoulder': 'Axlar',
   'itemUi.slots.waist': 'Midja',
   'itemUi.stats.agi': 'Smidighet',
@@ -6258,7 +6683,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.greyjaw_stalker.bonus3': 'Ökar attack- och magihastighet med 15%.',
   'entities.itemSets.necromancers.name': 'Mournweave-skrud',
   'entities.itemSets.necromancers.bonus2':
-    'Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).',
+    'Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).',
   'entities.itemSets.necromancers.bonus3': 'Ökar intellekt med 10 och uthållighet med 10.',
   'entities.itemSets.nighttalon.name': 'Direfang-päls',
   'entities.itemSets.nighttalon.bonus2': 'Ökar attackkraft med 40.',
@@ -6266,12 +6691,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ökar smidighet med 15, kritisk chans med 2% samt attack- och magihastighet med 15%.',
   'entities.itemSets.soulflame.name': 'Wraithfire-regalier',
   'entities.itemSets.soulflame.bonus2':
-    'Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).',
+    'Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).',
   'entities.itemSets.soulflame.bonus3':
     'Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.',
   'entities.itemSets.stormcallers.name': 'Galecall-skrud',
   'entities.itemSets.stormcallers.bonus2':
-    'Du kan inte knuffas bakåt (100% motstånd mot tillbakastöt).',
+    'Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).',
   'entities.itemSets.stormcallers.bonus3':
     'Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.',
   'entities.itemSets.vale_arcanist.name': 'Dalarkanistens skrud',
@@ -6388,6 +6813,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.swag.claimed': 'Hämtad',
   'hudChrome.discord.swag.locked': 'Låst',
   'hudChrome.discord.swag.free': 'Gratis',
+  'hudChrome.fct.cheap': 'Billigare!',
   'hudChrome.discord.swag.cost': '{points} p',
   'hudChrome.discord.swag.needTier': 'Nå en högre rang för att hämta detta.',
   'hudChrome.discord.swag.needPoints': 'Inte tillräckligt med poäng.',
@@ -6691,14 +7117,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.mobileCameraJoystick': 'Kamera joystick',
   'hudChrome.options.mobileLeftHanded': 'Vänsterhänt layout',
   'entities.quests.q_archetype_acceptance.title': 'Ett hantverk att kalla ditt eget',
-  'entities.quests.q_archetype_acceptance.text':
-    'Varje hantverkare i Eastbrook nöjer sig så småningom med ett hantverk att kalla sitt eget. Bevisa dig själv med en enda gärning, {playerName}, och förklara din väg.',
-  'entities.quests.q_archetype_acceptance.completion': 'Din väg är vald; gå det bra.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Skogsvarg dödad',
   'entities.quests.q_prof_make_amends.title': 'Att göra gott',
-  'entities.quests.q_prof_make_amends.text':
-    'För att avsätta ett hantverk åt ett annat måste en hantverkare först göra gott för vägen som inte gicks, {playerName}.',
-  'entities.quests.q_prof_make_amends.completion': 'Gjorda ändringar; en ny väg är öppen för dig.',
   'entities.quests.q_prof_make_amends.objectives.0.label': 'Skogsvarg dödad',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Varje låda, kista och krimskrams är i tryggt förvar hos Förgyllda kassakistan.',
@@ -6951,11 +7370,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.steam.title': 'Steam',
   'hudChrome.steam.unlink': 'Koppla bort Steam',
   'entities.items.chunk_of_ore.name': 'Malmklump',
-  'entities.quests.q_prof_intro.completion':
-    'Ser du? Malm i packningen och valkar på händerna. Fortsätt med gruvdrift, skogsavverkning och örtplockning medan du färdas längs vägarna. När du är tillbaka i staden, kom ihåg Stadsfokus-tavlan vid marknaden och arbetsbänken i närheten. Det går att försörja sig hederligt på alltihop, om du vill.',
-  'entities.quests.q_prof_intro.objectives.0.label': 'Malmklump',
-  'entities.quests.q_prof_intro.text':
-    'Alla i Östbäck har ett yrke vid sidan om svärdet, {playerName}. Det finns malmådror utspridda runt staden, så svinga en hacka och ge mig 5 klumpar. Bryt dem själv, märk väl; jag ser skillnaden.',
   'entities.quests.q_prof_intro.title': 'Ett yrke för varje hand',
   'hudChrome.auth.appleChoiceExpired':
     'Den här Apple-inloggningen har gått ut. Logga in med Apple igen.',
@@ -7485,6 +7899,135 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.staff': 'Stav',
   'hudChrome.wocStore.wtype.sword': 'Svärd',
   'hudChrome.wocStore.wtype.wand': 'Trollstav',
+  'guide.abilityHook.revenge':
+    'Träffar fiender framför dig och kan bli kostnadsfri efter en undvikning eller parering.',
+  'guide.abilityHook.hamstring': 'Hämmar en fiendes rörelse så att den inte kan fly.',
+  'entities.abilities.aura_surge.name': 'Gryningsrikoschett',
+  'entities.abilities.aura_surge.description':
+    'Slungar en gryningssmidd sköld för {damage} Helig skada, tystar huvudmålet i 2 sek. och studsar sedan till upp till 2 ytterligare fiender inom 10 meter för 75% skada per studs. (Paladintalang)',
+  'entities.abilities.aspect_of_the_wild.description':
+    'Inspirerar allierade inom 30 m med vild kraft och ökar deras attackkraft med 45 och attackhastighet med 5 % i 5 min. (jägartalang)',
+  'entities.abilities.avatar.name': 'Avatar',
+  'entities.abilities.avatar.description':
+    'Förvandla dig till en koloss i 20 sek., bryt alla kontrolleffekter på dig och öka din utdelade skada med 20%.',
+  'entities.abilities.avenging_wrath.description':
+    'Åkallar hämnande kraft och ökar din attackkraft med 60 och besvärjelsekraft med 30 i 20 sek. (paladintalang)',
+  'entities.abilities.berserk.description': 'Ökar din attackkraft med 70 i 15 sek. (druidtalang)',
+  'entities.abilities.bladestorm.name': 'Klingstorm',
+  'entities.abilities.bladestorm.description':
+    'Bli en virvlande storm av stål och träffa alla fiender inom 6 meter för {damage} skada varje sekund i 4 sek.',
+  'entities.abilities.blink.description':
+    'Teleporterar dig 15 m framåt och bryter rotningseffekter. (magikertalang)',
+  'entities.abilities.bloodlust.description':
+    'Driver allierade inom 30 m till raseri och ökar deras attackhastighet med 30 % i 15 sek. (schamantalang)',
+  'entities.abilities.chain_lightning.description':
+    'Slungar blixtar mot målområdet och ger {damage} skada till fiender i närheten. (schamantalang)',
+  'entities.abilities.chaos_bolt.description':
+    'Slungar en kaotisk eldblixt som ger {damage} Eldskada. (häxmästartalang)',
+  'entities.abilities.cloak_of_shadows.description':
+    'Sveper in dig i skuggor och absorberar 420 skada i 5 sek. (skurktalang)',
+  'entities.abilities.cone_of_cold.description':
+    'Golpea a närliggande fiender con escarcha e inflige {damage} de daño de Frost. (magikertalang)',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Förbannar målet och minskar dess rörelsehastighet med 30 % i 12 sek. (häxmästartalang)',
+  'entities.abilities.death_coil.description':
+    'Träffar fienden för {damage} Skuggskada och skrämmer den sedan i 3 sek. (häxmästartalang)',
+  'entities.abilities.deep_freeze.description':
+    'Congela profundamente a målet, inflige {damage} de daño de Frost y lo aturde durante 4 sek. (magikertalang)',
+  'entities.abilities.desperate_prayer.description':
+    'Helar dig omedelbart för {damage}. (prästtalang)',
+  'entities.abilities.deterrence.description':
+    'Ökar din chans att undvika med 50 procentenheter i 10 sek. (jägartalang)',
+  'entities.abilities.divine_shield.description':
+    'Skyddar dig med helig kraft och absorberar 900 skada i 8 sek. (paladintalang)',
+  'entities.abilities.earthbind.description':
+    'Binder fiender i närheten till marken och rotar dem i 2 sek. (schamantalang)',
+  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magikertalang)',
+  'entities.abilities.frenzied_regeneration.description':
+    'Återställer 180 hälsa under 10 sek. Endast i Björngestalt. (druidtalang)',
+  'entities.abilities.frost_trap.description':
+    'Fryser fiender i målområdet i 3 sek. så att de varken kan röra sig eller agera. (jägartalang)',
+  'entities.abilities.ghostly_strike.description':
+    'Träffar fienden för vapenskada plus {damage}, ökar undvikandet kortvarigt och ger 1 kombinationspoäng. (skurktalang)',
+  'entities.abilities.hammer_of_wrath.description':
+    'Slungar en helig hammare mot en sårad fiende och ger {damage} Helig skada. Kan bara användas under 20 % hälsa. (paladintalang)',
+  'entities.abilities.healing_stream.description':
+    'Återställer 120 hälsa hos ett allierat mål under 12 sek. (schamantalang)',
+  'entities.abilities.holy_wrath.description':
+    'Släpper lös helig kraft och ger {damage} skada till fiender i närheten. (paladintalang)',
+  'entities.abilities.howl_of_terror.description':
+    'Skrämmer fiender i närheten i upp till 3 sek. Skada kan bryta effekten. (häxmästartalang)',
+  'entities.abilities.ice_block.description':
+    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalang)',
+  'entities.abilities.inner_focus.description':
+    'Gör din nästa besvärjelse kostnadsfri. Varar i 60 sek. (prästtalang)',
+  'entities.abilities.innervate.description':
+    'Levande sav väller upp i dig i 10 sek. och återställer 20 av din aktuella resurs i vågor: mana, raseri eller energi. Formbyte avbryter den inte. Sömn, bedövning eller stasis stoppar saven. (druidtalang)',
+  'entities.abilities.mend_pet.name': 'Lappa ihop',
+  'entities.abilities.mend_pet.description':
+    'Sana a vänligt mål por {damage} durante 15 sek. (jägartalang)',
+  'entities.abilities.meteor.description':
+    'Kallar ner en meteor på målområdet och ger {damage} Eldskada. Därefter bränns fiender där för 12 till 18 Eldskada varannan sekund i 6 sek. (magikertalang)',
+  'entities.abilities.mind_sear.description':
+    'Kanaliserar skuggenergi mot målområdet och ger {damage} skada varje sekund till fiender i närheten. (prästtalang)',
+  'entities.abilities.multi_shot.description':
+    'Avfyrar en salva mot målområdet och ger {damage} Fysisk skada till fiender inom 8 m. (jägartalang)',
+  'entities.abilities.prayer_of_healing.description':
+    'Helar allierade i närheten för {damage}. (prästtalang)',
+  'entities.abilities.preparation.description':
+    'Avslutar nedkylningen för Spurt, Undvikande och Försvinnande. (skurktalang)',
+  'entities.abilities.presence_of_mind.description':
+    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalang)',
+  'entities.abilities.psychic_scream.description':
+    'Skrämmer fiender i närheten i upp till 4 sek. Skada kan bryta effekten. (prästtalang)',
+  'entities.abilities.shadowstep.description': 'Kliver genom skuggorna mot ditt mål. (skurktalang)',
+  'entities.abilities.silence.description': 'Tystar målet i 4 sek. (prästtalang)',
+  'entities.abilities.tranquility.description':
+    'Kanaliserar återställande energi i 4 sek. och helar allierade inom 30 m för 42 till 52 varje sekund. (druidtalang)',
+  'game.talents.readout.rowsSummary': 'Talanger: {head}, {picked}/{unlocked} valrader valda.',
+  'hudChrome.fct.absorbed': '{amount} absorberat',
+  'game.talents.choicesTab': 'Val',
+  'game.talents.rowUnlockToast': 'Ett nytt talangval har låsts upp!',
+  'game.talents.rowUnlocks': 'Låses upp på nivå {level}',
+  'entities.abilities.blazing_barrier.name': 'Flammande barriär',
+  'entities.abilities.blazing_barrier.description':
+    'Svep in dig i lågor och absorbera 130 skada i 60 sek. (Eld)',
+  'entities.abilities.cold_snap.name': 'Vinterns kallelse',
+  'entities.abilities.cold_snap.description':
+    'Avslutar nedkylningen för Flimmersteg, Frostslöja och Förbättrad osynlighet. (magikertalang)',
+  'entities.abilities.greater_invisibility.name': 'Förbättrad osynlighet',
+  'entities.abilities.greater_invisibility.description':
+    'Försvinn i 20 sek.: tar bort 2 skadeeffekter över tid och du tar 90% mindre skada medan du är osynlig och en kort stund efteråt. (magikertalang)',
+  'entities.abilities.hot_streak.name': 'Het svit',
+  'entities.abilities.hot_streak.description':
+    'Passiv: två kritiska träffar i rad med dina Eldbesvärjelser (Glödbult, Glödfall, Skålla, Pyrolans eller Flamslag) gör nästa Pyrolans eller Flamslag omedelbar och kostnadsfri. Förbrukarna räknas till NÄSTA svit, även kostnadsfria kast; ett Flamslag räknas en gång oavsett hur många fiender det träffar, och endast den första träffen kan räknas. (Eld)',
+  'entities.abilities.ice_floes.name': 'Isflak',
+  'entities.abilities.ice_floes.description':
+    'Dina nästa två besvärjelser med kasttid kan kastas medan du rör dig. Varar i 15 sek. (magikertalang)',
+  'entities.abilities.ignition.name': 'Antändning',
+  'entities.abilities.ignition.description':
+    'Passiv: kritiska träffar med dina besvärjelser bränner målet för 40% av den utdelade skadan under 6 sek. och kan staplas. (Eldmästerskap)',
+  'entities.abilities.mass_barrier.name': 'Massbarriär',
+  'entities.abilities.mass_barrier.description':
+    'Skyddar dig och upp till 4 närliggande allierade inom 30 m; varje barriär absorberar 130 skada i 60 sek. (magikertalang)',
+  'entities.abilities.overload.name': 'Överbelastning',
+  'entities.abilities.overload.description':
+    'Din nästa besvärjelse förstärks med 40% men kostar 50% mer mana. Varar i 10 sek. (magikertalang)',
+  'entities.abilities.power_echo.name': 'Krafteko',
+  'entities.abilities.power_echo.description':
+    'Din nästa direkta besvärjelse upprepas med 50% kraft på samma mål. Varar i 10 sek. (magikertalang)',
+  'entities.abilities.rings_of_frost.name': 'Frostring',
+  'entities.abilities.rings_of_frost.description':
+    'Åkallar en ring i 10 sek. Fiender som korsar dess kant fryses i 4 sek. (magikertalang)',
+  'entities.abilities.rune_of_power.name': 'Kraftruna',
+  'entities.abilities.rune_of_power.description':
+    'Rista en kraftruna vid dina fötter i 15 sek.: allierade som står inom 8 m gör 10% mer skada. (magikertalang)',
+  'entities.abilities.summon_water_elemental.name': 'Åkalla vattenelementar',
+  'entities.abilities.summon_water_elemental.description':
+    'Åkalla en vattenelementar som strider vid din sida, slungar Vattenprojektiler mot ditt mål och kanaliserar Vattenstråle. (Frost)',
+  'entities.mobs.water_elemental.name': 'Vattenelementar',
+  'entities.items.conjured_bread4.name': 'Frambesvärjt festbröd',
+  'entities.items.conjured_water4.name': 'Frambesvärjt källvatten',
   'devCommand.actions.attune.description': 'Markera alla länkningskrav som slutförda.',
   'devCommand.actions.attune.label': 'Lås upp länkningar',
   'devCommand.actions.bot.description':
@@ -7636,4 +8179,29 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Slå på Visa föremålsnivå i alternativen för att snabbt jämföra två delar. Utrustning med känd källa, från fiender, uppdrag och hantverksyrken, visar då en föremålsnivå: ett enda tal som ungefär anger styrkan utifrån ursprunget och gör förbättringar jämförbara även mellan olika platser. Delar utan sådan källa, som enkla handelsvaror och startutrustning, visar ingen nivå; ett saknat tal är normalt.',
   'guide.professions.craftHowBody':
     'Öppna hantverksfönstret (standardtangent T) för att se alla recept du kan, vad de kräver och vad du har; när materialen finns räcker ett klick. Vanliga recept kan tillverkas var som helst. Några avancerade recept, däribland verktyg på hög nivå och sällsynta rustningar för besvärjare, kräver hantverksnavet i Highwatch.',
+  'hudChrome.auraEffect.battleStance': 'Stridsställning: 10% mer raserigenerering',
+  'hudChrome.auraEffect.berserkerStance':
+    'Bärsärkaställning: kritiska träffar sker 3% oftare och slår 3% hårdare',
+  'hudChrome.auraEffect.crit': 'Ökar kritisk träffchans med {pct}%',
+  'hudChrome.auraEffect.rageGen': 'Ökar raserigenereringen med {pct}%',
+  'hudChrome.auraEffect.reckless':
+    'Ökar kritisk träffchans med {pct}% och raserigenereringen med {ragePct}%',
+  'hudChrome.auraEffect.avatar': 'Koloss: vållad skada ökad med {pct}%',
+  'hudChrome.auraEffect.bloodbath': 'Ökar kritisk träffchans och vållad skada med {pct}%',
+  'hudChrome.auraEffect.dieBySword': 'Minskar skadan du tar med {pct}%',
+  'hudChrome.auraEffect.sanguine':
+    'Ökar attackhastigheten med {hastePct}% och vållad skada med {dmgPct}%',
+  'hudChrome.auraEffect.battleTrance':
+    'Ditt nästa Plundrarhugg eller Stympande hugg kostar inget raseri',
+  'hudChrome.auraEffect.revengeFree': 'Din nästa Hämnd kostar inget raseri',
+  'hudChrome.auraEffect.victoryRush': 'Segerrus är redo',
+  'hudChrome.auraEffect.maxHpPct': 'Ökar maximal hälsa med {pct}%',
+  'hudChrome.statInfo.names.parry': 'Parering',
+  'hudChrome.statInfo.desc.parry':
+    'Din chans att helt parera ett närstridsanfall framifrån utan att ta någon skada. Ett slag bakifrån kan inte pareras.',
+  'hud.combat.floatingParry': 'Parerade',
+  'hud.combat.parried': 'Din {ability} pareras av {target}.',
+  'hudChrome.options.mouseoverCast': 'Kasta via muspekaren på gruppramarna',
+  'hudChrome.options.showTargetOfTarget': 'Visa målets mål',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Målets mål',
 };

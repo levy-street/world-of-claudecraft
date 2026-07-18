@@ -869,6 +869,14 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     drinkMana: 672,
     sellValue: 0,
   },
+  conjured_water4: {
+    id: 'conjured_water4',
+    name: 'Conjured Springwater',
+    kind: 'drink',
+    quality: 'common',
+    drinkMana: 1150,
+    sellValue: 0,
+  },
   // --- conjured food (mage Conjure Food ranks; foodHp tiers pair with the
   // conjured-water mana tiers above) ---
   conjured_bread: {
@@ -895,6 +903,14 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     foodHp: 552,
     sellValue: 0,
   },
+  conjured_bread4: {
+    id: 'conjured_bread4',
+    name: 'Conjured Feastloaf',
+    kind: 'food',
+    quality: 'common',
+    foodHp: 980,
+    sellValue: 0,
+  },
   // --- Smith Haldren's stock (common/white, levels 3-7) ---
   eastbrook_arming_sword: {
     id: 'eastbrook_arming_sword',
@@ -905,6 +921,17 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 5, max: 9, speed: 2.2 },
     sellValue: 140,
     buyValue: 1400,
+  },
+  eastbrook_greatsword: {
+    id: 'eastbrook_greatsword',
+    name: 'Eastbrook Greatsword',
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'common',
+    weapon: { min: 9, max: 15, speed: 3.4 },
+    sellValue: 160,
+    buyValue: 1600,
   },
   bronzework_mace: {
     id: 'bronzework_mace',
@@ -936,6 +963,20 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stats: { int: 1 },
     sellValue: 150,
     buyValue: 1500,
+  },
+  eastbrook_buckler: {
+    id: 'eastbrook_buckler',
+    name: 'Eastbrook Buckler',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'offhand',
+    shield: true,
+    blockValue: 6,
+    quality: 'common',
+    stats: { armor: 34, sta: 1 },
+    sellValue: 130,
+    buyValue: 1300,
+    requiredClass: ['warrior', 'paladin', 'shaman'],
   },
   eastbrook_chain_vest: {
     id: 'eastbrook_chain_vest',
@@ -1297,6 +1338,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     questId: 'q_greyjaw',
   },
   chunk_of_ore: {
+    // Retired profession-intro workaround. Keep the shipped id resolvable for
+    // older character saves, but no live acquisition path grants it now that
+    // q_prof_intro uses a genuine gather objective.
     id: 'chunk_of_ore',
     name: 'Chunk of Ore',
     kind: 'quest',

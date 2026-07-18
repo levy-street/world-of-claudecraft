@@ -3,8 +3,9 @@
 This phase turns the six deep crafts into real progressions: common to rare tier ladders that
 consume the Phase 4 node materials, corpse components, fish, and vendor reagents, backed by a
 pinned economy invariant so no recipe ever vendors above its inputs. It is its own slice because
-it is pure batch content work (hundreds of records across a handful of tables) with no new sim
-behavior: everything it needs (wheel math, masterwork, stations, training) landed in Phases 1
+it is almost pure batch content work (hundreds of records across a handful of tables): the one
+sanctioned sim touch is wiring the named Phase 2 materialTierBonus hook at its crafting.ts call
+site. Everything else it needs (wheel math, masterwork, stations, training) landed in Phases 1
 to 9, and everything that consumes it (fishing supply, node tiers, tuning) comes after.
 
 ## Context pointers
@@ -97,6 +98,15 @@ Materials/collision agent deliverables:
 - Dedicated material ItemDefs for hide, silk, venomSac, and meat (plus any other corpse
   component the audit surfaces), with HARVEST_COMPONENT_ITEMS remapped so harvesting
   yields the new materials.
+- The perfect specimen (2026-07-17 amendment): a rare corpse-component family riding the
+  EXISTING rollCorpseMaterialRarity roll and the signable-rarity floor (rare+, always
+  signed): corpse harvesting's jackpot fantasy, celebrated by the Phase 4 loot-line
+  treatment. No new event system and no proficiency work (monster-harvest proficiency
+  stays wave 2).
+- Wire the Phase 2 materialTierBonus hook (the named hook in
+  src/sim/professions/masterwork.ts): real material-tier values at the crafting.ts call
+  site keyed by the consumed materials' rarity, pinned in the masterwork tests. Higher-tier
+  materials now visibly raise masterwork odds; the cap and draw order are untouched.
 - The old quest items keep their quest roles ONLY: quest drops and quest credit paths
   stay exactly as they are, with a regression test proving quest credit still works and
   that a wolf hide no longer advances a boar quest.
@@ -110,6 +120,12 @@ Craft content agent deliverables (each of the six, for its craft):
 - Each tier's recipes consume Phase 4 node materials, the new corpse component materials,
   fish (cooking: author the recipes and the fish ItemDefs now; Phase 11 lands the supply),
   and vendor reagents.
+- Cross-tier composition (2026-07-17 amendment): higher-tier recipes also consume SOME
+  lower-tier materials (at least one lower-tier material family per rare recipe) so new
+  gatherers keep selling into a mature economy.
+- Cooking and alchemy only: combat-worthy consumables at EVERY tier (food and potion
+  outputs a raider actually uses), keeping a permanent destruction channel for low-tier
+  materials (2026-07-17 amendment).
 - Every output is a real ItemDef with an English catalog row and the procedural icon
   fallback (bespoke WebP icon overrides are not required this phase).
 - Every new recipe is trained, not known, at the matching master via the Phase 9
@@ -130,6 +146,9 @@ Verify stage (adversarial) deliverables:
   master and training links, catalog keys, component mappings.
 - Confirm every gathered or harvested material introduced by Phases 4 and 10 has at least
   one consuming recipe.
+- Confirm the cross-tier rule (every rare recipe consumes at least one lower-tier material
+  family) and the every-tier consumable rule (cooking and alchemy output combat-worthy
+  consumables at each tier).
 - Report every issue including low-severity and uncertain ones; ranking happens later.
 
 INVARIANTS THIS PHASE MUST KEEP:
@@ -202,13 +221,21 @@ STEP 5 - ACCEPTANCE CRITERIA (do not mark complete until all check):
 - [ ] Every new recipe is trained-not-known at its matching master.
 - [ ] Every new item and recipe has an English catalog row; wordy names carry their five
       non-Latin fills (M16).
+- [ ] Every rare recipe consumes at least one lower-tier material family; cooking and
+      alchemy have combat-worthy consumables at every tier.
+- [ ] The materialTierBonus hook is wired with pinned values; higher-tier materials raise
+      the masterwork proc chance; the cap and draw-order pins stay green.
+- [ ] The perfect specimen family exists, rides the corpse rarity roll, and is always
+      signed at rare+.
 - [ ] npm run wiki:content regenerates clean.
 
 STEP 6 - DOC UPDATES + MEMORY:
 - Update docs/professions-2/progress.md (mark Phase 10 status; note deferrals).
 - Update docs/professions-2/state.md: the Phase 10 entry in New surfaces gains the new
-  material item id families (hide/silk/venomSac/meat/fiber/cloth), the ladder table
-  locations, the economy invariant test path, the i18n key namespaces added, the fish
+  material item id families (hide/silk/venomSac/meat/fiber/cloth), the perfect specimen
+  family, the ladder table
+  locations, the economy invariant test path, the wired materialTierBonus values, the
+  i18n key namespaces added, the fish
   item ids authored ahead of Phase 11, and the per-master trained recipe mapping.
 - If you use Claude Code memory, record any surprising rules or current-state notes for
   the next session.

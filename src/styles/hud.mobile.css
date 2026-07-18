@@ -58,6 +58,12 @@
   body.mobile-touch #game-canvas {
     touch-action: none;
   }
+  /* The shared Fire, Chronomancy and Frost phoenix keeps its desktop artwork
+     proportions while taking less of the phone battlefield. The root is
+     already draggable, and scale composes with its independent translate. */
+  body.mobile-touch #proc-overlay {
+    scale: 0.2;
+  }
   /* The HUD overlay must let one-finger panning reach scrollable windows (Bag,
      Market, etc.) on iOS: Safari intersects touch-action down the ancestor
      chain, so `none` here would block child scroll containers and a child's
@@ -271,12 +277,20 @@
     border-color: #d8c46bb8;
   }
   body.mobile-touch #mobile-autorun-target.locked {
+    top: 50%;
+    z-index: 1;
+    transform: translate(-50%, -50%) scale(1);
     color: #fff7c7;
     border-color: var(--gold);
     box-shadow:
       0 0 0 1px #0009,
       inset 0 1px 0 #ffffff24,
       0 0 18px #e3c66a99;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.mobile-touch #mobile-autorun-target {
+      transition: none;
+    }
   }
   /* Hidden by default (settings.mobileCameraJoystick, def false): swipe-look on
      open gameplay space is the primary camera path (plan decision 2). Hidden
@@ -829,6 +843,13 @@
     box-shadow:
       0 0 12px #ffd100aa,
       inset 0 0 0 1px #ffd10077;
+  }
+  body.mobile-touch #mobile-action-ring button.empowered {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 14px #ffd100dd,
+      inset 0 0 0 1px #fff0a6aa;
+    animation: action-empowered-pulse 1.15s ease-in-out infinite;
   }
   body.mobile-touch #mobile-action-ring button.used {
     border-color: var(--gold);
@@ -1694,6 +1715,14 @@
     grid-template-columns: repeat(2, minmax(0, calc(112px * var(--mobile-chrome-scale, 1))));
     grid-template-rows: none;
   }
+  /* A real raid must not inherit the party-only two-row column flow: with nine
+     visible allies that would create five columns and run off a portrait phone.
+     Raid presentation fills two bounded columns top-to-bottom instead. */
+  body.mobile-touch #party-frames.party-style-raid .party-rows {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, calc(112px * var(--mobile-chrome-scale, 1))));
+    grid-template-rows: none;
+  }
   body.mobile-touch #party-frames.below-target {
     /* +135px (was 130px): the collapse chip is the container's first child now, so keep
        it clear of the target frame's bottom edge (the same +5px nudge as landscape). */
@@ -2455,6 +2484,22 @@
     max-height: none;
     overflow: hidden;
   }
+  /* The LIST owns the tracks (rows subgrid into it, see components.css), so the
+     tighter mobile template lands on the list; the cap column wraps below. */
+  body.mobile-touch .profession-skill-list {
+    grid-template-columns: minmax(82px, 1fr) 34px minmax(68px, auto);
+  }
+  body.mobile-touch .profession-skill-row > :last-child {
+    grid-column: 1 / -1;
+  }
+  /* The cap value wraps to its own line per row on mobile (no cap column
+     exists), so the Cap column header would float over nothing: hide it. */
+  body.mobile-touch .profession-skill-header > :last-child {
+    display: none;
+  }
+  body.mobile-touch .qd-profession-choice select {
+    min-height: 40px;
+  }
   body.mobile-touch .dev-command-header {
     padding: 10px 54px 9px 12px;
   }
@@ -2512,6 +2557,14 @@
     grid-template-columns: 1fr 1fr;
     justify-items: start;
   }
+  body.mobile-touch #claudium-window .cl-wallet-connect {
+    grid-template-columns: 1fr;
+  }
+  body.mobile-touch #claudium-window .cl-wallet-connect button {
+    grid-column: 1;
+    grid-row: auto;
+    min-height: 40px;
+  }
   body.mobile-touch #claudium-window .cl-rail {
     min-height: 44px;
     padding: 7px 8px;
@@ -2578,6 +2631,23 @@
   }
   body.mobile-touch #claudium-window .cl-sku-buy {
     min-height: 40px;
+  }
+  @media (orientation: landscape) {
+    body.mobile-touch #claudium-window .cl-body:has(> .cl-wallet-connect) {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: stretch;
+      gap: 10px;
+    }
+    body.mobile-touch
+      #claudium-window
+      .cl-body:has(> .cl-wallet-connect)
+      > :not(.cl-balance, .cl-wallet-connect) {
+      grid-column: 1 / -1;
+    }
+    body.mobile-touch #claudium-window .cl-wallet-connect {
+      margin-top: 0;
+    }
   }
   body.mobile-touch #vendor-window {
     max-height: calc(58vh - 20px);
@@ -3374,35 +3444,86 @@
   body.mobile-touch .perf-footer .btn {
     min-height: 44px;
   }
-  /* Full-screen landscape-first overlay (issue 1577 char/talents redo, see
-     #char-window above): the old partial sheet left too little height for a
-     full talent tree to read on a real landscape phone even before the
-     fit-to-view scale (talent_tree_fit.ts / fitTreeToMobileViewport in
-     talents_window.ts) kicks in, so #tal-body gets the whole screen to work
-     with instead of a reserved player-frame band. */
+  /* Compact centered Talents sheet. The specialization picker is intentionally
+     three-up in every orientation so all specs remain visible and tappable
+     without a horizontal or vertical selection gesture. */
   body.mobile-touch #talents-window {
     position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: auto;
-    max-width: none;
-    max-height: none;
-    transform: none;
+    left: 50%;
+    right: auto;
+    top: 50%;
+    bottom: auto;
+    width: min(620px, calc(var(--app-vw) / var(--window-scale, 1) - 20px));
+    max-width: calc(var(--app-vw) / var(--window-scale, 1) - 20px);
+    max-height: calc(var(--app-vh) / var(--window-scale, 1) - 20px);
+    transform: translate(-50%, -50%);
+    overflow-x: hidden;
+    overflow-y: hidden;
     z-index: 95 !important;
   }
   body.mobile-touch #talents-window #tal-body {
+    width: 100%;
+    min-height: 0;
+    max-height: max(150px, min(360px, calc(var(--app-vh) / var(--window-scale, 1) - 180px)));
     overflow: auto;
   }
-  /* The class/spec tab switch already exists on desktop (tal-tabs); on mobile
-     it is the mechanism issue 1577's redo leans on to see one tree at a time
-     at a bigger fit-to-view scale, instead of a taller stacked layout. Bigger
-     touch targets for the tab strip itself. */
+  body.mobile-touch #talents-window .panel-title {
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    font-size: 13px;
+  }
+  body.mobile-touch #talents-window .tal-tabs {
+    margin: 4px 0;
+  }
   body.mobile-touch #talents-window .tal-tab {
     min-height: 40px;
     display: flex;
     align-items: center;
+    padding: 4px 6px;
+  }
+  body.mobile-touch #talents-window .ts-specs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    min-height: 0;
+    gap: 6px;
+    margin: 6px 0;
+  }
+  body.mobile-touch #talents-window .ts-panel {
+    padding: 8px 4px;
+    aspect-ratio: auto;
+    min-height: 150px;
+  }
+  body.mobile-touch #talents-window .ts-panel-head {
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+  body.mobile-touch #talents-window .ts-panel .ts-icon {
+    width: 36px;
+    height: 36px;
+  }
+  body.mobile-touch #talents-window .ts-name {
+    font-size: 11px;
+    overflow-wrap: anywhere;
+  }
+  body.mobile-touch #talents-window .ts-role {
+    font-size: 8px;
+  }
+  body.mobile-touch #talents-window .ts-det-desc,
+  body.mobile-touch #talents-window .ts-det-meta,
+  body.mobile-touch #talents-window .ts-det-mastery,
+  body.mobile-touch #talents-window .ts-ex-block {
+    display: none;
+  }
+  body.mobile-touch #talents-window .ts-view-talents {
+    min-height: 40px;
+    margin-top: auto;
+    padding: 4px 3px;
+    font-size: 9px;
+    line-height: 1.15;
+  }
+  body.mobile-touch #talents-window .tal-loadout-btn {
+    min-height: 40px;
+    padding: 5px 9px;
   }
   body.mobile-touch #spellbook [data-close] {
     min-width: 40px;
@@ -4309,32 +4430,10 @@
     body.mobile-touch #mobile-preflight-steps {
       font-size: 11px;
     }
-    /* Issue 1577 round 2 (11): a further landscape improvement on top of the
-       full-screen fit-to-view talent tree. Flow the window as a wrapping row so
-       the tree (#tal-body) and the build/loadout controls (.tal-foot) sit side
-       by side (two columns) instead of the foot stacking below and stealing the
-       vertical room the tree fits into. The header/help/tabs stay full width on
-       top. The tree's fit-to-view scale (fitTreeToMobileViewport) measures
-       #tal-body live, so it adapts to the narrower-but-taller column
-       automatically. */
-    body.mobile-touch #talents-window {
-      column-count: 2;
-      column-gap: 14px;
-      box-sizing: border-box;
-    }
-    body.mobile-touch #talents-window > * {
-      break-inside: avoid;
-    }
-    body.mobile-touch #talents-window > .panel-title,
-    body.mobile-touch #talents-window > .tal-head,
-    body.mobile-touch #talents-window > .tal-help,
-    body.mobile-touch #talents-window > .tal-tabs {
-      column-span: all;
-    }
+    /* Keep the footer compact below the full-width, internally scrollable body. */
     body.mobile-touch #talents-window > .tal-foot {
       margin-top: 0;
-      border-top: 0;
-      padding-top: 0;
+      padding-top: 4px;
     }
   }
   /* Re-homed from the char-select responsive block in shell.css: narrow-width

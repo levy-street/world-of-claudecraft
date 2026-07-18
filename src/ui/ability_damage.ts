@@ -128,6 +128,7 @@ export function abilityPrimaryEffect(res: ResolvedAbility): AbilityEffect | unde
       eff.type === 'aoeHeal' ||
       eff.type === 'aoeRoot' ||
       eff.type === 'groundAoE' ||
+      (eff.type === 'repositionToAim' && eff.landingAoe !== undefined) ||
       eff.type === 'consumeAura' ||
       eff.type === 'finisherDamage' ||
       eff.type === 'drainTick' ||
@@ -159,8 +160,19 @@ export function abilityOverTimeEffect(
  *  the player actually knows. Null when the ability has none. */
 export function abilityBuffValue(res: ResolvedAbility): number | null {
   for (const eff of res.effects) {
-    if (eff.type === 'selfBuff' || eff.type === 'buffTarget') return eff.value;
-    if (eff.type === 'aoeAttackPower') return eff.amount;
+    if (eff.type === 'selfBuff' || eff.type === 'buffTarget') {
+      // form_fireball carries a 1+fraction speed multiplier; the tooltip's $b%
+      // wants the whole-percent bonus (1.4 -> 40).
+      if (eff.kind === 'form_fireball') return (eff.value - 1) * 100;
+      return eff.value;
+    }
+    if (eff.type === 'aoeAttackPower') {
+      // The reworked shout (Direhowl) is a percentage damage cut (pct) rather than
+      // the old flat attack-power drain (amount): show the whole-percent value the
+      // player feels, so $b never renders the now-zero legacy amount.
+      if (eff.pct != null) return Math.round(eff.pct * 100);
+      return eff.amount ?? null;
+    }
   }
   return null;
 }
@@ -173,4 +185,25 @@ export function abilityDurationValue(res: ResolvedAbility): number | null {
     if ('duration' in eff && typeof eff.duration === 'number') return eff.duration;
   }
   return null;
+}
+
+/** Dynamic percentages for the Hourglass tooltip, read from the resolved effect. */
+export function abilityTemporalHourglassValues(res: ResolvedAbility): {
+  healing: number;
+  selfCooldownRecovery: number;
+  allyCooldownRecovery: number;
+  hostilePveDuration: number;
+  hostilePvpDuration: number;
+  groundDuration: number;
+} | null {
+  const effect = res.effects.find((candidate) => candidate.type === 'temporalHourglass');
+  if (effect?.type !== 'temporalHourglass') return null;
+  return {
+    healing: effect.healMaxHpPct * 100,
+    selfCooldownRecovery: (effect.selfCooldownRate - 1) * 100,
+    allyCooldownRecovery: (effect.allyCooldownRate - 1) * 100,
+    hostilePveDuration: effect.hostilePveDuration,
+    hostilePvpDuration: effect.hostilePvpDuration,
+    groundDuration: effect.groundDuration,
+  };
 }

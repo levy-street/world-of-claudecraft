@@ -56,7 +56,8 @@ describe('Sim.cancelAura', () => {
     const sim = makeSim();
     const p = sim.player;
     p.auras.push(buff({ sourceId: p.id }));
+    const before = p.auras.slice();
     sim.cancelAura('absent');
-    expect(p.auras).toHaveLength(1);
+    expect(p.auras).toEqual(before);
   });
 });

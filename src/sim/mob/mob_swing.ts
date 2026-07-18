@@ -19,6 +19,7 @@
 // (applyAura/dealDamage/effectiveArmor/recalcPlayer + the rng/emit/players/entities
 // primitives), all of which still resolve on Sim.
 
+import { isDisarmed } from '../combat/cc';
 import { applyThornsReaction } from '../combat/thorns_charge';
 import { MOBS } from '../data';
 import * as deedsMod from '../deeds';
@@ -35,7 +36,10 @@ function isDevourableAura(a: Aura): boolean {
     (a.kind.startsWith('buff_') && a.value > 0) ||
     a.kind === 'hot' ||
     a.kind === 'absorb' ||
-    a.kind === 'imbue'
+    a.kind === 'imbue' ||
+    // Lifesap's regen surge is a rich beneficial aura: purgeable counterplay
+    // (the adversarial finding that it had none).
+    a.kind === 'resource_sap'
   );
 }
 
@@ -301,14 +305,21 @@ export function runMobSwingAffixes(
   // disarm: a brutal swing can knock the weapon from a player's grip, suppressing
   // their auto-attack for a duration. Players only (only they run the primary-target
   // auto-attack path) and hostile only, so a friendly pet (mobSwing's other caller)
-  // never disarms the party. Refreshes by id; never stacks.
+  // never disarms the party. Never stacks, and never refreshes while already active:
+  // a landed hit is only able to seed a FRESH disarm window, so a run of procs (one
+  // brute swinging faster than its own duration, or several in the same pack each
+  // rolling their own chance) cannot chain-extend the lockout past its stated
+  // duration. The already-disarmed check sits AFTER the rng roll so a swing at an
+  // already-disarmed target still draws its proc roll, keeping every downstream draw
+  // at its documented stream position.
   const disarm = MOBS[mob.templateId]?.disarm;
   if (
     disarm &&
     mob.hostile &&
     target.kind === 'player' &&
     !target.dead &&
-    ctx.rng.chance(disarm.chance)
+    ctx.rng.chance(disarm.chance) &&
+    !isDisarmed(target)
   ) {
     ctx.applyAura(target, {
       id: `disarm_${mob.templateId}`,

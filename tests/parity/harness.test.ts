@@ -130,7 +130,9 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
   // gate" rule). Update these snapshots only when intentionally re-categorizing.
   it('ENTITY_EXCLUDE membership is exactly the pinned set', () => {
     expect([...ENTITY_EXCLUDE].sort()).toEqual([
+      'castConsumedEmpower', // one-cast empower guard flag; effect pinned via procState + events
       'color',
+      'damageHistory',
       'equippedInstances',
       'equippedItems',
       'guild',
@@ -147,6 +149,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'prevFacing',
       'prevPos',
       'scale',
+      'sharedCritBonus', // derived crit core; its inputs (ratings/talents/auras) are sampled
       'skin',
       'skinCatalog',
       'stealthed',
@@ -188,7 +191,14 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
     const entity = sim.player as unknown as Record<string, unknown>;
     const meta = sim.players.get(sim.playerId)! as unknown as Record<string, unknown>;
     // Optional fields that are legitimately absent on a fresh entity/meta.
-    const optionalEntity = new Set(['netUpdatedAt', 'netInterval', 'holderTier', 'holderBalance']);
+    const optionalEntity = new Set([
+      'netUpdatedAt',
+      'netInterval',
+      'holderTier',
+      'holderBalance',
+      'damageHistory', // Rewind's ring; only present after a player takes damage
+      'castConsumedEmpower', // set only while a cast that consumed an empower resolves
+    ]);
     const optionalMeta = new Set(['characterId', 'lastWhisperFrom']);
     for (const k of ENTITY_EXCLUDE) {
       if (!optionalEntity.has(k)) expect(k in entity, `Entity.${k} missing (renamed?)`).toBe(true);

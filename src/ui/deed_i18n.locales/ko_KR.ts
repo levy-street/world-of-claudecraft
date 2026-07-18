@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_card_duel_first_win: {
+    name: '패를 보여줘',
+    desc: '카드 마스터에게서 카드 대결에 승리하십시오.',
+  },
   prog_first_steps: {
     name: '첫걸음',
     desc: '레벨 2를 달성하고 머나먼 여정의 첫걸음을 내디디십시오.',
@@ -23,8 +27,8 @@ export const table: DeedLocaleTable = {
   prog_specialized: { name: '출사표', desc: '전문화를 선택하고 그 대표 기술을 배우십시오.' },
   prog_deep_roots: { name: '깊이 내린 뿌리', desc: '마지막 단의 특성에 특성 점수를 사용하십시오.' },
   prog_full_build: {
-    name: '온전한 열하나',
-    desc: '특성 점수 11점을 모두 하나의 조합에 투자하십시오.',
+    name: '온전한 여섯',
+    desc: '하나의 조합에서 특성 6개 줄마다 하나씩 선택하십시오.',
   },
   prog_veteran: { name: '베테랑', desc: '누적 경험치 250,000을 획득하십시오.', title: '베테랑' },
   prog_champion: { name: '용사', desc: '누적 경험치 500,000을 획득하십시오.', title: '용사' },

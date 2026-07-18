@@ -46,6 +46,7 @@ import {
   isFormAuraKind,
   MAX_LEVEL,
   MELEE_RANGE,
+  questObjectiveRequired,
   xpForLevel,
 } from '../types';
 import { groundHeight } from '../world';
@@ -289,7 +290,12 @@ export function overpowerReadout(ctx: SimContext, e: Entity, meta: PlayerMeta): 
 // only one is ever active, so the first match is the answer.
 export function formReadout(e: Entity): string {
   const form = e.auras.find(
-    (a) => isFormAuraKind(a.kind) || a.kind === 'defensive_stance' || a.kind === 'stealth',
+    (a) =>
+      isFormAuraKind(a.kind) ||
+      a.kind === 'battle_stance' ||
+      a.kind === 'berserker_stance' ||
+      a.kind === 'defensive_stance' ||
+      a.kind === 'stealth',
   );
   if (!form) return 'You are not in any form or stance.';
   if (form.kind === 'stealth') return 'You are stealthed.';
@@ -417,7 +423,10 @@ export function questReadout(meta: PlayerMeta): string {
     const quest = QUESTS[qid];
     if (!quest) continue;
     const objs = quest.objectives
-      .map((o, i) => `${o.label} ${Math.min(qp.counts[i] ?? 0, o.count)}/${o.count}`)
+      .map((o, i) => {
+        const required = questObjectiveRequired(quest, qp, i);
+        return `${o.label} ${Math.min(qp.counts[i] ?? 0, required)}/${required}`;
+      })
       .join(', ');
     const tag = qp.state === 'ready' ? ' (ready)' : '';
     lines.push(`${quest.name}${tag} — ${objs}`);
@@ -430,6 +439,7 @@ export function questReadout(meta: PlayerMeta): string {
 export function gearReadout(meta: PlayerMeta): string {
   const slots: [EquipSlot, string][] = [
     ['mainhand', 'Main Hand'],
+    ['offhand', 'Off Hand'],
     ['helmet', 'Helmet'],
     ['shoulder', 'Shoulder'],
     ['chest', 'Chest'],
@@ -611,22 +621,11 @@ export function talentsReadout(meta: PlayerMeta, e: Entity): string {
   if (total <= 0)
     return `You have not unlocked talents yet — they begin at level ${FIRST_TALENT_LEVEL}.`;
   const spent = pointsSpent(meta.talents);
-  // Split spent points by tree (cold path: walk the allocation once on demand).
-  const byId = new Map(ct.nodes.map((n) => [n.id, n] as const));
-  let classPts = 0;
-  let specPts = 0;
-  for (const id in meta.talents.ranks) {
-    const node = byId.get(id);
-    if (!node) continue;
-    if (node.tree === 'class') classPts += meta.talents.ranks[id];
-    else specPts += meta.talents.ranks[id];
-  }
   const specName = meta.talents.spec
     ? (ct.specs.find((s) => s.id === meta.talents.spec)?.name ?? meta.talents.spec)
     : null;
   const head = specName ?? 'no specialization';
-  const breakdown = specName ? `Class ${classPts}, ${specName} ${specPts}` : `Class ${classPts}`;
   const unspent = total - spent;
   const tail = unspent > 0 ? ` ${unspent} unspent.` : '';
-  return `Talents: ${head} — ${spent}/${total} points spent (${breakdown}).${tail}`;
+  return `Talents: ${head} - ${spent}/${total} rows selected.${tail}`;
 }

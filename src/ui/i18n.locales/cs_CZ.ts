@@ -2,9 +2,288 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const cs_CZ: Partial<Record<TranslationKey, string>> = {
-  'entities.abilities.ironhold.description':
-    'Zapři se za svůj štít a sniž veškeré utrpěné poškození o 40 % po dobu 8 sekund.',
-  'entities.abilities.ironhold.name': 'Železný hmat',
+  'hud.pet.waterJet': 'Vodní paprsek',
+  'hud.pet.waterJetDesc':
+    'Přikaž svému vodnímu elementálovi, aby po dobu 3 sekund soustředil zpomalující proud. Čas obnovy 8 sekund. Kliknutím pravým tlačítkem aktivuješ automatické seslání, kdykoli je schopnost mimo čas obnovy.',
+  'hud.pet.waterJetTitle': 'Vodní paprsek',
+  'hud.prompts.acceptResurrection': 'Přijmout vzkříšení',
+  'hud.prompts.resurrectionOffer': '{name} tě chce vrátit k životu. Přijímáš?',
+  'itemUi.stats.parry': 'Odražení',
+  'apiError.wallet.handoff_invalid':
+    'Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu.',
+  'cardDuel.close': 'Zavřít',
+  'cardDuel.counts': 'Balíček: {deck} · Odložiště: {discard}',
+  'cardDuel.forfeit': 'Vzdát se',
+  'cardDuel.forfeitAria': 'Vzdát se Karetního souboje',
+  'cardDuel.join': 'Vstoupit do fronty',
+  'cardDuel.joinAria': 'Vstoupit do fronty Karetního souboje',
+  'cardDuel.leave': 'Odejít z fronty',
+  'cardDuel.leaveAria': 'Odejít z fronty Karetního souboje',
+  'cardDuel.playCardAria': 'Zahrát kartu {value}',
+  'cardDuel.queued': 'Čekám na soupeře...',
+  'cardDuel.round': 'Skóre kola: {mine} - {theirs}',
+  'cardDuel.title': 'Karetní souboj',
+  'cardDuel.unavailable': 'Karetní souboj vyžaduje dalšího hráče online.',
+  'cardDuel.vsOpponent': 'vs {name}',
+  'cardDuel.waitingOnOpponent': 'Čekám na soupeřovu kartu...',
+  'cardDuel.yourTurn': 'Zahraj kartu',
+  'entities.abilities.arcane_surge.description':
+    'Prožene nepřítelem příval surového éteru a způsobí mu {damage} poškození. Každé seslání zanechá Éterický náboj, který zvyšuje poškození a rychlost sesílání tvého příštího Přívalu éteru (o 5 % za každý) a ostře zdražuje jeho manový náklad, ukládá se až do 4; Éterické šipky náboje spotřebují. Každé seslání může také aktivovat Éterický spěch, takže tvůj příští Příval éteru nebude nic stát a budeš jej sesílat dvakrát rychleji.',
+  'entities.abilities.arcane_surge.name': 'Příval éteru',
+  'entities.abilities.blizzard.description':
+    'Přivolá ledovou bouři na cílovou plochu po dobu 6 s, působí {damage} mrazivého poškození každou sekundu a zpomaluje nepřátele o 40 %. Každý zasažený nepřítel zkrátí cooldown Zmrzlé sféry o 0,5 s, nejvýše o 3 s za seslání. (Mráz)',
+  'entities.abilities.blizzard.name': 'Blizzard',
+  'entities.abilities.brain_freeze.description':
+    'Kopí jinovatky má 20% šanci způsobit, že tvůj příští Winterlash bude okamžitý, o 30 % silnější a bez cooldownu. (Mráz)',
+  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.dragons_breath.description':
+    'Podrž pro nabití rozšiřujícího se ohnivého dechu, pak ho pusť v kuželi. Delší nabití zasáhne dál a způsobí více poškození. Zasažení nepřátelé jsou dezorientováni; poškození efekt přeruší. Maximální nabití vždy kriticky zasáhne a počítá se jednou pro Žhavou sérii. (Oheň)',
+  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.fingers_of_frost.description':
+    'Kopí jinovatky má 15% šanci udělit Zmrzlé prsty, až 2 nabití: tvoje příští Ice Lance považuje cíl za zmrazený. (Mráz)',
+  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fireball_form.description':
+    'Přeměníš se v planoucí žar a zvýšíš rychlost pohybu o {buff} %. V přeměněné podobě nemůžeš útočit ani sesílat kouzla. Seslej znovu pro návrat do normální podoby.',
+  'entities.abilities.fireball_form.name': 'Žárová podoba',
+  'entities.abilities.flurry.description':
+    'Vypustíš tři ledové střely, každá za {damage} mrazivého poškození, a na cíl sesadíš Zimní chlad: jeho příštím 2 příchozím slučitelným kouzlům se cíl jeví jako zmrazený. Brain Freeze způsobí, že Winterlash je okamžitý, o 30 % silnější a přeskočí cooldown. (Mráz)',
+  'entities.abilities.flurry.name': 'Winterlash',
+  'entities.abilities.frozen_orb.description':
+    'Vypustíš sféru vířícího mrazu, která se 8 s pohybuje vpřed a způsobuje {damage} mrazivého poškození každou sekundu blízkým nepřátelům a zpomaluje je o 30 %. Její zásahy generují Zmrzlé prsty. (Mráz)',
+  'entities.abilities.frozen_orb.name': 'Zmrzlá sféra',
+  'entities.abilities.glacial_front.description':
+    'Podrž pro nabití rozšiřující se mrazivé fronty, pak ji pusť v kuželi. Delší nabití zasáhne dál a způsobí více poškození. Všichni zasažení nepřátelé jsou zpomaleni o 50 % na 4 s; maximální nabití je také ukotvuje na 1 s. (Mráz)',
+  'entities.abilities.glacial_front.name': 'Ledová fronta',
+  'entities.abilities.glacial_spike.description':
+    'Přivoláš mohutný ledový hrot, spotřebuješ 5 Rampouchů a způsobíš {damage} mrazivého poškození a zmrazíš cíl na místě na 4 s. (Mráz)',
+  'entities.abilities.glacial_spike.name': 'Ledový hrot',
+  'entities.abilities.ice_lance.description':
+    'Vrhneš střep ledu, způsobíš {damage} mrazivého poškození, trojnásobný proti zmrazenému cíli. Spotřebuje Zmrzlé prsty nebo nabití Zimního chladu, aby byl cíl považován za zmrazený. (Mráz)',
+  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.perfect_moment.description':
+    'Popadneš svůj dokonalý okamžik: okamžitě získáš 4 Éterické náboje a po dobu 10 s Éterické šipky je nespotřebovávají. (Chronomagie)',
+  'entities.abilities.perfect_moment.name': 'Dokonalý okamžik',
+  'entities.abilities.shatter.description':
+    'Tvá kouzla získají 50% šanci na kritický zásah proti zmrazeným cílům a tyto kritické zásahy způsobí o 20 % více poškození. Zmrzlé prsty a Zimní chlad se počítají jako zmrazení. (Mráz)',
+  'entities.abilities.shatter.name': 'Drcení mrazem',
+  'entities.abilities.temporal_acceleration.description':
+    'Urychlí tok času pro tvou skupinu nebo raid a zvýší rychlost útoku, sesílání a kanálování o 30 % po dobu 15 s. Spojenci, kteří nedávno byli pod vlivem Urychlení času nebo Válečných bubnů, jsou příliš vyčerpaní, aby z toho měli prospěch. (Chronomagie)',
+  'entities.abilities.temporal_acceleration.name': 'Urychlení času',
+  'entities.abilities.temporal_barrier.description':
+    'Posuneš cíl o okamžik mimo přítomnost; časová schránka pohltí {damage} poškození po dobu 10 s, než se časová linka zacvakne zpět.',
+  'entities.abilities.temporal_barrier.name': 'Časová bariéra',
+  'entities.abilities.temporal_cascade.description':
+    'Sešle ozvěnu přes tvou skupinu: cíl a až čtyři nejbližší spojenci jsou okamžitě zaceleni a každý je označen na {duration} s; část arcanového poškození, které způsobuješ, se přes jejich ozvěny vrátí a vyléčí je. (Chronomagie)',
+  'entities.abilities.temporal_cascade.name': 'Časová kaskáda',
+  'entities.abilities.temporal_echo.description':
+    'Označíš spojence ozvěnou zdravějšího okamžiku a okamžitě zacelíš {damage} zdraví. Po dobu {duration} s část arcanového poškození, které způsobuješ, se přes tuto ozvěnu vrátí a léčí je.',
+  'entities.abilities.temporal_echo.name': 'Časová ozvěna',
+  'entities.abilities.temporal_hourglass.description':
+    'Umístíš časové přesýpací hodiny na zvolené místo. Pod nepřítelem ho pozastaví na {hostilePveDuration} s v PvE nebo {hostilePvpDuration} s v PvP a zabrání veškerým akcím; poškození efekt přeruší. Pod tvýma nohama nebo pod spojencem ze skupiny udělí stázi na {duration} s, zabrání poškození a akcím, obnoví {healing} % maximálního zdraví a urychlí obnovu cooldownu o {selfCooldownRecovery} % pro tebe nebo o {allyCooldownRecovery} % pro spojence. Na prázdné zemi přesýpací hodiny čekají {groundDuration} s a ovlivní první platnou jednotku, která na ně vstoupí. Prospěšnou auru lze ručně zrušit.',
+  'entities.abilities.temporal_hourglass.name': 'Přesýpací hodiny zastavení',
+  'entities.abilities.temporal_mend.description':
+    'Posuneš spojence okamžikem do budoucnosti a zacelíš {damage} zdraví, jak se tělo usadí do svého zdravějšího budoucího já. (Chronomagie: signaturní schopnost)',
+  'entities.abilities.temporal_mend.name': 'Časové zacelení',
+  'entities.abilities.temporal_reversal.description':
+    'Přetočíš časovou linku padlého spojence a navrátíš ho k životu u jeho těla se zlomkem zdraví a many, i uprostřed boje. (Chronomagie)',
+  'entities.abilities.temporal_reversal.name': 'Časový návrat',
+  'entities.abilities.temporal_rewind.description':
+    'Vyšleš arcanovou vlnu přes svou skupinu nebo raid a přetočíš čas, čímž obnovíš 30 % poškození, které každý spojenec do 40 yardů utrpěl za posledních 5 sekund (nejvýše 35 % jejich maximálního zdraví). Nemůže být kritický efekt. (Chronomagie)',
+  'entities.abilities.temporal_rewind.name': 'Přetočení',
+  'entities.npcs.card_master.greeting':
+    'Jak by byl Karetní souboj? Na tři kola, vítěz získá právo chlubit se.',
+  'entities.npcs.card_master.name': 'Karetní mistr',
+  'entities.npcs.card_master.title': 'Rozdavač osudu',
+  'entities.quests.q_archetype_acceptance.completion':
+    'Slib platí. Tyto dva řemeslné obory jsou nyní tvoje hlavní a znalosti naproti nim se stanou tvým koníčkem.',
+  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Vytěžena rudná žíla',
+  'entities.quests.q_archetype_acceptance.text':
+    'Znalost je vědomost, {playerName}, ale ladění je slib. Zvol si dvě sousední řemesla, jejichž metody budeš nést jako svá hlavní, a pak mi přines rudu zpracovanou ve Vale vlastníma rukama.',
+  'entities.quests.q_prof_hobby_switch.completion':
+    'Lehčí volba, ale užitečná. Následuj tu zvídavost tak daleko, jak vzácná práce dovolí.',
+  'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Sklizena bylinkářská záplata',
+  'entities.quests.q_prof_hobby_switch.text':
+    'Hlavní obory vyžadují slib. Koníček se jen ptá, kam tě zavede tvá zvídavost, {playerName}. Nasbírej pár bylin a rozhodni se, které řemeslo naproti svým hlavním oborům chceš provozovat.',
+  'entities.quests.q_prof_hobby_switch.title': 'Jiná kratochvíle',
+  'entities.quests.q_prof_intro.completion':
+    'Vidíš? Ruda vytěžena a mozoly na rukách. Pokračuj v dolování, těžbě dřeva a sběru bylin cestou po silnicích, a až se vrátíš do města, mrkni na Nástěnku obecního středu u tržiště a na řemeslný stůl poblíž. Je v tom poctivý obchod, pokud ho chceš.',
+  'entities.quests.q_prof_intro.objectives.0.label': 'Vytěžena rudná žíla',
+  'entities.quests.q_prof_intro.text':
+    'Každá duše v Eastbrooku pracuje kromě meče i v nějakém řemesle, {playerName}. V skalách kolem Měděného dolu jihozápadně od města jsou rudné žíly. Jdi si sám zamasat krumpáčem a vytěž jich 5; věř mi, poznám rozdíl.',
+  'entities.quests.q_prof_make_amends.completion':
+    'Starý rytmus se vrací. Tvůj dřívější pár je opět aktivní.',
+  'entities.quests.q_prof_make_amends.text':
+    'Ten pár jsi nesl(a) i dříve, {playerName}. Návrat není nový slib. Pomoz udržovat silnici v Údolí průjezdnou a práce tvým rukám připomene, co kdysi uměly.',
+  'gpuNotice.bodyDesktop':
+    'Hra běží bez grafické akcelerace a bude pomalá. Aktualizuj ovladače grafiky a restartuj hru. Ve Windows nastav hru na Vysoký výkon v Nastavení, Systém, Displej, Grafika.',
+  'gpuNotice.bodyWeb':
+    'Hra běží bez grafické akcelerace a bude pomalá. Povol hardwarovou akceleraci v nastavení prohlížeče, aktualizuj ovladače grafiky a restartuj prohlížeč.',
+  'gpuNotice.dismiss': 'Zavřít',
+  'guide.abilityHook.blink': 'Teleportuje tě krátce dopředu a po cestě ruší ukotvení.',
+  'guide.abilityHook.blizzard':
+    'Pokryje plochu ledem pro postupné ničení a zpomalení celé skupiny nepřátel.',
+  'guide.abilityHook.brain_freeze':
+    'Tvoje mrazivé střely někdy způsobí, že příští Winterlash bude okamžitý a silnější.',
+  'guide.abilityHook.fingers_of_frost':
+    'Tvoje mrazivé střely někdy posílí Ice Lance tak, aby zasáhl, jako by byl cíl zmrazen.',
+  'guide.abilityHook.fireball_form':
+    'Staneš se živým žarem a přeběhneš otevřeným terénem vysokou rychlostí.',
+  'guide.abilityHook.flurry':
+    'Tři rychlé střely, které cíl ochladí, takže tvoje příští mrazivé zásahy dopadnou, jako by byl zmrazen.',
+  'guide.abilityHook.frozen_orb':
+    'Pomalu kutálí sféru skupinou nepřátel, která vše ochladí a živí tvoje mrazivé procsy.',
+  'guide.abilityHook.ice_lance':
+    'Okamžitý střep pro využití mrazivých procsů, zasáhne výrazně silněji zmrazeného cíle.',
+  'guide.abilityHook.shatter':
+    'Tvá kouzla mají mnohem vyšší šanci na kritický zásah proti zmrazeným cílům.',
+  'guide.deedsPage.renownBody':
+    'Věhlas je skóre za Knihou. Každý skutek, který vykonáš, má svou pevnou hodnotu a tvůj celkový součet nikdy neklesne, takže klidný týden tě o nic nepřipraví. Hrstka skutků závisí spíše na štěstí než na dovednosti a Počiny jsou oceněním samy o sobě, takže ani jedny do Věhlasu nepřidávají. Skutky bez Věhlasu se stále počítají jako splněné v tvé Knize; prostě nikdy neskórují.',
+  'guide.deedsPage.standingsNote':
+    'Říše vedou průběžný součet Věhlasu za každý účet: žebříček řadí celé účty podle celoživotního Věhlasu a každý skutek se počítá jednou za všechny postavy, přičemž zobrazuje jen Věhlas, takže skutky bez Věhlasu žebříčkem nikdy nepohnou, i když se v tvé Knize počítají. Chceš-li vidět, kdo kde stojí, otevři v herním menu Žebříček a přejdi na záložku Věhlas; pořadí je tam, nikoli na wiki.',
+  'hudChrome.archetypePair.alchemy+cooking': 'Lékárník',
+  'hudChrome.archetypePair.armorcrafting+engineering': 'Ozubničář',
+  'hudChrome.archetypePair.cooking+leatherworking': 'Lapač',
+  'hudChrome.archetypePair.enchanting+jewelcrafting': 'Klenotovazač',
+  'hudChrome.archetypePair.engineering+alchemy': 'Bombardér',
+  'hudChrome.archetypePair.inscription+enchanting': 'Arkanista',
+  'hudChrome.archetypePair.jewelcrafting+weaponcrafting': 'Čepelář',
+  'hudChrome.archetypePair.leatherworking+tailoring': 'Krejčovský kožešník',
+  'hudChrome.archetypePair.tailoring+inscription': 'Magotkalec',
+  'hudChrome.archetypePair.weaponcrafting+armorcrafting': 'Kovář',
+  'hudChrome.auraEffect.cheapCast': 'Tvoje příští kouzlo stojí o {pct} % méně',
+  'hudChrome.auraEffect.combustionCrit': 'Tvoje ohnivá kouzla vždy kriticky zasáhnou',
+  'hudChrome.auraEffect.dmgDone': 'Zvyšuje způsobené poškození o {pct} %',
+  'hudChrome.auraEffect.dmgDoneReduce': 'Snižuje způsobené poškození o {pct} %',
+  'hudChrome.auraEffect.elementalConvergencePrimed':
+    'Tvoje příští kouzlo z jiné živlové školy udělí Živlovou konvergenci',
+  'hudChrome.auraEffect.formFireball':
+    'Žárová podoba: rychlost pohybu zvýšena o {pct} %; útoky a kouzla jsou zakázány',
+  'hudChrome.auraEffect.freeCast': 'Tvoje příští seslání nestojí nic',
+  'hudChrome.auraEffect.heatingUp':
+    'Tvůj příští po sobě jdoucí kritický zásah stavebního ohnivého kouzla udělí Žhavou sérii; nekritický stavební útok Rozehřívání odstraní',
+  'hudChrome.auraEffect.iceFloesCasts':
+    'Tvoje příštích {n} kouzel s dobou sesílání lze sesílat za pohybu',
+  'hudChrome.auraEffect.increase.sp': 'Zvyšuje sílu kouzel o {value}',
+  'hudChrome.auraEffect.instantCast': 'Tvoje příští kouzlo s dobou sesílání je okamžité',
+  'hudChrome.auraEffect.overloadNext':
+    'Tvoje příští kouzlo je posíleno o {pct} %, ale stojí o 50 % více many',
+  'hudChrome.auraEffect.powerEchoNext':
+    'Tvoje příští přímé kouzlo se zopakuje na stejný cíl za {pct} % síly',
+  'hudChrome.auraEffect.temporalHourglass':
+    'Nezranitelný/á a neschopný/á jednat; obnovuje zdraví a urychluje obnovu cooldownu. Klikni pravým tlačítkem pro zrušení.',
+  'hudChrome.craftName.alchemy': 'Alchymie',
+  'hudChrome.craftName.armorcrafting': 'Zbrojnictví',
+  'hudChrome.craftName.cooking': 'Vaření',
+  'hudChrome.craftName.enchanting': 'Okouzlování',
+  'hudChrome.craftName.engineering': 'Strojírenství',
+  'hudChrome.craftName.inscription': 'Písemnictví',
+  'hudChrome.craftName.jewelcrafting': 'Klenotnictví',
+  'hudChrome.craftName.leatherworking': 'Kožedělnictví',
+  'hudChrome.craftName.tailoring': 'Krejčovství',
+  'hudChrome.craftName.weaponcrafting': 'Kovářství zbraní',
+  'hudChrome.crafting.attunementPreview':
+    'Výsledek: titul {title}; {majorA} a {majorB} se stávají neomezenými hlavními obory; {hobby} se stává koníčkem s omezením na vzácné; veškeré ostatní znalosti řemesla jsou zachovány, ale dočasně omezeny na běžné.',
+  'hudChrome.crafting.comboMet': 'Připraveno.',
+  'hudChrome.crafting.comboNotAttuned': 'Nejprve zvol pár archetypů.',
+  'hudChrome.crafting.comboRequires': 'Ladění: {craftA} + {craftB}, úroveň {tier}.',
+  'hudChrome.crafting.comboSyncing': 'Kontroluji realmové ladění.',
+  'hudChrome.crafting.comboTierUnmet': 'Dostaň oba hlavní obory na požadovanou úroveň.',
+  'hudChrome.crafting.comboWrongPair': 'Pro výrobu aktivuj přesně tento pár.',
+  'hudChrome.crafting.hobbyPreview':
+    'Výsledek: {hobby} se stává koníčkem s omezením na vzácné. Oba hlavní obory a veškeré zachované hodnoty dovedností zůstávají beze změny.',
+  'hudChrome.crafting.identity.ceilingCommon': 'Omezení na běžné',
+  'hudChrome.crafting.identity.ceilingRare': 'Omezení na vzácné',
+  'hudChrome.crafting.identity.ceilingUnlimited': 'Bez omezení posílení',
+  'hudChrome.crafting.identity.colCap': 'Omezení',
+  'hudChrome.crafting.identity.colCraft': 'Řemeslo',
+  'hudChrome.crafting.identity.colRole': 'Role',
+  'hudChrome.crafting.identity.colSkill': 'Dovednost',
+  'hudChrome.crafting.identity.dormantKnowledge':
+    'Znalosti {craft} jsou zachovány, ale dočasně neaktivní, dokud nebude aktivní jejich pár nebo koníček.',
+  'hudChrome.crafting.identity.history': 'Objeveno {pairs} párů, dokončeno {returns} návratů',
+  'hudChrome.crafting.identity.historyLabel': 'Historie',
+  'hudChrome.crafting.identity.hobbyLabel': 'Koníček',
+  'hudChrome.crafting.identity.majorsLabel': 'Hlavní obory',
+  'hudChrome.crafting.identity.nearTier':
+    '{craft} je {points} dovednostních bodů od příští úrovně.',
+  'hudChrome.crafting.identity.roleDormant': 'Dočasně neaktivní znalosti',
+  'hudChrome.crafting.identity.roleHobby': 'Koníček',
+  'hudChrome.crafting.identity.roleMajor': 'Hlavní obor',
+  'hudChrome.crafting.identity.roleUnattuned': 'Neladěno',
+  'hudChrome.crafting.identity.skillAria':
+    '{craft}, dovednost {skill}, úroveň {tier}, {role}, {ceiling}',
+  'hudChrome.crafting.identity.syncing': 'Čeká se na tvou řemeslnou identitu z realmu.',
+  'hudChrome.crafting.identity.title': 'Řemeslná identita',
+  'hudChrome.crafting.identity.titleLabel': 'Titul',
+  'hudChrome.crafting.identity.tutorial':
+    'První úroveň: dosáhni dovednosti {skill} v řemesle. Úspěšné recepty toto řemeslo posunou bez ztráty znalostí jinde.',
+  'hudChrome.crafting.identity.unattuned':
+    'Žádný pár archetypů není aktivní. Tvoje znalosti jsou zachovány, ale kombinované recepty vyžadují naladěný pár.',
+  'hudChrome.crafting.noProfessionChoice':
+    'V tuto chvíli není dostupná žádná platná volba profese.',
+  'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
+  'hudChrome.crafting.professionChoice': 'Volba profese',
+  'hudChrome.deeds.lbScopeNote':
+    'Účty seřazeny podle celoživotního Věhlasu. Každý skutek se počítá jednou za všechny postavy na účtu.',
+  'hudChrome.deeds.lbSelfAccount':
+    'Tvůj účet: pořadí {rank}, top {percent} procent, Věhlas {renown}',
+  'hudChrome.deeds.lbSelfRank': 'Tvůj účet: pořadí {rank}, top {percent} procent',
+  'hudChrome.nameplate.mobEliteLevel': '{level}+',
+  'hudChrome.nameplate.mobLevel': '{level}',
+  'hudChrome.specPanel.specUnlockBanner': 'Specializace odemčena!',
+  'hudChrome.specPanel.specUnlockHint': 'Stiskni N pro výběr specializace.',
+  'hudChrome.wocStore.wallet.connect': 'Připojit peněženku',
+  'hudChrome.wocStore.wallet.connectedUnlinked':
+    'Aplikace peněženky je připojena k tomuto prohlížeči, ale její veřejná adresa ještě není propojena s tvým účtem WoC.',
+  'hudChrome.wocStore.wallet.linkedConnected':
+    'Tvoje propojená aplikace peněženky je připojena a připravena na nákupy za SOL nebo WOC.',
+  'hudChrome.wocStore.wallet.linkedDisconnected':
+    'Tvoje veřejná adresa je propojena. Znovu připoj tuto aplikaci peněženky, když budeš chtít platit za SOL nebo WOC.',
+  'hudChrome.wocStore.wallet.manage': 'Spravovat peněženku',
+  'hudChrome.wocStore.wallet.mismatched':
+    'Je připojena jiná peněženka. Ověř ji pro nahrazení propojené adresy nebo znovu připoj propojenou peněženku.',
+  'hudChrome.wocStore.wallet.reconnect': 'Znovu připojit peněženku',
+  'hudChrome.wocStore.wallet.title': 'Peněženka Solana',
+  'hudChrome.wocStore.wallet.unlinked':
+    'Připoj aplikaci peněženky a jednou podpiš pro propojení její veřejné adresy s tvým účtem WoC. Nikdy nepřijmeme tvoji obnovovací frázi ani soukromý klíč.',
+  'hudChrome.wocStore.wallet.verify': 'Ověřit a propojit',
+  'wallet.bagConnect': 'Propojit peněženku',
+  'wallet.bagLink': 'Ověřit peněženku',
+  'wallet.bagReconnect': 'Znovu připojit peněženku',
+  'wallet.browser.completeBody': 'Můžeš se vrátit do desktopové aplikace World of ClaudeCraft.',
+  'wallet.browser.completeTitle': 'Autorizace peněženky dokončena',
+  'wallet.browser.continueWith': 'Pokračovat s {wallet}',
+  'wallet.browser.extensionHelp':
+    'Nebyla nalezena žádná kompatibilní rozšíření peněženky. Nainstaluj nebo odemkni Phantom, Solflare nebo jiný Solana prohlížečový wallet a zkus to znovu.',
+  'wallet.browser.eyebrow': 'Desktopová autorizace peněženky',
+  'wallet.browser.failed':
+    'Autorizace peněženky selhala nebo vypršela. Vrať se do desktopové aplikace a zkus to znovu.',
+  'wallet.browser.linkBody':
+    'Zvol rozšíření peněženky v tomto prohlížeči. Podepíšeš ověřovací zprávu a vrátíš se do desktopové aplikace.',
+  'wallet.browser.paymentBody':
+    'Zvol peněženku propojenou s tvým účtem a schval transakci v tomto prohlížeči.',
+  'wallet.browser.retry': 'Zkusit znovu',
+  'wallet.browser.returnButton': 'Vrátit se do desktopové aplikace',
+  'wallet.browser.reviewBody':
+    'Postupuj podle výzvy od {wallet}. Nechej tuto stránku prohlížeče otevřenou.',
+  'wallet.browser.reviewTitle': 'Zkontroluj ve své peněžence',
+  'wallet.browser.safety':
+    'World of ClaudeCraft nikdy nepožaduje tvoji obnovovací frázi ani soukromý klíč.',
+  'wallet.browser.title': 'Připojit peněženku Solana',
+  'wallet.manualReturnBrowserHelp':
+    'Po schválení se vrať na tuto záložku hry. Pokud iOS otevře jiný prohlížeč, zavři ho a ručně se vrať do původního prohlížeče.',
+  'wallet.manualReturnStandaloneHelp':
+    'Po schválení se vrať do World of ClaudeCraft z domovské obrazovky. Pokud iOS otevře prohlížeč, zavři ho a ručně znovu otevři aplikaci z domovské obrazovky.',
+  'wallet.mobileAppHelp':
+    'Zvol Phantom nebo Solflare. Tvoje aplikace peněženky požádá o schválení. Nechej tuto hru otevřenou a po dokončení se do ní vrať.',
+  'wallet.openAppButton': 'Otevřít {wallet}',
+  'wallet.openAppHelp':
+    'Otevři {wallet} pro kontrolu tohoto požadavku. Nechej tuto záložku hry otevřenou, zatímco je aplikace peněženky aktivní.',
+  'wallet.openAppTitle': 'Pokračovat v {wallet}',
+  'wallet.preparingAppButton': 'Připravuji {wallet}...',
+  'wallet.standaloneAppHelp':
+    'Připojení peněženky není zatím v aplikaci z domovské obrazovky dostupné. Otevři World of ClaudeCraft v Safari nebo Chrome pro použití Phantom nebo Solflare.',
+  'wallet.walletAppUnavailable': '{wallet} nelze připravit. Zavři toto okno a zkus to znovu.',
   'entities.abilities.primal_reflexes.description':
     'Tvoje instinkty se zostří a tvá šance na vyhnutí se útoku vzroste o 50 % po dobu 6 sekund.',
   'entities.abilities.primal_reflexes.name': 'Prvotní reflexy',
@@ -156,6 +435,168 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'loading.realmFull': 'Tento svět je momentálně plný. Zkus to prosím znovu za několik minut.',
   'loading.tooManyConnections':
     'Z tvé sítě se k tomuto světu připojuje příliš mnoho spojení. Zavři nadbytečná herní okna nebo to zkus znovu za několik minut.',
+  'entities.items.eastbrook_greatsword.name': 'Eastbrookský obouruční meč',
+  'entities.items.highwatch_greatsword.name': 'Highwatchský obouruční meč',
+  'entities.items.highwatch_wallshield.name': 'Highwatchský hradební štít',
+  'entities.items.eastbrook_buckler.name': 'Eastbrookský pukléř',
+  'entities.abilities.battle_stance.description':
+    'Útočný bojový postoj: vytváříš o 10 % více vzteku. Výchozí postoj pro Arms a Protection.',
+  'entities.abilities.battle_stance.name': 'Bojový postoj',
+  'entities.abilities.berserker_stance.description':
+    'Lehkomyslný bojový postoj: tvoje kritické zásahy padají o 3 % častěji a udeří o 3 % silněji. Válečník Fury bojuje vždy v tomto postoji.',
+  'entities.abilities.berserker_stance.name': 'Postoj berserka',
+  'entities.abilities.breachmaker.description':
+    'Ztluče cíl za poškození zbraně plus {damage} a prolomí jeho kryt: tvoje vlastní útoky proti němu způsobují o 20 % více poškození po dobu 8 s. (Arms)',
+  'entities.abilities.breachmaker.name': 'Prolamovač',
+  'entities.abilities.cleaving_blows.description':
+    'Rudá žeň vždy vrátí jedno nabití Dvojúderu. (Fury)',
+  'entities.abilities.cleaving_blows.name': 'Rozpolcující údery',
+  'entities.abilities.deep_wounds.description':
+    'Pasivní: tvůj Mrzačící úder nechá cíl krvácet a působí mu fyzické poškození během 6 s. (Arms)',
+  'entities.abilities.deep_wounds.name': 'Zející rány',
+  'entities.abilities.defiant_bellow.description':
+    'Vzdorný řev: každý nepřítel do 10 yardů je vyprovokován a nucen na tebe 3 s útočit. (Protection)',
+  'entities.abilities.defiant_bellow.name': 'Vzdorný řev',
+  'entities.abilities.diabolical_twinstrike.description':
+    'Když jsi rozzuřen(a), tvůj Dvojúder způsobuje o 15 % více poškození. (Fury)',
+  'entities.abilities.diabolical_twinstrike.name': 'Ďábelský dvojúder',
+  'entities.abilities.die_by_sword.description':
+    'Obranná schopnost: po dobu 8 s utrpíš o 30 % méně poškození a vyhneš se mnohem více útokům.',
+  'entities.abilities.die_by_sword.name': 'Smrt s mečem v ruce',
+  'entities.abilities.emboldening_roar.description':
+    'Vydáš osmělující řev: ty a spřátelení hráči do 40 yardů jste Osměleni a vaše další 3 schopnosti budou zaručeně kritické zásahy. (Fury)',
+  'entities.abilities.emboldening_roar.name': 'Osmělující řev',
+  'entities.abilities.enrage_passive.description':
+    'Pasivní: když jsi rozzuřen(a), způsobuješ o 7 % více poškození, útočíš o 25 % rychleji a pohybuješ se o 10 % rychleji po dobu 4 s. Pouštění žilou má 30% šanci tě rozzuřit; Rudá žeň tě rozzuří vždy. (Fury)',
+  'entities.abilities.enrage_passive.name': 'Vřava',
+  'entities.abilities.faultline.description':
+    'Vyšle zemí tlakovou vlnu: nepřátelé před tebou do 8 yardů utrpí {damage} poškození a jsou na 3 s omráčeni. (Protection)',
+  'entities.abilities.faultline.name': 'Zlomová linie',
+  'entities.abilities.furious_mending.description':
+    'Po dobu 10 s utrpíš o 20 % méně poškození, a dokud efekt trvá, Pouštění žilou tě léčí za 20 % tvého maximálního zdraví. (Fury)',
+  'entities.abilities.furious_mending.name': 'Zuřivé zacelení',
+  'entities.abilities.heroic_leap.description':
+    'Skočíš do cílové oblasti a při dopadu způsobíš okolním nepřátelům {damage} poškození.',
+  'entities.abilities.heroic_leap.name': 'Válečný skok',
+  'entities.abilities.intimidating_shout.description':
+    'Děsivý pokřik, který až 5 nepřátel do 8 yardů zažene na 8 s na útěk hrůzou. Poškození může efekt přerušit.',
+  'entities.abilities.intimidating_shout.name': 'Zastrašující pokřik',
+  'entities.abilities.iron_resolve.description':
+    'Zatneš zuby a ignoruješ bolest: spotřebuješ až 40 vzteku (nejméně 20) a za každý spotřebovaný bod vzteku absorbuješ 4 poškození po dobu až 10 s. (Ochrana)',
+  'entities.abilities.iron_resolve.name': 'Železné odhodlání',
+  'entities.abilities.measured_fury.description':
+    'Tvá odměřená zuřivost zostřuje tvé hospodaření: schopnosti tě stojí o 10 % méně vzteku. (Arms)',
+  'entities.abilities.measured_fury.name': 'Odměřená zuřivost',
+  'entities.abilities.piercing_howl.description':
+    'Pronikavý pokřik, který na 8 s zpomalí všechny nepřátele do 15 yardů o 50 %.',
+  'entities.abilities.piercing_howl.name': 'Pronikavé zavytí',
+  'entities.abilities.raging_gale.description':
+    'Okamžitě dvakrát udeříš zbraní, každý zásah způsobí 40 % poškození zbraně plus {damage}, a vygeneruješ 8 vzteku. Ukládá až 2 nabití. (Fury)',
+  'entities.abilities.raging_gale.name': 'Dvojúder',
+  'entities.abilities.raised_guard.description':
+    'Zapři se za štítem: po dobu 6 s utrpíš o 50 % méně fyzického poškození. Ukládá až 2 nabití. (Protection)',
+  'entities.abilities.raised_guard.name': 'Zvednutý kryt',
+  'entities.abilities.rallying_cry.description':
+    'Vydáš odvážný řev, který tobě a členům skupiny do 40 metrů na 10 s zvýší maximální zdraví o 20 %. Ochrana: po dobu trvání také utrpí o 5 % méně poškození.',
+  'entities.abilities.rallying_cry.name': 'Řev odvahy',
+  'entities.abilities.recklessness.description':
+    'Rozzuření: tvoje generování vzteku se zvýší o 50 % a šance na kritický zásah o 20 % na 12 s.',
+  'entities.abilities.recklessness.name': 'Bezhlavost',
+  'entities.abilities.red_harvest.description':
+    'Vydej ze sebe vše: v šílenství třikrát udeříš, každý úder za 65 % poškození zbraně plus {damage}, a vždy tě to rozzuří. (Fury)',
+  'entities.abilities.red_harvest.name': 'Rudá žeň',
+  'entities.abilities.revenge.description':
+    'Zaútočíš širokým obloukem a způsobíš fyzické poškození všem nepřátelům před tebou. Při více než 5 cílech je poškození sníženo. Když se vyhneš útoku nebo ho odrazíš, tvá příští Odveta nemusí stát žádný vztek. (Protection)',
+  'entities.abilities.revenge.name': 'Odveta',
+  'entities.abilities.sanguine_aura.description':
+    'Naplň svou zbraň krví nepřátel: ty a tvoji spojenci na blízko získáte na 20 s o 10 % vyšší rychlost útoku a o 10 % vyšší poškození.',
+  'entities.abilities.sanguine_aura.name': 'Krvavá aura',
+  'entities.abilities.seasoned_soldier.description':
+    'Tvoje kritické automatické útoky generují o 10 % více vzteku. (Arms)',
+  'entities.abilities.seasoned_soldier.name': 'Ostřílený voják',
+  'entities.abilities.storm_bolt.description':
+    'Mrštíš zbraní po cíli za {damage} poškození a omráčíš ho na 3 s.',
+  'entities.abilities.storm_bolt.name': 'Bouřná střela',
+  'entities.abilities.sudden_death.description':
+    'Tvoje automatické útoky mají šanci ti dovolit seslat Předčasný hrob na cíl s libovolným zdravím, a to zcela bez ceny vzteku. (Arms)',
+  'entities.abilities.sudden_death.name': 'Náhlá smrt',
+  'entities.abilities.sweeping_strikes.description':
+    'Po dobu 12 s tvoje útoky na jeden cíl zasáhnou také 1 blízkého nepřítele za plné poškození. (Arms)',
+  'entities.abilities.sweeping_strikes.name': 'Široký oblouk',
+  'entities.abilities.victory_rush.description':
+    'Udeříš za poškození zbraně plus {damage} a vyléčíš se za 20 % svého maximálního zdraví. Použitelné jen do 20 s od zabití nepřítele.',
+  'entities.abilities.victory_rush.name': 'Vítězný nápor',
+  'hudChrome.specPanel.complexity': 'Složitost',
+  'hudChrome.specPanel.complexityHigh': 'Vysoká',
+  'hudChrome.specPanel.complexityLow': 'Nízká',
+  'hudChrome.specPanel.complexityMedium': 'Střední',
+  'hudChrome.specPanel.exampleAbilities': 'Ukázkové schopnosti',
+  'hudChrome.specPanel.primaryAttr': 'Primární atribut',
+  'hudChrome.specPanel.selectSpec': 'Vybrat specializaci',
+  'hudChrome.specPanel.viewTalents': 'Zobrazit talenty',
+  'hudChrome.talentRows.comingSoon': 'Již brzy',
+  'hudChrome.talentRows.defaultLoadout': 'Výchozí sestava',
+  'hudChrome.talentRows.tab': 'Volby',
+  'hudChrome.talentRows.readoutSummary': 'Talenty: {head}, vybráno {spent}/{total} řad.',
+  'entities.abilities.aspect_of_the_wild.name': 'Maska divokého tesáku',
+  'entities.abilities.avenging_wrath.name': 'Křídlo odplaty',
+  'entities.abilities.berserk.name': 'Rudý opar',
+  'entities.abilities.blink.name': 'Mihokrok',
+  'entities.abilities.bloodlust.name': 'Válečné bubny',
+  'entities.abilities.chain_lightning.name': 'Rozvětvený blesk',
+  'entities.abilities.chaos_bolt.name': 'Zkázný šíp',
+  'entities.abilities.cloak_of_shadows.name': 'Stínoplášť',
+  'entities.abilities.cone_of_cold.name': 'Mrazivý smyk',
+  'entities.abilities.curse_of_exhaustion.name': 'Olověná kletba',
+  'entities.abilities.death_coil.name': 'Hrobová spirála',
+  'entities.abilities.deep_freeze.name': 'Mrtvý mráz',
+  'entities.abilities.desperate_prayer.name': 'Poslední modlitba',
+  'entities.abilities.deterrence.name': 'Štětinová stráž',
+  'entities.abilities.divine_shield.name': 'Světelný štít',
+  'entities.abilities.earthbind.name': 'Svírající země',
+  'entities.abilities.evocation.name': 'Éterická studna',
+  'entities.abilities.frenzied_regeneration.name': 'Divoké zacelení',
+  'entities.abilities.frost_trap.name': 'Jinovatková léčka',
+  'entities.abilities.ghostly_strike.name': 'Přízračný úder',
+  'entities.abilities.hammer_of_wrath.name': 'Zvonící kladivo',
+  'entities.abilities.healing_stream.name': 'Pramenná studna',
+  'entities.abilities.holy_wrath.name': 'Hněv světce',
+  'entities.abilities.howl_of_terror.name': 'Děsivé zavytí',
+  'entities.abilities.ice_block.name': 'Ledová rakev',
+  'entities.abilities.inner_focus.name': 'Ztišená mysl',
+  'entities.abilities.innervate.name': 'Míza života',
+  'entities.abilities.meteor.name': 'Nebeský kámen',
+  'entities.abilities.mind_sear.name': 'Spálení mysli',
+  'entities.abilities.multi_shot.name': 'Tříštivý výstřel',
+  'entities.abilities.prayer_of_healing.name': 'Sborové zacelení',
+  'entities.abilities.preparation.name': 'Záložní plán',
+  'entities.abilities.presence_of_mind.name': 'Zrychlená mysl',
+  'entities.abilities.psychic_scream.name': 'Výkřik hrůzy',
+  'entities.abilities.shadowstep.name': 'Stínový skluz',
+  'entities.abilities.silence.name': 'Umlčení',
+  'entities.abilities.tranquility.name': 'Píseň háje',
+  'entities.abilities.cleansing_verdict.name': 'Očistný rozsudek',
+  'entities.abilities.cleansing_verdict.description':
+    'Odstraní škodlivý magický účinek ze spojeneckého cíle a vyléčí jej svatou magií za {damage}.',
+  'entities.abilities.smoke_screen.name': 'Kouřová clona',
+  'entities.abilities.smoke_screen.description':
+    'Zmizíte v oblaku kouře a na 8 s zvýšíte svou šanci na úhyb o 30 %.',
+  'entities.abilities.spellsteal.name': 'Krádež kouzla',
+  'entities.abilities.spellsteal.description':
+    'Ukradne nepříteli prospěšný magický účinek a přenese jej na vás.',
+  'entities.abilities.startle_shot.name': 'Lekavý výstřel',
+  'entities.abilities.startle_shot.description':
+    'Divoký výstřel, který na {duration} s dezorientuje cíl. Jakékoli poškození účinek zruší.',
+  'entities.abilities.typhoon.name': 'Tajfun',
+  'entities.abilities.typhoon.description':
+    'Poryv větru odhodí všechny nepřátele do 8 m a omráčí je, čímž na 4 s sníží jejich rychlost pohybu o 50 %.',
+  'entities.abilities.voidfeast.name': 'Hostina prázdnoty',
+  'entities.abilities.voidfeast.description':
+    'Pohltí magický účinek (prospěšný z nepřítele nebo škodlivý ze spojence) a vyléčí vás o 6 % maximálního zdraví.',
+  'hudChrome.abilityError.shieldRequired': 'Musíte mít nasazený štít.',
+  'entities.abilities.collective_reversal.name': 'Hromadné navrácení',
+  'entities.abilities.collective_reversal.description':
+    'Vrátí časovou osu každého padlého člena vaší skupiny nebo raidu a oživí ho u jeho těla s 30% zdraví a many. Nelze seslat v boji. (Chronomancie)',
   'entities.abilities.sport_boot.description':
     'Dlouhý vysoký odkop směrem k zaměřovanému bodu. Dav to miluje.',
   'entities.abilities.sport_boot.name': 'Velký odkop',
@@ -412,16 +853,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.walkUp': 'Přijď k Prasečímu poli a sleduj zápas z tribun.',
   'hudChrome.archetypeTitle.label': 'Titul',
   'hudChrome.archetypeTitle.none': 'Žádný',
-  'hudChrome.archetypeTitle.armorcrafting': 'Zbrojíř',
-  'hudChrome.archetypeTitle.weaponcrafting': 'Kovář zbraní',
-  'hudChrome.archetypeTitle.jewelcrafting': 'Klenotník',
-  'hudChrome.archetypeTitle.alchemy': 'Alchymista',
-  'hudChrome.archetypeTitle.engineering': 'Inženýr',
-  'hudChrome.archetypeTitle.cooking': 'Kuchař',
-  'hudChrome.archetypeTitle.inscription': 'Písař',
-  'hudChrome.archetypeTitle.enchanting': 'Očarovatel',
-  'hudChrome.archetypeTitle.tailoring': 'Krejčí',
-  'hudChrome.archetypeTitle.leatherworking': 'Koželuh',
   'entities.itemSets.crownforged.bonus4':
     'Kritické zásahy tvé zbraně roztříští cíl efektem Kostitříska a způsobí mu krvácení za 8 poškození každé 2 s po dobu 12 s. Nasčítá se až 3krát.',
   'entities.itemSets.deathlord.bonus4':
@@ -1086,6 +1517,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'itemUi.slots.helmet': 'Helma',
   'itemUi.slots.legs': 'Nohy',
   'itemUi.slots.mainhand': 'Hlavní ruka',
+  'itemUi.slots.twoHand': 'Obouruční',
+  'itemUi.slots.offhand': 'Vedlejší ruka',
   'itemUi.slots.shoulder': 'Ramena',
   'itemUi.slots.waist': 'Pas',
   'itemUi.stats.agi': 'Obratnost',
@@ -2148,7 +2581,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileControls': 'Mobilní ovládání',
   'hud.core.mobileMap': 'Mapa',
   'hud.core.mobileMenu': 'Menu',
-  'hud.core.mobileSettings': 'Nastavení',
   'hud.core.mobileMeters': 'Měřiče',
   'hud.core.mobileMore': 'Více',
   'hud.core.mobileMoreAria': 'Zobrazit další menu',
@@ -2415,7 +2847,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hud.pet.rename': 'Přejmenovat mazlíčka',
   'hud.pet.renameConfirm': 'Přejmenovat',
   'hud.pet.renameLabel': 'Vyber nové jméno mazlíčka.',
-  'hud.pet.revive': 'Oživit mazlíčka',
+  'hud.pet.revive': 'Ošetření',
   'hud.pet.stanceDesc': 'Klikni a vyber pasivní, obranný nebo agresivní postoj.',
   'hud.pet.stanceTitle': 'Postoj mazlíčka',
   'hud.pet.taunt': 'Provokace',
@@ -2755,6 +3187,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.swag.claimedToast': 'Vyzvednuto: {name}',
   'hudChrome.discord.swag.cost': '{points} bodů',
   'hudChrome.discord.swag.free': 'Zdarma',
+  'hudChrome.fct.cheap': 'Levnější!',
   'hudChrome.discord.swag.locked': 'Zamčeno',
   'hudChrome.discord.swag.needPoints': 'Nemáš dost bodů.',
   'hudChrome.discord.swag.needTier': 'Pro vyzvednutí dosáhni vyšší hodnosti.',
@@ -3403,13 +3836,13 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.emoteEditor.title': 'Emoty',
   'hudChrome.emoteWheel.edit': 'Upravit',
   'hudChrome.emoteWheel.label': 'Emoty',
+  'hudChrome.itemHeroicTag': '[HRDINSKÉ]',
+  'hudChrome.itemSoulbound': 'Vázáno na duši',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.landing.highContrast': 'Vysoký kontrast',
   'hudChrome.landing.highContrastAria':
     'Přepnout vysoce kontrastní pozadí: vypne pohyblivý trailer, aby text úvodní obrazovky zůstal čitelný',
-  'hudChrome.nameplate.mob': '[{level}] {name}',
-  'hudChrome.nameplate.mobElite': '[{level}+] {name}',
   'hudChrome.paperdoll.unequipAria': 'Sundat {item}',
   'hudChrome.paperdoll.unequipHint':
     'Klikni na x, pravé kliknutí, nebo přetáhni do batohů pro sundání',
@@ -3881,7 +4314,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': 'Dubová kůže',
   'entities.abilities.bash.description': 'Omráčí cíl na 2 s. Pouze v medvědí podobě.',
   'entities.abilities.bash.name': 'Otřes',
-  'entities.abilities.battle_shout.description': 'Zvýší tvoji sílu útoku o {buff} na 2 min.',
+  'entities.abilities.battle_shout.description':
+    'Výkřik, který zvýší sílu útoku všech členů družiny o {buff}% na 30 min.',
   'entities.abilities.battle_shout.name': 'Železný řev',
   'entities.abilities.bear_charge.name': 'Medvědí výpad',
   'entities.abilities.bear_form.description':
@@ -3914,8 +4348,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cleave.description':
     'Rozmáchlý úder, který zasáhne všechny nepřátele před tebou za {damage} poškození.',
   'entities.abilities.cleave.name': 'Žací oblouk',
-  'entities.abilities.commanding_shout.description': 'Zvýší tvoji výdrž o {buff} na 2 min.',
-  'entities.abilities.commanding_shout.name': 'Povzbuzující pokřik',
   'entities.abilities.concussive_shot.description':
     'Omráčí cíl za {damage} poškození a zpomalí jeho pohyb o 50 % na 4 s.',
   'entities.abilities.concussive_shot.name': 'Otřásající výstřel',
@@ -3953,7 +4385,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Demoralizuje blízké nepřátele a sníží jejich sílu útoku o 20 na 20 s. Pouze v medvědí podobě.',
   'entities.abilities.demoralizing_roar.name': 'Zbabělý řev',
   'entities.abilities.demoralizing_shout.description':
-    'Vypustíš děsivý řev, který sníží sílu útoku všech blízkých nepřátel o {buff} na 30 s.',
+    'Vypustíš děsivý řev, který sníží poškození způsobované všemi blízkými nepřáteli o {buff}% na 20 s.',
   'entities.abilities.demoralizing_shout.name': 'Děsivé vytí',
   'entities.abilities.devotion_aura.description': 'Zvýší tvoji zbroj o {buff} na 30 min.',
   'entities.abilities.devotion_aura.name': 'Neochvějná aura',
@@ -3988,8 +4420,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.description':
     'Dokončovací útok, který odhalí cíl a sníží jeho zbroj o {damage} na 30 s.',
   'entities.abilities.expose_armor.name': 'Průraz zbroje',
-  'entities.abilities.faerie_fire.description':
-    'Sníží zbroj cíle o {damage}% na 40 s. Nesčítá se se Seřezáním zbroje.',
   'entities.abilities.faerie_fire.name': 'Čarodějné světlo',
   'entities.abilities.fear.description':
     'Vžene nepříteli hrůzu a nechá ho krčit se až 8 s. Jakékoli poškození efekt přeruší.',
@@ -4154,17 +4584,14 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.regrowth.name': 'Druhý květ',
   'entities.abilities.rejuvenation.description': 'Vyléčí cíl za {damage} během 12 s.',
   'entities.abilities.rejuvenation.name': 'Divoký květ',
-  'entities.abilities.rend.description':
-    'Zraní cíl a způsobí mu krvácení za {damage} poškození během {duration} s.',
-  'entities.abilities.rend.name': 'Hluboká rána',
   'entities.abilities.renew.description': 'Vyléčí cíl za {damage} během 15 s.',
   'entities.abilities.renew.name': 'Přetrvávající milost',
   'entities.abilities.retribution_aura.description':
     'Obklopí tě svatou energií na 30 min a způsobí 5 svatého poškození každému nepříteli, který tě zasáhne na blízko.',
   'entities.abilities.retribution_aura.name': 'Aura odplaty',
   'entities.abilities.revive_pet.description':
-    'Oživí tvého mrtvého mazlíčka a vrátí ho po tvém boku.',
-  'entities.abilities.revive_pet.name': 'Oživit mazlíčka',
+    'Ošetří tvého mazlíčka. Pokud žije, obnoví mu celkem {overTime} zdraví během 12 s v intervalech po 3 s. Pokud je mrtvý, oživí ho s 35 % zdraví.',
+  'entities.abilities.revive_pet.name': 'Ošetření',
   'entities.abilities.righteous_fury.description':
     'Zvýší hrozbu vytvořenou tvým svatým poškozením o 60 % na 30 min. Základ tankovacího paladina.',
   'entities.abilities.righteous_fury.name': 'Hořící přísaha',
@@ -4615,6 +5042,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_crown.name': 'Koruna volání vichru',
   'entities.items.stormcallers_handguards.name': 'Rukavice volajícího bouři',
   'entities.items.stormcallers_spaulders.name': 'Nárameníky volání vichru',
+  'entities.items.bonewrought_greatsword.name': 'Obouruční meč z kosti',
+  'entities.items.direfang_greatblade.name': 'Velká čepel děsivého tesáku',
+  'entities.items.bonewrought_bulwark.name': 'Hradba z kosti',
+  'entities.items.wraithfire_orb.name': 'Koule přízračného ohně',
   'entities.items.stormcallers_waistguard.name': 'Pás volajícího bouři',
   'entities.items.stormshard_leggings.name': 'Legíny bouřkového střepu',
   'entities.items.sturdy_belt.name': 'Pevný cestovatelský opasek',
@@ -4662,6 +5093,108 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.windguard_leggings.name': 'Legíny větrné stráže',
   'entities.items.wolf_fang.name': 'Prasklý vlčí tesák',
   'entities.items.wolfhide_satchel.name': 'Brašna z vlčí kůže',
+  'entities.abilities.aspect_of_the_wild.description':
+    'Povzbudí spojence do 30 m divokou silou a na 5 min. jim zvýší útočnou sílu o 45 a rychlost útoku o 5 %. (lovecký talent)',
+  'entities.abilities.avatar.name': 'Avatar',
+  'entities.abilities.avatar.description':
+    'Na 20 s se proměníš v kolosa, zrušíš všechny ovládací efekty a zvýšíš své způsobené poškození o 20 %.',
+  'entities.abilities.avenging_wrath.description':
+    'Přivolá moc pomsty a na 20 s vám zvýší útočnou sílu o 60 a sílu kouzel o 30. (paladinský talent)',
+  'entities.abilities.berserk.description':
+    'Na 15 s vám zvýší útočnou sílu o 70. (druidský talent)',
+  'entities.abilities.bladestorm.name': 'Bouře čepelí',
+  'entities.abilities.bladestorm.description':
+    'Proměníš se ve vířící bouři oceli a po dobu 4 s každou sekundu zasáhneš všechny nepřátele do 6 metrů za {damage} poškození.',
+  'entities.abilities.blink.description':
+    'Teleportuje vás o 15 m vpřed a zruší účinky zakořenění. (mágský talent)',
+  'entities.abilities.bloodlust.description':
+    'Uvede spojence do 30 m do běsnění a na 15 s jim zvýší rychlost útoku o 30 %. (šamanský talent)',
+  'entities.abilities.chain_lightning.description':
+    'Sešle blesk na cílovou oblast a způsobí blízkým nepřátelům {damage} bodů poškození. (šamanský talent)',
+  'entities.abilities.chaos_bolt.description':
+    'Vrhne střelu chaotického ohně, která způsobí {damage} bodů ohnivého poškození. (černokněžnický talent)',
+  'entities.abilities.cloak_of_shadows.description':
+    'Zahalí vás do stínů a po dobu 5 s absorbuje 420 bodů poškození. (lotrovský talent)',
+  'entities.abilities.cone_of_cold.description':
+    'Golpea a blízké nepřátele con escarcha e inflige {damage} de daño de Mrazu. (mágovský talent)',
+  'entities.abilities.counter_shot.name': 'Umlčující výstřel',
+  'entities.abilities.counter_shot.description':
+    'Rychlý výstřel, který přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
+  'entities.abilities.counterspell.name': 'Zlomení kouzla',
+  'entities.abilities.counterspell.description':
+    'Přeruší sesílání kouzla cíle a na 6 s mu znemožní kouzla stejné školy.',
+  'entities.abilities.curse_of_exhaustion.description':
+    'Prokleje cíl a na 12 s mu sníží rychlost pohybu o 30 %. (černokněžnický talent)',
+  'entities.abilities.death_coil.description':
+    'Zasáhne nepřítele za {damage} bodů stínového poškození a poté ho na 3 s vyděsí. (černokněžnický talent)',
+  'entities.abilities.deep_freeze.description':
+    'Congela profundamente a cíl, inflige {damage} de daño de Mrazu y lo aturde durante 4 s. (mágovský talent)',
+  'entities.abilities.desperate_prayer.description':
+    'Okamžitě vás vyléčí o {damage}. (kněžský talent)',
+  'entities.abilities.deterrence.description':
+    'Na 10 s zvýší vaši šanci na úhyb o 50 procentních bodů. (lovecký talent)',
+  'entities.abilities.divine_shield.description':
+    'Ochrání vás svatou mocí, která po dobu 8 s absorbuje 900 bodů poškození. (paladinský talent)',
+  'entities.abilities.earthbind.description':
+    'Připoutá blízké nepřátele k zemi a na 2 s je zakoření. (šamanský talent)',
+  'entities.abilities.evocation.description': 'Restaura manu rápidamente. (mágovský talent)',
+  'entities.abilities.frenzied_regeneration.description':
+    'Během 10 s obnoví 180 bodů zdraví. Pouze v Medvědí podobě. (druidský talent)',
+  'entities.abilities.frost_trap.description':
+    'Na 3 s zmrazí nepřátele v cílové oblasti, takže se nemohou pohybovat ani jednat. (lovecký talent)',
+  'entities.abilities.ghostly_strike.description':
+    'Zasáhne nepřítele za poškození zbraně plus {damage}, krátce zvýší úhyb a udělí 1 kombinovaný bod. (lotrovský talent)',
+  'entities.abilities.hammer_of_wrath.description':
+    'Vrhne svaté kladivo na zraněného nepřítele za {damage} bodů Svatého poškození. Lze použít pouze pod 20 % zdraví. (paladinský talent)',
+  'entities.abilities.healing_stream.description':
+    'Během 12 s obnoví spojeneckému cíli 120 bodů zdraví. (šamanský talent)',
+  'entities.abilities.holy_wrath.description':
+    'Uvolní svatou moc a způsobí blízkým nepřátelům {damage} bodů poškození. (paladinský talent)',
+  'entities.abilities.howl_of_terror.description':
+    'Vyděsí blízké nepřátele až na 3 s. Poškození může účinek zrušit. (černokněžnický talent)',
+  'entities.abilities.ice_block.description':
+    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (mágovský talent)',
+  'entities.abilities.inner_focus.description':
+    'Vaše příští kouzlo bude zdarma. Trvá 60 s. (kněžský talent)',
+  'entities.abilities.innervate.description':
+    'Po dobu 10 s ve vás proudí živá míza a ve vlnách obnoví 20 bodů vašeho aktuálního zdroje: many, zuřivosti nebo energie. Změna podoby ji nepřeruší. Spánek, omráčení nebo stáze proud mízy zastaví. (druidský talent)',
+  'entities.abilities.kick.name': 'Kopanec',
+  'entities.abilities.kick.description':
+    'Přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
+  'entities.abilities.mend_pet.name': 'Ošetření',
+  'entities.abilities.mend_pet.description':
+    'Sana a spřátelený cíl por {damage} durante 15 s. (lovecký talent)',
+  'entities.abilities.meteor.description':
+    'Přivolá meteor na cílovou oblast za {damage} bodů ohnivého poškození. Poté nepřátelé v oblasti utrpí každé 2 s po dobu 6 s dalších 12 až 18 bodů ohnivého poškození. (mágský talent)',
+  'entities.abilities.mind_sear.description':
+    'Usměrní stínovou energii na cílovou oblast a každou sekundu způsobí blízkým nepřátelům {damage} bodů poškození. (kněžský talent)',
+  'entities.abilities.multi_shot.description':
+    'Vystřelí salvu na cílovou oblast a způsobí nepřátelům v okruhu 8 m {damage} bodů fyzického poškození. (lovecký talent)',
+  'entities.abilities.prayer_of_healing.description':
+    'Vyléčí blízké spojence o {damage}. (kněžský talent)',
+  'entities.abilities.preparation.description':
+    'Dokončí přebíjení Sprintu, Úhybu a Zmizení. (lotrovský talent)',
+  'entities.abilities.presence_of_mind.description':
+    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (mágovský talent)',
+  'entities.abilities.psychic_scream.description':
+    'Vyděsí blízké nepřátele až na 4 s. Poškození může účinek zrušit. (kněžský talent)',
+  'entities.abilities.pummel.name': 'Drtič čelistí',
+  'entities.abilities.pummel.description':
+    'Přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
+  'entities.abilities.rebuke.name': 'Pokárání',
+  'entities.abilities.rebuke.description':
+    'Přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
+  'entities.abilities.shadowstep.description':
+    'Vykročíte stíny směrem ke svému cíli. (lotrovský talent)',
+  'entities.abilities.silence.description': 'Na 4 s umlčí cíl. (kněžský talent)',
+  'entities.abilities.skull_bash.name': 'Úder hlavou',
+  'entities.abilities.skull_bash.description':
+    'Výpad hlavou, který přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
+  'entities.abilities.spell_lock.name': 'Příkaz mlčet',
+  'entities.abilities.spell_lock.description':
+    'Umlčí cíl během sesílání a na 5 s mu znemožní kouzla stejné školy.',
+  'entities.abilities.tranquility.description':
+    'Po dobu 4 s usměrňuje léčivou energii a každou sekundu vyléčí spojence do 30 m o 42 až 52. (druidský talent)',
   'entities.items.worn_sword.name': 'Zubatý krátký meč',
   'entities.items.woven_robe.name': 'Údolně tkané roucho',
   'entities.items.wyrmcult_grand_robe.name': 'Velké roucho kultu draka',
@@ -4686,18 +5219,21 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.deathlord.name': 'Bojová výbava mohylového pána',
   'entities.itemSets.greyjaw_stalker.bonus3': 'Zvyšuje rychlost útoku a sesílání o 15 %.',
   'entities.itemSets.greyjaw_stalker.name': 'Výbava stopaře Šedočelista',
-  'entities.itemSets.necromancers.bonus2': 'Nelze tě odhodit (100% odolnost proti odhození).',
+  'entities.itemSets.necromancers.bonus2':
+    'Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).',
   'entities.itemSets.necromancers.bonus3': 'Zvyšuje intelekt o 10 a výdrž o 10.',
   'entities.itemSets.necromancers.name': 'Oděv smutkotkaní',
   'entities.itemSets.nighttalon.bonus2': 'Zvyšuje sílu útoku o 40.',
   'entities.itemSets.nighttalon.bonus3':
     'Zvyšuje obratnost o 15, šanci na kritický zásah o 2 % a rychlost útoku i sesílání o 15 %.',
   'entities.itemSets.nighttalon.name': 'Kožešina děsivého tesáku',
-  'entities.itemSets.soulflame.bonus2': 'Nelze tě odhodit (100% odolnost proti odhození).',
+  'entities.itemSets.soulflame.bonus2':
+    'Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).',
   'entities.itemSets.soulflame.bonus3':
     'Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %.',
   'entities.itemSets.soulflame.name': 'Regálie přízračného ohně',
-  'entities.itemSets.stormcallers.bonus2': 'Nelze tě odhodit (100% odolnost proti odhození).',
+  'entities.itemSets.stormcallers.bonus2':
+    'Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).',
   'entities.itemSets.stormcallers.bonus3':
     'Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %.',
   'entities.itemSets.stormcallers.name': 'Roucha volání vichru',
@@ -5001,10 +5537,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_aldrics_fallen_star.text':
     'Viděl jsem, jak ze západního nebe spadl kámen, {playerName}. Udeřil do stěny močálu a vybuchl jako výheň, daleko za vdovím houštím. Jdi na západ, najdi, co přežilo výbuch, a přines mi cokoli, co nepatří do tohoto světa.',
   'entities.quests.q_aldrics_fallen_star.title': 'Aldricova spadlá hvězda',
-  'entities.quests.q_archetype_acceptance.completion': 'Tvá cesta je zvolena, kráčej po ní dobře.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Lesní vlk zabit',
-  'entities.quests.q_archetype_acceptance.text':
-    'Každý řemeslník Eastbrooku si časem vybere jedno řemeslo za své. Dokaž svou cenu jediným činem, {playerName}, a urči svou cestu.',
   'entities.quests.q_archetype_acceptance.title': 'Vlastní řemeslo',
   'entities.quests.q_bandits.completion':
     'O deset nožů ve tmě méně. Vezmi si tohle, zasloužíš si to.',
@@ -5315,10 +5847,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_palecoil.text':
     'Jeden tvar v plese není žádný utopený člověk. Had barvy kosti klouže po hluboké římse, kde začínají schody, Sethrael, říkají jí opisy, Bledá spirála, vlastní strážná šelma měsíce. Dokud střeží tu vodu, nikdo se k bráně živý nedostane. Sestup na římsu a zabij ji, {playerName}. Vezmi její srdeční šupinu, abych věděl, že je hotovo.',
   'entities.quests.q_palecoil.title': 'Sethrael Bledá spirála',
-  'entities.quests.q_prof_make_amends.completion': 'Náprava vykonána, otevírá se ti nová cesta.',
   'entities.quests.q_prof_make_amends.objectives.0.label': 'Lesní vlk zabit',
-  'entities.quests.q_prof_make_amends.text':
-    'Aby řemeslník odložil jedno řemeslo pro druhé, musí nejdřív napravit cestu, kterou nešel, {playerName}.',
   'entities.quests.q_prof_make_amends.title': 'Náprava',
   'entities.quests.q_prowler_pelts.completion': 'Dobré silné kožešiny. Hráz teď přežije nás oba.',
   'entities.quests.q_prowler_pelts.objectives.0.label': 'Kožešina slatinného plížence',
@@ -5946,9 +6475,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.chooser.none': 'Žádná třída nesplňuje všechny filtry. Vyčisti jeden a uvidíš víc.',
   'guide.abilityHook.heroic_strike': 'Zařadí těžší švih, který utratí vztek při příštím zásahu.',
   'guide.abilityHook.battle_shout': 'Povzbuzující pokřik, který zvedne sílu útoku party.',
-  'guide.abilityHook.commanding_shout': 'Posílí výdrž, aby všichni v boji vydrželi déle.',
   'guide.abilityHook.charge': 'Vyrazí k vzdálenému nepříteli a otevře boj krátkým omráčením.',
-  'guide.abilityHook.rend': 'Otevře krvácení, které cíl postupně opotřebuje.',
   'guide.abilityHook.thunder_clap': 'Zasáhne vše kolem tebe a zpomalí jejich útoky.',
   'guide.abilityHook.seal_of_righteousness':
     'Naplní tvé švihy svatým poškozením, které potom utratíš Verdiktem.',
@@ -6620,6 +7147,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.withdrawQuantityConfirm': 'Vybrat',
   'hudChrome.bank.withdrawQuantityInput': 'Množství k výběru',
   'hudChrome.bank.withdrawQuantityTitle': 'Vybrat {item}',
+  'hud.core.mobileSettings': 'Nastavení',
+  'entities.abilities.faerie_fire.description':
+    'Sníží zbroj cíle o {damage}% na 40 s. Nesčítá se se Seřezáním zbroje.',
   'abilityUi.tooltip.selfOnly': 'Pouze na sebe',
   'itemUi.lootRoll.rolled': '{answered}/{total} hodilo',
   'entities.items.arcanite_bar.name': 'Arkanitový prut',
@@ -6671,6 +7201,85 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'yumi.queue.leave': 'Opouštíš frontu Ochraňte Yumi.',
   'yumi.queue.teamLeave': 'Tvůj tým opouští frontu Ochraňte Yumi.',
   'yumi.respawn.title': 'K ZEMI!',
+  'entities.abilities.crusader_strike.name': 'Křižácký úder',
+  'entities.abilities.crusader_strike.description':
+    'Zasáhne cíl za poškození zbraně plus {damage} svatého poškození. (talent paladina)',
+  'entities.abilities.metamorphosis.name': 'Děsivý zjev',
+  'entities.abilities.metamorphosis.description':
+    'Na 20 s se proměníš v děsivého démona, zvýšíš svoje poškození kouzly o 20 % a rychlost sesílání o 20 %. Tvůj démon způsobuje o 50 % více poškození a sesílá o 20 % rychleji. (klíčová schopnost Démonologie)',
+  'entities.abilities.aura_surge.name': 'Úsvitový odraz',
+  'entities.abilities.aura_surge.description':
+    'Vrhne úsvitem kovaný štít za {damage} bodů Svatého poškození, umlčí hlavní cíl na 2 sek. a poté se odrazí až ke 2 dalším nepřátelům do 10 yardů; každý odraz způsobí 75% poškození. (Paladinský talent)',
+  'entities.abilities.holy_shock.name': 'Svatý otřes',
+  'entities.abilities.holy_shock.description':
+    'Zasáhne spojenecký cíl svatou energií a vyléčí ho, nebo způsobí nepříteli {damage} svatého poškození. (klíčová schopnost Svaté magie)',
+  'entities.abilities.holy_shield.name': 'Posvěcená hradba',
+  'entities.abilities.holy_shield.description':
+    'Vrhne na nepřítele zářivou záštitu, způsobí mu svaté poškození a odrazí se ke 2 blízkým nepřátelům. (klíčová schopnost Ochrany)',
+  'entities.abilities.bestial_wrath.name': 'Vyjící běs',
+  'entities.abilities.bestial_wrath.description':
+    'Uvrhne tě do zvířecího běsnění, zvýší tvoji sílu útoku o 20 % a poškození způsobené tvým společníkem o 100 % na 15 s. (klíčová schopnost Mistrovství šelem)',
+  'entities.abilities.trueshot_aura.name': 'Aura jistého letu',
+  'entities.abilities.trueshot_aura.description':
+    'Povzbudí blízké spojence a zvýší jejich sílu útoku o 10 % na 30 min. (klíčová schopnost Střelby)',
+  'entities.abilities.wyvern_sting.name': 'Žihadlo wyverny',
+  'entities.abilities.wyvern_sting.description':
+    'Bodne nepřítele na dálku a vyřadí ho až na 4 s. Jakékoli poškození efekt přeruší. (klíčová schopnost Přežití)',
+  'entities.abilities.arcane_power.name': 'Příval éteru',
+  'entities.abilities.arcane_power.description':
+    'Zvýší tvoje poškození kouzly o 20 % a rychlost sesílání o 10 % na 10 s. (klíčová schopnost Tajemné magie)',
+  'entities.abilities.combustion.name': 'Fénixův trans',
+  'entities.abilities.combustion.description':
+    'Zvýší šanci na kritický zásah kouzlem o 50 % na 15 s. (klíčová schopnost Ohně)',
+  'entities.abilities.icy_veins.name': 'Ledové žíly',
+  'entities.abilities.icy_veins.description':
+    'Zvýší rychlost sesílání o 30 % a na 10 s zabrání přerušení i zpomalení sesílání. (klíčová schopnost Mrazu)',
+  'entities.abilities.cold_blood.name': 'Klid zabijáka',
+  'entities.abilities.cold_blood.description':
+    'Soustředí tvůj vražedný záměr, takže tvůj příští útok bude kritickým zásahem. (klíčová schopnost Vraždění)',
+  'entities.abilities.blade_flurry.name': 'Zrcadlové čepele',
+  'entities.abilities.blade_flurry.description':
+    'Rozpoutá smršť čepelí a zvýší tvoji rychlost útoku o 20 % na 12 s. (klíčová schopnost Boje)',
+  'entities.abilities.hemorrhage.name': 'Rudá stuha',
+  'entities.abilities.hemorrhage.description':
+    'Zasáhne nepřítele za poškození zbraně plus {damage}, způsobí mu krvácení na 12 s a zvýší utrpěné poškození krvácením o 40 %. Udělí 1 combo bod. (klíčová schopnost Lstivosti)',
+  'entities.abilities.power_infusion.name': 'Pomazání',
+  'entities.abilities.power_infusion.description':
+    'Naplní spojenecký cíl mocí a zvýší jeho rychlost sesílání o 20 % na 15 s. (klíčová schopnost Kázně)',
+  'entities.abilities.holy_nova.name': 'Svatá nova',
+  'entities.abilities.holy_nova.description':
+    'Vyvolá výbuch svaté záře, který vyléčí blízké spojence za {damage} a poškodí blízké nepřátele. (klíčová schopnost Svaté magie)',
+  'entities.abilities.shadowform.name': 'Podoba šerého závoje',
+  'entities.abilities.shadowform.description':
+    'Přijmeš podobu stínu, zvýšíš svoje stínové poškození o 15 a posílíš stínovou magii, dokud podobu neopustíš. Dalším sesláním se vrátíš do normální podoby. (klíčová schopnost Stínu)',
+  'entities.abilities.elemental_mastery.name': 'Prvotní mistrovství',
+  'entities.abilities.elemental_mastery.description':
+    'Povolá bouři a tvé příští kouzlo sešle okamžitě. (klíčová schopnost Živlů)',
+  'entities.abilities.siphon_life.name': 'Žilopijec',
+  'entities.abilities.siphon_life.description':
+    'Vysává život nepřítele, způsobí mu {damage} stínového poškození během 30 s a vyléčí tě za způsobené poškození. (klíčová schopnost Utrpení)',
+  'entities.abilities.conflagrate.name': 'Vzplanutí',
+  'entities.abilities.conflagrate.description':
+    'Spotřebuje Hořící pakt na nepříteli a zapálí ho za {damage} ohnivého poškození. (klíčová schopnost Ničení)',
+  'entities.abilities.moonkin_form.name': 'Podoba měsíčního křídla',
+  'entities.abilities.moonkin_form.description':
+    'Promění tě v děsivého měsíčníka, zvýší tvoje poškození kouzly o 20 % a zbroj o 50 %. Trvá, dokud podobu neopustíš. Dalším sesláním se vrátíš do normální podoby. (klíčová schopnost Rovnováhy)',
+  'entities.abilities.feral_charge.name': 'Prvotní nápor',
+  'entities.abilities.feral_charge.description':
+    'Uvolní prvotní nápor. Ve vlčí podobě zvýší obnovu energie o 100 % na 10 s. V medvědí podobě okamžitě vygeneruje 50 vzteku. (klíčová schopnost Divokosti)',
+  'entities.abilities.swiftmend.name': 'Rychlé zhojení',
+  'entities.abilities.swiftmend.description':
+    'Spotřebuje průběžné léčení na spojeneckém cíli a vyléčí ho za {damage}. (klíčová schopnost Obnovy)',
+  'entities.abilities.chain_heal.name': 'Řetězové léčení',
+  'entities.items.chunk_of_ore.name': 'Kus rudy',
+  'entities.quests.q_prof_intro.title': 'Řemeslo pro každou ruku',
+  'game.talents.choicesTab': 'Volby',
+  'game.talents.readout.rowsSummary': 'Talenty: {head}, vybráno {picked}/{unlocked} řádků voleb.',
+  'game.talents.rowUnlockToast': 'Odemkla se nová volba talentu!',
+  'game.talents.rowUnlocks': 'Odemkne se na úrovni {level}',
+  'hudChrome.fct.absorbed': 'Pohlceno {amount}',
+  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Odeslat o jeden kus {item} méně',
+  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Odeslat o jeden kus {item} více',
   'hudChrome.auth.forgotPrompt': 'Zapomenuté heslo?',
   'hudChrome.auth.forgotTitle': 'Obnovení hesla',
   'hudChrome.auth.forgotHint':
@@ -6811,29 +7420,18 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.steam.noTicket': 'Steam nevydal propojovací tiket. Spusť Steam a zkus to znovu.',
   'hudChrome.steam.title': 'Steam',
   'hudChrome.steam.unlink': 'Odpojit Steam',
-  'entities.items.chunk_of_ore.name': 'Kus rudy',
-  'entities.quests.q_prof_intro.completion':
-    'Vidíš? Rudu v batohu a mozoly na rukou. Pokračuj v těžbě, kácení dřeva a sběru bylin, když cestuješ po cestách, a až se vrátíš do města, nezapomeň na tabuli Zaměření města u tržiště a řemeslnický ponk poblíž. V tom všem čeká poctivé živobytí, pokud o něj stojíš.',
-  'entities.quests.q_prof_intro.objectives.0.label': 'Kus rudy',
-  'entities.quests.q_prof_intro.text':
-    'Každý v Eastbrooku ovládá vedle meče i nějaké řemeslo, {playerName}. Kolem města jsou roztroušené rudné žíly, tak se rozmáchni krumpáčem a přines mi 5 kusů. Vytěž je vlastníma rukama; rozdíl poznám.',
-  'entities.quests.q_prof_intro.title': 'Řemeslo pro každou ruku',
   'hudChrome.auth.appleChoiceExpired':
     'Platnost tohoto přihlášení přes Apple vypršela. Přihlas se přes Apple znovu.',
   'hudChrome.auth.appleChoiceIntro': 'Vytvoř nový účet, nebo propoj Apple s účtem, který už máš.',
   'hudChrome.auth.appleError': 'Přihlášení přes Apple se nezdařilo. Zkus to znovu.',
   'hudChrome.auth.appleLoginCta': 'Pokračovat přes Apple',
   'hudChrome.dailyRewards.reason.banned': 'Máš zákaz účasti v denních odměnách. Důvod: {reason}',
-  'hudChrome.itemHeroicTag': '[HRDINSKÉ]',
-  'hudChrome.itemSoulbound': 'Vázáno na duši',
   'hudChrome.keybinds.categoryPet': 'Mazlíček',
   'hudChrome.keybinds.petAggressive': 'Mazlíček: Agresivní',
   'hudChrome.keybinds.petAttack': 'Mazlíček: Útok',
   'hudChrome.keybinds.petDefensive': 'Mazlíček: Obranný',
   'hudChrome.keybinds.petStop': 'Mazlíček: Zastavit',
   'hudChrome.keybinds.petTaunt': 'Mazlíček: Provokace',
-  'hudChrome.mailbox.parcelQtyDecreaseAria': 'Odeslat o jeden kus {item} méně',
-  'hudChrome.mailbox.parcelQtyIncreaseAria': 'Odeslat o jeden kus {item} více',
   'hudChrome.readyCheck.notReady': 'Nepřipraven(a)',
   'hudChrome.readyCheck.prompt': 'Hráč {name} zahájil kontrolu připravenosti. Jsi připraven(a)?',
   'hudChrome.readyCheck.ready': 'Připraven(a)',
@@ -6997,99 +7595,11 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.worldBossBody':
     'Vysoko na Thornpeaku bouře nad Bouřným skalním štítem občas nabere tvar. Thunzharr, Probouzející se štít tam povstává v pravidelném rytmu, elementál o síle raidu, s nímž v otevřeném světě bojuje kdokoli odpoví na volání, a čím víc vyzyvatelů se proti němu postaví, tím je mocnější. Každý, kdo se do boje zapojí, získá vlastní hod o jeho kořist, ctěný za podmínek raidového zámku, a jeho pád doznívá dost dlouho, aby padlí stihli doběhnout zpět a nárokovat, co jim náleží. Sesbírej víc mečů, než si myslíš, že potřebuješ.',
   'guide.worldPage.worldBossTitle': 'Když se štít probudí: světový boss',
-  'entities.abilities.arcane_power.description':
-    'Zvýší tvoje poškození kouzly o 20 % a rychlost sesílání o 10 % na 10 s. (klíčová schopnost Tajemné magie)',
-  'entities.abilities.arcane_power.name': 'Příval éteru',
-  'entities.abilities.bestial_wrath.description':
-    'Uvrhne tě do zvířecího běsnění, zvýší tvoji sílu útoku o 20 % a poškození způsobené tvým společníkem o 100 % na 15 s. (klíčová schopnost Mistrovství šelem)',
-  'entities.abilities.bestial_wrath.name': 'Vyjící běs',
-  'entities.abilities.blade_flurry.description':
-    'Rozpoutá smršť čepelí a zvýší tvoji rychlost útoku o 20 % na 12 s. (klíčová schopnost Boje)',
-  'entities.abilities.blade_flurry.name': 'Zrcadlové čepele',
   'entities.abilities.chain_heal.description':
     'Vyléčí spojenecký cíl za velké množství zdraví, poté přeskočí až na 2 další blízké spojence. Každý další skok léčí o 50 % méně. (klíčová schopnost Obnovy)',
-  'entities.abilities.chain_heal.name': 'Řetězové léčení',
-  'entities.abilities.cold_blood.description':
-    'Soustředí tvůj vražedný záměr, takže tvůj příští útok bude kritickým zásahem. (klíčová schopnost Vraždění)',
-  'entities.abilities.cold_blood.name': 'Klid zabijáka',
-  'entities.abilities.combustion.description':
-    'Zvýší šanci na kritický zásah kouzlem o 50 % na 15 s. (klíčová schopnost Ohně)',
-  'entities.abilities.combustion.name': 'Bleskový žár',
-  'entities.abilities.conflagrate.description':
-    'Spotřebuje Hořící pakt na nepříteli a zapálí ho za {damage} ohnivého poškození. (klíčová schopnost Ničení)',
-  'entities.abilities.conflagrate.name': 'Vzplanutí',
-  'entities.abilities.counter_shot.description':
-    'Rychlý výstřel, který přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
-  'entities.abilities.counter_shot.name': 'Umlčující výstřel',
-  'entities.abilities.counterspell.description':
-    'Přeruší sesílání kouzla cíle a na 6 s mu znemožní kouzla stejné školy.',
-  'entities.abilities.counterspell.name': 'Zlomení kouzla',
-  'entities.abilities.crusader_strike.description':
-    'Zasáhne cíl za poškození zbraně plus {damage} svatého poškození. (talent paladina)',
-  'entities.abilities.crusader_strike.name': 'Křižácký úder',
-  'entities.abilities.elemental_mastery.description':
-    'Povolá bouři a tvé příští kouzlo sešle okamžitě. (klíčová schopnost Živlů)',
-  'entities.abilities.elemental_mastery.name': 'Prvotní mistrovství',
-  'entities.abilities.feral_charge.description':
-    'Uvolní prvotní nápor. Ve vlčí podobě zvýší obnovu energie o 100 % na 10 s. V medvědí podobě okamžitě vygeneruje 50 vzteku. (klíčová schopnost Divokosti)',
-  'entities.abilities.feral_charge.name': 'Prvotní nápor',
-  'entities.abilities.hemorrhage.description':
-    'Zasáhne nepřítele za poškození zbraně plus {damage}, způsobí mu krvácení na 12 s a zvýší utrpěné poškození krvácením o 40 %. Udělí 1 combo bod. (klíčová schopnost Lstivosti)',
-  'entities.abilities.hemorrhage.name': 'Rudá stuha',
-  'entities.abilities.holy_nova.description':
-    'Vyvolá výbuch svaté záře, který vyléčí blízké spojence za {damage} a poškodí blízké nepřátele. (klíčová schopnost Svaté magie)',
-  'entities.abilities.holy_nova.name': 'Svatá nova',
-  'entities.abilities.holy_shield.description':
-    'Vrhne na nepřítele zářivou záštitu, způsobí mu svaté poškození a odrazí se ke 2 blízkým nepřátelům. (klíčová schopnost Ochrany)',
-  'entities.abilities.holy_shield.name': 'Posvěcená hradba',
-  'entities.abilities.holy_shock.description':
-    'Zasáhne spojenecký cíl svatou energií a vyléčí ho, nebo způsobí nepříteli {damage} svatého poškození. (klíčová schopnost Svaté magie)',
-  'entities.abilities.holy_shock.name': 'Svatý otřes',
   'entities.abilities.holy_taunt.description':
     'Vyzve cíl: tvoje hrozba se zvýší na úroveň jeho nejnenáviděnějšího nepřítele a cíl je donucen tě 3 s útočit.',
   'entities.abilities.holy_taunt.name': 'Posvátná výzva',
-  'entities.abilities.icy_veins.description':
-    'Zvýší rychlost sesílání o 30 % a na 10 s zabrání přerušení i zpomalení sesílání. (klíčová schopnost Mrazu)',
-  'entities.abilities.icy_veins.name': 'Ledové žíly',
-  'entities.abilities.kick.description':
-    'Přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
-  'entities.abilities.kick.name': 'Kopanec',
-  'entities.abilities.metamorphosis.description':
-    'Na 20 s se proměníš v děsivého démona, zvýšíš svoje poškození kouzly o 20 % a rychlost sesílání o 20 %. Tvůj démon způsobuje o 50 % více poškození a sesílá o 20 % rychleji. (klíčová schopnost Démonologie)',
-  'entities.abilities.metamorphosis.name': 'Děsivý zjev',
-  'entities.abilities.moonkin_form.description':
-    'Promění tě v děsivého měsíčníka, zvýší tvoje poškození kouzly o 20 % a zbroj o 50 %. Trvá, dokud podobu neopustíš. Dalším sesláním se vrátíš do normální podoby. (klíčová schopnost Rovnováhy)',
-  'entities.abilities.moonkin_form.name': 'Podoba měsíčního křídla',
-  'entities.abilities.power_infusion.description':
-    'Naplní spojenecký cíl mocí a zvýší jeho rychlost sesílání o 20 % na 15 s. (klíčová schopnost Kázně)',
-  'entities.abilities.power_infusion.name': 'Pomazání',
-  'entities.abilities.pummel.description':
-    'Přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
-  'entities.abilities.pummel.name': 'Drtič čelistí',
-  'entities.abilities.rebuke.description':
-    'Přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
-  'entities.abilities.rebuke.name': 'Pokárání',
-  'entities.abilities.shadowform.description':
-    'Přijmeš podobu stínu, zvýšíš svoje stínové poškození o 15 a posílíš stínovou magii, dokud podobu neopustíš. Dalším sesláním se vrátíš do normální podoby. (klíčová schopnost Stínu)',
-  'entities.abilities.shadowform.name': 'Podoba šerého závoje',
-  'entities.abilities.siphon_life.description':
-    'Vysává život nepřítele, způsobí mu {damage} stínového poškození během 30 s a vyléčí tě za způsobené poškození. (klíčová schopnost Utrpení)',
-  'entities.abilities.siphon_life.name': 'Žilopijec',
-  'entities.abilities.skull_bash.description':
-    'Výpad hlavou, který přeruší sesílání kouzla cíle a na 4 s mu znemožní kouzla stejné školy.',
-  'entities.abilities.skull_bash.name': 'Úder hlavou',
-  'entities.abilities.spell_lock.description':
-    'Umlčí cíl během sesílání a na 5 s mu znemožní kouzla stejné školy.',
-  'entities.abilities.spell_lock.name': 'Příkaz mlčet',
-  'entities.abilities.swiftmend.description':
-    'Spotřebuje průběžné léčení na spojeneckém cíli a vyléčí ho za {damage}. (klíčová schopnost Obnovy)',
-  'entities.abilities.swiftmend.name': 'Rychlé zhojení',
-  'entities.abilities.trueshot_aura.description':
-    'Povzbudí blízké spojence a zvýší jejich sílu útoku o 10 % na 30 min. (klíčová schopnost Střelby)',
-  'entities.abilities.trueshot_aura.name': 'Aura jistého letu',
-  'entities.abilities.wyvern_sting.description':
-    'Bodne nepřítele na dálku a vyřadí ho až na 4 s. Jakékoli poškození efekt přeruší. (klíčová schopnost Přežití)',
-  'entities.abilities.wyvern_sting.name': 'Žihadlo wyverny',
   'entities.items.ashen_focus_ring.name': 'Prsten popelavého soustředění',
   'entities.items.ashstalker_cowl.name': 'Kápě Popelavého stopaře',
   'entities.items.ashstalker_grips.name': 'Rukavice Popelavého stopaře',
@@ -7411,6 +7921,48 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.staff': 'Hůl',
   'hudChrome.wocStore.wtype.sword': 'Meč',
   'hudChrome.wocStore.wtype.wand': 'Hůlka',
+  'guide.abilityHook.revenge':
+    'Sekne nepřátele před tebou a po úhybu nebo odražení může být zdarma.',
+  'guide.abilityHook.hamstring': 'Zmrzačí pohyb nepřítele, aby nemohl uniknout.',
+  'entities.abilities.blazing_barrier.name': 'Ohnivá bariéra',
+  'entities.abilities.blazing_barrier.description':
+    'Obklopíš se plameny a pohltíš 130 bodů poškození po dobu 60 s. (Oheň)',
+  'entities.abilities.cold_snap.name': 'Volání zimy',
+  'entities.abilities.cold_snap.description':
+    'Okamžitě dokončí dobu obnovení Mžikového kroku, Mrazivého závoje a Dokonalé neviditelnosti. (mágovský talent)',
+  'entities.abilities.greater_invisibility.name': 'Dokonalá neviditelnost',
+  'entities.abilities.greater_invisibility.description':
+    'Na 20 s zmizíš: odstraní 2 efekty průběžného poškození a během neviditelnosti i krátce po ní utrpíš o 90 % méně poškození. (mágovský talent)',
+  'entities.abilities.hot_streak.name': 'Žhavá série',
+  'entities.abilities.hot_streak.description':
+    'Pasivní: dva kritické zásahy v řadě ohnivými kouzly (Škvárový šíp, Pád škváry, Opaření, Žárové kopí nebo Plamenný úder) učiní tvé příští Žárové kopí nebo Plamenný úder okamžitým a bez nákladů. Spotřebovávající kouzla se započítávají do DALŠÍ série, včetně bezplatných seslání; Plamenný úder se započítá jen jednou bez ohledu na počet zasažených nepřátel a vždy se počítá pouze úvodní zásah. (Oheň)',
+  'entities.abilities.ice_floes.name': 'Ledové kry',
+  'entities.abilities.ice_floes.description':
+    'Tvoje příští dvě kouzla s dobou sesílání lze seslat za pohybu. Trvá 15 s. (mágovský talent)',
+  'entities.abilities.ignition.name': 'Vznícení',
+  'entities.abilities.ignition.description':
+    'Pasivní: kritické zásahy tvých kouzel spalují cíl za 40 % způsobeného poškození během 6 s a účinek se sčítá. (mistrovství Ohně)',
+  'entities.abilities.mass_barrier.name': 'Hromadná bariéra',
+  'entities.abilities.mass_barrier.description':
+    'Ochrání tebe a až 4 blízké spojence v dosahu 30 m; každá bariéra pohltí 130 bodů poškození po dobu 60 s. (mágovský talent)',
+  'entities.abilities.overload.name': 'Přetížení',
+  'entities.abilities.overload.description':
+    'Tvoje příští kouzlo je posíleno o 40 %, ale stojí o 50 % více many. Trvá 10 s. (mágovský talent)',
+  'entities.abilities.power_echo.name': 'Ozvěna moci',
+  'entities.abilities.power_echo.description':
+    'Tvoje příští přímé kouzlo se na stejném cíli zopakuje s 50 % síly. Trvá 10 s. (mágovský talent)',
+  'entities.abilities.rings_of_frost.name': 'Kruh mrazu',
+  'entities.abilities.rings_of_frost.description':
+    'Vyvolá na 10 s kruh. Nepřátelé, kteří překročí jeho okraj, budou na 4 s zmrazeni. (mágovský talent)',
+  'entities.abilities.rune_of_power.name': 'Runa moci',
+  'entities.abilities.rune_of_power.description':
+    'Na 15 s si pod nohy vryješ runu moci: spojenci stojící v dosahu 8 m způsobují o 10 % více poškození. (mágovský talent)',
+  'entities.abilities.summon_water_elemental.name': 'Vyvolat vodního elementála',
+  'entities.abilities.summon_water_elemental.description':
+    'Vyvolá vodního elementála, který bojuje po tvém boku, vrhá na tvůj cíl Vodní střely a usměrňuje Vodní proud. (Mráz)',
+  'entities.mobs.water_elemental.name': 'Vodní elementál',
+  'entities.items.conjured_bread4.name': 'Vyčarovaný hodovní bochník',
+  'entities.items.conjured_water4.name': 'Vyčarovaná pramenitá voda',
   'devCommand.actions.attune.description': 'Označ všechny požadavky na naladění jako splněné.',
   'devCommand.actions.attune.label': 'Odemknout naladění',
   'devCommand.actions.bot.description': 'Vytvoř nehybného hráče, kterému lze šeptat.',
@@ -7560,4 +8112,30 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Pro rychlé porovnání dvou kusů zapněte v možnostech Zobrazit úroveň předmětu. Výbava se známým původem, od nepřátel, z úkolů a řemesel, pak ukazuje úroveň předmětu: jediné číslo, které přibližně vyjadřuje sílu podle zdroje a umožňuje poznat lepší vylepšení i mezi různými sloty. Kusy bez takového původu, například základní zboží obchodníků a počáteční výbava, úroveň neukazují; chybějící číslo je normální.',
   'guide.professions.craftHowBody':
     'Otevřete okno Výroba (výchozí klávesa T) a uvidíte všechny známé recepty, jejich požadavky i své zásoby; máte-li materiály, stačí jedno kliknutí. Běžné recepty lze vyrábět kdekoli. Některé pokročilé recepty, včetně nástrojů vyšší úrovně a vzácné zbroje pro sesilatele, vyžadují výrobní centrum v Highwatchi.',
+  'hudChrome.auraEffect.battleStance': 'Bojový postoj: o 10 % vyšší generování vzteku',
+  'hudChrome.auraEffect.berserkerStance':
+    'Postoj berserka: kritické zásahy o 3 % častěji a o 3 % tvrdší',
+  'hudChrome.auraEffect.crit': 'Zvyšuje šanci na kritický zásah o {pct} %',
+  'hudChrome.auraEffect.rageGen': 'Zvyšuje generování vzteku o {pct} %',
+  'hudChrome.auraEffect.reckless':
+    'Zvyšuje šanci na kritický zásah o {pct} % a generování vzteku o {ragePct} %',
+  'hudChrome.auraEffect.avatar': 'Kolos: způsobené poškození zvýšeno o {pct} %',
+  'hudChrome.auraEffect.bloodbath':
+    'Zvyšuje šanci na kritický zásah a způsobené poškození o {pct} %',
+  'hudChrome.auraEffect.dieBySword': 'Snižuje obdržené poškození o {pct} %',
+  'hudChrome.auraEffect.sanguine':
+    'Zvyšuje rychlost útoku o {hastePct} % a způsobené poškození o {dmgPct} %',
+  'hudChrome.auraEffect.battleTrance':
+    'Tvůj příští Nájezdnický úder nebo Mrzačící úder nestojí žádný vztek',
+  'hudChrome.auraEffect.revengeFree': 'Tvá příští Odveta nestojí žádný vztek',
+  'hudChrome.auraEffect.victoryRush': 'Vítězný nápor je připraven',
+  'hudChrome.auraEffect.maxHpPct': 'Zvyšuje maximální zdraví o {pct} %',
+  'hudChrome.statInfo.names.parry': 'Odražení',
+  'hudChrome.statInfo.desc.parry':
+    'Tvoje šance zcela odrazit čelní útok na blízko a neutrpět žádné poškození. Úder zezadu odrazit nelze.',
+  'hud.combat.floatingParry': 'Odraženo',
+  'hud.combat.parried': '{target} odráží tvoji schopnost {ability}.',
+  'hudChrome.options.mouseoverCast': 'Sesílání najetím myší na rámech skupiny',
+  'hudChrome.options.showTargetOfTarget': 'Zobrazit cíl cíle',
+  'hudChrome.unitFrame.targetOfTargetLabel': 'Značka tvé značky',
 };

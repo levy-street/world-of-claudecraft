@@ -20,7 +20,15 @@
 import { isRooted, isStunned } from './combat/cc';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import { GHOST_RUN_MULT } from './spirit';
-import { DT, type Entity, type MoveInput, normAngle, RUN_SPEED, TURN_SPEED } from './types';
+import {
+  DT,
+  ENRAGE_MOVE_MULT,
+  type Entity,
+  type MoveInput,
+  normAngle,
+  RUN_SPEED,
+  TURN_SPEED,
+} from './types';
 import {
   groundHeight,
   terrainDownhill,
@@ -58,8 +66,12 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
     speed = 1;
   for (const a of e.auras) {
     if (a.kind === 'slow' || a.kind === 'stealth') slow = Math.min(slow, a.value);
-    // buff_speed and form_travel both carry a 1+fraction multiplier (1.4 = +40%).
-    if (a.kind === 'buff_speed' || a.kind === 'form_travel') speed = Math.max(speed, a.value);
+    // Speed buffs and travel forms carry a 1+fraction multiplier (1.4 = +40%).
+    if (a.kind === 'buff_speed' || a.kind === 'form_travel' || a.kind === 'form_fireball') {
+      speed = Math.max(speed, a.value);
+    }
+    // Fury Enrage: +10% move speed (non-stacking with other speed buffs).
+    if (a.kind === 'enrage') speed = Math.max(speed, ENRAGE_MOVE_MULT);
   }
   // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
   if (extraSpeedPct) speed += extraSpeedPct;
@@ -148,8 +160,15 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     if (p.castingAbility) {
       // A mobile cast (def flag, or talent-granted via the resolved ability)
       // survives its caster's movement; everything else breaks, fishing included.
+      // Ice Floes (mage choice row) also protects: while its aura is worn the
+      // cast survives, and COMPLETING the hard cast spends one of the aura's
+      // protected uses (casting_lifecycle), so moving mid-cast never overspends.
       const casting = deps.resolvedAbility(p.castingAbility, p.id);
-      const mobile = casting != null && (casting.def.castWhileMoving || casting.castWhileMoving);
+      const mobile =
+        casting != null &&
+        (casting.def.castWhileMoving ||
+          casting.castWhileMoving ||
+          p.auras.some((a) => a.kind === 'ice_floes'));
       if (!mobile) deps.cancelCast(p);
     }
     const len = Math.hypot(mx, mz);

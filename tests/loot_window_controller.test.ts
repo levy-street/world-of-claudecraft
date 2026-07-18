@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { ITEMS, MOBS } from '../src/sim/data';
 import type { Entity } from '../src/sim/types';
 import { LootWindowController } from '../src/ui/hud/loot/loot_window_controller';
@@ -26,7 +27,10 @@ function entity(
   } as Entity;
 }
 
-function harness(initialEntities: Entity[] = []) {
+function harness(
+  initialEntities: Entity[] = [],
+  corpseAvailability = (mob: Entity) => corpseLootAvailability(mob, 7),
+) {
   const element = document.createElement('div');
   element.id = 'loot-window';
   document.body.appendChild(element);
@@ -51,6 +55,7 @@ function harness(initialEntities: Entity[] = []) {
     element,
     document,
     world: () => world,
+    corpseAvailability,
     closeTransient,
     hideTooltip,
     entityName: (entry) => entry.name,
@@ -117,6 +122,28 @@ describe('LootWindowController', () => {
     expect(test.lootCorpse).toHaveBeenCalledWith(10);
     expect(test.element.style.display).toBe('none');
     expect(test.hideTooltip).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses the shared corpse availability gate before opening', () => {
+    const mob = entity(12, {
+      kind: 'mob',
+      templateId: harvestMobId,
+      loot: null,
+    });
+    const corpseAvailability = vi.fn(() => ({
+      componentTags: undefined,
+      harvestable: false,
+      visibleItems: [],
+      hasLoot: false,
+      canOpen: false,
+    }));
+    const test = harness([mob], corpseAvailability);
+
+    test.controller.openCorpse(12, 0, 0);
+
+    expect(corpseAvailability).toHaveBeenCalledWith(mob);
+    expect(test.closeTransient).not.toHaveBeenCalled();
+    expect(test.element.style.display).not.toBe('block');
   });
 
   it('passes the selected harvest components through the IWorld seam', () => {

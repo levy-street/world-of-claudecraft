@@ -45,4 +45,39 @@ describe('mobile window layout CSS', () => {
     expect(block).toContain('width: min(330px, calc(var(--app-vw) / var(--ui-scale, 1) - 32px));');
     expect(block).toContain('max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 32px);');
   });
+
+  it('shows all three mobile specializations in one compact grid without horizontal drag', () => {
+    expect(mobileCss).not.toMatch(/body\.mobile-touch #talents-window \{[^}]*column-count: 2;/);
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #talents-window \{[^}]*width: min\(620px,[^}]*transform: translate\(-50%, -50%\);[^}]*overflow-x: hidden;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #talents-window \.ts-specs-grid \{[^}]*display: grid;[^}]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/,
+    );
+    expect(mobileCss).not.toMatch(
+      /body\.mobile-touch #talents-window \.ts-specs-grid \{[^}]*flex-direction: column;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch #talents-window \.ts-panel \{[^}]*min-height: 150px;/,
+    );
+  });
+
+  it('places the Claudium wallet card beside the balance in mobile landscape', () => {
+    expect(mobileCss).toContain(`@media (orientation: landscape) {
+    body.mobile-touch #claudium-window .cl-body:has(> .cl-wallet-connect) {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: stretch;
+      gap: 10px;
+    }`);
+    expect(mobileCss).toContain(`body.mobile-touch
+      #claudium-window
+      .cl-body:has(> .cl-wallet-connect)
+      > :not(.cl-balance, .cl-wallet-connect) {
+      grid-column: 1 / -1;
+    }`);
+    expect(mobileCss).toContain(`body.mobile-touch #claudium-window .cl-wallet-connect {
+      margin-top: 0;
+    }`);
+  });
 });

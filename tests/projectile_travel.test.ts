@@ -188,9 +188,11 @@ describe('scheduleProjectile + advancePendingProjectiles', () => {
   });
 });
 
-// End-to-end: drive a real Sim and assert a mage Fire Blast (an INSTANT projectile
+// End-to-end: drive a real Sim and assert a mage Ice Lance (an INSTANT projectile
 // spell, so no cast-time pushback to muddy the timing) deals NO damage on the tick it
 // is cast and SOME damage a few ticks later, when the bolt actually lands.
+// (The mage rework made Fire Blast spec-gated AND `projectile: false`, biting the
+// moment it is pressed, so Ice Lance is now the kit's instant projectile.)
 function place(sim: Sim, e: any, x: number, z: number) {
   e.pos.x = x;
   e.pos.z = z;
@@ -198,10 +200,12 @@ function place(sim: Sim, e: any, x: number, z: number) {
   e.prevPos = { ...e.pos };
 }
 
-describe('deferred projectile damage end-to-end (mage Fire Blast)', () => {
-  function castBlastAndTrack(seed: number) {
+describe('deferred projectile damage end-to-end (mage Ice Lance)', () => {
+  function castLanceAndTrack(seed: number) {
     const sim = new Sim({ seed, playerClass: 'mage', autoEquip: true });
     sim.setPlayerLevel(20);
+    // Ice Lance is Frost-spec kit: commit the spec so the ability is known.
+    expect(sim.setSpec('frost')).toBe(true);
     const p = sim.player;
     p.hp = p.maxHp;
     p.resource = p.maxResource;
@@ -220,7 +224,7 @@ describe('deferred projectile damage end-to-end (mage Fire Blast)', () => {
     sim.player.targetId = target.id;
 
     const startHp = target.hp;
-    (sim as any).castAbility('fire_blast'); // instant: schedules the bolt this tick
+    (sim as any).castAbility('ice_lance'); // instant: schedules the bolt this tick
 
     let hpOneTickLater = startHp;
     let landedAtTick = -1;
@@ -233,7 +237,7 @@ describe('deferred projectile damage end-to-end (mage Fire Blast)', () => {
   }
 
   it('does not apply damage the instant it is cast, but lands it a few ticks later', () => {
-    const r = castBlastAndTrack(7);
+    const r = castLanceAndTrack(7);
     // The bolt is still in flight one tick after the cast: no damage yet.
     expect(r.hpOneTickLater).toBe(r.startHp);
     // It lands within the flight window and deals real damage.
@@ -243,8 +247,8 @@ describe('deferred projectile damage end-to-end (mage Fire Blast)', () => {
   });
 
   it('is deterministic: same seed, same landing and damage', () => {
-    const a = castBlastAndTrack(7);
-    const b = castBlastAndTrack(7);
+    const a = castLanceAndTrack(7);
+    const b = castLanceAndTrack(7);
     expect(a).toEqual(b);
   });
 });

@@ -104,11 +104,11 @@ export type {
   DeedStats,
   OverheadEmoteId,
 } from './sim/types';
-
 // --- facet aux-type + value re-exports (each travels with its facet file) ---
 export type { BankBonusSource, BankInfo } from './world_api/bank';
 export type { CardMinigameInfo } from './world_api/card_minigame';
 export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
+export type { ActiveFrostRing, ActiveTemporalHourglass } from './world_api/combat';
 export type { AccountCosmetics } from './world_api/cosmetics';
 export type {
   DailyRewardEligibilityView,
@@ -152,10 +152,16 @@ export type {
   DungeonFinderQueueView,
 } from './world_api/dungeon_finder';
 export type { RaidLockout } from './world_api/dungeons';
+export type { WorldInteractionOutcome } from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
-export type { CraftResultView, PlayerProfessionsView, RecipeDef } from './world_api/professions';
+export type {
+  CraftingIdentityView,
+  CraftResultView,
+  PlayerProfessionsView,
+  RecipeDef,
+} from './world_api/professions';
 export type {
   DevLeaderboardEntry,
   GuildLeaderboardEntry,
@@ -294,8 +300,10 @@ export const COMMAND_NAMES = [
   'pet_rename',
   'pet_revive',
   'pet_attack',
+  'pet_water_jet',
   'pet_taunt',
   'pet_auto_taunt',
+  'pet_auto_water_jet',
   'pet_feed',
   'pet_heal',
   'pet_mode',
@@ -384,6 +392,7 @@ export const COMMAND_NAMES = [
   'vcup_ready',
   'vcup_bet',
   'vcup_practice',
+  'releaseEmpowered',
   'df_roles',
   'df_queue',
   'df_queue_leave',
@@ -399,6 +408,9 @@ export const COMMAND_NAMES = [
   'ignore_add',
   'ignore_remove',
   'stow_weapon',
+  // Append-only protocol addition for the canonical Talents V2 row mutation.
+  'selectTalentRow',
+  'resurrect_respond',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -474,6 +486,7 @@ export const COMMAND_FACETS = {
   cast: 'IWorldCombat',
   castSlot: 'IWorldCombat',
   castAt: 'IWorldCombat',
+  releaseEmpowered: 'IWorldCombat',
   cancel_aura: 'IWorldCombat',
   attack: 'IWorldCombat',
   stopattack: 'IWorldCombat',
@@ -482,6 +495,7 @@ export const COMMAND_FACETS = {
   // resurrection (with Resurrection Sickness). Wire strings are snake_case by design.
   resurrect_corpse: 'IWorldCombat',
   resurrect_healer: 'IWorldCombat',
+  resurrect_respond: 'IWorldCombat',
   // IWorldTargeting: target selection + tab cycling.
   target: 'IWorldTargeting',
   tab: 'IWorldTargeting',
@@ -499,6 +513,7 @@ export const COMMAND_FACETS = {
   applyTalents: 'IWorldTalents',
   respec: 'IWorldTalents',
   setSpec: 'IWorldTalents',
+  selectTalentRow: 'IWorldTalents',
   saveLoadout: 'IWorldTalents',
   switchLoadout: 'IWorldTalents',
   deleteLoadout: 'IWorldTalents',
@@ -514,8 +529,10 @@ export const COMMAND_FACETS = {
   pet_rename: 'IWorldPet',
   pet_revive: 'IWorldPet',
   pet_attack: 'IWorldPet',
+  pet_water_jet: 'IWorldPet',
   pet_taunt: 'IWorldPet',
   pet_auto_taunt: 'IWorldPet',
+  pet_auto_water_jet: 'IWorldPet',
   pet_feed: 'IWorldPet',
   pet_heal: 'IWorldPet',
   pet_mode: 'IWorldPet',

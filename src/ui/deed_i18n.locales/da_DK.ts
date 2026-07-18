@@ -7,6 +7,10 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_card_duel_first_win: {
+    name: 'Husets Regler',
+    desc: 'Vind en Kortduel hos Kortmesteren.',
+  },
   prog_first_steps: {
     name: 'De Første Skridt',
     desc: 'Nå niveau 2, og tag dit første skridt på en lang vej.',
@@ -32,8 +36,8 @@ export const table: DeedLocaleTable = {
     desc: 'Brug et talentpoint på et talent i nederste række.',
   },
   prog_full_build: {
-    name: 'Alle Elleve',
-    desc: 'Brug alle elleve talentpoint på ét og samme build.',
+    name: 'Alle Seks',
+    desc: 'Vælg én mulighed i alle seks talentrækker i ét build.',
   },
   prog_veteran: { name: 'Veteran', desc: 'Optjen sammenlagt 250.000 erfaring.', title: 'Veteran' },
   prog_champion: { name: 'Mester', desc: 'Optjen sammenlagt 500.000 erfaring.', title: 'Mester' },

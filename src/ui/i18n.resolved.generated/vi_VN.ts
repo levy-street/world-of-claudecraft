@@ -233,6 +233,9 @@ export const vi_VN: EnTranslations = {
       "title": "Thiên phú",
       "classTab": "Lớp",
       "specTab": "Chuyên môn",
+      "choicesTab": "Lựa chọn",
+      "rowUnlockToast": "Đã mở khóa một lựa chọn tài năng mới!",
+      "rowUnlocks": "Mở khóa ở cấp {level}",
       "available": "Khả dụng",
       "spent": "Đã dùng",
       "pointSource": "Nhận 1 điểm tài năng mỗi cấp từ cấp {first} đến {cap}. Lên cấp để có thêm điểm.",
@@ -291,6 +294,7 @@ export const vi_VN: EnTranslations = {
         "noTree": "Lớp nhân vật của bạn chưa có cây thiên phú.",
         "locked": "Bạn chưa mở khóa thiên phú — chúng bắt đầu ở cấp {level}.",
         "noSpec": "chưa có chuyên môn",
+        "rowsSummary": "Tài năng: {head}, đã chọn {picked}/{unlocked} hàng lựa chọn.",
         "summary": "Thiên phú: {head} — đã dùng {spent}/{total} điểm ({breakdown}).",
         "breakdownClass": "Lớp {classPts}",
         "breakdownSpec": "Lớp {classPts}, {spec} {specPts}",
@@ -314,6 +318,10 @@ export const vi_VN: EnTranslations = {
       "resurrectAtCorpse": "Hồi Sinh Tại Xác Chết",
       "resurrectAtHealer": "Người Canh Giữ Nhợt Nhạt (Cái Giá của Người Canh Giữ)",
       "spiritHealerAlive": "Người Canh Giữ Nhợt Nhạt trông nom kẻ chết. Bạn vẫn còn ở giữa cõi sống."
+    },
+    "fct": {
+      "absorbed": "Đã hấp thụ {amount}",
+      "cheap": "Giảm chi phí!"
     },
     "emotes": {
       "wave": "Vẫy Tay",
@@ -416,6 +424,18 @@ export const vi_VN: EnTranslations = {
       "armoryEyebrow": "Mùa 1",
       "armoryTitle": "Kho Vũ Khí",
       "armoryBody": "Ngoại hình vũ khí giới hạn từ Kho Vũ Khí Mùa 1. Dùng chung toàn tài khoản, hoàn toàn mang tính thẩm mỹ và hiển thị với mọi người xung quanh bạn.",
+      "wallet": {
+        "title": "Ví Solana",
+        "unlinked": "Hãy kết nối một ứng dụng ví, rồi ký một lần để liên kết địa chỉ công khai của nó với tài khoản WoC của bạn. Chúng tôi không bao giờ nhận cụm từ khôi phục hoặc khóa riêng tư của bạn.",
+        "connectedUnlinked": "Ứng dụng ví đã kết nối với trình duyệt này, nhưng địa chỉ công khai của nó chưa được liên kết với tài khoản WoC của bạn.",
+        "linkedDisconnected": "Địa chỉ công khai của bạn đã được liên kết. Hãy kết nối lại ứng dụng ví đó khi bạn muốn thanh toán bằng SOL hoặc WOC.",
+        "linkedConnected": "Ứng dụng ví đã liên kết của bạn đã kết nối và sẵn sàng cho các giao dịch mua bằng SOL hoặc WOC.",
+        "mismatched": "Một ví khác đang kết nối. Hãy xác minh nó để thay thế địa chỉ đã liên kết, hoặc kết nối lại ví đã liên kết.",
+        "connect": "Kết nối ví",
+        "verify": "Xác minh và liên kết",
+        "reconnect": "Kết nối lại ví",
+        "manage": "Quản lý ví"
+      },
       "collectionLine": "Bộ sưu tập {collection}",
       "collections": {
         "guildmark": "Nhãn hiệu bang hội",
@@ -709,6 +729,7 @@ export const vi_VN: EnTranslations = {
       "playerLabel": "Anh Hùng Của Bạn",
       "targetLabel": "Mục Tiêu Của Bạn",
       "targetAnnounce": "Đánh Dấu {name}",
+      "targetOfTargetLabel": "Mục Tiêu Của Mục Tiêu",
       "partyLabel": "Đội Của Bạn",
       "partyChip": "Tổ Đội",
       "partyGroup": "Nhóm {n}",
@@ -1011,16 +1032,39 @@ export const vi_VN: EnTranslations = {
       "aurasOnPlayerFrame": "Hiệu Ứng Có Lợi Trên Khung Người Chơi",
       "highContrastBackground": "Nền Tương Phản Cao",
       "startAttackOnAbility": "Tự Đánh Khi Dùng Kỹ Năng",
-      "showAttackButton": "Hiển Thị Nút Tấn Công",
       "walkByAutoloot": "Tự Nhặt Đồ Khi Đi Ngang",
       "groundReticle": "Vòng ngắm mục tiêu mặt đất",
+      "mouseoverCast": "Thi Triển Khi Rê Chuột Trên Khung Tổ Đội",
       "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
+      "showTargetOfTarget": "Hiện Mục Tiêu Của Mục Tiêu",
+      "showAttackButton": "Hiển Thị Nút Tấn Công",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
       "mobileCameraJoystick": "Cần điều khiển máy ảnh",
       "mobileLeftHanded": "Bố cục thuận tay trái"
+    },
+    "talentRows": {
+      "tab": "Lựa chọn",
+      "defaultLoadout": "Bộ trang bị mặc định",
+      "comingSoon": "Sắp ra mắt",
+      "readoutSummary": "Thiên phú: {head}, đã chọn {spent}/{total} hàng."
+    },
+    "abilityError": {
+      "shieldRequired": "Bạn phải trang bị khiên."
+    },
+    "specPanel": {
+      "primaryAttr": "Thuộc tính chính",
+      "complexity": "Độ phức tạp",
+      "complexityLow": "Thấp",
+      "complexityMedium": "Trung bình",
+      "complexityHigh": "Cao",
+      "exampleAbilities": "Kỹ năng tiêu biểu",
+      "viewTalents": "Xem thiên phú",
+      "selectSpec": "Chọn chuyên môn",
+      "specUnlockBanner": "Chuyên Môn Đã Mở Khóa!",
+      "specUnlockHint": "Nhấn N để chọn chuyên môn của bạn."
     },
     "controller": {
       "title": "Tay Cầm",
@@ -1133,6 +1177,7 @@ export const vi_VN: EnTranslations = {
         "spellPower": "Sức Mạnh Phép Thuật",
         "critRating": "Chỉ Số Chí Mạng",
         "hasteRating": "Chỉ Số Thần Tốc",
+        "parry": "Gạt Đòn",
         "hitRating": "Chỉ Số Trúng Đòn",
         "warfare": "Chiến Tranh"
       },
@@ -1151,6 +1196,7 @@ export const vi_VN: EnTranslations = {
         "dodge": "Tỉ lệ bạn né hoàn toàn một đòn cận chiến, không nhận sát thương.",
         "critRating": "Chỉ số chí mạng từ trang bị và phần thưởng bộ trang bị của bạn, nâng tỉ lệ chí mạng của bạn. Khoảng 10 điểm chỉ số ban 1% chí mạng.",
         "hasteRating": "Chỉ số thần tốc từ trang bị và phần thưởng bộ trang bị của bạn, đẩy nhanh các đòn tấn công và việc thi triển phép của bạn. Khoảng 10 điểm chỉ số ban 1% thần tốc.",
+        "parry": "Cơ hội để bạn gạt trọn vẹn một đòn cận chiến từ phía trước, không nhận chút sát thương nào. Đòn đánh từ phía sau không thể bị gạt.",
         "hitRating": "Chỉ số trúng đòn từ trang bị và các chỉ số bộ của bạn, giảm tần suất tấn công bị hụt và phép thuật bị kháng, đặc biệt khi đối mặt với kẻ địch cấp cao hơn. Khoảng 10 chỉ số cho 1% trúng đòn.",
         "warfare": "Tăng sát thương gây ra cho người chơi thêm {increase}% và giảm sát thương nhận từ người chơi thêm {reduction}%."
       },
@@ -1501,9 +1547,35 @@ export const vi_VN: EnTranslations = {
       "attackSpeedSlow": "Reduce la velocidad de ataque un {pct}%",
       "attackSpeedFast": "Aumenta la velocidad de ataque un {pct}%",
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
+      "dmgDone": "Tăng sát thương gây ra lên {pct}%",
+      "dmgDoneReduce": "Giảm sát thương gây ra đi {pct}%",
+      "heatingUp": "Cú chí mạng tiếp theo của kỹ năng xây dựng Lửa liên tiếp sẽ ban Hot Streak; cú không chí mạng sẽ xóa Đang Nóng Dần",
+      "elementalConvergencePrimed": "Phép tiếp theo của bạn từ trường nguyên tố khác sẽ ban Hội Tụ Nguyên Tố",
+      "battleStance": "Thế Công: tạo nộ khí nhiều hơn 10%",
+      "berserkerStance": "Thế Cuồng Chiến: chí mạng thường xuyên hơn 3% và mạnh hơn 3%",
+      "crit": "Tăng tỉ lệ chí mạng thêm {pct}%",
+      "rageGen": "Tăng lượng nộ khí tạo ra thêm {pct}%",
+      "reckless": "Tăng tỉ lệ chí mạng thêm {pct}% và lượng nộ khí tạo ra thêm {ragePct}%",
+      "avatar": "Khổng Tượng: sát thương gây ra tăng {pct}%",
+      "bloodbath": "Tăng tỉ lệ chí mạng và sát thương gây ra thêm {pct}%",
+      "dieBySword": "Giảm sát thương phải chịu đi {pct}%",
+      "sanguine": "Tăng tốc độ tấn công thêm {hastePct}% và sát thương gây ra thêm {dmgPct}%",
+      "battleTrance": "Đòn Cướp Phá hoặc Đòn Tàn Phế tiếp theo của bạn không tốn nộ khí",
+      "revengeFree": "Phục Thù tiếp theo của bạn không tốn nộ khí",
+      "victoryRush": "Đà Chiến Thắng đã sẵn sàng",
+      "maxHpPct": "Tăng máu tối đa thêm {pct}%",
+      "temporalHourglass": "Miễn nhiễm và không thể hành động; hồi phục máu và tăng tốc phục hồi thời gian hồi chiêu. Nhấp chuột phải để hủy bỏ.",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
+      "combustionCrit": "Các phép Lửa của bạn luôn chí mạng",
+      "overloadNext": "Phép tiếp theo của bạn được khuếch đại {pct}% nhưng tốn thêm 50% mana",
+      "powerEchoNext": "Phép trực tiếp tiếp theo của bạn lặp lại với {pct}% sức mạnh trên cùng mục tiêu",
+      "iceFloesCasts": "Phép tiếp theo {n} của bạn có thời gian thi triển có thể được thi triển trong khi di chuyển",
+      "freeCast": "Lần thi triển tiếp theo của bạn không tốn mana",
+      "instantCast": "Phép tiếp theo của bạn có thời gian thi triển sẽ lập tức",
+      "cheapCast": "Phép tiếp theo của bạn tốn ít hơn {pct}%",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
+        "sp": "Tăng sức mạnh phép thuật lên {value}",
         "armor": "Aumenta la armadura en {value}",
         "int": "Aumenta el intelecto en {value}",
         "agi": "Aumenta la agilidad en {value}",
@@ -1557,6 +1629,7 @@ export const vi_VN: EnTranslations = {
       "formBear": "Bruin Form: tăng máu và giáp.",
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
       "formTravel": "Fleet Form: tốc độ di chuyển tăng {pct}%.",
+      "formFireball": "Ember Form: tốc độ di chuyển tăng {pct}%; tấn công và thi triển phép bị vô hiệu hóa",
       "defensiveStance": "Thế Thủ: giảm sát thương phải chịu, tăng đe dọa.",
       "righteousFury": "Lời Thề Rực Cháy: tăng mạnh đe dọa từ sát thương Thánh.",
       "scale": "Tamaño aumentado un {pct}%",
@@ -1603,8 +1676,8 @@ export const vi_VN: EnTranslations = {
       "removeFromBarAria": "Gỡ {name} khỏi thanh kỹ năng"
     },
     "nameplate": {
-      "mob": "[{level}] {name}",
-      "mobElite": "[{level}+] {name}"
+      "mobLevel": "{level}",
+      "mobEliteLevel": "{level}+"
     },
     "mobTooltip": {
       "levelFamily": "{family} cấp {level}",
@@ -2014,17 +2087,31 @@ export const vi_VN: EnTranslations = {
     "archetypeTitle": {
       "label": "Danh hiệu",
       "none": "Không có",
-      "hobbyLabel": "Sở Thích",
-      "armorcrafting": "Thợ Giáp",
-      "weaponcrafting": "Thợ Rèn Vũ Khí",
-      "jewelcrafting": "Thợ Kim Hoàn",
-      "alchemy": "Nhà Giả Kim",
-      "engineering": "Kỹ Sư",
-      "cooking": "Đầu Bếp",
-      "inscription": "Thợ Khắc Chữ",
-      "enchanting": "Thợ Phù Phép",
-      "tailoring": "Thợ May",
-      "leatherworking": "Thợ Da"
+      "hobbyLabel": "Sở Thích"
+    },
+    "archetypePair": {
+      "engineering+alchemy": "Chuyên Gia Nổ",
+      "alchemy+cooking": "Dược Sĩ",
+      "cooking+leatherworking": "Thợ Bẫy",
+      "leatherworking+tailoring": "Thợ Trang Phục",
+      "tailoring+inscription": "Thợ Dệt Phép",
+      "inscription+enchanting": "Pháp Sư Học Thuật",
+      "enchanting+jewelcrafting": "Thợ Đá Quý",
+      "jewelcrafting+weaponcrafting": "Thợ Rèn Kiếm",
+      "weaponcrafting+armorcrafting": "Thợ Rèn",
+      "armorcrafting+engineering": "Thợ Cơ Khí"
+    },
+    "craftName": {
+      "armorcrafting": "Rèn Giáp",
+      "weaponcrafting": "Rèn Vũ Khí",
+      "jewelcrafting": "Chế Tác Đá Quý",
+      "alchemy": "Giả Kim",
+      "engineering": "Cơ Khí",
+      "cooking": "Nấu Ăn",
+      "inscription": "Khắc Chữ",
+      "enchanting": "Pháp Khắc",
+      "tailoring": "May Vá",
+      "leatherworking": "Thuộc Da"
     },
     "crafting": {
       "title": "Chế tạo",
@@ -2038,6 +2125,42 @@ export const vi_VN: EnTranslations = {
       "insufficientMaterials": "Bạn không có tài liệu cho việc đó.",
       "unknownRecipe": "Công thức đó không tồn tại.",
       "comboRequirementUnmet": "Bạn chưa có cả hai nghề chế tạo cần thiết ở bậc yêu cầu cho công thức đó.",
+      "comboRequires": "Thụ ngộ: {craftA} + {craftB}, bậc {tier}.",
+      "comboMet": "Sẵn sàng.",
+      "comboSyncing": "Đang kiểm tra thụ ngộ vương quốc.",
+      "comboNotAttuned": "Hãy chọn một đôi kiểu mẫu trước.",
+      "comboWrongPair": "Hãy kích hoạt đúng đôi này để chế tác nó.",
+      "comboTierUnmet": "Hãy nâng cả hai kỹ nghệ chuyên ngành lên bậc yêu cầu.",
+      "professionChoice": "Lựa chọn nghề nghiệp",
+      "noProfessionChoice": "Hiện không có lựa chọn nghề nghiệp hợp lệ nào.",
+      "pairOptionLabel": "{pair} ({craftA} + {craftB})",
+      "attunementPreview": "Kết quả: danh hiệu {title}; {majorA} và {majorB} trở thành chuyên ngành không giới hạn; {hobby} trở thành sở thích giới hạn hiếm; tất cả kiến thức kỹ năng khác được giữ lại nhưng giới hạn ở thông thường khi không hoạt động.",
+      "hobbyPreview": "Kết quả: {hobby} trở thành sở thích giới hạn hiếm. Cả hai chuyên ngành và tất cả giá trị kỹ năng đã giữ lại đều không thay đổi.",
+      "identity": {
+        "title": "Danh Tính Chế Tác",
+        "syncing": "Đang đợi danh tính chế tác của bạn từ vương quốc.",
+        "unattuned": "Không có đôi kiểu mẫu nào đang hoạt động. Kiến thức của bạn được giữ lại, nhưng các công thức kết hợp yêu cầu một đôi đã thụ ngộ.",
+        "titleLabel": "Danh Hiệu",
+        "majorsLabel": "Chuyên Ngành",
+        "hobbyLabel": "Sở Thích",
+        "historyLabel": "Lịch Sử",
+        "history": "Đã khám phá {pairs} đôi, đã hoàn thành {returns} lần quay lại",
+        "roleMajor": "Chuyên Ngành",
+        "roleHobby": "Sở Thích",
+        "roleDormant": "Kiến thức không hoạt động",
+        "roleUnattuned": "Chưa Thụ Ngộ",
+        "ceilingUnlimited": "Không giới hạn tăng cường",
+        "ceilingRare": "Giới hạn hiếm",
+        "ceilingCommon": "Giới hạn thông thường",
+        "skillAria": "{craft}, kỹ năng {skill}, bậc {tier}, {role}, {ceiling}",
+        "colCraft": "Kỹ Nghệ",
+        "colSkill": "Kỹ Năng",
+        "colRole": "Vai Trò",
+        "colCap": "Giới Hạn",
+        "tutorial": "Bậc đầu tiên: đạt kỹ năng {skill} trong một kỹ nghệ. Các công thức thành công nâng kỹ nghệ đó mà không xóa kiến thức ở nơi khác.",
+        "nearTier": "{craft} còn {points} kỹ năng nữa là đến bậc tiếp theo.",
+        "dormantKnowledge": "Kiến thức {craft} được giữ lại nhưng không hoạt động cho đến khi đôi hoặc sở thích của nó được kích hoạt."
+      },
       "notAtHub": "Bạn phải ở trung tâm chế tác, đạt cấp yêu cầu, mới chế tạo được thứ đó.",
       "throttled": "Bạn đang chế tạo quá nhanh. Hãy chờ một lát rồi thử lại.",
       "recipeNotLearned": "Bạn chưa học công thức đó."
@@ -2201,9 +2324,9 @@ export const vi_VN: EnTranslations = {
       "charOpenBook": "Sách Kỳ Công",
       "lbTab": "Danh Vọng",
       "lbTitleCol": "Danh Hiệu",
-      "lbScopeNote": "Accounts ranked by lifetime Renown. Each deed counts once across all characters on an account.",
-      "lbSelfAccount": "Your account: rank {rank}, top {percent} percent, {renown} Renown",
-      "lbSelfRank": "Your account: rank {rank}, top {percent} percent",
+      "lbScopeNote": "Tài khoản được xếp hạng theo Danh Vọng trọn đời. Mỗi kỳ công được tính một lần trên tất cả nhân vật trong một tài khoản.",
+      "lbSelfAccount": "Tài khoản của bạn: hạng {rank}, top {percent} phần trăm, {renown} Danh Vọng",
+      "lbSelfRank": "Tài khoản của bạn: hạng {rank}, top {percent} phần trăm",
       "lbEmpty": "Chưa có sử quan nào được xếp hạng.",
       "broadcastsLabel": "Chia sẻ kỳ công vừa lập với bang hội và bạn bè",
       "titledName": "{name} [{title}]"
@@ -2307,6 +2430,9 @@ export const vi_VN: EnTranslations = {
       "already_linked": "Tài khoản của bạn đã liên kết với một tài khoản Steam.",
       "account_taken": "Tài khoản Steam đó đã được liên kết với một tài khoản khác.",
       "upstream": "Steam không phản hồi. Hãy thử lại sau giây lát."
+    },
+    "wallet": {
+      "handoff_invalid": "Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại."
     },
     "welcome": {
       "invalid_input": "Dữ liệu nhập không hợp lệ."
@@ -2767,10 +2893,10 @@ export const vi_VN: EnTranslations = {
     },
     "abilityHook": {
       "heroic_strike": "Đặt sẵn một cú vung nặng tay tiêu nộ khí vào đòn đánh kế tiếp của bạn.",
+      "revenge": "Quét trúng kẻ địch phía trước và có thể không tốn tài nguyên sau khi né hoặc đỡ đòn.",
+      "hamstring": "Cản trở di chuyển của kẻ địch để chúng không thể chạy thoát.",
       "battle_shout": "Một tiếng hô cổ vũ giúp tăng sức tấn công cho cả tổ đội.",
-      "commanding_shout": "Tăng cường thể lực để mọi người trụ vững lâu hơn trong trận.",
       "charge": "Lao tới kẻ địch ở xa để mở màn trận đấu bằng một cú choáng ngắn.",
-      "rend": "Mở một vết chảy máu bào mòn mục tiêu dần theo thời gian.",
       "thunder_clap": "Đánh trúng mọi thứ quanh bạn và làm chậm đòn tấn công của chúng.",
       "seal_of_righteousness": "Phù chú đòn vung của bạn với sát thương Thánh, rồi giải phóng bằng Verdict.",
       "holy_light": "Một đòn trị liệu vững chãi, đáng kể để hồi đầy cho đồng đội hoặc bản thân.",
@@ -2803,9 +2929,18 @@ export const vi_VN: EnTranslations = {
       "lightning_shield": "Tích điện cho bạn để kẻ tấn công nhận sát thương Tự Nhiên khi đánh trúng bạn.",
       "flame_shock": "Một đòn thiêu đốt tức thời giáng trực diện và tiếp tục sém cháy theo thời gian.",
       "fireball": "Đòn hỏa thuật chủ lực của bạn, vừa giáng một đòn vừa khiến mục tiêu cháy âm ỉ.",
+      "fireball_form": "Trở thành tia lửa sống để vượt qua địa hình trống với tốc độ cao.",
       "frost_armor": "Một buff bản thân lâu dài giúp tôi luyện giáp của bạn trước trận đấu.",
       "arcane_intellect": "Tăng Trí Tuệ để mở rộng bể mana của đồng đội, hãy niệm trước khi vào trận.",
       "frostbolt": "Tấn công từ xa và làm chậm mục tiêu để nó không thể áp sát bạn.",
+      "ice_lance": "Một mảnh lập tức để tiêu hao hiệu ứng băng, đánh mạnh hơn nhiều với mục tiêu đang đóng băng.",
+      "flurry": "Ba mũi tên nhanh làm lạnh mục tiêu để các cú đánh băng tiếp theo của bạn đánh như thể nó đang đóng băng.",
+      "fingers_of_frost": "Đôi khi các mũi tên băng của bạn tăng cường Ice Lance để đánh như thể mục tiêu đang đóng băng.",
+      "brain_freeze": "Đôi khi các mũi tên băng của bạn khiến Winterlash tiếp theo lập tức và mạnh hơn.",
+      "shatter": "Phép của bạn có tỷ lệ chí mạng cao hơn nhiều với mục tiêu đang đóng băng.",
+      "frozen_orb": "Lăn một quả cầu chậm qua bầy, làm lạnh mọi thứ và tạo ra các hiệu ứng băng của bạn.",
+      "blizzard": "Phủ băng lên một khu vực để làm hao mòn và làm chậm cả bầy.",
+      "blink": "Dịch chuyển bạn một đoạn ngắn về phía trước, phá vỡ các hiệu ứng cố định khi thoát ra.",
       "conjure_water": "Tạo ra đồ uống hồi mana, để bạn nạp lại giữa các đợt kéo quái.",
       "conjure_food": "Tạo ra thức ăn hồi máu khi bạn ngồi xuống dùng bữa.",
       "shadow_bolt": "Một tia bóng tối bạn niệm vào mục tiêu, đòn chủ lực quen thuộc của bạn.",
@@ -3102,7 +3237,7 @@ export const vi_VN: EnTranslations = {
       "howHeading": "Cách kỳ công hoạt động",
       "howBody": "Kỳ công được lập và giữ lại theo từng nhân vật một, nên mỗi anh hùng bạn chơi đều dựng nên cuốn Sách của riêng mình; chỉ Bảng Xếp Hạng của vương quốc mới gom Danh Vọng của bạn qua tất cả các nhân vật bạn chơi, và tính mỗi kỳ công đúng một lần. Mỗi kỳ công ghi rõ ràng nó đòi hỏi gì ở bạn, ngay trong Sách Kỳ Công trong trò chơi, nên bạn luôn biết mình đang theo đuổi điều gì, và bạn có thể theo dõi những kỳ công mình nhắm tới để giữ chúng trong tầm mắt khi chơi. Một số ít vẫn được giữ bí mật và chỉ lộ diện khi bạn đã lập được chúng. Sách cũng tự giữ mình trung thực: bất cứ điều gì hồ sơ quá khứ của bạn có thể chứng minh, nó ghi công ngay lập tức, nên một kỳ cựu chẳng bao giờ mở sách ra thấy một trang trống; chỉ những kỳ công đếm số mới bắt đầu đếm lại từ đầu.",
       "renownHeading": "Danh Vọng",
-      "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful of deeds turn on luck rather than skill, and Feats are an honor of their own, so both of those are worth no Renown at all. Deeds without Renown still count toward completion in your Book; they simply never score.",
+      "renownBody": "Danh Vọng là điểm số đằng sau Sách. Mỗi kỳ công bạn lập có giá trị một lượng nhất định, và tổng điểm chỉ tăng lên, vì vậy một tuần lễ yên tĩnh không bao giờ khiến bạn mất vị thế. Một số kỳ công dựa vào may mắn hơn là kỹ năng, và Kỳ Tích là vinh dự riêng, vì vậy cả hai đều không tính Danh Vọng. Kỳ công không có Danh Vọng vẫn tính vào hoàn thành trong Sách của bạn; chúng chỉ không bao giờ ghi điểm.",
       "rewardsHeading": "Danh hiệu và viền tên",
       "rewardsBody": "Phần thưởng đều chỉ để phô diễn, và đó chính là chủ ý. Một số kỳ công ban danh hiệu để bạn mang hoặc viền để đóng khung tên bạn, và không bao giờ có thứ gì khiến anh hùng của bạn mạnh hơn. Hãy chọn danh hiệu bạn muốn trong Sách Kỳ Công, nó sẽ theo bạn trên bảng tên, trong kênh trò chuyện và trên các bảng xếp hạng cho mọi người cùng thấy.",
       "chroniclesHeading": "Biên Niên Sử",
@@ -3111,7 +3246,7 @@ export const vi_VN: EnTranslations = {
       "featsBody": "Kỳ Tích là một ngăn sách riêng: ghi chép về di sản và những lần đầu tiên của thế giới, những kỳ công gắn với một thời đã qua hay một khoảnh khắc chỉ xảy ra đúng một lần. Chúng không mang Danh Vọng và nằm ngoài số đếm hoàn thành, được lưu giữ mãi mãi như ký ức về những gì đã làm nên.",
       "catalogHeading": "Toàn bộ danh mục kỳ công",
       "catalogBody": "Đây là toàn bộ kỳ công mà cuốn Sách có thể lưu giữ, xếp theo từng hạng mục. Những kỳ công bí mật được cố ý lược khỏi danh sách này, chờ chính bạn tìm ra. Hãy mở Sách Kỳ Công trong trò chơi để xem chính xác mỗi kỳ công đòi hỏi điều gì.",
-      "standingsNote": "The realms keep a running tally of Renown across every account: the board ranks whole accounts by lifetime Renown, counting each deed once across all your characters, and it shows Renown alone, so deeds that carry none never move the standings even though they count in your Book. To see who stands where, open the Leaderboard in game and turn to its Renown tab; the standings live there, not on the wiki.",
+      "standingsNote": "Các vương quốc lưu giữ tổng số Danh Vọng liên tục trên mọi tài khoản: bảng xếp hạng toàn bộ tài khoản theo Danh Vọng trọn đời, tính mỗi kỳ công một lần trên tất cả nhân vật của bạn, và nó chỉ hiển thị Danh Vọng, vì vậy các kỳ công không mang Danh Vọng không bao giờ thay đổi thứ hạng dù chúng tính trong Sách của bạn. Để xem ai đứng ở đâu, hãy mở Bảng Xếp Hạng trong trò chơi và chuyển sang tab Danh Vọng của nó; thứ hạng nằm ở đó, không phải trên wiki.",
       "catHeading": "{label} ({count})",
       "colName": "Kỳ Công",
       "colRenown": "Danh Vọng",
@@ -4027,6 +4162,9 @@ export const vi_VN: EnTranslations = {
     "balancePreviewTitle": "Xem trước số dư $WOC của ví đã kết nối",
     "balancePreviewAria": "Xem trước số dư ví đã kết nối: {balance}. Liên kết ví để xác minh huy hiệu chủ sở hữu.",
     "balanceAmount": "{amount} $WOC",
+    "bagConnect": "Liên kết ví",
+    "bagLink": "Xác minh ví",
+    "bagReconnect": "Kết nối lại ví",
     "connected": "Đã kết nối: {address}",
     "connectedWithBalance": "Đã kết nối: {balance} - {address}",
     "connectedLinked": "Đã xác minh: {address}",
@@ -4041,12 +4179,37 @@ export const vi_VN: EnTranslations = {
     "helpLinkedDisconnected": "Đặc quyền chủ sở hữu đang hoạt động. Kết nối ứng dụng khi bạn cần ký hoặc chi tiêu.",
     "helpLinkedDisconnectedWithBalance": "Đặc quyền chủ sở hữu đang hoạt động. Kết nối ứng dụng khi bạn cần ký hoặc chi tiêu.",
     "extensionHelp": "Để thấy ví ở đây, hãy giữ một tiện ích ví trình duyệt như Solflare Wallet đang hoạt động.",
+    "mobileAppHelp": "Hãy chọn Phantom hoặc Solflare. Ứng dụng ví của bạn sẽ yêu cầu phê duyệt. Giữ trò chơi này mở và quay lại khi hoàn thành.",
+    "standaloneAppHelp": "Kết nối ví chưa có sẵn trong ứng dụng Màn hình chính. Hãy mở World of ClaudeCraft trong Safari hoặc Chrome để sử dụng Phantom hoặc Solflare.",
+    "openAppTitle": "Tiếp tục trong {wallet}",
+    "openAppHelp": "Hãy mở {wallet} để xem xét yêu cầu này. Giữ tab trò chơi này mở trong khi ứng dụng ví đang hoạt động.",
+    "openAppButton": "Mở {wallet}",
+    "manualReturnBrowserHelp": "Sau khi phê duyệt, hãy quay lại tab trò chơi này. Nếu iOS mở một trình duyệt khác, hãy đóng nó và quay lại trình duyệt gốc thủ công.",
+    "manualReturnStandaloneHelp": "Sau khi phê duyệt, hãy quay lại World of ClaudeCraft từ Màn hình chính của bạn. Nếu iOS mở một trình duyệt, hãy đóng nó và mở lại ứng dụng Màn hình chính thủ công.",
+    "preparingAppButton": "Đang chuẩn bị {wallet}...",
+    "walletAppUnavailable": "Không thể chuẩn bị {wallet}. Hãy đóng cửa sổ này và thử lại.",
     "flowConnect": "Chọn một ví. Quá trình xác minh sẽ tiếp tục tự động.",
     "flowSign": "Ký vào thông điệp xác minh trong ứng dụng ví của bạn. Không cần giao dịch hay SOL.",
     "flowVerify": "Đang xác minh quyền sở hữu ví...",
     "linkFailed": "Xác minh ví thất bại.",
     "verifyFailed": "Xác minh ví thất bại.",
     "unlinkFailed": "Không thể hủy liên kết ví.",
+    "browser": {
+      "eyebrow": "Ủy quyền ví trên máy tính",
+      "title": "Kết Nối Ví Solana",
+      "linkBody": "Hãy chọn một tiện ích mở rộng ví trong trình duyệt này. Bạn sẽ ký một tin nhắn xác minh, sau đó quay lại ứng dụng máy tính.",
+      "paymentBody": "Hãy chọn ví đã liên kết với tài khoản của bạn và phê duyệt giao dịch trong trình duyệt này.",
+      "extensionHelp": "Không tìm thấy tiện ích mở rộng ví tương thích nào. Hãy cài đặt hoặc mở khóa Phantom, Solflare hoặc ví trình duyệt Solana khác, rồi thử lại.",
+      "safety": "World of ClaudeCraft không bao giờ yêu cầu cụm từ khôi phục hoặc khóa riêng tư của bạn.",
+      "continueWith": "Tiếp tục với {wallet}",
+      "reviewTitle": "Xem xét trong ví của bạn",
+      "reviewBody": "Làm theo hướng dẫn từ {wallet}. Giữ trang trình duyệt này mở.",
+      "completeTitle": "Ủy quyền ví hoàn tất",
+      "completeBody": "Bạn có thể quay lại ứng dụng máy tính World of ClaudeCraft.",
+      "returnButton": "Quay lại ứng dụng máy tính",
+      "failed": "Ủy quyền ví thất bại hoặc đã hết hạn. Hãy quay lại ứng dụng máy tính và thử lại.",
+      "retry": "Thử Lại"
+    },
     "holder": "Chủ sở hữu $WOC",
     "holderTierTitle": "Chủ sở hữu $WOC bậc {tier}",
     "holderTiers": {
@@ -4369,22 +4532,22 @@ export const vi_VN: EnTranslations = {
     "buyAria": "Mua {item} với giá {marks} Dấu Ấn Anh Hùng"
   },
   "cardDuel": {
-    "title": "Card Duel",
-    "close": "Close",
-    "join": "Join Queue",
-    "joinAria": "Join the Card Duel queue",
-    "leave": "Leave Queue",
-    "leaveAria": "Leave the Card Duel queue",
-    "forfeit": "Forfeit",
-    "forfeitAria": "Forfeit the Card Duel",
-    "queued": "Waiting for an opponent...",
-    "unavailable": "Card Duel requires another player online.",
+    "title": "Đấu Bài",
+    "close": "Đóng",
+    "join": "Tham Gia Hàng Chờ",
+    "joinAria": "Tham gia hàng chờ Đấu Bài",
+    "leave": "Rời Hàng Chờ",
+    "leaveAria": "Rời hàng chờ Đấu Bài",
+    "forfeit": "Bỏ Cuộc",
+    "forfeitAria": "Bỏ cuộc Đấu Bài",
+    "queued": "Đang đợi đối thủ...",
+    "unavailable": "Đấu Bài cần có một người chơi khác đang trực tuyến.",
     "vsOpponent": "vs {name}",
-    "round": "Round score: {mine} - {theirs}",
-    "counts": "Deck: {deck} · Discard: {discard}",
-    "playCardAria": "Play the {value} card",
-    "waitingOnOpponent": "Waiting on your opponent's card...",
-    "yourTurn": "Play a card"
+    "round": "Điểm hiệp: {mine} - {theirs}",
+    "counts": "Bộ bài: {deck} · Thải bài: {discard}",
+    "playCardAria": "Đánh bài {value}",
+    "waitingOnOpponent": "Đang đợi bài của đối thủ...",
+    "yourTurn": "Đánh một lá bài"
   },
   "delveUi": {
     "board": {
@@ -4886,9 +5049,9 @@ export const vi_VN: EnTranslations = {
     }
   },
   "gpuNotice": {
-    "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
-    "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
-    "dismiss": "Dismiss"
+    "bodyDesktop": "Trò chơi đang chạy mà không có tăng tốc GPU và sẽ chậm. Hãy cập nhật trình điều khiển đồ họa, sau đó khởi động lại trò chơi. Trên Windows, hãy đặt trò chơi thành Hiệu suất cao trong Cài đặt > Hệ thống > Màn hình > Đồ họa.",
+    "bodyWeb": "Trò chơi đang chạy mà không có tăng tốc GPU và sẽ chậm. Hãy bật tăng tốc phần cứng trong cài đặt trình duyệt, cập nhật trình điều khiển đồ họa, sau đó khởi động lại trình duyệt.",
+    "dismiss": "Bỏ Qua"
   },
   "realm": {
     "noRealms": "Không có thế giới nào khả dụng.",
@@ -5311,11 +5474,14 @@ export const vi_VN: EnTranslations = {
       "openTrade": "Mở Giao Dịch",
       "duelRequest": "{name} đã thách đấu tay đôi với bạn!",
       "acceptDuel": "Chấp Nhận Đấu Tay Đôi",
+      "resurrectionOffer": "{name} muốn đưa bạn trở lại cõi sống. Bạn có chấp nhận không?",
+      "acceptResurrection": "Chấp Nhận Hồi Sinh",
       "decline": "Từ Chối"
     },
     "combat": {
       "floatingMiss": "Trượt",
       "floatingDodge": "Né",
+      "floatingParry": "Gạt Đòn",
       "floatingResist": "Kháng",
       "cannotMove": "Không thể di chuyển!",
       "attack": "tấn công",
@@ -5325,6 +5491,7 @@ export const vi_VN: EnTranslations = {
       "damageTakenCrit": "{source} chí mạng bạn gây {amount}.",
       "miss": "{ability} của bạn trượt {target}.",
       "dodged": "{ability} của bạn bị {target} né.",
+      "parried": "{ability} của bạn bị {target} gạt đòn.",
       "resisted": "{target} kháng lại {ability} của bạn.",
       "healSelf": "{ability} của bạn hồi {amount} máu cho bạn.",
       "healSelfCrit": "{ability} của bạn chí mạng hồi {amount} máu cho bạn.",
@@ -5485,6 +5652,7 @@ export const vi_VN: EnTranslations = {
     },
     "pet": {
       "attack": "Tấn Công",
+      "waterJet": "Phun Nước",
       "taunt": "Khiêu Khích",
       "healDemon": "Trị Liệu Quỷ",
       "healPet": "Trị Liệu Thú",
@@ -5493,6 +5661,8 @@ export const vi_VN: EnTranslations = {
       "aggressive": "Hung Hãn",
       "petAttackTitle": "Thú Tấn Công",
       "petAttackDesc": "Ra lệnh cho thú tấn công mục tiêu thù địch hiện tại của bạn.",
+      "waterJetTitle": "Phun Nước",
+      "waterJetDesc": "Ra lệnh cho Nguyên Tố Nước của bạn dồn dập một luồng nước làm chậm trong 3 giây. Thời gian hồi chiêu 8 giây. Nhấp chuột phải để tự động tung chiêu mỗi khi hết thời gian hồi chiêu.",
       "petTauntTitle": "Thú Khiêu Khích",
       "petTauntDesc": "Ra lệnh cho thú lao vào và Gầm Gừ khi trong tầm. Hồi chiêu 10 giây.",
       "healDemonDesc": "Tiêu hao mana để truyền trị liệu cho quỷ của bạn trong 5 giây.",
@@ -5503,7 +5673,7 @@ export const vi_VN: EnTranslations = {
       "defensiveDesc": "Tấn công kẻ thù làm hại bạn hoặc thú của bạn.",
       "aggressiveDesc": "Tấn công kẻ thù thù địch ở gần.",
       "rename": "Đổi Tên Thú",
-      "revive": "Hồi Sinh Thú",
+      "revive": "Băng Bó",
       "abandon": "Bỏ Rơi Thú",
       "cancel": "Hủy",
       "renameLabel": "Chọn một tên mới cho thú.",
@@ -5759,6 +5929,8 @@ export const vi_VN: EnTranslations = {
     },
     "slots": {
       "mainhand": "Tay Chính",
+      "twoHand": "Hai Tay",
+      "offhand": "Tay Phụ",
       "helmet": "Mũ Giáp",
       "neck": "Cổ",
       "shoulder": "Giáp Vai",
@@ -5799,7 +5971,8 @@ export const vi_VN: EnTranslations = {
       "attackPower": "Sức Tấn Công",
       "dps": "Sát thương/giây",
       "critChance": "Tỉ Lệ Chí Mạng",
-      "dodge": "Né Tránh"
+      "dodge": "Né Tránh",
+      "parry": "Đỡ Đòn"
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",
@@ -6038,23 +6211,15 @@ export const vi_VN: EnTranslations = {
       },
       "battle_shout": {
         "name": "Tiếng Gầm Thép",
-        "description": "Tăng sức mạnh tấn công của ngươi thêm {buff} trong 2 phút."
-      },
-      "commanding_shout": {
-        "name": "Tiếng Hô Trợ Uy",
-        "description": "Tăng Thể Lực của ngươi thêm {buff} trong 2 phút."
+        "description": "Một tiếng hô làm tăng {buff}% sức mạnh tấn công của tất cả thành viên tổ đội trong 30 phút."
       },
       "demoralizing_shout": {
         "name": "Tiếng Hú Hung Hiểm",
-        "description": "Bật ra tiếng hô đáng sợ, giảm sức tấn công của tất cả kẻ địch xung quanh đi {buff} trong 30 giây."
+        "description": "Phát ra tiếng hô đáng sợ, giảm {buff}% sát thương do tất cả kẻ địch xung quanh gây ra trong 20 giây."
       },
       "charge": {
         "name": "Xông Tới",
         "description": "Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Tầm 8-25 thước."
-      },
-      "rend": {
-        "name": "Vết Rạch Sâu",
-        "description": "Gây vết thương cho mục tiêu, khiến chúng chảy máu nhận {damage} sát thương trong {duration} giây."
       },
       "thunder_clap": {
         "name": "Đòn Chấn Rung",
@@ -6100,6 +6265,10 @@ export const vi_VN: EnTranslations = {
         "name": "Tia Tàn Lửa",
         "description": "Ném ra một quả cầu lửa rực cháy gây {damage} sát thương Hỏa cùng sát thương cộng dồn theo thời gian."
       },
+      "fireball_form": {
+        "name": "Ember Form",
+        "description": "Biến thành than hồng rực cháy, tăng tốc độ di chuyển lên {buff}%. Bạn không thể tấn công hay thi triển phép trong khi biến đổi. Thi triển lại để trở về dạng bình thường."
+      },
       "frost_armor": {
         "name": "Áo Choàng Sương Giá",
         "description": "Bao bọc bạn trong băng giá, tăng giáp thêm {buff} trong 30 phút."
@@ -6111,6 +6280,94 @@ export const vi_VN: EnTranslations = {
       "frostbolt": {
         "name": "Thương Băng Giá",
         "description": "Phóng ra một mũi tiễn băng, gây {damage} sát thương Băng và làm chậm di chuyển 40%."
+      },
+      "blazing_barrier": {
+        "name": "Lá Chắn Rực Lửa",
+        "description": "Bao bọc bản thân trong lửa, hấp thụ 130 sát thương trong 60 giây. (Lửa)"
+      },
+      "cold_snap": {
+        "name": "Tiếng Gọi Mùa Đông",
+        "description": "Hoàn tất thời gian hồi của Bước Chớp, Màn Sương Giá và Tàng Hình Cao Cấp. (tài năng pháp sư)"
+      },
+      "greater_invisibility": {
+        "name": "Tàng Hình Cao Cấp",
+        "description": "Biến mất trong 20 giây: xóa 2 hiệu ứng sát thương theo thời gian và bạn nhận ít hơn 90% sát thương khi đang tàng hình và trong chốc lát sau đó. (tài năng pháp sư)"
+      },
+      "hot_streak": {
+        "name": "Chuỗi Nóng",
+        "description": "Nội tại: hai đòn chí mạng liên tiếp bằng phép Lửa của bạn (Tia Tàn Lửa, Mưa Tàn Lửa, Bỏng Rát, Thương Liệt Hỏa hoặc Cú Đánh Lửa) khiến Thương Liệt Hỏa hoặc Cú Đánh Lửa tiếp theo được thi triển tức thì và miễn phí. Phép tiêu hao được tính cho chuỗi TIẾP THEO, kể cả lần thi triển miễn phí; một Cú Đánh Lửa chỉ được tính một lần dù trúng bao nhiêu kẻ địch, và chỉ cú va chạm đầu tiên được tính. (Lửa)"
+      },
+      "ice_floes": {
+        "name": "Băng Trôi",
+        "description": "Hai phép tiếp theo có thời gian niệm có thể được thi triển khi đang di chuyển. Kéo dài 15 giây. (tài năng pháp sư)"
+      },
+      "ignition": {
+        "name": "Bốc Cháy",
+        "description": "Nội tại: đòn chí mạng từ phép của bạn đốt mục tiêu với 40% sát thương đã gây ra trong 6 giây và có thể cộng dồn. (tinh thông Lửa)"
+      },
+      "mass_barrier": {
+        "name": "Lá Chắn Hàng Loạt",
+        "description": "Che chắn cho bạn và tối đa 4 đồng minh ở gần trong phạm vi 30 m; mỗi lá chắn hấp thụ 130 sát thương trong 60 giây. (tài năng pháp sư)"
+      },
+      "overload": {
+        "name": "Quá Tải",
+        "description": "Phép tiếp theo của bạn được khuếch đại 40% nhưng tốn thêm 50% mana. Kéo dài 10 giây. (tài năng pháp sư)"
+      },
+      "power_echo": {
+        "name": "Vọng Âm Sức Mạnh",
+        "description": "Phép trực tiếp tiếp theo của bạn lặp lại với 50% sức mạnh trên cùng mục tiêu. Kéo dài 10 giây. (tài năng pháp sư)"
+      },
+      "rings_of_frost": {
+        "name": "Vòng Băng Giá",
+        "description": "Triệu hồi một vòng tròn trong 10 giây. Kẻ địch vượt qua rìa vòng bị đóng băng trong 4 giây. (tài năng pháp sư)"
+      },
+      "rune_of_power": {
+        "name": "Ấn Sức Mạnh",
+        "description": "Khắc một ấn sức mạnh dưới chân trong 15 giây: đồng minh đứng trong phạm vi 8 m gây thêm 10% sát thương. (tài năng pháp sư)"
+      },
+      "summon_water_elemental": {
+        "name": "Triệu Hồi Nguyên Tố Nước",
+        "description": "Triệu hồi một Nguyên Tố Nước chiến đấu bên bạn, phóng Tên Nước vào mục tiêu và vận phép Tia Nước. (Băng Giá)"
+      },
+      "ice_lance": {
+        "name": "Ice Lance",
+        "description": "Phóng một mảnh băng gây {damage} sát thương Băng, nhân ba lần với mục tiêu đang đóng băng. Tiêu hao Fingers of Frost hoặc một điện tích Cơn Lạnh Mùa Đông để coi mục tiêu như đang đóng băng. (Băng)"
+      },
+      "flurry": {
+        "name": "Winterlash",
+        "description": "Phóng ba mũi tên băng gây {damage} sát thương Băng mỗi mũi và gắn Cơn Lạnh Mùa Đông lên mục tiêu: 2 phép thi triển hợp lệ tiếp theo sẽ coi mục tiêu như đang đóng băng. Brain Freeze khiến Winterlash lập tức, mạnh hơn 30% và bỏ qua thời gian hồi chiêu. (Băng)"
+      },
+      "frozen_orb": {
+        "name": "Frozen Orb",
+        "description": "Phóng ra một quả cầu xoáy băng giá trôi về phía trước trong 8 giây, gây {damage} sát thương Băng mỗi giây cho các kẻ thù lân cận và làm chậm chúng 30%. Các cú đánh của nó tạo ra Fingers of Frost. (Băng)"
+      },
+      "blizzard": {
+        "name": "Blizzard",
+        "description": "Triệu gọi bão tuyết xuống khu vực mục tiêu trong 6 giây, gây {damage} sát thương Băng mỗi giây và làm chậm kẻ thù 40%. Mỗi kẻ thù bị đánh trúng rút ngắn 0,5 giây của Frozen Orb, tối đa 3 giây mỗi lần thi triển. (Băng)"
+      },
+      "glacial_spike": {
+        "name": "Glacial Spike",
+        "description": "Triệu hồi một gai băng khổng lồ, tiêu hao 5 Băng Nhọn để gây {damage} sát thương Băng và đóng băng mục tiêu tại chỗ trong 4 giây. (Băng)"
+      },
+      "glacial_front": {
+        "name": "Glacial Front",
+        "description": "Giữ để tích tụ màn băng giá ngày càng rộng, rồi thả ra thành hình nón. Tích tụ lâu hơn sẽ đạt xa hơn và gây nhiều sát thương hơn. Tất cả kẻ thù bị trúng sẽ bị làm chậm 50% trong 4 giây; tích tụ tối đa còn cố định chúng trong 1 giây. (Băng)"
+      },
+      "dragons_breath": {
+        "name": "Dragon's Breath",
+        "description": "Giữ để tích tụ làn hơi thở lửa ngày càng rộng, rồi thả ra thành hình nón. Tích tụ lâu hơn sẽ đạt xa hơn và gây nhiều sát thương hơn. Kẻ thù bị trúng sẽ mất định hướng và sát thương sẽ phá vỡ hiệu ứng; tích tụ tối đa luôn chí mạng và tính một lần vào Hot Streak. (Lửa)"
+      },
+      "fingers_of_frost": {
+        "name": "Fingers of Frost",
+        "description": "Thương Băng Giá có 15% xác suất ban Fingers of Frost, tối đa 2 điện tích: Ice Lance tiếp theo của bạn coi mục tiêu như đang đóng băng. (Băng)"
+      },
+      "brain_freeze": {
+        "name": "Brain Freeze",
+        "description": "Thương Băng Giá có 20% xác suất khiến Winterlash tiếp theo của bạn lập tức, mạnh hơn 30% và không có thời gian hồi chiêu. (Băng)"
+      },
+      "shatter": {
+        "name": "Brittle Ruin",
+        "description": "Phép của bạn có thêm 50% xác suất chí mạng với mục tiêu đang đóng băng, và những cú chí mạng đó gây thêm 20% sát thương. Fingers of Frost và Cơn Lạnh Mùa Đông được tính là đóng băng. (Băng)"
       },
       "conjure_water": {
         "name": "Kết Nước",
@@ -6532,10 +6789,6 @@ export const vi_VN: EnTranslations = {
         "name": "Da Sồi",
         "description": "Da ngươi rắn lại như vỏ cây, tăng 150 giáp trong 15 giây."
       },
-      "ironhold": {
-        "name": "Thiết Lũy",
-        "description": "Ẩn sau lá chắn bảo vệ, giảm 40% sát thương nhận vào trong 8 giây."
-      },
       "sacred_bulwark": {
         "name": "Phòng Bị Thánh Thần",
         "description": "Trong {duration} giây, đòn tấn công tiếp theo của kẻ địch vốn sẽ giết chết bạn sẽ bị vô hiệu hóa, thay vào đó hồi phục bạn lên 35% máu."
@@ -6624,6 +6877,10 @@ export const vi_VN: EnTranslations = {
         "name": "Sốc Thánh",
         "description": "Gây sốc một mục tiêu đồng minh bằng năng lượng Thánh, hồi cho họ {damage}. (dấu ấn Thánh)"
       },
+      "aura_surge": {
+        "name": "Khiên Dội Bình Minh",
+        "description": "Ném một tấm khiên rèn từ bình minh gây {damage} sát thương Thánh, khiến mục tiêu chính câm lặng trong 2 giây, rồi dội sang tối đa 2 kẻ địch khác trong phạm vi 10 mét, gây 75% sát thương mỗi lần dội. (thiên phú Paladin)"
+      },
       "holy_shield": {
         "name": "Khiên Thánh",
         "description": "Bảo vệ bạn bằng sức mạnh Thánh trong 10 giây, tăng giáp thêm 90 và đánh kẻ tấn công cận chiến gây 12 sát thương Thánh. (dấu ấn Bảo Hộ)"
@@ -6645,7 +6902,7 @@ export const vi_VN: EnTranslations = {
         "description": "Tăng sát thương phép 20% và tốc độ phép 10% trong 10 giây. (kỹ năng đặc trưng Arcane)"
       },
       "combustion": {
-        "name": "Thiêu Đốt",
+        "name": "Phượng Hoàng Xuất Thần",
         "description": "Tăng tỉ lệ chí mạng phép 50% trong 15 giây. (kỹ năng đặc trưng Fire)"
       },
       "icy_veins": {
@@ -6728,6 +6985,246 @@ export const vi_VN: EnTranslations = {
         "name": "Triệu Hồi Wraithborn",
         "description": "Ràng buộc một Wraithborn theo ý chí của bạn, một con quỷ tinh nhuệ trút sát thương Bóng Tối nặng nề từ xa. Thời gian hồi chiêu dài kìm hãm sức mạnh tàn phá của nó. Triệu hồi một con quỷ mới sẽ giải tán con hiện tại. Bạn chỉ có thể có một con quỷ cùng lúc."
       },
+      "battle_stance": {
+        "name": "Thế Công",
+        "description": "Thế đứng tấn công hung hãn: bạn tạo nộ khí nhiều hơn 10%. Thế đứng mặc định của nhánh Vũ Khí và nhánh Hộ Vệ."
+      },
+      "berserker_stance": {
+        "name": "Thế Cuồng Chiến",
+        "description": "Thế đứng liều lĩnh: các đòn chí mạng của bạn xuất hiện thường xuyên hơn 3% và đánh mạnh hơn 3%. Chiến Binh nhánh Cuồng Nộ luôn chiến đấu trong thế đứng này."
+      },
+      "sweeping_strikes": {
+        "name": "Vòng Cung Mở Rộng",
+        "description": "Trong 12 giây, các đòn tấn công đơn mục tiêu của bạn cũng đánh trúng 1 kẻ địch lân cận với toàn bộ sát thương. (nhánh Vũ Khí)"
+      },
+      "deep_wounds": {
+        "name": "Vết Thương Toác Rộng",
+        "description": "Nội tại: Đòn Tàn Phế của bạn khiến mục tiêu chảy máu, nhận sát thương Vật Lý trong 6 giây. (nhánh Vũ Khí)"
+      },
+      "enrage_passive": {
+        "name": "Cuồng Loạn",
+        "description": "Nội tại: khi Cuồng Hóa, bạn gây thêm 7% sát thương, tấn công nhanh hơn 25% và di chuyển nhanh hơn 10% trong 4 giây. Trích Huyết có 30% cơ hội khiến bạn Cuồng Hóa; Mùa Gặt Đỏ thì luôn luôn. (nhánh Cuồng Nộ)"
+      },
+      "raging_gale": {
+        "name": "Song Kích",
+        "description": "Lập tức vung vũ khí đánh hai lần, mỗi đòn gây 40% sát thương vũ khí cộng thêm {damage}, và tạo 8 nộ khí. Tích trữ tối đa 2 lượt dùng. (nhánh Cuồng Nộ)"
+      },
+      "red_harvest": {
+        "name": "Mùa Gặt Đỏ",
+        "description": "Dốc cạn tất cả: chém ba lần trong cơn điên cuồng, mỗi đòn gây 65% sát thương vũ khí cộng thêm {damage}, và luôn khiến bạn Cuồng Hóa. (nhánh Cuồng Nộ)"
+      },
+      "furious_mending": {
+        "name": "Hồi Phục Cuồng Nộ",
+        "description": "Trong 10 giây bạn nhận ít hơn 20% sát thương, và trong lúc hiệu ứng còn hiệu lực, Trích Huyết của bạn hồi cho bạn 20% máu tối đa. (nhánh Cuồng Nộ)"
+      },
+      "emboldening_roar": {
+        "name": "Tiếng Gầm Khích Lệ",
+        "description": "Bật lên một tiếng gầm khích lệ: bạn và những người chơi thân thiện trong vòng 40 thước được Khích Lệ, và 3 kỹ năng tiếp theo của bạn chắc chắn là đòn chí mạng. (nhánh Cuồng Nộ)"
+      },
+      "raised_guard": {
+        "name": "Giương Khiên",
+        "description": "Ghì chặt sau tấm khiên: bạn nhận ít hơn 50% sát thương Vật Lý trong 6 giây. Tích trữ tối đa 2 lượt dùng. (nhánh Hộ Vệ)"
+      },
+      "iron_resolve": {
+        "name": "Ý Chí Sắt Đá",
+        "description": "Nghiến răng chịu đau: tiêu hao tối đa 40 nộ khí (tối thiểu 20) để hấp thụ 4 sát thương cho mỗi điểm nộ khí đã dùng, kéo dài tối đa 10 giây. (Hộ Vệ)"
+      },
+      "faultline": {
+        "name": "Vết Nứt Địa Tầng",
+        "description": "Truyền một chấn động xuyên qua mặt đất: kẻ địch phía trước bạn trong vòng 8 thước nhận {damage} sát thương và bị choáng trong 3 giây. (nhánh Hộ Vệ)"
+      },
+      "defiant_bellow": {
+        "name": "Tiếng Gầm Thách Thức",
+        "description": "Một tiếng gầm thách thức: mọi kẻ địch trong vòng 10 thước bị khiêu khích, buộc phải tấn công bạn trong 3 giây. (nhánh Hộ Vệ)"
+      },
+      "breachmaker": {
+        "name": "Đòn Công Thành",
+        "description": "Nện mục tiêu gây sát thương vũ khí cộng thêm {damage} và phá vỡ thế thủ của nó: các đòn tấn công của chính bạn lên mục tiêu này gây thêm 20% sát thương trong 8 giây. (nhánh Vũ Khí)"
+      },
+      "measured_fury": {
+        "name": "Thịnh Nộ Chừng Mực",
+        "description": "Cơn thịnh nộ chừng mực giúp bạn chi tiêu khôn ngoan hơn: các kỹ năng của bạn tốn ít hơn 10% nộ khí. (nhánh Vũ Khí)"
+      },
+      "seasoned_soldier": {
+        "name": "Người Lính Dày Dạn",
+        "description": "Các đòn đánh thường chí mạng của bạn tạo nộ khí nhiều hơn 10%. (nhánh Vũ Khí)"
+      },
+      "diabolical_twinstrike": {
+        "name": "Song Kích Hiểm Ác",
+        "description": "Khi đang Cuồng Hóa, Song Kích của bạn gây thêm 15% sát thương. (nhánh Cuồng Nộ)"
+      },
+      "cleaving_blows": {
+        "name": "Đòn Chém Bổ",
+        "description": "Mùa Gặt Đỏ luôn hoàn lại một lượt dùng Song Kích. (nhánh Cuồng Nộ)"
+      },
+      "sudden_death": {
+        "name": "Đột Tử",
+        "description": "Các đòn đánh thường của bạn có cơ hội cho phép bạn tung Nấm Mồ Sớm lên mục tiêu ở bất kỳ mức máu nào mà không tốn nộ khí. (nhánh Vũ Khí)"
+      },
+      "storm_bolt": {
+        "name": "Cú Ném Bão Tố",
+        "description": "Ném vũ khí của bạn vào mục tiêu gây {damage} sát thương, làm choáng nó trong 3 giây."
+      },
+      "piercing_howl": {
+        "name": "Tiếng Hú Xuyên Thấu",
+        "description": "Một tiếng hét xuyên thấu làm chậm mọi kẻ địch trong vòng 15 thước đi 50% trong 8 giây."
+      },
+      "die_by_sword": {
+        "name": "Sống Chết Cùng Kiếm",
+        "description": "Kỹ năng phòng thủ hồi chiêu dài: trong 8 giây bạn nhận ít hơn 30% sát thương và né được nhiều đòn tấn công hơn hẳn."
+      },
+      "recklessness": {
+        "name": "Liều Lĩnh",
+        "description": "Cuồng Hóa: lượng nộ khí bạn tạo ra tăng 50% và tỉ lệ chí mạng tăng 20% trong 12 giây."
+      },
+      "sanguine_aura": {
+        "name": "Hào Quang Huyết Sắc",
+        "description": "Tẩm máu quân thù lên vũ khí của bạn: bạn và các đồng minh cận chiến nhận thêm 10% tốc độ tấn công và 10% sát thương trong 20 giây."
+      },
+      "victory_rush": {
+        "name": "Đà Chiến Thắng",
+        "description": "Giáng đòn gây sát thương vũ khí cộng thêm {damage} và hồi 20% máu tối đa của bạn. Chỉ dùng được trong vòng 20 giây sau khi hạ gục một kẻ địch."
+      },
+      "intimidating_shout": {
+        "name": "Tiếng Hét Uy Hiếp",
+        "description": "Một tiếng hét kinh hoàng khiến tối đa 5 kẻ địch trong vòng 8 thước bỏ chạy trong sợ hãi suốt 8 giây. Sát thương có thể phá vỡ hiệu ứng."
+      },
+      "revenge": {
+        "name": "Phục Thù",
+        "description": "Tấn công theo một vòng cung rộng, gây sát thương Vật Lý lên mọi kẻ địch phía trước bạn. Trên 5 mục tiêu thì sát thương bị giảm. Khi bạn né hoặc gạt đòn, Phục Thù tiếp theo của bạn có thể không tốn nộ khí. (Protection)"
+      },
+      "heroic_leap": {
+        "name": "Bước Nhảy Chiến",
+        "description": "Nhảy đến khu vực mục tiêu, gây {damage} sát thương lên kẻ địch lân cận khi tiếp đất."
+      },
+      "rallying_cry": {
+        "name": "Tiếng Gầm Quả Cảm",
+        "description": "Cất tiếng gầm quả cảm, tăng 20% máu tối đa cho bạn và các thành viên tổ đội trong phạm vi 40 mét trong 10 giây. Hộ Vệ: họ cũng nhận ít hơn 5% sát thương trong thời gian hiệu lực."
+      },
+      "aspect_of_the_wild": {
+        "name": "Dáng Nanh Hoang",
+        "description": "Truyền sức mạnh hoang dã cho đồng minh trong phạm vi 30 m, tăng 45 sức mạnh công kích và 5% tốc độ đánh của họ trong 5 phút. (thiên phú Thợ săn)"
+      },
+      "avatar": {
+        "name": "Hóa Thân",
+        "description": "Hóa thành một khổng tượng trong 20 giây, phá bỏ mọi hiệu ứng khống chế lên bạn và tăng 20% sát thương gây ra."
+      },
+      "avenging_wrath": {
+        "name": "Cánh Báo Thù",
+        "description": "Triệu hồi sức mạnh báo thù, tăng 60 sức mạnh công kích và 30 sức mạnh phép thuật của bạn trong 20 giây. (thiên phú Paladin)"
+      },
+      "berserk": {
+        "name": "Sương Đỏ",
+        "description": "Tăng 70 sức mạnh công kích của bạn trong 15 giây. (thiên phú Druid)"
+      },
+      "bladestorm": {
+        "name": "Bão Kiếm",
+        "description": "Hóa thành một cơn bão thép cuồng xoáy, đánh trúng mọi kẻ địch trong phạm vi 6 mét với {damage} sát thương mỗi giây trong 4 giây."
+      },
+      "blink": {
+        "name": "Bước Chớp",
+        "description": "Dịch chuyển bạn 15 m về phía trước và phá hiệu ứng trói chân. (thiên phú Pháp sư)"
+      },
+      "bloodlust": {
+        "name": "Trống Chiến",
+        "description": "Khiến đồng minh trong phạm vi 30 m trở nên cuồng nộ, tăng 30% tốc độ đánh của họ trong 15 giây. (thiên phú Shaman)"
+      },
+      "chain_lightning": {
+        "name": "Sét Rẽ Nhánh",
+        "description": "Phóng sét vào khu vực mục tiêu, gây {damage} sát thương lên kẻ địch ở gần. (thiên phú Shaman)"
+      },
+      "chaos_bolt": {
+        "name": "Tia Hủy Diệt",
+        "description": "Phóng một luồng lửa hỗn loạn gây {damage} sát thương Lửa. (thiên phú Warlock)"
+      },
+      "cleansing_verdict": {
+        "name": "Phán Quyết Thanh Tẩy",
+        "description": "Xóa một hiệu ứng phép thuật có hại khỏi mục tiêu đồng minh và hồi cho họ {damage} máu bằng phép Thánh."
+      },
+      "cloak_of_shadows": {
+        "name": "Áo Choàng Bóng",
+        "description": "Bao phủ bạn trong bóng tối, hấp thụ 420 sát thương trong 5 giây. (thiên phú Đạo tặc)"
+      },
+      "cone_of_cold": {
+        "name": "Quét Băng",
+        "description": "Golpea a gần đó kẻ địch con escarcha e inflige {damage} de daño de Băng. (thiên phú pháp sư)"
+      },
+      "counterspell": {
+        "name": "Phản Phép",
+        "description": "Chống lại phép mục tiêu đang niệm và ngăn mục tiêu thi triển phép thuộc hệ đó trong 6 giây."
+      },
+      "curse_of_exhaustion": {
+        "name": "Lời Nguyền Chì",
+        "description": "Nguyền rủa mục tiêu, giảm 30% tốc độ di chuyển trong 12 giây. (thiên phú Warlock)"
+      },
+      "death_coil": {
+        "name": "Vòng Xoáy Mộ",
+        "description": "Đánh kẻ địch gây {damage} sát thương Bóng tối, rồi khiến chúng kinh hoàng trong 3 giây. (thiên phú Warlock)"
+      },
+      "deep_freeze": {
+        "name": "Băng Chết",
+        "description": "Congela profundamente a mục tiêu, inflige {damage} de daño de Băng y lo aturde durante 4 giây. (thiên phú pháp sư)"
+      },
+      "desperate_prayer": {
+        "name": "Lời Cầu Cuối",
+        "description": "Hồi ngay {damage} máu cho bạn. (thiên phú Tu sĩ)"
+      },
+      "deterrence": {
+        "name": "Hộ Vệ Gai",
+        "description": "Tăng 50 điểm phần trăm khả năng né tránh của bạn trong 10 giây. (thiên phú Thợ săn)"
+      },
+      "divine_shield": {
+        "name": "Hộ Vệ Ánh Sáng",
+        "description": "Bảo vệ bạn bằng sức mạnh thần thánh, hấp thụ 900 sát thương trong 8 giây. (thiên phú Paladin)"
+      },
+      "earthbind": {
+        "name": "Đất Níu Giữ",
+        "description": "Trói kẻ địch ở gần xuống đất trong 2 giây. (thiên phú Shaman)"
+      },
+      "evocation": {
+        "name": "Giếng Ête",
+        "description": "Restaura mana rápidamente. (thiên phú pháp sư)"
+      },
+      "frenzied_regeneration": {
+        "name": "Hồi Phục Hoang Dã",
+        "description": "Hồi 180 máu trong 10 giây. Chỉ dùng được ở Dạng Gấu. (thiên phú Druid)"
+      },
+      "frost_trap": {
+        "name": "Bẫy Sương Giá",
+        "description": "Đóng băng kẻ địch trong khu vực mục tiêu trong 3 giây, khiến chúng không thể di chuyển hoặc hành động. (thiên phú Thợ săn)"
+      },
+      "ghostly_strike": {
+        "name": "Đòn Ma Ảnh",
+        "description": "Đánh kẻ địch gây sát thương vũ khí cộng {damage}, tăng né tránh trong thời gian ngắn và cho 1 điểm liên kích. (thiên phú Đạo tặc)"
+      },
+      "hammer_of_wrath": {
+        "name": "Búa Ngân Chuông",
+        "description": "Ném búa thần thánh vào kẻ địch bị thương, gây {damage} sát thương Thánh. Chỉ dùng được khi còn dưới 20% máu. (thiên phú Paladin)"
+      },
+      "healing_stream": {
+        "name": "Giếng Suối",
+        "description": "Hồi 120 máu cho một mục tiêu đồng minh trong 12 giây. (thiên phú Shaman)"
+      },
+      "holy_wrath": {
+        "name": "Cơn Giận Thánh",
+        "description": "Giải phóng sức mạnh thần thánh, gây {damage} sát thương lên kẻ địch ở gần. (thiên phú Paladin)"
+      },
+      "howl_of_terror": {
+        "name": "Tiếng Hú Kinh Hoàng",
+        "description": "Khiến kẻ địch ở gần sợ hãi trong tối đa 3 giây. Sát thương có thể phá hiệu ứng. (thiên phú Warlock)"
+      },
+      "ice_block": {
+        "name": "Quan Tài Lạnh",
+        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 giây. (thiên phú pháp sư)"
+      },
+      "inner_focus": {
+        "name": "Tâm Trí Tĩnh",
+        "description": "Khiến phép tiếp theo của bạn không tốn tài nguyên. Kéo dài 60 giây. (thiên phú Tu sĩ)"
+      },
+      "innervate": {
+        "name": "Nhựa Sống",
+        "description": "Nhựa sống trào dâng trong bạn trong 10 giây và hồi 20 tài nguyên hiện tại theo từng đợt: mana, nộ khí hoặc năng lượng. Biến hình không làm gián đoạn. Ngủ, choáng hoặc đình trệ sẽ làm dòng nhựa ngừng lại. (thiên phú Druid)"
+      },
       "pummel": {
         "name": "Đấm Dồn Dập",
         "description": "Làm gián đoạn quá trình niệm phép của mục tiêu và ngăn mục tiêu thi triển phép thuộc hệ đó trong 4 giây."
@@ -6736,9 +7233,81 @@ export const vi_VN: EnTranslations = {
         "name": "Cú Đá",
         "description": "Làm gián đoạn quá trình niệm phép của mục tiêu và ngăn mục tiêu thi triển phép thuộc hệ đó trong 4 giây."
       },
-      "counterspell": {
-        "name": "Phản Phép",
-        "description": "Chống lại phép mục tiêu đang niệm và ngăn mục tiêu thi triển phép thuộc hệ đó trong 6 giây."
+      "mend_pet": {
+        "name": "Băng Bó",
+        "description": "Sana a mục tiêu thân thiện por {damage} durante 15 giây. (thiên phú thợ săn)"
+      },
+      "meteor": {
+        "name": "Đá Trời",
+        "description": "Gọi thiên thạch xuống khu vực mục tiêu, gây {damage} sát thương Lửa, rồi thiêu đốt kẻ địch tại đó với 12 đến 18 sát thương Lửa mỗi 2 giây trong 6 giây. (thiên phú Pháp sư)"
+      },
+      "temporal_mend": {
+        "name": "Temporal Mend",
+        "description": "Kéo một đồng minh tiến một khoảnh khắc vào tương lai, hồi phục {damage} máu khi cơ thể ổn định vào phiên bản tương lai khỏe mạnh hơn của mình. (Thời Thuật nguyên thủy)"
+      },
+      "temporal_barrier": {
+        "name": "Temporal Barrier",
+        "description": "Dịch chuyển mục tiêu ra khỏi thực tại một nhịp tim, một lớp bọc thời gian hấp thụ {damage} sát thương trong 10 giây trước khi dòng thời gian bật trở lại."
+      },
+      "temporal_echo": {
+        "name": "Temporal Echo",
+        "description": "Đánh dấu một đồng minh bằng tiếng vang của một khoảnh khắc khỏe mạnh hơn, hồi phục {damage} máu ngay lập tức. Trong {duration} giây, một phần sát thương Bí Thuật bạn gây ra sẽ được kéo trở lại qua tiếng vang để chữa lành họ."
+      },
+      "temporal_cascade": {
+        "name": "Temporal Cascade",
+        "description": "Gửi một tiếng vang lan tỏa qua nhóm của bạn: mục tiêu và tối đa bốn đồng minh gần nhất của họ được chữa lành cùng lúc và mỗi người được đánh dấu trong {duration} giây, kéo một phần sát thương Bí Thuật bạn gây ra trở lại qua những tiếng vang của họ để chữa lành họ. (Thời Thuật)"
+      },
+      "temporal_reversal": {
+        "name": "Temporal Reversal",
+        "description": "Tua lại dòng thời gian của một đồng minh đã ngã xuống, đưa họ trở lại cuộc sống tại thân xác với một phần máu và mana, ngay cả giữa chiến đấu. (Thời Thuật)"
+      },
+      "collective_reversal": {
+        "name": "Đảo ngược tập thể",
+        "description": "Tua ngược dòng thời gian của mọi thành viên đã chết trong nhóm hoặc đội đột kích, hồi sinh họ bên cạnh thi thể với 30% máu và năng lượng phép. Không thể thi triển khi đang chiến đấu. (Thời thuật)"
+      },
+      "temporal_rewind": {
+        "name": "Rewind",
+        "description": "Gửi một làn sóng bí thuật qua nhóm hoặc đột kích của bạn, tua lại thời gian để phục hồi 30% sát thương mỗi đồng minh trong phạm vi 40 thước đã nhận trong 5 giây qua (tối đa 35% máu tối đa của họ). Không thể là hiệu ứng chí mạng. (Thời Thuật)"
+      },
+      "temporal_hourglass": {
+        "name": "Hourglass of Suspension",
+        "description": "Đặt một đồng hồ cát thời gian tại vị trí đã chọn. Bên dưới kẻ thù, nó treo lơ lửng họ trong {hostilePveDuration} giây trong PvE hoặc {hostilePvpDuration} giây trong PvP và ngăn mọi hành động; sát thương phá vỡ hiệu ứng. Dưới chân bạn hoặc dưới đồng minh trong nhóm, nó ban trạng thái tĩnh lặng trong {duration} giây, ngăn sát thương và hành động, hồi phục {healing}% máu tối đa và giúp thời gian hồi chiêu phục hồi nhanh hơn {selfCooldownRecovery}% cho bạn hoặc {allyCooldownRecovery}% cho đồng minh. Trên nền đất trống, đồng hồ cát chờ trong {groundDuration} giây và ảnh hưởng đến đơn vị hợp lệ đầu tiên bước lên nó. Hào quang có lợi có thể bị hủy bỏ thủ công."
+      },
+      "temporal_acceleration": {
+        "name": "Temporal Acceleration",
+        "description": "Tăng tốc dòng chảy thời gian cho nhóm hoặc đột kích của bạn, tăng tốc độ tấn công, thi triển phép và kênh phép lên 30% trong 15 giây. Đồng minh vừa bị ảnh hưởng bởi Tăng Tốc Thời Gian hoặc Trống Chiến sẽ quá kiệt sức để nhận lợi ích. (Thời Thuật)"
+      },
+      "perfect_moment": {
+        "name": "Perfect Moment",
+        "description": "Chớp lấy khoảnh khắc hoàn hảo của bạn: lập tức nhận 4 Điện Tích Bí Thuật và trong 10 giây Phi Tiêu Ê-te không tiêu hao chúng. (Thời Thuật)"
+      },
+      "arcane_surge": {
+        "name": "Sức Mạnh Bí Thuật",
+        "description": "Kéo một đợt aether nguyên chất xuyên qua kẻ thù gây {damage} sát thương. Mỗi lần tung chiêu để lại một Điện Tích Bí Thuật làm tăng sát thương và tốc độ thi triển của Sức Mạnh Bí Thuật tiếp theo (5% nhanh hơn mỗi điện tích) nhưng tăng mạnh chi phí mana, chồng tối đa 4 lần; Phi Tiêu Ê-te tiêu hao các điện tích. Mỗi lần thi triển cũng có thể kích hoạt Aether Rush, khiến Sức Mạnh Bí Thuật tiếp theo miễn phí và thi triển nhanh gấp đôi."
+      },
+      "mind_sear": {
+        "name": "Thiêu Ý Nghĩ",
+        "description": "Niệm năng lượng Bóng tối lên khu vực mục tiêu, gây {damage} sát thương mỗi giây lên kẻ địch ở gần. (thiên phú Tu sĩ)"
+      },
+      "multi_shot": {
+        "name": "Bắn Tách",
+        "description": "Bắn một loạt tên vào khu vực mục tiêu, gây {damage} sát thương Vật lý lên kẻ địch trong bán kính 8 m. (thiên phú Thợ săn)"
+      },
+      "prayer_of_healing": {
+        "name": "Hồi Phục Hợp Xướng",
+        "description": "Hồi {damage} máu cho đồng minh ở gần. (thiên phú Tu sĩ)"
+      },
+      "preparation": {
+        "name": "Dự Phòng",
+        "description": "Kết thúc thời gian hồi của Chạy nước rút, Né tránh và Biến mất. (thiên phú Đạo tặc)"
+      },
+      "presence_of_mind": {
+        "name": "Tâm Trí Tăng Tốc",
+        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 giây. (thiên phú pháp sư)"
+      },
+      "psychic_scream": {
+        "name": "Tiếng Thét Tâm Linh",
+        "description": "Khiến kẻ địch ở gần sợ hãi trong tối đa 4 giây. Sát thương có thể phá hiệu ứng. (thiên phú Tu sĩ)"
       },
       "counter_shot": {
         "name": "Phát Bắn Phản Đòn",
@@ -6748,6 +7317,26 @@ export const vi_VN: EnTranslations = {
         "name": "Quở Trách",
         "description": "Làm gián đoạn quá trình niệm phép của mục tiêu và ngăn mục tiêu thi triển phép thuộc hệ đó trong 4 giây."
       },
+      "shadowstep": {
+        "name": "Trượt Bóng",
+        "description": "Bước xuyên bóng tối về phía mục tiêu. (thiên phú Đạo tặc)"
+      },
+      "silence": {
+        "name": "Câm Lặng",
+        "description": "Khiến mục tiêu câm lặng trong 4 giây. (thiên phú Tu sĩ)"
+      },
+      "smoke_screen": {
+        "name": "Màn Khói",
+        "description": "Bạn biến mất trong đám khói, tăng 30% khả năng né tránh trong 8 giây."
+      },
+      "spellsteal": {
+        "name": "Đánh Cắp Phép",
+        "description": "Đánh cắp một hiệu ứng phép thuật có lợi từ kẻ địch và chuyển nó sang bạn."
+      },
+      "startle_shot": {
+        "name": "Phát Bắn Giật Mình",
+        "description": "Một phát bắn hoang dại làm mục tiêu mất phương hướng trong {duration} giây. Bất kỳ sát thương nào cũng phá hiệu ứng."
+      },
       "skull_bash": {
         "name": "Húc Sọ",
         "description": "Một cú húc đầu lao tới làm gián đoạn niệm phép của mục tiêu và khóa hệ phép đó trong 4 giây."
@@ -6755,6 +7344,18 @@ export const vi_VN: EnTranslations = {
       "spell_lock": {
         "name": "Khóa Phép",
         "description": "Làm câm lặng mục tiêu đang niệm phép và ngăn mục tiêu thi triển phép thuộc hệ đó trong 5 giây."
+      },
+      "tranquility": {
+        "name": "Khúc Ca Rừng Thưa",
+        "description": "Niệm năng lượng hồi phục trong 4 giây, hồi 42 đến 52 máu mỗi giây cho đồng minh trong phạm vi 30 m. (thiên phú Druid)"
+      },
+      "typhoon": {
+        "name": "Cuồng Phong",
+        "description": "Một luồng gió đẩy lùi mọi kẻ địch trong phạm vi 8 m và làm chúng choáng váng, giảm 50% tốc độ di chuyển trong 4 giây."
+      },
+      "voidfeast": {
+        "name": "Yến Tiệc Hư Không",
+        "description": "Nuốt một hiệu ứng phép thuật (hiệu ứng có lợi từ kẻ địch hoặc có hại từ đồng minh) và hồi cho bạn 6% máu tối đa."
       },
       "bear_charge": {
         "name": "Cú Lao Bruin",
@@ -6773,8 +7374,8 @@ export const vi_VN: EnTranslations = {
         "description": "Một đòn mở màn từ trạng thái ẩn thân cào xé kẻ địch gây sát thương vũ khí cộng thêm {damage} và gây sát thương chảy máu trong 9 giây. Tặng 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói."
       },
       "revive_pet": {
-        "name": "Hồi Sinh Thú",
-        "description": "Hồi sinh thú cưng đã chết và đưa nó trở lại bên bạn."
+        "name": "Băng Bó",
+        "description": "Băng bó cho thú cưng. Nếu còn sống, thú cưng hồi tổng cộng {overTime} máu trong 12 giây, mỗi 3 giây hồi một lần. Nếu đã chết, thú cưng được hồi sinh với 35% máu."
       }
     },
     "items": {
@@ -7537,6 +8138,12 @@ export const vi_VN: EnTranslations = {
       "emberglass_warstaff": {
         "name": "Chiến Trượng Emberglass"
       },
+      "conjured_water4": {
+        "name": "Nước Suối Được Tạo Phép"
+      },
+      "conjured_bread4": {
+        "name": "Bánh Đại Tiệc Được Tạo Phép"
+      },
       "bristleback_maul": {
         "name": "Búa Gallowglass"
       },
@@ -8005,6 +8612,18 @@ export const vi_VN: EnTranslations = {
       "heroic_mark": {
         "name": "Dấu Ấn Anh Hùng"
       },
+      "eastbrook_buckler": {
+        "name": "Khiên Nhỏ Đông Khê"
+      },
+      "eastbrook_greatsword": {
+        "name": "Đại Kiếm Đông Khê"
+      },
+      "highwatch_greatsword": {
+        "name": "Đại Kiếm Highwatch"
+      },
+      "highwatch_wallshield": {
+        "name": "Khiên Tường Highwatch"
+      },
       "morthens_cryptforged_hauberk": {
         "name": "Áo Giáp Lưới Rèn Hầm Mộ của Morthen"
       },
@@ -8157,6 +8776,18 @@ export const vi_VN: EnTranslations = {
       },
       "stormcallers_spaulders": {
         "name": "Giáp Vai Galecall"
+      },
+      "bonewrought_greatsword": {
+        "name": "Đại Kiếm Bonewrought"
+      },
+      "direfang_greatblade": {
+        "name": "Đại Đao Direfang"
+      },
+      "bonewrought_bulwark": {
+        "name": "Khiên Lũy Bonewrought"
+      },
+      "wraithfire_orb": {
+        "name": "Quả Cầu Wraithfire"
       },
       "unknown_alien_weaponry": {
         "name": "Vũ Khí Ngoài Hành Tinh Bí Ẩn"
@@ -8406,9 +9037,6 @@ export const vi_VN: EnTranslations = {
       "nythraxis_skeleton_warrior": {
         "name": "Cấm Vệ Hồi Sinh"
       },
-      "nythraxis_scourge_of_thornpeak": {
-        "name": "Nythraxis, Tai Họa Đỉnh Gai"
-      },
       "nythraxis_heroic_warrior_add": {
         "name": "Aldren, Vệ Chiến Bất Tử"
       },
@@ -8417,6 +9045,9 @@ export const vi_VN: EnTranslations = {
       },
       "nythraxis_heroic_rogue_add": {
         "name": "Voss, Lưỡi Dao Bất Tử"
+      },
+      "nythraxis_scourge_of_thornpeak": {
+        "name": "Nythraxis, Tai Họa Đỉnh Gai"
       },
       "reliquary_ledger_wraith": {
         "name": "Oan Hồn Sổ Sách"
@@ -8588,6 +9219,9 @@ export const vi_VN: EnTranslations = {
       },
       "ysolei": {
         "name": "Ysolei, Hóa Thân Nguyệt Chết Chìm"
+      },
+      "water_elemental": {
+        "name": "Nguyên Tố Nước"
       }
     },
     "npcs": {
@@ -8707,9 +9341,9 @@ export const vi_VN: EnTranslations = {
         "greeting": "Chào mừng đến với Két Sắt Mạ Vàng. Hàng hóa của ngươi nằm yên an toàn sau những ổ khóa của chúng tôi."
       },
       "card_master": {
-        "name": "Card Master",
-        "title": "Dealer of Chance",
-        "greeting": "Care for a Card Duel? Best of three, winner takes the bragging rights."
+        "name": "Bậc Thầy Bài",
+        "title": "Kẻ Chia Bài May Rủi",
+        "greeting": "Muốn thử Đấu Bài không? Chơi ba ván, người thắng lấy quyền khoe."
       },
       "bursar_petra_vell": {
         "name": "Thủ Quỹ Petra Vell",
@@ -8770,11 +9404,11 @@ export const vi_VN: EnTranslations = {
     "quests": {
       "q_prof_intro": {
         "title": "Nghề Cho Mọi Đôi Tay",
-        "text": "Mọi người ở Đông Khê đều làm một nghề bên cạnh việc cầm kiếm, {playerName}. Các mạch quặng nằm rải rác quanh thị trấn, nên hãy vung cuốc và mang về cho ta 5 khối. Tự tay khai thác nhé, ta sẽ biết nếu không phải vậy.",
-        "completion": "Thấy chưa? Quặng trong túi, chai sạn trên tay. Cứ tiếp tục khai khoáng, đốn gỗ và hái thảo dược dọc đường. Khi về thị trấn, nhớ ghé bảng Trọng Tâm Thị Trấn cạnh chợ và bàn chế tác gần đó. Nếu muốn, mọi việc ấy đều có thể thành một nghề kiếm sống đàng hoàng.",
+        "text": "Mỗi người ở Eastbrook đều làm một nghề ngoài kiếm, {playerName}. Có những mỏ quặng trong các tảng đá quanh Hố Đồng, phía tây nam thị trấn. Hãy cầm cuốc và tự tay khai thác 5 mỏ, nhé; ta sẽ biết sự khác biệt.",
+        "completion": "Thấy chưa? Quặng đã thu thập và tay đã có vết chai. Tiếp tục khai thác mỏ, chặt gỗ và hái thảo dược khi bạn đi trên đường, và khi trở lại thị trấn, chú ý đến bảng Trọng Tâm Thị Trấn gần chợ và bàn thủ công gần đó. Có một giao dịch công bằng chờ đợi trong tất cả, nếu bạn muốn.",
         "objectives": {
           "0": {
-            "label": "Khối Quặng"
+            "label": "Mỏ quặng đã khai thác"
           }
         }
       },
@@ -9562,21 +10196,31 @@ export const vi_VN: EnTranslations = {
       },
       "q_archetype_acceptance": {
         "title": "Một nghề để gọi riêng của bạn",
-        "text": "Mỗi nghệ nhân của Eastbrook cuối cùng đều định cư trên một nghề thủ công riêng của họ. Hãy chứng tỏ bản thân bằng một hành động duy nhất, {playerName}, và tuyên bố con đường của bạn.",
-        "completion": "Con đường của bạn đã được chọn; đi bộ tốt.",
+        "text": "Kỹ năng là kiến thức, {playerName}, nhưng thụ ngộ là một lời hứa. Hãy chọn hai kỹ nghệ liền kề mà bạn sẽ mang theo làm chuyên ngành, rồi mang cho ta quặng được khai thác từ Thung Lũng bằng đôi tay của chính bạn.",
+        "completion": "Lời hứa đã giữ. Hai kỹ nghệ này nay là chuyên ngành của bạn, và kiến thức đối diện với chúng trở thành sở thích của bạn.",
+        "objectives": {
+          "0": {
+            "label": "Mỏ quặng đã khai thác"
+          }
+        }
+      },
+      "q_prof_make_amends": {
+        "title": "Sửa đổi",
+        "text": "Bạn đã mang đôi kỹ nghệ đó trước đây rồi, {playerName}. Quay lại không phải là lời thề mới. Hãy giúp giữ con đường Thung Lũng thông thoáng, và công việc sẽ nhắc đôi tay bạn nhớ lại điều chúng từng biết.",
+        "completion": "Nhịp điệu cũ trở lại. Đôi kỹ nghệ trước của bạn đã hoạt động trở lại.",
         "objectives": {
           "0": {
             "label": "Sói rừng bị giết"
           }
         }
       },
-      "q_prof_make_amends": {
-        "title": "Sửa đổi",
-        "text": "Để dành một nghề cho một nghề khác, trước tiên một nghệ nhân phải sửa đổi con đường đã không đi, {playerName}.",
-        "completion": "Đã thực hiện sửa đổi; một con đường mới đang mở ra cho bạn.",
+      "q_prof_hobby_switch": {
+        "title": "Một Đam Mê Khác",
+        "text": "Chuyên ngành đòi hỏi lời thề. Sở thích chỉ hỏi sự tò mò của bạn đi đâu, {playerName}. Hãy hái một ít thảo dược và quyết định kỹ nghệ nào đối diện với chuyên ngành của bạn mà bạn muốn theo đuổi.",
+        "completion": "Một lựa chọn nhẹ nhàng hơn, nhưng hữu ích. Hãy theo đuổi sự tò mò đó đến khi công việc hiếm có đưa nó đi xa nhất.",
         "objectives": {
           "0": {
-            "label": "Sói rừng bị giết"
+            "label": "Mảnh thảo dược đã thu hoạch"
           }
         }
       },
@@ -9845,7 +10489,7 @@ export const vi_VN: EnTranslations = {
       },
       "necromancers": {
         "name": "Y Phục Mournweave",
-        "bonus2": "Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).",
+        "bonus2": "Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).",
         "bonus3": "Tăng trí tuệ thêm 10 và thể lực thêm 10.",
         "bonus4": "Các phép của bạn có 10% cơ hội ban Tâm Trí Thông Suốt, khiến phép kế tiếp của bạn được thi triển miễn phí."
       },
@@ -9857,13 +10501,13 @@ export const vi_VN: EnTranslations = {
       },
       "soulflame": {
         "name": "Lễ Phục Wraithfire",
-        "bonus2": "Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).",
+        "bonus2": "Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).",
         "bonus3": "Tăng trí tuệ thêm 15, tinh thần thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.",
         "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây."
       },
       "stormcallers": {
         "name": "Áo Lễ Galecall",
-        "bonus2": "Bạn không thể bị đẩy lùi (kháng đẩy lùi 100%).",
+        "bonus2": "Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).",
         "bonus3": "Tăng trí tuệ thêm 15, tinh thần thêm 15 và tốc độ tấn công cùng thi triển thêm 15%.",
         "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây."
       },

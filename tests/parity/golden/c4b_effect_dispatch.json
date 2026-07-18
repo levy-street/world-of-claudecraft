@@ -35,8 +35,8 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 416,
-      "state": "03b30561",
-      "events": "b05fee70",
+      "state": "a7b2049d",
+      "events": "6d459b8e",
       "rng": {
         "draws": 2,
         "digest": "68f9f3dd"
@@ -46,7 +46,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 416,
-      "state": "d85ff5e7",
+      "state": "15eac0d8",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -57,7 +57,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 416,
-      "state": "cf61f585",
+      "state": "bf81a648",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -68,7 +68,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 416,
-      "state": "d15f54b5",
+      "state": "b10441e7",
       "events": "f826d8fd",
       "rng": {
         "draws": 2,
@@ -79,7 +79,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 416,
-      "state": "6da52308",
+      "state": "5c736f73",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -90,7 +90,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 416,
-      "state": "e7d68446",
+      "state": "8b426c76",
       "events": "fff4b128",
       "rng": {
         "draws": 2,
@@ -101,7 +101,7 @@
       "tick": 32,
       "time": 1.6,
       "nextId": 416,
-      "state": "cab7de24",
+      "state": "9203a9c1",
       "events": "fdc222e0",
       "rng": {
         "draws": 4,
@@ -131,6 +131,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -157,6 +158,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -166,7 +171,8 @@
           "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -180,10 +186,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -265,8 +271,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -330,7 +335,8 @@
           "entityId": 411,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -346,8 +352,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -432,8 +437,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -515,8 +519,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -598,8 +601,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -608,6 +610,19 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3598.4,
+              "school": "physical",
+              "sourceId": 409
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 100.6,
           "comboUntil": -1,
           "critChance": 0.0695,
@@ -623,6 +638,7 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -641,10 +657,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 498,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 85,
             "str": 61
           },
           "templateId": "warrior",
@@ -712,6 +728,7 @@
           "critChance": 0.091,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
+          "dualWielding": true,
           "fallStartY": -3.065499,
           "fiveSecondRule": 100.6,
           "hp": 50000,
@@ -722,6 +739,13 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -912,6 +936,7 @@
           "aiState": "chase",
           "auras": [
             {
+              "breakChanceScale": 0.1,
               "breaksOnDamage": true,
               "duration": 8,
               "id": "fear_incap",
@@ -987,7 +1012,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 416,
-      "state": "2a60205c",
+      "state": "dff7832c",
       "events": "4b378bfb",
       "rng": {
         "draws": 4,
@@ -998,7 +1023,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 416,
-      "state": "9cd519c6",
+      "state": "ae16991b",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1009,7 +1034,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 416,
-      "state": "efd8d5f0",
+      "state": "f012c406",
       "events": "741638a5",
       "rng": {
         "draws": 36,
@@ -1020,7 +1045,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 416,
-      "state": "5ba95631",
+      "state": "575c44ca",
       "events": "741638a5",
       "rng": {
         "draws": 50,
@@ -1031,7 +1056,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 416,
-      "state": "09f0913b",
+      "state": "4b1848da",
       "events": "741638a5",
       "rng": {
         "draws": 66,
@@ -1042,7 +1067,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 416,
-      "state": "11b84e7a",
+      "state": "77cc7c3a",
       "events": "741638a5",
       "rng": {
         "draws": 80,
@@ -1053,7 +1078,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 416,
-      "state": "51e0d7db",
+      "state": "e53bcbb8",
       "events": "741638a5",
       "rng": {
         "draws": 101,
@@ -1064,7 +1089,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 416,
-      "state": "f493efc2",
+      "state": "c3b0a6f4",
       "events": "741638a5",
       "rng": {
         "draws": 127,
@@ -1075,7 +1100,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 416,
-      "state": "54d510c9",
+      "state": "65a5c63b",
       "events": "741638a5",
       "rng": {
         "draws": 152,
@@ -1086,7 +1111,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 416,
-      "state": "11b7d2f0",
+      "state": "a4ba757b",
       "events": "741638a5",
       "rng": {
         "draws": 174,
@@ -1097,7 +1122,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 416,
-      "state": "93c4dbbe",
+      "state": "fa86932e",
       "events": "741638a5",
       "rng": {
         "draws": 203,
@@ -1108,7 +1133,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 416,
-      "state": "9fed31bb",
+      "state": "c90a2022",
       "events": "741638a5",
       "rng": {
         "draws": 230,
@@ -1119,7 +1144,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 416,
-      "state": "3a728393",
+      "state": "47733614",
       "events": "741638a5",
       "rng": {
         "draws": 253,
@@ -1130,7 +1155,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 416,
-      "state": "fa195fea",
+      "state": "2d9ad824",
       "events": "741638a5",
       "rng": {
         "draws": 276,
@@ -1141,7 +1166,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 416,
-      "state": "d68a82e1",
+      "state": "b2be77fc",
       "events": "741638a5",
       "rng": {
         "draws": 304,
@@ -1152,7 +1177,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 416,
-      "state": "2ce6963d",
+      "state": "97b67847",
       "events": "741638a5",
       "rng": {
         "draws": 328,
@@ -1163,7 +1188,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 416,
-      "state": "d944e6b0",
+      "state": "67c70610",
       "events": "741638a5",
       "rng": {
         "draws": 360,
@@ -1174,7 +1199,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 416,
-      "state": "fa55557d",
+      "state": "2268a0c2",
       "events": "741638a5",
       "rng": {
         "draws": 388,
@@ -1185,7 +1210,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 416,
-      "state": "3f3b2da0",
+      "state": "972e8708",
       "events": "741638a5",
       "rng": {
         "draws": 408,
@@ -1196,7 +1221,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 416,
-      "state": "ae619a5f",
+      "state": "680aa2a8",
       "events": "741638a5",
       "rng": {
         "draws": 435,
@@ -1207,7 +1232,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 417,
-      "state": "9789cc7c",
+      "state": "1197b0a8",
       "events": "2198b200",
       "rng": {
         "draws": 445,
@@ -1237,6 +1262,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -1263,6 +1289,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -1272,7 +1302,8 @@
           "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -1286,10 +1317,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -1371,8 +1402,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -1436,7 +1466,8 @@
           "entityId": 411,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -1452,8 +1483,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -1538,8 +1568,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -1621,8 +1650,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -1704,8 +1732,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -1714,6 +1741,19 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 409
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "combatTimer": 105.65,
           "comboUntil": -1,
           "critChance": 0.0695,
@@ -1729,6 +1769,7 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -1747,10 +1788,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 498,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 85,
             "str": 61
           },
           "templateId": "warrior",
@@ -1818,6 +1859,7 @@
           "critChance": 0.091,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
+          "dualWielding": true,
           "fallStartY": -3.065499,
           "fiveSecondRule": 105.65,
           "hp": 50000,
@@ -1828,6 +1870,13 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -2018,6 +2067,7 @@
           "aiState": "chase",
           "auras": [
             {
+              "breakChanceScale": 0.1,
               "breaksOnDamage": true,
               "duration": 8,
               "id": "fear_incap",
@@ -2093,7 +2143,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 418,
-      "state": "bd8422cb",
+      "state": "87b4e9de",
       "events": "47bf19c5",
       "rng": {
         "draws": 446,
@@ -2123,6 +2173,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -2149,6 +2200,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -2158,7 +2213,8 @@
           "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -2172,10 +2228,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -2257,8 +2313,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -2322,7 +2377,8 @@
           "entityId": 411,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -2338,8 +2394,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -2424,8 +2479,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -2507,8 +2561,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -2590,8 +2643,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -2600,6 +2652,19 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 409
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -2616,6 +2681,7 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -2635,10 +2701,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 498,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 85,
             "str": 61
           },
           "targetId": 417,
@@ -2707,6 +2773,7 @@
           "critChance": 0.091,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
+          "dualWielding": true,
           "fallStartY": -3.065499,
           "fiveSecondRule": 105.65,
           "hp": 50000,
@@ -2717,6 +2784,13 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -2907,6 +2981,7 @@
           "aiState": "chase",
           "auras": [
             {
+              "breakChanceScale": 0.1,
               "breaksOnDamage": true,
               "duration": 8,
               "id": "fear_incap",
@@ -3033,7 +3108,7 @@
           "threat": [
             [
               409,
-              131
+              170
             ]
           ],
           "weapon": {
@@ -3048,8 +3123,8 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 420,
-      "state": "f7973dab",
-      "events": "52322dd6",
+      "state": "97914cd8",
+      "events": "f260958f",
       "rng": {
         "draws": 448,
         "digest": "7a0cf6db"
@@ -3078,6 +3153,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -3104,6 +3180,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -3113,7 +3193,8 @@
           "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -3127,10 +3208,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -3216,8 +3297,8 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "arcane"
           },
           "townFocus": {}
         },
@@ -3281,7 +3362,8 @@
           "entityId": 411,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -3297,8 +3379,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -3383,8 +3464,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -3466,8 +3546,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -3549,8 +3628,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -3559,6 +3637,19 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 409
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -3575,6 +3666,7 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -3594,10 +3686,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 498,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 85,
             "str": 61
           },
           "targetId": 417,
@@ -3617,14 +3709,14 @@
           "dodgeChance": 0.056,
           "fallStartY": -3.247367,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 418,
           "id": 410,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
-          "maxResource": 1506,
+          "maxHp": 418,
+          "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -3635,7 +3727,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 1446,
+          "resource": 1521,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -3666,6 +3758,7 @@
           "critChance": 0.091,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
+          "dualWielding": true,
           "fallStartY": -3.065499,
           "fiveSecondRule": 105.65,
           "hp": 50000,
@@ -3676,6 +3769,13 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -3866,6 +3966,7 @@
           "aiState": "chase",
           "auras": [
             {
+              "breakChanceScale": 0.1,
               "breaksOnDamage": true,
               "duration": 8,
               "id": "fear_incap",
@@ -3992,7 +4093,7 @@
           "threat": [
             [
               409,
-              131
+              170
             ]
           ],
           "weapon": {
@@ -4115,8 +4216,8 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 421,
-      "state": "ed857082",
-      "events": "dcaf47ec",
+      "state": "025ef903",
+      "events": "3f040b60",
       "rng": {
         "draws": 453,
         "digest": "7e3f8a61"
@@ -4145,6 +4246,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -4171,6 +4273,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -4180,7 +4286,8 @@
           "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -4194,10 +4301,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -4283,8 +4390,8 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "arcane"
           },
           "townFocus": {}
         },
@@ -4352,7 +4459,8 @@
           "entityId": 411,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -4368,8 +4476,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -4454,8 +4561,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -4537,8 +4643,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -4620,8 +4725,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -4630,6 +4734,19 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 409
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -4646,6 +4763,7 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -4665,10 +4783,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 498,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 85,
             "str": 61
           },
           "targetId": 417,
@@ -4688,14 +4806,14 @@
           "dodgeChance": 0.056,
           "fallStartY": -3.247367,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 418,
           "id": 410,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
-          "maxResource": 1506,
+          "maxHp": 418,
+          "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -4706,7 +4824,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 1446,
+          "resource": 1521,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -4742,6 +4860,7 @@
           "critChance": 0.091,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
+          "dualWielding": true,
           "fallStartY": -3.065499,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1,
@@ -4754,6 +4873,13 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -4945,6 +5071,7 @@
           "aiState": "chase",
           "auras": [
             {
+              "breakChanceScale": 0.1,
               "breaksOnDamage": true,
               "duration": 8,
               "id": "fear_incap",
@@ -5071,7 +5198,7 @@
           "threat": [
             [
               409,
-              131
+              170
             ]
           ],
           "weapon": {
@@ -5259,8 +5386,8 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 422,
-      "state": "11da4937",
-      "events": "f1242daf",
+      "state": "e7b49160",
+      "events": "7099dbc4",
       "rng": {
         "draws": 454,
         "digest": "b431b368"
@@ -5289,6 +5416,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -5315,6 +5443,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -5324,7 +5456,8 @@
           "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -5338,10 +5471,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -5427,8 +5560,8 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "arcane"
           },
           "townFocus": {}
         },
@@ -5496,7 +5629,8 @@
           "entityId": 411,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -5512,8 +5646,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -5602,8 +5735,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -5685,8 +5817,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -5768,8 +5899,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -5778,6 +5908,19 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 409
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -5794,6 +5937,7 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -5813,10 +5957,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 498,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 85,
             "str": 61
           },
           "targetId": 417,
@@ -5836,14 +5980,14 @@
           "dodgeChance": 0.056,
           "fallStartY": -3.247367,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 418,
           "id": 410,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
-          "maxResource": 1506,
+          "maxHp": 418,
+          "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -5854,7 +5998,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 1446,
+          "resource": 1521,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -5890,6 +6034,7 @@
           "critChance": 0.091,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
+          "dualWielding": true,
           "fallStartY": -3.065499,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1,
@@ -5902,6 +6047,13 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -6118,6 +6270,7 @@
           "aiState": "chase",
           "auras": [
             {
+              "breakChanceScale": 0.1,
               "breaksOnDamage": true,
               "duration": 8,
               "id": "fear_incap",
@@ -6244,7 +6397,7 @@
           "threat": [
             [
               409,
-              131
+              170
             ]
           ],
           "weapon": {
@@ -6483,7 +6636,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 423,
-      "state": "dbac074a",
+      "state": "75d7e3bf",
       "events": "5a90b14e",
       "rng": {
         "draws": 454,
@@ -6513,6 +6666,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -6539,6 +6693,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -6548,7 +6706,8 @@
           "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -6562,10 +6721,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -6651,8 +6810,8 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "arcane"
           },
           "townFocus": {}
         },
@@ -6720,7 +6879,8 @@
           "entityId": 411,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -6736,8 +6896,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -6826,8 +6985,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -6909,8 +7067,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -6992,8 +7149,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -7002,6 +7158,19 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 409
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -7018,6 +7187,7 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -7037,10 +7207,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 498,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 85,
             "str": 61
           },
           "targetId": 417,
@@ -7060,14 +7230,14 @@
           "dodgeChance": 0.056,
           "fallStartY": -3.247367,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 418,
           "id": 410,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
-          "maxResource": 1506,
+          "maxHp": 418,
+          "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -7078,7 +7248,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 1446,
+          "resource": 1521,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -7114,6 +7284,7 @@
           "critChance": 0.091,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
+          "dualWielding": true,
           "fallStartY": -3.065499,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1,
@@ -7126,6 +7297,13 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -7355,6 +7533,7 @@
           "aiState": "chase",
           "auras": [
             {
+              "breakChanceScale": 0.1,
               "breaksOnDamage": true,
               "duration": 8,
               "id": "fear_incap",
@@ -7481,7 +7660,7 @@
           "threat": [
             [
               409,
-              131
+              170
             ]
           ],
           "weapon": {
@@ -7761,7 +7940,7 @@
       "tick": 133,
       "time": 6.65,
       "nextId": 423,
-      "state": "dbac074a",
+      "state": "75d7e3bf",
       "events": "741638a5",
       "rng": {
         "draws": 454,
@@ -7791,6 +7970,7 @@
             "dungeonClears": {},
             "itemsDiscovered": [
               "baked_bread",
+              "eastbrook_buckler",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -7817,6 +7997,10 @@
               ""
             ],
             [
+              "prog_specialized",
+              ""
+            ],
+            [
               "prog_the_long_middle",
               ""
             ]
@@ -7826,7 +8010,8 @@
           "entityId": 409,
           "equipment": {
             "chest": "recruit_tunic",
-            "mainhand": "worn_sword"
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -7840,10 +8025,10 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
-          "renown": 55,
+          "renown": 65,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "prot"
           },
           "townFocus": {}
         },
@@ -7929,8 +8114,8 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {},
+            "spec": "arcane"
           },
           "townFocus": {}
         },
@@ -7998,7 +8183,8 @@
           "entityId": 411,
           "equipment": {
             "chest": "footpad_jerkin",
-            "mainhand": "rusty_dagger"
+            "mainhand": "rusty_dagger",
+            "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
@@ -8014,8 +8200,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -8104,8 +8289,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -8187,8 +8371,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         },
@@ -8270,8 +8453,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 55,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -8280,6 +8462,19 @@
         {
           "aiState": "idle",
           "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3593.35,
+              "school": "physical",
+              "sourceId": 409
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -8296,6 +8491,7 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -8315,10 +8511,10 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 376,
+            "armor": 498,
             "int": 10,
             "spi": 11,
-            "sta": 60,
+            "sta": 85,
             "str": 61
           },
           "targetId": 417,
@@ -8338,14 +8534,14 @@
           "dodgeChance": 0.056,
           "fallStartY": -3.247367,
           "gcdRemaining": 1.5,
-          "hp": 50000,
+          "hp": 418,
           "id": 410,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 50000,
-          "maxResource": 1506,
+          "maxHp": 418,
+          "maxResource": 1581,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -8356,7 +8552,7 @@
             "z": -45
           },
           "potionCooldownUntil": -1,
-          "resource": 1446,
+          "resource": 1521,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -8392,6 +8588,7 @@
           "critChance": 0.091,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
+          "dualWielding": true,
           "fallStartY": -3.065499,
           "fiveSecondRule": 105.65,
           "gcdRemaining": 1,
@@ -8404,6 +8601,13 @@
           "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
+          "offhandItemId": "rusty_dagger",
+          "offhandWeapon": {
+            "dagger": true,
+            "max": 4,
+            "min": 2,
+            "speed": 1.8
+          },
           "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
@@ -8633,6 +8837,7 @@
           "aiState": "chase",
           "auras": [
             {
+              "breakChanceScale": 0.1,
               "breaksOnDamage": true,
               "duration": 8,
               "id": "fear_incap",
@@ -8759,7 +8964,7 @@
           "threat": [
             [
               409,
-              131
+              170
             ]
           ],
           "weapon": {

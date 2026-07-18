@@ -67,8 +67,10 @@ harvesting that feeds it all.
   framework, keeping its minigame), and corpse harvesting (hide, silk, meat,
   components: the adventurer's feeder).
 - **Masterwork replaces the five-way quality roll.** Every craft yields the
-  deterministic, budgeted item. A proc (scaling with skill, self-signed
-  materials, and specialization) yields a masterwork: bounded bonus stats via
+  deterministic, budgeted item. A proc (scaling with skill, signed
+  materials, and specialization; amended 2026-07-17 from self-signed-only to
+  any player's signature, see the addendum below) yields a masterwork:
+  bounded bonus stats via
   the existing item-budget machinery, maker's mark, toast plus zone-chat
   celebration. Power ladder: baseline crafted < dungeon drops; masterwork
   rivals dungeon drops and stays below the raid floor; raids keep the summit.
@@ -121,8 +123,10 @@ the load-bearing facts:
 
 - Wave 2+: market/mail carriage for instanced goods (#1146), commissions and
   boundTo semantics (#1298), Jack of All Trades (#1296), monster-harvest
-  proficiency, salvage UI, battlefield experience expansion, item biographies,
-  tool effects, jewelcrafting/inscription depth. These stay filed on the epic.
+  proficiency, battlefield experience expansion, item biographies,
+  tool effects, jewelcrafting/inscription depth. These stay filed on the
+  epic. (Salvage UI left this list on 2026-07-17: its wiring joins Phase 13
+  per the design-review amendments below.)
 - Growing or shrinking the ten-craft wheel. Growth routes through gathering
   skills and off-wheel systems per the design doc's fragility rules.
 - Any admission gate on known recipes, client-decided outcomes, or
@@ -136,3 +140,35 @@ the load-bearing facts:
   with placeholder values in `state.md`, tuned in Phase 15 against live data.
 - Cloth material sourcing: humanoid corpse components plus a plant fiber from
   herbalism (decided in brainstorm; exact item list lands in Phase 10).
+
+## 2026-07-17 design-review amendments (approved)
+
+After Phase 2 landed, the maintainer reviewed an external design review of
+the packet (the Codex review) and approved a set of amendments. state.md
+records them as binding rulings under "2026-07-17 design-review amendments";
+each owning phase file carries the updated deliverables. In one line each:
+
+- The masterwork signed-reagent proc term counts ANY player's signature
+  (rewarding trade with gatherers, not vertical self-sufficiency); the
+  self-signed reagent-quantity discount stays self-only.
+- Recipe training is skill-tier gated at the masters, with locked rows
+  always visible in the Train view: the RuneScape-style unlock ladder,
+  delivered on the LEARNING side; known recipes are never use-gated.
+- Masters spread across the three zone hubs (every archetype keeps a zone 1
+  anchor; the tannery and apothecary root in Fenbridge and Highwatch),
+  delivering the vision's far-flung-stations promise.
+- The Phase 4 rare event ships per-node-type flavors (pristine vein,
+  ancient heartwood, moonlit bloom); corpse harvesting gains the perfect
+  specimen component in Phase 10, so every gathering family has a jackpot.
+- Salvage wiring joins Phase 13, giving obsolete crafted gear a wave-one
+  destination.
+- Profession deeds carry titles and marquee-tier renown, so the deeds
+  pipeline (nameplates, marquee broadcast, Renown board) celebrates
+  professions; a Specialist deed marks the 75-skill threshold.
+- Masters gain recurring pull: cadence-capped work-order quests and
+  tier-crossing congratulation mail (Phase 14).
+- Phase 6 resolves the masterwork broadcast audience (zone-visible via the
+  Phase 4 soft-zone mechanism), extends the identity wire so masterworks
+  are inspectable online, and adds tier-up toasts.
+- End of Phase 7 is the vertical-slice checkpoint: the Phase 7 QA session
+  plays the eight-step journey end to end before wave one begins.

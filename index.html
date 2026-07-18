@@ -248,6 +248,21 @@
         <div id="tf-castbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-i18n-aria="hudChrome.castBar.targetAria" aria-label="Unit Cast Bar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
       </div>
       <div class="uf-buffs" id="tf-debuffs"></div>
+      <!-- Target of Target (showTargetOfTarget option): the classic mini-frame showing
+           who the current target is targeting. A #target-frame child so it inherits the
+           target's children-zoom and hides with the whole frame when there is no target;
+           its own unit_frame painter toggles it flex/none when the target-of-target is
+           known/unknown. Portrait + name + hp bar only (no resource/cast/debuffs). -->
+      <div id="totarget-frame" class="unitframe totarget" role="group" data-i18n-aria="hudChrome.unitFrame.targetOfTargetLabel" aria-label="Mark's Mark">
+        <div class="portrait-wrap">
+          <div class="portrait"><canvas id="totf-portrait" width="54" height="54"></canvas></div>
+          <div class="level-chip" id="totf-level"></div>
+        </div>
+        <div class="uf-bars">
+          <div class="uf-name" id="totf-name"></div>
+          <div class="bar hp"><div class="bar-fill" id="totf-hp"></div><div class="bar-text" id="totf-hp-text"></div></div>
+        </div>
+      </div>
     </div>
 
     <div id="party-frames" role="group" data-i18n-aria="hudChrome.unitFrame.partyLabel" aria-label="Your Band"></div>
@@ -336,6 +351,7 @@
           </div>
           <div id="petbar" class="panel"></div>
           <div id="xpbar"><div class="fill"></div><div class="rested"></div><div class="ticks"></div><div class="label"></div></div>
+          <div id="stancebar"></div>
           <div id="actionbar2" class="panel"></div>
           <div id="actionbar" class="panel"></div>
         </div>
@@ -1519,6 +1535,7 @@
        the loading fade; painted by src/ui/welcome_screen_window.ts. Hidden by default. -->
   <div id="welcome-screen" hidden>
     <div class="ws-stars" aria-hidden="true"></div>
+    <div id="ws-stage" class="ws-stage" aria-hidden="true"></div>
     <div id="ws-header" class="ws-header"></div>
     <div class="ws-body">
       <div class="ws-main">

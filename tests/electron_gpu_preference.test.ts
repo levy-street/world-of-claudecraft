@@ -2,14 +2,22 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import {
   alreadyHighPerformance,
+  buildLinuxPrimeEnv,
   buildRegQueryArgs,
   buildRegWriteArgs,
   forceHighPerformanceGpu,
   HIGH_PERF_GPU_SWITCHES,
   HIGH_PERFORMANCE_PREFERENCE,
+  hasExplicitOzonePlatformArg,
   hasUnparseableValueType,
+  isLinuxHybridGpu,
+  LINUX_OZONE_X11_ARG,
+  LINUX_PRIME_ENV,
   mergeHighPerformancePreference,
+  PRIME_RELAUNCH_MARKER,
   parseRegQueryData,
+  relaunchForLinuxPrime,
+  shouldRelaunchForLinuxPrime,
   summarizeGpuDevices,
   USER_GPU_PREFERENCES_KEY,
 } from '../electron/gpu_preference.cjs';
@@ -55,6 +63,21 @@ describe('GPU preference constants (load-bearing literals)', () => {
     expect(USER_GPU_PREFERENCES_KEY).toBe('HKCU\\Software\\Microsoft\\DirectX\\UserGpuPreferences');
     // 2 = high performance (discrete); 1 = power saving (integrated); 0 = let Windows decide.
     expect(HIGH_PERFORMANCE_PREFERENCE).toBe('GpuPreference=2;');
+  });
+
+  it('pins the Linux PRIME env, ozone flag, and relaunch marker to their literal values', () => {
+    // Every value here is a wire token a driver, glvnd, or Chromium parses; asserting them
+    // against themselves elsewhere would let a typo (say, ozone-platform=wayland, which
+    // reintroduces the GPU-process crash-loop) ship with green tests.
+    expect(LINUX_PRIME_ENV).toEqual({
+      DRI_PRIME: '1',
+      __NV_PRIME_RENDER_OFFLOAD: '1',
+      __GLX_VENDOR_LIBRARY_NAME: 'nvidia',
+      __EGL_VENDOR_LIBRARY_FILENAMES: '/usr/share/glvnd/egl_vendor.d/10_nvidia.json',
+      __VK_LAYER_NV_optimus: 'NVIDIA_only',
+    });
+    expect(LINUX_OZONE_X11_ARG).toBe('--ozone-platform=x11');
+    expect(PRIME_RELAUNCH_MARKER).toBe('WOC_PRIME_RELAUNCHED');
   });
 });
 
@@ -262,12 +285,307 @@ describe('summarizeGpuDevices', () => {
   });
 });
 
+// The default fileExists is the real fs.existsSync probing the NVIDIA ICD json, which
+// differs per machine (present with the NVIDIA driver, absent everywhere else), so every
+// test injects it to stay hermetic.
+const eglJsonPresent = () => true;
+const eglJsonAbsent = (path: string) => {
+  expect(path).toBe('/usr/share/glvnd/egl_vendor.d/10_nvidia.json');
+  return false;
+};
+
+describe('buildLinuxPrimeEnv', () => {
+  it('offers all five PRIME offload variables against an empty environment', () => {
+    expect(buildLinuxPrimeEnv({}, eglJsonPresent)).toEqual(LINUX_PRIME_ENV);
+  });
+
+  it('omits __EGL_VENDOR_LIBRARY_FILENAMES when the NVIDIA EGL ICD json does not exist', () => {
+    // glvnd treats that variable as a REPLACEMENT of its vendor list: naming a missing
+    // file leaves EGL with zero vendors and no GL at all, so on a machine without the
+    // NVIDIA driver (where the json is absent) the entry must not be set.
+    const additions = buildLinuxPrimeEnv({}, eglJsonAbsent);
+    expect(additions).not.toHaveProperty('__EGL_VENDOR_LIBRARY_FILENAMES');
+    expect(additions).toEqual({
+      DRI_PRIME: '1',
+      __NV_PRIME_RENDER_OFFLOAD: '1',
+      __GLX_VENDOR_LIBRARY_NAME: 'nvidia',
+      __VK_LAYER_NV_optimus: 'NVIDIA_only',
+    });
+  });
+
+  it('never overrides a variable the caller already set', () => {
+    // A player who already launches via their own `prime-run`, or who hand-picked a
+    // vendor library, keeps their own value; we only fill in what is missing.
+    const existing = { __GLX_VENDOR_LIBRARY_NAME: 'mesa', UNRELATED: 'x' };
+    const additions = buildLinuxPrimeEnv(existing, eglJsonPresent);
+    expect(additions).toEqual({
+      DRI_PRIME: '1',
+      __NV_PRIME_RENDER_OFFLOAD: '1',
+      __EGL_VENDOR_LIBRARY_FILENAMES: '/usr/share/glvnd/egl_vendor.d/10_nvidia.json',
+      __VK_LAYER_NV_optimus: 'NVIDIA_only',
+    });
+    expect(additions).not.toHaveProperty('__GLX_VENDOR_LIBRARY_NAME');
+  });
+
+  it('does not mutate the environment object passed in', () => {
+    const existing = { FOO: 'bar' };
+    buildLinuxPrimeEnv(existing, eglJsonPresent);
+    expect(existing).toEqual({ FOO: 'bar' });
+  });
+});
+
+describe('hasExplicitOzonePlatformArg', () => {
+  it('matches the explicit flag in both spellings', () => {
+    expect(hasExplicitOzonePlatformArg(['--ozone-platform=wayland'])).toBe(true);
+    expect(hasExplicitOzonePlatformArg(['--ozone-platform'])).toBe(true);
+  });
+
+  it('does NOT count --ozone-platform-hint as an explicit choice', () => {
+    // A hint is a preference Chromium lets an explicit flag override; treating it as a
+    // choice would suppress the x11 append and reintroduce the Wayland crash-loop.
+    expect(hasExplicitOzonePlatformArg(['--ozone-platform-hint=auto'])).toBe(false);
+    expect(hasExplicitOzonePlatformArg([])).toBe(false);
+    expect(hasExplicitOzonePlatformArg(undefined)).toBe(false);
+  });
+});
+
+describe('isLinuxHybridGpu', () => {
+  it('is true when /sys/class/drm exposes two or more card devices', () => {
+    const readdir = (path: string) => {
+      expect(path).toBe('/sys/class/drm');
+      return ['card0', 'card0-eDP-1', 'card1', 'renderD128', 'renderD129', 'version'];
+    };
+    expect(isLinuxHybridGpu(readdir)).toBe(true);
+  });
+
+  it('is false on a single-GPU machine (render nodes and connectors do not count)', () => {
+    expect(isLinuxHybridGpu(() => ['card0', 'card0-eDP-1', 'renderD128', 'version'])).toBe(false);
+  });
+
+  it('is false when /sys is unreadable (impose nothing when we cannot tell)', () => {
+    expect(
+      isLinuxHybridGpu(() => {
+        throw new Error('ENOENT');
+      }),
+    ).toBe(false);
+  });
+});
+
+describe('shouldRelaunchForLinuxPrime', () => {
+  it('is true when at least one PRIME variable is missing', () => {
+    expect(shouldRelaunchForLinuxPrime({}, [], eglJsonPresent)).toBe(true);
+  });
+
+  it('is false with no marker once every PRIME variable is already present', () => {
+    // That environment is wholly the player's own (their prime-run wrapper), flag or not.
+    expect(shouldRelaunchForLinuxPrime({ ...LINUX_PRIME_ENV }, [], eglJsonPresent)).toBe(false);
+  });
+
+  it('is false for a marked process whose argv carries an explicit ozone choice', () => {
+    // The normal relaunched child: env half AND argv half both present.
+    expect(
+      shouldRelaunchForLinuxPrime(
+        { ...LINUX_PRIME_ENV, WOC_PRIME_RELAUNCHED: '1' },
+        ['--ozone-platform=x11'],
+        eglJsonPresent,
+      ),
+    ).toBe(false);
+  });
+
+  it('is TRUE for a marked process whose argv lost the ozone flag (updater restart)', () => {
+    // electron-updater's restart-to-update respawns with the current env (marker and PRIME
+    // vars included) but EMPTY argv; without this arm the updated process would run PRIME
+    // on the session default backend, the documented Wayland crash-loop. Loop-safe: the
+    // relaunch it triggers always yields a child WITH an explicit ozone arg.
+    expect(
+      shouldRelaunchForLinuxPrime(
+        { ...LINUX_PRIME_ENV, WOC_PRIME_RELAUNCHED: '1' },
+        [],
+        eglJsonPresent,
+      ),
+    ).toBe(true);
+  });
+});
+
+describe('relaunchForLinuxPrime', () => {
+  function fakeSpawn() {
+    const calls: Array<{ command: string; args: string[]; options: Record<string, unknown> }> = [];
+    const unref = vi.fn();
+    const spawn = vi.fn((command: string, args: string[], options?: unknown) => {
+      calls.push({ command, args, options: options as Record<string, unknown> });
+      return { unref };
+    });
+    return { spawn, calls, unref };
+  }
+
+  // Hermetic defaults: a hybrid machine with the NVIDIA EGL json installed. Individual
+  // tests override the arms they exercise.
+  function deps(overrides: Record<string, unknown> = {}) {
+    return { platform: 'linux', isHybridGpu: () => true, fileExists: eglJsonPresent, ...overrides };
+  }
+
+  it('does nothing on a non-Linux platform', () => {
+    const { spawn } = fakeSpawn();
+    expect(relaunchForLinuxPrime(deps({ platform: 'win32', spawn, env: {} }))).toBe(false);
+    expect(spawn).not.toHaveBeenCalled();
+  });
+
+  it('does nothing on a single-GPU machine (hybrid gate)', () => {
+    // A non-hybrid machine gets neither the extra spawn nor a forced X11 backend.
+    const { spawn } = fakeSpawn();
+    const result = relaunchForLinuxPrime(deps({ spawn, env: {}, isHybridGpu: () => false }));
+    expect(result).toBe(false);
+    expect(spawn).not.toHaveBeenCalled();
+  });
+
+  it('does nothing when every PRIME variable is already present without the marker', () => {
+    const { spawn } = fakeSpawn();
+    const env = { ...LINUX_PRIME_ENV };
+    expect(relaunchForLinuxPrime(deps({ spawn, env, argv: [] }))).toBe(false);
+    expect(spawn).not.toHaveBeenCalled();
+  });
+
+  it('does nothing for a relaunched child (marker plus explicit ozone argv)', () => {
+    const { spawn } = fakeSpawn();
+    const env = { ...LINUX_PRIME_ENV, WOC_PRIME_RELAUNCHED: '1' };
+    const result = relaunchForLinuxPrime(deps({ spawn, env, argv: ['--ozone-platform=x11'] }));
+    expect(result).toBe(false);
+    expect(spawn).not.toHaveBeenCalled();
+  });
+
+  it('re-execs the same binary and argv with the PRIME env baked in, and unrefs the child', () => {
+    const { spawn, calls, unref } = fakeSpawn();
+    const env = { UNRELATED: 'x' };
+    const result = relaunchForLinuxPrime(
+      deps({
+        spawn,
+        env,
+        execPath: '/usr/bin/world-of-claudecraft',
+        argv: ['--some-flag'],
+        log: { info: vi.fn() },
+      }),
+    );
+    expect(result).toBe(true);
+    expect(calls).toHaveLength(1);
+    expect(calls[0].command).toBe('/usr/bin/world-of-claudecraft');
+    expect(calls[0].args).toEqual(['--some-flag', '--ozone-platform=x11']);
+    // Full options pin (not a subset match): a stray option here changes spawn semantics.
+    expect(calls[0].options).toEqual({
+      env: {
+        ...LINUX_PRIME_ENV,
+        UNRELATED: 'x',
+        WOC_PRIME_RELAUNCHED: '1',
+      },
+      stdio: 'inherit',
+      detached: true,
+    });
+    expect(unref).toHaveBeenCalled();
+  });
+
+  it('re-execs a marked-but-flagless process to restore the argv half (updater restart)', () => {
+    // The post-auto-update state: env inherited from the relaunched child (marker and all
+    // PRIME vars present), argv empty. The relaunch must fire again purely to restore
+    // --ozone-platform=x11, and the marker stays set on the new child.
+    const { spawn, calls } = fakeSpawn();
+    const env = { ...LINUX_PRIME_ENV, WOC_PRIME_RELAUNCHED: '1' };
+    const result = relaunchForLinuxPrime(deps({ spawn, env, execPath: 'x', argv: [] }));
+    expect(result).toBe(true);
+    expect(calls[0].args).toEqual(['--ozone-platform=x11']);
+    const childEnv = calls[0].options.env as Record<string, string>;
+    expect(childEnv.WOC_PRIME_RELAUNCHED).toBe('1');
+  });
+
+  it('spawns the outer AppImage (env.APPIMAGE), never execPath, inside an AppImage', () => {
+    // execPath points inside the runtime's FUSE mount, which dies the moment this process
+    // exits; the outer file survives and brings up a fresh runtime + mount (the same
+    // source electron-updater restarts from).
+    const { spawn, calls } = fakeSpawn();
+    const env = { APPIMAGE: '/home/p/Applications/world-of-claudecraft.AppImage' };
+    relaunchForLinuxPrime(deps({ spawn, env, execPath: '/tmp/.mount_worldXYZ/binary', argv: [] }));
+    expect(calls[0].command).toBe('/home/p/Applications/world-of-claudecraft.AppImage');
+  });
+
+  it('ignores a non-absolute APPIMAGE value and falls back to execPath', () => {
+    const { spawn, calls } = fakeSpawn();
+    const env = { APPIMAGE: 'relative/evil.AppImage' };
+    relaunchForLinuxPrime(deps({ spawn, env, execPath: '/usr/bin/woc', argv: [] }));
+    expect(calls[0].command).toBe('/usr/bin/woc');
+  });
+
+  it('never overrides a variable the caller already set in the child env', () => {
+    const { spawn, calls } = fakeSpawn();
+    const env = { __GLX_VENDOR_LIBRARY_NAME: 'mesa' };
+    relaunchForLinuxPrime(deps({ spawn, env, execPath: 'x', argv: [] }));
+    const childEnv = calls[0].options.env as Record<string, string>;
+    expect(childEnv.__GLX_VENDOR_LIBRARY_NAME).toBe('mesa');
+    expect(childEnv.DRI_PRIME).toBe('1');
+  });
+
+  it('omits the EGL vendor replacement when the NVIDIA ICD json is absent on this machine', () => {
+    const { spawn, calls } = fakeSpawn();
+    relaunchForLinuxPrime(
+      deps({ spawn, env: {}, execPath: 'x', argv: [], fileExists: () => false }),
+    );
+    const childEnv = calls[0].options.env as Record<string, string>;
+    expect(childEnv).not.toHaveProperty('__EGL_VENDOR_LIBRARY_FILENAMES');
+    expect(childEnv.__NV_PRIME_RENDER_OFFLOAD).toBe('1');
+  });
+
+  it('appends --ozone-platform=x11 to the relaunch argv (Wayland GPU-process crash-loop guard)', () => {
+    const { spawn, calls } = fakeSpawn();
+    relaunchForLinuxPrime(deps({ spawn, env: {}, execPath: 'x', argv: ['--some-flag'] }));
+    expect(calls[0].args).toEqual(['--some-flag', '--ozone-platform=x11']);
+  });
+
+  it('never overrides a player-supplied explicit --ozone-platform argv flag', () => {
+    const { spawn, calls } = fakeSpawn();
+    relaunchForLinuxPrime(
+      deps({ spawn, env: {}, execPath: 'x', argv: ['--ozone-platform=wayland'] }),
+    );
+    expect(calls[0].args).toEqual(['--ozone-platform=wayland']);
+  });
+
+  it('still appends the explicit flag when argv only carries an ozone HINT', () => {
+    // --ozone-platform-hint is a preference, not a choice; Chromium lets the explicit
+    // flag we append override it, and honoring a wayland hint under PRIME would recreate
+    // the crash-loop.
+    const { spawn, calls } = fakeSpawn();
+    relaunchForLinuxPrime(
+      deps({ spawn, env: {}, execPath: 'x', argv: ['--ozone-platform-hint=auto'] }),
+    );
+    expect(calls[0].args).toEqual(['--ozone-platform-hint=auto', '--ozone-platform=x11']);
+  });
+
+  it('returns false and logs a warning when spawn itself throws', () => {
+    const spawn = vi.fn(() => {
+      throw new Error('spawn EACCES');
+    });
+    const warn = vi.fn();
+    const result = relaunchForLinuxPrime(deps({ spawn, env: {}, log: { warn } }));
+    expect(result).toBe(false);
+    expect(warn).toHaveBeenCalled();
+  });
+});
+
 describe('forceHighPerformanceGpu', () => {
   it('appends both switches on non-Windows and never touches the registry', () => {
     const { app, switches } = fakeApp();
     const execFileSync = vi.fn();
     forceHighPerformanceGpu({ app, platform: 'darwin', execFileSync });
     expect(switches).toEqual(['force-high-performance-gpu', 'force_high_performance_gpu']);
+    expect(execFileSync).not.toHaveBeenCalled();
+  });
+
+  it('appends the switches on Linux too, and never touches the registry (relaunch is a separate call)', () => {
+    // forceHighPerformanceGpu no longer touches process.env on Linux at all: an in-process
+    // mutation here never reaches the GPU process (see gpu_preference.cjs lever 3), so that
+    // job belongs entirely to relaunchForLinuxPrime, called earlier by main.cjs.
+    const { app, switches } = fakeApp();
+    const execFileSync = vi.fn();
+    const env = {};
+    forceHighPerformanceGpu({ app, platform: 'linux', execFileSync, env });
+    expect(switches).toEqual(['force-high-performance-gpu', 'force_high_performance_gpu']);
+    expect(env).toEqual({});
     expect(execFileSync).not.toHaveBeenCalled();
   });
 
@@ -538,6 +856,31 @@ describe('main.cjs gpu wiring pin', () => {
     expect(callAt).toBeLessThan(readyAt);
   });
 
+  it('guards the whole startup behind relaunchForLinuxPrime, exiting the parent immediately', () => {
+    // The Linux fix only works as a re-exec BEFORE any Electron startup: the guard must
+    // sit at module scope (column 0), run before forceHighPerformanceGpu and before any
+    // logging or window setup, and the parent must stop executing via process.exit(0).
+    // Any of these moving (into whenReady, below initLogging, losing the exit) silently
+    // kills the fix while the pure-function tests above stay green.
+    // One regex pins the whole shape: guard at column 0 with process.exit(0) as the block
+    // body (comments aside) and nothing else inside.
+    expect(source).toMatch(
+      /^if \(relaunchForLinuxPrime\(\{ log: console \}\)\) \{\n(?:\s*\/\/[^\n]*\n)*\s*process\.exit\(0\);\n\}/m,
+    );
+    const guardAt = source.indexOf('if (relaunchForLinuxPrime({ log: console })) {');
+    expect(guardAt).toBeGreaterThan(-1);
+    expect(guardAt).toBeLessThan(source.indexOf('forceHighPerformanceGpu({ app, log });'));
+    expect(guardAt).toBeLessThan(source.indexOf('initLogging('));
+  });
+
+  it('logs the PRIME-relaunched-child line the docs verification checklist points at', () => {
+    // The parent exits before file logging exists, so the CHILD records the durable
+    // evidence; docs/desktop-release.md tells the release verifier to grep main.log for
+    // exactly this line.
+    expect(source).toContain('[gpu] running as PRIME-relaunched child');
+    expect(source).toContain('process.env[PRIME_RELAUNCH_MARKER]');
+  });
+
   it('re-logs GPU status on every load, not just the first (crash-recovery reloads)', () => {
     // A GPU-process crash followed by the recovery auto-reload is exactly when the adapter
     // can flip to the WARP software fallback; .once would keep only the pre-crash reading.
@@ -551,5 +894,28 @@ describe('main.cjs gpu wiring pin', () => {
     expect(source).toContain('summarizeGpuDevices');
     expect(source).toContain('discreteInactive');
     expect(source).toContain('discrete GPU is present but INACTIVE');
+  });
+});
+
+describe('electron-dev.mjs PRIME pre-apply pin', () => {
+  // The dev orchestrator kills Vite the moment its electron child exits, so on a Linux
+  // hybrid machine the main.cjs relaunch would tear down the dev server under the
+  // detached grandchild. The dev spawn therefore pre-applies the exact configuration the
+  // relaunch would have produced (env additions + marker + explicit ozone flag), which
+  // suppresses the relaunch entirely. Pin that wiring textually, same approach as the
+  // main.cjs block above.
+  const source = readFileSync(new URL('../scripts/electron-dev.mjs', import.meta.url), 'utf8');
+
+  it('pre-applies the PRIME env, marker, and ozone flag using the module predicates', () => {
+    expect(source).toContain("createRequire(import.meta.url)('../electron/gpu_preference.cjs')");
+    expect(source).toContain('shouldRelaunchForLinuxPrime(process.env, [])');
+    expect(source).toContain('isLinuxHybridGpu()');
+    expect(source).toContain("[PRIME_RELAUNCH_MARKER]: '1'");
+    expect(source).toContain('[LINUX_OZONE_X11_ARG]');
+  });
+
+  it('feeds the pre-applied config into the electron spawn (env and argv both)', () => {
+    expect(source).toContain("spawn(electronCommand, ['.', ...prime.args]");
+    expect(source).toContain('...prime.env,');
   });
 });

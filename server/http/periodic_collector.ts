@@ -23,6 +23,8 @@
  */
 export class PeriodicCollector<T> {
   private snapshot: T | null = null;
+  private lastSuccessAtMs: number | null = null;
+  private initialTimer: ReturnType<typeof setTimeout> | null = null;
   private timer: ReturnType<typeof setInterval> | null = null;
   private inFlight: Promise<T | null> | null = null;
 
@@ -44,6 +46,11 @@ export class PeriodicCollector<T> {
     return this.snapshot;
   }
 
+  /** Wall-clock time of the last successful refresh, or null before the first one. */
+  lastSuccessfulRefreshAtMs(): number | null {
+    return this.lastSuccessAtMs;
+  }
+
   /**
    * Run the query once and cache the result. Never throws: a failed query is
    * reported via onError and leaves the previous snapshot in place. Returns the
@@ -54,6 +61,7 @@ export class PeriodicCollector<T> {
     const run = (async () => {
       try {
         this.snapshot = await this.query();
+        this.lastSuccessAtMs = Date.now();
       } catch (err) {
         this.onError(err);
       }
@@ -68,19 +76,33 @@ export class PeriodicCollector<T> {
   }
 
   /**
-   * Kick off an immediate refresh and then repeat every intervalMs. The interval is
-   * unref()'d so it never keeps the process alive on its own (mirrors the other boot
-   * intervals in main.ts). Idempotent: a second start() is a no-op while running.
+   * Kick off a refresh after the optional delay and then repeat every intervalMs.
+   * The interval is unref()'d so it never keeps the process alive on its own
+   * (mirrors the other boot intervals in main.ts). Idempotent: a second start() is
+   * a no-op while running.
    */
-  start(): void {
-    if (this.timer) return;
-    void this.refresh();
-    this.timer = setInterval(() => void this.refresh(), this.intervalMs);
-    this.timer.unref();
+  start(initialDelayMs = 0): void {
+    if (this.initialTimer || this.timer) return;
+    const begin = () => {
+      this.initialTimer = null;
+      void this.refresh();
+      this.timer = setInterval(() => void this.refresh(), this.intervalMs);
+      this.timer.unref();
+    };
+    if (initialDelayMs <= 0) {
+      begin();
+      return;
+    }
+    this.initialTimer = setTimeout(begin, initialDelayMs);
+    this.initialTimer.unref();
   }
 
   /** Stop the interval and wait for any current refresh to settle. */
   async stop(): Promise<void> {
+    if (this.initialTimer) {
+      clearTimeout(this.initialTimer);
+      this.initialTimer = null;
+    }
     if (this.timer) {
       clearInterval(this.timer);
       this.timer = null;

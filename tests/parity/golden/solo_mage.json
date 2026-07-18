@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 410,
-      "state": "b25a4691",
+      "state": "93f7b221",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -74,8 +74,7 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }
@@ -137,7 +136,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 411,
-      "state": "eb7bd95e",
+      "state": "08ad1492",
       "events": "64c0a36b",
       "rng": {
         "draws": 3,
@@ -148,7 +147,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 411,
-      "state": "74d30ad9",
+      "state": "3238a129",
       "events": "b15c7da7",
       "rng": {
         "draws": 3,
@@ -159,7 +158,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 411,
-      "state": "e1adf691",
+      "state": "c6fee221",
       "events": "d129bff0",
       "rng": {
         "draws": 73,
@@ -170,7 +169,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 411,
-      "state": "8c2482e5",
+      "state": "fa56d1cd",
       "events": "d129bff0",
       "rng": {
         "draws": 163,
@@ -181,7 +180,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 411,
-      "state": "ae7f5a3d",
+      "state": "85f5b585",
       "events": "f54b792b",
       "rng": {
         "draws": 259,
@@ -192,7 +191,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 411,
-      "state": "676a6a9c",
+      "state": "91f9c5f0",
       "events": "d129bff0",
       "rng": {
         "draws": 380,
@@ -203,7 +202,7 @@
       "tick": 128,
       "time": 6.4,
       "nextId": 411,
-      "state": "c7197d43",
+      "state": "b62d8c93",
       "events": "741638a5",
       "rng": {
         "draws": 421,
@@ -281,8 +280,7 @@
           "nodeHarvestReadyAt": {},
           "renown": 20,
           "talents": {
-            "choices": {},
-            "ranks": {}
+            "rows": {}
           },
           "townFocus": {}
         }

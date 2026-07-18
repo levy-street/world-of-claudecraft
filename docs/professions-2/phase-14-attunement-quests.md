@@ -1,7 +1,9 @@
 # Phase 14: Attunement quests and nudges
 
 This phase makes the identity journey live end to end: acceptance lore quests at the masters for
-all four wave-one archetypes, honest switching costs through repeatable make-amends quests, and
+all four wave-one archetypes, honest switching costs through repeatable make-amends quests, the
+masters' recurring pull (cadence-capped work-order quests and tier-crossing congratulation
+mail, the 2026-07-17 amendment), and
 the legibility layer (trend nudges that complete #1295, a pre-commit preview that explains
 everything, and the attunement celebration). It is its own slice because it is the first phase
 where the PR 2039 quest machinery, the Phase 7 trend classifier, and the Phase 8 masters meet in
@@ -38,7 +40,8 @@ the Phase 15 deed pass.
 This is Phase 14 of the Professions 2.0 feature: Attunement quests and nudges.
 Model: Opus 4.8, xhigh effort. Harness: Claude Code.
 Goal: make the identity journey live end to end: lore quests at the masters for all four
-wave-one archetypes, honest switching costs, and the legibility layer (nudges, complete
+wave-one archetypes, honest switching costs, the masters' recurring pull (work orders and
+tier mail), and the legibility layer (nudges, complete
 pre-commit preview, celebration).
 
 STEP 0 - PRE-FLIGHT:
@@ -93,6 +96,14 @@ Agent content deliverables:
 - Retire the placeholder quest rows q_archetype_acceptance and q_prof_make_amends cleanly:
   remove the content rows, their i18n keys, and their locale fills per the workflow rules;
   no dangling questIds or orphaned references anywhere.
+- One repeatable work-order quest per master (six total; the 2026-07-17 amendment): a
+  cadence-capped craft-objective turn-in ("the master needs N of X") on QuestDef.repeatable
+  plus the 2039 craft objective, consuming that master's craft materials: a recurring
+  material sink with a face on it. Rewards use the state.md work-order tuning target
+  (MAINTAINER numbers; stop and ask if they are still absent; never gold-positive against
+  the input vendor value) and the cadence cap reuses the nudge cadence pattern so the loop
+  can never become an unbounded XP or gold faucet (the q_prof_hobby_switch lesson in
+  state.md OPEN items).
 
 Agent sim deliverables:
 - Switch cost wiring: the escalation formula resolves in the sim through the make-amends
@@ -101,6 +112,12 @@ Agent sim deliverables:
   classifier, then a letter-voice follow-up; both cadence-capped so they can never spam.
 - The tutorial panel fires exactly once, at the first cap moment, and never again for that
   character.
+- Tier-crossing mail (the 2026-07-17 amendment): a one-shot-per-tier congratulation letter
+  from the attuned archetype's ANCHOR master (the giver of its lore quest, always the
+  zone 1 master under the state.md assignment) when a MAJOR craft crosses a
+  TIER_SKILL_STEP boundary, in the Phase 7 letter voice and delivery infra; one-shot flags
+  per tier, cadence-safe, never for hobby or dormant crafts, never for unattuned
+  characters (the Phase 7 Guild letter owns that moment).
 
 Agent ui deliverables:
 - Attunement preview completeness: the preview (identity card/view plus the quest dialog
@@ -117,6 +134,9 @@ Agent tests deliverables:
   the preview return cost line; matcher coverage for the broadcast and nudge strings.
 - A determinism test for the new sim logic (nudge cadence and switch cost resolution under
   a fixed seed).
+- Work-order and tier-mail tests: work-order credit and its cadence cap (a loop of
+  immediate re-turn-ins is bounded and never gold-positive); the tier mail fires exactly
+  once per tier per craft, only for attuned majors, and never re-fires on load.
 - Remove tests pinned to the retired placeholder quests; re-pin deliberately where behavior
   moved to the new quests.
 
@@ -164,7 +184,8 @@ BLOCKING finding stands.
 STEP 4 - COMMIT CADENCE:
 Commit in slices with explicit paths, never git add -A; every commit carries a body:
 - feat(content): archetype lore quests at the wave-one masters
-- feat(professions): switch costs and nudge cadence
+- feat(content): work-order quests at the masters
+- feat(professions): switch costs, nudge cadence, and tier-crossing mail
 - feat(ui): attunement preview and celebration
 
 STEP 5 - ACCEPTANCE CRITERIA (do not mark complete until all check):
@@ -180,6 +201,11 @@ STEP 5 - ACCEPTANCE CRITERIA (do not mark complete until all check):
       tutorial panel fires exactly once at the first cap moment.
 - [ ] Attunement celebration lands: banner, title grant, id-based zone broadcast with
       matcher coverage; deed hook present but inert.
+- [ ] Each master offers its cadence-capped work order; turning one in consumes the
+      materials and cannot be looped for unbounded XP or gold.
+- [ ] Crossing a major-craft tier delivers exactly one congratulation mail from the
+      archetype's master; re-crossings, hobby crossings, and unattuned characters deliver
+      none.
 - [ ] q_archetype_acceptance and q_prof_make_amends are fully retired: no content rows,
       i18n keys, locale fills, tests, or questIds references remain.
 - [ ] Players attuned via 2039's intro quest keep their state; mid-quest placeholder
@@ -189,8 +215,9 @@ STEP 5 - ACCEPTANCE CRITERIA (do not mark complete until all check):
 STEP 6 - DOC UPDATES + MEMORY:
 Update docs/professions-2/progress.md (status table row, Phase 14 checklist, notes with the
 phase-start commit and any deferrals). Update docs/professions-2/state.md: the New surfaces
-per phase list gains the Phase 14 entry (the four lore quest ids and the make-amends quest
-ids, the nudge cadence surface and its i18n key namespaces, the celebration broadcast id and
+per phase list gains the Phase 14 entry (the four lore quest ids, the make-amends quest
+ids, the six work-order quest ids and their cadence cap, the tier-mail one-shot flags, the
+nudge cadence surface and its i18n key namespaces, the celebration broadcast id and
 matcher rule, and the note that the placeholder quest rows are gone). Record surprises to
 Claude Code memory.
 

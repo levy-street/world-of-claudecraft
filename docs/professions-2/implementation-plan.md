@@ -98,7 +98,11 @@ landed. Therefore every UI phase in this packet:
 
 ## Phase summary
 
-Phases 1 to 7 are the fun kernel; 8 to 15 are wave one. PR 2039 (open at
+Phases 1 to 7 are the fun kernel; 8 to 15 are wave one. End of Phase 7 is
+the vertical-slice checkpoint (see README). Phase 6 depends on Phases 2 and
+4, not on Phase 5, and may run ahead of the wheel window if the
+design-language rollout stalls Phase 5. The 2026-07-17 design-review
+amendments in state.md bind their owning phases below. PR 2039 (open at
 packet creation; 104 files; adds `craftingIdentity`/`cprof`, the shared
 `combo_eligibility` rule with attunement-gated combos, `attunedPairs`
 pair-level history, craft/gather quest objectives, quest-driven attunement
@@ -110,20 +114,21 @@ Phase 1.
 | 1 | Ring and identity foundations | Merge-window amendments on PR 2039: adopt the blueprint ring, pair-named archetype titles, the 5 review items | sim content, i18n, tests |
 | 2 | Masterwork model | Deterministic outputs + masterwork proc with stats via `item_budget`; retire the five-way roll and `trivialAt` | sim, wire event, tests |
 | 3 | Host-parity bug fixes | Trade instance carriage; corpse claims on the wire | sim, net, server, tests |
-| 4 | Node materials and pristine veins | Real per-rarity node yields, signed rare+ yields, one rare event, gather feedback | sim content, ui, render |
+| 4 | Node materials and pristine veins | Real per-rarity node yields, signed rare+ yields, per-node-type rare events, gather feedback | sim content, ui, render |
 | 5 | The professions wheel window | The flagship window at deeds quality on the deeds recipe | ui, styles, i18n |
-| 6 | Crafting window upgrades and celebrations | Skill display, combo/station legibility, masterwork toast/broadcast, maker's mark tooltips | ui, i18n |
+| 6 | Crafting window upgrades and celebrations | Skill display, combo/station legibility, masterwork toast + zone broadcast, tier-up toasts, maker's mark tooltips, inspectable instances | ui, i18n, net, sim |
 | 7 | The Guild letter | Trend detection, the letter via mail, the first-attunement hook; S3 scanner gap closed | sim, content, tests |
-| 8 | Stations and masters (sim/server) | Typed station registry, master NPC records, placement-safety test, mobile-station perk live | sim, content, server |
-| 9 | Station presence and training | Station props + masters rendered, recipe training on `acquireRecipe`, shops, hands-vs-stations live | render, ui, content |
-| 10 | Recipe ladders and materials (ultracode) | Six deep crafts' tier ladders + material families + economy invariant tests | content, tests |
+| 8 | Stations and masters (sim/server) | Typed station registry, masters across the three zone hubs, placement-safety test, specialization-gated mobile station | sim, content, server |
+| 9 | Station presence and training | Station props + masters rendered, skill-tier-gated training with a visible locked-row ladder, shops, hands-vs-stations live | render, ui, content |
+| 10 | Recipe ladders and materials (ultracode) | Six deep crafts' tier ladders + material families + economy invariant tests + the materialTierBonus wire | content, sim, tests |
 | 11 | Fishing joins the framework | Fishing proficiency + catch rarity ladder feeding cooking | sim, content, ui |
 | 12 | Base tool tier gating | Node tiers; tool tier + skill gates; tools matter; effects stay parked | sim, content, tests |
-| 13 | Enchanting reachable | Disenchant + enchant-apply on IWorld/wire/UI in both hosts | world_api, net, server, ui |
-| 14 | Attunement quests and nudges | Lore quests at the masters for four archetypes; nudges; celebration | content, sim, ui |
+| 13 | Enchanting reachable | Disenchant, enchant-apply, and salvage on IWorld/wire/UI in both hosts | world_api, net, server, ui |
+| 14 | Attunement quests and nudges | Lore quests, work orders, and tier mail at the masters; nudges; celebration | content, sim, ui |
 | 15 | Deeds, tuning, and polish | Universal profession deeds, economy tuning, wiki rewrite, final gate | content, docs, tests |
 
 Wave 2+ (NOT this packet, tracked on epic #1866): market/mail instance
 carriage (#1146), commissions and boundTo (#1298), Jack of All Trades
-(#1296), monster-harvest proficiency, salvage UI, battlefield experience
-expansion, item biographies, tool effects, jewelcrafting/inscription depth.
+(#1296), monster-harvest proficiency, battlefield experience expansion,
+item biographies, tool effects, jewelcrafting/inscription depth. (Salvage
+wiring left this list on 2026-07-17; it joins Phase 13.)

@@ -71,7 +71,8 @@ const appBuildId =
 const desktopApiOrigin = env(['VITE_DESKTOP_API_ORIGIN']);
 const isDesktopDevBuild = env(['VITE_DESKTOP_APP']) === '1';
 const apiProxyTarget =
-  isDesktopDevBuild && desktopApiOrigin ? desktopApiOrigin : 'http://127.0.0.1:8787';
+  env(['WOC_DEV_API_TARGET']) ??
+  (isDesktopDevBuild && desktopApiOrigin ? desktopApiOrigin : 'http://127.0.0.1:8787');
 const wsProxyTarget = apiProxyTarget.replace(/^https:/, 'wss:').replace(/^http:/, 'ws:');
 
 // Pretty-URL aliases for standalone static HTML pages. Mirrors the production
@@ -85,6 +86,8 @@ const STATIC_PAGE_ALIASES = new Map([
   ['/social-media-links/', '/links.html'],
   ['/play', '/play.html'],
   ['/play/', '/play.html'],
+  ['/wallet-handoff', '/wallet-handoff.html'],
+  ['/wallet-handoff/', '/wallet-handoff.html'],
   ['/privacy', '/privacy.html'],
   ['/privacy/', '/privacy.html'],
   ['/terms', '/terms.html'],
@@ -345,6 +348,7 @@ export default defineConfig({
         play: fileURLToPath(new URL('play.html', import.meta.url)),
         guide: fileURLToPath(new URL('guide.html', import.meta.url)),
         editor: fileURLToPath(new URL('editor.html', import.meta.url)),
+        walletHandoff: fileURLToPath(new URL('wallet-handoff.html', import.meta.url)),
       },
       output: {
         // three.js almost never changes between our releases and is the single
