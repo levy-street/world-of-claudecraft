@@ -1312,40 +1312,24 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.walletAppUnavailable"
   ],
   "zh_CN": [
-    "auth.currentCharacter",
-    "glitchReroll.cancel",
-    "glitchReroll.confirm",
-    "glitchReroll.title",
     "hudChrome.crafting.identity.ceilingRare",
     "hudChrome.crafting.pairOptionLabel",
     "hudChrome.nameplate.mobEliteLevel",
     "hudChrome.nameplate.mobLevel"
   ],
   "zh_TW": [
-    "auth.currentCharacter",
-    "glitchReroll.cancel",
-    "glitchReroll.confirm",
-    "glitchReroll.title",
     "hudChrome.crafting.identity.ceilingRare",
     "hudChrome.crafting.pairOptionLabel",
     "hudChrome.nameplate.mobEliteLevel",
     "hudChrome.nameplate.mobLevel"
   ],
   "ko_KR": [
-    "auth.currentCharacter",
-    "glitchReroll.cancel",
-    "glitchReroll.confirm",
-    "glitchReroll.title",
     "hudChrome.crafting.identity.ceilingRare",
     "hudChrome.crafting.pairOptionLabel",
     "hudChrome.nameplate.mobEliteLevel",
     "hudChrome.nameplate.mobLevel"
   ],
   "ja_JP": [
-    "auth.currentCharacter",
-    "glitchReroll.cancel",
-    "glitchReroll.confirm",
-    "glitchReroll.title",
     "hudChrome.crafting.identity.ceilingRare",
     "hudChrome.crafting.pairOptionLabel",
     "hudChrome.nameplate.mobEliteLevel",
@@ -1575,10 +1559,6 @@ export const pending: Record<string, readonly string[]> = {
     "wallet.walletAppUnavailable"
   ],
   "ru_RU": [
-    "auth.currentCharacter",
-    "glitchReroll.cancel",
-    "glitchReroll.confirm",
-    "glitchReroll.title",
     "hudChrome.crafting.identity.ceilingRare",
     "hudChrome.crafting.pairOptionLabel",
     "hudChrome.nameplate.mobEliteLevel",

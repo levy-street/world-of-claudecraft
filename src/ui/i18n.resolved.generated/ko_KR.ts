@@ -4118,7 +4118,7 @@ export const ko_KR: EnTranslations = {
     "haveAccountPrompt": "이미 계정이 있으신가요?",
     "characters": "캐릭터 목록:",
     "createCharacter": "캐릭터 생성",
-    "currentCharacter": "Your Current Character",
+    "currentCharacter": "현재 캐릭터",
     "characterName": "캐릭터 이름",
     "characterNamePlaceholder": "캐릭터 이름",
     "enterWorld": "세계 입장",
@@ -5123,9 +5123,9 @@ export const ko_KR: EnTranslations = {
     "confirm": "영구 삭제"
   },
   "glitchReroll": {
-    "title": "Start Over?",
-    "cancel": "Keep Character",
-    "confirm": "Start Over"
+    "title": "다시 시작할까요?",
+    "cancel": "캐릭터 유지",
+    "confirm": "다시 시작"
   },
   "classDetails": {
     "sections": {

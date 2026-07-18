@@ -8252,4 +8252,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.glitchVoice.invalidError': 'Настройки голосового чата недействительны.',
   'hudChrome.glitchVoice.unavailableError': 'Голосовой чат временно недоступен.',
   'hudChrome.glitchVoice.permissionError': 'Разрешите доступ к микрофону для голосового чата.',
+  'auth.currentCharacter': 'Текущий персонаж',
+  'glitchReroll.title': 'Начать заново?',
+  'glitchReroll.cancel': 'Оставить персонажа',
+  'glitchReroll.confirm': 'Начать заново',
 };

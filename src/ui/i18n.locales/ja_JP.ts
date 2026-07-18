@@ -8108,4 +8108,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.glitchVoice.unavailableError': 'ボイスチャットは一時的に利用できません。',
   'hudChrome.glitchVoice.permissionError':
     'ボイスチャットを使用するにはマイクへのアクセスを許可してください。',
+  'auth.currentCharacter': '現在のキャラクター',
+  'glitchReroll.title': '最初からやり直しますか？',
+  'glitchReroll.cancel': 'キャラクターを維持',
+  'glitchReroll.confirm': '最初からやり直す',
 };

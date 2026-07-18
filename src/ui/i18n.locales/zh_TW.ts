@@ -7719,4 +7719,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.glitchVoice.invalidError': '語音聊天設定無效。',
   'hudChrome.glitchVoice.unavailableError': '語音聊天暫時無法使用。',
   'hudChrome.glitchVoice.permissionError': '請允許麥克風存取以使用語音聊天。',
+  'auth.currentCharacter': '目前角色',
+  'glitchReroll.title': '重新開始？',
+  'glitchReroll.cancel': '保留角色',
+  'glitchReroll.confirm': '重新開始',
 };

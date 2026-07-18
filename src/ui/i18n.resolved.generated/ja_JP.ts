@@ -4118,7 +4118,7 @@ export const ja_JP: EnTranslations = {
     "haveAccountPrompt": "アカウントをお持ちですか？",
     "characters": "キャラクター数：",
     "createCharacter": "キャラクター作成",
-    "currentCharacter": "Your Current Character",
+    "currentCharacter": "現在のキャラクター",
     "characterName": "キャラクター名",
     "characterNamePlaceholder": "キャラクター名",
     "enterWorld": "世界に入る",
@@ -5123,9 +5123,9 @@ export const ja_JP: EnTranslations = {
     "confirm": "完全に削除"
   },
   "glitchReroll": {
-    "title": "Start Over?",
-    "cancel": "Keep Character",
-    "confirm": "Start Over"
+    "title": "最初からやり直しますか？",
+    "cancel": "キャラクターを維持",
+    "confirm": "最初からやり直す"
   },
   "classDetails": {
     "sections": {

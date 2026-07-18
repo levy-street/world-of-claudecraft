@@ -4118,7 +4118,7 @@ export const ru_RU: EnTranslations = {
     "haveAccountPrompt": "Уже есть аккаунт?",
     "characters": "Персонажи:",
     "createCharacter": "Создать персонажа",
-    "currentCharacter": "Your Current Character",
+    "currentCharacter": "Текущий персонаж",
     "characterName": "Имя персонажа",
     "characterNamePlaceholder": "Имя персонажа",
     "enterWorld": "Войти в мир",
@@ -5123,9 +5123,9 @@ export const ru_RU: EnTranslations = {
     "confirm": "Удалить навсегда"
   },
   "glitchReroll": {
-    "title": "Start Over?",
-    "cancel": "Keep Character",
-    "confirm": "Start Over"
+    "title": "Начать заново?",
+    "cancel": "Оставить персонажа",
+    "confirm": "Начать заново"
   },
   "classDetails": {
     "sections": {

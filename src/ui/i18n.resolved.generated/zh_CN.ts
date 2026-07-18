@@ -4118,7 +4118,7 @@ export const zh_CN: EnTranslations = {
     "haveAccountPrompt": "已有账号？",
     "characters": "角色列表：",
     "createCharacter": "创建角色",
-    "currentCharacter": "Your Current Character",
+    "currentCharacter": "当前角色",
     "characterName": "角色名称",
     "characterNamePlaceholder": "输入角色名称",
     "enterWorld": "进入世界",
@@ -5123,9 +5123,9 @@ export const zh_CN: EnTranslations = {
     "confirm": "永久删除"
   },
   "glitchReroll": {
-    "title": "Start Over?",
-    "cancel": "Keep Character",
-    "confirm": "Start Over"
+    "title": "重新开始？",
+    "cancel": "保留角色",
+    "confirm": "重新开始"
   },
   "classDetails": {
     "sections": {

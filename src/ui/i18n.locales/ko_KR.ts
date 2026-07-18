@@ -8087,4 +8087,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.glitchVoice.invalidError': '음성 채팅 설정이 올바르지 않습니다.',
   'hudChrome.glitchVoice.unavailableError': '음성 채팅을 일시적으로 사용할 수 없습니다.',
   'hudChrome.glitchVoice.permissionError': '음성 채팅을 사용하려면 마이크 접근을 허용하세요.',
+  'auth.currentCharacter': '현재 캐릭터',
+  'glitchReroll.title': '다시 시작할까요?',
+  'glitchReroll.cancel': '캐릭터 유지',
+  'glitchReroll.confirm': '다시 시작',
 };
