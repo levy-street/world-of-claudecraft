@@ -226,6 +226,7 @@ import {
 import { renderDiscordWidget } from './ui/discord_widget';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
+import { syncGlitchAvatarLoading } from './ui/glitch_avatar_loading';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { chatInputSize } from './ui/hud/chat/chat_input_autosize';
 import { wireSkinPicker } from './ui/hud/cosmetics/skin_picker';
@@ -3844,9 +3845,20 @@ function setCharcreateSelection(cls: PlayerClass, skin: number): void {
 
 function syncGlitchCharacterPreview(existing: CharacterSummary): void {
   const previewContainer = $('#charcreate-preview-container');
-  characterPreview?.setContainer(previewContainer);
-  characterPreview?.setClass(existing.class);
-  characterPreview?.setSkin(clampSkinForClass(existing.class, existing.skin ?? 0));
+  if (!characterPreview) {
+    syncGlitchAvatarLoading(previewContainer, {
+      glitchActive: GLITCH_CONFIG.enabled,
+      previewReady: false,
+    });
+    return;
+  }
+  characterPreview.setContainer(previewContainer);
+  characterPreview.setClass(existing.class);
+  characterPreview.setSkin(clampSkinForClass(existing.class, existing.skin ?? 0));
+  syncGlitchAvatarLoading(previewContainer, {
+    glitchActive: GLITCH_CONFIG.enabled,
+    previewReady: true,
+  });
   syncPreviewAfterPanelLayout();
 }
 

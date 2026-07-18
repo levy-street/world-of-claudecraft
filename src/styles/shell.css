@@ -4845,6 +4845,93 @@
     height: 100% !important;
   }
 
+  .glitch-avatar-loading {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: none;
+    place-content: center;
+    justify-items: center;
+    gap: 14px;
+    color: var(--gold);
+    background: radial-gradient(circle, rgba(33, 27, 50, 0.72), rgba(8, 8, 15, 0.18) 62%);
+    pointer-events: none;
+  }
+
+  body.glitch-mode .glitch-avatar-loading:not([hidden]) {
+    display: grid;
+  }
+
+  .glitch-avatar-loading-rune {
+    position: relative;
+    display: block;
+    width: 88px;
+    height: 88px;
+    filter: drop-shadow(0 0 12px var(--color-primary-glow));
+  }
+
+  .glitch-avatar-loading-ring,
+  .glitch-avatar-loading-core {
+    position: absolute;
+    border-radius: 50%;
+  }
+
+  .glitch-avatar-loading-ring {
+    inset: 0;
+    border: 3px solid rgba(214, 176, 70, 0.28);
+    border-top-color: var(--gold);
+    border-bottom-color: var(--color-primary);
+    animation: glitchAvatarRuneSpin 1.45s linear infinite;
+  }
+
+  .glitch-avatar-loading-ring-inner {
+    inset: 14px;
+    border-width: 2px;
+    animation-direction: reverse;
+    animation-duration: 1.05s;
+  }
+
+  .glitch-avatar-loading-core {
+    inset: 34px;
+    background: var(--gold);
+    box-shadow: 0 0 18px var(--color-primary-glow);
+    animation: glitchAvatarRunePulse 1.2s ease-in-out infinite;
+  }
+
+  .glitch-avatar-loading-label {
+    font-family: var(--title-font);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-shadow: 0 2px 5px #000;
+  }
+
+  @keyframes glitchAvatarRuneSpin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes glitchAvatarRunePulse {
+    0%,
+    100% {
+      opacity: 0.45;
+      transform: scale(0.72);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glitch-avatar-loading-ring,
+    .glitch-avatar-loading-core {
+      animation: none;
+    }
+  }
+
   /* The selected-character name plate over the 3D stage. Belongs to the desktop
      docked layout (the only one with a full 3D turntable); mobile shows the name
      on each roster card already, so it stays hidden by default and the docked
