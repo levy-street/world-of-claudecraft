@@ -530,6 +530,12 @@ class Sfx {
     const cd = opts?.cooldown ?? 0;
     // -Infinity sentinel: see the matching comment on playAt's cooldown check.
     if (cd > 0 && now - (this.lastPlay.get(key) ?? Number.NEGATIVE_INFINITY) < cd) return;
+    // Unlike playAt (which always stamps lastPlay, since it defaults cd to
+    // 0.03), playUi only stamps it when a cooldown was actually requested:
+    // playUi's cooldown defaults to 0 (opt-in only, see the line above), so an
+    // uncooled key has nothing to stamp against and no reason to pay the map
+    // write. This is a deliberate difference in bookkeeping semantics for the
+    // same shared map, not a bug.
     if (cd > 0) this.lastPlay.set(key, now);
     this.commitVariant(key, variantIndex);
     const jitter = opts?.jitter !== false;
