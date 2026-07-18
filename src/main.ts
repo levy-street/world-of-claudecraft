@@ -283,6 +283,7 @@ import {
   shouldDisconnectUnverifiedWallet,
 } from './ui/wallet_balance';
 import { buildWalletConnectionView } from './ui/wallet_connection_view';
+import { mountWelcomeStage } from './ui/welcome_screen_stage';
 import { shouldUseWelcomeScreen } from './ui/welcome_screen_view';
 import {
   mountWelcomeScreen,
@@ -3468,6 +3469,12 @@ async function startOffline(
   if (welcomeRoot) {
     await new Promise<void>((resolve) => {
       welcomeScreen = mountWelcomeScreen(welcomeRoot, {
+        mountStage: (el) =>
+          mountWelcomeStage(
+            el,
+            () => characterPreview,
+            () => window.matchMedia('(min-width: 861px) and (pointer: fine)').matches,
+          ),
         // offline: true already forces every store/chest/discord-desktop tile off in the
         // gating matrix regardless of platform, but mobileTouch/nativeApp still drive the
         // touch-vs-keyboard Continue hint ("Tap to continue"), so derive them for real
@@ -5404,6 +5411,12 @@ async function enterWorld(
   };
   if (welcomeRoot) {
     welcomeScreen = mountWelcomeScreen(welcomeRoot, {
+      mountStage: (el) =>
+        mountWelcomeStage(
+          el,
+          () => characterPreview,
+          () => window.matchMedia('(min-width: 861px) and (pointer: fine)').matches,
+        ),
       platform: {
         nativeApp: NATIVE_APP,
         desktopApp: DESKTOP_APP,

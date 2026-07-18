@@ -10607,10 +10607,15 @@
     display: none;
   }
   #welcome-screen::before {
-    /* ridge silhouettes along the bottom, same trick as the mock's .scene::before */
+    /* ridge silhouettes along the bottom, same trick as the mock's .scene::before.
+       Negative z: scene decor must paint BEHIND every panel and text run (it used
+       to sit above in the positioned-z-auto step and dimmed the footer chrome).
+       The 2px overscan stops device-pixel snapping at fractional zoom from
+       exposing a bare edge row. */
     content: "";
     position: fixed;
-    inset: auto 0 0 0;
+    z-index: -1;
+    inset: auto -2px -2px -2px;
     height: 46%;
     background:
       radial-gradient(58% 120% at 22% 128%, #050509 48%, transparent 50%),
@@ -10620,15 +10625,19 @@
   }
   #welcome-screen::after {
     /* soft vignette; an inset shadow leaves the center clear so it never
-       obscures panel content, only darkens the far edges. */
+       obscures panel content, only darkens the far edges. Kept behind content
+       (negative z) and gentle: the old 60px full-strength ring blacked out the
+       CTA valley at the bottom center. */
     content: "";
     position: fixed;
-    inset: 0;
-    box-shadow: inset 0 0 180px 60px rgba(0, 0, 0, 0.72);
+    z-index: -1;
+    inset: -2px;
+    box-shadow: inset 0 0 160px 24px rgba(0, 0, 0, 0.55);
     pointer-events: none;
   }
   .ws-stars {
     position: fixed;
+    z-index: -1;
     top: 26px;
     left: 18%;
     width: 2px;
@@ -10828,6 +10837,18 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+  }
+  /* An empty rail (armory promo off, chest not ready, no event) must not keep
+     its flex share: it silently squeezed the news column off-center on wide
+     desktops whenever every tile was gated off. */
+  .ws-rail:not(:has(> :not([hidden]))) {
+    display: none;
+  }
+  /* Character stage host: desktop-only centerpiece (the live char-select
+     CharacterPreview canvas is re-parented here while the welcome screen is
+     up); display: none outside the desktop composition. */
+  .ws-stage {
+    display: none;
   }
   .ws-armory-card[hidden],
   .ws-chest-tile[hidden],
@@ -11128,6 +11149,327 @@
     .ws-continue-hint {
       font-size: 10px;
       margin-top: 4px;
+    }
+  }
+  /* Desktop launcher composition: the exact complement of the compact media
+     query above, so touch and short viewports keep the base flow untouched.
+     The mobile-first column markup is recomposed with grid + display: contents
+     into the AAA-launcher shape: a content-hugging glass news rail on the
+     left; on the right a cinematic stage with the player's live character
+     render as the centerpiece (the greeting above it, one dominant gilded
+     CTA below it, the Discord strip demoted to a slim bottom card); status
+     and version as corner chrome. Cold path (shown once per login), so the
+     entrance motion and star twinkle cost nothing per-frame in-world; both
+     respect prefers-reduced-motion. */
+  @media (min-width: 861px) and (pointer: fine) {
+    #welcome-screen {
+      display: grid;
+      grid-template-columns: minmax(430px, 33vw) minmax(0, 1fr);
+      grid-template-rows: auto minmax(0, 1fr) auto auto auto auto;
+      column-gap: clamp(36px, 4.5vw, 84px);
+      row-gap: 16px;
+      padding: clamp(28px, 4vh, 48px) clamp(32px, 5.5vw, 110px);
+      background:
+        radial-gradient(1400px 640px at 76% -12%, rgba(64, 52, 118, 0.6), transparent 64%),
+        radial-gradient(1500px 560px at 12% 116%, rgba(96, 66, 22, 0.55), transparent 62%),
+        radial-gradient(900px 420px at 88% 78%, rgba(38, 32, 78, 0.5), transparent 70%),
+        radial-gradient(1100px 380px at 62% 108%, rgba(214, 168, 46, 0.16), transparent 62%),
+        linear-gradient(180deg, #10121f 0%, #151329 42%, #1b1430 68%, #0a0912 100%);
+    }
+    .ws-body,
+    .ws-main,
+    .ws-footer {
+      display: contents;
+    }
+    /* Stage layering: the character canvas fills the whole right column
+       behind the greeting/CTA/Discord, which stack above it. */
+    .ws-stage {
+      display: block;
+      grid-column: 2;
+      grid-row: 1 / 6;
+      position: relative;
+      z-index: 0;
+      min-height: 0;
+      animation: ws-fade 0.7s ease-out backwards;
+    }
+    .ws-stage canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .ws-header,
+    .ws-rail,
+    .ws-discord-strip,
+    .ws-enter-wrap,
+    .ws-status,
+    .ws-version {
+      position: relative;
+      z-index: 1;
+    }
+    .ws-news-panel {
+      grid-column: 1;
+      grid-row: 1 / 6;
+      align-self: start;
+      max-height: 100%;
+      border-radius: 10px;
+      border-color: rgba(111, 90, 42, 0.85);
+      background: linear-gradient(180deg, rgba(19, 17, 30, 0.92), rgba(10, 9, 16, 0.94));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 209, 0, 0.1),
+        0 24px 64px rgba(0, 0, 0, 0.55);
+      padding: 20px 24px 14px;
+      animation: ws-rise 0.5s ease-out backwards;
+    }
+    .ws-panel-title {
+      letter-spacing: 0.18em;
+      font-size: 15px;
+    }
+    .ws-news-collapsed-summary {
+      font-size: 14px;
+    }
+    .ws-header {
+      grid-column: 2;
+      grid-row: 1;
+      align-self: start;
+      justify-self: center;
+      max-width: none;
+      margin: 0;
+      padding-top: clamp(4px, 2.5vh, 28px);
+      text-align: center;
+      animation: ws-rise 0.55s ease-out 0.05s backwards;
+    }
+    /* No live character render mounted (WebGL unavailable, /play, or assets
+       still warming): re-center the greeting across the hero space so the
+       stage reads as intentional, not abandoned. */
+    #welcome-screen:has(#ws-stage:empty) .ws-header {
+      grid-row: 1 / 3;
+      align-self: center;
+      padding-top: 0;
+    }
+    .ws-welcome-back {
+      font-size: clamp(38px, 3.6vw, 54px);
+      line-height: 1.1;
+      letter-spacing: 0.015em;
+      background: linear-gradient(180deg, #ffeaa8 8%, var(--gold) 55%, #b8942e 96%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: none;
+      filter: drop-shadow(0 3px 14px rgba(0, 0, 0, 0.85))
+        drop-shadow(0 0 26px rgba(255, 209, 0, 0.16));
+    }
+    .ws-header-meta {
+      margin-top: 12px;
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .ws-header::after {
+      content: "";
+      display: block;
+      height: 1px;
+      width: min(300px, 50%);
+      margin: 18px auto 0;
+      background: linear-gradient(90deg, transparent, rgba(199, 168, 87, 0.6), transparent);
+    }
+    .ws-rail {
+      grid-column: 2;
+      grid-row: 3;
+      justify-self: center;
+      width: min(420px, 100%);
+      max-width: 420px;
+      animation: ws-rise 0.55s ease-out 0.1s backwards;
+    }
+    .ws-enter-wrap {
+      grid-column: 2;
+      grid-row: 4;
+      align-self: end;
+      justify-self: center;
+      animation: ws-rise 0.55s ease-out 0.15s backwards;
+    }
+    .ws-continue {
+      position: relative;
+      overflow: hidden;
+      min-width: 320px;
+      min-height: 58px;
+      font-size: 24px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 8px;
+      padding: 14px 56px;
+      box-shadow:
+        0 6px 34px rgba(255, 209, 0, 0.38),
+        0 2px 8px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      transition:
+        transform 0.15s ease,
+        filter 0.15s ease,
+        box-shadow 0.15s ease;
+    }
+    .ws-continue:not(:disabled):hover {
+      transform: translateY(-1px);
+      filter: brightness(1.06);
+      box-shadow:
+        0 10px 44px rgba(255, 209, 0, 0.5),
+        0 2px 8px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+    .ws-continue:not(:disabled)::after {
+      content: "";
+      position: absolute;
+      inset: -40% auto;
+      left: -30%;
+      width: 24%;
+      transform: skewX(-18deg);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      animation: ws-sheen 4.5s ease-in-out 1.2s infinite;
+      pointer-events: none;
+    }
+    .ws-continue-hint {
+      margin-top: 10px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: var(--color-text-light);
+      opacity: 0.75;
+    }
+    /* Discord demoted to a slim, quiet card under the CTA: the strip must
+       never outweigh Enter World. */
+    .ws-discord-strip {
+      grid-column: 2;
+      grid-row: 5;
+      justify-self: center;
+      width: min(640px, 100%);
+      padding: 8px 12px;
+      gap: 12px;
+      border-color: rgba(88, 101, 242, 0.28);
+      background: linear-gradient(180deg, rgba(19, 17, 30, 0.72), rgba(10, 9, 16, 0.74));
+      box-shadow: none;
+      animation: ws-rise 0.55s ease-out 0.2s backwards;
+    }
+    .ws-discord-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 34% 46%, #fff 2.8px, transparent 3.4px),
+        radial-gradient(circle at 66% 46%, #fff 2.8px, transparent 3.4px), #5865f2;
+      box-shadow: none;
+    }
+    .ws-discord-title {
+      font-size: 13px;
+    }
+    .ws-discord-sub {
+      font-size: 11.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .btn-discord {
+      flex: none;
+      white-space: nowrap;
+      min-height: 34px;
+      padding: 6px 14px;
+      font-size: 12.5px;
+      box-shadow: none;
+    }
+    .ws-status {
+      grid-column: 1;
+      grid-row: 6;
+      align-self: end;
+      justify-content: flex-start;
+      text-align: left;
+    }
+    .ws-version {
+      grid-column: 2;
+      grid-row: 6;
+      align-self: end;
+      justify-self: end;
+      flex: none;
+      color: var(--color-text-muted);
+      pointer-events: none;
+    }
+    /* Denser two-layer starfield with a slow twinkle. */
+    .ws-stars {
+      box-shadow:
+        16vw 14px 0 -0.4px #b9bff3,
+        34vw 40px 0 -0.6px #9aa0d8,
+        48vw 22px 0 -0.4px #cfd3ff,
+        62vw 54px 0 -0.7px #8d93cc,
+        72vw 16px 0 -0.5px #b9bff3,
+        6vw 70px 0 -0.7px #8d93cc,
+        11vw 34px 0 -0.5px #cfd3ff,
+        26vw 8px 0 -0.7px #9aa0d8,
+        42vw 64px 0 -0.6px #b9bff3,
+        55vw 6px 0 -0.5px #cfd3ff,
+        68vw 78px 0 -0.8px #8d93cc,
+        79vw 44px 0 -0.5px #b9bff3,
+        87vw 12px 0 -0.6px #cfd3ff,
+        92vw 60px 0 -0.8px #9aa0d8;
+      animation: ws-twinkle 6s ease-in-out infinite alternate;
+    }
+    .ws-stars::after {
+      content: "";
+      position: fixed;
+      top: 120px;
+      left: 8%;
+      width: 1.6px;
+      height: 1.6px;
+      border-radius: 50%;
+      background: #9aa0d8;
+      box-shadow:
+        9vw 46px 0 -0.6px #8d93cc,
+        21vw 90px 0 -0.7px #b9bff3,
+        37vw 30px 0 -0.8px #9aa0d8,
+        52vw 74px 0 -0.6px #cfd3ff,
+        64vw 24px 0 -0.8px #8d93cc,
+        76vw 66px 0 -0.7px #9aa0d8,
+        85vw 96px 0 -0.6px #b9bff3;
+      opacity: 0.6;
+      animation: ws-twinkle 8s ease-in-out 2s infinite alternate;
+    }
+  }
+  @keyframes ws-rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+  @keyframes ws-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes ws-sheen {
+    0%,
+    62% {
+      left: -30%;
+    }
+    82%,
+    100% {
+      left: 128%;
+    }
+  }
+  @keyframes ws-twinkle {
+    from {
+      opacity: 0.55;
+    }
+    to {
+      opacity: 0.9;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ws-news-panel,
+    .ws-header,
+    .ws-rail,
+    .ws-stage,
+    .ws-discord-strip,
+    .ws-enter-wrap,
+    .ws-stars,
+    .ws-stars::after,
+    .ws-continue,
+    .ws-continue:not(:disabled)::after {
+      animation: none !important;
+      transition: none !important;
     }
   }
   /* ---------- developer command center ---------- */
