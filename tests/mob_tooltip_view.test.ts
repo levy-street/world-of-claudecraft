@@ -63,14 +63,14 @@ describe('mobTooltipHtml', () => {
     const html = mobTooltipHtml(
       model({
         quests: [
-          { title: 'Wolves at the Door', progress: 'Forest Wolf slain: 3/8' },
+          { title: 'Wolves at the Door', progress: 'Forest Wolf slain: 2/3' },
           { title: 'Another Errand', progress: 'Wolf Pelt: 1/4' },
         ],
       }),
       deps,
     );
     expect(html).toContain('<div class="tt-quest-name">Wolves at the Door</div>');
-    expect(html).toContain('<div class="tt-quest-obj">Forest Wolf slain: 3/8</div>');
+    expect(html).toContain('<div class="tt-quest-obj">Forest Wolf slain: 2/3</div>');
     expect(html).toContain('<div class="tt-quest-name">Another Errand</div>');
     // order: family line, then the quest lines, then the reaction line
     const familyAt = html.indexOf('levelFamily');

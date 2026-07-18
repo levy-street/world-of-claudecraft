@@ -731,10 +731,10 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Wolves at the Door',
     giverNpcId: 'marshal_redbrook',
     turnInNpcId: 'marshal_redbrook',
-    text: 'The forest wolves grow bold, snapping at travelers on the north road. Thin their numbers, $N. Slay 8 Forest Wolves and Eastbrook will breathe easier.',
+    text: 'The forest wolves grow bold, snapping at travelers on the north road. Thin their numbers, $N. Slay 3 Forest Wolves and Eastbrook will breathe easier.',
     completionText: 'Fine work. The road feels safer already.',
     objectives: [
-      { type: 'kill', targetMobId: 'forest_wolf', count: 8, label: 'Forest Wolf slain' },
+      { type: 'kill', targetMobId: 'forest_wolf', count: 3, label: 'Forest Wolf slain' },
     ],
     xpReward: 250,
     copperReward: 75,

@@ -306,6 +306,18 @@ export const en_CA: EnTranslations = {
     "spectate": {
       "banner": "Spectating {name}"
     },
+    "glitchVoice": {
+      "off": "Voice Chat Off",
+      "connecting": "Connecting to Voice Chat",
+      "on": "Voice Chat On",
+      "muted": "Voice Chat Muted",
+      "authError": "Voice chat needs a new Glitch sign-in.",
+      "bannedError": "Voice chat is unavailable for this player.",
+      "retryError": "Voice chat is busy. Try again in a moment.",
+      "invalidError": "Voice chat configuration is invalid.",
+      "unavailableError": "Voice chat is temporarily unavailable.",
+      "permissionError": "Allow microphone access to use voice chat."
+    },
     "readyCheck": {
       "prompt": "{name} has started a ready check. Are you ready?",
       "ready": "Ready",
@@ -4105,7 +4117,8 @@ export const en_CA: EnTranslations = {
     "noAccountPrompt": "New to the world?",
     "haveAccountPrompt": "Already have an account?",
     "characters": "Characters:",
-    "createCharacter": "Create Character",
+    "createCharacter": "Create A Character",
+    "currentCharacter": "Your Current Character",
     "characterName": "Character Name",
     "characterNamePlaceholder": "Character name",
     "enterWorld": "Enter World",
@@ -5108,6 +5121,11 @@ export const en_CA: EnTranslations = {
     "confirmLabel": "Type the character name to confirm",
     "cancel": "Cancel",
     "confirm": "Delete Permanently"
+  },
+  "glitchReroll": {
+    "title": "Start Over?",
+    "cancel": "Keep Character",
+    "confirm": "Start Over"
   },
   "classDetails": {
     "sections": {
@@ -9414,7 +9432,7 @@ export const en_CA: EnTranslations = {
       },
       "q_wolves": {
         "title": "Wolves at the Door",
-        "text": "The forest wolves grow bold, snapping at travelers on the north road. Thin their numbers, {playerName}. Slay 8 Forest Wolves and Eastbrook will breathe easier.",
+        "text": "The forest wolves grow bold, snapping at travelers on the north road. Thin their numbers, {playerName}. Slay 3 Forest Wolves and Eastbrook will breathe easier.",
         "completion": "Fine work. The road feels safer already.",
         "objectives": {
           "0": {

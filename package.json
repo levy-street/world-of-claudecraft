@@ -12,6 +12,7 @@
   "description": "World of Claudecraft: a classic-style micro-MMO + headless RL training environment",
   "scripts": {
     "dev": "vite",
+    "start": "node dist-server/server.cjs",
     "release:check": "node scripts/release_version.mjs check",
     "release:prepare": "node scripts/release_version.mjs prepare",
     "version:sync": "node scripts/version_sync.mjs",
@@ -21,6 +22,7 @@
     "wiki:stills": "node scripts/wiki/render_model_stills.mjs",
     "sitemap:build": "node scripts/build_sitemap.mjs",
     "build:native": "VITE_NATIVE_APP=1 VITE_API_ORIGIN=${VITE_API_ORIGIN:-https://worldofclaudecraft.com} npm run build",
+    "deploy:glitch": "node scripts/glitch_deploy.mjs",
     "native:sync": "npm run build:native && npx cap sync",
     "native:open:ios": "npm run native:sync && npx cap open ios",
     "native:open:android": "npm run native:sync && npx cap open android",

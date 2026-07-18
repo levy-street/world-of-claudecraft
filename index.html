@@ -452,6 +452,7 @@
       <button type="button" class="micro-btn" id="mm-emote" data-i18n-aria="hudChrome.emoteWheel.label" aria-label="Emotes" data-icon="emote"><span class="keybind">x</span></button>
       <button type="button" class="micro-btn" id="mm-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" data-icon="music"></button>
       <button type="button" class="micro-btn" id="mm-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="keybind">o</span></button>
+      <button type="button" class="micro-btn" id="mm-glitch-voice" hidden data-i18n-title="hudChrome.glitchVoice.off" data-i18n-aria="hudChrome.glitchVoice.off" title="Voice Chat Off" aria-label="Voice Chat Off" aria-pressed="false" data-icon="voice"></button>
       <button type="button" class="micro-btn" id="mm-discord" hidden data-i18n-title="hudChrome.discord.title" data-i18n-aria="hudChrome.discord.title" title="Discord" aria-label="Discord" data-icon="discord"><span class="keybind">u</span></button>
       <button type="button" class="micro-btn" id="mm-options" data-i18n-title="hud.options.gameMenu" data-i18n-aria="hud.options.gameMenu" title="Game Menu" aria-label="Game Menu" data-icon="menu"><span class="keybind">esc</span></button>
     </div>
@@ -1038,7 +1039,7 @@
 
         <div id="charcreate-panel" class="panel charselect-screen cs-wow" hidden>
           <header class="cs-head">
-            <h2 class="auth-title cs-title" data-i18n="auth.createCharacter">Create a Character</h2>
+            <h2 class="auth-title cs-title"><span data-i18n="auth.createCharacter">Create a Character</span> <span id="glitch-user" class="gold" hidden></span></h2>
           </header>
           <div class="cs-body cs-body-create">
             <div class="cs-create-col">
@@ -1071,7 +1072,16 @@
               </div>
             </div>
             <div class="cs-detail-col">
-              <div class="char-preview-container cs-preview" id="charcreate-preview-container"></div>
+              <div class="char-preview-container cs-preview" id="charcreate-preview-container">
+                <div class="glitch-avatar-loading" data-glitch-avatar-loading role="status" aria-live="polite" hidden>
+                  <span class="glitch-avatar-loading-rune" aria-hidden="true">
+                    <span class="glitch-avatar-loading-ring glitch-avatar-loading-ring-outer"></span>
+                    <span class="glitch-avatar-loading-ring glitch-avatar-loading-ring-inner"></span>
+                    <span class="glitch-avatar-loading-core"></span>
+                  </span>
+                  <span class="glitch-avatar-loading-label" data-i18n="character.loading">Loading...</span>
+                </div>
+              </div>
               <div id="charcreate-class-details" class="class-details-panel" aria-live="polite"></div>
             </div>
           </div>
@@ -1362,6 +1372,19 @@
       </div>
     </div>
 
+    <!-- Glitch single-character re-roll confirmation: changing a persisted Glitch
+         character replaces it, so a leveled character warns before losing progress. -->
+    <div id="glitch-reroll-modal" class="modal-backdrop" hidden>
+      <div class="confirm-modal panel auth-panel-premium" role="dialog" aria-modal="true" aria-labelledby="glitch-reroll-title">
+        <h2 id="glitch-reroll-title" data-i18n="glitchReroll.title">Start over?</h2>
+        <p id="glitch-reroll-body"></p>
+        <div class="confirm-actions">
+          <button type="button" class="btn btn-secondary" id="btn-glitch-reroll-cancel" data-i18n="glitchReroll.cancel">Keep character</button>
+          <button type="button" class="btn btn-danger" id="btn-glitch-reroll-confirm" data-i18n="glitchReroll.confirm">Start over</button>
+        </div>
+      </div>
+    </div>
+
     <footer class="homepage-footer">
       <div class="footer-bar">
       <div class="footer-left">
@@ -1483,6 +1506,7 @@
           <button type="button" class="x-btn" id="mobile-more-close" data-i18n-title="hud.options.returnToGame" data-i18n-aria="hud.options.returnToGame" title="Return to Game" aria-label="Return to Game" data-icon="close"></button>
         </div>
         <div id="mobile-extra-grid">
+          <button type="button" class="mobile-btn" id="mobile-glitch-voice" hidden data-i18n-title="hudChrome.glitchVoice.off" data-i18n-aria="hudChrome.glitchVoice.off" title="Voice Chat Off" aria-label="Voice Chat Off" aria-pressed="false" data-icon="voice"><span class="mobile-label" data-i18n="hudChrome.glitchVoice.off">Voice Chat Off</span></button>
           <button type="button" class="mobile-btn" id="mobile-discord" hidden data-i18n-title="hudChrome.discord.title" data-i18n-aria="hudChrome.discord.title" title="Discord" aria-label="Discord" data-icon="discord"><span class="mobile-label" data-i18n="hudChrome.discord.title">Discord</span></button>
           <button type="button" class="mobile-btn" id="mobile-donate" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft" data-icon="donate"><span class="mobile-label" data-i18n="nav.donate">Donate</span></button>
           <button type="button" class="mobile-btn" id="mobile-emote" data-i18n-title="hudChrome.emoteWheel.label" data-i18n-aria="hudChrome.emoteWheel.label" title="Emotes" aria-label="Emotes" data-icon="emote"><span class="mobile-label" data-i18n="hudChrome.emoteWheel.label">Emotes</span></button>

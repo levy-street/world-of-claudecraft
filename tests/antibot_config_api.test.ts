@@ -146,7 +146,8 @@ describe('GET /admin/api/antibot-config', () => {
     await handleAdminApi(fakeReq(), res, game);
     expect(res.statusCode).toBe(200);
     expect(res.body.data?.updatedAt).toBe('2026-07-04T00:00:00.000Z');
-    expect((res.body.data?.fields as ConfigField[])[0].id).toBe('gate.kick_score');
+    const fields = res.body.data?.fields as ConfigField[] | undefined;
+    expect(fields?.[0]?.id).toBe('gate.kick_score');
   });
 });
 
@@ -173,7 +174,8 @@ describe('POST /admin/api/antibot-config', () => {
       7,
       'Tune after calibration',
     );
-    expect((res.body.data?.fields as ConfigField[])[0].value).toBe(1.5);
+    const fields = res.body.data?.fields as ConfigField[] | undefined;
+    expect(fields?.[0]?.value).toBe(1.5);
     expect(res.body.data?.updatedAt).toBe('2026-07-04T00:00:01.000Z');
   });
 

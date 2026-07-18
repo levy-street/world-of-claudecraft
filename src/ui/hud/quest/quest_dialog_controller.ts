@@ -55,6 +55,18 @@ export interface QuestDialogControllerDeps {
   openDelveBoard(npcId: number): void;
   openValeCup(): void;
   openCardDuel(): void;
+  onTalkInteraction?(event: {
+    kind: 'open' | 'option';
+    npcId: string;
+    npcEntityId?: number;
+    optionKey?: string;
+    questId?: string;
+    questState?: string;
+    questCount?: number;
+    hasVendor?: boolean;
+    hasMarket?: boolean;
+    source?: string;
+  }): void;
   voice: {
     play(key: string): void;
     isPlaying(): boolean;
@@ -88,6 +100,16 @@ export class QuestDialogController {
       return;
     }
     this.openedAt = this.deps.now();
+    const definition = NPCS[npc.templateId];
+    this.deps.onTalkInteraction?.({
+      kind: 'open',
+      npcId: npc.templateId,
+      npcEntityId: npc.id,
+      questCount: npc.questIds.length,
+      hasVendor: npc.vendorItems.length > 0,
+      hasMarket: !!definition?.market,
+      source: 'quest_dialog',
+    });
     this.ensureFocusTrap();
     this.deps.closeTransient();
     this.deps.voice.play(`greeting__${npc.templateId}`);
@@ -296,23 +318,81 @@ export class QuestDialogController {
     }
     this.deps.element.innerHTML = html;
     this.deps.element.querySelectorAll<HTMLElement>('[data-quest]').forEach((item) => {
-      item.addEventListener('click', () => this.renderQuestDetail(npc, item.dataset.quest ?? ''));
+      item.addEventListener('click', () => {
+        const questId = item.dataset.quest ?? '';
+        const questState = this.deps.world().questState(questId);
+        this.deps.onTalkInteraction?.({
+          kind: 'option',
+          npcId: npc.templateId,
+          npcEntityId: npc.id,
+          optionKey: questState === 'ready' ? 'quest_turnin_detail' : 'quest_offer_detail',
+          questId,
+          questState,
+          source: 'quest_dialog',
+        });
+        this.renderQuestDetail(npc, questId);
+      });
     });
     this.deps.element.querySelectorAll<HTMLButtonElement>('[data-discuss]').forEach((item) => {
       item.addEventListener('click', () => {
+        const questId = item.dataset.discuss ?? '';
+        this.deps.onTalkInteraction?.({
+          kind: 'option',
+          npcId: npc.templateId,
+          npcEntityId: npc.id,
+          optionKey: 'quest_discuss',
+          questId,
+          questState: this.deps.world().questState(questId),
+          source: 'quest_dialog',
+        });
         const liveWorld = this.deps.world();
         liveWorld.targetEntity(npc.id);
         liveWorld.interact();
         item.disabled = true;
       });
     });
-    this.bindRoute('[data-vendor]', () => this.deps.openVendor(npc.id));
+    this.bindRoute('[data-vendor]', () => {
+      this.deps.onTalkInteraction?.({
+        kind: 'option',
+        npcId: npc.templateId,
+        npcEntityId: npc.id,
+        optionKey: 'vendor',
+        source: 'quest_dialog',
+      });
+      this.deps.openVendor(npc.id);
+    });
     this.bindRoute('[data-heroic-shop]', () => this.deps.openHeroicVendor(npc.id));
-    this.bindRoute('[data-market]', this.deps.openMarket);
-    this.bindRoute('[data-delve-board]', () => this.deps.openDelveBoard(npc.id));
+    this.bindRoute('[data-market]', () => {
+      this.deps.onTalkInteraction?.({
+        kind: 'option',
+        npcId: npc.templateId,
+        npcEntityId: npc.id,
+        optionKey: 'world_market',
+        source: 'quest_dialog',
+      });
+      this.deps.openMarket();
+    });
+    this.bindRoute('[data-delve-board]', () => {
+      this.deps.onTalkInteraction?.({
+        kind: 'option',
+        npcId: npc.templateId,
+        npcEntityId: npc.id,
+        optionKey: 'delve_board',
+        source: 'quest_dialog',
+      });
+      this.deps.openDelveBoard(npc.id);
+    });
     this.bindRoute('[data-vcup]', this.deps.openValeCup);
     this.bindRoute('[data-card-duel]', this.deps.openCardDuel);
-    this.bindClose();
+    this.bindClose(() => {
+      this.deps.onTalkInteraction?.({
+        kind: 'option',
+        npcId: npc.templateId,
+        npcEntityId: npc.id,
+        optionKey: 'close',
+        source: 'quest_dialog',
+      });
+    });
     this.showAndFocus();
   }
 
@@ -419,6 +499,15 @@ export class QuestDialogController {
         const selection = this.deps.element.querySelector<HTMLSelectElement>(
           '[data-profession-selection]',
         )?.value;
+        this.deps.onTalkInteraction?.({
+          kind: 'option',
+          npcId: npc.templateId,
+          npcEntityId: npc.id,
+          optionKey: 'quest_accept',
+          questId,
+          questState: state,
+          source: 'quest_detail',
+        });
         if (selection === undefined) liveWorld.acceptQuest(questId);
         else liveWorld.acceptQuest(questId, selection);
         liveWorld.reportTelemetry('quest_accept', {
@@ -431,6 +520,15 @@ export class QuestDialogController {
       const button = this.makeButton(t('questUi.dialog.completeQuest'));
       button.addEventListener('click', () => {
         const liveWorld = this.deps.world();
+        this.deps.onTalkInteraction?.({
+          kind: 'option',
+          npcId: npc.templateId,
+          npcEntityId: npc.id,
+          optionKey: 'quest_complete',
+          questId,
+          questState: state,
+          source: 'quest_detail',
+        });
         liveWorld.turnInQuest(questId);
         liveWorld.reportTelemetry('quest_turnin', {
           timeMs: this.deps.now() - this.openedAt,
@@ -440,9 +538,30 @@ export class QuestDialogController {
       this.deps.element.appendChild(button);
     }
     const back = this.makeButton(t('questUi.dialog.back'));
-    back.addEventListener('click', () => this.renderGossip(npc));
+    back.addEventListener('click', () => {
+      this.deps.onTalkInteraction?.({
+        kind: 'option',
+        npcId: npc.templateId,
+        npcEntityId: npc.id,
+        optionKey: 'back',
+        questId,
+        questState: state,
+        source: 'quest_detail',
+      });
+      this.renderGossip(npc);
+    });
     this.deps.element.appendChild(back);
-    this.bindClose();
+    this.bindClose(() => {
+      this.deps.onTalkInteraction?.({
+        kind: 'option',
+        npcId: npc.templateId,
+        npcEntityId: npc.id,
+        optionKey: 'close_detail',
+        questId,
+        questState: state,
+        source: 'quest_detail',
+      });
+    });
     this.showAndFocus();
   }
 
@@ -482,8 +601,11 @@ export class QuestDialogController {
     });
   }
 
-  private bindClose(): void {
-    this.deps.element.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+  private bindClose(onClose?: () => void): void {
+    this.deps.element.querySelector('[data-close]')?.addEventListener('click', () => {
+      onClose?.();
+      this.close();
+    });
   }
 
   private showAndFocus(): void {

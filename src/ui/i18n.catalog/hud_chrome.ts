@@ -13,6 +13,18 @@ export const hudChromeStrings = {
   spectate: {
     banner: 'Spectating {name}',
   },
+  glitchVoice: {
+    off: 'Voice Chat Off',
+    connecting: 'Connecting to Voice Chat',
+    on: 'Voice Chat On',
+    muted: 'Voice Chat Muted',
+    authError: 'Voice chat needs a new Glitch sign-in.',
+    bannedError: 'Voice chat is unavailable for this player.',
+    retryError: 'Voice chat is busy. Try again in a moment.',
+    invalidError: 'Voice chat configuration is invalid.',
+    unavailableError: 'Voice chat is temporarily unavailable.',
+    permissionError: 'Allow microphone access to use voice chat.',
+  },
   // Raid/party ready-check prompt (the leader ran /ready). The buttons answer the
   // yes/no prompt; the outcome is announced in chat by the sim.
   readyCheck: {

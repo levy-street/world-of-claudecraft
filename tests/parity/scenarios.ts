@@ -1667,7 +1667,7 @@ function questKillCredit(): Scenario {
       rec.snapshot('quest-accepted');
       // Slay each Forest Wolf one at a time (only one alive, so frenzyPackmates finds
       // no living packmate), crediting the player on every death.
-      const need = quest.objectives[0].count; // 8
+      const need = quest.objectives[0].count;
       for (let i = 0; i < need; i++) {
         const wolf = spawnMob(sim, 'forest_wolf', 2, p.pos.x + 2, p.pos.y, p.pos.z);
         wolf.tappedById = p.id;

@@ -245,14 +245,17 @@ describe('POST /api/steam/link', () => {
     ['non-hex', 'z'.repeat(80)],
     ['too short', 'a'.repeat(MIN_TICKET_HEX_CHARS - 2)],
     ['too long', 'a'.repeat(MAX_TICKET_HEX_CHARS + 2)],
-  ])('rejects a %s ticket 400 steam.invalid_ticket without an upstream call', async (_name, ticket) => {
-    enableSteam();
-    await expect(handler()(linkCtx({ ticket }))).rejects.toMatchObject({
-      status: 400,
-      code: 'steam.invalid_ticket',
-    });
-    expect(verifyMock).not.toHaveBeenCalled();
-  });
+  ])(
+    'rejects a %s ticket 400 steam.invalid_ticket without an upstream call',
+    async (_name, ticket) => {
+      enableSteam();
+      await expect(handler()(linkCtx({ ticket }))).rejects.toMatchObject({
+        status: 400,
+        code: 'steam.invalid_ticket',
+      });
+      expect(verifyMock).not.toHaveBeenCalled();
+    },
+  );
 
   it('answers 503 steam.upstream when enabled but unprovisioned (no app id / key), before any upstream call', async () => {
     process.env.STEAM_ENABLED = '1';
@@ -349,18 +352,21 @@ describe('POST /api/steam/link', () => {
   it.each([
     ['account_linked' as const, 'steam.already_linked'],
     ['steam_taken' as const, 'steam.account_taken'],
-  ])('maps a displace race arm %s to its 409 (23505 re-classified behind the reclaim)', async (arm, code) => {
-    enableSteam();
-    accountForSteamIdMock.mockResolvedValue(99);
-    displaceMock.mockResolvedValue({ result: arm, displacedAccountId: null });
-    await expect(handler()(linkCtx({ ticket: GOOD_TICKET }))).rejects.toMatchObject({
-      status: 409,
-      code,
-    });
-    // A lost race wrote nothing, so no reconcile and no cache flip.
-    expect(reconcileMock).not.toHaveBeenCalled();
-    expect(onLinkChangedMock).not.toHaveBeenCalled();
-  });
+  ])(
+    'maps a displace race arm %s to its 409 (23505 re-classified behind the reclaim)',
+    async (arm, code) => {
+      enableSteam();
+      accountForSteamIdMock.mockResolvedValue(99);
+      displaceMock.mockResolvedValue({ result: arm, displacedAccountId: null });
+      await expect(handler()(linkCtx({ ticket: GOOD_TICKET }))).rejects.toMatchObject({
+        status: 409,
+        code,
+      });
+      // A lost race wrote nothing, so no reconcile and no cache flip.
+      expect(reconcileMock).not.toHaveBeenCalled();
+      expect(onLinkChangedMock).not.toHaveBeenCalled();
+    },
+  );
 });
 
 // ---------------------------------------------------------------------------

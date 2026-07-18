@@ -66,7 +66,9 @@ describe('mobile More-tray launcher', () => {
     expect(mobileControlsSrc).toContain(
       "this.bindButton('mobile-crafting', () => this.callbacks.onCrafting());",
     );
-    expect(mainSrc).toContain('onCrafting: () => hud.toggleCrafting(),');
+    expect(mainSrc).toContain('onCrafting: () => {');
+    expect(mainSrc).toContain("trackUiSurface('crafting', 'touch');");
+    expect(mainSrc).toContain('hud.toggleCrafting();');
   });
 });
 

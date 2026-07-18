@@ -1798,6 +1798,10 @@
     animation-duration: calc(1.6s * var(--motion-scale, 1));
     animation-play-state: var(--fx-ambient-anim, running);
   }
+  #mm-glitch-voice.active {
+    border-color: var(--gold);
+    color: #fff;
+  }
   @keyframes tal-pulse {
     0%,
     100% {
@@ -4157,7 +4161,7 @@
   }
   /* The quest-progress flash (quest_progress_banner.ts): small yellow lines
      stacked at the top-center, above the zone banner's slot, the classic
-     "Forest Wolf slain: 3/8" cue. Lines are appended by the banner module and
+     "Forest Wolf slain: 2/3" cue. Lines are appended by the banner module and
      fade out on their own timers. */
   #quest-banner {
     position: absolute;

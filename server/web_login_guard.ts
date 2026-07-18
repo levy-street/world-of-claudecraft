@@ -13,6 +13,12 @@ export const DESKTOP_APP_ORIGINS = new Set([
   'http://localhost:5173',
 ]);
 
+export const GLITCH_APP_ORIGINS = new Set([
+  'https://www.glitch.fun',
+  'https://glitch.fun',
+  'https://glitch-game-content.s3.amazonaws.com',
+]);
+
 export function isNativeAppRequest(req: Pick<IncomingMessage, 'headers'>): boolean {
   const origin = req.headers.origin;
   return typeof origin === 'string' && NATIVE_APP_ORIGINS.has(origin);
@@ -32,12 +38,17 @@ export function isDesktopAppRequest(req: Pick<IncomingMessage, 'headers'>): bool
 // so reflecting these specific origins is safe. Returns the origin to reflect,
 // or null when the request must get no CORS headers (same-origin pages and
 // unknown origins).
-export function allowedCorsOrigin(origin: unknown): string | null {
+export function allowedCorsOrigin(
+  origin: unknown,
+  env: NodeJS.ProcessEnv = process.env,
+): string | null {
   if (typeof origin !== 'string') return null;
   if (
     REALM_ORIGINS.has(origin) ||
     NATIVE_APP_ORIGINS.has(origin) ||
-    DESKTOP_APP_ORIGINS.has(origin)
+    DESKTOP_APP_ORIGINS.has(origin) ||
+    GLITCH_APP_ORIGINS.has(origin) ||
+    configuredWebOrigins(env).has(origin)
   ) {
     return origin;
   }
@@ -75,10 +86,8 @@ export function isWebClientRequest(
     ...REALM_ORIGINS,
     ...NATIVE_APP_ORIGINS,
     ...DESKTOP_APP_ORIGINS,
-    ...String(env.WEB_ORIGINS ?? '')
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean),
+    ...GLITCH_APP_ORIGINS,
+    ...configuredWebOrigins(env),
   ]);
   if (allow.has(origin)) return true;
   let host: string;
@@ -94,4 +103,13 @@ export function isWebClientRequest(
   const reqHost = String(req.headers.host ?? '');
   if (host === fwd || host === reqHost) return true;
   return /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(host);
+}
+
+function configuredWebOrigins(env: NodeJS.ProcessEnv = process.env): Set<string> {
+  return new Set(
+    String(env.WEB_ORIGINS ?? '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean),
+  );
 }

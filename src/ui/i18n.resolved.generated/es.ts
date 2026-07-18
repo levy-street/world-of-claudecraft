@@ -306,6 +306,18 @@ export const es: EnTranslations = {
     "spectate": {
       "banner": "Observando a {name}"
     },
+    "glitchVoice": {
+      "off": "Voice Chat Off",
+      "connecting": "Connecting to Voice Chat",
+      "on": "Voice Chat On",
+      "muted": "Voice Chat Muted",
+      "authError": "Voice chat needs a new Glitch sign-in.",
+      "bannedError": "Voice chat is unavailable for this player.",
+      "retryError": "Voice chat is busy. Try again in a moment.",
+      "invalidError": "Voice chat configuration is invalid.",
+      "unavailableError": "Voice chat is temporarily unavailable.",
+      "permissionError": "Allow microphone access to use voice chat."
+    },
     "readyCheck": {
       "prompt": "{name} ha iniciado una comprobación de disponibilidad. ¿Estás listo?",
       "ready": "Listo",
@@ -4106,6 +4118,7 @@ export const es: EnTranslations = {
     "haveAccountPrompt": "¿Ya tienes una cuenta?",
     "characters": "Personajes:",
     "createCharacter": "Crear Personaje",
+    "currentCharacter": "Your Current Character",
     "characterName": "Nombre del Personaje",
     "characterNamePlaceholder": "Nombre del personaje",
     "enterWorld": "Entrar al Mundo",
@@ -5108,6 +5121,11 @@ export const es: EnTranslations = {
     "confirmLabel": "Escribe el nombre del personaje para confirmar",
     "cancel": "Cancelar",
     "confirm": "Eliminar permanentemente"
+  },
+  "glitchReroll": {
+    "title": "Start Over?",
+    "cancel": "Keep Character",
+    "confirm": "Start Over"
   },
   "classDetails": {
     "sections": {

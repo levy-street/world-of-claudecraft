@@ -2,7 +2,7 @@
 // extracted from the Sim monolith in session Q1. The trio mutates the live
 // PlayerMeta.questLog in place (immutability waiver) and draws no rng; here we drive
 // each function against a minimal fake SimContext (capturing emitted events + a
-// controllable countItem) and real QUESTS content (q_wolves kill-8, q_boars collect-5).
+// controllable countItem) and real QUESTS content (q_wolves kill-3, q_boars collect-5).
 
 import { describe, expect, it } from 'vitest';
 import { QUESTS } from '../src/sim/data';
@@ -50,7 +50,7 @@ describe('quest_credit: onMobKilledForQuests (kill credit)', () => {
   it('increments per matching kill, emits questProgress, and promotes to ready at the target', () => {
     const ctx = makeCtx();
     const meta = makeMeta();
-    const quest = QUESTS.q_wolves; // kill 8 forest_wolf
+    const quest = QUESTS.q_wolves; // kill 3 forest_wolf
     const need = quest.objectives[0].count;
     const qp: QuestProgress = { questId: 'q_wolves', counts: [0], state: 'active' };
     meta.questLog.set('q_wolves', qp);

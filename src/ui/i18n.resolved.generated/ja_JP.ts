@@ -306,6 +306,18 @@ export const ja_JP: EnTranslations = {
     "spectate": {
       "banner": "{name}を観戦中"
     },
+    "glitchVoice": {
+      "off": "ボイスチャット：オフ",
+      "connecting": "ボイスチャットに接続中",
+      "on": "ボイスチャット：オン",
+      "muted": "ボイスチャット：ミュート",
+      "authError": "ボイスチャットには Glitch への再ログインが必要です。",
+      "bannedError": "このプレイヤーはボイスチャットを利用できません。",
+      "retryError": "ボイスチャットが混み合っています。しばらくしてからもう一度お試しください。",
+      "invalidError": "ボイスチャットの設定が無効です。",
+      "unavailableError": "ボイスチャットは一時的に利用できません。",
+      "permissionError": "ボイスチャットを使用するにはマイクへのアクセスを許可してください。"
+    },
     "readyCheck": {
       "prompt": "{name} が準備確認を開始しました。準備はいいですか？",
       "ready": "準備完了",
@@ -4106,6 +4118,7 @@ export const ja_JP: EnTranslations = {
     "haveAccountPrompt": "アカウントをお持ちですか？",
     "characters": "キャラクター数：",
     "createCharacter": "キャラクター作成",
+    "currentCharacter": "現在のキャラクター",
     "characterName": "キャラクター名",
     "characterNamePlaceholder": "キャラクター名",
     "enterWorld": "世界に入る",
@@ -5108,6 +5121,11 @@ export const ja_JP: EnTranslations = {
     "confirmLabel": "確認のためキャラクター名を入力",
     "cancel": "キャンセル",
     "confirm": "完全に削除"
+  },
+  "glitchReroll": {
+    "title": "最初からやり直しますか？",
+    "cancel": "キャラクターを維持",
+    "confirm": "最初からやり直す"
   },
   "classDetails": {
     "sections": {

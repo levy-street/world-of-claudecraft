@@ -1612,7 +1612,7 @@ describe('client-side delta merge', () => {
       expect(sent).toContainEqual({ t: 'cmd', cmd: 'accept', quest: 'q_wolves' });
 
       (client as any).pendingQuestCommands.clear();
-      client.questLog.set('q_wolves', { questId: 'q_wolves', counts: [8], state: 'ready' });
+      client.questLog.set('q_wolves', { questId: 'q_wolves', counts: [3], state: 'ready' });
       client.turnInQuest('q_wolves');
       expect(client.questLog.has('q_wolves')).toBe(true);
       expect(client.questsDone.has('q_wolves')).toBe(false);

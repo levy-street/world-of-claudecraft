@@ -306,6 +306,18 @@ export const ru_RU: EnTranslations = {
     "spectate": {
       "banner": "Наблюдение за {name}"
     },
+    "glitchVoice": {
+      "off": "Голосовой чат выключен",
+      "connecting": "Подключение к голосовому чату",
+      "on": "Голосовой чат включён",
+      "muted": "Микрофон в голосовом чате выключен",
+      "authError": "Для голосового чата нужно снова войти в Glitch.",
+      "bannedError": "Голосовой чат недоступен этому игроку.",
+      "retryError": "Голосовой чат занят. Повторите попытку позже.",
+      "invalidError": "Настройки голосового чата недействительны.",
+      "unavailableError": "Голосовой чат временно недоступен.",
+      "permissionError": "Разрешите доступ к микрофону для голосового чата."
+    },
     "readyCheck": {
       "prompt": "{name} начал проверку готовности. Вы готовы?",
       "ready": "Готов",
@@ -4106,6 +4118,7 @@ export const ru_RU: EnTranslations = {
     "haveAccountPrompt": "Уже есть аккаунт?",
     "characters": "Персонажи:",
     "createCharacter": "Создать персонажа",
+    "currentCharacter": "Текущий персонаж",
     "characterName": "Имя персонажа",
     "characterNamePlaceholder": "Имя персонажа",
     "enterWorld": "Войти в мир",
@@ -5108,6 +5121,11 @@ export const ru_RU: EnTranslations = {
     "confirmLabel": "Введите имя персонажа для подтверждения",
     "cancel": "Отмена",
     "confirm": "Удалить навсегда"
+  },
+  "glitchReroll": {
+    "title": "Начать заново?",
+    "cancel": "Оставить персонажа",
+    "confirm": "Начать заново"
   },
   "classDetails": {
     "sections": {

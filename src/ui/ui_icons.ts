@@ -50,6 +50,7 @@ export type UiIconName =
   | 'more'
   | 'meters'
   | 'whisper'
+  | 'voice'
   | 'music'
   | 'talents'
   | 'skull'
@@ -147,6 +148,8 @@ const ICONS: Record<UiIconName, string> = {
   nameplates: '<path d="M88 132h336v68H88zM88 220h336v56H88zM236 296h40l-20 34z"/>',
   whisper:
     '<path fill-rule="evenodd" d="M48 112h416a16 16 0 0 1 16 16v256a16 16 0 0 1-16 16H48a16 16 0 0 1-16-16V128a16 16 0 0 1 16-16zM72 152 256 292 440 152z"/>',
+  voice:
+    '<path d="M256 48a72 72 0 0 0-72 72v136a72 72 0 0 0 144 0V120a72 72 0 0 0-72-72zM128 232h40v24a88 88 0 0 0 176 0v-24h40v24c0 64-47 117-108 126v42h68v40H168v-40h68v-42c-61-9-108-62-108-126v-24z"/>',
   music:
     '<path d="M158 374a54 54 0 1 0 108 0 54 54 0 1 0-108 0M260 128h22v246h-22zM282 122c46 16 70 58 46 98 12-32-6-62-46-74z"/>',
   talents:

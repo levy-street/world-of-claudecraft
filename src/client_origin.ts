@@ -2,10 +2,17 @@
 // independent of the online world client so presentation modules can use the
 // configured Capacitor production origin without importing net/.
 
-import { isDesktopAppRuntime, normalizeOrigin, runtimeApiOrigin } from './runtime';
+import {
+  isDesktopAppRuntime,
+  normalizeGameApiOrigin,
+  normalizeOrigin,
+  runtimeApiOrigin,
+} from './runtime';
 
 export const NATIVE_APP = String(import.meta.env.VITE_NATIVE_APP ?? '') === '1';
-export const NATIVE_API_ORIGIN = normalizeOrigin(String(import.meta.env.VITE_API_ORIGIN ?? ''));
+export const NATIVE_API_ORIGIN = normalizeGameApiOrigin(
+  String(import.meta.env.VITE_API_ORIGIN ?? ''),
+);
 export const DESKTOP_APP = isDesktopAppRuntime();
 export const DESKTOP_API_ORIGIN = DESKTOP_APP ? runtimeApiOrigin() : '';
 

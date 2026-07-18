@@ -306,6 +306,18 @@ export const cs_CZ: EnTranslations = {
     "spectate": {
       "banner": "Sleduješ {name}"
     },
+    "glitchVoice": {
+      "off": "Voice Chat Off",
+      "connecting": "Connecting to Voice Chat",
+      "on": "Voice Chat On",
+      "muted": "Voice Chat Muted",
+      "authError": "Voice chat needs a new Glitch sign-in.",
+      "bannedError": "Voice chat is unavailable for this player.",
+      "retryError": "Voice chat is busy. Try again in a moment.",
+      "invalidError": "Voice chat configuration is invalid.",
+      "unavailableError": "Voice chat is temporarily unavailable.",
+      "permissionError": "Allow microphone access to use voice chat."
+    },
     "readyCheck": {
       "prompt": "Hráč {name} zahájil kontrolu připravenosti. Jsi připraven(a)?",
       "ready": "Připraven(a)",
@@ -4106,6 +4118,7 @@ export const cs_CZ: EnTranslations = {
     "haveAccountPrompt": "Už máš účet?",
     "characters": "Postavy:",
     "createCharacter": "Vytvořit postavu",
+    "currentCharacter": "Your Current Character",
     "characterName": "Jméno postavy",
     "characterNamePlaceholder": "Jméno postavy",
     "enterWorld": "Vstoupit do světa",
@@ -5108,6 +5121,11 @@ export const cs_CZ: EnTranslations = {
     "confirmLabel": "Pro potvrzení napiš jméno postavy",
     "cancel": "Zrušit",
     "confirm": "Trvale smazat"
+  },
+  "glitchReroll": {
+    "title": "Start Over?",
+    "cancel": "Keep Character",
+    "confirm": "Start Over"
   },
   "classDetails": {
     "sections": {

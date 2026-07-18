@@ -1499,14 +1499,14 @@ describe('leveling', () => {
 });
 
 describe('quests', () => {
-  it('full wolf quest flow: accept, kill 8, turn in', () => {
+  it('full wolf quest flow: accept, kill 3, turn in', () => {
     const sim = makeSim('warrior');
     teleportTo(sim, 4, 4);
     sim.interact();
     expect(sim.questState('q_wolves')).toBe('active');
     const wolves = [...sim.entities.values()].filter((e) => e.templateId === 'forest_wolf');
-    expect(wolves.length).toBeGreaterThanOrEqual(8);
-    for (let k = 0; k < 8; k++) {
+    expect(wolves.length).toBeGreaterThanOrEqual(3);
+    for (let k = 0; k < 3; k++) {
       const wolf = wolves[k];
       wolf.hp = 1;
       teleportTo(sim, wolf.pos.x + 2, wolf.pos.z);
@@ -1548,7 +1548,7 @@ describe('quests', () => {
     expect(sim.events).toContainEqual({ type: 'error', text: 'Too far away.', pid: sim.player.id });
 
     sim.events = [];
-    sim.questLog.set('q_wolves', { questId: 'q_wolves', counts: [8], state: 'ready' });
+    sim.questLog.set('q_wolves', { questId: 'q_wolves', counts: [3], state: 'ready' });
     sim.turnInQuest('q_wolves');
     expect(sim.questState('q_wolves')).toBe('ready');
     expect(sim.events).toContainEqual({ type: 'error', text: 'Too far away.', pid: sim.player.id });
@@ -1610,7 +1610,7 @@ describe('quests', () => {
     teleportTo(sim, 4, 4);
     sim.interact();
     const qp = sim.questLog.get('q_wolves')!;
-    qp.counts[0] = 8;
+    qp.counts[0] = 3;
     (sim as any).ctx.checkQuestReady(qp, (sim as any).primary);
     sim.interact(); // turn in wolves
     // accept bandits specifically

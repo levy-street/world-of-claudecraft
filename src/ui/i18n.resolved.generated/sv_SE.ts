@@ -306,6 +306,18 @@ export const sv_SE: EnTranslations = {
     "spectate": {
       "banner": "Åskådar {name}"
     },
+    "glitchVoice": {
+      "off": "Voice Chat Off",
+      "connecting": "Connecting to Voice Chat",
+      "on": "Voice Chat On",
+      "muted": "Voice Chat Muted",
+      "authError": "Voice chat needs a new Glitch sign-in.",
+      "bannedError": "Voice chat is unavailable for this player.",
+      "retryError": "Voice chat is busy. Try again in a moment.",
+      "invalidError": "Voice chat configuration is invalid.",
+      "unavailableError": "Voice chat is temporarily unavailable.",
+      "permissionError": "Allow microphone access to use voice chat."
+    },
     "readyCheck": {
       "prompt": "{name} har startat en beredskapskontroll. Är du redo?",
       "ready": "Redo",
@@ -4106,6 +4118,7 @@ export const sv_SE: EnTranslations = {
     "haveAccountPrompt": "Har du redan ett konto?",
     "characters": "Karaktärer:",
     "createCharacter": "Skapa karaktär",
+    "currentCharacter": "Your Current Character",
     "characterName": "Karaktärsnamn",
     "characterNamePlaceholder": "Karaktärsnamn",
     "enterWorld": "Träd in i världen",
@@ -5108,6 +5121,11 @@ export const sv_SE: EnTranslations = {
     "confirmLabel": "Skriv karaktärens namn för att bekräfta",
     "cancel": "Avbryt",
     "confirm": "Radera permanent"
+  },
+  "glitchReroll": {
+    "title": "Start Over?",
+    "cancel": "Keep Character",
+    "confirm": "Start Over"
   },
   "classDetails": {
     "sections": {

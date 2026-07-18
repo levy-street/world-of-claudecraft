@@ -306,6 +306,18 @@ export const en_XA: EnTranslations = {
     "spectate": {
       "banner": "[Šþéçţáţíñĝ {name}]"
     },
+    "glitchVoice": {
+      "off": "[Ʋóíçé Çĥáţ Óƒƒ]",
+      "connecting": "[Çóññéçţíñĝ ţó Ʋóíçé Çĥáţ]",
+      "on": "[Ʋóíçé Çĥáţ Óñ]",
+      "muted": "[Ʋóíçé Çĥáţ Ɱúţéð]",
+      "authError": "[Ʋóíçé çĥáţ ñééðš á ñéŵ Ĝļíţçĥ šíĝñ-íñ.]",
+      "bannedError": "[Ʋóíçé çĥáţ íš úñáʋáíļáƀļé ƒóŕ ţĥíš þļáýéŕ.]",
+      "retryError": "[Ʋóíçé çĥáţ íš ƀúšý. Ţŕý áĝáíñ íñ á ɱóɱéñţ.]",
+      "invalidError": "[Ʋóíçé çĥáţ çóñƒíĝúŕáţíóñ íš íñʋáļíð.]",
+      "unavailableError": "[Ʋóíçé çĥáţ íš ţéɱþóŕáŕíļý úñáʋáíļáƀļé.]",
+      "permissionError": "[Áļļóŵ ɱíçŕóþĥóñé áççéšš ţó úšé ʋóíçé çĥáţ.]"
+    },
     "readyCheck": {
       "prompt": "[{name} ĥáš šţáŕţéð á ŕéáðý çĥéçķ. Áŕé ýóú ŕéáðý?]",
       "ready": "[Ŕéáðý]",
@@ -4105,7 +4117,8 @@ export const en_XA: EnTranslations = {
     "noAccountPrompt": "[Ñéŵ ţó ţĥé ŵóŕļð?]",
     "haveAccountPrompt": "[Áļŕéáðý ĥáʋé áñ áççóúñţ?]",
     "characters": "[Çĥáŕáçţéŕš:]",
-    "createCharacter": "[Çŕéáţé Çĥáŕáçţéŕ]",
+    "createCharacter": "[Çŕéáţé Á Çĥáŕáçţéŕ]",
+    "currentCharacter": "[Ýóúŕ Çúŕŕéñţ Çĥáŕáçţéŕ]",
     "characterName": "[Çĥáŕáçţéŕ Ñáɱé]",
     "characterNamePlaceholder": "[Çĥáŕáçţéŕ ñáɱé]",
     "enterWorld": "[Éñţéŕ Ŵóŕļð]",
@@ -5108,6 +5121,11 @@ export const en_XA: EnTranslations = {
     "confirmLabel": "[Ţýþé ţĥé çĥáŕáçţéŕ ñáɱé ţó çóñƒíŕɱ]",
     "cancel": "[Çáñçéļ]",
     "confirm": "[Ðéļéţé Þéŕɱáñéñţļý]"
+  },
+  "glitchReroll": {
+    "title": "[Šţáŕţ Óʋéŕ?]",
+    "cancel": "[Ķééþ Çĥáŕáçţéŕ]",
+    "confirm": "[Šţáŕţ Óʋéŕ]"
   },
   "classDetails": {
     "sections": {
@@ -9414,7 +9432,7 @@ export const en_XA: EnTranslations = {
       },
       "q_wolves": {
         "title": "[Ŵóļʋéš áţ ţĥé Ðóóŕ]",
-        "text": "[Ţĥé ƒóŕéšţ ŵóļʋéš ĝŕóŵ ƀóļð, šñáþþíñĝ áţ ţŕáʋéļéŕš óñ ţĥé ñóŕţĥ ŕóáð. Ţĥíñ ţĥéíŕ ñúɱƀéŕš, {playerName}. Šļáý 8 Ƒóŕéšţ Ŵóļʋéš áñð Éášţƀŕóóķ ŵíļļ ƀŕéáţĥé éášíéŕ.]",
+        "text": "[Ţĥé ƒóŕéšţ ŵóļʋéš ĝŕóŵ ƀóļð, šñáþþíñĝ áţ ţŕáʋéļéŕš óñ ţĥé ñóŕţĥ ŕóáð. Ţĥíñ ţĥéíŕ ñúɱƀéŕš, {playerName}. Šļáý 3 Ƒóŕéšţ Ŵóļʋéš áñð Éášţƀŕóóķ ŵíļļ ƀŕéáţĥé éášíéŕ.]",
         "completion": "[Ƒíñé ŵóŕķ. Ţĥé ŕóáð ƒééļš šáƒéŕ áļŕéáðý.]",
         "objectives": {
           "0": {

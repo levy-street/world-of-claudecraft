@@ -404,6 +404,17 @@ CREATE INDEX IF NOT EXISTS accounts_created_user_agent_created ON accounts(creat
 CREATE INDEX IF NOT EXISTS accounts_last_login_ip_login ON accounts(last_login_ip, last_login DESC);
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS is_gm BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS force_rename BOOLEAN NOT NULL DEFAULT FALSE;
+CREATE TABLE IF NOT EXISTS glitch_accounts (
+  title_id TEXT NOT NULL,
+  install_id TEXT NOT NULL,
+  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  glitch_user_name TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (title_id, install_id),
+  UNIQUE (account_id)
+);
+CREATE INDEX IF NOT EXISTS glitch_accounts_account ON glitch_accounts(account_id);
 CREATE TABLE IF NOT EXISTS play_sessions (
   id SERIAL PRIMARY KEY,
   account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
@@ -466,6 +477,11 @@ CREATE TABLE IF NOT EXISTS site_presence_sessions (
   ip_hash TEXT NOT NULL DEFAULT '',
   user_agent_hash TEXT NOT NULL DEFAULT ''
 );
+ALTER TABLE site_presence_sessions ADD COLUMN IF NOT EXISTS page TEXT NOT NULL DEFAULT 'unknown';
+ALTER TABLE site_presence_sessions ADD COLUMN IF NOT EXISTS first_seen_at TIMESTAMPTZ NOT NULL DEFAULT now();
+ALTER TABLE site_presence_sessions ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now();
+ALTER TABLE site_presence_sessions ADD COLUMN IF NOT EXISTS ip_hash TEXT NOT NULL DEFAULT '';
+ALTER TABLE site_presence_sessions ADD COLUMN IF NOT EXISTS user_agent_hash TEXT NOT NULL DEFAULT '';
 CREATE INDEX IF NOT EXISTS site_presence_sessions_last_seen
   ON site_presence_sessions(last_seen_at DESC);
 CREATE TABLE IF NOT EXISTS admin_site_presence_samples (
@@ -473,6 +489,8 @@ CREATE TABLE IF NOT EXISTS admin_site_presence_samples (
   sampled_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   active_visitors INT NOT NULL
 );
+ALTER TABLE admin_site_presence_samples ADD COLUMN IF NOT EXISTS sampled_at TIMESTAMPTZ NOT NULL DEFAULT now();
+ALTER TABLE admin_site_presence_samples ADD COLUMN IF NOT EXISTS active_visitors INT NOT NULL DEFAULT 0;
 CREATE INDEX IF NOT EXISTS admin_site_presence_samples_sampled
   ON admin_site_presence_samples(sampled_at DESC);
 CREATE TABLE IF NOT EXISTS chat_logs (
@@ -1424,6 +1442,55 @@ export async function touchLogin(accountId: number, meta: RequestMetadata = {}):
      WHERE id = $1`,
     [accountId, cleanMetadataText(meta.ip, 128), cleanMetadataText(meta.userAgent, 512)],
   );
+}
+
+export interface GlitchAccountLinkRow {
+  title_id: string;
+  install_id: string;
+  account_id: number;
+  glitch_user_name: string | null;
+}
+
+export async function glitchAccountForInstall(
+  titleId: string,
+  installId: string,
+): Promise<GlitchAccountLinkRow | null> {
+  const res = await pool.query(
+    `SELECT title_id, install_id, account_id, glitch_user_name
+       FROM glitch_accounts
+      WHERE title_id = $1 AND install_id = $2`,
+    [titleId, installId],
+  );
+  return res.rows[0] ?? null;
+}
+
+export async function glitchAccountForAccount(
+  accountId: number,
+): Promise<GlitchAccountLinkRow | null> {
+  const res = await pool.query(
+    `SELECT title_id, install_id, account_id, glitch_user_name
+       FROM glitch_accounts
+      WHERE account_id = $1`,
+    [accountId],
+  );
+  return res.rows[0] ?? null;
+}
+
+export async function linkGlitchAccount(
+  titleId: string,
+  installId: string,
+  accountId: number,
+  glitchUserName: string,
+): Promise<GlitchAccountLinkRow> {
+  const res = await pool.query(
+    `INSERT INTO glitch_accounts (title_id, install_id, account_id, glitch_user_name)
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT (title_id, install_id)
+     DO UPDATE SET glitch_user_name = EXCLUDED.glitch_user_name, updated_at = now()
+     RETURNING title_id, install_id, account_id, glitch_user_name`,
+    [titleId, installId, accountId, glitchUserName],
+  );
+  return res.rows[0];
 }
 
 // A bearer token's authority. 'full' is a normal web session; 'read' is a
@@ -2618,6 +2685,43 @@ export async function deleteCharacter(accountId: number, characterId: number): P
     [characterId, accountId, REALM],
   );
   return (res.rowCount ?? 0) > 0;
+}
+
+export async function rerollCharacter(
+  accountId: number,
+  characterId: number,
+  cls: PlayerClass,
+  state: CharacterState,
+): Promise<CharacterRow | null> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const existing = await client.query(
+      'SELECT name FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3 FOR UPDATE',
+      [characterId, accountId, REALM],
+    );
+    const name = existing.rows[0]?.name;
+    if (typeof name !== 'string') {
+      await client.query('ROLLBACK');
+      return null;
+    }
+    await client.query('DELETE FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3', [
+      characterId,
+      accountId,
+      REALM,
+    ]);
+    const created = await client.query(
+      'INSERT INTO characters (account_id, name, class, realm, state) VALUES ($1, $2, $3, $4, $5) RETURNING id, account_id, name, class, level, state, is_gm, force_rename',
+      [accountId, name, cls, REALM, JSON.stringify(state)],
+    );
+    await client.query('COMMIT');
+    return created.rows[0] ?? null;
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 // How many characters this account has on each realm, deliberately NOT

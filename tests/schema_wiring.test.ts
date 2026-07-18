@@ -57,7 +57,7 @@ vi.mock('pg', () => ({
   }),
 }));
 
-import { closeMarketWriteGateForTests, ensureSchema, saveMarketState } from '../server/db';
+import { closeMarketWriteGateForTests, ensureSchema, SCHEMA, saveMarketState } from '../server/db';
 import { RATELIMIT_PRUNE_SQL } from '../server/ratelimit_db';
 import type { MarketSave } from '../src/sim/sim';
 
@@ -147,6 +147,24 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS accounts');
     // password_set is the column the unlink guard reads; it must be added at boot.
     expect(applied).toContain('password_set');
+  });
+
+  it('migrates existing site-presence tables instead of relying on create-table only', async () => {
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS site_presence_sessions');
+    expect(applied).toContain(
+      'ALTER TABLE site_presence_sessions ADD COLUMN IF NOT EXISTS ip_hash',
+    );
+    expect(applied).toContain(
+      'ALTER TABLE site_presence_sessions ADD COLUMN IF NOT EXISTS user_agent_hash',
+    );
+    expect(applied).toContain(
+      'ALTER TABLE admin_site_presence_samples ADD COLUMN IF NOT EXISTS active_visitors',
+    );
+    expect(SCHEMA.indexOf('CREATE TABLE IF NOT EXISTS site_presence_sessions')).toBeLessThan(
+      SCHEMA.indexOf('ALTER TABLE site_presence_sessions ADD COLUMN IF NOT EXISTS ip_hash'),
+    );
   });
 
   it('disables the statement timeout for the boot transaction before the advisory lock', async () => {

@@ -31,6 +31,17 @@ import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
+import {
+  bootstrapGlitchSession,
+  type GlitchSession,
+  parseGlitchLaunchInstallId,
+  readGlitchConfig,
+  readGlitchDefaultClass,
+  sendGlitchBehaviorEvent,
+  startGlitchInstallHeartbeat,
+} from './game/glitch';
+import { GlitchBehaviorTracker } from './game/glitch_events';
+import { bindGlitchVoiceChat, type GlitchVoiceControl } from './game/glitch_voice';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import { stopAutorunForInteraction } from './game/interaction_autorun';
@@ -98,6 +109,13 @@ import { EconomyClient, newIdempotencyKey, startClaudiumPurchase } from './net/e
 // controller below, so it stays out of the main entry chunk and only loads when
 // the feature is enabled + used.
 import {
+  GLITCH_CHAR_ACTION,
+  GLITCH_CHAR_STEP_KEY,
+  type GlitchCharselectAction,
+  type GlitchChosenCharacter,
+  glitchCharselectAction,
+} from './net/glitch_charselect';
+import {
   isAppleAuthorizationCancellation,
   isNativeIos,
   signInWithNativeApple,
@@ -144,6 +162,7 @@ import { Renderer } from './render/renderer';
 import type { SelfMotionFrame } from './render/self_motion';
 import { navigatorSaveData } from './render/sky';
 import { desktopBridge } from './runtime';
+import { publicAssetUrl } from './runtime_assets';
 import { pathCrossesFence } from './sim/colliders';
 import { isStunned } from './sim/combat/cc';
 import { ABILITIES, CLASSES } from './sim/content/classes';
@@ -207,6 +226,7 @@ import {
 import { renderDiscordWidget } from './ui/discord_widget';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
+import { syncGlitchAvatarLoading } from './ui/glitch_avatar_loading';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { chatInputSize } from './ui/hud/chat/chat_input_autosize';
 import { wireSkinPicker } from './ui/hud/cosmetics/skin_picker';
@@ -265,6 +285,7 @@ import {
 } from './ui/wallet_balance';
 import { buildWalletConnectionView } from './ui/wallet_connection_view';
 import { mountWelcomeStage } from './ui/welcome_screen_stage';
+import { shouldUseWelcomeScreen } from './ui/welcome_screen_view';
 import {
   mountWelcomeScreen,
   takeArmoryOpenIntent,
@@ -502,6 +523,17 @@ declare const __APP_VERSION__: string;
 declare const __APP_BUILD_ID__: string;
 declare const __APP_BUILD_DATE__: string;
 
+const GLITCH_CONFIG = readGlitchConfig(import.meta.env, __APP_VERSION__);
+let activeGlitchVoice: GlitchVoiceControl | null = null;
+
+function stopActiveGlitchVoice(): void {
+  activeGlitchVoice?.stop();
+  activeGlitchVoice = null;
+}
+
+function leaveActiveGlitchVoice(keepalive = false): void {
+  activeGlitchVoice?.leave(keepalive);
+}
 function syncBuildInfo(): void {
   const el = document.getElementById('game-version');
   if (!el) return;
@@ -905,6 +937,8 @@ async function startGame(
   online: ClientWorld | null,
   keybindScope: string,
   playIntro = false,
+  glitchBehavior: GlitchBehaviorTracker | null = null,
+  glitchSession: GlitchSession | null = null,
 ): Promise<void> {
   // Model/texture/HDRI fetches were kicked off at module import; the renderer
   // builds its scene synchronously, so everything must be resolved first.
@@ -1028,8 +1062,44 @@ async function startGame(
       dailyRewardsEnabled: !NATIVE_APP,
       devCommandsEnabled: import.meta.env.DEV,
     });
+    if (glitchBehavior) {
+      hud.attachBehavior({
+        onTalkInteraction: (event) => glitchBehavior.trackTalkInteraction(event, world),
+        onMerchantInteraction: (event) => glitchBehavior.trackMerchantInteraction(event, world),
+        onEmote: (emoteId) => glitchBehavior.trackEmote(emoteId, world),
+      });
+    }
     perf.setHud(hud);
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
+    stopActiveGlitchVoice();
+    if (glitchSession) {
+      const buttons = ['mm-glitch-voice', 'mobile-glitch-voice']
+        .map((id) => document.getElementById(id))
+        .filter((button): button is HTMLButtonElement => button instanceof HTMLButtonElement);
+      activeGlitchVoice = bindGlitchVoiceChat({
+        session: glitchSession,
+        displayName: world.player.name,
+        buttons,
+        getScope: () => ({
+          realm: api.realm || 'offline',
+          x: world.player.pos.x,
+          z: world.player.pos.z,
+        }),
+        labels: {
+          off: 'hudChrome.glitchVoice.off',
+          connecting: 'hudChrome.glitchVoice.connecting',
+          on: 'hudChrome.glitchVoice.on',
+          muted: 'hudChrome.glitchVoice.muted',
+          authError: 'hudChrome.glitchVoice.authError',
+          bannedError: 'hudChrome.glitchVoice.bannedError',
+          retryError: 'hudChrome.glitchVoice.retryError',
+          invalidError: 'hudChrome.glitchVoice.invalidError',
+          unavailableError: 'hudChrome.glitchVoice.unavailableError',
+          permissionError: 'hudChrome.glitchVoice.permissionError',
+        },
+      });
+    }
+    glitchBehavior?.track('world_load', 'renderer_ready');
   } catch (err) {
     // e.g. WebGL context creation failure: surface it instead of leaving the
     // loading screen up forever
@@ -1116,6 +1186,18 @@ async function startGame(
     hud.clearPendingChatLinks();
     recoverFromMobileKeyboard();
   };
+  function openChat(method = 'unknown'): void {
+    glitchBehavior?.trackUiSurface('chat', method, world);
+    ensureMobileComposerInPanel();
+    hud.applyChatInputPresentation();
+    chatInput.style.display = 'block';
+    anchorChatInput();
+    autosizeChatInput();
+    chatInput.focus();
+  }
+  function trackUiSurface(surface: string, method: string): void {
+    glitchBehavior?.trackUiSurface(surface, method, world);
+  }
   // On the touch HUD the composer is a desktop-style bar at the TOP of the chat panel
   // (above the tabs + log), so on mobile it lives INSIDE #chatlog-wrap as its first child
   // rather than as an absolutely-positioned sibling. Move it there once, lazily, the first
@@ -1126,16 +1208,6 @@ async function startGame(
     if (!wrap || chatInput.parentElement === wrap) return;
     wrap.insertBefore(chatInput, wrap.firstChild);
   };
-  function openChat(): void {
-    // reflect the active/sticky send channel in the placeholder (e.g. "Message World")
-    // and tint the input text to that channel's color
-    ensureMobileComposerInPanel();
-    hud.applyChatInputPresentation();
-    chatInput.style.display = 'block';
-    anchorChatInput();
-    autosizeChatInput();
-    chatInput.focus();
-  }
   // Mobile read view: tapping the Chat button opens the centered panel with the composer
   // bar VISIBLE but NOT focused (no keyboard). Tapping the composer focuses it and raises
   // the keyboard (native + the focus handler). Same as openChat minus the focus.
@@ -1195,6 +1267,13 @@ async function startGame(
       } else if (!hud.maybeHandleQuestShareCommand(raw)) {
         const text = hud.composeChatSend(raw);
         if (text) {
+          glitchBehavior?.trackChat(
+            raw.trim().startsWith('/') ? 'send_command' : 'send_message',
+            {
+              length_bucket: Math.ceil(text.length / 20) * 20,
+            },
+            world,
+          );
           world.chat(text);
           // Remember the channel this line reached so the next open (on the All
           // tab) defaults there and tints the input to its color. Pass the host so a
@@ -1247,47 +1326,64 @@ async function startGame(
       },
       // slot 0 (key 1) is Attack for every class, auto-attack without needing
       // right-click; keys and clicks share the Hud's remappable slot layout
-      onAbility: (slot) => hud.castSlot(slot),
+      onAbility: (slot) => {
+        glitchBehavior?.trackOnce('first_ability', 'combat', 'first_ability', { slot });
+        hud.castSlot(slot);
+      },
       onAbilityDown: (slot) => hud.pressSlot(slot),
       onAbilityUp: (slot) => hud.releaseSlot(slot),
-      onInputIntent: (kind) => perf.markInputIntent(kind),
+      onInputIntent: (kind) => {
+        perf.markInputIntent(kind);
+        glitchBehavior?.trackFirstInput(kind, world);
+      },
       onUiKey: (key) => {
         if (key !== 'escape') hud.cancelGroundAim();
         switch (key) {
           case 'interact':
+            trackUiSurface('interact', 'keyboard');
             interactKey();
             break;
           case 'bags':
+            trackUiSurface('bags', 'keyboard');
             hud.toggleBags();
             break;
           case 'crafting':
             hud.toggleCrafting();
             break;
           case 'char':
+            trackUiSurface('character', 'keyboard');
             hud.toggleChar();
             break;
           case 'spellbook':
+            trackUiSurface('spellbook', 'keyboard');
             hud.toggleSpellbook();
             break;
           case 'questlog':
+            trackUiSurface('questlog', 'keyboard');
             hud.toggleQuestLog();
             break;
           case 'map':
+            trackUiSurface('map', 'keyboard');
             hud.toggleMap();
             break;
           case 'nameplates':
+            trackUiSurface('nameplates', 'keyboard');
             renderer.showNameplates = !renderer.showNameplates;
             break;
           case 'talents':
+            trackUiSurface('talents', 'keyboard');
             hud.toggleTalents();
             break;
           case 'meters':
+            trackUiSurface('meters', 'keyboard');
             hud.toggleMeters();
             break;
           case 'social':
+            trackUiSurface('social', 'keyboard');
             hud.toggleSocial();
             break;
           case 'arena':
+            trackUiSurface('arena', 'keyboard');
             hud.toggleArena();
             break;
           case 'dungeonFinder':
@@ -1297,12 +1393,15 @@ async function startGame(
             hud.toggleValeCup();
             break;
           case 'leaderboard':
+            trackUiSurface('leaderboard', 'keyboard');
             hud.toggleLeaderboard();
             break;
           case 'calendar':
+            trackUiSurface('calendar', 'keyboard');
             hud.toggleCalendar();
             break;
           case 'discord':
+            trackUiSurface('discord', 'keyboard');
             toggleDiscordPanel();
             break;
           case 'deeds':
@@ -1320,9 +1419,10 @@ async function startGame(
             break;
           }
           case 'chat':
-            openChat();
+            openChat('keyboard');
             break;
           case 'escape':
+            trackUiSurface('escape_menu', 'keyboard');
             if (hud.cancelGroundAim()) break;
             // close the topmost panel; if nothing was open, open the game menu
             if (!hud.closeAll()) hud.toggleOptionsMenu();
@@ -1348,34 +1448,101 @@ async function startGame(
   // The ring's attack toggle acquires the nearest attackable enemy when tapped
   // with no live hostile target (the HUD falls back to plain castSlot(0) until
   // this is wired); the Target button cycles targets via the Tab path below.
-  hud.onMobileAttackNearest = () => attackNearest();
+  hud.onMobileAttackNearest = () => {
+    glitchBehavior?.trackFirstInput('touch_attack', world);
+    attackNearest();
+  };
 
   const mobileControls = new MobileControls(input, {
     onCycleTarget: () => world.tabTarget(),
     onJump: () => input.triggerTouchJump(),
-    onInteract: () => interactKey(),
-    onChat: () => openChat(),
-    onChatOpen: () => openChatRead(),
+    onInteract: () => {
+      trackUiSurface('interact', 'touch');
+      interactKey();
+    },
+    onChat: () => openChat('touch'),
+    onChatOpen: () => {
+      trackUiSurface('chat', 'touch');
+      openChatRead();
+    },
     onChatClose: () => closeChat(),
-    onMenu: () => hud.toggleOptionsMenu(),
-    onSocial: () => hud.toggleSocial(),
-    onDiscord: () => openDiscordEntry(),
-    onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),
-    onEmotes: () => hud.toggleEmoteWheel(),
-    onArena: () => hud.toggleArena(),
-    onDungeonFinder: () => hud.toggleDungeonFinder(),
-    onValeCup: () => hud.toggleValeCup(),
-    onQuestLog: () => hud.toggleQuestLog(),
-    onCharacter: () => hud.toggleChar(),
-    onBags: () => hud.toggleBags(),
-    onCrafting: () => hud.toggleCrafting(),
-    onSpellbook: () => hud.toggleSpellbook(),
-    onTalents: () => hud.toggleTalents(),
-    onMap: () => hud.toggleMap(),
-    onLeaderboard: () => hud.toggleLeaderboard(),
-    onDailyRewards: () => hud.toggleDailyRewards(),
-    onDeeds: () => hud.toggleDeeds(),
-    onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
+    onMenu: () => {
+      trackUiSurface('escape_menu', 'touch');
+      hud.toggleOptionsMenu();
+    },
+    onSocial: () => {
+      trackUiSurface('social', 'touch');
+      hud.toggleSocial();
+    },
+    onDiscord: () => {
+      trackUiSurface('discord', 'touch');
+      openDiscordEntry();
+    },
+    onDonate: () => {
+      trackUiSurface('donate', 'touch');
+      window.open(DONATE_URL, '_blank', 'noopener,noreferrer');
+    },
+    onEmotes: () => {
+      trackUiSurface('emotes', 'touch');
+      hud.toggleEmoteWheel();
+    },
+    onArena: () => {
+      trackUiSurface('arena', 'touch');
+      hud.toggleArena();
+    },
+    onDungeonFinder: () => {
+      trackUiSurface('dungeon_finder', 'touch');
+      hud.toggleDungeonFinder();
+    },
+    onValeCup: () => {
+      trackUiSurface('valecup', 'touch');
+      hud.toggleValeCup();
+    },
+    onQuestLog: () => {
+      trackUiSurface('questlog', 'touch');
+      hud.toggleQuestLog();
+    },
+    onCharacter: () => {
+      trackUiSurface('character', 'touch');
+      hud.toggleChar();
+    },
+    onBags: () => {
+      trackUiSurface('bags', 'touch');
+      hud.toggleBags();
+    },
+    onCrafting: () => {
+      trackUiSurface('crafting', 'touch');
+      hud.toggleCrafting();
+    },
+    onSpellbook: () => {
+      trackUiSurface('spellbook', 'touch');
+      hud.toggleSpellbook();
+    },
+    onTalents: () => {
+      trackUiSurface('talents', 'touch');
+      hud.toggleTalents();
+    },
+    onMap: () => {
+      trackUiSurface('map', 'touch');
+      hud.toggleMap();
+    },
+    onLeaderboard: () => {
+      trackUiSurface('leaderboard', 'touch');
+      hud.toggleLeaderboard();
+    },
+    onDailyRewards: () => {
+      trackUiSurface('daily_rewards', 'touch');
+      hud.toggleDailyRewards();
+    },
+    onDeeds: () => {
+      trackUiSurface('deeds', 'touch');
+      hud.toggleDeeds();
+    },
+    onNameplates: () => {
+      trackUiSurface('nameplates', 'touch');
+      renderer.showNameplates = !renderer.showNameplates;
+      return renderer.showNameplates;
+    },
     onMusic: () => {
       music.setEnabled(!music.enabled);
       return music.enabled;
@@ -1419,14 +1586,19 @@ async function startGame(
   const gamepadBindings = new GamepadBindings();
   const canUseGameKeysNow = () => !gameplayInputBlocked();
   function dispatchGamepadAction(id: string): void {
+    glitchBehavior?.trackFirstInput('gamepad', world);
     if (id === 'escape') {
       if (dismissCameraPrompt()) return;
+      trackUiSurface('escape_menu', 'gamepad');
       if (hud.cancelGroundAim()) return;
       if (!hud.closeAll()) hud.toggleOptionsMenu();
       return;
     }
     if (!canUseGameKeysNow()) return; // suppress play actions while a modal/chat is up
     if (id.startsWith('slot')) {
+      glitchBehavior?.trackOnce('first_ability', 'combat', 'first_ability', {
+        slot: Number(id.slice(4)),
+      });
       hud.castSlot(Number(id.slice(4)));
       return;
     }
@@ -1442,61 +1614,78 @@ async function startGame(
         world.friendlyTabTarget();
         break;
       case 'interact':
+        trackUiSurface('interact', 'gamepad');
         interactKey();
         break;
       case 'bags':
+        trackUiSurface('bags', 'gamepad');
         hud.toggleBags();
         break;
       case 'char':
+        trackUiSurface('character', 'gamepad');
         hud.toggleChar();
         break;
       case 'spellbook':
+        trackUiSurface('spellbook', 'gamepad');
         hud.toggleSpellbook();
         break;
       case 'questlog':
+        trackUiSurface('questlog', 'gamepad');
         hud.toggleQuestLog();
         break;
       case 'map':
+        trackUiSurface('map', 'gamepad');
         hud.toggleMap();
         break;
       case 'nameplates':
+        trackUiSurface('nameplates', 'gamepad');
         renderer.showNameplates = !renderer.showNameplates;
         break;
       case 'talents':
+        trackUiSurface('talents', 'gamepad');
         hud.toggleTalents();
         break;
       case 'meters':
+        trackUiSurface('meters', 'gamepad');
         hud.toggleMeters();
         break;
       case 'social':
+        trackUiSurface('social', 'gamepad');
         hud.toggleSocial();
         break;
       case 'arena':
+        trackUiSurface('arena', 'gamepad');
         hud.toggleArena();
         break;
       case 'valecup':
         hud.toggleValeCup();
         break;
       case 'leaderboard':
+        trackUiSurface('leaderboard', 'gamepad');
         hud.toggleLeaderboard();
         break;
       case 'calendar':
+        trackUiSurface('calendar', 'gamepad');
         hud.toggleCalendar();
         break;
       case 'discord':
+        trackUiSurface('discord', 'gamepad');
         toggleDiscordPanel();
         break;
       case 'deeds':
         hud.toggleDeeds();
         break;
       case 'chat':
-        openChat();
+        openChat('gamepad');
         break;
     }
   }
   const gamepad = new GamepadManager(input, gamepadBindings, {
     onAction: (id) => dispatchGamepadAction(id),
-    onInputEdge: () => inputMeter.record(performance.now()),
+    onInputEdge: () => {
+      inputMeter.record(performance.now());
+      glitchBehavior?.trackFirstInput('gamepad', world);
+    },
     isPointerMode: () => hud.isWindowOpen() || cameraPromptOpen(),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => hud.refreshControllerLabels(),
@@ -2178,6 +2367,7 @@ async function startGame(
           nativeApp: NATIVE_APP,
           desktopApp: DESKTOP_APP,
           mobileTouch: document.body.classList.contains('mobile-touch'),
+          glitchActive: GLITCH_CONFIG.enabled,
         })
       ) {
         hud.attachStorePromoCard();
@@ -2805,6 +2995,7 @@ async function startGame(
     perf.trace('input.gamepad', () => gamepad.poll(frameDt), { frameDtMs: frameDt * 1000 });
     perf.trace('input.hoverCursor', () => updateHoverCursor(), { active: input.hoverActive });
     perf.markInputFrame(performance.now());
+    glitchBehavior?.observeWorld(world, now);
 
     const mouselook = intro === null && input.isMouselookActive() && !movementFrozen();
     const controllerFacing = input.controllerFacingOverride();
@@ -2973,6 +3164,7 @@ async function startGame(
     }
     net.pendingFacingDelta = 0; // superseded by the interpolated follow below
     const drainedEvents = net.drainEvents();
+    glitchBehavior?.observeSimEvents(drainedEvents, world, now);
     perf.time('events', () =>
       perf.trace('hud.handleEvents', () => hud.handleEvents(drainedEvents), {
         mode: 'online',
@@ -3186,6 +3378,12 @@ async function startGame(
   }
   await nextPaint();
   last = performance.now();
+  if (glitchBehavior || glitchSession) {
+    window.addEventListener('pagehide', () => {
+      glitchBehavior?.track('world_session', 'end');
+      leaveActiveGlitchVoice(true);
+    });
+  }
   requestAnimationFrame(frame);
   // cut to the game only once the first frame is actually on screen
   requestAnimationFrame(() =>
@@ -3196,6 +3394,8 @@ async function startGame(
       if (intro) intro.startedAt = performance.now();
       window.setTimeout(() => {
         gameInputReady = true;
+        glitchBehavior?.track('world_session', 'start');
+        glitchBehavior?.observeWorld(world, performance.now());
         perf.reset();
         startPerfReporter({
           perf,
@@ -3266,7 +3466,7 @@ async function startOffline(
   // immediately (no connection to wait on) and every store/chest/discord tile
   // stays hidden per the gating matrix; the news fetch still hits the site
   // origin and fails soft if offline.
-  const welcomeRoot = $('#welcome-screen');
+  const welcomeRoot = shouldUseWelcomeScreen(GLITCH_CONFIG.enabled) ? $('#welcome-screen') : null;
   if (welcomeRoot) {
     await new Promise<void>((resolve) => {
       welcomeScreen = mountWelcomeScreen(welcomeRoot, {
@@ -3363,6 +3563,62 @@ async function startOffline(
   void startGame(sim, sim, null, `offline:${playerClass}:${name}`, true);
 }
 
+async function startGlitchAuthenticatedGame(session: GlitchSession): Promise<void> {
+  const configuredClass = readGlitchDefaultClass(
+    import.meta.env,
+    Object.keys(CLASSES),
+  ) as PlayerClass;
+  const glitchBehavior = new GlitchBehaviorTracker({
+    build: `${__APP_VERSION__} (${__APP_BUILD_ID__})`,
+    sendEvent: (event) => sendGlitchBehaviorEvent(session, event),
+  });
+  glitchBehavior.track(
+    'glitch_launch',
+    session.launchedByGlitch ? 'launch_validated' : 'validated',
+    {
+      license_type: session.licenseType ?? 'unknown',
+    },
+  );
+  glitchBehavior.track('glitch_auth', 'login_start', { default_class: configuredClass });
+  let login: Awaited<ReturnType<Api['glitchLogin']>>;
+  try {
+    login = await api.glitchLogin({
+      installId: session.installId,
+      defaultClass: configuredClass,
+    });
+  } catch (err) {
+    glitchBehavior.track('glitch_auth', 'login_error', { reason: 'request_failed' });
+    throw err;
+  }
+  glitchBehavior.track('glitch_auth', 'login_complete', {
+    class_key: login.character.class,
+    level: login.character.level,
+  });
+  startGlitchInstallHeartbeat({ session });
+  showGlitchCharacterGate(session, glitchBehavior, login);
+}
+
+async function maybeStartGlitchLaunch(): Promise<boolean> {
+  if (!GLITCH_CONFIG.enabled || !parseGlitchLaunchInstallId(location.search)) return false;
+  showLoadingScreen(t('loading.connectingRealm'));
+  try {
+    const session = await bootstrapGlitchSession({
+      config: GLITCH_CONFIG,
+      storage: window.localStorage,
+      search: location.search,
+    });
+    if (!session?.launchedByGlitch) {
+      hideLoadingScreen();
+      return false;
+    }
+    await startGlitchAuthenticatedGame(session);
+    return true;
+  } catch (err) {
+    fatalOverlay(userFacingApiError(err));
+    return true;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Online flow: login -> character select -> world
 // ---------------------------------------------------------------------------
@@ -3392,6 +3648,16 @@ let characterPreview: CharacterPreview | null = null;
 let authModeApply: ((mode: 'login' | 'register') => void) | null = null;
 let offlineSkin = 0; // chosen appearance skin for the offline quick-start character
 let onlineSkin = 0; // chosen appearance skin for new online characters
+interface GlitchCharselectState {
+  session: GlitchSession;
+  behavior: GlitchBehaviorTracker;
+  existing: CharacterSummary;
+  userName: string;
+}
+
+let glitchCharselectState: GlitchCharselectState | null = null;
+let pendingGlitchReroll: { chosen: GlitchChosenCharacter; action: GlitchCharselectAction } | null =
+  null;
 
 function releaseStartScreenPreview(): void {
   if (!characterPreview) return;
@@ -3495,14 +3761,322 @@ function refreshOfflineSkins(cls: PlayerClass): void {
   });
 }
 
-/** Reset to the default skin and (re)render the online creation picker for a class. */
-function refreshOnlineSkins(cls: PlayerClass): void {
-  onlineSkin = 0;
-  characterPreview?.setSkin(0);
-  renderSkinPicker('#online-skin-row', cls, 0, (i) => {
+function clampSkinForClass(cls: PlayerClass, skin: number): number {
+  const count = skinCount(`player_${cls}`);
+  if (count <= 0) return 0;
+  return Math.max(0, Math.min(count - 1, Math.floor(skin)));
+}
+
+function setOnlineSkinPicker(cls: PlayerClass, skin: number): void {
+  const nextSkin = clampSkinForClass(cls, skin);
+  onlineSkin = nextSkin;
+  characterPreview?.setSkin(nextSkin);
+  renderSkinPicker('#online-skin-row', cls, nextSkin, (i) => {
     onlineSkin = i;
     characterPreview?.setSkin(i);
+    trackGlitchCharAction(GLITCH_CHAR_ACTION.selectAppearance, {
+      class_key: cls,
+      skin: i,
+      changed: glitchCharselectState ? i !== glitchCharselectState.existing.skin : false,
+    });
   });
+}
+
+/** Reset to the default skin and (re)render the online creation picker for a class. */
+function refreshOnlineSkins(cls: PlayerClass): void {
+  setOnlineSkinPicker(cls, 0);
+}
+
+function currentGlitchChosenCharacter(): GlitchChosenCharacter | null {
+  const clsEl = document.querySelector('#charcreate-panel .mini-class.sel') as HTMLElement | null;
+  if (!clsEl?.dataset.class) return null;
+  const lockedGlitchName = glitchCharselectState?.existing.name;
+  const nameInput = $('#new-char-name') as HTMLInputElement;
+  return {
+    class: clsEl.dataset.class as PlayerClass,
+    skin: selectedSkin('#online-skin-row', onlineSkin),
+    name: (lockedGlitchName ?? nameInput.value).trim(),
+  };
+}
+
+function glitchCharMetadata(
+  chosen: GlitchChosenCharacter | null = currentGlitchChosenCharacter(),
+  extra: Record<string, string | number | boolean | null> = {},
+): Record<string, string | number | boolean | null> {
+  const state = glitchCharselectState;
+  return {
+    existing_class: state?.existing.class ?? null,
+    existing_level: state?.existing.level ?? null,
+    existing_skin: state?.existing.skin ?? null,
+    existing_online: state?.existing.online ?? null,
+    force_rename: state?.existing.forceRename ?? null,
+    chosen_class: chosen?.class ?? null,
+    chosen_skin: chosen?.skin ?? null,
+    name_changed: state && chosen ? chosen.name.trim() !== state.existing.name.trim() : null,
+    class_changed: state && chosen ? chosen.class !== state.existing.class : null,
+    skin_changed: state && chosen ? chosen.skin !== state.existing.skin : null,
+    ...extra,
+  };
+}
+
+function trackGlitchCharAction(
+  actionKey: (typeof GLITCH_CHAR_ACTION)[keyof typeof GLITCH_CHAR_ACTION],
+  metadata: Record<string, string | number | boolean | null> = {},
+): void {
+  const state = glitchCharselectState;
+  if (!state) return;
+  state.behavior.track(
+    GLITCH_CHAR_STEP_KEY,
+    actionKey,
+    glitchCharMetadata(currentGlitchChosenCharacter(), metadata),
+  );
+}
+
+function setCharcreateSelection(cls: PlayerClass, skin: number): void {
+  document.querySelectorAll('#charcreate-panel .mini-class').forEach((el) => {
+    const selected = (el as HTMLElement).dataset.class === cls;
+    el.classList.toggle('sel', selected);
+    el.setAttribute('aria-pressed', selected ? 'true' : 'false');
+  });
+  renderClassDetails('charcreate-class-details', cls);
+  characterPreview?.setClass(cls);
+  setOnlineSkinPicker(cls, skin);
+}
+
+function syncGlitchCharacterPreview(existing: CharacterSummary): void {
+  const previewContainer = $('#charcreate-preview-container');
+  if (!characterPreview) {
+    syncGlitchAvatarLoading(previewContainer, {
+      glitchActive: GLITCH_CONFIG.enabled,
+      previewReady: false,
+    });
+    return;
+  }
+  characterPreview.setContainer(previewContainer);
+  characterPreview.setClass(existing.class);
+  characterPreview.setSkin(clampSkinForClass(existing.class, existing.skin ?? 0));
+  syncGlitchAvatarLoading(previewContainer, {
+    glitchActive: GLITCH_CONFIG.enabled,
+    previewReady: true,
+  });
+  syncPreviewAfterPanelLayout();
+}
+
+function showGlitchCharacterGate(
+  session: GlitchSession,
+  behavior: GlitchBehaviorTracker,
+  login: Awaited<ReturnType<Api['glitchLogin']>>,
+): void {
+  const existing = { ...login.character };
+  glitchCharselectState = {
+    session,
+    behavior,
+    existing,
+    userName: login.username || session.userName,
+  };
+  document.body.classList.add('glitch-mode');
+  const startScreen = document.getElementById('start-screen');
+  if (startScreen) startScreen.style.display = '';
+  const userEl = document.getElementById('glitch-user');
+  if (userEl) {
+    userEl.hidden = false;
+    userEl.textContent = glitchCharselectState.userName;
+  }
+  const titleLabel = document.querySelector(
+    '#charcreate-panel .auth-title [data-i18n]',
+  ) as HTMLElement | null;
+  if (titleLabel) {
+    const titleKey: TranslationKey = login.characterCreated
+      ? 'auth.createCharacter'
+      : 'auth.currentCharacter';
+    titleLabel.dataset.i18n = titleKey;
+    titleLabel.textContent = t(titleKey);
+  }
+  const createBtn = $('#btn-create-char') as HTMLButtonElement;
+  createBtn.setAttribute('data-i18n', 'auth.enterWorld');
+  createBtn.textContent = t('auth.enterWorld');
+  const nameInput = $('#new-char-name') as HTMLInputElement;
+  nameInput.value = existing.name;
+  nameInput.readOnly = true;
+  nameInput.tabIndex = -1;
+  nameInput.setAttribute('aria-hidden', 'true');
+  nameInput.classList.remove('user-invalid-fallback');
+  nameInput.removeAttribute('aria-invalid');
+  $('#charselect-error').textContent = '';
+  show('#charcreate-panel');
+  setCharcreateSelection(existing.class, existing.skin ?? 0);
+  syncGlitchCharacterPreview(existing);
+  void assetsReady().then(() => syncGlitchCharacterPreview(existing));
+  hideLoadingScreen();
+  trackGlitchCharAction(GLITCH_CHAR_ACTION.open);
+  createBtn.focus();
+}
+
+function setGlitchCharacterBlock(reason: GlitchCharselectAction['reason']): void {
+  const errorEl = $('#charselect-error');
+  const nameInput = $('#new-char-name') as HTMLInputElement;
+  switch (reason) {
+    case 'name_required':
+      errorEl.textContent = t('errors.characterNameRequired');
+      nameInput.classList.add('user-invalid-fallback');
+      nameInput.setAttribute('aria-invalid', 'true');
+      nameInput.focus();
+      return;
+    case 'name_invalid':
+      errorEl.textContent = t('errors.characterNameInvalid');
+      nameInput.classList.add('user-invalid-fallback');
+      nameInput.setAttribute('aria-invalid', 'true');
+      nameInput.focus();
+      return;
+    case 'rename_required':
+      errorEl.textContent = t('errors.api.renameBeforeEntering');
+      nameInput.focus();
+      return;
+    default:
+      errorEl.textContent = t('errors.pickClass');
+  }
+}
+
+function openGlitchRerollDialog(
+  chosen: GlitchChosenCharacter,
+  action: GlitchCharselectAction,
+): void {
+  const state = glitchCharselectState;
+  if (!state) return;
+  pendingGlitchReroll = { chosen, action };
+  const modal = $('#glitch-reroll-modal');
+  const body = $('#glitch-reroll-body');
+  body.textContent = t('deleteCharacter.body', { name: state.existing.name });
+  modal.removeAttribute('hidden');
+  trackGlitchCharAction(GLITCH_CHAR_ACTION.rerollConfirmShown, {
+    action_kind: action.kind,
+  });
+  ($('#btn-glitch-reroll-cancel') as HTMLButtonElement).focus();
+}
+
+function closeGlitchRerollDialog(trackCancel = false): void {
+  if (trackCancel && pendingGlitchReroll) {
+    trackGlitchCharAction(GLITCH_CHAR_ACTION.rerollConfirmCancel, {
+      action_kind: pendingGlitchReroll.action.kind,
+    });
+  }
+  pendingGlitchReroll = null;
+  $('#glitch-reroll-modal').setAttribute('hidden', '');
+}
+
+async function submitGlitchCharacter(button: HTMLButtonElement): Promise<void> {
+  const state = glitchCharselectState;
+  const chosen = currentGlitchChosenCharacter();
+  if (!state || !chosen) {
+    $('#charselect-error').textContent = t('errors.pickClass');
+    trackGlitchCharAction(GLITCH_CHAR_ACTION.error, { reason: 'class_missing' });
+    return;
+  }
+
+  const action = glitchCharselectAction({
+    existing: state.existing,
+    chosen,
+    nameValid: validateCharacterName(chosen.name),
+  });
+  trackGlitchCharAction(GLITCH_CHAR_ACTION.submit, {
+    action_kind: action.kind,
+    blocked_reason: action.reason,
+    needs_confirm: action.needsConfirm,
+    takeover: action.takeover,
+  });
+
+  if (action.kind === 'blocked') {
+    setGlitchCharacterBlock(action.reason);
+    trackGlitchCharAction(GLITCH_CHAR_ACTION.error, {
+      reason: action.reason ?? 'blocked',
+      action_kind: action.kind,
+    });
+    return;
+  }
+  if (action.needsConfirm) {
+    openGlitchRerollDialog(chosen, action);
+    return;
+  }
+  await runGlitchCharacterAction(button, chosen, action);
+}
+
+async function runGlitchCharacterAction(
+  button: HTMLButtonElement,
+  chosen: GlitchChosenCharacter,
+  action: GlitchCharselectAction,
+): Promise<void> {
+  const state = glitchCharselectState;
+  if (!state || action.kind === 'blocked') return;
+  closeGlitchRerollDialog(false);
+  const primaryButton = $('#btn-create-char') as HTMLButtonElement;
+  const previousPrimaryText = primaryButton.textContent ?? t('auth.enterWorld');
+  const previousButtonText = button.textContent ?? previousPrimaryText;
+  primaryButton.disabled = true;
+  primaryButton.textContent = t('loading.enteringWorld');
+  button.disabled = true;
+  button.textContent = t('loading.enteringWorld');
+  $('#charselect-error').textContent = '';
+
+  try {
+    if (action.takeover) {
+      trackGlitchCharAction(GLITCH_CHAR_ACTION.takeover, {
+        action_kind: action.kind,
+      });
+      await api.takeoverCharacter(state.existing.id);
+    }
+
+    let character: CharacterSummary = { ...state.existing, online: false };
+    if (action.kind === 'rename') {
+      trackGlitchCharAction(GLITCH_CHAR_ACTION.rename);
+      const renamed = await api.renameCharacter(state.existing.id, chosen.name);
+      character = {
+        ...state.existing,
+        name: renamed.name,
+        forceRename: false,
+        online: false,
+      };
+    } else if (action.kind === 'reroll') {
+      trackGlitchCharAction(GLITCH_CHAR_ACTION.reroll, {
+        confirmed: action.needsConfirm,
+      });
+      const nameChanged = chosen.name.trim() !== state.existing.name.trim();
+      if (nameChanged) {
+        const created = await api.createCharacter(chosen.name, chosen.class, chosen.skin);
+        await api.deleteCharacter(state.existing.id, state.existing.name);
+        character = { ...created, online: false };
+      } else {
+        const rerolled = await api.glitchRerollCharacter(
+          state.existing.id,
+          chosen.class,
+          chosen.skin,
+        );
+        character = { ...rerolled, online: false };
+      }
+      trackGlitchCharAction(GLITCH_CHAR_ACTION.create, {
+        class_key: character.class,
+        skin: character.skin,
+      });
+    } else {
+      trackGlitchCharAction(GLITCH_CHAR_ACTION.enter);
+    }
+
+    glitchCharselectState = { ...state, existing: character };
+    await enterWorld(character, primaryButton, {
+      glitchBehavior: state.behavior,
+      glitchSession: state.session,
+    });
+    glitchCharselectState = null;
+  } catch (err) {
+    primaryButton.disabled = false;
+    primaryButton.textContent = previousPrimaryText;
+    button.disabled = false;
+    button.textContent = previousButtonText;
+    $('#charselect-error').textContent = userFacingApiError(err);
+    trackGlitchCharAction(GLITCH_CHAR_ACTION.error, {
+      reason: 'request_failed',
+      action_kind: action.kind,
+    });
+  }
 }
 
 function updatePreviewContainer(panelId: string): void {
@@ -4776,7 +5350,14 @@ function syncCharselectEnterButton(): void {
   }
 }
 
-async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Promise<void> {
+async function enterWorld(
+  c: CharacterSummary,
+  button?: HTMLButtonElement,
+  opts: {
+    glitchBehavior?: GlitchBehaviorTracker | null;
+    glitchSession?: GlitchSession | null;
+  } = {},
+): Promise<void> {
   try {
     if (button) {
       button.disabled = true;
@@ -4792,6 +5373,10 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
       button.textContent = t('auth.enterWorld');
     }
   }
+  opts.glitchBehavior?.track('world_load', 'connect_start', {
+    class_key: c.class,
+    level: c.level,
+  });
   const world = new ClientWorld(api.token!, c.id, c.class, api.base, getClientSeed());
   // Wire shareable player cards for this online session: publishing uploads the
   // composited PNG to this realm and returns an absolute public page URL, and
@@ -4817,7 +5402,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   // is the only way forward, gated on the same readiness condition the old
   // auto-poll used to gate startGame on. Falls back to the old bare loading
   // screen if the welcome-screen DOM is absent (the /play entry lacks it).
-  const welcomeRoot = $('#welcome-screen');
+  const welcomeRoot = shouldUseWelcomeScreen(GLITCH_CONFIG.enabled) ? $('#welcome-screen') : null;
   let started = false;
   const proceedToGame = () => {
     if (started) return;
@@ -4826,7 +5411,15 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     welcomeScreen?.hide();
     welcomeScreen?.destroy();
     welcomeScreen = null;
-    void startGame(world, null, world, `char:${c.id}`, true);
+    void startGame(
+      world,
+      null,
+      world,
+      `char:${c.id}`,
+      true,
+      opts.glitchBehavior ?? null,
+      opts.glitchSession ?? null,
+    );
   };
   if (welcomeRoot) {
     welcomeScreen = mountWelcomeScreen(welcomeRoot, {
@@ -4881,6 +5474,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   const poll = setInterval(() => {
     if (world.connected && world.entities.has(world.playerId)) {
       clearInterval(poll);
+      opts.glitchBehavior?.track('world_load', 'first_snapshot');
       // Remember the active session (character + realm) so a WebView reload
       // during play resumes straight back into the world instead of the
       // home/login screen. Also resets the resume-attempt budget: entry
@@ -4895,6 +5489,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
       clearInterval(poll);
       world.close();
       clearCardProviders();
+      opts.glitchBehavior?.track('world_load', 'entry_timeout');
       welcomeScreen?.destroy();
       welcomeScreen = null;
       hideReconnectOverlay();
@@ -4908,6 +5503,8 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   world.onDisconnect = (reason) => {
     clearInterval(poll);
     clearCardProviders();
+    stopActiveGlitchVoice();
+    opts.glitchBehavior?.trackDisconnect(reason, world);
     welcomeScreen?.destroy();
     welcomeScreen = null;
     hideReconnectOverlay();
@@ -7254,6 +7851,7 @@ function stopLandingTrailer(): void {
 }
 
 let landingTrailerWired = false;
+let startScreensWired = false;
 function applyLandingBackdrop(highContrast: boolean): void {
   const backdrop = document.getElementById('start-screen-backdrop');
   const video = document.getElementById('bg-home') as HTMLVideoElement | null;
@@ -7315,6 +7913,8 @@ function applyLandingBackdrop(highContrast: boolean): void {
 }
 
 function wireStartScreens(): void {
+  if (startScreensWired) return;
+  startScreensWired = true;
   // Initial page translation and stats load. Lazy locale flip: a stored non-en locale is now
   // a real chunk fetch, and the homepage IS the first paint (there is no loading screen to sit
   // behind), so we localize-then-reveal to prevent an English flash + text swap. The start
@@ -8067,6 +8667,12 @@ function wireStartScreens(): void {
   // character creation
   document.querySelectorAll('#charcreate-panel .mini-class').forEach((el) => {
     const handleMiniClassSelect = () => {
+      const cls = (el as HTMLElement).dataset.class as PlayerClass;
+      const previousSelected = document.querySelector(
+        '#charcreate-panel .mini-class.sel',
+      ) as HTMLElement | null;
+      const previousClass = previousSelected?.dataset.class as PlayerClass | undefined;
+      const skin = previousClass === cls ? selectedSkin('#online-skin-row', onlineSkin) : 0;
       if (hoverTimeouts['charcreate-class-details'] !== null) {
         window.clearTimeout(hoverTimeouts['charcreate-class-details']);
         hoverTimeouts['charcreate-class-details'] = null;
@@ -8086,9 +8692,14 @@ function wireStartScreens(): void {
       el.classList.add('sel');
       el.setAttribute('aria-pressed', 'true');
 
-      const cls = (el as HTMLElement).dataset.class as PlayerClass;
       renderClassDetails('charcreate-class-details', cls);
-      refreshOnlineSkins(cls);
+      characterPreview?.setClass(cls);
+      setOnlineSkinPicker(cls, skin);
+      trackGlitchCharAction(GLITCH_CHAR_ACTION.selectClass, {
+        class_key: cls,
+        previous_class: previousClass ?? null,
+        changed: previousClass !== cls,
+      });
     };
     el.addEventListener('click', handleMiniClassSelect);
     el.addEventListener('keydown', (e) =>
@@ -8221,7 +8832,12 @@ function wireStartScreens(): void {
     });
   });
 
-  $('#btn-create-char').addEventListener('click', async () => {
+  $('#btn-create-char').addEventListener('click', async (event) => {
+    const btn = event.currentTarget as HTMLButtonElement;
+    if (glitchCharselectState) {
+      await submitGlitchCharacter(btn);
+      return;
+    }
     const name = newCharNameInput.value.trim();
     const clsEl = document.querySelector('#charcreate-panel .mini-class.sel') as HTMLElement | null;
     loginError('');
@@ -8314,6 +8930,29 @@ function wireStartScreens(): void {
         normalizeDeleteConfirmation(deleteConfirmInput.value) !==
         normalizeDeleteConfirmation(target.name);
     }
+  });
+
+  const glitchRerollModal = $('#glitch-reroll-modal');
+  const glitchRerollCancel = $('#btn-glitch-reroll-cancel') as HTMLButtonElement;
+  const glitchRerollConfirm = $('#btn-glitch-reroll-confirm') as HTMLButtonElement;
+  glitchRerollCancel.addEventListener('click', () => closeGlitchRerollDialog(true));
+  glitchRerollModal.addEventListener('click', (e) => {
+    if (e.target === glitchRerollModal) closeGlitchRerollDialog(true);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (glitchRerollModal.hasAttribute('hidden')) return;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closeGlitchRerollDialog(true);
+    }
+  });
+  glitchRerollConfirm.addEventListener('click', async () => {
+    const pending = pendingGlitchReroll;
+    if (!pending) return;
+    trackGlitchCharAction(GLITCH_CHAR_ACTION.rerollConfirmAccept, {
+      action_kind: pending.action.kind,
+    });
+    await runGlitchCharacterAction(glitchRerollConfirm, pending.chosen, pending.action);
   });
 
   const setupNavBtn = (
@@ -8923,7 +9562,7 @@ function wireStartScreens(): void {
 // playing through the loading screen and fades out once the game is on screen.
 function initHomepageMusic(): void {
   if (homepageMusic) return;
-  const el = new Audio('/audio/main-theme.mp3');
+  const el = new Audio(publicAssetUrl('/audio/main-theme.mp3'));
   el.loop = true;
   el.muted = homepageMusicMuted;
   el.preload = 'auto';
@@ -8977,21 +9616,28 @@ function fadeOutHomepageMusic(durationMs = 1600): void {
   }
 })();
 
-// Editor play-test handoff: if the map editor stored a custom world and sent us
-// here, boot straight into that offline world and skip the start screen. Any
-// malformed/absent request falls through to the normal home flow.
-const editorPlaytest = takeEditorPlaytestRequest();
-if (editorPlaytest) {
+async function bootInitialFlow(): Promise<void> {
   startSitePresence('home');
-  void startOffline(
-    editorPlaytest.playerClass,
-    editorPlaytest.playerName,
-    0,
-    editorPlaytest.content,
-    editorPlaytest.seed,
-  );
-} else {
-  startSitePresence('home');
+  if (GLITCH_CONFIG.enabled && parseGlitchLaunchInstallId(location.search)) wireStartScreens();
+  if (await maybeStartGlitchLaunch()) return;
+
+  // Editor play-test handoff: if the map editor stored a custom world and sent us
+  // here, boot straight into that offline world and skip the start screen. Any
+  // malformed/absent request falls through to the normal home flow.
+  const editorPlaytest = takeEditorPlaytestRequest();
+  if (editorPlaytest) {
+    void startOffline(
+      editorPlaytest.playerClass,
+      editorPlaytest.playerName,
+      0,
+      editorPlaytest.content,
+      editorPlaytest.seed,
+    );
+    return;
+  }
+
   wireStartScreens();
   initHomepageMusic();
 }
+
+void bootInitialFlow();

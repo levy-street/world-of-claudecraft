@@ -10,6 +10,7 @@
 // pool of persistent looping sources for ambience and sustained spell casts.
 
 import { apiUrl } from '../client_origin';
+import { publicAssetUrl } from '../runtime_assets';
 import type { BiomeId } from '../sim/types';
 import {
   SFX_CATALOG_HASH,
@@ -225,7 +226,7 @@ class Sfx {
           this.failedLoads.add(cacheKey);
           return null;
         }
-        const res = await fetch(variant.url);
+        const res = await fetch(publicAssetUrl(variant.url));
         if (!res.ok) {
           this.failedLoads.add(cacheKey);
           return null;

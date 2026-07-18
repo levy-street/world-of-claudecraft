@@ -4845,6 +4845,93 @@
     height: 100% !important;
   }
 
+  .glitch-avatar-loading {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: none;
+    place-content: center;
+    justify-items: center;
+    gap: 14px;
+    color: var(--gold);
+    background: radial-gradient(circle, rgba(33, 27, 50, 0.72), rgba(8, 8, 15, 0.18) 62%);
+    pointer-events: none;
+  }
+
+  body.glitch-mode .glitch-avatar-loading:not([hidden]) {
+    display: grid;
+  }
+
+  .glitch-avatar-loading-rune {
+    position: relative;
+    display: block;
+    width: 88px;
+    height: 88px;
+    filter: drop-shadow(0 0 12px var(--color-primary-glow));
+  }
+
+  .glitch-avatar-loading-ring,
+  .glitch-avatar-loading-core {
+    position: absolute;
+    border-radius: 50%;
+  }
+
+  .glitch-avatar-loading-ring {
+    inset: 0;
+    border: 3px solid rgba(214, 176, 70, 0.28);
+    border-top-color: var(--gold);
+    border-bottom-color: var(--color-primary);
+    animation: glitchAvatarRuneSpin 1.45s linear infinite;
+  }
+
+  .glitch-avatar-loading-ring-inner {
+    inset: 14px;
+    border-width: 2px;
+    animation-direction: reverse;
+    animation-duration: 1.05s;
+  }
+
+  .glitch-avatar-loading-core {
+    inset: 34px;
+    background: var(--gold);
+    box-shadow: 0 0 18px var(--color-primary-glow);
+    animation: glitchAvatarRunePulse 1.2s ease-in-out infinite;
+  }
+
+  .glitch-avatar-loading-label {
+    font-family: var(--title-font);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-shadow: 0 2px 5px #000;
+  }
+
+  @keyframes glitchAvatarRuneSpin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes glitchAvatarRunePulse {
+    0%,
+    100% {
+      opacity: 0.45;
+      transform: scale(0.72);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glitch-avatar-loading-ring,
+    .glitch-avatar-loading-core {
+      animation: none;
+    }
+  }
+
   /* The selected-character name plate over the 3D stage. Belongs to the desktop
      docked layout (the only one with a full 3D turntable); mobile shows the name
      on each roster card already, so it stays hidden by default and the docked
@@ -7522,6 +7609,111 @@
   }
   #desktop-update-toast .desktop-update-restart {
     border-color: var(--color-primary);
+  }
+
+  /* Glitch pre-game character screen. When a Glitch-authenticated player boots, the
+     game reuses the #charcreate-panel as a single-character customize screen
+     (class and appearance) and sets body.glitch-mode. Strip everything a Glitch
+     player has no account for: the top menu bar and its Donate button, the site
+     footer, the $WOC wallet row, the GitHub developer link, and the panel's Back
+     button (there is no login to return to). There is no multi-character roster
+     here, so nothing to hide there. Applies at every viewport (unlike the desktop
+     header-pin rules), so it lives at the layer top level, not inside a media query. */
+  body.glitch-mode
+  :is(
+    .homepage-header,
+    .homepage-footer,
+    .official-site-copy,
+    .cs-wallet,
+    .cs-wallet-hidden-note,
+    #cs-github-group,
+    #btn-charcreate-back
+  ) {
+    display: none !important;
+  }
+  body.glitch-mode #charcreate-panel .cs-section-header[data-i18n="auth.name"],
+  body.glitch-mode #new-char-name {
+    display: none !important;
+  }
+  body.glitch-mode #charcreate-panel .char-input-group {
+    margin-bottom: 0;
+  }
+  body.glitch-mode #charcreate-panel .cs-form-actions {
+    order: -1;
+    justify-content: center;
+    margin: 0 0 14px;
+    padding-top: 0;
+  }
+  body.glitch-mode #charcreate-panel #btn-create-char {
+    flex: 0 1 300px;
+    width: min(300px, 100%);
+    margin: 0 auto;
+  }
+  /* The header is gone (not pinned), so drop the strip its height reserved. */
+  body.glitch-mode:not(.mobile-touch) #charcreate-panel.cs-wow {
+    border-top: 0;
+  }
+  @media (min-width: 861px) {
+    body.glitch-mode:not(.mobile-touch) #charcreate-panel.cs-wow .char-input-group {
+      top: 130px;
+      width: min(360px, calc(100vw - 48px));
+    }
+    body.glitch-mode:not(.mobile-touch) #charcreate-panel.cs-wow #btn-create-char {
+      top: 74px;
+      right: auto;
+      bottom: auto;
+      left: 50%;
+      transform: translateX(-50%);
+      min-width: 300px;
+      z-index: 4;
+    }
+  }
+  /* The Glitch username sits beside the character gate title in gold. */
+  body.glitch-mode #glitch-user {
+    display: inline;
+  }
+  @media (max-width: 860px) {
+    body.glitch-mode #charcreate-panel {
+      width: min(380px, calc(100vw - 32px));
+      max-width: calc(100vw - 32px);
+    }
+    body.glitch-mode #charcreate-panel .auth-title {
+      max-width: 100%;
+      font-size: clamp(17px, 5.2vw, 20px);
+      line-height: 1.12;
+      letter-spacing: 0.7px;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    body.glitch-mode #glitch-user {
+      display: block;
+      margin-top: 2px;
+    }
+    body.glitch-mode #charcreate-panel .cs-create-col {
+      overflow-x: hidden;
+      padding: 14px;
+    }
+    body.glitch-mode #charcreate-panel .mini-class-row {
+      grid-template-columns: 1fr;
+    }
+    body.glitch-mode #charcreate-panel .mini-class.has-portrait {
+      width: 100%;
+      min-width: 0;
+    }
+    body.glitch-mode #charcreate-panel .mini-class-label {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    body.glitch-mode #charcreate-panel .cs-form-actions {
+      width: 100%;
+    }
+    body.glitch-mode #charcreate-panel #btn-create-char {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      flex: 1 1 auto;
+    }
   }
 
   /* ---------- software rendering notice ---------- */

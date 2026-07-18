@@ -25,18 +25,19 @@ const EXPECT = {
   permissionsPolicy:
     'accelerometer=(), ambient-light-sensor=(), battery=(), bluetooth=(), camera=(), ' +
     'display-capture=(), geolocation=(), gyroscope=(), hid=(), idle-detection=(), ' +
-    'local-fonts=(), magnetometer=(), microphone=(), midi=(), payment=(), serial=(), ' +
-    'usb=(), xr-spatial-tracking=()',
+    'local-fonts=(), magnetometer=(), midi=(), payment=(), serial=(), usb=(), ' +
+    'xr-spatial-tracking=(), microphone=(self)',
   crossOriginOpenerPolicy: 'same-origin',
   crossOriginResourcePolicy: 'same-origin',
+  crossOriginResourcePolicyEmbed: 'cross-origin',
   strictTransportSecurity: 'max-age=31536000; includeSubDomains',
   frameOptions: 'DENY',
   cacheControl: 'no-store',
 } as const;
 
 /** Drive withSecurityHeaders over a fresh req/res and return the FakeRes. */
-function run(url: string, env?: NodeJS.ProcessEnv): FakeRes {
-  const req = makeReq({ url });
+function run(url: string, env?: NodeJS.ProcessEnv, headers?: Record<string, string>): FakeRes {
+  const req = makeReq({ url, headers });
   const res = new FakeRes();
   withSecurityHeaders(req, res as unknown as http.ServerResponse, env);
   return res;
@@ -50,6 +51,39 @@ describe('withSecurityHeaders (unit)', () => {
     expect(res.getHeader('Permissions-Policy')).toBe(EXPECT.permissionsPolicy);
     expect(res.getHeader('Cross-Origin-Opener-Policy')).toBe(EXPECT.crossOriginOpenerPolicy);
     expect(res.getHeader('Cross-Origin-Resource-Policy')).toBe(EXPECT.crossOriginResourcePolicy);
+  });
+
+  it('allows Glitch to make the public game shell cross-origin request seen in the live embed', () => {
+    const res = run('/', undefined, {
+      referer: 'https://www.glitch.fun/',
+      'sec-fetch-mode': 'no-cors',
+      'sec-fetch-site': 'cross-site',
+    });
+    expect(res.getHeader('Cross-Origin-Resource-Policy')).toBe(
+      EXPECT.crossOriginResourcePolicyEmbed,
+    );
+  });
+
+  it('keeps API, admin, oauth, and internal paths same-origin even for Glitch requests', () => {
+    for (const url of [
+      '/api',
+      '/api/project-stats',
+      '/admin/api/overview',
+      '/oauth/authorize',
+      '/internal/restart-countdown',
+    ]) {
+      const res = run(url, undefined, { referer: 'https://www.glitch.fun/' });
+      expect(res.getHeader('Cross-Origin-Resource-Policy')).toBe(EXPECT.crossOriginResourcePolicy);
+    }
+  });
+
+  it('keeps direct public requests same-origin when no Glitch origin is present', () => {
+    expect(run('/').getHeader('Cross-Origin-Resource-Policy')).toBe(
+      EXPECT.crossOriginResourcePolicy,
+    );
+    expect(
+      run('/', undefined, { referer: 'not a valid url' }).getHeader('Cross-Origin-Resource-Policy'),
+    ).toBe(EXPECT.crossOriginResourcePolicy);
   });
 
   it('sets HSTS only when NODE_ENV is production', () => {
@@ -87,15 +121,17 @@ describe('withSecurityHeaders (unit)', () => {
     }
   });
 
-  it('excludes the gameplay features from the Permissions-Policy and denies the sensors', () => {
+  it('allows gameplay features from self and denies unused sensors', () => {
     const value = run('/anything').getHeader('Permissions-Policy') as string;
     // Fullscreen (mobile landscape lock) and Gamepad are in active use, so denying
     // them would break the game; they must NOT appear in the deny list.
     expect(value.includes('fullscreen')).toBe(false);
     expect(value.includes('gamepad')).toBe(false);
-    // Sensitive capabilities the game never uses ARE denied.
+    // Glitch voice chat needs the microphone only from the game origin. Other
+    // sensitive capabilities the game never uses remain denied.
     expect(value.includes('camera=()')).toBe(true);
-    expect(value.includes('microphone=()')).toBe(true);
+    expect(value.includes('microphone=(self)')).toBe(true);
+    expect(value.includes('microphone=()')).toBe(false);
     expect(value.includes('geolocation=()')).toBe(true);
   });
 
@@ -178,12 +214,14 @@ async function driveRoute(
  * Assert the full unconditional set is present with the pinned literal values,
  * and that the deferred headers (CSP, COEP) and HSTS (non-prod env) are absent.
  */
-function expectCoreHeaders(res: FakeRes): void {
+function expectCoreHeaders(res: FakeRes, opts: { crossOriginResourcePolicy?: string } = {}): void {
+  const crossOriginResourcePolicy =
+    opts.crossOriginResourcePolicy ?? EXPECT.crossOriginResourcePolicy;
   expect(res.getHeader('X-Content-Type-Options')).toBe(EXPECT.contentTypeOptions);
   expect(res.getHeader('Referrer-Policy')).toBe(EXPECT.referrerPolicy);
   expect(res.getHeader('Permissions-Policy')).toBe(EXPECT.permissionsPolicy);
   expect(res.getHeader('Cross-Origin-Opener-Policy')).toBe(EXPECT.crossOriginOpenerPolicy);
-  expect(res.getHeader('Cross-Origin-Resource-Policy')).toBe(EXPECT.crossOriginResourcePolicy);
+  expect(res.getHeader('Cross-Origin-Resource-Policy')).toBe(crossOriginResourcePolicy);
   expect(res.getHeader('Content-Security-Policy')).toBeUndefined();
   expect(res.getHeader('Cross-Origin-Embedder-Policy')).toBeUndefined();
   expect(res.getHeader('Strict-Transport-Security')).toBeUndefined();
@@ -204,6 +242,30 @@ describe('routeHttpRequest security headers (integration)', () => {
     expectCoreHeaders(res);
     // A non-oauth branch adds no clickjacking header.
     expect(res.getHeader('X-Frame-Options')).toBeUndefined();
+  });
+
+  it('allows the Glitch embed root probe on public static responses', async () => {
+    const res = await driveRoute('legacy', {
+      url: '/no-such-file-xyz.txt',
+      headers: {
+        referer: 'https://www.glitch.fun/',
+        'sec-fetch-mode': 'no-cors',
+        'sec-fetch-site': 'cross-site',
+      },
+    });
+    expect(res.statusCode).toBe(404);
+    expectCoreHeaders(res, {
+      crossOriginResourcePolicy: EXPECT.crossOriginResourcePolicyEmbed,
+    });
+  });
+
+  it('keeps the API branch same-origin for Glitch-originated requests', async () => {
+    const res = await driveRoute('legacy', {
+      url: '/api/site-presence',
+      headers: { referer: 'https://www.glitch.fun/' },
+    });
+    expect(res.statusCode).toBe(405);
+    expectCoreHeaders(res);
   });
 
   it('sets the headers on a legacy /api 405 error response', async () => {

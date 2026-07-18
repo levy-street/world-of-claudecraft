@@ -7,9 +7,82 @@
 > `ansible-playbook playbooks/setup_server.yml -e target_host=idyllic-games-prod`
 > pulls and redeploys. The guide below is the generic, standalone path.
 
-One EC2 instance runs everything: the game server, Postgres, MediaWiki, and Caddy
-(TLS reverse proxy). Sized for a small population, a `t4g.small`
-(~$14/month all-in) is comfortable for a handful of concurrent players.
+One EC2 instance can run everything: the game server, Postgres, MediaWiki, and
+Caddy (TLS reverse proxy). That bundled Postgres path is for local dev,
+playtests, and single-host installs. For production or any deployment where
+more than one host/process must share accounts and characters, put Postgres on a
+managed database such as Azure Database for PostgreSQL Flexible Server and point
+every game server at the same `DATABASE_URL`.
+
+Important architecture rule: one game server process owns the live `Sim` for one
+realm. A shared database keeps persistent state common, but two processes with
+the same `REALM_NAME` would be two separate live worlds. The server now takes a
+Postgres advisory singleton lock per realm at boot and fails fast if another
+process already hosts that realm. Scale one world by routing all players for
+that realm to its one authoritative process; scale out by adding separate
+realms, each with a different `REALM_NAME`, all pointed at the same managed
+Postgres database.
+
+The single-host guide below is comfortable for a small population on a
+`t4g.small` (~$14/month all-in).
+
+## Production Database
+
+For Glitch MMO launches and multi-host production, use a managed Postgres that
+all game server instances can reach. Azure Flexible Server is the expected path.
+
+Example Azure CLI flow:
+
+```bash
+export AZ_RESOURCE_GROUP=woc-prod
+export AZ_LOCATION=eastus
+export AZ_POSTGRES_SERVER=woc-prod-pg-$RANDOM
+export AZ_POSTGRES_ADMIN=eastbrook
+export AZ_POSTGRES_PASSWORD="$(openssl rand -base64 36 | tr -d '\n')"
+
+az group create \
+  --name "$AZ_RESOURCE_GROUP" \
+  --location "$AZ_LOCATION"
+
+az postgres flexible-server create \
+  --resource-group "$AZ_RESOURCE_GROUP" \
+  --name "$AZ_POSTGRES_SERVER" \
+  --location "$AZ_LOCATION" \
+  --admin-user "$AZ_POSTGRES_ADMIN" \
+  --admin-password "$AZ_POSTGRES_PASSWORD" \
+  --version 16 \
+  --sku-name Standard_B1ms \
+  --tier Burstable \
+  --storage-size 32 \
+  --storage-auto-grow Enabled \
+  --backup-retention 7 \
+  --public-access 0.0.0.0
+
+az postgres flexible-server db create \
+  --resource-group "$AZ_RESOURCE_GROUP" \
+  --server-name "$AZ_POSTGRES_SERVER" \
+  --database-name eastbrook
+
+# Prefer replacing this with the fixed outbound IP of your game host or load
+# balancer. 0.0.0.0 allows Azure-internal traffic; it is convenient, not a
+# complete network policy.
+az postgres flexible-server firewall-rule create \
+  --resource-group "$AZ_RESOURCE_GROUP" \
+  --name allow-game-host \
+  --server-name "$AZ_POSTGRES_SERVER" \
+  --start-ip-address "<game-host-public-ip>" \
+  --end-ip-address "<game-host-public-ip>"
+
+export DATABASE_URL="postgres://${AZ_POSTGRES_ADMIN}:${AZ_POSTGRES_PASSWORD}@${AZ_POSTGRES_SERVER}.postgres.database.azure.com:5432/eastbrook?sslmode=require"
+```
+
+Put that `DATABASE_URL` in the game server runtime environment. Do not commit it.
+Azure Postgres requires TLS for client connections, so keep
+`?sslmode=require`.
+
+When using Docker Compose for the game server, set `DATABASE_URL` in `/opt/eastbrook/.env`.
+The compose file honors that managed URL; if it is unset, it falls back to the
+bundled local Postgres service.
 
 ## 1. Confirm the repo is public
 

@@ -8096,4 +8096,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.mouseoverCast': 'パーティフレームでマウスオーバーキャスト',
   'hudChrome.options.showTargetOfTarget': 'ターゲットのターゲットを表示',
   'hudChrome.unitFrame.targetOfTargetLabel': 'ターゲットのターゲット',
+  'hudChrome.glitchVoice.off': 'ボイスチャット：オフ',
+  'hudChrome.glitchVoice.connecting': 'ボイスチャットに接続中',
+  'hudChrome.glitchVoice.on': 'ボイスチャット：オン',
+  'hudChrome.glitchVoice.muted': 'ボイスチャット：ミュート',
+  'hudChrome.glitchVoice.authError': 'ボイスチャットには Glitch への再ログインが必要です。',
+  'hudChrome.glitchVoice.bannedError': 'このプレイヤーはボイスチャットを利用できません。',
+  'hudChrome.glitchVoice.retryError':
+    'ボイスチャットが混み合っています。しばらくしてからもう一度お試しください。',
+  'hudChrome.glitchVoice.invalidError': 'ボイスチャットの設定が無効です。',
+  'hudChrome.glitchVoice.unavailableError': 'ボイスチャットは一時的に利用できません。',
+  'hudChrome.glitchVoice.permissionError':
+    'ボイスチャットを使用するにはマイクへのアクセスを許可してください。',
+  'auth.currentCharacter': '現在のキャラクター',
+  'glitchReroll.title': '最初からやり直しますか？',
+  'glitchReroll.cancel': 'キャラクターを維持',
+  'glitchReroll.confirm': '最初からやり直す',
 };

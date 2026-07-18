@@ -306,6 +306,18 @@ export const nl_NL: EnTranslations = {
     "spectate": {
       "banner": "Toeschouwer bij {name}"
     },
+    "glitchVoice": {
+      "off": "Voice Chat Off",
+      "connecting": "Connecting to Voice Chat",
+      "on": "Voice Chat On",
+      "muted": "Voice Chat Muted",
+      "authError": "Voice chat needs a new Glitch sign-in.",
+      "bannedError": "Voice chat is unavailable for this player.",
+      "retryError": "Voice chat is busy. Try again in a moment.",
+      "invalidError": "Voice chat configuration is invalid.",
+      "unavailableError": "Voice chat is temporarily unavailable.",
+      "permissionError": "Allow microphone access to use voice chat."
+    },
     "readyCheck": {
       "prompt": "{name} heeft een gereedheidscontrole gestart. Ben je gereed?",
       "ready": "Gereed",
@@ -4106,6 +4118,7 @@ export const nl_NL: EnTranslations = {
     "haveAccountPrompt": "Heb je al een account?",
     "characters": "Personages:",
     "createCharacter": "Personage aanmaken",
+    "currentCharacter": "Your Current Character",
     "characterName": "Personagenaam",
     "characterNamePlaceholder": "Personagenaam",
     "enterWorld": "Wereld betreden",
@@ -5108,6 +5121,11 @@ export const nl_NL: EnTranslations = {
     "confirmLabel": "Typ de personagenaam om te bevestigen",
     "cancel": "Annuleren",
     "confirm": "Permanent verwijderen"
+  },
+  "glitchReroll": {
+    "title": "Start Over?",
+    "cancel": "Keep Character",
+    "confirm": "Start Over"
   },
   "classDetails": {
     "sections": {

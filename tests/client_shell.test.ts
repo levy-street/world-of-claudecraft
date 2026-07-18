@@ -927,9 +927,8 @@ describe('client HTML shell', () => {
     // pinned to the shells' URLs.
     expect(mainTs).toContain("const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';");
     expect(mainTs).toContain("window.open(discordInviteUrl(), '_blank', 'noopener,noreferrer');");
-    expect(mainTs).toContain(
-      "onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),",
-    );
+    expect(mainTs).toContain('onDonate: () => {');
+    expect(mainTs).toContain("window.open(DONATE_URL, '_blank', 'noopener,noreferrer');");
     for (const [name, entry] of [
       ['index.html', html],
       ['play.html', playHtml],
@@ -969,6 +968,21 @@ describe('client HTML shell', () => {
     );
     expect(mainTs).toContain('function syncDiscordEntries(): void {');
     expect(mainTs).toContain("const desktopBtn = document.getElementById('mm-discord');");
+  });
+
+  it('ships hidden Glitch-only voice controls in both desktop and mobile shells', () => {
+    for (const [name, entry] of [
+      ['index.html', html],
+      ['play.html', playHtml],
+    ] as const) {
+      expect(entry, name).toMatch(/id="mm-glitch-voice"[^>]*hidden/);
+      expect(entry, name).toMatch(/id="mm-glitch-voice"[^>]*data-icon="voice"/);
+      expect(entry, name).toMatch(/id="mobile-glitch-voice"[^>]*hidden/);
+      expect(entry, name).toMatch(/id="mobile-glitch-voice"[^>]*data-icon="voice"/);
+    }
+    expect(mainTs).toContain('activeGlitchVoice = bindGlitchVoiceChat({');
+    expect(mainTs).toContain('session: glitchSession');
+    expect(mainTs).toContain("realm: api.realm || 'offline'");
   });
 
   it('ships the consumables quick bar in BOTH entries, collapsed by default', () => {
@@ -1820,7 +1834,8 @@ describe('client HTML shell', () => {
       'body.mobile-touch #petbar {\n    position: fixed;\n    left: 50%;\n    top: max(8px, env(safe-area-inset-top));',
     );
     expect(hudMobileCss).toContain('body.mobile-touch #mobile-more {\n    position: static;');
-    expect(mainTs).toContain('onMenu: () => hud.toggleOptionsMenu(),');
+    expect(mainTs).toContain('onMenu: () => {');
+    expect(mainTs).toContain('hud.toggleOptionsMenu();');
     expect(mobileControlsTs).not.toContain("bindButton('mobile-more-chat'");
     expect(mobileControlsTs).not.toContain("bindButton('mobile-more-social'");
     expect(mobileControlsTs).not.toContain("bindButton('mobile-more-quest'");
@@ -1835,7 +1850,8 @@ describe('client HTML shell', () => {
     expect(mainTs).not.toContain('onTarget:');
     expect(mobileControlsTs).not.toContain("bindButton('mobile-target'");
     expect(mainTs).toContain('onCycleTarget: () => world.tabTarget(),');
-    expect(mainTs).toContain('hud.onMobileAttackNearest = () => attackNearest();');
+    expect(mainTs).toContain('hud.onMobileAttackNearest = () => {');
+    expect(mainTs).toContain('attackNearest();');
     expect(mobileControlsTs).toContain(
       "this.bindButton('mobile-target-cycle', () => this.callbacks.onCycleTarget());",
     );

@@ -7,6 +7,7 @@
 // `quest__<questId>__complete`) against the generated manifest; unknown keys and
 // missing files are silent no-ops, so the game runs fine before any audio exists.
 
+import { publicAssetUrl } from '../runtime_assets';
 import { VOICE_LINES } from './voice_manifest.generated';
 
 // Voices sit slightly under their slider value so NPC dialogue doesn't overpower
@@ -81,7 +82,7 @@ class GameVoice {
     if (!src) return;
     this.stop();
     if (!this.el) this.el = new Audio();
-    this.el.src = src;
+    this.el.src = publicAssetUrl(src);
     this.playGain = opts?.gain ?? 1;
     this.distanceGain = 1; // a fresh line starts at full: you just clicked the NPC, you are close
     this.applyVolume();

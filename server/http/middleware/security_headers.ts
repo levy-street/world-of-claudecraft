@@ -33,6 +33,7 @@ const CONTENT_TYPE_OPTIONS_VALUE = 'nosniff';
 const REFERRER_POLICY_VALUE = 'strict-origin-when-cross-origin';
 const CROSS_ORIGIN_OPENER_POLICY_VALUE = 'same-origin';
 const CROSS_ORIGIN_RESOURCE_POLICY_VALUE = 'same-origin';
+const CROSS_ORIGIN_RESOURCE_POLICY_EMBED_VALUE = 'cross-origin';
 // One year, with subdomains. Set ONLY in production (see below): an HSTS header
 // on localhost poisons the browser's HSTS cache for every future localhost dev.
 const STRICT_TRANSPORT_SECURITY_VALUE = 'max-age=31536000; includeSubDomains';
@@ -47,12 +48,18 @@ const PRODUCTION_NODE_ENV = 'production';
 // consent and device HTML pages must never be framed, and its token /
 // device_authorization JSON responses carry bearer secrets.
 const OAUTH_PATH_PREFIX = '/oauth/';
+const SENSITIVE_PATH_PREFIXES: readonly string[] = ['/api', '/admin/api', '/oauth', '/internal'];
+const GLITCH_EMBED_ORIGINS: ReadonlySet<string> = new Set([
+  'https://glitch.fun',
+  'https://www.glitch.fun',
+]);
 
 // The browser features denied to every page. Fullscreen and Gamepad are
 // deliberately ABSENT: the game client calls the Fullscreen API (src/main.ts,
 // required for the mobile landscape orientation lock) and the Gamepad API
 // (src/game/gamepad.ts). Autoplay and screen-wake-lock are likewise excluded as
-// plausible game features a blanket deny would silently break. Everything below
+// plausible game features a blanket deny would silently break. Microphone is
+// allowed only to the game origin for opt-in Glitch voice chat. Everything below
 // is a sensor / capability the game never uses.
 const PERMISSIONS_POLICY_DENY_FEATURES: readonly string[] = [
   'accelerometer',
@@ -67,7 +74,6 @@ const PERMISSIONS_POLICY_DENY_FEATURES: readonly string[] = [
   'idle-detection',
   'local-fonts',
   'magnetometer',
-  'microphone',
   'midi',
   'payment',
   'serial',
@@ -78,9 +84,10 @@ const PERMISSIONS_POLICY_DENY_FEATURES: readonly string[] = [
 // Each denied feature as `name=()` (an empty allowlist), joined into the single
 // Permissions-Policy value. Built once from the list above so the list is the
 // one source of truth.
-const PERMISSIONS_POLICY_VALUE = PERMISSIONS_POLICY_DENY_FEATURES.map(
-  (feature) => `${feature}=()`,
-).join(', ');
+const PERMISSIONS_POLICY_VALUE = [
+  ...PERMISSIONS_POLICY_DENY_FEATURES.map((feature) => `${feature}=()`),
+  'microphone=(self)',
+].join(', ');
 
 /**
  * Set the security headers on `res` for every HTTP response. A plain top-level
@@ -103,7 +110,7 @@ export function withSecurityHeaders(
   res.setHeader(HEADER_REFERRER_POLICY, REFERRER_POLICY_VALUE);
   res.setHeader(HEADER_PERMISSIONS_POLICY, PERMISSIONS_POLICY_VALUE);
   res.setHeader(HEADER_CROSS_ORIGIN_OPENER_POLICY, CROSS_ORIGIN_OPENER_POLICY_VALUE);
-  res.setHeader(HEADER_CROSS_ORIGIN_RESOURCE_POLICY, CROSS_ORIGIN_RESOURCE_POLICY_VALUE);
+  res.setHeader(HEADER_CROSS_ORIGIN_RESOURCE_POLICY, glitchEmbedResourcePolicy(req, path));
 
   if (env.NODE_ENV === PRODUCTION_NODE_ENV) {
     res.setHeader(HEADER_STRICT_TRANSPORT_SECURITY, STRICT_TRANSPORT_SECURITY_VALUE);
@@ -116,4 +123,33 @@ export function withSecurityHeaders(
 
   res.removeHeader(HEADER_SERVER);
   res.removeHeader(HEADER_POWERED_BY);
+}
+
+function glitchEmbedResourcePolicy(req: http.IncomingMessage, path: string): string {
+  if (SENSITIVE_PATH_PREFIXES.some((prefix) => pathMatchesPrefix(path, prefix))) {
+    return CROSS_ORIGIN_RESOURCE_POLICY_VALUE;
+  }
+  if (!requestComesFromGlitch(req)) return CROSS_ORIGIN_RESOURCE_POLICY_VALUE;
+  return CROSS_ORIGIN_RESOURCE_POLICY_EMBED_VALUE;
+}
+
+function pathMatchesPrefix(path: string, prefix: string): boolean {
+  return path === prefix || path.startsWith(`${prefix}/`);
+}
+
+function requestComesFromGlitch(req: http.IncomingMessage): boolean {
+  const origin = originFromHeader(req.headers.origin);
+  if (origin && GLITCH_EMBED_ORIGINS.has(origin)) return true;
+  const refererOrigin = originFromHeader(req.headers.referer);
+  return refererOrigin ? GLITCH_EMBED_ORIGINS.has(refererOrigin) : false;
+}
+
+function originFromHeader(value: string | string[] | undefined): string {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (!raw) return '';
+  try {
+    return new URL(raw).origin;
+  } catch {
+    return '';
+  }
 }

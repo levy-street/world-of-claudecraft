@@ -1,3 +1,4 @@
+import { publicAssetUrl } from '../../runtime_assets';
 import { MEDIA_ASSETS } from './manifest.generated';
 
 function logicalPath(url: string): string {
@@ -6,6 +7,6 @@ function logicalPath(url: string): string {
 
 export function assetUrl(url: string): string {
   const logical = logicalPath(url);
-  if (import.meta.env.DEV) return `/${logical}`;
-  return MEDIA_ASSETS[logical] ?? `/${logical}`;
+  if (import.meta.env.DEV) return publicAssetUrl(logical);
+  return publicAssetUrl(MEDIA_ASSETS[logical] ?? logical);
 }

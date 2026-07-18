@@ -114,6 +114,8 @@ describe('Reown AppKit Solana deploy container contract', () => {
   it('passes the public Reown project id into the game client build', () => {
     expect(compose).toContain(`VITE_REOWN_PROJECT_ID: ${composeEnv('VITE_REOWN_PROJECT_ID')}`);
     expect(dockerfile).toContain('ARG VITE_REOWN_PROJECT_ID=""');
-    expect(dockerfile).toContain('VITE_REOWN_PROJECT_ID="$VITE_REOWN_PROJECT_ID"');
+    expect(dockerfile).toContain(
+      'if [ -n "$VITE_REOWN_PROJECT_ID" ]; then export VITE_REOWN_PROJECT_ID; else unset VITE_REOWN_PROJECT_ID; fi;',
+    );
   });
 });

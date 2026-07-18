@@ -1,5 +1,18 @@
+import { normalizeGameApiOrigin } from './runtime';
+
 const STORAGE_KEY = 'woc_site_visitor_id';
 const HEARTBEAT_MS = 45_000;
+const GLITCH_STATIC_HOST = 'glitch-game-content.s3.amazonaws.com';
+
+export function sitePresenceEndpoint(
+  location: Pick<Location, 'hostname'>,
+  configuredApiOrigin = String(import.meta.env.VITE_API_ORIGIN ?? ''),
+): string | null {
+  const apiOrigin = normalizeGameApiOrigin(configuredApiOrigin);
+  if (apiOrigin) return `${apiOrigin}/api/site-presence`;
+  if (location.hostname === GLITCH_STATIC_HOST) return null;
+  return '/api/site-presence';
+}
 
 function randomVisitorId(): string {
   const bytes = new Uint8Array(18);
@@ -29,10 +42,12 @@ function pageName(fallback: string): string {
 }
 
 export function startSitePresence(fallbackPage = 'home'): void {
+  const endpoint = sitePresenceEndpoint(window.location);
+  if (!endpoint) return;
   const id = visitorId();
   const send = () => {
     if (document.visibilityState === 'hidden') return;
-    void fetch('/api/site-presence', {
+    void fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ visitorId: id, page: pageName(fallbackPage) }),

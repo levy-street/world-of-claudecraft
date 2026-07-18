@@ -3,6 +3,7 @@
 // the footer. Pure DOM construction; the app owns routing and active-state updates.
 // All player-visible text is a t() key; all interpolated text passes through esc().
 
+import { publicAssetUrl } from '../runtime_assets';
 import { esc } from '../ui/esc';
 import {
   getLanguage,
@@ -106,7 +107,7 @@ export function buildChrome(
     <header class="guide-header">
       <div class="guide-header-inner">
         <a class="guide-brand" href="${esc(GUIDE_BASE)}">
-          <img class="guide-brand-logo" src="/woc-logo-guide.webp" width="239" height="160" alt="${esc(t('guide.brand'))}" decoding="async" />
+          <img class="guide-brand-logo" src="${esc(publicAssetUrl('/woc-logo-guide.webp'))}" width="239" height="160" alt="${esc(t('guide.brand'))}" decoding="async" />
         </a>
         <button type="button" class="guide-menu-toggle" aria-expanded="false" aria-controls="guide-primary-nav" aria-label="${esc(t('guide.nav.openMenu'))}">
           <span class="guide-menu-bars" aria-hidden="true"></span>
@@ -206,7 +207,6 @@ export function buildChrome(
     },
     { signal },
   );
-
   // Keyboard entry points for search: "/" (outside form fields) and Cmd/Ctrl+K.
   const searchInput = mount.querySelector('#guide-search-input') as HTMLInputElement;
   const searchWrap = mount.querySelector('.guide-search') as HTMLElement;

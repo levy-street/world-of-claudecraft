@@ -1,5 +1,5 @@
 import { execSync } from 'node:child_process';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
@@ -74,6 +74,7 @@ const apiProxyTarget =
   env(['WOC_DEV_API_TARGET']) ??
   (isDesktopDevBuild && desktopApiOrigin ? desktopApiOrigin : 'http://127.0.0.1:8787');
 const wsProxyTarget = apiProxyTarget.replace(/^https:/, 'wss:').replace(/^http:/, 'ws:');
+const isGlitchBuild = process.env.VITE_GLITCH_ENABLED === '1';
 
 // Pretty-URL aliases for standalone static HTML pages. Mirrors the production
 // server rewrite in server/main.ts so these paths resolve in dev and preview too.
@@ -296,8 +297,88 @@ function musicEditorSavePlugin() {
   };
 }
 
+const GLITCH_ROOT_ASSET_PATTERN =
+  '(?:(?:audio|env|guide-stills|media|models|textures|ui|vfx)/[^"\\\')\\s]+|(?:apple-touch-icon|favicon(?:-[0-9]+x[0-9]+)?|home-bg|icon-[0-9]+|loading-screen|manifest|robots|sitemap|llms|woc[-_][^/"\\\')\\s]+|worldofclaudecraft-logo|World-of-ClaudeCraft-Whitepaper-v1\\.0)\\.[A-Za-z0-9]+)';
+const GLITCH_HTML_ROOT_ASSET_RE = new RegExp(
+  `\\b(href|src|poster|data-trailer-src)=(["'])/(${GLITCH_ROOT_ASSET_PATTERN})([^"']*)\\2`,
+  'g',
+);
+const GLITCH_CSS_ROOT_ASSET_RE = new RegExp(
+  `url\\((["']?)/(${GLITCH_ROOT_ASSET_PATTERN})([^"'\\)]*)\\1\\)`,
+  'g',
+);
+const GLITCH_MANIFEST_ROOT_ASSET_RE = new RegExp(
+  `("src"\\s*:\\s*")/(${GLITCH_ROOT_ASSET_PATTERN})([^"]*)"`,
+  'g',
+);
+
+function rewriteGlitchHtmlAssets(source: string): string {
+  return source
+    .replace(
+      GLITCH_HTML_ROOT_ASSET_RE,
+      (_match, attr: string, quote: string, assetPath: string, suffix: string) =>
+        `${attr}=${quote}./${assetPath}${suffix}${quote}`,
+    )
+    .replace(
+      GLITCH_CSS_ROOT_ASSET_RE,
+      (_match, quote: string, assetPath: string, suffix: string) =>
+        `url(${quote}./${assetPath}${suffix}${quote})`,
+    );
+}
+
+function rewriteGlitchCssAssets(source: string): string {
+  return source.replace(
+    GLITCH_CSS_ROOT_ASSET_RE,
+    (_match, quote: string, assetPath: string, suffix: string) =>
+      `url(${quote}../${assetPath}${suffix}${quote})`,
+  );
+}
+
+function rewriteGlitchManifestAssets(source: string): string {
+  return source.replace(
+    GLITCH_MANIFEST_ROOT_ASSET_RE,
+    (_match, prefix: string, assetPath: string, suffix: string) =>
+      `${prefix}./${assetPath}${suffix}"`,
+  );
+}
+
+function walkFiles(dir: string): string[] {
+  const out: string[] = [];
+  for (const name of readdirSync(dir)) {
+    const file = path.join(dir, name);
+    const stat = statSync(file);
+    if (stat.isDirectory()) out.push(...walkFiles(file));
+    else out.push(file);
+  }
+  return out;
+}
+
+function glitchStaticAssetPlugin() {
+  return {
+    name: 'woc-glitch-static-asset-urls',
+    apply: 'build' as const,
+    closeBundle() {
+      if (!isGlitchBuild) return;
+      const outDir = path.resolve(root, 'dist');
+      if (!existsSync(outDir)) return;
+      for (const file of walkFiles(outDir)) {
+        const ext = path.extname(file);
+        if (ext !== '.html' && ext !== '.css' && ext !== '.webmanifest') continue;
+        const original = readFileSync(file, 'utf8');
+        const next =
+          ext === '.css'
+            ? rewriteGlitchCssAssets(original)
+            : ext === '.webmanifest'
+              ? rewriteGlitchManifestAssets(original)
+              : rewriteGlitchHtmlAssets(original);
+        if (next !== original) writeFileSync(file, next);
+      }
+    },
+  };
+}
+
 export default defineConfig({
-  base: '/',
+  base: isGlitchBuild ? './' : '/',
   // The Svelte plugin only transforms the standalone admin entry. The testing
   // plugin is scoped to Vitest so it cannot affect production client builds.
   plugins: [
@@ -305,6 +386,7 @@ export default defineConfig({
     ...(process.env.VITEST ? [svelteTesting()] : []),
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
+    glitchStaticAssetPlugin(),
     musicEditorSavePlugin(),
   ],
   resolve: { alias: { '#bot-detector': botDetectorImpl } },

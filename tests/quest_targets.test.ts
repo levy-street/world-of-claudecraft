@@ -69,12 +69,13 @@ describe('questObjectivesForMob (the mob tooltip quest lines)', () => {
   it('lists an incomplete kill objective with its live counts', () => {
     const { quest, mobId, objIndex } = requireKillQuest();
     const counts = quest.objectives.map(() => 0);
-    counts[objIndex] = 3;
+    const current = Math.max(0, quest.objectives[objIndex].count - 1);
+    counts[objIndex] = current;
     const lines = questObjectivesForMob(activeLog(quest, counts), mobId);
     expect(lines).toContainEqual({
       questId: quest.id,
       objectiveIndex: objIndex,
-      current: 3,
+      current,
       total: quest.objectives[objIndex].count,
     });
     // an unrelated mob gets no lines from this quest's kill objective

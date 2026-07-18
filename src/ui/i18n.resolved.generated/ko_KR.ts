@@ -306,6 +306,18 @@ export const ko_KR: EnTranslations = {
     "spectate": {
       "banner": "{name} 관전 중"
     },
+    "glitchVoice": {
+      "off": "음성 채팅 꺼짐",
+      "connecting": "음성 채팅 연결 중",
+      "on": "음성 채팅 켜짐",
+      "muted": "음성 채팅 음소거됨",
+      "authError": "음성 채팅을 사용하려면 Glitch에 다시 로그인해야 합니다.",
+      "bannedError": "이 플레이어는 음성 채팅을 사용할 수 없습니다.",
+      "retryError": "음성 채팅이 사용 중입니다. 잠시 후 다시 시도하세요.",
+      "invalidError": "음성 채팅 설정이 올바르지 않습니다.",
+      "unavailableError": "음성 채팅을 일시적으로 사용할 수 없습니다.",
+      "permissionError": "음성 채팅을 사용하려면 마이크 접근을 허용하세요."
+    },
     "readyCheck": {
       "prompt": "{name} 님이 준비 확인을 시작했습니다. 준비되셨습니까?",
       "ready": "준비 완료",
@@ -4106,6 +4118,7 @@ export const ko_KR: EnTranslations = {
     "haveAccountPrompt": "이미 계정이 있으신가요?",
     "characters": "캐릭터 목록:",
     "createCharacter": "캐릭터 생성",
+    "currentCharacter": "현재 캐릭터",
     "characterName": "캐릭터 이름",
     "characterNamePlaceholder": "캐릭터 이름",
     "enterWorld": "세계 입장",
@@ -5108,6 +5121,11 @@ export const ko_KR: EnTranslations = {
     "confirmLabel": "확인을 위해 캐릭터 이름 입력",
     "cancel": "취소",
     "confirm": "영구 삭제"
+  },
+  "glitchReroll": {
+    "title": "다시 시작할까요?",
+    "cancel": "캐릭터 유지",
+    "confirm": "다시 시작"
   },
   "classDetails": {
     "sections": {

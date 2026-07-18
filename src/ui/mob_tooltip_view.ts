@@ -10,7 +10,7 @@ import { esc } from './esc';
 
 /** One Questie-style quest line pair: the quest's already-localized title
  *  (green) over its objective progress line (gold), e.g.
- *  "Wolves at the Door" / "Forest Wolf slain: 3/8". */
+ *  "Wolves at the Door" / "Forest Wolf slain: 2/3". */
 export interface MobTooltipQuestLine {
   title: string;
   progress: string;

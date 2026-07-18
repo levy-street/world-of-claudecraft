@@ -727,6 +727,16 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.mainApi,
     method: 'POST',
+    path: '/api/auth/glitch',
+    handler: 'handleApi arm: /api/auth/glitch (handleGlitchLogin)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: 'rateLimited',
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
     path: '/api/auth/apple',
     handler: 'handleApi arm: /api/auth/apple (handleAppleLogin)',
     contentType: PROBLEM_JSON,

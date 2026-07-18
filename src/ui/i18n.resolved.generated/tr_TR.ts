@@ -306,6 +306,18 @@ export const tr_TR: EnTranslations = {
     "spectate": {
       "banner": "{name} izleniyor"
     },
+    "glitchVoice": {
+      "off": "Voice Chat Off",
+      "connecting": "Connecting to Voice Chat",
+      "on": "Voice Chat On",
+      "muted": "Voice Chat Muted",
+      "authError": "Voice chat needs a new Glitch sign-in.",
+      "bannedError": "Voice chat is unavailable for this player.",
+      "retryError": "Voice chat is busy. Try again in a moment.",
+      "invalidError": "Voice chat configuration is invalid.",
+      "unavailableError": "Voice chat is temporarily unavailable.",
+      "permissionError": "Allow microphone access to use voice chat."
+    },
     "readyCheck": {
       "prompt": "{name} bir hazır kontrolü başlattı. Hazır mısın?",
       "ready": "Hazır",
@@ -4106,6 +4118,7 @@ export const tr_TR: EnTranslations = {
     "haveAccountPrompt": "Zaten bir hesabın var mı?",
     "characters": "Karakterler:",
     "createCharacter": "Karakter Oluştur",
+    "currentCharacter": "Your Current Character",
     "characterName": "Karakter Adı",
     "characterNamePlaceholder": "Karakter adı",
     "enterWorld": "Dünyaya Gir",
@@ -5108,6 +5121,11 @@ export const tr_TR: EnTranslations = {
     "confirmLabel": "Onaylamak için karakter adını yazın",
     "cancel": "İptal",
     "confirm": "Kalıcı Olarak Sil"
+  },
+  "glitchReroll": {
+    "title": "Start Over?",
+    "cancel": "Keep Character",
+    "confirm": "Start Over"
   },
   "classDetails": {
     "sections": {

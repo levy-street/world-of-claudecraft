@@ -1,5 +1,5 @@
 // The WoW-style quest-progress banner: short yellow lines at the top-center
-// ("Forest Wolf slain: 3/8") whenever a quest mob dies or a quest item lands in
+// ("Forest Wolf slain: 2/3") whenever a quest mob dies or a quest item lands in
 // the bags. Event-driven (the sim's questProgress SimEvent, already localized
 // by the Hud before it reaches here), never a per-frame path, so plain DOM
 // construction is fine. Up to maxLines stack (a multi-objective loot burst

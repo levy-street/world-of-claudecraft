@@ -283,7 +283,9 @@ describe('touch open chain (More tray -> Hud)', () => {
       "this.bindButton('mobile-deeds', () => this.callbacks.onDeeds());",
     );
     expect(mobileControlsSrc).toContain('onDeeds(): void;');
-    expect(mainSrc).toContain('onDeeds: () => hud.toggleDeeds(),');
+    expect(mainSrc).toContain('onDeeds: () => {');
+    expect(mainSrc).toContain("trackUiSurface('deeds', 'touch');");
+    expect(mainSrc).toContain('hud.toggleDeeds();');
   });
 });
 

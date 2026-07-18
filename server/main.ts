@@ -98,10 +98,13 @@ import {
   getAccountsCount,
   getCharacter,
   getCharacterById,
+  glitchAccountForAccount,
+  glitchAccountForInstall,
   guildNameForCharacter,
   isAdminAccount,
   lifetimeXpRankForCharacter,
   lifetimeXpStanding,
+  linkGlitchAccount,
   listCharacters,
   listCompanionTokens,
   loadAccountCosmetics,
@@ -115,6 +118,7 @@ import {
   releaseAllCharacterLeases,
   releaseCharacterLease,
   renameCharacter,
+  rerollCharacter,
   revokeCompanionToken,
   saveToken,
   scopeAllowsMutation,
@@ -166,6 +170,7 @@ import {
 } from './github';
 import { configureGithubContributorsRuntime, topContributors } from './github_contributors';
 import { pruneGitHubOAuthStates } from './github_db';
+import { handleGlitchLogin, readGlitchServerConfig } from './glitch_auth';
 import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
 import { registerBusinessMetrics } from './http/business_metrics';
@@ -251,6 +256,7 @@ import {
 } from './ratelimit';
 import { createPgRateLimitStore } from './ratelimit_db';
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
+import { acquireRealmSingletonLock } from './realm_lock';
 import { resolveReportTarget } from './report_target';
 import { BUG_REPORT_MAX_BODY_BYTES, configureReportsRuntime } from './reports';
 import { resolveSfxOverlayFile } from './sfx_overlay';
@@ -1034,6 +1040,7 @@ function publicCors(res: http.ServerResponse): void {
 
 // Anti-bot: when enabled, /api/login + /api/register require a same-origin browser
 // request (a recognised Origin header), so only the web client can obtain a token.
+const GLITCH_SERVER_CONFIG = readGlitchServerConfig();
 // Resolved once on the boot Config (activeConfig().requireWebLogin), which mirrors
 // web_login_guard.ts webLoginEnforced, replacing the former module-scope const.
 
@@ -1069,6 +1076,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       req.method === 'POST' &&
       (url === '/api/register' ||
         url === '/api/login' ||
+        url === '/api/auth/glitch' ||
         url === '/api/desktop-login/create' ||
         url === '/api/desktop-login/exchange') &&
       !rateLimited(req).allowed
@@ -1241,6 +1249,28 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const emailMissing = !(account.email && account.email.trim());
       return json(res, 200, { token, username: account.username, emailMissing });
     }
+    if (req.method === 'POST' && url === '/api/auth/glitch') {
+      return handleGlitchLogin(
+        req,
+        res,
+        {
+          realm: REALM,
+          config: GLITCH_SERVER_CONFIG,
+          requestMetadata,
+          initialCharacterState,
+          glitchAccountForInstall,
+          linkGlitchAccount,
+          createAccount,
+          touchLogin,
+          saveToken,
+          listCharacters,
+          createCharacterCapped,
+          isCharacterOnline: (characterId) =>
+            [...liveGame().clients.values()].some((session) => session.characterId === characterId),
+        },
+        json,
+      );
+    }
     if (req.method === 'POST' && url === '/api/desktop-login/create') {
       // Desktop-login create scope fix: the handoff code mints a FULL session
       // via exchange, so create requires a full active session too
@@ -1275,17 +1305,6 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       }
       if (req.method === 'POST') {
         const body = await readBody(req);
-        const name = normalizeCharName(body.name);
-        if (name === null)
-          return json(res, 400, {
-            error: 'invalid character name (2-16 letters)',
-            code: 'character.name_invalid',
-          });
-        if (offensiveName(name))
-          return json(res, 400, {
-            error: 'character name is not allowed',
-            code: 'character.name_not_allowed',
-          });
         const validClasses = [
           'warrior',
           'paladin',
@@ -1297,6 +1316,68 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           'warlock',
           'druid',
         ];
+        if (body.glitchRerollCharacterId !== undefined) {
+          if (!validClasses.includes(body.class))
+            return json(res, 400, { error: 'invalid class', code: 'character.invalid_class' });
+          const characterId =
+            typeof body.glitchRerollCharacterId === 'number' &&
+            Number.isSafeInteger(body.glitchRerollCharacterId) &&
+            body.glitchRerollCharacterId > 0
+              ? body.glitchRerollCharacterId
+              : null;
+          if (characterId === null || !(await glitchAccountForAccount(accountId))) {
+            return json(res, 404, { error: 'not found', code: 'character.not_found' });
+          }
+          const character = await getCharacter(accountId, characterId);
+          if (!character)
+            return json(res, 404, { error: 'not found', code: 'character.not_found' });
+          if (character.force_rename)
+            return json(res, 403, {
+              error: 'character rename is not permitted',
+              code: 'character.rename_not_permitted',
+            });
+          if ([...liveGame().clients.values()].some((s) => s.characterId === characterId)) {
+            return json(res, 400, {
+              error: 'character is currently online',
+              code: 'character.online',
+            });
+          }
+          const skin = Math.max(
+            0,
+            Math.min(7, Math.floor(typeof body.skin === 'number' ? body.skin : 0)),
+          );
+          const c = await rerollCharacter(
+            accountId,
+            characterId,
+            body.class,
+            initialCharacterState(body.class, character.name, skin),
+          );
+          return json(
+            res,
+            c ? 200 : 404,
+            c
+              ? {
+                  id: c.id,
+                  name: c.name,
+                  class: c.class,
+                  level: c.level,
+                  skin: c.state?.skin ?? skin,
+                  forceRename: c.force_rename,
+                }
+              : { error: 'not found', code: 'character.not_found' },
+          );
+        }
+        const name = normalizeCharName(body.name);
+        if (name === null)
+          return json(res, 400, {
+            error: 'invalid character name (2-16 letters)',
+            code: 'character.name_invalid',
+          });
+        if (offensiveName(name))
+          return json(res, 400, {
+            error: 'character name is not allowed',
+            code: 'character.name_not_allowed',
+          });
         if (!validClasses.includes(body.class))
           return json(res, 400, { error: 'invalid class', code: 'character.invalid_class' });
         const skin = Math.max(
@@ -2609,6 +2690,8 @@ export async function startServer(): Promise<http.Server> {
     }
   }
   await ensureSchema();
+  const realmLock = await acquireRealmSingletonLock(pool, REALM);
+  if (realmLock) console.log(`acquired authoritative realm lock for "${REALM}"`);
   await seedOAuthClients();
   const game = liveGame();
   // Inject the game-session methods the ported admin routes (server/admin.ts) call
@@ -2844,6 +2927,7 @@ export async function startServer(): Promise<http.Server> {
       console.error('lease release-all failed:', err),
     );
     await game.chatLog.stop();
+    await realmLock?.release();
     await pool.end();
     process.exit(0);
   };

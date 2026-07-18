@@ -6,6 +6,7 @@
 // OPERATOR RULING, 2026-07-02, ip-refactor/02-WORKING-MEMORY.md); ability/aura IDS are frozen.
 
 import { describe, expect, it } from 'vitest';
+import { QUESTS } from '../../src/sim/data';
 import type { Recorder } from './record';
 import { record } from './record';
 import { SCENARIOS } from './scenarios';
@@ -422,7 +423,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     // onMobKilledForQuests bumped progress on each forest_wolf death.
     expect(
       ev.filter((e) => e.type === 'questProgress' && e.questId === 'q_wolves').length,
-    ).toBeGreaterThanOrEqual(8);
+    ).toBeGreaterThanOrEqual(QUESTS.q_wolves.objectives[0].count);
     // checkQuestReady promoted active -> ready, and the quest was turned in.
     expect(ev.some((e) => e.type === 'questReady' && e.questId === 'q_wolves')).toBe(true);
     expect(ev.some((e) => e.type === 'questDone' && e.questId === 'q_wolves')).toBe(true);

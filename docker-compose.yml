@@ -31,11 +31,11 @@ services:
         VITE_WALLET_DISABLED: ${VITE_WALLET_DISABLED:-}
     container_name: eastbrook-game
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
     environment:
-      DATABASE_URL: postgres://eastbrook:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env. See .env.example.}@postgres:5432/eastbrook
+      # Production can pass a managed Postgres URL (for example Azure Flexible
+      # Server with sslmode=require). Local dev falls back to the bundled
+      # postgres service below.
+      DATABASE_URL: ${DATABASE_URL:-postgres://eastbrook:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env. See .env.example.}@postgres:5432/eastbrook}
       PORT: "8787"
       # Runtime: node flags for the game process, chiefly the V8 heap ceiling
       # (--max-old-space-size). Node sizes its default old-space from TOTAL SYSTEM

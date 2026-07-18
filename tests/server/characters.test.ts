@@ -549,6 +549,78 @@ describe('create handler', () => {
     expect(createCharacterCapped).not.toHaveBeenCalled();
   });
 
+  it('200s a Glitch reroll with an unchanged numeric name without public name validation', async () => {
+    const initialCharacterState = vi.fn((cls: CharacterRow['class'], name: string, skin: number) =>
+      st({ class: cls, name, skin }),
+    );
+    installRuntime({ initialCharacterState });
+    const existing = charRow({
+      id: 5,
+      name: 'Glitch400',
+      class: 'warrior',
+      state: st({ skin: 0 }),
+    });
+    const rerolled = charRow({
+      id: 22,
+      name: 'Glitch400',
+      class: 'priest',
+      state: st({ skin: 3 }),
+    });
+    const createCharacterCapped = vi.fn(async () => charRow());
+    const rerollCharacter = vi.fn(async () => rerolled);
+    setCharactersDbForTests({
+      getCharacter: vi.fn(async () => existing),
+      glitchAccountForAccount: vi.fn(async () => ({
+        title_id: 'title',
+        install_id: 'install',
+        account_id: 7,
+        glitch_user_name: 'Glitch400',
+      })),
+      createCharacterCapped,
+      rerollCharacter,
+    });
+
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { glitchRerollCharacterId: 5, class: 'priest', skin: 3 },
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      id: 22,
+      name: 'Glitch400',
+      class: 'priest',
+      level: 1,
+      skin: 3,
+      forceRename: false,
+    });
+    expect(initialCharacterState).toHaveBeenCalledWith('priest', 'Glitch400', 3);
+    expect(rerollCharacter).toHaveBeenCalledWith(7, 5, 'priest', {
+      class: 'priest',
+      name: 'Glitch400',
+      skin: 3,
+    });
+    expect(createCharacterCapped).not.toHaveBeenCalled();
+  });
+
+  it('404s a Glitch reroll request from a non-Glitch account', async () => {
+    const getCharacter = vi.fn(async () => charRow({ id: 5, name: 'Glitch400' }));
+    const rerollCharacter = vi.fn(async () => charRow());
+    setCharactersDbForTests({
+      glitchAccountForAccount: vi.fn(async () => null),
+      getCharacter,
+      rerollCharacter,
+    });
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { glitchRerollCharacterId: 5, class: 'priest', skin: 3 },
+    });
+    expect(res.status).toBe(404);
+    expect(res.body).toEqual({ error: 'not found', code: 'character.not_found' });
+    expect(getCharacter).not.toHaveBeenCalled();
+    expect(rerollCharacter).not.toHaveBeenCalled();
+  });
+
   it('400s a disallowed (offensive) name', async () => {
     const createCharacterCapped = vi.fn(async () => charRow());
     setCharactersDbForTests({ createCharacterCapped });

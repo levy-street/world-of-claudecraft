@@ -306,6 +306,18 @@ export const id_ID: EnTranslations = {
     "spectate": {
       "banner": "Menonton {name}"
     },
+    "glitchVoice": {
+      "off": "Voice Chat Off",
+      "connecting": "Connecting to Voice Chat",
+      "on": "Voice Chat On",
+      "muted": "Voice Chat Muted",
+      "authError": "Voice chat needs a new Glitch sign-in.",
+      "bannedError": "Voice chat is unavailable for this player.",
+      "retryError": "Voice chat is busy. Try again in a moment.",
+      "invalidError": "Voice chat configuration is invalid.",
+      "unavailableError": "Voice chat is temporarily unavailable.",
+      "permissionError": "Allow microphone access to use voice chat."
+    },
     "readyCheck": {
       "prompt": "{name} memulai pemeriksaan kesiapan. Apakah kamu siap?",
       "ready": "Siap",
@@ -4106,6 +4118,7 @@ export const id_ID: EnTranslations = {
     "haveAccountPrompt": "Sudah punya akun?",
     "characters": "Karakter:",
     "createCharacter": "Buat Karakter",
+    "currentCharacter": "Your Current Character",
     "characterName": "Nama Karakter",
     "characterNamePlaceholder": "Nama karakter",
     "enterWorld": "Masuki Dunia",
@@ -5108,6 +5121,11 @@ export const id_ID: EnTranslations = {
     "confirmLabel": "Ketik nama karakter untuk mengonfirmasi",
     "cancel": "Batal",
     "confirm": "Hapus Permanen"
+  },
+  "glitchReroll": {
+    "title": "Start Over?",
+    "cancel": "Keep Character",
+    "confirm": "Start Over"
   },
   "classDetails": {
     "sections": {

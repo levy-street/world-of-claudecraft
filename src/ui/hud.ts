@@ -24,6 +24,7 @@ import { mechHeldWeaponOverride } from '../render/characters/manifest';
 import { onPortraitsReady } from '../render/characters/portrait';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
 import type { Renderer } from '../render/renderer';
+import { publicAssetUrl } from '../runtime_assets';
 import {
   type ChatSenderFlair,
   normalizeStreamerLink,
@@ -497,6 +498,38 @@ export interface OptionsHooks {
   gamepad: GamepadBindingsHooks;
 }
 
+export interface BehaviorHooks {
+  onTalkInteraction(event: HudTalkInteractionEvent): void;
+  onMerchantInteraction(event: HudMerchantInteractionEvent): void;
+  onEmote?(emoteId: string): void;
+}
+
+export interface HudTalkInteractionEvent {
+  kind: 'open' | 'option';
+  npcId: string;
+  npcEntityId?: number;
+  optionKey?: string;
+  questId?: string;
+  questState?: string;
+  questCount?: number;
+  hasVendor?: boolean;
+  hasMarket?: boolean;
+  source?: string;
+}
+
+export interface HudMerchantInteractionEvent {
+  kind: 'open' | 'option';
+  merchantType: 'vendor' | 'market';
+  vendorId?: string;
+  vendorEntityId?: number;
+  optionKey?: string;
+  itemId?: string;
+  stockCount?: number;
+  buybackCount?: number;
+  proceeds?: number;
+  source?: string;
+}
+
 export interface ThemeHooks {
   get(): ThemeState;
   setPreset(id: PresetId): void;
@@ -963,6 +996,7 @@ export class Hud {
   private mobileHotbarDrag: MobileHotbarDrag | null = null;
   private suppressNextActionClick = false;
   private optionsHooks: OptionsHooks | null = null;
+  private behaviorHooks: BehaviorHooks | null = null;
   private reportHooks: ReportHooks | null = null;
   private bugReportHooks: BugReportHooks | null = null;
   // Only wired online (main.ts owns the Discord account/panel state); its presence
@@ -1481,6 +1515,7 @@ export class Hud {
       openDelveBoard: (npcId) => this.openDelveBoard(npcId),
       openValeCup: () => this.toggleValeCup(),
       openCardDuel: () => this.toggleCardDuel(),
+      onTalkInteraction: (event) => this.behaviorHooks?.onTalkInteraction(event),
       voice: {
         play: (key) => voice.play(key),
         isPlaying: () => voice.isPlaying(),
@@ -1748,8 +1783,7 @@ export class Hud {
     } else if (dailyRewardsButton) {
       this.dailyRewardsButtonEl = dailyRewardsButton;
       this.mobileDailyRewardsButtonEl = mobileDailyRewardsButton;
-      dailyRewardsButton.innerHTML =
-        '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async">';
+      dailyRewardsButton.innerHTML = `<img class="daily-rewards-icon" src="${esc(publicAssetUrl('/ui/daily-rewards/treasure_chest.webp'))}" alt="" draggable="false" decoding="async">`;
       this.syncDailyRewardsSurfaceLabels();
       dailyRewardsButton.classList.remove('spin-ready');
       this.applyDailyRewardsChestButtonVisibility();
@@ -2858,6 +2892,7 @@ export class Hud {
     if (picked === 'edit') this.openEmoteEditor();
     else if (picked) {
       this.sim.playEmote(picked);
+      this.behaviorHooks?.onEmote?.(picked);
       audio.click();
     }
   }
@@ -2867,6 +2902,7 @@ export class Hud {
     if (choice === 'edit') this.openEmoteEditor();
     else {
       this.sim.playEmote(choice);
+      this.behaviorHooks?.onEmote?.(choice);
       audio.click();
     }
   }
@@ -10382,6 +10418,16 @@ export class Hud {
     if (this.bankWindowOpen) this.closeBank();
     this.openHeroicVendorNpcId = null; // the marks shop shares the container
     this.openVendorNpcId = npcId;
+    const npc = this.sim.entities.get(npcId);
+    this.behaviorHooks?.onMerchantInteraction({
+      kind: 'open',
+      merchantType: 'vendor',
+      vendorId: npc?.templateId,
+      vendorEntityId: npcId,
+      stockCount: npc?.kind === 'npc' ? npc.vendorItems.length : undefined,
+      buybackCount: this.sim.vendorBuyback.length,
+      source: 'npc',
+    });
     document.body.classList.add('vendor-open');
     this.renderVendor();
     this.renderBags();
@@ -10411,6 +10457,20 @@ export class Hud {
       if ($('#bags').style.display !== 'none') this.renderBags();
       this.renderVendor();
     };
+    const trackMerchantOption = (
+      optionKey: string,
+      extra: Partial<HudMerchantInteractionEvent> = {},
+    ) => {
+      this.behaviorHooks?.onMerchantInteraction({
+        kind: 'option',
+        merchantType: 'vendor',
+        vendorId: npc.kind === 'npc' ? npc.templateId : undefined,
+        vendorEntityId: npc.id,
+        optionKey,
+        source: 'vendor_window',
+        ...extra,
+      });
+    };
     renderVendorWindow(
       $('#vendor-window'),
       entityDisplayName(npc),
@@ -10421,9 +10481,18 @@ export class Hud {
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
-        onBuy: (itemId) => buyAndRefresh(() => this.sim.buyItem(npc.id, itemId)),
-        onBuyBack: (itemId) => buyAndRefresh(() => this.sim.buyBackItem(itemId)),
-        onSellJunk: () => buyAndRefresh(() => this.sim.sellAllJunk()),
+        onBuy: (itemId) => {
+          trackMerchantOption('buy', { itemId });
+          buyAndRefresh(() => this.sim.buyItem(npc.id, itemId));
+        },
+        onBuyBack: (itemId) => {
+          trackMerchantOption('buyback', { itemId });
+          buyAndRefresh(() => this.sim.buyBackItem(itemId));
+        },
+        onSellJunk: () => {
+          trackMerchantOption('sell_junk', { proceeds: junkProceeds });
+          buyAndRefresh(() => this.sim.sellAllJunk());
+        },
         onClose: () => this.closeVendor(),
         sellJunk: {
           enabled: junk.length > 0,
@@ -10614,6 +10683,14 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   openMarket(): void {
+    const npc = this.nearbyMarketNpc();
+    this.behaviorHooks?.onMerchantInteraction({
+      kind: 'open',
+      merchantType: 'market',
+      vendorId: npc?.templateId ?? 'world_market',
+      vendorEntityId: npc?.id,
+      source: npc ? 'npc' : 'direct',
+    });
     this.marketWindow.open();
   }
 
@@ -12669,6 +12746,10 @@ export class Hud {
 
   attachOptions(hooks: OptionsHooks): void {
     this.optionsHooks = hooks;
+  }
+
+  attachBehavior(hooks: BehaviorHooks): void {
+    this.behaviorHooks = hooks;
   }
 
   attachReporting(hooks: ReportHooks): void {

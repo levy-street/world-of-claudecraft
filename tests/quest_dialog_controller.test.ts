@@ -81,6 +81,7 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
   const openDelveBoard = vi.fn();
   const openValeCup = vi.fn();
   const openCardDuel = vi.fn();
+  const onTalkInteraction = vi.fn();
   const controller = new QuestDialogController({
     element,
     document,
@@ -113,6 +114,7 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
     openDelveBoard,
     openValeCup,
     openCardDuel,
+    onTalkInteraction,
     voice,
   });
   return {
@@ -138,6 +140,7 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
     openDelveBoard,
     openValeCup,
     openCardDuel,
+    onTalkInteraction,
   };
 }
 
@@ -203,11 +206,24 @@ describe('QuestDialogController', () => {
     offeredNpc.questIds = ['q_wolves'];
     const offered = harness(offeredNpc, 'available');
     offered.controller.open(offeredNpc.id);
+    expect(offered.onTalkInteraction).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: 'open', npcId: 'marshal_redbrook' }),
+    );
     offered.element.querySelector<HTMLButtonElement>('[data-quest="q_wolves"]')?.click();
+    expect(offered.onTalkInteraction).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'option',
+        optionKey: 'quest_offer_detail',
+        questId: 'q_wolves',
+      }),
+    );
     expect(offered.element.innerHTML).toContain('text:q_wolves');
     offered.element.querySelector<HTMLButtonElement>('.btn')?.click();
 
     expect(offered.acceptQuest).toHaveBeenCalledWith('q_wolves');
+    expect(offered.onTalkInteraction).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: 'option', optionKey: 'quest_accept' }),
+    );
     expect(offered.reportTelemetry).toHaveBeenCalledWith('quest_accept', { timeMs: 0 });
 
     const readyNpc = npc(31, 'marshal_redbrook');

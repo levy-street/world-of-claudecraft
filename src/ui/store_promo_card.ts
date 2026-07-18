@@ -22,10 +22,12 @@ export interface StorePromoVisibilityInput {
   nativeApp: boolean;
   desktopApp: boolean;
   mobileTouch: boolean;
+  /** Glitch owns its launch experience and does not show the WOC Store promo. */
+  glitchActive?: boolean;
 }
 
 export function shouldShowStorePromo(input: StorePromoVisibilityInput): boolean {
-  return !input.nativeApp && !input.desktopApp && !input.mobileTouch;
+  return !input.nativeApp && !input.desktopApp && !input.mobileTouch && !input.glitchActive;
 }
 
 const STORE_PROMO_ASPECT_HEIGHT = 590;

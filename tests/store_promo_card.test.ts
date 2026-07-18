@@ -120,9 +120,14 @@ describe('store promo card', () => {
   });
 
   it('is limited to the desktop web interface with independent platform guards', () => {
-    expect(shouldShowStorePromo({ nativeApp: false, desktopApp: false, mobileTouch: false })).toBe(
-      true,
-    );
+    expect(
+      shouldShowStorePromo({
+        nativeApp: false,
+        desktopApp: false,
+        mobileTouch: false,
+        glitchActive: false,
+      }),
+    ).toBe(true);
     expect(shouldShowStorePromo({ nativeApp: true, desktopApp: false, mobileTouch: false })).toBe(
       false,
     );
@@ -132,6 +137,14 @@ describe('store promo card', () => {
     expect(shouldShowStorePromo({ nativeApp: false, desktopApp: false, mobileTouch: true })).toBe(
       false,
     );
+    expect(
+      shouldShowStorePromo({
+        nativeApp: false,
+        desktopApp: false,
+        mobileTouch: false,
+        glitchActive: true,
+      }),
+    ).toBe(false);
   });
 
   it('reserves proportional visual space above chat, including the scaled gap', () => {

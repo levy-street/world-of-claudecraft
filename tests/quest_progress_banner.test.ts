@@ -59,11 +59,11 @@ describe('QuestProgressBanner', () => {
   it('appends a yellow line per progress event, newest last', () => {
     const host = fakeEl();
     const banner = new QuestProgressBanner(host as unknown as HTMLElement);
-    banner.show('Forest Wolf slain: 1/8');
-    banner.show('Forest Wolf slain: 2/8');
+    banner.show('Forest Wolf slain: 1/3');
+    banner.show('Forest Wolf slain: 2/3');
     expect(host.children.map((c) => c.textContent)).toEqual([
-      'Forest Wolf slain: 1/8',
-      'Forest Wolf slain: 2/8',
+      'Forest Wolf slain: 1/3',
+      'Forest Wolf slain: 2/3',
     ]);
     expect(host.children[0].className).toBe('quest-banner-line');
   });
@@ -80,7 +80,7 @@ describe('QuestProgressBanner', () => {
   it('fades a line after its visible window, then removes it after the fade', () => {
     const host = fakeEl();
     const banner = new QuestProgressBanner(host as unknown as HTMLElement);
-    banner.show('Forest Wolf slain: 3/8');
+    banner.show('Forest Wolf slain: 3/3');
     const line = host.children[0];
     // fully visible through the window
     vi.advanceTimersByTime(QUEST_BANNER_LINE_MS - 1);

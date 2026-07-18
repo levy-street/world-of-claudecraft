@@ -130,6 +130,14 @@ export interface CharacterSummary {
   offhandItemId?: string | null;
 }
 
+export interface GlitchLoginResult {
+  token: string;
+  username: string;
+  realm: string;
+  characterCreated: boolean;
+  character: CharacterSummary;
+}
+
 function stringList(value: unknown): string[] {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === 'string')
@@ -152,6 +160,22 @@ function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
     mechChromaIds: stringList(src.mechChromaIds),
     weaponSkinIds: stringList(src.weaponSkinIds),
     weaponSkinLoadout: stringRecord(src.weaponSkinLoadout),
+  };
+}
+
+function normalizeCharacterSummary(value: unknown): CharacterSummary {
+  const src = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+  const cls = typeof src.class === 'string' && src.class in CLASSES ? src.class : 'warrior';
+  return {
+    id: Number(src.id ?? 0),
+    name: typeof src.name === 'string' ? src.name : 'Glitch Player',
+    class: cls as PlayerClass,
+    level: Math.max(1, Math.floor(typeof src.level === 'number' ? src.level : 1)),
+    skin: Math.max(0, Math.floor(typeof src.skin === 'number' ? src.skin : 0)),
+    online: src.online === true,
+    forceRename: src.forceRename === true,
+    lastPlayed: typeof src.lastPlayed === 'string' ? src.lastPlayed : null,
+    playtimeSeconds: typeof src.playtimeSeconds === 'number' ? src.playtimeSeconds : 0,
   };
 }
 
@@ -449,6 +473,26 @@ export class Api {
     this.username = data.username;
   }
 
+  async glitchLogin(input: {
+    installId: string;
+    defaultClass: PlayerClass;
+  }): Promise<GlitchLoginResult> {
+    const data = await this.post('/api/auth/glitch', {
+      install_id: input.installId,
+      default_class: input.defaultClass,
+    });
+    this.token = typeof data.token === 'string' ? data.token : null;
+    this.username = typeof data.username === 'string' ? data.username : null;
+    if (typeof data.realm === 'string') this.realm = data.realm;
+    return {
+      token: this.token ?? '',
+      username: this.username ?? '',
+      realm: typeof data.realm === 'string' ? data.realm : '',
+      characterCreated: data.characterCreated === true,
+      character: normalizeCharacterSummary(data.character),
+    };
+  }
+
   async createDesktopWalletHandoff(
     action: { kind: 'link' } | { kind: 'transaction'; reference: string; expectedAddress: string },
   ): Promise<{ code: string; expiresInMs: number }> {
@@ -668,12 +712,27 @@ export class Api {
     return data.characters;
   }
 
-  async createCharacter(name: string, cls: PlayerClass, skin = 0): Promise<void> {
-    await this.post('/api/characters', { name, class: cls, skin });
+  async createCharacter(name: string, cls: PlayerClass, skin = 0): Promise<CharacterSummary> {
+    const data = await this.post('/api/characters', { name, class: cls, skin });
+    return normalizeCharacterSummary(data);
   }
 
-  async renameCharacter(characterId: number, name: string): Promise<void> {
-    await this.post(`/api/characters/${characterId}/rename`, { name });
+  async glitchRerollCharacter(
+    characterId: number,
+    cls: PlayerClass,
+    skin = 0,
+  ): Promise<CharacterSummary> {
+    const data = await this.post('/api/characters', {
+      glitchRerollCharacterId: characterId,
+      class: cls,
+      skin,
+    });
+    return normalizeCharacterSummary(data);
+  }
+
+  async renameCharacter(characterId: number, name: string): Promise<CharacterSummary> {
+    const data = await this.post(`/api/characters/${characterId}/rename`, { name });
+    return normalizeCharacterSummary(data);
   }
 
   async deleteCharacter(characterId: number, name: string): Promise<void> {
@@ -1690,7 +1749,8 @@ export class ClientWorld implements IWorld {
   }
 
   private canSendCommand(): boolean {
-    return this.connected && this.ws.readyState === WebSocket.OPEN;
+    const openState = typeof WebSocket === 'undefined' ? 1 : WebSocket.OPEN;
+    return this.connected && this.ws.readyState === openState;
   }
 
   private rawCmd(payload: Record<string, unknown>): void {

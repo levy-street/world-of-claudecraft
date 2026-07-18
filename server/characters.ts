@@ -52,6 +52,7 @@ import {
   createCharacterCapped,
   deleteCharacter,
   getCharacter,
+  glitchAccountForAccount,
   guildNameForCharacter,
   lifetimeXpRankForCharacter,
   lifetimeXpStanding,
@@ -59,6 +60,7 @@ import {
   moderationStatusForAccount,
   reclaimDeactivatedName,
   renameCharacter,
+  rerollCharacter,
   scopeAllowsMutation,
 } from './db';
 import { recentDeedsForCharacter } from './deeds_db';
@@ -197,8 +199,10 @@ const REAL_CHARACTERS_DB = {
   listCharacters,
   getCharacter,
   createCharacterCapped,
+  glitchAccountForAccount,
   reclaimDeactivatedName,
   renameCharacter,
+  rerollCharacter,
   deleteCharacter,
   lifetimeXpStanding,
   guildNameForCharacter,
@@ -264,6 +268,64 @@ function buildCharacterList(
       offhandItemId: c.state?.equipment?.offhand ?? null,
     })),
   };
+}
+
+/** Shared create/reroll response shape (mirrors the legacy inline body). */
+function characterSummaryBody(c: CharacterRow, fallbackSkin: number): unknown {
+  return {
+    id: c.id,
+    name: c.name,
+    class: c.class,
+    level: c.level,
+    skin: c.state?.skin ?? fallbackSkin,
+    forceRename: c.force_rename,
+  };
+}
+
+/** The skin clamp shared by create and Glitch reroll (mirrors the legacy inline helper). */
+function clampSkin(value: unknown): number {
+  return Math.max(0, Math.min(MAX_SKIN, Math.floor(typeof value === 'number' ? value : 0)));
+}
+
+/** Hidden-body character ids are numeric, positive, and safe to pass to SQL params. */
+function bodyPositiveId(value: unknown): number | null {
+  const n = typeof value === 'number' ? value : Number.NaN;
+  return Number.isSafeInteger(n) && n > 0 ? n : null;
+}
+
+async function glitchRerollCharacterHandler(
+  ctx: Ctx,
+  accountId: number,
+  characterIdRaw: unknown,
+  cls: PlayerClass,
+  skin: number,
+): Promise<void> {
+  const rt = useRuntime();
+  const characterId = bodyPositiveId(characterIdRaw);
+  if (characterId === null || !(await charactersDb.glitchAccountForAccount(accountId))) {
+    json(ctx.res, 404, NOT_FOUND);
+    return;
+  }
+  const character = await charactersDb.getCharacter(accountId, characterId);
+  if (!character) {
+    json(ctx.res, 404, NOT_FOUND);
+    return;
+  }
+  if (character.force_rename) {
+    json(ctx.res, 403, RENAME_NOT_PERMITTED);
+    return;
+  }
+  if (rt.isCharacterOnline(character.id)) {
+    json(ctx.res, 400, CHARACTER_ONLINE);
+    return;
+  }
+  const c = await charactersDb.rerollCharacter(
+    accountId,
+    character.id,
+    cls,
+    rt.initialCharacterState(cls, character.name, skin),
+  );
+  json(ctx.res, c ? 200 : 404, c ? characterSummaryBody(c, skin) : NOT_FOUND);
 }
 
 // ---------------------------------------------------------------------------
@@ -357,6 +419,20 @@ async function createCharacterHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
   const accountId = ctxAccountId(ctx);
   const body = (ctx.body ?? {}) as Record<string, unknown>;
+  if (body.glitchRerollCharacterId !== undefined) {
+    if (typeof body.class !== 'string' || !VALID_CLASSES.includes(body.class)) {
+      json(ctx.res, 400, INVALID_CLASS);
+      return;
+    }
+    await glitchRerollCharacterHandler(
+      ctx,
+      accountId,
+      body.glitchRerollCharacterId,
+      body.class as PlayerClass,
+      clampSkin(body.skin),
+    );
+    return;
+  }
   const name = normalizeCharName(body.name);
   if (name === null) {
     json(ctx.res, 400, INVALID_CHAR_NAME);
@@ -371,10 +447,7 @@ async function createCharacterHandler(ctx: Ctx): Promise<void> {
     return;
   }
   const cls = body.class as PlayerClass;
-  const skin = Math.max(
-    0,
-    Math.min(MAX_SKIN, Math.floor(typeof body.skin === 'number' ? body.skin : 0)),
-  );
+  const skin = clampSkin(body.skin);
   const create = () =>
     charactersDb.createCharacterCapped(
       accountId,
@@ -385,14 +458,7 @@ async function createCharacterHandler(ctx: Ctx): Promise<void> {
     );
   const respondCreated = (c: CharacterRow): void => {
     gameMetricsCounters().characterCreated();
-    json(ctx.res, 200, {
-      id: c.id,
-      name: c.name,
-      class: c.class,
-      level: c.level,
-      skin: c.state?.skin ?? skin,
-      forceRename: c.force_rename,
-    });
+    json(ctx.res, 200, characterSummaryBody(c, skin));
   };
   try {
     const c = await create();

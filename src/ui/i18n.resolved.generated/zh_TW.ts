@@ -306,6 +306,18 @@ export const zh_TW: EnTranslations = {
     "spectate": {
       "banner": "正在觀察 {name}"
     },
+    "glitchVoice": {
+      "off": "語音聊天已關閉",
+      "connecting": "正在連線語音聊天",
+      "on": "語音聊天已開啟",
+      "muted": "語音聊天已靜音",
+      "authError": "語音聊天需要重新登入 Glitch。",
+      "bannedError": "此玩家無法使用語音聊天。",
+      "retryError": "語音聊天忙碌中，請稍後再試。",
+      "invalidError": "語音聊天設定無效。",
+      "unavailableError": "語音聊天暫時無法使用。",
+      "permissionError": "請允許麥克風存取以使用語音聊天。"
+    },
     "readyCheck": {
       "prompt": "{name} 發起了準備確認。你準備好了嗎？",
       "ready": "準備就緒",
@@ -4106,6 +4118,7 @@ export const zh_TW: EnTranslations = {
     "haveAccountPrompt": "已有帳號？",
     "characters": "角色列表：",
     "createCharacter": "建立角色",
+    "currentCharacter": "目前角色",
     "characterName": "角色名稱",
     "characterNamePlaceholder": "輸入角色名稱",
     "enterWorld": "進入世界",
@@ -5108,6 +5121,11 @@ export const zh_TW: EnTranslations = {
     "confirmLabel": "輸入角色名稱以確認",
     "cancel": "取消",
     "confirm": "永久刪除"
+  },
+  "glitchReroll": {
+    "title": "重新開始？",
+    "cancel": "保留角色",
+    "confirm": "重新開始"
   },
   "classDetails": {
     "sections": {

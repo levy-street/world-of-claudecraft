@@ -306,6 +306,18 @@ export const vi_VN: EnTranslations = {
     "spectate": {
       "banner": "Đang xem {name}"
     },
+    "glitchVoice": {
+      "off": "Voice Chat Off",
+      "connecting": "Connecting to Voice Chat",
+      "on": "Voice Chat On",
+      "muted": "Voice Chat Muted",
+      "authError": "Voice chat needs a new Glitch sign-in.",
+      "bannedError": "Voice chat is unavailable for this player.",
+      "retryError": "Voice chat is busy. Try again in a moment.",
+      "invalidError": "Voice chat configuration is invalid.",
+      "unavailableError": "Voice chat is temporarily unavailable.",
+      "permissionError": "Allow microphone access to use voice chat."
+    },
     "readyCheck": {
       "prompt": "{name} đã bắt đầu kiểm tra sẵn sàng. Bạn đã sẵn sàng chưa?",
       "ready": "Sẵn Sàng",
@@ -4106,6 +4118,7 @@ export const vi_VN: EnTranslations = {
     "haveAccountPrompt": "Đã có tài khoản?",
     "characters": "Nhân vật:",
     "createCharacter": "Tạo Nhân Vật",
+    "currentCharacter": "Your Current Character",
     "characterName": "Tên Nhân Vật",
     "characterNamePlaceholder": "Tên nhân vật",
     "enterWorld": "Vào Thế Giới",
@@ -5108,6 +5121,11 @@ export const vi_VN: EnTranslations = {
     "confirmLabel": "Nhập tên nhân vật để xác nhận",
     "cancel": "Hủy",
     "confirm": "Xóa Vĩnh Viễn"
+  },
+  "glitchReroll": {
+    "title": "Start Over?",
+    "cancel": "Keep Character",
+    "confirm": "Start Over"
   },
   "classDetails": {
     "sections": {
