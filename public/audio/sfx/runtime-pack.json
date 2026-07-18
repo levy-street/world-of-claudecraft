@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "dd2968ab6a79bce578f0803de70321323dbded965c6697bb5549ebf82c54a89b",
-  "catalogHash": "af777ce2c4dff9a3c7b5577936f2f7cfe871a35b0276173d3f03d880a2603d55",
+  "bundleId": "7f5b4fa9ae0e2e6b1a2ad603957a3063a400f399e5e578a0efe52ff636635dd2",
+  "catalogHash": "409fff6d2b0a52d526d5a9ed7fb35a58225c1291397c69a42098a77d28ea2d53",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -44,12 +44,12 @@
       "variants": [
         {
           "id": "main",
-          "url": "/audio/sfx/amb_forge.mp3?v=b123393cfcdc",
-          "bytes": 343605,
-          "sha256": "b123393cfcdcd82ec10950089db8fd50d064c19c037966c30989453231ee1bbd"
+          "url": "/audio/sfx/amb_forge.mp3?v=935da6a031d4",
+          "bytes": 145492,
+          "sha256": "935da6a031d4bbd6d3ff2a9ea29eaf2effee1f28bda0b5a1f10a2b15b6409961"
         }
       ],
-      "gain": 1.778279,
+      "gain": 1,
       "playbackRate": 1
     },
     "amb_rain": {
@@ -3046,6 +3046,138 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "ui_craft_alchemy": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_craft_alchemy.mp3?v=c68fdf613536",
+          "bytes": 32016,
+          "sha256": "c68fdf6135369057461e481903ba26898191b7e6ef22c5f6a7a6db7162c27e05"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_craft_armorcrafting": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_craft_armorcrafting.mp3?v=30373b170373",
+          "bytes": 16970,
+          "sha256": "30373b1703734fafca9d71b310f9dea83d5e55b4fd385c72bdc2fdca10f248d5"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_craft_cooking": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_craft_cooking.mp3?v=c4a3ea9a2546",
+          "bytes": 50825,
+          "sha256": "c4a3ea9a25466116832806ec2bd044a39d25f6894ad116c44e0651a1793a24a6"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_craft_disenchant": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_craft_disenchant.mp3?v=9281e7f0e117",
+          "bytes": 14462,
+          "sha256": "9281e7f0e1178d2bcb7cbf0705429a2243fdede840e40e6c8155e6ff16c54d55"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_craft_enchanting": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_craft_enchanting.mp3?v=8a36a7abf662",
+          "bytes": 21359,
+          "sha256": "8a36a7abf66262cbac5429b6ad873c925ddeab6eea3b07d7215cc2d890bdb83a"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_craft_engineering": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_craft_engineering.mp3?v=038af557c856",
+          "bytes": 38913,
+          "sha256": "038af557c856d1c5a00b3a09c871f38f7114564df566d25f2310382260efbc80"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_craft_inscription": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_craft_inscription.mp3?v=3888e48de9a7",
+          "bytes": 31390,
+          "sha256": "3888e48de9a7b26a1615a380aab7e918c937fddbea02ded8fc5e90db90d42b08"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_craft_jewelcrafting": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_craft_jewelcrafting.mp3?v=992eb06311e8",
+          "bytes": 21359,
+          "sha256": "992eb06311e83548ad448bcb63a14c63f2452346b9a98e2ef4ddfa50fdb72667"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_craft_leatherworking": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_craft_leatherworking.mp3?v=4512f1c03bd2",
+          "bytes": 20105,
+          "sha256": "4512f1c03bd2207cb9e9f33dfd783ec31ac2ae15976923128dbbc3d365db5c43"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_craft_tailoring": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_craft_tailoring.mp3?v=7b9db76b71a0",
+          "bytes": 52705,
+          "sha256": "7b9db76b71a0d6d93b6b1dc9eae8c525e194cb6bdde14691a5e10cbeaf1c8821"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_craft_weaponcrafting": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_craft_weaponcrafting.mp3?v=1dd9a42b20a4",
+          "bytes": 15089,
+          "sha256": "1dd9a42b20a4d0321e26f9f6f7522242f7f74647e56190e67cdde6637a328c5d"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "ui_death": {
       "variants": [
         {
@@ -3238,73 +3370,91 @@
       "gain": 1,
       "playbackRate": 1
     },
-    "ui_fish_bite": {
+    "ui_gather_herb": {
       "variants": [
         {
-          "id": "main",
-          "url": "/audio/sfx/ui_fish_bite.mp3?v=e35376cdc03d",
-          "bytes": 18224,
-          "sha256": "e35376cdc03d4cd41a9377c600b12caff2ec56523e92a6f7dde059baea5d2dce"
+          "id": "1",
+          "url": "/audio/sfx/ui_gather_herb_1.mp3?v=8e62ee8032a5",
+          "bytes": 12581,
+          "sha256": "8e62ee8032a5fdb00f14849ac225fd0276277d6935fa542e062d19ecc8f336c7"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/ui_gather_herb_2.mp3?v=69421891d757",
+          "bytes": 6939,
+          "sha256": "69421891d7570262af361f70965a6f4f66a5c5dab8be2904437675ccc62cc86a"
+        },
+        {
+          "id": "3",
+          "url": "/audio/sfx/ui_gather_herb_3.mp3?v=0eef813589f7",
+          "bytes": 6312,
+          "sha256": "0eef813589f7baa6c0fde2697e5bee7ebe6d0b871fc8355b19d4b92017c82732"
+        },
+        {
+          "id": "4",
+          "url": "/audio/sfx/ui_gather_herb_4.mp3?v=db56b818f8c1",
+          "bytes": 6939,
+          "sha256": "db56b818f8c1dc89994c4a963a12ae3b8b495ca5c04576a359ccf87c0c58a820"
         }
       ],
       "gain": 1,
       "playbackRate": 1
     },
-    "ui_fish_cast": {
+    "ui_gather_ore": {
       "variants": [
         {
-          "id": "main",
-          "url": "/audio/sfx/ui_fish_cast.mp3?v=93c009333ef2",
-          "bytes": 15716,
-          "sha256": "93c009333ef2e01a11c7f73b0e654a23b6d3726e6105fa584d0ea4a23bd6e5cd"
+          "id": "1",
+          "url": "/audio/sfx/ui_gather_ore_1.mp3?v=2ab08dc4e6b2",
+          "bytes": 46436,
+          "sha256": "2ab08dc4e6b2df1692a3477bbd4d8ec286ca6d540107b3158e3bdbbff6ae1533"
+        },
+        {
+          "id": "2",
+          "url": "/audio/sfx/ui_gather_ore_2.mp3?v=f541978940ea",
+          "bytes": 45182,
+          "sha256": "f541978940eada79778e3d9500c38cfafb140195d4dca9279914ddef2555fc64"
+        },
+        {
+          "id": "3",
+          "url": "/audio/sfx/ui_gather_ore_3.mp3?v=a8b48b9aec19",
+          "bytes": 43928,
+          "sha256": "a8b48b9aec190e0557979cf3f9029f8e8930734fd78f3ad5ef1acce70d289ce6"
+        },
+        {
+          "id": "4",
+          "url": "/audio/sfx/ui_gather_ore_4.mp3?v=f997acc83ec9",
+          "bytes": 50198,
+          "sha256": "f997acc83ec96554a02465d94505fa3383b4274d4d0fbe198c86e178c47114dd"
         }
       ],
       "gain": 1,
       "playbackRate": 1
     },
-    "ui_fish_reel": {
+    "ui_gather_wood": {
       "variants": [
         {
-          "id": "main",
-          "url": "/audio/sfx/ui_fish_reel.mp3?v=132ca07893df",
-          "bytes": 18224,
-          "sha256": "132ca07893dfd39a0fb2bd74f241a9752b0d4701d66d79a597b9af70a52d64fd"
-        }
-      ],
-      "gain": 1,
-      "playbackRate": 1
-    },
-    "ui_gather_cast": {
-      "variants": [
+          "id": "1",
+          "url": "/audio/sfx/ui_gather_wood_1.mp3?v=5d11fc301a6a",
+          "bytes": 35151,
+          "sha256": "5d11fc301a6ad2cfc0d877934b21eaaabd80cb14f3981152bbe6c472d81563df"
+        },
         {
-          "id": "main",
-          "url": "/audio/sfx/ui_gather_cast.mp3?v=7c2be6a5c0fd",
-          "bytes": 13835,
-          "sha256": "7c2be6a5c0fd46fe577f79a5ac32f0686811258e02a54274f095267d1faf8803"
-        }
-      ],
-      "gain": 1,
-      "playbackRate": 1
-    },
-    "ui_gather_rare": {
-      "variants": [
+          "id": "2",
+          "url": "/audio/sfx/ui_gather_wood_2.mp3?v=3061a5007ceb",
+          "bytes": 36405,
+          "sha256": "3061a5007cebe138bd616ad49b26407e7ca2508850076622652312ee36b7a84a"
+        },
         {
-          "id": "main",
-          "url": "/audio/sfx/ui_gather_rare.mp3?v=43ede340f746",
-          "bytes": 20732,
-          "sha256": "43ede340f7468eef32a4c406957df0ccdc265033ae070c650f12cc5894d4e8b7"
-        }
-      ],
-      "gain": 1,
-      "playbackRate": 1
-    },
-    "ui_gather_strike": {
-      "variants": [
+          "id": "3",
+          "url": "/audio/sfx/ui_gather_wood_3.mp3?v=2aa7a35f1b0b",
+          "bytes": 35151,
+          "sha256": "2aa7a35f1b0ba634b358ba38a782b8df68cfa0a0337480c0d86ec80460a0c8f2"
+        },
         {
-          "id": "main",
-          "url": "/audio/sfx/ui_gather_strike.mp3?v=a3ff9792a000",
-          "bytes": 13835,
-          "sha256": "a3ff9792a0005baff282aa5a6b7524e5fe7e093926cf7a5b494d4a2becdc3d2c"
+          "id": "4",
+          "url": "/audio/sfx/ui_gather_wood_4.mp3?v=e9f85759452e",
+          "bytes": 40794,
+          "sha256": "e9f85759452efac0100c182ee37ff2c409eb6a8acd0bb5084cb60c89a74778e2"
         }
       ],
       "gain": 1,
@@ -3353,6 +3503,18 @@
           "url": "/audio/sfx/ui_loot_item_5.mp3?v=000f2c9b765c",
           "bytes": 8193,
           "sha256": "000f2c9b765cb9dcb5c9295388ad278f5f40a54c8283dd3c49d238f1e9844dc8"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_masterwork": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_masterwork.mp3?v=78ee87f22b9a",
+          "bytes": 48944,
+          "sha256": "78ee87f22b9a046eda43273756eb2ee051f1706eb50d46daa844e4e6a6418071"
         }
       ],
       "gain": 1,

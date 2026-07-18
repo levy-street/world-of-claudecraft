@@ -728,6 +728,40 @@ export const SFX = [
   { key: 'ui_card_reveal', custom: true },
   { key: 'ui_card_round_push', custom: true },
   { key: 'ui_card_shuffle', custom: true },
+
+  // --- Gathering node harvests (custom recordings, not ElevenLabs) ----------
+  // One cue per GatherNodeType ('ore'/'wood'/'herb', src/sim/types.ts), fired
+  // from the gatherResult sim event. Multi-take (no-repeat-random picker).
+  { key: 'ui_gather_ore', custom: true },
+  { key: 'ui_gather_wood', custom: true },
+  { key: 'ui_gather_herb', custom: true },
+
+  // --- Crafting completion, per craft family (custom recordings) -----------
+  // One cue per CRAFT_RING entry (src/sim/content/professions.ts), fired from
+  // the craftResult sim event keyed off recipeId's craft family.
+  { key: 'ui_craft_engineering', custom: true },
+  { key: 'ui_craft_alchemy', custom: true },
+  { key: 'ui_craft_cooking', custom: true },
+  { key: 'ui_craft_leatherworking', custom: true },
+  { key: 'ui_craft_tailoring', custom: true },
+  { key: 'ui_craft_inscription', custom: true },
+  { key: 'ui_craft_enchanting', custom: true },
+  { key: 'ui_craft_jewelcrafting', custom: true },
+  { key: 'ui_craft_weaponcrafting', custom: true },
+  { key: 'ui_craft_armorcrafting', custom: true },
+
+  // Masterwork proc (custom recording): layers ALONGSIDE the ui_craft_<family>
+  // cue above on a masterwork craft, not a replacement for it (Jamie's
+  // explicit design call, 2026-07-18).
+  { key: 'ui_masterwork', custom: true },
+
+  // Disenchant proc (custom recording): the enchanting profession's own
+  // action, separate from the craftByFamily set above since disenchant does
+  // not go through the recipe/craftResult path (src/sim/professions/
+  // enchanting.ts disenchantItem). No client UI calls disenchantItem() yet
+  // as of 2026-07-18; the sound is wired and ready for whenever that trigger
+  // gets built.
+  { key: 'ui_craft_disenchant', custom: true },
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

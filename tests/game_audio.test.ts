@@ -174,6 +174,82 @@ describe('sampled GameAudio facade', () => {
     ]);
   });
 
+  it('maps each GatherNodeType to its own editable clip', () => {
+    const audio = new GameAudio();
+
+    audio.gather('ore');
+    audio.gather('wood');
+    audio.gather('herb');
+
+    expect(sfxMock.playUi.mock.calls.map(([key]) => key)).toEqual([
+      'ui_gather_ore',
+      'ui_gather_wood',
+      'ui_gather_herb',
+    ]);
+  });
+
+  it('maps each craft family to its own clip, falling back to the loot ding for an unknown family', () => {
+    const audio = new GameAudio();
+
+    audio.craftSuccess('weaponcrafting');
+    audio.craftSuccess('armorcrafting');
+    audio.craftSuccess('jewelcrafting');
+    audio.craftSuccess('leatherworking');
+    audio.craftSuccess('tailoring');
+    audio.craftSuccess('engineering');
+    audio.craftSuccess('alchemy');
+    audio.craftSuccess('cooking');
+    audio.craftSuccess('inscription');
+    audio.craftSuccess('enchanting');
+    audio.craftSuccess('not_a_real_craft');
+
+    expect(sfxMock.playUi.mock.calls.map(([key]) => key)).toEqual([
+      'ui_craft_weaponcrafting',
+      'ui_craft_armorcrafting',
+      'ui_craft_jewelcrafting',
+      'ui_craft_leatherworking',
+      'ui_craft_tailoring',
+      'ui_craft_engineering',
+      'ui_craft_alchemy',
+      'ui_craft_cooking',
+      'ui_craft_inscription',
+      'ui_craft_enchanting',
+      'ui_loot_item',
+    ]);
+  });
+
+  it('plays the masterwork sting as its own cue, layered by the caller alongside craftSuccess', () => {
+    const audio = new GameAudio();
+
+    audio.craftSuccess('alchemy');
+    audio.masterwork();
+
+    expect(sfxMock.playUi.mock.calls.map(([key]) => key)).toEqual([
+      'ui_craft_alchemy',
+      'ui_masterwork',
+    ]);
+  });
+
+  it('plays the disenchant cue on its own key', () => {
+    const audio = new GameAudio();
+
+    audio.disenchant();
+
+    expect(sfxMock.playUi).toHaveBeenLastCalledWith('ui_craft_disenchant', { jitter: false });
+  });
+
+  it('gates gather, craftSuccess, masterwork, and disenchant on setFeedbackEnabled', () => {
+    const audio = new GameAudio();
+    audio.setFeedbackEnabled(false);
+
+    audio.gather('ore');
+    audio.craftSuccess('alchemy');
+    audio.masterwork();
+    audio.disenchant();
+
+    expect(sfxMock.playUi).not.toHaveBeenCalled();
+  });
+
   it('removes the ten procedural-only methods that have no call sites', () => {
     const obsolete = [
       'meleeHit',

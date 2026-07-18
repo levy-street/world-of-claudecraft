@@ -192,6 +192,7 @@ export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/pa
 export type {
   CraftingIdentityView,
   CraftResultView,
+  DisenchantResultView,
   PlayerProfessionsView,
   RecipeDef,
 } from './world_api/professions';
@@ -311,6 +312,7 @@ export const COMMAND_NAMES = [
   'harvest_node',
   'craft_item',
   'place_mobile_station',
+  'disenchant_item',
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',

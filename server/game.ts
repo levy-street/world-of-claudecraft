@@ -4353,6 +4353,9 @@ export class GameServer {
         // of craftingIdentityFor's JSON), so no dirty-marking is needed here.
         if (typeof msg.recipe === 'string') sim.trainRecipe(msg.recipe, pid);
         break;
+      case 'disenchant_item':
+        if (typeof msg.item === 'string') sim.disenchantItem(msg.item, pid);
+        break;
       case 'sell_all_junk':
         sim.sellAllJunk(pid);
         break;
