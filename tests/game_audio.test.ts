@@ -64,6 +64,7 @@ describe('sampled GameAudio facade', () => {
       ['death', 'ui_death'],
       ['arenaLoss', 'ui_arena_loss'],
       ['duelChallenge', 'ui_duel_challenge'],
+      ['invitePrompt', 'ui_duel_challenge'],
       ['duelCountdownTick', 'ui_duel_countdown'],
       ['duelStart', 'ui_duel_start'],
       ['vcupKickoff', 'ui_vcup_kickoff'],
@@ -113,6 +114,7 @@ describe('sampled GameAudio facade', () => {
       'death',
       'arenaLoss',
       'error',
+      'invitePrompt',
     ] as const;
     for (const m of feedback) audio[m]();
     expect(sfxMock.playUi).not.toHaveBeenCalled();

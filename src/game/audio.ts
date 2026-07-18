@@ -176,6 +176,16 @@ export class GameAudio {
     this.play(UI_CUES.duelChallenge);
   }
 
+  // Same ui_duel_challenge cue as a real duel/arena/Vale Cup challenge, but
+  // gated: party invite, guild invite, and a resurrection offer are not
+  // time-critical the way an actual match challenge is, and questAccept()
+  // (which they used before it was retired) always respected the Interface &
+  // Feedback Sounds toggle. Losing that gating was an unintended side effect
+  // of consolidating onto duelChallenge(), not a deliberate change.
+  invitePrompt(): void {
+    this.playFeedback(UI_CUES.duelChallenge);
+  }
+
   duelCountdownTick(): void {
     this.play(UI_CUES.duelCountdown);
   }

@@ -8974,7 +8974,7 @@ export class Hud {
           break;
         }
         case 'partyInvite':
-          audio.duelChallenge();
+          audio.invitePrompt();
           this.showPrompt(
             t('hud.prompts.partyInvite', { name: `<b>${esc(ev.fromName)}</b>` }),
             t('hud.prompts.joinParty'),
@@ -8997,8 +8997,8 @@ export class Hud {
           break;
         case 'resurrectionOffer':
           // Same "someone is asking you to respond to a prompt" vocabulary as
-          // party/guild invite; questAccept() was retired, see duelChallenge().
-          audio.duelChallenge();
+          // party/guild invite; questAccept() was retired, see invitePrompt().
+          audio.invitePrompt();
           // The sim keeps one authoritative latest offer per dead player. Mirror
           // that singleton in the HUD so an older prompt can never answer a newer
           // Chronomancer's offer.
@@ -9023,7 +9023,7 @@ export class Hud {
           );
           break;
         case 'guildInvite':
-          audio.duelChallenge();
+          audio.invitePrompt();
           this.showPrompt(
             t('hud.prompts.guildInvite', {
               name: `<b>${esc(ev.fromName)}</b>`,
