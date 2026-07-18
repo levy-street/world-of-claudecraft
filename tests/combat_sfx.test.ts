@@ -126,10 +126,13 @@ describe('combat SFX policy', () => {
     expect(mobVoiceCue('water_elemental', 'hurt')).toBe('mob_water_elemental_attack');
     expect(mobVoiceFamily('stormcrag_elemental')).toBe('elemental');
   });
-  it('suppresses crit stingers for boss targets only', () => {
+  it('suppresses crit stingers for boss and dummy targets', () => {
     expect(shouldPlayCritSfxForTarget(target('mob', 'nythraxis_scourge_of_thornpeak'))).toBe(false);
     expect(shouldPlayCritSfxForTarget(target('mob', 'nythraxis_skeleton_warrior'))).toBe(true);
     expect(shouldPlayCritSfxForTarget(target('player', 'warrior'))).toBe(true);
+    // The Training Dummy soaks hits for the damage meter; it should never
+    // react to a crit like a real fight.
+    expect(shouldPlayCritSfxForTarget(target('mob', 'training_dummy'))).toBe(false);
   });
 
   it('suppresses Nythraxis add voice barks without muting ordinary undead', () => {
@@ -340,13 +343,15 @@ describe('combat SFX policy', () => {
     expect(Object.keys(MOB_VOICE_CUES).sort()).toEqual([...SFX_MOB_EXTENSION_FAMILIES].sort());
   });
 
-  it('requests a hurt reaction only for a crit against a non-boss mob', () => {
+  it('requests a hurt reaction only for a crit against a non-boss, non-dummy mob', () => {
     const mob = target('mob', 'crypt_shambler');
     const boss = target('mob', 'nythraxis_scourge_of_thornpeak');
+    const dummy = target('mob', 'training_dummy');
     const player = target('player', 'warrior');
     expect(mobVoiceActionForDamage(damage({ crit: true }), mob)).toBe('hurt');
     expect(mobVoiceActionForDamage(damage({ crit: false }), mob)).toBeNull();
     expect(mobVoiceActionForDamage(damage({ crit: true }), boss)).toBeNull();
+    expect(mobVoiceActionForDamage(damage({ crit: true }), dummy)).toBeNull();
     expect(mobVoiceActionForDamage(damage({ crit: true }), player)).toBeNull();
   });
 
