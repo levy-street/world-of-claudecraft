@@ -26,6 +26,12 @@ const REF_DISTANCE = 5; // world units at which a sound is at full volume
 const MAX_DISTANCE = 46; // hard cutoff: beyond this, sources are silent/skipped
 const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
 const POINT_AMBIENCE_GAIN = 0.18;
+// amb_forge's custom recording sits far quieter than a generated clip even
+// after conform (a percussive hammer-strike signal has little headroom under
+// the true-peak safety floor, so the per-key gain-map ceiling can't boost it
+// meaningfully); compensate with its own mix target instead of raising
+// POINT_AMBIENCE_GAIN, which would also make every campfire louder.
+const FORGE_AMBIENCE_GAIN = 0.3;
 const FOOTSTEP_CUES: Partial<Record<string, string>> = {
   grass: 'foot_grass',
   dirt: 'foot_dirt',
@@ -742,7 +748,8 @@ class Sfx {
       return;
     }
     const key = source.kind === 'campfire' ? 'amb_campfire' : 'amb_forge';
-    this.loop(source.id, key, POINT_AMBIENCE_GAIN, source.x, source.y, source.z);
+    const gain = source.kind === 'forge' ? FORGE_AMBIENCE_GAIN : POINT_AMBIENCE_GAIN;
+    this.loop(source.id, key, gain, source.x, source.y, source.z);
   }
 
   /** Cross-fade the global ambience loops to match the player's surroundings.
