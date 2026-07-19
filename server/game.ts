@@ -5948,7 +5948,6 @@ export class GameServer {
       this.limitedSupply.onMint(ev.itemId, ev.serial, {
         characterId: winner?.characterId ?? null,
         characterName: ev.name,
-        bossId: null,
       });
       // English source; the client re-localizes via server_i18n.ts and renders
       // the [[i:...]] token as a quality-colored item link. formatNumber is a
