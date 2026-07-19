@@ -127,9 +127,9 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
     const sniper = render('hunter', (e) => e.id === 'hun_r14_sniper_training');
     expect(sniper).toContain('cast time is reduced by 20%');
 
-    const attunement = render('shaman', (e) => e.id === 'sha_r11_elemental_attunement');
-    expect(attunement).toContain('critical strikes');
-    expect(attunement).toContain('instant');
+    const recall = render('shaman', (e) => e.id === 'sha_r20_elemental_fury');
+    expect(recall).toContain('Every 3rd Jolt');
+    expect(recall).toContain('instant');
 
     const mastery = render('warrior', (e) => e.id === 'war_row_blood_offering');
     expect(mastery).toContain('ability criticals deal 15% more damage');
@@ -213,6 +213,7 @@ const PCT_FIELDS = new Set([
   'amountPctMaxHp',
   'amountPctSourceMaxHp',
   'healPctMaxHp',
+  'pctMax',
   // Thuggery mastery: the Sword Specialization extra-attack chance.
   'extraAttackPct',
   // Nature's Fury: the moonwing party spell-crit fraction.
@@ -232,6 +233,7 @@ const PCT_FIELDS = new Set([
   'barrierDrPct',
   // Ignition (fire mage mastery): the burn fraction, shown as "40%".
   'ignitionPct',
+  'fulminationOverloadPctPerCharge',
   // Chronoweave (arcane mage mastery): the mana cushion + regen, applied in
   // entity.ts / auras.ts, shown as "5%" and "20%" in the hand-written description.
   'manaPct',
@@ -619,20 +621,18 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
     expect(survival).toContain('dodge chance by 4%');
   });
 
-  it('localized thorns procs identify the ward and reflected melee strike trigger', async () => {
+  it('localized movement procs identify Arc Bolt and the speed burst', async () => {
     await ensureLocaleLoaded('es');
     setLanguage('es');
     const entry = effects.find(
       (candidate) =>
         candidate.cls === 'shaman' && candidate.id.endsWith('sha_r5_improved_lightning_shield'),
     );
-    if (!entry) throw new Error('missing Improved Thunder Ward talent entry');
+    if (!entry) throw new Error('missing Rebounding Current talent entry');
 
     const rendered = entry.render();
-    expect(rendered).toContain(tEntity({ kind: 'ability', id: 'lightning_shield', field: 'name' }));
-    expect(rendered).toContain(
-      'Protege a un aliado para que los atacantes cuerpo a cuerpo se hieran al golpearlo.',
-    );
+    expect(rendered).toContain(tEntity({ kind: 'ability', id: 'lightning_bolt', field: 'name' }));
+    expect(rendered).toContain('30');
     setLanguage('en');
   });
 });

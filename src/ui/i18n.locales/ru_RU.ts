@@ -8044,7 +8044,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description':
     'Бросает священный молот в раненого противника, нанося {damage} ед. урона от Света. Можно использовать только при запасе здоровья ниже 20%. (талант паладина)',
   'entities.abilities.healing_stream.description':
-    'Восстанавливает союзной цели 120 ед. здоровья за 12 сек. (талант шамана)',
+    'Восстанавливает союзной цели 180 ед. здоровья за 12 сек. (талант шамана)',
   'entities.abilities.holy_wrath.description':
     'Высвобождает святую силу, нанося ближайшим противникам {damage} ед. урона. (талант паладина)',
   'entities.abilities.howl_of_terror.description':
@@ -8399,4 +8399,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.alchemist_verane.title': 'Хозяин аптекарской',
   'entities.npcs.alchemist_verane.greeting':
     'Отмерь дважды, лей один раз, {className}. В аптекарской не прощают пролитых реактивов.',
+  'entities.abilities.earth_shield.name': 'Каменный заслон',
+  'entities.abilities.earth_shield.description':
+    'Снижает урон от следующих 6 прямых атак на 20%. Время действия 20 сек. (талант шамана)',
+  'entities.abilities.elemental_demand.name': 'Зов стихий',
+  'entities.abilities.elemental_demand.description':
+    'Приказывает стихиям захватить цель и заставить ее атаковать вас в течение 3 сек. (Дух войны)',
+  'entities.abilities.unleash_weapon.name': 'Стихийный разряд',
+  'entities.abilities.unleash_weapon.description':
+    'Высвобождает чары оружия, нанося {damage} ед. урона и создавая зависящий от чар эффект: Каменная связь дает угрозу, Огненное клеймо поджигает, а Ледяная связь замедляет. (талант шамана)',
 };

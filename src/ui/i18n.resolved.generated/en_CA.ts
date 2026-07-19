@@ -7256,6 +7256,14 @@ export const en_CA: EnTranslations = {
         "name": "Gripping Earth",
         "description": "Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)"
       },
+      "earth_shield": {
+        "name": "Stone Aegis",
+        "description": "Reduces damage from the next 6 direct attacks by 20%. Lasts 20 sec. (Shaman talent)"
+      },
+      "elemental_demand": {
+        "name": "Elemental Demand",
+        "description": "Commands the elements to seize the target, forcing it to attack you for 3 sec. (Warspirit)"
+      },
       "evocation": {
         "name": "Aetherwell",
         "description": "Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel. (Mage talent)"
@@ -7278,7 +7286,7 @@ export const en_CA: EnTranslations = {
       },
       "healing_stream": {
         "name": "Springwell",
-        "description": "Restores 120 health to a friendly target over 12 sec. (Shaman talent)"
+        "description": "Restores 180 health to a friendly target over 12 sec. (Shaman talent)"
       },
       "holy_wrath": {
         "name": "Saint's Ire",
@@ -7295,6 +7303,10 @@ export const en_CA: EnTranslations = {
       "inner_focus": {
         "name": "Stilled Mind",
         "description": "Makes your next spell free. Lasts 60 sec. (Priest talent)"
+      },
+      "unleash_weapon": {
+        "name": "Elemental Discharge",
+        "description": "Discharges your weapon imbue for {damage} damage and an effect based on the imbue: threat from Stonebound, a burn from Pyrebrand, or a slow from Rimebound. (Shaman talent)"
       },
       "innervate": {
         "name": "Lifesap",

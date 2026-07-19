@@ -89,6 +89,12 @@ import {
 } from './spell_combat';
 import { isSpellResisted } from './spell_resist';
 import { onCastCompleted } from './talent_procs';
+import {
+  clearWarspiritArcBoltSnapshot,
+  prepareWarspiritArcBolt,
+  warspiritArcBoltCastTime,
+  warspiritArcBoltStacks,
+} from './warspirit';
 
 // Shaman shocks (earth/flame/frost) share one cooldown; lightning_shock joins them
 // for the shared-cooldown predicate. Moved with the casting slice (only callers).
@@ -295,6 +301,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
         : res;
       applyAbility(ctx, p, meta, resolved);
     }
+    clearWarspiritArcBoltSnapshot(p);
     // the aim point is consumed by the resolved area effects; drop it so a later
     // non-aimed cast can't inherit a stale target point.
     p.castAim = null;
@@ -367,6 +374,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   p.channelTicksLeft = 0; // an interrupted channel owes no more ticks
   p.castAim = null;
   p.castTargetId = null;
+  clearWarspiritArcBoltSnapshot(p);
   // an interrupted cast never completed, so its queued follow-up is dropped too
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
@@ -837,13 +845,24 @@ export function castAbility(
   // unchanged.
   const gcd = Math.max(MIN_GCD, ctx.playerGcdFor(meta.cls) / spellHasteMult(p));
   // A channel keeps its duration, so it must not eat a next_cast_instant charge.
-  const castTime =
+  const empoweredCastTime =
     !ability.channel &&
     res.castTime > 0 &&
     (ability.school !== 'physical' || hasScopedNextCastInstant(p, ability.id)) &&
     consumeNextCastInstant(ctx, p, ability.id)
       ? 0
       : res.castTime;
+  const arcBoltStacks = warspiritArcBoltStacks(ctx, p, meta, ability.id);
+  if (arcBoltStacks > 0) p.warspiritArcBoltStacks = arcBoltStacks;
+  else clearWarspiritArcBoltSnapshot(p);
+  const castTime = warspiritArcBoltCastTime(
+    ctx,
+    p,
+    meta,
+    ability.id,
+    empoweredCastTime,
+    arcBoltStacks,
+  );
   // A free cast is consumed where the cost is actually billed: here for channels
   // and instants (this tick resolves them via the local `res`), but for cast-time
   // spells the bill lands in applyAbility at completion, which RE-RESOLVES the
@@ -920,6 +939,7 @@ export function castAbility(
     ? { ...res, empowerLevel: ability.empowerStages }
     : res;
   applyAbility(ctx, p, meta, instantResolved, castTargetId);
+  clearWarspiritArcBoltSnapshot(p);
   // instant ground-targeted cast: its effects have consumed the aim point. An
   // interleaved instant instead hands the aim back to the cast still running.
   p.castAim = blinkThrough ? heldCastAim : null;
@@ -1524,6 +1544,7 @@ function applyAbility(
         : Math.min(p.resource, ability.spendResourceCap);
     res = { ...res, cost: spend };
   }
+  res = prepareWarspiritArcBolt(ctx, p, meta, res);
 
   // helpful spells never miss
   if (

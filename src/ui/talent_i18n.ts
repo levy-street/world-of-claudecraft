@@ -82,6 +82,8 @@ type DisplayGlobalKey = Exclude<
   | 'ignitionPct'
   | 'manaPct'
   | 'manaRegenPct'
+  | 'rockbiterThreatPct'
+  | 'fulminationOverloadPctPerCharge'
 >;
 
 const NON_DISPLAY_GLOBALS = new Set<GlobalKey>([
@@ -108,6 +110,8 @@ const NON_DISPLAY_GLOBALS = new Set<GlobalKey>([
   'ignitionPct',
   'manaPct',
   'manaRegenPct',
+  'rockbiterThreatPct',
+  'fulminationOverloadPctPerCharge',
 ]);
 
 export interface TalentLocaleText {
@@ -8979,9 +8983,15 @@ export function grantAbilityValues(id: string): InterpolationValues {
   const values: Record<string, string> = {};
   const chain = effects.find((effect) => effect.type === 'chainDamage');
   const direct = effects.find((effect) =>
-    ['directDamage', 'aoeDamage', 'heal', 'aoeHeal', 'drainTick', 'groundAoE'].includes(
-      effect.type,
-    ),
+    [
+      'directDamage',
+      'aoeDamage',
+      'heal',
+      'aoeHeal',
+      'drainTick',
+      'groundAoE',
+      'unleashWeapon',
+    ].includes(effect.type),
   );
   const ground = effects.find((effect) => effect.type === 'groundAoE');
   const absorb = effects.find((effect) => effect.type === 'absorb');
@@ -9213,7 +9223,16 @@ function procDescription(proc: ProcDef, lang: SupportedLanguage, text: TalentLoc
 type DescribedAddedEffect = Extract<
   AbilityEffect,
   {
-    type: 'root' | 'aoeRoot' | 'slow' | 'absorb' | 'dot' | 'extendDot' | 'interrupt' | 'consumeDot';
+    type:
+      | 'root'
+      | 'aoeRoot'
+      | 'slow'
+      | 'absorb'
+      | 'dot'
+      | 'extendDot'
+      | 'interrupt'
+      | 'consumeDot'
+      | 'consumeAuraChargesDamage';
   }
 >;
 
@@ -9226,7 +9245,8 @@ function assertDescribedAddedEffect(effect: AbilityEffect): asserts effect is De
     effect.type !== 'dot' &&
     effect.type !== 'extendDot' &&
     effect.type !== 'interrupt' &&
-    effect.type !== 'consumeDot'
+    effect.type !== 'consumeDot' &&
+    effect.type !== 'consumeAuraChargesDamage'
   ) {
     throw new Error(`Unsupported talent rider effect: ${effect.type}`);
   }
@@ -9261,6 +9281,8 @@ function addedEffectDescription(
       return `${name}: ${t('hudChrome.auraEffect.lockout')} (${seconds(effect.lockout, lang)}).`;
     case 'consumeDot':
       return `${name} -> ${abilityName(effect.dot)}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s.`;
+    case 'consumeAuraChargesDamage':
+      return `${name} -> ${abilityName(effect.auraId)}: ${formatNumber(effect.damagePerCharge, lang)} ${text.statLabels.damage} x charge${effect.radius === undefined ? '' : ` (r=${formatNumber(effect.radius, lang)})`}.`;
   }
 }
 

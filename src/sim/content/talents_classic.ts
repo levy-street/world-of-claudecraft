@@ -17,6 +17,7 @@ function spec(
   masteryName: string,
   masteryDescription: string,
   effect: TalentEffect,
+  extraGrants?: string[],
 ): SpecDef {
   return {
     id,
@@ -26,6 +27,7 @@ function spec(
     icon,
     description,
     signature,
+    ...(extraGrants ? { extraGrants } : {}),
     mastery: { name: masteryName, description: masteryDescription, effect },
   };
 }
@@ -283,9 +285,42 @@ const SHAMAN_SPECS: SpecDef[] = [
     '*',
     'A ranged caster who calls lightning, flame, and frost.',
     'elemental_mastery',
-    'Earthen Fury',
-    'Increases your spell damage by 15% and your spell haste by 10%.',
-    { global: { spellDmgPct: 0.15, spellHastePct: 0.1 } },
+    'Fulmination',
+    'Arc Bolt builds Thunder Ward to 9 charges. Each charge gives Arc Bolt 5% Overload chance for a half-damage repeat that can chain once. Earthen Jolt consumes every charge for 8 Nature damage each to nearby enemies. Increases your spell damage by 15% and spell haste by 10%.',
+    {
+      global: {
+        spellDmgPct: 0.15,
+        spellHastePct: 0.1,
+        fulminationOverloadPctPerCharge: 0.05,
+      },
+      ability: [
+        {
+          ability: 'earth_shock',
+          addEffects: [
+            {
+              type: 'consumeAuraChargesDamage',
+              auraId: 'lightning_shield',
+              damagePerCharge: 8,
+              radius: 8,
+            },
+          ],
+        },
+      ],
+      proc: {
+        id: 'sha_fulmination',
+        name: 'Fulmination',
+        school: 'nature',
+        trigger: { on: 'castNth', n: 1, abilities: ['lightning_bolt'] },
+        responses: [
+          {
+            kind: 'addAuraCharges',
+            ability: 'lightning_shield',
+            amount: 1,
+            maxCharges: 9,
+          },
+        ],
+      },
+    },
   ),
   spec(
     'enhancement',
@@ -293,11 +328,22 @@ const SHAMAN_SPECS: SpecDef[] = [
     'Warspirit',
     'dps',
     'x',
-    'A weapon fighter who channels the storm through melee swings.',
+    'A weapon fighter who channels the storm through melee swings and can cover short off-tank windows.',
     'stormstrike',
     'Skyrend',
-    'Increases your melee attack speed by 10% and your physical ability damage by 10%.',
-    { global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 } },
+    'Landed auto-attacks and Ancestral Strike build Skyrend, up to 5 stacks lasting 30 sec. Each stack shortens the next Arc Bolt by 20% and increases its damage by 10%. Arc Bolt consumes every stack and becomes instant at 5. Stonebound Weapon doubles threat while active. Increases maximum health by 10%, armor by 20%, melee haste by 10%, and melee ability damage by 10%.',
+    {
+      stats: { maxHpPct: 0.1, armorPct: 0.2 },
+      global: { meleeHastePct: 0.1, meleeDmgPct: 0.1, rockbiterThreatPct: 1 },
+      proc: {
+        id: 'sha_skyrend',
+        name: 'Skyrend',
+        school: 'nature',
+        trigger: { on: 'meleeHit', abilities: ['auto_attack', 'stormstrike'] },
+        responses: [{ kind: 'stackAura', aura: 'stormcharge', maxStacks: 5, duration: 30 }],
+      },
+    },
+    ['elemental_demand'],
   ),
   spec(
     'restoration',
@@ -308,12 +354,27 @@ const SHAMAN_SPECS: SpecDef[] = [
     'A healer using ancestral waves and efficient nature magic.',
     'chain_heal',
     'Cleansing Tides',
-    'Your healing spells cost 20% less mana.',
+    'Completing Chain Heal makes your next Mending Waters within 8 sec cost 50% less. Your healing spells cost 20% less mana.',
     {
       ability: [
         { ability: 'chain_heal', costPct: -0.2 },
         { ability: 'healing_wave', costPct: -0.2 },
       ],
+      proc: {
+        id: 'sha_cleansing_tides',
+        name: 'Cleansing Tides',
+        school: 'nature',
+        trigger: { on: 'castNth', n: 1, abilities: ['chain_heal'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_cheap',
+            abilities: ['healing_wave'],
+            duration: 8,
+            costPct: 0.5,
+          },
+        ],
+      },
     },
   ),
 ];

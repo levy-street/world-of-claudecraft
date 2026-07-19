@@ -7256,6 +7256,14 @@ export const nl_NL: EnTranslations = {
         "name": "Grijpende aarde",
         "description": "Bindt nabije vijanden aan de aarde en wortelt ze 2 sec. (sjamaantalent)"
       },
+      "earth_shield": {
+        "name": "Stone Aegis",
+        "description": "Reduces damage from the next 6 direct attacks by 20%. Lasts 20 sec. (Shaman talent)"
+      },
+      "elemental_demand": {
+        "name": "Elemental Demand",
+        "description": "Commands the elements to seize the target, forcing it to attack you for 3 sec. (Warspirit)"
+      },
       "evocation": {
         "name": "Etherbron",
         "description": "Restaura mana rápidamente. (magiertalent)"
@@ -7295,6 +7303,10 @@ export const nl_NL: EnTranslations = {
       "inner_focus": {
         "name": "Gestilde geest",
         "description": "Maakt je volgende spreuk gratis. Duurt 60 sec. (priestertalent)"
+      },
+      "unleash_weapon": {
+        "name": "Elemental Discharge",
+        "description": "Discharges your weapon imbue for {damage} damage and an effect based on the imbue: threat from Stonebound, a burn from Pyrebrand, or a slow from Rimebound. (Shaman talent)"
       },
       "innervate": {
         "name": "Levenssap",

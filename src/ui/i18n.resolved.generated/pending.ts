@@ -10,6 +10,12 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name",
     "entities.items.copper_ore.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
@@ -130,6 +136,12 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "es_ES": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name",
     "entities.items.copper_ore.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
@@ -250,6 +262,12 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "fr_FR": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name",
     "entities.items.copper_ore.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
@@ -370,6 +388,12 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "fr_CA": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name",
     "entities.items.copper_ore.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
@@ -491,6 +515,12 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name",
     "entities.items.copper_ore.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
@@ -611,6 +641,12 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "de_DE": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name",
     "entities.items.copper_ore.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
@@ -743,6 +779,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.skillValue"
   ],
   "pt_BR": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name",
     "entities.items.copper_ore.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
@@ -866,6 +908,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.skillValue"
   ],
   "cs_CZ": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name",
     "entities.items.copper_ore.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
@@ -986,6 +1034,12 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "nl_NL": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name",
     "entities.items.copper_ore.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
@@ -1106,6 +1160,12 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "pl_PL": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name",
     "entities.items.copper_ore.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
@@ -1226,6 +1286,12 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "id_ID": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name",
     "entities.items.copper_ore.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
@@ -1346,6 +1412,12 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "tr_TR": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name",
     "entities.items.copper_ore.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
@@ -1466,6 +1538,12 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "sv_SE": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name",
     "entities.items.copper_ore.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
@@ -1586,6 +1664,12 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "vi_VN": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name",
     "entities.items.copper_ore.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
@@ -1706,6 +1790,12 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "da_DK": [
+    "entities.abilities.earth_shield.description",
+    "entities.abilities.earth_shield.name",
+    "entities.abilities.elemental_demand.description",
+    "entities.abilities.elemental_demand.name",
+    "entities.abilities.unleash_weapon.description",
+    "entities.abilities.unleash_weapon.name",
     "entities.items.copper_ore.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",

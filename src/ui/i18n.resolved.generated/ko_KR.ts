@@ -7256,6 +7256,14 @@ export const ko_KR: EnTranslations = {
         "name": "붙드는 대지",
         "description": "주위 적을 대지에 묶어 2초 동안 이동하지 못하게 합니다. (주술사 특성)"
       },
+      "earth_shield": {
+        "name": "돌의 방벽",
+        "description": "다음 6회의 직접 공격으로 받는 피해를 20% 감소시킵니다. 20초 동안 지속됩니다. (주술사 특성)"
+      },
+      "elemental_demand": {
+        "name": "정령의 도발",
+        "description": "정령에게 명령해 대상을 붙잡고 3초 동안 자신을 공격하게 합니다. (전투영혼)"
+      },
       "evocation": {
         "name": "에테르샘",
         "description": "마나를 빠르게 회복합니다. (마법사 특성)"
@@ -7278,7 +7286,7 @@ export const ko_KR: EnTranslations = {
       },
       "healing_stream": {
         "name": "샘물",
-        "description": "12초에 걸쳐 아군 대상의 생명력을 120 회복합니다. (주술사 특성)"
+        "description": "12초에 걸쳐 아군 대상의 생명력을 180 회복합니다. (주술사 특성)"
       },
       "holy_wrath": {
         "name": "성자의 분노",
@@ -7295,6 +7303,10 @@ export const ko_KR: EnTranslations = {
       "inner_focus": {
         "name": "고요한 마음",
         "description": "다음 주문을 자원 소모 없이 사용합니다. 60초 동안 지속됩니다. (사제 특성)"
+      },
+      "unleash_weapon": {
+        "name": "정령 방출",
+        "description": "무기 강화 효과를 방출해 {damage}의 피해를 입히고 강화에 따른 효과를 냅니다. 돌결속은 위협, 불꽃낙인은 화상, 서리결속은 감속을 부여합니다. (주술사 특성)"
       },
       "innervate": {
         "name": "생명 수액",

@@ -64,6 +64,8 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `combat/casting_lifecycle.ts` | `updateCasting`, `castAbility(BySlot)`, `cancelCast`, `pushbackCast`, GCD/cost/cooldown |
 | `combat/effect_dispatch.ts` | `runEffects` (the per-effect switch) |
 | `combat/auto_attack.ts` | start/stop/update auto-attack, `meleeSwing`, `rangedSwing` |
+| `combat/fulmination.ts` + `combat/warspirit.ts` | Shaman specialization rotations: Thunder Ward overload/discharge and Skyrend stack snapshots |
+| `combat/earth_shield.ts` + `combat/unleash_weapon.ts` | Shaman active mitigation and weapon-imbue discharge |
 | `combat/equip_procs.ts` + `combat/set_procs.ts` | legendary weapon on-action procs; item-set bonus procs |
 | `combat/empower_next.ts` + `combat/thorns_charge.ts` | next-cast empower/free aura consumption; charge-limited thorns |
 | `projectile_travel.ts` | in-flight homing projectiles: `pendingProjectiles` + the prologue `advancePendingProjectiles` phase |

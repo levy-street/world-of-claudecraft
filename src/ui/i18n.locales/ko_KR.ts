@@ -7888,7 +7888,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description':
     '부상당한 적에게 신성한 망치를 던져 {damage}의 신성 피해를 입힙니다. 생명력이 20% 미만일 때만 사용할 수 있습니다. (성기사 특성)',
   'entities.abilities.healing_stream.description':
-    '12초에 걸쳐 아군 대상의 생명력을 120 회복합니다. (주술사 특성)',
+    '12초에 걸쳐 아군 대상의 생명력을 180 회복합니다. (주술사 특성)',
   'entities.abilities.holy_wrath.description':
     '신성한 힘을 방출해 주위 적에게 {damage}의 피해를 입힙니다. (성기사 특성)',
   'entities.abilities.howl_of_terror.description':
@@ -8227,4 +8227,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.alchemist_verane.title': '약방의 주인',
   'entities.npcs.alchemist_verane.greeting':
     '두 번 재고 한 번에 부어라, {className}. 약방에서는 쏟은 시약을 봐주지 않는다.',
+  'entities.abilities.earth_shield.name': '돌의 방벽',
+  'entities.abilities.earth_shield.description':
+    '다음 6회의 직접 공격으로 받는 피해를 20% 감소시킵니다. 20초 동안 지속됩니다. (주술사 특성)',
+  'entities.abilities.elemental_demand.name': '정령의 도발',
+  'entities.abilities.elemental_demand.description':
+    '정령에게 명령해 대상을 붙잡고 3초 동안 자신을 공격하게 합니다. (전투영혼)',
+  'entities.abilities.unleash_weapon.name': '정령 방출',
+  'entities.abilities.unleash_weapon.description':
+    '무기 강화 효과를 방출해 {damage}의 피해를 입히고 강화에 따른 효과를 냅니다. 돌결속은 위협, 불꽃낙인은 화상, 서리결속은 감속을 부여합니다. (주술사 특성)',
 };

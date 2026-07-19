@@ -1369,8 +1369,150 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
   rows: [
     {
       level: 5,
-      theme: 'elements',
-      decision: 'Arc Bolt-fed free jolt vs reflected-hit instant bolt vs imbued sustain',
+      theme: 'mobility',
+      decision: 'post-cast sprint vs mobile healing vs early instant travel form',
+      options: [
+        {
+          id: 'sha_r5_improved_lightning_shield',
+          name: 'Rebounding Current',
+          description: 'Completing Arc Bolt increases your movement speed by 30% for 3 sec.',
+          icon: 'lightning_bolt',
+          effect: {
+            proc: {
+              id: 'sha_rebounding_current',
+              name: 'Rebounding Current',
+              school: 'nature',
+              trigger: { on: 'castNth', n: 1, abilities: ['lightning_bolt'] },
+              responses: [
+                {
+                  kind: 'aura',
+                  auraKind: 'buff_speed',
+                  value: 1.3,
+                  duration: 3,
+                  name: 'Rebounding Current',
+                },
+              ],
+            },
+          },
+        },
+        {
+          id: 'sha_r11_ancestral_guidance',
+          name: 'Guiding Spirits',
+          description: 'Mending Waters can be cast while moving.',
+          icon: 'healing_wave',
+          effect: { ability: [{ ability: 'healing_wave', castWhileMoving: true }] },
+        },
+        {
+          id: 'sha_r17_improved_ghost_wolf',
+          name: 'Wolfstep',
+          description: 'Shadewolf becomes instant.',
+          icon: 'ghost_wolf',
+          effect: { ability: [{ ability: 'ghost_wolf', castPct: -1 }] },
+        },
+      ],
+    },
+    {
+      level: 8,
+      theme: 'survival',
+      decision: 'imbued sustain vs reactive absorb vs reactive recovery',
+      options: [
+        {
+          id: 'sha_r5_imbue_mastery',
+          name: 'Imbued Lifeblood',
+          description:
+            'Landed melee auto-attacks with an active weapon imbue heal you for 4% of your maximum health. 3 sec internal cooldown.',
+          icon: 'rockbiter_weapon',
+          effect: {
+            proc: {
+              id: 'sha_imbued_lifeblood',
+              name: 'Imbued Lifeblood',
+              trigger: {
+                on: 'meleeHit',
+                abilities: ['auto_attack'],
+                auraKind: 'imbue',
+                icd: 3,
+              },
+              responses: [{ kind: 'heal', amountPctMaxHp: 0.04, applyTo: 'self' }],
+            },
+          },
+        },
+        {
+          id: 'sha_r17_elemental_warding',
+          name: 'Stonewake Shell',
+          description:
+            'Taking a hit for at least 15% of your maximum health raises an earthen shell absorbing 12% of your maximum health for 10 sec. 20 sec internal cooldown.',
+          icon: 'lightning_shield',
+          effect: {
+            proc: {
+              id: 'sha_stonewake_shell',
+              name: 'Stonewake Shell',
+              school: 'nature',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
+              responses: [
+                {
+                  kind: 'absorb',
+                  amountPctMaxHp: 0.12,
+                  duration: 10,
+                  name: 'Stonewake Shell',
+                },
+              ],
+            },
+          },
+        },
+        {
+          id: 'sha_r8_ancestral_mending',
+          name: 'Ancestral Mending',
+          description:
+            'Taking a hit for at least 15% of your maximum health heals you for 12% of your maximum health. 20 sec internal cooldown.',
+          icon: 'healing_wave',
+          effect: {
+            proc: {
+              id: 'sha_ancestral_mending',
+              name: 'Ancestral Mending',
+              school: 'nature',
+              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
+              responses: [{ kind: 'heal', amountPctMaxHp: 0.12, applyTo: 'self' }],
+            },
+          },
+        },
+      ],
+    },
+    {
+      level: 11,
+      theme: 'control',
+      decision: 'single-target interrupt vs single-target root vs area root',
+      options: [
+        {
+          id: 'sha_r8_improved_earth_shock',
+          name: 'Fault Rebuke',
+          description: 'Earthen Jolt also interrupts spellcasting for a 2 sec school lockout.',
+          icon: 'earth_shock',
+          effect: {
+            ability: [{ ability: 'earth_shock', addEffects: [{ type: 'interrupt', lockout: 2 }] }],
+          },
+        },
+        {
+          id: 'sha_r8_frost_bind',
+          name: 'Rime Lock',
+          description: 'Rime Jolt also roots the target for 2 sec.',
+          icon: 'frost_shock',
+          effect: {
+            ability: [{ ability: 'frost_shock', addEffects: [{ type: 'root', duration: 2 }] }],
+          },
+        },
+        {
+          id: 'sha_r17_earthbind',
+          name: 'Gripping Earth',
+          description: 'Grants Gripping Earth.',
+          icon: 'earthbind',
+          effect: { grant: { ability: 'earthbind' } },
+        },
+      ],
+    },
+    {
+      level: 14,
+      theme: 'amplify',
+      decision: 'Arc Bolt-fed free Jolt vs imbued Jolt tempo vs Jolt-fed mana',
       options: [
         {
           id: 'sha_r5_concussion',
@@ -1395,70 +1537,28 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           },
         },
         {
-          id: 'sha_r5_improved_lightning_shield',
-          name: 'Rebounding Current',
+          id: 'sha_r14_weapon_fury',
+          name: 'Imbued Tempo',
           description:
-            'When your Thunder Ward reflects a strike, your next Arc Bolt within 8 sec is instant.',
-          icon: 'lightning_shield',
+            'Landed melee auto-attacks with an imbued weapon shave 0.5 sec off your Jolt cooldowns.',
+          icon: 'stormstrike',
           effect: {
             proc: {
-              id: 'sha_ward_surge',
-              name: 'Rebounding Current',
-              trigger: { on: 'thornsReflect', ability: 'lightning_shield' },
+              id: 'sha_weapon_fury',
+              name: 'Imbued Tempo',
+              trigger: { on: 'meleeHit', abilities: ['auto_attack'], auraKind: 'imbue' },
               responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
-                  abilities: ['lightning_bolt'],
-                  duration: 8,
-                },
+                { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 0.5 },
+                { kind: 'cooldownRefund', ability: 'flame_shock', seconds: 0.5 },
+                { kind: 'cooldownRefund', ability: 'frost_shock', seconds: 0.5 },
               ],
             },
           },
         },
         {
-          id: 'sha_r5_imbue_mastery',
-          name: 'Imbued Lifeblood',
-          description: 'Each landed melee auto-attack with an active weapon imbue heals you for 8.',
-          icon: 'rockbiter_weapon',
-          effect: {
-            proc: {
-              id: 'sha_imbued_lifeblood',
-              name: 'Imbued Lifeblood',
-              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
-              responses: [{ kind: 'heal', amount: 8 }],
-            },
-          },
-        },
-      ],
-    },
-    {
-      level: 8,
-      theme: 'jolts',
-      decision: 'interrupting Earthen Jolt vs rooting Rime Jolt vs Jolt-fed mana',
-      options: [
-        {
-          id: 'sha_r8_improved_earth_shock',
-          name: 'Fault Rebuke',
-          description: 'Earthen Jolt also interrupts spellcasting for a 2 sec school lockout.',
-          icon: 'earth_shock',
-          effect: {
-            ability: [{ ability: 'earth_shock', addEffects: [{ type: 'interrupt', lockout: 2 }] }],
-          },
-        },
-        {
-          id: 'sha_r8_frost_bind',
-          name: 'Rime Lock',
-          description: 'Rime Jolt also roots the target for 2 sec.',
-          icon: 'frost_shock',
-          effect: {
-            ability: [{ ability: 'frost_shock', addEffects: [{ type: 'root', duration: 2 }] }],
-          },
-        },
-        {
           id: 'sha_r8_shock_efficiency',
           name: 'Returning Current',
-          description: 'Every 3rd Jolt restores 30 mana.',
+          description: 'Every 3rd Jolt restores 8% of your maximum mana.',
           icon: 'earth_shock',
           effect: {
             proc: {
@@ -1469,60 +1569,30 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
                 n: 3,
                 abilities: ['earth_shock', 'flame_shock', 'frost_shock'],
               },
-              responses: [{ kind: 'resource', amount: 30, resourceType: 'mana' }],
+              responses: [{ kind: 'resource', pctMax: 0.08, resourceType: 'mana' }],
             },
           },
         },
       ],
     },
     {
-      level: 11,
-      theme: 'attunement',
-      decision: 'heal-crit tempo vs bolt-crit tempo vs healing-over-time spring',
+      level: 17,
+      theme: 'cooldown',
+      decision: 'imbue burst vs active mitigation vs emergency healing over time',
       options: [
         {
-          id: 'sha_r11_ancestral_guidance',
-          name: 'Guiding Spirits',
-          description:
-            'When your Mending Waters critically heals, your next Mending Waters within 10 sec is instant.',
-          icon: 'healing_wave',
-          effect: {
-            proc: {
-              id: 'sha_guiding_spirits',
-              name: 'Guiding Spirits',
-              trigger: { on: 'spellCrit', abilities: ['healing_wave'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
-                  abilities: ['healing_wave'],
-                  duration: 10,
-                },
-              ],
-            },
-          },
+          id: 'sha_r17_elemental_discharge',
+          name: 'Elemental Discharge',
+          description: 'Grants Elemental Discharge.',
+          icon: 'unleash_weapon',
+          effect: { grant: { ability: 'unleash_weapon' } },
         },
         {
-          id: 'sha_r11_elemental_attunement',
-          name: 'Sky Echo',
-          description: 'Arc Bolt critical strikes make your next Arc Bolt within 8 sec instant.',
-          icon: 'lightning_bolt',
-          effect: {
-            proc: {
-              id: 'sha_elemental_attunement',
-              name: 'Sky Echo',
-              school: 'nature',
-              trigger: { on: 'spellCrit', abilities: ['lightning_bolt'] },
-              responses: [
-                {
-                  kind: 'empowerNext',
-                  aura: 'next_cast_instant',
-                  abilities: ['lightning_bolt'],
-                  duration: 8,
-                },
-              ],
-            },
-          },
+          id: 'sha_r17_stone_aegis',
+          name: 'Stone Aegis',
+          description: 'Grants Stone Aegis.',
+          icon: 'earth_shield',
+          effect: { grant: { ability: 'earth_shield' } },
         },
         {
           id: 'sha_r11_healing_stream',
@@ -1534,92 +1604,9 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
       ],
     },
     {
-      level: 14,
-      theme: 'storm',
-      decision: 'area lightning vs DoT detonation vs imbued-melee Jolt cooldowns',
-      options: [
-        {
-          id: 'sha_r14_chain_lightning',
-          name: 'Skybranch',
-          description: 'Grants Skybranch.',
-          icon: 'chain_lightning',
-          effect: { grant: { ability: 'chain_lightning' } },
-        },
-        {
-          id: 'sha_r14_improved_flame_shock',
-          name: 'Cinder Rupture',
-          description:
-            'Earthen Jolt detonates your Cinder Jolt on the target, dealing its remaining damage instantly.',
-          icon: 'flame_shock',
-          effect: {
-            ability: [
-              { ability: 'earth_shock', addEffects: [{ type: 'consumeDot', dot: 'flame_shock' }] },
-            ],
-          },
-        },
-        {
-          id: 'sha_r14_weapon_fury',
-          name: 'Imbued Tempo',
-          description:
-            'Landed melee auto-attacks with an imbued weapon shave 0.5 sec off your Jolt cooldowns.',
-          icon: 'stormstrike',
-          effect: {
-            proc: {
-              id: 'sha_weapon_fury',
-              name: 'Imbued Tempo',
-              trigger: { on: 'meleeSwingWhile', auraKind: 'imbue' },
-              responses: [
-                { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 0.5 },
-                { kind: 'cooldownRefund', ability: 'flame_shock', seconds: 0.5 },
-                { kind: 'cooldownRefund', ability: 'frost_shock', seconds: 0.5 },
-              ],
-            },
-          },
-        },
-      ],
-    },
-    {
-      level: 17,
-      theme: 'warding',
-      decision: 'ground root vs instant travel form vs reactive absorb',
-      options: [
-        {
-          id: 'sha_r17_earthbind',
-          name: 'Gripping Earth',
-          description: 'Grants Gripping Earth.',
-          icon: 'earthbind',
-          effect: { grant: { ability: 'earthbind' } },
-        },
-        {
-          id: 'sha_r17_improved_ghost_wolf',
-          name: 'Wolfstep',
-          description: 'Shadewolf becomes instant.',
-          icon: 'ghost_wolf',
-          effect: { ability: [{ ability: 'ghost_wolf', castPct: -1 }] },
-        },
-        {
-          // Phase-2 defensive pass: the copy-paste shield becomes the shaman
-          // flavor: the ancestors knit the wound shut on the spot.
-          id: 'sha_r17_elemental_warding',
-          name: 'Ancestral Mending',
-          description:
-            'Taking a hit for at least 15% of your maximum health instantly heals you for 12% of your maximum health. 20 sec internal cooldown.',
-          icon: 'lightning_shield',
-          effect: {
-            proc: {
-              id: 'sha_elemental_warding',
-              name: 'Ancestral Mending',
-              trigger: { on: 'bigHitTaken', hpFrac: 0.15, icd: 20 },
-              responses: [{ kind: 'heal', amountPctMaxHp: 0.12 }],
-            },
-          },
-        },
-      ],
-    },
-    {
       level: 20,
-      theme: 'ascendance',
-      decision: 'party haste vs crit-fed Jolt burst vs emergency healing echoes',
+      theme: 'capstone',
+      decision: 'group haste vs Jolt-fed signature tempo vs core-rotation sustain',
       options: [
         {
           id: 'sha_r20_bloodlust',
@@ -1632,20 +1619,24 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'sha_r20_elemental_fury',
           name: 'Storm Recall',
           description:
-            "Arc Bolt critical strikes finish Earthen Jolt's cooldown and make your next Earthen Jolt within 8 sec free.",
-          icon: 'lightning_bolt',
+            'Every 3rd Jolt finishes Ancestral Strike cooldown and makes your next Arc Bolt, Mending Waters, or Chain Heal within 8 sec instant.',
+          icon: 'earth_shock',
           effect: {
             proc: {
               id: 'sha_storm_recall',
               name: 'Storm Recall',
               school: 'nature',
-              trigger: { on: 'spellCrit', abilities: ['lightning_bolt'] },
+              trigger: {
+                on: 'castNth',
+                n: 3,
+                abilities: ['earth_shock', 'flame_shock', 'frost_shock'],
+              },
               responses: [
-                { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 'reset' },
+                { kind: 'cooldownRefund', ability: 'stormstrike', seconds: 'reset' },
                 {
                   kind: 'empowerNext',
-                  aura: 'next_cast_free',
-                  abilities: ['earth_shock'],
+                  aura: 'next_cast_instant',
+                  abilities: ['lightning_bolt', 'healing_wave', 'chain_heal'],
                   duration: 8,
                 },
               ],
@@ -1656,16 +1647,19 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'sha_r20_tidal_waves',
           name: 'Undertow Promise',
           description:
-            'Every 3rd Mending Waters leaves an echo for 10 sec: if the target falls below 35% health, the echo heals them for 80.',
+            'Every 3rd Arc Bolt, Ancestral Strike, Mending Waters, or Chain Heal restores 10% of your maximum health.',
           icon: 'healing_wave',
           effect: {
             proc: {
               id: 'sha_undertow_promise',
               name: 'Undertow Promise',
-              trigger: { on: 'castNth', n: 3, abilities: ['healing_wave'] },
-              responses: [
-                { kind: 'echo', belowFrac: 0.35, window: 10, heal: 80, name: 'Undertow Promise' },
-              ],
+              school: 'nature',
+              trigger: {
+                on: 'castNth',
+                n: 3,
+                abilities: ['lightning_bolt', 'stormstrike', 'healing_wave', 'chain_heal'],
+              },
+              responses: [{ kind: 'heal', amountPctMaxHp: 0.1, applyTo: 'self' }],
             },
           },
         },

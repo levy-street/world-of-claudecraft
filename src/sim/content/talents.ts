@@ -147,6 +147,10 @@ export interface GlobalModEffect {
   // a stacking burn (combat/fire_mage.ts igniteOnCrit copies the resolved
   // amount). Scales with level like every spec mastery.
   ignitionPct?: number;
+  // Warspirit off-tank posture: extra threat while Stonebound Weapon is active.
+  rockbiterThreatPct?: number;
+  // Fulmination: Arc Bolt overload chance contributed by each Thunder Ward charge.
+  fulminationOverloadPctPerCharge?: number;
 }
 
 export type ProcTrigger =
@@ -540,6 +544,8 @@ function zeroGlobal(): Required<GlobalModEffect> {
     blinkCast: 0,
     convergence: 0,
     ignitionPct: 0,
+    rockbiterThreatPct: 0,
+    fulminationOverloadPctPerCharge: 0,
   };
 }
 
@@ -643,6 +649,9 @@ export function accumulateTalentEffect(
     target.blinkCast += (source.blinkCast ?? 0) * multiplier;
     target.convergence += (source.convergence ?? 0) * multiplier;
     target.ignitionPct += (source.ignitionPct ?? 0) * multiplier;
+    target.rockbiterThreatPct += (source.rockbiterThreatPct ?? 0) * multiplier;
+    target.fulminationOverloadPctPerCharge +=
+      (source.fulminationOverloadPctPerCharge ?? 0) * multiplier;
   }
   for (const ability of effect.ability ?? []) {
     const target = modifiers.abilities[ability.ability] ?? zeroAbilityMod();

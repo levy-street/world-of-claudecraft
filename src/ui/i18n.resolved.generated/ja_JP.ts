@@ -7256,6 +7256,14 @@ export const ja_JP: EnTranslations = {
         "name": "大地の縛り",
         "description": "周囲の敵を大地に縛り、2秒間移動不能にする。（シャーマンのタレント）"
       },
+      "earth_shield": {
+        "name": "岩の守り",
+        "description": "次の6回の直接攻撃から受けるダメージを20%軽減する。20秒間持続。（シャーマンのタレント）"
+      },
+      "elemental_demand": {
+        "name": "元素の挑発",
+        "description": "元素に命じて対象を引きつけ、3秒間自分を攻撃させる。（ウォースピリット）"
+      },
       "evocation": {
         "name": "エーテルの井戸",
         "description": "マナを急速に回復する。（メイジタレント）"
@@ -7278,7 +7286,7 @@ export const ja_JP: EnTranslations = {
       },
       "healing_stream": {
         "name": "湧き水",
-        "description": "味方1体の体力を12秒かけて120回復する。（シャーマンのタレント）"
+        "description": "味方1体の体力を12秒かけて180回復する。（シャーマンのタレント）"
       },
       "holy_wrath": {
         "name": "聖者の怒り",
@@ -7295,6 +7303,10 @@ export const ja_JP: EnTranslations = {
       "inner_focus": {
         "name": "静まる心",
         "description": "次に使用するスペルの消費をなくす。効果時間60秒。（プリーストのタレント）"
+      },
+      "unleash_weapon": {
+        "name": "元素解放",
+        "description": "武器の付与魔法を解放して{damage}ダメージを与え、付与魔法に応じた効果を発生させる。ストーンバウンドは脅威、パイアブランドは炎上、ライムバウンドは減速。（シャーマンのタレント）"
       },
       "innervate": {
         "name": "生命の樹液",

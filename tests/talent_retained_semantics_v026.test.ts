@@ -91,7 +91,7 @@ function effect<T extends AbilityEffect['type']>(
 }
 
 describe('retained v0.26 all-class Talents V2 semantics', () => {
-  it('resolves the final Twin Verdicts, Rattling Ambush, Storm Recall, Sky Echo, Bruin Rebound, and content values', () => {
+  it('resolves the final Twin Verdicts, Steady Draw, Storm Recall, Rebounding Current, Bruin Rebound, and content values', () => {
     const rowOption = (cls: PlayerClass, id: string) => {
       const option = ROW_TREES[cls].flatMap((row) => row.options).find((o) => o.id === id);
       if (!option) throw new Error(`missing row option ${cls}:${id}`);
@@ -123,10 +123,19 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
       id: 'sha_storm_recall',
       name: 'Storm Recall',
       school: 'nature',
-      trigger: { on: 'spellCrit', abilities: ['lightning_bolt'] },
+      trigger: {
+        on: 'castNth',
+        n: 3,
+        abilities: ['earth_shock', 'flame_shock', 'frost_shock'],
+      },
       responses: [
-        { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 'reset' },
-        { kind: 'empowerNext', aura: 'next_cast_free', abilities: ['earth_shock'], duration: 8 },
+        { kind: 'cooldownRefund', ability: 'stormstrike', seconds: 'reset' },
+        {
+          kind: 'empowerNext',
+          aura: 'next_cast_instant',
+          abilities: ['lightning_bolt', 'healing_wave', 'chain_heal'],
+          duration: 8,
+        },
       ],
     });
     const bolt = resolved('shaman', 'lightning_bolt', { 20: 'sha_r20_elemental_fury' });
@@ -138,9 +147,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
       effect(resolved('shaman', 'earth_shock'), 'directDamage'),
     );
 
-    const skyEcho = rowOption('shaman', 'sha_r11_elemental_attunement');
-    expect(skyEcho.name).toBe('Sky Echo');
-    expect(skyEcho.effect.proc?.name).toBe('Sky Echo');
+    const rebound = rowOption('shaman', 'sha_r5_improved_lightning_shield');
+    expect(rebound.name).toBe('Rebounding Current');
+    expect(rebound.effect.proc?.name).toBe('Rebounding Current');
 
     const bruin = rowOption('druid', 'dru_r8_brutal_bash');
     expect(bruin.name).toBe('Bruin Rebound');
