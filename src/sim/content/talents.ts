@@ -1,5 +1,6 @@
 import type { AbilityEffect, AuraKind, ResourceType } from '../types';
 import { ALL_CLASSES, MAX_LEVEL, type PlayerClass } from '../types';
+import { specBaselineFor } from './spec_baselines';
 import {
   isTalentRowLevel,
   ROW_LEVELS,
@@ -692,6 +693,7 @@ export function computeTalentModifiers(
     modifiers.role = spec.role;
     modifiers.grants.push({ ability: spec.signature, rank: 1 });
     accumulateTalentEffect(modifiers, spec.mastery.effect, Math.min(1, Math.max(0, level) / 20));
+    accumulateTalentEffect(modifiers, specBaselineFor(cls, spec.id));
   }
 
   for (const row of tree) {

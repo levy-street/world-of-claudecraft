@@ -280,7 +280,7 @@ describe('modifier bake and known-ability resolution', () => {
     expect(pursuit.global.onKillSpeedPct).toBeCloseTo(0.3);
   });
 
-  it('bakes only the winning Warrior spec mastery and signature', () => {
+  it('bakes only the winning Warrior spec effects and signature', () => {
     const arms = computeTalentModifiers('warrior', allocation('arms'));
     expect(arms.grants).toContainEqual({ ability: 'mortal_strike', rank: 1 });
     expect(arms.global.masteryTwoHandDmgPct).toBeCloseTo(0.1);
@@ -288,13 +288,13 @@ describe('modifier bake and known-ability resolution', () => {
 
     const fury = computeTalentModifiers('warrior', allocation('fury'));
     expect(fury.grants).toContainEqual({ ability: 'bloodthirst', rank: 1 });
-    expect(fury.stats.crit).toBeCloseTo(0.05);
-    expect(fury.stats.ap).toBe(10);
+    expect(fury.stats.crit).toBeCloseTo(0.08);
+    expect(fury.stats.ap).toBe(20);
 
     const prot = computeTalentModifiers('warrior', allocation('prot'));
     expect(prot.grants).toContainEqual({ ability: 'shield_slam', rank: 1 });
     expect(prot.global.threatPct).toBeCloseTo(0.3);
-    expect(prot.stats).toMatchObject({ armorPct: 0.1, staPct: 0.4, armorFromStrPct: 0.7 });
+    expect(prot.stats).toMatchObject({ armorPct: 0.37, staPct: 0.4, armorFromStrPct: 0.7 });
   });
 
   it('makes every spec signature known at the first unlock level', () => {
