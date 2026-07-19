@@ -10,6 +10,7 @@
     "other": 0
   },
   "keyTrimDb": {
+    "amb_forge": 5,
     "buff_apply": 4.5,
     "cast_chain_heal": 4.5,
     "cast_lightning_bolt": 5,

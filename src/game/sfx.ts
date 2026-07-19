@@ -26,15 +26,17 @@ const REF_DISTANCE = 5; // world units at which a sound is at full volume
 const MAX_DISTANCE = 46; // hard cutoff: beyond this, sources are silent/skipped
 const MAX_DISTANCE_SQ = MAX_DISTANCE * MAX_DISTANCE;
 const POINT_AMBIENCE_GAIN = 0.18;
-// amb_forge's custom recording sits far quieter than a generated clip even
-// after conform (a percussive hammer-strike signal has little headroom under
-// the true-peak safety floor, so the per-key gain-map ceiling can't boost it
-// meaningfully); compensate with its own mix target instead of raising
-// POINT_AMBIENCE_GAIN, which would also make every campfire louder. 1.0 is
-// unity, the maximum this lever allows: zero attenuation, playing the source
-// at exactly its own conform-verified peak-safe level (-1.6 dBTP). There is
-// no more headroom to give past this without re-mastering the source hotter.
-const FORGE_AMBIENCE_GAIN = 1.0;
+// amb_forge's custom recording still reads quiet in-game even with the
+// catalog's keyTrimDb ceiling (scripts/sfx/sfx_gain_map.json) applied at its
+// full sanctioned +5dB, the maximum true-peak headroom under the shared
+// -6dBFS conform ceiling (the recording's own peak sits at -6.0 dBTP after
+// conform: a percussive hammer-strike signal has little room left under that
+// engine-wide floor). This mix target REPLACES POINT_AMBIENCE_GAIN for forge
+// only (campfire is unaffected), and stacks with the manifest's +5dB entry
+// gain in loop()'s mixedTarget: 0.625 (this) * 1.778 (the +5dB trim,
+// SFX_GAIN_LIMITS.amb_forge) = ~1.11, tuned by ear against the +5dB trim
+// alone (~0.32 effective, still too quiet).
+const FORGE_AMBIENCE_GAIN = 0.625;
 const FOOTSTEP_CUES: Partial<Record<string, string>> = {
   grass: 'foot_grass',
   dirt: 'foot_dirt',
