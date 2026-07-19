@@ -19,11 +19,15 @@
 
 import type { ItemDef } from '../types';
 
-// Combat rating seeds, matching the established tiers: the ilvl-26 heroic-vendor
-// jewelry uses 25 (2.5%); the ilvl-29 raid gear seeds 20 (2.0%). Off the primary
-// budget (like spellPower/hitRating elsewhere), so stat sums stay budget-exact.
-const RELIC_JEWELRY_RATING = 25; // 25 rating = 2.5%
-const RELIC_RAID_RATING = 20; // 20 rating = 2.0%
+// Combat rating seeds, matching the established item-level ladder (pinned by
+// tests/combat_rating.test.ts) so a relic never sits off-tier for its item level.
+// Ratings are OFF the primary-stat budget (like spellPower), so stat sums stay
+// budget-exact. The ilvl-29 raid tier is one rating of 20; the ilvl-31 tier is
+// 40; the ilvl-37 raid-heroic tier is a 70 primary plus a 30 secondary.
+const RELIC_RAID_RATING = 20; // ilvl 29 (2.0%): the crown, the world-boss neck
+const RELIC_HEROIC_RATING = 40; // ilvl 31 (4.0%): the heroic-dungeon signets
+const RELIC_LEGENDARY_PRIMARY = 70; // ilvl 37 (7.0%): Emberfall Edge primary
+const RELIC_LEGENDARY_SECONDARY = 30; // ilvl 37 (3.0%): Emberfall Edge secondary
 
 // Broad melee class list for the flagship weapon: str/agi wielders, mirroring the
 // existing legendary kingsbane_last_oath (warrior/rogue/hunter/shaman/paladin).
@@ -59,8 +63,8 @@ export const LIMITED_ITEMS: Record<string, ItemDef> = {
     // 49-point legendary mainhand budget: a str-forward melee identity (str 24,
     // agi 10, sta 15) that stays usable across the MELEE_WIELDERS group.
     stats: { str: 24, agi: 10, sta: 15 },
-    hitRating: RELIC_RAID_RATING,
-    critRating: RELIC_RAID_RATING,
+    hitRating: RELIC_LEGENDARY_PRIMARY,
+    critRating: RELIC_LEGENDARY_SECONDARY,
     sellValue: 30000,
     requiredClass: MELEE_WIELDERS,
     // Emberfall: a weapon strike may erupt in fire that leaps to nearby foes and
@@ -115,7 +119,7 @@ export const LIMITED_ITEMS: Record<string, ItemDef> = {
     limitedSupply: 150,
     requiredLevel: 20,
     stats: { agi: 8, sta: 5 },
-    hasteRating: RELIC_JEWELRY_RATING,
+    hasteRating: RELIC_RAID_RATING,
     sellValue: 15000,
   },
 
@@ -134,7 +138,7 @@ export const LIMITED_ITEMS: Record<string, ItemDef> = {
     limitedSupply: 200,
     requiredLevel: 20,
     stats: { str: 8, sta: 5 },
-    hitRating: RELIC_JEWELRY_RATING,
+    hitRating: RELIC_HEROIC_RATING,
     sellValue: 12000,
   },
   sealed_vault_signet_bastion: {
@@ -147,7 +151,7 @@ export const LIMITED_ITEMS: Record<string, ItemDef> = {
     limitedSupply: 200,
     requiredLevel: 20,
     stats: { int: 8, sta: 5 },
-    critRating: RELIC_JEWELRY_RATING,
+    critRating: RELIC_HEROIC_RATING,
     sellValue: 12000,
   },
   sealed_vault_signet_temple: {
@@ -160,7 +164,7 @@ export const LIMITED_ITEMS: Record<string, ItemDef> = {
     limitedSupply: 200,
     requiredLevel: 20,
     stats: { int: 7, spi: 6 },
-    hasteRating: RELIC_JEWELRY_RATING,
+    hasteRating: RELIC_HEROIC_RATING,
     sellValue: 12000,
     requiredClass: HEAL_HYBRID,
   },
@@ -174,7 +178,7 @@ export const LIMITED_ITEMS: Record<string, ItemDef> = {
     limitedSupply: 200,
     requiredLevel: 20,
     stats: { agi: 8, sta: 5 },
-    hitRating: RELIC_JEWELRY_RATING,
+    hitRating: RELIC_HEROIC_RATING,
     sellValue: 12000,
   },
 };
