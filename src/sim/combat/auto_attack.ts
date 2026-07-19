@@ -385,6 +385,7 @@ export function meleeSwing(
     // weaponStrike path threads it here so per-ability crit talents reach the
     // shared hit table.
     critBonus?: number;
+    abilityId?: string;
     onDealt?: (amount: number) => void;
     whiteDualWieldPenalty?: boolean;
   },
@@ -486,7 +487,7 @@ export function meleeSwing(
   // Landed-swing talent responses resolve before the target retaliates or the
   // weapon's on-hit proc fires. This is observable for defensive healing and
   // preserves the authored Oathwheel, Venom Dividend, and imbue proc cadence.
-  if (attacker.kind === 'player') onMeleeSwing(ctx, attacker);
+  if (attacker.kind === 'player') onMeleeSwing(ctx, attacker, opts.abilityId ?? 'auto_attack');
   // thorns / lightning shield: melee attackers take damage back. Charge-limited
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
   if (!attacker.dead) {

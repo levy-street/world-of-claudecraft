@@ -1,9 +1,10 @@
 // Talent proc engine: the shared primitive behind behavior-changing choice-row
 // options (docs/design/choice-row-quality-pass.md). A row option carries a
 // declarative ProcDef; combat code reports moments (cast completed, crit,
-// shield consumed, HoT expired, big hit taken, imbued swing) through single
+// shield consumed, HoT expired, big hit taken, landed melee hit, imbued swing) through single
 // delegating calls here, and this module holds the per-player counters and
-// internal cooldowns and applies the response. Counters and icds are plain
+// internal cooldowns and applies the response. Responses can also stack a visible
+// aura, add charges to an owned aura, or restore a percentage resource. Counters and icds are plain
 // tick math; a trigger with an optional `chance` draws through the sim Rng
 // only at the moment it would otherwise fire, so players without such a proc
 // draw no rng and replay determinism is untouched. Nothing is persisted.
@@ -100,19 +101,56 @@ function fireOne(
       if (response.resourceType !== undefined && player.resourceType !== response.resourceType) {
         break;
       }
-      player.resource = Math.min(player.maxResource, player.resource + response.amount);
-      break;
-    case 'heal':
-      ctx.applyHeal(
-        player,
-        subject,
-        response.amountPctSourceMaxHp !== undefined
-          ? Math.round(player.maxHp * response.amountPctSourceMaxHp)
-          : response.amountPctMaxHp !== undefined
-            ? Math.round(subject.maxHp * response.amountPctMaxHp)
-            : (response.amount ?? 0),
-        def.name,
+      player.resource = Math.min(
+        player.maxResource,
+        player.resource + (response.amount ?? player.maxResource * response.pctMax),
       );
+      break;
+    case 'stackAura': {
+      const existing = player.auras.find(
+        (aura) => aura.id === def.id && aura.sourceId === player.id,
+      );
+      if (existing) {
+        existing.stacks = Math.min(response.maxStacks, (existing.stacks ?? 0) + 1);
+        existing.remaining = response.duration;
+        existing.duration = response.duration;
+      } else {
+        ctx.applyAura(player, {
+          id: def.id,
+          name: def.name,
+          kind: response.aura,
+          remaining: response.duration,
+          duration: response.duration,
+          value: 0,
+          stacks: 1,
+          sourceId: player.id,
+          school: def.school ?? 'physical',
+        });
+      }
+      break;
+    }
+    case 'addAuraCharges': {
+      const aura = player.auras.find(
+        (entry) => entry.id === response.ability && entry.sourceId === player.id,
+      );
+      if (!aura) break;
+      aura.charges = Math.min(response.maxCharges, (aura.charges ?? 0) + response.amount);
+      break;
+    }
+    case 'heal':
+      {
+        const recipient = response.applyTo === 'self' ? player : subject;
+        ctx.applyHeal(
+          player,
+          recipient,
+          response.amountPctSourceMaxHp !== undefined
+            ? Math.round(player.maxHp * response.amountPctSourceMaxHp)
+            : response.amountPctMaxHp !== undefined
+              ? Math.round(recipient.maxHp * response.amountPctMaxHp)
+              : (response.amount ?? 0),
+          def.name,
+        );
+      }
       break;
     case 'absorb':
       ctx.applyAura(subject, {
@@ -282,9 +320,23 @@ export function onDamageTaken(ctx: SimContext, player: Entity, amount: number): 
   }
 }
 
-export function onMeleeSwing(ctx: SimContext, player: Entity): void {
+export function onMeleeSwing(ctx: SimContext, player: Entity, abilityId = 'auto_attack'): void {
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;
+    if (trigger.on === 'meleeHit') {
+      if (!trigger.abilities.includes(abilityId)) continue;
+      if (
+        trigger.auraKind !== undefined &&
+        !player.auras.some((aura) => aura.kind === trigger.auraKind)
+      ) {
+        continue;
+      }
+      if (trigger.icd !== undefined && state(player).icds[def.id] !== undefined) continue;
+      if (trigger.chance !== undefined && !ctx.rng.chance(trigger.chance)) continue;
+      if (trigger.icd !== undefined) state(player).icds[def.id] = trigger.icd;
+      fire(ctx, player, def, player);
+      continue;
+    }
     if (trigger.on !== 'meleeSwingWhile') continue;
     if (!player.auras.some((aura) => aura.kind === trigger.auraKind)) continue;
     // G2/G4 (mirrors the cast triggers): optional internal cooldown and fire

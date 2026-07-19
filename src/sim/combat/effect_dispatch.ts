@@ -317,6 +317,7 @@ export function runEffects(
           // Ability-scoped crit talents (ResolvedAbilityMod.critPct, e.g. the
           // Redhanded Craven Thrust mastery) ride the shared hit table.
           critBonus: mods.abilities[ability.id]?.critPct ?? 0,
+          abilityId: ability.id,
           onDealt:
             areaEcho || sweeping
               ? (amount) => {
