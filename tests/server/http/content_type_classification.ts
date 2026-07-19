@@ -145,6 +145,7 @@ export const API_CONTENT_TYPE: Readonly<Record<string, ContentTypeClass>> = {
   '/api/steam/link': PROBLEM_JSON,
   '/api/steam/status': PROBLEM_JSON,
   '/api/welcome/flags': PROBLEM_JSON,
+  '/api/limited-mints': PROBLEM_JSON,
   '/api/card': BINARY,
   '/api/referrals': PROBLEM_JSON,
   '/api/discord/swag/claim': PROBLEM_JSON,

@@ -1238,6 +1238,9 @@ export const en_XA: EnTranslations = {
       "joinChannels": "[Ţíþ: ţýþé /ĵóíñ ŵóŕļð óŕ /ĵóíñ ļƒĝ ţó çĥáţ ŵíţĥ þļáýéŕš áçŕóšš ţĥé ŵóŕļð.]"
     },
     "itemHeroicTag": "[[ĤÉŔÓÍÇ]]",
+    "limitedRelicSupply": "[Ļíɱíţéð ŕéļíç: óñļý {count} ŵíļļ éʋéŕ éẋíšţ]",
+    "limitedRelicSerial": "[Ŕéļíç {serial} óƒ {supply}]",
+    "limitedRelicClaim": "[{name} ĥáš çļáíɱéð {item}, ŕéļíç {serial} óƒ {supply}.]",
     "itemSoulbound": "[Šóúļƀóúñð]",
     "itemSet": {
       "header": "[{name} ({have}/{total})]",
@@ -8950,6 +8953,27 @@ export const en_XA: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "[Ĝáļéçáļļ Ŵáíšţĝúáŕð]"
+      },
+      "emberfall_edge": {
+        "name": "[Éɱƀéŕƒáļļ Éðĝé]"
+      },
+      "crown_of_the_thornpeak_scourge": {
+        "name": "[Çŕóŵñ óƒ ţĥé Ţĥóŕñþéáķ Šçóúŕĝé]"
+      },
+      "thunzharrs_stormheart": {
+        "name": "[Ţĥúñžĥáŕŕ'š Šţóŕɱĥéáŕţ]"
+      },
+      "sealed_vault_signet_crypt": {
+        "name": "[Šéáļéð Šíĝñéţ óƒ ţĥé Ĥóļļóŵ Çŕýþţ]"
+      },
+      "sealed_vault_signet_bastion": {
+        "name": "[Šéáļéð Šíĝñéţ óƒ ţĥé Šúñķéñ Ɓášţíóñ]"
+      },
+      "sealed_vault_signet_temple": {
+        "name": "[Šéáļéð Šíĝñéţ óƒ ţĥé Ðŕóŵñéð Ţéɱþļé]"
+      },
+      "sealed_vault_signet_sanctum": {
+        "name": "[Šéáļéð Šíĝñéţ óƒ ţĥé Ĝŕáʋéŵýŕɱ Šáñçţúɱ]"
       }
     },
     "mobs": {

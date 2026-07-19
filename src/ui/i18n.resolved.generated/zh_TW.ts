@@ -1238,6 +1238,9 @@ export const zh_TW: EnTranslations = {
       "joinChannels": "提示：輸入 /join world 或 /join lfg 可與全世界的玩家聊天。"
     },
     "itemHeroicTag": "[英雄]",
+    "limitedRelicSupply": "限量聖物：全世界僅有 {count} 件",
+    "limitedRelicSerial": "聖物 第 {serial} / {supply} 號",
+    "limitedRelicClaim": "{name} 獲得了 {item}，聖物 第 {serial} / {supply} 號。",
     "itemSoulbound": "靈魂綁定",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -8950,6 +8953,27 @@ export const zh_TW: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "喚雷者腰甲"
+      },
+      "emberfall_edge": {
+        "name": "燼落之刃"
+      },
+      "crown_of_the_thornpeak_scourge": {
+        "name": "荊峰災星之冠"
+      },
+      "thunzharrs_stormheart": {
+        "name": "圖恩札爾的風暴之心"
+      },
+      "sealed_vault_signet_crypt": {
+        "name": "空塚密庫封印戒"
+      },
+      "sealed_vault_signet_bastion": {
+        "name": "沉沒堡壘封印戒"
+      },
+      "sealed_vault_signet_temple": {
+        "name": "溺亡神廟封印戒"
+      },
+      "sealed_vault_signet_sanctum": {
+        "name": "墓龍聖所封印戒"
       }
     },
     "mobs": {

@@ -1338,6 +1338,15 @@ export const en = {
       nighttalon_waistband: { name: 'Direfang Waistband' },
       soulflame_cord: { name: 'Wraithfire Cord' },
       stormcallers_waistguard: { name: 'Galecall Waistguard' },
+      // Limited relics (content/limited_drops.ts): hard-capped, serial-numbered
+      // drops from the raid boss, world boss, and heroic dungeon finals.
+      emberfall_edge: { name: 'Emberfall Edge' },
+      crown_of_the_thornpeak_scourge: { name: 'Crown of the Thornpeak Scourge' },
+      thunzharrs_stormheart: { name: "Thunzharr's Stormheart" },
+      sealed_vault_signet_crypt: { name: 'Sealed Signet of the Hollow Crypt' },
+      sealed_vault_signet_bastion: { name: 'Sealed Signet of the Sunken Bastion' },
+      sealed_vault_signet_temple: { name: 'Sealed Signet of the Drowned Temple' },
+      sealed_vault_signet_sanctum: { name: 'Sealed Signet of the Gravewyrm Sanctum' },
     },
     itemSets: itemSetEntityText,
     mobs: {

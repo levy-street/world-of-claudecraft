@@ -4422,6 +4422,22 @@ export class Hud {
       qualityKindHtml += ` <span style="color:#e5cc80">${esc(t('hudChrome.itemHeroicTag'))}</span>`;
     }
     html += `<div class="tt-sub">${qualityKindHtml}</div>`;
+    // Limited-relic scarcity lines (content/limited_drops.ts): the static cap
+    // shows on every copy (bags, loot links, vendor), and a minted copy that
+    // carries its own serial (instance.serial) shows its number too. Gold, to
+    // read as the prestige marker it is.
+    if (item.limitedSupply !== undefined) {
+      const supplyText =
+        instance?.serial !== undefined
+          ? t('hudChrome.limitedRelicSerial', {
+              serial: formatNumber(instance.serial, { maximumFractionDigits: 0 }),
+              supply: formatNumber(item.limitedSupply, { maximumFractionDigits: 0 }),
+            })
+          : t('hudChrome.limitedRelicSupply', {
+              count: formatNumber(item.limitedSupply, { maximumFractionDigits: 0 }),
+            });
+      html += `<div class="tt-sub" style="color:#f0a030">${esc(supplyText)}</div>`;
+    }
     if (item.slot) {
       // Classic layout: slot name on the left, armor subtype (Cloth/Leather/Mail)
       // right-aligned on the same line so it is clear which classes the gear suits.
@@ -8698,6 +8714,23 @@ export class Hud {
             audio.coin();
           else audio.lootItem();
           if ($('#bags').style.display !== 'none') this.renderBags();
+          break;
+        }
+        case 'limitedMint': {
+          // A limited relic entered a player's hands (offline: the sim emits this
+          // directly; online the server intercepts it and broadcasts a system
+          // line instead, so this arm fires only offline). The item renders as a
+          // quality-colored link via the [[i:...]] token; gold, like the tooltip.
+          this.log(
+            t('hudChrome.limitedRelicClaim', {
+              name: ev.name,
+              item: `[[i:${ev.itemId}]]`,
+              serial: formatNumber(ev.serial, { maximumFractionDigits: 0 }),
+              supply: formatNumber(ev.supply, { maximumFractionDigits: 0 }),
+            }),
+            '#f0a030',
+          );
+          audio.lootItem();
           break;
         }
         case 'craftResult': {

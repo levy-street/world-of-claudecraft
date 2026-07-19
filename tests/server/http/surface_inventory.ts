@@ -893,6 +893,19 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // Public limited-relic mint ledger (the true-scarcity feature,
+  // server/limited_routes.ts): a registry-only RouteDef with no legacy ladder
+  // arm. Anonymous public read, rate-limited in-handler with publicReadRateLimited.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/limited-mints',
+    handler: 'server/limited_routes.ts limitedMintsHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: 'publicReadRateLimited',
+    requireOwnedExpected: null,
+  },
   // Daily-rewards player family (v0.19.0, server/daily_rewards.ts): served by
   // the handleDailyRewardApi sub-dispatcher behind the main.ts PREFIX arm
   // `url.startsWith('/api/daily-rewards')`, which runs bearerActiveAccount

@@ -26,6 +26,7 @@ import {
   NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL,
 } from './content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from './content/heroic_vendor';
+import { LIMITED_ITEM_SOURCE } from './content/limited_drops';
 import { FURY_STOCK, WARFARE_SOURCE_LEVEL } from './content/pvp_honor';
 import { ALL_RECIPES, DUNGEONS, ITEMS, MOBS, QUESTS } from './data';
 // The pure budget primitives live in the leaf module ./item_budget (no ./data
@@ -197,6 +198,14 @@ function buildSourceIndex(): Map<string, ItemSource> {
   // no derivable item level: the budget gates below skip it and the tooltip's item
   // level/score lines never show. Not a raid source.
   for (const recipe of ALL_RECIPES) bump(recipe.resultItemId, recipe.level, false);
+  // Limited relics (content/limited_drops.ts): they roll through a separate
+  // append-only phase, not a mob loot array, so their source level and raid flag
+  // are declared explicitly here. The legendary Emberfall Edge reads the heroic
+  // raid tier (27 -> ilvl 37), the raid trophies read the Nythraxis/world-boss
+  // raid epic tier (20 + raid -> ilvl 29), the signets the five-man heroic tier
+  // (25 -> ilvl 31), so each relic's tooltip level and stat budget derive here.
+  for (const [itemId, src] of Object.entries(LIMITED_ITEM_SOURCE))
+    bump(itemId, src.level, src.raid);
   return idx;
 }
 
