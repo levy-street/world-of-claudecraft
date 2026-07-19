@@ -12,10 +12,23 @@
 //
 // Serial lifecycle: leased -> minted (confirmed in a player's possession) or
 // leased -> released (a graceful shutdown returned an unclaimed buffer serial to
-// the pool for dense reuse). A serial is NEVER re-adopted on boot: once leased it
-// is treated as issued/in-flight, so an ungraceful crash can only LOSE a serial
-// (it stays orphaned as 'leased', reducing effective supply by the small buffer
-// size), never DOUBLE-ISSUE it. That keeps the hard cap inviolable across crashes.
+// the pool for dense reuse). A serial is NEVER re-adopted or auto-reclaimed on
+// boot: once leased it is treated as issued/in-flight, so an ungraceful crash (or
+// a relic that drops and is never looted) can only LOSE a serial (it stays
+// orphaned as 'leased', reducing effective supply), never DOUBLE-ISSUE it. That
+// keeps a serial unique and the cap inviolable across crashes, which matters more
+// than reclaiming the rare orphan: a 'leased' row at boot is indistinguishable
+// from one a player actually holds whose mint-record write failed, so an
+// auto-reclaim could re-issue a live serial.
+//
+// OPS RUNBOOK (orphan recovery, manual + deliberate): if orphaned leases ever
+// erode a popular relic's effective supply enough to matter, reclaim them ONLY
+// after confirming no realm is live and no player holds the serial (audit against
+// character saves), e.g.
+//   UPDATE limited_serials SET state='released', character_name=NULL
+//     WHERE state='leased' AND leased_at < now() - interval '1 day';
+// Never automate this: the safety of the whole feature rests on not re-issuing a
+// serial that reached a player.
 
 import type { Pool } from 'pg';
 import { ITEMS } from '../src/sim/data';
@@ -38,7 +51,6 @@ CREATE TABLE IF NOT EXISTS limited_serials (
   realm TEXT NOT NULL,
   character_id INT,
   character_name TEXT,
-  boss_id TEXT,
   leased_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   minted_at TIMESTAMPTZ,
   PRIMARY KEY (item_id, serial)
@@ -48,11 +60,11 @@ CREATE TABLE IF NOT EXISTS limited_serials (
 CREATE INDEX IF NOT EXISTS limited_serials_reclaim ON limited_serials(item_id, state, serial);
 `;
 
-// Winner attribution recorded when a leased serial is confirmed minted.
+// Winner attribution recorded when a leased serial is confirmed minted. The
+// source boss is implied by the item id, so it is not stored separately.
 export interface LimitedMintAttribution {
   characterId: number | null;
   characterName: string;
-  bossId: string | null;
 }
 
 // One confirmed mint, for the public ledger read.
@@ -94,16 +106,10 @@ export interface LimitedSupplyDb {
   // observer write never double-attributes.
   markMinted(itemId: string, serial: number, attr: LimitedMintAttribution): Promise<void>;
   // Return this realm's still-leased buffer serials to the pool (graceful
-  // shutdown), so a clean restart reuses them instead of burning them.
+  // shutdown), so a clean restart reuses them instead of burning them. Only the
+  // buffer serials (leased, never claimed) are passed here, so this can never
+  // release a serial that reached a player.
   releaseSerials(itemId: string, serials: number[], realm: string): Promise<void>;
-  // Release EVERY still-leased serial this realm owns, back to the pool. Run once
-  // at boot BEFORE warming the buffer: the sim world is freshly regenerated then
-  // (boss corpses never persist across a restart), so a leased row this realm
-  // owns can only be a serial that was never minted, whether it was a crashed
-  // buffer or a relic that dropped and was never looted (F1). Reclaiming them
-  // keeps the effective supply from eroding below the cap over the realm's life.
-  // Returns the number of serials reclaimed.
-  reclaimRealmLeases(realm: string): Promise<number>;
   // The public ledger snapshot: per-item counts plus every confirmed mint.
   readMints(): Promise<LimitedMintsSnapshot>;
 }
@@ -146,7 +152,7 @@ export class PgLimitedSupplyDb implements LimitedSupplyDb {
       const reclaimed = await client.query(
         `UPDATE limited_serials s
            SET state = 'leased', realm = $2, leased_at = now(),
-               character_id = NULL, character_name = NULL, boss_id = NULL, minted_at = NULL
+               character_id = NULL, character_name = NULL, minted_at = NULL
          WHERE (s.item_id, s.serial) = (
            SELECT item_id, serial FROM limited_serials
            WHERE item_id = $1 AND state = 'released'
@@ -191,9 +197,9 @@ export class PgLimitedSupplyDb implements LimitedSupplyDb {
   async markMinted(itemId: string, serial: number, attr: LimitedMintAttribution): Promise<void> {
     await this.pool.query(
       `UPDATE limited_serials
-         SET state = 'minted', character_id = $3, character_name = $4, boss_id = $5, minted_at = now()
+         SET state = 'minted', character_id = $3, character_name = $4, minted_at = now()
        WHERE item_id = $1 AND serial = $2 AND state = 'leased'`,
-      [itemId, serial, attr.characterId, attr.characterName, attr.bossId],
+      [itemId, serial, attr.characterId, attr.characterName],
     );
   }
 
@@ -201,20 +207,10 @@ export class PgLimitedSupplyDb implements LimitedSupplyDb {
     if (serials.length === 0) return;
     await this.pool.query(
       `UPDATE limited_serials
-         SET state = 'released', character_id = NULL, character_name = NULL, boss_id = NULL
+         SET state = 'released', character_id = NULL, character_name = NULL
        WHERE item_id = $1 AND serial = ANY($2::int[]) AND state = 'leased' AND realm = $3`,
       [itemId, serials, realm],
     );
-  }
-
-  async reclaimRealmLeases(realm: string): Promise<number> {
-    const res = await this.pool.query(
-      `UPDATE limited_serials
-         SET state = 'released', character_id = NULL, character_name = NULL, boss_id = NULL
-       WHERE realm = $1 AND state = 'leased'`,
-      [realm],
-    );
-    return res.rowCount ?? 0;
   }
 
   async readMints(): Promise<LimitedMintsSnapshot> {

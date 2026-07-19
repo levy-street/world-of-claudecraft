@@ -126,6 +126,31 @@ describe('limited relics: rng draw safety (parity)', () => {
       expect(items.some((s) => s.itemId === EMBER)).toBe(false);
     }
   });
+
+  it('world-boss path mints the relic as a serialed personalFor slot per contributor', () => {
+    // rollWorldBossLoot rolls each contributor's relic via appendLimitedDrops with
+    // a personalFor makeSlot (world_boss.ts). Verify that slot shape mints a
+    // serialed personal slot, distinct from the shared-corpse path above.
+    const THUNZHARR = 'thunzharr_waking_peak';
+    const NECK = 'thunzharrs_stormheart';
+    const contributor = 42;
+    let minted: LootSlot | undefined;
+    for (let seed = 0; seed < 500 && !minted; seed++) {
+      const sim = makeSim(1);
+      sim.rng = new Rng(seed);
+      const items: LootSlot[] = [];
+      const mob = createMob(-1, MOBS[THUNZHARR], MOBS[THUNZHARR].minLevel, { x: 0, y: 0, z: 0 });
+      appendLimitedDrops(sim.ctx, mob, items, false, (itemId) => ({
+        itemId,
+        count: 1,
+        personalFor: [contributor],
+      }));
+      minted = items.find((s) => s.itemId === NECK);
+    }
+    expect(minted).toBeTruthy();
+    expect(minted?.personalFor).toEqual([contributor]); // per-contributor personal slot
+    expect(minted?.instance?.serial).toBe(1); // fresh world ledger: the first mint
+  });
 });
 
 describe('limited relics: end-to-end through rollLoot', () => {

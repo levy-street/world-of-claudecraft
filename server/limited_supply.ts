@@ -9,26 +9,30 @@
 // lockoutNowMs / raidResetMs / utcDay: the sim stays pure and the host owns the
 // non-deterministic ledger. Claim draws no rng.
 //
-// Supply integrity (see limited_supply_db.ts): a leased serial is never treated as
-// minted until the winner takes possession, so the cap is never EXCEEDED. To keep
-// it from eroding DOWNWARD, init() reclaims every serial this realm still holds
-// 'leased' at boot (a crashed buffer or a relic that dropped and was never looted)
-// back into the pool: the world is fresh then, so such a serial was never minted.
-// A graceful shutdown additionally releases the live buffer via releaseAll().
+// Supply integrity (see limited_supply_db.ts): a serial is never treated as minted
+// until the winner takes possession, and a claimed serial is NEVER re-issued, so
+// the cap is never exceeded and a serial is never duplicated (the load-bearing
+// promise). A graceful shutdown releases the unclaimed buffer via releaseAll() so
+// clean restarts waste nothing. The only residual is that an ungraceful crash, or
+// a relic that drops and is never looted, orphans its serial as 'leased' forever
+// (the effective supply erodes slightly DOWNWARD, always the safe direction). We
+// deliberately do NOT auto-reclaim orphaned leases: at boot a 'leased' row is
+// indistinguishable from one a player actually holds whose mint-record write
+// failed, so reclaiming it could re-issue a live serial. Recovering orphans is a
+// manual ops decision (see the runbook note in limited_supply_db.ts).
 
 import type { LimitedMintAttribution, LimitedSupplyDb } from './limited_supply_db';
 
 // Buffer target per item: how many pre-leased serials to keep ready for the
 // synchronous claim. Deliberately 1. A larger buffer would let one realm (or the
 // whole cluster, at boot) pre-lease a big slice of a small-cap relic's supply
-// into idle buffers, starving other realms of a relic that has stock left, and
-// would widen the crash/abandon window (a leased-but-unminted serial only returns
-// to the pool via the boot reclaim below). The shared-corpse bosses roll each
-// relic at most once per kill, so 1 always suffices there; only the world boss
-// rolls per contributor, where 1 paces minting at one-per-kill (the supply still
-// fully mints over time, and a beyond-buffer multi-win falls back to a plain drop
-// with the serial preserved for a later winner). See reclaimRealmLeases for why a
-// tiny buffer keeps the effective supply honest.
+// into idle buffers, starving other realms of a relic that still has stock, and
+// would widen the crash window (an unclaimed buffer serial is only recovered by a
+// graceful releaseAll). The shared-corpse bosses roll each relic at most once per
+// kill, so 1 always suffices there; only the world boss rolls per contributor,
+// where 1 paces minting at one-per-kill (the supply still fully mints over time,
+// and a beyond-buffer multi-win falls back to a plain drop with the serial
+// preserved in the pool for a later winner).
 const DEFAULT_BUFFER_TARGET = 1;
 
 export interface LimitedSupplyServiceOptions {
@@ -66,14 +70,6 @@ export class LimitedSupplyService {
   // game loop starts, so the first relic kill finds a warm pool.
   async init(items: { itemId: string; supply: number }[]): Promise<void> {
     await this.db.seedSupply(items);
-    // Reclaim this realm's stale leases FIRST: the world is fresh at boot, so any
-    // serial still 'leased' by this realm was never minted (a crashed buffer or an
-    // abandoned drop), and returning it to the pool keeps the effective supply
-    // from eroding below the cap. Runs before the warm below so a reclaimed serial
-    // can immediately re-lease into the fresh buffer.
-    const reclaimed = await this.db.reclaimRealmLeases(this.realm);
-    if (reclaimed > 0)
-      console.log(`[limited-supply] reclaimed ${reclaimed} stale relic lease(s) at boot`);
     for (const { itemId, supply } of items) {
       this.supplyByItem.set(itemId, supply);
       this.pools.set(itemId, []);

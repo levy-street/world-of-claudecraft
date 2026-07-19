@@ -76,17 +76,6 @@ class FakeLimitedSupplyDb implements LimitedSupplyDb {
     }
   }
 
-  async reclaimRealmLeases(realm: string): Promise<number> {
-    let n = 0;
-    for (const r of this.rows) {
-      if (r.realm === realm && r.state === 'leased') {
-        r.state = 'released';
-        n++;
-      }
-    }
-    return n;
-  }
-
   async readMints(): Promise<LimitedMintsSnapshot> {
     const supplies = [...this.supply.entries()].map(([itemId, s]) => ({
       itemId,
@@ -179,8 +168,8 @@ describe('LimitedSupplyService: mint attribution + release', () => {
     const svc = new LimitedSupplyService(db, 'r1', { bufferTarget: 2 });
     await svc.init(CAPS);
     const serial = svc.claim(ITEM) as number;
-    svc.onMint(ITEM, serial, { characterId: 7, characterName: 'Ada', bossId: null });
-    svc.onMint(ITEM, serial, { characterId: 7, characterName: 'Ada', bossId: null }); // retry
+    svc.onMint(ITEM, serial, { characterId: 7, characterName: 'Ada' });
+    svc.onMint(ITEM, serial, { characterId: 7, characterName: 'Ada' }); // retry
     await settle();
     expect(db.stateOf(ITEM, serial)).toBe('minted');
     expect(db.countByState(ITEM, 'minted')).toBe(1); // retry did not double-count
@@ -201,29 +190,30 @@ describe('LimitedSupplyService: mint attribution + release', () => {
     expect([svc2.claim(ITEM), svc2.claim(ITEM), svc2.claim(ITEM)].sort()).toEqual([1, 2, 3]);
   });
 
-  it('reclaims stale leases at boot so an abandoned drop never erodes the supply (F1)', async () => {
+  it('never re-issues a claimed serial across a crash+reboot (uniqueness holds over erosion)', async () => {
     const db = new FakeLimitedSupplyDb();
-    // A realm claims a serial that is dropped on a corpse but never looted (the
-    // relic is abandoned), then the process dies WITHOUT a graceful release.
+    // A realm claims serial 1 (dropped, granted to a player), then the process
+    // dies ungracefully (no releaseAll). Serial 1 is orphaned 'leased' in the DB.
     const r1 = new LimitedSupplyService(db, 'realm-one', { bufferTarget: 1 });
     await r1.init(CAPS);
-    r1.claim(ITEM); // popped, dropped, never minted -> orphaned 'leased' in the DB
-    await settle(); // the refill re-leases another into the buffer
-    // Crash: no releaseAll. The realm's abandoned serial plus its buffer are both
-    // left 'leased', and NONE is minted -> without a reclaim they would be lost.
-    expect(db.countByState(ITEM, 'leased')).toBeGreaterThanOrEqual(2);
-    expect(db.countByState(ITEM, 'minted')).toBe(0);
-    // The next boot reclaims every stale lease before warming, so the whole
-    // supply is mintable again: drain to exhaustion and confirm all 5 mint.
+    const claimed = r1.claim(ITEM);
+    expect(claimed).toBe(1);
+    await settle(); // the refill re-leases serial 2 into the buffer
+    // A fresh boot must NOT re-issue serial 1 (a player holds it): the next mints
+    // continue past it, so the same serial never appears twice in the world. This
+    // is the deliberate tradeoff: the orphaned serial 1 erodes the effective
+    // supply, but uniqueness (the load-bearing promise) is never violated.
     const r1b = new LimitedSupplyService(db, 'realm-one', { bufferTarget: 1 });
     await r1b.init(CAPS);
-    const minted = new Set<number>();
+    const minted: number[] = [];
     for (let i = 0; i < 12; i++) {
       const s = r1b.claim(ITEM);
-      if (s !== null) minted.add(s);
+      if (s !== null) minted.push(s);
       await settle();
     }
-    expect([...minted].sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5]);
+    expect(minted).not.toContain(1); // never duplicated
+    expect(new Set(minted).size).toBe(minted.length); // all distinct
+    expect(Math.max(...minted)).toBeLessThanOrEqual(5); // never past the cap
   });
 });
 
