@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 413,
-      "state": "8cb11fd6",
+      "state": "030c01fc",
       "events": "b8ebb63c",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 413,
-      "state": "08325e67",
+      "state": "10a675d9",
       "events": "f4966fd6",
       "rng": {
         "draws": 28,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 413,
-      "state": "0a5f2589",
+      "state": "379c4577",
       "events": "965c54ae",
       "rng": {
         "draws": 138,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 413,
-      "state": "a7115abe",
+      "state": "f9dbf060",
       "events": "509ca05e",
       "rng": {
         "draws": 294,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 413,
-      "state": "86e705ef",
+      "state": "d060b56b",
       "events": "1a0deeb8",
       "rng": {
         "draws": 300,
@@ -358,7 +358,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 122,
+          "attackPower": 137,
           "auras": [
             {
               "duration": 3600,
@@ -405,7 +405,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 410,
+            "armor": 459,
             "int": 10,
             "spi": 11,
             "sta": 61,
@@ -473,7 +473,7 @@
           "castTotal": 2.5,
           "castingAbility": "fireball",
           "comboUntil": -1,
-          "critChance": 0.091,
+          "critChance": 0.121,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
           "dualWielding": true,
@@ -529,7 +529,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 115,
+          "attackPower": 147,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.091,
@@ -537,12 +537,12 @@
           "dodgeChance": 0.091,
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
-          "hp": 783,
+          "hp": 945,
           "id": 412,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 783,
+          "maxHp": 945,
           "maxResource": 622,
           "moveSpeed": 7,
           "onGround": true,
@@ -553,7 +553,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
-          "rangedPower": 164,
+          "rangedPower": 196,
           "resource": 622,
           "resourceType": "mana",
           "spawnPos": {
@@ -564,10 +564,10 @@
           "spellPower": 16,
           "stats": {
             "agi": 82,
-            "armor": 375,
+            "armor": 420,
             "int": 32,
             "spi": 33,
-            "sta": 57,
+            "sta": 66,
             "str": 33
           },
           "templateId": "hunter",
@@ -583,7 +583,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 413,
-      "state": "6fcb61c3",
+      "state": "bab8065b",
       "events": "e7af647e",
       "rng": {
         "draws": 300,
@@ -866,7 +866,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 122,
+          "attackPower": 137,
           "auras": [
             {
               "duration": 3600,
@@ -913,7 +913,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 410,
+            "armor": 459,
             "int": 10,
             "spi": 11,
             "sta": 61,
@@ -979,7 +979,7 @@
           "attackPower": 118,
           "castTotal": 2.5,
           "comboUntil": -1,
-          "critChance": 0.091,
+          "critChance": 0.121,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
           "dualWielding": true,
@@ -1035,7 +1035,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 115,
+          "attackPower": 147,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.091,
@@ -1043,12 +1043,12 @@
           "dodgeChance": 0.091,
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
-          "hp": 783,
+          "hp": 945,
           "id": 412,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 783,
+          "maxHp": 945,
           "maxResource": 622,
           "moveSpeed": 7,
           "onGround": true,
@@ -1059,7 +1059,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
-          "rangedPower": 164,
+          "rangedPower": 196,
           "resource": 622,
           "resourceType": "mana",
           "spawnPos": {
@@ -1070,10 +1070,10 @@
           "spellPower": 16,
           "stats": {
             "agi": 82,
-            "armor": 375,
+            "armor": 420,
             "int": 32,
             "spi": 33,
-            "sta": 57,
+            "sta": 66,
             "str": 33
           },
           "templateId": "hunter",
@@ -1089,7 +1089,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 413,
-      "state": "5c22e2fe",
+      "state": "f5a5dac2",
       "events": "1c461241",
       "rng": {
         "draws": 300,
@@ -1376,7 +1376,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 122,
+          "attackPower": 137,
           "auras": [
             {
               "duration": 3600,
@@ -1423,7 +1423,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 410,
+            "armor": 459,
             "int": 10,
             "spi": 11,
             "sta": 61,
@@ -1489,7 +1489,7 @@
           "attackPower": 118,
           "castTotal": 2,
           "comboUntil": -1,
-          "critChance": 0.091,
+          "critChance": 0.121,
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
@@ -1545,7 +1545,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 115,
+          "attackPower": 147,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.091,
@@ -1553,12 +1553,12 @@
           "dodgeChance": 0.091,
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
-          "hp": 783,
+          "hp": 945,
           "id": 412,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 783,
+          "maxHp": 945,
           "maxResource": 622,
           "moveSpeed": 7,
           "onGround": true,
@@ -1569,7 +1569,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
-          "rangedPower": 164,
+          "rangedPower": 196,
           "resource": 622,
           "resourceType": "mana",
           "spawnPos": {
@@ -1580,10 +1580,10 @@
           "spellPower": 16,
           "stats": {
             "agi": 82,
-            "armor": 375,
+            "armor": 420,
             "int": 32,
             "spi": 33,
-            "sta": 57,
+            "sta": 66,
             "str": 33
           },
           "templateId": "hunter",
@@ -1599,7 +1599,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 413,
-      "state": "069ed3f2",
+      "state": "0a4d4fd0",
       "events": "741638a5",
       "rng": {
         "draws": 429,
@@ -1610,7 +1610,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 413,
-      "state": "a44f004d",
+      "state": "b4fb4aff",
       "events": "741638a5",
       "rng": {
         "draws": 524,
@@ -1897,7 +1897,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 122,
+          "attackPower": 137,
           "auras": [
             {
               "duration": 3600,
@@ -1945,7 +1945,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 410,
+            "armor": 459,
             "int": 10,
             "spi": 11,
             "sta": 61,
@@ -2012,7 +2012,7 @@
           "castTotal": 2,
           "combatTimer": 2.05,
           "comboUntil": -1,
-          "critChance": 0.091,
+          "critChance": 0.121,
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
@@ -2068,7 +2068,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 115,
+          "attackPower": 147,
           "combatTimer": 101.05,
           "comboUntil": -1,
           "critChance": 0.091,
@@ -2076,12 +2076,12 @@
           "dodgeChance": 0.091,
           "facing": 3.141593,
           "fiveSecondRule": 106.1,
-          "hp": 783,
+          "hp": 945,
           "id": 412,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 783,
+          "maxHp": 945,
           "maxResource": 622,
           "moveSpeed": 7,
           "onGround": true,
@@ -2092,7 +2092,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
-          "rangedPower": 164,
+          "rangedPower": 196,
           "resource": 622,
           "resourceType": "mana",
           "spawnPos": {
@@ -2103,10 +2103,10 @@
           "spellPower": 16,
           "stats": {
             "agi": 82,
-            "armor": 375,
+            "armor": 420,
             "int": 32,
             "spi": 33,
-            "sta": 57,
+            "sta": 66,
             "str": 33
           },
           "templateId": "hunter",
