@@ -217,6 +217,19 @@ const HOT_PAINTERS: ReadonlyArray<{
   { file: 'hud/action_bar/action_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },
+  // party_below_target measures the target frame, its #tf-debuffs strip, the
+  // party container, and (on mobile) the rows wrapper + move zone (five rect
+  // reads) ONLY when its cheap invalidation key changes (target/buff-count/
+  // layout change), never steady-state per frame; every property write routes
+  // through the elided setStyleProp facet. The same gated measure also pays
+  // getComputedStyle via the shared getUiScale helper (ui_scale.ts), which
+  // this per-file scan cannot see; it is behind the same key, so steady state
+  // stays layout-read-free.
+  {
+    file: 'party_below_target_painter.ts',
+    allow: {},
+    reflowAllow: { '.getBoundingClientRect': 5 },
+  },
   // cold-path chrome wiring (click/roving-keyboard listeners), fired once per full
   // window render like the hand-rolled listeners it replaces, not a per-frame painter.
   // It makes no raw DOM writes; the 3 `.dataset` hits are reads of `tab.dataset.tab`

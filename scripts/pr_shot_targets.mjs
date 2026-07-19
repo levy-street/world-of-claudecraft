@@ -808,6 +808,102 @@ export const TARGETS = [
       return {};
     },
   },
+  {
+    key: 'party-below-target',
+    label: 'Party frames clear the target buff strip',
+    when: ['party_below_target'],
+    variants: [
+      { key: 'desktop', charClass: 'paladin', charName: 'Overlap' },
+      { key: 'mobile', charClass: 'paladin', charName: 'Overlap', mobile: true },
+      // The common case: an unwrapped strip, where the full 2x2 party fits
+      // above the move joystick (the 18-aura variant shows the degraded
+      // one-row-plus-scroll extreme).
+      { key: 'mobile-light', charClass: 'paladin', charName: 'Overlap', mobile: true, auras: 6 },
+    ],
+    async capture(page, variant) {
+      await page.evaluate((auraCount) => {
+        const sim = window.__game.sim;
+        const me = sim.primaryId;
+        const p = sim.player;
+        // Party state lives on the PartyMachine (sim.party); assemble the
+        // struct directly (offline invites queue stale cards).
+        const pm = sim.party;
+        const roster = [
+          ['Brightoak', 'druid'],
+          ['Stormcaller', 'shaman'],
+          ['Nightblade', 'rogue'],
+          ['Emberlyn', 'mage'],
+        ];
+        const pids = roster.map(([name, cls], i) => {
+          const pid = sim.addPlayer(cls, name);
+          const e = sim.entities.get(pid);
+          if (e) {
+            e.pos = { x: p.pos.x + (i % 4) * 2 - 3, y: p.pos.y, z: p.pos.z + 2 };
+            e.prevPos = { ...e.pos };
+          }
+          return pid;
+        });
+        const party = {
+          id: pm.nextPartyId++,
+          leader: me,
+          members: [me, ...pids],
+          raid: false,
+          raidGroups: new Map(),
+          lootStrategies: {},
+        };
+        pm.parties.set(party.id, party);
+        pm.partyByPid.set(me, party.id);
+        for (const q of pids) pm.partyByPid.set(q, party.id);
+        // Target a nearby mob and load its strip with enough auras that the
+        // wrapped rows exceed the old hand-tuned below-target offset.
+        let mob = null;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.ownerId === null && !e.dead) {
+            mob = e;
+            break;
+          }
+        }
+        if (!mob) return;
+        mob.pos = { x: p.pos.x + 2, y: p.pos.y, z: p.pos.z + 8 };
+        mob.prevPos = { ...mob.pos };
+        sim.rebucket(mob);
+        sim.targetEntity(mob.id);
+        for (let i = 0; i < auraCount; i++) {
+          sim.applyAura(mob, {
+            id: `overlap_probe_${i}`,
+            name: `Probe ${i}`,
+            kind: 'dot',
+            value: 1,
+            remaining: 600,
+            duration: 600,
+            sourceId: me,
+            school: 'shadow',
+          });
+        }
+      }, variant.auras ?? 18);
+      await wait(1200);
+      // Becoming leader auto-opens Loot Settings on the frame the HUD notices
+      // the new party; close it AFTER that frame so the corner stays clean.
+      await page.evaluate(() => window.__game.hud.closeLootSettings?.());
+      if (variant.mobile) {
+        // Expand the party chip (persisted-collapse default) so the member
+        // frames render below the strip; poll its own aria-expanded state.
+        for (let i = 0; i < 8; i++) {
+          const state = await page.evaluate(() => {
+            const chip = document.querySelector('#party-frames [aria-expanded]');
+            if (!chip) return 'no-chip';
+            if (chip.getAttribute('aria-expanded') === 'true') return 'expanded';
+            chip.click();
+            return 'clicked';
+          });
+          if (state === 'expanded' || state === 'no-chip') break;
+          await wait(400);
+        }
+      }
+      await wait(600);
+      return {};
+    },
+  },
 ];
 
 // Map a list of changed file paths to the targets they imply (deduped, registry order).

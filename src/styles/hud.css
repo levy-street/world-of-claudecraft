@@ -602,7 +602,14 @@
     left: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    /* Each icon's duration text hangs 13px BELOW it, out of flow (.buff .dur,
+       bottom: -13px), so the wrap row gap reserves that height (13px + the 4px
+       visual gap) or a wrapped row paints over the previous row's timers, and
+       the bottom padding folds the LAST row's timers into the strip's own box,
+       so the measured below-target bottom (party_below_target_painter.ts)
+       covers them too. */
+    gap: 17px 4px;
+    padding-bottom: 13px;
     max-width: 100%;
     pointer-events: auto;
   }
@@ -4388,7 +4395,14 @@
     zoom: var(--party-frame-scale, 1);
   }
   #party-frames.below-target {
-    top: 96px;
+    /* Below the target frame's MEASURED bottom: party_below_target_painter.ts
+       writes the author-space bottom of the target frame INCLUDING its
+       #tf-debuffs strip into --party-below-target-bottom, so the frames clear
+       the buff strip at any buff count, UI scale, or dragged frame position.
+       (The strip's own padding folds its hanging timer text into that box, so
+       a plain 8px gap suffices.) The var fallback reproduces the old
+       hand-tuned 96px (88px + the gap) before the first measure lands. */
+    top: calc(var(--party-below-target-bottom, 88px) + 8px);
   }
   .party-frame {
     --cls: #7fb8ff;

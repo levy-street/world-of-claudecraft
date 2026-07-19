@@ -129,6 +129,7 @@ const UI_PURE_CORES = [
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',
+  'src/ui/party_below_target_core.ts',
   'src/ui/party_collapse.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/low_health.ts',

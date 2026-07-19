@@ -1727,12 +1727,32 @@
     grid-template-rows: none;
   }
   body.mobile-touch #party-frames.below-target {
-    /* +135px (was 130px): the collapse chip is the container's first child now, so keep
-       it clear of the target frame's bottom edge (the same +5px nudge as landscape). */
-    top: calc(max(8px, env(safe-area-inset-top)) + 135px);
+    /* Below the target frame's MEASURED bottom (see the hud.css below-target
+       rule): --party-below-target-bottom replaces the hand-nudged +135px
+       constant, so the chip and frames clear the target's #tf-debuffs strip at
+       any buff count. The var fallback reproduces the old constant (safe-area
+       + 127px + the 8px gap = the old +135px) until the first measure lands. */
+    top: calc(
+      var(--party-below-target-bottom, calc(max(8px, env(safe-area-inset-top)) + 127px)) +
+      8px
+    );
   }
   body.mobile-touch #party-frames.below-target .party-rows {
-    max-height: calc(100dvh - max(8px, env(safe-area-inset-top)) - 190px);
+    /* The pushed-down rows stop ABOVE the move joystick's capture zone instead
+       of sitting on it and stealing its touches: the painter
+       (party_below_target_painter.ts) writes the MEASURED rows top (below the
+       collapse chip, so no chip-height constant is guessed) and the measured
+       #mobile-move-zone top; this rule keeps an 8px margin above the zone and
+       never shrinks below one 40px touch-floor row (a pathologically short
+       leftover viewport then overhangs the zone's top edge slightly; the
+       floating wheel still springs to any touch below). Falls back to no
+       bound while the sensors are unset (zone hidden, first frame). Overflow
+       keeps the hidden rows reachable by scroll. One tier-free rule: the
+       measured sensors already reflect the landscape metrics. */
+    max-height: max(
+      40px,
+      calc(var(--party-move-zone-top, 100dvh) - var(--party-rows-top, 0px) - 8px)
+    );
   }
   /* party rows are role="button" tap targets (tap to target a member), so they
      must clear the 40x40 mobile touch floor, not the compact desktop
@@ -4426,14 +4446,18 @@
       max-height: calc(100dvh - max(6px, env(safe-area-inset-top)) - 113px);
     }
     body.mobile-touch #party-frames.below-target {
-      /* +105px (was 100px): the collapse chip is now the container's first child, and
-         a chip crowding the scaled target frame reads as a mis-tap pair; the extra 5px
-         keeps the chip clear of the target frame's bottom edge (>= 4px). */
-      top: calc(max(6px, env(safe-area-inset-top)) + 105px);
+      /* Landscape twin of the measured below-target offset above: the var
+         fallback reproduces the old hand-nudged +105px constant (safe-area
+         + 97px + the 8px gap) until the first measure lands. */
+      top: calc(
+        var(--party-below-target-bottom, calc(max(6px, env(safe-area-inset-top)) + 97px)) +
+        8px
+      );
     }
-    body.mobile-touch #party-frames.below-target .party-rows {
-      max-height: calc(100dvh - max(6px, env(safe-area-inset-top)) - 160px);
-    }
+    /* No landscape .party-rows override for below-target: the base tier's
+       measured joystick-clearing max-height is tier-free (its sensors already
+       reflect this tier's zone position), and the below-target selector
+       out-specifies the plain landscape max-height rule above. */
     /* keep the 40x40 touch floor in landscape too (was 25px); width matches the
        base double-stack tier (issue 1577 (2), a further trim from the old
        single-column 118px so two columns stay comfortably on-screen). */
