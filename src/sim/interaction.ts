@@ -32,6 +32,7 @@ import {
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
 import { isInRaidInstance } from './instances/dungeons';
+import { grantLootItem } from './loot/limited_gate';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -125,8 +126,11 @@ export function lootCorpse(
   for (const s of [...mob.loot.items]) {
     if (!lootSlotVisibleTo(s, meta.entityId)) continue;
     if (s.openToAll) {
+      // grantLootItem preserves an instanced slot's payload (a minted limited
+      // serial) and fires its one-time mint announcement; plain slots route to
+      // the ordinary stacking addItem exactly as before.
       while (s.count > 0 && ctx.canAddItem(s.itemId, 1, meta.entityId)) {
-        ctx.addItem(s.itemId, 1, meta.entityId);
+        grantLootItem(ctx, s.itemId, 1, s.instance, meta.entityId);
         s.count--;
         didLoot = true;
       }
@@ -138,14 +142,14 @@ export function lootCorpse(
         bagsFull = true;
         continue;
       }
-      ctx.addItem(s.itemId, 1, meta.entityId);
+      grantLootItem(ctx, s.itemId, 1, s.instance, meta.entityId);
       s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
       tookPersonal = true;
       didLoot = true;
       continue;
     }
     if (!rights.shared) continue;
-    while (s.count > 0 && awardSharedLootItem(ctx, s.itemId, mob, meta)) {
+    while (s.count > 0 && awardSharedLootItem(ctx, s.itemId, mob, meta, s.instance)) {
       s.count--;
       didLoot = true;
     }

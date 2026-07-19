@@ -706,6 +706,12 @@ interface BaseItemDef {
   // Marks a bespoke heroic-tier item (e.g. the Heroic Nythraxis raid epics) for
   // tooltip chrome; these keep their own name key, unlike heroicOf variants.
   heroic?: boolean;
+  // Hard global supply cap for a limited-edition drop (content/limited_drops.ts).
+  // Presence marks the item as limited: every dropped copy mints a 1-based
+  // ItemInstancePayload.serial through the claimLimitedSerial seam at loot-roll
+  // time, and once the cap is exhausted the item never drops again (the roll
+  // substitutes the item's registered fallback instead; see loot/limited_gate.ts).
+  limitedSupply?: number;
 }
 
 // Item-set bonuses (classic "tier set" style). Flat effects fold into
@@ -893,6 +899,11 @@ export interface ItemInstancePayload {
   enchant?: string;
   /** Player id (Entity id) this specific copy is bound to. */
   boundTo?: number;
+  /** 1-based mint number of a limited-supply item (ItemDef.limitedSupply). Set
+   *  exactly once when the drop mints at loot-roll time (loot/limited_gate.ts)
+   *  and immutable for the copy's whole life. A scalar, so the deep-clone
+   *  discipline below carries it through every save/load boundary unchanged. */
+  serial?: number;
 }
 
 export interface InvSlot {
@@ -3097,6 +3108,15 @@ export type SimEvent = { pid?: number } & (
       expiresAt: number;
       candidates: { pid: number; name: string }[];
     }
+  // A limited-supply item entered a player's possession (loot/limited_gate.ts):
+  // fired once per mint, at the moment the serialed copy lands in the winner's
+  // bags (after any need/greed or master-loot resolution). Emitted WITH the
+  // winner's pid so the server can attribute the mint to a character; the
+  // server intercepts it in routeEvents (never delivering the raw event) and
+  // rebroadcasts the claim realm-wide as a system line, while the offline
+  // client renders the claim line from the event directly. Carries ids and
+  // numbers only, never English.
+  | { type: 'limitedMint'; itemId: string; serial: number; supply: number; name: string }
   | { type: 'error'; text: string; reason?: ErrorReason }
   | { type: 'questAccepted'; questId: string }
   | {
@@ -3722,6 +3742,15 @@ export interface SimConfig {
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.
   raidResetMs?: (nowMs: number) => number;
+  // Host-owned mint allocator for limited-supply drops (ItemDef.limitedSupply).
+  // Returns the next 1-based serial for the item, or null when the global supply
+  // is exhausted (the roll then awards the item's registered fallback instead).
+  // The authoritative server backs this with its cross-realm Postgres serial
+  // lease pool (server/limited_supply.ts); offline/headless omit it and fall
+  // back to the per-world in-memory ledger (Sim.limitedMints), so a private
+  // world competes over its own full supply. Must be synchronous and never
+  // draw rng or wall clock: it is environmental input, like lockoutNowMs.
+  claimLimitedSerial?: (itemId: string) => number | null;
   // Offline play-test: a custom world to run instead of the built-in one. The Sim
   // ctor reads spawns from here; render/terrain read it via the data.ts registry,
   // so callers that set this MUST also call setActiveWorldContent() with content

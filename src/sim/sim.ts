@@ -206,6 +206,7 @@ import {
   paginateLeaderboard,
 } from './leaderboard_page';
 import type { Ante, PickAction } from './lockpick';
+import { claimFromWorldLedger } from './loot/limited_gate';
 // L1: the loot-distribution layer (party-loot strategy, the rollLoot roller, copper
 // split, need-greed roll lifecycle, corpse-loot helpers) moved to ./loot/loot_roll.ts;
 // Sim keeps thin same-named delegates that call these.
@@ -1439,6 +1440,12 @@ export class Sim {
   };
   private nextLootRollId = 1;
   private pendingLootRolls = new Map<number, PendingLootRoll>();
+  // Per-world mint ledger for limited-supply drops: itemId -> highest serial
+  // minted so far in THIS world. Only the offline/headless default allocator
+  // reads it (claimFromWorldLedger via cfg.claimLimitedSerial); the online
+  // server injects its cross-realm Postgres-backed allocator instead, so this
+  // map stays empty there. In-memory like the rest of the offline world state.
+  private limitedMints = new Map<string, number>();
   trades = new Map<number, TradeSession>(); // pid -> shared session (both pids point at it)
   tradeInvites = new Map<number, { fromPid: number; expires: number }>();
   duels = new Map<number, DuelState>(); // pid -> shared duel (both pids)
@@ -1574,6 +1581,11 @@ export class Sim {
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
+      // Limited-drop mint allocator: the server injects its cross-realm serial
+      // lease pool; offline/headless fall back to the per-world ledger below.
+      claimLimitedSerial:
+        cfg.claimLimitedSerial ??
+        ((itemId: string) => claimFromWorldLedger(this.limitedMints, itemId)),
       valeCupShowcase: cfg.valeCupShowcase ?? false,
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
       // the same custom world via sim.cfg.world. Undefined for the built-in world.
@@ -1850,6 +1862,15 @@ export class Sim {
   // (server: realm-local 3 AM daily reset); offline/headless fall back to a flat 24h day.
   private raidResetMs(nowMs: number): number {
     return this.cfg.raidResetMs(nowMs);
+  }
+
+  // Mint allocator for limited-supply drops. The ctor default routes to the
+  // per-world in-memory ledger (claimFromWorldLedger over this.limitedMints);
+  // the server overrides via SimConfig.claimLimitedSerial with its cross-realm
+  // serial lease pool. Synchronous and rng-free either way, so the loot roll's
+  // draw order never depends on ledger state.
+  private claimLimitedSerial(itemId: string): number | null {
+    return this.cfg.claimLimitedSerial(itemId);
   }
 
   // -------------------------------------------------------------------------
@@ -3734,6 +3755,7 @@ export class Sim {
       // raidResetMs is the host-owned reset boundary the lockout grant reads through.
       lockoutNowMs: sim.lockoutNowMs.bind(sim),
       raidResetMs: sim.raidResetMs.bind(sim),
+      claimLimitedSerial: sim.claimLimitedSerial.bind(sim),
       instanceKeyFor: sim.instanceKeyFor.bind(sim),
       instanceOriginOf: sim.instanceOriginOf.bind(sim),
       instanceClaimIdAt: sim.instanceClaimIdAt.bind(sim),

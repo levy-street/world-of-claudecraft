@@ -8942,6 +8942,27 @@ export const zh_CN: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "唤雷者腰甲"
+      },
+      "emberfall_edge": {
+        "name": "烬落之刃"
+      },
+      "crown_of_the_thornpeak_scourge": {
+        "name": "荆峰灾星之冠"
+      },
+      "thunzharrs_stormheart": {
+        "name": "图恩扎尔的风暴之心"
+      },
+      "sealed_vault_signet_crypt": {
+        "name": "空冢密库封印戒"
+      },
+      "sealed_vault_signet_bastion": {
+        "name": "沉没堡垒封印戒"
+      },
+      "sealed_vault_signet_temple": {
+        "name": "溺亡神庙封印戒"
+      },
+      "sealed_vault_signet_sanctum": {
+        "name": "墓龙圣所封印戒"
       }
     },
     "mobs": {
