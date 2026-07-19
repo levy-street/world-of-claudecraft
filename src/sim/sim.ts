@@ -6766,7 +6766,10 @@ export class Sim {
   // opts.silent suppresses only the client's default loot audio cue for this
   // grant (the "You receive:" text line still prints); a caller with its own
   // dedicated cue for the same grant (gathering/crafting/enchanting) sets
-  // this so the generic ding doesn't stack on top of it.
+  // this so the generic ding doesn't stack on top of it. Professions 2.0's
+  // later phases add new grant sites here (Phase 4 rare-event jackpot yields,
+  // Phase 13's disenchant UI wiring): pass { silent: true } from those too,
+  // or the new grants will double-ding the same way the original ones did.
   addItem(itemId: string, count: number, pid?: number, opts?: { silent?: boolean }): void {
     const r = this.resolve(pid);
     if (!r) return;
