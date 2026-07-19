@@ -9185,6 +9185,27 @@ export const ja_JP: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "嵐呼びの腰当て"
+      },
+      "emberfall_edge": {
+        "name": "燼落の刃"
+      },
+      "crown_of_the_thornpeak_scourge": {
+        "name": "荊峰の災厄の冠"
+      },
+      "thunzharrs_stormheart": {
+        "name": "サンザールの嵐の心臓"
+      },
+      "sealed_vault_signet_crypt": {
+        "name": "虚ろな地下墓所の封印指輪"
+      },
+      "sealed_vault_signet_bastion": {
+        "name": "沈んだ砦の封印指輪"
+      },
+      "sealed_vault_signet_temple": {
+        "name": "水没した神殿の封印指輪"
+      },
+      "sealed_vault_signet_sanctum": {
+        "name": "墓竜の聖所の封印指輪"
       }
     },
     "mobs": {

@@ -25,6 +25,7 @@
 
 import { HEROIC_BOSS_LOOT } from '../content/heroic_loot';
 import { heroicVariantId } from '../content/heroic_variants';
+import { LIMITED_DROPS } from '../content/limited_drops';
 import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
 import { itemLevel } from '../item_level';
@@ -35,6 +36,7 @@ import type {
   CurrencyLootStrategy,
   Entity,
   ItemDef,
+  ItemInstancePayload,
   ItemLootStrategy,
   LootEntry,
   LootRollChoice,
@@ -45,6 +47,7 @@ import type {
   MasterLootThreshold,
 } from '../types';
 import { dist2d, PARTY_XP_RANGE } from '../types';
+import { grantLootItem, resolveRolledDrop } from './limited_gate';
 import { LOOT_FFA_DELAY } from './loot_ffa';
 
 // How long (seconds) a need-greed roll stays open before it auto-resolves. Sole
@@ -81,6 +84,11 @@ export interface PendingLootRoll {
   // When set, this is a master-loot assignment (not a need/greed vote): only the
   // master looter pid decides, and a timeout returns the item to the corpse.
   masterLooter?: number;
+  // Per-instance payload of the corpse slot this roll is distributing (a minted
+  // limited-drop serial). Carried through the whole roll lifecycle, including a
+  // master-to-need/greed conversion and a return to the corpse, so the serial
+  // survives every distribution outcome.
+  instance?: ItemInstancePayload;
 }
 
 function partyLootStrategiesForMob(ctx: SimContext, mob: Entity): LootStrategies | null {
@@ -296,11 +304,47 @@ export function rollLoot(
       }
     }
   }
+  // Limited-supply relics (content/limited_drops.ts): a separate, append-only
+  // phase so the tables above stay pristine (their goldens are byte-identical)
+  // and the item-level heroic sweep is never polluted by the legendary/jewelry
+  // relics. Each eligible entry draws exactly one ctx.rng.chance AFTER every
+  // draw above, so only a kill of a limited-drop boss adds draws, and always at
+  // the tail. A win mints a serialed slot through the shared corpse pool (shared
+  // rights, so a raid rolls need/greed on it like any drop).
+  appendLimitedDrops(ctx, mob, items, heroicClaim, (itemId) => ({
+    itemId,
+    count: 1,
+  }));
   if (copper > 0 || items.length > 0) {
     mob.loot = { copper, items };
     mob.lootable = true;
     // start the owner-lock countdown: after LOOT_FFA_DELAY the tap opens to all.
     mob.lootFfaTimer = LOOT_FFA_DELAY;
+  }
+}
+
+// Roll a boss's limited-supply relic entries and append any wins to `items`.
+// `makeSlot` builds the base slot for the drop (a shared slot in rollLoot, a
+// personalFor slot in rollWorldBossLoot); the minted serial is layered onto it.
+// Entries flagged heroicOnly are skipped WITHOUT drawing rng outside a heroic
+// claim, so a normal-difficulty kill's draw order never depends on them.
+export function appendLimitedDrops(
+  ctx: SimContext,
+  mob: Entity,
+  items: LootSlot[],
+  heroicClaim: boolean,
+  makeSlot: (itemId: string) => LootSlot,
+): void {
+  const entries = LIMITED_DROPS[mob.templateId];
+  if (!entries) return;
+  for (const entry of entries) {
+    if (entry.heroicOnly && !heroicClaim) continue;
+    if (!ctx.rng.chance(entry.chance)) continue;
+    const drop = resolveRolledDrop(ctx, entry.itemId);
+    if (!drop) continue;
+    const slot = makeSlot(drop.itemId);
+    if (drop.instance) slot.instance = drop.instance;
+    items.push(slot);
   }
 }
 
@@ -343,7 +387,12 @@ export function distributeLootCopper(ctx: SimContext, mob: Entity, looter: Playe
   mob.loot.copper = 0;
 }
 
-function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boolean {
+function startNeedGreedRoll(
+  ctx: SimContext,
+  itemId: string,
+  mob: Entity,
+  instance?: ItemInstancePayload,
+): boolean {
   if (effectiveItemLootStrategy(ctx, itemId, mob) !== 'need-greed') return false;
   const candidates = partyLootCandidatesForMob(ctx, mob);
   if (candidates.length <= 1) return false;
@@ -362,6 +411,7 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
     partyMembers,
     choices: new Map(),
     expiresAt: ctx.time + LOOT_ROLL_TIMEOUT,
+    instance,
   };
   ctx.pendingLootRolls.set(roll.id, roll);
   mob.corpseTimer = Math.max(mob.corpseTimer, LOOT_ROLL_TIMEOUT + 2);
@@ -385,7 +435,12 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
 // the drop is at/above the configured threshold. Returns false (so the caller
 // falls through to need/greed or looter-takes-all) when master loot does not
 // apply: disabled, below threshold, a solo looter, or no resolvable looter.
-function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): boolean {
+function startMasterLootRoll(
+  ctx: SimContext,
+  itemId: string,
+  mob: Entity,
+  instance?: ItemInstancePayload,
+): boolean {
   const strategies = partyLootStrategiesForMob(ctx, mob);
   if (!strategies || !strategies.master.enabled) return false;
   const def = ITEMS[itemId];
@@ -409,6 +464,7 @@ function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): bool
     choices: new Map(),
     expiresAt: ctx.time + MASTER_LOOT_TIMEOUT,
     masterLooter: looterPid,
+    instance,
   };
   ctx.pendingLootRolls.set(roll.id, roll);
   mob.corpseTimer = Math.max(mob.corpseTimer, MASTER_LOOT_TIMEOUT + 2);
@@ -431,7 +487,12 @@ function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): bool
 // loot-time in-range set: that is the fairness point. Mirrors
 // tryAwardCopperByFairSplit's shape (strategy check, candidate-count guard,
 // party lookup) but advances a per-party cursor instead of a Fisher-Yates split.
-function tryAwardItemByRoundRobin(ctx: SimContext, itemId: string, mob: Entity): boolean {
+function tryAwardItemByRoundRobin(
+  ctx: SimContext,
+  itemId: string,
+  mob: Entity,
+  instance?: ItemInstancePayload,
+): boolean {
   if (effectiveItemLootStrategy(ctx, itemId, mob) !== 'round-robin') return false;
   const candidates = partyLootCandidatesForMob(ctx, mob);
   if (candidates.length <= 1) return false;
@@ -439,7 +500,7 @@ function tryAwardItemByRoundRobin(ctx: SimContext, itemId: string, mob: Entity):
   if (!party) return false;
   const winner = candidates[party.lootTurn % candidates.length];
   party.lootTurn++;
-  ctx.addItem(itemId, 1, winner.entityId);
+  grantLootItem(ctx, itemId, 1, instance, winner.entityId);
   return true;
 }
 
@@ -454,12 +515,13 @@ export function awardSharedLootItem(
   itemId: string,
   mob: Entity,
   looter: PlayerMeta,
+  instance?: ItemInstancePayload,
 ): boolean {
-  if (startMasterLootRoll(ctx, itemId, mob)) return true;
-  if (startNeedGreedRoll(ctx, itemId, mob)) return true;
-  if (tryAwardItemByRoundRobin(ctx, itemId, mob)) return true;
+  if (startMasterLootRoll(ctx, itemId, mob, instance)) return true;
+  if (startNeedGreedRoll(ctx, itemId, mob, instance)) return true;
+  if (tryAwardItemByRoundRobin(ctx, itemId, mob, instance)) return true;
   if (!ctx.canAddItem(itemId, 1, looter.entityId)) return false;
-  ctx.addItem(itemId, 1, looter.entityId);
+  grantLootItem(ctx, itemId, 1, instance, looter.entityId);
   return true;
 }
 
@@ -608,7 +670,7 @@ export function assignMasterLoot(
         text: `${r.meta.name} assigned [[i:${roll.itemId}]] to ${targetName}.`,
         pid,
       });
-    ctx.addItem(roll.itemId, 1, targets[0]);
+    grantLootItem(ctx, roll.itemId, 1, roll.instance, targets[0]);
     return;
   }
   convertMasterRollToNeedGreed(ctx, roll, targets);
@@ -754,7 +816,7 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
       });
     return;
   }
-  ctx.addItem(roll.itemId, 1, winner.pid);
+  grantLootItem(ctx, roll.itemId, 1, roll.instance, winner.pid);
 }
 
 // Whether `pid` is a currently-connected player the loot hub's addItem/resolve
@@ -770,8 +832,21 @@ function returnLootRollItemToCorpse(ctx: SimContext, roll: PendingLootRoll): voi
   const mob = ctx.entities.get(roll.mobId);
   if (!mob?.dead) return;
   if (!mob.loot) mob.loot = { copper: 0, items: [] };
+  // An instanced item (a minted limited-drop serial) is non-fungible: it always
+  // returns as its OWN slot, never merged into an existing stack, mirroring the
+  // bag-side never-merge rule for instance slots.
+  if (roll.instance) {
+    mob.loot.items.push({
+      itemId: roll.itemId,
+      count: 1,
+      openToAll: true,
+      instance: roll.instance,
+    });
+    mob.lootable = true;
+    return;
+  }
   const existing = mob.loot.items.find(
-    (slot) => slot.openToAll && slot.itemId === roll.itemId && !slot.personalFor,
+    (slot) => slot.openToAll && slot.itemId === roll.itemId && !slot.personalFor && !slot.instance,
   );
   if (existing) existing.count += 1;
   else mob.loot.items.push({ itemId: roll.itemId, count: 1, openToAll: true });

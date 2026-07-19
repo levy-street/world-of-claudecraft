@@ -9,25 +9,145 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.items.crown_of_the_thornpeak_scourge.name",
+    "entities.items.emberfall_edge.name",
+    "entities.items.sealed_vault_signet_bastion.name",
+    "entities.items.sealed_vault_signet_crypt.name",
+    "entities.items.sealed_vault_signet_sanctum.name",
+    "entities.items.sealed_vault_signet_temple.name",
+    "entities.items.thunzharrs_stormheart.name"
+  ],
+  "es_ES": [
+    "entities.items.crown_of_the_thornpeak_scourge.name",
+    "entities.items.emberfall_edge.name",
+    "entities.items.sealed_vault_signet_bastion.name",
+    "entities.items.sealed_vault_signet_crypt.name",
+    "entities.items.sealed_vault_signet_sanctum.name",
+    "entities.items.sealed_vault_signet_temple.name",
+    "entities.items.thunzharrs_stormheart.name"
+  ],
+  "fr_FR": [
+    "entities.items.crown_of_the_thornpeak_scourge.name",
+    "entities.items.emberfall_edge.name",
+    "entities.items.sealed_vault_signet_bastion.name",
+    "entities.items.sealed_vault_signet_crypt.name",
+    "entities.items.sealed_vault_signet_sanctum.name",
+    "entities.items.sealed_vault_signet_temple.name",
+    "entities.items.thunzharrs_stormheart.name"
+  ],
+  "fr_CA": [
+    "entities.items.crown_of_the_thornpeak_scourge.name",
+    "entities.items.emberfall_edge.name",
+    "entities.items.sealed_vault_signet_bastion.name",
+    "entities.items.sealed_vault_signet_crypt.name",
+    "entities.items.sealed_vault_signet_sanctum.name",
+    "entities.items.sealed_vault_signet_temple.name",
+    "entities.items.thunzharrs_stormheart.name"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.items.crown_of_the_thornpeak_scourge.name",
+    "entities.items.emberfall_edge.name",
+    "entities.items.sealed_vault_signet_bastion.name",
+    "entities.items.sealed_vault_signet_crypt.name",
+    "entities.items.sealed_vault_signet_sanctum.name",
+    "entities.items.sealed_vault_signet_temple.name",
+    "entities.items.thunzharrs_stormheart.name"
+  ],
+  "de_DE": [
+    "entities.items.crown_of_the_thornpeak_scourge.name",
+    "entities.items.emberfall_edge.name",
+    "entities.items.sealed_vault_signet_bastion.name",
+    "entities.items.sealed_vault_signet_crypt.name",
+    "entities.items.sealed_vault_signet_sanctum.name",
+    "entities.items.sealed_vault_signet_temple.name",
+    "entities.items.thunzharrs_stormheart.name"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.items.crown_of_the_thornpeak_scourge.name",
+    "entities.items.emberfall_edge.name",
+    "entities.items.sealed_vault_signet_bastion.name",
+    "entities.items.sealed_vault_signet_crypt.name",
+    "entities.items.sealed_vault_signet_sanctum.name",
+    "entities.items.sealed_vault_signet_temple.name",
+    "entities.items.thunzharrs_stormheart.name"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.items.crown_of_the_thornpeak_scourge.name",
+    "entities.items.emberfall_edge.name",
+    "entities.items.sealed_vault_signet_bastion.name",
+    "entities.items.sealed_vault_signet_crypt.name",
+    "entities.items.sealed_vault_signet_sanctum.name",
+    "entities.items.sealed_vault_signet_temple.name",
+    "entities.items.thunzharrs_stormheart.name"
+  ],
+  "nl_NL": [
+    "entities.items.crown_of_the_thornpeak_scourge.name",
+    "entities.items.emberfall_edge.name",
+    "entities.items.sealed_vault_signet_bastion.name",
+    "entities.items.sealed_vault_signet_crypt.name",
+    "entities.items.sealed_vault_signet_sanctum.name",
+    "entities.items.sealed_vault_signet_temple.name",
+    "entities.items.thunzharrs_stormheart.name"
+  ],
+  "pl_PL": [
+    "entities.items.crown_of_the_thornpeak_scourge.name",
+    "entities.items.emberfall_edge.name",
+    "entities.items.sealed_vault_signet_bastion.name",
+    "entities.items.sealed_vault_signet_crypt.name",
+    "entities.items.sealed_vault_signet_sanctum.name",
+    "entities.items.sealed_vault_signet_temple.name",
+    "entities.items.thunzharrs_stormheart.name"
+  ],
+  "id_ID": [
+    "entities.items.crown_of_the_thornpeak_scourge.name",
+    "entities.items.emberfall_edge.name",
+    "entities.items.sealed_vault_signet_bastion.name",
+    "entities.items.sealed_vault_signet_crypt.name",
+    "entities.items.sealed_vault_signet_sanctum.name",
+    "entities.items.sealed_vault_signet_temple.name",
+    "entities.items.thunzharrs_stormheart.name"
+  ],
+  "tr_TR": [
+    "entities.items.crown_of_the_thornpeak_scourge.name",
+    "entities.items.emberfall_edge.name",
+    "entities.items.sealed_vault_signet_bastion.name",
+    "entities.items.sealed_vault_signet_crypt.name",
+    "entities.items.sealed_vault_signet_sanctum.name",
+    "entities.items.sealed_vault_signet_temple.name",
+    "entities.items.thunzharrs_stormheart.name"
+  ],
+  "sv_SE": [
+    "entities.items.crown_of_the_thornpeak_scourge.name",
+    "entities.items.emberfall_edge.name",
+    "entities.items.sealed_vault_signet_bastion.name",
+    "entities.items.sealed_vault_signet_crypt.name",
+    "entities.items.sealed_vault_signet_sanctum.name",
+    "entities.items.sealed_vault_signet_temple.name",
+    "entities.items.thunzharrs_stormheart.name"
+  ],
+  "vi_VN": [
+    "entities.items.crown_of_the_thornpeak_scourge.name",
+    "entities.items.emberfall_edge.name",
+    "entities.items.sealed_vault_signet_bastion.name",
+    "entities.items.sealed_vault_signet_crypt.name",
+    "entities.items.sealed_vault_signet_sanctum.name",
+    "entities.items.sealed_vault_signet_temple.name",
+    "entities.items.thunzharrs_stormheart.name"
+  ],
+  "da_DK": [
+    "entities.items.crown_of_the_thornpeak_scourge.name",
+    "entities.items.emberfall_edge.name",
+    "entities.items.sealed_vault_signet_bastion.name",
+    "entities.items.sealed_vault_signet_crypt.name",
+    "entities.items.sealed_vault_signet_sanctum.name",
+    "entities.items.sealed_vault_signet_temple.name",
+    "entities.items.thunzharrs_stormheart.name"
+  ]
 };

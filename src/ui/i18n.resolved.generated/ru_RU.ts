@@ -9185,6 +9185,27 @@ export const ru_RU: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Поясная защита призывателя бурь"
+      },
+      "emberfall_edge": {
+        "name": "Клинок Углепада"
+      },
+      "crown_of_the_thornpeak_scourge": {
+        "name": "Корона Бича Терновой Вершины"
+      },
+      "thunzharrs_stormheart": {
+        "name": "Грозовое сердце Тунзарра"
+      },
+      "sealed_vault_signet_crypt": {
+        "name": "Запечатанная печатка Полой крипты"
+      },
+      "sealed_vault_signet_bastion": {
+        "name": "Запечатанная печатка Затонувшего бастиона"
+      },
+      "sealed_vault_signet_temple": {
+        "name": "Запечатанная печатка Утонувшего храма"
+      },
+      "sealed_vault_signet_sanctum": {
+        "name": "Запечатанная печатка Святилища могильного червя"
       }
     },
     "mobs": {
