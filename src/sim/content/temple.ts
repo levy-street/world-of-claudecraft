@@ -268,6 +268,7 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     loot: [
       { copper: 6000, chance: 1 },
       { itemId: 'ysols_pearl_greaves', chance: 0.5 },
+      { itemId: 'drownedmoon_aegis', chance: 0.15 },
       // exclusive "one of three" blue chests (weights sum to 1.0)
       { itemId: 'moonshroud_breastplate', chance: 0.34, rollGroup: 'ysolei_blue' },
       { itemId: 'moonshroud_robe', chance: 0.33, rollGroup: 'ysolei_blue' },
@@ -600,6 +601,21 @@ export const TEMPLE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 60, agi: 6, sta: 2 },
     sellValue: 1400,
     requiredClass: ROG,
+  },
+  drownedmoon_aegis: {
+    id: 'drownedmoon_aegis',
+    name: 'Drowned Moon Aegis',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'offhand',
+    shield: true,
+    blockValue: 24,
+    quality: 'epic',
+    // Ysolei is level 18, so the epic quality bump makes this item level 24.
+    // Thirteen primary stats exactly fill the epic offhand budget.
+    stats: { armor: 440, sta: 9, str: 4 },
+    sellValue: 6500,
+    requiredClass: WAR,
   },
   drownedmoon_maul: {
     id: 'drownedmoon_maul',

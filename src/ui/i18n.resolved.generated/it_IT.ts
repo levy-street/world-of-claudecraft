@@ -8225,6 +8225,15 @@ export const it_IT: EnTranslations = {
       "silverleaf_herb": {
         "name": "Silverleaf Herb"
       },
+      "boundstone_bulwark": {
+        "name": "Baluardo di pietra vincolata"
+      },
+      "drownedmoon_aegis": {
+        "name": "Egida della Luna Sommersa"
+      },
+      "gravewyrm_bulwark": {
+        "name": "Baluardo del dragone sepolcrale"
+      },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"
       },

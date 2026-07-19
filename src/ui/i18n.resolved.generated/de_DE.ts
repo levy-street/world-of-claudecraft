@@ -8225,6 +8225,15 @@ export const de_DE: EnTranslations = {
       "silverleaf_herb": {
         "name": "Silverleaf Herb"
       },
+      "boundstone_bulwark": {
+        "name": "Bollwerk aus gebundenem Stein"
+      },
+      "drownedmoon_aegis": {
+        "name": "Ägis des ertrunkenen Mondes"
+      },
+      "gravewyrm_bulwark": {
+        "name": "Bollwerk des Grabwyrms"
+      },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
       },

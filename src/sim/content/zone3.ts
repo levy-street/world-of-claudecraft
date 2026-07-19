@@ -2711,6 +2711,21 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     sellValue: 8000,
     requiredClass: ['rogue', 'hunter'],
   },
+  gravewyrm_bulwark: {
+    id: 'gravewyrm_bulwark',
+    name: 'Gravewyrm Bulwark',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'offhand',
+    shield: true,
+    blockValue: 27,
+    quality: 'epic',
+    // Korzul is level 20, so the epic quality bump makes this item level 26.
+    // Fourteen primary stats exactly fill the epic offhand budget.
+    stats: { armor: 540, sta: 10, str: 4 },
+    sellValue: 8000,
+    requiredClass: ['warrior', 'paladin', 'shaman'],
+  },
   // --- Inventory 2.0 epics: one per armor archetype, filling the new slots and
   // named into the existing Barrowlord/Mournweave/Nightfang Korzul epic families.
   // Stat budget is slot-weighted off the item-level formula (src/sim/item_level.ts),

@@ -8225,6 +8225,15 @@ export const da_DK: EnTranslations = {
       "silverleaf_herb": {
         "name": "Silverleaf Herb"
       },
+      "boundstone_bulwark": {
+        "name": "Boundstone Bulwark"
+      },
+      "drownedmoon_aegis": {
+        "name": "Drowned Moon Aegis"
+      },
+      "gravewyrm_bulwark": {
+        "name": "Gravewyrm Bulwark"
+      },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
       },

@@ -8225,6 +8225,15 @@ export const id_ID: EnTranslations = {
       "silverleaf_herb": {
         "name": "Silverleaf Herb"
       },
+      "boundstone_bulwark": {
+        "name": "Boundstone Bulwark"
+      },
+      "drownedmoon_aegis": {
+        "name": "Drowned Moon Aegis"
+      },
+      "gravewyrm_bulwark": {
+        "name": "Gravewyrm Bulwark"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },

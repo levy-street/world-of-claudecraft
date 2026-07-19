@@ -8225,6 +8225,15 @@ export const ru_RU: EnTranslations = {
       "silverleaf_herb": {
         "name": "Трава серебролист"
       },
+      "boundstone_bulwark": {
+        "name": "Оплот связанного камня"
+      },
+      "drownedmoon_aegis": {
+        "name": "Эгида утонувшей луны"
+      },
+      "gravewyrm_bulwark": {
+        "name": "Оплот могильного змея"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

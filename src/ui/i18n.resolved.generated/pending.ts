@@ -866,7 +866,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.skillValue"
   ],
   "cs_CZ": [
+    "entities.items.boundstone_bulwark.name",
     "entities.items.copper_ore.name",
+    "entities.items.drownedmoon_aegis.name",
+    "entities.items.gravewyrm_bulwark.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
     "entities.items.silverleaf_herb.name",
@@ -986,7 +989,10 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "nl_NL": [
+    "entities.items.boundstone_bulwark.name",
     "entities.items.copper_ore.name",
+    "entities.items.drownedmoon_aegis.name",
+    "entities.items.gravewyrm_bulwark.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
     "entities.items.silverleaf_herb.name",
@@ -1106,7 +1112,10 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "pl_PL": [
+    "entities.items.boundstone_bulwark.name",
     "entities.items.copper_ore.name",
+    "entities.items.drownedmoon_aegis.name",
+    "entities.items.gravewyrm_bulwark.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
     "entities.items.silverleaf_herb.name",
@@ -1226,7 +1235,10 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "id_ID": [
+    "entities.items.boundstone_bulwark.name",
     "entities.items.copper_ore.name",
+    "entities.items.drownedmoon_aegis.name",
+    "entities.items.gravewyrm_bulwark.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
     "entities.items.silverleaf_herb.name",
@@ -1346,7 +1358,10 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "tr_TR": [
+    "entities.items.boundstone_bulwark.name",
     "entities.items.copper_ore.name",
+    "entities.items.drownedmoon_aegis.name",
+    "entities.items.gravewyrm_bulwark.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
     "entities.items.silverleaf_herb.name",
@@ -1466,7 +1481,10 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "sv_SE": [
+    "entities.items.boundstone_bulwark.name",
     "entities.items.copper_ore.name",
+    "entities.items.drownedmoon_aegis.name",
+    "entities.items.gravewyrm_bulwark.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
     "entities.items.silverleaf_herb.name",
@@ -1586,7 +1604,10 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "vi_VN": [
+    "entities.items.boundstone_bulwark.name",
     "entities.items.copper_ore.name",
+    "entities.items.drownedmoon_aegis.name",
+    "entities.items.gravewyrm_bulwark.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
     "entities.items.silverleaf_herb.name",
@@ -1706,7 +1727,10 @@ export const pending: Record<string, readonly string[]> = {
     "loading.slowConnection"
   ],
   "da_DK": [
+    "entities.items.boundstone_bulwark.name",
     "entities.items.copper_ore.name",
+    "entities.items.drownedmoon_aegis.name",
+    "entities.items.gravewyrm_bulwark.name",
     "entities.items.iron_ore.name",
     "entities.items.ironbark_log.name",
     "entities.items.silverleaf_herb.name",
