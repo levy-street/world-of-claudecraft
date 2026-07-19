@@ -8907,6 +8907,53 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   },
 };
 
+const SHAMAN_OWNER_TITLE_OVERRIDES: Record<string, Partial<Record<SupportedLanguage, string>>> = {
+  Fulmination: {
+    es: 'Fulminación',
+    es_ES: 'Fulminación',
+    fr_FR: 'Fulguration',
+    fr_CA: 'Fulguration',
+    it_IT: 'Fulminazione',
+    de_DE: 'Blitzentladung',
+    zh_CN: '雷霆爆发',
+    zh_TW: '雷霆爆發',
+    ko_KR: '번개 폭발',
+    ja_JP: '雷撃爆発',
+    pt_BR: 'Fulminação',
+    ru_RU: 'Грозовой разряд',
+    cs_CZ: 'Bleskový výboj',
+    nl_NL: 'Bliksemontlading',
+    pl_PL: 'Wyładowanie',
+    id_ID: 'Ledakan Petir',
+    tr_TR: 'Yıldırım Boşalması',
+    sv_SE: 'Blixturladdning',
+    vi_VN: 'Bùng Nổ Sấm Sét',
+    da_DK: 'Lynudladning',
+  },
+  'Stonewake Shell': {
+    es: 'Caparazón pétreo',
+    es_ES: 'Caparazón pétreo',
+    fr_FR: 'Carapace de pierre',
+    fr_CA: 'Carapace de pierre',
+    it_IT: 'Guscio di pietra',
+    de_DE: 'Steinerne Hülle',
+    zh_CN: '石醒护壳',
+    zh_TW: '石醒護殼',
+    ko_KR: '깨어난 돌껍질',
+    ja_JP: '目覚めの岩殻',
+    pt_BR: 'Carapaça pétrea',
+    ru_RU: 'Каменный панцирь',
+    cs_CZ: 'Kamenný krunýř',
+    nl_NL: 'Steenhuid',
+    pl_PL: 'Kamienna skorupa',
+    id_ID: 'Cangkang Batu',
+    tr_TR: 'Taş Kabuk',
+    sv_SE: 'Stenskal',
+    vi_VN: 'Vỏ Đá Thức Tỉnh',
+    da_DK: 'Stenskal',
+  },
+};
+
 function talentClassData(): ClassTalents[] {
   return Object.values(TALENTS).filter((ct): ct is ClassTalents => ct !== undefined);
 }
@@ -8941,6 +8988,8 @@ function translateTitle(source: string, lang: SupportedLanguage): string {
   }
   const retained = RETAINED_ROW_TITLE_OVERRIDES[lang]?.[source];
   if (retained !== undefined) return retained;
+  const shamanOwnerOverride = SHAMAN_OWNER_TITLE_OVERRIDES[source]?.[lang];
+  if (shamanOwnerOverride !== undefined) return shamanOwnerOverride;
   const override = titleOverrides[lang]?.[source];
   if (override !== undefined) return override;
   // Every shipped talent name has an explicit override (enforced by tests) or is an
@@ -9294,6 +9343,7 @@ export function hasTalentTitleOverride(lang: SupportedLanguage, source: string):
   return (
     RETAINED_ROW_TITLE_OVERRIDES[lang]?.[source] !== undefined ||
     grantAbilityIdByTitle.has(source) ||
+    SHAMAN_OWNER_TITLE_OVERRIDES[source]?.[lang] !== undefined ||
     titleOverrides[lang]?.[source] !== undefined
   );
 }
