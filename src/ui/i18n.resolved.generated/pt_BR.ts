@@ -1238,6 +1238,9 @@ export const pt_BR: EnTranslations = {
       "joinChannels": "Dica: digite /join world ou /join lfg para conversar com jogadores do mundo inteiro."
     },
     "itemHeroicTag": "[HEROICO]",
+    "limitedRelicSupply": "Limited relic: only {count} will ever exist",
+    "limitedRelicSerial": "Relic {serial} of {supply}",
+    "limitedRelicClaim": "{name} has claimed {item}, relic {serial} of {supply}.",
     "itemSoulbound": "Vinculado à alma",
     "itemSet": {
       "header": "{name} ({have}/{total})",

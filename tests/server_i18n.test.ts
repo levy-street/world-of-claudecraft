@@ -310,3 +310,38 @@ describe('localizeServerDuration maps formatDuration output (via the filter-mute
     setLanguage('en');
   });
 });
+
+// The realm-wide limited-relic claim broadcast (server/game.ts routeEvents ->
+// broadcastSystem). It reuses the offline hudChrome.limitedRelicClaim key via
+// a server_i18n RULE, and is an S3-guard blind spot (a broadcastSystem template
+// literal), so pin it here per the server/CLAUDE.md "back it with a dedicated
+// test" rule: a drift between the emit and the RULE ships English otherwise.
+describe('limited-relic claim broadcast localization', () => {
+  const broadcast = 'Ada has claimed [[i:emberfall_edge]], relic 1 of 25.';
+  // The five locales that carry the M16 fill for hudChrome.limitedRelicClaim.
+  const FILLED = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const;
+
+  it('recognizes the broadcast and preserves the item link token and numbers', async () => {
+    for (const lang of supportedLanguages) {
+      await ensureLocaleLoaded(lang);
+      setLanguage(lang);
+      const out = localizeServerText(broadcast);
+      expect(out, `${lang}: broadcast recognized`).not.toBeNull();
+      // The [[i:id]] token must survive so the chat renderer draws the item link.
+      expect(out, `${lang}: link token preserved`).toContain('[[i:emberfall_edge]]');
+      expect(out).toContain('Ada'); // claimant name verbatim
+      expect(out).toContain('1'); // serial
+      expect(out).toContain('25'); // supply
+    }
+    setLanguage('en');
+  });
+
+  it('renders the localized form (not raw English) in the filled non-Latin locales', async () => {
+    for (const lang of FILLED) {
+      await ensureLocaleLoaded(lang);
+      setLanguage(lang);
+      expect(localizeServerText(broadcast), `${lang}: localized`).not.toBe(broadcast);
+    }
+    setLanguage('en');
+  });
+});

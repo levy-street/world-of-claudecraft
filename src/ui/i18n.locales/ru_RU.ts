@@ -706,6 +706,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.methodMaster':
     'Способ добычи изменён на мастера добычи. Мастер добычи: {name}.',
   'hudChrome.masterLoot.methodGroup': 'Способ добычи изменён на групповой.',
+  'hudChrome.limitedRelicSupply': 'Лимитная реликвия: всего {count} в мире',
+  'hudChrome.limitedRelicSerial': 'Реликвия {serial} из {supply}',
+  'hudChrome.limitedRelicClaim': '{name} получает {item}, реликвия {serial} из {supply}.',
   'hudChrome.masterLoot.assigned': '{looter} передал предмет {item} игроку {target}.',
   'hudChrome.masterLoot.unassigned': 'Предмет {item} не был назначен и доступен всем.',
   'hudChrome.masterLoot.leaderOnly': 'Только лидер группы может менять способ добычи.',

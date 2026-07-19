@@ -1238,6 +1238,9 @@ export const da_DK: EnTranslations = {
       "joinChannels": "Tip: skriv /join world eller /join lfg for at chatte med spillere på tværs af verdenen."
     },
     "itemHeroicTag": "[HEROISK]",
+    "limitedRelicSupply": "Limited relic: only {count} will ever exist",
+    "limitedRelicSerial": "Relic {serial} of {supply}",
+    "limitedRelicClaim": "{name} has claimed {item}, relic {serial} of {supply}.",
     "itemSoulbound": "Sjælebundet",
     "itemSet": {
       "header": "{name} ({have}/{total})",

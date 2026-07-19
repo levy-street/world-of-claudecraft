@@ -1238,6 +1238,9 @@ export const nl_NL: EnTranslations = {
       "joinChannels": "Tip: typ /join world of /join lfg om te chatten met spelers over de hele wereld."
     },
     "itemHeroicTag": "[HELDHAFTIG]",
+    "limitedRelicSupply": "Limited relic: only {count} will ever exist",
+    "limitedRelicSerial": "Relic {serial} of {supply}",
+    "limitedRelicClaim": "{name} has claimed {item}, relic {serial} of {supply}.",
     "itemSoulbound": "Zielsgebonden",
     "itemSet": {
       "header": "{name} ({have}/{total})",

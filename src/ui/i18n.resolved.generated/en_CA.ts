@@ -1238,6 +1238,9 @@ export const en_CA: EnTranslations = {
       "joinChannels": "Tip: type /join world or /join lfg to chat with players across the world."
     },
     "itemHeroicTag": "[HEROIC]",
+    "limitedRelicSupply": "Limited relic: only {count} will ever exist",
+    "limitedRelicSerial": "Relic {serial} of {supply}",
+    "limitedRelicClaim": "{name} has claimed {item}, relic {serial} of {supply}.",
     "itemSoulbound": "Soulbound",
     "itemSet": {
       "header": "{name} ({have}/{total})",
