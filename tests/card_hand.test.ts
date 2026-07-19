@@ -40,23 +40,40 @@ describe('card_hand', () => {
     expect(playCard(state, notHeld as number)).toBeNull();
   });
 
-  it('drawOne reshuffles the discard pile back into the deck once empty', () => {
+  it('drawOne reshuffles the discard pile back into the deck once empty, and reports it', () => {
     const rng = new Rng(1);
     const state = createCardHand(rng);
     // Drain the deck entirely, discarding every drawn card so the pool stays
-    // in deck+discard (never lost).
+    // in deck+discard (never lost). None of these draws should report a
+    // reshuffle: the deck still has cards left every time drawOne runs here.
     while (state.deck.length > 0) {
-      drawOne(rng, state);
+      expect(drawOne(rng, state)).toBe(false);
       const v = state.hand.pop();
       if (v !== undefined) state.discard.push(v);
     }
     expect(state.deck.length).toBe(0);
     const handCountBefore = state.hand.length;
-    drawOne(rng, state);
+    // This is the one draw that must trip the reshuffle: the deck is empty
+    // going in, and the discard pile gets shuffled back into it.
+    expect(drawOne(rng, state)).toBe(true);
     // The discard pile was reshuffled into the deck, then one card drawn from it:
     // the pool stays at 20 total, and the hand grew by exactly one card.
     expect(state.deck.length + state.discard.length + state.hand.length).toBe(20);
     expect(state.hand.length).toBe(handCountBefore + 1);
+  });
+
+  it('drawOne reports no reshuffle for an ordinary draw with cards left in the deck', () => {
+    const rng = new Rng(2);
+    const state = createCardHand(rng);
+    expect(state.deck.length).toBeGreaterThan(0);
+    expect(drawOne(rng, state)).toBe(false);
+  });
+
+  it('drawOne is a no-op (and reports no reshuffle) once deck and discard are both empty', () => {
+    const rng = new Rng(3);
+    const state = { deck: [], hand: [], discard: [] };
+    expect(drawOne(rng, state)).toBe(false);
+    expect(state.hand).toEqual([]);
   });
 
   it('never loses or duplicates a card across deck+hand+discard', () => {

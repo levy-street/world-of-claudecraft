@@ -3284,6 +3284,22 @@ export type SimEvent = { pid?: number } & (
     }
   // personal outcome line for each fighter (rides beside the anchored vcupEnd)
   | { type: 'vcupResult'; won: boolean; draw: boolean }
+  // Card Duel minigame (src/sim/social/card_duel.ts). Personal (pid), text-free
+  // on purpose (the client picks its own audio/copy off the structured
+  // fields, same as gatherResult/craftResult above).
+  | { type: 'cardDuelMatchStart'; pid?: number }
+  | { type: 'cardPlayed'; pid?: number }
+  | {
+      type: 'cardRoundResolved';
+      mine: number;
+      theirs: number;
+      outcome: 'win' | 'lose' | 'push';
+      // True when this side's post-round draw emptied the deck and had to
+      // reshuffle the discard pile back in (see card_hand.ts drawOne).
+      reshuffled: boolean;
+      pid?: number;
+    }
+  | { type: 'cardDuelMatchEnd'; won: boolean; pid?: number }
   | {
       type: 'heal2';
       sourceId: number;

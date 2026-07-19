@@ -76,6 +76,10 @@ describe('sampled GameAudio facade', () => {
       ['fiestaAugment', 'ui_fiesta_augment'],
       ['fiestaDown', 'ui_fiesta_down'],
       ['fiestaRevive', 'ui_fiesta_revive'],
+      ['cardPlay', 'ui_card_play'],
+      ['cardReveal', 'ui_card_reveal'],
+      ['cardRoundPush', 'ui_card_round_push'],
+      ['cardShuffle', 'ui_card_shuffle'],
     ] as const;
 
     for (const [method, key] of routes) {
