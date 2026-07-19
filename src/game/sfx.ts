@@ -768,13 +768,13 @@ class Sfx {
     );
     this.ambient(
       'amb_wind_peaks',
-      // 0.13 matches amb_wind_marsh's mix target; amb_wind_peaks/vale/marsh are
+      // 0.12 matches amb_wind_vale's mix target; amb_wind_peaks/vale/marsh are
       // all generated to the same -14ish LUFS target with no custom mastering
       // (confirmed by measurement), so there is no asset-level reason for
       // peaks to sit louder than its siblings. The old 0.18 was a player-
       // reported "too loud" complaint at Thornpeak Heights (this biome also
       // covers desert/volcano) traced to this constant alone, not the file.
-      !inDungeon && (biome === 'peaks' || biome === 'desert' || biome === 'volcano') ? 0.13 : 0,
+      !inDungeon && (biome === 'peaks' || biome === 'desert' || biome === 'volcano') ? 0.12 : 0,
     );
     this.ambient('amb_rain', precip === 'rain' ? 0.11 : 0); // sharp clip, kept very low
     this.ambient('amb_snow', precip === 'snow' ? 0.13 : 0);
