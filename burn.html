@@ -1,0 +1,1037 @@
+<title>WOC Burn Tracker</title>
+<style>
+  /* ============ WOC burn chamber - deliberate single dark theme ============ */
+  :root { color-scheme: dark; }
+  .burncalc {
+    /* ground */
+    --page:        #0c0a06;
+    --surface:     #14110b;
+    --surface-2:   #1a1610;
+    --inset:       #0f0c07;
+    /* brand chrome (never a data series) */
+    --gold:        #d8b15a;
+    --gold-bright: #f3d489;
+    --gold-dim:    #6b5226;
+    /* ink */
+    --ink:         #e8dfc8;
+    --ink-2:       #b6ad95;
+    --ink-3:       #8a8270;
+    /* hairlines */
+    --line:        #2a2418;
+    --grid:        #221c11;
+    /* data accent (validated ≥3:1 on surface) */
+    --burn:        #d95926;
+
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    --mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .burncalc {
+    background: var(--page);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 0 20px 72px;
+  }
+  .burncalc *, .burncalc *::before, .burncalc *::after { box-sizing: border-box; }
+  .shell { max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+
+  /* ---------- runtime error surface ---------- */
+  .err {
+    display: none; margin-top: 16px; padding: 12px 16px; border-radius: 8px;
+    border: 1px solid #7a2a1a; background: #250f08; color: #e8b39a; font-size: 13px;
+  }
+  .err.show { display: block; }
+  .err b { color: #f3c8b0; }
+
+  /* ---------- header / hero ---------- */
+  .masthead { text-align: center; padding-top: 48px; display: flex; flex-direction: column; gap: 6px; }
+  .masthead .rule {
+    height: 1px; max-width: 420px; margin: 0 auto 18px; width: 100%;
+    background: linear-gradient(90deg, transparent, var(--gold-dim) 20%, var(--gold) 50%, var(--gold-dim) 80%, transparent);
+  }
+  .masthead .eyebrow {
+    font-size: 12px; letter-spacing: 5px; text-transform: uppercase; color: var(--ink-3);
+  }
+  .masthead h1 {
+    font-family: var(--serif); font-variant: small-caps; letter-spacing: 3px;
+    font-size: clamp(30px, 5vw, 44px); line-height: 1.1; color: var(--gold-bright);
+    margin: 0; text-wrap: balance; font-weight: 600;
+  }
+  .masthead .mint {
+    display: inline-block; margin: 8px auto 0; padding: 4px 14px; border-radius: 999px;
+    border: 1px solid var(--gold-dim); background: rgba(20, 17, 11, 0.8);
+    font-family: var(--mono); font-size: 11px; color: var(--ink-2); word-break: break-all;
+  }
+
+  .hero { display: flex; justify-content: center; align-items: stretch; gap: 0; flex-wrap: wrap; }
+  .hero .cell { padding: 10px 36px; text-align: center; }
+  .hero .cell + .cell { border-left: 1px solid var(--line); }
+  .hero .big {
+    font-family: var(--mono); font-size: clamp(30px, 4.5vw, 46px); line-height: 1.15; font-weight: 600;
+  }
+  .hero .big.woc { color: var(--burn); }
+  .hero .big.usd { color: var(--ink); }
+  .hero .cap { margin-top: 2px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-3); }
+  .hero .sub2 { margin-top: 4px; font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); }
+  .hero .sub2.live { color: #9fe6a0; }
+  @media (max-width: 620px) {
+    .hero .cell + .cell { border-left: none; border-top: 1px solid var(--line); }
+    .hero { flex-direction: column; }
+  }
+
+  /* ---------- generic card ---------- */
+  .card {
+    background: linear-gradient(180deg, var(--surface-2), var(--surface));
+    border: 1px solid var(--line); border-radius: 10px; padding: 20px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .card > h2 {
+    font-family: var(--serif); font-variant: small-caps; letter-spacing: 2px; font-weight: 600;
+    font-size: 19px; color: var(--gold-bright); margin: 0;
+  }
+  .card .sub { font-size: 12.5px; color: var(--ink-3); margin: -8px 0 0; }
+  .cardhead { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+  .chipbtn {
+    font: inherit; font-size: 12.5px; letter-spacing: 1px; cursor: pointer;
+    padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line);
+    background: var(--inset); color: var(--ink-2);
+  }
+  .chipbtn:hover:not(:disabled) { border-color: var(--gold-dim); color: var(--gold-bright); }
+  .chipbtn:disabled { opacity: 0.5; cursor: default; }
+  .chipbtn:focus-visible, .seg button:focus-visible, .burncalc a:focus-visible {
+    outline: 2px solid var(--gold); outline-offset: 2px;
+  }
+
+  /* ---------- burn feed ---------- */
+  .feed { display: flex; flex-direction: column; gap: 8px; }
+  .brow {
+    display: grid; grid-template-columns: 1fr auto; gap: 4px 14px; align-items: center;
+    padding: 10px 14px; border: 1px solid var(--grid); border-radius: 8px; background: var(--inset);
+  }
+  .brow .l1 { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; min-width: 0; }
+  .brow .amt { font-family: var(--mono); font-size: 15px; font-weight: 600; color: var(--burn); white-space: nowrap; }
+  .brow .burned { font-size: 12px; color: var(--burn); letter-spacing: 1px; }
+  .brow .who {
+    font-family: var(--mono); font-size: 10.5px; color: var(--ink-3);
+    border: 1px solid var(--grid); border-radius: 999px; padding: 1px 8px; white-space: nowrap;
+  }
+  .brow .r { text-align: right; white-space: nowrap; }
+  .brow .r a { color: var(--ink-2); text-decoration: none; font-family: var(--mono); font-size: 11px; }
+  .brow .r a:hover { color: var(--gold-bright); text-decoration: underline; }
+  .brow .when { font-family: var(--mono); font-size: 11px; color: var(--ink-3); margin-left: 10px; }
+  .feed-empty {
+    padding: 26px 18px; text-align: center; border: 1px dashed var(--line); border-radius: 8px;
+    color: var(--ink-3); font-size: 13px;
+  }
+  .feed-empty b { color: var(--ink-2); }
+  .coverage { font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); }
+
+  /* ---------- stat tiles + segmented ---------- */
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; background: var(--inset); padding: 2px; }
+  .seg button {
+    font: inherit; font-size: 11.5px; letter-spacing: 1px; cursor: pointer; border: 1px solid transparent;
+    background: transparent; color: var(--ink-3); padding: 4px 12px; border-radius: 999px;
+  }
+  .seg button[aria-pressed="true"] { background: var(--surface-2); color: var(--gold-bright); border-color: var(--gold-dim); }
+
+  .statgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 860px) { .statgrid { grid-template-columns: 1fr; } }
+  .tiles { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .tile { background: var(--inset); border: 1px solid var(--grid); border-radius: 8px; padding: 12px 14px; min-width: 0; }
+  .tile .v { font-family: var(--mono); font-size: 21px; font-weight: 600; color: var(--ink); overflow-wrap: break-word; }
+  .tile .v.ember { color: var(--burn); }
+  .tile .k { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-3); margin-top: 2px; }
+
+  /* ---------- chart ---------- */
+  .chartbox { position: relative; }
+  .chartbox svg { display: block; width: 100%; height: auto; }
+  .tip {
+    position: absolute; pointer-events: none; z-index: 5; display: none;
+    background: #0f0c07; border: 1px solid var(--gold-dim); border-radius: 7px;
+    padding: 8px 11px; font-size: 12px; color: var(--ink-2); white-space: nowrap;
+    box-shadow: 0 6px 22px rgba(0,0,0,0.6);
+  }
+  .tip b { color: var(--ink); font-family: var(--mono); font-weight: 600; }
+  .tip .t { color: var(--gold-bright); font-family: var(--serif); font-variant: small-caps; letter-spacing: 1px; }
+
+  /* ---------- tables ---------- */
+  .tblwrap { overflow-x: auto; }
+  table.data { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.data th, table.data td { padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--grid); }
+  table.data th {
+    font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600;
+    color: var(--ink-3); border-bottom: 1px solid var(--line); white-space: nowrap;
+  }
+  table.data td { color: var(--ink-2); }
+  table.data td:first-child { color: var(--ink); }
+  table.data td.mono { font-family: var(--mono); font-size: 11.5px; white-space: nowrap; }
+  table.data td.wrap { font-size: 11px; font-family: var(--mono); }
+  .kind {
+    display: inline-block; font-family: var(--mono); font-size: 9px; letter-spacing: 1px;
+    text-transform: uppercase; padding: 1px 6px; border-radius: 999px;
+  }
+  .kind.code { color: #9fe6a0; border: 1px solid #2e6b34; }
+  .kind.assumption { color: #f3d489; border: 1px solid #7a6128; }
+
+  /* ---------- how it works ---------- */
+  .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: center; }
+  @media (max-width: 760px) { .trio { grid-template-columns: 1fr; } }
+  .trio .step { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px 6px; }
+  .trio .glyph {
+    width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center;
+    border: 1px solid var(--gold-dim); background: radial-gradient(circle at 35% 30%, #2a2110, #14110b 70%);
+    font-size: 22px; color: var(--gold-bright);
+  }
+  .trio h3 {
+    font-family: var(--serif); font-variant: small-caps; letter-spacing: 2px;
+    font-size: 17px; color: var(--gold-bright); margin: 0; font-weight: 600;
+  }
+  .trio p { font-size: 12.5px; color: var(--ink-2); margin: 0; max-width: 30ch; }
+  @media (prefers-reduced-motion: no-preference) {
+    .glyph.fire { animation: emberpulse 3.2s ease-in-out infinite; }
+    @keyframes emberpulse {
+      0%, 100% { box-shadow: 0 0 10px rgba(217, 89, 38, 0.18); }
+      50%      { box-shadow: 0 0 26px rgba(217, 89, 38, 0.42); }
+    }
+  }
+
+  /* ---------- footnotes ---------- */
+  .foot p { font-size: 12px; color: var(--ink-3); margin: 0; }
+  .foot p + p { margin-top: 6px; }
+  .foot .nb { color: #b48a52; }
+</style>
+
+<div class="burncalc">
+  <div class="shell">
+
+    <div class="err" id="errBanner" role="alert"></div>
+
+    <header class="masthead">
+      <div class="rule" aria-hidden="true"></div>
+      <div class="eyebrow">World of ClaudeCraft</div>
+      <h1>$WOC Burn Tracker</h1>
+      <div class="mint">mint 3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth &middot; on-chain ledger of every $WOC ever destroyed</div>
+    </header>
+
+    <section class="hero" aria-label="Totals">
+      <div class="cell">
+        <div class="big woc" id="heroWoc">-</div>
+        <div class="cap">Total burned</div>
+        <div class="sub2" id="chainStatus">loading…</div>
+      </div>
+      <div class="cell">
+        <div class="big usd" id="heroUsd">-</div>
+        <div class="cap">Total value</div>
+        <div class="sub2" id="priceStatus">loading…</div>
+      </div>
+    </section>
+
+    <!-- ================= burn feed ================= -->
+    <section class="card">
+      <div class="cardhead">
+        <h2>Burn Ledger</h2>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="chipbtn" id="refreshBtn" type="button">Refresh</button>
+          <button class="chipbtn" id="scanBtn" type="button">Scan deeper</button>
+        </div>
+      </div>
+      <p class="sub">Every spl-token burn of the $WOC mint found in its transaction history, newest first.</p>
+      <div class="feed" id="feed"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span class="coverage" id="coverage"></span>
+        <button class="chipbtn" id="moreBtn" type="button" style="display:none;">Show more</button>
+      </div>
+    </section>
+
+    <!-- ================= stats ================= -->
+    <div class="statgrid">
+      <section class="card">
+        <div class="cardhead">
+          <h2>Period</h2>
+          <div class="seg" role="group" aria-label="Period">
+            <button data-period="day" aria-pressed="true">Day</button>
+            <button data-period="week" aria-pressed="false">Week</button>
+            <button data-period="month" aria-pressed="false">Month</button>
+          </div>
+        </div>
+        <div class="tiles">
+          <div class="tile"><div class="v ember" id="pWoc">-</div><div class="k" id="pWocK">$WOC burned / day</div></div>
+          <div class="tile"><div class="v" id="pUsd">-</div><div class="k" id="pUsdK">value / day</div></div>
+          <div class="tile"><div class="v" id="pTxs">-</div><div class="k" id="pTxsK">burn txs / day</div></div>
+        </div>
+        <p class="sub" id="periodNote"></p>
+      </section>
+
+      <section class="card">
+        <h2>Rate</h2>
+        <div class="tiles">
+          <div class="tile"><div class="v ember" id="rDay">-</div><div class="k">avg $WOC / day (scanned)</div></div>
+          <div class="tile"><div class="v" id="rUsdDay">-</div><div class="k">avg value / day</div></div>
+          <div class="tile"><div class="v" id="rLast">-</div><div class="k">last burn</div></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Supply</h2>
+        <div class="tiles">
+          <div class="tile"><div class="v" id="sNow">-</div><div class="k">current supply</div></div>
+          <div class="tile"><div class="v ember" id="sPct">-</div><div class="k">of 1B initial burned</div></div>
+          <div class="tile"><div class="v" id="sPrice">-</div><div class="k">$WOC price</div></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ================= cumulative chart ================= -->
+    <section class="card">
+      <h2>Burned Over Time</h2>
+      <p class="sub" id="chartNote">Cumulative $WOC destroyed, from the scanned burn history.</p>
+      <div class="chartbox" id="areaBox">
+        <svg id="areaSvg" role="img" aria-label="Cumulative WOC burned over time."></svg>
+        <div class="tip" id="areaTip"></div>
+      </div>
+    </section>
+
+    <!-- ================= how it works ================= -->
+    <section class="card" aria-label="How WOC burning works">
+      <h2 style="text-align:center;">How $WOC Burning Works</h2>
+      <div class="trio">
+        <div class="step">
+          <div class="glyph" aria-hidden="true">&#9878;</div>
+          <h3>Spend</h3>
+          <p>Players spend $WOC on renames, respecs, Logol wares, wagers and voice NPCs; players and brands pay USDC/SOL for skins, characters, subs and ads.</p>
+        </div>
+        <div class="step">
+          <div class="glyph" aria-hidden="true">&#8646;</div>
+          <h3>Split</h3>
+          <p>Every payment routes through a split constant in code: 100% for $WOC sinks, 50% of Aldrin subs, 30% of skins and character sales, 50% of $WOC ad spend.</p>
+        </div>
+        <div class="step">
+          <div class="glyph fire" aria-hidden="true">&#128293;</div>
+          <h3>Burn</h3>
+          <p>$WOC legs burn on-chain via SPL token burn; USD legs accumulate in burn vaults and a keeper market-buys $WOC and burns it. Supply only ever goes down.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= mechanics provenance ================= -->
+    <section class="card foot" aria-label="Burn mechanics and caveats">
+      <h2>The Mechanics Behind the Burns</h2>
+      <div class="tblwrap">
+        <table class="data">
+          <thead><tr><th>Mechanic</th><th>Rate</th><th>Kind</th><th>Source</th></tr></thead>
+          <tbody id="mechTable"></tbody>
+        </table>
+      </div>
+      <p class="nb">Routes that do <b>not</b> burn: DEX-swap platform fee (25 bps &rarr; treasury &middot; svc #17), talent ware sales (80/20 performer/treasury &middot; #1554), USDC/SOL ad spend (treasury), merch &amp; Claudium card-rail margins (economy-service policy).</p>
+      <p>Total burned is computed as 1,000,000,000 (fixed pump.fun mint) minus the live on-chain supply - it is exact even when the transaction feed below has only been partially scanned. Data: Solana RPC + the game's price chain (Pyth/Jupiter). Add <span class="coverage">#p.rpc=https://your-rpc</span> to the URL to use a private RPC. Nothing on this page is financial advice.</p>
+    </section>
+
+  </div>
+</div>
+
+<script>
+/* __MODEL_START__ (generated from burn_model.js - do not edit here) */
+'use strict';
+/* ============================================================================
+ * WOC burn-tracker model - single source of truth.
+ *
+ * The tracker reports burns that have ALREADY happened on-chain:
+ *   - total burned  = initial supply (1e9, pump.fun fixed mint) minus the
+ *     mint's current on-chain supply (getTokenSupply) - always exact;
+ *   - the feed      = spl-token burn / burnChecked instructions found in the
+ *     mint's transaction history - best-effort, labeled by scan coverage.
+ *
+ * Everything here is pure and fail-closed (malformed/non-positive -> null,
+ * never a guess), mirroring the economy service's oracle style, and the node
+ * test suite executes this exact file (build.js embeds it byte-for-byte).
+ * ========================================================================== */
+
+/* --------------------------------------------------------------------------
+ * Market price - the same chain the game's economy service uses
+ * (svc-dexswap: claudium/oracle.ts + settlement/oracle_prices.ts): Pyth
+ * Hermes v2 when a feed id is configured, else the Jupiter price API (the
+ * aggregator the DEX-swap engine quotes through).
+ * ------------------------------------------------------------------------ */
+var PRICE_SOURCE = {
+  mint: '3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth',            // WOC_MINT · woc_config.ts
+  jupiterUrl: 'https://lite-api.jup.ag/price/v3?ids=',              // DEX-swap quotes via Jupiter · svc #17
+  hermesUrl: 'https://hermes.pyth.network',                         // PYTH_HERMES_URL default shape · oracle.ts
+  pythFeedId: '',                                                   // PYTH_WOC_USD_FEED_ID - env-configured; none published in repo
+  maxAgeMs: 60000                                                   // CLAUDIUM_ORACLE_MAX_AGE_MS default · bootstrap.ts:166
+};
+
+/* Baked fallback for CSP-sandboxed hosts (the published artifact cannot make
+ * external requests). build.js refreshes this block on every build. */
+var PRICE_SNAPSHOT = /*__PRICE_SNAPSHOT_START__*/ {"usdPerWoc":0.00017699046166975,"source":"jupiter","fetchedAtMs":1784465855132} /*__PRICE_SNAPSHOT_END__*/;
+
+/* Pyth Hermes v2 shape: { parsed: [ { price: { price, expo, publish_time } } ] }
+ * Same math as the service: usdPerWoc = price * 10^expo. Staleness is the
+ * caller's check (publishMs vs maxAgeMs), as in fetchWocUsdPrice. */
+function parsePythV2(body) {
+  if (typeof body !== 'object' || body === null) return null;
+  var parsed = body.parsed;
+  if (!Array.isArray(parsed) || parsed.length === 0) return null;
+  var price = parsed[0] && parsed[0].price;
+  if (!price) return null;
+  var raw = Number(price.price);
+  var expo = Number(price.expo);
+  var publish = Number(price.publish_time);
+  if (!isFinite(raw) || expo !== Math.trunc(expo) || !isFinite(expo) || !isFinite(publish)) return null;
+  var usdPerWoc = raw * Math.pow(10, expo);
+  if (!(usdPerWoc > 0) || !isFinite(usdPerWoc)) return null;
+  return { usdPerWoc: usdPerWoc, publishMs: publish * 1000 };
+}
+
+/* Jupiter price v3 shape: { "<mint>": { usdPrice, ... } }. No publish time in
+ * the payload, so the caller stamps fetch time. */
+function parseJupiterV3(body, mint) {
+  if (typeof body !== 'object' || body === null) return null;
+  var entry = body[mint];
+  if (!entry || typeof entry !== 'object') return null;
+  var usd = Number(entry.usdPrice);
+  if (!(usd > 0) || !isFinite(usd)) return null;
+  return { usdPerWoc: usd, publishMs: null };
+}
+
+/* --------------------------------------------------------------------------
+ * Chain source - Solana JSON-RPC. The default public endpoint is rate-limited;
+ * a private RPC (e.g. Helius) can be supplied via the p.rpc URL param.
+ * ------------------------------------------------------------------------ */
+var CHAIN_SOURCE = {
+  rpcUrl: 'https://api.mainnet-beta.solana.com',
+  mint: PRICE_SOURCE.mint,
+  initialSupply: 1e9,        // pump.fun fixed 1B mint; matches WOC_MAX_SUPPLY · holder_tier.ts:8
+  decimals: 6,               // WOC_DECIMALS · woc_config.ts:34
+  sigPageLimit: 50,          // signatures per history page
+  explorerTxUrl: 'https://solscan.io/tx/'
+};
+
+/* Known burn authorities -> human labels. Attribution is additive: unknown
+ * authorities still show in the feed as plain on-chain burns. Extend as the
+ * game's mainnet keeper/treasury addresses become public. */
+var ATTRIBUTION = {};
+
+/* Baked chain snapshot (refreshed by build.js; live-refreshed by the page
+ * where the host allows fetches). burns: newest-first {sig, ms, amount,
+ * authority}. scannedSigs/oldestScannedMs describe feed coverage - the
+ * headline total NEVER depends on the feed. */
+var CHAIN_SNAPSHOT = /*__CHAIN_SNAPSHOT_START__*/ {"currentSupply":999557928.221353,"burns":[],"scannedSigs":120,"oldestScannedMs":1784441876000,"cursor":"ewKaSXgBAatSE1rjkTthF4hYajcnk7LGwahiVKQtQoEUGSiGyj3bjtxueRzuFV1GrcAoVcMXMu12MkN13kAGaEj","fetchedAtMs":1784466036339} /*__CHAIN_SNAPSHOT_END__*/;
+
+/* getTokenSupply result shape:
+ * { result: { value: { amount, decimals, uiAmount } } } */
+function parseTokenSupply(body) {
+  if (typeof body !== 'object' || body === null) return null;
+  var v = body.result && body.result.value;
+  if (!v) return null;
+  var ui = Number(v.uiAmount);
+  var dec = Number(v.decimals);
+  if (!(ui > 0) || !isFinite(ui) || !isFinite(dec)) return null;
+  return { uiAmount: ui, decimals: dec };
+}
+
+/* getSignaturesForAddress result shape:
+ * { result: [ { signature, blockTime, err, ... } ] }
+ * Failed transactions cannot have burned anything -> marked so callers skip
+ * hydrating them. */
+function parseSignatures(body) {
+  if (typeof body !== 'object' || body === null) return null;
+  var list = body.result;
+  if (!Array.isArray(list)) return null;
+  var out = [];
+  for (var i = 0; i < list.length; i++) {
+    var s = list[i];
+    if (!s || typeof s.signature !== 'string') continue;
+    out.push({
+      signature: s.signature,
+      blockTimeMs: isFinite(Number(s.blockTime)) ? Number(s.blockTime) * 1000 : 0,
+      failed: s.err !== null && s.err !== undefined
+    });
+  }
+  return out;
+}
+
+/* getTransaction (jsonParsed) -> burns of OUR mint inside this tx.
+ * Walks top-level and inner instructions for spl-token burn / burnChecked.
+ * amount: burn carries base units in info.amount; burnChecked carries
+ * info.tokenAmount.uiAmount. */
+function parseBurnsFromTx(body, mint, decimals) {
+  if (typeof body !== 'object' || body === null) return [];
+  var res = body.result;
+  if (!res || !res.transaction || !res.transaction.message) return [];
+  if (res.meta && res.meta.err) return []; // failed tx: nothing burned
+  var instrs = res.transaction.message.instructions || [];
+  var inner = [];
+  var groups = (res.meta && res.meta.innerInstructions) || [];
+  for (var g = 0; g < groups.length; g++) {
+    var gi = groups[g].instructions || [];
+    for (var j = 0; j < gi.length; j++) inner.push(gi[j]);
+  }
+  var all = instrs.concat(inner);
+  var sig = (res.transaction.signatures && res.transaction.signatures[0]) || '';
+  var ms = isFinite(Number(res.blockTime)) ? Number(res.blockTime) * 1000 : 0;
+  var burns = [];
+  for (var i = 0; i < all.length; i++) {
+    var p = all[i] && all[i].parsed;
+    if (!p || typeof p !== 'object') continue;
+    if (p.type !== 'burn' && p.type !== 'burnChecked') continue;
+    var info = p.info || {};
+    if (info.mint !== mint) continue;
+    var amount = null;
+    if (p.type === 'burn' && info.amount != null) {
+      var base = Number(info.amount);
+      if (isFinite(base) && base > 0) amount = base / Math.pow(10, decimals);
+    } else if (p.type === 'burnChecked' && info.tokenAmount) {
+      var ui = Number(info.tokenAmount.uiAmount);
+      if (isFinite(ui) && ui > 0) amount = ui;
+    }
+    if (!(amount > 0)) continue;
+    burns.push({
+      sig: sig,
+      ms: ms,
+      amount: amount,
+      authority: String(info.authority || info.multisigAuthority || '')
+    });
+  }
+  return burns;
+}
+
+/* Merge new burns into an existing list, dedupe by sig+amount, newest first. */
+function mergeBurns(existing, incoming) {
+  var seen = {};
+  existing.forEach(function (b) { seen[b.sig + '#' + b.amount] = true; });
+  var merged = existing.slice();
+  incoming.forEach(function (b) {
+    var k = b.sig + '#' + b.amount;
+    if (!seen[k]) { seen[k] = true; merged.push(b); }
+  });
+  merged.sort(function (a, b) { return b.ms - a.ms; });
+  return merged;
+}
+
+/* Rolling day/week/month stats over the scanned feed, ending at nowMs. */
+function windowStats(burns, nowMs) {
+  var W = { day: 86400000, week: 7 * 86400000, month: 30 * 86400000 };
+  var out = {};
+  Object.keys(W).forEach(function (k) {
+    var lo = nowMs - W[k], woc = 0, txs = 0;
+    burns.forEach(function (b) { if (b.ms >= lo && b.ms <= nowMs) { woc += b.amount; txs++; } });
+    out[k] = { woc: woc, txs: txs };
+  });
+  out.latestMs = burns.length ? burns[0].ms : 0;
+  return out;
+}
+
+/* p.rpc URL override: the only externalized-config knob the tracker takes.
+ * Only https URLs are accepted - anything else is reported, never applied. */
+function parseRpcOverride(search, hash) {
+  var qs = String(search || '').replace(/^\?/, '') + '&' + String(hash || '').replace(/^#/, '');
+  var params = new URLSearchParams(qs);
+  var raw = params.get('p.rpc');
+  if (raw == null || raw === '') return { rpcUrl: null, warnings: [] };
+  var ok = /^https:\/\/[\w.-]+(:\d+)?(\/[^\s]*)?$/.test(raw);
+  if (!ok) return { rpcUrl: null, warnings: ['ignoring p.rpc (must be an https URL): ' + raw] };
+  return { rpcUrl: raw, warnings: [] };
+}
+
+/* --------------------------------------------------------------------------
+ * The burn mechanics (display + provenance; the chain is the data source).
+ * kind 'code' = shipped constant · 'assumption' = no code constant exists.
+ * ------------------------------------------------------------------------ */
+var MECHANICS = [
+  { label: 'Character / guild renames, vanity, .sol subdomains', rate: '500 / 2,500 / 1,000 / 1,000 $WOC · 100% burn', kind: 'code', source: '#1496, #1499 · woc_config.ts (splitPrice, WOC_BURN_BPS=10000)' },
+  { label: 'Respec + loadout slots', rate: '750 / 1,500 $WOC · 100% burn', kind: 'code', source: '#1553 · woc_config.ts:83-84' },
+  { label: 'Voice NPC clone', rate: '25,000 $WOC · burn hardcoded (treasury=null)', kind: 'code', source: '#1099 · voice_npc.ts:145-147' },
+  { label: 'Logol merchant wares', rate: '5k-40k + 250k flagship · 100% burn', kind: 'code', source: '#1473 · content/logol.ts:160-201' },
+  { label: 'Arena wager rake', rate: '500 bps of pot, 100% burned · 1,000 bps hard cap', kind: 'code', source: '#799 · arena_wager_boot.ts:60 · woc_escrow lib.rs:32' },
+  { label: 'Aldrin Club subscription', rate: '$20/mo · 50% buy-and-burn', kind: 'code', source: '#938 · aldrin_config.ts:20,35' },
+  { label: 'Creator skins market', rate: '30% of USDC sales · buy-and-burn', kind: 'code', source: '#897 · marketplace.ts:56' },
+  { label: 'Character market', rate: '30% of sales · buyback-and-burn keeper', kind: 'code', source: '#1497 · character_market lib.rs:21' },
+  { label: 'Premium listing slots', rate: '$25 · 30% burn leg · 4 slots / 7 days', kind: 'code', source: '#1551 · premium_listings.ts:58-68' },
+  { label: '$WOC-rail ads', rate: '250 $WOC/min · 50% burned after approval', kind: 'code', source: 'ads fork #1 · woc_config.ts:142,153' },
+  { label: 'Talent slot fees', rate: '100% burned · tiered schedule, not in code', kind: 'assumption', source: 'talent/woc-featured-talent-program.md' },
+  { label: 'Claudium $WOC rail', rate: 'burn leg, BPS set by the economy service', kind: 'assumption', source: 'claudium_proxy.ts:57-64 · svc #16' }
+];
+
+/* --------------------------------------------------------------------------
+ * Formatters (pure; exercised by the tests).
+ * ------------------------------------------------------------------------ */
+function trimNum(x) {
+  var v = Math.abs(x) >= 100 ? Math.round(x) : Math.round(x * 10) / 10;
+  return String(v);
+}
+var fmt = {
+  n: function (n) {
+    if (!isFinite(n)) return '-';
+    var a = Math.abs(n);
+    if (a >= 1e9) return trimNum(n / 1e9) + 'B';
+    if (a >= 1e6) return trimNum(n / 1e6) + 'M';
+    if (a >= 1e3) return trimNum(n / 1e3) + 'K';
+    return trimNum(n);
+  },
+  usd: function (n) { return '$' + fmt.n(n); },
+  full: function (n) { return Math.round(n).toLocaleString('en-US'); },
+  full2: function (n) {
+    return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  },
+  pct: function (x) {
+    if (x >= 10) return Math.round(x) + '%';
+    if (x >= 1) return (Math.round(x * 10) / 10) + '%';
+    return (Math.round(x * 1000) / 1000) + '%';
+  },
+  price: function (n) {
+    if (!isFinite(n) || n <= 0) return '-';
+    if (n >= 1) return '$' + n.toFixed(2);
+    if (n >= 0.01) return '$' + n.toFixed(4);
+    return '$' + Number(n.toPrecision(3));
+  },
+  ago: function (deltaMs) {
+    if (!isFinite(deltaMs) || deltaMs < 0) return '-';
+    var s = Math.round(deltaMs / 1000);
+    if (s < 60) return s + 's';
+    if (s < 3600) return Math.floor(s / 60) + 'm';
+    if (s < 86400) return Math.floor(s / 3600) + 'h';
+    return Math.floor(s / 86400) + 'd';
+  },
+  shortAddr: function (a) {
+    a = String(a || '');
+    return a.length > 12 ? a.slice(0, 4) + '…' + a.slice(-4) : a;
+  }
+};
+
+var WocBurnModel = {
+  PRICE_SOURCE: PRICE_SOURCE,
+  PRICE_SNAPSHOT: PRICE_SNAPSHOT,
+  parsePythV2: parsePythV2,
+  parseJupiterV3: parseJupiterV3,
+  CHAIN_SOURCE: CHAIN_SOURCE,
+  CHAIN_SNAPSHOT: CHAIN_SNAPSHOT,
+  ATTRIBUTION: ATTRIBUTION,
+  parseTokenSupply: parseTokenSupply,
+  parseSignatures: parseSignatures,
+  parseBurnsFromTx: parseBurnsFromTx,
+  mergeBurns: mergeBurns,
+  windowStats: windowStats,
+  parseRpcOverride: parseRpcOverride,
+  MECHANICS: MECHANICS,
+  fmt: fmt
+};
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = WocBurnModel;
+} else if (typeof window !== 'undefined') {
+  window.WocBurnModel = WocBurnModel;
+}
+
+/* __MODEL_END__ */
+</script>
+
+<script>
+(function () {
+  'use strict';
+
+  var M = window.WocBurnModel;
+  var $ = function (id) { return document.getElementById(id); };
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+
+  /* ---------- runtime error surface ---------- */
+  function showError(msg) {
+    var b = $('errBanner');
+    b.innerHTML = '<b>Tracker error:</b> ' + String(msg).replace(/[<>&]/g, function (c) {
+      return { '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c];
+    }) + ' - reload to reset.';
+    b.classList.add('show');
+  }
+  window.addEventListener('error', function (e) { showError(e.message || 'unknown error'); });
+  window.addEventListener('unhandledrejection', function (e) { showError((e.reason && e.reason.message) || e.reason || 'unhandled rejection'); });
+
+  /* ---------- state (seeded from the build-time snapshot) ---------- */
+  var chain = {
+    currentSupply: M.CHAIN_SNAPSHOT.currentSupply || 0,
+    burns: (M.CHAIN_SNAPSHOT.burns || []).slice(),
+    scannedSigs: M.CHAIN_SNAPSHOT.scannedSigs || 0,
+    oldestScannedMs: M.CHAIN_SNAPSHOT.oldestScannedMs || 0,
+    cursor: M.CHAIN_SNAPSHOT.cursor || '',
+    fetchedAtMs: M.CHAIN_SNAPSHOT.fetchedAtMs || 0,
+    live: false
+  };
+  var price = {
+    usdPerWoc: M.PRICE_SNAPSHOT.usdPerWoc,
+    source: M.PRICE_SNAPSHOT.source,
+    fetchedAtMs: M.PRICE_SNAPSHOT.fetchedAtMs,
+    live: false
+  };
+  var ui = { period: 'day', feedExpanded: false, scanning: false };
+
+  var rpcUrl = M.CHAIN_SOURCE.rpcUrl;
+  var ov = M.parseRpcOverride(location.search, location.hash);
+  ov.warnings.forEach(function (w) { console.warn('[burntracker] ' + w); });
+  if (ov.rpcUrl) { rpcUrl = ov.rpcUrl; console.info('[burntracker] using custom RPC: ' + rpcUrl); }
+
+  /* ---------- fetch plumbing (fail-closed; snapshot survives any failure) ---------- */
+  function abortIn(ms) {
+    return (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(ms) : undefined;
+  }
+  function rpc(method, params, timeoutMs) {
+    return fetch(rpcUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: method, params: params }),
+      signal: abortIn(timeoutMs || 12000)
+    }).then(function (r) {
+      if (r.status === 429) return Promise.reject(new Error('RPC rate-limited (429) - consider #p.rpc=<your https RPC>'));
+      if (!r.ok) return Promise.reject(new Error('RPC HTTP ' + r.status));
+      return r.json();
+    });
+  }
+
+  function fetchLivePrice() {
+    var src = M.PRICE_SOURCE;
+    function viaJupiter() {
+      return fetch(src.jupiterUrl + src.mint, { signal: abortIn(8000) })
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)); })
+        .then(function (body) {
+          var p = M.parseJupiterV3(body, src.mint);
+          return p ? { usdPerWoc: p.usdPerWoc, source: 'jupiter' } : Promise.reject(new Error('unparseable payload'));
+        });
+    }
+    if (!src.pythFeedId) return viaJupiter();
+    var url = src.hermesUrl.replace(/\/$/, '') + '/v2/updates/price/latest?ids[]=' + encodeURIComponent(src.pythFeedId);
+    return fetch(url, { signal: abortIn(8000) })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)); })
+      .then(function (body) {
+        var p = M.parsePythV2(body);
+        if (p && Date.now() - p.publishMs <= src.maxAgeMs) return { usdPerWoc: p.usdPerWoc, source: 'pyth' };
+        return Promise.reject(new Error('pyth stale/unparseable'));
+      })
+      .catch(function () { return viaJupiter(); });
+  }
+
+  /* Hydrate a list of signatures into burns, gently (sequential, small gap). */
+  function hydrateSigs(sigs, onProgress) {
+    var found = [];
+    var i = 0;
+    function next() {
+      if (i >= sigs.length) return Promise.resolve(found);
+      var s = sigs[i++];
+      if (onProgress) onProgress(i, sigs.length);
+      return rpc('getTransaction', [s.signature, { encoding: 'jsonParsed', maxSupportedTransactionVersion: 0 }], 15000)
+        .then(function (body) {
+          M.parseBurnsFromTx(body, M.CHAIN_SOURCE.mint, M.CHAIN_SOURCE.decimals)
+            .forEach(function (b) { found.push(b); });
+        })
+        .catch(function (e) { console.warn('[burntracker] tx hydrate failed: ' + e.message); })
+        .then(function () { return new Promise(function (res) { setTimeout(res, 180); }); })
+        .then(next);
+    }
+    return next();
+  }
+
+  /* Refresh: supply + price + newest page of history. */
+  function refresh() {
+    $('refreshBtn').disabled = true;
+    var pSupply = rpc('getTokenSupply', [M.CHAIN_SOURCE.mint]).then(function (body) {
+      var s = M.parseTokenSupply(body);
+      if (!s) throw new Error('unparseable supply');
+      chain.currentSupply = s.uiAmount;
+      chain.fetchedAtMs = Date.now();
+      chain.live = true;
+      renderAll(); // headline goes live immediately; feed hydration continues behind
+    });
+    var pPrice = fetchLivePrice().then(function (live) {
+      price = { usdPerWoc: live.usdPerWoc, source: live.source, fetchedAtMs: Date.now(), live: true };
+      renderAll();
+    });
+    var pFeed = rpc('getSignaturesForAddress', [M.CHAIN_SOURCE.mint, { limit: M.CHAIN_SOURCE.sigPageLimit }])
+      .then(function (body) {
+        var sigs = M.parseSignatures(body);
+        if (!sigs) throw new Error('unparseable signatures');
+        var known = {};
+        chain.burns.forEach(function (b) { known[b.sig] = true; });
+        var fresh = sigs.filter(function (s) { return !s.failed && !known[s.signature]; }).slice(0, 25);
+        if (!chain.cursor && sigs.length) chain.cursor = sigs[sigs.length - 1].signature;
+        return hydrateSigs(fresh).then(function (burns) {
+          chain.burns = M.mergeBurns(chain.burns, burns);
+          chain.scannedSigs += fresh.length;
+          var oldest = sigs.length ? sigs[sigs.length - 1].blockTimeMs : 0;
+          if (!chain.oldestScannedMs || (oldest && oldest < chain.oldestScannedMs)) chain.oldestScannedMs = chain.oldestScannedMs || oldest;
+        });
+      });
+    return Promise.allSettled([pSupply, pPrice, pFeed]).then(function (results) {
+      results.forEach(function (r) { if (r.status === 'rejected') console.warn('[burntracker] refresh: ' + r.reason.message); });
+      $('refreshBtn').disabled = false;
+      renderAll();
+    });
+  }
+
+  /* Scan deeper: page back from the cursor, hydrate, merge. */
+  function scanDeeper() {
+    if (ui.scanning) return;
+    ui.scanning = true;
+    var btn = $('scanBtn');
+    btn.disabled = true;
+    var opts = { limit: M.CHAIN_SOURCE.sigPageLimit };
+    if (chain.cursor) opts.before = chain.cursor;
+    rpc('getSignaturesForAddress', [M.CHAIN_SOURCE.mint, opts])
+      .then(function (body) {
+        var sigs = M.parseSignatures(body);
+        if (!sigs || !sigs.length) {
+          btn.textContent = 'History fully scanned';
+          return;
+        }
+        chain.cursor = sigs[sigs.length - 1].signature;
+        var ok = sigs.filter(function (s) { return !s.failed; });
+        return hydrateSigs(ok, function (i, n) { btn.textContent = 'Scanning… ' + i + '/' + n; })
+          .then(function (burns) {
+            chain.burns = M.mergeBurns(chain.burns, burns);
+            chain.scannedSigs += ok.length;
+            var oldest = sigs[sigs.length - 1].blockTimeMs;
+            if (oldest && (!chain.oldestScannedMs || oldest < chain.oldestScannedMs)) chain.oldestScannedMs = oldest;
+            btn.textContent = 'Scan deeper';
+          });
+      })
+      .catch(function (e) {
+        console.warn('[burntracker] scan: ' + e.message);
+        btn.textContent = 'Scan failed - retry';
+      })
+      .then(function () {
+        ui.scanning = false;
+        btn.disabled = false;
+        renderAll();
+      });
+  }
+
+  /* ---------- render ---------- */
+  function totalBurned() {
+    return chain.currentSupply > 0 ? Math.max(0, M.CHAIN_SOURCE.initialSupply - chain.currentSupply) : 0;
+  }
+
+  function renderHero() {
+    var burned = totalBurned();
+    $('heroWoc').textContent = chain.currentSupply > 0 ? M.fmt.full2(burned) + ' WOC' : '-';
+    $('heroUsd').textContent = chain.currentSupply > 0 ? '$' + M.fmt.full2(burned * price.usdPerWoc) : '-';
+    var cs = $('chainStatus');
+    if (chain.currentSupply > 0) {
+      cs.textContent = (chain.live ? 'live · solana rpc · ' : 'snapshot · ') +
+        (chain.fetchedAtMs ? M.fmt.ago(Date.now() - chain.fetchedAtMs) + ' ago' : 'unknown age');
+      cs.className = 'sub2' + (chain.live ? ' live' : '');
+    } else {
+      cs.textContent = 'supply unavailable - refresh or set #p.rpc=<https rpc>';
+      cs.className = 'sub2';
+    }
+    var ps = $('priceStatus');
+    ps.textContent = (price.live ? 'live · ' : 'snapshot · ') + price.source + ' · ' + M.fmt.price(price.usdPerWoc) +
+      (price.fetchedAtMs ? ' · ' + M.fmt.ago(Date.now() - price.fetchedAtMs) + ' ago' : '');
+    ps.className = 'sub2' + (price.live ? ' live' : '');
+  }
+
+  function renderFeed() {
+    var feed = $('feed');
+    feed.textContent = '';
+    var burns = chain.burns;
+    if (!burns.length) {
+      var d = document.createElement('div');
+      d.className = 'feed-empty';
+      d.innerHTML = 'No burn transactions found in the scanned window yet - <b>the total above is exact regardless</b> (it comes from live supply math, not this feed). Every money rail ships fail-closed behind flags; this ledger lights up row by row as mechanics fire on mainnet. Try <b>Scan deeper</b> to walk further back in history.';
+      feed.appendChild(d);
+      $('moreBtn').style.display = 'none';
+    } else {
+      var show = ui.feedExpanded ? burns : burns.slice(0, 12);
+      show.forEach(function (b) {
+        var row = document.createElement('div');
+        row.className = 'brow';
+        var who = M.ATTRIBUTION[b.authority] || M.fmt.shortAddr(b.authority) || 'unknown authority';
+        var l = document.createElement('div');
+        l.className = 'l1';
+        l.innerHTML = '<span class="amt">' + M.fmt.full2(b.amount) + ' WOC</span>' +
+          '<span class="burned">Burned &#128293;</span>' +
+          '<span class="who">' + who + '</span>';
+        var r = document.createElement('div');
+        r.className = 'r';
+        var a = document.createElement('a');
+        a.href = M.CHAIN_SOURCE.explorerTxUrl + encodeURIComponent(b.sig);
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = M.fmt.shortAddr(b.sig);
+        var when = document.createElement('span');
+        when.className = 'when';
+        when.textContent = b.ms ? M.fmt.ago(Date.now() - b.ms) + ' ago' : '';
+        r.appendChild(a);
+        r.appendChild(when);
+        row.appendChild(l);
+        row.appendChild(r);
+        feed.appendChild(row);
+      });
+      $('moreBtn').style.display = burns.length > 12 && !ui.feedExpanded ? '' : 'none';
+    }
+    var scannedTotal = burns.reduce(function (t, b) { return t + b.amount; }, 0);
+    $('coverage').textContent = 'feed covers ' + chain.scannedSigs + ' scanned mint txs'
+      + (chain.oldestScannedMs ? ' back to ' + new Date(chain.oldestScannedMs).toISOString().slice(0, 10) : '')
+      + ' · ' + M.fmt.full2(scannedTotal) + ' WOC attributed of ' + M.fmt.full2(totalBurned()) + ' total';
+  }
+
+  function renderStats() {
+    var stats = M.windowStats(chain.burns, Date.now());
+    var w = stats[ui.period];
+    var lbl = ui.period === 'day' ? 'day' : ui.period === 'week' ? 'week' : '30d';
+    $('pWoc').textContent = M.fmt.n(w.woc);
+    $('pUsd').textContent = M.fmt.usd(w.woc * price.usdPerWoc);
+    $('pTxs').textContent = String(w.txs);
+    $('pWocK').textContent = '$WOC burned / ' + lbl;
+    $('pUsdK').textContent = 'value / ' + lbl;
+    $('pTxsK').textContent = 'burn txs / ' + lbl;
+    $('periodNote').textContent = 'From the scanned feed - scan deeper for older burns.';
+
+    var spanMs = chain.oldestScannedMs ? Date.now() - chain.oldestScannedMs : 0;
+    var spanDays = Math.max(spanMs / 86400000, 1 / 24);
+    var scannedTotal = chain.burns.reduce(function (t, b) { return t + b.amount; }, 0);
+    var perDay = chain.burns.length ? scannedTotal / spanDays : 0;
+    $('rDay').textContent = chain.burns.length ? M.fmt.n(perDay) : '-';
+    $('rUsdDay').textContent = chain.burns.length ? M.fmt.usd(perDay * price.usdPerWoc) : '-';
+    $('rLast').textContent = stats.latestMs ? M.fmt.ago(Date.now() - stats.latestMs) + ' ago' : 'none scanned';
+
+    $('sNow').textContent = chain.currentSupply > 0 ? M.fmt.full(chain.currentSupply) : '-';
+    $('sPct').textContent = chain.currentSupply > 0
+      ? M.fmt.pct(totalBurned() / M.CHAIN_SOURCE.initialSupply * 100) : '-';
+    $('sPrice').textContent = M.fmt.price(price.usdPerWoc);
+  }
+
+  /* ---------- cumulative chart ---------- */
+  function el(tag, attrs) {
+    var e = document.createElementNS(SVG_NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  function renderChart() {
+    var svg = $('areaSvg'), tip = $('areaTip'), box = $('areaBox');
+    svg.textContent = '';
+    var burns = chain.burns.slice().reverse(); // oldest first
+    var note = $('chartNote');
+    if (burns.length < 2) {
+      svg.setAttribute('viewBox', '0 0 640 80');
+      var t = el('text', { x: 320, y: 45, 'text-anchor': 'middle', 'font-size': '13', fill: '#8a8270' });
+      t.textContent = burns.length ? 'One burn scanned - chart appears with two or more.' : 'No burns in the scanned window yet.';
+      svg.appendChild(t);
+      note.textContent = 'Cumulative $WOC destroyed, from the scanned burn history.';
+      return;
+    }
+    var offset = Math.max(0, totalBurned() - burns.reduce(function (t, b) { return t + b.amount; }, 0));
+    note.textContent = offset > 0.005
+      ? 'Cumulative $WOC destroyed. ' + M.fmt.full2(offset) + ' WOC was burned before/outside the scanned window (baseline).'
+      : 'Cumulative $WOC destroyed, from the scanned burn history.';
+
+    var pts = [];
+    var cum = offset;
+    burns.forEach(function (b) { cum += b.amount; pts.push({ ms: b.ms, v: cum }); });
+
+    var W = 640, H = 220, PADL = 56, PADR = 16, PADT = 12, PADB = 26;
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    var pw = W - PADL - PADR, ph = H - PADT - PADB;
+    var t0 = pts[0].ms, t1 = pts[pts.length - 1].ms;
+    if (t1 <= t0) t1 = t0 + 1;
+    var vMax = pts[pts.length - 1].v, vMin = offset;
+    var pad = Math.max((vMax - vMin) * 0.1, vMax * 0.001, 1);
+    var y0 = Math.max(0, vMin - pad), y1 = vMax + pad;
+    var X = function (ms) { return PADL + (ms - t0) / (t1 - t0) * pw; };
+    var Y = function (v) { return PADT + (1 - (v - y0) / (y1 - y0)) * ph; };
+
+    [0, 0.5, 1].forEach(function (f) {
+      var v = y0 + f * (y1 - y0);
+      var y = Y(v);
+      svg.appendChild(el('line', { x1: PADL, x2: W - PADR, y1: y, y2: y, stroke: '#221c11', 'stroke-width': 1 }));
+      var t = el('text', { x: PADL - 8, y: y + 4, 'font-size': '10.5', 'text-anchor': 'end',
+        fill: '#8a8270', 'font-family': 'ui-monospace, Menlo, monospace' });
+      t.textContent = M.fmt.n(v);
+      svg.appendChild(t);
+    });
+    [0, 0.5, 1].forEach(function (f) {
+      var ms = t0 + f * (t1 - t0);
+      var t = el('text', { x: X(ms), y: H - 8, 'font-size': '10.5',
+        'text-anchor': f === 0 ? 'start' : f === 1 ? 'end' : 'middle',
+        fill: '#8a8270', 'font-family': 'ui-monospace, Menlo, monospace' });
+      t.textContent = new Date(ms).toISOString().slice(5, 10);
+      svg.appendChild(t);
+    });
+
+    // step path (burns are discrete events)
+    var d = 'M' + X(pts[0].ms) + ',' + Y(pts[0].v);
+    for (var i = 1; i < pts.length; i++) {
+      d += ' L' + X(pts[i].ms) + ',' + Y(pts[i - 1].v) + ' L' + X(pts[i].ms) + ',' + Y(pts[i].v);
+    }
+    var area = d + ' L' + X(t1) + ',' + Y(y0) + ' L' + X(t0) + ',' + Y(y0) + ' Z';
+    svg.appendChild(el('path', { d: area, fill: 'rgba(217,89,38,0.16)' }));
+    svg.appendChild(el('path', { d: d, fill: 'none', stroke: '#d95926', 'stroke-width': 2 }));
+    svg.appendChild(el('circle', { cx: X(t1), cy: Y(vMax), r: 5.5, fill: '#14110b' }));
+    svg.appendChild(el('circle', { cx: X(t1), cy: Y(vMax), r: 4, fill: '#d95926' }));
+
+    var cross = el('line', { x1: 0, x2: 0, y1: PADT, y2: H - PADB, stroke: '#6b5226', 'stroke-width': 1, visibility: 'hidden' });
+    svg.appendChild(cross);
+    var hit = el('rect', { x: PADL, y: PADT, width: pw, height: ph, fill: 'transparent' });
+    hit.addEventListener('mousemove', function (evt) {
+      var r = svg.getBoundingClientRect();
+      var fx = (evt.clientX - r.left) / r.width * W;
+      var best = 0, bd = Infinity;
+      for (var i = 0; i < pts.length; i++) {
+        var dd = Math.abs(X(pts[i].ms) - fx);
+        if (dd < bd) { bd = dd; best = i; }
+      }
+      var p = pts[best];
+      cross.setAttribute('x1', X(p.ms)); cross.setAttribute('x2', X(p.ms));
+      cross.setAttribute('visibility', 'visible');
+      tip.innerHTML = '<span class="t">' + new Date(p.ms).toISOString().slice(0, 10) + '</span><br>' +
+        'cumulative <b>' + M.fmt.full2(p.v) + '</b> WOC';
+      tip.style.display = 'block';
+      var br = box.getBoundingClientRect();
+      var lx = (evt.clientX - br.left) + 14;
+      tip.style.left = Math.min(lx, Math.max(br.width - tip.offsetWidth - 8, 0)) + 'px';
+      tip.style.top = (evt.clientY - br.top + 14) + 'px';
+    });
+    hit.addEventListener('mouseleave', function () {
+      tip.style.display = 'none'; cross.setAttribute('visibility', 'hidden');
+    });
+    svg.appendChild(hit);
+  }
+
+  function renderMechanics() {
+    var tb = $('mechTable');
+    tb.textContent = '';
+    M.MECHANICS.forEach(function (m) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + m.label + '</td><td class="mono">' + m.rate + '</td>' +
+        '<td><span class="kind ' + m.kind + '">' + (m.kind === 'assumption' ? 'assumed' : m.kind) + '</span></td>' +
+        '<td class="wrap">' + m.source + '</td>';
+      tb.appendChild(tr);
+    });
+  }
+
+  function renderAll() {
+    renderHero();
+    renderFeed();
+    renderStats();
+    renderChart();
+  }
+
+  /* ---------- wiring ---------- */
+  document.querySelectorAll('.seg [data-period]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      ui.period = b.getAttribute('data-period');
+      document.querySelectorAll('.seg [data-period]').forEach(function (x) {
+        x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+      });
+      renderStats();
+    });
+  });
+  $('refreshBtn').addEventListener('click', refresh);
+  $('scanBtn').addEventListener('click', scanDeeper);
+  $('moreBtn').addEventListener('click', function () { ui.feedExpanded = true; renderFeed(); });
+
+  /* ---------- boot ---------- */
+  renderMechanics();
+  renderAll();
+  refresh(); // upgrade snapshot -> live where the host allows fetches
+})();
+</script>
