@@ -1,0 +1,104 @@
+import { describe, expect, it } from 'vitest';
+import { GATHER_NODES } from '../src/sim/data';
+import { nodeMaterialFor } from '../src/sim/professions/gathering';
+import { Sim } from '../src/sim/sim';
+import type { Entity, SimEvent } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
+
+// Every grant in the game flows through the one shared inventory hub
+// (Sim.addItem/addItemInstance), which unconditionally emitted a 'loot'
+// event that hud.ts's case 'loot' turns into audio.lootItem()/coin() -
+// BEFORE this change, that meant every gather/craft/disenchant grant played
+// the generic loot ding stacked on top of its own new dedicated cue
+// (audio.gather/craftSuccess/disenchant). This pins that the professions
+// grant sites now pass { silent: true } so the loot event's TEXT still
+// prints (no missing feedback) but the generic AUDIO CUE is suppressed,
+// while every OTHER grant path (quest reward, vendor, mail, trade, corpse
+// loot, enchant apply) is completely unaffected and stays loud.
+
+function mustEntity(sim: Sim, pid: number): Entity {
+  const entity = sim.entities.get(pid);
+  if (!entity) throw new Error(`missing entity ${pid}`);
+  return entity;
+}
+
+function makeWorld(seed = 42) {
+  return new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+}
+
+function teleportOntoNode(sim: Sim, pid: number, nodeId: string) {
+  const node = GATHER_NODES.find((n) => n.id === nodeId);
+  if (!node) throw new Error(`missing node ${nodeId}`);
+  const p = mustEntity(sim, pid);
+  p.pos.x = node.pos.x;
+  p.pos.z = node.pos.z;
+  p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
+  p.prevPos = { ...p.pos };
+}
+
+const NODE_ID = GATHER_NODES[0].id;
+const NODE_MATERIAL = nodeMaterialFor(GATHER_NODES[0].type, GATHER_NODES[0].zoneId);
+
+function lootEvents(events: SimEvent[]): Array<Extract<SimEvent, { type: 'loot' }>> {
+  return events.filter((e): e is Extract<SimEvent, { type: 'loot' }> => e.type === 'loot');
+}
+
+describe('professions grants suppress the generic loot audio cue, not the text', () => {
+  it('a gather harvest emits a silent loot event (text still prints)', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Miner');
+    teleportOntoNode(sim, pid, NODE_ID);
+
+    expect(sim.harvestNode(NODE_ID, pid)).toBe(true);
+    const events = lootEvents(sim.tick());
+    expect(events.length).toBeGreaterThan(0);
+    for (const ev of events) {
+      expect(ev.silent).toBe(true);
+      expect(ev.text).toContain('You receive:');
+    }
+  });
+
+  it('a plain addItem grant (every non-professions path) stays loud by default', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Vendee');
+    sim.addItem(NODE_MATERIAL.itemId, 1, pid);
+    const events = lootEvents(sim.tick());
+    expect(events.length).toBe(1);
+    expect(events[0].silent).toBeUndefined();
+  });
+
+  it('a plain addItemInstance grant stays loud by default too', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Enchanter');
+    sim.addItemInstance(NODE_MATERIAL.itemId, { signer: 'Test' }, pid);
+    const events = lootEvents(sim.tick());
+    expect(events.length).toBe(1);
+    expect(events[0].silent).toBeUndefined();
+  });
+
+  it('a successful craft emits (only) silent loot events', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    sim.addItem('spider_leg', 1, pid); // the reagent grant itself stays loud
+    sim.craftItem('recipe_tough_jerky', false, pid);
+    expect(sim.lastCraftResult?.ok).toBe(true);
+    const events = lootEvents(sim.tick());
+    // The reagent grant (loud) plus the crafted-output grant (silent): only
+    // the output grant should be silenced, proving the flag is scoped to the
+    // specific craft-output call site, not a blanket suppression.
+    expect(events.some((e) => e.silent === true)).toBe(true);
+    expect(events.some((e) => e.silent === undefined)).toBe(true);
+  });
+
+  it('a disenchant emits a silent loot event for the reclaimed material', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    sim.addItem('eastbrook_arming_sword', 1, pid);
+    sim.tick(); // drain the (loud) sword grant before isolating the disenchant
+    sim.disenchantItem('eastbrook_arming_sword', pid);
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    const events = lootEvents(sim.tick());
+    expect(events.length).toBe(1);
+    expect(events[0].silent).toBe(true);
+  });
+});

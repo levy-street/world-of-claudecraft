@@ -631,7 +631,9 @@ export interface SimContextCallbacks {
   // I2b lockpick controller (abandonLockpick/tickLockpickTimeout), and the I2c companion
   // AI (spawnDelveCompanion/despawnDelveCompanion/maybeCompanionBark).
   partyMembersForKey(key: string): number[];
-  addItem(itemId: string, count: number, pid?: number): void;
+  // opts.silent: see Sim.addItem's matching param, same contract (suppress
+  // only the client's default loot audio cue, the text line still prints).
+  addItem(itemId: string, count: number, pid?: number, opts?: { silent?: boolean }): void;
   // #1145 signed materials: grants a single non-fungible item copy carrying an
   // instance payload (signer/charges/rolled/boundTo, #1165), never merged into a
   // plain fungible stack. Used by corpse harvest to stamp a rare+ monster
@@ -641,6 +643,7 @@ export interface SimContextCallbacks {
     instance: ItemInstancePayload,
     pid?: number,
     count?: number,
+    opts?: { silent?: boolean },
   ): void;
   // L2 World Market escrow (marketList) also consumes removeItem; it is declared once
   // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.

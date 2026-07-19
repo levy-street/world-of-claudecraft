@@ -4136,9 +4136,9 @@ export class Sim {
       // reach-ins delegate to delves/runs via their Sim method body.
       partyMembersForKey: (key) => sim.partyMembersForKey(key),
       grantXp: (amount, meta, opts) => sim.grantXp(amount, meta, opts),
-      addItem: (itemId, count, pid) => sim.addItem(itemId, count, pid),
-      addItemInstance: (itemId, instance, pid, count) =>
-        sim.addItemInstance(itemId, instance, pid, count),
+      addItem: (itemId, count, pid, opts) => sim.addItem(itemId, count, pid, opts),
+      addItemInstance: (itemId, instance, pid, count, opts) =>
+        sim.addItemInstance(itemId, instance, pid, count, opts),
       // L2's World Market escrow (marketList) also consumes removeItem; it is bound once
       // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.
       spawnBossAdds: (boss, mobId, count) => sim.spawnBossAdds(boss, mobId, count),
@@ -6763,7 +6763,11 @@ export class Sim {
   // this hub always lands, so an async award (loot roll, master loot, delve
   // rewards) can't destroy items. Capacity is enforced by canAddItem pre-checks
   // at the command boundaries instead.
-  addItem(itemId: string, count: number, pid?: number): void {
+  // opts.silent suppresses only the client's default loot audio cue for this
+  // grant (the "You receive:" text line still prints); a caller with its own
+  // dedicated cue for the same grant (gathering/crafting/enchanting) sets
+  // this so the generic ding doesn't stack on top of it.
+  addItem(itemId: string, count: number, pid?: number, opts?: { silent?: boolean }): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta } = r;
@@ -6777,6 +6781,7 @@ export class Sim {
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
       text: `You receive: ${def?.name ?? itemId}${count > 1 ? ' x' + count : ''}.`,
       pid: meta.entityId,
+      silent: opts?.silent,
     });
     this.ctx.onInventoryChangedForQuests(meta);
     if (
@@ -6796,7 +6801,14 @@ export class Sim {
   // grant (a rare-event windfall) emits ONE loot line with the xN suffix
   // instead of one line and cue per unit; discovery and quest hooks fire once
   // per grant, matching addItem's per-call semantics.
-  addItemInstance(itemId: string, instance: ItemInstancePayload, pid?: number, count = 1): void {
+  // opts.silent: see addItem's matching param above, same contract.
+  addItemInstance(
+    itemId: string,
+    instance: ItemInstancePayload,
+    pid?: number,
+    count = 1,
+    opts?: { silent?: boolean },
+  ): void {
     const r = this.resolve(pid);
     if (!r) return;
     if (count < 1) return;
@@ -6828,6 +6840,7 @@ export class Sim {
       // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
       text: `You receive: ${def?.name ?? itemId}${count > 1 ? ' x' + count : ''}.`,
       pid: meta.entityId,
+      silent: opts?.silent,
     });
     this.ctx.onInventoryChangedForQuests(meta);
   }

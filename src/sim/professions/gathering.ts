@@ -497,7 +497,10 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
   const grantFungibleFit = (): number => {
     let fit = qty;
     while (fit > 1 && !ctx.canAddItem(itemId, fit, meta.entityId)) fit--;
-    ctx.addItem(itemId, fit, meta.entityId);
+    // silent: the gatherResult event below plays its own node-type cue
+    // (audio.gather in src/game/audio.ts); the generic loot ding would
+    // otherwise stack on top of it for every single harvest.
+    ctx.addItem(itemId, fit, meta.entityId, { silent: true });
     return fit;
   };
   if (signed) {
@@ -516,7 +519,8 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     if (fit > 0) {
       // One batched grant: a x5 windfall lands as ONE "You receive: X x5."
       // line and cue instead of five (the recorded loot-burst polish).
-      ctx.addItemInstance(itemId, { signer: meta.name }, meta.entityId, fit);
+      // silent: see grantFungibleFit's matching comment above, same reason.
+      ctx.addItemInstance(itemId, { signer: meta.name }, meta.entityId, fit, { silent: true });
       grantedQty = fit;
     }
     if (grantedQty === 0) {

@@ -307,10 +307,13 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
   } else {
     count = disenchantYield(def, ctx.rng);
   }
-  ctx.addItem(materialItemId, count, pid);
+  // silent on both grants below: the disenchantResult event fires its own
+  // dedicated cue (audio.disenchant in src/game/audio.ts); the generic loot
+  // ding would otherwise stack on top of it for every disenchant.
+  ctx.addItem(materialItemId, count, pid, { silent: true });
   if (secondaryItemId && secondaryCount) {
     for (let i = 0; i < secondaryCount; i++) {
-      ctx.addItemInstance(secondaryItemId, { bindOnTrade: true }, pid);
+      ctx.addItemInstance(secondaryItemId, { bindOnTrade: true }, pid, 1, { silent: true });
     }
   }
   // Quality-tiered gain: the disenchanted item's def quality is the input tier.
@@ -528,7 +531,10 @@ export function resolveApplyEnchant(
   // additive bonus and marker (enchantedPayloadFor above, shared with the
   // capacity gate).
   const merged = enchantedPayloadFor(consumed, enchant);
-  ctx.addItemInstance(itemId, merged, pid);
+  // silent: the enchantResult event fires its own dedicated cue
+  // (audio.enchant in src/game/audio.ts); the generic loot ding would
+  // otherwise stack on top of it for every applied enchant.
+  ctx.addItemInstance(itemId, merged, pid, 1, { silent: true });
   // Quality-tiered gain: the applied enchant's reagent-derived tier.
   if (meta) grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
   return { ok: true, itemId, enchantId };

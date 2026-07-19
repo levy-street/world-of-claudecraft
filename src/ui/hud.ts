@@ -9132,13 +9132,18 @@ export class Hud {
             /^.+ was not assigned and is free for all\.$/.test(ev.text)
           )
             this.lootRolls.closeForItem(ev.text);
-          if (
-            ev.text.includes('loot') ||
-            ev.text.includes('Sold') ||
-            ev.text.includes('Bought back')
-          )
-            audio.coin();
-          else audio.lootItem();
+          // silent: a professions grant (gather/craft/enchant) with its own
+          // dedicated cue for this same grant sets this so the generic ding
+          // doesn't stack on top of it; the text line above still prints.
+          if (!ev.silent) {
+            if (
+              ev.text.includes('loot') ||
+              ev.text.includes('Sold') ||
+              ev.text.includes('Bought back')
+            )
+              audio.coin();
+            else audio.lootItem();
+          }
           if ($('#bags').style.display !== 'none') this.renderBags();
           break;
         }

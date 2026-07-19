@@ -3262,7 +3262,12 @@ export type SimEvent = { pid?: number } & (
   // the client can batch those into one summary line instead of banner spam.
   | { type: 'deedUnlocked'; deedId: string; retro?: boolean }
   | { type: 'learnAbility'; abilityId: string; rank: number }
-  | { type: 'loot'; text: string }
+  // silent: true suppresses only the client's default loot audio cue (the
+  // "You receive: X" text line still prints as normal); a caller with its
+  // own dedicated cue for the same grant (gathering/crafting/enchanting) sets
+  // this so the generic ding doesn't stack on top of it. See Sim.addItem/
+  // addItemInstance's opts param, the one place this gets set.
+  | { type: 'loot'; text: string; silent?: boolean }
   | {
       type: 'lootRoll';
       rollId: number;

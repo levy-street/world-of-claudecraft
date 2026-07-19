@@ -108,7 +108,7 @@ describe('sampled GameAudio facade', () => {
     expect(audio.feedbackEnabled).toBe(false);
 
     // The interface/feedback cues fall silent (loot, level, quest, whisper,
-    // etc.), including five of the six gathering-rhythm cues.
+    // etc.), including the gating gather/fish rhythm cues that take no args.
     const feedback = [
       'coin',
       'levelUp',
@@ -121,12 +121,19 @@ describe('sampled GameAudio facade', () => {
       'error',
       'invitePrompt',
       'gatherCast',
-      'gatherStrike',
-      'gatherRare',
       'fishCast',
       'fishReel',
     ] as const;
     for (const m of feedback) audio[m]();
+    // The parameterized gather/rarity/craft/enchanting cues gate the same way;
+    // exercised separately since they take a required argument.
+    audio.gather('ore');
+    audio.gatherRareTier('rare');
+    audio.craftSuccess('alchemy');
+    audio.masterwork();
+    audio.disenchant();
+    audio.salvage();
+    audio.enchant();
     expect(sfxMock.playUi).not.toHaveBeenCalled();
 
     // Direct-affordance cues (you clicked/opened) and gameplay-timing cues (duel
