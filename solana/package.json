@@ -1,0 +1,21 @@
+{
+  "name": "@woc/economy-programs",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Anchor TS test harness for the consolidated $WOC economy programs (woc_escrow, woc_lp_vault, realm_stake_escrow, job_escrow, character_market)",
+  "scripts": {
+    "test": "ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+  },
+  "devDependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
+    "@solana/spl-token": "^0.4.9",
+    "@solana/web3.js": "^1.95.8",
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^20.11.0",
+    "chai": "^4.3.4",
+    "mocha": "^9.0.3",
+    "ts-mocha": "^10.0.0",
+    "typescript": "^5.4.0"
+  }
+}
