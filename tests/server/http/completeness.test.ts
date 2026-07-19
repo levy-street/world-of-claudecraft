@@ -113,6 +113,9 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/steam/link',
   '/api/steam/status',
   '/api/welcome/flags',
+  // Public limited-relic mint ledger (server/limited_routes.ts), the true-scarcity
+  // feature: a new registry-only public read, no legacy ladder arm.
+  '/api/limited-mints',
 ]);
 
 // Every legacy /api ladder row (dispatcher === main handleApi), minus the
@@ -212,6 +215,9 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
   // more than once.
   const MIGRATED_ROUTES: readonly LadderRoute[] = [
     { method: 'GET', path: '/api/leaderboard' },
+    // The public limited-relic mint ledger (server/limited_routes.ts): a
+    // registry-only route (in REGISTRY_ONLY_PATHS), so it has no legacy arm.
+    { method: 'GET', path: '/api/limited-mints' },
     { method: 'GET', path: '/api/arena/leaderboard' },
     { method: 'GET', path: '/api/releases' },
     { method: 'GET', path: '/api/project-stats' },
