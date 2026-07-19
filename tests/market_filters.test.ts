@@ -58,7 +58,15 @@ describe('World Market filters', () => {
       'axe',
       'other',
     ]);
-    expect(MARKET_RARITY_FILTERS).toEqual(['all', 'poor', 'common', 'uncommon', 'rare', 'epic']);
+    expect(MARKET_RARITY_FILTERS).toEqual([
+      'all',
+      'poor',
+      'common',
+      'uncommon',
+      'rare',
+      'epic',
+      'legendary',
+    ]);
   });
 
   it('groups wearable armor separately from weapons and consumables', () => {
@@ -100,6 +108,18 @@ describe('World Market filters', () => {
       'keen_dirk',
       'greyjaw_pelt_cloak',
       'elixir_of_the_bear',
+    ]);
+  });
+
+  it('filters legendary-quality listings (the orange-name tier above epic)', () => {
+    const withLegendary = [...items, 'deathless_heartwood', 'kingsbane_last_oath'];
+    expect(filterIds(withLegendary, { rarity: 'legendary' })).toEqual([
+      'deathless_heartwood',
+      'kingsbane_last_oath',
+    ]);
+    expect(filterIds(withLegendary, { itemType: 'weapon', rarity: 'legendary' })).toEqual([
+      'deathless_heartwood',
+      'kingsbane_last_oath',
     ]);
   });
 

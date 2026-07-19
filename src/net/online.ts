@@ -40,12 +40,14 @@ import { parseTalentAllocation } from '../sim/talent_allocation_input';
 import { repairTalentLoadouts } from '../sim/talent_loadouts';
 import {
   type Aura,
+  cloneItemInstancePayload,
   type DeedStats,
   type DungeonDifficulty,
   type Entity,
   type EquipSlot,
   emptyMoveInput,
   type InvSlot,
+  type ItemInstancePayload,
   type LootRollChoice,
   type LootRollGroupStatus,
   type LootRollPrompt,
@@ -1455,8 +1457,11 @@ export class ClientWorld implements IWorld {
   connected = false;
   onDisconnect: ((reason: string) => void) | null = null;
   // fired on each unexpected socket drop while auto-reconnect is pending, and
-  // once the world is live again; main.ts shows/hides the reconnect overlay
-  onConnectionLost: (() => void) | null = null;
+  // once the world is live again; main.ts shows/hides the reconnect overlay.
+  // attempt/maxAttempts/nextRetryAtMs let the overlay show live progress
+  // (attempt count + retry countdown) instead of a static "reconnecting" string.
+  onConnectionLost: ((attempt: number, maxAttempts: number, nextRetryAtMs: number) => void) | null =
+    null;
   onReconnected: (() => void) | null = null;
   private reconnectAttempts = 0;
   // consecutive 'character already in world' rejections during a reconnect;
@@ -1545,10 +1550,15 @@ export class ClientWorld implements IWorld {
       // visibilitychange while it is pending takes the clearTimeout branch
       // below: never two live timers, never a double openSocket.
       clearTimeout(this.reconnectTimer);
+      const delayMs = Math.random() * 1000;
       this.reconnectTimer = window.setTimeout(() => {
         this.reconnectTimer = undefined;
         this.openSocket();
-      }, Math.random() * 1000);
+      }, delayMs);
+      // Keep the overlay's countdown honest: without this it keeps counting down
+      // toward the ORIGINAL backoff delay (which can be tens of seconds at a high
+      // attempt count) while the real retry now fires in under a second.
+      this.onConnectionLost?.(this.reconnectAttempts, RECONNECT_MAX_ATTEMPTS, Date.now() + delayMs);
       return;
     }
     // No reconnect scheduled yet but the socket is not open: onclose was
@@ -1600,7 +1610,6 @@ export class ClientWorld implements IWorld {
       return;
     }
     this.reconnectAttempts++;
-    this.onConnectionLost?.();
     const delayMs = computeBackoffDelay(
       this.reconnectAttempts,
       RECONNECT_BASE_DELAY_MS,
@@ -1614,6 +1623,12 @@ export class ClientWorld implements IWorld {
       this.reconnectTimer = undefined;
       this.openSocket();
     }, delayMs);
+    // Fired AFTER reconnectTimer is armed: onConnectionLost creates/mutates DOM,
+    // starts an interval, and resolves a t() key, any of which could throw. If it
+    // threw before the timer was set, reconnectAttempts would already be
+    // incremented with no retry scheduled, no onDisconnect, and no fatal overlay,
+    // permanently dead auto-reconnect for the rest of the session.
+    this.onConnectionLost?.(this.reconnectAttempts, RECONNECT_MAX_ATTEMPTS, Date.now() + delayMs);
   }
 
   private endSession(): void {
@@ -2188,6 +2203,16 @@ export class ClientWorld implements IWorld {
         e.offhandItemId = w.oh ?? null; // equipped offhand → held weapon model (render-only)
         e.weaponSkinId = w.wsk ?? null; // active weapon-skin cosmetic (render-only)
         e.equippedItems = w.eq ?? {}; // full worn set (render-only), for the inspect window
+        // Worn per-slot instance payloads (masterwork/enchant rolls), for the
+        // inspect window (terse `eqi`, sparse like `eq`: an absent key on a
+        // full record means no worn piece carries one, so it resets to {}).
+        // Deep-cloned per slot: a payload's own rolled.stats map must never
+        // alias wire-parsed JSON a later message could mutate.
+        e.equippedInstances = Object.fromEntries(
+          Object.entries((w.eqi ?? {}) as Record<string, ItemInstancePayload>).map(
+            ([slot, inst]) => [slot, cloneItemInstancePayload(inst)],
+          ),
+        );
         e.skinCatalog = w.cat === 'mech' ? 'mech' : 'class';
         e.holderTier = w.ht ?? 0; // $WOC holder-tier flair (cosmetic, server-set)
         e.holderBalance = typeof w.hb === 'number' ? w.hb : undefined; // exact $WOC, for inspect

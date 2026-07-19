@@ -34,6 +34,7 @@ type Ev = {
   crit?: boolean;
   attackAnimation?: 'ranged-shot';
   attackAnimationStarted?: true;
+  abilityId?: string;
 };
 
 function makeSim(
@@ -314,7 +315,10 @@ describe('auto_attack rangedSwing: Auto Shot vs Wand', () => {
     expect(
       events.some(
         (e) =>
-          e.type === 'spellfx' && e.school === 'physical' && e.attackAnimation === 'ranged-shot',
+          e.type === 'spellfx' &&
+          e.school === 'physical' &&
+          e.attackAnimation === 'ranged-shot' &&
+          e.abilityId === 'auto_shot',
       ),
     ).toBe(true);
     landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
@@ -368,14 +372,20 @@ describe('auto_attack rangedSwing: Auto Shot vs Wand', () => {
 });
 
 describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
-  it('a hunter at range takes the ranged branch (Auto Shot), arming ranged-speed cadence', () => {
+  it('a hunter at point-blank range still takes the ranged Auto Shot branch', () => {
     const { sim, p, meta } = makeSim('hunter', 12);
-    const mob = spawnDummy(sim, p, 8, 20); // beyond the 8yd dead zone, within 35
+    const mob = spawnDummy(sim, p, 8, 2);
     p.autoAttack = true;
     p.swingTimer = 0;
     const events = capture(sim);
     updatePlayerAutoAttack(sim.ctx, p, meta);
     expect(p.swingTimer).toBeGreaterThan(0); // reset to the weapon's speed * swingIntervalMult (at fire time)
+    expect(
+      events.some(
+        (e) => e.type === 'spellfx' && e.fx === 'projectile' && e.abilityId === 'auto_shot',
+      ),
+    ).toBe(true);
+    expect(events.some((e) => e.type === 'damage' && e.ability === 'Attack')).toBe(false);
     landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot');
     expect(events.some((e) => e.type === 'damage' && e.ability === 'Auto Shot')).toBe(true);
   });

@@ -5,8 +5,7 @@
 // It is constructed as new ActionBarPainter(writers, descriptor, resolveBgImage),
 // where the descriptor carries the container + the per-slot element refs and the
 // keybind set: multiplicity is a constructor arg, not a hardcoded id, so
-// a second/third bar is another descriptor with no code change (adding bars is a
-// follow-on feature).
+// every desktop row and mobile variant can reuse the family without a code fork.
 //
 // Three Top-risk-1/4 details:
 //   - The aria-label routes through the elided setAttr (the per-button cache keyed on

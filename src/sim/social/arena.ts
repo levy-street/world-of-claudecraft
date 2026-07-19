@@ -899,7 +899,12 @@ export function readyArenaFighter(ctx: SimContext, e: Entity, opts: { clearPrep:
   if (meta)
     recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   e.hp = e.maxHp;
-  e.resource = e.resourceType === 'mana' ? e.maxResource : e.resourceType === 'energy' ? 100 : 0;
+  e.resource =
+    e.resourceType === 'mana'
+      ? e.maxResource
+      : e.resourceType === 'energy' || e.resourceType === 'focus'
+        ? 100
+        : 0;
   e.targetId = null;
   e.autoAttack = false;
   // Drop any held movement intent so a fighter placed/respawned into the arena does

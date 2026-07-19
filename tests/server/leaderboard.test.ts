@@ -100,7 +100,6 @@ function deedsRow(rank: number): DeedsLeaderboardEntry {
     cls: 'warrior' as DeedsLeaderboardEntry['cls'],
     level: 20,
     renown: 500 - rank,
-    deedCount: 40 - rank,
     title: rank === 1 ? 'prog_veteran' : null,
   };
 }
@@ -292,11 +291,18 @@ describe('response builders (convention B deferred: leaders key preserved)', () 
     const first = (body.leaders as Record<string, unknown>[])[0];
     expect(first.name).toBe('Chronicler1');
     expect(first.renown).toBe(499);
-    // deedCount stays POPULATED on the wire this release (deprecated
-    // wire-compat for stale clients, issue #2044); current clients never
-    // display it.
-    expect(first.deedCount).toBe(39);
     expect(first.title).toBe('prog_veteran');
+    // The exact wire key set: Renown is the one ranked number the entry
+    // carries (the ranked-surface rule; the retired count output is gone).
+    expect(Object.keys(first).sort()).toEqual([
+      'cls',
+      'level',
+      'name',
+      'rank',
+      'realm',
+      'renown',
+      'title',
+    ]);
     expect('accountId' in first).toBe(false);
   });
 

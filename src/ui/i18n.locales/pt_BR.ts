@@ -3442,7 +3442,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Lança uma seta de gelo, causando {damage} de dano de Gelo e reduzindo a velocidade de movimento em 40%.',
   'entities.abilities.blazing_barrier.name': 'Barreira Flamejante',
   'entities.abilities.blazing_barrier.description':
-    'Envolve você em chamas, absorvendo 130 de dano por 60 s. (Fogo)',
+    'Envolve você em chamas, absorvendo {damage} de dano por 60 s. (Fogo)',
   'entities.abilities.cold_snap.name': 'Chamado do Inverno',
   'entities.abilities.cold_snap.description':
     'Encerra o tempo de recarga de Passo Cintilante, Véu de Gelo e Invisibilidade Maior. (Talento de mago)',
@@ -3493,7 +3493,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Transforma o inimigo em sapo por até {duration} s. O sapo vagueia e se cura rapidamente. Qualquer dano quebra o efeito. Apenas feras e humanoides.',
   'entities.abilities.frost_nova.name': 'Grilhão de Gelo',
   'entities.abilities.frost_nova.description':
-    'Congela todos os inimigos próximos no lugar por até 8 s e causa {damage} de dano de Gelo.',
+    'Congela todos os inimigos próximos no lugar por até 8 s e causa {damage} de dano de Gelo. O enraizamento se rompe após receber dano acumulado equivalente a 15% da vida máxima do alvo, com um mínimo de 20 e um máximo de 60 de dano.',
   'entities.abilities.arcane_explosion.name': 'Explosão Etérea',
   'entities.abilities.arcane_explosion.description':
     'Uma explosão de energia Arcana atinge todos os inimigos próximos com {damage} de dano Arcano.',
@@ -7143,7 +7143,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'download.linuxCta': 'Baixar para Linux',
   'download.windowsCta': 'Baixar para Windows',
   'download.linuxHint': 'AppImage: torne-o executável e execute-o. Não é necessária instalação.',
-  'loading.reconnecting': 'Conexão perdida. Reconectando...',
   'guide.nav.settings': 'Configurações e desempenho',
   'guide.settingsPage.advancedBody':
     'Avançado começa no nível High e desbloqueia quatro seletores extras, para que você possa passar seus quadros onde realmente os percebe: detalhes do terreno, densidade da folhagem, efeitos e iluminação e qualidade da sombra. Assim como a qualidade gráfica, eles se aplicam após uma recarga.',

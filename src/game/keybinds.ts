@@ -1,5 +1,5 @@
 // Player-rebindable controls. Every bindable game action, movement, camera,
-// targeting, interface windows, and the 23 action-bar slots, lives in one
+// targeting, interface windows, and the 34 action-bar slots, lives in one
 // registry, and the Keybinds map holds up to two KeyboardEvent.codes per
 // action (primary + secondary, e.g. W and ArrowUp both Move Forward). Input
 // dispatches edge actions and polls held (movement) actions through this map;
@@ -29,8 +29,8 @@ export interface BindAction {
   allowShared?: boolean;
 }
 
-// slot 0 is Attack, 1..11 the primary ability bar, 12..22 the secondary bar.
-export const ACTION_BAR_SLOTS = 23;
+// Slot 0 is Attack. Slots 1..11, 12..22, and 23..33 are the three ability rows.
+export const ACTION_BAR_SLOTS = 34;
 
 const SLOT_DEFAULTS = [
   'Digit1',
@@ -59,6 +59,19 @@ const SLOT_DEFAULTS = [
   'Numpad9',
   'Numpad0',
   'NumpadDecimal',
+  // Third bar (slots 23..33): shifted numpad bindings keep the row distinct
+  // while preserving the same physical layout as the secondary bar.
+  'Shift+Numpad1',
+  'Shift+Numpad2',
+  'Shift+Numpad3',
+  'Shift+Numpad4',
+  'Shift+Numpad5',
+  'Shift+Numpad6',
+  'Shift+Numpad7',
+  'Shift+Numpad8',
+  'Shift+Numpad9',
+  'Shift+Numpad0',
+  'Shift+NumpadDecimal',
 ];
 
 export const BIND_ACTIONS: BindAction[] = [
@@ -239,6 +252,16 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyZ'],
   },
+  // Professions parks on the shifted layer of KeyP like Deeds does on Z:
+  // every bare letter default is already taken, and Shift+P keeps the
+  // Spellbook's plain P untouched. Rebindable like any action.
+  {
+    id: 'professions',
+    label: 'Professions',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyP'],
+  },
   {
     id: 'chat',
     label: 'Open Chat',
@@ -290,7 +313,14 @@ export const BIND_ACTIONS: BindAction[] = [
   ...SLOT_DEFAULTS.map(
     (code, i): BindAction => ({
       id: `slot${i}`,
-      label: i === 0 ? 'Attack' : i <= 11 ? `Action Bar ${i + 1}` : `Secondary Bar ${i - 11}`,
+      label:
+        i === 0
+          ? 'Attack'
+          : i <= 11
+            ? `Action Bar ${i + 1}`
+            : i <= 22
+              ? `Secondary Bar ${i - 11}`
+              : `Third Bar ${i - 22}`,
       category: 'Action Bar',
       kind: 'edge',
       defaults: [code],

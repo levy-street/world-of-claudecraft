@@ -306,6 +306,14 @@ export const fr_FR: EnTranslations = {
     "spectate": {
       "banner": "Vous observez {name}"
     },
+    "resource": {
+      "focus": "Focus",
+      "lowFocus": "Low Focus",
+      "notEnoughFocus": "Not enough focus!"
+    },
+    "hunter": {
+      "turtleAttackError": "You can't attack while protected by Aspect of the Turtle."
+    },
     "readyCheck": {
       "prompt": "{name} a lancé une vérification de disponibilité. Êtes-vous prêt ?",
       "ready": "Prêt",
@@ -750,6 +758,7 @@ export const fr_FR: EnTranslations = {
       "leaderboard": "Classement",
       "dailyRewards": "Boutique",
       "deeds": "Hauts faits",
+      "professions": "Professions",
       "nameplates": "Noms",
       "haptics": "Vibrations",
       "hapticsOff": "Vibrations désactivées",
@@ -1039,6 +1048,7 @@ export const fr_FR: EnTranslations = {
       "itemLevelLine": "Niveau d'objet {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Afficher la barre d'action secondaire",
+      "showThirdActionBar": "Show Third Action Bar",
       "showTargetOfTarget": "Afficher la cible de la cible",
       "showAttackButton": "Afficher le bouton d'attaque",
       "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes",
@@ -1468,7 +1478,8 @@ export const fr_FR: EnTranslations = {
       "watchTwitch": "Regarder sur Twitch",
       "watchX": "Voir sur X",
       "watchKick": "Regarder sur Kick",
-      "watchYouTube": "Regarder sur YouTube"
+      "watchYouTube": "Regarder sur YouTube",
+      "streamerBadgeTitle": "Verified streamer"
     },
     "lootSettings": {
       "title": "Réglages de butin",
@@ -2082,7 +2093,9 @@ export const fr_FR: EnTranslations = {
       "mining": "Minage",
       "logging": "Bûcheronnage",
       "herbalism": "Herboristerie",
-      "notReady": "Ce nœud de ressource n'a pas encore réapparu pour vous."
+      "notReady": "Ce nœud de ressource n'a pas encore réapparu pour vous.",
+      "gatherLine": "You gather: {name}.",
+      "gatherLineQty": "You gather: {name} x{qty}."
     },
     "archetypeTitle": {
       "label": "Titre",
@@ -2113,6 +2126,42 @@ export const fr_FR: EnTranslations = {
       "tailoring": "Couture",
       "leatherworking": "Travail du cuir"
     },
+    "professions": {
+      "title": "Professions",
+      "close": "Close professions",
+      "ringAria": "Craft wheel",
+      "skillsHeader": "Craft skills",
+      "gatheringHeader": "Gathering",
+      "perksHeader": "Perks",
+      "identityHeader": "Identity",
+      "roleMajor": "Major",
+      "roleHobby": "Hobby",
+      "roleDormant": "Dormant",
+      "roleUnattuned": "Unattuned",
+      "ceilingUnlimited": "No empowerment cap",
+      "ceilingRare": "Rare cap",
+      "ceilingCommon": "Common cap",
+      "skillValue": "{skill} / {max}",
+      "tierPipAria": "Tier {tier}",
+      "nextUnlockTier": "{points} points to the next tier: masterwork odds improve",
+      "nextUnlockSpecialized": "{points} points to Specialized: material costs drop",
+      "nextUnlockMax": "At maximum skill",
+      "perkSpecializedLine": "{craft}: Specialized, material costs -{pct}%",
+      "perkSpecializedAt": "Specializes at {threshold} skill",
+      "switchCost": "Next archetype switch costs {cost} amends",
+      "syncing": "Waiting for your profession data from the realm.",
+      "tutorialLine": "Reach {target} skill in any craft to unlock your first tier.",
+      "ctaHeader": "Next step",
+      "ctaRaise": "Keep raising {craft}: {points} more points to the next tier.",
+      "ctaStart": "Craft or gather with any profession to begin.",
+      "unattunedIdentity": "You are not yet attuned to an archetype. Raise your crafts and complete an attunement to choose your pair.",
+      "nudgeNearTier": "{craft}: {points} points from the next tier",
+      "nudgeDormant": "Your {craft} knowledge lies dormant",
+      "hobbyLabel": "Hobby: {craft}",
+      "majorsLabel": "Majors: {a} and {b}",
+      "pairsHeld": "Pairs held: {count}",
+      "returnsLabel": "Returns: {count}"
+    },
     "crafting": {
       "title": "Artisanat",
       "close": "Fermer la fabrication",
@@ -2131,6 +2180,7 @@ export const fr_FR: EnTranslations = {
       "comboNotAttuned": "Choisissez d'abord une paire d'archétype.",
       "comboWrongPair": "Activez cette paire exacte pour le fabriquer.",
       "comboTierUnmet": "Élevez les deux métiers majeurs au palier requis.",
+      "comboTierUnmetNamed": "Raise {crafts} to tier {tier}.",
       "professionChoice": "Choix de profession",
       "noProfessionChoice": "Aucun choix de profession valide n'est disponible en ce moment.",
       "pairOptionLabel": "{pair} ({craftA} + {craftB})",
@@ -2163,7 +2213,19 @@ export const fr_FR: EnTranslations = {
       },
       "notAtHub": "Vous devez être à l'atelier d'artisanat, au niveau requis, pour fabriquer cela.",
       "throttled": "Vous fabriquez trop vite. Patientez un instant et réessayez.",
-      "recipeNotLearned": "Vous n'avez pas encore appris cette recette."
+      "recipeNotLearned": "Vous n'avez pas encore appris cette recette.",
+      "skillReqLine": "Requires {craft} {skill}",
+      "difficultyFull": "Full skill gain",
+      "difficultyReduced": "Reduced skill gain",
+      "difficultyNone": "No skill gain",
+      "stationBadge": "Station",
+      "stationOutOfRange": "Move to the crafting hub station to craft this.",
+      "masterworkToast": "Masterwork! {name}",
+      "masterworkZoneLine": "{crafter} crafted a masterwork {name}!",
+      "tierUpToast": "{craft} advanced to tier {tier}!",
+      "makersMark": "Crafted by {name}",
+      "masterworkSeal": "Masterwork",
+      "enchantedLine": "Enchanted"
     },
     "finder": {
       "title": "Chercheur de donjons",
@@ -2331,6 +2393,11 @@ export const fr_FR: EnTranslations = {
       "broadcastsLabel": "Partager les hauts faits accomplis avec la guilde et les amis",
       "titledName": "{name} « {title} »"
     }
+  },
+  "gatherEvent": {
+    "pristineVein": "{finder} struck a pristine vein!",
+    "ancientHeartwood": "{finder} felled an ancient heartwood!",
+    "moonlitBloom": "{finder} discovered a moonlit bloom!"
   },
   "apiError": {
     "validation": {
@@ -2841,7 +2908,8 @@ export const fr_FR: EnTranslations = {
     "resourceName": {
       "rage": "Rage",
       "mana": "Mana",
-      "energy": "Énergie"
+      "energy": "Énergie",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "Toutes les classes",
@@ -2905,6 +2973,8 @@ export const fr_FR: EnTranslations = {
       "blessing_of_might": "Augmente la puissance d'attaque d'une cible alliée, à lancer de préférence avant d'engager.",
       "divine_protection": "Une garde protectrice rapide pour encaisser les dégâts quand la situation se tend.",
       "raptor_strike": "Un coup de mêlée puissant pour quand quelque chose comble la distance.",
+      "hunters_mark": "Marks one priority target so you and your pet can pressure it harder.",
+      "disengage": "Leaps backwards to quickly open space when an enemy gets too close.",
       "aspect_of_the_hawk": "Une posture à garder active pour aiguiser votre puissance d'attaque à distance.",
       "serpent_sting": "Inflige un venin qui inflige des dégâts de nature dans la durée.",
       "arcane_shot": "Un tir instantané à distance pour quelques dégâts supplémentaires rapides.",
@@ -4985,7 +5055,9 @@ export const fr_FR: EnTranslations = {
     "rendererFailed": "Impossible de démarrer le rendu: essayez de recharger. {error}",
     "enterTimeout": "Impossible d'entrer dans le monde. La connexion a expiré. Le serveur de jeu est-il lancé ?",
     "connectionLost": "La connexion au serveur a été perdue.",
-    "reconnecting": "Connexion perdue. Reconnexion...",
+    "reconnectingAttempt": "Connection lost. Reconnecting... (attempt {attempt}/{maxAttempts}, retrying in {seconds}s)",
+    "reconnectingNow": "Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})",
+    "slowConnection": "This is taking longer than usual. Check your internet connection.",
     "connectionRejected": "Le serveur a fermé la connexion.",
     "realmFull": "Ce monde est complet en ce moment. Veuillez réessayer dans quelques minutes.",
     "tooManyConnections": "Trop de connexions à ce monde proviennent de votre réseau. Veuillez fermer les fenêtres de jeu superflues ou réessayer dans quelques minutes.",
@@ -6088,6 +6160,7 @@ export const fr_FR: EnTranslations = {
       "rarityUncommon": "Peu commun",
       "rarityRare": "Rare",
       "rarityEpic": "Épique",
+      "rarityLegendary": "Legendary",
       "merchantStock": "Stock du Marchand",
       "stackCount": "x{count}",
       "each": "{money} l'unité",
@@ -6288,7 +6361,7 @@ export const fr_FR: EnTranslations = {
       },
       "blazing_barrier": {
         "name": "Barrière flamboyante",
-        "description": "Vous enveloppe de flammes et absorbe 130 points de dégâts pendant 60 s. (Feu)"
+        "description": "Vous enveloppe de flammes et absorbe {damage} points de dégâts pendant 60 s. (Feu)"
       },
       "cold_snap": {
         "name": "Rappel de l'hiver",
@@ -6396,7 +6469,7 @@ export const fr_FR: EnTranslations = {
       },
       "frost_nova": {
         "name": "Icebind",
-        "description": "Gèle tous les ennemis proches sur place pendant un maximum de 8 s et inflige {damage} points de dégâts de Givre."
+        "description": "Gèle tous les ennemis proches sur place pendant un maximum de 8 s et inflige {damage} points de dégâts de Givre. L’immobilisation prend fin après avoir subi un total de dégâts égal à 15 % des points de vie maximum de la cible, avec un minimum de 20 et un maximum de 60 points de dégâts."
       },
       "arcane_explosion": {
         "name": "Aetherburst",
@@ -6566,6 +6639,14 @@ export const fr_FR: EnTranslations = {
         "name": "Frappe éventrante",
         "description": "Une puissante attaque de mêlée qui augmente les dégâts de {damage}. S'active lors de votre prochaine frappe."
       },
+      "hunters_mark": {
+        "name": "Hunter's Mark",
+        "description": "Marks an enemy for 60 sec, revealing it and increasing damage dealt by you and your pet by 5%."
+      },
+      "disengage": {
+        "name": "Disengage",
+        "description": "Leap backwards up to 15 yd, quickly creating distance from nearby enemies."
+      },
       "aspect_of_the_hawk": {
         "name": "Aspect du busard",
         "description": "Adopte l'aspect du busard et augmente la puissance d'attaque de {buff} pendant 30 min."
@@ -6578,9 +6659,17 @@ export const fr_FR: EnTranslations = {
         "name": "Tir funeste",
         "description": "Tir instantané qui inflige {damage} points de dégâts des Arcanes."
       },
+      "exhilaration": {
+        "name": "Exhilaration",
+        "description": "Instantly restores 30% of your maximum health."
+      },
       "concussive_shot": {
         "name": "Tir déstabilisant",
         "description": "Hébète la cible pour {damage} points de dégâts et ralentit son déplacement de 50% pendant 4 s."
+      },
+      "freezing_trap": {
+        "name": "Freezing Trap",
+        "description": "Places a trap that incapacitates the first enemy to trigger it for 60 sec. Damage breaks the effect."
       },
       "mongoose_bite": {
         "name": "Counterfang",
@@ -6594,17 +6683,49 @@ export const fr_FR: EnTranslations = {
         "name": "Aspect de la martre",
         "description": "Adopte l'aspect de la martre et augmente vos chances d'esquive de 8% pendant 30 min."
       },
+      "feign_death": {
+        "name": "Feign Death",
+        "description": "Feign death for up to 6 min, dropping enemy threat and cancelling enemy casts targeting you. Acting ends the effect."
+      },
       "aspect_of_the_cheetah": {
         "name": "Aspect du coursier",
         "description": "Adopte l'aspect du coursier et augmente la vitesse de déplacement de 30% pendant 30 min."
+      },
+      "steady_shot": {
+        "name": "Steady Shot",
+        "description": "A moving shot that deals Physical damage and generates 20 Focus."
+      },
+      "explosive_shot": {
+        "name": "Explosive Shot",
+        "description": "Plants ammunition that explodes after 3 sec, damaging enemies within 8 yd."
+      },
+      "kill_shot": {
+        "name": "Kill Shot",
+        "description": "A ranged finishing shot usable only against enemies below 20% health."
       },
       "aimed_shot": {
         "name": "Tir tendu",
         "description": "Un tir soigneusement décoché qui inflige {damage} points de dégâts."
       },
+      "aspect_of_the_turtle": {
+        "name": "Aspect of the Turtle",
+        "description": "Reduces all damage taken by 30% for 8 sec, but prevents you from attacking while active."
+      },
       "rapid_fire": {
         "name": "Tir fiévreux",
         "description": "Augmente votre vitesse d'attaque de 40% pendant 15 s."
+      },
+      "multi_shot": {
+        "name": "Tir fendu",
+        "description": "Décoche une volée sur la zone ciblée et inflige {damage} points de dégâts physiques aux ennemis dans un rayon de 8 m. (talent de Chasseur)"
+      },
+      "trueshot": {
+        "name": "Trueshot",
+        "description": "For 15 sec, gain 10% critical strike chance and 20% critical damage while Aimed Shot and Rapid Fire recover faster."
+      },
+      "powerful_shot": {
+        "name": "Powershot",
+        "description": "Hold to charge a narrow piercing line shot. Charging chiefly increases its damage and length; release to fire."
       },
       "smite": {
         "name": "Châtiment",
@@ -7293,10 +7414,6 @@ export const fr_FR: EnTranslations = {
       "mind_sear": {
         "name": "Brûle-pensée",
         "description": "Canalise de l'énergie d'Ombre sur la zone ciblée et inflige {damage} points de dégâts chaque seconde aux ennemis proches. (talent de Prêtre)"
-      },
-      "multi_shot": {
-        "name": "Tir fendu",
-        "description": "Décoche une volée sur la zone ciblée et inflige {damage} points de dégâts physiques aux ennemis dans un rayon de 8 m. (talent de Chasseur)"
       },
       "prayer_of_healing": {
         "name": "Soin du chœur",
@@ -8142,6 +8259,18 @@ export const fr_FR: EnTranslations = {
       },
       "emberglass_warstaff": {
         "name": "Bâton de guerre de verre ardent"
+      },
+      "copper_ore": {
+        "name": "Copper Ore"
+      },
+      "iron_ore": {
+        "name": "Iron Ore"
+      },
+      "ironbark_log": {
+        "name": "Ironbark Log"
+      },
+      "silverleaf_herb": {
+        "name": "Silverleaf Herb"
       },
       "conjured_water4": {
         "name": "Eau de source invoquée"
@@ -10469,6 +10598,56 @@ export const fr_FR: EnTranslations = {
         "sender": "Intendant héroïque",
         "subject": "Vos Marques héroïques",
         "body": "Votre groupe a triomphé de l’épreuve héroïque pendant que vous combattiez à l’arrière ou gisiez à terre. Votre verrouillage a tout de même été enregistré, alors votre part de Marques héroïques vous est envoyée ici au lieu d’être perdue. Faites-en bon usage.\n\n- Intendant héroïque"
+      },
+      "guild_trend_engineering_alchemy": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Engineering and Alchemy",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Engineering and Alchemy: charges measured and reagents weighed, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Bombardier in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_alchemy_cooking": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Alchemy and Cooking",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Alchemy and Cooking: draughts simmered and dishes seasoned, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Apothecary in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_cooking_leatherworking": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Cooking and Leatherworking",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Cooking and Leatherworking: meals plated and hides cured, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_leatherworking_tailoring": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Leatherworking and Tailoring",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Leatherworking and Tailoring: leather cut and cloth hemmed, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Outfitter in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_tailoring_inscription": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Tailoring and Inscription",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Tailoring and Inscription: seams stitched and glyphs inked, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_inscription_enchanting": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Inscription and Enchanting",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Inscription and Enchanting: scrolls lettered and charms woven, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_enchanting_jewelcrafting": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Enchanting and Jewelcrafting",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Enchanting and Jewelcrafting: charms bound and stones polished, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_jewelcrafting_weaponcrafting": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Jewelcrafting and Weaponcrafting",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Jewelcrafting and Weaponcrafting: gems seated and edges ground, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_weaponcrafting_armorcrafting": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Weaponcrafting and Armorcrafting",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Weaponcrafting and Armorcrafting: blades tempered and plates fitted, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Smith in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_armorcrafting_engineering": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Armorcrafting and Engineering",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Armorcrafting and Engineering: plates riveted and gears trued, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
       }
     },
     "itemSets": {

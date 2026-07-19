@@ -66,6 +66,7 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `combat/auto_attack.ts` | start/stop/update auto-attack, `meleeSwing`, `rangedSwing` |
 | `combat/equip_procs.ts` + `combat/set_procs.ts` | legendary weapon on-action procs; item-set bonus procs |
 | `combat/empower_next.ts` + `combat/thorns_charge.ts` | next-cast empower/free aura consumption; charge-limited thorns |
+| `hunter_base_abilities.ts` | Hunter mark, Disengage, Turtle, Exhilaration, Feign Death, and single-trigger Freezing Trap mechanics |
 | `projectile_travel.ts` | in-flight homing projectiles: `pendingProjectiles` + the prologue `advancePendingProjectiles` phase |
 | `progression/xp.ts` | `prestige`, rested-XP, `isResting` |
 | `progression/talents.ts` | `applyTalents`/`spendTalent`/`setSpec`/`respec`/loadouts/`recomputeTalents` |

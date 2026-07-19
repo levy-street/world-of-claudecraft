@@ -306,6 +306,14 @@ export const vi_VN: EnTranslations = {
     "spectate": {
       "banner": "Đang xem {name}"
     },
+    "resource": {
+      "focus": "Focus",
+      "lowFocus": "Low Focus",
+      "notEnoughFocus": "Not enough focus!"
+    },
+    "hunter": {
+      "turtleAttackError": "You can't attack while protected by Aspect of the Turtle."
+    },
     "readyCheck": {
       "prompt": "{name} đã bắt đầu kiểm tra sẵn sàng. Bạn đã sẵn sàng chưa?",
       "ready": "Sẵn Sàng",
@@ -750,6 +758,7 @@ export const vi_VN: EnTranslations = {
       "leaderboard": "Xếp Hạng",
       "dailyRewards": "Cửa hàng",
       "deeds": "Kỳ Công",
+      "professions": "Professions",
       "nameplates": "Tên",
       "haptics": "Phản Hồi Rung",
       "hapticsOff": "Tắt Phản Hồi Rung",
@@ -1039,6 +1048,7 @@ export const vi_VN: EnTranslations = {
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
+      "showThirdActionBar": "Show Third Action Bar",
       "showTargetOfTarget": "Hiện Mục Tiêu Của Mục Tiêu",
       "showAttackButton": "Hiển Thị Nút Tấn Công",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
@@ -1468,7 +1478,8 @@ export const vi_VN: EnTranslations = {
       "watchTwitch": "Xem trên Twitch",
       "watchX": "Xem trên X",
       "watchKick": "Xem trên Kick",
-      "watchYouTube": "Xem trên YouTube"
+      "watchYouTube": "Xem trên YouTube",
+      "streamerBadgeTitle": "Verified streamer"
     },
     "lootSettings": {
       "title": "Cài Đặt Chiến Lợi Phẩm",
@@ -2082,7 +2093,9 @@ export const vi_VN: EnTranslations = {
       "mining": "Khai mỏ",
       "logging": "Đốn gỗ",
       "herbalism": "Thảo dược học",
-      "notReady": "Điểm tài nguyên này chưa hồi sinh lại dành cho bạn."
+      "notReady": "Điểm tài nguyên này chưa hồi sinh lại dành cho bạn.",
+      "gatherLine": "You gather: {name}.",
+      "gatherLineQty": "You gather: {name} x{qty}."
     },
     "archetypeTitle": {
       "label": "Danh hiệu",
@@ -2113,6 +2126,42 @@ export const vi_VN: EnTranslations = {
       "tailoring": "May Vá",
       "leatherworking": "Thuộc Da"
     },
+    "professions": {
+      "title": "Professions",
+      "close": "Close professions",
+      "ringAria": "Craft wheel",
+      "skillsHeader": "Craft skills",
+      "gatheringHeader": "Gathering",
+      "perksHeader": "Perks",
+      "identityHeader": "Identity",
+      "roleMajor": "Major",
+      "roleHobby": "Hobby",
+      "roleDormant": "Dormant",
+      "roleUnattuned": "Unattuned",
+      "ceilingUnlimited": "No empowerment cap",
+      "ceilingRare": "Rare cap",
+      "ceilingCommon": "Common cap",
+      "skillValue": "{skill} / {max}",
+      "tierPipAria": "Tier {tier}",
+      "nextUnlockTier": "{points} points to the next tier: masterwork odds improve",
+      "nextUnlockSpecialized": "{points} points to Specialized: material costs drop",
+      "nextUnlockMax": "At maximum skill",
+      "perkSpecializedLine": "{craft}: Specialized, material costs -{pct}%",
+      "perkSpecializedAt": "Specializes at {threshold} skill",
+      "switchCost": "Next archetype switch costs {cost} amends",
+      "syncing": "Waiting for your profession data from the realm.",
+      "tutorialLine": "Reach {target} skill in any craft to unlock your first tier.",
+      "ctaHeader": "Next step",
+      "ctaRaise": "Keep raising {craft}: {points} more points to the next tier.",
+      "ctaStart": "Craft or gather with any profession to begin.",
+      "unattunedIdentity": "You are not yet attuned to an archetype. Raise your crafts and complete an attunement to choose your pair.",
+      "nudgeNearTier": "{craft}: {points} points from the next tier",
+      "nudgeDormant": "Your {craft} knowledge lies dormant",
+      "hobbyLabel": "Hobby: {craft}",
+      "majorsLabel": "Majors: {a} and {b}",
+      "pairsHeld": "Pairs held: {count}",
+      "returnsLabel": "Returns: {count}"
+    },
     "crafting": {
       "title": "Chế tạo",
       "close": "Đóng chế tạo",
@@ -2131,6 +2180,7 @@ export const vi_VN: EnTranslations = {
       "comboNotAttuned": "Hãy chọn một đôi kiểu mẫu trước.",
       "comboWrongPair": "Hãy kích hoạt đúng đôi này để chế tác nó.",
       "comboTierUnmet": "Hãy nâng cả hai kỹ nghệ chuyên ngành lên bậc yêu cầu.",
+      "comboTierUnmetNamed": "Raise {crafts} to tier {tier}.",
       "professionChoice": "Lựa chọn nghề nghiệp",
       "noProfessionChoice": "Hiện không có lựa chọn nghề nghiệp hợp lệ nào.",
       "pairOptionLabel": "{pair} ({craftA} + {craftB})",
@@ -2163,7 +2213,19 @@ export const vi_VN: EnTranslations = {
       },
       "notAtHub": "Bạn phải ở trung tâm chế tác, đạt cấp yêu cầu, mới chế tạo được thứ đó.",
       "throttled": "Bạn đang chế tạo quá nhanh. Hãy chờ một lát rồi thử lại.",
-      "recipeNotLearned": "Bạn chưa học công thức đó."
+      "recipeNotLearned": "Bạn chưa học công thức đó.",
+      "skillReqLine": "Requires {craft} {skill}",
+      "difficultyFull": "Full skill gain",
+      "difficultyReduced": "Reduced skill gain",
+      "difficultyNone": "No skill gain",
+      "stationBadge": "Station",
+      "stationOutOfRange": "Move to the crafting hub station to craft this.",
+      "masterworkToast": "Masterwork! {name}",
+      "masterworkZoneLine": "{crafter} crafted a masterwork {name}!",
+      "tierUpToast": "{craft} advanced to tier {tier}!",
+      "makersMark": "Crafted by {name}",
+      "masterworkSeal": "Masterwork",
+      "enchantedLine": "Enchanted"
     },
     "finder": {
       "title": "Tìm Hầm Ngục",
@@ -2331,6 +2393,11 @@ export const vi_VN: EnTranslations = {
       "broadcastsLabel": "Chia sẻ kỳ công vừa lập với bang hội và bạn bè",
       "titledName": "{name} [{title}]"
     }
+  },
+  "gatherEvent": {
+    "pristineVein": "{finder} struck a pristine vein!",
+    "ancientHeartwood": "{finder} felled an ancient heartwood!",
+    "moonlitBloom": "{finder} discovered a moonlit bloom!"
   },
   "apiError": {
     "validation": {
@@ -2841,7 +2908,8 @@ export const vi_VN: EnTranslations = {
     "resourceName": {
       "rage": "Cuồng Nộ",
       "mana": "Mana",
-      "energy": "Năng Lượng"
+      "energy": "Năng Lượng",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "Tất cả lớp nhân vật",
@@ -2905,6 +2973,8 @@ export const vi_VN: EnTranslations = {
       "blessing_of_might": "Tăng sức tấn công cho mục tiêu thân thiện, nên niệm trước khi vào trận.",
       "divine_protection": "Một tấm bùa hộ mệnh nhanh gọn để hứng sát thương khi tình thế ngặt nghèo.",
       "raptor_strike": "Một cú vung cận chiến mạnh tay cho khi có kẻ áp sát bạn.",
+      "hunters_mark": "Marks one priority target so you and your pet can pressure it harder.",
+      "disengage": "Leaps backwards to quickly open space when an enemy gets too close.",
       "aspect_of_the_hawk": "Một trạng thái bạn duy trì để gia tăng sức tấn công tầm xa.",
       "serpent_sting": "Tiêm vào một liều nọc độc gây sát thương tự nhiên theo thời gian.",
       "arcane_shot": "Một phát bắn tức thời từ xa cho lượng sát thương phụ nhanh gọn.",
@@ -4985,7 +5055,9 @@ export const vi_VN: EnTranslations = {
     "rendererFailed": "Không thể khởi động bộ kết xuất: thử tải lại. {error}",
     "enterTimeout": "Không thể vào thế giới. Kết nối đã quá thời gian. Máy chủ trò chơi có đang chạy không?",
     "connectionLost": "Đã mất kết nối tới máy chủ.",
-    "reconnecting": "Mất kết nối. Đang kết nối lại...",
+    "reconnectingAttempt": "Connection lost. Reconnecting... (attempt {attempt}/{maxAttempts}, retrying in {seconds}s)",
+    "reconnectingNow": "Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})",
+    "slowConnection": "This is taking longer than usual. Check your internet connection.",
     "connectionRejected": "Máy chủ đã đóng kết nối.",
     "realmFull": "Thế giới này đang đầy người chơi. Vui lòng thử lại sau vài phút.",
     "tooManyConnections": "Có quá nhiều kết nối đến thế giới này từ mạng của bạn. Vui lòng đóng bớt cửa sổ trò chơi hoặc thử lại sau vài phút.",
@@ -6088,6 +6160,7 @@ export const vi_VN: EnTranslations = {
       "rarityUncommon": "Khác Thường",
       "rarityRare": "Hiếm",
       "rarityEpic": "Sử Thi",
+      "rarityLegendary": "Legendary",
       "merchantStock": "Hàng của Thương Nhân",
       "stackCount": "x{count}",
       "each": "{money} mỗi món",
@@ -6288,7 +6361,7 @@ export const vi_VN: EnTranslations = {
       },
       "blazing_barrier": {
         "name": "Lá Chắn Rực Lửa",
-        "description": "Bao bọc bản thân trong lửa, hấp thụ 130 sát thương trong 60 giây. (Lửa)"
+        "description": "Bao bọc bản thân trong lửa, hấp thụ {damage} sát thương trong 60 giây. (Lửa)"
       },
       "cold_snap": {
         "name": "Tiếng Gọi Mùa Đông",
@@ -6396,7 +6469,7 @@ export const vi_VN: EnTranslations = {
       },
       "frost_nova": {
         "name": "Trói Băng",
-        "description": "Đóng băng tất cả kẻ địch xung quanh tại chỗ trong tối đa 8 giây, gây {damage} sát thương Băng."
+        "description": "Đóng băng tất cả kẻ địch xung quanh tại chỗ trong tối đa 8 giây, gây {damage} sát thương Băng. Hiệu ứng trói chân bị phá vỡ sau khi nhận tổng sát thương bằng 15% máu tối đa của mục tiêu, tối thiểu 20 và tối đa 60 sát thương."
       },
       "arcane_explosion": {
         "name": "Nổ Ê-te",
@@ -6566,6 +6639,14 @@ export const vi_VN: EnTranslations = {
         "name": "Đòn Moi Ruột",
         "description": "Một đòn cận chiến mạnh tăng sát thương thêm {damage}. Kích hoạt ở đòn đánh tiếp theo của bạn."
       },
+      "hunters_mark": {
+        "name": "Hunter's Mark",
+        "description": "Marks an enemy for 60 sec, revealing it and increasing damage dealt by you and your pet by 5%."
+      },
+      "disengage": {
+        "name": "Disengage",
+        "description": "Leap backwards up to 15 yd, quickly creating distance from nearby enemies."
+      },
       "aspect_of_the_hawk": {
         "name": "Lốt Diều Hâu",
         "description": "Khoác lên lốt diều hâu, tăng sức mạnh tấn công thêm {buff} trong 30 phút."
@@ -6578,9 +6659,17 @@ export const vi_VN: EnTranslations = {
         "name": "Bắn Tà Ác",
         "description": "Một phát bắn tức thời gây {damage} sát thương Bí Thuật."
       },
+      "exhilaration": {
+        "name": "Exhilaration",
+        "description": "Instantly restores 30% of your maximum health."
+      },
       "concussive_shot": {
         "name": "Bắn Rúng Động",
         "description": "Làm choáng váng mục tiêu gây {damage} sát thương, giảm 50% tốc độ di chuyển trong 4 giây."
+      },
+      "freezing_trap": {
+        "name": "Freezing Trap",
+        "description": "Places a trap that incapacitates the first enemy to trigger it for 60 sec. Damage breaks the effect."
       },
       "mongoose_bite": {
         "name": "Phản Nanh",
@@ -6594,17 +6683,49 @@ export const vi_VN: EnTranslations = {
         "name": "Lốt Chồn",
         "description": "Khoác lên lốt chồn, tăng tỷ lệ né đòn thêm 8% trong 30 phút."
       },
+      "feign_death": {
+        "name": "Feign Death",
+        "description": "Feign death for up to 6 min, dropping enemy threat and cancelling enemy casts targeting you. Acting ends the effect."
+      },
       "aspect_of_the_cheetah": {
         "name": "Lốt Tuấn Mã",
         "description": "Khoác lên lốt tuấn mã, tăng tốc độ di chuyển thêm 30% trong 30 phút."
+      },
+      "steady_shot": {
+        "name": "Steady Shot",
+        "description": "A moving shot that deals Physical damage and generates 20 Focus."
+      },
+      "explosive_shot": {
+        "name": "Explosive Shot",
+        "description": "Plants ammunition that explodes after 3 sec, damaging enemies within 8 yd."
+      },
+      "kill_shot": {
+        "name": "Kill Shot",
+        "description": "A ranged finishing shot usable only against enemies below 20% health."
       },
       "aimed_shot": {
         "name": "Kéo Cung Dài",
         "description": "Một phát bắn được giương cung cẩn thận gây {damage} sát thương."
       },
+      "aspect_of_the_turtle": {
+        "name": "Aspect of the Turtle",
+        "description": "Reduces all damage taken by 30% for 8 sec, but prevents you from attacking while active."
+      },
       "rapid_fire": {
         "name": "Giương Cung Cuồng Loạn",
         "description": "Tăng tốc độ tấn công của bạn thêm 40% trong 15 giây."
+      },
+      "multi_shot": {
+        "name": "Bắn Tách",
+        "description": "Bắn một loạt tên vào khu vực mục tiêu, gây {damage} sát thương Vật lý lên kẻ địch trong bán kính 8 m. (thiên phú Thợ săn)"
+      },
+      "trueshot": {
+        "name": "Trueshot",
+        "description": "For 15 sec, gain 10% critical strike chance and 20% critical damage while Aimed Shot and Rapid Fire recover faster."
+      },
+      "powerful_shot": {
+        "name": "Powershot",
+        "description": "Hold to charge a narrow piercing line shot. Charging chiefly increases its damage and length; release to fire."
       },
       "smite": {
         "name": "Trừng Phạt",
@@ -7293,10 +7414,6 @@ export const vi_VN: EnTranslations = {
       "mind_sear": {
         "name": "Thiêu Ý Nghĩ",
         "description": "Niệm năng lượng Bóng tối lên khu vực mục tiêu, gây {damage} sát thương mỗi giây lên kẻ địch ở gần. (thiên phú Tu sĩ)"
-      },
-      "multi_shot": {
-        "name": "Bắn Tách",
-        "description": "Bắn một loạt tên vào khu vực mục tiêu, gây {damage} sát thương Vật lý lên kẻ địch trong bán kính 8 m. (thiên phú Thợ săn)"
       },
       "prayer_of_healing": {
         "name": "Hồi Phục Hợp Xướng",
@@ -8142,6 +8259,18 @@ export const vi_VN: EnTranslations = {
       },
       "emberglass_warstaff": {
         "name": "Chiến Trượng Emberglass"
+      },
+      "copper_ore": {
+        "name": "Copper Ore"
+      },
+      "iron_ore": {
+        "name": "Iron Ore"
+      },
+      "ironbark_log": {
+        "name": "Ironbark Log"
+      },
+      "silverleaf_herb": {
+        "name": "Silverleaf Herb"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
@@ -10469,6 +10598,56 @@ export const vi_VN: EnTranslations = {
         "sender": "Quân nhu Anh Hùng",
         "subject": "Dấu Ấn Anh Hùng của bạn",
         "body": "Đội của bạn đã vượt qua thử thách Anh Hùng khi bạn chiến đấu ở hậu tuyến hoặc đã ngã xuống. Khóa lượt của bạn vẫn được ghi nhận, vì vậy phần Dấu Ấn Anh Hùng của bạn được gửi đến đây thay vì thất lạc. Hãy sử dụng chúng thật tốt.\n\n- Quân nhu Anh Hùng"
+      },
+      "guild_trend_engineering_alchemy": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Engineering and Alchemy",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Engineering and Alchemy: charges measured and reagents weighed, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Bombardier in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_alchemy_cooking": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Alchemy and Cooking",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Alchemy and Cooking: draughts simmered and dishes seasoned, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Apothecary in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_cooking_leatherworking": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Cooking and Leatherworking",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Cooking and Leatherworking: meals plated and hides cured, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_leatherworking_tailoring": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Leatherworking and Tailoring",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Leatherworking and Tailoring: leather cut and cloth hemmed, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Outfitter in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_tailoring_inscription": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Tailoring and Inscription",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Tailoring and Inscription: seams stitched and glyphs inked, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_inscription_enchanting": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Inscription and Enchanting",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Inscription and Enchanting: scrolls lettered and charms woven, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_enchanting_jewelcrafting": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Enchanting and Jewelcrafting",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Enchanting and Jewelcrafting: charms bound and stones polished, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_jewelcrafting_weaponcrafting": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Jewelcrafting and Weaponcrafting",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Jewelcrafting and Weaponcrafting: gems seated and edges ground, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_weaponcrafting_armorcrafting": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Weaponcrafting and Armorcrafting",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Weaponcrafting and Armorcrafting: blades tempered and plates fitted, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Smith in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_armorcrafting_engineering": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Armorcrafting and Engineering",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Armorcrafting and Engineering: plates riveted and gears trued, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
       }
     },
     "itemSets": {

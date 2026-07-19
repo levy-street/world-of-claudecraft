@@ -9160,9 +9160,11 @@ function procResponseDescription(
       return `+${formatNumber(response.amount, lang)} ${t('classDetails.labels.resource')}`;
     case 'heal': {
       const healValue =
-        response.amountPctMaxHp !== undefined
-          ? `${formatPercent(response.amountPctMaxHp, lang)} ${text.statLabels.maxHpPct}`
-          : formatNumber(response.amount ?? 0, lang);
+        response.amountPctSourceMaxHp !== undefined
+          ? `${formatPercent(response.amountPctSourceMaxHp, lang)} ${text.statLabels.maxHpPct}`
+          : response.amountPctMaxHp !== undefined
+            ? `${formatPercent(response.amountPctMaxHp, lang)} ${text.statLabels.maxHpPct}`
+            : formatNumber(response.amount ?? 0, lang);
       return `+${healValue} ${t('hud.meters.healing')}`;
     }
     case 'absorb': {

@@ -31,6 +31,13 @@ import { isDispellableAura } from '../aura_classify';
 import { ITEMS, isDelvePos, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
+import {
+  breakFeignDeath,
+  FEIGN_DEATH_ID,
+  isOffensiveAbility,
+  isProtectedByTurtle,
+} from '../hunter_base_abilities';
+import { consumeDeathblow, hasDeathblow, rapidFireRicochet } from '../hunter_marksmanship';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -242,8 +249,15 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       // channelTicksLeft is only tracked for FIXED-count channels (it starts > 0);
       // duration-based channels (Demon Heal, boss channels) leave it 0, so they
       // fire unbounded here exactly as before and never flush below.
-      if (p.channelTicksLeft > 0) p.channelTicksLeft -= 1;
-      fireChannelTick();
+      const active =
+        p.castingAbility && p.castingAbility !== DEMON_HEAL_CAST_ID
+          ? ctx.resolvedAbility(p.castingAbility, p.id)
+          : null;
+      const fixedCount = (active?.def.channel?.ticks ?? 0) > 0;
+      if (!fixedCount || p.channelTicksLeft > 0) {
+        if (p.channelTicksLeft > 0) p.channelTicksLeft -= 1;
+        fireChannelTick();
+      }
     }
     if (p.castRemaining <= CAST_COMPLETE_EPS) {
       // Flush any fixed-count tick the timer has not reached yet: the tick
@@ -447,6 +461,12 @@ export function castAbility(
   if (res.def.passive) return;
   meta.lastActiveTick = ctx.tickCount; // a cast attempt is a deliberate action
   const ability = res.def;
+  const executeOverride = ability.id === 'kill_shot' && hasDeathblow(p);
+  if (ability.id !== FEIGN_DEATH_ID) breakFeignDeath(ctx, p);
+  if (isProtectedByTurtle(p) && isOffensiveAbility(ability)) {
+    ctx.error(p.id, "You can't attack while protected by Aspect of the Turtle.");
+    return;
+  }
   if (cancelStasisToggle(ctx, p, ability)) return;
   // Ice Block (usableWhileControlled) ignores control: it may be pressed while
   // stunned, polymorphed, incapacitated, silenced, or locked out, so it always frees
@@ -529,7 +549,9 @@ export function castAbility(
         ? 'Not enough rage!'
         : p.resourceType === 'energy'
           ? 'Not enough energy!'
-          : 'Not enough mana!',
+          : p.resourceType === 'focus'
+            ? 'Not enough focus!'
+            : 'Not enough mana!',
     );
     return;
   }
@@ -673,6 +695,7 @@ export function castAbility(
     if (
       ability.requiresTargetHpBelow !== undefined &&
       target.hp > target.maxHp * ability.requiresTargetHpBelow &&
+      !executeOverride &&
       !(ability.id === 'execute' && p.auras.some((aura) => aura.kind === 'sudden_death'))
     ) {
       ctx.error(
@@ -824,6 +847,7 @@ export function castAbility(
     return;
   }
   p.castTargetId = target?.id ?? null;
+  if (executeOverride) consumeDeathblow(ctx, p);
 
   // Brain Freeze (combat/frost_mage.ts): consumed HERE, after every gate
   // above (so a blocked cast never eats the proc) and before the cast-time /
@@ -1295,12 +1319,19 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
     cancelCast(ctx, p);
     return;
   }
+  for (const effect of res.effects) {
+    if (effect.type === 'gainResource') {
+      p.resource = Math.min(p.maxResource, p.resource + effect.amount);
+    }
+  }
   ctx.emit({
     type: 'spellfx',
     sourceId: p.id,
     targetId: target.id,
     school: res.def.school,
     fx: 'projectile',
+    abilityId: res.def.id,
+    ...(res.def.class === 'hunter' ? { projectileStyle: 'hunter-arrow' as const } : {}),
   });
   // Each channel bolt (e.g. Arcane Missiles) deals its damage on arrival, not on the
   // tick it is fired; a target that dies mid-flight fizzles it (the drain's guard).
@@ -1315,17 +1346,24 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
       res.def.id === 'arcane_missiles'
         ? aetherDartsBoltBonus(ctx, src, res.def.channel?.ticks ?? 1)
         : 0;
+    const physical = res.def.school === 'physical';
     for (const eff of res.effects) {
       if (eff.type === 'directDamage') {
-        const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, src) ? 1 : ctx.spellCrit(src));
+        const crit = ctx.rng.chance(
+          consumeNextAttackCrit(ctx, src) ? 1 : physical ? src.critChance : ctx.spellCrit(src),
+        );
         let dmg = ctx.rng.range(eff.min, eff.max) + channelSp + surgeBonus;
-        dmg *= spellDamageMultFromAuras(src);
+        if (physical) dmg *= 1 - armorReduction(ctx.effectiveArmor(tgt), src.level);
+        else dmg *= spellDamageMultFromAuras(src);
         // A channeled spell tick (Arcane Missiles) is a spell crit, so it takes the
         // spell crit-damage channel of the mastery (plus the generic bonus) like
         // every other spell crit.
-        if (crit) dmg *= 1.5 + src.critDmgSpellBonus;
-        ctx.dealDamage(src, tgt, Math.round(dmg), crit, res.def.school, res.def.name, 'hit');
-        noteSpellHit(ctx, src, crit, res.def.id);
+        if (crit) dmg *= physical ? 2 + src.critDmgPhysBonus : 1.5 + src.critDmgSpellBonus;
+        const dealt = Math.max(1, Math.round(dmg));
+        ctx.dealDamage(src, tgt, dealt, crit, res.def.school, res.def.name, 'hit');
+        if (physical) {
+          if (res.def.id === 'rapid_fire') rapidFireRicochet(ctx, src, tgt, dealt, res.def.name);
+        } else noteSpellHit(ctx, src, crit, res.def.id);
       } else if (eff.type === 'drainTick') {
         const dmg = Math.round(ctx.rng.range(eff.min, eff.max) + channelSp);
         ctx.dealDamage(src, tgt, dmg, false, res.def.school, res.def.name, 'hit');
@@ -1552,6 +1590,16 @@ function applyAbility(
     const isSpell = ability.school !== 'physical';
     spendAbilityCost(ctx, p, meta, res);
     armAbilityCooldown(p, ability.id, res.cooldown, togglingOff, res.bonusCharges ?? 0);
+    const generated = res.effects.filter((effect) => effect.type === 'gainResource');
+    for (const effect of generated) {
+      if (effect.type === 'gainResource') {
+        p.resource = Math.min(p.maxResource, p.resource + effect.amount);
+      }
+    }
+    const impactRes =
+      generated.length > 0
+        ? { ...res, effects: res.effects.filter((effect) => effect.type !== 'gainResource') }
+        : res;
     ctx.emit({
       type: 'spellfx',
       sourceId: p.id,
@@ -1560,6 +1608,8 @@ function applyAbility(
       // A spell may override the flying-bolt visual (e.g. Lightning Bolt draws a
       // jagged electric strike); the projectile MECHANIC below is unchanged.
       fx: ability.projectileFx ?? 'projectile',
+      abilityId: ability.id,
+      ...(ability.class === 'hunter' ? { projectileStyle: 'hunter-arrow' as const } : {}),
       ...(isSpell ? {} : { attackAnimation: 'ranged-shot' as const }),
     });
     // The bolt is now in flight: its hit roll and effects resolve when it reaches the
@@ -1571,7 +1621,7 @@ function applyAbility(
     // Taunts (e.g. Sacred Goad) ALWAYS land: a resisted taunt would silently break
     // tanking, so a taunt ability skips the resist roll entirely (physical taunts like
     // Goad / Menace already never roll, since they resolve instantly below).
-    const isTaunt = res.effects.some((eff) => eff.type === 'taunt');
+    const isTaunt = impactRes.effects.some((eff) => eff.type === 'taunt');
     scheduleProjectile(ctx, p, target, (src, tgt) => {
       if (isSpell && !isTaunt && isSpellResisted(ctx.rng, src.level, tgt.level, src.hitBonus)) {
         ctx.emit({
@@ -1587,7 +1637,7 @@ function applyAbility(
         ctx.enterCombat(src, tgt);
         return;
       }
-      ctx.runEffects(src, meta, tgt, res, !isSpell);
+      ctx.runEffects(src, meta, tgt, impactRes, !isSpell);
     });
     // 'spellCast' set procs (Clearcasting) roll at CAST COMPLETION, matching the
     // trigger name: the cast is done even though the bolt is still in flight (a

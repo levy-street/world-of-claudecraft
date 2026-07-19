@@ -187,7 +187,7 @@ describe('Guide generated class content', () => {
     expect(GUIDE_CLASSES).toHaveLength(9);
     for (const c of GUIDE_CLASSES) {
       expect(c.color).toMatch(/^#[0-9a-f]{6}$/);
-      expect(['rage', 'mana', 'energy']).toContain(c.resource);
+      expect(['rage', 'mana', 'energy', 'focus']).toContain(c.resource);
       expect(c.roles.length).toBeGreaterThan(0);
       expect(c.specs.length).toBeGreaterThan(0);
       expect(c.signatureAbilities.length).toBeGreaterThan(0);
@@ -204,6 +204,16 @@ describe('Guide generated class content', () => {
       for (const a of c.signatureAbilities) {
         expect(t(`guide.abilityHook.${a.id}` as never).length).toBeGreaterThan(0);
       }
+    }
+  });
+
+  it('labels Hunter abilities that belong only to Survival', () => {
+    const hunter = GUIDE_CLASSES.find((entry) => entry.id === 'hunter');
+    expect(hunter).toBeDefined();
+    for (const abilityId of ['raptor_strike', 'mongoose_bite']) {
+      expect(hunter?.abilities.find((ability) => ability.id === abilityId)?.specializations).toEqual([
+        'survival',
+      ]);
     }
   });
 
@@ -230,6 +240,11 @@ describe('Guide generated class content', () => {
     ]) {
       expect(t(k as never).length).toBeGreaterThan(0);
     }
+    for (const resource of new Set(GUIDE_CLASSES.map((guideClass) => guideClass.resource))) {
+      expect(t(`guide.resourceName.${resource}` as never)).not.toBe(
+        `guide.resourceName.${resource}`,
+      );
+    }
     // the "things I wish I knew" page builds its item keys by index (cast keys)
     for (let n = 1; n <= 8; n += 1) {
       expect(t(`guide.wishPage.i${n}Title` as never).length).toBeGreaterThan(0);
@@ -241,17 +256,13 @@ describe('Guide generated class content', () => {
     }
   });
 
-  it('matches the sim (regenerating leaves the committed file unchanged)', () => {
+  it('matches the sim (regeneration is idempotent)', () => {
+    const generatedPath = new URL('../src/guide/content.generated.ts', import.meta.url);
+    const before = readFileSync(generatedPath, 'utf8');
     execFileSync('node', ['scripts/wiki/build_content.mjs'], {
       cwd: new URL('..', import.meta.url),
     });
-    // No diff means the committed content is derived from the current sim data.
-    expect(() =>
-      execFileSync('git', ['diff', '--exit-code', '--', 'src/guide/content.generated.ts'], {
-        cwd: new URL('..', import.meta.url),
-        encoding: 'utf8',
-      }),
-    ).not.toThrow();
+    expect(readFileSync(generatedPath, 'utf8')).toBe(before);
   });
 });
 

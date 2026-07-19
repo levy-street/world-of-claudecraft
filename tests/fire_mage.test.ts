@@ -413,7 +413,10 @@ describe('the personal-barrier slot', () => {
     const p = sim.player;
     p.resource = p.maxResource;
     const mob = addDummy(sim);
-    sim.castAbility('blazing_barrier'); // 130 absorb, the FIRE barrier
+    sim.castAbility('blazing_barrier');
+    const initialBarrier =
+      p.auras.find((aura) => aura.id === 'blazing_barrier' && aura.kind === 'absorb')?.value ?? 0;
+    const breakHeal = Math.round(p.maxHp * 0.1);
     const deal = (n: number) =>
       (
         sim as unknown as {
@@ -430,10 +433,12 @@ describe('the personal-barrier slot', () => {
       ).dealDamage(mob, p, n, false, 'physical', null, 'hit');
     p.hp -= 100;
     const hp0 = p.hp;
-    deal(100); // cut to 85, fully soaked (130 -> 45)
+    deal(100);
     expect(p.hp).toBe(hp0);
-    deal(100); // cut to 85, 45 soaked, the break heals 39, 40 lands
-    expect(p.hp).toBe(hp0 + 39 - 40);
+    const remainingBarrier = initialBarrier - 85;
+    const landingDamage = 85 - remainingBarrier;
+    deal(100);
+    expect(p.hp).toBe(hp0 + breakHeal - landingDamage);
   });
 
   it('Cold Snap finishes the Blazing Barrier cooldown too', () => {

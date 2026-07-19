@@ -29,6 +29,7 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'spellvuln',
   'lockout',
   'vulnerability',
+  'hunter_mark',
   'hex',
   'tongues',
   'cost_tax',

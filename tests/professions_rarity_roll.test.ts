@@ -65,11 +65,16 @@ describe('material rarity roll (#1122)', () => {
     const denied = resolveHarvest(meta, node, 500, rng);
     expect(denied.granted).toBe(false);
     expect(denied.rarity).toBeUndefined();
+    expect(denied.qty).toBeUndefined();
+    expect(denied.rareEvent).toBeUndefined();
     expect(draws).toBe(0);
-    // The same rng then serves the granted path with exactly one draw.
+    // The same rng then serves the granted path with exactly TWO draws (the
+    // Phase 4 pinned contract: draw #1 rollMaterialRarity, draw #2
+    // rollGatherRareEvent; see tests/gather_rare_events.test.ts for the
+    // order pin).
     const granted = resolveHarvest(meta, node, 1000, rng);
     expect(granted.granted).toBe(true);
-    expect(draws).toBe(1);
+    expect(draws).toBe(2);
   });
 
   it('the proficiency ceiling is pinned to 100', () => {

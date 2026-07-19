@@ -26,6 +26,7 @@ import { tickTemporalHourglassGround } from './combat/temporal_hourglass';
 import { DELVES, DUNGEON_X_THRESHOLD, dungeonAt, zoneAt } from './data';
 import { clearDrownedLitanyBellsAndMarks } from './delves/drowned_litany_boss';
 import { recalcPlayerStats } from './entity';
+import { isFreezingTrap, triggerFreezingTrap } from './hunter_base_abilities';
 import { aurasSurvivingDeath } from './resurrection';
 import type { SimContext } from './sim_context';
 import type { Entity, SimEvent, Vec3 } from './types';
@@ -52,6 +53,9 @@ export type GroundAoE = {
   ability: string;
   // Spell Power added per tick, snapshotted at cast time (caster ground AoEs).
   spBonus?: number;
+  freezingTrapDuration?: number;
+  freezingTrapId?: string;
+  visualEntityId?: number;
   // Rune of Power (mage choice row): a FRIENDLY zone. When set, each pulse
   // buffs allies inside (+allyBuffPct damage done, refreshed while they stand
   // near) instead of damaging hostiles; min/max are ignored and the pulse
@@ -201,6 +205,20 @@ export function drainDelayedEvents(ctx: SimContext): void {
 export function tickGroundAoEs(ctx: SimContext): void {
   for (let i = ctx.groundAoEs.length - 1; i >= 0; i--) {
     const effect = ctx.groundAoEs[i];
+    if (isFreezingTrap(effect)) {
+      effect.remaining -= DT;
+      const source = ctx.entities.get(effect.sourceId);
+      if (
+        !source ||
+        source.dead ||
+        triggerFreezingTrap(ctx, effect) ||
+        effect.remaining <= CAST_COMPLETE_EPS
+      ) {
+        ctx.dropEntity(effect.visualEntityId);
+        ctx.groundAoEs.splice(i, 1);
+      }
+      continue;
+    }
     const persistentSource = ctx.entities.get(effect.sourceId);
     const hourglassChangedRegion = Boolean(
       effect.temporalHourglass &&
@@ -293,7 +311,7 @@ export function releaseSpiritInDelve(ctx: SimContext, pid: number): void {
   p.resource =
     p.resourceType === 'mana'
       ? Math.round(p.maxResource * 0.5)
-      : p.resourceType === 'energy'
+      : p.resourceType === 'energy' || p.resourceType === 'focus'
         ? 100
         : 0;
   p.targetId = null;

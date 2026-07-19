@@ -73,7 +73,6 @@ describe('ClientWorld.deedsLeaderboard', () => {
           cls: 'warrior',
           level: 20,
           renown: 50,
-          deedCount: 2,
           title: 'prog_veteran',
         },
       ],

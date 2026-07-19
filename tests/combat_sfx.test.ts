@@ -126,10 +126,14 @@ describe('combat SFX policy', () => {
     expect(mobVoiceCue('water_elemental', 'hurt')).toBe('mob_water_elemental_attack');
     expect(mobVoiceFamily('stormcrag_elemental')).toBe('elemental');
   });
-  it('suppresses crit stingers for boss targets only', () => {
+  it('suppresses the crit ding for a boss but not the Training Dummy', () => {
     expect(shouldPlayCritSfxForTarget(target('mob', 'nythraxis_scourge_of_thornpeak'))).toBe(false);
     expect(shouldPlayCritSfxForTarget(target('mob', 'nythraxis_skeleton_warrior'))).toBe(true);
     expect(shouldPlayCritSfxForTarget(target('player', 'warrior'))).toBe(true);
+    // 2026-07-19 follow-up to #2116: the dummy still gets the plain crit
+    // ding (only the hurt-bark vocalization is suppressed for it, see
+    // mobVoiceActionForDamage below).
+    expect(shouldPlayCritSfxForTarget(target('mob', 'training_dummy'))).toBe(true);
   });
 
   it('suppresses Nythraxis add voice barks without muting ordinary undead', () => {
@@ -159,6 +163,38 @@ describe('combat SFX policy', () => {
         fx: 'projectile',
       }),
     ).toEqual({ key: 'melee_bow', anchorId: 10 });
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'physical',
+        fx: 'projectile',
+        abilityId: 'kill_shot',
+      }),
+    ).toEqual({ key: 'melee_bow', anchorId: 10 });
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'physical',
+        fx: 'projectile',
+        abilityId: 'aimed_shot',
+      }),
+    ).toEqual({ key: 'combat_hunter_aimed_shot', anchorId: 10 });
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'physical',
+        fx: 'projectile',
+        abilityId: 'auto_shot',
+      }),
+    ).toEqual({ key: 'combat_hunter_auto_shot', anchorId: 10 });
+    expect('combat_hunter_aimed_shot' in SFX_CLIPS).toBe(true);
+    expect('combat_hunter_auto_shot' in SFX_CLIPS).toBe(true);
     for (const school of ['fire', 'frost', 'arcane', 'shadow', 'holy', 'nature']) {
       const cue = spellFxCue({
         type: 'spellfx',
@@ -254,6 +290,21 @@ describe('combat SFX policy', () => {
     ).toBeNull();
   });
 
+  it('uses the dedicated arrow impact for Hunter Auto Shot hits', () => {
+    expect(
+      impactCueForDamage(
+        damage({ ability: 'Auto Shot', school: 'physical' }),
+        target('mob', 'forest_wolf'),
+      ),
+    ).toBe('impact_hunter_arrow');
+    expect(
+      impactCueForDamage(
+        damage({ ability: 'Attack', school: 'physical' }),
+        target('mob', 'forest_wolf'),
+      ),
+    ).toBe('impact_flesh');
+  });
+
   it('preserves v0.25 mob families and loaded subfamily overrides', () => {
     expect(mobVoiceFamily('mudfin_murloc')).toBe('mudfin');
     expect(mobVoiceCue('mudfin_murloc', 'aggro')).toBe('mob_mudfin_aggro');
@@ -340,13 +391,17 @@ describe('combat SFX policy', () => {
     expect(Object.keys(MOB_VOICE_CUES).sort()).toEqual([...SFX_MOB_EXTENSION_FAMILIES].sort());
   });
 
-  it('requests a hurt reaction only for a crit against a non-boss mob', () => {
+  it('requests a hurt reaction only for a crit against a non-boss, non-dummy mob', () => {
     const mob = target('mob', 'crypt_shambler');
     const boss = target('mob', 'nythraxis_scourge_of_thornpeak');
+    const dummy = target('mob', 'training_dummy');
     const player = target('player', 'warrior');
     expect(mobVoiceActionForDamage(damage({ crit: true }), mob)).toBe('hurt');
     expect(mobVoiceActionForDamage(damage({ crit: false }), mob)).toBeNull();
     expect(mobVoiceActionForDamage(damage({ crit: true }), boss)).toBeNull();
+    // The dummy is excluded from the hurt bark specifically, even though it
+    // still gets the plain crit ding (shouldPlayCritSfxForTarget, tested above).
+    expect(mobVoiceActionForDamage(damage({ crit: true }), dummy)).toBeNull();
     expect(mobVoiceActionForDamage(damage({ crit: true }), player)).toBeNull();
   });
 
@@ -382,11 +437,17 @@ describe('combat SFX policy', () => {
     expect(weaponSwingCue(druid)).toBe('melee_unarmed');
   });
 
-  it('plays attempted physical swings for avoidance but not magic or Auto Shot impact', () => {
+  it('plays attempted physical swings for avoidance but not magic or ranged launch impacts', () => {
     const warrior = target('player', 'warrior');
     expect(playerSwingCueForDamage(damage({ kind: 'miss' }), warrior)).toBe('melee_swing_blade');
     expect(playerSwingCueForDamage(damage({ kind: 'dodge' }), warrior)).toBe('melee_swing_blade');
     expect(playerSwingCueForDamage(damage({ school: 'fire' }), warrior)).toBeNull();
     expect(playerSwingCueForDamage(damage({ ability: 'Auto Shot' }), warrior)).toBeNull();
+    expect(
+      playerSwingCueForDamage(
+        damage({ ability: 'Aimed Shot', attackAnimationStarted: true }),
+        warrior,
+      ),
+    ).toBeNull();
   });
 });

@@ -8,6 +8,7 @@ import {
 } from '../src/sim/content/talents';
 import {
   abilityScalingPower,
+  absorbBonus,
   channelTickBonus,
   directHealBonus,
   directHitBonus,
@@ -35,6 +36,7 @@ function required<T>(value: T | undefined): T {
 
 const SC: AbilityScaling = { spellPower: 80, rangedPower: 200, attackPower: 140 };
 const ARCANE_MODS = { ...emptyModifiers(), spec: 'arcane' as const };
+const FROST_MODS = { ...emptyModifiers(), spec: 'frost' as const };
 const PROT_MODS = computeTalentModifiers('warrior', {
   ...emptyAllocation(),
   spec: 'prot',
@@ -134,6 +136,13 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
     const eff = required(heal.effects.find((e) => e.type === 'heal'));
     expect(abilityDamageBonus(heal, eff, SC)).toBe(directHealBonus(SC.spellPower, heal.castTime));
     expect(abilityDamageBonus(heal, eff, SC)).toBeGreaterThan(0);
+  });
+
+  it('a personal mage barrier shows the same Spell Power bonus combat applies', () => {
+    const barrier = known('mage', 'ice_barrier', FROST_MODS);
+    const eff = required(barrier.effects.find((e) => e.type === 'absorb'));
+    if (eff.type !== 'absorb') throw new Error('expected absorb');
+    expect(abilityDamageBonus(barrier, eff, SC)).toBe(absorbBonus(SC.spellPower, 0.5));
   });
 
   it('a pure HoT folds Spell Power across all its ticks; a hybrid HoT rider does not', () => {

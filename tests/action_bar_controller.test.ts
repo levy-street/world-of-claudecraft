@@ -68,11 +68,51 @@ function makeHarness(
 }
 
 describe('ActionBarController form persistence', () => {
-  it('keeps the public bar contract at one attack slot plus 22 configurable slots', () => {
-    expect(ACTION_BAR_ABILITY_SLOTS).toBe(22);
+  it('keeps the public bar contract at one attack slot plus 33 configurable slots', () => {
+    expect(ACTION_BAR_ABILITY_SLOTS).toBe(33);
   });
 
-  it('round-trips source slot 20 through the existing 22-slot storage model', () => {
+  it('extends a saved two-row bar with an empty third row without losing bindings', () => {
+    const storage = new MemoryStorage();
+    const legacy = Array.from(
+      { length: 22 },
+      (_, index): HotbarAction => (index === 0 ? { type: 'ability', id: 'sunder_armor' } : null),
+    );
+    storage.setItem('woc_hotbar_warrior_ActionbarTester', JSON.stringify(legacy));
+    const { controller } = makeHarness('warrior', ['sunder_armor'], bar(), storage);
+
+    controller.init();
+
+    expect(controller.actions).toHaveLength(33);
+    expect(controller.actions[0]).toEqual({ type: 'ability', id: 'sunder_armor' });
+    expect(controller.actions.slice(22)).toEqual(Array.from({ length: 11 }, () => null));
+  });
+
+  it('persists the last third-row slot independently across Druid forms and reloads', () => {
+    const storage = new MemoryStorage();
+    const first = makeHarness('druid', ['wrath', 'bear_form', 'claw'], bar(), storage);
+    const caster = bar();
+    caster[32] = { type: 'ability', id: 'wrath' };
+    first.controller.replaceActions(caster);
+    first.controller.saveActions();
+
+    first.state.auras = ['form_bear'];
+    first.controller.syncActiveForm();
+    const bear = bar();
+    bear[32] = { type: 'ability', id: 'claw' };
+    first.controller.replaceActions(bear);
+    first.controller.saveActions();
+
+    const reloaded = makeHarness('druid', ['wrath', 'bear_form', 'claw'], bar(), storage);
+    reloaded.controller.init();
+    expect(reloaded.controller.actions[32]).toEqual({ type: 'ability', id: 'wrath' });
+
+    reloaded.state.auras = ['form_bear'];
+    reloaded.controller.syncActiveForm();
+    expect(reloaded.controller.actions[32]).toEqual({ type: 'ability', id: 'claw' });
+  });
+
+  it('round-trips source slot 20 through the expanded storage model', () => {
     const storage = new MemoryStorage();
     const slot20Bar = bar();
     slot20Bar[19] = { type: 'ability', id: 'sinister_strike' };

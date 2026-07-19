@@ -26,7 +26,7 @@ import {
   ZONES,
 } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
-import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
+import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
@@ -62,7 +62,11 @@ describe('content referential integrity', () => {
           }
           if (obj.itemId) {
             if (!ITEMS[obj.itemId]) problems.push(`${q.id}: gather item ${obj.itemId} missing`);
-            if (!Object.values(NODE_HARVEST_TABLE).some((entry) => entry.itemId === obj.itemId)) {
+            if (
+              !Object.values(NODE_MATERIAL_TABLE).some((byZone) =>
+                Object.values(byZone).some((row) => row.itemId === obj.itemId),
+              )
+            ) {
               problems.push(`${q.id}: gather item ${obj.itemId} has no node source`);
             }
           }

@@ -3686,6 +3686,7 @@ function c5AutoAttack(): Scenario {
       const mage = sim.addPlayer('mage', 'Mg') as number;
       const ids = [warrior, rogue, hunterM, hunterR, mage];
       for (const pid of ids) sim.setPlayerLevel(15, pid);
+      sim.setSpec('survival', hunterM);
       const eWarrior = sim.entities.get(warrior) as AnyEntity;
       const eRogue = sim.entities.get(rogue) as AnyEntity;
       const eHunterM = sim.entities.get(hunterM) as AnyEntity;
@@ -4291,6 +4292,68 @@ function professionsCraft(seed = 21): Scenario {
   };
 }
 
+// Gathering (Professions 2.0 Phase 4): the zone-material harvest path. Pins the
+// two-draw-per-harvest contract (draw #1 rollMaterialRarity, draw #2
+// rollGatherRareEvent) in the draw-order digest, the zero-draw cooldown denial,
+// the proficiency-0 fungible grant, the max-proficiency signed yield, and a
+// hunted rare-event hit (gatherRareEvent zone broadcast + x5 signed yield +
+// gatherResult qty/rareEvent payload) inside a fixed 100-harvest window.
+//
+// Seed HUNTED (bounded scan from seed 1 upward over this exact drive sequence,
+// not committed) so the herb window's rare-event draw hits inside the recorded
+// run with no bags-full denial; only the found literal is pinned here.
+function professionsGather(seed = 3): Scenario {
+  return {
+    name: 'professions_gather',
+    coverage: [
+      'class:warrior (gatherer)',
+      'granted harvest: exactly two rng draws (rarity roll then rare-event roll)',
+      'cooldown denial: zero rng draws',
+      'proficiency-0 grant: common rarity, fungible zone material (copper_ore)',
+      'max-proficiency wood harvest: rarity ladder off the proficiency ceiling',
+      'rare gather event: hunted hit in the herb window, gatherRareEvent fanout + x5 signed yield',
+      'gatherResult qty/rareEvent payload fields',
+    ],
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      const pid = sim.playerId as number;
+      const meta = sim.players.get(pid) as any;
+      const p = sim.player as AnyEntity;
+
+      // Phase 1: proficiency-0 ore harvest (common, fungible grant) plus an
+      // immediate second attempt denied by the player's own cooldown, which
+      // must add ZERO draws to the digest.
+      teleport(sim, p, -70, -53); // ore_eastbrook_1
+      sim.harvestNode('ore_eastbrook_1', pid);
+      sim.harvestNode('ore_eastbrook_1', pid); // denied: own timer, no draw
+      rec.snapshot('harvest-ore-common-and-denial');
+      rec.tick(2);
+
+      // Phase 2: max-proficiency wood harvest: the rarity roll runs at the
+      // proficiency ceiling (zero common weight), so the rolled tier plus the
+      // signed-or-fungible grant shape land in the state sample.
+      meta.gatheringProficiency.logging = 100;
+      teleport(sim, p, -62, 8); // wood_eastbrook_1
+      sim.harvestNode('wood_eastbrook_1', pid);
+      rec.snapshot('harvest-wood-max-proficiency');
+      rec.tick(2);
+
+      // Phase 3: the rare-event window. Repeated herb harvests with the
+      // per-player cooldown cleared advance the shared stream exactly two
+      // draws per harvest; the hunted seed hits the 1/90 rare event inside
+      // this fixed window (gatherRareEvent + the forced-signed x5 yield).
+      teleport(sim, p, -86, 90); // herb_eastbrook_1
+      for (let i = 0; i < 100; i++) {
+        delete meta.nodeHarvestReadyAt.herb_eastbrook_1;
+        sim.harvestNode('herb_eastbrook_1', pid);
+      }
+      rec.snapshot('rare-event-window');
+      rec.tick(2);
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -4346,4 +4409,5 @@ export const SCENARIOS: Scenario[] = [
   playerTrade(),
   chatSocial(),
   professionsCraft(),
+  professionsGather(),
 ];

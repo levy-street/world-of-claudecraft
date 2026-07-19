@@ -6,14 +6,33 @@
 // stays in Hud (open<Window>/close<Window>), same as vendor_window.ts.
 
 import { craftNameText } from './char_window';
-import type { CraftingView } from './crafting_view';
+import type { CraftDifficulty, CraftingView } from './crafting_view';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
+import { QUALITY_COLOR } from './icons';
 import type { PainterHostPresentation } from './painter_host';
 import { renderProfessionIdentityCard } from './profession_identity_card';
 import type { ProfessionIdentityModel } from './profession_identity_view';
 import { svgIcon } from './ui_icons';
+
+// Skill-gain difficulty tint, reusing the static quality palette the HUD's
+// item surfaces already share (icons.ts): the classic recipe-color intuition
+// (orange = full gains, green = some, gray = none). A tint is only ever a
+// HINT here: the adjacent difficulty LABEL and the aria text carry the same
+// information, and both are identical on every graphics preset/tier
+// (docs/design/graphics-settings-fairness.md).
+const DIFFICULTY_TINT: Record<CraftDifficulty, string> = {
+  full: QUALITY_COLOR.legendary,
+  reduced: QUALITY_COLOR.uncommon,
+  none: QUALITY_COLOR.poor,
+};
+
+const DIFFICULTY_LABEL_KEY = {
+  full: 'hudChrome.crafting.difficultyFull',
+  reduced: 'hudChrome.crafting.difficultyReduced',
+  none: 'hudChrome.crafting.difficultyNone',
+} as const;
 
 export interface CraftingWindowDeps extends PainterHostPresentation {
   hideTooltip(): void;
@@ -85,20 +104,47 @@ export function renderCraftingWindow(
             tier: formatNumber(row.comboRequirement.minTier, { maximumFractionDigits: 0 }),
           })
         : '';
+      // tier_unmet names ONLY the under-tier craft(s) (the acceptance
+      // criterion: the player can tell WHICH craft to raise from the row
+      // alone); the localized names join like the reagent list above. The
+      // param-less comboTierUnmet stays the defensive fallback for an
+      // eligibility result that names no craft.
       const comboStatus = row.comboRequirement
-        ? t(
-            row.comboRequirement.reason === null
-              ? 'hudChrome.crafting.comboMet'
-              : row.comboRequirement.reason === 'syncing'
-                ? 'hudChrome.crafting.comboSyncing'
-                : row.comboRequirement.reason === 'not_attuned'
-                  ? 'hudChrome.crafting.comboNotAttuned'
-                  : row.comboRequirement.reason === 'wrong_pair'
-                    ? 'hudChrome.crafting.comboWrongPair'
-                    : 'hudChrome.crafting.comboTierUnmet',
-          )
+        ? row.comboRequirement.reason === 'tier_unmet' &&
+          row.comboRequirement.unmetCrafts.length > 0
+          ? t('hudChrome.crafting.comboTierUnmetNamed', {
+              crafts: row.comboRequirement.unmetCrafts.map((c) => craftNameText(c)).join(', '),
+              tier: formatNumber(row.comboRequirement.minTier, { maximumFractionDigits: 0 }),
+            })
+          : t(
+              row.comboRequirement.reason === null
+                ? 'hudChrome.crafting.comboMet'
+                : row.comboRequirement.reason === 'syncing'
+                  ? 'hudChrome.crafting.comboSyncing'
+                  : row.comboRequirement.reason === 'not_attuned'
+                    ? 'hudChrome.crafting.comboNotAttuned'
+                    : row.comboRequirement.reason === 'wrong_pair'
+                      ? 'hudChrome.crafting.comboWrongPair'
+                      : 'hudChrome.crafting.comboTierUnmet',
+            )
         : '';
       const comboAccessible = comboLine ? `. ${comboLine} ${comboStatus}` : '';
+
+      // Phase 6 legibility: the skill-req line, the skill-gain difficulty
+      // label, and the hub-station badge. All three are actionable info, so
+      // each is TEXT (tint is a redundant hint), folded into the aria name,
+      // and identical on every graphics preset/tier.
+      const skillLine = t('hudChrome.crafting.skillReqLine', {
+        craft: craftNameText(row.professionId),
+        skill: formatNumber(row.skillReq, { maximumFractionDigits: 0 }),
+      });
+      const difficultyLabel = t(DIFFICULTY_LABEL_KEY[row.difficulty]);
+      const stationLabel = row.station ? t('hudChrome.crafting.stationBadge') : '';
+      const stationOutOfRange =
+        row.station && !row.station.inRange ? t('hudChrome.crafting.stationOutOfRange') : '';
+      const stationAccessible = row.station
+        ? `. ${stationLabel}${stationOutOfRange ? `. ${stationOutOfRange}` : ''}`
+        : '';
 
       const icon = row.result ? deps.itemIcon(row.result) : '';
       const craftBtn = document.createElement('button');
@@ -109,7 +155,7 @@ export function renderCraftingWindow(
       // tooltip, which keyboard, screen-reader, and mobile no-hover users never reach).
       craftBtn.setAttribute(
         'aria-label',
-        `${t('hudChrome.crafting.resultAria', { name: resultName })}. ${t('hudChrome.crafting.reagentsNeeded')} ${reagentLines}${comboAccessible}`,
+        `${t('hudChrome.crafting.resultAria', { name: resultName })}. ${t('hudChrome.crafting.reagentsNeeded')} ${reagentLines}. ${skillLine}. ${difficultyLabel}${stationAccessible}${comboAccessible}`,
       );
       const resultCountSuffix =
         row.resultCount > 1
@@ -119,14 +165,17 @@ export function renderCraftingWindow(
       // player can see at a glance which reagents and counts a recipe needs, and
       // the :disabled opacity (components.css .vendor-item:disabled) makes an
       // unaffordable recipe visually distinct without hovering.
-      craftBtn.innerHTML = `${icon}<span class="vi-name">${esc(resultName)}${esc(resultCountSuffix)}<span class="vi-sub">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${esc(reagentLines)}</span></span><span class="vi-price">${esc(t('hudChrome.crafting.craft'))}</span>`;
+      const stationBadgeHtml = row.station
+        ? `<span class="crafting-station-badge${row.station.inRange ? '' : ' out-of-range'}">${esc(stationLabel)}</span>`
+        : '';
+      craftBtn.innerHTML = `${icon}<span class="vi-name">${esc(resultName)}${esc(resultCountSuffix)}<span class="vi-sub">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${esc(reagentLines)}</span><span class="vi-sub crafting-skill-line">${esc(skillLine)} <span class="crafting-difficulty" data-difficulty="${esc(row.difficulty)}" style="color:${DIFFICULTY_TINT[row.difficulty]}">${esc(difficultyLabel)}</span>${stationBadgeHtml}</span></span><span class="vi-price">${esc(t('hudChrome.crafting.craft'))}</span>`;
       craftBtn.addEventListener('click', () => {
         if (row.craftable) deps.onCraft(row.recipeId);
       });
       deps.attachTooltip(
         craftBtn,
         () =>
-          `${row.result ? deps.itemTooltip(row.result) : ''}<div class="tt-sub">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${esc(reagentLines)}</div>${comboLine ? `<div class="tt-sub">${esc(comboLine)} ${esc(comboStatus)}</div>` : ''}`,
+          `${row.result ? deps.itemTooltip(row.result) : ''}<div class="tt-sub">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${esc(reagentLines)}</div><div class="tt-sub">${esc(skillLine)} ${esc(difficultyLabel)}</div>${row.station ? `<div class="tt-sub">${esc(stationLabel)}${stationOutOfRange ? ` ${esc(stationOutOfRange)}` : ''}</div>` : ''}${comboLine ? `<div class="tt-sub">${esc(comboLine)} ${esc(comboStatus)}</div>` : ''}`,
       );
       item.appendChild(craftBtn);
       if (comboLine) {
@@ -137,6 +186,17 @@ export function renderCraftingWindow(
         comboNote.setAttribute('aria-hidden', 'true');
         comboNote.textContent = `${comboLine} ${comboStatus}`;
         item.appendChild(comboNote);
+      }
+      if (stationOutOfRange) {
+        // Same pattern as the combo note above: a station-disabled Craft button
+        // must never read as a bare disabled button, so the reason sits
+        // adjacent, outside the button's :disabled opacity. aria-hidden because
+        // the button's aria-label already carries the same sentence.
+        const stationNote = document.createElement('div');
+        stationNote.className = 'crafting-combo-requirement crafting-station-requirement';
+        stationNote.setAttribute('aria-hidden', 'true');
+        stationNote.textContent = stationOutOfRange;
+        item.appendChild(stationNote);
       }
       el.appendChild(item);
     }

@@ -608,7 +608,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // `TOOL_RECIPE_STUBS`, de-stubbed into src/sim/content/recipes.ts once
   // #1127's crafting action existed to consume them). `kind: 'junk'`, same
   // generic-material shape as bone_fragments/linen_scrap/spider_leg below:
-  // not gathered from a dedicated node yet (see gathering.ts NODE_HARVEST_TABLE).
+  // The ore/log/herb entries are also node-gathered since Phase 4 (the
+  // mirefen_marsh/thornpeak_heights rows of gathering.ts NODE_MATERIAL_TABLE);
+  // arcanite_bar stays vendor-only.
   // Sold by Quartermaster Bree at the Highwatch hub (zone3.ts) so every hub
   // recipe has a live reagent source; buyValue is the trade-goods staple
   // markup already used in this file (4x sellValue, travelers_knapsack's
@@ -665,6 +667,39 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     sellValue: 40,
     buyValue: 160,
+  },
+  // Low-tier gathering-node materials (Professions 2.0 Phase 4): the
+  // eastbrook_vale and mirefen_marsh rows of gathering.ts NODE_MATERIAL_TABLE.
+  // Node-gathered only, so no buyValue (not vendor-stocked); tier is read from
+  // sellValue exactly like the reagents above, and the same common-quality
+  // house rule applies (never poor, or sellAllJunk would vendor them).
+  copper_ore: {
+    id: 'copper_ore',
+    name: 'Copper Ore',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 4,
+  },
+  iron_ore: {
+    id: 'iron_ore',
+    name: 'Iron Ore',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 8,
+  },
+  ironbark_log: {
+    id: 'ironbark_log',
+    name: 'Ironbark Log',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 4,
+  },
+  silverleaf_herb: {
+    id: 'silverleaf_herb',
+    name: 'Silverleaf Herb',
+    kind: 'junk',
+    quality: 'common',
+    sellValue: 4,
   },
   // Cosmetic event reward: using it rolls a rarity rank (server-side) and opens
   // the skin-select overlay. See src/sim/content/skins.ts. Dev-grant for now.

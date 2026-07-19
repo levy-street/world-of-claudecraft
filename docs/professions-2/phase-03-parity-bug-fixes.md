@@ -5,6 +5,17 @@ Release PR 2045 landed the instance-preserving trade fix on release/v0.27.0 (reg
 `tests/trade.test.ts`) before this phase started, so the only remaining Phase 3 deliverable is the
 `harvestClaimedBy` mirror below. Re-verify against code at session start per the docs anchor rule.
 
+AS-LANDED DEVIATION (2026-07-17, Phase 3 merge a8c65a2c2, reviewed by cross-platform-sync): the
+instructions below to register `hcb` in `ALL_DELTA_KEYS` / `TERSE_TO_IWORLD` were mis-specified.
+`harvestClaimedBy` is a PER-ENTITY field, so `hcb` rides `dynamicFields` in `server/game.ts`
+(sparse emit, auto-delta via the per-entity wire cache; the `tap` key is the template), and those
+two registries pin selfWireJson maybe() SELF keys only (their scrape test asserts set-equality, so
+listing `hcb` there would break it). The as-landed pin set: the round-trip and live-broadcast
+suites in `tests/snapshots.test.ts` and `tests/corpse_harvest_sim.test.ts` (the sparse-absence
+assertion in snapshots is the no-bloat tooth; `tests/bandwidth.test.ts` stays green but carries no
+hcb-specific scenario). Authority: the Phase 3 LANDED entry in `state.md`. Read the registry
+instructions below through this note.
+
 This phase fixes the two known host-parity data bugs so item instances and corpse claims are
 truthful in every host: trades currently strip `ItemInstancePayload` (the `removePreferFungible`
 return is discarded), and `harvestClaimedBy` is hardcoded `null` in `ClientWorld`, so the online
@@ -27,8 +38,9 @@ survive trades; Phase 4 gathering trusts corpse claims), and neither adds new ga
 - `src/sim/professions/combo_eligibility.ts`: the shared combo gate both hosts must consume
   (the 2033 stub trap: verify liveness, not just member shape).
 - `tests/trade.test.ts`, `tests/corpse_harvest_sim.test.ts`: the suites to extend.
-- `tests/snapshots.test.ts`: the `ALL_DELTA_KEYS` / `TERSE_TO_IWORLD` wire pins; the existing
-  `prof`/`gprof`/`ncd`/`tfocus` self-wire keys are the pattern for `hcb`.
+- `tests/snapshots.test.ts`: the `ALL_DELTA_KEYS` / `TERSE_TO_IWORLD` wire pins (SELF keys only;
+  as landed, `hcb` is a per-entity `dynamicFields` key patterned on `tap`, see the deviation note
+  above).
 - `CLAUDE.md` (root) plus `src/sim/CLAUDE.md`, `src/net/CLAUDE.md`, `server/CLAUDE.md`,
   `src/ui/hud/CLAUDE.md`, `tests/CLAUDE.md`.
 
@@ -79,9 +91,10 @@ Spawn an Explore agent to read and summarize:
   src/ui/hud/CLAUDE.md, tests/CLAUDE.md
 The agent must return: exactly where trade.ts discards the removePreferFungible return and what
 that return contains; the full ItemInstancePayload shape (signer, charges, rolled, boundTo) and
-the instance-preserving grant helpers in bags.ts; the recipe for adding a delta-omitted terse
-wire key (server emit in wireEntity, ClientWorld mirror, ALL_DELTA_KEYS + TERSE_TO_IWORLD pin
-updates); how the corpse picker sources harvestClaimedBy; how the crafting view consumes
+the instance-preserving grant helpers in bags.ts; the recipe for adding a sparse per-entity terse
+wire key (dynamicFields emit in server/game.ts, ClientWorld mirror; ALL_DELTA_KEYS +
+TERSE_TO_IWORLD are for SELF keys only, see the deviation note at the top); how the corpse picker
+sources harvestClaimedBy; how the crafting view consumes
 combo_eligibility today in each host; and the existing test patterns in the three suites.
 
 STEP 2 - CHOOSE ORCHESTRATION + EXECUTE:
@@ -100,9 +113,9 @@ Agent trade (sim) deliverables:
   with the right payloads landing on the right granted items.
 
 Agent wire (server + net) deliverables:
-- harvestClaimedBy rides the wire: a new terse key (hcb), delta-omitted like the existing
-  prof/gprof/ncd/tfocus keys, emitted from wireEntity in server/game.ts and registered in
-  ALL_DELTA_KEYS and TERSE_TO_IWORLD (re-pin tests/snapshots.test.ts deliberately).
+- harvestClaimedBy rides the wire: a new terse key (hcb), sparse-emitted from wireEntity's
+  dynamicFields in server/game.ts (as landed; NOT the self-key registries, see the deviation
+  note at the top), pinned by the snapshots round-trip suite.
 - ClientWorld mirrors hcb in src/net/online.ts, replacing the hardcoded null.
 - The corpse picker in src/ui/hud/loot/loot_window_controller.ts no longer offers claimed
   corpses online, with a test against a ClientWorld-shaped stub.
@@ -120,9 +133,10 @@ INVARIANTS THIS PHASE MUST KEEP:
   harvesting, and every existing wire consumer keep working unchanged.
 - Server authority: the server resolves all trade and claim outcomes; the client only mirrors
   and renders (the picker filters on mirrored truth, it never decides claims).
-- Wire parity pins: every new terse key lands in ALL_DELTA_KEYS and TERSE_TO_IWORLD in the same
-  change; tests/snapshots.test.ts, tests/bandwidth.test.ts, and tests/world_api_parity.test.ts
-  stay green; hcb is delta-omitted and cheap.
+- Wire parity pins: every new SELF terse key lands in ALL_DELTA_KEYS and TERSE_TO_IWORLD in the
+  same change; a per-entity dynamicFields key (hcb, as landed) is pinned by its round-trip suite
+  instead; tests/snapshots.test.ts, tests/bandwidth.test.ts, and tests/world_api_parity.test.ts
+  stay green; hcb is sparse-emitted and cheap.
 - IWorld both worlds: any read the UI consumes exists on the facet and behaves identically in
   Sim and ClientWorld; verify liveness, not just member shape.
 - Determinism: all randomness via Rng; no Math.random, Date.now, or performance.now anywhere
@@ -173,8 +187,10 @@ STEP 5 - ACCEPTANCE CRITERIA (do not mark complete until all check):
       online corpse picker matches sim truth and no longer offers claimed corpses (stub test
       green)
 - [ ] The combo-gating liveness test passes with Sim-shaped and ClientWorld-shaped inputs
-- [ ] ALL_DELTA_KEYS and TERSE_TO_IWORLD pins updated deliberately; tests/snapshots.test.ts,
-      tests/bandwidth.test.ts (hcb is cheap), and tests/world_api_parity.test.ts green
+- [ ] hcb pinned per its as-landed shape (per-entity dynamicFields key: the snapshots round-trip
+      suite incl. the sparse-absence assertion; deliberately absent from ALL_DELTA_KEYS and
+      TERSE_TO_IWORLD); tests/snapshots.test.ts, tests/bandwidth.test.ts, and
+      tests/world_api_parity.test.ts green
 - [ ] tests/trade.test.ts, tests/corpse_harvest_sim.test.ts, tests/env_protocol.test.ts,
       tests/architecture.test.ts, npx tsc --noEmit, and npm run ci:changed all green
 - [ ] Mail and market still refuse instanced items (untouched)

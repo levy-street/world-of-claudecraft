@@ -104,7 +104,9 @@ describe('side rail height budget', () => {
   const BUDGET_PX = 660; // maximized 1366x768 usable viewport height
   const BOTTOM_ANCHOR_PX = 74; // #side-buttons { bottom: 74px }
   const COMPACT_MICRO_PX = 24; // .micro-btn height under @media (max-height: 720px)
-  const COMPACT_GAP_PX = 2; // #side-buttons gap under the same media query
+  // Tightened from 2px when the professions launcher became the 18th button:
+  // 128 + 18 * 26 + 74 = 670 broke the budget, 18 * 25 fits at 652.
+  const COMPACT_GAP_PX = 1; // #side-buttons gap under the same media query
   // The Daily Rewards chest block (button plus its gap) at the top of the rail,
   // from the reviewer's offline measurement of the rendered rail.
   const DAILY_CHEST_BLOCK_PX = 128;
@@ -114,7 +116,7 @@ describe('side rail height budget', () => {
     expect(hudCss).toMatch(
       /@media \(max-height: 720px\)[\s\S]*?#side-buttons \.micro-btn \{\s*height: 24px;/,
     );
-    expect(hudCss).toMatch(/@media \(max-height: 720px\)[\s\S]*?#side-buttons \{\s*gap: 2px;/);
+    expect(hudCss).toMatch(/@media \(max-height: 720px\)[\s\S]*?#side-buttons \{\s*gap: 1px;/);
     expect(hudCss).toMatch(/#side-buttons \{[^}]*bottom: 74px;/);
   });
 

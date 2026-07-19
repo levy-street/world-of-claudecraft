@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
+  ACTION_BAR_SLOTS,
   actionAllowsShared,
   actionKind,
   BIND_ACTIONS,
@@ -72,13 +73,39 @@ describe('registry', () => {
     expect(actionKind('nope')).toBe(null);
   });
 
-  it('covers the expected categories and 23 action-bar slots (attack + 11 primary + 11 secondary)', () => {
+  it('covers attack plus three rows of 11 configurable action-bar slots', () => {
     expect(BIND_CATEGORIES).toContain('Movement');
     expect(BIND_CATEGORIES).toContain('Action Bar');
-    expect(BIND_ACTIONS.filter((a) => a.category === 'Action Bar').length).toBe(23);
+    expect(ACTION_BAR_SLOTS).toBe(34);
+    expect(BIND_ACTIONS.filter((a) => a.category === 'Action Bar').length).toBe(34);
     // The secondary bar's slots exist and default to the numpad row.
     expect(BIND_ACTIONS.find((a) => a.id === 'slot12')?.defaults).toEqual(['Numpad1']);
     expect(BIND_ACTIONS.find((a) => a.id === 'slot22')?.defaults).toEqual(['NumpadDecimal']);
+    // The third row uses shifted numpad bindings so it remains distinct.
+    const thirdRowDefaults = [
+      'Shift+Numpad1',
+      'Shift+Numpad2',
+      'Shift+Numpad3',
+      'Shift+Numpad4',
+      'Shift+Numpad5',
+      'Shift+Numpad6',
+      'Shift+Numpad7',
+      'Shift+Numpad8',
+      'Shift+Numpad9',
+      'Shift+Numpad0',
+      'Shift+NumpadDecimal',
+    ];
+    expect(
+      BIND_ACTIONS.filter((a) => a.category === 'Action Bar')
+        .slice(23)
+        .map(({ id, label, defaults }) => ({ id, label, defaults })),
+    ).toEqual(
+      thirdRowDefaults.map((code, index) => ({
+        id: `slot${index + 23}`,
+        label: `Third Bar ${index + 1}`,
+        defaults: [code],
+      })),
+    );
     // Discord is a rebindable Interface window toggle (default U).
     const discord = BIND_ACTIONS.find((a) => a.id === 'discord');
     expect(discord?.category).toBe('Interface');
@@ -135,6 +162,10 @@ describe('Keybinds defaults', () => {
     // Bare Z sheathes; the Book of Deeds ships on the shifted layer of the same key.
     expect(kb.actionForCode('KeyZ')).toBe('sheathe');
     expect(kb.actionForCode('Shift+KeyZ')).toBe('deeds');
+    for (let index = 0; index < 11; index++) {
+      const suffix = index < 9 ? index + 1 : index === 9 ? 0 : 'Decimal';
+      expect(kb.actionForCode(`Shift+Numpad${suffix}`)).toBe(`slot${index + 23}`);
+    }
   });
 
   it('exposes primary/secondary codes and labels', () => {

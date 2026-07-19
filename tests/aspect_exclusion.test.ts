@@ -2,12 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/content/classes';
 import { Sim } from '../src/sim/sim';
 
-// The three hunter aspects are mutually exclusive: only one may be active at a
-// time. They are marked with the shared `exclusiveGroup: 'aspect'` and enforced
-// at the self-buff apply site (effect_dispatch).
+// Hawk is the maintenance aspect. Cheetah is a separate short movement cooldown,
+// so using it never removes Hawk.
 const makeHunter = (seed = 42) => {
   const sim = new Sim({ seed, playerClass: 'hunter', autoEquip: true });
-  sim.setPlayerLevel(14); // hawk(4) + monkey(10) + cheetah(14) all known
+  sim.setPlayerLevel(14); // hawk(4) + cheetah(14) known
   return sim;
 };
 
@@ -27,35 +26,17 @@ const castSelfBuff = (sim: Sim, id: string) => {
 };
 
 describe('hunter aspect mutual exclusion', () => {
-  it('marks all three aspects with the shared exclusive group', () => {
+  it('keeps Hawk as the sole maintenance aspect', () => {
     expect(ABILITIES.aspect_of_the_hawk.exclusiveGroup).toBe('aspect');
-    expect(ABILITIES.aspect_of_the_monkey.exclusiveGroup).toBe('aspect');
-    expect(ABILITIES.aspect_of_the_cheetah.exclusiveGroup).toBe('aspect');
+    expect(ABILITIES.aspect_of_the_monkey).toBeUndefined();
+    expect(ABILITIES.aspect_of_the_cheetah.exclusiveGroup).toBeUndefined();
   });
 
-  it('keeps only the most recently cast aspect active', () => {
+  it('lets the temporary Cheetah sprint coexist with a maintenance aspect', () => {
     const sim = makeHunter();
     castAspect(sim, 'aspect_of_the_hawk');
-    expect(aspectAuras(sim)).toEqual(['aspect_of_the_hawk']);
-
-    castAspect(sim, 'aspect_of_the_monkey');
-    expect(aspectAuras(sim)).toEqual(['aspect_of_the_monkey']);
-
-    castAspect(sim, 'aspect_of_the_cheetah');
-    expect(aspectAuras(sim)).toEqual(['aspect_of_the_cheetah']);
-  });
-
-  it('returns the swapped-out aspect stat to baseline (no stacking AP)', () => {
-    const sim = makeHunter();
-    const baseAp = sim.player.attackPower;
-
-    castAspect(sim, 'aspect_of_the_hawk'); // +AP
-    expect(sim.player.attackPower).toBeGreaterThan(baseAp);
-
-    // Switching to monkey must drop the hawk AP bonus, not run both at once.
-    castAspect(sim, 'aspect_of_the_monkey');
-    expect(sim.player.attackPower).toBe(baseAp);
-    expect(sim.player.auras.some((a) => a.id === 'aspect_of_the_hawk')).toBe(false);
+    sim.castAbility('aspect_of_the_cheetah');
+    expect(aspectAuras(sim)).toEqual(['aspect_of_the_hawk', 'aspect_of_the_cheetah']);
   });
 
   it('does not cancel non-aspect buffs when an aspect is cast', () => {
@@ -70,7 +51,7 @@ describe('hunter aspect mutual exclusion', () => {
     const run = () => {
       const sim = makeHunter(7);
       castAspect(sim, 'aspect_of_the_hawk');
-      castAspect(sim, 'aspect_of_the_cheetah');
+      sim.castAbility('aspect_of_the_cheetah');
       return aspectAuras(sim);
     };
     expect(run()).toEqual(run());

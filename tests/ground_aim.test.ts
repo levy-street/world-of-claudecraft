@@ -43,16 +43,25 @@ describe('ground_aim', () => {
     expect(aim.point.z).toBeCloseTo(8, 6);
   });
 
-  it('resolves radius from the first aoeDamage, groundAoE, or channel pulse effect', () => {
+  it('resolves radius from every supported ground-targeted area effect', () => {
     const aoeDamage: AbilityEffect[] = [{ type: 'aoeDamage', min: 1, max: 2, radius: 7 }];
     const groundAoE: AbilityEffect[] = [
       { type: 'groundAoE', min: 1, max: 2, radius: 8, duration: 4, interval: 1 },
     ];
     const channelPulse: AbilityEffect[] = [{ type: 'aoeDamage', min: 1, max: 2, radius: 9 }];
+    const freezingTrap: AbilityEffect[] = [
+      {
+        type: 'freezingTrap',
+        radius: 1.5,
+        trapDuration: 60,
+        incapacitateDuration: 8,
+      },
+    ];
 
     expect(abilityAoeRadius({ effects: aoeDamage })).toBe(7);
     expect(abilityAoeRadius({ effects: groundAoE })).toBe(8);
     expect(abilityAoeRadius({ effects: channelPulse })).toBe(9);
+    expect(abilityAoeRadius({ effects: freezingTrap })).toBe(1.5);
   });
 
   it('falls back when no area radius is present', () => {

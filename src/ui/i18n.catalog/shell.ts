@@ -44,7 +44,10 @@ export const shellStrings = {
       rendererFailed: 'Could not start the renderer: try reloading. {error}',
       enterTimeout: 'Could not enter world. The connection timed out. Is the game server running?',
       connectionLost: 'Connection to the server was lost.',
-      reconnecting: 'Connection lost. Reconnecting...',
+      reconnectingAttempt:
+        'Connection lost. Reconnecting... (attempt {attempt}/{maxAttempts}, retrying in {seconds}s)',
+      reconnectingNow: 'Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})',
+      slowConnection: 'This is taking longer than usual. Check your internet connection.',
       connectionRejected: 'The server closed the connection.',
       realmFull: 'This world is full right now. Please try again in a few minutes.',
       tooManyConnections:

@@ -306,6 +306,14 @@ export const ja_JP: EnTranslations = {
     "spectate": {
       "banner": "{name}を観戦中"
     },
+    "resource": {
+      "focus": "Focus",
+      "lowFocus": "Low Focus",
+      "notEnoughFocus": "Not enough focus!"
+    },
+    "hunter": {
+      "turtleAttackError": "You can't attack while protected by Aspect of the Turtle."
+    },
     "readyCheck": {
       "prompt": "{name} が準備確認を開始しました。準備はいいですか？",
       "ready": "準備完了",
@@ -750,6 +758,7 @@ export const ja_JP: EnTranslations = {
       "leaderboard": "ランキング",
       "dailyRewards": "ストア",
       "deeds": "功績",
+      "professions": "専門技能",
       "nameplates": "ネームプレート",
       "haptics": "振動",
       "hapticsOff": "振動オフ",
@@ -1039,6 +1048,7 @@ export const ja_JP: EnTranslations = {
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
+      "showThirdActionBar": "3本目のアクションバーを表示",
       "showTargetOfTarget": "ターゲットのターゲットを表示",
       "showAttackButton": "攻撃ボタンを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
@@ -1468,7 +1478,8 @@ export const ja_JP: EnTranslations = {
       "watchTwitch": "Twitch で視聴",
       "watchX": "X で見る",
       "watchKick": "Kick で視聴",
-      "watchYouTube": "YouTube で視聴"
+      "watchYouTube": "YouTube で視聴",
+      "streamerBadgeTitle": "認証済み配信者"
     },
     "lootSettings": {
       "title": "分配設定",
@@ -2082,7 +2093,9 @@ export const ja_JP: EnTranslations = {
       "mining": "採掘",
       "logging": "伐採",
       "herbalism": "薬草学",
-      "notReady": "この資源ノードはまだあなたのために再生していません。"
+      "notReady": "この資源ノードはまだあなたのために再生していません。",
+      "gatherLine": "{name}を採集した。",
+      "gatherLineQty": "{name}を{qty}個採集した。"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -2113,6 +2126,42 @@ export const ja_JP: EnTranslations = {
       "tailoring": "裁縫",
       "leatherworking": "皮革加工"
     },
+    "professions": {
+      "title": "専門技能",
+      "close": "専門技能を閉じる",
+      "ringAria": "技の輪",
+      "skillsHeader": "製作技能",
+      "gatheringHeader": "採集",
+      "perksHeader": "特典",
+      "identityHeader": "専門性",
+      "roleMajor": "主専攻",
+      "roleHobby": "趣味",
+      "roleDormant": "休眠中",
+      "roleUnattuned": "未調律",
+      "ceilingUnlimited": "強化上限なし",
+      "ceilingRare": "レア上限",
+      "ceilingCommon": "コモン上限",
+      "skillValue": "{skill} / {max}",
+      "tierPipAria": "ティア {tier}",
+      "nextUnlockTier": "次のティアまであと {points}：傑作の成功率が上がります",
+      "nextUnlockSpecialized": "専門化まであと {points}：素材コストが下がります",
+      "nextUnlockMax": "技能は最大です",
+      "perkSpecializedLine": "{craft}：専門化、素材コスト -{pct}%",
+      "perkSpecializedAt": "技能 {threshold} で専門化します",
+      "switchCost": "次のアーキタイプ切り替えには償いが {cost} 必要です",
+      "syncing": "サーバーから専門技能のデータを受信しています。",
+      "tutorialLine": "いずれかの技を技能 {target} まで上げると、最初のティアが解放されます。",
+      "ctaHeader": "次のステップ",
+      "ctaRaise": "{craft}を伸ばしましょう。次のティアまであと {points} です。",
+      "ctaStart": "いずれかの専門技能で製作か採集を行うと始まります。",
+      "unattunedIdentity": "まだアーキタイプに調律していません。技を伸ばし、調律を完了して組み合わせを選びましょう。",
+      "nudgeNearTier": "{craft}：次のティアまであと {points}",
+      "nudgeDormant": "{craft}の知識は休眠中です",
+      "hobbyLabel": "趣味：{craft}",
+      "majorsLabel": "主専攻：{a}と{b}",
+      "pairsHeld": "保持している組み合わせ：{count}",
+      "returnsLabel": "復帰：{count}"
+    },
     "crafting": {
       "title": "製作",
       "close": "製作を閉じる",
@@ -2131,6 +2180,7 @@ export const ja_JP: EnTranslations = {
       "comboNotAttuned": "先にアーキタイプの組み合わせを選んでください。",
       "comboWrongPair": "製作するには、この組み合わせを有効にしてください。",
       "comboTierUnmet": "両方の主専攻を必要ティアまで上げてください。",
+      "comboTierUnmetNamed": "{crafts}をティア {tier} まで上げてください。",
       "professionChoice": "職業の選択",
       "noProfessionChoice": "現在選択できる職業はありません。",
       "pairOptionLabel": "{pair}（{craftA} + {craftB}）",
@@ -2163,7 +2213,19 @@ export const ja_JP: EnTranslations = {
       },
       "notAtHub": "それを製作するには、必要なレベルで製作拠点にいる必要があります。",
       "throttled": "製作が速すぎます。少し待ってからもう一度お試しください。",
-      "recipeNotLearned": "そのレシピはまだ習得していません。"
+      "recipeNotLearned": "そのレシピはまだ習得していません。",
+      "skillReqLine": "{craft} {skill} が必要",
+      "difficultyFull": "技能上昇（全量）",
+      "difficultyReduced": "技能上昇（減少）",
+      "difficultyNone": "技能上昇なし",
+      "stationBadge": "製作拠点",
+      "stationOutOfRange": "製作するには製作拠点に移動してください。",
+      "masterworkToast": "傑作！{name}",
+      "masterworkZoneLine": "{crafter}が傑作{name}を作り上げました！",
+      "tierUpToast": "{craft}がティア {tier} に到達しました！",
+      "makersMark": "製作者：{name}",
+      "masterworkSeal": "傑作",
+      "enchantedLine": "エンチャント済み"
     },
     "finder": {
       "title": "ダンジョンファインダー",
@@ -2331,6 +2393,11 @@ export const ja_JP: EnTranslations = {
       "broadcastsLabel": "功績の達成をギルドとフレンドに共有する",
       "titledName": "{name}【{title}】"
     }
+  },
+  "gatherEvent": {
+    "pristineVein": "{finder}が純粋な鉱脈を掘り当てた！",
+    "ancientHeartwood": "{finder}が太古の心木を切り倒した！",
+    "moonlitBloom": "{finder}が月光の花を発見した！"
   },
   "apiError": {
     "validation": {
@@ -2841,7 +2908,8 @@ export const ja_JP: EnTranslations = {
     "resourceName": {
       "rage": "レイジ",
       "mana": "マナ",
-      "energy": "エナジー"
+      "energy": "エナジー",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "すべてのクラス",
@@ -2905,6 +2973,8 @@ export const ja_JP: EnTranslations = {
       "blessing_of_might": "味方の攻撃力を上げます。プルの前に唱えておくとよいでしょう。",
       "divine_protection": "状況が厳しいときにダメージを吸収する、素早い守りの結界です。",
       "raptor_strike": "敵に距離を詰められたときに使う、重い近接の一撃です。",
+      "hunters_mark": "Marks one priority target so you and your pet can pressure it harder.",
+      "disengage": "Leaps backwards to quickly open space when an enemy gets too close.",
       "aspect_of_the_hawk": "維持し続けることで遠隔攻撃力を高めるスタンスです。",
       "serpent_sting": "毒を浴びせ、継続してネイチャーダメージを与えます。",
       "arcane_shot": "遠距離からの即時ショットで、手早く追加ダメージを与えます。",
@@ -3383,13 +3453,13 @@ export const ja_JP: EnTranslations = {
       "craftHowTitle": "製作ウィンドウ",
       "craftHowBody": "製作ウィンドウ（初期設定はTキー）を開くと、あなたが知っているすべてのレシピ、それぞれに必要なもの、そして手持ちの材料が確認できます。材料がそろっていれば、クリック一つで作業が完了します。一般的なレシピは世界のどこでも製作できます。一部の高度なレシピ、上位の道具や希少なキャスター防具などは、ハイウォッチの製作拠点に立って作る必要があります。",
       "craftMasteryTitle": "技能と熟達",
-      "craftMasteryBody": "製作に成功するとその職の技能が上がりますが、技能がレシピを閉ざしてしまうことはありません。レシピを知っていて材料を持っていれば、いつでも挑戦できます。技能が高まって得られるのは品質です。熟練した手ほど、より上等な品を作り上げます。唯一の例外は組み合わせレシピで、これは解放される前に、その両方の職で腕前を証明しておくことを求めます。",
+      "craftMasteryBody": "製作に成功するとその職の技能が上がりますが、技能がレシピを閉ざしてしまうことはありません。レシピを知っていて材料を持っていれば、いつでも挑戦できます。どのレシピも約束どおりの品を仕上げますが、熟練した手はときに傑作を生み出します。同じ品ながら仕上がりが上等で、わずかな追加の力を宿しています。唯一の例外は組み合わせレシピで、二つの職をつなぐアーキタイプに調律し、両方の職で確かな腕前を示した製作者にのみ開かれます。",
       "craftComboTitle": "組み合わせレシピ",
       "craftComboBody": "単独の職自身のレシピ一覧に加えて、この輪は隣り合う二つの職を同時に呼び出す組み合わせレシピにも対応しており、孤立した一職だけでなく、輪の上で隣接する職に投資したキャラクターに報います。製作者はその二つの職を自分自身で修めていなければならず、いずれの側も取引相手の技能で代わりを務めることはできません。",
       "archetypeTitle": "十の生き方",
       "archetypeIntro": "十の職はそれぞれ生き方も体現しており、その職に単に従事すること以上の、より広いアイデンティティを取り入れることができる。あなたの現在の生き方は一度にひとつだけであり、チェックリストではない：あなたは一つを担い、望むならば後で変更することもできる。",
       "archetypeChooseTitle": "生き方を選ぶ",
-      "archetypeChooseBody": "生き方の宣言は、物語の一幕になる予定だ：そのアイデンティティへとあなたを正式に迎え入れるクエストである。その道はまだ建設中なので、今のところすべてのキャラクターは選択を前に残したまま世界を歩いており、その間、すべての製作はレアの品質ティアまで進められる。",
+      "archetypeChooseBody": "生き方の宣言は、物語の一幕だ：そのアイデンティティへとあなたを正式に迎え入れるクエストである。宣言するまでは、どの職の技能もレアのティアまで伸ばせる。ひと組を選び取れば、その二つの職は最後まで開かれ、輪の向こう側にある一つの職は趣味として手元に残り、やはりレアのティアまで働く。そのアイデンティティを掲げているあいだ、残るすべての職はコモンのティアにとどまる。",
       "archetypeSwitchTitle": "心変わり",
       "archetypeSwitchBody": "宣言が終身刑になるわけでもない。予定されているのは、新しい職を取り上げる前に古い職へ「償い」をする繰り返し可能な行いで、切り替えるたびに償いは少しずつ重くなる。そのため選択は代償のないものにはならず、意味を持ち続ける。宣言そのものと同じく、これもまだ道の途上にある。",
       "archetypeIdentityTitle": "あなたの生き方が意味するもの",
@@ -4985,7 +5055,9 @@ export const ja_JP: EnTranslations = {
     "rendererFailed": "レンダラーを開始できません。再読み込みしてください。{error}",
     "enterTimeout": "世界に入れませんでした。接続がタイムアウトしました。ゲームサーバーは動作していますか？",
     "connectionLost": "サーバーとの接続が切断されました。",
-    "reconnecting": "サーバーとの接続が切断されました。再接続しています...",
+    "reconnectingAttempt": "サーバーとの接続が切断されました。再接続しています...（試行 {attempt}/{maxAttempts}、{seconds}秒後に再試行）",
+    "reconnectingNow": "サーバーとの接続が切断されました。今すぐ再接続しています...（試行 {attempt}/{maxAttempts}）",
+    "slowConnection": "読み込みに時間がかかっています。インターネット接続を確認してください。",
     "connectionRejected": "サーバーが接続を閉じました。",
     "realmFull": "このワールドは現在満員です。数分後にもう一度お試しください。",
     "tooManyConnections": "お使いのネットワークからこのワールドへの接続が多すぎます。余分なゲームウィンドウを閉じるか、数分後にもう一度お試しください。",
@@ -6088,6 +6160,7 @@ export const ja_JP: EnTranslations = {
       "rarityUncommon": "高品質",
       "rarityRare": "レア",
       "rarityEpic": "エピック",
+      "rarityLegendary": "伝説",
       "merchantStock": "商人の在庫",
       "stackCount": "x{count}",
       "each": "各 {money}",
@@ -6288,7 +6361,7 @@ export const ja_JP: EnTranslations = {
       },
       "blazing_barrier": {
         "name": "ブレイジングバリア",
-        "description": "自身を炎で包み、130ダメージを吸収します。60秒間持続します。（火）"
+        "description": "自身を炎で包み、{damage}ダメージを吸収します。60秒間持続します。（火）"
       },
       "cold_snap": {
         "name": "冬の呼び戻し",
@@ -6396,7 +6469,7 @@ export const ja_JP: EnTranslations = {
       },
       "frost_nova": {
         "name": "氷縛",
-        "description": "周囲の敵すべてを最大8秒間その場に凍結させ、{damage} の冷気ダメージを与えます。"
+        "description": "周囲の敵すべてを最大8秒間その場に凍結させ、{damage} の冷気ダメージを与えます。移動不能効果は、対象の最大体力の15%に相当する累積ダメージを受けると解除されます。解除に必要なダメージは最低20、最大60です。"
       },
       "arcane_explosion": {
         "name": "エーテルバースト",
@@ -6566,6 +6639,14 @@ export const ja_JP: EnTranslations = {
         "name": "腹裂きの一撃",
         "description": "強力な近接攻撃でダメージを{damage}増加させます。次のスイングで発動します。"
       },
+      "hunters_mark": {
+        "name": "Hunter's Mark",
+        "description": "Marks an enemy for 60 sec, revealing it and increasing damage dealt by you and your pet by 5%."
+      },
+      "disengage": {
+        "name": "Disengage",
+        "description": "Leap backwards up to 15 yd, quickly creating distance from nearby enemies."
+      },
       "aspect_of_the_hawk": {
         "name": "猛禽の相",
         "description": "猛禽の相をまとい、30分間、攻撃力を{buff}増加させます。"
@@ -6578,9 +6659,17 @@ export const ja_JP: EnTranslations = {
         "name": "凶弾",
         "description": "{damage} の秘術ダメージを与える即時射撃です。"
       },
+      "exhilaration": {
+        "name": "Exhilaration",
+        "description": "Instantly restores 30% of your maximum health."
+      },
       "concussive_shot": {
         "name": "動揺の射撃",
         "description": "対象を朦朧とさせて{damage}ダメージを与え、4秒間、移動速度を50%低下させます。"
+      },
+      "freezing_trap": {
+        "name": "Freezing Trap",
+        "description": "Places a trap that incapacitates the first enemy to trigger it for 60 sec. Damage breaks the effect."
       },
       "mongoose_bite": {
         "name": "反撃の牙",
@@ -6594,17 +6683,49 @@ export const ja_JP: EnTranslations = {
         "name": "テンの相",
         "description": "テンの相をまとい、30分間、回避率を8%増加させます。"
       },
+      "feign_death": {
+        "name": "Feign Death",
+        "description": "Feign death for up to 6 min, dropping enemy threat and cancelling enemy casts targeting you. Acting ends the effect."
+      },
       "aspect_of_the_cheetah": {
         "name": "駿馬の相",
         "description": "駿馬の相をまとい、30分間、移動速度を30%増加させます。"
+      },
+      "steady_shot": {
+        "name": "Steady Shot",
+        "description": "A moving shot that deals Physical damage and generates 20 Focus."
+      },
+      "explosive_shot": {
+        "name": "Explosive Shot",
+        "description": "Plants ammunition that explodes after 3 sec, damaging enemies within 8 yd."
+      },
+      "kill_shot": {
+        "name": "Kill Shot",
+        "description": "A ranged finishing shot usable only against enemies below 20% health."
       },
       "aimed_shot": {
         "name": "引き絞り",
         "description": "慎重に引き絞った射撃で {damage} のダメージを与えます。"
       },
+      "aspect_of_the_turtle": {
+        "name": "Aspect of the Turtle",
+        "description": "Reduces all damage taken by 30% for 8 sec, but prevents you from attacking while active."
+      },
       "rapid_fire": {
         "name": "熱狂の速射",
         "description": "15秒間、攻撃速度が40%増加します。"
+      },
+      "multi_shot": {
+        "name": "分裂射撃",
+        "description": "対象地点へ矢の一斉射撃を放ち、8ヤード以内の敵に{damage}の物理ダメージを与える。（ハンターのタレント）"
+      },
+      "trueshot": {
+        "name": "Trueshot",
+        "description": "For 15 sec, gain 10% critical strike chance and 20% critical damage while Aimed Shot and Rapid Fire recover faster."
+      },
+      "powerful_shot": {
+        "name": "強力射撃",
+        "description": "Hold to charge a narrow piercing line shot. Charging chiefly increases its damage and length; release to fire."
       },
       "smite": {
         "name": "スマイト",
@@ -7293,10 +7414,6 @@ export const ja_JP: EnTranslations = {
       "mind_sear": {
         "name": "思念焼き",
         "description": "対象地点へ闇のエネルギーをチャネリングし、周囲の敵に毎秒{damage}のダメージを与える。（プリーストのタレント）"
-      },
-      "multi_shot": {
-        "name": "分裂射撃",
-        "description": "対象地点へ矢の一斉射撃を放ち、8ヤード以内の敵に{damage}の物理ダメージを与える。（ハンターのタレント）"
       },
       "prayer_of_healing": {
         "name": "聖歌の癒し",
@@ -8142,6 +8259,18 @@ export const ja_JP: EnTranslations = {
       },
       "emberglass_warstaff": {
         "name": "熾火硝子の戦杖"
+      },
+      "copper_ore": {
+        "name": "銅鉱石"
+      },
+      "iron_ore": {
+        "name": "鉄鉱石"
+      },
+      "ironbark_log": {
+        "name": "アイアンバークの丸太"
+      },
+      "silverleaf_herb": {
+        "name": "シルバーリーフ草"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"
@@ -10469,6 +10598,56 @@ export const ja_JP: EnTranslations = {
         "sender": "英雄級補給官",
         "subject": "あなたの英雄の印",
         "body": "あなたが後方で、あるいは倒れて戦っている間に、あなたの部隊が英雄級の試練を突破しました。ロックアウトは同じように科されたので、あなたの分の英雄の印は失われることなく、ここへ飛んできました。大切に使ってください。\n\n- 英雄級補給官"
+      },
+      "guild_trend_engineering_alchemy": {
+        "sender": "製作ギルド",
+        "subject": "工作と錬金術の腕前について",
+        "body": "職人へ\n\n工作と錬金術に励むあなたの評判がギルドに届いています。火薬を量り、試薬を計り、二つの技が互いを高め合っていると。隣り合う技を共に磨く手は、調律の備えができた証です。この組を結んだ者は、やがて爆破師の名を得ます。イーストブルックの鍛冶師ハルドレンを訪ねてください。今は彼が親方たちの代弁を務めています。自らの手がけた仕事で腕前を示せば、彼がその二つの技をあなたの主専攻として調律してくれるでしょう。\n\n敬意を込めて、\n製作ギルド"
+      },
+      "guild_trend_alchemy_cooking": {
+        "sender": "製作ギルド",
+        "subject": "錬金術と料理の腕前について",
+        "body": "職人へ\n\n錬金術と料理に励むあなたの評判がギルドに届いています。秘薬を煎じ、皿の味を調え、二つの技が互いを高め合っていると。隣り合う技を共に磨く手は、調律の備えができた証です。この組を結んだ者は、やがて薬師の名を得ます。イーストブルックの鍛冶師ハルドレンを訪ねてください。今は彼が親方たちの代弁を務めています。自らの手がけた仕事で腕前を示せば、彼がその二つの技をあなたの主専攻として調律してくれるでしょう。\n\n敬意を込めて、\n製作ギルド"
+      },
+      "guild_trend_cooking_leatherworking": {
+        "sender": "製作ギルド",
+        "subject": "料理と皮革加工の腕前について",
+        "body": "職人へ\n\n料理と皮革加工に励むあなたの評判がギルドに届いています。料理を仕上げ、革をなめし、二つの技が互いを高め合っていると。隣り合う技を共に磨く手は、調律の備えができた証です。イーストブルックの鍛冶師ハルドレンを訪ねてください。今は彼が親方たちの代弁を務めています。自らの手がけた仕事で腕前を示せば、彼がその二つの技をあなたの主専攻として調律してくれるでしょう。\n\n敬意を込めて、\n製作ギルド"
+      },
+      "guild_trend_leatherworking_tailoring": {
+        "sender": "製作ギルド",
+        "subject": "皮革加工と裁縫の腕前について",
+        "body": "職人へ\n\n皮革加工と裁縫に励むあなたの評判がギルドに届いています。革を裁ち、布を縫い、二つの技が互いを高め合っていると。隣り合う技を共に磨く手は、調律の備えができた証です。この組を結んだ者は、やがて装具師の名を得ます。イーストブルックの鍛冶師ハルドレンを訪ねてください。今は彼が親方たちの代弁を務めています。自らの手がけた仕事で腕前を示せば、彼がその二つの技をあなたの主専攻として調律してくれるでしょう。\n\n敬意を込めて、\n製作ギルド"
+      },
+      "guild_trend_tailoring_inscription": {
+        "sender": "製作ギルド",
+        "subject": "裁縫と銘文の腕前について",
+        "body": "職人へ\n\n裁縫と銘文に励むあなたの評判がギルドに届いています。縫い目を整え、銘を書き入れ、二つの技が互いを高め合っていると。隣り合う技を共に磨く手は、調律の備えができた証です。イーストブルックの鍛冶師ハルドレンを訪ねてください。今は彼が親方たちの代弁を務めています。自らの手がけた仕事で腕前を示せば、彼がその二つの技をあなたの主専攻として調律してくれるでしょう。\n\n敬意を込めて、\n製作ギルド"
+      },
+      "guild_trend_inscription_enchanting": {
+        "sender": "製作ギルド",
+        "subject": "銘文とエンチャントの腕前について",
+        "body": "職人へ\n\n銘文とエンチャントに励むあなたの評判がギルドに届いています。巻物に銘を記し、魔力を編み、二つの技が互いを高め合っていると。隣り合う技を共に磨く手は、調律の備えができた証です。イーストブルックの鍛冶師ハルドレンを訪ねてください。今は彼が親方たちの代弁を務めています。自らの手がけた仕事で腕前を示せば、彼がその二つの技をあなたの主専攻として調律してくれるでしょう。\n\n敬意を込めて、\n製作ギルド"
+      },
+      "guild_trend_enchanting_jewelcrafting": {
+        "sender": "製作ギルド",
+        "subject": "エンチャントと宝石細工の腕前について",
+        "body": "職人へ\n\nエンチャントと宝石細工に励むあなたの評判がギルドに届いています。魔力を吹き込み、石を磨き、二つの技が互いを高め合っていると。隣り合う技を共に磨く手は、調律の備えができた証です。イーストブルックの鍛冶師ハルドレンを訪ねてください。今は彼が親方たちの代弁を務めています。自らの手がけた仕事で腕前を示せば、彼がその二つの技をあなたの主専攻として調律してくれるでしょう。\n\n敬意を込めて、\n製作ギルド"
+      },
+      "guild_trend_jewelcrafting_weaponcrafting": {
+        "sender": "製作ギルド",
+        "subject": "宝石細工と武器鍛冶の腕前について",
+        "body": "職人へ\n\n宝石細工と武器鍛冶に励むあなたの評判がギルドに届いています。宝石を据え、刃を研ぎ、二つの技が互いを高め合っていると。隣り合う技を共に磨く手は、調律の備えができた証です。イーストブルックの鍛冶師ハルドレンを訪ねてください。今は彼が親方たちの代弁を務めています。自らの手がけた仕事で腕前を示せば、彼がその二つの技をあなたの主専攻として調律してくれるでしょう。\n\n敬意を込めて、\n製作ギルド"
+      },
+      "guild_trend_weaponcrafting_armorcrafting": {
+        "sender": "製作ギルド",
+        "subject": "武器鍛冶と防具鍛冶の腕前について",
+        "body": "職人へ\n\n武器鍛冶と防具鍛冶に励むあなたの評判がギルドに届いています。刃を鍛え、板金を合わせ、二つの技が互いを高め合っていると。隣り合う技を共に磨く手は、調律の備えができた証です。この組を結んだ者は、やがて鍛冶師の名を得ます。イーストブルックの鍛冶師ハルドレンを訪ねてください。今は彼が親方たちの代弁を務めています。自らの手がけた仕事で腕前を示せば、彼がその二つの技をあなたの主専攻として調律してくれるでしょう。\n\n敬意を込めて、\n製作ギルド"
+      },
+      "guild_trend_armorcrafting_engineering": {
+        "sender": "製作ギルド",
+        "subject": "防具鍛冶と工作の腕前について",
+        "body": "職人へ\n\n防具鍛冶と工作に励むあなたの評判がギルドに届いています。板金を鋲で留め、歯車を調え、二つの技が互いを高め合っていると。隣り合う技を共に磨く手は、調律の備えができた証です。イーストブルックの鍛冶師ハルドレンを訪ねてください。今は彼が親方たちの代弁を務めています。自らの手がけた仕事で腕前を示せば、彼がその二つの技をあなたの主専攻として調律してくれるでしょう。\n\n敬意を込めて、\n製作ギルド"
       }
     },
     "itemSets": {

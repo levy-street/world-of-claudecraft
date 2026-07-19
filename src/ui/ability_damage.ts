@@ -13,6 +13,7 @@
 import type { ResolvedAbility } from '../sim/sim';
 import {
   abilityScalingPower,
+  absorbBonus,
   channelTickBonus,
   directHealBonus,
   directHitBonus,
@@ -79,6 +80,8 @@ export function abilityDamageBonus(
       // Combat adds the direct-heal rider (full cast-time coefficient off Spell
       // Power, no AP scale-down) to every direct heal in effect_dispatch.
       return directHealBonus(scaling.spellPower, res.castTime);
+    case 'absorb':
+      return absorbBonus(scaling.spellPower, eff.spellPowerCoeff ?? 0);
     case 'hot': {
       // A HoT that rides a direct heal (Regrowth) does NOT scale in combat (the
       // direct part already took the coefficient); only pure HoTs (Rejuvenation)

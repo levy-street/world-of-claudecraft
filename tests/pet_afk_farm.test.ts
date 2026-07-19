@@ -131,7 +131,8 @@ describe('aggressive pet AFK-farm gate: activity stamping (end-to-end)', () => {
   it('a real ability cast stamps activity', () => {
     const { sim, pid, meta } = setupE2E();
     expect(isFresh(sim, meta)).toBe(false);
-    sim.castAbility('raptor_strike', pid); // resolves (known at level 1), stamps
+    sim.setPlayerLevel(4, pid);
+    sim.castAbility('aspect_of_the_hawk', pid);
     expect(isFresh(sim, meta)).toBe(true);
   });
 

@@ -2148,6 +2148,142 @@ const PRIMITIVES = {
     ctx.fill();
     ctx.restore();
   },
+  needle(ctx, pal) {
+    ctx.rotate(0.6);
+    // thread through the eye, drawn first so the shaft reads on top
+    ctx.strokeStyle = '#e8b33a';
+    ctx.lineWidth = 2.2;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(0, -21);
+    ctx.bezierCurveTo(14, -26, 24, -14, 18, 2);
+    ctx.bezierCurveTo(14, 14, 22, 20, 28, 24);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-2.6, -28);
+    ctx.lineTo(2.6, -28);
+    ctx.lineTo(0.8, 12);
+    ctx.lineTo(0, 30);
+    ctx.lineTo(-0.8, 12);
+    ctx.closePath();
+    ctx.fillStyle = lin(ctx, -3, 0, 3, 0, [
+      [0, pal.light],
+      [0.55, pal.base],
+      [1, pal.dark],
+    ]);
+    ctx.fill();
+    edge(ctx, pal.accent, 1.2);
+    ctx.fillStyle = pal.accent;
+    ctx.beginPath();
+    ctx.ellipse(0, -23, 1.4, 3.2, 0, 0, TAU);
+    ctx.fill();
+  },
+  gear(ctx, pal) {
+    const teeth = 8;
+    const outer = 30;
+    const inner = 22;
+    ctx.beginPath();
+    for (let i = 0; i < teeth; i++) {
+      const a = (i / teeth) * TAU;
+      const half = Math.PI / teeth;
+      const t = half * 0.42;
+      ctx.lineTo(Math.cos(a - half + t) * inner, Math.sin(a - half + t) * inner);
+      ctx.lineTo(Math.cos(a - t) * outer, Math.sin(a - t) * outer);
+      ctx.lineTo(Math.cos(a + t) * outer, Math.sin(a + t) * outer);
+      ctx.lineTo(Math.cos(a + half - t) * inner, Math.sin(a + half - t) * inner);
+    }
+    ctx.closePath();
+    ctx.fillStyle = lin(ctx, -22, -22, 22, 22, [
+      [0, pal.light],
+      [0.55, pal.base],
+      [1, pal.dark],
+    ]);
+    ctx.fill();
+    edge(ctx, pal.accent, 1.4);
+    ctx.fillStyle = pal.dark;
+    ctx.beginPath();
+    ctx.arc(0, 0, 8, 0, TAU);
+    ctx.fill();
+    edge(ctx, pal.accent, 1.2);
+    ctx.strokeStyle = withAlpha(pal.light, 0.8);
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.arc(0, 0, 14.5, Math.PI * 0.85, Math.PI * 1.45);
+    ctx.stroke();
+  },
+  pickaxe(ctx, pal) {
+    ctx.rotate(0.55);
+    ctx.fillStyle = lin(ctx, -2, 0, 2, 0, [
+      [0, '#a87c44'],
+      [1, '#46290e'],
+    ]);
+    rrPath(ctx, -2, -26, 4, 56, 2);
+    ctx.fill();
+    edge(ctx, '#2a1806', 1);
+    // crescent head across the top, both tips tapering down
+    ctx.beginPath();
+    ctx.moveTo(-28, -6);
+    ctx.quadraticCurveTo(0, -34, 28, -6);
+    ctx.quadraticCurveTo(24, -12, 14, -18);
+    ctx.quadraticCurveTo(0, -25, -14, -18);
+    ctx.quadraticCurveTo(-24, -12, -28, -6);
+    ctx.closePath();
+    ctx.fillStyle = lin(ctx, -20, -28, 16, -8, [
+      [0, pal.light],
+      [0.55, pal.base],
+      [1, pal.dark],
+    ]);
+    ctx.fill();
+    edge(ctx, pal.accent, 1.4);
+    ctx.strokeStyle = pal.light;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(-25, -8);
+    ctx.quadraticCurveTo(0, -31, 25, -8);
+    ctx.stroke();
+  },
+  fish(ctx, pal) {
+    // ripple rings under the leap
+    ctx.strokeStyle = withAlpha(pal.light, 0.6);
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.ellipse(0, 26, 17, 4.5, 0, 0, TAU);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(0, 26, 9, 2.4, 0, 0, TAU);
+    ctx.stroke();
+    ctx.save();
+    ctx.rotate(-0.35);
+    ctx.translate(0, -6);
+    ctx.beginPath();
+    ctx.moveTo(-22, 0);
+    ctx.quadraticCurveTo(-10, -11, 6, -8);
+    ctx.quadraticCurveTo(12, -7, 15, -3);
+    ctx.lineTo(24, -10);
+    ctx.quadraticCurveTo(20, 0, 24, 10);
+    ctx.lineTo(15, 3);
+    ctx.quadraticCurveTo(12, 7, 6, 8);
+    ctx.quadraticCurveTo(-10, 11, -22, 0);
+    ctx.closePath();
+    ctx.fillStyle = lin(ctx, -18, -10, 18, 10, [
+      [0, pal.light],
+      [0.55, pal.base],
+      [1, pal.dark],
+    ]);
+    ctx.fill();
+    edge(ctx, pal.accent, 1.3);
+    ctx.strokeStyle = withAlpha(pal.dark, 0.8);
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(-12, -6);
+    ctx.quadraticCurveTo(-9, 0, -12, 6);
+    ctx.stroke();
+    ctx.fillStyle = pal.accent;
+    ctx.beginPath();
+    ctx.arc(-16, -2.5, 1.6, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+  },
 } satisfies Record<string, Painter>;
 type PrimitiveName = keyof typeof PRIMITIVES;
 
@@ -2458,7 +2594,17 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // hunter
   raptor_strike: r('earth', 'blood', ['claw_slash']),
   aspect_of_the_hawk: r('storm', 'sky', ['wing'], ['glow']),
-  aspect_of_the_monkey: r('nature', 'leafGreen', ['paw'], ['motion']),
+  hunters_mark: r('storm', 'gold', ['crosshair', { p: 'eye', ...BR }], ['glow']),
+  disengage: r('steel', 'sky', ['boot', { p: 'arrow', ...TL }], ['motion']),
+  exhilaration: r('nature', 'leafGreen', ['heart', { p: 'sunburst', ...BR }], ['glow']),
+  freezing_trap: r('frost', 'ice', ['snowflake', { p: 'crosshair', ...BR }], ['arcs']),
+  feign_death: r('shadow', 'bone', ['skull', { p: 'heart', ...BR }], ['arcs']),
+  aspect_of_the_turtle: r('nature', 'ice', ['shield', { p: 'paw', ...BR }], ['glow']),
+  steady_shot: r('nature', 'gold', ['arrow', { p: 'crosshair', ...TR }]),
+  explosive_shot: r('fire', 'gold', ['arrow', { p: 'flame', ...BR }], ['sparkle']),
+  kill_shot: r('blood', 'steel', ['crosshair', { p: 'arrow', ...BR }], ['glow']),
+  trueshot: r('storm', 'gold', ['crosshair', { p: 'arrow', ...BR }], ['glow']),
+  powerful_shot: r('fury', 'gold', ['arrow', { p: 'sunburst', ...TR }], ['motion']),
   serpent_sting: r('nature', 'venom', ['fang', { p: 'arrow', ...BR }], ['drips']),
   arcane_shot: r('arcane', 'arcanePink', ['arrow'], ['glow', 'sparkle']),
   concussive_shot: r('storm', 'sky', ['arrow'], ['arcs']),
@@ -2674,7 +2820,6 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   holy_shock: r('holy', 'holyGold', ['bolt', { p: 'cross', ...BR }], ['glow']),
   holy_shield: r('holy', 'gold', ['shield', { p: 'sunburst', ...BR }]),
   bestial_wrath: r('fury', 'blood', ['paw'], ['glow']),
-  trueshot_aura: r('storm', 'gold', ['arrow'], ['arcs']),
   wyvern_sting: r('nature', 'venom', ['wing', { p: 'fang', ...BR }], ['drips']),
   arcane_power: r('arcane', 'arcanePink', ['sigil_rune'], ['glow']),
   combustion: r('fire', 'ember', ['flame'], ['sparkle']),
@@ -3531,7 +3676,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'retribution_aura',
   // hunter (CraftPix premium "RPG Archer skill icons" pack). The archer pack is
   // arrows/bows/traps only — the beast/aspect-animal abilities (aspect_of_the_hawk,
-  // aspect_of_the_monkey, tame_beast, dismiss_pet, revive_pet) have no fitting art
+  // tame_beast, dismiss_pet, revive_pet) have no fitting art
   // here and intentionally stay on their procedural recipes until a beast pack lands.
   'raptor_strike',
   'mongoose_bite',
@@ -3769,7 +3914,6 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'demoralizing_roar',
   'insect_swarm', // druid
   // final bespoke fills from per-ability "_Missing_*" packs — completes every class.
-  'aspect_of_the_monkey',
   'revive_pet', // hunter
   'mind_flay', // priest
   'garrote',
@@ -4222,6 +4366,101 @@ export function iconDataUrl(kind: IconKind, id: string, size: number = DEFAULT_I
   const cached = urlCache.get(key);
   if (cached) return cached;
   const url = iconCanvas(kind, id, size).toDataURL();
+  urlCache.set(key, url);
+  return url;
+}
+
+// ---------------------------------------------------------------------------
+// Profession icons (Professions 2.0): the ten craft-wheel crafts plus the
+// gathering skills, consumed by the professions window via professionIconUrl.
+// Ids follow docs/professions-2/asset-manifest.json (prof_<craftId>,
+// gather_<skill>). Committed painted art under public/ui/professions/
+// (PROFESSION_IMAGE_IDS, normalized by scripts/convert_profession_icons_webp.mjs)
+// wins over the procedural recipe, mirroring the item/deed image sets.
+// ---------------------------------------------------------------------------
+
+const PROFESSION_RECIPES: Record<string, IconRecipe> = {
+  prof_weaponcrafting: r(
+    'fire',
+    'steel',
+    [{ p: 'sword' }, { p: 'flame', x: 13, y: 13, s: 0.45, pal: 'ember' }],
+    ['glow'],
+  ),
+  prof_armorcrafting: r('steel', 'steel', [
+    { p: 'chestplate' },
+    { p: 'mace', x: 13, y: -13, s: 0.45, pal: 'gold' },
+  ]),
+  prof_tailoring: r('cloth', 'cloth', [
+    { p: 'trousers', ...BIG },
+    { p: 'needle', pal: 'bone' },
+  ]),
+  prof_leatherworking: r('leather', 'leather', [{ p: 'pelt', ...BIG }, { p: 'dagger' }]),
+  prof_cooking: r('food', 'ember', [
+    { p: 'flame', y: 14, s: 0.6 },
+    { p: 'meat', y: -6, s: 0.85 },
+  ]),
+  prof_alchemy: r('arcane', 'venom', [{ p: 'potion' }], ['sparkle']),
+  prof_engineering: r('steel', 'gold', [
+    { p: 'gear', x: -6, y: -5 },
+    { p: 'gear', x: 15, y: 13, s: 0.55 },
+  ]),
+  prof_enchanting: r(
+    'arcane',
+    'arcanePink',
+    [{ p: 'sigil_rune', ...BIG }, { p: 'staff' }],
+    ['sparkle'],
+  ),
+  prof_jewelcrafting: r('treasure', 'sky', [{ p: 'gem' }], ['sparkle']),
+  prof_inscription: r(
+    'parchment',
+    'bone',
+    [{ p: 'scroll' }, { p: 'sigil_rune', x: 13, y: 13, s: 0.45, pal: 'gold' }],
+    ['glow'],
+  ),
+  gather_mining: r('earth', 'steel', [{ p: 'pickaxe' }], ['sparkle']),
+  gather_logging: r('wood', 'steel', [{ p: 'axe' }]),
+  gather_herbalism: r(
+    'nature',
+    'leafGreen',
+    [{ p: 'leaf' }, { p: 'leaf', x: 11, y: 11, s: 0.5, rot: 2.6 }],
+    ['sparkle'],
+  ),
+  gather_fishing: r('drink', 'sky', [{ p: 'fish' }], ['glow']),
+};
+
+// Painted profession art override (mirrors ITEM_IMAGE_IDS / DEED_IMAGE_IDS): ids
+// whose committed WebP under public/ui/professions/ wins over the procedural
+// recipe. Empty until painted art lands; tests/profession_icons.test.ts pins the
+// bijection with the committed files.
+export const PROFESSION_IMAGE_IDS = new Set<string>([]);
+
+const PROFESSION_ICON_DIR = '/ui/professions';
+/** Static URL of a profession icon's painted art, or null while unshipped. */
+export function professionImageUrl(id: string): string | null {
+  return PROFESSION_IMAGE_IDS.has(id) ? `${PROFESSION_ICON_DIR}/${id}.webp` : null;
+}
+
+/** True when `id` has an explicit profession recipe, as opposed to falling
+ *  through to the generic fallback; lets a test pin every manifest id to a
+ *  deliberate icon. */
+export function hasProfessionIconRecipe(id: string): boolean {
+  return id in PROFESSION_RECIPES;
+}
+
+/** Icon URL for a profession/gathering id: the committed WebP when wired,
+ *  otherwise the cached procedural data URL from PROFESSION_RECIPES. */
+export function professionIconUrl(id: string, size: number = DEFAULT_ICON_SIZE): string {
+  const img = professionImageUrl(id);
+  if (img) return img;
+  const key = `profession|${id}|${size}`;
+  const cached = urlCache.get(key);
+  if (cached) return cached;
+  let canvas = canvasCache.get(key);
+  if (!canvas) {
+    canvas = compose(PROFESSION_RECIPES[id] ?? UNKNOWN_RECIPE, key, size);
+    canvasCache.set(key, canvas);
+  }
+  const url = canvas.toDataURL();
   urlCache.set(key, url);
   return url;
 }

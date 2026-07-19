@@ -5,6 +5,7 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { artisanRowPreloadInternalsForTest } from '../src/render/artisan_row_props';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import { critterPreloadInternalsForTest } from '../src/render/critters';
 import { marshDressingPreloadInternalsForTest } from '../src/render/delve_marsh_dressing';
@@ -72,6 +73,12 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('quest object assets', () => {
     for (const url of Object.values(questObjectPreloadInternalsForTest.questObjectUrl)) {
+      expectAssetExistsAndManifested(url);
+    }
+  });
+
+  it('artisan row prop assets', () => {
+    for (const url of Object.values(artisanRowPreloadInternalsForTest.assetUrl)) {
       expectAssetExistsAndManifested(url);
     }
   });

@@ -78,7 +78,7 @@ import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { ItemDef } from '../types';
-import { archetypeCeilingFor } from './archetype';
+import { archetypeCeilingFor, craftSkillGainMultiplier } from './archetype';
 import { comboEligibility } from './combo_eligibility';
 import { canUseCraftingHubStation } from './crafting_hub';
 import { isSignableMaterialRarity, type MaterialRarity } from './gathering';
@@ -93,7 +93,6 @@ import {
   materialCostMultiplier,
   tierCapability,
   tierForSkill,
-  tierProgressMultiplier,
 } from './wheel';
 
 // One flat craft-skill point per successful common-tier craft (the free-floor
@@ -450,25 +449,18 @@ export function resolveCraftForRecipe(
     ctx.addItem(recipe.resultItemId, recipe.resultCount, pid);
   }
   if (meta) {
-    // #1129/#1148 review: a recipe whose tier is ABOVE this craft's ARCHETYPE
-    // ceiling (ceilingTier, the same archetypeCeilingFor value the quality
-    // clamp reads above) must grant zero progress, full stop, never the
-    // ordinary diminishing-returns treatment: that is what makes a dormant or
-    // hobby craft's climb actually stop at its cap. The guard deliberately
-    // compares against the archetype ceiling ALONE, never craftCeiling's
-    // min-with-raw-capability: there is NO skillReq admission gate on
-    // crafting (content/recipes.ts documents that resolveCraft does not read
-    // skillReq), so a recipe tier above the player's RAW capability is the
-    // ordinary, doc-confirmed climb ("full at or above capability: this is
-    // how capability advances in the first place", wheel.ts) and must keep
-    // granting full progress exactly as base did. Below or at the ceiling,
-    // the ordinary curve (full at/above raw capability, reduced one tier
-    // under, zero two-plus under) applies unchanged off raw capability.
-    const recipeTier = tierForSkill(recipe.skillReq);
-    const multiplier =
-      recipeTier > ceilingTier
-        ? 0
-        : tierProgressMultiplier(tierCapability(meta.craftSkills, recipe.professionId), recipeTier);
+    // The #1129/#1148 gain doctrine (archetype ceiling alone zeroes, ordinary
+    // curve off raw capability otherwise) lives in the shared
+    // craftSkillGainMultiplier, which the crafting window's difficulty label
+    // also consumes so the hint can never diverge from this grant.
+    const multiplier = craftSkillGainMultiplier(
+      meta.craftSkills,
+      meta.archetype.activeArchetype,
+      meta.archetype.pairedMajor,
+      recipe.professionId,
+      meta.archetype.hobbyCraft,
+      recipe.skillReq,
+    );
     gainCraftSkill(meta.craftSkills, recipe.professionId, CRAFT_SKILL_GAIN * multiplier);
     meta.craftThrottle.count += 1;
     // Character XP for the craft (profession_xp.ts), tier-scaled and

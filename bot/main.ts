@@ -234,8 +234,10 @@ async function main(): Promise<void> {
         console.error(e);
       }
     }
-    // Attach the in-game level + class icon to the member's Discord nickname
-    // (built from the stable Discord handle so re-syncs don't compound).
+    // Attach the in-game level + class icon to the member's Discord nickname.
+    // The base name fallback can be the member's already-suffixed live nick
+    // (flex.username is null for older links), so buildLevelNick strips any
+    // existing suffix first to stay idempotent across re-syncs.
     if (cfg.syncNicknames && flex.character) {
       const base = flex.username ?? memberNames.get(userId) ?? 'Member';
       const nick = buildLevelNick(base, flex.character.level, flex.character.class);

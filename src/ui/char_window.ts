@@ -311,11 +311,13 @@ export class CharWindow {
     row.innerHTML = `${icon}
         <div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item" style="color:${qColor}">${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
     if (item) {
-      this.deps.attachTooltip(
-        row,
-        () =>
-          `${this.deps.itemTooltip(item)}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`,
-      );
+      this.deps.attachTooltip(row, () => {
+        // Own worn copy's per-copy lines (seal, enchanted marker, maker's mark):
+        // the self entity mirror carries equippedInstances in both worlds.
+        const world = this.deps.world();
+        const instance = world.entities.get(world.playerId)?.equippedInstances?.[slot];
+        return `${this.deps.itemTooltip(item, instance)}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`;
+      });
       // Corner x: a styled glyph control (not an in-game icon), revealed on
       // hover/focus and always shown on touch where right-click is unavailable.
       const unequip = document.createElement('button');

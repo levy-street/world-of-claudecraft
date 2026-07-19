@@ -31,7 +31,9 @@ export function lowResourceView(input: LowResourceInput): LowResourceView {
 
   // Only mana/energy warn; rage and resource-less/degenerate frames are silent.
   if (maxResource <= 0) return inactive;
-  if (resourceType !== 'mana' && resourceType !== 'energy') return inactive;
+  if (resourceType !== 'mana' && resourceType !== 'energy' && resourceType !== 'focus') {
+    return inactive;
+  }
 
   const frac = clamp01(resource / maxResource);
   if (frac >= LOW_RESOURCE_THRESHOLD) return inactive;
@@ -43,7 +45,12 @@ export function lowResourceView(input: LowResourceInput): LowResourceView {
   const opacity = 0.4 + tt ** 0.8 * 0.55;
   // Breathe slowly when just-low (~1.4s), urgently when near-empty (~0.5s).
   const pulseSeconds = 1.4 - tt * 0.9;
-  const label = resourceType === 'mana' ? t('game.hud.lowMana') : t('game.hud.lowEnergy');
+  const label =
+    resourceType === 'mana'
+      ? t('game.hud.lowMana')
+      : resourceType === 'focus'
+        ? t('hudChrome.resource.lowFocus')
+        : t('game.hud.lowEnergy');
 
   return { active: true, opacity, pulseSeconds, label };
 }

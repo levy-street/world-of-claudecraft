@@ -186,29 +186,39 @@ describe('spec gating', () => {
 });
 
 describe('frostbolt proc generation', () => {
-  it('a committed-frost mage eventually rolls both procs, capped at 2 stacks', () => {
-    const { sim, p } = makeSim();
-    spawnTarget(sim, p);
-    sim.drainEvents();
-    let sawFingers = false;
-    let sawBrain = false;
-    for (let cast = 0; cast < 30; cast++) {
-      castAndResolve(sim, p, 'frostbolt', 'Rimelance');
-      const fingers = p.auras.find((a) => a.kind === 'fingers_of_frost');
-      const brain = p.auras.find((a) => a.kind === 'brain_freeze');
-      if (fingers) {
-        sawFingers = true;
-        expect(fingers.stacks ?? 1).toBeLessThanOrEqual(FINGERS_OF_FROST_MAX_STACKS);
-        expect(fingers.duration).toBe(FINGERS_OF_FROST_DURATION);
+  // 30 casts x up to 140 sync tick() calls apiece (castAndResolve's projectile
+  // wait) is a lot of synchronous sim work for vitest's 5s default: fine on an
+  // idle machine, but tight under worker-pool CPU contention. Real execution is
+  // sub-second in isolation; give this one real headroom instead of flaking.
+  const PROC_TEST_TIMEOUT_MS = 20_000;
+
+  it(
+    'a committed-frost mage eventually rolls both procs, capped at 2 stacks',
+    () => {
+      const { sim, p } = makeSim();
+      spawnTarget(sim, p);
+      sim.drainEvents();
+      let sawFingers = false;
+      let sawBrain = false;
+      for (let cast = 0; cast < 30; cast++) {
+        castAndResolve(sim, p, 'frostbolt', 'Rimelance');
+        const fingers = p.auras.find((a) => a.kind === 'fingers_of_frost');
+        const brain = p.auras.find((a) => a.kind === 'brain_freeze');
+        if (fingers) {
+          sawFingers = true;
+          expect(fingers.stacks ?? 1).toBeLessThanOrEqual(FINGERS_OF_FROST_MAX_STACKS);
+          expect(fingers.duration).toBe(FINGERS_OF_FROST_DURATION);
+        }
+        if (brain) {
+          sawBrain = true;
+          expect(brain.duration).toBe(BRAIN_FREEZE_DURATION);
+        }
       }
-      if (brain) {
-        sawBrain = true;
-        expect(brain.duration).toBe(BRAIN_FREEZE_DURATION);
-      }
-    }
-    expect(sawFingers).toBe(true);
-    expect(sawBrain).toBe(true);
-  });
+      expect(sawFingers).toBe(true);
+      expect(sawBrain).toBe(true);
+    },
+    PROC_TEST_TIMEOUT_MS,
+  );
 
   it('a mage without the frost spec never generates either proc', () => {
     const { sim, p } = makeSim({ spec: null });
@@ -220,28 +230,32 @@ describe('frostbolt proc generation', () => {
     }
   });
 
-  it('same seed, same casts: identical proc sequence (determinism)', () => {
-    const run = (): string[] => {
-      const { sim, p } = makeSim({ seed: 777 });
-      spawnTarget(sim, p);
-      const gained: string[] = [];
-      for (let cast = 0; cast < 12; cast++) {
-        const events = castAndResolve(sim, p, 'frostbolt', 'Rimelance');
-        for (const e of events) {
-          if (
-            e.type === 'aura' &&
-            e.gained &&
-            (e.name === 'Fingers of Frost' || e.name === 'Brain Freeze')
-          )
-            gained.push(e.name);
+  it(
+    'same seed, same casts: identical proc sequence (determinism)',
+    () => {
+      const run = (): string[] => {
+        const { sim, p } = makeSim({ seed: 777 });
+        spawnTarget(sim, p);
+        const gained: string[] = [];
+        for (let cast = 0; cast < 12; cast++) {
+          const events = castAndResolve(sim, p, 'frostbolt', 'Rimelance');
+          for (const e of events) {
+            if (
+              e.type === 'aura' &&
+              e.gained &&
+              (e.name === 'Fingers of Frost' || e.name === 'Brain Freeze')
+            )
+              gained.push(e.name);
+          }
         }
-      }
-      return gained;
-    };
-    const first = run();
-    expect(first.length).toBeGreaterThan(0);
-    expect(run()).toEqual(first);
-  });
+        return gained;
+      };
+      const first = run();
+      expect(first.length).toBeGreaterThan(0);
+      expect(run()).toEqual(first);
+    },
+    PROC_TEST_TIMEOUT_MS,
+  );
 });
 
 describe('Ice Lance frozen resolution', () => {

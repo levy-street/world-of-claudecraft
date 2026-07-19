@@ -16,7 +16,7 @@ import { ITEMS } from '../data';
 import { removePreferFungible } from '../items';
 import type { PlayerMeta, TradeSession } from '../sim';
 import type { SimContext } from '../sim_context';
-import { dist2d, type InvSlot } from '../types';
+import { dist2d, type InvSlot, type ItemInstancePayload } from '../types';
 
 // A trade is only offered/kept while both parties are within this many yards;
 // the drift sweep cancels an open session once they wander past TRADE_RANGE + 4.
@@ -120,21 +120,37 @@ export function tradeSetOffer(
   session.acceptedB = false;
 }
 
-// Moves one side's offer, preserving each slot's ItemInstancePayload (enchants,
-// signed materials, rolled quality, boundTo) instead of re-granting plain copies.
+// Removal phase of the swap: consumes one side's offer out of their bags,
+// preserving each slot's ItemInstancePayload (enchants, signed materials,
+// rolled quality, boundTo) for grantOffer instead of re-granting plain copies.
 // removePreferFungible already reports exactly which consumed slots carried an
-// instance; this only had to route those payloads back in through addItemInstance
-// rather than discarding them, the same way discardItem never needed to because a
-// discarded item's payload does not need to reappear anywhere. sellItem is NOT the
-// same case: it records vendor buyback (items.ts sellItem), and buyback re-grants
-// a plain copy today, so a sold instanced item still loses its payload there; that
-// is a pre-existing sibling of this bug, not fixed by this change.
-function transferOffer(ctx: SimContext, items: InvSlot[], fromPid: number, toPid: number): void {
+// instance; grantOffer only had to route those payloads back in through
+// addItemInstance rather than discarding them, the same way discardItem never
+// needed to because a discarded item's payload does not need to reappear
+// anywhere. sellItem is NOT the same case: it records vendor buyback (items.ts
+// sellItem), and buyback re-grants a plain copy today, so a sold instanced item
+// still loses its payload there; that is a pre-existing sibling of this bug,
+// not fixed by this change.
+// BOTH removals must run before EITHER grant: when the two offers share an
+// itemId, granting first inflates the counter-party's stock, so their removal
+// consumes just-received copies (removeItem scans highest-index-first, exactly
+// where addItemInstance pushes) and a swapped instance bounces straight back
+// to its owner, or gets spared while a plain copy crosses in its place.
+type PendingGrant = { itemId: string; plainCount: number; instances: ItemInstancePayload[] };
+
+function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): PendingGrant[] {
+  const grants: PendingGrant[] = [];
   for (const s of items) {
     const instances = removePreferFungible(ctx, s.itemId, s.count, fromPid);
-    const plainCount = s.count - instances.length;
-    if (plainCount > 0) ctx.addItem(s.itemId, plainCount, toPid);
-    for (const instance of instances) ctx.addItemInstance(s.itemId, instance, toPid);
+    grants.push({ itemId: s.itemId, plainCount: s.count - instances.length, instances });
+  }
+  return grants;
+}
+
+function grantOffer(ctx: SimContext, grants: PendingGrant[], toPid: number): void {
+  for (const g of grants) {
+    if (g.plainCount > 0) ctx.addItem(g.itemId, g.plainCount, toPid);
+    for (const instance of g.instances) ctx.addItemInstance(g.itemId, instance, toPid);
   }
 }
 
@@ -167,7 +183,7 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
   }
   // capacity gate: each side must fit what they RECEIVE after what they GIVE
   // leaves their bags (simulated on a scratch copy; nothing moved yet). A
-  // receive is not uniformly fungible: transferOffer (below) grants each
+  // receive is not uniformly fungible: grantOffer (below) grants each
   // instanced copy via addItemInstance, which always takes a fresh slot and
   // never merges into a plain stack of the same itemId (bags.ts addStacked
   // skips slots with `.instance`). fitsAll alone assumes every unit of a
@@ -211,8 +227,10 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
   // swap
   metaA.copper = metaA.copper - session.offerA.copper + session.offerB.copper;
   metaB.copper = metaB.copper - session.offerB.copper + session.offerA.copper;
-  transferOffer(ctx, session.offerA.items, session.a, session.b);
-  transferOffer(ctx, session.offerB.items, session.b, session.a);
+  const grantsToB = removeOffer(ctx, session.offerA.items, session.a);
+  const grantsToA = removeOffer(ctx, session.offerB.items, session.b);
+  grantOffer(ctx, grantsToB, session.b);
+  grantOffer(ctx, grantsToA, session.a);
   for (const tPid of [session.a, session.b]) {
     ctx.emit({ type: 'log', text: 'Trade complete.', color: '#8df', pid: tPid });
     ctx.emit({ type: 'tradeDone', pid: tPid });

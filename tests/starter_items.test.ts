@@ -23,9 +23,9 @@ describe('starter rations', () => {
     });
   }
 
-  it('rage and energy classes are exactly the waterless ones', () => {
+  it('rage, energy, and Focus classes are exactly the waterless ones', () => {
     const waterless = ALL_CLASSES.filter((c) => CLASSES[c].resourceType !== 'mana').sort();
-    expect(waterless).toEqual(['rogue', 'warrior']);
+    expect(waterless).toEqual(['hunter', 'rogue', 'warrior']);
   });
 
   it('a saved character keeps its bags as-is (no re-grant on load)', () => {

@@ -197,7 +197,7 @@ Every class runs on classic-era MMO mechanics implemented from first principles,
 
 - **Warrior**: rage, Reaver Strike (on-next-swing, off-GCD), Iron Bellow, Onrush, Deep Gash, Quaking Blow, Hobbling Cut, Blood Toll, Redhand (dodge proc).
 - **Paladin**: Oathbrand unleashed by Verdict, Mending Light, Steadfast Aura, Oath of Iron, Ward of Faith (absorb), Sundering Gavel (stun), Last Rite.
-- **Hunter**: ranged auto-attack (8-35 yd with a classic-style dead zone), Gutting Strike, Harrier's Guise, Venom Barb, Fell Shot, Rattling Shot, Counterfang, Fettering Slash, and a tameable pet from level 10.
+- **Hunter**: Focus-powered ranged auto-attack (8-35 yd with a classic-style dead zone), a tameable pet from level 10, and a shared utility kit including Hunter's Mark, Disengage, Aspect of the Cheetah, Aspect of the Turtle, Exhilaration, Feign Death, and Freezing Trap.
 - **Rogue**: energy and combo points, Wicked Slash, Dirt Nap, Craven Thrust (behind, dagger), Eye Jab, Ghostfoot, Cutthroat Tempo, Swift Heels.
 - **Priest**: Smite, Whispered Prayer, Litany of Resolve, Dirge of Decay, Psalm of Warding (absorb), Lingering Grace (HoT), Mindfracture.
 - **Shaman**: Arc Bolt, Stonebound Weapon (imbue), Mending Waters, Earthen Jolt, Thunder Ward (thorns), Cinder Jolt.

@@ -306,6 +306,14 @@ export const nl_NL: EnTranslations = {
     "spectate": {
       "banner": "Toeschouwer bij {name}"
     },
+    "resource": {
+      "focus": "Focus",
+      "lowFocus": "Low Focus",
+      "notEnoughFocus": "Not enough focus!"
+    },
+    "hunter": {
+      "turtleAttackError": "You can't attack while protected by Aspect of the Turtle."
+    },
     "readyCheck": {
       "prompt": "{name} heeft een gereedheidscontrole gestart. Ben je gereed?",
       "ready": "Gereed",
@@ -750,6 +758,7 @@ export const nl_NL: EnTranslations = {
       "leaderboard": "Ranglijst",
       "dailyRewards": "Winkel",
       "deeds": "Daden",
+      "professions": "Professions",
       "nameplates": "Namen",
       "haptics": "Haptiek",
       "hapticsOff": "Haptiek uit",
@@ -1039,6 +1048,7 @@ export const nl_NL: EnTranslations = {
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
+      "showThirdActionBar": "Show Third Action Bar",
       "showTargetOfTarget": "Doelwit van doelwit tonen",
       "showAttackButton": "Aanvalsknop Tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
@@ -1468,7 +1478,8 @@ export const nl_NL: EnTranslations = {
       "watchTwitch": "Bekijken op Twitch",
       "watchX": "Bekijken op X",
       "watchKick": "Bekijken op Kick",
-      "watchYouTube": "Bekijken op YouTube"
+      "watchYouTube": "Bekijken op YouTube",
+      "streamerBadgeTitle": "Verified streamer"
     },
     "lootSettings": {
       "title": "Buitinstellingen",
@@ -2082,7 +2093,9 @@ export const nl_NL: EnTranslations = {
       "mining": "Mijnbouw",
       "logging": "Houtkap",
       "herbalism": "Kruidenkunde",
-      "notReady": "Dit grondstoffenpunt is voor jou nog niet teruggekeerd."
+      "notReady": "Dit grondstoffenpunt is voor jou nog niet teruggekeerd.",
+      "gatherLine": "You gather: {name}.",
+      "gatherLineQty": "You gather: {name} x{qty}."
     },
     "archetypeTitle": {
       "label": "Titel",
@@ -2113,6 +2126,42 @@ export const nl_NL: EnTranslations = {
       "tailoring": "Kleermaken",
       "leatherworking": "Leerbewerken"
     },
+    "professions": {
+      "title": "Professions",
+      "close": "Close professions",
+      "ringAria": "Craft wheel",
+      "skillsHeader": "Craft skills",
+      "gatheringHeader": "Gathering",
+      "perksHeader": "Perks",
+      "identityHeader": "Identity",
+      "roleMajor": "Major",
+      "roleHobby": "Hobby",
+      "roleDormant": "Dormant",
+      "roleUnattuned": "Unattuned",
+      "ceilingUnlimited": "No empowerment cap",
+      "ceilingRare": "Rare cap",
+      "ceilingCommon": "Common cap",
+      "skillValue": "{skill} / {max}",
+      "tierPipAria": "Tier {tier}",
+      "nextUnlockTier": "{points} points to the next tier: masterwork odds improve",
+      "nextUnlockSpecialized": "{points} points to Specialized: material costs drop",
+      "nextUnlockMax": "At maximum skill",
+      "perkSpecializedLine": "{craft}: Specialized, material costs -{pct}%",
+      "perkSpecializedAt": "Specializes at {threshold} skill",
+      "switchCost": "Next archetype switch costs {cost} amends",
+      "syncing": "Waiting for your profession data from the realm.",
+      "tutorialLine": "Reach {target} skill in any craft to unlock your first tier.",
+      "ctaHeader": "Next step",
+      "ctaRaise": "Keep raising {craft}: {points} more points to the next tier.",
+      "ctaStart": "Craft or gather with any profession to begin.",
+      "unattunedIdentity": "You are not yet attuned to an archetype. Raise your crafts and complete an attunement to choose your pair.",
+      "nudgeNearTier": "{craft}: {points} points from the next tier",
+      "nudgeDormant": "Your {craft} knowledge lies dormant",
+      "hobbyLabel": "Hobby: {craft}",
+      "majorsLabel": "Majors: {a} and {b}",
+      "pairsHeld": "Pairs held: {count}",
+      "returnsLabel": "Returns: {count}"
+    },
     "crafting": {
       "title": "Knutselen",
       "close": "Sluit het maken",
@@ -2131,6 +2180,7 @@ export const nl_NL: EnTranslations = {
       "comboNotAttuned": "Kies eerst een archetype-paar.",
       "comboWrongPair": "Activeer precies dit paar om het te maken.",
       "comboTierUnmet": "Breng beide hoofdambachten naar de vereiste rang.",
+      "comboTierUnmetNamed": "Raise {crafts} to tier {tier}.",
       "professionChoice": "Beroepskeuze",
       "noProfessionChoice": "Er is momenteel geen geldige beroepskeuze beschikbaar.",
       "pairOptionLabel": "{pair} ({craftA} + {craftB})",
@@ -2163,7 +2213,19 @@ export const nl_NL: EnTranslations = {
       },
       "notAtHub": "Je moet bij de werkbank zijn, op het vereiste niveau, om dat te maken.",
       "throttled": "Je maakt te snel. Wacht even en probeer het opnieuw.",
-      "recipeNotLearned": "Je hebt dat recept nog niet geleerd."
+      "recipeNotLearned": "Je hebt dat recept nog niet geleerd.",
+      "skillReqLine": "Requires {craft} {skill}",
+      "difficultyFull": "Full skill gain",
+      "difficultyReduced": "Reduced skill gain",
+      "difficultyNone": "No skill gain",
+      "stationBadge": "Station",
+      "stationOutOfRange": "Move to the crafting hub station to craft this.",
+      "masterworkToast": "Masterwork! {name}",
+      "masterworkZoneLine": "{crafter} crafted a masterwork {name}!",
+      "tierUpToast": "{craft} advanced to tier {tier}!",
+      "makersMark": "Crafted by {name}",
+      "masterworkSeal": "Masterwork",
+      "enchantedLine": "Enchanted"
     },
     "finder": {
       "title": "Kerkerzoekmachine",
@@ -2331,6 +2393,11 @@ export const nl_NL: EnTranslations = {
       "broadcastsLabel": "Deel behaalde daden met je gilde en vrienden",
       "titledName": "{name} [{title}]"
     }
+  },
+  "gatherEvent": {
+    "pristineVein": "{finder} struck a pristine vein!",
+    "ancientHeartwood": "{finder} felled an ancient heartwood!",
+    "moonlitBloom": "{finder} discovered a moonlit bloom!"
   },
   "apiError": {
     "validation": {
@@ -2841,7 +2908,8 @@ export const nl_NL: EnTranslations = {
     "resourceName": {
       "rage": "Woede",
       "mana": "Mana",
-      "energy": "Energie"
+      "energy": "Energie",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "Alle klassen",
@@ -2905,6 +2973,8 @@ export const nl_NL: EnTranslations = {
       "blessing_of_might": "Verhoogt de aanvalskracht van een vriendelijk doelwit, goed om voor een pull uit te spreken.",
       "divine_protection": "Een snelle beschermende wering om schade op te vangen als het hard tegen hard gaat.",
       "raptor_strike": "Een harde uithaal van dichtbij voor wanneer iets de afstand met je overbrugt.",
+      "hunters_mark": "Marks one priority target so you and your pet can pressure it harder.",
+      "disengage": "Leaps backwards to quickly open space when an enemy gets too close.",
       "aspect_of_the_hawk": "Een houding die je aanhoudt om je aanvalskracht op afstand aan te scherpen.",
       "serpent_sting": "Plaatst een gif dat natuurschade laat bloeden na verloop van tijd.",
       "arcane_shot": "Een direct schot van afstand voor snelle extra schade.",
@@ -4985,7 +5055,9 @@ export const nl_NL: EnTranslations = {
     "rendererFailed": "Kon de renderer niet starten: probeer opnieuw te laden. {error}",
     "enterTimeout": "Kon de wereld niet betreden. De verbinding is verlopen. Draait de gameserver?",
     "connectionLost": "De verbinding met de server is verbroken.",
-    "reconnecting": "Verbinding verbroken. Opnieuw verbinding maken...",
+    "reconnectingAttempt": "Connection lost. Reconnecting... (attempt {attempt}/{maxAttempts}, retrying in {seconds}s)",
+    "reconnectingNow": "Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})",
+    "slowConnection": "This is taking longer than usual. Check your internet connection.",
     "connectionRejected": "De server heeft de verbinding gesloten.",
     "realmFull": "Deze wereld is op dit moment vol. Probeer het over een paar minuten opnieuw.",
     "tooManyConnections": "Er komen te veel verbindingen naar deze wereld vanuit jouw netwerk. Sluit extra spelvensters of probeer het over een paar minuten opnieuw.",
@@ -6088,6 +6160,7 @@ export const nl_NL: EnTranslations = {
       "rarityUncommon": "Ongewoon",
       "rarityRare": "Zeldzaam",
       "rarityEpic": "Episch",
+      "rarityLegendary": "Legendary",
       "merchantStock": "Voorraad van de handelaar",
       "stackCount": "x{count}",
       "each": "{money} per stuk",
@@ -6288,7 +6361,7 @@ export const nl_NL: EnTranslations = {
       },
       "blazing_barrier": {
         "name": "Vlammende barrière",
-        "description": "Omhul jezelf met vlammen en absorbeer 130 schade gedurende 60 sec. (Vuur)"
+        "description": "Omhul jezelf met vlammen en absorbeer {damage} schade gedurende 60 sec. (Vuur)"
       },
       "cold_snap": {
         "name": "Roep van de winter",
@@ -6396,7 +6469,7 @@ export const nl_NL: EnTranslations = {
       },
       "frost_nova": {
         "name": "IJsboei",
-        "description": "Bevriest alle nabije vijanden ter plaatse gedurende maximaal 8 sec en brengt {damage} Vorstschade toe."
+        "description": "Bevriest alle nabije vijanden ter plaatse gedurende maximaal 8 sec en brengt {damage} Vorstschade toe. Het worteleffect breekt na cumulatieve schade gelijk aan 15% van de maximale gezondheid van het doelwit, met een minimum van 20 en een maximum van 60 schade."
       },
       "arcane_explosion": {
         "name": "Aetherbarst",
@@ -6566,6 +6639,14 @@ export const nl_NL: EnTranslations = {
         "name": "Ontweiende Slag",
         "description": "Een sterke slagaanval die de schade met {damage} verhoogt. Activeert bij je volgende slag."
       },
+      "hunters_mark": {
+        "name": "Hunter's Mark",
+        "description": "Marks an enemy for 60 sec, revealing it and increasing damage dealt by you and your pet by 5%."
+      },
+      "disengage": {
+        "name": "Disengage",
+        "description": "Leap backwards up to 15 yd, quickly creating distance from nearby enemies."
+      },
       "aspect_of_the_hawk": {
         "name": "Gedaante van de Kiekendief",
         "description": "Neem de gedaante van de kiekendief aan, waardoor je aanvalskracht met {buff} toeneemt gedurende 30 min."
@@ -6578,9 +6659,17 @@ export const nl_NL: EnTranslations = {
         "name": "Boosaardig Schot",
         "description": "Een onmiddellijk schot dat {damage} Arcane schade toebrengt."
       },
+      "exhilaration": {
+        "name": "Exhilaration",
+        "description": "Instantly restores 30% of your maximum health."
+      },
       "concussive_shot": {
         "name": "Ratelend Schot",
         "description": "Versuft het doelwit voor {damage} schade, waardoor de beweging met 50% wordt vertraagd gedurende 4 sec."
+      },
+      "freezing_trap": {
+        "name": "Freezing Trap",
+        "description": "Places a trap that incapacitates the first enemy to trigger it for 60 sec. Damage breaks the effect."
       },
       "mongoose_bite": {
         "name": "Tegenbeet",
@@ -6594,17 +6683,49 @@ export const nl_NL: EnTranslations = {
         "name": "Gedaante van de Marter",
         "description": "Neem de gedaante van de marter aan, waardoor je ontwijkkans met 8% toeneemt gedurende 30 min."
       },
+      "feign_death": {
+        "name": "Feign Death",
+        "description": "Feign death for up to 6 min, dropping enemy threat and cancelling enemy casts targeting you. Acting ends the effect."
+      },
       "aspect_of_the_cheetah": {
         "name": "Gedaante van de Renner",
         "description": "Neem de gedaante van de renner aan, waardoor je bewegingssnelheid met 30% toeneemt gedurende 30 min."
+      },
+      "steady_shot": {
+        "name": "Steady Shot",
+        "description": "A moving shot that deals Physical damage and generates 20 Focus."
+      },
+      "explosive_shot": {
+        "name": "Explosive Shot",
+        "description": "Plants ammunition that explodes after 3 sec, damaging enemies within 8 yd."
+      },
+      "kill_shot": {
+        "name": "Kill Shot",
+        "description": "A ranged finishing shot usable only against enemies below 20% health."
       },
       "aimed_shot": {
         "name": "Lange Trek",
         "description": "Een zorgvuldig getrokken schot dat {damage} schade toebrengt."
       },
+      "aspect_of_the_turtle": {
+        "name": "Aspect of the Turtle",
+        "description": "Reduces all damage taken by 30% for 8 sec, but prevents you from attacking while active."
+      },
       "rapid_fire": {
         "name": "Koortsige Trek",
         "description": "Verhoogt je aanvalssnelheid met 40% gedurende 15 sec."
+      },
+      "multi_shot": {
+        "name": "Splijtschot",
+        "description": "Vuurt een salvo af op het doelgebied en brengt vijanden binnen een straal van 8 m {damage} Fysieke schade toe. (jagertalent)"
+      },
+      "trueshot": {
+        "name": "Trueshot",
+        "description": "For 15 sec, gain 10% critical strike chance and 20% critical damage while Aimed Shot and Rapid Fire recover faster."
+      },
+      "powerful_shot": {
+        "name": "Powershot",
+        "description": "Hold to charge a narrow piercing line shot. Charging chiefly increases its damage and length; release to fire."
       },
       "smite": {
         "name": "Kastijden",
@@ -7293,10 +7414,6 @@ export const nl_NL: EnTranslations = {
       "mind_sear": {
         "name": "Gedachtenbrand",
         "description": "Kanaliseert Schaduwenergie naar het doelgebied en brengt nabije vijanden elke seconde {damage} schade toe. (priestertalent)"
-      },
-      "multi_shot": {
-        "name": "Splijtschot",
-        "description": "Vuurt een salvo af op het doelgebied en brengt vijanden binnen een straal van 8 m {damage} Fysieke schade toe. (jagertalent)"
       },
       "prayer_of_healing": {
         "name": "Koorherstel",
@@ -8142,6 +8259,18 @@ export const nl_NL: EnTranslations = {
       },
       "emberglass_warstaff": {
         "name": "Sintelglazen Oorlogsstaf"
+      },
+      "copper_ore": {
+        "name": "Copper Ore"
+      },
+      "iron_ore": {
+        "name": "Iron Ore"
+      },
+      "ironbark_log": {
+        "name": "Ironbark Log"
+      },
+      "silverleaf_herb": {
+        "name": "Silverleaf Herb"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"
@@ -10469,6 +10598,56 @@ export const nl_NL: EnTranslations = {
         "sender": "Heroïsche kwartiermeester",
         "subject": "Je heroïsche marken",
         "body": "Je groep heeft de heroïsche beproeving doorstaan terwijl jij in de achterhoede vocht of verslagen op de grond lag. Ook jouw binding is vastgelegd, dus je aandeel heroïsche marken is hierheen gestuurd in plaats van verloren te gaan. Gebruik ze goed.\n\n- Heroïsche kwartiermeester"
+      },
+      "guild_trend_engineering_alchemy": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Engineering and Alchemy",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Engineering and Alchemy: charges measured and reagents weighed, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Bombardier in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_alchemy_cooking": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Alchemy and Cooking",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Alchemy and Cooking: draughts simmered and dishes seasoned, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Apothecary in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_cooking_leatherworking": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Cooking and Leatherworking",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Cooking and Leatherworking: meals plated and hides cured, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_leatherworking_tailoring": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Leatherworking and Tailoring",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Leatherworking and Tailoring: leather cut and cloth hemmed, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Outfitter in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_tailoring_inscription": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Tailoring and Inscription",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Tailoring and Inscription: seams stitched and glyphs inked, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_inscription_enchanting": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Inscription and Enchanting",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Inscription and Enchanting: scrolls lettered and charms woven, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_enchanting_jewelcrafting": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Enchanting and Jewelcrafting",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Enchanting and Jewelcrafting: charms bound and stones polished, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_jewelcrafting_weaponcrafting": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Jewelcrafting and Weaponcrafting",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Jewelcrafting and Weaponcrafting: gems seated and edges ground, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_weaponcrafting_armorcrafting": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Weaponcrafting and Armorcrafting",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Weaponcrafting and Armorcrafting: blades tempered and plates fitted, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Smith in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_armorcrafting_engineering": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Armorcrafting and Engineering",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Armorcrafting and Engineering: plates riveted and gears trued, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
       }
     },
     "itemSets": {

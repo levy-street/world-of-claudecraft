@@ -215,3 +215,16 @@ describe('hobbyCraftText (#1294): id-to-key view model', () => {
     }
   });
 });
+
+describe('char_window: own-paperdoll per-copy tooltip threading (Phase 6)', () => {
+  it('resolves the worn instance from the self entity mirror inside the tooltip closure', () => {
+    // Both worlds mirror the own worn set on the self entity
+    // (equippedInstances), so the paperdoll tooltip must read it per slot at
+    // hover time (a closure over deps.world(), never a stale capture) and
+    // forward it into the widened itemTooltip dep. Dropping either line
+    // reverts the own paperdoll to def-only tooltips while every pure-core
+    // suite stays green.
+    expect(painter).toContain('world.entities.get(world.playerId)?.equippedInstances?.[slot]');
+    expect(painter).toContain('this.deps.itemTooltip(item, instance)');
+  });
+});

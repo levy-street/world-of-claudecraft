@@ -89,7 +89,7 @@ const HUNTER_SPECS: SpecDef[] = [
     'dps',
     'x',
     'A precise archer built around ranged burst and efficient shots.',
-    'trueshot_aura',
+    'steady_shot',
     'Iron Aim',
     'Increases your ranged ability damage by 20% and critical strike chance by 3%.',
     { global: { meleeDmgPct: 0.2 }, stats: { crit: 0.03 } },

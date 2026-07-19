@@ -28,6 +28,8 @@
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
 import { CLASSES, isArenaPos, MOBS } from '../data';
+import { breakFeignDeath, isProtectedByTurtle } from '../hunter_base_abilities';
+import { maybeProcLockAndLoad } from '../hunter_marksmanship';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -75,6 +77,11 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   if (!r) return;
   const p = r.e;
   if (p.dead) return;
+  breakFeignDeath(ctx, p);
+  if (isProtectedByTurtle(p)) {
+    ctx.error(p.id, "You can't attack while protected by Aspect of the Turtle.");
+    return;
+  }
   if (isInStasis(p)) return;
   if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
@@ -130,6 +137,10 @@ export function stopAutoAttack(ctx: SimContext, pid?: number): void {
 export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   p.swingTimer = Math.max(0, p.swingTimer - DT);
   p.offhandSwingTimer = Math.max(0, p.offhandSwingTimer - DT);
+  if (isProtectedByTurtle(p)) {
+    p.autoAttack = false;
+    return;
+  }
   if (p.auras.some((a) => isTravelFormAuraKind(a.kind))) {
     p.autoAttack = false;
     return;
@@ -151,8 +162,8 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   // casters (wand-style, no dead zone so they don't run into melee, #94).
   // Form-aware: a druid keeps the class wand only in caster or Moonwing Form;
   // bear/cat/travel resolve to undefined here and fall through to melee.
-  const ranged = rangedAutoProfile(p, meta.cls);
-  if (ranged && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange)) {
+  const ranged = rangedAutoProfile(p, meta.cls, meta.talents.spec);
+  if (ranged && d <= ranged.maxRange && d >= ranged.minRange) {
     if (!ctx.hasLineOfSight(p, t)) return;
     ctx.breakGhostWolf(p);
     // Hunters shoot with their equipped weapon (damage range + speed), casters
@@ -305,7 +316,9 @@ export function rangedSwing(
     targetId: target.id,
     school,
     fx: 'projectile',
-    ...(ranged.wand ? { wand: true as const } : { attackAnimation: 'ranged-shot' as const }),
+    ...(ranged.wand
+      ? { wand: true as const }
+      : { abilityId: 'auto_shot', attackAnimation: 'ranged-shot' as const }),
   });
   if (!ranged.wand && attacker.kind === 'player') {
     onCastCompleted(ctx, attacker, 'auto_shot', target);
@@ -355,6 +368,7 @@ export function rangedSwing(
       true,
       !ranged.wand,
     );
+    if (!ranged.wand && atk.kind === 'player') maybeProcLockAndLoad(ctx, atk);
     // 4-piece set procs keyed to weapon crits (ranged arm). Gated on setProcs
     // inside applySetProcs, so proc-less players draw no rng.
     if (crit && atk.kind === 'player') ctx.applySetProcs(atk, tgt, 'weaponCrit');

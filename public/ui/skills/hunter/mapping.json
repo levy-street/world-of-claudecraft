@@ -73,14 +73,8 @@
       "sourcePack": "_Missing_Icons_Hunter",
       "sourceFile": "42.png",
       "output": "revive_pet.webp"
-    },
-    {
-      "abilityId": "aspect_of_the_monkey",
-      "sourcePack": "_Missing_Icons_Hunter",
-      "sourceFile": "41.png",
-      "output": "aspect_of_the_monkey.webp"
     }
   ],
-  "note": "5 beast/aspect-animal abilities lack art in the archer pack; they keep their procedural icons until a beast/companion pack is added.",
+  "note": "4 beast/aspect-animal abilities lack art in the archer pack; they keep their procedural icons until a beast/companion pack is added.",
   "deferredStayProcedural": {}
 }

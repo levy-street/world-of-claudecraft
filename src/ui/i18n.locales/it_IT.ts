@@ -3454,7 +3454,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Lancia un dardo di gelo, infliggendo {damage} danni da Gelo e rallentando il movimento del 40%.',
   'entities.abilities.blazing_barrier.name': 'Barriera ardente',
   'entities.abilities.blazing_barrier.description':
-    'Ti avvolge nelle fiamme, assorbendo 130 danni per 60 s. (Fuoco)',
+    'Ti avvolge nelle fiamme, assorbendo {damage} danni per 60 s. (Fuoco)',
   'entities.abilities.cold_snap.name': "Richiamo dell'inverno",
   'entities.abilities.cold_snap.description':
     'Termina il tempo di recupero di Passo fulmineo, Velo di Gelo e Invisibilità superiore. (Talento del mago)',
@@ -3505,7 +3505,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Trasforma il nemico in un rospo per un massimo di {duration} sec. Il rospo vaga e guarisce rapidamente. Qualsiasi danno interrompe l'effetto. Solo bestie e umanoidi.",
   'entities.abilities.frost_nova.name': 'Vincolo di Ghiaccio',
   'entities.abilities.frost_nova.description':
-    'Congela sul posto tutti i nemici vicini per un massimo di 8 s e infligge {damage} danni da Gelo.',
+    'Congela sul posto tutti i nemici vicini per un massimo di 8 s e infligge {damage} danni da Gelo. L’immobilizzazione si interrompe dopo aver subito danni cumulativi pari al 15% della salute massima del bersaglio, con un minimo di 20 e un massimo di 60 danni.',
   'entities.abilities.arcane_explosion.name': "Scoppio d'Etere",
   'entities.abilities.arcane_explosion.description':
     "Un'esplosione di energia Arcana colpisce tutti i nemici vicini per {damage} danni Arcani.",
@@ -7170,7 +7170,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'download.windowsCta': 'Scarica per Windows',
   'download.linuxHint':
     'AppImage: rendilo eseguibile, quindi eseguilo. Nessuna installazione necessaria.',
-  'loading.reconnecting': 'Connessione persa. Riconnessione...',
   'guide.nav.settings': 'Impostazioni e prestazioni',
   'guide.settingsPage.advancedBody':
     'Avanzato inizia dal livello High e sblocca quattro selettori extra, così puoi spendere i tuoi fotogrammi dove li noti effettivamente: dettaglio del terreno, densità del fogliame, effetti e illuminazione e qualità delle ombre. Come la qualità grafica, si applicano dopo una ricarica.',

@@ -38,8 +38,31 @@ Spawn an Explore agent to read and summarize:
 - All files created or modified in Phase 6 (use `git diff` against the phase-start commit)
 - CLAUDE.md (root), src/ui/CLAUDE.md, src/styles/CLAUDE.md
 The agent must return: the full list of Phase 6 deliverables and acceptance criteria, all
-new and modified files, the new hudChrome keys and the sim_i18n matcher rule, and any
-known issues or deferrals noted in progress.md.
+new and modified files, the new hudChrome keys and the broadcast localization path, and
+any known issues or deferrals noted in progress.md.
+
+AS-LANDED DEVIATIONS (2026-07-19, authoritative over this file's older wording; the
+state.md Phase 6 surfaces entry carries the full record):
+- There is NO sim_i18n matcher rule for the masterwork broadcast. The broadcast landed
+  as a structured, text-free masterworkZone SimEvent (ids plus values, the Phase 4
+  gatherRareEvent precedent); the HUD localizes it via hudChrome.crafting
+  masterworkZoneLine and the S3 guard passes by construction. Do not fail the audit
+  hunting a matcher row; DO verify the guard is green and the event carries no English.
+- The celebration gate is the deeds pure-plan style (craft_celebration_view.ts,
+  buildDeedUnlockPlan precedent); no deed-fireworks module exists anywhere. Reduced
+  motion trims only the banner fade (plan.motion, consumed by showBanner); the log
+  lines, banner text, sound, and the polite ARIA announcer are never gated.
+- The parity golden professions_craft eventDigest was re-pinned deliberately in its own
+  commit (the crafter receives their own masterworkZone copy); rng fingerprints are
+  byte-identical, which is the no-rng proof.
+- The gear-inspect surface is hud.ts openInspect/buildInspectSlotRow, NOT
+  armory_inspect.ts (that file is the cosmetic skin panel and was left untouched).
+- eqi rides identityFields beside eq (never ALL_DELTA_KEYS or dynamicFields), trimmed
+  server-side to signer/enchant/rolled (the boundTo/charges strip is negatively pinned
+  in tests/snapshots.test.ts).
+- The skill-gain difficulty label consumes the shared craftSkillGainMultiplier
+  (src/sim/professions/archetype.ts), the same function the sim grant site calls; the
+  ceiling arm is archetypeCeilingFor ALONE, never craftCeiling.
 
 STEP 2 - QA AUDIT (spawn the three agents below in parallel, using only the Explore
 summary; prompt each for COVERAGE not filtering: report every issue including low-severity
@@ -117,7 +140,7 @@ Multi-agent review dispatch: apply the Review Dispatch Matrix in
 docs/professions-2/implementation-plan.md (the plan carries the one canonical copy).
 Check `git diff --name-only` against the phase-start commit and spawn ONLY the agents
 whose row matches (expected here: frontend-seam-reviewer, cross-platform-sync for the
-sim_i18n matcher, the SimEvent emit, and the identity-wire extension, and
+broadcast localization path, the SimEvent emit, and the identity-wire extension, and
 architecture-reviewer for the sanctioned sim touch), plus qa-checklist (this is the
 phase-completion QA gate).
 Prompt each for COVERAGE not filtering. Resume any review agent that truncates

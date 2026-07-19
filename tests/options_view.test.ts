@@ -300,6 +300,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       'aurasOnPlayerFrame',
       'showItemLevel',
       'showSecondaryActionBar',
+      'showThirdActionBar',
       'showTargetOfTarget',
       'showAttackButton',
       'showDailyRewardsChest',
@@ -313,6 +314,21 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       ],
     });
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });
+  });
+
+  it('enables the third action-bar toggle only while the secondary row is visible', () => {
+    const hidden = buildInterfaceControls(makeSource());
+    expect(find(hidden, 'showSecondaryActionBar')).toMatchObject({
+      control: 'boolToggle',
+      rerender: true,
+    });
+    expect(find(hidden, 'showThirdActionBar')).toMatchObject({
+      control: 'boolToggle',
+      disabled: true,
+    });
+
+    const visible = buildInterfaceControls(makeSource({}, { showSecondaryActionBar: true }));
+    expect(find(visible, 'showThirdActionBar')).toMatchObject({ disabled: false });
   });
 
   it('marks only uiScale as commit-on-release; the other comfort sliders stay live (#1558)', () => {

@@ -3466,7 +3466,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schleudert einen Frostblitz, verursacht {damage} Frostschaden und verlangsamt die Bewegung um 40%.',
   'entities.abilities.blazing_barrier.name': 'Flammende Barriere',
   'entities.abilities.blazing_barrier.description':
-    'Hüllt Euch in Flammen und absorbiert 60 Sek. lang 130 Schaden. (Feuer)',
+    'Hüllt Euch in Flammen und absorbiert 60 Sek. lang {damage} Schaden. (Feuer)',
   'entities.abilities.cold_snap.name': 'Ruf des Winters',
   'entities.abilities.cold_snap.description':
     'Beendet die Abklingzeit von Flimmerschritt, Frostschleier und Großer Unsichtbarkeit. (Magiertalent)',
@@ -3517,7 +3517,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verwandelt den Gegner bis zu {duration} Sek. lang in eine Kröte. Die Kröte wandert umher und heilt sich schnell. Jeder Schaden bricht den Effekt. Nur Wildtiere und Humanoide.',
   'entities.abilities.frost_nova.name': 'Icebind',
   'entities.abilities.frost_nova.description':
-    'Friert alle nahen Gegner bis zu 8 Sek. lang fest und verursacht {damage} Frostschaden.',
+    'Friert alle nahen Gegner bis zu 8 Sek. lang fest und verursacht {damage} Frostschaden. Der Festhalteeffekt endet nach kumulativem Schaden in Höhe von 15 % der maximalen Gesundheit des Ziels, mindestens jedoch 20 und höchstens 60 Schaden.',
   'entities.abilities.arcane_explosion.name': 'Aetherburst',
   'entities.abilities.arcane_explosion.description':
     'Ein Ausbruch arkaner Energie trifft alle nahen Gegner für {damage} Arkanschaden.',
@@ -7201,7 +7201,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'download.windowsCta': 'Für Windows herunterladen',
   'download.linuxHint':
     'AppImage: Machen Sie es ausführbar und führen Sie es dann aus. Keine Installation erforderlich.',
-  'loading.reconnecting': 'Verbindung verloren. Verbindung wird wieder hergestellt...',
   'guide.nav.settings': 'Einstellungen und Leistung',
   'guide.settingsPage.advancedBody':
     '„Advanced“ beginnt mit der High-Stufe und schaltet vier zusätzliche Auswahlmöglichkeiten frei, sodass Sie Ihre Frames dort platzieren können, wo Sie sie tatsächlich bemerken: Geländedetails, Laubdichte, Effekte und Beleuchtung sowie Schattenqualität. Sie gelten ebenso wie die Grafikqualität nach einem Neuladen.',

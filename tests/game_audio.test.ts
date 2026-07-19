@@ -56,21 +56,30 @@ describe('sampled GameAudio facade', () => {
       ['coin', 'ui_coin'],
       ['levelUp', 'ui_level_up'],
       ['achievement', 'ui_achievement'],
+      ['cosmeticUnlock', 'ui_cosmetic_unlock'],
       ['lootItem', 'ui_loot_item'],
-      ['questAccept', 'ui_quest_accept'],
       ['questDone', 'ui_quest_done'],
       ['whisper', 'ui_whisper'],
       ['sheep', 'ui_sheep'],
       ['death', 'ui_death'],
-      ['error', 'ui_error'],
+      ['arenaLoss', 'ui_arena_loss'],
       ['duelChallenge', 'ui_duel_challenge'],
+      ['invitePrompt', 'ui_duel_challenge'],
       ['duelCountdownTick', 'ui_duel_countdown'],
       ['duelStart', 'ui_duel_start'],
+      ['vcupKickoff', 'ui_vcup_kickoff'],
       ['duelEnd', 'ui_duel_end'],
+      ['readyCheck', 'ui_ready_check'],
+      ['weaponSheathe', 'ui_weapon_sheathe'],
+      ['weaponUnsheathe', 'ui_weapon_unsheathe'],
       ['fiestaWave', 'ui_fiesta_wave'],
       ['fiestaAugment', 'ui_fiesta_augment'],
       ['fiestaDown', 'ui_fiesta_down'],
       ['fiestaRevive', 'ui_fiesta_revive'],
+      ['cardPlay', 'ui_card_play'],
+      ['cardReveal', 'ui_card_reveal'],
+      ['cardRoundPush', 'ui_card_round_push'],
+      ['cardShuffle', 'ui_card_shuffle'],
     ] as const;
 
     for (const [method, key] of routes) {
@@ -78,6 +87,17 @@ describe('sampled GameAudio facade', () => {
       expect(sfxMock.playUi).toHaveBeenLastCalledWith(key, { jitter: false });
     }
     expect(sfxMock.playUi).toHaveBeenCalledTimes(routes.length);
+  });
+
+  it('rate-limits the error cue so spamming a failure does not spam the sound', () => {
+    const audio = new GameAudio();
+
+    audio.error();
+    expect(sfxMock.playUi).toHaveBeenLastCalledWith('ui_error', {
+      jitter: false,
+      cooldown: 1.5,
+    });
+    expect(sfxMock.playUi).toHaveBeenCalledTimes(1);
   });
 
   it('gates the feedback cues on setFeedbackEnabled but leaves timing/affordance cues alone', () => {
@@ -92,12 +112,13 @@ describe('sampled GameAudio facade', () => {
       'coin',
       'levelUp',
       'lootItem',
-      'questAccept',
       'questDone',
       'whisper',
       'sheep',
       'death',
+      'arenaLoss',
       'error',
+      'invitePrompt',
     ] as const;
     for (const m of feedback) audio[m]();
     expect(sfxMock.playUi).not.toHaveBeenCalled();
@@ -119,85 +140,6 @@ describe('sampled GameAudio facade', () => {
     audio.setFeedbackEnabled(true);
     audio.lootItem();
     expect(sfxMock.playUi).toHaveBeenLastCalledWith('ui_loot_item', { jitter: false });
-  });
-
-  it('preserves the distinct procedural three-note ready-check chime', () => {
-    const frequencyParams: Array<{ setValueAtTime: ReturnType<typeof vi.fn> }> = [];
-    const oscillators: Array<{
-      type: OscillatorType;
-      start: ReturnType<typeof vi.fn>;
-      stop: ReturnType<typeof vi.fn>;
-    }> = [];
-    const gainNodes: Array<{
-      gain: {
-        value: number;
-        setValueAtTime: ReturnType<typeof vi.fn>;
-        linearRampToValueAtTime: ReturnType<typeof vi.fn>;
-        exponentialRampToValueAtTime: ReturnType<typeof vi.fn>;
-      };
-      connect: ReturnType<typeof vi.fn>;
-    }> = [];
-    const context = {
-      currentTime: 5,
-      destination: {},
-      createGain: vi.fn(() => {
-        const node = {
-          gain: {
-            value: 0,
-            setValueAtTime: vi.fn(),
-            linearRampToValueAtTime: vi.fn(),
-            exponentialRampToValueAtTime: vi.fn(),
-          },
-          connect: vi.fn((target: unknown) => target),
-        };
-        gainNodes.push(node);
-        return node;
-      }),
-      createOscillator: vi.fn(() => {
-        const frequency = { setValueAtTime: vi.fn() };
-        const oscillator = {
-          type: 'sine' as OscillatorType,
-          frequency,
-          connect: vi.fn((target: unknown) => target),
-          start: vi.fn(),
-          stop: vi.fn(),
-        };
-        frequencyParams.push(frequency);
-        oscillators.push(oscillator);
-        return oscillator;
-      }),
-    };
-    vi.stubGlobal(
-      'AudioContext',
-      vi.fn(function AudioContextMock() {
-        return context;
-      }),
-    );
-
-    const audio = new GameAudio();
-    audio.setVolume(0.5);
-    audio.init();
-    sfxMock.playUi.mockClear();
-    audio.readyCheck();
-
-    expect(sfxMock.playUi).not.toHaveBeenCalled();
-    expect(gainNodes[0].gain.value).toBe(0.16);
-    expect(oscillators.map((oscillator) => oscillator.type)).toEqual([
-      'triangle',
-      'triangle',
-      'triangle',
-    ]);
-    expect(frequencyParams.map((param) => param.setValueAtTime.mock.calls[0])).toEqual([
-      [784, 5],
-      [988, 5.12],
-      [1319, 5.24],
-    ]);
-    expect(oscillators.map((oscillator) => oscillator.start.mock.calls[0][0])).toEqual([
-      5, 5.12, 5.24,
-    ]);
-    expect(oscillators.map((oscillator) => oscillator.stop.mock.calls[0][0])).toEqual([
-      5.21, 5.33, 5.57,
-    ]);
   });
 
   it('maps all Fiesta word and score variants to separately editable clips', () => {
@@ -240,11 +182,11 @@ describe('sampled GameAudio facade', () => {
 });
 
 describe('deterministic UI SFX catalog', () => {
-  it('adds 26 unique UI cues to the authoritative studio inventory', () => {
+  it('adds 14 unique UI cues to the authoritative studio inventory', () => {
     const keys = UI_SFX_CATALOG.map((cue: { key: string }) => cue.key);
     const fullCatalogKeys = new Set(SFX.map((cue: { key: string }) => cue.key));
 
-    expect(keys).toHaveLength(26);
+    expect(keys).toHaveLength(14);
     expect(new Set(keys).size).toBe(keys.length);
     expect(keys.every((key: string) => key.startsWith('ui_'))).toBe(true);
     expect(UI_SFX_CATALOG.every((cue: { generator: string }) => cue.generator === 'ffmpeg')).toBe(

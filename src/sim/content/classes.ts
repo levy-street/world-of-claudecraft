@@ -34,7 +34,7 @@ export interface ClassDef {
   hpPerLevel: number;
   baseMana: number;
   manaPerLevel: number;
-  resourceType: 'rage' | 'mana' | 'energy';
+  resourceType: 'rage' | 'mana' | 'energy' | 'focus';
   startWeapon: string;
   startOffhand?: string;
   startChest: string;
@@ -289,28 +289,37 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     statsPerLevel: { str: 1, agi: 3, sta: 2, int: 1, spi: 1, armor: 8 },
     baseHp: 50,
     hpPerLevel: 15,
-    baseMana: 80,
-    manaPerLevel: 18,
-    resourceType: 'mana',
+    baseMana: 100, // focus cap
+    manaPerLevel: 0,
+    resourceType: 'focus',
     startWeapon: 'rusty_hatchet',
     startChest: 'footpad_jerkin',
-    startItems: START_RATIONS_MANA,
-    ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 8 },
+    startItems: START_RATIONS,
+    ranged: { min: 5, max: 9, speed: 2.3, maxRange: 35, minRange: 0 },
     abilities: [
       'raptor_strike',
+      'hunters_mark',
+      'disengage',
       'aspect_of_the_hawk',
       'serpent_sting',
       'arcane_shot',
+      'exhilaration',
       'concussive_shot',
+      'freezing_trap',
       'mongoose_bite',
       'wing_clip',
       'tame_beast',
       'dismiss_pet',
       'revive_pet',
-      'aspect_of_the_monkey',
+      'feign_death',
       'aspect_of_the_cheetah',
+      'steady_shot',
+      'explosive_shot',
+      'kill_shot',
       'aimed_shot',
+      'aspect_of_the_turtle',
       'rapid_fire',
+      'trueshot',
       'volley',
       'counter_shot',
     ],
@@ -470,6 +479,9 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
 // ---------------------------------------------------------------------------
 // Abilities — classic-era rank values and learn levels (levels 1-10)
 // ---------------------------------------------------------------------------
+
+const MAGE_PERSONAL_BARRIER_SPELL_POWER_COEFF = 0.5;
+const MAGE_TEMPORAL_BARRIER_SPELL_POWER_COEFF = 0.25;
 
 export const ABILITIES: Record<string, AbilityDef> = {
   // ====================== WARRIOR ======================
@@ -1518,18 +1530,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
       "Loose three icy bolts for $d Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant, 30% harder, and skips its cooldown. (Frost)",
   },
   // Frozen Orb: the roaming proc generator (combat/frozen_orb.ts). Instant,
-  // 30s cooldown; the orb drifts forward pulsing frost damage + a 30% snare
+  // 45s cooldown; the orb drifts forward pulsing frost damage + a 30% snare
   // once per second for 8s. First strike guarantees a Fingers of Frost stack,
   // then 20% per striking pulse. Blizzard shortens its cooldown (below).
   frozen_orb: {
     id: 'frozen_orb',
     name: 'Frozen Orb',
     class: 'mage',
-    learnLevel: 12,
+    learnLevel: 15,
     specs: ['frost'],
     cost: 50,
     castTime: 0,
-    cooldown: 30,
+    cooldown: 45,
     range: 0,
     school: 'frost',
     requiresTarget: false,
@@ -1856,6 +1868,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Transforms the enemy into a toad for up to $t sec. The toad wanders and heals rapidly. Any damage breaks the effect. Beasts and humanoids only.',
   },
+  // One meaningful follow-up breaks Icebind, while tiny incidental ticks do not.
+  // The cap prevents high-health targets from gaining a stronger root.
+  // Frost Nova deals its own damage before applying the root, so that packet is excluded.
+  // Keep this data on every rank because resolved ranks replace the full effects array.
+  // Values are cumulative post-mitigation damage.
   frost_nova: {
     id: 'frost_nova',
     name: 'Icebind',
@@ -1867,16 +1884,35 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'frost',
     requiresTarget: false,
-    effects: [{ type: 'aoeRoot', duration: 8, radius: 10, min: 6, max: 7 }],
+    effects: [
+      {
+        type: 'aoeRoot',
+        duration: 8,
+        radius: 10,
+        min: 6,
+        max: 7,
+        breakOnDamage: { maxHpPct: 0.15, min: 20, max: 60 },
+      },
+    ],
     ranks: [
       {
         rank: 2,
         level: 16,
         cost: 50,
-        effects: [{ type: 'aoeRoot', duration: 8, radius: 10, min: 12, max: 14 }],
+        effects: [
+          {
+            type: 'aoeRoot',
+            duration: 8,
+            radius: 10,
+            min: 12,
+            max: 14,
+            breakOnDamage: { maxHpPct: 0.15, min: 20, max: 60 },
+          },
+        ],
       },
     ],
-    description: 'Freezes all nearby enemies in place for up to 8 sec, dealing $d Frost damage.',
+    description:
+      "Freezes all nearby enemies in place for up to 8 sec, dealing $d Frost damage. The root breaks after cumulative damage equal to 15% of the target's maximum health, with a minimum of 20 and a maximum of 60 damage.",
   },
   arcane_explosion: {
     id: 'arcane_explosion',
@@ -2080,10 +2116,41 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'arcane',
     requiresTarget: true,
     targetType: 'friendly',
-    effects: [{ type: 'absorb', amount: 55, duration: 10 }],
+    effects: [
+      {
+        type: 'absorb',
+        amount: 55,
+        duration: 10,
+        spellPowerCoeff: MAGE_TEMPORAL_BARRIER_SPELL_POWER_COEFF,
+      },
+    ],
     ranks: [
-      { rank: 2, level: 12, cost: 75, effects: [{ type: 'absorb', amount: 100, duration: 10 }] },
-      { rank: 3, level: 18, cost: 105, effects: [{ type: 'absorb', amount: 160, duration: 10 }] },
+      {
+        rank: 2,
+        level: 12,
+        cost: 75,
+        effects: [
+          {
+            type: 'absorb',
+            amount: 100,
+            duration: 10,
+            spellPowerCoeff: MAGE_TEMPORAL_BARRIER_SPELL_POWER_COEFF,
+          },
+        ],
+      },
+      {
+        rank: 3,
+        level: 18,
+        cost: 105,
+        effects: [
+          {
+            type: 'absorb',
+            amount: 160,
+            duration: 10,
+            spellPowerCoeff: MAGE_TEMPORAL_BARRIER_SPELL_POWER_COEFF,
+          },
+        ],
+      },
     ],
     description:
       'Shifts the target a heartbeat out of the present, a temporal shell absorbing $d damage for 10 sec before the timeline snaps back.',
@@ -2398,13 +2465,50 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Frostveil',
     class: 'mage',
     learnLevel: 5,
-    cost: 90,
+    cost: 45,
     castTime: 0,
     cooldown: 30,
     range: 0,
     school: 'frost',
     requiresTarget: false,
-    effects: [{ type: 'absorb', amount: 130, duration: 60 }],
+    // The original level-20 shield moved down to the spec pick at level 5.
+    // Rank it through the leveling curve instead of granting its cap value early.
+    effects: [
+      {
+        type: 'absorb',
+        amount: 50,
+        duration: 60,
+        spellPowerCoeff: MAGE_PERSONAL_BARRIER_SPELL_POWER_COEFF,
+      },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 12,
+        cost: 65,
+        effects: [
+          {
+            type: 'absorb',
+            amount: 90,
+            duration: 60,
+            spellPowerCoeff: MAGE_PERSONAL_BARRIER_SPELL_POWER_COEFF,
+          },
+        ],
+      },
+      {
+        rank: 3,
+        level: 18,
+        cost: 90,
+        effects: [
+          {
+            type: 'absorb',
+            amount: 130,
+            duration: 60,
+            spellPowerCoeff: MAGE_PERSONAL_BARRIER_SPELL_POWER_COEFF,
+          },
+        ],
+      },
+    ],
     description: 'Shields you in ice, absorbing $d damage for 60 sec.',
   },
 
@@ -3066,6 +3170,91 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
 
   // ====================== HUNTER ======================
+  hunters_mark: {
+    id: 'hunters_mark',
+    name: "Hunter's Mark",
+    class: 'hunter',
+    learnLevel: 1,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 35,
+    school: 'physical',
+    requiresTarget: true,
+    targetType: 'enemy',
+    effects: [{ type: 'huntersMark', damageAmp: 0.05, duration: 60 }],
+    description:
+      'Marks an enemy for 60 sec, revealing it and increasing damage dealt by you and your pet by 5%.',
+  },
+  disengage: {
+    id: 'disengage',
+    name: 'Disengage',
+    class: 'hunter',
+    learnLevel: 4,
+    cost: 0,
+    castTime: 0,
+    cooldown: 20,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [{ type: 'disengage', distance: 15 }],
+    description: 'Leap backwards up to 15 yd, quickly creating distance from nearby enemies.',
+  },
+  exhilaration: {
+    id: 'exhilaration',
+    name: 'Exhilaration',
+    class: 'hunter',
+    learnLevel: 6,
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [{ type: 'healPctMax', percent: 0.3 }],
+    description: 'Instantly restores 30% of your maximum health.',
+  },
+  freezing_trap: {
+    id: 'freezing_trap',
+    name: 'Freezing Trap',
+    class: 'hunter',
+    learnLevel: 8,
+    cost: 0,
+    castTime: 0,
+    cooldown: 30,
+    range: 30,
+    school: 'frost',
+    requiresTarget: false,
+    targetMode: 'position',
+    effects: [
+      {
+        type: 'freezingTrap',
+        radius: 1.5,
+        trapDuration: 60,
+        incapacitateDuration: 60,
+      },
+    ],
+    description:
+      'Places a trap that incapacitates the first enemy to trigger it for 60 sec. Damage breaks the effect.',
+  },
+  feign_death: {
+    id: 'feign_death',
+    name: 'Feign Death',
+    class: 'hunter',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 30,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [{ type: 'feignDeath', duration: 360 }],
+    description:
+      'Feign death for up to 6 min, dropping enemy threat and cancelling enemy casts targeting you. Acting ends the effect.',
+  },
   tame_beast: {
     id: 'tame_beast',
     name: 'Wildbond',
@@ -3114,6 +3303,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'raptor_strike',
     name: 'Gutting Strike',
     class: 'hunter',
+    specs: ['survival'],
     learnLevel: 1,
     cost: 15,
     castTime: 0,
@@ -3169,7 +3359,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 0,
     range: 35,
-    minRange: 8,
     school: 'nature',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -3194,12 +3383,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'arcane_shot',
     name: 'Fell Shot',
     class: 'hunter',
-    learnLevel: 5,
+    learnLevel: 6,
     cost: 25,
     castTime: 0,
     cooldown: 6,
     range: 35,
-    minRange: 8,
     school: 'arcane',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -3219,7 +3407,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 12,
     range: 35,
-    minRange: 8,
     school: 'physical',
     projectile: true, // a fired shot: damage/slow resolve when the bolt lands
     // A fired shot: its flat damage scales off Ranged AP like the other shots,
@@ -3236,6 +3423,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'mongoose_bite',
     name: 'Counterfang',
     class: 'hunter',
+    specs: ['survival'],
     learnLevel: 10,
     cost: 10,
     castTime: 0,
@@ -3273,46 +3461,93 @@ export const ABILITIES: Record<string, AbilityDef> = {
     ],
     description: 'Inflicts a wound for $d damage, slowing the enemy by 40% for 10 sec.',
   },
-  aspect_of_the_monkey: {
-    id: 'aspect_of_the_monkey',
-    name: "Marten's Guise",
-    class: 'hunter',
-    learnLevel: 5,
-    cost: 20,
-    castTime: 0,
-    cooldown: 0,
-    range: 0,
-    school: 'nature',
-    requiresTarget: false,
-    exclusiveGroup: 'aspect',
-    effects: [{ type: 'selfBuff', kind: 'buff_dodge', value: 0.08, duration: 1800 }],
-    description: 'Take on the aspect of the monkey, increasing your dodge chance by 8% for 30 min.',
-  },
   aspect_of_the_cheetah: {
     id: 'aspect_of_the_cheetah',
-    name: "Courser's Guise",
+    name: 'Aspect of the Cheetah',
     class: 'hunter',
     learnLevel: 14,
-    cost: 20,
+    cost: 0,
     castTime: 0,
-    cooldown: 0,
+    cooldown: 180,
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    exclusiveGroup: 'aspect',
-    effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.3, duration: 1800 }],
-    description: 'Take on the aspect of the cheetah, increasing movement speed by 30% for 30 min.',
+    offGcd: true,
+    effects: [{ type: 'selfBuff', kind: 'buff_speed', value: 1.9, duration: 3 }],
+    description: 'Increases your movement speed by 90% for 3 sec.',
+  },
+  steady_shot: {
+    id: 'steady_shot',
+    name: 'Steady Shot',
+    class: 'hunter',
+    specs: ['marksmanship'],
+    learnLevel: 5,
+    cost: 0,
+    castTime: 1.75,
+    castWhileMoving: true,
+    cooldown: 0,
+    range: 35,
+    school: 'physical',
+    projectile: true,
+    scalesWith: 'ranged',
+    requiresTarget: true,
+    targetType: 'enemy',
+    effects: [
+      { type: 'directDamage', min: 24, max: 30 },
+      { type: 'gainResource', amount: 20 },
+    ],
+    description:
+      'A steady shot that deals $d Physical damage and generates 20 Focus. Can be cast while moving.',
+  },
+  explosive_shot: {
+    id: 'explosive_shot',
+    name: 'Explosive Shot',
+    class: 'hunter',
+    specs: ['marksmanship'],
+    learnLevel: 8,
+    cost: 20,
+    castTime: 0,
+    cooldown: 30,
+    range: 35,
+    school: 'physical',
+    projectile: true,
+    scalesWith: 'ranged',
+    requiresTarget: true,
+    targetType: 'enemy',
+    effects: [{ type: 'explosiveShot', delay: 3, min: 70, max: 86, radius: 8 }],
+    description:
+      'Plants explosive ammunition in the target. After 3 sec it explodes for Physical damage to enemies within 8 yd.',
+  },
+  kill_shot: {
+    id: 'kill_shot',
+    name: 'Kill Shot',
+    class: 'hunter',
+    specs: ['beast_mastery', 'marksmanship'],
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 10,
+    range: 35,
+    school: 'physical',
+    projectile: true,
+    scalesWith: 'ranged',
+    requiresTarget: true,
+    targetType: 'enemy',
+    requiresTargetHpBelow: 0.2,
+    effects: [{ type: 'directDamage', min: 95, max: 115 }],
+    description:
+      'Attempts to finish an enemy below 20% health with a powerful ranged shot for $d Physical damage.',
   },
   aimed_shot: {
     id: 'aimed_shot',
-    name: 'Long Draw',
+    name: 'Aimed Shot',
     class: 'hunter',
-    learnLevel: 11,
-    cost: 50,
+    specs: ['marksmanship'],
+    learnLevel: 16,
+    cost: 35,
     castTime: 3.0,
-    cooldown: 6,
+    cooldown: 15,
     range: 35,
-    minRange: 8,
     school: 'physical',
     projectile: true, // a fired shot: damage resolves when the arrow lands
     scalesWith: 'ranged',
@@ -3320,20 +3555,93 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [{ type: 'directDamage', min: 50, max: 62 }],
     description: 'A carefully aimed shot that deals $d damage.',
   },
-  rapid_fire: {
-    id: 'rapid_fire',
-    name: 'Fevered Draw',
+  aspect_of_the_turtle: {
+    id: 'aspect_of_the_turtle',
+    name: 'Aspect of the Turtle',
     class: 'hunter',
-    learnLevel: 20,
+    learnLevel: 18,
     cost: 0,
     castTime: 0,
-    cooldown: 300,
+    cooldown: 180,
     range: 0,
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'buff_haste', value: 1.4, duration: 15 }],
-    description: 'Increases your attack speed by 40% for 15 sec.',
+    effects: [{ type: 'aspectTurtle', reduction: 0.3, duration: 8 }],
+    description:
+      'Reduces all damage taken by 30% for 8 sec, but prevents you from attacking while active.',
+  },
+  rapid_fire: {
+    id: 'rapid_fire',
+    name: 'Rapid Fire',
+    class: 'hunter',
+    specs: ['marksmanship'],
+    learnLevel: 20,
+    cost: 0,
+    castTime: 0,
+    castWhileMoving: true,
+    channel: { duration: 1.9, ticks: 7 },
+    cooldown: 16,
+    range: 35,
+    school: 'physical',
+    projectile: true,
+    scalesWith: 'ranged',
+    requiresTarget: true,
+    targetType: 'enemy',
+    effects: [
+      { type: 'directDamage', min: 13, max: 17 },
+      { type: 'gainResource', amount: 3 },
+    ],
+    description:
+      'Channels 7 rapid shots over 1.9 sec. Each shot deals $d Physical damage and generates 3 Focus. Can be channeled while moving.',
+  },
+  trueshot: {
+    id: 'trueshot',
+    name: 'Trueshot',
+    class: 'hunter',
+    specs: ['marksmanship'],
+    learnLevel: 20,
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    effects: [{ type: 'trueshot', duration: 15, critChance: 0.1, critDamage: 0.2 }],
+    description:
+      'For 15 sec, gain 10% critical strike chance and 20% critical damage. Aimed Shot cooldown recovers 40% faster and Rapid Fire cooldown recovers 60% faster.',
+  },
+  powerful_shot: {
+    id: 'powerful_shot',
+    name: 'Powershot',
+    class: 'hunter',
+    specs: ['marksmanship'],
+    learnLevel: 20,
+    cost: 0,
+    castTime: 2.5,
+    empowerStages: 4,
+    castWhileMoving: false,
+    cooldown: 45,
+    range: 45,
+    school: 'physical',
+    scalesWith: 'ranged',
+    requiresTarget: false,
+    effects: [
+      {
+        type: 'powerfulShot',
+        min: 90,
+        max: 110,
+        minLength: 15,
+        maxLength: 45,
+        minWidth: 2,
+        maxWidth: 2.4,
+        minDamageScale: 0.35,
+        maxDamageScale: 1,
+      },
+    ],
+    description:
+      'Hold to aim a narrow piercing shot. Charging greatly increases its damage and length, and only slightly increases its width. Release to fire; it fires automatically at full charge.',
   },
 
   // ====================== PRIEST ======================
@@ -5300,7 +5608,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 60,
     range: 30,
-    minRange: 8,
     school: 'nature',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -5618,7 +5925,6 @@ export const ABILITIES: Record<string, AbilityDef> = {
     castTime: 0,
     cooldown: 20,
     range: 35,
-    minRange: 8,
     school: 'physical',
     scalesWith: 'ranged',
     requiresTarget: true,
@@ -5928,7 +6234,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     class: 'mage',
     learnLevel: 5,
     specs: ['fire'],
-    cost: 90,
+    cost: 45,
     castTime: 0,
     cooldown: 30,
     range: 0,
@@ -5936,8 +6242,43 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     // The fire spec's PERSONAL BARRIER slot (Frost carries Frostveil): the
     // shared row talents hook either id via PERSONAL_BARRIER_IDS.
-    effects: [{ type: 'absorb', amount: 130, duration: 60 }],
-    description: 'Wreathe yourself in flame, absorbing 130 damage for 60 sec. (Fire)',
+    effects: [
+      {
+        type: 'absorb',
+        amount: 50,
+        duration: 60,
+        spellPowerCoeff: MAGE_PERSONAL_BARRIER_SPELL_POWER_COEFF,
+      },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 12,
+        cost: 65,
+        effects: [
+          {
+            type: 'absorb',
+            amount: 90,
+            duration: 60,
+            spellPowerCoeff: MAGE_PERSONAL_BARRIER_SPELL_POWER_COEFF,
+          },
+        ],
+      },
+      {
+        rank: 3,
+        level: 18,
+        cost: 90,
+        effects: [
+          {
+            type: 'absorb',
+            amount: 130,
+            duration: 60,
+            spellPowerCoeff: MAGE_PERSONAL_BARRIER_SPELL_POWER_COEFF,
+          },
+        ],
+      },
+    ],
+    description: 'Wreathe yourself in flame, absorbing $d damage for 60 sec. (Fire)',
   },
   ignition: {
     id: 'ignition',
@@ -6215,7 +6556,7 @@ function scaleEffect(
     case 'lifeTap':
       return { ...eff, mana: Math.round(eff.mana * dmgMult + flat) };
     case 'gainResource':
-      return { ...eff, amount: Math.round(eff.amount * dmgMult + flat) };
+      return eff;
     default:
       return eff;
   }

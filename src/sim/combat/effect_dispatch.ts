@@ -20,12 +20,30 @@ import { ABILITIES, isDelvePos } from '../data';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
+import {
+  applyAspectOfTheTurtle,
+  applyHuntersMark,
+  applyPercentMaxHeal,
+  disengage,
+  feignDeath,
+  huntersMarkDamageMultiplier,
+  placeFreezingTrap,
+} from '../hunter_base_abilities';
+import {
+  aimedShotRicochet,
+  applyExplosiveShot,
+  applyTrueshot,
+  fireHunterMultiShot,
+  firePowerfulShot,
+  maybeProcDeathblow,
+} from '../hunter_marksmanship';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../mob/healer_channel';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
   abilityScalingPower,
+  absorbBonus,
   directHealBonus,
   directHitBonus,
   dotTickBonus,
@@ -54,7 +72,7 @@ import {
   hasSweepingStrikes,
   sweepStrikeDamage,
 } from './area_echo';
-import { isRootedOrChilled } from './cc';
+import { damageBreakThreshold, isRootedOrChilled } from './cc';
 import {
   ARCANE_SURGE_ID,
   aetherSurgeAddStack,
@@ -412,11 +430,12 @@ export function runEffects(
         // the caster's charge aura (combat/chronomancy.ts).
         if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
         const finalDamage = Math.round(dmg);
-        lastDirectDamage = finalDamage;
+        const dealtDamage = Math.round(finalDamage * huntersMarkDamageMultiplier(p, target));
+        lastDirectDamage = dealtDamage;
         ctx.dealDamage(
           p,
           target,
-          finalDamage,
+          dealtDamage,
           crit,
           ability.school,
           ability.name,
@@ -428,6 +447,10 @@ export function runEffects(
           false,
           ability.id,
         );
+        if (ability.id === 'aimed_shot') {
+          aimedShotRicochet(ctx, p, target, finalDamage, ability.name);
+          maybeProcDeathblow(ctx, p);
+        }
         if (areaEcho) {
           areaEchoDealt = true;
           echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
@@ -798,7 +821,7 @@ export function runEffects(
           kind: 'absorb',
           remaining: eff.duration,
           duration: eff.duration,
-          value: eff.amount,
+          value: eff.amount + absorbBonus(p.spellPower, eff.spellPowerCoeff ?? 0),
           sourceId: p.id,
           school: ability.school,
         });
@@ -2096,6 +2119,7 @@ export function runEffects(
                 `${ability.id}_root`,
                 eff.duration,
                 ability.school,
+                eff.breakOnDamage ? damageBreakThreshold(m.maxHp, eff.breakOnDamage) : undefined,
               );
             }
           }
@@ -2442,6 +2466,56 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
+        break;
+      }
+      case 'huntersMark': {
+        applyHuntersMark(ctx, p, target, eff.damageAmp, eff.duration, ability.name);
+        break;
+      }
+      case 'disengage': {
+        disengage(ctx, p, eff.distance);
+        break;
+      }
+      case 'aspectTurtle': {
+        applyAspectOfTheTurtle(ctx, p, eff.reduction, eff.duration, ability.name);
+        break;
+      }
+      case 'healPctMax': {
+        applyPercentMaxHeal(ctx, p, eff.percent, ability.name);
+        break;
+      }
+      case 'feignDeath': {
+        feignDeath(ctx, p, eff.duration, ability.name);
+        break;
+      }
+      case 'freezingTrap': {
+        placeFreezingTrap(
+          ctx,
+          p,
+          p.castAim ?? p.pos,
+          eff.radius,
+          eff.trapDuration,
+          eff.incapacitateDuration,
+          ability.name,
+        );
+        break;
+      }
+      case 'trueshot': {
+        applyTrueshot(ctx, p, meta, eff.duration, eff.critChance, eff.critDamage, ability.name);
+        break;
+      }
+      case 'explosiveShot': {
+        applyExplosiveShot(ctx, p, target, eff.delay, ability.name);
+        break;
+      }
+      case 'hunterMultiShot': {
+        fireHunterMultiShot(ctx, p, target, res, eff.min, eff.max, eff.radius, eff.softCap);
+        break;
+      }
+      case 'powerfulShot': {
+        const stages = Math.max(1, ability.empowerStages ?? 1);
+        const fraction = stages <= 1 ? 1 : ((res.empowerLevel ?? stages) - 1) / (stages - 1);
+        firePowerfulShot(ctx, p, res, fraction);
         break;
       }
       case 'charge': {

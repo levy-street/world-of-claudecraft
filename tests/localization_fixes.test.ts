@@ -542,6 +542,8 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     setLanguage('de_DE');
     expect(localizeSimAuraName('Tamed')).not.toBeNull();
     expect(localizeSimAuraName('Tamed')).not.toBe('Tamed');
+    expect(localizeSimAuraName('Lock and Load')).not.toBeNull();
+    expect(localizeSimAuraName('Deathblow')).not.toBeNull();
     expect(localizeSimAuraName('not-an-aura')).toBeNull();
     setLanguage('en');
   });
@@ -1198,5 +1200,31 @@ describe('server restart-countdown announcements are localized (broadcastSystem 
       }
     }
     setLanguage('en');
+  });
+});
+
+// --- S3 meta-guard: the scan LIST itself. PR 2039 closed the quest_commands
+// blind spot by adding src/sim/quests/quest_commands.ts to the simSrc scan
+// list above; the profession-choice denial strings have their only emitter
+// occurrences there, so dropping the entry silently reopens the blind spot
+// while the gate stays green. This reads THIS test file's own source and fails
+// if the entry ever leaves the list. The marker strings are concatenated at
+// runtime so this guard can never match its own source instead of the list. ---
+describe('S3 meta-guard: quest_commands.ts stays on the simSrc scan list', () => {
+  it('keeps src/sim/quests/quest_commands.ts in the S3 scan list', () => {
+    const self = fs.readFileSync(
+      path.resolve(process.cwd(), 'tests/localization_fixes.test.ts'),
+      'utf8',
+    );
+    const listStart = self.indexOf(['const simSrc', '= ['].join(' '));
+    expect(listStart, 'the simSrc scan-list declaration should exist').toBeGreaterThan(-1);
+    const listEnd = self.indexOf([']', 'join'].join('.'), listStart);
+    expect(listEnd, 'the simSrc scan list should close with a join').toBeGreaterThan(listStart);
+    const listBlock = self.slice(listStart, listEnd);
+    const entry = ['src/sim/quests', 'quest_commands.ts'].join('/');
+    expect(
+      listBlock.includes(`'${entry}'`),
+      `${entry} must stay in the S3 simSrc scan list (the PR 2039 blind-spot fix)`,
+    ).toBe(true);
   });
 });

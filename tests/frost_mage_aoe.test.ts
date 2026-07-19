@@ -77,19 +77,28 @@ const knownIds = (spec: string | null): Set<string> =>
   );
 
 describe('AoE content defs', () => {
-  it('pins Frozen Orb: instant, 30s cooldown, frost-gated, orb effect', () => {
+  it('pins Frozen Orb: level 15, instant, 45s cooldown, frost-gated, orb effect', () => {
     const def = ABILITIES.frozen_orb;
     expect(def).toBeDefined();
     expect(def.name).toBe('Frozen Orb');
-    expect(def.learnLevel).toBe(12);
+    expect(def.learnLevel).toBe(15);
     expect(def.specs).toEqual(['frost']);
     expect(def.castTime).toBe(0);
-    expect(def.cooldown).toBe(30);
+    expect(def.cooldown).toBe(45);
     expect(def.school).toBe('frost');
     expect(def.requiresTarget).toBe(false);
     expect(def.effects).toEqual([
       { type: 'frozenOrb', min: 8, max: 11, radius: 6, duration: 8, interval: 1 },
     ]);
+  });
+
+  it('unlocks Frozen Orb at level 15, not level 14', () => {
+    const frostMods = computeTalentModifiers('mage', alloc('frost'));
+    const at14 = abilitiesKnownAt('mage', 14, frostMods).map((known) => known.def.id);
+    const at15 = abilitiesKnownAt('mage', 15, frostMods).map((known) => known.def.id);
+
+    expect(at14).not.toContain('frozen_orb');
+    expect(at15).toContain('frozen_orb');
   });
 
   it('pins Blizzard: a 2s cast placing a 6s self-pulsing storm, 8s cooldown', () => {
@@ -301,12 +310,13 @@ describe('Blizzard in combat', () => {
     face(p, pack[0]);
     sim.drainEvents();
     p.resource = p.maxResource;
-    p.cooldowns.set('frozen_orb', 30);
+    const orbCooldown = ABILITIES.frozen_orb.cooldown;
+    p.cooldowns.set('frozen_orb', orbCooldown);
     sim.castAbility('blizzard', undefined, { x: p.pos.x, z: p.pos.z + 11 });
     const seconds = 2 + 6.6; // the cast, then the storm's pulses
     tickFor(sim, seconds);
     // Natural tick-down (elapsed) + the capped refund, never more.
-    const expected = 30 - seconds - BLIZZARD_ORB_CDR_CAP;
+    const expected = orbCooldown - seconds - BLIZZARD_ORB_CDR_CAP;
     expect(p.cooldowns.get('frozen_orb')).toBeCloseTo(expected, 0);
 
     // A second cast gets a FRESH budget (the per-cast reset).
@@ -326,7 +336,7 @@ describe('Blizzard in combat', () => {
       for (let i = 0; i < packSize; i++) spawnDummy(sim, p, 10 + i);
       sim.drainEvents();
       p.resource = p.maxResource;
-      p.cooldowns.set('frozen_orb', 30);
+      p.cooldowns.set('frozen_orb', ABILITIES.frozen_orb.cooldown);
       sim.castAbility('blizzard', undefined, { x: p.pos.x, z: p.pos.z + 11 });
       tickFor(sim, midChannel);
       return p.cooldowns.get('frozen_orb') ?? 0;

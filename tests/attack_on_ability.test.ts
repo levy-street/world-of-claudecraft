@@ -41,6 +41,17 @@ describe('abilityStartsAutoAttack', () => {
     expect(gouge.some((e) => e.type === 'directDamage')).toBe(true);
     expect(gouge.some((e) => e.type === 'incapacitate')).toBe(true);
     expect(abilityStartsAutoAttack(gouge)).toBe(false);
+
+    // Icebind deals its own damage before applying its damage-breakable root.
+    // That initial packet stays, but a follow-up white swing must not shatter it.
+    const icebind = effectsOf('frost_nova');
+    expect(
+      icebind.some(
+        (e) =>
+          e.type === 'aoeRoot' && e.breakOnDamage !== undefined && (e.min !== 0 || e.max !== 0),
+      ),
+    ).toBe(true);
+    expect(abilityStartsAutoAttack(icebind)).toBe(false);
   });
 
   it('is order-independent for the break-on-damage CC exclusion', () => {
@@ -57,6 +68,17 @@ describe('abilityStartsAutoAttack', () => {
     expect(abilityStartsAutoAttack([fear, dmg])).toBe(false);
   });
 
+  it('still engages on a damaging area root that does not break on damage', () => {
+    const root: AbilityEffect = {
+      type: 'aoeRoot',
+      duration: 4,
+      radius: 8,
+      min: 6,
+      max: 7,
+    };
+    expect(abilityStartsAutoAttack([root])).toBe(true);
+  });
+
   it('does not engage on an empty effect list', () => {
     expect(abilityStartsAutoAttack([])).toBe(false);
   });
@@ -67,7 +89,6 @@ describe('abilityStartsAutoAttack', () => {
     // why castSlot must additionally gate on hasAutoAttackTarget: an unconditional
     // startAutoAttack here pops a spurious "Invalid attack target." toast (#1063).
     expect(abilityStartsAutoAttack(effectsOf('arcane_explosion'))).toBe(true);
-    expect(abilityStartsAutoAttack(effectsOf('frost_nova'))).toBe(true);
     expect(abilityStartsAutoAttack(effectsOf('thunder_clap'))).toBe(true);
     expect(abilityStartsAutoAttack(effectsOf('consecration'))).toBe(true);
     expect(abilityStartsAutoAttack(effectsOf('cleave'))).toBe(true);

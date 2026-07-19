@@ -2356,7 +2356,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Bao bọc bạn trong băng giá, tăng giáp thêm {buff} trong 30 phút.',
   'entities.abilities.frost_armor.name': 'Áo Choàng Sương Giá',
   'entities.abilities.frost_nova.description':
-    'Đóng băng tất cả kẻ địch xung quanh tại chỗ trong tối đa 8 giây, gây {damage} sát thương Băng.',
+    'Đóng băng tất cả kẻ địch xung quanh tại chỗ trong tối đa 8 giây, gây {damage} sát thương Băng. Hiệu ứng trói chân bị phá vỡ sau khi nhận tổng sát thương bằng 15% máu tối đa của mục tiêu, tối thiểu 20 và tối đa 60 sát thương.',
   'entities.abilities.frost_nova.name': 'Trói Băng',
   'entities.abilities.frost_shock.description':
     'Lập tức giáng băng giá vào mục tiêu gây {damage} sát thương Băng và làm chậm di chuyển của nó 50% trong 8 giây.',
@@ -7078,7 +7078,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'download.linuxCta': 'Tải xuống cho Linux',
   'download.windowsCta': 'Tải xuống cho Windows',
   'download.linuxHint': 'AppImage: làm cho nó có thể thực thi được rồi chạy nó. Không cần cài đặt.',
-  'loading.reconnecting': 'Mất kết nối. Đang kết nối lại...',
   'guide.nav.settings': 'Cài đặt & Hiệu suất',
   'guide.settingsPage.advancedBody':
     'Nâng cao bắt đầu từ cấp High và mở khóa bốn bộ chọn bổ sung, do đó bạn có thể sử dụng khung hình của mình ở nơi bạn thực sự chú ý đến chúng: Chi tiết địa hình, Mật độ tán lá, Hiệu ứng & Ánh sáng và Chất lượng bóng. Giống như Chất lượng đồ họa, chúng được áp dụng sau khi tải lại.',
@@ -8022,7 +8021,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'game.talents.rowUnlocks': 'Mở khóa ở cấp {level}',
   'entities.abilities.blazing_barrier.name': 'Lá Chắn Rực Lửa',
   'entities.abilities.blazing_barrier.description':
-    'Bao bọc bản thân trong lửa, hấp thụ 130 sát thương trong 60 giây. (Lửa)',
+    'Bao bọc bản thân trong lửa, hấp thụ {damage} sát thương trong 60 giây. (Lửa)',
   'entities.abilities.cold_snap.name': 'Tiếng Gọi Mùa Đông',
   'entities.abilities.cold_snap.description':
     'Hoàn tất thời gian hồi của Bước Chớp, Màn Sương Giá và Tàng Hình Cao Cấp. (tài năng pháp sư)',

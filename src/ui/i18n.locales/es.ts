@@ -3440,7 +3440,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Lanza una descarga de escarcha que causa {damage} de daño de Escarcha y reduce la velocidad de movimiento un 40%.',
   'entities.abilities.blazing_barrier.name': 'Barrera llameante',
   'entities.abilities.blazing_barrier.description':
-    'Te envuelve en llamas y absorbe 130 de daño durante 60 s. (Fuego)',
+    'Te envuelve en llamas y absorbe {damage} de daño durante 60 s. (Fuego)',
   'entities.abilities.cold_snap.name': 'Llamada del invierno',
   'entities.abilities.cold_snap.description':
     'Finaliza el tiempo de reutilización de Paso centelleante, Velo de Escarcha e Invisibilidad superior. (Talento de mago)',
@@ -3491,7 +3491,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Transforma al enemigo en sapo durante hasta {duration} s. El sapo deambula y se cura rápidamente. Cualquier daño rompe el efecto. Solo bestias y humanoides.',
   'entities.abilities.frost_nova.name': 'Atadura de Hielo',
   'entities.abilities.frost_nova.description':
-    'Congela a todos los enemigos cercanos en el sitio durante hasta 8 s e inflige {damage} de daño de Escarcha.',
+    'Congela a todos los enemigos cercanos en el sitio durante hasta 8 s e inflige {damage} de daño de Escarcha. El enraizamiento se rompe tras recibir daño acumulado equivalente al 15 % de la salud máxima del objetivo, con un mínimo de 20 y un máximo de 60 de daño.',
   'entities.abilities.arcane_explosion.name': 'Estallido de Éter',
   'entities.abilities.arcane_explosion.description':
     'Una explosión de energía Arcana golpea a todos los enemigos cercanos por {damage} de daño Arcano.',
@@ -3631,15 +3631,15 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.aspect_of_the_monkey.name': 'Aspecto de la Marta',
   'entities.abilities.aspect_of_the_monkey.description':
     'Adoptas el aspecto de la marta y aumentas tu probabilidad de esquivar un 8% durante 30 min.',
-  'entities.abilities.aspect_of_the_cheetah.name': 'Aspecto del Corcel',
+  'entities.abilities.aspect_of_the_cheetah.name': 'Aspecto del guepardo',
   'entities.abilities.aspect_of_the_cheetah.description':
-    'Adoptas el aspecto del corcel y aumentas la velocidad de movimiento un 30% durante 30 min.',
-  'entities.abilities.aimed_shot.name': 'Tensado Largo',
+    'Aumenta tu velocidad de movimiento un 90% durante 3 s.',
+  'entities.abilities.aimed_shot.name': 'Disparo de puntería',
   'entities.abilities.aimed_shot.description':
-    'Un disparo cuidadosamente tensado que inflige {damage} de daño.',
-  'entities.abilities.rapid_fire.name': 'Tensado Febril',
+    'Un disparo cuidadosamente apuntado que inflige {damage} de daño físico.',
+  'entities.abilities.rapid_fire.name': 'Fuego rápido',
   'entities.abilities.rapid_fire.description':
-    'Aumenta tu velocidad de ataque un 40% durante 15 s.',
+    'Canaliza 7 disparos durante 1,9 s. Cada disparo genera 3 p. de enfoque y la canalización continúa mientras te mueves.',
   'entities.abilities.smite.name': 'Punición',
   'entities.abilities.smite.description': 'Castiga al enemigo por {damage} de daño Sagrado.',
   'entities.abilities.lesser_heal.name': 'Plegaria Susurrada',
@@ -7162,7 +7162,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'download.linuxCta': 'Descargar para Linux',
   'download.windowsCta': 'Descargar para Windows',
   'download.linuxHint': 'AppImage: hazlo ejecutable y luego ejecútalo. No se necesita instalación.',
-  'loading.reconnecting': 'Conexión perdida. Reconectando...',
   'guide.nav.settings': 'Configuración y rendimiento',
   'guide.settingsPage.advancedBody':
     'Avanzado comienza desde el nivel High y desbloquea cuatro selectores adicionales, para que puedas pasar tus fotogramas donde realmente los notes: Detalle del terreno, Densidad del follaje, Efectos e iluminación y Calidad de las sombras. Al igual que la calidad de los gráficos, se aplican después de una recarga.',

@@ -299,3 +299,14 @@ describe('bags_window: styles for the drag affordances', () => {
     expect(components).toContain('.equip-slot.drop-target {');
   });
 });
+
+describe('bags_window: per-copy instance tooltip forwarding (Professions 2.0 Phase 6)', () => {
+  it("forwards the slot's instance payload into the widened itemTooltip dep", () => {
+    // The bank arm has a model-level pin (bank_view.test.ts BankSlotModel
+    // .instance passthrough); the bags arm is a direct painter call, so the
+    // call site itself is the load-bearing surface: dropping `s.instance`
+    // reverts every bag tooltip to def-only while all pure-core suites stay
+    // green (the exact regression class the widened dep was added for).
+    expect(painter).toContain('this.deps.itemTooltip(item, s.instance)');
+  });
+});

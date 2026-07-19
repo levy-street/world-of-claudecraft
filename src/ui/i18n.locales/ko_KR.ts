@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'entities.abilities.powerful_shot.name': '강력 사격',
   'hudChrome.crafting.identity.ceilingRare': '희귀 상한',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -680,6 +681,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.playerMenu.profileUnavailable': '{name} 님의 프로필을 찾을 수 없습니다.',
   'hudChrome.playerMenu.aiTag': '[AI]',
   'hudChrome.playerMenu.aiTagTitle': 'AI 운영 계정',
+  'hudChrome.playerMenu.streamerBadgeTitle': '인증된 스트리머',
   'hudChrome.playerMenu.watchTwitch': 'Twitch에서 시청',
   'hudChrome.playerMenu.watchX': 'X에서 보기',
   'hudChrome.playerMenu.watchKick': 'Kick에서 시청',
@@ -973,6 +975,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.highContrastBackground': '고대비 배경',
   'hudChrome.options.showItemLevel': '아이템 레벨 표시',
   'hudChrome.options.showSecondaryActionBar': '보조 액션 바 표시',
+  'hudChrome.options.showThirdActionBar': '세 번째 액션 바 표시',
   'hudChrome.options.showDailyRewardsChest': '일일 보상 보물상자 표시',
   'hudChrome.options.mobileCameraJoystick': '카메라 조이스틱',
   'hudChrome.options.mobileLeftHanded': '왼손잡이 레이아웃',
@@ -1445,7 +1448,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'loading.enterTimeout':
     '세계에 입장할 수 없습니다. 연결 시간이 초과되었습니다. 게임 서버가 실행 중인가요?',
   'loading.connectionLost': '서버와의 연결이 끊어졌습니다.',
-  'loading.reconnecting': '연결이 끊어졌습니다. 다시 연결하는 중...',
+  'loading.reconnectingAttempt':
+    '연결이 끊어졌습니다. 다시 연결하는 중...(시도 {attempt}/{maxAttempts}, {seconds}초 후 재시도)',
+  'loading.reconnectingNow':
+    '연결이 끊어졌습니다. 지금 다시 연결하는 중...(시도 {attempt}/{maxAttempts})',
+  'loading.slowConnection': '로딩이 평소보다 오래 걸리고 있습니다. 인터넷 연결을 확인하세요.',
   'loading.connectionRejected': '서버가 연결을 종료했습니다.',
   'loading.realmFull': '이 월드는 현재 포화 상태입니다. 몇 분 후에 다시 시도해 주세요.',
   'loading.tooManyConnections':
@@ -2333,6 +2340,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.rarityUncommon': '고급',
   'itemUi.market.rarityRare': '희귀',
   'itemUi.market.rarityEpic': '영웅',
+  'itemUi.market.rarityLegendary': '전설',
   'itemUi.market.merchantStock': '상인 재고',
   'itemUi.market.stackCount': 'x{count}',
   'itemUi.market.each': '개당 {money}',
@@ -2471,7 +2479,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적을 최대 {duration}초 동안 두꺼비로 변이시킵니다. 두꺼비는 돌아다니며 빠르게 회복합니다. 피해를 받으면 효과가 해제됩니다. 야수와 인간형에게만 사용할 수 있습니다.',
   'entities.abilities.frost_nova.name': '얼음 속박',
   'entities.abilities.frost_nova.description':
-    '주위 모든 적을 최대 8초 동안 제자리에 얼리고 {damage}의 냉기 피해를 입힙니다.',
+    '주위 모든 적을 최대 8초 동안 제자리에 얼리고 {damage}의 냉기 피해를 입힙니다. 이동 불가 효과는 대상 최대 생명력의 15%에 해당하는 누적 피해를 받으면 해제되며, 피해 기준은 최소 20, 최대 60입니다.',
   'entities.abilities.arcane_explosion.name': '에테르 폭발',
   'entities.abilities.arcane_explosion.description':
     '비전 에너지 폭발이 주위 모든 적에게 {damage}의 비전 피해를 입힙니다.',
@@ -6287,6 +6295,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.comboNotAttuned': '먼저 원형 기술 조합을 선택하세요.',
   'hudChrome.crafting.comboWrongPair': '제작하려면 이 정확한 조합을 활성화하세요.',
   'hudChrome.crafting.comboTierUnmet': '두 주 전공을 모두 필요한 티어까지 올리세요.',
+  'hudChrome.crafting.comboTierUnmetNamed': '{crafts}을(를) 티어 {tier}까지 올리세요.',
   'hudChrome.crafting.professionChoice': '전문 기술 선택',
   'hudChrome.crafting.noProfessionChoice': '현재 선택할 수 있는 전문 기술이 없습니다.',
   'hudChrome.crafting.attunementPreview':
@@ -6907,7 +6916,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '각 제작법은 여러분이 채집하거나 구매하는 특정 재료를 필요로 한다. 가장 단순한 제작법은 일반 재료만으로 충분하며 처음부터 만들 수 있어, 전문직을 익히는 즉시 작업을 시작할 수 있다. 제작법 목록은 아직 채워지는 중이다. 몇몇 전문직은 첫 제작법을 기다리고 있으며, 전문직이 성장함에 따라 더 많은 제작법이 추가된다.',
   'guide.professions.craftMasteryTitle': '숙련도와 통달',
   'guide.professions.craftMasteryBody':
-    '제작에 성공하면 해당 전문직의 숙련도가 오르며, 숙련도가 제작법을 잠가 두는 일은 결코 없다. 제작법을 알고 그 재료를 지녔다면 언제든 시도할 수 있다. 숙련도가 대신 안겨 주는 것은 품질이니, 손에 익은 솜씨일수록 더 뛰어난 결과물을 내놓는다. 유일한 예외는 조합 제작법으로, 열리기 전에 두 전문직 모두에서 실력을 입증하기를 요구한다.',
+    '제작에 성공하면 해당 전문직의 숙련도가 오르며, 숙련도가 제작법을 잠가 두는 일은 결코 없다. 제작법을 알고 그 재료를 지녔다면 언제든 시도할 수 있다. 모든 제작법은 약속한 그대로의 결과물을 내놓지만, 손에 익은 솜씨는 이따금 걸작을 만들어 낸다. 같은 물건이되 마무리가 더 정교하고, 약간의 추가 힘이 깃들어 있다. 유일한 예외는 조합 제작법으로, 두 전문직을 잇는 원형에 조율하고 두 전문직 모두에서 검증된 실력을 갖춘 제작자에게만 열린다.',
   'guide.professions.craftComboTitle': '조합 제작법',
   'guide.professions.craftComboBody':
     '단일 전문직 자체의 제작법 목록을 넘어, 이 원환은 인접한 두 전문직을 동시에 필요로 하는 조합 제작법도 지원하여, 고립된 하나의 전문직이 아니라 원환 위에서 인접한 전문직들에 투자한 캐릭터에게 보상을 준다. 제작자는 두 전문직을 모두 스스로 지녀야 하며, 파트너의 숙련도가 어느 한쪽을 대신할 수는 없다.',
@@ -6916,7 +6925,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '열 가지 전문직은 각각 원형도 상징하며, 단순히 그 전문직에 종사하는 것을 넘어서는 더 넓은 정체성을 받아들일 수 있다. 당신의 현재 원형은 한 번에 하나뿐이며 목록이 아니다: 당신은 하나를 지니며, 원한다면 나중에 다른 것으로 바꿀 수 있다.',
   'guide.professions.archetypeChooseTitle': '원형 선택하기',
   'guide.professions.archetypeChooseBody':
-    '원형을 선언하는 것은 하나의 이야기 장면이 될 것이다: 그 정체성으로 당신을 공식적으로 받아들이는 퀘스트다. 그 길은 아직 만들어지는 중이므로, 지금은 모든 캐릭터가 그 선택을 앞에 둔 채 세계를 걷고 있으며, 그동안 모든 제작은 희귀 품질 등급까지 나아간다.',
+    '원형을 선언하는 것은 하나의 이야기 장면이다: 그 정체성으로 당신을 공식적으로 받아들이는 퀘스트다. 선언하기 전에는 모든 전문직의 숙련도가 희귀 티어까지 오를 수 있다. 한 쌍을 받아들이면 그 두 전문직은 끝까지 열리고, 수레바퀴 반대편의 한 전문직은 취미로 곁에 남아 여전히 희귀 티어까지 쓸 수 있으며, 그 정체성을 지니는 동안 나머지 모든 전문직은 일반 티어에 머문다.',
   'guide.professions.archetypeSwitchTitle': '마음을 바꾸기',
   'guide.professions.archetypeSwitchBody':
     '선언이 종신형이 되는 일도 없을 것이다. 계획은 새 원형을 받아들이기 전에 옛 전문직에 속죄하는 반복 가능한 절차이며, 바꿀 때마다 그 속죄는 조금씩 더 무거워져, 선택이 대가 없는 것이 아니라 늘 의미 있는 것으로 남는다. 선언 그 자체와 마찬가지로, 이 역시 아직 오는 중이다.',
@@ -7060,6 +7069,50 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.letters.heroic_marks_reward.subject': '당신의 영웅의 징표',
   'entities.letters.heroic_marks_reward.body':
     '당신이 후방에서, 혹은 쓰러진 채로 싸우는 동안 당신의 부대가 영웅 시련을 돌파했습니다. 잠금은 똑같이 적용되었으니, 당신 몫의 영웅의 징표는 사라지지 않고 이곳으로 날아왔습니다. 잘 쓰십시오.\n\n- 영웅 병참장교',
+  'entities.letters.guild_trend_engineering_alchemy.sender': '제작 길드',
+  'entities.letters.guild_trend_engineering_alchemy.subject': '기계공학과 연금술 솜씨에 관하여',
+  'entities.letters.guild_trend_engineering_alchemy.body':
+    '장인에게,\n\n기계공학과 연금술에 힘쓰는 그대의 소문이 길드에 닿았습니다. 장약을 재고 시약을 달며 두 기술이 서로를 키워 주고 있다지요. 이웃한 두 기술을 함께 갈고닦는 손은 조율할 준비가 되었다는 증표입니다. 이 짝을 맺은 이는 언젠가 폭격수의 이름을 얻습니다. 이스트브룩의 대장장이 할드렌을 찾아가십시오. 지금은 그가 장인들을 대신해 말합니다. 자신의 손으로 해낸 결과물로 솜씨를 증명하면, 그가 그 두 기술을 그대의 주 전공으로 조율해 줄 것입니다.\n\n경의를 담아,\n제작 길드',
+  'entities.letters.guild_trend_alchemy_cooking.sender': '제작 길드',
+  'entities.letters.guild_trend_alchemy_cooking.subject': '연금술과 요리 솜씨에 관하여',
+  'entities.letters.guild_trend_alchemy_cooking.body':
+    '장인에게,\n\n연금술과 요리에 힘쓰는 그대의 소문이 길드에 닿았습니다. 물약을 달이고 요리에 간을 맞추며 두 기술이 서로를 키워 주고 있다지요. 이웃한 두 기술을 함께 갈고닦는 손은 조율할 준비가 되었다는 증표입니다. 이 짝을 맺은 이는 언젠가 약제사의 이름을 얻습니다. 이스트브룩의 대장장이 할드렌을 찾아가십시오. 지금은 그가 장인들을 대신해 말합니다. 자신의 손으로 해낸 결과물로 솜씨를 증명하면, 그가 그 두 기술을 그대의 주 전공으로 조율해 줄 것입니다.\n\n경의를 담아,\n제작 길드',
+  'entities.letters.guild_trend_cooking_leatherworking.sender': '제작 길드',
+  'entities.letters.guild_trend_cooking_leatherworking.subject': '요리와 가죽세공 솜씨에 관하여',
+  'entities.letters.guild_trend_cooking_leatherworking.body':
+    '장인에게,\n\n요리와 가죽세공에 힘쓰는 그대의 소문이 길드에 닿았습니다. 음식을 차려 내고 가죽을 무두질하며 두 기술이 서로를 키워 주고 있다지요. 이웃한 두 기술을 함께 갈고닦는 손은 조율할 준비가 되었다는 증표입니다. 이스트브룩의 대장장이 할드렌을 찾아가십시오. 지금은 그가 장인들을 대신해 말합니다. 자신의 손으로 해낸 결과물로 솜씨를 증명하면, 그가 그 두 기술을 그대의 주 전공으로 조율해 줄 것입니다.\n\n경의를 담아,\n제작 길드',
+  'entities.letters.guild_trend_leatherworking_tailoring.sender': '제작 길드',
+  'entities.letters.guild_trend_leatherworking_tailoring.subject': '가죽세공과 재봉 솜씨에 관하여',
+  'entities.letters.guild_trend_leatherworking_tailoring.body':
+    '장인에게,\n\n가죽세공과 재봉에 힘쓰는 그대의 소문이 길드에 닿았습니다. 가죽을 마름질하고 천을 꿰매며 두 기술이 서로를 키워 주고 있다지요. 이웃한 두 기술을 함께 갈고닦는 손은 조율할 준비가 되었다는 증표입니다. 이 짝을 맺은 이는 언젠가 의복 장인의 이름을 얻습니다. 이스트브룩의 대장장이 할드렌을 찾아가십시오. 지금은 그가 장인들을 대신해 말합니다. 자신의 손으로 해낸 결과물로 솜씨를 증명하면, 그가 그 두 기술을 그대의 주 전공으로 조율해 줄 것입니다.\n\n경의를 담아,\n제작 길드',
+  'entities.letters.guild_trend_tailoring_inscription.sender': '제작 길드',
+  'entities.letters.guild_trend_tailoring_inscription.subject': '재봉과 각인 솜씨에 관하여',
+  'entities.letters.guild_trend_tailoring_inscription.body':
+    '장인에게,\n\n재봉과 각인에 힘쓰는 그대의 소문이 길드에 닿았습니다. 솔기를 다듬고 문양을 새기며 두 기술이 서로를 키워 주고 있다지요. 이웃한 두 기술을 함께 갈고닦는 손은 조율할 준비가 되었다는 증표입니다. 이스트브룩의 대장장이 할드렌을 찾아가십시오. 지금은 그가 장인들을 대신해 말합니다. 자신의 손으로 해낸 결과물로 솜씨를 증명하면, 그가 그 두 기술을 그대의 주 전공으로 조율해 줄 것입니다.\n\n경의를 담아,\n제작 길드',
+  'entities.letters.guild_trend_inscription_enchanting.sender': '제작 길드',
+  'entities.letters.guild_trend_inscription_enchanting.subject': '각인과 마법부여 솜씨에 관하여',
+  'entities.letters.guild_trend_inscription_enchanting.body':
+    '장인에게,\n\n각인과 마법부여에 힘쓰는 그대의 소문이 길드에 닿았습니다. 두루마리에 글을 새기고 마력을 엮으며 두 기술이 서로를 키워 주고 있다지요. 이웃한 두 기술을 함께 갈고닦는 손은 조율할 준비가 되었다는 증표입니다. 이스트브룩의 대장장이 할드렌을 찾아가십시오. 지금은 그가 장인들을 대신해 말합니다. 자신의 손으로 해낸 결과물로 솜씨를 증명하면, 그가 그 두 기술을 그대의 주 전공으로 조율해 줄 것입니다.\n\n경의를 담아,\n제작 길드',
+  'entities.letters.guild_trend_enchanting_jewelcrafting.sender': '제작 길드',
+  'entities.letters.guild_trend_enchanting_jewelcrafting.subject':
+    '마법부여와 보석세공 솜씨에 관하여',
+  'entities.letters.guild_trend_enchanting_jewelcrafting.body':
+    '장인에게,\n\n마법부여와 보석세공에 힘쓰는 그대의 소문이 길드에 닿았습니다. 마력을 불어넣고 보석을 갈고닦으며 두 기술이 서로를 키워 주고 있다지요. 이웃한 두 기술을 함께 갈고닦는 손은 조율할 준비가 되었다는 증표입니다. 이스트브룩의 대장장이 할드렌을 찾아가십시오. 지금은 그가 장인들을 대신해 말합니다. 자신의 손으로 해낸 결과물로 솜씨를 증명하면, 그가 그 두 기술을 그대의 주 전공으로 조율해 줄 것입니다.\n\n경의를 담아,\n제작 길드',
+  'entities.letters.guild_trend_jewelcrafting_weaponcrafting.sender': '제작 길드',
+  'entities.letters.guild_trend_jewelcrafting_weaponcrafting.subject':
+    '보석세공과 무기 제작 솜씨에 관하여',
+  'entities.letters.guild_trend_jewelcrafting_weaponcrafting.body':
+    '장인에게,\n\n보석세공과 무기 제작에 힘쓰는 그대의 소문이 길드에 닿았습니다. 보석을 물리고 날을 갈며 두 기술이 서로를 키워 주고 있다지요. 이웃한 두 기술을 함께 갈고닦는 손은 조율할 준비가 되었다는 증표입니다. 이스트브룩의 대장장이 할드렌을 찾아가십시오. 지금은 그가 장인들을 대신해 말합니다. 자신의 손으로 해낸 결과물로 솜씨를 증명하면, 그가 그 두 기술을 그대의 주 전공으로 조율해 줄 것입니다.\n\n경의를 담아,\n제작 길드',
+  'entities.letters.guild_trend_weaponcrafting_armorcrafting.sender': '제작 길드',
+  'entities.letters.guild_trend_weaponcrafting_armorcrafting.subject':
+    '무기 제작과 방어구 제작 솜씨에 관하여',
+  'entities.letters.guild_trend_weaponcrafting_armorcrafting.body':
+    '장인에게,\n\n무기 제작과 방어구 제작에 힘쓰는 그대의 소문이 길드에 닿았습니다. 칼날을 벼리고 판금을 맞추며 두 기술이 서로를 키워 주고 있다지요. 이웃한 두 기술을 함께 갈고닦는 손은 조율할 준비가 되었다는 증표입니다. 이 짝을 맺은 이는 언젠가 대장장이의 이름을 얻습니다. 이스트브룩의 대장장이 할드렌을 찾아가십시오. 지금은 그가 장인들을 대신해 말합니다. 자신의 손으로 해낸 결과물로 솜씨를 증명하면, 그가 그 두 기술을 그대의 주 전공으로 조율해 줄 것입니다.\n\n경의를 담아,\n제작 길드',
+  'entities.letters.guild_trend_armorcrafting_engineering.sender': '제작 길드',
+  'entities.letters.guild_trend_armorcrafting_engineering.subject':
+    '방어구 제작과 기계공학 솜씨에 관하여',
+  'entities.letters.guild_trend_armorcrafting_engineering.body':
+    '장인에게,\n\n방어구 제작과 기계공학에 힘쓰는 그대의 소문이 길드에 닿았습니다. 판금에 못을 박고 톱니를 맞추며 두 기술이 서로를 키워 주고 있다지요. 이웃한 두 기술을 함께 갈고닦는 손은 조율할 준비가 되었다는 증표입니다. 이스트브룩의 대장장이 할드렌을 찾아가십시오. 지금은 그가 장인들을 대신해 말합니다. 자신의 손으로 해낸 결과물로 솜씨를 증명하면, 그가 그 두 기술을 그대의 주 전공으로 조율해 줄 것입니다.\n\n경의를 담아,\n제작 길드',
   'hudChrome.calendar.title': '이벤트 달력',
   'hudChrome.calendar.close': '달력 닫기',
   'hudChrome.calendar.keybindLabel': '이벤트 달력',
@@ -7109,6 +7162,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.logging': '벌목',
   'hudChrome.gathering.herbalism': '약초학',
   'hudChrome.gathering.notReady': '이 자원 채집지는 아직 당신을 위해 재생성되지 않았습니다.',
+  'hudChrome.gathering.gatherLine': '{name}을(를) 채집했습니다.',
+  'hudChrome.gathering.gatherLineQty': '{name}을(를) {qty}개 채집했습니다.',
+  'gatherEvent.pristineVein': '{finder}님이 순수한 광맥을 발견했습니다!',
+  'gatherEvent.ancientHeartwood': '{finder}님이 고대 심목을 베어냈습니다!',
+  'gatherEvent.moonlitBloom': '{finder}님이 달빛 꽃을 발견했습니다!',
+  'entities.items.copper_ore.name': '구리 광석',
+  'entities.items.iron_ore.name': '철 광석',
+  'entities.items.ironbark_log.name': '무쇠껍질나무 통나무',
+  'entities.items.silverleaf_herb.name': '은빛잎 약초',
   'hudChrome.archetypeTitle.label': '칭호',
   'hudChrome.archetypeTitle.none': '없음',
   'hudChrome.archetypeTitle.hobbyLabel': '취미',
@@ -7165,6 +7227,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.notAtHub': '그것을 제작하려면 필요한 레벨로 제작 거점에 있어야 합니다.',
   'hudChrome.crafting.throttled': '너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.',
   'hudChrome.crafting.recipeNotLearned': '아직 그 제작법을 배우지 않았습니다.',
+  'hudChrome.crafting.skillReqLine': '{craft} {skill} 필요',
+  'hudChrome.crafting.difficultyFull': '숙련도 전량 상승',
+  'hudChrome.crafting.difficultyReduced': '숙련도 상승 감소',
+  'hudChrome.crafting.difficultyNone': '숙련도 상승 없음',
+  'hudChrome.crafting.stationBadge': '제작 거점',
+  'hudChrome.crafting.stationOutOfRange': '제작하려면 제작 거점으로 이동하세요.',
+  'hudChrome.crafting.masterworkToast': '걸작! {name}',
+  'hudChrome.crafting.masterworkZoneLine': '{crafter}님이 걸작 {name}을(를) 제작했습니다!',
+  'hudChrome.crafting.tierUpToast': '{craft} 티어 {tier} 달성!',
+  'hudChrome.crafting.makersMark': '제작자: {name}',
+  'hudChrome.crafting.masterworkSeal': '걸작',
+  'hudChrome.crafting.enchantedLine': '마법부여됨',
   'hudChrome.mobile.actionPageIndicator': '{page}페이지',
   'hudChrome.mobile.spellbookPageLabel': '페이지 {page}',
   'hudChrome.mobile.hideKeyboard': '키보드 숨기기',
@@ -7925,7 +7999,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_water4.name': '창조된 샘물',
   'entities.abilities.blazing_barrier.name': '이글거리는 방벽',
   'entities.abilities.blazing_barrier.description':
-    '자신을 불길로 감싸 130의 피해를 흡수합니다. 60초 동안 지속됩니다. (화염)',
+    '자신을 불길로 감싸 {damage}의 피해를 흡수합니다. 60초 동안 지속됩니다. (화염)',
   'entities.abilities.cold_snap.name': '겨울의 부름',
   'entities.abilities.cold_snap.description':
     '깜빡임 걸음, 서리장막 및 상급 투명화의 재사용 대기시간을 즉시 초기화합니다. (마법사 특성)',
@@ -8085,4 +8159,43 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.mouseoverCast': '파티 창에서 마우스오버 시전',
   'hudChrome.options.showTargetOfTarget': '대상의 대상 표시',
   'hudChrome.unitFrame.targetOfTargetLabel': '대상의 대상',
+  'hudChrome.mobile.professions': '전문 기술',
+  'hudChrome.professions.title': '전문 기술',
+  'hudChrome.professions.close': '전문 기술 닫기',
+  'hudChrome.professions.ringAria': '기술의 수레바퀴',
+  'hudChrome.professions.skillsHeader': '제작 기술',
+  'hudChrome.professions.gatheringHeader': '채집',
+  'hudChrome.professions.perksHeader': '특전',
+  'hudChrome.professions.identityHeader': '정체성',
+  'hudChrome.professions.roleMajor': '주 전공',
+  'hudChrome.professions.roleHobby': '취미',
+  'hudChrome.professions.roleDormant': '비활성',
+  'hudChrome.professions.roleUnattuned': '미조율',
+  'hudChrome.professions.ceilingUnlimited': '강화 상한 없음',
+  'hudChrome.professions.ceilingRare': '희귀 상한',
+  'hudChrome.professions.ceilingCommon': '일반 상한',
+  'hudChrome.professions.tierPipAria': '티어 {tier}',
+  'hudChrome.professions.nextUnlockTier':
+    '다음 티어까지 숙련도 {points} 남음: 걸작 확률이 높아집니다',
+  'hudChrome.professions.nextUnlockSpecialized':
+    '전문화까지 숙련도 {points} 남음: 재료 소모가 줄어듭니다',
+  'hudChrome.professions.nextUnlockMax': '최대 숙련도입니다',
+  'hudChrome.professions.perkSpecializedLine': '{craft}: 전문화, 재료 소모 -{pct}%',
+  'hudChrome.professions.perkSpecializedAt': '숙련도 {threshold}에서 전문화됩니다',
+  'hudChrome.professions.switchCost': '다음 원형 전환에는 속죄 {cost}이 필요합니다',
+  'hudChrome.professions.syncing': '서버에서 전문 기술 정보를 불러오고 있습니다.',
+  'hudChrome.professions.tutorialLine':
+    '아무 기술이나 숙련도 {target}까지 올리면 첫 티어가 열립니다.',
+  'hudChrome.professions.ctaHeader': '다음 단계',
+  'hudChrome.professions.ctaRaise':
+    '{craft}를 계속 올리세요. 다음 티어까지 숙련도 {points} 남았습니다.',
+  'hudChrome.professions.ctaStart': '아무 전문 기술로 제작하거나 채집하면 시작됩니다.',
+  'hudChrome.professions.unattunedIdentity':
+    '아직 원형에 조율되지 않았습니다. 기술을 올리고 조율을 완료하여 조합을 선택하세요.',
+  'hudChrome.professions.nudgeNearTier': '{craft}: 다음 티어까지 숙련도 {points}',
+  'hudChrome.professions.nudgeDormant': '{craft} 지식이 비활성 상태입니다',
+  'hudChrome.professions.hobbyLabel': '취미: {craft}',
+  'hudChrome.professions.majorsLabel': '주 전공: {a}, {b}',
+  'hudChrome.professions.pairsHeld': '보유한 조합: {count}',
+  'hudChrome.professions.returnsLabel': '복귀: {count}',
 };

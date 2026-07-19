@@ -306,6 +306,14 @@ export const cs_CZ: EnTranslations = {
     "spectate": {
       "banner": "Sleduješ {name}"
     },
+    "resource": {
+      "focus": "Focus",
+      "lowFocus": "Low Focus",
+      "notEnoughFocus": "Not enough focus!"
+    },
+    "hunter": {
+      "turtleAttackError": "You can't attack while protected by Aspect of the Turtle."
+    },
     "readyCheck": {
       "prompt": "Hráč {name} zahájil kontrolu připravenosti. Jsi připraven(a)?",
       "ready": "Připraven(a)",
@@ -750,6 +758,7 @@ export const cs_CZ: EnTranslations = {
       "leaderboard": "Žebříčky",
       "dailyRewards": "Obchod",
       "deeds": "Skutky",
+      "professions": "Professions",
       "nameplates": "Jména",
       "haptics": "Haptika",
       "hapticsOff": "Haptika vypnuta",
@@ -1039,6 +1048,7 @@ export const cs_CZ: EnTranslations = {
       "itemLevelLine": "Úroveň předmětu {level}",
       "itemScoreLine": "Skóre {score}",
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
+      "showThirdActionBar": "Show Third Action Bar",
       "showTargetOfTarget": "Zobrazit cíl cíle",
       "showAttackButton": "Zobrazit tlačítko útoku",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
@@ -1468,7 +1478,8 @@ export const cs_CZ: EnTranslations = {
       "watchTwitch": "Sledovat na Twitchi",
       "watchX": "Zobrazit na X",
       "watchKick": "Sledovat na Kicku",
-      "watchYouTube": "Sledovat na YouTube"
+      "watchYouTube": "Sledovat na YouTube",
+      "streamerBadgeTitle": "Verified streamer"
     },
     "lootSettings": {
       "title": "Nastavení kořisti",
@@ -2082,7 +2093,9 @@ export const cs_CZ: EnTranslations = {
       "mining": "Těžba",
       "logging": "Dřevorubectví",
       "herbalism": "Bylinkářství",
-      "notReady": "Tento zdroj pro tebe ještě neobnovil zásoby."
+      "notReady": "Tento zdroj pro tebe ještě neobnovil zásoby.",
+      "gatherLine": "You gather: {name}.",
+      "gatherLineQty": "You gather: {name} x{qty}."
     },
     "archetypeTitle": {
       "label": "Titul",
@@ -2113,6 +2126,42 @@ export const cs_CZ: EnTranslations = {
       "tailoring": "Krejčovství",
       "leatherworking": "Kožedělnictví"
     },
+    "professions": {
+      "title": "Professions",
+      "close": "Close professions",
+      "ringAria": "Craft wheel",
+      "skillsHeader": "Craft skills",
+      "gatheringHeader": "Gathering",
+      "perksHeader": "Perks",
+      "identityHeader": "Identity",
+      "roleMajor": "Major",
+      "roleHobby": "Hobby",
+      "roleDormant": "Dormant",
+      "roleUnattuned": "Unattuned",
+      "ceilingUnlimited": "No empowerment cap",
+      "ceilingRare": "Rare cap",
+      "ceilingCommon": "Common cap",
+      "skillValue": "{skill} / {max}",
+      "tierPipAria": "Tier {tier}",
+      "nextUnlockTier": "{points} points to the next tier: masterwork odds improve",
+      "nextUnlockSpecialized": "{points} points to Specialized: material costs drop",
+      "nextUnlockMax": "At maximum skill",
+      "perkSpecializedLine": "{craft}: Specialized, material costs -{pct}%",
+      "perkSpecializedAt": "Specializes at {threshold} skill",
+      "switchCost": "Next archetype switch costs {cost} amends",
+      "syncing": "Waiting for your profession data from the realm.",
+      "tutorialLine": "Reach {target} skill in any craft to unlock your first tier.",
+      "ctaHeader": "Next step",
+      "ctaRaise": "Keep raising {craft}: {points} more points to the next tier.",
+      "ctaStart": "Craft or gather with any profession to begin.",
+      "unattunedIdentity": "You are not yet attuned to an archetype. Raise your crafts and complete an attunement to choose your pair.",
+      "nudgeNearTier": "{craft}: {points} points from the next tier",
+      "nudgeDormant": "Your {craft} knowledge lies dormant",
+      "hobbyLabel": "Hobby: {craft}",
+      "majorsLabel": "Majors: {a} and {b}",
+      "pairsHeld": "Pairs held: {count}",
+      "returnsLabel": "Returns: {count}"
+    },
     "crafting": {
       "title": "Výroba",
       "close": "Zavřít výrobu",
@@ -2131,6 +2180,7 @@ export const cs_CZ: EnTranslations = {
       "comboNotAttuned": "Nejprve zvol pár archetypů.",
       "comboWrongPair": "Pro výrobu aktivuj přesně tento pár.",
       "comboTierUnmet": "Dostaň oba hlavní obory na požadovanou úroveň.",
+      "comboTierUnmetNamed": "Raise {crafts} to tier {tier}.",
       "professionChoice": "Volba profese",
       "noProfessionChoice": "V tuto chvíli není dostupná žádná platná volba profese.",
       "pairOptionLabel": "{pair} ({craftA} + {craftB})",
@@ -2163,7 +2213,19 @@ export const cs_CZ: EnTranslations = {
       },
       "notAtHub": "Abys to mohl vyrobit, musíš být v řemeslném centru a mít potřebnou úroveň.",
       "throttled": "Vyrábíš příliš rychle. Chvíli počkej a zkus to znovu.",
-      "recipeNotLearned": "Tento recept ses ještě nenaučil."
+      "recipeNotLearned": "Tento recept ses ještě nenaučil.",
+      "skillReqLine": "Requires {craft} {skill}",
+      "difficultyFull": "Full skill gain",
+      "difficultyReduced": "Reduced skill gain",
+      "difficultyNone": "No skill gain",
+      "stationBadge": "Station",
+      "stationOutOfRange": "Move to the crafting hub station to craft this.",
+      "masterworkToast": "Masterwork! {name}",
+      "masterworkZoneLine": "{crafter} crafted a masterwork {name}!",
+      "tierUpToast": "{craft} advanced to tier {tier}!",
+      "makersMark": "Crafted by {name}",
+      "masterworkSeal": "Masterwork",
+      "enchantedLine": "Enchanted"
     },
     "finder": {
       "title": "Hledač dungeonů",
@@ -2331,6 +2393,11 @@ export const cs_CZ: EnTranslations = {
       "broadcastsLabel": "Sdílet vykonané skutky s cechem a přáteli",
       "titledName": "{name} [{title}]"
     }
+  },
+  "gatherEvent": {
+    "pristineVein": "{finder} struck a pristine vein!",
+    "ancientHeartwood": "{finder} felled an ancient heartwood!",
+    "moonlitBloom": "{finder} discovered a moonlit bloom!"
   },
   "apiError": {
     "validation": {
@@ -2841,7 +2908,8 @@ export const cs_CZ: EnTranslations = {
     "resourceName": {
       "rage": "Vztek",
       "mana": "Mana",
-      "energy": "Energie"
+      "energy": "Energie",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "Všechny třídy",
@@ -2905,6 +2973,8 @@ export const cs_CZ: EnTranslations = {
       "blessing_of_might": "Zvedne přátelskému cíli sílu útoku, dobré seslat před pullem.",
       "divine_protection": "Rychlá ochranná záštita, která pohltí poškození, když přituhne.",
       "raptor_strike": "Tvrdý útok na blízko pro chvíle, kdy se k tobě něco dostane.",
+      "hunters_mark": "Marks one priority target so you and your pet can pressure it harder.",
+      "disengage": "Leaps backwards to quickly open space when an enemy gets too close.",
       "aspect_of_the_hawk": "Postoj, který udržuješ pro ostřejší sílu útoku na dálku.",
       "serpent_sting": "Zasadí jed, který v čase krvácí přírodní poškození.",
       "arcane_shot": "Okamžitý výstřel z dálky pro rychlé extra poškození.",
@@ -4985,7 +5055,9 @@ export const cs_CZ: EnTranslations = {
     "rendererFailed": "Renderer se nepodařilo spustit: zkus stránku obnovit. {error}",
     "enterTimeout": "Nepodařilo se vstoupit do světa. Připojení vypršelo. Běží herní server?",
     "connectionLost": "Připojení k serveru bylo ztraceno.",
-    "reconnecting": "Připojení ztraceno. Znovu se připojuje...",
+    "reconnectingAttempt": "Connection lost. Reconnecting... (attempt {attempt}/{maxAttempts}, retrying in {seconds}s)",
+    "reconnectingNow": "Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})",
+    "slowConnection": "This is taking longer than usual. Check your internet connection.",
     "connectionRejected": "Server ukončil připojení.",
     "realmFull": "Tento svět je momentálně plný. Zkus to prosím znovu za několik minut.",
     "tooManyConnections": "Z tvé sítě se k tomuto světu připojuje příliš mnoho spojení. Zavři nadbytečná herní okna nebo to zkus znovu za několik minut.",
@@ -6088,6 +6160,7 @@ export const cs_CZ: EnTranslations = {
       "rarityUncommon": "Neobvyklé",
       "rarityRare": "Vzácné",
       "rarityEpic": "Epické",
+      "rarityLegendary": "Legendary",
       "merchantStock": "Zásoby Obchodníka",
       "stackCount": "x{count}",
       "each": "{money} za kus",
@@ -6288,7 +6361,7 @@ export const cs_CZ: EnTranslations = {
       },
       "blazing_barrier": {
         "name": "Ohnivá bariéra",
-        "description": "Obklopíš se plameny a pohltíš 130 bodů poškození po dobu 60 s. (Oheň)"
+        "description": "Obklopíš se plameny a pohltíš {damage} bodů poškození po dobu 60 s. (Oheň)"
       },
       "cold_snap": {
         "name": "Volání zimy",
@@ -6396,7 +6469,7 @@ export const cs_CZ: EnTranslations = {
       },
       "frost_nova": {
         "name": "Ledové spoutání",
-        "description": "Zmrazí všechny blízké nepřátele na místě až na 8 s a způsobí {damage} mrazového poškození."
+        "description": "Zmrazí všechny blízké nepřátele na místě až na 8 s a způsobí {damage} mrazového poškození. Znehybnění se zruší po obdržení celkového poškození ve výši 15 % maximálního zdraví cíle, nejméně však 20 a nejvýše 60 poškození."
       },
       "arcane_explosion": {
         "name": "Éterický výbuch",
@@ -6566,6 +6639,14 @@ export const cs_CZ: EnTranslations = {
         "name": "Párací úder",
         "description": "Silný útok na blízko, který zvýší poškození o {damage}. Aktivuje se při tvém dalším úderu."
       },
+      "hunters_mark": {
+        "name": "Hunter's Mark",
+        "description": "Marks an enemy for 60 sec, revealing it and increasing damage dealt by you and your pet by 5%."
+      },
+      "disengage": {
+        "name": "Disengage",
+        "description": "Leap backwards up to 15 yd, quickly creating distance from nearby enemies."
+      },
       "aspect_of_the_hawk": {
         "name": "Podoba motáka",
         "description": "Přijmeš podobu motáka, která zvýší sílu útoku o {buff} na 30 min."
@@ -6578,9 +6659,17 @@ export const cs_CZ: EnTranslations = {
         "name": "Prokletý výstřel",
         "description": "Okamžitý výstřel, který způsobí {damage} arkánního poškození."
       },
+      "exhilaration": {
+        "name": "Exhilaration",
+        "description": "Instantly restores 30% of your maximum health."
+      },
       "concussive_shot": {
         "name": "Otřásající výstřel",
         "description": "Omráčí cíl za {damage} poškození a zpomalí jeho pohyb o 50 % na 4 s."
+      },
+      "freezing_trap": {
+        "name": "Freezing Trap",
+        "description": "Places a trap that incapacitates the first enemy to trigger it for 60 sec. Damage breaks the effect."
       },
       "mongoose_bite": {
         "name": "Protišpičák",
@@ -6594,17 +6683,49 @@ export const cs_CZ: EnTranslations = {
         "name": "Podoba kuny",
         "description": "Přijmeš podobu kuny, která zvýší tvoji šanci na uhýbání o 8 % na 30 min."
       },
+      "feign_death": {
+        "name": "Feign Death",
+        "description": "Feign death for up to 6 min, dropping enemy threat and cancelling enemy casts targeting you. Acting ends the effect."
+      },
       "aspect_of_the_cheetah": {
         "name": "Podoba běžce",
         "description": "Přijmeš podobu běžce, která zvýší rychlost pohybu o 30 % na 30 min."
+      },
+      "steady_shot": {
+        "name": "Steady Shot",
+        "description": "A moving shot that deals Physical damage and generates 20 Focus."
+      },
+      "explosive_shot": {
+        "name": "Explosive Shot",
+        "description": "Plants ammunition that explodes after 3 sec, damaging enemies within 8 yd."
+      },
+      "kill_shot": {
+        "name": "Kill Shot",
+        "description": "A ranged finishing shot usable only against enemies below 20% health."
       },
       "aimed_shot": {
         "name": "Dlouhý nátah",
         "description": "Pečlivě natažený výstřel, který způsobí {damage} poškození."
       },
+      "aspect_of_the_turtle": {
+        "name": "Aspect of the Turtle",
+        "description": "Reduces all damage taken by 30% for 8 sec, but prevents you from attacking while active."
+      },
       "rapid_fire": {
         "name": "Horečný nátah",
         "description": "Zvýší tvoji rychlost útoku o 40 % na 15 s."
+      },
+      "multi_shot": {
+        "name": "Tříštivý výstřel",
+        "description": "Vystřelí salvu na cílovou oblast a způsobí nepřátelům v okruhu 8 m {damage} bodů fyzického poškození. (lovecký talent)"
+      },
+      "trueshot": {
+        "name": "Trueshot",
+        "description": "For 15 sec, gain 10% critical strike chance and 20% critical damage while Aimed Shot and Rapid Fire recover faster."
+      },
+      "powerful_shot": {
+        "name": "Powershot",
+        "description": "Hold to charge a narrow piercing line shot. Charging chiefly increases its damage and length; release to fire."
       },
       "smite": {
         "name": "Potrestání",
@@ -7293,10 +7414,6 @@ export const cs_CZ: EnTranslations = {
       "mind_sear": {
         "name": "Spálení mysli",
         "description": "Usměrní stínovou energii na cílovou oblast a každou sekundu způsobí blízkým nepřátelům {damage} bodů poškození. (kněžský talent)"
-      },
-      "multi_shot": {
-        "name": "Tříštivý výstřel",
-        "description": "Vystřelí salvu na cílovou oblast a způsobí nepřátelům v okruhu 8 m {damage} bodů fyzického poškození. (lovecký talent)"
       },
       "prayer_of_healing": {
         "name": "Sborové zacelení",
@@ -8142,6 +8259,18 @@ export const cs_CZ: EnTranslations = {
       },
       "emberglass_warstaff": {
         "name": "Bojová hůl z uhlíkového skla"
+      },
+      "copper_ore": {
+        "name": "Copper Ore"
+      },
+      "iron_ore": {
+        "name": "Iron Ore"
+      },
+      "ironbark_log": {
+        "name": "Ironbark Log"
+      },
+      "silverleaf_herb": {
+        "name": "Silverleaf Herb"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
@@ -10469,6 +10598,56 @@ export const cs_CZ: EnTranslations = {
         "sender": "Hrdinský zásobovač",
         "subject": "Vaše hrdinské marky",
         "body": "Vaše skupina zdolala hrdinskou zkoušku, zatímco jste bojovali v týlu nebo leželi poraženi. Také vaše uzamčení bylo zaznamenáno, takže váš podíl hrdinských marek dorazil sem, místo aby se ztratil. Využijte je dobře.\n\n- Hrdinský zásobovač"
+      },
+      "guild_trend_engineering_alchemy": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Engineering and Alchemy",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Engineering and Alchemy: charges measured and reagents weighed, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Bombardier in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_alchemy_cooking": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Alchemy and Cooking",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Alchemy and Cooking: draughts simmered and dishes seasoned, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Apothecary in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_cooking_leatherworking": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Cooking and Leatherworking",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Cooking and Leatherworking: meals plated and hides cured, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_leatherworking_tailoring": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Leatherworking and Tailoring",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Leatherworking and Tailoring: leather cut and cloth hemmed, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Outfitter in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_tailoring_inscription": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Tailoring and Inscription",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Tailoring and Inscription: seams stitched and glyphs inked, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_inscription_enchanting": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Inscription and Enchanting",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Inscription and Enchanting: scrolls lettered and charms woven, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_enchanting_jewelcrafting": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Enchanting and Jewelcrafting",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Enchanting and Jewelcrafting: charms bound and stones polished, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_jewelcrafting_weaponcrafting": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Jewelcrafting and Weaponcrafting",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Jewelcrafting and Weaponcrafting: gems seated and edges ground, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_weaponcrafting_armorcrafting": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Weaponcrafting and Armorcrafting",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Weaponcrafting and Armorcrafting: blades tempered and plates fitted, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Smith in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "guild_trend_armorcrafting_engineering": {
+        "sender": "The Crafting Guild",
+        "subject": "Your work in Armorcrafting and Engineering",
+        "body": "Artisan,\n\nWord reaches the Guild of your work in Armorcrafting and Engineering: plates riveted and gears trued, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
       }
     },
     "itemSets": {

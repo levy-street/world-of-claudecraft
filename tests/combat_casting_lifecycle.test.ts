@@ -518,9 +518,10 @@ describe('casting_lifecycle: determinism', () => {
   });
 });
 
-describe('casting_lifecycle: physical ranged shots resolve on projectile impact (Long Draw)', () => {
+describe('casting_lifecycle: physical ranged shots resolve on projectile impact (Aimed Shot)', () => {
   it('deals no damage at cast completion; damage lands when the arrow arrives', () => {
     const { sim, p, meta } = makeSim('hunter', 20);
+    expect(sim.setSpec('marksmanship')).toBe(true);
     p.resource = p.maxResource = 500;
     const mob = spawnTarget(sim, p, 20, 20); // 20yd: within 35yd range, beyond the 8yd deadzone
     const events: Array<Record<string, any>> = [];
@@ -546,7 +547,7 @@ describe('casting_lifecycle: physical ranged shots resolve on projectile impact 
     expect(
       events.some(
         (e) =>
-          e.type === 'damage' && e.ability === 'Long Draw' && e.attackAnimationStarted === true,
+          e.type === 'damage' && e.ability === 'Aimed Shot' && e.attackAnimationStarted === true,
       ),
     ).toBe(true);
   });

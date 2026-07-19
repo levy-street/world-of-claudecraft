@@ -26,7 +26,7 @@ describe('Talent V2 persisted loadout repair', () => {
     expect(repaired.loadouts[0]).toEqual({
       name: 'x'.repeat(24),
       alloc: { spec: 'arms', rows: { 5: validOption } },
-      bar: ['charge', ...Array(21).fill(null)],
+      bar: ['charge', ...Array(29).fill(null)],
     });
     expect(repaired.loadouts[1].alloc).toEqual({ spec: null, rows: {} });
   });

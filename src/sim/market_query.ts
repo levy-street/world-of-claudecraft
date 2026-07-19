@@ -37,7 +37,15 @@ export const MARKET_WEAPON_TYPE_FILTERS = [
   'axe',
   'other',
 ] as const;
-export const MARKET_RARITY_FILTERS = ['all', 'poor', 'common', 'uncommon', 'rare', 'epic'] as const;
+export const MARKET_RARITY_FILTERS = [
+  'all',
+  'poor',
+  'common',
+  'uncommon',
+  'rare',
+  'epic',
+  'legendary',
+] as const;
 
 // Listings per browse page (the count of OTHER sellers' listings shown at a time;
 // the player's own listings are always wired on top for quick reclaim).

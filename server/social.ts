@@ -9,6 +9,7 @@
 // the real Postgres + socket implementations in.
 
 import type { ChatSenderFlair } from '../src/sim/account_flair';
+import type { PlayerClass } from '../src/sim/types';
 
 export type GuildRank = 'leader' | 'officer' | 'member';
 
@@ -157,6 +158,11 @@ export interface SocialActor {
   // the actor has no live meta or no title: an untitled relay line beats a
   // stale db read. SocialService itself stays sim-ignorant.
   activeTitle?: string | null;
+  // The actor's class, read from the LIVE sim meta the same way activeTitle
+  // is: guild/officer chat has no live entity for most recipients (guildmates
+  // are frequently far outside interest scope), so the class rides the relay
+  // event exactly like the title rather than being looked up client-side.
+  cls?: PlayerClass;
 }
 
 // Presence + delivery, provided by game.ts. Keeps this module ignorant of
@@ -203,6 +209,8 @@ export type SocialEvent =
   // fromTitle mirrors the sim chat event's optional field (a deed id the
   // client localizes through deed_i18n, never display text); omitted for an
   // untitled sender.
+  // classId mirrors the sim chat event's optional field the same way: the
+  // sender's class, absent only when the actor has no live meta.
   | {
       type: 'chat';
       from: string;
@@ -210,6 +218,7 @@ export type SocialEvent =
       text: string;
       channel: 'guild' | 'officer';
       flair?: ChatSenderFlair;
+      classId?: PlayerClass;
     }
   | { type: 'guildInvite'; fromName: string; guildName: string }
   // Structured guild-calendar outcome; the client renders the visible line
@@ -884,6 +893,7 @@ export class SocialService {
       type: 'chat',
       from: actor.name,
       ...(actor.activeTitle ? { fromTitle: actor.activeTitle } : {}),
+      ...(actor.cls ? { classId: actor.cls } : {}),
       text,
       channel: 'guild',
       flair: this.tx.chatFlairFor(actor.characterId),
@@ -953,6 +963,7 @@ export class SocialService {
       type: 'chat',
       from: actor.name,
       ...(actor.activeTitle ? { fromTitle: actor.activeTitle } : {}),
+      ...(actor.cls ? { classId: actor.cls } : {}),
       text,
       channel: 'officer',
       flair: this.tx.chatFlairFor(actor.characterId),

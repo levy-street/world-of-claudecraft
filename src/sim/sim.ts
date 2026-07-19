@@ -190,6 +190,7 @@ import {
 import { canEquipItem, resolveEquipSlot } from './equipment_rules';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import { breakFeignDeath } from './hunter_base_abilities';
 import * as interaction from './interaction';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
@@ -286,6 +287,7 @@ import {
   isEnchantedInstance,
 } from './professions/enchanting';
 import * as professionsFocus from './professions/focus';
+import { announceMasterworkZone } from './professions/gather_events';
 import {
   drainGatheringGrants,
   emptyGatheringProficiency,
@@ -295,6 +297,7 @@ import {
   isNodeHarvestableBy,
   normalizeGatheringProficiency,
 } from './professions/gathering';
+import { updateGuildTrendLetters } from './professions/guild_letter';
 import type { MasterworkProc } from './professions/masterwork';
 import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
 import type { ProfessionRecipeRecord as RecipeDef } from './professions/types';
@@ -1114,6 +1117,10 @@ export interface PlayerMeta {
   // One-time Ravenpost welcome letter sent (persisted in CharacterState, so
   // existing characters get the service announcement exactly once).
   mailWelcomed: boolean;
+  // One-time Guild trend letter sent (Professions 2.0 Phase 7): flipped when
+  // the craft-trend sweep books the letter (professions/guild_letter.ts).
+  // Persisted in CharacterState so no later load can re-send it.
+  guildLetterSent: boolean;
   // Delve meta progression (persisted in CharacterState).
   delveMarks: number;
   delveClears: Record<string, number>;
@@ -1285,6 +1292,9 @@ export interface CharacterState {
   // Ravenpost welcome letter already sent (optional so pre-mail saves load
   // cleanly and receive the announcement letter once on their next login).
   mailWelcomed?: boolean;
+  // Guild trend letter already sent (optional so pre-phase-7 saves load
+  // cleanly and receive at most one letter when their crafts qualify).
+  guildLetterSent?: boolean;
   // World-boss loot lockouts now ride `raidLockouts` (keyed worldboss:<mobId>). The
   // legacy per-day `worldBossDaily` field is intentionally dropped: pre-migration saves
   // that still carry it just ignore it (a player locked at deploy may loot once more, a
@@ -1590,6 +1600,7 @@ export class Sim {
       resolvedAbility: (abilityId, pid) => this.resolvedAbility(abilityId, pid),
       cancelCast: (p) => this.cancelCast(p),
       standUp: (p) => this.standUp(p),
+      onDeliberateMove: (p) => breakFeignDeath(this.ctx, p),
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
         this.dealDamage(source, target, amount, crit, school, ability, kind, noRage);
         // The one sim-side observer of a lethal fall (hid_fall_death): the
@@ -2079,6 +2090,7 @@ export class Sim {
       craftThrottle: { windowStart: 0, count: 0 },
       marketQuery: defaultMarketQuery(),
       mailWelcomed: false,
+      guildLetterSent: false,
       archetype: emptyArchetypeState(),
       delveMarks: 0,
       delveClears: {},
@@ -2191,6 +2203,7 @@ export class Sim {
       if (s.knownRecipes) meta.knownRecipes = new Set(s.knownRecipes);
       meta.archetype = normalizeArchetypeState(s.archetype, meta.craftSkills);
       meta.mailWelcomed = s.mailWelcomed === true;
+      meta.guildLetterSent = s.guildLetterSent === true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
@@ -2248,7 +2261,7 @@ export class Sim {
       player.resource =
         classDef.resourceType === 'mana'
           ? Math.min(player.maxResource, Math.max(0, savedState.resource))
-          : classDef.resourceType === 'energy'
+          : classDef.resourceType === 'energy' || classDef.resourceType === 'focus'
             ? 100
             : 0;
     } else {
@@ -2256,7 +2269,7 @@ export class Sim {
       player.resource =
         classDef.resourceType === 'mana'
           ? player.maxResource
-          : classDef.resourceType === 'energy'
+          : classDef.resourceType === 'energy' || classDef.resourceType === 'focus'
             ? 100
             : 0;
     }
@@ -2846,6 +2859,7 @@ export class Sim {
       },
       heroicDaily: { date: meta.heroicDaily.date, marked: [...meta.heroicDaily.marked] },
       mailWelcomed: meta.mailWelcomed,
+      guildLetterSent: meta.guildLetterSent,
       townFocus: { ...meta.townFocus },
       // World-boss lockouts serialize via raidLockouts (above), not a separate field.
       // Book of Deeds: every field conditional (absent while empty/null/zero)
@@ -3935,6 +3949,8 @@ export class Sim {
       marketListingBelongsTo: (listing, meta) => sim.market.marketListingBelongsTo(listing, meta),
       queueQuestLetter: (questId, pid) => sim.postOffice.queueQuestLetter(questId, pid),
       mailHeroicMarks: (pid, itemId, count) => sim.postOffice.mailHeroicMarks(pid, itemId, count),
+      mailAuthoredLetter: (meta, letter) =>
+        sim.postOffice.sendLetter(sim.postOffice.mailKeyFor(meta), meta.name, letter, 'system'),
       // Book of Deeds seam callbacks (owned by deeds.ts). Late-bound arrows so
       // sim.ctx resolves at call time (the Q1 pattern).
       bumpDeedStat: (meta, stat, delta) => deedsMod.bumpDeedStat(sim.ctx, meta, stat, delta),
@@ -4326,6 +4342,12 @@ export class Sim {
     this.market.update();
     lap?.('market');
     this.postOffice.update();
+    // The Guild trend letter sweep (Professions 2.0 Phase 7): the single 1 Hz
+    // chokepoint that watches every craft-skill mutation path plus the load
+    // backfill case. Draws ZERO rng and emits nothing itself (it only books a
+    // letter via ctx.mailAuthoredLetter), so appending it inside the mail
+    // phase cannot fork the draw order.
+    updateGuildTrendLetters(this.ctx);
     lap?.('postOffice');
     drainDelayedEvents(this.ctx);
     lap?.('delayedEv');
@@ -5065,6 +5087,7 @@ export class Sim {
     id: string,
     duration: number,
     school: Aura['school'],
+    breakThreshold?: number,
   ): void {
     const remaining = this.diminishedCrowdControlDuration(source, target, 'root', duration);
     if (remaining === null) return;
@@ -5077,6 +5100,7 @@ export class Sim {
       value: 0,
       sourceId: source.id,
       school,
+      ...(breakThreshold !== undefined ? { breaksOnDamage: true, breakThreshold } : {}),
     });
   }
 
@@ -6803,6 +6827,10 @@ export class Sim {
       };
       meta.lastMasterwork = proc;
       this.emit({ type: 'masterwork', ...proc, pid: meta.entityId });
+      // Zone-wide celebration copy (Phase 6): the professions module owns the
+      // fanout and the instance-space exclusion; draws no rng, runs after the
+      // personal emit.
+      announceMasterworkZone(this.ctx, meta.entityId, meta.name, proc);
     }
   }
 

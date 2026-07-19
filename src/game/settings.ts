@@ -284,6 +284,10 @@ export const BOOL_SETTINGS = {
   // applied in main.ts. Purely a display preference; the slots stay reachable via
   // their keybinds either way, so the row being hidden never disables those abilities.
   showSecondaryActionBar: { def: false },
+  // off by default: reveals the third desktop action bar row (#actionbar3, slots
+  // 23..33). main.ts enforces that this row can only remain enabled while the
+  // secondary row is visible. Mobile exposes the same slots through ring pages.
+  showThirdActionBar: { def: false },
   // off by default: the classic "target of target" mini-frame. When on, and you have
   // a target, a small unit frame under the target frame shows who YOUR target is
   // targeting (a mob's aggro target, a player's selected target). Purely a display

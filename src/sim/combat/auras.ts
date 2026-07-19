@@ -29,6 +29,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { pctValue, recalcPlayerStats } from '../entity';
+import { detonateExplosiveShot, hunterCooldownRecoveryRate } from '../hunter_marksmanship';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
@@ -92,6 +93,8 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
     let regen = 20;
     for (const a of p.auras) if (a.kind === 'buff_energyregen') regen *= 1 + a.value;
     p.resource = Math.min(p.maxResource, p.resource + Math.round(regen));
+  } else if (p.resourceType === 'focus') {
+    p.resource = Math.min(p.maxResource, p.resource + 20);
   } else if (p.resourceType === 'rage' && !p.inCombat) {
     p.resource = Math.max(0, p.resource - 2);
   }
@@ -130,7 +133,7 @@ export function updateTimers(p: Entity): void {
   p.fiveSecondRule += DT;
   p.combatTimer += DT;
   for (const [k, v] of p.cooldowns) {
-    const nv = v - temporalHourglassCooldownDelta(p, k);
+    const nv = v - temporalHourglassCooldownDelta(p, k) * hunterCooldownRecoveryRate(p, k);
     if (nv <= 0) p.cooldowns.delete(k);
     else p.cooldowns.set(k, nv);
   }
@@ -148,7 +151,8 @@ export function updateTimers(p: Entity): void {
         );
       }
       // Parallel per-charge recharge: every running timer ticks at once.
-      const delta = temporalHourglassCooldownDelta(p, abilityId);
+      const delta =
+        temporalHourglassCooldownDelta(p, abilityId) * hunterCooldownRecoveryRate(p, abilityId);
       state.recharges = state.recharges.map((t) => t - delta);
       while (state.recharges.length > 0 && state.recharges[0] <= 0) {
         state.recharges.shift();
@@ -188,6 +192,15 @@ export function cleanseFriendlyNpcAuras(ctx: SimContext, e: Entity): void {
 
 export function updateAuras(ctx: SimContext, e: Entity): void {
   if (e.dead) {
+    for (let i = e.auras.length - 1; i >= 0; i--) {
+      const aura = e.auras[i];
+      if (aura.kind !== 'explosive_shot') continue;
+      aura.remaining -= DT;
+      if (aura.remaining > CAST_COMPLETE_EPS) continue;
+      detonateExplosiveShot(ctx, e, aura);
+      e.auras.splice(i, 1);
+      ctx.emit({ type: 'aura', targetId: e.id, name: aura.name, gained: false });
+    }
     e.stealthed = e.auras.some((a) => a.kind === 'stealth');
     return;
   }
@@ -277,6 +290,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       }
     }
     if (a.remaining <= CAST_COMPLETE_EPS) {
+      if (a.kind === 'explosive_shot') detonateExplosiveShot(ctx, e, a);
       e.auras.splice(i, 1);
       ctx.applyNonPlayerStatAura(e, a, -1);
       ctx.emit({ type: 'aura', targetId: e.id, name: a.name, gained: false });
@@ -297,7 +311,8 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
         a.kind === 'die_by_sword' ||
         a.kind === 'enrage' ||
         a.kind === 'bloodbath' ||
-        a.kind === 'berserker_stance'
+        a.kind === 'berserker_stance' ||
+        a.kind === 'trueshot'
       )
         statsDirty = true;
     }

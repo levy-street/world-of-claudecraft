@@ -23,7 +23,7 @@ Research: 4-way codex fan-out over the codebase (2026-07-02, release/v0.18.0).
   baseline. Audit found only warrior's 3 signatures are real, the other 24
   fake. Fix: mechanism (A) everywhere, a NEW grant-only classic talent spell
   per spec (Holy Shock, Combustion, Shadowform, Arcane Power, ...); no
-  baseline kit demotions, nobody loses an ability they have today.
+  baseline kit demotions except later class redesigns explicitly approved by the owner.
 - **No spec stat trees** (recommended, confirmed direction): spec passive
   identity lives entirely in the (kept) mastery; rows are selectable skills.
   No residual point/stat tree of any kind.
@@ -335,7 +335,7 @@ Fix (owner decision): mechanism (A) everywhere. Every spec gets a NEW
 grant-only signature ability, preferring the classic-era spec talent spell
 (matches the repo's classic-fidelity rule and the warrior precedent). The old
 fake signature returns to being a plain kit ability. NO baseline kit
-demotions: no existing character loses an ability they have today.
+demotions in this phase; later class redesigns may explicitly reassign baseline abilities.
 
 | Spec | Today (fake) | New signature (all grant-only, all NEW defs) |
 |---|---|---|
@@ -343,7 +343,7 @@ demotions: no existing character loses an ability they have today.
 | paladin/protection | righteous_fury | Holy Shield (block/absorb active) |
 | paladin/retribution | judgement | Repentance (single-target incapacitate) |
 | hunter/beast_mastery | tame_beast | Bestial Wrath (pet enrage active) |
-| hunter/marksmanship | aimed_shot | Trueshot Aura (party ranged AP aura) |
+| hunter/marksmanship | aimed_shot | Steady Shot (moving Focus generator) |
 | hunter/survival | wing_clip | Wyvern Sting (sleep sting) |
 | mage/arcane | arcane_missiles | Arcane Power (+20% spell dmg active) |
 | mage/fire | scorch | Combustion (next fire spells crit) |
@@ -618,11 +618,11 @@ flash_of_light, exorcism, consecration, righteous_fury, retribution_aura)
   tint via the form-tint render feature) / Hammer of Wrath [grant NEW]
   (ranged holy execute below 20% HP) / Aura Mastery [mod] (auras +60%)
 
-**Hunter** (kit: raptor_strike, aspect_of_the_hawk/monkey/cheetah,
-serpent_sting, arcane_shot, concussive_shot, mongoose_bite, wing_clip,
+**Hunter** (kit: aspect_of_the_hawk/cheetah, serpent_sting, arcane_shot,
+concussive_shot, wing_clip, Survival-only raptor_strike/mongoose_bite,
 aimed_shot, rapid_fire, tame/dismiss/revive pet)
 - L5: Improved Serpent Sting [mod] (+30%) / Quick Shots [mod]
-  (Arcane Shot cd -40%) / Aspect Mastery [mod] (Hawk and Monkey +40%)
+  (Arcane Shot cd -40%) / Aspect Mastery [mod] (Hawk +40%)
 - L8: Counter Shot [grant NEW, P1] (interrupt shot, 4s lockout, 20s cd; the
   operator's original example) / Frost Trap [grant NEW] (ground trap, roots
   3s) / Improved Concussive [mod] (Concussive Shot cd -40%)

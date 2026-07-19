@@ -1154,7 +1154,7 @@
   /* ---------- spellbook ---------- */
   /* spellbook */
   #spellbook {
-    width: 430px;
+    width: 760px;
   }
   .spellbook-class,
   .spell-rank {
@@ -1162,9 +1162,17 @@
     font-size: 11px;
   }
   .spell-list {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 2px;
+  }
+  @media (min-width: 900px) {
+    body:not(.mobile-touch) .spell-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .spell-list > .spell-sub {
+    grid-column: 1 / -1;
   }
   .spell-row {
     display: flex;
@@ -3446,6 +3454,100 @@
   .tal-head b {
     color: var(--gold);
   }
+  .hun-choice-rows {
+    display: grid;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .hun-choice-row {
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr);
+    gap: 8px;
+    align-items: stretch;
+  }
+  .hun-choice-level {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 62px;
+    color: var(--gold);
+    background: #15110a;
+    border: 1px solid #5a4a22;
+    border-radius: 5px;
+    font: 700 11px / 1 var(--title-font);
+    text-align: center;
+  }
+  .hun-choice-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .hun-choice-option {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    min-width: 0;
+    min-height: 62px;
+    padding: 7px;
+    color: #c8b888;
+    background: #171208;
+    border: 1px solid #463a1c;
+    border-radius: 5px;
+    cursor: var(--cursor-point);
+    font-family: var(--body-font);
+    text-align: left;
+  }
+  .hun-choice-option:hover,
+  .hun-choice-option:focus-visible {
+    background: #211a0c;
+    border-color: #8f7025;
+  }
+  .hun-choice-option:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: -2px;
+  }
+  .hun-choice-option.sel {
+    color: #fff6d5;
+    background: #2c2410;
+    border-color: var(--gold);
+    box-shadow:
+      inset 0 0 0 1px #ffd10044,
+      0 0 8px #b8902a55;
+  }
+  .hun-choice-option:disabled {
+    opacity: 0.42;
+    filter: grayscale(0.75);
+    cursor: not-allowed;
+  }
+  .hco-icon {
+    width: 34px;
+    height: 34px;
+    flex: none;
+    display: block;
+    background-color: #15110a;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border: 1px solid #5a4a22;
+    border-radius: 4px;
+  }
+  .hun-choice-option.sel .hco-icon {
+    border-color: var(--gold);
+  }
+  .hco-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    font-size: 10.5px;
+    line-height: 1.25;
+  }
+  .hco-copy b {
+    color: #fff;
+    font-family: var(--title-font);
+    font-size: 11px;
+  }
   #tal-body {
     overflow-x: auto;
     overflow-y: visible;
@@ -3957,6 +4059,12 @@
       flex-direction: column;
     }
     .tal-foot {
+      grid-template-columns: 1fr;
+    }
+    .hun-choice-row {
+      grid-template-columns: 42px minmax(0, 1fr);
+    }
+    .hun-choice-options {
       grid-template-columns: 1fr;
     }
     .tal-specs {
@@ -4739,6 +4847,28 @@
     color: var(--color-text-muted);
     font-size: 10px;
     line-height: 1.35;
+  }
+  /* Phase 6 legibility: the skill-req / difficulty / station line inside the
+     recipe button. The difficulty tint is set inline from the shared quality
+     palette (icons.ts) with its text label always adjacent, so the info is
+     never color-only; no new tap targets (the whole row stays the button). */
+  .crafting-skill-line {
+    display: block;
+    margin-top: 2px;
+  }
+  .crafting-station-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 0 4px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 3px;
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .crafting-station-badge.out-of-range {
+    border-style: dashed;
   }
   .vendor-empty {
     padding: 5px;
@@ -5768,6 +5898,233 @@
     font-family: var(--title-font);
     margin-top: -2px;
   }
+  /* ---------- professions ---------- */
+  /* The Professions window: a cold, read-only identity browser (identity
+     card, craft wheel, ten skill bars with tier pips, perks readout, nudges,
+     gathering rows) over IWorldProfessions. Bar widths and ring node
+     positions are build-time inline writes; ring strokes carry
+     vector-effect="non-scaling-stroke" so these pixel widths survive the
+     unit-circle viewBox; every colour in this section is a token. */
+  #professions-window {
+    width: 560px;
+    max-height: calc(var(--app-vh, 100vh) * 0.78 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  #professions-window .panel-title {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #professions-window .panel-title > span {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .prof-scroll {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 120px;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+  .prof-section-header {
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gold-dim);
+  }
+  .prof-identity,
+  .prof-crafts,
+  .prof-perks,
+  .prof-gathering,
+  .prof-cta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .prof-pair-title {
+    font-family: var(--title-font);
+    font-size: 14px;
+    color: var(--gold);
+  }
+  .prof-identity-line,
+  .prof-identity-paragraph,
+  .prof-cta-line {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .prof-switch-cost,
+  .prof-tutorial {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .prof-ring {
+    position: relative;
+    flex: none;
+    width: 220px;
+    height: 220px;
+    margin: 4px auto;
+  }
+  .prof-ring-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .prof-ring-circle {
+    fill: none;
+    stroke: var(--color-border-default);
+    stroke-width: 2px;
+  }
+  .prof-ring-arc {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 3px;
+    stroke-linecap: round;
+  }
+  .prof-ring-chord {
+    stroke: var(--gold-dim);
+    stroke-width: 2px;
+    stroke-dasharray: 6 4;
+  }
+  .prof-ring-node {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    margin: -16px 0 0 -16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border-default);
+    border-radius: 50%;
+    background: var(--color-bg-dark);
+  }
+  .prof-ring-node img {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+  }
+  .prof-ring-node.role-major {
+    border-color: var(--gold);
+    box-shadow: 0 0 6px var(--color-primary-glow-heavy);
+  }
+  .prof-ring-node.role-hobby {
+    border-color: var(--gold-dim);
+  }
+  .prof-ring-node.role-dormant {
+    opacity: 0.55;
+  }
+  .prof-list,
+  .prof-perk-list,
+  .prof-nudges {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .prof-craft-row,
+  .prof-gather-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .prof-craft-icon {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 4px;
+  }
+  .prof-craft-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .prof-craft-head {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 12px;
+  }
+  .prof-craft-name {
+    font-family: var(--title-font);
+    color: var(--gold);
+  }
+  .role-dormant .prof-craft-name {
+    color: var(--color-text-muted);
+  }
+  .prof-role-badge,
+  .prof-ceiling {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border-default);
+    border-radius: 8px;
+    padding: 0 6px;
+  }
+  .role-major .prof-role-badge {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  .role-hobby .prof-role-badge {
+    color: var(--gold-dim);
+  }
+  .prof-skill-value {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--color-text-light);
+  }
+  .prof-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .prof-bar {
+    display: inline-block;
+    flex: 1 1 auto;
+    height: 8px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 4px;
+    background: var(--color-bg-input);
+    overflow: hidden;
+  }
+  .prof-bar-fill {
+    display: block;
+    height: 100%;
+    background: var(--gold-dim);
+  }
+  .prof-pips {
+    display: inline-flex;
+    flex: none;
+    gap: 2px;
+  }
+  .prof-pip {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-input);
+  }
+  .prof-pip.filled {
+    background: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  .prof-next,
+  .prof-perk-line,
+  .prof-nudges li {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
   /* ---------- AAA window-frame adoption: master-detail windows (batch 2) ---------- */
   /* The quest log, mailbox, social panel, and spellbook adopt the shared
      window-frame grammar (src/ui/window_frame.ts; spec 6.1 + 8). Each mounts the
@@ -5851,12 +6208,15 @@
   /* ---------- social ---------- */
   /* social: friends / guild / ignore */
   #social-window {
-    /* Wider than the other windows: the tab rail carries FIVE tabs (Friends,
-       Guild, Ignored, Blocked, Raid) whose labels are locale-sized, and the guild
+    /* Landscape shape: wide enough that the friend/guild/ignore/block lists lay
+       out as a two-column masonry (`.soc-body`'s `columns` below) instead of one
+       long stacked scroll, and the raid tab's two groups sit side by side
+       (`.raid-groups`). The tab rail still carries FIVE tabs (Friends, Guild,
+       Ignored, Blocked, Raid) whose labels are locale-sized, and the guild
        roster rows carry a name + rank + zone + last-seen line. */
-    width: 520px;
+    width: 760px;
     max-width: calc(100vw - 24px);
-    height: 560px;
+    height: 480px;
     max-height: calc(100vh - 24px);
     flex-direction: column;
     overflow-x: hidden;
@@ -5917,11 +6277,32 @@
     border-color: #6f5a2a;
     background: linear-gradient(#2a2436, #161220);
   }
+  /* Multi-column landscape layout: a CSS grid (not CSS multicol) lays the
+     friends/guild/ignore/block rows out in up to two 260px columns while the
+     window is wide, and collapses back to one column on its own once the
+     available width drops below two 260px columns (no separate media query
+     needed; the mobile-touch override below still forces one column
+     explicitly since the window is pinned to `width: auto` there). CSS
+     multicol with a bounded, non-auto block size (this flex item's height
+     comes from the fixed-height `#social-window`) does not grow vertically:
+     it spills unreachable rows into extra inline columns that `overflow-x:
+     hidden` clips with no way to scroll to them, silently hiding friends past
+     roughly the first two columns' worth. Grid rows, by contrast, wrap and
+     keep growing the scrollable block axis. Rows flow left-to-right,
+     top-to-bottom by DOM order (`grid-auto-flow: row`, the default) so
+     reading order matches a plain list; the guild header and the empty/
+     notice states span the full width with `grid-column: 1 / -1` so they
+     read as one banner across both columns instead of only the first. */
   .soc-body {
     overflow-y: auto;
     overflow-x: hidden;
     flex: 1;
     min-height: 80px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    align-content: start;
+    row-gap: 4px;
+    column-gap: var(--spacing-md);
   }
   .soc-row {
     display: flex;
@@ -6146,31 +6527,41 @@
     font-size: 12px;
     padding: 10px 6px;
     text-align: center;
+    grid-column: 1 / -1;
   }
   .soc-empty-action {
     margin-top: 12px;
+    grid-column: 1 / -1;
   }
   .soc-guild-head {
     font-family: var(--title-font);
     color: var(--gold);
     font-size: 15px;
     padding: 2px 4px 6px;
+    grid-column: 1 / -1;
   }
   .soc-guild-head .gm {
     color: var(--color-text-muted);
     font-size: 11px;
   }
+  /* Raid tab: the two groups sit side by side in the landscape window (falling
+     back to stacked on mobile-touch). It escapes the `.soc-body` grid flow
+     above with `grid-column: 1 / -1` so it keeps its own explicit grid instead
+     of being placed into a `.soc-body` track. The stacked fallback is keyed on
+     `body.mobile-touch` (in hud.mobile.css), not a viewport media query here:
+     this window's own width, not the viewport's, decides when two 260px-ish
+     groups stop fitting, and a tablet-width touch viewport should stack the
+     same way a phone does rather than getting two undivided columns. */
   .raid-groups {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
+    grid-column: 1 / -1;
   }
+  /* No divider between the two side-by-side groups (a vertical rule would need
+     its own column-gap border trick); the stacked mobile-touch fallback in
+     hud.mobile.css restores the horizontal divider between them. */
   .raid-group {
-    border-top: 1px solid #3d3218;
-    padding-top: 6px;
-  }
-  .raid-group:first-child {
-    border-top: 0;
     padding-top: 0;
   }
   .raid-row .soc-actions {

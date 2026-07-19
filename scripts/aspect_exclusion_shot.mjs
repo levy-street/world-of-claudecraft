@@ -1,8 +1,6 @@
-// Screenshot the hunter aspect mutual-exclusion fix in the offline client.
-// Boots a hunter, levels to 14 so Hawk/Monkey/Cheetah are all trained, then casts
-// each aspect in turn (clearing the GCD between casts). Before the fix all three
-// stacked (+AP, +dodge, +speed at once); now only the most recent aspect is up.
-// Captures the buff bar holding a single aspect icon and logs the stat proof.
+// Screenshot the Hunter aspect behavior in the offline client.
+// Boots a Hunter, levels to 14 so Hawk and Cheetah are trained, then confirms
+// the maintenance aspect and temporary movement cooldown can coexist.
 
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
@@ -44,7 +42,7 @@ const result = await page.evaluate(() => {
   const g = window.__game;
   const sim = g.sim;
   const p = sim.player;
-  sim.setPlayerLevel(14); // hawk(4) + monkey(10) + cheetah(14) all trained
+  sim.setPlayerLevel(14); // hawk(4) + cheetah(14) trained
   p.gm = true; // survive the ambient world loop while we pose
   // Aspects trigger the GCD; settle 32 ticks (1.6s) between casts so each lands.
   const settle = () => {
@@ -52,31 +50,28 @@ const result = await page.evaluate(() => {
   };
   const aspects = () => p.auras.filter((a) => a.id.startsWith('aspect_of_the_')).map((a) => a.id);
 
-  const base = { ap: p.attackPower, dodge: p.dodgeChance };
+  const base = { ap: p.attackPower };
   sim.castAbility('aspect_of_the_hawk');
   settle();
   const afterHawk = { aspects: aspects(), ap: p.attackPower };
-  sim.castAbility('aspect_of_the_monkey');
-  settle();
-  const afterMonkey = { aspects: aspects(), ap: p.attackPower, dodge: p.dodgeChance };
   sim.castAbility('aspect_of_the_cheetah');
   settle();
   const afterCheetah = { aspects: aspects() };
-  return { base, afterHawk, afterMonkey, afterCheetah };
+  return { base, afterHawk, afterCheetah };
 });
 console.log('aspect exclusion result:', JSON.stringify(result, null, 2));
-// Sanity: exactly one aspect active at each step, and the swapped-out AP is gone.
+// Sanity: Hawk applies attack power and remains active during Cheetah.
 const ok =
-  result.afterHawk.aspects.length === 1 &&
-  result.afterMonkey.aspects.length === 1 &&
-  result.afterCheetah.aspects.join() === 'aspect_of_the_cheetah' &&
-  result.afterMonkey.ap === result.base.ap; // hawk AP dropped after swapping to monkey
-console.log(ok ? 'PASS: only one aspect active, no stat stacking' : 'FAIL: aspects stacked');
+  result.afterHawk.aspects.join() === 'aspect_of_the_hawk' &&
+  result.afterHawk.ap > result.base.ap &&
+  result.afterCheetah.aspects.includes('aspect_of_the_hawk') &&
+  result.afterCheetah.aspects.includes('aspect_of_the_cheetah');
+console.log(ok ? 'PASS: Hawk and Cheetah coexist' : 'FAIL: Hunter aspect state is wrong');
 
 await new Promise((r) => setTimeout(r, 600));
 await page.screenshot({ path: 'tmp/aspect_exclusion_scene.png' });
 
-// Buff-bar crop (top-right): should show a single aspect icon, not three.
+// Buff-bar crop (top-right): should show Hawk and the temporary Cheetah cooldown.
 const box = await page.evaluate(() => {
   const bar = document.querySelector('#buff-bar');
   if (!bar) return null;

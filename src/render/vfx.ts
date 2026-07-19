@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX } from './gfx';
+import { HUNTER_ARROW_PROFILE } from './hunter_arrow_core';
 
 // Spell & ambience particle system. One pooled THREE.Points cloud drawn with
 // additive blending; projectiles are lightweight emitters that home on their
@@ -163,7 +164,8 @@ export const SCHOOL_COLORS: Record<string, number> = {
 
 interface Projectile {
   pos: THREE.Vector3;
-  targetId: number;
+  targetId?: number;
+  targetPos?: THREE.Vector3;
   color: THREE.Color; // base school color (impact burst = x1.6)
   coreColor: THREE.Color; // HDR core (x2.5)
   trailColor: THREE.Color; // sparkling trail (x1.4)
@@ -174,6 +176,8 @@ interface Projectile {
   // When set, the flying head renders as a short jagged electric bolt streak
   // (a lightning "bolt-shaped" projectile) instead of a smooth glowing comet.
   lightning?: boolean;
+  powerfulShot?: boolean;
+  hunterArrow?: boolean;
   // Visual heft multiplier (Pyroblast's heavyBolt = 2): scales the comet core,
   // trail and impact flash; mechanics and speed are untouched.
   scale?: number;
@@ -407,7 +411,13 @@ export class Vfx {
   // High-level effects
   // ---------------------------------------------------------------------
 
-  projectile(sourceId: number, targetId: number, school: string, scale = 1): void {
+  projectile(
+    sourceId: number,
+    targetId: number,
+    school: string,
+    scale = 1,
+    projectileStyle?: 'hunter-arrow',
+  ): void {
     const from = this.anchor(sourceId, 0.62);
     if (!from) return;
     const colors = projectileSchoolColors(school);
@@ -423,6 +433,25 @@ export class Vfx {
       coreSprite: sprites.core,
       trailSprite: sprites.trail,
       scale,
+      hunterArrow: projectileStyle === 'hunter-arrow',
+    });
+  }
+
+  powerfulShot(sourceId: number, x: number, z: number): void {
+    const from = this.anchor(sourceId, 0.62);
+    if (!from) return;
+    const colors = projectileSchoolColors('physical');
+    this.projectiles.push({
+      pos: from.clone(),
+      targetPos: new THREE.Vector3(x, from.y, z),
+      color: colors.base,
+      coreColor: colors.core,
+      trailColor: colors.trail,
+      speed: 52,
+      ttl: 1.5,
+      coreSprite: SPR.star,
+      trailSprite: SPR.trace,
+      powerfulShot: true,
     });
   }
 
@@ -1225,7 +1254,8 @@ export class Vfx {
     for (let i = this.projectiles.length - 1; i >= 0; i--) {
       const pr = this.projectiles[i];
       pr.ttl -= dt;
-      const target = this.anchor(pr.targetId, 0.5);
+      const target =
+        pr.targetPos ?? (pr.targetId === undefined ? null : this.anchor(pr.targetId, 0.5));
       if (!target || pr.ttl <= 0) {
         this.projectiles.splice(i, 1);
         continue;
@@ -1275,7 +1305,47 @@ export class Vfx {
       const uz = dir.z / dist;
       dir.multiplyScalar(step / dist);
       pr.pos.add(dir);
-      if (pr.lightning) {
+      if (pr.powerfulShot) {
+        for (let s = 0; s < 9; s++) {
+          const back = s * 0.32;
+          const x = pr.pos.x - ux * back;
+          const y = pr.pos.y - uy * back;
+          const z = pr.pos.z - uz * back;
+          const head = s === 0;
+          this.spawn(
+            x,
+            y,
+            z,
+            0,
+            0,
+            0,
+            head ? pr.coreColor : pr.trailColor,
+            head ? 0.62 : 0.38,
+            0.14,
+            0,
+            head ? SPR.star : SPR.trace,
+          );
+        }
+      } else if (pr.hunterArrow) {
+        for (const sample of HUNTER_ARROW_PROFILE) {
+          const x = pr.pos.x - ux * sample.back;
+          const y = pr.pos.y - uy * sample.back;
+          const z = pr.pos.z - uz * sample.back;
+          this.spawn(
+            x,
+            y,
+            z,
+            0,
+            0,
+            0,
+            sample.head ? pr.coreColor : pr.trailColor,
+            sample.size,
+            0.16,
+            0,
+            sample.head ? SPR.star : SPR.trace,
+          );
+        }
+      } else if (pr.lightning) {
         // The flying head is a short jagged electric streak trailing back along
         // the travel direction: a few segments, each kicked perpendicular for the
         // zig-zag, so it reads as a lightning bolt shape rather than a round comet.

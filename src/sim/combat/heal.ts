@@ -133,6 +133,33 @@ export function applyHeal(
   return healed;
 }
 
+// Fixed, non-critical heals still pass through the shared outgoing/incoming
+// multipliers and heal-absorb budget. This is used by percentage-based personal
+// recovery such as Exhilaration without spending an RNG draw or firing weapon
+// procs intended for cast heals.
+export function applyFixedHeal(
+  ctx: SimContext,
+  source: Entity,
+  target: Entity,
+  amount: number,
+  ability: string,
+): void {
+  if (target.dead) return;
+  let healed = Math.round(amount * hexOutputMult(ctx, source) * healingTakenMult(ctx, target));
+  healed = consumeHealAbsorb(ctx, target, healed);
+  healed = Math.min(healed, target.maxHp - target.hp);
+  target.hp += healed;
+  ctx.emit({
+    type: 'heal2',
+    sourceId: source.id,
+    targetId: target.id,
+    amount: healed,
+    crit: false,
+    ability,
+  });
+  healingThreat(ctx, source, target, healed);
+}
+
 // Classic healing threat: 0.5 per point of EFFECTIVE healing (overheal is
 // free), split evenly among every mob already fighting the healed target.
 // Party membership does not change threat; it only affects social systems.

@@ -315,6 +315,11 @@ export function applyLoadoutBar(
   abilityExists: (id: string) => boolean,
 ): HotbarAction[] {
   return Array.from({ length: slots }, (_, i) => {
+    // A pre-third-row loadout contains only 22 entries. Missing tail entries
+    // mean the row did not exist when it was saved, not that the player chose
+    // to clear it, so preserve the current action there. An explicit null
+    // inside the saved span still clears an ability while retaining items.
+    if (i >= bar.length) return current[i] ?? null;
     const v = bar[i];
     if (typeof v === 'string' && abilityExists(v)) return { type: 'ability' as const, id: v };
     const existing = current[i];

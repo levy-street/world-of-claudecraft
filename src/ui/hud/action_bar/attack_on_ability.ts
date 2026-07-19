@@ -16,7 +16,8 @@ import type { AbilityEffect, Entity } from '../../../sim/types';
 //               combat/effect_dispatch.ts); a swing would shatter the CC, so an ability
 //               applying one must NEVER start auto-attack even when it also deals damage
 //               (gouge does both). A future break-on-damage CC effect MUST be classified
-//               here, not 'other', or a damage+CC ability built on it would break its own CC.
+//               here, not 'other', or handled from its effect data as `aoeRoot` is below,
+//               or a damage+CC ability built on it would break its own CC.
 //   'other'   - heal/buff/utility/non-breaking CC (stun, root, slow): irrelevant either way.
 type AutoAttackClass = 'damage' | 'breakCC' | 'other';
 
@@ -91,6 +92,16 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   finisherStun: 'other',
   gainResource: 'other',
   selfDamagePctMax: 'other',
+  huntersMark: 'other',
+  disengage: 'other',
+  aspectTurtle: 'other',
+  healPctMax: 'other',
+  feignDeath: 'other',
+  freezingTrap: 'breakCC',
+  trueshot: 'other',
+  explosiveShot: 'damage',
+  hunterMultiShot: 'damage',
+  powerfulShot: 'damage',
   selfHealPctMax: 'other',
   selfHotPctMax: 'other',
   aoeAllyMaxHp: 'other',
@@ -125,6 +136,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
 export function abilityStartsAutoAttack(effects: AbilityEffect[]): boolean {
   let damaging = false;
   for (const e of effects) {
+    if (e.type === 'aoeRoot' && e.breakOnDamage !== undefined) return false;
     const cls = EFFECT_CLASS[e.type];
     if (cls === 'breakCC') return false;
     if (

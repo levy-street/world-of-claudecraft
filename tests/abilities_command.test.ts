@@ -53,4 +53,20 @@ describe('/abilities command', () => {
     expect(errorAfter(sim, '/spells', a)).toContain(first);
     expect(errorAfter(sim, '/spellbook', a)).toContain('Spellbook');
   });
+
+  it('shows Marksmanship abilities only in a Marksmanship Hunter spellbook', () => {
+    const sim = makeWorld();
+    const hunter = sim.addPlayer('hunter', 'Artemis');
+    sim.setPlayerLevel(20, hunter);
+    expect(sim.setSpec('beast_mastery', hunter)).toBe(true);
+    sim.tick();
+    const beastMastery = errorAfter(sim, '/abilities', hunter)!;
+    expect(beastMastery).not.toContain('Aimed Shot');
+    expect(beastMastery).not.toContain('Rapid Fire');
+
+    expect(sim.setSpec('marksmanship', hunter)).toBe(true);
+    const marksmanship = errorAfter(sim, '/abilities', hunter)!;
+    expect(marksmanship).toContain('Aimed Shot');
+    expect(marksmanship).toContain('Rapid Fire');
+  });
 });

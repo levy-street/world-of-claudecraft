@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { TIER_SKILL_STEP } from '../src/sim/professions/wheel';
 import {
   buildAttunementPreview,
   buildProfessionIdentityView,
@@ -81,6 +82,19 @@ describe('buildProfessionIdentityView', () => {
       targetSkill: 25,
     });
     expect(buildProfessionIdentityView(baseIdentity).tutorial).toBeNull();
+  });
+
+  it('keeps the tutorial hint until the first tier-1 crossing, then never shows it again', () => {
+    const zero = Object.fromEntries(Object.keys(baseIdentity.craftSkills).map((id) => [id, 0]));
+    const withCooking = (skill: number) =>
+      buildProfessionIdentityView({ ...baseIdentity, craftSkills: { ...zero, cooking: skill } });
+    // One point short of tier 1 in the best craft: the hint still shows.
+    expect(withCooking(24).tutorial).toEqual({ targetSkill: TIER_SKILL_STEP });
+    // The first craft to reach skill 25 retires the hint...
+    expect(withCooking(25).tutorial).toBeNull();
+    // ...and it stays retired as skills keep growing.
+    expect(withCooking(80).tutorial).toBeNull();
+    expect(withCooking(300).tutorial).toBeNull();
   });
 });
 

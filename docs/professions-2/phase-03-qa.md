@@ -55,8 +55,9 @@ Correctness agent:
   - The hcb claim key under interest-scope edges: a corpse leaving and re-entering the ~120 yd
     interest radius must arrive with the correct claim state, and a claim change while the
     corpse is out of scope must not leave a stale mirror.
-  - No snapshot bloat: hcb is delta-omitted, absent when unchanged, and tests/bandwidth.test.ts
-    confirms it is cheap.
+  - No snapshot bloat: hcb is sparse-emitted, absent when unclaimed (the snapshots.test.ts
+    sparse-absence assertion is the pin), and tests/bandwidth.test.ts stays green without
+    loosened budgets (it carries no hcb-specific scenario).
 - Verify the offline Sim path and the online ClientWorld path behave identically for trades,
   corpse claims, and combo gating; check edge cases (empty trade, self-claimed corpse, a corpse
   claimed by the viewing player, cancelled trade returning instances intact).
@@ -66,8 +67,10 @@ Test coverage agent:
   delta omission, the picker filter, the ClientWorld mirror).
 - Add missing tests, including a determinism test (same seed, same result) if sim logic changed
   (trade grant ordering is sim logic).
-- Update any existing tests broken by Phase 03; verify the ALL_DELTA_KEYS / TERSE_TO_IWORLD
-  re-pins were deliberate, not accidental.
+- Update any existing tests broken by Phase 03; verify hcb's ABSENCE from ALL_DELTA_KEYS /
+  TERSE_TO_IWORLD is the reviewed as-landed deviation (per-entity dynamicFields key, pinned by
+  its round-trip suites; see the deviation note atop phase-03-parity-bug-fixes.md), not an
+  accidental omission.
 - Remove orphaned tests for replaced behavior (for example a test pinning the old
   payload-stripping trade or the hardcoded-null harvestClaimedBy).
 - Verify assertions are decisive (they check payload field values and claim ids, not just "it
@@ -121,7 +124,8 @@ STOPPING RULES:
   correct items in both directions; probe stack splits and cancelled trades.
 - The hcb claim key under interest-scope edges: corpses crossing the interest radius must never
   show a stale or missing claim in `ClientWorld`.
-- No snapshot bloat: `hcb` is delta-omitted and absent when unchanged; `tests/bandwidth.test.ts`
-  stays green without loosened budgets.
+- No snapshot bloat: `hcb` is sparse-emitted and absent when unclaimed (the `tests/snapshots.test.ts`
+  sparse-absence assertion is the pin); `tests/bandwidth.test.ts` stays green without loosened
+  budgets (no hcb-specific scenario lives there).
 - Liveness, not shape: the combo-gating test must prove live `combo_eligibility` values flow
   through `ClientWorld`, not merely that the member exists (the #2033 trap).

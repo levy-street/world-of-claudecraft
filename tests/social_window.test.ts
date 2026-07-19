@@ -7,6 +7,42 @@ import { describe, expect, it } from 'vitest';
 // delegation: social repaints on the slow-HUD divider, so a content refresh must NOT
 // re-attach per-row handlers (one delegated listener on the persistent body does it).
 const painter = readFileSync(new URL('../src/ui/social_window.ts', import.meta.url), 'utf8');
+const componentsCss = readFileSync(
+  new URL('../src/styles/components.css', import.meta.url),
+  'utf8',
+);
+
+describe('social_window: .soc-body layout never uses CSS multicol', () => {
+  // Regression for a review finding on the wide-landscape relayout: `.soc-body` is a
+  // flex item inside `#social-window`, which has a DEFINED height (`height: 480px`). A
+  // multicol container (`columns:`/`column-count:`) with a bounded, non-auto block size
+  // does not grow vertically: it spills rows past the box into extra INLINE columns
+  // instead, and `overflow-x: hidden` (also set here) clips them with no scroll path to
+  // reach them, so friends/guild/ignored/blocked rows past roughly the first two columns
+  // silently vanish and are unreachable. `overflow-y: auto` on a grid, by contrast, keeps
+  // working because grid rows wrap and grow the scrollable block axis. Pin the fix as
+  // grid, not multicol, so this cannot regress back to `columns:`.
+  const body = (() => {
+    const start = componentsCss.indexOf('.soc-body {');
+    expect(start, '.soc-body rule not found in components.css').toBeGreaterThan(-1);
+    const end = componentsCss.indexOf('}', start);
+    return componentsCss.slice(start, end);
+  })();
+
+  it('lays friend/guild/ignore/block rows out with CSS grid', () => {
+    expect(body).toContain('display: grid');
+    expect(body).toContain('grid-template-columns: repeat(auto-fill, minmax(260px, 1fr))');
+  });
+
+  it('never declares columns or column-count (the bug: overflow columns get clipped, not scrolled)', () => {
+    expect(body).not.toMatch(/(?:^|[;{\s])columns\s*:/);
+    expect(body).not.toMatch(/(?:^|[;{\s])column-count\s*:/);
+  });
+
+  it('keeps overflow-y auto so the grid rows remain reachable by scroll', () => {
+    expect(body).toContain('overflow-y: auto');
+  });
+});
 
 describe('social_window: no magic values', () => {
   it('carries no literal hex color in TS (status dots are CSS-classed)', () => {

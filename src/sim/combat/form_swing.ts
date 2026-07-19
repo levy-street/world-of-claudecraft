@@ -45,9 +45,11 @@ export function wandAllowedInForm(e: Entity): boolean {
 export function rangedAutoProfile(
   e: Entity,
   cls: PlayerClass,
+  spec?: string | null,
 ): (typeof CLASSES)[PlayerClass]['ranged'] {
   const ranged = CLASSES[cls].ranged;
   if (!ranged) return undefined;
+  if (cls === 'hunter' && spec === 'survival') return undefined;
   if (ranged.wand && !wandAllowedInForm(e)) return undefined;
   return ranged;
 }

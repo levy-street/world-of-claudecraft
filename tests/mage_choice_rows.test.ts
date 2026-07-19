@@ -86,10 +86,13 @@ describe('mage choice rows (owner tree)', () => {
     expect(p.resource).toBe(full - 80);
   });
 
-  it('Warded cuts damage 15% while Frostveil is up and heals 39 when it breaks', () => {
-    const { sim, p } = rig({ 8: 'mag_r8_warded' });
+  it('Warded cuts damage 15% and heals for 10% mage max health on break', () => {
+    const { sim, p } = rig({ 8: 'mag_r8_warded' }, 8);
     const mob = addTargetMob(sim);
-    sim.castAbility('ice_barrier'); // 130 absorb
+    sim.castAbility('ice_barrier');
+    const initialBarrier =
+      p.auras.find((aura) => aura.id === 'ice_barrier' && aura.kind === 'absorb')?.value ?? 0;
+    const breakHeal = Math.round(p.maxHp * 0.1);
     const deal = (n: number) =>
       (
         sim as unknown as {
@@ -106,11 +109,51 @@ describe('mage choice rows (owner tree)', () => {
       ).dealDamage(mob, p, n, false, 'physical', null, 'hit');
     p.hp -= 100; // the break heal resolves before the landing hit: leave room
     const hp0 = p.hp;
-    deal(100); // cut to 85, fully soaked (barrier 130 -> 45)
-    expect(p.hp).toBe(hp0);
-    deal(100); // cut to 85, 45 soaked, the break heals 39, then 40 lands
-    expect(p.hp).toBe(hp0 + 39 - 40);
+    deal(100);
+    expect(p.hp).toBe(hp0 + breakHeal - (85 - initialBarrier));
     expect(p.auras.some((a) => a.id === 'ice_barrier' && a.kind === 'absorb')).toBe(false);
+  });
+
+  it("Warded scales an ally's Temporal Barrier heal from the mage, not the ally", () => {
+    const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.applyTalents({ spec: 'arcane', rows: { 8: 'mag_r8_warded' } } as never)).toBe(true);
+    sim.tick();
+    const mage = sim.player;
+    mage.resource = mage.maxResource;
+    const allyId = sim.addPlayer('warrior', 'Escudado');
+    const ally = sim.entities.get(allyId);
+    if (!ally) throw new Error('ally missing');
+    ally.pos.x = mage.pos.x + 5;
+    ally.pos.z = mage.pos.z;
+    sim.targetEntity(allyId);
+    sim.castAbility('temporal_barrier');
+    sim.tick();
+    const barrier = ally.auras.find(
+      (aura) => aura.id === 'temporal_barrier' && aura.kind === 'absorb',
+    );
+    expect(barrier).toBeDefined();
+
+    const mob = addTargetMob(sim);
+    ally.hp -= 100;
+    const hp0 = ally.hp;
+    (
+      sim as unknown as {
+        dealDamage(
+          s: Entity,
+          t: Entity,
+          n: number,
+          c: boolean,
+          sc: string,
+          a: string | null,
+          k: string,
+        ): void;
+      }
+    ).dealDamage(mob, ally, barrier?.value ?? 0, false, 'physical', null, 'hit');
+
+    const mageScaledHeal = Math.round(mage.maxHp * 0.1);
+    expect(mageScaledHeal).not.toBe(Math.round(ally.maxHp * 0.1));
+    expect(ally.hp).toBe(hp0 + mageScaledHeal);
   });
 
   it('Temporal Rift cleanses the next stun instantly, then cools down 20 sec', () => {

@@ -190,7 +190,7 @@ export const ALL_CLASSES: PlayerClass[] = [
   'warlock',
   'druid',
 ];
-export type ResourceType = 'rage' | 'mana' | 'energy';
+export type ResourceType = 'rage' | 'mana' | 'energy' | 'focus';
 export const OVERHEAD_EMOTE_IDS = [
   'wave',
   'laugh',
@@ -336,6 +336,7 @@ export type AuraKind =
   | 'critvuln'
   | 'next_cast_instant'
   | 'next_cast_free'
+  | 'next_cast_free_instant'
   | 'next_execute_free'
   | 'next_cast_cheap'
   // Lifesap (druid): flat resource restored on each classic 2-sec regen tick,
@@ -378,6 +379,12 @@ export type AuraKind =
   | 'victory_rush'
   | 'aoe_echo'
   | 'sure_crit'
+  | 'feign_death'
+  | 'hunter_mark'
+  | 'trueshot'
+  | 'hunter_ricochet'
+  | 'hunter_execute_override'
+  | 'explosive_shot'
   // Ice Floes (mage choice row): `value` = cast-time spells left that may be
   // cast while moving. player_motion skips its cancel while worn; finishing a
   // hard cast decrements the value and removes the aura at 0
@@ -481,6 +488,12 @@ export interface Aura {
   // ticks. These fields are simulation-only and need not ride the wire.
   temporalHealRemaining?: number;
   temporalHealTicksRemaining?: number;
+}
+
+export interface DamageBreakBudget {
+  maxHpPct: number;
+  min: number;
+  max: number;
 }
 
 export type CrowdControlDrCategory =
@@ -1683,6 +1696,44 @@ export interface MobTemplate {
   purgeOnHit?: { chance: number; name: string };
 }
 
+interface AoeRootBase {
+  type: 'aoeRoot';
+  duration: number;
+  radius: number;
+  min: number;
+  max: number;
+}
+
+type AoeRootEffect =
+  | (AoeRootBase & {
+      breakOnDamage?: DamageBreakBudget;
+      stun?: false;
+      ring?: never;
+      trap?: never;
+    })
+  | (AoeRootBase & {
+      breakOnDamage?: never;
+      stun: true;
+      ring?: never;
+      trap?: never;
+    })
+  | (AoeRootBase & {
+      breakOnDamage?: never;
+      stun?: boolean;
+      // Persistent annular root. `duration` remains the root duration; the
+      // nested duration is how long the ring can catch new enemies.
+      ring: { duration: number; innerRadius: number };
+      trap?: never;
+    })
+  | (AoeRootBase & {
+      breakOnDamage?: never;
+      ring?: never;
+      stun?: boolean;
+      // Armed trap at the caster's feet. It freezes the first enemy contact
+      // after armTime and expires after lifetime.
+      trap: { armTime: number; lifetime: number };
+    });
+
 export type AbilityEffect =
   | { type: 'weaponDamage'; bonus: number } // on-next-swing bonus (heroic strike)
   | {
@@ -1806,7 +1857,7 @@ export type AbilityEffect =
       radius: number;
     }
   | { type: 'hot'; total: number; duration: number; interval: number } // renew, rejuvenation
-  | { type: 'absorb'; amount: number; duration: number } // power word: shield
+  | { type: 'absorb'; amount: number; duration: number; spellPowerCoeff?: number } // power word: shield
   | { type: 'imbue'; bonus: number; duration: number; judgeMin?: number; judgeMax?: number } // seals / rockbiter: extra damage per swing
   | { type: 'judgement'; dmgMult?: number; flat?: number } // consume your imbue, deal its judgement damage to the target
   | { type: 'lifeTap'; hp: number; mana: number }
@@ -1923,21 +1974,7 @@ export type AbilityEffect =
   | { type: 'aoeAllyDamage'; pct: number; duration: number; radius: number }
   | { type: 'aoeAllySureCrit'; charges: number; duration: number; radius: number }
   | { type: 'aoeSlow'; mult: number; duration: number; radius: number }
-  | {
-      type: 'aoeRoot';
-      duration: number;
-      radius: number;
-      min: number;
-      max: number;
-      stun?: boolean;
-      // Optional persistent annular trap. `duration` remains the root duration;
-      // the nested duration is how long the ring can catch new enemies.
-      ring?: { duration: number; innerRadius: number };
-      // Optional armed trap at the caster's feet (combat/hunter_trap.ts):
-      // arms after armTime, freezes the first enemy contact for `duration`,
-      // expires after lifetime. One per owner.
-      trap?: { armTime: number; lifetime: number };
-    }
+  | AoeRootEffect
   | {
       type: 'empoweredCone';
       angle: number;
@@ -2013,6 +2050,31 @@ export type AbilityEffect =
   | { type: 'finisherStun'; base: number; perCombo: number } // kidney shot: stun seconds scale with combo
   | { type: 'gainResource'; amount: number } // bloodrage immediate
   | { type: 'selfDamagePctMax'; pct: number } // bloodrage cost
+  | { type: 'huntersMark'; damageAmp: number; duration: number }
+  | { type: 'disengage'; distance: number }
+  | { type: 'aspectTurtle'; reduction: number; duration: number }
+  | { type: 'healPctMax'; percent: number }
+  | { type: 'feignDeath'; duration: number }
+  | {
+      type: 'freezingTrap';
+      radius: number;
+      trapDuration: number;
+      incapacitateDuration: number;
+    }
+  | { type: 'trueshot'; duration: number; critChance: number; critDamage: number }
+  | { type: 'explosiveShot'; delay: number; min: number; max: number; radius: number }
+  | { type: 'hunterMultiShot'; min: number; max: number; radius: number; softCap: number }
+  | {
+      type: 'powerfulShot';
+      min: number;
+      max: number;
+      minLength: number;
+      maxLength: number;
+      minWidth: number;
+      maxWidth: number;
+      minDamageScale: number;
+      maxDamageScale: number;
+    }
   | { type: 'selfHealPctMax'; pct: number }
   | { type: 'selfHotPctMax'; pct: number; duration: number; interval: number }
   | { type: 'aoeAllyMaxHp'; pct: number; duration: number; radius: number }
@@ -2263,6 +2325,11 @@ export interface GroundObjectDef {
 // Gatherable world nodes (ore/wood/herb). Permanent, unowned fixtures: this
 // issue is content plus visibility only, no harvest logic (see G3).
 export type GatherNodeType = 'ore' | 'wood' | 'herb';
+
+// Rare gather event flavors (Professions 2.0 Phase 4), one per node family:
+// ore rolls pristine_vein, wood rolls ancient_heartwood, herb rolls
+// moonlit_bloom (professions/gather_events.ts gatherRareEventFlavor).
+export type GatherRareEventFlavor = 'pristine_vein' | 'ancient_heartwood' | 'moonlit_bloom';
 
 export interface GatherNodeDef {
   id: string;
@@ -2875,8 +2942,11 @@ export interface Entity {
   // ItemInstancePayload of whichever equipped piece carries one (an enchanted
   // item's `rolled.stats`), keyed the same as equippedItems. Sparse: a slot with
   // a plain (unenchanted) piece, or nothing equipped, has no entry. Recomputed in
-  // recalcPlayerStats alongside equippedItems; the sim reads the SOURCE
-  // (PlayerMeta.equipmentInstance) for the actual stat bonus, never this mirror.
+  // recalcPlayerStats alongside equippedItems and synced in identity fields
+  // (terse `eqi`, players only, only when non-empty, like `eq`) so the inspect
+  // window shows another player's masterwork/enchant payloads (Phase 6); the sim
+  // reads the SOURCE (PlayerMeta.equipmentInstance) for the actual stat bonus,
+  // never this mirror.
   equippedInstances: Partial<Record<EquipSlot, ItemInstancePayload>>;
   // $WOC holder-tier flair (cosmetic): 0/undefined = none, 1-10 = Ember…Sovereign.
   // Set server-side from the player's connected-wallet balance and synced in
@@ -3141,6 +3211,14 @@ export type SimEvent = { pid?: number } & (
       // from players far outside your ~120yd interest scope, where no entity
       // record exists locally.
       flair?: ChatSenderFlair;
+      // The SENDER's class, for the same reason and by the same rule as `flair`
+      // above: it rides the event rather than being read off the sender's
+      // entity because general/world/lfg/guild chat reaches you from players
+      // far outside your ~120yd interest scope, where `IWorld.entities` (world-
+      // complete offline, interest-scoped online) has no record for them. Set
+      // for every player-sourced chat line (mob/boss yells omit it, same as
+      // fromTitle).
+      classId?: PlayerClass;
     }
   | { type: 'partyInvite'; fromPid: number; fromName: string }
   // The party/raid leader started a ready check: the recipient's client plays a
@@ -3279,6 +3357,22 @@ export type SimEvent = { pid?: number } & (
     }
   // personal outcome line for each fighter (rides beside the anchored vcupEnd)
   | { type: 'vcupResult'; won: boolean; draw: boolean }
+  // Card Duel minigame (src/sim/social/card_duel.ts). Personal (pid), text-free
+  // on purpose (the client picks its own audio/copy off the structured
+  // fields, same as gatherResult/craftResult above).
+  | { type: 'cardDuelMatchStart'; pid?: number }
+  | { type: 'cardPlayed'; pid?: number }
+  | {
+      type: 'cardRoundResolved';
+      mine: number;
+      theirs: number;
+      outcome: 'win' | 'lose' | 'push';
+      // True when this side's post-round draw emptied the deck and had to
+      // reshuffle the discard pile back in (see card_hand.ts drawOne).
+      reshuffled: boolean;
+      pid?: number;
+    }
+  | { type: 'cardDuelMatchEnd'; won: boolean; pid?: number }
   | {
       type: 'heal2';
       sourceId: number;
@@ -3339,7 +3433,9 @@ export type SimEvent = { pid?: number } & (
       level?: number;
       // Stable presentation discriminator; renderers must not infer a player
       // attack animation from school or an English ability label.
+      abilityId?: string;
       attackAnimation?: 'ranged-shot';
+      projectileStyle?: 'hunter-arrow';
       // True for a wand auto-attack projectile, so combat_sfx.ts can pick the
       // dedicated wand_<school> cue instead of the real-spell proj_<school>
       // one: a passive auto-attack must not sound identical to an actual cast.
@@ -3375,6 +3471,8 @@ export type SimEvent = { pid?: number } & (
       // (one orb per caster: the cooldown far outlasts the flight).
       sourceId?: number;
     }
+  // A targetless directional projectile travelling to a fixed world point.
+  | { type: 'powerfulShotFx'; sourceId: number; x: number; z: number }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide
   // `telegraph` marks an entityId-anchored line as an actionable mechanic cue
@@ -3485,6 +3583,26 @@ export type SimEvent = { pid?: number } & (
   // `crafter` repeats as payload). Ids only, text-free on purpose (like
   // craftResult above): the client renders its own localized copy.
   | { type: 'masterwork'; recipeId: string; itemId: string; crafter: number }
+  // Masterwork zone broadcast (Professions 2.0 Phase 6): the soft zone-wide
+  // copy of a masterwork proc, one per overworld player currently in the
+  // crafter's zone INCLUDING the crafter, `pid` being the RECIPIENT (the
+  // gatherRareEvent/chat fanout idiom); crafterPid/crafterName identify the
+  // crafter. Deliberately a SEPARATE type from the personal `masterwork`
+  // event above: the online client rebuilds lastMasterwork from ANY
+  // 'masterwork' event, so a bystander copy under that type would corrupt
+  // their own-proc mirror. Skipped entirely for instanced crafters (the
+  // personal event alone fires there). Ids plus values only, text-free on
+  // purpose: the client renders its own localized line
+  // (hudChrome.crafting.masterworkZoneLine).
+  | {
+      type: 'masterworkZone';
+      pid: number;
+      crafterPid: number;
+      crafterName: string;
+      itemId: string;
+      recipeId: string;
+      zoneId: string;
+    }
   // Gather-node harvest outcome (#1729): a successful resource harvest emits
   // this so the client can play a gathering audio cue for the acting player.
   // Personal (carries pid), delivered only to the harvester. Emitted only on a
@@ -3500,6 +3618,30 @@ export type SimEvent = { pid?: number } & (
       professionId: GatheringProfessionId;
       itemId: string;
       rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+      // Units actually granted (Professions 2.0 Phase 4): the qtyByRarity
+      // yield, multiplied by GATHER_RARE_EVENT_YIELD_MULT on a rare event.
+      qty: number;
+      // The rare event this harvest rolled (resolveHarvest draw #2), or null.
+      rareEvent: GatherRareEventFlavor | null;
+    }
+  // Rare gather event (Professions 2.0 Phase 4): a harvest struck a pristine
+  // vein / ancient heartwood / moonlit bloom. Soft zone broadcast: one copy is
+  // emitted per player currently in the node's zone, `pid` being the RECIPIENT
+  // (the chat fanout idiom); finderPid/finderName identify the harvester. Ids
+  // plus values only, text-free on purpose: the client renders its own
+  // localized line off `flavor` (the gatherEvent.* keys). The HUD reads only
+  // flavor/finderName/finderPid today; zoneId/nodeType/itemId are forward
+  // payload for the Phase 15 per-family deeds/tuning consumers (asserted by
+  // the Phase 4 tests so the shape is already load-bearing on the wire).
+  | {
+      type: 'gatherRareEvent';
+      pid: number;
+      flavor: GatherRareEventFlavor;
+      finderName: string;
+      finderPid: number;
+      zoneId: string;
+      nodeType: GatherNodeType;
+      itemId: string;
     }
 );
 

@@ -259,6 +259,8 @@ describe('Interface & Comfort settings pack', () => {
     expect(s.get('showWalletOnPlayerCard')).toBe(true);
     expect(s.get('showDevBadges')).toBe(true);
     expect(s.get('showDailyRewardsChest')).toBe(true);
+    expect(s.get('showSecondaryActionBar')).toBe(false);
+    expect(s.get('showThirdActionBar')).toBe(false);
     expect(s.get('invertLookY')).toBe(false);
   });
 

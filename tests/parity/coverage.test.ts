@@ -972,4 +972,63 @@ describe('coverage: each scenario fires its subsystem', () => {
     // draws exactly the single masterwork proc roll (0 + 3 = 3 across the whole run).
     expect(trace.draws).toBe(3);
   });
+
+  it('professions_gather: two draws per harvest, zero-draw denial, zone materials, and the hunted rare event fires', () => {
+    const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'professions_gather')!);
+    const ev = rec.allEvents as Ev[];
+    const pid = (rec.sim as any).playerId as number;
+    const meta = (rec.sim as any).players.get(pid);
+
+    // Every scripted harvest granted: 1 ore + 1 wood + 100 herb.
+    const gathers = ev.filter((e) => e.type === 'gatherResult');
+    expect(gathers).toHaveLength(102);
+    expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(false);
+
+    // Phase 1 pins ride the first labelled frame: the granted harvest drew
+    // exactly TWO rng values (rarity + rare event) and the cooldown denial
+    // drew ZERO, since no tick ran before that snapshot.
+    const phase1 = trace.frames.find((f) => f.label === 'harvest-ore-common-and-denial');
+    expect(phase1, 'missing the phase 1 frame').toBeTruthy();
+    expect(phase1!.rng.draws).toBe(2);
+    expect(
+      ev.some(
+        (e) => e.type === 'error' && e.text === 'This resource node has not respawned for you yet.',
+      ),
+    ).toBe(true);
+
+    // Zone materials: ore granted copper_ore at proficiency 0 (common), wood
+    // granted ironbark_log at the proficiency ceiling (never common).
+    expect(gathers[0].itemId).toBe('copper_ore');
+    expect(gathers[0].rarity).toBe('common');
+    const wood = gathers.find((e) => e.itemId === 'ironbark_log');
+    expect(wood, 'wood harvest missing').toBeTruthy();
+    expect(wood!.rarity).not.toBe('common');
+
+    // The hunted rare event fired inside the run: flavor matches its family,
+    // the paired gatherResult carries the x5 yield, and the units landed as
+    // signed instances in the finder's bags.
+    const rare = ev.find((e) => e.type === 'gatherRareEvent');
+    expect(rare, 'rare event did not fire (hunted seed regressed)').toBeTruthy();
+    expect(rare!.finderPid).toBe(pid);
+    const flavorByType: Record<string, string> = {
+      ore: 'pristine_vein',
+      wood: 'ancient_heartwood',
+      herb: 'moonlit_bloom',
+    };
+    expect(rare!.flavor).toBe(flavorByType[rare!.nodeType]);
+    const rareGather = gathers.find((e) => e.rareEvent === rare!.flavor);
+    expect(rareGather, 'no gatherResult paired with the rare event').toBeTruthy();
+    const qtyByRarity: Record<string, number> = {
+      common: 1,
+      uncommon: 2,
+      rare: 2,
+      epic: 3,
+      legendary: 4,
+    };
+    expect(rareGather!.qty).toBe(qtyByRarity[rareGather!.rarity] * 5);
+    const signed = meta.inventory.filter(
+      (s: any) => s.itemId === rare!.itemId && s.instance?.signer === meta.name,
+    );
+    expect(signed.length).toBeGreaterThanOrEqual(rareGather!.qty);
+  });
 });

@@ -841,7 +841,7 @@ export class BagsWindow {
       const link = bagShiftLinks(mode)
         ? `<div class="tt-sub">${esc(t('hudChrome.itemShare.linkHint'))}</div>`
         : '';
-      return this.deps.itemTooltip(item) + extra + partial + equipDrag + destroy + link;
+      return this.deps.itemTooltip(item, s.instance) + extra + partial + equipDrag + destroy + link;
     });
   }
 

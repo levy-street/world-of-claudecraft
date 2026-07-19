@@ -106,9 +106,11 @@ function fireOne(
       ctx.applyHeal(
         player,
         subject,
-        response.amountPctMaxHp !== undefined
-          ? Math.round(subject.maxHp * response.amountPctMaxHp)
-          : (response.amount ?? 0),
+        response.amountPctSourceMaxHp !== undefined
+          ? Math.round(player.maxHp * response.amountPctSourceMaxHp)
+          : response.amountPctMaxHp !== undefined
+            ? Math.round(subject.maxHp * response.amountPctMaxHp)
+            : (response.amount ?? 0),
         def.name,
       );
       break;

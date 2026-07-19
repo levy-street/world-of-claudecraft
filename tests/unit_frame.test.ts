@@ -53,6 +53,7 @@ describe('unitResourceClass: the power-type discriminator (folds the inline tern
   it('maps each power type to its class', () => {
     expect(unitResourceClass('rage')).toBe('rage');
     expect(unitResourceClass('energy')).toBe('energy');
+    expect(unitResourceClass('focus')).toBe('energy');
     expect(unitResourceClass('mana')).toBe('mana');
   });
 

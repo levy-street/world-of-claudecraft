@@ -29,6 +29,7 @@ import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
+import { huntersMarkDamageMultiplier } from '../hunter_base_abilities';
 import { pvpDamageMultiplier } from '../pvp';
 import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
@@ -291,6 +292,10 @@ export function dealDamage(
   if (!alreadyFinal && source && school === 'shadow' && amount > 0) {
     const form = source.auras.find((a) => a.kind === 'form_shadow');
     if (form) amount = Math.round(amount * (1 + form.value / 100));
+  }
+
+  if (!alreadyFinal && amount > 0) {
+    amount = Math.round(amount * huntersMarkDamageMultiplier(source, target));
   }
 
   // Warded (mage choice row): the wearer takes barrierDrPct less damage while

@@ -1542,24 +1542,36 @@
       inset 0 0 0 1px #ffd10066,
       0 0 6px #ffd10033;
   }
+  /* A third action row adds 58px to the stack. Lift the cast and swing timers
+     by the same amount so 720p layouts keep both timers clear of the stack. */
+  body.show-actionbar3 #castbar {
+    bottom: 318px;
+  }
+  body.show-actionbar3 #swingbar {
+    bottom: 292px;
+  }
   #actionbar,
-  #actionbar2 {
+  #actionbar2,
+  #actionbar3 {
     display: flex;
     gap: 4px;
     padding: 6px;
   }
-  /* The optional second action bar (second-action-bar feature) sits just under the
-     primary one; a tighter bottom pad keeps the pair compact. It is OFF by default
-     (a single classic bar): the Interface option "Show Secondary Action Bar" adds
-     body.show-actionbar2 to reveal it. The slots stay keybind-reachable either way.
-     Mobile keeps a single bar regardless (see body.mobile-touch rule in hud.mobile.css):
-     it lives in @layer hud-mobile, ordered after @layer components where this reveal rule
-     sits, so it wins by layer precedence regardless of specificity. */
-  #actionbar2 {
+  /* The optional rows stack above the primary action bar. Tighter bottom padding
+     keeps the group compact. Both are off by default; Interface options add
+     body.show-actionbar2 and body.show-actionbar3. The third-row option depends
+     on the secondary row, so the visible order is always primary, secondary,
+     then third from bottom to top. Hidden slots remain keybind-reachable.
+     Mobile uses the paged action ring regardless of these desktop options. */
+  #actionbar2,
+  #actionbar3 {
     padding-bottom: 2px;
     display: none;
   }
   body.show-actionbar2 #actionbar2 {
+    display: flex;
+  }
+  body.show-actionbar3 #actionbar3 {
     display: flex;
   }
   .action-btn {
@@ -1840,7 +1852,7 @@
      rail-height budget test in tests/crafting_launcher.test.ts. */
   @media (max-height: 720px) {
     #side-buttons {
-      gap: 2px;
+      gap: 1px;
     }
     #side-buttons .micro-btn {
       height: 24px;
@@ -2102,6 +2114,11 @@
     user-select: text;
   }
   .chat-player-name {
+    /* A live player sender stamps --class-color (see hud.ts); everyone else (and any
+       future "disable class colors" toggle or forced-colors override) falls back to
+       the inherited channel color instead of an inline color the CSS cascade could
+       never win back. */
+    color: var(--class-color, inherit);
     cursor: var(--cursor-point);
     text-decoration: underline;
     text-decoration-thickness: 1px;
@@ -4155,6 +4172,11 @@
     letter-spacing: 1px;
     white-space: nowrap;
   }
+  /* Reduced-motion celebrations (hud.ts showBanner motion=false): the banner
+     appears and clears instantly, same text and duration, no fade. */
+  #banner.banner-no-motion {
+    transition: none;
+  }
   /* The quest-progress flash (quest_progress_banner.ts): small yellow lines
      stacked at the top-center, above the zone banner's slot, the classic
      "Forest Wolf slain: 3/8" cue. Lines are appended by the banner module and
@@ -4843,6 +4865,33 @@
   #ctx-menu .ctx-item .ui-icon {
     width: 14px;
     height: 14px;
+  }
+  /* Verified-streamer chat flair: a small brand-mark badge beside the sender
+     name (see chatStreamerBadgeEl). Tinted with the accent token rather than a
+     platform brand hex, so it reads as "this account is flagged", not as an
+     ad for one platform. Purely decorative (role="img", no click/tap binding):
+     the sender name sitting right beside it already opens the SAME player menu
+     (which lists the streamer's channel links up top), so a second, tiny
+     (12x12, well under the 40x40 mobile / 24x24 WCAG floor in src/ui/CLAUDE.md)
+     tap target here would only duplicate that affordance without a keyboard
+     path of its own. */
+  .streamer-badge {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 3px;
+    color: var(--color-accent);
+  }
+  .streamer-badge .ui-icon {
+    width: 12px;
+    height: 12px;
+  }
+  /* Same rationale as .ai-tag: currentColor should already resolve to the forced
+     text color, but stamp it explicitly so the mark cannot vanish under a forced
+     palette. */
+  @media (forced-colors: active) {
+    .streamer-badge {
+      color: CanvasText;
+    }
   }
 
   /* ---------- prompts (invite/trade/duel) ---------- */

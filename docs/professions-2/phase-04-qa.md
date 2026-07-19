@@ -38,6 +38,25 @@ agent for COVERAGE, not filtering: report every gap with confidence and severity
 reply comes back truncated, resume that agent and have it continue from where it stopped;
 do not restart completed work.
 
+AS-LANDED DEVIATIONS (2026-07-18, verify against these, not the older wording below):
+- The harvest SFX cue rides the grant hub's own `loot` SimEvent, NOT the `gatherResult`
+  case: the first draft double-logged and double-played (review catch), so the landed
+  `gatherResult` case renders only the rarity-colored "You gather:" line
+  (hudChrome.gathering.gatherLine/gatherLineQty, worded apart from the loot family) and
+  adds no second cue; a pin in tests/gather_event_i18n.test.ts enforces both. "Drives the
+  HUD log line and cue" therefore means: the line from gatherResult, the cue from the same
+  harvest's loot event, plus the finder-only achievement cue on gatherRareEvent.
+- There are NO sim_i18n/server_i18n matcher rows for the three broadcasts, deliberately:
+  the events are text-free and id-based (the craftResult/skinEvent precedent), so no
+  English leaves the sim and the S3 scan list is unchanged. The localization surface is
+  the client-side gatherEvent.* catalog keys plus overlay fills, pinned by
+  tests/gather_event_i18n.test.ts (existence, exact English, placeholder splices, hud
+  switch liveness, flavor-to-key mapping). Read "matcher rows" below as those pins.
+- Commit cadence landed as four commits, not three: the open-gate fix first, then tables
+  AND the rare-event module together (gathering.ts imports the module, so splitting them
+  leaves an unbuildable commit), then the parity golden alone (tests/parity convention),
+  then the HUD/i18n commit.
+
 Agent correctness:
 - Verify every deliverable and acceptance criterion against the real code, not the phase
   summary: per-node-type tables keyed by rolled rarity, zone-appropriate tiers, rare+

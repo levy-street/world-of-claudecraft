@@ -182,7 +182,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.title': 'Profundidad',
   'entities.abilities.blazing_barrier.name': 'Barrera ardiente',
   'entities.abilities.blazing_barrier.description':
-    'Rodéate de fuego para absorber 130 de daño durante 60 s. (Fuego)',
+    'Rodéate de fuego para absorber {damage} de daño durante 60 s. (Fuego)',
   'entities.abilities.cold_snap.name': 'Llamada invernal',
   'entities.abilities.cold_snap.description':
     'Restablece el tiempo de reutilización de Paso centelleante, Velo de Escarcha e Invisibilidad mejorada. (Talento de mago)',

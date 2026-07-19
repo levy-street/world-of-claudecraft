@@ -1408,6 +1408,7 @@ describe('on-next-swing cooldowns (#56)', () => {
   it('Gutting Strike applies its 6s cooldown when the queued swing resolves', () => {
     const sim = makeSim('hunter');
     sim.setPlayerLevel(10);
+    expect(sim.setSpec('survival')).toBe(true);
     const wolf = nearestMob(sim, 'forest_wolf');
     teleport(sim, sim.player, wolf.pos.x + 2, wolf.pos.z); // inside melee range
     sim.targetEntity(wolf.id);

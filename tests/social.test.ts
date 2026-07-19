@@ -124,6 +124,7 @@ describe('nine classes', () => {
       // resource type sane
       if (cls === 'warrior') expect(p.resourceType).toBe('rage');
       else if (cls === 'rogue') expect(p.resourceType).toBe('energy');
+      else if (cls === 'hunter') expect(p.resourceType).toBe('focus');
       else expect(p.resourceType).toBe('mana');
     }
   });

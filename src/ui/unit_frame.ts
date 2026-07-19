@@ -159,7 +159,7 @@ const NO_ABSORB = {
 export function unitResourceClass(kind: UnitResourceKind): UnitResourceClass {
   if (kind === 'none') return 'none';
   if (kind === 'rage') return 'rage';
-  if (kind === 'energy') return 'energy';
+  if (kind === 'energy' || kind === 'focus') return 'energy';
   // 'mana' or null: the player's default branch, byte-identical to the old ternary.
   return 'mana';
 }

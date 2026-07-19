@@ -524,6 +524,28 @@ describe('applying a saved talent loadout bar', () => {
 
     expect(applyLoadoutBar(current, ['no_such_ability'], 1, abilityExists)).toEqual([null]);
   });
+
+  it('restores an ability in the last slot of the third row', () => {
+    const current = Array(33).fill(null);
+    const saved = Array<string | null>(33).fill(null);
+    saved[32] = 'polymorph';
+
+    expect(applyLoadoutBar(current, saved, 33, abilityExists)[32]).toEqual({
+      type: 'ability',
+      id: 'polymorph',
+    });
+  });
+
+  it('preserves third-row actions missing from a legacy two-row loadout', () => {
+    const current = Array<ReturnType<typeof applyLoadoutBar>[number]>(33).fill(null);
+    current[32] = { type: 'ability', id: 'polymorph' };
+    const legacyBar = Array<string | null>(22).fill(null);
+
+    expect(applyLoadoutBar(current, legacyBar, 33, abilityExists)[32]).toEqual({
+      type: 'ability',
+      id: 'polymorph',
+    });
+  });
 });
 
 describe('loadoutKnownAbilityIds', () => {

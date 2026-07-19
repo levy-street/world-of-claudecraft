@@ -176,9 +176,14 @@ export type ProcResponse =
   | { kind: 'cooldownRefund'; ability: string; seconds: number | 'reset' }
   | { kind: 'resource'; amount: number; resourceType?: ResourceType }
   // The pct-of-max-health variants (phase-2 defensive pass) override the flat
-  // number when present, so the responses scale with the wearer instead of
-  // rotting as levels rise.
-  | { kind: 'heal'; amount?: number; amountPctMaxHp?: number }
+  // number when present. Most scale with the wearer; source scaling is for
+  // shields whose proc owner can differ from the protected ally.
+  | {
+      kind: 'heal';
+      amount?: number;
+      amountPctMaxHp?: number;
+      amountPctSourceMaxHp?: number;
+    }
   | { kind: 'absorb'; amount?: number; amountPctMaxHp?: number; duration: number; name: string }
   | {
       kind: 'echo';
@@ -245,7 +250,7 @@ export interface SavedLoadout {
 }
 
 export const MAX_LOADOUTS = 10;
-export const SAVED_LOADOUT_BAR_SLOTS = 22;
+export const SAVED_LOADOUT_BAR_SLOTS = 33;
 
 export interface ResolvedAbilityMod {
   dmgPct: number;

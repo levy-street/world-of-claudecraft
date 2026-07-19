@@ -5,9 +5,9 @@
 // live through src/ui/talent_i18n.ts. No balance numbers or instanced spoilers here.
 
 export type GuideRole = 'tank' | 'healer' | 'dps';
-export type GuideResource = 'rage' | 'mana' | 'energy';
+export type GuideResource = 'rage' | 'mana' | 'energy' | 'focus';
 
-export interface GuideAbilityRef { id: string; name: string; }
+export interface GuideAbilityRef { id: string; name: string; specializations?: string[]; }
 export interface GuideClassSpec { id: string; name: string; role: GuideRole; signature: string; }
 
 // Interactive 3D model data, mirrored from the renderer's VisualDef manifest. The Guide's
@@ -140,7 +140,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "revenge",
-        "name": "Revenge"
+        "name": "Revenge",
+        "specializations": [
+          "prot"
+        ]
       },
       {
         "id": "battle_shout",
@@ -152,7 +155,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "thunder_clap",
-        "name": "Quaking Blow"
+        "name": "Quaking Blow",
+        "specializations": [
+          "prot"
+        ]
       },
       {
         "id": "hamstring",
@@ -166,7 +172,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "revenge",
-        "name": "Revenge"
+        "name": "Revenge",
+        "specializations": [
+          "prot"
+        ]
       },
       {
         "id": "battle_shout",
@@ -178,7 +187,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "thunder_clap",
-        "name": "Quaking Blow"
+        "name": "Quaking Blow",
+        "specializations": [
+          "prot"
+        ]
       },
       {
         "id": "hamstring",
@@ -186,7 +198,11 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "bloodrage",
-        "name": "Blood Toll"
+        "name": "Blood Toll",
+        "specializations": [
+          "arms",
+          "prot"
+        ]
       },
       {
         "id": "overpower",
@@ -194,11 +210,17 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "raging_gale",
-        "name": "Twinstrike"
+        "name": "Twinstrike",
+        "specializations": [
+          "fury"
+        ]
       },
       {
         "id": "raised_guard",
-        "name": "Raised Guard"
+        "name": "Raised Guard",
+        "specializations": [
+          "prot"
+        ]
       },
       {
         "id": "pummel",
@@ -210,27 +232,45 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "furious_mending",
-        "name": "Furious Mending"
+        "name": "Furious Mending",
+        "specializations": [
+          "fury"
+        ]
       },
       {
         "id": "iron_resolve",
-        "name": "Iron Resolve"
+        "name": "Iron Resolve",
+        "specializations": [
+          "prot"
+        ]
       },
       {
         "id": "slam",
-        "name": "Brute Swing"
+        "name": "Brute Swing",
+        "specializations": [
+          "arms"
+        ]
       },
       {
         "id": "red_harvest",
-        "name": "Red Harvest"
+        "name": "Red Harvest",
+        "specializations": [
+          "fury"
+        ]
       },
       {
         "id": "whirlwind",
-        "name": "Bladed Gyre"
+        "name": "Bladed Gyre",
+        "specializations": [
+          "fury"
+        ]
       },
       {
         "id": "faultline",
-        "name": "Faultline"
+        "name": "Faultline",
+        "specializations": [
+          "prot"
+        ]
       },
       {
         "id": "heroic_leap",
@@ -238,7 +278,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "cleave",
-        "name": "Reaping Arc"
+        "name": "Reaping Arc",
+        "specializations": [
+          "arms"
+        ]
       },
       {
         "id": "rallying_cry",
@@ -246,11 +289,17 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "emboldening_roar",
-        "name": "Emboldening Roar"
+        "name": "Emboldening Roar",
+        "specializations": [
+          "fury"
+        ]
       },
       {
         "id": "defiant_bellow",
-        "name": "Defiant Bellow"
+        "name": "Defiant Bellow",
+        "specializations": [
+          "prot"
+        ]
       },
       {
         "id": "battle_stance",
@@ -258,15 +307,25 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "berserker_stance",
-        "name": "Berserker Stance"
+        "name": "Berserker Stance",
+        "specializations": [
+          "fury"
+        ]
       },
       {
         "id": "defensive_stance",
-        "name": "Guarded Stance"
+        "name": "Guarded Stance",
+        "specializations": [
+          "arms",
+          "prot"
+        ]
       },
       {
         "id": "demoralizing_shout",
-        "name": "Direhowl"
+        "name": "Direhowl",
+        "specializations": [
+          "prot"
+        ]
       },
       {
         "id": "intimidating_shout",
@@ -274,7 +333,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "sunder_armor",
-        "name": "Armor Shear"
+        "name": "Armor Shear",
+        "specializations": [
+          "prot"
+        ]
       },
       {
         "id": "taunt",
@@ -282,39 +344,66 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "measured_fury",
-        "name": "Measured Fury"
+        "name": "Measured Fury",
+        "specializations": [
+          "arms"
+        ]
       },
       {
         "id": "seasoned_soldier",
-        "name": "Seasoned Soldier"
+        "name": "Seasoned Soldier",
+        "specializations": [
+          "arms"
+        ]
       },
       {
         "id": "sudden_death",
-        "name": "Sudden Death"
+        "name": "Sudden Death",
+        "specializations": [
+          "arms"
+        ]
       },
       {
         "id": "diabolical_twinstrike",
-        "name": "Diabolical Twinstrike"
+        "name": "Diabolical Twinstrike",
+        "specializations": [
+          "fury"
+        ]
       },
       {
         "id": "cleaving_blows",
-        "name": "Cleaving Blows"
+        "name": "Cleaving Blows",
+        "specializations": [
+          "fury"
+        ]
       },
       {
         "id": "breachmaker",
-        "name": "Breachmaker"
+        "name": "Breachmaker",
+        "specializations": [
+          "arms"
+        ]
       },
       {
         "id": "sweeping_strikes",
-        "name": "Widening Arc"
+        "name": "Widening Arc",
+        "specializations": [
+          "arms"
+        ]
       },
       {
         "id": "deep_wounds",
-        "name": "Gaping Wounds"
+        "name": "Gaping Wounds",
+        "specializations": [
+          "arms"
+        ]
       },
       {
         "id": "enrage_passive",
-        "name": "Mayhem"
+        "name": "Mayhem",
+        "specializations": [
+          "fury"
+        ]
       }
     ],
     "model": "player_warrior",
@@ -447,7 +536,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
   {
     "id": "hunter",
     "color": "#abd473",
-    "resource": "mana",
+    "resource": "focus",
     "roles": [
       "dps"
     ],
@@ -462,7 +551,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "marksmanship",
         "name": "Coldsight",
         "role": "dps",
-        "signature": "trueshot_aura"
+        "signature": "steady_shot"
       },
       {
         "id": "survival",
@@ -474,7 +563,18 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     "signatureAbilities": [
       {
         "id": "raptor_strike",
-        "name": "Gutting Strike"
+        "name": "Gutting Strike",
+        "specializations": [
+          "survival"
+        ]
+      },
+      {
+        "id": "hunters_mark",
+        "name": "Hunter's Mark"
+      },
+      {
+        "id": "disengage",
+        "name": "Disengage"
       },
       {
         "id": "aspect_of_the_hawk",
@@ -487,20 +587,23 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "arcane_shot",
         "name": "Fell Shot"
-      },
-      {
-        "id": "concussive_shot",
-        "name": "Rattling Shot"
-      },
-      {
-        "id": "mongoose_bite",
-        "name": "Counterfang"
       }
     ],
     "abilities": [
       {
         "id": "raptor_strike",
-        "name": "Gutting Strike"
+        "name": "Gutting Strike",
+        "specializations": [
+          "survival"
+        ]
+      },
+      {
+        "id": "hunters_mark",
+        "name": "Hunter's Mark"
+      },
+      {
+        "id": "disengage",
+        "name": "Disengage"
       },
       {
         "id": "aspect_of_the_hawk",
@@ -515,12 +618,23 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Fell Shot"
       },
       {
+        "id": "exhilaration",
+        "name": "Exhilaration"
+      },
+      {
         "id": "concussive_shot",
         "name": "Rattling Shot"
       },
       {
+        "id": "freezing_trap",
+        "name": "Freezing Trap"
+      },
+      {
         "id": "mongoose_bite",
-        "name": "Counterfang"
+        "name": "Counterfang",
+        "specializations": [
+          "survival"
+        ]
       },
       {
         "id": "wing_clip",
@@ -539,20 +653,59 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Patch Up"
       },
       {
-        "id": "aspect_of_the_monkey",
-        "name": "Marten's Guise"
+        "id": "feign_death",
+        "name": "Feign Death"
       },
       {
         "id": "aspect_of_the_cheetah",
-        "name": "Courser's Guise"
+        "name": "Aspect of the Cheetah"
+      },
+      {
+        "id": "steady_shot",
+        "name": "Steady Shot",
+        "specializations": [
+          "marksmanship"
+        ]
+      },
+      {
+        "id": "explosive_shot",
+        "name": "Explosive Shot",
+        "specializations": [
+          "marksmanship"
+        ]
+      },
+      {
+        "id": "kill_shot",
+        "name": "Kill Shot",
+        "specializations": [
+          "beast_mastery",
+          "marksmanship"
+        ]
       },
       {
         "id": "aimed_shot",
-        "name": "Long Draw"
+        "name": "Aimed Shot",
+        "specializations": [
+          "marksmanship"
+        ]
+      },
+      {
+        "id": "aspect_of_the_turtle",
+        "name": "Aspect of the Turtle"
       },
       {
         "id": "rapid_fire",
-        "name": "Fevered Draw"
+        "name": "Rapid Fire",
+        "specializations": [
+          "marksmanship"
+        ]
+      },
+      {
+        "id": "trueshot",
+        "name": "Trueshot",
+        "specializations": [
+          "marksmanship"
+        ]
       },
       {
         "id": "volley",
@@ -1001,43 +1154,73 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "ignition",
-        "name": "Ignition"
+        "name": "Ignition",
+        "specializations": [
+          "fire"
+        ]
       },
       {
         "id": "hot_streak",
-        "name": "Hot Streak"
+        "name": "Hot Streak",
+        "specializations": [
+          "fire"
+        ]
       },
       {
         "id": "blazing_barrier",
-        "name": "Blazing Barrier"
+        "name": "Blazing Barrier",
+        "specializations": [
+          "fire"
+        ]
       },
       {
         "id": "meteor",
-        "name": "Meteor"
+        "name": "Meteor",
+        "specializations": [
+          "fire"
+        ]
       },
       {
         "id": "combustion",
-        "name": "Phoenix Trance"
+        "name": "Phoenix Trance",
+        "specializations": [
+          "fire"
+        ]
       },
       {
         "id": "summon_water_elemental",
-        "name": "Summon Water Elemental"
+        "name": "Summon Water Elemental",
+        "specializations": [
+          "frost"
+        ]
       },
       {
         "id": "ice_lance",
-        "name": "Ice Lance"
+        "name": "Ice Lance",
+        "specializations": [
+          "frost"
+        ]
       },
       {
         "id": "fingers_of_frost",
-        "name": "Fingers of Frost"
+        "name": "Fingers of Frost",
+        "specializations": [
+          "frost"
+        ]
       },
       {
         "id": "brain_freeze",
-        "name": "Brain Freeze"
+        "name": "Brain Freeze",
+        "specializations": [
+          "frost"
+        ]
       },
       {
         "id": "shatter",
-        "name": "Brittle Ruin"
+        "name": "Brittle Ruin",
+        "specializations": [
+          "frost"
+        ]
       },
       {
         "id": "conjure_food",
@@ -1049,15 +1232,24 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "fire_blast",
-        "name": "Cinderfall"
+        "name": "Cinderfall",
+        "specializations": [
+          "fire"
+        ]
       },
       {
         "id": "arcane_missiles",
-        "name": "Aether Darts"
+        "name": "Aether Darts",
+        "specializations": [
+          "arcane"
+        ]
       },
       {
         "id": "flurry",
-        "name": "Winterlash"
+        "name": "Winterlash",
+        "specializations": [
+          "frost"
+        ]
       },
       {
         "id": "polymorph",
@@ -1069,87 +1261,150 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "frozen_orb",
-        "name": "Frozen Orb"
+        "name": "Frozen Orb",
+        "specializations": [
+          "frost"
+        ]
       },
       {
         "id": "blizzard",
-        "name": "Blizzard"
+        "name": "Blizzard",
+        "specializations": [
+          "frost"
+        ]
       },
       {
         "id": "icy_veins",
-        "name": "Icy Veins"
+        "name": "Icy Veins",
+        "specializations": [
+          "frost"
+        ]
       },
       {
         "id": "glacial_spike",
-        "name": "Glacial Spike"
+        "name": "Glacial Spike",
+        "specializations": [
+          "frost"
+        ]
       },
       {
         "id": "glacial_front",
-        "name": "Glacial Front"
+        "name": "Glacial Front",
+        "specializations": [
+          "frost"
+        ]
       },
       {
         "id": "dragons_breath",
-        "name": "Dragon's Breath"
+        "name": "Dragon's Breath",
+        "specializations": [
+          "fire"
+        ]
       },
       {
         "id": "arcane_explosion",
-        "name": "Aetherburst"
+        "name": "Aetherburst",
+        "specializations": [
+          "arcane"
+        ]
       },
       {
         "id": "scorch",
-        "name": "Scald"
+        "name": "Scald",
+        "specializations": [
+          "fire"
+        ]
       },
       {
         "id": "ice_barrier",
-        "name": "Frostveil"
+        "name": "Frostveil",
+        "specializations": [
+          "frost"
+        ]
       },
       {
         "id": "pyroblast",
-        "name": "Pyrelance"
+        "name": "Pyrelance",
+        "specializations": [
+          "fire"
+        ]
       },
       {
         "id": "flamestrike",
-        "name": "Flamestrike"
+        "name": "Flamestrike",
+        "specializations": [
+          "fire"
+        ]
       },
       {
         "id": "temporal_barrier",
-        "name": "Temporal Barrier"
+        "name": "Temporal Barrier",
+        "specializations": [
+          "arcane"
+        ]
       },
       {
         "id": "temporal_echo",
-        "name": "Temporal Echo"
+        "name": "Temporal Echo",
+        "specializations": [
+          "arcane"
+        ]
       },
       {
         "id": "arcane_surge",
-        "name": "Aether Surge"
+        "name": "Aether Surge",
+        "specializations": [
+          "arcane"
+        ]
       },
       {
         "id": "temporal_cascade",
-        "name": "Temporal Cascade"
+        "name": "Temporal Cascade",
+        "specializations": [
+          "arcane"
+        ]
       },
       {
         "id": "temporal_reversal",
-        "name": "Temporal Reversal"
+        "name": "Temporal Reversal",
+        "specializations": [
+          "arcane"
+        ]
       },
       {
         "id": "collective_reversal",
-        "name": "Collective Reversal"
+        "name": "Collective Reversal",
+        "specializations": [
+          "arcane"
+        ]
       },
       {
         "id": "temporal_rewind",
-        "name": "Rewind"
+        "name": "Rewind",
+        "specializations": [
+          "arcane"
+        ]
       },
       {
         "id": "temporal_hourglass",
-        "name": "Hourglass of Suspension"
+        "name": "Hourglass of Suspension",
+        "specializations": [
+          "arcane"
+        ]
       },
       {
         "id": "temporal_acceleration",
-        "name": "Temporal Acceleration"
+        "name": "Temporal Acceleration",
+        "specializations": [
+          "arcane"
+        ]
       },
       {
         "id": "perfect_moment",
-        "name": "Perfect Moment"
+        "name": "Perfect Moment",
+        "specializations": [
+          "arcane"
+        ]
       },
       {
         "id": "fireball_form",

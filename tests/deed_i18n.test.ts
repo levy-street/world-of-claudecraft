@@ -117,8 +117,9 @@ describe('titledDisplayName + titledNameDecoration (the name-plus-title pattern)
     const fn = hudSrc.slice(hudSrc.indexOf('private chatLogFrom('));
     // The window spans the sender-span setup: the name is now clickable/tappable as
     // well as right-clickable, so the contextmenu arm sits behind those handlers.
-    expect(fn.slice(0, 2400)).toContain('sender.textContent = titledDisplayName(name, fromTitle);');
-    expect(fn.slice(0, 2400)).toContain('this.openChatPlayerContextMenu(name, ev.clientX');
+    // (widened from 2400: the classId doc comment above the --class-color stamp)
+    expect(fn.slice(0, 3200)).toContain('sender.textContent = titledDisplayName(name, fromTitle);');
+    expect(fn.slice(0, 3200)).toContain('this.openChatPlayerContextMenu(name, ev.clientX');
     const toWhisperArm = hudSrc.slice(hudSrc.indexOf('CHAT_TEMPLATE_KEYS.toWhisper') - 200);
     expect(toWhisperArm.slice(0, 400)).not.toContain('ev.fromTitle');
   });

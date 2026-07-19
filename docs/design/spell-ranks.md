@@ -85,7 +85,8 @@
 |---|---|---|---|---|
 | `arcane_explosion` | 14 | 60 | inst | aoeDamage 26–31, radius 10 (caster-centered) |
 | `scorch` | 16 | 35 | 1.5s | directDamage 32–40 (fast fire filler) |
-| `ice_barrier` | 20 | 90 | inst, 30cd | absorb 130, 60s (self) |
+| `ice_barrier` / `blazing_barrier` | 5 (R2 12, R3 18) | 45 / 65 / 90 | inst, 30cd | absorb 50 / 90 / 130 + 50% Spell Power, 60s (self) |
+| `temporal_barrier` | 5 (R2 12, R3 18) | 50 / 75 / 105 | inst, 12cd | absorb 55 / 100 / 160 + 25% Spell Power, 10s (friendly) |
 | `pyroblast` | 20 | 125 | 6.0s cast | directDamage 75–100 + dot 24/12s (6×4) — big nuke + burn |
 
 **Sanity** — L14: Fireball R3 avg 42 (+6 dot) ≈ 48/cast → 292 hp ≈ 6.1 casts ✓. L20: FB R4 avg 68 (+12) = 80 → 400 hp = 5 casts (+Fire Blast R3 trims one) ✓.
@@ -163,7 +164,7 @@
 
 | Ability | Rank | Learn | Cost | Effect values |
 |---|---|---|---|---|
-| raptor_strike | 1 | 1 | 15 | weaponDamage +5 (next swing, 6cd) |
+| raptor_strike (Survival) | 1 | 1 | 15 | weaponDamage +5 (next swing, 6cd) |
 | | **2** | **8** | 25 | **+11** |
 | | **3** | **14** | 35 | **+18** |
 | | **4** | **20** | 45 | **+27** |
@@ -176,7 +177,7 @@
 | aspect_of_the_hawk | 1 | 4 | 20 | buff_ap +20, 30min |
 | | **2** | **12** | 30 | buff_ap **+35** |
 | | **3** | **18** | 40 | buff_ap **+50** |
-| mongoose_bite | 1 | 10 | 10 | weaponStrike +12 (dodge proc) |
+| mongoose_bite (Survival) | 1 | 10 | 10 | weaponStrike +12 (dodge proc) |
 | | **2** | **16** | 10 | weaponStrike **+24** |
 | concussive_shot / wing_clip | 1 | 8/10 | — | no further ranks (utility; slows don't scale) |
 
@@ -184,10 +185,21 @@
 
 | Ability | Learn | Cost | Cast/CD | Effects |
 |---|---|---|---|---|
-| `aspect_of_the_monkey` | 10 | 20 | inst | selfBuff buff_dodge +0.08, 30min |
-| `aspect_of_the_cheetah` | 14 | 20 | inst | selfBuff buff_speed 1.3, 30min (replaces Hawk while active; daze rider omitted) |
-| `aimed_shot` | 16 | 50 | 3.0s cast, 6cd, 8–35yd | directDamage 50–62 |
-| `rapid_fire` | 20 | 0 | inst, 300cd, offGcd | selfBuff buff_haste 1.4, 15s |
+| `hunters_mark` | 2 | 0 | inst | marks for 60s; Hunter and pet deal 5% more damage |
+| `disengage` | 4 | 0 | inst, 20cd, offGcd | collision-safe 15yd backward leap |
+| `steady_shot` | 5 | 0 | 1.75s, 8-35yd, cast while moving | directDamage 24-30; generates 20 Focus when fired |
+| `exhilaration` | 6 | 0 | inst, 120cd, offGcd | restores 30% maximum health |
+| `explosive_shot` | 8 | 20 | inst, 30cd, 8-35yd | after 3s: physical AoE 70-86 within 8yd of the target |
+| `freezing_trap` | 8 | 0 | inst, 30cd, 30yd | persists 60s; first trigger incapacitated 8s, breaks on damage |
+| `feign_death` | 10 | 0 | inst, 30cd, offGcd | drops threat and targeted casts; ends on action or after 6s |
+| `kill_shot` | 10 | 0 | inst, 10cd, 8-35yd | BM/MM execute; directDamage 95-115 below 20% health |
+| `aspect_of_the_cheetah` | 14 | 0 | inst, 180cd, offGcd | selfBuff buff_speed 1.9, 3s |
+| `aimed_shot` | 16 | 35 | 3.0s cast, 15cd, 8-35yd | MM directDamage 50-62; one charge |
+| `aspect_of_the_turtle` | 18 | 0 | inst, 180cd, offGcd | 30% damage reduction for 8s; prevents attacks |
+| `rapid_fire` | 20 | 0 | 1.9s channel, 16cd, 8-35yd, cast while moving | MM 7 shots at 13-17; each generates 3 Focus |
+| `trueshot` | 20 | 0 | inst, 120cd, offGcd | MM 15s: +10% crit, +20% crit damage; Aimed/Rapid recover 40%/60% faster |
+| `multi_shot` | row 14 | 30 | inst, no cd, 8-35yd | target plus enemies within 10yd; soft cap above 5; primes one ricochet |
+| `powerful_shot` | row 20 | 0 | held up to 2.5s, 45cd | MM narrow piercing line; charge increases damage and range; auto-fires at maximum |
 
 **Sanity** — L14: auto ~17/2.3s + Arcane R2 (~27/6s) + Sting R2 (35) → 292 hp ≈ 8 autos + 3 arcanes + sting, ~18s ✓. L20: Aimed (~56) + Arcane R3 (~43) + Sting R3 (55) + ~7 autos (~170) ≈ 400 ✓.
 
@@ -369,10 +381,10 @@
 | Class | New abilities (id @ level) | New sim work |
 |---|---|---|
 | Warrior | execute@14, slam@16, cleave@18 | wire existing `requiresTargetHpBelow` |
-| Mage | arcane_explosion@14, scorch@16, ice_barrier@20, pyroblast@20 | none |
+| Mage | personal barrier@5 (R2@12, R3@18), arcane_explosion@14, scorch@16, pyroblast@20 | none |
 | Rogue | kidney_shot@14, ambush@16, adrenaline_rush@20 | **finisherStun effect (the only new effect type)** |
 | Paladin | flash_of_light@12, exorcism@14, consecration@18 | none |
-| Hunter | aspect_of_the_cheetah@14, aimed_shot@16, rapid_fire@20 | none |
+| Hunter | feign_death@10, kill_shot@10, aspect_of_the_cheetah@14, aimed_shot@16, aspect_of_the_turtle@18, rapid_fire/trueshot@20 | `hunter_base_abilities.ts` utilities; `hunter_marksmanship.ts` MM effects and charged line shot |
 | Priest | heal@14 (R2@20), mind_flay@16, flash_heal@20 | none (drainTick healFrac 0) |
 | Shaman | frost_shock@14, ghost_wolf@16, stormstrike@20, frostbrand_weapon@12 (R2@20) | none (imbue reuse) |
 | Warlock | fear@14, searing_pain@16, shadowburn@20 | none (incapacitate reuse) |

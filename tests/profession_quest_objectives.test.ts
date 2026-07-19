@@ -4,7 +4,7 @@
 
 import { afterEach, describe, expect, it } from 'vitest';
 import { GATHER_NODES, QUESTS } from '../src/sim/data';
-import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
+import { nodeMaterialFor } from '../src/sim/professions/gathering';
 import { Sim } from '../src/sim/sim';
 import type { QuestDef, QuestObjective, QuestProgress } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -94,7 +94,7 @@ describe('gather quest objectives', () => {
       { type: 'gather', nodeType: 'ore', count: 1, label: 'Ore vein harvested' },
       {
         type: 'gather',
-        itemId: NODE_HARVEST_TABLE.ore.itemId,
+        itemId: nodeMaterialFor('ore', 'eastbrook_vale').itemId,
         count: 1,
         label: 'Ore material gathered',
       },

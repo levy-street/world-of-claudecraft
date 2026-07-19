@@ -268,7 +268,7 @@ export function attackReadout(ctx: SimContext, p: Entity, meta: PlayerMeta): str
   // ranged classes (hunter auto shot, caster wands) swing at their ranged
   // speed; everyone else, including a druid shifted into a wandless form,
   // uses the form-aware melee cadence (bear: weapon, cat: claw baseline)
-  const base = rangedAutoProfile(p, meta.cls)?.speed ?? baseSwingSpeed(p);
+  const base = rangedAutoProfile(p, meta.cls, meta.talents.spec)?.speed ?? baseSwingSpeed(p);
   const interval = base * ctx.swingIntervalMult(p);
   const next = p.swingTimer <= 0 ? 'now' : `in ${p.swingTimer.toFixed(1)}s`;
   return `Auto-attack is on against ${t.name} — next swing ${next} (${interval.toFixed(1)}s swing).`;
@@ -459,7 +459,7 @@ export function gearReadout(meta: PlayerMeta): string {
   return `Equipped (${worn}/${slots.length}): ${parts.join(', ')}.`;
 }
 export function abilitiesReadout(meta: PlayerMeta, e: Entity): string {
-  const known = abilitiesKnownAt(meta.cls, e.level);
+  const known = abilitiesKnownAt(meta.cls, e.level, meta.talentMods);
   if (known.length === 0) return 'You have not learned any abilities yet.';
   const list = known.map((k) => `${k.def.name} (Rank ${k.rank})`).join(', ');
   return `Spellbook (${known.length}): ${list}.`;

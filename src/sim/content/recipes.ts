@@ -12,9 +12,11 @@
 // no skillReq admission gate anywhere: crafting.ts reads skillReq only for
 // skill-gain scaling, and itemLevelBudget feeds the #1301 gold sink.
 //
-// Inputs are existing harvested-material item ids from the gathering content
-// (src/sim/professions/gathering.ts NODE_HARVEST_TABLE): bone_fragments
-// (mining), linen_scrap (logging), spider_leg (herbalism). Outputs reuse
+// Inputs are existing junk-material item ids (src/sim/content/items.ts):
+// bone_fragments, linen_scrap, spider_leg. Since Professions 2.0 Phase 4
+// nodes grant real materials (NODE_MATERIAL_TABLE in
+// src/sim/professions/gathering.ts) and these junk items drop only from
+// mobs/corpses; the recipes still consume them. Outputs reuse
 // existing low-tier BASE_ITEMS entries (src/sim/content/items.ts) rather than
 // introducing new item ids, to avoid expanding the positional item-name arrays
 // in src/ui/i18n.catalog/items.ts for this issue.

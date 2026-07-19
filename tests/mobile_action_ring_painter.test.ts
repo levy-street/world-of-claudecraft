@@ -150,16 +150,27 @@ describe('mobile action ring: source-slot state per page', () => {
     expect(state.slots[1].abilityId).toBe('fireball');
   });
 
-  it('the same button index follows source slots 1, 6, 11, and 16 across all four pages', () => {
+  it('the same button index follows the first source slot across all seven pages', () => {
     const pageBox = { page: 0 };
     const bySlot = new Map<number, ActionBarAbility>([
       [1, ability('fireball')],
       [6, ability('frostbolt')],
       [11, ability('arcane_blast')],
       [16, ability('shadow_bolt')],
+      [21, ability('execute')],
+      [26, ability('ice_block')],
+      [31, ability('blink')],
     ]);
     const view = createActionBarView({ slots: ringDescriptor(pageBox, bySlot) }, fakeDeps());
-    for (const expected of ['fireball', 'frostbolt', 'arcane_blast', 'shadow_bolt']) {
+    for (const expected of [
+      'fireball',
+      'frostbolt',
+      'arcane_blast',
+      'shadow_bolt',
+      'execute',
+      'ice_block',
+      'blink',
+    ]) {
       expect(view.tick(idleWorld()).slots[1].abilityId).toBe(expected);
       pageBox.page = nextMobilePage(pageBox.page);
     }
@@ -242,13 +253,13 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
       (key) => `URL(${key})`,
       (key, values) => (values ? `${key}|${JSON.stringify(values)}` : key),
     );
-    const pageBox = { page: 3 };
+    const pageBox = { page: 6 };
     const view = createActionBarView({ slots: ringDescriptor(pageBox, new Map()) }, fakeDeps());
     painter.paint(view.tick(idleWorld()), pageBox.page, mobilePageCount());
 
     expect(calls).toContainEqual({
       m: 'setText',
-      args: [indicator, 'hudChrome.mobile.actionPageIndicator|{"page":4,"count":4}'],
+      args: [indicator, 'hudChrome.mobile.actionPageIndicator|{"page":7,"count":7}'],
     });
     expect(calls).toContainEqual({
       m: 'setAttr',
@@ -318,6 +329,54 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
 
     painter.paint(view.tick(idleWorld()), 1, 2);
     expect(counts.writes).toBeGreaterThan(writesAfterFirst);
+  });
+
+  it('paints page 7 with third-row slots 31 to 33 and hides two unavailable buttons', () => {
+    const { calls, writers } = recordingFacet();
+    const els = [0, 1, 2, 3, 4, 5].map((i) => slotElements(`ring${i}`));
+    const indicator = { tag: 'indicator' } as unknown as HTMLElement;
+    const painter = new MobileActionRingPainter(
+      writers,
+      {
+        bar: { container: { tag: 'c' } as unknown as HTMLElement, slots: els },
+        pageToggle: { tag: 'toggle' } as unknown as HTMLElement,
+        pageIndicator: indicator,
+      },
+      (key) => `URL(${key})`,
+      (key, values) => (values ? `${key}|${JSON.stringify(values)}` : key),
+    );
+    const pageBox = { page: 6 };
+    const view = createActionBarView(
+      {
+        slots: ringDescriptor(
+          pageBox,
+          new Map([
+            [31, ability('slot31')],
+            [32, ability('slot32')],
+            [33, ability('slot33')],
+          ]),
+        ),
+      },
+      fakeDeps(),
+    );
+    const state = view.tick(idleWorld());
+
+    expect(state.slots.slice(1).map((slot) => slot.abilityId)).toEqual([
+      'slot31',
+      'slot32',
+      'slot33',
+      null,
+      null,
+    ]);
+    painter.paint(state, 6, 7);
+    expect(calls).toContainEqual({
+      m: 'setText',
+      args: [indicator, 'hudChrome.mobile.actionPageIndicator|{"page":7,"count":7}'],
+    });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [els[4].btn, 'empty', true] });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [els[5].btn, 'empty', true] });
+    expect(calls).toContainEqual({ m: 'setDisplay', args: [els[4].btn, 'none'] });
+    expect(calls).toContainEqual({ m: 'setDisplay', args: [els[5].btn, 'none'] });
   });
 });
 

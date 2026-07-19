@@ -324,6 +324,7 @@ export function recalcPlayerStats(
   let bonusAp = setEff.ap;
   let bonusDodge = 0;
   let bonusCrit = 0;
+  let bonusCritDmgPhys = 0;
   let bonusHaste = 0;
   let bearForm = false;
   let catForm = false;
@@ -373,6 +374,10 @@ export function recalcPlayerStats(
       s.int = Math.round(s.int * m);
       s.spi = Math.round(s.spi * m);
     } else if (a.kind === 'buff_dodge') bonusDodge += a.value;
+    else if (a.kind === 'trueshot') {
+      bonusCrit += a.value;
+      bonusCritDmgPhys += a.value2 ?? 0;
+    }
     else if (a.kind === 'buff_scale') scaleMul *= a.value;
     // Metamorphosis: a temporary demon transform that also makes the caster larger.
     else if (a.kind === 'form_metamorph') scaleMul *= 1.35;
@@ -585,7 +590,7 @@ export function recalcPlayerStats(
   // channel bonus is added at its matching crit site (spell base 1.5, phys base 2,
   // heal base 1.5).
   e.critDmgSpellBonus = mods?.global.critDmgSpellPct ?? 0;
-  e.critDmgPhysBonus = mods?.global.critDmgPhysPct ?? 0;
+  e.critDmgPhysBonus = (mods?.global.critDmgPhysPct ?? 0) + bonusCritDmgPhys;
   e.critDmgHealBonus = mods?.global.critDmgHealPct ?? 0;
   e.castPushbackReduction = setEff.castPushbackReduction;
   e.knockbackResistance = setEff.knockbackResistance;
@@ -626,7 +631,7 @@ export function recalcPlayerStats(
       : Math.round(e.maxResource * manaFrac);
   } else {
     e.resourceType = def.resourceType;
-    e.maxResource = 100; // rage and energy both cap at 100
+    e.maxResource = 100; // rage, energy, and Focus all cap at 100
     e.resource = Math.min(e.resource, 100);
   }
 }

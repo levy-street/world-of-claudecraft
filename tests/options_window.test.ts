@@ -108,10 +108,17 @@ describe('options_window: control-primitive dispatch wiring', () => {
   it('routes each descriptor kind to its matching builder', () => {
     expect(painter).toContain('this.settingSlider(parent, c, hooks)');
     expect(painter).toContain('this.settingToggle(parent, c, hooks)');
-    expect(painter).toContain('this.settingBoolToggle(parent, c, hooks)');
+    expect(painter).toContain('c.rerender ? (key) => rerender(key) : undefined');
     expect(painter).toContain(
       'this.settingChoice(parent, c, hooks, c.rerender ? rerender : undefined)',
     );
+  });
+
+  it('restores focus after a dependency toggle rerenders the Interface view', () => {
+    expect(painter).toContain('toggle.dataset.settingKey = key');
+    expect(painter).toContain('onChange?.(key)');
+    expect(painter).toMatch(/data-setting-key="\$\{focusKey\}"/);
+    expect(painter).toContain('?.focus()');
   });
 
   it('fires the exact same setting write per control kind as the inline original', () => {

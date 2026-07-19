@@ -1,7 +1,9 @@
 import { SPORT_ABILITIES } from '../../../sim/content/vale_cup';
 import { ABILITIES, ITEMS } from '../../../sim/data';
 import type { PlayerClass } from '../../../sim/types';
+import { hunterUtilityMigrationIds } from '../../hunter_hotbar_migration';
 import { WARRIOR_STANCE_GROUP } from '../../stance_bar_view';
+import { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 import {
   actionForAttackSlot,
   attackSlotStorageKey,
@@ -21,7 +23,7 @@ import {
   saveAttackSlotAction as writeAttackSlotAction,
 } from './hotbar';
 
-export const ACTION_BAR_ABILITY_SLOTS = 22;
+export { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 
 export type HotbarForm = 'normal' | 'bear' | 'cat' | 'cat_stealth' | 'stealth' | 'sport';
 
@@ -116,6 +118,30 @@ export class ActionBarController {
     if (this.knownAbilityIdsAtLastSync === null) {
       if (!this.loadedFromStorage) {
         for (const id of knownAbilityIds) consider(id);
+      }
+      if (this.deps.playerClass === 'hunter' && this.activeFormState === 'normal') {
+        const migrationKey = `${this.slotMapKey('normal')}_hunter_kit_v2`;
+        let migrated = false;
+        try {
+          migrated = this.deps.storage.getItem(migrationKey) === '1';
+        } catch {
+          // Storage can be unavailable in private browsing modes.
+        }
+        for (const id of hunterUtilityMigrationIds(
+          this.deps.playerClass,
+          this.activeFormState,
+          knownAbilityIds,
+          migrated,
+        )) {
+          consider(id);
+        }
+        if (!migrated) {
+          try {
+            this.deps.storage.setItem(migrationKey, '1');
+          } catch {
+            // The next sync may safely retry this idempotent migration.
+          }
+        }
       }
     } else {
       for (const id of knownAbilityIds) {

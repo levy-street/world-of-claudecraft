@@ -13,6 +13,7 @@
 // the browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
 import type { FrozenOrbState } from './combat/frozen_orb';
+import type { LetterDef } from './content/letters';
 import type { TalentModifiers } from './content/talents';
 import type { DeedRuntime } from './deeds';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
@@ -392,6 +393,7 @@ export interface SimContextCallbacks {
     id: string,
     duration: number,
     school: Aura['school'],
+    breakThreshold?: number,
   ): void;
   applyKnockback(source: Entity, target: Entity, distance: number): number;
   diminishedCrowdControlDuration(
@@ -789,6 +791,12 @@ export interface SimContextCallbacks {
   // the daily lockout but was not at the corpse to loot them (awardHeroicMarks in
   // instances/dungeons.ts). Binding points at the PostOffice instance on Sim.
   mailHeroicMarks(pid: number, itemId: string, count: number): void;
+
+  // Ravenpost mail: books an authored letter to a character through the standard
+  // system-mail path (mailKeyFor recipient key, 'system' kind, the letter's own
+  // delivery delay). The Guild trend letter sweep (professions/guild_letter.ts)
+  // consumes it. Binding points at the PostOffice instance on Sim.
+  mailAuthoredLetter(meta: PlayerMeta, letter: LetterDef): void;
 
   // Set proc firing is owned by combat/set_procs.ts.
   applySetProcs(source: Entity, target: Entity | null, trigger: SetProc['trigger']): void;
@@ -1246,6 +1254,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     // Ravenpost mail: the quest turn-in letter hook (points at the PostOffice on Sim).
     queueQuestLetter: host.queueQuestLetter,
     mailHeroicMarks: host.mailHeroicMarks,
+    mailAuthoredLetter: host.mailAuthoredLetter,
     applySetProcs: host.applySetProcs,
     // Book of Deeds seam (points at deeds.ts via the Sim-bound arrows).
     bumpDeedStat: host.bumpDeedStat,

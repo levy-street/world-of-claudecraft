@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   abilityScalingPower,
+  absorbBonus,
   channelSpellCoeff,
   channelTickBonus,
   directHealBonus,
@@ -134,6 +135,13 @@ describe('directHealBonus', () => {
     // Same Spell Power and cast time as a full-coeff nuke: heal takes the full 1.0.
     const sp = 300;
     expect(directHealBonus(sp, 3.5)).toBe(directHitBonus(sp, def({ school: 'holy' }), 3.5));
+  });
+});
+
+describe('absorbBonus', () => {
+  it('adds the authored fraction of Spell Power to a shield', () => {
+    expect(absorbBonus(123, 0.5)).toBe(62);
+    expect(absorbBonus(80, 0)).toBe(0);
   });
 });
 

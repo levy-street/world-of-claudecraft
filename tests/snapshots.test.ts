@@ -2551,6 +2551,105 @@ describe('weapon skin wire (weaponSkinId)', () => {
   });
 });
 
+// Worn per-slot instance payloads ride the identity wire (terse key `eqi`,
+// Professions 2.0 Phase 6) so the inspect window shows another player's
+// masterwork/enchant rolls. Sparse exactly like `eq`: players only, present
+// only while at least one worn piece carries a payload, absent otherwise (the
+// no-bloat tooth: an instance-less player's identity record is byte-unchanged).
+// `eqi` is an IDENTITY key, not a maybe() delta key, so it stays out of
+// ALL_DELTA_KEYS; and like `eq` it is outside TERSE_TO_IWORLD scope (that map
+// pins delta keys + self scalars only). End-to-end GameServer liveness plus
+// clone-not-alias live in tests/inspect_instances.test.ts.
+describe('equipped instance wire (eqi)', () => {
+  const inst = { rolled: { masterwork: true, stats: { int: 3, spi: 1 } }, signer: 'Aldric' };
+
+  it('carries eqi through wireEntity only while an instanced piece is worn', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Thaldrin');
+    const e = sim.entities.get(pid)!;
+    // The fresh auto-equipped worn set is all plain pieces: eq rides, eqi
+    // stays off the wire entirely.
+    expect(wireEntity(e).eq).toBeDefined();
+    expect(wireEntity(e).eqi).toBeUndefined();
+
+    sim.addItemInstance('eastbrook_ritual_vestments', structuredClone(inst), pid);
+    sim.equipItem('eastbrook_ritual_vestments', pid);
+    expect((wireEntity(e).eq as any).chest).toBe('eastbrook_ritual_vestments');
+    expect(wireEntity(e).eqi).toEqual({ chest: inst });
+
+    // Unequipping the one instanced piece drops the key again (sparse, like wsk).
+    sim.unequipItem('chest', pid);
+    expect(wireEntity(e).eqi).toBeUndefined();
+  });
+
+  it('strips non-cosmetic instance fields from the wire payload (data minimization)', () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Yrsa');
+    const e = sim.entities.get(pid)!;
+    sim.addItemInstance(
+      'eastbrook_ritual_vestments',
+      {
+        signer: 'Aldric',
+        rolled: { masterwork: true, stats: { int: 3 } },
+        boundTo: pid,
+        charges: { mend: 2 },
+      },
+      pid,
+    );
+    sim.equipItem('eastbrook_ritual_vestments', pid);
+    const wired = wireEntity(e).eqi as Record<string, Record<string, unknown>>;
+    // Only the cosmetic inspect fields (signer, enchant, rolled) leave the
+    // server; boundTo and charges are gameplay state no inspecting client
+    // needs and must never ride the identity wire.
+    expect(wired.chest.signer).toBe('Aldric');
+    expect(wired.chest.rolled).toEqual({ masterwork: true, stats: { int: 3 } });
+    expect(wired.chest.boundTo).toBeUndefined();
+    expect(wired.chest.charges).toBeUndefined();
+    expect(Object.keys(wired.chest).sort()).toEqual(['rolled', 'signer']);
+  });
+
+  it('restores equippedInstances from a full record, deep-cloned; an eqi-less full record resets', () => {
+    const client = bareClient(99);
+    const base = {
+      id: 7,
+      k: 'player',
+      tid: 'warrior',
+      nm: 'Brae',
+      lv: 5,
+      x: 0,
+      y: 0,
+      z: 0,
+      f: 0,
+      hp: 100,
+      mhp: 100,
+    };
+    const wireInst = structuredClone(inst);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [{ ...base, eq: { chest: 'eastbrook_ritual_vestments' }, eqi: { chest: wireInst } }],
+    });
+    const e = client.entities.get(7)!;
+    expect(e.equippedInstances).toEqual({ chest: inst });
+    // Deep-cloned, never aliased: mutating the wire-parsed payload (a later
+    // message could) must not reach the mirror, rolled.stats included.
+    expect(e.equippedInstances.chest).not.toBe(wireInst);
+    wireInst.rolled.stats.int = 99;
+    expect(e.equippedInstances.chest?.rolled?.stats?.int).toBe(3);
+
+    // A lite record (no identity fields) leaves the mirror in place.
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [{ id: 7, x: 1, y: 0, z: 1, f: 0, hp: 100, mhp: 100 }],
+    });
+    expect(client.entities.get(7)?.equippedInstances).toEqual({ chest: inst });
+
+    // A later full record WITHOUT eqi means no worn piece carries a payload
+    // anymore: the mirror resets to empty (the `eq` absent-key semantics).
+    (client as any).applySnapshot({ t: 'snap', ents: [base] });
+    expect(client.entities.get(7)?.equippedInstances).toEqual({});
+  });
+});
+
 describe('delve self-state mirrors over the wire', () => {
   let server: GameServer;
   let fc: FakeClient;

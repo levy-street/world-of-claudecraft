@@ -715,7 +715,7 @@ const classAbilityNamesEn = {
       [
         'blazing_barrier',
         'Blazing Barrier',
-        'Wreathe yourself in flame, absorbing 130 damage for 60 sec. (Fire)',
+        'Wreathe yourself in flame, absorbing {damage} damage for 60 sec. (Fire)',
       ],
       [
         'cold_snap',
@@ -846,7 +846,7 @@ const classAbilityNamesEn = {
       [
         'frost_nova',
         'Icebind',
-        'Freezes all nearby enemies in place for up to 8 sec, dealing {damage} Frost damage.',
+        "Freezes all nearby enemies in place for up to 8 sec, dealing {damage} Frost damage. The root breaks after cumulative damage equal to 15% of the target's maximum health, with a minimum of 20 and a maximum of 60 damage.",
       ],
       [
         'arcane_explosion',
@@ -1023,6 +1023,16 @@ const classAbilityNamesEn = {
         'A strong melee attack that increases damage by {damage}. Activates on your next swing.',
       ],
       [
+        'hunters_mark',
+        "Hunter's Mark",
+        'Marks an enemy for 60 sec, revealing it and increasing damage dealt by you and your pet by 5%.',
+      ],
+      [
+        'disengage',
+        'Disengage',
+        'Leap backwards up to 15 yd, quickly creating distance from nearby enemies.',
+      ],
+      [
         'aspect_of_the_hawk',
         "Harrier's Guise",
         "Take on the harrier's guise, increasing attack power by {buff} for 30 min.",
@@ -1033,10 +1043,16 @@ const classAbilityNamesEn = {
         'Stings the target, dealing {damage} Nature damage over 15 sec.',
       ],
       ['arcane_shot', 'Fell Shot', 'An instant shot that deals {damage} Arcane damage.'],
+      ['exhilaration', 'Exhilaration', 'Instantly restores 30% of your maximum health.'],
       [
         'concussive_shot',
         'Rattling Shot',
         'Dazes the target for {damage} damage, slowing movement by 50% for 4 sec.',
+      ],
+      [
+        'freezing_trap',
+        'Freezing Trap',
+        'Places a trap that incapacitates the first enemy to trigger it for 60 sec. Damage breaks the effect.',
       ],
       [
         'mongoose_bite',
@@ -1054,12 +1070,56 @@ const classAbilityNamesEn = {
         "Take on the marten's guise, increasing your dodge chance by 8% for 30 min.",
       ],
       [
-        'aspect_of_the_cheetah',
-        "Courser's Guise",
-        "Take on the courser's guise, increasing movement speed by 30% for 30 min.",
+        'feign_death',
+        'Feign Death',
+        'Feign death for up to 6 min, dropping enemy threat and cancelling enemy casts targeting you. Acting ends the effect.',
       ],
-      ['aimed_shot', 'Long Draw', 'A carefully drawn shot that deals {damage} damage.'],
-      ['rapid_fire', 'Fevered Draw', 'Increases your attack speed by 40% for 15 sec.'],
+      [
+        'aspect_of_the_cheetah',
+        'Aspect of the Cheetah',
+        'Increases your movement speed by 90% for 3 sec.',
+      ],
+      [
+        'steady_shot',
+        'Steady Shot',
+        'A moving shot that deals Physical damage and generates 20 Focus.',
+      ],
+      [
+        'explosive_shot',
+        'Explosive Shot',
+        'Plants ammunition that explodes after 3 sec, damaging enemies within 8 yd.',
+      ],
+      [
+        'kill_shot',
+        'Kill Shot',
+        'A ranged finishing shot usable only against enemies below 20% health.',
+      ],
+      ['aimed_shot', 'Aimed Shot', 'A carefully aimed shot that deals {damage} Physical damage.'],
+      [
+        'aspect_of_the_turtle',
+        'Aspect of the Turtle',
+        'Reduces all damage taken by 30% for 8 sec, but prevents you from attacking while active.',
+      ],
+      [
+        'rapid_fire',
+        'Rapid Fire',
+        'Channels 7 shots over 1.9 sec. Each shot generates 3 Focus, and the channel can continue while moving.',
+      ],
+      [
+        'multi_shot',
+        'Multi-Shot',
+        'Hits your target and nearby enemies. Hitting at least 2 empowers Aimed Shot or Rapid Fire to ricochet.',
+      ],
+      [
+        'trueshot',
+        'Trueshot',
+        'For 15 sec, gain 10% critical strike chance and 20% critical damage while Aimed Shot and Rapid Fire recover faster.',
+      ],
+      [
+        'powerful_shot',
+        'Powershot',
+        'Hold to charge a narrow piercing line shot. Charging chiefly increases its damage and length; release to fire.',
+      ],
       ['smite', 'Smite', 'Smites the enemy for {damage} Holy damage.'],
       ['lesser_heal', 'Whispered Prayer', 'Heals a friendly target for {damage}.'],
       [
@@ -2240,7 +2300,7 @@ export const classAbilityNames = {
         [
           'aspect_of_the_cheetah',
           'Aspecto del guepardo',
-          'Adoptas el aspecto del guepardo y aumentas la velocidad de movimiento un 30% durante 30 min.',
+          'Aumenta tu velocidad de movimiento un 90% durante 3 s.',
         ],
         [
           'aspect_of_the_monkey',
@@ -2250,9 +2310,13 @@ export const classAbilityNames = {
         [
           'aimed_shot',
           'Disparo de puntería',
-          'Un disparo cuidadosamente apuntado que inflige {damage} de daño.',
+          'Un disparo cuidadosamente apuntado que inflige {damage} de daño físico.',
         ],
-        ['rapid_fire', 'Fuego rápido', 'Aumenta tu velocidad de ataque un 40% durante 15 s.'],
+        [
+          'rapid_fire',
+          'Fuego rápido',
+          'Canaliza 7 disparos durante 1,9 s. Cada disparo genera 3 p. de enfoque y la canalización continúa mientras te mueves.',
+        ],
         ['smite', 'Punición', 'Castiga al enemigo por {damage} de daño Sagrado.'],
         ['lesser_heal', 'Sanación inferior', 'Sana a un objetivo amistoso por {damage}.'],
         [

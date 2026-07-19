@@ -217,6 +217,7 @@ import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { type ClaudiumHooks, Hud } from './ui/hud';
+import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
 import { chatInputSize } from './ui/hud/chat/chat_input_autosize';
 import { wireSkinPicker } from './ui/hud/cosmetics/skin_picker';
 import {
@@ -241,6 +242,11 @@ import {
 } from './ui/i18n';
 import { defaultIconPrewarmEntries, prewarmIconCache } from './ui/icon_prewarm';
 import { iconDataUrl } from './ui/icons';
+import {
+  noteLoadingProgress,
+  startSlowConnectionWatch,
+  stopSlowConnectionWatch,
+} from './ui/loading_slow_hint';
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
 import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
 import { applyNativeDeviceLanguage } from './ui/native_language';
@@ -361,6 +367,7 @@ const RESOURCE_KEYS = {
   mana: 'classDetails.resources.mana',
   energy: 'classDetails.resources.energy',
   rage: 'classDetails.resources.rage',
+  focus: 'hudChrome.resource.focus',
 } satisfies Record<string, TranslationKey>;
 
 function classDisplayDescription(className: PlayerClass): string {
@@ -796,6 +803,7 @@ function showLoadingScreen(statusText: string): void {
   el.classList.add('visible');
   setLoadingStatus(statusText);
   startLoadingTips();
+  startSlowConnectionWatch();
 }
 
 function setLoadingStatus(text: string): void {
@@ -805,6 +813,7 @@ function setLoadingStatus(text: string): void {
 function setLoadingProgress(done: number, total: number): void {
   $('#ls-fill').style.width = total > 0 ? `${Math.round((done / total) * 100)}%` : '0%';
   setLoadingStatus(t('loading.worldProgress', { done, total }));
+  noteLoadingProgress();
 }
 
 // Rotating "did you know" copy under the progress bar, purely cosmetic (no
@@ -835,6 +844,7 @@ function hideLoadingScreen(): void {
   if (!el.classList.contains('visible')) return;
   el.classList.add('fade');
   stopLoadingTips();
+  stopSlowConnectionWatch();
   loadingHideTimer = window.setTimeout(() => {
     el.classList.remove('visible', 'fade');
     loadingHideTimer = null;
@@ -953,6 +963,10 @@ async function startGame(
     fatalOverlay(t('loading.assetsFailed', { error: technicalErrorMessage(err) }));
     return;
   }
+  // Assets are the only network-bound phase the slow-connection hint can
+  // speak to; everything after this is synchronous CPU-bound scene build, so
+  // stop watching here rather than leaving it armed through hideLoadingScreen.
+  stopSlowConnectionWatch();
   const spectateBadge = createSpectateBadge();
   setLoadingStatus(t('loading.enteringWorld'));
   // Let the final status + full progress bar paint before the synchronous
@@ -1354,6 +1368,9 @@ async function startGame(
           case 'deeds':
             hud.toggleDeeds();
             break;
+          case 'professions':
+            hud.toggleProfessions();
+            break;
           case 'sheathe': {
             // Cosmetic sheathe toggle (Z). The world owns the rule (dead-gate,
             // combat auto-unsheathe); play the cue only when the state moved.
@@ -1421,6 +1438,7 @@ async function startGame(
     onLeaderboard: () => hud.toggleLeaderboard(),
     onDailyRewards: () => hud.toggleDailyRewards(),
     onDeeds: () => hud.toggleDeeds(),
+    onProfessions: () => hud.toggleProfessions(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
     onMusic: () => {
       music.setEnabled(!music.enabled);
@@ -1534,6 +1552,9 @@ async function startGame(
         break;
       case 'deeds':
         hud.toggleDeeds();
+        break;
+      case 'professions':
+        hud.toggleProfessions();
         break;
       case 'chat':
         openChat();
@@ -1714,11 +1735,19 @@ async function startGame(
       document.body.classList.toggle('compact-chat', settings.set('compactChat', !!value));
       return;
     }
-    if (key === 'showSecondaryActionBar') {
-      document.body.classList.toggle(
-        'show-actionbar2',
-        settings.set('showSecondaryActionBar', !!value),
+    if (key === 'showSecondaryActionBar' || key === 'showThirdActionBar') {
+      const visibility = resolveActionBarVisibility(
+        {
+          secondary: settings.get('showSecondaryActionBar'),
+          third: settings.get('showThirdActionBar'),
+        },
+        key,
+        !!value,
       );
+      settings.set('showSecondaryActionBar', visibility.secondary);
+      settings.set('showThirdActionBar', visibility.third);
+      document.body.classList.toggle('show-actionbar2', visibility.secondary);
+      document.body.classList.toggle('show-actionbar3', visibility.third);
       return;
     }
     if (key === 'showTargetOfTarget') {
@@ -2013,7 +2042,11 @@ async function startGame(
         assembleBugReportMeta({
           build: `${__APP_VERSION__} (${__APP_BUILD_ID__})`,
           userAgent: navigator.userAgent,
-          viewport: { w: window.innerWidth, h: window.innerHeight, dpr: window.devicePixelRatio },
+          viewport: {
+            w: window.innerWidth,
+            h: window.innerHeight,
+            dpr: window.devicePixelRatio,
+          },
           zone: zoneBiomeAt(world.player.pos.z),
           level: world.player.level,
           // Entity has no `cls`; the player's class is its templateId (see Entity).
@@ -2024,7 +2057,11 @@ async function startGame(
         api.submitBugReport({
           characterId: online.characterId,
           characterName: world.player.name,
-          pos: { x: world.player.pos.x, y: world.player.pos.y, z: world.player.pos.z },
+          pos: {
+            x: world.player.pos.x,
+            y: world.player.pos.y,
+            z: world.player.pos.z,
+          },
           description: payload.description,
           screenshot: payload.screenshot,
           meta: payload.meta,
@@ -2037,7 +2074,10 @@ async function startGame(
     // fail closed; the SDK itself returns typed unavailable states, never throws.
     // The game therefore boots and plays with the service OFF: snapshot() resolves
     // to the disabled state and the window renders its empty notice.
-    const economy = new EconomyClient({ token: () => api.token, base: api.base });
+    const economy = new EconomyClient({
+      token: () => api.token,
+      base: api.base,
+    });
     const wocBalanceBaseUnits = (balance: number | null): string | null => {
       if (balance === null || !Number.isFinite(balance) || balance < 0) return null;
       return String(Math.floor(balance * 1_000_000));
@@ -2089,7 +2129,11 @@ async function startGame(
             balance,
             skus,
             nativeRails,
-            walletBalances: { solLamports: null, usdcBaseUnits: null, wocBaseUnits: null },
+            walletBalances: {
+              solLamports: null,
+              usdcBaseUnits: null,
+              wocBaseUnits: null,
+            },
             nativePrices: skus.map((row) => ({
               sku: row.sku,
               solAmountBase: null,
@@ -2252,7 +2296,6 @@ async function startGame(
         t('questUi.errors.tooFar'),
         t('hudChrome.gathering.notReady'),
         t('errors.nothingInteract'),
-        online === null,
       ),
       input,
       mobileControls,
@@ -2287,12 +2330,31 @@ async function startGame(
     return findPlayerPath(world.cfg.seed, world.player.pos, target, undefined, true, true);
   }
 
-  function resolvedClickMoveTarget(target: { x: number; z: number }): { x: number; z: number } {
+  function resolvedClickMoveTarget(target: { x: number; z: number }): {
+    x: number;
+    z: number;
+  } {
     // swim: keep a clicked water destination instead of snapping it to shore.
     return resolvePlayerDestination(world.cfg.seed, target, true);
   }
 
   function syncGroundAimReticle(): void {
+    const powerfulShot = hud.powerfulShotAimReticle();
+    if (powerfulShot) {
+      renderer.setGroundAimReticle({
+        x: powerfulShot.x,
+        z: powerfulShot.z,
+        radius: 0,
+        school: 'physical',
+        dimmed: false,
+        line: {
+          length: powerfulShot.length,
+          width: powerfulShot.width,
+          facing: powerfulShot.facing,
+        },
+      });
+      return;
+    }
     if (!hud.isGroundAimActive()) {
       renderer.setGroundAimReticle(null);
       return;
@@ -2386,7 +2448,7 @@ async function startGame(
       return;
     }
     const e = world.entities.get(id);
-    const interactionOutcome = handlePickedEntity(world, hud, id, button, x, y, online === null);
+    const interactionOutcome = handlePickedEntity(world, hud, id, button, x, y);
     const didInteractImmediately = interactionOutcome === true;
     if (e && e.id !== world.player.id) {
       // Mark the entity when you engage it: a left-click target, or the click-to-move
@@ -2400,7 +2462,7 @@ async function startGame(
       // regular click handler still performs target/interact behavior.
       if (
         isClickMoveButton &&
-        shouldApproachPickedEntity(world.player, e, didInteractImmediately, online === null)
+        shouldApproachPickedEntity(world.player, e, didInteractImmediately)
       ) {
         const target = resolvedClickMoveTarget({ x: e.pos.x, z: e.pos.z });
         input.setClickMoveTarget(target, 3.5, e.id, clickMovePathTo(target));
@@ -2861,8 +2923,12 @@ async function startGame(
     perf.trace('input.updateTouchLook', () => input.updateTouchLook(frameDt), {
       frameDtMs: frameDt * 1000,
     });
-    perf.trace('input.gamepad', () => gamepad.poll(frameDt), { frameDtMs: frameDt * 1000 });
-    perf.trace('input.hoverCursor', () => updateHoverCursor(), { active: input.hoverActive });
+    perf.trace('input.gamepad', () => gamepad.poll(frameDt), {
+      frameDtMs: frameDt * 1000,
+    });
+    perf.trace('input.hoverCursor', () => updateHoverCursor(), {
+      active: input.hoverActive,
+    });
     perf.markInputFrame(performance.now());
 
     const mouselook = intro === null && input.isMouselookActive() && !movementFrozen();
@@ -3348,7 +3414,12 @@ async function startOffline(
         fetchReleases: () => api.releases(20),
         fetchArmoryPromoEnabled: () => Promise.resolve(false),
         fetchDiscord: () =>
-          Promise.resolve({ enabled: null, linked: null, guildMember: null, fetchFailed: false }),
+          Promise.resolve({
+            enabled: null,
+            linked: null,
+            guildMember: null,
+            fetchFailed: false,
+          }),
         fetchChest: () => Promise.resolve({ ready: false, unknown: true }),
         header: () => ({
           characterName: name,
@@ -3979,7 +4050,9 @@ function paintAccountPortal(
   const since = $('#account-member-since');
   since.textContent = model.header.memberSinceIso
     ? t('hudChrome.account.memberSince', {
-        date: formatDateTime(new Date(model.header.memberSinceIso), { dateStyle: 'medium' }),
+        date: formatDateTime(new Date(model.header.memberSinceIso), {
+          dateStyle: 'medium',
+        }),
       })
     : '';
   $('#account-char-count').textContent = t('hudChrome.account.charactersCount', {
@@ -4302,7 +4375,9 @@ function setupSecuritySection(): void {
   ($('#account-export-btn') as HTMLElement).addEventListener('click', async () => {
     try {
       const bundle = await api.exportData();
-      const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(bundle, null, 2)], {
+        type: 'application/json',
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -4983,7 +5058,8 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   // an unexpected drop is not fatal: the server holds the character in-world
   // (linkdead) while ClientWorld auto-reconnects, so just veil the game until
   // the world resumes; onDisconnect above fires if the retries run out
-  world.onConnectionLost = () => showReconnectOverlay();
+  world.onConnectionLost = (attempt, maxAttempts, nextRetryAtMs) =>
+    showReconnectOverlay(attempt, maxAttempts, nextRetryAtMs);
   world.onReconnected = () => hideReconnectOverlay();
 }
 
@@ -5083,7 +5159,10 @@ function renderClassDetails(
   // Bind class color as a custom property for clean styling
   panel.style.setProperty('--class-color', classColorHex);
 
-  const statsList: { nameKey: TranslationKey; key: keyof typeof classDef.baseStats }[] = [
+  const statsList: {
+    nameKey: TranslationKey;
+    key: keyof typeof classDef.baseStats;
+  }[] = [
     { nameKey: 'classDetails.labels.strength', key: 'str' },
     { nameKey: 'classDetails.labels.agility', key: 'agi' },
     { nameKey: 'classDetails.labels.stamina', key: 'sta' },
@@ -5313,7 +5392,9 @@ function updateSeoMetadata(lang: SupportedLanguage): void {
             url: canonicalHref,
             inLanguage: languageTag(lang),
             description: t('seo.description'),
-            publisher: { '@id': 'https://worldofclaudecraft.com/#organization' },
+            publisher: {
+              '@id': 'https://worldofclaudecraft.com/#organization',
+            },
           },
           {
             '@type': 'Organization',
@@ -5336,7 +5417,9 @@ function updateSeoMetadata(lang: SupportedLanguage): void {
             image: 'https://worldofclaudecraft.com/woc_logo_square.webp',
             description: t('seo.description'),
             inLanguage: languageTag(lang),
-            publisher: { '@id': 'https://worldofclaudecraft.com/#organization' },
+            publisher: {
+              '@id': 'https://worldofclaudecraft.com/#organization',
+            },
             sameAs,
           },
         ],
@@ -6008,8 +6091,14 @@ function walletAddressLabel(address: string, linked: boolean, balance: number | 
   if (balance !== null) {
     const balanceText = walletBalanceText(balance);
     return linked
-      ? t('wallet.connectedLinkedWithBalance', { balance: balanceText, address: short })
-      : t('wallet.connectedWithBalance', { balance: balanceText, address: short });
+      ? t('wallet.connectedLinkedWithBalance', {
+          balance: balanceText,
+          address: short,
+        })
+      : t('wallet.connectedWithBalance', {
+          balance: balanceText,
+          address: short,
+        });
   }
   return linked
     ? t('wallet.connectedLinked', { address: short })
@@ -6020,7 +6109,10 @@ function walletHelpText(address: string, linked: boolean, balance: number | null
   const short = shortenAddress(address);
   if (linked) {
     return balance !== null
-      ? t('wallet.helpLinkedWithBalance', { balance: walletBalanceText(balance), address: short })
+      ? t('wallet.helpLinkedWithBalance', {
+          balance: walletBalanceText(balance),
+          address: short,
+        })
       : t('wallet.helpLinked', { address: short });
   }
   if (!api.token) {
@@ -6185,7 +6277,9 @@ function updateWalletButton(): void {
     btn.title = t('wallet.verifyTitle');
     btn.setAttribute(
       'aria-label',
-      t('wallet.verifyAddressAria', { address: shortenAddress(connectedAddress) }),
+      t('wallet.verifyAddressAria', {
+        address: shortenAddress(connectedAddress),
+      }),
     );
     setWalletStatus(null);
     setWalletHelp(walletHelpText(connectedAddress, false, connectedWocBalance), 'attention');
@@ -6512,7 +6606,11 @@ function startGithubOAuth(): void {
 // needed for a deliberate cancel) versus a real failure.
 window.addEventListener('message', (e: MessageEvent) => {
   if (e.origin !== location.origin) return;
-  const d = e.data as { source?: string; ok?: boolean; error?: string | null } | null;
+  const d = e.data as {
+    source?: string;
+    ok?: boolean;
+    error?: string | null;
+  } | null;
   if (d?.source !== 'woc-github') return;
   githubPopup?.close();
   githubPopup = null;
@@ -6971,7 +7069,11 @@ function readDiscordChoice(): ExternalAuthLoginChoice | null {
   }
   if (!raw) return null;
   try {
-    const d = JSON.parse(raw) as { linkToken?: unknown; username?: unknown; ts?: unknown };
+    const d = JSON.parse(raw) as {
+      linkToken?: unknown;
+      username?: unknown;
+      ts?: unknown;
+    };
     const fresh = typeof d.ts === 'number' && Date.now() - d.ts < DISCORD_CHOICE_TTL_MS;
     if (typeof d.linkToken === 'string' && d.linkToken && fresh) {
       return {
@@ -7086,7 +7188,9 @@ async function completeDesktopWalletVerifyFlow(): Promise<void> {
   let verificationFailed = false;
   try {
     setWalletFlowStatus('connect');
-    const authorization = await authorizeDesktopWalletInBrowser({ kind: 'link' });
+    const authorization = await authorizeDesktopWalletInBrowser({
+      kind: 'link',
+    });
     if (authorization.kind !== 'link') throw new Error('invalid wallet link authorization');
     setWalletFlowStatus('verify');
     const result = await api.linkWallet(

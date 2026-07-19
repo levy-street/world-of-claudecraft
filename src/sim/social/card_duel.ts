@@ -182,6 +182,7 @@ function startCardDuelMatch(ctx: SimContext, a: number, b: number): void {
       color: '#fa6',
       pid,
     });
+    ctx.emit({ type: 'cardDuelMatchStart', pid });
   }
 }
 
@@ -275,6 +276,7 @@ export function playCardInDuel(ctx: SimContext, cardValue: number, pid?: number)
   }
   if (isA) match.playedA = played;
   else match.playedB = played;
+  ctx.emit({ type: 'cardPlayed', pid: r.meta.entityId });
   if (match.playedA !== null && match.playedB !== null) {
     resolveRound(ctx, match);
   }
@@ -288,8 +290,8 @@ function resolveRound(ctx: SimContext, match: CardDuelMatch): void {
   // a === b: a push, neither side scores.
   match.playedA = null;
   match.playedB = null;
-  drawOne(ctx.rng, match.handA);
-  drawOne(ctx.rng, match.handB);
+  const reshuffledA = drawOne(ctx.rng, match.handA);
+  const reshuffledB = drawOne(ctx.rng, match.handB);
   match.roundDeadline = ctx.time + CARD_DUEL_ROUND_DEADLINE_S;
   for (const pid of [match.a, match.b]) {
     const mine = pid === match.a ? a : b;
@@ -298,6 +300,14 @@ function resolveRound(ctx: SimContext, match: CardDuelMatch): void {
       type: 'log',
       text: `Card Duel round: you played ${mine}, opponent played ${theirs}.`,
       color: '#fa6',
+      pid,
+    });
+    ctx.emit({
+      type: 'cardRoundResolved',
+      mine,
+      theirs,
+      outcome: mine > theirs ? 'win' : mine < theirs ? 'lose' : 'push',
+      reshuffled: pid === match.a ? reshuffledA : reshuffledB,
       pid,
     });
   }
@@ -343,6 +353,7 @@ function endCardDuelMatch(ctx: SimContext, match: CardDuelMatch, winnerPid: numb
         pid,
       });
     }
+    ctx.emit({ type: 'cardDuelMatchEnd', won: pid === winnerPid, pid });
   }
 }
 
@@ -378,6 +389,7 @@ function forfeitMatch(ctx: SimContext, match: CardDuelMatch, forfeiterPid: numbe
       color: '#fa6',
       pid: forfeiterPid,
     });
+    ctx.emit({ type: 'cardDuelMatchEnd', won: false, pid: forfeiterPid });
   }
   if (winnerMeta) {
     ctx.emit({
@@ -386,6 +398,7 @@ function forfeitMatch(ctx: SimContext, match: CardDuelMatch, forfeiterPid: numbe
       color: '#fa6',
       pid: winnerPid,
     });
+    ctx.emit({ type: 'cardDuelMatchEnd', won: true, pid: winnerPid });
   }
 }
 
@@ -403,6 +416,11 @@ function voidMatch(ctx: SimContext, match: CardDuelMatch): void {
       color: '#fa6',
       pid,
     });
+    // won: false for both sides is a lie in the AFK-timeout case (nobody
+    // lost either), but it is the only value the field has: a void match
+    // still needs a cue, or an early Forfeit ends the match in total
+    // silence while forfeiting a round later correctly plays arenaLoss().
+    ctx.emit({ type: 'cardDuelMatchEnd', won: false, pid });
   }
 }
 

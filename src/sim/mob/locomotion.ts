@@ -31,6 +31,7 @@ import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
+import { isFeigningDeath } from '../hunter_base_abilities';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { SimContext } from '../sim_context';
 import { clearThreat, stealthDetectionRadius } from '../threat';
@@ -281,7 +282,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         // pad. Ruled acceptable: one 50 ms deferral, uniform across hosts.
         ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, MAX_AGGRO_RADIUS, (e, d2) => {
           counters.aggroScanPlayerVisits++;
-          if (e.dead) return;
+          if (e.dead || isFeigningDeath(e)) return;
           const radius = Math.max(
             4,
             Math.min(MAX_AGGRO_RADIUS, template.aggroRadius + (mob.level - e.level) * 1.5),
@@ -302,7 +303,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       const counters = ctx.mobScanCounters;
       ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, MAX_AGGRO_RADIUS, (e, d2) => {
         counters.aggroScanPlayerVisits++;
-        if (e.dead) return;
+        if (e.dead || isFeigningDeath(e)) return;
         if (isTrivialTo(mob, e)) return;
         let radius = Math.max(
           4,

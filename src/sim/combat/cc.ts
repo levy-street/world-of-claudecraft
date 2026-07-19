@@ -9,7 +9,11 @@
 // `src/sim`-pure: imports only sibling sim types (no DOM/Three/render/ui/game/net,
 // no Math.random/Date.now), enforced by tests/architecture.test.ts.
 
-import type { Aura, Entity } from '../types';
+import type { Aura, DamageBreakBudget, Entity } from '../types';
+
+export function damageBreakThreshold(maxHp: number, budget: DamageBreakBudget): number {
+  return Math.min(budget.max, Math.max(budget.min, Math.round(maxHp * budget.maxHpPct)));
+}
 
 // A stun freezes everything: movement, casts, melee, abilities. Stasis,
 // incapacitate, and polymorph share the same total-lockout shape.

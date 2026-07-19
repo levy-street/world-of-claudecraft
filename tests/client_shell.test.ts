@@ -223,6 +223,25 @@ describe('client HTML shell', () => {
     }
   });
 
+  it('carries the loading-screen element set, including #ls-slow-hint, in BOTH entries', () => {
+    // main.ts is shared by index.html and play.html (src/CLAUDE.md: "index.html
+    // AND play.html both load src/main.ts"). setSlowConnectionHintVisible is
+    // hit on every 1s tick of the slow-connection watch during the whole
+    // loading screen, so a missing element on either entry throws (or, with
+    // the null-guard, silently never shows) on that entry. #2106's review
+    // caught play.html shipping the reconnect countdown work without this
+    // element; pin both entries so it cannot regress unnoticed.
+    for (const entry of [html, playHtml]) {
+      expect(entry).toContain('id="loading-screen"');
+      expect(entry).toContain('id="ls-fill"');
+      expect(entry).toContain('id="ls-status"');
+      expect(entry).toContain('id="ls-tip"');
+      expect(entry).toContain(
+        '<div id="ls-slow-hint" data-i18n="loading.slowConnection" role="status" aria-live="polite">',
+      );
+    }
+  });
+
   it('places skip links as the first focusable elements in BOTH entries', () => {
     for (const entry of [html, playHtml]) {
       const skipMain = entry.indexOf('class="hud-skip" href="#ui"');
@@ -1027,6 +1046,7 @@ describe('client HTML shell', () => {
 
   it('carries identical mobile-action-ring markup in BOTH entries', () => {
     for (const entry of [html, playHtml]) {
+      expect(entry).toContain('id="actionbar3"');
       expect(entry).toContain('id="mobile-action-ring"');
       expect(entry).toContain('id="mobile-action-attack"');
       expect(entry).toContain('id="mobile-action-page-toggle"');
@@ -1037,6 +1057,30 @@ describe('client HTML shell', () => {
       const indices = slotMatches.map((m) => m[1]).sort();
       expect(indices).toEqual(['0', '1', '2', '3', '4']);
     }
+  });
+
+  it('stacks the optional third desktop row above the secondary row in both entries', () => {
+    for (const entry of [html, playHtml]) {
+      const third = entry.indexOf('id="actionbar3"');
+      const secondary = entry.indexOf('id="actionbar2"');
+      const primary = entry.indexOf('id="actionbar"');
+      expect(third).toBeGreaterThan(-1);
+      expect(third).toBeLessThan(secondary);
+      expect(secondary).toBeLessThan(primary);
+    }
+    expect(hudCss).toContain('body.show-actionbar3 #actionbar3 {\n    display: flex;\n  }');
+    expect(hudCss).toContain('body.show-actionbar3 #castbar {\n    bottom: 318px;\n  }');
+    expect(hudCss).toContain('body.show-actionbar3 #swingbar {\n    bottom: 292px;\n  }');
+    expect(hudTs).toContain("const bar3 = $('#actionbar3');");
+    expect(hudTs).toContain('const container = bars[actionBarRowForSlot(i) - 1];');
+    expect(hudTs).toContain('keyCapLabel(this.keybinds.primaryLabel(slotKey))');
+  });
+
+  it('applies the pure visibility dependency to both optional desktop rows', () => {
+    expect(mainTs).toContain("key === 'showThirdActionBar'");
+    expect(mainTs).toContain('resolveActionBarVisibility(');
+    expect(mainTs).toContain("classList.toggle('show-actionbar2', visibility.secondary)");
+    expect(mainTs).toContain("classList.toggle('show-actionbar3', visibility.third)");
   });
 
   it('carries the same community-tray links in BOTH entries, with no duplicate Discord entry', () => {
@@ -1886,10 +1930,15 @@ describe('client HTML shell', () => {
     );
     expect(mainTs).toContain("import { tryNearbyInteraction } from './game/nearby_interaction';");
     expect(mainTs).toContain('stopAutorunForInteraction(\n      tryNearbyInteraction(');
-    expect(mainTs).toContain("t('errors.nothingInteract'),\n        online === null,");
+    // Phase 4 open-gate flip: the trailing (online === null) override is gone,
+    // so the helpers default harvestStateReliable = true (trusting the hcb
+    // corpse-claim mirror online); the call now closes right after the
+    // nothing-to-interact string.
+    expect(mainTs).toContain("t('errors.nothingInteract'),\n      ),");
+    expect(mainTs).not.toContain('online === null');
     expect(mainTs).toContain('const interactionOutcome = handlePickedEntity(');
     expect(mainTs).toContain(
-      'isClickMoveButton &&\n        shouldApproachPickedEntity(world.player, e, didInteractImmediately, online === null)',
+      'isClickMoveButton &&\n        shouldApproachPickedEntity(world.player, e, didInteractImmediately)',
     );
     expect(mainTs).toContain(
       'stopAutorunForInteraction(interactionOutcome, input, mobileControls);',
@@ -2087,9 +2136,10 @@ describe('client HTML shell', () => {
 
   it('hides the desktop action bars on touch: the mobile action ring supersedes them', () => {
     // The paged mobile action ring (bcc5fa53) replaced the scrollable desktop
-    // #actionbar row on touch, so both desktop bars (and their .action-btn
+    // #actionbar row on touch, so all desktop bars (and their .action-btn
     // sizing/drag/hover rules, only ever reachable while a bar is visible) stay
     // display:none rather than also being scaled/laid out for touch.
+    expect(hudMobileCss).toContain('body.mobile-touch #actionbar3 {\n    display: none;\n  }');
     expect(hudMobileCss).toContain('body.mobile-touch #actionbar2 {\n    display: none;\n  }');
     expect(hudMobileCss).toContain('body.mobile-touch #actionbar {\n    display: none;\n  }');
     expect(hudMobileCss).not.toContain('body.mobile-touch #actionbar {\n    display: flex;');

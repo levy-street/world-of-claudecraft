@@ -19,6 +19,7 @@ import { ArenaWindow } from '../../src/ui/arena_window';
 import { BagsWindow } from '../../src/ui/bags_window';
 import { CharWindow } from '../../src/ui/char_window';
 import { FOCUSABLE_SELECTOR } from '../../src/ui/focus_manager';
+import { resolveActionBarVisibility } from '../../src/ui/hud/action_bar/action_bar_visibility_core';
 import { QuestLogWindow } from '../../src/ui/hud/quest/questlog_window';
 import { t } from '../../src/ui/i18n';
 import { LeaderboardWindow } from '../../src/ui/leaderboard_window';
@@ -328,6 +329,83 @@ describe('axe: options menu', () => {
     expect(root.getAttribute('aria-label')).toBe(t('hudChrome.perf.title'));
     expect(root.getAttribute('aria-labelledby')).toBeNull();
     await expectClean(root);
+  });
+
+  it('enables the third action row through the secondary row and preserves keyboard focus', () => {
+    const values: Record<string, number | boolean> = {
+      showSecondaryActionBar: false,
+      showThirdActionBar: false,
+    };
+    const settings = {
+      get: (key: string) => values[key] ?? false,
+      set: (key: string, value: number | boolean) => {
+        values[key] = value;
+        return value;
+      },
+    };
+    const hooks = {
+      settings,
+      onSettingChange: (key: string, value: number | boolean) => {
+        if (key !== 'showSecondaryActionBar' && key !== 'showThirdActionBar') return;
+        const visibility = resolveActionBarVisibility(
+          {
+            secondary: Boolean(values.showSecondaryActionBar),
+            third: Boolean(values.showThirdActionBar),
+          },
+          key,
+          Boolean(value),
+        );
+        values.showSecondaryActionBar = visibility.secondary;
+        values.showThirdActionBar = visibility.third;
+      },
+      theme: {
+        get: () => ({ preset: 'classic', custom: {} }),
+        setPreset: () => {},
+        setCustom: () => {},
+        resetCustom: () => {},
+      },
+      perfOverlay: { setPlacement: () => {} },
+    };
+    const root = host('options-menu');
+    root.style.display = 'none';
+    const win = new OptionsWindow(
+      stubDeps({
+        root: () => root,
+        world: () =>
+          ({
+            realm: 'Claudemoon',
+            player: { name: 'Aurelia', pos: { x: 0, y: 0, z: 0 } },
+          }) as never,
+        options: () => hooks as never,
+        bugReport: () => null,
+        buildDropdown: () => document.createElement('div'),
+        captureFocus: () => null,
+      }),
+    );
+    const toggle = (key: string) =>
+      root.querySelector<HTMLButtonElement>(`[data-setting-key="${key}"]`);
+
+    win.toggle();
+    const interfaceButton = Array.from(root.querySelectorAll<HTMLButtonElement>('.opt-btn')).find(
+      (button) => button.textContent === t('hud.options.interface'),
+    );
+    interfaceButton?.click();
+
+    expect(toggle('showThirdActionBar')?.disabled).toBe(true);
+    const secondary = toggle('showSecondaryActionBar');
+    secondary?.focus();
+    secondary?.click();
+    expect(values.showSecondaryActionBar).toBe(true);
+    expect(toggle('showThirdActionBar')?.disabled).toBe(false);
+    expect(document.activeElement).toBe(toggle('showSecondaryActionBar'));
+
+    toggle('showThirdActionBar')?.click();
+    expect(values.showThirdActionBar).toBe(true);
+    toggle('showSecondaryActionBar')?.click();
+    expect(values.showSecondaryActionBar).toBe(false);
+    expect(values.showThirdActionBar).toBe(false);
+    expect(toggle('showThirdActionBar')?.disabled).toBe(true);
+    expect(document.activeElement).toBe(toggle('showSecondaryActionBar'));
   });
 });
 

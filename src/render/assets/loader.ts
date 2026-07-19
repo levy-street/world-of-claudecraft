@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+import { MAX_LOAD_ATTEMPTS, retryDelayMs } from './load_retry';
 import { assetUrl } from './media';
 import { assetLoadStarted, recordAssetLoad } from './stats';
 
@@ -55,6 +56,23 @@ function scheduleLoad<T>(q: AssetQueue, run: () => Promise<T>): Promise<T> {
   });
 }
 
+/** Retries a fetch-and-parse attempt on failure: a single transient network
+ *  blip (common on mobile connections) must not permanently sink a boot-time
+ *  asset load. Only the LAST attempt's error escapes; earlier ones are
+ *  swallowed since the caller only cares whether it eventually succeeded. */
+function withRetry<T>(attemptOnce: () => Promise<T>): Promise<T> {
+  const attempt = (n: number): Promise<T> =>
+    attemptOnce().catch((err: unknown) => {
+      if (n >= MAX_LOAD_ATTEMPTS) throw err;
+      return new Promise<T>((resolve, reject) => {
+        globalThis.setTimeout(() => {
+          attempt(n + 1).then(resolve, reject);
+        }, retryDelayMs(n));
+      });
+    });
+  return attempt(1);
+}
+
 function loader(): GLTFLoader {
   if (!gltfLoader) {
     gltfLoader = new GLTFLoader();
@@ -70,30 +88,29 @@ export function loadGltf(url: string): Promise<GLTF> {
   let p = gltfCache.get(resolved);
   if (!p) {
     const startedAt = assetLoadStarted();
-    p = scheduleLoad(
-      gltfQueue,
-      () =>
-        new Promise<GLTF>((resolve, reject) => {
-          loader().load(
-            resolved,
-            (gltf) => {
-              recordAssetLoad('gltf', resolved, startedAt);
-              resolve(gltf);
-            },
-            undefined,
-            () => {
-              recordAssetLoad('gltf', resolved, startedAt, true);
-              reject(new Error(`asset load failed: ${url} (missing file or bad GLB)`));
-            },
-          );
-        }),
-    ).catch((err: unknown) => {
-      // Evict the rejected promise so the next call re-fetches rather than
-      // permanently caching a failure (black void bug: rejected promise poisons
-      // ensureDungeonAssets for the whole session).
-      gltfCache.delete(resolved);
-      throw err;
-    });
+    p = scheduleLoad(gltfQueue, () =>
+      withRetry(
+        () =>
+          new Promise<GLTF>((resolve, reject) => {
+            loader().load(resolved, resolve, undefined, () =>
+              reject(new Error(`asset load failed: ${url} (missing file or bad GLB)`)),
+            );
+          }),
+      ),
+    ).then(
+      (gltf) => {
+        recordAssetLoad('gltf', resolved, startedAt);
+        return gltf;
+      },
+      (err: unknown) => {
+        recordAssetLoad('gltf', resolved, startedAt, true);
+        // Evict the rejected promise so the next call re-fetches rather than
+        // permanently caching a failure (black void bug: rejected promise poisons
+        // ensureDungeonAssets for the whole session).
+        gltfCache.delete(resolved);
+        throw err;
+      },
+    );
     gltfCache.set(resolved, p);
   }
   return p;
@@ -113,24 +130,30 @@ export function loadHdr(url: string): Promise<THREE.DataTexture> {
   let p = hdrCache.get(resolved);
   if (!p) {
     const startedAt = assetLoadStarted();
-    p = scheduleLoad(
-      hdrQueue,
-      () =>
-        new Promise<THREE.DataTexture>((resolve, reject) => {
-          new RGBELoader().load(
-            resolved,
-            (tex) => {
-              tex.mapping = THREE.EquirectangularReflectionMapping;
-              recordAssetLoad('hdr', resolved, startedAt);
-              resolve(tex);
-            },
-            undefined,
-            () => {
-              recordAssetLoad('hdr', resolved, startedAt, true);
-              reject(new Error(`hdr load failed: ${url}`));
-            },
-          );
-        }),
+    p = scheduleLoad(hdrQueue, () =>
+      withRetry(
+        () =>
+          new Promise<THREE.DataTexture>((resolve, reject) => {
+            new RGBELoader().load(
+              resolved,
+              (tex) => {
+                tex.mapping = THREE.EquirectangularReflectionMapping;
+                resolve(tex);
+              },
+              undefined,
+              () => reject(new Error(`hdr load failed: ${url}`)),
+            );
+          }),
+      ),
+    ).then(
+      (tex) => {
+        recordAssetLoad('hdr', resolved, startedAt);
+        return tex;
+      },
+      (err: unknown) => {
+        recordAssetLoad('hdr', resolved, startedAt, true);
+        throw err;
+      },
     );
     hdrCache.set(resolved, p);
   }
@@ -147,25 +170,31 @@ export function loadTexture(
   let p = texCache.get(key);
   if (!p) {
     const startedAt = assetLoadStarted();
-    p = scheduleLoad(
-      textureQueue,
-      () =>
-        new Promise<THREE.Texture>((resolve, reject) => {
-          new THREE.TextureLoader().load(
-            resolved,
-            (tex) => {
-              if (opts.srgb) tex.colorSpace = THREE.SRGBColorSpace;
-              if (opts.repeat) tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-              recordAssetLoad('texture', resolved, startedAt);
-              resolve(tex);
-            },
-            undefined,
-            () => {
-              recordAssetLoad('texture', resolved, startedAt, true);
-              reject(new Error(`texture load failed: ${url}`));
-            },
-          );
-        }),
+    p = scheduleLoad(textureQueue, () =>
+      withRetry(
+        () =>
+          new Promise<THREE.Texture>((resolve, reject) => {
+            new THREE.TextureLoader().load(
+              resolved,
+              (tex) => {
+                if (opts.srgb) tex.colorSpace = THREE.SRGBColorSpace;
+                if (opts.repeat) tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+                resolve(tex);
+              },
+              undefined,
+              () => reject(new Error(`texture load failed: ${url}`)),
+            );
+          }),
+      ),
+    ).then(
+      (tex) => {
+        recordAssetLoad('texture', resolved, startedAt);
+        return tex;
+      },
+      (err: unknown) => {
+        recordAssetLoad('texture', resolved, startedAt, true);
+        throw err;
+      },
     );
     texCache.set(key, p);
   }

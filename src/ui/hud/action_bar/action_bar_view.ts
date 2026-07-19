@@ -17,8 +17,8 @@
 // per-slot state array ONCE and returns a tick(world) that mutates it IN PLACE and
 // returns the SAME references every call, so a correct frame allocates no new
 // array/object garbage (the reused-reference allocation proxy). Two
-// descriptors yield two independent views, so a second/third bar is another
-// descriptor, not a code fork (the second/third bar itself is a follow-on feature).
+// descriptors yield independent views, so desktop rows, the mobile ring, and
+// consumables reuse the same derivation without a code fork.
 //
 // Parity: the world input is a structural subset of IWorld that BOTH
 // the offline Sim and the online ClientWorld mirror expose (player.cooldowns is a

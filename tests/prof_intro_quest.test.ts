@@ -7,7 +7,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { GATHER_NODES, NPCS, QUEST_ORDER, QUESTS } from '../src/sim/data';
-import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
+import { nodeMaterialFor } from '../src/sim/professions/gathering';
 import { Sim } from '../src/sim/sim';
 import { terrainHeight } from '../src/sim/world';
 
@@ -79,7 +79,7 @@ describe('q_prof_intro: mining, and only mining, satisfies the gather objective'
 
     expect(sim.countItem('chunk_of_ore', pid)).toBe(0);
     sim.harvestNode(ORE_NODE_ID, pid);
-    expect(sim.countItem(NODE_HARVEST_TABLE.ore.itemId, pid)).toBe(1);
+    expect(sim.countItem(nodeMaterialFor('ore', 'eastbrook_vale').itemId, pid)).toBe(1);
     expect(sim.countItem('chunk_of_ore', pid)).toBe(0);
     expect(sim.meta(pid)!.questLog.get('q_prof_intro')?.counts).toEqual([1]);
   });

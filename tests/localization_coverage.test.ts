@@ -3,7 +3,7 @@ import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { DEEDS } from '../src/sim/content/deeds';
-import { QUEST_LETTERS } from '../src/sim/content/letters';
+import { GUILD_TREND_LETTERS, QUEST_LETTERS } from '../src/sim/content/letters';
 import {
   ABILITIES,
   CLASSES,
@@ -1025,8 +1025,8 @@ describe('i18n Localization Key Coverage', () => {
       Object.keys(DUNGEONS).length * 3 +
       Object.keys(DELVES).length * 3 +
       // Ravenpost authored letters: welcome + Heroic Marks reward + quest
-      // letters, 3 fields each.
-      (2 + Object.keys(QUEST_LETTERS).length) * 3;
+      // letters + Guild trend letters, 3 fields each.
+      (2 + Object.keys(QUEST_LETTERS).length + Object.keys(GUILD_TREND_LETTERS).length) * 3;
     expect(worldEntries).toHaveLength(expectedWorldCount);
 
     for (const lang of supportedLanguages) {

@@ -374,6 +374,9 @@ export default defineConfig({
         process.env.DATABASE_URL ?? 'postgres://vitest:vitest@127.0.0.1:5433/wocc_vitest_dummy',
     },
     globalSetup: ['./tests/global_setup.ts'],
+    // Runs per test file (unlike globalSetup, which runs once outside any
+    // jsdom environment); see the file for why this is needed on Node 22+.
+    setupFiles: ['./tests/jsdom_local_storage_setup.ts'],
     // Two kinds of exclusion, kept together:
     // - agent-runtime directories may contain local worktree copies, and their tracked
     //   config or instruction files are not product test sources. Excluding them keeps a

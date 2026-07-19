@@ -1,6 +1,7 @@
 // Spell Power scaling: the pure, host-agnostic coefficient math that turns a
 // caster's Spell Power (or an attacker's Attack Power, for "attack spells") into
-// the flat damage added to a spell hit, channel tick, DoT tick, or AoE hit.
+// the flat amount added to a spell hit, heal, absorb, channel tick, DoT tick,
+// or AoE hit.
 //
 // Classic-era model:
 //   - direct nuke: coeff = clamp(castTime, 1.5, 7) / 3.5 (instants use the 1.5 floor)
@@ -89,6 +90,12 @@ export function directHitBonus(
 // AoE damage takes, so multi-target heals do not triple-dip Spell Power.
 export function directHealBonus(spellPower: number, castTimeSec: number, aoe = false): number {
   return Math.round(spellPower * directSpellCoeff(castTimeSec) * (aoe ? SPELL_AOE_COEFF_MULT : 1));
+}
+
+// Flat bonus added to an absorb shield with an explicitly authored coefficient.
+// Shields without a coefficient remain fixed by rank.
+export function absorbBonus(spellPower: number, coefficient: number): number {
+  return Math.max(0, Math.round(spellPower * coefficient));
 }
 
 // Flat bonus added to ONE HoT tick: the total DoT coefficient (duration / 15)

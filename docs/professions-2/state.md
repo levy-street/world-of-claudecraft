@@ -208,7 +208,9 @@ Phase 13), and interaction handlers return an outcome boolean (#1982).
 - Gathering: nodes (harvestNode both hosts, ncd cooldowns), corpse harvesting
   (claims + focus picker + town focus, tfocus; claims mirrored online via the
   per-entity hcb key since Phase 3), fixed corpse rarity baseline
-  40; node yields are placeholder junk until Phase 4.
+  40; node yields are real zone-tiered materials since Phase 4
+  (NODE_MATERIAL_TABLE; rare+ rolls signed, rare events x5 always
+  signed with the soft-zone broadcast; see the Phase 4 row below).
 - Salvage/disenchant/enchant: sim-complete in salvage.ts / enchanting.ts;
   lastSalvageResult/lastDisenchantResult/lastEnchantResult on PlayerMeta;
   no IWorld/wire/UI until Phase 13 (salvage wiring JOINS Phase 13 per the
@@ -290,10 +292,12 @@ tables, i18n key namespaces, files created)
     under the old ring. Do not roll v0.27.0 back to v0.26.0 once the
     attunement quests are live; mirror this in the v0.27.0 release notes
     at tag time.
-  - Screenshot convention: this packet's phases commit PR shots under
-    docs/pr-screenshots/ (established earlier in the program), while root
-    CLAUDE.md names docs/screenshots. Keep the program-local convention
-    consistent within the packet; the maintainer may unify later.
+  - Screenshot convention (corrected by Phase 5 QA, 2026-07-18): the
+    packet's shots live under docs/screenshots/ per root CLAUDE.md. No
+    docs/pr-screenshots/ directory has ever existed in the tree; the
+    earlier version of this note recorded a packet-local convention that
+    was never actually used, and Phases 1 to 5 all committed under
+    docs/screenshots/.
 - Phase 2: (landed 2026-07-17, branch
   feature/professions-2-phase-02-masterwork) SimEvent masterwork
   { recipeId, itemId, crafter } (personal, pid = crafter, ids only),
@@ -353,7 +357,10 @@ tables, i18n key namespaces, files created)
     correctly against the masterwork ceiling but was authored for the
     rolled-output model; rewording is deferred to Phase 6 (masterwork
     surfacing) and Phase 15 (full rewrite) to avoid the i18n
-    semantic-regression pins mid-packet.
+    semantic-regression pins mid-packet. DONE 2026-07-19: Phase 6 landed
+    the minimal accuracy reword (the two factually wrong sentences only:
+    masterwork proc instead of quality-buying, skill tier instead of
+    quality tier); the full page rewrite stays Phase 15.
   - Standing wire invariant (security review): equipped stats flow from
     instance rolled.stats server-side, which is safe because no wire
     command ingests a client-supplied ItemInstancePayload; any future
@@ -391,35 +398,222 @@ tables, i18n key namespaces, files created)
   a ClientWorld-shaped mirror). hcb is deliberately NOT in ALL_DELTA_KEYS or
   TERSE_TO_IWORLD: those pin selfWireJson maybe() self keys only (the scrape
   test asserts set-equality), and a per-entity dynamicFields key is pinned by
-  the round-trip + bandwidth tests instead; the phase file's pin instruction
-  was written for self keys (deviation reviewed, cross-platform-sync PASS).
+  its round-trip suites instead (the snapshots sparse-absence assertion is
+  the no-bloat tooth; bandwidth.test.ts stays green but carries no
+  hcb-specific scenario); the phase file's pin instruction was written for
+  self keys (deviation reviewed, cross-platform-sync PASS; as-landed note
+  swept into the phase file + QA twin by Phase 3 QA).
   Trade payload carriage pre-landed via PR 2045; Phase 3 added the
   bidirectional full-payload pin (tests/trade.test.ts) and the combo-gating
   liveness pin (tests/crafting_view_combo_liveness.test.ts: Sim and
   ClientWorld arms fed by a real cprof broadcast, decisiveness
   mutation-tested). No IWorld member changes; world_api_parity untouched.
-  - DEFERRED to Phase 4 (gathering trusts corpse claims): src/main.ts still
-    passes harvestStateReliable = (online === null) at its three interaction
-    open-gate sites, so the truthful mirror is consumed by the in-window
-    picker (hud.ts wiring defaults reliable true) but not yet at the online
-    OPEN gate: a harvest-only corpse (tags, no regular loot) still never
-    opens online, a pre-existing limitation, not a Phase 3 regression. Flip
-    the three sites to trust the mirror, with an open-gate test, when
-    Phase 4 makes gathering trust corpse claims.
+  - DEFERRAL LANDED in Phase 4 (2026-07-18): the three main.ts open-gate
+    sites dropped their (online === null) override, so the helpers default
+    harvestStateReliable = true and the truthful hcb mirror is consumed at
+    the online OPEN gate; harvest-only corpses now open online when
+    unclaimed and stay closed when claimed
+    (tests/gather_open_gate.test.ts pins both arms). The despawn-grace
+    heads-up resolved by pinning the REAL open boundary: the corpse open
+    arm has always gated at INTERACT_RANGE + 1 (6 yd, pre-existing), far
+    inside the 90 yd+ interest/grace band, so a grace-frozen boundary
+    corpse can be approached but never opened; the pin asserts opens at
+    exactly 6, refusals at 6.01 and at 90.
   - Drift notes: instance-level boundTo copies are tradeable (tradeSetOffer
     gates only def-level soulbound; carried verbatim per #1298, possible
     design follow-up); vendor sellItem buyback still re-grants a plain copy
-    losing the payload (pre-existing, documented in trade.ts's header, out
-    of scope); the bareClient test fixture now has three hand-rolled copies
-    (snapshots, corpse_harvest_sim, combo liveness suites): rule-of-three
-    tripped, a shared tests/helpers/ extraction is a Phase 3 QA or Phase 15
-    cleanup candidate.
-- Phase 4: (planned) node material tables; per-node-type rare events
-  (pristine vein / ancient heartwood / moonlit bloom) + deed-mark hooks.
-- Phase 5: (planned) professions window (.window id professions-window) +
-  view core + painter + hudChrome.professions.* keys.
-- Phase 7: (planned) trend detection module; Guild letter content; S3 scan
-  list gains src/sim/quests/quest_commands.ts.
+    losing the payload (pre-existing, documented in the removeOffer comment
+    in trade.ts, out of scope); the bareClient fixture is hand-rolled in 21
+    test files repo-wide (tests/CLAUDE.md blesses the idiom; the three
+    professions suites are byte-near-identical copies): Phase 3 QA judged
+    the extraction a standalone chore, not QA churn (a shared
+    tests/helpers/bare_client.ts adopted first by the three identical
+    copies; the 18 divergent variants need per-file verification; filed
+    as issue 2088).
+  - Phase 3 QA: PASS 2026-07-17, zero blocking. Found and fixed
+    test-first the tradeConfirm sequencing defect in the pre-landed
+    PR 2045 code (same-itemId bidirectional trades cross-contaminated:
+    grant-before-remove let the second removal consume just-granted
+    stock; now two-phase, removeOffer both sides then grantOffer both
+    sides, matching the fitsAfterSwap model; no dupe or loss existed,
+    conservation always held). Coverage closed: live GameServer
+    broadcast suite for hcb (lite delta record + scope
+    eviction/re-entry, claims and clears made out of view),
+    partial-stack sparing pin, no-escrow cancel pin, claimed-corpse
+    arms of corpseLootAvailability. Reviewer fan-out (architecture,
+    cross-platform-sync, test-coverage-auditor with revert
+    experiments, qa-checklist): all PASS. Details in progress.md.
+- Phase 4: (landed 2026-07-18) `NODE_MATERIAL_TABLE` + `nodeMaterialFor`
+  in src/sim/professions/gathering.ts (node type x zoneId rows, one
+  frozen shared `MATERIAL_QTY_BY_RARITY` curve: 1/2/2/3/4; Phase 15
+  clones per row before tuning per family). New material ItemDef ids:
+  copper_ore, iron_ore, ironbark_log, silverleaf_herb (junk/common,
+  tier via sellValue 4/8, no buyValue); zones 2 and 3 grant the existing
+  thorium_ore/ashwood_log/elderwood_log/goldleaf_herb/sunpetal_herb.
+  Rare-event module src/sim/professions/gather_events.ts:
+  GATHER_RARE_EVENT_CHANCE (1/90, the one shared cadence knob),
+  GATHER_RARE_EVENT_YIELD_MULT (5), rollGatherRareEvent = resolveHarvest
+  draw #2 (draw #1 stays rollMaterialRarity; two draws per granted
+  harvest, zero on denial, pinned by tests + the professions_gather
+  parity golden). SimEvents: gatherResult gained qty + rareEvent;
+  new per-recipient 'gatherRareEvent' (pid = recipient, flavor
+  pristine_vein/ancient_heartwood/moonlit_bloom by node type). The
+  soft-zone broadcast mechanism Phase 6 reuses lives in
+  gather_events.ts emitToZonePlayers (zoneAt(z) match, instance space
+  excluded past DUNGEON_X_THRESHOLD). Dormant deed marks:
+  markVisited 'gather_event:<flavor>' at the resolution site.
+  Client i18n namespaces: hudChrome.gathering.gatherLine/gatherLineQty
+  ("You gather:", distinct from the grant hub's "You receive:" loot
+  line, no second cue) and gatherEvent.pristineVein/ancientHeartwood/
+  moonlitBloom (top-level, the skinEvent idiom). The Phase 3
+  harvestStateReliable deferral landed: main.ts's three open-gate
+  sites trust the hcb mirror (open gate stays at the pre-existing
+  INTERACT_RANGE + 1 boundary, so grace-frozen boundary corpses stay
+  unreachable; tests/gather_open_gate.test.ts).
+  - Phase 4 QA: PASS with fixes 2026-07-18. Found and fixed test-first:
+    the signed harvest grant could overflow bag capacity (the fungible
+    canAddItem pre-gate counts stack top-up room; a signed instance
+    needs a fresh slot). Landed policy: every signed unit requires a
+    genuinely free slot, and with none the yield falls back to an
+    UNSIGNED stack top-up of what fits, so the truncation contract wins
+    over signing in that self-inflicted edge (crossing-case pin in
+    tests/gather_rare_events.test.ts; draw order and the
+    professions_gather golden untouched). The corpse focus-harvest path
+    keeps the same pre-existing hole (fitsAll fungible simulation vs
+    rare+ signed instance grants) and is filed as #2139 with the
+    gathering fix as the reference policy.
+  - Phase 4 QA drift notes (2026-07-18): a signed rare-event windfall
+    emits one grant-hub loot line + cue PER INSTANCE (up to five) on
+    top of the single "You gather: x5" line and the broadcast line;
+    consistent with the D1 cue-ownership decision but reads as spam,
+    Phase 15 polish candidate (batch or debounce). Zone-1 signed
+    starter instances are a design-confirm item for the maintainer:
+    signing tracks rarity/rare events, never zone tier, so
+    high-proficiency zone-1 farming mints signed sellValue-4 starters
+    (self-limiting: signed units never merge, so they consume slots
+    fast, and the stockpiling mitigation caps the item TIER as locked).
+    corpseLootAvailability's harvestStateReliable parameter is a
+    deliberately retained seam: production always uses the default
+    (true) since the open-gate flip, and its false arm stays pinned
+    POSITIONALLY (no named reference) in
+    tests/corpse_loot_availability.test.ts and tests/interactions.test.ts,
+    so name-greps miss it; documented at the helper. gatherEvent.* as a
+    top-level catalog namespace (not hudChrome.gathering) is accepted
+    as landed: the skinEvent idiom, overlays filled, moving it is
+    churn without user value. finderName cannot smuggle the [[i:
+    item-link token into the chat parser: validCharNameShape forbids
+    brackets server-side.
+- Phase 5: (landed 2026-07-18) the professions window (.window id
+  professions-window): src/ui/professions_view.ts (UI_PURE_CORES pure
+  core; COMPOSES profession_identity_view, does not absorb it; exports
+  the ring layout math, skill-bar/pip model with core-derived
+  fillFraction, next-unlock union, switch cost via
+  requiredAmendsProgress, progressive disclosure, professionsRefreshSig;
+  CRAFT_MAX_SKILL 300 is a presentational cap local to the core, content
+  defines no craft-side maximum) and src/ui/professions_window.ts (cold
+  deeds-pattern painter; the ring is DOM nodes over one inline SVG
+  styled from components.css tokens; close is the only interactive
+  control, pinned). The hudChrome.professions.* key namespace (plus
+  hudChrome.mobile.professions; the perk line is one perkSpecializedLine
+  key interpolating {craft}, never a concat of localized fragments).
+  Icons: prof_<craftId> x10 + gather_* x4 procedural recipes (incl. the
+  Phase 11 forward slot gather_fishing), professionIconUrl over the
+  empty committed WebP set public/ui/professions/, the
+  scripts/convert_profession_icons_webp.mjs scaffold (assets:professions)
+  and tests/profession_icons.test.ts pinning the empty-set bijection.
+  Launchers: #mm-professions, #mobile-professions (More tray), keybind
+  Shift+KeyP via input.ts/mobile_controls.ts dispatch (main.ts kept to
+  switch cases + the handler-bag entry). The change-aware shot target
+  'professions' in scripts/pr_shot_targets.mjs stubs craftingIdentity +
+  professionsState with a representative attuned Smith (renown-board
+  precedent). Phase 11 touch point: the painter's GATHERING_NAME_KEYS
+  map gains the fishing row and its catalog key with the fishing read.
+  QA (2026-07-18): the simplified raise-vs-start call-to-action decision
+  lives in the core (SimplifiedCta on SimplifiedCallToAction, both arms
+  pinned), not the painter; Hud exposes only toggleProfessions (the
+  open/close/isOpen wrappers were unconsumed and dropped).
+- Phase 6: (landed 2026-07-19, branch
+  feature/professions-2-phase-06-crafting-window) SimEvent masterworkZone
+  { recipeId, itemId, crafterPid, crafterName, zoneId } (one pid-scoped
+  copy per overworld zone player, the crafter included; instance space
+  excluded; a SEPARATE type from the personal masterwork event so
+  bystander copies never touch lastMasterwork), emitted via
+  announceMasterworkZone in src/sim/professions/gather_events.ts (the
+  Phase 4 emitToZonePlayers is now exported); wire identity key eqi
+  (players only, sparse, beside eq, NEVER a delta key; payload trimmed
+  server-side to signer/enchant/rolled, the boundTo/charges strip pinned)
+  mirrored into ClientWorld EntityView.equippedInstances with
+  cloneItemInstancePayload; NO new IWorld member (EntityView already
+  declared equippedInstances; parity counts unchanged);
+  craftSkillGainMultiplier in src/sim/professions/archetype.ts (the ONE
+  gain composition, consumed by crafting.ts AND the crafting view so the
+  difficulty label cannot diverge); crafting_view rows gain skillReq,
+  difficulty ('full'/'reduced'/'none'), station { required, inRange }
+  (requiresHubStation joined RecipeDefLike, buildCraftingView gained
+  stationInRange); pure cores src/ui/craft_celebration_view.ts
+  (computeCraftTierUps + buildCraftCelebrationPlan, in UI_PURE_CORES) and
+  sibling module src/ui/item_instance_tooltip.ts (seal, enchanted marker,
+  bonus stat lines, makers mark; also now owns itemStatName/itemNumber,
+  moved out of hud.ts); PainterHostPresentation.itemTooltip widened to
+  (item, instance?) and threaded at bags/bank/paperdoll/inspect;
+  hudChrome.crafting.* keys skillReqLine, difficultyFull/Reduced/None,
+  stationBadge, stationOutOfRange, masterworkToast, masterworkZoneLine,
+  tierUpToast, makersMark, masterworkSeal, enchantedLine (M16 fills in
+  the five non-Latin overlays); NO sim_i18n matcher row (as-landed
+  deviation: the broadcast is a structured text-free event on the
+  gatherRareEvent precedent, so the S3 guard is satisfied by
+  construction; the phase file's premised matcher rule does not exist);
+  parity golden professions_craft eventDigest re-pinned deliberately (the
+  crafter's own zone copy; rng fingerprints byte-identical); tier-up
+  toasts derive client-side from craftSkills inside a bounded
+  post-craftResult drain window; the celebration consumer trims only the
+  banner fade under reduced motion (plan.motion), the polite ARIA
+  announcer is never gated. Tests: crafting_view boundary sweep pinned to
+  the shared multiplier, masterwork_zone_broadcast + inspect_instances
+  liveness suites, snapshots eqi round-trip + data-minimization pin,
+  item_instance_tooltip + craft_celebration_view unit suites, bank_view
+  instance passthrough pin. Phase 6 QA additions (2026-07-19, PASS with
+  fixes, zero blocking): tier_unmet now names the under-tier craft(s)
+  via hudChrome.crafting.comboTierUnmetNamed ({crafts} + {tier}; the
+  param-less comboTierUnmet stays the defensive fallback, M16 fills in
+  the five non-Latin overlays); the tier-up armed drain window is the
+  pure step observeCraftSkillsForTierUps (+
+  CRAFT_TIER_UP_DRAIN_WINDOW) in craft_celebration_view.ts, hud.ts a
+  thin consumer; masterwork_zone_broadcast gained a live GameServer
+  session-routing suite (the hcb broadcast-suite precedent) and hud
+  zone-arm source pins; threading pins landed for the bags forwarding
+  call site, the char_window self-mirror closure, the openInspect slot
+  rows, and hud.itemTooltip composition order; plan.motion consumer and
+  station-repaint liveness are source-pinned.
+- Phase 7 (landed 2026-07-19; phase start 8e88b27f5): trend module
+  src/sim/professions/trend.ts (classifyCraftTrend, CraftTrend,
+  GUILD_LETTER_SKILL_THRESHOLD = TIER_SKILL_STEP; pair score = member
+  sum over ARCHETYPE_PAIR_TARGETS, leading pair by score then min
+  member then first member then ring order, crossed at the threshold);
+  trigger src/sim/professions/guild_letter.ts (maybeSendGuildTrendLetter
+  + updateGuildTrendLetters, the 1 Hz sweep beside postOffice.update in
+  the tick mail phase) booking mail through the NEW append-only
+  SimContext callback mailAuthoredLetter; one-shot
+  PlayerMeta.guildLetterSent (optional CharacterState field, normalize
+  default false via s.guildLetterSent === true, serialized
+  unconditionally, the mailWelcomed shape); GUILD_TREND_LETTERS in
+  src/sim/content/letters.ts (10 pair-keyed letters, ids
+  guild_trend_<a>_<b>, load-time ring-completeness guard, Smith Haldren
+  stands in for masters until Phase 8); entities.letters coverage via
+  LETTER_IDS in world_entity_i18n.ts + LETTERS_BY_ID in entity_i18n.ts
+  + M16 fills in the five non-Latin overlays; the S3 scan list ALREADY
+  contained src/sim/quests/quest_commands.ts (PR 2039), its membership
+  now pinned by a meta-guard in tests/localization_fixes.test.ts.
+  Phase 7 QA additions (2026-07-19): skillOf counts only positive
+  FINITE numbers (Number.isFinite, the comment contract made real);
+  per-clause eligibility negatives and a flip-before-send pin on the
+  exported maybeSendGuildTrendLetter, the system MailKind pinned on the
+  mailInfo surface, a two-player same-sweep case, and a same-seed
+  determinism pin (tests/professions_trend.test.ts); live GameServer
+  session-routing suite tests/guild_letter_online.test.ts (owner-only
+  mailArrived, mailU mirrors, booking-level one-shot). OPEN maintainer
+  decision from the vertical slice: the letter to Haldren hop dead-ends
+  pre-q_prof_intro (no locked-row hint, no redirect to Odell).
 - Phase 8: (planned) station registry (typed stations, multi-zone); master
   NpcDefs across the three hubs; placement-safety test.
 - Phase 13: (planned) disenchantItem/applyEnchant/salvageItem IWorld

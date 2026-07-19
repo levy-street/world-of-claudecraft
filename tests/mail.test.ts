@@ -321,89 +321,100 @@ describe('taking attachments against bag capacity (finding 2)', () => {
 });
 
 describe('unread index equivalence (finding 4)', () => {
-  it('matches the linear scan across sends, deliveries, reads, takes, deletes, renames and expiries', () => {
-    const sim = makeWorld();
-    const alice = sim.addPlayer('warrior', 'Alice');
-    const bob = sim.addPlayer('mage', 'Bob');
-    const aliceMeta = sim.meta(alice);
-    const bobMeta = sim.meta(bob);
-    if (!aliceMeta || !bobMeta) throw new Error('no meta');
-    aliceMeta.copper = 100_000;
+  // This drives sim.tick() one tick at a time across several full mail-delivery
+  // windows, checking the maintained unread index against a linear-scan oracle
+  // after EVERY tick. That is a lot of synchronous work for vitest's 5s default
+  // under worker-pool CPU contention, though it is sub-second in isolation; give
+  // it real headroom instead of flaking.
+  const UNREAD_INDEX_TEST_TIMEOUT_MS = 20_000;
 
-    // biome-ignore lint/suspicious/noExplicitAny: read the raw book to replay the old scan.
-    const po = sim.postOffice as any;
-    // The former linear scan, kept here as the oracle the maintained index must
-    // reproduce byte-for-byte.
-    const refUnread = (pid: number): number => {
-      const meta = sim.meta(pid);
-      if (!meta) return 0;
-      const now = sim.time;
-      const key = String(meta.characterId ?? meta.entityId);
-      let n = 0;
-      for (const m of po.mail as { read: boolean; deliverAt: number; recipientKey: string }[]) {
-        if (
-          !m.read &&
-          now >= m.deliverAt &&
-          (m.recipientKey === key || m.recipientKey === meta.name)
-        )
-          n++;
-      }
-      return n;
-    };
-    const check = (): void => {
-      expect(sim.mailUnreadFor(alice)).toBe(refUnread(alice));
-      expect(sim.mailUnreadFor(bob)).toBe(refUnread(bob));
-    };
+  it(
+    'matches the linear scan across sends, deliveries, reads, takes, deletes, renames and expiries',
+    () => {
+      const sim = makeWorld();
+      const alice = sim.addPlayer('warrior', 'Alice');
+      const bob = sim.addPlayer('mage', 'Bob');
+      const aliceMeta = sim.meta(alice);
+      const bobMeta = sim.meta(bob);
+      if (!aliceMeta || !bobMeta) throw new Error('no meta');
+      aliceMeta.copper = 100_000;
 
-    check(); // welcome letters delivered immediately
-    moveToMailbox(sim, alice);
-    sim.addItem('roasted_boar', 6, alice);
+      // biome-ignore lint/suspicious/noExplicitAny: read the raw book to replay the old scan.
+      const po = sim.postOffice as any;
+      // The former linear scan, kept here as the oracle the maintained index must
+      // reproduce byte-for-byte.
+      const refUnread = (pid: number): number => {
+        const meta = sim.meta(pid);
+        if (!meta) return 0;
+        const now = sim.time;
+        const key = String(meta.characterId ?? meta.entityId);
+        let n = 0;
+        for (const m of po.mail as { read: boolean; deliverAt: number; recipientKey: string }[]) {
+          if (
+            !m.read &&
+            now >= m.deliverAt &&
+            (m.recipientKey === key || m.recipientKey === meta.name)
+          )
+            n++;
+        }
+        return n;
+      };
+      const check = (): void => {
+        expect(sim.mailUnreadFor(alice)).toBe(refUnread(alice));
+        expect(sim.mailUnreadFor(bob)).toBe(refUnread(bob));
+      };
 
-    // Two letters to Bob, still in flight.
-    sim.mailSend('Bob', 'A', 'a', 100, [], alice);
-    check();
-    sim.mailSend('Bob', 'B', 'b', 0, [{ itemId: 'roasted_boar', count: 2 }], alice);
-    check();
+      check(); // welcome letters delivered immediately
+      moveToMailbox(sim, alice);
+      sim.addItem('roasted_boar', 6, alice);
 
-    // Advance ONE tick at a time across the delivery boundary: the index must be
-    // byte-identical to the scan at every tick, including the exact delivery tick.
-    for (let i = 0; i < (MAIL_DELIVERY_SECONDS + 2) * 20; i++) {
-      sim.tick();
+      // Two letters to Bob, still in flight.
+      sim.mailSend('Bob', 'A', 'a', 100, [], alice);
       check();
-    }
+      sim.mailSend('Bob', 'B', 'b', 0, [{ itemId: 'roasted_boar', count: 2 }], alice);
+      check();
 
-    moveToMailbox(sim, bob);
-    const letterA = sim.mailInfoFor(bob)?.messages.find((m) => m.subject === 'A');
-    const letterB = sim.mailInfoFor(bob)?.messages.find((m) => m.subject === 'B');
-    if (!letterA || !letterB) throw new Error('letters not delivered');
+      // Advance ONE tick at a time across the delivery boundary: the index must be
+      // byte-identical to the scan at every tick, including the exact delivery tick.
+      for (let i = 0; i < (MAIL_DELIVERY_SECONDS + 2) * 20; i++) {
+        sim.tick();
+        check();
+      }
 
-    sim.mailMarkRead(letterA.id, bob);
-    check();
-    sim.mailTake(letterA.id, bob); // coin taken, A now empty and read
-    check();
-    sim.mailDelete(letterA.id, bob); // delete the emptied, read letter
-    check();
-    sim.mailTake(letterB.id, bob); // takes the boars, marks read
-    check();
+      moveToMailbox(sim, bob);
+      const letterA = sim.mailInfoFor(bob)?.messages.find((m) => m.subject === 'A');
+      const letterB = sim.mailInfoFor(bob)?.messages.find((m) => m.subject === 'B');
+      if (!letterA || !letterB) throw new Error('letters not delivered');
 
-    // Rename path: a name-keyed offline letter folded onto the stable id key.
-    sim.mailSendResolved({ key: 'Ghost', name: 'Ghost' }, 'Ghostly', 'boo', 0, [], alice);
-    for (let i = 0; i < (MAIL_DELIVERY_SECONDS + 2) * 20; i++) sim.tick();
-    check();
-    // Fold the Ghost-keyed letter onto Bob (his mail key is his entity id here).
-    expect(sim.rekeyMailOwner(bob, 'Ghost', 'Bob')).toBe(true);
-    check();
+      sim.mailMarkRead(letterA.id, bob);
+      check();
+      sim.mailTake(letterA.id, bob); // coin taken, A now empty and read
+      check();
+      sim.mailDelete(letterA.id, bob); // delete the emptied, read letter
+      check();
+      sim.mailTake(letterB.id, bob); // takes the boars, marks read
+      check();
 
-    // Expiry path: force an unread plain letter to expire and prune.
-    sim.mailSend('Bob', 'Expireme', 'bye', 0, [], alice);
-    for (let i = 0; i < (MAIL_DELIVERY_SECONDS + 2) * 20; i++) sim.tick();
-    check();
-    const doomed = po.mail.find((m: { subject: string }) => m.subject === 'Expireme');
-    doomed.expiresAt = sim.time + 0.5;
-    tickFor(sim, 2);
-    expect(po.mail.some((m: { subject: string }) => m.subject === 'Expireme')).toBe(false);
-    check();
-  });
+      // Rename path: a name-keyed offline letter folded onto the stable id key.
+      sim.mailSendResolved({ key: 'Ghost', name: 'Ghost' }, 'Ghostly', 'boo', 0, [], alice);
+      for (let i = 0; i < (MAIL_DELIVERY_SECONDS + 2) * 20; i++) sim.tick();
+      check();
+      // Fold the Ghost-keyed letter onto Bob (his mail key is his entity id here).
+      expect(sim.rekeyMailOwner(bob, 'Ghost', 'Bob')).toBe(true);
+      check();
+
+      // Expiry path: force an unread plain letter to expire and prune.
+      sim.mailSend('Bob', 'Expireme', 'bye', 0, [], alice);
+      for (let i = 0; i < (MAIL_DELIVERY_SECONDS + 2) * 20; i++) sim.tick();
+      check();
+      const doomed = po.mail.find((m: { subject: string }) => m.subject === 'Expireme');
+      doomed.expiresAt = sim.time + 0.5;
+      tickFor(sim, 2);
+      expect(po.mail.some((m: { subject: string }) => m.subject === 'Expireme')).toBe(false);
+      check();
+    },
+    UNREAD_INDEX_TEST_TIMEOUT_MS,
+  );
 
   it('rebuilds a byte-identical index after a serialize/load round-trip', () => {
     const sim = makeWorld();

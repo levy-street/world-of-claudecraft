@@ -38,7 +38,7 @@ function joinServer(
   fc: FakeClient,
   characterId: number,
   name: string,
-  cls: 'warrior' | 'rogue' = 'warrior',
+  cls: 'warrior' | 'rogue' | 'hunter' = 'warrior',
 ): ClientSession {
   const session = server.join(fc.ws, characterId, characterId, name, cls, null);
   if ('error' in session) throw new Error(session.error);
@@ -410,6 +410,51 @@ describe('crowd interest management', () => {
     ).toBe(true);
     expect(entRecord(snap, rogue.pid)).toBeNull();
     expect(inKeep(snap, rogue.pid)).toBe(false);
+  });
+
+  it('reveals a marked stealthed opponent only to the Hunter who owns the mark', () => {
+    const hunterFc = fakeWs();
+    const hunter = joinServer(server, hunterFc, 3, 'Tracker', 'hunter');
+    const rogueFc = fakeWs();
+    const rogue = joinServer(server, rogueFc, 4, 'MarkedSneak', 'rogue');
+    server.sim.setPlayerLevel(20, hunter.pid);
+    server.sim.setPlayerLevel(20, rogue.pid);
+    server.sim.setPlayerLevel(20, viewer.pid);
+    const h = server.sim.entities.get(hunter.pid)!;
+    placeAt(server, rogue.pid, h.pos.x + 30, h.pos.z);
+    placeAt(server, viewer.pid, h.pos.x, h.pos.z + 1);
+    server.sim.duelRequest(rogue.pid, hunter.pid);
+    server.sim.duelAccept(rogue.pid);
+    for (let i = 0; i < 20 * 5 && server.sim.duelFor(hunter.pid)?.state !== 'active'; i++) {
+      server.sim.tick();
+    }
+    expect(server.sim.duelFor(hunter.pid)?.state).toBe('active');
+    server.sim.entities.get(rogue.pid)?.auras.push({
+      id: 'hunters_mark',
+      name: "Hunter's Mark",
+      kind: 'hunter_mark',
+      remaining: 60,
+      duration: 60,
+      value: 0.05,
+      sourceId: hunter.pid,
+      school: 'physical',
+    });
+    server.sim.targetEntity(null, rogue.pid);
+    server.sim.castAbility('stealth', rogue.pid);
+    expect(server.sim.entities.get(rogue.pid)?.stealthed).toBe(true);
+    expect(
+      server.sim.isHostileTo(
+        server.sim.entities.get(hunter.pid)!,
+        server.sim.entities.get(rogue.pid)!,
+      ),
+    ).toBe(true);
+
+    hunterFc.sent.length = 0;
+    viewerFc.sent.length = 0;
+    step(server);
+
+    expect(entRecord(lastSnap(hunterFc.sent), rogue.pid)).not.toBeNull();
+    expect(entRecord(lastSnap(viewerFc.sent), rogue.pid)).toBeNull();
   });
 
   it('hides stealthed active duel opponents even inside normal detection range', () => {

@@ -39,6 +39,7 @@ import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
+import { buildArtisanRowProps } from './artisan_row_props';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { type BirdsView, buildBirds } from './birds';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
@@ -104,6 +105,9 @@ import {
 } from './gfx';
 import { GlacialFrontVisual } from './glacial_front_visual';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
+import { buildHunterFreezingTrap } from './hunter_freezing_trap';
+import { type HunterFrozenFeetVisual, syncHunterFrozenFeet } from './hunter_frozen_feet';
+import { HunterMarkMarkers } from './hunter_mark_markers';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
@@ -134,6 +138,7 @@ import {
   reconcileViewPointLights,
 } from './point_light_budget';
 import { buildComposer, type PostPipeline } from './post';
+import { PowerfulShotTelegraph } from './powerful_shot_visual';
 import {
   orderedPrewarmIds,
   type PrewarmPolicy,
@@ -615,6 +620,7 @@ export interface EntityView {
   temporalHourglassVisual: TemporalHourglassVisual | null;
   frostNovaRootVisual: FrostNovaRootVisual | null; // Atadura de Hielo restraint at the feet
   mageBarrierVisual: MageBarrierVisual | null; // personal mage absorb shell, built lazily
+  hunterFrozenFeet: HunterFrozenFeetVisual | null;
   skin: number; // last-rendered appearance skin — diffed each frame for live swaps
   mainhandItemId: string | null; // last-rendered equipped weapon — diffed for live held-weapon swaps
   offhandItemId: string | null; // last-rendered shield/second weapon, independent of mainhand skins
@@ -704,7 +710,12 @@ function distSqXZ(a: Entity, b: Entity): number {
   return dx * dx + dz * dz;
 }
 
-function summarizeMs(values: number[]): { count: number; avg: number; p95: number; max: number } {
+function summarizeMs(values: number[]): {
+  count: number;
+  avg: number;
+  p95: number;
+  max: number;
+} {
   if (values.length === 0) return { count: 0, avg: 0, p95: 0, max: 0 };
   const sorted = [...values].sort((a, b) => a - b);
   const total = values.reduce((a, b) => a + b, 0);
@@ -718,7 +729,14 @@ function summarizeMs(values: number[]): { count: number; avg: number; p95: numbe
 }
 
 function emptyFramePhaseMs(): RendererFramePhaseMs {
-  return { setup: 0, entities: 0, world: 0, nameplates: 0, submit: 0, total: 0 };
+  return {
+    setup: 0,
+    entities: 0,
+    world: 0,
+    nameplates: 0,
+    submit: 0,
+    total: 0,
+  };
 }
 
 function emptyWorldPhaseMs(): RendererWorldPhaseMs {
@@ -891,6 +909,7 @@ export class Renderer {
   private aoeRingNext = 0;
   private recklessSkulls = new RecklessSkullPainter();
   private groundAimReticle: GroundAimReticleVisual;
+  private powerfulShotTelegraph: PowerfulShotTelegraph;
   raycaster = new THREE.Raycaster();
   clickTargets: THREE.Object3D[] = [];
   // Gather-node meshes (#1866), raycast separately from `clickTargets`/`pick()`:
@@ -906,7 +925,11 @@ export class Renderer {
   // always null in the shipped game.
   editorCam: { pos: THREE.Vector3; target: THREE.Vector3 } | null = null;
   // Smoothed chase-cam occlusion (1 = no pull-in); see updateCamera.
-  private camOcclusion: CameraOcclusionState = { pullT: 1, lensT: 1, fov: CAMERA_BASE_FOV };
+  private camOcclusion: CameraOcclusionState = {
+    pullT: 1,
+    lensT: 1,
+    fov: CAMERA_BASE_FOV,
+  };
   showNameplates = true;
   // settings-backed developer-badge display toggle (nameplate glyph + outline);
   // initialized from Settings and kept live by main.ts's applySetting dispatcher.
@@ -1056,7 +1079,10 @@ export class Renderer {
   private mageGroundFx!: MageGroundFx;
   private ringOfFrostVisuals!: RingOfFrostVisuals;
   private temporalHourglassGroundVisuals!: TemporalHourglassGroundVisuals;
-  private readonly mageBarrierStateScratch: MageBarrierState = { theme: 'frost', value: 0 };
+  private readonly mageBarrierStateScratch: MageBarrierState = {
+    theme: 'frost',
+    value: 0,
+  };
   private glacialFrontVisual!: GlacialFrontVisual;
   private weather: Weather;
   private weatherOn = true;
@@ -1086,7 +1112,12 @@ export class Renderer {
   // per bout, camera-centred, only shown while the local player is practicing).
   private valeCupSky = new ValeCupPracticeSky();
   private valeCupTeamRings: ValeCupTeamRingsView;
-  private vcupFireworks: { at: number; x: number; z: number; colors: readonly number[] }[] = [];
+  private vcupFireworks: {
+    at: number;
+    x: number;
+    z: number;
+    colors: readonly number[];
+  }[] = [];
   private valeCupBallDust: ValeCupBallDust | null = null;
   private valeCupBallTrail: ValeCupBallTrail | null = null;
   // seed-bound ground sampler, built once so the per-frame Vale Cup ring update
@@ -1535,6 +1566,11 @@ export class Renderer {
     freezeStaticMatrices(gatherNodes.group);
     this.gatherNodeMeshes = gatherNodes.group.children;
 
+    const artisanRow = buildArtisanRowProps(this.sim.cfg.seed);
+    setRenderCategory(artisanRow.group, 'props');
+    this.scene.add(artisanRow.group);
+    freezeStaticMatrices(artisanRow.group);
+
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each
     // frame (see drapeRingLocalY / sync) so it stays legible on slopes instead
@@ -1648,6 +1684,8 @@ export class Renderer {
       this.lowGfx ? 1 : SELECTION_RING_BOOST,
     );
     setRenderCategory(this.groundAimReticle.group, 'ui3d');
+    this.powerfulShotTelegraph = new PowerfulShotTelegraph(this.scene, this.groundSample);
+    setRenderCategory(this.powerfulShotTelegraph.group, 'ui3d');
     for (let i = 0; i < CLICK_MARKER_POOL; i++) {
       const mat = new THREE.MeshBasicMaterial({
         transparent: true,
@@ -2052,7 +2090,9 @@ export class Renderer {
     this.renderDiagnosticsLastPrograms = programs;
     this.renderDiagnosticsLastTextures = textures;
 
-    type MutableCategoryStats = RenderDiagnosticsCategoryStats & { materialKeys: Set<string> };
+    type MutableCategoryStats = RenderDiagnosticsCategoryStats & {
+      materialKeys: Set<string>;
+    };
     const categories: Record<string, MutableCategoryStats> = {};
     const totals = { objects: 0, draws: 0, triangles: 0, points: 0 };
     const newMaterials: string[] = [];
@@ -2183,7 +2223,9 @@ export class Renderer {
         requestIdleCallback?: (callback: () => void, options?: { timeout?: number }) => number;
       };
       if (win.requestIdleCallback)
-        win.requestIdleCallback(run, { timeout: RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS });
+        win.requestIdleCallback(run, {
+          timeout: RENDER_DIAGNOSTICS_IDLE_TIMEOUT_MS,
+        });
       else window.setTimeout(run, 100);
     }
     return this.renderDiagnosticsSnapshot;
@@ -2263,7 +2305,11 @@ export class Renderer {
       if (required && !includeRequired) continue;
       const d2 = distSqXZ(e, center);
       if (!required && d2 > rangeSq) continue;
-      this.viewCandidates.push({ e, d2, priority: this.viewCandidatePriority(e, center, d2) });
+      this.viewCandidates.push({
+        e,
+        d2,
+        priority: this.viewCandidatePriority(e, center, d2),
+      });
     }
     if (this.viewCandidates.length > 1) {
       this.viewCandidates.sort((a, b) => a.priority - b.priority || a.d2 - b.d2 || a.e.id - b.e.id);
@@ -2593,7 +2639,10 @@ export class Renderer {
     return group;
   }
 
-  private buildPlayerPrewarmGroup(deadline: number): { group: THREE.Group; visualCount: number } {
+  private buildPlayerPrewarmGroup(deadline: number): {
+    group: THREE.Group;
+    visualCount: number;
+  } {
     const group = new THREE.Group();
     const p = this.sim.player;
     group.position.set(p.pos.x, p.pos.y, p.pos.z - 21);
@@ -3283,7 +3332,8 @@ export class Renderer {
           this.triggerAttack(ev.sourceId, warriorCast.abilityId);
           break;
         }
-        if (ev.fx === 'projectile') this.vfx.projectile(ev.sourceId, ev.targetId, ev.school);
+        if (ev.fx === 'projectile')
+          this.vfx.projectile(ev.sourceId, ev.targetId, ev.school, 1, ev.projectileStyle);
         else if (ev.fx === 'heavyBolt')
           // Pyroblast's boulder: the same homing comet, doubled up.
           this.vfx.projectile(ev.sourceId, ev.targetId, ev.school, 2);
@@ -3343,6 +3393,10 @@ export class Renderer {
         }
         break;
       }
+      case 'powerfulShotFx':
+        this.triggerAttack(ev.sourceId);
+        this.vfx.powerfulShot(ev.sourceId, ev.x, ev.z);
+        break;
       case 'spellfxAt': {
         // The Frozen Orb flight, animated locally from its three moments:
         // 'release' starts the drift, 'halt'/'resume' freeze and restart it at
@@ -3798,6 +3852,11 @@ export class Renderer {
       body = built.group;
       height = built.height;
       objectMesh = body!;
+    } else if (e.kind === 'object' && e.templateId === 'hunter_freezing_trap') {
+      const built = buildHunterFreezingTrap();
+      body = built.group;
+      height = built.height;
+      objectMesh = body;
     } else if (e.kind === 'object' && e.templateId?.startsWith('delve_')) {
       // Delve interactables: skip the object pool (each is unique/stateful) and
       // build a dedicated procedural mesh that matches the crypt aesthetic.
@@ -4074,6 +4133,7 @@ export class Renderer {
       temporalHourglassVisual: null,
       frostNovaRootVisual: null,
       mageBarrierVisual: null,
+      hunterFrozenFeet: null,
       height,
       clickTarget,
       nameplate: np,
@@ -4292,6 +4352,7 @@ export class Renderer {
   private yumiMazeViews = new Map<number, YumiMazeView>();
   // Blue/red team arrows above every yumi fighter (yumi_team_markers.ts).
   private readonly yumiTeamMarkers = new YumiTeamMarkers();
+  private readonly hunterMarkMarkers = new HunterMarkMarkers();
   // Delve module interiors build asynchronously; track in-flight keys so a
   // per-frame ensureDelveInteriorsNear does not re-schedule a build mid-load.
   private pendingInteriors = new Set<string>();
@@ -4626,7 +4687,10 @@ export class Renderer {
       v.fireballTravelVisual?.dispose();
     } else {
       if (v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
-        this.storePooledObject(v.objectPoolKey, { group: v.objectMesh, height: v.height });
+        this.storePooledObject(v.objectPoolKey, {
+          group: v.objectMesh,
+          height: v.height,
+        });
       } else {
         // Object views usually own their geometries. Door portal resources are
         // shared and prewarmed, so they must survive interest churn.
@@ -4642,6 +4706,7 @@ export class Renderer {
     v.temporalHourglassVisual?.dispose();
     v.frostNovaRootVisual?.dispose();
     v.mageBarrierVisual?.dispose();
+    v.hunterFrozenFeet?.dispose();
     this.views.delete(id);
   }
 
@@ -4709,7 +4774,15 @@ export class Renderer {
     setRenderCategory(group, 'ui3d');
     group.visible = false;
     this.scene.add(group);
-    this.targetCone = { group, pos, localXZ: fan.localXZ, worldXYZ, ringPos, ringXZ, ringWorldXYZ };
+    this.targetCone = {
+      group,
+      pos,
+      localXZ: fan.localXZ,
+      worldXYZ,
+      ringPos,
+      ringXZ,
+      ringWorldXYZ,
+    };
   }
 
   sync(
@@ -4838,6 +4911,7 @@ export class Renderer {
       let temporalHourglassMode: TemporalHourglassMode | null = null;
       let hasFrostNovaRoot = false;
       let mageBarrierState: MageBarrierState | null = null;
+      let hasHunterFreeze = false;
       for (const a of e.auras) {
         if (a.kind === 'polymorph') hasPoly = true;
         if (a.kind === 'form_bear') hasBear = true;
@@ -4858,6 +4932,7 @@ export class Renderer {
           if (a.kind === 'incapacitate') temporalHourglassMode = 'hostile';
         }
         if (isFrostNovaRootAura(a)) hasFrostNovaRoot = true;
+        if (a.id === 'freezing_trap' && a.kind === 'incapacitate') hasHunterFreeze = true;
         mageBarrierState ??= mageBarrierStateForAura(a, this.mageBarrierStateScratch);
       }
       const polyed = hasPoly;
@@ -5053,6 +5128,12 @@ export class Renderer {
 
       this.updateBaseVisual(e, v);
       if (!v.visual) continue;
+      v.hunterFrozenFeet = syncHunterFrozenFeet(
+        v.hunterFrozenFeet,
+        v.group,
+        v.height,
+        hasHunterFreeze,
+      );
       if (iceBlockActivated) this.activeVisual(v)?.playEmote('wave', 1);
 
       // off-screen rigs still need their pose/audio updated, but not their draws.
@@ -5563,6 +5644,7 @@ export class Renderer {
     this.tickFiestaGlows(dt);
     for (const view of this.yumiMazeViews.values()) view.update(this.sim);
     this.yumiTeamMarkers.update(this.sim, this.views);
+    this.hunterMarkMarkers.update(this.sim, this.views);
     this.tickValeCupFx(dt);
     worldStart = markWorldPhase('vfx', worldStart);
 
@@ -5759,7 +5841,11 @@ export class Renderer {
       this.lastLocalPos = { x: selfPos.x, z: selfPos.z };
     }
     const inTravelForm = p.auras.some((a) => a.kind === 'form_travel');
-    const target = targetIntensity({ inTravelForm, speed, reducedMotion: this.reducedMotion() });
+    const target = targetIntensity({
+      inTravelForm,
+      speed,
+      reducedMotion: this.reducedMotion(),
+    });
     this.travelSpeedFx.update(target, dt);
   }
 
@@ -5988,7 +6074,9 @@ export class Renderer {
       if (m.isMesh) m.geometry.dispose();
     });
     const disposeMat = (mat: THREE.Material): void => {
-      const withMap = mat as THREE.Material & { normalMap?: THREE.Texture | null };
+      const withMap = mat as THREE.Material & {
+        normalMap?: THREE.Texture | null;
+      };
       withMap.normalMap?.dispose();
       mat.dispose();
     };
@@ -6428,19 +6516,41 @@ export class Renderer {
   }
 
   setGroundAimReticle(
-    aim: { x: number; z: number; radius: number; school: string; dimmed: boolean } | null,
+    aim: {
+      x: number;
+      z: number;
+      radius: number;
+      school: string;
+      dimmed: boolean;
+      line?: { length: number; width: number; facing: number };
+    } | null,
   ): void {
-    this.groundAimReticle.setAim(
-      aim
-        ? {
-            x: aim.x,
-            z: aim.z,
-            radius: aim.radius,
-            color: SCHOOL_COLORS[aim.school] ?? 0xffffff,
-            dimmed: aim.dimmed,
-          }
-        : null,
-    );
+    if (!aim) {
+      this.groundAimReticle.setAim(null);
+      this.powerfulShotTelegraph.hide();
+      return;
+    }
+    if (aim.line) {
+      this.groundAimReticle.setAim(null);
+      this.powerfulShotTelegraph.update(
+        aim.x,
+        aim.z,
+        aim.line.length,
+        aim.line.width,
+        aim.line.facing,
+        SCHOOL_COLORS[aim.school] ?? 0xffffff,
+      );
+      this.powerfulShotTelegraph.setOpacity(aim.dimmed ? 0.45 : 0.8);
+      return;
+    }
+    this.powerfulShotTelegraph.hide();
+    this.groundAimReticle.setAim({
+      x: aim.x,
+      z: aim.z,
+      radius: aim.radius,
+      color: SCHOOL_COLORS[aim.school] ?? 0xffffff,
+      dimmed: aim.dimmed,
+    });
   }
 
   private updateAoeRings(dt: number): void {

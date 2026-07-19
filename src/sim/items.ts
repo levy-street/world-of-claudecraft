@@ -29,6 +29,7 @@ import {
   weaponHand,
 } from './equipment_rules';
 import { formatMoney } from './format_money';
+import { breakFeignDeath } from './hunter_base_abilities';
 import { moveStackToCell } from './inventory_order';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
@@ -383,6 +384,7 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
       );
       return;
     }
+    breakFeignDeath(ctx, p);
     // #1149 Battlefield Experience: credit the instance removeItem actually
     // consumed (PR #1281 review, High: a self-signed instance sitting
     // untouched at a different slot must never be credited for a plain copy
@@ -421,6 +423,7 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     // no shared potion cooldown; re-quaffing refreshes the buff via applyAura.
     const elx = def.elixir;
     if (!elx) return;
+    breakFeignDeath(ctx, p);
     ctx.removeItem(itemId, 1, meta.entityId);
     ctx.applyAura(p, {
       id: `elixir_${itemId}`,

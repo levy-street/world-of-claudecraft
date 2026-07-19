@@ -34,7 +34,7 @@ const SPEC_SIGS = {
   ],
   hunter: [
     ['beast_mastery', 'bestial_wrath'],
-    ['marksmanship', 'trueshot_aura'],
+    ['marksmanship', 'steady_shot'],
     ['survival', 'wyvern_sting'],
   ],
   mage: [

@@ -2388,7 +2388,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menyelubungimu dengan embun beku, meningkatkan zirah sebesar {buff} selama 30 menit.',
   'entities.abilities.frost_armor.name': 'Mantel Embun Beku',
   'entities.abilities.frost_nova.description':
-    'Membekukan semua musuh di sekitar di tempatnya hingga 8 detik, memberi {damage} kerusakan Beku.',
+    'Membekukan semua musuh di sekitar di tempatnya hingga 8 detik, memberi {damage} kerusakan Beku. Efek pengakaran berakhir setelah menerima total kerusakan sebesar 15% kesehatan maksimum target, dengan minimal 20 dan maksimal 60 kerusakan.',
   'entities.abilities.frost_nova.name': 'Icebind',
   'entities.abilities.frost_shock.description':
     'Seketika mengejutkan target dengan embun beku sebesar {damage} kerusakan Beku dan memperlambat gerakannya sebesar 50% selama 8 detik.',
@@ -7145,7 +7145,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'download.windowsCta': 'Unduh untuk Windows',
   'download.linuxHint':
     'AppImage: membuatnya dapat dieksekusi, lalu jalankan. Tidak perlu instalasi.',
-  'loading.reconnecting': 'Koneksi terputus. Menyambungkan kembali...',
   'guide.nav.settings': 'Pengaturan & Kinerja',
   'guide.settingsPage.advancedBody':
     'Lanjutan dimulai dari tingkat High dan membuka empat pemetik tambahan, sehingga Anda dapat menggunakan bingkai di tempat yang benar-benar Anda sadari: Detail Medan, Kepadatan Dedaunan, Efek & Pencahayaan, dan Kualitas Bayangan. Seperti Kualitas Grafis, ini berlaku setelah memuat ulang.',
@@ -8089,7 +8088,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'game.talents.rowUnlocks': 'Terbuka pada level {level}',
   'entities.abilities.blazing_barrier.name': 'Penghalang Membara',
   'entities.abilities.blazing_barrier.description':
-    'Selimuti dirimu dengan api untuk menyerap 130 kerusakan selama 60 dtk. (Api)',
+    'Selimuti dirimu dengan api untuk menyerap {damage} kerusakan selama 60 dtk. (Api)',
   'entities.abilities.cold_snap.name': 'Panggilan Musim Dingin',
   'entities.abilities.cold_snap.description':
     'Mengakhiri waktu pemulihan Langkah Kedip, Selubung Beku, dan Ketaklihatan Agung. (talenta mage)',

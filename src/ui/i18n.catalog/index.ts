@@ -201,6 +201,14 @@ export const en = {
   },
   game: gameStrings,
   hudChrome: hudChromeStrings,
+  // Rare gather events (Professions 2.0 Phase 4): the zone-broadcast lines
+  // rendered from the id-based gatherRareEvent SimEvent; {finder} is the
+  // harvester's player name and splices verbatim.
+  gatherEvent: {
+    pristineVein: '{finder} struck a pristine vein!',
+    ancientHeartwood: '{finder} felled an ancient heartwood!',
+    moonlitBloom: '{finder} discovered a moonlit bloom!',
+  },
   apiError: apiErrorStrings,
   guide: guideStrings,
   editor: editorStrings,

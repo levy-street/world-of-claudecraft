@@ -34,10 +34,9 @@ Turns the player's keyboard/mouse/touch/gamepad into **movement intent** +
   through the `IWorld`-shaped interfaces passed to them. Do not import
   `Sim`/`ClientWorld` here.
 - **`music.ts` synthesizes its soundtrack** in code via WebAudio. **`audio.ts` is
-  primarily a compatibility facade over `sfx.ts`:** personal UI/event methods
-  resolve to typed sampled `ui_*` cues. The release-specific `readyCheck()` chime
-  remains a small procedural WebAudio fallback until it has a dedicated sampled
-  catalog key. `sfx.ts` and `voice.ts` play pre-rendered clips under `public/audio/`
+  a compatibility facade over `sfx.ts`:** every personal UI/event method resolves
+  to a typed sampled `ui_*` cue; there is no remaining procedural WebAudio bed.
+  `sfx.ts` and `voice.ts` play pre-rendered clips under `public/audio/`
   keyed off their `*_manifest.generated.ts`; a missing clip is a silent no-op (the
   dialogue/combat text stays the source of truth).
 - **`AudioContext` needs a user gesture**: `audio.init()`/`music.init()`/`sfx.init()`

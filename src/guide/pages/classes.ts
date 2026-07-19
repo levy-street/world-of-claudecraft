@@ -60,6 +60,7 @@ const FILTER_GROUPS: {
       { value: 'rage', labelKey: 'guide.resourceName.rage' },
       { value: 'mana', labelKey: 'guide.resourceName.mana' },
       { value: 'energy', labelKey: 'guide.resourceName.energy' },
+      { value: 'focus', labelKey: 'guide.resourceName.focus' },
     ],
   },
   {
@@ -237,7 +238,7 @@ function signatureKitHtml(c: GuideClassInfo): string {
       <li class="guide-kit-item">
         ${crestImg(iconDataUrl('ability', a.id, 56), 48, 'guide-ability-icon')}
         <div class="guide-kit-text">
-          <span class="guide-kit-name">${esc(a.name)}</span>
+          <span class="guide-kit-name">${esc(abilityNameWithSpecs(c, a))}</span>
           <span class="guide-kit-line">${esc(abilityHook(a.id))}</span>
         </div>
       </li>`,
@@ -266,7 +267,7 @@ function fullKitHtml(c: GuideClassInfo): string {
       (a) => `
       <li class="guide-ability">
         ${crestImg(iconDataUrl('ability', a.id, 56), 48, 'guide-ability-icon')}
-        <span class="guide-ability-name">${esc(a.name)}</span>
+        <span class="guide-ability-name">${esc(abilityNameWithSpecs(c, a))}</span>
       </li>`,
     )
     .join('');
@@ -276,6 +277,13 @@ function fullKitHtml(c: GuideClassInfo): string {
       <p>${esc(t('guide.classPage.fullKitNote'))}</p>
       <ul class="guide-ability-strip">${items}</ul>
     </section>`;
+}
+
+function abilityNameWithSpecs(c: GuideClassInfo, ability: GuideClassInfo['abilities'][number]): string {
+  const names = (ability.specializations ?? [])
+    .map((specId) => c.specs.find((spec) => spec.id === specId)?.name)
+    .filter((name): name is string => Boolean(name));
+  return names.length > 0 ? `${ability.name} (${names.join(', ')})` : ability.name;
 }
 
 function warlockPetsHtml(): string {

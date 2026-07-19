@@ -1978,6 +1978,20 @@
     text-shadow: 1px 1px 2px #000;
     min-height: 1.2em;
   }
+  #ls-slow-hint {
+    max-width: min(480px, 80vw);
+    margin-top: 2px;
+    color: var(--color-text-error);
+    font-family: var(--font-ui);
+    font-size: 12px;
+    text-align: center;
+    text-shadow: 1px 1px 2px #000;
+    min-height: 2.4em;
+    visibility: hidden;
+  }
+  #ls-slow-hint.visible {
+    visibility: visible;
+  }
 
   /* ---------- play console (realm selector + Play CTA) ---------- */
   .play-console {

@@ -24,6 +24,7 @@ const HARMFUL: AuraKind[] = [
   'spellvuln',
   'lockout',
   'vulnerability',
+  'hunter_mark',
   'hex',
   'tongues',
   'cost_tax',

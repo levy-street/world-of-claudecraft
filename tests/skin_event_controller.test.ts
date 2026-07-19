@@ -34,7 +34,7 @@ function harness(reduceMotion = false) {
     bagOpen: vi.fn(),
     bagClose: vi.fn(),
     click: vi.fn(),
-    levelUp: vi.fn(),
+    cosmeticUnlock: vi.fn(),
   };
   const claimEventSkin = vi.fn();
   const preview = { mount: vi.fn(), setSkin: vi.fn() };
@@ -125,7 +125,7 @@ describe('SkinEventController', () => {
 
     expect(test.claimEventSkin).toHaveBeenCalledWith(Number(swatch?.dataset.skin));
     expect(test.showBanner).toHaveBeenCalledTimes(1);
-    expect(test.audio.levelUp).toHaveBeenCalledTimes(1);
+    expect(test.audio.cosmeticUnlock).toHaveBeenCalledTimes(1);
     expect(test.renderBagsIfOpen).toHaveBeenCalledTimes(1);
     expect(document.getElementById('skin-event')?.classList.contains('open')).toBe(false);
   });

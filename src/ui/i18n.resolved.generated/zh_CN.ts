@@ -306,6 +306,14 @@ export const zh_CN: EnTranslations = {
     "spectate": {
       "banner": "正在观察 {name}"
     },
+    "resource": {
+      "focus": "Focus",
+      "lowFocus": "Low Focus",
+      "notEnoughFocus": "Not enough focus!"
+    },
+    "hunter": {
+      "turtleAttackError": "You can't attack while protected by Aspect of the Turtle."
+    },
     "readyCheck": {
       "prompt": "{name} 发起了准备确认。你准备好了吗？",
       "ready": "准备就绪",
@@ -750,6 +758,7 @@ export const zh_CN: EnTranslations = {
       "leaderboard": "排行榜",
       "dailyRewards": "商店",
       "deeds": "功绩",
+      "professions": "专业",
       "nameplates": "姓名板",
       "haptics": "震动反馈",
       "hapticsOff": "震动反馈：关",
@@ -1039,6 +1048,7 @@ export const zh_CN: EnTranslations = {
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",
+      "showThirdActionBar": "显示第三动作条",
       "showTargetOfTarget": "显示目标的目标",
       "showAttackButton": "显示攻击按钮",
       "showDailyRewardsChest": "显示每日奖励宝箱",
@@ -1468,7 +1478,8 @@ export const zh_CN: EnTranslations = {
       "watchTwitch": "在 Twitch 观看",
       "watchX": "在 X 查看",
       "watchKick": "在 Kick 观看",
-      "watchYouTube": "在 YouTube 观看"
+      "watchYouTube": "在 YouTube 观看",
+      "streamerBadgeTitle": "认证主播"
     },
     "lootSettings": {
       "title": "拾取设置",
@@ -2082,7 +2093,9 @@ export const zh_CN: EnTranslations = {
       "mining": "采矿",
       "logging": "伐木",
       "herbalism": "草药学",
-      "notReady": "这个资源节点尚未为你重新生成。"
+      "notReady": "这个资源节点尚未为你重新生成。",
+      "gatherLine": "你采集了：{name}。",
+      "gatherLineQty": "你采集了：{name} x{qty}。"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -2113,6 +2126,42 @@ export const zh_CN: EnTranslations = {
       "tailoring": "裁缝",
       "leatherworking": "制皮"
     },
+    "professions": {
+      "title": "专业",
+      "close": "关闭专业",
+      "ringAria": "技艺之轮",
+      "skillsHeader": "制作技能",
+      "gatheringHeader": "采集",
+      "perksHeader": "加成",
+      "identityHeader": "身份",
+      "roleMajor": "主修",
+      "roleHobby": "爱好",
+      "roleDormant": "休眠",
+      "roleUnattuned": "未调谐",
+      "ceilingUnlimited": "无强化上限",
+      "ceilingRare": "稀有品质上限",
+      "ceilingCommon": "普通品质上限",
+      "skillValue": "{skill} / {max}",
+      "tierPipAria": "阶级 {tier}",
+      "nextUnlockTier": "距离下一阶级还差 {points} 点：打造大师之作的几率将提升",
+      "nextUnlockSpecialized": "距离专精还差 {points} 点：材料消耗将降低",
+      "nextUnlockMax": "已达技能上限",
+      "perkSpecializedLine": "{craft}：专精，材料消耗 -{pct}%",
+      "perkSpecializedAt": "技能达到 {threshold} 后专精",
+      "switchCost": "下次切换原型需要 {cost} 点补偿",
+      "syncing": "正在等待服务器发送你的专业数据。",
+      "tutorialLine": "将任意一门技艺提升到技能 {target}，即可解锁你的第一个阶级。",
+      "ctaHeader": "下一步",
+      "ctaRaise": "继续提升{craft}：距离下一阶级还差 {points} 点。",
+      "ctaStart": "使用任意专业进行制作或采集，即可开始。",
+      "unattunedIdentity": "你尚未调谐任何原型。提升你的技艺并完成一次调谐，以选择你的组合。",
+      "nudgeNearTier": "{craft}：距离下一阶级还差 {points} 点",
+      "nudgeDormant": "你的{craft}知识正处于休眠状态",
+      "hobbyLabel": "爱好：{craft}",
+      "majorsLabel": "主修：{a}和{b}",
+      "pairsHeld": "已持有组合：{count}",
+      "returnsLabel": "回归：{count}"
+    },
     "crafting": {
       "title": "制作",
       "close": "关闭制作",
@@ -2131,6 +2180,7 @@ export const zh_CN: EnTranslations = {
       "comboNotAttuned": "请先选择一个原型组合。",
       "comboWrongPair": "启用这个确切组合才能制作。",
       "comboTierUnmet": "将两项主修技艺提升到所需阶级。",
+      "comboTierUnmetNamed": "将{crafts}提升到阶级 {tier}。",
       "professionChoice": "专业选择",
       "noProfessionChoice": "当前没有可用的专业选择。",
       "pairOptionLabel": "{pair}（{craftA} + {craftB}）",
@@ -2163,7 +2213,19 @@ export const zh_CN: EnTranslations = {
       },
       "notAtHub": "必须达到所需等级并位于制作站，才能制作该物品。",
       "throttled": "你制作得太快了，请稍等片刻后再试。",
-      "recipeNotLearned": "你还没有学会这个配方。"
+      "recipeNotLearned": "你还没有学会这个配方。",
+      "skillReqLine": "需要{craft} {skill}",
+      "difficultyFull": "完整技能成长",
+      "difficultyReduced": "技能成长减少",
+      "difficultyNone": "无技能成长",
+      "stationBadge": "制作站",
+      "stationOutOfRange": "前往制作站才能制作该物品。",
+      "masterworkToast": "杰作！{name}",
+      "masterworkZoneLine": "{crafter}制作出了杰作{name}！",
+      "tierUpToast": "{craft}提升至阶级 {tier}！",
+      "makersMark": "制作者：{name}",
+      "masterworkSeal": "杰作",
+      "enchantedLine": "已附魔"
     },
     "finder": {
       "title": "地下城查找器",
@@ -2331,6 +2393,11 @@ export const zh_CN: EnTranslations = {
       "broadcastsLabel": "与公会和好友分享功绩达成",
       "titledName": "{name}【{title}】"
     }
+  },
+  "gatherEvent": {
+    "pristineVein": "{finder}挖到了一条纯净的矿脉！",
+    "ancientHeartwood": "{finder}砍倒了一棵远古心木！",
+    "moonlitBloom": "{finder}发现了一朵月光之花！"
   },
   "apiError": {
     "validation": {
@@ -2841,7 +2908,8 @@ export const zh_CN: EnTranslations = {
     "resourceName": {
       "rage": "怒气",
       "mana": "法力",
-      "energy": "能量"
+      "energy": "能量",
+      "focus": "Focus"
     },
     "classPage": {
       "back": "所有职业",
@@ -2905,6 +2973,8 @@ export const zh_CN: EnTranslations = {
       "blessing_of_might": "提升友方目标的攻击强度，开怪前施放正合适。",
       "divine_protection": "一道快速的守护结界，在局势吃紧时吸收伤害。",
       "raptor_strike": "一记沉重的近战挥击，用于有东西贴近你时。",
+      "hunters_mark": "Marks one priority target so you and your pet can pressure it harder.",
+      "disengage": "Leaps backwards to quickly open space when an enemy gets too close.",
       "aspect_of_the_hawk": "持续保持的姿态，强化你的远程攻击强度。",
       "serpent_sting": "施加一道毒液，随时间造成自然流血伤害。",
       "arcane_shot": "一次远程的瞬发射击，迅速打出额外伤害。",
@@ -3383,13 +3453,13 @@ export const zh_CN: EnTranslations = {
       "craftHowTitle": "制作窗口",
       "craftHowBody": "打开制作窗口（默认按键 T），即可查看你已知的每个配方、各自所需的材料，以及你手头现有的材料；材料齐备时，点击一下即可完成制作。普通配方可以在世界的任何地方制作。少数进阶配方，包括高阶工具和稀有的施法者护甲，则要求你站在高守哨站的制作枢纽处。",
       "craftMasteryTitle": "技能与精通",
-      "craftMasteryBody": "成功制作会提升你在该行业的技能，而技能绝不会把某个行业的配方锁起来：只要你知道一个配方并持有它的材料，你就可以尝试制作。技能为你换来的是品质，熟练的手艺能打造出更精良的作品。唯一的例外是组合配方，它们要求你在其涉及的两门行业中都证明过自己，才会向你开放。",
+      "craftMasteryBody": "成功制作会提升你在该行业的技能，而技能绝不会把某个行业的配方锁起来：只要你知道一个配方并持有它的材料，你就可以尝试制作。每个配方产出的都是它所承诺的那件成品，而熟练的手艺偶尔能打造出一件杰作：同样的成品，做工更精，并蕴含一丝额外的力量。唯一的例外是组合配方：只有调谐到连接这两门行业的原型、并在两门行业都证明过技艺的制作者，才能使用它们。",
       "craftComboTitle": "组合配方",
       "craftComboBody": "除了单一行业自身的配方列表之外，这个轮环还支持需要同时调用两个相邻行业的组合配方，用以奖励那些在轮环上投入了相邻行业、而非只专精孤立一项的角色。制作者必须自己同时掌握这两门行业；搭档的技能无法替代其中任何一半。",
       "archetypeTitle": "十大命途",
       "archetypeIntro": "十种行业各自也代表一种命途，一种超越单纯从事该行业本身的更广阔身份。你的当前命途一次只能有一个，而非一份清单：你只承载一个命途，但如果愿意，之后可以更改。",
       "archetypeChooseTitle": "选择你的命途",
-      "archetypeChooseBody": "宣告命途将会是一个剧情时刻：一个正式接纳你进入该身份的任务。这条路仍在铺设之中，所以眼下每位角色都还带着这个尚未做出的选择行走世间，而在此期间，每种制作行业都可以推进到精良品质层级。",
+      "archetypeChooseBody": "宣告命途是一个剧情时刻：一个正式接纳你进入该身份的任务。在你宣告之前，每种行业的技能都能提升到稀有层级。一旦你选定一对行业，这两门行业便完全放开；轮盘对侧的一门行业会作为爱好留在你身边，仍能练到稀有层级；而在你保有这一身份期间，其余所有行业都停留在普通层级。",
       "archetypeSwitchTitle": "回心转意",
       "archetypeSwitchBody": "宣告也不会是一纸终身判决。按照规划，在改投新的命途之前，你需要先向旧行业完成一次可重复的赎罪，而每转换一次，下一次赎罪的代价都会更沉，因此这个选择始终有分量，而非毫无代价。与宣告本身一样，它也仍在路上。",
       "archetypeIdentityTitle": "你的命途意味着什么",
@@ -4985,7 +5055,9 @@ export const zh_CN: EnTranslations = {
     "rendererFailed": "无法启动渲染器：请尝试刷新。{error}",
     "enterTimeout": "无法进入世界。连接已超时。游戏服务器是否正在运行？",
     "connectionLost": "与服务器的连接已断开。",
-    "reconnecting": "连接已断开。正在重新连接...",
+    "reconnectingAttempt": "连接已断开。正在重新连接...（第 {attempt}/{maxAttempts} 次尝试，{seconds} 秒后重试）",
+    "reconnectingNow": "连接已断开，正在立即重新连接...（第 {attempt}/{maxAttempts} 次尝试）",
+    "slowConnection": "加载时间比平时长。请检查您的网络连接。",
     "connectionRejected": "服务器关闭了连接。",
     "realmFull": "当前服务器已满，请稍后几分钟再试。",
     "tooManyConnections": "您的网络向该服务器发起的连接过多。请关闭多余的游戏窗口，或稍后几分钟再试。",
@@ -6088,6 +6160,7 @@ export const zh_CN: EnTranslations = {
       "rarityUncommon": "优秀",
       "rarityRare": "稀有",
       "rarityEpic": "史诗",
+      "rarityLegendary": "传奇",
       "merchantStock": "商人库存",
       "stackCount": "x{count}",
       "each": "每个 {money}",
@@ -6288,7 +6361,7 @@ export const zh_CN: EnTranslations = {
       },
       "blazing_barrier": {
         "name": "炽热屏障",
-        "description": "以烈焰环绕自身，吸收 130 点伤害，持续 60 秒。（火焰）"
+        "description": "以烈焰环绕自身，吸收 {damage} 点伤害，持续 60 秒。（火焰）"
       },
       "cold_snap": {
         "name": "冬之召还",
@@ -6396,7 +6469,7 @@ export const zh_CN: EnTranslations = {
       },
       "frost_nova": {
         "name": "冰缚",
-        "description": "将附近所有敌人冻结在原地，最多持续 8 秒，并造成 {damage} 点冰霜伤害。"
+        "description": "将附近所有敌人冻结在原地，最多持续 8 秒，并造成 {damage} 点冰霜伤害。定身效果会在累计受到相当于目标最大生命值15%的伤害后解除，伤害阈值最低为20点，最高为60点。"
       },
       "arcane_explosion": {
         "name": "以太爆发",
@@ -6566,6 +6639,14 @@ export const zh_CN: EnTranslations = {
         "name": "剖膛一击",
         "description": "一次强力近战攻击，使伤害提高 {damage}。在你的下一次挥击时触发。"
       },
+      "hunters_mark": {
+        "name": "Hunter's Mark",
+        "description": "Marks an enemy for 60 sec, revealing it and increasing damage dealt by you and your pet by 5%."
+      },
+      "disengage": {
+        "name": "Disengage",
+        "description": "Leap backwards up to 15 yd, quickly creating distance from nearby enemies."
+      },
       "aspect_of_the_hawk": {
         "name": "鹞鹰之姿",
         "description": "化为鹞鹰之姿，使攻击强度提高 {buff}，持续 30 分钟。"
@@ -6578,9 +6659,17 @@ export const zh_CN: EnTranslations = {
         "name": "凶邪射击",
         "description": "瞬发射击，造成 {damage} 点奥术伤害。"
       },
+      "exhilaration": {
+        "name": "Exhilaration",
+        "description": "Instantly restores 30% of your maximum health."
+      },
       "concussive_shot": {
         "name": "震颤射击",
         "description": "使目标眩晕迟缓，造成 {damage} 点伤害，并使移动速度降低 50%，持续 4 秒。"
+      },
+      "freezing_trap": {
+        "name": "Freezing Trap",
+        "description": "Places a trap that incapacitates the first enemy to trigger it for 60 sec. Damage breaks the effect."
       },
       "mongoose_bite": {
         "name": "反噬獠牙",
@@ -6594,17 +6683,49 @@ export const zh_CN: EnTranslations = {
         "name": "松貂之姿",
         "description": "化为松貂之姿，使躲闪几率提高 8%，持续 30 分钟。"
       },
+      "feign_death": {
+        "name": "Feign Death",
+        "description": "Feign death for up to 6 min, dropping enemy threat and cancelling enemy casts targeting you. Acting ends the effect."
+      },
       "aspect_of_the_cheetah": {
         "name": "骏马之姿",
         "description": "化为骏马之姿，使移动速度提高 30%，持续 30 分钟。"
+      },
+      "steady_shot": {
+        "name": "Steady Shot",
+        "description": "A moving shot that deals Physical damage and generates 20 Focus."
+      },
+      "explosive_shot": {
+        "name": "Explosive Shot",
+        "description": "Plants ammunition that explodes after 3 sec, damaging enemies within 8 yd."
+      },
+      "kill_shot": {
+        "name": "Kill Shot",
+        "description": "A ranged finishing shot usable only against enemies below 20% health."
       },
       "aimed_shot": {
         "name": "引弓长射",
         "description": "一次精心引弓的射击，造成 {damage} 点伤害。"
       },
+      "aspect_of_the_turtle": {
+        "name": "Aspect of the Turtle",
+        "description": "Reduces all damage taken by 30% for 8 sec, but prevents you from attacking while active."
+      },
       "rapid_fire": {
         "name": "狂热引弓",
         "description": "使你的攻击速度提高 40%，持续 15 秒。"
+      },
+      "multi_shot": {
+        "name": "分裂射击",
+        "description": "向目标区域射出散射箭，对8码内的敌人造成{damage}点物理伤害。（猎人天赋）"
+      },
+      "trueshot": {
+        "name": "Trueshot",
+        "description": "For 15 sec, gain 10% critical strike chance and 20% critical damage while Aimed Shot and Rapid Fire recover faster."
+      },
+      "powerful_shot": {
+        "name": "强力射击",
+        "description": "Hold to charge a narrow piercing line shot. Charging chiefly increases its damage and length; release to fire."
       },
       "smite": {
         "name": "惩击",
@@ -7293,10 +7414,6 @@ export const zh_CN: EnTranslations = {
       "mind_sear": {
         "name": "灼思",
         "description": "在目标区域引导暗影能量，每秒对附近的敌人造成{damage}点伤害。（牧师天赋）"
-      },
-      "multi_shot": {
-        "name": "分裂射击",
-        "description": "向目标区域射出散射箭，对8码内的敌人造成{damage}点物理伤害。（猎人天赋）"
       },
       "prayer_of_healing": {
         "name": "圣歌愈疗",
@@ -8142,6 +8259,18 @@ export const zh_CN: EnTranslations = {
       },
       "emberglass_warstaff": {
         "name": "烬晶战杖"
+      },
+      "copper_ore": {
+        "name": "铜矿石"
+      },
+      "iron_ore": {
+        "name": "铁矿石"
+      },
+      "ironbark_log": {
+        "name": "铁皮木原木"
+      },
+      "silverleaf_herb": {
+        "name": "银叶草"
       },
       "conjured_water4": {
         "name": "魔法泉水"
@@ -10469,6 +10598,56 @@ export const zh_CN: EnTranslations = {
         "sender": "英勇军需官",
         "subject": "你的英勇印记",
         "body": "你的部队清剿了英勇试炼，而你在后排作战，或已倒在尘土之中。你的锁定同样已经生效，因此你那一份英勇印记飞到了这里，而非就此遗失。好好使用它们。\n\n- 英勇军需官"
+      },
+      "guild_trend_engineering_alchemy": {
+        "sender": "工匠公会",
+        "subject": "关于你的工程学与炼金术",
+        "body": "工匠：\n\n你钻研工程学与炼金术的名声已传到公会：称好装药，量好试剂，两门技艺相辅相成。能同时打磨相邻两门技艺的手，正是准备好调谐的手。缔结这一对技艺的人，终会赢得爆破师之名。请到东溪镇拜访哈德伦铁匠：眼下由他代诸位大师发言。用亲手做出的成果向他证明你的技艺，他便会把这两门技艺调谐为你的主修。\n\n谨此，\n工匠公会"
+      },
+      "guild_trend_alchemy_cooking": {
+        "sender": "工匠公会",
+        "subject": "关于你的炼金术与烹饪",
+        "body": "工匠：\n\n你钻研炼金术与烹饪的名声已传到公会：熬好药剂，调好菜肴，两门技艺相辅相成。能同时打磨相邻两门技艺的手，正是准备好调谐的手。缔结这一对技艺的人，终会赢得药剂师之名。请到东溪镇拜访哈德伦铁匠：眼下由他代诸位大师发言。用亲手做出的成果向他证明你的技艺，他便会把这两门技艺调谐为你的主修。\n\n谨此，\n工匠公会"
+      },
+      "guild_trend_cooking_leatherworking": {
+        "sender": "工匠公会",
+        "subject": "关于你的烹饪与制皮",
+        "body": "工匠：\n\n你钻研烹饪与制皮的名声已传到公会：端出菜肴，鞣好皮革，两门技艺相辅相成。能同时打磨相邻两门技艺的手，正是准备好调谐的手。请到东溪镇拜访哈德伦铁匠：眼下由他代诸位大师发言。用亲手做出的成果向他证明你的技艺，他便会把这两门技艺调谐为你的主修。\n\n谨此，\n工匠公会"
+      },
+      "guild_trend_leatherworking_tailoring": {
+        "sender": "工匠公会",
+        "subject": "关于你的制皮与裁缝",
+        "body": "工匠：\n\n你钻研制皮与裁缝的名声已传到公会：裁好皮革，缝好衣料，两门技艺相辅相成。能同时打磨相邻两门技艺的手，正是准备好调谐的手。缔结这一对技艺的人，终会赢得制装师之名。请到东溪镇拜访哈德伦铁匠：眼下由他代诸位大师发言。用亲手做出的成果向他证明你的技艺，他便会把这两门技艺调谐为你的主修。\n\n谨此，\n工匠公会"
+      },
+      "guild_trend_tailoring_inscription": {
+        "sender": "工匠公会",
+        "subject": "关于你的裁缝与铭文",
+        "body": "工匠：\n\n你钻研裁缝与铭文的名声已传到公会：缝好衣线，写好铭文，两门技艺相辅相成。能同时打磨相邻两门技艺的手，正是准备好调谐的手。请到东溪镇拜访哈德伦铁匠：眼下由他代诸位大师发言。用亲手做出的成果向他证明你的技艺，他便会把这两门技艺调谐为你的主修。\n\n谨此，\n工匠公会"
+      },
+      "guild_trend_inscription_enchanting": {
+        "sender": "工匠公会",
+        "subject": "关于你的铭文与附魔",
+        "body": "工匠：\n\n你钻研铭文与附魔的名声已传到公会：写满卷轴，织入魔力，两门技艺相辅相成。能同时打磨相邻两门技艺的手，正是准备好调谐的手。请到东溪镇拜访哈德伦铁匠：眼下由他代诸位大师发言。用亲手做出的成果向他证明你的技艺，他便会把这两门技艺调谐为你的主修。\n\n谨此，\n工匠公会"
+      },
+      "guild_trend_enchanting_jewelcrafting": {
+        "sender": "工匠公会",
+        "subject": "关于你的附魔与珠宝加工",
+        "body": "工匠：\n\n你钻研附魔与珠宝加工的名声已传到公会：注入魔力，磨亮宝石，两门技艺相辅相成。能同时打磨相邻两门技艺的手，正是准备好调谐的手。请到东溪镇拜访哈德伦铁匠：眼下由他代诸位大师发言。用亲手做出的成果向他证明你的技艺，他便会把这两门技艺调谐为你的主修。\n\n谨此，\n工匠公会"
+      },
+      "guild_trend_jewelcrafting_weaponcrafting": {
+        "sender": "工匠公会",
+        "subject": "关于你的珠宝加工与武器锻造",
+        "body": "工匠：\n\n你钻研珠宝加工与武器锻造的名声已传到公会：镶好宝石，磨利刀锋，两门技艺相辅相成。能同时打磨相邻两门技艺的手，正是准备好调谐的手。请到东溪镇拜访哈德伦铁匠：眼下由他代诸位大师发言。用亲手做出的成果向他证明你的技艺，他便会把这两门技艺调谐为你的主修。\n\n谨此，\n工匠公会"
+      },
+      "guild_trend_weaponcrafting_armorcrafting": {
+        "sender": "工匠公会",
+        "subject": "关于你的武器锻造与护甲锻造",
+        "body": "工匠：\n\n你钻研武器锻造与护甲锻造的名声已传到公会：淬好刀刃，敲合甲片，两门技艺相辅相成。能同时打磨相邻两门技艺的手，正是准备好调谐的手。缔结这一对技艺的人，终会赢得铁匠之名。请到东溪镇拜访哈德伦铁匠：眼下由他代诸位大师发言。用亲手做出的成果向他证明你的技艺，他便会把这两门技艺调谐为你的主修。\n\n谨此，\n工匠公会"
+      },
+      "guild_trend_armorcrafting_engineering": {
+        "sender": "工匠公会",
+        "subject": "关于你的护甲锻造与工程学",
+        "body": "工匠：\n\n你钻研护甲锻造与工程学的名声已传到公会：铆好甲片，校准齿轮，两门技艺相辅相成。能同时打磨相邻两门技艺的手，正是准备好调谐的手。请到东溪镇拜访哈德伦铁匠：眼下由他代诸位大师发言。用亲手做出的成果向他证明你的技艺，他便会把这两门技艺调谐为你的主修。\n\n谨此，\n工匠公会"
       }
     },
     "itemSets": {

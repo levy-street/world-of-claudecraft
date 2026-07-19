@@ -12,6 +12,7 @@ function matches(aura: Aura, abilityId?: string): boolean {
 // next_attack_crit: those bill on swings, not casts.
 const EMPOWER_CAST_KINDS: ReadonlySet<string> = new Set([
   'next_cast_free',
+  'next_cast_free_instant',
   'next_execute_free',
   'next_cast_instant',
   'next_cast_cheap',
@@ -40,7 +41,9 @@ export function consumeAuraKind(
 export function hasNextCastFree(e: Entity, abilityId?: string): boolean {
   return e.auras.some(
     (aura) =>
-      (aura.kind === 'next_cast_free' || aura.kind === 'next_execute_free') &&
+      (aura.kind === 'next_cast_free' ||
+        aura.kind === 'next_cast_free_instant' ||
+        aura.kind === 'next_execute_free') &&
       matches(aura, abilityId),
   );
 }
@@ -73,7 +76,9 @@ export function freeCostAuraActive(
 ): boolean {
   for (const aura of auras) {
     if (
-      (aura.kind === 'next_cast_free' || aura.kind === 'next_execute_free') &&
+      (aura.kind === 'next_cast_free' ||
+        aura.kind === 'next_cast_free_instant' ||
+        aura.kind === 'next_execute_free') &&
       (aura.empowerAbilities === undefined || aura.empowerAbilities.includes(abilityId))
     ) {
       return true;
@@ -91,6 +96,7 @@ export function hasFreeCostFor(e: Entity, abilityId: string): boolean {
 
 export function consumeNextCastFree(ctx: SimContext, e: Entity, abilityId?: string): boolean {
   return (
+    consumeAuraKind(ctx, e, 'next_cast_free_instant', abilityId) !== null ||
     consumeAuraKind(ctx, e, 'next_cast_free', abilityId) !== null ||
     consumeAuraKind(ctx, e, 'next_execute_free', abilityId) !== null
   );
@@ -106,13 +112,19 @@ export function consumeFreeCostFor(ctx: SimContext, e: Entity, abilityId: string
 }
 
 export function consumeNextCastInstant(ctx: SimContext, e: Entity, abilityId?: string): boolean {
+  if (
+    e.auras.some(
+      (aura) => aura.kind === 'next_cast_free_instant' && matches(aura, abilityId),
+    )
+  )
+    return true;
   return consumeAuraKind(ctx, e, 'next_cast_instant', abilityId) !== null;
 }
 
 export function hasScopedNextCastInstant(e: Entity, abilityId: string): boolean {
   return e.auras.some(
     (aura) =>
-      aura.kind === 'next_cast_instant' &&
+      (aura.kind === 'next_cast_instant' || aura.kind === 'next_cast_free_instant') &&
       aura.empowerAbilities !== undefined &&
       aura.empowerAbilities.includes(abilityId),
   );

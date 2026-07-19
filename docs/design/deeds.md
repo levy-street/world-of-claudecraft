@@ -133,8 +133,8 @@ and it surfaces as Renown, never as a count.
 number shown on a ranked surface must be either recomputable by the player
 from an in-game surface or explicitly labeled with its set and scope. The
 Renown board therefore displays Renown alone: there is no deed-count column
-(the retired wire field is deprecated and tracked for removal in issue
-#2044), the account scope is stated in visible text on the tab
+and no count rides the wire (the deprecated wire-compat output was removed
+by issue #2044), the account scope is stated in visible text on the tab
 (`hudChrome.deeds.lbScopeNote`), and the self line carries the account's
 board-scored Renown so a single-character player can verify it against their
 Book. If a deed count is ever re-added to a ranked surface, it must be named

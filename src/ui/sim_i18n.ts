@@ -85,6 +85,7 @@ const baseEnTable = {
   'error.tameTooStrong': 'That beast is too strong to tame.',
   'error.tameTooHigh': 'That beast is too high level for you to tame.',
   'error.tameDungeon': 'You cannot tame dungeon creatures.',
+  'error.turtleProtected': "You can't attack while protected by Aspect of the Turtle.",
   'error.alreadyHavePet': 'You already have a pet.',
   'error.noLootPermission': "You don't have permission to loot that.",
   'error.corpseAlreadyHarvested': 'This corpse has already been harvested.',
@@ -213,6 +214,8 @@ const baseEnTable = {
   'log.mobChannels': '{name} channels {mechanic}.',
   'log.channelInterrupted': '{mechanic} is interrupted!',
   'aura.tamed': 'Tamed',
+  'aura.lockAndLoad': 'Lock and Load',
+  'aura.deathblow': 'Deathblow',
   'aura.causticSpores': 'Caustic Spores',
   'aura.elixirBear': 'Might of the Bear',
   // Shared Bloodlust / Temporal Acceleration exhaustion debuff (combat/haste_burst.ts).
@@ -5748,6 +5751,8 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   // procced by Bloodletting and Red Harvest; shown on the buff bar.
   Enraged: 'aura.enraged',
   Tamed: 'aura.tamed',
+  'Lock and Load': 'aura.lockAndLoad',
+  Deathblow: 'aura.deathblow',
   'Temporal Exhaustion': 'aura.temporalExhaustion',
   'Cauterize Fatigue': 'aura.cauterizeFatigue',
   'Might of the Bear': 'aura.elixirBear',

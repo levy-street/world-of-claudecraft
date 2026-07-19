@@ -67,7 +67,14 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase9_pa
 
 // routeHttpRequest is synchronous fire-and-forget (void apiEntry(req, res)), so a
 // dispatch must poll res.writableEnded before the captured triple is readable.
-const MAX_POLL_TICKS = 5000;
+const MAX_POLL_TICKS = 200_000;
+// The comment above assumes the dummy DATABASE_URL is unreachable so DB-touching
+// requests (the leaderboard corpus entries) reject fast. A contributor whose local
+// dev Postgres happens to be listening on the same port instead gets a REAL cold
+// boot (ensureSchema's advisory-lock DDL) plus real queries for the whole corpus,
+// which can outrun vitest's default 10s hookTimeout. Give this hook real headroom
+// so it is correct either way, not just when nothing answers on that port.
+const PARITY_HOOK_TIMEOUT_MS = 120_000;
 // The /api/perf dev gate reads process.env.ALLOW_DEV_COMMANDS per request.
 const DEV_COMMANDS_ENV = 'ALLOW_DEV_COMMANDS';
 // Content-Length header sentinel: far above the player-card byte cap, so the
@@ -367,7 +374,7 @@ beforeAll(async () => {
 
   const fixtures = API_REQUEST_CORPUS.map(specToFixture);
   report = await runParity({ oldDispatch, newDispatch, fixtures });
-});
+}, PARITY_HOOK_TIMEOUT_MS);
 
 afterAll(async () => {
   const main = (await import('../../../server/main')) as MainModule;

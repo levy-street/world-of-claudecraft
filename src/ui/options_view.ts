@@ -61,6 +61,10 @@ export interface BoolToggleControl {
   key: string;
   labelKey: TranslationKey;
   on: boolean;
+  /** Disabled controls remain visible but cannot dispatch until their dependency is met. */
+  disabled?: boolean;
+  /** Rebuild the panel after dispatch so dependent controls refresh immediately. */
+  rerender?: boolean;
 }
 
 export interface ChoiceOption {
@@ -169,7 +173,8 @@ const boolToggle = (
   s: OptionsSettingsSource,
   key: string,
   labelKey: TranslationKey,
-): BoolToggleControl => ({ control: 'boolToggle', key, labelKey, on: s.bool(key) });
+  opts: Pick<BoolToggleControl, 'disabled' | 'rerender'> = {},
+): BoolToggleControl => ({ control: 'boolToggle', key, labelKey, on: s.bool(key), ...opts });
 
 const choice = (
   s: OptionsSettingsSource,
@@ -417,7 +422,12 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     boolToggle(s, 'mouseoverCast', 'hudChrome.options.mouseoverCast'),
     boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame'),
     boolToggle(s, 'showItemLevel', 'hudChrome.options.showItemLevel'),
-    boolToggle(s, 'showSecondaryActionBar', 'hudChrome.options.showSecondaryActionBar'),
+    boolToggle(s, 'showSecondaryActionBar', 'hudChrome.options.showSecondaryActionBar', {
+      rerender: true,
+    }),
+    boolToggle(s, 'showThirdActionBar', 'hudChrome.options.showThirdActionBar', {
+      disabled: !s.bool('showSecondaryActionBar'),
+    }),
     boolToggle(s, 'showTargetOfTarget', 'hudChrome.options.showTargetOfTarget'),
     boolToggle(s, 'showAttackButton', 'hudChrome.options.showAttackButton'),
     boolToggle(s, 'showDailyRewardsChest', 'hudChrome.options.showDailyRewardsChest'),

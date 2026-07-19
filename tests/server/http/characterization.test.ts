@@ -32,7 +32,12 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase3';
 
 // routeHttpRequest is synchronous fire-and-forget (void handleApi(...)), so the
 // dispatcher must poll res.writableEnded before the captured triple is readable.
-const MAX_POLL_TICKS = 5000;
+const MAX_POLL_TICKS = 200_000;
+// See the matching comment in parity.test.ts: a local dev Postgres reachable on
+// the dummy DATABASE_URL's port turns the leaderboard cases' DB reads (and this
+// suite's cold ensureSchema boot) into real work that can exceed vitest's
+// default 10s hookTimeout.
+const BEFORE_ALL_HOOK_TIMEOUT_MS = 60_000;
 // Where this surface's goldens live: tests/server/fixtures/main/.
 const FIXTURE_DIR = `${__dirname}/../fixtures/main`;
 
@@ -84,7 +89,7 @@ beforeAll(async () => {
   // legacy characterization it has always been, immune to the default flip.
   main.setApiDispatchModeForTests('legacy');
   dispatch = await loadDispatch();
-});
+}, BEFORE_ALL_HOOK_TIMEOUT_MS);
 
 afterAll(() => {
   for (const key of DISCORD_ENV_KEYS) {
@@ -182,47 +187,82 @@ describe('main /api characterization: GitHub releases proxy (network stubbed to 
 });
 
 describe('main /api characterization: leaderboard payload shapes (empty cache)', () => {
-  it('GET /api/leaderboard default paged board', async () => {
-    await characterize('leaderboard_default', makeReq({ method: 'GET', url: '/api/leaderboard' }));
-  });
+  // Unlike the rest of this file's contract paths, the leaderboard board reads
+  // (getLeaderboard/getGuildLeaderboard/getDeedsLeaderboard) genuinely await the
+  // db pool before falling back to an empty page. A dummy DATABASE_URL that
+  // nothing answers on rejects fast, but a contributor whose local dev Postgres
+  // happens to be reachable on that same port pays a real query round trip;
+  // give these three real headroom above vitest's 5s default.
+  const LEADERBOARD_TEST_TIMEOUT_MS = 30_000;
 
-  it('GET /api/leaderboard?board=guilds guild board', async () => {
-    await characterize(
-      'leaderboard_guilds',
-      makeReq({ method: 'GET', url: '/api/leaderboard?board=guilds' }),
-    );
-  });
+  it(
+    'GET /api/leaderboard default paged board',
+    async () => {
+      await characterize(
+        'leaderboard_default',
+        makeReq({ method: 'GET', url: '/api/leaderboard' }),
+      );
+    },
+    LEADERBOARD_TEST_TIMEOUT_MS,
+  );
 
-  it('GET /api/leaderboard?board=deeds Renown board (anonymous, empty cache)', async () => {
-    // The account-level Renown board: fixed scope 'global', metric 'renown',
-    // no self row for an anonymous caller. The pool-less refresh serves the
-    // deterministic empty page, like the other board fixtures.
-    await characterize(
-      'leaderboard_deeds',
-      makeReq({ method: 'GET', url: '/api/leaderboard?board=deeds' }),
-    );
-  });
+  it(
+    'GET /api/leaderboard?board=guilds guild board',
+    async () => {
+      await characterize(
+        'leaderboard_guilds',
+        makeReq({ method: 'GET', url: '/api/leaderboard?board=guilds' }),
+      );
+    },
+    LEADERBOARD_TEST_TIMEOUT_MS,
+  );
 
-  it('GET /api/leaderboard?scope=global global scope', async () => {
-    await characterize(
-      'leaderboard_scope_global',
-      makeReq({ method: 'GET', url: '/api/leaderboard?scope=global' }),
-    );
-  });
+  it(
+    'GET /api/leaderboard?board=deeds Renown board (anonymous, empty cache)',
+    async () => {
+      // The account-level Renown board: fixed scope 'global', metric 'renown',
+      // no self row for an anonymous caller. The pool-less refresh serves the
+      // deterministic empty page, like the other board fixtures.
+      await characterize(
+        'leaderboard_deeds',
+        makeReq({ method: 'GET', url: '/api/leaderboard?board=deeds' }),
+      );
+    },
+    LEADERBOARD_TEST_TIMEOUT_MS,
+  );
 
-  it('GET /api/leaderboard?scope=realm realm scope', async () => {
-    await characterize(
-      'leaderboard_scope_realm',
-      makeReq({ method: 'GET', url: '/api/leaderboard?scope=realm' }),
-    );
-  });
+  it(
+    'GET /api/leaderboard?scope=global global scope',
+    async () => {
+      await characterize(
+        'leaderboard_scope_global',
+        makeReq({ method: 'GET', url: '/api/leaderboard?scope=global' }),
+      );
+    },
+    LEADERBOARD_TEST_TIMEOUT_MS,
+  );
 
-  it('GET /api/leaderboard?limit=5 legacy single-page board', async () => {
-    await characterize(
-      'leaderboard_limit5',
-      makeReq({ method: 'GET', url: '/api/leaderboard?limit=5' }),
-    );
-  });
+  it(
+    'GET /api/leaderboard?scope=realm realm scope',
+    async () => {
+      await characterize(
+        'leaderboard_scope_realm',
+        makeReq({ method: 'GET', url: '/api/leaderboard?scope=realm' }),
+      );
+    },
+    LEADERBOARD_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'GET /api/leaderboard?limit=5 legacy single-page board',
+    async () => {
+      await characterize(
+        'leaderboard_limit5',
+        makeReq({ method: 'GET', url: '/api/leaderboard?limit=5' }),
+      );
+    },
+    LEADERBOARD_TEST_TIMEOUT_MS,
+  );
 });
 
 describe('main /api characterization: binary request class (player card)', () => {

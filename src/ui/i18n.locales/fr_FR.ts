@@ -3847,7 +3847,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Lance un éclair de givre, inflige {damage} points de dégâts de Givre et ralentit le déplacement de 40%.',
   'entities.abilities.blazing_barrier.name': 'Barrière flamboyante',
   'entities.abilities.blazing_barrier.description':
-    'Vous enveloppe de flammes et absorbe 130 points de dégâts pendant 60 s. (Feu)',
+    'Vous enveloppe de flammes et absorbe {damage} points de dégâts pendant 60 s. (Feu)',
   'entities.abilities.cold_snap.name': "Rappel de l'hiver",
   'entities.abilities.cold_snap.description':
     'Met fin au temps de recharge de Pas scintillant, Voile de givre et Invisibilité supérieure. (Talent de mage)',
@@ -3898,7 +3898,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Transforme l'ennemi en crapaud pendant un maximum de {duration} s. Le crapaud erre et récupère rapidement. Tout dégât interrompt l'effet. Bêtes et humanoïdes uniquement.",
   'entities.abilities.frost_nova.name': 'Icebind',
   'entities.abilities.frost_nova.description':
-    'Gèle tous les ennemis proches sur place pendant un maximum de 8 s et inflige {damage} points de dégâts de Givre.',
+    'Gèle tous les ennemis proches sur place pendant un maximum de 8 s et inflige {damage} points de dégâts de Givre. L’immobilisation prend fin après avoir subi un total de dégâts égal à 15 % des points de vie maximum de la cible, avec un minimum de 20 et un maximum de 60 points de dégâts.',
   'entities.abilities.arcane_explosion.name': 'Aetherburst',
   'entities.abilities.arcane_explosion.description':
     "Une explosion d'énergie des Arcanes touche tous les ennemis proches pour {damage} points de dégâts des Arcanes.",
@@ -7587,7 +7587,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'download.windowsCta': 'Télécharger pour Windows',
   'download.linuxHint':
     'AppImage$1 rendez-le exécutable, puis exécutez-le. Aucune installation nécessaire.',
-  'loading.reconnecting': 'Connexion perdue. Reconnexion...',
   'guide.nav.settings': 'Paramètres et performances',
   'guide.settingsPage.advancedBody':
     'Advanced commence à partir du niveau High et débloque quatre sélecteurs supplémentaires, afin que vous puissiez passer vos images là où vous les remarquez réellement$1 détails du terrain, densité du feuillage, effets et éclairage et qualité des ombres. Comme la qualité graphique, ils s’appliquent après un rechargement.',

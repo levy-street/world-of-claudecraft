@@ -113,6 +113,8 @@ export interface PlayerMotionDeps {
   ): { def: { castWhileMoving?: boolean }; castWhileMoving?: boolean } | null;
   cancelCast(p: Entity): void;
   standUp(p: Entity): void;
+  /** Live-sim hook for states such as Feign Death that end on deliberate movement. */
+  onDeliberateMove?(p: Entity): void;
   /** Fall damage: the one rng-reachable callee. A no-op on the client. */
   dealDamage(
     source: null,
@@ -129,6 +131,17 @@ export interface PlayerMotionDeps {
 export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInput): void {
   const stepStartX = p.pos.x;
   const stepStartZ = p.pos.z;
+  if (
+    inp.forward ||
+    inp.back ||
+    inp.turnLeft ||
+    inp.turnRight ||
+    inp.strafeLeft ||
+    inp.strafeRight ||
+    inp.jump
+  ) {
+    deps.onDeliberateMove?.(p);
+  }
   // Convention: facing f points along (sin f, cos f); the camera sits behind
   // the player, so screen-right is the world vector (-cos f, sin f).
   // Turning right therefore DECREASES facing.

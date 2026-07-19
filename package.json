@@ -61,6 +61,7 @@
     "assets:items": "node scripts/convert_item_icons_webp.mjs",
     "assets:skills": "node scripts/convert_skill_icons_webp.mjs",
     "assets:deeds": "node scripts/convert_deed_icons_webp.mjs",
+    "assets:professions": "node scripts/convert_profession_icons_webp.mjs",
     "build:env": "esbuild headless/env_server.ts --bundle --platform=node --format=cjs --outfile=dist-env/env_server.cjs",
     "env": "npm run build:env && node dist-env/env_server.cjs",
     "bench": "npm run build:env && node dist-env/env_server.cjs --bench",

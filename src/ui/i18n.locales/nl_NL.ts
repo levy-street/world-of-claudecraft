@@ -2326,7 +2326,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Omhult je in vorst en verhoogt het pantser met {buff} gedurende 30 min.',
   'entities.abilities.frost_armor.name': 'Rijpmantel',
   'entities.abilities.frost_nova.description':
-    'Bevriest alle nabije vijanden ter plaatse gedurende maximaal 8 sec en brengt {damage} Vorstschade toe.',
+    'Bevriest alle nabije vijanden ter plaatse gedurende maximaal 8 sec en brengt {damage} Vorstschade toe. Het worteleffect breekt na cumulatieve schade gelijk aan 15% van de maximale gezondheid van het doelwit, met een minimum van 20 en een maximum van 60 schade.',
   'entities.abilities.frost_nova.name': 'IJsboei',
   'entities.abilities.frost_shock.description':
     'Schokt het doelwit ogenblikkelijk met vorst voor {damage} Vorstschade en vertraagt zijn beweging met 50% gedurende 8 sec.',
@@ -7098,7 +7098,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'download.windowsCta': 'Downloaden voor Windows',
   'download.linuxHint':
     'AppImage: maak het uitvoerbaar en voer het vervolgens uit. Geen installatie nodig.',
-  'loading.reconnecting': 'Verbinding verbroken. Opnieuw verbinding maken...',
   'guide.nav.settings': 'Instellingen en prestaties',
   'guide.settingsPage.advancedBody':
     'Geavanceerd begint vanaf het niveau High en ontgrendelt vier extra keuzemogelijkheden, zodat u uw frames kunt besteden waar u ze daadwerkelijk opmerkt: terreindetail, bladdichtheid, effecten en belichting en schaduwkwaliteit. Net als Grafische kwaliteit zijn ze van toepassing na een herlaadbeurt.',
@@ -8090,7 +8089,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'game.talents.rowUnlocks': 'Wordt ontgrendeld op niveau {level}',
   'entities.abilities.blazing_barrier.name': 'Vlammende barrière',
   'entities.abilities.blazing_barrier.description':
-    'Omhul jezelf met vlammen en absorbeer 130 schade gedurende 60 sec. (Vuur)',
+    'Omhul jezelf met vlammen en absorbeer {damage} schade gedurende 60 sec. (Vuur)',
   'entities.abilities.cold_snap.name': 'Roep van de winter',
   'entities.abilities.cold_snap.description':
     'Voltooit de afkoeltijd van Flitsstap, Vorstsluier en Grotere onzichtbaarheid. (magiërstalent)',
