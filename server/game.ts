@@ -149,6 +149,8 @@ import { gameMetricsCounters } from './http/game_signals';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { keepaliveSweepDelayed } from './keepalive_sweep';
+import { LimitedSupplyService } from './limited_supply';
+import { createLimitedSupplyDb, limitedSupplyCaps } from './limited_supply_db';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
 import { trackReachedLevel5 } from './meta_capi';
@@ -1200,6 +1202,10 @@ export class GameServer {
   private readonly sessionsByCharacterId = new Map<number, ClientSession>();
   private readonly accountCosmeticsByAccount = new Map<number, AccountCosmetics>();
   private readonly botDetector: BotDetector = createBotDetector();
+  // Cross-realm limited-relic serial ledger. Constructed here (field initializers
+  // run before the constructor body, so the Sim's claimLimitedSerial binding can
+  // reference it); its buffer is warmed by initLimitedSupply() at boot.
+  private readonly limitedSupply = new LimitedSupplyService(createLimitedSupplyDb(pool), REALM);
   readonly chatLog = new ChatLogger(insertChatLogs);
   // Admin-managed soft/hard word lists + escalation config. Loaded from the DB
   // at boot (loadChatFilter) and refreshed whenever an admin edits the lists.
@@ -1355,6 +1361,11 @@ export class GameServer {
       // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
       // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).
       raidResetMs: (nowMs) => nextRaidResetMs(nowMs, REALM_RESET_TIME_ZONE),
+      // Limited-supply relic mint allocator: pops a pre-leased serial from the
+      // cross-realm ledger buffer synchronously (or null -> the sim awards the
+      // fallback). The service's buffer is warmed by initLimitedSupply() before
+      // the loop starts; a claim before that returns null. See limited_supply.ts.
+      claimLimitedSerial: (itemId) => this.limitedSupply.claim(itemId),
       // Per-phase timing inside sim.tick(). The clock stays host-side (sim purity);
       // `simLapMark` is refreshed right before each sim.tick() call in the loop. The
       // probe is always passed but early-returns unless a detailed capture is active,
@@ -1807,6 +1818,19 @@ export class GameServer {
       }
       if (list.length > 0) this.send(session, { t: 'socialpos', list });
     }
+  }
+
+  // Warm the limited-relic serial buffer from the cross-realm ledger. Awaited at
+  // boot BEFORE start(), so the first relic kill finds a ready pool; a claim
+  // before this resolves simply returns null and the sim awards the fallback.
+  async initLimitedSupply(): Promise<void> {
+    await this.limitedSupply.init(limitedSupplyCaps());
+  }
+
+  // Graceful-shutdown counterpart: return this realm's unclaimed buffer serials to
+  // the cross-realm pool so a clean restart reuses them instead of orphaning them.
+  async releaseLimitedSupply(): Promise<void> {
+    await this.limitedSupply.releaseAll();
   }
 
   start(): void {
@@ -5940,6 +5964,25 @@ export class GameServer {
       const flair = this.chatFlairForPid(ev.fromPid);
       if (flair) ev.flair = flair;
     }
+    // Limited-relic mints are handled once per batch, not delivered as raw
+    // personal events: record the winner attribution on the cross-realm ledger
+    // and announce the claim realm-wide (the whole point of true scarcity is the
+    // public, permanent record). The per-session loop below skips them.
+    for (const ev of events) {
+      if (ev.type !== 'limitedMint') continue;
+      const winner = ev.pid !== undefined ? this.clients.get(ev.pid) : undefined;
+      this.limitedSupply.onMint(ev.itemId, ev.serial, {
+        characterId: winner?.characterId ?? null,
+        characterName: ev.name,
+        bossId: null,
+      });
+      // English source; the client re-localizes via server_i18n.ts and renders
+      // the [[i:...]] token as a quality-colored item link. formatNumber is a
+      // client concern, so the raw integers ship as-is and localize on render.
+      this.broadcastSystem(
+        `${ev.name} has claimed [[i:${ev.itemId}]], relic ${ev.serial} of ${ev.supply}.`,
+      );
+    }
     // ignore list: social invites from blocked senders are resolved once per
     // batch (dropped for every session and declined in the sim), not per
     // receiving session, so spectators of the target never see them either.
@@ -5963,6 +6006,10 @@ export class GameServer {
         const mine: SimEvent[] = [];
         for (const ev of events) {
           if (suppressedInvites?.has(ev)) continue;
+          // Limited-relic mints are announced realm-wide by the pre-pass above,
+          // never delivered as a raw personal event (avoids a double render for
+          // the winner, who also sees the broadcast).
+          if (ev.type === 'limitedMint') continue;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (

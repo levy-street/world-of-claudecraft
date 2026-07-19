@@ -203,6 +203,8 @@ import { configureInternalRuntime, handleInternalApi } from './internal';
 import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
 import { buildDeedsBoard, configureLeaderboardRuntime, type ReleaseEntry } from './leaderboard';
+import { configureLimitedRuntime } from './limited_routes';
+import { createLimitedSupplyDb } from './limited_supply_db';
 import { MAX_MAP_SAVE_BYTES } from './maps';
 import {
   mapDeleteCore,
@@ -2254,6 +2256,14 @@ configureDeedsRuntime({
   deedsRarity: getDeedsRarity,
 });
 
+// Inject the cross-realm relic ledger reader the public /api/limited-mints
+// handler needs but cannot pool-bind without a cycle back to db.ts. Done at
+// module load, before any request, mirroring the configure calls above.
+configureLimitedRuntime({
+  readMints: () => createLimitedSupplyDb(pool).readMints(),
+  now: () => Date.now(),
+});
+
 // Inject the main.ts runtime the ported auth handlers (server/auth_routes.ts) need
 // but cannot import without a cycle: the live IP-block gate off the GameServer, the
 // one Turnstile / native-attestation decision, and the request-metadata stamp. Done
@@ -2792,6 +2802,9 @@ export async function startServer(): Promise<http.Server> {
   const businessMetrics = registerBusinessMetrics(httpMetrics.registry);
   businessMetrics.start();
 
+  // Warm the limited-relic serial buffer from the cross-realm ledger BEFORE the
+  // loop starts, so the first relic kill mints from a ready pool.
+  await game.initLimitedSupply();
   game.start();
   server.listen(config.port, () => {
     console.log(`World of ClaudeCraft server listening on http://localhost:${config.port}`);
@@ -2811,6 +2824,9 @@ export async function startServer(): Promise<http.Server> {
     await businessMetrics.stop();
     game.stop();
     await game.saveAll('shutdown');
+    // Return this realm's unclaimed relic serial buffer to the shared pool for
+    // dense reuse on the next boot (an ungraceful crash simply orphans it).
+    await game.releaseLimitedSupply();
     await game.saveMarket();
     await game.saveMail();
     await game.endAllPlaySessions();

@@ -34,6 +34,7 @@ import { routes as discordRoutes } from '../discord';
 import { routes as githubRoutes } from '../github';
 import { routes as internalRoutes } from '../internal';
 import { routes as leaderboardRoutes } from '../leaderboard';
+import { routes as limitedRoutes } from '../limited_routes';
 import { routes as mapsRoutes } from '../maps_routes';
 import { routes as oauthRoutes } from '../oauth';
 import { routes as reportsRoutes } from '../reports';
@@ -115,6 +116,7 @@ export interface ApiRegistry {
  */
 export const apiRoutes: readonly RouteDef[] = [
   ...leaderboardRoutes,
+  ...limitedRoutes,
   ...authRoutes,
   ...appleAuthRoutes,
   ...characterRoutes,
