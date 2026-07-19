@@ -7525,7 +7525,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description':
     '向受傷的敵人投擲神聖之錘，造成{damage}點神聖傷害。只能對生命值低於20%的目標使用。（聖騎士天賦）',
   'entities.abilities.healing_stream.description':
-    '在12秒內為一個友方目標恢復120點生命值。（薩滿天賦）',
+    '在12秒內為一個友方目標恢復180點生命值。（薩滿天賦）',
   'entities.abilities.holy_wrath.description':
     '釋放神聖之力，對附近的敵人造成{damage}點傷害。（聖騎士天賦）',
   'entities.abilities.howl_of_terror.description':
@@ -7849,4 +7849,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.alchemist_verane.title': '藥坊大師',
   'entities.npcs.alchemist_verane.greeting':
     '量兩次，倒一次，{className}。藥坊裡容不得灑掉的藥劑。',
+  'entities.abilities.earth_shield.name': '石之壁壘',
+  'entities.abilities.earth_shield.description':
+    '使接下來6次直接攻擊造成的傷害降低20%。持續20秒。（薩滿天賦）',
+  'entities.abilities.elemental_demand.name': '元素號令',
+  'entities.abilities.elemental_demand.description': '號令元素攫住目標，迫使其攻擊你3秒。（戰魂）',
+  'entities.abilities.unleash_weapon.name': '元素釋放',
+  'entities.abilities.unleash_weapon.description':
+    '釋放武器附魔，造成{damage}點傷害並依附魔觸發效果：石縛提高威脅，炎印造成灼燒，霜縛造成減速。（薩滿天賦）',
 };

@@ -7256,6 +7256,14 @@ export const pt_BR: EnTranslations = {
         "name": "Terra Agarradora",
         "description": "Prende os inimigos próximos à terra, enraizando-os por 2 s. (talento de Xamã)"
       },
+      "earth_shield": {
+        "name": "Stone Aegis",
+        "description": "Reduces damage from the next 6 direct attacks by 20%. Lasts 20 sec. (Shaman talent)"
+      },
+      "elemental_demand": {
+        "name": "Elemental Demand",
+        "description": "Commands the elements to seize the target, forcing it to attack you for 3 sec. (Warspirit)"
+      },
       "evocation": {
         "name": "Poço Etéreo",
         "description": "Restaura mana rápidamente. (talento de mago)"
@@ -7295,6 +7303,10 @@ export const pt_BR: EnTranslations = {
       "inner_focus": {
         "name": "Mente Serena",
         "description": "Faz seu próximo feitiço não custar nada. Dura 60 s. (talento de Sacerdote)"
+      },
+      "unleash_weapon": {
+        "name": "Elemental Discharge",
+        "description": "Discharges your weapon imbue for {damage} damage and an effect based on the imbue: threat from Stonebound, a burn from Pyrebrand, or a slow from Rimebound. (Shaman talent)"
       },
       "innervate": {
         "name": "Seiva Vital",

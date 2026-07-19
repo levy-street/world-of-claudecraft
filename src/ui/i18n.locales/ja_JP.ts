@@ -7904,7 +7904,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description':
     '傷ついた敵に聖なるハンマーを投げ、{damage}の聖属性ダメージを与える。体力が20%未満の対象にのみ使用可能。（パラディンのタレント）',
   'entities.abilities.healing_stream.description':
-    '味方1体の体力を12秒かけて120回復する。（シャーマンのタレント）',
+    '味方1体の体力を12秒かけて180回復する。（シャーマンのタレント）',
   'entities.abilities.holy_wrath.description':
     '聖なる力を解き放ち、周囲の敵に{damage}のダメージを与える。（パラディンのタレント）',
   'entities.abilities.howl_of_terror.description':
@@ -8243,4 +8243,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.alchemist_verane.title': '薬房の主',
   'entities.npcs.alchemist_verane.greeting':
     '二度量って一度で注ぐ、{className}。薬房ではこぼした試薬に容赦はしない。',
+  'entities.abilities.earth_shield.name': '岩の守り',
+  'entities.abilities.earth_shield.description':
+    '次の6回の直接攻撃から受けるダメージを20%軽減する。20秒間持続。（シャーマンのタレント）',
+  'entities.abilities.elemental_demand.name': '元素の挑発',
+  'entities.abilities.elemental_demand.description':
+    '元素に命じて対象を引きつけ、3秒間自分を攻撃させる。（ウォースピリット）',
+  'entities.abilities.unleash_weapon.name': '元素解放',
+  'entities.abilities.unleash_weapon.description':
+    '武器の付与魔法を解放して{damage}ダメージを与え、付与魔法に応じた効果を発生させる。ストーンバウンドは脅威、パイアブランドは炎上、ライムバウンドは減速。（シャーマンのタレント）',
 };

@@ -1703,6 +1703,16 @@ const classAbilityNamesEn = {
         'Binds nearby enemies to the earth, rooting them for 2 sec. (Shaman talent)',
       ],
       [
+        'earth_shield',
+        'Stone Aegis',
+        'Reduces damage from the next 6 direct attacks by 20%. Lasts 20 sec. (Shaman talent)',
+      ],
+      [
+        'elemental_demand',
+        'Elemental Demand',
+        'Commands the elements to seize the target, forcing it to attack you for 3 sec. (Warspirit)',
+      ],
+      [
         'evocation',
         'Aetherwell',
         'Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel. (Mage talent)',
@@ -1730,7 +1740,7 @@ const classAbilityNamesEn = {
       [
         'healing_stream',
         'Springwell',
-        'Restores 120 health to a friendly target over 12 sec. (Shaman talent)',
+        'Restores 180 health to a friendly target over 12 sec. (Shaman talent)',
       ],
       [
         'holy_wrath',
@@ -1748,6 +1758,11 @@ const classAbilityNamesEn = {
         'Encases you in ice, absorbing a massive amount of damage for 8 sec. (Mage talent)',
       ],
       ['inner_focus', 'Stilled Mind', 'Makes your next spell free. Lasts 60 sec. (Priest talent)'],
+      [
+        'unleash_weapon',
+        'Elemental Discharge',
+        'Discharges your weapon imbue for {damage} damage and an effect based on the imbue: threat from Stonebound, a burn from Pyrebrand, or a slow from Rimebound. (Shaman talent)',
+      ],
       [
         'innervate',
         'Lifesap',

@@ -25,6 +25,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   weaponDamage: 'damage',
   weaponStrike: 'damage',
   directDamage: 'damage',
+  consumeAuraChargesDamage: 'damage',
   interrupt: 'other',
   dispel: 'other',
   // Silence locks the school but does not break on damage, so it never blocks the engage.
@@ -102,6 +103,7 @@ const EFFECT_CLASS: Record<AbilityEffect['type'], AutoAttackClass> = {
   absorbSpentResource: 'other',
   aoeTaunt: 'other',
   taunt: 'other',
+  unleashWeapon: 'damage',
   tamePet: 'other',
   dismissPet: 'other',
   summonPet: 'other',

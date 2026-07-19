@@ -7256,6 +7256,14 @@ export const vi_VN: EnTranslations = {
         "name": "Đất Níu Giữ",
         "description": "Trói kẻ địch ở gần xuống đất trong 2 giây. (thiên phú Shaman)"
       },
+      "earth_shield": {
+        "name": "Stone Aegis",
+        "description": "Reduces damage from the next 6 direct attacks by 20%. Lasts 20 sec. (Shaman talent)"
+      },
+      "elemental_demand": {
+        "name": "Elemental Demand",
+        "description": "Commands the elements to seize the target, forcing it to attack you for 3 sec. (Warspirit)"
+      },
       "evocation": {
         "name": "Giếng Ête",
         "description": "Restaura mana rápidamente. (thiên phú pháp sư)"
@@ -7295,6 +7303,10 @@ export const vi_VN: EnTranslations = {
       "inner_focus": {
         "name": "Tâm Trí Tĩnh",
         "description": "Khiến phép tiếp theo của bạn không tốn tài nguyên. Kéo dài 60 giây. (thiên phú Tu sĩ)"
+      },
+      "unleash_weapon": {
+        "name": "Elemental Discharge",
+        "description": "Discharges your weapon imbue for {damage} damage and an effect based on the imbue: threat from Stonebound, a burn from Pyrebrand, or a slow from Rimebound. (Shaman talent)"
       },
       "innervate": {
         "name": "Nhựa Sống",

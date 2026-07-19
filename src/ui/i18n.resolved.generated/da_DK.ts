@@ -7256,6 +7256,14 @@ export const da_DK: EnTranslations = {
         "name": "Gribende jord",
         "description": "Binder fjender i nærheden til jorden og forankrer dem i 2 sek. (shamantalent)"
       },
+      "earth_shield": {
+        "name": "Stone Aegis",
+        "description": "Reduces damage from the next 6 direct attacks by 20%. Lasts 20 sec. (Shaman talent)"
+      },
+      "elemental_demand": {
+        "name": "Elemental Demand",
+        "description": "Commands the elements to seize the target, forcing it to attack you for 3 sec. (Warspirit)"
+      },
       "evocation": {
         "name": "Æterbrønd",
         "description": "Restaura mana rápidamente. (magikertalent)"
@@ -7295,6 +7303,10 @@ export const da_DK: EnTranslations = {
       "inner_focus": {
         "name": "Stillet sind",
         "description": "Gør din næste besværgelse gratis. Varer 60 sek. (præstetalent)"
+      },
+      "unleash_weapon": {
+        "name": "Elemental Discharge",
+        "description": "Discharges your weapon imbue for {damage} damage and an effect based on the imbue: threat from Stonebound, a burn from Pyrebrand, or a slow from Rimebound. (Shaman talent)"
       },
       "innervate": {
         "name": "Livssaft",

@@ -7256,6 +7256,14 @@ export const zh_CN: EnTranslations = {
         "name": "攫握大地",
         "description": "将附近的敌人束缚于大地，使其定身2秒。（萨满天赋）"
       },
+      "earth_shield": {
+        "name": "石之壁垒",
+        "description": "使接下来6次直接攻击造成的伤害降低20%。持续20秒。（萨满天赋）"
+      },
+      "elemental_demand": {
+        "name": "元素号令",
+        "description": "号令元素攫住目标，迫使其攻击你3秒。（战魂）"
+      },
       "evocation": {
         "name": "以太之井",
         "description": "快速恢复法力。（法师天赋）"
@@ -7278,7 +7286,7 @@ export const zh_CN: EnTranslations = {
       },
       "healing_stream": {
         "name": "泉涌",
-        "description": "在12秒内为一个友方目标恢复120点生命值。（萨满天赋）"
+        "description": "在12秒内为一个友方目标恢复180点生命值。（萨满天赋）"
       },
       "holy_wrath": {
         "name": "圣徒之怒",
@@ -7295,6 +7303,10 @@ export const zh_CN: EnTranslations = {
       "inner_focus": {
         "name": "静心",
         "description": "使你的下一个法术不消耗资源。持续60秒。（牧师天赋）"
+      },
+      "unleash_weapon": {
+        "name": "元素释放",
+        "description": "释放武器附魔，造成{damage}点伤害并根据附魔触发效果：石缚提高威胁，炎印造成灼烧，霜缚造成减速。（萨满天赋）"
       },
       "innervate": {
         "name": "生命树液",

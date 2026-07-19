@@ -7256,6 +7256,14 @@ export const es: EnTranslations = {
         "name": "Tierra Prensora",
         "description": "Ata a la tierra a los enemigos cercanos y los inmoviliza durante 2 s. (talento de Chamán)"
       },
+      "earth_shield": {
+        "name": "Stone Aegis",
+        "description": "Reduces damage from the next 6 direct attacks by 20%. Lasts 20 sec. (Shaman talent)"
+      },
+      "elemental_demand": {
+        "name": "Elemental Demand",
+        "description": "Commands the elements to seize the target, forcing it to attack you for 3 sec. (Warspirit)"
+      },
       "evocation": {
         "name": "Pozo de Éter",
         "description": "Canaliza durante 6 s: cada segundo restaura 40 de maná y acumula 8 de poder con hechizos mientras canalizas. (talento de mago)"
@@ -7295,6 +7303,10 @@ export const es: EnTranslations = {
       "inner_focus": {
         "name": "Mente Serena",
         "description": "Hace que tu siguiente hechizo sea gratuito. Dura 60 s. (talento de Sacerdote)"
+      },
+      "unleash_weapon": {
+        "name": "Elemental Discharge",
+        "description": "Discharges your weapon imbue for {damage} damage and an effect based on the imbue: threat from Stonebound, a burn from Pyrebrand, or a slow from Rimebound. (Shaman talent)"
       },
       "innervate": {
         "name": "Savia Vital",

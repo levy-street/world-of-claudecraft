@@ -7256,6 +7256,14 @@ export const zh_TW: EnTranslations = {
         "name": "攫握大地",
         "description": "將附近的敵人束縛於大地，使其定身2秒。（薩滿天賦）"
       },
+      "earth_shield": {
+        "name": "石之壁壘",
+        "description": "使接下來6次直接攻擊造成的傷害降低20%。持續20秒。（薩滿天賦）"
+      },
+      "elemental_demand": {
+        "name": "元素號令",
+        "description": "號令元素攫住目標，迫使其攻擊你3秒。（戰魂）"
+      },
       "evocation": {
         "name": "乙太之井",
         "description": "快速恢復法力。（法師天賦）"
@@ -7278,7 +7286,7 @@ export const zh_TW: EnTranslations = {
       },
       "healing_stream": {
         "name": "泉湧",
-        "description": "在12秒內為一個友方目標恢復120點生命值。（薩滿天賦）"
+        "description": "在12秒內為一個友方目標恢復180點生命值。（薩滿天賦）"
       },
       "holy_wrath": {
         "name": "聖徒之怒",
@@ -7295,6 +7303,10 @@ export const zh_TW: EnTranslations = {
       "inner_focus": {
         "name": "靜心",
         "description": "使你的下一個法術不消耗資源。持續60秒。（牧師天賦）"
+      },
+      "unleash_weapon": {
+        "name": "元素釋放",
+        "description": "釋放武器附魔，造成{damage}點傷害並依附魔觸發效果：石縛提高威脅，炎印造成灼燒，霜縛造成減速。（薩滿天賦）"
       },
       "innervate": {
         "name": "生命樹液",

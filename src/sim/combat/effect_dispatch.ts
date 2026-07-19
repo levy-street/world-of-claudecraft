@@ -79,6 +79,7 @@ import {
   SHATTER_CRIT_DMG_BONUS,
 } from './frost_mage';
 import { spawnFrozenOrb } from './frozen_orb';
+import { maybeFulminationOverload } from './fulmination';
 import { glacialFrontContains } from './glacial_front';
 import { livingGroupRaidInRadius } from './group_targeting';
 import { applyGroupHaste } from './haste_burst';
@@ -91,6 +92,7 @@ import { spawnRingOfFrost } from './ring_of_frost';
 import { hasCastShield, noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
+import { runUnleashWeapon } from './unleash_weapon';
 
 export { SWEEP_MULT } from './area_echo';
 
@@ -317,6 +319,7 @@ export function runEffects(
           // Ability-scoped crit talents (ResolvedAbilityMod.critPct, e.g. the
           // Redhanded Craven Thrust mastery) ride the shared hit table.
           critBonus: mods.abilities[ability.id]?.critPct ?? 0,
+          abilityId: ability.id,
           onDealt:
             areaEcho || sweeping
               ? (amount) => {
@@ -375,6 +378,7 @@ export function runEffects(
         // abilityScalingPower picks the rating; powerScale (inside directHitBonus)
         // applies the AP scale-down. A non-scaling effect just contributes 0.
         dmg += directHitBonus(abilityScalingPower(p, ability), ability, res.castTime);
+        dmg *= res.damageMult ?? 1;
         if (eff.vsRootedMult !== undefined && rooted) dmg *= eff.vsRootedMult;
         // Ice Lance against a frozen-counting target (combat/frost_mage.ts):
         // the per-cast resolution carries its 3x; 1 for every other cast.
@@ -414,6 +418,7 @@ export function runEffects(
         if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
         const finalDamage = Math.round(dmg);
         lastDirectDamage = finalDamage;
+        const targetHpBefore = target.hp;
         ctx.dealDamage(
           p,
           target,
@@ -429,6 +434,17 @@ export function runEffects(
           false,
           ability.id,
         );
+        if (isSpell && target.hp < targetHpBefore) {
+          maybeFulminationOverload(
+            ctx,
+            p,
+            target,
+            ability.id,
+            ability.name,
+            ability.school,
+            finalDamage,
+          );
+        }
         if (areaEcho) {
           areaEchoDealt = true;
           echoAreaDamage(ctx, p, target, finalDamage, ability.school, ability.name, threatOpts);
@@ -490,6 +506,52 @@ export function runEffects(
         // routed through this same case does not. No-op (no rng draw) unless the
         // caster wields a proc weapon with a spellDamage proc.
         if (isSpell) runWeaponProcs(ctx, p, target, 'spellDamage');
+        break;
+      }
+      case 'consumeAuraChargesDamage': {
+        if (!target || !ctx.isHostileTo(p, target)) break;
+        const auraIndex = p.auras.findIndex(
+          (aura) => aura.id === eff.auraId && aura.sourceId === p.id && (aura.charges ?? 0) > 0,
+        );
+        if (auraIndex < 0) break;
+        const aura = p.auras[auraIndex];
+        const charges = aura.charges ?? 0;
+        p.auras.splice(auraIndex, 1);
+        ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+        const targets = [target];
+        if (eff.radius !== undefined) {
+          ctx.emit({
+            type: 'spellfxAt',
+            x: target.pos.x,
+            z: target.pos.z,
+            school: ability.school,
+            fx: 'nova',
+            radius: eff.radius,
+          });
+          for (const nearby of ctx.hostilesInRadius(p, target.pos, eff.radius)) {
+            if (nearby.id === target.id || !ctx.hasLineOfSight(target, nearby)) continue;
+            targets.push(nearby);
+          }
+        }
+        for (const dischargeTarget of targets) {
+          if (!ctx.isHostileTo(p, dischargeTarget)) continue;
+          ctx.dealDamage(
+            p,
+            dischargeTarget,
+            charges * eff.damagePerCharge,
+            false,
+            ability.school,
+            ability.name,
+            'hit',
+            false,
+            threatOpts,
+            true,
+            dischargeTarget.id === target.id && attackAnimationStarted,
+            false,
+            ability.id,
+            dischargeTarget.id !== target.id,
+          );
+        }
         break;
       }
       case 'finisherDamage': {
@@ -825,6 +887,11 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
+        break;
+      }
+      case 'unleashWeapon': {
+        if (!target || !ctx.isHostileTo(p, target)) break;
+        runUnleashWeapon(ctx, p, target, ability, eff.min, eff.max);
         break;
       }
       case 'judgement': {

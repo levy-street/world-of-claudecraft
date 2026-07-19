@@ -3908,7 +3908,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'ghost_wolf',
     name: 'Shadewolf',
     class: 'shaman',
-    learnLevel: 16,
+    learnLevel: 5,
     cost: 35,
     castTime: 2.0,
     cooldown: 0,
@@ -6252,6 +6252,17 @@ function scaleEffect(
         weaponMult: (eff.weaponMult ?? 1) * dmgMult,
       };
     case 'directDamage':
+      return {
+        ...eff,
+        min: Math.round(eff.min * dmgMult + flat),
+        max: Math.round(eff.max * dmgMult + flat),
+      };
+    case 'consumeAuraChargesDamage':
+      return {
+        ...eff,
+        damagePerCharge: Math.round(eff.damagePerCharge * dmgMult),
+      };
+    case 'unleashWeapon':
       return {
         ...eff,
         min: Math.round(eff.min * dmgMult + flat),

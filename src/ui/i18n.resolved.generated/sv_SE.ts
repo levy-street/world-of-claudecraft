@@ -7256,6 +7256,14 @@ export const sv_SE: EnTranslations = {
         "name": "Gripande jord",
         "description": "Binder fiender i närheten till marken och rotar dem i 2 sek. (schamantalang)"
       },
+      "earth_shield": {
+        "name": "Stone Aegis",
+        "description": "Reduces damage from the next 6 direct attacks by 20%. Lasts 20 sec. (Shaman talent)"
+      },
+      "elemental_demand": {
+        "name": "Elemental Demand",
+        "description": "Commands the elements to seize the target, forcing it to attack you for 3 sec. (Warspirit)"
+      },
       "evocation": {
         "name": "Eterbrunn",
         "description": "Restaura mana rápidamente. (magikertalang)"
@@ -7295,6 +7303,10 @@ export const sv_SE: EnTranslations = {
       "inner_focus": {
         "name": "Stillat sinne",
         "description": "Gör din nästa besvärjelse kostnadsfri. Varar i 60 sek. (prästtalang)"
+      },
+      "unleash_weapon": {
+        "name": "Elemental Discharge",
+        "description": "Discharges your weapon imbue for {damage} damage and an effect based on the imbue: threat from Stonebound, a burn from Pyrebrand, or a slow from Rimebound. (Shaman talent)"
       },
       "innervate": {
         "name": "Livssav",

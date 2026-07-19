@@ -7256,6 +7256,14 @@ export const cs_CZ: EnTranslations = {
         "name": "Svírající země",
         "description": "Připoutá blízké nepřátele k zemi a na 2 s je zakoření. (šamanský talent)"
       },
+      "earth_shield": {
+        "name": "Stone Aegis",
+        "description": "Reduces damage from the next 6 direct attacks by 20%. Lasts 20 sec. (Shaman talent)"
+      },
+      "elemental_demand": {
+        "name": "Elemental Demand",
+        "description": "Commands the elements to seize the target, forcing it to attack you for 3 sec. (Warspirit)"
+      },
       "evocation": {
         "name": "Éterická studna",
         "description": "Restaura manu rápidamente. (mágovský talent)"
@@ -7295,6 +7303,10 @@ export const cs_CZ: EnTranslations = {
       "inner_focus": {
         "name": "Ztišená mysl",
         "description": "Vaše příští kouzlo bude zdarma. Trvá 60 s. (kněžský talent)"
+      },
+      "unleash_weapon": {
+        "name": "Elemental Discharge",
+        "description": "Discharges your weapon imbue for {damage} damage and an effect based on the imbue: threat from Stonebound, a burn from Pyrebrand, or a slow from Rimebound. (Shaman talent)"
       },
       "innervate": {
         "name": "Míza života",

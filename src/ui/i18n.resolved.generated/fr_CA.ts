@@ -7256,6 +7256,14 @@ export const fr_CA: EnTranslations = {
         "name": "Terre agrippante",
         "description": "Lie les ennemis proches à la terre et les immobilise pendant 2 s. (talent de Chaman)"
       },
+      "earth_shield": {
+        "name": "Stone Aegis",
+        "description": "Reduces damage from the next 6 direct attacks by 20%. Lasts 20 sec. (Shaman talent)"
+      },
+      "elemental_demand": {
+        "name": "Elemental Demand",
+        "description": "Commands the elements to seize the target, forcing it to attack you for 3 sec. (Warspirit)"
+      },
       "evocation": {
         "name": "Puits d’éther",
         "description": "Restaura mana rápidamente. (talent de mage)"
@@ -7295,6 +7303,10 @@ export const fr_CA: EnTranslations = {
       "inner_focus": {
         "name": "Esprit apaisé",
         "description": "Votre prochain sort ne coûte rien. Dure 60 s. (talent de Prêtre)"
+      },
+      "unleash_weapon": {
+        "name": "Elemental Discharge",
+        "description": "Discharges your weapon imbue for {damage} damage and an effect based on the imbue: threat from Stonebound, a burn from Pyrebrand, or a slow from Rimebound. (Shaman talent)"
       },
       "innervate": {
         "name": "Sève vitale",

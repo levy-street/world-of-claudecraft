@@ -135,7 +135,7 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
   });
 
   it('heals from Imbued Lifeblood only while a weapon imbue is active', () => {
-    const sim = simWithRows('shaman', { 5: 'sha_r5_imbue_mastery' });
+    const sim = simWithRows('shaman', { 8: 'sha_r5_imbue_mastery' });
     const rng = sim.ctx.rng as typeof sim.ctx.rng & { chance(probability: number): boolean };
     rng.chance = () => false;
     sim.player.hp = sim.player.maxHp - 20;
@@ -145,7 +145,7 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
 
     sim.player.auras.push(aura('test_imbue', 'imbue', sim.playerId, 'nature'));
     onMeleeSwing(sim.ctx, sim.player);
-    expect(sim.player.hp).toBe(sim.player.maxHp - 12);
+    expect(sim.player.hp).toBe(sim.player.maxHp);
   });
 
   it('makes Consume mobile with Walking Hunger', () => {
@@ -296,50 +296,16 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     expect(foreign.extendedBy).toBeUndefined();
   });
 
-  it('detonates the pending next Cinder Jolt tick and preserves another caster DoT', () => {
-    const detonation = (tickTimer: number): { damage: number; foreignRemains: boolean } => {
-      const sim = simWithRows('shaman', { 14: 'sha_r14_improved_flame_shock' });
-      const target = addTarget(sim);
-      const own = {
-        ...aura('flame_shock', 'dot', sim.playerId, 'fire', 10),
-        remaining: 5,
-        duration: 12,
-        tickInterval: 3,
-        tickTimer,
-      };
-      const foreign = { ...own, sourceId: 999_999 };
-      target.auras.push(foreign, own);
-      const ability = resolved(sim, 'earth_shock');
-      const consume = ability.effects.find((effect) => effect.type === 'consumeDot');
-      if (!consume) throw new Error('missing Cinder Rupture effect');
-      const detonationOnly = { ...ability, effects: [consume] };
-      const rng = sim.ctx.rng as typeof sim.ctx.rng & {
-        chance(probability: number): boolean;
-        range(min: number, max: number): number;
-      };
-      let rngDraws = 0;
-      rng.chance = () => {
-        rngDraws++;
-        return false;
-      };
-      rng.range = (min) => {
-        rngDraws++;
-        return min;
-      };
-      const before = target.hp;
+  it('restores mana from every third Jolt with Returning Current', () => {
+    const sim = simWithRows('shaman', { 14: 'sha_r8_shock_efficiency' });
+    sim.player.resource = 0;
 
-      runResolved(sim, target, detonationOnly);
+    onCastCompleted(sim.ctx, sim.player, 'earth_shock');
+    onCastCompleted(sim.ctx, sim.player, 'flame_shock');
+    expect(sim.player.resource).toBe(0);
+    onCastCompleted(sim.ctx, sim.player, 'frost_shock');
 
-      expect(target.auras).not.toContain(own);
-      expect(rngDraws).toBe(0);
-      return {
-        damage: before - target.hp,
-        foreignRemains: target.auras.includes(foreign),
-      };
-    };
-
-    expect(detonation(1)).toEqual({ damage: 20, foreignRemains: true });
-    expect(detonation(3)).toEqual({ damage: 10, foreignRemains: true });
+    expect(sim.player.resource).toBeCloseTo(sim.player.maxResource * 0.08);
   });
 
   it('pins exact Cleansing Verdict and Voidfeast healing with correct dispel direction', () => {

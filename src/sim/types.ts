@@ -303,6 +303,11 @@ export type AuraKind =
   | 'brain_freeze'
   | 'winters_chill'
   | 'icicles'
+  // Shaman owner pass. `stormcharge` is the visible Skyrend bank.
+  // `earth_shield` spends one charge to reduce each direct incoming attack.
+  // Warspirit threat is derived from the existing Stonebound Weapon imbue.
+  | 'stormcharge'
+  | 'earth_shield'
   // Chronomancer offensive cooldown (combat/chronomancy.ts): while worn, Aether
   // Darts does not consume the caster's Arcane Charges.
   | 'perfect_moment'
@@ -1737,6 +1742,12 @@ export type AbilityEffect =
       weaponMult?: number;
     } // instant special attack (sinister strike, overpower, backstab)
   | { type: 'directDamage'; min: number; max: number; vsRootedMult?: number }
+  | {
+      type: 'consumeAuraChargesDamage';
+      auraId: string;
+      damagePerCharge: number;
+      radius?: number;
+    }
   // rageOnInterrupt: rage minted when a cast is ACTUALLY cut (Pummel's
   // incentive design), scaled like ability-granted rage; never on a whiff.
   | { type: 'interrupt'; lockout: number; rageOnInterrupt?: number }
@@ -2083,6 +2094,7 @@ export type AbilityEffect =
   | { type: 'absorbSpentResource'; mult: number; duration: number }
   | { type: 'aoeTaunt'; radius: number }
   | { type: 'taunt' } // taunt/growl: match top threat and force-attack the caster
+  | { type: 'unleashWeapon'; min: number; max: number }
   | { type: 'tamePet' } // hunter tame beast: the targeted mob becomes the caster's pet
   | { type: 'dismissPet' } // release the caster's pet back to the wild
   | { type: 'summonPet'; templateId: string } // warlock demon summon: creates/replaces a controlled pet
@@ -2704,6 +2716,9 @@ export interface Entity {
   castingAbility: string | null;
   castRemaining: number;
   castTotal: number;
+  /** Skyrend stacks captured when Arc Bolt starts so the completed cast consumes
+   *  the same bank that shortened its cast time. */
+  warspiritArcBoltStacks?: number;
   // Entity-targeted casting: the target captured at cast start for entity-targeted
   // casts (hostile and friendly) and channels. Timed casts and channel ticks resolve
   // against this id, so retargeting mid-cast/mid-channel cannot redirect the spell,

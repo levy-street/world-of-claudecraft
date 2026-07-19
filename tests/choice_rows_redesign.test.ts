@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -165,7 +166,7 @@ describe('priest redesign', () => {
 
 describe('shaman redesign', () => {
   it('Fault Line: every 3rd Arc Bolt makes the next shock free', () => {
-    const { sim, p } = rig('shaman', 20, { 5: 'sha_r5_concussion' });
+    const { sim, p } = rig('shaman', 20, { 14: 'sha_r5_concussion' });
     addTargetMob(sim, 100000, 8);
     for (let i = 0; i < 3; i++) castAndSettle(sim, 'lightning_bolt');
     expect(p.auras.some((a) => a.kind === 'next_cast_free')).toBe(true);
@@ -176,16 +177,14 @@ describe('shaman redesign', () => {
     expect(p.resource).toBe(before);
   });
 
-  it('Improved Cinder Jolt: Earthen Jolt detonates the Cinder Jolt DoT', () => {
-    const { sim } = rig('shaman', 20, {
-      8: 'sha_r8_shock_efficiency',
-      14: 'sha_r14_improved_flame_shock',
-    });
-    const mob = addTargetMob(sim, 100000, 8);
-    castAndSettle(sim, 'flame_shock', 7); // the shocks share a cooldown; wait it out
-    expect(mob.auras.some((a) => a.kind === 'dot' && a.id === 'flame_shock')).toBe(true);
-    castAndSettle(sim, 'earth_shock', 1);
-    expect(mob.auras.some((a) => a.kind === 'dot' && a.id === 'flame_shock')).toBe(false);
+  it('Returning Current: every 3rd Jolt restores 8% maximum mana', () => {
+    const { sim, p } = rig('shaman', 20, { 14: 'sha_r8_shock_efficiency' });
+    p.resource = 0;
+    onCastCompleted(sim.ctx, p, 'earth_shock');
+    onCastCompleted(sim.ctx, p, 'flame_shock');
+    expect(p.resource).toBe(0);
+    onCastCompleted(sim.ctx, p, 'frost_shock');
+    expect(p.resource).toBeCloseTo(p.maxResource * 0.08);
   });
 
   it('Weapon Fury: imbued swings shave the shock cooldowns', () => {
@@ -210,22 +209,15 @@ describe('shaman redesign', () => {
     expect(before! - after).toBeGreaterThan(0.5);
   });
 
-  it('Undertow Promise: every 3rd Mending Waters leaves an emergency heal echo', () => {
-    // The #1756 choice pass rebuilt this row off chain_heal (never obtainable)
-    // onto baseline Mending Waters: every 3rd cast stores an 80-heal echo that
-    // fires when the target drops below 35% inside its 10 sec window.
+  it('Undertow Promise: every 3rd Mending Waters restores the Shaman directly', () => {
     const { sim, p } = rig('shaman', 20, { 20: 'sha_r20_tidal_waves' });
     p.hp = 1;
-    sim.targetEntity(sim.playerId);
-    for (let i = 0; i < 3; i++) castAndSettle(sim, 'healing_wave', 5);
-    expect(p.auras.some((a) => a.id === 'sha_undertow_promise' && a.kind === 'heal_echo')).toBe(
-      true,
-    );
-    p.hp = Math.ceil(p.maxHp * 0.4);
     const before = p.hp;
-    sim.ctx.dealDamage(null, p, Math.ceil(p.maxHp * 0.1), false, 'physical', null, 'hit');
-    expect(p.hp).toBeGreaterThan(before - Math.ceil(p.maxHp * 0.1));
-    expect(p.auras.some((a) => a.id === 'sha_undertow_promise')).toBe(false);
+    onCastCompleted(sim.ctx, p, 'healing_wave');
+    onCastCompleted(sim.ctx, p, 'healing_wave');
+    expect(p.hp).toBe(before);
+    onCastCompleted(sim.ctx, p, 'healing_wave');
+    expect(p.hp).toBeGreaterThanOrEqual(before + Math.round(p.maxHp * 0.1));
   });
 });
 

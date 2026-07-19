@@ -58,6 +58,7 @@ import {
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
 import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
 import { recordDamageTaken } from './damage_history';
+import { applyEarthShield } from './earth_shield';
 import {
   cauterizeFireDamageMult,
   fireMageCauterize,
@@ -182,6 +183,12 @@ export function dealDamage(
     let ward = 0;
     for (const a of target.auras) if (a.kind === 'shield_wall') ward = Math.max(ward, a.value);
     if (ward > 0) amount = Math.round(amount * (1 - ward));
+  }
+
+  // Stone Aegis spends charges only on direct attacks from another entity.
+  // Damage-over-time ticks, reflects, and self-damage leave the bank intact.
+  if (direct && source && source.id !== target.id && amount > 0) {
+    amount = applyEarthShield(ctx, target, amount);
   }
 
   // Expose: a cracked-guard debuff amplifies the physical damage the victim

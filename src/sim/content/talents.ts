@@ -147,6 +147,10 @@ export interface GlobalModEffect {
   // a stacking burn (combat/fire_mage.ts igniteOnCrit copies the resolved
   // amount). Scales with level like every spec mastery.
   ignitionPct?: number;
+  // Warspirit off-tank posture: extra threat while Stonebound Weapon is active.
+  rockbiterThreatPct?: number;
+  // Fulmination: Arc Bolt overload chance contributed by each Thunder Ward charge.
+  fulminationOverloadPctPerCharge?: number;
 }
 
 export type ProcTrigger =
@@ -162,6 +166,13 @@ export type ProcTrigger =
   | { on: 'shieldConsumed'; ability: string }
   | { on: 'hotExpired'; ability: string }
   | { on: 'bigHitTaken'; hpFrac: number; icd: number }
+  | {
+      on: 'meleeHit';
+      abilities: string[];
+      auraKind?: AuraKind;
+      icd?: number;
+      chance?: number;
+    }
   | { on: 'meleeSwingWhile'; auraKind: string; icd?: number; chance?: number }
   | { on: 'thornsReflect'; ability: string };
 
@@ -174,7 +185,12 @@ export type ProcResponse =
       costPct?: number;
     }
   | { kind: 'cooldownRefund'; ability: string; seconds: number | 'reset' }
-  | { kind: 'resource'; amount: number; resourceType?: ResourceType }
+  | ({ kind: 'resource'; resourceType?: ResourceType } & (
+      | { amount: number; pctMax?: never }
+      | { amount?: never; pctMax: number }
+    ))
+  | { kind: 'stackAura'; aura: AuraKind; maxStacks: number; duration: number }
+  | { kind: 'addAuraCharges'; ability: string; amount: number; maxCharges: number }
   // The pct-of-max-health variants (phase-2 defensive pass) override the flat
   // number when present. Most scale with the wearer; source scaling is for
   // shields whose proc owner can differ from the protected ally.
@@ -183,6 +199,7 @@ export type ProcResponse =
       amount?: number;
       amountPctMaxHp?: number;
       amountPctSourceMaxHp?: number;
+      applyTo?: 'self';
     }
   | { kind: 'absorb'; amount?: number; amountPctMaxHp?: number; duration: number; name: string }
   | {
@@ -222,6 +239,7 @@ export interface SpecDef {
   icon: string;
   description: string;
   signature: string;
+  extraGrants?: string[];
   mastery: { name: string; description: string; effect: TalentEffect };
 }
 
@@ -526,6 +544,8 @@ function zeroGlobal(): Required<GlobalModEffect> {
     blinkCast: 0,
     convergence: 0,
     ignitionPct: 0,
+    rockbiterThreatPct: 0,
+    fulminationOverloadPctPerCharge: 0,
   };
 }
 
@@ -629,6 +649,9 @@ export function accumulateTalentEffect(
     target.blinkCast += (source.blinkCast ?? 0) * multiplier;
     target.convergence += (source.convergence ?? 0) * multiplier;
     target.ignitionPct += (source.ignitionPct ?? 0) * multiplier;
+    target.rockbiterThreatPct += (source.rockbiterThreatPct ?? 0) * multiplier;
+    target.fulminationOverloadPctPerCharge +=
+      (source.fulminationOverloadPctPerCharge ?? 0) * multiplier;
   }
   for (const ability of effect.ability ?? []) {
     const target = modifiers.abilities[ability.ability] ?? zeroAbilityMod();
@@ -691,6 +714,7 @@ export function computeTalentModifiers(
     modifiers.spec = spec.id;
     modifiers.role = spec.role;
     modifiers.grants.push({ ability: spec.signature, rank: 1 });
+    for (const ability of spec.extraGrants ?? []) modifiers.grants.push({ ability, rank: 1 });
     accumulateTalentEffect(modifiers, spec.mastery.effect, Math.min(1, Math.max(0, level) / 20));
   }
 

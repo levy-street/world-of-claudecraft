@@ -877,6 +877,7 @@ export interface ResolvedAbility {
   damagePushbackImmune?: boolean; // talent-granted immunity to damage-driven cast pushback
   charges?: number; // authored stored uses; undefined means one use
   bonusCharges?: number; // talent-added uses, kept distinct from native maxCharges
+  damageMult?: number; // per-cast output multiplier captured by a rotational proc
   /** 1-based authoritative charge stage for hold-to-charge spells. */
   empowerLevel?: number;
 }
@@ -4152,7 +4153,16 @@ export class Sim {
     let m = threatModifier(source, school);
     if (source.kind === 'player') {
       const meta = this.players.get(source.id);
-      if (meta) m *= 1 + this.playerMods(meta).global.threatPct;
+      if (meta) {
+        const global = this.playerMods(meta).global;
+        m *= 1 + global.threatPct;
+        if (
+          global.rockbiterThreatPct > 0 &&
+          source.auras.some((aura) => aura.kind === 'imbue' && aura.id === 'rockbiter_weapon')
+        ) {
+          m *= 1 + global.rockbiterThreatPct;
+        }
+      }
     }
     return m;
   }
@@ -5436,6 +5446,7 @@ export class Sim {
       threatMult?: number;
       forceCrit?: boolean;
       critBonus?: number;
+      abilityId?: string;
       onDealt?: (amount: number) => void;
     },
   ): boolean {

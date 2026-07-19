@@ -182,7 +182,7 @@ describe('auto_attack meleeSwing: landed talent procs resolve before retaliation
 
   it('lets Imbued Lifeblood save its owner from otherwise lethal thorns', () => {
     const { sim, p } = makeSim('shaman', 20, 1756);
-    expect(sim.applyTalents({ spec: null, rows: { 5: 'sha_r5_imbue_mastery' } })).toBe(true);
+    expect(sim.applyTalents({ spec: null, rows: { 8: 'sha_r5_imbue_mastery' } })).toBe(true);
     const mob = spawnDummy(sim, p, 1);
     addImbue(p);
     addThorns(mob, 10);

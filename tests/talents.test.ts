@@ -140,6 +140,9 @@ describe('Talents V2 registry and reachability', () => {
     for (const cls of ALL_CLASSES) {
       for (const spec of requiredTalents(cls).specs) {
         expect(ABILITIES[spec.signature], `${cls}:${spec.id}:${spec.signature}`).toBeTruthy();
+        for (const abilityId of spec.extraGrants ?? []) {
+          expect(ABILITIES[abilityId], `${cls}:${spec.id}:${abilityId}`).toBeTruthy();
+        }
       }
       for (const row of requiredTree(cls)) {
         for (const option of row.options) {

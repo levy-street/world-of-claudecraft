@@ -53,6 +53,21 @@ describe('spec masteries', () => {
         { ability: 'chain_heal', costPct: -0.2 },
         { ability: 'healing_wave', costPct: -0.2 },
       ],
+      proc: {
+        id: 'sha_cleansing_tides',
+        name: 'Cleansing Tides',
+        school: 'nature',
+        trigger: { on: 'castNth', n: 1, abilities: ['chain_heal'] },
+        responses: [
+          {
+            kind: 'empowerNext',
+            aura: 'next_cast_cheap',
+            abilities: ['healing_wave'],
+            duration: 8,
+            costPct: 0.5,
+          },
+        ],
+      },
     });
     expect(TALENTS.warlock?.specs.find((s) => s.id === 'affliction')?.mastery.effect).toEqual({
       global: { dotDmgPct: 0.2 },
@@ -134,7 +149,15 @@ describe('spec masteries', () => {
       global: { dotDmgPct: 0.15, spellDmgPct: 0.1 },
     });
     expect(TALENTS.shaman?.specs.find((s) => s.id === 'enhancement')?.mastery.effect).toEqual({
-      global: { meleeHastePct: 0.1, meleeDmgPct: 0.1 },
+      stats: { maxHpPct: 0.1, armorPct: 0.2 },
+      global: { meleeHastePct: 0.1, meleeDmgPct: 0.1, rockbiterThreatPct: 1 },
+      proc: {
+        id: 'sha_skyrend',
+        name: 'Skyrend',
+        school: 'nature',
+        trigger: { on: 'meleeHit', abilities: ['auto_attack', 'stormstrike'] },
+        responses: [{ kind: 'stackAura', aura: 'stormcharge', maxStacks: 5, duration: 30 }],
+      },
     });
     expect(TALENTS.druid?.specs.find((s) => s.id === 'balance')?.mastery.effect).toEqual({
       global: { spellDmgPct: 0.15, spellHastePct: 0.1 },

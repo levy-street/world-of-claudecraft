@@ -7525,7 +7525,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hammer_of_wrath.description':
     '向受伤的敌人投掷神圣之锤，造成{damage}点神圣伤害。只能对生命值低于20%的目标使用。（圣骑士天赋）',
   'entities.abilities.healing_stream.description':
-    '在12秒内为一个友方目标恢复120点生命值。（萨满天赋）',
+    '在12秒内为一个友方目标恢复180点生命值。（萨满天赋）',
   'entities.abilities.holy_wrath.description':
     '释放神圣之力，对附近的敌人造成{damage}点伤害。（圣骑士天赋）',
   'entities.abilities.howl_of_terror.description':
@@ -7848,4 +7848,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.alchemist_verane.title': '药坊大师',
   'entities.npcs.alchemist_verane.greeting':
     '量两次，倒一次，{className}。药坊里容不得洒掉的药剂。',
+  'entities.abilities.earth_shield.name': '石之壁垒',
+  'entities.abilities.earth_shield.description':
+    '使接下来6次直接攻击造成的伤害降低20%。持续20秒。（萨满天赋）',
+  'entities.abilities.elemental_demand.name': '元素号令',
+  'entities.abilities.elemental_demand.description': '号令元素攫住目标，迫使其攻击你3秒。（战魂）',
+  'entities.abilities.unleash_weapon.name': '元素释放',
+  'entities.abilities.unleash_weapon.description':
+    '释放武器附魔，造成{damage}点伤害并根据附魔触发效果：石缚提高威胁，炎印造成灼烧，霜缚造成减速。（萨满天赋）',
 };

@@ -82,6 +82,8 @@ type DisplayGlobalKey = Exclude<
   | 'ignitionPct'
   | 'manaPct'
   | 'manaRegenPct'
+  | 'rockbiterThreatPct'
+  | 'fulminationOverloadPctPerCharge'
 >;
 
 const NON_DISPLAY_GLOBALS = new Set<GlobalKey>([
@@ -108,6 +110,8 @@ const NON_DISPLAY_GLOBALS = new Set<GlobalKey>([
   'ignitionPct',
   'manaPct',
   'manaRegenPct',
+  'rockbiterThreatPct',
+  'fulminationOverloadPctPerCharge',
 ]);
 
 export interface TalentLocaleText {
@@ -8903,6 +8907,53 @@ const titleOverrides: Partial<Record<SupportedLanguage, Record<string, string>>>
   },
 };
 
+const SHAMAN_OWNER_TITLE_OVERRIDES: Record<string, Partial<Record<SupportedLanguage, string>>> = {
+  Fulmination: {
+    es: 'Fulminación',
+    es_ES: 'Fulminación',
+    fr_FR: 'Fulguration',
+    fr_CA: 'Fulguration',
+    it_IT: 'Fulminazione',
+    de_DE: 'Blitzentladung',
+    zh_CN: '雷霆爆发',
+    zh_TW: '雷霆爆發',
+    ko_KR: '번개 폭발',
+    ja_JP: '雷撃爆発',
+    pt_BR: 'Fulminação',
+    ru_RU: 'Грозовой разряд',
+    cs_CZ: 'Bleskový výboj',
+    nl_NL: 'Bliksemontlading',
+    pl_PL: 'Wyładowanie',
+    id_ID: 'Ledakan Petir',
+    tr_TR: 'Yıldırım Boşalması',
+    sv_SE: 'Blixturladdning',
+    vi_VN: 'Bùng Nổ Sấm Sét',
+    da_DK: 'Lynudladning',
+  },
+  'Stonewake Shell': {
+    es: 'Caparazón pétreo',
+    es_ES: 'Caparazón pétreo',
+    fr_FR: 'Carapace de pierre',
+    fr_CA: 'Carapace de pierre',
+    it_IT: 'Guscio di pietra',
+    de_DE: 'Steinerne Hülle',
+    zh_CN: '石醒护壳',
+    zh_TW: '石醒護殼',
+    ko_KR: '깨어난 돌껍질',
+    ja_JP: '目覚めの岩殻',
+    pt_BR: 'Carapaça pétrea',
+    ru_RU: 'Каменный панцирь',
+    cs_CZ: 'Kamenný krunýř',
+    nl_NL: 'Steenhuid',
+    pl_PL: 'Kamienna skorupa',
+    id_ID: 'Cangkang Batu',
+    tr_TR: 'Taş Kabuk',
+    sv_SE: 'Stenskal',
+    vi_VN: 'Vỏ Đá Thức Tỉnh',
+    da_DK: 'Stenskal',
+  },
+};
+
 function talentClassData(): ClassTalents[] {
   return Object.values(TALENTS).filter((ct): ct is ClassTalents => ct !== undefined);
 }
@@ -8937,6 +8988,8 @@ function translateTitle(source: string, lang: SupportedLanguage): string {
   }
   const retained = RETAINED_ROW_TITLE_OVERRIDES[lang]?.[source];
   if (retained !== undefined) return retained;
+  const shamanOwnerOverride = SHAMAN_OWNER_TITLE_OVERRIDES[source]?.[lang];
+  if (shamanOwnerOverride !== undefined) return shamanOwnerOverride;
   const override = titleOverrides[lang]?.[source];
   if (override !== undefined) return override;
   // Every shipped talent name has an explicit override (enforced by tests) or is an
@@ -8979,9 +9032,15 @@ export function grantAbilityValues(id: string): InterpolationValues {
   const values: Record<string, string> = {};
   const chain = effects.find((effect) => effect.type === 'chainDamage');
   const direct = effects.find((effect) =>
-    ['directDamage', 'aoeDamage', 'heal', 'aoeHeal', 'drainTick', 'groundAoE'].includes(
-      effect.type,
-    ),
+    [
+      'directDamage',
+      'aoeDamage',
+      'heal',
+      'aoeHeal',
+      'drainTick',
+      'groundAoE',
+      'unleashWeapon',
+    ].includes(effect.type),
   );
   const ground = effects.find((effect) => effect.type === 'groundAoE');
   const absorb = effects.find((effect) => effect.type === 'absorb');
@@ -9132,6 +9191,8 @@ function procTriggerDescription(
       return `${abilityName(trigger.ability)}: 0 s`;
     case 'bigHitTaken':
       return `>= ${formatPercent(trigger.hpFrac, lang)} ${text.statLabels.maxHpPct} (${seconds(trigger.icd, lang)} ${text.statLabels.cooldown})`;
+    case 'meleeHit':
+      return `${text.statLabels.meleeDmgPct}: ${abilityList(trigger.abilities)}`;
     case 'meleeSwingWhile':
       return `${text.statLabels.meleeDmgPct} @ ${t('hudChrome.auraEffect.imbue')}`;
     case 'thornsReflect':
@@ -9157,7 +9218,15 @@ function procResponseDescription(
     case 'cooldownRefund':
       return `${abilityName(response.ability)}: -${response.seconds === 'reset' ? formatPercent(1, lang) : seconds(response.seconds, lang)} ${text.statLabels.cooldown}`;
     case 'resource':
-      return `+${formatNumber(response.amount, lang)} ${t('classDetails.labels.resource')}`;
+      return `+${
+        response.amount !== undefined
+          ? formatNumber(response.amount, lang)
+          : formatPercent(response.pctMax, lang)
+      } ${t('classDetails.labels.resource')}`;
+    case 'stackAura':
+      return `x${formatNumber(response.maxStacks, lang)} (${seconds(response.duration, lang)})`;
+    case 'addAuraCharges':
+      return `${abilityName(response.ability)}: +${formatNumber(response.amount, lang)}`;
     case 'heal': {
       const healValue =
         response.amountPctSourceMaxHp !== undefined
@@ -9203,7 +9272,16 @@ function procDescription(proc: ProcDef, lang: SupportedLanguage, text: TalentLoc
 type DescribedAddedEffect = Extract<
   AbilityEffect,
   {
-    type: 'root' | 'aoeRoot' | 'slow' | 'absorb' | 'dot' | 'extendDot' | 'interrupt' | 'consumeDot';
+    type:
+      | 'root'
+      | 'aoeRoot'
+      | 'slow'
+      | 'absorb'
+      | 'dot'
+      | 'extendDot'
+      | 'interrupt'
+      | 'consumeDot'
+      | 'consumeAuraChargesDamage';
   }
 >;
 
@@ -9216,7 +9294,8 @@ function assertDescribedAddedEffect(effect: AbilityEffect): asserts effect is De
     effect.type !== 'dot' &&
     effect.type !== 'extendDot' &&
     effect.type !== 'interrupt' &&
-    effect.type !== 'consumeDot'
+    effect.type !== 'consumeDot' &&
+    effect.type !== 'consumeAuraChargesDamage'
   ) {
     throw new Error(`Unsupported talent rider effect: ${effect.type}`);
   }
@@ -9251,6 +9330,8 @@ function addedEffectDescription(
       return `${name}: ${t('hudChrome.auraEffect.lockout')} (${seconds(effect.lockout, lang)}).`;
     case 'consumeDot':
       return `${name} -> ${abilityName(effect.dot)}: ${formatPercent(1, lang)} ${text.statLabels.damage} / 0 s.`;
+    case 'consumeAuraChargesDamage':
+      return `${name} -> ${abilityName(effect.auraId)}: ${formatNumber(effect.damagePerCharge, lang)} ${text.statLabels.damage} x charge${effect.radius === undefined ? '' : ` (r=${formatNumber(effect.radius, lang)})`}.`;
   }
 }
 
@@ -9262,6 +9343,7 @@ export function hasTalentTitleOverride(lang: SupportedLanguage, source: string):
   return (
     RETAINED_ROW_TITLE_OVERRIDES[lang]?.[source] !== undefined ||
     grantAbilityIdByTitle.has(source) ||
+    SHAMAN_OWNER_TITLE_OVERRIDES[source]?.[lang] !== undefined ||
     titleOverrides[lang]?.[source] !== undefined
   );
 }
