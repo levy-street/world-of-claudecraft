@@ -30,10 +30,11 @@ const POINT_AMBIENCE_GAIN = 0.18;
 // after conform (a percussive hammer-strike signal has little headroom under
 // the true-peak safety floor, so the per-key gain-map ceiling can't boost it
 // meaningfully); compensate with its own mix target instead of raising
-// POINT_AMBIENCE_GAIN, which would also make every campfire louder. 0.75 is
-// an unusually high point-ambience gain (still ~4dB of true-peak headroom
-// left at this file's -1.6 dBTP), reflecting how quiet the source take is.
-const FORGE_AMBIENCE_GAIN = 0.75;
+// POINT_AMBIENCE_GAIN, which would also make every campfire louder. 1.0 is
+// unity, the maximum this lever allows: zero attenuation, playing the source
+// at exactly its own conform-verified peak-safe level (-1.6 dBTP). There is
+// no more headroom to give past this without re-mastering the source hotter.
+const FORGE_AMBIENCE_GAIN = 1.0;
 const FOOTSTEP_CUES: Partial<Record<string, string>> = {
   grass: 'foot_grass',
   dirt: 'foot_dirt',
