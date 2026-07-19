@@ -55,6 +55,9 @@ describe('Card Duel audio event wiring', () => {
       (e): e is Extract<SimEvent, { type: 'cardPlayed' }> => e.type === 'cardPlayed',
     );
     expect(played).toEqual([{ type: 'cardPlayed', pid: a }]);
+    // cardRoundResolved carries both sides' card values, so it must NOT leak
+    // until the opponent has played too; a single play must never emit it.
+    expect(drained.some((e) => e.type === 'cardRoundResolved')).toBe(false);
   });
 
   it('emits a correctly-scored cardRoundResolved for both sides when a round resolves', () => {

@@ -41,7 +41,10 @@ describe('Card Duel audio wiring in hud.ts', () => {
 
   it('reuses duelEnd for a match win and arenaLoss for a match loss, not new recordings', () => {
     const body = caseBody('cardDuelMatchEnd');
-    expect(body).toContain('audio.duelEnd();');
-    expect(body).toContain('audio.arenaLoss();');
+    // Pin the branch direction itself, not just that both cues appear
+    // somewhere in the case: a swapped if (ev.won) would still pass a bare
+    // toContain check on both lines.
+    expect(body).toContain('if (ev.won) audio.duelEnd();');
+    expect(body).toContain('else audio.arenaLoss();');
   });
 });
