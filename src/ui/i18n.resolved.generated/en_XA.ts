@@ -1242,6 +1242,9 @@ export const en_XA: EnTranslations = {
       "joinChannels": "[Ţíþ: ţýþé /ĵóíñ ŵóŕļð óŕ /ĵóíñ ļƒĝ ţó çĥáţ ŵíţĥ þļáýéŕš áçŕóšš ţĥé ŵóŕļð.]"
     },
     "itemHeroicTag": "[[ĤÉŔÓÍÇ]]",
+    "limitedRelicSupply": "[Ļíɱíţéð ŕéļíç: óñļý {count} ŵíļļ éʋéŕ éẋíšţ]",
+    "limitedRelicSerial": "[Ŕéļíç {serial} óƒ {supply}]",
+    "limitedRelicClaim": "[{name} ĥáš çļáíɱéð {item}, ŕéļíç {serial} óƒ {supply}.]",
     "itemSoulbound": "[Šóúļƀóúñð]",
     "itemSet": {
       "header": "[{name} ({have}/{total})]",

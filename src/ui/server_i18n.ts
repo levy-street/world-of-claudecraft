@@ -11,7 +11,14 @@
 import { CLASSES, DUNGEONS, ZONES } from '../sim/data';
 import type { PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
-import { getLanguage, type InterpolationValues, type SupportedLanguage, tPlural } from './i18n';
+import {
+  formatNumber,
+  getLanguage,
+  type InterpolationValues,
+  type SupportedLanguage,
+  t,
+  tPlural,
+} from './i18n';
 import { SERVER_NEW } from './server_i18n.newlocales';
 import { IN_GAME_MODERATION_MESSAGES } from './server_i18n_moderation';
 
@@ -1962,6 +1969,20 @@ for (const key of Object.keys(DICT.en)) {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  {
+    // Realm-wide limited-relic claim broadcast (server/game.ts routeEvents).
+    // Renders the SAME hudChrome.limitedRelicClaim key as the offline path so
+    // both hosts read identically; the [[i:id]] token is preserved verbatim so
+    // the chat renderer turns it into a quality-colored item link.
+    re: /^(.+) has claimed \[\[i:([a-z0-9_]+)\]\], relic (\d+) of (\d+)\.$/,
+    build: (m) =>
+      t('hudChrome.limitedRelicClaim', {
+        name: m[1],
+        item: `[[i:${m[2]}]]`,
+        serial: formatNumber(Number(m[3]), { maximumFractionDigits: 0 }),
+        supply: formatNumber(Number(m[4]), { maximumFractionDigits: 0 }),
+      }),
+  },
   {
     re: /^You found the guild <([^>]+)>! You are its Guild Master\.$/,
     build: (m) => tServer('guild.founded', { name: m[1] }),

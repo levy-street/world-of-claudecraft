@@ -1242,6 +1242,9 @@ export const ja_JP: EnTranslations = {
       "joinChannels": "ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。"
     },
     "itemHeroicTag": "[ヒロイック]",
+    "limitedRelicSupply": "限定遺物：世界に {count} 個のみ",
+    "limitedRelicSerial": "遺物 {serial} / {supply}",
+    "limitedRelicClaim": "{name} が {item} を手に入れた。遺物 {serial} / {supply}。",
     "itemSoulbound": "魂縛",
     "itemSet": {
       "header": "{name} ({have}/{total})",

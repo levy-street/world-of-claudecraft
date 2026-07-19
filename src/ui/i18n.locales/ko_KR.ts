@@ -706,6 +706,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterLoot.methodMaster':
     '전리품 방식이 분배 담당으로 설정되었습니다. 분배 담당자: {name}.',
   'hudChrome.masterLoot.methodGroup': '전리품 방식이 파티 분배로 설정되었습니다.',
+  'hudChrome.limitedRelicSupply': '한정 유물: 전 세계에 {count}개만 존재',
+  'hudChrome.limitedRelicSerial': '유물 {serial} / {supply}',
+  'hudChrome.limitedRelicClaim': '{name}님이 {item}을(를) 획득했습니다. 유물 {serial} / {supply}.',
   'hudChrome.masterLoot.assigned': '{looter}님이 {item}을(를) {target}에게 분배했습니다.',
   'hudChrome.masterLoot.unassigned': '{item}이(가) 분배되지 않아 모두가 획득할 수 있습니다.',
   'hudChrome.masterLoot.leaderOnly': '파티장만 전리품 방식을 변경할 수 있습니다.',

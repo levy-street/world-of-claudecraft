@@ -1242,6 +1242,9 @@ export const zh_TW: EnTranslations = {
       "joinChannels": "提示：輸入 /join world 或 /join lfg 可與全世界的玩家聊天。"
     },
     "itemHeroicTag": "[英雄]",
+    "limitedRelicSupply": "限量聖物：全世界僅有 {count} 件",
+    "limitedRelicSerial": "聖物 第 {serial} / {supply} 號",
+    "limitedRelicClaim": "{name} 獲得了 {item}，聖物 第 {serial} / {supply} 號。",
     "itemSoulbound": "靈魂綁定",
     "itemSet": {
       "header": "{name} ({have}/{total})",

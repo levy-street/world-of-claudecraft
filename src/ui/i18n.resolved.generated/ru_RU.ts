@@ -1242,6 +1242,9 @@ export const ru_RU: EnTranslations = {
       "joinChannels": "Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру."
     },
     "itemHeroicTag": "[ГЕРОИЧЕСКИЙ]",
+    "limitedRelicSupply": "Лимитная реликвия: всего {count} в мире",
+    "limitedRelicSerial": "Реликвия {serial} из {supply}",
+    "limitedRelicClaim": "{name} получает {item}, реликвия {serial} из {supply}.",
     "itemSoulbound": "Персональный",
     "itemSet": {
       "header": "{name} ({have}/{total})",

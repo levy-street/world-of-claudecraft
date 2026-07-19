@@ -1242,6 +1242,9 @@ export const ko_KR: EnTranslations = {
       "joinChannels": "팁: /join world 또는 /join lfg를 입력하면 월드 전역의 플레이어와 대화할 수 있습니다."
     },
     "itemHeroicTag": "[영웅]",
+    "limitedRelicSupply": "한정 유물: 전 세계에 {count}개만 존재",
+    "limitedRelicSerial": "유물 {serial} / {supply}",
+    "limitedRelicClaim": "{name}님이 {item}을(를) 획득했습니다. 유물 {serial} / {supply}.",
     "itemSoulbound": "귀속",
     "itemSet": {
       "header": "{name} ({have}/{total})",

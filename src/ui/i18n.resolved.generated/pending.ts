@@ -16,7 +16,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.sealed_vault_signet_crypt.name",
     "entities.items.sealed_vault_signet_sanctum.name",
     "entities.items.sealed_vault_signet_temple.name",
-    "entities.items.thunzharrs_stormheart.name"
+    "entities.items.thunzharrs_stormheart.name",
+    "hudChrome.limitedRelicClaim",
+    "hudChrome.limitedRelicSerial",
+    "hudChrome.limitedRelicSupply"
   ],
   "es_ES": [
     "entities.items.crown_of_the_thornpeak_scourge.name",
@@ -25,7 +28,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.sealed_vault_signet_crypt.name",
     "entities.items.sealed_vault_signet_sanctum.name",
     "entities.items.sealed_vault_signet_temple.name",
-    "entities.items.thunzharrs_stormheart.name"
+    "entities.items.thunzharrs_stormheart.name",
+    "hudChrome.limitedRelicClaim",
+    "hudChrome.limitedRelicSerial",
+    "hudChrome.limitedRelicSupply"
   ],
   "fr_FR": [
     "entities.items.crown_of_the_thornpeak_scourge.name",
@@ -34,7 +40,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.sealed_vault_signet_crypt.name",
     "entities.items.sealed_vault_signet_sanctum.name",
     "entities.items.sealed_vault_signet_temple.name",
-    "entities.items.thunzharrs_stormheart.name"
+    "entities.items.thunzharrs_stormheart.name",
+    "hudChrome.limitedRelicClaim",
+    "hudChrome.limitedRelicSerial",
+    "hudChrome.limitedRelicSupply"
   ],
   "fr_CA": [
     "entities.items.crown_of_the_thornpeak_scourge.name",
@@ -43,7 +52,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.sealed_vault_signet_crypt.name",
     "entities.items.sealed_vault_signet_sanctum.name",
     "entities.items.sealed_vault_signet_temple.name",
-    "entities.items.thunzharrs_stormheart.name"
+    "entities.items.thunzharrs_stormheart.name",
+    "hudChrome.limitedRelicClaim",
+    "hudChrome.limitedRelicSerial",
+    "hudChrome.limitedRelicSupply"
   ],
   "en_CA": [],
   "it_IT": [
@@ -53,7 +65,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.sealed_vault_signet_crypt.name",
     "entities.items.sealed_vault_signet_sanctum.name",
     "entities.items.sealed_vault_signet_temple.name",
-    "entities.items.thunzharrs_stormheart.name"
+    "entities.items.thunzharrs_stormheart.name",
+    "hudChrome.limitedRelicClaim",
+    "hudChrome.limitedRelicSerial",
+    "hudChrome.limitedRelicSupply"
   ],
   "de_DE": [
     "entities.items.crown_of_the_thornpeak_scourge.name",
@@ -62,7 +77,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.sealed_vault_signet_crypt.name",
     "entities.items.sealed_vault_signet_sanctum.name",
     "entities.items.sealed_vault_signet_temple.name",
-    "entities.items.thunzharrs_stormheart.name"
+    "entities.items.thunzharrs_stormheart.name",
+    "hudChrome.limitedRelicClaim",
+    "hudChrome.limitedRelicSerial",
+    "hudChrome.limitedRelicSupply"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -75,7 +93,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.sealed_vault_signet_crypt.name",
     "entities.items.sealed_vault_signet_sanctum.name",
     "entities.items.sealed_vault_signet_temple.name",
-    "entities.items.thunzharrs_stormheart.name"
+    "entities.items.thunzharrs_stormheart.name",
+    "hudChrome.limitedRelicClaim",
+    "hudChrome.limitedRelicSerial",
+    "hudChrome.limitedRelicSupply"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -85,7 +106,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.sealed_vault_signet_crypt.name",
     "entities.items.sealed_vault_signet_sanctum.name",
     "entities.items.sealed_vault_signet_temple.name",
-    "entities.items.thunzharrs_stormheart.name"
+    "entities.items.thunzharrs_stormheart.name",
+    "hudChrome.limitedRelicClaim",
+    "hudChrome.limitedRelicSerial",
+    "hudChrome.limitedRelicSupply"
   ],
   "nl_NL": [
     "entities.items.crown_of_the_thornpeak_scourge.name",
@@ -94,7 +118,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.sealed_vault_signet_crypt.name",
     "entities.items.sealed_vault_signet_sanctum.name",
     "entities.items.sealed_vault_signet_temple.name",
-    "entities.items.thunzharrs_stormheart.name"
+    "entities.items.thunzharrs_stormheart.name",
+    "hudChrome.limitedRelicClaim",
+    "hudChrome.limitedRelicSerial",
+    "hudChrome.limitedRelicSupply"
   ],
   "pl_PL": [
     "entities.items.crown_of_the_thornpeak_scourge.name",
@@ -103,7 +130,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.sealed_vault_signet_crypt.name",
     "entities.items.sealed_vault_signet_sanctum.name",
     "entities.items.sealed_vault_signet_temple.name",
-    "entities.items.thunzharrs_stormheart.name"
+    "entities.items.thunzharrs_stormheart.name",
+    "hudChrome.limitedRelicClaim",
+    "hudChrome.limitedRelicSerial",
+    "hudChrome.limitedRelicSupply"
   ],
   "id_ID": [
     "entities.items.crown_of_the_thornpeak_scourge.name",
@@ -112,7 +142,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.sealed_vault_signet_crypt.name",
     "entities.items.sealed_vault_signet_sanctum.name",
     "entities.items.sealed_vault_signet_temple.name",
-    "entities.items.thunzharrs_stormheart.name"
+    "entities.items.thunzharrs_stormheart.name",
+    "hudChrome.limitedRelicClaim",
+    "hudChrome.limitedRelicSerial",
+    "hudChrome.limitedRelicSupply"
   ],
   "tr_TR": [
     "entities.items.crown_of_the_thornpeak_scourge.name",
@@ -121,7 +154,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.sealed_vault_signet_crypt.name",
     "entities.items.sealed_vault_signet_sanctum.name",
     "entities.items.sealed_vault_signet_temple.name",
-    "entities.items.thunzharrs_stormheart.name"
+    "entities.items.thunzharrs_stormheart.name",
+    "hudChrome.limitedRelicClaim",
+    "hudChrome.limitedRelicSerial",
+    "hudChrome.limitedRelicSupply"
   ],
   "sv_SE": [
     "entities.items.crown_of_the_thornpeak_scourge.name",
@@ -130,7 +166,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.sealed_vault_signet_crypt.name",
     "entities.items.sealed_vault_signet_sanctum.name",
     "entities.items.sealed_vault_signet_temple.name",
-    "entities.items.thunzharrs_stormheart.name"
+    "entities.items.thunzharrs_stormheart.name",
+    "hudChrome.limitedRelicClaim",
+    "hudChrome.limitedRelicSerial",
+    "hudChrome.limitedRelicSupply"
   ],
   "vi_VN": [
     "entities.items.crown_of_the_thornpeak_scourge.name",
@@ -139,7 +178,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.sealed_vault_signet_crypt.name",
     "entities.items.sealed_vault_signet_sanctum.name",
     "entities.items.sealed_vault_signet_temple.name",
-    "entities.items.thunzharrs_stormheart.name"
+    "entities.items.thunzharrs_stormheart.name",
+    "hudChrome.limitedRelicClaim",
+    "hudChrome.limitedRelicSerial",
+    "hudChrome.limitedRelicSupply"
   ],
   "da_DK": [
     "entities.items.crown_of_the_thornpeak_scourge.name",
@@ -148,6 +190,9 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.sealed_vault_signet_crypt.name",
     "entities.items.sealed_vault_signet_sanctum.name",
     "entities.items.sealed_vault_signet_temple.name",
-    "entities.items.thunzharrs_stormheart.name"
+    "entities.items.thunzharrs_stormheart.name",
+    "hudChrome.limitedRelicClaim",
+    "hudChrome.limitedRelicSerial",
+    "hudChrome.limitedRelicSupply"
   ]
 };
