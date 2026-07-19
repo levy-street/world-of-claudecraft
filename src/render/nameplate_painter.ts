@@ -51,6 +51,11 @@ import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
 
 const emoteIconUrl = (id: string): string => `/ui/emotes/emote-${id}.png`;
+const STATE_CURRENT_TARGET = 1 << 0;
+const STATE_HOSTILE = 1 << 1;
+const STATE_DEAD_ENEMY = 1 << 2;
+const STATE_MY_PET = 1 << 3;
+const STATE_AGGROED_ON_ME = 1 << 4;
 
 export interface NameplatePainterDeps {
   /** the per-entity view pool the renderer owns (keyed by entity id) */
@@ -152,11 +157,13 @@ export class NameplatePainter {
       }
       const isCurrentTarget = id === p.targetId;
       const deadEnemy = e.dead && (e.hostile || (e.kind === 'player' && this.isHostilePlayer(e)));
-      v.nameplate.classList.toggle('np-current-target', isCurrentTarget);
-      v.nameplate.classList.toggle('np-hostile', e.hostile);
-      v.nameplate.classList.toggle('np-dead-enemy', deadEnemy);
-      v.nameplate.classList.toggle('np-my-pet', e.ownerId === p.id);
-      v.nameplate.classList.toggle('np-aggroed-on-me', e.aggroTargetId === p.id);
+      let stateMask = 0;
+      if (isCurrentTarget) stateMask |= STATE_CURRENT_TARGET;
+      if (e.hostile) stateMask |= STATE_HOSTILE;
+      if (deadEnemy) stateMask |= STATE_DEAD_ENEMY;
+      if (e.ownerId === p.id) stateMask |= STATE_MY_PET;
+      if (e.aggroTargetId === p.id) stateMask |= STATE_AGGROED_ON_ME;
+      this.setNameplateState(v, stateMask);
       if (!fullPass && !plan.urgent) continue;
       const isSelf = id === p.id;
       v.nameplate.classList.toggle('has-emote', plan.hasOverheadEmote);
@@ -289,7 +296,7 @@ export class NameplatePainter {
           '1',
         );
         this.setNameplateLevel(v, '', '');
-        v.nameplate.classList.remove('np-friendly-pet');
+        this.setFriendlyPetState(v, false);
       } else {
         const diff = e.level - p.level;
         const template = MOBS[e.templateId];
@@ -299,7 +306,7 @@ export class NameplatePainter {
         // classic level-difference ("con") color.
         const friendlyPet = isFriendlyPet(e, world.entities, this.isHostilePlayer);
         const color = mobNameColor(diff, e.dead, friendlyPet);
-        v.nameplate.classList.toggle('np-friendly-pet', friendlyPet);
+        this.setFriendlyPetState(v, friendlyPet);
         const mobName = e.ownerId !== null ? e.name : mobDisplayName(e.templateId);
         const levelText = e.dead
           ? ''
@@ -357,12 +364,47 @@ export class NameplatePainter {
       v.nameplate.style.display = 'none';
       v.nameplateDisplay = 'none';
     }
-    v.nameplate.classList.remove('np-current-target');
-    v.nameplate.classList.remove('np-hostile');
-    v.nameplate.classList.remove('np-dead-enemy');
-    v.nameplate.classList.remove('np-my-pet');
-    v.nameplate.classList.remove('np-aggroed-on-me');
-    v.nameplate.classList.remove('np-friendly-pet');
+    if (v.nameplateStateMask !== 0) {
+      v.nameplate.classList.remove(
+        'np-current-target',
+        'np-hostile',
+        'np-dead-enemy',
+        'np-my-pet',
+        'np-aggroed-on-me',
+      );
+      v.nameplateStateMask = 0;
+    }
+    if (v.nameplateFriendlyPet) {
+      v.nameplate.classList.remove('np-friendly-pet');
+      v.nameplateFriendlyPet = false;
+    }
+  }
+
+  private setNameplateState(v: EntityView, nextMask: number): void {
+    const changed = v.nameplateStateMask ^ nextMask;
+    if (changed === 0) return;
+    if (changed & STATE_CURRENT_TARGET) {
+      v.nameplate.classList.toggle('np-current-target', !!(nextMask & STATE_CURRENT_TARGET));
+    }
+    if (changed & STATE_HOSTILE) {
+      v.nameplate.classList.toggle('np-hostile', !!(nextMask & STATE_HOSTILE));
+    }
+    if (changed & STATE_DEAD_ENEMY) {
+      v.nameplate.classList.toggle('np-dead-enemy', !!(nextMask & STATE_DEAD_ENEMY));
+    }
+    if (changed & STATE_MY_PET) {
+      v.nameplate.classList.toggle('np-my-pet', !!(nextMask & STATE_MY_PET));
+    }
+    if (changed & STATE_AGGROED_ON_ME) {
+      v.nameplate.classList.toggle('np-aggroed-on-me', !!(nextMask & STATE_AGGROED_ON_ME));
+    }
+    v.nameplateStateMask = nextMask;
+  }
+
+  private setFriendlyPetState(v: EntityView, friendly: boolean): void {
+    if (v.nameplateFriendlyPet === friendly) return;
+    v.nameplate.classList.toggle('np-friendly-pet', friendly);
+    v.nameplateFriendlyPet = friendly;
   }
 
   private setNameplateStatic(

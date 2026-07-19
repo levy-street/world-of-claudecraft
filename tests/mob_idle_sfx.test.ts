@@ -91,10 +91,21 @@ describe('isIdleBarkCandidate', () => {
 });
 
 describe('pickIdleBarkCandidates', () => {
-  it('rolls every eligible mob independently when the rng always succeeds', () => {
+  it('caps a successful sweep at one bark attempt to avoid burst audio decoding', () => {
     const candidates = [candidate(1, 'forest_wolf'), candidate(2, 'wild_boar')];
     const picked = pickIdleBarkCandidates(candidates, 1000, new Map(), alwaysRolls);
-    expect(picked.map((c) => c.id).sort()).toEqual([1, 2]);
+    expect(picked.map((c) => c.id)).toEqual([1]);
+  });
+
+  it('selects uniformly among successful rolls instead of favoring insertion order', () => {
+    const candidates = [candidate(1, 'forest_wolf'), candidate(2, 'wild_boar')];
+    const rolls = [0, 0, 0.99];
+    const picked = pickIdleBarkCandidates(candidates, 1000, new Map(), () => {
+      const roll = rolls.shift();
+      if (roll === undefined) throw new Error('unexpected rng call');
+      return roll;
+    });
+    expect(picked.map((c) => c.id)).toEqual([2]);
   });
 
   it('picks nobody when the rng always fails', () => {

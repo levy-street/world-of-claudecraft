@@ -12,6 +12,7 @@ import { mobVoiceFamily, shouldPlayMobVoiceSfxForEntity } from './combat_sfx';
 // tuned down by ear in-game to 0.17, which felt right around both the wolf
 // camps and the ogre war-camp.
 export const MOB_IDLE_CHECK_INTERVAL_MS = 2500;
+export const MOB_IDLE_MAX_ATTEMPTS_PER_SWEEP = 1;
 export const MOB_IDLE_SCAN_RADIUS = 40;
 export const MOB_IDLE_BASE_CHANCE = 0.17;
 export const MOB_IDLE_PER_ENTITY_COOLDOWN_MS = 12_000;
@@ -62,7 +63,10 @@ export interface IdleBarkCandidate {
 
 /** Pure selection: which of `candidates` (already filtered by the caller to
  *  non-combat, in-range, non-muted, alive mobs) should attempt an idle bark
- *  this sweep. Deliberately does NOT stamp `lastBarkAt`: a mob that rolls a
+ *  this sweep. The result is deliberately capped so one HUD sweep cannot
+ *  start several cold audio fetch/decode jobs together on any device.
+ *
+ *  Deliberately does NOT stamp `lastBarkAt`: a mob that rolls a
  *  bark but loses the shared per-key playback cooldown to another mob of the
  *  same cue (see sfx.playAt's own `cooldown` option, the backstop against
  *  two mobs barking the identical clip in the same instant) must get another
@@ -83,14 +87,20 @@ export function pickIdleBarkCandidates(
     familyCounts.set(family, (familyCounts.get(family) ?? 0) + 1);
   }
 
-  const picked: IdleBarkCandidate[] = [];
+  const successful: IdleBarkCandidate[] = [];
   for (const c of candidates) {
     const family = mobVoiceFamily(c.templateId);
     if (!family) continue;
     const last = lastBarkAt.get(c.id);
     if (last !== undefined && now - last < MOB_IDLE_PER_ENTITY_COOLDOWN_MS) continue;
     const chance = MOB_IDLE_BASE_CHANCE * idleDensityFactor(familyCounts.get(family) ?? 1);
-    if (rng() < chance) picked.push(c);
+    if (rng() < chance) {
+      successful.push(c);
+    }
   }
-  return picked;
+  if (successful.length <= MOB_IDLE_MAX_ATTEMPTS_PER_SWEEP) return successful;
+  // Candidate order follows stable entity insertion order. Select uniformly
+  // among successful rolls so early-spawned mobs cannot starve later families.
+  const index = Math.min(successful.length - 1, Math.floor(rng() * successful.length));
+  return [successful[index]];
 }
