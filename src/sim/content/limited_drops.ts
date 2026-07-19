@@ -201,7 +201,9 @@ export const LIMITED_ITEM_SOURCE: Record<string, { level: number; raid: boolean 
 // relic still drops a comparable, tier-appropriate reward rather than nothing.
 export const LIMITED_FALLBACK: Record<string, string> = {
   emberfall_edge: 'deathless_greatblade', // heroic Nythraxis epic 2H weapon
-  crown_of_the_thornpeak_scourge: 'crownforged_dreadhelm', // Nythraxis raid epic helm
+  // A caster cloth helm, matching the crown's own cloth/caster audience (the
+  // mail crownforged_dreadhelm would not be a comparable consolation).
+  crown_of_the_thornpeak_scourge: 'soulflame_cowl', // Nythraxis epic caster helm
   thunzharrs_stormheart: 'nighttalon_grips', // Thunzharr agile epic glove
   sealed_vault_signet_crypt: 'morthens_cryptforged_hauberk', // Morthen heroic epic
   sealed_vault_signet_bastion: 'tidebound_spaulders', // Vael heroic epic

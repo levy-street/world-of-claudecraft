@@ -96,6 +96,14 @@ export interface LimitedSupplyDb {
   // Return this realm's still-leased buffer serials to the pool (graceful
   // shutdown), so a clean restart reuses them instead of burning them.
   releaseSerials(itemId: string, serials: number[], realm: string): Promise<void>;
+  // Release EVERY still-leased serial this realm owns, back to the pool. Run once
+  // at boot BEFORE warming the buffer: the sim world is freshly regenerated then
+  // (boss corpses never persist across a restart), so a leased row this realm
+  // owns can only be a serial that was never minted, whether it was a crashed
+  // buffer or a relic that dropped and was never looted (F1). Reclaiming them
+  // keeps the effective supply from eroding below the cap over the realm's life.
+  // Returns the number of serials reclaimed.
+  reclaimRealmLeases(realm: string): Promise<number>;
   // The public ledger snapshot: per-item counts plus every confirmed mint.
   readMints(): Promise<LimitedMintsSnapshot>;
 }
@@ -197,6 +205,16 @@ export class PgLimitedSupplyDb implements LimitedSupplyDb {
        WHERE item_id = $1 AND serial = ANY($2::int[]) AND state = 'leased' AND realm = $3`,
       [itemId, serials, realm],
     );
+  }
+
+  async reclaimRealmLeases(realm: string): Promise<number> {
+    const res = await this.pool.query(
+      `UPDATE limited_serials
+         SET state = 'released', character_id = NULL, character_name = NULL, boss_id = NULL
+       WHERE realm = $1 AND state = 'leased'`,
+      [realm],
+    );
+    return res.rowCount ?? 0;
   }
 
   async readMints(): Promise<LimitedMintsSnapshot> {

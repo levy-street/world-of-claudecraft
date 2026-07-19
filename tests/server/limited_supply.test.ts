@@ -76,6 +76,17 @@ class FakeLimitedSupplyDb implements LimitedSupplyDb {
     }
   }
 
+  async reclaimRealmLeases(realm: string): Promise<number> {
+    let n = 0;
+    for (const r of this.rows) {
+      if (r.realm === realm && r.state === 'leased') {
+        r.state = 'released';
+        n++;
+      }
+    }
+    return n;
+  }
+
   async readMints(): Promise<LimitedMintsSnapshot> {
     const supplies = [...this.supply.entries()].map(([itemId, s]) => ({
       itemId,
@@ -188,6 +199,31 @@ describe('LimitedSupplyService: mint attribution + release', () => {
     const svc2 = new LimitedSupplyService(db, 'r1', { bufferTarget: 3 });
     await svc2.init(CAPS);
     expect([svc2.claim(ITEM), svc2.claim(ITEM), svc2.claim(ITEM)].sort()).toEqual([1, 2, 3]);
+  });
+
+  it('reclaims stale leases at boot so an abandoned drop never erodes the supply (F1)', async () => {
+    const db = new FakeLimitedSupplyDb();
+    // A realm claims a serial that is dropped on a corpse but never looted (the
+    // relic is abandoned), then the process dies WITHOUT a graceful release.
+    const r1 = new LimitedSupplyService(db, 'realm-one', { bufferTarget: 1 });
+    await r1.init(CAPS);
+    r1.claim(ITEM); // popped, dropped, never minted -> orphaned 'leased' in the DB
+    await settle(); // the refill re-leases another into the buffer
+    // Crash: no releaseAll. The realm's abandoned serial plus its buffer are both
+    // left 'leased', and NONE is minted -> without a reclaim they would be lost.
+    expect(db.countByState(ITEM, 'leased')).toBeGreaterThanOrEqual(2);
+    expect(db.countByState(ITEM, 'minted')).toBe(0);
+    // The next boot reclaims every stale lease before warming, so the whole
+    // supply is mintable again: drain to exhaustion and confirm all 5 mint.
+    const r1b = new LimitedSupplyService(db, 'realm-one', { bufferTarget: 1 });
+    await r1b.init(CAPS);
+    const minted = new Set<number>();
+    for (let i = 0; i < 12; i++) {
+      const s = r1b.claim(ITEM);
+      if (s !== null) minted.add(s);
+      await settle();
+    }
+    expect([...minted].sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5]);
   });
 });
 
