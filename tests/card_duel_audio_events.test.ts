@@ -157,4 +157,20 @@ describe('Card Duel audio event wiring', () => {
     expect(ended.find((e) => e.pid === a)?.won).toBe(false);
     expect(ended.find((e) => e.pid === b)?.won).toBe(true);
   });
+
+  it('emits cardDuelMatchEnd for both sides on a void match (an early forfeit before any round is won)', () => {
+    const sim = makeWorld();
+    const { a, b } = queueDuo(sim);
+    // Forfeit immediately, before either side has won a round: this routes
+    // through voidMatch, not the winner/loser forfeit branch above. It used
+    // to end in total audio silence, indistinguishable from a no-op button.
+    sim.forfeitCardDuel(a);
+    const ended = sim
+      .tick()
+      .filter(
+        (e): e is Extract<SimEvent, { type: 'cardDuelMatchEnd' }> => e.type === 'cardDuelMatchEnd',
+      );
+    expect(ended.map((e) => e.pid).sort()).toEqual([a, b].sort());
+    expect(ended.every((e) => e.won === false)).toBe(true);
+  });
 });

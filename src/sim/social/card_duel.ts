@@ -416,6 +416,11 @@ function voidMatch(ctx: SimContext, match: CardDuelMatch): void {
       color: '#fa6',
       pid,
     });
+    // won: false for both sides is a lie in the AFK-timeout case (nobody
+    // lost either), but it is the only value the field has: a void match
+    // still needs a cue, or an early Forfeit ends the match in total
+    // silence while forfeiting a round later correctly plays arenaLoss().
+    ctx.emit({ type: 'cardDuelMatchEnd', won: false, pid });
   }
 }
 
