@@ -1,7 +1,7 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "ca80eabecd6203da0c3d1eb1532c49268e5a3d5ada14c605e4391b86025c7963",
+  "bundleId": "ea6a18ee9509e18ae5733b82a7daca80f2e8f7eb08b248a71a630200fb0eb76e",
   "catalogHash": "4b1d98a68cf3a2759583c1da903648130ef74ecce4486e324c247a1180d95b01",
   "clips": {
     "amb_birds": {
@@ -44,9 +44,9 @@
       "variants": [
         {
           "id": "main",
-          "url": "/audio/sfx/amb_forge.mp3?v=e7b1e8f8bd96",
+          "url": "/audio/sfx/amb_forge.mp3?v=b123393cfcdc",
           "bytes": 343605,
-          "sha256": "e7b1e8f8bd960a3dcbc42ea308e2aefd6eb9965e98370275ae634b559431e02e"
+          "sha256": "b123393cfcdcd82ec10950089db8fd50d064c19c037966c30989453231ee1bbd"
         }
       ],
       "gain": 1,

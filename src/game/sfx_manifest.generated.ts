@@ -89,7 +89,7 @@ export const SFX_CLIPS =
     ]
   },
   "amb_forge": {
-    "url": "/audio/sfx/amb_forge.mp3?v=e7b1e8f8bd96",
+    "url": "/audio/sfx/amb_forge.mp3?v=b123393cfcdc",
     "loop": true,
     "category": "ambience",
     "preload": "lazy",
@@ -97,13 +97,13 @@ export const SFX_CLIPS =
     "gain": 1,
     "playbackRate": 1,
     "bytes": 343605,
-    "hash": "e7b1e8f8bd96",
+    "hash": "b123393cfcdc",
     "variants": [
       {
         "id": "main",
-        "url": "/audio/sfx/amb_forge.mp3?v=e7b1e8f8bd96",
+        "url": "/audio/sfx/amb_forge.mp3?v=b123393cfcdc",
         "bytes": 343605,
-        "sha256": "e7b1e8f8bd960a3dcbc42ea308e2aefd6eb9965e98370275ae634b559431e02e"
+        "sha256": "b123393cfcdcd82ec10950089db8fd50d064c19c037966c30989453231ee1bbd"
       }
     ]
   },
