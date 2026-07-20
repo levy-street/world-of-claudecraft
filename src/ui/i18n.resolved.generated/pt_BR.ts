@@ -1684,7 +1684,8 @@ export const pt_BR: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "{family} de nível {level}",
@@ -5841,7 +5842,8 @@ export const pt_BR: EnTranslations = {
         "offline": "Offline",
         "combat": "Em combate",
         "dungeon": "Em masmorra",
-        "dead": "Morto"
+        "dead": "Morto",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {

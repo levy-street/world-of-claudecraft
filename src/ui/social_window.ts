@@ -89,6 +89,8 @@ function statusLabel(status: string | undefined): string {
       return t('hud.social.status.dungeon');
     case 'dead':
       return t('hud.social.status.dead');
+    case 'afk':
+      return t('hud.social.status.afk');
     default:
       return t('hud.social.status.online');
   }

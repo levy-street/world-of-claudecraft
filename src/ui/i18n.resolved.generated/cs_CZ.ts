@@ -1684,7 +1684,8 @@ export const cs_CZ: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "Úroveň {level} {family}",
@@ -5841,7 +5842,8 @@ export const cs_CZ: EnTranslations = {
         "offline": "Offline",
         "combat": "V boji",
         "dungeon": "V dungeonu",
-        "dead": "Mrtvý"
+        "dead": "Mrtvý",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {

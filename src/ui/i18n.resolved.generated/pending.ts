@@ -10,69 +10,114 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hud.social.status.afk",
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.nameplate.afkTag"
   ],
   "es_ES": [
+    "hud.social.status.afk",
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.nameplate.afkTag"
   ],
   "fr_FR": [
+    "hud.social.status.afk",
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.nameplate.afkTag"
   ],
   "fr_CA": [
+    "hud.social.status.afk",
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.nameplate.afkTag"
   ],
   "en_CA": [],
   "it_IT": [
+    "hud.social.status.afk",
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.nameplate.afkTag"
   ],
   "de_DE": [
+    "hud.social.status.afk",
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.nameplate.afkTag"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hud.social.status.afk",
+    "hudChrome.nameplate.afkTag"
+  ],
+  "zh_TW": [
+    "hud.social.status.afk",
+    "hudChrome.nameplate.afkTag"
+  ],
+  "ko_KR": [
+    "hud.social.status.afk",
+    "hudChrome.nameplate.afkTag"
+  ],
+  "ja_JP": [
+    "hud.social.status.afk",
+    "hudChrome.nameplate.afkTag"
+  ],
   "pt_BR": [
+    "hud.social.status.afk",
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.nameplate.afkTag"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hud.social.status.afk",
+    "hudChrome.nameplate.afkTag"
+  ],
   "cs_CZ": [
+    "hud.social.status.afk",
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.nameplate.afkTag"
   ],
   "nl_NL": [
+    "hud.social.status.afk",
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.nameplate.afkTag"
   ],
   "pl_PL": [
+    "hud.social.status.afk",
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.nameplate.afkTag"
   ],
   "id_ID": [
+    "hud.social.status.afk",
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.nameplate.afkTag"
   ],
   "tr_TR": [
+    "hud.social.status.afk",
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.nameplate.afkTag"
   ],
   "sv_SE": [
+    "hud.social.status.afk",
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.nameplate.afkTag"
   ],
   "vi_VN": [
+    "hud.social.status.afk",
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.nameplate.afkTag"
   ],
   "da_DK": [
+    "hud.social.status.afk",
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.nameplate.afkTag"
   ]
 };

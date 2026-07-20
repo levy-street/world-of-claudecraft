@@ -6272,6 +6272,10 @@
   .soc-dot.dead {
     background: #888;
   }
+  .soc-dot.afk {
+    background: #d8a94b;
+    box-shadow: 0 0 5px #d8a94baa;
+  }
   /* name column flexes and ellipsis-truncates so it never pushes the other columns */
   .soc-id {
     display: flex;

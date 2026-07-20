@@ -2,7 +2,7 @@
 // server/social.ts shapes; kept here so the HUD has no server-side imports.
 import type { PlayerFlair } from '../sim/account_flair';
 
-export type PresenceStatus = 'online' | 'combat' | 'dungeon' | 'dead';
+export type PresenceStatus = 'online' | 'combat' | 'dungeon' | 'dead' | 'afk';
 export type GuildRank = 'leader' | 'officer' | 'member';
 
 export interface FriendInfo {
