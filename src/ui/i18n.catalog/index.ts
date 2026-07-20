@@ -783,6 +783,12 @@ export const en = {
     // delve-shop keys; only the marks-specific strings live here.
     balance: 'Heroic Marks: {count}',
     buyAria: 'Buy {item} for {marks} Heroic Marks',
+    // Confirm dialog gating each purchase: marks purchases record no buyback,
+    // so a mis-tap would be unrefundable without it.
+    buyConfirmTitle: 'Confirm Purchase',
+    buyConfirmBody: 'Buy {item} for {marks} Heroic Marks? Marks purchases cannot be refunded.',
+    buyConfirmAccept: 'Buy',
+    buyConfirmCancel: 'Cancel',
   },
   // The Card Master window (Card Duel minigame): queue join/leave affordance
   // plus the in-match hand strip + round-score panel.
@@ -838,6 +844,12 @@ export const en = {
       reqHeroic: 'Requires a Heroic clear',
       reqClears: 'Requires {count} clears',
       empty: 'Nothing in stock.',
+      // Confirm dialog gating each purchase: marks purchases record no buyback,
+      // so a mis-tap would be unrefundable without it.
+      buyConfirmTitle: 'Confirm Purchase',
+      buyConfirmBody: 'Buy {item} for {marks} Delve Marks? Marks purchases cannot be refunded.',
+      buyConfirmAccept: 'Buy',
+      buyConfirmCancel: 'Cancel',
     },
     tracker: {
       title: 'Delve',

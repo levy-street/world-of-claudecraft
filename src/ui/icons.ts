@@ -2941,6 +2941,7 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     { p: 'sack', pal: 'earthBrown' },
     { p: 'paw', ...BR },
   ]),
+  silkspun_satchel: r('cloth', 'sky', [{ p: 'sack', pal: 'sky' }]),
   gravewoven_bag: r('shadow', 'shadowPurple', [{ p: 'sack', pal: 'shadowPurple' }], ['glow']),
   mistcallers_duffel: r(
     'arcane',
@@ -4210,6 +4211,7 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'gravewoven_bag',
   'linen_pouch',
   'mistcallers_duffel',
+  'silkspun_satchel',
   'travelers_knapsack',
   'wolfhide_satchel',
   // tools (gathering picks/axes/sickles + cosmetic armor-plate skin tokens)

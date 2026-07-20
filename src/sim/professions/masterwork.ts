@@ -42,10 +42,10 @@ export interface MasterworkChanceInput {
   // The crafter has reached the specialization threshold in the recipe's craft
   // (wheel.ts isSpecialized, content-driven, never hardcoded).
   specialized: boolean;
-  // Phase 10 material-tier hook: reserved additive chance input for
-  // material-tier quality feeding the proc. Always 0 until Phase 10 wires a
-  // real value; it participates in the sum today so wiring it later is purely
-  // a call-site change.
+  // Phase 10 material-tier feed: additive chance from the consumed
+  // materials' tier (material_tier.ts materialTierBonusForReagents at the
+  // crafting.ts call site). A tier-0-only reagent list feeds exactly 0, so
+  // every pre-Phase-10 scenario is unchanged.
   materialTierBonus?: number;
 }
 

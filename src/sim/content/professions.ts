@@ -72,16 +72,31 @@ export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = ['mining', 'log
 // item wired up so far are listed here; a mob whose componentTags don't map to any
 // of these still becomes single-use claimed, it just yields no item yet (future
 // profession-harvest issues wire up the rest).
-// KNOWN CONTENT GAP (v0.21.0 release-merge audit, needs a maintainer content call):
-// hide/silk/venomSac map to kind:'quest' items (q_boars/q_spiders/q_widows), so a
-// harvest currently grants quest-collect credit from ANY tagged mob (a wolf hide
-// advances the boar quest). The intended fix is dedicated profession-material
-// items, which is content design, not wiring; do not paper over it here.
+// Phase 10 closed the v0.21.0 collision gap: hide/silk/venomSac now yield the
+// dedicated profession materials (content/profession_items.ts), so a harvest
+// never grants quest-collect credit. The old quest items (boar_hide via
+// q_boars kill loot, webwood_silk via q_spiders, widow_venom_sac via q_widows)
+// keep their quest roles only.
 export const HARVEST_COMPONENT_ITEMS: Readonly<Record<string, string>> = {
-  hide: 'boar_hide',
+  hide: 'rough_hide',
   fang: 'wolf_fang',
-  silk: 'webwood_silk',
-  venomSac: 'widow_venom_sac',
+  silk: 'spider_silk',
+  venomSac: 'venom_gland',
+  meat: 'game_meat',
+  cloth: 'homespun_cloth',
+};
+
+// Perfect specimens (Phase 10): the signed jackpot family. When a corpse
+// harvest's rarity roll clears the signable floor (rare-or-better,
+// isSignableMaterialRarity), the harvester is granted the component family's
+// specimen as a SIGNED instance in addition to the plain component grant
+// (src/sim/interaction.ts harvestCorpse). Families without a specimen keep
+// the pre-Phase-10 behavior (the regular component itself grants signed).
+export const HARVEST_COMPONENT_SPECIMENS: Readonly<Record<string, string>> = {
+  hide: 'pristine_hide',
+  silk: 'pristine_silk',
+  venomSac: 'pristine_venom_gland',
+  meat: 'prime_cut',
 };
 
 // Tool effect slotting (#1136): a slottable bonus layered on top of a base

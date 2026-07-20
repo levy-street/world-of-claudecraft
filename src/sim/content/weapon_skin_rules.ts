@@ -18,6 +18,8 @@ export type ItemWeaponType = WeaponSkinType | 'polearm';
 export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   // Swords
   worn_sword: 'sword',
+  ironedge_longsword: 'sword',
+  thorium_warblade: 'sword',
   redbrook_blade: 'sword',
   valeborn_spellblade: 'sword',
   eastbrook_arming_sword: 'sword',
@@ -40,6 +42,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   direfang_greatblade: 'sword',
   // Daggers
   rusty_dagger: 'dagger',
+  whetted_iron_dirk: 'dagger',
   keen_dirk: 'dagger',
   moggers_shiv: 'dagger',
   vale_carving_knife: 'dagger',
@@ -66,6 +69,8 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   first_blood_razor: 'dagger',
   // Maces
   training_mace: 'mace',
+  copper_flanged_mace: 'mace',
+  ironshod_maul: 'mace',
   bristleback_maul: 'mace',
   moggers_copper_cudgel: 'mace',
   bronzework_mace: 'mace',
@@ -77,6 +82,8 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   nhalias_bell_maul: 'mace',
   // Axes
   rusty_hatchet: 'axe',
+  copper_bearded_axe: 'axe',
+  arcanite_war_axe: 'axe',
   gorraks_cruel_chopper: 'axe',
   tunnelkings_spade: 'axe',
   gorraks_cleaver: 'axe',
@@ -86,6 +93,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   gravewyrm_cleaver: 'axe',
   // Staves
   gnarled_staff: 'staff',
+  elderwood_battle_staff: 'staff',
   apprentice_staff: 'staff',
   hickory_shortstaff: 'staff',
   gravecaller_staff: 'staff',
@@ -114,6 +122,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   stormcallers_focus: 'wand',
   // Polearms (no skins target these)
   tidereaver_gaff: 'polearm',
+  ironbark_boar_spear: 'polearm',
   fen_reaver_glaive: 'polearm',
 };
 

@@ -317,7 +317,11 @@ export const ru_RU: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Воскреснуть у тела",
       "resurrectAtHealer": "Целитель душ (болезнь воскрешения)",
-      "spiritHealerAlive": "Целитель душ оберегает мёртвых. Вы всё ещё среди живых."
+      "spiritHealerAlive": "Целитель душ оберегает мёртвых. Вы всё ещё среди живых.",
+      "healerConfirmTitle": "Принять болезнь воскрешения?",
+      "healerConfirmBody": "Целитель душ воскресит вас на месте, но болезнь воскрешения снизит все ваши характеристики на 75%, на высоких уровнях до 10 минут. Если дух дойдёт до вашего тела, воскрешение будет без штрафа.",
+      "healerConfirmAccept": "Воскресить",
+      "healerConfirmCancel": "Отмена"
     },
     "fct": {
       "absorbed": "Поглощено {amount}",
@@ -4615,7 +4619,11 @@ export const ru_RU: EnTranslations = {
   },
   "heroicShop": {
     "balance": "Героические знаки: {count}",
-    "buyAria": "Купить {item} за {marks} героических знаков"
+    "buyAria": "Купить {item} за {marks} героических знаков",
+    "buyConfirmTitle": "Подтвердить покупку",
+    "buyConfirmBody": "Купить {item} за {marks} героических знаков? Покупки за знаки не подлежат возврату.",
+    "buyConfirmAccept": "Купить",
+    "buyConfirmCancel": "Отмена"
   },
   "cardDuel": {
     "title": "Карточная дуэль",
@@ -4668,7 +4676,11 @@ export const ru_RU: EnTranslations = {
       "buyAria": "Купить {item} за {marks} Меток Вылазок",
       "reqHeroic": "Требуется героическое прохождение",
       "reqClears": "Требуется прохождений: {count}",
-      "empty": "Нет товаров в наличии."
+      "empty": "Нет товаров в наличии.",
+      "buyConfirmTitle": "Подтвердить покупку",
+      "buyConfirmBody": "Купить {item} за {marks} Меток Вылазок? Покупки за метки не подлежат возврату.",
+      "buyConfirmAccept": "Купить",
+      "buyConfirmCancel": "Отмена"
     },
     "tracker": {
       "title": "Вылазка",
@@ -8243,6 +8255,210 @@ export const ru_RU: EnTranslations = {
       },
       "silverleaf_herb": {
         "name": "Трава серебролист"
+      },
+      "rough_hide": {
+        "name": "Грубая шкура"
+      },
+      "spider_silk": {
+        "name": "Паучий шелк"
+      },
+      "venom_gland": {
+        "name": "Ядовитая железа"
+      },
+      "game_meat": {
+        "name": "Мясо дичи"
+      },
+      "homespun_cloth": {
+        "name": "Домотканое полотно"
+      },
+      "pristine_hide": {
+        "name": "Безупречная шкура"
+      },
+      "pristine_silk": {
+        "name": "Безупречный паучий шелк"
+      },
+      "pristine_venom_gland": {
+        "name": "Безупречная ядовитая железа"
+      },
+      "prime_cut": {
+        "name": "Отборная вырезка"
+      },
+      "smithing_flux": {
+        "name": "Кузнечный флюс"
+      },
+      "spool_of_thread": {
+        "name": "Катушка ниток"
+      },
+      "tanning_agent": {
+        "name": "Дубильное средство"
+      },
+      "cooking_salt": {
+        "name": "Поваренная соль"
+      },
+      "glass_vial": {
+        "name": "Стеклянный флакон"
+      },
+      "copper_bearded_axe": {
+        "name": "Медный бородовидный топор"
+      },
+      "copper_flanged_mace": {
+        "name": "Медная ребристая булава"
+      },
+      "ironbark_boar_spear": {
+        "name": "Рогатина из железнокорого дерева"
+      },
+      "ironedge_longsword": {
+        "name": "Железнокромочный длинный меч"
+      },
+      "ironshod_maul": {
+        "name": "Окованный железом молот"
+      },
+      "whetted_iron_dirk": {
+        "name": "Отточенный железный кинжал"
+      },
+      "thorium_warblade": {
+        "name": "Ториевый боевой клинок"
+      },
+      "arcanite_war_axe": {
+        "name": "Арканитовый боевой топор"
+      },
+      "elderwood_battle_staff": {
+        "name": "Боевой посох из древней бузины"
+      },
+      "riveted_copper_girdle": {
+        "name": "Клепаный медный пояс"
+      },
+      "coppermail_sabatons": {
+        "name": "Медные кольчужные сабатоны"
+      },
+      "coppermail_gauntlets": {
+        "name": "Медные кольчужные рукавицы"
+      },
+      "ironlink_hauberk": {
+        "name": "Железная кольчуга"
+      },
+      "ironlink_legguards": {
+        "name": "Железные кольчужные поножи"
+      },
+      "ironlink_spaulders": {
+        "name": "Железные кольчужные наплечники"
+      },
+      "thoriumscale_greathelm": {
+        "name": "Ториевый чешуйчатый большой шлем"
+      },
+      "thoriumscale_cuirass": {
+        "name": "Ториевая чешуйчатая кираса"
+      },
+      "thoriumscale_leggings": {
+        "name": "Ториевые чешуйчатые ноговицы"
+      },
+      "homespun_hood": {
+        "name": "Домотканый капюшон"
+      },
+      "homespun_mitts": {
+        "name": "Домотканые рукавицы"
+      },
+      "silverthread_slippers": {
+        "name": "Туфли из серебряной нити"
+      },
+      "goldweave_robe": {
+        "name": "Златотканое одеяние"
+      },
+      "goldweave_leggings": {
+        "name": "Златотканые поножи"
+      },
+      "silkspun_satchel": {
+        "name": "Шёлкопряденая сумка"
+      },
+      "silkbinders_raiment": {
+        "name": "Облачение шёлкоткача"
+      },
+      "sunweave_mantle": {
+        "name": "Солнцетканая мантия"
+      },
+      "sunweave_treads": {
+        "name": "Солнцетканая поступь"
+      },
+      "fenbridge_hide_leggings": {
+        "name": "Поножи из кожи Фенбриджа"
+      },
+      "fenbridge_hide_boots": {
+        "name": "Сапоги из кожи Фенбриджа"
+      },
+      "fenbridge_hide_belt": {
+        "name": "Пояс из кожи Фенбриджа"
+      },
+      "marshstalker_jerkin": {
+        "name": "Куртка болотного охотника"
+      },
+      "marshstalker_hood": {
+        "name": "Капюшон болотного охотника"
+      },
+      "marshstalker_spaulders": {
+        "name": "Наплечники болотного охотника"
+      },
+      "mirewarden_jerkin": {
+        "name": "Куртка стража трясины"
+      },
+      "mirewarden_leggings": {
+        "name": "Поножи стража трясины"
+      },
+      "mirewarden_treads": {
+        "name": "Поступь стража трясины"
+      },
+      "pan_seared_perch": {
+        "name": "Обжаренный речной окунь"
+      },
+      "hunters_game_skewer": {
+        "name": "Охотничий шашлык из дичи"
+      },
+      "herbed_marsh_pike": {
+        "name": "Болотная щука с травами"
+      },
+      "ashwood_smoked_eel": {
+        "name": "Копчёный угорь на пепельном дереве"
+      },
+      "goldleaf_game_stew": {
+        "name": "Рагу из дичи с золотолистом"
+      },
+      "frostgill_chowder": {
+        "name": "Похлёбка из морозожаберной форели"
+      },
+      "silvered_carp_supper": {
+        "name": "Ужин из серебристого карпа"
+      },
+      "anglers_feast_platter": {
+        "name": "Пиршественное блюдо рыболова"
+      },
+      "marlows_grand_roast": {
+        "name": "Роскошное жаркое Марлоу"
+      },
+      "silverleaf_healing_draught": {
+        "name": "Целебный настой серебролиста"
+      },
+      "silverleaf_mana_draught": {
+        "name": "Настой маны серебролиста"
+      },
+      "elixir_of_the_boar": {
+        "name": "Эликсир вепря"
+      },
+      "goldleaf_healing_draught": {
+        "name": "Целебный настой золотолиста"
+      },
+      "goldleaf_mana_draught": {
+        "name": "Настой маны золотолиста"
+      },
+      "venomfire_elixir": {
+        "name": "Эликсир ядопламени"
+      },
+      "sunpetal_healing_draught": {
+        "name": "Целебный настой солнцелепеста"
+      },
+      "sunpetal_mana_draught": {
+        "name": "Настой маны солнцелепеста"
+      },
+      "elixir_of_the_serpent": {
+        "name": "Эликсир змея"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

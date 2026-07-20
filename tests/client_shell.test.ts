@@ -1229,7 +1229,7 @@ describe('client HTML shell', () => {
       'bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());',
     );
     expect(hudTs).toContain(
-      'bindTouchTap(this.resurrectHealerBtnEl, () => this.onResurrectAtSpiritHealer?.());',
+      'bindTouchTap(this.resurrectHealerBtnEl, () => this.requestSpiritHealerResurrect());',
     );
     expect(mainTs).toContain(
       'hud.onResurrectAtSpiritHealer = () => {\n    void stopAutorunForInteraction(world.resurrectAtSpiritHealer(), input, mobileControls);\n  };',

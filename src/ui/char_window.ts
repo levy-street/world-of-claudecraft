@@ -361,7 +361,9 @@ export class CharWindow {
     const item = ITEMS[itemId];
     if (!item) return;
     const world = this.deps.world();
-    switch (paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level)) {
+    switch (
+      paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level, world.talentSpec)
+    ) {
       case 'blockedSlot':
         this.deps.showError(tSim('error.wrongEquipSlot'));
         return;
@@ -396,7 +398,13 @@ export class CharWindow {
       const accepts =
         !!item &&
         !!slot &&
-        paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level) === 'equip';
+        paperdollDropAction(
+          item,
+          slot,
+          world.cfg.playerClass,
+          world.player.level,
+          world.talentSpec,
+        ) === 'equip';
       row.classList.toggle('drop-target', accepts);
     }
   }
@@ -412,7 +420,13 @@ export class CharWindow {
       const world = this.deps.world();
       if (
         !item ||
-        paperdollDropAction(item, slot, world.cfg.playerClass, world.player.level) !== 'equip'
+        paperdollDropAction(
+          item,
+          slot,
+          world.cfg.playerClass,
+          world.player.level,
+          world.talentSpec,
+        ) !== 'equip'
       )
         return;
       e.preventDefault();

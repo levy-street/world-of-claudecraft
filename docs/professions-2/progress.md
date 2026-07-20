@@ -24,8 +24,8 @@ Update this file at the end of every implementation and QA session. Statuses:
 | 8 | Stations and masters (sim and server) | complete | 2026-07-19 | 2026-07-19 |
 | 8 QA | Verify stations and masters | complete | 2026-07-19 | 2026-07-19 |
 | 9 | Station presence and recipe training | complete | 2026-07-19 | 2026-07-19 |
-| 9 QA | Verify station presence and training | not started | | |
-| 10 | Recipe ladders and materials content | not started | | |
+| 9 QA | Verify station presence and training | complete | 2026-07-19 | 2026-07-19 |
+| 10 | Recipe ladders and materials content | complete | 2026-07-19 | 2026-07-19 |
 | 10 QA | Verify recipe ladders and materials | not started | | |
 | 11 | Fishing joins the framework | not started | | |
 | 11 QA | Verify fishing framework | not started | | |
@@ -357,11 +357,11 @@ CLAUDE.md.
 - [x] Hands-vs-stations split confirmed live (landed in Phase 8; the `FIELD_RECIPES` OPEN item resolves as the default: the nine commons stay field-craftable, recorded in state.md)
 
 ### Phase 10: Recipe ladders and materials content
-- [ ] Tier ladders for all six deep crafts (common through rare at minimum) with material families
-- [ ] Cloth sourcing: humanoid components + plant fiber; corpse component quest-item collision ended
-- [ ] Economy invariant test pinned: no recipe vendors for more than its inputs
-- [ ] Cross-tier composition; combat-worthy consumables at every cooking/alchemy tier; materialTierBonus wired; the perfect specimen
-- [ ] Wiki content regenerated; recipe data feeds the guide
+- [x] Tier ladders for all six deep crafts (common through rare at minimum) with material families (`LADDER_RECIPES` in `src/sim/content/recipes.ts`: 54 trainer recipes, 9 per craft, 3 per rung at skillReq 0/25/50; outputs and materials in the new `src/sim/content/profession_items.ts`; no epic rung, per the locked wave-one ladder)
+- [x] Cloth sourcing: humanoid components + plant fiber; corpse component quest-item collision ended (`homespun_cloth` via the new cloth componentTag on humanoids, the herb ladder serves as plant fiber; `HARVEST_COMPONENT_ITEMS` remapped to dedicated materials, quest items keep their questId-gated kill-loot roles, regression suite `tests/harvest_component_materials.test.ts`)
+- [x] Economy invariant test pinned: no recipe vendors for more than its inputs (`tests/recipe_economy.test.ts`, strict less-than over every recipe in ALL_RECIPES with vendor reagents priced at purchase price; 14 pre-Phase-10 violators ride the frozen `LEGACY_GOLD_POSITIVE_RECIPE_IDS` exception list, a Phase 15 burn-down target pinned three ways)
+- [x] Cross-tier composition; combat-worthy consumables at every cooking/alchemy tier; materialTierBonus wired; the perfect specimen (every rung-50 recipe consumes a lower-band material, pinned; food/potion/elixir outputs at every rung inside the existing power curves; `src/sim/professions/material_tier.ts` at 0.01 per tier, max-tier rule, tier-0 contributes exactly 0 so parity goldens are unchanged; `pristine_hide`/`pristine_silk`/`pristine_venom_gland`/`prime_cut` granted signed at rare+ on the existing corpse rarity roll)
+- [x] Wiki content regenerated; recipe data feeds the guide (regenerates clean with zero diff; the generator does not yet enumerate recipe records, so the guide skeleton is unchanged, and the professions guide rewrite stays the Phase 15 deliverable)
 
 ### Phase 11: Fishing joins the framework
 - [ ] Fishing proficiency (additive, framework-integrated) while the minigame stays as-is
@@ -791,3 +791,34 @@ E2E not re-run, the Phase 8-precedent deferral). Its remaining INFO,
 a dedicated train_recipe rate limit, stays optional: the command is
 idempotent (already-known denies without charging) and the global
 command cadence limiter applies.
+
+Phase 10 (2026-07-19): recipe ladders and materials content, built as
+an ultracode Workflow off phase-start 720efc89f (the Phase 9 QA merge;
+the QA diff is the PR's commits off that tip). Orchestration: two
+parallel writer agents (materials/collision/specimen, and the
+materialTierBonus wiring) with disjoint file ownership, then six
+parallel craft designers returning structured ladders to scratchpad
+JSON, folded in by three sequential integration passes (one commit per
+craft pair) and a dedicated economy-test writer, with the validation
+matrix run green at the tip before the review fan-out. Quest credit
+was verified BEFORE the harvest remap landed: all three collect quests
+(q_boars, q_spiders, q_widows) have questId-gated kill-loot drops on
+their own mobs, so no quest lost its source. Key as-landed calls, all
+swept into both phase-10 files: the economy invariant carries a frozen
+14-member legacy exception list (8 commons, the 3 caster-hub rows, the
+3 combos; measured, pinned three ways, Phase 15 burn-down) because
+fixing the legacy sellValues would break the prime directive inside a
+content phase; the perfect specimen grants IN ADDITION to the plain
+component at rare+ (specimen-less families keep the old signed-regular
+behavior); every new recipe including the skillReq-0 rungs is
+station-bound and trainer-taught (coexists with the grandfathered
+field commons); materialTierBonus keys off def-level material tier
+bands, not consumed-instance rarity (instances do not report which
+copy was consumed); the six raw fish already existed so no fish
+ItemDefs were authored; no new deeds (recipes and materials are not
+conquerable content per docs/design/deeds.md). Deferred with reasons:
+guide recipe enumeration (Phase 15 professions guide rewrite), the
+recipeForResultItem reverse-lookup gap for non-common tables
+(pre-existing), a single shared battle-elixir aura slot (maintainer
+call; per-item power stays capped at the bear's 12), and the legacy
+gold-positive burn-down (Phase 15).

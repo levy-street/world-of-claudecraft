@@ -59,11 +59,11 @@ import {
 } from '../src/sim/talent_allocation_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
+  ALL_EQUIP_SLOTS,
   type Aura,
   DT,
   dist2d,
   type Entity,
-  EQUIP_SLOTS,
   type EquipSlot,
   emptyMoveInput,
   isDungeonDifficulty,
@@ -4012,7 +4012,8 @@ export class GameServer {
           // sim's own resolver rather than trusting the client. The sim then
           // re-validates the slot against the item itself.
           const aimed =
-            typeof msg.slot === 'string' && (EQUIP_SLOTS as readonly string[]).includes(msg.slot)
+            typeof msg.slot === 'string' &&
+            (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
               ? (msg.slot as EquipSlot)
               : undefined;
           if (aimed) sim.equipItemToSlot(msg.item, aimed, pid);
@@ -4027,7 +4028,12 @@ export class GameServer {
         }
         break;
       case 'unequip_item':
-        if (typeof msg.slot === 'string' && (EQUIP_SLOTS as readonly string[]).includes(msg.slot)) {
+        // ALL_EQUIP_SLOTS, not the frozen EQUIP_SLOTS: the latter omits the
+        // additive 'offhand' slot, so any offhand unequip was silently dropped here.
+        if (
+          typeof msg.slot === 'string' &&
+          (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
+        ) {
           sim.unequipItem(msg.slot as EquipSlot, pid);
         }
         break;

@@ -135,3 +135,37 @@ STOPPING RULES:
   phase scope (for example, a material whose only viable source turns out to be wave-2
   content, or a collision fix that cannot preserve existing quest saves).
 ```
+
+## As-landed deviations the QA session must verify against (2026-07-19)
+
+The build deviated from the older wording above in these ways (mirrored
+from phase-10-recipe-ladders.md per the amend-the-twin rule; surfaces in
+the state.md Phase 10 entry). Verify the pins rather than hunt for the
+original premises:
+
+- The economy invariant (tests/recipe_economy.test.ts) enumerates EVERY
+  recipe and prices vendor reagents at purchase price as specified, but
+  carries the frozen 14-member LEGACY_GOLD_POSITIVE_RECIPE_IDS exception
+  list (a Phase 15 burn-down, pinned three ways). "Fails on any
+  gold-positive recipe" is therefore true for every recipe authored after
+  Phase 9, and the legacy list self-prunes when a member is fixed.
+- No fish ItemDefs were authored (the six raw fish pre-existed; cooking
+  consumes them, pinned in the material demand coverage block).
+- Specimen semantics: signed specimen IN ADDITION to a now-plain regular
+  component at rare+; fang and cloth (no specimen) keep signed-regular
+  grants at rare+ (pinned in tests/corpse_harvest_sim.test.ts).
+- All 54 new recipes are trainer-taught and station-bound, including the
+  skillReq-0 rungs (free fee tier); they live in LADDER_RECIPES, and
+  train_not_taught_here remains content-unreachable (no drop or quest
+  acquisition recipe was authored, so the Phase 9 precedence pin stands).
+- materialTierBonus: def-level tier bands, max-tier rule, 0.01 per tier,
+  tier-0 contributes exactly 0 (parity goldens unchanged, pinned with a
+  real-Sim seed-69 call-site flip in tests/professions_masterwork.test.ts).
+- tests/professions_grandfather.test.ts's non-combo undefined-acquisition
+  arm was rescoped to the frozen 21; tests/corpse_harvest_sim.test.ts was
+  rewritten off its boar_hide lock; tests/town_focus_sim.test.ts took a
+  mechanical id swap.
+- The cross-tier rule is pinned negative-form: every rung-50 recipe must
+  consume at least one non-rare-band reagent.
+- No new deeds records; wiki:content regenerates with zero diff (the
+  generator does not enumerate recipes yet; guide rewrite is Phase 15).

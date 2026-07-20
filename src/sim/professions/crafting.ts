@@ -82,6 +82,7 @@ import { archetypeCeilingFor, craftSkillGainMultiplier } from './archetype';
 import { comboEligibility } from './combo_eligibility';
 import { isSignableMaterialRarity, type MaterialRarity } from './gathering';
 import { masterworkBonusStats, masterworkBumpedQuality, masterworkProcChance } from './masterwork';
+import { materialTierBonusForReagents } from './material_tier';
 import { isStationActive } from './mobile_station';
 import { craftActionXp } from './profession_xp';
 import { isAtStation, stationTypeForCraft } from './stations';
@@ -421,6 +422,10 @@ export function resolveCraftForRecipe(
       tierCapability(craftSkills, recipe.professionId) - tierForSkill(recipe.skillReq),
     signedReagent: signedReagentUsed,
     specialized: isSpecialized(craftSkills, recipe.professionId),
+    // Phase 10: higher-tier materials raise the proc odds. Pure def-level
+    // lookup over the recipe's declared reagent list (material_tier.ts), so
+    // it draws nothing and cannot move the single procRoll draw above.
+    materialTierBonus: materialTierBonusForReagents(recipe.reagents),
   });
   // Effect gate (gates the EFFECT, never the draw): the def must bake a
   // non-null bonus record, and the bumped quality tier must not exceed the

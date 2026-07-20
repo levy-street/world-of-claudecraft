@@ -255,25 +255,15 @@ export function runEffects(
   if (ctx.playerMods(meta).global.battleRhythm > 0) {
     meta.abilityRhythm = (meta.abilityRhythm + 1) % 3;
     if (meta.abilityRhythm === 0) {
-      const blink = {
-        remaining: DT,
-        duration: DT,
-        sourceId: p.id,
-        school: ability.school,
-      };
-      ctx.applyAura(p, {
-        id: 'battle_rhythm',
-        name: 'Battle Rhythm',
-        kind: 'buff_dmg_done',
-        value: 0.05,
-        ...blink,
-      });
       ctx.applyAura(p, {
         id: 'battle_rhythm_rage',
         name: 'Battle Rhythm',
         kind: 'buff_rage_gen',
         value: 0.2,
-        ...blink,
+        remaining: DT,
+        duration: DT,
+        sourceId: p.id,
+        school: ability.school,
       });
     }
   }

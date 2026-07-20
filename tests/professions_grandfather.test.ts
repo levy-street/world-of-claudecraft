@@ -110,10 +110,17 @@ describe('PRE_TRAINING_RECIPE_IDS (the frozen historical record)', () => {
     for (const recipe of COMBO_RECIPES) {
       expect(recipe.acquisition, recipe.id).toEqual(['trainer']);
     }
-    // And NOTHING else gained a list: the switch is scoped to the combos.
+    // And no OTHER recipe inside the frozen record gained a list: within the
+    // 21 pre-training ids the acquisition switch stays scoped to the combos.
+    // Recipes OUTSIDE the record are Phase 10+ content and are required to
+    // carry their own non-empty acquisition list (guarded above).
+    const preTrainingIds = new Set(PRE_TRAINING_RECIPE_IDS);
     for (const recipe of ALL_RECIPES) {
-      if (recipe.comboRequirement) continue;
-      expect(recipe.acquisition, `${recipe.id} must stay grandfathered`).toBeUndefined();
+      if (!preTrainingIds.has(recipe.id) || recipe.comboRequirement) continue;
+      expect(
+        recipe.acquisition === undefined || recipe.acquisition.length === 0,
+        `${recipe.id} must stay grandfathered`,
+      ).toBe(true);
     }
   });
 });

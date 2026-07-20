@@ -868,6 +868,14 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "silkspun_satchel",
+      "name": "Silkspun Satchel",
+      "sourcePack": "woc_bags",
+      "sourceFile": "WoC_Bag_03.png (hue-shifted silk recolor of the linen_pouch conversion; dedicated art welcome)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "linen_scrap",
       "name": "Linen Scrap",
       "sourcePack": "generic100b",

@@ -138,9 +138,8 @@ export const WARRIOR_ROWS: RowTree = [
       {
         id: 'war_row_battle_rhythm',
         name: 'Battle Rhythm',
-        description:
-          'Every third ability you use generates 20% more rage and deals 5% more damage.',
-        // LIVE: flags the rolling counter in runEffects (every 3rd cast empowered).
+        description: 'Every third ability you use generates 20% more rage.',
+        // LIVE: flags the rolling counter in runEffects (every 3rd cast generates more rage).
         effect: { global: { battleRhythm: 1 } },
       },
     ],
