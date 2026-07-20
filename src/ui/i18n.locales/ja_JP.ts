@@ -7598,6 +7598,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.sortAria': '銀行のアイテムを並べ替える',
   'hudChrome.bank.searchAria': '名前で銀行のアイテムを検索',
   'hudChrome.bank.depositAll': 'すべての素材を預ける',
+  'hudChrome.bank.depositAllTooltip':
+    '収まる限りの製作素材と専門技能ツールを預けます。装備、消耗品、クエストアイテムはバッグに残ります。',
   'hudChrome.bank.depositAllDone': '素材を預けました：{count}。',
   'hudChrome.bank.depositAllFull': '素材を預けました：{count}。銀行がいっぱいになりました。',
   'hudChrome.bank.depositAllNone': '銀行がいっぱいです：何も預けられませんでした。',

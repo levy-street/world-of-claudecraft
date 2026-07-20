@@ -1997,6 +1997,7 @@ export const sv_SE: EnTranslations = {
       "sortAria": "Sortera bankföremål",
       "searchAria": "Sök bankföremål efter namn",
       "depositAll": "Sätt in alla material",
+      "depositAllTooltip": "Banks every crafting material and profession tool that fits, leaving gear, consumables and quest items in your bags.",
       "depositAllDone": "Material insatta: {count}.",
       "depositAllFull": "Material insatta: {count}. Banken är nu full.",
       "depositAllNone": "Banken är full: inget sattes in.",

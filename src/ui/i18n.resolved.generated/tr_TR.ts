@@ -1997,6 +1997,7 @@ export const tr_TR: EnTranslations = {
       "sortAria": "Banka eşyalarını sırala",
       "searchAria": "Banka eşyalarını ada göre ara",
       "depositAll": "Tüm malzemeleri yatır",
+      "depositAllTooltip": "Banks every crafting material and profession tool that fits, leaving gear, consumables and quest items in your bags.",
       "depositAllDone": "Yatırılan malzeme: {count}.",
       "depositAllFull": "Yatırılan malzeme: {count}. Banka artık dolu.",
       "depositAllNone": "Banka dolu: hiçbir şey yatırılmadı.",

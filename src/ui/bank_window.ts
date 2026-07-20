@@ -555,6 +555,10 @@ export class BankWindow {
     deposit.type = 'button';
     deposit.className = 'bank-deposit-all';
     deposit.textContent = t('hudChrome.bank.depositAll');
+    // "Material" here is the bag-filter category, which also covers profession
+    // tools (bag_filter.ts: junk | tool), so the label alone leaves players
+    // guessing whether their pickaxe is about to be banked. Spell it out.
+    deposit.title = t('hudChrome.bank.depositAllTooltip');
     deposit.disabled =
       this.depositAllPending ||
       !hasDepositableMaterials(this.deps.world().inventory, (id) => ITEMS[id]);

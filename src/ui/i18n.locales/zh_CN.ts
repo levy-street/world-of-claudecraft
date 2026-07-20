@@ -7230,6 +7230,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.sortAria': '排序银行物品',
   'hudChrome.bank.searchAria': '按名称搜索银行物品',
   'hudChrome.bank.depositAll': '存入所有材料',
+  'hudChrome.bank.depositAllTooltip':
+    '存入所有放得下的制作材料和专业工具，装备、消耗品和任务物品会留在背包中。',
   'hudChrome.bank.depositAllDone': '已存入材料：{count}。',
   'hudChrome.bank.depositAllFull': '已存入材料：{count}。银行已满。',
   'hudChrome.bank.depositAllNone': '银行已满：未存入任何物品。',

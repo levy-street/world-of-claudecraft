@@ -1997,6 +1997,7 @@ export const it_IT: EnTranslations = {
       "sortAria": "Ordina gli oggetti della banca",
       "searchAria": "Cerca gli oggetti della banca per nome",
       "depositAll": "Deposita tutti i materiali",
+      "depositAllTooltip": "Banks every crafting material and profession tool that fits, leaving gear, consumables and quest items in your bags.",
       "depositAllDone": "Materiali depositati: {count}.",
       "depositAllFull": "Materiali depositati: {count}. Ora la banca è piena.",
       "depositAllNone": "Banca piena: non è stato depositato nulla.",

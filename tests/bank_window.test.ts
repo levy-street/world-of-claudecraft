@@ -295,6 +295,12 @@ describe('bank_window: search / sort / deposit-all', () => {
     expect(painter).toContain('this.onSlotClick(slot.slotIndex, ev.shiftKey)');
   });
 
+  // The button's "materials" is the bag-filter category, which also sweeps up
+  // profession tools, so the label needs a tooltip spelling out what moves.
+  it('explains what deposit-all covers through a localized tooltip', () => {
+    expect(painter).toContain("deposit.title = t('hudChrome.bank.depositAllTooltip')");
+  });
+
   it('gates the deposit-all button on hasDepositableMaterials and plans + sends on click', () => {
     expect(painter).toContain("t('hudChrome.bank.depositAll')");
     expect(painter).toContain('hasDepositableMaterials(this.deps.world().inventory');
