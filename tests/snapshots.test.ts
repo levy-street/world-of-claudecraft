@@ -3693,6 +3693,24 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     expect(desc?.school).toBe('shadow');
   });
 
+  it('round-trips unbreakable control so the client never offers cancellation', () => {
+    const scriptedStasis: Aura = {
+      id: 'scripted_stasis',
+      name: 'Scripted Stasis',
+      kind: 'stasis',
+      remaining: 10,
+      duration: 10,
+      value: 0,
+      sourceId: 0,
+      school: 'arcane',
+      unbreakableControl: true,
+    };
+
+    const { wire, mirror } = roundTrip(scriptedStasis);
+    expect(wireAura(wire, 'scripted_stasis').ub).toBe(1);
+    expect(mirror.unbreakableControl).toBe(true);
+  });
+
   it('round-trips the imbue judgement range (value2/value3), value omitted when 0', () => {
     const imbue: Aura = {
       id: 'holy_might',

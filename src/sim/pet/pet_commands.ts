@@ -35,6 +35,7 @@
 // directly (already pure); everything that touches not-yet-extracted Sim state
 // routes through the seam.
 
+import { hasUnbreakableMovementLock } from '../combat/cc';
 import { DUNGEON_X_THRESHOLD, ITEMS, isDelvePos, MOBS } from '../data';
 import { createMob } from '../entity';
 import type { PetState } from '../sim';
@@ -66,6 +67,15 @@ const PET_NAME_RE = /^[A-Za-z][A-Za-z '-]{1,15}$/;
 // so the surfaced error must say why instead of implying the pet was lost.
 function noPetError(e: Entity, fallback = 'You have no pet.'): string {
   return isDelvePos(e.pos.x) ? 'Pets are not allowed inside the delves.' : fallback;
+}
+
+// Encounter-authored movement locks freeze the owner's direct command surface too.
+// This guard intentionally lives only on user-issued commands: passive pet AI and
+// system lifecycle operations (summon/restore/stow) remain encounter-owned.
+function petCommandBlockedByControl(ctx: SimContext, owner: Entity): boolean {
+  if (!hasUnbreakableMovementLock(owner)) return false;
+  ctx.error(owner.id, 'You are stunned.');
+  return true;
 }
 
 // -------------------------------------------------------------------------
@@ -451,6 +461,7 @@ export function abandonPet(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Only hunters can abandon pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
     ctx.error(r.e.id, noPetError(r.e));
@@ -467,6 +478,7 @@ export function renamePet(ctx: SimContext, name: string, pid?: number): void {
     ctx.error(r.e.id, 'Only pet classes can rename pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
     ctx.error(r.e.id, noPetError(r.e));
@@ -491,6 +503,7 @@ export function revivePet(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Only pet classes can revive pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
     ctx.error(r.e.id, noPetError(r.e));
@@ -531,6 +544,7 @@ export function petAttack(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Only pet classes can command pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
@@ -554,6 +568,7 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Only pet classes can command pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
@@ -590,6 +605,7 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
 export function petWaterJet(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id);
   const jet = pet ? MOBS[pet.templateId]?.petRanged?.jet : undefined;
   if (!pet || !jet || pet.dead || pet.castingAbility || pet.petTauntTimer > 0) return;
@@ -609,6 +625,7 @@ export function feedPet(ctx: SimContext, itemId: string, pid?: number): void {
     ctx.error(r.e.id, 'Only hunters can feed pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
     ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
@@ -651,6 +668,7 @@ export function healPet(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Only warlocks can channel demon healing.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   if (r.e.dead) {
     ctx.error(r.e.id, 'You are dead.');
     return;
@@ -706,6 +724,7 @@ export function setPetMode(ctx: SimContext, mode: PetMode, pid?: number): void {
     ctx.error(r.e.id, 'Only pet classes can command pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
@@ -729,6 +748,7 @@ export function setPetAutoTaunt(ctx: SimContext, enabled: boolean, pid?: number)
     ctx.error(r.e.id, 'Only pet classes can command pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
@@ -753,6 +773,7 @@ export function setPetAutoWaterJet(ctx: SimContext, enabled: boolean, pid?: numb
     ctx.error(r.e.id, 'Only pet classes can command pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {

@@ -56,6 +56,7 @@ import {
   xpForLevel,
 } from '../types';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
+import { isUnbreakableControlAura } from './cc';
 import { chronomancyConvertArcaneDamage, stripTemporalEchoes } from './chronomancy';
 import { recordDamageTaken } from './damage_history';
 import {
@@ -706,7 +707,7 @@ export function dealDamage(
     }
     for (let i = target.auras.length - 1; i >= 0; i--) {
       const breakable = target.auras[i];
-      if (breakable.breaksOnDamage) {
+      if (breakable.breaksOnDamage && !isUnbreakableControlAura(breakable)) {
         if (breakable.breakThreshold !== undefined && breakable.breakThreshold > amount) {
           breakable.breakThreshold -= amount;
           continue;
@@ -1004,9 +1005,8 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   e.dead = true;
   e.hp = 0;
   ctx.clearNonPlayerStatAuras(e);
-  // The Keeper's Toll (Resurrection Sickness) is the one debuff that survives death: it
-  // must not be sheddable by dying and releasing the spirit. Only a player ever carries
-  // it, so mobs still clear fully.
+  // Death cannot shed persistent death penalties or encounter-owned unbreakable
+  // control. The encounter script remains responsible for releasing its markers.
   e.auras = aurasSurvivingDeath(e.auras);
   e.ccDr.clear();
   e.castingAbility = null;

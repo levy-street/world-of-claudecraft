@@ -2,6 +2,7 @@ import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '.
 import type { SimContext } from '../sim_context';
 import { type AbilityDef, DT, type Entity, type Vec3 } from '../types';
 import { groundHeight, terrainSteepnessAt, waterLevelAt } from '../world';
+import { hasUnbreakableMovementLock } from './cc';
 
 const SWEEP_STEP = 0.5;
 const FLIGHT_DURATION = 0.6;
@@ -93,6 +94,7 @@ export function armHeroicLeap(
   landingAoe: { min: number; max: number; radius: number },
   ability: Pick<AbilityDef, 'name' | 'school'>,
 ): void {
+  if (hasUnbreakableMovementLock(entity)) return;
   const landing = sweptLanding(ctx, entity, aim);
   entity.chargeTargetId = null;
   entity.chargePath = [];
@@ -111,7 +113,7 @@ export function armHeroicLeap(
 export function advanceHeroicLeap(ctx: SimContext, entity: Entity): boolean {
   const flight = entity.leap;
   if (!flight) return false;
-  if (entity.dead || wasExternallyRelocated(entity)) {
+  if (entity.dead || hasUnbreakableMovementLock(entity) || wasExternallyRelocated(entity)) {
     entity.leap = null;
     return false;
   }

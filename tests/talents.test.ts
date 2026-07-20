@@ -281,6 +281,8 @@ describe('modifier bake and known-ability resolution', () => {
   });
 
   it('bakes only the winning Warrior spec mastery and signature', () => {
+    // Warrior has no restored baseline (excluded as a top-tier class), so these
+    // values are the mastery contribution alone.
     const arms = computeTalentModifiers('warrior', allocation('arms'));
     expect(arms.grants).toContainEqual({ ability: 'mortal_strike', rank: 1 });
     expect(arms.global.masteryTwoHandDmgPct).toBeCloseTo(0.1);

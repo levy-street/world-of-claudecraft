@@ -25,7 +25,7 @@
 // directly (already pure); everything that touches not-yet-owned Sim state routes
 // through the seam.
 
-import { isStunned } from '../combat/cc';
+import { isStunned, isUnbreakableControlAura } from '../combat/cc';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
 import * as deedsMod from '../deeds';
 import { createMob, createNpc } from '../entity';
@@ -35,7 +35,6 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { clearThreat, threatEntries } from '../threat';
 import {
-  type Aura,
   type AuraKind,
   angleTo,
   armorReduction,
@@ -116,7 +115,7 @@ const NYTHRAXIS_DREAD_CURSE_MAX_STACKS = 10;
 const NYTHRAXIS_DEATHLESS_SOUL_REND_LOCKOUT = 15;
 const NYTHRAXIS_PHASE_TWO_SETTLE_DELAY = 5;
 const NYTHRAXIS_TRANSITION_DURATION = 21;
-const NYTHRAXIS_TRANSITION_STUN = 21.5;
+const NYTHRAXIS_TRANSITION_CONTROL_GRACE = 0.5;
 const NYTHRAXIS_FINAL_STAND_HP = 0.05;
 // Brother Aldric enters on the door side of the arena (the raid's side, lower z
 // than the boss spawn) and walks toward the boss. Distances are yards in front
@@ -184,14 +183,6 @@ export function isNythraxisControllableAdd(target: Entity): boolean {
   );
 }
 
-export function isNythraxisScriptedControl(target: Entity, aura: Aura): boolean {
-  return (
-    target.kind === 'mob' &&
-    (isNythraxisRaidAddTemplate(target.templateId) || target.ownerId !== null) &&
-    aura.id === 'nythraxis_transition_stun'
-  );
-}
-
 // ----- skeleton-warrior add AI (consumed by mob retarget on Sim) ------------------
 
 export function findNythraxisBossForAdd(ctx: SimContext, add: Entity): Entity | null {
@@ -225,18 +216,19 @@ export function scheduleNythraxisAddDespawnIfBossReset(ctx: SimContext, add: Ent
 // ----- boss-death dialogue hook (fired from updateMob's dead-branch via ctx) -------
 
 export function onBossDeath(ctx: SimContext, mob: Entity): void {
-  if (mob.templateId === NYTHRAXIS_BOSS_ID && mob.nythraxis && !mob.nythraxis.deathSpoken) {
-    mob.nythraxis.deathSpoken = true;
-    mob.nythraxis.phase = 'dead';
-    nythraxisDialogueSet(ctx, mob, [
-      { speaker: 'nythraxis', text: 'Malric...', delay: 0 },
-      {
-        speaker: 'nythraxis',
-        text: 'What have you done',
-        delay: NYTHRAXIS_DIALOGUE_LINE_SECONDS,
-      },
-    ]);
-  }
+  if (mob.templateId !== NYTHRAXIS_BOSS_ID || !mob.nythraxis) return;
+  if (mob.nythraxis.deathSpoken) return;
+  clearNythraxisTransitionControl(ctx, mob);
+  mob.nythraxis.deathSpoken = true;
+  mob.nythraxis.phase = 'dead';
+  nythraxisDialogueSet(ctx, mob, [
+    { speaker: 'nythraxis', text: 'Malric...', delay: 0 },
+    {
+      speaker: 'nythraxis',
+      text: 'What have you done',
+      delay: NYTHRAXIS_DIALOGUE_LINE_SECONDS,
+    },
+  ]);
 }
 
 // ----- encounter lifecycle --------------------------------------------------------
@@ -279,9 +271,7 @@ export function resetNythraxisEncounter(ctx: SimContext, boss: Entity): void {
     );
     clearNythraxisWardChannelCast(p);
   }
-  for (const e of nythraxisTransitionStunTargets(ctx, boss)) {
-    if (e.kind !== 'player') e.auras = e.auras.filter((a) => a.id !== 'nythraxis_transition_stun');
-  }
+  clearNythraxisTransitionControl(ctx, boss);
   const aldric = findNythraxisAldric(ctx, boss);
   if (aldric) ctx.dropEntity(aldric.id);
   for (const ward of nythraxisDeathlessChannelObjects(ctx, boss)) {
@@ -549,11 +539,25 @@ export function playersInNythraxisRoom(ctx: SimContext, boss: Entity): Entity[] 
 export function nythraxisTransitionStunTargets(ctx: SimContext, boss: Entity): Entity[] {
   return [...ctx.entities.values()].filter(
     (e) =>
-      !e.dead &&
-      dist2d(e.pos, boss.spawnPos) <= NYTHRAXIS_ROOM_RADIUS &&
       (e.kind === 'player' ||
-        (e.kind === 'mob' && (isNythraxisRaidAddTemplate(e.templateId) || e.ownerId !== null))),
+        (e.kind === 'mob' && (isNythraxisRaidAddTemplate(e.templateId) || e.ownerId !== null))) &&
+      willBeInNythraxisRoomAfterResurrection(ctx, boss, e),
   );
+}
+
+function willBeInNythraxisRoomAfterResurrection(
+  ctx: SimContext,
+  boss: Entity,
+  entity: Entity,
+): boolean {
+  if (dist2d(entity.pos, boss.spawnPos) <= NYTHRAXIS_ROOM_RADIUS) return true;
+  if (entity.kind !== 'player' || !entity.dead) return false;
+  const offer = ctx.pendingResurrections.get(entity.id);
+  if (!offer || ctx.time >= offer.expiresAt) return false;
+  const caster = ctx.entities.get(offer.casterId);
+  const destination =
+    caster?.kind === 'player' && !caster.dead ? caster.pos : offer.fallbackDestination;
+  return dist2d(destination, boss.spawnPos) <= NYTHRAXIS_ROOM_RADIUS;
 }
 
 export function nythraxisRoomMetas(ctx: SimContext, boss: Entity): PlayerMeta[] {
@@ -850,24 +854,14 @@ export function startNythraxisTransition(
     school: 'physical',
     fx: 'nova',
   });
-  for (const e of nythraxisTransitionStunTargets(ctx, boss)) {
-    ctx.applyAura(e, {
-      id: 'nythraxis_transition_stun',
-      name: 'Shuddering Stomp',
-      kind: 'stun',
-      remaining: NYTHRAXIS_TRANSITION_STUN,
-      duration: NYTHRAXIS_TRANSITION_STUN,
-      value: 0,
-      sourceId: boss.id,
-      school: 'physical',
-    });
-  }
+  applyNythraxisTransitionControl(ctx, boss, st);
+  const transitionControlDuration = st.transitionTimer + NYTHRAXIS_TRANSITION_CONTROL_GRACE;
   ctx.applyAura(boss, {
     id: 'nythraxis_transition_pause',
     name: 'Shuddering Stomp',
     kind: 'stun',
-    remaining: NYTHRAXIS_TRANSITION_STUN,
-    duration: NYTHRAXIS_TRANSITION_STUN,
+    remaining: transitionControlDuration,
+    duration: transitionControlDuration,
     value: 0,
     sourceId: boss.id,
     school: 'physical',
@@ -876,6 +870,51 @@ export function startNythraxisTransition(
   lightNythraxisWardstones(ctx, boss);
   nythraxisDialogueSet(ctx, boss, transitionLines, false, true);
   st.transitionCues = [];
+}
+
+function applyNythraxisTransitionControl(
+  ctx: SimContext,
+  boss: Entity,
+  st: NonNullable<Entity['nythraxis']>,
+): void {
+  const transitionControlDuration = st.transitionTimer + NYTHRAXIS_TRANSITION_CONTROL_GRACE;
+  for (const e of nythraxisTransitionStunTargets(ctx, boss)) {
+    if (
+      e.auras.some(
+        (aura) =>
+          aura.id === 'nythraxis_transition_stun' &&
+          aura.kind === 'stun' &&
+          aura.sourceId === boss.id &&
+          aura.remaining > st.transitionTimer &&
+          isUnbreakableControlAura(aura),
+      )
+    )
+      continue;
+    // Generic aura application recalculates player stats; for a dead ghost that
+    // temporarily zeros the full grey display pools established on release.
+    // This control has no stat payload, so preserve those display-only values.
+    const ghostDisplay = e.kind === 'player' && e.dead && e.ghost ? [e.hp, e.resource] : null;
+    ctx.applyAura(e, {
+      id: 'nythraxis_transition_stun',
+      name: 'Shuddering Stomp',
+      kind: 'stun',
+      remaining: transitionControlDuration,
+      duration: transitionControlDuration,
+      value: 0,
+      sourceId: boss.id,
+      school: 'physical',
+      unbreakableControl: true,
+    });
+    if (ghostDisplay) [e.hp, e.resource] = ghostDisplay;
+  }
+}
+
+function clearNythraxisTransitionControl(ctx: SimContext, boss: Entity): void {
+  for (const entity of ctx.entities.values()) {
+    entity.auras = entity.auras.filter(
+      (aura) => aura.id !== 'nythraxis_transition_stun' || aura.sourceId !== boss.id,
+    );
+  }
 }
 
 export function spawnNythraxisAldric(ctx: SimContext, boss: Entity): void {
@@ -905,6 +944,7 @@ export function updateNythraxisTransition(
   boss: Entity,
   st: NonNullable<Entity['nythraxis']>,
 ): void {
+  applyNythraxisTransitionControl(ctx, boss, st);
   const aldric = findNythraxisAldric(ctx, boss);
   if (aldric) {
     const dest = ctx.groundPos(boss.spawnPos.x, boss.spawnPos.z - NYTHRAXIS_ALDRIC_WALK_DIST);
@@ -918,9 +958,7 @@ export function updateNythraxisTransition(
   st.soulRendTimer = NYTHRAXIS_PHASE_TWO_SETTLE_DELAY;
   st.deathlessTimer = NYTHRAXIS_PHASE_TWO_SETTLE_DELAY + 15;
   boss.auras = boss.auras.filter((a) => a.id !== 'nythraxis_transition_pause');
-  for (const e of nythraxisTransitionStunTargets(ctx, boss)) {
-    e.auras = e.auras.filter((a) => a.id !== 'nythraxis_transition_stun');
-  }
+  clearNythraxisTransitionControl(ctx, boss);
 }
 
 export function lightNythraxisWardstones(ctx: SimContext, boss: Entity): void {

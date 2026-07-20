@@ -826,6 +826,8 @@ interface WireAura {
   // per-viewer), so the per-entity dyn cache keeps eliding; an old client ignores it and
   // an old server's omission decodes to 0, which matches no player id.
   src?: number;
+  // Encounter-owned control marker. Omitted for ordinary auras.
+  ub?: 1;
 }
 
 interface WhoRosterRow {
@@ -961,6 +963,7 @@ function wireAura(a: Aura): WireAura {
   // The caster's entity id, for the client's own-aura prominence on the target strip
   // (auras_view ownFirst). Omitted for the rare 0/absent source, which decodes to 0.
   if (a.sourceId) w.src = a.sourceId;
+  if (a.unbreakableControl) w.ub = 1;
   return w;
 }
 

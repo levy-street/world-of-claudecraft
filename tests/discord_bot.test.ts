@@ -4,6 +4,7 @@ import {
   allTierRoleNames,
   buildActivityMessage,
   buildDailyRewardWinnersMessage,
+  buildInviteMessage,
   buildLevelNick,
   buildLinkContent,
   buildRelayMessage,
@@ -13,13 +14,17 @@ import {
   clearDepartedFlair,
   clearedMemberMeta,
   computeRoleSync,
+  findManagedInviteMessage,
   GATEWAY_INTENTS,
   GATEWAY_OP,
   GUILD_LARGE_THRESHOLD,
   heartbeatIntervalMs,
+  INVITE_REFRESH_INTERVAL_MS,
   identifyPayload,
   indexSpecialRoleIds,
+  inviteRefreshDue,
   isSlashCommand,
+  isUnknownMessageError,
   levelNickSuffix,
   MEMBERS_META_BATCH,
   memberRolesFromPayload,
@@ -577,6 +582,91 @@ describe('significant-activity cards', () => {
     }) as { allowed_mentions: { users: string[] }; embeds: Array<Record<string, any>> };
     expect(msg.embeds[0].description).toContain('Ghost'); // plain, no mention
     expect(msg.allowed_mentions.users).toEqual(['111']);
+  });
+});
+
+describe('invite auto-rotation', () => {
+  it('is due when never created', () => {
+    expect(inviteRefreshDue(null, 1_000)).toBe(true);
+  });
+
+  it('is not due before the refresh interval elapses', () => {
+    const now = 1_000_000_000;
+    expect(inviteRefreshDue(now - INVITE_REFRESH_INTERVAL_MS + 1, now)).toBe(false);
+  });
+
+  it('is due once the refresh interval has fully elapsed', () => {
+    const now = 1_000_000_000;
+    expect(inviteRefreshDue(now - INVITE_REFRESH_INTERVAL_MS, now)).toBe(true);
+  });
+
+  it('builds an invite message embedding the url without pinging anyone', () => {
+    const msg = buildInviteMessage('https://discord.gg/abc123') as {
+      allowed_mentions: unknown;
+      embeds: Array<{ description: string }>;
+    };
+    expect(msg.allowed_mentions).toEqual({ parse: [] });
+    expect(msg.embeds[0].description).toContain('https://discord.gg/abc123');
+  });
+
+  it('rediscovers the bot own prior invite message after a restart', () => {
+    const found = findManagedInviteMessage(
+      [
+        {
+          id: 'm2',
+          author: { id: 'bot1' },
+          embeds: [{ title: 'Join the World of ClaudeCraft Discord' }],
+          timestamp: '2026-01-01T00:00:00.000Z',
+          edited_timestamp: '2026-01-05T00:00:00.000Z',
+        },
+      ],
+      'bot1',
+    );
+    expect(found).toEqual({ id: 'm2', lastSetMs: Date.parse('2026-01-05T00:00:00.000Z') });
+  });
+
+  it('falls back to the original post time when the message was never edited', () => {
+    const found = findManagedInviteMessage(
+      [
+        {
+          id: 'm1',
+          author: { id: 'bot1' },
+          embeds: [{ title: 'Join the World of ClaudeCraft Discord' }],
+          timestamp: '2026-01-01T00:00:00.000Z',
+          edited_timestamp: null,
+        },
+      ],
+      'bot1',
+    );
+    expect(found).toEqual({ id: 'm1', lastSetMs: Date.parse('2026-01-01T00:00:00.000Z') });
+  });
+
+  it('ignores messages from other authors or without the invite embed', () => {
+    expect(
+      findManagedInviteMessage(
+        [
+          {
+            id: 'm3',
+            author: { id: 'someone-else' },
+            embeds: [{ title: 'Join the World of ClaudeCraft Discord' }],
+            timestamp: '2026-01-01T00:00:00.000Z',
+          },
+          {
+            id: 'm4',
+            author: { id: 'bot1' },
+            embeds: [{ title: 'Not the invite embed' }],
+            timestamp: '2026-01-01T00:00:00.000Z',
+          },
+        ],
+        'bot1',
+      ),
+    ).toBeNull();
+  });
+
+  it('recognizes Discord Unknown Message (10008) so a stale id can be dropped', () => {
+    expect(isUnknownMessageError({ code: 10008 })).toBe(true);
+    expect(isUnknownMessageError({ code: 50001 })).toBe(false);
+    expect(isUnknownMessageError(new Error('network blip'))).toBe(false);
   });
 });
 

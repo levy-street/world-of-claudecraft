@@ -135,6 +135,7 @@ interface ClientWireAura {
   charges?: number;
   emp?: Aura['empowerAbilities'];
   src?: number;
+  ub?: 1;
 }
 
 // ---------------------------------------------------------------------------
@@ -2410,6 +2411,7 @@ export class ClientWorld implements IWorld {
             // The caster's entity id, for the target strip's own-aura prominence
             // (auras_view ownFirst). An old server omits it; 0 matches no player id.
             rec.sourceId = a.src ?? 0;
+            rec.unbreakableControl = a.ub === 1 ? true : undefined;
           }
         } else {
           e.auras = wireAuras.map((a) => ({
@@ -2427,6 +2429,7 @@ export class ClientWorld implements IWorld {
             stacks: a.stacks,
             charges: a.charges,
             empowerAbilities: a.emp,
+            unbreakableControl: a.ub === 1 ? true : undefined,
           }));
         }
       }

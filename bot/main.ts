@@ -19,6 +19,7 @@ import {
   allTierRoleNames,
   buildActivityMessage,
   buildDailyRewardWinnersMessage,
+  buildInviteMessage,
   buildLevelNick,
   buildLinkContent,
   buildRelayMessage,
@@ -27,9 +28,12 @@ import {
   clearDepartedFlair,
   clearedMemberMeta,
   computeRoleSync,
+  findManagedInviteMessage,
   GUILD_LARGE_THRESHOLD,
   indexSpecialRoleIds,
+  inviteRefreshDue,
   isSlashCommand,
+  isUnknownMessageError,
   MEMBERS_META_BATCH,
   memberRolesFromPayload,
   type RawVoiceState,
@@ -515,6 +519,53 @@ async function main(): Promise<void> {
     }
   };
 
+  // Keep the server invite fresh: a bare Discord invite created with a finite
+  // max_age expires (the prior hand-made invite went stale after Discord's
+  // 30-day default), so periodically mint a never-expiring invite and edit a
+  // single channel message in place with it. The message id lives only in
+  // memory, so it is rediscovered below on every boot (a fresh message is
+  // posted only when no prior one is found, e.g. the very first run or if
+  // it was deleted out from under the bot).
+  let inviteMessageId: string | null = null;
+  let inviteCreatedAtMs: number | null = null;
+  if (cfg.inviteChannelId) {
+    try {
+      const recent = await discord.listMessages(cfg.inviteChannelId, 10);
+      const found = findManagedInviteMessage(recent, cfg.clientId);
+      if (found) {
+        inviteMessageId = found.id;
+        inviteCreatedAtMs = found.lastSetMs;
+      }
+    } catch (e) {
+      console.error('[bot] invite message rediscovery failed', e);
+    }
+  }
+  const refreshInviteIfDue = async (): Promise<void> => {
+    if (!cfg.inviteChannelId) return;
+    if (!inviteRefreshDue(inviteCreatedAtMs, Date.now())) return;
+    const invite = await discord.createInvite(cfg.inviteChannelId, {
+      maxAgeSeconds: 0,
+      maxUses: 0,
+    });
+    const payload = buildInviteMessage(`https://discord.gg/${invite.code}`);
+    if (inviteMessageId) {
+      try {
+        await discord.editMessage(cfg.inviteChannelId, inviteMessageId, payload);
+      } catch (e) {
+        if (!isUnknownMessageError(e)) throw e;
+        // The managed message was deleted out from under us; drop the stale
+        // id so the block below posts a replacement instead of retrying the
+        // same edit forever.
+        inviteMessageId = null;
+      }
+    }
+    if (!inviteMessageId) {
+      const message = await discord.createMessage(cfg.inviteChannelId, payload);
+      inviteMessageId = message.id;
+    }
+    inviteCreatedAtMs = Date.now();
+  };
+
   gateway.connect(false);
   setInterval(
     () => void syncAllOnlineRoles().catch((e) => console.error(e)),
@@ -535,6 +586,11 @@ async function main(): Promise<void> {
       .then(() => pushAllMemberMeta())
       .catch((e) => console.error(e));
   }, ROLE_SYNC_INTERVAL_MS).unref();
+  void refreshInviteIfDue().catch((e) => console.error('[bot] invite refresh failed', e));
+  setInterval(
+    () => void refreshInviteIfDue().catch((e) => console.error('[bot] invite refresh failed', e)),
+    ROLE_SYNC_INTERVAL_MS,
+  ).unref();
   console.log('[bot] World of ClaudeCraft Discord bot started');
 }
 

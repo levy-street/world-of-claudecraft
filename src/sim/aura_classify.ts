@@ -3,7 +3,8 @@
 // i18n), so it lives in src/sim/ and both src/ui/hud.ts and src/sim/sim.ts import
 // it. Keeping ONE classifier avoids the drift where the HUD treated silence/disarm/
 // blind/etc. as debuffs but /targetbuffs (a narrower set) tagged them as buffs.
-import type { AuraKind } from './types';
+import { isUnbreakableControlAura } from './combat/cc';
+import type { Aura, AuraKind } from './types';
 
 // A kind that is harmful by nature regardless of its value. Mirrors classic-era
 // "Debuff" framing: damage-over-time, crowd control, stat/armor reductions, and
@@ -49,9 +50,10 @@ export function isDebuffAura(kind: AuraKind, value: number): boolean {
 // and the cast's direction picks the polarity (an OFFENSIVE dispel strips a
 // benefit off an enemy; a friendly one strips a harmful effect off an ally).
 export function isDispellableAura(
-  aura: { kind: AuraKind; value: number; school: string },
+  aura: Pick<Aura, 'kind' | 'value' | 'school' | 'unbreakableControl'>,
   offensive: boolean,
 ): boolean {
+  if (isUnbreakableControlAura(aura)) return false;
   if (aura.school === 'physical') return false;
   const harmful = isDebuffAura(aura.kind, aura.value);
   return offensive ? !harmful : harmful;

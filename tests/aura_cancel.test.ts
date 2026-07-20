@@ -67,6 +67,15 @@ describe('isDebuffAura', () => {
       expect(isCancelableAura(aura('x', kind))).toBe(true);
     }
   });
+
+  it('never exposes unbreakable encounter control as player-cancelable', () => {
+    const scriptedStasis = {
+      ...aura('scripted_stasis', 'stasis'),
+      unbreakableControl: true,
+    } as Aura;
+
+    expect(isCancelableAura(scriptedStasis)).toBe(false);
+  });
 });
 
 describe('auraAffectsStats', () => {

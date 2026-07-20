@@ -49,6 +49,21 @@ describe('StableAuraWireCache', () => {
     expect(cache.rebuilds).toBe(1);
   });
 
+  it('serializes unbreakable control and rebuilds when its protection changes', () => {
+    const cache = new StableAuraWireCache();
+    const active = aura('scripted_stasis', 10);
+    active.kind = 'stasis';
+    active.unbreakableControl = true;
+
+    const protectedWire = cache.encode([active], 0, false);
+    expect(JSON.parse(protectedWire.json)[0]).toMatchObject({ ub: 1 });
+
+    active.unbreakableControl = undefined;
+    const ordinaryWire = cache.encode([active], 0, false);
+    expect(ordinaryWire.revision).toBe(protectedWire.revision + 1);
+    expect(JSON.parse(ordinaryWire.json)[0]).not.toHaveProperty('ub');
+  });
+
   it('rebuilds for every wire-visible mutation and explicit empty removal', () => {
     const cache = new StableAuraWireCache();
     const first = aura('first', 10);

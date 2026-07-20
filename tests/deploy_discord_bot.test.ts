@@ -28,4 +28,10 @@ describe('Discord bot deploy container contract', () => {
   it('passes the shared Discord bot secret to the game server', () => {
     expect(compose).toContain(`DISCORD_BOT_SECRET: ${composeEnv('DISCORD_BOT_SECRET')}`);
   });
+
+  it('forwards the invite-rotation channel id, so the feature is not silently disabled in prod', () => {
+    expect(compose).toContain(
+      `DISCORD_INVITE_CHANNEL_ID: ${composeEnv('DISCORD_INVITE_CHANNEL_ID')}`,
+    );
+  });
 });

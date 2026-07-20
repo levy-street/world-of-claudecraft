@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
 import * as nythraxis from '../src/sim/encounters/nythraxis';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import { dist2d, type Entity, NYTHRAXIS_ADD_ID, NYTHRAXIS_BOSS_ID } from '../src/sim/types';
+import { dist2d, type Entity, NYTHRAXIS_BOSS_ID } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 type AnySim = Sim & Record<string, any>;
@@ -62,7 +62,7 @@ function setup(opts: { difficulty?: 'normal' | 'heroic'; dpsCount?: number } = {
 }
 
 describe('Nythraxis encounter module (N1)', () => {
-  it('CC-immunity predicates classify raid enemies, control auras, and the scripted stun', () => {
+  it('CC-immunity predicates classify raid enemies and control auras', () => {
     const { ctx, boss } = setup();
     expect(nythraxis.isNythraxisRaidEnemy(boss)).toBe(true);
     expect(nythraxis.isNythraxisRaidEnemy({ kind: 'player' } as Entity)).toBe(false);
@@ -70,12 +70,6 @@ describe('Nythraxis encounter module (N1)', () => {
     expect(nythraxis.isNythraxisControlAura(ctx, 'slow')).toBe(true);
     expect(nythraxis.isNythraxisControlAura(ctx, 'stun')).toBe(true);
     expect(nythraxis.isNythraxisControlAura(ctx, 'dot')).toBe(false);
-    // The transition stun is the one scripted control that lands on adds / pets.
-    const add = { kind: 'mob', templateId: NYTHRAXIS_ADD_ID, ownerId: null } as Entity;
-    expect(
-      nythraxis.isNythraxisScriptedControl(add, { id: 'nythraxis_transition_stun' } as never),
-    ).toBe(true);
-    expect(nythraxis.isNythraxisScriptedControl(add, { id: 'frost_nova' } as never)).toBe(false);
   });
 
   it('Raise Fallen seeds and re-arms on the 30 second cadence (both difficulties)', () => {
@@ -98,7 +92,9 @@ describe('Nythraxis encounter module (N1)', () => {
     boss.hp = Math.floor(boss.maxHp * 0.69);
     nythraxis.updateNythraxisEncounter(ctx, boss);
     expect(boss.nythraxis?.phase).toBe('transition');
-    expect(tank.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(true);
+    expect(tank.auras.find((a) => a.id === 'nythraxis_transition_stun')).toMatchObject({
+      unbreakableControl: true,
+    });
     const aldric = [...ctx.entities.values()].find(
       (e) => e.templateId === 'brother_aldric_raid' && !e.dead,
     );
@@ -111,6 +107,177 @@ describe('Nythraxis encounter module (N1)', () => {
     );
     expect(wards.length).toBe(3);
     expect(wards.every((w) => w.auras.some((a) => a.id === 'nythraxis_wardstone_lit'))).toBe(true);
+  });
+
+  it('keeps the room stunned while queued dialogue extends the transition', () => {
+    const { sim, ctx, boss, tank } = setup();
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    const st = boss.nythraxis!;
+    st.dialogueBusyUntil = ctx.time + 6;
+    boss.hp = Math.floor(boss.maxHp * 0.69);
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+
+    const transitionStun = tank.auras.find((a) => a.id === 'nythraxis_transition_stun');
+    expect(transitionStun?.remaining).toBeGreaterThan(st.transitionTimer);
+
+    for (let tick = 0; tick < 22 * 20; tick++) sim.tick();
+    expect(st.phase).toBe('transition');
+    expect(tank.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(true);
+
+    for (let tick = 0; tick < 6 * 20; tick++) sim.tick();
+    expect(st.phase).toBe(2);
+    expect(tank.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(false);
+  });
+
+  it('enforces transition control through death, immediate revival, and unexpected removal', () => {
+    const { sim, ctx, boss, tank, dps } = setup();
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    const latePlayer = dps[0];
+    sim.setPlayerLevel(20, latePlayer.id);
+    latePlayer.dead = true;
+    latePlayer.hp = 0;
+    latePlayer.corpsePos = { ...latePlayer.pos };
+    ctx.pendingResurrections.set(latePlayer.id, {
+      casterId: tank.id,
+      hpFrac: 0.35,
+      fallbackDestination: { ...tank.pos },
+      expiresAt: ctx.time + 30,
+    });
+    boss.hp = Math.floor(boss.maxHp * 0.69);
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    const st = boss.nythraxis!;
+    expect(latePlayer.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(true);
+
+    sim.respondToResurrection(true, latePlayer.id);
+    expect(latePlayer.dead).toBe(false);
+    expect(latePlayer.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(true);
+    const revivedAt = { ...latePlayer.pos };
+    const revivedResource = latePlayer.resource;
+    sim.meta(latePlayer.id)!.moveInput.forward = true;
+    sim.castAbility('blink', latePlayer.id);
+    expect(latePlayer.resource).toBe(revivedResource);
+    expect(latePlayer.cooldowns.has('blink')).toBe(false);
+    sim.tick();
+    expect(dist2d(latePlayer.pos, revivedAt)).toBeLessThan(0.01);
+
+    latePlayer.auras = [
+      ...latePlayer.auras.filter((a) => a.id !== 'nythraxis_transition_stun'),
+      {
+        id: 'nythraxis_transition_stun',
+        name: 'Downgraded Stun',
+        kind: 'stun',
+        remaining: 1,
+        duration: 1,
+        value: 0,
+        sourceId: boss.id,
+        school: 'physical',
+      },
+    ];
+    nythraxis.updateNythraxisTransition(ctx, boss, st);
+    expect(latePlayer.auras.filter((a) => a.id === 'nythraxis_transition_stun')).toEqual([
+      expect.objectContaining({
+        name: 'Shuddering Stomp',
+        sourceId: boss.id,
+        unbreakableControl: true,
+      }),
+    ]);
+
+    latePlayer.pos.x += 500;
+    st.transitionTimer = 0.01;
+    nythraxis.updateNythraxisTransition(ctx, boss, st);
+    expect(latePlayer.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(false);
+  });
+
+  it('pre-marks a released raider whose pending resurrection returns them to the room', () => {
+    const { sim, ctx, boss, tank, dps } = setup();
+    const releasedRaider = dps[0];
+    releasedRaider.dead = true;
+    releasedRaider.hp = 0;
+    sim.releaseSpirit(releasedRaider.id);
+    expect(dist2d(releasedRaider.pos, boss.spawnPos)).toBeGreaterThan(300);
+    ctx.pendingResurrections.set(releasedRaider.id, {
+      casterId: tank.id,
+      hpFrac: 0.35,
+      fallbackDestination: { ...tank.pos },
+      expiresAt: ctx.time + 30,
+    });
+
+    boss.hp = Math.floor(boss.maxHp * 0.69);
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    expect(releasedRaider.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(true);
+    expect(releasedRaider.hp).toBe(releasedRaider.maxHp);
+
+    sim.respondToResurrection(true, releasedRaider.id);
+    const revivedAt = { ...releasedRaider.pos };
+    sim.castAbility('blink', releasedRaider.id);
+
+    expect(releasedRaider.dead).toBe(false);
+    expect(releasedRaider.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(true);
+    expect(releasedRaider.pos).toEqual(revivedAt);
+    expect(releasedRaider.cooldowns.has('blink')).toBe(false);
+  });
+
+  it('keeps a chained resurrection arrival controlled before the next encounter tick', () => {
+    const { sim, ctx, boss, tank, dps } = setup();
+    const [arrivalAnchor, chainedRaider] = dps;
+    for (const raider of [arrivalAnchor, chainedRaider]) {
+      raider.dead = true;
+      raider.hp = 0;
+      sim.releaseSpirit(raider.id);
+      expect(dist2d(raider.pos, boss.spawnPos)).toBeGreaterThan(300);
+    }
+    // The chained raider's offer was made while its caster was still a distant
+    // ghost, so its fallback does not reveal that the caster will revive in-room.
+    ctx.pendingResurrections.set(chainedRaider.id, {
+      casterId: arrivalAnchor.id,
+      hpFrac: 0.35,
+      fallbackDestination: { ...arrivalAnchor.pos },
+      expiresAt: ctx.time + 30,
+    });
+    ctx.pendingResurrections.set(arrivalAnchor.id, {
+      casterId: tank.id,
+      hpFrac: 0.35,
+      fallbackDestination: { ...tank.pos },
+      expiresAt: ctx.time + 30,
+    });
+
+    boss.hp = Math.floor(boss.maxHp * 0.69);
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    expect(arrivalAnchor.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(true);
+    expect(chainedRaider.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(false);
+
+    sim.respondToResurrection(true, arrivalAnchor.id);
+    sim.respondToResurrection(true, chainedRaider.id);
+    const revivedAt = { ...chainedRaider.pos };
+    sim.castAbility('blink', chainedRaider.id);
+
+    expect(chainedRaider.dead).toBe(false);
+    expect(chainedRaider.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(true);
+    expect(chainedRaider.pos).toEqual(revivedAt);
+    expect(chainedRaider.cooldowns.has('blink')).toBe(false);
+  });
+
+  it('releases every transition marker when the boss dies mid-transition', () => {
+    const { ctx, boss, tank, dps } = setup();
+    const deadRaider = dps[0];
+    deadRaider.dead = true;
+    deadRaider.hp = 0;
+    boss.hp = Math.floor(boss.maxHp * 0.69);
+    nythraxis.updateNythraxisEncounter(ctx, boss);
+    expect(boss.nythraxis?.phase).toBe('transition');
+    expect(tank.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(true);
+    expect(deadRaider.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(true);
+
+    boss.dead = true;
+    boss.hp = 0;
+    nythraxis.onBossDeath(ctx, boss);
+
+    expect(boss.nythraxis?.phase).toBe('dead');
+    for (const entity of ctx.entities.values()) {
+      expect(
+        entity.auras.some((a) => a.id === 'nythraxis_transition_stun' && a.sourceId === boss.id),
+      ).toBe(false);
+    }
   });
 
   it('heroic Soul Rend marks six distinct non-tank players', () => {

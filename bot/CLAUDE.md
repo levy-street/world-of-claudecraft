@@ -62,6 +62,17 @@ Zero new dependencies: Gateway over the existing `ws`, REST via built-in `fetch`
   so a failed post retries (at-least-once).
 - Daily engagement grant: first message or voice-join per member per day, deduped
   bot-side AND server-side (grant dedupe key), so it is exactly-once.
+- Invite auto-refresh: checked every `ROLE_SYNC_INTERVAL_MS` (5 min) and once at
+  startup; a fresh never-expiring invite (`max_age: 0`) is minted and a single
+  channel message kept edited in place once `INVITE_REFRESH_INTERVAL_MS` (25 days,
+  `logic.ts`) has elapsed since the last one, so the link never goes stale the way
+  a hand-made invite (Discord's 30-day default) does. The message id lives only in
+  memory, so on boot it is rediscovered by listing the channel's recent messages
+  and matching the bot's own author id plus the invite embed's stable title
+  (`findManagedInviteMessage`); a fresh message is posted only when none is found.
+  If the managed message is deleted out from under the bot, the next refresh's
+  edit fails with Discord's Unknown Message error (10008), which clears the
+  stale id and posts a replacement instead of retrying forever.
 
 ## Roles
 - **Status tiers** (`WoC Initiate` up to `WoC Mythic`; ladder in
@@ -85,8 +96,9 @@ Required: `DISCORD_BOT_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_GUILD_ID`,
 (one-time startup announcement), `DISCORD_RELAY_CHANNEL_ID` (falls back to test),
 `DISCORD_ACTIVITY_CHANNEL_ID` (falls back to relay, then test),
 `DISCORD_DAILY_REWARDS_CHANNEL_ID`, `DISCORD_SYNC_NICKNAMES` (`0` disables, default
-on). `DISCORD_WELCOME_CHANNEL_ID` is read but currently unwired (no welcome message
-is posted). Boot loads `.env`/`.env.local` when present but runs fine from ambient
+on), `DISCORD_INVITE_CHANNEL_ID` (channel the auto-rotated never-expiring invite
+message is kept current in; unset disables invite auto-refresh). `DISCORD_WELCOME_CHANNEL_ID`
+is read but currently unwired (no welcome message is posted). Boot loads `.env`/`.env.local` when present but runs fine from ambient
 env alone (`process.loadEnvFile`).
 
 ## Limits / notes

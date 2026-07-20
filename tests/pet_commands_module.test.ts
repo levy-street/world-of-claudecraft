@@ -7,10 +7,16 @@ import {
   completeTame,
   feedPet,
   healPet,
+  petAttack,
   petOf,
+  petTaunt,
+  petWaterJet,
+  renamePet,
   restorePet,
   revivePet,
   serializePet,
+  setPetAutoTaunt,
+  setPetAutoWaterJet,
   setPetMode,
   summonPet,
 } from '../src/sim/pet/pet_commands';
@@ -48,6 +54,110 @@ function spawnWolf(sim: AnySim, near: AnyEntity, level = 2): AnyEntity {
 }
 
 describe('pet_commands module (P1b)', () => {
+  it('an unbreakable owner movement lock blocks every user-issued pet command', () => {
+    const { sim, hid, hunter } = hunterWorld();
+    const tame = spawnWolf(sim, hunter);
+    completeTame(sim.ctx, hunter, tame);
+    const pet = petOf(sim.ctx, hid) as AnyEntity;
+    const target = spawnWolf(sim, hunter);
+    hunter.targetId = target.id;
+    sim.ctx.applyAura(hunter, {
+      id: 'scripted_boss_lock',
+      name: 'Scripted Boss Lock',
+      kind: 'root',
+      value: 0,
+      remaining: 10,
+      duration: 10,
+      sourceId: target.id,
+      school: 'shadow',
+      unbreakableControl: true,
+    });
+
+    // Revival is immediate rather than tick-driven, so it must be rejected at the
+    // command boundary instead of waiting for the encounter to mark the pet again.
+    pet.dead = true;
+    pet.hp = 0;
+    revivePet(sim.ctx, hid);
+    expect(pet.dead).toBe(true);
+    expect(pet.hp).toBe(0);
+
+    // Put the pet back into a neutral live state as a system/encounter operation,
+    // then prove every direct control surface remains side-effect free.
+    pet.dead = false;
+    pet.hp = Math.floor(pet.maxHp * 0.5);
+    pet.aiState = 'idle';
+    pet.aggroTargetId = null;
+    pet.inCombat = false;
+    pet.petTauntTimer = 0;
+    pet.petManualTauntPending = false;
+    sim.addItem('baked_bread', 1, hid);
+    const breadBefore = sim.countItem('baked_bread', hid);
+
+    petAttack(sim.ctx, hid);
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+    expect(target.threat.has(pet.id)).toBe(false);
+
+    petTaunt(sim.ctx, hid);
+    expect(pet.petTauntTimer).toBe(0);
+    expect(pet.petManualTauntPending).toBe(false);
+    expect(target.forcedTargetId).not.toBe(pet.id);
+
+    feedPet(sim.ctx, 'baked_bread', hid);
+    expect(sim.countItem('baked_bread', hid)).toBe(breadBefore);
+    expect(pet.auras.some((a) => a.id === 'feed_pet')).toBe(false);
+
+    setPetMode(sim.ctx, 'aggressive', hid);
+    setPetAutoTaunt(sim.ctx, true, hid);
+    expect(pet.petMode).toBe('defensive');
+    expect(pet.petAutoTaunt).toBe(false);
+
+    // Exercise the mage-only active/autocast seam on the same owned entity.
+    pet.templateId = 'water_elemental';
+    setPetAutoWaterJet(sim.ctx, true, hid);
+    petWaterJet(sim.ctx, hid);
+    expect(pet.petAutoWaterJet).toBe(false);
+    expect(pet.castingAbility).toBeNull();
+    expect(pet.petTauntTimer).toBe(0);
+    expect(target.auras.some((a) => a.id === 'water_jet')).toBe(false);
+
+    const nameBefore = pet.name;
+    renamePet(sim.ctx, 'Locked', hid);
+    abandonPet(sim.ctx, hid);
+    expect(pet.name).toBe(nameBefore);
+    expect(sim.entities.has(pet.id)).toBe(true);
+  });
+
+  it('an unbreakable owner movement lock cannot spend mana or arm Demon Heal', () => {
+    const sim = new Sim({ seed: 12, playerClass: 'warlock', noPlayer: true }) as AnySim;
+    const pid = sim.addPlayer('warlock', 'Demonist') as number;
+    const owner = sim.entities.get(pid) as AnyEntity;
+    summonPet(sim.ctx, owner, 'emberkin');
+    const pet = petOf(sim.ctx, pid) as AnyEntity;
+    pet.hp = Math.max(1, pet.maxHp - 50);
+    owner.resource = owner.maxResource;
+    sim.ctx.applyAura(owner, {
+      id: 'scripted_boss_lock',
+      name: 'Scripted Boss Lock',
+      kind: 'root',
+      value: 0,
+      remaining: 10,
+      duration: 10,
+      sourceId: pet.id,
+      school: 'shadow',
+      unbreakableControl: true,
+    });
+    const manaBefore = owner.resource;
+    const gcdBefore = owner.gcdRemaining;
+
+    healPet(sim.ctx, pid);
+
+    expect(owner.resource).toBe(manaBefore);
+    expect(owner.gcdRemaining).toBe(gcdBefore);
+    expect(owner.castingAbility).toBeNull();
+    expect(owner.channeling).toBe(false);
+  });
+
   it('hunter lifecycle: tame -> setMode -> feed -> revive -> abandon', () => {
     const { sim, hid, hunter } = hunterWorld();
     const wolf = spawnWolf(sim, hunter);

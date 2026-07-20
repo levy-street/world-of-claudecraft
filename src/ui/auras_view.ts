@@ -115,6 +115,9 @@ export interface AuraInput {
   // and the mirror decodes 0, which matches no player id, so the strip degrades to the
   // un-prioritized layout instead of misattributing.
   sourceId?: number;
+  // Encounter-owned control cannot be canceled by the player. Mirrored over the
+  // online aura wire so the cancel affordance matches the authoritative sim.
+  unbreakableControl?: true;
 }
 
 /** The entity fields the core reads: just its aura list. */
@@ -304,7 +307,7 @@ export function createAurasView(
         // The buff bar (mode 'buffs', the player's own auras) offers right-click-cancel;
         // a helpful buff is cancelable, a debuff never. The target debuff strip
         // (mode 'debuffs') is read-only, so nothing there is cancelable.
-        slot.cancelable = mode === 'buffs' && !debuff;
+        slot.cancelable = mode === 'buffs' && !debuff && a.unbreakableControl !== true;
         slot.effectHtml = deps.auraEffectHtml(a);
         slot.own = own;
         count++;

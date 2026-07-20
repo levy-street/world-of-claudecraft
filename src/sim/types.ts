@@ -446,6 +446,9 @@ export interface Aura {
   tickTimer?: number;
   sourceId: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+  // Encounter-authored control that must land through immunity and cannot be
+  // removed by player counters. Natural expiry and encounter cleanup still own it.
+  unbreakableControl?: true;
   breaksOnDamage?: boolean;
   // Lingering Dread lets a break-on-damage fear absorb this much damage before
   // breaking. Undefined retains the normal break-on-any-damage behavior.
@@ -1771,8 +1774,8 @@ export type AbilityEffect =
   | { type: 'aoeFear'; duration: number; radius: number; maxTargets?: number }
   | { type: 'clearCooldowns'; abilities: string[] }
   | { type: 'breakControl' }
-  // Ice Block: strip EVERY debuff (control, DoTs, stat saps, ...) off the caster.
-  // Broader than breakControl (which covers control auras only). See effect_dispatch.
+  // Ice Block: strip every player-removable debuff (control, DoTs, stat saps, ...)
+  // off the caster. Broader than breakControl. See effect_dispatch.
   | { type: 'cleanseSelf' }
   | {
       type: 'repositionToAim';

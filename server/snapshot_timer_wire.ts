@@ -27,6 +27,7 @@ interface StableAuraRecord {
   charges: number | undefined;
   empowerAbilities: readonly string[] | undefined;
   sourceId: number;
+  unbreakableControl: boolean;
   paused: boolean;
   deadline: number;
 }
@@ -47,6 +48,7 @@ interface StableAuraWire {
   charges?: number;
   emp?: readonly string[];
   src?: number;
+  ub?: 1;
 }
 
 function round2(value: number): number {
@@ -86,6 +88,7 @@ function auraMatches(
     record.charges === aura.charges &&
     sameStringList(record.empowerAbilities, aura.empowerAbilities) &&
     record.sourceId === aura.sourceId &&
+    record.unbreakableControl === (aura.unbreakableControl === true) &&
     record.paused === paused &&
     record.deadline === deadline
   );
@@ -106,6 +109,7 @@ function auraRecord(aura: Aura, simTime: number, paused: boolean): StableAuraRec
     charges: aura.charges,
     empowerAbilities: aura.empowerAbilities ? [...aura.empowerAbilities] : undefined,
     sourceId: aura.sourceId,
+    unbreakableControl: aura.unbreakableControl === true,
     paused,
     deadline: round2(paused ? aura.remaining : simTime + aura.remaining),
   };
@@ -129,6 +133,7 @@ function auraWire(record: StableAuraRecord): StableAuraWire {
   if (record.charges !== undefined) wire.charges = record.charges;
   if (record.empowerAbilities !== undefined) wire.emp = record.empowerAbilities;
   if (record.sourceId) wire.src = record.sourceId;
+  if (record.unbreakableControl) wire.ub = 1;
   return wire;
 }
 

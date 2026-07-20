@@ -177,6 +177,41 @@ describe('mage choice rows (owner tree)', () => {
     expect(p.auras.some((a) => a.kind === 'stun')).toBe(true); // ICD running
   });
 
+  it('Temporal Rift never eats scripted encounter control (Nythraxis transition stun)', () => {
+    const { sim, p } = rig({ 8: 'mag_r8_temporal_rift' });
+    const mob = addTargetMob(sim);
+    const anySim = sim as unknown as { applyAura(t: Entity, a: object): void };
+    // The phase-two cinematic room stun, boss-sourced exactly as the encounter
+    // applies it (encounters/nythraxis.ts startNythraxisTransition).
+    anySim.applyAura(p, {
+      id: 'nythraxis_transition_stun',
+      name: 'Shuddering Stomp',
+      kind: 'stun',
+      value: 0,
+      remaining: 6,
+      duration: 6,
+      sourceId: mob.id,
+      school: 'physical',
+      unbreakableControl: true,
+    });
+    // The scripted stun LANDS and the rift charge is not consumed.
+    expect(p.auras.some((a) => a.id === 'nythraxis_transition_stun')).toBe(true);
+    expect(p.auras.some((a) => a.id === 'temporal_rift_cd')).toBe(false);
+    // An ordinary combat stun immediately after is still cleansed as normal.
+    anySim.applyAura(p, {
+      id: 'test_stun',
+      name: 'Test Stun',
+      kind: 'stun',
+      value: 0,
+      remaining: 3,
+      duration: 3,
+      sourceId: mob.id,
+      school: 'physical',
+    });
+    expect(p.auras.some((a) => a.id === 'test_stun')).toBe(false);
+    expect(p.auras.some((a) => a.id === 'temporal_rift_cd')).toBe(true);
+  });
+
   it('Greater Invisibility strips 2 DoTs, vanishes, and cuts damage 90%', () => {
     const { sim, p } = rig({ 8: 'mag_r8_greater_invis' });
     const mob = addTargetMob(sim);

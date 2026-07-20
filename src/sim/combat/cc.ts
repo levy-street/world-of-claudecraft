@@ -11,6 +11,34 @@
 
 import type { Aura, DamageBreakBudget, Entity } from '../types';
 
+// Some scripted encounter control is part of the encounter timeline rather
+// than ordinary combat CC. Player immunity, cleanse, dispel, control-break, and
+// damage-break paths all consult this predicate. Expiry and encounter-owned
+// cleanup deliberately do not, so the encounter remains the lifecycle owner.
+export function isUnbreakableControlAura(aura: Pick<Aura, 'unbreakableControl'>): boolean {
+  return aura.unbreakableControl === true;
+}
+
+const MOVEMENT_LOCK_AURA_KINDS: ReadonlySet<Aura['kind']> = new Set([
+  'stun',
+  'stasis',
+  'root',
+  'incapacitate',
+  'polymorph',
+]);
+
+export function hasUnbreakableMovementLock(
+  entity: Pick<Entity, 'auras'>,
+  excludedAura?: Aura,
+): boolean {
+  return entity.auras.some(
+    (aura) =>
+      aura !== excludedAura &&
+      MOVEMENT_LOCK_AURA_KINDS.has(aura.kind) &&
+      isUnbreakableControlAura(aura),
+  );
+}
+
 export function damageBreakThreshold(maxHp: number, budget: DamageBreakBudget): number {
   return Math.min(budget.max, Math.max(budget.min, Math.round(maxHp * budget.maxHpPct)));
 }

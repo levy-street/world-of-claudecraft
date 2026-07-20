@@ -44,7 +44,14 @@ import {
   spendResource as spendResourceImpl,
   updateCasting as updateCastingImpl,
 } from './combat/casting_lifecycle';
-import { isLockedOut, isRooted, isSilenced, isStunned } from './combat/cc';
+import {
+  hasUnbreakableMovementLock,
+  isLockedOut,
+  isRooted,
+  isSilenced,
+  isStunned,
+  isUnbreakableControlAura,
+} from './combat/cc';
 import { aetherSurgeCostMult, echoVisibleTo } from './combat/chronomancy';
 import {
   dealDamage as dealDamageImpl,
@@ -4439,7 +4446,8 @@ export class Sim {
   }
   private updateFearMovement(e: Entity): boolean {
     const aura = this.fearAura(e);
-    if (!aura || e.auras.some((a) => a.kind === 'root')) return false;
+    if (!aura || e.auras.some((a) => a.kind === 'root') || hasUnbreakableMovementLock(e, aura))
+      return false;
     const angle = Number.isFinite(aura.value) ? aura.value : e.facing;
     const dest = this.groundPos(e.pos.x + Math.sin(angle) * 10, e.pos.z + Math.cos(angle) * 10);
     this.moveToward(e, dest, this.fleeMoveSpeed(e));
@@ -4473,16 +4481,12 @@ export class Sim {
     );
   }
   // Nythraxis CC-immunity predicates moved to encounters/nythraxis.ts (N1); Sim keeps
-  // thin delegates because the hot applyAura immunity path reads them via this.X
-  // (isNythraxisControlAura routes back through ctx.isControlAura, which stays on Sim).
+  // thin delegates because the hot applyAura immunity path reads them via this.X.
   private isNythraxisControlAura(kind: AuraKind): boolean {
     return nythraxis.isNythraxisControlAura(this.ctx, kind);
   }
   private isNythraxisRaidEnemy(target: Entity): boolean {
     return nythraxis.isNythraxisRaidEnemy(target);
-  }
-  private isNythraxisScriptedControl(target: Entity, aura: Aura): boolean {
-    return nythraxis.isNythraxisScriptedControl(target, aura);
   }
   // L1 loot distribution moved to loot/loot_roll.ts (behind SimContext). Sim keeps a
   // thin delegate for partyLootCandidatesForMob because dead_party_loot.test.ts reaches
@@ -5045,7 +5049,8 @@ export class Sim {
     if (
       this.isIceBlocked(target) &&
       this.isIceBlockCrowdControlAura(aura.kind) &&
-      aura.sourceId !== target.id
+      aura.sourceId !== target.id &&
+      !isUnbreakableControlAura(aura)
     )
       return;
     if (
@@ -5053,7 +5058,7 @@ export class Sim {
       !nythraxis.isNythraxisControllableAdd(target) && // priest + stalker are meant to be CC'd
       this.isNythraxisControlAura(aura.kind) &&
       aura.sourceId !== target.id &&
-      !this.isNythraxisScriptedControl(target, aura)
+      !isUnbreakableControlAura(aura)
     )
       return;
     if (
@@ -5061,7 +5066,7 @@ export class Sim {
       (MOBS[target.templateId]?.ccImmune || target.ccImmune) &&
       this.isControlAura(aura.kind) &&
       aura.sourceId !== target.id &&
-      !this.isNythraxisScriptedControl(target, aura)
+      !isUnbreakableControlAura(aura)
     )
       return;
     // Slow immunity is separate from ccImmune: snares (kind 'slow') are not control auras,
@@ -5072,17 +5077,21 @@ export class Sim {
       target.kind === 'mob' &&
       (MOBS[target.templateId]?.slowImmune || target.slowImmune) &&
       aura.kind === 'slow' &&
-      aura.sourceId !== target.id
+      aura.sourceId !== target.id &&
+      !isUnbreakableControlAura(aura)
     )
       return;
     // Temporal Rift (mage choice row): every 20 sec the next stun, root or
     // silence to land on the wearer is cleansed instantly, i.e. never applied.
     // The ICD rides an 'internal_cd' aura (no new entity field enters the
     // parity state hash) that the player can watch tick down. Draws no rng.
+    // Encounter-authored unbreakable control is never a cleanse target: the
+    // whole raid freezes for the sequence. Combat CC stays cleansable.
     if (
       target.kind === 'player' &&
       (aura.kind === 'stun' || aura.kind === 'root' || aura.kind === 'silence') &&
-      aura.sourceId !== target.id
+      aura.sourceId !== target.id &&
+      !isUnbreakableControlAura(aura)
     ) {
       const riftMeta = this.players.get(target.id);
       if (
@@ -5104,7 +5113,13 @@ export class Sim {
         return;
       }
     }
-    for (const existing of auraReplacementConflicts(target.auras, aura)) {
+    const replacementConflicts = auraReplacementConflicts(target.auras, aura);
+    if (
+      !isUnbreakableControlAura(aura) &&
+      replacementConflicts.some((index) => isUnbreakableControlAura(target.auras[index]))
+    )
+      return;
+    for (const existing of replacementConflicts) {
       this.applyNonPlayerStatAura(target, target.auras[existing], -1);
       target.auras.splice(existing, 1);
     }

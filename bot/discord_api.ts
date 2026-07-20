@@ -3,7 +3,23 @@
 // member role edits, and posting messages. Naive about rate limits (low volume):
 // on a 429 it waits the returned retry_after once and retries.
 
+import type { DiscordMessageSummary } from './logic';
+
 const API = 'https://discord.com/api/v10';
+
+// Thrown for any non-2xx response. `code` is Discord's own numeric API error
+// code (distinct from the HTTP status) when the error body parses as JSON;
+// callers that need to branch on a specific Discord error (e.g. 10008 Unknown
+// Message) match on it rather than the HTTP status.
+export class DiscordApiError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+    public code?: number,
+  ) {
+    super(message);
+  }
+}
 
 export class DiscordApi {
   constructor(private token: string) {}
@@ -31,7 +47,17 @@ export class DiscordApi {
     }
     if (!resp.ok) {
       const text = await resp.text().catch(() => '');
-      throw new Error(`[bot] discord ${method} ${path} -> ${resp.status} ${text.slice(0, 200)}`);
+      let code: number | undefined;
+      try {
+        code = (JSON.parse(text) as { code?: number }).code;
+      } catch {
+        /* not JSON; leave code undefined */
+      }
+      throw new DiscordApiError(
+        `[bot] discord ${method} ${path} -> ${resp.status} ${text.slice(0, 200)}`,
+        resp.status,
+        code,
+      );
     }
     if (resp.status === 204) return null;
     return resp.json().catch(() => null);
@@ -121,7 +147,43 @@ export class DiscordApi {
     await this.request('PATCH', `/guilds/${guildId}/members/${userId}`, { nick });
   }
 
-  async createMessage(channelId: string, payload: Record<string, unknown>): Promise<void> {
-    await this.request('POST', `/channels/${channelId}/messages`, payload);
+  async createMessage(
+    channelId: string,
+    payload: Record<string, unknown>,
+  ): Promise<{ id: string }> {
+    return (await this.request('POST', `/channels/${channelId}/messages`, payload)) as {
+      id: string;
+    };
+  }
+
+  // Edit a message the bot previously posted (used to keep the invite message
+  // current in place instead of reposting).
+  async editMessage(
+    channelId: string,
+    messageId: string,
+    payload: Record<string, unknown>,
+  ): Promise<void> {
+    await this.request('PATCH', `/channels/${channelId}/messages/${messageId}`, payload);
+  }
+
+  // List the most recent messages in a channel (newest first). Used to
+  // rediscover the bot's own previously-posted invite message after a
+  // restart, since the message id otherwise lives only in memory.
+  async listMessages(channelId: string, limit = 10): Promise<DiscordMessageSummary[]> {
+    const data = await this.request('GET', `/channels/${channelId}/messages?limit=${limit}`);
+    return Array.isArray(data) ? (data as DiscordMessageSummary[]) : [];
+  }
+
+  // Create an invite for a channel (needs CREATE_INSTANT_INVITE). `maxAgeSeconds:
+  // 0` means the invite never expires; `maxUses: 0` means unlimited uses.
+  async createInvite(
+    channelId: string,
+    opts: { maxAgeSeconds: number; maxUses: number; unique?: boolean },
+  ): Promise<{ code: string }> {
+    return (await this.request('POST', `/channels/${channelId}/invites`, {
+      max_age: opts.maxAgeSeconds,
+      max_uses: opts.maxUses,
+      unique: opts.unique ?? false,
+    })) as { code: string };
   }
 }

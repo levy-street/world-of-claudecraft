@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 419,
-      "state": "6c07dcab",
+      "state": "54eff241",
       "events": "4e53bde1",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 419,
-      "state": "3289985a",
+      "state": "ae282d00",
       "events": "2624f545",
       "rng": {
         "draws": 28,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 419,
-      "state": "4889dd94",
+      "state": "3f7fa57a",
       "events": "92dd922d",
       "rng": {
         "draws": 138,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 419,
-      "state": "1eaa5daf",
+      "state": "a21d9609",
       "events": "547fbe65",
       "rng": {
         "draws": 294,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 419,
-      "state": "2e73e78a",
+      "state": "b8d206d0",
       "events": "b1fb8310",
       "rng": {
         "draws": 300,
@@ -477,7 +477,7 @@
           "castTotal": 2.5,
           "castingAbility": "fireball",
           "comboUntil": -1,
-          "critChance": 0.091,
+          "critChance": 0.121,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
           "dualWielding": true,
@@ -533,7 +533,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 115,
+          "attackPower": 139,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.091,
@@ -557,7 +557,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
-          "rangedPower": 164,
+          "rangedPower": 188,
           "resource": 622,
           "resourceType": "mana",
           "spawnPos": {
@@ -568,7 +568,7 @@
           "spellPower": 16,
           "stats": {
             "agi": 82,
-            "armor": 375,
+            "armor": 405,
             "int": 32,
             "spi": 33,
             "sta": 57,
@@ -587,7 +587,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 419,
-      "state": "e0c273d4",
+      "state": "b82ab0e2",
       "events": "ffc08c87",
       "rng": {
         "draws": 300,
@@ -987,7 +987,7 @@
           "attackPower": 118,
           "castTotal": 2.5,
           "comboUntil": -1,
-          "critChance": 0.091,
+          "critChance": 0.121,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
           "dualWielding": true,
@@ -1043,7 +1043,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 115,
+          "attackPower": 139,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.091,
@@ -1067,7 +1067,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
-          "rangedPower": 164,
+          "rangedPower": 188,
           "resource": 622,
           "resourceType": "mana",
           "spawnPos": {
@@ -1078,7 +1078,7 @@
           "spellPower": 16,
           "stats": {
             "agi": 82,
-            "armor": 375,
+            "armor": 405,
             "int": 32,
             "spi": 33,
             "sta": 57,
@@ -1097,7 +1097,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 419,
-      "state": "d6cab7fb",
+      "state": "0a3ffd41",
       "events": "f677c602",
       "rng": {
         "draws": 300,
@@ -1501,7 +1501,7 @@
           "attackPower": 118,
           "castTotal": 2,
           "comboUntil": -1,
-          "critChance": 0.091,
+          "critChance": 0.121,
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
@@ -1557,7 +1557,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 115,
+          "attackPower": 139,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.091,
@@ -1581,7 +1581,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
-          "rangedPower": 164,
+          "rangedPower": 188,
           "resource": 622,
           "resourceType": "mana",
           "spawnPos": {
@@ -1592,7 +1592,7 @@
           "spellPower": 16,
           "stats": {
             "agi": 82,
-            "armor": 375,
+            "armor": 405,
             "int": 32,
             "spi": 33,
             "sta": 57,
@@ -1611,7 +1611,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 419,
-      "state": "beef5b13",
+      "state": "03564c95",
       "events": "741638a5",
       "rng": {
         "draws": 429,
@@ -1622,7 +1622,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 419,
-      "state": "f848fe08",
+      "state": "083d7d5e",
       "events": "741638a5",
       "rng": {
         "draws": 524,
@@ -2028,7 +2028,7 @@
           "castTotal": 2,
           "combatTimer": 2.05,
           "comboUntil": -1,
-          "critChance": 0.091,
+          "critChance": 0.121,
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
@@ -2084,7 +2084,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 115,
+          "attackPower": 139,
           "combatTimer": 101.05,
           "comboUntil": -1,
           "critChance": 0.091,
@@ -2108,7 +2108,7 @@
             "z": -1232
           },
           "potionCooldownUntil": -1,
-          "rangedPower": 164,
+          "rangedPower": 188,
           "resource": 622,
           "resourceType": "mana",
           "spawnPos": {
@@ -2119,7 +2119,7 @@
           "spellPower": 16,
           "stats": {
             "agi": 82,
-            "armor": 375,
+            "armor": 405,
             "int": 32,
             "spi": 33,
             "sta": 57,

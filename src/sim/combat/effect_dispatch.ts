@@ -55,7 +55,12 @@ import {
   hasSweepingStrikes,
   sweepStrikeDamage,
 } from './area_echo';
-import { damageBreakThreshold, isRootedOrChilled } from './cc';
+import {
+  damageBreakThreshold,
+  hasUnbreakableMovementLock,
+  isRootedOrChilled,
+  isUnbreakableControlAura,
+} from './cc';
 import {
   ARCANE_SURGE_ID,
   aetherSurgeAddStack,
@@ -135,7 +140,7 @@ function exclusiveGroupOfAura(id: string): string | undefined {
 function removeRootAuras(ctx: SimContext, entity: Entity): void {
   for (let index = entity.auras.length - 1; index >= 0; index--) {
     const aura = entity.auras[index];
-    if (aura.kind !== 'root') continue;
+    if (aura.kind !== 'root' || isUnbreakableControlAura(aura)) continue;
     entity.auras.splice(index, 1);
     ctx.emit({ type: 'aura', targetId: entity.id, name: aura.name, gained: false });
   }
@@ -1003,12 +1008,12 @@ export function runEffects(
         break;
       }
       case 'cleanseSelf': {
-        // Ice Block: strip EVERY debuff off the caster (control, DoTs, stat saps, ...),
-        // broader than breakControl. Uses the shared classifier so the split matches
-        // the buff/debuff frame exactly. Emits the aura-lost event so client bars clear.
+        // Ice Block strips every player-removable debuff off the caster (control,
+        // DoTs, stat saps, ...), broader than breakControl. Encounter-authored
+        // unbreakable control stays until its owning script releases it.
         for (let i = p.auras.length - 1; i >= 0; i--) {
           const aura = p.auras[i];
-          if (isDebuffAura(aura.kind, aura.value)) {
+          if (isDebuffAura(aura.kind, aura.value) && !isUnbreakableControlAura(aura)) {
             p.auras.splice(i, 1);
             ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
           }
@@ -2146,11 +2151,12 @@ export function runEffects(
         for (let i = p.auras.length - 1; i >= 0; i--) {
           const aura = p.auras[i];
           if (
-            ctx.isControlAura(aura.kind) ||
-            aura.kind === 'silence' ||
-            aura.kind === 'blind' ||
-            aura.kind === 'disarm' ||
-            aura.kind === 'slow'
+            !isUnbreakableControlAura(aura) &&
+            (ctx.isControlAura(aura.kind) ||
+              aura.kind === 'silence' ||
+              aura.kind === 'blind' ||
+              aura.kind === 'disarm' ||
+              aura.kind === 'slow')
           ) {
             p.auras.splice(i, 1);
             ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
@@ -2159,11 +2165,12 @@ export function runEffects(
         break;
       }
       case 'repositionToAim': {
-        if (!eff.landingAoe) break;
+        if (!eff.landingAoe || hasUnbreakableMovementLock(p)) break;
         armHeroicLeap(ctx, p, p.castAim ?? p.pos, eff.landingAoe, ability);
         break;
       }
       case 'blinkForward': {
+        if (hasUnbreakableMovementLock(p)) break;
         if (eff.breakRoots) removeRootAuras(ctx, p);
         let distance = eff.distance;
         let facing = p.facing;
@@ -2437,7 +2444,7 @@ export function runEffects(
         break;
       }
       case 'charge': {
-        if (!target) break;
+        if (!target || hasUnbreakableMovementLock(p)) break;
         // the stun effect in the same ability lands this tick; the player
         // then runs the route at charge speed instead of teleporting
         p.chargeTargetId = target.id;

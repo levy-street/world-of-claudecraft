@@ -4,7 +4,8 @@
 
 import type { SimContext } from '../sim_context';
 import { revivePlayerAt } from '../spirit';
-import type { Entity } from '../types';
+import type { Aura, Entity } from '../types';
+import { isUnbreakableControlAura } from './cc';
 
 export const RESURRECTION_OFFER_SECONDS = 30;
 
@@ -33,9 +34,37 @@ export function respondToResurrection(ctx: SimContext, accept: boolean, pid?: nu
   ctx.pendingResurrections.delete(r.e.id);
   if (!accept || ctx.time >= offer.expiresAt || !r.e.dead) return;
   const caster = ctx.entities.get(offer.casterId);
-  const destination =
-    caster?.kind === 'player' && !caster.dead ? caster.pos : offer.fallbackDestination;
+  const arrivalAnchor = caster?.kind === 'player' && !caster.dead ? caster : null;
+  const destination = arrivalAnchor?.pos ?? offer.fallbackDestination;
   revivePlayerAt(ctx, r.e.id, destination, offer.hpFrac);
+  if (arrivalAnchor) inheritArrivalAnchorControl(ctx, arrivalAnchor, r.e);
+}
+
+// A live caster is also the authoritative arrival anchor. If that anchor is held
+// by encounter-owned control, accepting an older resurrection offer must not open
+// a same-call action window before the encounter's next update (notably when the
+// caster itself has just accepted a chained resurrection into the encounter).
+function inheritArrivalAnchorControl(ctx: SimContext, anchor: Entity, target: Entity): void {
+  for (const aura of anchor.auras) {
+    if (!isUnbreakableControlAura(aura) || aura.remaining <= 0) continue;
+    if (
+      target.auras.some(
+        (existing) =>
+          existing.id === aura.id &&
+          existing.sourceId === aura.sourceId &&
+          existing.kind === aura.kind &&
+          isUnbreakableControlAura(existing),
+      )
+    )
+      continue;
+    ctx.applyAura(target, cloneAura(aura));
+  }
+}
+
+function cloneAura(aura: Aura): Aura {
+  return aura.empowerAbilities
+    ? { ...aura, empowerAbilities: [...aura.empowerAbilities] }
+    : { ...aura };
 }
 
 export function updateResurrectionOffers(ctx: SimContext): void {

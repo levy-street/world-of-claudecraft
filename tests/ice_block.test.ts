@@ -55,6 +55,15 @@ function debuff(id: string, kind: Aura['kind'], value = 0): Aura {
   return { id, name: id, kind, value, remaining: 30, duration: 30, sourceId: 0, school: 'shadow' };
 }
 
+function unbreakableControl(
+  id: string,
+  kind: Aura['kind'],
+): Aura & {
+  unbreakableControl: true;
+} {
+  return { ...debuff(id, kind), unbreakableControl: true };
+}
+
 describe('Ice Block: immunity + cleanse + control', () => {
   it('grants total immunity and blocks your own actions, then restores on expiry', () => {
     const { sim, p } = rigMage();
@@ -105,6 +114,36 @@ describe('Ice Block: immunity + cleanse + control', () => {
     for (const id of ['test_stun', 'test_poly', 'test_dot', 'test_slow']) {
       expect(p.auras.some((a) => a.id === id)).toBe(false);
     }
+  });
+
+  it('cannot cleanse unbreakable encounter control but still cleanses ordinary debuffs', () => {
+    const { sim, p } = rigMage();
+    p.auras.push(unbreakableControl('scripted_stun', 'stun'));
+    p.auras.push(debuff('ordinary_dot', 'dot', 50));
+
+    sim.castAbility('ice_block');
+
+    expect(p.auras.some((a) => a.id === 'scripted_stun')).toBe(true);
+    expect(p.auras.some((a) => a.id === 'ordinary_dot')).toBe(false);
+    expect(p.auras.some((a) => a.id === 'ice_block' && a.kind === 'stasis')).toBe(true);
+  });
+
+  it('cannot prevent unbreakable encounter control from landing', () => {
+    const { sim, p } = rigMage();
+    const mob = addTargetMob(sim);
+    const applyAura = (aura: Aura) =>
+      (sim as unknown as { applyAura(target: Entity, aura: Aura): void }).applyAura(p, aura);
+    const scripted = unbreakableControl('scripted_stun', 'stun');
+    scripted.sourceId = mob.id;
+    const ordinary = debuff('ordinary_stun', 'stun');
+    ordinary.sourceId = mob.id;
+
+    sim.castAbility('ice_block');
+    applyAura(scripted);
+    applyAura(ordinary);
+
+    expect(p.auras.some((a) => a.id === 'scripted_stun')).toBe(true);
+    expect(p.auras.some((a) => a.id === 'ordinary_stun')).toBe(false);
   });
 
   it('rejects every incoming external crowd-control aura until Ice Block ends', () => {
@@ -165,6 +204,23 @@ describe('Ice Block: immunity + cleanse + control', () => {
     tickSeconds(sim, 1);
     sim.castAbility('ice_block');
     expect(p.auras.some((a) => a.kind === 'stasis')).toBe(false);
+  });
+
+  it('recast removes only caster-owned stasis when an aura id collides', () => {
+    const { sim, p } = rigMage();
+    const protectedAura = {
+      ...unbreakableControl('ice_block', 'stasis'),
+      sourceId: 9000,
+    };
+    const ownedStasis = { ...debuff('ice_block', 'stasis'), sourceId: p.id };
+    const ownedAbsorb = { ...debuff('ice_block_absorb', 'absorb', 100), sourceId: p.id };
+    p.auras.push(protectedAura, ownedStasis, ownedAbsorb);
+
+    sim.castAbility('ice_block');
+
+    expect(p.auras).toContain(protectedAura);
+    expect(p.auras).not.toContain(ownedStasis);
+    expect(p.auras).not.toContain(ownedAbsorb);
   });
 
   it('Frost carries two Ice Block charges; other specs carry one', () => {

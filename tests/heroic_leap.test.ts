@@ -71,6 +71,59 @@ describe('Heroic Leap: arcs over time, slams on landing', () => {
     expect(Math.abs(p.pos.x - aim.x)).toBeGreaterThan(6);
     expect(p.leap).not.toBeNull();
   });
+
+  it('cannot arm or continue through unbreakable encounter control', () => {
+    const rooted = new Sim({ seed: 31, playerClass: 'warrior', autoEquip: true }) as AnySim;
+    rooted.setPlayerLevel(MAX_LEVEL);
+    const rootedPlayer = rooted.player;
+    const rootedStart = { ...rootedPlayer.pos };
+    const rootedResource = rootedPlayer.resource;
+    rootedPlayer.auras.push({
+      id: 'scripted_root',
+      name: 'Scripted Root',
+      kind: 'root',
+      remaining: 10,
+      duration: 10,
+      value: 0,
+      sourceId: 9000,
+      school: 'shadow',
+      unbreakableControl: true,
+    });
+    rooted.castAbility('heroic_leap', rootedPlayer.id, {
+      x: rootedPlayer.pos.x + 12,
+      z: rootedPlayer.pos.z,
+    });
+    expect(rootedPlayer.leap ?? null).toBeNull();
+    expect(rootedPlayer.pos).toEqual(rootedStart);
+    expect(rootedPlayer.resource).toBe(rootedResource);
+    expect(rootedPlayer.cooldowns.has('heroic_leap')).toBe(false);
+
+    const stunned = new Sim({ seed: 32, playerClass: 'warrior', autoEquip: true }) as AnySim;
+    stunned.setPlayerLevel(MAX_LEVEL);
+    const stunnedPlayer = stunned.player;
+    stunned.castAbility('heroic_leap', stunnedPlayer.id, {
+      x: stunnedPlayer.pos.x + 12,
+      z: stunnedPlayer.pos.z,
+    });
+    stunned.tick();
+    expect(stunnedPlayer.leap).not.toBeNull();
+    const heldAt = { ...stunnedPlayer.pos };
+    stunnedPlayer.auras.push({
+      id: 'scripted_stun',
+      name: 'Scripted Stun',
+      kind: 'stun',
+      remaining: 10,
+      duration: 10,
+      value: 0,
+      sourceId: 9000,
+      school: 'shadow',
+      unbreakableControl: true,
+    });
+    stunned.tick();
+    expect(stunnedPlayer.leap).toBeNull();
+    expect(stunnedPlayer.pos.x).toBeCloseTo(heldAt.x, 5);
+    expect(stunnedPlayer.pos.z).toBeCloseTo(heldAt.z, 5);
+  });
 });
 
 // The flight must die with the caster or with any external relocation: a stale
