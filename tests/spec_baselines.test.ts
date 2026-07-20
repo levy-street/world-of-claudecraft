@@ -20,7 +20,7 @@ interface BaselineSnapshot {
 
 const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
   'paladin/holy': {
-    stats: { str: 6 },
+    stats: { int: 6 },
     global: { healPct: 0.06 },
     abilities: {
       seal_of_righteousness: { costPct: -0.16 },
@@ -45,11 +45,11 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     },
   },
   'hunter/beast_mastery': {
-    stats: { sta: 9, ap: 32, armorPct: 0.12, maxHpPct: 0.08 },
+    stats: { ap: 24, armorPct: 0.08 },
     abilities: { aspect_of_the_hawk: { buffPct: 0.4 } },
   },
   'hunter/marksmanship': {
-    stats: { crit: 0.03 },
+    stats: { crit: 0.03, agi: 6 },
     abilities: {
       arcane_shot: { dmgPct: 0.24, costPct: -0.16, cooldownPct: -0.1 },
       serpent_sting: { costPct: -0.16 },
@@ -102,14 +102,14 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     },
   },
   'priest/shadow': {
-    stats: { spi: 9 },
+    stats: { int: 6 },
     abilities: {
       shadow_word_pain: { dmgPct: 0.24, costPct: -0.1 },
       mind_blast: { dmgPct: 0.18, costPct: -0.1 },
     },
   },
   'shaman/elemental': {
-    stats: { int: 4 },
+    stats: { int: 8 },
     abilities: {
       lightning_bolt: { dmgPct: 0.18, costPct: -0.35, castPct: -0.2 },
       earth_shock: { dmgPct: 0.18, costPct: -0.15 },
@@ -117,7 +117,7 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     },
   },
   'shaman/enhancement': {
-    stats: { int: 6, ap: 24 },
+    stats: { int: 2, ap: 24 },
     abilities: {
       lightning_bolt: { costPct: -0.1 },
       earth_shock: { costPct: -0.1 },
@@ -130,14 +130,15 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     abilities: { healing_wave: { dmgPct: 0.1, costPct: -0.46, castPct: -0.1 } },
   },
   'warlock/affliction': {
-    global: { spellDmgPct: 0.02 },
+    stats: { int: 6 },
+    global: { spellDmgPct: 0.06 },
     abilities: {
       corruption: { dmgPct: 0.16, costPct: -0.15, castPct: -0.7 },
       curse_of_agony: { dmgPct: 0.09, costPct: -0.15 },
     },
   },
   'warlock/demonology': {
-    stats: { sta: 15, staPct: 0.08, armorPct: 0.06 },
+    stats: { sta: 8, armorPct: 0.06, int: 6 },
     abilities: {
       shadow_bolt: { costPct: -0.08 },
       immolate: { costPct: -0.08 },
@@ -152,7 +153,7 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     },
   },
   'druid/balance': {
-    stats: { spi: 3 },
+    stats: { int: 3 },
     global: { spellDmgPct: 0.08 },
     abilities: {
       entangling_roots: { costPct: -0.18, castPct: -0.24 },
@@ -171,7 +172,7 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     },
   },
   'druid/restoration': {
-    stats: { spi: 3 },
+    stats: { int: 3, spi: 3 },
     global: { healPct: 0.08 },
     abilities: {
       entangling_roots: { costPct: -0.18 },
@@ -193,6 +194,11 @@ function rounded(value: number): number {
 function numericDelta(actual: NumericRecord, base: NumericRecord): NumericRecord | undefined {
   const delta: NumericRecord = {};
   for (const key of Object.keys(actual).sort()) {
+    // Only diff numeric fields. Resolved ability mods also carry booleans and
+    // arrays (castWhileMoving, addEffects); subtracting those would coerce to
+    // NaN and silently pass. A future baseline that sets one must be asserted
+    // explicitly, not smuggled through this delta.
+    if (typeof actual[key] !== 'number') continue;
     const value = rounded(actual[key] - (base[key] ?? 0));
     if (value !== 0) delta[key] = value;
   }
@@ -259,6 +265,37 @@ describe('v0.28 passive restoration hotfix', () => {
       }
     }
     expect(missing).toEqual([]);
+  });
+
+  it('only modifies ability dimensions that are live on the resolved kit', () => {
+    // A restoration must not silently no-op: a costPct row needs a nonzero cost,
+    // a castPct row a nonzero cast time, a cooldownPct row a nonzero cooldown, and
+    // a dmgPct/buffPct row an effect to scale. This catches a future kit change
+    // (e.g. an ability made instant or free) that would quietly kill a baseline.
+    const dead: string[] = [];
+    for (const [cls, specs] of Object.entries(SPEC_BASELINES)) {
+      for (const [spec, baseline] of Object.entries(specs ?? {})) {
+        const playerClass = cls as PlayerClass;
+        const known = abilitiesKnownAt(
+          playerClass,
+          20,
+          computeTalentModifiers(playerClass, allocation(spec), 20),
+        );
+        for (const mod of baseline.ability ?? []) {
+          const entry = known.find(({ def }) => def.id === mod.ability);
+          if (!entry) continue; // existence is covered by the previous test
+          const tag = `${cls}/${spec}/${mod.ability}`;
+          if (mod.costPct && entry.cost <= 0) dead.push(`${tag}: costPct on zero cost`);
+          if (mod.castPct && entry.castTime <= 0) dead.push(`${tag}: castPct on instant cast`);
+          if (mod.cooldownPct && entry.cooldown <= 0)
+            dead.push(`${tag}: cooldownPct on no cooldown`);
+          if ((mod.dmgPct || mod.buffPct) && entry.effects.length === 0) {
+            dead.push(`${tag}: dmgPct/buffPct with no effect to scale`);
+          }
+        }
+      }
+    }
+    expect(dead).toEqual([]);
   });
 
   it('restores the complete repository-backed baseline for all 21 applicable specs', () => {

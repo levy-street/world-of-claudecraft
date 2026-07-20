@@ -54,6 +54,21 @@ The table remains separate from mastery and talent choice data. Future class-own
 replace, or retire individual restoration values without changing saved talent allocations or
 rewriting the Talents 2.0 interface.
 
+## Known interactions
+
+Fiesta standardization (`fiestaStandardize` in `src/sim/social/fiesta.ts`) rebuilds every
+fighter to `defaultBuild`, which selects the first specialization. Restored classes therefore
+enter a bout with their floor applied, and Warrior and Mage enter without one. This is
+intentional and consistent with the exclusion: the floor lifts the classes that fell behind, so
+withholding it from the two strongest classes is correct in the standardized mode as well, not a
+fairness regression. No fiesta-specific override is added.
+
+Stat identity: a spec's restored flat attribute matches the stat it actually scales with
+(Intellect for casters and healers, Strength or ranged Attack Power for the martial specs). A
+v0.28.x pass corrected the inherited attributes that did not (for example a healer that had
+carried Strength, or caster specs that had carried the combat-inert Spirit), keeping the floor's
+magnitude while pointing it at a stat the spec can use.
+
 ## Source of truth
 
 The values come from the pre-v0.27 level-20 Nythraxis reference allocations at

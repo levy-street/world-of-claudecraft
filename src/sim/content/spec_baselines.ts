@@ -18,7 +18,8 @@ export type SpecBaselineTable = Partial<Record<PlayerClass, Record<string, Talen
 export const SPEC_BASELINES: SpecBaselineTable = {
   paladin: {
     holy: {
-      stats: { str: 6 },
+      // v0.28.x stat-identity pass: healer scales on Int, not Str.
+      stats: { int: 6 },
       global: { healPct: 0.06 },
       ability: [
         { ability: 'seal_of_righteousness', costPct: -0.16 },
@@ -45,11 +46,14 @@ export const SPEC_BASELINES: SpecBaselineTable = {
   },
   hunter: {
     beast_mastery: {
-      stats: { sta: 9, ap: 32, armorPct: 0.12, maxHpPct: 0.08 },
+      // v0.28.x stat-identity pass: de-overloaded. Was Sta +9, AP +32, Armor
+      // +12%, Max HP +8% (top-of-table AP plus a redundant double-HP pile).
+      stats: { ap: 24, armorPct: 0.08 },
       ability: [{ ability: 'aspect_of_the_hawk', buffPct: 0.4 }],
     },
     marksmanship: {
-      stats: { crit: 0.03 },
+      // v0.28.x stat-identity pass: thin baseline; add the primary (Agi).
+      stats: { crit: 0.03, agi: 6 },
       ability: [
         { ability: 'arcane_shot', dmgPct: 0.24, costPct: -0.16, cooldownPct: -0.1 },
         { ability: 'serpent_sting', costPct: -0.16 },
@@ -106,7 +110,9 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ],
     },
     shadow: {
-      stats: { spi: 9 },
+      // v0.28.x stat-identity pass: shadow is a DPS caster, so its flat stat is
+      // Int (spell power), not the combat-dead Spirit it inherited.
+      stats: { int: 6 },
       ability: [
         { ability: 'shadow_word_pain', dmgPct: 0.24, costPct: -0.1 },
         { ability: 'mind_blast', dmgPct: 0.18, costPct: -0.1 },
@@ -115,7 +121,9 @@ export const SPEC_BASELINES: SpecBaselineTable = {
   },
   shaman: {
     elemental: {
-      stats: { int: 4 },
+      // v0.28.x stat-identity pass: Int is the caster primary and must exceed
+      // the melee (Enhancement) and healer (Restoration) shaman specs.
+      stats: { int: 8 },
       ability: [
         { ability: 'lightning_bolt', dmgPct: 0.18, costPct: -0.35, castPct: -0.2 },
         { ability: 'earth_shock', dmgPct: 0.18, costPct: -0.15 },
@@ -123,7 +131,9 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ],
     },
     enhancement: {
-      stats: { int: 6, ap: 24 },
+      // v0.28.x stat-identity pass: Enhancement primary is Strength, so its Int
+      // stays below Elemental's; melee AP is retained.
+      stats: { int: 2, ap: 24 },
       ability: [
         { ability: 'lightning_bolt', costPct: -0.1 },
         { ability: 'earth_shock', costPct: -0.1 },
@@ -138,14 +148,21 @@ export const SPEC_BASELINES: SpecBaselineTable = {
   },
   warlock: {
     affliction: {
-      global: { spellDmgPct: 0.02 },
+      // v0.28.x stat-identity pass: +2% was the lowest baseline on the table and
+      // it carried no flat stat. Lift to peer level and add the primary (Int).
+      stats: { int: 6 },
+      global: { spellDmgPct: 0.06 },
       ability: [
         { ability: 'corruption', dmgPct: 0.16, costPct: -0.15, castPct: -0.7 },
         { ability: 'curse_of_agony', dmgPct: 0.09, costPct: -0.15 },
       ],
     },
     demonology: {
-      stats: { sta: 15, staPct: 0.08, armorPct: 0.06 },
+      // v0.28.x stat-identity pass: trimmed the oversized self-stamina (was Sta
+      // +15, Sta +8%, Armor +6%). Demonology stays bulky but gains its damage
+      // stat. Pet armour/health is not a modifier the engine exposes (only pet
+      // damage), so that direction would be a separate feature, not this pass.
+      stats: { sta: 8, armorPct: 0.06, int: 6 },
       ability: [
         { ability: 'shadow_bolt', costPct: -0.08 },
         { ability: 'immolate', costPct: -0.08 },
@@ -162,7 +179,9 @@ export const SPEC_BASELINES: SpecBaselineTable = {
   },
   druid: {
     balance: {
-      stats: { spi: 3 },
+      // v0.28.x stat-identity pass: Spirit is out-of-combat regen only (dead in
+      // combat); Int is the balance caster's throughput.
+      stats: { int: 3 },
       global: { spellDmgPct: 0.08 },
       ability: [
         { ability: 'entangling_roots', costPct: -0.18, castPct: -0.24 },
@@ -181,7 +200,9 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       ],
     },
     restoration: {
-      stats: { spi: 3 },
+      // v0.28.x stat-identity pass: add Int for healing throughput; keep some
+      // Spirit for mana longevity (acceptable on a healer, unlike a DPS).
+      stats: { int: 3, spi: 3 },
       global: { healPct: 0.08 },
       ability: [
         { ability: 'entangling_roots', costPct: -0.18 },
