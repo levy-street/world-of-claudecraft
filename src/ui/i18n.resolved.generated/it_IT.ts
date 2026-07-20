@@ -3026,9 +3026,9 @@ export const it_IT: EnTranslations = {
       "ice_lance": "Un frammento istantaneo per spendere le abilità da Gelo, colpisce molto più forte su un bersaglio congelato.",
       "flurry": "Tre dardi rapidi che gelano il bersaglio cosicché i prossimi colpi da gelo lo colpiscano come se fosse congelato.",
       "fingers_of_frost": "I tuoi dardi gelidi a volte potenziano una Ice Lance per colpire come se il bersaglio fosse congelato.",
-      "brain_freeze": "I tuoi dardi gelidi a volte rendono il prossimo Winterlash istantaneo e più potente.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and skip its cooldown.",
       "shatter": "I tuoi incantesimi vanno in critico molto più spesso contro i bersagli congelati.",
-      "frozen_orb": "Fa rotolare lentamente un globo nel gruppo nemico che gela i bersagli e alimenta le tue abilità da Gelo.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills enemies and banks Icicles.",
       "blizzard": "Copre un'area di ghiaccio per logorare e rallentare un intero gruppo di nemici.",
       "blink": "Ti teletrasporta a breve distanza in avanti, liberandoti dalle radici nel farlo.",
       "conjure_water": "Evoca bevande che ripristinano il mana, così puoi rifornirti tra un pull e l'altro.",
@@ -6441,11 +6441,11 @@ export const it_IT: EnTranslations = {
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Scocca tre dardi gelidi che infliggono {damage} danni da Gelo ciascuno e applica Gelo Invernale al bersaglio: i prossimi 2 incantesimi compatibili in arrivo lo trattano come congelato. Brain Freeze rende Winterlash istantaneo, il 30% più potente e salta il suo recupero. (Gelo)"
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)"
       },
       "frozen_orb": {
         "name": "Frozen Orb",
-        "description": "Lancia un globo di gelo vorticante che avanza per 8 secondi, infliggendo {damage} danni da Gelo al secondo ai nemici vicini e rallentandoli del 30%. I suoi colpi generano Fingers of Frost. (Gelo)"
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)"
       },
       "blizzard": {
         "name": "Blizzard",
@@ -6469,11 +6469,11 @@ export const it_IT: EnTranslations = {
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "Lancia di Brina ha il 20% di probabilità di rendere il prossimo Winterlash istantaneo, il 30% più potente e senza tempo di recupero. (Gelo)"
+        "description": "Rimelance has a 20% chance to make your next Winterlash instant and free of its cooldown. (Frost)"
       },
       "shatter": {
         "name": "Brittle Ruin",
-        "description": "I tuoi incantesimi guadagnano il 50% di probabilità di colpo critico contro i bersagli congelati, e tali colpi critici infliggono il 20% di danni in più. Fingers of Frost e Gelo Invernale contano come congelati. (Gelo)"
+        "description": "Your spells gain 50% critical strike chance against frozen targets. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Vincolo dell'Acqua",

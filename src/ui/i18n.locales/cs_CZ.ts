@@ -33,8 +33,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     'Přivolá ledovou bouři na cílovou plochu po dobu 6 s, působí {damage} mrazivého poškození každou sekundu a zpomaluje nepřátele o 40 %. Každý zasažený nepřítel zkrátí cooldown Zmrzlé sféry o 0,5 s, nejvýše o 3 s za seslání. (Mráz)',
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    'Kopí jinovatky má 20% šanci způsobit, že tvůj příští Winterlash bude okamžitý, o 30 % silnější a bez cooldownu. (Mráz)',
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     'Podrž pro nabití rozšiřujícího se ohnivého dechu, pak ho pusť v kuželi. Delší nabití zasáhne dál a způsobí více poškození. Zasažení nepřátelé jsou dezorientováni; poškození efekt přeruší. Maximální nabití vždy kriticky zasáhne a počítá se jednou pro Žhavou sérii. (Oheň)',
@@ -45,11 +43,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Přeměníš se v planoucí žar a zvýšíš rychlost pohybu o {buff} %. V přeměněné podobě nemůžeš útočit ani sesílat kouzla. Seslej znovu pro návrat do normální podoby.',
   'entities.abilities.fireball_form.name': 'Žárová podoba',
-  'entities.abilities.flurry.description':
-    'Vypustíš tři ledové střely, každá za {damage} mrazivého poškození, a na cíl sesadíš Zimní chlad: jeho příštím 2 příchozím slučitelným kouzlům se cíl jeví jako zmrazený. Brain Freeze způsobí, že Winterlash je okamžitý, o 30 % silnější a přeskočí cooldown. (Mráz)',
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    'Vypustíš sféru vířícího mrazu, která se 8 s pohybuje vpřed a způsobuje {damage} mrazivého poškození každou sekundu blízkým nepřátelům a zpomaluje je o 30 %. Její zásahy generují Zmrzlé prsty. (Mráz)',
   'entities.abilities.frozen_orb.name': 'Zmrzlá sféra',
   'entities.abilities.glacial_front.description':
     'Podrž pro nabití rozšiřující se mrazivé fronty, pak ji pusť v kuželi. Delší nabití zasáhne dál a způsobí více poškození. Všichni zasažení nepřátelé jsou zpomaleni o 50 % na 4 s; maximální nabití je také ukotvuje na 1 s. (Mráz)',
@@ -63,8 +57,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.description':
     'Popadneš svůj dokonalý okamžik: okamžitě získáš 4 Éterické náboje a po dobu 10 s Éterické šipky je nespotřebovávají. (Chronomagie)',
   'entities.abilities.perfect_moment.name': 'Dokonalý okamžik',
-  'entities.abilities.shatter.description':
-    'Tvá kouzla získají 50% šanci na kritický zásah proti zmrazeným cílům a tyto kritické zásahy způsobí o 20 % více poškození. Zmrzlé prsty a Zimní chlad se počítají jako zmrazení. (Mráz)',
   'entities.abilities.shatter.name': 'Drcení mrazem',
   'entities.abilities.temporal_acceleration.description':
     'Urychlí tok času pro tvou skupinu nebo raid a zvýší rychlost útoku, sesílání a kanálování o 30 % po dobu 15 s. Spojenci, kteří nedávno byli pod vlivem Urychlení času nebo Válečných bubnů, jsou příliš vyčerpaní, aby z toho měli prospěch. (Chronomagie)',
@@ -122,16 +114,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.blink': 'Teleportuje tě krátce dopředu a po cestě ruší ukotvení.',
   'guide.abilityHook.blizzard':
     'Pokryje plochu ledem pro postupné ničení a zpomalení celé skupiny nepřátel.',
-  'guide.abilityHook.brain_freeze':
-    'Tvoje mrazivé střely někdy způsobí, že příští Winterlash bude okamžitý a silnější.',
   'guide.abilityHook.fingers_of_frost':
     'Tvoje mrazivé střely někdy posílí Ice Lance tak, aby zasáhl, jako by byl cíl zmrazen.',
   'guide.abilityHook.fireball_form':
     'Staneš se živým žarem a přeběhneš otevřeným terénem vysokou rychlostí.',
   'guide.abilityHook.flurry':
     'Tři rychlé střely, které cíl ochladí, takže tvoje příští mrazivé zásahy dopadnou, jako by byl zmrazen.',
-  'guide.abilityHook.frozen_orb':
-    'Pomalu kutálí sféru skupinou nepřátel, která vše ochladí a živí tvoje mrazivé procsy.',
   'guide.abilityHook.ice_lance':
     'Okamžitý střep pro využití mrazivých procsů, zasáhne výrazně silněji zmrazeného cíle.',
   'guide.abilityHook.shatter':

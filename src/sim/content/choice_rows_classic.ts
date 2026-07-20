@@ -127,7 +127,6 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
             ability: [
               { ability: 'ice_barrier', addEffects: [{ type: 'breakRoots' }] },
               { ability: 'blazing_barrier', addEffects: [{ type: 'breakRoots' }] },
-              { ability: 'temporal_barrier', addEffects: [{ type: 'breakRoots' }] },
             ],
           },
         },

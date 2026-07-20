@@ -46,8 +46,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     "Déchaîne une tempête de glace sur la zone ciblée pendant 6 s, infligeant {damage} points de dégâts de Givre par seconde et ralentissant les ennemis de 40 %. Chaque ennemi touché réduit le temps de recharge de Frozen Orb de 0,5 s, jusqu'à 3 s par incantation. (Givre)",
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    'Rimelance a 20 % de chances de rendre votre prochain Winterlash instantané, 30 % plus puissant et exempté de son temps de recharge. (Givre)',
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     "Maintenez pour accumuler un souffle de flammes de plus en plus large, puis relâchez-le en cône. Plus la charge est longue, plus la portée et les dégâts augmentent. Les ennemis touchés sont désorientés et les dégâts brisent l'effet ; une charge maximale critique toujours et compte une fois pour Bonne série. (Feu)",
@@ -58,11 +56,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Vous vous transformez en braise ardente, augmentant votre vitesse de déplacement de {buff} %. Vous ne pouvez pas attaquer ni lancer de sorts sous cette forme. Réactivez pour reprendre votre forme normale.',
   'entities.abilities.fireball_form.name': 'Forme de braise',
-  'entities.abilities.flurry.description':
-    "Décochez trois traits de glace infligeant chacun {damage} points de dégâts de Givre et posez Morsure de l'hiver sur la cible : ses 2 prochains sorts compatibles entrants la traitent comme gelée. Brain Freeze rend Winterlash instantané, 30 % plus puissant, et supprime son temps de recharge. (Givre)",
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    "Libérez un orbe de givre tourbillonnant qui dérive vers l'avant pendant 8 s, infligeant {damage} points de dégâts de Givre par seconde aux ennemis proches et les ralentissant de 30 %. Ses frappes génèrent des Fingers of Frost. (Givre)",
   'entities.abilities.frozen_orb.name': 'Frozen Orb',
   'entities.abilities.glacial_front.description':
     'Maintenez pour accumuler un front de givre de plus en plus large, puis relâchez-le en cône. Plus la charge est longue, plus la portée et les dégâts augmentent. Tous les ennemis touchés sont ralentis de 50 % pendant 4 s ; une charge maximale les immobilise également pendant 1 s. (Givre)',
@@ -76,8 +70,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.description':
     "Saisissez votre moment parfait : gagnez instantanément 4 Charges d'arcane, et pendant 10 s Traits d'Aether ne les consomme pas. (Chromancie)",
   'entities.abilities.perfect_moment.name': 'Moment parfait',
-  'entities.abilities.shatter.description':
-    "Vos sorts gagnent 50 % de chances de coup critique contre les cibles gelées, et ces coups critiques infligent 20 % de dégâts en plus. Fingers of Frost et Morsure de l'hiver comptent comme gelés. (Givre)",
   'entities.abilities.shatter.name': 'Brittle Ruin',
   'entities.abilities.temporal_acceleration.description':
     "Accélère le flux du temps pour votre groupe ou raid, augmentant la vitesse d'attaque, d'incantation et de canalisation de 30 % pendant 15 s. Les alliés récemment affectés par Accélération temporelle ou Tambours de guerre sont trop épuisés pour en bénéficier. (Chromancie)",
@@ -136,16 +128,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Vous téléporte sur une courte distance vers l'avant, brisant les immobilisations au départ.",
   'guide.abilityHook.blizzard':
     "Recouvre une zone de glace pour user et ralentir tout un groupe d'ennemis.",
-  'guide.abilityHook.brain_freeze':
-    'Vos traits de givre rendent parfois votre prochain Winterlash instantané et plus dévastateur.',
   'guide.abilityHook.fingers_of_frost':
     'Vos traits de givre permettent parfois à un Ice Lance de frapper comme si la cible était gelée.',
   'guide.abilityHook.fireball_form':
     'Devenez une braise vivante pour traverser un terrain dégagé à grande vitesse.',
   'guide.abilityHook.flurry':
     'Trois traits rapides qui refroidissent la cible pour que vos prochains coups de givre frappent comme si elle était gelée.',
-  'guide.abilityHook.frozen_orb':
-    'Fait rouler un orbe lent dans le groupe, gelant tout sur son passage et alimentant vos déclencheurs de givre.',
   'guide.abilityHook.ice_lance':
     'Un éclat instantané pour dépenser vos déclencheurs de givre, il frappe bien plus fort sur une cible gelée.',
   'guide.abilityHook.shatter':

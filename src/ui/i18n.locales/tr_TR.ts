@@ -33,8 +33,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     "Hedef alana 6 saniye boyunca buz fırtınası çağırır, her saniye {damage} Don hasarı verir ve düşmanları %40 yavaşlatır. Vurulan her düşman Donmuş Küre'nin süresini 0,5 saniye azaltır (kullanım başına en fazla 3 saniye). (Don)",
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    "Ayaz Mızrağı'nın bir sonraki Winterlash'i anlık, %30 daha sert ve bekleme süresiz yapma ihtimali %20'dir. (Don)",
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     'Genişleyen bir alev nefesi biriktirmek için basılı tut, ardından bir koni şeklinde bırak. Daha uzun şarjlar daha uzağa ulaşır ve daha fazla hasar verir. Vurulan düşmanlar yönelim kaybeder; hasar bu etkiyi bozar. Azami şarj her zaman kritik vurur ve Sıcak Seri için bir kez sayılır. (Ateş)',
@@ -45,11 +43,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Alev saçan bir köze dönüşerek hareket hızını {buff}% artır. Dönüşüm sırasında saldıramazsın veya büyü kullanamazsın. Normal formuna dönmek için yeniden kullan.',
   'entities.abilities.fireball_form.name': 'Kor Formu',
-  'entities.abilities.flurry.description':
-    "Her biri {damage} Don hasarı veren üç buz oku fırlat ve hedefe Kışın Üşümesi'ni uygula: bir sonraki 2 uyumlu büyü onu donmuş gibi değerlendirir. Brain Freeze, Winterlash'i anlık, %30 daha sert yapar ve bekleme süresini atlatır. (Don)",
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    'Yakındaki düşmanlara her saniye {damage} Don hasarı vererek ve onları %30 yavaşlatarak 8 saniye ileri süzülen dönen bir buz küre bırak. Vuruşları Donmuş Parmaklar üretir. (Don)',
   'entities.abilities.frozen_orb.name': 'Frozen Orb',
   'entities.abilities.glacial_front.description':
     'Genişleyen bir don cephesi biriktirmek için basılı tut, ardından bir koni şeklinde bırak. Daha uzun şarjlar daha uzağa ulaşır ve daha fazla hasar verir. Vurulan tüm düşmanlar 4 saniye boyunca %50 yavaşlar. Azami şarj ayrıca onları 1 saniye kökler. (Don)',
@@ -63,8 +57,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.description':
     'Mükemmel anını yakala: anında 4 Gizemli Yük kazan ve 10 saniye boyunca Aether Okları onları tüketmez. (Kronomansi)',
   'entities.abilities.perfect_moment.name': 'Mükemmel An',
-  'entities.abilities.shatter.description':
-    'Büyülerin donmuş hedeflere karşı %50 kritik vuruş şansı kazanır ve bu kritik vuruşlar %20 daha fazla hasar verir. Donmuş Parmaklar ve Kışın Üşümesi donmuş sayılır. (Don)',
   'entities.abilities.shatter.name': 'Brittle Ruin',
   'entities.abilities.temporal_acceleration.description':
     "Grubunuz veya akınınız için zamanın akışını hızlandırarak saldırı, büyü atma ve kanalize hızını 15 saniye boyunca %30 artırır. Yakın zamanda Zamansal Hızlanma veya Savaş Davulları'ndan etkilenen müttefikler bu etkiden yararlanamayacak kadar tükenmiştir. (Kronomansi)",
@@ -121,16 +113,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'gpuNotice.dismiss': 'Kapat',
   'guide.abilityHook.blink': 'Sizi kısa bir mesafe ileriye ışınlayarak kökleri koparır.',
   'guide.abilityHook.blizzard': 'Tüm bir grubu yıpratmak ve yavaşlatmak için alanı buzla kaplar.',
-  'guide.abilityHook.brain_freeze':
-    "Buz okların zaman zaman bir sonraki Winterlash'i anlık ve daha sert yapar.",
   'guide.abilityHook.fingers_of_frost':
     "Buz okların zaman zaman bir Ice Lance'e hedef donmuş gibi vurma gücü verir.",
   'guide.abilityHook.fireball_form':
     'Açık arazide yüksek hızda hareket etmek için yaşayan bir kora dönüş.',
   'guide.abilityHook.flurry':
     'Hedefi soğutan ve bir sonraki don vuruşlarının donmuşmuş gibi isabet etmesini sağlayan üç hızlı ok.',
-  'guide.abilityHook.frozen_orb':
-    'Grubun içinden yavaş bir küre geçirerek her şeyi soğutur ve don tetiklemelerini besler.',
   'guide.abilityHook.ice_lance':
     'Don tetiklemeleri harcamaya yarayan anlık bir kıymık; donmuş hedefe çok daha sert vurur.',
   'guide.abilityHook.shatter': 'Büyülerin donmuş hedeflere karşı çok daha sık kritik vurur.',

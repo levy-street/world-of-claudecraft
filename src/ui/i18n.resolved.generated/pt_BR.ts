@@ -3026,9 +3026,9 @@ export const pt_BR: EnTranslations = {
       "ice_lance": "Um fragmento instantâneo para gastar procs de gelo, acerta muito mais forte em um alvo congelado.",
       "flurry": "Três projéteis rápidos que resfriam o alvo para que seus próximos acertos de gelo o atinjam como se estivesse congelado.",
       "fingers_of_frost": "Seus projéteis de gelo às vezes capacitam uma Ice Lance a atingir como se o alvo estivesse congelado.",
-      "brain_freeze": "Seus projéteis de gelo às vezes tornam a próxima Winterlash instantânea e mais poderosa.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and skip its cooldown.",
       "shatter": "Seus feitiços acertam criticamente com muito mais frequência contra alvos congelados.",
-      "frozen_orb": "Rola um orbe lento pelo grupo que resfria tudo e alimenta seus procs de gelo.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills enemies and banks Icicles.",
       "blizzard": "Cobre uma área de gelo para desgastar e desacelerar um grupo inteiro de inimigos.",
       "blink": "Teleporta você uma curta distância à frente, quebrando raízes ao partir.",
       "conjure_water": "Conjura bebidas que restauram mana, para você reabastecer entre as puxadas.",
@@ -6441,11 +6441,11 @@ export const pt_BR: EnTranslations = {
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Dispara três projéteis gelados causando {damage} de dano de Gelo cada e planta o Frio de Inverno no alvo: seus próximos 2 feitiços compatíveis recebidos o tratam como congelado. Brain Freeze torna a Winterlash instantânea, 30% mais potente e cancela sua recarga. (Gelo)"
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)"
       },
       "frozen_orb": {
         "name": "Frozen Orb",
-        "description": "Lança um orbe de gelo que avança por 8 s, causando {damage} de dano de Gelo por segundo aos inimigos próximos e desacelerando-os em 30%. Seus acertos geram Fingers of Frost. (Gelo)"
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)"
       },
       "blizzard": {
         "name": "Blizzard",
@@ -6469,11 +6469,11 @@ export const pt_BR: EnTranslations = {
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "A Lança de Geada tem 20% de chance de tornar sua próxima Winterlash instantânea, 30% mais potente e sem recarga. (Gelo)"
+        "description": "Rimelance has a 20% chance to make your next Winterlash instant and free of its cooldown. (Frost)"
       },
       "shatter": {
         "name": "Ruína Frágil",
-        "description": "Seus feitiços ganham 50% de chance de acerto crítico contra alvos congelados, e esses acertos críticos causam 20% mais dano. Fingers of Frost e Frio de Inverno contam como congelado. (Gelo)"
+        "description": "Your spells gain 50% critical strike chance against frozen targets. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Vínculo de Água",

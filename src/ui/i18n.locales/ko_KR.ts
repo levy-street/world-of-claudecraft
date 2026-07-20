@@ -7956,10 +7956,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.fingers_of_frost':
     '냉기 화살이 때때로 얼음창을 강화해 대상을 얼어붙은 것으로 간주하게 합니다.',
   'guide.abilityHook.brain_freeze':
-    '냉기 화살이 때때로 다음 겨울의 채찍을 즉시 시전하게 하고 피해를 증가시킵니다.',
+    '냉기 화살이 때때로 다음 겨울의 채찍을 즉시 시전하게 하고 재사용 대기시간을 무시합니다.',
   'guide.abilityHook.shatter': '얼어붙은 대상에 대한 주문의 치명타 확률이 크게 증가합니다.',
   'guide.abilityHook.frozen_orb':
-    '느리게 움직이는 얼음 구슬을 적 무리에 굴려, 주변을 얼리고 냉기 발동 효과를 생성합니다.',
+    '느리게 움직이는 얼음 구슬을 적 무리에 굴려 적을 둔화시키고 고드름을 축적합니다.',
   'guide.abilityHook.blizzard':
     '지역을 얼음으로 뒤덮어 적 무리에게 피해를 주고 이동 속도를 감소시킵니다.',
   'guide.abilityHook.blink': '짧은 거리를 앞으로 순간이동하며 이동 불가 효과를 해제합니다.',
@@ -7972,10 +7972,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '얼음창을 던져 {damage}의 냉기 피해를 입힙니다. 얼어붙은 대상에게는 피해가 세 배로 증가합니다. 서리의 손가락 또는 혹한의 추위 한 충전을 소모하면 대상을 얼어붙은 것으로 간주합니다. (냉기)',
   'entities.abilities.flurry.name': '겨울의 채찍',
   'entities.abilities.flurry.description':
-    '얼음 화살 세 발을 날려 각각 {damage}의 냉기 피해를 입히고 대상에게 혹한의 추위를 부여합니다. 다음 2회의 호환 주문은 대상을 얼어붙은 것으로 간주합니다. 두뇌 빙결이 발동하면 즉시 시전되고 피해가 30% 증가하며 재사용 대기시간을 무시합니다. (냉기)',
+    '얼음 화살 세 발을 날려 각각 {damage}의 냉기 피해를 입히고 대상에게 혹한의 추위를 부여합니다. 다음 2회의 호환 주문은 대상을 얼어붙은 것으로 간주합니다. 두뇌 빙결이 발동하면 즉시 시전되고 재사용 대기시간을 무시합니다. (냉기)',
   'entities.abilities.frozen_orb.name': '얼어붙은 구슬',
   'entities.abilities.frozen_orb.description':
-    '소용돌이치는 얼음 구슬을 방출해 8초 동안 전방으로 이동시킵니다. 주변 적에게 매초 {damage}의 냉기 피해를 입히고 이동 속도를 30% 감소시킵니다. 적중할 때마다 서리의 손가락을 생성합니다. (냉기)',
+    '소용돌이치는 얼음 구슬을 방출해 8초 동안 전방으로 이동시킵니다. 주변 적에게 매초 {damage}의 냉기 피해를 입히고 이동 속도를 30% 감소시킵니다. 적중한 파동마다 고드름 1개를 생성합니다. (냉기)',
   'entities.abilities.blizzard.name': '눈보라',
   'entities.abilities.blizzard.description':
     '대상 지역에 6초 동안 얼음 폭풍을 불러 매초 {damage}의 냉기 피해를 입히고 적의 이동 속도를 40% 감소시킵니다. 적 한 명에게 적중할 때마다 얼어붙은 구슬의 재사용 대기시간이 0.5초, 한 번 시전할 때 최대 3초 감소합니다. (냉기)',
@@ -7993,10 +7993,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '서리끝 창이 15% 확률로 서리의 손가락을 부여합니다. 최대 2회 충전됩니다. 다음 얼음창은 대상을 얼어붙은 것으로 간주합니다. (냉기)',
   'entities.abilities.brain_freeze.name': '두뇌 빙결',
   'entities.abilities.brain_freeze.description':
-    '서리끝 창이 20% 확률로 다음 겨울의 채찍을 즉시 시전하게 하고 피해를 30% 증가시키며 재사용 대기시간을 무시하게 합니다. (냉기)',
+    '서리끝 창이 20% 확률로 다음 겨울의 채찍을 즉시 시전하게 하고 재사용 대기시간을 무시하게 합니다. (냉기)',
   'entities.abilities.shatter.name': '바스라지는 파멸',
   'entities.abilities.shatter.description':
-    '얼어붙은 대상에 대한 주문의 치명타 확률이 50% 증가하고, 해당 치명타의 피해가 20% 증가합니다. 서리의 손가락과 혹한의 추위도 대상을 얼어붙은 것으로 간주합니다. (냉기)',
+    '얼어붙은 대상에 대한 주문의 치명타 확률이 50% 증가합니다. 서리의 손가락과 혹한의 추위도 대상을 얼어붙은 것으로 간주합니다. (냉기)',
   'entities.abilities.temporal_cascade.name': '시간의 연쇄',
   'entities.abilities.temporal_cascade.description':
     '시간의 메아리를 파티에 연쇄시켜 대상과 가장 가까운 아군 최대 네 명을 즉시 치유하고 각각에게 {duration}초 동안 징표를 남깁니다. 자신이 입힌 비전 피해의 일부가 메아리를 타고 돌아와 징표가 있는 아군을 치유합니다. (시간술)',

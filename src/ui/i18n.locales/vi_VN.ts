@@ -33,8 +33,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     'Triệu gọi bão tuyết xuống khu vực mục tiêu trong 6 giây, gây {damage} sát thương Băng mỗi giây và làm chậm kẻ thù 40%. Mỗi kẻ thù bị đánh trúng rút ngắn 0,5 giây của Frozen Orb, tối đa 3 giây mỗi lần thi triển. (Băng)',
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    'Thương Băng Giá có 20% xác suất khiến Winterlash tiếp theo của bạn lập tức, mạnh hơn 30% và không có thời gian hồi chiêu. (Băng)',
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     'Giữ để tích tụ làn hơi thở lửa ngày càng rộng, rồi thả ra thành hình nón. Tích tụ lâu hơn sẽ đạt xa hơn và gây nhiều sát thương hơn. Kẻ thù bị trúng sẽ mất định hướng và sát thương sẽ phá vỡ hiệu ứng; tích tụ tối đa luôn chí mạng và tính một lần vào Hot Streak. (Lửa)',
@@ -45,11 +43,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Biến thành than hồng rực cháy, tăng tốc độ di chuyển lên {buff}%. Bạn không thể tấn công hay thi triển phép trong khi biến đổi. Thi triển lại để trở về dạng bình thường.',
   'entities.abilities.fireball_form.name': 'Ember Form',
-  'entities.abilities.flurry.description':
-    'Phóng ba mũi tên băng gây {damage} sát thương Băng mỗi mũi và gắn Cơn Lạnh Mùa Đông lên mục tiêu: 2 phép thi triển hợp lệ tiếp theo sẽ coi mục tiêu như đang đóng băng. Brain Freeze khiến Winterlash lập tức, mạnh hơn 30% và bỏ qua thời gian hồi chiêu. (Băng)',
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    'Phóng ra một quả cầu xoáy băng giá trôi về phía trước trong 8 giây, gây {damage} sát thương Băng mỗi giây cho các kẻ thù lân cận và làm chậm chúng 30%. Các cú đánh của nó tạo ra Fingers of Frost. (Băng)',
   'entities.abilities.frozen_orb.name': 'Frozen Orb',
   'entities.abilities.glacial_front.description':
     'Giữ để tích tụ màn băng giá ngày càng rộng, rồi thả ra thành hình nón. Tích tụ lâu hơn sẽ đạt xa hơn và gây nhiều sát thương hơn. Tất cả kẻ thù bị trúng sẽ bị làm chậm 50% trong 4 giây; tích tụ tối đa còn cố định chúng trong 1 giây. (Băng)',
@@ -63,8 +57,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.description':
     'Chớp lấy khoảnh khắc hoàn hảo của bạn: lập tức nhận 4 Điện Tích Bí Thuật và trong 10 giây Phi Tiêu Ê-te không tiêu hao chúng. (Thời Thuật)',
   'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.description':
-    'Phép của bạn có thêm 50% xác suất chí mạng với mục tiêu đang đóng băng, và những cú chí mạng đó gây thêm 20% sát thương. Fingers of Frost và Cơn Lạnh Mùa Đông được tính là đóng băng. (Băng)',
   'entities.abilities.shatter.name': 'Brittle Ruin',
   'entities.abilities.temporal_acceleration.description':
     'Tăng tốc dòng chảy thời gian cho nhóm hoặc đột kích của bạn, tăng tốc độ tấn công, thi triển phép và kênh phép lên 30% trong 15 giây. Đồng minh vừa bị ảnh hưởng bởi Tăng Tốc Thời Gian hoặc Trống Chiến sẽ quá kiệt sức để nhận lợi ích. (Thời Thuật)',
@@ -122,16 +114,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.blink':
     'Dịch chuyển bạn một đoạn ngắn về phía trước, phá vỡ các hiệu ứng cố định khi thoát ra.',
   'guide.abilityHook.blizzard': 'Phủ băng lên một khu vực để làm hao mòn và làm chậm cả bầy.',
-  'guide.abilityHook.brain_freeze':
-    'Đôi khi các mũi tên băng của bạn khiến Winterlash tiếp theo lập tức và mạnh hơn.',
   'guide.abilityHook.fingers_of_frost':
     'Đôi khi các mũi tên băng của bạn tăng cường Ice Lance để đánh như thể mục tiêu đang đóng băng.',
   'guide.abilityHook.fireball_form':
     'Trở thành tia lửa sống để vượt qua địa hình trống với tốc độ cao.',
   'guide.abilityHook.flurry':
     'Ba mũi tên nhanh làm lạnh mục tiêu để các cú đánh băng tiếp theo của bạn đánh như thể nó đang đóng băng.',
-  'guide.abilityHook.frozen_orb':
-    'Lăn một quả cầu chậm qua bầy, làm lạnh mọi thứ và tạo ra các hiệu ứng băng của bạn.',
   'guide.abilityHook.ice_lance':
     'Một mảnh lập tức để tiêu hao hiệu ứng băng, đánh mạnh hơn nhiều với mục tiêu đang đóng băng.',
   'guide.abilityHook.shatter':

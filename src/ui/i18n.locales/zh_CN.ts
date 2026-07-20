@@ -7584,9 +7584,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.flurry': '快速射出三枚冰弹，使目标寒冷，让你接下来的冰霜法术视其为已冻结。',
   'guide.abilityHook.fingers_of_frost':
     '你的冰霜箭有时会强化一次冰枪术，使其命中时视目标为已冻结。',
-  'guide.abilityHook.brain_freeze': '你的冰霜箭有时会使下一次凛冬之鞭瞬发且造成更高伤害。',
+  'guide.abilityHook.brain_freeze': '你的冰霜箭有时会使下一次凛冬之鞭瞬发并跳过冷却时间。',
   'guide.abilityHook.shatter': '你的法术对冻结目标的暴击几率大幅提高。',
-  'guide.abilityHook.frozen_orb': '让一颗缓慢的冰球穿过敌群，冻结沿途一切并触发你的冰霜效果。',
+  'guide.abilityHook.frozen_orb': '让一颗缓慢的冰球穿过敌群，使敌人减速并积蓄冰刺。',
   'guide.abilityHook.blizzard': '以冰雪覆盖一片区域，持续伤害并减速整群敌人。',
   'guide.abilityHook.blink': '向前瞬移一小段距离，并在离开时解除定身。',
   'hud.pet.waterJet': '水流喷射',
@@ -7598,10 +7598,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '投掷一枚冰刺，造成 {damage} 点冰霜伤害；对冻结目标造成三倍伤害。消耗寒冰指或一层凛冬之寒，使目标视为已冻结。（冰霜）',
   'entities.abilities.flurry.name': '凛冬之鞭',
   'entities.abilities.flurry.description':
-    '连续射出三枚冰弹，每枚造成 {damage} 点冰霜伤害，并对目标施加凛冬之寒：接下来 2 个兼容法术会将其视为已冻结。思维冻结会使凛冬之鞭瞬发、伤害提高 30%，并无视冷却时间。（冰霜）',
+    '连续射出三枚冰弹，每枚造成 {damage} 点冰霜伤害，并对目标施加凛冬之寒：接下来 2 个兼容法术会将其视为已冻结。思维冻结会使凛冬之鞭瞬发并无视冷却时间。（冰霜）',
   'entities.abilities.frozen_orb.name': '寒冰宝珠',
   'entities.abilities.frozen_orb.description':
-    '释放一颗旋转的寒冰宝珠，向前漂移 8 秒，每秒对附近敌人造成 {damage} 点冰霜伤害并使其减速 30%。宝珠命中时会产生寒冰指。（冰霜）',
+    '释放一颗旋转的寒冰宝珠，向前漂移 8 秒，每秒对附近敌人造成 {damage} 点冰霜伤害并使其减速 30%。每次命中的脉冲都会生成一枚冰刺。（冰霜）',
   'entities.abilities.blizzard.name': '暴风雪',
   'entities.abilities.blizzard.description':
     '在目标区域召唤持续 6 秒的冰风暴，每秒造成 {damage} 点冰霜伤害并使敌人减速 40%。每命中一个敌人，寒冰宝珠的冷却时间缩短 0.5 秒，每次施法最多缩短 3 秒。（冰霜）',
@@ -7619,10 +7619,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '霜缘之矛有 15% 几率赋予寒冰指，最多 2 层：你的下一次冰枪术会将目标视为已冻结。（冰霜）',
   'entities.abilities.brain_freeze.name': '思维冻结',
   'entities.abilities.brain_freeze.description':
-    '霜缘之矛有 20% 几率使你的下一次凛冬之鞭变为瞬发、伤害提高 30%，并且不受冷却时间限制。（冰霜）',
+    '霜缘之矛有 20% 几率使你的下一次凛冬之鞭变为瞬发，并且不受冷却时间限制。（冰霜）',
   'entities.abilities.shatter.name': '脆碎之殇',
   'entities.abilities.shatter.description':
-    '你的法术对冻结目标的暴击几率提高 50%，这些暴击造成的伤害提高 20%。寒冰指和凛冬之寒会将目标视为已冻结。（冰霜）',
+    '你的法术对冻结目标的暴击几率提高 50%。寒冰指和凛冬之寒会将目标视为已冻结。（冰霜）',
   'entities.abilities.temporal_cascade.name': '时光奔流',
   'entities.abilities.temporal_cascade.description':
     '让一道回响在队伍中奔流：立即治疗目标及其至多四名最近的盟友，并为每人施加持续 {duration} 秒的印记；你造成的部分奥术伤害会通过回响转化为对他们的治疗。（时光术）',

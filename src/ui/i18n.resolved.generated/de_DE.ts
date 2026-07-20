@@ -3026,9 +3026,9 @@ export const de_DE: EnTranslations = {
       "ice_lance": "Ein sofortiger Splitter zum Verbrauchen von Frostprocs; trifft eingefrorene Ziele weit stärker.",
       "flurry": "Drei schnelle Geschosse, die das Ziel kühlen, sodass deine nächsten Frosttreffer landen, als wäre es eingefroren.",
       "fingers_of_frost": "Deine Frostgeschosse stärken manchmal ein Ice Lance, als ob das Ziel eingefroren wäre.",
-      "brain_freeze": "Deine Frostgeschosse lassen das nächste Winterlash manchmal sofort und stärker zuschlagen.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and skip its cooldown.",
       "shatter": "Deine Zauber treffen eingefrorene Ziele weit öfter kritisch.",
-      "frozen_orb": "Rollt eine langsame Kugel durch die Gruppe, die alles kühlt und deine Frostprocs füttert.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills enemies and banks Icicles.",
       "blizzard": "Bedeckt ein Gebiet mit Eis, um eine ganze Gruppe zu schwächen und zu verlangsamen.",
       "blink": "Teleportiert dich eine kurze Strecke vorwärts und bricht dabei Verwurzelungen.",
       "conjure_water": "Zaubert Getränke herbei, die Mana wiederherstellen, damit du zwischen den Pulls auffüllen kannst.",
@@ -6441,11 +6441,11 @@ export const de_DE: EnTranslations = {
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Schießt drei eisige Geschosse ab, die jeweils {damage} Frostschaden verursachen, und legt Winterskälte auf das Ziel: dessen nächste 2 eintreffende kompatible Zauber behandeln es als eingefroren. Brain Freeze macht Winterlash sofort, 30% stärker und lässt seine Abklingzeit entfallen. (Frost)"
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)"
       },
       "frozen_orb": {
         "name": "Frozen Orb",
-        "description": "Entfesselt eine Kugel wirbelnden Frosts, die 8 Sek. lang vorwärtsdriftet, nahegelegenen Feinden pro Sekunde {damage} Frostschaden zufügt und sie um 30% verlangsamt. Ihre Treffer erzeugen Fingers of Frost. (Frost)"
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)"
       },
       "blizzard": {
         "name": "Blizzard",
@@ -6469,11 +6469,11 @@ export const de_DE: EnTranslations = {
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "Rimelance hat eine 20% Chance, deinen nächsten Winterlash sofort, 30% stärker und ohne Abklingzeit werden zu lassen. (Frost)"
+        "description": "Rimelance has a 20% chance to make your next Winterlash instant and free of its cooldown. (Frost)"
       },
       "shatter": {
         "name": "Brittle Ruin",
-        "description": "Deine Zauber erhalten 50% kritische Trefferchance gegen eingefrorene Ziele, und diese kritischen Treffer verursachen 20% mehr Schaden. Fingers of Frost und Winterskälte zählen als eingefroren. (Frost)"
+        "description": "Your spells gain 50% critical strike chance against frozen targets. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Waterbind",

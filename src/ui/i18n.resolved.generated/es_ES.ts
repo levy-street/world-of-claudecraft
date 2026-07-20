@@ -3026,9 +3026,9 @@ export const es_ES: EnTranslations = {
       "ice_lance": "Un fragmento instantáneo para gastar activaciones de escarcha; golpea mucho más fuerte sobre un objetivo congelado.",
       "flurry": "Tres proyectiles rápidos que enfrían al objetivo para que tus próximos golpes de escarcha impacten como si estuviera congelado.",
       "fingers_of_frost": "Tus proyectiles de escarcha potencian a veces una Ice Lance para golpear como si el objetivo estuviera congelado.",
-      "brain_freeze": "Tus proyectiles de escarcha hacen a veces que el siguiente Winterlash sea instantáneo y golpee más fuerte.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and skip its cooldown.",
       "shatter": "Tus hechizos causan golpes críticos con mucha más frecuencia contra objetivos congelados.",
-      "frozen_orb": "Lanza un orbe lento por el grupo que enfría a cada enemigo y alimenta tus activaciones de escarcha.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills enemies and banks Icicles.",
       "blizzard": "Cubre un área de hielo para desgastar y ralentizar a grupos enteros de enemigos.",
       "blink": "Te teletransporta una corta distancia hacia adelante, rompiendo los efectos de inmovilización al salir.",
       "conjure_water": "Crea bebidas que restauran maná, para que puedas reponerte entre combates.",
@@ -6441,11 +6441,11 @@ export const es_ES: EnTranslations = {
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Lanza tres proyectiles de hielo que causan {damage} de daño de Escarcha cada uno y aplican Frío Invernal al objetivo: sus próximos 2 hechizos compatibles lo tratan como congelado. Brain Freeze hace que Winterlash sea instantáneo, golpee un 30% más fuerte y omita su tiempo de reutilización. (Escarcha)"
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)"
       },
       "frozen_orb": {
         "name": "Frozen Orb",
-        "description": "Lanza un orbe de escarcha arremolinada que avanza durante 8 s, causando {damage} de daño de Escarcha por segundo a los enemigos cercanos y ralentizándolos un 30%. Sus golpes generan Fingers of Frost. (Escarcha)"
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)"
       },
       "blizzard": {
         "name": "Blizzard",
@@ -6469,11 +6469,11 @@ export const es_ES: EnTranslations = {
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "Lanza de Escarcha tiene un 20% de probabilidad de hacer que tu siguiente Winterlash sea instantáneo, golpee un 30% más fuerte y esté libre de su tiempo de reutilización. (Escarcha)"
+        "description": "Rimelance has a 20% chance to make your next Winterlash instant and free of its cooldown. (Frost)"
       },
       "shatter": {
         "name": "Ruina Quebradiza",
-        "description": "Tus hechizos ganan un 50% de probabilidad de golpe crítico contra objetivos congelados, y esos críticos causan un 20% más de daño. Fingers of Frost y Frío Invernal cuentan como congelado. (Escarcha)"
+        "description": "Your spells gain 50% critical strike chance against frozen targets. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Conjurar Agua",

@@ -7585,9 +7585,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.flurry': '快速射出三枚冰彈，使目標寒冷，讓你接下來的冰霜法術視其為已凍結。',
   'guide.abilityHook.fingers_of_frost':
     '你的冰霜箭有時會強化一次冰槍術，使其命中時將目標視為已凍結。',
-  'guide.abilityHook.brain_freeze': '你的冰霜箭有時會使下一次凜冬之鞭瞬發且造成更高傷害。',
+  'guide.abilityHook.brain_freeze': '你的冰霜箭有時會使下一次凜冬之鞭瞬發並跳過冷卻時間。',
   'guide.abilityHook.shatter': '你的法術對凍結目標的致命一擊機率大幅提高。',
-  'guide.abilityHook.frozen_orb': '讓一顆緩慢的冰球穿過敵群，冰凍沿途的一切並觸發你的冰霜效果。',
+  'guide.abilityHook.frozen_orb': '讓一顆緩慢的冰球穿過敵群，使敵人緩速並積蓄冰柱。',
   'guide.abilityHook.blizzard': '以冰雪覆蓋一片區域，持續傷害並緩速整群敵人。',
   'guide.abilityHook.blink': '向前瞬移一小段距離，並在離開時解除定身。',
   'hud.pet.waterJet': '水流噴射',
@@ -7599,10 +7599,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '投擲一枚冰刺，造成 {damage} 點冰霜傷害；對凍結目標造成三倍傷害。消耗寒冰指或一層凜冬之寒，使目標視為已凍結。（冰霜）',
   'entities.abilities.flurry.name': '凜冬之鞭',
   'entities.abilities.flurry.description':
-    '連續射出三枚冰彈，每枚造成 {damage} 點冰霜傷害，並對目標施加凜冬之寒：接下來 2 個相容法術會將其視為已凍結。思維凍結會使凜冬之鞭瞬發、傷害提高 30%，並跳過冷卻時間。（冰霜）',
+    '連續射出三枚冰彈，每枚造成 {damage} 點冰霜傷害，並對目標施加凜冬之寒：接下來 2 個相容法術會將其視為已凍結。思維凍結會使凜冬之鞭瞬發並跳過冷卻時間。（冰霜）',
   'entities.abilities.frozen_orb.name': '寒冰寶珠',
   'entities.abilities.frozen_orb.description':
-    '釋放一顆旋轉的寒冰寶珠，向前飄移 8 秒，每秒對附近敵人造成 {damage} 點冰霜傷害並使其緩速 30%。寶珠命中時會產生寒冰指。（冰霜）',
+    '釋放一顆旋轉的寒冰寶珠，向前飄移 8 秒，每秒對附近敵人造成 {damage} 點冰霜傷害並使其緩速 30%。每次命中的脈衝都會生成一枚冰柱。（冰霜）',
   'entities.abilities.blizzard.name': '暴風雪',
   'entities.abilities.blizzard.description':
     '在目標區域召喚持續 6 秒的冰風暴，每秒造成 {damage} 點冰霜傷害並使敵人緩速 40%。每命中一名敵人，寒冰寶珠的冷卻時間縮短 0.5 秒，每次施法最多縮短 3 秒。（冰霜）',
@@ -7620,10 +7620,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '霜緣之矛有 15% 機率賦予寒冰指，最多 2 層：你的下一次冰槍術會將目標視為已凍結。（冰霜）',
   'entities.abilities.brain_freeze.name': '思維凍結',
   'entities.abilities.brain_freeze.description':
-    '霜緣之矛有 20% 機率使你的下一次凜冬之鞭變為瞬發、傷害提高 30%，並且不受冷卻時間限制。（冰霜）',
+    '霜緣之矛有 20% 機率使你的下一次凜冬之鞭變為瞬發，並且不受冷卻時間限制。（冰霜）',
   'entities.abilities.shatter.name': '脆碎之殤',
   'entities.abilities.shatter.description':
-    '你的法術對凍結目標的致命一擊機率提高 50%，這些致命一擊造成的傷害提高 20%。寒冰指和凜冬之寒會將目標視為已凍結。（冰霜）',
+    '你的法術對凍結目標的致命一擊機率提高 50%。寒冰指和凜冬之寒會將目標視為已凍結。（冰霜）',
   'entities.abilities.temporal_cascade.name': '時光奔流',
   'entities.abilities.temporal_cascade.description':
     '讓一道回音在隊伍中奔流：立即治療目標及其至多四名最近的盟友，並為每人施加持續 {duration} 秒的印記；你造成的部分秘法傷害會透過回音轉化為對他們的治療。（時光術）',

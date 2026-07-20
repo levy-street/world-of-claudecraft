@@ -43,6 +43,18 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect((rec.allEvents as Ev[]).some((e) => e.type === 'castStart')).toBe(true);
   });
 
+  it('frost_proc_orb: committed Frost reaches proc draws and Frozen Orb pulses', () => {
+    const rec = run('frost_proc_orb');
+    const notes = rec.notes as Record<string, unknown>;
+    expect(notes.sawFingersOfFrost).toBe(true);
+    expect(notes.sawBrainFreeze).toBe(true);
+    expect(
+      (rec.allEvents as Ev[]).some(
+        (event) => event.type === 'damage' && event.ability === 'Frozen Orb',
+      ),
+    ).toBe(true);
+  });
+
   it('solo_rogue: weaponStrike via sinister_strike fires', () => {
     const rec = run('solo_rogue');
     const pid = (rec.sim as any).playerId;

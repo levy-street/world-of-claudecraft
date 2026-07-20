@@ -3026,9 +3026,9 @@ export const nl_NL: EnTranslations = {
       "ice_lance": "Een directe scherf om vorstprocs mee te verbruiken, raakt veel harder op een bevroren doelwit.",
       "flurry": "Drie snelle boutten die het doelwit koelen zodat je volgende vorsttreffers landen alsof het bevroren is.",
       "fingers_of_frost": "Je vorstboutten geven een Ice Lance soms de kracht om te treffen alsof het doelwit bevroren is.",
-      "brain_freeze": "Je vorstboutten maken de volgende Winterlash soms direct en harder rakend.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and skip its cooldown.",
       "shatter": "Je spreuken criten veel vaker tegen bevroren doelwitten.",
-      "frozen_orb": "Rolt een langzame bol door de troep die alles verkilt en je vorstprocs voedt.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills enemies and banks Icicles.",
       "blizzard": "Bedekt een gebied met ijs om een heel roedel te slijten en te vertragen.",
       "blink": "Teleporteert je een korte afstand vooruit en verbreekt onderweg wortels.",
       "conjure_water": "Roept drank op die mana herstelt, zodat je tussen pulls kunt bijvullen.",
@@ -6441,11 +6441,11 @@ export const nl_NL: EnTranslations = {
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Schiet drie ijsboutten af die elk {damage} Vorstschade toebrengen en Winterskil op het doelwit leggen: de volgende 2 binnenkomende compatibele spreuken behandelen het als bevroren. Brain Freeze maakt Winterlash direct, 30% harder, en slaat de afkoeltijd over. (Vorst)"
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)"
       },
       "frozen_orb": {
         "name": "Frozen Orb",
-        "description": "Laat een bol van wervelende vorst los die 8 sec naar voren drijft, per seconde {damage} Vorstschade toebrengt aan nabije vijanden en ze 30% vertraagt. Zijn treffers genereren Fingers of Frost. (Vorst)"
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)"
       },
       "blizzard": {
         "name": "Blizzard",
@@ -6469,11 +6469,11 @@ export const nl_NL: EnTranslations = {
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "Rijplans heeft 20% kans om je volgende Winterlash direct, 30% harder en vrij van zijn afkoeltijd te maken. (Vorst)"
+        "description": "Rimelance has a 20% chance to make your next Winterlash instant and free of its cooldown. (Frost)"
       },
       "shatter": {
         "name": "Brittle Ruin",
-        "description": "Je spreuken krijgen 50% kritieke trefkans tegen bevroren doelwitten, en die kritieke treffers brengen 20% meer schade toe. Fingers of Frost en Winterskil tellen als bevroren. (Vorst)"
+        "description": "Your spells gain 50% critical strike chance against frozen targets. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Waterbinding",

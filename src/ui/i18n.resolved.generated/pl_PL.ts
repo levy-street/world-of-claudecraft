@@ -3026,9 +3026,9 @@ export const pl_PL: EnTranslations = {
       "ice_lance": "Natychmiastowy odłamek do wydawania efektów mrozu, trafia znacznie silniej w zamrożony cel.",
       "flurry": "Trzy szybkie pociski, które mrożą cel, czyniąc kolejne lodowe trafienia jakby był zamrożony.",
       "fingers_of_frost": "Twoje lodowe pociski czasem wzmacniają Ice Lance, by trafiała cel jak zamrożony.",
-      "brain_freeze": "Twoje lodowe pociski czasem czynią następny Winterlash natychmiastowym i silniejszym.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and skip its cooldown.",
       "shatter": "Twoje czary trafiają krytycznie znacznie częściej w zamrożone cele.",
-      "frozen_orb": "Toczy powolny orb przez grupę wrogów, mroząc wszystko i zasilając twoje efekty mrozu.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills enemies and banks Icicles.",
       "blizzard": "Pokrywa obszar lodem, by niszczyć i spowalniać całe grupy wrogów.",
       "blink": "Teleportuje cię o krótki dystans do przodu, zrywając unieruchomienia.",
       "conjure_water": "Przywołuje napoje przywracające manę, byś mógł uzupełnić ją między walkami.",
@@ -6441,11 +6441,11 @@ export const pl_PL: EnTranslations = {
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Wypuszcza trzy lodowe pociski zadające po {damage} obrażeń od Mrozu i nakłada Winterowy Chłód na cel: dwa kolejne trafienia odpowiednimi czarami traktują cel jako zamrożony. Brain Freeze czyni Winterlash natychmiastowym, 30% silniejszym i usuwa jego czas odnowienia. (Mróz)"
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)"
       },
       "frozen_orb": {
         "name": "Frozen Orb",
-        "description": "Wypuszcza orb wirującego mrozu, który unosi się naprzód przez 8 sek., zadając {damage} obrażeń od Mrozu co sekundę pobliskim wrogom i spowalniając ich o 30%. Jego trafienia generują Palce Mrozu. (Mróz)"
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)"
       },
       "blizzard": {
         "name": "Blizzard",
@@ -6469,11 +6469,11 @@ export const pl_PL: EnTranslations = {
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "Szronowa lanca ma 20% szansy, aby następny Winterlash był natychmiastowy, 30% silniejszy i bez czasu odnowienia. (Mróz)"
+        "description": "Rimelance has a 20% chance to make your next Winterlash instant and free of its cooldown. (Frost)"
       },
       "shatter": {
         "name": "Brittle Ruin",
-        "description": "Twoje czary zyskują 50% szansy na trafienie krytyczne przeciwko zamrożonym celom, a te trafienia krytyczne zadają o 20% więcej obrażeń. Palce Mrozu i Winterowy Chłód liczą się jako zamrożenie. (Mróz)"
+        "description": "Your spells gain 50% critical strike chance against frozen targets. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Przywołanie wody",

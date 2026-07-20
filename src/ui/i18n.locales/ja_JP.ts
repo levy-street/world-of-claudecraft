@@ -7972,10 +7972,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.fingers_of_frost':
     '氷の矢が、ときどき次のアイスランスに対象を凍結状態として扱う力を与えます。',
   'guide.abilityHook.brain_freeze':
-    '氷の矢が、ときどき次のウィンターラッシュを即時発動にして威力を高めます。',
+    '氷の矢が、ときどき次のウィンターラッシュを即時発動にしてクールダウンを無視します。',
   'guide.abilityHook.shatter': '凍結した対象に対する呪文のクリティカル率が大幅に上昇します。',
-  'guide.abilityHook.frozen_orb':
-    'ゆっくり進む氷球を敵の群れへ放ち、周囲を冷やして氷の効果を発生させます。',
+  'guide.abilityHook.frozen_orb': 'ゆっくり進む氷球を敵の群れへ放ち、敵を冷やして氷柱を蓄えます。',
   'guide.abilityHook.blizzard':
     '一帯を氷で覆い、敵の群れにダメージを与えながら移動速度を低下させます。',
   'guide.abilityHook.blink': '短い距離を前方へ瞬間移動し、移動不能効果を解除します。',
@@ -7988,10 +7987,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '氷の槍を投げ、{damage}の氷ダメージを与えます。凍結した対象には3倍のダメージを与えます。フィンガーズ・オブ・フロストまたはウィンターズ・チルを1チャージ消費すると、対象を凍結状態として扱います。（氷）',
   'entities.abilities.flurry.name': 'ウィンターラッシュ',
   'entities.abilities.flurry.description':
-    '3発の氷弾を放ち、それぞれ{damage}の氷ダメージを与え、対象にウィンターズ・チルを付与します。次に命中する対応呪文2回は対象を凍結状態として扱います。ブレインフリーズ発動時は即時発動となり、威力が30%上昇してクールダウンを無視します。（氷）',
+    '3発の氷弾を放ち、それぞれ{damage}の氷ダメージを与え、対象にウィンターズ・チルを付与します。次に命中する対応呪文2回は対象を凍結状態として扱います。ブレインフリーズ発動時は即時発動となり、クールダウンを無視します。（氷）',
   'entities.abilities.frozen_orb.name': 'フローズンオーブ',
   'entities.abilities.frozen_orb.description':
-    '渦巻く氷球を放ち、8秒間前方へ漂わせます。周囲の敵に毎秒{damage}の氷ダメージを与え、移動速度を30%低下させます。命中するとフィンガーズ・オブ・フロストを生成します。（氷）',
+    '渦巻く氷球を放ち、8秒間前方へ漂わせます。周囲の敵に毎秒{damage}の氷ダメージを与え、移動速度を30%低下させます。敵に命中したパルスごとに氷柱を1つ生成します。（氷）',
   'entities.abilities.blizzard.name': 'ブリザード',
   'entities.abilities.blizzard.description':
     '対象地点に6秒間吹雪を呼び、毎秒{damage}の氷ダメージを与えて敵の移動速度を40%低下させます。敵1体に命中するたび、フローズンオーブのクールダウンを0.5秒、1回の発動につき最大3秒短縮します。（氷）',
@@ -8009,10 +8008,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ライムランスが15%の確率でフィンガーズ・オブ・フロストを1チャージ付与します（最大2チャージ）。次のアイスランスは対象を凍結状態として扱います。（氷）',
   'entities.abilities.brain_freeze.name': 'ブレインフリーズ',
   'entities.abilities.brain_freeze.description':
-    'ライムランスが20%の確率で、次のウィンターラッシュを即時発動にし、威力を30%上昇させ、クールダウンを無視させます。（氷）',
+    'ライムランスが20%の確率で、次のウィンターラッシュを即時発動にし、クールダウンを無視させます。（氷）',
   'entities.abilities.shatter.name': '脆き破滅',
   'entities.abilities.shatter.description':
-    '凍結した対象に対する呪文のクリティカル率が50%上昇し、そのクリティカルダメージが20%上昇します。フィンガーズ・オブ・フロストとウィンターズ・チルも対象を凍結状態として扱います。（氷）',
+    '凍結した対象に対する呪文のクリティカル率が50%上昇します。フィンガーズ・オブ・フロストとウィンターズ・チルも対象を凍結状態として扱います。（氷）',
   'entities.abilities.temporal_cascade.name': '時の連鎖',
   'entities.abilities.temporal_cascade.description':
     '時の残響をパーティ内に連鎖させ、対象と最も近い味方最大4人を即座に回復し、それぞれに{duration}秒間印を付けます。あなたが与えた秘術ダメージの一部が残響を通じて戻り、印のついた味方を回復します。（クロノマンシー）',

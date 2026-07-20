@@ -33,8 +33,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     'Kallar en isstorm över målområdet i 6 sek, orsakar {damage} Frost-skada varje sekund och saktar ner fiender med 40%. Varje träffad fiende minskar Frozen Orbs nedkylning med 0,5 sek, upp till 3 sek per kast. (Frost)',
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    'Rimlans har 20% chans att göra nästa Winterlash omedelbar, 30% hårdare och fri från dess nedkylning. (Frost)',
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     'Håll intryckt för att samla en vidgande flammande andedräkt, släpp sedan för en kon. Längre laddningar når längre och gör mer skada. Träffade fiender desorienteras och skada bryter effekten; maximal laddning är alltid ett kritiskt slag och räknas en gång mot Het svit. (Eld)',
@@ -45,11 +43,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Förvandlas till en glödande glöd och ökar rörelsehastigheten med {buff}%. Du kan inte attackera eller kasta besvärjelser under förvandlingen. Kasta om för att återgå till normal form.',
   'entities.abilities.fireball_form.name': 'Ember Form',
-  'entities.abilities.flurry.description':
-    'Avfyrar tre isiga bultar för {damage} Frost-skada var och en och planterar Vinterkyla på målet: dess nästa 2 inkommande kompatibla besvärjelser behandlar det som fryst. Brain Freeze gör Winterlash omedelbar, 30% hårdare och hoppar över dess nedkylning. (Frost)',
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    'Skjuter ut en kula av virvelande frost som glider framåt i 8 sek, orsakar {damage} Frost-skada varje sekund på närliggande fiender och saktar ner dem med 30%. Kulans slag ger Fingers of Frost. (Frost)',
   'entities.abilities.frozen_orb.name': 'Frozen Orb',
   'entities.abilities.glacial_front.description':
     'Håll intryckt för att samla en vidgande frostfront, släpp sedan för en kon. Längre laddningar når längre och gör mer skada. Alla träffade fiender saktas ner med 50% i 4 sek; maximal laddning rotar dem också i 1 sek. (Frost)',
@@ -63,8 +57,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.description':
     'Grip ditt perfekta ögonblick: vinn genast 4 Arkanska Laddningar, och under 10 sek förbrukar Eterpilar dem inte. (Kronomantik)',
   'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.description':
-    'Dina besvärjelser får 50% kritisk träffchans mot frysta mål, och dessa kritiska slag gör 20% mer skada. Fingers of Frost och Vinterkyla räknas som fryst. (Frost)',
   'entities.abilities.shatter.name': 'Brittle Ruin',
   'entities.abilities.temporal_acceleration.description':
     'Accelererar tidens flöde för din grupp eller raid, ökar attack-, kast- och kanalisationshastighet med 30% i 15 sek. Allierade som nyligen påverkats av Temporal Acceleration eller Krigstrummor är för utmattade för att dra nytta av det. (Kronomantik)',
@@ -122,16 +114,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.blink':
     'Teleporterar dig ett kort stycke framåt och bryter rötter på vägen ut.',
   'guide.abilityHook.blizzard': 'Täcker ett område med is för att nöta ner och sakta en hel flock.',
-  'guide.abilityHook.brain_freeze':
-    'Dina frostbultar gör ibland nästa Flurry omedelbar och hårdare träffande.',
   'guide.abilityHook.fingers_of_frost':
     'Dina frostbultar stärker ibland en Ice Lance att slå som om målet vore fryst.',
   'guide.abilityHook.fireball_form':
     'Bli en levande glöd för att ta dig över öppen mark med hög hastighet.',
   'guide.abilityHook.flurry':
     'Tre snabba bultar som kyler målet så dina nästa frostträffar landar som om det vore fryst.',
-  'guide.abilityHook.frozen_orb':
-    'Rullar en långsam kula genom flocken som kyler allt och matar dina frostprocsar.',
   'guide.abilityHook.ice_lance':
     'En omedelbar bit för att förbruka frostprocsar, träffar mycket hårdare på ett fryst mål.',
   'guide.abilityHook.shatter': 'Dina besvärjelser kritikträffar mycket oftare mot frysta mål.',

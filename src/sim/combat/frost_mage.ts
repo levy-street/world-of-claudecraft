@@ -99,7 +99,7 @@ function emitFade(ctx: SimContext, e: Entity, aura: Aura): void {
   ctx.emit({ type: 'aura', targetId: e.id, name: aura.name, gained: false, auraKind: aura.kind });
 }
 
-/** Grant one Fingers of Frost stack (frostbolt roll, Frozen Orb later).
+/** Grant one Fingers of Frost stack from a frostbolt roll.
  *  At the 2-stack cap the new charge is simply lost, no refresh: the owner's
  *  anti-waste rule, so banking procs is a real rotational mistake. */
 export function gainFingersOfFrost(ctx: SimContext, p: Entity): void {

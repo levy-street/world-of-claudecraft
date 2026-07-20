@@ -3026,9 +3026,9 @@ export const fr_FR: EnTranslations = {
       "ice_lance": "Un éclat instantané pour dépenser vos déclencheurs de givre, il frappe bien plus fort sur une cible gelée.",
       "flurry": "Trois traits rapides qui refroidissent la cible pour que vos prochains coups de givre frappent comme si elle était gelée.",
       "fingers_of_frost": "Vos traits de givre permettent parfois à un Ice Lance de frapper comme si la cible était gelée.",
-      "brain_freeze": "Vos traits de givre rendent parfois votre prochain Winterlash instantané et plus dévastateur.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and skip its cooldown.",
       "shatter": "Vos sorts obtiennent des critiques bien plus souvent contre les cibles gelées.",
-      "frozen_orb": "Fait rouler un orbe lent dans le groupe, gelant tout sur son passage et alimentant vos déclencheurs de givre.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills enemies and banks Icicles.",
       "blizzard": "Recouvre une zone de glace pour user et ralentir tout un groupe d'ennemis.",
       "blink": "Vous téléporte sur une courte distance vers l'avant, brisant les immobilisations au départ.",
       "conjure_water": "Invoque des boissons qui rendent du mana, pour refaire le plein entre deux engagements.",
@@ -6441,11 +6441,11 @@ export const fr_FR: EnTranslations = {
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Décochez trois traits de glace infligeant chacun {damage} points de dégâts de Givre et posez Morsure de l'hiver sur la cible : ses 2 prochains sorts compatibles entrants la traitent comme gelée. Brain Freeze rend Winterlash instantané, 30 % plus puissant, et supprime son temps de recharge. (Givre)"
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)"
       },
       "frozen_orb": {
         "name": "Frozen Orb",
-        "description": "Libérez un orbe de givre tourbillonnant qui dérive vers l'avant pendant 8 s, infligeant {damage} points de dégâts de Givre par seconde aux ennemis proches et les ralentissant de 30 %. Ses frappes génèrent des Fingers of Frost. (Givre)"
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)"
       },
       "blizzard": {
         "name": "Blizzard",
@@ -6469,11 +6469,11 @@ export const fr_FR: EnTranslations = {
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "Rimelance a 20 % de chances de rendre votre prochain Winterlash instantané, 30 % plus puissant et exempté de son temps de recharge. (Givre)"
+        "description": "Rimelance has a 20% chance to make your next Winterlash instant and free of its cooldown. (Frost)"
       },
       "shatter": {
         "name": "Brittle Ruin",
-        "description": "Vos sorts gagnent 50 % de chances de coup critique contre les cibles gelées, et ces coups critiques infligent 20 % de dégâts en plus. Fingers of Frost et Morsure de l'hiver comptent comme gelés. (Givre)"
+        "description": "Your spells gain 50% critical strike chance against frozen targets. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Waterbind",

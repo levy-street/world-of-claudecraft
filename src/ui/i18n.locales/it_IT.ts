@@ -46,8 +46,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     "Scatena una tempesta di ghiaccio sull'area bersaglio per 6 secondi, infliggendo {damage} danni da Gelo al secondo e rallentando i nemici del 40%. Ogni nemico colpito riduce di 0,5 secondi il recupero di Frozen Orb, fino a 3 secondi per lancio. (Gelo)",
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    'Lancia di Brina ha il 20% di probabilità di rendere il prossimo Winterlash istantaneo, il 30% più potente e senza tempo di recupero. (Gelo)',
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     "Tieni premuto per raccogliere un soffio di fiamma sempre più ampio, poi rilascialo a cono. Cariche più lunghe raggiungono più lontano e infliggono più danni. I nemici colpiti vengono disorientati e i danni interrompono l'effetto; la carica massima colpisce sempre criticamente e conta una volta verso Vampata. (Fuoco)",
@@ -58,11 +56,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Ti trasformi in una brace ardente, aumentando la velocità di movimento del {buff}%. Non puoi attaccare né lanciare incantesimi mentre sei trasformato. Rilancia per tornare alla tua forma normale.',
   'entities.abilities.fireball_form.name': 'Forma Brace',
-  'entities.abilities.flurry.description':
-    'Scocca tre dardi gelidi che infliggono {damage} danni da Gelo ciascuno e applica Gelo Invernale al bersaglio: i prossimi 2 incantesimi compatibili in arrivo lo trattano come congelato. Brain Freeze rende Winterlash istantaneo, il 30% più potente e salta il suo recupero. (Gelo)',
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    'Lancia un globo di gelo vorticante che avanza per 8 secondi, infliggendo {damage} danni da Gelo al secondo ai nemici vicini e rallentandoli del 30%. I suoi colpi generano Fingers of Frost. (Gelo)',
   'entities.abilities.frozen_orb.name': 'Frozen Orb',
   'entities.abilities.glacial_front.description':
     'Tieni premuto per raccogliere un fronte di gelo sempre più ampio, poi rilascialo a cono. Cariche più lunghe raggiungono più lontano e infliggono più danni. Tutti i nemici colpiti vengono rallentati del 50% per 4 secondi; la carica massima li radica anche per 1 secondo. (Gelo)',
@@ -76,8 +70,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.description':
     "Cogli il tuo momento perfetto: guadagni istantaneamente 4 Cariche Arcane e per 10 secondi Dardi d'Etere non le consuma. (Cronomanzia)",
   'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.description':
-    'I tuoi incantesimi guadagnano il 50% di probabilità di colpo critico contro i bersagli congelati, e tali colpi critici infliggono il 20% di danni in più. Fingers of Frost e Gelo Invernale contano come congelati. (Gelo)',
   'entities.abilities.shatter.name': 'Brittle Ruin',
   'entities.abilities.temporal_acceleration.description':
     'Accelera il flusso del tempo per il tuo gruppo o incursione, aumentando la velocità di attacco, lancio e canalizzazione del 30% per 15 secondi. Gli alleati colpiti di recente da Accelerazione Temporale o Tamburi di Guerra sono troppo esausti per beneficiarne. (Cronomanzia)',
@@ -136,16 +128,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Ti teletrasporta a breve distanza in avanti, liberandoti dalle radici nel farlo.',
   'guide.abilityHook.blizzard':
     "Copre un'area di ghiaccio per logorare e rallentare un intero gruppo di nemici.",
-  'guide.abilityHook.brain_freeze':
-    'I tuoi dardi gelidi a volte rendono il prossimo Winterlash istantaneo e più potente.',
   'guide.abilityHook.fingers_of_frost':
     'I tuoi dardi gelidi a volte potenziano una Ice Lance per colpire come se il bersaglio fosse congelato.',
   'guide.abilityHook.fireball_form':
     'Diventa una brace vivente per attraversare terreno aperto ad alta velocità.',
   'guide.abilityHook.flurry':
     'Tre dardi rapidi che gelano il bersaglio cosicché i prossimi colpi da gelo lo colpiscano come se fosse congelato.',
-  'guide.abilityHook.frozen_orb':
-    'Fa rotolare lentamente un globo nel gruppo nemico che gela i bersagli e alimenta le tue abilità da Gelo.',
   'guide.abilityHook.ice_lance':
     'Un frammento istantaneo per spendere le abilità da Gelo, colpisce molto più forte su un bersaglio congelato.',
   'guide.abilityHook.shatter':

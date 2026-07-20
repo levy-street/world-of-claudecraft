@@ -46,8 +46,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     'Ruft 6 Sek. lang einen Eissturm auf das Zielgebiet, der pro Sekunde {damage} Frostschaden verursacht und Feinde um 40% verlangsamt. Jeder getroffene Feind verkürzt Frozen Orb um 0,5 Sek., bis zu 3 Sek. pro Einsatz. (Frost)',
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    'Rimelance hat eine 20% Chance, deinen nächsten Winterlash sofort, 30% stärker und ohne Abklingzeit werden zu lassen. (Frost)',
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     'Halte gedrückt, um einen sich ausbreitenden Flammenodem aufzuladen, und lass ihn dann als Kegel los. Längere Aufladungen reichen weiter und verursachen mehr Schaden. Getroffene Feinde werden desorientiert, und Schaden bricht den Effekt; maximale Aufladung trifft immer kritisch und zählt einmal für Heiße Serie. (Feuer)',
@@ -58,11 +56,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Verwandelt dich in eine lodernde Glut und erhöht die Bewegungsgeschwindigkeit um {buff}%. Während der Verwandlung kannst du weder angreifen noch Zauber wirken. Erneut wirken, um zur normalen Gestalt zurückzukehren.',
   'entities.abilities.fireball_form.name': 'Glutgestalt',
-  'entities.abilities.flurry.description':
-    'Schießt drei eisige Geschosse ab, die jeweils {damage} Frostschaden verursachen, und legt Winterskälte auf das Ziel: dessen nächste 2 eintreffende kompatible Zauber behandeln es als eingefroren. Brain Freeze macht Winterlash sofort, 30% stärker und lässt seine Abklingzeit entfallen. (Frost)',
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    'Entfesselt eine Kugel wirbelnden Frosts, die 8 Sek. lang vorwärtsdriftet, nahegelegenen Feinden pro Sekunde {damage} Frostschaden zufügt und sie um 30% verlangsamt. Ihre Treffer erzeugen Fingers of Frost. (Frost)',
   'entities.abilities.frozen_orb.name': 'Frozen Orb',
   'entities.abilities.glacial_front.description':
     'Halte gedrückt, um eine sich ausbreitende Frostfront aufzuladen, und lass sie dann als Kegel los. Längere Aufladungen reichen weiter und verursachen mehr Schaden. Alle getroffenen Feinde werden 4 Sek. lang um 50% verlangsamt; maximale Aufladung verwurzelt sie zusätzlich 1 Sek. lang. (Frost)',
@@ -76,8 +70,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.description':
     'Nutze deinen perfekten Moment: Gewinne sofort 4 Arkane Ladungen, und für 10 Sek. verbraucht Aether-Pfeile diese nicht. (Chronomantie)',
   'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.description':
-    'Deine Zauber erhalten 50% kritische Trefferchance gegen eingefrorene Ziele, und diese kritischen Treffer verursachen 20% mehr Schaden. Fingers of Frost und Winterskälte zählen als eingefroren. (Frost)',
   'entities.abilities.shatter.name': 'Brittle Ruin',
   'entities.abilities.temporal_acceleration.description':
     'Beschleunigt den Zeitfluss für deine Gruppe oder deinen Schlachtzug und erhöht Angriffs-, Zauber- und Kanalisierungsgeschwindigkeit 15 Sek. lang um 30%. Verbündete, die kürzlich von Temporaler Beschleunigung oder Kriegstrommeln betroffen waren, sind zu erschöpft, um davon zu profitieren. (Chronomantie)',
@@ -136,16 +128,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Teleportiert dich eine kurze Strecke vorwärts und bricht dabei Verwurzelungen.',
   'guide.abilityHook.blizzard':
     'Bedeckt ein Gebiet mit Eis, um eine ganze Gruppe zu schwächen und zu verlangsamen.',
-  'guide.abilityHook.brain_freeze':
-    'Deine Frostgeschosse lassen das nächste Winterlash manchmal sofort und stärker zuschlagen.',
   'guide.abilityHook.fingers_of_frost':
     'Deine Frostgeschosse stärken manchmal ein Ice Lance, als ob das Ziel eingefroren wäre.',
   'guide.abilityHook.fireball_form':
     'Werde zu einer lebendigen Glut und überquere offenes Gelände mit hoher Geschwindigkeit.',
   'guide.abilityHook.flurry':
     'Drei schnelle Geschosse, die das Ziel kühlen, sodass deine nächsten Frosttreffer landen, als wäre es eingefroren.',
-  'guide.abilityHook.frozen_orb':
-    'Rollt eine langsame Kugel durch die Gruppe, die alles kühlt und deine Frostprocs füttert.',
   'guide.abilityHook.ice_lance':
     'Ein sofortiger Splitter zum Verbrauchen von Frostprocs; trifft eingefrorene Ziele weit stärker.',
   'guide.abilityHook.shatter': 'Deine Zauber treffen eingefrorene Ziele weit öfter kritisch.',

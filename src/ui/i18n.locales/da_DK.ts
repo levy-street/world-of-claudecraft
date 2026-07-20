@@ -33,8 +33,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     'Kalder en isstorm ned over målområdet i 6 sek., gør {damage} Frost-skade hvert sekund og sætter fjenders hast ned med 40%. Hver fjende ramt reducerer Frozen Orb med 0,5 sek., op til 3 sek. pr. kast. (Frost)',
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    'Rimlanse har 20% chance for at gøre dit næste Winterlash øjeblikkeligt, 30% hårdere og fri for dets nedkøling. (Frost)',
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     'Hold for at samle et stadig bredere åndedrag af flammer, og slip det derefter i en kegle. Længere opladning rækker længere og gør mere skade. Fjender ramt bliver desorienterede og skade afbryder effekten; maksimal opladning rammer altid kritisk og tæller én gang mod Hed Stime. (Ild)',
@@ -45,11 +43,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Forvandl dig til en brændende glød og forøg bevægelseshastighed med {buff}%. Du kan ikke angribe eller kaste trolddom, mens du er forvandlet. Genudkast for at vende tilbage til din normale form.',
   'entities.abilities.fireball_form.name': 'Ember Form',
-  'entities.abilities.flurry.description':
-    'Affyr tre ispile der gør {damage} Frost-skade hver og påfører Vinterkulden på målet: dets næste 2 indkommende kompatible trolddomme behandler det som frosset. Brain Freeze gør Winterlash øjeblikkeligt, 30% hårdere og springer dets nedkøling over. (Frost)',
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    'Udslip en kugle af hvirvlende frost, der driver fremad i 8 sek. og gør {damage} Frost-skade hvert sekund på nærliggende fjender og sætter dem ned med 30%. Dens slag genererer Fingers of Frost. (Frost)',
   'entities.abilities.frozen_orb.name': 'Frozen Orb',
   'entities.abilities.glacial_front.description':
     'Hold for at samle en stadig bredere front af frost, og slip den derefter i en kegle. Længere opladning rækker længere og gør mere skade. Alle fjender ramt sættes ned med 50% i 4 sek.; maksimal opladning rodfæster dem også i 1 sek. (Frost)',
@@ -63,8 +57,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.description':
     'Grib dit perfekte øjeblik: få øjeblikkeligt 4 Arkane Ladninger, og i 10 sek. bruger Æterpile dem ikke. (Kronomantik)',
   'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.description':
-    'Dine trolddomme får 50% kritisk chance mod frosne mål, og disse kritiske slag gør 20% mere skade. Fingers of Frost og Vinterkulden tæller som frosset. (Frost)',
   'entities.abilities.shatter.name': 'Brittle Ruin',
   'entities.abilities.temporal_acceleration.description':
     'Fremskynder tidens gang for din gruppe eller raid og øger angrebshastighed, kastetempo og kanaliseringstempo med 30% i 15 sek. Allierede der for nylig blev påvirkede af Temporal Acceleration eller Krigstrommer er for udmattede til at have gavn af det. (Kronomantik)',
@@ -123,16 +115,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Teleporterer dig en kort afstand fremad og bryder rodfæstning ved udgangen.',
   'guide.abilityHook.blizzard':
     'Dækker et område med is for at nedslide og sætte farten ned på en hel flok.',
-  'guide.abilityHook.brain_freeze':
-    'Dine frostpile gør sommetider dit næste Winterlash øjeblikkeligt og hårdere.',
   'guide.abilityHook.fingers_of_frost':
     'Dine frostpile styrker sommetider en Ice Lance til at ramme, som om målet var frosset.',
   'guide.abilityHook.fireball_form':
     'Bliv til en levende glød for at krydse åbent terræn med høj hastighed.',
   'guide.abilityHook.flurry':
     'Tre hurtige pile der køler målet, så dine næste frostramninger lander, som om det var frosset.',
-  'guide.abilityHook.frozen_orb':
-    'Ruller en langsom kugle gennem flokken, der køler alt ned og giver dine frostudløsere næring.',
   'guide.abilityHook.ice_lance':
     'En øjeblikkelig skarv til at bruge frostudløsere, den rammer langt hårdere mod et frosset mål.',
   'guide.abilityHook.shatter': 'Dine trolddomme får langt oftere kritisk chance mod frosne mål.',

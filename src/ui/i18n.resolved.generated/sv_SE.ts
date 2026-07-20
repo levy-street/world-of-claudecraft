@@ -3026,9 +3026,9 @@ export const sv_SE: EnTranslations = {
       "ice_lance": "En omedelbar bit för att förbruka frostprocsar, träffar mycket hårdare på ett fryst mål.",
       "flurry": "Tre snabba bultar som kyler målet så dina nästa frostträffar landar som om det vore fryst.",
       "fingers_of_frost": "Dina frostbultar stärker ibland en Ice Lance att slå som om målet vore fryst.",
-      "brain_freeze": "Dina frostbultar gör ibland nästa Flurry omedelbar och hårdare träffande.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and skip its cooldown.",
       "shatter": "Dina besvärjelser kritikträffar mycket oftare mot frysta mål.",
-      "frozen_orb": "Rullar en långsam kula genom flocken som kyler allt och matar dina frostprocsar.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills enemies and banks Icicles.",
       "blizzard": "Täcker ett område med is för att nöta ner och sakta en hel flock.",
       "blink": "Teleporterar dig ett kort stycke framåt och bryter rötter på vägen ut.",
       "conjure_water": "Frammanar drycker som återställer mana, så du kan fylla på mellan anstormningarna.",
@@ -6441,11 +6441,11 @@ export const sv_SE: EnTranslations = {
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Avfyrar tre isiga bultar för {damage} Frost-skada var och en och planterar Vinterkyla på målet: dess nästa 2 inkommande kompatibla besvärjelser behandlar det som fryst. Brain Freeze gör Winterlash omedelbar, 30% hårdare och hoppar över dess nedkylning. (Frost)"
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)"
       },
       "frozen_orb": {
         "name": "Frozen Orb",
-        "description": "Skjuter ut en kula av virvelande frost som glider framåt i 8 sek, orsakar {damage} Frost-skada varje sekund på närliggande fiender och saktar ner dem med 30%. Kulans slag ger Fingers of Frost. (Frost)"
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)"
       },
       "blizzard": {
         "name": "Blizzard",
@@ -6469,11 +6469,11 @@ export const sv_SE: EnTranslations = {
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "Rimlans har 20% chans att göra nästa Winterlash omedelbar, 30% hårdare och fri från dess nedkylning. (Frost)"
+        "description": "Rimelance has a 20% chance to make your next Winterlash instant and free of its cooldown. (Frost)"
       },
       "shatter": {
         "name": "Brittle Ruin",
-        "description": "Dina besvärjelser får 50% kritisk träffchans mot frysta mål, och dessa kritiska slag gör 20% mer skada. Fingers of Frost och Vinterkyla räknas som fryst. (Frost)"
+        "description": "Your spells gain 50% critical strike chance against frozen targets. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Vattenbindning",

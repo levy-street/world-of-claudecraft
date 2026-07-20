@@ -33,8 +33,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     'Roept een ijsstorm op over het doelgebied gedurende 6 sec, die {damage} Vorstschade per seconde toebrengt en vijanden met 40% vertraagt. Elk getroffen vijand haalt 0,5 sec af van Frozen Orb, tot 3 sec per worp. (Vorst)',
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    'Rijplans heeft 20% kans om je volgende Winterlash direct, 30% harder en vrij van zijn afkoeltijd te maken. (Vorst)',
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     'Houd ingedrukt om een brede vuurstroom op te laden en laat hem los in een kegel. Langere ladingen reiken verder en richten meer schade aan. Getroffen vijanden raken gedesoriënteerd en schade verbreekt het effect; maximale lading treft altijd kritiek en telt eenmaal mee voor Hete reeks. (Vuur)',
@@ -45,11 +43,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Verander in een vlammende sintel, waardoor je bewegingssnelheid met {buff}% toeneemt. Je kunt niet aanvallen of spreuken uitspreken terwijl je getransformeerd bent. Heractiveer om terug te keren naar je normale gedaante.',
   'entities.abilities.fireball_form.name': 'Ember Form',
-  'entities.abilities.flurry.description':
-    'Schiet drie ijsboutten af die elk {damage} Vorstschade toebrengen en Winterskil op het doelwit leggen: de volgende 2 binnenkomende compatibele spreuken behandelen het als bevroren. Brain Freeze maakt Winterlash direct, 30% harder, en slaat de afkoeltijd over. (Vorst)',
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    'Laat een bol van wervelende vorst los die 8 sec naar voren drijft, per seconde {damage} Vorstschade toebrengt aan nabije vijanden en ze 30% vertraagt. Zijn treffers genereren Fingers of Frost. (Vorst)',
   'entities.abilities.frozen_orb.name': 'Frozen Orb',
   'entities.abilities.glacial_front.description':
     'Houd ingedrukt om een brede vorstgolf op te laden en laat hem los in een kegel. Langere ladingen reiken verder en richten meer schade aan. Alle getroffen vijanden worden gedurende 4 sec met 50% vertraagd; maximale lading wortelt ze ook 1 sec vast. (Vorst)',
@@ -63,8 +57,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.description':
     'Grijp je perfecte moment: ontvang direct 4 Arcaneladingen, en gedurende 10 sec verbruikt Aetherpijlen ze niet. (Chronomantie)',
   'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.description':
-    'Je spreuken krijgen 50% kritieke trefkans tegen bevroren doelwitten, en die kritieke treffers brengen 20% meer schade toe. Fingers of Frost en Winterskil tellen als bevroren. (Vorst)',
   'entities.abilities.shatter.name': 'Brittle Ruin',
   'entities.abilities.temporal_acceleration.description':
     'Versnelt de tijdstroom voor je groep of raid, waardoor aanvals-, bezwerings- en kanalisatiesnelheid gedurende 15 sec met 30% toeneemt. Bondgenoten die recentelijk door Temporal Acceleration of Oorlogstrommen zijn getroffen, zijn te uitgeput om ervan te profiteren. (Chronomantie)',
@@ -123,15 +115,11 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Teleporteert je een korte afstand vooruit en verbreekt onderweg wortels.',
   'guide.abilityHook.blizzard':
     'Bedekt een gebied met ijs om een heel roedel te slijten en te vertragen.',
-  'guide.abilityHook.brain_freeze':
-    'Je vorstboutten maken de volgende Winterlash soms direct en harder rakend.',
   'guide.abilityHook.fingers_of_frost':
     'Je vorstboutten geven een Ice Lance soms de kracht om te treffen alsof het doelwit bevroren is.',
   'guide.abilityHook.fireball_form': 'Word een levende sintel om open terrein snel te doorkruisen.',
   'guide.abilityHook.flurry':
     'Drie snelle boutten die het doelwit koelen zodat je volgende vorsttreffers landen alsof het bevroren is.',
-  'guide.abilityHook.frozen_orb':
-    'Rolt een langzame bol door de troep die alles verkilt en je vorstprocs voedt.',
   'guide.abilityHook.ice_lance':
     'Een directe scherf om vorstprocs mee te verbruiken, raakt veel harder op een bevroren doelwit.',
   'guide.abilityHook.shatter': 'Je spreuken criten veel vaker tegen bevroren doelwitten.',

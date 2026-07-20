@@ -1991,7 +1991,7 @@ export type AbilityEffect =
     }
   // Frozen Orb (combat/frozen_orb.ts): releases a slow-drifting orb from the
   // caster that pulses frost damage + a snare every `interval` for `duration`
-  // seconds and feeds Fingers of Frost (frost mage spec kit).
+  // seconds and banks Icicles (frost mage spec kit).
   | {
       type: 'frozenOrb';
       min: number;

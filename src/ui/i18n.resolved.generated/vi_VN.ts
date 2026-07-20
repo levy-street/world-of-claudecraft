@@ -3026,9 +3026,9 @@ export const vi_VN: EnTranslations = {
       "ice_lance": "Một mảnh lập tức để tiêu hao hiệu ứng băng, đánh mạnh hơn nhiều với mục tiêu đang đóng băng.",
       "flurry": "Ba mũi tên nhanh làm lạnh mục tiêu để các cú đánh băng tiếp theo của bạn đánh như thể nó đang đóng băng.",
       "fingers_of_frost": "Đôi khi các mũi tên băng của bạn tăng cường Ice Lance để đánh như thể mục tiêu đang đóng băng.",
-      "brain_freeze": "Đôi khi các mũi tên băng của bạn khiến Winterlash tiếp theo lập tức và mạnh hơn.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and skip its cooldown.",
       "shatter": "Phép của bạn có tỷ lệ chí mạng cao hơn nhiều với mục tiêu đang đóng băng.",
-      "frozen_orb": "Lăn một quả cầu chậm qua bầy, làm lạnh mọi thứ và tạo ra các hiệu ứng băng của bạn.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills enemies and banks Icicles.",
       "blizzard": "Phủ băng lên một khu vực để làm hao mòn và làm chậm cả bầy.",
       "blink": "Dịch chuyển bạn một đoạn ngắn về phía trước, phá vỡ các hiệu ứng cố định khi thoát ra.",
       "conjure_water": "Tạo ra đồ uống hồi mana, để bạn nạp lại giữa các đợt kéo quái.",
@@ -6441,11 +6441,11 @@ export const vi_VN: EnTranslations = {
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Phóng ba mũi tên băng gây {damage} sát thương Băng mỗi mũi và gắn Cơn Lạnh Mùa Đông lên mục tiêu: 2 phép thi triển hợp lệ tiếp theo sẽ coi mục tiêu như đang đóng băng. Brain Freeze khiến Winterlash lập tức, mạnh hơn 30% và bỏ qua thời gian hồi chiêu. (Băng)"
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)"
       },
       "frozen_orb": {
         "name": "Frozen Orb",
-        "description": "Phóng ra một quả cầu xoáy băng giá trôi về phía trước trong 8 giây, gây {damage} sát thương Băng mỗi giây cho các kẻ thù lân cận và làm chậm chúng 30%. Các cú đánh của nó tạo ra Fingers of Frost. (Băng)"
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)"
       },
       "blizzard": {
         "name": "Blizzard",
@@ -6469,11 +6469,11 @@ export const vi_VN: EnTranslations = {
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "Thương Băng Giá có 20% xác suất khiến Winterlash tiếp theo của bạn lập tức, mạnh hơn 30% và không có thời gian hồi chiêu. (Băng)"
+        "description": "Rimelance has a 20% chance to make your next Winterlash instant and free of its cooldown. (Frost)"
       },
       "shatter": {
         "name": "Brittle Ruin",
-        "description": "Phép của bạn có thêm 50% xác suất chí mạng với mục tiêu đang đóng băng, và những cú chí mạng đó gây thêm 20% sát thương. Fingers of Frost và Cơn Lạnh Mùa Đông được tính là đóng băng. (Băng)"
+        "description": "Your spells gain 50% critical strike chance against frozen targets. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Kết Nước",

@@ -3026,9 +3026,9 @@ export const id_ID: EnTranslations = {
       "ice_lance": "Serpihan seketika untuk menghabiskan proc beku, menyerang jauh lebih keras pada target yang membeku.",
       "flurry": "Tiga baut cepat yang mendinginkan target agar pukulan beku berikutmu mendarat seolah target membeku.",
       "fingers_of_frost": "Baut bekumu terkadang memberdayakan Ice Lance agar menyerang seolah target membeku.",
-      "brain_freeze": "Baut bekumu terkadang membuat Winterlash berikutnya seketika dan lebih keras.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and skip its cooldown.",
       "shatter": "Mantramu jauh lebih sering kritis terhadap target yang membeku.",
-      "frozen_orb": "Menggelindingkan bola lambat melalui gerombolan yang mendinginkan segalanya dan memicu proc bekumu.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills enemies and banks Icicles.",
       "blizzard": "Membungkus area dengan es untuk mengikis dan memperlambat seluruh gerombolan.",
       "blink": "Menteleportasimu maju sebentar, memutus akar saat keluar.",
       "conjure_water": "Menciptakan minuman yang memulihkan mana, sehingga kamu bisa mengisi ulang di sela tarikan.",
@@ -6441,11 +6441,11 @@ export const id_ID: EnTranslations = {
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Lepaskan tiga baut es untuk {damage} kerusakan Beku masing-masing dan tanamkan Dingin Musim Dingin pada target: 2 mantra masuk berikutnya yang kompatibel memperlakukannya seolah membeku. Brain Freeze menjadikan Winterlash seketika, 30% lebih keras, dan melewati jedanya. (Beku)"
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)"
       },
       "frozen_orb": {
         "name": "Frozen Orb",
-        "description": "Lepaskan bola embun beku yang berputar-putar maju selama 8 dtk, memberikan {damage} kerusakan Beku setiap detik kepada musuh di sekitar dan memperlambat mereka sebesar 30%. Serangannya menghasilkan Fingers of Frost. (Beku)"
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)"
       },
       "blizzard": {
         "name": "Blizzard",
@@ -6469,11 +6469,11 @@ export const id_ID: EnTranslations = {
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "Rimelance memiliki peluang 20% menjadikan Winterlash berikutmu seketika, 30% lebih keras, dan bebas dari jedanya. (Beku)"
+        "description": "Rimelance has a 20% chance to make your next Winterlash instant and free of its cooldown. (Frost)"
       },
       "shatter": {
         "name": "Brittle Ruin",
-        "description": "Mantramu memperoleh peluang serangan kritis 50% terhadap target yang membeku, dan serangan kritis tersebut memberikan 20% lebih banyak kerusakan. Fingers of Frost dan Dingin Musim Dingin dianggap membeku. (Beku)"
+        "description": "Your spells gain 50% critical strike chance against frozen targets. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Waterbind",

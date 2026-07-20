@@ -33,8 +33,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     'Przywołuje burzę lodową nad wybranym obszarem na 6 sek., zadając {damage} obrażeń od Mrozu co sekundę i spowalniając wrogów o 40%. Każdy trafiony wróg skraca odnowienie Frozen Orb o 0,5 sek., maksymalnie 3 sek. na rzucenie. (Mróz)',
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    'Szronowa lanca ma 20% szansy, aby następny Winterlash był natychmiastowy, 30% silniejszy i bez czasu odnowienia. (Mróz)',
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     'Przytrzymaj, aby zebrać rosnący stożek płomieni, a następnie go wypuść. Dłuższe ładowanie sięga dalej i zadaje więcej obrażeń. Trafieni wrogowie zostają zdezorientowani, a obrażenia zrywają efekt; maksymalny ładunek zawsze trafia krytycznie i wlicza się raz do Gorącej Serii. (Ogień)',
@@ -45,11 +43,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Przemienia się w płonący żar, zwiększając prędkość ruchu o {buff}%. W tej postaci nie możesz atakować ani rzucać czarów. Ponownie rzuć, aby powrócić do normalnej formy.',
   'entities.abilities.fireball_form.name': 'Ember Form',
-  'entities.abilities.flurry.description':
-    'Wypuszcza trzy lodowe pociski zadające po {damage} obrażeń od Mrozu i nakłada Winterowy Chłód na cel: dwa kolejne trafienia odpowiednimi czarami traktują cel jako zamrożony. Brain Freeze czyni Winterlash natychmiastowym, 30% silniejszym i usuwa jego czas odnowienia. (Mróz)',
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    'Wypuszcza orb wirującego mrozu, który unosi się naprzód przez 8 sek., zadając {damage} obrażeń od Mrozu co sekundę pobliskim wrogom i spowalniając ich o 30%. Jego trafienia generują Palce Mrozu. (Mróz)',
   'entities.abilities.frozen_orb.name': 'Frozen Orb',
   'entities.abilities.glacial_front.description':
     'Przytrzymaj, aby zebrać rosnący front lodowy, a następnie go wypuść w stożku. Dłuższe ładowanie sięga dalej i zadaje więcej obrażeń. Wszyscy trafieni wrogowie zostają spowolnieni o 50% na 4 sek.; maksymalny ładunek dodatkowo unieruchamia ich na 1 sek. (Mróz)',
@@ -63,8 +57,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.description':
     'Uchwyć swój doskonały moment: natychmiast zyskujesz 4 Eteryczne Ładunki i przez 10 sek. Eteryczne strzały ich nie wydają. (Chronomancja)',
   'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.description':
-    'Twoje czary zyskują 50% szansy na trafienie krytyczne przeciwko zamrożonym celom, a te trafienia krytyczne zadają o 20% więcej obrażeń. Palce Mrozu i Winterowy Chłód liczą się jako zamrożenie. (Mróz)',
   'entities.abilities.shatter.name': 'Brittle Ruin',
   'entities.abilities.temporal_acceleration.description':
     'Przyspiesza bieg czasu dla twojej grupy lub rajdu, zwiększając prędkość ataku, rzucania czarów i kanalizowania o 30% przez 15 sek. Sojusznicy, na których niedawno działała Temporal Acceleration lub Bębny Wojny, są zbyt wyczerpani, aby skorzystać z efektu. (Chronomancja)',
@@ -122,16 +114,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.blink':
     'Teleportuje cię o krótki dystans do przodu, zrywając unieruchomienia.',
   'guide.abilityHook.blizzard': 'Pokrywa obszar lodem, by niszczyć i spowalniać całe grupy wrogów.',
-  'guide.abilityHook.brain_freeze':
-    'Twoje lodowe pociski czasem czynią następny Winterlash natychmiastowym i silniejszym.',
   'guide.abilityHook.fingers_of_frost':
     'Twoje lodowe pociski czasem wzmacniają Ice Lance, by trafiała cel jak zamrożony.',
   'guide.abilityHook.fireball_form':
     'Stań się żywym żarem, by przemierzać otwarte tereny z dużą prędkością.',
   'guide.abilityHook.flurry':
     'Trzy szybkie pociski, które mrożą cel, czyniąc kolejne lodowe trafienia jakby był zamrożony.',
-  'guide.abilityHook.frozen_orb':
-    'Toczy powolny orb przez grupę wrogów, mroząc wszystko i zasilając twoje efekty mrozu.',
   'guide.abilityHook.ice_lance':
     'Natychmiastowy odłamek do wydawania efektów mrozu, trafia znacznie silniej w zamrożony cel.',
   'guide.abilityHook.shatter':

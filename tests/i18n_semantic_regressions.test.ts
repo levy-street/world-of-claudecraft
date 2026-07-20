@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { TranslationKey } from '../src/ui/i18n.catalog';
+import { guideStrings } from '../src/ui/i18n.catalog/guide';
 import { cs_CZ } from '../src/ui/i18n.locales/cs_CZ';
 import { da_DK } from '../src/ui/i18n.locales/da_DK';
 import { de_DE } from '../src/ui/i18n.locales/de_DE';
@@ -47,6 +48,39 @@ function translation(locale: string, key: TranslationKey): string {
 }
 
 describe('reviewed localization semantics', () => {
+  it('English Frost guide hooks describe the retained mechanics', () => {
+    expect(guideStrings.abilityHook.brain_freeze).toContain('skip its cooldown');
+    expect(guideStrings.abilityHook.brain_freeze).not.toContain('harder-hitting');
+    expect(guideStrings.abilityHook.frozen_orb).toContain('Icicles');
+    expect(guideStrings.abilityHook.frozen_orb).not.toContain('frost procs');
+  });
+
+  const frostTerms: Record<string, { cooldown: string; icicle: string }> = {
+    ja_JP: { cooldown: 'クールダウン', icicle: '氷柱' },
+    ko_KR: { cooldown: '재사용 대기시간', icicle: '고드름' },
+    ru_RU: { cooldown: 'восстановления', icicle: 'Сосуль' },
+    zh_CN: { cooldown: '冷却时间', icicle: '冰刺' },
+    zh_TW: { cooldown: '冷卻時間', icicle: '冰柱' },
+  };
+
+  for (const [locale, terms] of Object.entries(frostTerms)) {
+    it(`${locale} keeps Frost tooltips aligned with the reduced proc mechanics`, () => {
+      const flurry = translation(locale, 'entities.abilities.flurry.description');
+      const brainFreeze = translation(locale, 'entities.abilities.brain_freeze.description');
+      const shatter = translation(locale, 'entities.abilities.shatter.description');
+      const frozenOrb = translation(locale, 'entities.abilities.frozen_orb.description');
+      const brainFreezeGuide = translation(locale, 'guide.abilityHook.brain_freeze');
+      const frozenOrbGuide = translation(locale, 'guide.abilityHook.frozen_orb');
+
+      expect(flurry).not.toContain('30%');
+      expect(brainFreeze).not.toContain('30%');
+      expect(shatter).not.toContain('20%');
+      expect(frozenOrb).toContain(terms.icicle);
+      expect(brainFreezeGuide).toContain(terms.cooldown);
+      expect(frozenOrbGuide).toContain(terms.icicle);
+    });
+  }
+
   const marketTerms: Record<string, string> = {
     id_ID: 'dunia',
     tr_TR: 'dünya',

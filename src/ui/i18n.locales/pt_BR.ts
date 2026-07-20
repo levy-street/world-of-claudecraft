@@ -46,8 +46,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     'Invoca uma tempestade de gelo sobre a área alvo por 6 s, causando {damage} de dano de Gelo por segundo e desacelerando os inimigos em 40%. Cada inimigo atingido reduz em 0,5 s o tempo restante do Orbe Congelado, até no máximo 3 s por lançamento. (Gelo)',
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    'A Lança de Geada tem 20% de chance de tornar sua próxima Winterlash instantânea, 30% mais potente e sem recarga. (Gelo)',
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     'Mantenha pressionado para acumular um sopro de chamas cada vez mais amplo, depois solte em cone. Cargas mais longas alcançam mais longe e causam mais dano. Os inimigos atingidos ficam desorientados e o dano quebra o efeito; a carga máxima sempre causa acerto crítico e conta uma vez para o Embalo Ardente. (Fogo)',
@@ -58,11 +56,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Transforma-se em uma brasa viva, aumentando a velocidade de movimento em {buff}%. Você não pode atacar nem lançar magias enquanto transformado. Lance novamente para retornar à sua forma normal.',
   'entities.abilities.fireball_form.name': 'Forma de Brasa',
-  'entities.abilities.flurry.description':
-    'Dispara três projéteis gelados causando {damage} de dano de Gelo cada e planta o Frio de Inverno no alvo: seus próximos 2 feitiços compatíveis recebidos o tratam como congelado. Brain Freeze torna a Winterlash instantânea, 30% mais potente e cancela sua recarga. (Gelo)',
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    'Lança um orbe de gelo que avança por 8 s, causando {damage} de dano de Gelo por segundo aos inimigos próximos e desacelerando-os em 30%. Seus acertos geram Fingers of Frost. (Gelo)',
   'entities.abilities.frozen_orb.name': 'Frozen Orb',
   'entities.abilities.glacial_front.description':
     'Mantenha pressionado para acumular uma frente de gelo cada vez mais ampla, depois solte em cone. Cargas mais longas alcançam mais longe e causam mais dano. Todos os inimigos atingidos são desacelerados em 50% por 4 s; a carga máxima também os prende por 1 s. (Gelo)',
@@ -76,8 +70,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.description':
     'Aproveite o momento perfeito: ganhe instantaneamente 4 Cargas Arcanas e, por 10 s, Dardos Etéreos não as consome. (Cronomancia)',
   'entities.abilities.perfect_moment.name': 'Momento Perfeito',
-  'entities.abilities.shatter.description':
-    'Seus feitiços ganham 50% de chance de acerto crítico contra alvos congelados, e esses acertos críticos causam 20% mais dano. Fingers of Frost e Frio de Inverno contam como congelado. (Gelo)',
   'entities.abilities.shatter.name': 'Ruína Frágil',
   'entities.abilities.temporal_acceleration.description':
     'Acelera o fluxo do tempo para seu grupo ou raide, aumentando a velocidade de ataque, lançamento e canalização em 30% por 15 s. Aliados recentemente afetados por Aceleração Temporal ou Tambores de Guerra estão exaustos demais para se beneficiar. (Cronomancia)',
@@ -136,16 +128,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Teleporta você uma curta distância à frente, quebrando raízes ao partir.',
   'guide.abilityHook.blizzard':
     'Cobre uma área de gelo para desgastar e desacelerar um grupo inteiro de inimigos.',
-  'guide.abilityHook.brain_freeze':
-    'Seus projéteis de gelo às vezes tornam a próxima Winterlash instantânea e mais poderosa.',
   'guide.abilityHook.fingers_of_frost':
     'Seus projéteis de gelo às vezes capacitam uma Ice Lance a atingir como se o alvo estivesse congelado.',
   'guide.abilityHook.fireball_form':
     'Torne-se uma brasa viva para cruzar terreno aberto em alta velocidade.',
   'guide.abilityHook.flurry':
     'Três projéteis rápidos que resfriam o alvo para que seus próximos acertos de gelo o atinjam como se estivesse congelado.',
-  'guide.abilityHook.frozen_orb':
-    'Rola um orbe lento pelo grupo que resfria tudo e alimenta seus procs de gelo.',
   'guide.abilityHook.ice_lance':
     'Um fragmento instantâneo para gastar procs de gelo, acerta muito mais forte em um alvo congelado.',
   'guide.abilityHook.shatter':

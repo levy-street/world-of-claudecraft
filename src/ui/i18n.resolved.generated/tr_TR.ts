@@ -3026,9 +3026,9 @@ export const tr_TR: EnTranslations = {
       "ice_lance": "Don tetiklemeleri harcamaya yarayan anlık bir kıymık; donmuş hedefe çok daha sert vurur.",
       "flurry": "Hedefi soğutan ve bir sonraki don vuruşlarının donmuşmuş gibi isabet etmesini sağlayan üç hızlı ok.",
       "fingers_of_frost": "Buz okların zaman zaman bir Ice Lance'e hedef donmuş gibi vurma gücü verir.",
-      "brain_freeze": "Buz okların zaman zaman bir sonraki Winterlash'i anlık ve daha sert yapar.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and skip its cooldown.",
       "shatter": "Büyülerin donmuş hedeflere karşı çok daha sık kritik vurur.",
-      "frozen_orb": "Grubun içinden yavaş bir küre geçirerek her şeyi soğutur ve don tetiklemelerini besler.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills enemies and banks Icicles.",
       "blizzard": "Tüm bir grubu yıpratmak ve yavaşlatmak için alanı buzla kaplar.",
       "blink": "Sizi kısa bir mesafe ileriye ışınlayarak kökleri koparır.",
       "conjure_water": "Mana yenileyen içecekler çağırır, böylece akınlar arasında dolum yapabilirsin.",
@@ -6441,11 +6441,11 @@ export const tr_TR: EnTranslations = {
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Her biri {damage} Don hasarı veren üç buz oku fırlat ve hedefe Kışın Üşümesi'ni uygula: bir sonraki 2 uyumlu büyü onu donmuş gibi değerlendirir. Brain Freeze, Winterlash'i anlık, %30 daha sert yapar ve bekleme süresini atlatır. (Don)"
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)"
       },
       "frozen_orb": {
         "name": "Frozen Orb",
-        "description": "Yakındaki düşmanlara her saniye {damage} Don hasarı vererek ve onları %30 yavaşlatarak 8 saniye ileri süzülen dönen bir buz küre bırak. Vuruşları Donmuş Parmaklar üretir. (Don)"
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)"
       },
       "blizzard": {
         "name": "Blizzard",
@@ -6469,11 +6469,11 @@ export const tr_TR: EnTranslations = {
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "Ayaz Mızrağı'nın bir sonraki Winterlash'i anlık, %30 daha sert ve bekleme süresiz yapma ihtimali %20'dir. (Don)"
+        "description": "Rimelance has a 20% chance to make your next Winterlash instant and free of its cooldown. (Frost)"
       },
       "shatter": {
         "name": "Brittle Ruin",
-        "description": "Büyülerin donmuş hedeflere karşı %50 kritik vuruş şansı kazanır ve bu kritik vuruşlar %20 daha fazla hasar verir. Donmuş Parmaklar ve Kışın Üşümesi donmuş sayılır. (Don)"
+        "description": "Your spells gain 50% critical strike chance against frozen targets. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Su Bağlama",

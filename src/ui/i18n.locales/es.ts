@@ -46,8 +46,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     'Desata una tormenta de hielo sobre el área objetivo durante 6 s, causando {damage} de daño de Escarcha por segundo y ralentizando a los enemigos un 40%. Cada enemigo golpeado reduce en 0,5 s el tiempo restante del Orbe Helado, hasta un máximo de 3 s por lanzamiento. (Escarcha)',
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    'Lanza de Escarcha tiene un 20% de probabilidad de hacer que tu siguiente Winterlash sea instantáneo, golpee un 30% más fuerte y esté libre de su tiempo de reutilización. (Escarcha)',
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     'Mantén pulsado para concentrar un aliento de llamas cada vez más amplio, luego suéltalo en un cono. Las concentraciones más largas alcanzan más lejos e infligen más daño. Los enemigos golpeados quedan desorientados y el daño rompe el efecto; la concentración máxima siempre es un golpe crítico y cuenta una vez hacia Buena Racha. (Fuego)',
@@ -58,11 +56,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Te transformas en una brasa ardiente, aumentando la velocidad de movimiento un {buff}%. No puedes atacar ni lanzar hechizos mientras estás transformado. Vuelve a lanzar la habilidad para recuperar tu forma normal.',
   'entities.abilities.fireball_form.name': 'Forma de Brasa',
-  'entities.abilities.flurry.description':
-    'Lanza tres proyectiles de hielo que causan {damage} de daño de Escarcha cada uno y aplican Frío Invernal al objetivo: sus próximos 2 hechizos compatibles lo tratan como congelado. Brain Freeze hace que Winterlash sea instantáneo, golpee un 30% más fuerte y omita su tiempo de reutilización. (Escarcha)',
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    'Lanza un orbe de escarcha arremolinada que avanza durante 8 s, causando {damage} de daño de Escarcha por segundo a los enemigos cercanos y ralentizándolos un 30%. Sus golpes generan Fingers of Frost. (Escarcha)',
   'entities.abilities.frozen_orb.name': 'Frozen Orb',
   'entities.abilities.glacial_front.description':
     'Mantén pulsado para concentrar un frente de escarcha cada vez más amplio, luego suéltalo en un cono. Las concentraciones más largas alcanzan más lejos e infligen más daño. Cada enemigo golpeado queda ralentizado un 50% durante 4 s; la concentración máxima también los inmoviliza durante 1 s. (Escarcha)',
@@ -73,8 +67,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_lance.description':
     'Lanza un fragmento de hielo que causa {damage} de daño de Escarcha, triplicado contra un objetivo congelado. Gasta Fingers of Frost o una carga de Frío Invernal para tratar al objetivo como congelado. (Escarcha)',
   'entities.abilities.ice_lance.name': 'Ice Lance',
-  'entities.abilities.shatter.description':
-    'Tus hechizos ganan un 50% de probabilidad de golpe crítico contra objetivos congelados, y esos críticos causan un 20% más de daño. Fingers of Frost y Frío Invernal cuentan como congelado. (Escarcha)',
   'entities.abilities.shatter.name': 'Ruina Quebradiza',
   'entities.abilities.temporal_acceleration.description':
     'Acelera el flujo del tiempo para tu grupo o banda, aumentando la velocidad de ataque, lanzamiento y canalización un 30% durante 15 s. Los aliados afectados recientemente por Aceleración Temporal o Tambores de Guerra están demasiado agotados para beneficiarse. (Cronomancia)',
@@ -121,16 +113,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Te teletransporta una corta distancia hacia adelante, rompiendo los efectos de inmovilización al salir.',
   'guide.abilityHook.blizzard':
     'Cubre un área de hielo para desgastar y ralentizar a grupos enteros de enemigos.',
-  'guide.abilityHook.brain_freeze':
-    'Tus proyectiles de escarcha hacen a veces que el siguiente Winterlash sea instantáneo y golpee más fuerte.',
   'guide.abilityHook.fingers_of_frost':
     'Tus proyectiles de escarcha potencian a veces una Ice Lance para golpear como si el objetivo estuviera congelado.',
   'guide.abilityHook.fireball_form':
     'Conviértete en una brasa viviente para cruzar terreno abierto a gran velocidad.',
   'guide.abilityHook.flurry':
     'Tres proyectiles rápidos que enfrían al objetivo para que tus próximos golpes de escarcha impacten como si estuviera congelado.',
-  'guide.abilityHook.frozen_orb':
-    'Lanza un orbe lento por el grupo que enfría a cada enemigo y alimenta tus activaciones de escarcha.',
   'guide.abilityHook.ice_lance':
     'Un fragmento instantáneo para gastar activaciones de escarcha; golpea mucho más fuerte sobre un objetivo congelado.',
   'guide.abilityHook.shatter':

@@ -44,8 +44,11 @@ export function talentEffectIconRef(effect: TalentEffect | undefined): TalentIco
   if (effect?.global?.blinkCast) return { kind: 'ability', id: 'blink_while_casting' };
   if (effect?.global?.barrierDrPct) return { kind: 'ability', id: 'warded' };
   if (
-    firstAbility?.ability === 'ice_barrier' &&
-    firstAbility.addEffects?.some((added) => added.type === 'breakRoots')
+    effect?.ability?.some(
+      (mod) =>
+        mod.ability === 'ice_barrier' &&
+        mod.addEffects?.some((added) => added.type === 'breakRoots'),
+    )
   ) {
     return { kind: 'ability', id: 'temporal_rift' };
   }

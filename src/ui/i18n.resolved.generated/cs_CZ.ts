@@ -3026,9 +3026,9 @@ export const cs_CZ: EnTranslations = {
       "ice_lance": "Okamžitý střep pro využití mrazivých procsů, zasáhne výrazně silněji zmrazeného cíle.",
       "flurry": "Tři rychlé střely, které cíl ochladí, takže tvoje příští mrazivé zásahy dopadnou, jako by byl zmrazen.",
       "fingers_of_frost": "Tvoje mrazivé střely někdy posílí Ice Lance tak, aby zasáhl, jako by byl cíl zmrazen.",
-      "brain_freeze": "Tvoje mrazivé střely někdy způsobí, že příští Winterlash bude okamžitý a silnější.",
+      "brain_freeze": "Your frost bolts sometimes make the next Flurry instant and skip its cooldown.",
       "shatter": "Tvá kouzla mají mnohem vyšší šanci na kritický zásah proti zmrazeným cílům.",
-      "frozen_orb": "Pomalu kutálí sféru skupinou nepřátel, která vše ochladí a živí tvoje mrazivé procsy.",
+      "frozen_orb": "Rolls a slow orb through the pack that chills enemies and banks Icicles.",
       "blizzard": "Pokryje plochu ledem pro postupné ničení a zpomalení celé skupiny nepřátel.",
       "blink": "Teleportuje tě krátce dopředu a po cestě ruší ukotvení.",
       "conjure_water": "Vyvolá nápoje obnovující manu, abys mezi pully doplnil zásoby.",
@@ -6441,11 +6441,11 @@ export const cs_CZ: EnTranslations = {
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Vypustíš tři ledové střely, každá za {damage} mrazivého poškození, a na cíl sesadíš Zimní chlad: jeho příštím 2 příchozím slučitelným kouzlům se cíl jeví jako zmrazený. Brain Freeze způsobí, že Winterlash je okamžitý, o 30 % silnější a přeskočí cooldown. (Mráz)"
+        "description": "Loose three icy bolts for {damage} Frost damage each and plant Winter's Chill on the target: its next 2 incoming compatible spells treat it as frozen. Brain Freeze makes Winterlash instant and skips its cooldown. (Frost)"
       },
       "frozen_orb": {
         "name": "Zmrzlá sféra",
-        "description": "Vypustíš sféru vířícího mrazu, která se 8 s pohybuje vpřed a způsobuje {damage} mrazivého poškození každou sekundu blízkým nepřátelům a zpomaluje je o 30 %. Její zásahy generují Zmrzlé prsty. (Mráz)"
+        "description": "Release an orb of swirling frost that drifts forward for 8 sec, dealing {damage} Frost damage each second to nearby enemies and slowing them by 30%. Each striking pulse generates one Icicle. (Frost)"
       },
       "blizzard": {
         "name": "Blizzard",
@@ -6469,11 +6469,11 @@ export const cs_CZ: EnTranslations = {
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "Kopí jinovatky má 20% šanci způsobit, že tvůj příští Winterlash bude okamžitý, o 30 % silnější a bez cooldownu. (Mráz)"
+        "description": "Rimelance has a 20% chance to make your next Winterlash instant and free of its cooldown. (Frost)"
       },
       "shatter": {
         "name": "Drcení mrazem",
-        "description": "Tvá kouzla získají 50% šanci na kritický zásah proti zmrazeným cílům a tyto kritické zásahy způsobí o 20 % více poškození. Zmrzlé prsty a Zimní chlad se počítají jako zmrazení. (Mráz)"
+        "description": "Your spells gain 50% critical strike chance against frozen targets. Fingers of Frost and Winter's Chill count as frozen. (Frost)"
       },
       "conjure_water": {
         "name": "Vodní pouto",

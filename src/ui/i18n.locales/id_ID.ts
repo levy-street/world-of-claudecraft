@@ -33,8 +33,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     'Memanggil badai es ke area target selama 6 dtk, memberikan {damage} kerusakan Beku setiap detik dan memperlambat musuh sebesar 40%. Setiap musuh yang terkena mempersingkat Frozen Orb sebesar 0,5 dtk, hingga 3 dtk per rapalan. (Beku)',
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    'Rimelance memiliki peluang 20% menjadikan Winterlash berikutmu seketika, 30% lebih keras, dan bebas dari jedanya. (Beku)',
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     'Tahan untuk mengumpulkan napas api yang melebar, lalu lepaskan dalam kerucut. Pengisian lebih lama menjangkau lebih jauh dan memberikan lebih banyak kerusakan. Musuh yang terkena kehilangan arah dan kerusakan mematahkan efeknya; pengisian maksimum selalu menghasilkan serangan kritis dan dihitung sekali untuk Hot Streak. (Api)',
@@ -45,11 +43,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Berubah menjadi bara membara, meningkatkan kecepatan gerak sebesar {buff}%. Kamu tidak dapat menyerang atau merafalkan mantra saat berubah wujud. Rapal ulang untuk kembali ke wujud normalmu.',
   'entities.abilities.fireball_form.name': 'Ember Form',
-  'entities.abilities.flurry.description':
-    'Lepaskan tiga baut es untuk {damage} kerusakan Beku masing-masing dan tanamkan Dingin Musim Dingin pada target: 2 mantra masuk berikutnya yang kompatibel memperlakukannya seolah membeku. Brain Freeze menjadikan Winterlash seketika, 30% lebih keras, dan melewati jedanya. (Beku)',
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    'Lepaskan bola embun beku yang berputar-putar maju selama 8 dtk, memberikan {damage} kerusakan Beku setiap detik kepada musuh di sekitar dan memperlambat mereka sebesar 30%. Serangannya menghasilkan Fingers of Frost. (Beku)',
   'entities.abilities.frozen_orb.name': 'Frozen Orb',
   'entities.abilities.glacial_front.description':
     'Tahan untuk mengumpulkan barisan embun beku yang melebar, lalu lepaskan dalam kerucut. Pengisian lebih lama menjangkau lebih jauh dan memberikan lebih banyak kerusakan. Semua musuh yang terkena diperlambat 50% selama 4 dtk; pengisian maksimum juga mengakar mereka selama 1 dtk. (Beku)',
@@ -63,8 +57,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.description':
     'Raih momen sempurnamu: seketika dapatkan 4 Muatan Arkan, dan selama 10 dtk Panah Aether tidak mengonsumsinya. (Kronomansi)',
   'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.description':
-    'Mantramu memperoleh peluang serangan kritis 50% terhadap target yang membeku, dan serangan kritis tersebut memberikan 20% lebih banyak kerusakan. Fingers of Frost dan Dingin Musim Dingin dianggap membeku. (Beku)',
   'entities.abilities.shatter.name': 'Brittle Ruin',
   'entities.abilities.temporal_acceleration.description':
     'Mempercepat aliran waktu untuk grupmu atau raid, meningkatkan kecepatan serangan, rapalan, dan penyaluran sebesar 30% selama 15 dtk. Sekutu yang baru saja terpengaruh Temporal Acceleration atau Genderang Perang terlalu lelah untuk merasakan manfaatnya. (Kronomansi)',
@@ -122,16 +114,12 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.blink': 'Menteleportasimu maju sebentar, memutus akar saat keluar.',
   'guide.abilityHook.blizzard':
     'Membungkus area dengan es untuk mengikis dan memperlambat seluruh gerombolan.',
-  'guide.abilityHook.brain_freeze':
-    'Baut bekumu terkadang membuat Winterlash berikutnya seketika dan lebih keras.',
   'guide.abilityHook.fingers_of_frost':
     'Baut bekumu terkadang memberdayakan Ice Lance agar menyerang seolah target membeku.',
   'guide.abilityHook.fireball_form':
     'Jadilah bara hidup untuk melintasi medan terbuka dengan kecepatan tinggi.',
   'guide.abilityHook.flurry':
     'Tiga baut cepat yang mendinginkan target agar pukulan beku berikutmu mendarat seolah target membeku.',
-  'guide.abilityHook.frozen_orb':
-    'Menggelindingkan bola lambat melalui gerombolan yang mendinginkan segalanya dan memicu proc bekumu.',
   'guide.abilityHook.ice_lance':
     'Serpihan seketika untuk menghabiskan proc beku, menyerang jauh lebih keras pada target yang membeku.',
   'guide.abilityHook.shatter': 'Mantramu jauh lebih sering kritis terhadap target yang membeku.',
