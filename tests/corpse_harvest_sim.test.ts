@@ -26,9 +26,17 @@ import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { ClientWorld } from '../src/net/online';
 import { bagCapacity, stackSizeOf } from '../src/sim/bags';
-import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
+import {
+  HARVEST_COMPONENT_ITEMS,
+  MONSTER_MATERIAL_TIERS,
+  monsterMaterialTierFor,
+} from '../src/sim/content/professions';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import {
+  bestOwnedAnyGatherToolTier,
+  canHarvestMonsterMaterial,
+} from '../src/sim/professions/tools';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
@@ -482,6 +490,165 @@ describe('two-specimen-family harvest capacity contract (Phase 10 QA)', () => {
     expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
     expect(sim.countItem('game_meat', a)).toBeGreaterThanOrEqual(1);
     expect(m.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(false);
+  });
+});
+
+// Corpse premium-arm tool gating (Professions 2.0 Phase 12): the plain
+// component grant is NEVER gated (the bare-hands floor); only the
+// signed/specimen upgrade of a signable rarity roll checks the best owned
+// gathering tool of ANY profession against MONSTER_MATERIAL_TIERS. Every
+// wave-one family ships at tier 1, so the deny arm is unreachable through
+// shipped content; the mutation seam below is documented on the test.
+describe('corpse premium-arm tool gating (Professions 2.0 Phase 12)', () => {
+  // A ONE-player rig (distinct from setup()'s two players): the deny/dedupe
+  // seeds below were hunted against exactly this construction order, and the
+  // second addPlayer would shift the world's draw positions.
+  function soloRig(seed: number, templateId = 'forest_wolf') {
+    const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+    const internals = sim as unknown as SimInternals;
+    const a = sim.addPlayer('warrior', 'Alpha');
+    sim.tick();
+    const e = internals.entities.get(a)!;
+    e.pos = { x: 0, y: 0, z: 0 };
+    e.prevPos = { x: 0, y: 0, z: 0 };
+    const template = MOBS[templateId];
+    const mob = createMob(9999, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.aiState = 'dead';
+    mob.corpseTimer = 9999;
+    mob.respawnTimer = 9999;
+    internals.entities.set(mob.id, mob);
+    return { sim, internals, a, mob };
+  }
+
+  // MONSTER_MATERIAL_TIERS is typed Readonly but is a plain runtime object,
+  // and interaction.ts resolves monsterMaterialTierFor inline (no injectable
+  // seam), so raising one family's tier here, restored in finally, is the
+  // narrowest honest way to drive the REAL deny arm rather than pin a
+  // re-implementation. Restored before any assertion runs.
+  function withTier(component: string, tier: number, body: () => void): void {
+    const tiers = MONSTER_MATERIAL_TIERS as Record<string, number>;
+    const prior = tiers[component];
+    tiers[component] = tier;
+    try {
+      body();
+    } finally {
+      tiers[component] = prior;
+    }
+  }
+
+  it('lists every harvest component family literally, all at tier 1 (the wave-one prime directive)', () => {
+    // LITERAL set equality, never derived from HARVEST_COMPONENT_ITEMS alone:
+    // a future higher-tier corpse family must consciously re-pin this.
+    expect(MONSTER_MATERIAL_TIERS).toEqual({
+      hide: 1,
+      fang: 1,
+      silk: 1,
+      venomSac: 1,
+      meat: 1,
+      cloth: 1,
+    });
+    expect(Object.keys(MONSTER_MATERIAL_TIERS).sort()).toEqual(
+      Object.keys(HARVEST_COMPONENT_ITEMS).sort(),
+    );
+    expect(monsterMaterialTierFor('hide')).toBe(1);
+    // An unlisted (future) component defaults to the bare-hands floor: never gated.
+    expect(monsterMaterialTierFor('no_such_component')).toBe(1);
+  });
+
+  it('the pure deny decision: bare hands (tier 1) cannot cover a tier-2 material, tier 2 can', () => {
+    expect(canHarvestMonsterMaterial(1, 2)).toBe(false);
+    expect(canHarvestMonsterMaterial(2, 2)).toBe(true);
+  });
+
+  it('bare hands still earn the signed specimen on real content: tier-1 families never gate (seed 5)', () => {
+    const { sim, internals, a, mob } = setup(5);
+    const meta = internals.players.get(a)!;
+    // Genuinely bare-handed: the starting kit resolves to the tier-1 floor.
+    expect(bestOwnedAnyGatherToolTier(meta.inventory, ITEMS)).toBe(1);
+    sim.drainEvents();
+    sim.harvestCorpse(mob.id, ['hide'], a);
+    expect(sim.drainEvents().some((e) => e.type === 'gatherDenied')).toBe(false);
+    const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
+    expect(specimen?.instance?.signer).toBe('Alpha');
+    expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
+  });
+
+  it('a denied premium pull downgrades to the plain grant: same qty, same claim, same draws (seed 5)', () => {
+    // Baseline arm, unmutated: seed 5's rarity roll clears the signable floor,
+    // so the specimen jackpot lands beside the plain component.
+    const base = soloRig(5);
+    let baseDraws = 0;
+    base.sim.rng.setObserver(() => baseDraws++);
+    try {
+      base.sim.harvestCorpse(base.mob.id, ['hide'], base.a);
+    } finally {
+      base.sim.rng.setObserver(null);
+    }
+    const basePlain = base.sim.countItem('rough_hide', base.a);
+    expect(basePlain).toBe(3);
+    expect(base.sim.countItem('pristine_hide', base.a)).toBe(1);
+
+    // Denied arm: hide raised to tier 2, same seed, same rig, same draws.
+    const { sim, internals, a, mob } = soloRig(5);
+    sim.drainEvents();
+    let draws = 0;
+    withTier('hide', 2, () => {
+      sim.rng.setObserver(() => draws++);
+      try {
+        sim.harvestCorpse(mob.id, ['hide'], a);
+      } finally {
+        sim.rng.setObserver(null);
+      }
+    });
+    // Draw-order invariant: the rarity roll is STILL consumed on a denied
+    // pull (the denial sits strictly after the roll and draws nothing).
+    expect(baseDraws).toBe(2);
+    expect(draws).toBe(2);
+    // Claim outcome identical: the corpse is spent either way.
+    expect(mob.harvestClaimedBy).toBe(a);
+    // The yield downgrades to the plain fungible grant: same quantity, no
+    // jackpot, no signed instance anywhere.
+    expect(sim.countItem('rough_hide', a)).toBe(basePlain);
+    expect(sim.countItem('pristine_hide', a)).toBe(0);
+    const meta = internals.players.get(a)!;
+    expect(meta.inventory.some((s) => s.itemId === 'rough_hide' && s.instance)).toBe(false);
+    // Event shape pin: surface corpse carries NO professionId (the contract:
+    // professionId is present exactly when surface === 'node').
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
+      { type: 'gatherDenied', pid: a, surface: 'corpse', requiredTier: 2 },
+    ]);
+  });
+
+  it('at most ONE gatherDenied per harvest command, even with several denied families (seed 11)', () => {
+    // Seed 11 pre-verified against soloRig: BOTH wolf families (hide and
+    // fang) roll signable on an untagged harvest, so raising both tiers
+    // denies two yields in one command; the dedupe flag must emit exactly one
+    // event, tiered off the FIRST failing family.
+    const base = soloRig(11);
+    base.sim.harvestCorpse(base.mob.id, undefined, base.a);
+    const baseMeta = base.internals.players.get(base.a)!;
+    expect(base.sim.countItem('pristine_hide', base.a)).toBe(1);
+    expect(
+      baseMeta.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance?.signer === 'Alpha'),
+    ).toBe(true);
+
+    const { sim, internals, a, mob } = soloRig(11);
+    sim.drainEvents();
+    withTier('hide', 2, () => {
+      withTier('fang', 2, () => {
+        sim.harvestCorpse(mob.id, undefined, a);
+      });
+    });
+    const denied = sim.drainEvents().filter((e) => e.type === 'gatherDenied');
+    expect(denied).toEqual([{ type: 'gatherDenied', pid: a, surface: 'corpse', requiredTier: 2 }]);
+    // Both families downgraded: plain yields land, nothing is signed.
+    const meta = internals.players.get(a)!;
+    expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('wolf_fang', a)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('pristine_hide', a)).toBe(0);
+    expect(meta.inventory.some((s) => s.instance?.signer)).toBe(false);
+    expect(mob.harvestClaimedBy).toBe(a);
   });
 });
 

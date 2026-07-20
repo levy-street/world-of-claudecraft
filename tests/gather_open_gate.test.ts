@@ -161,7 +161,7 @@ describe('tryNearbyInteraction default arm', () => {
   it('dispatches a lootable corpse without any harvest-state argument (the default arm)', () => {
     const withLoot = corpse({ loot: { copper: 5, items: [] } });
     const { world, hud, lootCorpse } = nearbyRig(withLoot);
-    expect(tryNearbyInteraction(world, hud, [], 'far', 'notReady', 'nothing')).toBe(true);
+    expect(tryNearbyInteraction(world, hud, [], null, 'far', 'notReady', 'nothing')).toBe(true);
     expect(lootCorpse).toHaveBeenCalledWith(2);
   });
 
@@ -170,7 +170,7 @@ describe('tryNearbyInteraction default arm', () => {
     // opens through the click path (handlePickedEntity above). Pinned so a
     // future change to that contract is deliberate.
     const { world, hud, lootCorpse } = nearbyRig(corpse({}));
-    expect(tryNearbyInteraction(world, hud, [], 'far', 'notReady', 'nothing')).toBe(false);
+    expect(tryNearbyInteraction(world, hud, [], null, 'far', 'notReady', 'nothing')).toBe(false);
     expect(lootCorpse).not.toHaveBeenCalled();
     expect(hud.showError).toHaveBeenCalledWith('nothing');
   });

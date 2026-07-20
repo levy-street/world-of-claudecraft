@@ -41,7 +41,7 @@ import {
   startFishing,
 } from '../src/sim/professions/fishing';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import type { Entity, PlayerClass, SimEvent } from '../src/sim/types';
+import { type Entity, FISHING_CAST_ID, type PlayerClass, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 
 function makeSim(seed = 4242): Sim {
@@ -477,6 +477,9 @@ describe('fishing band selection liveness (pin 6)', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 150;
+    // Phase 12: band 1 also needs the tier-2 rod in bags (the silent tool
+    // cap); the bag scan is rng-free, so the pinned stream is unchanged.
+    sim.addItem('ironreel_fishing_rod', 1);
     // B1_SEQ_4242 diverges from B0_SEQ_4242 at index 1 for the same rng
     // stream, so this match proves the live path actually switched tables.
     expect(catchSequence(sim, meta, 12)).toEqual(B1_SEQ_4242);
@@ -486,10 +489,92 @@ describe('fishing band selection liveness (pin 6)', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 200;
+    // Phase 12: band 2 needs the tier-3 rod (band b requires tool tier b + 1).
+    sim.addItem('silverstream_fishing_rod', 1);
     // The koi at index 16 sits where the band-1 table yields an empty hook
     // (see the B2_SEQ_4242 derivation comment), so this match proves the
     // live path resolved the TOP band, not a band-1 collapse.
     expect(catchSequence(sim, meta, 18)).toEqual(B2_SEQ_4242);
+  });
+});
+
+// Phase 12 band tool cap: catch band b requires an owned rod of tier b + 1
+// (canGatherTier(rodTier, b + 1)); the effective band is min(proficiency
+// band, best band the owned rod covers), capped SILENTLY (no event, no
+// denial: the cast still lands a band-capped catch). The simple pole is not a
+// gatherTool, so it floors to tier 1: band 0, the shipped table, stays
+// reachable with the pole or bare hands.
+describe('fishing band tool cap (Professions 2.0 Phase 12)', () => {
+  it('proficiency 150 with NO rod silently caps to the band-0 table (literal sequence)', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    meta.gatheringProficiency.fishing = 150;
+    // B0 and B1 diverge at index 1 (perch vs trout) on this stream, so 12
+    // casts are decisive: band-1 proficiency without the rod still walks the
+    // SHIPPED band-0 table, and nothing else changes (no error, no event).
+    expect(catchSequence(sim, meta, 12)).toEqual(B0_SEQ_4242.slice(0, 12));
+  });
+
+  it('proficiency 250 with the tier-2 rod stays band 1: the koi window yields an empty hook', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    meta.gatheringProficiency.fishing = 250;
+    sim.addItem('ironreel_fishing_rod', 1);
+    // Index 1 (trout, not band 0's perch) proves the walk left band 0; index
+    // 16 is the band DISCRIMINATOR: that draw lands in the 92-to-94 window
+    // where band 2 yields the koi but band 1 an empty hook (the B2_SEQ_4242
+    // derivation comment), so null there proves the tier-2 rod held the walk
+    // at band 1 despite band-2 proficiency.
+    expect(catchSequence(sim, meta, 18)).toEqual([...B2_SEQ_4242.slice(0, 16), null, PERCH]);
+  });
+
+  it('proficiency 250 with the tier-3 rod reaches band 2 (the full B2 literal)', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    meta.gatheringProficiency.fishing = 250;
+    sim.addItem('silverstream_fishing_rod', 1);
+    expect(catchSequence(sim, meta, 18)).toEqual(B2_SEQ_4242);
+  });
+
+  it('a pole-only proficiency-0 angler is byte-identical to the shipped pre-phase walk', () => {
+    const sim = makeSim(4242);
+    const meta = sim.meta(sim.playerId)!;
+    // The pole keeps use: { type: 'fishing' }: not a gatherTool, so the bag
+    // scan floors to tier 1 and band 0 resolves exactly as before Phase 12.
+    sim.addItem('simple_fishing_pole', 1);
+    expect(catchSequence(sim, meta, 30)).toEqual(B0_SEQ_4242);
+  });
+
+  it('useItem on each new rod starts the standard fishing cast', () => {
+    for (const rodId of ['ironreel_fishing_rod', 'silverstream_fishing_rod']) {
+      const sim = makeSim(4242);
+      // South shore of the vale lake, facing the center (the pin-10 idiom).
+      const pz = LAKE.z - LAKE.radius - 2;
+      teleportTo(sim, LAKE.x, pz);
+      sim.player.facing = Math.atan2(0, LAKE.z - pz);
+      sim.addItem(rodId, 1);
+      sim.events = [];
+      sim.useItem(rodId);
+      expect(sim.player.castingAbility, rodId).toBe(FISHING_CAST_ID);
+      expect(sim.events).toContainEqual(
+        expect.objectContaining({ type: 'castStart', ability: FISHING_CAST_ID, time: 5 }),
+      );
+      // The rod is a permanent tool: never consumed by the cast.
+      expect(sim.countItem(rodId)).toBe(1);
+    }
+  });
+
+  it('useItem on a non-fishing gathering tool stays a safe no-op', () => {
+    // The re-homed half of the retired "safe no-op until the gather-node
+    // system lands" pin (tests/professions_tools.test.ts): node access gating
+    // scans bags (professions/tools.ts bestOwnedGatherToolTier), never an
+    // item USE, so using a pick does nothing, casts nothing, and keeps it.
+    const sim = makeSim(4242);
+    sim.addItem('copper_mining_pick', 1);
+    sim.events = [];
+    expect(() => sim.useItem('copper_mining_pick')).not.toThrow();
+    expect(sim.countItem('copper_mining_pick')).toBe(1);
+    expect(sim.events.some((e) => (e as { type: string }).type === 'castStart')).toBe(false);
   });
 });
 

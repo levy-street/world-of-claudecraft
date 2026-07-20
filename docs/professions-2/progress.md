@@ -29,7 +29,7 @@ Update this file at the end of every implementation and QA session. Statuses:
 | 10 QA | Verify recipe ladders and materials | complete | 2026-07-19 | 2026-07-19 |
 | 11 | Fishing joins the framework | complete (PR #2197 merged into release/v0.29.0) | 2026-07-20 | 2026-07-20 |
 | 11 QA | Verify fishing framework | complete (PR #2199 merged) | 2026-07-20 | 2026-07-20 |
-| 12 | Base tool tier gating | not started | | |
+| 12 | Base tool tier gating | built (PR #2217 open) | 2026-07-20 | 2026-07-20 |
 | 12 QA | Verify tool tier gating | not started | | |
 | 12b | Gathering rhythm | not started | | |
 | 12b QA | Verify gathering rhythm | not started | | |
@@ -434,9 +434,20 @@ UI clamps via the Phase 5 above-cap saturation pin), and the catchLine unknown-i
 fallback arm (defensive, unreachable today).
 
 ### Phase 12: Base tool tier gating
-- [ ] Nodes carry tiers; tool tier + skill gate node and corpse-material access
-- [ ] The 15 existing tools change outcomes; stale no-op test pin replaced
-- [ ] Tool effects remain parked (explicitly out of scope)
+- [x] Nodes carry tiers; tool tier + skill gate node and corpse-material access
+- [x] The 15 existing tools change outcomes; stale no-op test pin replaced
+- [x] Tool effects remain parked (explicitly out of scope)
+
+Built 2026-07-20. As-landed decisions (the phase file's "As landed" block is the authority):
+text-free `gatherDenied` SimEvent + `hudChrome.gathering.*` keys instead of sim_i18n matcher
+rows; the tiered fishing rods (ironreel tier 2, silverstream tier 3, trader_wilkes) were
+authored HERE because no rod tier vocabulary existed; corpse gating reads the all-tier-1
+MONSTER_MATERIAL_TIERS table so the deny arm never fires in shipped content (deny = premium
+downgrade, yield preserved); the fishing band cap is silent (12b owns rod-synergy UX); no new
+IWorld member; parity goldens byte-identical. Deferred: rod-synergy and cap visibility UX
+(Phase 12b), higher-tier corpse families (future content composes with the live gate), the
+node hover tooltip is desktop-pointer-only (mobile reads the minimap lock tint + denial
+toast).
 
 ### Phase 12b: Gathering rhythm
 - [ ] Gather cast (tool-tier and band scaled, floored); completion re-validates; move cancels free

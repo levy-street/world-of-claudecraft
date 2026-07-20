@@ -2802,6 +2802,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.ghostly_essence.name': 'Tinh Chất Ma Quái',
   'entities.items.glacier_melt.name': 'Nước Băng Tan',
   'entities.items.glimmerfin_koi.name': 'Cá Koi Vây Lấp Lánh',
+  'entities.items.ironreel_fishing_rod.name': 'Cần câu guồng sắt',
+  'entities.items.silverstream_fishing_rod.name': 'Cần câu suối bạc',
   'entities.items.glowing_wax.name': 'Sáp Phát Sáng',
   'entities.items.gnarled_staff.name': 'Trượng Gỗ Sồi Đầm Lầy',
   'entities.items.gorraks_cleaver.name': 'Dao Phay Của Gorrak',

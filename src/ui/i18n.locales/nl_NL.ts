@@ -2776,6 +2776,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.ghostly_essence.name': 'Spookachtige Essentie',
   'entities.items.glacier_melt.name': 'Gletsjersmeltwater',
   'entities.items.glimmerfin_koi.name': 'Glansvin-Koi',
+  'entities.items.ironreel_fishing_rod.name': 'Hengel met ijzeren molen',
+  'entities.items.silverstream_fishing_rod.name': 'Zilverbeek-hengel',
   'entities.items.glowing_wax.name': 'Gloeiende Was',
   'entities.items.gnarled_staff.name': 'Moeraseiken Staf',
   'entities.items.gorraks_cleaver.name': 'Gorraks Hakmes',

@@ -15,6 +15,29 @@ shorten the fishing bite delay and widen its reaction window. Do not add any spe
 timing mechanic in this phase; the tier fields and rod band gates authored here are exactly
 what 12b composes with.
 
+As landed (2026-07-20, authoritative over the Starter Prompt below where they differ):
+- Denials are a text-free personal SimEvent, `gatherDenied { pid, surface: 'node' | 'corpse',
+  requiredTier, professionId? }`, rendered client-side from `hudChrome.gathering.*` keys (the
+  craftResult/trainResult packet precedent, the same correction Phase 6 made). The Starter
+  Prompt's "sim matcher rule in src/ui/sim_i18n.ts" premise is superseded: the sim emits no
+  text on the new paths, so the S3 guard is green with zero matcher additions.
+- The fishing rod tier vocabulary did not exist (the simple pole is tierless), so this phase
+  authored it: two vendor rods, ironreel_fishing_rod (tier 2) and silverstream_fishing_rod
+  (tier 3) at trader_wilkes, `use: gatherTool` with `professionId: 'fishing'`, and a useItem
+  arm routing that shape to startFishing. Phase 12b's rod synergy reads these tiers.
+- Corpse pulls gate against a per-family `MONSTER_MATERIAL_TIERS` content table
+  (content/professions.ts) with EVERY wave-one family at tier 1, so the gate is live code that
+  never fires in shipped content (the only reading that satisfies both the rare+ gating
+  deliverable and the prime directive; rarity-derived tiers would have locked out shipped
+  v0.28.0 capability). A denied rare+ pull downgrades to the plain grant it gets on a common
+  roll (yield preserved, signature/jackpot withheld); the claim and every draw position are
+  byte-identical.
+- The fishing band cap is SILENT (no event, no denial: the capped cast still lands a catch);
+  band b requires rod tier b + 1, and band 0, the shipped table, stays reachable with the pole
+  or bare hands. 12b owns the rod-synergy UX.
+- No new IWorld member: both hosts read node tier off the shared content def, and the parity
+  goldens are byte-identical because gather nodes are content, not entities.
+
 ## Context pointers
 
 - `docs/professions-2/state.md`: locked decisions (tool effects PARKED; prime directive), the

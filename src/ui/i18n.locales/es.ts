@@ -4941,6 +4941,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread3.name': 'Pastel de Miel Conjurado',
   'entities.items.conjured_bread4.name': 'Pan de Festín Conjurado',
   'entities.items.glimmerfin_koi.name': 'Koi de aletas brillantes',
+  'entities.items.ironreel_fishing_rod.name': 'Caña de carrete de hierro',
+  'entities.items.silverstream_fishing_rod.name': 'Caña del arroyo plateado',
   'entities.items.raw_bog_eel.name': 'Anguila de ciénaga cruda',
   'entities.items.raw_frostgill_trout.name': 'Trucha de agallas gélidas cruda',
   'entities.items.raw_marsh_pike.name': 'Lucio de marisma crudo',

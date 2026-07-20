@@ -1,6 +1,33 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// Mock the db layer so no Postgres is needed for the Phase 12 online-routing
+// suite at the bottom (the corpse_harvest_sim.test.ts idiom); the offline
+// suites above it never touch the server.
+vi.mock('../server/db', () => ({
+  pool: { query: vi.fn(async () => ({ rows: [] })) },
+  saveCharacterState: vi.fn(async () => {}),
+  openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
+  closePlaySession: vi.fn(async () => {}),
+  insertChatLogs: vi.fn(async () => {}),
+  walletForAccount: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
+  markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  setAccountWeaponSkinLoadout: vi.fn(async () => ({
+    completedQuestIds: [],
+    mechChromaIds: [],
+    weaponSkinIds: [],
+    weaponSkinLoadout: {},
+  })),
+}));
+
+import { type ClientSession, GameServer } from '../server/game';
+import { ClientWorld } from '../src/net/online';
 import { bagCapacity } from '../src/sim/bags';
-import { GATHER_NODES } from '../src/sim/data';
+import { GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
+import { completeFishing } from '../src/sim/professions/fishing';
 import {
   MATERIAL_RARITY_MAX_PROFICIENCY,
   NODE_HARVEST_TABLE,
@@ -411,5 +438,319 @@ describe('gather-completion event for audio (#1729)', () => {
       return sim.drainEvents().find((e) => e.type === 'gatherResult');
     };
     expect(run()).toEqual(run());
+  });
+});
+
+// The Phase 12 prime directive: every node def that shipped BEFORE the tool
+// tier ramp keeps tier 1 and stays harvestable with no tool at all. The id
+// list is LITERAL, never derived from GATHER_NODES (the FIELD_RECIPES
+// tautology lesson): a future tier edit on any shipped node reds this pin
+// decisively instead of silently re-deriving.
+describe('lockout prevention: pre-phase nodes stay bare-hands harvestable (Phase 12)', () => {
+  const PRE_PHASE_NODE_IDS = [
+    'ore_eastbrook_1',
+    'ore_eastbrook_2',
+    'ore_eastbrook_3',
+    'wood_eastbrook_1',
+    'wood_eastbrook_2',
+    'wood_eastbrook_3',
+    'herb_eastbrook_1',
+    'herb_eastbrook_2',
+    'herb_eastbrook_3',
+    'ore_mirefen_1',
+    'ore_mirefen_2',
+    'ore_mirefen_3',
+    'wood_mirefen_1',
+    'wood_mirefen_2',
+    'wood_mirefen_3',
+    'herb_mirefen_1',
+    'herb_mirefen_2',
+    'herb_mirefen_3',
+    'ore_thornpeak_1',
+    'ore_thornpeak_2',
+    'wood_thornpeak_1',
+    'wood_thornpeak_2',
+    'herb_thornpeak_1',
+    'herb_thornpeak_2',
+  ] as const;
+
+  it('all 24 pre-phase defs carry tier 1 and a bare-hands player harvests every one', () => {
+    expect(PRE_PHASE_NODE_IDS).toHaveLength(24);
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'BareHands');
+    const meta = mustMeta(sim, pid);
+    // Genuinely bare-handed: the starting kit carries no gathering tool.
+    expect(meta.inventory.some((s) => ITEMS[s.itemId]?.use?.type === 'gatherTool')).toBe(false);
+    for (const id of PRE_PHASE_NODE_IDS) {
+      expect(mustNode(id).tier, id).toBe(1);
+      teleportOntoNode(sim, pid, id);
+      sim.drainEvents();
+      expect(sim.harvestNode(id, pid), id).toBe(true);
+      expect(
+        sim.drainEvents().some((e) => e.type === 'gatherDenied'),
+        id,
+      ).toBe(false);
+    }
+  });
+
+  it('the ramp is purely additive: only the NEW _t2/_t3 veins carry tier 2 or higher', () => {
+    const gated = GATHER_NODES.filter((n) => n.tier > 1)
+      .map((n) => n.id)
+      .sort();
+    expect(gated).toEqual([
+      'herb_mirefen_t2',
+      'herb_thornpeak_t2',
+      'herb_thornpeak_t3',
+      'ore_mirefen_t2',
+      'ore_thornpeak_t2',
+      'ore_thornpeak_t3',
+      'wood_mirefen_t2',
+      'wood_thornpeak_t2',
+      'wood_thornpeak_t3',
+    ]);
+  });
+});
+
+// Deny ORDER pins (Phase 12): dead -> unknown node -> too far -> respawn ->
+// tool gate -> bags full. Each case constructs the two competing denials at
+// once, so the winning arm proves the order.
+describe('node tool gate ordering (Phase 12)', () => {
+  const T2 = 'ore_mirefen_t2';
+
+  it('the respawn deny fires before the tool gate: a cooling node never emits gatherDenied', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'OrderA');
+    teleportOntoNode(sim, pid, T2);
+    sim.addItem('iron_mining_pick', 1, pid);
+    expect(sim.harvestNode(T2, pid)).toBe(true);
+    // Drop the pick: the second attempt is both cooling AND tool-short.
+    const meta = mustMeta(sim, pid);
+    meta.inventory = meta.inventory.filter((s) => s.itemId !== 'iron_mining_pick');
+    sim.drainEvents();
+    expect(sim.harvestNode(T2, pid)).toBe(false);
+    const ev = sim.drainEvents();
+    expect(
+      ev.some(
+        (e) => e.type === 'error' && e.text === 'This resource node has not respawned for you yet.',
+      ),
+    ).toBe(true);
+    expect(ev.some((e) => e.type === 'gatherDenied')).toBe(false);
+  });
+
+  it('the tool gate fires before the bags-full deny', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'OrderB');
+    teleportOntoNode(sim, pid, T2);
+    const meta = mustMeta(sim, pid);
+    meta.inventory.length = 0;
+    for (let i = 0; i < bagCapacity(meta.bags); i++) {
+      meta.inventory.push({ itemId: 'bone_fragments', count: 1, instance: { boundTo: pid } });
+    }
+    expect(sim.canAddItem('iron_ore', 1, pid)).toBe(false);
+    sim.drainEvents();
+    expect(sim.harvestNode(T2, pid)).toBe(false);
+    const ev = sim.drainEvents();
+    expect(ev.some((e) => e.type === 'gatherDenied')).toBe(true);
+    expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(false);
+  });
+
+  it('a tier-1 harvest takes the untouched hot path: no gatherDenied, exactly the two pinned draws', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'HotPath');
+    teleportOntoNode(sim, pid, NODE_ID);
+    sim.drainEvents();
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      expect(sim.harvestNode(NODE_ID, pid)).toBe(true);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(draws).toBe(2);
+    expect(sim.drainEvents().some((e) => e.type === 'gatherDenied')).toBe(false);
+  });
+});
+
+// Same-seed determinism across every NEW Phase 12 path in one drive: a denied
+// bare-hands attempt, a granted tier-2 harvest, a corpse harvest, and a
+// tool-capped fishing catch. The observable is the full event stream plus the
+// settled post-state, so an extra/removed rng draw or a reordered emit on any
+// of these paths breaks the pin.
+describe('Phase 12 determinism (same seed, same drive)', () => {
+  it('two Sims produce identical event streams and post-state through the gated paths', () => {
+    const run = () => {
+      const sim = new Sim({ seed: 4242, playerClass: 'warrior', noPlayer: true });
+      const pid = sim.addPlayer('warrior', 'Det');
+      sim.tick();
+      const meta = mustMeta(sim, pid);
+      const events: unknown[] = [];
+      teleportOntoNode(sim, pid, 'ore_mirefen_t2');
+      sim.drainEvents();
+      sim.harvestNode('ore_mirefen_t2', pid); // denied: bare hands at a tier-2 vein
+      sim.addItem('iron_mining_pick', 1, pid);
+      sim.harvestNode('ore_mirefen_t2', pid); // granted
+      // A wolf corpse harvest beside the vein (the tier-1 corpse path).
+      const template = MOBS.forest_wolf;
+      const p = mustEntity(sim, pid);
+      const wolf = createMob(987654, template, template.maxLevel, { ...p.pos });
+      wolf.dead = true;
+      wolf.aiState = 'dead';
+      wolf.corpseTimer = 9999;
+      wolf.respawnTimer = 9999;
+      sim.entities.set(wolf.id, wolf);
+      sim.harvestCorpse(wolf.id, ['hide'], pid);
+      // A band-capped catch: band-1 proficiency with no rod resolves band 0.
+      meta.gatheringProficiency.fishing = 150;
+      completeFishing(sim.ctx, p, meta);
+      events.push(...sim.drainEvents());
+      sim.tick();
+      return {
+        events,
+        ore: sim.countItem('iron_ore', pid),
+        proficiency: { ...meta.gatheringProficiency },
+        nodeReady: sim.nodeHarvestableByMeFor('ore_mirefen_t2', pid),
+        inventory: JSON.parse(JSON.stringify(meta.inventory)),
+      };
+    };
+    const a = run();
+    expect(a).toEqual(run());
+    // Non-degenerate: the drive really exercised the deny and grant arms.
+    expect(a.events.some((e) => (e as { type: string }).type === 'gatherDenied')).toBe(true);
+    expect(a.events.some((e) => (e as { type: string }).type === 'gatherResult')).toBe(true);
+    expect(a.ore).toBeGreaterThanOrEqual(1);
+    expect(a.nodeReady).toBe(false);
+  });
+});
+
+// --- Online routing (Phase 12): the live GameServer router + snapshot
+// pipeline, the professions_fishing pin-8 / corpse_harvest_sim idiom. The
+// gatherDenied event is personal (routed generically by ev.pid, no server
+// change), and a granted harvest still mirrors the per-player cooldown over
+// the ncd self-delta.
+
+interface FakeClient {
+  sent: any[];
+  ws: any;
+}
+
+function fakeWs(): FakeClient {
+  const sent: any[] = [];
+  return { sent, ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) } };
+}
+
+function joinServer(server: GameServer, fc: FakeClient, id: number, name: string): ClientSession {
+  const session = server.join(fc.ws, id, id, name, 'warrior', null);
+  if ('error' in session) throw new Error(session.error);
+  session.blockListLoaded = true;
+  return session;
+}
+
+function deliveredEvents(fc: FakeClient): { type: string }[] {
+  return fc.sent.filter((m) => m.t === 'events').flatMap((m) => m.list as { type: string }[]);
+}
+
+function lastSnap(sent: any[]): any {
+  for (let i = sent.length - 1; i >= 0; i--) {
+    if (sent[i].t === 'snap') return sent[i];
+  }
+  return null;
+}
+
+// A ClientWorld without the WebSocket plumbing, to drive applySnapshot
+// directly (the bareClient idiom from tests/snapshots.test.ts).
+function bareClient(pid: number): ClientWorld {
+  const c: any = Object.create(ClientWorld.prototype);
+  c.cfg = { seed: 20061, playerClass: 'warrior' };
+  c.entities = new Map();
+  c.playerId = pid;
+  c.ownPlayerId = pid;
+  c.ownPlayerClass = 'warrior';
+  c.spectating = null;
+  c.cupInfo = null;
+  c.sportRole = null;
+  c.moveInput = {};
+  c.inventory = [];
+  c.vendorBuyback = [];
+  c.equipment = {};
+  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
+  c.copper = 0;
+  c.honor = 0;
+  c.lifetimeHonor = 0;
+  c.xp = 0;
+  c.known = [];
+  c.questLog = new Map();
+  c.questsDone = new Set();
+  c.pendingQuestCommands = new Map();
+  c.partyInfo = null;
+  c.selectedDungeonDifficulty = 'normal';
+  c.tradeInfo = null;
+  c.duelInfo = null;
+  c.lastSnapAt = 0;
+  c.snapInterval = 50;
+  c.serverTickHz = null;
+  c.missingSince = new Map();
+  c.pendingFacingDelta = 0;
+  c.connected = true;
+  c.eventQueue = [];
+  c.mouselookFacing = null;
+  c.lastInputSentAt = 0;
+  c.lastInputSig = '';
+  c.inputSeq = 0;
+  c.pendingInputSeqSentAt = new Map();
+  c.ackedInputSeq = 0;
+  c.inputEchoSamples = [];
+  c.spectateFacingPending = false;
+  c.pendingSpectateFacing = null;
+  c.nodeCooldowns = new Map();
+  return c;
+}
+
+describe('node tool gating over the live server (Phase 12)', () => {
+  it('gatherDenied reaches the attempting session only; a granted harvest still mirrors ncd', () => {
+    const server = new GameServer();
+    const fcA = fakeWs();
+    const fcB = fakeWs();
+    const sa = joinServer(server, fcA, 71, 'Prospector');
+    const sb = joinServer(server, fcB, 72, 'Bystander');
+    const node = mustNode('ore_mirefen_t2');
+    const e = server.sim.entities.get(sa.pid);
+    if (!e) throw new Error('missing server entity');
+    e.pos.x = node.pos.x;
+    e.pos.z = node.pos.z;
+    e.pos.y = terrainHeight(node.pos.x, node.pos.z, server.sim.cfg.seed);
+    e.prevPos = { ...e.pos };
+    server.sim.tick();
+    fcA.sent.length = 0;
+    fcB.sent.length = 0;
+
+    // Bare hands: the deny is denied server-side and routed personally by
+    // ev.pid through the generic router (no gatherDenied-specific wiring).
+    expect(server.sim.harvestNode('ore_mirefen_t2', sa.pid)).toBe(false);
+    (server as any).routeEvents(server.sim.drainEvents());
+    expect(deliveredEvents(fcA).filter((ev) => ev.type === 'gatherDenied')).toEqual([
+      {
+        type: 'gatherDenied',
+        pid: sa.pid,
+        surface: 'node',
+        professionId: 'mining',
+        requiredTier: 2,
+      },
+    ]);
+    // Bystander isolation: the personal denial never leaks to another session.
+    expect(sb.pid).not.toBe(sa.pid);
+    expect(deliveredEvents(fcB).some((ev) => ev.type === 'gatherDenied')).toBe(false);
+
+    // Granted with the pick: the per-player cooldown mirrors over the ncd
+    // self-delta into the real ClientWorld, exactly as for a tier-1 node.
+    server.sim.addItem('iron_mining_pick', 1, sa.pid);
+    expect(server.sim.harvestNode('ore_mirefen_t2', sa.pid)).toBe(true);
+    server.sim.tick();
+    (server as any).broadcastSnapshots();
+    const client = bareClient(sa.pid);
+    const snap = lastSnap(fcA.sent);
+    expect(snap).not.toBeNull();
+    (client as any).applySnapshot(snap);
+    expect(client.nodeHarvestableByMe('ore_mirefen_t2')).toBe(false);
+    expect(client.nodeHarvestableByMe('ore_mirefen_1')).toBe(true);
   });
 });

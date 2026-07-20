@@ -137,6 +137,7 @@ const MINIMAP_COLOR_TOKENS = {
   outline: '--color-minimap-outline',
   gatherReady: '--color-minimap-gather-ready',
   gatherCooldown: '--color-minimap-gather-cooldown',
+  gatherLocked: '--color-minimap-node-locked',
   station: '--color-minimap-station',
 } as const;
 
@@ -418,8 +419,13 @@ export class MinimapPainter {
           ctx.stroke();
           break;
         case 'gather-node':
+          // Tool-tier lock (Professions 2.0 Phase 12) composes with the
+          // respawn state: a locked node keeps the ready/cooldown silhouette
+          // (radius + outline) but the locked tint replaces the state color,
+          // so both dimensions stay readable at once. Actionable info on
+          // every graphics tier (fairness invariant: never preset-gated).
           if (m.ready) {
-            ctx.fillStyle = colors.gatherReady;
+            ctx.fillStyle = m.locked ? colors.gatherLocked : colors.gatherReady;
             ctx.strokeStyle = colors.outline;
             ctx.lineWidth = MARKER_OUTLINE_WIDTH;
             ctx.beginPath();
@@ -427,7 +433,7 @@ export class MinimapPainter {
             ctx.fill();
             ctx.stroke();
           } else {
-            ctx.fillStyle = colors.gatherCooldown;
+            ctx.fillStyle = m.locked ? colors.gatherLocked : colors.gatherCooldown;
             ctx.beginPath();
             ctx.arc(m.mx, m.my, GATHER_NODE_COOLDOWN_RADIUS, 0, FULL_CIRCLE);
             ctx.fill();

@@ -2097,7 +2097,25 @@ export const vi_VN: EnTranslations = {
       "notReady": "Điểm tài nguyên này chưa hồi sinh lại dành cho bạn.",
       "gatherLine": "Bạn tập hợp: {name}.",
       "gatherLineQty": "Bạn tập hợp: {name} x{qty}.",
-      "catchLine": "You reel in: {name}"
+      "catchLine": "You reel in: {name}",
+      "nodeName": {
+        "ore": "Ore Vein",
+        "wood": "Timber Stand",
+        "herb": "Herb Patch"
+      },
+      "tierRequired": {
+        "mining": "Requires a tier {tier} mining pick",
+        "logging": "Requires a tier {tier} logging axe",
+        "herbalism": "Requires a tier {tier} herbalism sickle"
+      },
+      "toolTierUnmet": {
+        "mining": "You need a tier {tier} mining pick to harvest this vein.",
+        "logging": "You need a tier {tier} logging axe to fell this stand.",
+        "herbalism": "You need a tier {tier} herbalism sickle to gather this patch."
+      },
+      "toolTierUnmetCorpse": "You need a tier {tier} gathering tool to recover the finest materials.",
+      "stateReady": "Ready",
+      "stateCooldown": "Respawning"
     },
     "archetypeTitle": {
       "label": "Danh hiệu",
@@ -8711,6 +8729,12 @@ export const vi_VN: EnTranslations = {
       },
       "verlans_oathblade": {
         "name": "Thề Kiếm của Verlan"
+      },
+      "ironreel_fishing_rod": {
+        "name": "Cần câu guồng sắt"
+      },
+      "silverstream_fishing_rod": {
+        "name": "Cần câu suối bạc"
       },
       "briny_idol": {
         "name": "Thần Tượng Mặn Mòi"
