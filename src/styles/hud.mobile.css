@@ -1745,11 +1745,18 @@
        #mobile-move-zone top; this rule keeps an 8px margin above the zone and
        never shrinks below one 40px touch-floor row (a pathologically short
        leftover viewport then overhangs the zone's top edge slightly; the
-       floating wheel still springs to any touch below). Falls back to no
-       bound while the sensors are unset (zone hidden, first frame). Overflow
-       keeps the hidden rows reachable by scroll. One tier-free rule: the
-       measured sensors already reflect the landscape metrics. */
-    max-height: max(40px, calc(var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 8px));
+       floating wheel still springs to any touch below). An unusable pad falls
+       back to the viewport bottom inside the painter, so this tier is bounded
+       for the same reason desktop is; the sensors unset only when no member
+       rows exist yet, and then there is nothing to bound. Overflow keeps the
+       hidden rows reachable by scroll. One tier-free rule: the measured
+       sensors already reflect the landscape metrics.
+       The gap term is 2px, not the intended 8px, because this tier inherits
+       the base below-target rule's padding/margin (the keyline and focus-ring
+       clearance), whose negative margin lifts the measured rows top by 6px;
+       2px + 6px is the 8px gap. That inheritance also fixes the same
+       outline/ring clipping on mobile, which predates this change. */
+    max-height: max(40px, calc(var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 2px));
   }
   /* party rows are role="button" tap targets (tap to target a member), so they
      must clear the 40x40 mobile touch floor, not the compact desktop

@@ -126,6 +126,14 @@ export class PartyBelowTargetPainter {
   // collapse state; the debuff child count tracks the strip's wrap height.
   // The move zone is statically anchored (its geometry depends only on the
   // viewport and the chrome scale, both keyed), so it adds no key input.
+  //
+  // The container's class attribute is LOAD-BEARING beyond those variants:
+  // #party-frames is zero-width out of a party (the pool detaches the rows
+  // wrapper in clear()), so a target selected BEFORE joining a party measures
+  // a party column the stack cannot overlap and reports no push. The pool
+  // toggles `party-present` on the container one frame later, and reading that
+  // class here is what forces the re-measure that applies the push. Do not
+  // prune it from the key.
   private buildKey(memberCount: number, mobile: boolean): string {
     const { container, frame, debuffs } = this.els;
     const root = frame?.ownerDocument.documentElement;
@@ -165,30 +173,40 @@ export class PartyBelowTargetPainter {
 
   // The rows-bound sensors: the rows' own top (below the collapse chip, so no
   // chip-height arithmetic is ever guessed) and the limit the rows must end
-  // above. On mobile the limit prefers the RESTING wheel (its invisible
-  // capture band above may be traded for a member row; touches there hit real
-  // member tap targets), falling back to the static capture zone while the
-  // wheel is mid-drag (.floating, sprung under the thumb, so its rect is
-  // meaningless); a hidden or missing pad (chat overlay up) reports null. On
-  // desktop there is no movement pad and the limit is simply the viewport
-  // bottom, so a long raid roster scrolls instead of running off screen. The
-  // rows top depends on our own bottom write, which the key's style-attribute
-  // input catches, so it settles one gated re-measure after a push change.
+  // above. On desktop that limit is the viewport bottom, so a long raid roster
+  // scrolls instead of running off screen. On mobile it is the movement pad,
+  // preferring the RESTING wheel (the capture zone's invisible band above the
+  // wheel may be traded for a member row; touches there hit real member tap
+  // targets) and falling back to the static capture zone when the wheel is
+  // mid-drag (.floating, sprung under the thumb, so its rect is meaningless).
+  //
+  // The floating check does NOT track a drag live: the wheel's class is
+  // deliberately absent from the invalidation key, because keying it would
+  // force a layout read at the start and end of every joystick drag, the most
+  // performance-sensitive interaction on the touch HUD. It exists so that a
+  // re-measure triggered by something else while a drag happens to be in
+  // flight (a buff count changing mid-combat, routine) does not read the
+  // sprung wheel. Between such re-measures the bound is simply stale, which
+  // is harmless: the rows are not relaid out during the drag either.
+  //
+  // An unusable pad (missing, or zero-height) falls back to the viewport
+  // bottom rather than reporting null, so mobile keeps a bound for exactly
+  // the reason desktop has one; only a missing rows wrapper (no members
+  // rendered yet, hence nothing to bound) unsets the sensors. The rows top
+  // depends on our own bottom write, which the key's style-attribute input
+  // catches, so it settles one gated re-measure after a push change.
   private measureRowsBound(mobile: boolean): { rowsTop: number; limit: number } | null {
     const rows = this.els.rows();
     if (!rows) return null;
     const z = safeScale(getUiScale());
-    let limit: number;
+    const viewportLimit = this.win.innerHeight / z;
+    let limit = viewportLimit;
     if (mobile) {
       const wheel = this.els.moveWheel();
       const atRest = wheel && !(wheel.getAttribute('class') ?? '').includes('floating');
       const pad = atRest ? wheel : this.els.moveZone();
-      if (!pad) return null;
-      const padBox = pad.getBoundingClientRect();
-      if (padBox.height <= 0) return null;
-      limit = padBox.top / z;
-    } else {
-      limit = this.win.innerHeight / z;
+      const padBox = pad?.getBoundingClientRect();
+      limit = padBox && padBox.height > 0 ? padBox.top / z : viewportLimit;
     }
     const rowsBox = rows.getBoundingClientRect();
     return { rowsTop: rowsBox.top / z, limit };

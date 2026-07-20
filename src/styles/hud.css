@@ -4412,11 +4412,21 @@
        minimum, and overflow members scroll. The whole calc divides by the
        Party Frame Scale zoom this element carries, which multiplies author
        lengths back at used-value time (the mobile tier pins zoom: 1 and has
-       its own rule). Unset sensors (no push) fall back to no bound. */
+       its own rule). Unset sensors (no push) fall back to no bound.
+       The grid column is EXACTLY one frame wide, so a bare scroll container
+       would clip everything a .party-frame paints outside its border box: the
+       .panel keyline (outline: 1px) and the 5px :focus-visible ring, on every
+       frame, whenever a target is selected and regardless of whether anything
+       actually overflows. The padding gives that paint room inside the scroll
+       container and the equal negative margin cancels it, so the frames land
+       in exactly the same place; the gap term drops 12px to 6px because the
+       negative margin lifts the measured rows top by the same 6px. */
+    padding: 6px;
+    margin: -6px;
     max-height: max(
       40px,
       calc(
-        (var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 12px) /
+        (var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 6px) /
         var(--party-frame-scale, 1)
       )
     );

@@ -208,7 +208,7 @@ describe('PartyBelowTargetPainter (measure gating + property write)', () => {
   });
 
   it('writes the rows-bound sensors while pushing: pad top on mobile, viewport bottom on desktop', () => {
-    const { painter, moveWheel, props } = build();
+    const { painter, props } = build();
     // Desktop: the limit is the viewport bottom (the injected 900px window),
     // so a long roster scrolls instead of running off screen.
     painter.update(true, 5, false);
@@ -220,18 +220,43 @@ describe('PartyBelowTargetPainter (measure gating + property write)', () => {
     painter.update(true, 5, true);
     expect(props.get(PARTY_ROWS_TOP_PROP)).toBe('227.0px');
     expect(props.get(PARTY_ROWS_LIMIT_PROP)).toBe('266.0px');
-    // A mid-drag wheel (.floating, sprung under the thumb) is meaningless as a
-    // bound: fall back to the static capture zone's top.
+  });
+
+  it('does not re-measure for the wheel class alone (no layout read mid-drag)', () => {
+    // memberCount is held FIXED across every assertion here: the wheel's class
+    // is deliberately absent from the invalidation key, so it must be the only
+    // thing that changed for this to pin the documented behavior (an earlier
+    // version of this test bumped memberCount between arms, which meant the
+    // class was never shown to drive anything).
+    const { painter, moveWheel, rows, props } = build();
+    painter.update(true, 5, true);
+    expect(props.get(PARTY_ROWS_LIMIT_PROP)).toBe('266.0px');
+    const readsAfterFirst = rows.rectReads;
+    // Drag starts: the wheel springs under the thumb and gains .floating. The
+    // bound stays the (now stale) resting-wheel value and costs NO layout read,
+    // which is the point: keying this would measure on every drag start/end.
     moveWheel.attrs.class = 'mobile-joystick floating';
+    painter.update(true, 5, true);
+    expect(rows.rectReads).toBe(readsAfterFirst);
+    expect(props.get(PARTY_ROWS_LIMIT_PROP)).toBe('266.0px');
+    // A real key change landing mid-drag DOES re-measure, and then the sprung
+    // wheel is skipped in favor of the static capture zone.
     painter.update(true, 6, true);
+    expect(rows.rectReads).toBe(readsAfterFirst + 1);
     expect(props.get(PARTY_ROWS_LIMIT_PROP)).toBe('250.0px');
-    // A hidden pad (mobile chat overlay: wheel at rest but zero-size zone and
-    // wheel) unsets both sensors on the next key change.
-    moveWheel.attrs.class = 'mobile-joystick';
+  });
+
+  it('falls back to the viewport bottom on mobile when the pad is unusable', () => {
+    // Symmetry with desktop: an unusable pad must not leave the rows unbounded
+    // (the mobile below-target rule out-specifies the base tier's own bound,
+    // so "no sensors" would mean "no bound" and reintroduce the off-screen
+    // roster this PR fixed).
+    const { painter, moveWheel, moveZone, props } = build();
     moveWheel.rect.height = 0;
-    painter.update(true, 7, true);
-    expect(props.get(PARTY_ROWS_TOP_PROP)).toBe('initial');
-    expect(props.get(PARTY_ROWS_LIMIT_PROP)).toBe('initial');
+    moveZone.rect.height = 0;
+    painter.update(true, 5, true);
+    expect(props.get(PARTY_ROWS_LIMIT_PROP)).toBe('900.0px');
+    expect(props.get(PARTY_ROWS_TOP_PROP)).toBe('227.0px');
   });
 
   it('re-measures after a content-driven size change (ResizeObserver epoch)', () => {
@@ -302,9 +327,19 @@ describe('below-target CSS derives from the measured bottom', () => {
   it('desktop: pushed rows are viewport-bounded and scroll (10-raid off-screen case)', () => {
     const rule = hudCss.match(/#party-frames\.below-target \.party-rows \{([^}]*)\}/)?.[1] ?? '';
     expect(rule).toContain(
-      'max-height: max(40px, calc((var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 12px) / var(--party-frame-scale, 1)));',
+      'max-height: max(40px, calc((var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 6px) / var(--party-frame-scale, 1)));',
     );
     expect(rule).toContain('overflow: auto;');
+  });
+
+  it('desktop: the scroll container leaves room for the keyline and focus ring', () => {
+    // The grid column is exactly one frame wide, so a bare overflow container
+    // clips the .panel outline (1px) and the 5px :focus-visible ring on every
+    // frame whenever a target is selected, overflow or not. The padding gives
+    // that paint room; the equal negative margin keeps the frames in place.
+    const rule = hudCss.match(/#party-frames\.below-target \.party-rows \{([^}]*)\}/)?.[1] ?? '';
+    expect(rule).toContain('padding: 6px;');
+    expect(rule).toContain('margin: -6px;');
   });
 
   it('strip box owns its hanging timer text (wrap row gap + last-row padding)', () => {
@@ -320,7 +355,7 @@ describe('below-target CSS derives from the measured bottom', () => {
       'top: calc(var(--party-below-target-bottom, calc(max(8px, env(safe-area-inset-top)) + 127px)) + 8px);',
     );
     expect(hudMobileCss).toContain(
-      'max-height: max(40px, calc(var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 8px));',
+      'max-height: max(40px, calc(var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 2px));',
     );
     expect(hudMobileCss).not.toContain('top: calc(max(8px, env(safe-area-inset-top)) + 135px);');
     // The old fixed screen-bottom reserve must not return alongside the
