@@ -22,12 +22,17 @@
 //   charName   name typed into #char-name when that field is present (default 'Adventurer')
 //   settleMs   pause after Enter World for the world to load (default 2500; 0 to skip)
 //   dismissMobilePreflight  wait for and dismiss the touch-only gate (default true)
+//   mobilePreflightTimeoutMs  maximum wait for the touch-only gate (default 5000)
+//   gameBootTimeoutMs  maximum wait for window.__game.sim.player (default 30000)
+// Returns true when the world boot hook appeared before gameBootTimeoutMs, otherwise false.
 export async function enterOfflineGame(page, opts = {}) {
   const {
     charClass = 'warrior',
     charName = 'Adventurer',
     settleMs = 2500,
     dismissMobilePreflight = true,
+    mobilePreflightTimeoutMs = 5000,
+    gameBootTimeoutMs = 30000,
   } = opts;
   const card = `#offline-select .mini-class[data-class="${charClass}"]`;
   await page.waitForSelector('#btn-offline', { timeout: 30000 });
@@ -49,7 +54,10 @@ export async function enterOfflineGame(page, opts = {}) {
   // so the world actually boots. No-op on desktop, where the preflight never appears.
   if (dismissMobilePreflight) {
     await page
-      .waitForSelector('#mobile-preflight-continue', { visible: true, timeout: 5000 })
+      .waitForSelector('#mobile-preflight-continue', {
+        visible: true,
+        timeout: mobilePreflightTimeoutMs,
+      })
       .catch(() => {});
     await page.evaluate(() => document.querySelector('#mobile-preflight-continue')?.click());
   }
@@ -68,10 +76,14 @@ export async function enterOfflineGame(page, opts = {}) {
   // Wait for the world to actually boot (the window.__game debug hook appears post-start)
   // rather than guessing with a fixed delay, so post-entry code that reads window.__game.sim
   // does not race the loader. Falls back to the settle delay if the hook never shows.
-  await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 30000 }).catch(() => {});
+  const gameBooted = await page
+    .waitForFunction(() => window.__game?.sim?.player, { timeout: gameBootTimeoutMs })
+    .then(() => true)
+    .catch(() => false);
   if (settleMs > 0) await new Promise((r) => setTimeout(r, settleMs));
 
   await dismissEntryOverlays(page);
+  return gameBooted;
 }
 
 // Skip the first-spawn intro cinematic (Escape is its documented skip gesture), click any

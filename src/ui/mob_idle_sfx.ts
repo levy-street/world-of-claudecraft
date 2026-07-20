@@ -12,7 +12,6 @@ import { mobVoiceFamily, shouldPlayMobVoiceSfxForEntity } from './combat_sfx';
 // tuned down by ear in-game to 0.17, which felt right around both the wolf
 // camps and the ogre war-camp.
 export const MOB_IDLE_CHECK_INTERVAL_MS = 2500;
-export const MOB_IDLE_MAX_ATTEMPTS_PER_SWEEP = 1;
 export const MOB_IDLE_SCAN_RADIUS = 40;
 export const MOB_IDLE_BASE_CHANCE = 0.17;
 export const MOB_IDLE_PER_ENTITY_COOLDOWN_MS = 12_000;
@@ -98,7 +97,9 @@ export function pickIdleBarkCandidates(
       successful.push(c);
     }
   }
-  if (successful.length <= MOB_IDLE_MAX_ATTEMPTS_PER_SWEEP) return successful;
+  // Exactly one attempt is a deliberate invariant: it bounds cold audio
+  // fetch/decode fan-out for every client, rather than acting as a tuning knob.
+  if (successful.length <= 1) return successful;
   // Candidate order follows stable entity insertion order. Select uniformly
   // among successful rolls so early-spawned mobs cannot starve later families.
   const index = Math.min(successful.length - 1, Math.floor(rng() * successful.length));

@@ -5,7 +5,8 @@ import path from 'node:path';
 import puppeteer from 'puppeteer-core';
 
 import { BROWSER_PATH } from './browser_path.mjs';
-import { dismissEntryOverlays, enterOfflineGame } from './enter_offline_game.mjs';
+import { enterOfflineGame } from './enter_offline_game.mjs';
+import { perfTourEntryOptions } from './perf_tour_entry_options.mjs';
 
 const BASE_URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const VIEWPORT_MODE = process.env.PERF_VIEWPORT ?? 'both';
@@ -111,18 +112,8 @@ function isIgnorableConsoleError(text) {
 async function bootOffline(page, viewport) {
   await page.setViewport(viewport);
   await page.goto(perfUrl(), { waitUntil: 'domcontentloaded', timeout: NAV_TIMEOUT_MS });
-  await enterOfflineGame(page, {
-    charClass: 'warrior',
-    charName: viewport.label === 'mobile' ? 'MobilePerf' : 'DesktopPerf',
-    settleMs: 0,
-    dismissMobilePreflight: viewport.isMobile,
-  });
-  try {
-    await page.waitForFunction(
-      () => Boolean(window.__game?.sim?.player && window.__game?.perf?.report),
-      { timeout: BOOT_TIMEOUT_MS },
-    );
-  } catch (err) {
+  const gameBooted = await enterOfflineGame(page, perfTourEntryOptions(viewport, BOOT_TIMEOUT_MS));
+  if (!gameBooted) {
     const state = await page.evaluate(() => {
       const visiblePanel =
         [
@@ -147,11 +138,8 @@ async function bootOffline(page, viewport) {
         fatalText: fatal?.textContent ?? '',
       };
     });
-    throw new Error(`Timed out waiting for offline world boot: ${JSON.stringify(state)}`, {
-      cause: err,
-    });
+    throw new Error(`Timed out waiting for offline world boot: ${JSON.stringify(state)}`);
   }
-  await dismissEntryOverlays(page);
   await sleep(SETTLE_MS);
 }
 

@@ -287,7 +287,10 @@ non-dummy, unmuted mob within `MOB_IDLE_SCAN_RADIUS` of the player and rolls
 each one independently
 against `MOB_IDLE_BASE_CHANCE`, damped by how many same-family mobs are
 clustered nearby (`idleDensityFactor`, `src/ui/mob_idle_sfx.ts`) so a dense
-pack does not all bark in the same sweep. A per-entity cooldown
+pack does not all bark in the same sweep. If several rolls succeed, exactly
+one is selected uniformly for an attempt. That fixed invariant bounds cold
+audio fetch/decode fan-out to one attempt per sweep on every client. A
+per-entity cooldown
 (`MOB_IDLE_PER_ENTITY_COOLDOWN_MS`) additionally rate-limits one mob's own
 repeats, stamped only when `sfx.playAt` reports the sound actually played
 (not merely attempted), so losing the shared per-key playback cooldown
