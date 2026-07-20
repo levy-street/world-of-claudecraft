@@ -30,8 +30,10 @@ export async function POST(req: NextRequest) {
       env.RATE_LIMIT_WINDOW_SECONDS,
     );
     if (!rl.allowed) return NextResponse.json({ error: 'rate limited' }, { status: 429 });
-  } catch {
-    // Redis unavailable → fail open; signature auth still protects mutations.
+  } catch (err) {
+    // Redis unavailable → fail open (signature auth still protects
+    // mutations), but say so — silent fail-open is invisible in an incident.
+    console.error('[ratelimit] redis unavailable, failing open:', (err as Error).message);
   }
 
   const { nonce, message, expiresAt } = await issueNonce(walletAddress, purpose);

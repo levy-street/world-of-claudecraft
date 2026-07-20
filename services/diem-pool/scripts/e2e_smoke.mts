@@ -27,17 +27,22 @@ await prisma.$transaction([
   prisma.provider.deleteMany(),
   prisma.systemConfig.deleteMany(),
 ]);
+const { Redis } = await import('ioredis');
+
+/** Reset rate-limit windows (fixed windows persist across smoke runs). */
+async function clearRateLimits(): Promise<void> {
+  const redis = new Redis(process.env.REDIS_URL!);
+  const rlKeys = await redis.keys('rl:*');
+  if (rlKeys.length) await redis.del(...rlKeys);
+  redis.disconnect();
+}
+
 {
   const { Queue } = await import('bullmq');
   const q = new Queue('settlement-events', { connection: { url: process.env.REDIS_URL } as any });
   await q.obliterate({ force: true }).catch(() => {});
   await q.close();
-  // Reset rate-limit windows so back-to-back smoke runs don't trip them.
-  const { Redis } = await import('ioredis');
-  const redis = new Redis(process.env.REDIS_URL!);
-  const rlKeys = await redis.keys('rl:*');
-  if (rlKeys.length) await redis.del(...rlKeys);
-  redis.disconnect();
+  await clearRateLimits();
 }
 
 let failures = 0;
@@ -105,6 +110,12 @@ async function infer(extra: Record<string, unknown> = {}) {
       ...extra,
     }),
   });
+}
+
+console.log('— health endpoint —');
+{
+  const h = await api('/api/health');
+  check('health: 200 with db+redis ok on a clean stack', h.status === 200 && h.body.db.ok && h.body.redis.ok, h.body);
 }
 
 console.log('— registration —');
@@ -227,6 +238,105 @@ console.log('— revocation & house fallback —');
 
 const overview = await api('/api/admin/overview', { headers: { 'x-admin-token': ADMIN } });
 check('admin overview reflects revocations', overview.body.statusCounts.REVOKED === 2, overview.body.statusCounts);
+
+console.log('— failover & DEGRADED —');
+await clearRateLimits();
+// Flaky passes registration's 1-token validation, then 500s on real traffic.
+// 10x capacity makes it the certain first pick for the next requests.
+const good = await register('Good Provider', 10, 'vn_good_key_0123456789abcdefghi');
+const flaky = await register('Flaky Provider', 100, 'vn_flaky_key_0123456789abcdefg');
+for (const label of ['first', 'second'] as const) {
+  const res = await infer();
+  check(
+    `${label} request survives flaky upstream via failover to good`,
+    res.status === 200 && res.headers.get('x-pool-provider-id') === good.id,
+    { status: res.status, provider: res.headers.get('x-pool-provider-id') },
+  );
+}
+{
+  const row = await prisma.provider.findUnique({ where: { id: flaky.id } });
+  check(
+    'flaky DEGRADED after 2 consecutive hard failures',
+    row?.status === 'DEGRADED' && row.consecutiveFailures >= 2,
+    { status: row?.status, failures: row?.consecutiveFailures },
+  );
+}
+
+console.log('— concurrent metering exactness —');
+const { utcDay } = await import('../src/lib/settlement');
+const spendKey = { providerId_date: { providerId: good.id, date: utcDay(new Date()) } };
+const spendBefore = await prisma.providerDailySpend.findUnique({ where: spendKey });
+const burst = await Promise.all(Array.from({ length: 20 }, () => infer()));
+check('all 20 concurrent requests succeeded', burst.every((r) => r.status === 200));
+check(
+  'all 20 routed to the sole ACTIVE provider',
+  burst.every((r) => r.headers.get('x-pool-provider-id') === good.id),
+);
+{
+  const spendAfter = await prisma.providerDailySpend.findUnique({ where: spendKey });
+  const deltaUsd = Number(spendAfter!.spentUsd) - Number(spendBefore?.spentUsd ?? 0);
+  const deltaReqs = (spendAfter?.requests ?? 0) - (spendBefore?.requests ?? 0);
+  check('spend delta is exactly 20 × $0.00021 (atomic upsert)', Math.abs(deltaUsd - 20 * 0.00021) < 1e-9, deltaUsd);
+  check('request counter delta is exactly 20', deltaReqs === 20, deltaReqs);
+}
+
+console.log('— admin pricing editor —');
+{
+  const put = await api('/api/admin/pricing', {
+    method: 'PUT',
+    headers: { 'x-admin-token': ADMIN },
+    body: JSON.stringify({ model: 'test-model-x', inputUsdPerMTokens: 1.25, outputUsdPerMTokens: 5, active: true }),
+  });
+  check('pricing PUT accepted', put.status === 200, put.body);
+  const list = await api('/api/admin/pricing', { headers: { 'x-admin-token': ADMIN } });
+  const row = list.body.pricing.find((r: any) => r.model === 'test-model-x');
+  check('pricing GET round-trips the new rates', row?.inputUsdPerMTokens === 1.25 && row?.outputUsdPerMTokens === 5, row);
+  const noAuth = await api('/api/admin/pricing', {
+    method: 'PUT',
+    body: JSON.stringify({ model: 'x', inputUsdPerMTokens: 0, outputUsdPerMTokens: 0 }),
+  });
+  check('pricing PUT without token rejected', noAuth.status === 401);
+}
+
+console.log('— input validation —');
+check('unknown purpose rejected (400)', (await infer({ purpose: 'crypto_mining' })).status === 400);
+check(
+  'payload without messages rejected (400)',
+  (await infer({ payload: { model: 'llama-3.3-70b' } })).status === 400,
+);
+check('unknown wallet stats 404', (await api('/api/providers/by-wallet/NoSuchWallet1111111111111111111111')).status === 404);
+check('malformed JSON body rejected (400)', (
+  await api('/api/providers/register', { method: 'POST', body: 'not-json{' })
+).status === 400);
+
+console.log('— rate limiting —');
+await clearRateLimits();
+{
+  const codes: number[] = [];
+  for (let i = 0; i < 25; i++) {
+    const res = await api('/api/providers/nonce', {
+      method: 'POST',
+      body: JSON.stringify({ walletAddress: alpha.wallet, purpose: 'register' }),
+    });
+    codes.push(res.status);
+  }
+  // Nonce limit is RATE_LIMIT_REGISTER_PER_IP × 4 = 20 per window per IP.
+  check(
+    'nonce issuance: first 20 pass, then 429',
+    codes.slice(0, 20).every((c) => c === 200) && codes.slice(20).every((c) => c === 429),
+    codes.join(','),
+  );
+}
+
+console.log('— health endpoint (post-settlement) —');
+{
+  const h = await api('/api/health');
+  check(
+    'health: settlement recorded and stack still ok',
+    h.status === 200 && h.body.settlement.lastSettledDate !== null && !h.body.routingPaused,
+    h.body,
+  );
+}
 
 await prisma.$disconnect();
 console.log(failures === 0 ? '\nALL SMOKE CHECKS PASSED' : `\n${failures} CHECKS FAILED`);

@@ -36,8 +36,10 @@ export async function POST(req: NextRequest) {
     if (!byIp.allowed || !byWallet.allowed) {
       return NextResponse.json({ error: 'rate limited' }, { status: 429 });
     }
-  } catch {
-    // Redis down → fail open; the signature + nonce checks below still gate.
+  } catch (err) {
+    // Redis down → fail open (signature + nonce still gate), but log it —
+    // silent fail-open is invisible in an incident.
+    console.error('[ratelimit] redis unavailable, failing open:', (err as Error).message);
   }
 
   // Nonce is consumed before signature verification so a bad signature still

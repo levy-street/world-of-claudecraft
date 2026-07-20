@@ -1,6 +1,9 @@
 // Mock Venice API for E2E smoke testing: OpenAI-compatible surface with
-// Bearer auth. Keys containing "bad" are rejected 401; keys containing
-// "broke" get 429 insufficient-credit.
+// Bearer auth. Key modes (by substring):
+//   "bad"   → 401 on everything (invalid key)
+//   "broke" → 429 insufficient-credit on everything (unfunded key)
+//   "flaky" → passes the 1-token validation call, then 500s on real traffic
+//             (a key that registered fine but whose upstream broke later)
 import http from 'node:http';
 
 const server = http.createServer((req, res) => {
@@ -21,6 +24,9 @@ const server = http.createServer((req, res) => {
     req.on('data', (c) => (body += c));
     req.on('end', () => {
       const p = JSON.parse(body || '{}');
+      if (key.includes('flaky') && p.max_tokens !== 1) {
+        return json(500, { error: { message: 'upstream exploded' } });
+      }
       json(200, {
         id: 'chatcmpl-mock',
         object: 'chat.completion',

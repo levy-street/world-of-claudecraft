@@ -18,12 +18,17 @@ async function main(): Promise<void> {
   await queue.upsertJobScheduler(
     'health-probe',
     { every: 30 * 60 * 1000 },
-    { name: 'health-probe' },
+    { name: 'health-probe', opts: { attempts: 2, backoff: { type: 'exponential', delay: 30_000 } } },
   );
+  // Settlement MUST eventually run for every day — a transient DB failure at
+  // midnight retries with backoff instead of silently waiting a full day.
   await queue.upsertJobScheduler(
     'daily-settlement',
     { pattern: '0 0 * * *', tz: 'UTC' },
-    { name: 'daily-settlement' },
+    {
+      name: 'daily-settlement',
+      opts: { attempts: 5, backoff: { type: 'exponential', delay: 60_000 } },
+    },
   );
 
   const worker = new Worker(

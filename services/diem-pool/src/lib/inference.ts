@@ -42,6 +42,7 @@ const globalState = globalThis as unknown as {
   poolRouter?: WeightedRouter;
   poolCache?: PoolCache | null;
   pricingCache?: { at: number; rates: Map<string, ModelRate> } | null;
+  unpricedModelsWarned?: Set<string>;
 };
 
 function getRouter(): WeightedRouter {
@@ -89,7 +90,20 @@ async function getRate(model: string): Promise<ModelRate> {
       ),
     };
   }
-  return globalState.pricingCache.rates.get(model) ?? FALLBACK_RATE;
+  const rate = globalState.pricingCache.rates.get(model);
+  if (!rate) {
+    // Conservative fallback so unknown models are never under-metered; warn
+    // once per model so the admin adds real pricing.
+    const warned = (globalState.unpricedModelsWarned ??= new Set());
+    if (!warned.has(model)) {
+      warned.add(model);
+      console.warn(
+        `[pricing] no active pricing for model "${model}" — metering at conservative fallback rates; add it in the admin pricing table`,
+      );
+    }
+    return FALLBACK_RATE;
+  }
+  return rate;
 }
 
 async function recordUsage(
@@ -112,6 +126,9 @@ async function recordUsage(
         costUsd,
         gameAccountId: input.gameAccountId ?? null,
         house: providerId === null,
+        // Explicit routing timestamp (not DB insert time) so the settlement
+        // window and the intraday spend row always agree on the UTC day.
+        createdAt: now,
       },
     }),
   ];
@@ -153,26 +170,54 @@ async function markCreditExhausted(provider: Provider, now: Date): Promise<void>
   globalState.poolCache?.spentUsd.set(provider.id, capacity);
 }
 
-async function onHardFailure(providerId: string): Promise<void> {
+async function onHardFailure(provider: Provider): Promise<void> {
   const updated = await prisma.provider.update({
-    where: { id: providerId },
+    where: { id: provider.id },
     data: { consecutiveFailures: { increment: 1 } },
   });
+  // `provider` is the cached row — keep it in sync so onSuccess's write-skip
+  // and the 2-strike threshold see failures accrued within the cache TTL.
+  provider.consecutiveFailures = updated.consecutiveFailures;
   if (updated.consecutiveFailures >= 2 && updated.status === 'ACTIVE') {
     await prisma.provider.update({
-      where: { id: providerId },
+      where: { id: provider.id },
       data: { status: 'DEGRADED', unhealthyToday: true },
     });
     invalidatePoolCache();
   }
 }
 
-async function onSuccess(providerId: string): Promise<void> {
-  // Single cheap conditional write; no-op for already-healthy providers.
+async function onSuccess(provider: Provider): Promise<void> {
+  // Skip the write entirely for already-healthy providers (the common case).
+  if (provider.consecutiveFailures === 0) return;
   await prisma.provider.updateMany({
-    where: { id: providerId, consecutiveFailures: { gt: 0 } },
+    where: { id: provider.id, consecutiveFailures: { gt: 0 } },
     data: { consecutiveFailures: 0 },
   });
+  provider.consecutiveFailures = 0;
+}
+
+/**
+ * Metering failure after a successful upstream call must not fail the
+ * request: the provider's credit is already spent and the game already has
+ * its completion. Serve the response, log loudly (unmetered = unpaid), and
+ * let the next call surface persistent DB trouble via loadPool.
+ */
+async function meterOrWarn(
+  now: Date,
+  providerId: string | null,
+  input: InferenceInput,
+  result: VeniceCallResult,
+): Promise<void> {
+  try {
+    await recordUsage(now, providerId, input, result);
+  } catch (err) {
+    console.error(
+      `[inference] METERING FAILED for provider=${providerId ?? 'house'} model=${result.model} ` +
+        `tokens=${result.usage.promptTokens}/${result.usage.completionTokens} — response served but unrewarded:`,
+      err,
+    );
+  }
 }
 
 /** One upstream attempt with a single same-key retry on retryable errors. */
@@ -220,8 +265,8 @@ export async function routeInference(input: InferenceInput): Promise<InferenceOu
 
     try {
       const result = await callWithRetry(apiKey, input.payload);
-      await recordUsage(now, provider.id, input, result);
-      await onSuccess(provider.id);
+      await meterOrWarn(now, provider.id, input, result);
+      await onSuccess(provider);
       return { status: 200, body: result.body, providerId: provider.id, house: false };
     } catch (err) {
       if (!(err instanceof VeniceError)) throw err;
@@ -242,7 +287,7 @@ export async function routeInference(input: InferenceInput): Promise<InferenceOu
           };
         default:
           // server/network/rate_limited after retry → count a hard failure, fail over.
-          await onHardFailure(provider.id);
+          await onHardFailure(provider);
           continue;
       }
     }
@@ -253,7 +298,7 @@ export async function routeInference(input: InferenceInput): Promise<InferenceOu
   if (houseKey) {
     try {
       const result = await callWithRetry(houseKey, input.payload);
-      await recordUsage(now, null, input, result);
+      await meterOrWarn(now, null, input, result);
       return { status: 200, body: result.body, providerId: null, house: true };
     } catch (err) {
       if (err instanceof VeniceError) {

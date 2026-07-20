@@ -55,5 +55,17 @@ export async function runHealthProbes(now: Date = new Date()): Promise<void> {
   }
 
   invalidatePoolCache();
-  console.log(`[health] probed ${providers.length} providers`);
+
+  // Housekeeping: nonces are single-use with a 10-minute TTL; anything used
+  // or expired for over a day is only table bloat. A day of history stays
+  // queryable for abuse forensics.
+  const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const pruned = await prisma.providerNonce.deleteMany({
+    where: { OR: [{ usedAt: { lt: dayAgo } }, { expiresAt: { lt: dayAgo } }] },
+  });
+
+  console.log(
+    `[health] probed ${providers.length} providers` +
+      (pruned.count ? `, pruned ${pruned.count} stale nonces` : ''),
+  );
 }

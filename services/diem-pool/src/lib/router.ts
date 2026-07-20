@@ -96,8 +96,4 @@ export class WeightedRouter {
   forget(id: string): void {
     this.counters.delete(id);
   }
-
-  reset(): void {
-    this.counters.clear();
-  }
 }

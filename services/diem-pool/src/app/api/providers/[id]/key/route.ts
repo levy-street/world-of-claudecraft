@@ -13,13 +13,14 @@ export const dynamic = 'force-dynamic';
  * immediately. (Providers can also revoke server-side on Venice; this removes
  * our copy and stops routing.)
  */
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const parsed = revokeSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: 'invalid request', issues: parsed.error.issues }, { status: 400 });
   }
 
-  const provider = await prisma.provider.findUnique({ where: { id: params.id } });
+  const { id } = await params;
+  const provider = await prisma.provider.findUnique({ where: { id } });
   if (!provider) return NextResponse.json({ error: 'provider not found' }, { status: 404 });
 
   const { signedMessage, nonce } = parsed.data;

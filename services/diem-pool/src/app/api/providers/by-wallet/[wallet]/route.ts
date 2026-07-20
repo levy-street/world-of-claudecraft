@@ -9,8 +9,9 @@ export const dynamic = 'force-dynamic';
  * Provider dashboard stats. Read-only, no key material — everything here is
  * as public as the leaderboard, so no signature required to view.
  */
-export async function GET(_req: NextRequest, { params }: { params: { wallet: string } }) {
-  const provider = await prisma.provider.findUnique({ where: { wallet: params.wallet } });
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ wallet: string }> }) {
+  const { wallet } = await params;
+  const provider = await prisma.provider.findUnique({ where: { wallet } });
   if (!provider) return NextResponse.json({ error: 'not registered' }, { status: 404 });
 
   const today = utcDay(new Date());

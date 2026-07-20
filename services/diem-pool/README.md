@@ -55,7 +55,7 @@ sequenceDiagram
 
 ## Stack
 
-- **Next.js 14 (App Router)** — API routes + provider/admin dashboard
+- **Next.js 15 (App Router)** — API routes + provider/admin dashboard
 - **PostgreSQL + Prisma** — providers, usage metering, reward ledger
 - **BullMQ + Redis** — health probes (30 min), daily settlement (00:00 UTC),
   `settlement-events` outbox queue
@@ -89,10 +89,12 @@ npm run worker              # BullMQ worker (separate terminal)
 npm test
 npm run typecheck
 
-# Optional full-stack smoke (DESTRUCTIVE — scratch DB only): mock Venice
-# upstream + real registration/routing/settlement flow end to end.
+# Optional full-stack verification (DESTRUCTIVE — scratch DB only): mock
+# Venice upstream + real registration/routing/settlement flow end to end.
 node scripts/mock_venice.mjs &          # set VENICE_BASE_URL=http://127.0.0.1:4567/api/v1
-npx tsx scripts/e2e_smoke.mts
+npx tsx scripts/e2e_smoke.mts           # API-level: 60+ checks incl. failover & concurrency
+npx tsx scripts/ui_e2e.mts              # browser-level: dashboard/admin/leaderboard flows
+npx tsx scripts/load_sanity.mts         # throughput/latency sanity vs the mock upstream
 ```
 
 The game backend calls the pool like this:
@@ -195,17 +197,59 @@ Notes:
 | `POST /api/internal/inference` | Game → pool inference (shared secret) |
 | `GET /api/admin/overview` · `GET/PUT /api/admin/pricing` · `GET/POST /api/admin/killswitch` | Admin API |
 
-## Operational notes
+## Operations
 
-- Venice's real balance/consumption response shapes should be inspected in
-  production; `src/lib/venice.ts` sniffs a few likely balance headers but
-  falls back to declared capacity — adapt `parseBalanceUsd` once real
-  responses are available.
-- Seeded model pricing (`prisma/seed.ts`) is a snapshot; keep the table in
-  sync with https://venice.ai/pricing via the admin editor.
-- `purpose: image_gen` is metered and tagged, but v1 routes all purposes
-  through `/chat/completions`; wiring Venice's image endpoint is follow-up
-  work.
+- **Monitoring**: `GET /api/health` (unauthenticated, for LB probes and
+  alerting) reports DB round-trip latency, Redis reachability, last settled
+  day (flags a stuck settlement worker), the kill-switch state, and provider
+  status counts. 200 when fully healthy, 503 otherwise. Structured
+  warn/error logs mark every degraded path: `[ratelimit]` fail-open,
+  `[pricing]` unknown-model fallback, `[inference] METERING FAILED`,
+  `[settle]`/`[health]`/`[worker]` job outcomes.
+- **Rollback**: deploys are stateless — roll back by redeploying the previous
+  image. The schema is a single additive migration (`prisma migrate deploy`
+  is idempotent); settlement re-runs are idempotent by design. For incidents,
+  the admin kill switch stops all routing instantly without a deploy, and
+  individual providers can be revoked.
+- **Job resilience**: scheduled jobs retry with exponential backoff
+  (settlement: 5 attempts from midnight UTC; probes: 2). A settlement missed
+  entirely (worker down) is picked up safely later — run
+  `runDailySettlement()` for the missed date or just let ops re-fire; the
+  `SettlementRun` guard prevents double-pay.
+- **Data retention**: nonces are pruned automatically after a day.
+  `UsageEvent` grows with traffic (one row per inference call) — the reward
+  ledger only needs daily sums, so archive/partition events older than your
+  audit window once volume warrants it.
+- **Dependencies**: `package-lock.json` pins the tree; `npm audit` is clean
+  as of the last commit (a `postcss` override keeps Next's transitive pin on
+  the patched line).
+
+## Known limitations (v1)
+
+These are the places where the implementation makes assumptions that must be
+checked against the real Venice API before money-equivalent rewards ship:
+
+- **Venice balance shapes are assumed, not verified.** `src/lib/venice.ts`
+  sniffs a few plausible balance headers (`parseBalanceUsd`) and otherwise
+  trusts the provider's *declared* DIEM count for capacity. Inspect real
+  Venice responses and adapt; until then a provider can over-declare
+  capacity (bounded by `MAX_DECLARED_DIEM`, and metering still only pays for
+  actually-served compute).
+- **Seeded model pricing is a snapshot** (`prisma/seed.ts`), not live data.
+  Keep the table in sync with https://venice.ai/pricing via the admin
+  editor; unknown models are metered at a conservative fallback rate and
+  logged.
+- **`purpose: image_gen` is tagged and metered but routed through
+  `/chat/completions`** like everything else; wiring Venice's image endpoint
+  is follow-up work.
+- **Streaming is not supported** — the router forces `stream: false` so the
+  `usage` block is always present for metering.
+- **Self-dealing detection is a heuristic** (top-account share of daily
+  usage), surfaced in admin only — it flags, it does not prove or ban.
+- **The wallet flow is verified with an injected test wallet**
+  (`scripts/ui_e2e.mts`) that implements the Phantom `connect`/`signMessage`
+  interface with real ed25519 signatures; a pass against the actual Phantom
+  extension is still worth doing before launch.
 
 ## Non-goals (v1)
 
