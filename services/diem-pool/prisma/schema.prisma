@@ -1,0 +1,159 @@
+// DIEM delegation pool — Prisma schema
+//
+// Money columns: USD amounts are DECIMAL (never floats) — usage costs carry
+// 8 fractional digits because single calls can cost fractions of a cent.
+// Claudium amounts are integers (it is an indivisible in-game currency).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProviderStatus {
+  ACTIVE
+  DEGRADED
+  REVOKED
+  INVALID
+}
+
+enum UsagePurpose {
+  npc_dialogue
+  quest_gen
+  dungeon_master
+  agent_player
+  image_gen
+}
+
+enum NoncePurpose {
+  register
+  revoke
+}
+
+model Provider {
+  id                     String         @id @default(cuid())
+  wallet                 String         @unique
+  displayName            String
+  // AES-256-GCM envelope ("v1:<iv>:<ct>:<tag>", base64 parts). Null once revoked.
+  encryptedKey           String?
+  keyLast4               String?
+  dailyCapacityUsd       Decimal        @db.Decimal(12, 2)
+  status                 ProviderStatus @default(ACTIVE)
+  consecutiveHealthyDays Int            @default(0)
+  // Routing-time consecutive hard failures; 2 → DEGRADED.
+  consecutiveFailures    Int            @default(0)
+  // Set by health probes / routing failures during the day, consumed and
+  // reset by settlement to maintain the health streak.
+  unhealthyToday         Boolean        @default(false)
+  // Self-dealing heuristic: share of the provider's daily usage attributable
+  // to its single busiest game account (0..1). Surfaced in admin, no auto-ban.
+  suspicionScore         Decimal        @default(0) @db.Decimal(5, 4)
+  lastProbeAt            DateTime?
+  lastHealthyAt          DateTime?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  usageEvents UsageEvent[]
+  dailySpend  ProviderDailySpend[]
+  rewards     RewardLedger[]
+
+  @@index([status])
+}
+
+// One-time nonces for wallet-signature auth on provider mutations.
+model ProviderNonce {
+  id        String       @id @default(cuid())
+  wallet    String
+  nonce     String       @unique
+  purpose   NoncePurpose
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime     @default(now())
+
+  @@index([wallet, purpose])
+}
+
+model UsageEvent {
+  id               String       @id @default(cuid())
+  // Null for house-key traffic (house = true).
+  providerId       String?
+  provider         Provider?    @relation(fields: [providerId], references: [id], onDelete: SetNull)
+  purpose          UsagePurpose
+  model            String
+  promptTokens     Int
+  completionTokens Int
+  costUsd          Decimal      @db.Decimal(14, 8)
+  // Which game account triggered the call (for self-dealing detection).
+  gameAccountId    String?
+  house            Boolean      @default(false)
+  createdAt        DateTime     @default(now())
+
+  @@index([providerId, createdAt])
+  @@index([createdAt])
+}
+
+// Intraday spend accumulator, atomically incremented with each UsageEvent.
+// The router reads this to weight providers by remaining daily credit.
+model ProviderDailySpend {
+  providerId String
+  provider   Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  // UTC calendar date.
+  date       DateTime @db.Date
+  spentUsd   Decimal  @default(0) @db.Decimal(14, 8)
+  requests   Int      @default(0)
+
+  @@id([providerId, date])
+  @@index([date])
+}
+
+// Per-1M-token USD rates, admin-editable, seeded from Venice's published pricing.
+model ModelPricing {
+  id                  String   @id @default(cuid())
+  model               String   @unique
+  inputUsdPerMTokens  Decimal  @db.Decimal(12, 6)
+  outputUsdPerMTokens Decimal  @db.Decimal(12, 6)
+  active              Boolean  @default(true)
+  updatedAt           DateTime @updatedAt
+}
+
+model RewardLedger {
+  id              String   @id @default(cuid())
+  providerId      String
+  provider        Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  // UTC calendar date being settled.
+  date            DateTime @db.Date
+  consumedUsd     Decimal  @db.Decimal(14, 8)
+  baseClaudium    Int
+  multiplier      Decimal  @db.Decimal(4, 2)
+  standbyClaudium Int
+  capped          Boolean
+  totalClaudium   Int
+  createdAt       DateTime @default(now())
+
+  // Idempotency anchor: settlement upserts on this key, safe to re-run.
+  @@unique([providerId, date])
+  @@index([date])
+}
+
+// Marks a settlement day as processed. Ledger upserts are idempotent on
+// (providerId, date); this guards the non-idempotent side effects (health
+// streak bump, suspicion scoring, webhook emission) against double-runs.
+model SettlementRun {
+  date        DateTime  @id @db.Date
+  startedAt   DateTime  @default(now())
+  // Streak/suspicion updates + ledger rows are applied in one transaction
+  // guarded by this flag; a crashed run resumes at event emission instead of
+  // double-bumping streaks.
+  streaksApplied Boolean @default(false)
+  completedAt DateTime?
+}
+
+// Small config KV (kill switch etc.) so ops don't require redeploys.
+model SystemConfig {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

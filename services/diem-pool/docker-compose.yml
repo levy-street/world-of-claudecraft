@@ -1,0 +1,21 @@
+# Local dev dependencies for the DIEM pool service.
+#   docker compose up -d
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: diempool
+      POSTGRES_PASSWORD: change-me
+      POSTGRES_DB: diempool
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - diempool-pg:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '127.0.0.1:6379:6379'
+
+volumes:
+  diempool-pg:
