@@ -351,6 +351,28 @@ describe('grip override wiring (editor saves reach the game)', () => {
     expect(tuned.position[1]).toBeCloseTo(0.05 + (row?.pos?.[1] ?? 0), 5);
     expect(tuned.quaternion).not.toEqual(bare.quaternion);
   });
+
+  it('mirrors a per-weapon offset onto the off-hand (X and Z flip, Y shared)', async () => {
+    // The override is authored against the right hand; the off-hand is the mirror
+    // image (a 180-degree turn about Y), so a large offset must flip X and Z or the
+    // off-hand model sits off the grip (a legendary sword skin on a dual-wielder).
+    const { variantGripTransform } = await import('../src/render/characters/weapon_grip');
+    const override = { pos: [-0.1787, -0.0279, -0.273] as [number, number, number] };
+    const right = variantGripTransform(1.2, false, 0.05, 1.6, override);
+    const left = variantGripTransform(1.2, true, 0.05, 1.6, override);
+    expect(left.position[0]).toBeCloseTo(-right.position[0], 5);
+    expect(left.position[2]).toBeCloseTo(-right.position[2], 5);
+    // Y is the along-bone lift, shared by both hands.
+    expect(left.position[1]).toBeCloseTo(right.position[1], 5);
+    // A scale-only override (ice_fang and friends) has no X/Z to flip, so the grip
+    // position is identical in both hands, off-hand skins render byte-identically.
+    const scaleOnlyR = variantGripTransform(1.2, false, 0.05, 1.6, { scale: 1.3 });
+    const scaleOnlyL = variantGripTransform(1.2, true, 0.05, 1.6, { scale: 1.3 });
+    for (let i = 0; i < 3; i++) {
+      expect(scaleOnlyL.position[i]).toBeCloseTo(scaleOnlyR.position[i], 5);
+      expect(scaleOnlyL.position[i]).toBeCloseTo([0, 0.05, 0][i], 5);
+    }
+  });
 });
 
 describe('eligible classes per skin type (store card chips)', () => {
