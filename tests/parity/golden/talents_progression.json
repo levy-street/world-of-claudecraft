@@ -149,7 +149,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "0f1b6106",
+      "state": "87dd9fcf",
       "events": "dfb18311",
       "rng": {
         "draws": 0,
@@ -219,7 +219,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 137,
+          "attackPower": 122,
           "auras": [
             {
               "duration": 3600,
@@ -267,7 +267,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 459,
+            "armor": 410,
             "int": 10,
             "spi": 11,
             "sta": 61,
@@ -286,7 +286,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "902d2753",
+      "state": "f9e3d02a",
       "events": "e4ae8916",
       "rng": {
         "draws": 0,
@@ -353,7 +353,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 137,
+          "attackPower": 122,
           "auras": [
             {
               "duration": 3600,
@@ -401,7 +401,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 459,
+            "armor": 410,
             "int": 10,
             "spi": 11,
             "sta": 61,
@@ -420,7 +420,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "905c9530",
+      "state": "1ae3fbdb",
       "events": "e76b12c7",
       "rng": {
         "draws": 0,
@@ -504,7 +504,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 137,
+          "attackPower": 122,
           "auras": [
             {
               "duration": 3600,
@@ -552,7 +552,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 459,
+            "armor": 410,
             "int": 10,
             "spi": 11,
             "sta": 61,
@@ -571,7 +571,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "3ace9fd3",
+      "state": "3d4ad090",
       "events": "995cddae",
       "rng": {
         "draws": 0,
@@ -655,7 +655,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 137,
+          "attackPower": 122,
           "auras": [
             {
               "duration": 3600,
@@ -703,7 +703,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 459,
+            "armor": 410,
             "int": 10,
             "spi": 11,
             "sta": 61,
@@ -722,7 +722,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "b257fa47",
+      "state": "45ff16ba",
       "events": "1d6d7623",
       "rng": {
         "draws": 0,
@@ -806,7 +806,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 159,
+          "attackPower": 132,
           "auras": [
             {
               "duration": 3600,
@@ -822,7 +822,7 @@
           "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
-          "critChance": 0.1495,
+          "critChance": 0.1195,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fallStartY": 1.5,
@@ -854,7 +854,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 459,
+            "armor": 410,
             "int": 10,
             "spi": 11,
             "sta": 61,
@@ -873,7 +873,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "b257fa47",
+      "state": "45ff16ba",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -957,7 +957,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 159,
+          "attackPower": 132,
           "auras": [
             {
               "duration": 3600,
@@ -973,7 +973,7 @@
           "blockValue": 6,
           "combatTimer": 99,
           "comboUntil": -1,
-          "critChance": 0.1495,
+          "critChance": 0.1195,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fallStartY": 1.5,
@@ -1005,7 +1005,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 459,
+            "armor": 410,
             "int": 10,
             "spi": 11,
             "sta": 61,

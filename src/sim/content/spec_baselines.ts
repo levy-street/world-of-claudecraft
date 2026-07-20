@@ -2,6 +2,13 @@
 // reference allocations as a full-strength specialization baseline. These
 // effects are intentionally separate from mastery and choice rows so class
 // owners can rebalance and redesign each spec without deleting the hotfix floor.
+//
+// Warrior and Mage are deliberately excluded. The floor exists to close the gap
+// for the classes weakened by the Talents 2.0 transition; warrior and mage are
+// already the two strongest classes, so restoring their pre-v0.27 passives would
+// widen the gap this hotfix is meant to close. Their masteries, signatures, and
+// ability kits are untouched, only the restored baseline is withheld. Mage also
+// has no Chronomancy baseline (new healer kit, no former baseline to restore).
 
 import type { PlayerClass } from '../types';
 import type { TalentEffect } from './talents';
@@ -9,19 +16,6 @@ import type { TalentEffect } from './talents';
 export type SpecBaselineTable = Partial<Record<PlayerClass, Record<string, TalentEffect>>>;
 
 export const SPEC_BASELINES: SpecBaselineTable = {
-  warrior: {
-    arms: {
-      stats: { armorPct: 0.12, apPct: 0.12 },
-      ability: [{ ability: 'overpower', dmgPct: 0.5 }],
-    },
-    fury: {
-      stats: { ap: 10, crit: 0.03, apPct: 0.12, armorPct: 0.12 },
-    },
-    prot: {
-      stats: { apPct: 0.12, armorPct: 0.27 },
-      ability: [{ ability: 'thunder_clap', dmgPct: 0.3, costPct: -0.5 }],
-    },
-  },
   paladin: {
     holy: {
       stats: { str: 6 },
@@ -140,24 +134,6 @@ export const SPEC_BASELINES: SpecBaselineTable = {
     restoration: {
       stats: { int: 6 },
       ability: [{ ability: 'healing_wave', dmgPct: 0.1, costPct: -0.46, castPct: -0.1 }],
-    },
-  },
-  mage: {
-    fire: {
-      global: { spellDmgPct: 0.06 },
-      ability: [
-        { ability: 'fireball', dmgPct: 0.15, costPct: -0.12, castPct: -0.12 },
-        { ability: 'frostbolt', costPct: -0.12 },
-        { ability: 'fire_blast', dmgPct: 0.24 },
-        { ability: 'scorch', dmgPct: 0.54 },
-      ],
-    },
-    frost: {
-      stats: { int: 2, crit: 0.04, dodge: 0.02, armorPct: 0.1 },
-      ability: [
-        { ability: 'frostbolt', dmgPct: 0.15, costPct: -0.12, castPct: -0.12 },
-        { ability: 'fireball', costPct: -0.12 },
-      ],
     },
   },
   warlock: {

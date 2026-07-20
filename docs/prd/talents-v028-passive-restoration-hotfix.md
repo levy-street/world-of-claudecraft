@@ -22,13 +22,17 @@ after this restoration is live.
 
 ## Scope
 
-- Restore automatic passive packages for 26 specializations across all nine classes.
+- Restore automatic passive packages for 21 specializations across seven classes.
 - Apply the complete package as soon as a specialization is selected at level 5.
 - Keep current specialization masteries and all six talent choice rows additive.
 - Restore flat and percentage stats, global throughput, and ability-specific damage, healing,
   cost, cast-time, cooldown, and buff modifiers.
+- Exclude Warrior and Mage entirely. The floor exists to close the gap for the classes weakened
+  by the Talents 2.0 transition; Warrior and Mage are already the two strongest classes, so
+  restoring their pre-v0.27 passives would widen the gap this hotfix is meant to close. Their
+  masteries, signatures, and ability kits are untouched; only the restored baseline is withheld.
 - Leave Mage Chronomancy unchanged because its current healer design has no equivalent
-  pre-v0.27 healer baseline to restore.
+  pre-v0.27 healer baseline to restore (subsumed by the Mage exclusion above).
 - Do not add talent cards, ranks, tabs, notifications, abilities, buttons, procs, or rotations.
 
 The accepted hotfix tradeoff is stronger early leveling. The old level-20 reference modifiers
@@ -56,22 +60,23 @@ The values come from the pre-v0.27 level-20 Nythraxis reference allocations at
 `6155ad2079906402ce87e64c778b31cd88ef2875`, compared with the v0.28 release baseline at
 `571ab021995165098ce691a89b227732bcbb8fae`.
 
-Old granted abilities and proc effects are excluded. Modifiers for Warrior Rend, Warrior Reaver
-Strike, and Cryomancy Aether Darts are also excluded because those abilities are not available to
-the affected current specializations. Redirecting those values to replacement abilities would be
-new class design, not restoration. Wildfang uses the historical tank allocation and deducts the
-armor already folded into its current mastery.
+Warrior and Mage are excluded wholesale (see Scope), so their historical modifiers are not
+sourced at all. Among the restored classes, old granted abilities and proc effects are excluded,
+as is any modifier that targets an ability not available to the affected current specialization;
+redirecting those values to replacement abilities would be new class design, not restoration.
+Wildfang uses the historical tank allocation and deducts the armor already folded into its
+current mastery.
 
-The complete machine-checked 26-spec matrix lives in `tests/spec_baselines.test.ts` beside the
+The complete machine-checked 21-spec matrix lives in `tests/spec_baselines.test.ts` beside the
 implementation table in `src/sim/content/spec_baselines.ts`.
 
 ## Release criteria
 
-1. The 26-spec baseline matrix fails against unmodified `release/v0.28.0`.
+1. The 21-spec baseline matrix fails against unmodified `release/v0.28.0`.
 2. The same matrix passes with the hotfix.
 3. Full restoration is identical at levels 5 and 20.
 4. No baseline applies without a selected specialization.
-5. Chronomancy remains unchanged.
+5. Warrior and Mage receive no baseline at any level; Chronomancy remains unchanged.
 6. No restoration package contains a grant or proc.
 7. Focused talent, specialization, architecture, type, and parity checks pass or any intentional
    parity changes are reviewed and committed separately.
@@ -80,7 +85,7 @@ implementation table in `src/sim/content/spec_baselines.ts`.
 
 ### Specialization power restoration
 
-Restored passive specialization power lost during the Talents 2.0 transition for 26
+Restored passive specialization power lost during the Talents 2.0 transition for 21
 specializations.
 
 - The restored bonuses apply automatically when you select a specialization.
@@ -91,6 +96,8 @@ specializations.
 - No new abilities or action-bar buttons have been added, and no respec is required.
 - The full package applies from specialization unlock, so early-level characters will be stronger
   than before this hotfix.
+- Warrior and Mage do not receive a restored floor: they are already the strongest classes, and
+  this pass is about lifting the classes that fell behind, not widening the lead.
 - Chronomancy is unchanged because its healer kit has no former healer baseline to restore.
 
 This hotfix establishes an immediate power floor for v0.28.0. Further class fantasy, rotation,

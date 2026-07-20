@@ -19,17 +19,6 @@ interface BaselineSnapshot {
 }
 
 const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
-  'warrior/arms': {
-    stats: { armorPct: 0.12, apPct: 0.12 },
-    abilities: { overpower: { dmgPct: 0.5 } },
-  },
-  'warrior/fury': {
-    stats: { ap: 10, crit: 0.03, apPct: 0.12, armorPct: 0.12 },
-  },
-  'warrior/prot': {
-    stats: { apPct: 0.12, armorPct: 0.27 },
-    abilities: { thunder_clap: { dmgPct: 0.3, costPct: -0.5 } },
-  },
   'paladin/holy': {
     stats: { str: 6 },
     global: { healPct: 0.06 },
@@ -140,22 +129,6 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     stats: { int: 6 },
     abilities: { healing_wave: { dmgPct: 0.1, costPct: -0.46, castPct: -0.1 } },
   },
-  'mage/fire': {
-    global: { spellDmgPct: 0.06 },
-    abilities: {
-      fireball: { dmgPct: 0.15, costPct: -0.12, castPct: -0.12 },
-      frostbolt: { costPct: -0.12 },
-      fire_blast: { dmgPct: 0.24 },
-      scorch: { dmgPct: 0.54 },
-    },
-  },
-  'mage/frost': {
-    stats: { int: 2, crit: 0.04, dodge: 0.02, armorPct: 0.1 },
-    abilities: {
-      frostbolt: { dmgPct: 0.15, costPct: -0.12, castPct: -0.12 },
-      fireball: { costPct: -0.12 },
-    },
-  },
   'warlock/affliction': {
     global: { spellDmgPct: 0.02 },
     abilities: {
@@ -251,13 +224,17 @@ function baselineSnapshot(cls: PlayerClass, specId: string, level: number): Base
 }
 
 describe('v0.28 passive restoration hotfix', () => {
-  it('contains exactly 26 passive-only spec baselines and excludes Chronomancy', () => {
+  it('contains exactly 21 passive-only spec baselines and excludes Warrior, Mage, and Chronomancy', () => {
     const entries = Object.entries(SPEC_BASELINES).flatMap(([cls, specs]) =>
       Object.entries(specs ?? {}).map(([spec, effect]) => ({ cls, spec, effect })),
     );
 
-    expect(entries).toHaveLength(26);
-    expect(entries.some(({ cls, spec }) => cls === 'mage' && spec === 'arcane')).toBe(false);
+    expect(entries).toHaveLength(21);
+    // Warrior and Mage are the strongest classes and are deliberately given no
+    // floor, so restoring their pre-v0.27 passives cannot widen the gap.
+    expect(SPEC_BASELINES.warrior).toBeUndefined();
+    expect(SPEC_BASELINES.mage).toBeUndefined();
+    expect(entries.some(({ cls }) => cls === 'warrior' || cls === 'mage')).toBe(false);
     for (const { effect } of entries) {
       expect(effect.grant).toBeUndefined();
       expect(effect.proc).toBeUndefined();
@@ -284,20 +261,26 @@ describe('v0.28 passive restoration hotfix', () => {
     expect(missing).toEqual([]);
   });
 
-  it('restores the complete repository-backed baseline for all 26 applicable specs', () => {
-    expect(Object.keys(EXPECTED_BASELINES)).toHaveLength(26);
+  it('restores the complete repository-backed baseline for all 21 applicable specs', () => {
+    expect(Object.keys(EXPECTED_BASELINES)).toHaveLength(21);
     for (const [key, expected] of Object.entries(EXPECTED_BASELINES)) {
       const [cls, spec] = key.split('/') as [PlayerClass, string];
       expect(baselineSnapshot(cls, spec, 20), key).toEqual(expected);
     }
   });
 
-  it('applies the full baseline as soon as a spec unlocks, without changing Chronomancy', () => {
+  it('applies the full baseline at unlock and leaves Warrior, Mage, and Chronomancy floor-free', () => {
     for (const key of Object.keys(EXPECTED_BASELINES)) {
       const [cls, spec] = key.split('/') as [PlayerClass, string];
       expect(baselineSnapshot(cls, spec, 5), key).toEqual(EXPECTED_BASELINES[key]);
     }
-    expect(baselineSnapshot('mage', 'arcane', 20)).toEqual({});
+    // Excluded specs gain nothing beyond their (level-scaled) mastery, at any level.
+    for (const spec of ['arms', 'fury', 'prot']) {
+      expect(baselineSnapshot('warrior', spec, 20), `warrior/${spec}`).toEqual({});
+    }
+    for (const spec of ['fire', 'frost', 'arcane']) {
+      expect(baselineSnapshot('mage', spec, 20), `mage/${spec}`).toEqual({});
+    }
   });
 
   it('adds no baseline when no specialization is selected', () => {
@@ -315,16 +298,31 @@ describe('v0.28 passive restoration hotfix', () => {
     }
   });
 
-  it('keeps choice-row effects additive to the automatic baseline', () => {
-    const baseline = computeTalentModifiers('warrior', allocation('fury'), 20);
+  it('keeps choice-row effects additive to the auto-applied spec layer', () => {
+    // Warrior has no restored baseline, so this isolates the choice row stacking
+    // purely on top of the auto-applied mastery/signature without disturbing it.
+    const specOnly = computeTalentModifiers('warrior', allocation('fury'), 20);
     const withChoice = computeTalentModifiers(
       'warrior',
       { spec: 'fury', rows: { 5: 'war_row_double_charge' } },
       20,
     );
 
-    expect(withChoice.stats).toEqual(baseline.stats);
-    expect(withChoice.abilities.overpower).toEqual(baseline.abilities.overpower);
+    expect(withChoice.stats).toEqual(specOnly.stats);
     expect(withChoice.abilities.charge?.bonusCharges).toBe(1);
+  });
+
+  it('keeps a restored baseline intact when a choice row is added', () => {
+    // A baselined class (rogue) must keep its folded-in baseline modifier when a
+    // choice row stacks on top; the two accumulate, neither clobbers the other.
+    const baseline = computeTalentModifiers('rogue', allocation('assassination'), 20);
+    const withChoice = computeTalentModifiers(
+      'rogue',
+      { spec: 'assassination', rows: { 5: 'rog_r5_relentless_strikes' } },
+      20,
+    );
+
+    expect(baseline.abilities.eviscerate?.dmgPct).toBeCloseTo(0.32);
+    expect(withChoice.abilities.eviscerate).toEqual(baseline.abilities.eviscerate);
   });
 });

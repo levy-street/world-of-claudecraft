@@ -31,7 +31,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 419,
-      "state": "aea82689",
+      "state": "3eb86c42",
       "events": "4e53bde1",
       "rng": {
         "draws": 0,
@@ -42,7 +42,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 419,
-      "state": "95bbff04",
+      "state": "c47084a3",
       "events": "2624f545",
       "rng": {
         "draws": 28,
@@ -53,7 +53,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 419,
-      "state": "0a61374a",
+      "state": "88716f6d",
       "events": "92dd922d",
       "rng": {
         "draws": 138,
@@ -64,7 +64,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 419,
-      "state": "c464e3c9",
+      "state": "1cdcb70a",
       "events": "547fbe65",
       "rng": {
         "draws": 294,
@@ -75,7 +75,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 419,
-      "state": "9eed13da",
+      "state": "44e3ce35",
       "events": "b1fb8310",
       "rng": {
         "draws": 300,
@@ -362,7 +362,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 137,
+          "attackPower": 122,
           "auras": [
             {
               "duration": 3600,
@@ -409,7 +409,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 459,
+            "armor": 410,
             "int": 10,
             "spi": 11,
             "sta": 61,
@@ -587,7 +587,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 419,
-      "state": "db9d0620",
+      "state": "8515a631",
       "events": "ffc08c87",
       "rng": {
         "draws": 300,
@@ -874,7 +874,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 137,
+          "attackPower": 122,
           "auras": [
             {
               "duration": 3600,
@@ -921,7 +921,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 459,
+            "armor": 410,
             "int": 10,
             "spi": 11,
             "sta": 61,
@@ -1097,7 +1097,7 @@
       "tick": 101,
       "time": 5.05,
       "nextId": 419,
-      "state": "50346b73",
+      "state": "b2432a5e",
       "events": "f677c602",
       "rng": {
         "draws": 300,
@@ -1388,7 +1388,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 137,
+          "attackPower": 122,
           "auras": [
             {
               "duration": 3600,
@@ -1435,7 +1435,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 459,
+            "armor": 410,
             "int": 10,
             "spi": 11,
             "sta": 61,
@@ -1611,7 +1611,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 419,
-      "state": "a2eccde5",
+      "state": "bd360de0",
       "events": "741638a5",
       "rng": {
         "draws": 429,
@@ -1622,7 +1622,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 419,
-      "state": "4486fc56",
+      "state": "f29756c7",
       "events": "741638a5",
       "rng": {
         "draws": 524,
@@ -1913,7 +1913,7 @@
       "entities": [
         {
           "aiState": "idle",
-          "attackPower": 137,
+          "attackPower": 122,
           "auras": [
             {
               "duration": 3600,
@@ -1961,7 +1961,7 @@
           "spellPower": 5,
           "stats": {
             "agi": 39,
-            "armor": 459,
+            "armor": 410,
             "int": 10,
             "spi": 11,
             "sta": 61,
