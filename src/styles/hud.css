@@ -4404,6 +4404,24 @@
        hand-tuned 96px (88px + the gap) before the first measure lands. */
     top: calc(var(--party-below-target-bottom, 88px) + 8px);
   }
+  #party-frames.below-target .party-rows {
+    /* A long roster below a tall stack must not run off screen (a 10-raid
+       against a heavily debuffed target did, on a 720px-tall window): the
+       painter's sensors (the rows' measured top and, on desktop, the viewport
+       bottom as the limit) bound the rows 12px above the limit, one 40px row
+       minimum, and overflow members scroll. The whole calc divides by the
+       Party Frame Scale zoom this element carries, which multiplies author
+       lengths back at used-value time (the mobile tier pins zoom: 1 and has
+       its own rule). Unset sensors (no push) fall back to no bound. */
+    max-height: max(
+      40px,
+      calc(
+        (var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 12px) /
+        var(--party-frame-scale, 1)
+      )
+    );
+    overflow: auto;
+  }
   .party-frame {
     --cls: #7fb8ff;
     position: relative;

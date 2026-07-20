@@ -6,12 +6,13 @@
 // that property, so the frames clear the buff strip at any buff count, UI
 // scale, or dragged frame position instead of relying on a hand-tuned constant.
 //
-// On mobile it also writes two SENSOR properties, --party-rows-top and
-// --party-move-zone-top (the member rows' measured top and the move joystick
-// capture zone's measured top, both author-space), from which the mobile
-// below-target .party-rows rule derives its max-height, so the pushed-down
-// rows always stop above the movement pad instead of covering it. The painter
-// only senses; the policy arithmetic (gaps, floors) stays in the stylesheet.
+// While pushing, it also writes two SENSOR properties, --party-rows-top and
+// --party-rows-limit (the member rows' measured top, and the y the rows must
+// end above: the move pad's top on mobile, the viewport bottom on desktop),
+// from which the below-target .party-rows rules derive their max-height, so
+// the pushed-down rows stop above the movement pad on mobile and never run
+// off screen on desktop (long raid rosters scroll instead). The painter only
+// senses; the policy arithmetic (gaps, floors) stays in the stylesheet.
 //
 // Hot-path discipline: update() runs every frame from Hud.updatePartyFrames,
 // so the (at most five) getBoundingClientRect measures are gated behind a
@@ -30,8 +31,9 @@ import { getUiScale } from './ui_scale';
 export const PARTY_BELOW_TARGET_BOTTOM_PROP = '--party-below-target-bottom';
 /** Sensor property: the member rows' measured top (author-space px). */
 export const PARTY_ROWS_TOP_PROP = '--party-rows-top';
-/** Sensor property: the move joystick capture zone's measured top. */
-export const PARTY_MOVE_ZONE_TOP_PROP = '--party-move-zone-top';
+/** Sensor property: the y the rows must end above (author-space px): the move
+ *  pad's top on mobile, the viewport bottom on desktop. */
+export const PARTY_ROWS_LIMIT_PROP = '--party-rows-limit';
 // Writing `initial` explicitly unsets a custom property (guaranteed-invalid),
 // so var(--party-below-target-bottom, fallback) resolves to its fallback.
 const PROP_UNSET = 'initial';
@@ -105,12 +107,13 @@ export class PartyBelowTargetPainter {
       };
       this.lastBottom = targetShown ? this.measure() : null;
       set(PARTY_BELOW_TARGET_BOTTOM_PROP, this.lastBottom);
-      // The two mobile sensors ride the same gate: with no push active they
-      // unset, and the .party-rows rule falls back to its unbounded default.
+      // The two rows-bound sensors ride the same gate: with no push active
+      // they unset, and the .party-rows rules fall back to their unbounded
+      // defaults.
       const sensors =
-        targetShown && this.lastBottom !== null && mobile ? this.measureRowsBound() : null;
+        targetShown && this.lastBottom !== null ? this.measureRowsBound(mobile) : null;
       set(PARTY_ROWS_TOP_PROP, sensors?.rowsTop ?? null);
-      set(PARTY_MOVE_ZONE_TOP_PROP, sensors?.padTop ?? null);
+      set(PARTY_ROWS_LIMIT_PROP, sensors?.limit ?? null);
     }
     return this.lastBottom;
   }
@@ -160,27 +163,34 @@ export class PartyBelowTargetPainter {
     });
   }
 
-  // The mobile rows-bound sensors: the rows' own top (below the collapse chip,
-  // so no chip-height arithmetic is ever guessed) and the movement pad's top.
-  // The bound prefers the RESTING wheel (its invisible capture band above may
-  // be traded for a member row; touches there hit real member tap targets),
-  // falling back to the static capture zone while the wheel is mid-drag
-  // (.floating, sprung under the thumb, so its rect is meaningless). A hidden
-  // or missing pad (chat overlay up, desktop) reports null and the CSS falls
-  // back to no bound. The rows top depends on our own bottom write, which the
-  // key's style-attribute input catches, so it settles one gated re-measure
-  // after a push change.
-  private measureRowsBound(): { rowsTop: number; padTop: number } | null {
+  // The rows-bound sensors: the rows' own top (below the collapse chip, so no
+  // chip-height arithmetic is ever guessed) and the limit the rows must end
+  // above. On mobile the limit prefers the RESTING wheel (its invisible
+  // capture band above may be traded for a member row; touches there hit real
+  // member tap targets), falling back to the static capture zone while the
+  // wheel is mid-drag (.floating, sprung under the thumb, so its rect is
+  // meaningless); a hidden or missing pad (chat overlay up) reports null. On
+  // desktop there is no movement pad and the limit is simply the viewport
+  // bottom, so a long raid roster scrolls instead of running off screen. The
+  // rows top depends on our own bottom write, which the key's style-attribute
+  // input catches, so it settles one gated re-measure after a push change.
+  private measureRowsBound(mobile: boolean): { rowsTop: number; limit: number } | null {
     const rows = this.els.rows();
     if (!rows) return null;
-    const wheel = this.els.moveWheel();
-    const atRest = wheel && !(wheel.getAttribute('class') ?? '').includes('floating');
-    const pad = atRest ? wheel : this.els.moveZone();
-    if (!pad) return null;
-    const padBox = pad.getBoundingClientRect();
-    if (padBox.height <= 0) return null;
-    const rowsBox = rows.getBoundingClientRect();
     const z = safeScale(getUiScale());
-    return { rowsTop: rowsBox.top / z, padTop: padBox.top / z };
+    let limit: number;
+    if (mobile) {
+      const wheel = this.els.moveWheel();
+      const atRest = wheel && !(wheel.getAttribute('class') ?? '').includes('floating');
+      const pad = atRest ? wheel : this.els.moveZone();
+      if (!pad) return null;
+      const padBox = pad.getBoundingClientRect();
+      if (padBox.height <= 0) return null;
+      limit = padBox.top / z;
+    } else {
+      limit = this.win.innerHeight / z;
+    }
+    const rowsBox = rows.getBoundingClientRect();
+    return { rowsTop: rowsBox.top / z, limit };
   }
 }

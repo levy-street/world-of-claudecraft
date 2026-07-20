@@ -1749,10 +1749,7 @@
        bound while the sensors are unset (zone hidden, first frame). Overflow
        keeps the hidden rows reachable by scroll. One tier-free rule: the
        measured sensors already reflect the landscape metrics. */
-    max-height: max(
-      40px,
-      calc(var(--party-move-zone-top, 100dvh) - var(--party-rows-top, 0px) - 8px)
-    );
+    max-height: max(40px, calc(var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 8px));
   }
   /* party rows are role="button" tap targets (tap to target a member), so they
      must clear the 40x40 mobile touch floor, not the compact desktop

@@ -17,7 +17,7 @@ import {
 } from '../src/ui/party_below_target_core';
 import {
   PARTY_BELOW_TARGET_BOTTOM_PROP,
-  PARTY_MOVE_ZONE_TOP_PROP,
+  PARTY_ROWS_LIMIT_PROP,
   PARTY_ROWS_TOP_PROP,
   PartyBelowTargetPainter,
 } from '../src/ui/party_below_target_painter';
@@ -207,30 +207,31 @@ describe('PartyBelowTargetPainter (measure gating + property write)', () => {
     expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('initial');
   });
 
-  it('writes the mobile rows-bound sensors only while pushing on mobile', () => {
+  it('writes the rows-bound sensors while pushing: pad top on mobile, viewport bottom on desktop', () => {
     const { painter, moveWheel, props } = build();
-    // Desktop: sensors stay unset.
+    // Desktop: the limit is the viewport bottom (the injected 900px window),
+    // so a long roster scrolls instead of running off screen.
     painter.update(true, 5, false);
-    expect(props.get(PARTY_ROWS_TOP_PROP)).toBe('initial');
-    expect(props.get(PARTY_MOVE_ZONE_TOP_PROP)).toBe('initial');
+    expect(props.get(PARTY_ROWS_TOP_PROP)).toBe('227.0px');
+    expect(props.get(PARTY_ROWS_LIMIT_PROP)).toBe('900.0px');
     // Mobile with a resting wheel: the rows top and the WHEEL top written
     // (author space); the zone's invisible top band is tradeable, so the
     // resting wheel is the preferred bound.
     painter.update(true, 5, true);
     expect(props.get(PARTY_ROWS_TOP_PROP)).toBe('227.0px');
-    expect(props.get(PARTY_MOVE_ZONE_TOP_PROP)).toBe('266.0px');
+    expect(props.get(PARTY_ROWS_LIMIT_PROP)).toBe('266.0px');
     // A mid-drag wheel (.floating, sprung under the thumb) is meaningless as a
     // bound: fall back to the static capture zone's top.
     moveWheel.attrs.class = 'mobile-joystick floating';
     painter.update(true, 6, true);
-    expect(props.get(PARTY_MOVE_ZONE_TOP_PROP)).toBe('250.0px');
+    expect(props.get(PARTY_ROWS_LIMIT_PROP)).toBe('250.0px');
     // A hidden pad (mobile chat overlay: wheel at rest but zero-size zone and
     // wheel) unsets both sensors on the next key change.
     moveWheel.attrs.class = 'mobile-joystick';
     moveWheel.rect.height = 0;
     painter.update(true, 7, true);
     expect(props.get(PARTY_ROWS_TOP_PROP)).toBe('initial');
-    expect(props.get(PARTY_MOVE_ZONE_TOP_PROP)).toBe('initial');
+    expect(props.get(PARTY_ROWS_LIMIT_PROP)).toBe('initial');
   });
 
   it('re-measures after a content-driven size change (ResizeObserver epoch)', () => {
@@ -298,6 +299,14 @@ describe('below-target CSS derives from the measured bottom', () => {
     expect(hudCss).not.toContain('top: 96px');
   });
 
+  it('desktop: pushed rows are viewport-bounded and scroll (10-raid off-screen case)', () => {
+    const rule = hudCss.match(/#party-frames\.below-target \.party-rows \{([^}]*)\}/)?.[1] ?? '';
+    expect(rule).toContain(
+      'max-height: max(40px, calc((var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 12px) / var(--party-frame-scale, 1)));',
+    );
+    expect(rule).toContain('overflow: auto;');
+  });
+
   it('strip box owns its hanging timer text (wrap row gap + last-row padding)', () => {
     // The wrap row gap reserves the 13px .buff .dur overhang between rows and
     // the bottom padding folds the last row's timers into the measured box.
@@ -311,7 +320,7 @@ describe('below-target CSS derives from the measured bottom', () => {
       'top: calc(var(--party-below-target-bottom, calc(max(8px, env(safe-area-inset-top)) + 127px)) + 8px);',
     );
     expect(hudMobileCss).toContain(
-      'max-height: max(40px, calc(var(--party-move-zone-top, 100dvh) - var(--party-rows-top, 0px) - 8px));',
+      'max-height: max(40px, calc(var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 8px));',
     );
     expect(hudMobileCss).not.toContain('top: calc(max(8px, env(safe-area-inset-top)) + 135px);');
     // The old fixed screen-bottom reserve must not return alongside the
