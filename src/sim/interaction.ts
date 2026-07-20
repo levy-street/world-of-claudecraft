@@ -24,6 +24,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { bagCapacity, fitsAll } from './bags';
+import { HARVEST_COMPONENT_SPECIMENS } from './content/professions';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
 import {
@@ -281,18 +282,45 @@ export function harvestCorpse(
     // #1142 roll for a focused component; an unfocused component's tier is
     // exactly the roll above, untouched.
     const tier = applyFocusTierBonus(y.tier, y.component, meta.townFocus);
-    // #1145: a rare-or-better monster material is stamped with the harvester's
-    // name (a non-fungible instance slot); anything below that rarity stays a
-    // plain fungible grant at the (focus-adjusted) tier's yield quantity, same
-    // as before this issue. One rarity roll per yielded component, independent
-    // of the component's tier roll/bonus above.
+    // #1145 + Phase 10: one rarity roll per yielded component, independent of
+    // the component's tier roll/bonus above. For a family with a Pristine
+    // specimen (HARVEST_COMPONENT_SPECIMENS), a rare-or-better roll grants the
+    // specimen as the SIGNED jackpot IN ADDITION to the plain component; the
+    // regular component always grants plain. A family without a specimen keeps
+    // the pre-Phase-10 behavior: the component itself grants signed at rare+.
     const rarity = rollCorpseMaterialRarity(ctx.rng);
-    if (isSignableMaterialRarity(rarity)) {
-      ctx.addItemInstance(itemId, { signer: meta.name }, meta.entityId);
-    } else {
+    const specimenId = isSignableMaterialRarity(rarity)
+      ? HARVEST_COMPONENT_SPECIMENS[y.component]
+      : undefined;
+    if (specimenId !== undefined) {
       // #1143: the same per-point yield bonus applied to the tier's base
       // quantity, on top of the tier shift above, so focus below the
       // 5-point tier-shift threshold still does something.
+      ctx.addItem(itemId, focusedHarvestQuantity(tier, y.component, meta.townFocus), meta.entityId);
+      // Signed instances never merge into stacks (bags.ts addStacked, #1165):
+      // the specimen needs a genuinely free slot, and when none remains after
+      // the plain grant it truncates rather than overflowing the bag (the
+      // pre-gate above reserves room for the plain components only, the same
+      // truncation contract harvestNode's signed grants follow).
+      if (meta.inventory.length < bagCapacity(meta.bags)) {
+        ctx.addItemInstance(specimenId, { signer: meta.name }, meta.entityId);
+      }
+    } else if (isSignableMaterialRarity(rarity)) {
+      // Same free-slot contract as the specimen arm above: a signed instance
+      // never merges into a stack, and the pre-gate only reserves plain-stack
+      // room, so with no genuinely free slot the grant falls back to the
+      // plain fungible top-up (the signature truncates, the yield does not).
+      if (meta.inventory.length < bagCapacity(meta.bags)) {
+        ctx.addItemInstance(itemId, { signer: meta.name }, meta.entityId);
+      } else {
+        ctx.addItem(
+          itemId,
+          focusedHarvestQuantity(tier, y.component, meta.townFocus),
+          meta.entityId,
+        );
+      }
+    } else {
+      // #1143: as above, the focus yield bonus on top of the tier shift.
       ctx.addItem(itemId, focusedHarvestQuantity(tier, y.component, meta.townFocus), meta.entityId);
     }
   }

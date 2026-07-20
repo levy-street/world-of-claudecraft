@@ -17,7 +17,6 @@ export interface PickInteractionWorld {
   leaveDungeon(): InteractionOutcome;
   pickUpObject(id: number): InteractionOutcome;
   startAutoAttack(): void;
-  resurrectAtSpiritHealer(): InteractionOutcome;
 }
 
 export interface PickInteractionHud {
@@ -27,6 +26,7 @@ export interface PickInteractionHud {
   openMailbox(): void;
   showError(text: string): void;
   closeContextMenu(): void;
+  requestSpiritHealerResurrect(): void;
 }
 
 export function isAttackHoverTarget(e: Entity | undefined): boolean {
@@ -190,9 +190,13 @@ export function handlePickedEntity(
       if (d <= INTERACT_RANGE + 2) {
         if (e.templateId === 'spirit_healer') {
           // The Spirit Healer resurrects a ghost in place (with Resurrection
-          // Sickness). To the living it offers only watchful flavor.
-          if (world.player.ghost) return world.resurrectAtSpiritHealer();
-          else {
+          // Sickness), so the click routes through the HUD's confirm gate
+          // rather than sending the command directly. To the living it offers
+          // only watchful flavor.
+          if (world.player.ghost) {
+            hud.requestSpiritHealerResurrect();
+            return true;
+          } else {
             hud.showError(t('hudChrome.death.spiritHealerAlive'));
             return false;
           }

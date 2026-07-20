@@ -317,7 +317,11 @@ export const zh_TW: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "在屍體旁復活",
       "resurrectAtHealer": "靈魂醫者（復活虛弱）",
-      "spiritHealerAlive": "靈魂醫者只看護逝者。你仍是生者。"
+      "spiritHealerAlive": "靈魂醫者只看護逝者。你仍是生者。",
+      "healerConfirmTitle": "接受復活虛弱？",
+      "healerConfirmBody": "靈魂醫者可以就地復活你，但復活虛弱會使你的全部屬性降低75%，高等級時最長持續10分鐘。讓靈魂返回屍體復活則沒有任何懲罰。",
+      "healerConfirmAccept": "復活",
+      "healerConfirmCancel": "取消"
     },
     "fct": {
       "absorbed": "吸收 {amount}",
@@ -4615,7 +4619,11 @@ export const zh_TW: EnTranslations = {
   },
   "heroicShop": {
     "balance": "英雄徽記: {count}",
-    "buyAria": "用{marks}枚英雄徽記購買{item}"
+    "buyAria": "用{marks}枚英雄徽記購買{item}",
+    "buyConfirmTitle": "確認購買",
+    "buyConfirmBody": "用{marks}枚英雄徽記購買{item}？徽記購買後無法退款。",
+    "buyConfirmAccept": "購買",
+    "buyConfirmCancel": "取消"
   },
   "cardDuel": {
     "title": "紙牌對決",
@@ -4668,7 +4676,11 @@ export const zh_TW: EnTranslations = {
       "buyAria": "用 {marks} 枚秘探印記購買 {item}",
       "reqHeroic": "需要英雄難度通關",
       "reqClears": "需要通關 {count} 次",
-      "empty": "暫無存貨。"
+      "empty": "暫無存貨。",
+      "buyConfirmTitle": "確認購買",
+      "buyConfirmBody": "用 {marks} 枚秘探印記購買 {item}？印記購買後無法退款。",
+      "buyConfirmAccept": "購買",
+      "buyConfirmCancel": "取消"
     },
     "tracker": {
       "title": "秘探",
@@ -8243,6 +8255,210 @@ export const zh_TW: EnTranslations = {
       },
       "silverleaf_herb": {
         "name": "銀葉草"
+      },
+      "rough_hide": {
+        "name": "粗糙的獸皮"
+      },
+      "spider_silk": {
+        "name": "蜘蛛絲"
+      },
+      "venom_gland": {
+        "name": "毒液腺"
+      },
+      "game_meat": {
+        "name": "野味肉"
+      },
+      "homespun_cloth": {
+        "name": "手織布"
+      },
+      "pristine_hide": {
+        "name": "完美的獸皮"
+      },
+      "pristine_silk": {
+        "name": "完美的蜘蛛絲"
+      },
+      "pristine_venom_gland": {
+        "name": "完美的毒液腺"
+      },
+      "prime_cut": {
+        "name": "上等肉塊"
+      },
+      "smithing_flux": {
+        "name": "鍛造助熔劑"
+      },
+      "spool_of_thread": {
+        "name": "線軸"
+      },
+      "tanning_agent": {
+        "name": "鞣革劑"
+      },
+      "cooking_salt": {
+        "name": "烹飪用鹽"
+      },
+      "glass_vial": {
+        "name": "玻璃瓶"
+      },
+      "copper_bearded_axe": {
+        "name": "銅鬚斧"
+      },
+      "copper_flanged_mace": {
+        "name": "銅翼錘"
+      },
+      "ironbark_boar_spear": {
+        "name": "鐵皮木野豬矛"
+      },
+      "ironedge_longsword": {
+        "name": "鐵刃長劍"
+      },
+      "ironshod_maul": {
+        "name": "鐵包巨槌"
+      },
+      "whetted_iron_dirk": {
+        "name": "磨利鐵匕首"
+      },
+      "thorium_warblade": {
+        "name": "瑟銀戰刃"
+      },
+      "arcanite_war_axe": {
+        "name": "秘銀戰斧"
+      },
+      "elderwood_battle_staff": {
+        "name": "古老接骨木戰棍"
+      },
+      "riveted_copper_girdle": {
+        "name": "鉚釘銅腰帶"
+      },
+      "coppermail_sabatons": {
+        "name": "銅鏈戰靴"
+      },
+      "coppermail_gauntlets": {
+        "name": "銅鏈護手"
+      },
+      "ironlink_hauberk": {
+        "name": "鐵鏈鎖甲"
+      },
+      "ironlink_legguards": {
+        "name": "鐵鏈護腿"
+      },
+      "ironlink_spaulders": {
+        "name": "鐵鏈肩甲"
+      },
+      "thoriumscale_greathelm": {
+        "name": "瑟銀鱗巨盔"
+      },
+      "thoriumscale_cuirass": {
+        "name": "瑟銀鱗胸甲"
+      },
+      "thoriumscale_leggings": {
+        "name": "瑟銀鱗腿甲"
+      },
+      "homespun_hood": {
+        "name": "手織兜帽"
+      },
+      "homespun_mitts": {
+        "name": "手織連指手套"
+      },
+      "silverthread_slippers": {
+        "name": "銀線便鞋"
+      },
+      "goldweave_robe": {
+        "name": "金織長袍"
+      },
+      "goldweave_leggings": {
+        "name": "金織護腿"
+      },
+      "silkspun_satchel": {
+        "name": "絲紡挎包"
+      },
+      "silkbinders_raiment": {
+        "name": "縛絲法衣"
+      },
+      "sunweave_mantle": {
+        "name": "陽織披肩"
+      },
+      "sunweave_treads": {
+        "name": "陽織足墊"
+      },
+      "fenbridge_hide_leggings": {
+        "name": "芬橋皮護腿"
+      },
+      "fenbridge_hide_boots": {
+        "name": "芬橋皮靴"
+      },
+      "fenbridge_hide_belt": {
+        "name": "芬橋皮腰帶"
+      },
+      "marshstalker_jerkin": {
+        "name": "沼澤潛獵者皮甲"
+      },
+      "marshstalker_hood": {
+        "name": "沼澤潛獵者兜帽"
+      },
+      "marshstalker_spaulders": {
+        "name": "沼澤潛獵者肩甲"
+      },
+      "mirewarden_jerkin": {
+        "name": "泥沼守衛皮甲"
+      },
+      "mirewarden_leggings": {
+        "name": "泥沼守衛護腿"
+      },
+      "mirewarden_treads": {
+        "name": "泥沼守衛足墊"
+      },
+      "pan_seared_perch": {
+        "name": "香煎河鱸魚"
+      },
+      "hunters_game_skewer": {
+        "name": "獵人野味串"
+      },
+      "herbed_marsh_pike": {
+        "name": "香草沼澤狗魚"
+      },
+      "ashwood_smoked_eel": {
+        "name": "灰木燻鰻魚"
+      },
+      "goldleaf_game_stew": {
+        "name": "金葉野味燉肉"
+      },
+      "frostgill_chowder": {
+        "name": "霜鰓濃湯"
+      },
+      "silvered_carp_supper": {
+        "name": "銀鯉晚宴"
+      },
+      "anglers_feast_platter": {
+        "name": "漁夫盛宴拼盤"
+      },
+      "marlows_grand_roast": {
+        "name": "馬洛的盛大烤肉"
+      },
+      "silverleaf_healing_draught": {
+        "name": "銀葉治療藥水"
+      },
+      "silverleaf_mana_draught": {
+        "name": "銀葉法力藥水"
+      },
+      "elixir_of_the_boar": {
+        "name": "野豬藥劑"
+      },
+      "goldleaf_healing_draught": {
+        "name": "金葉治療藥水"
+      },
+      "goldleaf_mana_draught": {
+        "name": "金葉法力藥水"
+      },
+      "venomfire_elixir": {
+        "name": "毒火藥劑"
+      },
+      "sunpetal_healing_draught": {
+        "name": "陽瓣治療藥水"
+      },
+      "sunpetal_mana_draught": {
+        "name": "陽瓣法力藥水"
+      },
+      "elixir_of_the_serpent": {
+        "name": "巨蛇藥劑"
       },
       "conjured_water4": {
         "name": "魔法泉水"

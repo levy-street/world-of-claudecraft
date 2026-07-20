@@ -173,6 +173,7 @@ describe('item webp icons', () => {
       'gravewoven_bag',
       'linen_pouch',
       'mistcallers_duffel',
+      'silkspun_satchel',
       'travelers_knapsack',
       'wolfhide_satchel',
     ]);

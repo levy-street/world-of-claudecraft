@@ -77,7 +77,7 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
       for (let i = 0; i < trials; i++) {
         const mob = spawnHideWolf(internals, 10000 + i, ZONE1.hub);
         sim.harvestCorpse(mob.id, undefined, a);
-        total = sim.countItem('boar_hide', a);
+        total = sim.countItem('rough_hide', a);
       }
       return total;
     }
@@ -102,7 +102,7 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
       for (let i = 0; i < trials; i++) {
         const mob = spawnHideWolf(internals, 30000 + i, ZONE1.hub);
         sim.harvestCorpse(mob.id, undefined, a);
-        total = sim.countItem('boar_hide', a);
+        total = sim.countItem('rough_hide', a);
       }
       return total;
     }
@@ -118,12 +118,12 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
     sim.setTownFocus({ fang: 10 }, a);
     const mob = spawnHideWolf(internals, 20000, ZONE1.hub);
     sim.harvestCorpse(mob.id, undefined, a);
-    const withOtherFocused = sim.countItem('boar_hide', a);
+    const withOtherFocused = sim.countItem('rough_hide', a);
 
     const { sim: sim2, internals: internals2, a: a2 } = setup();
     const mob2 = spawnHideWolf(internals2, 20001, ZONE1.hub);
     sim2.harvestCorpse(mob2.id, undefined, a2);
-    const baseline = sim2.countItem('boar_hide', a2);
+    const baseline = sim2.countItem('rough_hide', a2);
 
     // Both draw the same rng stream from a freshly-seeded Sim (seed 21), so the
     // unfocused 'hide' component's tier roll is identical either way.

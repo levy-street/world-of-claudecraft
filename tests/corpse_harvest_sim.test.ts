@@ -136,11 +136,12 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     const { sim, mob, a, b } = setup();
     sim.harvestCorpse(mob.id, undefined, a);
     sim.harvestCorpse(mob.id, undefined, b);
-    // forest_wolf's componentTags (#1140) include 'hide', mapped to boar_hide.
-    // #1142's focus-harvest tier roll can grant more than one per tier, so the
-    // winner gets AT LEAST one, never the loser.
-    expect(sim.countItem('boar_hide', a)).toBeGreaterThanOrEqual(1);
-    expect(sim.countItem('boar_hide', b)).toBe(0);
+    // forest_wolf's componentTags (#1140) include 'hide', mapped to the
+    // dedicated rough_hide material (Phase 10). #1142's focus-harvest tier
+    // roll can grant more than one per tier, so the winner gets AT LEAST one,
+    // never the loser.
+    expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('rough_hide', b)).toBe(0);
   });
 
   it('denies harvest against a mob with no profession component tags', () => {
@@ -179,7 +180,7 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
       true,
     );
     expect(mob.harvestClaimedBy).toBeNull();
-    expect(sim.countItem('boar_hide', a)).toBe(0);
+    expect(sim.countItem('rough_hide', a)).toBe(0);
     // The corpse stays unclaimed: a living player can still win it.
     sim.harvestCorpse(mob.id, undefined, b);
     expect(mob.harvestClaimedBy).toBe(b);
@@ -193,12 +194,12 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     const ev = sim.drainEvents();
     expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
     expect(mob.harvestClaimedBy).toBeNull();
-    expect(sim.countItem('boar_hide', a)).toBe(0);
+    expect(sim.countItem('rough_hide', a)).toBe(0);
     // The unconsumed claim is still winnable by a player with bag room.
     sim.harvestCorpse(mob.id, undefined, b);
     expect(mob.harvestClaimedBy).toBe(b);
     // #1142's focus-harvest tier roll can grant more than one per component.
-    expect(sim.countItem('boar_hide', b)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('rough_hide', b)).toBeGreaterThanOrEqual(1);
   });
 
   it('a slot-full inventory with a nearly-full yield stack is refused, never taken over capacity', () => {
@@ -212,8 +213,8 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
-    // Convert one gear slot into a boar_hide stack with room for exactly 1.
-    m.inventory[0] = { itemId: 'boar_hide', count: stackSizeOf(ITEMS.boar_hide) - 1 };
+    // Convert one gear slot into a rough_hide stack with room for exactly 1.
+    m.inventory[0] = { itemId: 'rough_hide', count: stackSizeOf(ITEMS.rough_hide) - 1 };
     expect(m.inventory.length).toBe(cap);
     sim.drainEvents();
     sim.harvestCorpse(mob.id, ['hide'], a);
@@ -221,11 +222,11 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     expect(ev.some((e) => e.type === 'error' && e.text === 'Your bags are full.')).toBe(true);
     expect(mob.harvestClaimedBy).toBeNull();
     expect(m.inventory.length).toBeLessThanOrEqual(cap);
-    expect(sim.countItem('boar_hide', a)).toBe(stackSizeOf(ITEMS.boar_hide) - 1);
+    expect(sim.countItem('rough_hide', a)).toBe(stackSizeOf(ITEMS.rough_hide) - 1);
     // The unconsumed claim is still winnable by a player with room.
     sim.harvestCorpse(mob.id, ['hide'], b);
     expect(mob.harvestClaimedBy).toBe(b);
-    expect(sim.countItem('boar_hide', b)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('rough_hide', b)).toBeGreaterThanOrEqual(1);
   });
 
   it('a tagged corpse with no mapped item consumes the claim and yields nothing', () => {
@@ -274,37 +275,96 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
   });
 });
 
-// #1145: a rare-or-better corpse-harvested monster material is stamped with the
-// harvester's own name; below that rarity floor the grant stays a plain
-// fungible stack (at the yield's rolled tier quantity, per the #1142 focus-harvest
-// tier roll), same behavior as before this issue. Each case focuses on a single
-// component (`['hide']`) so the harvest draws exactly one tier roll and one rarity
-// roll, keeping the seed choice legible. Seeds below are pre-verified against this
-// exact setup() shape (two players, seeded before the harvest's rolls) to land on
-// each side of the rarity floor.
-describe('signed materials (#1145)', () => {
-  it('a rare-or-better harvest stamps the item with the harvester name (seed 5)', () => {
+// #1145 + Phase 10 Pristine specimens: a rare-or-better rarity roll on a
+// family with a specimen (HARVEST_COMPONENT_SPECIMENS) grants the specimen as
+// a SIGNED instance IN ADDITION to the plain component; the regular component
+// always grants plain, and below the rarity floor no specimen exists at all.
+// A family WITHOUT a specimen (fang) keeps the pre-Phase-10 behavior: the
+// component itself grants signed at rare-or-better. Each case focuses on a
+// single component so the harvest draws exactly one tier roll and one rarity
+// roll, keeping the seed choice legible. Seeds below are pre-verified against
+// this exact setup() shape (two players, seeded before the harvest's rolls)
+// to land on each side of the rarity floor.
+describe('signed Pristine specimens (#1145, Phase 10)', () => {
+  it('a rare-or-better harvest grants the signed specimen PLUS the plain component (seed 5)', () => {
     const { sim, internals, a, mob } = setup(5);
     sim.harvestCorpse(mob.id, ['hide'], a);
     const meta = internals.players.get(a)!;
-    const slot = meta.inventory.find((s) => s.itemId === 'boar_hide');
-    expect(slot).toBeDefined();
-    expect(slot?.instance?.signer).toBe('Alpha');
-    // A signed instance is always its own single-count slot (addItemInstance),
-    // regardless of the tier the focus-harvest roll landed on.
-    expect(sim.countItem('boar_hide', a)).toBe(1);
+    // The regular component grants plain (fungible, unsigned), at its rolled
+    // tier quantity: the specimen is now the signed jackpot, not the hide.
+    const plain = meta.inventory.find((s) => s.itemId === 'rough_hide');
+    expect(plain).toBeDefined();
+    expect(plain?.instance).toBeUndefined();
+    expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
+    // The specimen is granted exactly once and is ALWAYS signed: its own
+    // single-count instance slot (addItemInstance), never a fungible stack.
+    const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
+    expect(specimen).toBeDefined();
+    expect(specimen?.instance?.signer).toBe('Alpha');
+    expect(sim.countItem('pristine_hide', a)).toBe(1);
   });
 
-  it('a below-rare harvest grants a plain, unsigned fungible stack at its tier quantity (seed 2)', () => {
+  it('a below-rare harvest grants a plain stack at its tier quantity and NO specimen (seed 2)', () => {
     const { sim, internals, a, mob } = setup(2);
     sim.harvestCorpse(mob.id, ['hide'], a);
     const meta = internals.players.get(a)!;
-    const slot = meta.inventory.find((s) => s.itemId === 'boar_hide');
+    const slot = meta.inventory.find((s) => s.itemId === 'rough_hide');
     expect(slot).toBeDefined();
     expect(slot?.instance).toBeUndefined();
     // This seed's focus-tier roll lands above the poor floor, so the fungible
     // grant is more than a single unit (harvestTierQuantity(tier), #1142).
-    expect(sim.countItem('boar_hide', a)).toBe(2);
+    expect(sim.countItem('rough_hide', a)).toBe(2);
+    expect(sim.countItem('pristine_hide', a)).toBe(0);
+  });
+
+  it('a specimen-less family (fang) keeps the signed-component behavior at rare-or-better (seed 5)', () => {
+    const { sim, internals, a, mob } = setup(5);
+    sim.harvestCorpse(mob.id, ['fang'], a);
+    const meta = internals.players.get(a)!;
+    const slot = meta.inventory.find((s) => s.itemId === 'wolf_fang');
+    expect(slot).toBeDefined();
+    expect(slot?.instance?.signer).toBe('Alpha');
+    expect(sim.countItem('wolf_fang', a)).toBe(1);
+  });
+
+  it('a slot-full signed-family harvest falls back to the plain stack, never over capacity (seed 5)', () => {
+    // The pre-gate reserves plain-stack room only, so a partial stack lets it
+    // pass while a signed instance would still need a fresh slot. The rare+
+    // arm must then fall back to the plain fungible top-up (the signature
+    // truncates, the yield does not), same free-slot contract as the
+    // specimen arm.
+    const { sim, internals, a, mob } = setup(5);
+    fillBags(sim, internals, a);
+    const m = internals.players.get(a)!;
+    const cap = bagCapacity(m.bags);
+    m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
+    expect(m.inventory.length).toBe(cap);
+    sim.harvestCorpse(mob.id, ['fang'], a);
+    expect(mob.harvestClaimedBy).toBe(a);
+    expect(m.inventory.length).toBeLessThanOrEqual(cap);
+    const signed = m.inventory.find((s) => s.itemId === 'wolf_fang' && s.instance?.signer);
+    expect(signed).toBeUndefined();
+    // Seed 5's rarity roll clears the signable floor with this exact draw
+    // sequence (proven by the unfixed code overflowing here), so the count
+    // above the seeded 1 proves the plain fallback delivered the yield.
+    expect(sim.countItem('wolf_fang', a)).toBeGreaterThan(1);
+  });
+
+  it('a slot-full specimen harvest truncates the specimen and keeps the plain yield (seed 5)', () => {
+    // Plain grant tops up the partial stack without opening a slot, so the
+    // specimen guard sees a full bag: the jackpot truncates rather than
+    // overflowing, and the plain component still arrives.
+    const { sim, internals, a, mob } = setup(5);
+    fillBags(sim, internals, a);
+    const m = internals.players.get(a)!;
+    const cap = bagCapacity(m.bags);
+    m.inventory[0] = { itemId: 'rough_hide', count: 1 };
+    expect(m.inventory.length).toBe(cap);
+    sim.harvestCorpse(mob.id, ['hide'], a);
+    expect(mob.harvestClaimedBy).toBe(a);
+    expect(m.inventory.length).toBeLessThanOrEqual(cap);
+    expect(m.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(false);
+    expect(sim.countItem('rough_hide', a)).toBeGreaterThan(1);
   });
 });
 

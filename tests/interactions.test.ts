@@ -503,6 +503,7 @@ describe('handlePickedEntity', () => {
       openMailbox: () => {},
       showError: () => {},
       closeContextMenu: () => {},
+      requestSpiritHealerResurrect: () => {},
     };
 
     expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(false);
@@ -542,6 +543,7 @@ describe('handlePickedEntity', () => {
       openMailbox: () => {},
       showError: () => {},
       closeContextMenu: () => {},
+      requestSpiritHealerResurrect: () => {},
     };
 
     handlePickedEntity(world, hud, 2, 2, 10, 20);
@@ -588,6 +590,7 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
       openMailbox: () => calls.push('openMailbox'),
       showError: () => calls.push('showError'),
       closeContextMenu: () => {},
+      requestSpiritHealerResurrect: () => calls.push('requestSpiritHealerResurrect'),
     };
     return { world, hud, calls };
   }
@@ -644,7 +647,7 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
     expect(calls).not.toContain('openLoot');
   });
 
-  it('a ghost right-clicking the Spirit Healer still takes the healer res', () => {
+  it('a ghost right-clicking the Spirit Healer routes through the confirm gate', () => {
     const healer = stubEntity({
       id: 2,
       kind: 'npc',
@@ -653,7 +656,10 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
     });
     const { world, hud, calls } = rig({ dead: true, ghost: true }, healer);
     expect(handlePickedEntity(world, hud, 2, 2, 10, 20)).toBe(true);
-    expect(calls).toContain('resurrectAtSpiritHealer');
+    // The click opens the HUD confirm (which owns sending the command on OK);
+    // it must never send the resurrect command directly.
+    expect(calls).toContain('requestSpiritHealerResurrect');
+    expect(calls).not.toContain('resurrectAtSpiritHealer');
     expect(calls).not.toContain('openQuestDialog');
   });
 

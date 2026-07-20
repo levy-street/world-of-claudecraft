@@ -233,6 +233,7 @@ import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
+import { findNearbyAllies } from './mob/nearby_allies';
 import {
   createMobScanCounters,
   type MobScanCounters,
@@ -6117,13 +6118,12 @@ export class Sim {
       mob.mendTimer -= DT;
       if (mob.mendTimer <= 0) {
         mob.mendTimer = tmpl.mendAlly.every;
-        const wounded: Entity[] = [];
-        for (const ally of this.entities.values()) {
-          if (ally.kind !== 'mob' || ally.dead || ally.ownerId !== null) continue; // skip players, pets, corpses
-          if (ally.hostile !== mob.hostile || ally.hp >= ally.maxHp) continue; // only wounded same-faction mobs
-          if (dist2d(ally.pos, mob.pos) > tmpl.mendAlly.radius) continue;
-          wounded.push(ally);
-        }
+        const wounded = findNearbyAllies(
+          this.grid,
+          mob,
+          tmpl.mendAlly.radius,
+          (ally) => ally.hp < ally.maxHp, // only wounded same-faction mobs
+        );
         if (wounded.length > 0) {
           const school = tmpl.mendAlly.school ?? 'nature';
           this.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
@@ -6151,13 +6151,7 @@ export class Sim {
       mob.wardTimer -= DT;
       if (mob.wardTimer <= 0) {
         mob.wardTimer = tmpl.wardAllies.every;
-        const allies: Entity[] = [];
-        for (const ally of this.entities.values()) {
-          if (ally.kind !== 'mob' || ally.dead || ally.ownerId !== null) continue; // skip players, pets, corpses
-          if (ally.hostile !== mob.hostile) continue; // same-faction mobs only
-          if (dist2d(ally.pos, mob.pos) > tmpl.wardAllies.radius) continue;
-          allies.push(ally);
-        }
+        const allies = findNearbyAllies(this.grid, mob, tmpl.wardAllies.radius);
         if (allies.length > 0) {
           const school = tmpl.wardAllies.school ?? 'holy';
           this.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
@@ -6219,11 +6213,14 @@ export class Sim {
         mob.channelTimer -= DT;
         if (mob.channelTimer <= 0) {
           mob.channelTimer = ch.every;
+          const candidates = findNearbyAllies(
+            this.grid,
+            mob,
+            ch.radius,
+            (ally) => ally.id !== mob.id, // same-faction, not self
+          );
           let protectee: Entity | null = null;
-          for (const ally of this.entities.values()) {
-            if (ally.kind !== 'mob' || ally.dead || ally.ownerId !== null) continue; // skip players, pets, corpses
-            if (ally.hostile !== mob.hostile || ally.id === mob.id) continue; // same-faction, not self
-            if (dist2d(ally.pos, mob.pos) > ch.radius) continue;
+          for (const ally of candidates) {
             if (!protectee || ally.maxHp > protectee.maxHp) protectee = ally; // the boss = biggest pool
           }
           if (protectee && protectee.hp < protectee.maxHp) {
@@ -6267,13 +6264,7 @@ export class Sim {
       mob.rallyTimer -= DT;
       if (mob.rallyTimer <= 0) {
         mob.rallyTimer = tmpl.rally.every;
-        const allies: Entity[] = [];
-        for (const ally of this.entities.values()) {
-          if (ally.kind !== 'mob' || ally.dead || ally.ownerId !== null) continue; // skip players, pets, corpses
-          if (ally.hostile !== mob.hostile) continue; // only same-faction mobs
-          if (dist2d(ally.pos, mob.pos) > tmpl.rally.radius) continue;
-          allies.push(ally);
-        }
+        const allies = findNearbyAllies(this.grid, mob, tmpl.rally.radius);
         if (allies.length > 0) {
           const school = tmpl.rally.school ?? 'physical';
           this.emit({ type: 'spellfx', sourceId: mob.id, targetId: mob.id, school, fx: 'nova' });
@@ -6306,13 +6297,7 @@ export class Sim {
       mob.warcryTimer -= DT;
       if (mob.warcryTimer <= 0) {
         mob.warcryTimer = tmpl.warcry.every;
-        const allies: Entity[] = [];
-        for (const ally of this.entities.values()) {
-          if (ally.kind !== 'mob' || ally.dead || ally.ownerId !== null) continue; // skip players, pets, corpses
-          if (ally.hostile !== mob.hostile) continue; // same-faction only
-          if (dist2d(ally.pos, mob.pos) > tmpl.warcry.radius) continue;
-          allies.push(ally);
-        }
+        const allies = findNearbyAllies(this.grid, mob, tmpl.warcry.radius);
         if (allies.length > 0) {
           const school = tmpl.warcry.school ?? 'physical';
           const auraId = `warcry_${mob.templateId}`;

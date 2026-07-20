@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { STATIONS } from '../src/sim/content/professions';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
-import { TIER_SKILL_STEP } from '../src/sim/professions/wheel';
+import { TIER_SKILL_STEP, tierForSkill } from '../src/sim/professions/wheel';
 import {
   buildTrainView,
   isRecipeKnownForViewer,
@@ -123,16 +123,35 @@ describe('buildTrainView', () => {
   });
 
   it('locked rows are ALWAYS present and carry the named tier requirement', () => {
-    // Skill 0 everywhere: every trainer recipe of the station locks, and each
+    // Skill 0 everywhere: every trainer recipe above the free floor locks (the
+    // skillReq-0 Phase 10 ladder rungs stay teachable at tier 0), and each
     // locked row names its craft and the flat threshold tier * TIER_SKILL_STEP.
+    // forgemistress_darva serves both forge crafts, so her locked ladder is the
+    // two combo recipes plus the tier-1 (skillReq 25) and tier-2 (skillReq 50)
+    // weaponcrafting/armorcrafting rungs.
     const view = buildTrainView('forgemistress_darva', deps());
     const locked = view.rows.filter((row) => row.state === 'locked');
     expect(locked.map((row) => row.recipeId).sort()).toEqual([
+      'recipe_arcanite_war_axe',
+      'recipe_elderwood_battle_staff',
       'recipe_forgeguard_bulwark_gauntlets',
       'recipe_ironbound_warplate_helm',
+      'recipe_ironedge_longsword',
+      'recipe_ironlink_hauberk',
+      'recipe_ironlink_legguards',
+      'recipe_ironlink_spaulders',
+      'recipe_ironshod_maul',
+      'recipe_thorium_warblade',
+      'recipe_thoriumscale_cuirass',
+      'recipe_thoriumscale_greathelm',
+      'recipe_thoriumscale_leggings',
+      'recipe_whetted_iron_dirk',
     ]);
     for (const row of locked) {
-      expect(row.requirement).toEqual({ craft: row.professionId, skill: TIER_SKILL_STEP });
+      expect(row.requirement).toEqual({
+        craft: row.professionId,
+        skill: tierForSkill(row.skillReq) * TIER_SKILL_STEP,
+      });
     }
     // Known rows never carry a requirement.
     for (const row of view.rows.filter((entry) => entry.state === 'known')) {

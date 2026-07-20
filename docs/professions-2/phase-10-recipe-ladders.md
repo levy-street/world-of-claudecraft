@@ -251,3 +251,47 @@ STOPPING RULES:
 - Stop and ask if ending the quest-item collision would require deleting or reshaping an
   ItemDef players may hold (prime directive).
 ```
+
+## As landed (2026-07-19)
+
+The build followed this file with these as-landed deviations, authoritative
+over the older wording above (mirrored in phase-10-qa.md per the
+amend-the-twin rule); the full surface record is the Phase 10 entry in
+state.md:
+
+- The economy invariant test enumerates every recipe but carries a FROZEN
+  14-member LEGACY_GOLD_POSITIVE_RECIPE_IDS exception list (8 wave-one
+  commons, the 3 caster-hub rows, the 3 combos): fixing the legacy output
+  sellValues inside a content phase would break the prime directive
+  (existing item values and live vendor income), so the list is pinned
+  three ways (subset of PRE_TRAINING_RECIPE_IDS, every member still
+  violates so it self-prunes, exact literals) as a Phase 15 burn-down
+  target. No Phase 10 recipe is exempt; strict less-than holds for all 54.
+- No fish ItemDefs were authored: the six raw fish already shipped
+  (fishing is live pre-Phase-11), and cooking consumes them directly. The
+  "author the fish ItemDefs now" deliverable was already satisfied.
+- The perfect specimen grants IN ADDITION to the plain component when the
+  existing corpse rarity roll clears rare+, and the regular component now
+  grants plain when a specimen family exists; specimen-less families
+  (fang, cloth) keep the old signed-regular behavior at rare+.
+- Every new recipe, including the skillReq-0 rungs, is trainer-taught AND
+  station-bound; the grandfathered field commons coexist unchanged. New
+  recipes live in the new LADDER_RECIPES table (COMMON_RECIPES and
+  FIELD_RECIPES are literally pinned at their nine wave-one entries).
+- materialTierBonus is keyed by def-level material tier bands (max-tier
+  rule, 0.01 per tier), not consumed-instance rarity: consumption does not
+  report which instance was removed, so instance-rarity keying would need
+  a consumption-order change. thorium_ore keys tier 1 by vendor price
+  band; arcanite_bar keys tier 2 despite not being a node yield.
+- tests/professions_grandfather.test.ts's non-combo arm was rescoped (it
+  had forbidden ANY non-combo recipe from carrying acquisition), and
+  tests/corpse_harvest_sim.test.ts was rewritten off its boar_hide lock;
+  the cross-tier rule is encoded negative-form (every rung-50 recipe must
+  consume at least one non-rare-band reagent) because fish and vendor
+  reagents are unbanded commons.
+- No new deeds: recipes, materials, and the specimen family are not
+  conquerable content under the docs/design/deeds.md authoring contract;
+  rare-find deeds stay Phase 15.
+- The wiki generator does not yet enumerate recipe records, so
+  npm run wiki:content regenerates with zero diff; the professions guide
+  rewrite remains the Phase 15 deliverable.
