@@ -1,8 +1,9 @@
 # Shaman Warspirit v0.28.0 PRD
 
-Status: owner design direction, pre-approval and pre-implementation
+Status: Levy-approved owner design direction, pre-implementation
 Owner: Ryze
 Target: `release/v0.28.0`, PBE Wave A
+Approval: Levy, confirmed 2026-07-20
 Parent design: [Shaman v0.28.0 Class Design](../design/shaman-v028-class-design.md)
 
 ## Specialization gate
@@ -13,13 +14,14 @@ postures and all posture state before the new specialization kit is resolved.
 
 ## Outcome
 
-Warspirit is a melee spellcaster with two deliberate weapon postures. Galeheart creates a reliable
-three-hit offensive rhythm and earns instant spells. Stonebound keeps the melee-to-cast rhythm but
-trades Galeheart damage for the mitigation and threat needed to off-tank.
+Warspirit is a dual-wield melee spellcaster with two deliberate weapon postures. Galeheart creates
+a reliable three-hit offensive rhythm and earns instant spells. Stonebound keeps the melee-to-cast
+rhythm but trades Galeheart damage for the mitigation and threat needed to off-tank.
 
 ## Design goals
 
 - Make melee attacks visibly earn the next spell.
+- Use the existing one-handed dual-wield system so both hands feed one cadence.
 - Add Galeheart without introducing high-variance burst or another action.
 - Consolidate weapon enhancements into Galeheart offense and Stonebound defense.
 - Let each earned instant become damage, control, or emergency healing.
@@ -33,13 +35,14 @@ trades Galeheart damage for the mitigation and threat needed to off-tank.
 - A separate Maelstrom resource bar.
 - Random Galeheart streaks that dominate balance or PvP outcomes.
 - A second melee rotation layered on top of the melee-to-cast rhythm.
+- Dual wielding two-handed weapons.
 - Additional reactive off-tank buttons for every incoming attack.
 
 ## Player experience
 
-With Galeheart active, the weapon and aura build through a three-hit cadence. The third landed melee
-attack triggers two echo strikes and arms the next Arc Bolt, Jolt, or Mending Waters as an instant
-and cheaper cast. Ancestral Strike advances the cadence faster.
+With Galeheart active, landed main-hand and off-hand base attacks build one shared three-hit
+cadence. The third landed attack triggers two echo strikes and arms the next Arc Bolt, Jolt, or
+Mending Waters as an instant and cheaper cast. Ancestral Strike advances the cadence faster.
 
 Applying Stonebound is a visible role decision. The same cadence still earns instant spells, but
 the echo burst disappears. Armor, mitigation, threat, Earthen Jolt snap threat, and Thunder Ward
@@ -50,6 +53,7 @@ damage smoothing take its place.
 | Action or state | Starting PBE behavior |
 |---|---|
 | Mana | Canonical Shaman resource. Earned casts are cheaper, not a second resource. |
+| One-handed dual wield | Warspirit equipment permission. Each landed base swing from either hand adds one cadence step. |
 | Galeheart Weapon | Warspirit offensive enhancement. Every third landed melee attack triggers two echo strikes. |
 | Stonebound Weapon | Warspirit off-tank enhancement. Replaces Galeheart and enables the defensive package. |
 | Ancestral Strike | Existing signature melee strike. Counts as two steps toward the next cadence trigger. |
@@ -62,6 +66,14 @@ and earned-spell decision are required.
 
 ## Weapon-enhancement contract
 
+- Warspirit may dual wield one-handed weapons through the existing equipment and auto-attack
+  rules. It never gains two-handed dual wielding.
+- A landed main-hand or off-hand base swing adds one cadence step. Existing off-hand damage and
+  miss rules remain canonical.
+- A shield remains legal in the off-hand. Stonebound can trade the second weapon's cadence for the
+  shield's canonical block value; the posture does not invent a shield attack.
+- Leaving Warspirit makes an equipped off-hand weapon illegal and routes it through the existing
+  safe off-hand sanitation path without deleting the item.
 - Warspirit has Galeheart Weapon and Stonebound Weapon available.
 - Applying one removes the other immediately.
 - The selected enhancement is visible on the weapon, character, aura list, and action state.
@@ -72,7 +84,8 @@ and earned-spell decision are required.
 
 ## Galeheart contract
 
-- Every third landed base melee attack triggers two immediate echo strikes.
+- Every third landed base melee attack from either equipped weapon triggers two immediate echo
+  strikes.
 - A successful Ancestral Strike adds two cadence steps.
 - The cadence wraps after three. Ancestral Strike may trigger at most one Galeheart event and carries
   any one-step overflow into the next cycle.

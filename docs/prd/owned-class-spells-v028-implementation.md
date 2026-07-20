@@ -4,7 +4,7 @@
 > [Talents 2.0 class design lab](../../prototypes/talents-v028/index.html) for a mobile-first comparison
 > of all nine specializations. This document and the linked class PRDs remain authoritative.
 
-Status: owner implementation plan, pending maintainer approval for gameplay slices
+Status: owner implementation plan; Shaman slice approved, Hunter and Priest pending
 Owner: Ryze
 Target: `release/v0.28.0`, then the assigned PBE wave for each class
 
@@ -24,6 +24,9 @@ rotation mechanics, procs, or talent rows into `SPEC_BASELINES`. The layers rema
 The class redesign is a large content feature. Gameplay slices require approval from Levy or
 Fernando before implementation and must pass through the listed PBE waves. Documentation and
 fail-first test scaffolding may land independently.
+
+The Shaman gameplay slice is approved by Levy as of 2026-07-20 and targets PBE Wave A. Hunter and
+Priest gameplay slices still require their own explicit approval before implementation.
 
 ## Non-negotiable implementation rules
 
@@ -85,6 +88,7 @@ This seam lands separately and cannot contain Packlord-specific tuning.
 | Faultwake | Reuse `earthquake`, rename its display, and add the Thundercall gate | Thundercall |
 | Primal Mastery | Reuse `elemental_mastery` and its signature grant | Thundercall |
 | Galeheart Weapon | New enhancement ability and deterministic cadence | Warspirit |
+| One-handed dual wield | Extend the existing spec-gated equipment permission and auto-attack cadence | Warspirit |
 | Stonebound Weapon | Reuse `rockbiter_weapon`, then hand it off to Warspirit at level 5 | Warspirit after level 5 |
 | Ancestral Strike | Reuse `stormstrike` and its signature grant | Warspirit |
 | Stormcast | New owner aura earned by the melee cadence | Warspirit |
@@ -149,6 +153,9 @@ present in the same slice.
 - Implement Thundercall in `src/sim/combat/shaman_thundercall.ts`.
 - Implement Warspirit in `src/sim/combat/shaman_warspirit.ts`.
 - Implement Spiritmend in `src/sim/combat/shaman_spiritmend.ts`.
+- Extend the existing `canDualWield` spec gate to Warspirit for one-handed weapons only. Count
+  landed main-hand and off-hand base swings toward one cadence, preserve canonical off-hand damage
+  and miss rules, and sanitize the off-hand weapon through the existing path on respec.
 - Keep Mending Current ownership keyed by Shaman and ally so one healer cannot consume another
   healer's pool.
 - Apply every Stonebound armor, mitigation, threat, and forced-target rider only while the posture
@@ -220,6 +227,8 @@ Add focused tests paired with the Shaman system modules:
 - Earthen Jolt and Faultwake consume the bank only after a valid resolved cast.
 - Defensive Thunder Ward charges never spend or duplicate the offensive bank.
 - Every valid third Warspirit melee step triggers one Galeheart event and one Stormcast state.
+- Warspirit alone may equip a one-handed off-hand weapon, and landed swings from either hand feed
+  the same cadence without letting echoes recurse.
 - Galeheart echoes never advance the cadence or recursively proc.
 - Stonebound removes Galeheart and applies every defensive rider as one visible tradeoff.
 - Leaving Stonebound removes armor, mitigation, threat, forced-target, and smoothing riders.

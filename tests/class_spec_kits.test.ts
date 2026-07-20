@@ -5,6 +5,7 @@ import {
   emptyAllocation,
   type TalentAllocation,
 } from '../src/sim/content/talents';
+import { canDualWield, canDualWieldTwoHand } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
 import { loadoutKnownAbilityIds } from '../src/ui/hud/action_bar/hotbar';
 
@@ -62,6 +63,19 @@ describe('Shaman v0.28 specialization ownership', () => {
         expect(known.has(abilityId), `${spec} should keep ${abilityId}`).toBe(true);
       }
     }
+  });
+
+  it('keeps Chain Heal as the Spiritmend signature instead of a talent morph', () => {
+    expect(knownAt('restoration', 5).has('chain_heal')).toBe(true);
+    expect(knownAt('elemental', 20).has('chain_heal')).toBe(false);
+    expect(knownAt('enhancement', 20).has('chain_heal')).toBe(false);
+  });
+
+  it('unlocks one-handed dual wield only for Warspirit', () => {
+    expect(canDualWield('shaman', 'enhancement')).toBe(true);
+    expect(canDualWield('shaman', 'elemental')).toBe(false);
+    expect(canDualWield('shaman', 'restoration')).toBe(false);
+    expect(canDualWieldTwoHand('shaman', 'enhancement')).toBe(false);
   });
 
   it('hands Stonebound Weapon from the starter kit to Warspirit at level 5', () => {

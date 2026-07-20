@@ -1,8 +1,9 @@
 # Shaman Thundercall v0.28.0 PRD
 
-Status: owner design direction, pre-approval and pre-implementation
+Status: Levy-approved owner design direction, pre-implementation
 Owner: Ryze
 Target: `release/v0.28.0`, PBE Wave A
+Approval: Levy, confirmed 2026-07-20
 Parent design: [Shaman v0.28.0 Class Design](../design/shaman-v028-class-design.md)
 
 ## Specialization gate
@@ -83,6 +84,10 @@ Arc Bolt builds Thunder charges
 
 Cinder and Rime Jolts retain their damage-over-time and control jobs. They do not consume Thunder
 charges in the starting design, so utility does not accidentally erase the main payoff.
+
+Chain Lightning does not replace Arc Bolt or become a required baseline action in this direction.
+It may remain optional talent space after the charge-to-shock loop is complete, but it cannot build
+or vent Thunder charges in a way that makes Arc Bolt and shock choice rotationally irrelevant.
 
 ## Primal Mastery
 

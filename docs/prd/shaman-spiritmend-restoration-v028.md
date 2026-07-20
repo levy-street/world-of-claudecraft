@@ -1,15 +1,18 @@
 # Shaman Spiritmend v0.28.0 PRD
 
-Status: owner design direction, pre-approval and pre-implementation
+Status: Levy-approved owner design direction, pre-implementation
 Owner: Ryze
 Target: `release/v0.28.0`, PBE Wave A
+Approval: Levy, confirmed 2026-07-20
 Parent design: [Shaman v0.28.0 Class Design](../design/shaman-v028-class-design.md)
 
 ## Specialization gate
 
 Lifespring Weapon, Mending Currents, Tidecall, and Cascading Mend belong only to Spiritmend.
-Selecting Thundercall or Warspirit removes every owned pool and exclusive action before the new
-specialization kit is resolved.
+Cascading Mend retains the shipped `chain_heal` id and the core Chain Heal role; it is granted by
+the specialization rather than by a talent or Mending Waters morph. Selecting Thundercall or
+Warspirit removes every owned pool and exclusive action before the new specialization kit is
+resolved.
 
 ## Outcome
 
@@ -20,6 +23,7 @@ it reaches to release more than the remaining healing immediately.
 ## Design goals
 
 - Give Spiritmend a unique prepare-and-collapse healing rhythm.
+- Keep Chain Heal as the specialization's baseline multi-target payoff rather than a talent morph.
 - Make Mending Waters, Tidecall, Cascading Mend, and Lifespring Weapon the complete core kit.
 - Let Mending Currents provide efficient healing over time before they are consumed.
 - Make Cascading Mend a large prepared burst without making it fail on unprepared allies.
@@ -34,6 +38,7 @@ it reaches to release more than the remaining healing immediately.
 - Mandatory ground placement or rapid party-target switching.
 - Cascading Mend that only functions when every target has been prepared.
 - Multiple independent healing-over-time effects to maintain on each ally.
+- A talent that replaces Mending Waters with Chain Heal and makes the baseline loop optional.
 
 ## Player experience
 
@@ -53,7 +58,7 @@ consume them now before an ally dies.
 | Mending Waters | Canonical cast-time heal. Creates or enlarges a 12-second Mending Current pool. |
 | Mending Current pool | One stored healing-over-time pool per ally per Shaman, capped relative to maximum health. |
 | Tidecall | One instant Spiritmend action. Heals immediately, adds to the target's pool, and refreshes it. |
-| Cascading Mend | Canonical initial heal and two-bounce signature. Consumes every Mending Current reached for a proposed 125% of its remaining amount. |
+| Cascading Mend (`chain_heal`) | Retained Chain Heal signature with its canonical initial heal and two bounces. Consumes every Mending Current reached for a proposed 125% of its remaining amount. |
 | Lifespring Weapon | Spiritmend-only enhancement that increases Mending Current deposits. |
 
 Tidecall is the player-facing action name. Mending Current is the pool it creates or enlarges.

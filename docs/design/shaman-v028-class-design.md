@@ -1,8 +1,9 @@
 # Shaman v0.28.0 Class Design
 
-Status: owner design direction, pre-implementation
+Status: Levy-approved owner design direction, pre-implementation
 Owner: Ryze
 Target: v0.28.0, PBE Wave A
+Approval: Levy, confirmed 2026-07-20
 
 ## Purpose
 
@@ -29,6 +30,18 @@ presentation, balance knobs, and PBE acceptance criteria:
 When a shared rule and a specialization PRD disagree, this class document wins. Existing ability
 behavior on `release/v0.28.0` remains canonical unless a PRD explicitly identifies an approved
 change.
+
+## Owner review decisions
+
+- Spiritmend remains Chain Heal-oriented. Cascading Mend retains the shipped `chain_heal` id and
+  core Chain Heal role as the specialization signature; it is not a talent morph of Mending
+  Waters. Mending Waters prepares allies, then Cascading Mend consumes their Mending Currents.
+- Thundercall remains an Arc Bolt builder and shock spender. Chain Lightning may remain optional
+  talent space, but it does not replace Arc Bolt or become a required baseline builder or vent.
+- Warspirit unlocks one-handed dual wielding. Landed main-hand and off-hand base weapon swings each
+  add one cadence step, while Galeheart echoes never add steps. A Stonebound player may replace the
+  off-hand weapon with a shield, accepting slower cadence in exchange for the existing block
+  benefit. Warspirit never dual wields two-handed weapons.
 
 ## Design principles
 
@@ -126,10 +139,14 @@ for a group.
 Warspirit is a melee battle shaman whose weapon strikes call down spells. It can sacrifice some
 offense to become a credible temporary off-tank for adds, emergencies, and small-group play.
 
+Warspirit is built around one-handed dual wielding in its damage posture. Both hands feed the same
+three-step cadence through the existing auto-attack system; they do not create separate banks.
+
 ### Core loop
 
 1. Galeheart Weapon or Stonebound Weapon establishes the offensive or defensive posture.
-2. Landed melee attacks build a visible three-step melee-to-cast cadence.
+2. Landed main-hand and off-hand base melee attacks each build one step of a visible three-step
+   melee-to-cast cadence.
 3. Every third landed melee attack with Galeheart triggers two automatic echo strikes.
 4. The same third hit arms the next Arc Bolt, Jolt, or Mending Waters as an instant and cheaper
    cast.
