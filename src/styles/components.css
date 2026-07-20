@@ -1242,16 +1242,23 @@
   }
 
   /* ---------- quest log ---------- */
-  /* quest log */
+  /* quest log: widened to a landscape shape so the detail pane gets real
+     reading width instead of wrapping narrow, and the detail's own max-height
+     cap is dropped so it flows with the window's single outer scroll instead
+     of a second, nested 380px scroll region. No max-width override here: the
+     shared `.window` clamp (layout.css) already bounds width against the
+     JS-synced app viewport, divided by --window-scale; a per-window override
+     using raw 100vw would disagree with that clamp and can overflow at higher
+     ui-scale. */
   #quest-log-window {
-    width: 520px;
+    width: 880px;
   }
   #quest-log-window .ql-cols {
     display: flex;
     gap: 12px;
   }
   .ql-list {
-    width: 180px;
+    width: 220px;
     border-right: 1px solid #463a1c;
     padding-right: 8px;
   }
@@ -1277,7 +1284,13 @@
   .ql-detail {
     flex: 1;
     font-size: 12px;
-    max-height: 380px;
+    max-height: none;
+    /* Reading-measure cap: the pane sits beside the 220px list inside the 880px
+       window, leaving roughly 616px of content width. 70ch undershot that badly
+       (~420-460px at this pane's 12px font), leaving 150px-plus of dead space
+       next to the list. 100ch uses most of the available width while still
+       capping line length on wider viewports. */
+    max-width: 100ch;
     min-height: 0;
     display: flex;
     flex-direction: column;
@@ -6086,11 +6099,21 @@
      notice, and add-row footer flow inside the scrolling .window-body, matching the
      pre-frame whole-panel scroll. */
 
-  /* Quest log: the two panes (list + measure-capped detail) fill the scrolling
-     body. The frame body owns the outer scroll; the list scrolls with it and the
-     detail caps its own reading measure. */
+  /* Quest log: the two panes (list + detail) fill the scrolling body. The
+     frame body owns the outer scroll; the list scrolls with it. Widened to
+     the same 880px landscape footprint as the live #quest-log-window rule
+     above, and the detail pane's reading-measure cap widened to use the
+     extra width instead of leaving it narrow inside a much wider window.
+     No max-width override: the shared `.window` clamp already bounds width
+     against the JS-synced app viewport (see the live rule above for why).
+     NOTE: this `.window-body` ancestor is never actually mounted (the
+     `window_frame.ts` "AAA window-frame adoption" painter that would have
+     mounted it was reverted); only the ungated `width` rule above is live.
+     Kept in sync with the live rule anyway so a future frame-phase revival
+     does not silently regress this window; do not delete it as dead code
+     without checking that history first. */
   #quest-log-window {
-    width: 520px;
+    width: 880px;
   }
   #quest-log-window .window-body .ql-cols {
     display: flex;
@@ -6100,7 +6123,7 @@
   }
   #quest-log-window .window-body .ql-detail {
     max-height: none;
-    max-width: 46ch;
+    max-width: 100ch;
   }
   #quest-log-window .window-footer .btn {
     min-width: 0;

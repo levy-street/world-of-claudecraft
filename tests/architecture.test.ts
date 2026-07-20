@@ -199,6 +199,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/action_bar/mobile_action_page_view.ts',
   'src/ui/hud/action_bar/consumable_bar_view.ts',
   'src/ui/mobile_hud_layout.ts',
+  'src/ui/mobile_fullscreen_window_core.ts',
   'src/ui/auras_view.ts',
   'src/ui/minimap_markers.ts',
   'src/ui/gathering_view.ts',

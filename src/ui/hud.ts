@@ -370,6 +370,7 @@ import {
   pickIdleBarkCandidates,
 } from './mob_idle_sfx';
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
+import { isMobileFullscreenWindowOpen } from './mobile_fullscreen_window_core';
 import { MovableFrame } from './movable_frame';
 import { OptionsWindow } from './options_window';
 import { makeWriterFacet, type PainterHostPresentation } from './painter_host';
@@ -2305,6 +2306,18 @@ export class Hud {
       .filter((win) => win.id !== 'mobile-extra-controls')
       .some((win) => this.isWindowVisible(win));
     document.body.classList.toggle('mobile-window-open', anyOpen);
+    const bagsWindow = document.getElementById('bags');
+    const charWindow = document.getElementById('char-window');
+    document.body.classList.toggle(
+      'mobile-fullscreen-window-open',
+      isMobileFullscreenWindowOpen(
+        !!bagsWindow && this.isWindowVisible(bagsWindow),
+        !!charWindow && this.isWindowVisible(charWindow),
+        document.body.classList.contains('vendor-open'),
+        document.body.classList.contains('bank-open'),
+        document.body.classList.contains('char-bags-paired'),
+      ),
+    );
     const storeWindow = document.getElementById('daily-rewards-window') as HTMLElement | null;
     const claudiumWindow = document.getElementById('claudium-window') as HTMLElement | null;
     const storeVisible = !!storeWindow && this.isWindowVisible(storeWindow);

@@ -1195,6 +1195,20 @@
     width: 100%;
     min-width: 0;
   }
+  /* #bottom-bar is not the hotbar (that is already hidden on touch above);
+     it docks the player frame / petbar / meters-window / stancebar stack. Only
+     bags and the character sheet are CSS-verified to cover the ENTIRE mobile
+     viewport (10px/0 inset on every edge, see the near-fullscreen block
+     below), matching the existing "covering the frame is fine here" tradeoff
+     already accepted for those two windows specifically. Every other game
+     window (loot, lockpick, delve-rite, loot-settings, map, quest-log,
+     vendor, ...) only pins its edges/top on touch and leaves real screen
+     visible below, so hiding the frame there would hide HP/resource while
+     combat continues. body.mobile-fullscreen-window-open is computed in
+     Hud.syncAnyWindowOpenState via isMobileFullscreenWindowOpen. */
+  body.mobile-touch.mobile-fullscreen-window-open #bottom-bar {
+    display: none;
+  }
   body.mobile-touch #xpbar {
     display: none;
   }
@@ -3683,7 +3697,25 @@
   }
   body.mobile-touch #quest-log-window .ql-detail {
     min-width: 0;
+    /* The components-layer 70ch/100ch reading-measure cap doesn't bind at
+       phone widths (screen is already narrower than the cap), but it does
+       bind on a tablet-width touch sheet, leaving dead space next to the
+       list. This just makes that literal by letting the pane use the full
+       width the sheet gives it. */
+    max-width: none;
   }
+  /* Dropping the components-layer `.ql-detail { max-height: 380px }` (the
+     landscape relayout) removes mobile's own internal scroll region too:
+     `.ql-detail` has no height context here (`.ql-cols` is an unbounded flex
+     row), so `.ql-detail-body`'s `overflow-y: auto` never has anything to
+     clip, and the sheet's own `overflow-y: auto` (mobile sheet base, above)
+     becomes the only scroll for a long quest, list included. This is an
+     intentional switch to the same single-outer-scroll model the desktop
+     window already uses (see quest_log_landscape_layout.test.ts), not an
+     oversight: for a long quest, the whole sheet now scrolls together with
+     the list, rather than only the detail pane scrolling internally. The
+     `.ql-detail-body` safe-area padding below stays harmless dead weight for
+     the case a future change reintroduces a bounded height here. */
   body.mobile-touch #quest-log-window .ql-detail-body {
     min-width: 0;
   }
