@@ -317,7 +317,11 @@ export const vi_VN: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Hồi Sinh Tại Xác Chết",
       "resurrectAtHealer": "Người Canh Giữ Nhợt Nhạt (Cái Giá của Người Canh Giữ)",
-      "spiritHealerAlive": "Người Canh Giữ Nhợt Nhạt trông nom kẻ chết. Bạn vẫn còn ở giữa cõi sống."
+      "spiritHealerAlive": "Người Canh Giữ Nhợt Nhạt trông nom kẻ chết. Bạn vẫn còn ở giữa cõi sống.",
+      "healerConfirmTitle": "Accept the Keeper's Toll?",
+      "healerConfirmBody": "The Pale Keeper will revive you here, but the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to your corpse revives you with no penalty.",
+      "healerConfirmAccept": "Revive Me",
+      "healerConfirmCancel": "Cancel"
     },
     "fct": {
       "absorbed": "Đã hấp thụ {amount}",
@@ -4615,7 +4619,11 @@ export const vi_VN: EnTranslations = {
   },
   "heroicShop": {
     "balance": "Dấu Ấn Anh Hùng: {count}",
-    "buyAria": "Mua {item} với giá {marks} Dấu Ấn Anh Hùng"
+    "buyAria": "Mua {item} với giá {marks} Dấu Ấn Anh Hùng",
+    "buyConfirmTitle": "Confirm Purchase",
+    "buyConfirmBody": "Buy {item} for {marks} Heroic Marks? Marks purchases cannot be refunded.",
+    "buyConfirmAccept": "Buy",
+    "buyConfirmCancel": "Cancel"
   },
   "cardDuel": {
     "title": "Đấu Bài",
@@ -4668,7 +4676,11 @@ export const vi_VN: EnTranslations = {
       "buyAria": "Mua {item} với giá {marks} Huy Hiệu Hang Sâu",
       "reqHeroic": "Yêu cầu một lần dọn sạch Anh Hùng",
       "reqClears": "Yêu cầu {count} lần dọn sạch",
-      "empty": "Hết hàng."
+      "empty": "Hết hàng.",
+      "buyConfirmTitle": "Confirm Purchase",
+      "buyConfirmBody": "Buy {item} for {marks} Delve Marks? Marks purchases cannot be refunded.",
+      "buyConfirmAccept": "Buy",
+      "buyConfirmCancel": "Cancel"
     },
     "tracker": {
       "title": "Hang Sâu",

@@ -12,7 +12,6 @@ export interface NearbyInteractionWorld {
   enterDungeon(dungeonId: string): InteractionOutcome;
   leaveDungeon(): InteractionOutcome;
   pickUpObject(id: number): InteractionOutcome;
-  resurrectAtSpiritHealer(): InteractionOutcome;
   nodeHarvestableByMe(nodeId: string): boolean;
   harvestNode(nodeId: string): InteractionOutcome;
 }
@@ -22,6 +21,7 @@ export interface NearbyInteractionHud {
   openQuestDialog(npcId: number): void;
   openDelveBoard(npcId: number): void;
   showError(text: string): void;
+  requestSpiritHealerResurrect(): void;
 }
 
 type NearbyGatherNode = Pick<GatherNodeDef, 'id' | 'pos'>;
@@ -121,7 +121,10 @@ export function tryNearbyInteraction(
     const npc = world.entities.get(bestNpc);
     if (npc?.kind !== 'npc') return false;
     if (npc.templateId === 'spirit_healer') {
-      return world.resurrectAtSpiritHealer();
+      // The scan only picks a spirit healer for a ghost; route the revive
+      // through the HUD's confirm gate rather than sending the command
+      // directly (it applies The Keeper's Toll).
+      hud.requestSpiritHealerResurrect();
     } else if (npc.templateId === 'brother_halven' || npc.templateId === 'brother_halven_marsh') {
       hud.openDelveBoard(bestNpc);
     } else {

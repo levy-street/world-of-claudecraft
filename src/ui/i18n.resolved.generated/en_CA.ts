@@ -317,7 +317,11 @@ export const en_CA: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Resurrect at Corpse",
       "resurrectAtHealer": "The Pale Keeper (Keeper's Toll)",
-      "spiritHealerAlive": "The Pale Keeper watches over the dead. You are still among the living."
+      "spiritHealerAlive": "The Pale Keeper watches over the dead. You are still among the living.",
+      "healerConfirmTitle": "Accept the Keeper's Toll?",
+      "healerConfirmBody": "The Pale Keeper will revive you here, but the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to your corpse revives you with no penalty.",
+      "healerConfirmAccept": "Revive Me",
+      "healerConfirmCancel": "Cancel"
     },
     "fct": {
       "absorbed": "Absorbed {amount}",
@@ -4615,7 +4619,11 @@ export const en_CA: EnTranslations = {
   },
   "heroicShop": {
     "balance": "Heroic Marks: {count}",
-    "buyAria": "Buy {item} for {marks} Heroic Marks"
+    "buyAria": "Buy {item} for {marks} Heroic Marks",
+    "buyConfirmTitle": "Confirm Purchase",
+    "buyConfirmBody": "Buy {item} for {marks} Heroic Marks? Marks purchases cannot be refunded.",
+    "buyConfirmAccept": "Buy",
+    "buyConfirmCancel": "Cancel"
   },
   "cardDuel": {
     "title": "Card Duel",
@@ -4668,7 +4676,11 @@ export const en_CA: EnTranslations = {
       "buyAria": "Buy {item} for {marks} Delve Marks",
       "reqHeroic": "Requires a Heroic clear",
       "reqClears": "Requires {count} clears",
-      "empty": "Nothing in stock."
+      "empty": "Nothing in stock.",
+      "buyConfirmTitle": "Confirm Purchase",
+      "buyConfirmBody": "Buy {item} for {marks} Delve Marks? Marks purchases cannot be refunded.",
+      "buyConfirmAccept": "Buy",
+      "buyConfirmCancel": "Cancel"
     },
     "tracker": {
       "title": "Delve",

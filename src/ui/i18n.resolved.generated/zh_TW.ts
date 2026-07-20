@@ -317,7 +317,11 @@ export const zh_TW: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "在屍體旁復活",
       "resurrectAtHealer": "靈魂醫者（復活虛弱）",
-      "spiritHealerAlive": "靈魂醫者只看護逝者。你仍是生者。"
+      "spiritHealerAlive": "靈魂醫者只看護逝者。你仍是生者。",
+      "healerConfirmTitle": "接受復活虛弱？",
+      "healerConfirmBody": "靈魂醫者可以就地復活你，但復活虛弱會使你的全部屬性降低75%，高等級時最長持續10分鐘。讓靈魂返回屍體復活則沒有任何懲罰。",
+      "healerConfirmAccept": "復活",
+      "healerConfirmCancel": "取消"
     },
     "fct": {
       "absorbed": "吸收 {amount}",
@@ -4615,7 +4619,11 @@ export const zh_TW: EnTranslations = {
   },
   "heroicShop": {
     "balance": "英雄徽記: {count}",
-    "buyAria": "用{marks}枚英雄徽記購買{item}"
+    "buyAria": "用{marks}枚英雄徽記購買{item}",
+    "buyConfirmTitle": "確認購買",
+    "buyConfirmBody": "用{marks}枚英雄徽記購買{item}？徽記購買後無法退款。",
+    "buyConfirmAccept": "購買",
+    "buyConfirmCancel": "取消"
   },
   "cardDuel": {
     "title": "紙牌對決",
@@ -4668,7 +4676,11 @@ export const zh_TW: EnTranslations = {
       "buyAria": "用 {marks} 枚秘探印記購買 {item}",
       "reqHeroic": "需要英雄難度通關",
       "reqClears": "需要通關 {count} 次",
-      "empty": "暫無存貨。"
+      "empty": "暫無存貨。",
+      "buyConfirmTitle": "確認購買",
+      "buyConfirmBody": "用 {marks} 枚秘探印記購買 {item}？印記購買後無法退款。",
+      "buyConfirmAccept": "購買",
+      "buyConfirmCancel": "取消"
     },
     "tracker": {
       "title": "秘探",

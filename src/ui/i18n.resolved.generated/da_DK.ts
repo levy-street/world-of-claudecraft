@@ -317,7 +317,11 @@ export const da_DK: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Genopstå ved liget",
       "resurrectAtHealer": "Den Blege Vogter (Vogterens Klokke)",
-      "spiritHealerAlive": "Den Blege Vogter våger over de døde. Du er stadig blandt de levende."
+      "spiritHealerAlive": "Den Blege Vogter våger over de døde. Du er stadig blandt de levende.",
+      "healerConfirmTitle": "Accept the Keeper's Toll?",
+      "healerConfirmBody": "The Pale Keeper will revive you here, but the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to your corpse revives you with no penalty.",
+      "healerConfirmAccept": "Revive Me",
+      "healerConfirmCancel": "Cancel"
     },
     "fct": {
       "absorbed": "{amount} absorberet",
@@ -4615,7 +4619,11 @@ export const da_DK: EnTranslations = {
   },
   "heroicShop": {
     "balance": "Heroiske Mærker: {count}",
-    "buyAria": "Køb {item} for {marks} Heroiske Mærker"
+    "buyAria": "Køb {item} for {marks} Heroiske Mærker",
+    "buyConfirmTitle": "Confirm Purchase",
+    "buyConfirmBody": "Buy {item} for {marks} Heroic Marks? Marks purchases cannot be refunded.",
+    "buyConfirmAccept": "Buy",
+    "buyConfirmCancel": "Cancel"
   },
   "cardDuel": {
     "title": "Kortduel",
@@ -4668,7 +4676,11 @@ export const da_DK: EnTranslations = {
       "buyAria": "Køb {item} for {marks} Delve-Mærker",
       "reqHeroic": "Kræver en Heroisk gennemførelse",
       "reqClears": "Kræver {count} gennemførelser",
-      "empty": "Intet på lager."
+      "empty": "Intet på lager.",
+      "buyConfirmTitle": "Confirm Purchase",
+      "buyConfirmBody": "Buy {item} for {marks} Delve Marks? Marks purchases cannot be refunded.",
+      "buyConfirmAccept": "Buy",
+      "buyConfirmCancel": "Cancel"
     },
     "tracker": {
       "title": "Delve",

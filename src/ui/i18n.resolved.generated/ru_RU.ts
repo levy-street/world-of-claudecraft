@@ -317,7 +317,11 @@ export const ru_RU: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Воскреснуть у тела",
       "resurrectAtHealer": "Целитель душ (болезнь воскрешения)",
-      "spiritHealerAlive": "Целитель душ оберегает мёртвых. Вы всё ещё среди живых."
+      "spiritHealerAlive": "Целитель душ оберегает мёртвых. Вы всё ещё среди живых.",
+      "healerConfirmTitle": "Принять болезнь воскрешения?",
+      "healerConfirmBody": "Целитель душ воскресит вас на месте, но болезнь воскрешения снизит все ваши характеристики на 75%, на высоких уровнях до 10 минут. Если дух дойдёт до вашего тела, воскрешение будет без штрафа.",
+      "healerConfirmAccept": "Воскресить",
+      "healerConfirmCancel": "Отмена"
     },
     "fct": {
       "absorbed": "Поглощено {amount}",
@@ -4615,7 +4619,11 @@ export const ru_RU: EnTranslations = {
   },
   "heroicShop": {
     "balance": "Героические знаки: {count}",
-    "buyAria": "Купить {item} за {marks} героических знаков"
+    "buyAria": "Купить {item} за {marks} героических знаков",
+    "buyConfirmTitle": "Подтвердить покупку",
+    "buyConfirmBody": "Купить {item} за {marks} героических знаков? Покупки за знаки не подлежат возврату.",
+    "buyConfirmAccept": "Купить",
+    "buyConfirmCancel": "Отмена"
   },
   "cardDuel": {
     "title": "Карточная дуэль",
@@ -4668,7 +4676,11 @@ export const ru_RU: EnTranslations = {
       "buyAria": "Купить {item} за {marks} Меток Вылазок",
       "reqHeroic": "Требуется героическое прохождение",
       "reqClears": "Требуется прохождений: {count}",
-      "empty": "Нет товаров в наличии."
+      "empty": "Нет товаров в наличии.",
+      "buyConfirmTitle": "Подтвердить покупку",
+      "buyConfirmBody": "Купить {item} за {marks} Меток Вылазок? Покупки за метки не подлежат возврату.",
+      "buyConfirmAccept": "Купить",
+      "buyConfirmCancel": "Отмена"
     },
     "tracker": {
       "title": "Вылазка",

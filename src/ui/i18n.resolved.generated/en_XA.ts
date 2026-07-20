@@ -317,7 +317,11 @@ export const en_XA: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "[Ŕéšúŕŕéçţ áţ Çóŕþšé]",
       "resurrectAtHealer": "[Ţĥé Þáļé Ķééþéŕ (Ķééþéŕ'š Ţóļļ)]",
-      "spiritHealerAlive": "[Ţĥé Þáļé Ķééþéŕ ŵáţçĥéš óʋéŕ ţĥé ðéáð. Ýóú áŕé šţíļļ áɱóñĝ ţĥé ļíʋíñĝ.]"
+      "spiritHealerAlive": "[Ţĥé Þáļé Ķééþéŕ ŵáţçĥéš óʋéŕ ţĥé ðéáð. Ýóú áŕé šţíļļ áɱóñĝ ţĥé ļíʋíñĝ.]",
+      "healerConfirmTitle": "[Áççéþţ ţĥé Ķééþéŕ'š Ţóļļ?]",
+      "healerConfirmBody": "[Ţĥé Þáļé Ķééþéŕ ŵíļļ ŕéʋíʋé ýóú ĥéŕé, ƀúţ ţĥé Ķééþéŕ'š Ţóļļ ŕéðúçéš áļļ óƒ ýóúŕ áţţŕíƀúţéš ƀý 75%, ƒóŕ úþ ţó 10 ɱíñúţéš áţ ĥíĝĥéŕ ļéʋéļš. Ŵáļķíñĝ ýóúŕ šþíŕíţ ƀáçķ ţó ýóúŕ çóŕþšé ŕéʋíʋéš ýóú ŵíţĥ ñó þéñáļţý.]",
+      "healerConfirmAccept": "[Ŕéʋíʋé Ɱé]",
+      "healerConfirmCancel": "[Çáñçéļ]"
     },
     "fct": {
       "absorbed": "[Áƀšóŕƀéð {amount}]",
@@ -4615,7 +4619,11 @@ export const en_XA: EnTranslations = {
   },
   "heroicShop": {
     "balance": "[Ĥéŕóíç Ɱáŕķš: {count}]",
-    "buyAria": "[Ɓúý {item} ƒóŕ {marks} Ĥéŕóíç Ɱáŕķš]"
+    "buyAria": "[Ɓúý {item} ƒóŕ {marks} Ĥéŕóíç Ɱáŕķš]",
+    "buyConfirmTitle": "[Çóñƒíŕɱ Þúŕçĥášé]",
+    "buyConfirmBody": "[Ɓúý {item} ƒóŕ {marks} Ĥéŕóíç Ɱáŕķš? Ɱáŕķš þúŕçĥášéš çáññóţ ƀé ŕéƒúñðéð.]",
+    "buyConfirmAccept": "[Ɓúý]",
+    "buyConfirmCancel": "[Çáñçéļ]"
   },
   "cardDuel": {
     "title": "[Çáŕð Ðúéļ]",
@@ -4668,7 +4676,11 @@ export const en_XA: EnTranslations = {
       "buyAria": "[Ɓúý {item} ƒóŕ {marks} Ðéļʋé Ɱáŕķš]",
       "reqHeroic": "[Ŕéɋúíŕéš á Ĥéŕóíç çļéáŕ]",
       "reqClears": "[Ŕéɋúíŕéš {count} çļéáŕš]",
-      "empty": "[Ñóţĥíñĝ íñ šţóçķ.]"
+      "empty": "[Ñóţĥíñĝ íñ šţóçķ.]",
+      "buyConfirmTitle": "[Çóñƒíŕɱ Þúŕçĥášé]",
+      "buyConfirmBody": "[Ɓúý {item} ƒóŕ {marks} Ðéļʋé Ɱáŕķš? Ɱáŕķš þúŕçĥášéš çáññóţ ƀé ŕéƒúñðéð.]",
+      "buyConfirmAccept": "[Ɓúý]",
+      "buyConfirmCancel": "[Çáñçéļ]"
     },
     "tracker": {
       "title": "[Ðéļʋé]",

@@ -317,7 +317,11 @@ export const id_ID: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Bangkit di Jasad",
       "resurrectAtHealer": "Sang Penjaga Pucat (Upeti Sang Penjaga)",
-      "spiritHealerAlive": "Sang Penjaga Pucat mengawasi para mati. Kamu masih termasuk yang hidup."
+      "spiritHealerAlive": "Sang Penjaga Pucat mengawasi para mati. Kamu masih termasuk yang hidup.",
+      "healerConfirmTitle": "Accept the Keeper's Toll?",
+      "healerConfirmBody": "The Pale Keeper will revive you here, but the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to your corpse revives you with no penalty.",
+      "healerConfirmAccept": "Revive Me",
+      "healerConfirmCancel": "Cancel"
     },
     "fct": {
       "absorbed": "{amount} diserap",
@@ -4615,7 +4619,11 @@ export const id_ID: EnTranslations = {
   },
   "heroicShop": {
     "balance": "Tanda Heroik: {count}",
-    "buyAria": "Beli {item} seharga {marks} Tanda Heroik"
+    "buyAria": "Beli {item} seharga {marks} Tanda Heroik",
+    "buyConfirmTitle": "Confirm Purchase",
+    "buyConfirmBody": "Buy {item} for {marks} Heroic Marks? Marks purchases cannot be refunded.",
+    "buyConfirmAccept": "Buy",
+    "buyConfirmCancel": "Cancel"
   },
   "cardDuel": {
     "title": "Duel Kartu",
@@ -4668,7 +4676,11 @@ export const id_ID: EnTranslations = {
       "buyAria": "Beli {item} seharga {marks} Tanda Delve",
       "reqHeroic": "Membutuhkan penyelesaian Heroik",
       "reqClears": "Membutuhkan {count} kali penyelesaian",
-      "empty": "Tidak ada stok."
+      "empty": "Tidak ada stok.",
+      "buyConfirmTitle": "Confirm Purchase",
+      "buyConfirmBody": "Buy {item} for {marks} Delve Marks? Marks purchases cannot be refunded.",
+      "buyConfirmAccept": "Buy",
+      "buyConfirmCancel": "Cancel"
     },
     "tracker": {
       "title": "Delve",

@@ -317,7 +317,11 @@ export const it_IT: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Risorgi al cadavere",
       "resurrectAtHealer": "Il Custode Pallido (Mal di resurrezione)",
-      "spiritHealerAlive": "Il Custode Pallido veglia sui morti. Tu sei ancora tra i vivi."
+      "spiritHealerAlive": "Il Custode Pallido veglia sui morti. Tu sei ancora tra i vivi.",
+      "healerConfirmTitle": "Accept the Keeper's Toll?",
+      "healerConfirmBody": "The Pale Keeper will revive you here, but the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to your corpse revives you with no penalty.",
+      "healerConfirmAccept": "Revive Me",
+      "healerConfirmCancel": "Cancel"
     },
     "fct": {
       "absorbed": "Assorbito {amount}",
@@ -4615,7 +4619,11 @@ export const it_IT: EnTranslations = {
   },
   "heroicShop": {
     "balance": "Marchi Eroici: {count}",
-    "buyAria": "Compra {item} per {marks} Marchi Eroici"
+    "buyAria": "Compra {item} per {marks} Marchi Eroici",
+    "buyConfirmTitle": "Confirm Purchase",
+    "buyConfirmBody": "Buy {item} for {marks} Heroic Marks? Marks purchases cannot be refunded.",
+    "buyConfirmAccept": "Buy",
+    "buyConfirmCancel": "Cancel"
   },
   "cardDuel": {
     "title": "Duello di Carte",
@@ -4668,7 +4676,11 @@ export const it_IT: EnTranslations = {
       "buyAria": "Compra {item} per {marks} Sigilli d'Incursione",
       "reqHeroic": "Richiede un'incursione eroica completata",
       "reqClears": "Richiede {count} incursioni completate",
-      "empty": "Niente in magazzino."
+      "empty": "Niente in magazzino.",
+      "buyConfirmTitle": "Confirm Purchase",
+      "buyConfirmBody": "Buy {item} for {marks} Delve Marks? Marks purchases cannot be refunded.",
+      "buyConfirmAccept": "Buy",
+      "buyConfirmCancel": "Cancel"
     },
     "tracker": {
       "title": "Incursione",

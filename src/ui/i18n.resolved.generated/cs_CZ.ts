@@ -317,7 +317,11 @@ export const cs_CZ: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Vzkřísit u mrtvoly",
       "resurrectAtHealer": "Bledý strážce (Strážcovo mýto)",
-      "spiritHealerAlive": "Bledý strážce dohlíží na mrtvé. Ty jsi stále mezi živými."
+      "spiritHealerAlive": "Bledý strážce dohlíží na mrtvé. Ty jsi stále mezi živými.",
+      "healerConfirmTitle": "Accept the Keeper's Toll?",
+      "healerConfirmBody": "The Pale Keeper will revive you here, but the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to your corpse revives you with no penalty.",
+      "healerConfirmAccept": "Revive Me",
+      "healerConfirmCancel": "Cancel"
     },
     "fct": {
       "absorbed": "Pohlceno {amount}",
@@ -4615,7 +4619,11 @@ export const cs_CZ: EnTranslations = {
   },
   "heroicShop": {
     "balance": "Hrdinské značky: {count}",
-    "buyAria": "Koupit {item} za {marks} hrdinských značek"
+    "buyAria": "Koupit {item} za {marks} hrdinských značek",
+    "buyConfirmTitle": "Confirm Purchase",
+    "buyConfirmBody": "Buy {item} for {marks} Heroic Marks? Marks purchases cannot be refunded.",
+    "buyConfirmAccept": "Buy",
+    "buyConfirmCancel": "Cancel"
   },
   "cardDuel": {
     "title": "Karetní souboj",
@@ -4668,7 +4676,11 @@ export const cs_CZ: EnTranslations = {
       "buyAria": "Koupit {item} za {marks} známek výprav",
       "reqHeroic": "Vyžaduje hrdinské dokončení",
       "reqClears": "Vyžaduje {count} dokončení",
-      "empty": "Nic není skladem."
+      "empty": "Nic není skladem.",
+      "buyConfirmTitle": "Confirm Purchase",
+      "buyConfirmBody": "Buy {item} for {marks} Delve Marks? Marks purchases cannot be refunded.",
+      "buyConfirmAccept": "Buy",
+      "buyConfirmCancel": "Cancel"
     },
     "tracker": {
       "title": "Výprava",

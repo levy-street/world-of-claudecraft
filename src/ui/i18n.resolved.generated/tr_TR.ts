@@ -317,7 +317,11 @@ export const tr_TR: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Cesedinin Başında Diril",
       "resurrectAtHealer": "Solgun Bekçi (Bekçinin Bedeli)",
-      "spiritHealerAlive": "Solgun Bekçi ölüleri gözetir. Sen hâlâ yaşayanlar arasındasın."
+      "spiritHealerAlive": "Solgun Bekçi ölüleri gözetir. Sen hâlâ yaşayanlar arasındasın.",
+      "healerConfirmTitle": "Accept the Keeper's Toll?",
+      "healerConfirmBody": "The Pale Keeper will revive you here, but the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to your corpse revives you with no penalty.",
+      "healerConfirmAccept": "Revive Me",
+      "healerConfirmCancel": "Cancel"
     },
     "fct": {
       "absorbed": "{amount} soğuruldu",
@@ -4615,7 +4619,11 @@ export const tr_TR: EnTranslations = {
   },
   "heroicShop": {
     "balance": "Kahramanca Nişanlar: {count}",
-    "buyAria": "{item} ürününü {marks} Kahramanca Nişan karşılığında satın al"
+    "buyAria": "{item} ürününü {marks} Kahramanca Nişan karşılığında satın al",
+    "buyConfirmTitle": "Confirm Purchase",
+    "buyConfirmBody": "Buy {item} for {marks} Heroic Marks? Marks purchases cannot be refunded.",
+    "buyConfirmAccept": "Buy",
+    "buyConfirmCancel": "Cancel"
   },
   "cardDuel": {
     "title": "Kart Düellosu",
@@ -4668,7 +4676,11 @@ export const tr_TR: EnTranslations = {
       "buyAria": "{item} ürününü {marks} Mağara Nişanı karşılığında satın al",
       "reqHeroic": "Bir Kahramanca temizleme gerektirir",
       "reqClears": "{count} temizleme gerektirir",
-      "empty": "Stokta bir şey yok."
+      "empty": "Stokta bir şey yok.",
+      "buyConfirmTitle": "Confirm Purchase",
+      "buyConfirmBody": "Buy {item} for {marks} Delve Marks? Marks purchases cannot be refunded.",
+      "buyConfirmAccept": "Buy",
+      "buyConfirmCancel": "Cancel"
     },
     "tracker": {
       "title": "Mağara",

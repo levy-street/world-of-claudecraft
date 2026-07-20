@@ -54,6 +54,18 @@ function makeHarness(validNpc = true) {
   const closeOtherWindows = vi.fn();
   const hideTooltip = vi.fn();
   const preloadInterior = vi.fn();
+  const confirmations: {
+    title: string;
+    body: string;
+    ok: string;
+    cancel: string;
+    onOk: () => void;
+  }[] = [];
+  const confirmDialog = vi.fn(
+    (title: string, body: string, ok: string, cancel: string, onOk: () => void) => {
+      confirmations.push({ title, body, ok, cancel, onOk });
+    },
+  );
   const controller = new DelveBoardController({
     element: panel,
     world: () => world,
@@ -65,6 +77,7 @@ function makeHarness(validNpc = true) {
     itemTooltip: () => '',
     delveName: () => 'The Test Reliquary',
     preloadInterior,
+    confirmDialog,
   });
   return {
     controller,
@@ -75,6 +88,8 @@ function makeHarness(validNpc = true) {
     delveBuyShopItem,
     delveShopOffers,
     preloadInterior,
+    confirmDialog,
+    confirmations,
     focusFirst,
     release,
     openFocusTrap,
@@ -139,7 +154,35 @@ describe('DelveBoardController', () => {
     test.panel.querySelector<HTMLButtonElement>('[data-board-tab="shop"]')?.click();
     expect(test.delveShopOffers).toHaveBeenCalledWith('collapsed_reliquary');
     test.panel.querySelector<HTMLButtonElement>(`[data-buy="${shopItemId}"]`)?.click();
-    expect(test.delveBuyShopItem).toHaveBeenCalledWith('collapsed_reliquary', shopItemId);
+
+    // The buy tap only opens the confirm dialog; the authoritative command
+    // fires exactly once, from the dialog's OK.
+    expect(test.delveBuyShopItem).not.toHaveBeenCalled();
+    expect(test.confirmations).toHaveLength(1);
+    test.confirmations[0].onOk();
+    expect(test.delveBuyShopItem).toHaveBeenCalledExactlyOnceWith(
+      'collapsed_reliquary',
+      shopItemId,
+    );
+  });
+
+  it('confirms a marks purchase with the item name and cost, and cancel sends nothing', () => {
+    const test = makeHarness();
+    test.controller.open(7);
+    test.panel.querySelector<HTMLButtonElement>('[data-board-tab="shop"]')?.click();
+
+    test.panel.querySelector<HTMLButtonElement>(`[data-buy="${shopItemId}"]`)?.click();
+
+    expect(test.confirmations).toHaveLength(1);
+    const confirm = test.confirmations[0];
+    expect(confirm.title).toBe('Confirm Purchase');
+    expect(confirm.body).toContain(ITEMS[shopItemId].name);
+    expect(confirm.body).toContain('2');
+    expect(confirm.body).toContain('Delve Marks');
+    expect(confirm.ok).toBe('Buy');
+    expect(confirm.cancel).toBe('Cancel');
+    // Dismissing the dialog (cancel/Escape never runs onOk) sends no command.
+    expect(test.delveBuyShopItem).not.toHaveBeenCalled();
   });
 
   it('closes and restores focus if the authoritative NPC disappears', () => {

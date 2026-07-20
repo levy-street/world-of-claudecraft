@@ -61,6 +61,7 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
     openQuestDialog: (id: number) => calls.push(`quest:${id}`),
     openDelveBoard: (id: number) => calls.push(`board:${id}`),
     showError: (text: string) => calls.push(`error:${text}`),
+    requestSpiritHealerResurrect: () => calls.push('requestResurrect'),
   };
   return { world, hud, nodes, calls, player };
 }
@@ -214,7 +215,9 @@ describe('tryNearbyInteraction', () => {
     ghost.player.dead = true;
     ghost.player.ghost = true;
     expect(interact(ghost)).toBe(true);
-    expect(ghost.calls).toEqual(['resurrect']);
+    // The interact key opens the HUD confirm gate; the resurrect command
+    // itself is only sent from the dialog's OK, never directly from here.
+    expect(ghost.calls).toEqual(['requestResurrect']);
 
     const corpse = entity({
       id: 3,

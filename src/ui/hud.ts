@@ -1428,6 +1428,8 @@ export class Hud {
       itemTooltip: (item, instance?: ItemInstancePayload) => this.itemTooltip(item, true, instance),
       delveName: delveDisplayName,
       preloadInterior: (event) => this.renderer.handleEvent(event),
+      confirmDialog: (title, body, okText, cancelText, onOk) =>
+        this.confirmDialog(title, body, okText, cancelText, onOk),
     });
     this.riteController = new RiteController({
       panel: $('#delve-rite-panel'),
@@ -1700,7 +1702,7 @@ export class Hud {
       this.sim.releaseSpirit();
     });
     bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());
-    bindTouchTap(this.resurrectHealerBtnEl, () => this.onResurrectAtSpiritHealer?.());
+    bindTouchTap(this.resurrectHealerBtnEl, () => this.requestSpiritHealerResurrect());
     document.addEventListener('pointerdown', (ev) => {
       const target = ev.target as Node | null;
       if (!target) return;
@@ -10774,7 +10776,7 @@ export class Hud {
       {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
-        onBuy: (itemId) => this.sim.buyHeroicVendorItem(itemId),
+        onBuy: (itemId) => this.requestHeroicVendorPurchase(itemId),
         onClose: () => this.closeHeroicVendor(),
       },
     );
@@ -11452,6 +11454,42 @@ export class Hud {
         this.sim.prestige();
         audio.click();
       },
+    );
+  }
+
+  // The Pale Keeper revive is irreversible and applies The Keeper's Toll (all
+  // attributes -75%, level-scaled up to 10 minutes), so it confirms first; the
+  // penalty-free corpse run stays one tap. OK sends the exact pre-existing
+  // command; cancel/Escape sends nothing. Public because every entry point to
+  // the revive routes through this one gate: the ghost-prompt button, the
+  // world-click on the Pale Keeper (game/interactions.ts), and the interact
+  // key (game/nearby_interaction.ts).
+  requestSpiritHealerResurrect(): void {
+    this.confirmDialog(
+      t('hudChrome.death.healerConfirmTitle'),
+      t('hudChrome.death.healerConfirmBody'),
+      t('hudChrome.death.healerConfirmAccept'),
+      t('hudChrome.death.healerConfirmCancel'),
+      () => this.onResurrectAtSpiritHealer?.(),
+    );
+  }
+
+  // Heroic Quartermaster purchases debit Heroic Marks with no buyback recorded
+  // (gold vendors are the only buyback source), so a mis-tap is unrefundable:
+  // confirm before sending the exact pre-existing buy command.
+  private requestHeroicVendorPurchase(itemId: string): void {
+    const offer = HEROIC_VENDOR_STOCK.find((candidate) => candidate.itemId === itemId);
+    const item = ITEMS[itemId];
+    if (!offer || !item) return;
+    this.confirmDialog(
+      t('heroicShop.buyConfirmTitle'),
+      t('heroicShop.buyConfirmBody', {
+        item: itemDisplayName(item),
+        marks: formatNumber(offer.marks, { maximumFractionDigits: 0 }),
+      }),
+      t('heroicShop.buyConfirmAccept'),
+      t('heroicShop.buyConfirmCancel'),
+      () => this.sim.buyHeroicVendorItem(itemId),
     );
   }
 
