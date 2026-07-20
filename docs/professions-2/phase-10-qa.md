@@ -169,3 +169,12 @@ original premises:
   consume at least one non-rare-band reagent.
 - No new deeds records; wiki:content regenerates with zero diff (the
   generator does not enumerate recipes yet; guide rewrite is Phase 15).
+- Phase 10 QA amendment (2026-07-19, mirrored in
+  phase-10-recipe-ladders.md per the amend-the-twin rule): harvestCorpse
+  grants ALL plain yields before any signed instance (signed-family
+  instances next, specimens last as guarded extras; rarity draws stay in
+  the first loop in yield order, draw sequence and parity goldens
+  byte-identical). The single-pass shape let a jackpot on a
+  two-specimen-family corpse steal the slot reserved for a later
+  family's plain stack and overflow the bag (17 of 16 at seed 1); fixed
+  test-first, pinned in tests/corpse_harvest_sim.test.ts.

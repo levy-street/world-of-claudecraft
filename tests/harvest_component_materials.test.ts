@@ -6,7 +6,10 @@
 // and the quest items remain obtainable ONLY through their quest-gated kill
 // loot (rollLoot's questId branch).
 import { describe, expect, it } from 'vitest';
-import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
+import {
+  HARVEST_COMPONENT_ITEMS,
+  HARVEST_COMPONENT_SPECIMENS,
+} from '../src/sim/content/professions';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import type { PlayerMeta } from '../src/sim/sim';
@@ -79,6 +82,18 @@ describe('the Phase 10 harvest map (pinned)', () => {
       venomSac: 'venom_gland',
       meat: 'game_meat',
       cloth: 'homespun_cloth',
+    });
+  });
+
+  it('the specimen map carries exactly the four jackpot families (fang and cloth have none)', () => {
+    // Literal sibling pin: a dropped or mistargeted specimen row would break
+    // a family's jackpot grant while every behavioral suite stays green on
+    // the remaining families.
+    expect({ ...HARVEST_COMPONENT_SPECIMENS }).toEqual({
+      hide: 'pristine_hide',
+      silk: 'pristine_silk',
+      venomSac: 'pristine_venom_gland',
+      meat: 'prime_cut',
     });
   });
 });

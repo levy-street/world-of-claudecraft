@@ -9,7 +9,6 @@ import { describe, expect, it } from 'vitest';
 import { STATIONS } from '../src/sim/content/professions';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
-import { TIER_SKILL_STEP, tierForSkill } from '../src/sim/professions/wheel';
 import {
   buildTrainView,
   isRecipeKnownForViewer,
@@ -147,11 +146,14 @@ describe('buildTrainView', () => {
       'recipe_thoriumscale_leggings',
       'recipe_whetted_iron_dirk',
     ]);
+    // LITERAL requirement values per rung (never the production formula: an
+    // expectation composed of tierForSkill * TIER_SKILL_STEP moves in
+    // lockstep with the code and can never red on a wrong requirement).
+    const REQUIRED_SKILL_BY_RUNG: Record<number, number> = { 25: 25, 50: 50 };
     for (const row of locked) {
-      expect(row.requirement).toEqual({
-        craft: row.professionId,
-        skill: tierForSkill(row.skillReq) * TIER_SKILL_STEP,
-      });
+      const skill = REQUIRED_SKILL_BY_RUNG[row.skillReq];
+      expect(skill, `${row.recipeId} rung ${row.skillReq}`).toBeDefined();
+      expect(row.requirement).toEqual({ craft: row.professionId, skill });
     }
     // Known rows never carry a requirement.
     for (const row of view.rows.filter((entry) => entry.state === 'known')) {

@@ -822,3 +822,36 @@ recipeForResultItem reverse-lookup gap for non-common tables
 (pre-existing), a single shared battle-elixir aura slot (maintainer
 call; per-item power stays capped at the bear's 12), and the legacy
 gold-positive burn-down (Phase 15).
+
+Phase 10 QA (2026-07-19): PASS with fixes, zero blocking. Verified off
+the merge af7ac3d8b (QA diff 720efc89f..ad2bbbe92; the merge's first
+parent 8564d1ee2 was concurrent release movement with zero file
+overlap, verified). Method: validation matrix green at the untouched
+tip first (19 suites incl. the five item-content convention suites,
+727 tests, wiki:content zero diff), four live played beats (train with
+the full deny ladder and exact fees, station-bound craft end to end,
+rare+ specimen dual grant with zero quest-item leakage across 400
+seeds, mid-objective q_boars save-compat with a working turn-in, and
+the materialTierBonus 10000-craft odds decisively above the no-bonus
+model), economy-invariant mutation checks (both arms bite), then a
+25-agent adversarial-verify Workflow (3 packet audits + the 4
+dispatch-matrix reviewers, every finding retried by an independent
+skeptic: 14 confirmed, 4 dissolved). The one real sim defect: a corpse
+with two specimen families could overflow the bag (the jackpot stole a
+later family's reserved plain slot); fixed test-first by granting all
+plain yields before any signed instance, draw order untouched. Also
+landed: the ladder execution suite (all 54 recipes craft end to end,
+specimen consumers, real train rungs, elixir def pins + live use path,
+silkspun_satchel capacity), the HARVEST_COMPONENT_SPECIMENS literal
+pin plus all-family behavior arms, the train_view locked-row literal
+re-pin (formula tautology), item_icons BAG_IDS sixth bag, the stale
+TOOL_RECIPE_STUBS sweep, and an itemFallback potion/elixir flask
+branch (the eleven new consumables rendered junk-trinket icons).
+Deferred with reasons (drift notes in state.md): wolf_fang consumer
+(the one demand-rule outlier, Phase 15), recipeForResultItem widening
+(a live gameplay switch for the dormant battlefield-XP trickle,
+maintainer call), shared battle-elixir exclusivity (maintainer call,
+re-confirmed), cooking rungs are sit-heal food only (maintainer
+glance), and the retro CI reds on the release push (Release gate
+locale shards + version gate) are the branch-wide mid-cycle state,
+identical on the pre-phase push, with the Browser job green.

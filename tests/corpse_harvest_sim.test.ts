@@ -327,6 +327,65 @@ describe('signed Pristine specimens (#1145, Phase 10)', () => {
     expect(sim.countItem('wolf_fang', a)).toBe(1);
   });
 
+  it('every other specimen family grants its own jackpot beside the plain component (seed 5)', () => {
+    // The hide row is exercised above; this sweeps the remaining three
+    // specimen rows behaviorally (silk and venomSac via webwood_spider, meat
+    // via wild_boar), so a mistargeted HARVEST_COMPONENT_SPECIMENS row cannot
+    // hide behind hide-only coverage. Seed 5's rarity roll clears the
+    // signable floor for a single focused component regardless of family
+    // (the roll's draw position is identical).
+    const families: { templateId: string; focus: string; plain: string; specimen: string }[] = [
+      {
+        templateId: 'webwood_spider',
+        focus: 'silk',
+        plain: 'spider_silk',
+        specimen: 'pristine_silk',
+      },
+      {
+        templateId: 'webwood_spider',
+        focus: 'venomSac',
+        plain: 'venom_gland',
+        specimen: 'pristine_venom_gland',
+      },
+      { templateId: 'wild_boar', focus: 'meat', plain: 'game_meat', specimen: 'prime_cut' },
+    ];
+    for (const f of families) {
+      const { sim, internals, a } = setup(5);
+      const template = MOBS[f.templateId];
+      const corpse = createMob(7776, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+      corpse.dead = true;
+      corpse.aiState = 'dead';
+      corpse.corpseTimer = 9999;
+      corpse.respawnTimer = 9999;
+      internals.entities.set(corpse.id, corpse);
+      sim.harvestCorpse(corpse.id, [f.focus], a);
+      const meta = internals.players.get(a)!;
+      const plain = meta.inventory.find((s) => s.itemId === f.plain);
+      expect(plain, `${f.focus} plain`).toBeDefined();
+      expect(plain?.instance, `${f.focus} plain stays unsigned`).toBeUndefined();
+      const specimen = meta.inventory.find((s) => s.itemId === f.specimen);
+      expect(specimen?.instance?.signer, `${f.focus} jackpot`).toBe('Alpha');
+      expect(sim.countItem(f.specimen, a)).toBe(1);
+    }
+  });
+
+  it('the cloth family (no specimen) grants the signed component at rare-or-better (seed 5)', () => {
+    const { sim, internals, a } = setup(5);
+    const template = MOBS.vale_bandit;
+    const corpse = createMob(7775, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    corpse.dead = true;
+    corpse.aiState = 'dead';
+    corpse.corpseTimer = 9999;
+    corpse.respawnTimer = 9999;
+    internals.entities.set(corpse.id, corpse);
+    sim.harvestCorpse(corpse.id, ['cloth'], a);
+    const meta = internals.players.get(a)!;
+    const slot = meta.inventory.find((s) => s.itemId === 'homespun_cloth');
+    expect(slot).toBeDefined();
+    expect(slot?.instance?.signer).toBe('Alpha');
+    expect(sim.countItem('homespun_cloth', a)).toBe(1);
+  });
+
   it('a slot-full signed-family harvest falls back to the plain stack, never over capacity (seed 5)', () => {
     // The pre-gate reserves plain-stack room only, so a partial stack lets it
     // pass while a signed instance would still need a fresh slot. The rare+
@@ -365,6 +424,64 @@ describe('signed Pristine specimens (#1145, Phase 10)', () => {
     expect(m.inventory.length).toBeLessThanOrEqual(cap);
     expect(m.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(false);
     expect(sim.countItem('rough_hide', a)).toBeGreaterThan(1);
+  });
+});
+
+// Phase 10 QA: a mob carrying TWO specimen families (wild_boar: hide -> and
+// meat -> are both in HARVEST_COMPONENT_SPECIMENS, tusk maps to nothing) is
+// where the grant ORDER matters: the pre-gate reserves room for the plain
+// component stacks only, so a signed jackpot granted mid-loop could consume
+// the slot reserved for a LATER family's plain stack and push the uncapped
+// plain grant past capacity. Plain yields must all land before any signed
+// instance; the jackpot is the extra that truncates, never the plain yield.
+describe('two-specimen-family harvest capacity contract (Phase 10 QA)', () => {
+  function addBoarCorpse(internals: SimInternals, id = 8888) {
+    const template = MOBS.wild_boar;
+    expect(template.componentTags).toEqual(['hide', 'tusk', 'meat']);
+    const boar = createMob(id, template, template.maxLevel, { x: 0, y: 0, z: 0 });
+    boar.dead = true;
+    boar.aiState = 'dead';
+    boar.corpseTimer = 9999;
+    boar.respawnTimer = 9999;
+    internals.entities.set(boar.id, boar);
+    return boar;
+  }
+
+  it('with a genuinely spare slot the jackpot still lands beside both plain yields (seed 1)', () => {
+    // Seed 1 pre-verified: the hide rarity roll clears the signable floor with
+    // this exact draw sequence (the rolls are inventory-independent, so this
+    // arm also proves the two-free-slot arm below EARNED its jackpot).
+    const { sim, internals, a } = setup(1);
+    const boar = addBoarCorpse(internals);
+    fillBags(sim, internals, a);
+    const m = internals.players.get(a)!;
+    const cap = bagCapacity(m.bags);
+    m.inventory.length = cap - 3; // three free slots, no hide/meat stacks
+    sim.harvestCorpse(boar.id, undefined, a);
+    expect(boar.harvestClaimedBy).toBe(a);
+    expect(m.inventory.length).toBeLessThanOrEqual(cap);
+    expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('game_meat', a)).toBeGreaterThanOrEqual(1);
+    const specimen = m.inventory.find((s) => s.itemId === 'pristine_hide');
+    expect(specimen?.instance?.signer).toBe('Alpha');
+  });
+
+  it('with exactly the reserved free slots the jackpot truncates, never the plain yield (seed 1)', () => {
+    // Two free slots = exactly the pre-gate's reservation for the two plain
+    // stacks. The unfixed code granted pristine_hide into the slot reserved
+    // for game_meat and spilled the meat stack past capacity (17 of 16).
+    const { sim, internals, a } = setup(1);
+    const boar = addBoarCorpse(internals);
+    fillBags(sim, internals, a);
+    const m = internals.players.get(a)!;
+    const cap = bagCapacity(m.bags);
+    m.inventory.length = cap - 2; // exactly the two reserved plain-stack slots
+    sim.harvestCorpse(boar.id, undefined, a);
+    expect(boar.harvestClaimedBy).toBe(a);
+    expect(m.inventory.length).toBeLessThanOrEqual(cap);
+    expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
+    expect(sim.countItem('game_meat', a)).toBeGreaterThanOrEqual(1);
+    expect(m.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(false);
   });
 });
 

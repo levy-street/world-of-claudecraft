@@ -807,6 +807,48 @@ tables, i18n key namespaces, files created)
   as the Phase 9 premium-reagent note); the shipped-items golden re-mint
   also absorbed 24 ids earlier phases had shipped without re-minting
   (append-only).
+  Phase 10 QA (2026-07-19) landed on top: harvestCorpse now grants ALL
+  plain yields before any signed instance (signed-family instances next,
+  specimens last as guarded extras; rarity draws stay in the first loop
+  in yield order so the draw sequence and parity goldens are
+  byte-identical). The reorder closes a real capacity break: on a corpse
+  with two specimen families (wild_boar hide+meat, webwood_spider
+  silk+venomSac) a jackpot granted mid-loop could consume the slot the
+  pre-gate reserved for a later family's plain stack and push the
+  uncapped plain grant past capacity (17 of 16, reproduced at seed 1;
+  pinned in tests/corpse_harvest_sim.test.ts). Also QA-landed: the
+  ladder execution suite tests/ladder_crafting.test.ts (all 54 recipes
+  craft end to end, the four specimen consumers consume real signed
+  instance slots, trainRecipe charges the real rungs, the three elixir
+  defs are pinned literally and apply through useItem, silkspun_satchel
+  contributes its authored 10 slots); a literal
+  HARVEST_COMPONENT_SPECIMENS pin plus behavior arms for every specimen
+  family and the cloth signed-regular arm; the train_view locked-row
+  requirement re-pinned to literals (the old expectation composed the
+  production formula and could never red); item_icons BAG_IDS carries
+  the sixth bag so guard F's license-override arm runs for it; the
+  stale inert TOOL_RECIPE_STUBS block in content/professions.ts was
+  swept (the real table is TOOL_RECIPES in recipes.ts, deliberately
+  outside COMMON_RECIPES); and src/ui/icons.ts itemFallback gained a
+  potion/elixir flask branch (the eleven new crafted consumables
+  rendered the junk-trinket fallback; now tinted flasks by function).
+  QA drift flags: wolf_fang is the one harvest family with no consuming
+  recipe (a signed jackpot that can never be crafted with; Phase 15
+  candidate: a consumer recipe or demoting fang out of
+  HARVEST_COMPONENT_ITEMS); the recipeForResultItem gap is sharper than
+  the Phase 10 note stated (zero COMMON outputs have rare+ def quality,
+  so every item that can pass battlefieldExperienceTrickle's
+  def-quality gate is unresolvable and the trickle stays dormant;
+  widening the scan to ALL_RECIPES is a one-line change but a live
+  gameplay switch, maintainer call); cooking's "combat-worthy
+  consumable at every rung" is satisfied by sit-heal foodHp values
+  only, no buff food exists at any rung (maintainer glance if the
+  amendment intended buff food); the aura M16 fills live in sim_i18n.ts
+  plus sim_i18n.newlocales.ts, NOT the i18n.locales overlays (which
+  carry the 68 item-name fills), the correct layout for sim-emitted
+  text; the economy invariant's decisiveness was mutation-verified both
+  ways (a seeded gold-positive new recipe reds the sweep, a legacy
+  member flipped non-violating reds the self-pruning arm).
 - Phase 13: (planned) disenchantItem/applyEnchant/salvageItem IWorld
   members + wire commands.
 

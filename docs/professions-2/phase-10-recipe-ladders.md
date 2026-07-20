@@ -295,3 +295,11 @@ state.md:
 - The wiki generator does not yet enumerate recipe records, so
   npm run wiki:content regenerates with zero diff; the professions guide
   rewrite remains the Phase 15 deliverable.
+- Phase 10 QA amendment (2026-07-19): harvestCorpse grants ALL plain
+  yields before any signed instance (signed-family instances next,
+  specimens last as guarded extras; the rarity draws stay in the first
+  loop in yield order, so the draw sequence and the parity goldens are
+  byte-identical). The single-pass shape let a jackpot on a
+  two-specimen-family corpse (wild_boar hide+meat) consume the slot the
+  pre-gate reserved for a later family's plain stack and overflow the
+  bag; pinned in tests/corpse_harvest_sim.test.ts.

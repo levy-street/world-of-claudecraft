@@ -1003,6 +1003,81 @@ export const TARGETS = [
       return {};
     },
   },
+  {
+    key: 'held-weapon-variants',
+    label: 'Held weapon model variants (mainhand + dual-wield offhand)',
+    when: ['src/ui/weapon_variants.ts', 'tests/held_weapon_models.test.ts'],
+    variants: [
+      {
+        key: 'cleaver-mainhand',
+        charClass: 'warrior',
+        charName: 'Cleaverjaw',
+        items: ['gravewyrm_cleaver'],
+        // Mirrored three-quarter: the mainhand (the subject) is the RIGHT hand.
+        yawFactor: 1.28,
+      },
+      {
+        key: 'dual-fang',
+        charClass: 'rogue',
+        charName: 'Twinfang',
+        items: ['mirejaw_fang_knife', 'mirejaw_fang_knife'],
+      },
+    ],
+    // A world-scene shot of the character facing the camera with the listed items
+    // equipped (second item, when present, goes to the offhand slot: the
+    // dual-wield case). Full-viewport shot (return {}): the subject is the 3D
+    // held model, not a window.
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      await page.evaluate((shot) => {
+        const game = window.__game;
+        const sim = game.sim;
+        const player = sim.player;
+        sim.setPlayerLevel?.(30, player.id);
+        // Draw the weapons: the held (not sheathed) pose is the subject.
+        if (player.weaponStowed) game.world.toggleWeaponStow();
+        const [mainId, offId] = shot.items;
+        // Aim each hand explicitly: the no-slot resolver (desiredEquipSlot) routes
+        // a dual-wielder's one-hander into an empty offhand, which would leave the
+        // starter weapon in the mainhand.
+        sim.addItem(mainId, 1, player.id);
+        sim.equipItemToSlot(mainId, 'mainhand', player.id);
+        if (offId) {
+          sim.addItem(offId, 1, player.id);
+          sim.equipItemToSlot(offId, 'offhand', player.id);
+        }
+        // Step away from the spawn campfire so the held models read against clean
+        // ground, then park the camera in front of the character, pulled back and
+        // level, so the whole body and both hands are in frame.
+        player.pos.x += 6;
+        player.pos.z += 4;
+        game.input.camDist = 5.5;
+        game.input.camPitch = 0.1;
+        // Three-quarter front view: an edge-on blade reads as a sliver from dead
+        // ahead; the off-angle shows the weapon's profile. The factor picks which
+        // hand is nearest the camera (below PI favors the left, above the right).
+        game.input.camYaw = player.facing + Math.PI * (shot.yawFactor ?? 0.72);
+      }, variant);
+      // The weapon GLBs and the rig settle, and the levelup/deed banners fade.
+      await wait(4500);
+      const equipped = await page.evaluate(() => {
+        const player = window.__game.sim.player;
+        return { mainhand: player.mainhandItemId, offhand: player.offhandItemId };
+      });
+      if (equipped.mainhand !== variant.items[0]) {
+        throw new Error(`mainhand equip failed: ${JSON.stringify(equipped)}`);
+      }
+      if (variant.items[1] && equipped.offhand !== variant.items[1]) {
+        throw new Error(`offhand equip failed: ${JSON.stringify(equipped)}`);
+      }
+      return {};
+    },
+  },
 ];
 
 // Map a list of changed file paths to the targets they imply (deduped, registry order).
