@@ -1,14 +1,15 @@
 // The additive 'offhand' equip slot (a post-launch slot: dual-wield weapons,
 // shields, and caster held items) is on the live ALL_EQUIP_SLOTS but not the
-// frozen launch-era EQUIP_SLOTS. Two slot-list validators still gated on the
-// frozen list, so any 'offhand'-targeting action fell through, for every class:
+// frozen launch-era EQUIP_SLOTS. Stale validation left offhand-targeting actions
+// incomplete:
 //   - unequip_item{slot:'offhand'} never reached sim.unequipItem, so an equipped
 //     offhand was stuck on (the reported bug)
 //   - the touch-drag drop hit test resolved the offhand paperdoll socket to no
 //     target, so a finger-drag onto the offhand never registered
-// Both are fixed by gating on ALL_EQUIP_SLOTS. This exercises the unequip case
-// end to end through the real GameServer.dispatchMessage, plus a pure-function
-// test of the touch hit test.
+// The aimed equip path also needs the live slot list and the weapon-aware slot
+// rule, otherwise a dual-wield drop is rejected or silently resolved to mainhand.
+// These tests exercise both wire commands through the real GameServer dispatch,
+// plus the pure touch hit test.
 import { describe, expect, it, vi } from 'vitest';
 
 // Mock the db layer so no Postgres is needed; the wire/dispatch logic is under test.
@@ -20,7 +21,7 @@ vi.mock('../server/db', () => ({
   saveMailState: vi.fn(async () => {}),
   loadMarketState: vi.fn(async () => null),
   loadMailState: vi.fn(async () => null),
-  loadAccountFlair: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
@@ -93,6 +94,32 @@ describe('unequip an offhand item over the wire', () => {
     // The offhand is now empty and the weapon is back in the bags.
     expect(meta.equipment.offhand).toBeFalsy();
     expect(meta.inventory.some((s) => s.itemId === 'training_mace')).toBe(true);
+  });
+});
+
+describe('equip an aimed offhand weapon over the wire', () => {
+  it('honors slot:offhand instead of falling back to the mainhand resolver', () => {
+    const server = new GameServer();
+    const session = joinServer(server, fakeWs(), 2, 'FuryAim');
+    const sim = server.sim;
+    const meta = sim.meta(session.pid)!;
+
+    sim.setPlayerLevel(40, session.pid);
+    expect(sim.setSpec('fury', session.pid)).toBe(true);
+    expect(sim.unequipItem('mainhand', session.pid)).toBe(true);
+    expect(sim.unequipItem('offhand', session.pid)).toBe(true);
+    expect(meta.equipment.mainhand).toBeFalsy();
+    expect(meta.equipment.offhand).toBeFalsy();
+    sim.addItem('training_mace', 1, session.pid);
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'equip', item: 'training_mace', slot: 'offhand' }),
+    );
+
+    expect(meta.equipment.offhand).toBe('training_mace');
+    expect(meta.equipment.mainhand).toBeFalsy();
+    expect(meta.inventory.some((s) => s.itemId === 'training_mace')).toBe(false);
   });
 });
 

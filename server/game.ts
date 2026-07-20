@@ -64,7 +64,6 @@ import {
   DT,
   dist2d,
   type Entity,
-  EQUIP_SLOTS,
   type EquipSlot,
   emptyMoveInput,
   isDungeonDifficulty,
@@ -4013,7 +4012,8 @@ export class GameServer {
           // sim's own resolver rather than trusting the client. The sim then
           // re-validates the slot against the item itself.
           const aimed =
-            typeof msg.slot === 'string' && (EQUIP_SLOTS as readonly string[]).includes(msg.slot)
+            typeof msg.slot === 'string' &&
+            (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
               ? (msg.slot as EquipSlot)
               : undefined;
           if (aimed) sim.equipItemToSlot(msg.item, aimed, pid);
