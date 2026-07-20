@@ -1,7 +1,13 @@
 // Client for the game server's secret-gated /internal/discord/* endpoints. The
 // bot reads flex/role data and pushes presence + reward grants; it authenticates
 // with the shared DISCORD_BOT_SECRET (x-woc-discord-secret), NOT a user bearer.
-import type { ActivityItem, DailyRewardWinnersDay, FlexData, RelayItem } from './logic';
+import type {
+  ActivityItem,
+  DailyRewardWinnersDay,
+  FlexData,
+  OnchainItem,
+  RelayItem,
+} from './logic';
 
 interface Envelope<T> {
   success: boolean;
@@ -109,6 +115,12 @@ export class ServerClient {
   /** Drain the significant-activity feed (level-ups, rare drops, duels, arena). */
   async drainActivity(): Promise<ActivityItem[]> {
     const data = await this.call<{ items: ActivityItem[] }>('GET', '/internal/discord/activity');
+    return data?.items ?? [];
+  }
+
+  /** Drain the on-chain ecosystem feed ($WOC burns, sales, Claudium purchases). */
+  async drainOnchain(): Promise<OnchainItem[]> {
+    const data = await this.call<{ items: OnchainItem[] }>('GET', '/internal/onchain/feed');
     return data?.items ?? [];
   }
 

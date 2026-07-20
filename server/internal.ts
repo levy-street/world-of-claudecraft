@@ -22,10 +22,14 @@ import {
   DEPLOY_SECRET_HEADER,
   DISCORD_SECRET_ENV,
   DISCORD_SECRET_HEADER,
+  ONCHAIN_SECRET_ENV,
+  ONCHAIN_SECRET_HEADER,
   requireInternalSecret,
 } from './http/middleware/require_internal_secret';
 import type { RouteDef, RouteMeta } from './http/types';
 import { json, readBody } from './http_util';
+import { drainOnchain, enqueueOnchain } from './onchain_activity';
+import { renderRealmLine, validateOnchainEvent } from './onchain_feed';
 
 function ok(res: http.ServerResponse, data: unknown): void {
   json(res, 200, { success: true, data, error: null });
@@ -61,11 +65,62 @@ export async function handleInternalApi(
     return ok(res, status);
   }
 
+  // POST /internal/onchain-event: the chain-watch worker reports a detected
+  // burn / $WOC sale / Claudium purchase. Gated by the dedicated onchain secret.
+  if (url.pathname === '/internal/onchain-event') {
+    if (req.method !== 'POST') return fail(res, 404, 'unknown endpoint');
+    const expected = process.env[ONCHAIN_SECRET_ENV] ?? '';
+    if (!expected) return fail(res, 404, 'unknown endpoint'); // feature off
+    const actual = String(req.headers[ONCHAIN_SECRET_HEADER] ?? '');
+    if (!secretsMatch(actual, expected)) return fail(res, 401, 'not authenticated');
+    const body = await readBody(req).catch(() => ({}) as Record<string, unknown>);
+    if (!ingestOnchainEvent(body, (line) => game.announceOnchain(line))) {
+      return fail(res, 400, 'invalid onchain event');
+    }
+    return ok(res, { received: true });
+  }
+
+  // GET /internal/onchain/feed: the Discord bot drains queued events to post them
+  // to the dedicated channel (and X). Gated by the Discord bot secret, like the
+  // other bot drains.
+  if (url.pathname === '/internal/onchain/feed') {
+    if (req.method !== 'GET') return fail(res, 404, 'unknown endpoint');
+    const expected = process.env[DISCORD_SECRET_ENV] ?? '';
+    if (!expected) return fail(res, 404, 'unknown endpoint'); // feature off
+    const actual = String(req.headers[DISCORD_SECRET_HEADER] ?? '');
+    if (!secretsMatch(actual, expected)) return fail(res, 401, 'not authenticated');
+    return ok(res, { items: drainOnchain() });
+  }
+
   if (url.pathname.startsWith('/internal/discord/')) {
     return handleDiscordInternal(req, res, url);
   }
 
   return fail(res, 404, 'unknown endpoint');
+}
+
+/** Highest-value-only floor for the realm-chat sink, so routine dust burns do not
+ * spam every player's chat. USD below this is queued for Discord/X but not
+ * broadcast in-game. Default 0 announces everything; operators raise it. */
+function onchainRealmMinUsd(): number {
+  const n = Number(process.env.WOC_ONCHAIN_REALM_MIN_USD ?? '0');
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+}
+
+/**
+ * Validate an inbound on-chain event, enqueue it for the bot (deduped by tx
+ * signature), and, when it is newly seen and clears the realm floor, announce it in
+ * realm chat via the injected broadcaster. Shared by both dispatch arms. Returns
+ * false only when the body is malformed (the caller answers 400).
+ */
+function ingestOnchainEvent(body: unknown, announce: (line: string) => void): boolean {
+  const evt = validateOnchainEvent(body);
+  if (!evt) return false;
+  const fresh = enqueueOnchain(evt, evt.sig, Date.now());
+  if (fresh && (evt.usd === null || evt.usd >= onchainRealmMinUsd())) {
+    announce(renderRealmLine(evt));
+  }
+  return true;
 }
 
 // Secret-gated server<->bot channel. The Discord bot (a separate process) reads
@@ -292,7 +347,7 @@ function sanitizeVoiceMember(m: unknown): {
 // The game-loop side effect the restart-countdown handler needs, injected at
 // boot by main.ts (configureInternalRuntime(game)) so this module never
 // imports the live GameServer instance.
-export type InternalRuntime = Pick<GameServer, 'startRestartCountdown'>;
+export type InternalRuntime = Pick<GameServer, 'startRestartCountdown' | 'announceOnchain'>;
 
 let internalRuntime: InternalRuntime | null = null;
 
@@ -325,6 +380,10 @@ const discordGate = requireInternalSecret({
   header: DISCORD_SECRET_HEADER,
   envVar: DISCORD_SECRET_ENV,
 });
+const onchainGate = requireInternalSecret({
+  header: ONCHAIN_SECRET_HEADER,
+  envVar: ONCHAIN_SECRET_ENV,
+});
 
 export const routes: RouteDef[] = [
   {
@@ -340,6 +399,28 @@ export const routes: RouteDef[] = [
       }
       return ok(ctx.res, status);
     },
+  },
+  {
+    method: 'POST',
+    path: '/internal/onchain-event',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [onchainGate],
+    handler: async (ctx) => {
+      const body = await readBody(ctx.req).catch(() => ({}) as Record<string, unknown>);
+      if (!ingestOnchainEvent(body, (line) => useInternalRuntime().announceOnchain(line))) {
+        return fail(ctx.res, 400, 'invalid onchain event');
+      }
+      return ok(ctx.res, { received: true });
+    },
+  },
+  {
+    method: 'GET',
+    path: '/internal/onchain/feed',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [discordGate],
+    handler: async (ctx) => ok(ctx.res, { items: drainOnchain() }),
   },
   {
     method: 'GET',

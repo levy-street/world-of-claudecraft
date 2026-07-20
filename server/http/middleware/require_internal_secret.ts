@@ -25,6 +25,17 @@ export const DISCORD_SECRET_HEADER = 'x-woc-discord-secret';
 export const DISCORD_SECRET_ENV = 'DISCORD_BOT_SECRET';
 
 /**
+ * Header + env pair for the on-chain activity worker gate (POST
+ * /internal/onchain-event). The chain-watch worker in the economy service posts
+ * detected burns/sales/purchases here; it authenticates with a dedicated secret,
+ * never the deploy or Discord secret (their holders must not be able to inject
+ * realm-chat announcements). Same feature-off-404 / mismatch-401 shape as the
+ * deploy and Discord gates.
+ */
+export const ONCHAIN_SECRET_HEADER = 'x-woc-onchain-secret';
+export const ONCHAIN_SECRET_ENV = 'WOC_ONCHAIN_SERVICE_SECRET';
+
+/**
  * Header + env pair for the daily-rewards payout-service gate (the
  * /internal/daily-rewards/* ops family). Unlike the two pairs above,
  * this gate FAILS CLOSED (requireInternalSecretFailClosed below): an unset env

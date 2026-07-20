@@ -565,10 +565,10 @@ describe('registry completeness: oauth + internal surfaces (server/oauth.ts, ser
   it('derives the expected non-empty ladders', () => {
     expect(oauthPostLadder.length).toBe(5);
     expect(oauthGetLadder.length).toBe(2);
-    // 18 = the handleInternalApi twelve (restart-countdown + the 11 Discord-bot
-    // routes, flaired-ids included) plus the six-route payout and moderation ops
-    // family below.
-    expect(internalLadder.length).toBe(18);
+    // 20 = the handleInternalApi twelve (restart-countdown + the 11 Discord-bot
+    // routes, flaired-ids included), the two onchain-feed routes (worker ingress +
+    // bot drain), and the six-route payout and moderation ops family below.
+    expect(internalLadder.length).toBe(20);
     expect(opsFamilyRows.length).toBe(6);
   });
 

@@ -7,6 +7,8 @@ import {
   buildInviteMessage,
   buildLevelNick,
   buildLinkContent,
+  buildOnchainMessage,
+  buildOnchainTweet,
   buildRelayMessage,
   buildWelcomeMessage,
   buildWhoamiContent,
@@ -29,6 +31,7 @@ import {
   MEMBERS_META_BATCH,
   memberRolesFromPayload,
   NICK_MAX,
+  type OnchainItem,
   type RelayItem,
   reconcileMemberRolesFromUpdate,
   relayAvatarUrl,
@@ -721,5 +724,103 @@ describe('daily rewards winner cards', () => {
       { name: 'Prize Pool', value: '$150.00', inline: true },
       { name: 'Next task', value: 'Win an arena match', inline: false },
     ]);
+  });
+});
+
+describe('on-chain activity feed builders', () => {
+  const SIG = '5YsdJH3LdRAjYzKf2yiJejHNB9f39zdEPxDXDZWptBwMvAF4VtpHEDeyM5kRFzxEqJX';
+  const burn: OnchainItem = {
+    kind: 'burn',
+    token: 'WOC',
+    amountUi: 25000,
+    usd: 4.38,
+    actor: 'Logan',
+    item: null,
+    sig: SIG,
+    blockMs: 1_784_462_593_000,
+    network: 'mainnet',
+    totalBurnedUi: 442072,
+  };
+
+  // No emoji or long dashes may exist in built output (repo copy rule); Discord
+  // shortcodes like :fire: are ASCII and allowed.
+  const BANNED = /[\u2013\u2014\u2015\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]|\uFE0F/u;
+
+  it('builds a burn embed with amount, value, total, actor, and a Solscan link', () => {
+    const msg = buildOnchainMessage(burn) as {
+      embeds: Array<{
+        author: { name: string };
+        title: string;
+        url: string;
+        color: number;
+        fields: Array<{ name: string; value: string; inline: boolean }>;
+      }>;
+      allowed_mentions: unknown;
+    };
+    const embed = msg.embeds[0];
+    expect(embed.author).toEqual({ name: ':fire: $WOC Burn' });
+    expect(embed.title).toBe('25,000 WOC burned');
+    expect(embed.url).toBe(`https://solscan.io/tx/${SIG}`);
+    expect(embed.fields).toEqual([
+      { name: 'Amount', value: '25,000 WOC', inline: true },
+      { name: 'Value', value: '$4.38', inline: true },
+      { name: 'Total burned', value: '442,072 WOC', inline: true },
+      { name: 'By', value: 'Logan', inline: true },
+    ]);
+    expect(msg.allowed_mentions).toEqual({ parse: [] }); // never pings
+  });
+
+  it('omits the Value field when USD is unavailable', () => {
+    const msg = buildOnchainMessage({ ...burn, usd: null }) as {
+      embeds: Array<{ fields: Array<{ name: string }> }>;
+    };
+    expect(msg.embeds[0].fields.map((f) => f.name)).not.toContain('Value');
+  });
+
+  it('titles a sale by item name and a claudium purchase distinctly', () => {
+    const sale = buildOnchainMessage({
+      ...burn,
+      kind: 'sale',
+      item: 'Cloaked in Infinity',
+      amountUi: 250000,
+    }) as { embeds: Array<{ title: string; author: { name: string } }> };
+    expect(sale.embeds[0].title).toBe('Cloaked in Infinity sold');
+    expect(sale.embeds[0].author.name).toBe(':crossed_swords: $WOC Sale');
+
+    const claud = buildOnchainMessage({
+      ...burn,
+      kind: 'claudium',
+      token: 'USDC',
+      item: '500 Claudium',
+    }) as { embeds: Array<{ author: { name: string } }> };
+    expect(claud.embeds[0].author.name).toBe(':gem: Claudium Purchase');
+  });
+
+  it('builds a burn tweet with the value, link, and tags', () => {
+    const tweet = buildOnchainTweet(burn);
+    expect(tweet).toBe(
+      `25,000 $WOC ($4.38) just burned in World of ClaudeCraft. Supply only goes down. https://solscan.io/tx/${SIG} #WOC #Solana`,
+    );
+  });
+
+  it('keeps every tweet within the 280 X-weighted limit and ASCII-only', () => {
+    const longItem = 'x'.repeat(200);
+    for (const item of [
+      burn,
+      { ...burn, kind: 'sale' as const, item: longItem, amountUi: 999999 },
+      { ...burn, kind: 'claudium' as const, token: 'SOL' as const, item: longItem },
+      { ...burn, usd: null },
+    ]) {
+      const tweet = buildOnchainTweet(item);
+      // Weighted length: the t.co link counts as 23 chars regardless of real length.
+      const weighted = tweet.replace(/https:\/\/solscan\.io\/tx\/\S+/, 'x'.repeat(23)).length;
+      expect(weighted, tweet).toBeLessThanOrEqual(280);
+      expect(BANNED.test(tweet), tweet).toBe(false);
+    }
+  });
+
+  it('emits no emoji or long dashes in any embed (ASCII source rule)', () => {
+    const msg = buildOnchainMessage(burn);
+    expect(BANNED.test(JSON.stringify(msg))).toBe(false);
   });
 });

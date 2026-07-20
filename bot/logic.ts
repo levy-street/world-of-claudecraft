@@ -641,6 +641,112 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
   return payload;
 }
 
+// ── On-chain ecosystem activity feed ──────────────────────────────────────────
+// The chain-watch worker detects $WOC burns, $WOC-settled item sales, and Claudium
+// purchases and hands them to the game server, which the bot drains here and posts
+// to the dedicated channel (and to X). Pure builders; the REST/X layers send them.
+export interface OnchainItem {
+  kind: 'burn' | 'sale' | 'claudium';
+  token: 'WOC' | 'SOL' | 'USDC';
+  amountUi: number;
+  usd: number | null;
+  actor: string;
+  item: string | null;
+  sig: string;
+  blockMs: number;
+  network: string;
+  totalBurnedUi: number | null;
+}
+
+const SOLSCAN_TX = 'https://solscan.io/tx/';
+// X wraps every link to a fixed-width t.co URL when it weighs a tweet, so a link
+// counts as this many characters no matter its real length.
+const TCO_URL_WEIGHT = 23;
+const TWEET_MAX = 280;
+
+function amountText(n: number): string {
+  const v = n >= 1000 ? Math.round(n) : Math.round(n * 100) / 100;
+  return v.toLocaleString('en-US');
+}
+
+function usdText(n: number | null): string | null {
+  if (n === null) return null;
+  return `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+/** Full createMessage payload for one on-chain event: a per-kind embed with the
+ * amount, USD value, actor, and a Solscan tx link. Never pings anyone. */
+export function buildOnchainMessage(item: OnchainItem): Record<string, unknown> {
+  const value = usdText(item.usd);
+  let author: string;
+  let title: string;
+  let color: number;
+  switch (item.kind) {
+    case 'burn':
+      author = ':fire: $WOC Burn';
+      title = `${amountText(item.amountUi)} WOC burned`;
+      color = 0xd95926;
+      break;
+    case 'sale':
+      author = ':crossed_swords: $WOC Sale';
+      title = item.item ? `${item.item} sold` : 'Item sold';
+      color = 0xd8b15a;
+      break;
+    case 'claudium':
+      author = ':gem: Claudium Purchase';
+      title = item.item ? `${item.item} purchased` : 'Claudium purchased';
+      color = 0x3987e5;
+      break;
+  }
+  const fields: Array<{ name: string; value: string; inline: boolean }> = [
+    { name: 'Amount', value: `${amountText(item.amountUi)} ${item.token}`, inline: true },
+  ];
+  if (value) fields.push({ name: 'Value', value, inline: true });
+  if (item.kind === 'burn' && item.totalBurnedUi !== null) {
+    fields.push({
+      name: 'Total burned',
+      value: `${amountText(item.totalBurnedUi)} WOC`,
+      inline: true,
+    });
+  }
+  if (item.actor) fields.push({ name: 'By', value: item.actor, inline: true });
+
+  const embed: Record<string, unknown> = {
+    color,
+    author: { name: author },
+    title,
+    url: `${SOLSCAN_TX}${encodeURIComponent(item.sig)}`,
+    fields,
+    footer: { text: `World of ClaudeCraft on-chain (${item.network})` },
+  };
+  return { embeds: [embed], allowed_mentions: { parse: [] } };
+}
+
+/** A <=280 (X-weighted) tweet for one on-chain event. ASCII only. */
+export function buildOnchainTweet(item: OnchainItem): string {
+  const value = usdText(item.usd);
+  const valuePart = value ? ` (${value})` : '';
+  const link = `${SOLSCAN_TX}${item.sig}`;
+  const tags = ' #WOC #Solana';
+  let body: string;
+  switch (item.kind) {
+    case 'burn':
+      body = `${amountText(item.amountUi)} $WOC${valuePart} just burned in World of ClaudeCraft. Supply only goes down.`;
+      break;
+    case 'sale':
+      body = `${item.item ?? 'An item'} sold for ${amountText(item.amountUi)} ${item.token}${valuePart} in World of ClaudeCraft.`;
+      break;
+    case 'claudium':
+      body = `${item.item ?? 'Claudium'} bought with ${amountText(item.amountUi)} ${item.token}${valuePart} in World of ClaudeCraft.`;
+      break;
+  }
+  // Budget the body so body + space + (link as t.co weight) + tags <= 280.
+  const budget = TWEET_MAX - (TCO_URL_WEIGHT + 1) - tags.length;
+  const trimmed =
+    body.length > budget ? `${body.slice(0, Math.max(0, budget - 3)).trimEnd()}...` : body;
+  return `${trimmed} ${link}${tags}`;
+}
+
 // ── Daily rewards winners feed ────────────────────────────────────────────────
 export interface DailyRewardWinner {
   day: string;

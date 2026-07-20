@@ -46,6 +46,8 @@ import {
   DEPLOY_SECRET_HEADER,
   DISCORD_SECRET_ENV,
   DISCORD_SECRET_HEADER,
+  ONCHAIN_SECRET_ENV,
+  ONCHAIN_SECRET_HEADER,
 } from '../../../server/http/middleware/require_internal_secret';
 import { withErrors } from '../../../server/http/middleware/with_errors';
 import { apiRoutes } from '../../../server/http/registry';
@@ -612,6 +614,14 @@ function gatePairFor(route: RouteDef): {
       unsetBody: INTERNAL_NOT_AUTHENTICATED,
     };
   }
+  if (route.path === '/internal/onchain-event') {
+    return {
+      header: ONCHAIN_SECRET_HEADER,
+      envVar: ONCHAIN_SECRET_ENV,
+      unsetStatus: 404,
+      unsetBody: INTERNAL_FEATURE_OFF,
+    };
+  }
   return {
     header: DISCORD_SECRET_HEADER,
     envVar: DISCORD_SECRET_ENV,
@@ -620,7 +630,12 @@ function gatePairFor(route: RouteDef): {
   };
 }
 
-const SWEPT_SECRET_ENVS = [DEPLOY_SECRET_ENV, DISCORD_SECRET_ENV, DAILY_REWARD_SECRET_ENV] as const;
+const SWEPT_SECRET_ENVS = [
+  DEPLOY_SECRET_ENV,
+  DISCORD_SECRET_ENV,
+  ONCHAIN_SECRET_ENV,
+  DAILY_REWARD_SECRET_ENV,
+] as const;
 
 describe('internal secret-gate mounting sweep: every /internal route is gated', () => {
   const savedSecrets = new Map<string, string | undefined>();
@@ -636,6 +651,7 @@ describe('internal secret-gate mounting sweep: every /internal route is gated', 
       startRestartCountdown: vi.fn(
         () => ({ started: true }) as ReturnType<InternalRuntime['startRestartCountdown']>,
       ),
+      announceOnchain: vi.fn(),
     });
   });
 
@@ -649,9 +665,10 @@ describe('internal secret-gate mounting sweep: every /internal route is gated', 
     vi.restoreAllMocks();
   });
 
-  it('selects the full 18-route internal surface (the handleInternalApi 12 + the 6 ops routes)', () => {
-    // The ops family includes four payout-service routes and two moderation mutations.
-    expect(internalSurfaceRoutes.length).toBe(18);
+  it('selects the full 20-route internal surface (the handleInternalApi 12 + the 6 ops routes + the 2 onchain routes)', () => {
+    // The ops family includes four payout-service routes and two moderation mutations;
+    // the onchain feed adds the worker ingress and the bot drain.
+    expect(internalSurfaceRoutes.length).toBe(20);
   });
 
   for (const route of internalSurfaceRoutes) {

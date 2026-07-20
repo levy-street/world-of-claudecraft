@@ -22,6 +22,8 @@ import {
   buildInviteMessage,
   buildLevelNick,
   buildLinkContent,
+  buildOnchainMessage,
+  buildOnchainTweet,
   buildRelayMessage,
   buildWhoamiContent,
   chunk,
@@ -46,6 +48,7 @@ import {
   voiceMembersForChannel,
 } from './logic';
 import { ServerClient, type VoiceMemberPush } from './server_client';
+import { postTweet } from './x_api';
 
 const ROLE_SYNC_INTERVAL_MS = 5 * 60_000;
 const PRESENCE_DEBOUNCE_MS = 4_000;
@@ -497,6 +500,32 @@ async function main(): Promise<void> {
     }
   };
 
+  // Drain + post the on-chain ecosystem feed ($WOC burns, sales, Claudium purchases)
+  // to the dedicated channel and, when enabled, to X. Deduped by tx signature so a
+  // retry never double-posts to either surface.
+  const postedOnchainSigs = new Set<string>();
+  const pollOnchain = async (): Promise<void> => {
+    if (!cfg.onchainChannelId && !cfg.x.enabled) return;
+    const items = await server.drainOnchain();
+    for (const item of items) {
+      if (postedOnchainSigs.has(item.sig)) continue;
+      postedOnchainSigs.add(item.sig);
+      if (postedOnchainSigs.size > 2000) postedOnchainSigs.clear();
+      if (cfg.onchainChannelId) {
+        await discord
+          .createMessage(cfg.onchainChannelId, buildOnchainMessage(item))
+          .catch((e) => console.error('[bot] onchain post failed', e));
+      }
+      if (cfg.x.enabled) {
+        await postTweet(buildOnchainTweet(item), cfg.x)
+          .then((r) => {
+            if (!r.ok) console.error('[bot] onchain tweet failed', r.status);
+          })
+          .catch((e) => console.error('[bot] onchain tweet failed', e));
+      }
+    }
+  };
+
   let dailyRewardsChannelMissingLogged = false;
   const pollDailyRewardWinners = async (): Promise<void> => {
     if (!cfg.dailyRewardsChannelId) {
@@ -577,6 +606,7 @@ async function main(): Promise<void> {
   ).unref();
   setInterval(() => void pollRelay().catch((e) => console.error(e)), RELAY_POLL_MS).unref();
   setInterval(() => void pollActivity().catch((e) => console.error(e)), RELAY_POLL_MS).unref();
+  setInterval(() => void pollOnchain().catch((e) => console.error(e)), RELAY_POLL_MS).unref();
   setInterval(
     () => void pollDailyRewardWinners().catch((e) => console.error(e)),
     RELAY_POLL_MS,
