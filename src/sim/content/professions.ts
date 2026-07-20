@@ -101,6 +101,29 @@ export const HARVEST_COMPONENT_ITEMS: Readonly<Record<string, string>> = {
   cloth: 'homespun_cloth',
 };
 
+// Monster material access tiers (Professions 2.0 Phase 12): which tool tier
+// the corpse-harvest premium (signed/specimen) arm requires per component
+// family, checked against the player's best owned gathering tool of ANY
+// profession (professions/tools.ts bestOwnedAnyGatherToolTier). EVERY
+// HARVEST_COMPONENT_ITEMS key is listed explicitly, ALL at 1 in wave one
+// (the Phase 12 prime directive: all pre-phase content stays bare-hands
+// harvestable); future corpse families may ship higher.
+export const MONSTER_MATERIAL_TIERS: Readonly<Record<string, number>> = {
+  hide: 1,
+  fang: 1,
+  silk: 1,
+  venomSac: 1,
+  meat: 1,
+  cloth: 1,
+};
+
+// The access tier for one component family. An unlisted component (a future
+// tag added before its tier row lands) defaults to 1: never gated, matching
+// the bare-hands floor.
+export function monsterMaterialTierFor(component: string): number {
+  return MONSTER_MATERIAL_TIERS[component] ?? 1;
+}
+
 // Perfect specimens (Phase 10): the signed jackpot family. When a corpse
 // harvest's rarity roll clears the signable floor (rare-or-better,
 // isSignableMaterialRarity), the harvester is granted the component family's

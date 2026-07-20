@@ -2838,6 +2838,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.ghostly_essence.name': 'Esensi Hantu',
   'entities.items.glacier_melt.name': 'Lelehan Gletser',
   'entities.items.glimmerfin_koi.name': 'Koi Sirip Kilau',
+  'entities.items.ironreel_fishing_rod.name': 'Joran gulungan besi',
+  'entities.items.silverstream_fishing_rod.name': 'Joran arus perak',
   'entities.items.glowing_wax.name': 'Lilin Bercahaya',
   'entities.items.gnarled_staff.name': 'Tongkat Bogoak',
   'entities.items.gorraks_cleaver.name': 'Golok Gorrak',

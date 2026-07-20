@@ -11,18 +11,38 @@
 // IWorldProfessions#nodeHarvestableByMe: the caller resolves it fresh, this
 // core never caches it.
 
+import { canGatherTier } from '../sim/professions/tools';
 import { dist2d, INTERACT_RANGE } from '../sim/types';
 import type { InteractionOutcome } from './interaction_autorun';
 
-export type GatherNodeVerdict = 'too_far' | 'not_ready' | 'harvest';
+export type GatherNodeVerdict = 'too_far' | 'tool_tier' | 'not_ready' | 'harvest';
+
+/** The tool-tier access gate for one node (Professions 2.0 Phase 12): the
+ *  node's content tier plus the viewer's owned-best matching tool tier (the
+ *  bare-hands floor is tier 1), with the localized denial line the caller
+ *  resolved for exactly this node (tier + profession baked in). Optional so
+ *  the pure decision stays callable tier-agnostically, but BOTH live call
+ *  sites (main.ts click path, nearby_interaction.ts) always pass it; the
+ *  required tier of a 'tool_tier' verdict is the toolGate.nodeTier the caller
+ *  already holds. */
+export interface GatherNodeToolGate {
+  nodeTier: number;
+  viewerToolTier: number;
+  unmetText: string;
+}
 
 export function decideGatherNodeAction(
   playerPos: { x: number; y: number; z: number },
   nodePos: { x: number; z: number },
   ready: boolean,
+  toolGate?: Pick<GatherNodeToolGate, 'nodeTier' | 'viewerToolTier'>,
 ): GatherNodeVerdict {
   const d = dist2d(playerPos, { x: nodePos.x, y: playerPos.y, z: nodePos.z });
   if (d > INTERACT_RANGE) return 'too_far';
+  // Between range and readiness, mirroring the sim's own harvestNode gate
+  // order (professions/gathering.ts): a locked node reads as locked, not as
+  // "not respawned", and the shared canGatherTier comparator decides.
+  if (toolGate && !canGatherTier(toolGate.viewerToolTier, toolGate.nodeTier)) return 'tool_tier';
   if (!ready) return 'not_ready';
   return 'harvest';
 }
@@ -48,10 +68,23 @@ export function handleGatherNodeInteract(
   nodePos: { x: number; z: number },
   tooFarText: string,
   notReadyText: string,
+  toolGate?: GatherNodeToolGate,
 ): InteractionOutcome {
-  const verdict = decideGatherNodeAction(playerPos, nodePos, world.nodeHarvestableByMe(nodeId));
+  const verdict = decideGatherNodeAction(
+    playerPos,
+    nodePos,
+    world.nodeHarvestableByMe(nodeId),
+    toolGate,
+  );
   if (verdict === 'too_far') {
     hud.showError(tooFarText);
+    return false;
+  }
+  if (verdict === 'tool_tier') {
+    // Only reachable with a toolGate (decideGatherNodeAction never returns it
+    // otherwise); the sim/server re-validates and would answer gatherDenied,
+    // so this stays the established don't-bother-sending pre-gate.
+    if (toolGate) hud.showError(toolGate.unmetText);
     return false;
   }
   if (verdict === 'not_ready') {

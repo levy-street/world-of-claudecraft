@@ -17,6 +17,7 @@ import {
   type GatheringProfessionId,
   HARVEST_COMPONENT_ITEMS,
 } from '../content/professions';
+import { ITEMS } from '../data';
 import type { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -33,6 +34,7 @@ import {
   rollGatherRareEvent,
 } from './gather_events';
 import { gatherActionXp } from './profession_xp';
+import { BARE_HANDS_TOOL_TIER, bestOwnedGatherToolTier, canGatherTier } from './tools';
 import type { PlayerProfessionSkill } from './types';
 
 export type GatheringProficiency = Record<GatheringProfessionId, number>;
@@ -272,6 +274,28 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   if (!isNodeHarvestableBy(meta, node.id, ctx.time)) {
     ctx.error(meta.entityId, 'This resource node has not respawned for you yet.');
     return false;
+  }
+  // Phase 12 tool gate: pure access gating, never a speed mechanic. Bare hands
+  // resolve to tier 1 (BARE_HANDS_TOOL_TIER floors the owned-best bag scan),
+  // so a tier-1 node, which is ALL pre-phase content, skips this branch
+  // entirely and its hot path is untouched. A tier-2+ node needs a
+  // matching-profession gatherTool of at least the node's tier anywhere in
+  // bags (no equip slot). The gate is rng-free and sits before both rng draws:
+  // a denial never touches the respawn timer, never draws rng, and never
+  // consumes anything.
+  if (node.tier > BARE_HANDS_TOOL_TIER) {
+    const professionId = NODE_HARVEST_TABLE[node.type].professionId;
+    const best = bestOwnedGatherToolTier(meta.inventory, professionId, ITEMS);
+    if (!canGatherTier(best, node.tier)) {
+      ctx.emit({
+        type: 'gatherDenied',
+        pid: meta.entityId,
+        surface: 'node',
+        professionId,
+        requiredTier: node.tier,
+      });
+      return false;
+    }
   }
   // Capacity pre-gate on the material this zone's node actually grants. The
   // item id is known BEFORE any rng draw (zone x type lookup, no roll), so a

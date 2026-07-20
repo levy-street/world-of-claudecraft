@@ -2751,6 +2751,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.ghostly_essence.name': 'Upiorna esencja',
   'entities.items.glacier_melt.name': 'Lodowcowa roztopa',
   'entities.items.glimmerfin_koi.name': 'Lśniącopłetwy karp koi',
+  'entities.items.ironreel_fishing_rod.name': 'Wędka z żelaznym kołowrotkiem',
+  'entities.items.silverstream_fishing_rod.name': 'Wędka srebrnego strumienia',
   'entities.items.glowing_wax.name': 'Świecący wosk',
   'entities.items.gnarled_staff.name': 'Kostur z bagiennego dębu',
   'entities.items.gorraks_cleaver.name': 'Tasak Gorraka',

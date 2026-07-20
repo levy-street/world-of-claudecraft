@@ -4937,6 +4937,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread3.name': 'Bolo de Mel Conjurado',
   'entities.items.conjured_bread4.name': 'Pão de Banquete Conjurado',
   'entities.items.glimmerfin_koi.name': 'Koi de nadadeiras cintilantes',
+  'entities.items.ironreel_fishing_rod.name': 'Vara com molinete de ferro',
+  'entities.items.silverstream_fishing_rod.name': 'Vara do riacho prateado',
   'entities.items.raw_bog_eel.name': 'Enguia de brejo crua',
   'entities.items.raw_frostgill_trout.name': 'Truta de guelras gélidas crua',
   'entities.items.raw_marsh_pike.name': 'Lúcio de pântano cru',

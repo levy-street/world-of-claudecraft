@@ -67,7 +67,9 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
 }
 
 function interact(r: ReturnType<typeof rig>) {
-  return tryNearbyInteraction(r.world, r.hud, r.nodes, 'too far', 'not ready', 'nothing');
+  // null nodeToolGateFor: the tier-agnostic legacy shape (the gate arm has its
+  // own dedicated test below).
+  return tryNearbyInteraction(r.world, r.hud, r.nodes, null, 'too far', 'not ready', 'nothing');
 }
 
 describe('tryNearbyInteraction', () => {
@@ -156,6 +158,7 @@ describe('tryNearbyInteraction', () => {
       type: 'ore',
       pos: { x: 1, z: 0 },
       level: 1,
+      tier: 1,
     } as const;
     const ready = rig([], [node]);
     expect(interact(ready)).toBe(true);
@@ -184,6 +187,7 @@ describe('tryNearbyInteraction', () => {
       type: 'ore',
       pos: { x: 1, z: 0 },
       level: 1,
+      tier: 1,
     } as const;
     const cases = [
       { targets: [corpse, delve, object, npc], expected: 'loot:5' },
@@ -237,6 +241,45 @@ describe('tryNearbyInteraction', () => {
 
     expect(interact(r)).toBe(false);
     expect(r.calls).toEqual(['error:nothing']);
+  });
+
+  it('threads nodeToolGateFor to the picked node and surfaces the unmet line (Phase 12)', () => {
+    const lockedNode = {
+      id: 'ore_t2',
+      zoneId: 'zone',
+      type: 'ore',
+      pos: { x: 1, z: 0 },
+      level: 10,
+      tier: 2,
+    } as const;
+    const r = rig([], [lockedNode]);
+    const seen: string[] = [];
+    const gateFor = (node: { id: string; tier: number }) => {
+      seen.push(node.id);
+      return { nodeTier: node.tier, viewerToolTier: 1, unmetText: 'needs tier 2' };
+    };
+    expect(
+      tryNearbyInteraction(r.world, r.hud, r.nodes, gateFor, 'too far', 'not ready', 'nothing'),
+    ).toBe(false);
+    // The resolver ran against the PICKED node, and the tool denial won over
+    // both harvest and not-ready (the node reads locked, not cooling).
+    expect(seen).toEqual(['ore_t2']);
+    expect(r.calls).toEqual(['error:needs tier 2']);
+
+    // The met arm: a sufficient viewer tier lets the harvest through untouched.
+    const met = rig([], [lockedNode]);
+    expect(
+      tryNearbyInteraction(
+        met.world,
+        met.hud,
+        met.nodes,
+        (node) => ({ nodeTier: node.tier, viewerToolTier: 2, unmetText: 'needs tier 2' }),
+        'too far',
+        'not ready',
+        'nothing',
+      ),
+    ).toBe(true);
+    expect(met.calls).toEqual(['harvest:ore_t2']);
   });
 
   it('returns a rejected authoritative pickup result', async () => {

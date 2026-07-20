@@ -460,6 +460,30 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 4,
     buyValue: 20,
   },
+  // Tiered fishing rods (Professions 2.0 Phase 12): gatherTool items like the
+  // picks/axes/sickles below, same tier pricing ladder. Their use still routes
+  // to startFishing (src/sim/items.ts useItem), so a rod casts exactly like
+  // the simple pole; the tier caps which catch rarity band the cast can land
+  // (band b needs tier b + 1, professions/fishing.ts). The simple pole stays
+  // `use: { type: 'fishing' }`: effective tier 1 via the bare-hands floor.
+  ironreel_fishing_rod: {
+    id: 'ironreel_fishing_rod',
+    name: 'Ironreel Fishing Rod',
+    kind: 'tool',
+    quality: 'common',
+    use: { type: 'gatherTool', professionId: 'fishing', tier: 2 },
+    sellValue: 10,
+    buyValue: 60,
+  },
+  silverstream_fishing_rod: {
+    id: 'silverstream_fishing_rod',
+    name: 'Silverstream Fishing Rod',
+    kind: 'tool',
+    quality: 'uncommon',
+    use: { type: 'gatherTool', professionId: 'fishing', tier: 3 },
+    sellValue: 25,
+    buyValue: 150,
+  },
   // Base gathering tools (#1123). Each is infinite-durability (this repo has
   // no durability field on ItemDef) and tiered: `use.tier` gates which
   // node/material tiers it can gather (see src/sim/professions/tools.ts).

@@ -2094,7 +2094,25 @@ export const ko_KR: EnTranslations = {
       "notReady": "이 자원 채집지는 아직 당신을 위해 재생성되지 않았습니다.",
       "gatherLine": "{name}을(를) 채집했습니다.",
       "gatherLineQty": "{name}을(를) {qty}개 채집했습니다.",
-      "catchLine": "{name}을(를) 낚아 올렸습니다"
+      "catchLine": "{name}을(를) 낚아 올렸습니다",
+      "nodeName": {
+        "ore": "광맥",
+        "wood": "벌목 나무",
+        "herb": "약초 군락"
+      },
+      "tierRequired": {
+        "mining": "{tier}티어 채광 곡괭이 필요",
+        "logging": "{tier}티어 벌목 도끼 필요",
+        "herbalism": "{tier}티어 약초 낫 필요"
+      },
+      "toolTierUnmet": {
+        "mining": "이 광맥을 캐려면 {tier}티어 채광 곡괭이가 필요합니다.",
+        "logging": "이 나무를 베려면 {tier}티어 벌목 도끼가 필요합니다.",
+        "herbalism": "이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다."
+      },
+      "toolTierUnmetCorpse": "최상급 재료를 회수하려면 {tier}티어 채집 도구가 필요합니다.",
+      "stateReady": "채집 가능",
+      "stateCooldown": "재생성 중"
     },
     "archetypeTitle": {
       "label": "칭호",
@@ -8709,6 +8727,12 @@ export const ko_KR: EnTranslations = {
       },
       "verlans_oathblade": {
         "name": "베를란의 맹세검"
+      },
+      "ironreel_fishing_rod": {
+        "name": "쇠릴 낚싯대"
+      },
+      "silverstream_fishing_rod": {
+        "name": "은빛 시내 낚싯대"
       },
       "briny_idol": {
         "name": "소금기 어린 우상"

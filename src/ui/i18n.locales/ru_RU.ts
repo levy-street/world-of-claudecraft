@@ -4134,6 +4134,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread2.name': 'Сотворённый чёрный каравай',
   'entities.items.conjured_bread3.name': 'Сотворённый медовый пряник',
   'entities.items.glimmerfin_koi.name': 'Карп кои с мерцающими плавниками',
+  'entities.items.ironreel_fishing_rod.name': 'Удочка с железной катушкой',
+  'entities.items.silverstream_fishing_rod.name': 'Удочка серебряного ручья',
   'entities.items.raw_bog_eel.name': 'Сырой болотный угорь',
   'entities.items.raw_frostgill_trout.name': 'Сырая морозожаберная форель',
   'entities.items.raw_marsh_pike.name': 'Сырая болотная щука',
@@ -7323,6 +7325,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.gatherLine': 'Вы добываете: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Вы добываете: {name} x{qty}.',
   'hudChrome.gathering.catchLine': 'Вы выуживаете: {name}',
+  'hudChrome.gathering.nodeName.ore': 'Рудная жила',
+  'hudChrome.gathering.nodeName.wood': 'Древостой',
+  'hudChrome.gathering.nodeName.herb': 'Заросли трав',
+  'hudChrome.gathering.tierRequired.mining': 'Требуется шахтерская кирка {tier} уровня',
+  'hudChrome.gathering.tierRequired.logging': 'Требуется лесорубный топор {tier} уровня',
+  'hudChrome.gathering.tierRequired.herbalism': 'Требуется серп травника {tier} уровня',
+  'hudChrome.gathering.toolTierUnmet.mining':
+    'Чтобы разработать эту жилу, нужна шахтерская кирка {tier} уровня.',
+  'hudChrome.gathering.toolTierUnmet.logging':
+    'Чтобы срубить этот древостой, нужен лесорубный топор {tier} уровня.',
+  'hudChrome.gathering.toolTierUnmet.herbalism':
+    'Чтобы собрать эти заросли, нужен серп травника {tier} уровня.',
+  'hudChrome.gathering.toolTierUnmetCorpse':
+    'Чтобы добыть лучшие материалы, нужен инструмент сбора {tier} уровня.',
+  'hudChrome.gathering.stateReady': 'Готово',
+  'hudChrome.gathering.stateCooldown': 'Восстанавливается',
   'gatherEvent.pristineVein': '{finder} находит нетронутую жилу!',
   'gatherEvent.ancientHeartwood': '{finder} добывает древнюю сердцевину!',
   'gatherEvent.moonlitBloom': '{finder} находит лунный цветок!',

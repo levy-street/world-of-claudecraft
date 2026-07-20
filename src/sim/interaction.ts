@@ -24,7 +24,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { bagCapacity, fitsAll } from './bags';
-import { HARVEST_COMPONENT_SPECIMENS } from './content/professions';
+import { HARVEST_COMPONENT_SPECIMENS, monsterMaterialTierFor } from './content/professions';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
 import {
@@ -52,6 +52,7 @@ import {
   resolveCorpseHarvest,
   rollCorpseMaterialRarity,
 } from './professions/gathering';
+import { bestOwnedAnyGatherToolTier, canHarvestMonsterMaterial } from './professions/tools';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, INTERACT_RANGE, type InvSlot, OBJECT_RESPAWN } from './types';
 import { markWorldBossLooted } from './world_boss';
@@ -269,6 +270,16 @@ export function harvestCorpse(
     return;
   }
   mob.harvestClaimedBy = claim.claimedBy;
+  // Phase 12 tool gate for the PREMIUM arm only: the plain component grant is
+  // never gated (the bare-hands floor), but a signable rarity roll's
+  // signed/specimen upgrade needs the player's best owned gathering tool of
+  // ANY profession to cover the component family's material tier. Resolved
+  // once, rng-free, before the per-yield loop. Every wave-one family is tier 1
+  // (content/professions.ts MONSTER_MATERIAL_TIERS, the prime directive), so
+  // in shipped content this gate never fires: it is the Phase 12 seam future
+  // higher-tier corpse families compose with.
+  const bestAny = bestOwnedAnyGatherToolTier(meta.inventory, ITEMS);
+  let toolDeniedEmitted = false;
   // #1145: a rare-or-better monster material is stamped with the harvester's
   // name (a non-fungible instance slot); anything below that rarity stays a
   // plain fungible grant, same as before this issue. One rarity roll per
@@ -301,6 +312,30 @@ export function harvestCorpse(
     const tier = applyFocusTierBonus(y.tier, y.component, meta.townFocus);
     const qty = focusedHarvestQuantity(tier, y.component, meta.townFocus);
     const rarity = rollCorpseMaterialRarity(ctx.rng);
+    // The rarity roll above MUST stay exactly where it is (one roll per yield,
+    // in yield order: the draw sequence is pinned by the parity goldens). The
+    // Phase 12 premium-arm denial below happens strictly AFTER the roll and
+    // draws no rng: a denied family downgrades to the plain fungible grant it
+    // gets on a common roll today (a specimen family keeps its plain component
+    // and only loses the jackpot push; a non-specimen family loses the
+    // signature, never the yield). At most ONE gatherDenied is emitted per
+    // harvest command, even when several yields are downgraded.
+    if (
+      isSignableMaterialRarity(rarity) &&
+      !canHarvestMonsterMaterial(bestAny, monsterMaterialTierFor(y.component))
+    ) {
+      ctx.addItem(itemId, qty, meta.entityId);
+      if (!toolDeniedEmitted) {
+        toolDeniedEmitted = true;
+        ctx.emit({
+          type: 'gatherDenied',
+          pid: meta.entityId,
+          surface: 'corpse',
+          requiredTier: monsterMaterialTierFor(y.component),
+        });
+      }
+      continue;
+    }
     const specimenId = isSignableMaterialRarity(rarity)
       ? HARVEST_COMPONENT_SPECIMENS[y.component]
       : undefined;

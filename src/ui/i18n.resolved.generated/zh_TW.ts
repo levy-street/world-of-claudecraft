@@ -2094,7 +2094,25 @@ export const zh_TW: EnTranslations = {
       "notReady": "這個資源節點尚未為你重新生成。",
       "gatherLine": "你採集了：{name}。",
       "gatherLineQty": "你採集了：{name} x{qty}。",
-      "catchLine": "你釣上了：{name}"
+      "catchLine": "你釣上了：{name}",
+      "nodeName": {
+        "ore": "礦脈",
+        "wood": "林木",
+        "herb": "草藥叢"
+      },
+      "tierRequired": {
+        "mining": "需要{tier}階採礦鎬",
+        "logging": "需要{tier}階伐木斧",
+        "herbalism": "需要{tier}階草藥鐮"
+      },
+      "toolTierUnmet": {
+        "mining": "你需要{tier}階採礦鎬才能開採這條礦脈。",
+        "logging": "你需要{tier}階伐木斧才能砍伐這片林木。",
+        "herbalism": "你需要{tier}階草藥鐮才能採集這片草藥叢。"
+      },
+      "toolTierUnmetCorpse": "你需要{tier}階採集工具才能取得最上等的材料。",
+      "stateReady": "可採集",
+      "stateCooldown": "恢復中"
     },
     "archetypeTitle": {
       "label": "稱號",
@@ -8709,6 +8727,12 @@ export const zh_TW: EnTranslations = {
       },
       "verlans_oathblade": {
         "name": "維爾蘭的誓約之刃"
+      },
+      "ironreel_fishing_rod": {
+        "name": "鐵輪釣竿"
+      },
+      "silverstream_fishing_rod": {
+        "name": "銀溪釣竿"
       },
       "briny_idol": {
         "name": "鹹海神像"

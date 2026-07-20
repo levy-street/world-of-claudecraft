@@ -614,23 +614,97 @@ export const TARGETS = [
   },
   {
     key: 'gather-node',
-    label: 'Gather node (click/tap-to-harvest, #1866)',
-    when: ['gather_node', 'gather_nodes'],
-    // Walks the player up to the first gather node the renderer actually built
-    // (`renderer.gatherNodeMeshes`, the same list `pickGatherNode` raycasts),
-    // so the frame shows the node the way a player would approach and click it.
-    async capture(page) {
+    label: 'Gather node (click/tap-to-harvest #1866; tool tier gating, Professions 2.0 Phase 12)',
+    when: ['gather_node', 'gather_nodes', 'gathering_view', 'professions/tools'],
+    // The Phase 12 variants stand at the mirefen tier-2 ore vein (falling back
+    // to the nearest pre-phase mirefen vein when the id does not exist, so the
+    // SAME recipe shoots the before side on the base tree): bare hands for the
+    // locked tooltip + minimap lock tint, an iron pick for the unlocked
+    // contrast, and a mobile tap-harvest whose outcome line is the denial
+    // toast on the gated tree and a plain gather line before it.
+    variants: [
+      { key: 'desktop-approach' },
+      { key: 'desktop-locked-hover' },
+      { key: 'desktop-unlocked-hover', pickup: 'iron_mining_pick' },
+      { key: 'desktop-minimap-locked', clipMinimap: true, standOff: true },
+      { key: 'mobile-harvest-outcome', mobile: true, harvest: true },
+    ],
+    async capture(page, variant) {
       await page.evaluate(() => {
-        const game = window.__game;
-        const mesh = game?.renderer?.gatherNodeMeshes?.[0];
-        const p = game?.world?.player;
-        if (!mesh || !p) return;
-        p.pos.x = mesh.position.x + 2.5;
-        p.pos.y = mesh.position.y;
-        p.pos.z = mesh.position.z + 2.5;
-        p.facing = Math.atan2(mesh.position.x - p.pos.x, mesh.position.z - p.pos.z);
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
       });
+      await page.evaluate(
+        (opts) => {
+          const game = window.__game;
+          const meshes = game?.renderer?.gatherNodeMeshes ?? [];
+          const byId = (id) => meshes.find((m) => m.userData?.gatherNodeId === id);
+          // ore_mirefen_t2 exists only on the Phase 12 tree; ore_mirefen_1 is the
+          // pre-phase vein 12 yd away, the honest before-side stand-in.
+          const mesh = byId('ore_mirefen_t2') ?? byId('ore_mirefen_1') ?? meshes[0];
+          const p = game?.world?.player;
+          if (!mesh || !p) return;
+          if (opts.pickup) game.world.addItem(opts.pickup, 1);
+          // The minimap variant stands off the vein so the lock-tinted marker
+          // is not hidden under the player arrow at the map centre.
+          const off = opts.standOff ? 14 : 2.5;
+          p.pos.x = mesh.position.x + off;
+          p.pos.y = mesh.position.y;
+          p.pos.z = mesh.position.z + off;
+          p.facing = Math.atan2(mesh.position.x - p.pos.x, mesh.position.z - p.pos.z);
+          window.__p12ShotNodeId = mesh.userData?.gatherNodeId ?? null;
+        },
+        { pickup: variant?.pickup ?? null, standOff: Boolean(variant?.standOff) },
+      );
       await wait(1200);
+      if (variant?.harvest) {
+        // Tap-harvest through the real IWorld command: denied on the gated
+        // tree (error toast), a plain gather line before it.
+        await page.evaluate(() => {
+          const game = window.__game;
+          if (window.__p12ShotNodeId) game.world.harvestNode(window.__p12ShotNodeId);
+        });
+        await wait(600);
+        return {};
+      }
+      if (variant?.key?.includes('hover')) {
+        // Project the node mesh to client coords and dispatch real pointermove
+        // events on the canvas (two, spaced past the tooltip's 120 ms pick
+        // throttle). On the base tree no hover listener exists and the frame
+        // simply shows no tooltip, which IS the before shot.
+        for (let i = 0; i < 4; i++) {
+          // Recompute the projection immediately before every dispatch (the
+          // camera settles over several frames) and aim at the rock's upper
+          // half so neither the ground nor the player steals the pick. The
+          // listener lives on #game-canvas specifically (main.ts wiring).
+          await page.evaluate(() => {
+            const game = window.__game;
+            const mesh = (game?.renderer?.gatherNodeMeshes ?? []).find(
+              (m) => m.userData?.gatherNodeId === window.__p12ShotNodeId,
+            );
+            const canvas = document.querySelector('#game-canvas');
+            const cam = game?.renderer?.camera;
+            if (!mesh || !canvas || !cam) return;
+            const v = mesh.position.clone();
+            v.y += 0.4;
+            v.project(cam);
+            const rect = canvas.getBoundingClientRect();
+            canvas.dispatchEvent(
+              new PointerEvent('pointermove', {
+                pointerType: 'mouse',
+                clientX: rect.left + ((v.x + 1) / 2) * rect.width,
+                clientY: rect.top + ((1 - v.y) / 2) * rect.height,
+                bubbles: true,
+              }),
+            );
+          });
+          await wait(200);
+        }
+        await wait(300);
+        return {};
+      }
+      if (variant?.clipMinimap) return { clip: '#minimap' };
       return {};
     },
   },
