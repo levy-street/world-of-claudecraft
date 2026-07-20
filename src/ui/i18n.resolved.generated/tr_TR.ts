@@ -2082,7 +2082,11 @@ export const tr_TR: EnTranslations = {
       "blockSearchPlaceholder": "Oyuncu adı",
       "blockAction": "Engelle",
       "nowBlocking": "{name} engellendi.",
-      "stopBlockingTitle": "{name} engelini kaldır"
+      "stopBlockingTitle": "{name} engelini kaldır",
+      "onlineHeader": "Online ({n})",
+      "offlineHeader": "Offline ({n})",
+      "hideOffline": "Hide offline",
+      "hideOfflineTitle": "Hide offline guild members"
     },
     "gathering": {
       "title": "Toplama",

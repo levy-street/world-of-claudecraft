@@ -2082,7 +2082,11 @@ export const da_DK: EnTranslations = {
       "blockSearchPlaceholder": "Spillernavn",
       "blockAction": "Blokér",
       "nowBlocking": "{name} blokeret.",
-      "stopBlockingTitle": "Fjern blokering af {name}"
+      "stopBlockingTitle": "Fjern blokering af {name}",
+      "onlineHeader": "Online ({n})",
+      "offlineHeader": "Offline ({n})",
+      "hideOffline": "Hide offline",
+      "hideOfflineTitle": "Hide offline guild members"
     },
     "gathering": {
       "title": "Indsamling",

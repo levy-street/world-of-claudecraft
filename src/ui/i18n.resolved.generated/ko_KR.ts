@@ -2082,7 +2082,11 @@ export const ko_KR: EnTranslations = {
       "blockSearchPlaceholder": "플레이어 이름",
       "blockAction": "차단",
       "nowBlocking": "{name} 님을 차단했습니다.",
-      "stopBlockingTitle": "{name} 님 차단 해제"
+      "stopBlockingTitle": "{name} 님 차단 해제",
+      "onlineHeader": "온라인 ({n})",
+      "offlineHeader": "오프라인 ({n})",
+      "hideOffline": "오프라인 숨기기",
+      "hideOfflineTitle": "오프라인 길드원 숨기기"
     },
     "gathering": {
       "title": "채집",

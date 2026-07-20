@@ -2082,7 +2082,11 @@ export const es: EnTranslations = {
       "blockSearchPlaceholder": "Nombre del jugador",
       "blockAction": "Bloquear",
       "nowBlocking": "{name} bloqueado.",
-      "stopBlockingTitle": "Dejar de bloquear a {name}"
+      "stopBlockingTitle": "Dejar de bloquear a {name}",
+      "onlineHeader": "Online ({n})",
+      "offlineHeader": "Offline ({n})",
+      "hideOffline": "Hide offline",
+      "hideOfflineTitle": "Hide offline guild members"
     },
     "gathering": {
       "title": "Recolección",

@@ -2082,7 +2082,11 @@ export const vi_VN: EnTranslations = {
       "blockSearchPlaceholder": "Tên người chơi",
       "blockAction": "Chặn",
       "nowBlocking": "Đã chặn {name}.",
-      "stopBlockingTitle": "Bỏ chặn {name}"
+      "stopBlockingTitle": "Bỏ chặn {name}",
+      "onlineHeader": "Online ({n})",
+      "offlineHeader": "Offline ({n})",
+      "hideOffline": "Hide offline",
+      "hideOfflineTitle": "Hide offline guild members"
     },
     "gathering": {
       "title": "Thu thập",

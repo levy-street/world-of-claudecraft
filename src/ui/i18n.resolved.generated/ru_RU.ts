@@ -2082,7 +2082,11 @@ export const ru_RU: EnTranslations = {
       "blockSearchPlaceholder": "Имя персонажа",
       "blockAction": "Заблокировать",
       "nowBlocking": "{name} заблокирован.",
-      "stopBlockingTitle": "Разблокировать {name}"
+      "stopBlockingTitle": "Разблокировать {name}",
+      "onlineHeader": "В сети ({n})",
+      "offlineHeader": "Не в сети ({n})",
+      "hideOffline": "Скрыть офлайн",
+      "hideOfflineTitle": "Скрыть офлайн участников гильдии"
     },
     "gathering": {
       "title": "Собирательство",

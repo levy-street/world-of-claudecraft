@@ -2082,7 +2082,11 @@ export const sv_SE: EnTranslations = {
       "blockSearchPlaceholder": "Spelarnamn",
       "blockAction": "Blockera",
       "nowBlocking": "{name} blockerad.",
-      "stopBlockingTitle": "Avblockera {name}"
+      "stopBlockingTitle": "Avblockera {name}",
+      "onlineHeader": "Online ({n})",
+      "offlineHeader": "Offline ({n})",
+      "hideOffline": "Hide offline",
+      "hideOfflineTitle": "Hide offline guild members"
     },
     "gathering": {
       "title": "Insamling",

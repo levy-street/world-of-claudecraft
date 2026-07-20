@@ -3,6 +3,8 @@ import type { PlayerClass } from '../src/sim/types';
 import {
   blockRows,
   friendRows,
+  type GuildRosterItem,
+  guildRosterItems,
   guildView,
   ignoreRows,
   raidView,
@@ -198,6 +200,115 @@ describe('per-tab row models', () => {
     const rows = guildView(social, 'Me').guild!.rows;
     expect(rows.find((r) => r.name === 'Seen')?.lastLogin).toBe(iso);
     expect(rows.find((r) => r.name === 'NeverSeen')?.lastLogin).toBeNull();
+  });
+});
+
+describe('guildRosterItems (online-first grouping + hide-offline filter)', () => {
+  // Build guild rows through guildView so the grouping is tested against the REAL row
+  // models the painter consumes (not a hand-shaped stand-in). Viewer is 'Nobody' so no
+  // row is self (irrelevant to grouping, which keys only on `online`).
+  function roster(members: Array<{ name: string; online: boolean }>) {
+    const social: SocialInfo = {
+      ...SOCIAL,
+      guild: {
+        ...(SOCIAL.guild as GuildInfo),
+        members: members.map((m) =>
+          guildMember({ name: m.name, rank: 'member', online: m.online }),
+        ),
+      },
+    };
+    return guildView(social, 'Nobody').guild!.rows;
+  }
+
+  it('groups online members first, then offline, each header carrying its count', () => {
+    const rows = roster([
+      { name: 'A', online: false },
+      { name: 'B', online: true },
+      { name: 'C', online: false },
+      { name: 'D', online: true },
+    ]);
+    // Online group keeps the source order (B before D); offline keeps it too (A before C).
+    expect(guildRosterItems(rows, false)).toEqual([
+      { kind: 'header', group: 'online', count: 2 },
+      { kind: 'member', row: rows.find((r) => r.name === 'B') },
+      { kind: 'member', row: rows.find((r) => r.name === 'D') },
+      { kind: 'header', group: 'offline', count: 2 },
+      { kind: 'member', row: rows.find((r) => r.name === 'A') },
+      { kind: 'member', row: rows.find((r) => r.name === 'C') },
+    ]);
+  });
+
+  it('renders exactly one group for an all-online roster (no empty Offline header)', () => {
+    const rows = roster([
+      { name: 'A', online: true },
+      { name: 'B', online: true },
+    ]);
+    const items = guildRosterItems(rows, false);
+    expect(items.filter((i) => i.kind === 'header')).toEqual([
+      { kind: 'header', group: 'online', count: 2 },
+    ]);
+    expect(items.some((i) => i.kind === 'header' && i.group === 'offline')).toBe(false);
+  });
+
+  it('renders exactly one group for an all-offline roster (no empty Online header)', () => {
+    const rows = roster([
+      { name: 'A', online: false },
+      { name: 'B', online: false },
+    ]);
+    const items = guildRosterItems(rows, false);
+    expect(items.filter((i) => i.kind === 'header')).toEqual([
+      { kind: 'header', group: 'offline', count: 2 },
+    ]);
+    expect(items.some((i) => i.kind === 'header' && i.group === 'online')).toBe(false);
+  });
+
+  it('hide-offline drops the offline header AND its member rows, leaving online intact', () => {
+    const rows = roster([
+      { name: 'On1', online: true },
+      { name: 'Off1', online: false },
+      { name: 'On2', online: true },
+    ]);
+    expect(guildRosterItems(rows, true)).toEqual([
+      { kind: 'header', group: 'online', count: 2 },
+      { kind: 'member', row: rows.find((r) => r.name === 'On1') },
+      { kind: 'member', row: rows.find((r) => r.name === 'On2') },
+    ]);
+    // No offline row (or its header) survives the filter.
+    const hidden = guildRosterItems(rows, true);
+    expect(hidden.some((i) => i.kind === 'member' && i.row.name === 'Off1')).toBe(false);
+    expect(hidden.some((i) => i.kind === 'header' && i.group === 'offline')).toBe(false);
+  });
+
+  it('hide-offline on an all-offline roster yields an empty roster (the toggle still lets it back)', () => {
+    const rows = roster([{ name: 'A', online: false }]);
+    expect(guildRosterItems(rows, true)).toEqual([]);
+  });
+
+  it('online header count reflects real online membership, unaffected by the hide-offline filter', () => {
+    const rows = roster([
+      { name: 'A', online: true },
+      { name: 'B', online: false },
+    ]);
+    const onlineHeader = (its: GuildRosterItem[]) =>
+      its.find((i) => i.kind === 'header' && i.group === 'online');
+    expect(onlineHeader(guildRosterItems(rows, false))).toEqual({
+      kind: 'header',
+      group: 'online',
+      count: 1,
+    });
+    expect(onlineHeader(guildRosterItems(rows, true))).toEqual({
+      kind: 'header',
+      group: 'online',
+      count: 1,
+    });
+  });
+
+  it('is a pure projection (same rows -> deeply-equal grouping)', () => {
+    const rows = roster([
+      { name: 'A', online: true },
+      { name: 'B', online: false },
+    ]);
+    expect(guildRosterItems(rows, false)).toEqual(guildRosterItems(rows, false));
   });
 });
 

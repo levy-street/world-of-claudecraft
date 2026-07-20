@@ -2082,7 +2082,11 @@ export const cs_CZ: EnTranslations = {
       "blockSearchPlaceholder": "Jméno hráče",
       "blockAction": "Zablokovat",
       "nowBlocking": "{name} zablokován.",
-      "stopBlockingTitle": "Odblokovat hráče {name}"
+      "stopBlockingTitle": "Odblokovat hráče {name}",
+      "onlineHeader": "Online ({n})",
+      "offlineHeader": "Offline ({n})",
+      "hideOffline": "Hide offline",
+      "hideOfflineTitle": "Hide offline guild members"
     },
     "gathering": {
       "title": "Sběr",

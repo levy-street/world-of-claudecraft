@@ -6195,6 +6195,7 @@
   }
   .soc-tab:focus-visible,
   .soc-x:focus-visible,
+  .soc-hide-offline:focus-visible,
   .soc-name.soc-link:focus-visible,
   .soc-sugg-item:focus-visible,
   .trade-item.mine:focus-visible {
@@ -6472,6 +6473,59 @@
   .soc-guild-head .gm {
     color: var(--color-text-muted);
     font-size: 11px;
+  }
+  /* Guild roster: the persisted "hide offline" toggle (an aria-pressed button with a
+     checkbox-like indicator) and the online/offline group sub-headers. */
+  .soc-hide-offline {
+    /* Span the responsive .soc-body grid so the toggle sits on its own row (a break
+       above the groups), but render at content width, left-aligned. */
+    grid-column: 1 / -1;
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 2px 4px 6px;
+    padding: 5px 9px;
+    font-size: 12px;
+    font-family: var(--title-font);
+    color: var(--color-text-muted);
+    background: #1a1410;
+    border: 1px solid #463a1c;
+    border-radius: 4px;
+    cursor: var(--cursor-point);
+  }
+  .soc-hide-offline:hover {
+    color: var(--gold);
+  }
+  .soc-hide-offline.on {
+    color: var(--gold);
+    border-color: #6f5a2a;
+  }
+  .soc-hide-box {
+    width: 12px;
+    height: 12px;
+    flex: none;
+    border: 1px solid #6f5a2a;
+    border-radius: 3px;
+    background: #120e0a;
+  }
+  .soc-hide-offline.on .soc-hide-box {
+    background: var(--gold);
+    box-shadow: inset 0 0 0 2px #120e0a;
+  }
+  .soc-group-head {
+    /* Full-width band so the online/offline groups stack cleanly instead of
+       interleaving across the responsive two-column .soc-body grid. */
+    grid-column: 1 / -1;
+    margin: 8px 0 2px;
+    padding: 4px 4px 3px;
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    border-top: 1px solid #3d3218;
+  }
+  .soc-group-head:first-of-type {
+    border-top: 0;
   }
   /* Raid tab: the two groups sit side by side in the landscape window (falling
      back to stacked on mobile-touch). It escapes the `.soc-body` grid flow

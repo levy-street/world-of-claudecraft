@@ -2082,7 +2082,11 @@ export const nl_NL: EnTranslations = {
       "blockSearchPlaceholder": "Spelersnaam",
       "blockAction": "Blokkeren",
       "nowBlocking": "{name} geblokkeerd.",
-      "stopBlockingTitle": "{name} deblokkeren"
+      "stopBlockingTitle": "{name} deblokkeren",
+      "onlineHeader": "Online ({n})",
+      "offlineHeader": "Offline ({n})",
+      "hideOffline": "Hide offline",
+      "hideOfflineTitle": "Hide offline guild members"
     },
     "gathering": {
       "title": "Verzamelen",

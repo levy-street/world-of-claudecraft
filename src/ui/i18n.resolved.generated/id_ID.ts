@@ -2082,7 +2082,11 @@ export const id_ID: EnTranslations = {
       "blockSearchPlaceholder": "Nama pemain",
       "blockAction": "Blokir",
       "nowBlocking": "{name} diblokir.",
-      "stopBlockingTitle": "Buka blokir {name}"
+      "stopBlockingTitle": "Buka blokir {name}",
+      "onlineHeader": "Online ({n})",
+      "offlineHeader": "Offline ({n})",
+      "hideOffline": "Hide offline",
+      "hideOfflineTitle": "Hide offline guild members"
     },
     "gathering": {
       "title": "Pengumpulan",

@@ -11,28 +11,52 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "es_ES": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "fr_FR": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "fr_CA": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "de_DE": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -40,39 +64,75 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "nl_NL": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "pl_PL": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "id_ID": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "tr_TR": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "sv_SE": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "vi_VN": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "da_DK": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ]
 };

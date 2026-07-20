@@ -2082,7 +2082,11 @@ export const ja_JP: EnTranslations = {
       "blockSearchPlaceholder": "プレイヤー名",
       "blockAction": "ブロック",
       "nowBlocking": "{name} をブロックしました。",
-      "stopBlockingTitle": "{name} のブロックを解除"
+      "stopBlockingTitle": "{name} のブロックを解除",
+      "onlineHeader": "オンライン ({n})",
+      "offlineHeader": "オフライン ({n})",
+      "hideOffline": "オフラインを非表示",
+      "hideOfflineTitle": "オフラインのギルドメンバーを非表示"
     },
     "gathering": {
       "title": "採集",
