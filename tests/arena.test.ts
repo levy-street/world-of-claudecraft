@@ -1,6 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { arenaOrigin, isArenaPos } from '../src/sim/data';
-import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
+import { cameraOcclusion, lineOfSightClear } from '../src/sim/colliders';
+import { ARENA_X_MIN, arenaOrigin, dungeonAt, instanceOrigin, isArenaPos } from '../src/sim/data';
+import {
+  ARENA_LAYOUT,
+  ARENA_SPAWNS_A_2v2,
+  ARENA_SPAWNS_B_2v2,
+  DUNGEON_WALL_HW,
+  DUNGEON_WALL_X,
+  layoutColliders,
+  NYTHRAXIS_LAYOUT,
+} from '../src/sim/dungeon_layout';
+import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { eloDelta, Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -693,6 +703,92 @@ describe('arena: class ability target filters', () => {
 });
 
 describe('arena: enclosing walls', () => {
+  it('classifies the complete arena footprint without claiming the neighboring raid', () => {
+    const o = arenaOrigin(0);
+    const xExtents = layoutColliders(ARENA_LAYOUT).flatMap((collider) => {
+      if (collider.type === 'circle') {
+        return [collider.x - collider.r, collider.x + collider.r];
+      }
+      const xRadius =
+        Math.abs(Math.cos(collider.rot)) * collider.hw +
+        Math.abs(Math.sin(collider.rot)) * collider.hd;
+      return [collider.x - xRadius, collider.x + xRadius];
+    });
+    const westOuterFace = o.x + Math.min(...xExtents);
+    const eastOuterFace = o.x + Math.max(...xExtents);
+    const westBandEdge = westOuterFace - 1;
+
+    expect(ARENA_X_MIN).toBe(westBandEdge);
+    expect(isArenaPos(westBandEdge)).toBe(true);
+    expect(isArenaPos(westOuterFace)).toBe(true);
+    expect(isArenaPos(eastOuterFace)).toBe(true);
+
+    const raidOrigin = instanceOrigin(5, 0);
+    const raidEastOuterFace =
+      raidOrigin.x + (NYTHRAXIS_LAYOUT.wallX ?? DUNGEON_WALL_X) + DUNGEON_WALL_HW;
+    expect(isArenaPos(raidEastOuterFace)).toBe(false);
+    expect(dungeonAt(raidEastOuterFace)?.id).toBe('nythraxis_boss_arena');
+  });
+
+  it('classifies every 2v2 combatant spawn as arena space', () => {
+    const o = arenaOrigin(0);
+    for (const spawn of [...ARENA_SPAWNS_A_2v2, ...ARENA_SPAWNS_B_2v2]) {
+      expect(isArenaPos(o.x + spawn.x)).toBe(true);
+    }
+  });
+
+  it('stops live player movement symmetrically at both side walls', () => {
+    const { sim, a, b } = queueDuo();
+    startBout(sim);
+    const match = sim.arenaMatchFor(a);
+    expect(match?.state).toBe('active');
+    const o = arenaOrigin(match?.slot ?? 0);
+    const startDistance = DUNGEON_WALL_X - 2;
+    teleport(sim, a, o.x - startDistance, o.z);
+    teleport(sim, b, o.x + startDistance, o.z);
+    sim.entities.get(a)!.facing = -Math.PI / 2;
+    sim.entities.get(b)!.facing = Math.PI / 2;
+    sim.meta(a)!.moveInput.forward = true;
+    sim.meta(b)!.moveInput.forward = true;
+
+    for (let i = 0; i < 20; i++) sim.tick();
+
+    const expectedStop = DUNGEON_WALL_X - DUNGEON_WALL_HW - PLAYER_BODY_RADIUS;
+    const westDistance = o.x - sim.entities.get(a)!.pos.x;
+    const eastDistance = sim.entities.get(b)!.pos.x - o.x;
+    expect(westDistance).toBeGreaterThan(startDistance);
+    expect(eastDistance).toBeGreaterThan(startDistance);
+    expect(westDistance).toBeCloseTo(expectedStop, 5);
+    expect(eastDistance).toBeCloseTo(expectedStop, 5);
+    expect(westDistance).toBeCloseTo(eastDistance, 5);
+  });
+
+  it('blocks line of sight through both side walls', () => {
+    const sim = makeWorld();
+    const o = arenaOrigin(0);
+    for (const side of [-1, 1]) {
+      const inside = {
+        x: o.x + side * (DUNGEON_WALL_X - 1.5),
+        z: o.z,
+      };
+      const outside = {
+        x: o.x + side * (DUNGEON_WALL_X + 1.5),
+        z: o.z,
+      };
+      expect(lineOfSightClear(sim.cfg.seed, inside, outside)).toBe(false);
+    }
+  });
+
+  it('reports camera occlusion at both side walls', () => {
+    const sim = makeWorld();
+    const o = arenaOrigin(0);
+    for (const side of [-1, 1]) {
+      const insideX = o.x + side * (DUNGEON_WALL_X - 1.5);
+      const outsideX = o.x + side * (DUNGEON_WALL_X + 4);
+      expect(cameraOcclusion(sim.cfg.seed, insideX, 2, o.z, outsideX, 2, o.z, 0.1)).toBeLessThan(1);
+    }
+  });
+
   it('melee auto-attack cannot land through the arena side wall', () => {
     const { sim, a, b } = queueDuo();
     startBout(sim);
