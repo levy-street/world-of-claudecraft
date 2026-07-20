@@ -4954,6 +4954,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread3.name': 'Dolce al miele evocato',
   'entities.items.conjured_bread4.name': 'Pane da banchetto evocato',
   'entities.items.glimmerfin_koi.name': 'Koi dalle pinne scintillanti',
+  'entities.items.ironreel_fishing_rod.name': 'Canna con mulinello di ferro',
+  'entities.items.silverstream_fishing_rod.name': "Canna del ruscello d'argento",
   'entities.items.raw_bog_eel.name': 'Anguilla di palude cruda',
   'entities.items.raw_frostgill_trout.name': 'Trota dalle branchie gelide cruda',
   'entities.items.raw_marsh_pike.name': 'Luccio di palude crudo',

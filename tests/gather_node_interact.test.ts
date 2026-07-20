@@ -24,6 +24,37 @@ describe('decideGatherNodeAction', () => {
     const playerPos = { x: 100, y: 0, z: 200 + INTERACT_RANGE };
     expect(decideGatherNodeAction(playerPos, nodePos, true)).toBe('harvest');
   });
+
+  // Phase 12: the tool-tier access gate, mirroring the sim's own harvestNode
+  // deny order (range, then tool tier, then readiness).
+  describe('tool_tier verdict (Phase 12)', () => {
+    const inRange = { x: 100, y: 0, z: 200 + 1 };
+    const unmet = { nodeTier: 2, viewerToolTier: 1 };
+    const met = { nodeTier: 2, viewerToolTier: 2 };
+
+    it('an in-range locked node reports tool_tier even when it is also not ready', () => {
+      // Readiness false AND tier unmet: the tool gate sits between range and
+      // readiness, so the lock wins (a locked node reads locked, never
+      // "not respawned").
+      expect(decideGatherNodeAction(inRange, nodePos, false, unmet)).toBe('tool_tier');
+      expect(decideGatherNodeAction(inRange, nodePos, true, unmet)).toBe('tool_tier');
+    });
+
+    it('too_far still wins over the tool gate out of range', () => {
+      const far = { x: 100, y: 0, z: 200 + INTERACT_RANGE + 2 };
+      expect(decideGatherNodeAction(far, nodePos, true, unmet)).toBe('too_far');
+    });
+
+    it('a met gate falls through to the readiness arms unchanged', () => {
+      expect(decideGatherNodeAction(inRange, nodePos, false, met)).toBe('not_ready');
+      expect(decideGatherNodeAction(inRange, nodePos, true, met)).toBe('harvest');
+    });
+
+    it('no toolGate keeps the legacy tier-agnostic decision', () => {
+      expect(decideGatherNodeAction(inRange, nodePos, false)).toBe('not_ready');
+      expect(decideGatherNodeAction(inRange, nodePos, true)).toBe('harvest');
+    });
+  });
 });
 
 describe('handleGatherNodeInteract', () => {
@@ -102,6 +133,56 @@ describe('handleGatherNodeInteract', () => {
     ).toBe(false);
     expect(calls).toEqual([]);
     expect(errors).toEqual([notReadyText]);
+  });
+
+  it('shows the pre-resolved unmet line and never sends harvestNode on a locked node (Phase 12)', () => {
+    // ready=false too: the lock must win over the not-ready feedback, exactly
+    // like the sim's own deny order.
+    const { world, calls } = fakeWorld(false);
+    const { hud, errors } = fakeHud();
+    expect(
+      handleGatherNodeInteract(
+        world,
+        hud,
+        { x: 0, y: 0, z: 0 },
+        'node_a',
+        nodePos,
+        tooFarText,
+        notReadyText,
+        {
+          nodeTier: 2,
+          viewerToolTier: 1,
+          unmetText: 'needs a tier 2 pick',
+        },
+      ),
+    ).toBe(false);
+    expect(calls).toEqual([]);
+    // The caller-resolved localized line surfaces verbatim (tier + profession
+    // were baked in by gatherNodeToolGateFor), and it wins over not-ready.
+    expect(errors).toEqual(['needs a tier 2 pick']);
+  });
+
+  it('a met toolGate leaves the harvest path untouched (Phase 12)', () => {
+    const { world, calls } = fakeWorld(true);
+    const { hud, errors } = fakeHud();
+    expect(
+      handleGatherNodeInteract(
+        world,
+        hud,
+        { x: 0, y: 0, z: 0 },
+        'node_a',
+        nodePos,
+        tooFarText,
+        notReadyText,
+        {
+          nodeTier: 2,
+          viewerToolTier: 3,
+          unmetText: 'needs a tier 2 pick',
+        },
+      ),
+    ).toBe(true);
+    expect(calls).toEqual(['node_a']);
+    expect(errors).toEqual([]);
   });
 
   it('returns the authoritative harvest result', async () => {

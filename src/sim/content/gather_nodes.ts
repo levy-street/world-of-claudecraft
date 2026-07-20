@@ -24,6 +24,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'ore',
     pos: { x: -70, z: -53 },
     level: 4,
+    tier: 1,
   },
   {
     id: 'ore_eastbrook_2',
@@ -31,6 +32,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'ore',
     pos: { x: -73, z: -49 },
     level: 4,
+    tier: 1,
   },
   {
     id: 'ore_eastbrook_3',
@@ -38,6 +40,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'ore',
     pos: { x: -67, z: -57 },
     level: 4,
+    tier: 1,
   },
 
   // Eastbrook Vale, wood stands around Webwood
@@ -47,6 +50,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'wood',
     pos: { x: -62, z: 8 },
     level: 4,
+    tier: 1,
   },
   {
     id: 'wood_eastbrook_2',
@@ -54,6 +58,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'wood',
     pos: { x: -57, z: -6 },
     level: 4,
+    tier: 1,
   },
   {
     id: 'wood_eastbrook_3',
@@ -61,6 +66,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'wood',
     pos: { x: -68, z: 18 },
     level: 4,
+    tier: 1,
   },
 
   // Eastbrook Vale, herb patches near Mirror Lake
@@ -70,6 +76,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'herb',
     pos: { x: -86, z: 90 },
     level: 4,
+    tier: 1,
   },
   {
     id: 'herb_eastbrook_2',
@@ -77,6 +84,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'herb',
     pos: { x: -92, z: 80 },
     level: 4,
+    tier: 1,
   },
   {
     id: 'herb_eastbrook_3',
@@ -84,12 +92,34 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'herb',
     pos: { x: -80, z: 95 },
     level: 4,
+    tier: 1,
   },
 
   // Mirefen Marsh (mirefen_marsh)
-  { id: 'ore_mirefen_1', zoneId: 'mirefen_marsh', type: 'ore', pos: { x: 40, z: 340 }, level: 10 },
-  { id: 'ore_mirefen_2', zoneId: 'mirefen_marsh', type: 'ore', pos: { x: -30, z: 360 }, level: 10 },
-  { id: 'ore_mirefen_3', zoneId: 'mirefen_marsh', type: 'ore', pos: { x: 35, z: 345 }, level: 10 },
+  {
+    id: 'ore_mirefen_1',
+    zoneId: 'mirefen_marsh',
+    type: 'ore',
+    pos: { x: 40, z: 340 },
+    level: 10,
+    tier: 1,
+  },
+  {
+    id: 'ore_mirefen_2',
+    zoneId: 'mirefen_marsh',
+    type: 'ore',
+    pos: { x: -30, z: 360 },
+    level: 10,
+    tier: 1,
+  },
+  {
+    id: 'ore_mirefen_3',
+    zoneId: 'mirefen_marsh',
+    type: 'ore',
+    pos: { x: 35, z: 345 },
+    level: 10,
+    tier: 1,
+  },
 
   {
     id: 'wood_mirefen_1',
@@ -97,6 +127,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'wood',
     pos: { x: 10, z: 330 },
     level: 10,
+    tier: 1,
   },
   {
     id: 'wood_mirefen_2',
@@ -104,6 +135,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'wood',
     pos: { x: -15, z: 355 },
     level: 10,
+    tier: 1,
   },
   {
     id: 'wood_mirefen_3',
@@ -111,6 +143,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'wood',
     pos: { x: -20, z: 315 },
     level: 10,
+    tier: 1,
   },
 
   {
@@ -119,6 +152,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'herb',
     pos: { x: 60, z: 385 },
     level: 10,
+    tier: 1,
   },
   {
     id: 'herb_mirefen_2',
@@ -126,6 +160,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'herb',
     pos: { x: -45, z: 452 },
     level: 10,
+    tier: 1,
   },
   {
     id: 'herb_mirefen_3',
@@ -133,6 +168,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'herb',
     pos: { x: 30, z: 355 },
     level: 10,
+    tier: 1,
   },
 
   // Thornpeak Heights (thornpeak_heights) had no gather nodes at all, forcing
@@ -146,6 +182,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'ore',
     pos: { x: 90, z: 608 },
     level: 17,
+    tier: 1,
   },
   {
     id: 'ore_thornpeak_2',
@@ -153,6 +190,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'ore',
     pos: { x: 78, z: 630 },
     level: 17,
+    tier: 1,
   },
 
   {
@@ -161,6 +199,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'wood',
     pos: { x: -55, z: 765 },
     level: 17,
+    tier: 1,
   },
   {
     id: 'wood_thornpeak_2',
@@ -168,6 +207,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'wood',
     pos: { x: -82, z: 782 },
     level: 17,
+    tier: 1,
   },
 
   {
@@ -176,6 +216,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'herb',
     pos: { x: 18, z: 648 },
     level: 17,
+    tier: 1,
   },
   {
     id: 'herb_thornpeak_2',
@@ -183,5 +224,88 @@ export const GATHER_NODES: GatherNodeDef[] = [
     type: 'herb',
     pos: { x: -18, z: 678 },
     level: 17,
+    tier: 1,
+  },
+
+  // Phase 12 tool-tier ramp. Zone 1 (eastbrook_vale) stays ALL tier 1: every
+  // pre-phase node above keeps tier 1, so nothing that was harvestable before
+  // this phase ever needs a tool. The ramp comes only from the NEW veins
+  // below: mirefen_marsh gains one tier-2 node per type, thornpeak_heights
+  // gains one tier-2 and one tier-3 node per type. Each sits a short walk
+  // (5 to 20 yd) from the matching existing cluster of the same type, and
+  // grants the zone's existing material via the zone-keyed
+  // NODE_MATERIAL_TABLE: no new materials and no yield changes (deliberate;
+  // rhythm and richer yields are later phases).
+  {
+    id: 'ore_mirefen_t2',
+    zoneId: 'mirefen_marsh',
+    type: 'ore',
+    pos: { x: 48, z: 352 },
+    level: 10,
+    tier: 2,
+  },
+  {
+    id: 'wood_mirefen_t2',
+    zoneId: 'mirefen_marsh',
+    type: 'wood',
+    pos: { x: 2, z: 342 },
+    level: 10,
+    tier: 2,
+  },
+  {
+    id: 'herb_mirefen_t2',
+    zoneId: 'mirefen_marsh',
+    type: 'herb',
+    pos: { x: 52, z: 396 },
+    level: 10,
+    tier: 2,
+  },
+  {
+    id: 'ore_thornpeak_t2',
+    zoneId: 'thornpeak_heights',
+    type: 'ore',
+    pos: { x: 102, z: 615 },
+    level: 17,
+    tier: 2,
+  },
+  {
+    id: 'ore_thornpeak_t3',
+    zoneId: 'thornpeak_heights',
+    type: 'ore',
+    pos: { x: 70, z: 640 },
+    level: 17,
+    tier: 3,
+  },
+  {
+    id: 'wood_thornpeak_t2',
+    zoneId: 'thornpeak_heights',
+    type: 'wood',
+    pos: { x: -45, z: 776 },
+    level: 17,
+    tier: 2,
+  },
+  {
+    id: 'wood_thornpeak_t3',
+    zoneId: 'thornpeak_heights',
+    type: 'wood',
+    pos: { x: -92, z: 793 },
+    level: 17,
+    tier: 3,
+  },
+  {
+    id: 'herb_thornpeak_t2',
+    zoneId: 'thornpeak_heights',
+    type: 'herb',
+    pos: { x: 28, z: 658 },
+    level: 17,
+    tier: 2,
+  },
+  {
+    id: 'herb_thornpeak_t3',
+    zoneId: 'thornpeak_heights',
+    type: 'herb',
+    pos: { x: -28, z: 690 },
+    level: 17,
+    tier: 3,
   },
 ];

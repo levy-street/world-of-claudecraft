@@ -986,6 +986,39 @@ tables, i18n key namespaces, files created)
   accrual has no maxSkill cap on the drain path (shared, pre-existing
   semantics across all four professions; the wheel UI clamps display via
   the Phase 5 above-cap saturation pin).
+- Phase 12 (built 2026-07-20, phase start c139db6d5, PR #2217): base tool
+  tier gating, PURE ACCESS GATING (no speed/cast/timing, 12b owns rhythm).
+  GatherNodeDef gains required `tier` (all 24 pre-phase defs tier 1; nine
+  new veins: ore/wood/herb_mirefen_t2, ore/wood/herb_thornpeak_t2 and
+  _t3; new defs of an existing type need no render change). Bare hands
+  resolve to effective tool tier 1 (BARE_HANDS_TOOL_TIER floors the
+  owned-best bag scan in professions/tools.ts: bestOwnedGatherToolTier
+  per profession, bestOwnedAnyGatherToolTier across all four for corpse
+  pulls; no equip UI). harvestNode gates tier 2+ nodes pre-draw and
+  rng-free (deny touches nothing); harvestCorpse gates ONLY the rare+
+  premium arm against MONSTER_MATERIAL_TIERS (content/professions.ts,
+  EVERY wave-one family tier 1, so the arm is live but never fires in
+  shipped content; deny downgrades to the plain grant, claim and draw
+  order byte-identical); completeFishing caps the band at the owned rod
+  tier (band b needs tier b + 1, SILENT cap, band 0 always reachable).
+  Denials: text-free personal SimEvent `gatherDenied { pid, surface:
+  'node'|'corpse', requiredTier, professionId? (node only) }` rendered
+  via hudChrome.gathering.* (nodeName.*, tierRequired.*, toolTierUnmet.*,
+  toolTierUnmetCorpse, stateReady/stateCooldown; five non-Latin overlay
+  fills); NO sim_i18n matcher rows (sim emits no text; S3 green). NEW
+  content: ironreel_fishing_rod (tier 2) and silverstream_fishing_rod
+  (tier 3) at trader_wilkes; a useItem arm routes gatherTool+fishing to
+  startFishing (the pole stays use:{type:'fishing'}, effective tier 1).
+  UI: node hover tooltip (desktop pointer only; src/ui/gather_node_tooltip.ts
+  on the shared #tooltip container; pure model in gathering_view.ts),
+  minimap lock tint (--color-minimap-node-locked) composing with
+  ready/cooldown, client pre-gate 'tool_tier' verdict in
+  gather_node_interact.ts (tryNearbyInteraction gained a REQUIRED 4th
+  nodeToolGateFor param: the client_shell source pin forbids trailing).
+  NO new IWorld member (tier reads off shared content in both hosts);
+  parity goldens byte-identical (nodes are content, not entities); the
+  tools.ts gating trio now has live callers while the effect/recharge
+  half stays PARKED with zero callers.
 - Phase 12b: (planned) the shared non-spell-cast predicate, the gather
   cast, the fishing bite minigame, rod synergy, placeholder cues; the
   Pin-cost appendix in phase-12b-gathering-rhythm.md is the pre-briefed

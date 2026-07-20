@@ -3,6 +3,24 @@
 Audit the Phase 12 implementation (node tiers plus tool tier gating) for correctness, missing
 tests, dead code, determinism, three-host parity, and i18n completeness.
 
+As-landed notes for this QA (2026-07-20; the phase file's "As landed" block is the authority):
+- Denials are the text-free personal `gatherDenied` SimEvent rendered from
+  `hudChrome.gathering.*` keys; there are NO new sim_i18n matcher rows and the sim emits no
+  new player text (the S3 guard is green by construction). Do not flag the missing matcher
+  rows as a gap.
+- This phase authored the tiered fishing rods (ironreel tier 2, silverstream tier 3, vendor)
+  and the useItem arm that lets a gatherTool-with-fishing-professionId cast; the simple pole
+  stays tierless at the effective bare-hands tier 1. The band cap is deliberately SILENT.
+- Corpse gating reads MONSTER_MATERIAL_TIERS (all wave-one families tier 1): the deny arm is
+  live code that cannot fire through shipped content. The corpse deny/dedupe tests reach the
+  real sim path by temporarily raising a family's tier via a documented restore-in-finally
+  helper over the non-frozen table export; evaluate that seam consciously (freezing the table
+  would require a real injectable seam in src first).
+- tryNearbyInteraction gained a REQUIRED 4th parameter (nodeToolGateFor, nullable), placed
+  there because the tests/client_shell.test.ts source pin forbids a trailing addition.
+- No new IWorld member (tier reads off shared content in both hosts); parity goldens are
+  byte-identical (gather nodes are content, not entities).
+
 ## QA Starter Prompt
 
 ```

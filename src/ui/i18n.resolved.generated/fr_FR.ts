@@ -2099,7 +2099,25 @@ export const fr_FR: EnTranslations = {
       "notReady": "Ce nœud de ressource n'a pas encore réapparu pour vous.",
       "gatherLine": "Vous rassemblez : {name}.",
       "gatherLineQty": "Vous rassemblez : {name} x{qty}.",
-      "catchLine": "You reel in: {name}"
+      "catchLine": "You reel in: {name}",
+      "nodeName": {
+        "ore": "Ore Vein",
+        "wood": "Timber Stand",
+        "herb": "Herb Patch"
+      },
+      "tierRequired": {
+        "mining": "Requires a tier {tier} mining pick",
+        "logging": "Requires a tier {tier} logging axe",
+        "herbalism": "Requires a tier {tier} herbalism sickle"
+      },
+      "toolTierUnmet": {
+        "mining": "You need a tier {tier} mining pick to harvest this vein.",
+        "logging": "You need a tier {tier} logging axe to fell this stand.",
+        "herbalism": "You need a tier {tier} herbalism sickle to gather this patch."
+      },
+      "toolTierUnmetCorpse": "You need a tier {tier} gathering tool to recover the finest materials.",
+      "stateReady": "Ready",
+      "stateCooldown": "Respawning"
     },
     "archetypeTitle": {
       "label": "Titre",
@@ -8713,6 +8731,12 @@ export const fr_FR: EnTranslations = {
       },
       "verlans_oathblade": {
         "name": "Lame du serment de Verlan"
+      },
+      "ironreel_fishing_rod": {
+        "name": "Canne à moulinet de fer"
+      },
+      "silverstream_fishing_rod": {
+        "name": "Canne du ruisseau d'argent"
       },
       "briny_idol": {
         "name": "Idole saumâtre"

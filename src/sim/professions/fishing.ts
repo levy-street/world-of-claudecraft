@@ -23,6 +23,7 @@ import type { SimContext } from '../sim_context';
 import { type Entity, FISHING_CAST_ID, FISHING_CAST_TIME, isConsuming } from '../types';
 import { groundHeight, waterLevelAt } from '../world';
 import { queueGatheringGrant } from './gathering';
+import { bestOwnedGatherToolTier, canGatherTier } from './tools';
 
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
 const FISHING_SAMPLE_DISTANCES = [4, 8, 12, 16, 20, 24];
@@ -120,7 +121,21 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   // state, resolved before the single rng draw below, so the draw order never
   // depends on it. Fall back to the Vale table for any spot without its own
   // (e.g. fishable water inside a dungeon zone), per band.
-  const bandTables = FISHING_TABLES_BY_BAND[fishingBandFor(meta.gatheringProficiency.fishing ?? 0)];
+  // Phase 12 rod gating: catch band b requires tool tier b + 1 (the shared
+  // canGatherTier comparator), so band 0, the shipped table, is always
+  // reachable: the simple pole and bare hands both resolve to effective tier 1
+  // via bestOwnedGatherToolTier's bare-hands floor. Effective band =
+  // min(proficiency band, best band the owned rod tier covers). The cap is
+  // SILENT by design: no event and no denial, the cast still lands a
+  // band-capped catch (Phase 12b adds the rod-synergy UX). All of this is pure
+  // state resolved before the single rng draw below, so the one-draw-per-catch
+  // contract and every existing seed's catch sequence are untouched.
+  const rodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
+  let allowedBand: 0 | 1 | 2 = 0;
+  if (canGatherTier(rodTier, 2)) allowedBand = 1;
+  if (canGatherTier(rodTier, 3)) allowedBand = 2;
+  const profBand = fishingBandFor(meta.gatheringProficiency.fishing ?? 0);
+  const bandTables = FISHING_TABLES_BY_BAND[Math.min(profBand, allowedBand) as 0 | 1 | 2];
   const table = bandTables[zoneAt(p.pos.z).id] ?? bandTables.eastbrook_vale;
   const total = table.reduce((sum, e) => sum + e.weight, 0);
   let roll = ctx.rng.next() * total;

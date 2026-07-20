@@ -2312,6 +2312,11 @@ export interface GatherNodeDef {
   // (professions/profession_xp.ts gatherActionXp), snapshotted at authoring
   // time from the node's zone levelRange midpoint rather than looked up live.
   level: number;
+  // Access tier (Professions 2.0 Phase 12), 1 = bare-hands: gated via
+  // canGatherTier against the player's best owned matching tool
+  // (professions/tools.ts bestOwnedGatherToolTier). Pure access gating, never
+  // a speed mechanic; every pre-phase node is tier 1.
+  tier: number;
 }
 
 export interface DungeonSpawn {
@@ -3610,6 +3615,21 @@ export type SimEvent = { pid?: number } & (
       qty: number;
       // The rare event this harvest rolled (resolveHarvest draw #2), or null.
       rareEvent: GatherRareEventFlavor | null;
+    }
+  // Gathering tool-gate denial (Professions 2.0 Phase 12): the player lacks a
+  // matching tool of at least `requiredTier` for a node harvest, or for a
+  // corpse harvest's premium (signed/specimen) arm. Personal (pid = the
+  // gatherer) and text-free on purpose (like gatherResult above): the client
+  // composes its own localized copy off the structured fields. `professionId`
+  // is present exactly when surface === 'node' (a corpse harvest is gated by
+  // the best tool tier across ALL gathering professions, so no single
+  // profession applies).
+  | {
+      type: 'gatherDenied';
+      pid: number;
+      surface: 'node' | 'corpse';
+      requiredTier: number;
+      professionId?: GatheringProfessionId;
     }
   // Fishing catch outcome (Professions 2.0 Phase 11): a landed catch emits
   // this so the client can log the reel-in feedback line for the acting

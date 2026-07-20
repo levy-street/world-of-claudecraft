@@ -4969,6 +4969,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread3.name': 'Herbeigezauberter Honigkuchen',
   'entities.items.conjured_bread4.name': 'Herbeigezauberter Festschmauslaib',
   'entities.items.glimmerfin_koi.name': 'Schimmerflossen-Koi',
+  'entities.items.ironreel_fishing_rod.name': 'Eisenrollen-Angelrute',
+  'entities.items.silverstream_fishing_rod.name': 'Silberbach-Angelrute',
   'entities.items.raw_bog_eel.name': 'Roher Mooraal',
   'entities.items.raw_frostgill_trout.name': 'Rohe Frostkiemen-Forelle',
   'entities.items.raw_marsh_pike.name': 'Roher Sumpfhecht',

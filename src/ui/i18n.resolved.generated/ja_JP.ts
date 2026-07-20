@@ -2099,7 +2099,25 @@ export const ja_JP: EnTranslations = {
       "notReady": "この資源ノードはまだあなたのために再生していません。",
       "gatherLine": "{name}を採集した。",
       "gatherLineQty": "{name}を{qty}個採集した。",
-      "catchLine": "{name}を釣り上げた"
+      "catchLine": "{name}を釣り上げた",
+      "nodeName": {
+        "ore": "鉱脈",
+        "wood": "立木",
+        "herb": "薬草の群生地"
+      },
+      "tierRequired": {
+        "mining": "ティア{tier}の採掘ピッケルが必要",
+        "logging": "ティア{tier}の伐採斧が必要",
+        "herbalism": "ティア{tier}の薬草鎌が必要"
+      },
+      "toolTierUnmet": {
+        "mining": "この鉱脈を採掘するにはティア{tier}の採掘ピッケルが必要です。",
+        "logging": "この立木を伐り倒すにはティア{tier}の伐採斧が必要です。",
+        "herbalism": "この群生地を採取するにはティア{tier}の薬草鎌が必要です。"
+      },
+      "toolTierUnmetCorpse": "最高の素材を回収するにはティア{tier}の採集道具が必要です。",
+      "stateReady": "採集可能",
+      "stateCooldown": "再生中"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -8713,6 +8731,12 @@ export const ja_JP: EnTranslations = {
       },
       "verlans_oathblade": {
         "name": "ヴァーランの誓約刃"
+      },
+      "ironreel_fishing_rod": {
+        "name": "鉄リールの釣り竿"
+      },
+      "silverstream_fishing_rod": {
+        "name": "銀流の釣り竿"
       },
       "briny_idol": {
         "name": "潮辛の偶像"

@@ -1,6 +1,6 @@
 import { dist2d, type Entity, type GatherNodeDef, INTERACT_RANGE } from '../sim/types';
 import { corpseLootAvailability } from './corpse_loot_availability';
-import { handleGatherNodeInteract } from './gather_node_interact';
+import { type GatherNodeToolGate, handleGatherNodeInteract } from './gather_node_interact';
 import type { InteractionOutcome } from './interaction_autorun';
 
 export interface NearbyInteractionWorld {
@@ -24,13 +24,19 @@ export interface NearbyInteractionHud {
   requestSpiritHealerResurrect(): void;
 }
 
-type NearbyGatherNode = Pick<GatherNodeDef, 'id' | 'pos'>;
+type NearbyGatherNode = Pick<GatherNodeDef, 'id' | 'pos' | 'type' | 'tier'>;
 
-/** Find and dispatch one eligible nearby interaction in stable priority order. */
+/** Find and dispatch one eligible nearby interaction in stable priority order.
+ *  `nodeToolGateFor` (Professions 2.0 Phase 12) resolves the tool-tier access
+ *  gate + localized denial line for the node about to be harvested; it sits
+ *  with the node list (not trailing) so the live call site (main.ts
+ *  interactKey) still closes on the nothing-to-interact string, as pinned by
+ *  tests/client_shell.test.ts. */
 export function tryNearbyInteraction(
   world: NearbyInteractionWorld,
   hud: NearbyInteractionHud,
   gatherNodes: readonly NearbyGatherNode[],
+  nodeToolGateFor: ((node: NearbyGatherNode) => GatherNodeToolGate) | null,
   tooFarText: string,
   notReadyText: string,
   nothingToInteractText: string,
@@ -141,6 +147,7 @@ export function tryNearbyInteraction(
       bestNode.pos,
       tooFarText,
       notReadyText,
+      nodeToolGateFor?.(bestNode),
     );
   }
   hud.showError(nothingToInteractText);

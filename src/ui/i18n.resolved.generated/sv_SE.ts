@@ -2099,7 +2099,25 @@ export const sv_SE: EnTranslations = {
       "notReady": "Den här resursnoden har inte återspawnats för dig ännu.",
       "gatherLine": "Du samlar: {name}.",
       "gatherLineQty": "Du samlar in: {name} x{qty}.",
-      "catchLine": "You reel in: {name}"
+      "catchLine": "You reel in: {name}",
+      "nodeName": {
+        "ore": "Ore Vein",
+        "wood": "Timber Stand",
+        "herb": "Herb Patch"
+      },
+      "tierRequired": {
+        "mining": "Requires a tier {tier} mining pick",
+        "logging": "Requires a tier {tier} logging axe",
+        "herbalism": "Requires a tier {tier} herbalism sickle"
+      },
+      "toolTierUnmet": {
+        "mining": "You need a tier {tier} mining pick to harvest this vein.",
+        "logging": "You need a tier {tier} logging axe to fell this stand.",
+        "herbalism": "You need a tier {tier} herbalism sickle to gather this patch."
+      },
+      "toolTierUnmetCorpse": "You need a tier {tier} gathering tool to recover the finest materials.",
+      "stateReady": "Ready",
+      "stateCooldown": "Respawning"
     },
     "archetypeTitle": {
       "label": "Titel",
@@ -8713,6 +8731,12 @@ export const sv_SE: EnTranslations = {
       },
       "verlans_oathblade": {
         "name": "Verlans edsklinga"
+      },
+      "ironreel_fishing_rod": {
+        "name": "Järnrullespö"
+      },
+      "silverstream_fishing_rod": {
+        "name": "Silverbäcksspö"
       },
       "briny_idol": {
         "name": "Salt avgudabild"

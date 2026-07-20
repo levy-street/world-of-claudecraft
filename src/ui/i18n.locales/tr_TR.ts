@@ -2796,6 +2796,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.ghostly_essence.name': 'Hayalet Özü',
   'entities.items.glacier_melt.name': 'Buzul Suyu',
   'entities.items.glimmerfin_koi.name': 'Pırıltıyüzgeç Koi',
+  'entities.items.ironreel_fishing_rod.name': 'Demir makaralı olta',
+  'entities.items.silverstream_fishing_rod.name': 'Gümüş dere oltası',
   'entities.items.glowing_wax.name': 'Parlayan Balmumu',
   'entities.items.gnarled_staff.name': 'Bataklık Meşesi Asası',
   'entities.items.gorraks_cleaver.name': "Gorrak'ın Satırı",

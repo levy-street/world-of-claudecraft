@@ -215,6 +215,7 @@ import {
   resetFramePositionsOnce,
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
+import { gatherDeniedLineKey } from './gathering_view';
 import { holderTierBadgeDataUrl, holderTierByIndex, holderTierDisplayName } from './holder_tier';
 import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
 import { ActionBarController } from './hud/action_bar/action_bar_controller';
@@ -8892,6 +8893,18 @@ export class Hud {
                 })
               : t('hudChrome.gathering.gatherLine', { name }),
             QUALITY_COLOR[ev.rarity],
+          );
+          break;
+        }
+        case 'gatherDenied': {
+          // Tool-tier denial (Professions 2.0 Phase 12): an error toast ONLY.
+          // No loot line, no cue, no other state (the grant-hub double-log
+          // trap); the sim event is text-free, so the pure core resolves the
+          // key off surface + professionId and requiredTier interpolates.
+          this.showError(
+            t(gatherDeniedLineKey(ev.surface, ev.professionId) as TranslationKey, {
+              tier: formatNumber(ev.requiredTier, { maximumFractionDigits: 0 }),
+            }),
           );
           break;
         }
