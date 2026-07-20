@@ -387,6 +387,11 @@ import {
   streamerActionPlatform,
   streamerMenuActions,
 } from './player_context_menu';
+import {
+  type PlayerTooltipI18n,
+  type PlayerTooltipModel,
+  playerTooltipHtml,
+} from './player_tooltip_view';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
 import { buildProcOverlay } from './proc_overlay_dom';
@@ -672,6 +677,10 @@ const STAT_VIEW_DEPS: StatTooltipI18n = {
 };
 // Same i18n + number-formatting surface, handed to the pure mob-hover tooltip view.
 const MOB_TOOLTIP_VIEW_DEPS: MobTooltipI18n = {
+  t: (key, params) => t(key as TranslationKey, params),
+  fmt: (value, opts) => formatNumber(value, opts),
+};
+const PLAYER_TOOLTIP_VIEW_DEPS: PlayerTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
 };
@@ -1051,13 +1060,9 @@ export class Hud {
   private readonly tooltipOwner = new SharedTooltipOwner<HTMLElement>();
   // Distinguishes a touch long-press "peek" (inspect, no action) from a tap.
   private peekGuard = new TouchPeekGuard();
-  // The mob whose world-hover tooltip is currently shown (showMobHoverTooltip),
-  // so main.ts's per-frame updateHoverCursor can call it every frame while the
-  // same mob stays hovered without rebuilding the tooltip HTML each time.
-  // A small composite key (id:level:hostile:playerLevel), not just the mob id, so
-  // the hover tooltip repaints when a mid-hover change moves its model. See
-  // showMobHoverTooltip.
-  private lastMobTooltipId: string | null = null;
+  // The world entity whose hover tooltip is currently shown, so main.ts can call
+  // its show method every frame without rebuilding unchanged HTML.
+  private lastHoverTooltipId: string | null = null;
   private errorTimer: number | undefined;
   private lastMirroredErrorText: string | undefined;
   private bannerTimer: number | undefined;
@@ -4377,9 +4382,9 @@ export class Hud {
     const questKey = mobQuests
       .map((q) => `${q.questId}#${q.objectiveIndex}:${q.current}/${q.total}`)
       .join(',');
-    const key = `${entity.id}:${entity.level}:${entity.hostile ? 1 : 0}:${this.sim.player.level}:${questKey}`;
-    if (key === this.lastMobTooltipId) return;
-    this.lastMobTooltipId = key;
+    const key = `mob:${entity.id}:${entity.level}:${entity.hostile ? 1 : 0}:${this.sim.player.level}:${questKey}`;
+    if (key === this.lastHoverTooltipId) return;
+    this.lastHoverTooltipId = key;
     const template = MOBS[entity.templateId];
     if (!template) {
       this.hideTooltip();
@@ -4409,11 +4414,27 @@ export class Hud {
     this.paintMobTooltipBottomRight(mobTooltipHtml(model, MOB_TOOLTIP_VIEW_DEPS));
   }
 
-  // Clears the world-hover mob tooltip; a no-op if none is showing, so main.ts
-  // can call it unconditionally every frame nothing (or a non-mob) is hovered.
-  clearMobHoverTooltip(): void {
-    if (this.lastMobTooltipId === null) return;
-    this.lastMobTooltipId = null;
+  showPlayerHoverTooltip(entity: Entity): void {
+    const playerClass = entity.templateId as PlayerClass;
+    const classLabel = CLASSES[playerClass] ? classDisplayName(playerClass) : entity.templateId;
+    const key = `player:${entity.id}:${entity.name}:${entity.level}:${entity.templateId}:${entity.guild}`;
+    if (key === this.lastHoverTooltipId) return;
+    this.lastHoverTooltipId = key;
+    const model: PlayerTooltipModel = {
+      name: entity.name,
+      classLabel,
+      classColor: classCss(playerClass),
+      level: entity.level,
+      guild: entity.guild,
+    };
+    this.paintMobTooltipBottomRight(playerTooltipHtml(model, PLAYER_TOOLTIP_VIEW_DEPS));
+  }
+
+  // Clears a world-hover tooltip; a no-op if none is showing, so main.ts can
+  // call it unconditionally every frame nothing eligible is hovered.
+  clearHoverTooltip(): void {
+    if (this.lastHoverTooltipId === null) return;
+    this.lastHoverTooltipId = null;
     this.hideTooltip();
   }
 

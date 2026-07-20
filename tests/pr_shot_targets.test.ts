@@ -22,6 +22,12 @@ describe('classifyDiff', () => {
     expect(plan.generic).toHaveLength(0);
   });
 
+  it('maps the player tooltip view to its focused hover target', () => {
+    const plan = classifyDiff(['src/ui/player_tooltip_view.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toEqual(['player-tooltip']);
+  });
+
   it('maps the tank cooldown regression suite to its focused visual target', () => {
     const plan = classifyDiff(['tests/tank_defensive_cds.test.ts']);
     expect(plan.isVisual).toBe(true);
