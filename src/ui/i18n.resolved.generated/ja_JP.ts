@@ -8256,6 +8256,15 @@ export const ja_JP: EnTranslations = {
       "silverleaf_herb": {
         "name": "シルバーリーフ草"
       },
+      "boundstone_bulwark": {
+        "name": "縛石の防壁"
+      },
+      "drownedmoon_aegis": {
+        "name": "溺れ月の大盾"
+      },
+      "gravewyrm_bulwark": {
+        "name": "墓所竜の防壁"
+      },
       "rough_hide": {
         "name": "粗い獣皮"
       },

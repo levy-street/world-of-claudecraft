@@ -8256,6 +8256,15 @@ export const es: EnTranslations = {
       "silverleaf_herb": {
         "name": "Silverleaf Herb"
       },
+      "boundstone_bulwark": {
+        "name": "Baluarte de piedra vinculada"
+      },
+      "drownedmoon_aegis": {
+        "name": "Égida de la Luna Ahogada"
+      },
+      "gravewyrm_bulwark": {
+        "name": "Baluarte de la sierpe sepulcral"
+      },
       "rough_hide": {
         "name": "Rough Hide"
       },

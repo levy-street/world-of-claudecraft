@@ -8256,6 +8256,15 @@ export const ko_KR: EnTranslations = {
       "silverleaf_herb": {
         "name": "은빛잎 약초"
       },
+      "boundstone_bulwark": {
+        "name": "결속석 방벽"
+      },
+      "drownedmoon_aegis": {
+        "name": "익사한 달의 아이기스"
+      },
+      "gravewyrm_bulwark": {
+        "name": "무덤고룡 방벽"
+      },
       "rough_hide": {
         "name": "거친 가죽"
       },

@@ -8256,6 +8256,15 @@ export const zh_CN: EnTranslations = {
       "silverleaf_herb": {
         "name": "银叶草"
       },
+      "boundstone_bulwark": {
+        "name": "缚石壁垒"
+      },
+      "drownedmoon_aegis": {
+        "name": "溺月神盾"
+      },
+      "gravewyrm_bulwark": {
+        "name": "墓穴巨龙壁垒"
+      },
       "rough_hide": {
         "name": "粗糙的兽皮"
       },

@@ -365,6 +365,21 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 60, sta: 6, str: 3 },
     sellValue: 340,
   },
+  boundstone_bulwark: {
+    id: 'boundstone_bulwark',
+    name: 'Boundstone Bulwark',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'offhand',
+    shield: true,
+    blockValue: 20,
+    quality: 'rare',
+    // Level-19 Sanctum Boneguards make this item level 22. Nine primary
+    // stats is the exact rare offhand budget, weighted toward tank stamina.
+    stats: { armor: 300, sta: 6, str: 3 },
+    sellValue: 2800,
+    requiredClass: ['warrior', 'paladin', 'shaman'],
+  },
   gravewyrm_mantle: {
     id: 'gravewyrm_mantle',
     name: 'Gravewyrm Mantle',

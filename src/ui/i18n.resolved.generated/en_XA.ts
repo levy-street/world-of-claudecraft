@@ -8256,6 +8256,15 @@ export const en_XA: EnTranslations = {
       "silverleaf_herb": {
         "name": "[Šíļʋéŕļéáƒ Ĥéŕƀ]"
       },
+      "boundstone_bulwark": {
+        "name": "[Ɓóúñðšţóñé Ɓúļŵáŕķ]"
+      },
+      "drownedmoon_aegis": {
+        "name": "[Ðŕóŵñéð Ɱóóñ Áéĝíš]"
+      },
+      "gravewyrm_bulwark": {
+        "name": "[Ĝŕáʋéŵýŕɱ Ɓúļŵáŕķ]"
+      },
       "rough_hide": {
         "name": "[Ŕóúĝĥ Ĥíðé]"
       },

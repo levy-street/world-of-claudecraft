@@ -298,6 +298,9 @@ const WEAPONS = 'models/weapons';
 const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   eastbrook_buckler: 'shield_round',
   highwatch_wallshield: 'shield_square',
+  boundstone_bulwark: 'shield_round',
+  drownedmoon_aegis: 'shield_round',
+  gravewyrm_bulwark: 'shield_square',
   bonewrought_bulwark: 'shield_square',
 };
 
