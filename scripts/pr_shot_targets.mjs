@@ -808,6 +808,105 @@ export const TARGETS = [
       return {};
     },
   },
+  {
+    key: 'confirm-gates',
+    label: 'Confirm dialogs: spirit-healer revive + marks purchases',
+    when: ['ui/hud/delve/delve_board_controller', 'tests/hud_confirm_gates'],
+    variants: [
+      { key: 'healer-desktop', scene: 'healer' },
+      { key: 'heroic-desktop', scene: 'heroic' },
+      { key: 'delve-desktop', scene: 'delve' },
+      { key: 'healer-mobile', scene: 'healer', mobile: true },
+      { key: 'heroic-mobile', scene: 'heroic', mobile: true },
+    ],
+    // Each scene stages the pre-existing one-tap action and takes it through the
+    // REAL button so the shot proves the confirm dialog now gates it. Full-frame
+    // shots: the dialog matters together with the scene it interrupts (ghost
+    // prompt / vendor window / delve board).
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      if (variant.scene === 'healer') {
+        // Die, release through the real death overlay button, then stand at the
+        // Pale Keeper so the ghost prompt offers the healer revive.
+        await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          if (!sim) return;
+          sim.player.hp = 1;
+          sim.player.dead = true;
+        });
+        await wait(600);
+        await page.evaluate(() => document.querySelector('#release-btn')?.click());
+        await wait(600);
+        await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          if (!sim) return;
+          for (const ent of sim.entities.values()) {
+            if (ent.kind === 'npc' && ent.templateId === 'spirit_healer') {
+              sim.player.pos.x = ent.pos.x + 2;
+              sim.player.pos.z = ent.pos.z + 2;
+              break;
+            }
+          }
+        });
+        await wait(600);
+        await page.evaluate(() => document.querySelector('#resurrect-healer-btn')?.click());
+      } else if (variant.scene === 'heroic') {
+        await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          if (!sim) return;
+          sim.addItem('heroic_mark', 60);
+          for (const ent of sim.entities.values()) {
+            if (ent.kind === 'npc' && ent.templateId === 'heroic_quartermaster') {
+              game.hud.openHeroicVendor(ent.id);
+              break;
+            }
+          }
+        });
+        await wait(500);
+        await page.evaluate(() =>
+          document.querySelector('#vendor-window .vendor-item:not([disabled])')?.click(),
+        );
+      } else {
+        // Unlock the delve shop stock and fund the marks wallet, then buy
+        // through the real shop-tab button.
+        await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          if (!sim) return;
+          const meta = sim.players.get(sim.player.id);
+          if (meta) {
+            meta.delveMarks = 99;
+            meta.delveClears = {
+              'collapsed_reliquary:normal': 20,
+              'collapsed_reliquary:heroic': 20,
+            };
+          }
+          for (const ent of sim.entities.values()) {
+            if (ent.kind === 'npc' && ent.templateId === 'brother_halven') {
+              game.hud.delveBoard.open(ent.id);
+              break;
+            }
+          }
+        });
+        await wait(500);
+        await page.evaluate(() =>
+          document.querySelector('#delve-board [data-board-tab="shop"]')?.click(),
+        );
+        await wait(400);
+        await page.evaluate(() =>
+          document.querySelector('#delve-board [data-buy]:not([disabled])')?.click(),
+        );
+      }
+      await pollForSize(page, '#confirm-dialog');
+      return {};
+    },
+  },
 ];
 
 // Map a list of changed file paths to the targets they imply (deduped, registry order).
