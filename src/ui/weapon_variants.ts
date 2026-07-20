@@ -55,6 +55,9 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   sloomtooth_tidefang: 'adv_dagger',
   skullsplitter_dirk: 'adv_dagger',
   first_blood_razor: 'adv_dagger', // WARFARE Agility main hand
+  mirejaw_fang_knife: 'dagger_a', // knives share dagger_a (vale_carving_knife)
+  drowned_choir_fang: 'dagger_c', // fangs share dagger_c (fang_of_korzul)
+  mistcallers_fang: 'adv_dagger', // EPIC: Heroic Vael dagger
 
   // ---- staves (staff_a..d + adv_staff + adv_druid_staff) ----------------------
   gnarled_staff: 'staff_a',
@@ -75,11 +78,16 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   deathless_heartwood: 'adv_druid_staff', // LEGENDARY druid relic (antler staff)
   drovers_staff: 'adv_druid_staff',
   emberglass_warstaff: 'adv_staff', // WARFARE caster main hand
+  lunar_tide_greatstaff: 'adv_staff', // EPIC: Heroic Ysolei staff
 
-  // ---- wands (1H caster: scepters / rods) -------------------------------------
+  // ---- wands (1H caster: scepters / rods / foci) ------------------------------
   drowned_tide_scepter: 'wand_a',
   drownedmoon_scepter: 'wand_b',
   palecoil_rod: 'adv_wand',
+  corpse_candle_focus: 'wand_a',
+  nhalias_litany_rod: 'wand_b',
+  stormcallers_focus: 'wand_b', // EPIC: Nythraxis raid caster focus
+  scepter_of_the_deathless_court: 'adv_wand', // EPIC: Nythraxis raid scepter
 
   // ---- maces (only 4 hammer models for ~9 maces) -----------------------------
   training_mace: 'hammer_a',
@@ -91,6 +99,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   bristleback_maul: 'hammer_d',
   brutoks_maul: 'hammer_d',
   drownedmoon_maul: 'hammer_d',
+  nhalias_bell_maul: 'hammer_d', // mauls share hammer_d
 
   // ---- axes (axe_a..d + adv axes) --------------------------------------------
   rusty_hatchet: 'axe_a',
@@ -99,6 +108,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   gorraks_cruel_chopper: 'axe_d',
   gorraks_cleaver: 'adv_axe_1handed',
   tradesman_hatchet: 'adv_axe_1handed',
+  gravewyrm_cleaver: 'adv_axe_1handed', // EPIC: Heroic Korzul axe
   tunnelkings_spade: 'adv_axe_2handed',
 
   // ---- polearms --------------------------------------------------------------
