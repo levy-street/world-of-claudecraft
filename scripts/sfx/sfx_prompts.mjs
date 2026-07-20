@@ -736,6 +736,12 @@ export const SFX = [
   { key: 'ui_gather_wood', custom: true },
   { key: 'ui_gather_herb', custom: true },
 
+  // Rare-or-better gather stinger: layers ALONGSIDE the ui_gather_<nodeType>
+  // cue above, one tier per rolled MaterialRarity (common/uncommon get none).
+  { key: 'ui_gather_rare', custom: true },
+  { key: 'ui_gather_epic', custom: true },
+  { key: 'ui_gather_legendary', custom: true },
+
   // --- Crafting completion, per craft family (custom recordings) -----------
   // One cue per CRAFT_RING entry (src/sim/content/professions.ts), fired from
   // the craftResult sim event keyed off recipeId's craft family.
@@ -762,6 +768,16 @@ export const SFX = [
   // as of 2026-07-18; the sound is wired and ready for whenever that trigger
   // gets built.
   { key: 'ui_craft_disenchant', custom: true },
+
+  // Salvage proc (custom recording): the enchanting profession's ungated
+  // break-any-item-for-generic-materials action (src/sim/professions/
+  // salvage.ts), separate from disenchant's rare+ arcane-materials path.
+  { key: 'ui_craft_salvage', custom: true },
+
+  // Apply-enchant proc (custom recording): the enchanting profession's
+  // apply-an-enchant-onto-a-held-copy action (src/sim/professions/
+  // enchanting.ts applyEnchant).
+  { key: 'ui_craft_enchant', custom: true },
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to
