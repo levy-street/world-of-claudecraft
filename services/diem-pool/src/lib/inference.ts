@@ -83,21 +83,29 @@ export function invalidatePoolCache(): void {
   globalState.classMapCache = null;
 }
 
-/** Top-priority active concrete model per (class, vendor), cached. */
-async function getClassMap(): Promise<Map<string, Map<VendorName, string>>> {
-  const cached = globalState.classMapCache;
-  if (cached && Date.now() - cached.at < CLASS_MAP_CACHE_MS) return cached.byClass;
-
-  const rows = await prisma.modelClassMap.findMany({
-    where: { active: true },
-    orderBy: { priority: 'asc' },
-  });
+/**
+ * Fold class-map rows into the best (lowest priority number wins) active
+ * concrete model per (class, vendor). Pure — exported for tests.
+ */
+export function foldClassMap(
+  rows: Array<{ class: string; vendor: string; model: string; priority: number; active: boolean }>,
+): Map<string, Map<VendorName, string>> {
   const byClass = new Map<string, Map<VendorName, string>>();
-  for (const row of rows) {
+  for (const row of [...rows].sort((a, b) => a.priority - b.priority)) {
+    if (!row.active) continue;
     const vendors = byClass.get(row.class) ?? new Map<VendorName, string>();
     if (!vendors.has(row.vendor as VendorName)) vendors.set(row.vendor as VendorName, row.model);
     byClass.set(row.class, vendors);
   }
+  return byClass;
+}
+
+/** Cached class → vendor → concrete-model resolution. */
+async function getClassMap(): Promise<Map<string, Map<VendorName, string>>> {
+  const cached = globalState.classMapCache;
+  if (cached && Date.now() - cached.at < CLASS_MAP_CACHE_MS) return cached.byClass;
+
+  const byClass = foldClassMap(await prisma.modelClassMap.findMany({ where: { active: true } }));
   globalState.classMapCache = { at: Date.now(), byClass };
   return byClass;
 }

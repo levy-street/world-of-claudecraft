@@ -3,10 +3,8 @@ import {
   computeSettlement,
   computeSuspicionScore,
   nextHealthyStreak,
-  persistSettlementRows,
   utcDay,
   vestingDate,
-  type LedgerStore,
   type ProviderDay,
   type SettlementConfig,
   type SettlementRow,
@@ -186,14 +184,18 @@ describe('computeSettlement — per-provider emission cap', () => {
 });
 
 describe('settlement idempotency', () => {
-  class FakeLedger implements LedgerStore {
+  // Models the worker's persistence contract: upsert keyed on
+  // (providerId, date) — the property that makes re-runs safe.
+  class FakeLedger {
     rows = new Map<string, SettlementRow>();
     writes = 0;
-    async upsertRow(dateUtc: Date, row: SettlementRow): Promise<void> {
+    upsert(dateUtc: Date, row: SettlementRow): void {
       this.writes++;
       this.rows.set(`${row.providerId}:${dateUtc.toISOString()}`, row);
     }
   }
+  const persist = (store: FakeLedger, dateUtc: Date, rows: SettlementRow[]) =>
+    rows.forEach((row) => store.upsert(dateUtc, row));
 
   it('re-running a settlement never duplicates or changes ledger rows', async () => {
     const days = [
@@ -204,13 +206,13 @@ describe('settlement idempotency', () => {
     const store = new FakeLedger();
 
     const first = computeSettlement(days, CFG);
-    await persistSettlementRows(store, date, first);
+    persist(store, date, first);
     const snapshot = new Map(store.rows);
 
     // Same inputs → same rows; upsert keyed on (providerId, date) → same state.
     const second = computeSettlement(days, CFG);
     expect(second).toEqual(first);
-    await persistSettlementRows(store, date, second);
+    persist(store, date, second);
 
     expect(store.writes).toBe(4);
     expect(store.rows.size).toBe(2);
@@ -220,8 +222,8 @@ describe('settlement idempotency', () => {
   it('a different day writes distinct rows (no cross-day clobbering)', async () => {
     const rows = computeSettlement([day({ providerId: 'a', consumedUsd: 1 })], CFG);
     const store = new FakeLedger();
-    await persistSettlementRows(store, utcDay(new Date('2026-07-19T12:00:00Z')), rows);
-    await persistSettlementRows(store, utcDay(new Date('2026-07-20T12:00:00Z')), rows);
+    persist(store, utcDay(new Date('2026-07-19T12:00:00Z')), rows);
+    persist(store, utcDay(new Date('2026-07-20T12:00:00Z')), rows);
     expect(store.rows.size).toBe(2);
   });
 });

@@ -182,7 +182,7 @@ type LedgerRowWithProvider = {
   standbyClaudium: number;
   capped: boolean;
   totalClaudium: number;
-  provider: { wallet: string; vendor: string };
+  provider: { wallet: string; vendor: VendorName };
 };
 
 function toEvent(row: LedgerRowWithProvider): SettlementEvent {

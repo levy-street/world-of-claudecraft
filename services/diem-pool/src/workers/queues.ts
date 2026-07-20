@@ -1,6 +1,7 @@
 import { Queue } from 'bullmq';
 import { Redis } from 'ioredis';
 import { getEnv } from '@/lib/env';
+import type { VendorName } from '@/lib/vendors/config';
 
 export const MAINTENANCE_QUEUE = 'pool-maintenance';
 /** The game backend consumes this queue to credit players' Claudium balances. */
@@ -23,7 +24,7 @@ export interface SettlementEvent {
   /** Consumers must dedupe on (providerId, date) — delivery is at-least-once. */
   providerId: string;
   wallet: string;
-  vendor: string;
+  vendor: VendorName;
   date: string; // YYYY-MM-DD (UTC)
   consumedUsd: number;
   baseClaudium: number;

@@ -224,6 +224,28 @@ Notes:
 | `POST /api/internal/inference` | Game → pool inference (shared secret) |
 | `GET /api/admin/overview` · `GET/PUT /api/admin/pricing` · `GET/POST /api/admin/killswitch` · `GET/PUT /api/admin/vendors` | Admin API |
 
+## Deploying (Railway)
+
+The service ships a production `Dockerfile` (migrate-on-start web process;
+the same image runs the worker with a different command) and a
+`railway.json` with the `/api/health` healthcheck wired up. From a machine
+with the Railway CLI authenticated:
+
+```bash
+cd services/diem-pool
+railway init                       # or `railway link` to an existing project
+railway add --database postgres    # provides DATABASE_URL
+railway add --database redis       # provides REDIS_URL
+railway variables set KEY_ENCRYPTION_KEY=$(openssl rand -hex 32) \
+  INTERNAL_SHARED_SECRET=$(openssl rand -hex 32) ADMIN_TOKEN=$(openssl rand -hex 16)
+railway up                         # builds the Dockerfile, deploys the web process
+# Worker: add a second service on the same repo/image with
+# start command `npm run worker`, sharing the same variables.
+```
+
+`prisma migrate deploy` runs on boot and is idempotent, so deploys and
+rollbacks (redeploy the previous image) are safe in either direction.
+
 ## Operations
 
 - **Monitoring**: `GET /api/health` (unauthenticated, for LB probes and

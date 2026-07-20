@@ -528,6 +528,39 @@ console.log('— vesting lifecycle & voiding —');
   await evq.close();
 }
 
+console.log('— stolen-key simulation (health probe INVALID voids pending) —');
+{
+  await clearRateLimits();
+  // A key that validated fine at registration, then got killed upstream —
+  // the signature of a stolen key once the victim notices.
+  const dying = await registerWith(null, 'Dying Rig', 'openai', 'sk-oai-dies-later-0123456789abc', {
+    dailyBudgetUsd: 10,
+  });
+  // Pending reward from an earlier day, as if it had served compute already.
+  await prisma.rewardLedger.create({
+    data: {
+      providerId: dying.id,
+      date: utcDay(new Date(), 2),
+      consumedUsd: 1,
+      baseClaudium: 100,
+      multiplier: 1,
+      standbyClaudium: 0,
+      capped: false,
+      totalClaudium: 100,
+      status: 'PENDING',
+      vestAt: new Date(Date.now() + 5 * 86_400_000),
+    },
+  });
+
+  const { runHealthProbes } = await import('../src/workers/health');
+  await runHealthProbes();
+
+  const row = await prisma.provider.findUnique({ where: { id: dying.id } });
+  check('health probe marks the upstream-revoked key INVALID', row?.status === 'INVALID', row?.status);
+  const ledger = await prisma.rewardLedger.findFirst({ where: { providerId: dying.id } });
+  check('going INVALID voids the pending rewards', ledger?.status === 'VOIDED', ledger?.status);
+}
+
 console.log('— admin pricing editor —');
 {
   const put = await api('/api/admin/pricing', {

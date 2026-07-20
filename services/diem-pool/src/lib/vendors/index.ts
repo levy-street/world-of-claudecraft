@@ -41,10 +41,7 @@ function openAiCompatibleAdapter(
   const opts = { baseUrl };
   return {
     vendor,
-    async validateKey(key) {
-      const result = await validateKey(key, validationModel, opts);
-      return result.ok ? { ok: true } : result;
-    },
+    validateKey: (key) => validateKey(key, validationModel, opts),
     probe: (key) => probeKey(key, opts),
     chat: (key, req) => chatCompletion(key, { ...req.payload, model: req.model }, opts),
   };

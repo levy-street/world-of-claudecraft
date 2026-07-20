@@ -107,23 +107,6 @@ export function computeSuspicionScore(
   return Math.round((top / total) * 10000) / 10000;
 }
 
-// Persistence is defined structurally so the worker passes Prisma and the
-// tests pass a fake; idempotency (re-running a day never duplicates or
-// double-pays) is a property of upserting on (providerId, date).
-export interface LedgerStore {
-  upsertRow(dateUtc: Date, row: SettlementRow): Promise<void>;
-}
-
-export async function persistSettlementRows(
-  store: LedgerStore,
-  dateUtc: Date,
-  rows: SettlementRow[],
-): Promise<void> {
-  for (const row of rows) {
-    await store.upsertRow(dateUtc, row);
-  }
-}
-
 /** Midnight-UTC Date for the calendar day `daysAgo` days before `now`. */
 export function utcDay(now: Date, daysAgo = 0): Date {
   return new Date(

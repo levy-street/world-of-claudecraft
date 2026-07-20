@@ -9,6 +9,7 @@
 //   "broke"       → credit exhausted on everything (unfunded key)
 //   "flaky"       → passes the 1-token validation call, then 500s
 //   "quota-later" → passes validation, then reports quota exhausted
+//   "dies-later"  → passes validation, then 401s (stolen key killed upstream)
 // Every successful chat call reports usage of 100 prompt / 50 completion
 // tokens so metering assertions are exact.
 import http from 'node:http';
@@ -44,6 +45,11 @@ const server = http.createServer(async (req, res) => {
       ? json(400, { type: 'error', error: { type: 'invalid_request_error', message: 'Your credit balance is too low' } })
       : json(429, { error: { message: 'You exceeded your current quota', code: 'insufficient_quota' } });
   }
+  const deadAuth = () =>
+    anthropic
+      ? json(401, { type: 'error', error: { type: 'authentication_error', message: 'api key revoked' } })
+      : json(401, { error: { message: 'api key revoked' } });
+  if (key.includes('dies-later') && req.method === 'GET') return deadAuth();
 
   // ── Anthropic dialect ──────────────────────────────────────────────────────
   if (anthropic) {
@@ -55,6 +61,7 @@ const server = http.createServer(async (req, res) => {
       if (!p.model || !Array.isArray(p.messages) || typeof p.max_tokens !== 'number') {
         return json(400, { type: 'error', error: { type: 'invalid_request_error', message: 'model, messages, max_tokens required' } });
       }
+      if (key.includes('dies-later') && p.max_tokens !== 1) return deadAuth();
       if (key.includes('flaky') && p.max_tokens !== 1) {
         return json(529, { type: 'error', error: { type: 'overloaded_error', message: 'Overloaded' } });
       }
@@ -80,6 +87,7 @@ const server = http.createServer(async (req, res) => {
   }
   if (req.method === 'POST' && url.endsWith('/chat/completions')) {
     const p = await readBody(req);
+    if (key.includes('dies-later') && p.max_tokens !== 1) return deadAuth();
     if (key.includes('flaky') && p.max_tokens !== 1) {
       return json(500, { error: { message: 'upstream exploded' } });
     }
