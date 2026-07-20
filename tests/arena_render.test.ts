@@ -1,3 +1,6 @@
+import { getBounds, NodeIO } from '@gltf-transform/core';
+import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { MeshoptDecoder } from 'meshoptimizer';
 import { describe, expect, it } from 'vitest';
 import { DungeonInteriors } from '../src/render/dungeon';
 import { ARENA_LAYOUT } from '../src/sim/dungeon_layout';
@@ -12,7 +15,18 @@ interface PlacementCall {
 }
 
 describe('arena cover rendering', () => {
-  it('maps each visible cover wall footprint onto its authored collider', () => {
+  it('maps each visible cover wall footprint onto its authored collider', async () => {
+    await MeshoptDecoder.ready;
+    const io = new NodeIO()
+      .registerExtensions(ALL_EXTENSIONS)
+      .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+    const document = await io.read('public/models/dungeon/wall.glb');
+    const scene = document.getRoot().listScenes()[0];
+    if (!scene) throw new Error('wall.glb has no scene');
+    const bounds = getBounds(scene);
+    expect(bounds.min[1]).toBeCloseTo(0, 6);
+    expect(bounds.max[1]).toBeCloseTo(4, 6);
+
     const calls: PlacementCall[] = [];
     const placements = {
       add: (
@@ -45,21 +59,21 @@ describe('arena cover rendering', () => {
       expect(Array.isArray(call.scale)).toBe(true);
       if (!Array.isArray(call.scale)) throw new Error('arena cover requires non-uniform scale');
 
-      // wall.glb bakes to local X [-2, 2] and Z [-0.5, 0.5]. Transform all
-      // four footprint corners with the same Y rotation Placements.add uses.
+      // Transform the shipped GLB's real bounds with the same scale and
+      // Y rotation Placements.add uses, including asset quantization.
       const [scaleX, , scaleZ] = call.scale;
-      const corners = [-2, 2].flatMap((localX) =>
-        [-0.5, 0.5].map((localZ) => ({
+      const corners = [bounds.min[0], bounds.max[0]].flatMap((localX) =>
+        [bounds.min[2], bounds.max[2]].map((localZ) => ({
           x: call.x + Math.cos(call.rotY) * localX * scaleX + Math.sin(call.rotY) * localZ * scaleZ,
           z: call.z - Math.sin(call.rotY) * localX * scaleX + Math.cos(call.rotY) * localZ * scaleZ,
         })),
       );
       const xs = corners.map((corner) => corner.x);
       const zs = corners.map((corner) => corner.z);
-      expect(Math.min(...xs)).toBeCloseTo(stub.x - stub.hw, 6);
-      expect(Math.max(...xs)).toBeCloseTo(stub.x + stub.hw, 6);
-      expect(Math.min(...zs)).toBeCloseTo(stub.z - stub.hd, 6);
-      expect(Math.max(...zs)).toBeCloseTo(stub.z + stub.hd, 6);
+      expect(Math.min(...xs)).toBeCloseTo(stub.x - stub.hw, 3);
+      expect(Math.max(...xs)).toBeCloseTo(stub.x + stub.hw, 3);
+      expect(Math.min(...zs)).toBeCloseTo(stub.z - stub.hd, 3);
+      expect(Math.max(...zs)).toBeCloseTo(stub.z + stub.hd, 3);
     }
   });
 });

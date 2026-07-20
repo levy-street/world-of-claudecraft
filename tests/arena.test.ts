@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { cameraOcclusion, lineOfSightClear } from '../src/sim/colliders';
-import { ARENA_X_MIN, arenaOrigin, dungeonAt, instanceOrigin, isArenaPos } from '../src/sim/data';
+import { cameraOcclusion, lineOfSightClear, resolveMovement } from '../src/sim/colliders';
+import {
+  ARENA_SLOT_COUNT,
+  ARENA_X_MIN,
+  arenaOrigin,
+  dungeonAt,
+  instanceOrigin,
+  isArenaPos,
+} from '../src/sim/data';
 import {
   ARENA_LAYOUT,
   ARENA_SPAWNS_A_2v2,
@@ -762,6 +769,52 @@ describe('arena: enclosing walls', () => {
     expect(eastDistance).toBeCloseTo(expectedStop, 5);
     expect(westDistance).toBeCloseTo(eastDistance, 5);
   });
+
+  it.each(Array.from({ length: ARENA_SLOT_COUNT }, (_, slot) => slot))(
+    'sweeps high-speed movement against all four walls in slot %s',
+    (slot) => {
+      const sim = makeWorld();
+      const o = arenaOrigin(slot);
+      const xLimit = DUNGEON_WALL_X - DUNGEON_WALL_HW - PLAYER_BODY_RADIUS;
+      const zMinLimit = ARENA_LAYOUT.zMin + DUNGEON_WALL_HW + PLAYER_BODY_RADIUS;
+      const zMaxLimit = ARENA_LAYOUT.zMax - DUNGEON_WALL_HW - PLAYER_BODY_RADIUS;
+      const cases = [
+        {
+          from: { x: o.x, z: o.z - 14 },
+          to: { x: o.x - DUNGEON_WALL_X - 10, z: o.z - 14 },
+          inside: (x: number, _z: number) => x >= o.x - xLimit - 1e-6,
+        },
+        {
+          from: { x: o.x, z: o.z - 14 },
+          to: { x: o.x + DUNGEON_WALL_X + 10, z: o.z - 14 },
+          inside: (x: number, _z: number) => x <= o.x + xLimit + 1e-6,
+        },
+        {
+          from: { x: o.x + 5, z: o.z + 2 },
+          to: { x: o.x + 5, z: o.z + ARENA_LAYOUT.zMin - 10 },
+          inside: (_x: number, z: number) => z >= o.z + zMinLimit - 1e-6,
+        },
+        {
+          from: { x: o.x + 5, z: o.z + 2 },
+          to: { x: o.x + 5, z: o.z + ARENA_LAYOUT.zMax + 10 },
+          inside: (_x: number, z: number) => z <= o.z + zMaxLimit + 1e-6,
+        },
+      ];
+
+      for (const testCase of cases) {
+        const result = resolveMovement(
+          sim.cfg.seed,
+          testCase.from.x,
+          testCase.from.z,
+          testCase.to.x,
+          testCase.to.z,
+          PLAYER_BODY_RADIUS,
+        );
+        expect(testCase.inside(result.x, result.z)).toBe(true);
+        expect(result).not.toEqual(testCase.to);
+      }
+    },
+  );
 
   it('blocks line of sight through both side walls', () => {
     const sim = makeWorld();
