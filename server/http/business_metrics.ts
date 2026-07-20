@@ -26,6 +26,7 @@ export const WOC_PLAYER_DAILY_PLAYTIME_SECONDS = 'woc_player_daily_playtime_seco
 export const WOC_PLAYER_FIRST_SESSION_MEDIAN_SECONDS = 'woc_player_first_session_median_seconds';
 export const WOC_PLAYER_FIRST_SESSION_LEVEL_RATE = 'woc_player_first_session_level_rate';
 export const WOC_PLAYER_RETENTION_RATE = 'woc_player_retention_rate';
+export const WOC_METRICS_REFRESH_COALESCED_TOTAL = 'woc_metrics_refresh_coalesced_total';
 export const WOC_PLAYER_FIRST_DAY_PLAYTIME_SECONDS = 'woc_player_first_day_playtime_seconds';
 export const WOC_PLAYER_FIRST_DAY_SESSIONS = 'woc_player_first_day_sessions';
 export const WOC_PLAYER_FIRST_DAY_PLAYTIME_ACCOUNTS = 'woc_player_first_day_playtime_accounts';
@@ -91,12 +92,27 @@ export function registerBusinessMetrics(
     refreshFailures.inc({ collector });
     console.error(`metrics collector refresh failed (${collector}):`, err);
   };
+  // A Counter rather than a Gauge with collect(): counters only support inc(), so the
+  // count cannot be backfilled from the collector's live getter at scrape time. The
+  // onCoalesce sink increments it per collector as each coalesce happens instead.
+  const coalesced = new Counter({
+    name: WOC_METRICS_REFRESH_COALESCED_TOTAL,
+    help: 'Refresh calls that joined an already in-flight collector query.',
+    labelNames: ['collector'],
+    registers: [registry],
+  });
+  // Touch each fixed label at registration so both series always render, starting at 0.
+  coalesced.inc({ collector: 'engagement' }, 0);
+  coalesced.inc({ collector: 'funnel' }, 0);
   const engagementCollector = new PeriodicCollector(
     queries.business,
     intervalMs,
     onError('engagement'),
+    () => coalesced.inc({ collector: 'engagement' }),
   );
-  const funnelCollector = new PeriodicCollector(queries.funnel, intervalMs, onError('funnel'));
+  const funnelCollector = new PeriodicCollector(queries.funnel, intervalMs, onError('funnel'), () =>
+    coalesced.inc({ collector: 'funnel' }),
+  );
 
   new Gauge({
     name: WOC_METRICS_COLLECTOR_SNAPSHOT_AGE_SECONDS,

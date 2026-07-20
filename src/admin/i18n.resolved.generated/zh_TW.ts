@@ -46,6 +46,7 @@ export const zh_TW: AdminTranslations = {
   "stats.peakOnline": "在線尖峰",
   "stats.peakOnlineToday": "24小時在線尖峰",
   "stats.peakOnlineAllTime": "歷史在線尖峰",
+  "stats.playersCap": "player cap",
   "stats.accounts": "帳號數",
   "stats.characters": "角色數",
   "stats.newAccounts24h": "24小時新帳號",

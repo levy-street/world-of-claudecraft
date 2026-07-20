@@ -1,27 +1,23 @@
-// Frozen Orb: the frost mage's roaming proc generator (owner design
+// Frozen Orb: the frost mage's roaming Icicle generator (owner design
 // 2026-07-11). The cast releases an orb that drifts slowly forward from the
 // caster, pulsing frost damage and a 30% snare on everything nearby once per
-// second for its 8s life. The FIRST enemy it ever strikes guarantees one
-// Fingers of Frost stack; after that, every pulse that struck at least one
-// enemy rolls one 20% chance for another (combat/frost_mage.ts owns the
-// stack rules and the 2-stack cap).
+// second for its 8s life. Each striking pulse banks one Icicle, never a
+// Fingers of Frost proc.
 //
 // The orb is SIM STATE, not an Entity: it lives in ctx.frozenOrbs (backing
 // array on Sim, the groundAoEs idiom), is never serialized or wired, and
 // dies with its caster. Movement, pulses, and expiry advance in
 // tickFrozenOrbs, called once per tick from Sim next to tickGroundAoEs.
 //
-// Determinism: pulses draw rng in a fixed order (per-target damage range in
-// hostilesInRadius grid order, then AT MOST one proc chance per pulse, drawn
-// only when the pulse struck someone). Only a committed-frost mage can cast
-// the ability, so no pre-existing golden ever reaches these draws.
+// Determinism: pulses draw damage ranges in hostilesInRadius grid order. Proc
+// generation is deterministic and does not add another shared-rng draw.
 //
 // `src/sim`-pure: sibling sim modules + the SimContext seam only
 // (enforced by tests/architecture.test.ts).
 
 import type { SimContext } from '../sim_context';
 import { DT, type Entity } from '../types';
-import { gainFingersOfFrost, gainIcicle } from './frost_mage';
+import { gainIcicle } from './frost_mage';
 import { spellDamageMultFromAuras } from './spell_combat';
 
 // Slow drift, WoW-style: fast enough to sweep a pack, slow enough that a
@@ -29,7 +25,6 @@ import { spellDamageMultFromAuras } from './spell_combat';
 export const FROZEN_ORB_SPEED = 4; // yards per second (owner playtest: 2.5 crawled)
 export const FROZEN_ORB_SLOW_MULT = 0.7; // -30% move speed
 export const FROZEN_ORB_SLOW_DURATION = 2.5; // refreshed every pulse it keeps hitting
-export const FROZEN_ORB_FINGERS_CHANCE = 0.2; // per pulse that struck someone
 // The orb LATCHES onto prey (owner design 2026-07-11, revised same day): while
 // any living hostile its PULSES can strike (inside the pulse radius, with the
 // pulse's own line-of-sight gate) remains, the orb holds position and grinds;
@@ -52,8 +47,6 @@ export interface FrozenOrbState {
   interval: number;
   pulseTimer: number;
   abilityName: string;
-  // The first strike's guaranteed Fingers of Frost has been granted.
-  firstHitDone: boolean;
   // Latched: a living enemy the pulses can strike is in reach, so the orb
   // holds position until nothing strikeable lives. Transitions emit the
   // halt/resume visual events so the client flight animation tracks the path.
@@ -116,7 +109,6 @@ export function spawnFrozenOrb(
     // scheduled tick (the cast itself is the wind-up, not a free hit).
     pulseTimer: eff.interval,
     abilityName,
-    firstHitDone: false,
     halted: false,
   });
 }
@@ -211,15 +203,6 @@ function pulseOrb(ctx: SimContext, orb: FrozenOrbState, source: Entity): void {
   if (struck === 0) return;
   // Each striking pulse also banks one Icicle toward Glacial Spike (deterministic,
   // no rng, so it never shifts the shared stream); this is what makes the orb the
-  // spender's accelerator. One per pulse, not per target, matching the proc rule.
+  // spender's accelerator. One per pulse, not per target.
   gainIcicle(ctx, source);
-  // Proc generation: the orb's whole point. One guaranteed stack on the first
-  // strike of the orb's life, then AT MOST one 20% roll per striking pulse
-  // (never one per target, so pack size cannot flood the rng stream).
-  if (!orb.firstHitDone) {
-    orb.firstHitDone = true;
-    gainFingersOfFrost(ctx, source);
-    return;
-  }
-  if (ctx.rng.chance(FROZEN_ORB_FINGERS_CHANCE)) gainFingersOfFrost(ctx, source);
 }

@@ -22,7 +22,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
   es: {
     mag_r5_blink_cast: 'Puedes usar Paso Fugaz en mitad de un lanzamiento sin interrumpirlo.',
     mag_r8_temporal_rift:
-      'Cada 20 s, el siguiente aturdimiento, inmovilización o silencio que te impacte se limpia al instante.',
+      'Lanzar tu barrera personal elimina los efectos de inmovilización que te afectan.',
     mag_r17_convergence:
       'Alternar un hechizo de Fuego y uno de Escarcha abre una oleada de poder de 8 s, una vez cada 30 s.',
     mag_r20_overflowing_power:
@@ -42,7 +42,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
   es_ES: {
     mag_r5_blink_cast: 'Puedes usar Paso Fugaz en mitad de un lanzamiento sin interrumpirlo.',
     mag_r8_temporal_rift:
-      'Cada 20 s, el siguiente aturdimiento, inmovilización o silencio que te impacte se limpia al instante.',
+      'Lanzar tu barrera personal elimina los efectos de inmovilización que te afectan.',
     mag_r17_convergence:
       'Alternar un hechizo de Fuego y uno de Escarcha abre una oleada de poder de 8 s, una vez cada 30 s.',
     mag_r20_overflowing_power:
@@ -63,7 +63,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     mag_r5_blink_cast:
       "Vous pouvez utiliser Pas scintillant au milieu d'une incantation sans l'interrompre.",
     mag_r8_temporal_rift:
-      'Toutes les 20 s, le prochain étourdissement, immobilisation ou silence qui vous frappe est dissipé instantanément.',
+      "Lancer votre barrière personnelle dissipe les effets d'immobilisation qui vous affectent.",
     mag_r17_convergence:
       'Alterner un sort de Feu et un sort de Givre déclenche une poussée de puissance de 8 s, une fois toutes les 30 s.',
     mag_r20_overflowing_power:
@@ -84,7 +84,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     mag_r5_blink_cast:
       "Vous pouvez utiliser Pas scintillant au milieu d'une incantation sans l'interrompre.",
     mag_r8_temporal_rift:
-      'Toutes les 20 s, le prochain étourdissement, immobilisation ou silence qui vous frappe est dissipé instantanément.',
+      "Lancer votre barrière personnelle dissipe les effets d'immobilisation qui vous affectent.",
     mag_r17_convergence:
       'Alterner un sort de Feu et un sort de Givre déclenche une poussée de puissance de 8 s, une fois toutes les 30 s.',
     mag_r20_overflowing_power:
@@ -104,7 +104,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
   it_IT: {
     mag_r5_blink_cast: 'Puoi usare Passo Baleno nel mezzo di un incantesimo senza interromperlo.',
     mag_r8_temporal_rift:
-      'Ogni 20 secondi, il prossimo stordimento, immobilizzazione o silenzio che ti colpisce viene rimosso istantaneamente.',
+      'Lanciare la tua barriera personale rimuove gli effetti di immobilizzazione che ti affliggono.',
     mag_r17_convergence:
       "Alternare un incantesimo di Fuoco e uno di Gelo apre un'ondata di potere di 8 secondi, una volta ogni 30 secondi.",
     mag_r20_overflowing_power:
@@ -124,7 +124,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     mag_r5_blink_cast:
       'Du kannst Flimmerschritt mitten in einem Zaubervorgang einsetzen, ohne ihn zu unterbrechen.',
     mag_r8_temporal_rift:
-      'Alle 20 Sek. wird die nächste Betäubung, Verwurzelung oder Stille, die dich trifft, sofort aufgehoben.',
+      'Das Wirken deiner persönlichen Barriere entfernt Verwurzelungseffekte von dir.',
     mag_r17_convergence:
       'Wenn du abwechselnd einen Feuer- und einen Frost-Zauber wirkst, entfachst du einmal alle 30 Sek. einen 8 Sek. anhaltenden Machtschub.',
     mag_r20_overflowing_power:
@@ -144,7 +144,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
   pt_BR: {
     mag_r5_blink_cast: 'Você pode usar Passo Cintilante durante uma conjuração sem interrompê-la.',
     mag_r8_temporal_rift:
-      'A cada 20 s, o próximo atordoamento, imobilização ou silêncio que atingir você é removido instantaneamente.',
+      'Conjurar sua barreira pessoal remove efeitos de imobilização que afetam você.',
     mag_r17_convergence:
       'Alternar entre uma magia de Fogo e uma de Gelo abre uma rajada de poder de 8 s, uma vez a cada 30 s.',
     mag_r20_overflowing_power:
@@ -164,7 +164,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     mag_r5_blink_cast:
       'Вы можете использовать Мерцающий шаг в процессе применения заклинания, не прерывая его.',
     mag_r8_temporal_rift:
-      'Каждые 20 сек. следующее оглушение, обездвиживание или немота, которые поразят вас, немедленно снимаются.',
+      'Применение личного барьера снимает действующие на вас эффекты обездвиживания.',
     mag_r17_convergence:
       'Чередование заклинания Огня и заклинания Льда открывает 8-секундный прилив силы, не чаще одного раза в 30 сек.',
     mag_r20_overflowing_power:
@@ -184,8 +184,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
   },
   cs_CZ: {
     mag_r5_blink_cast: 'Mihokrok můžeš použít uprostřed sesílání kouzla, aniž by bylo přerušeno.',
-    mag_r8_temporal_rift:
-      'Každých 20 s je nejbližší omráčení, ukotvení nebo umlčení, které tě zasáhne, okamžitě vyčištěno.',
+    mag_r8_temporal_rift: 'Seslání osobní bariéry z tebe odstraní účinky ukotvení.',
     mag_r17_convergence:
       'Střídání ohnivého a mrazivého kouzla otevře 8 s trvající příval moci, nejvýše jednou za 30 s.',
     mag_r20_overflowing_power:
@@ -205,7 +204,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     mag_r5_blink_cast:
       'Je kunt Flikkerstap gebruiken midden in een bezwering zonder die te onderbreken.',
     mag_r8_temporal_rift:
-      'Elke 20 sec wordt de eerstvolgende verdoving, wortel of stilte die je treft onmiddellijk gereinigd.',
+      'Het gebruiken van je persoonlijke barrière verwijdert worteleffecten die op je werken.',
     mag_r17_convergence:
       'Een Vuur- en een Vorstbezwering afwisselen opent een krachtsopstoot van 8 sec, maximaal eens per 30 sec.',
     mag_r20_overflowing_power:
@@ -225,7 +224,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     mag_r5_blink_cast:
       'Możesz użyć Migotliwego Kroku w trakcie rzucania czaru, nie przerywając go.',
     mag_r8_temporal_rift:
-      'Co 20 sek. następne ogłuszenie, unieruchomienie lub uciszenie, które cię dosięgnie, zostaje natychmiast oczyszczone.',
+      'Rzucenie osobistej bariery usuwa działające na ciebie efekty unieruchomienia.',
     mag_r17_convergence:
       'Naprzemienne użycie czaru Ognia i czaru Mrozu otwiera 8-sekundowy przypływ mocy, co najwyżej raz na 30 sek.',
     mag_r20_overflowing_power:
@@ -245,7 +244,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     mag_r5_blink_cast:
       'Kamu dapat menggunakan Langkah Kilat di tengah rapalan tanpa mengganggunya.',
     mag_r8_temporal_rift:
-      'Setiap 20 dtk, efek stun, akar, atau bungkam berikutnya yang mengenaimu akan langsung dibersihkan.',
+      'Merapalkan penghalang pribadimu menghapus efek akar yang sedang memengaruhimu.',
     mag_r17_convergence:
       'Bergantian menggunakan mantra Api dan Beku membuka lonjakan kekuatan selama 8 dtk, satu kali setiap 30 dtk.',
     mag_r20_overflowing_power:
@@ -265,8 +264,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
   tr_TR: {
     mag_r5_blink_cast:
       "Titreşim Adımı'nı bir büyüyü kesmeden kanalizasyon ortasında kullanabilirsin.",
-    mag_r8_temporal_rift:
-      'Her 20 saniyede bir, sana çarpan ilk sersemletme, köklenme veya susturma anında temizlenir.',
+    mag_r8_temporal_rift: 'Kişisel bariyerini kullanmak üzerindeki köklenme etkilerini kaldırır.',
     mag_r17_convergence:
       'Bir Ateş ve bir Buz büyüsünü art arda atmak, 30 saniyede bir olmak kaydıyla 8 saniyelik bir güç dalgası açar.',
     mag_r20_overflowing_power:
@@ -283,8 +281,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
   },
   sv_SE: {
     mag_r5_blink_cast: 'Du kan använda Flimmersteg mitt i en besvärjelse utan att avbryta den.',
-    mag_r8_temporal_rift:
-      'Var 20:e sekund rensas nästa bedövning, rotning eller tystnad som träffar dig omedelbart.',
+    mag_r8_temporal_rift: 'När du kastar din personliga barriär bryts rotningseffekter på dig.',
     mag_r17_convergence:
       'Att växelvis kasta en Eld- och en Frost-besvärjelse öppnar ett 8 sek långt kraftflöde, högst en gång var 30:e sek.',
     mag_r20_overflowing_power:
@@ -304,7 +301,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     mag_r5_blink_cast:
       'Bạn có thể dùng Bước Chớp giữa chừng một lượt niệm phép mà không làm gián đoạn nó.',
     mag_r8_temporal_rift:
-      'Cứ 20 giây, hiệu ứng choáng, cố định hoặc câm lặng tiếp theo nhắm vào bạn sẽ bị tẩy sạch ngay lập tức.',
+      'Thi triển lá chắn cá nhân sẽ xóa các hiệu ứng cố định đang ảnh hưởng đến bạn.',
     mag_r17_convergence:
       'Xen kẽ một phép Lửa và một phép Băng Giá kích hoạt 8 giây bùng phát sức mạnh, mỗi 30 giây một lần.',
     mag_r20_overflowing_power:
@@ -322,7 +319,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
   da_DK: {
     mag_r5_blink_cast: 'Du kan bruge Flimmertrin midt i en besværgelse uden at afbryde den.',
     mag_r8_temporal_rift:
-      'Hvert 20. sek. renses den næste bedøvelse, rodfæstelse eller tavshed der rammer dig, øjeblikkeligt.',
+      'Når du kaster din personlige barriere, fjernes rodfæstelseseffekter på dig.',
     mag_r17_convergence:
       'At veksle mellem en Ild- og en Frosttroldom åbner et kraftudbrud på 8 sek., maks. én gang pr. 30 sek.',
     mag_r20_overflowing_power:
@@ -340,7 +337,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
   },
   zh_CN: {
     mag_r5_blink_cast: '你可以在施法过程中使用闪烁步，而不会打断当前施法。',
-    mag_r8_temporal_rift: '每隔 20 秒，下一个命中你的昏迷、定身或沉默效果将被立即驱散。',
+    mag_r8_temporal_rift: '施放你的个人屏障会移除影响你的定身效果。',
     mag_r17_convergence:
       '交替施放一个火焰法术和一个冰霜法术，将触发 8 秒的力量爆发，每 30 秒最多触发一次。',
     mag_r20_overflowing_power:
@@ -356,7 +353,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
   },
   zh_TW: {
     mag_r5_blink_cast: '你可以在施法過程中使用閃爍步，而不會打斷詠唱。',
-    mag_r8_temporal_rift: '每隔20秒，下一個命中你的昏迷、定身或沉默效果將被立即淨化。',
+    mag_r8_temporal_rift: '施放你的個人屏障會移除影響你的定身效果。',
     mag_r17_convergence:
       '交替施放火焰系與冰霜系法術，可觸發持續8秒的力量湧現，每30秒最多觸發一次。',
     mag_r20_overflowing_power:
@@ -373,7 +370,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
   },
   ja_JP: {
     mag_r5_blink_cast: '詠唱の途中でも、それを中断せずに瞬き歩みを使用できます。',
-    mag_r8_temporal_rift: '20秒ごとに、次にあなたに当たるスタン、拘束、沈黙を即座に浄化します。',
+    mag_r8_temporal_rift: '自身のバリアを発動すると、自分にかかっている移動不能効果を解除します。',
     mag_r17_convergence:
       '炎と氷の呪文を交互に使用すると、30秒ごとに最大1回、8秒間の魔力の奔流が開きます。',
     mag_r20_overflowing_power:
@@ -390,7 +387,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
   },
   ko_KR: {
     mag_r5_blink_cast: '시전 도중에도 섬광걸음을 사용할 수 있으며, 시전이 끊기지 않습니다.',
-    mag_r8_temporal_rift: '20초마다, 다음으로 적중하는 기절, 속박, 침묵 효과를 즉시 해제합니다.',
+    mag_r8_temporal_rift: '개인 보호막을 시전하면 자신에게 걸린 이동 불가 효과가 해제됩니다.',
     mag_r17_convergence:
       '화염 주문과 냉기 주문을 번갈아 사용하면 8초간 마력이 분출됩니다. 30초마다 한 번 발동합니다.',
     mag_r20_overflowing_power:

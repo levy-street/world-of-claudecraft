@@ -1,7 +1,9 @@
 # Phase 13 QA: Verify Enchanting reachable
 
 Audits the Phase 13 diff: enchanting AND salvage reachable in both hosts, replay-safe
-destruction, live `ClientWorld` result mirroring, and complete tests and i18n for this phase.
+destruction, live `ClientWorld` result mirroring, complete tests and i18n for this phase, plus
+the 2026-07-20 content half (typed disenchant reagents with same-phase consumers, and the
+bind-on-trade primitive live against them).
 
 ## QA Starter Prompt
 
@@ -63,6 +65,21 @@ PHASE-SPECIFIC QA EMPHASIS (probe these directly, not just by reading):
 - Prime directive spot check: no existing bags, trade, equip, or bank flow changed behavior
   unless the player invokes the new actions; salvage carries the same replay-safety and
   warning guarantees as disenchant (probe it with the same duplicate/race protocol).
+- Typed reagents (the 2026-07-20 amendments): disenchant a rare and an uncommon of EACH
+  armor type and at least one weapon per bucket; prove the hybrid split (secondary at rare+,
+  none below) and that a sub-rare disenchant is byte-identical to pre-phase output. Run the
+  no-dead-materials referential pin and mutation-check it (a typed material stripped of its
+  consumer must red). Confirm the staves/wands bucket was flagged to the maintainer, not
+  silently defaulted (check state.md OPEN items or the resolved decision row).
+- Bind-on-trade, probed live: trade a typed rare+ reagent to a second player (stamps
+  boundTo), attempt the onward trade (refused, localized deny id, both hosts), and verify
+  the enforcement arm is generic over the instance payload (Phase 14b extends it to gear:
+  grep for reagent-specific conditionals in the gate and flag any). Verify mail and market
+  still refuse the instanced reagents (the face-to-face construction: the fungible-only
+  counting in the PostOffice mailSend/mailSendResolved paths and market.ts marketList).
+- The exclusions held: no cooking- or alchemy-keyed typed material exists, and no cooking
+  or alchemy recipe consumes a typed reagent (the deliberate both-sides exclusion); the
+  sink-sizing note landed in state.md's Tuning targets.
 
 STEP 3 - FIX: apply every BLOCKING and SHOULD-FIX finding; rerun the failed validation rows
 until green; commit with explicit paths (never git add -A), Conventional Commits with a body.

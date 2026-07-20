@@ -671,6 +671,7 @@ export const table: DeedLocaleTable = {
   },
   prog_tools_of_the_trade: {
     name: 'Орудия ремесла',
+    desc: 'Завершите изготовление на ремесленной станции.',
   },
   dgn_nythraxis_crypt: {
     name: 'Что хранил склеп',

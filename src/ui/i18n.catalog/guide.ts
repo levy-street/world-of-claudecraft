@@ -671,10 +671,9 @@ export const guideStrings = {
       'Three quick bolts that chill the target so your next frost hits land as if it were frozen.',
     fingers_of_frost:
       'Your frost bolts sometimes empower an Ice Lance to strike as if the target were frozen.',
-    brain_freeze: 'Your frost bolts sometimes make the next Flurry instant and harder-hitting.',
+    brain_freeze: 'Your frost bolts sometimes make the next Flurry instant and skip its cooldown.',
     shatter: 'Your spells crit far more often against frozen targets.',
-    frozen_orb:
-      'Rolls a slow orb through the pack that chills everything and feeds your frost procs.',
+    frozen_orb: 'Rolls a slow orb through the pack that chills enemies and banks Icicles.',
     blizzard: 'Blankets an area in ice to wear down and slow a whole pack.',
     blink: 'Teleports you a short distance forward, breaking roots on the way out.',
     conjure_water: 'Conjures drinks that restore mana, so you can refill between pulls.',

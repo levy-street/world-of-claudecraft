@@ -26,6 +26,7 @@
 // sibling targeting module are imported directly (already pure); everything that
 // touches not-yet-extracted Sim state routes through the seam.
 
+import { hasUnbreakableMovementLock } from '../combat/cc';
 import { VALE_CUP_BALL_TEMPLATE_ID } from '../content/vale_cup';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
@@ -240,7 +241,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     // is stunned, since the stun path skips updateMobTarget where it normally ticks.
     tickForcedTarget(mob);
     if (ctx.updateFearMovement(mob)) return;
-    if (mob.auras.some((a) => a.kind === 'polymorph')) {
+    const polymorphAura = mob.auras.find((a) => a.kind === 'polymorph');
+    if (polymorphAura && !hasUnbreakableMovementLock(mob, polymorphAura)) {
       mob.wanderTimer -= DT;
       if (mob.wanderTimer <= 0) {
         mob.wanderTimer = ctx.rng.range(0.8, 2);

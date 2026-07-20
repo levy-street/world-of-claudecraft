@@ -170,6 +170,7 @@ import {
 } from './craft_celebration_view';
 import { buildCraftingView } from './crafting_view';
 import { renderCraftingWindow, stationNameText } from './crafting_window';
+import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
 import {
   deedBroadcastLine,
@@ -388,6 +389,11 @@ import {
   streamerActionPlatform,
   streamerMenuActions,
 } from './player_context_menu';
+import {
+  type PlayerTooltipI18n,
+  type PlayerTooltipModel,
+  playerTooltipHtml,
+} from './player_tooltip_view';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
 import { buildProcOverlay } from './proc_overlay_dom';
@@ -673,6 +679,10 @@ const STAT_VIEW_DEPS: StatTooltipI18n = {
 };
 // Same i18n + number-formatting surface, handed to the pure mob-hover tooltip view.
 const MOB_TOOLTIP_VIEW_DEPS: MobTooltipI18n = {
+  t: (key, params) => t(key as TranslationKey, params),
+  fmt: (value, opts) => formatNumber(value, opts),
+};
+const PLAYER_TOOLTIP_VIEW_DEPS: PlayerTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
 };
@@ -1052,13 +1062,9 @@ export class Hud {
   private readonly tooltipOwner = new SharedTooltipOwner<HTMLElement>();
   // Distinguishes a touch long-press "peek" (inspect, no action) from a tap.
   private peekGuard = new TouchPeekGuard();
-  // The mob whose world-hover tooltip is currently shown (showMobHoverTooltip),
-  // so main.ts's per-frame updateHoverCursor can call it every frame while the
-  // same mob stays hovered without rebuilding the tooltip HTML each time.
-  // A small composite key (id:level:hostile:playerLevel), not just the mob id, so
-  // the hover tooltip repaints when a mid-hover change moves its model. See
-  // showMobHoverTooltip.
-  private lastMobTooltipId: string | null = null;
+  // The world entity whose hover tooltip is currently shown, so main.ts can call
+  // its show method every frame without rebuilding unchanged HTML.
+  private lastHoverTooltipId: string | null = null;
   private errorTimer: number | undefined;
   private lastMirroredErrorText: string | undefined;
   private bannerTimer: number | undefined;
@@ -3851,7 +3857,16 @@ export class Hud {
     root: () => $('#daily-rewards-window'),
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#daily-rewards-window'),
-    onStatus: (status) => this.applyDailyRewardsLauncherStatus(status),
+    // A status delivered by the window's render or spin is as fresh as a launcher
+    // fetch: invalidate any in-flight launcher fetch (seq bump) so a slower older
+    // response cannot overwrite it, and stamp the throttle so the next slowHud
+    // tick does not redundantly re-fetch.
+    onStatus: (status) => {
+      this.dailyRewardsLauncherSeq++;
+      this.lastDailyRewardsLauncherRefreshAt = performance.now();
+      this.applyDailyRewardsLauncherStatus(status);
+    },
+    onClose: () => this.refreshDailyRewardsLauncher(true),
     onWalletConnect: () => {
       window.dispatchEvent(new CustomEvent('woc:wallet-verify'));
     },
@@ -4394,9 +4409,9 @@ export class Hud {
     const questKey = mobQuests
       .map((q) => `${q.questId}#${q.objectiveIndex}:${q.current}/${q.total}`)
       .join(',');
-    const key = `${entity.id}:${entity.level}:${entity.hostile ? 1 : 0}:${this.sim.player.level}:${questKey}`;
-    if (key === this.lastMobTooltipId) return;
-    this.lastMobTooltipId = key;
+    const key = `mob:${entity.id}:${entity.level}:${entity.hostile ? 1 : 0}:${this.sim.player.level}:${questKey}`;
+    if (key === this.lastHoverTooltipId) return;
+    this.lastHoverTooltipId = key;
     const template = MOBS[entity.templateId];
     if (!template) {
       this.hideTooltip();
@@ -4426,11 +4441,27 @@ export class Hud {
     this.paintMobTooltipBottomRight(mobTooltipHtml(model, MOB_TOOLTIP_VIEW_DEPS));
   }
 
-  // Clears the world-hover mob tooltip; a no-op if none is showing, so main.ts
-  // can call it unconditionally every frame nothing (or a non-mob) is hovered.
-  clearMobHoverTooltip(): void {
-    if (this.lastMobTooltipId === null) return;
-    this.lastMobTooltipId = null;
+  showPlayerHoverTooltip(entity: Entity): void {
+    const playerClass = entity.templateId as PlayerClass;
+    const classLabel = CLASSES[playerClass] ? classDisplayName(playerClass) : entity.templateId;
+    const key = `player:${entity.id}:${entity.name}:${entity.level}:${entity.templateId}:${entity.guild}`;
+    if (key === this.lastHoverTooltipId) return;
+    this.lastHoverTooltipId = key;
+    const model: PlayerTooltipModel = {
+      name: entity.name,
+      classLabel,
+      classColor: classCss(playerClass),
+      level: entity.level,
+      guild: entity.guild,
+    };
+    this.paintMobTooltipBottomRight(playerTooltipHtml(model, PLAYER_TOOLTIP_VIEW_DEPS));
+  }
+
+  // Clears a world-hover tooltip; a no-op if none is showing, so main.ts can
+  // call it unconditionally every frame nothing eligible is hovered.
+  clearHoverTooltip(): void {
+    if (this.lastHoverTooltipId === null) return;
+    this.lastHoverTooltipId = null;
     this.hideTooltip();
   }
 
@@ -6776,7 +6807,10 @@ export class Hud {
     this.applyDailyRewardsChestButtonVisibility();
     if (!this.showDailyRewardsChestButton()) return;
     const now = performance.now();
-    if (!force && now - this.lastDailyRewardsLauncherRefreshAt < 60_000) return;
+    // Slow closed-window poll; the why and the arithmetic live in the core.
+    if (!shouldRefreshDailyRewardsLauncher(force, now, this.lastDailyRewardsLauncherRefreshAt)) {
+      return;
+    }
     this.lastDailyRewardsLauncherRefreshAt = now;
     const seq = ++this.dailyRewardsLauncherSeq;
     void this.sim
@@ -8866,6 +8900,19 @@ export class Hud {
                 })
               : t('hudChrome.gathering.gatherLine', { name }),
             QUALITY_COLOR[ev.rarity],
+          );
+          break;
+        }
+        case 'fishingResult': {
+          // Reel-in feedback line (Professions 2.0 Phase 11), colored by the
+          // caught item's quality. Identical on every graphics tier (player
+          // feedback is never profile-gated). The grant hub's own 'loot' event
+          // already prints the "You receive:" line and plays the loot cue, so
+          // this line uses distinct reel-in wording and adds no second cue.
+          const item = ITEMS[ev.itemId];
+          this.log(
+            t('hudChrome.gathering.catchLine', { name: item ? itemDisplayName(item) : ev.itemId }),
+            QUALITY_COLOR[ev.quality],
           );
           break;
         }
@@ -11783,7 +11830,10 @@ export class Hud {
   toggleDailyRewards(): void {
     if (!this.dailyRewardsEnabled()) return;
     this.dailyRewardsWindow.toggle();
-    this.refreshDailyRewardsLauncher(true);
+    // Close refreshes via onClose; force only the open direction here. The open
+    // force stays as the fallback for tabs that render without a status fetch
+    // (the store tab), where no onStatus push would arrive.
+    if (this.dailyRewardsWindow.isOpen) this.refreshDailyRewardsLauncher(true);
   }
 
   openWocStore(): void {

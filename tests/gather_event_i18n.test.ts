@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { GATHERING_PROFESSION_IDS } from '../src/sim/content/professions';
 import { hasTranslation, t } from '../src/ui/i18n';
 
 // Phase 4 gather-event localization: the sim emits ids plus values only
@@ -131,5 +132,54 @@ describe('hud event switch stays wired to the ids', () => {
     const rareStart = source.indexOf("case 'gatherRareEvent'");
     const rareBlock = source.slice(rareStart, source.indexOf('break;', rareStart));
     expect(rareBlock.includes('QUALITY_COLOR.epic')).toBe(true);
+  });
+});
+
+describe('hudChrome.gathering catch line (Professions 2.0 Phase 11)', () => {
+  // The fishingResult SimEvent is text-free like gatherResult, so the client
+  // catch line carries the same duties as the gather line above: exist,
+  // splice, diverge from BOTH the loot family and the gather family (the
+  // grant hub still prints "You receive:" for the same catch), stay wired in
+  // the hud switch, color by item quality, and add no second cue.
+  it('the catch-line key exists and splices the name', () => {
+    expect(hasTranslation('hudChrome.gathering.catchLine')).toBe(true);
+    expect(t('hudChrome.gathering.catchLine', { name: 'Glimmerfin Koi' })).toBe(
+      'You reel in: Glimmerfin Koi',
+    );
+  });
+
+  it('the catch line never regresses into the loot or gather wording families', () => {
+    const line = t('hudChrome.gathering.catchLine', { name: 'X' });
+    expect(line.startsWith('You receive')).toBe(false);
+    expect(line.startsWith('You gather')).toBe(false);
+  });
+
+  it('the fishingResult case is wired, quality-colored, and cue-free', () => {
+    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    const caseStart = source.indexOf("case 'fishingResult'");
+    expect(caseStart).toBeGreaterThan(-1);
+    const block = source.slice(caseStart, source.indexOf('break;', caseStart));
+    expect(block.includes('hudChrome.gathering.catchLine')).toBe(true);
+    expect(block.includes('QUALITY_COLOR[ev.quality]')).toBe(true);
+    expect(block.includes('audio.')).toBe(false);
+  });
+
+  it('every gathering profession id has a catalog label and both window rows', () => {
+    // The label maps in char_window.ts and professions_window.ts are
+    // string-keyed (an id with no key renders no row), so tsc no longer
+    // forces exhaustiveness. This is the tripwire a future fifth gathering
+    // profession trips instead: its id must have the catalog key and a row
+    // in BOTH name-key maps, or the row silently vanishes from the windows.
+    const charSource = readFileSync(path.resolve(process.cwd(), 'src/ui/char_window.ts'), 'utf8');
+    const wheelSource = readFileSync(
+      path.resolve(process.cwd(), 'src/ui/professions_window.ts'),
+      'utf8',
+    );
+    for (const id of GATHERING_PROFESSION_IDS) {
+      const key = `hudChrome.gathering.${id}`;
+      expect(hasTranslation(key as Parameters<typeof hasTranslation>[0]), key).toBe(true);
+      expect(charSource.includes(key), `char_window ${key}`).toBe(true);
+      expect(wheelSource.includes(key), `professions_window ${key}`).toBe(true);
+    }
   });
 });

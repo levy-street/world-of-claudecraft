@@ -4,7 +4,7 @@
 // merges those records into the flat tables the rest of the engine consumes,
 // and owns the world-layout constants.
 
-import { BASE_ITEMS, FISHING_RARE_ID, FISHING_TABLES } from './content/items';
+import { BASE_ITEMS } from './content/items';
 import type {
   CampDef,
   DelveDef,
@@ -24,7 +24,6 @@ import type {
 } from './types';
 
 export type { FishingEntry } from './content/items';
-export { FISHING_RARE_ID, FISHING_TABLES };
 
 import {
   BROTHER_HALVEN,

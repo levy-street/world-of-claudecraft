@@ -52,13 +52,14 @@ function makeClientWorld(): ClientWorld {
 }
 
 describe('professions contracts (#1164)', () => {
-  it('IWorldProfessions.professionsState carries the three all-zero gathering skills on a fresh Sim', () => {
+  it('IWorldProfessions.professionsState carries the four all-zero gathering skills on a fresh Sim', () => {
     const sim = new Sim({ seed: SIM_SEED, playerClass: PROBE_CLASS });
     expect(sim.professionsState).toEqual({
       skills: [
         { professionId: 'mining', skill: 0, maxSkill: 300 },
         { professionId: 'logging', skill: 0, maxSkill: 300 },
         { professionId: 'herbalism', skill: 0, maxSkill: 300 },
+        { professionId: 'fishing', skill: 0, maxSkill: 300 },
       ],
     });
   });

@@ -46,6 +46,7 @@ export const pt_BR: AdminTranslations = {
   "stats.peakOnline": "pico online",
   "stats.peakOnlineToday": "pico online 24h",
   "stats.peakOnlineAllTime": "pico online histórico",
+  "stats.playersCap": "player cap",
   "stats.accounts": "contas",
   "stats.characters": "personagens",
   "stats.newAccounts24h": "novas contas 24h",

@@ -56,6 +56,15 @@ function aura(
   };
 }
 
+function unbreakableControl(
+  owner: Entity,
+  id: string,
+  kind: Aura['kind'],
+  school: Aura['school'],
+): Aura & { unbreakableControl: true } {
+  return { ...aura(owner, id, kind, 0, school), unbreakableControl: true };
+}
+
 function step(sim: Sim, ticks: number): void {
   for (let index = 0; index < ticks; index++) sim.tick();
 }
@@ -235,6 +244,65 @@ describe('Talents V2 movement and control primitives', () => {
     runAbilityEffect(mage, null, 'blink');
     expect(mage.player.auras.some((entry) => entry.kind === 'root')).toBe(false);
     expect(resolvedSteps).toBeGreaterThan(0);
+  });
+
+  it('preserves unbreakable encounter control across player removal primitives', () => {
+    const warrior = new Sim({ seed: 81, playerClass: 'warrior', autoEquip: true });
+    warrior.player.auras.push(
+      unbreakableControl(warrior.player, 'scripted_stun', 'stun', 'shadow'),
+    );
+    runAbilityEffect(warrior, null, 'avatar');
+    expect(warrior.player.auras.some((entry) => entry.id === 'scripted_stun')).toBe(true);
+
+    const mage = new Sim({ seed: 82, playerClass: 'mage', autoEquip: true });
+    mage.player.auras.push(unbreakableControl(mage.player, 'scripted_root', 'root', 'nature'));
+    const mageStart = { ...mage.player.pos };
+    const originalResolve = mage.ctx.resolveMovePoint;
+    let protectedRootMoveSteps = 0;
+    (mage.ctx as { resolveMovePoint: typeof originalResolve }).resolveMovePoint = (
+      x,
+      z,
+      radius,
+      mover,
+    ) => {
+      protectedRootMoveSteps++;
+      return originalResolve(x, z, radius, mover);
+    };
+    runAbilityEffect(mage, null, 'blink');
+    expect(mage.player.auras.some((entry) => entry.id === 'scripted_root')).toBe(true);
+    expect(mage.player.pos).toEqual(mageStart);
+    expect(protectedRootMoveSteps).toBe(0);
+
+    const castingMage = new Sim({ seed: 85, playerClass: 'mage', autoEquip: true });
+    castingMage.setPlayerLevel(20);
+    castingMage.tick();
+    castingMage.player.gcdRemaining = 0;
+    castingMage.player.resource = castingMage.player.maxResource;
+    castingMage.player.auras.push(
+      unbreakableControl(castingMage.player, 'scripted_root', 'root', 'nature'),
+    );
+    const castingMageStart = { ...castingMage.player.pos };
+    const castingMageResource = castingMage.player.resource;
+    castingMage.castAbility('blink');
+    expect(castingMage.player.pos).toEqual(castingMageStart);
+    expect(castingMage.player.resource).toBe(castingMageResource);
+    expect(castingMage.player.cooldowns.has('blink')).toBe(false);
+
+    const rogue = new Sim({ seed: 84, playerClass: 'rogue', autoEquip: true });
+    const shadowstepTarget = addHostile(rogue, 10);
+    rogue.player.auras.push(unbreakableControl(rogue.player, 'scripted_root', 'root', 'nature'));
+    const rogueStart = { ...rogue.player.pos };
+    runAbilityEffect(rogue, shadowstepTarget, 'shadowstep');
+    expect(rogue.player.pos).toEqual(rogueStart);
+
+    const paladin = new Sim({ seed: 83, playerClass: 'paladin', noPlayer: true });
+    const casterId = paladin.addPlayer('paladin', 'Caster');
+    const allyId = paladin.addPlayer('mage', 'Ally');
+    const ally = paladin.entities.get(allyId);
+    if (!ally || paladin.player.id !== casterId) throw new Error('missing dispel rig entities');
+    ally.auras.push(unbreakableControl(paladin.player, 'scripted_silence', 'silence', 'shadow'));
+    runAbilityEffect(paladin, ally, 'cleansing_verdict');
+    expect(ally.auras.some((entry) => entry.id === 'scripted_silence')).toBe(true);
   });
 });
 

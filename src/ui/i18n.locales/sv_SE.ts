@@ -33,8 +33,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     'Kallar en isstorm över målområdet i 6 sek, orsakar {damage} Frost-skada varje sekund och saktar ner fiender med 40%. Varje träffad fiende minskar Frozen Orbs nedkylning med 0,5 sek, upp till 3 sek per kast. (Frost)',
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    'Rimlans har 20% chans att göra nästa Winterlash omedelbar, 30% hårdare och fri från dess nedkylning. (Frost)',
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     'Håll intryckt för att samla en vidgande flammande andedräkt, släpp sedan för en kon. Längre laddningar når längre och gör mer skada. Träffade fiender desorienteras och skada bryter effekten; maximal laddning är alltid ett kritiskt slag och räknas en gång mot Het svit. (Eld)',
@@ -45,11 +43,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Förvandlas till en glödande glöd och ökar rörelsehastigheten med {buff}%. Du kan inte attackera eller kasta besvärjelser under förvandlingen. Kasta om för att återgå till normal form.',
   'entities.abilities.fireball_form.name': 'Ember Form',
-  'entities.abilities.flurry.description':
-    'Avfyrar tre isiga bultar för {damage} Frost-skada var och en och planterar Vinterkyla på målet: dess nästa 2 inkommande kompatibla besvärjelser behandlar det som fryst. Brain Freeze gör Winterlash omedelbar, 30% hårdare och hoppar över dess nedkylning. (Frost)',
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    'Skjuter ut en kula av virvelande frost som glider framåt i 8 sek, orsakar {damage} Frost-skada varje sekund på närliggande fiender och saktar ner dem med 30%. Kulans slag ger Fingers of Frost. (Frost)',
   'entities.abilities.frozen_orb.name': 'Frozen Orb',
   'entities.abilities.glacial_front.description':
     'Håll intryckt för att samla en vidgande frostfront, släpp sedan för en kon. Längre laddningar når längre och gör mer skada. Alla träffade fiender saktas ner med 50% i 4 sek; maximal laddning rotar dem också i 1 sek. (Frost)',
@@ -63,8 +57,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.description':
     'Grip ditt perfekta ögonblick: vinn genast 4 Arkanska Laddningar, och under 10 sek förbrukar Eterpilar dem inte. (Kronomantik)',
   'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.description':
-    'Dina besvärjelser får 50% kritisk träffchans mot frysta mål, och dessa kritiska slag gör 20% mer skada. Fingers of Frost och Vinterkyla räknas som fryst. (Frost)',
   'entities.abilities.shatter.name': 'Brittle Ruin',
   'entities.abilities.temporal_acceleration.description':
     'Accelererar tidens flöde för din grupp eller raid, ökar attack-, kast- och kanalisationshastighet med 30% i 15 sek. Allierade som nyligen påverkats av Temporal Acceleration eller Krigstrummor är för utmattade för att dra nytta av det. (Kronomantik)',
@@ -122,16 +114,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.blink':
     'Teleporterar dig ett kort stycke framåt och bryter rötter på vägen ut.',
   'guide.abilityHook.blizzard': 'Täcker ett område med is för att nöta ner och sakta en hel flock.',
-  'guide.abilityHook.brain_freeze':
-    'Dina frostbultar gör ibland nästa Flurry omedelbar och hårdare träffande.',
   'guide.abilityHook.fingers_of_frost':
     'Dina frostbultar stärker ibland en Ice Lance att slå som om målet vore fryst.',
   'guide.abilityHook.fireball_form':
     'Bli en levande glöd för att ta dig över öppen mark med hög hastighet.',
   'guide.abilityHook.flurry':
     'Tre snabba bultar som kyler målet så dina nästa frostträffar landar som om det vore fryst.',
-  'guide.abilityHook.frozen_orb':
-    'Rullar en långsam kula genom flocken som kyler allt och matar dina frostprocsar.',
   'guide.abilityHook.ice_lance':
     'En omedelbar bit för att förbruka frostprocsar, träffar mycket hårdare på ett fryst mål.',
   'guide.abilityHook.shatter': 'Dina besvärjelser kritikträffar mycket oftare mot frysta mål.',
@@ -8205,4 +8193,264 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.mouseoverCast': 'Kasta via muspekaren på gruppramarna',
   'hudChrome.options.showTargetOfTarget': 'Visa målets mål',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Målets mål',
+  'itemUi.market.rarityLegendary': 'Legendarisk',
+  'loading.reconnectingAttempt':
+    'Anslutning förlorad. Återansluter... (försök {attempt}/{maxAttempts}, försöker igen om {seconds}s)',
+  'loading.reconnectingNow':
+    'Anslutning förlorad. Återansluter nu... (försök {attempt}/{maxAttempts})',
+  'loading.slowConnection': 'Detta tar längre tid än vanligt. Kontrollera din internetanslutning.',
+  'delveUi.shop.buyConfirmAccept': 'Köp',
+  'delveUi.shop.buyConfirmBody':
+    'Köp {item} för {marks} Delve-märken? Köp med märken kan inte återbetalas.',
+  'delveUi.shop.buyConfirmCancel': 'Avbryt',
+  'delveUi.shop.buyConfirmTitle': 'Bekräfta köp',
+  'entities.abilities.brain_freeze.description':
+    'Rimlans har 20 % chans att göra din nästa Winterlash omedelbar och utan nedkylning. (Frost)',
+  'entities.abilities.flurry.description':
+    'Avfyra tre isprojektiler som vardera orsakar {damage} frostskada och lägger Vinterkyla på målet: de nästa 2 kompatibla besvärjelserna mot det behandlar det som fruset. Brain Freeze gör Winterlash omedelbar och hoppar över dess nedkylning. (Frost)',
+  'entities.abilities.frozen_orb.description':
+    'Släpp ett klot av virvlande frost som driver framåt i 8 sekunder, orsakar {damage} frostskada varje sekund på fiender i närheten och saktar ner dem med 30 %. Varje träffande puls skapar en istapp. (Frost)',
+  'entities.abilities.shatter.description':
+    'Dina besvärjelser får 50 % högre kritisk träffchans mot frysta mål. Fingers of Frost och Vinterkyla räknas som frusna. (Frost)',
+  'entities.items.anglers_feast_platter.name': 'Fiskarens festfat',
+  'entities.items.arcanite_war_axe.name': 'Arkanitkrigsyxa',
+  'entities.items.ashwood_smoked_eel.name': 'Askvedsrökt ål',
+  'entities.items.cooking_salt.name': 'Matlagningssalt',
+  'entities.items.copper_bearded_axe.name': 'Koppar skäggyxa',
+  'entities.items.copper_flanged_mace.name': 'Kopparflänsad stridsklubba',
+  'entities.items.copper_ore.name': 'Kopparmalm',
+  'entities.items.coppermail_gauntlets.name': 'Kopparbrynjehandskar',
+  'entities.items.coppermail_sabatons.name': 'Kopparbrynjestövlar',
+  'entities.items.elderwood_battle_staff.name': 'Äldreskogens stridsstav',
+  'entities.items.elixir_of_the_boar.name': 'Galtens elixir',
+  'entities.items.elixir_of_the_serpent.name': 'Ormens elixir',
+  'entities.items.fenbridge_hide_belt.name': 'Fenbridge-läderbälte',
+  'entities.items.fenbridge_hide_boots.name': 'Fenbridge-läderstövlar',
+  'entities.items.fenbridge_hide_leggings.name': 'Fenbridge-läderbyxor',
+  'entities.items.frostgill_chowder.name': 'Frostgälsgryta',
+  'entities.items.game_meat.name': 'Viltkött',
+  'entities.items.glass_vial.name': 'Glasflaska',
+  'entities.items.goldleaf_game_stew.name': 'Guldblads viltgryta',
+  'entities.items.goldleaf_healing_draught.name': 'Guldblads läkande brygd',
+  'entities.items.goldleaf_mana_draught.name': 'Guldblads manabrygd',
+  'entities.items.goldweave_leggings.name': 'Guldvävda byxor',
+  'entities.items.goldweave_robe.name': 'Guldvävsrock',
+  'entities.items.herbed_marsh_pike.name': 'Örtad kärrgädda',
+  'entities.items.homespun_cloth.name': 'Hemspunnet tyg',
+  'entities.items.homespun_hood.name': 'Hemspunnen huva',
+  'entities.items.homespun_mitts.name': 'Hemspunna vantar',
+  'entities.items.hunters_game_skewer.name': 'Jägarens viltspett',
+  'entities.items.iron_ore.name': 'Järnmalm',
+  'entities.items.ironbark_boar_spear.name': 'Järnbarks vildsvinsspjut',
+  'entities.items.ironbark_log.name': 'Järnbarksstock',
+  'entities.items.ironedge_longsword.name': 'Järneggat långsvärd',
+  'entities.items.ironlink_hauberk.name': 'Järnlänksbrynja',
+  'entities.items.ironlink_legguards.name': 'Järnlänksbenskydd',
+  'entities.items.ironlink_spaulders.name': 'Järnlänksskuldror',
+  'entities.items.ironshod_maul.name': 'Järnskodd stridshammare',
+  'entities.items.marlows_grand_roast.name': 'Marlows feststek',
+  'entities.items.marshstalker_hood.name': 'Myrjägarhuva',
+  'entities.items.marshstalker_jerkin.name': 'Myrjägarjacka',
+  'entities.items.marshstalker_spaulders.name': 'Myrjägarskuldror',
+  'entities.items.mirewarden_jerkin.name': 'Myrväktarjacka',
+  'entities.items.mirewarden_leggings.name': 'Myrväktarbyxor',
+  'entities.items.mirewarden_treads.name': 'Myrväktarstövlar',
+  'entities.items.pan_seared_perch.name': 'Pannstekt flodabborre',
+  'entities.items.prime_cut.name': 'Förstklassig styckdetalj',
+  'entities.items.pristine_hide.name': 'Orört skinn',
+  'entities.items.pristine_silk.name': 'Orörd siden',
+  'entities.items.pristine_venom_gland.name': 'Orörd giftkörtel',
+  'entities.items.riveted_copper_girdle.name': 'Nitad koppargördel',
+  'entities.items.rough_hide.name': 'Grovt skinn',
+  'entities.items.silkbinders_raiment.name': 'Silkbinders klädsel',
+  'entities.items.silkspun_satchel.name': 'Silkespunna väska',
+  'entities.items.silvered_carp_supper.name': 'Middag på silverkarp',
+  'entities.items.silverleaf_healing_draught.name': 'Silverblads läkande brygd',
+  'entities.items.silverleaf_herb.name': 'Silverbladsört',
+  'entities.items.silverleaf_mana_draught.name': 'Silverblads manabrygd',
+  'entities.items.silverthread_slippers.name': 'Silvertrådiga tofflor',
+  'entities.items.smithing_flux.name': 'Smidesfluss',
+  'entities.items.spider_silk.name': 'Spindelsilke',
+  'entities.items.spool_of_thread.name': 'Trådrulle',
+  'entities.items.sunpetal_healing_draught.name': 'Solblads läkande brygd',
+  'entities.items.sunpetal_mana_draught.name': 'Solblads manabrygd',
+  'entities.items.sunweave_mantle.name': 'Solvävd mantel',
+  'entities.items.sunweave_treads.name': 'Solvävda stövlar',
+  'entities.items.tanning_agent.name': 'Garvningsmedel',
+  'entities.items.thorium_warblade.name': 'Toriumkrigsklinga',
+  'entities.items.thoriumscale_cuirass.name': 'Toriumfjällharnesk',
+  'entities.items.thoriumscale_greathelm.name': 'Toriumfjällstorhjälm',
+  'entities.items.thoriumscale_leggings.name': 'Toriumfjällsbyxor',
+  'entities.items.venom_gland.name': 'Giftkörtel',
+  'entities.items.venomfire_elixir.name': 'Gifteldselixir',
+  'entities.items.whetted_iron_dirk.name': 'Brynt järndolk',
+  'entities.letters.guild_trend_alchemy_cooking.body':
+    'Hantverkare,\n\nBud når gillet av ditt arbete i alkemi och matlagning: brygder puttrade och rätter kryddade, de två hantverken matar varandra. Närliggande hantverk som arbetats tillsammans markerar en hand redo för inställning. De som binder detta par får namnet apotekare i tid. Sök upp Smed Haldren, rustningsmannen i Eastbrook: han talar för mästarna för tillfället. Bevisa ditt hantverk för honom med arbete av dina egna händer, och han kommer att se dina två huvudyrken anpassade.\n\nI god ställning,\nHantverksgillet',
+  'entities.letters.guild_trend_alchemy_cooking.sender': 'Hantverksgillet',
+  'entities.letters.guild_trend_alchemy_cooking.subject': 'Ditt arbete inom alkemi och matlagning',
+  'entities.letters.guild_trend_armorcrafting_engineering.body':
+    'Hantverkare,\n\nBud når gillet av ditt arbete i rustningssmide och ingenjörskonst: plåtar nitade och kugghjul satta, de två hantverken matar varandra. Närliggande hantverk som arbetats tillsammans markerar en hand redo för inställning. Sök upp Smed Haldren, rustningsmannen i Eastbrook: han talar för mästarna för tillfället. Bevisa ditt hantverk för honom med arbete av dina egna händer, och han kommer att se dina två huvudyrken anpassade.\n\nI god ställning,\nHantverksgillet',
+  'entities.letters.guild_trend_armorcrafting_engineering.sender': 'Hantverksgillet',
+  'entities.letters.guild_trend_armorcrafting_engineering.subject':
+    'Ditt arbete med rustningssmide och ingenjörskonst',
+  'entities.letters.guild_trend_cooking_leatherworking.body':
+    'Hantverkare,\n\nBud når gillet av ditt arbete i matlagning och läderbearbetning: upplagda måltider och garvade hudar, de två hantverken matar varandra. Närliggande hantverk som arbetats tillsammans markerar en hand redo för inställning. Sök upp Smed Haldren, rustningsmannen i Eastbrook: han talar för mästarna för tillfället. Bevisa ditt hantverk för honom med arbete av dina egna händer, och han kommer att se dina två huvudyrken anpassade.\n\nI god ställning,\nHantverksgillet',
+  'entities.letters.guild_trend_cooking_leatherworking.sender': 'Hantverksgillet',
+  'entities.letters.guild_trend_cooking_leatherworking.subject':
+    'Ditt arbete inom matlagning och läderbearbetning',
+  'entities.letters.guild_trend_enchanting_jewelcrafting.body':
+    'Hantverkare,\n\nBud når gillet av ditt arbete i Förtrollande och juvelslipning: berlocker bundna och stenar polerade, de två hantverken matar varandra. Närliggande hantverk som arbetats tillsammans markerar en hand redo för inställning. Sök upp Smed Haldren, rustningsmannen i Eastbrook: han talar för mästarna för tillfället. Bevisa ditt hantverk för honom med arbete av dina egna händer, och han kommer att se dina två huvudyrken anpassade.\n\nI god ställning,\nHantverksgillet',
+  'entities.letters.guild_trend_enchanting_jewelcrafting.sender': 'Hantverksgillet',
+  'entities.letters.guild_trend_enchanting_jewelcrafting.subject':
+    'Ditt arbete inom förtrollande och smyckeskonst',
+  'entities.letters.guild_trend_engineering_alchemy.body':
+    'Hantverkare,\n\nBud når gillet av ditt arbete inom teknik och alkemi: laddningar mäts och reagenser vägs, de två hantverken matar varandra. Närliggande hantverk som arbetats tillsammans markerar en hand redo för inställning. De som binder detta par får namnet bombardör i tid. Sök upp Smed Haldren, rustningsmannen i Eastbrook: han talar för mästarna för tillfället. Bevisa ditt hantverk för honom med arbete av dina egna händer, och han kommer att se dina två huvudyrken anpassade.\n\nI god ställning,\nHantverksgillet',
+  'entities.letters.guild_trend_engineering_alchemy.sender': 'Hantverksgillet',
+  'entities.letters.guild_trend_engineering_alchemy.subject': 'Ditt arbete inom teknik och alkemi',
+  'entities.letters.guild_trend_inscription_enchanting.body':
+    'Hantverkare,\n\nBud når gillet om ditt arbete i inskription och förtrollning: rullar med bokstäver och berlocker vävda, de två hantverken matar varandra. Närliggande hantverk som arbetats tillsammans markerar en hand redo för inställning. Sök upp Smed Haldren, rustningsmannen i Eastbrook: han talar för mästarna för tillfället. Bevisa ditt hantverk för honom med arbete av dina egna händer, och han kommer att se dina två huvudyrken anpassade.\n\nI god ställning,\nHantverksgillet',
+  'entities.letters.guild_trend_inscription_enchanting.sender': 'Hantverksgillet',
+  'entities.letters.guild_trend_inscription_enchanting.subject':
+    'Ditt arbete i inskription och förtrollning',
+  'entities.letters.guild_trend_jewelcrafting_weaponcrafting.body':
+    'Hantverkare,\n\nBud når gillet av ditt arbete i juvelslipning och vapensmide: ädelstenar sitter och kanter slipade, de två hantverken matar varandra. Närliggande hantverk som arbetats tillsammans markerar en hand redo för inställning. Sök upp Smed Haldren, rustningsmannen i Eastbrook: han talar för mästarna för tillfället. Bevisa ditt hantverk för honom med arbete av dina egna händer, och han kommer att se dina två huvudyrken anpassade.\n\nI god ställning,\nHantverksgillet',
+  'entities.letters.guild_trend_jewelcrafting_weaponcrafting.sender': 'Hantverksgillet',
+  'entities.letters.guild_trend_jewelcrafting_weaponcrafting.subject':
+    'Ditt arbete inom juvelslipning och vapensmide',
+  'entities.letters.guild_trend_leatherworking_tailoring.body':
+    'Hantverkare,\n\nBud når gillet av ditt arbete i läderbearbetning och skrädderi: läder skuren och tyg fållad, de två hantverken matar varandra. Närliggande hantverk som arbetats tillsammans markerar en hand redo för inställning. De som binder detta par får namnet utrustare i tid. Sök upp Smed Haldren, rustningsmannen i Eastbrook: han talar för mästarna för tillfället. Bevisa ditt hantverk för honom med arbete av dina egna händer, och han kommer att se dina två huvudyrken anpassade.\n\nI god ställning,\nHantverksgillet',
+  'entities.letters.guild_trend_leatherworking_tailoring.sender': 'Hantverksgillet',
+  'entities.letters.guild_trend_leatherworking_tailoring.subject':
+    'Ditt arbete inom läderbearbetning och skrädderi',
+  'entities.letters.guild_trend_tailoring_inscription.body':
+    'Hantverkare,\n\nBud når gillet av ditt arbete i Skräddarsy och Inskription: sömmar sydda och glyfer färgade, de två hantverken matar varandra. Närliggande hantverk som arbetats tillsammans markerar en hand redo för inställning. Sök upp Smed Haldren, rustningsmannen i Eastbrook: han talar för mästarna för tillfället. Bevisa ditt hantverk för honom med arbete av dina egna händer, och han kommer att se dina två huvudyrken anpassade.\n\nI god ställning,\nHantverksgillet',
+  'entities.letters.guild_trend_tailoring_inscription.sender': 'Hantverksgillet',
+  'entities.letters.guild_trend_tailoring_inscription.subject':
+    'Ditt arbete inom Skrädderi och Inskription',
+  'entities.letters.guild_trend_weaponcrafting_armorcrafting.body':
+    'Hantverkare,\n\nBud når gilleten för ditt arbete inom vapenhantverk och pansarslöjd: blad härdat och plåtar monterade, de två hantverken matar varandra. Närliggande hantverk som arbetats tillsammans markerar en hand redo för inställning. De som binder detta par får namnet smed i tid. Sök upp Smed Haldren, rustningsmannen i Eastbrook: han talar för mästarna för tillfället. Bevisa ditt hantverk för honom med arbete av dina egna händer, och han kommer att se dina två huvudyrken anpassade.\n\nI god ställning,\nHantverksgillet',
+  'entities.letters.guild_trend_weaponcrafting_armorcrafting.sender': 'Hantverksgillet',
+  'entities.letters.guild_trend_weaponcrafting_armorcrafting.subject':
+    'Ditt arbete inom vapen- och pansarslöjd',
+  'entities.npcs.alchemist_verane.greeting':
+    'Mät två gånger och häll en gång, {className}. Apotekaren har inget tålamod för utspillda reagenser.',
+  'entities.npcs.alchemist_verane.name': 'Alkemisten Verane',
+  'entities.npcs.alchemist_verane.title': 'Apotekerns mästare',
+  'entities.npcs.cook_marlow.greeting':
+    'Inget lämnar mitt kök halvkokt, {className}. Sitt, ät och gå sedan ut igen.',
+  'entities.npcs.cook_marlow.name': 'Kocken Marlow',
+  'entities.npcs.cook_marlow.title': 'Kökens mästare',
+  'entities.npcs.forgemistress_darva.greeting':
+    'Smedjan svarar till mig, {className}. Ta med god malm så svarar det dig också.',
+  'entities.npcs.forgemistress_darva.name': 'Smedmästarinnan Darva',
+  'entities.npcs.forgemistress_darva.title': 'Smedjans mästare',
+  'entities.npcs.tanner_hesk.greeting':
+    'En hud är bara så bra som dess garvning, {className}. Karen är klara när du är.',
+  'entities.npcs.tanner_hesk.name': 'Garvare Hesk',
+  'entities.npcs.tanner_hesk.title': 'Mästaren på garveriet',
+  'entities.npcs.tinker_gizzel.greeting':
+    'Fjädrar, kedjehjul och vassa kanter, {className}: verktygsverket har vad dina händer saknar.',
+  'entities.npcs.tinker_gizzel.name': 'Fixare Gizzel',
+  'entities.npcs.tinker_gizzel.title': 'Verktygsverkets mästare',
+  'entities.npcs.weaver_ottilie.greeting':
+    'Tänk på trådarna, {className}. En stadig hand vid vävstolen slår en stark.',
+  'entities.npcs.weaver_ottilie.name': 'Väver Ottilie',
+  'entities.npcs.weaver_ottilie.title': 'Vävstolens mästare',
+  'gatherEvent.ancientHeartwood': '{finder} fällde en gammal kärnved!',
+  'gatherEvent.moonlitBloom': '{finder} upptäckte en månbelyst blomning!',
+  'gatherEvent.pristineVein': '{finder} träffade en orörd ådra!',
+  'guide.abilityHook.brain_freeze':
+    'Dina frostbesvärjelser gör ibland nästa Winterlash omedelbar och hoppar över dess nedkylning.',
+  'guide.abilityHook.frozen_orb':
+    'Rullar ett långsamt klot genom gruppen som kyler fiender och lagrar istappar.',
+  'heroicShop.buyConfirmAccept': 'Köp',
+  'heroicShop.buyConfirmBody':
+    'Köp {item} för {marks} heroiska märken? Köp med märken kan inte återbetalas.',
+  'heroicShop.buyConfirmCancel': 'Avbryt',
+  'heroicShop.buyConfirmTitle': 'Bekräfta köp',
+  'hudChrome.crafting.comboTierUnmetNamed': 'Höj {crafts} till nivå {tier}.',
+  'hudChrome.crafting.difficultyFull': 'Full skicklighetsvinst',
+  'hudChrome.crafting.difficultyNone': 'Ingen färdighetsvinst',
+  'hudChrome.crafting.difficultyReduced': 'Minskad färdighetsvinst',
+  'hudChrome.crafting.enchantedLine': 'Förtrollad',
+  'hudChrome.crafting.makersMark': 'Skapad av {name}',
+  'hudChrome.crafting.masterworkSeal': 'Mästerverk',
+  'hudChrome.crafting.masterworkToast': 'Mästerverk! {name}',
+  'hudChrome.crafting.masterworkZoneLine': '{crafter} skapade ett mästerverk {name}!',
+  'hudChrome.crafting.skillReqLine': 'Kräver {craft} {skill}',
+  'hudChrome.crafting.stationBadge': 'Station',
+  'hudChrome.crafting.stationName.apothecary': 'Apotekare',
+  'hudChrome.crafting.stationName.forge': 'Smedja',
+  'hudChrome.crafting.stationName.kitchens': 'Kök',
+  'hudChrome.crafting.stationName.loom': 'Vävstol',
+  'hudChrome.crafting.stationName.tannery': 'Garveri',
+  'hudChrome.crafting.stationName.toolworks': 'Verktygsverkstad',
+  'hudChrome.crafting.stationOutOfRangeNamed': 'Flytta till {station} för att skapa detta.',
+  'hudChrome.crafting.stationRequired': 'Du måste vara vid {station} för att skapa det.',
+  'hudChrome.crafting.tierUpToast': '{craft} avancerat till nivå {tier}!',
+  'hudChrome.death.healerConfirmAccept': 'Återuppliva mig',
+  'hudChrome.death.healerConfirmBody':
+    'Den bleka väktaren återupplivar dig här, men Väktartullen minskar alla dina egenskaper med 75 % i upp till 10 minuter på högre nivåer. Går du som ande tillbaka till din kropp återupplivas du utan påföljd.',
+  'hudChrome.death.healerConfirmCancel': 'Avbryt',
+  'hudChrome.death.healerConfirmTitle': 'Acceptera Väktartullen?',
+  'hudChrome.gathering.gatherLine': 'Du samlar: {name}.',
+  'hudChrome.gathering.gatherLineQty': 'Du samlar in: {name} x{qty}.',
+  'hudChrome.mobile.professions': 'Yrken',
+  'hudChrome.options.showThirdActionBar': 'Visa tredje åtgärdsfältet',
+  'hudChrome.playerMenu.streamerBadgeTitle': 'Verifierad streamer',
+  'hudChrome.professions.ceilingCommon': 'Vanlig gräns',
+  'hudChrome.professions.ceilingRare': 'Sällsynt gräns',
+  'hudChrome.professions.ceilingUnlimited': 'Ingen förstärkningsgräns',
+  'hudChrome.professions.close': 'Stäng yrken',
+  'hudChrome.professions.ctaHeader': 'Nästa steg',
+  'hudChrome.professions.ctaRaise': 'Fortsätt höja {craft}: {points} poäng till nästa nivå.',
+  'hudChrome.professions.ctaStart': 'Hantverk eller samla med vilket yrke som helst för att börja.',
+  'hudChrome.professions.gatheringHeader': 'Insamling',
+  'hudChrome.professions.hobbyLabel': 'Hobby: {craft}',
+  'hudChrome.professions.identityHeader': 'Identitet',
+  'hudChrome.professions.majorsLabel': 'Huvudämnen: {a} och {b}',
+  'hudChrome.professions.nextUnlockMax': 'Med maximal skicklighet',
+  'hudChrome.professions.nextUnlockSpecialized':
+    '{points} poäng till Specialiserad: materialkostnaderna sjunker',
+  'hudChrome.professions.nextUnlockTier':
+    '{points} poäng till nästa nivå: mästerverksodds förbättras',
+  'hudChrome.professions.nudgeDormant': 'Din {craft} kunskap ligger vilande',
+  'hudChrome.professions.nudgeNearTier': '{craft}: {points} poäng från nästa nivå',
+  'hudChrome.professions.pairsHeld': 'Par som hålls: {count}',
+  'hudChrome.professions.perkSpecializedAt': 'Specialiserad på {threshold} skicklighet',
+  'hudChrome.professions.perkSpecializedLine': '{craft}: Specialiserade, materialkostnader -{pct}%',
+  'hudChrome.professions.perksHeader': 'Förmåner',
+  'hudChrome.professions.returnsLabel': 'Returnerar: {count}',
+  'hudChrome.professions.ringAria': 'Hantverkshjul',
+  'hudChrome.professions.roleDormant': 'Vilande kunskap',
+  'hudChrome.professions.roleHobby': 'Hobby',
+  'hudChrome.professions.roleMajor': 'Huvudyrke',
+  'hudChrome.professions.roleUnattuned': 'Oinriktad',
+  'hudChrome.professions.skillValue': '{skill} / {max}',
+  'hudChrome.professions.skillsHeader': 'Hantverksfärdigheter',
+  'hudChrome.professions.switchCost': 'Nästa arketypbyte kostar {cost} botgöringspoäng',
+  'hudChrome.professions.syncing': 'Väntar på dina yrkesdata från riket.',
+  'hudChrome.professions.tierPipAria': 'Nivå {tier}',
+  'hudChrome.professions.title': 'Yrken',
+  'hudChrome.professions.tutorialLine':
+    'Nå {target} skicklighet i vilket hantverk som helst för att låsa upp din första nivå.',
+  'hudChrome.professions.unattunedIdentity':
+    'Du är ännu inte inställd på en arketyp. Lyft ditt hantverk och slutför en inställning för att välja ditt par.',
+  'hudChrome.training.alreadyKnown': 'Det receptet känner du redan till.',
+  'hudChrome.training.cannotAfford': 'Du har inte råd med den utbildningen.',
+  'hudChrome.training.close': 'Stäng utbildning',
+  'hudChrome.training.dialogOption': 'Utbildning',
+  'hudChrome.training.dialogOptionAria': 'Bläddra bland utbildningar från {name}',
+  'hudChrome.training.empty': 'Den här mästaren har ingenting att lära ut.',
+  'hudChrome.training.free': 'Gratis',
+  'hudChrome.training.learned': 'Lärt recept: {recipe}',
+  'hudChrome.training.notTaughtHere': 'Det receptet lärs inte ut här.',
+  'hudChrome.training.outOfRange': 'Du måste vara på stationen för att träna.',
+  'hudChrome.training.requirement': 'Undervisade på {craft} {skill}',
+  'hudChrome.training.stateKnown': 'Känd',
+  'hudChrome.training.stateLocked': 'Låst',
+  'hudChrome.training.stateTeachable': 'Tillgänglig',
+  'hudChrome.training.tierUnmet': 'Du behöver {craft} {skill} för att lära dig det receptet.',
+  'hudChrome.training.title': 'Utbildning: {name}',
+  'hudChrome.training.trainAria': 'Lär dig {name} för {fee}',
 };

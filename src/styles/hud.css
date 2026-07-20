@@ -1733,16 +1733,32 @@
     box-shadow: 0 0 8px #7fd1ff88;
   }
   /* micro-menu: bottom-right, stacked upward, sitting just above the
-     Discord/GitHub buttons (both right-aligned to the same edge). */
+     Discord/GitHub buttons (both right-aligned to the same edge). Two adjacent
+     columns instead of one long rail: col-b (the launchers used most in
+     combat/travel, plus the Daily Rewards chest) hugs the same right edge the
+     single rail used to anchor to; col-a sits right next to it with a small
+     gap, never spread across the HUD. Splitting the rail in two roughly halves
+     its height, which is what used to force the short-viewport compaction
+     below onto a maximized 1366x768 laptop. */
   #side-buttons {
     position: absolute;
     right: 16px;
     bottom: 74px;
     display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 2px;
+    z-index: 19;
+  }
+  .side-buttons-col {
+    display: flex;
     flex-direction: column;
     align-items: flex-end;
+    /* Explicit, not content-sized: #daily-rewards-button is 50px wide against
+       the 34px .micro-btn, and flex-end would otherwise right-align it inside
+       a 50px-wide column, opening a dead gutter between the two columns. */
+    width: 34px;
     gap: 4px;
-    z-index: 19;
   }
   .micro-btn {
     width: 34px;
@@ -1852,13 +1868,18 @@
     pointer-events: none;
   }
   /* Short-viewport rescue: #side-buttons is bottom-anchored and grows upward,
-     so on a maximized 1366x768 laptop (about 660px usable height) the topmost
-     button (the Daily Rewards chest) is pushed off the top of the screen and
-     becomes unclickable. Compact the rail (shorter buttons, tighter gap) so
-     every launcher, including the chest, stays on screen. Pinned by the
-     rail-height budget test in tests/crafting_launcher.test.ts. */
-  @media (max-height: 720px) {
-    #side-buttons {
+     so on a very short viewport the topmost button in the taller column (the
+     Daily Rewards chest, at the top of col-b) could still be pushed off the
+     top of the screen. Compact each column (shorter buttons, tighter gap) so
+     every launcher, including the chest, stays on screen. The two-column
+     split already keeps each column well under budget at 1366x768, but the
+     rescue stays as a floor for shorter viewports still. Pinned by the
+     rail-height budget test in tests/crafting_launcher.test.ts. Threshold is
+     600px, not 720px: uncompacted col-b (128 + 10 * (30 + 4) = 468) already
+     fits the 660px maximized-1366x768 budget, so the rescue only needs to
+     fire below that. */
+  @media (max-height: 600px) {
+    .side-buttons-col {
       gap: 1px;
     }
     #side-buttons .micro-btn {
@@ -2287,6 +2308,14 @@
     flex-direction: column;
     gap: 14px;
     pointer-events: none;
+    /* Above #side-buttons (z-index: 19): the two-column rail split moved its
+       icon strip taller on short viewports, into the tracker's vertical span.
+       Text stays readable over the icons instead of the rail painting over it.
+       The clickable rows inside the stack are shrunk to their own content
+       width (qt-header, qt-title, dt-header, dt-affix-row below) so this
+       z-index bump changes paint order only: it never lets a full-width
+       tracker row steal a click or hover meant for a rail button under it. */
+    z-index: 20;
   }
   /* ---------- quest tracker ---------- */
   #quest-tracker {
@@ -2300,11 +2329,19 @@
      click-through overlay and toggles the tracker's collapsed state. Native button
      chrome is reset so it keeps the plain gold-title look. The bottom border uses a
      themeable gold mix so it tracks the active UI theme. */
+  /* width: fit-content (not 100%): the header sits inside #right-tracker-stack,
+     which paints above the side-button rail on short viewports (z-index: 20
+     above). A full-width button would steal clicks and hover from any rail
+     icon its box happened to cross; shrinking the hitbox to the label's own
+     content keeps the click on whichever element is actually under the
+     pointer. The border-bottom underline shrinks to match: an accepted
+     tradeoff over the rail eating the tracker's clicks. */
   #quest-tracker .qt-header {
     display: flex;
     align-items: center;
     gap: 6px;
-    width: 100%;
+    width: fit-content;
+    max-width: 100%;
     font-family: var(--title-font);
     font-size: 14px;
     color: var(--color-text-overlay);
@@ -2343,10 +2380,15 @@
   }
   /* Quest rows are clickable: they re-enable pointer events like the header
      and jump to that quest's detail in the quest log (L). */
+  /* width: fit-content, same rail click-steal rationale as .qt-header above:
+     the block would otherwise span the tracker's full 240px, far past the
+     visible title text, and win clicks meant for a rail button underneath. */
   #quest-tracker .qt-title {
     font-weight: bold;
     margin-top: 8px;
     font-family: var(--title-font);
+    width: fit-content;
+    max-width: 100%;
     pointer-events: auto;
     cursor: pointer;
   }
@@ -2400,11 +2442,14 @@
     text-shadow: 1px 1px 2px #000;
     pointer-events: none;
   }
+  /* width: fit-content, same rail click-steal rationale as #quest-tracker
+     .qt-header above (both trackers share #right-tracker-stack). */
   #deed-tracker .dt-header {
     display: flex;
     align-items: center;
     gap: 6px;
-    width: 100%;
+    width: fit-content;
+    max-width: 100%;
     font-family: var(--title-font);
     font-size: 14px;
     color: var(--color-text-overlay);
@@ -2507,6 +2552,9 @@
   #delve-tracker .dt-obj.done {
     color: var(--color-text-success);
   }
+  /* width: fit-content, same rail click-steal rationale as the quest/deed
+     tracker headers above: a block flex row otherwise fills the tracker's
+     full width and wins hover/click meant for a rail button underneath. */
   #delve-tracker .dt-affix-row {
     pointer-events: auto;
     margin: 4px 0 0 8px;
@@ -2514,6 +2562,8 @@
     align-items: center;
     gap: 4px;
     flex-wrap: wrap;
+    width: fit-content;
+    max-width: calc(100% - 8px);
   }
   #delve-tracker .dt-affix-label {
     color: #c9b27a;

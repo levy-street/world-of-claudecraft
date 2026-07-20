@@ -8,6 +8,13 @@ paths and gives the existing tool items and six tool recipes a real purpose. It 
 because it depends on the node materials (Phase 4), recipe ladders (Phase 10), and fishing catch
 ladder (Phase 11) all being in place, while tool effects and charges stay parked for wave 2+.
 
+Forward note (2026-07-20 timing and economy amendments): Phase 12 stays PURE ACCESS GATING.
+Gathering speed and timing land in Phase 12b (phase-12b-gathering-rhythm.md, issue #2206),
+where tool tiers above a node's requirement shorten the new gather cast and rods additionally
+shorten the fishing bite delay and widen its reaction window. Do not add any speed, cast, or
+timing mechanic in this phase; the tier fields and rod band gates authored here are exactly
+what 12b composes with.
+
 ## Context pointers
 
 - `docs/professions-2/state.md`: locked decisions (tool effects PARKED; prime directive), the
@@ -164,6 +171,8 @@ Out of scope (do NOT do in this phase):
 - Tool effects, charges, and recharge (parked for wave 2+; the pure modules stay dormant).
 - Crafted tool recipe additions or recipe ladder changes (Phase 10 owns recipe content).
 - An equip UI or tool slots (owned-best semantics only).
+- ANY speed or timing mechanic: no gather cast, no harvest duration, no bite delay. Phase 12b
+  owns gathering rhythm; this phase is pure access gating (the 2026-07-20 amendments).
 
 STEP 3 - VALIDATION + MULTI-AGENT REVIEW:
 - Run the state.md sim row: `npx tsc --noEmit`, then

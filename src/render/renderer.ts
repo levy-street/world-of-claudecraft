@@ -647,6 +647,10 @@ export interface EntityView {
   nameplateDisplay: string;
   nameplateTransform: string;
   nameplateSig: string;
+  /** Bitset of the last-applied combat-state classes, for per-frame write elision. */
+  nameplateStateMask: number;
+  /** Last-applied friendly-pet class, diffed separately from the combat-state bitset. */
+  nameplateFriendlyPet: boolean;
   nameplateHpWidth: string;
   titleSig: string; // cheap-diff for the deed-title subtitle (lang|deed id)
   comboSig: string; // cheap-diff for the combo pip row
@@ -4122,6 +4126,8 @@ export class Renderer {
       nameplateDisplay: 'none',
       nameplateTransform: '',
       nameplateSig: '',
+      nameplateStateMask: 0,
+      nameplateFriendlyPet: false,
       nameplateHpWidth: '',
       titleSig: '',
       comboSig: '',

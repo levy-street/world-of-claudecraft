@@ -680,6 +680,7 @@ export const table: DeedLocaleTable = {
   },
   prog_tools_of_the_trade: {
     name: 'Perkakas Sang Tukang',
+    desc: 'Selesaikan proses pembuatan di stasiun kerajinan.',
   },
   dgn_nythraxis_crypt: {
     name: 'Yang Disimpan Kripta',

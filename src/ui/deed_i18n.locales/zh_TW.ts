@@ -372,6 +372,7 @@ export const table: DeedLocaleTable = {
   },
   prog_tools_of_the_trade: {
     name: '吃飯的傢伙',
+    desc: '在製作站完成一次製作。',
   },
   dgn_nythraxis_crypt: {
     name: '墓穴深藏之物',

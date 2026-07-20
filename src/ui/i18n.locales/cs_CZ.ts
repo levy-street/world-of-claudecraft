@@ -33,8 +33,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     'Přivolá ledovou bouři na cílovou plochu po dobu 6 s, působí {damage} mrazivého poškození každou sekundu a zpomaluje nepřátele o 40 %. Každý zasažený nepřítel zkrátí cooldown Zmrzlé sféry o 0,5 s, nejvýše o 3 s za seslání. (Mráz)',
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    'Kopí jinovatky má 20% šanci způsobit, že tvůj příští Winterlash bude okamžitý, o 30 % silnější a bez cooldownu. (Mráz)',
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     'Podrž pro nabití rozšiřujícího se ohnivého dechu, pak ho pusť v kuželi. Delší nabití zasáhne dál a způsobí více poškození. Zasažení nepřátelé jsou dezorientováni; poškození efekt přeruší. Maximální nabití vždy kriticky zasáhne a počítá se jednou pro Žhavou sérii. (Oheň)',
@@ -45,11 +43,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Přeměníš se v planoucí žar a zvýšíš rychlost pohybu o {buff} %. V přeměněné podobě nemůžeš útočit ani sesílat kouzla. Seslej znovu pro návrat do normální podoby.',
   'entities.abilities.fireball_form.name': 'Žárová podoba',
-  'entities.abilities.flurry.description':
-    'Vypustíš tři ledové střely, každá za {damage} mrazivého poškození, a na cíl sesadíš Zimní chlad: jeho příštím 2 příchozím slučitelným kouzlům se cíl jeví jako zmrazený. Brain Freeze způsobí, že Winterlash je okamžitý, o 30 % silnější a přeskočí cooldown. (Mráz)',
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    'Vypustíš sféru vířícího mrazu, která se 8 s pohybuje vpřed a způsobuje {damage} mrazivého poškození každou sekundu blízkým nepřátelům a zpomaluje je o 30 %. Její zásahy generují Zmrzlé prsty. (Mráz)',
   'entities.abilities.frozen_orb.name': 'Zmrzlá sféra',
   'entities.abilities.glacial_front.description':
     'Podrž pro nabití rozšiřující se mrazivé fronty, pak ji pusť v kuželi. Delší nabití zasáhne dál a způsobí více poškození. Všichni zasažení nepřátelé jsou zpomaleni o 50 % na 4 s; maximální nabití je také ukotvuje na 1 s. (Mráz)',
@@ -63,8 +57,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.description':
     'Popadneš svůj dokonalý okamžik: okamžitě získáš 4 Éterické náboje a po dobu 10 s Éterické šipky je nespotřebovávají. (Chronomagie)',
   'entities.abilities.perfect_moment.name': 'Dokonalý okamžik',
-  'entities.abilities.shatter.description':
-    'Tvá kouzla získají 50% šanci na kritický zásah proti zmrazeným cílům a tyto kritické zásahy způsobí o 20 % více poškození. Zmrzlé prsty a Zimní chlad se počítají jako zmrazení. (Mráz)',
   'entities.abilities.shatter.name': 'Drcení mrazem',
   'entities.abilities.temporal_acceleration.description':
     'Urychlí tok času pro tvou skupinu nebo raid a zvýší rychlost útoku, sesílání a kanálování o 30 % po dobu 15 s. Spojenci, kteří nedávno byli pod vlivem Urychlení času nebo Válečných bubnů, jsou příliš vyčerpaní, aby z toho měli prospěch. (Chronomagie)',
@@ -122,16 +114,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.blink': 'Teleportuje tě krátce dopředu a po cestě ruší ukotvení.',
   'guide.abilityHook.blizzard':
     'Pokryje plochu ledem pro postupné ničení a zpomalení celé skupiny nepřátel.',
-  'guide.abilityHook.brain_freeze':
-    'Tvoje mrazivé střely někdy způsobí, že příští Winterlash bude okamžitý a silnější.',
   'guide.abilityHook.fingers_of_frost':
     'Tvoje mrazivé střely někdy posílí Ice Lance tak, aby zasáhl, jako by byl cíl zmrazen.',
   'guide.abilityHook.fireball_form':
     'Staneš se živým žarem a přeběhneš otevřeným terénem vysokou rychlostí.',
   'guide.abilityHook.flurry':
     'Tři rychlé střely, které cíl ochladí, takže tvoje příští mrazivé zásahy dopadnou, jako by byl zmrazen.',
-  'guide.abilityHook.frozen_orb':
-    'Pomalu kutálí sféru skupinou nepřátel, která vše ochladí a živí tvoje mrazivé procsy.',
   'guide.abilityHook.ice_lance':
     'Okamžitý střep pro využití mrazivých procsů, zasáhne výrazně silněji zmrazeného cíle.',
   'guide.abilityHook.shatter':
@@ -8139,4 +8127,267 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.mouseoverCast': 'Sesílání najetím myší na rámech skupiny',
   'hudChrome.options.showTargetOfTarget': 'Zobrazit cíl cíle',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Značka tvé značky',
+  'itemUi.market.rarityLegendary': 'Legendární',
+  'loading.reconnectingAttempt':
+    'Spojení ztraceno. Znovu se připojuji... (pokus {attempt}/{maxAttempts}, opakování za {seconds}s)',
+  'loading.reconnectingNow':
+    'Spojení ztraceno. Nyní se znovu připojuje... (pokus {attempt}/{maxAttempts})',
+  'loading.slowConnection': 'Trvá to déle než obvykle. Zkontrolujte připojení k internetu.',
+  'delveUi.shop.buyConfirmAccept': 'Nakoupit',
+  'delveUi.shop.buyConfirmBody':
+    'Koupit {item} za {marks} Známek výpravy? Nákupy za známky nelze vrátit.',
+  'delveUi.shop.buyConfirmCancel': 'Zrušit',
+  'delveUi.shop.buyConfirmTitle': 'Potvrdit nákup',
+  'entities.abilities.brain_freeze.description':
+    'Kopí jinovatky má 20% šanci, že tvůj příští Winterlash bude okamžitý a obejde dobu obnovení. (Mráz)',
+  'entities.abilities.flurry.description':
+    'Vypustíš tři ledové střely, z nichž každá způsobí {damage} mrazivého poškození, a uvalíš na cíl Zimní chlad: další 2 kompatibilní kouzla jej považují za zmrazený. Brain Freeze učiní Winterlash okamžitým a obejde jeho dobu obnovení. (Mráz)',
+  'entities.abilities.frozen_orb.description':
+    'Vypustíš kouli vířícího mrazu, která se 8 s pohybuje vpřed, každou sekundu způsobí okolním nepřátelům {damage} mrazivého poškození a zpomalí je o 30 %. Každý zásah vytvoří jeden rampouch. (Mráz)',
+  'entities.abilities.shatter.description':
+    'Tvá kouzla mají proti zmrazeným cílům o 50 % vyšší šanci na kritický zásah. Fingers of Frost a Zimní chlad se počítají jako zmrazení. (Mráz)',
+  'entities.items.anglers_feast_platter.name': 'Rybářská hodovní mísa',
+  'entities.items.arcanite_war_axe.name': 'Arkanitová válečná sekera',
+  'entities.items.ashwood_smoked_eel.name': 'Ashwood uzený úhoř',
+  'entities.items.cooking_salt.name': 'Sůl na vaření',
+  'entities.items.copper_bearded_axe.name': 'Měděná vousatá sekera',
+  'entities.items.copper_flanged_mace.name': 'Měděný přírubový palcát',
+  'entities.items.copper_ore.name': 'Měděná ruda',
+  'entities.items.coppermail_gauntlets.name': 'Rukavice z měděné kroužkové zbroje',
+  'entities.items.coppermail_sabatons.name': 'Boty z měděné kroužkové zbroje',
+  'entities.items.elderwood_battle_staff.name': 'Bojová hůl z prastarého dřeva',
+  'entities.items.elixir_of_the_boar.name': 'Kančí elixír',
+  'entities.items.elixir_of_the_serpent.name': 'Hadí elixír',
+  'entities.items.fenbridge_hide_belt.name': 'Kožený opasek z Fenbridge',
+  'entities.items.fenbridge_hide_boots.name': 'Boty z fenbridgeské kůže',
+  'entities.items.fenbridge_hide_leggings.name': 'Nohavice z fenbridgeské kůže',
+  'entities.items.frostgill_chowder.name': 'Polévka Frostgill',
+  'entities.items.game_meat.name': 'Zvěřina',
+  'entities.items.glass_vial.name': 'Skleněná lahvička',
+  'entities.items.goldleaf_game_stew.name': 'Dušená zvěřina se zlatolistím',
+  'entities.items.goldleaf_healing_draught.name': 'Léčivý lektvar ze zlatolistu',
+  'entities.items.goldleaf_mana_draught.name': 'Manový lektvar ze zlatolistu',
+  'entities.items.goldweave_leggings.name': 'Zlatě tkané nohavice',
+  'entities.items.goldweave_robe.name': 'Zlatě tkané roucho',
+  'entities.items.herbed_marsh_pike.name': 'Bažinná štika na bylinkách',
+  'entities.items.homespun_cloth.name': 'Domácí tkanina',
+  'entities.items.homespun_hood.name': 'Podomácku tkaná kapuce',
+  'entities.items.homespun_mitts.name': 'Podomácku tkané rukavice',
+  'entities.items.hunters_game_skewer.name': 'Špíz z lovcovy zvěřiny',
+  'entities.items.iron_ore.name': 'Železná ruda',
+  'entities.items.ironbark_boar_spear.name': 'Kančí kopí ze železokůry',
+  'entities.items.ironbark_log.name': 'Kláda ze železokůry',
+  'entities.items.ironedge_longsword.name': 'Dlouhý meč se železným ostřím',
+  'entities.items.ironlink_hauberk.name': 'Železná kroužková košile',
+  'entities.items.ironlink_legguards.name': 'Chrániče nohou ze železných kroužků',
+  'entities.items.ironlink_spaulders.name': 'Železné kroužkové náplečníky',
+  'entities.items.ironshod_maul.name': 'Železem pobité kladivo',
+  'entities.items.marlows_grand_roast.name': 'Marlowova slavnostní pečeně',
+  'entities.items.marshstalker_hood.name': 'Kápě bažinného stopaře',
+  'entities.items.marshstalker_jerkin.name': 'Kazajka bažinného stopaře',
+  'entities.items.marshstalker_spaulders.name': 'Náplečníky bažinného stopaře',
+  'entities.items.mirewarden_jerkin.name': 'Kazajka strážce močálu',
+  'entities.items.mirewarden_leggings.name': 'Nohavice strážce močálu',
+  'entities.items.mirewarden_treads.name': 'Boty strážce močálu',
+  'entities.items.pan_seared_perch.name': 'Okoun opečený na pánvi',
+  'entities.items.prime_cut.name': 'Prvotřídní kus',
+  'entities.items.pristine_hide.name': 'Nepoškozená kůže',
+  'entities.items.pristine_silk.name': 'Nedotčené hedvábí',
+  'entities.items.pristine_venom_gland.name': 'Nedotčená jedová žláza',
+  'entities.items.riveted_copper_girdle.name': 'Nýtovaný měděný pás',
+  'entities.items.rough_hide.name': 'Hrubá kůže',
+  'entities.items.silkbinders_raiment.name': 'Roucho vazače hedvábí',
+  'entities.items.silkspun_satchel.name': 'Hedvábná brašna',
+  'entities.items.silvered_carp_supper.name': 'Večeře z postříbřeného kapra',
+  'entities.items.silverleaf_healing_draught.name': 'Léčivý lektvar ze stříbrnolistu',
+  'entities.items.silverleaf_herb.name': 'Stříbrnolistá bylina',
+  'entities.items.silverleaf_mana_draught.name': 'Manový lektvar ze stříbrnolistu',
+  'entities.items.silverthread_slippers.name': 'Pantofle ze stříbrné nitě',
+  'entities.items.smithing_flux.name': 'Kovářské tavidlo',
+  'entities.items.spider_silk.name': 'Pavoučí hedvábí',
+  'entities.items.spool_of_thread.name': 'Cívka nití',
+  'entities.items.sunpetal_healing_draught.name': 'Léčivý lektvar ze slunného květu',
+  'entities.items.sunpetal_mana_draught.name': 'Manový lektvar ze slunného květu',
+  'entities.items.sunweave_mantle.name': 'Sluncem tkaný plášť',
+  'entities.items.sunweave_treads.name': 'Boty ze sluneční tkaniny',
+  'entities.items.tanning_agent.name': 'Tříslovina',
+  'entities.items.thorium_warblade.name': 'Thoriová válečná čepel',
+  'entities.items.thoriumscale_cuirass.name': 'Kyrys z thoriových šupin',
+  'entities.items.thoriumscale_greathelm.name': 'Velká přilba z thoriových šupin',
+  'entities.items.thoriumscale_leggings.name': 'Nohavice z thoriových šupin',
+  'entities.items.venom_gland.name': 'Jedová žláza',
+  'entities.items.venomfire_elixir.name': 'Elixír Venomfire',
+  'entities.items.whetted_iron_dirk.name': 'Nabroušená železná dýka',
+  'entities.letters.guild_trend_alchemy_cooking.body':
+    'Řemeslníku,\n\nCech se doslechl o tvé práci v alchymii a vaření: lektvary probublávaly a pokrmy se kořenily, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Ti, kdo tuto dvojici spojí, časem získají titul Lékárníka. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech',
+  'entities.letters.guild_trend_alchemy_cooking.sender': 'Řemeslnický cech',
+  'entities.letters.guild_trend_alchemy_cooking.subject': 'Tvá práce v alchymii a vaření',
+  'entities.letters.guild_trend_armorcrafting_engineering.body':
+    'Řemeslníku,\n\nCech se doslechl o tvé práci v zbrojnictví a strojírenství: pláty se nýtovaly a ozubená kola se seřizovala, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech',
+  'entities.letters.guild_trend_armorcrafting_engineering.sender': 'Řemeslnický cech',
+  'entities.letters.guild_trend_armorcrafting_engineering.subject':
+    'Tvá práce v zbrojnictví a strojírenství',
+  'entities.letters.guild_trend_cooking_leatherworking.body':
+    'Řemeslníku,\n\nCech se doslechl o tvé práci ve vaření a kožedělnictví: pokrmy se chystaly a kůže činily, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech',
+  'entities.letters.guild_trend_cooking_leatherworking.sender': 'Řemeslnický cech',
+  'entities.letters.guild_trend_cooking_leatherworking.subject':
+    'Tvá práce ve vaření a kožedělnictví',
+  'entities.letters.guild_trend_enchanting_jewelcrafting.body':
+    'Řemeslníku,\n\nCech se doslechl o tvé práci v okouzlování a klenotnictví: kouzla se vázala a kameny leštily, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech',
+  'entities.letters.guild_trend_enchanting_jewelcrafting.sender': 'Řemeslnický cech',
+  'entities.letters.guild_trend_enchanting_jewelcrafting.subject':
+    'Tvá práce v okouzlování a klenotnictví',
+  'entities.letters.guild_trend_engineering_alchemy.body':
+    'Řemeslníku,\n\nCech se doslechl o tvé práci ve strojírenství a alchymii: nálože se odměřovaly a činidla vážila, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Ti, kdo tuto dvojici spojí, časem získají titul Bombardéra. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech',
+  'entities.letters.guild_trend_engineering_alchemy.sender': 'Řemeslnický cech',
+  'entities.letters.guild_trend_engineering_alchemy.subject':
+    'Tvá práce ve strojírenství a alchymii',
+  'entities.letters.guild_trend_inscription_enchanting.body':
+    'Řemeslníku,\n\nCech se doslechl o tvé práci v písemnictví a okouzlování: svitky se popisovaly a kouzla splétala, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech',
+  'entities.letters.guild_trend_inscription_enchanting.sender': 'Řemeslnický cech',
+  'entities.letters.guild_trend_inscription_enchanting.subject':
+    'Tvá práce v písemnictví a okouzlování',
+  'entities.letters.guild_trend_jewelcrafting_weaponcrafting.body':
+    'Řemeslníku,\n\nCech se doslechl o tvé práci v klenotnictví a kovářství zbraní: drahokamy se zasazovaly a ostří brousila, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech',
+  'entities.letters.guild_trend_jewelcrafting_weaponcrafting.sender': 'Řemeslnický cech',
+  'entities.letters.guild_trend_jewelcrafting_weaponcrafting.subject':
+    'Tvá práce v klenotnictví a kovářství zbraní',
+  'entities.letters.guild_trend_leatherworking_tailoring.body':
+    'Řemeslníku,\n\nCech se doslechl o tvé práci v kožedělnictví a krejčovství: kůže se řezala a látka lemovala, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Ti, kdo tuto dvojici spojí, časem získají titul Výstrojníka. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech',
+  'entities.letters.guild_trend_leatherworking_tailoring.sender': 'Řemeslnický cech',
+  'entities.letters.guild_trend_leatherworking_tailoring.subject':
+    'Tvá práce v kožedělnictví a krejčovství',
+  'entities.letters.guild_trend_tailoring_inscription.body':
+    'Řemeslníku,\n\nCech se doslechl o tvé práci v krejčovství a písemnictví: švy se sešívaly a glyfy psaly inkoustem, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech',
+  'entities.letters.guild_trend_tailoring_inscription.sender': 'Řemeslnický cech',
+  'entities.letters.guild_trend_tailoring_inscription.subject':
+    'Tvá práce v krejčovství a písemnictví',
+  'entities.letters.guild_trend_weaponcrafting_armorcrafting.body':
+    'Řemeslníku,\n\nCech se doslechl o tvé práci v kovářství zbraní a zbrojnictví: čepele se kalily a pláty lícovaly, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Ti, kdo tuto dvojici spojí, časem získají titul Kováře. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech',
+  'entities.letters.guild_trend_weaponcrafting_armorcrafting.sender': 'Řemeslnický cech',
+  'entities.letters.guild_trend_weaponcrafting_armorcrafting.subject':
+    'Tvá práce v kovářství zbraní a zbrojnictví',
+  'entities.npcs.alchemist_verane.greeting':
+    'Dvakrát měř a jednou nalij, {className}. Lékárník nemá trpělivost na rozlité reagencie.',
+  'entities.npcs.alchemist_verane.name': 'Alchymista Verane',
+  'entities.npcs.alchemist_verane.title': 'Mistr lékárny',
+  'entities.npcs.cook_marlow.greeting':
+    'V mých kuchyních nic nezůstane napůl uvařené, {className}. Sedněte si, jezte a pak se tam vraťte.',
+  'entities.npcs.cook_marlow.name': 'Kuchař Marlow',
+  'entities.npcs.cook_marlow.title': 'Mistr kuchyní',
+  'entities.npcs.forgemistress_darva.greeting':
+    'Kovárna mi odpoví, {className}. Přineste dobrou rudu a ona se vám také zodpoví.',
+  'entities.npcs.forgemistress_darva.name': 'Mistryně kovárny Darva',
+  'entities.npcs.forgemistress_darva.title': 'Mistryně kovárny',
+  'entities.npcs.tanner_hesk.greeting':
+    'Kůže je jen tak dobrá, jak dobře je vyčiněná, {className}. Kádě jsou připravené, až budeš ty.',
+  'entities.npcs.tanner_hesk.name': 'Koželuh Hesk',
+  'entities.npcs.tanner_hesk.title': 'Mistr koželužny',
+  'entities.npcs.tinker_gizzel.greeting':
+    'Pružiny, ozubená kolečka a ostré hrany, {className}: v nástrojárně najdeš vše, co tvým rukám chybí.',
+  'entities.npcs.tinker_gizzel.name': 'Kutil Gizzel',
+  'entities.npcs.tinker_gizzel.title': 'Mistr nástrojárny',
+  'entities.npcs.weaver_ottilie.greeting':
+    'Dávej pozor na nitě, {className}. Klidná ruka u stavu zmůže víc než silná.',
+  'entities.npcs.weaver_ottilie.name': 'Tkadlena Ottilie',
+  'entities.npcs.weaver_ottilie.title': 'Mistryně tkalcovny',
+  'gatherEvent.ancientHeartwood': '{finder} pokácel prastaré jádrové dřevo!',
+  'gatherEvent.moonlitBloom': '{finder} objevil měsíční květ!',
+  'gatherEvent.pristineVein': '{finder} narazil na nedotčenou rudnou žílu!',
+  'guide.abilityHook.brain_freeze':
+    'Tvoje mrazivá kouzla někdy způsobí, že další Winterlash bude okamžitý a přeskočí dobu obnovení.',
+  'guide.abilityHook.frozen_orb':
+    'Kutálí pomalou sféru skrz skupinu nepřátel, ochlazuje je a ukládá rampouchy.',
+  'heroicShop.buyConfirmAccept': 'Nakoupit',
+  'heroicShop.buyConfirmBody':
+    'Koupit {item} za {marks} Hrdinských známek? Nákupy za známky nelze vrátit.',
+  'heroicShop.buyConfirmCancel': 'Zrušit',
+  'heroicShop.buyConfirmTitle': 'Potvrdit nákup',
+  'hudChrome.crafting.comboTierUnmetNamed': 'Zvyšte {crafts} na úroveň {tier}.',
+  'hudChrome.crafting.difficultyFull': 'Plný zisk dovedností',
+  'hudChrome.crafting.difficultyNone': 'Žádný zisk dovedností',
+  'hudChrome.crafting.difficultyReduced': 'Snížený zisk dovedností',
+  'hudChrome.crafting.enchantedLine': 'Okouzlený',
+  'hudChrome.crafting.makersMark': 'Vytvořil {name}',
+  'hudChrome.crafting.masterworkSeal': 'Mistrovské dílo',
+  'hudChrome.crafting.masterworkToast': 'Mistrovské dílo! {name}',
+  'hudChrome.crafting.masterworkZoneLine': '{crafter} vytvořil mistrovské dílo {name}!',
+  'hudChrome.crafting.skillReqLine': 'Vyžaduje {craft} {skill}',
+  'hudChrome.crafting.stationBadge': 'Stanice',
+  'hudChrome.crafting.stationName.apothecary': 'Lékárník',
+  'hudChrome.crafting.stationName.forge': 'Kovárna',
+  'hudChrome.crafting.stationName.kitchens': 'Kuchyně',
+  'hudChrome.crafting.stationName.loom': 'Tkalcovský stav',
+  'hudChrome.crafting.stationName.tannery': 'Koželužna',
+  'hudChrome.crafting.stationName.toolworks': 'Nástrojárna',
+  'hudChrome.crafting.stationOutOfRangeNamed': 'Chcete-li to vytvořit, přejděte do {station}.',
+  'hudChrome.crafting.stationRequired': 'Abyste to mohli vytvořit, musíte být na {station}.',
+  'hudChrome.crafting.tierUpToast': '{craft} postoupilo do úrovně {tier}!',
+  'hudChrome.death.healerConfirmAccept': 'Oživ mě',
+  'hudChrome.death.healerConfirmBody':
+    'Bledý strážce tě zde oživí, ale Strážcovo mýto sníží všechny tvé vlastnosti o 75 %, na vyšších úrovních až na 10 minut. Když se jako duch vrátíš ke svému tělu, oživíš se bez postihu.',
+  'hudChrome.death.healerConfirmCancel': 'Zrušit',
+  'hudChrome.death.healerConfirmTitle': 'Přijmout strážcovo mýto?',
+  'hudChrome.gathering.gatherLine': 'Shromažďujete: {name}.',
+  'hudChrome.gathering.gatherLineQty': 'Shromažďujete: {name} x{qty}.',
+  'hudChrome.mobile.professions': 'Profese',
+  'hudChrome.options.showThirdActionBar': 'Zobrazit třetí panel akcí',
+  'hudChrome.playerMenu.streamerBadgeTitle': 'Ověřený streamer',
+  'hudChrome.professions.ceilingCommon': 'Omezení na běžné',
+  'hudChrome.professions.ceilingRare': 'Omezení na vzácné',
+  'hudChrome.professions.ceilingUnlimited': 'Bez omezení posílení',
+  'hudChrome.professions.close': 'Zavřít profese',
+  'hudChrome.professions.ctaHeader': 'Další krok',
+  'hudChrome.professions.ctaRaise':
+    'Pokračuj ve zvyšování {craft}: do další úrovně zbývá {points} bodů.',
+  'hudChrome.professions.ctaStart': 'Pro začátek vytvořte nebo shromážděte s jakoukoli profesí.',
+  'hudChrome.professions.gatheringHeader': 'Sběr',
+  'hudChrome.professions.hobbyLabel': 'Hobby: {craft}',
+  'hudChrome.professions.identityHeader': 'Identita',
+  'hudChrome.professions.majorsLabel': 'Hlavní: {a} a {b}',
+  'hudChrome.professions.nextUnlockMax': 'Při maximální zručnosti',
+  'hudChrome.professions.nextUnlockSpecialized':
+    '{points} bodů do specializace: náklady na materiál klesnou',
+  'hudChrome.professions.nextUnlockTier':
+    '{points} bodů do další úrovně: šance na mistrovské dílo se zvýší',
+  'hudChrome.professions.nudgeDormant': 'Vaše znalosti {craft} jsou nečinné',
+  'hudChrome.professions.nudgeNearTier': '{craft}: do další úrovně zbývá {points} bodů',
+  'hudChrome.professions.pairsHeld': 'Držené páry: {count}',
+  'hudChrome.professions.perkSpecializedAt': 'Specializace při dovednosti {threshold}',
+  'hudChrome.professions.perkSpecializedLine':
+    '{craft}: specializováno, náklady na materiál -{pct} %',
+  'hudChrome.professions.perksHeader': 'Výhody',
+  'hudChrome.professions.returnsLabel': 'Vrácení: {count}',
+  'hudChrome.professions.ringAria': 'Řemeslné kolo',
+  'hudChrome.professions.roleDormant': 'Dočasně neaktivní znalosti',
+  'hudChrome.professions.roleHobby': 'Koníček',
+  'hudChrome.professions.roleMajor': 'Hlavní obor',
+  'hudChrome.professions.roleUnattuned': 'Neladěno',
+  'hudChrome.professions.skillValue': '{skill} / {max}',
+  'hudChrome.professions.skillsHeader': 'Řemeslné dovednosti',
+  'hudChrome.professions.switchCost': 'Další změna archetypu stojí {cost} bodů nápravy',
+  'hudChrome.professions.syncing': 'Čekání na data vaší profese z říše.',
+  'hudChrome.professions.tierPipAria': 'Úroveň {tier}',
+  'hudChrome.professions.title': 'Profese',
+  'hudChrome.professions.tutorialLine':
+    'Dosáhněte dovednosti {target} v jakémkoli řemesle a odemkněte svou první úroveň.',
+  'hudChrome.professions.unattunedIdentity':
+    'Ještě nejste naladěni na archetyp. Zvyšte své řemeslo a dokončete naladění, abyste si vybrali svůj pár.',
+  'hudChrome.training.alreadyKnown': 'Ten recept už znáte.',
+  'hudChrome.training.cannotAfford': 'Ten trénink si nemůžete dovolit.',
+  'hudChrome.training.close': 'Zavřít trénink',
+  'hudChrome.training.dialogOption': 'Výcvik',
+  'hudChrome.training.dialogOptionAria': 'Prohlédnout výcvik u {name}',
+  'hudChrome.training.empty': 'Tento mistr nemá co učit.',
+  'hudChrome.training.free': 'Zdarma',
+  'hudChrome.training.learned': 'Naučen recept: {recipe}',
+  'hudChrome.training.notTaughtHere': 'Tento recept se zde neučí.',
+  'hudChrome.training.outOfRange': 'Abys mohl trénovat, musíš být u řemeslné stanice.',
+  'hudChrome.training.requirement': 'Vyučováno na {craft} {skill}',
+  'hudChrome.training.stateKnown': 'Známé',
+  'hudChrome.training.stateLocked': 'Zamčeno',
+  'hudChrome.training.stateTeachable': 'K dispozici',
+  'hudChrome.training.tierUnmet': 'K naučení tohoto receptu potřebuješ {craft} {skill}.',
+  'hudChrome.training.title': 'Školení: {name}',
+  'hudChrome.training.trainAria': 'Naučit se {name} za {fee}',
 };

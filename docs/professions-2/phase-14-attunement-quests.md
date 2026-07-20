@@ -5,7 +5,11 @@ all four wave-one archetypes, honest switching costs through repeatable make-ame
 masters' recurring pull (cadence-capped work-order quests and tier-crossing congratulation
 mail, the 2026-07-17 amendment), and
 the legibility layer (trend nudges that complete #1295, a pre-commit preview that explains
-everything, and the attunement celebration). It is its own slice because it is the first phase
+everything, and the attunement celebration). The 2026-07-20 amendments add one more legibility
+row: the crafting window gains a "learnable at a master" discoverability hint, because the
+Phase 9 known-recipes-only filter made the untrained ladders invisible from the window players
+actually live in, and the phase that makes masters prominent is the right one to route players
+to them. It is its own slice because it is the first phase
 where the PR 2039 quest machinery, the Phase 7 trend classifier, and the Phase 8 masters meet in
 player-facing content: every hook it fills already exists, and nothing later depends on it except
 the Phase 15 deed pass.
@@ -125,6 +129,15 @@ Agent ui deliverables:
   picture (majors, hobby, dormancy, return cost) is visible pre-commit in both hosts.
 - Attunement celebration: banner plus title grant plus an id-based zone broadcast that
   re-localizes through the sim_i18n matcher; the deed hook is left for Phase 15.
+- The "learnable at a master" hint row (the 2026-07-20 amendment): the crafting window,
+  which lists known recipes only since Phase 9, gains one discoverability line per craft
+  section telling the player MORE recipes are taught at that craft's master (resolve
+  knownness via the shared train_view.ts viewer predicates and the station via the
+  sim-side stationTypeForCraft in src/sim/professions/stations.ts; never a second
+  knownness rule). Untrained ladders exist but are
+  invisible today; this row routes players to them. Today's tokens, English-only t() key,
+  both hosts, graphics-preset-identical; render it only when the viewer actually has
+  unlearned trainer recipes for that craft (no noise for a fully-trained craft).
 
 Agent tests deliverables:
 - Extend tests/profession_attunement_quests.test.ts and tests/prof_intro_quest.test.ts:
@@ -206,6 +219,9 @@ STEP 5 - ACCEPTANCE CRITERIA (do not mark complete until all check):
 - [ ] Crossing a major-craft tier delivers exactly one congratulation mail from the
       archetype's master; re-crossings, hobby crossings, and unattuned characters deliver
       none.
+- [ ] The crafting window shows the "learnable at a master" hint exactly when the viewer
+      has unlearned trainer recipes for that craft, naming the right master or station, in
+      both hosts, through the shared viewer predicates.
 - [ ] q_archetype_acceptance and q_prof_make_amends are fully retired: no content rows,
       i18n keys, locale fills, tests, or questIds references remain.
 - [ ] Players attuned via 2039's intro quest keep their state; mid-quest placeholder

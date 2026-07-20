@@ -29,11 +29,15 @@ export function resSicknessDuration(level: number): number {
 }
 
 // Auras that survive a death / respawn reset: Resurrection Sickness (The Keeper's
-// Toll) and the Cauterize lockout ('cauterize_fatigue', combat/fire_mage.ts). Both
-// must not be sheddable by dying: res sickness IS the death penalty, and the
-// Cauterize fatigue is what stops die-revive-die from earning a second lethal save
-// inside the window. Every other aura clears. Used at every player death/respawn
-// site so the rule cannot drift.
+// Toll), the Cauterize lockout ('cauterize_fatigue', combat/fire_mage.ts), and
+// encounter-owned unbreakable control. None may be shed by dying; the encounter
+// script remains responsible for releasing its own control. Every other aura clears.
+// Used at every player death/respawn site so the rule cannot drift.
 export function aurasSurvivingDeath(auras: Aura[]): Aura[] {
-  return auras.filter((a) => a.id === RESURRECTION_SICKNESS_ID || a.kind === 'cauterize_fatigue');
+  return auras.filter(
+    (a) =>
+      a.id === RESURRECTION_SICKNESS_ID ||
+      a.kind === 'cauterize_fatigue' ||
+      a.unbreakableControl === true,
+  );
 }

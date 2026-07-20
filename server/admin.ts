@@ -12,10 +12,10 @@ import {
   listModerationActions,
   listSharedIps,
   onlineHistory,
-  overviewCounts,
   registrationsByDay,
   sessionsByDay,
 } from './admin_db';
+import { readOverviewCounts } from './admin_overview_cache';
 import {
   type AdminPermission,
   ASSIGNABLE_ADMIN_ROLES,
@@ -829,12 +829,13 @@ export async function handleAdminApi(
     }
 
     if (path === '/admin/api/overview') {
-      const counts = await overviewCounts();
+      const counts = await readOverviewCounts();
       const serverStats = game.adminStats();
       return ok(res, {
         ...counts,
         peakOnlineToday: Math.max(counts.peakOnlineToday, serverStats.online),
         peakOnlineAllTime: Math.max(counts.peakOnlineAllTime, serverStats.online),
+        playersCap: adminPlayersCap(),
         server: {
           ...serverStats,
           peakOnline: Math.max(
@@ -1146,6 +1147,31 @@ function useAdminRuntime(): AdminRuntime {
   return runtime;
 }
 
+// The realm player cap for the overview. It rides its OWN tiny seam, NOT AdminRuntime:
+// AdminRuntime is a Pick<GameServer> and main.ts injects the live GameServer by value,
+// but the cap is canonicalPlayersCap() (a main.ts module function, not a GameServer
+// method), so it cannot flow through the Pick. Both overview arms read this one accessor
+// so the field stays byte-identical across the legacy and RouteDef dispatch paths (the
+// dual-arm rule). Unlike useAdminRuntime, an unconfigured read returns 0 rather than
+// throwing: 0 is the same "cap disabled" sentinel canonicalPlayersCap emits, so a wiring
+// gap degrades one cosmetic StatCard to 0 instead of failing the whole overview response.
+let playersCapSource: (() => number) | null = null;
+
+/** Inject the realm player-cap source (canonicalPlayersCap) at boot. */
+export function configureAdminPlayersCap(fn: () => number): void {
+  playersCapSource = fn;
+}
+
+/** Clear the injected cap source so a unit test can install its own. */
+export function resetAdminPlayersCapForTests(): void {
+  playersCapSource = null;
+}
+
+/** The realm player cap for the overview, or 0 when unconfigured (cap disabled). */
+function adminPlayersCap(): number {
+  return playersCapSource ? playersCapSource() : 0;
+}
+
 // The DB reads/writes (plus the login-path auth + rate-limit primitives) the admin
 // route layer needs, bundled behind a test-only setter so they can be driven with a
 // fake and no Postgres; production never calls the setter. The same functions the
@@ -1170,7 +1196,10 @@ function makeRealAdminDb() {
     listModerationActions,
     listSharedIps,
     onlineHistory,
-    overviewCounts,
+    // Cache-backed (the shared admin overview memo; both dispatch arms read it):
+    // a setAdminDbForTests override still replaces this member outright, which
+    // bypasses the cache and keeps existing fakes exact.
+    overviewCounts: readOverviewCounts,
     registrationsByDay,
     sessionsByDay,
     listBugReports,
@@ -1316,6 +1345,7 @@ async function overviewHandler(ctx: Ctx): Promise<void> {
     ...counts,
     peakOnlineToday: Math.max(counts.peakOnlineToday, serverStats.online),
     peakOnlineAllTime: Math.max(counts.peakOnlineAllTime, serverStats.online),
+    playersCap: adminPlayersCap(),
     server: {
       ...serverStats,
       peakOnline: Math.max(serverStats.peakOnline, counts.peakOnlineAllTime, serverStats.online),

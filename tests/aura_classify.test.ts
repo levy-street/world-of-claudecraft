@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { isDebuffAura } from '../src/sim/aura_classify';
-import type { AuraKind } from '../src/sim/types';
+import { isDebuffAura, isDispellableAura } from '../src/sim/aura_classify';
+import type { Aura, AuraKind } from '../src/sim/types';
 
 // Every harmful kind the HUD and /targetbuffs treat as a debuff. Keeping this
 // list here (not importing the module's own set) is deliberate: the test pins
@@ -86,5 +86,18 @@ describe('isDebuffAura', () => {
   it('keeps a harmful kind a debuff regardless of value sign', () => {
     expect(isDebuffAura('dot', 0)).toBe(true);
     expect(isDebuffAura('slow', 0.5)).toBe(true);
+  });
+});
+
+describe('isDispellableAura', () => {
+  it('never offers unbreakable encounter control to a player dispel', () => {
+    const aura = {
+      kind: 'silence',
+      value: 0,
+      school: 'shadow',
+      unbreakableControl: true,
+    } as Pick<Aura, 'kind' | 'value' | 'school'> & { unbreakableControl: true };
+
+    expect(isDispellableAura(aura, false)).toBe(false);
   });
 });

@@ -46,6 +46,7 @@ export const tr_TR: AdminTranslations = {
   "stats.peakOnline": "en yüksek çevrimiçi",
   "stats.peakOnlineToday": "son 24 saatin en yüksek çevrimiçisi",
   "stats.peakOnlineAllTime": "tüm zamanların en yüksek çevrimiçisi",
+  "stats.playersCap": "player cap",
   "stats.accounts": "hesaplar",
   "stats.characters": "karakterler",
   "stats.newAccounts24h": "24s'te yeni hesaplar",

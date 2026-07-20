@@ -62,10 +62,8 @@ const h = vi.hoisted(() => {
     tasksForType: vi.fn(async () => [] as unknown[]),
     scoreForAccount: vi.fn(async () => 0),
     onlineMinutesForAccount: vi.fn(async () => 0),
-    rankForAccount: vi.fn(async () => null),
-    leaderboard: vi.fn(async () => [] as unknown[]),
-    leaderboardRowForAccount: vi.fn(async () => null),
     leaderboardTotal: vi.fn(async () => 0),
+    leaderboardSnapshot: vi.fn(async () => [] as unknown[]),
     leaderboardPage: vi.fn(async (_day: string, page: number, pageSize: number) => ({
       rows: [] as unknown[],
       page,
@@ -79,6 +77,7 @@ const h = vi.hoisted(() => {
     questTaskCompletionCount: vi.fn(async () => 0),
     recentPayouts: vi.fn(async (_limit: number) => state.recentPayouts),
     finalizeDay: vi.fn(async () => {}),
+    dayFinalized: vi.fn(async () => false),
     pendingPayouts: vi.fn(async (_limit: number) => state.pendingPayouts),
     unannouncedWinnerDays: vi.fn(async () => [] as unknown[]),
     markWinnersAnnounced: vi.fn(async () => true),
@@ -107,10 +106,8 @@ vi.mock('../../server/daily_rewards_db', async (importOriginal) => {
     tasksForType = h.db.tasksForType;
     scoreForAccount = h.db.scoreForAccount;
     onlineMinutesForAccount = h.db.onlineMinutesForAccount;
-    rankForAccount = h.db.rankForAccount;
-    leaderboard = h.db.leaderboard;
-    leaderboardRowForAccount = h.db.leaderboardRowForAccount;
     leaderboardTotal = h.db.leaderboardTotal;
+    leaderboardSnapshot = h.db.leaderboardSnapshot;
     leaderboardPage = h.db.leaderboardPage;
     spinForAccount = h.db.spinForAccount;
     recordSpin = h.db.recordSpin;
@@ -118,6 +115,7 @@ vi.mock('../../server/daily_rewards_db', async (importOriginal) => {
     questTaskCompletionCount = h.db.questTaskCompletionCount;
     recentPayouts = h.db.recentPayouts;
     finalizeDay = h.db.finalizeDay;
+    dayFinalized = h.db.dayFinalized;
     pendingPayouts = h.db.pendingPayouts;
     unannouncedWinnerDays = h.db.unannouncedWinnerDays;
     markWinnersAnnounced = h.db.markWinnersAnnounced;
@@ -147,7 +145,9 @@ vi.mock('../../server/woc_balance', async (importOriginal) => {
   return { ...actual, cachedWocBalance: h.balance.cachedWocBalance };
 });
 
+import { resetDailyFinalizeGuardForTests } from '../../server/daily_finalize_guard';
 import {
+  bustDailyRewardBoardCache,
   DailyRewardService,
   dailyRewardService,
   resetDailyRewardDbForTests,
@@ -155,6 +155,7 @@ import {
   routes,
   setDailyRewardDbForTests,
 } from '../../server/daily_rewards';
+import { resetDailyRewardSeedGateForTests } from '../../server/daily_rewards_seed_gate';
 import { compose } from '../../server/http/compose';
 import { withErrors } from '../../server/http/middleware/with_errors';
 import type { Method, Middleware } from '../../server/http/types';
@@ -348,6 +349,14 @@ beforeEach(() => {
   h.state.balance = null;
   resetDailyRewardDbForTests();
   resetDailyRewardPriceCacheForTests();
+  // Both memos live at module scope, so without a per-test reset an earlier test
+  // that seeds a (day, realm, config) key would let a later test skip the gated
+  // ensureDay/seedTasks pair (the ensureDayThrows case would never reach its throw).
+  resetDailyRewardSeedGateForTests();
+  resetDailyFinalizeGuardForTests();
+  // The routes drive the module-load singleton, whose instance board cache
+  // would otherwise leak a board snapshot across tests.
+  bustDailyRewardBoardCache();
   // Default: the gate secret and the config URL are unset, so the config falls back
   // (no fetch) and the ops gate fails closed unless a test opts in.
   delete process.env[OPS_SECRET_ENV];
@@ -486,6 +495,24 @@ describe('player routes: thin-handler dispatch', () => {
     // The handler dispatched into the service (which touched the mocked db).
     expect(h.db.ensureDay).toHaveBeenCalled();
     expect(r.reached).toBe(true);
+  });
+
+  it('delivers the exported bust to the live module singleton, not a detached cache', async () => {
+    // Behavioral pin on the moderation-bust delivery link: main.ts's
+    // bustBoardCaches calls bustDailyRewardBoardCache(), which must reach
+    // the INSTANCE cache of the module-load dailyRewardService singleton
+    // (the one these routes drive). A regression to a module-level cache in
+    // the board-cache module, or a bust aimed at a second service instance,
+    // keeps the source-text pin green and fails only here.
+    await runRoute('GET', '/api/daily-rewards', { headers: { authorization: BEARER } });
+    await runRoute('GET', '/api/daily-rewards', { headers: { authorization: BEARER } });
+    // Fresh within the TTL: both requests share one snapshot refresh.
+    expect(h.db.leaderboardSnapshot).toHaveBeenCalledTimes(1);
+    bustDailyRewardBoardCache();
+    const r = await runRoute('GET', '/api/daily-rewards', { headers: { authorization: BEARER } });
+    expect(r.status).toBe(200);
+    // The exported bust emptied the singleton's cache: the next read refreshed.
+    expect(h.db.leaderboardSnapshot).toHaveBeenCalledTimes(2);
   });
 
   it('GET leaderboard answers 200 with the page payload and decodes page/pageSize leniently', async () => {

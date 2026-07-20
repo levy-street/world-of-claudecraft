@@ -74,6 +74,10 @@ Dead code and cleanup agent:
   with the rest of src/sim/professions/.
 
 PHASE-SPECIFIC QA EMPHASIS (probe these specifically):
+- Phase 12 ships NO speed or timing change (the 2026-07-20 amendments): harvests stay
+  instant and the fishing cast stays the fixed 5 s. If the diff contains any cast, duration,
+  or bite mechanic, that is scope creep into Phase 12b, a BLOCKING finding; conversely, do
+  not flag the absence of speed mechanics as a gap.
 - The lockout-prevention invariant on EVERY pre-phase node: enumerate the node defs that
   existed before Phase 12 and prove each one still resolves as bare-hands harvestable; any
   single gated pre-phase node is a BLOCKING finding.
@@ -110,7 +114,8 @@ STEP 4 - UPDATE DOCS + MEMORY:
 STEP 5 - FINAL RESPONSE FORMAT:
 End your turn with: QA verdict (PASS / PASS-WITH-FOLLOWUPS / FAIL), counts of BLOCKING /
 SHOULD-FIX / NICE-TO-HAVE found and fixed, deferred items, and a one-line handoff for the
-Phase 13 implementation session.
+Phase 12b implementation session (Gathering rhythm follows Phase 12 in the restructured
+order).
 
 STOPPING RULES:
 - Stop and surface to the user if any BLOCKING item cannot be fixed without changing the phase

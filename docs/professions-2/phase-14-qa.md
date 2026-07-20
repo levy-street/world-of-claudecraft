@@ -26,7 +26,9 @@ Spawn an Explore agent to read and summarize:
 - the git diff against the Phase 14 start commit recorded in progress.md Notes
   (git diff <phase-start>..HEAD, plus --name-only for the file list)
 The summary must return: every deliverable and acceptance criterion, the full list of files
-touched, the STEP 3 validation command set from the phase file, and any deferrals the
+touched, the STEP 3 validation command set from the phase file, every row of the
+"Phase-specific QA emphasis" section at the bottom of THIS file (the audit agents receive
+only the summary, so the emphasis rows must ride in it), and any deferrals the
 implementation session recorded.
 
 STEP 2 - QA AUDIT:
@@ -48,7 +50,9 @@ Agent Correctness deliverables:
   character through nudge, master, lore quest, attunement, one cheap switch, and an
   escalating amends repeat; confirm selection validation rejects a pair outside the
   whitelist and that outcomes resolve server-side online.
-- Probe the phase-specific emphasis list:
+- Probe the phase-specific emphasis list (INCLUDING every row of the "Phase-specific QA
+  emphasis" section at the bottom of this file: the work orders, the tier-crossing mail,
+  and the learnable-at-a-master hint):
   - Quest availability matrix: at each of the four masters, verify offer/deny in every
     identity state (unattuned, attuned to the matching pair, attuned to a wrong pair,
     mid-quest, repeat make-amends), in both hosts.
@@ -95,7 +99,9 @@ recorded there. Record surprises to Claude Code memory.
 STEP 5 - FINAL RESPONSE FORMAT:
 Verdict: PASS / PASS-WITH-FOLLOWUPS / FAIL. Counts: findings by severity, findings fixed,
 tests added, tests removed. Deferrals with issue links. Validation results (each command,
-pass or fail). One line handoff for Phase 15 (deed hook location and any tuning notes).
+pass or fail). One line handoff for Phase 14b (Commissions and the Maker's Bond follows
+Phase 14 in the restructured order; pass along the deed hook location and any tuning notes
+for Phase 15 as well).
 
 STOPPING RULES:
 - Stop if the audit finds that 2039's selection whitelist cannot express a quest's target
@@ -119,3 +125,9 @@ STOPPING RULES:
 - Tier-crossing mail (the 2026-07-17 amendment): exactly one letter per tier per major
   craft, from the archetype's anchor master; re-crossings, hobby and dormant crossings,
   unattuned characters, and repeated loads deliver none.
+- The "learnable at a master" hint (the 2026-07-20 amendment): shown exactly when the
+  viewer has unlearned trainer recipes for the craft, absent for a fully-trained craft,
+  naming the right master or station (the master via the shared train_view.ts predicates,
+  the station via the sim-side stationTypeForCraft; a second knownness rule beside
+  isRecipeKnownForViewer is a finding); identical offline and online, and across graphics
+  presets.

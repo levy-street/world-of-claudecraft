@@ -1741,6 +1741,27 @@ describe('Nythraxis raid encounter', () => {
       add.swingTimer = 0;
       add.threat.set(tank.id, 1000);
     }
+    adds[0].auras.push({
+      id: 'fear_incap',
+      name: 'Fear',
+      kind: 'incapacitate',
+      remaining: 30,
+      duration: 30,
+      value: 0,
+      sourceId: tank.id,
+      school: 'shadow',
+    });
+    adds[1].auras.push({
+      id: 'polymorph',
+      name: 'Polymorph',
+      kind: 'polymorph',
+      remaining: 30,
+      duration: 30,
+      value: 0,
+      sourceId: tank.id,
+      school: 'arcane',
+    });
+    const transitionAddPositions = adds.map((add) => ({ ...add.pos }));
 
     boss.hp = Math.floor(boss.maxHp * 0.69);
     sim.tick();
@@ -1760,6 +1781,9 @@ describe('Nythraxis raid encounter', () => {
     ).toBe(false);
     expect(tank.hp).toBe(transitionHp);
     expect(boss.nythraxis?.phase).toBe('transition');
+    expect(adds.map((add, index) => dist2d(add.pos, transitionAddPositions[index]))).toEqual([
+      0, 0,
+    ]);
   });
 
   it('stuns active pets during the Aldric transition so they cannot keep attacking', () => {

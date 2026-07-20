@@ -262,10 +262,10 @@ function expectedTokens(effect: unknown): string[] {
       if (typeof value === 'number') {
         if (value === 0) continue;
         if (key === 'battleRhythm') continue;
-        // Temporal Rift / Blink While Casting / Elemental Convergence (mage
-        // choice rows) are picked/not-picked flags like battleRhythm; their
-        // timings are stated as durations, not this 1.
-        if (key === 'temporalRift' || key === 'blinkCast' || key === 'convergence') continue;
+        // Blink While Casting / Elemental Convergence (mage choice rows) are
+        // picked/not-picked flags like battleRhythm; their timings are stated
+        // as durations, not this 1.
+        if (key === 'blinkCast' || key === 'convergence') continue;
         // A +50% spell or heal crit-damage mastery lifts the 1.5x base to 2.0x, which the
         // hand-written descriptions phrase as "double" rather than "50%".
         if ((key === 'critDmgSpellPct' || key === 'critDmgHealPct') && value === 0.5) {

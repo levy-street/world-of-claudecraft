@@ -149,9 +149,10 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     # Exec form with a node one-liner, deliberately unlike the CMD-SHELL healthcheck
-    # the postgres service uses above: the runtime image is alpine and has no curl or
-    # wget, but it does ship node. The probe hits /livez and nothing else. /livez
-    # reports a WEDGED game loop, not merely a live process, so it catches the failure
+    # the postgres service uses above: the runtime image is a Debian slim base
+    # (node:26-slim) and has no curl or wget, but it does ship node. The probe hits
+    # /livez and nothing else. /livez reports a WEDGED game loop, not merely a live
+    # process, so it catches the failure
     # `restart: unless-stopped` cannot see (that policy only acts on process exit), and
     # it deliberately stays 200 while the server drains, so a graceful shutdown is never
     # misread as a wedge. /readyz flips to 503 while draining and would do exactly that.

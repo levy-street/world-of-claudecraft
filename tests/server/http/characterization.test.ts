@@ -10,10 +10,11 @@
 //
 // Determinism rules this file obeys:
 //   - It NEVER captures a 500 produced by the pool-less db (a test artifact). Every
-//     captured case returns BEFORE touching Postgres, or returns an empty payload
-//     because the leaderboard cache swallows the db error. Db-dependent success
-//     paths (project-stats, arena ladder, populated leaderboards, the OAuth/Discord
-//     success bounces) are DEFERRED, see the trailing comment block.
+//     captured case returns BEFORE touching Postgres, or returns an empty/zero
+//     payload because a TTL cache swallows the db error (the leaderboard, arena
+//     ladder, and project-stats caches all degrade deterministically). The remaining
+//     db-dependent success paths (populated leaderboards, the OAuth/Discord success
+//     bounces) are DEFERRED, see the trailing comment block.
 //   - The harness normalizer masks the dynamic fields (challengeId/nonce) by key, so
 //     the native-attestation challenge golden is byte-stable across runs.
 //   - The GitHub releases proxy does a network fetch; it is pinned deterministic by
@@ -21,6 +22,7 @@
 //     GitHub is unreachable returns an empty feed), never by editing source.
 
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { resetPublicReadRateLimits } from '../../../server/ratelimit';
 import { type Dispatch, goldenMaster, makeReq } from '../helpers';
 import { goldenContentTypeMismatch } from './content_type_consistency';
 
@@ -263,6 +265,26 @@ describe('main /api characterization: leaderboard payload shapes (empty cache)',
     },
     LEADERBOARD_TEST_TIMEOUT_MS,
   );
+});
+
+// The arena ladder and project-stats used to be DEFERRED (their unguarded db read
+// 500'd against the pool-less db). Now a TTL cache fronts each: the cold-cache read
+// degrades deterministically (arena to an empty ladder, project-stats to
+// accounts_created 0), so both are captured goldens like the empty-cache boards
+// above. The public-read limiter is reset per case so the captured status is always
+// the 200 body, never a 429 from an accumulated bucket.
+describe('main /api characterization: arena ladder + project-stats (cold-cache degrade)', () => {
+  beforeEach(() => {
+    resetPublicReadRateLimits();
+  });
+
+  it('GET /api/arena/leaderboard degrades to an empty 1v1 ladder', async () => {
+    await characterize('arena_default', makeReq({ method: 'GET', url: '/api/arena/leaderboard' }));
+  });
+
+  it('GET /api/project-stats degrades to accounts_created 0', async () => {
+    await characterize('project_stats', makeReq({ method: 'GET', url: '/api/project-stats' }));
+  });
 });
 
 describe('main /api characterization: binary request class (player card)', () => {
@@ -518,9 +540,10 @@ afterAll(() => {
 });
 
 // DEFERRED /api routes (db- or network-dependent success paths; capturing them
-// here would either bless a pool-less 500 or record a non-deterministic body):
-//   - GET  /api/project-stats          getAccountsCount() hits the db -> pool-less 500.
-//   - GET  /api/arena/leaderboard      topArenaRatings() hits the db per request -> 500.
+// here would either bless a pool-less 500 or record a non-deterministic body).
+// (/api/project-stats and /api/arena/leaderboard graduated OUT of this list: a TTL
+// cache now fronts each, so a cold-cache db error degrades deterministically instead
+// of 500ing; both are captured goldens above.)
 //   - GET  /api/woc/balance            live Solana RPC fetch -> non-deterministic.
 //   - GET  /api/email/unsubscribe?token=<non-empty>   accountByUnsubscribeToken() -> db 500.
 //   - GET  /api/search?q=<term> WITH a valid bearer    searchCharacters() -> db.

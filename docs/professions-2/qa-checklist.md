@@ -17,15 +17,18 @@ or screenshot path), not vibes.
 
 ## Determinism
 - [ ] All new randomness (masterwork proc, rare gather events, node rarity,
-      fishing catches) draws through `Rng` with pinned draw-order tests; no
+      fishing catches, the Phase 12b hidden bite delay) draws through `Rng`
+      with pinned draw-order tests; no
       `Math.random` / `Date.now` / `performance.now` anywhere in `src/sim/`.
 - [ ] `npx vitest run tests/architecture.test.ts` green.
 - [ ] Same-seed determinism test covers a full gather-craft-masterwork sequence.
 
 ## Server authority
 - [ ] Every new command (train recipe, disenchant, enchant apply, salvage,
-      quest advance) validates server-side; the client never decides craft
-      outcomes, masterwork procs, harvest rewards, or quest credit.
+      quest advance, the Phase 14b commission opt-in and master unbind)
+      validates server-side; the client never decides craft
+      outcomes, masterwork procs, harvest rewards, quest credit, the
+      Phase 12b bite deadline, or a bind-on-trade stamp.
 - [ ] Invalid or replayed commands cannot duplicate rewards, recipes, or skill.
 
 ## Persistence

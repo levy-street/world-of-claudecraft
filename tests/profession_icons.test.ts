@@ -31,10 +31,10 @@ const professionsDir = path.join(publicDir, 'ui/professions');
 
 // The full icon id set of docs/professions-2/asset-manifest.json wave one: the ten
 // craft-wheel crafts plus the gathering skills. Derived from the sim content tables so a
-// renamed craft fails loudly here; gather_fishing is pinned literally because the manifest
-// ships it ahead of the sim (fishing lands in Phase 11).
+// renamed craft fails loudly here; gather_fishing now derives from the sim content like the
+// other gathering skills (fishing joined GATHERING_PROFESSION_IDS in Phase 11).
 const CRAFT_ICON_IDS = CRAFT_RING.map((c) => `prof_${c.id}`);
-const GATHER_ICON_IDS = [...GATHERING_PROFESSION_IDS.map((id) => `gather_${id}`), 'gather_fishing'];
+const GATHER_ICON_IDS = GATHERING_PROFESSION_IDS.map((id) => `gather_${id}`);
 const ICON_IDS = [...CRAFT_ICON_IDS, ...GATHER_ICON_IDS];
 
 const isDotfile = (p: string): boolean => path.basename(p).startsWith('.');

@@ -92,7 +92,7 @@ describe('buildGatheringProficiencyRows', () => {
   it('returns one row per gathering profession, in the fixed order', () => {
     const world = makeWorld({ proficiency: { mining: 3, logging: 0, herbalism: 7 } });
     const rows = buildGatheringProficiencyRows(world);
-    expect(rows.map((r) => r.professionId)).toEqual(['mining', 'logging', 'herbalism']);
+    expect(rows.map((r) => r.professionId)).toEqual(['mining', 'logging', 'herbalism', 'fishing']);
   });
 
   it('matches the input values exactly', () => {
@@ -102,6 +102,7 @@ describe('buildGatheringProficiencyRows', () => {
       { professionId: 'mining', value: 12 },
       { professionId: 'logging', value: 4 },
       { professionId: 'herbalism', value: 0 },
+      { professionId: 'fishing', value: 0 },
     ]);
   });
 

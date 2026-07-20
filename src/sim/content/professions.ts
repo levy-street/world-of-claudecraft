@@ -16,7 +16,7 @@ import { ZONE1_ZONE } from './zone1';
 import { ZONE2_ZONE } from './zone2';
 import { ZONE3_ZONE } from './zone3';
 
-export type GatheringProfessionId = 'mining' | 'logging' | 'herbalism';
+export type GatheringProfessionId = 'mining' | 'logging' | 'herbalism' | 'fishing';
 
 export interface GatheringProfessionDef extends ProfessionRecord {
   id: GatheringProfessionId;
@@ -50,11 +50,26 @@ export const GATHERING_PROFESSIONS: Record<GatheringProfessionId, GatheringProfe
     icon: 'herbalism',
     description: 'Collecting herbs and plants growing in the wild.',
   },
+  fishing: {
+    id: 'fishing',
+    category: 'gathering',
+    maxSkill: 300,
+    name: 'Fishing',
+    icon: 'fishing',
+    description: 'Reeling catches from the rivers and lakes across the zones.',
+  },
 };
 
 // Stable iteration order, used for defaulting/normalizing a per-player
-// proficiency record. Keep in sync with GATHERING_PROFESSIONS above.
-export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = ['mining', 'logging', 'herbalism'];
+// proficiency record. Keep in sync with GATHERING_PROFESSIONS above. Fishing is
+// appended LAST (Professions 2.0 Phase 11) so the pre-existing iteration order
+// of the starter three is preserved for every consumer that walks this list.
+export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = [
+  'mining',
+  'logging',
+  'herbalism',
+  'fishing',
+];
 
 // Tool effect slotting (#1136): a slottable bonus layered on top of a base
 // gathering tool's tier (see ../professions/tools.ts). Each effect carries its

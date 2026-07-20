@@ -60,13 +60,69 @@ describe('PeriodicCollector', () => {
     const query = vi.fn(() => new Promise<number>((done) => (resolve = done)));
     const collector = new PeriodicCollector(query, 60_000);
 
+    expect(collector.coalescedCount).toBe(0);
     const first = collector.refresh();
     const second = collector.refresh();
     expect(query).toHaveBeenCalledTimes(1);
+    expect(collector.coalescedCount).toBe(1);
 
     resolve(9);
     await expect(Promise.all([first, second])).resolves.toEqual([9, 9]);
     expect(collector.current()).toBe(9);
+    expect(collector.coalescedCount).toBe(1);
+  });
+
+  it('counts every extra joiner of one in-flight query', async () => {
+    let resolve!: (value: number) => void;
+    const query = vi.fn(() => new Promise<number>((done) => (resolve = done)));
+    const collector = new PeriodicCollector(query, 60_000);
+
+    const first = collector.refresh();
+    const second = collector.refresh();
+    const third = collector.refresh();
+    expect(query).toHaveBeenCalledTimes(1);
+    expect(collector.coalescedCount).toBe(2);
+
+    resolve(11);
+    await expect(Promise.all([first, second, third])).resolves.toEqual([11, 11, 11]);
+    expect(collector.coalescedCount).toBe(2);
+  });
+
+  it('never counts clean sequential refreshes as coalesced', async () => {
+    const onCoalesce = vi.fn();
+    const query = vi.fn(async () => 1);
+    const collector = new PeriodicCollector(query, 60_000, undefined, onCoalesce);
+
+    await collector.refresh();
+    await collector.refresh();
+    expect(query).toHaveBeenCalledTimes(2);
+    expect(collector.coalescedCount).toBe(0);
+    expect(onCoalesce).not.toHaveBeenCalled();
+  });
+
+  it('a throwing onCoalesce sink is reported via onError and never breaks refresh', async () => {
+    let resolve!: (value: number) => void;
+    const query = vi.fn(() => new Promise<number>((done) => (resolve = done)));
+    const onError = vi.fn();
+    const onCoalesce = vi.fn(() => {
+      throw new Error('sink boom');
+    });
+    const collector = new PeriodicCollector(query, 60_000, onError, onCoalesce);
+
+    const first = collector.refresh();
+    const second = collector.refresh();
+    expect(onCoalesce).toHaveBeenCalledTimes(1);
+    expect(collector.coalescedCount).toBe(1);
+    // The sink's throw is routed to onError under its own label, carrying the
+    // sink's error as the cause, so triage cannot mistake it for a failed query.
+    expect(onError).toHaveBeenCalledTimes(1);
+    const reported = onError.mock.calls[0][0] as Error;
+    expect(reported.message).toBe('onCoalesce sink threw');
+    expect((reported.cause as Error).message).toBe('sink boom');
+
+    resolve(3);
+    await expect(Promise.all([first, second])).resolves.toEqual([3, 3]);
+    expect(collector.current()).toBe(3);
   });
 
   it('start() triggers an immediate refresh and stop() is safe before/after start', async () => {

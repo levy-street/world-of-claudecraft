@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   BLIZZARD_ORB_CDR_CAP,
   BLIZZARD_ORB_CDR_PER_ENEMY,
-  FINGERS_OF_FROST_MAX_STACKS,
+  ICICLE_MAX,
 } from '../src/sim/combat/frost_mage';
 import { FROZEN_ORB_SLOW_MULT, FROZEN_ORB_SPEED } from '../src/sim/combat/frozen_orb';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
@@ -18,7 +18,7 @@ import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 
 // Frost mage AoE half (owner design 2026-07-11): Frozen Orb, the drifting
-// proc generator (combat/frozen_orb.ts), and Blizzard, the ground channel
+// Icicle generator (combat/frozen_orb.ts), and Blizzard, the ground channel
 // that snares and refunds Frozen Orb cooldown per enemy struck, capped per
 // cast (combat/frost_mage.ts channel hooks).
 
@@ -212,7 +212,7 @@ describe('Frozen Orb in combat', () => {
     expect((sim as any).ctx.frozenOrbs).toHaveLength(0);
   });
 
-  it('pulses damage and a 30% snare on nearby enemies, first strike guarantees Fingers', () => {
+  it('pulses damage and a 30% snare while banking Icicles, not Fingers', () => {
     const { sim, p } = makeSim();
     const near = spawnDummy(sim, p, 4);
     face(p, near);
@@ -227,9 +227,8 @@ describe('Frozen Orb in combat', () => {
     expect(slow).toBeDefined();
     expect(slow?.kind).toBe('slow');
     expect(slow?.value).toBe(FROZEN_ORB_SLOW_MULT);
-    // The first strike's Fingers of Frost is guaranteed.
-    const fingers = p.auras.find((a) => a.kind === 'fingers_of_frost');
-    expect(fingers).toBeDefined();
+    expect(p.auras.find((a) => a.kind === 'icicles')?.stacks).toBe(1);
+    expect(p.auras.some((a) => a.kind === 'fingers_of_frost')).toBe(false);
   });
 
   it('drifts forward: a distant enemy is only reached after the orb travels', () => {
@@ -248,7 +247,7 @@ describe('Frozen Orb in combat', () => {
     expect(damageEvents(late, 'Frozen Orb').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('expires after its 8s life and never overcaps Fingers of Frost', () => {
+  it('expires after its 8s life, caps Icicles, and never grants Fingers', () => {
     const { sim, p } = makeSim();
     const near = spawnDummy(sim, p, 3);
     face(p, near);
@@ -259,8 +258,9 @@ describe('Frozen Orb in combat', () => {
     for (let i = 0; i < 20 * 9; i++) {
       const events = sim.tick();
       total += damageEvents(events, 'Frozen Orb').length;
-      const fingers = p.auras.find((a) => a.kind === 'fingers_of_frost');
-      if (fingers) expect(fingers.stacks ?? 1).toBeLessThanOrEqual(FINGERS_OF_FROST_MAX_STACKS);
+      const icicles = p.auras.find((a) => a.kind === 'icicles');
+      if (icicles) expect(icicles.stacks ?? 1).toBeLessThanOrEqual(ICICLE_MAX);
+      expect(p.auras.some((a) => a.kind === 'fingers_of_frost')).toBe(false);
     }
     expect(total).toBeGreaterThan(0);
     // Life over: two more seconds add nothing.

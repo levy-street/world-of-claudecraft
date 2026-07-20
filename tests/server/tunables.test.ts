@@ -431,6 +431,16 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
   const dbSrc = read('server/db.ts');
   const reportsSrc = read('server/reports.ts');
   const dailySrc = read('server/daily_rewards.ts');
+  const retentionSrc = read('server/play_session_retention_db.ts');
+
+  // Slice a function BODY: from its declaration to the next top-level export,
+  // so a neighbor's match can never satisfy a body that lost its own.
+  const bodyOf = (source: string, decl: string): string => {
+    const start = source.indexOf(decl);
+    expect(start, `${decl} not found`).toBeGreaterThan(-1);
+    const next = source.indexOf('\nexport ', start + decl.length);
+    return next === -1 ? source.slice(start) : source.slice(start, next);
+  };
 
   it('the WS maxPayload references WS_MAX_PAYLOAD_BYTES, defined once', () => {
     expect(mainSrc).toContain('maxPayload: WS_MAX_PAYLOAD_BYTES');
@@ -499,14 +509,7 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     // Dropping runWithStatementTimeout at ONE call site silently reverts that
     // read to the 15s session default while its own suite stays green (the
     // suites answer BEGIN/SET LOCAL and forward the real query through the same
-    // spy), so pin each function BODY to the wrapper. Slices run to the next
-    // export so a neighbor's wrapper cannot satisfy a body that lost its own.
-    const bodyOf = (source: string, decl: string): string => {
-      const start = source.indexOf(decl);
-      expect(start, `${decl} not found`).toBeGreaterThan(-1);
-      const next = source.indexOf('\nexport ', start + decl.length);
-      return next === -1 ? source.slice(start) : source.slice(start, next);
-    };
+    // spy), so pin each function BODY to the wrapper via the shared bodyOf.
     for (const decl of [
       'export async function topArenaRatings',
       'export async function topLifetimeXp',
@@ -529,16 +532,11 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     expect(bodyOf(read('server/deeds_db.ts'), 'export async function deedRarityCounts')).toContain(
       'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
     );
-    expect(
-      bodyOf(
-        read('server/client_perf_metrics_db.ts'),
-        'export async function clientPerfMetricRows',
-      ),
-    ).toContain('runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS');
     // The on-demand admin reads carry the wrapper in the body that owns their
     // heaviest scan: sessionsByDay and accountDetail wrap directly; clientPerfSummary
-    // threads the bound query into its private perf helpers from ONE wrapper call, so
-    // the wrapper lives in its own body. pruneChatLogs (db.ts) wraps its delete.
+    // runs its whole roll-up as ONE GROUPING SETS statement inside its own wrapper
+    // call. The batched retention prunes (db.ts) stay on the default allowance;
+    // batching is what makes the default safe for them (pinned below).
     for (const decl of [
       'export async function sessionsByDay',
       'export async function clientPerfSummary',
@@ -548,12 +546,14 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
         'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
       );
     }
-    // clientPerfSummary inherits the allowance ONLY if it hands the bound query to
-    // both perf helpers; pin the threading so a helper cannot silently drop back to a
-    // pool.query outside the raised transaction without reddening this.
+    // clientPerfSummary collapsed its seven serialized reads into one GROUPING SETS
+    // statement issued through the bound query; pin the collapsed shape so the
+    // roll-up cannot silently split back out or drop to a bare pool read outside
+    // the raised transaction without reddening this.
     const perfSummaryBody = bodyOf(adminSrc, 'export async function clientPerfSummary');
-    expect(perfSummaryBody).toContain('perfAggregate(query,');
-    expect(perfSummaryBody).toContain('perfBuckets(query,');
+    expect(perfSummaryBody).toContain('runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS');
+    expect(perfSummaryBody).toContain('GROUPING SETS');
+    expect(perfSummaryBody).not.toContain('pool.query');
     // accountDetail wraps ONLY the account row whose correlated play_sessions sum
     // grows without bound; its four LIMIT-capped companion reads stay on the default.
     // Slice from the wrapper to the next pool.query and require the playtime
@@ -572,24 +572,123 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     expect(wrappedRead).toContain('playtime_seconds');
     expect(wrappedRead).toContain('FROM accounts');
     expect(wrappedRead).toContain('WHERE id = $1');
-    expect(bodyOf(dbSrc, 'export async function pruneChatLogs')).toContain(
-      'runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS',
+    // The retention prunes are deliberately NOT heavy call sites anymore: each call
+    // is one bounded DELETE batch on the default allowance, and the sweep drives
+    // iteration. Batching is what makes the default safe; re-wrapping would be a
+    // regression to the timed-out-forever one-shot DELETE.
+    expect(bodyOf(dbSrc, 'export async function pruneChatLogsBatch')).not.toContain(
+      'runWithStatementTimeout',
     );
+    expect(bodyOf(dbSrc, 'export async function pruneClientPerfReportsBatch')).not.toContain(
+      'runWithStatementTimeout',
+    );
+  });
+
+  it('the play-session retention prunes stay batched on the default allowance', () => {
+    // A batch primitive must never regress to an unbatched one-shot DELETE on
+    // the heavy allowance: each call is ONE bounded batch (LIMIT $2) and the
+    // sweep drives iteration, which is what makes the default statement
+    // timeout safe here.
+    const foldBody = bodyOf(retentionSrc, 'export async function prunePlaySessionsBatch');
+    const agingBody = bodyOf(retentionSrc, 'export async function pruneAccountIpAssociationsBatch');
+    expect(foldBody).not.toContain('runWithStatementTimeout');
+    expect(agingBody).not.toContain('runWithStatementTimeout');
+    expect(foldBody).toContain('LIMIT $2');
+    expect(agingBody).toContain('LIMIT $2');
+    // The fold prunes on session age (started_at) and the aging prune on link
+    // age (last_seen_at); pin each body's cutoff predicate so the two can
+    // never swap.
+    expect(foldBody).toContain("started_at < now() - ($1 || ' days')::interval");
+    expect(agingBody).toContain("last_seen_at < now() - ($1 || ' days')::interval");
+  });
+
+  it('the player-activity retention prune stays batched on the default allowance', () => {
+    // Same contract as the sibling prunes: one bounded batch per call (LIMIT $2)
+    // on the default statement timeout, with the sweep driving iteration.
+    const metricsSrc = read('server/player_metrics_db.ts');
+    const body = bodyOf(metricsSrc, 'export async function prunePlayerActivityDailyBatch');
+    expect(body).not.toContain('runWithStatementTimeout');
+    expect(body).toContain('LIMIT $2');
+    // The cutoff rides the UTC activity-day clock the writers stamp; pin the
+    // literal so the reward-clock helper (a different day boundary) can never
+    // swap in.
+    expect(body).toContain("day < (now() AT TIME ZONE 'UTC')::date - $1::int");
+  });
+
+  it('the retention floor stays strictly above the admin activity window', () => {
+    // The fold must never delete a session an admin activity chart still
+    // counts. Extract both literals from source so a widened admin window
+    // (server/admin.ts) that overtakes the floor reddens this pin.
+    const adminModuleSrc = read('server/admin.ts');
+    const windowMatch = adminModuleSrc.match(/const ACTIVITY_WINDOW_DAYS = (\d+);/);
+    const floorMatch = retentionSrc.match(
+      /export const PLAY_SESSION_RETENTION_FLOOR_DAYS = (\d+);/,
+    );
+    expect(windowMatch).not.toBeNull();
+    expect(floorMatch).not.toBeNull();
+    expect(Number(floorMatch?.[1])).toBeGreaterThan(Number(windowMatch?.[1]));
   });
 
   it('the player character-select read stays on the default statement timeout', () => {
     // db.ts listCharacters is the login-path character-select read: it deliberately
     // stays on the 15s default so it fails fast during a database brownout rather than
     // pinning a client for up to the heavy allowance. It must NEVER gain the wrapper.
-    const bodyOf = (source: string, decl: string): string => {
-      const start = source.indexOf(decl);
-      expect(start, `${decl} not found`).toBeGreaterThan(-1);
-      const next = source.indexOf('\nexport ', start + decl.length);
-      return next === -1 ? source.slice(start) : source.slice(start, next);
-    };
     expect(bodyOf(dbSrc, 'export async function listCharacters')).not.toContain(
       'runWithStatementTimeout',
     );
+  });
+
+  it('the character-select read joins the lifetime rollup so folds never shrink playtime', () => {
+    // The fold deletes old sessions after folding them into play_session_totals;
+    // without this join every player's character-select playtime and last-played
+    // would silently shrink after the first fold. Pin the exact rollup terms.
+    const body = bodyOf(dbSrc, 'export async function listCharacters');
+    expect(body).toContain('LEFT JOIN play_session_totals totals');
+    expect(body).toContain('ON totals.account_id = c.account_id AND totals.character_id = c.id');
+    expect(body).toContain('GREATEST(ps.last_played, totals.last_played)');
+    expect(body).toContain(
+      'COALESCE(ps.playtime_seconds, 0) + COALESCE(totals.playtime_seconds, 0)',
+    );
+  });
+
+  it('the account data export includes the retention rollups', () => {
+    // play_session_totals and account_ip_associations are stored personal data;
+    // a data export that omits them is unfaithful once raw sessions fold away.
+    const body = bodyOf(dbSrc, 'export async function exportAccountData');
+    expect(body).toContain('FROM play_session_totals');
+    expect(body).toContain('FROM account_ip_associations');
+  });
+
+  it('topLifetimeXp predicates and orders on the bare indexed lifetime-XP expression', () => {
+    // The two lifetime-XP expression indexes are built on the bare
+    // ((state->>'lifetimeXp')::bigint); a COALESCE-wrapped WHERE or an
+    // alias-based ORDER BY cannot match them, which silently reverts every 30s
+    // leaderboard cache refresh to a full characters scan plus sort. dbSrc is
+    // RAW source text, so the pins below match the unevaluated
+    // ${LIFETIME_XP_EXPR} token exactly as it sits inside the template literal.
+    expect(dbSrc).toContain(`const LIFETIME_XP_EXPR = "((state->>'lifetimeXp')::bigint)";`);
+    const body = bodyOf(dbSrc, 'export async function topLifetimeXp');
+    // One WHERE filter and one ORDER BY per arm (realm and global): two each,
+    // so a reversion of a single arm reddens this too.
+    expect(count(body, '${LIFETIME_XP_EXPR} >')).toBe(2);
+    expect(count(body, '${LIFETIME_XP_EXPR} DESC')).toBe(2);
+    // The old shapes must not return. COALESCE stays legal ONLY as the
+    // SELECT-list output value (followed by ' AS'), never as the filter.
+    expect(body).not.toContain(`COALESCE((state->>'lifetimeXp')::bigint, 0) >`);
+    expect(body).not.toContain('ORDER BY lifetime_xp DESC');
+    // NULLS LAST would re-break index usability (a DESC index defaults to
+    // NULLS FIRST). Scoped to this body: listCharacterNamesForSitemap keeps
+    // its own NULLS LAST deliberately.
+    expect(body).not.toContain('NULLS LAST');
+    // Tie the index DDL to the same constant so query and index cannot drift:
+    // the SCHEMA region spanning both CREATE INDEX statements carries the
+    // token once per index.
+    const idxStart = dbSrc.indexOf('CREATE INDEX IF NOT EXISTS characters_lifetime_xp');
+    expect(idxStart).toBeGreaterThan(-1);
+    const globalStart = dbSrc.indexOf('CREATE INDEX IF NOT EXISTS characters_lifetime_xp_global');
+    expect(globalStart).toBeGreaterThan(idxStart);
+    const idxRegion = dbSrc.slice(idxStart, dbSrc.indexOf(';', globalStart) + 1);
+    expect(count(idxRegion, '${LIFETIME_XP_EXPR} DESC')).toBe(2);
   });
 
   it('the heavy-statement exemption interpolates the named constant and validates the integer', () => {

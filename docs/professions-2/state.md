@@ -4,13 +4,13 @@ The ONLY file every session must trust. Update it at the end of every phase.
 
 ## Current phase
 
-Phase 1 (Ring and identity foundations) and its QA: complete
-(2026-07-17, PASS, zero blocking; fixes and drift notes below). Phase 2
-(Masterwork model): complete (2026-07-17, branch
-feature/professions-2-phase-02-masterwork; six reviewers, zero blocking;
-landed surfaces and drift notes below). Phase 2 QA: complete
-(2026-07-17, PASS, zero blocking; coverage pins, retirement cleanup, and
-QA drift notes below). Next: Phase 3 (phase-03-parity-bug-fixes.md).
+Phases 1 through 11 and all their QA sessions: complete (per-phase records
+under "New surfaces per phase" below and in progress.md). v0.28.0 SHIPPED
+with Phases 1 through 10 aboard; Phase 11 (fishing) and its QA merged into
+release/v0.29.0. The 2026-07-20 timing and economy amendments restructured
+the remaining plan to 12, 12b, 13, 14, 14b, 15 (see the amendments block
+under Locked design decisions). Next: Phase 12 (phase-12-tool-gating.md,
+issue #2057).
 
 ## Locked design decisions
 
@@ -70,6 +70,9 @@ QA drift notes below). Next: Phase 3 (phase-03-parity-bug-fixes.md).
   src/sim/professions/tools.ts stay dormant; do not wire, do not delete.
 - Wave 2+ excluded from this packet (see implementation-plan.md); EXCEPTION
   2026-07-17: salvage wiring moved INTO Phase 13 (see the amendments below).
+  EXCEPTION 2026-07-20: the binding enforcement half of commissions (#1298)
+  moved INTO the packet as Phase 14b; the commission ORDER workflow stays
+  wave 2 on #1298.
 - 2026-07-17 design-review amendments (maintainer-approved; the response to
   the external Codex review). Each binds its owning phase file, which
   carries the full deliverable wording:
@@ -122,6 +125,79 @@ QA drift notes below). Next: Phase 3 (phase-03-parity-bug-fixes.md).
     professions; a cosmetic Specialist deed lands at the 75-skill
     threshold; a faucet-vs-sink review runs in the tuning pass. Still
     basic, universal, cosmetic-only, append-only.
+- 2026-07-20 timing and economy amendments (maintainer-approved; this block
+  is the authority, on the 2026-07-17 template). The restructure INSERTS
+  Phases 12b and 14b without renumbering anything; the remaining order is
+  12, 12b, 13, 14, 14b, 15. Epic #1866 sub-issues: #2206 (Gathering
+  rhythm), #2207 (Commissions and the Maker's Bond), #2208 (the profession
+  SFX help-wanted list). Each ruling binds its owning phase file, which
+  carries the full deliverable wording:
+  - NEW Phase 12b, Gathering rhythm (#2206,
+    phase-12b-gathering-rhythm.md + QA twin): gathering gains ACTION TIME.
+    A gather cast (base about 2.5 s, shortened per owned tool tier above
+    the node's Phase 12 requirement and modestly by proficiency band,
+    floor about 1.5 s) rides the fishing cast-id template behind a new
+    shared non-spell-cast predicate consolidating the eleven scattered
+    FISHING_CAST_ID exemption sites; completion re-validates range,
+    respawn, and capacity. The FIXED 5 s FISHING CAST IS SUPERSEDED by the
+    bite minigame: ONE hidden seeded delay drawn at startFishing (roughly
+    3 to 8 s, exact numbers the implementer's call), never readable from
+    castRemaining/castTotal or any broadcast field, a text-free personal
+    bite SimEvent (bobber VFX + cue), a generous server-authoritative
+    tick-deadline reaction window (the lockpick stepDeadlineTick
+    precedent), reel = re-pressing the pole on the existing useItem
+    dispatch (command census unchanged), and a miss costs nothing but the
+    cast. Rods shorten the average bite delay and widen the window,
+    composing with Phase 12's band gating. SHIPPING NOTE: v0.29.0 ships
+    the fixed 5 s cast as-is; the bite model replaces it only when 12b
+    lands. The phase file carries a Pin-cost appendix: the CLOSED,
+    pre-briefed list of deliberate re-pins and golden regens (anything
+    outside it that reds is a defect, not a cost).
+  - Phase 12 (amended): stays PURE ACCESS GATING; forward notes only
+    (speed lands in 12b, rods gain bite synergy in 12b).
+  - Phase 13 (amended): typed disenchant reagents on the HYBRID model:
+    the universal rarity ladder (DISENCHANT_MATERIAL_BY_QUALITY
+    dust/essence/shard) stays for every quality, and RARE OR ABOVE
+    additionally yields a type-keyed secondary material keyed off the
+    existing ArmorType (cloth/leather/mail) and the sim-side weapon-kind
+    taxonomy (WEAPON_TYPE_BY_ITEM); the staves/wands bucket is a FLAGGED
+    maintainer decision; cooking and alchemy are deliberately excluded on
+    both sides. Every typed material ships WITH at least one consumer
+    recipe in the same phase (the wolf_fang no-dead-materials rule). The
+    bind-on-trade PRIMITIVE lands in this phase applied to the typed
+    rare+ reagents as its first LIVE consumer (never a dormant stub, the
+    2033 lesson); the enforcement arm stays generic so Phase 14b extends
+    it. Sink sizing notes the measured faucet: every heroic final boss
+    drops TWO tradeable epics (src/sim/content/heroic_loot.ts).
+  - Phase 14 (amended): the crafting window gains the "learnable at a
+    master" discoverability hint row (the Phase 9 known-recipes-only
+    filter made the untrained ladders invisible; the hint resolves
+    through the shared train_view.ts viewer predicates, never a second
+    knownness rule, and renders only when unlearned trainer recipes
+    exist for that craft).
+  - NEW Phase 14b, Commissions and the Maker's Bond (#2207,
+    phase-14b-commissions-binding.md + QA twin): opt-in commission
+    crafts bind to the recipient on FIRST trade, enforced in the same
+    trade gate that blocks def-level soulbound items; mail and market
+    already refuse instanced items, so first delivery is face-to-face by
+    construction; a master unbind service clears the bond for gold (a
+    real sink on the resolveTrain service shape). Resolves the
+    enforcement semantics of #1298 (which stays open as the parent for
+    the full commission ORDER workflow). THREE maintainer decisions stay
+    FLAGGED, never defaulted, and must be resolved before the phase
+    runs: character-vs-account binding, which item classes may opt in,
+    and unbind pricing (see OPEN items).
+  - Phase 15 (amended): the profession SFX completion sweep over #2208
+    (every Phase 12b PLACEHOLDER clip replaced or explicitly re-filed;
+    the five missing station ambiences beside amb_forge; per-craft
+    success variants where delivered); the rare-fish deed celebrates
+    through the Phase 12b bite moment; the legacy junk-recipe burn-down
+    (LEGACY_GOLD_POSITIVE_RECIPE_IDS) cross-checks candidates against
+    the Phase 13 typed-reagent consumers before plain price nerfs.
+  - SFX placeholders are SANCTIONED across the packet: generated with
+    the deterministic local synthesis pipeline (scripts/sfx/ui_sfx.mjs
+    cue specs), passing npm run sfx:check, catalog rows marked
+    PLACEHOLDER for the sound engineer, all tracked on #2208.
 
 ## Non-negotiable constraints
 
@@ -849,8 +925,78 @@ tables, i18n key namespaces, files created)
   text; the economy invariant's decisiveness was mutation-verified both
   ways (a seeded gold-positive new recipe reds the sweep, a legacy
   member flipped non-violating reds the self-pruning arm).
+- Phase 11 (built 2026-07-20; phase start 09e943669; DRAFT PR #2197
+  retargeted to release/v0.29.0 after the cut, sync 83b929398 audit-clean;
+  QA runs after the maintainer merges):
+  fishing joins the gathering framework. `src/sim/professions/fishing.ts`
+  (startFishing/completeFishing behind SimContext, late-bound ctx arrows at
+  the sim.ts host literal on the runEffects idiom; move-not-rewrite, parity
+  goldens byte-identical, sim.ts shed 111 lines). `GatheringProfessionId`
+  gains `fishing` appended LAST (eager-init in emptyGatheringProficiency;
+  normalize-on-load zero-defaults old saves; ROLLBACK CAVEAT: pre-Phase-11
+  normalize drops the unknown fishing key, so accrued fishing proficiency
+  re-zeroes on a downgrade round trip, the mailWelcomed class). Accrual:
+  `queueGatheringGrant(meta, 'fishing', 1)` per landed catch (junk counts;
+  no-bite, bags-full, and the codfather branch never accrue). Catch rarity
+  ladder: `FISHING_TABLES_BY_BAND` (3 bands x 3 zones) selected by
+  `fishingBandFor` over `FISHING_BAND_THRESHOLDS` [0, 100, 200]; band 0 IS
+  the shipped table object (the `FISHING_TABLES` export aliases it) so every
+  pre-phase seed reproduces its catch sequence; higher bands shift weight
+  from junk/empty-hook rows into the six cooking fish, koi weight flat
+  everywhere; band selection is pure state ahead of the unchanged single rng
+  draw. Wire: zero changes (gprof/prof whole-record; no IWorld member
+  added). Catch feedback: text-free personal `fishingResult` SimEvent
+  (gatherResult family, itemId + ItemDef quality) rendered as
+  `hudChrome.gathering.catchLine` colored by quality, wording apart from the
+  loot and gather lines, no second cue; keys `hudChrome.gathering.fishing` +
+  `catchLine` with M16 fills in the five non-Latin overlays. UI rows ride
+  the existing builders (char window + wheel window name-key maps; the Phase
+  5 gather_fishing icon read went live). `tests/professions_fishing.test.ts`
+  (21 pins: literal band-0/band-1 seed sequences, the one-draw contract with
+  zero draws on the codfather branch, accrual arms, table literals with flat
+  koi and monotone shifts, alias identity, the fishingResult contract, a
+  live GameServer gprof round trip with bystander isolation, the accepted
+  deed drift). Screenshots: docs/screenshots/professions-2-phase-11-fishing/.
+- Phase 11 drift notes (2026-07-20): prog_first_harvest (trigger gathering
+  amount 1, desc "Harvest your first gathering node") now completes on a
+  first landed CATCH, and prog_master_gatherer (count 3, desc naming the
+  starter trio) counts fishing so any 3 of 4 at 100 completes it; both
+  accepted as cosmetic-only and pinned as documented Phase 11 semantics in
+  tests/professions_fishing.test.ts (a deed-desc wording pass is a
+  maintainer call). guide.professions gatherTitle/gatherIntro prose still
+  says "Three gathering trades" (Phase 15 guide rewrite owns the reword;
+  touching reviewed prose trips the full-gate i18n semantic-regression
+  pins). catchLine's English carries no trailing period while gatherLine
+  has one (deliberate; the five overlay fills match their English source).
+- Phase 11 QA notes (2026-07-20, PASS with fixes, zero blocking): the S3
+  drift guard scan list now includes src/sim/professions/fishing.ts (the
+  extraction had orphaned the three fishing-only emit literals from reword
+  protection; matchers unchanged). The stranded data.ts FISHING_RARE_ID /
+  FISHING_TABLES re-export dropped (the band-0 alias comment in
+  content/items.ts now names the deeds zone-key guard as the surviving
+  consumer). New pins, all mutation-verified: band-2 liveness on the live
+  catch path, codfather over-capacity force-add (soft-lock defense),
+  col_glimmerfin off a fished koi, startFishing deny arms + fixed 5 s
+  zero-draw cast start, nonzero fishing persistence round trip, and the
+  ACCEPTED rollback caveat (stripped-key reload re-zeroes fishing only).
+  Chore candidate: the `const SWIM_DEPTH = PLAYER_SWIM_DEPTH` deep-water
+  alias now has FOUR copies (sim.ts, player_motion.ts, mob/locomotion.ts,
+  professions/fishing.ts); rule of three tripped, a shared deep-water
+  predicate is the extraction shape. Awareness note: gathering proficiency
+  accrual has no maxSkill cap on the drain path (shared, pre-existing
+  semantics across all four professions; the wheel UI clamps display via
+  the Phase 5 above-cap saturation pin).
+- Phase 12b: (planned) the shared non-spell-cast predicate, the gather
+  cast, the fishing bite minigame, rod synergy, placeholder cues; the
+  Pin-cost appendix in phase-12b-gathering-rhythm.md is the pre-briefed
+  re-pin list.
 - Phase 13: (planned) disenchantItem/applyEnchant/salvageItem IWorld
-  members + wire commands.
+  members + wire commands; plus, per the 2026-07-20 amendments, the typed
+  disenchant reagents (hybrid model, same-phase consumers) and the
+  bind-on-trade primitive applied to them.
+- Phase 14b: (planned) the commission marker, bind-on-first-trade
+  enforcement, the master unbind service; blocked on the three flagged
+  maintainer decisions in OPEN items.
 
 ## Tuning targets (placeholders until Phase 15 tunes against live data)
 
@@ -871,6 +1017,16 @@ tables, i18n key namespaces, files created)
 - Work-order quests (Phase 14): reward numbers need MAINTAINER numbers
   before Phase 14 runs (never gold-positive against the input vendor value;
   the cadence cap reuses the nudge cadence pattern). Flagged in OPEN items.
+- Gathering rhythm (Phase 12b): gather cast base about 2.5 s, floor about
+  1.5 s, per-tool-tier and per-band reductions; bite delay roughly 3 to
+  8 s with the rod synergy deltas. Exact numbers are the implementer's
+  call within these shapes, landed as named exported constants and pinned;
+  record the finals here when 12b lands.
+- Unbind service fee (Phase 14b): a MAINTAINER number (see OPEN items);
+  never invented.
+- Typed-reagent yields and consumer costs (Phase 13): sized against the
+  measured heroic faucet (two tradeable epics per heroic final boss);
+  final numbers are maintainer calls in the Phase 15 tuning pass.
 
 ## OPEN items
 
@@ -897,8 +1053,10 @@ tables, i18n key namespaces, files created)
   trainer-taught; recorded in the Phase 9 surfaces entry).
 - Master NPC names/personalities (content flavor, Phase 8; maintainer may
   want a naming pass).
-- Whether fishing keeps a separate skill id or folds into professionsState
-  shape (Phase 11 decides; wire shape follows gprof pattern either way).
+- RESOLVED (2026-07-20, Phase 11): fishing FOLDS into the gathering
+  proficiency shape (a fourth GATHERING_PROFESSIONS row, no separate skill
+  id); the wire rides the existing gprof/prof whole-record keys unchanged
+  (ALL_DELTA_KEYS stays 49; recorded in the Phase 11 surfaces entry).
 - q_prof_hobby_switch is an unbounded repeatable 75 XP turn-in (flagged by
   the Phase 1 QA security review): fully server-authoritative and XP-only,
   but unlike its two self-limiting siblings it has no escalating gate, so a
@@ -916,3 +1074,16 @@ tables, i18n key namespaces, files created)
   note, intended). Flagged 2026-07-17 for a maintainer call; if masterworks
   should credit the bumped tier, that is a deliberate design change for a
   tuning phase, never a QA fix.
+- Phase 14b maintainer decisions (2026-07-20, FLAGGED, must be resolved
+  here before phase-14b-commissions-binding.md runs): (a) does the Maker's
+  Bond bind to the CHARACTER or the ACCOUNT; (b) which item classes may
+  opt into commission crafting; (c) the unbind service price (flat, or
+  scaled by item tier). The phase's STEP 0 stops if any row is still open.
+- Staves/wands typed-reagent bucket (2026-07-20, FLAGGED, Phase 13): which
+  type-keyed secondary material family staff and wand disenchants feed
+  (the sim-side weapon taxonomy has them as their own kinds; cloth-adjacent
+  is arguable). Resolve before or during the Phase 13 PR review.
+- The letter-to-Haldren dead-end (Phase 7 QA): an unattuned player who
+  follows the Guild letter before q_prof_intro is available hits a dialog
+  dead-end; options recorded in progress.md Notes; the fix naturally rides
+  Phase 14's master quest work. Still open.

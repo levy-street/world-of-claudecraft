@@ -50,8 +50,10 @@ starter prompt.
 | 10 | [Recipe ladders and materials content](phase-10-recipe-ladders.md) | [QA](phase-10-qa.md) |
 | 11 | [Fishing joins the framework](phase-11-fishing.md) | [QA](phase-11-qa.md) |
 | 12 | [Base tool tier gating](phase-12-tool-gating.md) | [QA](phase-12-qa.md) |
+| 12b | [Gathering rhythm](phase-12b-gathering-rhythm.md) | [QA](phase-12b-qa.md) |
 | 13 | [Enchanting reachable](phase-13-enchanting.md) | [QA](phase-13-qa.md) |
 | 14 | [Attunement quests and nudges](phase-14-attunement-quests.md) | [QA](phase-14-qa.md) |
+| 14b | [Commissions and the Maker's Bond](phase-14b-commissions-binding.md) | [QA](phase-14b-qa.md) |
 | 15 | [Deeds, tuning, and polish](phase-15-deeds-polish.md) | [Final QA + teardown](phase-15-qa.md) |
 
 Waves for orientation: phases 1 to 7 are the fun kernel (visibility, truth,
@@ -64,7 +66,11 @@ stands in until the Phase 8 masters land), celebrate a masterwork, trade
 it) before wave one begins. Ordering relief: Phase 6 depends on Phases 2
 and 4, NOT on Phase 5, so it may run ahead of the wheel window if the
 design-language rollout stalls Phase 5 (the state.md OPEN item).
-Wave 2+ work (market instance carriage, commissions, Jack of All Trades,
-monster proficiency, battlefield experience) is tracked on epic #1866, not
-in this packet; salvage wiring moved INTO Phase 13 by the 2026-07-17
-design-review amendments recorded in state.md.
+Wave 2+ work (market instance carriage, the commission ORDER workflow,
+Jack of All Trades, monster proficiency, battlefield experience) is
+tracked on epic #1866, not in this packet; salvage wiring moved INTO
+Phase 13 by the 2026-07-17 design-review amendments recorded in state.md,
+and the 2026-07-20 timing and economy amendments inserted Phases 12b
+(Gathering rhythm) and 14b (Commissions and the Maker's Bond) without
+renumbering; the state.md amendments block is the authority for both
+passes.

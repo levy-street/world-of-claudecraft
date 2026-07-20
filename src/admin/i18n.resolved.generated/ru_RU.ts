@@ -46,6 +46,7 @@ export const ru_RU: AdminTranslations = {
   "stats.peakOnline": "пик онлайна",
   "stats.peakOnlineToday": "пик онлайна за 24ч",
   "stats.peakOnlineAllTime": "пик онлайна за всё время",
+  "stats.playersCap": "player cap",
   "stats.accounts": "аккаунты",
   "stats.characters": "персонажи",
   "stats.newAccounts24h": "новых аккаунтов 24ч",

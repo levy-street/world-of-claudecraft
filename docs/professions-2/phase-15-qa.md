@@ -15,6 +15,14 @@ final audit of the entire Professions 2.0 packet, ending with the teardown offer
 - Spot-check the rewritten wiki professions page against the real sim code: every claim the
   page makes must be true of the shipped system, and the teardown offer must follow the house
   rule exactly.
+- The 2026-07-20 additions: the SFX completion sweep is accountable (scan the sfx catalogs
+  for PLACEHOLDER rows; each one found must be listed on issue #2208 with a recorded
+  maintainer sign-off; each replaced clip must pass npm run sfx:check, with a CREDITS.md
+  licensing row when it is an original recording, matching the phase file's
+  recordings-only licensing scope); the rare-fish deed unlocks through the REAL
+  bite-and-reel flow in the scripted playthrough; the legacy burn-down disposition
+  (LEGACY_GOLD_POSITIVE_RECIPE_IDS) is recorded per member with the typed-reagent
+  cross-check applied first.
 
 ## QA Starter Prompt
 
@@ -46,7 +54,9 @@ the state.md targets; the guide page's generated-data feeds; the validation comm
 phase; and any deferral or open item the implementation session left.
 
 STEP 2 - QA AUDIT:
-Fan out three parallel audit agents; each gets ONLY the Explore summary. Prompt every agent for
+Fan out three parallel audit agents; each gets ONLY the Explore summary (which must include
+every row of the "Phase-specific QA emphasis" section at the top of this file; those rows are
+audit obligations, not commentary). Prompt every agent for
 COVERAGE, not filtering: report every gap with confidence and severity; filtering happens in
 the fix pass. If any agent's output comes back truncated, re-prompt that agent to resume and
 finish its report before acting on it.

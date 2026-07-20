@@ -4,11 +4,11 @@
 //
 // The loop: Rimelance (frostbolt) impacts roll the two procs. Fingers of
 // Frost (up to 2 stacks) lets an Ice Lance treat its target as frozen.
-// Brain Freeze makes the next Flurry instant, 30% harder and cooldown-free;
+// Brain Freeze makes the next Flurry instant and cooldown-free;
 // Flurry's impact plants Winter's Chill (2 charges) on the target, and each
 // charge lets one compatible spell treat the target as frozen. "Frozen"
-// pays off through Shatter: +50% spell crit chance and +20% crit damage,
-// plus Ice Lance's own 3x damage.
+// pays off through Shatter's +50% spell crit chance plus Ice Lance's own 3x
+// damage.
 //
 // Determinism contract:
 // - rollFrostboltProcs draws EXACTLY two rng chances per frostbolt impact
@@ -31,16 +31,12 @@ export const FINGERS_OF_FROST_MAX_STACKS = 2;
 export const FINGERS_OF_FROST_DURATION = 15;
 export const BRAIN_FREEZE_CHANCE = 0.2;
 export const BRAIN_FREEZE_DURATION = 15;
-// Brain Freeze's empowered Flurry: instant, no cooldown, and this much harder.
-export const BRAIN_FREEZE_FLURRY_MULT = 1.3;
 export const WINTERS_CHILL_CHARGES = 2;
 export const WINTERS_CHILL_DURATION = 5;
-// Shatter: additive spell crit chance and extra crit damage against a target
-// this cast treats as frozen. Stacks with the Coldsnap Break row's
-// critVsRooted on a really-frozen target by design: the row pick sharpens
-// the spec's own payoff rather than replacing it.
+// Shatter: additive spell crit chance against a target this cast treats as
+// frozen. Stacks with the Coldsnap Break row's critVsRooted on a
+// really-frozen target by design.
 export const SHATTER_CRIT_BONUS = 0.5;
-export const SHATTER_CRIT_DMG_BONUS = 0.2;
 // Ice Lance "deals 200% more damage" against a frozen-counting target.
 export const ICE_LANCE_FROZEN_MULT = 3;
 
@@ -103,7 +99,7 @@ function emitFade(ctx: SimContext, e: Entity, aura: Aura): void {
   ctx.emit({ type: 'aura', targetId: e.id, name: aura.name, gained: false, auraKind: aura.kind });
 }
 
-/** Grant one Fingers of Frost stack (frostbolt roll, Frozen Orb later).
+/** Grant one Fingers of Frost stack from a frostbolt roll.
  *  At the 2-stack cap the new charge is simply lost, no refresh: the owner's
  *  anti-waste rule, so banking procs is a real rotational mistake. */
 export function gainFingersOfFrost(ctx: SimContext, p: Entity): void {
@@ -324,9 +320,8 @@ export function frostMageChannelPulse(
 
 /** Brain Freeze's cast-time override, applied in castAbility AFTER every
  *  validation gate (so a blocked cast never eats the proc) and BEFORE the
- *  cast-time/cooldown/cost reads: an armed Flurry goes instant, skips its
- *  cooldown entirely, and carries 30% more damage baked into its strikes
- *  (no extra rng: the same range draws roll over the scaled bounds). */
+ *  cast-time/cooldown/cost reads: an armed Flurry goes instant and skips its
+ *  cooldown entirely without adding another damage multiplier. */
 export function applyBrainFreezeOverride(
   ctx: SimContext,
   p: Entity,
@@ -341,14 +336,5 @@ export function applyBrainFreezeOverride(
     ...res,
     castTime: 0,
     cooldown: 0,
-    effects: res.effects.map((eff) =>
-      eff.type === 'directDamage'
-        ? {
-            ...eff,
-            min: Math.round(eff.min * BRAIN_FREEZE_FLURRY_MULT),
-            max: Math.round(eff.max * BRAIN_FREEZE_FLURRY_MULT),
-          }
-        : eff,
-    ),
   };
 }

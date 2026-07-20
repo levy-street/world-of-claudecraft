@@ -35,4 +35,20 @@ describe('mage painted talent icons', () => {
       });
     }
   });
+
+  it('keeps the Shifting Ward icon when its barrier modifiers are reordered', () => {
+    const option = MAGE_CHOICE_ROWS.rows
+      .flatMap((row) => row.options)
+      .find((candidate) => candidate.id === 'mag_r8_temporal_rift');
+    expect(option?.effect.ability).toBeDefined();
+    const reordered = {
+      ...option?.effect,
+      ability: [...(option?.effect.ability ?? [])].reverse(),
+    };
+
+    expect(talentEffectIconRef(reordered)).toEqual({
+      kind: 'ability',
+      id: 'temporal_rift',
+    });
+  });
 });

@@ -42,8 +42,16 @@ import {
   handleEmailUnsubscribe,
   verifyLoginTwoFactor,
 } from './account';
-import { configureAdminRuntime, handleAdminApi } from './admin';
-import { currentSitePresenceUsers, recordSitePresenceSample } from './admin_db';
+import { configureAdminPlayersCap, configureAdminRuntime, handleAdminApi } from './admin';
+import {
+  currentSitePresenceUsers,
+  distinctOnlineSampleRealms,
+  foldOnlinePeak,
+  pruneOnlineSamplesBatch,
+  pruneSitePresenceSamplesBatch,
+  pruneSitePresenceSessionsBatch,
+  recordSitePresenceSample,
+} from './admin_db';
 import { permissionsForRoles } from './admin_permissions';
 import { loadAntibotConfig } from './antibot_config_db';
 import {
@@ -67,6 +75,7 @@ import { configureAuthRuntime } from './auth_routes';
 import { computeBankBonus } from './bank_entitlements';
 import { bankLedgerIdle } from './bank_ledger';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
+import { createCachedRead } from './cached_read';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import { configureCharactersRuntime } from './characters';
 import {
@@ -75,8 +84,15 @@ import {
   handleClaudiumApi,
   handleClaudiumStripeWebhook,
 } from './claudium';
-import { handleDailyRewardApi, handleDailyRewardInternalApi } from './daily_rewards';
 import {
+  bustDailyRewardBoardCache,
+  dailyRewardEventsCutoffDay,
+  handleDailyRewardApi,
+  handleDailyRewardInternalApi,
+} from './daily_rewards';
+import { pruneDailyRewardEventsBatch } from './daily_rewards_db';
+import {
+  type ArenaLeaderRow,
   accountAndScopeForToken,
   accountById,
   accountForToken,
@@ -105,11 +121,12 @@ import {
   listCharacters,
   listCompanionTokens,
   loadAccountCosmetics,
+  loadWorldState,
   moderationStatusForAccount,
   pool,
   primarySlugForAccount,
-  pruneChatLogs,
-  pruneClientPerfReports,
+  pruneChatLogsBatch,
+  pruneClientPerfReportsBatch,
   reclaimDeactivatedName,
   referralCountForAccount,
   releaseAllCharacterLeases,
@@ -117,6 +134,7 @@ import {
   renameCharacter,
   revokeCompanionToken,
   saveToken,
+  saveWorldState,
   scopeAllowsMutation,
   searchCharacters,
   setAccountEmail,
@@ -202,7 +220,13 @@ import {
 import { configureInternalRuntime, handleInternalApi } from './internal';
 import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
-import { buildDeedsBoard, configureLeaderboardRuntime, type ReleaseEntry } from './leaderboard';
+import {
+  buildDeedsBoard,
+  configureLeaderboardRuntime,
+  type ReleaseEntry,
+  readArenaLeaderboard,
+  readProjectStats,
+} from './leaderboard';
 import { MAX_MAP_SAVE_BYTES } from './maps';
 import {
   mapDeleteCore,
@@ -226,11 +250,16 @@ import { handleOAuth, seedOAuthClients } from './oauth';
 import { pruneExpiredOAuthGrants } from './oauth_db';
 import { handlePerfReport } from './perf_report';
 import {
+  pruneAccountIpAssociationsBatch,
+  prunePlaySessionsBatch,
+} from './play_session_retention_db';
+import {
   captureReferral,
   cardUploadContentLengthTooLarge,
   handleCardRoutes,
   handleCardUpload,
 } from './player_card';
+import { prunePlayerActivityDailyBatch } from './player_metrics_db';
 import { handleAvatar, handleCharacterSitemap, handleProfilePage } from './profile_page';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
 import {
@@ -253,6 +282,7 @@ import { createPgRateLimitStore } from './ratelimit_db';
 import { isPublicCorsPath, publicOriginFromRequest, REALM, REALM_DIRECTORY } from './realm';
 import { resolveReportTarget } from './report_target';
 import { BUG_REPORT_MAX_BODY_BYTES, configureReportsRuntime } from './reports';
+import { createRetentionSweep, RETENTION_SWEEP_BATCH_SIZE } from './retention_sweep';
 import { resolveSfxOverlayFile } from './sfx_overlay';
 import { handleSitePresenceHeartbeat } from './site_presence';
 import { adminRolesForAccount } from './staff_db';
@@ -375,8 +405,8 @@ const WS_MAX_PAYLOAD_BYTES = 16 * 1024;
 // up (~1 minute total at 30 attempts x 2s).
 const DB_BOOT_MAX_ATTEMPTS = 30; // attempts (count)
 const DB_BOOT_RETRY_MS = 2_000;
-// Low-frequency background prune (OAuth grants/states, chat logs, perf reports)
-// runs once a day.
+// Low-frequency background prune (OAuth grants/states, pending logins) runs once
+// a day; the retention-table prunes run in the nightly retention sweep instead.
 const DAILY_PRUNE_INTERVAL_MS = 24 * 3600 * 1000;
 
 // The live GameServer, constructed on FIRST TOUCH via liveGame() (the
@@ -454,11 +484,27 @@ async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<Leaderboar
   return entries;
 }
 
+// Single-flight per scope, keyed on boardEpoch so a moderation bust (which bumps
+// boardEpoch) drops any in-flight pre-ban refresh: a post-bust reader no longer
+// joins that flight and receives its pre-ban snapshot, it starts a fresh delisting
+// read. Both read paths (the inline getter and the warm loop) share these, so a
+// warm tick landing on an inline read cannot run the query twice.
+const refreshLeaderboardShared: Record<'realm' | 'global', () => Promise<LeaderboardEntry[]>> = {
+  realm: singleFlight(
+    () => refreshLeaderboard('realm'),
+    () => boardEpoch,
+  ),
+  global: singleFlight(
+    () => refreshLeaderboard('global'),
+    () => boardEpoch,
+  ),
+};
+
 async function getLeaderboard(scope: 'realm' | 'global'): Promise<LeaderboardEntry[]> {
   const cached = leaderboardCache[scope];
   if (cached && Date.now() - cached.at < LEADERBOARD_TTL_MS) return cached.entries;
   try {
-    return await refreshLeaderboard(scope);
+    return await refreshLeaderboardShared[scope]();
   } catch (err) {
     console.error(`leaderboard refresh failed (${scope}):`, err);
     return cached?.entries ?? [];
@@ -494,14 +540,78 @@ async function refreshGuildLeaderboard(
   return entries;
 }
 
+const refreshGuildLeaderboardShared: Record<
+  'realm' | 'global',
+  () => Promise<GuildLeaderboardEntry[]>
+> = {
+  realm: singleFlight(
+    () => refreshGuildLeaderboard('realm'),
+    () => boardEpoch,
+  ),
+  global: singleFlight(
+    () => refreshGuildLeaderboard('global'),
+    () => boardEpoch,
+  ),
+};
+
 async function getGuildLeaderboard(scope: 'realm' | 'global'): Promise<GuildLeaderboardEntry[]> {
   const cached = guildLeaderboardCache[scope];
   if (cached && Date.now() - cached.at < LEADERBOARD_TTL_MS) return cached.entries;
   try {
-    return await refreshGuildLeaderboard(scope);
+    return await refreshGuildLeaderboardShared[scope]();
   } catch (err) {
     console.error(`guild leaderboard refresh failed (${scope}):`, err);
     return cached?.entries ?? [];
+  }
+}
+
+// Arena ladder cache. Per FORMAT ('1v1' | '2v2', the only two the public ladder
+// serves; the wider ArenaFormat union never reaches here, so an unrecognized
+// ?format value can never mint a third cache slot), same compute-once /
+// serve-from-memory shape as the player and guild boards above. Wired into
+// bustBoardCaches below because the ladder is character-faced and
+// moderation-visible: a ban delists immediately in-process while cross-process
+// peers converge within one TTL, the same tradeoff the other boards already make.
+// readArenaLeaderboard (server/leaderboard.ts) is the INNER read, so
+// ARENA_LEADERBOARD_LIMIT stays the one place the ladder depth is set.
+const arenaLeaderboardCache: Record<
+  '1v1' | '2v2',
+  { at: number; leaders: ArenaLeaderRow[] } | null
+> = {
+  '1v1': null,
+  '2v2': null,
+};
+
+async function refreshArena(format: '1v1' | '2v2'): Promise<ArenaLeaderRow[]> {
+  const epoch = boardEpoch;
+  const { leaders } = await readArenaLeaderboard({ topArenaRatings }, format);
+  // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
+  if (boardEpoch === epoch) arenaLeaderboardCache[format] = { at: Date.now(), leaders };
+  return leaders;
+}
+
+// Single-flight per format, keyed on boardEpoch exactly like the player/guild
+// refreshes, so a moderation bust (which bumps boardEpoch) drops any in-flight
+// pre-ban arena refresh instead of handing a post-bust reader its pre-ban snapshot.
+const refreshArenaShared: Record<'1v1' | '2v2', () => Promise<ArenaLeaderRow[]>> = {
+  '1v1': singleFlight(
+    () => refreshArena('1v1'),
+    () => boardEpoch,
+  ),
+  '2v2': singleFlight(
+    () => refreshArena('2v2'),
+    () => boardEpoch,
+  ),
+};
+
+async function getArenaLeaderboard(format: '1v1' | '2v2'): Promise<ArenaLeaderRow[]> {
+  const cached = arenaLeaderboardCache[format];
+  if (cached && Date.now() - cached.at < LEADERBOARD_TTL_MS) return cached.leaders;
+  try {
+    return await refreshArenaShared[format]();
+  } catch (err) {
+    console.error(`arena leaderboard refresh failed (${format}):`, err);
+    return cached?.leaders ?? [];
   }
 }
 
@@ -567,8 +677,13 @@ async function refreshDeedsBoard(): Promise<DeedsBoardCache> {
 // request, since the warm interval equals the cache TTL) must share ONE
 // refresh: concurrent flights would multiply the most expensive query the
 // process has, and the slower flight would overwrite a newer snapshot with a
-// fresher timestamp.
-const refreshDeedsBoardShared = singleFlight(refreshDeedsBoard);
+// fresher timestamp. The flight is keyed on boardEpoch like the leaderboard
+// and arena flights: the board is character-faced, and a plain flight let a
+// reader arriving AFTER a moderation bust join the in-flight pre-ban refresh
+// and be served a just-banned account's character for one read; keyed, the
+// bust (which bumps the epoch) makes that reader start a fresh, delisting
+// read instead, and the install guard above declines the pre-ban snapshot.
+const refreshDeedsBoardShared = singleFlight(refreshDeedsBoard, () => boardEpoch);
 
 // Freshness gate shared by the two board reads below: serve the cache inside
 // the TTL, else refresh, else stale-serve (or null before the first success).
@@ -604,20 +719,26 @@ async function deedsSelfRank(accountId: number): Promise<DeedsLeaderboardSelf | 
 // kind, so a ban delists and an unban relists on the next read here. In the
 // process-per-realm fleet, PEER realm processes keep their own caches and
 // converge within one LEADERBOARD_TTL_MS (the boards' pre-existing staleness
-// ceiling); the SQL exclusion makes their next refresh correct. Arena is
-// served uncached by design, and the daily-rewards board reads run per
-// request (the SQL exclusion in daily_rewards_db.ts is the whole mechanism),
-// so both are already exact fleet-wide with no cache to bust here. Bumping
-// boardEpoch as well as nulling the caches closes the lost-bust race: a refresh
-// already in flight when this fires will decline to install its pre-ban snapshot
-// (see boardEpoch), so a ban cannot be masked for up to a TTL cycle.
+// ceiling); the SQL exclusion makes their next refresh correct. The arena ladder
+// is now cached per format (arenaLeaderboardCache), so it is busted here too: its
+// former fleet-wide exactness becomes in-process-immediate delisting plus
+// TTL-bounded peer convergence, the same tradeoff every other board already made.
+// The daily-rewards board is cached in-process behind dailyRewardService's board
+// cache (daily_rewards_board_cache.ts, same TTL tradeoff), so it is busted below
+// with the rest. Bumping boardEpoch as well as nulling the caches closes the
+// lost-bust race: a refresh already in flight when this fires will decline to
+// install its pre-ban snapshot (see boardEpoch), so a ban cannot be masked for up
+// to a TTL cycle.
 function bustBoardCaches(): void {
   boardEpoch++;
   leaderboardCache.realm = null;
   leaderboardCache.global = null;
   guildLeaderboardCache.realm = null;
   guildLeaderboardCache.global = null;
+  arenaLeaderboardCache['1v1'] = null;
+  arenaLeaderboardCache['2v2'] = null;
   deedsBoardCache = null;
+  bustDailyRewardBoardCache();
 }
 setOnAccountModerated(bustBoardCaches);
 
@@ -633,22 +754,95 @@ let deedsRarityCache: {
   payload: import('../src/world_api').DeedsRarity;
 } | null = null;
 
+// Single-flight the rarity refresh so a login-page storm on a cold or just-expired
+// cache runs the two full-table aggregate scans (deedRarityCounts) once, not once
+// per caller. publicRarityPayload strips hidden deeds at refresh time, before the
+// cache install, so the anonymous endpoint never enumerates a hidden deed.
+// deedsRarityCache is deliberately NOT wired into bustBoardCaches (rarity is not
+// moderation-visible in the delisting sense); if it is ever added there, the same
+// boardEpoch capture-before-install guard the leaderboard refreshes carry must be
+// added in that same change.
+const refreshDeedsRarityShared = singleFlight(
+  async (): Promise<import('../src/world_api').DeedsRarity> => {
+    const payload = publicRarityPayload(await deedRarityCounts());
+    deedsRarityCache = { at: Date.now(), payload };
+    return payload;
+  },
+);
+
 async function getDeedsRarity(): Promise<import('../src/world_api').DeedsRarity> {
   if (deedsRarityCache && Date.now() - deedsRarityCache.at < DEEDS_RARITY_TTL_MS) {
     return deedsRarityCache.payload;
   }
   try {
-    // publicRarityPayload strips hidden deeds at refresh time: this cache
-    // feeds an anonymous endpoint, and a hidden deed's existence must not be
-    // enumerable the moment somebody earns it.
-    const payload = publicRarityPayload(await deedRarityCounts());
-    deedsRarityCache = { at: Date.now(), payload };
-    return payload;
+    return await refreshDeedsRarityShared();
   } catch (err) {
     console.error('deeds rarity refresh failed:', err);
     return deedsRarityCache?.payload ?? { totalEligible: 0, earned: {} };
   }
 }
+
+// Project-stats accounts-created counter cache. Unlike the player/guild/arena
+// boards, a COUNT(*) over accounts is moderation-INVARIANT (a ban or unban never
+// changes the row count, only eligibility), so it needs NO bust or epoch wiring,
+// the same call getDeedsRarity's cache makes above. It is a single-key read, so it
+// rides createCachedRead (server/cached_read.ts) directly rather than the per-scope
+// singleFlight the boards use. 60s TTL (the D11 exception): accounts-created is a
+// slow-moving marketing counter, not a moderation-sensitive ranked list, so a
+// minute of staleness is fine. Named to avoid colliding with db.ts's imported
+// getAccountsCount (mirrors getLeaderboard wrapping topLifetimeXp under a domain
+// name). readProjectStats (server/leaderboard.ts) is the INNER read; players_online
+// is a live per-request value the handler re-attaches, so the cache holds only the
+// count and the inner read gets a throwaway 0 for players_online that it discards.
+const PROJECT_STATS_TTL_MS = 60_000;
+const accountsCreatedCache = createCachedRead(
+  async () => (await readProjectStats({ getAccountsCount }, 0, REALM)).accounts_created,
+  { ttlMs: PROJECT_STATS_TTL_MS },
+);
+
+async function getAccountsCreatedCount(): Promise<number> {
+  try {
+    return await accountsCreatedCache.read();
+  } catch (err) {
+    // Only a never-warmed cache reaches here (createCachedRead stale-serves the
+    // last count on a later failure). Serve 0 rather than 500, the same
+    // degrade-not-throw contract getLeaderboard / getDeedsRarity already ship, so
+    // /api/project-stats stays 200 when the db is unreachable.
+    console.error('accounts-created count refresh failed:', err);
+    return 0;
+  }
+}
+
+// Test-only handle for the board-read single-flight suite. Not used in production:
+// it exposes the module-private board getters, their shared flights, the bust
+// hook, and a cache reset so a unit test can exercise the real single-flight
+// (concurrency, rejection-not-cached, stale-serve, and the bust-mid-flight
+// joiner-eviction) without driving through the runtime injection seams (which
+// would replace the function under test with a fake).
+export const boardReadTestSeam = {
+  getDeedsRarity,
+  getDeedsLeaderboard,
+  getLeaderboard,
+  getGuildLeaderboard,
+  getArenaLeaderboard,
+  getAccountsCreatedCount,
+  refreshDeedsRarityShared,
+  refreshLeaderboardShared,
+  refreshGuildLeaderboardShared,
+  refreshArenaShared,
+  bustBoardCaches,
+  reset(): void {
+    leaderboardCache.realm = null;
+    leaderboardCache.global = null;
+    guildLeaderboardCache.realm = null;
+    guildLeaderboardCache.global = null;
+    arenaLeaderboardCache['1v1'] = null;
+    arenaLeaderboardCache['2v2'] = null;
+    deedsBoardCache = null;
+    deedsRarityCache = null;
+    accountsCreatedCache.bust();
+  },
+};
 
 // ---------------------------------------------------------------------------
 // News & Updates: GitHub Releases proxy (read-only, public).
@@ -1638,9 +1832,13 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return await handlePerfReport(req, res);
     }
     if (req.method === 'GET' && url === '/api/project-stats') {
-      const accountsCount = await getAccountsCount();
+      // Accounts-created COUNT served from the shared cache getter (the same 60s
+      // cache the migrated projectStatsHandler reads); players_online stays a live
+      // per-request read, so it is re-attached here rather than cached. Rate-limited
+      // per IP like its migrated twin (same public-read budget, same 429 body).
+      if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate limited' });
       return json(res, 200, {
-        accounts_created: accountsCount,
+        accounts_created: await getAccountsCreatedCount(),
         players_online: liveGame().clients.size,
         realm: REALM,
       });
@@ -1673,10 +1871,15 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return json(res, 200, liveGame().perfProfile());
     }
     if (req.method === 'GET' && url === '/api/arena/leaderboard') {
-      // public all-time Ashen Coliseum ladder (top rated characters)
+      // public all-time Ashen Coliseum ladder (top rated characters), served from
+      // the shared per-format cache getter (the same cache the migrated
+      // arenaLeaderboardHandler reads), so the ladder query runs at most once per
+      // TTL per format instead of once per request. Rate-limited per IP like its
+      // migrated twin (same public-read budget, same 429 body).
+      if (!publicReadRateLimited(req).allowed) return json(res, 429, { error: 'rate limited' });
       const params = new URLSearchParams((req.url ?? '').split('?')[1] ?? '');
-      const format = params.get('format') === '2v2' ? '2v2' : '1v1';
-      return json(res, 200, { format, leaders: await topArenaRatings(20, format) });
+      const format: '1v1' | '2v2' = params.get('format') === '2v2' ? '2v2' : '1v1';
+      return json(res, 200, { format, leaders: await getArenaLeaderboard(format) });
     }
     if (req.method === 'GET' && url === '/api/leaderboard') {
       // lifetime-XP leaderboard (Max-Level XP Overflow), served from the
@@ -2221,10 +2424,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
 
 // Inject the main.ts runtime the ported public-read handlers (server/leaderboard.ts)
 // need but cannot import without a cycle: the live online count + dev perf profile
-// off the GameServer, the three cache-fronted readers (unchanged: the same TTL
-// caches the legacy arms use), the releases feed's repo + cap, and the two
-// request-shaped helpers. Done at module load, before any request, so the static
-// `routes` array registry.ts already spread in can serve.
+// off the GameServer, the cache-fronted board and stats readers (unchanged: the
+// same TTL caches the legacy arms use, arena and the project-stats count included),
+// the releases feed's repo + cap, and the two request-shaped helpers. Done at module
+// load, before any request, so the static `routes` array registry.ts already spread
+// in can serve.
 configureLeaderboardRuntime({
   playersOnline: () => liveGame().clients.size,
   playersCap: canonicalPlayersCap,
@@ -2234,6 +2438,8 @@ configureLeaderboardRuntime({
   getDevLeaderboard: () => topContributors(),
   getDeedsLeaderboard,
   deedsSelfRank,
+  getArenaLeaderboard,
+  getAccountsCreatedCount,
   getReleases,
   // A getter, not a value: configureLeaderboardRuntime runs at module load (before
   // startServer primes the config), but leaderboard.ts reads rt.githubRepo only at
@@ -2620,6 +2826,10 @@ export async function startServer(): Promise<http.Server> {
   // handleAdminApi / handleInternalApi ladders stay intact as the flag-off rollback
   // paths (and are the corresponding dispatchers' delegates).
   configureAdminRuntime(game);
+  // The admin overview's realm player cap: canonicalPlayersCap needs no game instance
+  // (unlike AdminRuntime), so it rides its own seam, fed the SAME canonical source
+  // /api/status uses, keeping the cap byte-identical across the status and overview reads.
+  configureAdminPlayersCap(canonicalPlayersCap);
   configureInternalRuntime(game);
   // Bot detector: replay this realm's saved config overrides onto the fresh
   // detector. Boot applies what it can; a stale entry (schema drift after a
@@ -2634,14 +2844,6 @@ export async function startServer(): Promise<http.Server> {
   }
   const orphans = await closeOrphanSessions();
   if (orphans > 0) console.log(`closed ${orphans} orphaned play session(s) from a previous run`);
-  const pruned = await pruneChatLogs(config.chatLogRetentionDays);
-  if (pruned > 0)
-    console.log(`pruned ${pruned} chat log row(s) older than ${config.chatLogRetentionDays} days`);
-  const prunedPerfReports = await pruneClientPerfReports(config.perfReportRetentionDays);
-  if (prunedPerfReports > 0)
-    console.log(
-      `pruned ${prunedPerfReports} client perf report row(s) older than ${config.perfReportRetentionDays} days`,
-    );
   await pruneApplePendingLogins(pool);
   await game.loadMarket();
   await game.loadMail();
@@ -2652,12 +2854,6 @@ export async function startServer(): Promise<http.Server> {
     .then((count) => recordSitePresenceSample(count))
     .catch((err) => console.error('site presence sample failed:', err));
   setInterval(() => {
-    void pruneChatLogs(config.chatLogRetentionDays).catch((err) =>
-      console.error('chat log prune failed:', err),
-    );
-    void pruneClientPerfReports(config.perfReportRetentionDays).catch((err) =>
-      console.error('perf report prune failed:', err),
-    );
     void pruneExpiredOAuthGrants(pool).catch((err) =>
       console.error('oauth grant prune failed:', err),
     );
@@ -2690,18 +2886,18 @@ export async function startServer(): Promise<http.Server> {
   // keep both leaderboard caches warm so the first viewer never waits on the
   // query and it never recomputes per request (PR-3)
   const warmLeaderboards = () => {
-    void refreshLeaderboard('realm').catch((err) =>
-      console.error('leaderboard refresh failed (realm):', err),
-    );
-    void refreshLeaderboard('global').catch((err) =>
-      console.error('leaderboard refresh failed (global):', err),
-    );
-    void refreshGuildLeaderboard('realm').catch((err) =>
-      console.error('guild leaderboard refresh failed (realm):', err),
-    );
-    void refreshGuildLeaderboard('global').catch((err) =>
-      console.error('guild leaderboard refresh failed (global):', err),
-    );
+    void refreshLeaderboardShared
+      .realm()
+      .catch((err) => console.error('leaderboard refresh failed (realm):', err));
+    void refreshLeaderboardShared
+      .global()
+      .catch((err) => console.error('leaderboard refresh failed (global):', err));
+    void refreshGuildLeaderboardShared
+      .realm()
+      .catch((err) => console.error('guild leaderboard refresh failed (realm):', err));
+    void refreshGuildLeaderboardShared
+      .global()
+      .catch((err) => console.error('guild leaderboard refresh failed (global):', err));
     // Demand-gated: the Renown board is a full-table roll-up, so keep it warm
     // only while it is actually being viewed (a request within
     // DEEDS_BOARD_DEMAND_TTL_MS). An idle board pays nothing here; a cold or stale
@@ -2799,6 +2995,81 @@ export async function startServer(): Promise<http.Server> {
     console.log(`  WS:   /ws, then first message {t:"auth",token,character}`);
   });
 
+  // Off-peak batched retention. The sweep self-clocks once per UTC day behind a
+  // database advisory lock, so with several processes exactly one sweeps; each
+  // primitive below is one bounded DELETE batch and the sweep drives iteration.
+  const retentionSweep = createRetentionSweep({
+    connect: () => pool.connect(),
+    utcHour: config.retentionSweepUtcHour,
+    maxRowsPerRun: config.retentionSweepMaxRowsPerRun,
+    batchSize: RETENTION_SWEEP_BATCH_SIZE,
+    // The persisted marker keeps a mid-day deploy or restart from re-running the
+    // sweep at peak: it is consulted under the advisory lock and written only
+    // after a completed sweep.
+    loadLastSweepDay: async () => {
+      const stored = await loadWorldState<{ day?: unknown }>('retention_sweep:last_run');
+      return typeof stored?.day === 'string' ? stored.day : null;
+    },
+    saveLastSweepDay: async (day) => {
+      await saveWorldState('retention_sweep:last_run', { day });
+    },
+    tables: [
+      { name: 'chat_logs', pruneBatch: (n) => pruneChatLogsBatch(config.chatLogRetentionDays, n) },
+      {
+        name: 'client_perf_reports',
+        pruneBatch: (n) => pruneClientPerfReportsBatch(config.perfReportRetentionDays, n),
+      },
+      {
+        name: 'daily_reward_events',
+        pruneBatch: async (n) => {
+          // The reward day rolls at a configured UTC offset, not midnight, so the
+          // cutoff comes from the reward clock (null means retention is off).
+          const cutoff = await dailyRewardEventsCutoffDay(config.dailyRewardEventsRetentionDays);
+          if (cutoff === null) return 0;
+          return pruneDailyRewardEventsBatch(cutoff, n);
+        },
+      },
+      {
+        // The activity day is the UTC calendar day the metrics writers stamp,
+        // so the primitive derives its own UTC cutoff (no reward-clock helper).
+        name: 'player_activity_daily',
+        pruneBatch: (n) =>
+          prunePlayerActivityDailyBatch(pool, config.playerActivityRetentionDays, n),
+      },
+      {
+        name: 'admin_site_presence_samples',
+        pruneBatch: (n) => pruneSitePresenceSamplesBatch(config.sitePresenceRetentionDays, n),
+      },
+      {
+        name: 'site_presence_sessions',
+        pruneBatch: (n) => pruneSitePresenceSessionsBatch(config.sitePresenceRetentionDays, n),
+      },
+      // The play-session fold feeds account_ip_associations, so the feeder table
+      // is swept before the ager in the same run.
+      {
+        name: 'play_sessions',
+        pruneBatch: (n) => prunePlaySessionsBatch(pool, config.playSessionRetentionDays, n),
+      },
+      {
+        name: 'account_ip_associations',
+        pruneBatch: (n) =>
+          pruneAccountIpAssociationsBatch(pool, config.accountIpAssociationRetentionDays, n),
+      },
+    ],
+    // The fold precondition makes sample pruning lossless; skip the whole group
+    // when retention is off so quiet configs write nothing to world_state.
+    onlineSamples:
+      config.onlineSamplesRetentionDays > 0
+        ? {
+            listRealms: () => distinctOnlineSampleRealms(),
+            foldPeak: (realm) => foldOnlinePeak(realm),
+            pruneBatch: (realm, n) =>
+              pruneOnlineSamplesBatch(realm, config.onlineSamplesRetentionDays, n),
+          }
+        : undefined,
+  });
+  retentionSweep.start();
+
   const shutdown = async () => {
     // Flip readiness to draining FIRST so /readyz answers 503 and a load balancer
     // sheds new traffic before we stop the loop and persist (in-flight requests and
@@ -2809,6 +3080,9 @@ export async function startServer(): Promise<http.Server> {
     // close below (their intervals are unref()'d, but an in-flight tick could still
     // fire before pool.end()).
     await businessMetrics.stop();
+    // Same rationale for the retention sweep: an in-flight prune batch must not
+    // race the pool close below.
+    await retentionSweep.stop();
     game.stop();
     await game.saveAll('shutdown');
     await game.saveMarket();

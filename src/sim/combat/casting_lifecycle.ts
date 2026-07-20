@@ -55,7 +55,15 @@ import {
   normAngle,
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
-import { isInStasis, isLockedOut, isSilenced, isStunned, tonguesMult } from './cc';
+import {
+  hasUnbreakableMovementLock,
+  isInStasis,
+  isLockedOut,
+  isSilenced,
+  isStunned,
+  isUnbreakableControlAura,
+  tonguesMult,
+} from './cc';
 import {
   ARCANE_SURGE_ID,
   aetherDartsBoltBonus,
@@ -127,12 +135,23 @@ function isStasisToggle(ability: AbilityDef): boolean {
 }
 
 function cancelStasisToggle(ctx: SimContext, entity: Entity, ability: AbilityDef): boolean {
-  if (!isStasisToggle(ability) || !entity.auras.some((aura) => aura.id === ability.id)) {
+  if (
+    !isStasisToggle(ability) ||
+    !entity.auras.some(
+      (aura) =>
+        aura.id === ability.id && aura.sourceId === entity.id && !isUnbreakableControlAura(aura),
+    )
+  ) {
     return false;
   }
   for (let index = entity.auras.length - 1; index >= 0; index--) {
     const aura = entity.auras[index];
-    if (aura.id !== ability.id && aura.id !== `${ability.id}_absorb`) continue;
+    if (
+      (aura.id !== ability.id && aura.id !== `${ability.id}_absorb`) ||
+      aura.sourceId !== entity.id ||
+      isUnbreakableControlAura(aura)
+    )
+      continue;
     entity.auras.splice(index, 1);
     ctx.emit({ type: 'aura', targetId: entity.id, name: aura.name, gained: false });
   }
@@ -448,10 +467,9 @@ export function castAbility(
   meta.lastActiveTick = ctx.tickCount; // a cast attempt is a deliberate action
   const ability = res.def;
   if (cancelStasisToggle(ctx, p, ability)) return;
-  // Ice Block (usableWhileControlled) ignores control: it may be pressed while
-  // stunned, polymorphed, incapacitated, silenced, or locked out, so it always frees
-  // the caster (its cleanseSelf effect then strips the debuffs). Its own stasis is the
-  // one control it still respects, but the recast toggle above already handles that.
+  // Ice Block (usableWhileControlled) may be pressed through ordinary control;
+  // cleanseSelf removes the player-breakable debuffs while encounter-authored
+  // unbreakable control remains. Its own stasis is handled by the recast toggle above.
   if (!ability.usableWhileControlled) {
     if (isInStasis(p)) return;
     if (isStunned(p)) {
@@ -466,6 +484,18 @@ export function castAbility(
       ctx.error(p.id, 'You are silenced!');
       return;
     }
+  }
+  if (
+    hasUnbreakableMovementLock(p) &&
+    res.effects.some(
+      (effect) =>
+        effect.type === 'blinkForward' ||
+        effect.type === 'repositionToAim' ||
+        effect.type === 'charge',
+    )
+  ) {
+    ctx.error(p.id, 'You are stunned!');
+    return;
   }
   // Blink While Casting (mage choice row): Flickerstep slips through the busy
   // guard AND the GCD, an escape button that never touches the cast in

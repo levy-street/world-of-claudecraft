@@ -13,13 +13,16 @@ import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 
-function rig(rows: Record<number, string>, level = 20) {
+function rig(
+  rows: Record<number, string>,
+  level = 20,
+  spec: 'arcane' | 'fire' | 'frost' = 'frost',
+) {
   const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
   sim.setPlayerLevel(level);
-  // Frost-specced rig: the Chronomancy gating (mage-chronomancy.md Phase 1)
-  // moved the offensive kit these rows exercise (Frostveil, the fire/frost
-  // nukes) onto the two DPS specs, so a spec-less rig can no longer cast it.
-  expect(sim.applyTalents({ spec: 'frost', rows })).toBe(true);
+  // Spec-selected rig: Chronomancy gating means these rows can no longer be
+  // exercised reliably with a spec-less mage.
+  expect(sim.applyTalents({ spec, rows })).toBe(true);
   const p = sim.player;
   p.resource = p.maxResource;
   return { sim, p };
@@ -43,6 +46,24 @@ function addTargetMob(sim: Sim, hp = 100000, dist = 10): Entity {
 
 function tickFor(sim: Sim, seconds: number): void {
   for (let i = 0; i < Math.round(seconds * 20); i++) sim.tick();
+}
+
+function applyControl(
+  sim: Sim,
+  target: Entity,
+  sourceId: number,
+  kind: 'root' | 'slow' | 'stun',
+): void {
+  (sim as unknown as { applyAura(t: Entity, a: object): void }).applyAura(target, {
+    id: `test_${kind}`,
+    name: `Test ${kind}`,
+    kind,
+    value: kind === 'slow' ? 0.5 : 0,
+    remaining: 3,
+    duration: 3,
+    sourceId,
+    school: 'physical',
+  });
 }
 
 describe('mage base kit', () => {
@@ -156,27 +177,56 @@ describe('mage choice rows (owner tree)', () => {
     expect(ally.hp).toBe(hp0 + mageScaledHeal);
   });
 
-  it('Temporal Rift cleanses the next stun instantly, then cools down 20 sec', () => {
+  it('Shifting Ward breaks roots on barrier cast but never passively ignores a stun', () => {
     const { sim, p } = rig({ 8: 'mag_r8_temporal_rift' });
     const mob = addTargetMob(sim);
-    const applyStun = () =>
-      (sim as unknown as { applyAura(t: Entity, a: object): void }).applyAura(p, {
-        id: 'test_stun',
-        name: 'Test Stun',
-        kind: 'stun',
-        value: 0,
-        remaining: 3,
-        duration: 3,
-        sourceId: mob.id,
-        school: 'physical',
-      });
-    applyStun();
-    expect(p.auras.some((a) => a.kind === 'stun')).toBe(false); // cleansed
-    expect(p.auras.some((a) => a.id === 'temporal_rift_cd')).toBe(true);
-    applyStun();
-    expect(p.auras.some((a) => a.kind === 'stun')).toBe(true); // ICD running
+    const row = MAGE_CHOICE_ROWS.rows.find((candidate) => candidate.level === 8);
+    const option = row?.options.find((candidate) => candidate.id === 'mag_r8_temporal_rift');
+    expect(option?.name).toBe('Shifting Ward');
+    expect(option?.effect.ability).toEqual([
+      { ability: 'ice_barrier', addEffects: [{ type: 'breakRoots' }] },
+      { ability: 'blazing_barrier', addEffects: [{ type: 'breakRoots' }] },
+    ]);
+
+    applyControl(sim, p, mob.id, 'slow');
+    applyControl(sim, p, mob.id, 'root');
+    expect(p.auras.some((a) => a.kind === 'root')).toBe(true);
+    sim.castAbility('ice_barrier');
+    expect(p.auras.some((a) => a.kind === 'root')).toBe(false);
+    expect(p.auras.some((a) => a.kind === 'slow')).toBe(true);
+
+    applyControl(sim, p, mob.id, 'stun');
+    expect(p.auras.some((a) => a.kind === 'stun')).toBe(true);
+    expect(p.auras.some((a) => a.id === 'temporal_rift_cd')).toBe(false);
   });
 
+  it('Shifting Ward breaks roots when a Fire mage casts Blazing Barrier', () => {
+    const { sim, p } = rig({ 8: 'mag_r8_temporal_rift' }, 20, 'fire');
+    const mob = addTargetMob(sim);
+    applyControl(sim, p, mob.id, 'root');
+
+    sim.castAbility('blazing_barrier');
+
+    expect(p.auras.some((aura) => aura.kind === 'root')).toBe(false);
+    expect(p.auras.some((aura) => aura.id === 'blazing_barrier')).toBe(true);
+  });
+
+  it('Shifting Ward does not self-cleanse an Arcane mage shielding an ally', () => {
+    const { sim, p } = rig({ 8: 'mag_r8_temporal_rift' }, 20, 'arcane');
+    const allyId = sim.addPlayer('warrior', 'Ward Target');
+    const ally = sim.entities.get(allyId);
+    if (!ally) throw new Error('ally missing');
+    ally.pos = { x: p.pos.x + 5, y: p.pos.y, z: p.pos.z };
+    ally.prevPos = { ...ally.pos };
+    applyControl(sim, p, ally.id, 'root');
+    sim.targetEntity(ally.id);
+
+    sim.castAbility('temporal_barrier');
+    sim.tick();
+
+    expect(ally.auras.some((aura) => aura.id === 'temporal_barrier')).toBe(true);
+    expect(p.auras.some((aura) => aura.kind === 'root')).toBe(true);
+  });
   it('Greater Invisibility strips 2 DoTs, vanishes, and cuts damage 90%', () => {
     const { sim, p } = rig({ 8: 'mag_r8_greater_invis' });
     const mob = addTargetMob(sim);
@@ -533,16 +583,18 @@ describe('the talents-window registry mirror', () => {
     // selectTalentRow path the talents window's Choices tab drives.
     expect(sim.selectTalentRow(8, 'mag_r8_temporal_rift')).toBe(true);
     (sim as unknown as { applyAura(t: Entity, a: object): void }).applyAura(p, {
-      id: 'test_stun',
-      name: 'Test Stun',
-      kind: 'stun',
+      id: 'test_root',
+      name: 'Test Root',
+      kind: 'root',
       value: 0,
       remaining: 3,
       duration: 3,
       sourceId: 424242,
       school: 'physical',
     });
-    expect(p.auras.some((a) => a.kind === 'stun')).toBe(false); // cleansed
-    expect(p.auras.some((a) => a.id === 'temporal_rift_cd')).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'root')).toBe(true);
+    p.resource = p.maxResource;
+    sim.castAbility('ice_barrier');
+    expect(p.auras.some((a) => a.kind === 'root')).toBe(false);
   });
 });

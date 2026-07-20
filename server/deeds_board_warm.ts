@@ -59,15 +59,28 @@ export function warmDeedsBoardIfDemanded(
  * not N concurrent ones. A settled run (fulfilled or rejected) clears the
  * slot, so the next call after a failure retries fresh rather than caching the
  * rejection.
+ *
+ * The optional `epochOf` getter opts a flight into epoch-keyed eviction: each
+ * flight captures the epoch current when it started, and a later caller whose
+ * epoch differs starts a FRESH flight instead of joining the in-flight one (so
+ * a bust that bumps the epoch drops in-flight joiners rather than handing them
+ * the pre-bust snapshot). When `epochOf` is omitted the epoch pins to 0, so
+ * behavior is exactly as before: join whatever is in flight, and clear the slot
+ * on settle.
  */
-export function singleFlight<T>(run: () => Promise<T>): () => Promise<T> {
-  let inFlight: Promise<T> | null = null;
+export function singleFlight<T>(run: () => Promise<T>, epochOf?: () => number): () => Promise<T> {
+  let inFlight: { epoch: number; promise: Promise<T> } | null = null;
   return () => {
-    if (inFlight === null) {
-      inFlight = run().finally(() => {
-        inFlight = null;
+    const epoch = epochOf ? epochOf() : 0;
+    if (inFlight === null || inFlight.epoch !== epoch) {
+      const flightEpoch = epoch;
+      const promise = run().finally(() => {
+        // Clear only THIS flight's slot: a bust may have started a newer flight
+        // under a fresher epoch, and this settling one must not clobber it.
+        if (inFlight !== null && inFlight.epoch === flightEpoch) inFlight = null;
       });
+      inFlight = { epoch: flightEpoch, promise };
     }
-    return inFlight;
+    return inFlight.promise;
   };
 }

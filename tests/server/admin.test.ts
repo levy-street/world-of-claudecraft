@@ -28,12 +28,16 @@
 // and every asserted path returns before any real query.
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase17_admin';
 
+import { readFileSync } from 'node:fs';
 import type * as http from 'node:http';
+import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   type AdminRuntime,
+  configureAdminPlayersCap,
   configureAdminRuntime,
   resetAdminDbForTests,
+  resetAdminPlayersCapForTests,
   resetAdminRuntimeForTests,
   routes,
   setAdminDbForTests,
@@ -213,6 +217,7 @@ afterEach(() => {
   resetRateLimitClock();
   resetAdminDbForTests();
   resetAdminRuntimeForTests();
+  resetAdminPlayersCapForTests();
   vi.clearAllMocks();
   vi.restoreAllMocks();
 });
@@ -1526,6 +1531,9 @@ describe('overview merge math (the one non-trivial read computation)', () => {
       providerUsageSnapshot,
     });
     installAdminRuntime();
+    // A distinctive cap (not colliding with any other body number) proves this arm
+    // reads the injected canonicalPlayersCap source, not a hardcoded 0 or a stat.
+    configureAdminPlayersCap(() => 4242);
     const r = await runRoute('GET', '/admin/api/overview', { headers: { authorization: BEARER } });
     expect(r.status).toBe(200);
     expect(r.body).toEqual({
@@ -1534,6 +1542,7 @@ describe('overview merge math (the one non-trivial read computation)', () => {
         accounts: 4,
         peakOnlineToday: 3,
         peakOnlineAllTime: 100,
+        playersCap: 4242,
         server: {
           online: 3,
           onlineAccounts: 2,
@@ -1550,6 +1559,21 @@ describe('overview merge math (the one non-trivial read computation)', () => {
     expect(providerUsageSnapshot).not.toHaveBeenCalled();
   });
 
+  it('serves playersCap 0 when the cap source is unconfigured (graceful default)', async () => {
+    // adminPlayersCap() returns 0 (it does NOT throw) when configureAdminPlayersCap was
+    // never wired, so a boot-wiring gap degrades this one cosmetic field to the same
+    // "cap disabled" sentinel canonicalPlayersCap emits, instead of failing the whole
+    // overview. Pin that false branch of the accessor.
+    authedAdminDb({
+      overviewCounts: async () => ({ accounts: 0, peakOnlineToday: 0, peakOnlineAllTime: 0 }),
+    });
+    installAdminRuntime();
+    resetAdminPlayersCapForTests();
+    const r = await runRoute('GET', '/admin/api/overview', { headers: { authorization: BEARER } });
+    expect(r.status).toBe(200);
+    expect((r.body as { data: { playersCap: number } }).data.playersCap).toBe(0);
+  });
+
   it('GET /admin/api/provider-usage serves the usage snapshot on its own route', async () => {
     const usage = { generatedAt: 9, windows: ['w'], metrics: ['m'], caches: ['c'] };
     authedAdminDb({ providerUsageSnapshot: () => usage });
@@ -1559,6 +1583,39 @@ describe('overview merge math (the one non-trivial read computation)', () => {
     });
     expect(r.status).toBe(200);
     expect(r.body).toEqual({ success: true, data: { usage }, error: null });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 12b. Overview player-cap boot wiring + dual-arm structural pins. main.ts cannot
+// be imported (it boots a server on import), so the boot wiring is verified by
+// source text (the tests/server/main_retention_wiring.test.ts idiom), comment-
+// stripped so a commented-out call can never satisfy a pin.
+// ---------------------------------------------------------------------------
+
+describe('overview player-cap wiring', () => {
+  const stripLineComments = (s: string): string => s.replace(/\/\/[^\n]*/g, '');
+  const MAIN = stripLineComments(
+    readFileSync(join(__dirname, '..', '..', 'server', 'main.ts'), 'utf8'),
+  );
+  const ADMIN = stripLineComments(
+    readFileSync(join(__dirname, '..', '..', 'server', 'admin.ts'), 'utf8'),
+  );
+
+  it('main.ts feeds canonicalPlayersCap into configureAdminPlayersCap at boot', () => {
+    // Without this wiring the accessor silently defaults to 0 and no unit test reds
+    // (each injects its own source). The CALL-form token '(canonicalPlayersCap)' cannot
+    // be satisfied by the import line, which lists the bare identifier.
+    expect(MAIN).toContain('configureAdminPlayersCap(canonicalPlayersCap)');
+  });
+
+  it('both overview arms read the ONE injected cap accessor (dual-arm agreement)', () => {
+    // The legacy handleAdminApi branch and the RouteDef overviewHandler must both source
+    // the cap from adminPlayersCap(), so the field cannot diverge across the two dispatch
+    // paths; exactly two call sites, one per arm. A hardcoded value or a divergent source
+    // in either arm drops the count.
+    const hits = ADMIN.match(/playersCap: adminPlayersCap\(\)/g) ?? [];
+    expect(hits).toHaveLength(2);
   });
 });
 

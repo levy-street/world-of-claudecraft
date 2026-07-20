@@ -8,11 +8,13 @@ import { describe, expect, it } from 'vitest';
 import {
   blindMissBonus,
   damageBreakThreshold,
+  hasUnbreakableMovementLock,
   isDisarmed,
   isLockedOut,
   isRooted,
   isSilenced,
   isStunned,
+  isUnbreakableControlAura,
   tonguesMult,
 } from '../src/sim/combat/cc';
 import type { AbilityEffect, Aura, Entity } from '../src/sim/types';
@@ -104,6 +106,25 @@ describe('cc: isRooted', () => {
   });
   it('is false with no root/stun-family aura', () => {
     expect(isRooted(withAuras(aura('silence')))).toBe(false);
+  });
+});
+
+describe('cc: unbreakable encounter control', () => {
+  it('identifies protected auras and only movement-locking kinds stop relocation', () => {
+    for (const kind of ['stun', 'stasis', 'root', 'incapacitate', 'polymorph'] as const) {
+      const protectedAura = aura(kind, 0, { unbreakableControl: true });
+      expect(isUnbreakableControlAura(protectedAura)).toBe(true);
+      expect(hasUnbreakableMovementLock(withAuras(protectedAura))).toBe(true);
+      expect(hasUnbreakableMovementLock(withAuras(protectedAura), protectedAura)).toBe(false);
+    }
+
+    expect(
+      hasUnbreakableMovementLock(withAuras(aura('silence', 0, { unbreakableControl: true }))),
+    ).toBe(false);
+    expect(
+      hasUnbreakableMovementLock(withAuras(aura('slow', 0, { unbreakableControl: true }))),
+    ).toBe(false);
+    expect(hasUnbreakableMovementLock(withAuras(aura('root')))).toBe(false);
   });
 });
 

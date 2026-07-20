@@ -105,6 +105,8 @@ import {
   type RecipeDef,
   type SocialInfo,
   type TradeInfo,
+  type VcSharedCupInfo,
+  type VcViewerReadout,
 } from '../world_api';
 import type { MasterworkView } from '../world_api/professions';
 import { computeBackoffDelay } from './backoff';
@@ -135,6 +137,7 @@ interface ClientWireAura {
   charges?: number;
   emp?: Aura['empowerAbilities'];
   src?: number;
+  ub?: 1;
 }
 
 // ---------------------------------------------------------------------------
@@ -1296,9 +1299,14 @@ export class ClientWorld implements IWorld {
   // --- IWorldCardMinigame: Card Duel queue/match state, mirrored from the
   // snapshot self (`s.cardDuel`, delta-omitted). ---
   cardMinigameInfo: CardMinigameInfo = { queued: false, available: true, match: null };
-  // --- IWorldValeCup: Vale Cup queue/match state, mirrored from the snapshot
-  // self (`s.vcup`, delta-omitted: a missing key keeps the prior mirror, an
-  // explicit null clears it, same as `s.arena`). ---
+  // --- IWorldValeCup: Vale Cup queue/match state, recomposed from two
+  // delta-omitted self keys: `s.vcup` (the per-viewer remainder plus a wire-only
+  // liveHidden flag) and `s.vcupb` (the realm-wide fragment, serialized once
+  // server-side and shared across viewers). We keep the last of each mirror and
+  // rebuild cupInfo whenever either changes; a missing key keeps its prior mirror
+  // (never default to empty, that would wipe the other fragment). ---
+  private lastVcupRemainder: VcViewerReadout | null = null;
+  private lastVcupShared: VcSharedCupInfo | null = null;
   cupInfo: CupInfo | null = null;
   // My live sport role, mirrored from the wireRev-gated heavy self field
   // `s.sport` ({ role } | null, delta-omitted). NON-IWorld mirror: while set,
@@ -2410,6 +2418,7 @@ export class ClientWorld implements IWorld {
             // The caster's entity id, for the target strip's own-aura prominence
             // (auras_view ownFirst). An old server omits it; 0 matches no player id.
             rec.sourceId = a.src ?? 0;
+            rec.unbreakableControl = a.ub === 1 ? true : undefined;
           }
         } else {
           e.auras = wireAuras.map((a) => ({
@@ -2427,6 +2436,7 @@ export class ClientWorld implements IWorld {
             stacks: a.stacks,
             charges: a.charges,
             empowerAbilities: a.emp,
+            unbreakableControl: a.ub === 1 ? true : undefined,
           }));
         }
       }
@@ -2651,7 +2661,9 @@ export class ClientWorld implements IWorld {
       if (s.cardDuel !== undefined) this.cardMinigameInfo = s.cardDuel;
       if (s.honor !== undefined) this.honor = s.honor ?? 0;
       if (s.lhonor !== undefined) this.lifetimeHonor = s.lhonor ?? 0;
-      if (s.vcup !== undefined) this.cupInfo = s.vcup;
+      if (s.vcup !== undefined) this.lastVcupRemainder = s.vcup as VcViewerReadout | null;
+      if (s.vcupb !== undefined) this.lastVcupShared = s.vcupb as VcSharedCupInfo | null;
+      if (s.vcup !== undefined || s.vcupb !== undefined) this.recomputeCupInfo();
       if (s.market !== undefined) this.marketInfo = s.market;
       if (s.mail !== undefined) this.mailInfo = s.mail;
       if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
@@ -2803,6 +2815,31 @@ export class ClientWorld implements IWorld {
     const v = this.cosmeticsChanged;
     this.cosmeticsChanged = false;
     return v;
+  }
+
+  // Rebuild the public cupInfo from the two mirrored wire fragments. A null
+  // remainder (the viewer has no readout, or an explicit vcup:null) clears it; a
+  // remainder with no shared fragment yet (should not happen, they ship together
+  // on every gate-open pass and every resync) keeps the prior value rather than
+  // emitting a half-built readout. liveHidden reapplies the per-viewer practice
+  // suppression the server derived and is never surfaced on CupInfo.
+  private recomputeCupInfo(): void {
+    const rem = this.lastVcupRemainder;
+    const shared = this.lastVcupShared;
+    if (rem === null) {
+      this.cupInfo = null;
+      return;
+    }
+    if (shared === null) return;
+    const { liveHidden, ...viewer } = rem;
+    this.cupInfo = {
+      ...viewer,
+      queueSizes: shared.queueSizes,
+      live: liveHidden ? null : shared.live,
+      board: shared.board,
+      guildBoard: shared.guildBoard,
+      practicing: shared.practicing,
+    };
   }
 
   // Refuse a hostile-target cast at an already-dead target: near-monotonic +

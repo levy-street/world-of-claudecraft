@@ -318,10 +318,10 @@ export const id_ID: EnTranslations = {
       "resurrectAtCorpse": "Bangkit di Jasad",
       "resurrectAtHealer": "Sang Penjaga Pucat (Upeti Sang Penjaga)",
       "spiritHealerAlive": "Sang Penjaga Pucat mengawasi para mati. Kamu masih termasuk yang hidup.",
-      "healerConfirmTitle": "Accept the Keeper's Toll?",
-      "healerConfirmBody": "The Pale Keeper will revive you here, but the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to your corpse revives you with no penalty.",
-      "healerConfirmAccept": "Revive Me",
-      "healerConfirmCancel": "Cancel"
+      "healerConfirmTitle": "Terima Upeti Sang Penjaga?",
+      "healerConfirmBody": "Sang Penjaga Pucat akan menghidupkan Anda kembali di sini, tetapi Upeti Sang Penjaga mengurangi semua atribut Anda sebesar 75%, hingga 10 menit pada level yang lebih tinggi. Membawa roh Anda kembali ke mayat Anda akan menghidupkan Anda kembali tanpa penalti.",
+      "healerConfirmAccept": "Bangkitkan Aku",
+      "healerConfirmCancel": "Membatalkan"
     },
     "fct": {
       "absorbed": "{amount} diserap",
@@ -754,7 +754,7 @@ export const id_ID: EnTranslations = {
       "leaderboard": "Peringkat",
       "dailyRewards": "Toko",
       "deeds": "Jasa",
-      "professions": "Professions",
+      "professions": "Profesi",
       "nameplates": "Nama",
       "haptics": "Haptik",
       "hapticsOff": "Haptik Nonaktif",
@@ -1044,7 +1044,7 @@ export const id_ID: EnTranslations = {
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
-      "showThirdActionBar": "Show Third Action Bar",
+      "showThirdActionBar": "Tampilkan Bilah Tindakan Ketiga",
       "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
       "showAttackButton": "Tampilkan Tombol Serang",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
@@ -1475,7 +1475,7 @@ export const id_ID: EnTranslations = {
       "watchX": "Lihat di X",
       "watchKick": "Tonton di Kick",
       "watchYouTube": "Tonton di YouTube",
-      "streamerBadgeTitle": "Verified streamer"
+      "streamerBadgeTitle": "Streamer terverifikasi"
     },
     "lootSettings": {
       "title": "Pengaturan Jarahan",
@@ -2089,9 +2089,11 @@ export const id_ID: EnTranslations = {
       "mining": "Penambangan",
       "logging": "Penebangan",
       "herbalism": "Herbalisme",
+      "fishing": "Fishing",
       "notReady": "Simpul sumber daya ini belum muncul kembali untukmu.",
-      "gatherLine": "You gather: {name}.",
-      "gatherLineQty": "You gather: {name} x{qty}."
+      "gatherLine": "Anda mengumpulkan: {name}.",
+      "gatherLineQty": "Anda mengumpulkan: {name} x{qty}.",
+      "catchLine": "You reel in: {name}"
     },
     "archetypeTitle": {
       "label": "Gelar",
@@ -2123,40 +2125,40 @@ export const id_ID: EnTranslations = {
       "leatherworking": "Pengolahan Kulit"
     },
     "professions": {
-      "title": "Professions",
-      "close": "Close professions",
-      "ringAria": "Craft wheel",
-      "skillsHeader": "Craft skills",
-      "gatheringHeader": "Gathering",
-      "perksHeader": "Perks",
-      "identityHeader": "Identity",
-      "roleMajor": "Major",
-      "roleHobby": "Hobby",
-      "roleDormant": "Dormant",
-      "roleUnattuned": "Unattuned",
-      "ceilingUnlimited": "No empowerment cap",
-      "ceilingRare": "Rare cap",
-      "ceilingCommon": "Common cap",
+      "title": "Profesi",
+      "close": "Tutup profesi",
+      "ringAria": "Roda kerajinan",
+      "skillsHeader": "Keterampilan kerajinan",
+      "gatheringHeader": "Mengumpulkan",
+      "perksHeader": "Keuntungan",
+      "identityHeader": "Identitas",
+      "roleMajor": "Besar",
+      "roleHobby": "Hobi",
+      "roleDormant": "Terbengkalai",
+      "roleUnattuned": "Tidak selaras",
+      "ceilingUnlimited": "Tidak ada batasan pemberdayaan",
+      "ceilingRare": "Topi langka",
+      "ceilingCommon": "Batasan umum",
       "skillValue": "{skill} / {max}",
-      "tierPipAria": "Tier {tier}",
-      "nextUnlockTier": "{points} points to the next tier: masterwork odds improve",
-      "nextUnlockSpecialized": "{points} points to Specialized: material costs drop",
-      "nextUnlockMax": "At maximum skill",
-      "perkSpecializedLine": "{craft}: Specialized, material costs -{pct}%",
-      "perkSpecializedAt": "Specializes at {threshold} skill",
-      "switchCost": "Next archetype switch costs {cost} amends",
-      "syncing": "Waiting for your profession data from the realm.",
-      "tutorialLine": "Reach {target} skill in any craft to unlock your first tier.",
-      "ctaHeader": "Next step",
-      "ctaRaise": "Keep raising {craft}: {points} more points to the next tier.",
-      "ctaStart": "Craft or gather with any profession to begin.",
-      "unattunedIdentity": "You are not yet attuned to an archetype. Raise your crafts and complete an attunement to choose your pair.",
-      "nudgeNearTier": "{craft}: {points} points from the next tier",
-      "nudgeDormant": "Your {craft} knowledge lies dormant",
-      "hobbyLabel": "Hobby: {craft}",
-      "majorsLabel": "Majors: {a} and {b}",
-      "pairsHeld": "Pairs held: {count}",
-      "returnsLabel": "Returns: {count}"
+      "tierPipAria": "Tingkat {tier}",
+      "nextUnlockTier": "{points} menunjuk ke tingkat berikutnya: peluang karya besar meningkat",
+      "nextUnlockSpecialized": "{points} menunjuk ke Khusus: biaya material turun",
+      "nextUnlockMax": "Pada keterampilan maksimal",
+      "perkSpecializedLine": "{craft}: Khusus, biaya material -{pct}%",
+      "perkSpecializedAt": "Mengkhususkan diri pada keterampilan {threshold}",
+      "switchCost": "Peralihan arketipe berikutnya membutuhkan {cost} poin penebusan",
+      "syncing": "Menunggu data profesi Anda dari ranah.",
+      "tutorialLine": "Raih keterampilan {target} di kerajinan apa pun untuk membuka kunci tingkat pertama Anda.",
+      "ctaHeader": "Langkah selanjutnya",
+      "ctaRaise": "Tingkatkan terus {craft}:{points} poin lebih banyak ke tingkat berikutnya.",
+      "ctaStart": "Buat atau kumpulkan dengan profesi apa pun untuk memulai.",
+      "unattunedIdentity": "Anda belum terbiasa dengan suatu arketipe. Tingkatkan kerajinan Anda dan selesaikan attunement untuk memilih pasangan Anda.",
+      "nudgeNearTier": "{craft}: {points} poin dari tingkat berikutnya",
+      "nudgeDormant": "Pengetahuan {craft} Anda tertidur",
+      "hobbyLabel": "Hobi: {craft}",
+      "majorsLabel": "Jurusan: {a} dan {b}",
+      "pairsHeld": "Pasangan yang dimiliki: {count}",
+      "returnsLabel": "Pengembalian: {count}"
     },
     "crafting": {
       "title": "kerajinan",
@@ -2176,7 +2178,7 @@ export const id_ID: EnTranslations = {
       "comboNotAttuned": "Pilih pasangan arketipe terlebih dahulu.",
       "comboWrongPair": "Aktifkan pasangan yang tepat ini untuk membuatnya.",
       "comboTierUnmet": "Naikkan kedua kerajinan utama ke tingkat yang disyaratkan.",
-      "comboTierUnmetNamed": "Raise {crafts} to tier {tier}.",
+      "comboTierUnmetNamed": "Naikkan {crafts} ke tingkat {tier}.",
       "professionChoice": "Pilihan profesi",
       "noProfessionChoice": "Tidak ada pilihan profesi yang tersedia saat ini.",
       "pairOptionLabel": "{pair} ({craftA} + {craftB})",
@@ -2207,48 +2209,48 @@ export const id_ID: EnTranslations = {
         "nearTier": "{craft} berjarak {points} keahlian dari tingkat berikutnya.",
         "dormantKnowledge": "Pengetahuan {craft} tersimpan namun tidak aktif hingga pasangan atau hobinya aktif."
       },
-      "stationRequired": "You must be at the {station} to craft that.",
+      "stationRequired": "Anda harus berada di {station} untuk membuatnya.",
       "stationName": {
-        "forge": "Forge",
-        "kitchens": "Kitchens",
-        "apothecary": "Apothecary",
-        "tannery": "Tannery",
-        "loom": "Loom",
-        "toolworks": "Toolworks"
+        "forge": "Bengkel Tempa",
+        "kitchens": "Dapur",
+        "apothecary": "Ahli obat",
+        "tannery": "Penyamakan",
+        "loom": "Mesin tenun",
+        "toolworks": "Bengkel Perkakas"
       },
       "throttled": "Kamu membuat terlalu cepat. Tunggu sejenak dan coba lagi.",
       "recipeNotLearned": "Kamu belum mempelajari resep itu.",
-      "skillReqLine": "Requires {craft} {skill}",
-      "difficultyFull": "Full skill gain",
-      "difficultyReduced": "Reduced skill gain",
-      "difficultyNone": "No skill gain",
-      "stationBadge": "Station",
-      "stationOutOfRangeNamed": "Move to the {station} to craft this.",
-      "masterworkToast": "Masterwork! {name}",
-      "masterworkZoneLine": "{crafter} crafted a masterwork {name}!",
-      "tierUpToast": "{craft} advanced to tier {tier}!",
-      "makersMark": "Crafted by {name}",
-      "masterworkSeal": "Masterwork",
-      "enchantedLine": "Enchanted"
+      "skillReqLine": "Membutuhkan {craft} {skill}",
+      "difficultyFull": "Peningkatan keterampilan penuh",
+      "difficultyReduced": "Mengurangi perolehan keterampilan",
+      "difficultyNone": "Tidak ada perolehan keterampilan",
+      "stationBadge": "Tempat Kerja Kerajinan",
+      "stationOutOfRangeNamed": "Pindah ke {station} untuk membuat ini.",
+      "masterworkToast": "Karya besar! {name}",
+      "masterworkZoneLine": "{crafter} membuat karya besar {name}!",
+      "tierUpToast": "{craft} maju ke tingkat {tier}!",
+      "makersMark": "Dibuat oleh {name}",
+      "masterworkSeal": "Karya besar",
+      "enchantedLine": "Terpesona"
     },
     "training": {
-      "title": "Training: {name}",
-      "close": "Close training",
-      "empty": "This master has nothing to teach.",
-      "free": "Free",
-      "stateKnown": "Known",
-      "stateTeachable": "Available",
-      "stateLocked": "Locked",
-      "requirement": "Taught at {craft} {skill}",
-      "trainAria": "Learn {name} for {fee}",
-      "dialogOption": "Training",
-      "dialogOptionAria": "Browse training from {name}",
-      "learned": "Recipe learned: {recipe}",
-      "tierUnmet": "You need {craft} {skill} to learn that recipe.",
-      "cannotAfford": "You cannot afford that training.",
-      "notTaughtHere": "That recipe is not taught here.",
-      "alreadyKnown": "You already know that recipe.",
-      "outOfRange": "You must be at the station to train."
+      "title": "Pelatihan: {name}",
+      "close": "Tutup pelatihan",
+      "empty": "Guru ini tidak punya apa pun untuk diajarkan.",
+      "free": "Bebas",
+      "stateKnown": "Diketahui",
+      "stateTeachable": "Tersedia",
+      "stateLocked": "Terkunci",
+      "requirement": "Diajarkan di {craft} {skill}",
+      "trainAria": "Pelajari {name} untuk {fee}",
+      "dialogOption": "Pelatihan",
+      "dialogOptionAria": "Jelajahi pelatihan dari {name}",
+      "learned": "Resep yang dipelajari: {recipe}",
+      "tierUnmet": "Anda memerlukan {craft} {skill} untuk mempelajari resep itu.",
+      "cannotAfford": "Anda tidak mampu membiayai pelatihan itu.",
+      "notTaughtHere": "Resep itu tidak diajarkan di sini.",
+      "alreadyKnown": "Anda sudah tahu resep itu.",
+      "outOfRange": "Anda harus berada di stasiun untuk berlatih."
     },
     "finder": {
       "title": "Pencari Dungeon",
@@ -2418,9 +2420,9 @@ export const id_ID: EnTranslations = {
     }
   },
   "gatherEvent": {
-    "pristineVein": "{finder} struck a pristine vein!",
-    "ancientHeartwood": "{finder} felled an ancient heartwood!",
-    "moonlitBloom": "{finder} discovered a moonlit bloom!"
+    "pristineVein": "{finder} memberikan kesan yang murni!",
+    "ancientHeartwood": "{finder} menebang inti kayu kuno!",
+    "moonlitBloom": "{finder} menemukan mekarnya cahaya bulan!"
   },
   "apiError": {
     "validation": {
@@ -3026,9 +3028,9 @@ export const id_ID: EnTranslations = {
       "ice_lance": "Serpihan seketika untuk menghabiskan proc beku, menyerang jauh lebih keras pada target yang membeku.",
       "flurry": "Tiga baut cepat yang mendinginkan target agar pukulan beku berikutmu mendarat seolah target membeku.",
       "fingers_of_frost": "Baut bekumu terkadang memberdayakan Ice Lance agar menyerang seolah target membeku.",
-      "brain_freeze": "Baut bekumu terkadang membuat Winterlash berikutnya seketika dan lebih keras.",
+      "brain_freeze": "Frostbolt Anda terkadang membuat Flurry berikutnya menjadi instan dan melewatkan cooldownnya.",
       "shatter": "Mantramu jauh lebih sering kritis terhadap target yang membeku.",
-      "frozen_orb": "Menggelindingkan bola lambat melalui gerombolan yang mendinginkan segalanya dan memicu proc bekumu.",
+      "frozen_orb": "Meluncurkan bola lambat ke dalam kawanan yang membuat musuh kedinginan dan membekukan es.",
       "blizzard": "Membungkus area dengan es untuk mengikis dan memperlambat seluruh gerombolan.",
       "blink": "Menteleportasimu maju sebentar, memutus akar saat keluar.",
       "conjure_water": "Menciptakan minuman yang memulihkan mana, sehingga kamu bisa mengisi ulang di sela tarikan.",
@@ -4620,10 +4622,10 @@ export const id_ID: EnTranslations = {
   "heroicShop": {
     "balance": "Tanda Heroik: {count}",
     "buyAria": "Beli {item} seharga {marks} Tanda Heroik",
-    "buyConfirmTitle": "Confirm Purchase",
-    "buyConfirmBody": "Buy {item} for {marks} Heroic Marks? Marks purchases cannot be refunded.",
-    "buyConfirmAccept": "Buy",
-    "buyConfirmCancel": "Cancel"
+    "buyConfirmTitle": "Konfirmasi Pembelian",
+    "buyConfirmBody": "Beli {item} untuk Tanda Heroik {marks}? Pembelian merek tidak dapat dikembalikan.",
+    "buyConfirmAccept": "Membeli",
+    "buyConfirmCancel": "Membatalkan"
   },
   "cardDuel": {
     "title": "Duel Kartu",
@@ -4677,10 +4679,10 @@ export const id_ID: EnTranslations = {
       "reqHeroic": "Membutuhkan penyelesaian Heroik",
       "reqClears": "Membutuhkan {count} kali penyelesaian",
       "empty": "Tidak ada stok.",
-      "buyConfirmTitle": "Confirm Purchase",
-      "buyConfirmBody": "Buy {item} for {marks} Delve Marks? Marks purchases cannot be refunded.",
-      "buyConfirmAccept": "Buy",
-      "buyConfirmCancel": "Cancel"
+      "buyConfirmTitle": "Konfirmasi Pembelian",
+      "buyConfirmBody": "Beli {item} seharga {marks} Tanda Delve? Pembelian tanda tidak dapat dikembalikan.",
+      "buyConfirmAccept": "Membeli",
+      "buyConfirmCancel": "Membatalkan"
     },
     "tracker": {
       "title": "Delve",
@@ -5083,9 +5085,9 @@ export const id_ID: EnTranslations = {
     "rendererFailed": "Tidak bisa memulai perender: coba muat ulang. {error}",
     "enterTimeout": "Tidak bisa masuk dunia. Koneksi kehabisan waktu. Apakah server gim berjalan?",
     "connectionLost": "Koneksi ke server terputus.",
-    "reconnectingAttempt": "Connection lost. Reconnecting... (attempt {attempt}/{maxAttempts}, retrying in {seconds}s)",
-    "reconnectingNow": "Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})",
-    "slowConnection": "This is taking longer than usual. Check your internet connection.",
+    "reconnectingAttempt": "Koneksi terputus. Menyambungkan kembali... (coba {attempt}/{maxAttempts}, coba lagi di {seconds}s)",
+    "reconnectingNow": "Koneksi terputus. Hubungkan kembali sekarang... (coba {attempt}/{maxAttempts})",
+    "slowConnection": "Ini memakan waktu lebih lama dari biasanya. Periksa koneksi internet Anda.",
     "connectionRejected": "Server menutup koneksi.",
     "realmFull": "Dunia ini sedang penuh. Coba lagi dalam beberapa menit.",
     "tooManyConnections": "Terlalu banyak koneksi ke dunia ini dari jaringanmu. Tutup jendela permainan ekstra atau coba lagi dalam beberapa menit.",
@@ -6188,7 +6190,7 @@ export const id_ID: EnTranslations = {
       "rarityUncommon": "Tak Biasa",
       "rarityRare": "Langka",
       "rarityEpic": "Epik",
-      "rarityLegendary": "Legendary",
+      "rarityLegendary": "Legendaris",
       "merchantStock": "Stok pedagang",
       "stackCount": "x{count}",
       "each": "{money} per buah",
@@ -6441,11 +6443,11 @@ export const id_ID: EnTranslations = {
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Lepaskan tiga baut es untuk {damage} kerusakan Beku masing-masing dan tanamkan Dingin Musim Dingin pada target: 2 mantra masuk berikutnya yang kompatibel memperlakukannya seolah membeku. Brain Freeze menjadikan Winterlash seketika, 30% lebih keras, dan melewati jedanya. (Beku)"
+        "description": "Lepaskan tiga baut es untuk masing-masing kerusakan {damage} Frost dan terapkan Winter's Chill pada target: 2 mantra kompatibel berikutnya yang masuk akan memperlakukannya sebagai beku. Brain Freeze menjadikan Winterlash instan dan melewatkan cooldownnya. (Embun beku)"
       },
       "frozen_orb": {
         "name": "Frozen Orb",
-        "description": "Lepaskan bola embun beku yang berputar-putar maju selama 8 dtk, memberikan {damage} kerusakan Beku setiap detik kepada musuh di sekitar dan memperlambat mereka sebesar 30%. Serangannya menghasilkan Fingers of Frost. (Beku)"
+        "description": "Melepaskan bola es yang berputar-putar yang melayang ke depan selama 8 detik, menimbulkan kerusakan {damage} Frost setiap detik ke musuh di sekitar dan memperlambat mereka sebesar 30%. Setiap denyut nadi menghasilkan satu es. (Embun beku)"
       },
       "blizzard": {
         "name": "Blizzard",
@@ -6469,11 +6471,11 @@ export const id_ID: EnTranslations = {
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "Rimelance memiliki peluang 20% menjadikan Winterlash berikutmu seketika, 30% lebih keras, dan bebas dari jedanya. (Beku)"
+        "description": "Rimelance memiliki peluang 20% ​​untuk membuat Winterlash berikutnya menjadi instan dan bebas cooldown. (Embun beku)"
       },
       "shatter": {
         "name": "Brittle Ruin",
-        "description": "Mantramu memperoleh peluang serangan kritis 50% terhadap target yang membeku, dan serangan kritis tersebut memberikan 20% lebih banyak kerusakan. Fingers of Frost dan Dingin Musim Dingin dianggap membeku. (Beku)"
+        "description": "Mantra Anda mendapatkan 50% peluang serangan kritis terhadap target yang dibekukan. Fingers of Frost dan Winter's Chill dihitung sebagai beku. (Embun beku)"
       },
       "conjure_water": {
         "name": "Waterbind",
@@ -8245,220 +8247,220 @@ export const id_ID: EnTranslations = {
         "name": "Tongkat Perang Emberglass"
       },
       "copper_ore": {
-        "name": "Copper Ore"
+        "name": "Bijih Tembaga"
       },
       "iron_ore": {
-        "name": "Iron Ore"
+        "name": "Bijih besi"
       },
       "ironbark_log": {
-        "name": "Ironbark Log"
+        "name": "Batang Kayu Kulit Besi"
       },
       "silverleaf_herb": {
-        "name": "Silverleaf Herb"
+        "name": "Ramuan Daun Perak"
       },
       "rough_hide": {
-        "name": "Rough Hide"
+        "name": "Kulit Kasar"
       },
       "spider_silk": {
-        "name": "Spider Silk"
+        "name": "Sutra Laba-laba"
       },
       "venom_gland": {
-        "name": "Venom Gland"
+        "name": "Kelenjar Racun"
       },
       "game_meat": {
-        "name": "Game Meat"
+        "name": "Daging Buruan"
       },
       "homespun_cloth": {
-        "name": "Homespun Cloth"
+        "name": "Kain tenunan sendiri"
       },
       "pristine_hide": {
-        "name": "Pristine Hide"
+        "name": "Kulit Murni"
       },
       "pristine_silk": {
-        "name": "Pristine Silk"
+        "name": "Sutra Murni"
       },
       "pristine_venom_gland": {
-        "name": "Pristine Venom Gland"
+        "name": "Kelenjar Racun Murni"
       },
       "prime_cut": {
-        "name": "Prime Cut"
+        "name": "Potongan Perdana"
       },
       "smithing_flux": {
-        "name": "Smithing Flux"
+        "name": "Fluks Smithing"
       },
       "spool_of_thread": {
-        "name": "Spool of Thread"
+        "name": "Gulungan Benang"
       },
       "tanning_agent": {
-        "name": "Tanning Agent"
+        "name": "Agen Penyamakan"
       },
       "cooking_salt": {
-        "name": "Cooking Salt"
+        "name": "Garam Memasak"
       },
       "glass_vial": {
-        "name": "Glass Vial"
+        "name": "Botol Kaca"
       },
       "copper_bearded_axe": {
-        "name": "Copper Bearded Axe"
+        "name": "Kapak Berjanggut Tembaga"
       },
       "copper_flanged_mace": {
-        "name": "Copper Flanged Mace"
+        "name": "Gada Bergelang Tembaga"
       },
       "ironbark_boar_spear": {
-        "name": "Ironbark Boar Spear"
+        "name": "Tombak Babi Kulit Besi"
       },
       "ironedge_longsword": {
-        "name": "Ironedge Longsword"
+        "name": "Pedang Panjang Tepi Besi"
       },
       "ironshod_maul": {
-        "name": "Ironshod Maul"
+        "name": "Palu Perang Berlapis Besi"
       },
       "whetted_iron_dirk": {
-        "name": "Whetted Iron Dirk"
+        "name": "Belati Besi yang Diasah"
       },
       "thorium_warblade": {
-        "name": "Thorium Warblade"
+        "name": "Pedang Perang Thorium"
       },
       "arcanite_war_axe": {
-        "name": "Arcanite War Axe"
+        "name": "Kapak Perang Arcanite"
       },
       "elderwood_battle_staff": {
-        "name": "Elderwood Battle Staff"
+        "name": "Staf Pertempuran Elderwood"
       },
       "riveted_copper_girdle": {
-        "name": "Riveted Copper Girdle"
+        "name": "Korset Tembaga Terpaku"
       },
       "coppermail_sabatons": {
-        "name": "Coppermail Sabatons"
+        "name": "Sabaton Coppermail"
       },
       "coppermail_gauntlets": {
-        "name": "Coppermail Gauntlets"
+        "name": "Sarung Tangan Tembaga"
       },
       "ironlink_hauberk": {
-        "name": "Ironlink Hauberk"
+        "name": "Tautan Besi Hauberk"
       },
       "ironlink_legguards": {
-        "name": "Ironlink Legguards"
+        "name": "Pelindung Kaki Ironlink"
       },
       "ironlink_spaulders": {
-        "name": "Ironlink Spaulders"
+        "name": "Spaulder Tautan Besi"
       },
       "thoriumscale_greathelm": {
-        "name": "Thoriumscale Greathelm"
+        "name": "Greathelm Skala Thorium"
       },
       "thoriumscale_cuirass": {
-        "name": "Thoriumscale Cuirass"
+        "name": "Lapisan Lapisan Thorium"
       },
       "thoriumscale_leggings": {
-        "name": "Thoriumscale Leggings"
+        "name": "Celana Sisik Thorium"
       },
       "homespun_hood": {
-        "name": "Homespun Hood"
+        "name": "Hood tenunan sendiri"
       },
       "homespun_mitts": {
-        "name": "Homespun Mitts"
+        "name": "Sarung tangan tenunan sendiri"
       },
       "silverthread_slippers": {
-        "name": "Silverthread Slippers"
+        "name": "Sandal Benang Perak"
       },
       "goldweave_robe": {
-        "name": "Goldweave Robe"
+        "name": "Jubah Tenun Emas"
       },
       "goldweave_leggings": {
-        "name": "Goldweave Leggings"
+        "name": "Legging Tenun Emas"
       },
       "silkspun_satchel": {
-        "name": "Silkspun Satchel"
+        "name": "Tas tenun sutra"
       },
       "silkbinders_raiment": {
-        "name": "Silkbinder's Raiment"
+        "name": "Pakaian Pengikat Sutra"
       },
       "sunweave_mantle": {
-        "name": "Sunweave Mantle"
+        "name": "Mantel Tenun Matahari"
       },
       "sunweave_treads": {
-        "name": "Sunweave Treads"
+        "name": "Tapak Tenun Matahari"
       },
       "fenbridge_hide_leggings": {
-        "name": "Fenbridge Hide Leggings"
+        "name": "Celana Kulit Fenbridge"
       },
       "fenbridge_hide_boots": {
-        "name": "Fenbridge Hide Boots"
+        "name": "Sepatu Bot Kulit Fenbridge"
       },
       "fenbridge_hide_belt": {
-        "name": "Fenbridge Hide Belt"
+        "name": "Sabuk Kulit Fenbridge"
       },
       "marshstalker_jerkin": {
-        "name": "Marshstalker Jerkin"
+        "name": "Rompi Penguntit Rawa"
       },
       "marshstalker_hood": {
-        "name": "Marshstalker Hood"
+        "name": "Tudung Penguntit Rawa"
       },
       "marshstalker_spaulders": {
-        "name": "Marshstalker Spaulders"
+        "name": "Spaulder Marshstalker"
       },
       "mirewarden_jerkin": {
-        "name": "Mirewarden Jerkin"
+        "name": "Rompi Penjaga Rawa"
       },
       "mirewarden_leggings": {
-        "name": "Mirewarden Leggings"
+        "name": "Celana Penjaga Rawa"
       },
       "mirewarden_treads": {
-        "name": "Mirewarden Treads"
+        "name": "Tapak Mirewarden"
       },
       "pan_seared_perch": {
-        "name": "Pan-Seared River Perch"
+        "name": "Ikan Tenggeran Sungai Panggang"
       },
       "hunters_game_skewer": {
-        "name": "Hunter's Game Skewer"
+        "name": "Tusuk Sate Game Pemburu"
       },
       "herbed_marsh_pike": {
-        "name": "Herbed Marsh Pike"
+        "name": "Marsh Pike herba"
       },
       "ashwood_smoked_eel": {
-        "name": "Ashwood Smoked Eel"
+        "name": "Belut Asap Ashwood"
       },
       "goldleaf_game_stew": {
-        "name": "Goldleaf Game Stew"
+        "name": "Rebusan Permainan Daun Emas"
       },
       "frostgill_chowder": {
-        "name": "Frostgill Chowder"
+        "name": "Sup Frostgill"
       },
       "silvered_carp_supper": {
-        "name": "Silvered Carp Supper"
+        "name": "Perjamuan Ikan Mas Perak"
       },
       "anglers_feast_platter": {
-        "name": "Angler's Feast Platter"
+        "name": "Piring Pesta Pemancing"
       },
       "marlows_grand_roast": {
-        "name": "Marlow's Grand Roast"
+        "name": "Panggang Besar Marlow"
       },
       "silverleaf_healing_draught": {
-        "name": "Silverleaf Healing Draught"
+        "name": "Ramuan Penyembuhan Daun Perak"
       },
       "silverleaf_mana_draught": {
-        "name": "Silverleaf Mana Draught"
+        "name": "Ramuan Mana Daun Perak"
       },
       "elixir_of_the_boar": {
-        "name": "Elixir of the Boar"
+        "name": "Ramuan Babi Hutan"
       },
       "goldleaf_healing_draught": {
-        "name": "Goldleaf Healing Draught"
+        "name": "Ramuan Penyembuhan Daun Emas"
       },
       "goldleaf_mana_draught": {
-        "name": "Goldleaf Mana Draught"
+        "name": "Ramuan Mana Daun Emas"
       },
       "venomfire_elixir": {
-        "name": "Venomfire Elixir"
+        "name": "Ramuan Api Racun"
       },
       "sunpetal_healing_draught": {
-        "name": "Sunpetal Healing Draught"
+        "name": "Ramuan Penyembuhan Kelopak Matahari"
       },
       "sunpetal_mana_draught": {
-        "name": "Sunpetal Mana Draught"
+        "name": "Ramuan Mana Kelopak Matahari"
       },
       "elixir_of_the_serpent": {
-        "name": "Elixir of the Serpent"
+        "name": "Ramuan Ular"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
@@ -9718,34 +9720,34 @@ export const id_ID: EnTranslations = {
         "greeting": "Gunung tidak melupakan apa pun, {playerName}, dan aku pun tidak. Mari kita lihat apa saja yang telah kau lakukan."
       },
       "forgemistress_darva": {
-        "name": "Forgemistress Darva",
-        "title": "Master of the Forge",
-        "greeting": "The forge answers to me, {className}. Bring good ore and it will answer to you too."
+        "name": "Empu Tempa Darva",
+        "title": "Tuan Penempaan",
+        "greeting": "Bengkel menjawab saya, {className}. Bawalah bijih yang bagus dan itu akan menjawabmu juga."
       },
       "cook_marlow": {
-        "name": "Cook Marlow",
-        "title": "Master of the Kitchens",
-        "greeting": "Nothing leaves my kitchens half-cooked, {className}. Sit, eat, then get back out there."
+        "name": "Masak Marlow",
+        "title": "Tuan Dapur",
+        "greeting": "Tidak ada yang membuat dapur saya setengah matang, {className}. Duduk, makan, lalu kembali ke sana."
       },
       "weaver_ottilie": {
-        "name": "Weaver Ottilie",
-        "title": "Master of the Loom",
-        "greeting": "Mind the threads, {className}. A steady hand at the loom beats a strong one."
+        "name": "Penenun Ottilie",
+        "title": "Tuan Alat Tenun",
+        "greeting": "Perhatikan utasnya, {className}. Tangan yang mantap pada alat tenun mengalahkan tangan yang kuat."
       },
       "tinker_gizzel": {
-        "name": "Tinker Gizzel",
-        "title": "Master of the Toolworks",
-        "greeting": "Springs, sprockets, and sharp edges, {className}: the toolworks has whatever your hands lack."
+        "name": "Gizzel Tinker",
+        "title": "Ahli Perkakas",
+        "greeting": "Pegas, sproket, dan tepi tajam, {className}: alat ini memiliki segala kekurangan yang dimiliki tangan Anda."
       },
       "tanner_hesk": {
-        "name": "Tanner Hesk",
-        "title": "Master of the Tannery",
-        "greeting": "A hide is only as good as its tanning, {className}. The vats are ready when you are."
+        "name": "Penyamak Hesk",
+        "title": "Tuan Penyamakan Kulit",
+        "greeting": "Kulit hanya akan bagus jika penyamakannya, {className}. Tong sudah siap saat Anda siap."
       },
       "alchemist_verane": {
-        "name": "Alchemist Verane",
-        "title": "Master of the Apothecary",
-        "greeting": "Measure twice and pour once, {className}. The apothecary has no patience for spilled reagents."
+        "name": "Alkemis Verane",
+        "title": "Master Apoteker",
+        "greeting": "Ukur dua kali dan tuang sekali, {className}. Apoteker tidak mempunyai kesabaran terhadap reagen yang tumpah."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -10818,54 +10820,54 @@ export const id_ID: EnTranslations = {
         "body": "Kelompokmu menuntaskan ujian heroik saat kamu bertempur di barisan belakang atau telah tumbang. Penguncianmu juga tercatat, jadi bagian Tanda Heroik milikmu dikirim ke sini alih-alih hilang. Gunakan dengan baik.\n\n- Perbekal heroik"
       },
       "guild_trend_engineering_alchemy": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Engineering and Alchemy",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Engineering and Alchemy: charges measured and reagents weighed, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Bombardier in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Persatuan Perajin",
+        "subject": "Pekerjaan Anda di bidang Teknik dan Alkimia",
+        "body": "Perajin,\n\nKabar mengenai pekerjaan Anda di bidang Teknik dan Alkimia sampai ke Persekutuan: muatan diukur dan reagen ditimbang, kedua kerajinan saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Mereka yang mengikat pasangan ini mendapatkan nama Pembombardir pada waktunya. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin"
       },
       "guild_trend_alchemy_cooking": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Alchemy and Cooking",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Alchemy and Cooking: draughts simmered and dishes seasoned, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Apothecary in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Persatuan Perajin",
+        "subject": "Pekerjaan Anda di Alkimia dan Memasak",
+        "body": "Perajin,\n\nPersekutuan tersiar kabar tentang pekerjaanmu dalam Alkimia dan Memasak: ramuan direbus dan hidangan dibumbui, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Mereka yang mengikat pasangan ini mendapatkan nama Apoteker pada waktunya. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin"
       },
       "guild_trend_cooking_leatherworking": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Cooking and Leatherworking",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Cooking and Leatherworking: meals plated and hides cured, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Persatuan Perajin",
+        "subject": "Pekerjaan Anda di bidang Memasak dan Pengerjaan Kulit",
+        "body": "Perajin,\n\nKabar mengenai pekerjaan Anda di bidang Memasak dan Pengerjaan Kulit sampai ke Persekutuan: hidangan disajikan dan kulit disamak, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin"
       },
       "guild_trend_leatherworking_tailoring": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Leatherworking and Tailoring",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Leatherworking and Tailoring: leather cut and cloth hemmed, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Outfitter in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Persatuan Perajin",
+        "subject": "Pekerjaan Anda di bidang Pengerjaan Kulit dan Penjahitan",
+        "body": "Perajin,\n\nKabar sampai ke Persekutuan tentang pekerjaan Anda dalam Pengerjaan Kulit dan Penjahitan: potongan kulit dan pinggiran kain, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Mereka yang mengikat pasangan ini mendapatkan nama Penata Busana pada waktunya. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin"
       },
       "guild_trend_tailoring_inscription": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Tailoring and Inscription",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Tailoring and Inscription: seams stitched and glyphs inked, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Persatuan Perajin",
+        "subject": "Pekerjaan Anda dalam Menjahit dan Prasasti",
+        "body": "Perajin,\n\nKabar sampai ke Persatuan tentang pekerjaan Anda dalam Menjahit dan Prasasti: jahitan dijahit dan glif diberi tinta, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin"
       },
       "guild_trend_inscription_enchanting": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Inscription and Enchanting",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Inscription and Enchanting: scrolls lettered and charms woven, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Persatuan Perajin",
+        "subject": "Pekerjaan Anda dalam Prasasti dan Mempesona",
+        "body": "Perajin,\n\nKabar sampai ke Persatuan tentang karya Anda dalam Prasasti dan Mempesona: gulungan-gulungan berhuruf dan jimat-jimat yang ditenun, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin"
       },
       "guild_trend_enchanting_jewelcrafting": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Enchanting and Jewelcrafting",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Enchanting and Jewelcrafting: charms bound and stones polished, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Persatuan Perajin",
+        "subject": "Pekerjaan Anda di Mempesona dan Kerajinan Perhiasan",
+        "body": "Perajin,\n\nKabar sampai ke Persekutuan tentang pekerjaan Anda dalam Mempesona dan Kerajinan Perhiasan: jimat diikat dan batu dipoles, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin"
       },
       "guild_trend_jewelcrafting_weaponcrafting": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Jewelcrafting and Weaponcrafting",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Jewelcrafting and Weaponcrafting: gems seated and edges ground, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Persatuan Perajin",
+        "subject": "Pekerjaan Anda di bidang Pembuatan Perhiasan dan Pembuatan Senjata",
+        "body": "Perajin,\n\nKabar sampai ke Persekutuan tentang pekerjaan Anda dalam Pembuatan Perhiasan dan Pembuatan Senjata: permata diletakkan dan ujungnya diratakan, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin"
       },
       "guild_trend_weaponcrafting_armorcrafting": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Weaponcrafting and Armorcrafting",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Weaponcrafting and Armorcrafting: blades tempered and plates fitted, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Smith in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Persatuan Perajin",
+        "subject": "Pekerjaan Anda di Pembuatan Senjata dan Pembuatan Zirah",
+        "body": "Perajin,\n\nKabar sampai ke Persekutuan tentang pekerjaan Anda dalam Pembuatan Senjata dan Pembuatan Zirah: bilahnya ditempa dan pelat dipasang, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Mereka yang mengikat pasangan ini mendapatkan nama Pandai Besi pada waktunya. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin"
       },
       "guild_trend_armorcrafting_engineering": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Armorcrafting and Engineering",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Armorcrafting and Engineering: plates riveted and gears trued, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Persatuan Perajin",
+        "subject": "Pekerjaan Anda di bidang Pembuatan Zirah dan Teknik",
+        "body": "Perajin,\n\nKabar sampai ke Persekutuan tentang pekerjaan Anda di bidang Pembuatan Zirah dan Teknik: pelat-pelat dipaku dan roda gigi dipasang, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin"
       }
     },
     "itemSets": {

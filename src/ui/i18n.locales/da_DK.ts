@@ -33,8 +33,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     'Kalder en isstorm ned over målområdet i 6 sek., gør {damage} Frost-skade hvert sekund og sætter fjenders hast ned med 40%. Hver fjende ramt reducerer Frozen Orb med 0,5 sek., op til 3 sek. pr. kast. (Frost)',
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    'Rimlanse har 20% chance for at gøre dit næste Winterlash øjeblikkeligt, 30% hårdere og fri for dets nedkøling. (Frost)',
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     'Hold for at samle et stadig bredere åndedrag af flammer, og slip det derefter i en kegle. Længere opladning rækker længere og gør mere skade. Fjender ramt bliver desorienterede og skade afbryder effekten; maksimal opladning rammer altid kritisk og tæller én gang mod Hed Stime. (Ild)',
@@ -45,11 +43,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Forvandl dig til en brændende glød og forøg bevægelseshastighed med {buff}%. Du kan ikke angribe eller kaste trolddom, mens du er forvandlet. Genudkast for at vende tilbage til din normale form.',
   'entities.abilities.fireball_form.name': 'Ember Form',
-  'entities.abilities.flurry.description':
-    'Affyr tre ispile der gør {damage} Frost-skade hver og påfører Vinterkulden på målet: dets næste 2 indkommende kompatible trolddomme behandler det som frosset. Brain Freeze gør Winterlash øjeblikkeligt, 30% hårdere og springer dets nedkøling over. (Frost)',
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    'Udslip en kugle af hvirvlende frost, der driver fremad i 8 sek. og gør {damage} Frost-skade hvert sekund på nærliggende fjender og sætter dem ned med 30%. Dens slag genererer Fingers of Frost. (Frost)',
   'entities.abilities.frozen_orb.name': 'Frozen Orb',
   'entities.abilities.glacial_front.description':
     'Hold for at samle en stadig bredere front af frost, og slip den derefter i en kegle. Længere opladning rækker længere og gør mere skade. Alle fjender ramt sættes ned med 50% i 4 sek.; maksimal opladning rodfæster dem også i 1 sek. (Frost)',
@@ -63,8 +57,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.description':
     'Grib dit perfekte øjeblik: få øjeblikkeligt 4 Arkane Ladninger, og i 10 sek. bruger Æterpile dem ikke. (Kronomantik)',
   'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.description':
-    'Dine trolddomme får 50% kritisk chance mod frosne mål, og disse kritiske slag gør 20% mere skade. Fingers of Frost og Vinterkulden tæller som frosset. (Frost)',
   'entities.abilities.shatter.name': 'Brittle Ruin',
   'entities.abilities.temporal_acceleration.description':
     'Fremskynder tidens gang for din gruppe eller raid og øger angrebshastighed, kastetempo og kanaliseringstempo med 30% i 15 sek. Allierede der for nylig blev påvirkede af Temporal Acceleration eller Krigstrommer er for udmattede til at have gavn af det. (Kronomantik)',
@@ -123,16 +115,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Teleporterer dig en kort afstand fremad og bryder rodfæstning ved udgangen.',
   'guide.abilityHook.blizzard':
     'Dækker et område med is for at nedslide og sætte farten ned på en hel flok.',
-  'guide.abilityHook.brain_freeze':
-    'Dine frostpile gør sommetider dit næste Winterlash øjeblikkeligt og hårdere.',
   'guide.abilityHook.fingers_of_frost':
     'Dine frostpile styrker sommetider en Ice Lance til at ramme, som om målet var frosset.',
   'guide.abilityHook.fireball_form':
     'Bliv til en levende glød for at krydse åbent terræn med høj hastighed.',
   'guide.abilityHook.flurry':
     'Tre hurtige pile der køler målet, så dine næste frostramninger lander, som om det var frosset.',
-  'guide.abilityHook.frozen_orb':
-    'Ruller en langsom kugle gennem flokken, der køler alt ned og giver dine frostudløsere næring.',
   'guide.abilityHook.ice_lance':
     'En øjeblikkelig skarv til at bruge frostudløsere, den rammer langt hårdere mod et frosset mål.',
   'guide.abilityHook.shatter': 'Dine trolddomme får langt oftere kritisk chance mod frosne mål.',
@@ -8191,4 +8179,268 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.mouseoverCast': 'Museover-kast på grupperammer',
   'hudChrome.options.showTargetOfTarget': 'Vis målets mål',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Målets Mål',
+  'itemUi.market.rarityLegendary': 'Legendarisk',
+  'loading.reconnectingAttempt':
+    'Forbindelse mistet. Genopretter forbindelse... (forsøg {attempt}/{maxAttempts}, prøver igen om {seconds}s)',
+  'loading.reconnectingNow':
+    'Forbindelse mistet. Genopretter forbindelse nu... (forsøg {attempt}/{maxAttempts})',
+  'loading.slowConnection': 'Dette tager længere tid end normalt. Tjek din internetforbindelse.',
+  'delveUi.shop.buyConfirmAccept': 'Køb',
+  'delveUi.shop.buyConfirmBody':
+    'Køb {item} for {marks} Delve-Mærker? Køb med mærker kan ikke refunderes.',
+  'delveUi.shop.buyConfirmCancel': 'Annuller',
+  'delveUi.shop.buyConfirmTitle': 'Bekræft køb',
+  'entities.abilities.brain_freeze.description':
+    'Rimlanse har 20 % chance for at gøre din næste Winterlash øjeblikkelig og fri for dens nedkøling. (Frost)',
+  'entities.abilities.flurry.description':
+    'Affyr tre iskolde projektiler, der hver giver {damage} frostskade, og påfør målet Vinterkulde: de næste 2 kompatible besværgelser mod det behandler det som frossent. Brain Freeze gør Winterlash øjeblikkelig og springer dens nedkøling over. (Frost)',
+  'entities.abilities.frozen_orb.description':
+    'Slip en kule af hvirvlende frost, der driver fremad i 8 sekunder, og giver {damage} frostskade hvert sekund til nærliggende fjender og bremser dem med 30%. Hver slående puls genererer en istap. (Frost)',
+  'entities.abilities.shatter.description':
+    'Dine besværgelser får 50 % chance for kritiske træffere mod frosne mål. Fingers of Frost og Vinterkulde tæller som frosne. (Frost)',
+  'entities.items.anglers_feast_platter.name': 'Lystfiskerfestfad',
+  'entities.items.arcanite_war_axe.name': 'Arkanitkrigsøkse',
+  'entities.items.ashwood_smoked_eel.name': 'Asketræ røget ål',
+  'entities.items.cooking_salt.name': 'Madlavningssalt',
+  'entities.items.copper_bearded_axe.name': 'Kobberskægøkse',
+  'entities.items.copper_flanged_mace.name': 'Kobberflanget stridskølle',
+  'entities.items.copper_ore.name': 'Kobbermalm',
+  'entities.items.coppermail_gauntlets.name': 'Kobberbrynjehandsker',
+  'entities.items.coppermail_sabatons.name': 'Kobberbrynjestøvler',
+  'entities.items.elderwood_battle_staff.name': 'Olderskovs kampstav',
+  'entities.items.elixir_of_the_boar.name': 'Ornes eliksir',
+  'entities.items.elixir_of_the_serpent.name': 'Slangens eliksir',
+  'entities.items.fenbridge_hide_belt.name': 'Fenbridge-læderbælte',
+  'entities.items.fenbridge_hide_boots.name': 'Fenbridge-læderstøvler',
+  'entities.items.fenbridge_hide_leggings.name': 'Fenbridge-læderbukser',
+  'entities.items.frostgill_chowder.name': 'Frostgællesuppe',
+  'entities.items.game_meat.name': 'Vildt kød',
+  'entities.items.glass_vial.name': 'Hætteglas af glas',
+  'entities.items.goldleaf_game_stew.name': 'Guldblads vildtgryde',
+  'entities.items.goldleaf_healing_draught.name': 'Guldblads helbredelsesdrik',
+  'entities.items.goldleaf_mana_draught.name': 'Guldblads manadrik',
+  'entities.items.goldweave_leggings.name': 'Guldvævede bukser',
+  'entities.items.goldweave_robe.name': 'Guldvævet kappe',
+  'entities.items.herbed_marsh_pike.name': 'Krydret mosegedde',
+  'entities.items.homespun_cloth.name': 'Hjemmespundet klæde',
+  'entities.items.homespun_hood.name': 'Hjemmespundet hætte',
+  'entities.items.homespun_mitts.name': 'Hjemmespundne luffer',
+  'entities.items.hunters_game_skewer.name': 'Jægerens vildtspyd',
+  'entities.items.iron_ore.name': 'Jernmalm',
+  'entities.items.ironbark_boar_spear.name': 'Jernbarks ornespyd',
+  'entities.items.ironbark_log.name': 'Jernbarkstamme',
+  'entities.items.ironedge_longsword.name': 'Jernægget langsværd',
+  'entities.items.ironlink_hauberk.name': 'Jernledsbrynje',
+  'entities.items.ironlink_legguards.name': 'Jernledsbenbeskyttere',
+  'entities.items.ironlink_spaulders.name': 'Jernledsskulderplader',
+  'entities.items.ironshod_maul.name': 'Jernbeslået stridshammer',
+  'entities.items.marlows_grand_roast.name': 'Marlows feststeg',
+  'entities.items.marshstalker_hood.name': 'Marskjægerhætte',
+  'entities.items.marshstalker_jerkin.name': 'Marskjægerjakke',
+  'entities.items.marshstalker_spaulders.name': 'Marskjægerskulderplader',
+  'entities.items.mirewarden_jerkin.name': 'Mosevogterjakke',
+  'entities.items.mirewarden_leggings.name': 'Mosevogterbukser',
+  'entities.items.mirewarden_treads.name': 'Mosevogterstøvler',
+  'entities.items.pan_seared_perch.name': 'Pandesteget flodaborre',
+  'entities.items.prime_cut.name': 'Førsteklasses udskæring',
+  'entities.items.pristine_hide.name': 'Uberørt skind',
+  'entities.items.pristine_silk.name': 'Uberørt silke',
+  'entities.items.pristine_venom_gland.name': 'Uberørt giftkirtel',
+  'entities.items.riveted_copper_girdle.name': 'Nittet kobberbælte',
+  'entities.items.rough_hide.name': 'Groft skind',
+  'entities.items.silkbinders_raiment.name': 'Silkebinderdragt',
+  'entities.items.silkspun_satchel.name': 'Silkespundet taske',
+  'entities.items.silvered_carp_supper.name': 'Middag af sølvkarpe',
+  'entities.items.silverleaf_healing_draught.name': 'Sølvblads helbredelsesdrik',
+  'entities.items.silverleaf_herb.name': 'Sølvbladsurt',
+  'entities.items.silverleaf_mana_draught.name': 'Sølvblads manadrik',
+  'entities.items.silverthread_slippers.name': 'Hjemmesko med sølvtråd',
+  'entities.items.smithing_flux.name': 'Smedefluss',
+  'entities.items.spider_silk.name': 'Edderkoppesilke',
+  'entities.items.spool_of_thread.name': 'Trådspole',
+  'entities.items.sunpetal_healing_draught.name': 'Solblads helbredelsesdrik',
+  'entities.items.sunpetal_mana_draught.name': 'Solblads manadrik',
+  'entities.items.sunweave_mantle.name': 'Solvævet skulderkappe',
+  'entities.items.sunweave_treads.name': 'Solvævede støvler',
+  'entities.items.tanning_agent.name': 'Garvemiddel',
+  'entities.items.thorium_warblade.name': 'Thoriumkrigsklinge',
+  'entities.items.thoriumscale_cuirass.name': 'Thoriumskælbrystplade',
+  'entities.items.thoriumscale_greathelm.name': 'Thoriumskæl-storhjelm',
+  'entities.items.thoriumscale_leggings.name': 'Thoriumskæl-benklæder',
+  'entities.items.venom_gland.name': 'Giftkirtel',
+  'entities.items.venomfire_elixir.name': 'Giftildseliksir',
+  'entities.items.whetted_iron_dirk.name': 'Slebet jerndolk',
+  'entities.letters.guild_trend_alchemy_cooking.body':
+    'håndværker,\n\nOrd når lauget af dit arbejde i Alkymi og madlavning: bryg simrede og retter krydret, de to håndværk nærer hinanden. Nabohåndværk, der arbejdes sammen, markerer en hånd, der er klar til afstemning. De, der binder dette par, får navnet apoteker med tiden. Opsøg Smed Haldren, rustningsmanden fra Eastbrook: han taler for mestrene for nu. Bevis dit håndværk for ham med arbejde af dine egne hænder, og han vil se dine to hovedfag afstemt.\n\nMed venlig hilsen,\nHåndværkerlauget',
+  'entities.letters.guild_trend_alchemy_cooking.sender': 'Håndværkerlauget',
+  'entities.letters.guild_trend_alchemy_cooking.subject': 'Dit arbejde med alkymi og madlavning',
+  'entities.letters.guild_trend_armorcrafting_engineering.body':
+    'håndværker,\n\nBud når lauget af dit arbejde inden for rustning og teknik: plader nittet og tandhjul justeret, de to håndværk nærer hinanden. Nabohåndværk, der arbejdes sammen, markerer en hånd, der er klar til afstemning. Opsøg Smed Haldren, rustningsmanden fra Eastbrook: han taler for mestrene for nu. Bevis dit håndværk for ham med arbejde af dine egne hænder, og han vil se dine to hovedfag afstemt.\n\nMed venlig hilsen,\nHåndværkerlauget',
+  'entities.letters.guild_trend_armorcrafting_engineering.sender': 'Håndværkerlauget',
+  'entities.letters.guild_trend_armorcrafting_engineering.subject':
+    'Dit arbejde inden for rustning og teknik',
+  'entities.letters.guild_trend_cooking_leatherworking.body':
+    'håndværker,\n\nBud når lauget af dit arbejde i madlavning og læderbearbejdning: måltider anrettet og skind garvet, de to håndværk fodrer hinanden. Nabohåndværk, der arbejdes sammen, markerer en hånd, der er klar til afstemning. Opsøg Smed Haldren, rustningsmanden fra Eastbrook: han taler for mestrene for nu. Bevis dit håndværk for ham med arbejde af dine egne hænder, og han vil se dine to hovedfag afstemt.\n\nMed venlig hilsen,\nHåndværkerlauget',
+  'entities.letters.guild_trend_cooking_leatherworking.sender': 'Håndværkerlauget',
+  'entities.letters.guild_trend_cooking_leatherworking.subject':
+    'Dit arbejde inden for madlavning og læderbearbejdning',
+  'entities.letters.guild_trend_enchanting_jewelcrafting.body':
+    'håndværker,\n\nBud når lauget af dit arbejde i fortryllelse og juvelslibning: amuletter bundet og sten poleret, de to håndværk nærer hinanden. Nabohåndværk, der arbejdes sammen, markerer en hånd, der er klar til afstemning. Opsøg Smed Haldren, rustningsmanden fra Eastbrook: han taler for mestrene for nu. Bevis dit håndværk for ham med arbejde af dine egne hænder, og han vil se dine to hovedfag afstemt.\n\nMed venlig hilsen,\nHåndværkerlauget',
+  'entities.letters.guild_trend_enchanting_jewelcrafting.sender': 'Håndværkerlauget',
+  'entities.letters.guild_trend_enchanting_jewelcrafting.subject':
+    'Dit arbejde med fortryllende og smykkekunst',
+  'entities.letters.guild_trend_engineering_alchemy.body':
+    'håndværker,\n\nBud når lauget af dit arbejde inden for teknik og alkymi: ladninger målt og reagenser vejet, de to håndværk fodrer hinanden. Nabohåndværk, der arbejdes sammen, markerer en hånd, der er klar til afstemning. De, der binder dette par, får navnet bombardér med tiden. Opsøg Smed Haldren, rustningsmanden fra Eastbrook: han taler for mestrene for nu. Bevis dit håndværk for ham med arbejde af dine egne hænder, og han vil se dine to hovedfag afstemt.\n\nMed venlig hilsen,\nHåndværkerlauget',
+  'entities.letters.guild_trend_engineering_alchemy.sender': 'Håndværkerlauget',
+  'entities.letters.guild_trend_engineering_alchemy.subject':
+    'Dit arbejde inden for teknik og alkymi',
+  'entities.letters.guild_trend_inscription_enchanting.body':
+    'håndværker,\n\nBud når lauget af dit arbejde i inskription og fortryllelse: ruller med bogstaver og amuletter vævet, de to håndværk nærer hinanden. Nabohåndværk, der arbejdes sammen, markerer en hånd, der er klar til afstemning. Opsøg Smed Haldren, rustningsmanden fra Eastbrook: han taler for mestrene for nu. Bevis dit håndværk for ham med arbejde af dine egne hænder, og han vil se dine to hovedfag afstemt.\n\nMed venlig hilsen,\nHåndværkerlauget',
+  'entities.letters.guild_trend_inscription_enchanting.sender': 'Håndværkerlauget',
+  'entities.letters.guild_trend_inscription_enchanting.subject':
+    'Dit arbejde i inskription og fortryllelse',
+  'entities.letters.guild_trend_jewelcrafting_weaponcrafting.body':
+    'håndværker,\n\nBud når lauget af dit arbejde i juvelslibning og våbenarbejde: ædelstene siddende og kanter slebet, de to håndværk nærer hinanden. Nabohåndværk, der arbejdes sammen, markerer en hånd, der er klar til afstemning. Opsøg Smed Haldren, rustningsmanden fra Eastbrook: han taler for mestrene for nu. Bevis dit håndværk for ham med arbejde af dine egne hænder, og han vil se dine to hovedfag afstemt.\n\nMed venlig hilsen,\nHåndværkerlauget',
+  'entities.letters.guild_trend_jewelcrafting_weaponcrafting.sender': 'Håndværkerlauget',
+  'entities.letters.guild_trend_jewelcrafting_weaponcrafting.subject':
+    'Dit arbejde i juvelslibning og våbenarbejde',
+  'entities.letters.guild_trend_leatherworking_tailoring.body':
+    'håndværker,\n\nBud når lauget af dit arbejde i læderbearbejdning og skrædderarbejde: læder skåret og stofsømt, de to håndværk nærer hinanden. Nabohåndværk, der arbejdes sammen, markerer en hånd, der er klar til afstemning. De, der binder dette par, får navnet udstyrsmager i tide. Opsøg Smed Haldren, rustningsmanden fra Eastbrook: han taler for mestrene for nu. Bevis dit håndværk for ham med arbejde af dine egne hænder, og han vil se dine to hovedfag afstemt.\n\nMed venlig hilsen,\nHåndværkerlauget',
+  'entities.letters.guild_trend_leatherworking_tailoring.sender': 'Håndværkerlauget',
+  'entities.letters.guild_trend_leatherworking_tailoring.subject':
+    'Dit arbejde inden for læderbearbejdning og skrædderarbejde',
+  'entities.letters.guild_trend_tailoring_inscription.body':
+    'håndværker,\n\nBud når lauget af dit arbejde i skrædderarbejdeet og inskription: sømme syet og glyffer sværtet, de to håndværk nærer hinanden. Nabohåndværk, der arbejdes sammen, markerer en hånd, der er klar til afstemning. Opsøg Smed Haldren, rustningsmanden fra Eastbrook: han taler for mestrene for nu. Bevis dit håndværk for ham med arbejde af dine egne hænder, og han vil se dine to hovedfag afstemt.\n\nMed venlig hilsen,\nHåndværkerlauget',
+  'entities.letters.guild_trend_tailoring_inscription.sender': 'Håndværkerlauget',
+  'entities.letters.guild_trend_tailoring_inscription.subject':
+    'Dit arbejde inden for skrædderarbejde og indskrivning',
+  'entities.letters.guild_trend_weaponcrafting_armorcrafting.body':
+    'håndværker,\n\nBud når lauget af dit arbejde i våben- og panserarbejde: klinger hærdet og plader monteret, de to håndværk nærer hinanden. Nabohåndværk, der arbejdes sammen, markerer en hånd, der er klar til afstemning. De, der binder dette par, får navnet smed med tiden. Opsøg Smed Haldren, rustningsmanden fra Eastbrook: han taler for mestrene for nu. Bevis dit håndværk for ham med arbejde af dine egne hænder, og han vil se dine to hovedfag afstemt.\n\nMed venlig hilsen,\nHåndværkerlauget',
+  'entities.letters.guild_trend_weaponcrafting_armorcrafting.sender': 'Håndværkerlauget',
+  'entities.letters.guild_trend_weaponcrafting_armorcrafting.subject':
+    'Dit arbejde inden for våben- og rustningsarbejde',
+  'entities.npcs.alchemist_verane.greeting':
+    'Mål to gange og hæld én gang, {className}. Apotekeren har ingen tålmodighed med spildte reagenser.',
+  'entities.npcs.alchemist_verane.name': 'Alkymisten Verane',
+  'entities.npcs.alchemist_verane.title': 'Apothekermester',
+  'entities.npcs.cook_marlow.greeting':
+    'Intet efterlader mit køkken halvt tilberedt, {className}. Sid, spis, og kom så derud igen.',
+  'entities.npcs.cook_marlow.name': 'Kok Marlow',
+  'entities.npcs.cook_marlow.title': 'Køkkenmesteren',
+  'entities.npcs.forgemistress_darva.greeting':
+    'Smedjen svarer mig, {className}. Medbring god malm, og det vil også svare dig.',
+  'entities.npcs.forgemistress_darva.name': 'Smedemester Darva',
+  'entities.npcs.forgemistress_darva.title': 'Smedjens mester',
+  'entities.npcs.tanner_hesk.greeting':
+    'Et skind er kun så godt som dets garvning, {className}. Karene er klar, når du er.',
+  'entities.npcs.tanner_hesk.name': 'Garver Hesk',
+  'entities.npcs.tanner_hesk.title': 'Garveriets mester',
+  'entities.npcs.tinker_gizzel.greeting':
+    'Fjedre, tandhjul og skarpe kanter, {className}: værktøjsværket har, hvad dine hænder mangler.',
+  'entities.npcs.tinker_gizzel.name': 'Tinker Gizel',
+  'entities.npcs.tinker_gizzel.title': 'Mester af værktøjsværket',
+  'entities.npcs.weaver_ottilie.greeting':
+    'Pas på trådene, {className}. En fast hånd ved væven slår en stærk.',
+  'entities.npcs.weaver_ottilie.name': 'Væver Ottilie',
+  'entities.npcs.weaver_ottilie.title': 'Vævens mester',
+  'gatherEvent.ancientHeartwood': '{finder} fældet et gammelt kernetræ!',
+  'gatherEvent.moonlitBloom': '{finder} opdagede en måneskin opblomstring!',
+  'gatherEvent.pristineVein': '{finder} ramte en uberørt åre!',
+  'guide.abilityHook.brain_freeze':
+    'Dine frostbolte gør nogle gange den næste Winterlash øjeblikkelig og springer dens nedkøling over.',
+  'guide.abilityHook.frozen_orb':
+    'Ruller en langsom kugle gennem flokken, som nedkøler fjender og oplagrer istapper.',
+  'heroicShop.buyConfirmAccept': 'Køb',
+  'heroicShop.buyConfirmBody':
+    'Køb {item} for {marks} Heroiske Mærker? Køb med mærker kan ikke refunderes.',
+  'heroicShop.buyConfirmCancel': 'Annuller',
+  'heroicShop.buyConfirmTitle': 'Bekræft køb',
+  'hudChrome.crafting.comboTierUnmetNamed': 'Hæv {crafts} til niveau {tier}.',
+  'hudChrome.crafting.difficultyFull': 'Fuld færdighedsforøgelse',
+  'hudChrome.crafting.difficultyNone': 'Ingen færdighedsforøgelse',
+  'hudChrome.crafting.difficultyReduced': 'Reduceret færdighedsforøgelse',
+  'hudChrome.crafting.enchantedLine': 'Fortryllet',
+  'hudChrome.crafting.makersMark': 'Udformet af {name}',
+  'hudChrome.crafting.masterworkSeal': 'Mesterværk',
+  'hudChrome.crafting.masterworkToast': 'Mesterværk! {name}',
+  'hudChrome.crafting.masterworkZoneLine': '{crafter} lavede et mesterværk {name}!',
+  'hudChrome.crafting.skillReqLine': 'Kræver {craft} {skill}',
+  'hudChrome.crafting.stationBadge': 'Station',
+  'hudChrome.crafting.stationName.apothecary': 'Apoteker',
+  'hudChrome.crafting.stationName.forge': 'Smedje',
+  'hudChrome.crafting.stationName.kitchens': 'Køkkener',
+  'hudChrome.crafting.stationName.loom': 'væv',
+  'hudChrome.crafting.stationName.tannery': 'Garveri',
+  'hudChrome.crafting.stationName.toolworks': 'Værktøjsværker',
+  'hudChrome.crafting.stationOutOfRangeNamed': 'Flyt til {station} for at lave dette.',
+  'hudChrome.crafting.stationRequired': 'Du skal være ved {station} for at lave det.',
+  'hudChrome.crafting.tierUpToast': '{craft} avanceret til niveau {tier}!',
+  'hudChrome.death.healerConfirmAccept': 'Genopliv mig',
+  'hudChrome.death.healerConfirmBody':
+    'Den Blege Vogter genopliver dig her, men Vogterens Klokke reducerer alle dine egenskaber med 75 % i op til 10 minutter på højere niveauer. Går du som ånd tilbage til dit lig, genoplives du uden straf.',
+  'hudChrome.death.healerConfirmCancel': 'Annuller',
+  'hudChrome.death.healerConfirmTitle': 'Vil du acceptere Vogterens Klokke?',
+  'hudChrome.gathering.gatherLine': 'Du samler: {name}.',
+  'hudChrome.gathering.gatherLineQty': 'Du samler: {name} x{qty}.',
+  'hudChrome.mobile.professions': 'Erhverv',
+  'hudChrome.options.showThirdActionBar': 'Vis tredje handlingslinje',
+  'hudChrome.playerMenu.streamerBadgeTitle': 'Verificeret streamer',
+  'hudChrome.professions.ceilingCommon': 'Almindelig begrænsning',
+  'hudChrome.professions.ceilingRare': 'Sjælden begrænsning',
+  'hudChrome.professions.ceilingUnlimited': 'Ingen forstærkningsbegrænsning',
+  'hudChrome.professions.close': 'Luk erhverv',
+  'hudChrome.professions.ctaHeader': 'Næste skridt',
+  'hudChrome.professions.ctaRaise':
+    'Fortsæt med at hæve {craft}: {points} point mere til næste niveau.',
+  'hudChrome.professions.ctaStart':
+    'Fremstil eller indsaml med et hvilket som helst erhverv for at begynde.',
+  'hudChrome.professions.gatheringHeader': 'Indsamling',
+  'hudChrome.professions.hobbyLabel': 'Hobby: {craft}',
+  'hudChrome.professions.identityHeader': 'Identitet',
+  'hudChrome.professions.majorsLabel': 'Hovedfag: {a} og {b}',
+  'hudChrome.professions.nextUnlockMax': 'Ved maksimal dygtighed',
+  'hudChrome.professions.nextUnlockSpecialized':
+    '{points} point til Specialiseret: materialeomkostningerne falder',
+  'hudChrome.professions.nextUnlockTier':
+    '{points} point til næste niveau: mesterværk odds forbedres',
+  'hudChrome.professions.nudgeDormant': 'Din {craft} viden ligger i dvale',
+  'hudChrome.professions.nudgeNearTier': '{craft}: {points} point fra næste niveau',
+  'hudChrome.professions.pairsHeld': 'Afholdte par: {count}',
+  'hudChrome.professions.perkSpecializedAt': 'Specialiseret i {threshold} færdigheder',
+  'hudChrome.professions.perkSpecializedLine':
+    '{craft}: Specialiseret, materialeomkostninger -{pct}%',
+  'hudChrome.professions.perksHeader': 'Frynsegoder',
+  'hudChrome.professions.returnsLabel': 'Returnerer: {count}',
+  'hudChrome.professions.ringAria': 'Håndværkshjul',
+  'hudChrome.professions.roleDormant': 'Inaktiv viden',
+  'hudChrome.professions.roleHobby': 'Hobby',
+  'hudChrome.professions.roleMajor': 'Hovedfag',
+  'hudChrome.professions.roleUnattuned': 'Ikke indstillet',
+  'hudChrome.professions.skillValue': '{skill} / {max}',
+  'hudChrome.professions.skillsHeader': 'Håndværksfærdigheder',
+  'hudChrome.professions.switchCost': 'Næste arketypeskift koster {cost} bodspoint',
+  'hudChrome.professions.syncing': 'Venter på dine professionsdata fra riget.',
+  'hudChrome.professions.tierPipAria': 'Niveau {tier}',
+  'hudChrome.professions.title': 'Erhverv',
+  'hudChrome.professions.tutorialLine':
+    'Opnå {target} færdigheder i ethvert håndværk for at låse op for dit første niveau.',
+  'hudChrome.professions.unattunedIdentity':
+    'Du er endnu ikke indstillet på en arketype. Hæv dit håndværk og fuldfør en afstemning for at vælge dit par.',
+  'hudChrome.training.alreadyKnown': 'Den opskrift kender du allerede.',
+  'hudChrome.training.cannotAfford': 'Du har ikke råd til den træning.',
+  'hudChrome.training.close': 'Luk træning',
+  'hudChrome.training.dialogOption': 'Uddannelse',
+  'hudChrome.training.dialogOptionAria': 'Gennemse træning fra {name}',
+  'hudChrome.training.empty': 'Denne mester har intet at lære.',
+  'hudChrome.training.free': 'Gratis',
+  'hudChrome.training.learned': 'Opskrift lært: {recipe}',
+  'hudChrome.training.notTaughtHere': 'Den opskrift er ikke undervist her.',
+  'hudChrome.training.outOfRange': 'Du skal være på stationen for at træne.',
+  'hudChrome.training.requirement': 'Undervist på {craft} {skill}',
+  'hudChrome.training.stateKnown': 'Kendt',
+  'hudChrome.training.stateLocked': 'Låst',
+  'hudChrome.training.stateTeachable': 'Tilgængelig',
+  'hudChrome.training.tierUnmet': 'Du skal bruge {craft} {skill} for at lære den opskrift.',
+  'hudChrome.training.title': 'Træning: {name}',
+  'hudChrome.training.trainAria': 'Lær {name} for {fee}',
 };

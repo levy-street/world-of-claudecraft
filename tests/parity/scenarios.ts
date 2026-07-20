@@ -5,6 +5,7 @@
 //  - multiple classes:        warrior / mage / rogue / hunter / warlock / paladin
 //  - meleeSwing weaponStrike:  heroic_strike (warrior), sinister_strike (rogue)
 //  - auto-attack + mobSwing:   solo_warrior (mob swings back)
+//  - frost proc draw order:    frost_proc_orb (Frozen Orb pulses + one proc-producing frostbolt)
 //  - frenzy + on-hit affix:    affix_mob (old_greyjaw frenzyOnHit + ridge_stalker bleed)
 //  - mob-swing affix cascade:  mob_swing_affixes (stun/venom/silence/rampage + friendly-pet short-circuit, M3)
 //  - pets:                     hunter_pet (updateRangedPetAttack), warlock_pet (mobSwing pet arm + applyTaunt)
@@ -173,6 +174,55 @@ function soloMage(): Scenario {
         rec.tick(16);
         face(p, mob);
       }
+    },
+  };
+}
+
+// Committed-Frost draw coverage: Frozen Orb reaches its pulse damage and Icicle
+// path, then the seed-pinned Rimelance impact grants both random procs. The
+// shared-rng digest therefore catches either proc draw moving or disappearing.
+function frostProcOrb(): Scenario {
+  return {
+    name: 'frost_proc_orb',
+    coverage: [
+      'class:mage (committed frost)',
+      'Frozen Orb pulse damage + Icicle generation',
+      'Fingers of Frost proc draw from frostbolt',
+      'Brain Freeze proc draw from frostbolt',
+    ],
+    build: () => new Sim({ seed: 43, playerClass: 'mage', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      sim.setPlayerLevel(20);
+      sim.setSpec('frost');
+      const p = sim.player as AnyEntity;
+      const mob = spawnMob(sim, 'training_dummy', 20, p.pos.x, p.pos.y, p.pos.z + 4);
+      beef(mob, 500000);
+      mob.aiState = 'idle';
+      rec.track(mob.id);
+      face(p, mob);
+      sim.targetEntity(mob.id);
+
+      p.resource = p.maxResource;
+      sim.castAbility('frozen_orb');
+      rec.tick(30);
+
+      p.gcdRemaining = 0;
+      p.resource = p.maxResource;
+      sim.castAbility('frostbolt');
+      for (let tick = 0; tick < 100; tick++) {
+        const events = rec.tick(1);
+        if (p.auras.some((aura) => aura.kind === 'fingers_of_frost')) {
+          rec.notes.sawFingersOfFrost = true;
+        }
+        if (p.auras.some((aura) => aura.kind === 'brain_freeze')) {
+          rec.notes.sawBrainFreeze = true;
+        }
+        if (events.some((event) => event.type === 'damage' && event.ability === 'Rimelance')) {
+          break;
+        }
+      }
+      rec.snapshot('frost-procs');
     },
   };
 }
@@ -4356,6 +4406,7 @@ function professionsGather(seed = 3): Scenario {
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
+  frostProcOrb(),
   soloRogue(),
   affixMob(),
   mobSwingAffixes(),

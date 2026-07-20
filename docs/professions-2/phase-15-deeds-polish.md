@@ -4,7 +4,11 @@ This phase closes the Professions 2.0 packet. It registers the basic universal p
 (cosmetic only, per the locked decision in `state.md`), replaces the placeholder tuning targets
 with the maintainer's final numbers in named constants, rewrites the `/wiki` professions page so
 the guide describes the system that actually shipped, finishes the `asset-manifest.json` designer
-handoff, and then runs the whole-feature QA matrix plus the release gate. It is its own slice
+handoff, and then runs the whole-feature QA matrix plus the release gate. The 2026-07-20
+amendments add the profession SFX completion sweep (the placeholder clips Phase 12b sanctioned
+are replaced or explicitly re-filed on the help-wanted issue #2208), require the rare-fish deed
+to celebrate through the Phase 12b bite moment, and point the legacy junk-recipe burn-down at
+the Phase 13 typed-reagent consumers. It is its own slice
 because every earlier phase must be landed before deeds can trigger on real behavior, tuning can
 be judged against the live system, and the wiki can tell the truth.
 
@@ -27,6 +31,10 @@ be judged against the live system, and the wiki can tell the truth.
   throttle constants in the crafting resolver path.
 - `src/guide/pages/professions.ts` plus the wiki content generator (`npm run wiki:content`,
   freshness-gated by `tests/guide.test.ts`); conventions in `src/guide/CLAUDE.md`.
+- The 2026-07-20 additions: issue #2208 (the profession sound slot list and per-clip pipeline
+  checklist), the PLACEHOLDER-marked catalog rows in `scripts/sfx/` from Phase 12b, the
+  `LEGACY_GOLD_POSITIVE_RECIPE_IDS` burn-down list in `tests/recipe_economy.test.ts`, and the
+  Phase 13 typed-reagent consumer recipes (the no-dead-materials referential pin).
 - Local conventions: `src/sim/CLAUDE.md`, `src/guide/CLAUDE.md`, `tests/CLAUDE.md`.
 
 ## Starter Prompt
@@ -69,10 +77,10 @@ is generated and freshness-gated; the current asset-manifest slot list; and the 
 matrix rows for deeds content, content-only, i18n keys added, and full-stack changes.
 
 STEP 2 - CHOOSE ORCHESTRATION + EXECUTE:
-Fan out three parallel agents (deeds, tuning, guide); each gets ONLY the Explore summary, never
-the planning docs. Their file sets are disjoint, so no worktree isolation is needed; if any
-overlap appears, serialize that overlap. After all three land, the main session runs the QA
-matrix (see STEP 3).
+Fan out four parallel agents (deeds, tuning, guide, polish); each gets ONLY the Explore
+summary, never the planning docs. Their file sets are disjoint, so no worktree isolation is
+needed; if any overlap appears, serialize that overlap. After all four land, the main session
+runs the QA matrix (see STEP 3).
 
 Agent deeds deliverables:
 - Register the basic universal profession deeds in src/sim/content/deeds.ts with triggers wired
@@ -80,7 +88,10 @@ Agent deeds deliverables:
   milestones (rare tier), the Specialist deed at the 75-skill specialization threshold, and
   the rare-find deeds for the Phase 4 event flavors (pristine vein, ancient heartwood,
   moonlit bloom) plus the Phase 10 perfect specimen. The rare fish deed already exists: verify
-  it, do not duplicate it.
+  it, do not duplicate it; and per the 2026-07-20 amendment, verify it celebrates THROUGH the
+  Phase 12b bite moment (the col_glimmerfin credit lands on the reeled catch, so the deed
+  banner follows the bite-and-reel beat rather than a silent timer; the scripted playthrough
+  drives the bite flow, not a direct grant).
 - Notability through the deeds pipeline (the 2026-07-17 ruling): first attunement and first
   masterwork carry TITLE rewards and marquee-tier renown (>= 25) so the existing pipeline
   fires in full: nameplate title, banner, fireworks gate, celebration sound,
@@ -106,9 +117,14 @@ Agent tuning deliverables:
   final value in the matching test.
 - Faucet-vs-sink review (the 2026-07-17 amendment): with live data, weigh the material and
   gold faucets (gathering, work-order rewards, quest gold) against the sinks (consumables,
-  crafting inputs, salvage and disenchant destruction, training and craft fees) and record
-  the balance with evidence in the phase notes; revisit the commissions (#1298) wave
-  assignment with that evidence and file the follow-up on epic #1866.
+  crafting inputs, salvage and disenchant destruction, the typed-reagent demand, training,
+  craft, and unbind fees) and record the balance with evidence in the phase notes.
+- The legacy junk-recipe burn-down (the 2026-07-20 amendment): work through
+  LEGACY_GOLD_POSITIVE_RECIPE_IDS (tests/recipe_economy.test.ts pins it three ways as a
+  burn-down target) and CROSS-CHECK each candidate fix against the Phase 13 typed-reagent
+  consumers: a legacy recipe reworked to consume a typed material closes two flags at once
+  (the gold-positive violation and a no-dead-materials consumer), so prefer that shape where
+  it fits before plain price nerfs. Maintainer numbers only; never invent balance values.
 
 Agent guide deliverables:
 - Rewrite the guide/wiki professions page (src/guide/pages/professions.ts) to describe the
@@ -119,6 +135,20 @@ Agent guide deliverables:
   guide.* prose keys added English-only.
 - Final asset-manifest.json pass: append every id that shipped procedurally across the packet,
   with purpose, size, format, and replacement notes.
+
+Agent polish deliverables (the 2026-07-20 SFX completion sweep):
+- Sweep every profession sound slot on issue #2208: the Phase 12b placeholder cues (gather
+  cast/strike, the rare-strike variant, fish cast/bite/reel), craft success, and the five
+  missing station ambiences beside amb_forge. For each slot, either a real clip replaces the
+  placeholder (the full per-clip checklist on #2208: catalog row, asset, sfx:manifest,
+  routing, gain map, sfx:check, docs row, CREDITS.md licensing for recordings) or the slot is
+  explicitly re-filed on #2208 with a note; the packet does not close with an UNTRACKED
+  placeholder.
+- Per-craft success variants where the sound engineer delivered them (the craftResult payload
+  already carries what a variant sting needs); never a second cue on grant lines the loot hub
+  owns (the Phase 4 double-log trap).
+- End state: no catalog row for a profession cue is still marked PLACEHOLDER, or every
+  remaining one is listed on #2208 with the maintainer's sign-off recorded in progress.md.
 
 Then, in the main session: run docs/professions-2/qa-checklist.md end to end, recording evidence
 (test name, command output, or screenshot path) per row; then npm run gate under Node 24; then
@@ -141,7 +171,9 @@ INVARIANTS THIS PHASE MUST KEEP:
   ItemDef players may hold; no hand-edits to generated files.
 
 Out of scope (do NOT do in this phase):
-- Anything wave 2: market/mail instance carriage (#1146), commissions and boundTo (#1298),
+- Anything wave 2: market/mail instance carriage (the closed #1146's scope, re-homed to a
+  named follow-up when picked up), the commission ORDER workflow
+  (#1298; the binding primitive and the Maker's Bond landed in Phases 13 and 14b),
   Jack of All Trades (#1296), monster-harvest proficiency, batch salvage UI (single-item
   salvage landed in Phase 13), battlefield experience
   expansion, item biographies, tool effects (parked and dormant), jewelcrafting or inscription
@@ -183,8 +215,13 @@ STEP 5 - ACCEPTANCE CRITERIA (do not mark complete until all check):
       the rare fish, and every rare-find deed all unlock).
 - [ ] First attunement and first masterwork deeds carry titles and marquee-tier renown; the
       scripted playthrough proves the nameplate title, banner, and marquee broadcast fire.
-- [ ] The faucet-vs-sink review is recorded with evidence and the commissions follow-up
-      filed on epic #1866.
+- [ ] The faucet-vs-sink review is recorded with evidence in the phase notes.
+- [ ] The legacy burn-down list shrank or every surviving member has a recorded maintainer
+      disposition; candidates were cross-checked against the typed-reagent consumers first.
+- [ ] Every profession sound slot on #2208 is either replaced (sfx:check green, licensing
+      recorded) or explicitly re-filed; no untracked PLACEHOLDER catalog row remains.
+- [ ] The rare-fish deed celebrates through the bite-and-reel flow in the scripted
+      playthrough (no direct-grant shortcut).
 - [ ] tests/deeds_content.test.ts pins the catalog append-only; all pre-packet deeds unchanged.
 - [ ] Every tuning constant is named, exported, pinned, and matches the maintainer's numbers.
 - [ ] The wiki professions page describes the shipped system; npm run wiki:content freshness

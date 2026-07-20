@@ -84,7 +84,12 @@ vi.mock('../server/staff_db', () => ({
   roleChangeHistory: vi.fn(async () => []),
 }));
 
-import { handleAdminApi, parsePageParams } from '../server/admin';
+import {
+  configureAdminPlayersCap,
+  handleAdminApi,
+  parsePageParams,
+  resetAdminPlayersCapForTests,
+} from '../server/admin';
 import {
   accountDetail,
   associationsForIp,
@@ -98,6 +103,7 @@ import {
   overviewCounts,
   type PerfRawRow,
 } from '../server/admin_db';
+import { resetOverviewCacheForTests } from '../server/admin_overview_cache';
 import { hashPassword, verifyPassword } from '../server/auth';
 import type { CalibrationHistogram, SuspiciousPlayer } from '../server/bot_detector/contract';
 import {
@@ -220,6 +226,11 @@ const fakeGame = fakeGameState as typeof fakeGameState & Parameters<typeof handl
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // The overview branch reads through the shared TTL memo (admin_overview_cache),
+  // whose refresh IS the mocked overviewCounts here; start every test cold so one
+  // test's cached value never leaks into the next.
+  resetOverviewCacheForTests();
+  resetAdminPlayersCapForTests();
   fakeGame.isIpBlocked.mockReturnValue(false);
   fakeGame.liveSharedIps.mockReturnValue([]);
   fakeGame.suspiciousPlayers.mockReturnValue([]);
@@ -283,6 +294,10 @@ describe('admin api auth', () => {
     await handleAdminApi(fakeReq({ token: VALID_TOKEN }), res, fakeGame);
 
     expect(res.statusCode).toBe(200);
+    // Exactly one DB read per cold request: the beforeEach cache reset makes
+    // this test's stub the refresh, so a stale cross-test snapshot (or a
+    // double refresh) shows up here as a count drift.
+    expect(overviewCounts).toHaveBeenCalledTimes(1);
     expect(res.body).toEqual({
       success: true,
       error: null,
@@ -291,6 +306,80 @@ describe('admin api auth', () => {
         siteUsersNow: 12,
         server: expect.objectContaining({ online: 2 }),
       }),
+    });
+  });
+
+  it('serves fresh counts to a later cold request instead of a stale snapshot', async () => {
+    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    // A different stub body than the other overview test: without the
+    // beforeEach cache reset, whichever overview test runs second would be
+    // served the FIRST test's cached counts and fail here, so the reset is
+    // load-bearing, not prophylactic.
+    vi.mocked(overviewCounts).mockResolvedValue({
+      accounts: 77,
+      characters: 88,
+      accountsToday: 9,
+      accountsWeek: 10,
+      accountsMonth: 11,
+      sessionsToday: 12,
+      activeAccountsToday: 13,
+      activeAccountsWeek: 15,
+      activeAccountsMonth: 16,
+      returningAccountsToday: 17,
+      avgPlaytimeSeconds: 1800,
+      peakOnlineToday: 18,
+      peakOnlineAllTime: 19,
+      siteUsersNow: 21,
+    });
+    const res = fakeRes();
+
+    await handleAdminApi(fakeReq({ token: VALID_TOKEN }), res, fakeGame);
+
+    expect(res.statusCode).toBe(200);
+    expect(overviewCounts).toHaveBeenCalledTimes(1);
+    expect(res.body).toEqual({
+      success: true,
+      error: null,
+      data: expect.objectContaining({ accounts: 77, siteUsersNow: 21 }),
+    });
+  });
+
+  it('includes the injected realm player cap on the legacy overview arm', async () => {
+    // The legacy handleAdminApi overview branch is a SEPARATE body from the RouteDef
+    // overviewHandler, so it needs its own cap assertion. The RouteDef merge-math test
+    // (tests/server/admin.test.ts) pins 4242 on that arm; pinning the SAME value here
+    // proves both dispatch arms read the one injected canonicalPlayersCap source, and
+    // reds if the legacy arm ever omits playersCap (the objectContaining "serves the
+    // overview" case would stay green on such an omission).
+    vi.mocked(accountForToken).mockResolvedValue(7);
+    vi.mocked(isAdminAccount).mockResolvedValue(true);
+    vi.mocked(overviewCounts).mockResolvedValue({
+      accounts: 1,
+      characters: 1,
+      accountsToday: 0,
+      accountsWeek: 0,
+      accountsMonth: 0,
+      sessionsToday: 0,
+      activeAccountsToday: 0,
+      activeAccountsWeek: 0,
+      activeAccountsMonth: 0,
+      returningAccountsToday: 0,
+      avgPlaytimeSeconds: 0,
+      peakOnlineToday: 0,
+      peakOnlineAllTime: 0,
+      siteUsersNow: 0,
+    });
+    configureAdminPlayersCap(() => 4242);
+    const res = fakeRes();
+
+    await handleAdminApi(fakeReq({ token: VALID_TOKEN }), res, fakeGame);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual({
+      success: true,
+      error: null,
+      data: expect.objectContaining({ playersCap: 4242 }),
     });
   });
 

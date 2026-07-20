@@ -90,6 +90,8 @@ export interface DailyRewardsWindowDeps {
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
   onVisibilityChange?(): void;
+  /** Fired once per actual close (not when already closed). */
+  onClose?(): void;
   onStatus?(status: DailyRewardStatus): void;
   onWalletConnect?(): void;
   storeEnabled?(): boolean;
@@ -141,6 +143,7 @@ export class DailyRewardsWindow {
 
   constructor(private readonly deps: DailyRewardsWindowDeps) {}
 
+  /** Whether the window is currently shown; lets the opener distinguish the toggle direction. */
   get isOpen(): boolean {
     return this.deps.root().style.display === 'block';
   }
@@ -196,6 +199,7 @@ export class DailyRewardsWindow {
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
     this.deps.onVisibilityChange?.();
+    this.deps.onClose?.();
   }
 
   async render(focus: 'open' | null = null): Promise<void> {

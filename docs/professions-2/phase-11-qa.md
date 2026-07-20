@@ -3,6 +3,21 @@
 Audit the Phase 11 diff (fishing proficiency, catch rarity ladder, the fishing module extraction,
 wire and UI rows) and fix what the audit finds.
 
+As-landed notes (2026-07-20), authoritative over the starter prompt's older wording where they
+touch: the phase landed as DRAFT PR #2197, built on the release/v0.28.0 tip and then retargeted
+to release/v0.29.0 after the cut (sync merge 83b929398, release-merge-audit clean; this QA runs
+only after the maintainer merges it; the phase-start hash is in the Phase 11 entry of
+progress.md and the QA diff is the PR's commits first-parent across the sync merge). Fishing FOLDED into the gathering proficiency shape (no separate
+skill id; gprof unchanged, ALL_DELTA_KEYS stays 49). The catch rarity ladder landed as
+`FISHING_TABLES_BY_BAND` bands [0, 100, 200] via `fishingBandFor` (pure state; the `FISHING_TABLES`
+export aliases band 0). Catch feedback landed as the text-free personal `fishingResult` SimEvent
+rendered via `hudChrome.gathering.catchLine` (no sim_i18n matcher row needed). On the draw-order
+emphasis below: the cast timer is a FIXED 5 s constant and draws no rng (it never did); the
+draw-order probe means startFishing stays draw-free and completeFishing keeps exactly one draw
+per normal catch (zero on the codfather branch). Accrual counts junk catches; no-bite,
+bags-full, and codfather never accrue. The deed drift (prog_first_harvest on a first catch,
+prog_master_gatherer any-3-of-4) is ACCEPTED and pinned; do not "fix" it back.
+
 ## QA Starter Prompt
 
 ```

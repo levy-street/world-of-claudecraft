@@ -18,7 +18,6 @@
 // raw hex sits in this painter.
 
 import { audio } from '../game/audio';
-import type { GatheringProfessionId } from '../sim/content/professions';
 import { ITEMS } from '../sim/data';
 import type { EquipSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
@@ -170,14 +169,15 @@ export interface CharWindowDeps extends PainterHostPresentation {
   showError(text: string): void;
 }
 
-// Maps each gathering profession id to its hud_chrome display-name key (issue 1124).
-const GATHERING_PROFESSION_LABEL_KEY: Record<
-  GatheringProfessionId,
-  'hudChrome.gathering.mining' | 'hudChrome.gathering.logging' | 'hudChrome.gathering.herbalism'
-> = {
+// Maps each gathering profession id to its hud_chrome display-name key (issue
+// 1124). String-keyed like the sibling professions_window.ts GATHERING_NAME_KEYS
+// (and this file's CRAFT_NAME_KEYS): an id with no key here renders no row
+// (fishing landed with Professions 2.0 Phase 11).
+const GATHERING_PROFESSION_LABEL_KEY: Record<string, TranslationKey> = {
   mining: 'hudChrome.gathering.mining',
   logging: 'hudChrome.gathering.logging',
   herbalism: 'hudChrome.gathering.herbalism',
+  fishing: 'hudChrome.gathering.fishing',
 };
 
 const SHARE_GLYPH =
@@ -282,10 +282,11 @@ export class CharWindow {
   private gatheringHtml(world: IWorld): string {
     const rows = buildGatheringProficiencyRows(world);
     const items = rows
-      .map(
-        (r) =>
-          `<span>${esc(t(GATHERING_PROFESSION_LABEL_KEY[r.professionId]))}: <b>${formatNumber(r.value, { maximumFractionDigits: 0 })}</b></span>`,
-      )
+      .map((r) => {
+        const key = GATHERING_PROFESSION_LABEL_KEY[r.professionId];
+        if (key === undefined) return '';
+        return `<span>${esc(t(key))}: <b>${formatNumber(r.value, { maximumFractionDigits: 0 })}</b></span>`;
+      })
       .join('');
     return `<div class="char-progression"><div class="cp-title">${esc(t('hudChrome.gathering.title'))}</div><div class="char-stats cp-stats">${items}</div></div>`;
   }

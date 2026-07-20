@@ -683,6 +683,7 @@ export const table: DeedLocaleTable = {
   },
   prog_tools_of_the_trade: {
     name: 'Dụng Cụ Nhà Nghề',
+    desc: 'Hoàn thành một lượt chế tác tại trạm chế tác.',
   },
   dgn_nythraxis_crypt: {
     name: 'Điều Hầm Mộ Cất Giữ',

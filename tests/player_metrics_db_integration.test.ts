@@ -13,6 +13,7 @@ import {
   PLAYER_METRICS_SCHEMA,
   playerBusinessSnapshot,
   playerFunnelSnapshot,
+  prunePlayerActivityDailyBatch,
   recordCharacterCreation,
 } from '../server/player_metrics_db';
 
@@ -528,6 +529,44 @@ describeDb('player metrics lifecycle SQL (real Postgres)', () => {
     expect(
       snapshot.retention.find((item) => item.period === 'yesterday' && item.day === 1)?.rate,
     ).toBe(1);
+  });
+
+  it('prunes strictly older-than-window activity days and keeps the boundary row', async () => {
+    // Executes the real DELETE (the DB-free suite pins the SQL text only):
+    // with a 400-day window, a row 401 days old is pruned, the row EXACTLY
+    // 400 days old stays (the cutoff comparison is strictly less-than), and a
+    // recent row is untouched; a second batch then finds nothing to delete.
+    const db = await scopedClient();
+    try {
+      const accountId = Number(
+        (await db.query('INSERT INTO accounts DEFAULT VALUES RETURNING id')).rows[0].id,
+      );
+      await db.query(
+        `INSERT INTO player_activity_daily (realm, day, account_id, sessions, playtime_seconds, max_level)
+         VALUES
+           ('eastbrook', (now() AT TIME ZONE 'UTC')::date - 401, $1, 1, 60, 2),
+           ('eastbrook', (now() AT TIME ZONE 'UTC')::date - 400, $1, 1, 60, 2),
+           ('eastbrook', (now() AT TIME ZONE 'UTC')::date - 1, $1, 1, 60, 2)`,
+        [accountId],
+      );
+    } finally {
+      db.release();
+    }
+
+    await expect(prunePlayerActivityDailyBatch(scopedPool(), 400, 500)).resolves.toBe(1);
+
+    const check = await scopedClient();
+    try {
+      const left = await check.query(
+        `SELECT ((now() AT TIME ZONE 'UTC')::date - day)::int AS age
+           FROM player_activity_daily ORDER BY day`,
+      );
+      expect(left.rows.map((row) => Number(row.age))).toEqual([400, 1]);
+    } finally {
+      check.release();
+    }
+
+    await expect(prunePlayerActivityDailyBatch(scopedPool(), 400, 500)).resolves.toBe(0);
   });
 
   it('seeds a veteran from their indexed earliest session instead of classifying them as new', async () => {

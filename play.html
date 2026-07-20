@@ -390,27 +390,31 @@
     <div id="social-window" class="window panel"></div>
     <div id="report-window" class="window panel"></div>
     <div id="side-buttons">
-      <button id="daily-rewards-button" type="button" data-i18n-title="hudChrome.wocStore.title" data-i18n-aria="hudChrome.wocStore.title" title="WOC Store" aria-label="WOC Store"></button>
-      <button class="micro-btn" id="mm-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="keybind">c</span></button>
-      <button class="micro-btn" id="mm-spell" data-i18n-title="abilityUi.spellbook.title" data-i18n-aria="abilityUi.spellbook.title" title="Spellbook" aria-label="Spellbook" data-icon="spellbook"><span class="keybind">p</span></button>
-      <button class="micro-btn" id="mm-talents" data-i18n-title="game.talents.title" data-i18n-aria="game.talents.title" title="Talents" aria-label="Talents" data-icon="talents"><span class="keybind">n</span></button>
-      <button class="micro-btn" id="mm-town-focus" style="display:none" data-i18n-title="hudChrome.townFocus.title" data-i18n-aria="hudChrome.townFocus.title" title="Town Focus" aria-label="Town Focus" data-icon="map"></button>
-      <button class="micro-btn" id="mm-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="keybind">l</span></button>
-      <button class="micro-btn" id="mm-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="keybind">s-z</span></button>
-      <button type="button" class="micro-btn" id="mm-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="target"><span class="keybind">s-p</span></button>
-      <button class="micro-btn" id="mm-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="keybind">m</span></button>
-      <button class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
-      <button class="micro-btn" id="mm-crafting" data-i18n-title="hudChrome.crafting.title" data-i18n-aria="hudChrome.crafting.title" title="Crafting" aria-label="Crafting" data-icon="crafting"><span class="keybind">t</span></button>
-      <button class="micro-btn" id="mm-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="keybind">g</span></button>
-      <button class="micro-btn" id="mm-dfinder" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Dungeon Finder" aria-label="Dungeon Finder" data-icon="dfinder"><span class="keybind">Shift+I</span></button>
-      <button class="micro-btn" id="mm-valecup" data-i18n-title="hudChrome.keybinds.valecup" data-i18n-aria="hudChrome.keybinds.valecup" title="Vale Cup" aria-label="Vale Cup" data-icon="ball"><span class="keybind">y</span></button>
-      <button class="micro-btn" id="mm-cardduel" data-i18n-title="cardDuel.title" data-i18n-aria="cardDuel.title" title="Card Duel" aria-label="Card Duel" data-icon="cards"></button>
-      <button class="micro-btn" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind">k</span></button>
-      <button class="micro-btn" id="mm-emote" data-i18n-aria="hudChrome.emoteWheel.label" aria-label="Emotes" data-icon="emote"><span class="keybind">x</span></button>
-      <button class="micro-btn" id="mm-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" data-icon="music"></button>
-      <button class="micro-btn" id="mm-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="keybind">o</span></button>
-      <button class="micro-btn" id="mm-discord" hidden data-i18n-title="hudChrome.discord.title" data-i18n-aria="hudChrome.discord.title" title="Discord" aria-label="Discord" data-icon="discord"><span class="keybind">u</span></button>
-      <button class="micro-btn" id="mm-options" data-i18n-title="hud.options.gameMenu" data-i18n-aria="hud.options.gameMenu" title="Game Menu" aria-label="Game Menu" data-icon="menu"><span class="keybind">esc</span></button>
+      <div id="side-buttons-col-a" class="side-buttons-col">
+        <button class="micro-btn" id="mm-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="keybind">c</span></button>
+        <button class="micro-btn" id="mm-spell" data-i18n-title="abilityUi.spellbook.title" data-i18n-aria="abilityUi.spellbook.title" title="Spellbook" aria-label="Spellbook" data-icon="spellbook"><span class="keybind">p</span></button>
+        <button class="micro-btn" id="mm-talents" data-i18n-title="game.talents.title" data-i18n-aria="game.talents.title" title="Talents" aria-label="Talents" data-icon="talents"><span class="keybind">n</span></button>
+        <button class="micro-btn" id="mm-town-focus" style="display:none" data-i18n-title="hudChrome.townFocus.title" data-i18n-aria="hudChrome.townFocus.title" title="Town Focus" aria-label="Town Focus" data-icon="map"></button>
+        <button class="micro-btn" id="mm-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="keybind">l</span></button>
+        <button class="micro-btn" id="mm-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="keybind">s-z</span></button>
+        <button type="button" class="micro-btn" id="mm-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="target"><span class="keybind">s-p</span></button>
+        <button class="micro-btn" id="mm-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="keybind">m</span></button>
+        <button class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
+        <button class="micro-btn" id="mm-crafting" data-i18n-title="hudChrome.crafting.title" data-i18n-aria="hudChrome.crafting.title" title="Crafting" aria-label="Crafting" data-icon="crafting"><span class="keybind">t</span></button>
+      </div>
+      <div id="side-buttons-col-b" class="side-buttons-col">
+        <button id="daily-rewards-button" type="button" data-i18n-title="hudChrome.wocStore.title" data-i18n-aria="hudChrome.wocStore.title" title="WOC Store" aria-label="WOC Store"></button>
+        <button class="micro-btn" id="mm-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="keybind">g</span></button>
+        <button class="micro-btn" id="mm-dfinder" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Dungeon Finder" aria-label="Dungeon Finder" data-icon="dfinder"><span class="keybind">Shift+I</span></button>
+        <button class="micro-btn" id="mm-valecup" data-i18n-title="hudChrome.keybinds.valecup" data-i18n-aria="hudChrome.keybinds.valecup" title="Vale Cup" aria-label="Vale Cup" data-icon="ball"><span class="keybind">y</span></button>
+        <button class="micro-btn" id="mm-cardduel" data-i18n-title="cardDuel.title" data-i18n-aria="cardDuel.title" title="Card Duel" aria-label="Card Duel" data-icon="cards"></button>
+        <button class="micro-btn" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind">k</span></button>
+        <button class="micro-btn" id="mm-emote" data-i18n-aria="hudChrome.emoteWheel.label" aria-label="Emotes" data-icon="emote"><span class="keybind">x</span></button>
+        <button class="micro-btn" id="mm-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" data-icon="music"></button>
+        <button class="micro-btn" id="mm-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="keybind">o</span></button>
+        <button class="micro-btn" id="mm-discord" hidden data-i18n-title="hudChrome.discord.title" data-i18n-aria="hudChrome.discord.title" title="Discord" aria-label="Discord" data-icon="discord"><span class="keybind">u</span></button>
+        <button class="micro-btn" id="mm-options" data-i18n-title="hud.options.gameMenu" data-i18n-aria="hud.options.gameMenu" title="Game Menu" aria-label="Game Menu" data-icon="menu"><span class="keybind">esc</span></button>
+      </div>
     </div>
     <div id="tooltip" class="panel"></div>
 
@@ -897,13 +901,13 @@
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.27.2-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.28.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="win"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.27.2-win.exe"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.28.0-win.exe"
               data-i18n="download.windowsCta"
             >Download for Windows</a>
           </div>
@@ -943,7 +947,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.27.2</div>
+      <div id="game-version">v0.28.0</div>
       </div>
       <div class="footer-legal-row">
         <a href="/terms" class="footer-link" data-i18n="footer.terms">Terms of Service</a>

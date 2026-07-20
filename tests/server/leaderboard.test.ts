@@ -133,6 +133,8 @@ function fakeRuntime(overrides: Partial<LeaderboardRuntime> = {}): LeaderboardRu
     getDevLeaderboard: async () => [],
     getDeedsLeaderboard: async () => [],
     deedsSelfRank: async () => null,
+    getArenaLeaderboard: async () => [],
+    getAccountsCreatedCount: async () => 0,
     getReleases: async () => [],
     githubRepo: 'levy-street/world-of-claudecraft',
     releasesMaxLimit: 20,
@@ -775,11 +777,11 @@ describe('leaderboard handler (through the injected cache-fronted runtime)', () 
   });
 });
 
-describe('arena leaderboard handler (through the injected db reads)', () => {
-  it('decodes ?format and serves { format, leaders } from the db read', async () => {
-    setLeaderboardDbForTests({
-      topArenaRatings: async (_limit, format) => [arenaRow(`Champ-${format}`)],
-    });
+describe('arena leaderboard handler (through the injected cache-fronted runtime)', () => {
+  it('decodes ?format and serves { format, leaders } from the runtime getter', async () => {
+    configureLeaderboardRuntime(
+      fakeRuntime({ getArenaLeaderboard: async (format) => [arenaRow(`Champ-${format}`)] }),
+    );
     const ctx = fakeCtx({
       method: 'GET',
       url: '/api/arena/leaderboard',
@@ -794,15 +796,36 @@ describe('arena leaderboard handler (through the injected db reads)', () => {
   });
 });
 
-describe('project-stats handler (through the injected db reads)', () => {
-  it('serves accounts_created from the db, players_online from the runtime, and the realm', async () => {
-    configureLeaderboardRuntime(fakeRuntime({ playersOnline: () => 9 }));
-    setLeaderboardDbForTests({ getAccountsCount: async () => 123 });
+describe('project-stats handler (through the injected cache-fronted runtime)', () => {
+  it('serves accounts_created from the runtime count, players_online live, and the realm', async () => {
+    configureLeaderboardRuntime(
+      fakeRuntime({ playersOnline: () => 9, getAccountsCreatedCount: async () => 123 }),
+    );
     const ctx = fakeCtx({ method: 'GET', url: '/api/project-stats' });
     await handlerFor('/api/project-stats')(ctx);
     const { status, body } = captured(ctx.res);
     expect(status).toBe(200);
     expect(body).toEqual({ accounts_created: 123, players_online: 9, realm: REALM_NAME });
+  });
+});
+
+describe('search handler (funnels a non-empty query through the dbReads bundle)', () => {
+  it('serves the searchCharacters results capped at SEARCH_RESULT_LIMIT', async () => {
+    // Arena and project-stats moved onto the cache-fronted runtime; search / realms
+    // / sheet still read the db through the dbReads bundle, so this keeps that seam
+    // (setLeaderboardDbForTests) covered at the handler level with a fake read.
+    configureLeaderboardRuntime(fakeRuntime());
+    setLeaderboardDbForTests({
+      searchCharacters: async (prefix, limit) => [
+        { name: `Match-${prefix}-${limit}`, cls: 'mage', level: 60 },
+      ],
+    });
+    const ctx = fakeCtx({ method: 'GET', url: '/api/search', query: { q: 'ar' } });
+    await handlerFor('/api/search')(ctx);
+    const { status, body } = captured(ctx.res);
+    expect(status).toBe(200);
+    const b = body as { results: { name: string }[] };
+    expect(b.results.map((r) => r.name)).toEqual([`Match-ar-${SEARCH_RESULT_LIMIT}`]);
   });
 });
 
@@ -875,6 +898,97 @@ describe('public sheet handler (rate-limited before any DB read)', () => {
     });
     await handlerFor('/api/public/characters/:name/sheet')(ctx);
     expect(captured(ctx.res)).toEqual({ status: 429, body: { error: 'rate limited' } });
+  });
+});
+
+describe('arena leaderboard handler (anonymous DB read is rate-limited)', () => {
+  it('serves 200 under the per-IP public-read budget, then 429 { error } once exhausted, and resets', async () => {
+    resetPublicReadRateLimits();
+    configureLeaderboardRuntime(fakeRuntime());
+    const arena = handlerFor('/api/arena/leaderboard');
+    let firstStatus = 0;
+    let saw429 = false;
+    // Same 127.0.0.1 bucket makeReq shares; a tight loop past the budget exhausts it.
+    for (let i = 0; i < PUBLIC_READ_MAX_PER_MINUTE + 5; i++) {
+      const ctx = fakeCtx({ method: 'GET', url: '/api/arena/leaderboard' });
+      await arena(ctx);
+      const { status, body } = captured(ctx.res);
+      if (i === 0) firstStatus = status;
+      if (status === 429) {
+        saw429 = true;
+        expect(body).toEqual({ error: 'rate limited' });
+        break;
+      }
+    }
+    expect(firstStatus).toBe(200);
+    expect(saw429).toBe(true);
+    resetPublicReadRateLimits();
+    const ctx = fakeCtx({ method: 'GET', url: '/api/arena/leaderboard' });
+    await arena(ctx);
+    expect(captured(ctx.res).status).toBe(200);
+  });
+
+  it('does not spend a cached getter call on a rate-limited request', async () => {
+    // Mirrors the public sheet handler's "before any DB read" ordering: the limiter
+    // must short-circuit BEFORE the cached read, so a 429 never reaches the getter.
+    // The fake runtime absorbs the read silently, so a status-only assertion cannot
+    // prove the ordering; a spy getter with not.toHaveBeenCalled can.
+    resetPublicReadRateLimits();
+    const getArena = vi.fn(async () => [] as ArenaLeaderRow[]);
+    configureLeaderboardRuntime(fakeRuntime({ getArenaLeaderboard: getArena }));
+    // Exhaust the per-IP bucket externally so the very next handler call is a 429.
+    for (let i = 0; i < PUBLIC_READ_MAX_PER_MINUTE + 1; i++) {
+      publicReadRateLimited(makeReq({ method: 'GET', url: '/api/arena/leaderboard' }));
+    }
+    const ctx = fakeCtx({ method: 'GET', url: '/api/arena/leaderboard' });
+    await handlerFor('/api/arena/leaderboard')(ctx);
+    expect(captured(ctx.res)).toEqual({ status: 429, body: { error: 'rate limited' } });
+    expect(getArena).not.toHaveBeenCalled();
+  });
+});
+
+describe('project-stats handler (anonymous DB read is rate-limited)', () => {
+  it('serves 200 under the per-IP public-read budget, then 429 { error } once exhausted, and resets', async () => {
+    resetPublicReadRateLimits();
+    configureLeaderboardRuntime(fakeRuntime());
+    const projectStats = handlerFor('/api/project-stats');
+    let firstStatus = 0;
+    let saw429 = false;
+    for (let i = 0; i < PUBLIC_READ_MAX_PER_MINUTE + 5; i++) {
+      const ctx = fakeCtx({ method: 'GET', url: '/api/project-stats' });
+      await projectStats(ctx);
+      const { status, body } = captured(ctx.res);
+      if (i === 0) firstStatus = status;
+      if (status === 429) {
+        saw429 = true;
+        expect(body).toEqual({ error: 'rate limited' });
+        break;
+      }
+    }
+    expect(firstStatus).toBe(200);
+    expect(saw429).toBe(true);
+    resetPublicReadRateLimits();
+    const ctx = fakeCtx({ method: 'GET', url: '/api/project-stats' });
+    await projectStats(ctx);
+    expect(captured(ctx.res).status).toBe(200);
+  });
+
+  it('does not spend a cached getter call on a rate-limited request', async () => {
+    // Mirrors the public sheet handler's "before any DB read" ordering: the limiter
+    // must short-circuit BEFORE the cached read, so a 429 never reaches the getter.
+    // The fake runtime absorbs the read silently, so a status-only assertion cannot
+    // prove the ordering; a spy getter with not.toHaveBeenCalled can.
+    resetPublicReadRateLimits();
+    const getCount = vi.fn(async () => 0);
+    configureLeaderboardRuntime(fakeRuntime({ getAccountsCreatedCount: getCount }));
+    // Exhaust the per-IP bucket externally so the very next handler call is a 429.
+    for (let i = 0; i < PUBLIC_READ_MAX_PER_MINUTE + 1; i++) {
+      publicReadRateLimited(makeReq({ method: 'GET', url: '/api/project-stats' }));
+    }
+    const ctx = fakeCtx({ method: 'GET', url: '/api/project-stats' });
+    await handlerFor('/api/project-stats')(ctx);
+    expect(captured(ctx.res)).toEqual({ status: 429, body: { error: 'rate limited' } });
+    expect(getCount).not.toHaveBeenCalled();
   });
 });
 

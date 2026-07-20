@@ -47,12 +47,10 @@ import {
   type CharacterSearchRow,
   characterCountsByRealm,
   findCharacterReportTargetByName,
-  getAccountsCount,
   getCharacterById,
   guildNameForCharacter,
   lifetimeXpRankForCharacter,
   searchCharacters,
-  topArenaRatings,
 } from './db';
 import { type RecentDeedRow, recentDeedsForCharacter } from './deeds_db';
 import { requireAccount } from './http/middleware/require_account';
@@ -121,7 +119,7 @@ export interface ReleaseEntry {
 /**
  * The main.ts-owned runtime the public-read handlers depend on but cannot import
  * without a cycle: the live online-player count and dev perf profile off the
- * GameServer, the three cache-fronted readers (unchanged: same TTL cache the
+ * GameServer, the cache-fronted board and stats readers (the same TTL caches the
  * legacy arms use, so cache behavior is identical on both dispatch paths), the
  * releases feed's repo + display cap, and the two request-shaped helpers.
  */
@@ -144,6 +142,12 @@ export interface LeaderboardRuntime {
   getDeedsLeaderboard(): Promise<DeedsLeaderboardEntry[]>;
   /** The caller's Renown-board standing off the same cache, null when unranked. */
   deedsSelfRank(accountId: number): Promise<DeedsLeaderboardSelf | null>;
+  /** Cache-fronted arena ladder read (main.ts getArenaLeaderboard): the leader
+   *  rows for ONE format; the handler re-attaches the { format, leaders } envelope. */
+  getArenaLeaderboard(format: '1v1' | '2v2'): Promise<ArenaLeaderRow[]>;
+  /** Cache-fronted accounts-created count for project-stats (main.ts
+   *  getAccountsCreatedCount): the moderation-invariant COUNT(*), its own 60s TTL. */
+  getAccountsCreatedCount(): Promise<number>;
   /** Cache-fronted GitHub releases proxy read (main.ts getReleases). */
   getReleases(): Promise<ReleaseEntry[]>;
   /** The repo slug the releases feed reports (main.ts GITHUB_REPO). */
@@ -215,8 +219,11 @@ export function decodeLegacyLimit(raw: string | undefined): number {
   );
 }
 
-/** ?format=2v2 -> '2v2'; anything else (incl. absent) -> 1v1. */
-export function decodeArenaFormat(raw: string | undefined): ArenaFormat {
+/** ?format=2v2 -> '2v2'; anything else (incl. absent) -> 1v1. The public ladder
+ *  only ever serves these two formats, so the return narrows below the wider
+ *  ArenaFormat union: an unrecognized ?format value can never mint a third arena
+ *  cache slot on either dispatch arm. */
+export function decodeArenaFormat(raw: string | undefined): '1v1' | '2v2' {
   return raw === ARENA_FORMAT_2V2 ? ARENA_FORMAT_2V2 : ARENA_FORMAT_DEFAULT;
 }
 
@@ -318,9 +325,12 @@ export function buildDevBoard(
 // Read functions (host-agnostic; take a narrow Db interface, no ctx/req/res).
 // The FakeCharactersDb / FakeLeaderboardDb (tests/server/helpers/fake_db.ts)
 // satisfy the relevant subset structurally, so these are unit-tested against the
-// fakes. The db-touching routes (arena, search, realms, project-stats,
-// sheet) go through these; the leaderboard/guild/releases routes read through the
-// injected cache-fronted runtime and the pure builders above instead.
+// fakes. The search, realms, and sheet routes call these directly through the
+// dbReads bundle; the leaderboard/guild/releases routes AND now the arena ladder
+// and project-stats count read through the injected cache-fronted runtime instead.
+// readArenaLeaderboard and readProjectStats stay here as the main.ts cache's INNER
+// reads (main.ts wraps them in a TTL + single-flight getter), so the arena depth
+// (ARENA_LEADERBOARD_LIMIT) and the project-stats body shape are still owned here.
 // ---------------------------------------------------------------------------
 
 /** DB read the arena ladder needs. */
@@ -441,14 +451,15 @@ export async function readPublicSheet(
 
 // The real db.ts reads, bundled once so each thin handler passes the same object
 // to its read function. The read functions only touch the subset they type. The
-// active bundle is a `let` behind a test-only setter so the two handlers that
-// ALWAYS hit the db (arena, project-stats) can be driven with a FakeDb; production
-// never calls the setter, so REAL_DB_READS is the only runtime binding.
+// active bundle is a `let` behind a test-only setter so the search / realms / sheet
+// handlers that hit the db can be driven with a FakeDb; production never calls the
+// setter, so REAL_DB_READS is the only runtime binding. The arena ladder and the
+// project-stats count no longer ride this bundle: both read through the
+// cache-fronted runtime (rt.getArenaLeaderboard / rt.getAccountsCreatedCount), like
+// the leaderboard and guild boards, so their db reads run at most once per TTL.
 const REAL_DB_READS = {
-  topArenaRatings,
   searchCharacters,
   characterCountsByRealm,
-  getAccountsCount,
   findCharacterReportTargetByName,
   getCharacterById,
   guildNameForCharacter,
@@ -529,9 +540,19 @@ async function leaderboardHandler(ctx: Ctx): Promise<void> {
   json(ctx.res, 200, buildStandardBoard(REALM, scope, entries, page, pageSize));
 }
 
-/** GET /api/arena/leaderboard: the public all-time Ashen Coliseum ladder. */
+/** GET /api/arena/leaderboard: the public all-time Ashen Coliseum ladder,
+ *  served from the per-format cache-fronted runtime (the same cache the legacy
+ *  main.ts arm reads), so the ladder query runs at most once per TTL per format.
+ *  Rate-limited in-handler with publicReadRateLimited (the same per-IP public-read
+ *  budget the search and sheet routes use); the 429 keeps the { error: 'rate
+ *  limited' } body shape. */
 async function arenaLeaderboardHandler(ctx: Ctx): Promise<void> {
-  json(ctx.res, 200, await readArenaLeaderboard(dbReads, firstQueryValue(ctx.query.format)));
+  if (!publicReadRateLimited(ctx.req).allowed) {
+    json(ctx.res, 429, { error: 'rate limited' });
+    return;
+  }
+  const format = decodeArenaFormat(firstQueryValue(ctx.query.format));
+  json(ctx.res, 200, { format, leaders: await useRuntime().getArenaLeaderboard(format) });
 }
 
 /** GET /api/releases: the News & Updates feed, mirrored from GitHub, cache-served. */
@@ -543,10 +564,24 @@ async function releasesHandler(ctx: Ctx): Promise<void> {
   json(ctx.res, 200, { repo: rt.githubRepo, releases: entries.slice(0, limit) });
 }
 
-/** GET /api/project-stats: accounts created, players online, realm. */
+/** GET /api/project-stats: accounts created, players online, realm. The
+ *  accounts-created COUNT is served from the cache-fronted runtime (the same 60s
+ *  cache the legacy main.ts arm reads); players_online stays a live per-request
+ *  read, so it is re-attached here rather than cached. Now an anonymous DB-fronted
+ *  read, it carries publicReadRateLimited in-handler (the same per-IP public-read
+ *  budget the search and sheet routes use); the 429 keeps the { error: 'rate
+ *  limited' } body shape. */
 async function projectStatsHandler(ctx: Ctx): Promise<void> {
+  if (!publicReadRateLimited(ctx.req).allowed) {
+    json(ctx.res, 429, { error: 'rate limited' });
+    return;
+  }
   const rt = useRuntime();
-  json(ctx.res, 200, await readProjectStats(dbReads, rt.playersOnline(), REALM));
+  json(ctx.res, 200, {
+    accounts_created: await rt.getAccountsCreatedCount(),
+    players_online: rt.playersOnline(),
+    realm: REALM,
+  });
 }
 
 /**

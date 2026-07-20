@@ -792,7 +792,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'poor',
     sellValue: 1,
   },
-  // The prized rare catch, reelable from any water — a lucky hook.
+  // The prized rare catch, reelable from any water, a lucky hook.
   glimmerfin_koi: {
     id: 'glimmerfin_koi',
     name: 'Glimmerfin Koi',
@@ -1807,37 +1807,110 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
 // --- Zone-aware fishing loot ----------------------------------------------
 // A cast resolves to one weighted draw from the table for the zone the angler
 // is standing in. `itemId: null` means "no fish are biting" (an empty hook).
-// The engine (Sim.completeFishing) rolls a single this.rng draw against the
-// running weight total, so catches stay replay-deterministic.
+// The engine (completeFishing, src/sim/professions/fishing.ts) rolls a single
+// rng draw against the running weight total, so catches stay
+// replay-deterministic.
 export interface FishingEntry {
   itemId: string | null;
   weight: number;
 }
 
-export const FISHING_TABLES: Record<string, FishingEntry[]> = {
-  eastbrook_vale: [
-    { itemId: 'raw_mirror_trout', weight: 45 },
-    { itemId: 'raw_river_perch', weight: 30 },
-    { itemId: 'tangled_weed', weight: 12 },
-    { itemId: 'glimmerfin_koi', weight: 3 },
-    { itemId: null, weight: 10 },
-  ],
-  mirefen_marsh: [
-    { itemId: 'raw_marsh_pike', weight: 40 },
-    { itemId: 'raw_bog_eel', weight: 30 },
-    { itemId: 'soggy_boot', weight: 8 },
-    { itemId: 'tangled_weed', weight: 9 },
-    { itemId: 'glimmerfin_koi', weight: 3 },
-    { itemId: null, weight: 10 },
-  ],
-  thornpeak_heights: [
-    { itemId: 'raw_frostgill_trout', weight: 40 },
-    { itemId: 'raw_stonescale_carp', weight: 30 },
-    { itemId: 'tangled_weed', weight: 14 },
-    { itemId: 'glimmerfin_koi', weight: 4 },
-    { itemId: null, weight: 12 },
-  ],
-};
+// Catch rarity ladder (Professions 2.0 Phase 11): fishing proficiency selects
+// one of three per-zone tables (bands). As proficiency rises the weight shifts
+// out of the junk rows (tangled_weed / soggy_boot) and the empty-hook null row
+// and into the zone's food-fish rows (the cooking inputs). The moves are
+// strictly monotonic per band step (each food fish non-decreasing, each junk /
+// null row non-increasing), the rare glimmerfin_koi weight is deliberately flat
+// across every band (its odds never scale with skill), every band still sums to
+// exactly 100, and the empty-hook null row is always present with weight >= 1.
+// Band boundaries and selection live in src/sim/professions/fishing.ts
+// (fishingBandFor); FISHING_TABLES_BY_BAND[band][zoneId] is the resolved table,
+// with the eastbrook_vale row as the fallback for any zone without its own.
+export const FISHING_TABLES_BY_BAND: Record<string, FishingEntry[]>[] = [
+  // Band 0 (proficiency 0-99): byte-identical to the shipped starter tables, so
+  // every pre-Phase-11 seed reproduces the exact same catch sequence.
+  {
+    eastbrook_vale: [
+      { itemId: 'raw_mirror_trout', weight: 45 },
+      { itemId: 'raw_river_perch', weight: 30 },
+      { itemId: 'tangled_weed', weight: 12 },
+      { itemId: 'glimmerfin_koi', weight: 3 },
+      { itemId: null, weight: 10 },
+    ],
+    mirefen_marsh: [
+      { itemId: 'raw_marsh_pike', weight: 40 },
+      { itemId: 'raw_bog_eel', weight: 30 },
+      { itemId: 'soggy_boot', weight: 8 },
+      { itemId: 'tangled_weed', weight: 9 },
+      { itemId: 'glimmerfin_koi', weight: 3 },
+      { itemId: null, weight: 10 },
+    ],
+    thornpeak_heights: [
+      { itemId: 'raw_frostgill_trout', weight: 40 },
+      { itemId: 'raw_stonescale_carp', weight: 30 },
+      { itemId: 'tangled_weed', weight: 14 },
+      { itemId: 'glimmerfin_koi', weight: 4 },
+      { itemId: null, weight: 12 },
+    ],
+  },
+  // Band 1 (proficiency 100-199): junk and empty hooks give way to more food fish.
+  {
+    eastbrook_vale: [
+      { itemId: 'raw_mirror_trout', weight: 48 },
+      { itemId: 'raw_river_perch', weight: 33 },
+      { itemId: 'tangled_weed', weight: 8 },
+      { itemId: 'glimmerfin_koi', weight: 3 },
+      { itemId: null, weight: 8 },
+    ],
+    mirefen_marsh: [
+      { itemId: 'raw_marsh_pike', weight: 43 },
+      { itemId: 'raw_bog_eel', weight: 33 },
+      { itemId: 'soggy_boot', weight: 6 },
+      { itemId: 'tangled_weed', weight: 7 },
+      { itemId: 'glimmerfin_koi', weight: 3 },
+      { itemId: null, weight: 8 },
+    ],
+    thornpeak_heights: [
+      { itemId: 'raw_frostgill_trout', weight: 43 },
+      { itemId: 'raw_stonescale_carp', weight: 33 },
+      { itemId: 'tangled_weed', weight: 10 },
+      { itemId: 'glimmerfin_koi', weight: 4 },
+      { itemId: null, weight: 10 },
+    ],
+  },
+  // Band 2 (proficiency 200+): a seasoned angler; food fish dominate, an empty
+  // hook is rare but never impossible.
+  {
+    eastbrook_vale: [
+      { itemId: 'raw_mirror_trout', weight: 51 },
+      { itemId: 'raw_river_perch', weight: 36 },
+      { itemId: 'tangled_weed', weight: 4 },
+      { itemId: 'glimmerfin_koi', weight: 3 },
+      { itemId: null, weight: 6 },
+    ],
+    mirefen_marsh: [
+      { itemId: 'raw_marsh_pike', weight: 46 },
+      { itemId: 'raw_bog_eel', weight: 36 },
+      { itemId: 'soggy_boot', weight: 4 },
+      { itemId: 'tangled_weed', weight: 5 },
+      { itemId: 'glimmerfin_koi', weight: 3 },
+      { itemId: null, weight: 6 },
+    ],
+    thornpeak_heights: [
+      { itemId: 'raw_frostgill_trout', weight: 46 },
+      { itemId: 'raw_stonescale_carp', weight: 36 },
+      { itemId: 'tangled_weed', weight: 6 },
+      { itemId: 'glimmerfin_koi', weight: 4 },
+      { itemId: null, weight: 8 },
+    ],
+  },
+];
+
+// The band-0 tables, kept under the original export name so pre-Phase-11
+// consumers (the deeds zone-key guard in tests/deeds_content.test.ts) resolve
+// unchanged. Identical object as FISHING_TABLES_BY_BAND[0], so its rows are the
+// shipped rows byte for byte.
+export const FISHING_TABLES: Record<string, FishingEntry[]> = FISHING_TABLES_BY_BAND[0];
 
 // The rare catch worth a celebratory shout in the combat log.
 export const FISHING_RARE_ID = 'glimmerfin_koi';

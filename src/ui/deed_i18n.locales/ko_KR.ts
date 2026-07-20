@@ -597,6 +597,7 @@ export const table: DeedLocaleTable = {
   },
   prog_tools_of_the_trade: {
     name: '장인의 연장',
+    desc: '제작 거점에서 제작을 한 번 완료하십시오.',
   },
   dgn_nythraxis_crypt: {
     name: '납골당이 지켜 온 것',

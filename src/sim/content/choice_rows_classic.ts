@@ -120,11 +120,15 @@ export const MAGE_CHOICE_ROWS: ClassChoiceRows = {
         },
         {
           id: 'mag_r8_temporal_rift',
-          name: 'Temporal Rift',
-          description:
-            'Every 20 sec, the next stun, root or silence to hit you is cleansed instantly.',
+          name: 'Shifting Ward',
+          description: 'Casting your personal barrier breaks roots affecting you.',
           icon: 'temporal_rift',
-          effect: { global: { temporalRift: 1 } },
+          effect: {
+            ability: [
+              { ability: 'ice_barrier', addEffects: [{ type: 'breakRoots' }] },
+              { ability: 'blazing_barrier', addEffects: [{ type: 'breakRoots' }] },
+            ],
+          },
         },
         {
           id: 'mag_r8_greater_invis',

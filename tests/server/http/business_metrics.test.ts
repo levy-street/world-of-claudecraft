@@ -6,6 +6,7 @@ import {
   registerBusinessMetrics,
   WOC_METRICS_COLLECTOR_REFRESH_FAILURES,
   WOC_METRICS_COLLECTOR_SNAPSHOT_AGE_SECONDS,
+  WOC_METRICS_REFRESH_COALESCED_TOTAL,
   WOC_PLAYER_ACCOUNTS_CREATED,
   WOC_PLAYER_CHARACTERS_CREATED,
   WOC_PLAYER_DAILY_ACTIVE_ACCOUNTS,
@@ -231,6 +232,7 @@ describe('registerBusinessMetrics', () => {
     expect(labelValues('segment')).toEqual(new Set(['new', 'returning', 'all', 'level_20']));
     expect(labelValues('level')).toEqual(new Set(['2', '5']));
     expect(labelValues('day')).toEqual(new Set(['1', '7', '30']));
+    expect(labelValues('collector')).toEqual(new Set(['engagement', 'funnel']));
     expect(labelValues('stat')).toEqual(new Set(['p50', 'p90']));
     expect(labelValues('bucket')).toEqual(
       new Set(['lt_10m', '10m_30m', '30m_1h', '1h_3h', 'gte_3h']),
@@ -248,6 +250,32 @@ describe('registerBusinessMetrics', () => {
     for (const forbidden of ['account_id', 'character_id', 'player', 'name', 'ip']) {
       expect(labelValues(forbidden).size).toBe(0);
     }
+  });
+
+  it('counts coalesced refreshes on a per-collector counter that always renders', async () => {
+    const registry = new Registry();
+    let resolveEngagement!: (value: PlayerBusinessSnapshot) => void;
+    const business = vi.fn(
+      () => new Promise<PlayerBusinessSnapshot>((done) => (resolveEngagement = done)),
+    );
+    const funnel = vi.fn(async () => funnelSnapshot());
+    const collector = registerBusinessMetrics(registry, { business, funnel });
+
+    // Both series render at 0 before any refresh has ever coalesced.
+    const before = await registry.metrics();
+    expect(sample(before, WOC_METRICS_REFRESH_COALESCED_TOTAL, 'collector="engagement"')).toBe('0');
+    expect(sample(before, WOC_METRICS_REFRESH_COALESCED_TOTAL, 'collector="funnel"')).toBe('0');
+
+    // Two refreshes race while the engagement query is still pending; the second joins the
+    // in-flight engagement query and increments the coalesced counter under its own label.
+    const first = collector.refresh();
+    const second = collector.refresh();
+    resolveEngagement(snapshot());
+    await Promise.all([first, second]);
+
+    const text = await registry.metrics();
+    expect(WOC_METRICS_REFRESH_COALESCED_TOTAL).toBe('woc_metrics_refresh_coalesced_total');
+    expect(sample(text, WOC_METRICS_REFRESH_COALESCED_TOTAL, 'collector="engagement"')).toBe('1');
   });
 
   it('keeps engagement fresh when the isolated funnel refresh fails and later recovers', async () => {

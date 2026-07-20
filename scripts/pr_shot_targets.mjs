@@ -28,6 +28,67 @@ async function pollForSize(page, selector, attempts = 20, intervalMs = 500) {
 
 export const TARGETS = [
   {
+    key: 'player-tooltip',
+    label: 'Player hover tooltip',
+    when: ['player_tooltip'],
+    async capture(page) {
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        const id = sim.addPlayer('mage', 'Aldwin');
+        const other = sim.entities.get(id);
+        if (!other) return { ok: false, reason: 'player spawn failed' };
+        other.level = 18;
+        other.guild = 'The Azure Order';
+        // Put the bot in front of the camera's focal point. Renderer places the
+        // camera behind the player along the opposite of this vector.
+        other.pos.x = player.pos.x + Math.sin(game.input.camYaw) * 3;
+        other.pos.z = player.pos.z + Math.cos(game.input.camYaw) * 3;
+        return { ok: true, id };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      await wait(500);
+      let point = null;
+      for (let attempt = 0; attempt < 12 && !point; attempt++) {
+        point = await page.evaluate((id) => {
+          const game = window.__game;
+          const other = game?.sim?.entities.get(id);
+          if (!game || !other) return null;
+          const anchor = game.renderer.worldToScreen(other.pos.x, other.pos.y + 0.8, other.pos.z);
+          if (anchor.behind) return null;
+          for (let dy = -120; dy <= 120; dy += 12) {
+            for (let dx = -80; dx <= 80; dx += 12) {
+              const x = anchor.x + dx;
+              const y = anchor.y + dy;
+              if (game.renderer.pick(x, y) === id) return { x, y };
+            }
+          }
+          return null;
+        }, staged.id);
+        if (!point) await wait(250);
+      }
+      if (!point) throw new Error('no renderer pick point for staged player');
+      await page.hover('#game-canvas');
+      await page.mouse.move(point.x, point.y);
+      await wait(500);
+      const shown = await page.evaluate((id) => {
+        const game = window.__game;
+        const tip = document.querySelector('#tooltip');
+        return (
+          game?.renderer.pick(game.input.hoverX, game.input.hoverY) === id &&
+          tip?.classList.contains('mob-tooltip') &&
+          getComputedStyle(tip).display !== 'none' &&
+          tip.textContent?.includes('Aldwin') &&
+          tip.textContent?.includes('The Azure Order')
+        );
+      }, staged.id);
+      if (!shown) throw new Error('player tooltip did not appear through the hover path');
+      return {};
+    },
+  },
+  {
     key: 'tank-defensive-cds',
     label: 'Tank defensive cooldowns',
     when: ['tests/tank_defensive_cds.test.ts'],
@@ -317,7 +378,17 @@ export const TARGETS = [
     key: 'char-window',
     label: 'Character window',
     when: ['ui/char_window', 'ui/char_view'],
-    async capture(page) {
+    // Desktop and mobile, each in two framings: the default top framing, plus
+    // the gathering panel scrolled into view (it sits below the fold and is
+    // per-player progression info a player reads on both form factors; Phase
+    // 11 added its fishing row).
+    variants: [
+      { key: 'desktop' },
+      { key: 'mobile', mobile: true },
+      { key: 'desktop-gathering', scrollSel: '.char-progression' },
+      { key: 'mobile-gathering', mobile: true, scrollSel: '.char-progression' },
+    ],
+    async capture(page, variant) {
       await page.evaluate(() => {
         const el = document.querySelector('#char-window');
         if (el) el.style.display = 'none';
@@ -328,6 +399,25 @@ export const TARGETS = [
         const w = document.querySelector('#char-window');
         return !!w && getComputedStyle(w).display !== 'none';
       });
+      if (open && variant?.scrollSel) {
+        // The window repaints on world changes and a repaint resets the scroll
+        // position, so a one-shot scrollIntoView can be undone before the
+        // screenshot lands. Pin the scrollable ancestor to the bottom on an
+        // interval that outlives this evaluate (cleared after 5s).
+        await page.evaluate((sel) => {
+          const pin = () => {
+            const target = document.querySelector(sel);
+            if (!target) return;
+            let sc = target.parentElement;
+            while (sc && sc.scrollHeight <= sc.clientHeight + 1) sc = sc.parentElement;
+            if (sc) sc.scrollTop = sc.scrollHeight;
+          };
+          pin();
+          const iv = setInterval(pin, 50);
+          setTimeout(() => clearInterval(iv), 5000);
+        }, variant.scrollSel);
+        await wait(400);
+      }
       return open ? { clip: '#char-window' } : {};
     },
   },
@@ -622,6 +712,14 @@ export const TARGETS = [
       { key: 'desktop-full', charClass: 'warrior', charName: 'Forgeheart' },
       { key: 'desktop-simplified', charClass: 'mage', charName: 'Newhand', simplified: true },
       { key: 'mobile', charClass: 'warrior', charName: 'Anvilmar', mobile: true },
+      // The gathering section sits below the craft-skill fold; a fourth
+      // framing scrolls it into view (Phase 11 added its fishing row).
+      {
+        key: 'desktop-gathering',
+        charClass: 'warrior',
+        charName: 'Forgeheart',
+        scrollSel: '.prof-gathering',
+      },
     ],
     // The offline sandbox starts unattuned with zero craft skill, which IS the
     // simplified variant. The full variants stub the two IWorld reads with a
@@ -672,6 +770,7 @@ export const TARGETS = [
               { professionId: 'mining', skill: 112, maxSkill: 300 },
               { professionId: 'logging', skill: 45, maxSkill: 300 },
               { professionId: 'herbalism', skill: 203, maxSkill: 300 },
+              { professionId: 'fishing', skill: 68, maxSkill: 300 },
             ],
           };
           const stateIsFn = typeof game.world.professionsState === 'function';
@@ -686,6 +785,23 @@ export const TARGETS = [
       }, variant);
       const open = await pollForSize(page, '#professions-window');
       if (!open) throw new Error('professions window did not open');
+      if (variant?.scrollSel) {
+        // Same repaint-vs-scroll race as the char-window target: pin the
+        // scrollable ancestor to the bottom until the screenshot lands.
+        await page.evaluate((sel) => {
+          const pin = () => {
+            const target = document.querySelector(sel);
+            if (!target) return;
+            let sc = target.parentElement;
+            while (sc && sc.scrollHeight <= sc.clientHeight + 1) sc = sc.parentElement;
+            if (sc) sc.scrollTop = sc.scrollHeight;
+          };
+          pin();
+          const iv = setInterval(pin, 50);
+          setTimeout(() => clearInterval(iv), 5000);
+        }, variant.scrollSel);
+        await wait(400);
+      }
       return { clip: '#professions-window' };
     },
   },

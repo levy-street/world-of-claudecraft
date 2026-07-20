@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt, type KnownAbility } from '../src/sim/content/classes';
-import { computeTalentModifiers, TALENTS, type TalentAllocation } from '../src/sim/content/talents';
+import {
+  accumulateTalentEffect,
+  computeTalentModifiers,
+  emptyModifiers,
+  TALENTS,
+  type TalentAllocation,
+} from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -14,8 +20,16 @@ function mastery(cls: PlayerClass, spec: string) {
   return computeTalentModifiers(cls, alloc(spec), 20);
 }
 
+function masteryOnly(cls: PlayerClass, specId: string) {
+  const modifiers = emptyModifiers();
+  const spec = TALENTS[cls].specs.find((candidate) => candidate.id === specId);
+  if (!spec) throw new Error(`missing ${cls}/${specId}`);
+  accumulateTalentEffect(modifiers, spec.mastery.effect);
+  return modifiers;
+}
+
 function known(cls: PlayerClass, id: string, spec?: string): KnownAbility {
-  const mods = spec ? mastery(cls, spec) : undefined;
+  const mods = spec ? masteryOnly(cls, spec) : undefined;
   const ability = abilitiesKnownAt(cls, 20, mods).find((a) => a.def.id === id);
   if (!ability) throw new Error(`missing ${cls} ability ${id}`);
   return ability;

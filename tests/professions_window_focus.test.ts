@@ -191,13 +191,15 @@ describe('ProfessionsWindow: mode and row gating', () => {
   });
 
   it('renders no gathering row for an unknown profession id', () => {
-    // gather_fishing ships an icon but no window read until Phase 11: an id
-    // with no GATHERING_NAME_KEYS entry renders no row BY DESIGN, while the
-    // known ids beside it still render.
+    // Fishing joined GATHERING_NAME_KEYS with Professions 2.0 Phase 11, so
+    // the unknown-id example is skinning (documented in gathering.ts as
+    // deliberately NOT a gathering profession): an id with no
+    // GATHERING_NAME_KEYS entry renders no row BY DESIGN, while the known
+    // ids beside it still render.
     const state = baseState();
     state.gathering = [
       { professionId: 'mining', skill: 30, maxSkill: 300 },
-      { professionId: 'fishing', skill: 10, maxSkill: 300 },
+      { professionId: 'skinning', skill: 10, maxSkill: 300 },
     ];
     const { el } = makeWindow(state);
     expect(el.querySelectorAll('.prof-gather-row')).toHaveLength(1);
@@ -206,7 +208,7 @@ describe('ProfessionsWindow: mode and row gating', () => {
 
   it('omits the gathering section entirely when every injected id is unknown', () => {
     const state = baseState();
-    state.gathering = [{ professionId: 'fishing', skill: 10, maxSkill: 300 }];
+    state.gathering = [{ professionId: 'skinning', skill: 10, maxSkill: 300 }];
     const { el } = makeWindow(state);
     expect(el.querySelectorAll('.prof-gather-row')).toHaveLength(0);
     expect(el.querySelector('.prof-gathering')).toBeNull();

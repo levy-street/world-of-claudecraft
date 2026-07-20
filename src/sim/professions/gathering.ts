@@ -368,7 +368,7 @@ export interface PendingGatherGrant {
 }
 
 export function emptyGatheringProficiency(): GatheringProficiency {
-  return { mining: 0, logging: 0, herbalism: 0 };
+  return { mining: 0, logging: 0, herbalism: 0, fishing: 0 };
 }
 
 export function isGatheringProfessionId(id: string): id is GatheringProfessionId {

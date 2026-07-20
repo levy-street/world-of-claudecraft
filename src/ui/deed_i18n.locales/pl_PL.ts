@@ -674,6 +674,7 @@ export const table: DeedLocaleTable = {
   },
   prog_tools_of_the_trade: {
     name: 'Narzędzia Fachu',
+    desc: 'Ukończ wytwarzanie przy stacji rzemieślniczej.',
   },
   dgn_nythraxis_crypt: {
     name: 'Co Kryła Krypta',

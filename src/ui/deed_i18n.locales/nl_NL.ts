@@ -686,6 +686,7 @@ export const table: DeedLocaleTable = {
   },
   prog_tools_of_the_trade: {
     name: 'Gereedschap van het Vak',
+    desc: 'Voltooi een ambachtswerk bij een ambachtsstation.',
   },
   dgn_nythraxis_crypt: {
     name: 'Wat de Crypte Bewaarde',

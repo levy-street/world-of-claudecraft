@@ -293,7 +293,7 @@ export type AuraKind =
   // `fingers_of_frost`: self buff, up to 2 stacks; an Ice Lance spends one to
   // treat its target as frozen (Shatter + its 3x frozen damage).
   // `brain_freeze`: self buff, single; the next Flurry goes instant, skips its
-  // cooldown and hits 30% harder (consumed in castAbility's override).
+  // cooldown, and keeps its base damage (consumed in castAbility's override).
   // `winters_chill`: TARGET debuff with 2 charges; each compatible spell
   // impact spends one to count the target as frozen.
   // `icicles`: self buff, up to 5 stacks, built by Rimelance impacts and Frozen
@@ -446,6 +446,9 @@ export interface Aura {
   tickTimer?: number;
   sourceId: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
+  // Encounter-authored control that must land through immunity and cannot be
+  // removed by player counters. Natural expiry and encounter cleanup still own it.
+  unbreakableControl?: true;
   breaksOnDamage?: boolean;
   // Lingering Dread lets a break-on-damage fear absorb this much damage before
   // breaking. Undefined retains the normal break-on-any-damage behavior.
@@ -1770,9 +1773,10 @@ export type AbilityEffect =
   // feared; absent = fear every hostile in radius (the warlock-style AoE fear).
   | { type: 'aoeFear'; duration: number; radius: number; maxTargets?: number }
   | { type: 'clearCooldowns'; abilities: string[] }
+  | { type: 'breakRoots' }
   | { type: 'breakControl' }
-  // Ice Block: strip EVERY debuff (control, DoTs, stat saps, ...) off the caster.
-  // Broader than breakControl (which covers control auras only). See effect_dispatch.
+  // Ice Block: strip every player-removable debuff (control, DoTs, stat saps, ...)
+  // Broader than breakRoots and breakControl. See effect_dispatch.
   | { type: 'cleanseSelf' }
   | {
       type: 'repositionToAim';
@@ -1987,7 +1991,7 @@ export type AbilityEffect =
     }
   // Frozen Orb (combat/frozen_orb.ts): releases a slow-drifting orb from the
   // caster that pulses frost damage + a snare every `interval` for `duration`
-  // seconds and feeds Fingers of Frost (frost mage spec kit).
+  // seconds and banks Icicles (frost mage spec kit).
   | {
       type: 'frozenOrb';
       min: number;
@@ -3606,6 +3610,21 @@ export type SimEvent = { pid?: number } & (
       qty: number;
       // The rare event this harvest rolled (resolveHarvest draw #2), or null.
       rareEvent: GatherRareEventFlavor | null;
+    }
+  // Fishing catch outcome (Professions 2.0 Phase 11): a landed catch emits
+  // this so the client can log the reel-in feedback line for the acting
+  // player. Personal (carries pid = the angler), emitted only on the
+  // landed-catch path (never on the no-bite, bags-full, or codfather quest
+  // branches), so every field is always present. Text-free on purpose (like
+  // gatherResult above): the client renders its own localized copy off the
+  // structured fields, so no sim/server i18n matcher rule is needed.
+  // `quality` is the caught ItemDef's quality (poor for junk catches,
+  // uncommon for the rare koi) so the line colors like an item name.
+  | {
+      type: 'fishingResult';
+      pid: number;
+      itemId: string;
+      quality: NonNullable<ItemDef['quality']>;
     }
   // Rare gather event (Professions 2.0 Phase 4): a harvest struck a pristine
   // vein / ancient heartwood / moonlit bloom. Soft zone broadcast: one copy is

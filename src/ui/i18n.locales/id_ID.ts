@@ -33,8 +33,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blizzard.description':
     'Memanggil badai es ke area target selama 6 dtk, memberikan {damage} kerusakan Beku setiap detik dan memperlambat musuh sebesar 40%. Setiap musuh yang terkena mempersingkat Frozen Orb sebesar 0,5 dtk, hingga 3 dtk per rapalan. (Beku)',
   'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.description':
-    'Rimelance memiliki peluang 20% menjadikan Winterlash berikutmu seketika, 30% lebih keras, dan bebas dari jedanya. (Beku)',
   'entities.abilities.brain_freeze.name': 'Brain Freeze',
   'entities.abilities.dragons_breath.description':
     'Tahan untuk mengumpulkan napas api yang melebar, lalu lepaskan dalam kerucut. Pengisian lebih lama menjangkau lebih jauh dan memberikan lebih banyak kerusakan. Musuh yang terkena kehilangan arah dan kerusakan mematahkan efeknya; pengisian maksimum selalu menghasilkan serangan kritis dan dihitung sekali untuk Hot Streak. (Api)',
@@ -45,11 +43,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.fireball_form.description':
     'Berubah menjadi bara membara, meningkatkan kecepatan gerak sebesar {buff}%. Kamu tidak dapat menyerang atau merafalkan mantra saat berubah wujud. Rapal ulang untuk kembali ke wujud normalmu.',
   'entities.abilities.fireball_form.name': 'Ember Form',
-  'entities.abilities.flurry.description':
-    'Lepaskan tiga baut es untuk {damage} kerusakan Beku masing-masing dan tanamkan Dingin Musim Dingin pada target: 2 mantra masuk berikutnya yang kompatibel memperlakukannya seolah membeku. Brain Freeze menjadikan Winterlash seketika, 30% lebih keras, dan melewati jedanya. (Beku)',
   'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.description':
-    'Lepaskan bola embun beku yang berputar-putar maju selama 8 dtk, memberikan {damage} kerusakan Beku setiap detik kepada musuh di sekitar dan memperlambat mereka sebesar 30%. Serangannya menghasilkan Fingers of Frost. (Beku)',
   'entities.abilities.frozen_orb.name': 'Frozen Orb',
   'entities.abilities.glacial_front.description':
     'Tahan untuk mengumpulkan barisan embun beku yang melebar, lalu lepaskan dalam kerucut. Pengisian lebih lama menjangkau lebih jauh dan memberikan lebih banyak kerusakan. Semua musuh yang terkena diperlambat 50% selama 4 dtk; pengisian maksimum juga mengakar mereka selama 1 dtk. (Beku)',
@@ -63,8 +57,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.perfect_moment.description':
     'Raih momen sempurnamu: seketika dapatkan 4 Muatan Arkan, dan selama 10 dtk Panah Aether tidak mengonsumsinya. (Kronomansi)',
   'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.description':
-    'Mantramu memperoleh peluang serangan kritis 50% terhadap target yang membeku, dan serangan kritis tersebut memberikan 20% lebih banyak kerusakan. Fingers of Frost dan Dingin Musim Dingin dianggap membeku. (Beku)',
   'entities.abilities.shatter.name': 'Brittle Ruin',
   'entities.abilities.temporal_acceleration.description':
     'Mempercepat aliran waktu untuk grupmu atau raid, meningkatkan kecepatan serangan, rapalan, dan penyaluran sebesar 30% selama 15 dtk. Sekutu yang baru saja terpengaruh Temporal Acceleration atau Genderang Perang terlalu lelah untuk merasakan manfaatnya. (Kronomansi)',
@@ -122,16 +114,12 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.blink': 'Menteleportasimu maju sebentar, memutus akar saat keluar.',
   'guide.abilityHook.blizzard':
     'Membungkus area dengan es untuk mengikis dan memperlambat seluruh gerombolan.',
-  'guide.abilityHook.brain_freeze':
-    'Baut bekumu terkadang membuat Winterlash berikutnya seketika dan lebih keras.',
   'guide.abilityHook.fingers_of_frost':
     'Baut bekumu terkadang memberdayakan Ice Lance agar menyerang seolah target membeku.',
   'guide.abilityHook.fireball_form':
     'Jadilah bara hidup untuk melintasi medan terbuka dengan kecepatan tinggi.',
   'guide.abilityHook.flurry':
     'Tiga baut cepat yang mendinginkan target agar pukulan beku berikutmu mendarat seolah target membeku.',
-  'guide.abilityHook.frozen_orb':
-    'Menggelindingkan bola lambat melalui gerombolan yang mendinginkan segalanya dan memicu proc bekumu.',
   'guide.abilityHook.ice_lance':
     'Serpihan seketika untuk menghabiskan proc beku, menyerang jauh lebih keras pada target yang membeku.',
   'guide.abilityHook.shatter': 'Mantramu jauh lebih sering kritis terhadap target yang membeku.',
@@ -8301,4 +8289,268 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.mouseoverCast': 'Rapal Saat Menyorot Bingkai Kelompok',
   'hudChrome.options.showTargetOfTarget': 'Tampilkan Sasaran dari Sasaran',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Sasaran dari Sasaran',
+  'itemUi.market.rarityLegendary': 'Legendaris',
+  'loading.reconnectingAttempt':
+    'Koneksi terputus. Menyambungkan kembali... (coba {attempt}/{maxAttempts}, coba lagi di {seconds}s)',
+  'loading.reconnectingNow':
+    'Koneksi terputus. Hubungkan kembali sekarang... (coba {attempt}/{maxAttempts})',
+  'loading.slowConnection':
+    'Ini memakan waktu lebih lama dari biasanya. Periksa koneksi internet Anda.',
+  'delveUi.shop.buyConfirmAccept': 'Membeli',
+  'delveUi.shop.buyConfirmBody':
+    'Beli {item} seharga {marks} Tanda Delve? Pembelian tanda tidak dapat dikembalikan.',
+  'delveUi.shop.buyConfirmCancel': 'Membatalkan',
+  'delveUi.shop.buyConfirmTitle': 'Konfirmasi Pembelian',
+  'entities.abilities.brain_freeze.description':
+    'Rimelance memiliki peluang 20% ​​untuk membuat Winterlash berikutnya menjadi instan dan bebas cooldown. (Embun beku)',
+  'entities.abilities.flurry.description':
+    "Lepaskan tiga baut es untuk masing-masing kerusakan {damage} Frost dan terapkan Winter's Chill pada target: 2 mantra kompatibel berikutnya yang masuk akan memperlakukannya sebagai beku. Brain Freeze menjadikan Winterlash instan dan melewatkan cooldownnya. (Embun beku)",
+  'entities.abilities.frozen_orb.description':
+    'Melepaskan bola es yang berputar-putar yang melayang ke depan selama 8 detik, menimbulkan kerusakan {damage} Frost setiap detik ke musuh di sekitar dan memperlambat mereka sebesar 30%. Setiap denyut nadi menghasilkan satu es. (Embun beku)',
+  'entities.abilities.shatter.description':
+    "Mantra Anda mendapatkan 50% peluang serangan kritis terhadap target yang dibekukan. Fingers of Frost dan Winter's Chill dihitung sebagai beku. (Embun beku)",
+  'entities.items.anglers_feast_platter.name': 'Piring Pesta Pemancing',
+  'entities.items.arcanite_war_axe.name': 'Kapak Perang Arcanite',
+  'entities.items.ashwood_smoked_eel.name': 'Belut Asap Ashwood',
+  'entities.items.cooking_salt.name': 'Garam Memasak',
+  'entities.items.copper_bearded_axe.name': 'Kapak Berjanggut Tembaga',
+  'entities.items.copper_flanged_mace.name': 'Gada Bergelang Tembaga',
+  'entities.items.copper_ore.name': 'Bijih Tembaga',
+  'entities.items.coppermail_gauntlets.name': 'Sarung Tangan Tembaga',
+  'entities.items.coppermail_sabatons.name': 'Sabaton Coppermail',
+  'entities.items.elderwood_battle_staff.name': 'Staf Pertempuran Elderwood',
+  'entities.items.elixir_of_the_boar.name': 'Ramuan Babi Hutan',
+  'entities.items.elixir_of_the_serpent.name': 'Ramuan Ular',
+  'entities.items.fenbridge_hide_belt.name': 'Sabuk Kulit Fenbridge',
+  'entities.items.fenbridge_hide_boots.name': 'Sepatu Bot Kulit Fenbridge',
+  'entities.items.fenbridge_hide_leggings.name': 'Celana Kulit Fenbridge',
+  'entities.items.frostgill_chowder.name': 'Sup Frostgill',
+  'entities.items.game_meat.name': 'Daging Buruan',
+  'entities.items.glass_vial.name': 'Botol Kaca',
+  'entities.items.goldleaf_game_stew.name': 'Rebusan Permainan Daun Emas',
+  'entities.items.goldleaf_healing_draught.name': 'Ramuan Penyembuhan Daun Emas',
+  'entities.items.goldleaf_mana_draught.name': 'Ramuan Mana Daun Emas',
+  'entities.items.goldweave_leggings.name': 'Legging Tenun Emas',
+  'entities.items.goldweave_robe.name': 'Jubah Tenun Emas',
+  'entities.items.herbed_marsh_pike.name': 'Marsh Pike herba',
+  'entities.items.homespun_cloth.name': 'Kain tenunan sendiri',
+  'entities.items.homespun_hood.name': 'Hood tenunan sendiri',
+  'entities.items.homespun_mitts.name': 'Sarung tangan tenunan sendiri',
+  'entities.items.hunters_game_skewer.name': 'Tusuk Sate Game Pemburu',
+  'entities.items.iron_ore.name': 'Bijih besi',
+  'entities.items.ironbark_boar_spear.name': 'Tombak Babi Kulit Besi',
+  'entities.items.ironbark_log.name': 'Batang Kayu Kulit Besi',
+  'entities.items.ironedge_longsword.name': 'Pedang Panjang Tepi Besi',
+  'entities.items.ironlink_hauberk.name': 'Tautan Besi Hauberk',
+  'entities.items.ironlink_legguards.name': 'Pelindung Kaki Ironlink',
+  'entities.items.ironlink_spaulders.name': 'Spaulder Tautan Besi',
+  'entities.items.ironshod_maul.name': 'Palu Perang Berlapis Besi',
+  'entities.items.marlows_grand_roast.name': 'Panggang Besar Marlow',
+  'entities.items.marshstalker_hood.name': 'Tudung Penguntit Rawa',
+  'entities.items.marshstalker_jerkin.name': 'Rompi Penguntit Rawa',
+  'entities.items.marshstalker_spaulders.name': 'Spaulder Marshstalker',
+  'entities.items.mirewarden_jerkin.name': 'Rompi Penjaga Rawa',
+  'entities.items.mirewarden_leggings.name': 'Celana Penjaga Rawa',
+  'entities.items.mirewarden_treads.name': 'Tapak Mirewarden',
+  'entities.items.pan_seared_perch.name': 'Ikan Tenggeran Sungai Panggang',
+  'entities.items.prime_cut.name': 'Potongan Perdana',
+  'entities.items.pristine_hide.name': 'Kulit Murni',
+  'entities.items.pristine_silk.name': 'Sutra Murni',
+  'entities.items.pristine_venom_gland.name': 'Kelenjar Racun Murni',
+  'entities.items.riveted_copper_girdle.name': 'Korset Tembaga Terpaku',
+  'entities.items.rough_hide.name': 'Kulit Kasar',
+  'entities.items.silkbinders_raiment.name': 'Pakaian Pengikat Sutra',
+  'entities.items.silkspun_satchel.name': 'Tas tenun sutra',
+  'entities.items.silvered_carp_supper.name': 'Perjamuan Ikan Mas Perak',
+  'entities.items.silverleaf_healing_draught.name': 'Ramuan Penyembuhan Daun Perak',
+  'entities.items.silverleaf_herb.name': 'Ramuan Daun Perak',
+  'entities.items.silverleaf_mana_draught.name': 'Ramuan Mana Daun Perak',
+  'entities.items.silverthread_slippers.name': 'Sandal Benang Perak',
+  'entities.items.smithing_flux.name': 'Fluks Smithing',
+  'entities.items.spider_silk.name': 'Sutra Laba-laba',
+  'entities.items.spool_of_thread.name': 'Gulungan Benang',
+  'entities.items.sunpetal_healing_draught.name': 'Ramuan Penyembuhan Kelopak Matahari',
+  'entities.items.sunpetal_mana_draught.name': 'Ramuan Mana Kelopak Matahari',
+  'entities.items.sunweave_mantle.name': 'Mantel Tenun Matahari',
+  'entities.items.sunweave_treads.name': 'Tapak Tenun Matahari',
+  'entities.items.tanning_agent.name': 'Agen Penyamakan',
+  'entities.items.thorium_warblade.name': 'Pedang Perang Thorium',
+  'entities.items.thoriumscale_cuirass.name': 'Lapisan Lapisan Thorium',
+  'entities.items.thoriumscale_greathelm.name': 'Greathelm Skala Thorium',
+  'entities.items.thoriumscale_leggings.name': 'Celana Sisik Thorium',
+  'entities.items.venom_gland.name': 'Kelenjar Racun',
+  'entities.items.venomfire_elixir.name': 'Ramuan Api Racun',
+  'entities.items.whetted_iron_dirk.name': 'Belati Besi yang Diasah',
+  'entities.letters.guild_trend_alchemy_cooking.body':
+    'Perajin,\n\nPersekutuan tersiar kabar tentang pekerjaanmu dalam Alkimia dan Memasak: ramuan direbus dan hidangan dibumbui, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Mereka yang mengikat pasangan ini mendapatkan nama Apoteker pada waktunya. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin',
+  'entities.letters.guild_trend_alchemy_cooking.sender': 'Persatuan Perajin',
+  'entities.letters.guild_trend_alchemy_cooking.subject': 'Pekerjaan Anda di Alkimia dan Memasak',
+  'entities.letters.guild_trend_armorcrafting_engineering.body':
+    'Perajin,\n\nKabar sampai ke Persekutuan tentang pekerjaan Anda di bidang Pembuatan Zirah dan Teknik: pelat-pelat dipaku dan roda gigi dipasang, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin',
+  'entities.letters.guild_trend_armorcrafting_engineering.sender': 'Persatuan Perajin',
+  'entities.letters.guild_trend_armorcrafting_engineering.subject':
+    'Pekerjaan Anda di bidang Pembuatan Zirah dan Teknik',
+  'entities.letters.guild_trend_cooking_leatherworking.body':
+    'Perajin,\n\nKabar mengenai pekerjaan Anda di bidang Memasak dan Pengerjaan Kulit sampai ke Persekutuan: hidangan disajikan dan kulit disamak, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin',
+  'entities.letters.guild_trend_cooking_leatherworking.sender': 'Persatuan Perajin',
+  'entities.letters.guild_trend_cooking_leatherworking.subject':
+    'Pekerjaan Anda di bidang Memasak dan Pengerjaan Kulit',
+  'entities.letters.guild_trend_enchanting_jewelcrafting.body':
+    'Perajin,\n\nKabar sampai ke Persekutuan tentang pekerjaan Anda dalam Mempesona dan Kerajinan Perhiasan: jimat diikat dan batu dipoles, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin',
+  'entities.letters.guild_trend_enchanting_jewelcrafting.sender': 'Persatuan Perajin',
+  'entities.letters.guild_trend_enchanting_jewelcrafting.subject':
+    'Pekerjaan Anda di Mempesona dan Kerajinan Perhiasan',
+  'entities.letters.guild_trend_engineering_alchemy.body':
+    'Perajin,\n\nKabar mengenai pekerjaan Anda di bidang Teknik dan Alkimia sampai ke Persekutuan: muatan diukur dan reagen ditimbang, kedua kerajinan saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Mereka yang mengikat pasangan ini mendapatkan nama Pembombardir pada waktunya. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin',
+  'entities.letters.guild_trend_engineering_alchemy.sender': 'Persatuan Perajin',
+  'entities.letters.guild_trend_engineering_alchemy.subject':
+    'Pekerjaan Anda di bidang Teknik dan Alkimia',
+  'entities.letters.guild_trend_inscription_enchanting.body':
+    'Perajin,\n\nKabar sampai ke Persatuan tentang karya Anda dalam Prasasti dan Mempesona: gulungan-gulungan berhuruf dan jimat-jimat yang ditenun, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin',
+  'entities.letters.guild_trend_inscription_enchanting.sender': 'Persatuan Perajin',
+  'entities.letters.guild_trend_inscription_enchanting.subject':
+    'Pekerjaan Anda dalam Prasasti dan Mempesona',
+  'entities.letters.guild_trend_jewelcrafting_weaponcrafting.body':
+    'Perajin,\n\nKabar sampai ke Persekutuan tentang pekerjaan Anda dalam Pembuatan Perhiasan dan Pembuatan Senjata: permata diletakkan dan ujungnya diratakan, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin',
+  'entities.letters.guild_trend_jewelcrafting_weaponcrafting.sender': 'Persatuan Perajin',
+  'entities.letters.guild_trend_jewelcrafting_weaponcrafting.subject':
+    'Pekerjaan Anda di bidang Pembuatan Perhiasan dan Pembuatan Senjata',
+  'entities.letters.guild_trend_leatherworking_tailoring.body':
+    'Perajin,\n\nKabar sampai ke Persekutuan tentang pekerjaan Anda dalam Pengerjaan Kulit dan Penjahitan: potongan kulit dan pinggiran kain, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Mereka yang mengikat pasangan ini mendapatkan nama Penata Busana pada waktunya. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin',
+  'entities.letters.guild_trend_leatherworking_tailoring.sender': 'Persatuan Perajin',
+  'entities.letters.guild_trend_leatherworking_tailoring.subject':
+    'Pekerjaan Anda di bidang Pengerjaan Kulit dan Penjahitan',
+  'entities.letters.guild_trend_tailoring_inscription.body':
+    'Perajin,\n\nKabar sampai ke Persatuan tentang pekerjaan Anda dalam Menjahit dan Prasasti: jahitan dijahit dan glif diberi tinta, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin',
+  'entities.letters.guild_trend_tailoring_inscription.sender': 'Persatuan Perajin',
+  'entities.letters.guild_trend_tailoring_inscription.subject':
+    'Pekerjaan Anda dalam Menjahit dan Prasasti',
+  'entities.letters.guild_trend_weaponcrafting_armorcrafting.body':
+    'Perajin,\n\nKabar sampai ke Persekutuan tentang pekerjaan Anda dalam Pembuatan Senjata dan Pembuatan Zirah: bilahnya ditempa dan pelat dipasang, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Mereka yang mengikat pasangan ini mendapatkan nama Pandai Besi pada waktunya. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin',
+  'entities.letters.guild_trend_weaponcrafting_armorcrafting.sender': 'Persatuan Perajin',
+  'entities.letters.guild_trend_weaponcrafting_armorcrafting.subject':
+    'Pekerjaan Anda di Pembuatan Senjata dan Pembuatan Zirah',
+  'entities.npcs.alchemist_verane.greeting':
+    'Ukur dua kali dan tuang sekali, {className}. Apoteker tidak mempunyai kesabaran terhadap reagen yang tumpah.',
+  'entities.npcs.alchemist_verane.name': 'Alkemis Verane',
+  'entities.npcs.alchemist_verane.title': 'Master Apoteker',
+  'entities.npcs.cook_marlow.greeting':
+    'Tidak ada yang membuat dapur saya setengah matang, {className}. Duduk, makan, lalu kembali ke sana.',
+  'entities.npcs.cook_marlow.name': 'Masak Marlow',
+  'entities.npcs.cook_marlow.title': 'Tuan Dapur',
+  'entities.npcs.forgemistress_darva.greeting':
+    'Bengkel menjawab saya, {className}. Bawalah bijih yang bagus dan itu akan menjawabmu juga.',
+  'entities.npcs.forgemistress_darva.name': 'Empu Tempa Darva',
+  'entities.npcs.forgemistress_darva.title': 'Tuan Penempaan',
+  'entities.npcs.tanner_hesk.greeting':
+    'Kulit hanya akan bagus jika penyamakannya, {className}. Tong sudah siap saat Anda siap.',
+  'entities.npcs.tanner_hesk.name': 'Penyamak Hesk',
+  'entities.npcs.tanner_hesk.title': 'Tuan Penyamakan Kulit',
+  'entities.npcs.tinker_gizzel.greeting':
+    'Pegas, sproket, dan tepi tajam, {className}: alat ini memiliki segala kekurangan yang dimiliki tangan Anda.',
+  'entities.npcs.tinker_gizzel.name': 'Gizzel Tinker',
+  'entities.npcs.tinker_gizzel.title': 'Ahli Perkakas',
+  'entities.npcs.weaver_ottilie.greeting':
+    'Perhatikan utasnya, {className}. Tangan yang mantap pada alat tenun mengalahkan tangan yang kuat.',
+  'entities.npcs.weaver_ottilie.name': 'Penenun Ottilie',
+  'entities.npcs.weaver_ottilie.title': 'Tuan Alat Tenun',
+  'gatherEvent.ancientHeartwood': '{finder} menebang inti kayu kuno!',
+  'gatherEvent.moonlitBloom': '{finder} menemukan mekarnya cahaya bulan!',
+  'gatherEvent.pristineVein': '{finder} memberikan kesan yang murni!',
+  'guide.abilityHook.brain_freeze':
+    'Frostbolt Anda terkadang membuat Flurry berikutnya menjadi instan dan melewatkan cooldownnya.',
+  'guide.abilityHook.frozen_orb':
+    'Meluncurkan bola lambat ke dalam kawanan yang membuat musuh kedinginan dan membekukan es.',
+  'heroicShop.buyConfirmAccept': 'Membeli',
+  'heroicShop.buyConfirmBody':
+    'Beli {item} untuk Tanda Heroik {marks}? Pembelian merek tidak dapat dikembalikan.',
+  'heroicShop.buyConfirmCancel': 'Membatalkan',
+  'heroicShop.buyConfirmTitle': 'Konfirmasi Pembelian',
+  'hudChrome.crafting.comboTierUnmetNamed': 'Naikkan {crafts} ke tingkat {tier}.',
+  'hudChrome.crafting.difficultyFull': 'Peningkatan keterampilan penuh',
+  'hudChrome.crafting.difficultyNone': 'Tidak ada perolehan keterampilan',
+  'hudChrome.crafting.difficultyReduced': 'Mengurangi perolehan keterampilan',
+  'hudChrome.crafting.enchantedLine': 'Terpesona',
+  'hudChrome.crafting.makersMark': 'Dibuat oleh {name}',
+  'hudChrome.crafting.masterworkSeal': 'Karya besar',
+  'hudChrome.crafting.masterworkToast': 'Karya besar! {name}',
+  'hudChrome.crafting.masterworkZoneLine': '{crafter} membuat karya besar {name}!',
+  'hudChrome.crafting.skillReqLine': 'Membutuhkan {craft} {skill}',
+  'hudChrome.crafting.stationBadge': 'Tempat Kerja Kerajinan',
+  'hudChrome.crafting.stationName.apothecary': 'Ahli obat',
+  'hudChrome.crafting.stationName.forge': 'Bengkel Tempa',
+  'hudChrome.crafting.stationName.kitchens': 'Dapur',
+  'hudChrome.crafting.stationName.loom': 'Mesin tenun',
+  'hudChrome.crafting.stationName.tannery': 'Penyamakan',
+  'hudChrome.crafting.stationName.toolworks': 'Bengkel Perkakas',
+  'hudChrome.crafting.stationOutOfRangeNamed': 'Pindah ke {station} untuk membuat ini.',
+  'hudChrome.crafting.stationRequired': 'Anda harus berada di {station} untuk membuatnya.',
+  'hudChrome.crafting.tierUpToast': '{craft} maju ke tingkat {tier}!',
+  'hudChrome.death.healerConfirmAccept': 'Bangkitkan Aku',
+  'hudChrome.death.healerConfirmBody':
+    'Sang Penjaga Pucat akan menghidupkan Anda kembali di sini, tetapi Upeti Sang Penjaga mengurangi semua atribut Anda sebesar 75%, hingga 10 menit pada level yang lebih tinggi. Membawa roh Anda kembali ke mayat Anda akan menghidupkan Anda kembali tanpa penalti.',
+  'hudChrome.death.healerConfirmCancel': 'Membatalkan',
+  'hudChrome.death.healerConfirmTitle': 'Terima Upeti Sang Penjaga?',
+  'hudChrome.gathering.gatherLine': 'Anda mengumpulkan: {name}.',
+  'hudChrome.gathering.gatherLineQty': 'Anda mengumpulkan: {name} x{qty}.',
+  'hudChrome.mobile.professions': 'Profesi',
+  'hudChrome.options.showThirdActionBar': 'Tampilkan Bilah Tindakan Ketiga',
+  'hudChrome.playerMenu.streamerBadgeTitle': 'Streamer terverifikasi',
+  'hudChrome.professions.ceilingCommon': 'Batasan umum',
+  'hudChrome.professions.ceilingRare': 'Topi langka',
+  'hudChrome.professions.ceilingUnlimited': 'Tidak ada batasan pemberdayaan',
+  'hudChrome.professions.close': 'Tutup profesi',
+  'hudChrome.professions.ctaHeader': 'Langkah selanjutnya',
+  'hudChrome.professions.ctaRaise':
+    'Tingkatkan terus {craft}:{points} poin lebih banyak ke tingkat berikutnya.',
+  'hudChrome.professions.ctaStart': 'Buat atau kumpulkan dengan profesi apa pun untuk memulai.',
+  'hudChrome.professions.gatheringHeader': 'Mengumpulkan',
+  'hudChrome.professions.hobbyLabel': 'Hobi: {craft}',
+  'hudChrome.professions.identityHeader': 'Identitas',
+  'hudChrome.professions.majorsLabel': 'Jurusan: {a} dan {b}',
+  'hudChrome.professions.nextUnlockMax': 'Pada keterampilan maksimal',
+  'hudChrome.professions.nextUnlockSpecialized':
+    '{points} menunjuk ke Khusus: biaya material turun',
+  'hudChrome.professions.nextUnlockTier':
+    '{points} menunjuk ke tingkat berikutnya: peluang karya besar meningkat',
+  'hudChrome.professions.nudgeDormant': 'Pengetahuan {craft} Anda tertidur',
+  'hudChrome.professions.nudgeNearTier': '{craft}: {points} poin dari tingkat berikutnya',
+  'hudChrome.professions.pairsHeld': 'Pasangan yang dimiliki: {count}',
+  'hudChrome.professions.perkSpecializedAt': 'Mengkhususkan diri pada keterampilan {threshold}',
+  'hudChrome.professions.perkSpecializedLine': '{craft}: Khusus, biaya material -{pct}%',
+  'hudChrome.professions.perksHeader': 'Keuntungan',
+  'hudChrome.professions.returnsLabel': 'Pengembalian: {count}',
+  'hudChrome.professions.ringAria': 'Roda kerajinan',
+  'hudChrome.professions.roleDormant': 'Terbengkalai',
+  'hudChrome.professions.roleHobby': 'Hobi',
+  'hudChrome.professions.roleMajor': 'Besar',
+  'hudChrome.professions.roleUnattuned': 'Tidak selaras',
+  'hudChrome.professions.skillValue': '{skill} / {max}',
+  'hudChrome.professions.skillsHeader': 'Keterampilan kerajinan',
+  'hudChrome.professions.switchCost':
+    'Peralihan arketipe berikutnya membutuhkan {cost} poin penebusan',
+  'hudChrome.professions.syncing': 'Menunggu data profesi Anda dari ranah.',
+  'hudChrome.professions.tierPipAria': 'Tingkat {tier}',
+  'hudChrome.professions.title': 'Profesi',
+  'hudChrome.professions.tutorialLine':
+    'Raih keterampilan {target} di kerajinan apa pun untuk membuka kunci tingkat pertama Anda.',
+  'hudChrome.professions.unattunedIdentity':
+    'Anda belum terbiasa dengan suatu arketipe. Tingkatkan kerajinan Anda dan selesaikan attunement untuk memilih pasangan Anda.',
+  'hudChrome.training.alreadyKnown': 'Anda sudah tahu resep itu.',
+  'hudChrome.training.cannotAfford': 'Anda tidak mampu membiayai pelatihan itu.',
+  'hudChrome.training.close': 'Tutup pelatihan',
+  'hudChrome.training.dialogOption': 'Pelatihan',
+  'hudChrome.training.dialogOptionAria': 'Jelajahi pelatihan dari {name}',
+  'hudChrome.training.empty': 'Guru ini tidak punya apa pun untuk diajarkan.',
+  'hudChrome.training.free': 'Bebas',
+  'hudChrome.training.learned': 'Resep yang dipelajari: {recipe}',
+  'hudChrome.training.notTaughtHere': 'Resep itu tidak diajarkan di sini.',
+  'hudChrome.training.outOfRange': 'Anda harus berada di stasiun untuk berlatih.',
+  'hudChrome.training.requirement': 'Diajarkan di {craft} {skill}',
+  'hudChrome.training.stateKnown': 'Diketahui',
+  'hudChrome.training.stateLocked': 'Terkunci',
+  'hudChrome.training.stateTeachable': 'Tersedia',
+  'hudChrome.training.tierUnmet': 'Anda memerlukan {craft} {skill} untuk mempelajari resep itu.',
+  'hudChrome.training.title': 'Pelatihan: {name}',
+  'hudChrome.training.trainAria': 'Pelajari {name} untuk {fee}',
 };

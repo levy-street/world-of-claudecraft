@@ -88,8 +88,8 @@ the TypeScript 6 JS API (via the `@typescript/typescript6` wrapper) because
   Checking a single file ad hoc (`npx tsc somefile.ts`) errors when the directory
   has a `tsconfig.json`; pass `--ignoreConfig` for the old behavior.
 - **Lockfile.** Regenerate `package-lock.json` only with
-  `npx npm@10 install --package-lock-only`: the file uses npm-10 semantics (CI
-  runs Node 22's bundled npm), and newer npm majors silently drop
+  `npx npm@10 install --package-lock-only`: the file uses npm-10 semantics, and
+  newer npm majors (including the npm 11 that CI's Node 26 bundles) silently drop
   `svelte-check`'s nested optional-peer entries, which desyncs `npm ci` in CI.
   Plain `npm ci` is safe under any npm major. After regenerating, confirm
   `npm ci --dry-run` is in sync under both npm 10 and your workstation's npm.

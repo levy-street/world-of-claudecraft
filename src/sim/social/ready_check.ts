@@ -82,12 +82,22 @@ function finalizeReadyCheck(ctx: SimContext, check: ReadyCheck): void {
     else if (state === 'notready') notReady++;
     else noResponse++; // still pending at finalize -> no response
   }
-  // One counts-only summary line to every participant (the yes/no answers stay
-  // private, as in the classic client). Numbers are re-localized client-side.
+  // The counts summary, then one line naming each member who declined or never
+  // answered, to every participant: classic-era clients announce the non-ready
+  // members to the group after a ready check, so the leader can act on who is
+  // holding the pull. Ready members are never named. A member who left mid-check
+  // has no slot (party.ts drops it) and so is never named either.
   for (const mPid of check.responses.keys()) {
     ctx.notice(
       mPid,
       `Ready check: ${ready} ready, ${notReady} not ready, ${noResponse} no response.`,
     );
+    for (const [pid, state] of check.responses) {
+      if (state === 'ready') continue;
+      const name = ctx.players.get(pid)?.name;
+      if (!name) continue;
+      if (state === 'notready') ctx.notice(mPid, `${name} is not ready.`);
+      else ctx.notice(mPid, `${name} did not respond to the ready check.`);
+    }
   }
 }

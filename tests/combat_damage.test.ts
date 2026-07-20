@@ -50,6 +50,28 @@ describe('combat/damage dealDamage (post-mitigation)', () => {
     expect(dmg.amount).toBe(100);
   });
 
+  it('does not break unbreakable encounter control when the target takes damage', () => {
+    const sim = makeSim();
+    const player = sim.player as AnyEntity;
+    const mob = spawnHostileMob(sim, 'forest_wolf', 5);
+    player.auras.push({
+      id: 'scripted_incapacitate',
+      name: 'Scripted Incapacitate',
+      kind: 'incapacitate',
+      remaining: 10,
+      duration: 10,
+      value: 0,
+      sourceId: mob.id,
+      school: 'shadow',
+      breaksOnDamage: true,
+      unbreakableControl: true,
+    } as Aura & { unbreakableControl: true });
+
+    dealDamage(sim.ctx, mob, player, 1, false, 'physical', null, 'hit');
+
+    expect(player.auras.some((a: Aura) => a.id === 'scripted_incapacitate')).toBe(true);
+  });
+
   it('vulnerability amplifies before absorb soaks', () => {
     const sim = makeSim();
     sim.setPlayerLevel(10);

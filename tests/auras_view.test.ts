@@ -130,6 +130,22 @@ describe('createAurasView: derivation per mode', () => {
     expect(createAurasView('debuffs', deps()).tick(entity([bleedVulnerability])).count).toBe(1);
   });
 
+  it('never presents protected helpful control as right-click cancelable', () => {
+    const ordinaryStasis = aura({ id: 'ordinary_stasis', kind: 'stasis' });
+    const protectedStasis = aura({
+      id: 'scripted_stasis',
+      kind: 'stasis',
+      unbreakableControl: true,
+    });
+
+    expect(
+      createAurasView('buffs', deps()).tick(entity([ordinaryStasis])).slots[0].cancelable,
+    ).toBe(true);
+    expect(
+      createAurasView('buffs', deps()).tick(entity([protectedStasis])).slots[0].cancelable,
+    ).toBe(false);
+  });
+
   it('emits one slot PER aura even when two share an id (no core-side dedup)', () => {
     // The sim dedups by id+sourceId, so one entity can carry two auras with the same id
     // from different sources. The core must NOT collapse them (that is the painter's job,

@@ -24,6 +24,7 @@ import type {
   VcMatchInfo,
   VcPhase,
   VcRosterPlayer,
+  VcSharedCupInfo,
 } from '../../world_api/vale_cup';
 import { isStunned } from '../combat/cc';
 import {
@@ -2163,7 +2164,32 @@ function guildBoard(ctx: SimContext): { name: string; wins: number; losses: numb
   return rows.slice(0, VC_BOARD_SIZE);
 }
 
-export function cupInfoFor(ctx: SimContext, pid: number): CupInfo | null {
+// The realm-wide fragment of CupInfo (queue sizes, the live strip, the winners
+// and guild boards, who is practicing), computed once and shared across every
+// viewer in a broadcast pass. `live` is RAW (no per-viewer practice suppression;
+// cupInfoFor reapplies that). Draws no rng, reads only sim state.
+export function cupSharedInfoFor(ctx: SimContext): VcSharedCupInfo {
+  const vc = ctx.vcup;
+  // Same read order as the pre-extraction cupInfoFor (practicing, then queue
+  // sizes): both are pure, rng-free reads, so the order is cosmetic, but keeping
+  // it verbatim makes this a strict move, not a rewrite.
+  const practicing = vc.practices
+    .map((p) => ctx.players.get(p.practice?.ownerPid ?? -1)?.name ?? '')
+    .filter((n) => n.length > 0);
+  const queueSizes: Record<VcBracket, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  for (const bracket of VC_BRACKETS) {
+    queueSizes[bracket] = vc.queues[bracket].reduce((n, u) => n + u.pids.length, 0);
+  }
+  return {
+    queueSizes,
+    live: vc.match ? liveMatchInfo(vc.match) : null,
+    board: winnersBoard(ctx),
+    guildBoard: guildBoard(ctx),
+    practicing,
+  };
+}
+
+export function cupInfoFor(ctx: SimContext, pid: number, shared?: VcSharedCupInfo): CupInfo | null {
   const meta = ctx.players.get(pid);
   if (!meta) return null;
   const vc = ctx.vcup;
@@ -2176,15 +2202,10 @@ export function cupInfoFor(ctx: SimContext, pid: number): CupInfo | null {
   // `match` so every "am I playing?" gate that keys off cupInfo.match is untouched.
   const e = ctx.entities.get(pid);
   const spectate = !match && vc.match && e && isAtSowfield(e.pos.x, e.pos.z) ? vc.match : null;
-  // Names of everyone currently off in a private practice instance (the HUD shows
-  // this in the Sowfield region so walk-ups see who is practicing).
-  const practicing = vc.practices
-    .map((p) => ctx.players.get(p.practice?.ownerPid ?? -1)?.name ?? '')
-    .filter((n) => n.length > 0);
-  const queueSizes: Record<VcBracket, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-  for (const bracket of VC_BRACKETS) {
-    queueSizes[bracket] = vc.queues[bracket].reduce((n, u) => n + u.pids.length, 0);
-  }
+  // The realm-wide fields (queue sizes, live strip, boards, practicing) are the
+  // same for every viewer; take the shared fragment if the caller already built
+  // it this pass, else compute it here.
+  const s = shared ?? cupSharedInfoFor(ctx);
   const until = deserterUntil(ctx, meta.name);
   return {
     standing: { wins: meta.vcupWins, losses: meta.vcupLosses, draws: meta.vcupDraws },
@@ -2199,19 +2220,20 @@ export function cupInfoFor(ctx: SimContext, pid: number): CupInfo | null {
         ? (queued.unit.roles[pid] ?? null)
         : meta.sportRole,
     position: queued ? vcupQueuePosition(ctx, pid, queued.bracket) : 0,
-    queueSizes,
+    queueSizes: s.queueSizes,
     deserterFor: until > 0 ? Math.ceil(until - ctx.time) : 0,
     match: match ? matchInfoFor(ctx, match, pid) : null,
     spectate: spectate ? matchInfoFor(ctx, spectate, pid) : null,
     betRecord: { wins: meta.vcupBetWins, losses: meta.vcupBetLosses, net: meta.vcupBetNet },
     // The Sowfield's running match, for the persistent indicator, EXCEPT to a
     // player off in a private practice instance: they should not see the other
-    // (main) game's live strip overlaid on their own bout.
-    live: vc.match && !match?.practice ? liveMatchInfo(vc.match) : null,
-    board: winnersBoard(ctx),
-    guildBoard: guildBoard(ctx),
+    // (main) game's live strip overlaid on their own bout. The shared fragment's
+    // `live` is RAW (realm-wide); this reapplies the per-viewer suppression.
+    live: match?.practice ? null : s.live,
+    board: s.board,
+    guildBoard: s.guildBoard,
     myGuild: e?.guild || null,
     guildStanding: { wins: meta.vcupGuildWins, losses: meta.vcupGuildLosses },
-    practicing,
+    practicing: s.practicing,
   };
 }

@@ -318,10 +318,10 @@ export const pl_PL: EnTranslations = {
       "resurrectAtCorpse": "Odrodź się przy zwłokach",
       "resurrectAtHealer": "Blady Strażnik (Myto Strażnika)",
       "spiritHealerAlive": "Blady Strażnik czuwa nad umarłymi. Ty wciąż jesteś wśród żywych.",
-      "healerConfirmTitle": "Accept the Keeper's Toll?",
-      "healerConfirmBody": "The Pale Keeper will revive you here, but the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to your corpse revives you with no penalty.",
-      "healerConfirmAccept": "Revive Me",
-      "healerConfirmCancel": "Cancel"
+      "healerConfirmTitle": "Przyjąć Myto Strażnika?",
+      "healerConfirmBody": "Blady Strażnik wskrzesi cię tutaj, ale Myto Strażnika zmniejsza wszystkie twoje atrybuty o 75% na maksymalnie 10 minut na wyższych poziomach. Odprowadzenie ducha z powrotem do zwłok ożywia cię bez kary.",
+      "healerConfirmAccept": "Ożyw mnie",
+      "healerConfirmCancel": "Anulować"
     },
     "fct": {
       "absorbed": "Pochłonięto {amount}",
@@ -754,7 +754,7 @@ export const pl_PL: EnTranslations = {
       "leaderboard": "Rankingi",
       "dailyRewards": "Sklep",
       "deeds": "Czyny",
-      "professions": "Professions",
+      "professions": "Zawody",
       "nameplates": "Nazwy",
       "haptics": "Wibracje",
       "hapticsOff": "Wibracje wył.",
@@ -1044,7 +1044,7 @@ export const pl_PL: EnTranslations = {
       "itemLevelLine": "Poziom przedmiotu {level}",
       "itemScoreLine": "Ocena {score}",
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
-      "showThirdActionBar": "Show Third Action Bar",
+      "showThirdActionBar": "Pokaż trzeci pasek akcji",
       "showTargetOfTarget": "Pokaż cel celu",
       "showAttackButton": "Pokaż Przycisk Ataku",
       "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród",
@@ -1475,7 +1475,7 @@ export const pl_PL: EnTranslations = {
       "watchX": "Zobacz na X",
       "watchKick": "Oglądaj na Kicku",
       "watchYouTube": "Oglądaj na YouTube",
-      "streamerBadgeTitle": "Verified streamer"
+      "streamerBadgeTitle": "Zweryfikowany streamer"
     },
     "lootSettings": {
       "title": "Ustawienia łupów",
@@ -2089,9 +2089,11 @@ export const pl_PL: EnTranslations = {
       "mining": "Górnictwo",
       "logging": "Wyrąb",
       "herbalism": "Zielarstwo",
+      "fishing": "Fishing",
       "notReady": "Ten węzeł zasobu jeszcze nie odrósł dla ciebie.",
-      "gatherLine": "You gather: {name}.",
-      "gatherLineQty": "You gather: {name} x{qty}."
+      "gatherLine": "Zbierasz: {name}.",
+      "gatherLineQty": "Zbierasz: {name} x{qty}.",
+      "catchLine": "You reel in: {name}"
     },
     "archetypeTitle": {
       "label": "Tytuł",
@@ -2123,40 +2125,40 @@ export const pl_PL: EnTranslations = {
       "leatherworking": "Garbarstwo"
     },
     "professions": {
-      "title": "Professions",
-      "close": "Close professions",
-      "ringAria": "Craft wheel",
-      "skillsHeader": "Craft skills",
-      "gatheringHeader": "Gathering",
-      "perksHeader": "Perks",
-      "identityHeader": "Identity",
-      "roleMajor": "Major",
-      "roleHobby": "Hobby",
-      "roleDormant": "Dormant",
-      "roleUnattuned": "Unattuned",
-      "ceilingUnlimited": "No empowerment cap",
-      "ceilingRare": "Rare cap",
-      "ceilingCommon": "Common cap",
+      "title": "Zawody",
+      "close": "Zamknij zawody",
+      "ringAria": "Koło rzemieślnicze",
+      "skillsHeader": "Umiejętności rzemieślnicze",
+      "gatheringHeader": "Zgromadzenie",
+      "perksHeader": "Gratisy",
+      "identityHeader": "Tożsamość",
+      "roleMajor": "Główny",
+      "roleHobby": "Dodatkowe",
+      "roleDormant": "Uśpiony",
+      "roleUnattuned": "Niedostrojony",
+      "ceilingUnlimited": "Brak limitu uprawnień",
+      "ceilingRare": "Rzadka czapka",
+      "ceilingCommon": "Wspólna czapka",
       "skillValue": "{skill} / {max}",
-      "tierPipAria": "Tier {tier}",
-      "nextUnlockTier": "{points} points to the next tier: masterwork odds improve",
-      "nextUnlockSpecialized": "{points} points to Specialized: material costs drop",
-      "nextUnlockMax": "At maximum skill",
-      "perkSpecializedLine": "{craft}: Specialized, material costs -{pct}%",
-      "perkSpecializedAt": "Specializes at {threshold} skill",
-      "switchCost": "Next archetype switch costs {cost} amends",
-      "syncing": "Waiting for your profession data from the realm.",
-      "tutorialLine": "Reach {target} skill in any craft to unlock your first tier.",
-      "ctaHeader": "Next step",
-      "ctaRaise": "Keep raising {craft}: {points} more points to the next tier.",
-      "ctaStart": "Craft or gather with any profession to begin.",
-      "unattunedIdentity": "You are not yet attuned to an archetype. Raise your crafts and complete an attunement to choose your pair.",
-      "nudgeNearTier": "{craft}: {points} points from the next tier",
-      "nudgeDormant": "Your {craft} knowledge lies dormant",
-      "hobbyLabel": "Hobby: {craft}",
-      "majorsLabel": "Majors: {a} and {b}",
-      "pairsHeld": "Pairs held: {count}",
-      "returnsLabel": "Returns: {count}"
+      "tierPipAria": "Poziom {tier}",
+      "nextUnlockTier": "{points} wskazuje na następny poziom: zwiększają się szanse na arcydzieło",
+      "nextUnlockSpecialized": "{points} wskazuje na Specjalistyczne: spadają koszty materiałów",
+      "nextUnlockMax": "Przy maksymalnych umiejętnościach",
+      "perkSpecializedLine": "{craft}: Specjalistyczne, koszty materiałowe -{pct}%",
+      "perkSpecializedAt": "Specjalizuje się w umiejętności {threshold}",
+      "switchCost": "Następna zmiana archetypu kosztuje {cost} punktów zadośćuczynienia",
+      "syncing": "Czekam na dane dotyczące Twojej profesji z krainy.",
+      "tutorialLine": "Osiągnij umiejętność {target} w dowolnym rzemiośle, aby odblokować swój pierwszy poziom.",
+      "ctaHeader": "Następny krok",
+      "ctaRaise": "Podnoś dalej {craft}: {points} więcej punktów do następnego poziomu.",
+      "ctaStart": "Na początek twórz lub zbieraj dowolną profesją.",
+      "unattunedIdentity": "Nie jesteś jeszcze dostrojony do archetypu. Podnieś swoje rzemiosło i dokończ dostrojenie, aby wybrać swoją parę.",
+      "nudgeNearTier": "{craft}: {points} punkty z następnego poziomu",
+      "nudgeDormant": "Twoja wiedza o {craft} pozostaje uśpiona",
+      "hobbyLabel": "Zajęcie dodatkowe: {craft}",
+      "majorsLabel": "Kierunki: {a} i {b}",
+      "pairsHeld": "Posiadane pary: {count}",
+      "returnsLabel": "Zwroty: {count}"
     },
     "crafting": {
       "title": "Rzemiosło",
@@ -2176,7 +2178,7 @@ export const pl_PL: EnTranslations = {
       "comboNotAttuned": "Najpierw wybierz parę archetypów.",
       "comboWrongPair": "Aktywuj dokładnie tę parę, aby to wykonać.",
       "comboTierUnmet": "Podnieś obie główne specjalizacje do wymaganego poziomu.",
-      "comboTierUnmetNamed": "Raise {crafts} to tier {tier}.",
+      "comboTierUnmetNamed": "Podnieś {crafts} do poziomu {tier}.",
       "professionChoice": "Wybór profesji",
       "noProfessionChoice": "Aktualnie nie ma dostępnego wyboru profesji.",
       "pairOptionLabel": "{pair} ({craftA} + {craftB})",
@@ -2207,48 +2209,48 @@ export const pl_PL: EnTranslations = {
         "nearTier": "Do następnego poziomu rzemiosła {craft} brakuje {points} umiejętności.",
         "dormantKnowledge": "Wiedza rzemiosła {craft} jest zachowana, lecz uśpiona, dopóki jego para lub hobby nie będzie aktywne."
       },
-      "stationRequired": "You must be at the {station} to craft that.",
+      "stationRequired": "Aby to wytworzyć, musisz być w {station}.",
       "stationName": {
-        "forge": "Forge",
-        "kitchens": "Kitchens",
-        "apothecary": "Apothecary",
-        "tannery": "Tannery",
-        "loom": "Loom",
-        "toolworks": "Toolworks"
+        "forge": "Kuźnia",
+        "kitchens": "Kuchnie",
+        "apothecary": "Aptekarz",
+        "tannery": "Garbarnia",
+        "loom": "Warsztat tkacki",
+        "toolworks": "Narzędziownia"
       },
       "throttled": "Wytwarzasz zbyt szybko. Zaczekaj chwilę i spróbuj ponownie.",
       "recipeNotLearned": "Nie nauczyłeś się jeszcze tego przepisu.",
-      "skillReqLine": "Requires {craft} {skill}",
-      "difficultyFull": "Full skill gain",
-      "difficultyReduced": "Reduced skill gain",
-      "difficultyNone": "No skill gain",
-      "stationBadge": "Station",
-      "stationOutOfRangeNamed": "Move to the {station} to craft this.",
-      "masterworkToast": "Masterwork! {name}",
-      "masterworkZoneLine": "{crafter} crafted a masterwork {name}!",
-      "tierUpToast": "{craft} advanced to tier {tier}!",
-      "makersMark": "Crafted by {name}",
-      "masterworkSeal": "Masterwork",
-      "enchantedLine": "Enchanted"
+      "skillReqLine": "Wymaga {craft} {skill}",
+      "difficultyFull": "Pełny przyrost umiejętności",
+      "difficultyReduced": "Zmniejszony przyrost umiejętności",
+      "difficultyNone": "Żadnego przyrostu umiejętności",
+      "stationBadge": "Stanowisko rzemieślnicze",
+      "stationOutOfRangeNamed": "Przejdź do {station}, aby to wytworzyć.",
+      "masterworkToast": "Arcydzieło! {name}",
+      "masterworkZoneLine": "{crafter} stworzył arcydzieło {name}!",
+      "tierUpToast": "{craft} awansowany na poziom {tier}!",
+      "makersMark": "Stworzone przez {name}",
+      "masterworkSeal": "Arcydzieło",
+      "enchantedLine": "Zaczarowany"
     },
     "training": {
-      "title": "Training: {name}",
-      "close": "Close training",
-      "empty": "This master has nothing to teach.",
-      "free": "Free",
-      "stateKnown": "Known",
-      "stateTeachable": "Available",
-      "stateLocked": "Locked",
-      "requirement": "Taught at {craft} {skill}",
-      "trainAria": "Learn {name} for {fee}",
-      "dialogOption": "Training",
-      "dialogOptionAria": "Browse training from {name}",
-      "learned": "Recipe learned: {recipe}",
-      "tierUnmet": "You need {craft} {skill} to learn that recipe.",
-      "cannotAfford": "You cannot afford that training.",
-      "notTaughtHere": "That recipe is not taught here.",
-      "alreadyKnown": "You already know that recipe.",
-      "outOfRange": "You must be at the station to train."
+      "title": "Szkolenie: {name}",
+      "close": "Zamknięcie szkolenia",
+      "empty": "Ten mistrz nie ma niczego do nauczenia.",
+      "free": "Bezpłatny",
+      "stateKnown": "Znany",
+      "stateTeachable": "Dostępny",
+      "stateLocked": "Zamknięty",
+      "requirement": "Uczył w {craft} {skill}",
+      "trainAria": "Naucz się {name} dla {fee}",
+      "dialogOption": "Szkolenie",
+      "dialogOptionAria": "Przeglądaj szkolenia z {name}",
+      "learned": "Poznawany przepis: {recipe}",
+      "tierUnmet": "Aby nauczyć się tego przepisu, potrzebujesz {craft} {skill}.",
+      "cannotAfford": "Nie stać Cię na takie szkolenie.",
+      "notTaughtHere": "Ten przepis nie jest tutaj nauczany.",
+      "alreadyKnown": "Znacie już ten przepis.",
+      "outOfRange": "Musisz być na stacji, żeby trenować."
     },
     "finder": {
       "title": "Znajdywacz Lochów",
@@ -2418,9 +2420,9 @@ export const pl_PL: EnTranslations = {
     }
   },
   "gatherEvent": {
-    "pristineVein": "{finder} struck a pristine vein!",
-    "ancientHeartwood": "{finder} felled an ancient heartwood!",
-    "moonlitBloom": "{finder} discovered a moonlit bloom!"
+    "pristineVein": "{finder} trafił w nieskazitelną żyłę!",
+    "ancientHeartwood": "{finder} ściął starożytną twardziel!",
+    "moonlitBloom": "{finder} odkrył rozkwit w świetle księżyca!"
   },
   "apiError": {
     "validation": {
@@ -3026,9 +3028,9 @@ export const pl_PL: EnTranslations = {
       "ice_lance": "Natychmiastowy odłamek do wydawania efektów mrozu, trafia znacznie silniej w zamrożony cel.",
       "flurry": "Trzy szybkie pociski, które mrożą cel, czyniąc kolejne lodowe trafienia jakby był zamrożony.",
       "fingers_of_frost": "Twoje lodowe pociski czasem wzmacniają Ice Lance, by trafiała cel jak zamrożony.",
-      "brain_freeze": "Twoje lodowe pociski czasem czynią następny Winterlash natychmiastowym i silniejszym.",
+      "brain_freeze": "Twoje mroźne pioruny czasami powodują, że następna Fala jest natychmiastowa i pomija jej czas odnowienia.",
       "shatter": "Twoje czary trafiają krytycznie znacznie częściej w zamrożone cele.",
-      "frozen_orb": "Toczy powolny orb przez grupę wrogów, mroząc wszystko i zasilając twoje efekty mrozu.",
+      "frozen_orb": "Rzuca powolną kulą przez paczkę, która chłodzi wrogów i gromadzi Sople.",
       "blizzard": "Pokrywa obszar lodem, by niszczyć i spowalniać całe grupy wrogów.",
       "blink": "Teleportuje cię o krótki dystans do przodu, zrywając unieruchomienia.",
       "conjure_water": "Przywołuje napoje przywracające manę, byś mógł uzupełnić ją między walkami.",
@@ -4620,10 +4622,10 @@ export const pl_PL: EnTranslations = {
   "heroicShop": {
     "balance": "Znaki heroiczne: {count}",
     "buyAria": "Kup {item} za {marks} Znaków heroicznych",
-    "buyConfirmTitle": "Confirm Purchase",
-    "buyConfirmBody": "Buy {item} for {marks} Heroic Marks? Marks purchases cannot be refunded.",
-    "buyConfirmAccept": "Buy",
-    "buyConfirmCancel": "Cancel"
+    "buyConfirmTitle": "Potwierdź zakup",
+    "buyConfirmBody": "Kupić {item} za {marks} Heroiczne Znaki? Zakupy znaków nie podlegają zwrotowi.",
+    "buyConfirmAccept": "Kupić",
+    "buyConfirmCancel": "Anulować"
   },
   "cardDuel": {
     "title": "Pojedynek Karciany",
@@ -4677,10 +4679,10 @@ export const pl_PL: EnTranslations = {
       "reqHeroic": "Wymaga heroicznego oczyszczenia",
       "reqClears": "Wymaga {count} oczyszczeń",
       "empty": "Brak towaru w magazynie.",
-      "buyConfirmTitle": "Confirm Purchase",
-      "buyConfirmBody": "Buy {item} for {marks} Delve Marks? Marks purchases cannot be refunded.",
-      "buyConfirmAccept": "Buy",
-      "buyConfirmCancel": "Cancel"
+      "buyConfirmTitle": "Potwierdź zakup",
+      "buyConfirmBody": "Kup {item} za {marks} Znaków Wypraw? Zakupy znaków nie podlegają zwrotowi.",
+      "buyConfirmAccept": "Kupić",
+      "buyConfirmCancel": "Anulować"
     },
     "tracker": {
       "title": "Wyprawa",
@@ -5083,9 +5085,9 @@ export const pl_PL: EnTranslations = {
     "rendererFailed": "Nie udało się uruchomić renderera: spróbuj odświeżyć. {error}",
     "enterTimeout": "Nie udało się wejść do świata. Upłynął limit czasu połączenia. Czy serwer gry jest uruchomiony?",
     "connectionLost": "Połączenie z serwerem zostało utracone.",
-    "reconnectingAttempt": "Connection lost. Reconnecting... (attempt {attempt}/{maxAttempts}, retrying in {seconds}s)",
-    "reconnectingNow": "Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})",
-    "slowConnection": "This is taking longer than usual. Check your internet connection.",
+    "reconnectingAttempt": "Połączenie utracone. Ponowne łączenie... (próba {attempt}/{maxAttempts}, ponowna próba w {seconds})",
+    "reconnectingNow": "Połączenie utracone. Łączę się teraz ponownie... (próba {attempt}/{maxAttempts})",
+    "slowConnection": "To trwa dłużej niż zwykle. Sprawdź swoje połączenie internetowe.",
     "connectionRejected": "Serwer zamknął połączenie.",
     "realmFull": "Ten świat jest teraz pełny. Spróbuj ponownie za kilka minut.",
     "tooManyConnections": "Z twojej sieci pochodzi zbyt wiele połączeń do tego świata. Zamknij dodatkowe okna gry lub spróbuj ponownie za kilka minut.",
@@ -6188,7 +6190,7 @@ export const pl_PL: EnTranslations = {
       "rarityUncommon": "Niezwykły",
       "rarityRare": "Rzadki",
       "rarityEpic": "Epicki",
-      "rarityLegendary": "Legendary",
+      "rarityLegendary": "Legendarny",
       "merchantStock": "Zapasy kupca",
       "stackCount": "x{count}",
       "each": "{money} za sztukę",
@@ -6441,11 +6443,11 @@ export const pl_PL: EnTranslations = {
       },
       "flurry": {
         "name": "Winterlash",
-        "description": "Wypuszcza trzy lodowe pociski zadające po {damage} obrażeń od Mrozu i nakłada Winterowy Chłód na cel: dwa kolejne trafienia odpowiednimi czarami traktują cel jako zamrożony. Brain Freeze czyni Winterlash natychmiastowym, 30% silniejszym i usuwa jego czas odnowienia. (Mróz)"
+        "description": "Wystrzel trzy lodowe pociski zadają {damage} obrażenia od Mrozu i nakładają Zimowy Chłód na cel: kolejne 2 nadchodzące kompatybilne zaklęcia traktują go jako zamrożony. Brain Freeze sprawia, że ​​Winterlash jest natychmiastowy i pomija jego czas odnowienia. (Mróz)"
       },
       "frozen_orb": {
         "name": "Frozen Orb",
-        "description": "Wypuszcza orb wirującego mrozu, który unosi się naprzód przez 8 sek., zadając {damage} obrażeń od Mrozu co sekundę pobliskim wrogom i spowalniając ich o 30%. Jego trafienia generują Palce Mrozu. (Mróz)"
+        "description": "Wypuszcza kulę wirującego mrozu, która dryfuje do przodu przez 8 sek., zadając co sekundę obrażenia od mrozu {damage} pobliskim wrogom i spowalniając ich o 30%. Każdy uderzający impuls generuje jeden Sopel. (Mróz)"
       },
       "blizzard": {
         "name": "Blizzard",
@@ -6469,11 +6471,11 @@ export const pl_PL: EnTranslations = {
       },
       "brain_freeze": {
         "name": "Brain Freeze",
-        "description": "Szronowa lanca ma 20% szansy, aby następny Winterlash był natychmiastowy, 30% silniejszy i bez czasu odnowienia. (Mróz)"
+        "description": "Szronowa lanca ma 20% szans, że twój następny Winterlash będzie natychmiastowy i pozbawiony czasu odnowienia. (Mróz)"
       },
       "shatter": {
         "name": "Brittle Ruin",
-        "description": "Twoje czary zyskują 50% szansy na trafienie krytyczne przeciwko zamrożonym celom, a te trafienia krytyczne zadają o 20% więcej obrażeń. Palce Mrozu i Winterowy Chłód liczą się jako zamrożenie. (Mróz)"
+        "description": "Twoje zaklęcia zyskują 50% szansy na trafienie krytyczne w przypadku zamrożonych celów. Fingers of Frost i Winter's Chill liczą się jako zamrożone. (Mróz)"
       },
       "conjure_water": {
         "name": "Przywołanie wody",
@@ -8245,220 +8247,220 @@ export const pl_PL: EnTranslations = {
         "name": "Warstaff z Żarowego Szkła"
       },
       "copper_ore": {
-        "name": "Copper Ore"
+        "name": "Ruda Miedzi"
       },
       "iron_ore": {
-        "name": "Iron Ore"
+        "name": "Ruda żelaza"
       },
       "ironbark_log": {
-        "name": "Ironbark Log"
+        "name": "Kłoda Żelaznej Kory"
       },
       "silverleaf_herb": {
-        "name": "Silverleaf Herb"
+        "name": "Ziele srebrzystego liścia"
       },
       "rough_hide": {
-        "name": "Rough Hide"
+        "name": "Szorstka skóra"
       },
       "spider_silk": {
-        "name": "Spider Silk"
+        "name": "Pajęczy jedwab"
       },
       "venom_gland": {
-        "name": "Venom Gland"
+        "name": "Gruczoł Jadowy"
       },
       "game_meat": {
-        "name": "Game Meat"
+        "name": "Mięso z dziczyzny"
       },
       "homespun_cloth": {
-        "name": "Homespun Cloth"
+        "name": "Samodziałowa tkanina"
       },
       "pristine_hide": {
-        "name": "Pristine Hide"
+        "name": "Nieskazitelna skóra"
       },
       "pristine_silk": {
-        "name": "Pristine Silk"
+        "name": "Nieskazitelny jedwab"
       },
       "pristine_venom_gland": {
-        "name": "Pristine Venom Gland"
+        "name": "Nieskazitelny Gruczoł Jadowy"
       },
       "prime_cut": {
-        "name": "Prime Cut"
+        "name": "Pierwsze cięcie"
       },
       "smithing_flux": {
-        "name": "Smithing Flux"
+        "name": "Topnik kowalski"
       },
       "spool_of_thread": {
-        "name": "Spool of Thread"
+        "name": "Szpula nici"
       },
       "tanning_agent": {
-        "name": "Tanning Agent"
+        "name": "Środek garbujący"
       },
       "cooking_salt": {
-        "name": "Cooking Salt"
+        "name": "Sól kuchenna"
       },
       "glass_vial": {
-        "name": "Glass Vial"
+        "name": "Szklana fiolka"
       },
       "copper_bearded_axe": {
-        "name": "Copper Bearded Axe"
+        "name": "Miedziany brodaty topór"
       },
       "copper_flanged_mace": {
-        "name": "Copper Flanged Mace"
+        "name": "Miedziana buława z kołnierzem"
       },
       "ironbark_boar_spear": {
-        "name": "Ironbark Boar Spear"
+        "name": "Włócznia Dzika Żelaznej Kory"
       },
       "ironedge_longsword": {
-        "name": "Ironedge Longsword"
+        "name": "Długi miecz Ironedge"
       },
       "ironshod_maul": {
-        "name": "Ironshod Maul"
+        "name": "Żelazny młot bojowy"
       },
       "whetted_iron_dirk": {
-        "name": "Whetted Iron Dirk"
+        "name": "Zaostrzony żelazny sztylet"
       },
       "thorium_warblade": {
-        "name": "Thorium Warblade"
+        "name": "Torowe ostrze bojowe"
       },
       "arcanite_war_axe": {
-        "name": "Arcanite War Axe"
+        "name": "Arkanitowy topór bojowy"
       },
       "elderwood_battle_staff": {
-        "name": "Elderwood Battle Staff"
+        "name": "Kostur Bojowy Elderwood"
       },
       "riveted_copper_girdle": {
-        "name": "Riveted Copper Girdle"
+        "name": "Nitowany miedziany pas"
       },
       "coppermail_sabatons": {
-        "name": "Coppermail Sabatons"
+        "name": "Sabatony miedziano-pocztowe"
       },
       "coppermail_gauntlets": {
-        "name": "Coppermail Gauntlets"
+        "name": "Miedziane rękawice kolcze"
       },
       "ironlink_hauberk": {
-        "name": "Ironlink Hauberk"
+        "name": "Kolczuga z żelaznych ogniw"
       },
       "ironlink_legguards": {
-        "name": "Ironlink Legguards"
+        "name": "Legguardy Ironlink"
       },
       "ironlink_spaulders": {
-        "name": "Ironlink Spaulders"
+        "name": "Naramienniki Ironlink"
       },
       "thoriumscale_greathelm": {
-        "name": "Thoriumscale Greathelm"
+        "name": "Wielki Hełm w łusce toru"
       },
       "thoriumscale_cuirass": {
-        "name": "Thoriumscale Cuirass"
+        "name": "Kirys w łuskach toru"
       },
       "thoriumscale_leggings": {
-        "name": "Thoriumscale Leggings"
+        "name": "Legginsy w łuskach toru"
       },
       "homespun_hood": {
-        "name": "Homespun Hood"
+        "name": "Kaptur samodziałowy"
       },
       "homespun_mitts": {
-        "name": "Homespun Mitts"
+        "name": "Domowe rękawice z jednym palcem"
       },
       "silverthread_slippers": {
-        "name": "Silverthread Slippers"
+        "name": "Kapcie ze srebrną nitką"
       },
       "goldweave_robe": {
-        "name": "Goldweave Robe"
+        "name": "Złota szata"
       },
       "goldweave_leggings": {
-        "name": "Goldweave Leggings"
+        "name": "Legginsy ze złotym splotem"
       },
       "silkspun_satchel": {
-        "name": "Silkspun Satchel"
+        "name": "Torba Silkspun"
       },
       "silkbinders_raiment": {
-        "name": "Silkbinder's Raiment"
+        "name": "Szata Jedwabnika"
       },
       "sunweave_mantle": {
-        "name": "Sunweave Mantle"
+        "name": "Płaszcz Sunweave"
       },
       "sunweave_treads": {
-        "name": "Sunweave Treads"
+        "name": "Bieżniki Sunweave"
       },
       "fenbridge_hide_leggings": {
-        "name": "Fenbridge Hide Leggings"
+        "name": "Legginsy Fenbridge ze skóry"
       },
       "fenbridge_hide_boots": {
-        "name": "Fenbridge Hide Boots"
+        "name": "Buty ze skóry Fenbridge"
       },
       "fenbridge_hide_belt": {
-        "name": "Fenbridge Hide Belt"
+        "name": "Skórzany pas Fenbridge"
       },
       "marshstalker_jerkin": {
-        "name": "Marshstalker Jerkin"
+        "name": "Kaftan tropiciela mokradeł"
       },
       "marshstalker_hood": {
-        "name": "Marshstalker Hood"
+        "name": "Kaptur Łowcy Marsh"
       },
       "marshstalker_spaulders": {
-        "name": "Marshstalker Spaulders"
+        "name": "Naramienniki Marshstalkera"
       },
       "mirewarden_jerkin": {
-        "name": "Mirewarden Jerkin"
+        "name": "Kaftan strażnika bagien"
       },
       "mirewarden_leggings": {
-        "name": "Mirewarden Leggings"
+        "name": "Legginsy Mirewarden"
       },
       "mirewarden_treads": {
-        "name": "Mirewarden Treads"
+        "name": "Bieżniki Mirewarden"
       },
       "pan_seared_perch": {
-        "name": "Pan-Seared River Perch"
+        "name": "Okoń rzeczny smażony na patelni"
       },
       "hunters_game_skewer": {
-        "name": "Hunter's Game Skewer"
+        "name": "Szaszłyk do gry Łowca"
       },
       "herbed_marsh_pike": {
-        "name": "Herbed Marsh Pike"
+        "name": "Zielny szczupak błotny"
       },
       "ashwood_smoked_eel": {
-        "name": "Ashwood Smoked Eel"
+        "name": "Węgorz jesionowy wędzony"
       },
       "goldleaf_game_stew": {
-        "name": "Goldleaf Game Stew"
+        "name": "Gulasz z dziczyzny Goldleaf"
       },
       "frostgill_chowder": {
-        "name": "Frostgill Chowder"
+        "name": "Zupa Frostgill"
       },
       "silvered_carp_supper": {
-        "name": "Silvered Carp Supper"
+        "name": "Kolacja ze srebrzystego karpia"
       },
       "anglers_feast_platter": {
-        "name": "Angler's Feast Platter"
+        "name": "Półmisek uczty wędkarskiej"
       },
       "marlows_grand_roast": {
-        "name": "Marlow's Grand Roast"
+        "name": "Wielka pieczeń Marlowa"
       },
       "silverleaf_healing_draught": {
-        "name": "Silverleaf Healing Draught"
+        "name": "Mikstura lecznicza ze Srebrnego Liścia"
       },
       "silverleaf_mana_draught": {
-        "name": "Silverleaf Mana Draught"
+        "name": "Mikstura many ze Srebrnego Liścia"
       },
       "elixir_of_the_boar": {
-        "name": "Elixir of the Boar"
+        "name": "Eliksir Dzika"
       },
       "goldleaf_healing_draught": {
-        "name": "Goldleaf Healing Draught"
+        "name": "Mikstura lecznicza ze Złotego Liścia"
       },
       "goldleaf_mana_draught": {
-        "name": "Goldleaf Mana Draught"
+        "name": "Mikstura many ze Złotego Liścia"
       },
       "venomfire_elixir": {
-        "name": "Venomfire Elixir"
+        "name": "Eliksir Jadowitego Ognia"
       },
       "sunpetal_healing_draught": {
-        "name": "Sunpetal Healing Draught"
+        "name": "Mikstura lecznicza ze Słonecznego Płatka"
       },
       "sunpetal_mana_draught": {
-        "name": "Sunpetal Mana Draught"
+        "name": "Mikstura many ze Słonecznego Płatka"
       },
       "elixir_of_the_serpent": {
-        "name": "Elixir of the Serpent"
+        "name": "Eliksir Węża"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
@@ -9718,34 +9720,34 @@ export const pl_PL: EnTranslations = {
         "greeting": "Góra niczego nie zapomina, {playerName}, i ja też nie. Zobaczmy, czego udało ci się dokonać."
       },
       "forgemistress_darva": {
-        "name": "Forgemistress Darva",
-        "title": "Master of the Forge",
-        "greeting": "The forge answers to me, {className}. Bring good ore and it will answer to you too."
+        "name": "Mistrzyni Forge Darva",
+        "title": "Mistrz Kuźni",
+        "greeting": "Kuźnia odpowiada mi, {className}. Przynieś dobrą rudę, a ona również ci odpowie."
       },
       "cook_marlow": {
-        "name": "Cook Marlow",
-        "title": "Master of the Kitchens",
-        "greeting": "Nothing leaves my kitchens half-cooked, {className}. Sit, eat, then get back out there."
+        "name": "Gotuj Marlowa",
+        "title": "Mistrz Kuchni",
+        "greeting": "Nic nie pozostawia mojej kuchni na wpół ugotowanej, {className}. Usiądź, zjedz, a potem wracaj tam."
       },
       "weaver_ottilie": {
-        "name": "Weaver Ottilie",
-        "title": "Master of the Loom",
-        "greeting": "Mind the threads, {className}. A steady hand at the loom beats a strong one."
+        "name": "Tkaczka Ottilie",
+        "title": "Mistrz krosna",
+        "greeting": "Uważaj na wątki, {className}. Pewna ręka na krośnie bije silną."
       },
       "tinker_gizzel": {
-        "name": "Tinker Gizzel",
-        "title": "Master of the Toolworks",
-        "greeting": "Springs, sprockets, and sharp edges, {className}: the toolworks has whatever your hands lack."
+        "name": "Majsterkowicz Gizzel",
+        "title": "Mistrz narzędziowni",
+        "greeting": "Sprężyny, zębatki i ostre krawędzie, {className}: narzędziownia ma wszystko, czego brakuje Twoim dłoniom."
       },
       "tanner_hesk": {
-        "name": "Tanner Hesk",
-        "title": "Master of the Tannery",
-        "greeting": "A hide is only as good as its tanning, {className}. The vats are ready when you are."
+        "name": "Tannera Heska",
+        "title": "Mistrz Garbarni",
+        "greeting": "Skóra jest tak dobra, jak jej garbowanie, {className}. Kadzie będą gotowe, kiedy ty będziesz."
       },
       "alchemist_verane": {
-        "name": "Alchemist Verane",
-        "title": "Master of the Apothecary",
-        "greeting": "Measure twice and pour once, {className}. The apothecary has no patience for spilled reagents."
+        "name": "Alchemik Verane",
+        "title": "Mistrz Aptekarstwa",
+        "greeting": "Odmierz dwa razy i wlej raz, {className}. Aptekarz nie ma cierpliwości do rozlanych odczynników."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -10818,54 +10820,54 @@ export const pl_PL: EnTranslations = {
         "body": "Twoja grupa pokonała heroiczną próbę, gdy walczyłeś na tyłach lub leżałeś pokonany. Twoja blokada również została zapisana, dlatego należna część heroicznych znaków trafiła tutaj, zamiast przepaść. Dobrze je wykorzystaj.\n\n- Heroiczny kwatermistrz"
       },
       "guild_trend_engineering_alchemy": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Engineering and Alchemy",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Engineering and Alchemy: charges measured and reagents weighed, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Bombardier in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Gildia Rzemieślnicza",
+        "subject": "Twoja praca w inżynierii i alchemii",
+        "body": "Rzemieślnik,\n\nDo Gildii docierają wieści o twojej pracy w Inżynierii i Alchemii: zmierzono ładunki i zważono odczynniki, a oba rzemiosła zasilają się nawzajem. Sąsiednie rzemiosła współpracujące wyznaczają rękę gotową do dostrojenia. Ci, którzy zwiążą tę parę, z czasem zyskają miano Bombardiera. Odszukaj Kowala Haldrena, płatnerza z Eastbrook: na razie przemawia on w imieniu mistrzów. Udowodnij mu swoje rzemiosło, wykonując pracę własnych rąk, a on zobaczy, że twoje dwie specjalności są zestrojone.\n\nZ wyrazami szacunku,\nGildia Rzemieślnicza"
       },
       "guild_trend_alchemy_cooking": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Alchemy and Cooking",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Alchemy and Cooking: draughts simmered and dishes seasoned, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Apothecary in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Gildia Rzemieślnicza",
+        "subject": "Twoja praca w Alchemii i Gotowaniu",
+        "body": "Rzemieślnik,\n\nDo Gildii docierają wieści o twojej pracy w Alchemii i Gotowaniu: gotowane na wolnym ogniu wywary i przyprawione potrawy, a oba rzemiosła karmią się nawzajem. Sąsiednie rzemiosła współpracujące wyznaczają rękę gotową do dostrojenia. Ci, którzy zwiążą tę parę, z czasem zyskają miano Aptekarza. Odszukaj Kowala Haldrena, płatnerza z Eastbrook: na razie przemawia on w imieniu mistrzów. Udowodnij mu swoje rzemiosło, wykonując pracę własnych rąk, a on zobaczy, że twoje dwie specjalności są zestrojone.\n\nZ wyrazami szacunku,\nGildia Rzemieślnicza"
       },
       "guild_trend_cooking_leatherworking": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Cooking and Leatherworking",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Cooking and Leatherworking: meals plated and hides cured, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Gildia Rzemieślnicza",
+        "subject": "Twoja praca w kuchni i obróbce skóry",
+        "body": "Rzemieślnik,\n\nDo Gildii docierają wieści o twojej pracy w kuchni i obróbce skóry: podane potrawy i wyprawione skóry, a oba rzemiosła karmią się nawzajem. Sąsiednie rzemiosła współpracujące wyznaczają rękę gotową do dostrojenia. Odszukaj Kowala Haldrena, płatnerza z Eastbrook: na razie przemawia on w imieniu mistrzów. Udowodnij mu swoje rzemiosło, wykonując pracę własnych rąk, a on zobaczy, że twoje dwie specjalności są zestrojone.\n\nZ wyrazami szacunku,\nGildia Rzemieślnicza"
       },
       "guild_trend_leatherworking_tailoring": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Leatherworking and Tailoring",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Leatherworking and Tailoring: leather cut and cloth hemmed, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Outfitter in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Gildia Rzemieślnicza",
+        "subject": "Twoja praca w branży skórzanej i krawieckiej",
+        "body": "Rzemieślnik,\n\nDo Gildii docierają wieści o Twojej pracy w zakresie obróbki skóry i krawiectwa: krojenie skóry i obszycie tkaniną, oba rzemiosła karmiące się nawzajem. Sąsiednie rzemiosła współpracujące wyznaczają rękę gotową do dostrojenia. Ci, którzy zwiążą tę parę, z czasem zyskają miano Zaopatrzeniowca. Odszukaj Kowala Haldrena, płatnerza z Eastbrook: na razie przemawia on w imieniu mistrzów. Udowodnij mu swoje rzemiosło, wykonując pracę własnych rąk, a on zobaczy, że twoje dwie specjalności są zestrojone.\n\nZ wyrazami szacunku,\nGildia Rzemieślnicza"
       },
       "guild_trend_tailoring_inscription": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Tailoring and Inscription",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Tailoring and Inscription: seams stitched and glyphs inked, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Gildia Rzemieślnicza",
+        "subject": "Twoja praca w krawiectwie i inskrypcji",
+        "body": "Rzemieślnik,\n\nDo Gildii docierają wieści o twojej pracy w krawiectwie i inskrypcji: zszyte szwy i namalowane glify, a oba rzemiosła zasilają się nawzajem. Sąsiednie rzemiosła współpracujące wyznaczają rękę gotową do dostrojenia. Odszukaj Kowala Haldrena, płatnerza z Eastbrook: na razie przemawia on w imieniu mistrzów. Udowodnij mu swoje rzemiosło, wykonując pracę własnych rąk, a on zobaczy, że twoje dwie specjalności są zestrojone.\n\nZ wyrazami szacunku,\nGildia Rzemieślnicza"
       },
       "guild_trend_inscription_enchanting": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Inscription and Enchanting",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Inscription and Enchanting: scrolls lettered and charms woven, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Gildia Rzemieślnicza",
+        "subject": "Twoja praca w Inskrypcji i Zaklinaniu",
+        "body": "Rzemieślnik,\n\nDo Gildii docierają wieści o twojej pracy w Inskrypcjach i Zaklinaniu: zwoje z napisami i tkane amulety, oba rzemiosła zasilają się nawzajem. Sąsiednie rzemiosła współpracujące wyznaczają rękę gotową do dostrojenia. Odszukaj Kowala Haldrena, płatnerza z Eastbrook: na razie przemawia on w imieniu mistrzów. Udowodnij mu swoje rzemiosło, wykonując pracę własnych rąk, a on zobaczy, że twoje dwie specjalności są zestrojone.\n\nZ wyrazami szacunku,\nGildia Rzemieślnicza"
       },
       "guild_trend_enchanting_jewelcrafting": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Enchanting and Jewelcrafting",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Enchanting and Jewelcrafting: charms bound and stones polished, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Gildia Rzemieślnicza",
+        "subject": "Twoja praca w zaklinaniu i jubilerstwie",
+        "body": "Rzemieślnik,\n\nDo Gildii docierają wieści o twojej pracy w zaklinaniu i jubilerstwie: oprawione amulety i wypolerowane kamienie, a oba rzemiosła zasilają się nawzajem. Sąsiednie rzemiosła współpracujące wyznaczają rękę gotową do dostrojenia. Odszukaj Kowala Haldrena, płatnerza z Eastbrook: na razie przemawia on w imieniu mistrzów. Udowodnij mu swoje rzemiosło, wykonując pracę własnych rąk, a on zobaczy, że twoje dwie specjalności są zestrojone.\n\nZ wyrazami szacunku,\nGildia Rzemieślnicza"
       },
       "guild_trend_jewelcrafting_weaponcrafting": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Jewelcrafting and Weaponcrafting",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Jewelcrafting and Weaponcrafting: gems seated and edges ground, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Gildia Rzemieślnicza",
+        "subject": "Twoja praca w jubilerstwie i wytwarzaniu broni",
+        "body": "Rzemieślnik,\n\nDo Gildii docierają wieści o twojej pracy w jubilerstwie i wytwarzaniu broni: klejnoty osadzone i oszlifowane, a oba rzemiosła zasilają się nawzajem. Sąsiednie rzemiosła współpracujące wyznaczają rękę gotową do dostrojenia. Odszukaj Kowala Haldrena, płatnerza z Eastbrook: na razie przemawia on w imieniu mistrzów. Udowodnij mu swoje rzemiosło, wykonując pracę własnych rąk, a on zobaczy, że twoje dwie specjalności są zestrojone.\n\nZ wyrazami szacunku,\nGildia Rzemieślnicza"
       },
       "guild_trend_weaponcrafting_armorcrafting": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Weaponcrafting and Armorcrafting",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Weaponcrafting and Armorcrafting: blades tempered and plates fitted, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Those who bind this pair earn the name of Smith in time. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Gildia Rzemieślnicza",
+        "subject": "Twoja praca w wytwarzaniu broni i opancerzeniu",
+        "body": "Rzemieślnik,\n\nDo Gildii docierają wieści o twojej pracy w wytwarzaniu broni i opancerzeniu: hartowane ostrza i zamontowane płyty, a oba rzemiosła zasilają się nawzajem. Sąsiednie rzemiosła współpracujące wyznaczają rękę gotową do dostrojenia. Ci, którzy zwiążą tę parę, z czasem zyskają miano Kowala. Odszukaj Kowala Haldrena, płatnerza z Eastbrook: na razie przemawia on w imieniu mistrzów. Udowodnij mu swoje rzemiosło, wykonując pracę własnych rąk, a on zobaczy, że twoje dwie specjalności są zestrojone.\n\nZ wyrazami szacunku,\nGildia Rzemieślnicza"
       },
       "guild_trend_armorcrafting_engineering": {
-        "sender": "The Crafting Guild",
-        "subject": "Your work in Armorcrafting and Engineering",
-        "body": "Artisan,\n\nWord reaches the Guild of your work in Armorcrafting and Engineering: plates riveted and gears trued, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+        "sender": "Gildia Rzemieślnicza",
+        "subject": "Twoja praca w zbrojeniówce i inżynierii",
+        "body": "Rzemieślnik,\n\nDo Gildii docierają wieści o twojej pracy w zbrojeniówce i inżynierii: płyty są nitowane, koła zębate ustawione, a oba rzemiosła zasilają się nawzajem. Sąsiednie rzemiosła współpracujące wyznaczają rękę gotową do dostrojenia. Odszukaj Kowala Haldrena, płatnerza z Eastbrook: na razie przemawia on w imieniu mistrzów. Udowodnij mu swoje rzemiosło, wykonując pracę własnych rąk, a on zobaczy, że twoje dwie specjalności są zestrojone.\n\nZ wyrazami szacunku,\nGildia Rzemieślnicza"
       }
     },
     "itemSets": {

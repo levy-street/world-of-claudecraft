@@ -2189,6 +2189,7 @@ export const hudChromeStrings = {
     mining: 'Mining',
     logging: 'Logging',
     herbalism: 'Herbalism',
+    fishing: 'Fishing',
     // #1866: click/tap/interact-key error when a targeted node's per-viewer
     // respawn timer has not elapsed yet (IWorldProfessions#nodeHarvestableByMe).
     notReady: 'This resource node has not respawned for you yet.',
@@ -2199,6 +2200,12 @@ export const hudChromeStrings = {
     // into that wording (divergence pin: tests/gather_event_i18n.test.ts).
     gatherLine: 'You gather: {name}.',
     gatherLineQty: 'You gather: {name} x{qty}.',
+    // Reel-in feedback line (Professions 2.0 Phase 11), rendered from the
+    // id-based fishingResult SimEvent. Like gatherLine above, deliberately
+    // worded APART from the loot family: the grant hub's own 'loot' event
+    // already prints "You receive:" for the same catch, so this line must
+    // never regress into that wording (nor into gatherLine's).
+    catchLine: 'You reel in: {name}',
   },
   // Archetype title chrome (#1130, pair-named under Professions 2.0 Phase 1):
   // `label` heads the character-sheet title line, `none` is shown before the
