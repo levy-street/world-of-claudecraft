@@ -175,13 +175,26 @@ export type ProcResponse =
   // The pct-of-max-health variants (phase-2 defensive pass) override the flat
   // number when present. Most scale with the wearer; source scaling is for
   // shields whose proc owner can differ from the protected ally.
+  // target: the recipient defaults to the trigger subject (the heal target,
+  // the hit-taker, or the triggering cast's target). 'self' pins it to the
+  // proc owner instead; REQUIRED for any proc whose triggering casts are
+  // hostile (Hellglass Ward), or the response lands on the enemy. Explicit by
+  // design: the engine never infers the recipient from hostility.
   | {
       kind: 'heal';
       amount?: number;
       amountPctMaxHp?: number;
       amountPctSourceMaxHp?: number;
+      target?: 'self';
     }
-  | { kind: 'absorb'; amount?: number; amountPctMaxHp?: number; duration: number; name: string }
+  | {
+      kind: 'absorb';
+      amount?: number;
+      amountPctMaxHp?: number;
+      duration: number;
+      name: string;
+      target?: 'self';
+    }
   | {
       kind: 'echo';
       belowFrac: number;
