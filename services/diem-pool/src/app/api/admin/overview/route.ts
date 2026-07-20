@@ -36,6 +36,8 @@ export async function GET(req: NextRequest) {
     providers: providers.map((p) => ({
       id: p.id,
       wallet: p.wallet,
+      vendor: p.vendor,
+      trustTier: p.trustTier,
       displayName: p.displayName,
       status: p.status,
       keyLast4: p.keyLast4,

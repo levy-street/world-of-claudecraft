@@ -14,6 +14,22 @@ const envSchema = z.object({
   VENICE_VALIDATION_MODEL: z.string().default('llama-3.2-3b'),
   HOUSE_VENICE_API_KEY: z.string().default(''),
 
+  // POOL_-prefixed on purpose: bare OPENAI_BASE_URL / ANTHROPIC_BASE_URL are
+  // common ambient variables (SDKs, dev tooling) and .env files never
+  // override real environment variables — an operator's shell must not be
+  // able to silently redirect pool traffic.
+  POOL_OPENAI_BASE_URL: z.string().url().default('https://api.openai.com/v1'),
+  OPENAI_VALIDATION_MODEL: z.string().default('gpt-4o-mini'),
+  POOL_ANTHROPIC_BASE_URL: z.string().url().default('https://api.anthropic.com/v1'),
+  ANTHROPIC_VALIDATION_MODEL: z.string().default('claude-haiku-4-5'),
+  POOL_KIMI_BASE_URL: z.string().url().default('https://api.moonshot.ai/v1'),
+  KIMI_VALIDATION_MODEL: z.string().default('moonshot-v1-8k'),
+
+  // Anti-stolen-key trust ramp for BYOK vendors (docs/PLAN-byok-multi-vendor.md §7).
+  TRUST_CAP_NEW_USD: z.coerce.number().positive().default(2),
+  TRUST_CAP_ESTABLISHED_USD: z.coerce.number().positive().default(25),
+  MAX_BYOK_DAILY_BUDGET_USD: z.coerce.number().positive().default(1000),
+
   DIEM_DAILY_USD: z.coerce.number().positive().default(1),
   MAX_DECLARED_DIEM: z.coerce.number().int().positive().default(10000),
   SPEND_HEADROOM: z.coerce.number().min(0.1).max(1).default(0.9),

@@ -3,23 +3,30 @@ import { prisma } from './db';
 import { getEnv } from './env';
 import { decryptSecret, redactSecrets } from './crypto';
 import { WeightedRouter, type ProviderSnapshot } from './router';
-import { chatCompletion, VeniceError, type VeniceCallResult } from './venice';
+import { VeniceError, type VeniceCallResult } from './venice';
 import { computeCostUsd, FALLBACK_RATE, type ModelRate } from './pricing';
 import { isRoutingPaused } from './config';
 import { utcDay } from './settlement';
-import type { Purpose } from './schemas';
+import { getAdapter } from './vendors';
+import { effectiveCapacityUsd, type VendorName, type VendorPolicy } from './vendors/config';
+import { getVendorPolicies } from './vendors/policies';
+import type { ModelClassName, Purpose } from './schemas';
 
-// Orchestrates one inference call: pick a provider by weighted round-robin,
-// call Venice with retry + failover, meter actual usage, maintain provider
-// health state. See router.ts for the weighting algorithm.
+// Orchestrates one inference call: resolve the model class to concrete
+// vendor models, pick a provider by weighted round-robin over eligible
+// vendors, dispatch through the vendor adapter with retry + failover, meter
+// actual usage, maintain provider health state. See router.ts for the
+// weighting algorithm and docs/PLAN-byok-multi-vendor.md for the vendor model.
 
 const POOL_CACHE_MS = 3_000;
 const PRICING_CACHE_MS = 60_000;
+const CLASS_MAP_CACHE_MS = 60_000;
 const MAX_PROVIDERS_PER_REQUEST = 3;
 
 export interface InferenceInput {
   payload: Record<string, unknown>;
   purpose: Purpose;
+  modelClass?: ModelClassName;
   gameAccountId?: string;
 }
 
@@ -27,6 +34,7 @@ export interface InferenceOutcome {
   status: number;
   body: unknown;
   providerId: string | null;
+  vendor: VendorName | null;
   house: boolean;
 }
 
@@ -42,6 +50,7 @@ const globalState = globalThis as unknown as {
   poolRouter?: WeightedRouter;
   poolCache?: PoolCache | null;
   pricingCache?: { at: number; rates: Map<string, ModelRate> } | null;
+  classMapCache?: { at: number; byClass: Map<string, Map<VendorName, string>> } | null;
   unpricedModelsWarned?: Set<string>;
 };
 
@@ -71,9 +80,41 @@ async function loadPool(now: Date): Promise<PoolCache> {
 /** Test/ops hook: force a pool reload on the next request. */
 export function invalidatePoolCache(): void {
   globalState.poolCache = null;
+  globalState.classMapCache = null;
 }
 
-async function getRate(model: string): Promise<ModelRate> {
+/** Top-priority active concrete model per (class, vendor), cached. */
+async function getClassMap(): Promise<Map<string, Map<VendorName, string>>> {
+  const cached = globalState.classMapCache;
+  if (cached && Date.now() - cached.at < CLASS_MAP_CACHE_MS) return cached.byClass;
+
+  const rows = await prisma.modelClassMap.findMany({
+    where: { active: true },
+    orderBy: { priority: 'asc' },
+  });
+  const byClass = new Map<string, Map<VendorName, string>>();
+  for (const row of rows) {
+    const vendors = byClass.get(row.class) ?? new Map<VendorName, string>();
+    if (!vendors.has(row.vendor as VendorName)) vendors.set(row.vendor as VendorName, row.model);
+    byClass.set(row.class, vendors);
+  }
+  globalState.classMapCache = { at: Date.now(), byClass };
+  return byClass;
+}
+
+/** "vendor:model" pins that vendor; a bare model is the legacy Venice contract. */
+export function parsePinnedModel(model: string): { vendor: VendorName; model: string } {
+  const idx = model.indexOf(':');
+  if (idx > 0) {
+    const vendor = model.slice(0, idx);
+    if (['venice', 'openai', 'anthropic', 'kimi'].includes(vendor)) {
+      return { vendor: vendor as VendorName, model: model.slice(idx + 1) };
+    }
+  }
+  return { vendor: 'venice', model };
+}
+
+async function getRate(vendor: VendorName, model: string): Promise<ModelRate> {
   const now = Date.now();
   if (!globalState.pricingCache || now - globalState.pricingCache.at > PRICING_CACHE_MS) {
     const rows = await prisma.modelPricing.findMany({ where: { active: true } });
@@ -81,7 +122,7 @@ async function getRate(model: string): Promise<ModelRate> {
       at: now,
       rates: new Map(
         rows.map((r) => [
-          r.model,
+          `${r.vendor}:${r.model}`,
           {
             inputUsdPerMTokens: Number(r.inputUsdPerMTokens),
             outputUsdPerMTokens: Number(r.outputUsdPerMTokens),
@@ -90,15 +131,16 @@ async function getRate(model: string): Promise<ModelRate> {
       ),
     };
   }
-  const rate = globalState.pricingCache.rates.get(model);
+  const rate = globalState.pricingCache.rates.get(`${vendor}:${model}`);
   if (!rate) {
     // Conservative fallback so unknown models are never under-metered; warn
     // once per model so the admin adds real pricing.
     const warned = (globalState.unpricedModelsWarned ??= new Set());
-    if (!warned.has(model)) {
-      warned.add(model);
+    const key = `${vendor}:${model}`;
+    if (!warned.has(key)) {
+      warned.add(key);
       console.warn(
-        `[pricing] no active pricing for model "${model}" — metering at conservative fallback rates; add it in the admin pricing table`,
+        `[pricing] no active pricing for "${key}" — metering at conservative fallback rates; add it in the admin pricing table`,
       );
     }
     return FALLBACK_RATE;
@@ -109,16 +151,18 @@ async function getRate(model: string): Promise<ModelRate> {
 async function recordUsage(
   now: Date,
   providerId: string | null,
+  vendor: VendorName,
   input: InferenceInput,
   result: VeniceCallResult,
 ): Promise<void> {
-  const rate = await getRate(result.model);
+  const rate = await getRate(vendor, result.model);
   const costUsd = computeCostUsd(rate, result.usage.promptTokens, result.usage.completionTokens);
 
   const writes: Prisma.PrismaPromise<unknown>[] = [
     prisma.usageEvent.create({
       data: {
         providerId,
+        vendor,
         purpose: input.purpose,
         model: result.model,
         promptTokens: result.usage.promptTokens,
@@ -149,25 +193,60 @@ async function recordUsage(
   }
 }
 
+/**
+ * Metering failure after a successful upstream call must not fail the
+ * request: the provider's credit is already spent and the game already has
+ * its completion. Serve the response, log loudly (unmetered = unpaid), and
+ * let the next call surface persistent DB trouble via loadPool.
+ */
+async function meterOrWarn(
+  now: Date,
+  providerId: string | null,
+  vendor: VendorName,
+  input: InferenceInput,
+  result: VeniceCallResult,
+): Promise<void> {
+  try {
+    await recordUsage(now, providerId, vendor, input, result);
+  } catch (err) {
+    console.error(
+      `[inference] METERING FAILED for provider=${providerId ?? 'house'} vendor=${vendor} model=${result.model} ` +
+        `tokens=${result.usage.promptTokens}/${result.usage.completionTokens} — response served but unrewarded:`,
+      err,
+    );
+  }
+}
+
+/** Stolen-key economics: an upstream-revoked key voids its unvested rewards. */
+export async function voidPendingRewards(providerId: string, reason: string): Promise<void> {
+  const res = await prisma.rewardLedger.updateMany({
+    where: { providerId, status: 'PENDING' },
+    data: { status: 'VOIDED' },
+  });
+  if (res.count > 0) {
+    console.warn(`[rewards] voided ${res.count} pending ledger rows for provider=${providerId} (${reason})`);
+  }
+}
+
 async function markInvalid(providerId: string): Promise<void> {
   await prisma.provider.update({
     where: { id: providerId },
     data: { status: 'INVALID', unhealthyToday: true },
   });
+  await voidPendingRewards(providerId, 'key went INVALID upstream');
   getRouter().forget(providerId);
   invalidatePoolCache();
 }
 
-/** Venice says the key's daily credit is gone: pin spend to capacity so the
- *  router excludes it until the next UTC day, without touching status. */
-async function markCreditExhausted(provider: Provider, now: Date): Promise<void> {
-  const capacity = Number(provider.dailyCapacityUsd);
+/** Upstream says the key's credit is gone: pin spend to the effective budget
+ *  so the router excludes it until the next UTC day, without touching status. */
+async function markCreditExhausted(provider: Provider, effectiveCapacity: number, now: Date): Promise<void> {
   await prisma.providerDailySpend.upsert({
     where: { providerId_date: { providerId: provider.id, date: utcDay(now) } },
-    create: { providerId: provider.id, date: utcDay(now), spentUsd: capacity, requests: 0 },
-    update: { spentUsd: capacity },
+    create: { providerId: provider.id, date: utcDay(now), spentUsd: effectiveCapacity, requests: 0 },
+    update: { spentUsd: effectiveCapacity },
   });
-  globalState.poolCache?.spentUsd.set(provider.id, capacity);
+  globalState.poolCache?.spentUsd.set(provider.id, effectiveCapacity);
 }
 
 async function onHardFailure(provider: Provider): Promise<void> {
@@ -197,77 +276,75 @@ async function onSuccess(provider: Provider): Promise<void> {
   provider.consecutiveFailures = 0;
 }
 
-/**
- * Metering failure after a successful upstream call must not fail the
- * request: the provider's credit is already spent and the game already has
- * its completion. Serve the response, log loudly (unmetered = unpaid), and
- * let the next call surface persistent DB trouble via loadPool.
- */
-async function meterOrWarn(
-  now: Date,
-  providerId: string | null,
-  input: InferenceInput,
-  result: VeniceCallResult,
-): Promise<void> {
-  try {
-    await recordUsage(now, providerId, input, result);
-  } catch (err) {
-    console.error(
-      `[inference] METERING FAILED for provider=${providerId ?? 'house'} model=${result.model} ` +
-        `tokens=${result.usage.promptTokens}/${result.usage.completionTokens} — response served but unrewarded:`,
-      err,
-    );
-  }
-}
-
 /** One upstream attempt with a single same-key retry on retryable errors. */
 async function callWithRetry(
+  vendor: VendorName,
   apiKey: string,
+  model: string,
   payload: Record<string, unknown>,
 ): Promise<VeniceCallResult> {
-  const opts = { baseUrl: getEnv().VENICE_BASE_URL };
+  const adapter = getAdapter(vendor);
   try {
-    return await chatCompletion(apiKey, payload, opts);
+    return await adapter.chat(apiKey, { model, payload });
   } catch (err) {
     if (err instanceof VeniceError && err.retryable) {
-      return await chatCompletion(apiKey, payload, opts);
+      return await adapter.chat(apiKey, { model, payload });
     }
     throw err;
   }
 }
 
-function toSnapshot(p: Provider, spentUsd: Map<string, number>): ProviderSnapshot {
-  return {
-    id: p.id,
-    status: p.status,
-    dailyCapacityUsd: Number(p.dailyCapacityUsd),
-    spentTodayUsd: spentUsd.get(p.id) ?? 0,
-  };
-}
-
 export async function routeInference(input: InferenceInput): Promise<InferenceOutcome> {
   if (await isRoutingPaused()) {
-    return { status: 503, body: { error: 'routing paused by admin' }, providerId: null, house: false };
+    return { status: 503, body: { error: 'routing paused by admin' }, providerId: null, vendor: null, house: false };
   }
 
+  const env = getEnv();
   const now = new Date();
+  const policies = await getVendorPolicies();
+  const caps = { newUsd: env.TRUST_CAP_NEW_USD, establishedUsd: env.TRUST_CAP_ESTABLISHED_USD };
+
+  // Resolve which vendors can serve this request and with which model.
+  let modelFor: (vendor: VendorName) => string | null;
+  if (input.modelClass) {
+    const vendorModels = (await getClassMap()).get(input.modelClass);
+    modelFor = (vendor) => vendorModels?.get(vendor) ?? null;
+  } else {
+    const pinned = parsePinnedModel(String(input.payload.model));
+    modelFor = (vendor) => (vendor === pinned.vendor ? pinned.model : null);
+  }
+
   const pool = await loadPool(now);
   const byId = new Map(pool.providers.map((p) => [p.id, p]));
-  const order = getRouter().pickOrder(
-    pool.providers.map((p) => toSnapshot(p, pool.spentUsd)),
-    MAX_PROVIDERS_PER_REQUEST,
-  );
+  const effectiveCap = (p: Provider) =>
+    effectiveCapacityUsd(
+      Number(p.dailyCapacityUsd),
+      p.trustTier,
+      (policies[p.vendor as VendorName] as VendorPolicy).trustRampEnabled,
+      caps,
+    );
+  const snapshots: ProviderSnapshot[] = pool.providers
+    .filter((p) => policies[p.vendor as VendorName].enabled && modelFor(p.vendor as VendorName) !== null)
+    .map((p) => ({
+      id: p.id,
+      status: p.status,
+      dailyCapacityUsd: effectiveCap(p),
+      spentTodayUsd: pool.spentUsd.get(p.id) ?? 0,
+    }));
+  const order = getRouter().pickOrder(snapshots, MAX_PROVIDERS_PER_REQUEST);
 
   for (const providerId of order) {
     const provider = byId.get(providerId);
     if (!provider?.encryptedKey) continue;
-    const apiKey = decryptSecret(provider.encryptedKey, getEnv().KEY_ENCRYPTION_KEY);
+    const vendor = provider.vendor as VendorName;
+    const model = modelFor(vendor)!;
+    const apiKey = decryptSecret(provider.encryptedKey, env.KEY_ENCRYPTION_KEY);
 
     try {
-      const result = await callWithRetry(apiKey, input.payload);
-      await meterOrWarn(now, provider.id, input, result);
+      const result = await callWithRetry(vendor, apiKey, model, input.payload);
+      await meterOrWarn(now, provider.id, vendor, input, result);
       await onSuccess(provider);
-      return { status: 200, body: result.body, providerId: provider.id, house: false };
+      return { status: 200, body: result.body, providerId: provider.id, vendor, house: false };
     } catch (err) {
       if (!(err instanceof VeniceError)) throw err;
       switch (err.kind) {
@@ -275,7 +352,7 @@ export async function routeInference(input: InferenceInput): Promise<InferenceOu
           await markInvalid(provider.id);
           continue;
         case 'insufficient_credit':
-          await markCreditExhausted(provider, now);
+          await markCreditExhausted(provider, effectiveCap(provider), now);
           continue;
         case 'bad_request':
           // Our payload is at fault — failing over would just repeat it.
@@ -283,6 +360,7 @@ export async function routeInference(input: InferenceInput): Promise<InferenceOu
             status: err.status ?? 400,
             body: { error: 'upstream rejected request', detail: redactSecrets(err.message, [apiKey]) },
             providerId: null,
+            vendor,
             house: false,
           };
         default:
@@ -293,19 +371,21 @@ export async function routeInference(input: InferenceInput): Promise<InferenceOu
     }
   }
 
-  // Pool exhausted (or empty) → house key fallback, tagged `house`.
-  const houseKey = getEnv().HOUSE_VENICE_API_KEY;
-  if (houseKey) {
+  // Pool exhausted (or empty) → house Venice key fallback, tagged `house`.
+  const houseKey = env.HOUSE_VENICE_API_KEY;
+  const houseModel = modelFor('venice');
+  if (houseKey && houseModel) {
     try {
-      const result = await callWithRetry(houseKey, input.payload);
-      await meterOrWarn(now, null, input, result);
-      return { status: 200, body: result.body, providerId: null, house: true };
+      const result = await callWithRetry('venice', houseKey, houseModel, input.payload);
+      await meterOrWarn(now, null, 'venice', input, result);
+      return { status: 200, body: result.body, providerId: null, vendor: 'venice', house: true };
     } catch (err) {
       if (err instanceof VeniceError) {
         return {
           status: 502,
           body: { error: 'house key upstream failure', detail: redactSecrets(err.message, [houseKey]) },
           providerId: null,
+          vendor: 'venice',
           house: true,
         };
       }
@@ -315,8 +395,13 @@ export async function routeInference(input: InferenceInput): Promise<InferenceOu
 
   return {
     status: 503,
-    body: { error: 'provider pool exhausted and no house key configured' },
+    body: {
+      error: houseKey
+        ? 'provider pool exhausted and no venice mapping exists for this model class'
+        : 'provider pool exhausted and no house key configured',
+    },
     providerId: null,
+    vendor: null,
     house: false,
   };
 }

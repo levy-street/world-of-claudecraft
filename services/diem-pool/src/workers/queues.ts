@@ -23,6 +23,7 @@ export interface SettlementEvent {
   /** Consumers must dedupe on (providerId, date) — delivery is at-least-once. */
   providerId: string;
   wallet: string;
+  vendor: string;
   date: string; // YYYY-MM-DD (UTC)
   consumedUsd: number;
   baseClaudium: number;

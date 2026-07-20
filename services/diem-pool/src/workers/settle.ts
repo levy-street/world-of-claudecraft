@@ -6,19 +6,26 @@ import {
   computeSuspicionScore,
   nextHealthyStreak,
   utcDay,
+  vestingDate,
   type ProviderDay,
 } from '@/lib/settlement';
+import { tierFromStreak, type VendorName } from '@/lib/vendors/config';
+import { getVendorPolicies } from '@/lib/vendors/policies';
 import { getSettlementEventsQueue, type SettlementEvent } from './queues';
 
-// Daily settlement job (midnight UTC): settles the UTC day that just ended.
+// Daily settlement job (midnight UTC): settles the UTC day that just ended,
+// then vests any pending rewards whose fraud window has elapsed.
 //
 // Idempotency model:
-//  - Ledger rows upsert on (providerId, date) — always safe to re-run.
-//  - Streak bumps / suspicion scores / unhealthyToday resets are NOT naturally
-//    idempotent, so they commit in one transaction together with the ledger
-//    rows and the SettlementRun.streaksApplied flag.
+//  - Ledger rows upsert on (providerId, date) — always safe to re-run. The
+//    upsert's update branch never touches status/vestAt, so a re-run can
+//    never resurrect a VOIDED row or un-vest a VESTED one.
+//  - Streak bumps / tier promotion / suspicion scores / unhealthyToday resets
+//    are NOT naturally idempotent, so they commit in one transaction together
+//    with the ledger rows and the SettlementRun.streaksApplied flag.
 //  - Event emission is at-least-once (re-run after a crash re-emits); the
-//    queue payload carries (providerId, date) for consumer-side dedupe.
+//    queue payload carries (providerId, date) and the queue jobId dedupes;
+//    webhook consumers must dedupe on the same key.
 
 export async function runDailySettlement(now: Date = new Date()): Promise<void> {
   const env = getEnv();
@@ -35,6 +42,8 @@ export async function runDailySettlement(now: Date = new Date()): Promise<void> 
     return;
   }
 
+  const policies = await getVendorPolicies();
+
   if (!run.streaksApplied) {
     const providers = await prisma.provider.findMany();
     const events = await prisma.usageEvent.findMany({
@@ -50,6 +59,7 @@ export async function runDailySettlement(now: Date = new Date()): Promise<void> 
     }
 
     const days: ProviderDay[] = providers.map((p) => {
+      const policy = policies[p.vendor as VendorName];
       const consumed = (eventsByProvider.get(p.id) ?? []).reduce((sum, e) => sum + e.costUsd, 0);
       const healthyAllDay = p.status === 'ACTIVE' && !p.unhealthyToday;
       return {
@@ -59,6 +69,8 @@ export async function runDailySettlement(now: Date = new Date()): Promise<void> 
         consumedUsd: round8(consumed),
         healthyAllDay,
         consecutiveHealthyDays: nextHealthyStreak(p.consecutiveHealthyDays, healthyAllDay),
+        rewardMultiplier: policy.rewardMultiplier,
+        standbyEligible: policy.standbyEligible,
       };
     });
 
@@ -71,76 +83,130 @@ export async function runDailySettlement(now: Date = new Date()): Promise<void> 
       minProvidersForCap: env.MIN_PROVIDERS_FOR_CAP,
     });
     const dayByProvider = new Map(days.map((d) => [d.providerId, d]));
+    const providerById = new Map(providers.map((p) => [p.id, p]));
 
     await prisma.$transaction([
-      ...providers.map((p) =>
-        prisma.provider.update({
+      ...providers.map((p) => {
+        const day = dayByProvider.get(p.id)!;
+        return prisma.provider.update({
           where: { id: p.id },
           data: {
-            consecutiveHealthyDays: dayByProvider.get(p.id)!.consecutiveHealthyDays,
+            consecutiveHealthyDays: day.consecutiveHealthyDays,
+            trustTier: tierFromStreak(day.consecutiveHealthyDays),
             unhealthyToday: false,
             suspicionScore: computeSuspicionScore(
               eventsByProvider.get(p.id) ?? [],
               env.SUSPICION_MIN_USD,
             ),
           },
-        }),
-      ),
-      ...rows.map((r) =>
-        prisma.rewardLedger.upsert({
+        });
+      }),
+      ...rows.map((r) => {
+        const vendor = providerById.get(r.providerId)!.vendor as VendorName;
+        const vestAt = vestingDate(date, policies[vendor].vestingDays);
+        const amounts = {
+          consumedUsd: r.consumedUsd,
+          baseClaudium: r.baseClaudium,
+          multiplier: r.multiplier,
+          standbyClaudium: r.standbyClaudium,
+          capped: r.capped,
+          totalClaudium: r.totalClaudium,
+        };
+        return prisma.rewardLedger.upsert({
           where: { providerId_date: { providerId: r.providerId, date } },
           create: {
             providerId: r.providerId,
             date,
-            consumedUsd: r.consumedUsd,
-            baseClaudium: r.baseClaudium,
-            multiplier: r.multiplier,
-            standbyClaudium: r.standbyClaudium,
-            capped: r.capped,
-            totalClaudium: r.totalClaudium,
+            ...amounts,
+            status: vestAt ? 'PENDING' : 'VESTED',
+            vestAt,
           },
-          update: {
-            consumedUsd: r.consumedUsd,
-            baseClaudium: r.baseClaudium,
-            multiplier: r.multiplier,
-            standbyClaudium: r.standbyClaudium,
-            capped: r.capped,
-            totalClaudium: r.totalClaudium,
-          },
-        }),
-      ),
+          // Never touch status/vestAt on re-run — a VOIDED or VESTED row
+          // must not be reopened by settling the same day twice.
+          update: amounts,
+        });
+      }),
       prisma.settlementRun.update({ where: { date }, data: { streaksApplied: true } }),
     ]);
-    console.log(`[settle] ${isoDate(date)} ledger written: ${rows.length} providers`);
+    const pendingCount = rows.filter((r) => {
+      const vendor = providerById.get(r.providerId)!.vendor as VendorName;
+      return policies[vendor].vestingDays > 0;
+    }).length;
+    console.log(
+      `[settle] ${isoDate(date)} ledger written: ${rows.length} providers (${pendingCount} pending vest)`,
+    );
   }
 
-  // Emit events from the ledger (source of truth), then mark the run complete.
+  // Emit events for instantly-vested rows, then mark the run complete.
+  // PENDING rows are emitted later by runVesting when their window elapses.
   const ledger = await prisma.rewardLedger.findMany({
-    where: { date },
-    include: { provider: { select: { wallet: true } } },
+    where: { date, status: 'VESTED' },
+    include: { provider: { select: { wallet: true, vendor: true } } },
   });
   for (const row of ledger) {
-    const event: SettlementEvent = {
-      providerId: row.providerId,
-      wallet: row.provider.wallet,
-      date: isoDate(date),
-      consumedUsd: Number(row.consumedUsd),
-      baseClaudium: row.baseClaudium,
-      multiplier: Number(row.multiplier),
-      standbyClaudium: row.standbyClaudium,
-      capped: row.capped,
-      totalClaudium: row.totalClaudium,
-    };
-    await getSettlementEventsQueue().add('settlement', event, {
-      // Queue-level dedupe for the common re-run case.
-      jobId: `settlement:${row.providerId}:${isoDate(date)}`,
-      removeOnComplete: { age: 7 * 24 * 3600 },
-    });
-    await postWebhook(event);
+    await emitSettlement(toEvent(row));
   }
 
   await prisma.settlementRun.update({ where: { date }, data: { completedAt: new Date() } });
   console.log(`[settle] ${isoDate(date)} complete: ${ledger.length} settlement events emitted`);
+}
+
+/**
+ * Vest matured PENDING rewards: emit the credit event (queue jobId dedupes),
+ * then flip PENDING→VESTED. Runs right after settlement each midnight; a
+ * crash between emit and flip re-emits next run — at-least-once, consumers
+ * dedupe on (providerId, date).
+ */
+export async function runVesting(now: Date = new Date()): Promise<void> {
+  const due = await prisma.rewardLedger.findMany({
+    where: { status: 'PENDING', vestAt: { lte: now } },
+    include: { provider: { select: { wallet: true, vendor: true } } },
+  });
+  for (const row of due) {
+    await emitSettlement(toEvent(row));
+    await prisma.rewardLedger.updateMany({
+      // Guarded transition: only PENDING→VESTED, never from VOIDED.
+      where: { id: row.id, status: 'PENDING' },
+      data: { status: 'VESTED' },
+    });
+  }
+  if (due.length) console.log(`[vest] vested ${due.length} matured reward rows`);
+}
+
+type LedgerRowWithProvider = {
+  providerId: string;
+  date: Date;
+  consumedUsd: unknown;
+  baseClaudium: number;
+  multiplier: unknown;
+  standbyClaudium: number;
+  capped: boolean;
+  totalClaudium: number;
+  provider: { wallet: string; vendor: string };
+};
+
+function toEvent(row: LedgerRowWithProvider): SettlementEvent {
+  return {
+    providerId: row.providerId,
+    wallet: row.provider.wallet,
+    vendor: row.provider.vendor,
+    date: isoDate(row.date),
+    consumedUsd: Number(row.consumedUsd),
+    baseClaudium: row.baseClaudium,
+    multiplier: Number(row.multiplier),
+    standbyClaudium: row.standbyClaudium,
+    capped: row.capped,
+    totalClaudium: row.totalClaudium,
+  };
+}
+
+async function emitSettlement(event: SettlementEvent): Promise<void> {
+  await getSettlementEventsQueue().add('settlement', event, {
+    // Queue-level dedupe across settlement re-runs and vesting retries.
+    jobId: `settlement:${event.providerId}:${event.date}`,
+    removeOnComplete: { age: 7 * 24 * 3600 },
+  });
+  await postWebhook(event);
 }
 
 async function postWebhook(event: SettlementEvent): Promise<void> {

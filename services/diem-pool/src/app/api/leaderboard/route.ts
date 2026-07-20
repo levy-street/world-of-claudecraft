@@ -17,7 +17,14 @@ export async function GET() {
 
   const providers = await prisma.provider.findMany({
     where: { id: { in: usage.map((u) => u.providerId!) } },
-    select: { id: true, displayName: true, wallet: true, status: true, consecutiveHealthyDays: true },
+    select: {
+      id: true,
+      displayName: true,
+      wallet: true,
+      vendor: true,
+      status: true,
+      consecutiveHealthyDays: true,
+    },
   });
   const byId = new Map(providers.map((p) => [p.id, p]));
 
@@ -30,6 +37,7 @@ export async function GET() {
           rank: i + 1,
           displayName: p.displayName,
           wallet: truncateWallet(p.wallet),
+          vendor: p.vendor,
           lifetimeUsdServed: Number(u._sum.costUsd ?? 0),
           status: p.status,
           healthStreakDays: p.consecutiveHealthyDays,

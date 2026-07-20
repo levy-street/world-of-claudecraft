@@ -2,9 +2,12 @@
 // persists results, so every rule here is unit-testable without a database.
 //
 // Reward pipeline per provider for a settled UTC day:
-//   base      = floor(consumedUsd * claudiumPerUsd)          — consumed compute only
+//   base      = floor(consumedUsd * claudiumPerUsd * rewardMultiplier)
+//               — consumed compute only; rewardMultiplier is the per-vendor knob
 //   afterMult = floor(base * multiplier)                     — 1.25x at a 30-day healthy streak
-//   standby   = floor(unusedCapacityUsd * standbyRate)       — only if ACTIVE + healthy all day
+//   standby   = floor(unusedCapacityUsd * standbyRate)       — only if ACTIVE + healthy all
+//               day AND the vendor is standby-eligible (stake-backed Venice
+//               capacity only — a free-to-declare BYOK budget earns no standby)
 //   prelim    = afterMult + standby
 // Then the anti-whale cap: when at least `minProvidersForCap` providers earned
 // something, nobody keeps more than `maxDailyShare` of the day's total
@@ -29,6 +32,10 @@ export interface ProviderDay {
   healthyAllDay: boolean;
   /** Streak including the settled day (caller updates streaks first). */
   consecutiveHealthyDays: number;
+  /** Per-vendor reward knob applied to the base (VendorConfig). */
+  rewardMultiplier: number;
+  /** Whether this provider's vendor earns standby on unused capacity. */
+  standbyEligible: boolean;
 }
 
 export interface SettlementRow {
@@ -43,13 +50,13 @@ export interface SettlementRow {
 
 export function computeSettlement(days: ProviderDay[], cfg: SettlementConfig): SettlementRow[] {
   const prelim = days.map((d) => {
-    const base = Math.floor(d.consumedUsd * cfg.claudiumPerUsd);
+    const base = Math.floor(d.consumedUsd * cfg.claudiumPerUsd * d.rewardMultiplier);
     const multiplier =
       d.consecutiveHealthyDays >= cfg.uptimeStreakDays ? cfg.uptimeMultiplier : 1;
     const afterMult = Math.floor(base * multiplier);
     const unusedUsd = Math.max(0, d.dailyCapacityUsd - d.consumedUsd);
     const standby =
-      d.healthyAllDay && d.status === 'ACTIVE'
+      d.healthyAllDay && d.status === 'ACTIVE' && d.standbyEligible
         ? Math.floor(unusedUsd * cfg.standbyClaudiumPerUsdCapacity)
         : 0;
     return { day: d, base, multiplier, standby, preliminary: afterMult + standby };
@@ -122,4 +129,14 @@ export function utcDay(now: Date, daysAgo = 0): Date {
   return new Date(
     Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - daysAgo),
   );
+}
+
+/**
+ * When a settled reward becomes spendable. null = vests immediately
+ * (stake-backed vendors); otherwise midnight UTC `vestingDays` after the
+ * settled day — the BYOK fraud window.
+ */
+export function vestingDate(settledDayUtc: Date, vestingDays: number): Date | null {
+  if (vestingDays <= 0) return null;
+  return new Date(settledDayUtc.getTime() + vestingDays * 86_400_000);
 }

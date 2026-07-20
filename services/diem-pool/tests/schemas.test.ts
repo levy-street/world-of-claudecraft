@@ -29,6 +29,21 @@ describe('inferenceRequestSchema', () => {
     ).toBe(false);
   });
 
+  it('accepts modelClass without a concrete model, requires one of the two', () => {
+    const noModel = { messages: [{ role: 'user', content: 'hi' }] };
+    expect(
+      inferenceRequestSchema.safeParse({ payload: noModel, purpose: 'npc_dialogue', modelClass: 'fast' })
+        .success,
+    ).toBe(true);
+    expect(
+      inferenceRequestSchema.safeParse({ payload: noModel, purpose: 'npc_dialogue' }).success,
+    ).toBe(false);
+    expect(
+      inferenceRequestSchema.safeParse({ payload: VALID_PAYLOAD, purpose: 'npc_dialogue', modelClass: 'galaxy' })
+        .success,
+    ).toBe(false);
+  });
+
   it('rejects empty messages, unknown roles, and oversized max_tokens', () => {
     expect(chatPayloadSchema.safeParse({ model: 'm', messages: [] }).success).toBe(false);
     expect(
@@ -67,8 +82,23 @@ describe('registerSchema', () => {
     declaredDiem: 25,
   };
 
-  it('accepts a valid registration', () => {
-    expect(registerSchema.safeParse(VALID).success).toBe(true);
+  it('accepts a valid registration (vendor defaults to venice)', () => {
+    const parsed = registerSchema.parse(VALID);
+    expect(parsed.vendor).toBe('venice');
+  });
+
+  it('requires the capacity field matching the vendor', () => {
+    // venice needs declaredDiem…
+    expect(registerSchema.safeParse({ ...VALID, declaredDiem: undefined }).success).toBe(false);
+    // …BYOK vendors need dailyBudgetUsd instead.
+    const byok = { ...VALID, vendor: 'openai', declaredDiem: undefined };
+    expect(registerSchema.safeParse(byok).success).toBe(false);
+    expect(registerSchema.safeParse({ ...byok, dailyBudgetUsd: 25 }).success).toBe(true);
+    expect(registerSchema.safeParse({ ...byok, dailyBudgetUsd: -5 }).success).toBe(false);
+  });
+
+  it('rejects unknown vendors', () => {
+    expect(registerSchema.safeParse({ ...VALID, vendor: 'skynet' }).success).toBe(false);
   });
 
   it.each([

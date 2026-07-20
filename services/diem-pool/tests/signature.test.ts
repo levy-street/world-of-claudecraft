@@ -47,6 +47,23 @@ describe('wallet signature verification', () => {
     expect(verifyWalletSignature(wallet, buildSignMessage('revoke', wallet, nonce), bs58.encode(sig))).toBe(false);
   });
 
+  it('binds the vendor: an openai register signature cannot register anthropic', () => {
+    const { wallet, secretKey } = makeWallet();
+    const nonce = 'nonce123456789abcdef';
+    const sig = sign(buildSignMessage('register', wallet, nonce, 'openai'), secretKey);
+    expect(
+      verifyWalletSignature(wallet, buildSignMessage('register', wallet, nonce, 'anthropic'), bs58.encode(sig)),
+    ).toBe(false);
+    expect(
+      verifyWalletSignature(wallet, buildSignMessage('register', wallet, nonce, 'openai'), bs58.encode(sig)),
+    ).toBe(true);
+  });
+
+  it('includes the vendor line only when a vendor is given', () => {
+    expect(buildSignMessage('register', 'W', 'N', 'openai')).toContain('Vendor: openai');
+    expect(buildSignMessage('revoke', 'W', 'N')).not.toContain('Vendor:');
+  });
+
   it('rejects garbage wallets and signatures without throwing', () => {
     const { wallet } = makeWallet();
     expect(verifyWalletSignature('not-a-wallet', 'msg', 'sig')).toBe(false);

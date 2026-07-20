@@ -67,14 +67,49 @@ function makeWallet() {
   return { wallet: bs58.encode(kp.publicKey), secretKey: kp.secretKey };
 }
 
-async function signNonce(wallet: string, secretKey: Uint8Array, purpose: 'register' | 'revoke') {
+async function signNonce(
+  wallet: string,
+  secretKey: Uint8Array,
+  purpose: 'register' | 'revoke',
+  vendor?: string,
+) {
   const n = await api('/api/providers/nonce', {
     method: 'POST',
-    body: JSON.stringify({ walletAddress: wallet, purpose }),
+    body: JSON.stringify({ walletAddress: wallet, purpose, ...(vendor ? { vendor } : {}) }),
   });
   check(`nonce issued (${purpose})`, n.status === 200, n.body);
   const sig = nacl.sign.detached(new TextEncoder().encode(n.body.message), secretKey);
   return { nonce: n.body.nonce as string, signedMessage: bs58.encode(sig) };
+}
+
+/** Register a key for any vendor, on fresh or existing wallet creds. */
+async function registerWith(
+  creds: { wallet: string; secretKey: Uint8Array } | null,
+  name: string,
+  vendor: string,
+  apiKey: string,
+  budget: { declaredDiem?: number; dailyBudgetUsd?: number },
+) {
+  const c = creds ?? makeWallet();
+  const { nonce, signedMessage } = await signNonce(c.wallet, c.secretKey, 'register', vendor);
+  const res = await api('/api/providers/register', {
+    method: 'POST',
+    body: JSON.stringify({
+      walletAddress: c.wallet,
+      signedMessage,
+      nonce,
+      vendor,
+      veniceApiKey: apiKey,
+      displayName: name,
+      ...budget,
+    }),
+  });
+  check(
+    `${name} (${vendor}) registered`,
+    res.status === 200 && res.body.vendor === vendor && res.body.keyLast4 === apiKey.slice(-4),
+    res.body,
+  );
+  return { wallet: c.wallet, secretKey: c.secretKey, id: res.body.id as string, body: res.body };
 }
 
 async function register(name: string, diem: number, apiKey: string) {
@@ -174,7 +209,7 @@ check('beta (4x capacity) served more', (served[beta.id] ?? 0) > (served[alpha.i
 const stats = await api(`/api/providers/by-wallet/${beta.wallet}`);
 check(
   'metering: beta todayConsumedUsd = calls × $0.00021',
-  Math.abs(stats.body.todayConsumedUsd - served[beta.id] * 0.00021) < 1e-9,
+  Math.abs(stats.body.keys?.[0]?.todayConsumedUsd - served[beta.id] * 0.00021) < 1e-9,
   stats.body,
 );
 check('no key material in stats', JSON.stringify(stats.body).includes('vn_beta') === false);
@@ -278,6 +313,219 @@ check(
   const deltaReqs = (spendAfter?.requests ?? 0) - (spendBefore?.requests ?? 0);
   check('spend delta is exactly 20 × $0.00021 (atomic upsert)', Math.abs(deltaUsd - 20 * 0.00021) < 1e-9, deltaUsd);
   check('request counter delta is exactly 20', deltaReqs === 20, deltaReqs);
+}
+
+console.log('— multi-vendor (BYOK) registration —');
+await clearRateLimits();
+const oai = await registerWith(null, 'OpenAI Rig', 'openai', 'sk-oai-good-0123456789abcdefghij', { dailyBudgetUsd: 40 });
+const anth = await registerWith(null, 'Anthropic Rig', 'anthropic', 'sk-ant-good-0123456789abcdefgh', { dailyBudgetUsd: 30 });
+const kim = await registerWith(null, 'Kimi Rig', 'kimi', 'sk-kimi-good-0123456789abcdefg', { dailyBudgetUsd: 20 });
+check('BYOK keys start at trust tier NEW', [oai, anth, kim].every((p) => p.body.trustTier === 'NEW'));
+check(
+  'wrong key shape rejected before validation (anthropic without sk-ant-)',
+  (
+    await (async () => {
+      const c = makeWallet();
+      const { nonce, signedMessage } = await signNonce(c.wallet, c.secretKey, 'register', 'anthropic');
+      return api('/api/providers/register', {
+        method: 'POST',
+        body: JSON.stringify({
+          walletAddress: c.wallet, signedMessage, nonce, vendor: 'anthropic',
+          veniceApiKey: 'sk-oai-shaped-0123456789abcdef', displayName: 'Wrong Shape', dailyBudgetUsd: 5,
+        }),
+      });
+    })()
+  ).status === 400,
+);
+await registerWith({ wallet: oai.wallet, secretKey: oai.secretKey }, 'OpenAI Rig Venice', 'venice', 'vn_oai_wallet_venice_0123456789', { declaredDiem: 3 });
+{
+  const multi = await api(`/api/providers/by-wallet/${oai.wallet}`);
+  check('wallet holds one key per vendor', multi.body.keys?.length === 2, multi.body.keys?.length);
+}
+
+console.log('— model-class routing across vendors —');
+const FAST_MODELS: Record<string, string> = {
+  venice: 'llama-3.2-3b',
+  openai: 'gpt-4o-mini',
+  anthropic: 'claude-haiku-4-5',
+  kimi: 'moonshot-v1-8k',
+};
+{
+  const vendorCounts: Record<string, number> = {};
+  let modelsMatch = true;
+  for (let i = 0; i < 30; i++) {
+    const res = await infer({
+      modelClass: 'fast',
+      payload: { messages: [{ role: 'user', content: 'Greet the traveler.' }], max_tokens: 64 },
+    });
+    check(`fast-class inference ${i} ok`, res.status === 200, res.body);
+    const vendor = res.headers.get('x-pool-vendor') ?? '';
+    vendorCounts[vendor] = (vendorCounts[vendor] ?? 0) + 1;
+    if ((res.body as { model?: string }).model !== FAST_MODELS[vendor]) modelsMatch = false;
+  }
+  check(
+    'all four vendors served fast-class traffic',
+    ['venice', 'openai', 'anthropic', 'kimi'].every((v) => (vendorCounts[v] ?? 0) >= 1),
+    vendorCounts,
+  );
+  check('each vendor used its class-mapped concrete model', modelsMatch, vendorCounts);
+}
+{
+  let pinnedOk = true;
+  for (let i = 0; i < 6; i++) {
+    const res = await infer({
+      payload: { model: 'openai:gpt-4o-mini', messages: [{ role: 'user', content: 'hi' }] },
+    });
+    if (res.status !== 200 || res.headers.get('x-pool-vendor') !== 'openai') pinnedOk = false;
+  }
+  check('"vendor:model" pins routing to that vendor', pinnedOk);
+  const legacy = await infer({
+    payload: { model: 'llama-3.3-70b', messages: [{ role: 'user', content: 'hi' }] },
+  });
+  check(
+    'legacy bare model still routes to venice',
+    legacy.status === 200 && legacy.headers.get('x-pool-vendor') === 'venice',
+  );
+}
+{
+  const res = await infer({
+    payload: {
+      model: 'anthropic:claude-sonnet-4-5',
+      messages: [
+        { role: 'system', content: 'You are the dungeon master.' },
+        { role: 'user', content: 'Narrate the crypt.' },
+      ],
+    },
+  });
+  const body = res.body as { choices?: Array<{ message?: { content?: string } }>; usage?: { prompt_tokens?: number } };
+  check(
+    'anthropic translation round-trips to OpenAI shape',
+    res.status === 200 &&
+      typeof body.choices?.[0]?.message?.content === 'string' &&
+      body.choices[0].message.content.length > 0 &&
+      body.usage?.prompt_tokens === 100,
+    res.body,
+  );
+}
+
+console.log('— BYOK quota exhaustion —');
+await clearRateLimits();
+const oaiQuota = await registerWith(null, 'Quota Rig', 'openai', 'sk-oai-quota-later-0123456789ab', { dailyBudgetUsd: 40 });
+{
+  let allOk = true;
+  for (let i = 0; i < 6; i++) {
+    const res = await infer({
+      payload: { model: 'openai:gpt-4o-mini', messages: [{ role: 'user', content: 'hi' }] },
+    });
+    if (res.status !== 200 || res.headers.get('x-pool-vendor') !== 'openai') allOk = false;
+  }
+  check('requests survive a quota-exhausted key via failover', allOk);
+  const row = await prisma.provider.findUnique({ where: { id: oaiQuota.id } });
+  const spend = await api(`/api/providers/by-wallet/${oaiQuota.wallet}`);
+  check(
+    'quota exhaustion pins spend to the trust-capped budget, status stays ACTIVE',
+    row?.status === 'ACTIVE' && spend.body.keys?.[0]?.todayConsumedUsd === 2,
+    { status: row?.status, spend: spend.body.keys?.[0]?.todayConsumedUsd },
+  );
+}
+
+console.log('— per-vendor kill switch —');
+{
+  await api('/api/admin/vendors', {
+    method: 'PUT',
+    headers: { 'x-admin-token': ADMIN },
+    body: JSON.stringify({ vendor: 'kimi', enabled: false }),
+  });
+  let kimiServed = 0;
+  for (let i = 0; i < 10; i++) {
+    const res = await infer({
+      modelClass: 'fast',
+      payload: { messages: [{ role: 'user', content: 'hi' }], max_tokens: 16 },
+    });
+    if (res.headers.get('x-pool-vendor') === 'kimi') kimiServed++;
+  }
+  check('disabled vendor receives no traffic', kimiServed === 0, kimiServed);
+  const put = await api('/api/admin/vendors', {
+    method: 'PUT',
+    headers: { 'x-admin-token': ADMIN },
+    body: JSON.stringify({ vendor: 'kimi', enabled: true }),
+  });
+  check('vendor re-enabled via admin API', put.status === 200 && put.body.enabled === true, put.body);
+}
+
+console.log('— vesting lifecycle & voiding —');
+{
+  const { runDailySettlement: settleAgain, runVesting } = await import('../src/workers/settle');
+  const { Queue } = await import('bullmq');
+  const evq = new Queue('settlement-events', { connection: { url: process.env.REDIS_URL } as any });
+  const settleDay = utcDay(fakeTomorrow, 1);
+  const dayStr = settleDay.toISOString().slice(0, 10);
+
+  // The earlier section already settled today with venice-only providers;
+  // clear that run so today's BYOK usage settles too (smoke owns this DB).
+  await prisma.rewardLedger.deleteMany({ where: { date: settleDay } });
+  await prisma.settlementRun.deleteMany({ where: { date: settleDay } });
+  await settleAgain(fakeTomorrow);
+
+  const byok = await prisma.rewardLedger.findMany({
+    where: { date: settleDay, providerId: { in: [oai.id, anth.id, kim.id] } },
+  });
+  check(
+    'BYOK rewards settle as PENDING with a 7-day vest date',
+    byok.length === 3 &&
+      byok.every((r) => r.status === 'PENDING' && r.vestAt !== null && r.totalClaudium > 0),
+    byok.map((r) => ({ status: r.status, vestAt: r.vestAt })),
+  );
+  const veniceRows = await prisma.rewardLedger.findMany({
+    where: { date: settleDay, providerId: good.id },
+  });
+  check('venice rewards vest instantly', veniceRows.every((r) => r.status === 'VESTED'));
+  check(
+    'pending rewards are not emitted to the game',
+    (await evq.getJob(`settlement:${oai.id}:${dayStr}`)) == null,
+  );
+
+  await runVesting(new Date());
+  check(
+    'vesting before the window elapses is a no-op',
+    (await prisma.rewardLedger.findFirst({ where: { id: byok[0].id } }))?.status === 'PENDING',
+  );
+
+  // Revoke the anthropic key while its reward is still pending → VOIDED.
+  {
+    const { nonce, signedMessage } = await signNonce(anth.wallet, anth.secretKey, 'revoke');
+    await api(`/api/providers/${anth.id}/key`, {
+      method: 'DELETE',
+      body: JSON.stringify({ signedMessage, nonce }),
+    });
+    const voided = await prisma.rewardLedger.findFirst({
+      where: { providerId: anth.id, date: settleDay },
+    });
+    check('revoking a key voids its pending rewards', voided?.status === 'VOIDED', voided?.status);
+  }
+
+  await runVesting(new Date(Date.now() + 8 * 86_400_000));
+  const after = await prisma.rewardLedger.findMany({
+    where: { date: settleDay, providerId: { in: [oai.id, kim.id, anth.id] } },
+  });
+  check(
+    'matured rewards vest; voided rewards stay voided',
+    after.filter((r) => r.providerId !== anth.id).every((r) => r.status === 'VESTED') &&
+      after.find((r) => r.providerId === anth.id)?.status === 'VOIDED',
+    after.map((r) => r.status),
+  );
+  check(
+    'vested rewards emit exactly one credit event',
+    (await evq.getJob(`settlement:${oai.id}:${dayStr}`)) != null &&
+      (await evq.getJob(`settlement:${anth.id}:${dayStr}`)) == null,
+  );
+  const wallets = await api(`/api/providers/by-wallet/${oai.wallet}`);
+  check(
+    'dashboard shows vested Claudium after the window',
+    wallets.body.totals?.claudiumVested > 0 && wallets.body.totals?.claudiumPending === 0,
+    wallets.body.totals,
+  );
+  await evq.close();
 }
 
 console.log('— admin pricing editor —');

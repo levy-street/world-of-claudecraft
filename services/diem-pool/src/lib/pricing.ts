@@ -21,20 +21,58 @@ export function computeCostUsd(rate: ModelRate, promptTokens: number, completion
 }
 
 /**
- * Seed rates (USD per 1M tokens) from Venice's published pricing at time of
- * writing. The live table is admin-editable — treat this as a starting point
- * and sync against https://venice.ai/pricing after deploy.
+ * Seed rates (USD per 1M tokens) from each vendor's published pricing at time
+ * of writing. The live table is admin-editable — treat this as a starting
+ * point and sync against the vendors' pricing pages after deploy.
  */
-export const SEED_PRICING: Record<string, ModelRate> = {
-  'llama-3.2-3b': { inputUsdPerMTokens: 0.15, outputUsdPerMTokens: 0.6 },
-  'llama-3.3-70b': { inputUsdPerMTokens: 0.7, outputUsdPerMTokens: 2.8 },
-  'llama-3.1-405b': { inputUsdPerMTokens: 1.5, outputUsdPerMTokens: 6.0 },
-  'qwen3-4b': { inputUsdPerMTokens: 0.15, outputUsdPerMTokens: 0.6 },
-  'qwen3-235b': { inputUsdPerMTokens: 0.9, outputUsdPerMTokens: 4.5 },
-  'mistral-31-24b': { inputUsdPerMTokens: 0.5, outputUsdPerMTokens: 2.0 },
-  'deepseek-r1-671b': { inputUsdPerMTokens: 3.5, outputUsdPerMTokens: 14.0 },
-  'venice-uncensored': { inputUsdPerMTokens: 0.5, outputUsdPerMTokens: 2.0 },
+export const SEED_PRICING_BY_VENDOR: Record<string, Record<string, ModelRate>> = {
+  venice: {
+    'llama-3.2-3b': { inputUsdPerMTokens: 0.15, outputUsdPerMTokens: 0.6 },
+    'llama-3.3-70b': { inputUsdPerMTokens: 0.7, outputUsdPerMTokens: 2.8 },
+    'llama-3.1-405b': { inputUsdPerMTokens: 1.5, outputUsdPerMTokens: 6.0 },
+    'qwen3-4b': { inputUsdPerMTokens: 0.15, outputUsdPerMTokens: 0.6 },
+    'qwen3-235b': { inputUsdPerMTokens: 0.9, outputUsdPerMTokens: 4.5 },
+    'mistral-31-24b': { inputUsdPerMTokens: 0.5, outputUsdPerMTokens: 2.0 },
+    'deepseek-r1-671b': { inputUsdPerMTokens: 3.5, outputUsdPerMTokens: 14.0 },
+    'venice-uncensored': { inputUsdPerMTokens: 0.5, outputUsdPerMTokens: 2.0 },
+  },
+  openai: {
+    'gpt-4o-mini': { inputUsdPerMTokens: 0.15, outputUsdPerMTokens: 0.6 },
+    'gpt-4o': { inputUsdPerMTokens: 2.5, outputUsdPerMTokens: 10.0 },
+    'gpt-4.1-mini': { inputUsdPerMTokens: 0.4, outputUsdPerMTokens: 1.6 },
+    'gpt-4.1': { inputUsdPerMTokens: 2.0, outputUsdPerMTokens: 8.0 },
+  },
+  anthropic: {
+    'claude-haiku-4-5': { inputUsdPerMTokens: 1.0, outputUsdPerMTokens: 5.0 },
+    'claude-sonnet-4-5': { inputUsdPerMTokens: 3.0, outputUsdPerMTokens: 15.0 },
+  },
+  kimi: {
+    'moonshot-v1-8k': { inputUsdPerMTokens: 0.2, outputUsdPerMTokens: 2.0 },
+    'kimi-k2': { inputUsdPerMTokens: 0.6, outputUsdPerMTokens: 2.5 },
+    'kimi-k2-thinking': { inputUsdPerMTokens: 0.6, outputUsdPerMTokens: 2.5 },
+  },
 };
+
+/** Default purpose-tier → concrete model mappings, seeded per vendor. */
+export const SEED_CLASS_MAP: Array<{
+  class: 'fast' | 'standard' | 'smart';
+  vendor: string;
+  model: string;
+  priority: number;
+}> = [
+  { class: 'fast', vendor: 'venice', model: 'llama-3.2-3b', priority: 10 },
+  { class: 'fast', vendor: 'openai', model: 'gpt-4o-mini', priority: 10 },
+  { class: 'fast', vendor: 'anthropic', model: 'claude-haiku-4-5', priority: 10 },
+  { class: 'fast', vendor: 'kimi', model: 'moonshot-v1-8k', priority: 10 },
+  { class: 'standard', vendor: 'venice', model: 'llama-3.3-70b', priority: 10 },
+  { class: 'standard', vendor: 'openai', model: 'gpt-4.1-mini', priority: 10 },
+  { class: 'standard', vendor: 'anthropic', model: 'claude-haiku-4-5', priority: 10 },
+  { class: 'standard', vendor: 'kimi', model: 'kimi-k2', priority: 10 },
+  { class: 'smart', vendor: 'venice', model: 'deepseek-r1-671b', priority: 10 },
+  { class: 'smart', vendor: 'openai', model: 'gpt-4.1', priority: 10 },
+  { class: 'smart', vendor: 'anthropic', model: 'claude-sonnet-4-5', priority: 10 },
+  { class: 'smart', vendor: 'kimi', model: 'kimi-k2-thinking', priority: 10 },
+];
 
 /**
  * Fallback applied when a response reports a model missing from the pricing

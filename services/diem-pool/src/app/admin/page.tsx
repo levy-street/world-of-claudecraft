@@ -9,6 +9,8 @@ import { useCallback, useState } from 'react';
 interface AdminProvider {
   id: string;
   wallet: string;
+  vendor: string;
+  trustTier: string;
   displayName: string;
   status: string;
   keyLast4: string | null;
@@ -18,6 +20,15 @@ interface AdminProvider {
   consecutiveFailures: number;
   suspicionScore: number;
   flagged: boolean;
+}
+
+interface VendorPolicyRow {
+  vendor: string;
+  enabled: boolean;
+  rewardMultiplier: number;
+  standbyEligible: boolean;
+  vestingDays: number;
+  trustRampEnabled: boolean;
 }
 
 interface Overview {
@@ -30,6 +41,7 @@ interface Overview {
 }
 
 interface PricingRow {
+  vendor: string;
   model: string;
   inputUsdPerMTokens: number;
   outputUsdPerMTokens: number;
@@ -40,8 +52,10 @@ export default function AdminPage() {
   const [token, setToken] = useState('');
   const [overview, setOverview] = useState<Overview | null>(null);
   const [pricing, setPricing] = useState<PricingRow[]>([]);
+  const [vendors, setVendors] = useState<VendorPolicyRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [edit, setEdit] = useState<PricingRow>({
+    vendor: 'venice',
     model: '',
     inputUsdPerMTokens: 0,
     outputUsdPerMTokens: 0,
@@ -51,9 +65,10 @@ export default function AdminPage() {
   const load = useCallback(async () => {
     setError(null);
     const headers = { 'x-admin-token': token };
-    const [ovRes, prRes] = await Promise.all([
+    const [ovRes, prRes, veRes] = await Promise.all([
       fetch('/api/admin/overview', { headers }),
       fetch('/api/admin/pricing', { headers }),
+      fetch('/api/admin/vendors', { headers }),
     ]);
     if (!ovRes.ok) {
       setError(ovRes.status === 401 ? 'bad admin token' : `overview failed (${ovRes.status})`);
@@ -62,7 +77,17 @@ export default function AdminPage() {
     }
     setOverview(await ovRes.json());
     if (prRes.ok) setPricing((await prRes.json()).pricing);
+    if (veRes.ok) setVendors((await veRes.json()).vendors);
   }, [token]);
+
+  async function toggleVendor(v: VendorPolicyRow) {
+    await fetch('/api/admin/vendors', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify({ vendor: v.vendor, enabled: !v.enabled }),
+    });
+    await load();
+  }
 
   async function toggleKillSwitch() {
     if (!overview) return;
@@ -137,12 +162,48 @@ export default function AdminPage() {
           </div>
 
           <div className="panel">
+            <h2>Vendors</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Vendor</th>
+                  <th>Enabled</th>
+                  <th>Reward ×</th>
+                  <th>Standby</th>
+                  <th>Vesting</th>
+                  <th>Trust ramp</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {vendors.map((v) => (
+                  <tr key={v.vendor}>
+                    <td>{v.vendor}</td>
+                    <td className={v.enabled ? 'ok' : 'error'}>{v.enabled ? 'on' : 'OFF'}</td>
+                    <td>{v.rewardMultiplier}×</td>
+                    <td>{v.standbyEligible ? 'yes' : 'no'}</td>
+                    <td>{v.vestingDays}d</td>
+                    <td>{v.trustRampEnabled ? 'yes' : 'no'}</td>
+                    <td>
+                      <button className={v.enabled ? 'danger' : ''} onClick={() => void toggleVendor(v)}>
+                        {v.enabled ? 'Disable' : 'Enable'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="panel">
             <h2>Providers</h2>
             <table>
               <thead>
                 <tr>
                   <th>Name</th>
+                  <th>Vendor</th>
                   <th>Status</th>
+                  <th>Tier</th>
                   <th>Key</th>
                   <th>Today / Cap</th>
                   <th>Streak</th>
@@ -154,7 +215,9 @@ export default function AdminPage() {
                 {overview.providers.map((p) => (
                   <tr key={p.id}>
                     <td title={p.wallet}>{p.displayName}</td>
+                    <td>{p.vendor}</td>
                     <td className={`status-${p.status}`}>{p.status}</td>
+                    <td>{p.trustTier}</td>
                     <td>{p.keyLast4 ? `…${p.keyLast4}` : '—'}</td>
                     <td>
                       ${p.todayConsumedUsd.toFixed(3)} / ${p.dailyCapacityUsd.toFixed(0)}
@@ -176,6 +239,7 @@ export default function AdminPage() {
             <table>
               <thead>
                 <tr>
+                  <th>Vendor</th>
                   <th>Model</th>
                   <th>Input</th>
                   <th>Output</th>
@@ -184,7 +248,8 @@ export default function AdminPage() {
               </thead>
               <tbody>
                 {pricing.map((r) => (
-                  <tr key={r.model}>
+                  <tr key={`${r.vendor}:${r.model}`}>
+                    <td>{r.vendor}</td>
                     <td>{r.model}</td>
                     <td>${r.inputUsdPerMTokens}</td>
                     <td>${r.outputUsdPerMTokens}</td>
@@ -195,6 +260,16 @@ export default function AdminPage() {
             </table>
             <form onSubmit={(e) => void savePricing(e)}>
               <h2>Add / update model</h2>
+              <label>
+                Vendor
+                <select value={edit.vendor} onChange={(e) => setEdit({ ...edit, vendor: e.target.value })}>
+                  {['venice', 'openai', 'anthropic', 'kimi'].map((v) => (
+                    <option key={v} value={v}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <label>
                 Model id
                 <input

@@ -1,11 +1,13 @@
 import { prisma } from '@/lib/db';
 import { getEnv } from '@/lib/env';
 import { decryptSecret } from '@/lib/crypto';
-import { probeKey } from '@/lib/venice';
-import { invalidatePoolCache } from '@/lib/inference';
+import { invalidatePoolCache, voidPendingRewards } from '@/lib/inference';
+import { getAdapter } from '@/lib/vendors';
+import type { VendorName } from '@/lib/vendors/config';
 
-// 30-minute health probe: GET /models per key (auth-exercising, zero tokens).
-//   401/403            → INVALID (provider revoked the key on Venice's side)
+// 30-minute health probe via each provider's vendor adapter (GET /models
+// equivalent — auth-exercising, zero tokens).
+//   401/403            → INVALID (key revoked upstream) + pending rewards voided
 //   429 / errors ×2    → DEGRADED (skipped by routing until it probes healthy)
 //   healthy            → ACTIVE (recovers DEGRADED), failure counter reset
 
@@ -21,7 +23,7 @@ export async function runHealthProbes(now: Date = new Date()): Promise<void> {
     await Promise.all(
       providers.slice(i, i + PROBE_CONCURRENCY).map(async (p) => {
         const key = decryptSecret(p.encryptedKey!, env.KEY_ENCRYPTION_KEY);
-        const result = await probeKey(key, { baseUrl: env.VENICE_BASE_URL });
+        const result = await getAdapter(p.vendor as VendorName).probe(key);
 
         switch (result) {
           case 'healthy':
@@ -35,6 +37,7 @@ export async function runHealthProbes(now: Date = new Date()): Promise<void> {
               where: { id: p.id },
               data: { status: 'INVALID', unhealthyToday: true, lastProbeAt: now },
             });
+            await voidPendingRewards(p.id, 'health probe: key revoked upstream');
             break;
           default: {
             // rate_limited / error — degrade only on repeat, matching routing.

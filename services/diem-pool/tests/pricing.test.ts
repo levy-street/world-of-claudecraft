@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computeCostUsd, FALLBACK_RATE, SEED_PRICING } from '@/lib/pricing';
+import { computeCostUsd, FALLBACK_RATE, SEED_CLASS_MAP, SEED_PRICING_BY_VENDOR } from '@/lib/pricing';
 
 describe('computeCostUsd', () => {
   it('prices per-1M-token rates exactly', () => {
@@ -25,10 +25,21 @@ describe('computeCostUsd', () => {
     expect(() => computeCostUsd(FALLBACK_RATE, -1, 0)).toThrow();
   });
 
-  it('fallback rate is at least as expensive as every seeded model', () => {
-    for (const rate of Object.values(SEED_PRICING)) {
-      expect(FALLBACK_RATE.inputUsdPerMTokens).toBeGreaterThanOrEqual(rate.inputUsdPerMTokens);
-      expect(FALLBACK_RATE.outputUsdPerMTokens).toBeGreaterThanOrEqual(rate.outputUsdPerMTokens);
+  it('fallback rate is at least as expensive as every seeded model, all vendors', () => {
+    for (const models of Object.values(SEED_PRICING_BY_VENDOR)) {
+      for (const rate of Object.values(models)) {
+        expect(FALLBACK_RATE.inputUsdPerMTokens).toBeGreaterThanOrEqual(rate.inputUsdPerMTokens);
+        expect(FALLBACK_RATE.outputUsdPerMTokens).toBeGreaterThanOrEqual(rate.outputUsdPerMTokens);
+      }
+    }
+  });
+
+  it('every seeded class mapping has seeded pricing for its concrete model', () => {
+    for (const row of SEED_CLASS_MAP) {
+      expect(
+        SEED_PRICING_BY_VENDOR[row.vendor]?.[row.model],
+        `${row.vendor}:${row.model} (${row.class})`,
+      ).toBeDefined();
     }
   });
 });

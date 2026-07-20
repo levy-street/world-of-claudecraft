@@ -5,6 +5,7 @@ import {
   nextHealthyStreak,
   persistSettlementRows,
   utcDay,
+  vestingDate,
   type LedgerStore,
   type ProviderDay,
   type SettlementConfig,
@@ -28,6 +29,8 @@ function day(overrides: Partial<ProviderDay> & { providerId: string }): Provider
     consumedUsd: 0,
     healthyAllDay: true,
     consecutiveHealthyDays: 1,
+    rewardMultiplier: 1,
+    standbyEligible: true,
     ...overrides,
   };
 }
@@ -78,6 +81,41 @@ describe('computeSettlement — uptime multiplier', () => {
       CFG,
     );
     expect(row.totalClaudium).toBe(68);
+  });
+});
+
+describe('computeSettlement — per-vendor economics', () => {
+  it('applies the vendor reward multiplier to the base', () => {
+    const [row] = computeSettlement(
+      [day({ providerId: 'a', consumedUsd: 1, healthyAllDay: false, rewardMultiplier: 1.5 })],
+      CFG,
+    );
+    expect(row.baseClaudium).toBe(150); // floor(1 × 100 × 1.5)
+  });
+
+  it('denies standby to standby-ineligible (BYOK) vendors even when healthy', () => {
+    const rows = computeSettlement(
+      [day({ providerId: 'byok', dailyCapacityUsd: 1000, consumedUsd: 0, standbyEligible: false })],
+      CFG,
+    );
+    // Huge declared budget, healthy all day, zero consumption → zero reward.
+    expect(rows).toHaveLength(0);
+  });
+
+  it('BYOK consumption still pays base while standby stays zero', () => {
+    const [row] = computeSettlement(
+      [day({ providerId: 'byok', dailyCapacityUsd: 100, consumedUsd: 2, standbyEligible: false })],
+      CFG,
+    );
+    expect(row.baseClaudium).toBe(200);
+    expect(row.standbyClaudium).toBe(0);
+    expect(row.totalClaudium).toBe(200);
+  });
+
+  it('vestingDate: instant for 0 days, midnight-UTC offset otherwise', () => {
+    const settled = utcDay(new Date('2026-07-20T12:00:00Z'));
+    expect(vestingDate(settled, 0)).toBeNull();
+    expect(vestingDate(settled, 7)?.toISOString()).toBe('2026-07-27T00:00:00.000Z');
   });
 });
 

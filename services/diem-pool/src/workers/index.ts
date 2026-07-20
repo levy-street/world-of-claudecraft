@@ -10,7 +10,7 @@ try {
 import { Queue, Worker } from 'bullmq';
 import { MAINTENANCE_QUEUE, newBullConnection } from './queues';
 import { runHealthProbes } from './health';
-import { runDailySettlement } from './settle';
+import { runDailySettlement, runVesting } from './settle';
 
 async function main(): Promise<void> {
   const queue = new Queue(MAINTENANCE_QUEUE, { connection: newBullConnection() });
@@ -35,7 +35,10 @@ async function main(): Promise<void> {
     MAINTENANCE_QUEUE,
     async (job) => {
       if (job.name === 'health-probe') await runHealthProbes();
-      else if (job.name === 'daily-settlement') await runDailySettlement();
+      else if (job.name === 'daily-settlement') {
+        await runDailySettlement();
+        await runVesting();
+      }
     },
     {
       connection: newBullConnection(),

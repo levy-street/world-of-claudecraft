@@ -7,11 +7,15 @@ const NONCE_TTL_MS = 10 * 60 * 1000;
 export async function issueNonce(
   wallet: string,
   purpose: 'register' | 'revoke',
+  vendor?: string,
 ): Promise<{ nonce: string; message: string; expiresAt: Date }> {
   const nonce = randomBytes(24).toString('hex');
   const expiresAt = new Date(Date.now() + NONCE_TTL_MS);
   await prisma.providerNonce.create({ data: { wallet, nonce, purpose, expiresAt } });
-  return { nonce, message: buildSignMessage(purpose, wallet, nonce), expiresAt };
+  // The vendor line only exists on register messages; verification rebuilds
+  // the message from the register request, so a mismatched vendor fails.
+  const message = buildSignMessage(purpose, wallet, nonce, purpose === 'register' ? vendor : undefined);
+  return { nonce, message, expiresAt };
 }
 
 /**

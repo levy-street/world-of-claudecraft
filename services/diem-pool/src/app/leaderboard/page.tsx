@@ -14,7 +14,7 @@ export default async function LeaderboardPage() {
   });
   const providers = await prisma.provider.findMany({
     where: { id: { in: usage.map((u) => u.providerId!) } },
-    select: { id: true, displayName: true, wallet: true, consecutiveHealthyDays: true },
+    select: { id: true, displayName: true, wallet: true, vendor: true, consecutiveHealthyDays: true },
   });
   const byId = new Map(providers.map((p) => [p.id, p]));
 
@@ -27,6 +27,7 @@ export default async function LeaderboardPage() {
             <tr>
               <th>#</th>
               <th>Provider</th>
+              <th>Vendor</th>
               <th>Wallet</th>
               <th>Lifetime $ served</th>
               <th>Health streak</th>
@@ -40,6 +41,7 @@ export default async function LeaderboardPage() {
                 <tr key={u.providerId}>
                   <td>{i + 1}</td>
                   <td>{p.displayName}</td>
+                  <td>{p.vendor}</td>
                   <td>
                     <code>{truncateWallet(p.wallet)}</code>
                   </td>
@@ -50,7 +52,7 @@ export default async function LeaderboardPage() {
             })}
             {usage.length === 0 && (
               <tr>
-                <td colSpan={5} className="muted">
+                <td colSpan={6} className="muted">
                   No compute served yet — be the first.
                 </td>
               </tr>

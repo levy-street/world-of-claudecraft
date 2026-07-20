@@ -49,13 +49,17 @@ export function verifyWalletSignature(
 
 /**
  * The exact message a provider signs. Server-built on both issue and verify so
- * the client can't vary it; the nonce makes it single-use.
+ * the client can't vary it; the nonce makes it single-use. Registration binds
+ * the vendor so a signature for one vendor can't register a key for another.
  */
-export function buildSignMessage(purpose: 'register' | 'revoke', wallet: string, nonce: string): string {
-  return [
-    'World of ClaudeCraft DIEM Pool',
-    `Action: ${purpose}`,
-    `Wallet: ${wallet}`,
-    `Nonce: ${nonce}`,
-  ].join('\n');
+export function buildSignMessage(
+  purpose: 'register' | 'revoke',
+  wallet: string,
+  nonce: string,
+  vendor?: string,
+): string {
+  const lines = ['World of ClaudeCraft DIEM Pool', `Action: ${purpose}`];
+  if (vendor) lines.push(`Vendor: ${vendor}`);
+  lines.push(`Wallet: ${wallet}`, `Nonce: ${nonce}`);
+  return lines.join('\n');
 }

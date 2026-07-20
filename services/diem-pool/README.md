@@ -1,16 +1,31 @@
-# WoCC DIEM Delegation Pool
+# WoCC Compute Delegation Pool (DIEM + BYOK)
 
-DIEM holders stake their tokens on Venice.ai and get a daily-refreshing API
-credit ($1/day per staked DIEM). This service lets them **delegate that
-capacity to World of ClaudeCraft** without giving up custody of anything:
+Players delegate AI compute to World of ClaudeCraft and earn **Claudium**:
 
-1. A provider registers a **scoped Venice API key** (signed with their Solana
-   wallet). They keep their DIEM; they can revoke the key at any time.
-2. The game backend routes its AI inference (NPC dialogue, quest generation,
-   dungeon master, agent players) through the pool of registered keys.
-3. Actual consumed compute is metered per provider and settled nightly in
-   **Claudium**, the in-game premium currency (internal ledger — no on-chain
-   transfer in v1).
+- **Venice/DIEM**: stake DIEM on Venice.ai for a daily-refreshing API credit
+  ($1/day per DIEM) and register a scoped Venice key.
+- **Bring-your-own-key (BYOK)**: attach your own **OpenAI**, **Anthropic**,
+  or **Kimi (Moonshot)** API key with a self-imposed daily donation budget.
+
+Either way it is non-custodial: keys are validated with a ~1-token call,
+encrypted at rest, revocable anytime, and never shown again. The game routes
+NPC dialogue, quest generation, dungeon-master and agent-player inference
+through the pool by **model class**, meters actual consumed compute per
+provider, and settles nightly in Claudium (internal ledger — no on-chain
+transfer in v1).
+
+Because BYOK keys spend real money, they carry extra fraud controls
+(design: `docs/PLAN-byok-multi-vendor.md`):
+
+- **Trust ramp** — a new key routes at most $2/day regardless of its declared
+  budget, $25/day after 7 healthy days, uncapped at 30 (`TRUST_CAP_*`).
+- **Reward vesting** — BYOK Claudium settles as PENDING and vests 7 days
+  later; a key that goes INVALID upstream (stolen-key signature) or is
+  revoked **voids** its unvested rewards.
+- **No standby pay** — only stake-backed Venice capacity earns the standby
+  rate; a free-to-declare BYOK budget pays only for consumed compute.
+- **Pinned endpoints** — vendors are an allowlist with pool-configured base
+  URLs; providers can never point us at their own server.
 
 ## Delegation flow
 
@@ -97,7 +112,9 @@ npx tsx scripts/ui_e2e.mts              # browser-level: dashboard/admin/leaderb
 npx tsx scripts/load_sanity.mts         # throughput/latency sanity vs the mock upstream
 ```
 
-The game backend calls the pool like this:
+The game backend calls the pool by **model class** (`fast` | `standard` |
+`smart`), and the pool resolves the concrete model per vendor via the
+admin-editable `ModelClassMap`:
 
 ```bash
 curl -s http://localhost:3100/api/internal/inference \
@@ -105,17 +122,21 @@ curl -s http://localhost:3100/api/internal/inference \
   -H "x-internal-secret: $INTERNAL_SHARED_SECRET" \
   -d '{
         "purpose": "npc_dialogue",
+        "modelClass": "fast",
         "gameAccountId": "acct_123",
         "payload": {
-          "model": "llama-3.3-70b",
           "messages": [{"role": "user", "content": "Greet the traveler."}],
           "max_tokens": 128
         }
       }'
 ```
 
-The response body is the upstream Venice (OpenAI-compatible) response;
-`x-pool-provider-id` / `x-pool-house` headers say who served it.
+The response body is always OpenAI chat-completion shaped regardless of the
+serving vendor (the Anthropic adapter translates both directions);
+`x-pool-provider-id` / `x-pool-vendor` / `x-pool-house` headers say who
+served it. Two pinning forms remain supported in `payload.model`:
+`"vendor:model"` routes to that vendor only, and a bare model name is the
+legacy Venice contract.
 
 ## Router weighting algorithm
 
@@ -143,10 +164,16 @@ weight(p) = max(0, dailyCapacityUsd × SPEND_HEADROOM − spentTodayUsd)
 
 | Step | Rule |
 | --- | --- |
-| Base | `floor(consumedUsd × CLAUDIUM_PER_USD)` — consumed compute only, never pledged capacity |
+| Base | `floor(consumedUsd × CLAUDIUM_PER_USD × vendorMultiplier)` — consumed compute only, never pledged capacity; the per-vendor multiplier is admin-tunable (default 1.0×) |
 | Uptime bonus | ×`UPTIME_MULTIPLIER` (1.25) once `consecutiveHealthyDays ≥ 30` |
-| Standby | `floor(unusedCapacityUsd × STANDBY_CLAUDIUM_PER_USD_CAPACITY)` for providers ACTIVE and healthy all day |
+| Standby | `floor(unusedCapacityUsd × STANDBY_CLAUDIUM_PER_USD_CAPACITY)` for providers ACTIVE and healthy all day — **standby-eligible (Venice) vendors only** |
 | Cap | nobody keeps more than `MAX_DAILY_SHARE` (20%) of the day's total uncapped emission |
+| Vesting | Venice rows vest instantly; BYOK rows settle PENDING and vest after `vestingDays` (7); INVALID/revoked keys void their PENDING rows |
+
+Trust tiers are recomputed from the healthy-day streak at settlement
+(`NEW < 7d ≤ ESTABLISHED < 30d ≤ TRUSTED`) and cap BYOK routing budgets.
+Credit events (queue + webhook) are emitted when a row **vests**, never for
+pending or voided rows.
 
 Notes:
 
@@ -195,7 +222,7 @@ Notes:
 | `GET /api/providers/by-wallet/:wallet` | Provider stats |
 | `GET /api/leaderboard` | Leaderboard JSON |
 | `POST /api/internal/inference` | Game → pool inference (shared secret) |
-| `GET /api/admin/overview` · `GET/PUT /api/admin/pricing` · `GET/POST /api/admin/killswitch` | Admin API |
+| `GET /api/admin/overview` · `GET/PUT /api/admin/pricing` · `GET/POST /api/admin/killswitch` · `GET/PUT /api/admin/vendors` | Admin API |
 
 ## Operations
 
@@ -229,12 +256,21 @@ Notes:
 These are the places where the implementation makes assumptions that must be
 checked against the real Venice API before money-equivalent rewards ship:
 
+- **Upstream shapes are verified against faithful mocks, not live APIs.**
+  The Venice/OpenAI/Kimi/Anthropic adapters encode each vendor's documented
+  auth, request/response, and error conventions (including OpenAI's
+  `insufficient_quota` 429s and Anthropic's 529/credit-balance errors), and
+  the E2E suite exercises them against dialect-accurate mocks — but a pass
+  against each real API with a funded key is required before launch.
 - **Venice balance shapes are assumed, not verified.** `src/lib/venice.ts`
   sniffs a few plausible balance headers (`parseBalanceUsd`) and otherwise
   trusts the provider's *declared* DIEM count for capacity. Inspect real
   Venice responses and adapt; until then a provider can over-declare
   capacity (bounded by `MAX_DECLARED_DIEM`, and metering still only pays for
   actually-served compute).
+- **Anthropic translation covers text chat only** — tool/function messages
+  and image parts are rejected as `bad_request` rather than silently
+  dropped; extend `translateRequest` when the game needs them.
 - **Seeded model pricing is a snapshot** (`prisma/seed.ts`), not live data.
   Keep the table in sync with https://venice.ai/pricing via the admin
   editor; unknown models are metered at a conservative fallback rate and

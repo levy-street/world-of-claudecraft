@@ -13,11 +13,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Allowlisted upstream vendors with pinned base URLs. Providers can never
+// supply their own endpoint — see docs/PLAN-byok-multi-vendor.md §7.
+enum Vendor {
+  venice
+  openai
+  anthropic
+  kimi
+}
+
 enum ProviderStatus {
   ACTIVE
   DEGRADED
   REVOKED
   INVALID
+}
+
+// Anti-stolen-key ramp for real-money (BYOK) keys: a key's routable budget is
+// capped by tier until it has a healthy track record. Venice (stake-backed)
+// keys are exempt via VendorConfig.trustRampEnabled = false.
+enum TrustTier {
+  NEW
+  ESTABLISHED
+  TRUSTED
+}
+
+// BYOK rewards vest after a fraud window; INVALID/revoked keys void their
+// pending rewards. Venice rewards vest immediately (vestingDays = 0).
+enum RewardStatus {
+  PENDING
+  VESTED
+  VOIDED
+}
+
+// Game-facing model tiers; ModelClassMap resolves them to concrete
+// vendor models at routing time.
+enum ModelClass {
+  fast
+  standard
+  smart
 }
 
 enum UsagePurpose {
@@ -35,13 +69,17 @@ enum NoncePurpose {
 
 model Provider {
   id                     String         @id @default(cuid())
-  wallet                 String         @unique
+  wallet                 String
+  vendor                 Vendor         @default(venice)
   displayName            String
   // AES-256-GCM envelope ("v1:<iv>:<ct>:<tag>", base64 parts). Null once revoked.
   encryptedKey           String?
   keyLast4               String?
+  // Venice: staked capacity (DIEM × $1/day). BYOK: self-declared daily spend
+  // budget. Routing additionally caps BYOK by trust tier.
   dailyCapacityUsd       Decimal        @db.Decimal(12, 2)
   status                 ProviderStatus @default(ACTIVE)
+  trustTier              TrustTier      @default(NEW)
   consecutiveHealthyDays Int            @default(0)
   // Routing-time consecutive hard failures; 2 → DEGRADED.
   consecutiveFailures    Int            @default(0)
@@ -60,7 +98,10 @@ model Provider {
   dailySpend  ProviderDailySpend[]
   rewards     RewardLedger[]
 
+  // One key per (wallet, vendor); a wallet may serve several vendors.
+  @@unique([wallet, vendor])
   @@index([status])
+  @@index([wallet])
 }
 
 // One-time nonces for wallet-signature auth on provider mutations.
@@ -81,6 +122,7 @@ model UsageEvent {
   // Null for house-key traffic (house = true).
   providerId       String?
   provider         Provider?    @relation(fields: [providerId], references: [id], onDelete: SetNull)
+  vendor           Vendor       @default(venice)
   purpose          UsagePurpose
   model            String
   promptTokens     Int
@@ -109,33 +151,67 @@ model ProviderDailySpend {
   @@index([date])
 }
 
-// Per-1M-token USD rates, admin-editable, seeded from Venice's published pricing.
+// Per-1M-token USD rates per vendor model, admin-editable, seeded from each
+// vendor's published pricing.
 model ModelPricing {
   id                  String   @id @default(cuid())
-  model               String   @unique
+  vendor              Vendor   @default(venice)
+  model               String
   inputUsdPerMTokens  Decimal  @db.Decimal(12, 6)
   outputUsdPerMTokens Decimal  @db.Decimal(12, 6)
   active              Boolean  @default(true)
   updatedAt           DateTime @updatedAt
+
+  @@unique([vendor, model])
+}
+
+// Game-facing model class → concrete vendor model, priority-ordered within a
+// vendor (lowest priority number wins). Admin-editable.
+model ModelClassMap {
+  id       String     @id @default(cuid())
+  class    ModelClass
+  vendor   Vendor
+  model    String
+  priority Int        @default(100)
+  active   Boolean    @default(true)
+
+  @@unique([class, vendor, model])
+  @@index([class, active])
+}
+
+// Per-vendor economics + kill switch. Rows override the in-code defaults
+// (src/lib/vendors/config.ts); the admin API upserts here.
+model VendorConfig {
+  vendor           Vendor   @id
+  enabled          Boolean  @default(true)
+  rewardMultiplier Decimal  @default(1.0) @db.Decimal(4, 2)
+  standbyEligible  Boolean  @default(false)
+  vestingDays      Int      @default(7)
+  trustRampEnabled Boolean  @default(true)
+  updatedAt        DateTime @updatedAt
 }
 
 model RewardLedger {
-  id              String   @id @default(cuid())
+  id              String       @id @default(cuid())
   providerId      String
-  provider        Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
-  // UTC calendar date being settled.
-  date            DateTime @db.Date
-  consumedUsd     Decimal  @db.Decimal(14, 8)
+  provider        Provider     @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  // UTC calendar day being settled.
+  date            DateTime     @db.Date
+  consumedUsd     Decimal      @db.Decimal(14, 8)
   baseClaudium    Int
-  multiplier      Decimal  @db.Decimal(4, 2)
+  multiplier      Decimal      @db.Decimal(4, 2)
   standbyClaudium Int
   capped          Boolean
   totalClaudium   Int
-  createdAt       DateTime @default(now())
+  // Vesting lifecycle. VESTED rows are the only ones the game credits.
+  status          RewardStatus @default(VESTED)
+  vestAt          DateTime?
+  createdAt       DateTime     @default(now())
 
   // Idempotency anchor: settlement upserts on this key, safe to re-run.
   @@unique([providerId, date])
   @@index([date])
+  @@index([status, vestAt])
 }
 
 // Marks a settlement day as processed. Ledger upserts are idempotent on

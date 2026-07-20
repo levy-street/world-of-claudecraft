@@ -5,7 +5,11 @@ from other AI vendors** — OpenAI, Anthropic, Kimi (Moonshot), and future
 OpenAI-compatible providers — and earn Claudium for the compute the game
 actually consumes through them.
 
-Status: design for review. Nothing here is implemented yet.
+Status: **Phases 1–2 implemented** (schema, adapters for OpenAI/Kimi/Anthropic,
+model classes, trust ramp, vesting/voiding, per-vendor admin controls, full
+test coverage). Phase 3 items (multiplier tuning UI, fraud view, image/vision
+classes, streaming) remain future work. Deviations from this design are noted
+in the README's Known-limitations section.
 
 ---
 

@@ -84,6 +84,37 @@ async function fillInput(page: Page, labelText: string, value: string): Promise<
   );
 }
 
+/** Set a React-controlled <select> via the native setter so onChange fires. */
+async function selectOption(page: Page, labelText: string, value: string): Promise<void> {
+  await page.evaluate(
+    (l: string, v: string) => {
+      const label = [...document.querySelectorAll('label')].find((x) =>
+        x.textContent?.includes(l),
+      );
+      const select = label?.querySelector('select');
+      if (!select) throw new Error(`select not found for label: ${l}`);
+      const setter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value')!.set!;
+      setter.call(select, v);
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    },
+    labelText,
+    value,
+  );
+}
+
+/** Click the button inside the first table row that has both `rowText` AND a
+ *  button (skips button-less rows, e.g. a provider row naming the vendor). */
+async function clickRowButton(page: Page, rowText: string): Promise<boolean> {
+  return page.evaluate((t: string) => {
+    const row = [...document.querySelectorAll('tr')].find(
+      (r) => r.textContent?.includes(t) && r.querySelector('button'),
+    );
+    if (!row) return false;
+    row.querySelector('button')!.click();
+    return true;
+  }, rowText);
+}
+
 // Rate-limit windows persist in Redis across runs; this script owns its stack.
 {
   const redis = new Redis(process.env.REDIS_URL!);
@@ -132,27 +163,37 @@ check(
   await page.evaluate(() => /…/.test(document.body.innerText)),
 );
 
-console.log('— provider dashboard: connect → register → stats → revoke —');
+console.log('— provider dashboard: connect → register (venice + openai) → stats → revoke —');
 await page.goto(`${BASE}/`, { waitUntil: 'networkidle0' });
-check('connect wallet reveals the register form',
-  await clickAndExpect(page, 'Connect wallet', 'Register a Venice API key'));
+check('connect wallet reveals the attach-key form',
+  await clickAndExpect(page, 'Connect wallet', 'Attach an API key'));
 check('shows the connected wallet', await waitForText(page, wallet.slice(0, 8)));
 
 await fillInput(page, 'Display name', 'UI Test Rig');
-await fillInput(page, 'Venice API key', 'vn_ui_test_key_0123456789abcdef');
+await fillInput(page, 'API key', 'vn_ui_test_key_0123456789abcdef');
 await fillInput(page, 'Staked DIEM', '12');
-check('register flow completes (nonce → sign → validate → store)',
-  await clickAndExpect(page, 'Sign & register', 'Registered — key …cdef'));
-check('stats panel renders status and capacity',
+check('venice register flow completes (nonce → sign → validate → store)',
+  await clickAndExpect(page, 'Sign & register', 'Registered — venice key …cdef'));
+check('key card renders status and capacity',
   (await waitForText(page, 'ACTIVE')) && (await waitForText(page, 'consumed today (of $12.00 cap)')));
-check('stats panel shows Claudium and streak tiles',
-  (await waitForText(page, 'Claudium earned')) && (await waitForText(page, 'health streak (1.25× at 30d)')));
+check('key card shows Claudium and trust tier tiles',
+  (await waitForText(page, 'Claudium earned')) && (await waitForText(page, 'health streak / trust tier')));
 
-check('revoke wipes the key and updates status',
-  await clickAndExpect(page, 'Revoke key', 'Key revoked and wiped.'));
+// The form auto-advances to the next open vendor; register an OpenAI key too.
+check('vendor picker moved to a BYOK vendor', await waitForText(page, 'donation budget'));
+await fillInput(page, 'Display name', 'UI OpenAI Rig');
+await fillInput(page, 'API key', 'sk-oai-ui-good-0123456789abcdef');
+await fillInput(page, 'Daily donation budget', '15');
+check('openai register flow completes',
+  await clickAndExpect(page, 'Sign & register', 'Registered — openai key …cdef'));
+check('both key cards visible', (await waitForText(page, 'venice: UI Test Rig')) && (await waitForText(page, 'openai: UI OpenAI Rig')));
+check('BYOK card shows the NEW trust tier', await waitForText(page, 'NEW'));
+
+check('revoke wipes the venice key and updates status',
+  await clickAndExpect(page, 'Revoke venice key', 'venice key revoked and wiped.'));
 check('status flips to REVOKED', await waitForText(page, 'REVOKED'));
-check('revoked provider is offered the register form again',
-  await waitForText(page, 'Register a Venice API key'));
+check('revoked vendor is offered for registration again',
+  await waitForText(page, 'Attach an API key'));
 
 console.log('— admin console —');
 await page.goto(`${BASE}/admin`, { waitUntil: 'networkidle0' });
@@ -163,15 +204,29 @@ await fillInput(page, 'Admin token', process.env.ADMIN_TOKEN!);
 check('overview loads with routing live',
   await clickAndExpect(page, 'Load', 'pool spend today'));
 check('provider table lists the UI test provider', await waitForText(page, 'UI Test Rig'));
+// The vendors rows commit a beat after the overview does — wait for their
+// buttons, not just the panel header, before clicking into them.
+check('vendors panel renders all policies',
+  (await waitForText(page, 'Trust ramp')) && (await waitForText(page, 'Disable')));
+
+// Toggle the kimi vendor off and back on from its table row.
+check('vendor kill switch disables kimi', await clickRowButton(page, 'kimi') && await waitForText(page, 'OFF'));
+check('vendor re-enabled', await clickRowButton(page, 'kimi') && (await (async () => {
+  await new Promise((r) => setTimeout(r, 500));
+  return !(await page.evaluate(() =>
+    [...document.querySelectorAll('tr')].some((r) => r.textContent?.includes('kimi') && r.textContent?.includes('OFF')),
+  ));
+})()));
 
 check('kill switch pauses routing',
   await clickAndExpect(page, 'KILL SWITCH — pause all routing', 'PAUSED'));
 check('resume restores routing', await clickAndExpect(page, 'Resume routing', 'live'));
 
+await selectOption(page, 'Vendor', 'kimi');
 await fillInput(page, 'Model id', 'ui-test-model');
 await fillInput(page, 'Input $/1M tokens', '2');
 await fillInput(page, 'Output $/1M tokens', '8');
-check('pricing editor saves and lists the new model',
+check('pricing editor saves and lists the new model under its vendor',
   await clickAndExpect(page, 'Save pricing', 'ui-test-model'));
 
 await browser.close();

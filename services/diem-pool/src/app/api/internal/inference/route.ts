@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
     status: outcome.status,
     headers: {
       'x-pool-provider-id': outcome.providerId ?? '',
+      'x-pool-vendor': outcome.vendor ?? '',
       'x-pool-house': String(outcome.house),
     },
   });

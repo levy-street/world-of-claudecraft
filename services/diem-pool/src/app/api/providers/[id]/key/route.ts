@@ -3,7 +3,7 @@ import { prisma } from '@/lib/db';
 import { revokeSchema } from '@/lib/schemas';
 import { buildSignMessage, verifyWalletSignature } from '@/lib/signature';
 import { consumeNonce } from '@/lib/nonce';
-import { invalidatePoolCache } from '@/lib/inference';
+import { invalidatePoolCache, voidPendingRewards } from '@/lib/inference';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -36,6 +36,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     where: { id: provider.id },
     data: { encryptedKey: null, keyLast4: null, status: 'REVOKED' },
   });
+  // Unvested BYOK rewards die with the key (fraud window — see BYOK plan §6).
+  await voidPendingRewards(provider.id, 'key revoked by provider');
   invalidatePoolCache();
 
   return NextResponse.json({ id: provider.id, status: 'REVOKED' });

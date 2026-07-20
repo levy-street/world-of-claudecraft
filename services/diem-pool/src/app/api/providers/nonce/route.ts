@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: 'invalid request', issues: parsed.error.issues }, { status: 400 });
   }
-  const { walletAddress, purpose } = parsed.data;
+  const { walletAddress, purpose, vendor } = parsed.data;
   if (!isValidSolanaAddress(walletAddress)) {
     return NextResponse.json({ error: 'invalid Solana wallet address' }, { status: 400 });
   }
@@ -36,6 +36,6 @@ export async function POST(req: NextRequest) {
     console.error('[ratelimit] redis unavailable, failing open:', (err as Error).message);
   }
 
-  const { nonce, message, expiresAt } = await issueNonce(walletAddress, purpose);
+  const { nonce, message, expiresAt } = await issueNonce(walletAddress, purpose, vendor);
   return NextResponse.json({ nonce, message, expiresAt });
 }

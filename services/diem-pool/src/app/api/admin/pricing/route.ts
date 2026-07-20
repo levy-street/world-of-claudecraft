@@ -9,9 +9,10 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   const denied = requireAdminToken(req);
   if (denied) return denied;
-  const rows = await prisma.modelPricing.findMany({ orderBy: { model: 'asc' } });
+  const rows = await prisma.modelPricing.findMany({ orderBy: [{ vendor: 'asc' }, { model: 'asc' }] });
   return NextResponse.json({
     pricing: rows.map((r) => ({
+      vendor: r.vendor,
       model: r.model,
       inputUsdPerMTokens: Number(r.inputUsdPerMTokens),
       outputUsdPerMTokens: Number(r.outputUsdPerMTokens),
@@ -29,11 +30,11 @@ export async function PUT(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: 'invalid request', issues: parsed.error.issues }, { status: 400 });
   }
-  const { model, inputUsdPerMTokens, outputUsdPerMTokens, active } = parsed.data;
+  const { vendor, model, inputUsdPerMTokens, outputUsdPerMTokens, active } = parsed.data;
   const row = await prisma.modelPricing.upsert({
-    where: { model },
-    create: { model, inputUsdPerMTokens, outputUsdPerMTokens, active },
+    where: { vendor_model: { vendor, model } },
+    create: { vendor, model, inputUsdPerMTokens, outputUsdPerMTokens, active },
     update: { inputUsdPerMTokens, outputUsdPerMTokens, active },
   });
-  return NextResponse.json({ model: row.model, active: row.active });
+  return NextResponse.json({ vendor: row.vendor, model: row.model, active: row.active });
 }
