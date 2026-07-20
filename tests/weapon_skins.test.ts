@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { WEAPON_VFX } from '../src/render/weapon_vfx';
 import {
   eligibleClassesForWeaponSkinType,
+  offhandMirrorsWeaponSkin,
   resolveActiveWeaponSkin,
   skinnableWeaponTypesFor,
   WEAPON_TYPE_BY_ITEM,
@@ -174,6 +175,42 @@ describe('skin apply rule', () => {
     for (const skin of WEAPON_SKIN_LIST) {
       expect(reachable.has(skin.weaponType), `${skin.id} (${skin.weaponType})`).toBe(true);
     }
+  });
+});
+
+describe('offhand weapon-skin mirror rule', () => {
+  it('mirrors the skin onto a matching-type one-hand offhand weapon', () => {
+    // A rogue with two daggers and a dagger skin shows both blades skinned.
+    expect(offhandMirrorsWeaponSkin('frostbite_dagger', 'rusty_dagger')).toBe(true);
+    expect(offhandMirrorsWeaponSkin('ashspark_dagger', 'keen_dirk')).toBe(true);
+    expect(offhandMirrorsWeaponSkin('ice_fang_sword', 'crossroads_saber')).toBe(true);
+  });
+
+  it('leaves a different-type offhand weapon untouched', () => {
+    expect(offhandMirrorsWeaponSkin('frostbite_dagger', 'crossroads_saber')).toBe(false);
+    expect(offhandMirrorsWeaponSkin('ice_fang_sword', 'rusty_dagger')).toBe(false);
+  });
+
+  it('never mirrors onto a shield (armor, no weapon type)', () => {
+    expect(offhandMirrorsWeaponSkin('ice_fang_sword', 'eastbrook_buckler')).toBe(false);
+    expect(offhandMirrorsWeaponSkin('frostbite_dagger', 'highwatch_wallshield')).toBe(false);
+  });
+
+  it('never mirrors onto a held offhand (orb/tome, no weapon type)', () => {
+    expect(offhandMirrorsWeaponSkin('ice_fang_sword', 'wraithfire_orb')).toBe(false);
+  });
+
+  it('resolves a heroic-prefixed offhand item to its base weapon type', () => {
+    expect(offhandMirrorsWeaponSkin('frostbite_dagger', 'heroic_moggers_shiv')).toBe(true);
+    expect(offhandMirrorsWeaponSkin('ice_fang_sword', 'heroic_moggers_shiv')).toBe(false);
+  });
+
+  it('returns false for an unknown or absent skin, or an empty offhand', () => {
+    expect(offhandMirrorsWeaponSkin('not_a_skin', 'rusty_dagger')).toBe(false);
+    expect(offhandMirrorsWeaponSkin(null, 'rusty_dagger')).toBe(false);
+    expect(offhandMirrorsWeaponSkin(undefined, 'rusty_dagger')).toBe(false);
+    expect(offhandMirrorsWeaponSkin('frostbite_dagger', null)).toBe(false);
+    expect(offhandMirrorsWeaponSkin('frostbite_dagger', undefined)).toBe(false);
   });
 });
 

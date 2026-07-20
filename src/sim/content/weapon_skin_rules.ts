@@ -178,6 +178,25 @@ export function resolveActiveWeaponSkin(
   return null;
 }
 
+/**
+ * True when the active weapon skin should also render on the offhand: the
+ * offhand holds a one-hand WEAPON whose type matches the skin's weaponType (a
+ * rogue with two daggers and a dagger skin shows both blades skinned). Shields
+ * (armor, no weapon type), held offhands (orbs/tomes, no weapon type), and any
+ * offhand weapon of a DIFFERENT type resolve to a non-matching weapon type and
+ * are excluded, so the equality check is the whole rule. Pure and
+ * account-cosmetic-only; the offhand keeps its own equipped item id on the wire
+ * and the mirror is derived locally from that id plus the resolved skin.
+ */
+export function offhandMirrorsWeaponSkin(
+  skinId: string | null | undefined,
+  offhandItemId: string | null | undefined,
+): boolean {
+  const def = skinId ? WEAPON_SKINS[skinId] : null;
+  if (!def) return false;
+  return weaponTypeForItem(offhandItemId) === def.weaponType;
+}
+
 /** True when `skinType` may be applied with the given class and mainhand item. */
 export function weaponSkinTypeMatches(
   cls: string,
