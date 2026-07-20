@@ -30,7 +30,7 @@
 // Markers carry the identity (the party class id) the painter resolves
 // to a color, never the resolved color.
 
-import { GATHER_NODES, isDelvePos, isYumiMazePos, QUESTS, zoneAt } from '../sim/data';
+import { GATHER_NODES, isDelvePos, isYumiMazePos, QUESTS, STATIONS, zoneAt } from '../sim/data';
 import { isQuestTurnInNpc } from '../sim/types';
 import type { IWorld } from '../world_api';
 
@@ -88,7 +88,11 @@ export type MinimapMarker =
   // harvestable-for-THIS-viewer from on-cooldown-for-this-viewer (per-player,
   // see IWorldProfessions#nodeHarvestableByMe; two viewers can see opposite
   // states for the same node id).
-  | { kind: 'gather-node'; mx: number; my: number; ready: boolean };
+  | { kind: 'gather-node'; mx: number; my: number; ready: boolean }
+  // A crafting station (Professions 2.0): STATIC content positions (never
+  // entities, no per-viewer state), so both IWorld hosts produce the same
+  // marker. Tier-identical by the fairness invariant: never preset-gated.
+  | { kind: 'station'; mx: number; my: number };
 
 /** Everything the painter draws for one overworld minimap frame: the marker list (in
  *  draw order) plus the committed zone id (the painter localizes the #zone-label). */
@@ -243,6 +247,16 @@ export function createMinimapMarkers(): MinimapMarkers {
           my: half + dz,
           ready: world.nodeHarvestableByMe(node.id),
         });
+      }
+
+      // Crafting stations (Professions 2.0): static content positions, one marker per
+      // station, identical for every viewer (no per-viewer classification, unlike the
+      // gather nodes above).
+      for (const station of STATIONS) {
+        const dx = -(station.pos.x - p.pos.x) * pxPerYard;
+        const dz = -(station.pos.z - p.pos.z) * pxPerYard;
+        if (dx * dx + dz * dz > rim2) continue;
+        markers.push({ kind: 'station', mx: half + dx, my: half + dz });
       }
 
       // The local player's facing arrow, drawn last at the centre.

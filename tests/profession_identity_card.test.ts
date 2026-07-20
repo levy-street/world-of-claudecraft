@@ -30,6 +30,7 @@ describe('profession identity card painter contract', () => {
       switchCount: 1,
       amendsProgress: 0,
       amendsRequired: 8,
+      knownRecipes: [],
     };
 
     renderProfessionIdentityCard(parent, buildProfessionIdentityView(identity));

@@ -1,5 +1,18 @@
 # Phase 09: Station presence and recipe training
 
+As landed (2026-07-19, authoritative where it deviates from the older wording below; the
+full surface list is state.md's Phase 9 entry): the wave-one trainer-taught set is exactly
+the three COMBO_RECIPES (the locked "uncommon at 25" rung; commons and the 75/150
+TOOL/CASTER recipes keep empty acquisition, grandfathered known to everyone). The tier
+denial does NOT use a sim_i18n matcher row: trainResult is a text-free structured SimEvent
+(the Phase 6/8 station_required precedent) whose five stable deny ids render via
+hudChrome.training.* keys, satisfying the S3 duty by construction. Grandfathering is
+flag-discriminated (recipesGrandfathered, the mailWelcomed idiom): a load missing the flag
+unions the frozen 21-id PRE_TRAINING_RECIPE_IDS once; NEW characters carry the flag from
+creation and train the combos instead. Training proximity accepts STATIC stations only (a
+mobile crafting station never satisfies training). The crafting window now lists known
+recipes only; unlearned trainer recipes surface in the Train ladder.
+
 Phase 8 landed the typed station registry and master NPC records in sim and server; this phase
 makes them real to players. Stations render as visible props in the world, show on the minimap,
 and their masters teach recipes for gold through a Train view that is skill-tier gated with a

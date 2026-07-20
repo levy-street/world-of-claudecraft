@@ -191,7 +191,7 @@ describe('v0.26 winning Warrior authored row and mastery runtime', () => {
     expect(player.hp).toBe(highHp);
   });
 
-  it('Battle Rhythm empowers exactly every third ability for damage and generated rage', () => {
+  it('Battle Rhythm empowers exactly every third ability for generated rage only', () => {
     const sim = warriorAtCap(2625);
     expect(sim.selectTalentRow(14, 'war_row_battle_rhythm')).toBe(true);
     const player = sim.player;
@@ -215,10 +215,10 @@ describe('v0.26 winning Warrior authored row and mastery runtime', () => {
     const empoweredDraws = draws;
     expect(player.auras).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ id: 'battle_rhythm', kind: 'buff_dmg_done', value: 0.05 }),
         expect.objectContaining({ id: 'battle_rhythm_rage', kind: 'buff_rage_gen', value: 0.2 }),
       ]),
     );
+    expect(player.auras.some((aura) => aura.id === 'battle_rhythm')).toBe(false);
     const hpBefore = target.hp;
     sim.dealDamage(player, target, 100, false, 'fire', 'Test Battle Rhythm Strike', 'hit', true);
     const empoweredDamage = hpBefore - target.hp;
@@ -233,7 +233,7 @@ describe('v0.26 winning Warrior authored row and mastery runtime', () => {
     sim.ctx.rng.setObserver(null);
     sim.dealDamage(player, target, 100, false, 'fire', 'Test Battle Rhythm Strike', 'hit', true);
     const normalDamage = fourthHpBefore - target.hp;
-    expect(empoweredDamage).toBe(Math.round(normalDamage * 1.05));
+    expect(empoweredDamage).toBe(normalDamage);
     expect(empoweredRage).toBeCloseTo(10 * 1.3);
     expect(player.resource).toBeCloseTo(10 * 1.1);
     expect(empoweredDraws).toBe(normalDraws);

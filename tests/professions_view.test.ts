@@ -48,6 +48,7 @@ function identity(over: Partial<CraftingIdentityView> = {}): CraftingIdentityVie
     switchCount: 0,
     amendsProgress: 0,
     amendsRequired: 0,
+    knownRecipes: [],
     ...over,
   };
 }

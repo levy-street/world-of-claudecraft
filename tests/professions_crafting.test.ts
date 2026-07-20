@@ -4,6 +4,7 @@ import {
   CASTER_HUB_RECIPES,
   COMBO_RECIPES,
   COMMON_RECIPES,
+  LADDER_RECIPES,
   recipeById,
   TOOL_RECIPES,
 } from '../src/sim/content/recipes';
@@ -387,14 +388,21 @@ describe('craftItem command (#1127)', () => {
 
   it('the IWorld recipeList read surface exposes every recipe, common, tool, and combo alike (#1132 review)', () => {
     const sim = makeSim();
-    const allIds = [...COMMON_RECIPES, ...TOOL_RECIPES, ...CASTER_HUB_RECIPES, ...COMBO_RECIPES]
+    const allIds = [
+      ...COMMON_RECIPES,
+      ...TOOL_RECIPES,
+      ...CASTER_HUB_RECIPES,
+      ...COMBO_RECIPES,
+      ...LADDER_RECIPES,
+    ]
       .map((r) => r.id)
       .sort();
     expect(sim.recipeList.length).toBe(
       COMMON_RECIPES.length +
         TOOL_RECIPES.length +
         CASTER_HUB_RECIPES.length +
-        COMBO_RECIPES.length,
+        COMBO_RECIPES.length +
+        LADDER_RECIPES.length,
     );
     expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
   });
@@ -582,6 +590,9 @@ describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
     sim.acceptArchetypeQuest('armorcrafting');
     setSkill(sim, pid, 'armorcrafting', 25);
     setSkill(sim, pid, 'weaponcrafting', 25);
+    // Phase 9 acquisition switch: combo recipes are trainer-taught, so the
+    // fresh test player learns this one explicitly before crafting it.
+    (sim as any).players.get(pid).knownRecipes.add(comboRecipe.id);
     grantItem(sim, 'bone_fragments', 4, pid);
     grantItem(sim, 'linen_scrap', 2, pid);
 

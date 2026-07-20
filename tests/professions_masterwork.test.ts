@@ -14,6 +14,7 @@ import {
   QUALITY_ILVL_BONUS,
   RAID_ILVL_BONUS,
 } from '../src/sim/item_level';
+import { resolveCraftForRecipe } from '../src/sim/professions/crafting';
 import {
   MASTERWORK_BASE_CHANCE,
   MASTERWORK_CHANCE_CAP,
@@ -26,6 +27,12 @@ import {
   masterworkBumpedQuality,
   masterworkProcChance,
 } from '../src/sim/professions/masterwork';
+import {
+  MASTERWORK_MATERIAL_TIER_CHANCE,
+  MATERIAL_TIER_BY_ITEM,
+  materialTierBonusForReagents,
+  materialTierForItem,
+} from '../src/sim/professions/material_tier';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import type { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
@@ -594,5 +601,146 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
     expect(r74.masterwork).toBeUndefined();
     expect(r75.masterwork).toBe(true);
     expect(r76.masterwork).toBe(true);
+  });
+});
+
+describe('material-tier masterwork feed (Phase 10, material_tier.ts)', () => {
+  it('pins the tier table and the per-tier chance step literally', () => {
+    // Load-bearing tuning literals, same convention as the proc-chance
+    // constant pins above: the step rides the masterwork bonus scale
+    // (it equals MASTERWORK_PER_TIER_ABOVE_CHANCE), and toEqual on the whole
+    // table trips on any added, dropped, or re-tiered row.
+    expect(MASTERWORK_MATERIAL_TIER_CHANCE).toBe(0.01);
+    expect(MATERIAL_TIER_BY_ITEM).toEqual({
+      iron_ore: 1,
+      ashwood_log: 1,
+      goldleaf_herb: 1,
+      thorium_ore: 1,
+      elderwood_log: 2,
+      sunpetal_herb: 2,
+      arcanite_bar: 2,
+    });
+    // An id absent from the table is tier 0: the baseline mob drops, the
+    // eastbrook_vale starter yields, and non-material inputs alike.
+    expect(materialTierForItem('bone_fragments')).toBe(0);
+    expect(materialTierForItem('copper_ore')).toBe(0);
+    expect(materialTierForItem('mithril_mining_pick')).toBe(0);
+    expect(materialTierForItem('no_such_item')).toBe(0);
+  });
+
+  it('a tier-0-only reagent list resolves to exactly 0 (the golden-safety arm)', () => {
+    expect(
+      materialTierBonusForReagents([
+        { itemId: 'bone_fragments' },
+        { itemId: 'linen_scrap' },
+        { itemId: 'spider_leg' },
+        { itemId: 'copper_ore' },
+        { itemId: 'ironbark_log' },
+        { itemId: 'silverleaf_herb' },
+      ]),
+    ).toBe(0);
+    expect(materialTierBonusForReagents([])).toBe(0);
+    // The two recipes the parity golden crafts consume only tier-0 reagents,
+    // so their proc chance is byte-identical to pre-Phase-10: this pin is the
+    // tripwire against any table growth that would touch a golden scenario.
+    expect(materialTierBonusForReagents(recipeById('recipe_minor_healing_potion')!.reagents)).toBe(
+      0,
+    );
+    expect(
+      materialTierBonusForReagents(recipeById('recipe_eastbrook_ritual_vestments')!.reagents),
+    ).toBe(0);
+  });
+
+  it('resolves the MAX reagent tier, never the sum', () => {
+    expect(materialTierBonusForReagents([{ itemId: 'iron_ore' }])).toBe(0.01);
+    expect(materialTierBonusForReagents([{ itemId: 'sunpetal_herb' }])).toBe(0.02);
+    // Mixed tiers 0 + 1 + 2 resolve to the max (0.02), never the 0.03 sum.
+    expect(
+      materialTierBonusForReagents([
+        { itemId: 'linen_scrap' },
+        { itemId: 'thorium_ore' },
+        { itemId: 'elderwood_log' },
+      ]),
+    ).toBe(0.02);
+    // Repeated top-tier materials never stack past the max either.
+    expect(
+      materialTierBonusForReagents([
+        { itemId: 'elderwood_log' },
+        { itemId: 'sunpetal_herb' },
+        { itemId: 'arcanite_bar' },
+      ]),
+    ).toBe(0.02);
+    // Real content rows: the mid-band tool recipe feeds 0.01, its premium
+    // upgrade 0.02 (the crafted tool inputs in both lists stay tier 0).
+    expect(materialTierBonusForReagents(recipeById('recipe_thorium_mining_pick')!.reagents)).toBe(
+      0.01,
+    );
+    expect(materialTierBonusForReagents(recipeById('recipe_arcanite_mining_pick')!.reagents)).toBe(
+      0.02,
+    );
+  });
+
+  it('feeds masterworkProcChance additively and clamps through the same cap', () => {
+    expect(
+      masterworkProcChance({
+        tiersAboveRecipe: 0,
+        signedReagent: false,
+        specialized: false,
+        materialTierBonus: materialTierBonusForReagents([{ itemId: 'sunpetal_herb' }]),
+      }),
+    ).toBeCloseTo(0.05, 12);
+    // 0.03 + 0.08 + 0.02 + 0.03 + 0.02 = 0.18 clamps to the 0.15 cap.
+    expect(
+      masterworkProcChance({
+        tiersAboveRecipe: 8,
+        signedReagent: true,
+        specialized: true,
+        materialTierBonus: 0.02,
+      }),
+    ).toBe(0.15);
+  });
+
+  it('the crafting call site passes the consumed materials tier into the proc (hunted seed-69 window)', () => {
+    // Same hunted seed-69 window as the signed-reagent cases above: the
+    // single proc draw lands in [0.03, 0.05). A synthetic skillReq-0 recipe
+    // (resolveCraftForRecipe's exported-for-tests seam) on a fresh warrior
+    // has no other bonus in play, so the ONLY chance input separating the
+    // two arms is the reagent's material tier: the tier-2 arm rolls at
+    // 0.03 + 0.02 = 0.05 and procs, the tier-0 arm rolls at the bare 0.03
+    // base and misses the identical draw (proving a tier-0 recipe's chance
+    // is unchanged by the wiring). Both arms draw exactly once: the lookup
+    // is pure and cannot move the procRoll draw.
+    const SEED = 69;
+    const craftSynthetic = (reagentItemId: string) => {
+      const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: false });
+      const pid = sim.playerId;
+      sim.addItem(reagentItemId, 1, pid);
+      const recipe: ProfessionRecipeRecord = {
+        id: 'recipe_test_material_tier',
+        professionId: 'tailoring',
+        resultItemId: 'eastbrook_ritual_vestments',
+        resultCount: 1,
+        reagents: [{ itemId: reagentItemId, count: 1 }],
+        skillReq: 0,
+        itemLevelBudget: 9,
+        level: 9,
+      };
+      const rng: Rng = (sim as any).ctx.rng;
+      let draws = 0;
+      rng.setObserver(() => {
+        draws++;
+      });
+      const result = resolveCraftForRecipe((sim as any).ctx, pid, recipe);
+      rng.setObserver(null);
+      return { result, draws };
+    };
+    const premium = craftSynthetic('sunpetal_herb');
+    expect(premium.result.ok).toBe(true);
+    expect(premium.result.masterwork).toBe(true);
+    expect(premium.draws).toBe(1);
+    const baseline = craftSynthetic('linen_scrap');
+    expect(baseline.result.ok).toBe(true);
+    expect(baseline.result.masterwork).toBeUndefined();
+    expect(baseline.draws).toBe(1);
   });
 });

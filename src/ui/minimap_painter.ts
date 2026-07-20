@@ -57,6 +57,10 @@ const PLAYER_ARROW_OUTLINE_WIDTH = 1;
 // "actionable" against the dimmer, outline-less cooldown dot.
 const GATHER_NODE_READY_RADIUS = 3;
 const GATHER_NODE_COOLDOWN_RADIUS = 2;
+// Crafting station: an outlined diamond (rotated-square silhouette) so it reads
+// apart from the round gather dots and the axis-aligned loot/mob squares at
+// minimap scale. Half-diagonal in px.
+const STATION_DIAMOND_RADIUS = 3;
 
 // Party / player arrow triangle geometry (canvas-local, drawn under a rotation).
 const PARTY_ARROW_TIP_X = 6;
@@ -133,6 +137,7 @@ const MINIMAP_COLOR_TOKENS = {
   outline: '--color-minimap-outline',
   gatherReady: '--color-minimap-gather-ready',
   gatherCooldown: '--color-minimap-gather-cooldown',
+  station: '--color-minimap-station',
 } as const;
 
 /** The resolved minimap marker colors for one redraw. */
@@ -397,6 +402,20 @@ export class MinimapPainter {
           ctx.fill();
           ctx.stroke();
           ctx.restore();
+          break;
+        case 'station':
+          // Tier-identical (fairness invariant): no preset or governor gating.
+          ctx.fillStyle = colors.station;
+          ctx.strokeStyle = colors.outline;
+          ctx.lineWidth = MARKER_OUTLINE_WIDTH;
+          ctx.beginPath();
+          ctx.moveTo(m.mx, m.my - STATION_DIAMOND_RADIUS);
+          ctx.lineTo(m.mx + STATION_DIAMOND_RADIUS, m.my);
+          ctx.lineTo(m.mx, m.my + STATION_DIAMOND_RADIUS);
+          ctx.lineTo(m.mx - STATION_DIAMOND_RADIUS, m.my);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
           break;
         case 'gather-node':
           if (m.ready) {

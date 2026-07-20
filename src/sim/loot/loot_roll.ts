@@ -704,10 +704,14 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
       ctx.emit({ type: 'loot', text: `Everyone passed on [[i:${roll.itemId}]].`, pid });
     return;
   }
-  // Reveal every roll, classic-style: one loot line per need/greed roller so the
-  // whole group can audit the outcome (passes were already visible live via
-  // lootRollGroupStatus and have no number to reveal).
-  for (const entry of entries) {
+  // Reveal one loot line per CONTENDING roller only: when anyone needed, need
+  // beats greed, so the greed numbers cannot affect the outcome and revealing
+  // them is noise. Nothing is hidden that matters: every choice (need, greed,
+  // pass) was already visible live via lootRollGroupStatus while the roll was
+  // open, and the winner line below still closes the roll. With no needers the
+  // greed rolls are the contest and all of them are revealed as before (passes
+  // have no number to reveal).
+  for (const entry of contenders) {
     const rollerName =
       ctx.players.get(entry.pid)?.name ?? roll.candidateNames.get(entry.pid) ?? 'Unknown';
     for (const pid of partyMembersForRoll(roll)) {

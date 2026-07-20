@@ -27,6 +27,7 @@ const baseIdentity = {
   switchCount: 2,
   amendsProgress: 1,
   amendsRequired: 11,
+  knownRecipes: [],
 };
 
 describe('buildProfessionIdentityView', () => {

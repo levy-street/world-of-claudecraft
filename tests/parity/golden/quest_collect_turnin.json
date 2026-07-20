@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "c617bad0",
+      "state": "9ad50532",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -70,6 +70,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -146,7 +147,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "11dc745b",
+      "state": "12a8bc6d",
       "events": "55b77d7a",
       "rng": {
         "draws": 0,
@@ -215,6 +216,7 @@
               }
             ]
           ],
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -291,7 +293,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "26193acd",
+      "state": "0464c507",
       "events": "489b2006",
       "rng": {
         "draws": 0,
@@ -367,6 +369,7 @@
               }
             ]
           ],
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -443,7 +446,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "4c971a56",
+      "state": "01ce1e78",
       "events": "448e0f67",
       "rng": {
         "draws": 0,
@@ -519,6 +522,7 @@
               }
             ]
           ],
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -595,7 +599,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "283b14d8",
+      "state": "15edae2a",
       "events": "4fde40da",
       "rng": {
         "draws": 0,
@@ -671,6 +675,7 @@
               }
             ]
           ],
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -747,7 +752,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "fe01d442",
+      "state": "4bed1c98",
       "events": "e0fa6fa7",
       "rng": {
         "draws": 0,
@@ -811,6 +816,7 @@
           "questsDone": [
             "q_boars"
           ],
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -888,7 +894,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 416,
-      "state": "a533d846",
+      "state": "fe0d997c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -952,6 +958,7 @@
           "questsDone": [
             "q_boars"
           ],
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },

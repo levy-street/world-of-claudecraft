@@ -1362,6 +1362,7 @@ export class ClientWorld implements IWorld {
     switchCount: 0,
     amendsProgress: 0,
     amendsRequired: 0,
+    knownRecipes: [],
   };
   // Gathering profession proficiency (Mining/Logging/Herbalism, #1119), mirrored
   // from the `gprof` self-wire delta below (the real read surface; see
@@ -2703,6 +2704,12 @@ export class ClientWorld implements IWorld {
           switchCount: cprof.switchCount ?? 0,
           amendsProgress: cprof.amendsProgress ?? 0,
           amendsRequired: cprof.amendsRequired ?? 0,
+          // Phase 9: the learned-recipe mirror. The identity is replaced
+          // wholesale on every cprof delta (see the comment above), so a
+          // train_recipe grant goes live the tick the server re-emits cprof
+          // (its JSON diff fires on the sorted array changing). The ?? []
+          // keeps a pre-Phase-9 server's payload loading cleanly.
+          knownRecipes: [...(cprof.knownRecipes ?? [])],
         };
         this.activeArchetype = this.craftingIdentity.activeArchetype;
         this.archetypeSwitchCount = this.craftingIdentity.switchCount;
@@ -2983,6 +2990,12 @@ export class ClientWorld implements IWorld {
   }
   placeMobileStation(craftId: string): void {
     this.cmd({ cmd: 'place_mobile_station', craft: craftId });
+  }
+  // Recipe training (Professions 2.0 Phase 9): command only, never predicted.
+  // The server resolves resolveTrain and answers with the personal
+  // trainResult event; the learned set mirrors back via the cprof delta.
+  trainRecipe(recipeId: string): void {
+    this.cmd({ cmd: 'train_recipe', recipe: recipeId });
   }
   sellItem(itemId: string, count?: number): void {
     this.cmd({ cmd: 'sell', item: itemId, count });

@@ -72,16 +72,31 @@ export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = ['mining', 'log
 // item wired up so far are listed here; a mob whose componentTags don't map to any
 // of these still becomes single-use claimed, it just yields no item yet (future
 // profession-harvest issues wire up the rest).
-// KNOWN CONTENT GAP (v0.21.0 release-merge audit, needs a maintainer content call):
-// hide/silk/venomSac map to kind:'quest' items (q_boars/q_spiders/q_widows), so a
-// harvest currently grants quest-collect credit from ANY tagged mob (a wolf hide
-// advances the boar quest). The intended fix is dedicated profession-material
-// items, which is content design, not wiring; do not paper over it here.
+// Phase 10 closed the v0.21.0 collision gap: hide/silk/venomSac now yield the
+// dedicated profession materials (content/profession_items.ts), so a harvest
+// never grants quest-collect credit. The old quest items (boar_hide via
+// q_boars kill loot, webwood_silk via q_spiders, widow_venom_sac via q_widows)
+// keep their quest roles only.
 export const HARVEST_COMPONENT_ITEMS: Readonly<Record<string, string>> = {
-  hide: 'boar_hide',
+  hide: 'rough_hide',
   fang: 'wolf_fang',
-  silk: 'webwood_silk',
-  venomSac: 'widow_venom_sac',
+  silk: 'spider_silk',
+  venomSac: 'venom_gland',
+  meat: 'game_meat',
+  cloth: 'homespun_cloth',
+};
+
+// Perfect specimens (Phase 10): the signed jackpot family. When a corpse
+// harvest's rarity roll clears the signable floor (rare-or-better,
+// isSignableMaterialRarity), the harvester is granted the component family's
+// specimen as a SIGNED instance in addition to the plain component grant
+// (src/sim/interaction.ts harvestCorpse). Families without a specimen keep
+// the pre-Phase-10 behavior (the regular component itself grants signed).
+export const HARVEST_COMPONENT_SPECIMENS: Readonly<Record<string, string>> = {
+  hide: 'pristine_hide',
+  silk: 'pristine_silk',
+  venomSac: 'pristine_venom_gland',
+  meat: 'prime_cut',
 };
 
 // Tool effect slotting (#1136): a slottable bonus layered on top of a base
@@ -230,93 +245,12 @@ export function craftById(craftId: string): CraftDef {
   return CRAFT_RING[indexOf(craftId)];
 }
 
-// The tier-4/5 tool recipes formerly stubbed here (#1135's `TOOL_RECIPE_STUBS`)
-// moved into COMMON_RECIPES in content/recipes.ts once #1127's crafting action
-// landed to consume them (see recipes.ts for the six 'engineering' recipes
-// producing thorium_mining_pick, arcanite_mining_pick, ashwood_axe,
-// elderwood_axe, goldleaf_sickle, and sunpetal_sickle).
-// P3 reconciliation stub (#1135): the crafted tier-4/5 base tools added for
-// this issue (see src/sim/content/items.ts: thorium_mining_pick,
-// arcanite_mining_pick, ashwood_axe, elderwood_axe, goldleaf_sickle,
-// sunpetal_sickle) are meant to be produced via a P3 recipe/crafting action
-// (#1127), NOT bought from a vendor. #1127 (the crafting action itself) has
-// not been implemented in any branch yet, so there is nowhere to register a
-// real, consumed recipe: adding one to a live recipe table would be dead data
-// nobody reads. Instead this is an INERT, documentation-only shape of what
-// each recipe SHOULD look like once #1127 lands. Nothing in the engine reads
-// `TOOL_RECIPE_STUBS` today: it is not merged into any content table by
-// data.ts, and no SimContext callback or effect references it.
-//
-// TODO(#1127): once the crafting action exists, move (not copy) this shape
-// into whatever the real recipe table turns out to be (ingredients + a craft
-// verb the player performs), wire `outputItemId` to the actual item grant,
-// and delete this stub in the same change.
-export interface ToolRecipeStub {
-  /** Item id this recipe would produce once #1127 can consume recipes. */
-  outputItemId: string;
-  /** Which craft on the CRAFT_RING would perform this (see #1125's ring). */
-  craftId: string;
-  /** Placeholder ingredient list: itemId plus quantity consumed per craft. */
-  ingredients: { itemId: string; qty: number }[];
-}
-
-// NOTE: several `ingredients[].itemId` values below (thorium_ore,
-// arcanite_bar, ashwood_log, elderwood_log, goldleaf_herb, sunpetal_herb) are
-// PLACEHOLDER ids: no matching ItemDef exists yet, because the monster
-// material / node-drop items they'd come from are their own future content
-// slice. That is fine ONLY because this table is inert and unread by the
-// engine; do not merge TOOL_RECIPE_STUBS into ITEMS or any live table until
-// those ingredient items are real and #1127 exists to consume the recipe.
-export const TOOL_RECIPE_STUBS: ToolRecipeStub[] = [
-  {
-    outputItemId: 'thorium_mining_pick',
-    craftId: 'engineering',
-    ingredients: [
-      { itemId: 'thorium_ore', qty: 4 },
-      { itemId: 'mithril_mining_pick', qty: 1 },
-    ],
-  },
-  {
-    outputItemId: 'arcanite_mining_pick',
-    craftId: 'engineering',
-    ingredients: [
-      { itemId: 'arcanite_bar', qty: 2 },
-      { itemId: 'thorium_mining_pick', qty: 1 },
-    ],
-  },
-  {
-    outputItemId: 'ashwood_axe',
-    craftId: 'engineering',
-    ingredients: [
-      { itemId: 'ashwood_log', qty: 4 },
-      { itemId: 'ironbark_axe', qty: 1 },
-    ],
-  },
-  {
-    outputItemId: 'elderwood_axe',
-    craftId: 'engineering',
-    ingredients: [
-      { itemId: 'elderwood_log', qty: 2 },
-      { itemId: 'ashwood_axe', qty: 1 },
-    ],
-  },
-  {
-    outputItemId: 'goldleaf_sickle',
-    craftId: 'engineering',
-    ingredients: [
-      { itemId: 'goldleaf_herb', qty: 4 },
-      { itemId: 'silverleaf_sickle', qty: 1 },
-    ],
-  },
-  {
-    outputItemId: 'sunpetal_sickle',
-    craftId: 'engineering',
-    ingredients: [
-      { itemId: 'sunpetal_herb', qty: 2 },
-      { itemId: 'goldleaf_sickle', qty: 1 },
-    ],
-  },
-];
+// The tier-4/5 tool recipes formerly stubbed here (#1135's inert
+// `TOOL_RECIPE_STUBS`) are live in content/recipes.ts as TOOL_RECIPES,
+// de-stubbed once #1127's crafting action landed to consume them. They are
+// deliberately kept OUT of COMMON_RECIPES (that table's module doc and tests
+// fix skillReq at 0 for every entry, and FIELD_RECIPES derives bare-hands
+// field-craftability from COMMON membership).
 
 // Specialization perk thresholds (#1134): a pure additive bonus layer on top
 // of the crafting path (P3, #1127) and the ten-craft wheel (P5, #1125/#1128).

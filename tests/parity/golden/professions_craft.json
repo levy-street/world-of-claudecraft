@@ -19,7 +19,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "c617bad0",
+      "state": "9ad50532",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -73,6 +73,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -149,7 +150,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "d2a3e187",
+      "state": "f8f1c359",
       "events": "7021a161",
       "rng": {
         "draws": 0,
@@ -207,6 +208,7 @@
           },
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -283,7 +285,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "b0333e34",
+      "state": "5d3edfe6",
       "events": "c3a1794c",
       "rng": {
         "draws": 1,
@@ -360,6 +362,7 @@
           "lifetimeXp": 24,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -437,7 +440,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "22b91484",
+      "state": "adb889ba",
       "events": "a39a1866",
       "rng": {
         "draws": 2,
@@ -544,6 +547,7 @@
           "lifetimeXp": 91,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -621,7 +625,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "c2af3395",
+      "state": "1befd9c7",
       "events": "c3a1794c",
       "rng": {
         "draws": 3,
@@ -726,6 +730,7 @@
           "lifetimeXp": 115,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -803,7 +808,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "c2af3395",
+      "state": "1befd9c7",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -908,6 +913,7 @@
           "lifetimeXp": 115,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },

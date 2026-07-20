@@ -317,7 +317,11 @@ export const ja_JP: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "亡骸で復活",
       "resurrectAtHealer": "霊魂の癒し手（復活の後遺症）",
-      "spiritHealerAlive": "霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。"
+      "spiritHealerAlive": "霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。",
+      "healerConfirmTitle": "復活の後遺症を受けますか？",
+      "healerConfirmBody": "霊魂の癒し手はこの場で復活させてくれますが、復活の後遺症により全属性が75%低下します。高レベルでは最長10分間続きます。魂を遺体まで戻せばペナルティなしで復活できます。",
+      "healerConfirmAccept": "復活する",
+      "healerConfirmCancel": "キャンセル"
     },
     "fct": {
       "absorbed": "{amount} 吸収",
@@ -2226,6 +2230,25 @@ export const ja_JP: EnTranslations = {
       "makersMark": "製作者：{name}",
       "masterworkSeal": "傑作",
       "enchantedLine": "エンチャント済み"
+    },
+    "training": {
+      "title": "訓練：{name}",
+      "close": "訓練を閉じる",
+      "empty": "この師匠には教えられるレシピがありません。",
+      "free": "無料",
+      "stateKnown": "習得済み",
+      "stateTeachable": "習得可能",
+      "stateLocked": "未開放",
+      "requirement": "{craft} {skill} で伝授",
+      "trainAria": "{fee}で{name}を習得",
+      "dialogOption": "訓練",
+      "dialogOptionAria": "{name}から訓練を受ける",
+      "learned": "レシピを習得しました：{recipe}",
+      "tierUnmet": "そのレシピを習得するには{craft}が {skill} 必要です。",
+      "cannotAfford": "その訓練の費用を支払えません。",
+      "notTaughtHere": "そのレシピはここでは教えていません。",
+      "alreadyKnown": "そのレシピはすでに習得しています。",
+      "outOfRange": "訓練するには作業台のそばにいる必要があります。"
     },
     "finder": {
       "title": "ダンジョンファインダー",
@@ -4596,7 +4619,11 @@ export const ja_JP: EnTranslations = {
   },
   "heroicShop": {
     "balance": "英雄の証: {count}",
-    "buyAria": "英雄の証{marks}個で{item}を購入"
+    "buyAria": "英雄の証{marks}個で{item}を購入",
+    "buyConfirmTitle": "購入の確認",
+    "buyConfirmBody": "英雄の証{marks}個で{item}を購入しますか？証での購入は返金できません。",
+    "buyConfirmAccept": "購入",
+    "buyConfirmCancel": "キャンセル"
   },
   "cardDuel": {
     "title": "カードデュエル",
@@ -4649,7 +4676,11 @@ export const ja_JP: EnTranslations = {
       "buyAria": "デルヴの刻印{marks}個で{item}を購入",
       "reqHeroic": "ヒロイッククリアが必要",
       "reqClears": "{count}回のクリアが必要",
-      "empty": "在庫がありません。"
+      "empty": "在庫がありません。",
+      "buyConfirmTitle": "購入の確認",
+      "buyConfirmBody": "デルヴの刻印{marks}個で{item}を購入しますか？刻印での購入は返金できません。",
+      "buyConfirmAccept": "購入",
+      "buyConfirmCancel": "キャンセル"
     },
     "tracker": {
       "title": "デルヴ",
@@ -8233,6 +8264,210 @@ export const ja_JP: EnTranslations = {
       },
       "gravewyrm_bulwark": {
         "name": "墓所竜の防壁"
+      },
+      "rough_hide": {
+        "name": "粗い獣皮"
+      },
+      "spider_silk": {
+        "name": "蜘蛛の糸"
+      },
+      "venom_gland": {
+        "name": "毒腺"
+      },
+      "game_meat": {
+        "name": "野獣の肉"
+      },
+      "homespun_cloth": {
+        "name": "手織りの布"
+      },
+      "pristine_hide": {
+        "name": "極上の獣皮"
+      },
+      "pristine_silk": {
+        "name": "極上の蜘蛛の糸"
+      },
+      "pristine_venom_gland": {
+        "name": "極上の毒腺"
+      },
+      "prime_cut": {
+        "name": "極上の肉"
+      },
+      "smithing_flux": {
+        "name": "鍛冶の融剤"
+      },
+      "spool_of_thread": {
+        "name": "糸巻き"
+      },
+      "tanning_agent": {
+        "name": "なめし剤"
+      },
+      "cooking_salt": {
+        "name": "調理用の塩"
+      },
+      "glass_vial": {
+        "name": "ガラスの小瓶"
+      },
+      "copper_bearded_axe": {
+        "name": "銅のひげ斧"
+      },
+      "copper_flanged_mace": {
+        "name": "銅のフランジメイス"
+      },
+      "ironbark_boar_spear": {
+        "name": "アイアンバークの猪槍"
+      },
+      "ironedge_longsword": {
+        "name": "鉄刃のロングソード"
+      },
+      "ironshod_maul": {
+        "name": "鉄装のモール"
+      },
+      "whetted_iron_dirk": {
+        "name": "研ぎ澄まされた鉄の短剣"
+      },
+      "thorium_warblade": {
+        "name": "トリウムのウォーブレード"
+      },
+      "arcanite_war_axe": {
+        "name": "アーケナイトの戦斧"
+      },
+      "elderwood_battle_staff": {
+        "name": "エルダーウッドのバトルスタッフ"
+      },
+      "riveted_copper_girdle": {
+        "name": "銅のリベットベルト"
+      },
+      "coppermail_sabatons": {
+        "name": "銅鎖のサバトン"
+      },
+      "coppermail_gauntlets": {
+        "name": "銅鎖のガントレット"
+      },
+      "ironlink_hauberk": {
+        "name": "鉄鎖のホーバーク"
+      },
+      "ironlink_legguards": {
+        "name": "鉄鎖のレッグガード"
+      },
+      "ironlink_spaulders": {
+        "name": "鉄鎖のショルダーガード"
+      },
+      "thoriumscale_greathelm": {
+        "name": "トリウム鱗のグレートヘルム"
+      },
+      "thoriumscale_cuirass": {
+        "name": "トリウム鱗のキュイラス"
+      },
+      "thoriumscale_leggings": {
+        "name": "トリウム鱗のレギンス"
+      },
+      "homespun_hood": {
+        "name": "手織りのフード"
+      },
+      "homespun_mitts": {
+        "name": "手織りのミトン"
+      },
+      "silverthread_slippers": {
+        "name": "銀糸のスリッパ"
+      },
+      "goldweave_robe": {
+        "name": "金織りのローブ"
+      },
+      "goldweave_leggings": {
+        "name": "金織りのレギンス"
+      },
+      "silkspun_satchel": {
+        "name": "絹紡ぎのサッチェル"
+      },
+      "silkbinders_raiment": {
+        "name": "絹縛りの法衣"
+      },
+      "sunweave_mantle": {
+        "name": "陽織りのマント"
+      },
+      "sunweave_treads": {
+        "name": "陽織りの足具"
+      },
+      "fenbridge_hide_leggings": {
+        "name": "フェンブリッジ革のレギンス"
+      },
+      "fenbridge_hide_boots": {
+        "name": "フェンブリッジ革のブーツ"
+      },
+      "fenbridge_hide_belt": {
+        "name": "フェンブリッジ革のベルト"
+      },
+      "marshstalker_jerkin": {
+        "name": "沼追跡者のジャーキン"
+      },
+      "marshstalker_hood": {
+        "name": "沼追跡者のフード"
+      },
+      "marshstalker_spaulders": {
+        "name": "沼追跡者の肩当て"
+      },
+      "mirewarden_jerkin": {
+        "name": "泥沼の番人のジャーキン"
+      },
+      "mirewarden_leggings": {
+        "name": "泥沼の番人のレギンス"
+      },
+      "mirewarden_treads": {
+        "name": "泥沼の番人の足具"
+      },
+      "pan_seared_perch": {
+        "name": "川スズキのソテー"
+      },
+      "hunters_game_skewer": {
+        "name": "狩人の野獣串"
+      },
+      "herbed_marsh_pike": {
+        "name": "沼カワカマスのハーブ焼き"
+      },
+      "ashwood_smoked_eel": {
+        "name": "アッシュウッドの燻製ウナギ"
+      },
+      "goldleaf_game_stew": {
+        "name": "ゴールドリーフの野獣シチュー"
+      },
+      "frostgill_chowder": {
+        "name": "霜エラマスのチャウダー"
+      },
+      "silvered_carp_supper": {
+        "name": "銀鯉の晩餐"
+      },
+      "anglers_feast_platter": {
+        "name": "釣り人の饗宴プレート"
+      },
+      "marlows_grand_roast": {
+        "name": "マーロウの豪華ロースト"
+      },
+      "silverleaf_healing_draught": {
+        "name": "シルバーリーフの治癒薬"
+      },
+      "silverleaf_mana_draught": {
+        "name": "シルバーリーフのマナ薬"
+      },
+      "elixir_of_the_boar": {
+        "name": "猪のエリクサー"
+      },
+      "goldleaf_healing_draught": {
+        "name": "ゴールドリーフの治癒薬"
+      },
+      "goldleaf_mana_draught": {
+        "name": "ゴールドリーフのマナ薬"
+      },
+      "venomfire_elixir": {
+        "name": "毒炎のエリクサー"
+      },
+      "sunpetal_healing_draught": {
+        "name": "サンペタルの治癒薬"
+      },
+      "sunpetal_mana_draught": {
+        "name": "サンペタルのマナ薬"
+      },
+      "elixir_of_the_serpent": {
+        "name": "蛇のエリクサー"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

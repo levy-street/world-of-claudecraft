@@ -302,6 +302,7 @@ export const IWORLD_MEMBERS = [
   { name: 'advanceAmendsProgress', kind: 'method' },
   { name: 'switchArchetype', kind: 'method' },
   { name: 'placeMobileStation', kind: 'method' },
+  { name: 'trainRecipe', kind: 'method' },
   { name: 'activeMobileStationCraft', kind: 'data' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
@@ -457,9 +458,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // plus the release's Card Duel facet, the Professions 2.0 identity
     // surface, and Phase 8's mobile-station pair (placeMobileStation +
     // activeMobileStationCraft).
-    expect(IWORLD_MEMBERS.length).toBe(250);
+    expect(IWORLD_MEMBERS.length).toBe(251);
     expect(DATA_MEMBERS.length).toBe(68);
-    expect(METHOD_MEMBERS.length).toBe(182);
+    expect(METHOD_MEMBERS.length).toBe(183);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -468,7 +469,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
 
   // Sorted-name `toEqual` snapshots: a dropped, renamed, or kind-flipped member reddens
   // these deliberately, forcing a reviewed edit. NOT length-only.
-  it('the full sorted member set is exactly the pinned 250', () => {
+  it('the full sorted member set is exactly the pinned 251', () => {
     expect(IWORLD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
@@ -706,6 +707,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'tradeInfo',
       'tradeRequest',
       'tradeSetOffer',
+      'trainRecipe',
       'turnInQuest',
       'unequipBag',
       'unequipItem',
@@ -796,7 +798,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     ]);
   });
 
-  it('the sorted method-kind set is exactly the pinned 182', () => {
+  it('the sorted method-kind set is exactly the pinned 183', () => {
     expect(METHOD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
@@ -969,6 +971,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'tradeConfirm',
       'tradeRequest',
       'tradeSetOffer',
+      'trainRecipe',
       'turnInQuest',
       'unequipBag',
       'unequipItem',
@@ -1404,6 +1407,7 @@ const FACET_PROFESSIONS = [
   'advanceAmendsProgress',
   'switchArchetype',
   'placeMobileStation',
+  'trainRecipe',
   'activeMobileStationCraft',
 ] as const satisfies readonly (keyof IWorldProfessions)[];
 type _ExhaustProfessions = AssertNever<
@@ -1481,10 +1485,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the 28 fa
     expect(overlaps, `members filed in more than one facet:\n${overlaps.join('\n')}`).toEqual([]);
   });
 
-  it('the union of the 28 facets equals the pinned 250-member IWORLD_MEMBERS set', () => {
+  it('the union of the 28 facets equals the pinned 251-member IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(250);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(250);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(251);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(251);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

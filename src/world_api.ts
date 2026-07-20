@@ -425,6 +425,9 @@ export const COMMAND_NAMES = [
   // Append-only protocol addition for the canonical Talents V2 row mutation.
   'selectTalentRow',
   'resurrect_respond',
+  // Recipe training (Professions 2.0 Phase 9): learn a trainer-taught recipe
+  // at its craft's station (Sim.trainRecipe via professions/training.ts).
+  'train_recipe',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch

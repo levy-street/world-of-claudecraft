@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 419,
-      "state": "deef534b",
+      "state": "6c07dcab",
       "events": "5560e865",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 419,
-      "state": "e90e9352",
+      "state": "3289985a",
       "events": "2624f545",
       "rng": {
         "draws": 36,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 419,
-      "state": "8a62c6f4",
+      "state": "4889dd94",
       "events": "92dd922d",
       "rng": {
         "draws": 120,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 419,
-      "state": "df6bcd1f",
+      "state": "1eaa5daf",
       "events": "547fbe65",
       "rng": {
         "draws": 231,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 419,
-      "state": "84eade74",
+      "state": "e5b234d4",
       "events": "b5a4d523",
       "rng": {
         "draws": 385,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 419,
-      "state": "3d5dc687",
+      "state": "abd8b687",
       "events": "741638a5",
       "rng": {
         "draws": 537,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 419,
-      "state": "a6ddc458",
+      "state": "c657d448",
       "events": "ec02393c",
       "rng": {
         "draws": 606,
@@ -162,6 +162,7 @@
           "lifetimeHonor": 20,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {
               "5": "war_row_double_charge",
@@ -230,6 +231,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {
               "5": "mag_r5_ice_floes",
@@ -299,6 +301,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {
               "5": "rog_r5_relentless_strikes",
@@ -367,6 +370,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {
               "5": "hun_r5_improved_serpent_sting",

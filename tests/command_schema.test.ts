@@ -28,9 +28,9 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // Water Jet commands, on top of Season 1 Armory skin, ignore_add/ignore_remove,
 // stow_weapon, Dungeon Finder, inv_move, the release's Card Duel minigame
 // (card_queue_join/leave, play_card, card_forfeit), and Professions 2.0
-// Phase 8's place_mobile_station.
-const EXPECTED_SEND_COUNT = 157;
-const EXPECTED_DISPATCH_COUNT = 166;
+// Phase 8's place_mobile_station and Phase 9's train_recipe.
+const EXPECTED_SEND_COUNT = 158;
+const EXPECTED_DISPATCH_COUNT = 167;
 const EXPECTED_DISPATCH_ONLY_COUNT = 9;
 
 // The chat sub-channel routing switch (server/game.ts `switch

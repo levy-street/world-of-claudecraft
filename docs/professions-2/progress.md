@@ -23,9 +23,9 @@ Update this file at the end of every implementation and QA session. Statuses:
 | 7 QA | Verify the Guild letter and quest objectives | complete | 2026-07-19 | 2026-07-19 |
 | 8 | Stations and masters (sim and server) | complete | 2026-07-19 | 2026-07-19 |
 | 8 QA | Verify stations and masters | complete | 2026-07-19 | 2026-07-19 |
-| 9 | Station presence and recipe training | not started | | |
-| 9 QA | Verify station presence and training | not started | | |
-| 10 | Recipe ladders and materials content | not started | | |
+| 9 | Station presence and recipe training | complete | 2026-07-19 | 2026-07-19 |
+| 9 QA | Verify station presence and training | complete | 2026-07-19 | 2026-07-19 |
+| 10 | Recipe ladders and materials content | complete | 2026-07-19 | 2026-07-19 |
 | 10 QA | Verify recipe ladders and materials | not started | | |
 | 11 | Fishing joins the framework | not started | | |
 | 11 QA | Verify fishing framework | not started | | |
@@ -351,17 +351,17 @@ CLAUDE.md.
 - [x] Mobile crafting station perk activates (bypasses the station gate for the placed craft's station type; specialization-gated `place_mobile_station` wire command in both worlds with the `mst` self-delta mirror, plus a `/dev mobilestation` arm)
 
 ### Phase 9: Station presence and recipe training
-- [ ] Stations render as world props; masters render and are interactable; minimap markers
-- [ ] Skill-tier-gated recipe training at masters on the `acquireRecipe` gate, with the visible locked-row ladder; every existing recipe grandfathered known
-- [ ] Master shops stocked (base tools, reagents); training fees are gold sinks
-- [ ] Hands-vs-stations split live: field recipes craft anywhere, uncommon+ at stations
+- [x] Stations render as world props (`src/render/stations.ts` + pure `stations_core.ts`; existing GLBs only, no radius decal); the six masters map to existing NPC visual keys; token-colored, tier-identical `station` minimap marker in both host shapes
+- [x] Skill-tier-gated recipe training at masters on the `acquireRecipe` gate (`src/sim/professions/training.ts`: `teachTierMet` is exactly the locked predicate; fees 0/25s/1g by tier, server-side, charged exactly once) with the visible locked-row ladder in the Train view (`src/ui/hud/vendor/train_view.ts` + painter); every existing recipe grandfathered known via the flag-discriminated `recipesGrandfathered` normalize-on-load (frozen 21-id `PRE_TRAINING_RECIPE_IDS`; legacy fixture test green); the three combo recipes are the wave-one trainer-taught set; new recipes default trained-not-known (pinned)
+- [x] Master shops stocked: each master sells the premium reagents its own station's recipes consume (tinker_gizzel all six; darva/ottilie/hesk thorium_ore; Bree unchanged), closing the Phase 8 travel-loop flag; training fees are gold sinks
+- [x] Hands-vs-stations split confirmed live (landed in Phase 8; the `FIELD_RECIPES` OPEN item resolves as the default: the nine commons stay field-craftable, recorded in state.md)
 
 ### Phase 10: Recipe ladders and materials content
-- [ ] Tier ladders for all six deep crafts (common through rare at minimum) with material families
-- [ ] Cloth sourcing: humanoid components + plant fiber; corpse component quest-item collision ended
-- [ ] Economy invariant test pinned: no recipe vendors for more than its inputs
-- [ ] Cross-tier composition; combat-worthy consumables at every cooking/alchemy tier; materialTierBonus wired; the perfect specimen
-- [ ] Wiki content regenerated; recipe data feeds the guide
+- [x] Tier ladders for all six deep crafts (common through rare at minimum) with material families (`LADDER_RECIPES` in `src/sim/content/recipes.ts`: 54 trainer recipes, 9 per craft, 3 per rung at skillReq 0/25/50; outputs and materials in the new `src/sim/content/profession_items.ts`; no epic rung, per the locked wave-one ladder)
+- [x] Cloth sourcing: humanoid components + plant fiber; corpse component quest-item collision ended (`homespun_cloth` via the new cloth componentTag on humanoids, the herb ladder serves as plant fiber; `HARVEST_COMPONENT_ITEMS` remapped to dedicated materials, quest items keep their questId-gated kill-loot roles, regression suite `tests/harvest_component_materials.test.ts`)
+- [x] Economy invariant test pinned: no recipe vendors for more than its inputs (`tests/recipe_economy.test.ts`, strict less-than over every recipe in ALL_RECIPES with vendor reagents priced at purchase price; 14 pre-Phase-10 violators ride the frozen `LEGACY_GOLD_POSITIVE_RECIPE_IDS` exception list, a Phase 15 burn-down target pinned three ways)
+- [x] Cross-tier composition; combat-worthy consumables at every cooking/alchemy tier; materialTierBonus wired; the perfect specimen (every rung-50 recipe consumes a lower-band material, pinned; food/potion/elixir outputs at every rung inside the existing power curves; `src/sim/professions/material_tier.ts` at 0.01 per tier, max-tier rule, tier-0 contributes exactly 0 so parity goldens are unchanged; `pristine_hide`/`pristine_silk`/`pristine_venom_gland`/`prime_cut` granted signed at rare+ on the existing corpse rarity roll)
+- [x] Wiki content regenerated; recipe data feeds the guide (regenerates clean with zero diff; the generator does not yet enumerate recipe records, so the guide skeleton is unchanged, and the professions guide rewrite stays the Phase 15 deliverable)
 
 ### Phase 11: Fishing joins the framework
 - [ ] Fishing proficiency (additive, framework-integrated) while the minigame stays as-is
@@ -687,3 +687,171 @@ props are the natural consumer), the expired station object
 lingering on the meta slot until the next placement (benign, every
 reader checks isStationActive), and the mobile-viewport station row
 being screenshot-verified only.
+
+2026-07-19 Phase 9 (station presence and recipe training) landed on
+feature/professions-2-phase-09-station-training off release/v0.28.0
+tip d40f0a90f (the phase-start commit for the QA diff; re-resolve the
+merge commit at PR time). Build was a three-agent parallel Workflow
+(sim/wire, render, ui) in one shared worktree with a fixed interface
+contract plus a tests agent after; all four completed first try.
+Decisions this phase made (maintainer-visible, none altering a locked
+state.md decision): the wave-one trainer-taught set is the three
+COMBO_RECIPES (skillReq 25, exactly the locked "uncommon at 25" rung;
+commons and the 75/150 TOOL/CASTER recipes keep empty acquisition,
+grandfathered known to everyone by the isRecipeKnown arm, per the
+locked wording); grandfathering is a flag-discriminated
+normalize-on-load (recipesGrandfathered, mailWelcomed idiom) that
+unions the frozen 21-id PRE_TRAINING_RECIPE_IDS into any save missing
+the flag, so legacy characters keep the combos while new characters
+train them; training proximity accepts STATIC stations only (a mobile
+crafting station never satisfies training, pinned); the crafting
+window now lists known recipes only (unlearned trainer recipes
+surface in the Train ladder instead). Deferrals with reasons: the
+train_not_taught_here deny arm has no positive test (content-
+unreachable until a drop/quest acquisition recipe exists; precedence
+pinned, Phase 10 owns content); the mobile-station prop stays
+deferred (pos/placedAtTick still consumer-less); visualKeyFor pins
+for the six master ids and a tokens-coverage pin for
+--color-minimap-station were skipped as optional; the i18n
+semantic-regressions suite is gate-tier only (no locale prose
+reworded). Surprises recorded to memory: the parity harness pins new
+persisted PlayerMeta fields by default (the 55-golden regen is
+exactly the recipesGrandfathered field, its own reviewed commit);
+resolveCraft denies combo_requirement_unmet before recipe_not_learned;
+wardweave_cowl/duskhide_wraps/sootscale_mantle genuinely consume
+thorium_ore, so the master-stock mapping is thorium-heavy by content,
+not by choice.
+
+Phase 9 QA (2026-07-19): PASS with fixes, zero blocking. Ten-agent
+fan-out (three packet audits plus privacy-security, migration-safety,
+cross-platform-sync, architecture, frontend-seam, test-coverage-
+auditor and the closing qa-checklist; database-performance did not
+match the diff), with the phase validation matrix pre-verified green
+at the untouched tip and passed to every agent as ground. Seven of
+ten completed inside the Workflow; frontend-seam, privacy-security
+and qa-checklist finished their investigations but failed structured
+delivery and were re-dispatched fresh via the Agent tool (the
+established recovery recipe), all completing there. Played behavior
+was verified twice over: the correctness audit ran six live
+headless-Sim probes (exact-balance train to zero, key-absent legacy
+blob, mobile-station craft beside the training deny, same-row ladder
+flip, multi-violation deny order, a grandfathered common crafted at
+skill 0), and the orchestrator drove the real offline client over
+CDP (gossip Train option, tier deny with the named "You need Alchemy
+25" line, exact-fee train, replay deny with no re-charge, fee-1
+cannot-afford, out-of-range, the 8yd proximity auto-close, the
+crafting-window known-filter in both directions, the station minimap
+marker and token, trained-not-known on a fresh character); the
+online arm rests on the live GameServer routing suite plus the
+snapshots cprof-mirror pin, both re-verified decisive. All nine
+acceptance criteria hold. Fixes landed: the exactly-affordable fee
+edge (copper equal to fee) pinned at the Sim level; per-pair deny
+reason-to-key mapping pins (a key swap inside the hud ternary chain
+previously passed every pin); isStationMasterNpc parametrized over
+all six STATIONS masters with a smith_haldren negative; a same-row
+locked-to-teachable flip pin at the 24/25 boundary; a full
+multi-violation deny-order pin; an explicit server-side
+recipesGrandfathered-true pin on a fresh online join; a key-absent
+(pre-#1299) legacy-save arm; and the accepted rollback caveat turned
+into a pin (a full current-shape blob stripped of the flag re-unions
+on return, fee-free, exactly the state.md release-notes wording).
+One frontend should-fix landed as a small extraction: the
+viewer-side knownness predicate was duplicated between the crafting
+window filter and the train ladder, now shared as train_view.ts
+isRecipeKnownForViewer (both call sites delegate; the known-filter
+source pin deliberately re-pinned to the delegation), and rowState
+now calls the sim's own teachTierMet instead of restating it.
+Dissolved on verification (the seventh phase running): the
+correctness agent's claim that the legacy fixture shape was wrong
+(knownRecipes existed at phase start d40f0a90f; the hand-frozen
+fixture is a genuine pre-Phase-9 shape). Deferred with reasons: the
+unknown-deny-reason fallback renders the out-of-range line instead
+of nothing (reachable only under client/server version skew on a
+closed 5-member union; maintainer call for a later phase); a
+same-state same-craft mobile-craft-versus-training-deny contrast is
+impossible in wave-one content (no plain station-gated alchemy
+recipe and no engineering trainer recipe exist; covered by
+cross-suite composition plus the live probe); the tokens-coverage
+pin for --color-minimap-station stays the accepted build-time
+deferral; the pr_shot_targets forge position literals are
+script-only. Privacy INFO for the economy owner: the master
+stocking makes thorium_ore and the six premium reagents purchasable
+in zones 1 and 2 where previously only quartermaster_bree (zone 3)
+sold them; deliberate, no price/arbitrage loop. The closing
+qa-checklist returned READY (zero blocking, zero should-fix); its
+five verify items all closed from session ground: the architecture
+suite ran green in the matrix, the fee table matches the state.md
+tuning targets verbatim (common free, uncommon 25s, rare 1g), the
+asset budget output is byte-identical to phase start (zero public/
+changes; its red rows are pre-existing debt outside the gate), guide
+freshness rides the gate's pretest wiki:content plus
+tests/guide.test.ts, and mobile rests on the green mobile window
+suites plus the phase's committed mobile screenshots (live mobile
+E2E not re-run, the Phase 8-precedent deferral). Its remaining INFO,
+a dedicated train_recipe rate limit, stays optional: the command is
+idempotent (already-known denies without charging) and the global
+command cadence limiter applies.
+
+Phase 10 (2026-07-19): recipe ladders and materials content, built as
+an ultracode Workflow off phase-start 720efc89f (the Phase 9 QA merge;
+the QA diff is the PR's commits off that tip). Orchestration: two
+parallel writer agents (materials/collision/specimen, and the
+materialTierBonus wiring) with disjoint file ownership, then six
+parallel craft designers returning structured ladders to scratchpad
+JSON, folded in by three sequential integration passes (one commit per
+craft pair) and a dedicated economy-test writer, with the validation
+matrix run green at the tip before the review fan-out. Quest credit
+was verified BEFORE the harvest remap landed: all three collect quests
+(q_boars, q_spiders, q_widows) have questId-gated kill-loot drops on
+their own mobs, so no quest lost its source. Key as-landed calls, all
+swept into both phase-10 files: the economy invariant carries a frozen
+14-member legacy exception list (8 commons, the 3 caster-hub rows, the
+3 combos; measured, pinned three ways, Phase 15 burn-down) because
+fixing the legacy sellValues would break the prime directive inside a
+content phase; the perfect specimen grants IN ADDITION to the plain
+component at rare+ (specimen-less families keep the old signed-regular
+behavior); every new recipe including the skillReq-0 rungs is
+station-bound and trainer-taught (coexists with the grandfathered
+field commons); materialTierBonus keys off def-level material tier
+bands, not consumed-instance rarity (instances do not report which
+copy was consumed); the six raw fish already existed so no fish
+ItemDefs were authored; no new deeds (recipes and materials are not
+conquerable content per docs/design/deeds.md). Deferred with reasons:
+guide recipe enumeration (Phase 15 professions guide rewrite), the
+recipeForResultItem reverse-lookup gap for non-common tables
+(pre-existing), a single shared battle-elixir aura slot (maintainer
+call; per-item power stays capped at the bear's 12), and the legacy
+gold-positive burn-down (Phase 15).
+
+Phase 10 QA (2026-07-19): PASS with fixes, zero blocking. Verified off
+the merge af7ac3d8b (QA diff 720efc89f..ad2bbbe92; the merge's first
+parent 8564d1ee2 was concurrent release movement with zero file
+overlap, verified). Method: validation matrix green at the untouched
+tip first (19 suites incl. the five item-content convention suites,
+727 tests, wiki:content zero diff), four live played beats (train with
+the full deny ladder and exact fees, station-bound craft end to end,
+rare+ specimen dual grant with zero quest-item leakage across 400
+seeds, mid-objective q_boars save-compat with a working turn-in, and
+the materialTierBonus 10000-craft odds decisively above the no-bonus
+model), economy-invariant mutation checks (both arms bite), then a
+25-agent adversarial-verify Workflow (3 packet audits + the 4
+dispatch-matrix reviewers, every finding retried by an independent
+skeptic: 14 confirmed, 4 dissolved). The one real sim defect: a corpse
+with two specimen families could overflow the bag (the jackpot stole a
+later family's reserved plain slot); fixed test-first by granting all
+plain yields before any signed instance, draw order untouched. Also
+landed: the ladder execution suite (all 54 recipes craft end to end,
+specimen consumers, real train rungs, elixir def pins + live use path,
+silkspun_satchel capacity), the HARVEST_COMPONENT_SPECIMENS literal
+pin plus all-family behavior arms, the train_view locked-row literal
+re-pin (formula tautology), item_icons BAG_IDS sixth bag, the stale
+TOOL_RECIPE_STUBS sweep, and an itemFallback potion/elixir flask
+branch (the eleven new consumables rendered junk-trinket icons).
+Deferred with reasons (drift notes in state.md): wolf_fang consumer
+(the one demand-rule outlier, Phase 15), recipeForResultItem widening
+(a live gameplay switch for the dormant battlefield-XP trickle,
+maintainer call), shared battle-elixir exclusivity (maintainer call,
+re-confirmed), cooking rungs are sit-heal food only (maintainer
+glance), and the retro CI reds on the release push (Release gate
+locale shards + version gate) are the branch-wide mid-cycle state,
+identical on the pre-phase push, with the Browser job green.

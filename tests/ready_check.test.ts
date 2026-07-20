@@ -32,6 +32,13 @@ function makeParty4() {
 const summaryFor = (evs: SimEvent[], pid: number) =>
   evs.find((e) => e.type === 'log' && e.pid === pid && /^Ready check:/.test((e as any).text));
 
+// The per-member follow-up lines naming who was not ready / never answered.
+const nameLinesFor = (evs: SimEvent[], pid: number) =>
+  evs
+    .filter((e) => e.type === 'log' && e.pid === pid)
+    .map((e) => (e as any).text as string)
+    .filter((text) => / is not ready\.$| did not respond to the ready check\.$/.test(text));
+
 const startEventsFor = (evs: SimEvent[], pid: number) =>
   evs.filter((e) => e.type === 'readyCheckStart' && e.pid === pid);
 
@@ -95,6 +102,45 @@ describe('ready check', () => {
     }
   });
 
+  it('names each not-ready and no-response member to every participant after the summary', () => {
+    const { sim, lead, a, b, c } = makeParty4();
+    sim.chat('/ready', lead);
+    sim.tick();
+    sim.readyCheckRespond(true, a); // Aay: ready
+    sim.readyCheckRespond(false, b); // Bee: explicit not ready
+    // Cee never answers: advance past the timeout to finalize as "no response".
+    const evs: SimEvent[] = [];
+    for (let i = 0; i < (READY_CHECK_SECONDS + 1) * 20; i++) evs.push(...sim.tick());
+    // One line per non-ready member, states distinguished, ready members never named.
+    for (const pid of [lead, a, b, c]) {
+      expect(nameLinesFor(evs, pid)).toEqual([
+        'Bee is not ready.',
+        'Cee did not respond to the ready check.',
+      ]);
+      // The counts summary always precedes the per-member name lines.
+      const logs = evs
+        .filter((e) => e.type === 'log' && e.pid === pid)
+        .map((e) => (e as any).text as string);
+      const summaryAt = logs.findIndex((text) => /^Ready check:/.test(text));
+      expect(summaryAt).toBeGreaterThanOrEqual(0);
+      expect(logs.indexOf('Bee is not ready.')).toBeGreaterThan(summaryAt);
+    }
+  });
+
+  it('an all-ready check emits the summary only, no per-member name lines', () => {
+    const { sim, lead, mate } = makeParty();
+    sim.chat('/ready', lead);
+    sim.tick();
+    sim.readyCheckRespond(true, mate); // everyone answered ready -> finalizes immediately
+    const evs: SimEvent[] = [...sim.tick()];
+    for (const pid of [lead, mate]) {
+      expect((summaryFor(evs, pid) as any)?.text).toBe(
+        'Ready check: 2 ready, 0 not ready, 0 no response.',
+      );
+      expect(nameLinesFor(evs, pid)).toEqual([]);
+    }
+  });
+
   it('a member leaving mid-check drops their pending slot so the rest can early-finalize', () => {
     const { sim, lead, a, b } = makeParty4();
     sim.chat('/ready', lead);
@@ -109,8 +155,15 @@ describe('ready check', () => {
     ) as number;
     sim.removePlayer(cee);
     // The end-of-tick sweep finalizes now that no one is pending (no full timeout).
-    sim.tick();
+    const evs: SimEvent[] = [...sim.tick()];
     expect((sim as any).readyChecks.size).toBe(0);
+    // The leaver's slot was dropped, so they count in no bucket and are never named.
+    for (const pid of [lead, a, b]) {
+      expect((summaryFor(evs, pid) as any)?.text).toBe(
+        'Ready check: 3 ready, 0 not ready, 0 no response.',
+      );
+      expect(nameLinesFor(evs, pid)).toEqual([]);
+    }
   });
 
   it('disbanding the party mid-check clears the check (no orphan summary fires later)', () => {

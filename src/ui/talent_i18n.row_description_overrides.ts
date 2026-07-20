@@ -35,8 +35,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Tus ataques automáticos generan un 10 % más de ira y tus habilidades, un 5 % más.',
     war_row_blood_offering:
       'Tus actitudes obtienen efectos adicionales. Actitud de Batalla: los golpes críticos de tus habilidades infligen un 15 % más de daño. Actitud Rabiosa: tus ataques automáticos son un 5 % más rápidos. Actitud en Guardia: un golpe que te quitaría al menos un 20 % de tu salud máxima inflige un 15 % menos de daño.',
-    war_row_battle_rhythm:
-      'Cada tercera habilidad que utilizas genera un 20 % más de ira e inflige un 5 % más de daño.',
+    war_row_battle_rhythm: 'Cada tercera habilidad que utilizas genera un 20 % más de ira.',
     war_row_colossal_might:
       'Cada punto de ira que gastas reduce en 0,1 s el tiempo de reutilización de tus grandes habilidades ofensivas, hasta 10 s cada 30 s.',
   },
@@ -56,8 +55,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Tus ataques automáticos generan un 10 % más de ira y tus habilidades, un 5 % más.',
     war_row_blood_offering:
       'Tus actitudes obtienen efectos adicionales. Actitud de Batalla: los golpes críticos de tus habilidades infligen un 15 % más de daño. Actitud Rabiosa: tus ataques automáticos son un 5 % más rápidos. Actitud en Guardia: un golpe que te quitaría al menos un 20 % de tu salud máxima inflige un 15 % menos de daño.',
-    war_row_battle_rhythm:
-      'Cada tercera habilidad que utilizas genera un 20 % más de ira e inflige un 5 % más de daño.',
+    war_row_battle_rhythm: 'Cada tercera habilidad que utilizas genera un 20 % más de ira.',
     war_row_colossal_might:
       'Cada punto de ira que gastas reduce en 0,1 s el tiempo de reutilización de tus grandes habilidades ofensivas, hasta 10 s cada 30 s.',
   },
@@ -78,8 +76,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Vos attaques automatiques génèrent 10 % de rage en plus et vos techniques 5 % de plus.',
     war_row_blood_offering:
       'Vos postures gagnent des effets supplémentaires. Posture de combat : les coups critiques de vos techniques infligent 15 % de dégâts supplémentaires. Posture berserker : vos attaques automatiques sont 5 % plus rapides. Posture de garde : un coup qui vous retirerait au moins 20 % de votre maximum de points de vie inflige 15 % de dégâts en moins.',
-    war_row_battle_rhythm:
-      'Chaque troisième technique utilisée génère 20 % de rage en plus et inflige 5 % de dégâts supplémentaires.',
+    war_row_battle_rhythm: 'Chaque troisième technique utilisée génère 20 % de rage en plus.',
     war_row_colossal_might:
       "Chaque point de rage dépensé réduit de 0,1 s le temps de recharge de vos grandes capacités offensives, jusqu'à 10 s toutes les 30 s.",
   },
@@ -100,8 +97,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Vos attaques automatiques génèrent 10 % de rage en plus et vos techniques 5 % de plus.',
     war_row_blood_offering:
       'Vos postures gagnent des effets supplémentaires. Posture de combat : les coups critiques de vos techniques infligent 15 % de dégâts supplémentaires. Posture berserker : vos attaques automatiques sont 5 % plus rapides. Posture de garde : un coup qui vous retirerait au moins 20 % de votre maximum de points de vie inflige 15 % de dégâts en moins.',
-    war_row_battle_rhythm:
-      'Chaque troisième technique utilisée génère 20 % de rage en plus et inflige 5 % de dégâts supplémentaires.',
+    war_row_battle_rhythm: 'Chaque troisième technique utilisée génère 20 % de rage en plus.',
     war_row_colossal_might:
       "Chaque point de rage dépensé réduit de 0,1 s le temps de recharge de vos grandes capacités offensives, jusqu'à 10 s toutes les 30 s.",
   },
@@ -120,8 +116,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'I tuoi attacchi automatici generano il 10% di rabbia in più e le tue abilità il 5% in più.',
     war_row_blood_offering:
       'Le tue posizioni ottengono effetti aggiuntivi. Posizione di Battaglia: i colpi critici delle tue abilità infliggono il 15% di danni in più. Posizione del Berserker: i tuoi attacchi automatici sono più rapidi del 5%. Posizione Guardinga: un colpo che ti sottrarrebbe almeno il 20% della salute massima infligge il 15% di danni in meno.',
-    war_row_battle_rhythm:
-      'Ogni terza abilità usata genera il 20% di rabbia in più e infligge il 5% di danni in più.',
+    war_row_battle_rhythm: 'Ogni terza abilità usata genera il 20% di rabbia in più.',
     war_row_colossal_might:
       'Ogni punto di rabbia speso riduce di 0,1 secondi il tempo di recupero delle tue grandi abilità offensive, fino a 10 secondi ogni 30 secondi.',
   },
@@ -142,8 +137,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Deine automatischen Angriffe erzeugen 10 % mehr Wut und deine Fähigkeiten 5 % mehr.',
     war_row_blood_offering:
       'Deine Haltungen erhalten zusätzliche Effekte. Kampfhaltung: Kritische Treffer deiner Fähigkeiten verursachen 15 % mehr Schaden. Berserkerhaltung: Deine automatischen Angriffe sind 5 % schneller. Wehrhafte Haltung: Ein Treffer, der dir mindestens 20 % deiner maximalen Gesundheit nehmen würde, verursacht 15 % weniger Schaden.',
-    war_row_battle_rhythm:
-      'Jede dritte eingesetzte Fähigkeit erzeugt 20 % mehr Wut und verursacht 5 % mehr Schaden.',
+    war_row_battle_rhythm: 'Jede dritte eingesetzte Fähigkeit erzeugt 20 % mehr Wut.',
     war_row_colossal_might:
       'Jeder verbrauchte Wutpunkt verkürzt die Abklingzeit deiner wichtigsten Angriffsfähigkeiten um 0,1 Sek., maximal 10 Sek. alle 30 Sek.',
   },
@@ -162,8 +156,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Seus ataques automáticos geram 10% mais raiva e suas habilidades geram 5% mais.',
     war_row_blood_offering:
       'Suas posturas recebem efeitos adicionais. Postura de Batalha: acertos críticos das suas habilidades causam 15% a mais de dano. Postura de Berserker: seus ataques automáticos ficam 5% mais rápidos. Postura de Guarda: um golpe que tiraria pelo menos 20% da sua vida máxima causa 15% a menos de dano.',
-    war_row_battle_rhythm:
-      'Cada terceira habilidade usada gera 20% mais raiva e causa 5% a mais de dano.',
+    war_row_battle_rhythm: 'Cada terceira habilidade usada gera 20% mais raiva.',
     war_row_colossal_might:
       'Cada ponto de raiva gasto reduz em 0,1 s a recarga das suas principais habilidades ofensivas, até 10 s a cada 30 s.',
   },
@@ -185,7 +178,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_blood_offering:
       'Ваши стойки получают дополнительные эффекты. Боевая стойка: критические удары способностей наносят на 15% больше урона. Стойка берсерка: автоматические атаки совершаются на 5% быстрее. Стойка стража: удар, который отнял бы не менее 20% максимального здоровья, наносит на 15% меньше урона.',
     war_row_battle_rhythm:
-      'Каждая третья использованная способность генерирует на 20% больше ярости и наносит на 5% больше урона.',
+      'Каждая третья использованная способность генерирует на 20% больше ярости.',
     war_row_colossal_might:
       'Каждая единица ярости, которую вы тратите, сокращает время восстановления ваших основных атакующих способностей на 0,1 сек., не более 10 сек. каждые 30 сек.',
   },
@@ -204,8 +197,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Vaše automatické útoky generují o 10 % více zuřivosti a vaše schopnosti o 5 % více.',
     war_row_blood_offering:
       'Vaše postoje získávají další účinky. Bojový postoj: kritické zásahy schopností způsobují o 15 % vyšší poškození. Postoj berserka: automatické útoky jsou o 5 % rychlejší. Krytý postoj: zásah, který by vám odebral alespoň 20 % maximálního zdraví, způsobí o 15 % nižší poškození.',
-    war_row_battle_rhythm:
-      'Každá třetí použitá schopnost generuje o 20 % více zuřivosti a způsobuje o 5 % vyšší poškození.',
+    war_row_battle_rhythm: 'Každá třetí použitá schopnost generuje o 20 % více zuřivosti.',
     war_row_colossal_might:
       'Každý bod zuřivosti, který utratíš, zkracuje cooldown tvých hlavních útočných schopností o 0,1 s, nejvýše 10 s každých 30 s.',
   },
@@ -225,8 +217,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Je automatische aanvallen genereren 10% meer woede en je vaardigheden 5% meer.',
     war_row_blood_offering:
       'Je houdingen krijgen extra effecten. Strijdhouding: kritieke treffers van je vaardigheden richten 15% meer schade aan. Berserkerhouding: je automatische aanvallen zijn 5% sneller. Bewaakte Houding: een treffer die minstens 20% van je maximale gezondheid zou kosten, richt 15% minder schade aan.',
-    war_row_battle_rhythm:
-      'Elke derde gebruikte vaardigheid genereert 20% meer woede en richt 5% meer schade aan.',
+    war_row_battle_rhythm: 'Elke derde gebruikte vaardigheid genereert 20% meer woede.',
     war_row_colossal_might:
       'Elk punt woede dat je uitgeeft verkort de herlaaditijd van je grote aanvalsvaardigheden met 0,1 sec, tot maximaal 10 sec elke 30 sec.',
   },
@@ -246,8 +237,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Twoje automatyczne ataki generują o 10% więcej szału, a umiejętności o 5% więcej.',
     war_row_blood_offering:
       'Twoje postawy zyskują dodatkowe efekty. Postawa bojowa: trafienia krytyczne umiejętności zadają o 15% więcej obrażeń. Postawa berserkera: automatyczne ataki są o 5% szybsze. Czujna postawa: cios, który odebrałby co najmniej 20% maksymalnego zdrowia, zadaje o 15% mniej obrażeń.',
-    war_row_battle_rhythm:
-      'Co trzecia użyta umiejętność generuje o 20% więcej szału i zadaje o 5% więcej obrażeń.',
+    war_row_battle_rhythm: 'Co trzecia użyta umiejętność generuje o 20% więcej szału.',
     war_row_colossal_might:
       'Każdy wydany punkt szału skraca czas odnowienia twoich głównych umiejętności ofensywnych o 0,1 sek., maksymalnie 10 sek. co 30 sek.',
   },
@@ -268,7 +258,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_blood_offering:
       'Kuda-kudamu memperoleh efek tambahan. Kuda-kuda Tempur: serangan kritis kemampuanmu menghasilkan 15% lebih banyak kerusakan. Kuda-kuda Berserker: serangan otomatismu 5% lebih cepat. Kuda-kuda Waspada: serangan yang akan mengurangi setidaknya 20% nyawa maksimummu menghasilkan 15% lebih sedikit kerusakan.',
     war_row_battle_rhythm:
-      'Setiap kemampuan ketiga yang kamu gunakan menghasilkan 20% lebih banyak amarah dan 5% lebih banyak kerusakan.',
+      'Setiap kemampuan ketiga yang kamu gunakan menghasilkan 20% lebih banyak amarah.',
     war_row_colossal_might:
       'Setiap poin amarah yang kamu habiskan mempersingkat waktu pemulihan kemampuan ofensif utamamu sebesar 0,1 dtk, hingga 10 dtk setiap 30 dtk.',
   },
@@ -287,8 +277,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_anger_management: 'Otomatik saldırıların %10, yeteneklerin %5 daha fazla öfke üretir.',
     war_row_blood_offering:
       'Duruşların ek etkiler kazanır. Savaş Duruşu: yeteneklerinin kritik vuruşları %15 daha fazla hasar verir. Berserker Duruşu: otomatik saldırıların %5 daha hızlıdır. Korumalı Duruş: azami sağlığının en az %20’sini götürecek bir darbe %15 daha az hasar verir.',
-    war_row_battle_rhythm:
-      'Kullandığın her üçüncü yetenek %20 daha fazla öfke üretir ve %5 daha fazla hasar verir.',
+    war_row_battle_rhythm: 'Kullandığın her üçüncü yetenek %20 daha fazla öfke üretir.',
     war_row_colossal_might:
       'Harcadığın her öfke puanı, büyük saldırı yeteneklerinin bekleme süresini 0,1 saniye kısaltır; 30 saniyede en fazla 10 saniye.',
   },
@@ -307,8 +296,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Dina automatiska attacker genererar 10 % mer raseri och dina förmågor 5 % mer.',
     war_row_blood_offering:
       'Dina ställningar får ytterligare effekter. Stridsställning: kritiska träffar med förmågor gör 15 % mer skada. Bärsärkaställning: dina automatiska attacker är 5 % snabbare. Gardställning: en träff som skulle ta minst 20 % av din maximala hälsa gör 15 % mindre skada.',
-    war_row_battle_rhythm:
-      'Var tredje förmåga du använder genererar 20 % mer raseri och gör 5 % mer skada.',
+    war_row_battle_rhythm: 'Var tredje förmåga du använder genererar 20 % mer raseri.',
     war_row_colossal_might:
       'Varje raserienhet du förbrukar kortar ned nedkylningen på dina stora anfallsförmågor med 0,1 sek, högst 10 sek var 30:e sek.',
   },
@@ -327,8 +315,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_anger_management: 'Đòn đánh tự động tạo thêm 10% nộ và kỹ năng tạo thêm 5% nộ.',
     war_row_blood_offering:
       'Các thế của bạn nhận thêm hiệu ứng. Thế Công: đòn chí mạng từ kỹ năng gây thêm 15% sát thương. Thế Cuồng Chiến: đòn đánh tự động nhanh hơn 5%. Thế Thủ: một đòn đánh vốn lấy đi ít nhất 20% máu tối đa của bạn sẽ gây ít hơn 15% sát thương.',
-    war_row_battle_rhythm:
-      'Mỗi kỹ năng thứ ba bạn sử dụng tạo thêm 20% nộ và gây thêm 5% sát thương.',
+    war_row_battle_rhythm: 'Mỗi kỹ năng thứ ba bạn sử dụng tạo thêm 20% nộ.',
     war_row_colossal_might:
       'Mỗi điểm nộ bạn tiêu tốn rút ngắn 0,1 giây thời gian hồi chiêu của các kỹ năng tấn công chủ lực, tối đa 10 giây mỗi 30 giây.',
   },
@@ -347,8 +334,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
       'Dine autoangreb genererer 10 % mere raseri, og dine evner genererer 5 % mere.',
     war_row_blood_offering:
       'Dine stillinger får yderligere effekter. Kampstilling: kritiske træffere med evner giver 15 % mere skade. Berserkerstilling: dine autoangreb er 5 % hurtigere. Værgende Stilling: et træf, der ville tage mindst 20 % af dit maksimale helbred, giver 15 % mindre skade.',
-    war_row_battle_rhythm:
-      'Hver tredje evne, du bruger, genererer 20 % mere raseri og giver 5 % mere skade.',
+    war_row_battle_rhythm: 'Hver tredje evne, du bruger, genererer 20 % mere raseri.',
     war_row_colossal_might:
       'Hvert raserispunkt du bruger, reducerer afkølingen på dine store angrebsevner med 0,1 sek., op til 10 sek. hvert 30. sek.',
   },
@@ -364,7 +350,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_anger_management: '你的自动攻击产生的怒气提高10%，技能产生的怒气提高5%。',
     war_row_blood_offering:
       '你的姿态获得额外效果。战斗姿态：你的技能暴击造成的伤害提高15%。狂暴姿态：你的自动攻击加快5%。戒备姿态：若一次命中会使你损失至少20%的最大生命值，则该次伤害降低15%。',
-    war_row_battle_rhythm: '你每使用第三个技能时，该技能产生的怒气提高20%，造成的伤害提高5%。',
+    war_row_battle_rhythm: '你每使用第三个技能时，该技能产生的怒气提高20%。',
     war_row_colossal_might:
       '你每消耗1点怒气，主要进攻技能的冷却时间缩短0.1秒，每30秒最多减少10秒。',
   },
@@ -381,7 +367,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_anger_management: '你的自動攻擊產生的怒氣提高10%，技能產生的怒氣提高5%。',
     war_row_blood_offering:
       '你的姿態獲得額外效果。戰鬥姿態：你的技能致命一擊造成的傷害提高15%。狂暴姿態：你的自動攻擊加快5%。戒備姿態：若一次命中會使你損失至少20%的最大生命值，則該次傷害降低15%。',
-    war_row_battle_rhythm: '你每使用第三個技能時，該技能產生的怒氣提高20%，造成的傷害提高5%。',
+    war_row_battle_rhythm: '你每使用第三個技能時，該技能產生的怒氣提高20%。',
     war_row_colossal_might:
       '你每消耗1點怒氣，主要進攻技能的冷卻時間縮短0.1秒，每30秒最多縮短10秒。',
   },
@@ -398,7 +384,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_anger_management: '自動攻撃の怒気生成量が10%、アビリティの怒気生成量が5%増加します。',
     war_row_blood_offering:
       '各スタンスに追加効果を与えます。バトルスタンス：アビリティのクリティカルダメージが15%増加します。バーサーカースタンス：自動攻撃が5%速くなります。ガーデッドスタンス：最大体力の20%以上を失う攻撃のダメージが15%減少します。',
-    war_row_battle_rhythm: '3回目に使用するアビリティは、怒気生成量が20%、ダメージが5%増加します。',
+    war_row_battle_rhythm: '3回目に使用するアビリティは、怒気生成量が20%増加します。',
     war_row_colossal_might:
       '消費した怒気1ポイントごとに、主要な攻撃アビリティのクールダウンが0.1秒短縮されます。30秒ごとに最大10秒まで。',
   },
@@ -415,7 +401,7 @@ export const RETAINED_ROW_DESCRIPTION_OVERRIDES: Partial<
     war_row_anger_management: '자동 공격의 분노 생성량이 10%, 능력의 분노 생성량이 5% 증가합니다.',
     war_row_blood_offering:
       '각 태세에 추가 효과가 부여됩니다. 전투 태세: 능력의 치명타 피해가 15% 증가합니다. 광전사 태세: 자동 공격이 5% 빨라집니다. 방어 태세: 최대 생명력의 20% 이상을 잃게 할 공격의 피해가 15% 감소합니다.',
-    war_row_battle_rhythm: '세 번째로 사용하는 능력은 분노 생성량이 20%, 피해가 5% 증가합니다.',
+    war_row_battle_rhythm: '세 번째로 사용하는 능력은 분노 생성량이 20% 증가합니다.',
     war_row_colossal_might:
       '소비한 분노 1포인트마다 주요 공격 기술의 재사용 대기시간이 0.1초 단축됩니다. 30초마다 최대 10초까지 줄어듭니다.',
   },

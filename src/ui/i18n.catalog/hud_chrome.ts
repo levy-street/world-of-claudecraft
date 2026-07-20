@@ -30,6 +30,13 @@ export const hudChromeStrings = {
     resurrectAtCorpse: 'Resurrect at Corpse',
     resurrectAtHealer: "The Pale Keeper (Keeper's Toll)",
     spiritHealerAlive: 'The Pale Keeper watches over the dead. You are still among the living.',
+    // Confirm dialog gating the Pale Keeper revive (the corpse run stays one-tap:
+    // it carries no penalty, so a confirm there would only add friction).
+    healerConfirmTitle: "Accept the Keeper's Toll?",
+    healerConfirmBody:
+      "The Pale Keeper will revive you here, but the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to your corpse revives you with no penalty.",
+    healerConfirmAccept: 'Revive Me',
+    healerConfirmCancel: 'Cancel',
   },
   // Floating combat text self-notes (proc consume labels, absorb readout).
   fct: {
@@ -2380,6 +2387,37 @@ export const hudChromeStrings = {
     // Generic enchanted marker: EnchantDef.name has no localized display
     // surface yet, so the tooltip marks the state without naming the enchant.
     enchantedLine: 'Enchanted',
+  },
+  // Recipe training window (Professions 2.0 Phase 9): a station master
+  // teaches trainer-acquisition recipes for a tier-priced copper fee
+  // (src/sim/professions/training.ts). Recipe result names resolve through
+  // the item table, craft names through craftName above, so these keys are
+  // only the window's own chrome plus the trainResult chat lines (the
+  // 'trainResult' SimEvent is text-free; the client derives every name from
+  // recipeId plus static content).
+  training: {
+    title: 'Training: {name}',
+    close: 'Close training',
+    empty: 'This master has nothing to teach.',
+    free: 'Free',
+    stateKnown: 'Known',
+    stateTeachable: 'Available',
+    stateLocked: 'Locked',
+    // The locked-row requirement line: {craft} is the localized craft name,
+    // {skill} the flat skill threshold of the recipe's tier.
+    requirement: 'Taught at {craft} {skill}',
+    trainAria: 'Learn {name} for {fee}',
+    // The gossip-dialog Train option on a station master.
+    dialogOption: 'Training',
+    dialogOptionAria: 'Browse training from {name}',
+    // trainResult chat lines. learned is the ONE success surface: no toast,
+    // no sound cue (the grant-hub double-log trap).
+    learned: 'Recipe learned: {recipe}',
+    tierUnmet: 'You need {craft} {skill} to learn that recipe.',
+    cannotAfford: 'You cannot afford that training.',
+    notTaughtHere: 'That recipe is not taught here.',
+    alreadyKnown: 'You already know that recipe.',
+    outOfRange: 'You must be at the station to train.',
   },
   // Dungeon Finder window (docs/prd/dungeon-finder.md). Dungeon, creature,
   // item, quest, and zone NAMES resolve through tEntity/world_entity_i18n,

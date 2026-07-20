@@ -317,7 +317,11 @@ export const pl_PL: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Odrodź się przy zwłokach",
       "resurrectAtHealer": "Blady Strażnik (Myto Strażnika)",
-      "spiritHealerAlive": "Blady Strażnik czuwa nad umarłymi. Ty wciąż jesteś wśród żywych."
+      "spiritHealerAlive": "Blady Strażnik czuwa nad umarłymi. Ty wciąż jesteś wśród żywych.",
+      "healerConfirmTitle": "Accept the Keeper's Toll?",
+      "healerConfirmBody": "The Pale Keeper will revive you here, but the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to your corpse revives you with no penalty.",
+      "healerConfirmAccept": "Revive Me",
+      "healerConfirmCancel": "Cancel"
     },
     "fct": {
       "absorbed": "Pochłonięto {amount}",
@@ -2226,6 +2230,25 @@ export const pl_PL: EnTranslations = {
       "makersMark": "Crafted by {name}",
       "masterworkSeal": "Masterwork",
       "enchantedLine": "Enchanted"
+    },
+    "training": {
+      "title": "Training: {name}",
+      "close": "Close training",
+      "empty": "This master has nothing to teach.",
+      "free": "Free",
+      "stateKnown": "Known",
+      "stateTeachable": "Available",
+      "stateLocked": "Locked",
+      "requirement": "Taught at {craft} {skill}",
+      "trainAria": "Learn {name} for {fee}",
+      "dialogOption": "Training",
+      "dialogOptionAria": "Browse training from {name}",
+      "learned": "Recipe learned: {recipe}",
+      "tierUnmet": "You need {craft} {skill} to learn that recipe.",
+      "cannotAfford": "You cannot afford that training.",
+      "notTaughtHere": "That recipe is not taught here.",
+      "alreadyKnown": "You already know that recipe.",
+      "outOfRange": "You must be at the station to train."
     },
     "finder": {
       "title": "Znajdywacz Lochów",
@@ -4596,7 +4619,11 @@ export const pl_PL: EnTranslations = {
   },
   "heroicShop": {
     "balance": "Znaki heroiczne: {count}",
-    "buyAria": "Kup {item} za {marks} Znaków heroicznych"
+    "buyAria": "Kup {item} za {marks} Znaków heroicznych",
+    "buyConfirmTitle": "Confirm Purchase",
+    "buyConfirmBody": "Buy {item} for {marks} Heroic Marks? Marks purchases cannot be refunded.",
+    "buyConfirmAccept": "Buy",
+    "buyConfirmCancel": "Cancel"
   },
   "cardDuel": {
     "title": "Pojedynek Karciany",
@@ -4649,7 +4676,11 @@ export const pl_PL: EnTranslations = {
       "buyAria": "Kup {item} za {marks} Znaków Wypraw",
       "reqHeroic": "Wymaga heroicznego oczyszczenia",
       "reqClears": "Wymaga {count} oczyszczeń",
-      "empty": "Brak towaru w magazynie."
+      "empty": "Brak towaru w magazynie.",
+      "buyConfirmTitle": "Confirm Purchase",
+      "buyConfirmBody": "Buy {item} for {marks} Delve Marks? Marks purchases cannot be refunded.",
+      "buyConfirmAccept": "Buy",
+      "buyConfirmCancel": "Cancel"
     },
     "tracker": {
       "title": "Wyprawa",
@@ -8233,6 +8264,210 @@ export const pl_PL: EnTranslations = {
       },
       "gravewyrm_bulwark": {
         "name": "Gravewyrm Bulwark"
+      },
+      "rough_hide": {
+        "name": "Rough Hide"
+      },
+      "spider_silk": {
+        "name": "Spider Silk"
+      },
+      "venom_gland": {
+        "name": "Venom Gland"
+      },
+      "game_meat": {
+        "name": "Game Meat"
+      },
+      "homespun_cloth": {
+        "name": "Homespun Cloth"
+      },
+      "pristine_hide": {
+        "name": "Pristine Hide"
+      },
+      "pristine_silk": {
+        "name": "Pristine Silk"
+      },
+      "pristine_venom_gland": {
+        "name": "Pristine Venom Gland"
+      },
+      "prime_cut": {
+        "name": "Prime Cut"
+      },
+      "smithing_flux": {
+        "name": "Smithing Flux"
+      },
+      "spool_of_thread": {
+        "name": "Spool of Thread"
+      },
+      "tanning_agent": {
+        "name": "Tanning Agent"
+      },
+      "cooking_salt": {
+        "name": "Cooking Salt"
+      },
+      "glass_vial": {
+        "name": "Glass Vial"
+      },
+      "copper_bearded_axe": {
+        "name": "Copper Bearded Axe"
+      },
+      "copper_flanged_mace": {
+        "name": "Copper Flanged Mace"
+      },
+      "ironbark_boar_spear": {
+        "name": "Ironbark Boar Spear"
+      },
+      "ironedge_longsword": {
+        "name": "Ironedge Longsword"
+      },
+      "ironshod_maul": {
+        "name": "Ironshod Maul"
+      },
+      "whetted_iron_dirk": {
+        "name": "Whetted Iron Dirk"
+      },
+      "thorium_warblade": {
+        "name": "Thorium Warblade"
+      },
+      "arcanite_war_axe": {
+        "name": "Arcanite War Axe"
+      },
+      "elderwood_battle_staff": {
+        "name": "Elderwood Battle Staff"
+      },
+      "riveted_copper_girdle": {
+        "name": "Riveted Copper Girdle"
+      },
+      "coppermail_sabatons": {
+        "name": "Coppermail Sabatons"
+      },
+      "coppermail_gauntlets": {
+        "name": "Coppermail Gauntlets"
+      },
+      "ironlink_hauberk": {
+        "name": "Ironlink Hauberk"
+      },
+      "ironlink_legguards": {
+        "name": "Ironlink Legguards"
+      },
+      "ironlink_spaulders": {
+        "name": "Ironlink Spaulders"
+      },
+      "thoriumscale_greathelm": {
+        "name": "Thoriumscale Greathelm"
+      },
+      "thoriumscale_cuirass": {
+        "name": "Thoriumscale Cuirass"
+      },
+      "thoriumscale_leggings": {
+        "name": "Thoriumscale Leggings"
+      },
+      "homespun_hood": {
+        "name": "Homespun Hood"
+      },
+      "homespun_mitts": {
+        "name": "Homespun Mitts"
+      },
+      "silverthread_slippers": {
+        "name": "Silverthread Slippers"
+      },
+      "goldweave_robe": {
+        "name": "Goldweave Robe"
+      },
+      "goldweave_leggings": {
+        "name": "Goldweave Leggings"
+      },
+      "silkspun_satchel": {
+        "name": "Silkspun Satchel"
+      },
+      "silkbinders_raiment": {
+        "name": "Silkbinder's Raiment"
+      },
+      "sunweave_mantle": {
+        "name": "Sunweave Mantle"
+      },
+      "sunweave_treads": {
+        "name": "Sunweave Treads"
+      },
+      "fenbridge_hide_leggings": {
+        "name": "Fenbridge Hide Leggings"
+      },
+      "fenbridge_hide_boots": {
+        "name": "Fenbridge Hide Boots"
+      },
+      "fenbridge_hide_belt": {
+        "name": "Fenbridge Hide Belt"
+      },
+      "marshstalker_jerkin": {
+        "name": "Marshstalker Jerkin"
+      },
+      "marshstalker_hood": {
+        "name": "Marshstalker Hood"
+      },
+      "marshstalker_spaulders": {
+        "name": "Marshstalker Spaulders"
+      },
+      "mirewarden_jerkin": {
+        "name": "Mirewarden Jerkin"
+      },
+      "mirewarden_leggings": {
+        "name": "Mirewarden Leggings"
+      },
+      "mirewarden_treads": {
+        "name": "Mirewarden Treads"
+      },
+      "pan_seared_perch": {
+        "name": "Pan-Seared River Perch"
+      },
+      "hunters_game_skewer": {
+        "name": "Hunter's Game Skewer"
+      },
+      "herbed_marsh_pike": {
+        "name": "Herbed Marsh Pike"
+      },
+      "ashwood_smoked_eel": {
+        "name": "Ashwood Smoked Eel"
+      },
+      "goldleaf_game_stew": {
+        "name": "Goldleaf Game Stew"
+      },
+      "frostgill_chowder": {
+        "name": "Frostgill Chowder"
+      },
+      "silvered_carp_supper": {
+        "name": "Silvered Carp Supper"
+      },
+      "anglers_feast_platter": {
+        "name": "Angler's Feast Platter"
+      },
+      "marlows_grand_roast": {
+        "name": "Marlow's Grand Roast"
+      },
+      "silverleaf_healing_draught": {
+        "name": "Silverleaf Healing Draught"
+      },
+      "silverleaf_mana_draught": {
+        "name": "Silverleaf Mana Draught"
+      },
+      "elixir_of_the_boar": {
+        "name": "Elixir of the Boar"
+      },
+      "goldleaf_healing_draught": {
+        "name": "Goldleaf Healing Draught"
+      },
+      "goldleaf_mana_draught": {
+        "name": "Goldleaf Mana Draught"
+      },
+      "venomfire_elixir": {
+        "name": "Venomfire Elixir"
+      },
+      "sunpetal_healing_draught": {
+        "name": "Sunpetal Healing Draught"
+      },
+      "sunpetal_mana_draught": {
+        "name": "Sunpetal Mana Draught"
+      },
+      "elixir_of_the_serpent": {
+        "name": "Elixir of the Serpent"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"

@@ -166,7 +166,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 0.85,
     color: 0x935116,
-    componentTags: ['hide', 'tusk'],
+    componentTags: ['hide', 'tusk', 'meat'],
   },
   webwood_spider: {
     id: 'webwood_spider',
@@ -368,6 +368,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     color: 0x943126,
     // A practiced thug flings a handful of road grit to foul your aim.
     blind: { chance: 0.25, miss: 0.3, duration: 5, name: 'Blinding Powder', school: 'physical' },
+    componentTags: ['cloth'],
   },
   restless_bones: {
     id: 'restless_bones',
@@ -705,7 +706,16 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     facing: -2.4,
     color: 0xb5541c,
     questIds: [],
-    vendorItems: ['copper_mining_pick', 'iron_mining_pick', 'mithril_mining_pick'],
+    // Phase 9 station stocking: thorium_ore is the premium reagent the forge
+    // station's own recipe (recipe_sootscale_mantle) consumes, so the master
+    // sells it alongside quartermaster_bree (zone3).
+    vendorItems: [
+      'copper_mining_pick',
+      'iron_mining_pick',
+      'mithril_mining_pick',
+      'smithing_flux',
+      'thorium_ore',
+    ],
     greeting: 'The forge answers to me, $C. Bring good ore and it will answer to you too.',
   },
   cook_marlow: {
@@ -723,6 +733,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'roasted_boar',
       'tough_jerky',
       'brightwood_venison',
+      'cooking_salt',
     ],
     greeting: 'Nothing leaves my kitchens half-cooked, $C. Sit, eat, then get back out there.',
   },
@@ -735,7 +746,15 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     facing: 0.8,
     color: 0x7161a8,
     questIds: [],
-    vendorItems: ['linen_pouch', 'travelers_knapsack', 'gathering_sickle'],
+    // Phase 9 station stocking: thorium_ore is the premium reagent the loom
+    // station's own recipe (recipe_wardweave_cowl) consumes.
+    vendorItems: [
+      'linen_pouch',
+      'travelers_knapsack',
+      'gathering_sickle',
+      'spool_of_thread',
+      'thorium_ore',
+    ],
     greeting: 'Mind the threads, $C. A steady hand at the loom beats a strong one.',
   },
   tinker_gizzel: {
@@ -747,6 +766,9 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     facing: -0.8,
     color: 0xb08d57,
     questIds: [],
+    // Phase 9 station stocking: the six premium reagents the toolworks
+    // recipes (TOOL_RECIPES) consume, previously sold only by
+    // quartermaster_bree (zone3).
     vendorItems: [
       'handaxe',
       'felling_axe',
@@ -754,6 +776,12 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'bronze_sickle',
       'silverleaf_sickle',
       'simple_fishing_pole',
+      'thorium_ore',
+      'arcanite_bar',
+      'ashwood_log',
+      'elderwood_log',
+      'goldleaf_herb',
+      'sunpetal_herb',
     ],
     greeting:
       'Springs, sprockets, and sharp edges, $C: the toolworks has whatever your hands lack.',

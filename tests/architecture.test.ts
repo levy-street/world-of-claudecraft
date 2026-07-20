@@ -153,6 +153,7 @@ const UI_PURE_CORES = [
   'src/ui/options_view.ts',
   'src/ui/hud/vendor/vendor_view.ts',
   'src/ui/hud/vendor/heroic_vendor_view.ts',
+  'src/ui/hud/vendor/train_view.ts',
   'src/ui/card_duel_view.ts',
   'src/ui/claudium_view.ts',
   'src/ui/woc_store_view.ts',
@@ -231,6 +232,7 @@ const UI_PURE_CORES = [
 // the same contract for the map editor's realtime terrain/water edits.
 const RENDER_PURE_CORES = [
   'src/render/cast_bar.ts',
+  'src/render/stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',

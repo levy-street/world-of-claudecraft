@@ -689,6 +689,299 @@ export const TARGETS = [
       return { clip: '#professions-window' };
     },
   },
+  {
+    key: 'train-window',
+    label: 'Train view: station-master recipe training ladder',
+    when: ['ui/hud/vendor/train_view', 'ui/hud/vendor/train_window'],
+    // Desktop and mobile: the three-state teaching ladder is actionable info (a
+    // player decides what to train), so it must read on both form factors.
+    variants: [
+      { key: 'desktop', charClass: 'warrior', charName: 'Forgeheart' },
+      { key: 'mobile', charClass: 'warrior', charName: 'Anvilmar', mobile: true },
+    ],
+    // Show all three row states in one frame at Forgemistress Darva's forge. Set
+    // the viewer's craft skills so the forge ladder renders every state at once:
+    // weaponcrafting at tier 1 (skill 30) makes recipe_forgeguard_bulwark_gauntlets
+    // TEACHABLE at a 25s fee; armorcrafting at tier 0 (skill 10) leaves
+    // recipe_ironbound_warplate_helm LOCKED with its named "Taught at ... 25"
+    // requirement; the acquisition-free commons of both crafts read KNOWN. The two
+    // combo recipes are grandfathered into knownRecipes for existing saves, so drop
+    // them from the set first or they would read KNOWN too. Give the player enough
+    // copper that the fee reads affordable. openTrain takes the master's ENTITY id
+    // (renderTrain does sim.entities.get(id).templateId), so resolve the entity, not
+    // the template id.
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      // Set state and open the window in ONE evaluate: the ticking sim would drift
+      // between two evaluates, and renderTrain reads the state synchronously here.
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const master = [...sim.entities.values()].find(
+          (e) => e.templateId === 'forgemistress_darva',
+        );
+        if (!master) return { ok: false, reason: 'no forgemistress_darva entity' };
+        const meta = sim.players.get(sim.primaryId);
+        if (!meta) return { ok: false, reason: 'no primary player meta' };
+        meta.craftSkills = { ...meta.craftSkills, weaponcrafting: 30, armorcrafting: 10 };
+        meta.knownRecipes.delete('recipe_forgeguard_bulwark_gauntlets');
+        meta.knownRecipes.delete('recipe_ironbound_warplate_helm');
+        sim.copper = 100000;
+        // The HUD auto-closes the train window when the player is more than 8yd
+        // from the master (hud.ts openTrainNpcId proximity check), so stand the
+        // player right beside Darva in this SAME evaluate or the next tick closes it.
+        const p = sim.player;
+        if (p?.pos) {
+          p.pos.x = master.pos.x;
+          p.pos.z = master.pos.z - 2;
+        }
+        const el = document.querySelector('#train-window');
+        if (el) el.style.display = 'none';
+        game.hud.openTrain(master.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`train-window setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#train-window');
+      if (!open) throw new Error('train window did not open');
+      // Verify the ladder rendered all three states (the whole point of the shot).
+      const states = await page.evaluate(() => ({
+        known: document.querySelectorAll('#train-window .train-known').length,
+        teachable: document.querySelectorAll('#train-window .train-teachable').length,
+        locked: document.querySelectorAll('#train-window .train-locked').length,
+      }));
+      if (!(states.known > 0 && states.teachable > 0 && states.locked > 0)) {
+        throw new Error(`train ladder missing a state: ${JSON.stringify(states)}`);
+      }
+      if (variant?.mobile) {
+        // The short landscape viewport cannot show the whole ladder at once, and
+        // the teachable (AVAILABLE) row sits last; scroll it to the bottom so the
+        // frame carries all three states (a KNOWN and the LOCKED row stay above it).
+        await page.evaluate(() => {
+          document
+            .querySelector('#train-window .train-teachable')
+            ?.scrollIntoView({ block: 'end' });
+        });
+        await wait(300);
+      }
+      return { clip: '#train-window' };
+    },
+  },
+  {
+    key: 'station-props',
+    label: 'Crafting-station scenery (Eastbrook forge)',
+    when: ['render/stations', 'src/sim/content/professions'],
+    variants: [{ key: 'desktop', charClass: 'warrior', charName: 'Forgeheart' }],
+    // A world-scene shot of the Eastbrook forge station props (anvil + reused
+    // crate/barrel clutter) beside Forgemistress Darva, framed the way a player
+    // walks up to it. The station sits at STATIONS station_eastbrook_forge
+    // {x:7, z:16.5} (content/professions.ts); stand a few yards south-east and
+    // face it (the gather-node facing idiom: atan2(dx, dz) toward the target).
+    // The GLB streams in on first view, so wait generously before the frame.
+    // Full-viewport shot (return {}), no selector clip: this is scenery, not a
+    // window, and the corner minimap with its new station diamond marker rides
+    // along.
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        const p = window.__game?.sim?.player;
+        if (p?.pos) {
+          // Eastbrook forge station (content/professions.ts station_eastbrook_forge).
+          const forge = { x: 7, z: 16.5 };
+          p.pos.x = 10;
+          p.pos.z = 10;
+          p.facing = Math.atan2(forge.x - p.pos.x, forge.z - p.pos.z);
+        }
+      });
+      // The anvil GLB and station clutter stream in on first view; wait generously.
+      await wait(4500);
+      await page.evaluate(() => document.querySelector('#gpu-notice')?.remove());
+      return {};
+    },
+  },
+  {
+    key: 'confirm-gates',
+    label: 'Confirm dialogs: spirit-healer revive + marks purchases',
+    when: ['ui/hud/delve/delve_board_controller', 'tests/hud_confirm_gates'],
+    variants: [
+      { key: 'healer-desktop', scene: 'healer' },
+      { key: 'heroic-desktop', scene: 'heroic' },
+      { key: 'delve-desktop', scene: 'delve' },
+      { key: 'healer-mobile', scene: 'healer', mobile: true },
+      { key: 'heroic-mobile', scene: 'heroic', mobile: true },
+    ],
+    // Each scene stages the pre-existing one-tap action and takes it through the
+    // REAL button so the shot proves the confirm dialog now gates it. Full-frame
+    // shots: the dialog matters together with the scene it interrupts (ghost
+    // prompt / vendor window / delve board).
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      if (variant.scene === 'healer') {
+        // Die, release through the real death overlay button, then stand at the
+        // Pale Keeper so the ghost prompt offers the healer revive.
+        await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          if (!sim) return;
+          sim.player.hp = 1;
+          sim.player.dead = true;
+        });
+        await wait(600);
+        await page.evaluate(() => document.querySelector('#release-btn')?.click());
+        await wait(600);
+        await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          if (!sim) return;
+          for (const ent of sim.entities.values()) {
+            if (ent.kind === 'npc' && ent.templateId === 'spirit_healer') {
+              sim.player.pos.x = ent.pos.x + 2;
+              sim.player.pos.z = ent.pos.z + 2;
+              break;
+            }
+          }
+        });
+        await wait(600);
+        await page.evaluate(() => document.querySelector('#resurrect-healer-btn')?.click());
+      } else if (variant.scene === 'heroic') {
+        await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          if (!sim) return;
+          sim.addItem('heroic_mark', 60);
+          for (const ent of sim.entities.values()) {
+            if (ent.kind === 'npc' && ent.templateId === 'heroic_quartermaster') {
+              game.hud.openHeroicVendor(ent.id);
+              break;
+            }
+          }
+        });
+        await wait(500);
+        await page.evaluate(() =>
+          document.querySelector('#vendor-window .vendor-item:not([disabled])')?.click(),
+        );
+      } else {
+        // Unlock the delve shop stock and fund the marks wallet, then buy
+        // through the real shop-tab button.
+        await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          if (!sim) return;
+          const meta = sim.players.get(sim.player.id);
+          if (meta) {
+            meta.delveMarks = 99;
+            meta.delveClears = {
+              'collapsed_reliquary:normal': 20,
+              'collapsed_reliquary:heroic': 20,
+            };
+          }
+          for (const ent of sim.entities.values()) {
+            if (ent.kind === 'npc' && ent.templateId === 'brother_halven') {
+              game.hud.delveBoard.open(ent.id);
+              break;
+            }
+          }
+        });
+        await wait(500);
+        await page.evaluate(() =>
+          document.querySelector('#delve-board [data-board-tab="shop"]')?.click(),
+        );
+        await wait(400);
+        await page.evaluate(() =>
+          document.querySelector('#delve-board [data-buy]:not([disabled])')?.click(),
+        );
+      }
+      await pollForSize(page, '#confirm-dialog');
+      return {};
+    },
+  },
+  {
+    key: 'held-weapon-variants',
+    label: 'Held weapon model variants (mainhand + dual-wield offhand)',
+    when: ['src/ui/weapon_variants.ts', 'tests/held_weapon_models.test.ts'],
+    variants: [
+      {
+        key: 'cleaver-mainhand',
+        charClass: 'warrior',
+        charName: 'Cleaverjaw',
+        items: ['gravewyrm_cleaver'],
+        // Mirrored three-quarter: the mainhand (the subject) is the RIGHT hand.
+        yawFactor: 1.28,
+      },
+      {
+        key: 'dual-fang',
+        charClass: 'rogue',
+        charName: 'Twinfang',
+        items: ['mirejaw_fang_knife', 'mirejaw_fang_knife'],
+      },
+    ],
+    // A world-scene shot of the character facing the camera with the listed items
+    // equipped (second item, when present, goes to the offhand slot: the
+    // dual-wield case). Full-viewport shot (return {}): the subject is the 3D
+    // held model, not a window.
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      await page.evaluate((shot) => {
+        const game = window.__game;
+        const sim = game.sim;
+        const player = sim.player;
+        sim.setPlayerLevel?.(30, player.id);
+        // Draw the weapons: the held (not sheathed) pose is the subject.
+        if (player.weaponStowed) game.world.toggleWeaponStow();
+        const [mainId, offId] = shot.items;
+        // Aim each hand explicitly: the no-slot resolver (desiredEquipSlot) routes
+        // a dual-wielder's one-hander into an empty offhand, which would leave the
+        // starter weapon in the mainhand.
+        sim.addItem(mainId, 1, player.id);
+        sim.equipItemToSlot(mainId, 'mainhand', player.id);
+        if (offId) {
+          sim.addItem(offId, 1, player.id);
+          sim.equipItemToSlot(offId, 'offhand', player.id);
+        }
+        // Step away from the spawn campfire so the held models read against clean
+        // ground, then park the camera in front of the character, pulled back and
+        // level, so the whole body and both hands are in frame.
+        player.pos.x += 6;
+        player.pos.z += 4;
+        game.input.camDist = 5.5;
+        game.input.camPitch = 0.1;
+        // Three-quarter front view: an edge-on blade reads as a sliver from dead
+        // ahead; the off-angle shows the weapon's profile. The factor picks which
+        // hand is nearest the camera (below PI favors the left, above the right).
+        game.input.camYaw = player.facing + Math.PI * (shot.yawFactor ?? 0.72);
+      }, variant);
+      // The weapon GLBs and the rig settle, and the levelup/deed banners fade.
+      await wait(4500);
+      const equipped = await page.evaluate(() => {
+        const player = window.__game.sim.player;
+        return { mainhand: player.mainhandItemId, offhand: player.offhandItemId };
+      });
+      if (equipped.mainhand !== variant.items[0]) {
+        throw new Error(`mainhand equip failed: ${JSON.stringify(equipped)}`);
+      }
+      if (variant.items[1] && equipped.offhand !== variant.items[1]) {
+        throw new Error(`offhand equip failed: ${JSON.stringify(equipped)}`);
+      }
+      return {};
+    },
+  },
 ];
 
 // Map a list of changed file paths to the targets they imply (deduped, registry order).

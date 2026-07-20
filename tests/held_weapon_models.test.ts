@@ -15,6 +15,8 @@ import {
   weaponSkinModelUrls,
 } from '../src/render/characters/manifest';
 import { WEAPON_SKIN_LIST } from '../src/sim/content/weapon_skins';
+import { ITEMS } from '../src/sim/data';
+import { weaponHand } from '../src/sim/equipment_rules';
 import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 
 // The per-item held weapon models: each weapon item maps (via the shared
@@ -45,6 +47,45 @@ describe('held weapon models', () => {
     expect(itemWeaponModelUrl('chest_armor_not_a_weapon')).toBeNull();
     expect(itemWeaponModelUrl(null)).toBeNull();
     expect(itemWeaponModelUrl(undefined)).toBeNull();
+  });
+
+  // COVERAGE: every equippable weapon must map to a held model. An unmapped item
+  // falls back asymmetrically in assets.ts: swapAttachDef keeps the class DEFAULT
+  // mainhand model (renders the wrong weapon) while offhandAttachDef returns null
+  // and attachAllProps silently skips the hand (renders nothing), so dual-wielding
+  // two copies of an unmapped one-hander showed only the mainhand.
+  it('every weapon item resolves a mainhand held model', () => {
+    const weapons = Object.values(ITEMS).filter((item) => item.kind === 'weapon');
+    expect(weapons.length).toBeGreaterThan(0);
+    const unmapped = weapons.filter((item) => itemWeaponModelUrl(item.id) === null);
+    expect(unmapped.map((item) => item.id)).toEqual([]);
+  });
+
+  // Anything that can sit in the offhand slot (a one-hander for a dual wielder, a
+  // fury two-hander, a shield) must resolve there too, or the hand renders empty.
+  // The held_offhand kind (caster orbs/tomes) is swept by the pin test below.
+  it('every offhand-capable weapon and shield resolves an offhand held model', () => {
+    const offhandCapable = Object.values(ITEMS).filter(
+      (item) =>
+        (item.kind === 'weapon' && weaponHand(item) !== 'mainhand') ||
+        (item.kind === 'armor' && item.slot === 'offhand' && item.shield === true),
+    );
+    expect(offhandCapable.length).toBeGreaterThan(0);
+    const unmapped = offhandCapable.filter((item) => itemOffhandModelUrl(item.id) === null);
+    expect(unmapped.map((item) => item.id)).toEqual([]);
+  });
+
+  // The wraithfire_orb (and its generated heroic clone) is the ONE known held
+  // model gap: the shared art set has no orb model to map it to, so it needs new
+  // art, not a table row. Pinning the exact set makes the exception conscious: a
+  // future held_offhand item must either map to a model or extend this pin.
+  it('pins the wraithfire orb as the only held_offhand without a model', () => {
+    const heldOffhands = Object.values(ITEMS).filter((item) => item.kind === 'held_offhand');
+    const unmapped = heldOffhands
+      .filter((item) => itemOffhandModelUrl(item.id) === null)
+      .map((item) => item.id)
+      .sort();
+    expect(unmapped).toEqual(['heroic_wraithfire_orb', 'wraithfire_orb']);
   });
 
   it('resolves actual offhands independently from the mainhand model', () => {

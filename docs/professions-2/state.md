@@ -319,8 +319,8 @@ tables, i18n key namespaces, files created)
   ProfessionRecipeRecord and all content records. Files created:
   src/sim/professions/masterwork.ts (pure leaf; masterworkProcChance
   carries the named Phase 10 material-tier hook, a defaulted
-  materialTierBonus summand that Phase 10 wires with real material-tier
-  values at the crafting.ts call site),
+  materialTierBonus summand that Phase 10 WIRED with real material-tier
+  values at the crafting.ts call site, see the Phase 10 entry),
   tests/professions_masterwork.test.ts,
   tests/masterwork_event_mirror.test.ts, and the professions_craft
   parity scenario plus golden. Rng draw-order pins: the drawCounts pin
@@ -664,6 +664,191 @@ tables, i18n key namespaces, files created)
   runtime cycle today because the zone modules never import
   professions content, but a future reverse import would see
   undefined during init).
+- Phase 9 (landed 2026-07-19; phase start d40f0a90f): recipe training
+  live end to end. src/sim/professions/training.ts (TRAINING_FEE_BY_TIER
+  [0, 2500, 10000] copper, clamp-to-last for future tiers pending the
+  Phase 10/15 tuning; trainingFeeFor; teachTierMet = exactly
+  tierForSkill(craftSkills[professionId] ?? 0) >= tierForSkill(skillReq);
+  resolveTrain with the replay-safe deny order already_known ->
+  not_taught_here -> out_of_range -> tier_unmet -> cannot_afford;
+  PRE_TRAINING_RECIPE_IDS, the frozen 21 pre-phase recipe ids;
+  grandfatherKnownRecipes). The acquisition switch: exactly the three
+  COMBO_RECIPES carry acquisition ['trainer'] (the wave-one taught set:
+  skillReq 25 is the locked "uncommon at 25" rung; commons and the
+  75/150 TOOL/CASTER recipes keep empty acquisition, grandfathered
+  known to everyone); every recipe authored after Phase 9 must carry a
+  non-empty acquisition list (trained-not-known default, pinned in
+  tests/professions_grandfather.test.ts). Persistence: PlayerMeta +
+  CharacterState recipesGrandfathered boolean (new chars true; a load
+  missing the flag unions PRE_TRAINING_RECIPE_IDS into knownRecipes
+  once, idempotent; parity goldens regenerated for the new persisted
+  field in their own commit). Wire: IWorldProfessions.trainRecipe +
+  train_recipe command; CraftingIdentityView.knownRecipes (sorted)
+  rides the existing cprof JSON-diff key (ALL_DELTA_KEYS stays 49);
+  text-free SimEvent trainResult {ok, recipeId, reason?} with deny ids
+  train_already_known/train_not_taught_here/train_out_of_range/
+  train_tier_unmet/train_cannot_afford rendered via hudChrome.training.*
+  (17 keys + five non-Latin M16 overlay fills; no sim_i18n matcher row,
+  the Phase 6/8 text-free-id precedent). Training proximity accepts
+  STATIC stations only (a mobile crafting station never satisfies
+  training, pinned). UI: Train dialog option on STATIONS masters,
+  train_view.ts pure core (UI_PURE_CORES) + train_window.ts painter on
+  the vendor family; locked rows always render with "Taught at {craft}
+  {skill}"; the crafting window now lists known recipes only. Render:
+  src/render/stations.ts + stations_core.ts (RENDER_PURE_CORES) prop
+  clusters on all six STATIONS records (existing GLBs only, no radius
+  decal), six master ids mapped to existing NPC visual keys, minimap
+  'station' marker + --color-minimap-station token, tier-identical,
+  pinned against both host shapes. Master stocking (the Phase 8 travel
+  loop flag): tinker_gizzel sells all six premium reagents;
+  forgemistress_darva, weaver_ottilie, tanner_hesk sell thorium_ore
+  (their station recipes' only premium reagent); cook_marlow,
+  alchemist_verane, quartermaster_bree unchanged. Phase 9 drift notes
+  (2026-07-19): the unknown-recipe (malformed) train arm emits a
+  reason-less ok:false trainResult (craftResult precedent; hud renders
+  nothing for it); train_not_taught_here is content-unreachable until
+  a drop/quest acquisition recipe exists (precedence pinned, no
+  positive arm test); online, before the first cprof lands
+  (craftingIdentity.synced false) the crafting window briefly hides
+  trainer recipes the player knows (transient, advisory-only); the
+  Eastbrook forge station prop stands ~2.7yd from smith_haldren's
+  stall anvil (two anvils, accepted: the station pos is the legible
+  gate anchor; drop the anvil entry in STATION_PROP_CLUSTERS.forge if
+  the maintainer prefers the stall to be the visual); station props
+  are BUILTIN_WORLD-guarded (artisan-row precedent), so editor custom
+  maps get the sim gate with no props; the mobile-station prop stays
+  deferred (pos/placedAtTick still consumer-less); smith_haldren does
+  not train (the forge's masterNpcId is forgemistress_darva, the
+  locked Phase 8 seating); since the Phase 9 QA pass, the viewer-side
+  knownness predicate is the SHARED train_view.ts
+  isRecipeKnownForViewer (the train ladder's known state and the
+  crafting window's known-filter both delegate to it, and rowState
+  delegates to training.ts teachTierMet, so neither UI site can
+  drift from the sim's rule; the hud known-filter source pin in
+  tests/train_window_hud.test.ts pins the delegation itself).
+  ROLLBACK CAVEAT (reviewed and consciously
+  accepted, migration-safety 2026-07-19): a character created under
+  Phase 9 code whose save round-trips through pre-Phase-9 server code
+  loses the unknown recipesGrandfathered field (old serialize rebuilds
+  CharacterState), so returning to Phase 9 code re-runs the union and
+  grants the three combos without the fee or tier gate. Same class as
+  the mailWelcomed re-trigger; bounded to a skipped gold fee (combo
+  USE stays pair-gated), and unavoidable for any additive flag old
+  code strips. Note it in the v0.28.0 release notes rollback section.
+- Phase 10 (2026-07-19): recipe ladders and materials content.
+  Materials (new data module src/sim/content/profession_items.ts, merged
+  via mergeItems in data.ts): harvest materials rough_hide, spider_silk,
+  venom_gland, game_meat, homespun_cloth (kind junk, quality common, no
+  buyValue); perfect specimens pristine_hide, pristine_silk,
+  pristine_venom_gland, prime_cut (quality rare), granted as a SIGNED
+  instance IN ADDITION to the plain component when the existing
+  rollCorpseMaterialRarity draw clears rare+ (src/sim/interaction.ts
+  harvestCorpse, zero new rng draws; specimen-less families, fang and
+  cloth, keep the pre-Phase-10 signed-regular behavior at rare+); vendor
+  reagents smithing_flux, spool_of_thread, tanning_agent, cooking_salt,
+  glass_vial (positive buyValue, sellValue a quarter of it, stocked ONLY
+  at the matching master; inserted before thorium_ore where the Phase 9
+  stock pin holds it last). HARVEST_COMPONENT_ITEMS remap: hide to
+  rough_hide, silk to spider_silk, venomSac to venom_gland, plus NEW
+  rows meat to game_meat (tags on wild_boar, mire_prowler, ridge_stalker)
+  and cloth to homespun_cloth (vale_bandit, gravecaller_cultist,
+  gravecaller_summoner, wyrmcult_zealot, wyrmcult_necromancer); fang
+  stays wolf_fang. The old quest items (boar_hide, webwood_silk,
+  widow_venom_sac) keep their questId-gated kill-loot roles only;
+  regression suite tests/harvest_component_materials.test.ts pins the
+  map, the no-quest-credit-from-harvest arm, and the live drop paths.
+  Ladders: LADDER_RECIPES in src/sim/content/recipes.ts, 54 trainer
+  recipes (9 per deep craft, 3 per rung at skillReq 0/25/50, acquisition
+  ['trainer'], stationType = the craft's station, scaffolding normalized
+  to 10/10, 16/15, 20/20 per rung; station-bound skillReq-0 rungs
+  coexist with the grandfathered field commons by design). Per-master
+  trained sets: forgemistress_darva 18 (weaponcrafting 9 + armorcrafting
+  9), weaver_ottilie 9, tanner_hesk 9, cook_marlow 9, alchemist_verane
+  9, tinker_gizzel 0 this phase (engineering stays the toolmaker line).
+  Specimen consumers, exactly one per family: recipe_silkbinders_raiment
+  (pristine_silk), recipe_mirewarden_jerkin (pristine_hide),
+  recipe_marlows_grand_roast (prime_cut), recipe_elixir_of_the_serpent
+  (pristine_venom_gland, resultCount 2). Cooking consumes all six
+  pre-existing raw fish (no fish ItemDefs were authored; fishing was
+  already live, so the phase-file premise was already satisfied).
+  materialTierBonus WIRED: src/sim/professions/material_tier.ts exports
+  MATERIAL_TIER_BY_ITEM (iron_ore, ashwood_log, goldleaf_herb,
+  thorium_ore tier 1; elderwood_log, sunpetal_herb, arcanite_bar tier
+  2; everything else 0) and MASTERWORK_MATERIAL_TIER_CHANCE 0.01,
+  max-tier rule, def-level keying (consumed-instance rarity is not
+  recoverable at the crafting.ts call site without a consumption-order
+  change); tier-0 reagent lists contribute exactly 0 so the parity
+  goldens are unchanged, pinned in tests/professions_masterwork.test.ts
+  including a real-Sim seed-69 call-site flip pin.
+  Economy invariant: tests/recipe_economy.test.ts, strict less-than over
+  every recipe in ALL_RECIPES with vendor-purchasable reagents priced at
+  buyValue; the frozen 14-member LEGACY_GOLD_POSITIVE_RECIPE_IDS
+  exception list (8 wave-one commons, the 3 caster-hub rows, the 3
+  combos; recipe_tough_jerky and the 6 tools clear) is pinned three ways
+  (subset of PRE_TRAINING_RECIPE_IDS, every member still violates so it
+  self-prunes, exact literals) and is a Phase 15 burn-down target, never
+  an escape hatch for new content. The same file pins referential
+  integrity (trainer homes resolve via stationTypeForCraft(professionId),
+  which also covers the station-free combos), material demand coverage
+  for every Phase 4 and Phase 10 material id, and the ladder shape rules.
+  i18n: 68 new entities.items.<id>.name keys with five non-Latin overlay
+  fills each; three new aura keys (aura.elixirBoar,
+  aura.elixirVenomfire, aura.elixirSerpent) beside aura.elixirBear in
+  sim_i18n (baseEnTable, the 14 locale DICT blocks, AURA_NAME_KEY
+  reverse rows), S3 guard green.
+  Drift and flags: distinct elixirs stack with each other and the bear
+  (per-item power capped at the bear's 12; a single shared battle-elixir
+  slot would be a sim change, maintainer call); recipeForResultItem still
+  scans COMMON_RECIPES only, so ladder outputs are invisible to the
+  Battlefield Experience reverse lookup (pre-existing for every
+  non-common table); the wiki generator does not yet enumerate recipe
+  records (guide professions rewrite stays Phase 15); each craft's cheap
+  reagent is stocked only at its master's hub (economy INFO, same class
+  as the Phase 9 premium-reagent note); the shipped-items golden re-mint
+  also absorbed 24 ids earlier phases had shipped without re-minting
+  (append-only).
+  Phase 10 QA (2026-07-19) landed on top: harvestCorpse now grants ALL
+  plain yields before any signed instance (signed-family instances next,
+  specimens last as guarded extras; rarity draws stay in the first loop
+  in yield order so the draw sequence and parity goldens are
+  byte-identical). The reorder closes a real capacity break: on a corpse
+  with two specimen families (wild_boar hide+meat, webwood_spider
+  silk+venomSac) a jackpot granted mid-loop could consume the slot the
+  pre-gate reserved for a later family's plain stack and push the
+  uncapped plain grant past capacity (17 of 16, reproduced at seed 1;
+  pinned in tests/corpse_harvest_sim.test.ts). Also QA-landed: the
+  ladder execution suite tests/ladder_crafting.test.ts (all 54 recipes
+  craft end to end, the four specimen consumers consume real signed
+  instance slots, trainRecipe charges the real rungs, the three elixir
+  defs are pinned literally and apply through useItem, silkspun_satchel
+  contributes its authored 10 slots); a literal
+  HARVEST_COMPONENT_SPECIMENS pin plus behavior arms for every specimen
+  family and the cloth signed-regular arm; the train_view locked-row
+  requirement re-pinned to literals (the old expectation composed the
+  production formula and could never red); item_icons BAG_IDS carries
+  the sixth bag so guard F's license-override arm runs for it; the
+  stale inert TOOL_RECIPE_STUBS block in content/professions.ts was
+  swept (the real table is TOOL_RECIPES in recipes.ts, deliberately
+  outside COMMON_RECIPES); and src/ui/icons.ts itemFallback gained a
+  potion/elixir flask branch (the eleven new crafted consumables
+  rendered the junk-trinket fallback; now tinted flasks by function).
+  QA drift flags: wolf_fang is the one harvest family with no consuming
+  recipe (a signed jackpot that can never be crafted with; Phase 15
+  candidate: a consumer recipe or demoting fang out of
+  HARVEST_COMPONENT_ITEMS); the recipeForResultItem gap is sharper than
+  the Phase 10 note stated (zero COMMON outputs have rare+ def quality,
+  so every item that can pass battlefieldExperienceTrickle's
+  def-quality gate is unresolvable and the trickle stays dormant;
+  widening the scan to ALL_RECIPES is a one-line change but a live
+  gameplay switch, maintainer call); cooking's "combat-worthy
+  consumable at every rung" is satisfied by sit-heal foodHp values
+  only, no buff food exists at any rung (maintainer glance if the
+  amendment intended buff food); the aura M16 fills live in sim_i18n.ts
+  plus sim_i18n.newlocales.ts, NOT the i18n.locales overlays (which
+  carry the 68 item-name fills), the correct layout for sim-emitted
+  text; the economy invariant's decisiveness was mutation-verified both
+  ways (a seeded gold-positive new recipe reds the sweep, a legacy
+  member flipped non-violating reds the self-pruning arm).
 - Phase 13: (planned) disenchantItem/applyEnchant/salvageItem IWorld
   members + wire commands.
 
@@ -706,8 +891,10 @@ tables, i18n key namespaces, files created)
   as the union, delta-key census 47), history rewritten so every commit
   carries a body, and the six review agents passed the amended head with
   zero blocking findings.
-- Exact FIELD_RECIPES membership (Phase 9 decides; default: the 9 common
-  recipes stay field-craftable so nothing breaks).
+- RESOLVED (2026-07-19, Phase 9): exact FIELD_RECIPES membership stays
+  the default, the 9 common recipes remain field-craftable (nothing
+  breaks; combos stay field-craftable but pair-gated and are now
+  trainer-taught; recorded in the Phase 9 surfaces entry).
 - Master NPC names/personalities (content flavor, Phase 8; maintainer may
   want a naming pass).
 - Whether fishing keeps a separate skill id or folds into professionsState

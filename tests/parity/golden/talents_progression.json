@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "b8868d4d",
+      "state": "28f12f87",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -72,6 +72,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -148,7 +149,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "45b24691",
+      "state": "87dd9fcf",
       "events": "dfb18311",
       "rng": {
         "draws": 0,
@@ -204,6 +205,7 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {
               "5": "war_row_double_charge",
@@ -284,7 +286,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "69b03024",
+      "state": "f9e3d02a",
       "events": "e4ae8916",
       "rng": {
         "draws": 0,
@@ -340,6 +342,7 @@
           "lifetimeXp": 167200,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {},
             "spec": "arms"
@@ -417,7 +420,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "1a4c4e11",
+      "state": "1ae3fbdb",
       "events": "e76b12c7",
       "rng": {
         "draws": 0,
@@ -488,6 +491,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {
               "8": "war_row_victory_rush"
@@ -567,7 +571,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "a5073db2",
+      "state": "3d4ad090",
       "events": "995cddae",
       "rng": {
         "draws": 0,
@@ -638,6 +642,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {
               "8": "war_row_die_by_the_sword"
@@ -717,7 +722,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "e003225c",
+      "state": "45ff16ba",
       "events": "1d6d7623",
       "rng": {
         "draws": 0,
@@ -788,6 +793,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {
               "8": "war_row_die_by_the_sword"
@@ -867,7 +873,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "e003225c",
+      "state": "45ff16ba",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -938,6 +944,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {
               "8": "war_row_die_by_the_sword"

@@ -2941,6 +2941,7 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     { p: 'sack', pal: 'earthBrown' },
     { p: 'paw', ...BR },
   ]),
+  silkspun_satchel: r('cloth', 'sky', [{ p: 'sack', pal: 'sky' }]),
   gravewoven_bag: r('shadow', 'shadowPurple', [{ p: 'sack', pal: 'shadowPurple' }], ['glow']),
   mistcallers_duffel: r(
     'arcane',
@@ -3500,6 +3501,17 @@ function itemFallback(id: string): IconRecipe | null {
     return isFlask
       ? r('drink', 'sky', [{ p: 'potion', pal: 'sky' }])
       : r('drink', 'sky', ['waterskin']);
+  }
+  if (it.kind === 'potion' || it.kind === 'elixir') {
+    // Crafted consumables without curated art (the Phase 10 draughts and
+    // elixirs) render the flask, tinted by function, instead of falling
+    // through to the trinket arm below.
+    const pal: PaletteName = has(name, ['healing'])
+      ? 'ember'
+      : has(name, ['mana'])
+        ? 'sky'
+        : 'venom';
+    return r('arcane', pal, [{ p: 'potion', pal }], it.kind === 'elixir' ? ['sparkle'] : fx);
   }
   if (it.kind === 'tool') {
     const prim: PrimitiveName = has(name, ['pole', 'rod', 'staff']) ? 'staff' : 'mace';
@@ -4210,6 +4222,7 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'gravewoven_bag',
   'linen_pouch',
   'mistcallers_duffel',
+  'silkspun_satchel',
   'travelers_knapsack',
   'wolfhide_satchel',
   // tools (gathering picks/axes/sickles + cosmetic armor-plate skin tokens)

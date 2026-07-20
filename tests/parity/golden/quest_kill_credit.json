@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "b8868d4d",
+      "state": "28f12f87",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -71,6 +71,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -147,7 +148,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "3d7ea4fd",
+      "state": "834c0c77",
       "events": "9b7e48a7",
       "rng": {
         "draws": 0,
@@ -218,6 +219,7 @@
               }
             ]
           ],
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -294,7 +296,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 424,
-      "state": "8731b6e5",
+      "state": "cbb5ad0b",
       "events": "90016984",
       "rng": {
         "draws": 40,
@@ -394,6 +396,7 @@
               }
             ]
           ],
+          "recipesGrandfathered": true,
           "renown": 30,
           "talents": {
             "rows": {}
@@ -472,7 +475,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 424,
-      "state": "eca60932",
+      "state": "2a61c10c",
       "events": "6df26093",
       "rng": {
         "draws": 40,
@@ -563,6 +566,7 @@
           "questsDone": [
             "q_wolves"
           ],
+          "recipesGrandfathered": true,
           "renown": 30,
           "talents": {
             "rows": {}
@@ -642,7 +646,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 424,
-      "state": "441f5757",
+      "state": "8b1963b1",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -733,6 +737,7 @@
           "questsDone": [
             "q_wolves"
           ],
+          "recipesGrandfathered": true,
           "renown": 30,
           "talents": {
             "rows": {}

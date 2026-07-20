@@ -3178,6 +3178,9 @@ describe('full self-state snapshot delta fixture', () => {
       { itemId: 'bone_fragments', count: 4 },
       { itemId: 'linen_scrap', count: 2 },
     ];
+    // Phase 9 acquisition switch: combo recipes are trainer-taught now, so a
+    // fresh test player must learn this one explicitly before crafting it.
+    meta.knownRecipes.add('recipe_ironbound_warplate_helm');
 
     broadcast(server);
     const client = bareClient(session.pid);
@@ -3198,6 +3201,54 @@ describe('full self-state snapshot delta fixture', () => {
       JSON.stringify({ t: 'cmd', cmd: 'craft_item', recipe: recipe.id }),
     );
     expect(server.sim.countItem(recipe.resultItemId, session.pid)).toBe(1);
+  });
+
+  it('train_recipe online: fee hits the self copper and the SORTED knownRecipes rides the cprof delta', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 72, 'Trainee');
+    const meta = server.sim.meta(session.pid)!;
+    meta.craftSkills.armorcrafting = 25; // ironbound is armorcrafting
+    meta.craftSkills.weaponcrafting = 25; // forgeguard is weaponcrafting
+    meta.copper = 10000;
+    // Stand at the Eastbrook forge: training is gated on the STATIC station.
+    const player = server.sim.entities.get(session.pid)!;
+    player.pos = { ...player.pos, x: 7, z: 16.5 };
+    player.prevPos = { ...player.pos };
+
+    broadcast(server);
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.craftingIdentity.knownRecipes).toEqual([]);
+
+    // Learn the two forge combos in REVERSE alphabetical order: the mirror
+    // must come back SORTED (the stable-signature contract), never insertion
+    // ordered, and each train charges its 2500 fee exactly once.
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'train_recipe', recipe: 'recipe_ironbound_warplate_helm' }),
+    );
+    server.handleMessage(
+      session,
+      JSON.stringify({
+        t: 'cmd',
+        cmd: 'train_recipe',
+        recipe: 'recipe_forgeguard_bulwark_gauntlets',
+      }),
+    );
+    expect(server.sim.meta(session.pid)?.copper).toBe(5000);
+
+    fc.sent.length = 0;
+    broadcast(server);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    // Liveness: the ClientWorld read surface reflects the grant with NO
+    // explicit dirty-marking anywhere in the dispatch case (knownRecipes is
+    // part of craftingIdentityFor's JSON, so the cprof maybe() diff fires).
+    expect(client.craftingIdentity.knownRecipes).toEqual([
+      'recipe_forgeguard_bulwark_gauntlets',
+      'recipe_ironbound_warplate_helm',
+    ]);
+    expect(client.copper).toBe(5000);
   });
 
   it('carries every one of the dirtied delta keys on the first snapshot', () => {

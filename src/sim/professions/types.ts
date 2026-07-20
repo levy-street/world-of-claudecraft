@@ -79,6 +79,13 @@ export interface ProfessionRecipeRecord {
   // professions/crafting.ts acquireRecipe) via one of the listed sources
   // before it can be crafted, independent of the player's tier/skill: knowing
   // a recipe and being able to craft it at tier are orthogonal gates.
+  //
+  // AUTHORING DEFAULT (Professions 2.0 Phase 9): trained, not known. Every
+  // recipe authored after Phase 9 (any id NOT in
+  // professions/training.ts PRE_TRAINING_RECIPE_IDS) MUST carry a non-empty
+  // acquisition list; omitting the field is reserved for the pre-Phase-9
+  // grandfathered set and is never correct for new content (a new recipe with
+  // no list would be silently known to every character with no learn step).
   acquisition?: readonly ('trainer' | 'drop' | 'quest')[];
   // Station-bound crafting (Professions 2.0 Phase 8, the hands-vs-stations
   // split; supersedes #1297's requiresHubStation boolean and its level-20

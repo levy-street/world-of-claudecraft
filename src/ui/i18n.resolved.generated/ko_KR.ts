@@ -317,7 +317,11 @@ export const ko_KR: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "시신에서 부활",
       "resurrectAtHealer": "영혼 치유사 (부활의 후유증)",
-      "spiritHealerAlive": "영혼 치유사는 죽은 자를 지킵니다. 당신은 아직 산 자입니다."
+      "spiritHealerAlive": "영혼 치유사는 죽은 자를 지킵니다. 당신은 아직 산 자입니다.",
+      "healerConfirmTitle": "부활의 후유증을 감수하시겠습니까?",
+      "healerConfirmBody": "영혼 치유사가 이 자리에서 부활시켜 주지만, 부활의 후유증으로 모든 능력치가 75% 감소하며 높은 레벨에서는 최대 10분간 지속됩니다. 영혼이 시신까지 걸어가서 부활하면 아무런 불이익이 없습니다.",
+      "healerConfirmAccept": "부활",
+      "healerConfirmCancel": "취소"
     },
     "fct": {
       "absorbed": "{amount} 흡수",
@@ -2226,6 +2230,25 @@ export const ko_KR: EnTranslations = {
       "makersMark": "제작자: {name}",
       "masterworkSeal": "걸작",
       "enchantedLine": "마법부여됨"
+    },
+    "training": {
+      "title": "훈련: {name}",
+      "close": "훈련 닫기",
+      "empty": "이 장인은 가르칠 제조법이 없습니다.",
+      "free": "무료",
+      "stateKnown": "습득함",
+      "stateTeachable": "습득 가능",
+      "stateLocked": "잠김",
+      "requirement": "{craft} {skill}에서 전수",
+      "trainAria": "{fee}(으)로 {name} 습득",
+      "dialogOption": "훈련",
+      "dialogOptionAria": "{name}에게 훈련 받기",
+      "learned": "제조법을 습득했습니다: {recipe}",
+      "tierUnmet": "그 제조법을 배우려면 {craft} {skill}이(가) 필요합니다.",
+      "cannotAfford": "훈련 비용을 지불할 수 없습니다.",
+      "notTaughtHere": "그 제조법은 여기서 가르치지 않습니다.",
+      "alreadyKnown": "이미 알고 있는 제조법입니다.",
+      "outOfRange": "훈련하려면 작업대 옆에 있어야 합니다."
     },
     "finder": {
       "title": "던전 찾기",
@@ -4596,7 +4619,11 @@ export const ko_KR: EnTranslations = {
   },
   "heroicShop": {
     "balance": "영웅의 징표: {count}",
-    "buyAria": "영웅의 징표 {marks}개로 {item} 구매"
+    "buyAria": "영웅의 징표 {marks}개로 {item} 구매",
+    "buyConfirmTitle": "구매 확인",
+    "buyConfirmBody": "영웅의 징표 {marks}개로 {item}을(를) 구매하시겠습니까? 징표 구매는 환불되지 않습니다.",
+    "buyConfirmAccept": "구매",
+    "buyConfirmCancel": "취소"
   },
   "cardDuel": {
     "title": "카드 대결",
@@ -4649,7 +4676,11 @@ export const ko_KR: EnTranslations = {
       "buyAria": "탐굴 증표 {marks}개로 {item} 구매",
       "reqHeroic": "영웅 난이도 클리어 필요",
       "reqClears": "{count}회 클리어 필요",
-      "empty": "재고가 없습니다."
+      "empty": "재고가 없습니다.",
+      "buyConfirmTitle": "구매 확인",
+      "buyConfirmBody": "탐굴 증표 {marks}개로 {item}을(를) 구매하시겠습니까? 증표 구매는 환불되지 않습니다.",
+      "buyConfirmAccept": "구매",
+      "buyConfirmCancel": "취소"
     },
     "tracker": {
       "title": "탐굴",
@@ -8233,6 +8264,210 @@ export const ko_KR: EnTranslations = {
       },
       "gravewyrm_bulwark": {
         "name": "무덤고룡 방벽"
+      },
+      "rough_hide": {
+        "name": "거친 가죽"
+      },
+      "spider_silk": {
+        "name": "거미 비단"
+      },
+      "venom_gland": {
+        "name": "독샘"
+      },
+      "game_meat": {
+        "name": "야생 고기"
+      },
+      "homespun_cloth": {
+        "name": "손으로 짠 천"
+      },
+      "pristine_hide": {
+        "name": "완벽한 가죽"
+      },
+      "pristine_silk": {
+        "name": "완벽한 거미 비단"
+      },
+      "pristine_venom_gland": {
+        "name": "완벽한 독샘"
+      },
+      "prime_cut": {
+        "name": "최상급 고기"
+      },
+      "smithing_flux": {
+        "name": "제련용 융제"
+      },
+      "spool_of_thread": {
+        "name": "실타래"
+      },
+      "tanning_agent": {
+        "name": "무두질 약품"
+      },
+      "cooking_salt": {
+        "name": "요리용 소금"
+      },
+      "glass_vial": {
+        "name": "유리병"
+      },
+      "copper_bearded_axe": {
+        "name": "구리 수염 도끼"
+      },
+      "copper_flanged_mace": {
+        "name": "구리 날개 철퇴"
+      },
+      "ironbark_boar_spear": {
+        "name": "무쇠껍질나무 멧돼지 창"
+      },
+      "ironedge_longsword": {
+        "name": "무쇠날 대검"
+      },
+      "ironshod_maul": {
+        "name": "무쇠 대형 망치"
+      },
+      "whetted_iron_dirk": {
+        "name": "날카로운 무쇠 단검"
+      },
+      "thorium_warblade": {
+        "name": "토륨 전투검"
+      },
+      "arcanite_war_axe": {
+        "name": "비전 전투도끼"
+      },
+      "elderwood_battle_staff": {
+        "name": "고대 딱총나무 전투 지팡이"
+      },
+      "riveted_copper_girdle": {
+        "name": "리벳 구리 허리띠"
+      },
+      "coppermail_sabatons": {
+        "name": "구리 사슬 사바톤"
+      },
+      "coppermail_gauntlets": {
+        "name": "구리 사슬 건틀릿"
+      },
+      "ironlink_hauberk": {
+        "name": "무쇠사슬 갑옷"
+      },
+      "ironlink_legguards": {
+        "name": "무쇠사슬 다리보호구"
+      },
+      "ironlink_spaulders": {
+        "name": "무쇠사슬 어깨보호구"
+      },
+      "thoriumscale_greathelm": {
+        "name": "토륨 비늘 대형 투구"
+      },
+      "thoriumscale_cuirass": {
+        "name": "토륨 비늘 흉갑"
+      },
+      "thoriumscale_leggings": {
+        "name": "토륨 비늘 각반"
+      },
+      "homespun_hood": {
+        "name": "손으로 짠 두건"
+      },
+      "homespun_mitts": {
+        "name": "손으로 짠 벙어리장갑"
+      },
+      "silverthread_slippers": {
+        "name": "은실 슬리퍼"
+      },
+      "goldweave_robe": {
+        "name": "황금직조 로브"
+      },
+      "goldweave_leggings": {
+        "name": "황금직조 각반"
+      },
+      "silkspun_satchel": {
+        "name": "실크 방적 가방"
+      },
+      "silkbinders_raiment": {
+        "name": "실크결속의 의복"
+      },
+      "sunweave_mantle": {
+        "name": "태양직조 망토"
+      },
+      "sunweave_treads": {
+        "name": "태양직조 발보호구"
+      },
+      "fenbridge_hide_leggings": {
+        "name": "펜브릿지 가죽 각반"
+      },
+      "fenbridge_hide_boots": {
+        "name": "펜브릿지 가죽 장화"
+      },
+      "fenbridge_hide_belt": {
+        "name": "펜브릿지 가죽 허리띠"
+      },
+      "marshstalker_jerkin": {
+        "name": "늪추적자 웃옷"
+      },
+      "marshstalker_hood": {
+        "name": "늪추적자 두건"
+      },
+      "marshstalker_spaulders": {
+        "name": "늪추적자 어깨보호구"
+      },
+      "mirewarden_jerkin": {
+        "name": "진흙수호자 웃옷"
+      },
+      "mirewarden_leggings": {
+        "name": "진흙수호자 각반"
+      },
+      "mirewarden_treads": {
+        "name": "진흙수호자 발보호구"
+      },
+      "pan_seared_perch": {
+        "name": "강농어 팬구이"
+      },
+      "hunters_game_skewer": {
+        "name": "사냥꾼의 야생 고기 꼬치"
+      },
+      "herbed_marsh_pike": {
+        "name": "허브 늪지 강꼬치고기"
+      },
+      "ashwood_smoked_eel": {
+        "name": "잿빛나무 훈제 뱀장어"
+      },
+      "goldleaf_game_stew": {
+        "name": "금빛잎 야생 고기 스튜"
+      },
+      "frostgill_chowder": {
+        "name": "서리아가미 차우더"
+      },
+      "silvered_carp_supper": {
+        "name": "은빛 잉어 만찬"
+      },
+      "anglers_feast_platter": {
+        "name": "낚시꾼의 성찬 접시"
+      },
+      "marlows_grand_roast": {
+        "name": "마를로의 대형 구이"
+      },
+      "silverleaf_healing_draught": {
+        "name": "은빛잎 치유 물약"
+      },
+      "silverleaf_mana_draught": {
+        "name": "은빛잎 마나 물약"
+      },
+      "elixir_of_the_boar": {
+        "name": "멧돼지의 비약"
+      },
+      "goldleaf_healing_draught": {
+        "name": "금빛잎 치유 물약"
+      },
+      "goldleaf_mana_draught": {
+        "name": "금빛잎 마나 물약"
+      },
+      "venomfire_elixir": {
+        "name": "독화의 비약"
+      },
+      "sunpetal_healing_draught": {
+        "name": "태양꽃잎 치유 물약"
+      },
+      "sunpetal_mana_draught": {
+        "name": "태양꽃잎 마나 물약"
+      },
+      "elixir_of_the_serpent": {
+        "name": "뱀의 비약"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

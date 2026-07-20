@@ -4783,6 +4783,35 @@
     padding-top: 6px;
   }
 
+  /* ---------- train window ---------- */
+  /* Recipe training (Professions 2.0 Phase 9): the station master's teaching
+     ladder. Rows reuse the vendor family classes (.vendor-item, .vi-name,
+     .vi-price, .vi-sub, .vendor-section-title); only the tri-state additions
+     live here, styled from existing tokens (no new tokens, no new hex). */
+  #train-window {
+    width: 400px;
+  }
+  .train-state {
+    font-family: var(--title-font);
+    font-size: 10px;
+    color: var(--gold);
+  }
+  /* Locked rows stay VISIBLE (the teaching ladder): grayed like a disabled
+     vendor row, with the named requirement on the .vi-sub line. The known
+     row is informational, never interactive, so it drops the hover affordance. */
+  .train-row.train-locked:disabled {
+    opacity: 0.45;
+  }
+  .train-row.train-known {
+    cursor: default;
+  }
+  .train-row.train-known:hover {
+    background: transparent;
+  }
+  .train-row.train-known .train-state {
+    opacity: 0.7;
+  }
+
   /* ---------- bags ---------- */
   /* bags, centred in the bottom gap between the action cluster and micro-menu */
   #bags {

@@ -24,6 +24,13 @@ export interface CraftingIdentityView {
   switchCount: number;
   amendsProgress: number;
   amendsRequired: number;
+  // Recipe training (Professions 2.0 Phase 9): the recipe ids this character
+  // has LEARNED via an acquisition source (trainer/drop/quest), SORTED for
+  // stable signatures (the server's cprof delta diffs the JSON form).
+  // Grandfathered recipes (no acquisition list) are known to everyone WITHOUT
+  // appearing here; full knownness is this set plus the empty-acquisition arm
+  // of src/sim/professions/crafting.ts isRecipeKnown over static content.
+  knownRecipes: readonly string[];
 }
 
 // Static content read: the common-tier recipe list (issue #1127). A plain
@@ -137,6 +144,14 @@ export interface IWorldProfessions {
   // placeMobileCraftingStation); Sim validates and stores on PlayerMeta,
   // ClientWorld sends the place_mobile_station command.
   placeMobileStation(craftId: string): void;
+  // Recipe training (Professions 2.0 Phase 9): learn `recipeId` from the
+  // resident master at its craft's STATIC station (a mobile station never
+  // satisfies training). Server-authoritative: Sim validates via
+  // src/sim/professions/training.ts resolveTrain (already known, trainer
+  // taught, station range, teach tier, fee), charges the tiered fee exactly
+  // once on success, and emits the personal text-free `trainResult` event;
+  // ClientWorld sends the train_recipe command and never decides the outcome.
+  trainRecipe(recipeId: string): void;
   // The craft id of the viewer's own currently ACTIVE (placed, unexpired)
   // mobile station, or null. An identifier, string-free per the seam rule.
   // Offline this reads the live PlayerMeta slot (expiry checked against the

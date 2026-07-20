@@ -19,7 +19,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "b8868d4d",
+      "state": "28f12f87",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -74,6 +74,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -150,7 +151,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "f040b76a",
+      "state": "9a898bcc",
       "events": "ac045378",
       "rng": {
         "draws": 2,
@@ -224,6 +225,7 @@
               "professionId": "mining"
             }
           ],
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -301,7 +303,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 416,
-      "state": "21a325e6",
+      "state": "41de7a20",
       "events": "f1898110",
       "rng": {
         "draws": 7,
@@ -406,6 +408,7 @@
               "professionId": "logging"
             }
           ],
+          "recipesGrandfathered": true,
           "renown": 10,
           "talents": {
             "rows": {}
@@ -485,7 +488,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 416,
-      "state": "0399c089",
+      "state": "d02509b3",
       "events": "00a6b070",
       "rng": {
         "draws": 212,
@@ -1054,6 +1057,7 @@
               "professionId": "herbalism"
             }
           ],
+          "recipesGrandfathered": true,
           "renown": 25,
           "talents": {
             "rows": {}
@@ -1133,7 +1137,7 @@
       "tick": 6,
       "time": 0.3,
       "nextId": 416,
-      "state": "4b0969d4",
+      "state": "4eea1d7a",
       "events": "f7c264db",
       "rng": {
         "draws": 212,
@@ -1317,6 +1321,7 @@
             "ore_eastbrook_1": 120,
             "wood_eastbrook_1": 120.1
           },
+          "recipesGrandfathered": true,
           "renown": 50,
           "talents": {
             "rows": {}

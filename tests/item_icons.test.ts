@@ -34,12 +34,14 @@ function walk(dir: string): string[] {
   return out;
 }
 
-// The 5 equippable bags. Pinned as a literal (guard E cross-checks it against ITEMS), so a
-// renamed bag or a drifted `kind` fails loudly instead of dropping out of the coverage.
+// The 6 equippable bags. Pinned as a literal (guard F walks it for the per-bag license
+// override), so a renamed bag or a drifted `kind` fails loudly instead of dropping out of
+// the coverage.
 const BAG_IDS = [
   'gravewoven_bag',
   'linen_pouch',
   'mistcallers_duffel',
+  'silkspun_satchel',
   'travelers_knapsack',
   'wolfhide_satchel',
 ];
@@ -173,6 +175,7 @@ describe('item webp icons', () => {
       'gravewoven_bag',
       'linen_pouch',
       'mistcallers_duffel',
+      'silkspun_satchel',
       'travelers_knapsack',
       'wolfhide_satchel',
     ]);

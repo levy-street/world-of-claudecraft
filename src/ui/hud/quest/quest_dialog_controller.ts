@@ -19,6 +19,7 @@ import { t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
 import { buildAttunementPreview } from '../../profession_identity_view';
 import { svgIcon } from '../../ui_icons';
+import { isStationMasterNpc } from '../vendor/train_view';
 import { gossipMenuIsEmpty } from './gossip_menu';
 
 export interface QuestDialogTextPort {
@@ -51,6 +52,7 @@ export interface QuestDialogControllerDeps {
   openChronicles(): void;
   openVendor(npcId: number): void;
   openHeroicVendor(npcId: number): void;
+  openTrain(npcId: number): void;
   openMarket(): void;
   openDelveBoard(npcId: number): void;
   openValeCup(): void;
@@ -227,6 +229,9 @@ export class QuestDialogController {
       )
       .map((progress) => progress.questId);
     const hasVendor = npc.vendorItems.length > 0;
+    // Station master (Professions 2.0 Phase 9): the resident master of a
+    // crafting station (stations content masterNpcId) offers recipe training.
+    const hasTraining = isStationMasterNpc(npc.templateId);
     const hasMarket = !!definition?.market;
     const hasHeroicVendor = !!definition?.heroicVendor;
     const hasDelveBoard = Object.values(DELVES).some(
@@ -245,6 +250,7 @@ export class QuestDialogController {
         hasDelveBoard,
         hasVcup: hasValeCup,
         hasCardMaster,
+        hasTraining,
       })
     ) {
       this.close();
@@ -277,6 +283,9 @@ export class QuestDialogController {
     if (hasVendor) {
       html += `<button type="button" class="qd-list-item" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
+    if (hasTraining) {
+      html += `<button type="button" class="qd-list-item" data-train="1" aria-label="${esc(t('hudChrome.training.dialogOptionAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.training.dialogOption'))}</button>`;
+    }
     if (hasMarket) {
       html += `<button type="button" class="qd-list-item" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
     }
@@ -308,6 +317,7 @@ export class QuestDialogController {
     });
     this.bindRoute('[data-vendor]', () => this.deps.openVendor(npc.id));
     this.bindRoute('[data-heroic-shop]', () => this.deps.openHeroicVendor(npc.id));
+    this.bindRoute('[data-train]', () => this.deps.openTrain(npc.id));
     this.bindRoute('[data-market]', this.deps.openMarket);
     this.bindRoute('[data-delve-board]', () => this.deps.openDelveBoard(npc.id));
     this.bindRoute('[data-vcup]', this.deps.openValeCup);

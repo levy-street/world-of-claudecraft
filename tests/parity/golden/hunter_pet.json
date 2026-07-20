@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "3888de3c",
+      "state": "7642597e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -73,6 +73,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -137,7 +138,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 419,
-      "state": "d859a70a",
+      "state": "a9776c08",
       "events": "28d2141c",
       "rng": {
         "draws": 10,
@@ -148,7 +149,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 419,
-      "state": "df2efd83",
+      "state": "f72903c1",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -159,7 +160,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 419,
-      "state": "b0f4762b",
+      "state": "b2bb4bf9",
       "events": "16c09823",
       "rng": {
         "draws": 105,
@@ -170,7 +171,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 419,
-      "state": "4ea20b4e",
+      "state": "e7e8f0ec",
       "events": "741638a5",
       "rng": {
         "draws": 202,
@@ -181,7 +182,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 419,
-      "state": "e8605b5d",
+      "state": "a3f039e3",
       "events": "b4893bed",
       "rng": {
         "draws": 303,
@@ -192,7 +193,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 419,
-      "state": "5f9cdf40",
+      "state": "e1577bee",
       "events": "741638a5",
       "rng": {
         "draws": 406,
@@ -203,7 +204,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 419,
-      "state": "5f9cdf40",
+      "state": "e1577bee",
       "events": "741638a5",
       "rng": {
         "draws": 406,
@@ -284,6 +285,7 @@
           "lifetimeXp": 44000,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "renown": 20,
           "talents": {
             "rows": {}

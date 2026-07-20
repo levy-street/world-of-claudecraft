@@ -329,10 +329,9 @@ function legitNumbers(effect: unknown): Set<number> {
       if (typeof value === 'number') {
         if (key === 'battleRhythm') {
           // Battle Rhythm is a picked/not-picked flag; the every-third-cast
-          // empowerment values live in effect_dispatch.ts (buff_rage_gen 0.2,
-          // buff_dmg_done 0.05), so the stated 20% and 5% are intrinsic.
+          // empowerment value lives in effect_dispatch.ts (buff_rage_gen 0.2),
+          // so the stated 20% is intrinsic.
           out.add(20);
-          out.add(5);
           continue;
         }
         add(value, PCT_FIELDS.has(key));
