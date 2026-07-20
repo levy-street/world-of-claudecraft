@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
     "hudChrome.gathering.nodeName.herb",
@@ -26,6 +27,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmetCorpse"
   ],
   "es_ES": [
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
     "hudChrome.gathering.nodeName.herb",
@@ -42,6 +44,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmetCorpse"
   ],
   "fr_FR": [
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
     "hudChrome.gathering.nodeName.herb",
@@ -58,6 +61,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmetCorpse"
   ],
   "fr_CA": [
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
     "hudChrome.gathering.nodeName.herb",
@@ -75,6 +79,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
     "hudChrome.gathering.nodeName.herb",
@@ -91,6 +96,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmetCorpse"
   ],
   "de_DE": [
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
     "hudChrome.gathering.nodeName.herb",
@@ -111,6 +117,7 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
     "hudChrome.gathering.nodeName.herb",
@@ -128,6 +135,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
     "hudChrome.gathering.nodeName.herb",
@@ -144,6 +152,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmetCorpse"
   ],
   "nl_NL": [
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
     "hudChrome.gathering.nodeName.herb",
@@ -160,6 +169,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmetCorpse"
   ],
   "pl_PL": [
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
     "hudChrome.gathering.nodeName.herb",
@@ -176,6 +186,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmetCorpse"
   ],
   "id_ID": [
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
     "hudChrome.gathering.nodeName.herb",
@@ -192,6 +203,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmetCorpse"
   ],
   "tr_TR": [
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
     "hudChrome.gathering.nodeName.herb",
@@ -208,6 +220,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmetCorpse"
   ],
   "sv_SE": [
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
     "hudChrome.gathering.nodeName.herb",
@@ -224,6 +237,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmetCorpse"
   ],
   "vi_VN": [
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
     "hudChrome.gathering.nodeName.herb",
@@ -240,6 +254,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmetCorpse"
   ],
   "da_DK": [
+    "hudChrome.bank.depositAllTooltip",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
     "hudChrome.gathering.nodeName.herb",

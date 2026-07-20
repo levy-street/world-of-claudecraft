@@ -1997,6 +1997,7 @@ export const da_DK: EnTranslations = {
       "sortAria": "Sortér bankens genstande",
       "searchAria": "Søg i bankens genstande efter navn",
       "depositAll": "Indsæt alle materialer",
+      "depositAllTooltip": "Banks every crafting material and profession tool that fits, leaving gear, consumables and quest items in your bags.",
       "depositAllDone": "Materialer indsat: {count}.",
       "depositAllFull": "Materialer indsat: {count}. Banken er nu fuld.",
       "depositAllNone": "Banken er fuld: intet indsat.",

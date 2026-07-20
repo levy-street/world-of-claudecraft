@@ -7583,6 +7583,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.sortAria': '은행 아이템 정렬',
   'hudChrome.bank.searchAria': '이름으로 은행 아이템 검색',
   'hudChrome.bank.depositAll': '모든 재료 보관',
+  'hudChrome.bank.depositAllTooltip':
+    '보관할 수 있는 제작 재료와 전문 기술 도구를 모두 보관합니다. 장비, 소모품, 퀘스트 아이템은 가방에 남습니다.',
   'hudChrome.bank.depositAllDone': '보관한 재료: {count}.',
   'hudChrome.bank.depositAllFull': '보관한 재료: {count}. 은행이 가득 찼습니다.',
   'hudChrome.bank.depositAllNone': '은행이 가득 참: 아무것도 보관하지 못했습니다.',

@@ -1997,6 +1997,7 @@ export const zh_TW: EnTranslations = {
       "sortAria": "排序銀行物品",
       "searchAria": "依名稱搜尋銀行物品",
       "depositAll": "存入所有材料",
+      "depositAllTooltip": "存入所有放得下的製作材料和專業工具，裝備、消耗品和任務物品會留在背包中。",
       "depositAllDone": "已存入材料：{count}。",
       "depositAllFull": "已存入材料：{count}。銀行已滿。",
       "depositAllNone": "銀行已滿：未存入任何物品。",

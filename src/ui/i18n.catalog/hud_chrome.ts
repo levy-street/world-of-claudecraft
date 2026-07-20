@@ -2085,6 +2085,8 @@ export const hudChromeStrings = {
     // Deposit-all-materials button + its transient summary line. {count} is
     // the number of material stacks moved.
     depositAll: 'Deposit all materials',
+    depositAllTooltip:
+      'Banks every crafting material and profession tool that fits, leaving gear, consumables and quest items in your bags.',
     depositAllDone: 'Materials deposited: {count}.',
     depositAllFull: 'Materials deposited: {count}. Bank now full.',
     depositAllNone: 'Bank full: nothing deposited.',

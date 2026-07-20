@@ -1997,6 +1997,7 @@ export const id_ID: EnTranslations = {
       "sortAria": "Urutkan barang bank",
       "searchAria": "Cari barang bank menurut nama",
       "depositAll": "Setor semua bahan",
+      "depositAllTooltip": "Banks every crafting material and profession tool that fits, leaving gear, consumables and quest items in your bags.",
       "depositAllDone": "Bahan disetor: {count}.",
       "depositAllFull": "Bahan disetor: {count}. Bank kini penuh.",
       "depositAllNone": "Bank penuh: tidak ada yang disetor.",
