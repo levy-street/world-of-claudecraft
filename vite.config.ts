@@ -22,6 +22,8 @@ export default defineConfig({
     },
   },
   test: {
-    exclude: ['**/node_modules/**', '**/dist/**', '**/.claude/**'],
+    // services/* have their own package.json + vitest config; the root run
+    // must not sweep their tests up without their dependencies installed.
+    exclude: ['**/node_modules/**', '**/dist/**', '**/.claude/**', 'services/**'],
   },
 });

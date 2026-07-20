@@ -44,3 +44,33 @@ jobs:
 
       - name: Build client
         run: npm run build
+
+  diem-pool:
+    name: diem-pool tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/diem-pool
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: services/diem-pool/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Run tests
+        run: npm test
+
+      - name: Typecheck
+        run: npm run typecheck
