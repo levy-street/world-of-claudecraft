@@ -172,6 +172,9 @@ const baseEnTable = {
   'log.partyLeaves': '{name} leaves the party.',
   'log.partyLeft': '{name} has left the party.',
   'log.partyRemoved': '{name} has been removed from the party.',
+  // Per-member ready-check follow-up lines (social/ready_check.ts finalizeReadyCheck).
+  'log.readyCheckNotReady': '{name} is not ready.',
+  'log.readyCheckNoResponse': '{name} did not respond to the ready check.',
   'loot.rollWin': '{winner} wins {item} ({roll})',
   'loot.rollWinnerOffline': '{winner} was offline; {item} returned to the corpse.',
   'loot.rollNeed': 'Need Roll - {roll} for {item} by {name}',
@@ -7033,6 +7036,13 @@ const RULES: Rule[] = [
     re: /^Ready check: (\d+) ready, (\d+) not ready, (\d+) no response\.$/,
     build: (m) =>
       t('hudChrome.readyCheck.result', { ready: m[1], notReady: m[2], noResponse: m[3] }),
+  },
+  // Per-member ready-check follow-ups (social/ready_check.ts finalizeReadyCheck).
+  // Player names splice verbatim; "Pet taunt is not ready." resolves via EXACT first.
+  { re: /^(.+) is not ready\.$/, build: (m) => tSim('log.readyCheckNotReady', { name: m[1] }) },
+  {
+    re: /^(.+) did not respond to the ready check\.$/,
+    build: (m) => tSim('log.readyCheckNoResponse', { name: m[1] }),
   },
   { re: /^Your class has no talent tree yet\.$/, build: () => t('game.talents.readout.noTree') },
   {
