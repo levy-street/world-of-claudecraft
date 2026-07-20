@@ -152,6 +152,7 @@
     --color-minimap-outline: #000;
     --color-minimap-gather-ready: #3ef07a;
     --color-minimap-gather-cooldown: #5a5f57;
+    --color-minimap-station: #d98e4a;
 
     /* Talents window: tree arrows + tooltip accents (talents_window.ts references
        these via var() so the painter carries no raw hex). Exact pre-existing values. */

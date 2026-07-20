@@ -1937,16 +1937,21 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'quest', questId: 'q_prof_intro' },
   },
-  // Reagent sourcing: every hub recipe requires one of the six tier 4/5
-  // reagents (thorium_ore, arcanite_bar, ashwood_log, elderwood_log,
+  // Reagent sourcing: every toolworks recipe requires one of the six tier
+  // 4/5 reagents (thorium_ore, arcanite_bar, ashwood_log, elderwood_log,
   // goldleaf_herb, sunpetal_herb), sold by Quartermaster Bree at the
   // Highwatch hub (zone3.ts), so this deed (and feat_book_complete through
   // it) is completable in live play. The vendor-to-craft-to-grant chain is
-  // pinned by tests/professions_crafting_hub.test.ts.
+  // pinned by tests/professions_crafting_hub.test.ts. The stat key stays
+  // 'hubCraftsPerformed' (persisted): since Phase 8 it counts station-bound
+  // crafts at any station (see professions/crafting.ts craftItem).
   prog_tools_of_the_trade: {
     id: 'prog_tools_of_the_trade',
     name: 'Tools of the Trade',
-    desc: 'Complete a station-bound craft at the Highwatch crafting hub.',
+    // Phase 8 reword (stations replaced the single Highwatch hub): the stale
+    // locale desc fills were dropped with it and refill at release
+    // (deed_i18n.locales, English fallback until then).
+    desc: 'Complete a craft at a crafting station.',
     category: 'progression',
     renown: 10,
     trigger: { kind: 'stat', stat: 'hubCraftsPerformed', count: 1 },

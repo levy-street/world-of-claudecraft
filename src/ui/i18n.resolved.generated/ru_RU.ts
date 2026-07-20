@@ -2203,7 +2203,15 @@ export const ru_RU: EnTranslations = {
         "nearTier": "Ремеслу {craft} не хватает {points} навыка до следующего ранга.",
         "dormantKnowledge": "Знания ремесла {craft} сохранены, но неактивны, пока не выбрана его пара или увлечение."
       },
-      "notAtHub": "Чтобы создать это, вы должны находиться у ремесленного центра и иметь требуемый уровень.",
+      "stationRequired": "Для изготовления нужно находиться у станции \"{station}\".",
+      "stationName": {
+        "forge": "Кузница",
+        "kitchens": "Кухни",
+        "apothecary": "Аптекарская",
+        "tannery": "Дубильня",
+        "loom": "Ткацкий станок",
+        "toolworks": "Мастерская"
+      },
       "throttled": "Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.",
       "recipeNotLearned": "Вы еще не изучили этот рецепт.",
       "skillReqLine": "Требуется {craft} {skill}",
@@ -2211,13 +2219,32 @@ export const ru_RU: EnTranslations = {
       "difficultyReduced": "Сниженный рост навыка",
       "difficultyNone": "Без роста навыка",
       "stationBadge": "Станция",
-      "stationOutOfRange": "Чтобы создать это, подойдите к станции ремесленного центра.",
+      "stationOutOfRangeNamed": "Подойдите к станции \"{station}\", чтобы изготовить это.",
       "masterworkToast": "Шедевр! {name}",
       "masterworkZoneLine": "Шедевр от {crafter}: {name}!",
       "tierUpToast": "{craft}: достигнут ранг {tier}!",
       "makersMark": "Создатель: {name}",
       "masterworkSeal": "Шедевр",
       "enchantedLine": "Зачаровано"
+    },
+    "training": {
+      "title": "Обучение: {name}",
+      "close": "Закрыть обучение",
+      "empty": "Этому мастеру нечему вас научить.",
+      "free": "Бесплатно",
+      "stateKnown": "Изучено",
+      "stateTeachable": "Доступно",
+      "stateLocked": "Недоступно",
+      "requirement": "Обучение при {craft} {skill}",
+      "trainAria": "Изучить {name} за {fee}",
+      "dialogOption": "Обучение",
+      "dialogOptionAria": "Пройти обучение у {name}",
+      "learned": "Рецепт изучен: {recipe}",
+      "tierUnmet": "Чтобы изучить этот рецепт, нужен навык {craft} {skill}.",
+      "cannotAfford": "Вам не хватает денег на это обучение.",
+      "notTaughtHere": "Этот рецепт здесь не преподают.",
+      "alreadyKnown": "Вы уже знаете этот рецепт.",
+      "outOfRange": "Для обучения нужно стоять у мастерской."
     },
     "finder": {
       "title": "Поиск подземелий",
@@ -9473,6 +9500,36 @@ export const ru_RU: EnTranslations = {
         "name": "Летописец Зензи",
         "title": "Летопись Терновых высот",
         "greeting": "Гора ничего не забывает, {playerName}, и я тоже. Посмотрим, какие деяния за тобой числятся."
+      },
+      "forgemistress_darva": {
+        "name": "Мастерица кузни Дарва",
+        "title": "Хозяйка кузни",
+        "greeting": "Горн слушается меня, {className}. Принеси хорошую руду, и он станет слушаться и тебя."
+      },
+      "cook_marlow": {
+        "name": "Повар Марлоу",
+        "title": "Хозяин кухни",
+        "greeting": "Из моей кухни ничего не выходит полусырым, {className}. Садись, поешь, а потом обратно в путь."
+      },
+      "weaver_ottilie": {
+        "name": "Ткачиха Оттилия",
+        "title": "Хозяйка ткацкого стана",
+        "greeting": "Береги нити, {className}. За станом твёрдая рука важнее сильной."
+      },
+      "tinker_gizzel": {
+        "name": "Механик Гиззел",
+        "title": "Хозяин мастерской",
+        "greeting": "Пружины, шестерёнки и острые кромки, {className}: в мастерской найдётся всё, чего не хватает твоим рукам."
+      },
+      "tanner_hesk": {
+        "name": "Кожевник Хеск",
+        "title": "Хозяин дубильни",
+        "greeting": "Шкура хороша ровно настолько, насколько хороша выделка, {className}. Чаны готовы, дело за тобой."
+      },
+      "alchemist_verane": {
+        "name": "Алхимик Веран",
+        "title": "Хозяин аптекарской",
+        "greeting": "Отмерь дважды, лей один раз, {className}. В аптекарской не прощают пролитых реактивов."
       },
       "tidewatcher_ondrel": {
         "name": "Ондрел Вейн",

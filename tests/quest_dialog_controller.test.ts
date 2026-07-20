@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DELVES, NPCS } from '../src/sim/data';
+import { DELVES, NPCS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
 import type { Entity } from '../src/sim/types';
 import type { FocusTrapHandle } from '../src/ui/focus_manager';
@@ -81,6 +81,7 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
   const openDelveBoard = vi.fn();
   const openValeCup = vi.fn();
   const openCardDuel = vi.fn();
+  const openTrain = vi.fn();
   const controller = new QuestDialogController({
     element,
     document,
@@ -113,6 +114,7 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
     openDelveBoard,
     openValeCup,
     openCardDuel,
+    openTrain,
     voice,
   });
   return {
@@ -138,6 +140,7 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
     openDelveBoard,
     openValeCup,
     openCardDuel,
+    openTrain,
   };
 }
 
@@ -306,6 +309,30 @@ describe('QuestDialogController', () => {
     cardMaster.controller.open(45);
     cardMaster.element.querySelector<HTMLButtonElement>('[data-card-duel]')?.click();
     expect(cardMaster.openCardDuel).toHaveBeenCalledTimes(1);
+  });
+
+  it('a station master offers the Train option and routes it to openTrain (Phase 9)', () => {
+    // Every STATIONS masterNpcId renders the [data-train] gossip option; the
+    // click routes the NPC ENTITY id (not the template id) to deps.openTrain.
+    const master = harness(npc(46, STATIONS[0].masterNpcId));
+    master.controller.open(46);
+    const button = master.element.querySelector<HTMLButtonElement>('[data-train]');
+    expect(button).not.toBeNull();
+    expect(button?.getAttribute('aria-label')).toBeTruthy();
+    button?.click();
+    expect(master.openTrain).toHaveBeenCalledWith(46);
+    expect(master.release).toHaveBeenCalledWith(false);
+  });
+
+  it('a non-master NPC renders no Train option (Phase 9)', () => {
+    const masters = new Set(STATIONS.map((station) => station.masterNpcId));
+    const plainId = Object.values(NPCS).find(
+      (definition) => !definition.banker && !masters.has(definition.id),
+    )?.id;
+    if (!plainId) throw new Error('non-master NPC fixture not found');
+    const plain = harness(npc(47, plainId));
+    plain.controller.open(47);
+    expect(plain.element.querySelector('[data-train]')).toBeNull();
   });
 
   it('closes stale gossip when the authoritative NPC disappears', () => {

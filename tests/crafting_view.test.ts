@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { archetypeCeilingFor } from '../src/sim/professions/archetype';
+import type { StationType } from '../src/sim/professions/stations';
 import { tierCapability, tierForSkill, tierProgressMultiplier } from '../src/sim/professions/wheel';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import {
@@ -185,8 +186,8 @@ describe('buildCraftingView combo-recipe gate (#1132 review)', () => {
   });
 });
 
-// Phase 6 (#2037): skill-req line, skill-gain difficulty, and the hub-station
-// gate on the rows model.
+// Phase 6 (#2037): skill-req line, skill-gain difficulty, and the station
+// gate (per-type since Phase 8) on the rows model.
 describe('buildCraftingView difficulty and skillReq', () => {
   // Identity where the recipe's craft (cooking) is a MAJOR: the archetype
   // ceiling is Infinity, isolating the ordinary tier curve.
@@ -370,12 +371,14 @@ describe('buildCraftingView difficulty and skillReq', () => {
   });
 });
 
-describe('buildCraftingView hub-station gate (#1297)', () => {
+describe('buildCraftingView station gate (Phase 8, formerly the #1297 hub boolean)', () => {
   function stationRecipe(id: string, reagents: { itemId: string; count: number }[]): RecipeDefLike {
-    return { ...recipe(id, reagents), requiresHubStation: true };
+    // The base recipe helper is professionId 'cooking': kitchens is its craft's
+    // own station type (STATION_TYPE_BY_CRAFT).
+    return { ...recipe(id, reagents), stationType: 'kitchens' };
   }
 
-  it('a station recipe in range carries the badge and stays craftable', () => {
+  it('a station recipe whose type is in the in-range set stays craftable', () => {
     const items = table(item('bone_fragments'), item('recipe_st_result'));
     const view = buildCraftingView(
       [stationRecipe('recipe_st', [{ itemId: 'bone_fragments', count: 1 }])],
@@ -383,9 +386,9 @@ describe('buildCraftingView hub-station gate (#1297)', () => {
       items,
       {},
       { synced: true, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
-      true,
+      new Set<StationType>(['kitchens']),
     );
-    expect(view.recipes[0].station).toEqual({ required: true, inRange: true });
+    expect(view.recipes[0].station).toEqual({ required: true, type: 'kitchens', inRange: true });
     expect(view.recipes[0].craftable).toBe(true);
   });
 
@@ -397,9 +400,23 @@ describe('buildCraftingView hub-station gate (#1297)', () => {
       items,
       {},
       { synced: true, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
-      false,
+      new Set<StationType>(),
     );
-    expect(view.recipes[0].station).toEqual({ required: true, inRange: false });
+    expect(view.recipes[0].station).toEqual({ required: true, type: 'kitchens', inRange: false });
+    expect(view.recipes[0].craftable).toBe(false);
+  });
+
+  it('the in-range set discriminates per type: a different station in range does not satisfy', () => {
+    const items = table(item('bone_fragments'), item('recipe_st_result'));
+    const view = buildCraftingView(
+      [stationRecipe('recipe_st', [{ itemId: 'bone_fragments', count: 1 }])],
+      [{ itemId: 'bone_fragments', count: 1 }],
+      items,
+      {},
+      { synced: true, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
+      new Set<StationType>(['forge', 'loom']),
+    );
+    expect(view.recipes[0].station).toEqual({ required: true, type: 'kitchens', inRange: false });
     expect(view.recipes[0].craftable).toBe(false);
   });
 
@@ -411,13 +428,13 @@ describe('buildCraftingView hub-station gate (#1297)', () => {
       items,
       {},
       { synced: true, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
-      true,
+      new Set<StationType>(['kitchens']),
     );
-    expect(view.recipes[0].station).toEqual({ required: true, inRange: true });
+    expect(view.recipes[0].station).toEqual({ required: true, type: 'kitchens', inRange: true });
     expect(view.recipes[0].craftable).toBe(false);
   });
 
-  it('a recipe without requiresHubStation gets a null station and ignores range', () => {
+  it('a recipe without stationType gets a null station and ignores the in-range set', () => {
     const items = table(item('bone_fragments'), item('recipe_free_result'));
     const view = buildCraftingView(
       [recipe('recipe_free', [{ itemId: 'bone_fragments', count: 1 }])],
@@ -425,17 +442,20 @@ describe('buildCraftingView hub-station gate (#1297)', () => {
       items,
       {},
       { synced: true, activeArchetype: null, pairedMajor: null, hobbyCraft: null },
-      false,
+      new Set<StationType>(),
     );
     expect(view.recipes[0].station).toBeNull();
     expect(view.recipes[0].craftable).toBe(true);
   });
 
-  it('stationInRange defaults to true when omitted', () => {
+  it('the in-range set defaults to EMPTY (out of range) when omitted', () => {
+    // Phase 8 re-pin: the old boolean defaulted to true; the set default is
+    // deliberately conservative, so a caller that forgets to pass it renders
+    // a disabled station row rather than a falsely-enabled one.
     const items = table(item('recipe_st_result'));
     const view = buildCraftingView([stationRecipe('recipe_st', [])], [], items);
-    expect(view.recipes[0].station).toEqual({ required: true, inRange: true });
-    expect(view.recipes[0].craftable).toBe(true);
+    expect(view.recipes[0].station).toEqual({ required: true, type: 'kitchens', inRange: false });
+    expect(view.recipes[0].craftable).toBe(false);
   });
 
   it('never mutates any input across the new difficulty and station paths', () => {
@@ -454,7 +474,14 @@ describe('buildCraftingView hub-station gate (#1297)', () => {
     const snapshots = [inventory, recipes, items, craftSkills, identity].map((v) =>
       JSON.stringify(v),
     );
-    buildCraftingView(recipes, inventory, items, craftSkills, identity, false);
+    buildCraftingView(
+      recipes,
+      inventory,
+      items,
+      craftSkills,
+      identity,
+      new Set<StationType>(['kitchens']),
+    );
     const after = [inventory, recipes, items, craftSkills, identity].map((v) => JSON.stringify(v));
     expect(after).toEqual(snapshots);
   });

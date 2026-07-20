@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CRAFTING_HUB_MIN_LEVEL, CRAFTING_HUB_POS } from '../src/sim/content/professions';
+import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
 import {
   CASTER_HUB_RECIPES,
   COMBO_RECIPES,
@@ -14,6 +14,7 @@ import {
   resolveCraftForRecipe,
 } from '../src/sim/professions/crafting';
 import { MASTERWORK_CHANCE_CAP } from '../src/sim/professions/masterwork';
+import { stationsOfType } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import type { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
@@ -24,6 +25,19 @@ function makeSim(seed = 42) {
 
 function grantItem(sim: Sim, itemId: string, count: number, pid: number) {
   for (let i = 0; i < count; i++) sim.addItem(itemId, 1, pid);
+}
+
+// Phase 8: station-bound recipes gate on POSITION only (the old level-20 hub
+// arm retired), so a harness just walks the player onto the recipe's station
+// (the STATIONS record, so a content re-placement can never strand this).
+function placeAtStationFor(sim: Sim, pid: number, recipeId: string) {
+  const stationType = recipeById(recipeId)?.stationType;
+  if (!stationType) throw new Error(`${recipeId} is not station-bound`);
+  const station = stationsOfType(stationType)[0];
+  const entity = (sim as any).entities.get(pid);
+  entity.pos.x = station.pos.x;
+  entity.pos.z = station.pos.z;
+  entity.prevPos = { ...entity.pos };
 }
 
 describe('recipe content (#1127)', () => {
@@ -63,14 +77,10 @@ describe('TOOL_RECIPES (#1135 de-stub): tier 4/5 tool recipes', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_thorium_mining_pick')!;
-    // #1297: TOOL_RECIPES are station-bound, so this recipe now also requires
-    // presence at the level-20 crafting hub (see professions_crafting_hub.test.ts
-    // for the gate's own dedicated coverage).
-    sim.setPlayerLevel(CRAFTING_HUB_MIN_LEVEL);
-    const entity = (sim as any).entities.get(pid);
-    entity.pos.x = CRAFTING_HUB_POS.x;
-    entity.pos.z = CRAFTING_HUB_POS.z;
-    entity.prevPos = { ...entity.pos };
+    // Phase 8: TOOL_RECIPES are station-bound (toolworks), so this recipe
+    // requires standing at that station; there is NO level arm anymore (see
+    // professions_crafting_hub.test.ts for the gate's dedicated coverage).
+    placeAtStationFor(sim, pid, recipe.id);
     grantItem(sim, 'thorium_ore', 4, pid);
     grantItem(sim, 'mithril_mining_pick', 1, pid);
 
@@ -97,16 +107,18 @@ describe('caster-stat (int/spi) crafting recipes', () => {
     expect(professionIds).toEqual(['armorcrafting', 'leatherworking', 'tailoring']);
     for (const recipe of casterCommon) {
       expect(recipe.skillReq).toBe(0);
-      expect(recipe.requiresHubStation).toBeUndefined();
+      expect(recipe.stationType).toBeUndefined();
     }
   });
 
-  it('CASTER_HUB_RECIPES defines one hub-gated int/spi piece per tailoring/leatherworking/armorcrafting', () => {
+  it('CASTER_HUB_RECIPES defines one station-bound int/spi piece per tailoring/leatherworking/armorcrafting', () => {
     expect(CASTER_HUB_RECIPES.length).toBe(3);
     const professionIds = CASTER_HUB_RECIPES.map((r) => r.professionId).sort();
     expect(professionIds).toEqual(['armorcrafting', 'leatherworking', 'tailoring']);
     for (const recipe of CASTER_HUB_RECIPES) {
-      expect(recipe.requiresHubStation).toBe(true);
+      // Phase 8: each piece is bound to ITS OWN craft's station type
+      // (loom/tannery/forge), never someone else's.
+      expect(recipe.stationType).toBe(STATION_TYPE_BY_CRAFT[recipe.professionId]);
       expect(recipe.skillReq).toBeGreaterThan(0);
       expect(recipe.reagents.length).toBeGreaterThan(0);
     }
@@ -136,15 +148,11 @@ describe('caster-stat (int/spi) crafting recipes', () => {
     expect(sim.countItem('eastbrook_ritual_vestments', pid)).toBe(1);
   });
 
-  it('crafts the hub-tier armorcrafting caster piece once station-gated and reagents held', () => {
+  it('crafts the station-tier armorcrafting caster piece once at the forge with reagents held', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_sootscale_mantle')!;
-    sim.setPlayerLevel(CRAFTING_HUB_MIN_LEVEL);
-    const entity = (sim as any).entities.get(pid);
-    entity.pos.x = CRAFTING_HUB_POS.x;
-    entity.pos.z = CRAFTING_HUB_POS.z;
-    entity.prevPos = { ...entity.pos };
+    placeAtStationFor(sim, pid, recipe.id);
     grantItem(sim, 'thorium_ore', 4, pid);
     grantItem(sim, 'bone_fragments', 2, pid);
 
@@ -574,6 +582,9 @@ describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
     sim.acceptArchetypeQuest('armorcrafting');
     setSkill(sim, pid, 'armorcrafting', 25);
     setSkill(sim, pid, 'weaponcrafting', 25);
+    // Phase 9 acquisition switch: combo recipes are trainer-taught, so the
+    // fresh test player learns this one explicitly before crafting it.
+    (sim as any).players.get(pid).knownRecipes.add(comboRecipe.id);
     grantItem(sim, 'bone_fragments', 4, pid);
     grantItem(sim, 'linen_scrap', 2, pid);
 

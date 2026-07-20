@@ -222,11 +222,13 @@ describe('Temporal Barrier', () => {
     sim.tick();
     let shield = p.auras.find((a) => a.id === 'temporal_barrier');
     expect(shield?.kind).toBe('absorb');
-    // Rank 3 base 160, scaled by the Chronoweave mastery (x1.15 at level 20):
-    // the shield rides the same healer mastery as the heals.
-    expect(shield?.value).toBe(184);
+    // Rank 3 base 160, scaled by the Chronoweave mastery (x1.15 at level 20)
+    // like the heals, plus 25 percent of the caster's spell power (PR #2154's
+    // barrier scaling; the autoEquip level-20 mage carries 40 spell power, so
+    // 184 + 10 = 194).
+    expect(shield?.value).toBe(194);
     // Absorption channels through the normal pipeline: a 100 hit leaves hp
-    // untouched and the shell at 60.
+    // untouched and the shell at 94.
     const mob = addHostile(sim);
     const hp0 = p.hp;
     (
@@ -244,7 +246,7 @@ describe('Temporal Barrier', () => {
     ).dealDamage(mob, p, 100, false, 'physical', null, 'hit');
     expect(p.hp).toBe(hp0);
     shield = p.auras.find((a) => a.id === 'temporal_barrier');
-    expect(shield?.value).toBe(84);
+    expect(shield?.value).toBe(94);
     // A same-caster recast REPLACES to full (the documented absorb rule).
     p.cooldowns.delete('temporal_barrier');
     (p as unknown as { gcdRemaining: number }).gcdRemaining = 0;
@@ -253,7 +255,7 @@ describe('Temporal Barrier', () => {
     sim.tick();
     const shields = p.auras.filter((a) => a.id === 'temporal_barrier');
     expect(shields.length).toBe(1); // never stacks with itself
-    expect(shields[0].value).toBe(184); // fresh full shell
+    expect(shields[0].value).toBe(194); // fresh full shell
     // Expiry: ride past the 10s window and the shell is gone.
     collect(sim, 10.5);
     expect(p.auras.some((a) => a.id === 'temporal_barrier')).toBe(false);

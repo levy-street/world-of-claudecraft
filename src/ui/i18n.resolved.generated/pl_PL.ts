@@ -2203,7 +2203,15 @@ export const pl_PL: EnTranslations = {
         "nearTier": "Do następnego poziomu rzemiosła {craft} brakuje {points} umiejętności.",
         "dormantKnowledge": "Wiedza rzemiosła {craft} jest zachowana, lecz uśpiona, dopóki jego para lub hobby nie będzie aktywne."
       },
-      "notAtHub": "Musisz być w warsztacie rzemieślniczym i mieć wymagany poziom, aby to wytworzyć.",
+      "stationRequired": "You must be at the {station} to craft that.",
+      "stationName": {
+        "forge": "Forge",
+        "kitchens": "Kitchens",
+        "apothecary": "Apothecary",
+        "tannery": "Tannery",
+        "loom": "Loom",
+        "toolworks": "Toolworks"
+      },
       "throttled": "Wytwarzasz zbyt szybko. Zaczekaj chwilę i spróbuj ponownie.",
       "recipeNotLearned": "Nie nauczyłeś się jeszcze tego przepisu.",
       "skillReqLine": "Requires {craft} {skill}",
@@ -2211,13 +2219,32 @@ export const pl_PL: EnTranslations = {
       "difficultyReduced": "Reduced skill gain",
       "difficultyNone": "No skill gain",
       "stationBadge": "Station",
-      "stationOutOfRange": "Move to the crafting hub station to craft this.",
+      "stationOutOfRangeNamed": "Move to the {station} to craft this.",
       "masterworkToast": "Masterwork! {name}",
       "masterworkZoneLine": "{crafter} crafted a masterwork {name}!",
       "tierUpToast": "{craft} advanced to tier {tier}!",
       "makersMark": "Crafted by {name}",
       "masterworkSeal": "Masterwork",
       "enchantedLine": "Enchanted"
+    },
+    "training": {
+      "title": "Training: {name}",
+      "close": "Close training",
+      "empty": "This master has nothing to teach.",
+      "free": "Free",
+      "stateKnown": "Known",
+      "stateTeachable": "Available",
+      "stateLocked": "Locked",
+      "requirement": "Taught at {craft} {skill}",
+      "trainAria": "Learn {name} for {fee}",
+      "dialogOption": "Training",
+      "dialogOptionAria": "Browse training from {name}",
+      "learned": "Recipe learned: {recipe}",
+      "tierUnmet": "You need {craft} {skill} to learn that recipe.",
+      "cannotAfford": "You cannot afford that training.",
+      "notTaughtHere": "That recipe is not taught here.",
+      "alreadyKnown": "You already know that recipe.",
+      "outOfRange": "You must be at the station to train."
     },
     "finder": {
       "title": "Znajdywacz Lochów",
@@ -9473,6 +9500,36 @@ export const pl_PL: EnTranslations = {
         "name": "Kronikarka Zenzie",
         "title": "Kronika Szczytów",
         "greeting": "Góra niczego nie zapomina, {playerName}, i ja też nie. Zobaczmy, czego udało ci się dokonać."
+      },
+      "forgemistress_darva": {
+        "name": "Forgemistress Darva",
+        "title": "Master of the Forge",
+        "greeting": "The forge answers to me, {className}. Bring good ore and it will answer to you too."
+      },
+      "cook_marlow": {
+        "name": "Cook Marlow",
+        "title": "Master of the Kitchens",
+        "greeting": "Nothing leaves my kitchens half-cooked, {className}. Sit, eat, then get back out there."
+      },
+      "weaver_ottilie": {
+        "name": "Weaver Ottilie",
+        "title": "Master of the Loom",
+        "greeting": "Mind the threads, {className}. A steady hand at the loom beats a strong one."
+      },
+      "tinker_gizzel": {
+        "name": "Tinker Gizzel",
+        "title": "Master of the Toolworks",
+        "greeting": "Springs, sprockets, and sharp edges, {className}: the toolworks has whatever your hands lack."
+      },
+      "tanner_hesk": {
+        "name": "Tanner Hesk",
+        "title": "Master of the Tannery",
+        "greeting": "A hide is only as good as its tanning, {className}. The vats are ready when you are."
+      },
+      "alchemist_verane": {
+        "name": "Alchemist Verane",
+        "title": "Master of the Apothecary",
+        "greeting": "Measure twice and pour once, {className}. The apothecary has no patience for spilled reagents."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",

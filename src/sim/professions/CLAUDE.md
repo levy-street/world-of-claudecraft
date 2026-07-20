@@ -29,9 +29,10 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
 - `enchanting.ts` / `salvage.ts`: disenchant + apply an enchant onto a SPECIFIC
   instanced copy (`ItemInstancePayload`); break items back into materials
   (off-wheel, ungated).
-- `tools.ts` / `crafting_hub.ts` / `focus.ts` / `mobile_station.ts`: pure-leaf
-  gates and bonuses (gather-tool tier, level-20 hub, town focus allocation,
-  field crafting station).
+- `tools.ts` / `stations.ts` / `focus.ts` / `mobile_station.ts`: pure-leaf
+  gates and bonuses (gather-tool tier, per-type crafting stations (Phase 8,
+  superseding the retired level-20 hub), town focus allocation, field
+  crafting station).
 - `profession_xp.ts` / `battlefield_xp.ts`: character-XP curves for gather/craft
   actions; the crafted-item attribution XP trickle.
 - `types.ts`: the shared record shapes. `index.ts` is a types-only barrel; the

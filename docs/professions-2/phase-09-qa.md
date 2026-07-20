@@ -3,6 +3,19 @@
 Independent audit of Phase 9: stations visible in both hosts, training live and
 server-authoritative, and no existing character lost a recipe.
 
+As-landed notes for this QA (2026-07-19, authoritative over older wording; details in
+state.md's Phase 9 entry): the taught set is exactly the three COMBO_RECIPES; commons and
+the 75/150 recipes stay grandfathered-known to everyone (so "learn a recipe" beats run on a
+combo at the forge or apothecary). There is NO sim_i18n matcher row for train denials by
+design: trainResult is a text-free structured event rendered via hudChrome.training.* (the
+station_required precedent); verify the keys, do not hunt for a matcher. The grandfather
+normalize is flag-discriminated (recipesGrandfathered): new characters have the flag true
+from creation and must train combos; the legacy fixture is a state blob WITHOUT the flag.
+The parity goldens were regenerated (own commit) purely for the new persisted flag. Mobile
+stations never satisfy training proximity (pinned). The crafting window filters to known
+recipes; the train_not_taught_here arm is content-unreachable until a drop/quest
+acquisition recipe exists (precedence pinned instead).
+
 ## Phase-specific QA emphasis
 
 - Train command replay/idempotency: a duplicated or replayed wire command must never

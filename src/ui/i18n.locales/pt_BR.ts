@@ -7331,8 +7331,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.armor': 'Aumenta a armadura em {pct}%',
   'hudChrome.auraEffect.increasePct.int': 'Aumenta o Intelecto em {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Aumenta o Vigor em {pct}%',
-  'hudChrome.crafting.notAtHub':
-    'Você precisa estar no posto de criação, no nível exigido, para criar isso.',
   'hudChrome.crafting.recipeNotLearned': 'Você ainda não aprendeu essa receita.',
   'hudChrome.crafting.throttled':
     'Você está criando rápido demais. Espere um momento e tente de novo.',

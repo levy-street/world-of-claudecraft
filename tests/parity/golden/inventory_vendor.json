@@ -20,7 +20,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 409,
+      "nextId": 415,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -34,8 +34,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "8886e549",
+      "nextId": 416,
+      "state": "58da384c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -73,7 +73,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -90,6 +90,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -108,7 +109,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             }
           ],
           "blockChance": 0.05,
@@ -121,7 +122,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 409,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -165,9 +166,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "a781bdcc",
-      "events": "ed93bf3b",
+      "nextId": 416,
+      "state": "c15c4ed3",
+      "events": "7db794b1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -206,7 +207,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -231,6 +232,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -249,7 +251,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             }
           ],
           "blockChance": 0.05,
@@ -262,7 +264,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 409,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -306,9 +308,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "42193177",
-      "events": "383988ae",
+      "nextId": 416,
+      "state": "e2f94fac",
+      "events": "aced36d1",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -349,7 +351,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "cryptbone_helm",
@@ -379,6 +381,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -397,7 +400,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             }
           ],
           "blockChance": 0.05,
@@ -410,7 +413,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 130,
-          "id": 409,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -454,9 +457,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "ca1dfe78",
-      "events": "a32daa78",
+      "nextId": 416,
+      "state": "041cd44f",
+      "events": "7b632ab5",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -497,7 +500,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "helmet": "roadwardens_helm",
@@ -527,6 +530,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -545,7 +549,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             }
           ],
           "blockChance": 0.05,
@@ -558,7 +562,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 120,
-          "id": 409,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -602,9 +606,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "aa75b092",
-      "events": "883e8901",
+      "nextId": 416,
+      "state": "41856809",
+      "events": "d7e42320",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -645,7 +649,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -678,6 +682,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -696,7 +701,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             }
           ],
           "blockChance": 0.05,
@@ -709,7 +714,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 409,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -753,9 +758,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "abcb2316",
-      "events": "09dad189",
+      "nextId": 416,
+      "state": "3f38658f",
+      "events": "e7c82b41",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -796,7 +801,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -829,6 +834,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -847,7 +853,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             }
           ],
           "blockChance": 0.05,
@@ -872,7 +878,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 409,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -917,9 +923,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "6a9d9401",
-      "events": "76ea733e",
+      "nextId": 416,
+      "state": "ddc2ebd8",
+      "events": "beac14d0",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -960,7 +966,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -989,6 +995,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -1007,7 +1014,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             }
           ],
           "blockChance": 0.05,
@@ -1032,7 +1039,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 409,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1077,9 +1084,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "70ceda15",
-      "events": "370d20cf",
+      "nextId": 416,
+      "state": "825b91d5",
+      "events": "700fff02",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1121,7 +1128,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1150,6 +1157,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -1168,7 +1176,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             },
             {
               "duration": 900,
@@ -1177,7 +1185,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 409,
+              "sourceId": 415,
               "value": 12
             }
           ],
@@ -1203,7 +1211,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
-          "id": 409,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1248,9 +1256,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "75b51f92",
-      "events": "e8c0c6fe",
+      "nextId": 416,
+      "state": "479a06c6",
+      "events": "5917907c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1293,7 +1301,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1326,6 +1334,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -1344,7 +1353,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             },
             {
               "duration": 900,
@@ -1353,7 +1362,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 409,
+              "sourceId": 415,
               "value": 12
             }
           ],
@@ -1379,7 +1388,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
-          "id": 409,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1424,9 +1433,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "54c6dd7b",
-      "events": "d9a65388",
+      "nextId": 416,
+      "state": "494ec213",
+      "events": "43fbfed4",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1469,7 +1478,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1502,6 +1511,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -1526,7 +1536,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             },
             {
               "duration": 900,
@@ -1535,7 +1545,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 409,
+              "sourceId": 415,
               "value": 12
             }
           ],
@@ -1561,7 +1571,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
-          "id": 409,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1606,9 +1616,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "6e264e64",
-      "events": "11d2e4c2",
+      "nextId": 416,
+      "state": "165a5772",
+      "events": "00fbfb69",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1652,7 +1662,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1681,6 +1691,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -1709,7 +1720,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             },
             {
               "duration": 900,
@@ -1718,7 +1729,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 409,
+              "sourceId": 415,
               "value": 12
             }
           ],
@@ -1744,7 +1755,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
-          "id": 409,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1789,9 +1800,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "4a445f48",
-      "events": "816eee0d",
+      "nextId": 416,
+      "state": "49f3a37a",
+      "events": "6787cd59",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1835,7 +1846,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1868,6 +1879,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -1896,7 +1908,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             },
             {
               "duration": 900,
@@ -1905,7 +1917,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 409,
+              "sourceId": 415,
               "value": 12
             }
           ],
@@ -1931,7 +1943,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
-          "id": 409,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1976,8 +1988,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "4a445f48",
+      "nextId": 416,
+      "state": "49f3a37a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2022,7 +2034,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2055,6 +2067,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -2083,7 +2096,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             },
             {
               "duration": 900,
@@ -2092,7 +2105,7 @@
               "name": "Might of the Bear",
               "remaining": 900,
               "school": "nature",
-              "sourceId": 409,
+              "sourceId": 415,
               "value": 12
             }
           ],
@@ -2118,7 +2131,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
-          "id": 409,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

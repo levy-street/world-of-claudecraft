@@ -7174,8 +7174,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.armor': 'Zvyšuje brnění o {pct} %',
   'hudChrome.auraEffect.increasePct.int': 'Zvyšuje Intelekt o {pct} %',
   'hudChrome.auraEffect.increasePct.sta': 'Zvyšuje Výdrž o {pct} %',
-  'hudChrome.crafting.notAtHub':
-    'Abys to mohl vyrobit, musíš být v řemeslném centru a mít potřebnou úroveň.',
   'hudChrome.crafting.recipeNotLearned': 'Tento recept ses ještě nenaučil.',
   'hudChrome.crafting.throttled': 'Vyrábíš příliš rychle. Chvíli počkej a zkus to znovu.',
   'hudChrome.mobile.chatPlaceholder': 'Něco napiš...',

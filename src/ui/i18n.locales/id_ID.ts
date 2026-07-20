@@ -7332,8 +7332,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.armor': 'Meningkatkan zirah sebesar {pct}%',
   'hudChrome.auraEffect.increasePct.int': 'Meningkatkan Kecerdasan sebesar {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Meningkatkan Stamina sebesar {pct}%',
-  'hudChrome.crafting.notAtHub':
-    'Kamu harus berada di pusat kerajinan, pada level yang disyaratkan, untuk membuat itu.',
   'hudChrome.crafting.recipeNotLearned': 'Kamu belum mempelajari resep itu.',
   'hudChrome.crafting.throttled': 'Kamu membuat terlalu cepat. Tunggu sejenak dan coba lagi.',
   'hudChrome.mobile.chatPlaceholder': 'Katakan sesuatu...',

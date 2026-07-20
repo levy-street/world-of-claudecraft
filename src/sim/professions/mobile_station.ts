@@ -1,23 +1,24 @@
-// Mobile crafting station (#1134): a specialized player can set up a
-// temporary crafting station in the field. Scope note, per this issue's own
-// text: there is currently NO existing "must be near a town crafting
-// station" gate anywhere in this codebase (there is no town/crafting-station
-// system filed at all yet; see the unfiled prerequisite noted in epic
-// #1152's Tier 6 notes). A gate-bypass mechanic has nothing to bypass, so
-// this module implements the MINIMAL viable slice instead: a real, tested,
-// INERT-for-now mechanic. It can be placed (gated on specialization via
-// wheel.ts), has a fixed duration, and is queryable. It currently has no
-// gameplay effect on `resolveCraft` (crafting.ts) because there is no
-// location gate to relax there. Once the town build-out lands a location
-// gate on crafting, `resolveCraft`/`resolveCraftForRecipe` (crafting.ts, #1127)
-// should read `isStationActive` alongside the town-proximity check.
+// Mobile crafting station (#1134, WIRED LIVE in Professions 2.0 Phase 8): a
+// specialized player can set up a temporary crafting station in the field.
+// Originally landed inert (no location gate existed to relax); the Phase 8
+// hands-vs-stations split gave it one: `resolveCraftForRecipe` (crafting.ts)
+// now accepts an ACTIVE own mobile station (isStationActive against the
+// current tick) in place of physical presence at a station, for recipes
+// whose stationType matches stationTypeForCraft(station.craftId)
+// (stations.ts). The per-player slot is `PlayerMeta.mobileStation` (sim.ts):
+// TRANSIENT, never serialized to the character save, since tick-domain
+// expiry is not restart-safe. Placement rides the IWorld
+// `placeMobileStation` member (world_api/professions.ts) and the
+// place_mobile_station wire command (server/game.ts), plus the
+// `/dev mobilestation <craftId>` cheat (dev_commands.ts).
 //
-// Same "caller owns the state" shape as `ToolEffectSlot` (tools.ts): this
-// module holds no state itself, it only builds/queries a plain
-// `MobileCraftingStation` value the caller (a future per-player station
-// slot, e.g. on `PlayerMeta` once one exists) stores and passes back in.
+// Same "caller owns the state" shape as `ToolEffectSlot` (tools.ts): the
+// pure half holds no state itself, it only builds/queries a plain
+// `MobileCraftingStation` value; `placeMobileStationForPlayer` below is the
+// one command-shaped writer, storing onto the resolved player's meta slot.
 
 import { MOBILE_CRAFTING_STATION_DURATION_TICKS } from '../content/professions';
+import type { SimContext } from '../sim_context';
 import { type CraftSkillState, isSpecialized } from './wheel';
 
 export interface MobileCraftingStation {
@@ -61,4 +62,31 @@ export function placeMobileCraftingStation(
 /** True only while `nowTick` is still within the station's placed duration. */
 export function isStationActive(station: MobileCraftingStation, nowTick: number): boolean {
   return nowTick < station.expiresAtTick;
+}
+
+/**
+ * Command body behind the IWorld `placeMobileStation` member and the
+ * `/dev mobilestation` cheat: resolves the caller's player (ctx.resolve, the
+ * same idiom craftItem uses), attempts the specialization-gated placement at
+ * the player's current position, and on success stores the station in the
+ * transient `PlayerMeta.mobileStation` slot (replacing any previous one).
+ * Returns the placed station, or undefined when the caller is unresolvable
+ * or not specialized in `craftId`. Draws no rng; denial has no side effect.
+ */
+export function placeMobileStationForPlayer(
+  ctx: SimContext,
+  craftId: string,
+  pid?: number,
+): MobileCraftingStation | undefined {
+  const r = ctx.resolve(pid);
+  if (!r) return undefined;
+  const station = placeMobileCraftingStation(
+    r.meta.name,
+    craftId,
+    { x: r.e.pos.x, z: r.e.pos.z },
+    r.meta.craftSkills,
+    ctx.tickCount,
+  );
+  if (station) r.meta.mobileStation = station;
+  return station;
 }

@@ -2203,7 +2203,15 @@ export const en_XA: EnTranslations = {
         "nearTier": "[{craft} íš {points} šķíļļ ƒŕóɱ íţš ñéẋţ ţíéŕ.]",
         "dormantKnowledge": "[{craft} ķñóŵļéðĝé íš ŕéţáíñéð ƀúţ ðóŕɱáñţ úñţíļ íţš þáíŕ óŕ ĥóƀƀý íš áçţíʋé.]"
       },
-      "notAtHub": "[Ýóú ɱúšţ ƀé áţ ţĥé çŕáƒţíñĝ ĥúƀ, áţ ţĥé ŕéɋúíŕéð ļéʋéļ, ţó çŕáƒţ ţĥáţ.]",
+      "stationRequired": "[Ýóú ɱúšţ ƀé áţ ţĥé {station} ţó çŕáƒţ ţĥáţ.]",
+      "stationName": {
+        "forge": "[Ƒóŕĝé]",
+        "kitchens": "[Ķíţçĥéñš]",
+        "apothecary": "[Áþóţĥéçáŕý]",
+        "tannery": "[Ţáññéŕý]",
+        "loom": "[Ļóóɱ]",
+        "toolworks": "[Ţóóļŵóŕķš]"
+      },
       "throttled": "[Ýóú áŕé çŕáƒţíñĝ ţóó ɋúíçķļý. Ŵáíţ á ɱóɱéñţ áñð ţŕý áĝáíñ.]",
       "recipeNotLearned": "[Ýóú ĥáʋé ñóţ ļéáŕñéð ţĥáţ ŕéçíþé ýéţ.]",
       "skillReqLine": "[Ŕéɋúíŕéš {craft} {skill}]",
@@ -2211,13 +2219,32 @@ export const en_XA: EnTranslations = {
       "difficultyReduced": "[Ŕéðúçéð šķíļļ ĝáíñ]",
       "difficultyNone": "[Ñó šķíļļ ĝáíñ]",
       "stationBadge": "[Šţáţíóñ]",
-      "stationOutOfRange": "[Ɱóʋé ţó ţĥé çŕáƒţíñĝ ĥúƀ šţáţíóñ ţó çŕáƒţ ţĥíš.]",
+      "stationOutOfRangeNamed": "[Ɱóʋé ţó ţĥé {station} ţó çŕáƒţ ţĥíš.]",
       "masterworkToast": "[Ɱášţéŕŵóŕķ! {name}]",
       "masterworkZoneLine": "[{crafter} çŕáƒţéð á ɱášţéŕŵóŕķ {name}!]",
       "tierUpToast": "[{craft} áðʋáñçéð ţó ţíéŕ {tier}!]",
       "makersMark": "[Çŕáƒţéð ƀý {name}]",
       "masterworkSeal": "[Ɱášţéŕŵóŕķ]",
       "enchantedLine": "[Éñçĥáñţéð]"
+    },
+    "training": {
+      "title": "[Ţŕáíñíñĝ: {name}]",
+      "close": "[Çļóšé ţŕáíñíñĝ]",
+      "empty": "[Ţĥíš ɱášţéŕ ĥáš ñóţĥíñĝ ţó ţéáçĥ.]",
+      "free": "[Ƒŕéé]",
+      "stateKnown": "[Ķñóŵñ]",
+      "stateTeachable": "[Áʋáíļáƀļé]",
+      "stateLocked": "[Ļóçķéð]",
+      "requirement": "[Ţáúĝĥţ áţ {craft} {skill}]",
+      "trainAria": "[Ļéáŕñ {name} ƒóŕ {fee}]",
+      "dialogOption": "[Ţŕáíñíñĝ]",
+      "dialogOptionAria": "[Ɓŕóŵšé ţŕáíñíñĝ ƒŕóɱ {name}]",
+      "learned": "[Ŕéçíþé ļéáŕñéð: {recipe}]",
+      "tierUnmet": "[Ýóú ñééð {craft} {skill} ţó ļéáŕñ ţĥáţ ŕéçíþé.]",
+      "cannotAfford": "[Ýóú çáññóţ áƒƒóŕð ţĥáţ ţŕáíñíñĝ.]",
+      "notTaughtHere": "[Ţĥáţ ŕéçíþé íš ñóţ ţáúĝĥţ ĥéŕé.]",
+      "alreadyKnown": "[Ýóú áļŕéáðý ķñóŵ ţĥáţ ŕéçíþé.]",
+      "outOfRange": "[Ýóú ɱúšţ ƀé áţ ţĥé šţáţíóñ ţó ţŕáíñ.]"
     },
     "finder": {
       "title": "[Ðúñĝéóñ Ƒíñðéŕ]",
@@ -9473,6 +9500,36 @@ export const en_XA: EnTranslations = {
         "name": "[Çĥŕóñíçļéŕ Žéñžíé]",
         "title": "[Ţĥé Þéáķš Çĥŕóñíçļé]",
         "greeting": "[Ţĥé ɱóúñţáíñ ƒóŕĝéţš ñóţĥíñĝ, {playerName}, áñð ñéíţĥéŕ ðó Í. Ļéţ úš šéé ŵĥáţ ýóú ĥáʋé ðóñé.]"
+      },
+      "forgemistress_darva": {
+        "name": "[Ƒóŕĝéɱíšţŕéšš Ðáŕʋá]",
+        "title": "[Ɱášţéŕ óƒ ţĥé Ƒóŕĝé]",
+        "greeting": "[Ţĥé ƒóŕĝé áñšŵéŕš ţó ɱé, {className}. Ɓŕíñĝ ĝóóð óŕé áñð íţ ŵíļļ áñšŵéŕ ţó ýóú ţóó.]"
+      },
+      "cook_marlow": {
+        "name": "[Çóóķ Ɱáŕļóŵ]",
+        "title": "[Ɱášţéŕ óƒ ţĥé Ķíţçĥéñš]",
+        "greeting": "[Ñóţĥíñĝ ļéáʋéš ɱý ķíţçĥéñš ĥáļƒ-çóóķéð, {className}. Šíţ, éáţ, ţĥéñ ĝéţ ƀáçķ óúţ ţĥéŕé.]"
+      },
+      "weaver_ottilie": {
+        "name": "[Ŵéáʋéŕ Óţţíļíé]",
+        "title": "[Ɱášţéŕ óƒ ţĥé Ļóóɱ]",
+        "greeting": "[Ɱíñð ţĥé ţĥŕéáðš, {className}. Á šţéáðý ĥáñð áţ ţĥé ļóóɱ ƀéáţš á šţŕóñĝ óñé.]"
+      },
+      "tinker_gizzel": {
+        "name": "[Ţíñķéŕ Ĝížžéļ]",
+        "title": "[Ɱášţéŕ óƒ ţĥé Ţóóļŵóŕķš]",
+        "greeting": "[Šþŕíñĝš, šþŕóçķéţš, áñð šĥáŕþ éðĝéš, {className}: ţĥé ţóóļŵóŕķš ĥáš ŵĥáţéʋéŕ ýóúŕ ĥáñðš ļáçķ.]"
+      },
+      "tanner_hesk": {
+        "name": "[Ţáññéŕ Ĥéšķ]",
+        "title": "[Ɱášţéŕ óƒ ţĥé Ţáññéŕý]",
+        "greeting": "[Á ĥíðé íš óñļý áš ĝóóð áš íţš ţáññíñĝ, {className}. Ţĥé ʋáţš áŕé ŕéáðý ŵĥéñ ýóú áŕé.]"
+      },
+      "alchemist_verane": {
+        "name": "[Áļçĥéɱíšţ Ʋéŕáñé]",
+        "title": "[Ɱášţéŕ óƒ ţĥé Áþóţĥéçáŕý]",
+        "greeting": "[Ɱéášúŕé ţŵíçé áñð þóúŕ óñçé, {className}. Ţĥé áþóţĥéçáŕý ĥáš ñó þáţíéñçé ƒóŕ šþíļļéð ŕéáĝéñţš.]"
       },
       "tidewatcher_ondrel": {
         "name": "[Óñðŕéļ Ʋáñé]",

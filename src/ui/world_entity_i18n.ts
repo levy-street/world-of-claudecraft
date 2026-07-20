@@ -146,6 +146,12 @@ const NPC_IDS = [
   'chronicler_saul', // Book of Deeds Chronicler (Eastbrook, zone 1)
   'chronicler_osric_fenn', // Book of Deeds Chronicler (Fenbridge, zone 2)
   'chronicler_edda_hartwell', // Book of Deeds Chronicler (Highwatch, zone 3)
+  'forgemistress_darva', // crafting-station master: forge (Eastbrook, zone 1)
+  'cook_marlow', // crafting-station master: kitchens (Eastbrook, zone 1)
+  'weaver_ottilie', // crafting-station master: loom (Eastbrook, zone 1)
+  'tinker_gizzel', // crafting-station master: toolworks (Eastbrook, zone 1)
+  'tanner_hesk', // crafting-station master: tannery (Fenbridge, zone 2)
+  'alchemist_verane', // crafting-station master: apothecary (Highwatch, zone 3)
 ] as const;
 
 const QUEST_IDS = [

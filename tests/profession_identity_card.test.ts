@@ -30,6 +30,7 @@ describe('profession identity card painter contract', () => {
       switchCount: 1,
       amendsProgress: 0,
       amendsRequired: 8,
+      knownRecipes: [],
     };
 
     renderProfessionIdentityCard(parent, buildProfessionIdentityView(identity));
@@ -138,7 +139,7 @@ describe('profession identity card painter contract', () => {
             reagents: [],
             skillReq: 0,
             difficulty: 'full',
-            station: { required: true, inRange: false },
+            station: { required: true, type: 'toolworks', inRange: false },
             craftable: false,
           },
         ],
@@ -162,12 +163,11 @@ describe('profession identity card painter contract', () => {
     expect(badge?.classList.contains('out-of-range')).toBe(true);
     // Never a bare disabled button: the reason text sits ADJACENT, outside the
     // button's :disabled opacity (the combo-note pattern), and the aria name
-    // carries the same sentence for non-visual users.
-    expect(stationNote?.textContent).toBe('Move to the crafting hub station to craft this.');
+    // carries the same sentence for non-visual users. Phase 8 re-pin: the
+    // note now NAMES the station type (stationOutOfRangeNamed + stationName).
+    expect(stationNote?.textContent).toBe('Move to the Toolworks to craft this.');
     expect(button?.contains(stationNote ?? null)).toBe(false);
-    expect(button?.getAttribute('aria-label')).toContain(
-      'Move to the crafting hub station to craft this.',
-    );
+    expect(button?.getAttribute('aria-label')).toContain('Move to the Toolworks to craft this.');
     // Full-gain difficulty still renders its text label (never color-only).
     expect(button?.querySelector('.crafting-difficulty')?.textContent).toBe('Full skill gain');
   });
@@ -305,7 +305,7 @@ describe('crafting window Phase 6 QA pins', () => {
             reagents: [],
             skillReq: 25,
             difficulty: 'full' as const,
-            station: { required: true, inRange: true },
+            station: { required: true, type: 'forge' as const, inRange: true },
             craftable: true,
           },
         ],
@@ -333,7 +333,7 @@ describe('crafting window Phase 6 QA pins', () => {
             reagents: [],
             skillReq: 25,
             difficulty: 'full' as const,
-            station: { required: true, inRange: false },
+            station: { required: true, type: 'forge' as const, inRange: false },
             craftable: false,
           },
         ],
@@ -344,27 +344,43 @@ describe('crafting window Phase 6 QA pins', () => {
     const html = build();
     expect(html).toContain('Requires Armorcrafting 25');
     expect(html).toContain('Full skill gain');
-    expect(html).toContain('Move to the crafting hub station to craft this.');
+    expect(html).toContain('Move to the Forge to craft this.');
   });
 });
 
 describe('crafting window station-range repaint liveness (source pins)', () => {
   const hud = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
 
-  it('the slow band repaints an OPEN window only when the live predicate flips', () => {
-    // Walking into/out of hub range must refresh the cold painter's rows
-    // (out-of-range note, disabled state) without a per-frame repaint: the
-    // slow band compares the live predicate against the last painted value.
+  it('the slow band repaints an OPEN window only when the live in-range set changes', () => {
+    // Walking into/out of a station's range (or the own mobile station
+    // appearing/expiring) must refresh the cold painter's rows (out-of-range
+    // note, disabled state) without a per-frame repaint: the slow band
+    // compares the live set's signature against the last painted one.
     expect(hud).toContain("$('#crafting-window').style.display === 'block' &&");
     expect(hud).toMatch(
-      /canUseCraftingHubStation\(sim\.player\.pos, sim\.player\.level\) !==\s*this\.lastCraftingStationInRange/,
+      /stationTypesSignature\(inRangeStationTypes\(sim\.player\.pos, sim\.activeMobileStationCraft\)\) !==\s*this\.lastCraftingStationSig/,
     );
   });
 
-  it('renderCrafting records the painted value and feeds the same predicate to the view', () => {
-    expect(hud).toContain(
-      'const stationInRange = canUseCraftingHubStation(this.sim.player.pos, this.sim.player.level);',
+  it('renderCrafting records the painted signature and feeds the same set to the view', () => {
+    expect(hud).toMatch(
+      /const inRangeStations = inRangeStationTypes\(\s*this\.sim\.player\.pos,\s*this\.sim\.activeMobileStationCraft,\s*\);/,
     );
-    expect(hud).toContain('this.lastCraftingStationInRange = stationInRange;');
+    expect(hud).toContain('this.lastCraftingStationSig = stationTypesSignature(inRangeStations);');
+  });
+});
+
+describe('craftResult deny toast names the station (source pins)', () => {
+  const hud = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+
+  it('station_required resolves the type from recipe content (no station field rides the event)', () => {
+    expect(hud).toMatch(
+      /ev\.reason === 'station_required' \? recipeById\(ev\.recipeId\)\?\.stationType : undefined/,
+    );
+  });
+
+  it('a resolved type renders the NAMED toast via stationRequired + stationNameText', () => {
+    expect(hud).toContain("t('hudChrome.crafting.stationRequired', {");
+    expect(hud).toContain('station: stationNameText(deniedStationType),');
   });
 });

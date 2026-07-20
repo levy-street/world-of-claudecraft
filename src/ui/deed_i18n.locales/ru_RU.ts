@@ -671,7 +671,6 @@ export const table: DeedLocaleTable = {
   },
   prog_tools_of_the_trade: {
     name: 'Орудия ремесла',
-    desc: 'Завершите изделие, требующее станка, в ремесленном центре Хайвотча.',
   },
   dgn_nythraxis_crypt: {
     name: 'Что хранил склеп',

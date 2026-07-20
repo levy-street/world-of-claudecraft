@@ -689,6 +689,125 @@ export const TARGETS = [
       return { clip: '#professions-window' };
     },
   },
+  {
+    key: 'train-window',
+    label: 'Train view: station-master recipe training ladder',
+    when: ['ui/hud/vendor/train_view', 'ui/hud/vendor/train_window'],
+    // Desktop and mobile: the three-state teaching ladder is actionable info (a
+    // player decides what to train), so it must read on both form factors.
+    variants: [
+      { key: 'desktop', charClass: 'warrior', charName: 'Forgeheart' },
+      { key: 'mobile', charClass: 'warrior', charName: 'Anvilmar', mobile: true },
+    ],
+    // Show all three row states in one frame at Forgemistress Darva's forge. Set
+    // the viewer's craft skills so the forge ladder renders every state at once:
+    // weaponcrafting at tier 1 (skill 30) makes recipe_forgeguard_bulwark_gauntlets
+    // TEACHABLE at a 25s fee; armorcrafting at tier 0 (skill 10) leaves
+    // recipe_ironbound_warplate_helm LOCKED with its named "Taught at ... 25"
+    // requirement; the acquisition-free commons of both crafts read KNOWN. The two
+    // combo recipes are grandfathered into knownRecipes for existing saves, so drop
+    // them from the set first or they would read KNOWN too. Give the player enough
+    // copper that the fee reads affordable. openTrain takes the master's ENTITY id
+    // (renderTrain does sim.entities.get(id).templateId), so resolve the entity, not
+    // the template id.
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      // Set state and open the window in ONE evaluate: the ticking sim would drift
+      // between two evaluates, and renderTrain reads the state synchronously here.
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const master = [...sim.entities.values()].find(
+          (e) => e.templateId === 'forgemistress_darva',
+        );
+        if (!master) return { ok: false, reason: 'no forgemistress_darva entity' };
+        const meta = sim.players.get(sim.primaryId);
+        if (!meta) return { ok: false, reason: 'no primary player meta' };
+        meta.craftSkills = { ...meta.craftSkills, weaponcrafting: 30, armorcrafting: 10 };
+        meta.knownRecipes.delete('recipe_forgeguard_bulwark_gauntlets');
+        meta.knownRecipes.delete('recipe_ironbound_warplate_helm');
+        sim.copper = 100000;
+        // The HUD auto-closes the train window when the player is more than 8yd
+        // from the master (hud.ts openTrainNpcId proximity check), so stand the
+        // player right beside Darva in this SAME evaluate or the next tick closes it.
+        const p = sim.player;
+        if (p?.pos) {
+          p.pos.x = master.pos.x;
+          p.pos.z = master.pos.z - 2;
+        }
+        const el = document.querySelector('#train-window');
+        if (el) el.style.display = 'none';
+        game.hud.openTrain(master.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`train-window setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#train-window');
+      if (!open) throw new Error('train window did not open');
+      // Verify the ladder rendered all three states (the whole point of the shot).
+      const states = await page.evaluate(() => ({
+        known: document.querySelectorAll('#train-window .train-known').length,
+        teachable: document.querySelectorAll('#train-window .train-teachable').length,
+        locked: document.querySelectorAll('#train-window .train-locked').length,
+      }));
+      if (!(states.known > 0 && states.teachable > 0 && states.locked > 0)) {
+        throw new Error(`train ladder missing a state: ${JSON.stringify(states)}`);
+      }
+      if (variant?.mobile) {
+        // The short landscape viewport cannot show the whole ladder at once, and
+        // the teachable (AVAILABLE) row sits last; scroll it to the bottom so the
+        // frame carries all three states (a KNOWN and the LOCKED row stay above it).
+        await page.evaluate(() => {
+          document
+            .querySelector('#train-window .train-teachable')
+            ?.scrollIntoView({ block: 'end' });
+        });
+        await wait(300);
+      }
+      return { clip: '#train-window' };
+    },
+  },
+  {
+    key: 'station-props',
+    label: 'Crafting-station scenery (Eastbrook forge)',
+    when: ['render/stations', 'src/sim/content/professions'],
+    variants: [{ key: 'desktop', charClass: 'warrior', charName: 'Forgeheart' }],
+    // A world-scene shot of the Eastbrook forge station props (anvil + reused
+    // crate/barrel clutter) beside Forgemistress Darva, framed the way a player
+    // walks up to it. The station sits at STATIONS station_eastbrook_forge
+    // {x:7, z:16.5} (content/professions.ts); stand a few yards south-east and
+    // face it (the gather-node facing idiom: atan2(dx, dz) toward the target).
+    // The GLB streams in on first view, so wait generously before the frame.
+    // Full-viewport shot (return {}), no selector clip: this is scenery, not a
+    // window, and the corner minimap with its new station diamond marker rides
+    // along.
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        const p = window.__game?.sim?.player;
+        if (p?.pos) {
+          // Eastbrook forge station (content/professions.ts station_eastbrook_forge).
+          const forge = { x: 7, z: 16.5 };
+          p.pos.x = 10;
+          p.pos.z = 10;
+          p.facing = Math.atan2(forge.x - p.pos.x, forge.z - p.pos.z);
+        }
+      });
+      // The anvil GLB and station clutter stream in on first view; wait generously.
+      await wait(4500);
+      await page.evaluate(() => document.querySelector('#gpu-notice')?.remove());
+      return {};
+    },
+  },
 ];
 
 // Map a list of changed file paths to the targets they imply (deduped, registry order).

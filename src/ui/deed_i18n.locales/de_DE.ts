@@ -678,7 +678,6 @@ export const table: DeedLocaleTable = {
   },
   prog_tools_of_the_trade: {
     name: 'Werkzeuge des Handwerks',
-    desc: 'Schließe eine an eine Werkstation gebundene Herstellung im Handwerkszentrum von Highwatch ab.',
   },
   dgn_nythraxis_crypt: {
     name: 'Was die Krypta hütete',

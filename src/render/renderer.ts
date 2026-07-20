@@ -153,6 +153,7 @@ import { isSharedGeometry, isSharedMaterial } from './shared_resource';
 import { buildClouds, buildSky, type SkyView } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { freezeStaticMatrices } from './static_matrix';
+import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import {
@@ -1540,6 +1541,16 @@ export class Renderer {
     setRenderCategory(artisanRow.group, 'props');
     this.scene.add(artisanRow.group);
     freezeStaticMatrices(artisanRow.group);
+
+    // Crafting-station scenery (Professions 2.0): static, except the kitchens
+    // fire, whose flame + light join the campfire flicker/ember pass above.
+    const stationProps = buildStationProps(this.sim.cfg.seed);
+    setRenderCategory(stationProps.group, 'props');
+    this.scene.add(stationProps.group);
+    freezeStaticMatrices(stationProps.group);
+    for (const flame of stationProps.flames) flame.matrixAutoUpdate = true;
+    this.flames.push(...stationProps.flames);
+    this.fireLights.push(...stationProps.fireLights);
 
     // selection ring — a classic target reticle: a base ring plus four
     // inward-pointing ticks. The base ring is draped over the terrain each

@@ -1,5 +1,18 @@
 # Phase 09: Station presence and recipe training
 
+As landed (2026-07-19, authoritative where it deviates from the older wording below; the
+full surface list is state.md's Phase 9 entry): the wave-one trainer-taught set is exactly
+the three COMBO_RECIPES (the locked "uncommon at 25" rung; commons and the 75/150
+TOOL/CASTER recipes keep empty acquisition, grandfathered known to everyone). The tier
+denial does NOT use a sim_i18n matcher row: trainResult is a text-free structured SimEvent
+(the Phase 6/8 station_required precedent) whose five stable deny ids render via
+hudChrome.training.* keys, satisfying the S3 duty by construction. Grandfathering is
+flag-discriminated (recipesGrandfathered, the mailWelcomed idiom): a load missing the flag
+unions the frozen 21-id PRE_TRAINING_RECIPE_IDS once; NEW characters carry the flag from
+creation and train the combos instead. Training proximity accepts STATIC stations only (a
+mobile crafting station never satisfies training). The crafting window now lists known
+recipes only; unlearned trainer recipes surface in the Train ladder.
+
 Phase 8 landed the typed station registry and master NPC records in sim and server; this phase
 makes them real to players. Stations render as visible props in the world, show on the minimap,
 and their masters teach recipes for gold through a Train view that is skill-tier gated with a
@@ -24,9 +37,9 @@ truth exists (Phase 8), and the recipe ladder content that depends on live train
 - `src/ui/hud/vendor/`: the vendor window family (`vendor_view.ts` pure core,
   `vendor_window.ts` painter; the heroic variant shows how the family extends).
 - `src/sim/professions/crafting.ts` (`acquireRecipe`, `acquireRecipeForRecipe`,
-  `isRecipeKnown`), `src/sim/professions/types.ts` (`knownRecipes`),
-  `src/sim/professions/crafting_hub.ts` (today's station gate), and the Phase 8 station
-  registry module named in `state.md`.
+  `isRecipeKnown`, and the `resolveCraftForRecipe` station gate),
+  `src/sim/professions/types.ts` (`knownRecipes`), and the Phase 8 station registry
+  `src/sim/professions/stations.ts` named in `state.md` (`crafting_hub.ts` is deleted).
 - `src/world_api/professions.ts` (the facet for the new command) and
   `tests/world_api_parity.test.ts` (the pin).
 - `server/game.ts` (command dispatch) and `src/net/online.ts` (wire command send plus the
@@ -61,8 +74,8 @@ Spawn one Explore agent to read and summarize:
 - docs/professions-2/phase-09-station-training.md (this phase file)
 - src/render/props.ts, src/render/characters/manifest.ts (NPC_KEYS), src/ui/minimap_markers.ts,
   src/ui/minimap_painter.ts, the src/ui/hud/vendor/ modules, src/sim/professions/crafting.ts,
-  src/sim/professions/types.ts, src/sim/professions/crafting_hub.ts, the Phase 8 station
-  registry module (see state.md "New surfaces per phase"), src/world_api/professions.ts,
+  src/sim/professions/types.ts, src/sim/professions/stations.ts (the Phase 8 station
+  registry; see state.md "New surfaces per phase"), src/world_api/professions.ts,
   server/game.ts (command dispatch only), src/net/online.ts (command send + ClientWorld mirror)
 - CLAUDE.md files: src/sim/CLAUDE.md, src/sim/professions/CLAUDE.md, src/render/CLAUDE.md,
   src/ui/CLAUDE.md, src/ui/hud/CLAUDE.md, src/world_api/CLAUDE.md, src/styles/CLAUDE.md

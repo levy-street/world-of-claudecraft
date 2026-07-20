@@ -7,7 +7,7 @@
 // Scope: COMMON_RECIPES all carry skillReq 0 (the free floor: a common-tier
 // recipe is craftable with zero craft skill, gated only by having the
 // materials). The file has since grown past that floor: TOOL_RECIPES
-// (skillReq 75/150, station-bound at the level-20 hub) and COMBO_RECIPES
+// (skillReq 75/150, station-bound at the toolworks) and COMBO_RECIPES
 // (skillReq 25, the #1132 dual-craft gate) sit alongside it. There is still
 // no skillReq admission gate anywhere: crafting.ts reads skillReq only for
 // skill-gain scaling, and itemLevelBudget feeds the #1301 gold sink.
@@ -32,6 +32,17 @@
 // materials as the common tier; outputs reuse existing BASE_ITEMS entries
 // (boundstone_helm, gravewyrm_gauntlets, elixir_of_the_bear) for the same
 // i18n reason as above.
+//
+// Acquisition (Professions 2.0 Phase 9, locked scope): ONLY the three
+// COMBO_RECIPES carry `acquisition: ['trainer']`, learned from the resident
+// master at their craft's station (professions/training.ts resolveTrain).
+// COMMON_RECIPES, TOOL_RECIPES, and CASTER_HUB_RECIPES deliberately keep NO
+// acquisition field: state.md locks them grandfathered, known to everyone via
+// the empty-acquisition arm of crafting.ts isRecipeKnown. Existing characters
+// keep the combo recipes too, via the one-time grandfather union
+// (training.ts PRE_TRAINING_RECIPE_IDS / grandfatherKnownRecipes); every
+// recipe authored AFTER Phase 9 must carry a non-empty acquisition list (see
+// the field doc in ../professions/types.ts).
 
 import type { ProfessionRecipeRecord } from '../professions/types';
 
@@ -160,11 +171,11 @@ export const COMMON_RECIPES: ProfessionRecipeRecord[] = [
 // ceiling), never as an admission gate: these are craftable on having the
 // reagents and standing at the hub station, same as any common recipe.
 //
-// requiresHubStation (issue #1297): every recipe below is also station-bound,
-// gated on presence at the level-20 crafting hub (content/professions.ts
-// CRAFTING_HUB_*, checked by ../professions/crafting_hub.ts). These are the
-// natural first station-bound recipes: real tier-4/5 gear already tier-gated
-// well past the common free floor, unlike COMMON_RECIPES/COMBO_RECIPES above
+// stationType (Professions 2.0 Phase 8, formerly #1297's requiresHubStation):
+// every recipe below is station-bound at the toolworks (content/professions.ts
+// STATIONS, checked by ../professions/stations.ts). These are the natural
+// first station-bound recipes: real tier-4/5 gear already tier-gated well
+// past the common free floor, unlike COMMON_RECIPES/COMBO_RECIPES above
 // (both free-field-craftable, deliberately left ungated here).
 export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
   {
@@ -179,7 +190,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 75,
     itemLevelBudget: 20,
     level: 20,
-    requiresHubStation: true,
+    stationType: 'toolworks',
   },
   {
     id: 'recipe_arcanite_mining_pick',
@@ -193,7 +204,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 150,
     itemLevelBudget: 30,
     level: 20,
-    requiresHubStation: true,
+    stationType: 'toolworks',
   },
   {
     id: 'recipe_ashwood_axe',
@@ -207,7 +218,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 75,
     itemLevelBudget: 20,
     level: 20,
-    requiresHubStation: true,
+    stationType: 'toolworks',
   },
   {
     id: 'recipe_elderwood_axe',
@@ -221,7 +232,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 150,
     itemLevelBudget: 30,
     level: 20,
-    requiresHubStation: true,
+    stationType: 'toolworks',
   },
   {
     id: 'recipe_goldleaf_sickle',
@@ -235,7 +246,7 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 75,
     itemLevelBudget: 20,
     level: 20,
-    requiresHubStation: true,
+    stationType: 'toolworks',
   },
   {
     id: 'recipe_sunpetal_sickle',
@@ -249,13 +260,14 @@ export const TOOL_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 150,
     itemLevelBudget: 30,
     level: 20,
-    requiresHubStation: true,
+    stationType: 'toolworks',
   },
 ];
 
-// Hub-tier caster-stat (int/spi) recipes (crafting content follow-up to the
-// COMMON_RECIPES caster pieces above): one per tailoring/leatherworking/
-// armorcrafting, at the same thorium tier and hub-gating as TOOL_RECIPES.
+// Station-tier caster-stat (int/spi) recipes (crafting content follow-up to
+// the COMMON_RECIPES caster pieces above): one per tailoring/leatherworking/
+// armorcrafting, at the same thorium tier as TOOL_RECIPES, each bound to its
+// own craft's station type (loom/tannery/forge).
 export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
   {
     id: 'recipe_wardweave_cowl',
@@ -269,7 +281,7 @@ export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 75,
     itemLevelBudget: 20,
     level: 20,
-    requiresHubStation: true,
+    stationType: 'loom',
   },
   {
     id: 'recipe_duskhide_wraps',
@@ -283,7 +295,7 @@ export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 75,
     itemLevelBudget: 20,
     level: 20,
-    requiresHubStation: true,
+    stationType: 'tannery',
   },
   {
     id: 'recipe_sootscale_mantle',
@@ -297,7 +309,7 @@ export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
     skillReq: 75,
     itemLevelBudget: 20,
     level: 20,
-    requiresHubStation: true,
+    stationType: 'forge',
   },
 ];
 
@@ -319,6 +331,7 @@ export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
     itemLevelBudget: 20,
     level: 15,
     comboRequirement: { craftA: 'armorcrafting', craftB: 'weaponcrafting', minTier: 1 },
+    acquisition: ['trainer'],
   },
   {
     id: 'recipe_forgeguard_bulwark_gauntlets',
@@ -333,6 +346,7 @@ export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
     itemLevelBudget: 18,
     level: 15,
     comboRequirement: { craftA: 'armorcrafting', craftB: 'weaponcrafting', minTier: 1 },
+    acquisition: ['trainer'],
   },
   {
     id: 'recipe_volatile_flux_elixir',
@@ -347,6 +361,7 @@ export const COMBO_RECIPES: ProfessionRecipeRecord[] = [
     itemLevelBudget: 16,
     level: 15,
     comboRequirement: { craftA: 'alchemy', craftB: 'engineering', minTier: 1 },
+    acquisition: ['trainer'],
   },
 ];
 
@@ -365,6 +380,13 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
 export function recipeById(recipeId: string): ProfessionRecipeRecord | undefined {
   return ALL_RECIPES.find((r) => r.id === recipeId);
 }
+
+// The hands-vs-stations field set (Professions 2.0 Phase 8): the recipe ids
+// craftable anywhere with bare hands, exactly the nine common recipes today.
+// Everything outside this set either carries a stationType (station-bound)
+// or is a combo recipe (field-craftable but pair-gated); the set exists so
+// content/tests can name "field recipe" without re-deriving it.
+export const FIELD_RECIPES: ReadonlySet<string> = new Set(COMMON_RECIPES.map((r) => r.id));
 
 // Reverse lookup (#1149, Battlefield Experience): the recipe whose crafting
 // produced a given result item id, so a tracked-event handler holding only an

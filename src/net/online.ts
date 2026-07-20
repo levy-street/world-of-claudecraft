@@ -1362,6 +1362,7 @@ export class ClientWorld implements IWorld {
     switchCount: 0,
     amendsProgress: 0,
     amendsRequired: 0,
+    knownRecipes: [],
   };
   // Gathering profession proficiency (Mining/Logging/Herbalism, #1119), mirrored
   // from the `gprof` self-wire delta below (the real read surface; see
@@ -1400,6 +1401,13 @@ export class ClientWorld implements IWorld {
   // server's `masterwork` event (applyMasterworkEvent below), exactly like
   // lastCraftResult above. Null until this session's first masterwork proc.
   lastMasterwork: MasterworkView | null = null;
+  // The viewer's own active mobile crafting station (Professions 2.0 Phase 8),
+  // mirrored from the server's `mst` self-delta (applySnapshot below). The
+  // server computes the active/expired state against its own tickCount, so
+  // this is always a server-authoritative value: placement is never predicted
+  // locally (net/ optimism rules), the delta lands after the server accepts
+  // the specialization-gated command, and it flips back to null on expiry.
+  activeMobileStationCraft: string | null = null;
   // Compatibility scalar projections of the atomic `cprof` identity mirror.
   // Quest acceptance is the only online transition path, so these direct legacy
   // methods deliberately send no wire commands.
@@ -2677,6 +2685,9 @@ export class ClientWorld implements IWorld {
       if (s.dclears !== undefined) this.delveClears = s.dclears ?? {};
       if (s.delveDaily !== undefined) this.delveDaily = s.delveDaily;
       if (s.tfocus !== undefined) this.townFocus = s.tfocus ?? {};
+      // mst -> activeMobileStationCraft: a nullable scalar, so the delta's
+      // explicit null (station expired or never placed) must overwrite.
+      if (s.mst !== undefined) this.activeMobileStationCraft = (s.mst as string | null) ?? null;
       if (s.gprof !== undefined) this.gatheringProficiency = s.gprof ?? {};
       if (s.prof !== undefined) this.professionsState = s.prof ?? { skills: [] };
       if (s.cprof !== undefined && s.cprof) {
@@ -2693,6 +2704,12 @@ export class ClientWorld implements IWorld {
           switchCount: cprof.switchCount ?? 0,
           amendsProgress: cprof.amendsProgress ?? 0,
           amendsRequired: cprof.amendsRequired ?? 0,
+          // Phase 9: the learned-recipe mirror. The identity is replaced
+          // wholesale on every cprof delta (see the comment above), so a
+          // train_recipe grant goes live the tick the server re-emits cprof
+          // (its JSON diff fires on the sorted array changing). The ?? []
+          // keeps a pre-Phase-9 server's payload loading cleanly.
+          knownRecipes: [...(cprof.knownRecipes ?? [])],
         };
         this.activeArchetype = this.craftingIdentity.activeArchetype;
         this.archetypeSwitchCount = this.craftingIdentity.switchCount;
@@ -2970,6 +2987,15 @@ export class ClientWorld implements IWorld {
   }
   craftItem(recipeId: string): void {
     this.cmd({ cmd: 'craft_item', recipe: recipeId });
+  }
+  placeMobileStation(craftId: string): void {
+    this.cmd({ cmd: 'place_mobile_station', craft: craftId });
+  }
+  // Recipe training (Professions 2.0 Phase 9): command only, never predicted.
+  // The server resolves resolveTrain and answers with the personal
+  // trainResult event; the learned set mirrors back via the cprof delta.
+  trainRecipe(recipeId: string): void {
+    this.cmd({ cmd: 'train_recipe', recipe: recipeId });
   }
   sellItem(itemId: string, count?: number): void {
     this.cmd({ cmd: 'sell', item: itemId, count });

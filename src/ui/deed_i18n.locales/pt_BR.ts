@@ -686,7 +686,6 @@ export const table: DeedLocaleTable = {
   },
   prog_tools_of_the_trade: {
     name: 'Ferramentas do Ofício',
-    desc: 'Conclua uma criação que exige uma estação no polo de ofícios de Highwatch.',
   },
   dgn_nythraxis_crypt: {
     name: 'O Que a Cripta Guardava',

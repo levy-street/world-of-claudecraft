@@ -59,11 +59,11 @@ import {
 } from '../src/sim/talent_allocation_input';
 import { stealthDetectionRadius, threatEntries } from '../src/sim/threat';
 import {
+  ALL_EQUIP_SLOTS,
   type Aura,
   DT,
   dist2d,
   type Entity,
-  EQUIP_SLOTS,
   type EquipSlot,
   emptyMoveInput,
   isDungeonDifficulty,
@@ -4012,7 +4012,8 @@ export class GameServer {
           // sim's own resolver rather than trusting the client. The sim then
           // re-validates the slot against the item itself.
           const aimed =
-            typeof msg.slot === 'string' && (EQUIP_SLOTS as readonly string[]).includes(msg.slot)
+            typeof msg.slot === 'string' &&
+            (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
               ? (msg.slot as EquipSlot)
               : undefined;
           if (aimed) sim.equipItemToSlot(msg.item, aimed, pid);
@@ -4027,7 +4028,12 @@ export class GameServer {
         }
         break;
       case 'unequip_item':
-        if (typeof msg.slot === 'string' && (EQUIP_SLOTS as readonly string[]).includes(msg.slot)) {
+        // ALL_EQUIP_SLOTS, not the frozen EQUIP_SLOTS: the latter omits the
+        // additive 'offhand' slot, so any offhand unequip was silently dropped here.
+        if (
+          typeof msg.slot === 'string' &&
+          (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
+        ) {
           sim.unequipItem(msg.slot as EquipSlot, pid);
         }
         break;
@@ -4063,6 +4069,17 @@ export class GameServer {
         break;
       case 'craft_item':
         if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, pid);
+        break;
+      case 'place_mobile_station':
+        if (typeof msg.craft === 'string') sim.placeMobileStation(msg.craft, pid);
+        break;
+      case 'train_recipe':
+        // Professions 2.0 Phase 9: fee + grant resolve inside the sim
+        // (Sim.trainRecipe -> professions/training.ts resolveTrain); the
+        // outcome reaches this client as the pid-scoped trainResult event and
+        // the learned set rides the per-tick cprof diff (knownRecipes is part
+        // of craftingIdentityFor's JSON), so no dirty-marking is needed here.
+        if (typeof msg.recipe === 'string') sim.trainRecipe(msg.recipe, pid);
         break;
       case 'sell_all_junk':
         sim.sellAllJunk(pid);
@@ -5469,6 +5486,12 @@ export class GameServer {
     // Craft skills and identity must arrive as one value so the client never
     // evaluates a recipe against a pair from one tick and skills from another.
     maybe('cprof', this.sim.craftingIdentityFor(anchorSession.pid));
+    // The viewer's own active mobile crafting station craft id (Professions
+    // 2.0 Phase 8), or null. Expiry resolves server-side (Sim.
+    // activeMobileStationCraftFor checks its own tickCount), so the delta
+    // naturally flips to null the tick a station lapses and the client never
+    // reasons about tick domains. Small scalar, diffed per tick like atitle.
+    maybe('mst', this.sim.activeMobileStationCraftFor(anchorSession.pid));
     maybe('tfocus', this.sim.townFocusFor(anchorSession.pid));
     // Raw gathering-profession proficiency map (IWorld `gatheringProficiency`,
     // #1119), a second small read alongside `prof` for the ORIGINAL flat-map

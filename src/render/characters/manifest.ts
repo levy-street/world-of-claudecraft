@@ -1307,6 +1307,16 @@ const NPC_KEYS: Record<string, string> = {
   // The graveyard angel: a robed figure, rendered translucent (ethereal) with a
   // holy shimmer by the renderer (see the spirit_healer branches there).
   spirit_healer: 'npc_villager_robed',
+  // Professions 2.0 station masters: existing looks only (no new GLBs). The
+  // forge and toolworks masters wear the smith's work apron; the weaver and
+  // alchemist match the robed apothecary/herbalist look; the cook and tanner
+  // read as working townsfolk.
+  forgemistress_darva: 'npc_smith',
+  tinker_gizzel: 'npc_smith',
+  weaver_ottilie: 'npc_villager_robed',
+  alchemist_verane: 'npc_villager_robed',
+  cook_marlow: 'npc_villager',
+  tanner_hesk: 'npc_villager',
 };
 
 export function visualKeyFor(e: Entity): string {

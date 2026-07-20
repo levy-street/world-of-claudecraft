@@ -10,7 +10,7 @@
 // canvas no-magic-values guard is in tests/minimap_painter.test.ts.
 
 import { describe, expect, it } from 'vitest';
-import { QUESTS } from '../src/sim/data';
+import { QUESTS, STATIONS } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { createMinimapMarkers, type MinimapMarker, minimapMode } from '../src/ui/minimap_markers';
 import type { IWorld } from '../src/world_api';
@@ -258,6 +258,99 @@ describe('allocation budget (the reused-reference proxy, wrapper floor)', () => 
     const core = createMinimapMarkers();
     const world = makeWorld('sim');
     expect(() => assertAllocationStable(() => core.build(world, S, PPY))).not.toThrow();
+  });
+});
+
+describe('station markers (Professions 2.0)', () => {
+  // A viewer in the Eastbrook square: the four zone-1 stations (forge,
+  // kitchens, loom, toolworks) sit inside the rim at this scale, while the
+  // Fenbridge tannery (z 314) and Highwatch apothecary (z 660) sit far
+  // beyond it. Station markers are STATIC content positions: no per-viewer
+  // state, so both host shapes and any social/profession stub state must
+  // produce byte-identical markers (the graphics-fairness doctrine).
+  const VIEW_POS = { x: 0, z: 10 };
+
+  function makeStationWorld(shape: 'sim' | 'client', over: Record<string, unknown> = {}): IWorld {
+    const junk = shape === 'sim' ? { hp: 100, maxHp: 100, castingAbility: null } : {};
+    const player = {
+      id: 1,
+      kind: 'player',
+      name: 'Me',
+      pos: { ...VIEW_POS },
+      facing: 0,
+      dead: false,
+      lootable: false,
+      aggroTargetId: null,
+      questIds: [],
+      templateId: '',
+      ...junk,
+    };
+    return {
+      player,
+      entities: new Map([[1, player]]),
+      partyInfo: null,
+      socialInfo: { friends: [], blocks: [], guild: null },
+      delveRun: null,
+      cfg: { seed: 42, playerClass: 'warrior' },
+      playerId: 1,
+      questState: () => 'unavailable',
+      nodeHarvestableByMe: () => true,
+      ...over,
+    } as unknown as IWorld;
+  }
+
+  function stationMarkers(world: IWorld): MinimapMarker[] {
+    return buildMarkers(world).filter((m) => m.kind === 'station');
+  }
+
+  it('projects one marker per in-range station at the exact canvas px (both shapes)', () => {
+    for (const shape of ['sim', 'client'] as const) {
+      const markers = stationMarkers(makeStationWorld(shape));
+      // The four Eastbrook stations; the two other-zone stations are culled.
+      expect(markers, shape).toHaveLength(4);
+      // The forge (STATIONS[0], x 7, z 16.5) lands at the projected px:
+      // mx = half - dx * pxPerYard, my = half - dz * pxPerYard.
+      const half = S / 2;
+      const forge = STATIONS[0];
+      expect(forge.id).toBe('station_eastbrook_forge');
+      const projected = markers.find(
+        (m) =>
+          Math.abs(m.mx - (half - (forge.pos.x - VIEW_POS.x) * PPY)) < 1e-9 &&
+          Math.abs(m.my - (half - (forge.pos.z - VIEW_POS.z) * PPY)) < 1e-9,
+      );
+      expect(projected, `${shape}: forge marker at the projected px`).toBeDefined();
+    }
+  });
+
+  it('culls stations beyond the rim: a field viewer far from every town sees none', () => {
+    const world = makeStationWorld('sim');
+    (world.player as unknown as { pos: { x: number; z: number } }).pos = { x: 0, z: 150 };
+    expect(stationMarkers(world)).toHaveLength(0);
+  });
+
+  it('is host- and viewer-invariant: shapes and unrelated stub state never change the set', () => {
+    const base = stationMarkers(makeStationWorld('sim'));
+    expect(stationMarkers(makeStationWorld('client'))).toEqual(base);
+    // Differing quest/social/profession state (another viewer, effectively):
+    // the station layer must not read ANY of it.
+    const busy = makeStationWorld('client', {
+      questState: () => 'available',
+      nodeHarvestableByMe: () => false,
+      socialInfo: {
+        friends: [{ id: 20, name: 'Friend', online: true }],
+        blocks: [],
+        guild: { id: 1, name: 'G', rank: 'member', members: [] },
+      },
+    });
+    expect(stationMarkers(busy)).toEqual(base);
+  });
+
+  it('draws stations before the player arrow (draw order: the arrow stays on top)', () => {
+    const markers = buildMarkers(makeStationWorld('sim'));
+    expect(markers[markers.length - 1].kind).toBe('player');
+    const lastStation = markers.map((m) => m.kind).lastIndexOf('station');
+    expect(lastStation).toBeGreaterThanOrEqual(0);
+    expect(lastStation).toBeLessThan(markers.length - 1);
   });
 });
 

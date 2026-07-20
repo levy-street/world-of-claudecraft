@@ -15,6 +15,7 @@ import {
   type ComboEligibilityReason,
   comboEligibility,
 } from '../sim/professions/combo_eligibility';
+import type { StationType } from '../sim/professions/stations';
 import type { InvSlot, ItemDef } from '../sim/types';
 
 export interface RecipeDefLike {
@@ -24,8 +25,9 @@ export interface RecipeDefLike {
   resultCount: number;
   reagents: readonly { itemId: string; count: number }[];
   skillReq: number;
-  // Station-bound recipe (#1297): craftable only at the level-20 crafting hub.
-  requiresHubStation?: boolean;
+  // Station-bound recipe (Professions 2.0 Phase 8): craftable only at a
+  // station of this type (see src/sim/professions/stations.ts).
+  stationType?: StationType;
   // Combo-recipe gate (#1132): present only on a recipe exclusive to one
   // specific adjacent craft pair. See src/sim/professions/types.ts for the
   // authoritative shape and src/sim/professions/crafting.ts for resolution.
@@ -73,9 +75,12 @@ export interface CraftingRecipeRow {
   /** Skill-gain outlook (see CraftDifficulty). Actionable info: identical on
    *  every graphics preset, and the painter must never carry it color-only. */
   difficulty: CraftDifficulty;
-  /** Hub-station gate (#1297): null when the recipe has no requiresHubStation;
-   *  otherwise whether the player currently stands in station range. */
-  station: { required: boolean; inRange: boolean } | null;
+  /** Station gate (Phase 8, formerly #1297's hub boolean): null when the
+   *  recipe has no stationType; otherwise WHICH station type it needs and
+   *  whether the player is currently in range of one (a physical station or
+   *  their own active mobile station, folded into the in-range set the HUD
+   *  passes in). */
+  station: { required: true; type: StationType; inRange: boolean } | null;
   /** True only when every reagent row is satisfied AND (for a combo recipe) the
    *  player's tier capability meets comboRequirement in both named crafts AND
    *  (for a station-bound recipe) the player is in station range: the "Craft"
@@ -105,10 +110,12 @@ function countInInventory(inventory: readonly InvSlot[], itemId: string): number
  * the local player's inventory, the item table (for display name/icon/
  * quality), and the local player's flat craft skills (for the combo-recipe
  * gate, #1132; defaults to empty so existing common-tier-only callers, e.g.
- * tests, need not pass it), and whether the player currently stands in range
- * of the crafting-hub station (for #1297 station-bound recipes; defaults to
- * true so station-free callers need not pass it). Read-only: never mutates
- * any of its inputs.
+ * tests, need not pass it), and the set of station types the player is
+ * currently in range of (Phase 8 station-bound recipes: physical stations
+ * plus the own active mobile station, precomputed once per repaint by the
+ * HUD via stations.ts inRangeStationTypes; defaults to empty, i.e. out of
+ * range of everything, so station-free callers need not pass it). Read-only:
+ * never mutates any of its inputs.
  */
 export function buildCraftingView(
   recipes: readonly RecipeDefLike[],
@@ -121,7 +128,7 @@ export function buildCraftingView(
     pairedMajor: null,
     hobbyCraft: null,
   },
-  stationInRange = true,
+  inRangeStations: ReadonlySet<StationType> = new Set(),
 ): CraftingView {
   // One mutable copy for the sim-side pure functions (their CraftSkills
   // parameter is mutable-typed); they never write it, this is typing only.
@@ -165,7 +172,13 @@ export function buildCraftingView(
     );
     const difficulty: CraftDifficulty =
       multiplier === 0 ? 'none' : multiplier === 1 ? 'full' : 'reduced';
-    const station = recipe.requiresHubStation ? { required: true, inRange: stationInRange } : null;
+    const station = recipe.stationType
+      ? {
+          required: true as const,
+          type: recipe.stationType,
+          inRange: inRangeStations.has(recipe.stationType),
+        }
+      : null;
     return {
       recipeId: recipe.id,
       professionId: recipe.professionId,

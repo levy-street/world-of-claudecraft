@@ -5,11 +5,7 @@
 // the player's earned set, every negative targets one exact gate condition.
 import { describe, expect, it } from 'vitest';
 import { handleDeath } from '../src/sim/combat/damage';
-import {
-  CRAFTING_HUB_MIN_LEVEL,
-  CRAFTING_HUB_POS,
-  CRAFTING_HUB_RADIUS,
-} from '../src/sim/content/professions';
+import { STATION_RADIUS } from '../src/sim/content/professions';
 import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import {
   type CupMatchForDeeds,
@@ -41,6 +37,7 @@ import {
 import { createMob } from '../src/sim/entity';
 import { respawnMob } from '../src/sim/mob/lifecycle';
 import { craftItem } from '../src/sim/professions/crafting';
+import { stationsOfType } from '../src/sim/professions/stations';
 import { type ArenaMatch, type InstanceSlot, type PlayerMeta, Sim } from '../src/sim/sim';
 import { endArenaMatch } from '../src/sim/social/arena';
 import { applyResurrectionSickness } from '../src/sim/spirit';
@@ -1332,26 +1329,31 @@ describe('kill-credit negatives (onMobKillCreditForDeeds)', () => {
   });
 });
 
-describe('hub-station craft counter (prog_tools_of_the_trade)', () => {
-  // The station-bound tool recipe and a free-field common recipe (recipes.ts).
-  const HUB_RECIPE = 'recipe_thorium_mining_pick';
+describe('station-bound craft counter (prog_tools_of_the_trade)', () => {
+  // The station-bound tool recipe (toolworks) and a free-field common recipe
+  // (recipes.ts). Phase 8: the gate is per-type station POSITION only; the
+  // old level-20 hub arm is retired.
+  const STATION_RECIPE = 'recipe_thorium_mining_pick';
   const FIELD_RECIPE = 'recipe_eastbrook_arming_sword';
+  // The station the recipe binds to, read from the STATIONS record so a
+  // content re-placement can never silently strand this suite.
+  const toolworks = stationsOfType('toolworks')[0];
 
-  function hubCrafter(sim: Sim, level = CRAFTING_HUB_MIN_LEVEL): PlayerMeta {
+  function stationCrafter(sim: Sim, level = 20): PlayerMeta {
     const meta = addMeta(sim, 'Crafter');
     const e = entityOf(sim, meta);
     e.level = level;
-    e.pos.x = CRAFTING_HUB_POS.x;
-    e.pos.z = CRAFTING_HUB_POS.z;
+    e.pos.x = toolworks.pos.x;
+    e.pos.z = toolworks.pos.z;
     sim.ctx.addItem('thorium_ore', 4, meta.entityId);
     sim.ctx.addItem('mithril_mining_pick', 1, meta.entityId);
     return meta;
   }
 
-  it('a station-bound craft at the hub bumps the counter and grants after the tick', () => {
+  it('a station-bound craft at the station bumps the counter and grants after the tick', () => {
     const sim = makeSim();
-    const meta = hubCrafter(sim);
-    const result = craftItem(sim.ctx, HUB_RECIPE, meta.entityId);
+    const meta = stationCrafter(sim);
+    const result = craftItem(sim.ctx, STATION_RECIPE, meta.entityId);
     expect(result.ok).toBe(true);
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(1);
     expect(meta.deedStats.counters.craftsPerformed).toBe(1);
@@ -1359,38 +1361,40 @@ describe('hub-station craft counter (prog_tools_of_the_trade)', () => {
     expect(meta.deedsEarned.has('prog_tools_of_the_trade')).toBe(true);
   });
 
-  it('one step outside the hub circle denies, and the denied attempt counts nothing', () => {
+  it('one step outside the station circle denies, and the denied attempt counts nothing', () => {
     const sim = makeSim();
-    const meta = hubCrafter(sim);
+    const meta = stationCrafter(sim);
     const e = entityOf(sim, meta);
-    e.pos.z = CRAFTING_HUB_POS.z + CRAFTING_HUB_RADIUS + 1;
-    const denied = craftItem(sim.ctx, HUB_RECIPE, meta.entityId);
+    e.pos.z = toolworks.pos.z + STATION_RADIUS + 1;
+    const denied = craftItem(sim.ctx, STATION_RECIPE, meta.entityId);
     expect(denied.ok).toBe(false);
-    expect(denied.reason).toBe('not_at_hub');
+    expect(denied.reason).toBe('station_required');
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(0);
     expect(meta.deedStats.counters.craftsPerformed).toBe(0);
     // One step back inside the boundary, the same craft resolves and counts.
-    e.pos.z = CRAFTING_HUB_POS.z + CRAFTING_HUB_RADIUS - 1;
-    expect(craftItem(sim.ctx, HUB_RECIPE, meta.entityId).ok).toBe(true);
+    e.pos.z = toolworks.pos.z + STATION_RADIUS - 1;
+    expect(craftItem(sim.ctx, STATION_RECIPE, meta.entityId).ok).toBe(true);
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(1);
     sim.tick();
     expect(meta.deedsEarned.has('prog_tools_of_the_trade')).toBe(true);
   });
 
-  it('below the hub level gate the same on-the-spot craft denies and counts nothing', () => {
+  it('the retired level arm: an under-20 crafter AT the station succeeds and counts', () => {
+    // Phase 8 inversion of the old level-20 hub gate (2026-07-17 maintainer
+    // ruling): the same on-the-spot craft that used to deny with not_at_hub
+    // one level under now resolves, counts, and grants.
     const sim = makeSim();
-    const meta = hubCrafter(sim, CRAFTING_HUB_MIN_LEVEL - 1);
-    const denied = craftItem(sim.ctx, HUB_RECIPE, meta.entityId);
-    expect(denied.ok).toBe(false);
-    expect(denied.reason).toBe('not_at_hub');
-    expect(meta.deedStats.counters.hubCraftsPerformed).toBe(0);
+    const meta = stationCrafter(sim, 19);
+    const result = craftItem(sim.ctx, STATION_RECIPE, meta.entityId);
+    expect(result.ok).toBe(true);
+    expect(meta.deedStats.counters.hubCraftsPerformed).toBe(1);
     sim.tick();
-    expect(meta.deedsEarned.has('prog_tools_of_the_trade')).toBe(false);
+    expect(meta.deedsEarned.has('prog_tools_of_the_trade')).toBe(true);
   });
 
-  it('an ordinary field recipe crafted while standing at the hub never counts', () => {
+  it('an ordinary field recipe crafted while standing at the station never counts', () => {
     const sim = makeSim();
-    const meta = hubCrafter(sim);
+    const meta = stationCrafter(sim);
     sim.ctx.addItem('bone_fragments', 2, meta.entityId);
     sim.ctx.addItem('linen_scrap', 1, meta.entityId);
     const result = craftItem(sim.ctx, FIELD_RECIPE, meta.entityId);

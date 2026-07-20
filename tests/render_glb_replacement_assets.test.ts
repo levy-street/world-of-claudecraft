@@ -15,6 +15,7 @@ import { fishPreloadInternalsForTest } from '../src/render/fish';
 import { gatherNodePreloadInternalsForTest } from '../src/render/gather_nodes';
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
+import { stationsPreloadInternalsForTest } from '../src/render/stations';
 import { yumiMazePreloadInternalsForTest } from '../src/render/yumi_maze';
 
 const publicDir = path.join(__dirname, '..', 'public');
@@ -79,6 +80,12 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('artisan row prop assets', () => {
     for (const url of Object.values(artisanRowPreloadInternalsForTest.assetUrl)) {
+      expectAssetExistsAndManifested(url);
+    }
+  });
+
+  it('crafting station prop assets (Professions 2.0 Phase 9)', () => {
+    for (const url of Object.values(stationsPreloadInternalsForTest.assetUrl)) {
       expectAssetExistsAndManifested(url);
     }
   });

@@ -80,10 +80,11 @@ import type { SimContext } from '../sim_context';
 import type { ItemDef } from '../types';
 import { archetypeCeilingFor, craftSkillGainMultiplier } from './archetype';
 import { comboEligibility } from './combo_eligibility';
-import { canUseCraftingHubStation } from './crafting_hub';
 import { isSignableMaterialRarity, type MaterialRarity } from './gathering';
 import { masterworkBonusStats, masterworkBumpedQuality, masterworkProcChance } from './masterwork';
+import { isStationActive } from './mobile_station';
 import { craftActionXp } from './profession_xp';
+import { isAtStation, stationTypeForCraft } from './stations';
 import type { ProfessionReagent, ProfessionRecipeRecord } from './types';
 import {
   type CraftSkillState,
@@ -126,7 +127,7 @@ export interface CraftResult {
     | 'combo_requirement_unmet'
     | 'recipe_not_learned'
     | 'throttled'
-    | 'not_at_hub';
+    | 'station_required';
 }
 
 /** Whether `meta` currently knows `recipe` (issue #1299): a recipe with no
@@ -170,8 +171,11 @@ export function acquireRecipe(
 /** Acquire one already-resolved recipe record from one source. Exported
  *  separately from `acquireRecipe` (mirroring the resolveCraft /
  *  resolveCraftForRecipe split above) so tests can exercise the success and
- *  wrong_source arms against a synthetic gated recipe without needing an
- *  acquisition-gated entry in `content/recipes.ts` (none exists yet). */
+ *  wrong_source arms against a synthetic gated recipe, independent of the
+ *  real acquisition-gated content (since Professions 2.0 Phase 9 the three
+ *  COMBO_RECIPES in `content/recipes.ts` are trainer-gated; see
+ *  ./training.ts for the training flow that feeds this the 'trainer'
+ *  source). */
 export function acquireRecipeForRecipe(
   ctx: SimContext,
   pid: number,
@@ -313,14 +317,20 @@ export function resolveCraftForRecipe(
   recipe: ProfessionRecipeRecord,
 ): CraftResult {
   const meta = ctx.players.get(pid);
-  // #1297: a station-bound recipe (TOOL_RECIPES today) requires the player to
-  // be physically present at the level-20 crafting hub. Checked before every
-  // other gate, no side effect on denial, same shape as the combo-requirement
-  // check below.
-  if (recipe.requiresHubStation) {
+  // Phase 8 station gate (supersedes #1297's hub gate; the level arm retired
+  // with it): a station-bound recipe requires the player to stand at a
+  // station of the recipe's type, OR to have their own ACTIVE mobile station
+  // (mobile_station.ts) whose craft maps to that type. Checked before every
+  // other gate, no side effect on denial, no rng, same shape as the
+  // combo-requirement check below.
+  if (recipe.stationType) {
     const entity = ctx.entities.get(pid);
-    if (!entity || !canUseCraftingHubStation(entity.pos, entity.level)) {
-      return { ok: false, recipeId: recipe.id, reason: 'not_at_hub' };
+    const mobileSatisfies =
+      !!meta?.mobileStation &&
+      isStationActive(meta.mobileStation, ctx.tickCount) &&
+      stationTypeForCraft(meta.mobileStation.craftId) === recipe.stationType;
+    if (!entity || (!isAtStation(entity.pos, recipe.stationType) && !mobileSatisfies)) {
+      return { ok: false, recipeId: recipe.id, reason: 'station_required' };
     }
   }
   if (
@@ -515,9 +525,11 @@ export function craftItem(ctx: SimContext, recipeId: string, pid?: number): Craf
   const result = resolveCraft(ctx, r.meta.entityId, recipeId);
   if (result.ok) {
     ctx.bumpDeedStat(r.meta, 'craftsPerformed', 1);
-    // A station-bound success already proved hub position and level in the
-    // resolve's hub gate, so the recipe flag alone identifies a hub craft.
-    if (recipeById(recipeId)?.requiresHubStation) {
+    // A station-bound success already proved station presence in the
+    // resolve's station gate, so stationType alone identifies one. The
+    // persisted stat key stays 'hubCraftsPerformed' for save back-compat: it
+    // now means station-bound crafts (Phase 8 renamed the gate, not the key).
+    if (recipeById(recipeId)?.stationType) {
       ctx.bumpDeedStat(r.meta, 'hubCraftsPerformed', 1);
     }
     // The dirty mark also covers the craft-skill gain the resolve applied.

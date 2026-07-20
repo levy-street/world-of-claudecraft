@@ -2203,7 +2203,15 @@ export const ja_JP: EnTranslations = {
         "nearTier": "{craft}は次のティアまであと技能 {points} です。",
         "dormantKnowledge": "{craft}の知識は保持されていますが、その組み合わせか趣味が有効になるまで休眠します。"
       },
-      "notAtHub": "それを製作するには、必要なレベルで製作拠点にいる必要があります。",
+      "stationRequired": "それを製作するには{station}にいる必要があります。",
+      "stationName": {
+        "forge": "鍛冶場",
+        "kitchens": "厨房",
+        "apothecary": "薬房",
+        "tannery": "皮なめし場",
+        "loom": "織機",
+        "toolworks": "工作場"
+      },
       "throttled": "製作が速すぎます。少し待ってからもう一度お試しください。",
       "recipeNotLearned": "そのレシピはまだ習得していません。",
       "skillReqLine": "{craft} {skill} が必要",
@@ -2211,13 +2219,32 @@ export const ja_JP: EnTranslations = {
       "difficultyReduced": "技能上昇（減少）",
       "difficultyNone": "技能上昇なし",
       "stationBadge": "製作拠点",
-      "stationOutOfRange": "製作するには製作拠点に移動してください。",
+      "stationOutOfRangeNamed": "{station}に移動して製作してください。",
       "masterworkToast": "傑作！{name}",
       "masterworkZoneLine": "{crafter}が傑作{name}を作り上げました！",
       "tierUpToast": "{craft}がティア {tier} に到達しました！",
       "makersMark": "製作者：{name}",
       "masterworkSeal": "傑作",
       "enchantedLine": "エンチャント済み"
+    },
+    "training": {
+      "title": "訓練：{name}",
+      "close": "訓練を閉じる",
+      "empty": "この師匠には教えられるレシピがありません。",
+      "free": "無料",
+      "stateKnown": "習得済み",
+      "stateTeachable": "習得可能",
+      "stateLocked": "未開放",
+      "requirement": "{craft} {skill} で伝授",
+      "trainAria": "{fee}で{name}を習得",
+      "dialogOption": "訓練",
+      "dialogOptionAria": "{name}から訓練を受ける",
+      "learned": "レシピを習得しました：{recipe}",
+      "tierUnmet": "そのレシピを習得するには{craft}が {skill} 必要です。",
+      "cannotAfford": "その訓練の費用を支払えません。",
+      "notTaughtHere": "そのレシピはここでは教えていません。",
+      "alreadyKnown": "そのレシピはすでに習得しています。",
+      "outOfRange": "訓練するには作業台のそばにいる必要があります。"
     },
     "finder": {
       "title": "ダンジョンファインダー",
@@ -9473,6 +9500,36 @@ export const ja_JP: EnTranslations = {
         "name": "年代記官ゼンジー",
         "title": "ソーンピーク高地の年代記",
         "greeting": "山は何ひとつ忘れない、{playerName}よ。私もだ。あなたの成したことを見せてもらおう。"
+      },
+      "forgemistress_darva": {
+        "name": "鍛冶長ダルヴァ",
+        "title": "鍛冶場の主",
+        "greeting": "炉は私に従う、{className}。良い鉱石を持って来れば、おまえにも従うようになる。"
+      },
+      "cook_marlow": {
+        "name": "料理人マーロウ",
+        "title": "厨房の主",
+        "greeting": "私の厨房から生煮えのまま出ていくものはない、{className}。座って食べて、それからまた行きな。"
+      },
+      "weaver_ottilie": {
+        "name": "織り手オッティリー",
+        "title": "機織り場の主",
+        "greeting": "糸に気をつけて、{className}。機を扱うなら、強い手より確かな手だよ。"
+      },
+      "tinker_gizzel": {
+        "name": "からくり師ギッゼル",
+        "title": "工房の主",
+        "greeting": "バネに歯車に切れ味のいい刃、{className}。あんたの手に足りないものは、この工房が何でも揃えるよ。"
+      },
+      "tanner_hesk": {
+        "name": "皮なめし職人ヘスク",
+        "title": "なめし場の主",
+        "greeting": "革の良し悪しはなめしで決まる、{className}。桶の用意はできている、あとはあんた次第だ。"
+      },
+      "alchemist_verane": {
+        "name": "錬金術師ヴェレーン",
+        "title": "薬房の主",
+        "greeting": "二度量って一度で注ぐ、{className}。薬房ではこぼした試薬に容赦はしない。"
       },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",

@@ -716,7 +716,6 @@ export const table: DeedLocaleTable = {
   },
   prog_tools_of_the_trade: {
     name: 'Gli Attrezzi del Mestiere',
-    desc: 'Completa una creazione vincolata a una postazione presso il polo artigiano di Highwatch.',
   },
   dgn_nythraxis_crypt: {
     name: 'Ciò che la Cripta Custodiva',

@@ -3,6 +3,7 @@ import { DUNGEONS, ITEMS, MOBS } from './data';
 import { createMob } from './entity';
 import { enterDungeon } from './instances/dungeons';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
+import { placeMobileStationForPlayer } from './professions/mobile_station';
 import { completeAllQuestsForDev } from './quests/dev_quest_commands';
 import type { SentChat } from './sim';
 import type { SimContext } from './sim_context';
@@ -269,6 +270,24 @@ export function handleDevChat(
     return null;
   }
 
+  const mobileStationMatch = /^\/(?:dev\s+mobilestation|devmobilestation)\s+(\S+)\s*$/i.exec(raw);
+  if (mobileStationMatch) {
+    // Places through the REAL specialization-gated path (mobile_station.ts),
+    // same as the wire command: the cheat saves the walk, not the gate.
+    const craftId = mobileStationMatch[1].toLowerCase();
+    const station = placeMobileStationForPlayer(ctx, craftId, pid);
+    if (!station) {
+      ctx.error(
+        pid,
+        `[dev] Could not place a mobile ${craftId} station (specialization required).`,
+      );
+    } else {
+      const minutes = Math.round((station.expiresAtTick - station.placedAtTick) / (20 * 60));
+      emitDevLog(ctx, pid, `[dev] Mobile ${craftId} station placed here for ${minutes} minutes.`);
+    }
+    return null;
+  }
+
   if (/^\/(?:dev\s+cascade|devcascade)\s*$/i.test(raw)) {
     // [dev] Controlled Cascada temporal playtest: a non-offensive training dummy plus
     // raid allies at known distances, with a per-cast metrics readout. Dev realms only.
@@ -380,7 +399,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev gold, /dev quest, /dev quests, /dev attune, /dev gather, /dev bot, /dev vendor, /dev lfg, /dev cascade, /dev sandbox, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev lfg, /dev cascade, /dev sandbox, /dev god, /dev heal, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

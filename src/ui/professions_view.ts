@@ -130,8 +130,8 @@ function craftPerks(skills: CraftSkills, craftId: string): CraftPerksModel {
 }
 
 // ---------------------------------------------------------------------------
-// Ring layout math: ten unit-circle nodes in CRAFT_RING order (the
-// CRAFTING_HUB_STATIONS angle idiom; the painter scales and centers).
+// Ring layout math: ten unit-circle nodes in CRAFT_RING order, evenly spaced
+// by index angle (the painter scales and centers).
 // ---------------------------------------------------------------------------
 
 export const RING_STEP_ANGLE = (2 * Math.PI) / CRAFT_RING.length;

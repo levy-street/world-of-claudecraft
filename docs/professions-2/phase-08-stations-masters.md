@@ -6,6 +6,22 @@ that no profession NPC or station sits inside hostile aggro range. It is its own
 is pure sim and content work with no rendering: Phase 9 (props, minimap, training UX) can only
 build on stations that already exist, gate correctly, and are provably placed safely.
 
+## As-landed deviations (2026-07-19, authoritative over the starter prompt below)
+
+- The deny reason follows the Phase 6 text-free-id precedent, NOT a `sim_i18n` matcher row:
+  `station_required` rides the existing `craftResult` SimEvent reason enum, and the ui resolves
+  the station name from `recipeById(ev.recipeId)?.stationType` via
+  `hudChrome.crafting.stationRequired` + `stationName.<type>` (`src/ui/hud.ts` mapping). The
+  event carries NO stationType value (recipe content is static and identical in both worlds).
+  `sim_i18n` is for free sim text; the S3 guard is satisfied by construction and stays green.
+- One extra IWorld read landed beyond the plan: `activeMobileStationCraft`
+  (IWorldProfessions), live in BOTH worlds via the `mst` self-delta mirror, because the
+  crafting window's per-type range set needs the viewer's own active mobile station and the
+  #2033 liveness rule forbids a dead null stub.
+- The parity goldens were regenerated in their own reviewed commit: the six static masters
+  shift the world-ctor entity-id counter by exactly +6 (id-family keys only, rng draw order
+  untouched, determinism arms green). Expected for any future static-NPC addition.
+
 ## Context pointers
 
 - `docs/professions-2/state.md`: locked decisions (hands vs stations, FIELD_RECIPES default of the

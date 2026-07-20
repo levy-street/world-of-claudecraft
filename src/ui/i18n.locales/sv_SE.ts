@@ -7201,8 +7201,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.armor': 'Ökar rustningen med {pct}%',
   'hudChrome.auraEffect.increasePct.int': 'Ökar Intellekt med {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Ökar Uthållighet med {pct}%',
-  'hudChrome.crafting.notAtHub':
-    'Du måste vara vid hantverksplatsen, på rätt nivå, för att tillverka det.',
   'hudChrome.crafting.recipeNotLearned': 'Du har inte lärt dig det receptet än.',
   'hudChrome.crafting.throttled': 'Du tillverkar för snabbt. Vänta ett ögonblick och försök igen.',
   'hudChrome.mobile.chatPlaceholder': 'Säg något...',

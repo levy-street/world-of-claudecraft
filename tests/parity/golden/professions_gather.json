@@ -18,8 +18,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "d449985e",
+      "nextId": 416,
+      "state": "28f12f87",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -57,7 +57,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -74,6 +74,7 @@
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -92,7 +93,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             }
           ],
           "blockChance": 0.05,
@@ -105,7 +106,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 409,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -149,9 +150,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 410,
-      "state": "d1712947",
-      "events": "b486143e",
+      "nextId": 416,
+      "state": "9a898bcc",
+      "events": "ac045378",
       "rng": {
         "draws": 2,
         "digest": "bfe7b728"
@@ -194,7 +195,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -224,6 +225,7 @@
               "professionId": "mining"
             }
           ],
+          "recipesGrandfathered": true,
           "talents": {
             "rows": {}
           },
@@ -243,7 +245,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             }
           ],
           "blockChance": 0.05,
@@ -256,7 +258,7 @@
           "fallStartY": 4.705663,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 409,
+          "id": 415,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -300,9 +302,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 410,
-      "state": "6fdb94ab",
-      "events": "f53a2be5",
+      "nextId": 416,
+      "state": "41de7a20",
+      "events": "f1898110",
       "rng": {
         "draws": 7,
         "digest": "cbece765"
@@ -358,7 +360,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -406,6 +408,7 @@
               "professionId": "logging"
             }
           ],
+          "recipesGrandfathered": true,
           "renown": 10,
           "talents": {
             "rows": {}
@@ -426,7 +429,7 @@
               "name": "Battle Stance",
               "remaining": 3599.9,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             }
           ],
           "blockChance": 0.05,
@@ -438,7 +441,7 @@
           "fallStartY": 3.675258,
           "fiveSecondRule": 99.1,
           "hp": 88,
-          "id": 409,
+          "id": 415,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -484,9 +487,9 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 410,
-      "state": "4a079766",
-      "events": "7e106d1c",
+      "nextId": 416,
+      "state": "d02509b3",
+      "events": "00a6b070",
       "rng": {
         "draws": 212,
         "digest": "1a92925a"
@@ -554,7 +557,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1054,6 +1057,7 @@
               "professionId": "herbalism"
             }
           ],
+          "recipesGrandfathered": true,
           "renown": 25,
           "talents": {
             "rows": {}
@@ -1074,7 +1078,7 @@
               "name": "Battle Stance",
               "remaining": 3599.8,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             }
           ],
           "blockChance": 0.05,
@@ -1086,7 +1090,7 @@
           "fallStartY": -8.5,
           "fiveSecondRule": 99.2,
           "hp": 176,
-          "id": 409,
+          "id": 415,
           "inCombat": true,
           "kind": "player",
           "level": 3,
@@ -1132,9 +1136,9 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 410,
-      "state": "3fdeb171",
-      "events": "fd83e24b",
+      "nextId": 416,
+      "state": "4eea1d7a",
+      "events": "f7c264db",
       "rng": {
         "draws": 212,
         "digest": "1a92925a"
@@ -1218,7 +1222,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 409,
+          "entityId": 415,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1317,6 +1321,7 @@
             "ore_eastbrook_1": 120,
             "wood_eastbrook_1": 120.1
           },
+          "recipesGrandfathered": true,
           "renown": 50,
           "talents": {
             "rows": {}
@@ -1337,7 +1342,7 @@
               "name": "Battle Stance",
               "remaining": 3599.7,
               "school": "physical",
-              "sourceId": 409
+              "sourceId": 415
             }
           ],
           "blockChance": 0.05,
@@ -1350,7 +1355,7 @@
           "fallStartY": -5.25,
           "fiveSecondRule": 99.3,
           "hp": 176,
-          "id": 409,
+          "id": 415,
           "inCombat": true,
           "kind": "player",
           "level": 3,

@@ -616,7 +616,6 @@ export const table: DeedLocaleTable = {
   },
   prog_tools_of_the_trade: {
     name: 'Fagets Redskaber',
-    desc: 'Fuldfør en stationsbunden fremstilling ved håndværkspladsen i Højvagten.',
   },
   dgn_nythraxis_crypt: {
     name: 'Hvad Krypten Gemte',

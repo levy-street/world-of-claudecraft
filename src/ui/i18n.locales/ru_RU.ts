@@ -7362,8 +7362,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': 'ПОРАЖЕНИЕ! Ваша Yumi пала.',
   'hudChrome.crafting.comboRequirementUnmet':
     'У вас нет обоих требуемых ремесел нужного уровня для этого рецепта.',
-  'hudChrome.crafting.notAtHub':
-    'Чтобы создать это, вы должны находиться у ремесленного центра и иметь требуемый уровень.',
   'hudChrome.crafting.throttled':
     'Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.',
   'hudChrome.crafting.recipeNotLearned': 'Вы еще не изучили этот рецепт.',
@@ -7372,14 +7370,21 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyReduced': 'Сниженный рост навыка',
   'hudChrome.crafting.difficultyNone': 'Без роста навыка',
   'hudChrome.crafting.stationBadge': 'Станция',
-  'hudChrome.crafting.stationOutOfRange':
-    'Чтобы создать это, подойдите к станции ремесленного центра.',
   'hudChrome.crafting.masterworkToast': 'Шедевр! {name}',
   'hudChrome.crafting.masterworkZoneLine': 'Шедевр от {crafter}: {name}!',
   'hudChrome.crafting.tierUpToast': '{craft}: достигнут ранг {tier}!',
   'hudChrome.crafting.makersMark': 'Создатель: {name}',
   'hudChrome.crafting.masterworkSeal': 'Шедевр',
   'hudChrome.crafting.enchantedLine': 'Зачаровано',
+  'hudChrome.crafting.stationRequired': 'Для изготовления нужно находиться у станции "{station}".',
+  'hudChrome.crafting.stationOutOfRangeNamed':
+    'Подойдите к станции "{station}", чтобы изготовить это.',
+  'hudChrome.crafting.stationName.forge': 'Кузница',
+  'hudChrome.crafting.stationName.kitchens': 'Кухни',
+  'hudChrome.crafting.stationName.apothecary': 'Аптекарская',
+  'hudChrome.crafting.stationName.tannery': 'Дубильня',
+  'hudChrome.crafting.stationName.loom': 'Ткацкий станок',
+  'hudChrome.crafting.stationName.toolworks': 'Мастерская',
   'hudChrome.mobile.actionPageIndicator': 'Стр. {page}',
   'hudChrome.mobile.spellbookPageLabel': 'Страница {page}',
   'hudChrome.mobile.hideKeyboard': 'Скрыть клавиатуру',
@@ -8370,4 +8375,45 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.majorsLabel': 'Главные ремёсла: {a} и {b}',
   'hudChrome.professions.pairsHeld': 'Открыто пар: {count}',
   'hudChrome.professions.returnsLabel': 'Возвращений: {count}',
+  'entities.npcs.forgemistress_darva.name': 'Мастерица кузни Дарва',
+  'entities.npcs.forgemistress_darva.title': 'Хозяйка кузни',
+  'entities.npcs.forgemistress_darva.greeting':
+    'Горн слушается меня, {className}. Принеси хорошую руду, и он станет слушаться и тебя.',
+  'entities.npcs.cook_marlow.name': 'Повар Марлоу',
+  'entities.npcs.cook_marlow.title': 'Хозяин кухни',
+  'entities.npcs.cook_marlow.greeting':
+    'Из моей кухни ничего не выходит полусырым, {className}. Садись, поешь, а потом обратно в путь.',
+  'entities.npcs.weaver_ottilie.name': 'Ткачиха Оттилия',
+  'entities.npcs.weaver_ottilie.title': 'Хозяйка ткацкого стана',
+  'entities.npcs.weaver_ottilie.greeting':
+    'Береги нити, {className}. За станом твёрдая рука важнее сильной.',
+  'entities.npcs.tinker_gizzel.name': 'Механик Гиззел',
+  'entities.npcs.tinker_gizzel.title': 'Хозяин мастерской',
+  'entities.npcs.tinker_gizzel.greeting':
+    'Пружины, шестерёнки и острые кромки, {className}: в мастерской найдётся всё, чего не хватает твоим рукам.',
+  'entities.npcs.tanner_hesk.name': 'Кожевник Хеск',
+  'entities.npcs.tanner_hesk.title': 'Хозяин дубильни',
+  'entities.npcs.tanner_hesk.greeting':
+    'Шкура хороша ровно настолько, насколько хороша выделка, {className}. Чаны готовы, дело за тобой.',
+  'entities.npcs.alchemist_verane.name': 'Алхимик Веран',
+  'entities.npcs.alchemist_verane.title': 'Хозяин аптекарской',
+  'entities.npcs.alchemist_verane.greeting':
+    'Отмерь дважды, лей один раз, {className}. В аптекарской не прощают пролитых реактивов.',
+  'hudChrome.training.title': 'Обучение: {name}',
+  'hudChrome.training.close': 'Закрыть обучение',
+  'hudChrome.training.empty': 'Этому мастеру нечему вас научить.',
+  'hudChrome.training.free': 'Бесплатно',
+  'hudChrome.training.stateKnown': 'Изучено',
+  'hudChrome.training.stateTeachable': 'Доступно',
+  'hudChrome.training.stateLocked': 'Недоступно',
+  'hudChrome.training.requirement': 'Обучение при {craft} {skill}',
+  'hudChrome.training.trainAria': 'Изучить {name} за {fee}',
+  'hudChrome.training.dialogOption': 'Обучение',
+  'hudChrome.training.dialogOptionAria': 'Пройти обучение у {name}',
+  'hudChrome.training.learned': 'Рецепт изучен: {recipe}',
+  'hudChrome.training.tierUnmet': 'Чтобы изучить этот рецепт, нужен навык {craft} {skill}.',
+  'hudChrome.training.cannotAfford': 'Вам не хватает денег на это обучение.',
+  'hudChrome.training.notTaughtHere': 'Этот рецепт здесь не преподают.',
+  'hudChrome.training.alreadyKnown': 'Вы уже знаете этот рецепт.',
+  'hudChrome.training.outOfRange': 'Для обучения нужно стоять у мастерской.',
 };

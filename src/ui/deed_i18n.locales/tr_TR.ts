@@ -637,7 +637,6 @@ export const table: DeedLocaleTable = {
   },
   prog_tools_of_the_trade: {
     name: 'Alet İşler, El Övünür',
-    desc: 'Yüksek Gözcü zanaat merkezinde tezgâh gerektiren bir üretimi tamamla.',
   },
   dgn_nythraxis_crypt: {
     name: 'Mahzenin Sakladığı',

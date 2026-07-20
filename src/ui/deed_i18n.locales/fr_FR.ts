@@ -722,7 +722,6 @@ export const table: DeedLocaleTable = {
   },
   prog_tools_of_the_trade: {
     name: 'Les outils du métier',
-    desc: "Réalisez une fabrication exigeant un établi au pôle d'artisanat de Highwatch.",
   },
   dgn_nythraxis_crypt: {
     name: 'Ce que gardait la crypte',

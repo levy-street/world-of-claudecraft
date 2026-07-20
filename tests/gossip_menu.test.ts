@@ -17,6 +17,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasTraining: false,
       }),
     ).toBe(true);
   });
@@ -36,6 +37,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasTraining: false,
       }),
     ).toBe(true);
   });
@@ -51,6 +53,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasTraining: false,
       }),
     ).toBe(false);
   });
@@ -66,6 +69,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasTraining: false,
       }),
     ).toBe(false);
   });
@@ -81,6 +85,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasTraining: false,
       }),
     ).toBe(false);
     expect(
@@ -93,6 +98,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasTraining: false,
       }),
     ).toBe(false);
     expect(
@@ -105,6 +111,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: false,
+        hasTraining: false,
       }),
     ).toBe(false);
     expect(
@@ -117,6 +124,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: true,
         hasVcup: false,
         hasCardMaster: false,
+        hasTraining: false,
       }),
     ).toBe(false);
     expect(
@@ -129,6 +137,7 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: true,
         hasCardMaster: false,
+        hasTraining: false,
       }),
     ).toBe(false);
     expect(
@@ -141,6 +150,21 @@ describe('gossipMenuIsEmpty', () => {
         hasDelveBoard: false,
         hasVcup: false,
         hasCardMaster: true,
+        hasTraining: false,
+      }),
+    ).toBe(false);
+    // Phase 9: a station master's Train option alone keeps the menu open.
+    expect(
+      gossipMenuIsEmpty({
+        questCount: 0,
+        discussionCount: 0,
+        hasVendor: false,
+        hasMarket: false,
+        hasHeroicVendor: false,
+        hasDelveBoard: false,
+        hasVcup: false,
+        hasCardMaster: false,
+        hasTraining: true,
       }),
     ).toBe(false);
   });

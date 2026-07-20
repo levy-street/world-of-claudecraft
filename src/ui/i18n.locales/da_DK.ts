@@ -7185,8 +7185,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.armor': 'Øger rustning med {pct}%',
   'hudChrome.auraEffect.increasePct.int': 'Øger Intellekt med {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Øger Udholdenhed med {pct}%',
-  'hudChrome.crafting.notAtHub':
-    'Du skal være ved håndværksstationen og på det krævede niveau for at lave det.',
   'hudChrome.crafting.recipeNotLearned': 'Du har ikke lært den opskrift endnu.',
   'hudChrome.crafting.throttled': 'Du laver ting for hurtigt. Vent et øjeblik, og prøv igen.',
   'hudChrome.mobile.chatPlaceholder': 'Sig noget...',

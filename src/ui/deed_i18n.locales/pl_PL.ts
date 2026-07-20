@@ -674,7 +674,6 @@ export const table: DeedLocaleTable = {
   },
   prog_tools_of_the_trade: {
     name: 'Narzędzia Fachu',
-    desc: 'Ukończ wytwarzanie wymagające stanowiska w rzemieślniczym zapleczu Wysokiej Strażnicy.',
   },
   dgn_nythraxis_crypt: {
     name: 'Co Kryła Krypta',

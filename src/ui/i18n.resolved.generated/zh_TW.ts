@@ -2203,7 +2203,15 @@ export const zh_TW: EnTranslations = {
         "nearTier": "{craft}距離下一階級還差 {points} 點技能。",
         "dormantKnowledge": "{craft}知識已保留，但在其組合或嗜好未啟用時處於休眠狀態。"
       },
-      "notAtHub": "必須達到所需等級並位於製作站，才能製作該物品。",
+      "stationRequired": "必須位於{station}才能製作該物品。",
+      "stationName": {
+        "forge": "鍛造坊",
+        "kitchens": "廚房",
+        "apothecary": "藥坊",
+        "tannery": "製革坊",
+        "loom": "織布機",
+        "toolworks": "工坊"
+      },
       "throttled": "你製作得太快了，請稍等片刻後再試。",
       "recipeNotLearned": "你還沒有學會這個配方。",
       "skillReqLine": "需要{craft} {skill}",
@@ -2211,13 +2219,32 @@ export const zh_TW: EnTranslations = {
       "difficultyReduced": "技能成長減少",
       "difficultyNone": "無技能成長",
       "stationBadge": "製作站",
-      "stationOutOfRange": "前往製作站才能製作該物品。",
+      "stationOutOfRangeNamed": "前往{station}即可製作該物品。",
       "masterworkToast": "傑作！{name}",
       "masterworkZoneLine": "{crafter}製作出了傑作{name}！",
       "tierUpToast": "{craft}提升至階級 {tier}！",
       "makersMark": "製作者：{name}",
       "masterworkSeal": "傑作",
       "enchantedLine": "已附魔"
+    },
+    "training": {
+      "title": "訓練：{name}",
+      "close": "關閉訓練",
+      "empty": "這位大師沒有可傳授的配方。",
+      "free": "免費",
+      "stateKnown": "已學會",
+      "stateTeachable": "可學習",
+      "stateLocked": "未解鎖",
+      "requirement": "需要{craft}達到 {skill} 後傳授",
+      "trainAria": "花費{fee}學習{name}",
+      "dialogOption": "訓練",
+      "dialogOptionAria": "向{name}學習配方",
+      "learned": "已學會配方：{recipe}",
+      "tierUnmet": "你需要{craft}達到 {skill} 才能學習該配方。",
+      "cannotAfford": "你付不起這次訓練的費用。",
+      "notTaughtHere": "這裡不傳授該配方。",
+      "alreadyKnown": "你已經學會了該配方。",
+      "outOfRange": "你必須站在對應的工作臺旁才能訓練。"
     },
     "finder": {
       "title": "地城搜尋器",
@@ -9473,6 +9500,36 @@ export const zh_TW: EnTranslations = {
         "name": "編年史者贊西",
         "title": "荊峰高地編年史",
         "greeting": "高山什麼都不會忘記，{playerName}，我也一樣。讓我看看你都做過什麼吧。"
+      },
+      "forgemistress_darva": {
+        "name": "達爾瓦鍛造師",
+        "title": "熔爐大師",
+        "greeting": "熔爐聽我的話，{className}。帶來好礦石，它也會聽你的。"
+      },
+      "cook_marlow": {
+        "name": "馬洛廚師",
+        "title": "廚房大師",
+        "greeting": "沒有半生不熟的東西能離開我的廚房，{className}。坐下吃完，再回去闖蕩。"
+      },
+      "weaver_ottilie": {
+        "name": "奧蒂莉織工",
+        "title": "織機大師",
+        "greeting": "當心絲線，{className}。在織機前，穩的手勝過有力的手。"
+      },
+      "tinker_gizzel": {
+        "name": "吉澤爾修補匠",
+        "title": "工坊大師",
+        "greeting": "彈簧、齒輪、鋒利的刃口，{className}：你手上缺什麼，工坊裡就有什麼。"
+      },
+      "tanner_hesk": {
+        "name": "赫斯克製革匠",
+        "title": "製革坊大師",
+        "greeting": "皮子的好壞全看鞣製，{className}。鞣槽已經備好，就等你了。"
+      },
+      "alchemist_verane": {
+        "name": "韋蘭煉金術士",
+        "title": "藥坊大師",
+        "greeting": "量兩次，倒一次，{className}。藥坊裡容不得灑掉的藥劑。"
       },
       "tidewatcher_ondrel": {
         "name": "翁德瑞爾·韋恩",

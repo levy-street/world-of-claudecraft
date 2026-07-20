@@ -17,9 +17,12 @@ hands-vs-stations gate, and the placement-safety proof.
   ZONE (the Fenbridge tannery checks zone 2 camps, the Highwatch apothecary zone 3 camps),
   and the master-to-zone assignment pin (four archetype anchors in zone 1; tannery
   Fenbridge; apothecary Highwatch) matches the state.md default as literals.
-- The deny reason localization: the sim emits a stable id, the `sim_i18n` matcher resolves it to
-  a real English `t()` key, and the S3 guard (`tests/localization_fixes.test.ts`) actually covers
-  the new emit site; no raw id or English concat ever reaches the player.
+- The deny reason localization (AS LANDED, the Phase 6 text-free-id precedent): the sim emits
+  the stable id `station_required` on the `craftResult` SimEvent (no free text, no `sim_i18n`
+  matcher row needed); `src/ui/hud.ts` maps it to `hudChrome.crafting.stationRequired`,
+  interpolating `stationName.<type>` resolved from `recipeById(ev.recipeId)?.stationType`.
+  Verify THAT path end to end; the S3 guard (`tests/localization_fixes.test.ts`) stays green by
+  construction, and no raw id or English concat ever reaches the player.
 - FIELD_RECIPES exactness: the set is EXACTLY the pre-phase nine `COMMON_RECIPES` ids, nothing
   more, nothing fewer; each of the nine crafts away from every station and via the T window.
 - The placement test derives from spawn content (camps plus `aggroRadius`), not hardcoded
@@ -76,7 +79,8 @@ Agent correctness deliverables:
   from any station; activate a mobile station and craft through the gate, then let it expire and
   confirm the deny returns.
 - Probe the phase-specific QA emphasis items: the CASTER_HUB_RECIPES migration (no regression
-  against the old requiresHubStation behavior), the deny reason matcher path end to end, and
+  against the old requiresHubStation behavior), the deny reason render path end to end (the
+  as-landed craftResult-id form above, not a sim_i18n matcher), and
   FIELD_RECIPES exactness (exactly the pre-phase nine COMMON_RECIPES ids).
 - Confirm the prime directive: every recipe craftable before the phase is still craftable at its
   station or in the field; nothing strands a mid-progress player.

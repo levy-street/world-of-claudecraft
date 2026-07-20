@@ -1091,10 +1091,10 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'cragwalker_boots',
       'windguard_leggings',
       'simple_fishing_pole',
-      // Tier 4/5 hub-recipe reagents (items.ts): Bree is the trade-goods
-      // vendor inside the crafting hub radius, so every requiresHubStation
-      // recipe has a live reagent source (prog_tools_of_the_trade needs at
-      // least one hub craft to be possible).
+      // Tier 4/5 station-recipe reagents (items.ts): Bree is the Highwatch
+      // trade-goods vendor, so every station-bound (stationType) recipe has
+      // a live reagent source (prog_tools_of_the_trade needs at least one
+      // station craft to be possible).
       'thorium_ore',
       'arcanite_bar',
       'ashwood_log',
@@ -1186,6 +1186,27 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     color: 0x5a6fd6, // cool indigo: the chronicler tint is her identity (shared mage visual)
     questIds: [],
     greeting: 'The mountain forgets nothing, $N, and neither do I. Let us see what you have done.',
+  },
+  // Crafting-station master (Professions 2.0 Phase 8): stands beside the
+  // Highwatch apothecary (content/professions.ts STATIONS), east of the
+  // well with a guard-safe camp margin.
+  alchemist_verane: {
+    id: 'alchemist_verane',
+    name: 'Alchemist Verane',
+    title: 'Master of the Apothecary',
+    pos: { x: 8.5, z: 658 },
+    facing: -0.4,
+    color: 0x58b09c,
+    questIds: [],
+    vendorItems: [
+      'minor_healing_potion',
+      'minor_mana_potion',
+      'lesser_healing_potion',
+      'lesser_mana_potion',
+      'elixir_of_the_bear',
+    ],
+    greeting:
+      'Measure twice and pour once, $C. The apothecary has no patience for spilled reagents.',
   },
 };
 

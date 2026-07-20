@@ -5,11 +5,12 @@
 // wires the craft/close actions. It owns no state; cross-window orchestration
 // stays in Hud (open<Window>/close<Window>), same as vendor_window.ts.
 
+import type { StationType } from '../sim/professions/stations';
 import { craftNameText } from './char_window';
 import type { CraftDifficulty, CraftingView } from './crafting_view';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
-import { formatNumber, t } from './i18n';
+import { formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import type { PainterHostPresentation } from './painter_host';
 import { renderProfessionIdentityCard } from './profession_identity_card';
@@ -33,6 +34,24 @@ const DIFFICULTY_LABEL_KEY = {
   reduced: 'hudChrome.crafting.difficultyReduced',
   none: 'hudChrome.crafting.difficultyNone',
 } as const;
+
+// Station display names (Professions 2.0 Phase 8): StationType id -> the
+// localized station name, same id-to-key table shape as craftNameText
+// (char_window.ts) so the deny toast (hud.ts) and the window rows below
+// never drift. Full literal keys on purpose (the key scanner reads them).
+const STATION_NAME_KEY: Record<StationType, TranslationKey> = {
+  forge: 'hudChrome.crafting.stationName.forge',
+  kitchens: 'hudChrome.crafting.stationName.kitchens',
+  apothecary: 'hudChrome.crafting.stationName.apothecary',
+  tannery: 'hudChrome.crafting.stationName.tannery',
+  loom: 'hudChrome.crafting.stationName.loom',
+  toolworks: 'hudChrome.crafting.stationName.toolworks',
+};
+
+/** The localized display name of one station type. */
+export function stationNameText(type: StationType): string {
+  return t(STATION_NAME_KEY[type]);
+}
 
 export interface CraftingWindowDeps extends PainterHostPresentation {
   hideTooltip(): void;
@@ -141,7 +160,11 @@ export function renderCraftingWindow(
       const difficultyLabel = t(DIFFICULTY_LABEL_KEY[row.difficulty]);
       const stationLabel = row.station ? t('hudChrome.crafting.stationBadge') : '';
       const stationOutOfRange =
-        row.station && !row.station.inRange ? t('hudChrome.crafting.stationOutOfRange') : '';
+        row.station && !row.station.inRange
+          ? t('hudChrome.crafting.stationOutOfRangeNamed', {
+              station: stationNameText(row.station.type),
+            })
+          : '';
       const stationAccessible = row.station
         ? `. ${stationLabel}${stationOutOfRange ? `. ${stationOutOfRange}` : ''}`
         : '';
