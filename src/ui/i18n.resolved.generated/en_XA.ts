@@ -705,6 +705,12 @@ export const en_XA: EnTranslations = {
       "collapseHint": "[Çóļļáþšé ɋúéšţ ţŕáçķéŕ]",
       "expandHint": "[Éẋþáñð ɋúéšţ ţŕáçķéŕ]"
     },
+    "interfaceTabs": {
+      "general": "[Ĝéñéŕáļ]",
+      "frames": "[Ƒŕáɱéš]",
+      "chat": "[Çĥáţ]",
+      "combat": "[Çóɱƀáţ]"
+    },
     "chatTimestamps": {
       "show": "[Šĥóŵ Çĥáţ Ţíɱéšţáɱþš]",
       "format": "[Ţíɱéšţáɱþ Ƒóŕɱáţ]",

@@ -705,6 +705,12 @@ export const ja_JP: EnTranslations = {
       "collapseHint": "クエストトラッカーを折りたたむ",
       "expandHint": "クエストトラッカーを展開する"
     },
+    "interfaceTabs": {
+      "general": "全般",
+      "frames": "フレーム",
+      "chat": "チャット",
+      "combat": "戦闘"
+    },
     "chatTimestamps": {
       "show": "チャットに時刻を表示",
       "format": "時刻の表記形式",

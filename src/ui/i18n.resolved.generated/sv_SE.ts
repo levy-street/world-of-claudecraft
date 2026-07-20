@@ -705,6 +705,12 @@ export const sv_SE: EnTranslations = {
       "collapseHint": "Fäll ihop uppdragsspåraren",
       "expandHint": "Fäll ut uppdragsspåraren"
     },
+    "interfaceTabs": {
+      "general": "General",
+      "frames": "Frames",
+      "chat": "Chat",
+      "combat": "Combat"
+    },
     "chatTimestamps": {
       "show": "Visa chattidsstämplar",
       "format": "Tidsstämpelformat",

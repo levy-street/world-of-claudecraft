@@ -4316,6 +4316,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.chatTimestamps.format': '時刻の表記形式',
   'hudChrome.chatTimestamps.note':
     '新しいチャット行の先頭に受信時刻を付けます（例：[14:32]）。この設定がオンの間に受信したメッセージにのみ適用されます。',
+  'hudChrome.interfaceTabs.general': '全般',
+  'hudChrome.interfaceTabs.frames': 'フレーム',
+  'hudChrome.interfaceTabs.chat': 'チャット',
+  'hudChrome.interfaceTabs.combat': '戦闘',
   'hudChrome.chatTimestamps.show': 'チャットに時刻を表示',
   'hudChrome.chatWindow.move': 'ドラッグでチャットウィンドウを移動',
   'hudChrome.chatWindow.resize': 'ドラッグでチャットウィンドウのサイズを変更',

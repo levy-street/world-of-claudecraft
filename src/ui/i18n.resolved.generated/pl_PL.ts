@@ -705,6 +705,12 @@ export const pl_PL: EnTranslations = {
       "collapseHint": "Zwiń śledzenie zadań",
       "expandHint": "Rozwiń śledzenie zadań"
     },
+    "interfaceTabs": {
+      "general": "General",
+      "frames": "Frames",
+      "chat": "Chat",
+      "combat": "Combat"
+    },
     "chatTimestamps": {
       "show": "Pokaż znaczniki czasu na czacie",
       "format": "Format znacznika czasu",

@@ -4357,6 +4357,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.chatTimestamps.format': 'Формат времени',
   'hudChrome.chatTimestamps.note':
     'Добавляет к каждой новой строке чата время её получения, например [14:32]. Влияет только на сообщения, полученные при включённой настройке.',
+  'hudChrome.interfaceTabs.general': 'Общие',
+  'hudChrome.interfaceTabs.frames': 'Рамки',
+  'hudChrome.interfaceTabs.chat': 'Чат',
+  'hudChrome.interfaceTabs.combat': 'Бой',
   'hudChrome.chatTimestamps.show': 'Показывать время в чате',
   'hudChrome.chatWindow.move': 'Перетащите, чтобы переместить окно чата',
   'hudChrome.chatWindow.resize': 'Перетащите, чтобы изменить размер окна чата',

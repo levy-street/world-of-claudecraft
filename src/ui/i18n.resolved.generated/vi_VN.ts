@@ -705,6 +705,12 @@ export const vi_VN: EnTranslations = {
       "collapseHint": "Thu gọn bảng theo dõi nhiệm vụ",
       "expandHint": "Mở rộng bảng theo dõi nhiệm vụ"
     },
+    "interfaceTabs": {
+      "general": "General",
+      "frames": "Frames",
+      "chat": "Chat",
+      "combat": "Combat"
+    },
     "chatTimestamps": {
       "show": "Hiện Dấu Thời Gian Trò Chuyện",
       "format": "Định Dạng Dấu Thời Gian",

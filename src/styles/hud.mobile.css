@@ -3745,6 +3745,24 @@
     padding-bottom: 9px;
     font-size: 16px;
   }
+  /* Interface panel tab strip on the mobile sheet: keep every tab at the 40px
+     touch floor and the 16px font, and let the four tabs scroll horizontally if
+     the sheet is too narrow to seat them (the same fallback the social tabs use),
+     so a tab never shrinks below the touch target. */
+  body.mobile-touch #options-menu .opt-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.mobile-touch #options-menu .opt-tab {
+    flex: 1 0 auto;
+    min-height: 40px;
+    min-width: max-content;
+    padding-inline: 12px;
+    font-size: 16px;
+    white-space: nowrap;
+  }
   body.mobile-touch #report-window {
     left: 10px !important;
     right: 10px !important;

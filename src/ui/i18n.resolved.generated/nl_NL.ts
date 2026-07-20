@@ -705,6 +705,12 @@ export const nl_NL: EnTranslations = {
       "collapseHint": "Queestevolger inklappen",
       "expandHint": "Queestevolger uitklappen"
     },
+    "interfaceTabs": {
+      "general": "General",
+      "frames": "Frames",
+      "chat": "Chat",
+      "combat": "Combat"
+    },
     "chatTimestamps": {
       "show": "Chat-tijdstempels tonen",
       "format": "Tijdstempelnotatie",

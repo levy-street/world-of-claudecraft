@@ -4146,6 +4146,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.chatTimestamps.format': '时间戳格式',
   'hudChrome.chatTimestamps.note':
     '在每条新聊天消息前加上其到达时间，例如 [14:32]。仅对开启此选项后收到的消息生效。',
+  'hudChrome.interfaceTabs.general': '通用',
+  'hudChrome.interfaceTabs.frames': '头像框',
+  'hudChrome.interfaceTabs.chat': '聊天',
+  'hudChrome.interfaceTabs.combat': '战斗',
   'hudChrome.chatTimestamps.show': '显示聊天时间戳',
   'hudChrome.chatWindow.move': '拖动以移动聊天窗口',
   'hudChrome.chatWindow.resize': '拖动以调整聊天窗口大小',

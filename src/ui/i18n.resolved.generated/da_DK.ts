@@ -705,6 +705,12 @@ export const da_DK: EnTranslations = {
       "collapseHint": "Fold opgavesporing sammen",
       "expandHint": "Fold opgavesporing ud"
     },
+    "interfaceTabs": {
+      "general": "General",
+      "frames": "Frames",
+      "chat": "Chat",
+      "combat": "Combat"
+    },
     "chatTimestamps": {
       "show": "Vis chat-tidsstempler",
       "format": "Tidsstempelformat",

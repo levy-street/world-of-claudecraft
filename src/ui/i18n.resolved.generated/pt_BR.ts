@@ -705,6 +705,12 @@ export const pt_BR: EnTranslations = {
       "collapseHint": "Recolher missões",
       "expandHint": "Expandir missões"
     },
+    "interfaceTabs": {
+      "general": "General",
+      "frames": "Frames",
+      "chat": "Chat",
+      "combat": "Combat"
+    },
     "chatTimestamps": {
       "show": "Mostrar horário no chat",
       "format": "Formato do horário",

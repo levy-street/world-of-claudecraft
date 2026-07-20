@@ -4298,6 +4298,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.chatTimestamps.format': '시각 표시 형식',
   'hudChrome.chatTimestamps.note':
     '새 채팅 줄마다 수신된 시각을 앞에 붙입니다(예: [14:32]). 이 옵션이 켜져 있는 동안 받은 메시지에만 적용됩니다.',
+  'hudChrome.interfaceTabs.general': '일반',
+  'hudChrome.interfaceTabs.frames': '프레임',
+  'hudChrome.interfaceTabs.chat': '채팅',
+  'hudChrome.interfaceTabs.combat': '전투',
   'hudChrome.chatTimestamps.show': '채팅 시각 표시',
   'hudChrome.chatWindow.move': '드래그하여 채팅 창 이동',
   'hudChrome.chatWindow.resize': '드래그하여 채팅 창 크기 조절',

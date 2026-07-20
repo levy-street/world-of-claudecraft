@@ -294,6 +294,12 @@ export const hudChromeStrings = {
     collapseHint: 'Collapse quest tracker',
     expandHint: 'Expand quest tracker',
   },
+  interfaceTabs: {
+    general: 'General',
+    frames: 'Frames',
+    chat: 'Chat',
+    combat: 'Combat',
+  },
   chatTimestamps: {
     show: 'Show Chat Timestamps',
     format: 'Timestamp Format',

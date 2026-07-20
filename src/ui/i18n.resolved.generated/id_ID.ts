@@ -705,6 +705,12 @@ export const id_ID: EnTranslations = {
       "collapseHint": "Ciutkan pelacak misi",
       "expandHint": "Bentangkan pelacak misi"
     },
+    "interfaceTabs": {
+      "general": "General",
+      "frames": "Frames",
+      "chat": "Chat",
+      "combat": "Combat"
+    },
     "chatTimestamps": {
       "show": "Tampilkan Cap Waktu Obrolan",
       "format": "Format Cap Waktu",

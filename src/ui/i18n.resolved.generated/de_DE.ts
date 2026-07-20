@@ -705,6 +705,12 @@ export const de_DE: EnTranslations = {
       "collapseHint": "Quests einklappen",
       "expandHint": "Quests ausklappen"
     },
+    "interfaceTabs": {
+      "general": "General",
+      "frames": "Frames",
+      "chat": "Chat",
+      "combat": "Combat"
+    },
     "chatTimestamps": {
       "show": "Chat-Zeitstempel anzeigen",
       "format": "Zeitstempelformat",

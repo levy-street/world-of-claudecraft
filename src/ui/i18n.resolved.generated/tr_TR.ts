@@ -705,6 +705,12 @@ export const tr_TR: EnTranslations = {
       "collapseHint": "Görev takipçisini daralt",
       "expandHint": "Görev takipçisini genişlet"
     },
+    "interfaceTabs": {
+      "general": "General",
+      "frames": "Frames",
+      "chat": "Chat",
+      "combat": "Combat"
+    },
     "chatTimestamps": {
       "show": "Sohbet Zaman Damgalarını Göster",
       "format": "Zaman Damgası Biçimi",

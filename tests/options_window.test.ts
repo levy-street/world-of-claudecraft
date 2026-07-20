@@ -98,6 +98,82 @@ describe('options_window: deed-broadcast account row', () => {
   });
 });
 
+// The Interface panel is split into four tabs built on the shared WAI-ARIA tab
+// family (tab_strip_view + tab_strip_painter). The pure taxonomy (one category
+// per control, union == full list, no dupes) is proven in options_view.test.ts;
+// here we pin that the painter uses the shared family, filters per tab, places
+// the bespoke rows into their tab, and remembers the tab for the session.
+describe('options_window: interface tab split', () => {
+  it('builds the strip from the shared tab-strip family, not hand-rolled markup', () => {
+    expect(painter).toContain("from './tab_strip_view'");
+    expect(painter).toContain("from './tab_strip_painter'");
+    expect(painter).toContain('tabStripHtml(');
+    expect(painter).toContain('tabStripModel({');
+    // roving keyboard + click selection wired through the shared painter
+    expect(painter).toContain("wireTabStrip(el, 'opt-tab'");
+    expect(painter).toContain("focusActiveTab(this.deps.root(), 'opt-tab', 'on')");
+  });
+
+  it('drives the strip off the four-tab order and repaints the body on select', () => {
+    expect(painter).toContain(
+      'tabs: INTERFACE_TAB_ORDER.map((id) => ({ id, label: t(INTERFACE_TAB_LABEL_KEY[id]) })),',
+    );
+    // selecting a tab updates the session tab then re-renders the whole view
+    expect(painter).toContain('this.interfaceTab = id as InterfaceTab;');
+    expect(painter).toMatch(
+      /wireTabStrip\(el, 'opt-tab', \(id, focusFollow\) => \{\s*this\.interfaceTab = id as InterfaceTab;\s*this\.renderInterface\(\);/,
+    );
+    // the panel body is the tabpanel the strip points at
+    expect(painter).toContain("panelId: 'interface-tabpanel',");
+    expect(painter).toContain("body.setAttribute('role', 'tabpanel');");
+  });
+
+  it('filters the declarative controls to the active tab', () => {
+    expect(painter).toContain(
+      'interfaceControlsForTab(buildInterfaceControls(this.settingsSource(hooks)), tab)',
+    );
+  });
+
+  it('places the bespoke rows into their approved tab', () => {
+    // language + theme lead the General tab
+    expect(painter).toMatch(
+      /if \(tab === 'general'\) \{\s*this\.languageSelect\(body\);\s*this\.renderThemeControls\(body\);/,
+    );
+    // the unit-frames reset row closes the Frames tab
+    expect(painter).toContain("if (tab === 'frames') this.unitFramesResetRow(body);");
+    // the chat-timestamp / chat-reset / deed-broadcast rows live in the Chat tab
+    expect(painter).toMatch(
+      /if \(tab === 'chat'\) \{[\s\S]*this\.chatTimestampRows\(body\);[\s\S]*this\.chatWindowResetRow\(body\);/,
+    );
+  });
+
+  it('remembers the interface tab for the session (a field, defaulting to general)', () => {
+    expect(painter).toContain("private interfaceTab: InterfaceTab = 'general';");
+    // The ONLY mutation of interfaceTab is the tab-select in the wireTabStrip
+    // callback, so the assignment count across the whole painter is exactly one.
+    expect(painter.match(/this\.interfaceTab = /g) ?? []).toHaveLength(1);
+    // And that one assignment is the tab-select, not a reset.
+    expect(painter).toContain('this.interfaceTab = id as InterfaceTab;');
+  });
+
+  it('never resets the interface tab in a lifecycle method (open/close/back)', () => {
+    // The session-persistence contract fails if a reset creeps into a lifecycle
+    // path, even one the "assignment count" guard above would miss (e.g. via a
+    // helper or a differently-spelled expression). Slice each lifecycle method
+    // body and assert none so much as mentions interfaceTab: only tab selection
+    // touches it. This is the source-guard equivalent of a close-reopen round
+    // trip (the live DOM round trip is the opt-in browser suite).
+    const methodBody = (sig: string) => {
+      const start = painter.indexOf(sig);
+      expect(start, `method not found: ${sig}`).toBeGreaterThan(-1);
+      return painter.slice(start, painter.indexOf('\n  }\n', start));
+    };
+    for (const sig of ['toggle(): void {', 'close(): void {', 'private goBack(): void {']) {
+      expect(methodBody(sig), `${sig} must not touch interfaceTab`).not.toContain('interfaceTab');
+    }
+  });
+});
+
 // The exact control-dispatch wiring. The pure value coercion is unit-tested in
 // options_view.test.ts (sliderDispatchValue / toggleNextValue / boolToggleNextValue);
 // here we pin that the painter routes each descriptor kind to its builder and fires

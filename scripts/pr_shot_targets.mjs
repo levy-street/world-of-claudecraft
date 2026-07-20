@@ -470,6 +470,29 @@ export const TARGETS = [
     },
   },
   {
+    key: 'interface-options-tabs',
+    label: 'Interface options panel (four-tab split)',
+    when: ['ui/options_window', 'ui/options_view'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        // Land on a fresh main menu, then route to the Interface sub-panel. The
+        // main menu lists Key Bindings, Controller, Graphics, Interface, Audio,
+        // Performance, [Report a Bug (online only)], Log Out, Return; offline has
+        // no bug-report row, so Interface is the fourth button.
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[3]?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .set-rows');
+      return open ? { clip: '#options-menu' } : {};
+    },
+  },
+  {
     key: 'chat-general-tab',
     label: 'Chat window: General/Chat tab',
     when: ['log_event_route'],

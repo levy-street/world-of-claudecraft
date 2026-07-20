@@ -705,6 +705,12 @@ export const ru_RU: EnTranslations = {
       "collapseHint": "Свернуть трекер заданий",
       "expandHint": "Развернуть трекер заданий"
     },
+    "interfaceTabs": {
+      "general": "Общие",
+      "frames": "Рамки",
+      "chat": "Чат",
+      "combat": "Бой"
+    },
     "chatTimestamps": {
       "show": "Показывать время в чате",
       "format": "Формат времени",

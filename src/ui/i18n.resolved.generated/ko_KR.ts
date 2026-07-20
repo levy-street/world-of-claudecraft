@@ -705,6 +705,12 @@ export const ko_KR: EnTranslations = {
       "collapseHint": "퀘스트 추적기 접기",
       "expandHint": "퀘스트 추적기 펼치기"
     },
+    "interfaceTabs": {
+      "general": "일반",
+      "frames": "프레임",
+      "chat": "채팅",
+      "combat": "전투"
+    },
     "chatTimestamps": {
       "show": "채팅 시각 표시",
       "format": "시각 표시 형식",

@@ -705,6 +705,12 @@ export const zh_TW: EnTranslations = {
       "collapseHint": "收合任務追蹤器",
       "expandHint": "展開任務追蹤器"
     },
+    "interfaceTabs": {
+      "general": "一般",
+      "frames": "頭像框",
+      "chat": "聊天",
+      "combat": "戰鬥"
+    },
     "chatTimestamps": {
       "show": "顯示聊天時間戳記",
       "format": "時間戳記格式",

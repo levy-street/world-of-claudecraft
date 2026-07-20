@@ -705,6 +705,12 @@ export const cs_CZ: EnTranslations = {
       "collapseHint": "Sbalit tracker úkolů",
       "expandHint": "Rozbalit tracker úkolů"
     },
+    "interfaceTabs": {
+      "general": "General",
+      "frames": "Frames",
+      "chat": "Chat",
+      "combat": "Combat"
+    },
     "chatTimestamps": {
       "show": "Zobrazit časové značky chatu",
       "format": "Formát časových značek",

@@ -8985,6 +8985,41 @@
     font-size: 11px;
     color: var(--color-text-muted);
   }
+  /* Interface panel tab strip (the shared WAI-ARIA tab family). Mirrors the
+     social-window tab look but scoped to .opt-tab so the two stay independent.
+     The four tabs share the row equally on desktop; the mobile sheet override in
+     hud.mobile.css keeps the 40px touch floor and scrolls if the sheet is very
+     narrow. */
+  .opt-tabs {
+    display: flex;
+    gap: 4px;
+    margin: 6px 0 10px;
+    flex: none;
+  }
+  .opt-tab {
+    flex: 1;
+    padding: 7px 4px;
+    font-size: 13px;
+    font-family: var(--title-font);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    background: #1a1410;
+    border: 1px solid #463a1c;
+    border-radius: 4px;
+    text-align: center;
+  }
+  .opt-tab:hover {
+    color: var(--gold);
+  }
+  .opt-tab:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .opt-tab.on {
+    color: var(--gold);
+    border-color: #6f5a2a;
+    background: linear-gradient(#2a2436, #161220);
+  }
   .kb-rows {
     display: flex;
     flex-direction: column;

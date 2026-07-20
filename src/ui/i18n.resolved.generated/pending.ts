@@ -11,28 +11,52 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.interfaceTabs.chat",
+    "hudChrome.interfaceTabs.combat",
+    "hudChrome.interfaceTabs.frames",
+    "hudChrome.interfaceTabs.general"
   ],
   "es_ES": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.interfaceTabs.chat",
+    "hudChrome.interfaceTabs.combat",
+    "hudChrome.interfaceTabs.frames",
+    "hudChrome.interfaceTabs.general"
   ],
   "fr_FR": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.interfaceTabs.chat",
+    "hudChrome.interfaceTabs.combat",
+    "hudChrome.interfaceTabs.frames",
+    "hudChrome.interfaceTabs.general"
   ],
   "fr_CA": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.interfaceTabs.chat",
+    "hudChrome.interfaceTabs.combat",
+    "hudChrome.interfaceTabs.frames",
+    "hudChrome.interfaceTabs.general"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.interfaceTabs.chat",
+    "hudChrome.interfaceTabs.combat",
+    "hudChrome.interfaceTabs.frames",
+    "hudChrome.interfaceTabs.general"
   ],
   "de_DE": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.interfaceTabs.chat",
+    "hudChrome.interfaceTabs.combat",
+    "hudChrome.interfaceTabs.frames",
+    "hudChrome.interfaceTabs.general"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -40,39 +64,75 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.interfaceTabs.chat",
+    "hudChrome.interfaceTabs.combat",
+    "hudChrome.interfaceTabs.frames",
+    "hudChrome.interfaceTabs.general"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.interfaceTabs.chat",
+    "hudChrome.interfaceTabs.combat",
+    "hudChrome.interfaceTabs.frames",
+    "hudChrome.interfaceTabs.general"
   ],
   "nl_NL": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.interfaceTabs.chat",
+    "hudChrome.interfaceTabs.combat",
+    "hudChrome.interfaceTabs.frames",
+    "hudChrome.interfaceTabs.general"
   ],
   "pl_PL": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.interfaceTabs.chat",
+    "hudChrome.interfaceTabs.combat",
+    "hudChrome.interfaceTabs.frames",
+    "hudChrome.interfaceTabs.general"
   ],
   "id_ID": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.interfaceTabs.chat",
+    "hudChrome.interfaceTabs.combat",
+    "hudChrome.interfaceTabs.frames",
+    "hudChrome.interfaceTabs.general"
   ],
   "tr_TR": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.interfaceTabs.chat",
+    "hudChrome.interfaceTabs.combat",
+    "hudChrome.interfaceTabs.frames",
+    "hudChrome.interfaceTabs.general"
   ],
   "sv_SE": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.interfaceTabs.chat",
+    "hudChrome.interfaceTabs.combat",
+    "hudChrome.interfaceTabs.frames",
+    "hudChrome.interfaceTabs.general"
   ],
   "vi_VN": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.interfaceTabs.chat",
+    "hudChrome.interfaceTabs.combat",
+    "hudChrome.interfaceTabs.frames",
+    "hudChrome.interfaceTabs.general"
   ],
   "da_DK": [
     "hudChrome.gathering.catchLine",
-    "hudChrome.gathering.fishing"
+    "hudChrome.gathering.fishing",
+    "hudChrome.interfaceTabs.chat",
+    "hudChrome.interfaceTabs.combat",
+    "hudChrome.interfaceTabs.frames",
+    "hudChrome.interfaceTabs.general"
   ]
 };
