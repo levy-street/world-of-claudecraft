@@ -12,6 +12,8 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   // ---- swords (sword_a..g + the adv set; legendary/epic kept distinct) --------
   worn_sword: 'sword_a',
   eastbrook_arming_sword: 'sword_b',
+  ironedge_longsword: 'sword_b', // crafted (weaponcrafting tier 2)
+  thorium_warblade: 'adv_sword_1handed', // crafted; warblades share adv_sword_1handed
   gravecaller_blade: 'sword_c',
   emberfang_warblade: 'sword_c',
   redbrook_blade: 'sword_d',
@@ -40,6 +42,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   caravan_warden_dirk: 'dagger_a',
   icevein_dirk: 'dagger_b',
   keen_dirk: 'dagger_b',
+  whetted_iron_dirk: 'dagger_b', // crafted; dirks share dagger_b
   mistbinder_kris: 'dagger_b',
   mirejaw_biteblade: 'dagger_b',
   cultist_flayer: 'dagger_b',
@@ -71,6 +74,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   hollow_vigil_staff: 'staff_c',
   emberwood_staff: 'staff_d',
   ironvein_lantern_staff: 'staff_d',
+  elderwood_battle_staff: 'staff_d', // crafted (weaponcrafting tier 3)
   staff_of_velkhar: 'staff_d',
   vaels_mist_staff: 'adv_staff',
   ogre_bonecharm_staff: 'adv_staff',
@@ -92,6 +96,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   // ---- maces (only 4 hammer models for ~9 maces) -----------------------------
   training_mace: 'hammer_a',
   bronzework_mace: 'hammer_a',
+  copper_flanged_mace: 'hammer_a', // crafted (weaponcrafting tier 1)
   moggers_copper_cudgel: 'hammer_b',
   crag_warden_cudgel: 'hammer_b',
   voss_sanctified_mace: 'hammer_c',
@@ -100,12 +105,15 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   brutoks_maul: 'hammer_d',
   drownedmoon_maul: 'hammer_d',
   nhalias_bell_maul: 'hammer_d', // mauls share hammer_d
+  ironshod_maul: 'hammer_d', // crafted 2H maul
 
   // ---- axes (axe_a..d + adv axes) --------------------------------------------
   rusty_hatchet: 'axe_a',
+  copper_bearded_axe: 'axe_a', // crafted (weaponcrafting tier 1)
   drogmars_skullcleaver: 'axe_b',
   deacons_cleaver: 'axe_c',
   gorraks_cruel_chopper: 'axe_d',
+  arcanite_war_axe: 'axe_d', // crafted (weaponcrafting tier 3)
   gorraks_cleaver: 'adv_axe_1handed',
   tradesman_hatchet: 'adv_axe_1handed',
   gravewyrm_cleaver: 'adv_axe_1handed', // EPIC: Heroic Korzul axe
@@ -114,4 +122,5 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   // ---- polearms --------------------------------------------------------------
   fen_reaver_glaive: 'scythe', // "Reaver" -> reaper scythe
   tidereaver_gaff: 'spear_a', // a gaff is a hooked spear
+  ironbark_boar_spear: 'spear_a', // crafted 2H spear
 };
