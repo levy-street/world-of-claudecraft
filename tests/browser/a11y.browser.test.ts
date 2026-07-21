@@ -390,6 +390,8 @@ describe('axe: options menu', () => {
       (button) => button.textContent === t('hud.options.interface'),
     );
     interfaceButton?.click();
+    // The Interface panel is tabbed; both action-bar toggles live under Combat.
+    root.querySelector<HTMLButtonElement>('.opt-tab[data-tab="combat"]')?.click();
 
     expect(toggle('showThirdActionBar')?.disabled).toBe(true);
     const secondary = toggle('showSecondaryActionBar');
