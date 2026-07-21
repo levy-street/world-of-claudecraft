@@ -1,13 +1,13 @@
 // Pure resolver: maps a weapon item id to the i18n key for its type label
 // (Sword / Dagger / Mace / Axe / Staff / Wand / Polearm / Bow / Crossbow) shown
-// right-aligned on the tooltip slot line, mirroring the armor-weight row. The
-// decision of WHICH type a weapon is lives in the sim's weaponTypeForItem (the
-// test-guarded WEAPON_TYPE_BY_ITEM map, heroic-aware); this leaf only turns that
-// type into a label key so the HUD consumer stays a thin lookup. Unlike the armor
-// row, the type is NEVER colored by class: any class can equip most weapon types
-// and the class/weapon rules are archetype-based, not type-based, so a red label
-// would mislead. DOM-free and i18n-runtime-free, unit-tested in
-// tests/weapon_type_label.test.ts.
+// on its own plain line in the tooltip, under the quality/kind line and above the
+// slot line. The decision of WHICH type a weapon is lives in the sim's
+// weaponTypeForItem (the test-guarded WEAPON_TYPE_BY_ITEM map, heroic-aware); this
+// leaf only turns that type into a label key so the HUD consumer stays a thin
+// lookup. Unlike the armor-weight row, the type is NEVER colored by class: any
+// class can equip most weapon types and the class/weapon rules are archetype-based,
+// not type-based, so a red label would mislead. DOM-free and i18n-runtime-free,
+// unit-tested in tests/weapon_type_label.test.ts.
 import type { ItemWeaponType } from '../sim/content/weapon_skin_rules';
 import { weaponTypeForItem } from '../sim/content/weapon_skin_rules';
 import type { TranslationKey } from './i18n';
