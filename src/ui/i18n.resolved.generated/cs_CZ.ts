@@ -1037,6 +1037,7 @@ export const cs_CZ: EnTranslations = {
       "showWalletOnPlayerCard": "Zobrazit peněženku na kartě hráče",
       "showDevBadges": "Zobrazit vývojářské odznaky",
       "showOwnNameplate": "Zobrazit mou jmenovku",
+      "showPlayerNameplates": "Show Player Nameplates",
       "uiScale": "Měřítko UI",
       "playerFrameScale": "Měřítko rámu hráče",
       "targetFrameScale": "Měřítko rámu cíle",

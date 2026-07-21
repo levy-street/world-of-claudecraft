@@ -240,6 +240,11 @@ export const BOOL_SETTINGS = {
   // it, so Discord linking and other flair changes have immediate visual feedback.
   // Purely a local display preference; players can turn it off for the classic view.
   showOwnNameplate: { def: true },
+  // on by default: render OTHER players' overhead nameplates. Off hides them
+  // (the current target stays visible so a clicked player is still readable),
+  // decluttering crowded hubs on short mobile viewports. Purely a local display
+  // preference; mob nameplates and unit frames are unaffected.
+  showPlayerNameplates: { def: true },
   // off by default: invert the vertical axis of mouselook (push mouse forward
   // to look down), the classic flight-sim preference.
   invertLookY: { def: false },

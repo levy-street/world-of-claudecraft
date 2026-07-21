@@ -922,6 +922,11 @@ export class Renderer {
   // overhead nameplate renders exactly as other players see it. Initialized from
   // Settings and kept live by main.ts's applySetting dispatcher (mirrors showDevBadges).
   showOwnNameplate = false;
+  // settings-backed other-players nameplate toggle (on by default): when off,
+  // other players' plates hide (current target exempt) so crowded hubs stay
+  // readable, especially on short mobile viewports. Initialized from Settings
+  // and kept live by main.ts's applySetting dispatcher (mirrors showOwnNameplate).
+  showPlayerNameplates = true;
   // settings-menu graphics knobs (applied live)
   private renderScale = 1; // user-requested resolution ceiling on top of the device pixel ratio
   private effectiveRenderScale = 1; // runtime value after adaptive backoff
@@ -1234,6 +1239,7 @@ export class Renderer {
       showNameplates: () => this.showNameplates,
       showDevBadges: () => this.showDevBadges,
       showOwnNameplate: () => this.showOwnNameplate,
+      showPlayerNameplates: () => this.showPlayerNameplates,
       isHostilePlayer: (e) => this.isHostilePlayer(e),
     });
 

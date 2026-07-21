@@ -847,6 +847,9 @@ export const hudChromeStrings = {
     // Interface panel toggle: render your own overhead nameplate the way other
     // players see it (on by default).
     showOwnNameplate: 'Show My Nameplate',
+    // Interface panel toggle: render other players' overhead nameplates (on by
+    // default); off declutters crowded hubs, the current target stays visible.
+    showPlayerNameplates: 'Show Player Nameplates',
     // Interface panel: global HUD zoom slider, and the mirror of the landing
     // page's high-contrast backdrop toggle.
     uiScale: 'UI Scale',

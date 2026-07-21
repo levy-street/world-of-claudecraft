@@ -5725,6 +5725,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.options.showDevBadges'
   | 'hudChrome.options.showItemLevel'
   | 'hudChrome.options.showOwnNameplate'
+  | 'hudChrome.options.showPlayerNameplates'
   | 'hudChrome.options.showSecondaryActionBar'
   | 'hudChrome.options.showTargetOfTarget'
   | 'hudChrome.options.showThirdActionBar'

@@ -1037,6 +1037,7 @@ export const en_XA: EnTranslations = {
       "showWalletOnPlayerCard": "[Šĥóŵ Ŵáļļéţ óñ Þļáýéŕ Çáŕð]",
       "showDevBadges": "[Šĥóŵ Ðéʋéļóþéŕ Ɓáðĝéš]",
       "showOwnNameplate": "[Šĥóŵ Ɱý Ñáɱéþļáţé]",
+      "showPlayerNameplates": "[Šĥóŵ Þļáýéŕ Ñáɱéþļáţéš]",
       "uiScale": "[ÚÍ Šçáļé]",
       "playerFrameScale": "[Þļáýéŕ Ƒŕáɱé Šçáļé]",
       "targetFrameScale": "[Ţáŕĝéţ Ƒŕáɱé Šçáļé]",

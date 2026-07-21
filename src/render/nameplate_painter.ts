@@ -72,6 +72,8 @@ export interface NameplatePainterDeps {
   showDevBadges: () => boolean;
   /** the player's own-nameplate toggle: render your own plate as others see it */
   showOwnNameplate: () => boolean;
+  /** the player's other-players nameplate toggle (current target exempt) */
+  showPlayerNameplates: () => boolean;
   /** PvP reaction check, owned by the renderer (duel/arena state) */
   isHostilePlayer: (e: Entity) => boolean;
 }
@@ -84,6 +86,7 @@ export class NameplatePainter {
   private readonly showNameplates: () => boolean;
   private readonly showDevBadges: () => boolean;
   private readonly showOwnNameplate: () => boolean;
+  private readonly showPlayerNameplates: () => boolean;
   private readonly isHostilePlayer: (e: Entity) => boolean;
   // scratch reused every frame (no per-frame alloc); was renderer.tmpV/tmpV2.
   private readonly tmpV = new THREE.Vector3();
@@ -107,6 +110,7 @@ export class NameplatePainter {
     this.showNameplates = deps.showNameplates;
     this.showDevBadges = deps.showDevBadges;
     this.showOwnNameplate = deps.showOwnNameplate;
+    this.showPlayerNameplates = deps.showPlayerNameplates;
     this.isHostilePlayer = deps.isHostilePlayer;
   }
 
@@ -120,11 +124,20 @@ export class NameplatePainter {
     const showNameplates = this.showNameplates();
     const showDevBadges = this.showDevBadges();
     const showOwnNameplate = this.showOwnNameplate();
+    const showPlayerNameplates = this.showPlayerNameplates();
     this.anchorCount = 0;
     for (const [id, v] of this.views) {
       const e = world.entities.get(id);
       if (!e) continue;
-      const plan = nameplatePlanInto(this.plan, e, p, v.height, showNameplates, showOwnNameplate);
+      const plan = nameplatePlanInto(
+        this.plan,
+        e,
+        p,
+        v.height,
+        showNameplates,
+        showOwnNameplate,
+        showPlayerNameplates,
+      );
       if (plan.hidden) {
         this.hideNameplate(v);
         continue;

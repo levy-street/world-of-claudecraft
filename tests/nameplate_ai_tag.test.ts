@@ -141,6 +141,7 @@ function harness(
     showNameplates: () => true,
     showDevBadges: () => true,
     showOwnNameplate: () => false,
+    showPlayerNameplates: () => true,
     isHostilePlayer: options.isHostilePlayer ?? (() => false),
   });
   return { painter, v };

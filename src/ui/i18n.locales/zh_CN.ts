@@ -949,6 +949,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnPlayerCard': '在玩家卡片显示钱包',
   'hudChrome.options.showDevBadges': '显示开发者徽章',
   'hudChrome.options.showOwnNameplate': '显示我的姓名板',
+  'hudChrome.options.showPlayerNameplates': '显示玩家姓名板',
   'hudChrome.playerCard.showWalletBadge': '显示钱包徽章',
   'hudChrome.options.uiScale': '界面缩放',
   'hudChrome.options.highContrastBackground': '高对比度背景',

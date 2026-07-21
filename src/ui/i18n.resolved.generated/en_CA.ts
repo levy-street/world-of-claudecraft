@@ -1037,6 +1037,7 @@ export const en_CA: EnTranslations = {
       "showWalletOnPlayerCard": "Show Wallet on Player Card",
       "showDevBadges": "Show Developer Badges",
       "showOwnNameplate": "Show My Nameplate",
+      "showPlayerNameplates": "Show Player Nameplates",
       "uiScale": "UI Scale",
       "playerFrameScale": "Player Frame Scale",
       "targetFrameScale": "Target Frame Scale",

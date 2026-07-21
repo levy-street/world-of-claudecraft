@@ -1037,6 +1037,7 @@ export const zh_TW: EnTranslations = {
       "showWalletOnPlayerCard": "在玩家卡片顯示錢包",
       "showDevBadges": "顯示開發者徽章",
       "showOwnNameplate": "顯示我的姓名板",
+      "showPlayerNameplates": "顯示玩家姓名板",
       "uiScale": "介面縮放",
       "playerFrameScale": "玩家框縮放",
       "targetFrameScale": "目標框縮放",

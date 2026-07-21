@@ -1037,6 +1037,7 @@ export const ru_RU: EnTranslations = {
       "showWalletOnPlayerCard": "Показывать кошелек на карточке игрока",
       "showDevBadges": "Показывать значки разработчика",
       "showOwnNameplate": "Показывать свою табличку с именем",
+      "showPlayerNameplates": "Показывать таблички с именами игроков",
       "uiScale": "Масштаб интерфейса",
       "playerFrameScale": "Размер рамки игрока",
       "targetFrameScale": "Размер рамки цели",

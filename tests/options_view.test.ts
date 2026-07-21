@@ -279,6 +279,7 @@ const GENERAL_KEYS = [
   'showDailyRewardsChest',
   'showItemLevel',
   'showOwnNameplate',
+  'showPlayerNameplates',
 ];
 const FRAMES_KEYS = [
   'playerFrameScale',
