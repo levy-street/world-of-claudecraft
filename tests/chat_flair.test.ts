@@ -278,4 +278,24 @@ describe('staff role: the chat fan-out encoding (anti-impersonation tag)', () =>
     route(server);
     expect(chatsOf(fb).find((ev) => ev.text === 'untagged').flair).toBeUndefined();
   });
+
+  it('never stamps a COMMUNITY role: the chat tag is a staff-only authority signal', () => {
+    const server = new GameServer();
+    const fa = fakeWs();
+    const fb = fakeWs();
+    const speaker = joinServer(server, fa, 1, 'Fan');
+    const listener = joinServer(server, fb, 2, 'Listener');
+    colocate(server, speaker.pid, listener.pid);
+    // Every non-staff catalog role (nameplate-tagged, chat-untagged), one line each.
+    for (const role of ['artists', 'contentcreator', 'legend', 'shill']) {
+      grantRole(server, speaker.pid, role);
+      cmd(server, speaker, `hello from ${role}`);
+    }
+    route(server);
+    for (const role of ['artists', 'contentcreator', 'legend', 'shill']) {
+      const heard = chatsOf(fb).find((ev) => ev.text === `hello from ${role}`);
+      expect(heard, role).toBeDefined();
+      expect(heard.flair, role).toBeUndefined();
+    }
+  });
 });

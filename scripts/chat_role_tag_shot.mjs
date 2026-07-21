@@ -49,7 +49,10 @@ await page.evaluate(() => {
     { from: 'Mira', flair: { role: 'coredevs' }, text: 'Server restart in 10 minutes.' },
     { from: 'Torv', flair: { role: 'mods' }, text: 'Keep general chat friendly please.' },
     { from: 'Impostor', text: 'i am also a dev btw (no tag: not verified)' },
-    { from: 'Caster', flair: { role: 'contentcreator' }, text: 'Streaming the raid tonight!' },
+    // Community roles (Artist/Content Creator/LEGEND/SHILL) are nameplate-only:
+    // the server never stamps them onto chat, so this line renders bare even
+    // though the sender holds a catalog role.
+    { from: 'Caster', text: 'Streaming the raid tonight! (community role: no chat tag)' },
   ];
   hud.handleEvents(
     lines.map((l, i) => ({

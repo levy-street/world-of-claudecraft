@@ -30,6 +30,7 @@ import {
 } from '../src/sim/data';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { parseRelayCommand } from '../src/sim/discord_relay';
+import { specialRoleChatTag } from '../src/sim/discord_roles';
 import {
   isInJailCage,
   JAIL_CENTER,
@@ -6199,13 +6200,16 @@ export class GameServer {
     for (const ev of events) {
       if (ev.type !== 'chat') continue;
       const flair = this.chatFlairForPid(ev.fromPid);
-      // The sender's top staff/special Discord role (the anti-impersonation
-      // chat tag) is composed here from the SENDER's entity rather than folded
-      // into the cached session.chatFlair: e.discordRole is written by the
-      // bot's members-meta push on its own cadence, so reading it live at
-      // fan-out cannot go stale. Allocates only for role holders.
+      // The sender's top STAFF Discord role (the anti-impersonation chat tag)
+      // is composed here from the SENDER's entity rather than folded into the
+      // cached session.chatFlair: e.discordRole is written by the bot's
+      // members-meta push on its own cadence, so reading it live at fan-out
+      // cannot go stale. Gated on the catalog's chatTag flag so community
+      // roles (Artist, Content Creator, LEGEND, SHILL) stay nameplate-only
+      // and the chat tag remains a pure authority signal. Allocates only for
+      // staff senders.
       const role = this.sim.entities.get(ev.fromPid)?.discordRole;
-      if (role) ev.flair = { ...flair, role };
+      if (role && specialRoleChatTag(role)) ev.flair = { ...flair, role };
       else if (flair) ev.flair = flair;
     }
     // ignore list: social invites from blocked senders are resolved once per
