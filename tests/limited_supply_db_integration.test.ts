@@ -73,7 +73,7 @@ describeDb('limited-relic serial ledger (real Postgres)', () => {
   it('markMinted confirms a leased serial once, and is a no-op on a non-leased row', async () => {
     await db.seedSupply([{ itemId: 'relic', supply: 3 }]);
     await db.leaseSerial('relic', 'r1'); // serial 1
-    await db.markMinted('relic', 1, { characterId: 42, characterName: 'Ada' });
+    await db.markMinted('relic', 1, { mintedById: 42, mintedByName: 'Ada' });
     expect(await rowState('relic', 1)).toBe('minted');
     const row = await pool.query(
       'SELECT character_id, character_name, minted_at FROM limited_serials WHERE serial=1',
@@ -82,7 +82,7 @@ describeDb('limited-relic serial ledger (real Postgres)', () => {
     expect(row.rows[0].character_name).toBe('Ada');
     expect(row.rows[0].minted_at).not.toBeNull();
     // A retry (or a mint against an already-minted serial) changes nothing.
-    await db.markMinted('relic', 1, { characterId: 99, characterName: 'Mallory' });
+    await db.markMinted('relic', 1, { mintedById: 99, mintedByName: 'Mallory' });
     const after = await pool.query('SELECT character_id FROM limited_serials WHERE serial=1');
     expect(after.rows[0].character_id).toBe(42); // not overwritten
   });
@@ -91,7 +91,7 @@ describeDb('limited-relic serial ledger (real Postgres)', () => {
     await db.seedSupply([{ itemId: 'relic', supply: 3 }]);
     await db.leaseSerial('relic', 'r1'); // 1 (r1)
     await db.leaseSerial('relic', 'r2'); // 2 (r2)
-    await db.markMinted('relic', 1, { characterId: 1, characterName: 'A' });
+    await db.markMinted('relic', 1, { mintedById: 1, mintedByName: 'A' });
     // r2 tries to release serials 1 (minted, not its realm) and 2 (its own leased).
     await db.releaseSerials('relic', [1, 2], 'r2');
     expect(await rowState('relic', 1)).toBe('minted'); // untouched (wrong realm + minted)
@@ -102,7 +102,7 @@ describeDb('limited-relic serial ledger (real Postgres)', () => {
     await db.seedSupply([{ itemId: 'relic', supply: 5 }]);
     await db.leaseSerial('relic', 'r1'); // 1
     await db.leaseSerial('relic', 'r1'); // 2
-    await db.markMinted('relic', 1, { characterId: 7, characterName: 'Bru' });
+    await db.markMinted('relic', 1, { mintedById: 7, mintedByName: 'Bru' });
     const snap = await db.readMints();
     const row = snap.supplies.find((s) => s.itemId === 'relic');
     expect(row).toEqual({ itemId: 'relic', supply: 5, minted: 1, leased: 1 });
@@ -110,7 +110,7 @@ describeDb('limited-relic serial ledger (real Postgres)', () => {
     expect(snap.mints[0]).toMatchObject({
       itemId: 'relic',
       serial: 1,
-      characterName: 'Bru',
+      mintedByName: 'Bru',
       realm: 'r1',
     });
     expect(typeof snap.mints[0].mintedAt).toBe('string');

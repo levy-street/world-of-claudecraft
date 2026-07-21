@@ -236,3 +236,51 @@ describe('limited relics: end-to-end through rollLoot', () => {
     expect(minted).toBe(true);
   });
 });
+
+// Why the public ledger's winner field is named `mintedBy` and not an
+// ownership word (server/limited_routes.ts, server/limited_supply_db.ts).
+//
+// A minted serial rides on the copy's ItemInstancePayload, and a player-to-
+// player trade preserves that payload (social/trade.ts removeOffer/grantOffer),
+// so a relic legitimately changes hands while its serial follows it. The mint
+// ledger is written exactly once, at the moment of possession, and is never
+// rewritten on transfer: it is a permanent record of who WON the serial, not an
+// index of who holds it now. This pins the transfer that makes that distinction
+// real, so nobody can reintroduce a current-owner reading of the mint ledger
+// without this test going red.
+describe('limited relics: a minted serial survives a trade', () => {
+  it('moves the serialed copy to the other player, leaving the mint record the winner', () => {
+    const sim = makeSim();
+    const winner = sim.addPlayer('warrior', 'Winner');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    const ew = sim.entities.get(winner)!;
+    const eb = sim.entities.get(buyer)!;
+    ew.pos.x = 0;
+    ew.pos.z = -40;
+    ew.prevPos = { ...ew.pos };
+    eb.pos.x = 2;
+    eb.pos.z = -40;
+    eb.prevPos = { ...eb.pos };
+    const metaW = sim.players.get(winner)!;
+    const metaB = sim.players.get(buyer)!;
+
+    // The winner holds relic #7: exactly what a mint leaves behind.
+    sim.addItemInstance(CROWN, { serial: 7 }, winner);
+    expect(metaW.inventory.find((s) => s.itemId === CROWN)?.instance?.serial).toBe(7);
+
+    sim.tradeRequest(buyer, winner);
+    sim.tradeAccept(buyer);
+    sim.tradeSetOffer([{ itemId: CROWN, count: 1 }], 0, winner);
+    sim.tradeConfirm(winner);
+    sim.tradeConfirm(buyer);
+    sim.tick();
+
+    // The serial followed the item to its new holder, intact and unduplicated.
+    expect(metaW.inventory.find((s) => s.itemId === CROWN)).toBeUndefined();
+    const received = metaB.inventory.find((s) => s.itemId === CROWN);
+    expect(received?.instance?.serial).toBe(7);
+    // The sim emits no mint event for a transfer, so the server observer never
+    // rewrites the ledger row: `mintedBy` stays the original winner by design.
+    expect(sim.events.filter((e: SimEvent) => e.type === 'limitedMint')).toHaveLength(0);
+  });
+});

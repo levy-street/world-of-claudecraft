@@ -36,8 +36,8 @@ describe('buildLimitedMintsResponse', () => {
     const snapshot: LimitedMintsSnapshot = {
       supplies: [{ itemId: 'emberfall_edge', supply: 25, minted: 2, leased: 1 }],
       mints: [
-        { itemId: 'emberfall_edge', serial: 2, characterName: 'Bru', realm: 'r1', mintedAt: 'b' },
-        { itemId: 'emberfall_edge', serial: 1, characterName: 'Ada', realm: 'r1', mintedAt: 'a' },
+        { itemId: 'emberfall_edge', serial: 2, mintedByName: 'Bru', realm: 'r1', mintedAt: 'b' },
+        { itemId: 'emberfall_edge', serial: 1, mintedByName: 'Ada', realm: 'r1', mintedAt: 'a' },
       ],
     };
     const { items } = buildLimitedMintsResponse(snapshot);
@@ -52,7 +52,36 @@ describe('buildLimitedMintsResponse', () => {
     expect(row.remaining).toBe(22);
     // mints are sorted by serial ascending
     expect(row.mints.map((m) => m.serial)).toEqual([1, 2]);
-    expect(row.mints[0].characterName).toBe('Ada');
+    expect(row.mints[0].mintedBy).toBe('Ada');
+  });
+
+  // The public field is `mintedBy`, never `characterName`/`owner`/`holder`. This
+  // endpoint is anonymous and unauthenticated, and the ledger is frozen at mint
+  // time, so an external consumer must not be handed a name that reads as the
+  // current owner. Pinned to literals: a rename back to an ownership-implying
+  // field is a breaking API change and has to fail here first.
+  it('names the winner field mintedBy and exposes no current-owner field', () => {
+    const snapshot: LimitedMintsSnapshot = {
+      supplies: [{ itemId: 'emberfall_edge', supply: 25, minted: 1, leased: 0 }],
+      mints: [
+        { itemId: 'emberfall_edge', serial: 1, mintedByName: 'Ada', realm: 'r1', mintedAt: 'a' },
+      ],
+    };
+    const mint = buildLimitedMintsResponse(snapshot).items[0].mints[0];
+    expect(Object.keys(mint).sort()).toEqual(['mintedAt', 'mintedBy', 'realm', 'serial']);
+    expect(mint.mintedBy).toBe('Ada');
+    for (const forbidden of ['characterName', 'owner', 'ownerName', 'holder', 'currentOwner'])
+      expect(mint).not.toHaveProperty(forbidden);
+  });
+
+  it('carries a null winner through as null rather than inventing a name', () => {
+    const snapshot: LimitedMintsSnapshot = {
+      supplies: [{ itemId: 'emberfall_edge', supply: 25, minted: 1, leased: 0 }],
+      mints: [
+        { itemId: 'emberfall_edge', serial: 1, mintedByName: null, realm: 'r1', mintedAt: 'a' },
+      ],
+    };
+    expect(buildLimitedMintsResponse(snapshot).items[0].mints[0].mintedBy).toBeNull();
   });
 
   it('never reports negative remaining and falls back to the id for an unknown item', () => {

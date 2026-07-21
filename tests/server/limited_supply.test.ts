@@ -17,7 +17,7 @@ interface SerialRow {
   serial: number;
   state: 'leased' | 'minted' | 'released';
   realm: string;
-  characterName: string | null;
+  mintedByName: string | null;
   mintedAt: string | null;
 }
 
@@ -42,7 +42,7 @@ class FakeLimitedSupplyDb implements LimitedSupplyDb {
     if (released) {
       released.state = 'leased';
       released.realm = realm;
-      released.characterName = null;
+      released.mintedByName = null;
       released.mintedAt = null;
       return released.serial;
     }
@@ -50,7 +50,7 @@ class FakeLimitedSupplyDb implements LimitedSupplyDb {
     if (!cap || cap.nextSerial > cap.supply) return null;
     const serial = cap.nextSerial;
     cap.nextSerial += 1;
-    this.rows.push({ itemId, serial, state: 'leased', realm, characterName: null, mintedAt: null });
+    this.rows.push({ itemId, serial, state: 'leased', realm, mintedByName: null, mintedAt: null });
     return serial;
   }
 
@@ -60,7 +60,7 @@ class FakeLimitedSupplyDb implements LimitedSupplyDb {
     );
     if (!row) return;
     row.state = 'minted';
-    row.characterName = attr.characterName;
+    row.mintedByName = attr.mintedByName;
     row.mintedAt = '2026-07-19T00:00:00.000Z';
   }
 
@@ -88,7 +88,7 @@ class FakeLimitedSupplyDb implements LimitedSupplyDb {
       .map((r) => ({
         itemId: r.itemId,
         serial: r.serial,
-        characterName: r.characterName,
+        mintedByName: r.mintedByName,
         realm: r.realm,
         mintedAt: r.mintedAt ?? '',
       }));
@@ -168,8 +168,8 @@ describe('LimitedSupplyService: mint attribution + release', () => {
     const svc = new LimitedSupplyService(db, 'r1', { bufferTarget: 2 });
     await svc.init(CAPS);
     const serial = svc.claim(ITEM) as number;
-    svc.onMint(ITEM, serial, { characterId: 7, characterName: 'Ada' });
-    svc.onMint(ITEM, serial, { characterId: 7, characterName: 'Ada' }); // retry
+    svc.onMint(ITEM, serial, { mintedById: 7, mintedByName: 'Ada' });
+    svc.onMint(ITEM, serial, { mintedById: 7, mintedByName: 'Ada' }); // retry
     await settle();
     expect(db.stateOf(ITEM, serial)).toBe('minted');
     expect(db.countByState(ITEM, 'minted')).toBe(1); // retry did not double-count

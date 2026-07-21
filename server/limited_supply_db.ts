@@ -44,6 +44,14 @@ CREATE TABLE IF NOT EXISTS limited_item_supply (
 );
 -- Every serial ever handed out, one row per (item_id, serial). The PRIMARY KEY
 -- makes a duplicate serial physically impossible; state tracks its lifecycle.
+--
+-- character_id / character_name are MINT-TIME attribution: they name whoever
+-- first took possession of the serial, written once by markMinted and never
+-- rewritten. They are NOT the current holder. A relic can change hands after
+-- minting (src/sim/social/trade.ts preserves the ItemInstancePayload, and with
+-- it the serial, across a player-to-player trade), and nothing updates this row
+-- when it does. The public read exposes them as mintedBy for that reason; see
+-- LimitedMintRecord.
 CREATE TABLE IF NOT EXISTS limited_serials (
   item_id TEXT NOT NULL,
   serial INT NOT NULL,
@@ -62,16 +70,26 @@ CREATE INDEX IF NOT EXISTS limited_serials_reclaim ON limited_serials(item_id, s
 
 // Winner attribution recorded when a leased serial is confirmed minted. The
 // source boss is implied by the item id, so it is not stored separately.
+// "mintedBy" is deliberate: this names the ORIGINAL winner at the moment of
+// possession, which is the only fact this ledger is authoritative about.
 export interface LimitedMintAttribution {
-  characterId: number | null;
-  characterName: string;
+  mintedById: number | null;
+  mintedByName: string;
 }
 
 // One confirmed mint, for the public ledger read.
+//
+// mintedByName is the character who FIRST took possession of this serial, frozen
+// at mint time. It is NOT the current owner: relics are tradeable and the ledger
+// is never rewritten on transfer, so for a traded relic this name is the past
+// winner and the present holder is unknown to this table. Anything that needs
+// live ownership must derive it from the authoritative characters.state blob,
+// not from here (the character_deeds index in server/db.ts is the precedent for
+// an observer-written index if that is ever wanted).
 export interface LimitedMintRecord {
   itemId: string;
   serial: number;
-  characterName: string | null;
+  mintedByName: string | null;
   realm: string;
   mintedAt: string;
 }
@@ -103,7 +121,9 @@ export interface LimitedSupplyDb {
   leaseSerial(itemId: string, realm: string): Promise<number | null>;
   // Confirm a leased serial as minted with its winner attribution. A no-op if the
   // serial is not currently 'leased' (already minted / released), so a retried
-  // observer write never double-attributes.
+  // observer write never double-attributes. Deliberately one-shot: the mint row
+  // is a permanent record of who WON the serial, never a current-owner index, so
+  // no later transfer rewrites it (see LimitedMintRecord).
   markMinted(itemId: string, serial: number, attr: LimitedMintAttribution): Promise<void>;
   // Return this realm's still-leased buffer serials to the pool (graceful
   // shutdown), so a clean restart reuses them instead of burning them. Only the
@@ -199,7 +219,7 @@ export class PgLimitedSupplyDb implements LimitedSupplyDb {
       `UPDATE limited_serials
          SET state = 'minted', character_id = $3, character_name = $4, minted_at = now()
        WHERE item_id = $1 AND serial = $2 AND state = 'leased'`,
-      [itemId, serial, attr.characterId, attr.characterName],
+      [itemId, serial, attr.mintedById, attr.mintedByName],
     );
   }
 
@@ -242,7 +262,7 @@ export class PgLimitedSupplyDb implements LimitedSupplyDb {
       mints: mintRows.rows.map((r) => ({
         itemId: r.item_id as string,
         serial: Number(r.serial),
-        characterName: (r.character_name as string | null) ?? null,
+        mintedByName: (r.character_name as string | null) ?? null,
         realm: r.realm as string,
         mintedAt: new Date(r.minted_at as string | Date).toISOString(),
       })),

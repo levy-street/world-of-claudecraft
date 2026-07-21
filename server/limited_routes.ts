@@ -3,6 +3,11 @@
 // anonymous, in-handler rate-limited, and served from a short in-process cache
 // rather than hitting Postgres per request.
 //
+// This is a MINT ledger, not an ownership ledger. Each entry records which
+// character first claimed a serial and when; relics can be traded afterwards and
+// nothing here follows them. That distinction is load-bearing for an anonymous
+// public API, so it is carried in the field name itself (`mintedBy`).
+//
 // Module-first split (server/CLAUDE.md): the SQL lives in limited_supply_db.ts;
 // this module carries only the pure response builder, the cache, and a thin Ctx
 // handler. The ledger reader is INJECTED at boot via configureLimitedRuntime so
@@ -38,7 +43,13 @@ function useRuntime(): LimitedRuntime {
 
 // One item's public row: the cap, how many are confirmed minted, how many can
 // still ever appear (supply minus minted minus in-flight leases), and the roll of
-// every confirmed serial with its holder.
+// every confirmed serial with the character who won it.
+//
+// `mintedBy` is the ORIGINAL winner, frozen at mint time, NOT the current owner.
+// The name is chosen to be unambiguous to an external consumer: relics are
+// tradeable, this ledger is never rewritten on transfer, and there is deliberately
+// no current-owner field to mistake it for. Callers building a "who holds it now"
+// view must not use this endpoint.
 interface LimitedItemView {
   itemId: string;
   name: string;
@@ -46,7 +57,7 @@ interface LimitedItemView {
   supply: number;
   minted: number;
   remaining: number;
-  mints: { serial: number; characterName: string | null; realm: string; mintedAt: string }[];
+  mints: { serial: number; mintedBy: string | null; realm: string; mintedAt: string }[];
 }
 
 // Pure snapshot -> response builder. Enriches each supply row with the item's
@@ -61,7 +72,7 @@ export function buildLimitedMintsResponse(snapshot: LimitedMintsSnapshot): {
     const list = mintsByItem.get(m.itemId) ?? [];
     list.push({
       serial: m.serial,
-      characterName: m.characterName,
+      mintedBy: m.mintedByName,
       realm: m.realm,
       mintedAt: m.mintedAt,
     });
