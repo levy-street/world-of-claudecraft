@@ -1173,6 +1173,7 @@ function blankEntity(id: number): Entity {
     chargePath: [],
     followTargetId: null,
     sitting: false,
+    afk: false,
     weaponStowed: false,
     eating: null,
     drinking: null,
@@ -2386,6 +2387,7 @@ export class ClientWorld implements IWorld {
       e.castTotal = w.castTot ?? 0;
       e.channeling = !!w.chan;
       e.sitting = !!w.sit;
+      e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
       e.weaponStowed = !!w.ws;
       e.aggroTargetId = w.aggro ?? null;
       // Another entity's selected target (players/bots; mobs use aggro above). Powers

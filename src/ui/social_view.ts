@@ -49,7 +49,7 @@ export interface FriendRow {
   cls: string;
   level: number;
   online: boolean;
-  /** Status dot kind: 'off' | 'online' | 'combat' | 'dungeon' | 'dead'. */
+  /** Status dot kind: 'off' | 'online' | 'combat' | 'dungeon' | 'dead' | 'afk'. */
   dot: string;
   status: string | undefined;
   zone: string | undefined;

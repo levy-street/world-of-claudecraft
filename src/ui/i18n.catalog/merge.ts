@@ -620,6 +620,7 @@ const mergeStringsEn = {
         combat: 'In Combat',
         dungeon: 'In Dungeon',
         dead: 'Dead',
+        afk: 'Away',
       },
       statusWithZone: '{status} - {zone}',
       ranks: { leader: 'Guild Master', officer: 'Officer', member: 'Member' },

@@ -1684,7 +1684,8 @@ export const ru_RU: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "Уровень {level} {family}",
@@ -5866,7 +5867,8 @@ export const ru_RU: EnTranslations = {
         "offline": "Не в сети",
         "combat": "В бою",
         "dungeon": "В подземелье",
-        "dead": "Мертв"
+        "dead": "Мертв",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {

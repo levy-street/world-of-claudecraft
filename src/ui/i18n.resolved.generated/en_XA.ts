@@ -1684,7 +1684,8 @@ export const en_XA: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "[{level}]",
-      "mobEliteLevel": "[{level}+]"
+      "mobEliteLevel": "[{level}+]",
+      "afkTag": "[ÁƑĶ]"
     },
     "mobTooltip": {
       "levelFamily": "[Ļéʋéļ {level} {family}]",
@@ -5866,7 +5867,8 @@ export const en_XA: EnTranslations = {
         "offline": "[Óƒƒļíñé]",
         "combat": "[Íñ Çóɱƀáţ]",
         "dungeon": "[Íñ Ðúñĝéóñ]",
-        "dead": "[Ðéáð]"
+        "dead": "[Ðéáð]",
+        "afk": "[Áŵáý]"
       },
       "statusWithZone": "[{status} - {zone}]",
       "ranks": {
