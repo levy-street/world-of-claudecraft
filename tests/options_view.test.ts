@@ -271,6 +271,7 @@ const GENERAL_KEYS = [
   'frostedPanels',
   'highContrastText',
   'reduceMotion',
+  'invertLookY',
   'landingHighContrast',
   'showDevBadges',
   'showWalletOnCharacterScreen',
@@ -299,7 +300,6 @@ const FRAMES_KEYS = [
 ];
 const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat'];
 const COMBAT_KEYS = [
-  'invertLookY',
   'startAttackOnAbilityUse',
   'showAttackButton',
   'walkByAutoloot',

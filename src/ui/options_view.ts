@@ -419,6 +419,9 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
       boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
       boolToggle(s, 'highContrastText', 'hud.options.highContrastText'),
       boolToggle(s, 'reduceMotion', 'hud.options.reduceMotion'),
+      // Camera comfort (mouse-look direction), so it sits with the comfort
+      // toggles rather than the Combat tab's attack/action-bar cluster.
+      boolToggle(s, 'invertLookY', 'hud.options.invertLookY'),
       boolToggle(s, 'landingHighContrast', 'hudChrome.options.highContrastBackground'),
       boolToggle(s, 'showDevBadges', 'hudChrome.options.showDevBadges'),
       boolToggle(s, 'showWalletOnCharacterScreen', 'hudChrome.options.showWalletOnCharacterScreen'),
@@ -464,7 +467,6 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
       boolToggle(s, 'compactChat', 'hud.options.compactChat'),
     ]),
     ...tag('combat', [
-      boolToggle(s, 'invertLookY', 'hud.options.invertLookY'),
       boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
       boolToggle(s, 'showAttackButton', 'hudChrome.options.showAttackButton'),
       boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
