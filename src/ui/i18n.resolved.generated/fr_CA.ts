@@ -2535,6 +2535,12 @@ export const fr_CA: EnTranslations = {
       "lbEmpty": "Aucun chroniqueur classé pour le moment.",
       "broadcastsLabel": "Partager les hauts faits accomplis avec la guilde et les amis",
       "titledName": "{name} « {title} »"
+    },
+    "browserNotice": {
+      "title": "Heads up: unsupported browser",
+      "body": "You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.",
+      "downloadDesktop": "Get the desktop app",
+      "dismiss": "Continue in browser"
     }
   },
   "gatherEvent": {

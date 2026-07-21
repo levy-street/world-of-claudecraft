@@ -222,6 +222,7 @@ const UI_PURE_CORES = [
   'src/ui/discord_widget_view.ts',
   'src/ui/desktop_update_view.ts',
   'src/ui/gpu_notice_view.ts',
+  'src/ui/browser_notice_view.ts',
   'src/ui/hud/loot/corpse_harvest_view.ts',
   'src/ui/town_focus_view.ts',
   'src/ui/pet_action_icons.ts',

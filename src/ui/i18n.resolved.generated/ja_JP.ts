@@ -2535,6 +2535,12 @@ export const ja_JP: EnTranslations = {
       "lbEmpty": "ランク入りした年代記作家はまだいません。",
       "broadcastsLabel": "功績の達成をギルドとフレンドに共有する",
       "titledName": "{name}【{title}】"
+    },
+    "browserNotice": {
+      "title": "Heads up: unsupported browser",
+      "body": "You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.",
+      "downloadDesktop": "Get the desktop app",
+      "dismiss": "Continue in browser"
     }
   },
   "gatherEvent": {

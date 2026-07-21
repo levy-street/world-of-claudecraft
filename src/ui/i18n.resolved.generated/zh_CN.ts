@@ -2535,6 +2535,12 @@ export const zh_CN: EnTranslations = {
       "lbEmpty": "暂无上榜的编年史家。",
       "broadcastsLabel": "与公会和好友分享功绩达成",
       "titledName": "{name}【{title}】"
+    },
+    "browserNotice": {
+      "title": "Heads up: unsupported browser",
+      "body": "You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.",
+      "downloadDesktop": "Get the desktop app",
+      "dismiss": "Continue in browser"
     }
   },
   "gatherEvent": {

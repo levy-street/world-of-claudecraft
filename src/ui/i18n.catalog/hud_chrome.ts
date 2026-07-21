@@ -2803,4 +2803,14 @@ export const hudChromeStrings = {
     // after placeholder strip, so no forced non-Latin fills.
     titledName: '{name} [{title}]',
   },
+  // Unsupported-browser notice (src/game/browser_notice.ts): a one-time
+  // dismissible toast shown when the browser is not Chrome, Firefox, or
+  // Safari. The title names the condition; the body explains the consequence
+  // and recommends the desktop app or a supported browser.
+  browserNotice: {
+    title: 'Heads up: unsupported browser',
+    body: 'You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.',
+    downloadDesktop: 'Get the desktop app',
+    dismiss: 'Continue in browser',
+  },
 };
