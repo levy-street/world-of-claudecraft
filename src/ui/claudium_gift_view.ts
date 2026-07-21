@@ -67,7 +67,11 @@ export const CLAUDIUM_GIFT_OCCASIONS: readonly ClaudiumGiftOccasion[] = [
 ];
 
 /** The three delivery methods in fixed display order. */
-export const CLAUDIUM_GIFT_DELIVERIES: readonly ClaudiumGiftDelivery[] = ['email', 'link', 'reveal'];
+export const CLAUDIUM_GIFT_DELIVERIES: readonly ClaudiumGiftDelivery[] = [
+  'email',
+  'link',
+  'reveal',
+];
 
 /**
  * The mutable draft the window collects across the steps. Money is never here; only
