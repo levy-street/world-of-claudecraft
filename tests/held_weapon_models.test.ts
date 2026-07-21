@@ -263,8 +263,8 @@ describe('weapon skin held models', () => {
     expect(weaponSkinModelUrl(undefined)).toBeNull();
   });
 
-  // The offhand slot mirrors the active skin ONLY onto a matching-type one-hand
-  // weapon; everything else keeps its own item model. This is the render half of
+  // The offhand slot mirrors the active skin ONLY onto a matching-type weapon;
+  // everything else keeps its own item model. This is the render half of
   // the pure offhandMirrorsWeaponSkin rule (its full truth table is in
   // tests/weapon_skins.test.ts).
   it('offhandModelUrl mirrors the skin onto a matching-type offhand weapon', () => {

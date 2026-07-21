@@ -332,7 +332,7 @@ export function itemOffhandModelUrl(itemId: string | null | undefined): string |
 }
 
 /** GLB url the offhand slot should render: the active weapon skin's model when it
- *  mirrors onto a matching-type one-hand offhand weapon (a rogue's second dagger
+ *  mirrors onto a matching-type offhand weapon (a rogue's second dagger
  *  under a dagger skin), otherwise the equipped offhand item's own model. A shield,
  *  held offhand (orb/tome), or different-type offhand weapon never mirrors, so it
  *  keeps its item model; null when the offhand has no mapped model. The mirror

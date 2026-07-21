@@ -704,7 +704,7 @@ export class CharacterVisual {
   /** Swap the actual offhand. When neither the old nor the new offhand mirrors the
    *  active weapon skin, this is the lean path that never disturbs the mainhand
    *  cosmetic pipeline (its rarity VFX keep running). When the offhand crosses into,
-   *  out of, or between skin-mirrored states (a matching-type one-hand weapon), it
+   *  out of, or between skin-mirrored states (a matching-type weapon), it
    *  routes through the full re-attach so the offhand gains or loses the skin model
    *  and its rarity VFX in step with the mainhand. */
   setOffhand(offhandItemId: string | null): void {
@@ -754,7 +754,7 @@ export class CharacterVisual {
   /** Re-attach BOTH held hands (gear swap / skin change), honoring an active
    *  sheathe so a weapon swapped while stowed lands on the back, not the hand. The
    *  offhand re-attaches with skin awareness: when the active skin mirrors onto a
-   *  matching-type one-hand offhand weapon, that payload joins the skin VFX/material
+   *  matching-type offhand weapon, that payload joins the skin VFX/material
    *  set; a shield, held offhand, or different-type weapon re-attaches with its own
    *  model and stays out of that set (pixel-untouched). */
   private reattachHeldWeapon(): void {

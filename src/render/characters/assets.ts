@@ -387,7 +387,7 @@ function swapAttachDef(
 
 // The AttachDef for the actual equipped offhand. Its model is the offhand item's
 // own, EXCEPT when the active mainhand skin mirrors onto it (a matching-type
-// one-hand offhand weapon), in which case the offhand renders the skin too.
+// offhand weapon), in which case the offhand renders the skin too.
 // Shields, held offhands (orbs/tomes), and different-type weapons never mirror
 // (offhandModelUrl gates it on the pure rule) and keep their item model.
 function offhandAttachDef(
@@ -655,7 +655,7 @@ function attachTargetBone(
 
 // Attach every authored prop: swappable slots take the equipped item's model (or an
 // applied weapon skin, which wins); the actual offhand slot takes the equipped
-// offhand's model (or the same skin mirrored onto a matching-type one-hand weapon,
+// offhand's model (or the same skin mirrored onto a matching-type weapon,
 // or nothing while none is equipped); every other attachment is fixed (the warlock's
 // spellbook offhand), except the hunter's fixed RANGED attach, which a bow/crossbow
 // skin replaces in place. The rogue lists both hand slots so a dagger shows in both.
@@ -740,7 +740,7 @@ export function setHeldWeapon(
 
 /** Replace only the actual offhand attachment, honoring an active sheathe. The
  *  offhand renders its own item model UNLESS the active mainhand skin mirrors onto
- *  it (a matching-type one-hand weapon), in which case it shows the skin (and the
+ *  it (a matching-type weapon), in which case it shows the skin (and the
  *  caller must run the rarity-VFX/material pass over the returned payload). Mainhand
  *  item/cosmetic models and their rarity VFX remain untouched. */
 export function setHeldOffhand(

@@ -179,11 +179,26 @@ describe('skin apply rule', () => {
 });
 
 describe('offhand weapon-skin mirror rule', () => {
-  it('mirrors the skin onto a matching-type one-hand offhand weapon', () => {
+  it('mirrors the skin onto a matching-type offhand weapon (rogue dual-wield)', () => {
     // A rogue with two daggers and a dagger skin shows both blades skinned.
     expect(offhandMirrorsWeaponSkin('frostbite_dagger', 'rusty_dagger')).toBe(true);
     expect(offhandMirrorsWeaponSkin('ashspark_dagger', 'keen_dirk')).toBe(true);
     expect(offhandMirrorsWeaponSkin('ice_fang_sword', 'crossroads_saber')).toBe(true);
+  });
+
+  it('mirrors onto a matching-type TWO-HAND offhand weapon (Fury dual-wield pair)', () => {
+    // Hand is deliberately not consulted: equipment_rules.canDualWieldTwoHand lets
+    // a Fury warrior offhand a two-hander, and the mainhand rule already skins a
+    // matching-type two-hander (greatswords classify as 'sword'), so the mirror
+    // must treat the offhand the same way or a Fury pair would render a skinned
+    // mainhand next to a bare offhand greatsword: the asymmetry this rule removes.
+    expect(WEAPON_TYPE_BY_ITEM.eastbrook_greatsword).toBe('sword');
+    expect(
+      resolveActiveWeaponSkin('warrior', 'eastbrook_greatsword', { sword: 'ice_fang_sword' }),
+    ).toBe('ice_fang_sword');
+    expect(offhandMirrorsWeaponSkin('ice_fang_sword', 'eastbrook_greatsword')).toBe(true);
+    // A different-type two-hander stays bare, same as the one-hand arm.
+    expect(offhandMirrorsWeaponSkin('frostbite_dagger', 'eastbrook_greatsword')).toBe(false);
   });
 
   it('leaves a different-type offhand weapon untouched', () => {
