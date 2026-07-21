@@ -245,9 +245,12 @@ describe('limited relics: end-to-end through rollLoot', () => {
 // so a relic legitimately changes hands while its serial follows it. The mint
 // ledger is written exactly once, at the moment of possession, and is never
 // rewritten on transfer: it is a permanent record of who WON the serial, not an
-// index of who holds it now. This pins the transfer that makes that distinction
-// real, so nobody can reintroduce a current-owner reading of the mint ledger
-// without this test going red.
+// index of who holds it now. What this pins is the sim-side half of that: the
+// serial genuinely moves between players, intact and unduplicated, and the
+// transfer emits no mint event for the server observer to act on. It does NOT
+// guard the server layer, so a ledger rewrite added in game.ts would not red
+// this test; the public field name is guarded separately, by the key-set pin in
+// tests/server/limited_routes.test.ts.
 describe('limited relics: a minted serial survives a trade', () => {
   it('moves the serialed copy to the other player, leaving the mint record the winner', () => {
     const sim = makeSim();
@@ -273,14 +276,24 @@ describe('limited relics: a minted serial survives a trade', () => {
     sim.tradeSetOffer([{ itemId: CROWN, count: 1 }], 0, winner);
     sim.tradeConfirm(winner);
     sim.tradeConfirm(buyer);
-    sim.tick();
+    // tick() DRAINS the queue and returns it (sim.ts: `const out = this.events;
+    // this.events = []`), so the batch must be captured here. Asserting on
+    // sim.events after the tick would read the emptied queue and pass vacuously.
+    const evs = sim.tick();
 
-    // The serial followed the item to its new holder, intact and unduplicated.
-    expect(metaW.inventory.find((s) => s.itemId === CROWN)).toBeUndefined();
-    const received = metaB.inventory.find((s) => s.itemId === CROWN);
-    expect(received?.instance?.serial).toBe(7);
+    // The serial followed the item to its new holder. filter, never find: find
+    // stops at the first match, so it cannot see a duplicated serial, and a dupe
+    // is the highest-consequence bug a hard-capped relic can have.
+    expect(metaW.inventory.filter((s) => s.itemId === CROWN)).toHaveLength(0);
+    const received = metaB.inventory.filter((s) => s.itemId === CROWN);
+    expect(received).toHaveLength(1);
+    expect(received[0].count).toBe(1);
+    expect(received[0].instance?.serial).toBe(7);
     // The sim emits no mint event for a transfer, so the server observer never
     // rewrites the ledger row: `mintedBy` stays the original winner by design.
-    expect(sim.events.filter((e: SimEvent) => e.type === 'limitedMint')).toHaveLength(0);
+    // The tradeDone control keeps this honest: it proves the captured batch is
+    // actually populated, so the limitedMint assertion cannot pass on an empty one.
+    expect(evs.some((e: SimEvent) => e.type === 'tradeDone')).toBe(true);
+    expect(evs.filter((e: SimEvent) => e.type === 'limitedMint')).toHaveLength(0);
   });
 });

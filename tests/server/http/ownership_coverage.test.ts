@@ -160,6 +160,8 @@ function installFakeRuntime(): void {
     saveMarket: vi.fn(async () => {}),
     rekeyMailOwner: vi.fn(() => false),
     saveMail: vi.fn(async () => {}),
+    renameLimitedMintedBy: vi.fn(async () => {}),
+    forgetLimitedMintedBy: vi.fn(async () => {}),
     // The fresh-character state is never serialized on the deny path; a bare object
     // is enough to satisfy the type for any handler that does run (negative control).
     initialCharacterState: vi.fn(

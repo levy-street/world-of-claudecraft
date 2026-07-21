@@ -45,11 +45,15 @@ function useRuntime(): LimitedRuntime {
 // still ever appear (supply minus minted minus in-flight leases), and the roll of
 // every confirmed serial with the character who won it.
 //
-// `mintedBy` is the ORIGINAL winner, frozen at mint time, NOT the current owner.
-// The name is chosen to be unambiguous to an external consumer: relics are
-// tradeable, this ledger is never rewritten on transfer, and there is deliberately
-// no current-owner field to mistake it for. Callers building a "who holds it now"
-// view must not use this endpoint.
+// Every field of a mint entry is frozen at mint time and named to say so:
+// `mintedBy` is the ORIGINAL winner and `mintedInRealm` the realm it minted in,
+// neither of which tracks the relic afterwards. Relics are tradeable and this
+// ledger is never rewritten on transfer, so there is deliberately no field here
+// describing the present: callers building a "who holds it now" or "where is it
+// now" view must not use this endpoint. The one exception to the freeze is the
+// published name, which a moderator force-rename follows and a character
+// deletion clears (see LimitedSupplyDb renameMintedBy / forgetMintedBy); a
+// cleared winner serves as null.
 interface LimitedItemView {
   itemId: string;
   name: string;
@@ -57,7 +61,7 @@ interface LimitedItemView {
   supply: number;
   minted: number;
   remaining: number;
-  mints: { serial: number; mintedBy: string | null; realm: string; mintedAt: string }[];
+  mints: { serial: number; mintedBy: string | null; mintedInRealm: string; mintedAt: string }[];
 }
 
 // Pure snapshot -> response builder. Enriches each supply row with the item's
@@ -73,7 +77,7 @@ export function buildLimitedMintsResponse(snapshot: LimitedMintsSnapshot): {
     list.push({
       serial: m.serial,
       mintedBy: m.mintedByName,
-      realm: m.realm,
+      mintedInRealm: m.mintedInRealm,
       mintedAt: m.mintedAt,
     });
     mintsByItem.set(m.itemId, list);

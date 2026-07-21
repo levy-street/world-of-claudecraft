@@ -11,7 +11,7 @@ import {
   resetLimitedMintsCache,
   routes,
 } from '../../server/limited_routes';
-import type { LimitedMintsSnapshot } from '../../server/limited_supply_db';
+import { LIMITED_SUPPLY_SCHEMA, type LimitedMintsSnapshot } from '../../server/limited_supply_db';
 import { resetPublicReadRateLimits } from '../../server/ratelimit';
 import { type FakeRes, fakeCtx, makeReq } from './helpers';
 
@@ -36,8 +36,20 @@ describe('buildLimitedMintsResponse', () => {
     const snapshot: LimitedMintsSnapshot = {
       supplies: [{ itemId: 'emberfall_edge', supply: 25, minted: 2, leased: 1 }],
       mints: [
-        { itemId: 'emberfall_edge', serial: 2, mintedByName: 'Bru', realm: 'r1', mintedAt: 'b' },
-        { itemId: 'emberfall_edge', serial: 1, mintedByName: 'Ada', realm: 'r1', mintedAt: 'a' },
+        {
+          itemId: 'emberfall_edge',
+          serial: 2,
+          mintedByName: 'Bru',
+          mintedInRealm: 'r1',
+          mintedAt: 'b',
+        },
+        {
+          itemId: 'emberfall_edge',
+          serial: 1,
+          mintedByName: 'Ada',
+          mintedInRealm: 'r1',
+          mintedAt: 'a',
+        },
       ],
     };
     const { items } = buildLimitedMintsResponse(snapshot);
@@ -64,21 +76,48 @@ describe('buildLimitedMintsResponse', () => {
     const snapshot: LimitedMintsSnapshot = {
       supplies: [{ itemId: 'emberfall_edge', supply: 25, minted: 1, leased: 0 }],
       mints: [
-        { itemId: 'emberfall_edge', serial: 1, mintedByName: 'Ada', realm: 'r1', mintedAt: 'a' },
+        {
+          itemId: 'emberfall_edge',
+          serial: 1,
+          mintedByName: 'Ada',
+          mintedInRealm: 'r1',
+          mintedAt: 'a',
+        },
       ],
     };
-    const mint = buildLimitedMintsResponse(snapshot).items[0].mints[0];
-    expect(Object.keys(mint).sort()).toEqual(['mintedAt', 'mintedBy', 'realm', 'serial']);
+    const item = buildLimitedMintsResponse(snapshot).items[0];
+    const mint = item.mints[0];
+    expect(Object.keys(mint).sort()).toEqual(['mintedAt', 'mintedBy', 'mintedInRealm', 'serial']);
     expect(mint.mintedBy).toBe('Ada');
-    for (const forbidden of ['characterName', 'owner', 'ownerName', 'holder', 'currentOwner'])
+    // The item row that wraps the mints is pinned too: without this, an
+    // ownership-implying field added at the item level would slip through, since
+    // the assertions above only ever look inside mints[].
+    expect(Object.keys(item).sort()).toEqual([
+      'itemId',
+      'minted',
+      'mints',
+      'name',
+      'quality',
+      'remaining',
+      'supply',
+    ]);
+    for (const forbidden of ['characterName', 'owner', 'ownerName', 'holder', 'currentOwner']) {
       expect(mint).not.toHaveProperty(forbidden);
+      expect(item).not.toHaveProperty(forbidden);
+    }
   });
 
   it('carries a null winner through as null rather than inventing a name', () => {
     const snapshot: LimitedMintsSnapshot = {
       supplies: [{ itemId: 'emberfall_edge', supply: 25, minted: 1, leased: 0 }],
       mints: [
-        { itemId: 'emberfall_edge', serial: 1, mintedByName: null, realm: 'r1', mintedAt: 'a' },
+        {
+          itemId: 'emberfall_edge',
+          serial: 1,
+          mintedByName: null,
+          mintedInRealm: 'r1',
+          mintedAt: 'a',
+        },
       ],
     };
     expect(buildLimitedMintsResponse(snapshot).items[0].mints[0].mintedBy).toBeNull();
@@ -142,5 +181,25 @@ describe('GET /api/limited-mints handler', () => {
     }
     expect(last.status).toBe(429);
     expect(last.body.error).toBe('rate_limited');
+  });
+});
+
+// The persisted COLUMN names are deliberately not renamed alongside the TS
+// fields: the DDL is CREATE TABLE IF NOT EXISTS applied at boot, so renaming a
+// column would silently fail to migrate any database that already has the table.
+// That decision is what makes this change a non-migration, and nothing else in
+// the default suite pins it (the SQL itself is exercised only by the Postgres
+// integration suite, which skips without TEST_DATABASE_URL). Pinned to literals
+// so "finishing" the rename in the schema fails here first.
+describe('LIMITED_SUPPLY_SCHEMA column names are frozen for back-compat', () => {
+  it('keeps character_id / character_name despite the mintedBy field rename', () => {
+    expect(LIMITED_SUPPLY_SCHEMA).toContain('character_id INT');
+    expect(LIMITED_SUPPLY_SCHEMA).toContain('character_name TEXT');
+    expect(LIMITED_SUPPLY_SCHEMA).not.toContain('minted_by_name');
+    expect(LIMITED_SUPPLY_SCHEMA).not.toContain('minted_by_id');
+    // The table is created idempotently, never altered, which is why the above
+    // matters: an ALTER-based rename has no home in this schema model.
+    expect(LIMITED_SUPPLY_SCHEMA).toContain('CREATE TABLE IF NOT EXISTS limited_serials');
+    expect(LIMITED_SUPPLY_SCHEMA).not.toContain('ALTER TABLE');
   });
 });

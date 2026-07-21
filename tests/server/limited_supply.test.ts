@@ -1,4 +1,11 @@
+// buildLimitedMintsResponse pulls server/db transitively, which constructs a pg
+// Pool at module load and throws without DATABASE_URL. The pool never connects:
+// the seam test below drives the in-memory fake only. Same guard as
+// tests/server/limited_routes.test.ts.
+process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_limited_seam';
+
 import { describe, expect, it } from 'vitest';
+import { buildLimitedMintsResponse } from '../../server/limited_routes';
 import { LimitedSupplyService } from '../../server/limited_supply';
 import type {
   LimitedMintAttribution,
@@ -12,12 +19,17 @@ import type {
 // markMinted only confirms a still-'leased' row; releaseSerials returns this
 // realm's leased serials to 'released'. One instance shared across two services
 // stands in for two realm processes on one Postgres, so the cap tests are real.
+// Field names mirror the real COLUMNS (character_id / character_name), not the
+// TS field names they map to. That keeps readMints below an honest translation
+// step rather than an identity pass-through, which is the exact dimension the
+// mintedBy rename is about, and it lets the rename/forget writes be modeled.
 interface SerialRow {
   itemId: string;
   serial: number;
   state: 'leased' | 'minted' | 'released';
   realm: string;
-  mintedByName: string | null;
+  characterId: number | null;
+  characterName: string | null;
   mintedAt: string | null;
 }
 
@@ -42,7 +54,8 @@ class FakeLimitedSupplyDb implements LimitedSupplyDb {
     if (released) {
       released.state = 'leased';
       released.realm = realm;
-      released.mintedByName = null;
+      released.characterId = null;
+      released.characterName = null;
       released.mintedAt = null;
       return released.serial;
     }
@@ -50,7 +63,15 @@ class FakeLimitedSupplyDb implements LimitedSupplyDb {
     if (!cap || cap.nextSerial > cap.supply) return null;
     const serial = cap.nextSerial;
     cap.nextSerial += 1;
-    this.rows.push({ itemId, serial, state: 'leased', realm, mintedByName: null, mintedAt: null });
+    this.rows.push({
+      itemId,
+      serial,
+      state: 'leased',
+      realm,
+      characterId: null,
+      characterName: null,
+      mintedAt: null,
+    });
     return serial;
   }
 
@@ -60,8 +81,21 @@ class FakeLimitedSupplyDb implements LimitedSupplyDb {
     );
     if (!row) return;
     row.state = 'minted';
-    row.mintedByName = attr.mintedByName;
+    row.characterId = attr.mintedById;
+    row.characterName = attr.mintedByName;
     row.mintedAt = '2026-07-19T00:00:00.000Z';
+  }
+
+  async renameMintedBy(characterId: number, newName: string): Promise<void> {
+    for (const r of this.rows) if (r.characterId === characterId) r.characterName = newName;
+  }
+
+  async forgetMintedBy(characterId: number): Promise<void> {
+    for (const r of this.rows) {
+      if (r.characterId !== characterId) continue;
+      r.characterId = null;
+      r.characterName = null;
+    }
   }
 
   async releaseSerials(itemId: string, serials: number[], realm: string): Promise<void> {
@@ -88,14 +122,19 @@ class FakeLimitedSupplyDb implements LimitedSupplyDb {
       .map((r) => ({
         itemId: r.itemId,
         serial: r.serial,
-        mintedByName: r.mintedByName,
-        realm: r.realm,
+        mintedByName: r.characterName,
+        mintedInRealm: r.realm,
         mintedAt: r.mintedAt ?? '',
       }));
     return { supplies, mints };
   }
 
   // Test helpers.
+  attributionOf(itemId: string, serial: number): { id: number | null; name: string | null } {
+    const r = this.rows.find((x) => x.itemId === itemId && x.serial === serial);
+    return { id: r?.characterId ?? null, name: r?.characterName ?? null };
+  }
+
   stateOf(itemId: string, serial: number): string | undefined {
     return this.rows.find((r) => r.itemId === itemId && r.serial === serial)?.state;
   }
@@ -236,5 +275,117 @@ describe('LimitedSupplyService: cross-realm cap (one ledger, two realms)', () =>
     }
     // Exactly the 5 distinct serials 1..5 ever issued, no duplicates, no overflow.
     expect([...minted].sort((x, y) => x - y)).toEqual([1, 2, 3, 4, 5]);
+  });
+});
+
+// The two deliberate exceptions to the mint row's immutability. Everything else
+// about a minted serial is frozen forever, but the PUBLISHED NAME is not the
+// platform's to keep: a moderator force-rename must reach the public ledger or
+// the moderation action is defeated on its widest-reach surface, and a deleted
+// character's name must stop being served. Both key off character_id, and both
+// must leave the serial row itself intact, because re-issuing a serial is the
+// one thing this feature can never do.
+describe('LimitedSupplyService: the immutability exceptions (rename and delete)', () => {
+  const mintOne = async (db: FakeLimitedSupplyDb, attr: LimitedMintAttribution) => {
+    const svc = new LimitedSupplyService(db, 'r1');
+    await svc.init(CAPS);
+    const serial = svc.claim(ITEM) as number;
+    svc.onMint(ITEM, serial, attr);
+    await settle();
+    return { svc, serial };
+  };
+
+  it('a force-rename rewrites the published name and nothing else about the row', async () => {
+    const db = new FakeLimitedSupplyDb();
+    const { svc, serial } = await mintOne(db, { mintedById: 42, mintedByName: 'Badname' });
+    await svc.renameMintedBy(42, 'Renamed');
+
+    expect(db.attributionOf(ITEM, serial)).toEqual({ id: 42, name: 'Renamed' });
+    // The serial survives, still minted: a rename must never free or re-issue it.
+    expect(db.stateOf(ITEM, serial)).toBe('minted');
+    expect(db.countByState(ITEM, 'minted')).toBe(1);
+    // It reaches the public read, which is the whole point of following the rename.
+    const snap = await db.readMints();
+    expect(snap.mints.map((m) => m.mintedByName)).toEqual(['Renamed']);
+  });
+
+  it('deleting a character clears its attribution but keeps the serial minted', async () => {
+    const db = new FakeLimitedSupplyDb();
+    const { svc, serial } = await mintOne(db, { mintedById: 42, mintedByName: 'Ada' });
+    await svc.forgetMintedBy(42);
+
+    // BOTH columns cleared: leaving character_id behind would keep a pointer to a
+    // deleted player on a row that disclaims being an owner index.
+    expect(db.attributionOf(ITEM, serial)).toEqual({ id: null, name: null });
+    // The row itself is untouched, so the serial can never be handed out again.
+    expect(db.stateOf(ITEM, serial)).toBe('minted');
+    expect(db.countByState(ITEM, 'minted')).toBe(1);
+    expect(db.countByState(ITEM, 'released')).toBe(0);
+    // The public read still shows the serial as minted, with a null winner.
+    const snap = await db.readMints();
+    expect(snap.mints).toHaveLength(1);
+    expect(snap.mints[0].serial).toBe(serial);
+    expect(snap.mints[0].mintedByName).toBeNull();
+  });
+
+  it('touches only the named character, never another player holding a serial', async () => {
+    const db = new FakeLimitedSupplyDb();
+    const svc = new LimitedSupplyService(db, 'r1');
+    await svc.init(CAPS);
+    const mine = svc.claim(ITEM) as number;
+    svc.onMint(ITEM, mine, { mintedById: 1, mintedByName: 'Mine' });
+    await settle();
+    const theirs = svc.claim(ITEM) as number;
+    svc.onMint(ITEM, theirs, { mintedById: 2, mintedByName: 'Theirs' });
+    await settle();
+
+    await svc.renameMintedBy(1, 'MineRenamed');
+    await svc.forgetMintedBy(1);
+
+    expect(db.attributionOf(ITEM, mine)).toEqual({ id: null, name: null });
+    expect(db.attributionOf(ITEM, theirs)).toEqual({ id: 2, name: 'Theirs' });
+  });
+
+  it('a serial minted without a resolvable character id is unreachable by either write', async () => {
+    const db = new FakeLimitedSupplyDb();
+    // The world-boss / linkdead case: game.ts passes `winner?.characterId ?? null`.
+    const { svc, serial } = await mintOne(db, { mintedById: null, mintedByName: 'Ghost' });
+    await svc.renameMintedBy(0, 'X');
+    await svc.forgetMintedBy(0);
+    // Documented limitation, pinned so it is a known gap and not a surprise: with
+    // no id there is no key to find the row by, so the name stays frozen.
+    expect(db.attributionOf(ITEM, serial)).toEqual({ id: null, name: 'Ghost' });
+  });
+});
+
+// The seam, end to end in one test. Every link was already pinned in isolation
+// (the service confirms a serial, the builder renames the field), but nothing
+// ran a real attribution all the way through, so a field-name mismatch between
+// readMints and the response builder had no runtime guard. This is the test that
+// would catch "the winner's name silently stops arriving on the public API".
+describe('limited relics: attribution survives service -> readMints -> public response', () => {
+  it('carries the winner through to mintedBy, and a cleared winner through to null', async () => {
+    const db = new FakeLimitedSupplyDb();
+    const svc = new LimitedSupplyService(db, 'realm-one');
+    await svc.init(CAPS);
+    const serial = svc.claim(ITEM) as number;
+    svc.onMint(ITEM, serial, { mintedById: 7, mintedByName: 'Ada' });
+    await settle();
+
+    const view = buildLimitedMintsResponse(await db.readMints());
+    const row = view.items.find((i) => i.itemId === ITEM);
+    expect(row?.mints).toEqual([
+      { serial, mintedBy: 'Ada', mintedInRealm: 'realm-one', mintedAt: expect.any(String) },
+    ]);
+
+    // And the deletion path all the way to the public payload: the serial stays
+    // on the ledger, the name stops being served.
+    await svc.forgetMintedBy(7);
+    const after = buildLimitedMintsResponse(await db.readMints());
+    const afterRow = after.items.find((i) => i.itemId === ITEM);
+    expect(afterRow?.mints).toEqual([
+      { serial, mintedBy: null, mintedInRealm: 'realm-one', mintedAt: expect.any(String) },
+    ]);
+    expect(afterRow?.minted).toBe(1); // still counted: the relic still exists
   });
 });

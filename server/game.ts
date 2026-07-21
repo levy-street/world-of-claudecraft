@@ -3239,6 +3239,20 @@ export class GameServer {
     return this.sim.rekeyMailOwner(characterId, oldName, newName);
   }
 
+  // The limited-relic mint ledger is a third denormalized copy of the character
+  // name, alongside the market seller and mail owner rekeys above, and it is the
+  // one published on an anonymous public endpoint. A force-rename must reach it
+  // or the moderation action is defeated where it is most visible; a deletion
+  // must clear it or the platform keeps publishing a name for a player who no
+  // longer exists. The serial row itself always survives both.
+  async renameLimitedMintedBy(characterId: number, newName: string): Promise<void> {
+    await this.limitedSupply.renameMintedBy(characterId, newName);
+  }
+
+  async forgetLimitedMintedBy(characterId: number): Promise<void> {
+    await this.limitedSupply.forgetMintedBy(characterId);
+  }
+
   // Close every open play_sessions row; called on graceful shutdown so the
   // sessions of currently-online players keep their real duration.
   async endAllPlaySessions(): Promise<void> {

@@ -104,6 +104,8 @@ function fakeRuntime(overrides: Partial<CharactersRuntime> = {}): CharactersRunt
     saveMarket: async () => {},
     rekeyMailOwner: () => false,
     saveMail: async () => {},
+    renameLimitedMintedBy: async () => {},
+    forgetLimitedMintedBy: async () => {},
     initialCharacterState: () => st(),
     publicOrigin: () => 'https://worldofclaudecraft.com',
     ...overrides,
@@ -782,6 +784,31 @@ describe('rename handler', () => {
     expect(saveMail).toHaveBeenCalledTimes(1);
   });
 
+  it('follows the rename into the public relic ledger (moderation must reach it)', async () => {
+    // The limited-relic mint ledger is a THIRD denormalized copy of the name,
+    // alongside the market seller and mail owner rekeys above, and it is the one
+    // published on an anonymous unauthenticated endpoint. force_rename exists to
+    // remedy an offensive or impersonating name, so a rename that does not reach
+    // the ledger leaves the original string being served forever.
+    const renamed = charRow({ id: 5, name: 'Newname', force_rename: false });
+    setCharactersDbForTests({ renameCharacter: async () => renamed });
+    const renameLimitedMintedBy = vi.fn(async () => {});
+    installRuntime({ isCharacterOnline: () => false, renameLimitedMintedBy });
+
+    const character = charRow({ id: 5, name: 'Oldname', force_rename: true });
+    const res = await callHandler('POST', '/api/characters/:id/rename', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(character),
+      body: { name: 'Newname' },
+    });
+    expect(res.status).toBe(200);
+    // Keyed by character id, carrying the NEW name, and unconditional: the ledger
+    // rows exist whether or not the player has a live session, so unlike the
+    // market/mail rekeys this must not be gated on a rekey landing.
+    expect(renameLimitedMintedBy).toHaveBeenCalledWith(5, 'Newname');
+    expect(renameLimitedMintedBy).toHaveBeenCalledTimes(1);
+  });
+
   it('does not save mail when no mailbox rekey landed', async () => {
     const renamed = charRow({ id: 5, name: 'Newname', force_rename: false });
     setCharactersDbForTests({ renameCharacter: async () => renamed });
@@ -980,6 +1007,34 @@ describe('delete handler', () => {
     });
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ ok: true });
+  });
+
+  it('clears the published ledger name once the delete lands', async () => {
+    setCharactersDbForTests({ deleteCharacter: async () => true });
+    const forgetLimitedMintedBy = vi.fn(async () => {});
+    installRuntime({ isCharacterOnline: () => false, forgetLimitedMintedBy });
+    const res = await callHandler('DELETE', '/api/characters/:id', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(charRow({ id: 9, name: 'Deleteme' })),
+      body: { name: 'Deleteme' },
+    });
+    expect(res.status).toBe(200);
+    expect(forgetLimitedMintedBy).toHaveBeenCalledWith(9);
+  });
+
+  it('leaves the ledger alone when the delete matched no row', async () => {
+    // The negative arm: a name is only unpublished for a character that actually
+    // stopped existing. A failed delete must not scrub a live player's record.
+    setCharactersDbForTests({ deleteCharacter: async () => false });
+    const forgetLimitedMintedBy = vi.fn(async () => {});
+    installRuntime({ isCharacterOnline: () => false, forgetLimitedMintedBy });
+    const res = await callHandler('DELETE', '/api/characters/:id', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(charRow({ id: 9, name: 'Deleteme' })),
+      body: { name: 'Deleteme' },
+    });
+    expect(res.status).toBe(404);
+    expect(forgetLimitedMintedBy).not.toHaveBeenCalled();
   });
 
   it('404s not-found when the delete matched no row', async () => {

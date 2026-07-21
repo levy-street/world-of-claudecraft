@@ -111,7 +111,7 @@ describeDb('limited-relic serial ledger (real Postgres)', () => {
       itemId: 'relic',
       serial: 1,
       mintedByName: 'Bru',
-      realm: 'r1',
+      mintedInRealm: 'r1',
     });
     expect(typeof snap.mints[0].mintedAt).toBe('string');
   });

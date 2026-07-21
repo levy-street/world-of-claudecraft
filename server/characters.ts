@@ -157,6 +157,10 @@ export interface CharactersRuntime {
   rekeyMailOwner(characterId: number, oldName: string, newName: string): boolean;
   /** game.saveMail: persist the Ravenpost mail book after a rekey. */
   saveMail(): Promise<void>;
+  /** game.renameLimitedMintedBy: follow a rename into the public relic ledger. */
+  renameLimitedMintedBy(characterId: number, newName: string): Promise<void>;
+  /** game.forgetLimitedMintedBy: drop the published name on character deletion. */
+  forgetLimitedMintedBy(characterId: number): Promise<void>;
   /** main.ts initialCharacterState: the serialized fresh-character state for create. */
   initialCharacterState(cls: PlayerClass, name: string, skin: number): CharacterState;
   /** main.ts publicOrigin: canonical share origin for the owner-sheet URLs. */
@@ -509,6 +513,10 @@ async function renameHandler(ctx: Ctx): Promise<void> {
     if (rt.rekeyMailOwner(character.id, character.name, c.name)) {
       await rt.saveMail();
     }
+    // The relic ledger is cross-realm and public, so it is followed
+    // unconditionally rather than only for an online character: the rows exist
+    // whether or not the player has a live session.
+    await rt.renameLimitedMintedBy(character.id, c.name);
     json(ctx.res, 200, {
       id: c.id,
       name: c.name,
@@ -548,6 +556,9 @@ async function deleteHandler(ctx: Ctx): Promise<void> {
     return;
   }
   const ok = await charactersDb.deleteCharacter(accountId, character.id);
+  // Only after the delete actually landed, and only then: the ledger name is
+  // cleared for a character that no longer exists, never for a failed delete.
+  if (ok) await rt.forgetLimitedMintedBy(character.id);
   json(ctx.res, ok ? 200 : 404, ok ? { ok: true } : NOT_FOUND);
 }
 

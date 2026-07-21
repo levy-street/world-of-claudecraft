@@ -25,8 +25,11 @@
 // erode a popular relic's effective supply enough to matter, reclaim them ONLY
 // after confirming no realm is live and no player holds the serial (audit against
 // character saves), e.g.
-//   UPDATE limited_serials SET state='released', character_name=NULL
+//   UPDATE limited_serials SET state='released', character_id=NULL, character_name=NULL
 //     WHERE state='leased' AND leased_at < now() - interval '1 day';
+// Null BOTH attribution columns, as releaseSerials and the reclaim arm do:
+// clearing only the name would leave a released row carrying a stale
+// character_id, which is exactly the current-owner reading this table disclaims.
 // Never automate this: the safety of the whole feature rests on not re-issuing a
 // serial that reached a player.
 
@@ -86,11 +89,16 @@ export interface LimitedMintAttribution {
 // live ownership must derive it from the authoritative characters.state blob,
 // not from here (the character_deeds index in server/db.ts is the precedent for
 // an observer-written index if that is ever wanted).
+// mintedInRealm is frozen the same way and for the same reason: the underlying
+// column is set when the serial is leased (and re-set on reclaim), so it names
+// the realm the relic minted in, never the realm it currently sits on. It is
+// named to say so rather than left as a bare `realm` an external consumer would
+// read as the relic's present location.
 export interface LimitedMintRecord {
   itemId: string;
   serial: number;
   mintedByName: string | null;
-  realm: string;
+  mintedInRealm: string;
   mintedAt: string;
 }
 
@@ -130,6 +138,22 @@ export interface LimitedSupplyDb {
   // buffer serials (leased, never claimed) are passed here, so this can never
   // release a serial that reached a player.
   releaseSerials(itemId: string, serials: number[], realm: string): Promise<void>;
+  // The two deliberate exceptions to the mint row's immutability. Everything
+  // else about the record is frozen, but the published NAME is not the platform's
+  // to keep once the player stops owning it:
+  //
+  // renameMintedBy: a moderator's force-rename (db.ts renameCharacter) is the
+  // remedy for an offensive or impersonating name. The rename handler already
+  // chases the other denormalized copies (market seller, mail owner); without
+  // this the anonymous public ledger would keep republishing the original string
+  // forever, defeating the moderation action on its widest-reach surface.
+  //
+  // forgetMintedBy: a deleted character's name is dropped from the record. Both
+  // attribution columns are nulled, the serial row itself SURVIVES (state and
+  // serial untouched), because reusing a serial is the one thing this feature
+  // can never do. The public read already renders a null winner as null.
+  renameMintedBy(characterId: number, newName: string): Promise<void>;
+  forgetMintedBy(characterId: number): Promise<void>;
   // The public ledger snapshot: per-item counts plus every confirmed mint.
   readMints(): Promise<LimitedMintsSnapshot>;
 }
@@ -216,10 +240,34 @@ export class PgLimitedSupplyDb implements LimitedSupplyDb {
 
   async markMinted(itemId: string, serial: number, attr: LimitedMintAttribution): Promise<void> {
     await this.pool.query(
+      // character_id has NO reader anywhere (readMints does not select it); it
+      // exists solely as the key renameMintedBy / forgetMintedBy use to find a
+      // player's rows. Despite the name it is not, and must not become, an
+      // owner pointer: it is frozen at mint like the rest of the row.
       `UPDATE limited_serials
          SET state = 'minted', character_id = $3, character_name = $4, minted_at = now()
        WHERE item_id = $1 AND serial = $2 AND state = 'leased'`,
       [itemId, serial, attr.mintedById, attr.mintedByName],
+    );
+  }
+
+  // Both writes key off character_id, the column nothing else reads. Only minted
+  // rows carry a non-null character_id (leaseSerial leaves it NULL and both
+  // release paths null it again), so no predicate on state is needed. A serial
+  // minted before the id was resolvable carries a NULL character_id and is
+  // therefore unreachable by either write: it keeps its frozen name.
+  async renameMintedBy(characterId: number, newName: string): Promise<void> {
+    await this.pool.query(
+      `UPDATE limited_serials SET character_name = $2 WHERE character_id = $1`,
+      [characterId, newName],
+    );
+  }
+
+  async forgetMintedBy(characterId: number): Promise<void> {
+    await this.pool.query(
+      `UPDATE limited_serials SET character_id = NULL, character_name = NULL
+       WHERE character_id = $1`,
+      [characterId],
     );
   }
 
@@ -263,7 +311,7 @@ export class PgLimitedSupplyDb implements LimitedSupplyDb {
         itemId: r.item_id as string,
         serial: Number(r.serial),
         mintedByName: (r.character_name as string | null) ?? null,
-        realm: r.realm as string,
+        mintedInRealm: r.realm as string,
         mintedAt: new Date(r.minted_at as string | Date).toISOString(),
       })),
     };

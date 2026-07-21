@@ -1486,6 +1486,10 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         if (liveGame().rekeyMailOwner(characterId, character.name, c.name)) {
           await liveGame().saveMail();
         }
+        // Twin of the migrated arm in characters.ts renameHandler: follow the
+        // rename into the public relic ledger so a force-rename is not defeated
+        // on the one surface that publishes the name anonymously.
+        await liveGame().renameLimitedMintedBy(characterId, c.name);
         return json(res, 200, {
           id: c.id,
           name: c.name,
@@ -1528,6 +1532,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         });
       }
       const ok = await deleteCharacter(accountId, characterId);
+      // Twin of the migrated arm in characters.ts deleteHandler: clear the
+      // published ledger name once the delete has actually landed.
+      if (ok) await liveGame().forgetLimitedMintedBy(characterId);
       return json(
         res,
         ok ? 200 : 404,
@@ -2296,6 +2303,9 @@ configureCharactersRuntime({
   rekeyMailOwner: (characterId, oldName, newName) =>
     liveGame().rekeyMailOwner(characterId, oldName, newName),
   saveMail: () => liveGame().saveMail(),
+  renameLimitedMintedBy: (characterId, newName) =>
+    liveGame().renameLimitedMintedBy(characterId, newName),
+  forgetLimitedMintedBy: (characterId) => liveGame().forgetLimitedMintedBy(characterId),
   initialCharacterState,
   publicOrigin,
 });

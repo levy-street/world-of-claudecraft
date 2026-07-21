@@ -99,6 +99,21 @@ export class LimitedSupplyService {
     this.enqueue(() => this.db.markMinted(itemId, serial, attr));
   }
 
+  // The two immutability exceptions (see LimitedSupplyDb). Unlike onMint these
+  // are AWAITED by their callers rather than queued on the fire-and-forget tail:
+  // both are moderation/privacy actions whose whole point is that they actually
+  // land, and both run on a REST request, never inside a tick, so there is no
+  // loop to block. A failure propagates to the caller instead of being logged
+  // and dropped, which is the opposite of the right call for a background mint
+  // write and the right one here.
+  async renameMintedBy(characterId: number, newName: string): Promise<void> {
+    await this.db.renameMintedBy(characterId, newName);
+  }
+
+  async forgetMintedBy(characterId: number): Promise<void> {
+    await this.db.forgetMintedBy(characterId);
+  }
+
   // Graceful shutdown: return every unclaimed buffered serial to the pool for
   // dense reuse on the next boot. Awaited by saveAll so it completes before exit.
   async releaseAll(): Promise<void> {
