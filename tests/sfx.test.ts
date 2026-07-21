@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { sfx } from '../src/game/sfx';
+import { FORGE_MAX_DISTANCE, MAX_DISTANCE, REF_DISTANCE, sfx } from '../src/game/sfx';
 import { SFX_CLIPS, type SfxEntry } from '../src/game/sfx_manifest.generated';
 import { MOUNT_KEYS } from '../src/sim/content/mounts';
 
@@ -310,6 +310,53 @@ describe('mount running audio', () => {
 // here (returning true on a cooldown-blocked or unbuffered attempt) would
 // silently bench a mob for the full cooldown window over a bark that never
 // actually played, the exact bug the design's own doc comment warns about.
+describe('amb_forge: its own narrower audible distance', () => {
+  beforeEach(() => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set('amb_forge', { duration: 3 });
+    buffers.set('amb_campfire', { duration: 3 });
+    sfx.setListener(0, 0, 0, 0, 0, 1);
+  });
+
+  function forgeSlot() {
+    const loops = (sfx as unknown as { loops: Map<string, { panner: unknown }> }).loops;
+    return loops.get('forge-1');
+  }
+
+  it('uses FORGE_MAX_DISTANCE on its panner, not the shared MAX_DISTANCE every other sound uses', () => {
+    const withinRange = FORGE_MAX_DISTANCE - 1;
+    sfx.ambience('vale', false, null, false, 0, [
+      { id: 'forge-1', kind: 'forge', x: withinRange, y: 0, z: 0 },
+    ]);
+    const slot = forgeSlot();
+    expect(slot).toBeDefined();
+    const panner = slot?.panner as { refDistance: number; maxDistance: number };
+    expect(panner.maxDistance).toBe(FORGE_MAX_DISTANCE); // not the shared MAX_DISTANCE
+    expect(panner.refDistance).toBe(REF_DISTANCE); // unchanged
+  });
+
+  it('stops playing beyond its own cutoff, well inside the shared MAX_DISTANCE (46)', () => {
+    // Halfway between the forge's own cutoff and the shared MAX_DISTANCE:
+    // guaranteed past the forge's cutoff and comfortably under the shared
+    // ceiling every other positional sound still uses, at any tuned value.
+    // If this were using the shared default, it would still be audible here.
+    const beyondForgeRange = (FORGE_MAX_DISTANCE + MAX_DISTANCE) / 2;
+    sfx.ambience('vale', false, null, false, 0, [
+      { id: 'forge-1', kind: 'forge', x: beyondForgeRange, y: 0, z: 0 },
+    ]);
+    expect(forgeSlot()).toBeUndefined();
+  });
+
+  it('a campfire at the same distance is unaffected, still using the shared MAX_DISTANCE', () => {
+    const beyondForgeRange = (FORGE_MAX_DISTANCE + MAX_DISTANCE) / 2;
+    sfx.ambience('vale', false, null, false, 0, [
+      { id: 'campfire-1', kind: 'campfire', x: beyondForgeRange, y: 0, z: 0 },
+    ]);
+    const loops = (sfx as unknown as { loops: Map<string, unknown> }).loops;
+    expect(loops.get('campfire-1')).toBeDefined();
+  });
+});
+
 describe('playAt return value', () => {
   it('returns false for an unbuffered key (kicks off the async load instead)', () => {
     expect(sfx.playAt('mob_beast_idle', 0, 0, 0)).toBe(false);

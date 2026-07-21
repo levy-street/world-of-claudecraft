@@ -326,6 +326,16 @@ as footstep variant choice, not gameplay-affecting).
 | `amb_rain` | ✓ | global | steady rainfall pattering with occasional distant thunder |
 | `amb_snow` | ✓ | global | a soft muffled snowy wind, quiet and cold |
 
+Point ambience (`amb_campfire`/`amb_forge`) shares the same falloff every
+other positional sound uses by default, but `amb_forge` gets its own,
+narrower audible-distance override (`FORGE_MAX_DISTANCE`, `src/game/sfx.ts`;
+`makePanner`/`loop`/`tooFar` all take an optional refDistance/maxDistance
+override, defaulting to the shared constants so nothing else's range shifts).
+This sets the stage for future station ambiences (Professions 2.0's other
+station types: kitchens, apothecary, tannery, loom, toolworks, see issue
+#2208) to get their own audible radius the same way: a new `AmbientPointSource`
+`kind` plus a named constant, no changes to the override mechanism itself.
+
 ### Interface and personal event cues
 
 These cues are non-positional, preload at startup, and keep the existing
