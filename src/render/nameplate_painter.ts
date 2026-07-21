@@ -224,7 +224,14 @@ export class NameplatePainter {
         const roleKey = suppressSelf ? undefined : e.discordRole;
         const roleColor = specialRoleColor(roleKey);
         const roleTag = discordRoleTagLabel(roleKey);
-        const displayName = roleTag ? `[${roleTag}] ${e.name}` : e.name;
+        const baseName = roleTag ? `[${roleTag}] ${e.name}` : e.name;
+        // Client-side AFK tag: the away flag rides the entity (`ak` wire bit ->
+        // e.afk), but the label is localized HERE, never baked into the wire
+        // name. Suppressed on your own hidden plate; shown on everyone else's.
+        // Folded into displayName so it flows through the repaint signature
+        // below (the plate repaints the instant AFK toggles).
+        const displayName =
+          !suppressSelf && e.afk ? `<${t('hudChrome.nameplate.afkTag')}> ${baseName}` : baseName;
         // Significant-contributor outline: a glowing outline drawn on top of the
         // existing name color (Discord staff or default) for a high dev tier, so
         // both read at once. Null for non-significant tiers, for a suppressed self

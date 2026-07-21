@@ -1684,7 +1684,8 @@ export const zh_TW: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "等級 {level} {family}",
@@ -5862,7 +5863,8 @@ export const zh_TW: EnTranslations = {
         "offline": "離線",
         "combat": "戰鬥中",
         "dungeon": "地城中",
-        "dead": "死亡"
+        "dead": "死亡",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {

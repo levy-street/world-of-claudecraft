@@ -1684,7 +1684,8 @@ export const ko_KR: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "{level}레벨 {family}",
@@ -5862,7 +5863,8 @@ export const ko_KR: EnTranslations = {
         "offline": "오프라인",
         "combat": "전투 중",
         "dungeon": "던전 안",
-        "dead": "죽음"
+        "dead": "죽음",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {

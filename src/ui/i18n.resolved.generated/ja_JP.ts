@@ -1684,7 +1684,8 @@ export const ja_JP: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "レベル{level} {family}",
@@ -5862,7 +5863,8 @@ export const ja_JP: EnTranslations = {
         "offline": "オフライン",
         "combat": "戦闘中",
         "dungeon": "ダンジョン内",
-        "dead": "死亡"
+        "dead": "死亡",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {

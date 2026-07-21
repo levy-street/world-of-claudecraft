@@ -14,6 +14,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -31,6 +32,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.logging",
     "hudChrome.gathering.toolTierUnmet.mining",
     "hudChrome.gathering.toolTierUnmetCorpse",
+    "hudChrome.nameplate.afkTag",
     "hudChrome.professions.nextUnlockMastered"
   ],
   "es_ES": [
@@ -38,6 +40,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -55,6 +58,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.logging",
     "hudChrome.gathering.toolTierUnmet.mining",
     "hudChrome.gathering.toolTierUnmetCorpse",
+    "hudChrome.nameplate.afkTag",
     "hudChrome.professions.nextUnlockMastered"
   ],
   "fr_FR": [
@@ -62,6 +66,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -79,6 +84,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.logging",
     "hudChrome.gathering.toolTierUnmet.mining",
     "hudChrome.gathering.toolTierUnmetCorpse",
+    "hudChrome.nameplate.afkTag",
     "hudChrome.professions.nextUnlockMastered"
   ],
   "fr_CA": [
@@ -86,6 +92,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -103,6 +110,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.logging",
     "hudChrome.gathering.toolTierUnmet.mining",
     "hudChrome.gathering.toolTierUnmetCorpse",
+    "hudChrome.nameplate.afkTag",
     "hudChrome.professions.nextUnlockMastered"
   ],
   "en_CA": [],
@@ -111,6 +119,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -128,6 +137,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.logging",
     "hudChrome.gathering.toolTierUnmet.mining",
     "hudChrome.gathering.toolTierUnmetCorpse",
+    "hudChrome.nameplate.afkTag",
     "hudChrome.professions.nextUnlockMastered"
   ],
   "de_DE": [
@@ -135,6 +145,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -152,17 +163,31 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.logging",
     "hudChrome.gathering.toolTierUnmet.mining",
     "hudChrome.gathering.toolTierUnmetCorpse",
+    "hudChrome.nameplate.afkTag",
     "hudChrome.professions.nextUnlockMastered"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hud.social.status.afk",
+    "hudChrome.nameplate.afkTag"
+  ],
+  "zh_TW": [
+    "hud.social.status.afk",
+    "hudChrome.nameplate.afkTag"
+  ],
+  "ko_KR": [
+    "hud.social.status.afk",
+    "hudChrome.nameplate.afkTag"
+  ],
+  "ja_JP": [
+    "hud.social.status.afk",
+    "hudChrome.nameplate.afkTag"
+  ],
   "pt_BR": [
     "abilityUi.cast.gathering",
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -180,14 +205,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.logging",
     "hudChrome.gathering.toolTierUnmet.mining",
     "hudChrome.gathering.toolTierUnmetCorpse",
+    "hudChrome.nameplate.afkTag",
     "hudChrome.professions.nextUnlockMastered"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hud.social.status.afk",
+    "hudChrome.nameplate.afkTag"
+  ],
   "cs_CZ": [
     "abilityUi.cast.gathering",
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -205,6 +235,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.logging",
     "hudChrome.gathering.toolTierUnmet.mining",
     "hudChrome.gathering.toolTierUnmetCorpse",
+    "hudChrome.nameplate.afkTag",
     "hudChrome.professions.nextUnlockMastered"
   ],
   "nl_NL": [
@@ -212,6 +243,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -229,6 +261,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.logging",
     "hudChrome.gathering.toolTierUnmet.mining",
     "hudChrome.gathering.toolTierUnmetCorpse",
+    "hudChrome.nameplate.afkTag",
     "hudChrome.professions.nextUnlockMastered"
   ],
   "pl_PL": [
@@ -236,6 +269,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -253,6 +287,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.logging",
     "hudChrome.gathering.toolTierUnmet.mining",
     "hudChrome.gathering.toolTierUnmetCorpse",
+    "hudChrome.nameplate.afkTag",
     "hudChrome.professions.nextUnlockMastered"
   ],
   "id_ID": [
@@ -260,6 +295,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -277,6 +313,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.logging",
     "hudChrome.gathering.toolTierUnmet.mining",
     "hudChrome.gathering.toolTierUnmetCorpse",
+    "hudChrome.nameplate.afkTag",
     "hudChrome.professions.nextUnlockMastered"
   ],
   "tr_TR": [
@@ -284,6 +321,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -301,6 +339,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.logging",
     "hudChrome.gathering.toolTierUnmet.mining",
     "hudChrome.gathering.toolTierUnmetCorpse",
+    "hudChrome.nameplate.afkTag",
     "hudChrome.professions.nextUnlockMastered"
   ],
   "sv_SE": [
@@ -308,6 +347,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -325,6 +365,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.logging",
     "hudChrome.gathering.toolTierUnmet.mining",
     "hudChrome.gathering.toolTierUnmetCorpse",
+    "hudChrome.nameplate.afkTag",
     "hudChrome.professions.nextUnlockMastered"
   ],
   "vi_VN": [
@@ -332,6 +373,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -349,6 +391,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.logging",
     "hudChrome.gathering.toolTierUnmet.mining",
     "hudChrome.gathering.toolTierUnmetCorpse",
+    "hudChrome.nameplate.afkTag",
     "hudChrome.professions.nextUnlockMastered"
   ],
   "da_DK": [
@@ -356,6 +399,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -373,6 +417,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTierUnmet.logging",
     "hudChrome.gathering.toolTierUnmet.mining",
     "hudChrome.gathering.toolTierUnmetCorpse",
+    "hudChrome.nameplate.afkTag",
     "hudChrome.professions.nextUnlockMastered"
   ]
 };

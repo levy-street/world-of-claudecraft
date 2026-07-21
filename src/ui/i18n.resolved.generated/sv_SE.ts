@@ -1684,7 +1684,8 @@ export const sv_SE: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "Nivå {level} {family}",
@@ -5862,7 +5863,8 @@ export const sv_SE: EnTranslations = {
         "offline": "Frånkopplad",
         "combat": "I strid",
         "dungeon": "I fängelsehåla",
-        "dead": "Död"
+        "dead": "Död",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {

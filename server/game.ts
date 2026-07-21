@@ -994,6 +994,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (e.ghost) out.gh = 1; // released spirit (ghost form); renders translucent
   if (e.lootable) out.loot = 1;
   if (e.hostile) out.h = 1;
+  if (e.afk) out.ak = 1; // /afk display bit: other clients tag the nameplate + presence dot
   // The target frame's resource bar: type + current/max, sent only for entities
   // that HAVE a resource (players and caster mobs; a resource-less wolf omits all
   // three and the frame hides its bar). The rounded res keeps an idle entity's
@@ -1740,6 +1741,9 @@ export class GameServer {
     if (e.dead) status = 'dead';
     else if (instanceZone != null) status = 'dungeon';
     else if (e.inCombat) status = 'combat';
+    // AFK is the lowest-priority active state: a dead/instanced/in-combat player
+    // reports that first, but an idle /afk player shows 'afk' over plain 'online'.
+    else if (this.sim.meta(session.pid)?.away?.mode === 'afk') status = 'afk';
     // The Sowfield is overworld ground (no instance band, no status change),
     // but the stadium is the presence players expect on match days: fighters
     // and walk-up spectators inside the footprint report the venue, not the

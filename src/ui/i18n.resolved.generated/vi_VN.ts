@@ -1684,7 +1684,8 @@ export const vi_VN: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "{family} cấp {level}",
@@ -5862,7 +5863,8 @@ export const vi_VN: EnTranslations = {
         "offline": "Ngoại Tuyến",
         "combat": "Đang Chiến Đấu",
         "dungeon": "Trong Hầm Ngục",
-        "dead": "Đã Chết"
+        "dead": "Đã Chết",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {

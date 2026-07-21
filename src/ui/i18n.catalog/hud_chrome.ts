@@ -1724,6 +1724,9 @@ export const hudChromeStrings = {
     // to the bracket only, not the mob name text.
     mobLevel: '{level}',
     mobEliteLevel: '{level}+',
+    // /afk tag prefixed to a player's overhead name (nameplate_painter.ts wraps
+    // it in angle brackets: "<AFK> Name"). Short label, not a sentence.
+    afkTag: 'AFK',
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
   // name (colored by the nameplate con-color), then "Level N <type>" ({family}

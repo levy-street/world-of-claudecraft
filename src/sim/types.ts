@@ -2799,6 +2799,12 @@ export interface Entity {
   // Z-key cosmetic toggle: held weapons render sheathed on the back. Cleared by
   // any deliberate combat action (auto-attack engage, ability cast), WoW-style.
   weaponStowed: boolean;
+  // /afk display mirror: true while this player's PlayerMeta.away is in `afk`
+  // mode. Kept in lockstep with meta.away by src/sim/social/away.ts so the flag
+  // rides the entity (wire `ak` bit) to other clients' nameplates and the social
+  // presence dot. Transient, session-only, never persisted; always false for
+  // non-players and for the `dnd` away mode.
+  afk: boolean;
   // mob AI
   aiState: AiState;
   tappedById: number | null; // first player to damage this mob owns loot/xp/quest credit
