@@ -5586,11 +5586,35 @@ export class GameServer {
         'achg',
         session.timerWireCache.encodeCharges(anchorSession.pid, p.abilityCharges).json,
       );
+      // The companion recharge timers ({abilityId: [deadline, length]}), so the
+      // bar can show the thin recharge sweep while the pool still holds a use
+      // (the empty-pool timer keeps riding `cds` unchanged). Additive key: an
+      // older client simply ignores it.
+      maybeSerialized(
+        'achr',
+        session.timerWireCache.encodeChargeRecharges(
+          anchorSession.pid,
+          p.abilityCharges,
+          this.sim.time,
+        ).json,
+      );
     } else {
       maybe(
         'achg',
         p.abilityCharges
           ? Object.fromEntries(Object.entries(p.abilityCharges).map(([k, v]) => [k, v.charges]))
+          : {},
+      );
+      // Legacy arm: raw remaining seconds ({abilityId: [remaining, length]}),
+      // resent per snapshot like every legacy timer.
+      maybe(
+        'achr',
+        p.abilityCharges
+          ? Object.fromEntries(
+              Object.entries(p.abilityCharges)
+                .filter(([, v]) => v.recharge > 0)
+                .map(([k, v]) => [k, [v.recharge, v.rechargeLength]]),
+            )
           : {},
       );
     }

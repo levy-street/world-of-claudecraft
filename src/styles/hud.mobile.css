@@ -822,6 +822,30 @@
     text-shadow: 1px 1px 2px #000;
     pointer-events: none;
   }
+  /* The thin recharge strip (charge-pool abilities), clipped by the ring
+     button's own circle like the cd-overlay sweep above. */
+  body.mobile-touch #mobile-action-ring button .recharge-overlay {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 5px;
+    height: 0;
+    background: #ffd97a99;
+    pointer-events: none;
+  }
+  /* Charge counts read as charges (gold plate), mirroring the desktop
+     .action-btn .item-count.charge-count treatment. */
+  body.mobile-touch #mobile-action-ring button .item-count.charge-count {
+    right: 3px;
+    bottom: 1px;
+    font-size: 12px;
+    color: var(--gold);
+    background: #000c;
+    border: 1px solid #ffd97a55;
+    border-radius: 4px;
+    padding: 0 3px;
+    z-index: 1;
+  }
   body.mobile-touch #mobile-action-ring button .keybind {
     display: none;
   }

@@ -261,6 +261,32 @@ describe('StableSelfTimerWireCache', () => {
     expect(cache.encodeCharges(1, charges)).not.toBe(firstCharges);
   });
 
+  it('encodes achr recharge deadlines stably while the timer ticks, rebuilding on charge events', () => {
+    const cache = new StableSelfTimerWireCache();
+    const charges = {
+      cast: { charges: 1, maxCharges: 2, recharge: 4, rechargeLength: 5 },
+    };
+    // simTime 0, 4s left on a 5s recharge: deadline 4.
+    const first = cache.encodeChargeRecharges(1, charges, 0);
+    expect(JSON.parse(first.json)).toEqual({ cast: [4, 5] });
+    // Half a second later the timer ticked to 3.5: same deadline, SAME cached
+    // object (the whole point of the deadline encoding).
+    charges.cast.recharge = 3.5;
+    expect(cache.encodeChargeRecharges(1, charges, 0.5)).toBe(first);
+    expect(cache.chargeRechargeRebuilds).toBe(1);
+    // A refund re-arms the next timer (new soonest deadline): rebuild.
+    charges.cast.recharge = 5;
+    const rearmed = cache.encodeChargeRecharges(1, charges, 0.5);
+    expect(rearmed).not.toBe(first);
+    expect(JSON.parse(rearmed.json)).toEqual({ cast: [5.5, 5] });
+    // Pool refilled (recharge 0): the entry drops to {}.
+    charges.cast.recharge = 0;
+    charges.cast.charges = 2;
+    expect(JSON.parse(cache.encodeChargeRecharges(1, charges, 1).json)).toEqual({});
+    // No charge bookkeeping at all serializes the same empty object.
+    expect(cache.encodeChargeRecharges(1, undefined, 1).json).toBe('{}');
+  });
+
   it('resets all sub-caches when a spectator changes anchor owner', () => {
     const cache = new StableSelfTimerWireCache();
     const state = timerEntity(new Map([['cast', 5]]));

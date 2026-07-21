@@ -1471,6 +1471,10 @@ export class ClientWorld implements IWorld {
   private stableTimerOwnerId: number | undefined;
   private stableCooldownSchedules: Map<string, StableCooldownWire> | undefined = new Map();
   private stableNodeDeadlines: Map<string, number> | undefined = new Map();
+  // abilityId -> [recharge deadline, recharge length] from the `achr` timer wire,
+  // retained like stableCooldownSchedules so the action bar's recharge strip
+  // keeps aging across snapshots that omit the unchanged achr JSON.
+  private stableChargeRecharges: Map<string, readonly [number, number]> | undefined = new Map();
   // entity id -> performance.now() when it first went missing from a snapshot;
   // used for the despawn grace window (anti-flicker), cleared once it returns
   private missingSince = new Map<number, number>();
@@ -2061,6 +2065,7 @@ export class ClientWorld implements IWorld {
       this.stableTimerOwnerId = undefined;
       this.stableCooldownSchedules?.clear();
       this.stableNodeDeadlines?.clear();
+      this.stableChargeRecharges?.clear();
     }
     if (
       mode !== 'stable' ||
@@ -2073,10 +2078,12 @@ export class ClientWorld implements IWorld {
 
     if (this.stableCooldownSchedules === undefined) this.stableCooldownSchedules = new Map();
     if (this.stableNodeDeadlines === undefined) this.stableNodeDeadlines = new Map();
+    if (this.stableChargeRecharges === undefined) this.stableChargeRecharges = new Map();
     if (this.stableTimerOwnerId !== this.playerId) {
       this.stableTimerOwnerId = this.playerId;
       this.stableCooldownSchedules.clear();
       this.stableNodeDeadlines.clear();
+      this.stableChargeRecharges.clear();
       this.nodeCooldowns = new Map();
     }
 
@@ -2101,6 +2108,7 @@ export class ClientWorld implements IWorld {
       // schedules tied to the old clock before decoding it.
       this.stableCooldownSchedules.clear();
       this.stableNodeDeadlines.clear();
+      this.stableChargeRecharges.clear();
     }
     this.stableTimerTime = rawTime;
     this.refreshStableSelfTimers(rawTime);
@@ -2127,6 +2135,23 @@ export class ClientWorld implements IWorld {
         else {
           this.stableNodeDeadlines.delete(nodeId);
           this.nodeCooldowns.delete(nodeId);
+        }
+      }
+    }
+    if (player?.abilityCharges && this.stableChargeRecharges) {
+      // Age the recharge strip between achr rebuilds (the wire only resends on a
+      // charge event). A deadline that passed floors at 0 until the server's
+      // refund event lands with the authoritative new count.
+      for (const [abilityId, [deadline, length]] of this.stableChargeRecharges) {
+        const rec = player.abilityCharges[abilityId];
+        if (!rec) continue;
+        const remaining = stableDeadlineRemaining(deadline, now);
+        if (remaining !== null && remaining > 0) {
+          rec.recharge = remaining;
+          rec.rechargeLength = length;
+        } else {
+          this.stableChargeRecharges.delete(abilityId);
+          rec.recharge = 0;
         }
       }
     }
@@ -2559,8 +2584,10 @@ export class ClientWorld implements IWorld {
         this.nodeCooldowns = new Map(Object.entries(s.ncd).map(([k, v]) => [k, Number(v)]));
       }
       if (s.achg !== undefined) {
-        // Recharge-model live counts (Frost's second Ice Block). Only the count is
-        // displayed; max/recharge are server-side details the mirror zero-fills.
+        // Recharge-model live counts (Frost's second Ice Block). maxCharges stays
+        // a server-side detail the mirror zero-fills (the bar derives the max from
+        // its own known-list rebake); recharge/rechargeLength are filled from the
+        // `achr` companion below when a charge is regenerating.
         e.abilityCharges = {};
         for (const k in s.achg) {
           e.abilityCharges[k] = {
@@ -2569,6 +2596,54 @@ export class ClientWorld implements IWorld {
             recharge: 0,
             rechargeLength: 0,
           };
+        }
+        if (s.achr !== undefined) {
+          // The companion recharge timers, driving the action bar's thin
+          // recharge sweep while the pool still holds a use. Stable timer wire
+          // sends [deadline, length] pairs (retained in stableChargeRecharges so
+          // refreshStableSelfTimers keeps aging them across omitted snapshots);
+          // legacy sends raw [remaining, length], resent per snapshot. Merged
+          // onto the achg records above; an id without a running recharge keeps
+          // the 0 fill, and an older server that never sends achr leaves the
+          // strip hidden.
+          const stable = timerWire.mode === 'stable' && timerWire.time !== null;
+          if (stable) {
+            if (this.stableChargeRecharges === undefined) this.stableChargeRecharges = new Map();
+            this.stableChargeRecharges.clear();
+          }
+          for (const k in s.achr) {
+            const rec = e.abilityCharges[k];
+            const pair = s.achr[k] as unknown;
+            if (!rec || !Array.isArray(pair)) continue;
+            const deadline = Number(pair[0]);
+            const len = Number(pair[1]);
+            const remaining =
+              timerWire.mode === 'stable'
+                ? timerWire.time !== null
+                  ? stableDeadlineRemaining(deadline, timerWire.time)
+                  : null
+                : deadline;
+            if (remaining !== null && remaining > 0 && len > 0) {
+              rec.recharge = remaining;
+              rec.rechargeLength = len;
+              if (stable) this.stableChargeRecharges?.set(k, [deadline, len]);
+            }
+          }
+        } else if (timerWire.mode === 'stable' && timerWire.time !== null) {
+          // achg re-sent without achr (the recharge JSON happened to be
+          // unchanged): the rebuilt zero-filled records re-fill from the
+          // retained deadlines instead of blanking the strip for a snapshot.
+          if (this.stableChargeRecharges) {
+            for (const [abilityId, [deadline, len]] of this.stableChargeRecharges) {
+              const rec = e.abilityCharges[abilityId];
+              if (!rec) continue;
+              const remaining = stableDeadlineRemaining(deadline, timerWire.time);
+              if (remaining !== null && remaining > 0) {
+                rec.recharge = remaining;
+                rec.rechargeLength = len;
+              }
+            }
+          }
         }
       }
       e.gcdRemaining = s.gcd ?? 0;

@@ -1675,6 +1675,35 @@
     height: 0%;
     border-radius: 0 0 4px 4px;
   }
+  /* The thin recharge strip on a charge-pool ability (Twinstrike, Double
+     Charge): a spent charge regenerating while the button stays pressable, so
+     it is deliberately subtler than the full-width .cd-overlay curtain that
+     runs on an empty pool. Height is driven by the painter (rechargePercent). */
+  .action-btn .recharge-overlay {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 5px;
+    height: 0%;
+    background: #ffd97a99;
+    border-radius: 0 0 4px 0;
+    pointer-events: none;
+  }
+  /* A charge count reads as CHARGES, not an item stack: gold on a small plate,
+     a step larger than the 10px stack count it replaces on these buttons, and
+     lifted ABOVE the cooldown curtain and recharge strip (which follow it in
+     the DOM) so the stored-uses number never disappears under a sweep. */
+  .action-btn .item-count.charge-count {
+    right: 1px;
+    bottom: 1px;
+    font-size: 12px;
+    color: var(--gold);
+    background: #000c;
+    border: 1px solid #ffd97a55;
+    border-radius: 4px;
+    padding: 0 3px;
+    z-index: 1;
+  }
   .action-btn.unusable .icon-label {
     filter: grayscale(1) brightness(0.5);
   }

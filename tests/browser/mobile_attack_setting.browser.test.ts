@@ -37,6 +37,8 @@ function slot(kind: ActionBarSlotState['kind']): ActionBarSlotState {
     cooldownPercent: 0,
     cdText: '',
     count: '',
+    isCharges: false,
+    rechargePercent: 0,
     usable: true,
     outOfRange: false,
     queued: false,
@@ -55,8 +57,9 @@ function ringSlot(index: number): ActionBarSlotElements {
   const keybindEl = document.createElement('span');
   const cdOverlay = document.createElement('span');
   const cdText = document.createElement('span');
-  button.append(label, countEl, keybindEl, cdOverlay, cdText);
-  return { btn: button, label, countEl, keybindEl, cdOverlay, cdText };
+  const rechargeOverlay = document.createElement('span');
+  button.append(label, countEl, keybindEl, cdOverlay, rechargeOverlay, cdText);
+  return { btn: button, label, countEl, keybindEl, cdOverlay, cdText, rechargeOverlay };
 }
 
 afterEach(() => {

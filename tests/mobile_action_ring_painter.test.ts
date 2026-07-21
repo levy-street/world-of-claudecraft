@@ -64,6 +64,7 @@ function slotElements(tag: string): ActionBarSlotElements {
     keybindEl: { tag: `${tag}-kb` } as unknown as HTMLElement,
     cdOverlay: { tag: `${tag}-cd` } as unknown as HTMLElement,
     cdText: { tag: `${tag}-cdtext` } as unknown as HTMLElement,
+    rechargeOverlay: { tag: `${tag}-recharge` } as unknown as HTMLElement,
   };
 }
 
@@ -305,6 +306,7 @@ describe('MobileActionRingPainter: page indicator + toggle aria', () => {
       keybindEl: realNode() as unknown as HTMLElement,
       cdOverlay: realNode() as unknown as HTMLElement,
       cdText: realNode() as unknown as HTMLElement,
+      rechargeOverlay: realNode() as unknown as HTMLElement,
     }));
     const painter = new MobileActionRingPainter(
       facet,

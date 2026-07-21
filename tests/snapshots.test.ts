@@ -2903,7 +2903,7 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // while the prior decoded value is preserved.
 // ---------------------------------------------------------------------------
 
-// The pinned set of the 50 delta keys, sorted. Cross-checked below against the
+// The pinned set of delta keys, sorted. Cross-checked below against the
 // live `maybe(...)` (and `maybeRaw(...)`) calls scraped from server/game.ts
 // source, so a 51st unregistered delta key reddens this gate. All but two ride
 // via `maybe(...)`; `vcupb` and `dfb` are written with `maybeRaw(...)` (realm-wide
@@ -2911,6 +2911,7 @@ describe('lockpick view rebuilds from events on the online client', () => {
 // shared across viewers), not plain `maybe(...)`.
 const ALL_DELTA_KEYS = [
   'achg',
+  'achr',
   'arena',
   'atitle',
   'bags',
@@ -3311,6 +3312,11 @@ describe('full self-state snapshot delta fixture', () => {
     // --- fields that decode onto the player ENTITY (client.player), not the client ---
     expect(client.player.cooldowns.get('heroic_strike')).toBe(5); // cds -> e.cooldowns
     expect(client.player.abilityCharges?.ice_block?.charges).toBe(1); // achg -> e.abilityCharges
+    // achr -> the same records' recharge timer (legacy wire: raw [remaining, length]);
+    // like vcup/vcupb it is hand-decoded inside the achg block, so it has no
+    // TERSE_TO_IWORLD rename entry.
+    expect(client.player.abilityCharges?.ice_block?.recharge).toBe(10);
+    expect(client.player.abilityCharges?.ice_block?.rechargeLength).toBe(240);
     expect(client.player.stats).toMatchObject({
       str: 12345,
       pvpOffense: 0.17,
@@ -3546,9 +3552,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 51 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(51);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(51);
+  it('ALL_DELTA_KEYS contains exactly 52 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(52);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(52);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -3567,7 +3573,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('vcupb')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
-    expect(scraped.size).toBe(51);
+    expect(scraped.size).toBe(52);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4485,12 +4491,15 @@ describe('negotiated stable timer wire v2', () => {
     expect(first.self.auras[0]).not.toHaveProperty('rem');
     expect(first.self.cds.stable_cast).toBe(5);
     expect(first.self.achg.stable_cast).toBe(1);
+    expect(first.self.achr.stable_cast).toEqual([5, 5]);
     expect(first.self.ncd.stable_node).toBe(30);
 
     const client = bareClient(session.pid);
     (client as any).applySnapshot(first);
     expect(client.player.auras[0].remaining).toBe(10);
     expect(client.player.cooldowns.get('stable_cast')).toBe(5);
+    expect(client.player.abilityCharges?.stable_cast?.recharge).toBe(5);
+    expect(client.player.abilityCharges?.stable_cast?.rechargeLength).toBe(5);
     expect(client.nodeHarvestableByMe('stable_node')).toBe(false);
 
     fc.sent.length = 0;
@@ -4501,16 +4510,21 @@ describe('negotiated stable timer wire v2', () => {
     expect(later.self).not.toHaveProperty('auras');
     expect(later.self).not.toHaveProperty('cds');
     expect(later.self).not.toHaveProperty('achg');
+    expect(later.self).not.toHaveProperty('achr');
     expect(later.self).not.toHaveProperty('ncd');
 
     (client as any).applySnapshot(later);
     expect(client.player.auras[0].remaining).toBeCloseTo(9.75, 5);
     expect(client.player.cooldowns.get('stable_cast')).toBeCloseTo(4.75, 5);
+    // the retained achr deadline ages the recharge strip across omitted snapshots
+    expect(client.player.abilityCharges?.stable_cast?.recharge).toBeCloseTo(4.75, 5);
     expect(client.nodeHarvestableByMe('stable_node')).toBe(false);
 
     player.auras.length = 0;
     player.cooldowns.clear();
     player.abilityCharges.stable_cast.charges = 2;
+    player.abilityCharges.stable_cast.recharge = 0;
+    player.abilityCharges.stable_cast.recharges = [];
     meta.nodeHarvestReadyAt.stable_node = server.sim.time - 1;
     fc.sent.length = 0;
     broadcast(server);
@@ -4518,12 +4532,14 @@ describe('negotiated stable timer wire v2', () => {
     expect(cleared.self.auras).toEqual([]);
     expect(cleared.self.cds).toEqual({});
     expect(cleared.self.achg).toEqual({ stable_cast: 2 });
+    expect(cleared.self.achr).toEqual({});
     expect(cleared.self.ncd).toEqual({});
 
     (client as any).applySnapshot(cleared);
     expect(client.player.auras).toEqual([]);
     expect(client.player.cooldowns.size).toBe(0);
     expect(client.player.abilityCharges?.stable_cast?.charges).toBe(2);
+    expect(client.player.abilityCharges?.stable_cast?.recharge).toBe(0);
     expect(client.nodeHarvestableByMe('stable_node')).toBe(true);
   });
 
