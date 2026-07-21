@@ -1,3 +1,5 @@
+import { t } from './i18n';
+
 /**
  * Toggles the visibility of a password input and updates the toggle button accessibility attributes.
  * @param input The password HTML input element
@@ -6,10 +8,10 @@
 export function togglePasswordVisibility(input: HTMLInputElement, button: HTMLButtonElement): void {
   const isPassword = input.type === 'password';
   input.type = isPassword ? 'text' : 'password';
-  
+
   // Update button accessibility states
   button.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
-  button.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+  button.setAttribute('aria-label', isPassword ? t('auth.hidePassword') : t('auth.showPassword'));
 }
 
 /**

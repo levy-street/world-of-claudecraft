@@ -1,195 +1,258 @@
-// Procedural WebAudio sound effects — no audio files.
+// Compatibility facade for non-positional UI and event sounds.
+//
+// GameAudio keeps the established HUD-facing method surface while delegating
+// playback, loading, voice limits, and volume control to the sampled SFX engine.
 
-const SFX_BASE_GAIN = 0.32; // master level at full volume
+import { sfx } from './sfx';
+
+// Minimum seconds between repeats of the SAME error cue: spamming an ability
+// on cooldown, or holding a cast with no mana, would otherwise refire the
+// bloop every failed attempt. Per-key (via sfx.playUi's own cooldown option),
+// so an unrelated error class right after still sounds immediately.
+const ERROR_SFX_COOLDOWN_SECONDS = 1.5;
+
+const UI_CUES = {
+  bagOpen: 'ui_bag_open',
+  bagClose: 'ui_bag_close',
+  click: 'ui_click',
+  coin: 'ui_coin',
+  levelUp: 'ui_level_up',
+  achievement: 'ui_achievement',
+  cosmeticUnlock: 'ui_cosmetic_unlock',
+  lootItem: 'ui_loot_item',
+  questDone: 'ui_quest_done',
+  whisper: 'ui_whisper',
+  sheep: 'ui_sheep',
+  death: 'ui_death',
+  arenaLoss: 'ui_arena_loss',
+  playerDeath: 'player_death',
+  readyCheck: 'ui_ready_check',
+  weaponSheathe: 'ui_weapon_sheathe',
+  weaponUnsheathe: 'ui_weapon_unsheathe',
+  error: 'ui_error',
+  duelChallenge: 'ui_duel_challenge',
+  duelCountdown: 'ui_duel_countdown',
+  duelStart: 'ui_duel_start',
+  vcupKickoff: 'ui_vcup_kickoff',
+  duelEnd: 'ui_duel_end',
+  fiestaWords: ['ui_fiesta_word_0', 'ui_fiesta_word_1', 'ui_fiesta_word_2', 'ui_fiesta_word_3'],
+  fiestaScoreMine: 'ui_fiesta_score_mine',
+  fiestaScoreOther: 'ui_fiesta_score_other',
+  fiestaWave: 'ui_fiesta_wave',
+  fiestaAugment: 'ui_fiesta_augment',
+  fiestaDown: 'ui_fiesta_down',
+  fiestaRevive: 'ui_fiesta_revive',
+  // Card Duel minigame (src/sim/social/card_duel.ts). cardShuffle covers both
+  // the initial deal (cardDuelMatchStart) and a mid-match reshuffle
+  // (cardRoundResolved.reshuffled); match win/lose deliberately reuse the
+  // existing duelEnd/arenaLoss cues rather than new recordings (Jamie's
+  // 2026-07-19 design call).
+  cardPlay: 'ui_card_play',
+  cardReveal: 'ui_card_reveal',
+  cardRoundPush: 'ui_card_round_push',
+  cardShuffle: 'ui_card_shuffle',
+} as const;
+
+type UiCue =
+  | Exclude<(typeof UI_CUES)[keyof typeof UI_CUES], readonly string[]>
+  | (typeof UI_CUES.fiestaWords)[number];
 
 export class GameAudio {
-  private ctx: AudioContext | null = null;
-  private master: GainNode | null = null;
-  private noiseBuf: AudioBuffer | null = null;
-  private vol = 1; // 0..1, set from the settings menu (applied to the master gain)
+  private vol = 1;
+  // Gates the discrete interface/feedback cues (loot, level, quest, whisper, error,
+  // ...) plus the combat avoid cues the HUD reads via `feedbackEnabled`. On by
+  // default; driven by the `interfaceSfx` setting. World/spatial sounds and the
+  // gameplay-timing cues (ready check, duel countdown) are unaffected.
+  private feedbackOn = true;
 
-  /** Set SFX volume (0..1). Safe before init(); applied when the context exists. */
-  setVolume(v: number): void {
-    this.vol = Math.min(1, Math.max(0, v));
-    if (this.master) this.master.gain.value = SFX_BASE_GAIN * this.vol;
+  /** Set SFX volume (0..1). Safe before init(). */
+  setVolume(value: number): void {
+    this.vol = Math.min(1, Math.max(0, value));
+    sfx.setVolume(this.vol);
   }
 
   get volume(): number {
     return this.vol;
   }
 
+  /** Enable/disable the interface and feedback cues (the `interfaceSfx` setting).
+   *  On by default; when off, the notification "beeps" fall silent while the SFX
+   *  volume slider and the spatial world sounds are untouched. Safe before init(). */
+  setFeedbackEnabled(value: boolean): void {
+    this.feedbackOn = value;
+  }
+
+  /** Whether the interface/feedback cues are on. The HUD reads this to gate the
+   *  combat avoid cues (miss/dodge/parry) it plays through the spatial engine. */
+  get feedbackEnabled(): boolean {
+    return this.feedbackOn;
+  }
+
+  /** Initialize sampled playback. Safe to call repeatedly after a user gesture. */
   init(): void {
-    if (this.ctx) return;
-    try {
-      this.ctx = new AudioContext();
-      this.master = this.ctx.createGain();
-      this.master.gain.value = SFX_BASE_GAIN * this.vol;
-      this.master.connect(this.ctx.destination);
-      const len = this.ctx.sampleRate;
-      this.noiseBuf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
-      const data = this.noiseBuf.getChannelData(0);
-      for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
-    } catch {
-      this.ctx = null;
-    }
+    sfx.setVolume(this.vol);
+    sfx.init();
   }
 
-  private noise(duration: number, filterFreq: number, gain: number, decay = 0.9, filterType: BiquadFilterType = 'lowpass'): void {
-    if (!this.ctx || !this.master || !this.noiseBuf) return;
-    const t = this.ctx.currentTime;
-    const src = this.ctx.createBufferSource();
-    src.buffer = this.noiseBuf;
-    src.playbackRate.value = 0.8 + Math.random() * 0.4;
-    const filter = this.ctx.createBiquadFilter();
-    filter.type = filterType;
-    filter.frequency.value = filterFreq;
-    const g = this.ctx.createGain();
-    g.gain.setValueAtTime(gain, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + duration * decay);
-    src.connect(filter).connect(g).connect(this.master);
-    src.start(t, Math.random() * 0.5, duration);
+  private play(key: UiCue, opts?: { cooldown?: number }): void {
+    sfx.playUi(key, { jitter: false, cooldown: opts?.cooldown });
   }
 
-  private tone(freq: number, duration: number, gain: number, type: OscillatorType = 'sine', delay = 0, slideTo?: number): void {
-    if (!this.ctx || !this.master) return;
-    const t = this.ctx.currentTime + delay;
-    const osc = this.ctx.createOscillator();
-    osc.type = type;
-    osc.frequency.setValueAtTime(freq, t);
-    if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, t + duration);
-    const g = this.ctx.createGain();
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(gain, t + 0.012);
-    g.gain.exponentialRampToValueAtTime(0.001, t + duration);
-    osc.connect(g).connect(this.master);
-    osc.start(t);
-    osc.stop(t + duration + 0.05);
-  }
-
-  meleeHit(crit = false): void {
-    this.noise(0.12, 900, crit ? 0.5 : 0.3);
-    this.tone(110 + Math.random() * 40, 0.08, crit ? 0.3 : 0.16, 'triangle');
-    if (crit) this.noise(0.2, 2400, 0.2, 0.6, 'highpass');
-  }
-
-  meleeMiss(): void {
-    this.noise(0.16, 1800, 0.12, 0.8, 'bandpass');
-  }
-
-  hitTaken(): void {
-    this.noise(0.1, 500, 0.25);
-    this.tone(80, 0.1, 0.2, 'square');
-  }
-
-  fire(): void {
-    this.noise(0.45, 700, 0.32, 0.8);
-    this.tone(160, 0.35, 0.2, 'sawtooth', 0, 60);
-  }
-
-  frost(): void {
-    this.noise(0.35, 4500, 0.18, 0.7, 'highpass');
-    this.tone(1300, 0.3, 0.12, 'sine', 0, 700);
-    this.tone(1750, 0.25, 0.08, 'sine', 0.04, 900);
-  }
-
-  arcane(): void {
-    this.tone(620, 0.22, 0.14, 'sine', 0, 850);
-    this.tone(930, 0.22, 0.1, 'sine', 0.05, 1240);
-  }
-
-  castStart(): void {
-    this.tone(300, 0.2, 0.06, 'sine', 0, 420);
-  }
-
-  levelUp(): void {
-    const notes = [392, 523, 659, 784, 1046];
-    notes.forEach((f, i) => this.tone(f, 0.5, 0.18, 'triangle', i * 0.09));
-    this.noise(0.8, 5000, 0.06, 0.95, 'highpass');
-  }
-
-  questAccept(): void {
-    this.tone(660, 0.18, 0.14, 'triangle');
-    this.tone(880, 0.25, 0.14, 'triangle', 0.1);
-  }
-
-  questDone(): void {
-    [523, 659, 784].forEach((f, i) => this.tone(f, 0.35, 0.16, 'triangle', i * 0.12));
-  }
-
-  coin(): void {
-    this.tone(2200, 0.1, 0.12, 'square');
-    this.tone(2800, 0.14, 0.1, 'square', 0.05);
-  }
-
-  lootItem(): void {
-    this.noise(0.12, 1200, 0.14, 0.8, 'bandpass');
-  }
-
-  death(): void {
-    this.tone(220, 1.4, 0.22, 'sawtooth', 0, 55);
-    this.noise(1.2, 300, 0.18, 0.95);
-  }
-
-  aggro(): void {
-    this.tone(140, 0.3, 0.14, 'sawtooth', 0, 90);
-    this.noise(0.25, 600, 0.12, 0.8);
-  }
-
-  drink(): void {
-    [0, 0.25, 0.5].forEach((d) => this.tone(420 + Math.random() * 80, 0.12, 0.08, 'sine', d, 280));
-  }
-
-  eat(): void {
-    [0, 0.3].forEach((d) => this.noise(0.1, 800, 0.1, 0.8, 'bandpass'));
-  }
-
-  click(): void {
-    this.tone(1400, 0.05, 0.08, 'square');
-  }
-
-  error(): void {
-    this.tone(220, 0.15, 0.1, 'square', 0, 180);
-  }
-
-  sheep(): void {
-    this.tone(620, 0.4, 0.13, 'sawtooth', 0, 520);
+  /** Play a cue only when interface/feedback sounds are enabled. The notification
+   *  cues (loot, level, quest, whisper, error, polymorph, death) route through here;
+   *  the gameplay-timing cues (ready check, duel countdown) call `play` directly. */
+  private playFeedback(key: UiCue, opts?: { cooldown?: number }): void {
+    if (this.feedbackOn) this.play(key, opts);
   }
 
   bagOpen(): void {
-    // leather flap + soft clasp
-    this.noise(0.09, 1400, 0.16, 0.7);
-    this.tone(660, 0.05, 0.06, 'triangle', 0.03);
+    this.play(UI_CUES.bagOpen);
   }
 
   bagClose(): void {
-    this.noise(0.08, 900, 0.14, 0.7);
-    this.tone(440, 0.05, 0.06, 'triangle', 0.01);
+    this.play(UI_CUES.bagClose);
+  }
+
+  click(): void {
+    this.play(UI_CUES.click);
+  }
+
+  coin(): void {
+    this.playFeedback(UI_CUES.coin);
+  }
+
+  levelUp(): void {
+    this.playFeedback(UI_CUES.levelUp);
+  }
+
+  achievement(): void {
+    this.play(UI_CUES.achievement);
+  }
+
+  cosmeticUnlock(): void {
+    this.play(UI_CUES.cosmeticUnlock);
+  }
+
+  // Your OWN character actually dying (the 'playerDeath' sim event), not a
+  // minigame/PvP loss chime (fiesta, Yumi, arena rating, Vale Cup all still
+  // use death() below): plays the real custom death vocalization instead of
+  // the generic UI stinger.
+  playerDeath(): void {
+    this.play(UI_CUES.playerDeath);
+  }
+
+  lootItem(): void {
+    this.playFeedback(UI_CUES.lootItem);
+  }
+
+  questDone(): void {
+    this.playFeedback(UI_CUES.questDone);
+  }
+
+  readyCheck(): void {
+    this.play(UI_CUES.readyCheck);
+  }
+
+  weaponSheathe(): void {
+    this.play(UI_CUES.weaponSheathe);
+  }
+
+  weaponUnsheathe(): void {
+    this.play(UI_CUES.weaponUnsheathe);
   }
 
   whisper(): void {
-    this.tone(1175, 0.09, 0.09, 'sine');
-    this.tone(1568, 0.12, 0.07, 'sine', 0.07);
+    this.playFeedback(UI_CUES.whisper);
+  }
+
+  sheep(): void {
+    this.playFeedback(UI_CUES.sheep);
+  }
+
+  death(): void {
+    this.playFeedback(UI_CUES.death);
+  }
+
+  arenaLoss(): void {
+    this.playFeedback(UI_CUES.arenaLoss);
+  }
+
+  error(): void {
+    this.playFeedback(UI_CUES.error, { cooldown: ERROR_SFX_COOLDOWN_SECONDS });
   }
 
   duelChallenge(): void {
-    // war horn: two rising fifths
-    this.tone(196, 0.35, 0.2, 'sawtooth');
-    this.tone(294, 0.45, 0.2, 'sawtooth', 0.18);
+    this.play(UI_CUES.duelChallenge);
+  }
+
+  // Same ui_duel_challenge cue as a real duel/arena/Vale Cup challenge, but
+  // gated: party invite, guild invite, and a resurrection offer are not
+  // time-critical the way an actual match challenge is, and questAccept()
+  // (which they used before it was retired) always respected the Interface &
+  // Feedback Sounds toggle. Losing that gating was an unintended side effect
+  // of consolidating onto duelChallenge(), not a deliberate change.
+  invitePrompt(): void {
+    this.playFeedback(UI_CUES.duelChallenge);
   }
 
   duelCountdownTick(): void {
-    this.tone(880, 0.07, 0.12, 'square');
+    this.play(UI_CUES.duelCountdown);
   }
 
   duelStart(): void {
-    // gong + cymbal wash
-    this.tone(220, 0.7, 0.28, 'triangle', 0, 110);
-    this.noise(0.4, 3000, 0.14, 0.5, 'highpass');
+    this.play(UI_CUES.duelStart);
+  }
+
+  vcupKickoff(): void {
+    this.play(UI_CUES.vcupKickoff);
   }
 
   duelEnd(): void {
-    this.tone(392, 0.18, 0.18, 'triangle');
-    this.tone(523, 0.3, 0.18, 'triangle', 0.12);
+    this.play(UI_CUES.duelEnd);
+  }
+
+  fiestaWord(tier = 0): void {
+    const index = Math.max(0, Math.min(3, Math.floor(Number.isFinite(tier) ? tier : 0)));
+    this.play(UI_CUES.fiestaWords[index]);
+  }
+
+  fiestaScorePing(mine: boolean): void {
+    this.play(mine ? UI_CUES.fiestaScoreMine : UI_CUES.fiestaScoreOther);
+  }
+
+  fiestaWave(): void {
+    this.play(UI_CUES.fiestaWave);
+  }
+
+  fiestaAugment(): void {
+    this.play(UI_CUES.fiestaAugment);
+  }
+
+  fiestaDown(): void {
+    this.play(UI_CUES.fiestaDown);
+  }
+
+  fiestaRevive(): void {
+    this.play(UI_CUES.fiestaRevive);
+  }
+
+  // Card Duel: live in-match feedback, same ungated category as the Fiesta
+  // cues above (match win/lose reuse duelEnd()/arenaLoss() directly, no
+  // dedicated methods needed for those).
+  cardPlay(): void {
+    this.play(UI_CUES.cardPlay);
+  }
+
+  cardReveal(): void {
+    this.play(UI_CUES.cardReveal);
+  }
+
+  cardRoundPush(): void {
+    this.play(UI_CUES.cardRoundPush);
+  }
+
+  cardShuffle(): void {
+    this.play(UI_CUES.cardShuffle);
   }
 }
 

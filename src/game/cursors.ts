@@ -8,17 +8,17 @@ function pngCursor(file: string, hotX: number, hotY: number, fallback: string): 
   return `url("${BASE}ui/cursors/${file}") ${hotX} ${hotY}, ${fallback}`;
 }
 
-/** Default explore / interact cursor. */
-export const CURSOR_HAND = pngCursor('hand-default.png', 12, 2, 'default');
+/** Default cursor — the ornate arrow. */
+export const CURSOR_HAND = pngCursor('arrow.png', 7, 2, 'default');
 
 /** Camera drag while mouse-look is enabled. */
 export const CURSOR_GRAB = pngCursor('hand-grab.png', 11, 16, 'grabbing');
 
-/** Hostile mob under the pointer. */
-export const CURSOR_ATTACK = pngCursor('attack-sword.png', 4, 4, 'pointer');
+/** Anything interactive under the pointer — the ornate gauntlet finger. */
+export const CURSOR_ATTACK = pngCursor('gauntlet.png', 6, 4, 'pointer');
 
-/** Party members and friendly NPCs (merchants, quest givers). */
-export const CURSOR_FRIENDLY = pngCursor('friendly-shield.png', 13, 30, 'default');
+/** Players, party members and friendly NPCs — also the gauntlet finger. */
+export const CURSOR_FRIENDLY = pngCursor('gauntlet.png', 6, 4, 'pointer');
 
 export function cursorForHover(kind: HoverCursorKind, draggingCamera: boolean): string {
   if (draggingCamera) return CURSOR_GRAB;

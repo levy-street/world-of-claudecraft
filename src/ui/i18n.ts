@@ -1,1875 +1,163 @@
-type Prev = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+// THE LAZY LOCALE FLIP. The runtime statically imports ONLY English eagerly:
+//   - `en`     the eager default + universal synchronous fallback (always resident),
+//   - `en_XA`  the dev-only pseudo-locale (referenced solely inside the
+//              !import.meta.env.PROD branch in tableFor, so a prod build tree-shakes it),
+//   - `pending` feeds the release-gate hard-fail in t(),
+//   - `LOCALE_LOADERS` + `SUPPORTED_LANGUAGES` drive lazy per-locale loading.
+// The 21 non-en dense slices are NO LONGER static-imported for use - each loads lazily via
+// LOCALE_LOADERS[lang]()'s dynamic import() as its own content-hashed chunk, so a
+// default-English visitor downloads zero non-en locale bytes. These are imported from the
+// SPECIFIC generated modules (en / en_XA / pending / loaders), never the index.ts barrel,
+// so the only reference to the barrel below is the dead re-export line - which Rollup
+// tree-shakes out of the app chunk.
 
-type Join<K, P> = K extends string | number
-  ? P extends string | number
-    ? `${K}${"" extends P ? "" : "."}${P}`
-    : never
-  : never;
+import type {
+  DeepPartial,
+  EnTranslations,
+  InterpolationValue,
+  InterpolationValues,
+  Leaves,
+  TranslationKey,
+} from './i18n.catalog';
+import { en } from './i18n.resolved.generated/en';
+import { en_XA } from './i18n.resolved.generated/en_XA';
+import { LOCALE_LOADERS, SUPPORTED_LANGUAGES } from './i18n.resolved.generated/loaders';
+import { pending } from './i18n.resolved.generated/pending';
 
-export type Leaves<T, D extends number = 5> = [D] extends [never]
-  ? never
-  : T extends object
-  ? { [K in keyof T]-?: Join<K, Leaves<T[K], Prev[D]>> }[keyof T]
-  : "";
-
-export const en = {
-  nav: {
-    home: "Home",
-    play: "Play",
-    stats: "Statistics",
-    about: "About",
-    highscores: "High Scores",
-    wiki: "Wiki",
-    news: "News",
-    download: "Download",
-    loginRegister: "Login/Register",
-  },
-  stats: {
-    title: "Realm Status",
-    accountsCreated: "Accounts Created",
-    playersOnline: "Players Online",
-    realmName: "Realm Name",
-  },
-  footer: {
-    copyright: "2026 World of ClaudeCraft",
-    githubLink: "https://github.com/levy-street/world-of-claudecraft",
-    githubLabel: "Open Source Project",
-    terms: "Terms of Service",
-    privacy: "Privacy Policy",
-    discordLabel: "Join the Discord",
-  },
-  highscores: {
-    title: "High Scores Leaderboard",
-    desc: "Track the realm's greatest champions and compare your progress.",
-  },
-  wiki: {
-    title: "Game Wiki & Guide",
-    desc: "Discover the secrets of the realm, class guides, and strategies.",
-  },
-  news: {
-    title: "News & Updates",
-    desc: "Read the latest patch notes, events, and community updates.",
-  },
-  download: {
-    title: "Download Desktop Launcher",
-    desc: "Get the standalone launcher for optimized performance and full-screen play.",
-  },
-  comingSoon: {
-    placeholder: "Coming Soon...",
-    featureComingSoon: "This feature is coming soon to the realm.",
-  },
-  mode: {
-    onlineTitle: "Play Online",
-    onlineDesc: "Log in to the realm. Your characters live on the server and you share the world with everyone else who's on.",
-    onlineAria: "Play Online: log in to the persistent shared realm",
-    offlineTitle: "Play Offline",
-    offlineDesc: "Instant single-player world in your browser. Nothing is saved: perfect for a quick brawl or testing.",
-    offlineAria: "Play Offline: start an instant local single-player session",
-    tipTitle: "TIP:",
-    tipText: "For the smoothest experience, turn off ad blocker extensions on this site. Community reports found some blockers can cause lag.",
-  },
-  auth: {
-    enterRealm: "Enter the Realm",
-    username: "Username",
-    usernameError: "Please enter your username.",
-    usernamePlaceholder: "Enter username",
-    password: "Password",
-    passwordError: "Please enter your password.",
-    passwordPlaceholder: "Enter password",
-    showPassword: "Show password",
-    hidePassword: "Hide password",
-    logIn: "Log In",
-    createAccount: "Create Account",
-    back: "Back",
-    realmList: "Realm List",
-    loadingRealms: "Loading realms...",
-    changeRealm: "Change Realm",
-    characters: "Characters:",
-    createCharacter: "Create Character",
-    characterName: "Character Name",
-    characterNamePlaceholder: "Character name",
-    enterWorld: "Enter World",
-    offlineCharacter: "Offline Character",
-    create: "Create",
-  },
-  classes: {
-    warrior: "Warrior",
-    paladin: "Paladin",
-    hunter: "Hunter",
-    rogue: "Rogue",
-    priest: "Priest",
-    shaman: "Shaman",
-    mage: "Mage",
-    warlock: "Warlock",
-    druid: "Druid",
-    warriorAria: "Warrior class",
-    paladinAria: "Paladin class",
-    hunterAria: "Hunter class",
-    rogueAria: "Rogue class",
-    priestAria: "Priest class",
-    shamanAria: "Shaman class",
-    mageAria: "Mage class",
-    warlockAria: "Warlock class",
-    druidAria: "Druid class",
-  },
-  controls: {
-    title: "Controls Guide",
-    movement: "Movement",
-    moveTurn: "Move / Turn",
-    strafe: "Strafe Left/Right",
-    jump: "Jump",
-    autorun: "Toggle Autorun",
-    combat: "Combat & Interaction",
-    target: "Target Enemy",
-    spells: "Cast Spells",
-    interact: "Interact / Loot",
-    nameplates: "Toggle Nameplates",
-    camera: "Camera & Mouse",
-    rightDrag: "Right-Drag",
-    leftDrag: "Left-Drag",
-    mouseWheel: "Mouse Wheel",
-    mouselook: "Mouselook",
-    orbit: "Orbit Camera",
-    zoom: "Zoom",
-    interfaces: "Interfaces",
-    charPane: "Character Pane",
-    spellbook: "Spellbook",
-    questLog: "Quest Log",
-    worldMap: "World Map",
-    bags: "Bags Inventory",
-    friends: "Friends & Guild",
-    chat: "Open Chat",
-  },
-};
-
-export const es: typeof en = {
-  nav: {
-    home: "Inicio",
-    play: "Jugar",
-    stats: "Estadísticas",
-    about: "Acerca de",
-    highscores: "Clasificaciones",
-    wiki: "Wiki",
-    news: "Noticias",
-    download: "Descargar",
-    loginRegister: "Iniciar Sesión/Registrarse",
-  },
-  stats: {
-    title: "Estado del Reino",
-    accountsCreated: "Cuentas Creadas",
-    playersOnline: "Jugadores en Línea",
-    realmName: "Nombre del Reino",
-  },
-  footer: {
-    copyright: "2026 World of ClaudeCraft",
-    githubLink: "https://github.com/levy-street/world-of-claudecraft",
-    githubLabel: "Proyecto de Código Abierto",
-    terms: "Términos de Servicio",
-    privacy: "Política de Privacidad",
-    discordLabel: "Únete al Discord",
-  },
-  highscores: {
-    title: "Clasificaciones de Puntuación",
-    desc: "Sigue a los campeones más grandes del reino y compara tu progreso.",
-  },
-  wiki: {
-    title: "Wiki y Guía del Juego",
-    desc: "Descubre los secretos del reino, guías de clase y estrategias.",
-  },
-  news: {
-    title: "Noticias y Actualizaciones",
-    desc: "Lee las últimas notas del parche, eventos y noticias de la comunidad.",
-  },
-  download: {
-    title: "Descargar Lanzador de Escritorio",
-    desc: "Consigue el lanzador independiente para un rendimiento optimizado y juego a pantalla completa.",
-  },
-  comingSoon: {
-    placeholder: "Próximamente...",
-    featureComingSoon: "Esta característica llegará pronto al reino.",
-  },
-  mode: {
-    onlineTitle: "Jugar en Línea",
-    onlineDesc: "Inicia sesión en el reino. Tus personagens viven en el servidor y compartes el mundo con todos los demás que estén conectados.",
-    onlineAria: "Jugar en Línea: inicia sesión en el reino compartido persistente",
-    offlineTitle: "Jugar en Solitario",
-    offlineDesc: "Mundo instantáneo en solitario en tu navegador. Nada se guarda: perfecto para una pelea rápida o pruebas.",
-    offlineAria: "Jugar en Solitario: inicia una sesión local instantánea de un jugador",
-    tipTitle: "CONSEJO:",
-    tipText: "Para la mejor experiencia, desactiva las extensiones de bloqueo de publicidad en este sitio. Reportes de la comunidad encontraron que algunos bloqueadores pueden causar retrasos.",
-  },
-  auth: {
-    enterRealm: "Entrar al Reino",
-    username: "Usuario",
-    usernameError: "Por favor, introduce tu nombre de usuario.",
-    usernamePlaceholder: "Introduce tu usuario",
-    password: "Contraseña",
-    passwordError: "Por favor, introduce tu contraseña.",
-    passwordPlaceholder: "Introduce tu contraseña",
-    showPassword: "Mostrar contraseña",
-    hidePassword: "Ocultar contraseña",
-    logIn: "Iniciar Sesión",
-    createAccount: "Crear Cuenta",
-    back: "Atrás",
-    realmList: "Lista de Reinos",
-    loadingRealms: "Cargando reinos...",
-    changeRealm: "Cambiar de Reino",
-    characters: "Personajes:",
-    createCharacter: "Crear Personaje",
-    characterName: "Nombre del Personaje",
-    characterNamePlaceholder: "Nombre del personaje",
-    enterWorld: "Entrar al Mundo",
-    offlineCharacter: "Personaje en Solitario",
-    create: "Crear",
-  },
-  classes: {
-    warrior: "Guerrero",
-    paladin: "Paladín",
-    hunter: "Cazador",
-    rogue: "Pícaro",
-    priest: "Sacerdote",
-    shaman: "Chamán",
-    mage: "Mago",
-    warlock: "Brujo",
-    druid: "Druida",
-    warriorAria: "Clase Guerrero",
-    paladinAria: "Clase Paladín",
-    hunterAria: "Clase Cazador",
-    rogueAria: "Clase Pícaro",
-    priestAria: "Clase Sacerdote",
-    shamanAria: "Clase Chamán",
-    mageAria: "Clase Mago",
-    warlockAria: "Clase Brujo",
-    druidAria: "Clase Druida",
-  },
-  controls: {
-    title: "Guía de Controles",
-    movement: "Movimiento",
-    moveTurn: "Moverse / Girar",
-    strafe: "Desplazarse Izquierda/Derecha",
-    jump: "Saltar",
-    autorun: "Correr Automáticamente",
-    combat: "Combate e Interacción",
-    target: "Marcar Enemigo",
-    spells: "Lanzar Hechizos",
-    interact: "Interactuar / Despojar",
-    nameplates: "Mostrar Nombres",
-    camera: "Cámara y Ratón",
-    rightDrag: "Arrastrar Clic Derecho",
-    leftDrag: "Arrastrar Clic Izquierdo",
-    mouseWheel: "Rueda del Ratón",
-    mouselook: "Mirar con Ratón",
-    orbit: "Rotar Cámara",
-    zoom: "Zoom",
-    interfaces: "Interfaces",
-    charPane: "Panel de Personaje",
-    spellbook: "Libro de Hechizos",
-    questLog: "Diario de Misiones",
-    worldMap: "Mapa del Mundo",
-    bags: "Inventario de Bolsas",
-    friends: "Amigos y Hermandad",
-    chat: "Abrir Chat",
-  },
-};
-
-export const es_ES: typeof en = {
-  nav: {
-    home: "Inicio",
-    play: "Jugar",
-    stats: "Estadísticas",
-    about: "Acerca de",
-    highscores: "Clasificaciones",
-    wiki: "Wiki",
-    news: "Noticias",
-    download: "Descargar",
-    loginRegister: "Iniciar sesión/Registrarse",
-  },
-  stats: {
-    title: "Estado del Reino",
-    accountsCreated: "Cuentas creadas",
-    playersOnline: "Jugadores en línea",
-    realmName: "Nombre del reino",
-  },
-  footer: {
-    copyright: "2026 World of ClaudeCraft",
-    githubLink: "https://github.com/levy-street/world-of-claudecraft",
-    githubLabel: "Proyecto de código abierto",
-    terms: "Términos de servicio",
-    privacy: "Política de privacidad",
-    discordLabel: "Únete al Discord",
-  },
-  highscores: {
-    title: "Tabla de clasificaciones",
-    desc: "Sigue a los campeones más grandes del reino y compara tu progreso.",
-  },
-  wiki: {
-    title: "Wiki y guía del juego",
-    desc: "Descubre los secretos del reino, guías de clase y estrategias.",
-  },
-  news: {
-    title: "Noticias y actualizaciones",
-    desc: "Lee las últimas notas del parche, eventos y noticias de la comunidad.",
-  },
-  download: {
-    title: "Descargar lanzador de escritorio",
-    desc: "Consigue el lanzador independiente para un rendimiento optimizado y juego a pantalla completa.",
-  },
-  comingSoon: {
-    placeholder: "Próximamente...",
-    featureComingSoon: "Esta característica llegará pronto al reino.",
-  },
-  mode: {
-    onlineTitle: "Jugar en línea",
-    onlineDesc: "Inicia sesión en el reino. Tus personajes viven en el servidor y compartes el mundo con todos los demás que estén conectados.",
-    onlineAria: "Jugar en línea: inicia sesión en el reino compartido persistente",
-    offlineTitle: "Jugar en solitario",
-    offlineDesc: "Mundo instantáneo en solitario en tu navegador. Nada se guarda: perfecto para una pelea rápida o pruebas.",
-    offlineAria: "Jugar en solitario: inicia una sesión local instantánea de un jugador",
-    tipTitle: "CONSEJO:",
-    tipText: "Para la mejor experiencia, desactiva las extensiones de bloqueo de publicidad en este sitio. Reportes de la comunidad encontraron que algunos bloqueadores pueden causar retrasos.",
-  },
-  auth: {
-    enterRealm: "Entrar al reino",
-    username: "Usuario",
-    usernameError: "Por favor, introduce tu nombre de usuario.",
-    usernamePlaceholder: "Introduce tu usuario",
-    password: "Contraseña",
-    passwordError: "Por favor, introduce tu contraseña.",
-    passwordPlaceholder: "Introduce tu contraseña",
-    showPassword: "Mostrar contraseña",
-    hidePassword: "Ocultar contraseña",
-    logIn: "Iniciar sesión",
-    createAccount: "Crear cuenta",
-    back: "Atrás",
-    realmList: "Lista de reinos",
-    loadingRealms: "Cargando reinos...",
-    changeRealm: "Cambiar de reino",
-    characters: "Personajes:",
-    createCharacter: "Crear personaje",
-    characterName: "Nombre del personaje",
-    characterNamePlaceholder: "Nombre del personaje",
-    enterWorld: "Entrar al mundo",
-    offlineCharacter: "Personaje en solitario",
-    create: "Crear",
-  },
-  classes: {
-    warrior: "Guerrero",
-    paladin: "Paladín",
-    hunter: "Cazador",
-    rogue: "Pícaro",
-    priest: "Sacerdote",
-    shaman: "Chamán",
-    mage: "Mago",
-    warlock: "Brujo",
-    druid: "Druida",
-    warriorAria: "Clase Guerrero",
-    paladinAria: "Clase Paladín",
-    hunterAria: "Clase Cazador",
-    rogueAria: "Clase Pícaro",
-    priestAria: "Clase Sacerdote",
-    shamanAria: "Clase Chamán",
-    mageAria: "Clase Mago",
-    warlockAria: "Clase Brujo",
-    druidAria: "Clase Druida",
-  },
-  controls: {
-    title: "Guía de controles",
-    movement: "Movimiento",
-    moveTurn: "Moverse/Girar",
-    strafe: "Desplazarse Izquierda/Derecha",
-    jump: "Saltar",
-    autorun: "Correr automáticamente",
-    combat: "Combate e interacción",
-    target: "Marcar enemigo",
-    spells: "Lanzar hechizos",
-    interact: "Interactuar/Despojar",
-    nameplates: "Mostrar nombres",
-    camera: "Cámara y ratón",
-    rightDrag: "Arrastrar clic derecho",
-    leftDrag: "Arrastrar clic izquierdo",
-    mouseWheel: "Rueda del ratón",
-    mouselook: "Mirar con ratón",
-    orbit: "Rotar cámara",
-    zoom: "Zoom",
-    interfaces: "Interfaces",
-    charPane: "Panel de personaje",
-    spellbook: "Libro de hechizos",
-    questLog: "Diario de misiones",
-    worldMap: "Mapa del mundo",
-    bags: "Inventario de bolsas",
-    friends: "Amigos y hermandad",
-    chat: "Abrir chat",
-  },
-};
-
-export const fr_FR: typeof en = {
-  nav: {
-    home: "Accueil",
-    play: "Jouer",
-    stats: "Statistiques",
-    about: "À propos",
-    highscores: "Classements",
-    wiki: "Wiki",
-    news: "Actualités",
-    download: "Télécharger",
-    loginRegister: "Se connecter/S'inscrire",
-  },
-  stats: {
-    title: "Statut du royaume",
-    accountsCreated: "Comptes créés",
-    playersOnline: "Joueurs en ligne",
-    realmName: "Nom du royaume",
-  },
-  footer: {
-    copyright: "2026 World of ClaudeCraft",
-    githubLink: "https://github.com/levy-street/world-of-claudecraft",
-    githubLabel: "Projet open source",
-    terms: "Conditions d'utilisation",
-    privacy: "Politique de confidentialité",
-    discordLabel: "Rejoindre le Discord",
-  },
-  highscores: {
-    title: "Tableau des classements",
-    desc: "Suivez les plus grands champions du royaume et comparez votre progression.",
-  },
-  wiki: {
-    title: "Wiki et guide du jeu",
-    desc: "Découvrez les secrets du royaume, les guides de classe et les stratégies.",
-  },
-  news: {
-    title: "Actualités et mises à jour",
-    desc: "Lisez les dernières notes de mise à jour, les événements et les nouvelles de la communauté.",
-  },
-  download: {
-    title: "Télécharger le lanceur de bureau",
-    desc: "Obtenez le lanceur autonome pour des performances optimisées et un jeu en plein écran.",
-  },
-  comingSoon: {
-    placeholder: "Bientôt disponible...",
-    featureComingSoon: "Cette fonctionnalité sera bientôt disponible sur le royaume.",
-  },
-  mode: {
-    onlineTitle: "Jouer en ligne",
-    onlineDesc: "Connectez-vous au royaume. Vos personnages vivent sur le serveur et vous partagez le monde avec tous les autres joueurs connectés.",
-    onlineAria: "Jouer en ligne: connectez-vous au royaume persistant partagé",
-    offlineTitle: "Jouer hors ligne",
-    offlineDesc: "Un monde solo instantané dans votre navigateur. Rien n'est sauvegardé: parfait pour un combat rapide ou des tests.",
-    offlineAria: "Jouer hors ligne: démarrer une session solo locale instantanée",
-    tipTitle: "CONSEIL:",
-    tipText: "Pour une expérience optimale, désactivez les extensions de blocage de publicité sur ce site. Certains bloqueurs peuvent causer des latences.",
-  },
-  auth: {
-    enterRealm: "Entrer dans le royaume",
-    username: "Nom d'utilisateur",
-    usernameError: "Veuillez saisir votre nom d'utilisateur.",
-    usernamePlaceholder: "Saisir le nom d'utilisateur",
-    password: "Mot de passe",
-    passwordError: "Veuillez saisir votre mot de passe.",
-    passwordPlaceholder: "Saisir le mot de passe",
-    showPassword: "Afficher le mot de passe",
-    hidePassword: "Masquer le mot de passe",
-    logIn: "Se connecter",
-    createAccount: "Créer un compte",
-    back: "Retour",
-    realmList: "Liste des royaumes",
-    loadingRealms: "Chargement des royaumes...",
-    changeRealm: "Changer de royaume",
-    characters: "Personages:",
-    createCharacter: "Créer un personnage",
-    characterName: "Nom du personnage",
-    characterNamePlaceholder: "Nom du personnage",
-    enterWorld: "Entrer dans le monde",
-    offlineCharacter: "Personnage hors ligne",
-    create: "Créer",
-  },
-  classes: {
-    warrior: "Guerrier",
-    paladin: "Paladin",
-    hunter: "Chasseur",
-    rogue: "Voleur",
-    priest: "Prêtre",
-    shaman: "Chaman",
-    mage: "Mage",
-    warlock: "Démoniste",
-    druid: "Druide",
-    warriorAria: "Classe Guerrier",
-    paladinAria: "Classe Paladin",
-    hunterAria: "Classe Chasseur",
-    rogueAria: "Classe Voleur",
-    priestAria: "Classe Prêtre",
-    shamanAria: "Classe Chaman",
-    mageAria: "Classe Mage",
-    warlockAria: "Classe Démoniste",
-    druidAria: "Classe Druide",
-  },
-  controls: {
-    title: "Guide des contrôles",
-    movement: "Déplacement",
-    moveTurn: "Avancer/Tourner",
-    strafe: "Déplacement latéral Gauche/Droite",
-    jump: "Sauter",
-    autorun: "Activer la course automatique",
-    combat: "Combat et interaction",
-    target: "Cibler l'ennemi",
-    spells: "Lancer des sorts",
-    interact: "Interagir/Fouiller",
-    nameplates: "Afficher les plaques de nom",
-    camera: "Caméra et souris",
-    rightDrag: "Glisser-clic droit",
-    leftDrag: "Glisser-clic gauche",
-    mouseWheel: "Molette de la souris",
-    mouselook: "Vue à la souris",
-    orbit: "Caméra orbitale",
-    zoom: "Zoom",
-    interfaces: "Interfaces",
-    charPane: "Fiche de personnage",
-    spellbook: "Grimoire",
-    questLog: "Journal de quêtes",
-    worldMap: "Carte du monde",
-    bags: "Inventaire des sacs",
-    friends: "Amis et guilde",
-    chat: "Ouvrir le chat",
-  },
-};
-
-export const fr_CA: typeof en = {
-  nav: {
-    home: "Accueil",
-    play: "Jouer",
-    stats: "Statistiques",
-    about: "À propos",
-    highscores: "Classements",
-    wiki: "Wiki",
-    news: "Actualités",
-    download: "Télécharger",
-    loginRegister: "Se connecter/S'enregistrer",
-  },
-  stats: {
-    title: "Statut du royaume",
-    accountsCreated: "Comptes créés",
-    playersOnline: "Joueurs en ligne",
-    realmName: "Nom du royaume",
-  },
-  footer: {
-    copyright: "2026 World of ClaudeCraft",
-    githubLink: "https://github.com/levy-street/world-of-claudecraft",
-    githubLabel: "Projet open source",
-    terms: "Conditions d'utilisation",
-    privacy: "Politique de confidentialité",
-    discordLabel: "Rejoindre le Discord",
-  },
-  highscores: {
-    title: "Tableau des classements",
-    desc: "Suivez les plus grands champions du royaume et comparez votre progression.",
-  },
-  wiki: {
-    title: "Wiki et guide du jeu",
-    desc: "Découvrez les secrets du royaume, les guides de classe et les stratégies.",
-  },
-  news: {
-    title: "Actualités et mises à jour",
-    desc: "Lisez les dernières notes de mise à jour, les événements et les nouvelles de la communauté.",
-  },
-  download: {
-    title: "Télécharger le lanceur de bureau",
-    desc: "Obtenez le lanceur autonome pour des performances optimisées et un jeu en plein écran.",
-  },
-  comingSoon: {
-    placeholder: "Bientôt disponible...",
-    featureComingSoon: "Cette fonctionnalité sera bientôt disponible sur le royaume.",
-  },
-  mode: {
-    onlineTitle: "Jouer en ligne",
-    onlineDesc: "Connectez-vous au royaume. Vos personnages vivent sur le serveur et vous partagez le monde avec tous les autres joueurs connectés.",
-    onlineAria: "Jouer en ligne: connectez-vous au royaume persistant partagé",
-    offlineTitle: "Jouer hors ligne",
-    offlineDesc: "Un monde solo instantané dans votre navigateur. Rien n'est sauvegardé: parfait pour un combat rapide ou des tests.",
-    offlineAria: "Jouer hors ligne: démarrer une session solo locale instantanée",
-    tipTitle: "CONSEIL:",
-    tipText: "Pour une expérience optimale, désactivez les extensions de blocage de publicité sur ce site. Certains bloqueurs peuvent causer des latences.",
-  },
-  auth: {
-    enterRealm: "Entrer dans le royaume",
-    username: "Nom d'utilisateur",
-    usernameError: "Veuillez saisir votre nom d'utilisateur.",
-    usernamePlaceholder: "Saisir le nom d'utilisateur",
-    password: "Mot de passe",
-    passwordError: "Veuillez saisir votre mot de passe.",
-    passwordPlaceholder: "Saisir le mot de passe",
-    showPassword: "Afficher le mot de passe",
-    hidePassword: "Masquer le mot de passe",
-    logIn: "Se connecter",
-    createAccount: "Créer un compte",
-    back: "Retour",
-    realmList: "Liste des royaumes",
-    loadingRealms: "Chargement des royaumes...",
-    changeRealm: "Changer de royaume",
-    characters: "Personages:",
-    createCharacter: "Créer un personnage",
-    characterName: "Nom du personnage",
-    characterNamePlaceholder: "Nom du personnage",
-    enterWorld: "Entrer dans le monde",
-    offlineCharacter: "Personnage hors ligne",
-    create: "Créer",
-  },
-  classes: {
-    warrior: "Guerrier",
-    paladin: "Paladin",
-    hunter: "Chasseur",
-    rogue: "Voleur",
-    priest: "Prêtre",
-    shaman: "Chaman",
-    mage: "Mage",
-    warlock: "Démoniste",
-    druid: "Druide",
-    warriorAria: "Classe Guerrier",
-    paladinAria: "Classe Paladin",
-    hunterAria: "Classe Chasseur",
-    rogueAria: "Classe Voleur",
-    priestAria: "Classe Prêtre",
-    shamanAria: "Classe Chaman",
-    mageAria: "Classe Mage",
-    warlockAria: "Classe Démoniste",
-    druidAria: "Classe Druide",
-  },
-  controls: {
-    title: "Guide des contrôles",
-    movement: "Déplacement",
-    moveTurn: "Avancer/Tourner",
-    strafe: "Déplacement latéral Gauche/Droite",
-    jump: "Sauter",
-    autorun: "Activer la course automatique",
-    combat: "Combat et interaction",
-    target: "Cibler l'ennemi",
-    spells: "Lancer des sorts",
-    interact: "Interagir/Fouiller",
-    nameplates: "Afficher les plaques de nom",
-    camera: "Caméra et souris",
-    rightDrag: "Glisser-clic droit",
-    leftDrag: "Glisser-clic gauche",
-    mouseWheel: "Molette de la souris",
-    mouselook: "Vue à la souris",
-    orbit: "Caméra orbitale",
-    zoom: "Zoom",
-    interfaces: "Interfaces",
-    charPane: "Fiche de personnage",
-    spellbook: "Grimoire",
-    questLog: "Journal de quêtes",
-    worldMap: "Carte du monde",
-    bags: "Inventaire des sacs",
-    friends: "Amis et guilde",
-    chat: "Ouvrir le chat",
-  },
-};
-
-export const en_CA: typeof en = {
-  nav: {
-    home: "Home",
-    play: "Play",
-    stats: "Statistics",
-    about: "About",
-    highscores: "High Scores",
-    wiki: "Wiki",
-    news: "News",
-    download: "Download",
-    loginRegister: "Login/Register",
-  },
-  stats: {
-    title: "Realm Status",
-    accountsCreated: "Accounts Created",
-    playersOnline: "Players Online",
-    realmName: "Realm Name",
-  },
-  footer: {
-    copyright: "2026 World of ClaudeCraft",
-    githubLink: "https://github.com/levy-street/world-of-claudecraft",
-    githubLabel: "Open Source Project",
-    terms: "Terms of Service",
-    privacy: "Privacy Policy",
-    discordLabel: "Join the Discord",
-  },
-  highscores: {
-    title: "High Scores Leaderboard",
-    desc: "Track the realm's greatest champions and compare your progress.",
-  },
-  wiki: {
-    title: "Game Wiki & Guide",
-    desc: "Discover the secrets of the realm, class guides, and strategies.",
-  },
-  news: {
-    title: "News & Updates",
-    desc: "Read the latest patch notes, events, and community updates.",
-  },
-  download: {
-    title: "Download Desktop Launcher",
-    desc: "Get the standalone launcher for optimized performance and full-screen play.",
-  },
-  comingSoon: {
-    placeholder: "Coming Soon...",
-    featureComingSoon: "This feature is coming soon to the realm.",
-  },
-  mode: {
-    onlineTitle: "Play Online",
-    onlineDesc: "Log in to the realm. Your characters live on the server and you share the world with everyone else who's on.",
-    onlineAria: "Play Online: log in to the persistent shared realm",
-    offlineTitle: "Play Offline",
-    offlineDesc: "Instant single-player world in your browser. Nothing is saved: perfect for a quick brawl or testing.",
-    offlineAria: "Play Offline: start an instant local single-player session",
-    tipTitle: "TIP:",
-    tipText: "For the smoothest experience, turn off ad blocker extensions on this site. Community reports found some blockers can cause lag.",
-  },
-  auth: {
-    enterRealm: "Enter the Realm",
-    username: "Username",
-    usernameError: "Please enter your username.",
-    usernamePlaceholder: "Enter username",
-    password: "Password",
-    passwordError: "Please enter your password.",
-    passwordPlaceholder: "Enter password",
-    showPassword: "Show password",
-    hidePassword: "Hide password",
-    logIn: "Log In",
-    createAccount: "Create Account",
-    back: "Back",
-    realmList: "Realm List",
-    loadingRealms: "Loading realms...",
-    changeRealm: "Change Realm",
-    characters: "Characters:",
-    createCharacter: "Create Character",
-    characterName: "Character Name",
-    characterNamePlaceholder: "Character name",
-    enterWorld: "Enter World",
-    offlineCharacter: "Offline Character",
-    create: "Create",
-  },
-  classes: {
-    warrior: "Warrior",
-    paladin: "Paladin",
-    hunter: "Hunter",
-    rogue: "Rogue",
-    priest: "Priest",
-    shaman: "Shaman",
-    mage: "Mage",
-    warlock: "Warlock",
-    druid: "Druid",
-    warriorAria: "Warrior class",
-    paladinAria: "Paladin class",
-    hunterAria: "Hunter class",
-    rogueAria: "Rogue class",
-    priestAria: "Priest class",
-    shamanAria: "Shaman class",
-    mageAria: "Mage class",
-    warlockAria: "Warlock class",
-    druidAria: "Druid class",
-  },
-  controls: {
-    title: "Controls Guide",
-    movement: "Movement",
-    moveTurn: "Move / Turn",
-    strafe: "Strafe Left/Right",
-    jump: "Jump",
-    autorun: "Toggle Autorun",
-    combat: "Combat & Interaction",
-    target: "Target Enemy",
-    spells: "Cast Spells",
-    interact: "Interact / Loot",
-    nameplates: "Toggle Nameplates",
-    camera: "Camera & Mouse",
-    rightDrag: "Right-Drag",
-    leftDrag: "Left-Drag",
-    mouseWheel: "Mouse Wheel",
-    mouselook: "Mouselook",
-    orbit: "Orbit Camera",
-    zoom: "Zoom",
-    interfaces: "Interfaces",
-    charPane: "Character Pane",
-    spellbook: "Spellbook",
-    questLog: "Quest Log",
-    worldMap: "World Map",
-    bags: "Bags Inventory",
-    friends: "Friends & Guild",
-    chat: "Open Chat",
-  },
-};
-
-export const it_IT: typeof en = {
-  nav: {
-    home: "Pagina principale",
-    play: "Gioca",
-    stats: "Statistiche",
-    about: "Informazioni",
-    highscores: "Classifiche",
-    wiki: "Wiki",
-    news: "Novità",
-    download: "Scarica",
-    loginRegister: "Accedi/Registrati",
-  },
-  stats: {
-    title: "Stato del Reame",
-    accountsCreated: "Account creati",
-    playersOnline: "Giocatori online",
-    realmName: "Nome del reame",
-  },
-  footer: {
-    copyright: "2026 World of ClaudeCraft",
-    githubLink: "https://github.com/levy-street/world-of-claudecraft",
-    githubLabel: "Progetto open source",
-    terms: "Termini di servizio",
-    privacy: "Informativa sulla privacy",
-    discordLabel: "Entra nel Discord",
-  },
-  highscores: {
-    title: "Classifica dei punteggi più alti",
-    desc: "Segui i più grandi campioni del reame e confronta i tuoi progressi.",
-  },
-  wiki: {
-    title: "Wiki e guida del gioco",
-    desc: "Scopri i segreti del reame, le guide di classe e le strategie.",
-  },
-  news: {
-    title: "Notizie e aggiornamenti",
-    desc: "Leggi le ultime note sulla patch, gli eventi e gli aggiornamenti della community.",
-  },
-  download: {
-    title: "Scarica il launcher per desktop",
-    desc: "Ottieni il launcher autonomo per prestazioni ottimizzate e gioco a schermo intero.",
-  },
-  comingSoon: {
-    placeholder: "Prossimamente...",
-    featureComingSoon: "Questa funzione sarà presto disponibile nel reame.",
-  },
-  mode: {
-    onlineTitle: "Gioca online",
-    onlineDesc: "Accedi al reame. I tuoi personaggi vivono sul server e condividi il mondo con tutti gli altri giocatori connessi.",
-    onlineAria: "Gioca online: accedi al reame condiviso persistente",
-    offlineTitle: "Gioca offline",
-    offlineDesc: "Un mondo a giocatore singolo istantaneo nel tuo browser. Nulla viene salvato: perfetto per un combattimento rapido o per testare.",
-    offlineAria: "Gioca offline: avvia una sessione locale a giocatore singolo istantanea",
-    tipTitle: "SUGGERIMENTO:",
-    tipText: "Per un'esperienza ottimale, disattiva le estensioni di blocco della pubblicità su questo sito. Alcuni utenti segnalano che i blocchi possono causare rallentamenti.",
-  },
-  auth: {
-    enterRealm: "Entra nel reame",
-    username: "Nome utente",
-    usernameError: "Inserisci il tuo nome utente.",
-    usernamePlaceholder: "Inserisci il nome utente",
-    password: "Password",
-    passwordError: "Inserisci la tua password.",
-    passwordPlaceholder: "Inserisci la password",
-    showPassword: "Mostra password",
-    hidePassword: "Nascondi password",
-    logIn: "Accedi",
-    createAccount: "Crea account",
-    back: "Indietro",
-    realmList: "Lista dei reimi",
-    loadingRealms: "Caricamento dei reami...",
-    changeRealm: "Cambia reame",
-    characters: "Personaggi:",
-    createCharacter: "Crea personaggio",
-    characterName: "Nome del personaggio",
-    characterNamePlaceholder: "Nome del personaggio",
-    enterWorld: "Entra nel mondo",
-    offlineCharacter: "Personaggio offline",
-    create: "Crea",
-  },
-  classes: {
-    warrior: "Guerriero",
-    paladin: "Paladino",
-    hunter: "Cacciatore",
-    rogue: "Ladro",
-    priest: "Sacerdote",
-    shaman: "Sciamano",
-    mage: "Mago",
-    warlock: "Stregone",
-    druid: "Druido",
-    warriorAria: "Classe Guerrier",
-    paladinAria: "Classe Paladino",
-    hunterAria: "Classe Cacciatore",
-    rogueAria: "Classe Ladro",
-    priestAria: "Classe Sacerdote",
-    shamanAria: "Classe Sciamano",
-    mageAria: "Classe Mago",
-    warlockAria: "Classe Stregone",
-    druidAria: "Classe Druido",
-  },
-  controls: {
-    title: "Guia ai controlli",
-    movement: "Movimento",
-    moveTurn: "Muoviti/Gira",
-    strafe: "Passi laterali Sinistra/Destra",
-    jump: "Salta",
-    autorun: "Attiva corsa automatica",
-    combat: "Combattimento e interazione",
-    target: "Seleziona nemico come bersaglio",
-    spells: "Lancia incantesimi",
-    interact: "Interagisci/Saccheggia",
-    nameplates: "Attiva targhette dei nomi",
-    camera: "Telecamera e mouse",
-    rightDrag: "Trascina con il tasto destro",
-    leftDrag: "Trascina con il tasto sinistro",
-    mouseWheel: "Rotella del mouse",
-    mouselook: "Visuale con il mouse",
-    orbit: "Orbita telecamera",
-    zoom: "Zoom",
-    interfaces: "Interfacce",
-    charPane: "Schermata personaggio",
-    spellbook: "Libro degli incantesimi",
-    questLog: "Registro delle missioni",
-    worldMap: "Mappa del mondo",
-    bags: "Inventario borse",
-    friends: "Amici e gilda",
-    chat: "Apri chat",
-  },
-};
-
-export const de_DE: typeof en = {
-  nav: {
-    home: "Startseite",
-    play: "Spielen",
-    stats: "Statistiken",
-    about: "Über uns",
-    highscores: "Bestenlisten",
-    wiki: "Wiki",
-    news: "Neuigkeiten",
-    download: "Herunterladen",
-    loginRegister: "Einloggen/Registrieren",
-  },
-  stats: {
-    title: "Realmstatus",
-    accountsCreated: "Erstellte Accounts",
-    playersOnline: "Spieler online",
-    realmName: "Realmname",
-  },
-  footer: {
-    copyright: "2026 World of ClaudeCraft",
-    githubLink: "https://github.com/levy-street/world-of-claudecraft",
-    githubLabel: "Open-Source-Projekt",
-    terms: "Nutzungsbedingungen",
-    privacy: "Datenschutzerklärung",
-    discordLabel: "Tritt dem Discord bei",
-  },
-  highscores: {
-    title: "Bestenliste",
-    desc: "Verfolge die größten Champions des Realms und vergleiche deinen Fortschritt.",
-  },
-  wiki: {
-    title: "Spiel-Wiki und Guides",
-    desc: "Entdecke die Geheimnisse des Realms, Klassenguides und Strategien.",
-  },
-  news: {
-    title: "Neuigkeiten und Updates",
-    desc: "Lies die neuesten Patchnotes, Events und Community-Updates.",
-  },
-  download: {
-    title: "Desktop-Launcher herunterladen",
-    desc: "Hol dir den eigenständigen Launcher für optimierte Leistung und Vollbildspiel.",
-  },
-  comingSoon: {
-    placeholder: "Demnächst...",
-    featureComingSoon: "Diese Funktion ist demnächst auf dem Realm verfügbar.",
-  },
-  mode: {
-    onlineTitle: "Online spielen",
-    onlineDesc: "Logge dich im Realm ein. Deine Charaktere befinden sich auf dem Server und du teilst dir die Welt mit allen anderen Spielern online.",
-    onlineAria: "Online spielen: Logge dich im persistenten, geteilten Realm ein",
-    offlineTitle: "Offline spielen",
-    offlineDesc: "Sofortige Einzelspielerwelt in deinem Browser. Es wird nichts gespeichert: perfekt für einen schnellen Kampf oder zum Testen.",
-    offlineAria: "Offline spielen: Starte eine sofortige lokale Einzelspielersitzung",
-    tipTitle: "TIPP:",
-    tipText: "Deaktiviere für das flüssigste Spielerlebnis Adblocker-Erweiterungen auf dieser Website. Community-Berichte zeigen, dass einige Blocker zu Verzögerungen führen können.",
-  },
-  auth: {
-    enterRealm: "Realm betreten",
-    username: "Benutzername",
-    usernameError: "Bitte gib deinen Benutzernamen ein.",
-    usernamePlaceholder: "Benutzername eingeben",
-    password: "Passwort",
-    passwordError: "Bitte gib dein Passwort ein.",
-    passwordPlaceholder: "Passwort eingeben",
-    showPassword: "Passwort anzeigen",
-    hidePassword: "Passwort ausblenden",
-    logIn: "Einloggen",
-    createAccount: "Account erstellen",
-    back: "Zurück",
-    realmList: "Realmliste",
-    loadingRealms: "Realms werden geladen...",
-    changeRealm: "Realm wechseln",
-    characters: "Charaktere:",
-    createCharacter: "Charakter erstellen",
-    characterName: "Charaktername",
-    characterNamePlaceholder: "Charaktername",
-    enterWorld: "Welt betreten",
-    offlineCharacter: "Offline-Charakter",
-    create: "Erstellen",
-  },
-  classes: {
-    warrior: "Krieger",
-    paladin: "Paladin",
-    hunter: "Jäger",
-    rogue: "Schurke",
-    priest: "Priester",
-    shaman: "Schamane",
-    mage: "Magier",
-    warlock: "Hexenmeister",
-    druid: "Druide",
-    warriorAria: "Krieger-Klasse",
-    paladinAria: "Paladin-Klasse",
-    hunterAria: "Jäger-Klasse",
-    rogueAria: "Schurke-Klasse",
-    priestAria: "Priester-Klasse",
-    shamanAria: "Schamane-Klasse",
-    mageAria: "Magier-Klasse",
-    warlockAria: "Hexenmeister-Klasse",
-    druidAria: "Druide-Klasse",
-  },
-  controls: {
-    title: "Steuerungsanleitung",
-    movement: "Bewegung",
-    moveTurn: "Bewegen/Drehen",
-    strafe: "Seitwärts bewegen Links/Rechts",
-    jump: "Springen",
-    autorun: "Automatisches Laufen umschalten",
-    combat: "Kampf und Interaktion",
-    target: "Feind anvisieren",
-    spells: "Zauber wirken",
-    interact: "Interagieren/Plündern",
-    nameplates: "Namensplaketten umschalten",
-    camera: "Kamera und Maus",
-    rightDrag: "Rechts ziehen",
-    leftDrag: "Links ziehen",
-    mouseWheel: "Mausrad",
-    mouselook: "Mausblick",
-    orbit: "Kamera umkreisen",
-    zoom: "Zoom",
-    interfaces: "Benutzeroberflächen",
-    charPane: "Charakterfenster",
-    spellbook: "Zauberbuch",
-    questLog: "Questlog",
-    worldMap: "Weltkarte",
-    bags: "Tascheninventar",
-    friends: "Freunde und Gilde",
-    chat: "Chat öffnen",
-  },
-};
-
-export const zh_CN: typeof en = {
-  nav: {
-    home: "首页",
-    play: "开始游戏",
-    stats: "数据统计",
-    about: "关于",
-    highscores: "排行榜",
-    wiki: "百科指南",
-    news: "新闻资讯",
-    download: "下载客户端",
-    loginRegister: "登录/注册",
-  },
-  stats: {
-    title: "服务器状态",
-    accountsCreated: "已创建账号",
-    playersOnline: "在线玩家数",
-    realmName: "服务器名称",
-  },
-  footer: {
-    copyright: "2026 World of ClaudeCraft",
-    githubLink: "https://github.com/levy-street/world-of-claudecraft",
-    githubLabel: "开源项目",
-    terms: "服务条款",
-    privacy: "隐私政策",
-    discordLabel: "加入Discord社区",
-  },
-  highscores: {
-    title: "高分排行榜",
-    desc: "追踪服务器中最伟大的英雄，并对比你的游戏进度。",
-  },
-  wiki: {
-    title: "游戏百科与指南",
-    desc: "探索世界的秘密、职业指南以及战术策略。",
-  },
-  news: {
-    title: "新闻与更新说明",
-    desc: "阅读最新补丁说明、游戏内事件和社区动态。",
-  },
-  download: {
-    title: "下载电脑版启动器",
-    desc: "获取独立启动器，以获得更优化的性能和全屏游戏体验。",
-  },
-  comingSoon: {
-    placeholder: "敬请期待...",
-    featureComingSoon: "该功能即将上线，敬请期待。",
-  },
-  mode: {
-    onlineTitle: "在线游玩",
-    onlineDesc: "登录服务器。你的角色数据保存在服务器上，与其他在线玩家共享同一个世界。",
-    onlineAria: "在线游玩：登录持久共享的联机世界",
-    offlineTitle: "单机试玩",
-    offlineDesc: "在浏览器中直接开启单人世界。所有数据均不保存：非常适合快速试玩或功能测试。",
-    offlineAria: "单机试玩：直接开始本地单人游戏会话",
-    tipTitle: "提示：",
-    tipText: "为了获得最流畅的游玩体验，请在此网站上关闭广告拦截插件。根据社区反馈，部分拦截器可能会导致游戏卡顿。",
-  },
-  auth: {
-    enterRealm: "进入服务器",
-    username: "用户名",
-    usernameError: "请输入用户名。",
-    usernamePlaceholder: "请输入用户名",
-    password: "密码",
-    passwordError: "请输入密码。",
-    passwordPlaceholder: "请输入密码",
-    showPassword: "显示密码",
-    hidePassword: "隐藏密码",
-    logIn: "登录",
-    createAccount: "创建账号",
-    back: "返回",
-    realmList: "服务器列表",
-    loadingRealms: "正在加载服务器...",
-    changeRealm: "切换服务器",
-    characters: "角色列表：",
-    createCharacter: "创建角色",
-    characterName: "角色名称",
-    characterNamePlaceholder: "输入角色名称",
-    enterWorld: "进入世界",
-    offlineCharacter: "单机角色",
-    create: "创建",
-  },
-  classes: {
-    warrior: "战士",
-    paladin: "圣骑士",
-    hunter: "猎人",
-    rogue: "潜行者",
-    priest: "牧师",
-    shaman: "萨满祭司",
-    mage: "法师",
-    warlock: "术士",
-    druid: "德鲁伊",
-    warriorAria: "战士职业",
-    paladinAria: "圣骑士职业",
-    hunterAria: "猎人职业",
-    rogueAria: "潜行者职业",
-    priestAria: "牧师职业",
-    shamanAria: "萨满祭司职业",
-    mageAria: "法师职业",
-    warlockAria: "术士职业",
-    druidAria: "德鲁伊职业",
-  },
-  controls: {
-    title: "操作指南",
-    movement: "移动操作",
-    moveTurn: "移动/转向",
-    strafe: "向左/向右平移",
-    jump: "跳跃",
-    autorun: "切换自动奔跑",
-    combat: "战斗与互动",
-    target: "锁定敌对目标",
-    spells: "施放法术",
-    interact: "互动/拾取",
-    nameplates: "显示姓名板",
-    camera: "视角与鼠标",
-    rightDrag: "右键拖拽",
-    leftDrag: "左键拖拽",
-    mouseWheel: "鼠标滚轮",
-    mouselook: "鼠标视口",
-    orbit: "环绕相机",
-    zoom: "缩放",
-    interfaces: "界面窗口",
-    charPane: "角色面板",
-    spellbook: "法术书",
-    questLog: "任务日志",
-    worldMap: "世界地图",
-    bags: "背包背包栏",
-    friends: "好友与公会",
-    chat: "打开聊天框",
-  },
-};
-
-export const zh_TW: typeof en = {
-  nav: {
-    home: "首頁",
-    play: "開始遊戲",
-    stats: "數據統計",
-    about: "關於",
-    highscores: "排行榜",
-    wiki: "百科指南",
-    news: "最新消息",
-    download: "下載客戶端",
-    loginRegister: "登入/註冊",
-  },
-  stats: {
-    title: "伺服器狀態",
-    accountsCreated: "已建立帳號",
-    playersOnline: "線上玩家數",
-    realmName: "伺服器名稱",
-  },
-  footer: {
-    copyright: "2026 World of ClaudeCraft",
-    githubLink: "https://github.com/levy-street/world-of-claudecraft",
-    githubLabel: "開源專案",
-    terms: "服務條款",
-    privacy: "隱私權政策",
-    discordLabel: "加入Discord社區",
-  },
-  highscores: {
-    title: "高分排行榜",
-    desc: "追蹤伺服器中最偉大的英雄，並對比你的遊戲進度。",
-  },
-  wiki: {
-    title: "遊戲百科與指南",
-    desc: "探索世界的秘密、職業指南以及戰術策略。",
-  },
-  news: {
-    title: "新聞與更新說明",
-    desc: "閱讀最新修補程式說明、遊戲內事件和社群動態。",
-  },
-  download: {
-    title: "下載電腦版啟動器",
-    desc: "獲取獨立啟動器，以獲得更優化的效能和全螢幕遊戲體驗。",
-  },
-  comingSoon: {
-    placeholder: "敬請期待...",
-    featureComingSoon: "該功能即將上線，敬請期待。",
-  },
-  mode: {
-    onlineTitle: "線上遊玩",
-    onlineDesc: "登入伺服器。您的角色數據保存在伺服器上，與其他線上玩家共享同一個世界。",
-    onlineAria: "線上遊玩：登入持久共享的聯機世界",
-    offlineTitle: "單機試玩",
-    offlineDesc: "在瀏覽器中直接開啟單人世界。所有數據均不保存：非常適合快速試玩或功能測試。",
-    offlineAria: "單機試玩：直接開始本地單人遊戲會話",
-    tipTitle: "提示：",
-    tipText: "為了獲得最流暢的遊玩體驗，請在此網站上關閉廣告攔截外掛。根據社群回饋，部分攔截器可能會導致遊戲延遲。",
-  },
-  auth: {
-    enterRealm: "進入伺服器",
-    username: "使用者名稱",
-    usernameError: "請輸入使用者名稱。",
-    usernamePlaceholder: "請輸入使用者名稱",
-    password: "密碼",
-    passwordError: "請輸入密碼。",
-    passwordPlaceholder: "請輸入密碼",
-    showPassword: "顯示密碼",
-    hidePassword: "隱藏密碼",
-    logIn: "登入",
-    createAccount: "建立帳號",
-    back: "返回",
-    realmList: "伺服器列表",
-    loadingRealms: "正在載入伺服器...",
-    changeRealm: "切換伺服器",
-    characters: "角色列表：",
-    createCharacter: "建立角色",
-    characterName: "角色名稱",
-    characterNamePlaceholder: "輸入角色名稱",
-    enterWorld: "進入世界",
-    offlineCharacter: "單機角色",
-    create: "建立",
-  },
-  classes: {
-    warrior: "戰士",
-    paladin: "聖騎士",
-    hunter: "獵人",
-    rogue: "潛行者",
-    priest: "牧師",
-    shaman: "薩滿",
-    mage: "法師",
-    warlock: "術士",
-    druid: "德魯伊",
-    warriorAria: "戰士職業",
-    paladinAria: "聖騎士職業",
-    hunterAria: "獵人職業",
-    rogueAria: "潛行者職業",
-    priestAria: "牧師職業",
-    shamanAria: "薩滿職業",
-    mageAria: "法師職業",
-    warlockAria: "術士職業",
-    druidAria: "德魯伊職業",
-  },
-  controls: {
-    title: "操作指南",
-    movement: "移動操作",
-    moveTurn: "移動/轉向",
-    strafe: "向左/向右平移",
-    jump: "跳躍",
-    autorun: "切換自動奔跑",
-    combat: "戰鬥與互動",
-    target: "鎖定敵對目標",
-    spells: "施放法术",
-    interact: "互動/拾取",
-    nameplates: "顯示姓名板",
-    camera: "視角與滑鼠",
-    rightDrag: "右鍵拖曳",
-    leftDrag: "左鍵拖曳",
-    mouseWheel: "滑鼠滾輪",
-    mouselook: "滑鼠視角",
-    orbit: "環繞鏡頭",
-    zoom: "縮放",
-    interfaces: "介面視窗",
-    charPane: "角色面板",
-    spellbook: "法術書",
-    questLog: "任務日誌",
-    worldMap: "世界地圖",
-    bags: "背包背包欄",
-    friends: "好友與公會",
-    chat: "開啟對話框",
-  },
-};
-
-export const ko_KR: typeof en = {
-  nav: {
-    home: "홈",
-    play: "플레이",
-    stats: "통계",
-    about: "정보",
-    highscores: "순위표",
-    wiki: "위키",
-    news: "새소식",
-    download: "다운로드",
-    loginRegister: "로그인/회원가입",
-  },
-  stats: {
-    title: "렐름 상태",
-    accountsCreated: "생성된 계정 수",
-    playersOnline: "현재 접속자 수",
-    realmName: "렐름 이름",
-  },
-  footer: {
-    copyright: "2026 World of ClaudeCraft",
-    githubLink: "https://github.com/levy-street/world-of-claudecraft",
-    githubLabel: "오픈 소스 프로젝트",
-    terms: "서비스 이용약관",
-    privacy: "개인정보 처리방침",
-    discordLabel: "Discord 참여하기",
-  },
-  highscores: {
-    title: "최고 점수 순위표",
-    desc: "렐름의 가장 위대한 챔피언들을 확인하고 당신의 진행 상태를 비교해 보세요.",
-  },
-  wiki: {
-    title: "게임 위키 및 가이드",
-    desc: "렐름의 비밀과 클래스 가이드, 전략 등을 확인해 보세요.",
-  },
-  news: {
-    title: "새소식 및 업데이트",
-    desc: "최신 패치 노트, 이벤트 소식, 커뮤니티 업데이트를 확인해 보세요.",
-  },
-  download: {
-    title: "데스크톱 런처 다운로드",
-    desc: "최적화된 성능과 전체 화면 플레이를 위해 독립형 런처를 다운로드하세요.",
-  },
-  comingSoon: {
-    placeholder: "준비 중...",
-    featureComingSoon: "이 기능은 곧 렐름에 업데이트될 예정입니다.",
-  },
-  mode: {
-    onlineTitle: "온라인 플레이",
-    onlineDesc: "렐름에 로그인합니다. 생성한 캐릭터는 서버에 저장되며 온라인에 있는 다른 모든 플레이어와 같은 세상을 공유합니다.",
-    onlineAria: "온라인 플레이: 지속적으로 공유되는 렐름에 로그인합니다",
-    offlineTitle: "오프라인 플레이",
-    offlineDesc: "브라우저에서 즉시 일인용 세상을 플레이합니다. 아무것도 저장되지 않아 빠른 전투나 연습에 적합합니다.",
-    offlineAria: "오프라인 플레이: 즉각적인 로컬 싱글 플레이 세션을 시작합니다",
-    tipTitle: "팁:",
-    tipText: "가장 원활한 이용을 위해 이 웹사이트의 광고 차단기 확장 프로그램을 비활성화해 주세요. 일부 차단기가 게임 성능 지연을 유발할 수 있습니다.",
-  },
-  auth: {
-    enterRealm: "렐름 입장",
-    username: "사용자 이름",
-    usernameError: "사용자 이름을 입력해 주세요.",
-    usernamePlaceholder: "사용자 이름 입력",
-    password: "비밀번호",
-    passwordError: "비밀번호를 입력해 주세요.",
-    passwordPlaceholder: "비밀번호 입력",
-    showPassword: "비밀번호 표시",
-    hidePassword: "비밀번호 숨기기",
-    logIn: "로그인",
-    createAccount: "계정 생성",
-    back: "뒤로 가기",
-    realmList: "렐름 목록",
-    loadingRealms: "렐름을 불러오는 중...",
-    changeRealm: "렐름 변경",
-    characters: "캐릭터 목록:",
-    createCharacter: "캐릭터 생성",
-    characterName: "캐릭터 이름",
-    characterNamePlaceholder: "캐릭터 이름",
-    enterWorld: "세계 입장",
-    offlineCharacter: "오프라인 캐릭터",
-    create: "생성",
-  },
-  classes: {
-    warrior: "전사",
-    paladin: "성기사",
-    hunter: "사냥꾼",
-    rogue: "도적",
-    priest: "사제",
-    shaman: "주술사",
-    mage: "마법사",
-    warlock: "흑마법사",
-    druid: "드루이드",
-    warriorAria: "전사 직업",
-    paladinAria: "성기사 직업",
-    hunterAria: "사냥꾼 직업",
-    rogueAria: "도적 직업",
-    priestAria: "사제 직업",
-    shamanAria: "주술사 직업",
-    mageAria: "마법사 직업",
-    warlockAria: "흑마법사 직업",
-    druidAria: "드루이드 직업",
-  },
-  controls: {
-    title: "조작 가이드",
-    movement: "이동 조작",
-    moveTurn: "이동 / 회전",
-    strafe: "좌/우 평행 이동",
-    jump: "점프",
-    autorun: "자동 달리기 전환",
-    combat: "전투 및 상호작용",
-    target: "적 대상 지정",
-    spells: "주문 시전",
-    interact: "상호작용 / 전리품 획득",
-    nameplates: "이름표 전환",
-    camera: "카메라 및 마우스",
-    rightDrag: "우클릭 드래그",
-    leftDrag: "좌클릭 드래그",
-    mouseWheel: "마우스 휠",
-    mouselook: "마우스 시점",
-    orbit: "카메라 회전",
-    zoom: "줌",
-    interfaces: "인터페이스",
-    charPane: "캐릭터 정보",
-    spellbook: "마법책",
-    questLog: "퀘스트 목록",
-    worldMap: "세계 지도",
-    bags: "가방 소지품",
-    friends: "친구 및 길드",
-    chat: "채팅창 열기",
-  },
-};
-
-export const ja_JP: typeof en = {
-  nav: {
-    home: "ホーム",
-    play: "プレイ",
-    stats: "統計",
-    about: "情報",
-    highscores: "ハイスコア",
-    wiki: "Wiki",
-    news: "ニュース",
-    download: "ダウンロード",
-    loginRegister: "ログイン/登録",
-  },
-  stats: {
-    title: "レルムステータス",
-    accountsCreated: "作成アカウント数",
-    playersOnline: "オンラインプレイヤー数",
-    realmName: "レルム名",
-  },
-  footer: {
-    copyright: "2026 World of ClaudeCraft",
-    githubLink: "https://github.com/levy-street/world-of-claudecraft",
-    githubLabel: "オープンソースプロジェクト",
-    terms: "利用規約",
-    privacy: "プライバシーポリシー",
-    discordLabel: "Discordに参加する",
-  },
-  highscores: {
-    title: "ハイスコアリーダーボード",
-    desc: "レルムの偉大なチャンピオンたちを確認し、あなたの進行度と比較しましょう。",
-  },
-  wiki: {
-    title: "ゲームWiki & ガイド",
-    desc: "レルムの秘密、クラスガイド、戦略を確認しましょう。",
-  },
-  news: {
-    title: "ニュース & アップデート",
-    desc: "最新のパッチノート、イベント、コミュニティの更新情報を確認しましょう。",
-  },
-  download: {
-    title: "デスクトップランチャーのダウンロード",
-    desc: "最適化されたパフォーマンスと全画面表示でのプレイのために、スタンドアロン版ランチャーを入手してください。",
-  },
-  comingSoon: {
-    placeholder: "近日公開...",
-    featureComingSoon: "この機能はまもなくレルムに実装されます。",
-  },
-  mode: {
-    onlineTitle: "オンラインでプレイ",
-    onlineDesc: "レルムにログインします。キャラクターはサーバー上に保存され、オンラインの他の全プレイヤーと同じ世界を共有します。",
-    onlineAria: "オンラインでプレイ：永続的な共有レルムにログインします",
-    offlineTitle: "オフラインでプレイ",
-    offlineDesc: "ブラウザ上で即座にシングルプレイヤーの世界を起動します。保存は一切されず、小規模な対戦やテストに最適です。",
-    offlineAria: "オフラインでプレイ：即座にローカルシングルプレイヤーセッションを開始します",
-    tipTitle: "ヒント：",
-    tipText: "よりスムーズな体験のために、本サイトでの広告ブロック拡張機能を無効にしてください。コミュニティの報告によると、一部のブロック機能がラグの原因になる場合があります。",
-  },
-  auth: {
-    enterRealm: "レルムに入る",
-    username: "ユーザー名",
-    usernameError: "ユーザー名を入力してください。",
-    usernamePlaceholder: "ユーザー名を入力",
-    password: "パスワード",
-    passwordError: "パスワードを入力してください。",
-    passwordPlaceholder: "パスワードを入力",
-    showPassword: "パスワードを表示",
-    hidePassword: "パスワードを非表示",
-    logIn: "ログイン",
-    createAccount: "アカウント作成",
-    back: "戻る",
-    realmList: "レルムリスト",
-    loadingRealms: "レルムを読み込み中...",
-    changeRealm: "レルム変更",
-    characters: "キャラクター数：",
-    createCharacter: "キャラクター作成",
-    characterName: "キャラクター名",
-    characterNamePlaceholder: "キャラクター名",
-    enterWorld: "世界に入る",
-    offlineCharacter: "オフラインキャラクター",
-    create: "作成",
-  },
-  classes: {
-    warrior: "戦士",
-    paladin: "パラディン",
-    hunter: "ハンター",
-    rogue: "ローグ",
-    priest: "プリースト",
-    shaman: "シャーマン",
-    mage: "メイジ",
-    warlock: "ウォーロック",
-    druid: "ドルイド",
-    warriorAria: "戦士クラス",
-    paladinAria: "パラディンクラス",
-    hunterAria: "ハンタークラス",
-    rogueAria: "ローグクラス",
-    priestAria: "プリーストクラス",
-    shamanAria: "シャーマンクラス",
-    mageAria: "メイジクラス",
-    warlockAria: "ウォーロッククラス",
-    druidAria: "ドルイドクラス",
-  },
-  controls: {
-    title: "操作ガイド",
-    movement: "移動",
-    moveTurn: "移動 / 旋回",
-    strafe: "左右平行移動",
-    jump: "ジャンプ",
-    autorun: "オートラン切り替え",
-    combat: "戦闘 & 相互作用",
-    target: "敵をターゲット",
-    spells: "呪文の詠唱",
-    interact: "相互作用 / 戦利品回収",
-    nameplates: "ネームプレート表示切り替え",
-    camera: "カメラ & マウス",
-    rightDrag: "右ドラッグ",
-    leftDrag: "左ドラッグ",
-    mouseWheel: "マウスホイール",
-    mouselook: "マウスルック",
-    orbit: "カメラの旋回",
-    zoom: "ズーム",
-    interfaces: "画面表示",
-    charPane: "キャラクター画面",
-    spellbook: "魔道書",
-    questLog: "クエストログ",
-    worldMap: "ワールドマップ",
-    bags: "バッグのインベントリ",
-    friends: "フレンド & ギルド",
-    chat: "チャットを開く",
-  },
-};
-
-export const pt_BR: typeof en = {
-  nav: {
-    home: "Início",
-    play: "Jogar",
-    stats: "Estatísticas",
-    about: "Sobre",
-    highscores: "Recordes",
-    wiki: "Wiki",
-    news: "Notícias",
-    download: "Baixar",
-    loginRegister: "Entrar/Registrar",
-  },
-  stats: {
-    title: "Status do Reino",
-    accountsCreated: "Contas criadas",
-    playersOnline: "Jogadores online",
-    realmName: "Nome do reino",
-  },
-  footer: {
-    copyright: "2026 World of ClaudeCraft",
-    githubLink: "https://github.com/levy-street/world-of-claudecraft",
-    githubLabel: "Projeto de código aberto",
-    terms: "Termos de serviço",
-    privacy: "Política de privacidade",
-    discordLabel: "Juntar-se ao Discord",
-  },
-  highscores: {
-    title: "Tabela de recordes",
-    desc: "Acompanhe os maiores campeões do reino e compare o seu progresso.",
-  },
-  wiki: {
-    title: "Wiki e guia do jogo",
-    desc: "Descubra os segredos do reino, guias de classes e estratégias.",
-  },
-  news: {
-    title: "Notícias e atualizações",
-    desc: "Leia as últimas notas do patch, eventos e atualizações da comunidade.",
-  },
-  download: {
-    title: "Baixar launcher para desktop",
-    desc: "Obtenha o launcher independente para desempenho otimizado e jogo em tela cheia.",
-  },
-  comingSoon: {
-    placeholder: "Em breve...",
-    featureComingSoon: "Este recurso estará disponível no reino em breve.",
-  },
-  mode: {
-    onlineTitle: "Jogar online",
-    onlineDesc: "Entre no reino. Seus personagens vivem no servidor e você compartilha o mundo com todos os outros online.",
-    onlineAria: "Jogar online: entre no reino compartilhado persistente",
-    offlineTitle: "Jogar offline",
-    offlineDesc: "Mundo solo instantâneo no seu navegador. Nada é salvo: perfeito para uma luta rápida ou testes.",
-    offlineAria: "Jogar offline: inicie uma sessão local de um jogador instantânea",
-    tipTitle: "DICA:",
-    tipText: "Para uma experiência mais suave, desative os bloqueadores de anúncios neste site. Relatos da comunidade indicam que alguns bloqueadores podem causar lag.",
-  },
-  auth: {
-    enterRealm: "Entrar no reino",
-    username: "Nome de usuário",
-    usernameError: "Por favor, insira seu nome de usuário.",
-    usernamePlaceholder: "Insira o usuário",
-    password: "Senha",
-    passwordError: "Por favor, insira sua senha.",
-    passwordPlaceholder: "Insira a senha",
-    showPassword: "Mostrar senha",
-    hidePassword: "Ocultar senha",
-    logIn: "Entrar",
-    createAccount: "Criar conta",
-    back: "Voltar",
-    realmList: "Lista de reinos",
-    loadingRealms: "Carregando reinos...",
-    changeRealm: "Mudar de reino",
-    characters: "Personagens:",
-    createCharacter: "Criar personagem",
-    characterName: "Nome do personagem",
-    characterNamePlaceholder: "Nome do personagem",
-    enterWorld: "Entrar no mundo",
-    offlineCharacter: "Personagem offline",
-    create: "Criar",
-  },
-  classes: {
-    warrior: "Guerreiro",
-    paladin: "Paladino",
-    hunter: "Caçador",
-    rogue: "Ladino",
-    priest: "Sacerdote",
-    shaman: "Xamã",
-    mage: "Mago",
-    warlock: "Bruxo",
-    druid: "Druida",
-    warriorAria: "Classe Guerreiro",
-    paladinAria: "Classe Paladino",
-    hunterAria: "Classe Caçador",
-    rogueAria: "Classe Ladino",
-    priestAria: "Classe Sacerdote",
-    shamanAria: "Classe Xamã",
-    mageAria: "Classe Mago",
-    warlockAria: "Classe Bruxo",
-    druidAria: "Classe Druida",
-  },
-  controls: {
-    title: "Guia de controles",
-    movement: "Movimentação",
-    moveTurn: "Mover / Virar",
-    strafe: "Passo lateral Esquerda/Direita",
-    jump: "Pular",
-    autorun: "Alternar corrida automática",
-    combat: "Combate e interação",
-    target: "Selecionar inimigo como alvo",
-    spells: "Conjurar feitiços",
-    interact: "Interagir / Saquear",
-    nameplates: "Alternar placas de nome",
-    camera: "Câmera e mouse",
-    rightDrag: "Arrastrar com botão direito",
-    leftDrag: "Arrastrar com botão esquerdo",
-    mouseWheel: "Roda do mouse",
-    mouselook: "Olhar com o mouse",
-    orbit: "Orbitar câmera",
-    zoom: "Zoom",
-    interfaces: "Interfaces",
-    charPane: "Painel do personagem",
-    spellbook: "Livro de feitiços",
-    questLog: "Registro de missões",
-    worldMap: "Mapa do mundo",
-    bags: "Inventário de bolsas",
-    friends: "Amigos e guilda",
-    chat: "Abrir chat",
-  },
-};
-
-export const ru_RU: typeof en = {
-  nav: {
-    home: "Главная",
-    play: "Играть",
-    stats: "Статистика",
-    about: "О проекте",
-    highscores: "Таблицы рекордов",
-    wiki: "Вики",
-    news: "Новости",
-    download: "Скачать",
-    loginRegister: "Войти / Зарегистрироваться",
-  },
-  stats: {
-    title: "Статус игрового мира",
-    accountsCreated: "Создано учетных записей",
-    playersOnline: "Игроков в сети",
-    realmName: "Название игрового мира",
-  },
-  footer: {
-    copyright: "2026 World of ClaudeCraft",
-    githubLink: "https://github.com/levy-street/world-of-claudecraft",
-    githubLabel: "Проект с открытым исходным кодом",
-    terms: "Условия использования",
-    privacy: "Политика конфиденциальности",
-    discordLabel: "Присоединиться к Discord",
-  },
-  highscores: {
-    title: "Таблица рекордов",
-    desc: "Отслеживайте величайших чемпионов игрового мира и сравнивайте свои успехи.",
-  },
-  wiki: {
-    title: "Вики и руководство",
-    desc: "Откройте секреты игрового мира, руководства по классам и стратегии.",
-  },
-  news: {
-    title: "Новости и обновления",
-    desc: "Читайте описание последних обновлений, информацию о событиях и новости сообщества.",
-  },
-  download: {
-    title: "Скачать загрузчик для ПК",
-    desc: "Загрузите отдельный клиент для оптимальной производительности и игры на весь экран.",
-  },
-  comingSoon: {
-    placeholder: "Скоро...",
-    featureComingSoon: "Эта функция скоро появится в игре.",
-  },
-  mode: {
-    onlineTitle: "Играть по сети",
-    onlineDesc: "Войдите в игровой мир. Ваши персонажи сохраняются на сервере, а вы делите игровой мир с другими игроками в сети.",
-    onlineAria: "Играть по сети: вход в постоянный общий игровой мир",
-    offlineTitle: "Играть вне сети",
-    offlineDesc: "Мгновенный одиночный мир прямо в браузере. Прогресс не сохраняется: идеально для быстрой драки или тестирования.",
-    offlineAria: "Играть вне сети: запуск мгновенного локального одиночного сеанса",
-    tipTitle: "СОВЕТ:",
-    tipText: "Для максимально плавной игры отключите блокировщики рекламы на этом сайте. По отзывам сообщества, некоторые блокировщики могут вызывать задержки.",
-  },
-  auth: {
-    enterRealm: "Войти в игровой мир",
-    username: "Имя пользователя",
-    usernameError: "Пожалуйста, введите имя пользователя.",
-    usernamePlaceholder: "Введите имя пользователя",
-    password: "Пароль",
-    passwordError: "Пожалуйста, введите пароль.",
-    passwordPlaceholder: "Введите пароль",
-    showPassword: "Показать пароль",
-    hidePassword: "Скрыть пароль",
-    logIn: "Войти",
-    createAccount: "Создать учетную запись",
-    back: "Назад",
-    realmList: "Список игровых миров",
-    loadingRealms: "Загрузка списка миров...",
-    changeRealm: "Сменить игровой мир",
-    characters: "Персонажи:",
-    createCharacter: "Создать персонажа",
-    characterName: "Имя персонажа",
-    characterNamePlaceholder: "Имя персонажа",
-    enterWorld: "Войти в мир",
-    offlineCharacter: "Персонаж вне сети",
-    create: "Создать",
-  },
-  classes: {
-    warrior: "Воин",
-    paladin: "Паладин",
-    hunter: "Охотник",
-    rogue: "Разбойник",
-    priest: "Жрец",
-    shaman: "Шаман",
-    mage: "Маг",
-    warlock: "Чернокнижник",
-    druid: "Друид",
-    warriorAria: "Класс Воин",
-    paladinAria: "Класс Паладин",
-    hunterAria: "Класс Охотник",
-    rogueAria: "Класс Разбойник",
-    priestAria: "Класс Жрец",
-    shamanAria: "Класс Шаман",
-    mageAria: "Класс Маг",
-    warlockAria: "Класс Чернокнижник",
-    druidAria: "Класс Друид",
-  },
-  controls: {
-    title: "Руководство по управлению",
-    movement: "Передвижение",
-    moveTurn: "Движение / поворот",
-    strafe: "Стрейф влево/вправо",
-    jump: "Прыжок",
-    autorun: "Вкл/выкл автобег",
-    combat: "Бой и взаимодействие",
-    target: "Выбор врага",
-    spells: "Заклинания",
-    interact: "Взаимодействие / сбор добычи",
-    nameplates: "Вкл/выкл индикаторы здоровья",
-    camera: "Камера и мышь",
-    rightDrag: "Перетаскивание правой кнопкой",
-    leftDrag: "Перетаскивание левой кнопкой",
-    mouseWheel: "Колесико мыши",
-    mouselook: "Обзор мышью",
-    orbit: "Вращение камеры",
-    zoom: "Приближение",
-    interfaces: "Интерфейсы",
-    charPane: "Окно персонажа",
-    spellbook: "Книга заклинаний",
-    questLog: "Журнал заданий",
-    worldMap: "Карта мира",
-    bags: "Сумки",
-    friends: "Друзья и гильдия",
-    chat: "Открыть чат",
-  },
-};
-
-const translations = {
+// Re-export the dense per-locale objects so const-importers of './i18n' keep an unchanged
+// surface: the S3 guard (tests/localization_fixes.test.ts) and the byte-equivalence
+// diagnostic (scripts/i18n_resolved_hash.mjs) read every locale const by name. This is a PURE
+// re-export (export-from, NO local binding): the app runtime references none of these names
+// through './i18n' - every read-path below (t, translationValue, hasTranslation, tOptional)
+// reads the lazy `resident` table instead - so Rollup drops the unused re-export and
+// tree-shakes the 21 non-en slices (and the barrel that assembles them) out of the app
+// chunk. THAT drop is the payload win of the lazy locale flip. `en` stays in the chunk via the eager
+// local import above (the universal English default), not via this line.
+export {
+  cs_CZ,
+  da_DK,
+  de_DE,
   en,
+  en_CA,
   es,
   es_ES,
-  fr_FR,
   fr_CA,
-  en_CA,
+  fr_FR,
+  id_ID,
   it_IT,
-  de_DE,
-  zh_CN,
-  zh_TW,
-  ko_KR,
   ja_JP,
+  ko_KR,
+  nl_NL,
+  pl_PL,
   pt_BR,
   ru_RU,
-};
+  sv_SE,
+  tr_TR,
+  vi_VN,
+  zh_CN,
+  zh_TW,
+} from './i18n.resolved.generated';
+// gameStrings is the post-cap/XP/leaderboard layer, which the table carries under the
+// `game` key. Source it from the eager generated dense `en` rather than re-exporting from
+// i18n.catalog, so importing './i18n' does not pull the full i18n.catalog base (en + shared content
+// layers, ~1 MB) into the client bundle - that module now exists only to feed the
+// generator. Same content, same export name.
+export const gameStrings = en.game;
+export type { DeepPartial, InterpolationValue, InterpolationValues, Leaves, TranslationKey };
 
-export type SupportedLanguage = keyof typeof translations;
+// The 22-locale set + its type derive from the generated SUPPORTED_LANGUAGES (the loaders
+// surface), NOT `keyof typeof translations`: after the lazy flip the full `translations`
+// map is no longer eagerly imported. The two are pinned equal (same 22 codes, same order)
+// by tests/i18n_emit_shape.test.ts.
+export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
+export const supportedLanguages = [...SUPPORTED_LANGUAGES] as SupportedLanguage[];
+// Membership set for isSupportedLanguage / getStoredLanguage now that the `translations`
+// map (whose keys were the old membership test) is no longer imported.
+const SUPPORTED_SET: ReadonlySet<string> = new Set(SUPPORTED_LANGUAGES);
 
-let currentLanguage: SupportedLanguage = "en";
+let currentLanguage: SupportedLanguage = 'en';
+
+// --- en_XA dev-only pseudo-locale --------------------------------------
+//
+// en_XA is the generated pseudo-locale (accent-pushed + bracketed `en`, with
+// {placeholders} preserved - see scripts/i18n_pseudo.mjs). It is deliberately NOT a
+// member of `translations`, so it never appears in supportedLanguages, the language
+// picker (populated from supportedLanguages), index.html hreflang, or the release
+// gate / registry. It is selectable ONLY via ?lang=en_XA on a NON-RELEASE build, as
+// a developer tool: any on-screen text that stays plain ASCII with no brackets is a
+// hard-coded literal that never became a t() key. The import.meta.env.PROD guard in
+// tableFor() is statically true in a production `vite build`, so Rollup
+// dead-code-eliminates the en_XA reference and tree-shakes the pseudo table out of
+// the shipped bundle entirely.
+const DEV_PSEUDO_LOCALE = 'en_XA';
+let pseudoActive = false;
+
+/** Whether the dev-only en_XA pseudo-locale is active (accent-push + brackets on
+ *  English, {placeholders} preserved). The `!import.meta.env.PROD` guard mirrors
+ *  tableFor, so a release build statically resolves this to `false` and any
+ *  consumer's pseudo branch tree-shakes away. Player text that resolves its
+ *  English OUTSIDE the catalog table (deed names/descs/titles come from the sim
+ *  content table, so tableFor never pseudo-folds them) consults this to fold at
+ *  render time (src/ui/deed_i18n.ts). */
+export function isPseudoActive(): boolean {
+  return !import.meta.env.PROD && pseudoActive;
+}
+
+export function isSupportedLanguage(value: string): value is SupportedLanguage {
+  return SUPPORTED_SET.has(value);
+}
+
+export function languageTag(lang: SupportedLanguage): string {
+  return lang.replace('_', '-');
+}
+
+function browserStorage(): Storage | null {
+  try {
+    const storage = globalThis.localStorage;
+    return storage && typeof storage === 'object' ? storage : null;
+  } catch {
+    return null;
+  }
+}
+
+function getStoredLanguage(): SupportedLanguage | null {
+  const storage = browserStorage();
+  if (!storage || typeof storage.getItem !== 'function') return null;
+  try {
+    const saved = storage.getItem('locale');
+    return saved && isSupportedLanguage(saved) ? saved : null;
+  } catch {
+    return null;
+  }
+}
+
+function setStoredLanguage(lang: SupportedLanguage): void {
+  const storage = browserStorage();
+  if (!storage || typeof storage.setItem !== 'function') return;
+  try {
+    storage.setItem('locale', lang);
+  } catch {
+    // Storage may be disabled or unavailable in test/browser privacy modes.
+  }
+}
 
 // Initialize language from URL query or localStorage if available (browser environments)
-if (typeof window !== "undefined" && window.location) {
+if (typeof window !== 'undefined' && window.location) {
   const params = new URLSearchParams(window.location.search);
-  const langParam = params.get("lang") as SupportedLanguage | null;
-  if (langParam && translations[langParam]) {
+  const langParam = params.get('lang');
+  if (langParam === DEV_PSEUDO_LOCALE && !isReleaseBuild()) {
+    // Dev-only en_XA pseudo-locale: keep currentLanguage = "en" as the base and flip
+    // the pseudo flag. en_XA is not a SupportedLanguage and is never persisted, so it
+    // cannot leak into supportedLanguages, the picker, or a stored preference. On a
+    // release build this branch is skipped, so ?lang=en_XA degrades to the default.
+    pseudoActive = true;
+  } else if (langParam && isSupportedLanguage(langParam)) {
     currentLanguage = langParam;
   } else {
-    const saved = localStorage.getItem("locale") as SupportedLanguage | null;
-    if (saved && translations[saved]) {
-      currentLanguage = saved;
-    }
+    currentLanguage = getStoredLanguage() ?? currentLanguage;
   }
-} else if (typeof localStorage !== "undefined") {
-  const saved = localStorage.getItem("locale") as SupportedLanguage | null;
-  if (saved && translations[saved]) {
-    currentLanguage = saved;
-  }
+} else {
+  currentLanguage = getStoredLanguage() ?? currentLanguage;
 }
 
 export function getLanguage(): SupportedLanguage {
@@ -1877,21 +165,338 @@ export function getLanguage(): SupportedLanguage {
 }
 
 export function setLanguage(lang: SupportedLanguage): void {
+  pseudoActive = false; // selecting a real locale leaves the dev pseudo-locale
   currentLanguage = lang;
-  if (typeof localStorage !== "undefined") {
-    localStorage.setItem("locale", lang);
+  setStoredLanguage(lang);
+}
+
+// --- lazy-locale async loader surface (the async locale loader) ----------------------------------
+//
+// ensureLocaleLoaded is the ONLY async surface in this module. t() and setLanguage stay
+// synchronous forever (locked decision: making t() async would force `await` through 600+
+// call sites and is a determinism/timing hazard). Callers await ensureLocaleLoaded BEFORE
+// setLanguage so the locale's dense table is resident before the next synchronous render.
+//
+// `resident` holds the dense table for every loaded locale. English is the ONLY locale
+// resident at boot (eager static default + universal sync fallback in tableFor); every
+// non-en locale is absent until ensureLocaleLoaded(lang) resolves its chunk. There is no
+// longer a static boot pre-seed - after the lazy flip the boot language's table is not
+// statically available (only `en` is), so the bootstrap await (src/main.ts startGame,
+// behind the loading screen) is a REAL per-locale fetch that populates resident before the
+// HUD's first localized paint.
+const resident: Partial<Record<SupportedLanguage, EnTranslations>> = { en };
+// One in-flight load promise per locale so concurrent callers coalesce onto a single
+// import instead of racing N of them.
+const inflight = new Map<SupportedLanguage, Promise<void>>();
+
+export function isLocaleResident(lang: SupportedLanguage): boolean {
+  return lang === 'en' || resident[lang] !== undefined;
+}
+
+// Soft failure hook for a locale chunk that failed to load (a real risk once the lazy locale flip
+// makes this a network fetch). Dev-channel only - an English console.warn, never player
+// text (the caller renders settings.languageLoadFailed via t()). A production telemetry
+// sink can be wired here later; it is intentionally silent on a release build today.
+function reportLocaleLoadFailure(lang: SupportedLanguage, err: unknown): void {
+  if (!isReleaseBuild()) {
+    console.warn(`i18n: failed to load locale "${lang}"`, err);
   }
 }
 
-export function t(key: Leaves<typeof en>): string {
-  const parts = key.split(".");
-  let current: any = translations[currentLanguage];
+export async function ensureLocaleLoaded(lang: SupportedLanguage): Promise<void> {
+  if (lang === 'en' || isLocaleResident(lang)) return; // English-instant / already loaded
+  const existing = inflight.get(lang);
+  if (existing) return existing; // coalesce onto the in-flight import
+  const loader = LOCALE_LOADERS[lang as keyof typeof LOCALE_LOADERS];
+  if (!loader) return; // no chunk for this code (en / unknown): treat as a resident no-op
+  const task = loader()
+    .then((mod) => {
+      // Shape-tolerant read: a Vite production chunk exposes the locale as the module
+      // default OR the named export, but under raw vitest (node, no DOM) import('./es')
+      // resolves the SOURCE .ts with NAMED exports only, so mod.default is undefined -
+      // fall back to the export keyed by the locale code.
+      resident[lang] =
+        (mod as { default?: EnTranslations }).default ??
+        (mod as Record<string, EnTranslations>)[lang];
+      inflight.delete(lang);
+    })
+    .catch((err) => {
+      inflight.delete(lang); // clear so a retry can start a fresh import
+      reportLocaleLoadFailure(lang, err);
+      throw err; // the caller decides the UI (the picker shows settings.languageLoadFailed)
+    });
+  inflight.set(lang, task);
+  return task;
+}
+
+// --- runtime prefetch (the stored-locale modulepreload, mechanism 1) -------------------------------------
+//
+// Start the current (stored / ?lang) locale's chunk fetch as EARLY as possible - the
+// moment this module evaluates - so the network request is already in flight before the
+// bootstrap await (src/main.ts startGame) reaches it. This complements the
+// parser-discoverable <link rel="modulepreload"> injected from index.html (mechanism 2):
+// the link makes the request high-priority and discoverable before main.ts parses; this
+// prefetch guarantees the dynamic import() is issued as soon as the i18n module runs. Both
+// target the SAME content-hashed chunk and dedupe to a single network fetch (the inflight
+// map coalesces app-side; the browser module map coalesces the request). Fire-and-forget:
+// the real await at startGame / the picker still gates first paint and owns the failure UI
+// (settings.languageLoadFailed) - the swallowed rejection here only prevents an early
+// failed fetch from surfacing as an unhandled rejection (the awaited caller re-runs
+// ensureLocaleLoaded, which cleared inflight on reject, so a retry restarts a fresh
+// import). English and an already-resident locale are no-ops; never speculative (only the
+// one active locale, never the other 12).
+export function prefetchLocale(lang: SupportedLanguage = currentLanguage): void {
+  if (lang === 'en' || isLocaleResident(lang)) return;
+  void ensureLocaleLoaded(lang).catch(() => {
+    // Swallowed: the awaited bootstrap/picker call re-runs the load and surfaces the error.
+  });
+}
+
+// Auto-fire on module evaluation in a browser so a stored / ?lang non-en visitor's chunk
+// is in flight immediately (i18n.ts is among the earliest modules the main chunk pulls in).
+// No-op for English (the default - preserves the zero-non-en-bytes guarantee for an English
+// visitor), for an unresolved locale, and outside a browser (vitest/node has no window); it
+// never throws.
+if (typeof window !== 'undefined') {
+  prefetchLocale();
+}
+
+function interpolate(template: string, values?: InterpolationValues): string {
+  if (!values) return template;
+  return template.replace(/\{([A-Za-z0-9_]+)\}/g, (match, name: string) => {
+    const value = values[name];
+    return value === undefined ? match : String(value);
+  });
+}
+
+// --- release detection + the t() miss / pending policy -----------------
+//
+// A non-release build (dev / pre-release / vitest) MAY render English for a key the
+// active locale has not translated yet (a registry-`pending` key): the dense table
+// carries that English fill, so it renders with no special-casing. A RELEASE build
+// must NEVER do that - the release CI gate asserts the pending set is empty, and
+// t() additionally hard-fails on any pending key as a never-fires backstop, so
+// English can never be silently shipped to a translated player. CONSEQUENCE: a
+// non-release build that still carries pending keys MUST NOT be deployed.
+//
+// Release detection: Vite statically replaces `import.meta.env.PROD` (true for
+// `vite build`, false for the dev server and vitest). Tests and the release build
+// step can force release semantics with the `I18N_RELEASE=1` env var. Read lazily,
+// on the cold (miss / pending) path only, so a test can flip it and the hot hit
+// path pays nothing.
+function isReleaseBuild(): boolean {
+  try {
+    if (typeof process !== 'undefined' && process.env && process.env.I18N_RELEASE === '1')
+      return true;
+  } catch {
+    // No `process` (browser runtime) - fall through to the build-time flag.
+  }
+  try {
+    return (import.meta as { env?: { PROD?: boolean } }).env?.PROD === true;
+  } catch {
+    return false;
+  }
+}
+
+// Keys each locale has NOT translated (the resolved table English-fills them).
+// Empty while overlays stay dense; populated once a locale goes sparse. Built once
+// from the generated `pending` lists. PENDING_TOTAL lets the hot path skip the
+// per-key membership test entirely when nothing is pending (the common case).
+const PENDING_SETS: Partial<Record<SupportedLanguage, ReadonlySet<string>>> = {};
+let PENDING_TOTAL = 0;
+for (const [lang, keys] of Object.entries(pending)) {
+  PENDING_SETS[lang as SupportedLanguage] = new Set(keys);
+  PENDING_TOTAL += keys.length;
+}
+
+// A key absent from the dense table is absent from `en` itself, so it is untracked
+// by the registry (the PR gate - tsc for t() keys, s3_registered for matcher emits -
+// rejects an unregistered key). Throw in dev/test so a typo'd or never-registered
+// key surfaces immediately; on an (already-gated) release build, degrade to the raw
+// key rather than crash a player's client mid-render.
+function onUntrackedKey(key: string): string {
+  if (!isReleaseBuild()) {
+    throw new Error(`i18n: untracked key "${key}" is not in the translation table or registry`);
+  }
+  return key;
+}
+
+// The dense table the current-language read paths resolve against. The en_XA pseudo table
+// only when the dev pseudo-locale is active AND the requested locale is the current one (so
+// an explicit read of some other locale is unaffected); en_XA is referenced solely inside
+// the !import.meta.env.PROD branch, so a production build tree-shakes it away.
+function tableFor(lang: SupportedLanguage): EnTranslations {
+  if (!import.meta.env.PROD && pseudoActive && lang === currentLanguage) {
+    return en_XA;
+  }
+  // resident holds English (always) + every locale ensureLocaleLoaded has resolved.
+  // resident.en is the universal English fallback for a locale not yet loaded (or one whose
+  // chunk failed to fetch): the synchronous read never blocks and never throws. Callers that
+  // need the localized table await ensureLocaleLoaded(lang) first (bootstrap / picker).
+  return resident[lang] ?? resident.en!;
+}
+
+export function t(key: TranslationKey, values?: InterpolationValues): string {
+  const parts = key.split('.');
+  let current: unknown = tableFor(currentLanguage);
   for (const part of parts) {
-    if (current && typeof current === "object") {
-      current = current[part];
+    if (current && typeof current === 'object' && part in current) {
+      current = (current as Record<string, unknown>)[part];
     } else {
-      return key;
+      return onUntrackedKey(key);
     }
   }
-  return typeof current === "string" ? current : key;
+  if (typeof current !== 'string') return onUntrackedKey(key);
+  if (PENDING_TOTAL > 0 && PENDING_SETS[currentLanguage]?.has(key) && isReleaseBuild()) {
+    throw new Error(
+      `i18n: key "${key}" is untranslated (pending) for locale "${currentLanguage}" on a release build; English must never ship to a translated player`,
+    );
+  }
+  return interpolate(current, values);
+}
+
+function translationValue(key: string, lang: SupportedLanguage): string | null {
+  const parts = key.split('.');
+  let current: unknown = tableFor(lang);
+  for (const part of parts) {
+    if (current && typeof current === 'object' && part in current) {
+      current = (current as Record<string, unknown>)[part];
+    } else {
+      return null;
+    }
+  }
+  return typeof current === 'string' ? current : null;
+}
+
+export function hasTranslation(key: string, lang: SupportedLanguage = currentLanguage): boolean {
+  return translationValue(key, lang) !== null;
+}
+
+export function tOptional(
+  key: string,
+  values?: InterpolationValues,
+  lang: SupportedLanguage = currentLanguage,
+): string | null {
+  const value = translationValue(key, lang);
+  return value === null ? null : interpolate(value, values);
+}
+
+// --- CLDR cardinal pluralization -------------------------------------------
+//
+// Plural-aware lookup for count-bearing strings. Keys follow the convention
+// `<base>.one | .few | .many | .other`; tPlural selects the active locale's
+// cardinal category for `count` via Intl.PluralRules and resolves the matching
+// leaf, falling back to `<base>.other` when the locale never produces that
+// category (English/German/Romance only select one/other; CJK only other) or the
+// specific leaf is absent. `count` is auto-supplied as {count}. This is what lets
+// a 3-form Slavic locale like Russian render the correct 1 / 2-4 / 5+ wording
+// instead of a wrong binary one/other split. One Intl.PluralRules is cached per
+// language tag; selection happens off the hot path (only at count-string renders).
+const pluralRulesCache = new Map<string, Intl.PluralRules>();
+function pluralRulesFor(lang: SupportedLanguage): Intl.PluralRules {
+  const tag = languageTag(lang);
+  let rules = pluralRulesCache.get(tag);
+  if (!rules) {
+    rules = new Intl.PluralRules(tag);
+    pluralRulesCache.set(tag, rules);
+  }
+  return rules;
+}
+
+export function tPlural(base: string, count: number, values?: InterpolationValues): string {
+  const category = pluralRulesFor(currentLanguage).select(count); // zero|one|two|few|many|other
+  const merged: InterpolationValues = { count, ...(values ?? {}) };
+  const candidate = `${base}.${category}`;
+  const key = (hasTranslation(candidate) ? candidate : `${base}.other`) as TranslationKey;
+  return t(key, merged);
+}
+
+// Constructing an Intl.NumberFormat parses locale data and is one of the costlier JS
+// ops; the HUD calls formatNumber on per-frame paths (aura stack counts, cast-bar
+// timers, the action bar). One formatter is cached per (language tag, options) so a
+// repeat format reuses it instead of rebuilding (mirrors pluralRulesCache). The key
+// folds the options by value, not identity, so two call sites passing equal options
+// share one formatter; a BCP-47 tag never contains '{', so tag + the options JSON is an
+// unambiguous key. NumberFormat instances are immutable, so sharing is safe.
+const numberFormatCache = new Map<string, Intl.NumberFormat>();
+function numberFormatFor(tag: string, options?: Intl.NumberFormatOptions): Intl.NumberFormat {
+  const key = options ? `${tag}${JSON.stringify(options)}` : tag;
+  let fmt = numberFormatCache.get(key);
+  if (!fmt) {
+    fmt = new Intl.NumberFormat(tag, options);
+    numberFormatCache.set(key, fmt);
+  }
+  return fmt;
+}
+
+export function formatNumber(
+  value: number,
+  options?: Intl.NumberFormatOptions,
+  lang: SupportedLanguage = currentLanguage,
+): string {
+  return numberFormatFor(languageTag(lang), options).format(value);
+}
+
+// A localized "N seconds" duration phrase (the API rate-limit error renders a
+// server-supplied retry delay this way; the server sends the raw seconds and never
+// localizes). Uses Intl's unit style so each locale's plural rules apply, including
+// the Slavic 3-form split; shares the cached NumberFormat pool with formatNumber.
+export function formatDuration(seconds: number, lang: SupportedLanguage = currentLanguage): string {
+  return numberFormatFor(languageTag(lang), {
+    style: 'unit',
+    unit: 'second',
+    unitDisplay: 'long',
+  }).format(seconds);
+}
+
+export function formatDateTime(
+  value: Date | number,
+  options?: Intl.DateTimeFormatOptions,
+  lang: SupportedLanguage = currentLanguage,
+): string {
+  return new Intl.DateTimeFormat(languageTag(lang), options).format(value);
+}
+
+export interface MoneyParts {
+  gold: number;
+  silver: number;
+  copper: number;
+}
+
+export type MoneyDisplayStyle = 'compact' | 'long';
+
+export function moneyParts(copper: number): MoneyParts {
+  const safeCopper = Number.isFinite(copper) ? Math.max(0, Math.floor(copper)) : 0;
+  return {
+    gold: Math.floor(safeCopper / 10000),
+    silver: Math.floor((safeCopper % 10000) / 100),
+    copper: safeCopper % 100,
+  };
+}
+
+export function formatMoney(copper: number, style: MoneyDisplayStyle = 'compact'): string {
+  const parts = moneyParts(copper);
+  const unitKeys =
+    style === 'compact'
+      ? ({
+          gold: 'itemUi.money.goldShort',
+          silver: 'itemUi.money.silverShort',
+          copper: 'itemUi.money.copperShort',
+        } satisfies Record<keyof MoneyParts, TranslationKey>)
+      : ({
+          gold: 'itemUi.money.gold',
+          silver: 'itemUi.money.silver',
+          copper: 'itemUi.money.copper',
+        } satisfies Record<keyof MoneyParts, TranslationKey>);
+  const rows: { value: number; unit: TranslationKey }[] = [];
+  if (parts.gold > 0) rows.push({ value: parts.gold, unit: unitKeys.gold });
+  if (parts.silver > 0 || parts.gold > 0) rows.push({ value: parts.silver, unit: unitKeys.silver });
+  if (parts.copper > 0 || rows.length === 0)
+    rows.push({ value: parts.copper, unit: unitKeys.copper });
+  return rows
+    .map(({ value, unit }) => {
+      const amount = formatNumber(value, { maximumFractionDigits: 0 });
+      return style === 'compact' ? `${amount}${t(unit)}` : `${amount} ${t(unit)}`;
+    })
+    .join(' ');
 }

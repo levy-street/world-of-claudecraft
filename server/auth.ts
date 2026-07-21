@@ -1,8 +1,11 @@
-import { readFileSync } from 'node:fs';
 import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
-import { RegExpMatcher, englishDataset, englishRecommendedTransformers } from 'obscenity';
+import { readFileSync } from 'node:fs';
+import { englishDataset, englishRecommendedTransformers, RegExpMatcher } from 'obscenity';
 
-const SCRYPT_N = 16384, SCRYPT_R = 8, SCRYPT_P = 1, KEYLEN = 64;
+const SCRYPT_N = 16384,
+  SCRYPT_R = 8,
+  SCRYPT_P = 1,
+  KEYLEN = 64;
 
 export function hashPassword(password: string): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -40,7 +43,7 @@ const CONFUSABLE_CHARS: Record<string, string> = {
   '4': 'a',
   '@': 'a',
   '5': 's',
-  '$': 's',
+  $: 's',
   '7': 't',
   '+': 't',
   '8': 'b',
@@ -51,9 +54,7 @@ const profanityMatcher = new RegExpMatcher({
   ...englishRecommendedTransformers,
 });
 
-const BUILT_IN_BANNED_NAME_TERMS = parseBanlist([
-  'hitler',
-].join('\n'));
+const BUILT_IN_BANNED_NAME_TERMS = parseBanlist(['hitler'].join('\n'));
 
 function normalizedUsernameForCensorship(username: string): string {
   return username
@@ -69,16 +70,29 @@ function parseBanlist(raw: string | undefined): string[] {
     .filter((term) => term.length > 0);
 }
 
+let banlistCacheKey: string | null = null;
+let banlistCacheTerms: string[] = [];
+
 function bannedUsernameTerms(): string[] {
-  const terms = BUILT_IN_BANNED_NAME_TERMS.concat(parseBanlist(process.env.USERNAME_BANLIST));
-  const file = process.env.USERNAME_BANLIST_FILE;
-  if (!file) return terms;
+  const rawList = process.env.USERNAME_BANLIST ?? '';
+  const file = process.env.USERNAME_BANLIST_FILE ?? '';
+  const cacheKey = `${rawList}\0${file}`;
+  if (cacheKey === banlistCacheKey) return banlistCacheTerms;
+
+  const terms = BUILT_IN_BANNED_NAME_TERMS.concat(parseBanlist(rawList));
+  if (!file) {
+    banlistCacheTerms = terms;
+    banlistCacheKey = cacheKey;
+    return banlistCacheTerms;
+  }
   try {
-    return terms.concat(parseBanlist(readFileSync(file, 'utf8')));
+    banlistCacheTerms = terms.concat(parseBanlist(readFileSync(file, 'utf8')));
   } catch (err) {
     console.warn(`could not read USERNAME_BANLIST_FILE (${file}):`, err);
     return terms;
   }
+  banlistCacheKey = cacheKey;
+  return banlistCacheTerms;
 }
 
 export function offensiveUsername(u: unknown): boolean {
@@ -88,9 +102,11 @@ export function offensiveUsername(u: unknown): boolean {
 export function offensiveName(u: unknown): boolean {
   if (typeof u !== 'string') return false;
   const normalized = normalizedUsernameForCensorship(u);
-  return profanityMatcher.hasMatch(u) ||
+  return (
+    profanityMatcher.hasMatch(u) ||
     profanityMatcher.hasMatch(normalized) ||
-    bannedUsernameTerms().some((term) => normalized.includes(term));
+    bannedUsernameTerms().some((term) => normalized.includes(term))
+  );
 }
 
 export function validUsername(u: unknown): u is string {
@@ -101,8 +117,34 @@ export function validUsernameShape(u: unknown): u is string {
   return typeof u === 'string' && /^[A-Za-z0-9_]{3,24}$/.test(u);
 }
 
+export const MIN_PASSWORD_LENGTH = 6;
+export const MAX_PASSWORD_LENGTH = 128;
+
 export function validPassword(p: unknown): p is string {
-  return typeof p === 'string' && p.length >= 6 && p.length <= 128;
+  return (
+    typeof p === 'string' && p.length >= MIN_PASSWORD_LENGTH && p.length <= MAX_PASSWORD_LENGTH
+  );
+}
+
+// Canonical email validator, shared by the register handler, the account portal,
+// and the Discord capture path so all three agree on shape and bound. Deliberately
+// permissive (a single "x@y.z" check): we capture a recovery address, we do not
+// try to out-validate a real mailbox, and RFC 5321 caps the whole address at 254.
+export const MAX_EMAIL_LENGTH = 254;
+const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Trim and validate an email address. Returns the cleaned address, or null when
+// it is missing, over-length, or the wrong shape. Callers store the returned
+// (trimmed) value so a padded address can never be persisted.
+export function normalizeEmail(e: unknown): string | null {
+  if (typeof e !== 'string') return null;
+  const trimmed = e.trim();
+  if (trimmed.length === 0 || trimmed.length > MAX_EMAIL_LENGTH) return null;
+  return EMAIL_SHAPE.test(trimmed) ? trimmed : null;
+}
+
+export function validEmail(e: unknown): e is string {
+  return normalizeEmail(e) !== null;
 }
 
 export function validCharName(n: unknown): n is string {

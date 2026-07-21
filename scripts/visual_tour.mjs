@@ -19,7 +19,7 @@ page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
 page.on('console', (m) => { if (m.type() === 'error') errors.push('CONSOLE: ' + m.text()); });
 
 await page.goto(URL, { waitUntil: 'networkidle0', timeout: 30000 });
-await page.click('#btn-offline');
+await page.evaluate(() => document.querySelector('#btn-offline').click());
 await new Promise((r) => setTimeout(r, 200));
 await page.screenshot({ path: 'tmp/t00_start.png' });
 await page.type('#char-name', 'Thorgar');

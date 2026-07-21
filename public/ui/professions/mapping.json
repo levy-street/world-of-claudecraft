@@ -1,0 +1,6 @@
+{
+  "license": "World of ClaudeCraft original art (project-owned) unless an entry carries its own \"license\" field, which overrides this file-level default.",
+  "iconSize": 128,
+  "note": "Profession and gathering skill icons (Professions 2.0). Ids follow docs/professions-2/asset-manifest.json (prof_<craftId>, gather_<skill>). WebP only; add art with `npm run assets:professions`, then wire each basename into PROFESSION_IMAGE_IDS (src/ui/icons.ts) and add its provenance entry here ({ \"id\", \"name\", \"source\", optional \"license\" }). The set ships empty: every id renders via its procedural recipe until painted art lands.",
+  "entries": []
+}

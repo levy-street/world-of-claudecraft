@@ -39,8 +39,10 @@ class WoWClassicEnv(gym.Env):
     """Single-agent World of Claudecraft environment.
 
     Observation: float32 vector (self, abilities, target, nearby mobs,
-    nearest interactable, quest states). Action: Discrete(18) —
-    movement, targeting, attack, 6 ability slots, interact, stop.
+    nearest interactable, quest states). Action: Discrete(23) —
+    movement/turn/strafe/jump, targeting, attack, 10 ability slots,
+    interact, stop, eat/drink. Sizes are content-dependent and queried
+    from the env's `info` cmd at startup — never hardcode them.
     """
 
     metadata = {"render_modes": []}
@@ -107,14 +109,17 @@ class WoWClassicEnv(gym.Env):
             self._episode_seed = seed
         else:
             self._episode_seed = int(self.np_random.integers(0, 2**31 - 1))
-        res = self._request(
-            {
-                "cmd": "reset",
-                "seed": self._episode_seed,
-                "player_class": self.player_class,
-                "config": self._config,
-            }
-        )
+        request: dict[str, Any] = {
+            "cmd": "reset",
+            "seed": self._episode_seed,
+            "player_class": self.player_class,
+            "config": self._config,
+        }
+        if options and "player_level" in options:
+            request["player_level"] = options["player_level"]
+        if options and "talents" in options:
+            request["talents"] = options["talents"]
+        res = self._request(request)
         obs = np.asarray(res["obs"], dtype=np.float32)
         return obs, res.get("info", {})
 

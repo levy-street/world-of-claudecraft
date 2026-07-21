@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="studio-token" content="__STUDIO_TOKEN__" />
+  <title>World of ClaudeCraft SFX Studio</title>
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/studio.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>World of ClaudeCraft SFX Studio</h1>
+      <p id="summary">Loading catalog and mastering analysis...</p>
+    </div>
+    <div class="toolbar" role="toolbar" aria-label="Project actions">
+      <button type="button" id="undo" title="Undo (Ctrl or Command + Z)">Undo</button>
+      <button type="button" id="redo" title="Redo (Ctrl or Command + Shift + Z)">Redo</button>
+      <button type="button" id="upload">Upload source</button>
+      <button type="button" id="save">Save draft</button>
+      <button type="button" id="reset-draft" title="Discard this cue's unpublished audio edits">Reset audio draft</button>
+      <button type="button" id="render">Render exact preview</button>
+      <button type="button" id="publish-playback">Apply playback mix</button>
+      <button type="button" id="publish" class="primary">Publish audio to game</button>
+      <button type="button" id="export-all" title="Download every published SFX master and the applied runtime mix">Export all</button>
+      <input type="file" id="file" accept="audio/*,.flac,.aif,.aiff" hidden />
+    </div>
+  </header>
+
+  <div class="statusbar">
+    <span id="status" role="status" aria-live="polite">Starting studio...</span>
+    <span id="dirty" class="badge">clean</span>
+    <span id="toolchain"></span>
+  </div>
+
+  <main class="workspace">
+    <aside class="catalog">
+      <div class="catalog-controls">
+        <input id="search" type="search" placeholder="Search key or prompt" aria-label="Search sounds" />
+        <div class="filter-row">
+          <select id="category" aria-label="Category filter">
+            <option value="all">All categories</option>
+          </select>
+          <select id="routing" aria-label="Routing filter">
+            <option value="all">All routes</option>
+            <option value="routed">Routed</option>
+            <option value="unrouted">Unrouted</option>
+            <option value="modified">Modified</option>
+            <option value="clipping">Unsafe peaks</option>
+          </select>
+        </div>
+      </div>
+      <div id="cue-list" class="cue-list" role="listbox" aria-label="Sound effect catalog"></div>
+    </aside>
+
+    <section class="editor">
+      <div class="preview-grid">
+        <section class="context card">
+          <div class="section-head">
+            <div>
+              <h2 id="cue-title">Select a cue</h2>
+              <p id="cue-path"></p>
+            </div>
+            <span id="route-badge" class="badge"></span>
+          </div>
+          <div class="context-view">
+            <canvas id="context-canvas"></canvas>
+            <div id="context-empty">No visual context</div>
+          </div>
+          <div class="context-bar">
+            <label>Animation
+              <select id="context-clip" aria-label="Context animation"></select>
+            </label>
+            <span id="context-label"></span>
+            <span id="context-status"></span>
+          </div>
+        </section>
+
+        <section class="inspector card">
+          <h2>Inspection</h2>
+          <dl id="inspection"></dl>
+          <h3>Generation brief</h3>
+          <p id="prompt"></p>
+          <h3>Game association</h3>
+          <p id="association"></p>
+          <h3>Versions</h3>
+          <div id="versions" class="versions"></div>
+        </section>
+      </div>
+
+      <section class="timeline card">
+        <div class="transport">
+          <button type="button" id="play">Play</button>
+          <button type="button" id="stop">Stop</button>
+          <button type="button" id="ab">A: source</button>
+          <label><input type="checkbox" id="loop-playback" /> Loop audition</label>
+          <label>Zoom <input type="range" id="zoom" min="1" max="32" step="0.25" value="1" /></label>
+          <span id="timeline-mode">source edit timeline</span>
+          <span id="timecode">00:00.000 / 00:00.000</span>
+          <span id="meter-readout">peak -inf dBFS, rms -inf dBFS</span>
+        </div>
+        <canvas id="waveform" aria-label="Waveform timeline"></canvas>
+        <canvas id="meter" aria-label="Stereo level meter"></canvas>
+        <div class="selection-tools">
+          <span id="selection-label">Drag waveform to select a region</span>
+          <span id="loop-region-label">Loop off</span>
+          <button type="button" id="keep-selection">Keep selection</button>
+          <button type="button" id="remove-selection">Remove selection</button>
+          <button type="button" id="set-loop">Set seamless loop</button>
+          <button type="button" id="clear-loop">Reset loop region</button>
+          <button type="button" id="clear-slices">Use full source</button>
+          <button type="button" id="snap-zero">Snap edges to zero crossings</button>
+        </div>
+      </section>
+
+      <section class="rack card">
+        <nav class="tabs" aria-label="Processing sections">
+          <button type="button" class="tab active" data-tab="edit">Edit</button>
+          <button type="button" class="tab" data-tab="tone">Tone</button>
+          <button type="button" class="tab" data-tab="dynamics">Dynamics</button>
+          <button type="button" class="tab" data-tab="master">Master and game</button>
+        </nav>
+
+        <div class="tab-panel active" data-panel="edit">
+          <div class="control-grid">
+            <label>Fade in <output data-out="fadeInMs">0 ms</output>
+              <input data-path="fadeInMs" type="range" min="0" max="5000" step="5" value="0" />
+            </label>
+            <label>Fade out <output data-out="fadeOutMs">0 ms</output>
+              <input data-path="fadeOutMs" type="range" min="0" max="5000" step="5" value="0" />
+            </label>
+            <label>Event delay <output data-out="delayMs">0 ms</output>
+              <input data-path="delayMs" type="range" min="0" max="3000" step="1" value="0" />
+            </label>
+            <label>Context sync <output data-out="syncOffsetMs">0 ms</output>
+              <input data-path="syncOffsetMs" type="range" min="-3000" max="3000" step="1" value="0" />
+            </label>
+            <label>Loop seam <output data-out="loop.crossfadeMs">20 ms</output>
+              <input data-path="loop.crossfadeMs" type="range" min="0" max="500" step="1" value="20" />
+            </label>
+            <label>Slice joins <output data-out="sliceCrossfadeMs">5 ms</output>
+              <input data-path="sliceCrossfadeMs" type="range" min="0" max="50" step="0.5" value="5" />
+            </label>
+          </div>
+          <div class="switches">
+            <label><input data-path="reverse" type="checkbox" /> Reverse</label>
+            <label><input data-path="loop.enabled" type="checkbox" disabled /> Runtime loop contract</label>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="tone">
+          <div class="eq-plot"><canvas id="eq-curve" aria-label="EQ response"></canvas></div>
+          <div class="control-grid compact">
+            <label>High-pass <output data-out="eq.highpassHz">20 Hz</output>
+              <input data-path="eq.highpassHz" type="range" min="10" max="10000" step="1" value="20" />
+            </label>
+            <label>Low shelf gain <output data-out="eq.lowGainDb">0 dB</output>
+              <input data-path="eq.lowGainDb" type="range" min="-24" max="24" step="0.1" value="0" />
+            </label>
+            <label>Low shelf freq <output data-out="eq.lowFreqHz">120 Hz</output>
+              <input data-path="eq.lowFreqHz" type="range" min="20" max="1000" step="1" value="120" />
+            </label>
+            <label>Mid gain <output data-out="eq.midGainDb">0 dB</output>
+              <input data-path="eq.midGainDb" type="range" min="-24" max="24" step="0.1" value="0" />
+            </label>
+            <label>Mid freq <output data-out="eq.midFreqHz">1000 Hz</output>
+              <input data-path="eq.midFreqHz" type="range" min="100" max="12000" step="1" value="1000" />
+            </label>
+            <label>Mid Q <output data-out="eq.midQ">1.00</output>
+              <input data-path="eq.midQ" type="range" min="0.1" max="18" step="0.05" value="1" />
+            </label>
+            <label>Presence gain <output data-out="eq.mid2GainDb">0 dB</output>
+              <input data-path="eq.mid2GainDb" type="range" min="-24" max="24" step="0.1" value="0" />
+            </label>
+            <label>Presence freq <output data-out="eq.mid2FreqHz">3000 Hz</output>
+              <input data-path="eq.mid2FreqHz" type="range" min="100" max="16000" step="1" value="3000" />
+            </label>
+            <label>Presence Q <output data-out="eq.mid2Q">1.00</output>
+              <input data-path="eq.mid2Q" type="range" min="0.1" max="18" step="0.05" value="1" />
+            </label>
+            <label>Detail gain <output data-out="eq.mid3GainDb">0 dB</output>
+              <input data-path="eq.mid3GainDb" type="range" min="-24" max="24" step="0.1" value="0" />
+            </label>
+            <label>Detail freq <output data-out="eq.mid3FreqHz">6000 Hz</output>
+              <input data-path="eq.mid3FreqHz" type="range" min="200" max="20000" step="1" value="6000" />
+            </label>
+            <label>Detail Q <output data-out="eq.mid3Q">1.00</output>
+              <input data-path="eq.mid3Q" type="range" min="0.1" max="18" step="0.05" value="1" />
+            </label>
+            <label>High shelf gain <output data-out="eq.highGainDb">0 dB</output>
+              <input data-path="eq.highGainDb" type="range" min="-24" max="24" step="0.1" value="0" />
+            </label>
+            <label>High shelf freq <output data-out="eq.highFreqHz">8000 Hz</output>
+              <input data-path="eq.highFreqHz" type="range" min="1000" max="20000" step="1" value="8000" />
+            </label>
+            <label>Low-pass <output data-out="eq.lowpassHz">20000 Hz</output>
+              <input data-path="eq.lowpassHz" type="range" min="100" max="24000" step="1" value="20000" />
+            </label>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="dynamics">
+          <div class="switches">
+            <label><input data-path="compressor.enabled" type="checkbox" /> Compressor</label>
+            <label><input data-path="normalize.enabled" type="checkbox" /> Pre-conform loudness shaping</label>
+            <label><input data-path="limiter.enabled" type="checkbox" checked /> True-peak limiter</label>
+          </div>
+          <div class="control-grid compact">
+            <label>Threshold <output data-out="compressor.thresholdDb">-18 dB</output>
+              <input data-path="compressor.thresholdDb" type="range" min="-60" max="0" step="0.1" value="-18" />
+            </label>
+            <label>Ratio <output data-out="compressor.ratio">3.0:1</output>
+              <input data-path="compressor.ratio" type="range" min="1" max="20" step="0.1" value="3" />
+            </label>
+            <label>Attack <output data-out="compressor.attackMs">10 ms</output>
+              <input data-path="compressor.attackMs" type="range" min="0.1" max="500" step="0.1" value="10" />
+            </label>
+            <label>Release <output data-out="compressor.releaseMs">120 ms</output>
+              <input data-path="compressor.releaseMs" type="range" min="1" max="2000" step="1" value="120" />
+            </label>
+            <label>Makeup <output data-out="compressor.makeupDb">0 dB</output>
+              <input data-path="compressor.makeupDb" type="range" min="0" max="24" step="0.1" value="0" />
+            </label>
+            <label>Mix <output data-out="compressor.mix">100%</output>
+              <input data-path="compressor.mix" type="range" min="0" max="1" step="0.01" value="1" />
+            </label>
+            <label>Target loudness <output data-out="normalize.targetLufs">-16 LUFS</output>
+              <input data-path="normalize.targetLufs" type="range" min="-36" max="-5" step="0.1" value="-16" />
+            </label>
+            <label>True peak target <output data-out="normalize.truePeakDb">-1 dBTP</output>
+              <input data-path="normalize.truePeakDb" type="range" min="-9" max="0" step="0.1" value="-1" />
+            </label>
+            <label>Limiter ceiling <output data-out="limiter.ceilingDb">-1 dBTP</output>
+              <input data-path="limiter.ceilingDb" type="range" min="-9" max="-0.1" step="0.1" value="-1" />
+            </label>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="master">
+          <div class="control-grid compact">
+            <label>Shared category baseline <output data-playback-out="categoryBaselineDb">0 dB</output>
+              <input data-playback-path="categoryBaselineDb" type="range" min="-60" max="0" step="0.1" value="0" />
+            </label>
+            <label>Per-key fine tune <output data-playback-out="keyTrimDb">0 dB</output>
+              <input data-playback-path="keyTrimDb" type="range" min="-60" max="24" step="0.1" value="0" />
+            </label>
+            <label>Resolved game gain <output data-playback-out="resolvedGainDb">0 dB</output>
+            </label>
+            <label>Playback speed <output data-playback-out="playbackRate">1.00x</output>
+              <input data-playback-path="playbackRate" type="range" min="0.25" max="4" step="0.01" value="1" />
+            </label>
+            <label>Output channels
+              <select data-path="output.channels">
+                <option value="auto">Auto: mono spatial, otherwise preserve source</option>
+                <option value="mono">Mono</option>
+                <option value="stereo">Stereo</option>
+              </select>
+            </label>
+            <label>Production output
+              <output>MP3, 44.1 kHz, 192 kbps</output>
+            </label>
+          </div>
+          <p class="hint">Category baseline and per-key fine tune add in dB. Their resolved gain must stay at or below 0 dB. Playback speed uses Web Audio playbackRate, so speed and pitch move together. Apply playback mix writes only checked-in maps and the generated manifest. It never renders or changes audio bytes.</p>
+          <p class="hint">Publish audio bakes trim, slices, fades, loop seams, reverse, EQ, dynamics, pre-conform loudness shaping, and channel layout. The fixed production conform then targets -6 dBFS peak below one second or -14 LUFS at and above one second, and emits 44.1 kHz, 192 kbps MP3. It never bakes playback gain or speed.</p>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script type="module" src="/viewer_live.js"></script>
+  <script type="module" src="/studio_ui.js"></script>
+</body>
+</html>

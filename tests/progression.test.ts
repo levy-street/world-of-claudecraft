@@ -1,17 +1,38 @@
 // Content integration checks: referential integrity across the merged
 // content tables, and the XP pacing budget that keeps leveling 1-20 free of
-// forced grinding. These tests are content-shape tests — they run against
+// forced grinding. These tests are content-shape tests: they run against
 // whatever the content modules currently export, so they hold as zones grow.
 import { describe, expect, it } from 'vitest';
+import { CHOICE_ROW_LEVELS, CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import {
-  CAMPS, CLASSES, ABILITIES, DUNGEON_LIST, GROUND_OBJECTS, ITEMS, MOBS, NPCS,
-  QUESTS, QUEST_ORDER, REWARD_ARCHETYPE, ROADS, ZONES,
-  WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z,
+  ABILITIES,
+  ALL_RECIPES,
+  CAMPS,
+  CLASSES,
+  DUNGEON_LIST,
+  GATHER_NODES,
+  GROUND_OBJECTS,
+  ITEMS,
+  MOBS,
+  NPCS,
+  QUEST_ORDER,
+  QUESTS,
+  REWARD_ARCHETYPE,
+  ROADS,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_X,
+  WORLD_MIN_Z,
+  ZONES,
 } from '../src/sim/data';
-import { ALL_CLASSES, XP_TABLE, MAX_LEVEL, ZoneDef } from '../src/sim/types';
+import { canEquipItem } from '../src/sim/equipment_rules';
+import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import { Sim } from '../src/sim/sim';
+import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
 const WORLD_SEED = 20061; // production seed (main.ts / server/game.ts)
+const SCRIPTED_COLLECT_ITEMS = new Set(['the_codfather']);
 
 describe('content referential integrity', () => {
   it('every quest reference resolves (NPCs, mobs, items, chains)', () => {
@@ -19,7 +40,8 @@ describe('content referential integrity', () => {
     for (const q of Object.values(QUESTS)) {
       if (!NPCS[q.giverNpcId]) problems.push(`${q.id}: giver ${q.giverNpcId} missing`);
       if (!NPCS[q.turnInNpcId]) problems.push(`${q.id}: turn-in ${q.turnInNpcId} missing`);
-      if (q.requiresQuest && !QUESTS[q.requiresQuest]) problems.push(`${q.id}: requires ${q.requiresQuest} missing`);
+      if (q.requiresQuest && !QUESTS[q.requiresQuest])
+        problems.push(`${q.id}: requires ${q.requiresQuest} missing`);
       for (const [cls, itemId] of Object.entries(q.itemRewards)) {
         if (itemId && !ITEMS[itemId]) problems.push(`${q.id}: reward ${itemId} (${cls}) missing`);
       }
@@ -30,6 +52,25 @@ describe('content referential integrity', () => {
         if (obj.type === 'collect' && (!obj.itemId || !ITEMS[obj.itemId])) {
           problems.push(`${q.id}: collect item ${obj.itemId} missing`);
         }
+        if (obj.type === 'craft' && !ALL_RECIPES.some((recipe) => recipe.id === obj.recipeId)) {
+          problems.push(`${q.id}: craft recipe ${obj.recipeId} missing`);
+        }
+        if (obj.type === 'gather') {
+          if (!obj.nodeType && !obj.itemId) problems.push(`${q.id}: gather target missing`);
+          if (obj.nodeType && !GATHER_NODES.some((node) => node.type === obj.nodeType)) {
+            problems.push(`${q.id}: gather node type ${obj.nodeType} missing`);
+          }
+          if (obj.itemId) {
+            if (!ITEMS[obj.itemId]) problems.push(`${q.id}: gather item ${obj.itemId} missing`);
+            if (
+              !Object.values(NODE_MATERIAL_TABLE).some((byZone) =>
+                Object.values(byZone).some((row) => row.itemId === obj.itemId),
+              )
+            ) {
+              problems.push(`${q.id}: gather item ${obj.itemId} has no node source`);
+            }
+          }
+        }
       }
     }
     expect(problems).toEqual([]);
@@ -38,7 +79,8 @@ describe('content referential integrity', () => {
   it('every quest is offered by its giver and turn-in NPCs', () => {
     const problems: string[] = [];
     for (const q of Object.values(QUESTS)) {
-      if (!NPCS[q.giverNpcId]?.questIds.includes(q.id)) problems.push(`${q.id}: not in ${q.giverNpcId}.questIds`);
+      if (!NPCS[q.giverNpcId]?.questIds.includes(q.id))
+        problems.push(`${q.id}: not in ${q.giverNpcId}.questIds`);
       if (q.turnInNpcId !== q.giverNpcId && !NPCS[q.turnInNpcId]?.questIds.includes(q.id)) {
         problems.push(`${q.id}: not in turn-in ${q.turnInNpcId}.questIds`);
       }
@@ -46,14 +88,18 @@ describe('content referential integrity', () => {
     expect(problems).toEqual([]);
   });
 
-  it('every collect objective is obtainable from loot or ground objects', () => {
+  it('every collect objective is obtainable', () => {
     const problems: string[] = [];
     for (const q of Object.values(QUESTS)) {
       for (const obj of q.objectives) {
         if (obj.type !== 'collect' || !obj.itemId) continue;
-        const fromLoot = Object.values(MOBS).some((m) => m.loot.some((l) => l.itemId === obj.itemId));
+        const fromLoot = Object.values(MOBS).some((m) =>
+          m.loot.some((l) => l.itemId === obj.itemId),
+        );
         const fromGround = GROUND_OBJECTS.some((g) => g.itemId === obj.itemId);
-        if (!fromLoot && !fromGround) problems.push(`${q.id}: ${obj.itemId} drops nowhere`);
+        const fromScript = SCRIPTED_COLLECT_ITEMS.has(obj.itemId);
+        if (!fromLoot && !fromGround && !fromScript)
+          problems.push(`${q.id}: ${obj.itemId} has no acquisition source`);
       }
     }
     expect(problems).toEqual([]);
@@ -69,20 +115,23 @@ describe('content referential integrity', () => {
     for (const m of Object.values(MOBS)) {
       for (const l of m.loot) {
         if (l.itemId && !ITEMS[l.itemId]) problems.push(`${m.id}: loot ${l.itemId} missing`);
-        if (l.questId && !QUESTS[l.questId]) problems.push(`${m.id}: loot quest-gate ${l.questId} missing`);
+        if (l.questId && !QUESTS[l.questId])
+          problems.push(`${m.id}: loot quest-gate ${l.questId} missing`);
       }
     }
     for (const npc of Object.values(NPCS)) {
       for (const itemId of npc.vendorItems ?? []) {
         if (!ITEMS[itemId]) problems.push(`${npc.id}: vendor item ${itemId} missing`);
-        else if (!ITEMS[itemId].buyValue) problems.push(`${npc.id}: vendor item ${itemId} has no buyValue`);
+        else if (!ITEMS[itemId].buyValue && !ITEMS[itemId].priceHonor)
+          problems.push(`${npc.id}: vendor item ${itemId} has no purchase price`);
       }
       for (const qid of npc.questIds) {
         if (!QUESTS[qid]) problems.push(`${npc.id}: questId ${qid} missing`);
       }
     }
     for (const c of CAMPS) {
-      if (!MOBS[c.mobId]) problems.push(`camp at (${c.center.x},${c.center.z}): mob ${c.mobId} missing`);
+      if (!MOBS[c.mobId])
+        problems.push(`camp at (${c.center.x},${c.center.z}): mob ${c.mobId} missing`);
     }
     for (const g of GROUND_OBJECTS) {
       if (!ITEMS[g.itemId]) problems.push(`ground object ${g.itemId} missing from ITEMS`);
@@ -107,14 +156,16 @@ describe('content referential integrity', () => {
       expect(zone.hub.z).toBeLessThan(zone.zMax);
     }
     for (const npc of Object.values(NPCS)) {
-      if (!inWorld(npc.pos.x, npc.pos.z)) problems.push(`${npc.id} outside world at (${npc.pos.x},${npc.pos.z})`);
+      if (!inWorld(npc.pos.x, npc.pos.z))
+        problems.push(`${npc.id} outside world at (${npc.pos.x},${npc.pos.z})`);
     }
     for (const c of CAMPS) {
       if (!inWorld(c.center.x, c.center.z)) problems.push(`camp ${c.mobId} outside world`);
     }
     for (const g of GROUND_OBJECTS) {
       for (const p of g.positions) {
-        if (!inWorld(p.x, p.z)) problems.push(`${g.itemId} sparkle outside world at (${p.x},${p.z})`);
+        if (!inWorld(p.x, p.z))
+          problems.push(`${g.itemId} sparkle outside world at (${p.x},${p.z})`);
       }
     }
     for (const d of DUNGEON_LIST) {
@@ -133,7 +184,7 @@ describe('content referential integrity', () => {
         if (!itemId) continue;
         const item = ITEMS[itemId];
         if (!item) continue; // missing items are caught by the integrity test
-        if (item.requiredClass && !item.requiredClass.includes(cls)) {
+        if (!canEquipItem(cls, item)) {
           problems.push(`${q.id}: ${cls} receives ${itemId} but cannot equip it`);
         }
       }
@@ -145,7 +196,8 @@ describe('content referential integrity', () => {
     const problems: string[] = [];
     for (const road of ROADS) {
       for (let i = 0; i + 1 < road.length; i++) {
-        const a = road[i], b = road[i + 1];
+        const a = road[i],
+          b = road[i + 1];
         const steps = Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.z - a.z) / 4));
         for (let s = 0; s <= steps; s++) {
           const t = s / steps;
@@ -153,7 +205,9 @@ describe('content referential integrity', () => {
           const z = a.z + (b.z - a.z) * t;
           const h = terrainHeight(x, z, WORLD_SEED);
           if (h < WATER_LEVEL - 0.5) {
-            problems.push(`road point (${x.toFixed(1)},${z.toFixed(1)}) underwater (h=${h.toFixed(2)})`);
+            problems.push(
+              `road point (${x.toFixed(1)},${z.toFixed(1)}) underwater (h=${h.toFixed(2)})`,
+            );
           }
         }
       }
@@ -178,13 +232,37 @@ describe('content referential integrity', () => {
   });
 });
 
+describe('talent row unlock progression', () => {
+  const unlockedRowsAt = (level: number): number =>
+    CHOICE_ROW_LEVELS.filter((rowLevel) => rowLevel <= level).length;
+
+  it('unlocks rows on the choice-row level schedule', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    for (const level of [1, 4, 5, 7, 8, 11, 14, 17, 20]) {
+      sim.setPlayerLevel(level);
+      expect(sim.talentPoints().total, `level ${level}`).toBe(unlockedRowsAt(level));
+    }
+  });
+
+  it('counts spent talents as picked rows, not old rank totals', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    sim.setPlayerLevel(20);
+    const r5 = CHOICE_ROWS.warrior.rows[0].options[0].id;
+    const r11 = CHOICE_ROWS.warrior.rows[2].options[1].id;
+    expect(sim.applyTalents({ spec: null, rows: { 5: r5, 11: r11 } })).toBe(true);
+    expect(sim.talentPoints()).toEqual({ total: CHOICE_ROW_LEVELS.length, spent: 2 });
+  });
+});
+
 describe('xp pacing budget (no forced grinding)', () => {
   // Mirrors the design-spec method: quest XP + estimated kill XP must cover
   // each zone's level band with headroom. Kill estimate: quest-required kills
   // (collect counts divided by drop chance) times a 1.6 travel/overshoot
   // factor, at 45+5*mobLevel each (elites x2).
   function questsForZone(zone: ZoneDef): { xp: number; killXp: number; count: number } {
-    let xp = 0, killXp = 0, count = 0;
+    let xp = 0,
+      killXp = 0,
+      count = 0;
     for (const q of Object.values(QUESTS)) {
       const giver = NPCS[q.giverNpcId];
       if (!giver || giver.pos.z < zone.zMin || giver.pos.z >= zone.zMax) continue;
@@ -199,7 +277,11 @@ describe('xp pacing budget (no forced grinding)', () => {
         } else if (obj.type === 'collect' && obj.itemId) {
           for (const m of Object.values(MOBS)) {
             const entry = m.loot.find((l) => l.itemId === obj.itemId);
-            if (entry) { mobId = m.id; kills = obj.count / Math.max(0.05, entry.chance); break; }
+            if (entry) {
+              mobId = m.id;
+              kills = obj.count / Math.max(0.05, entry.chance);
+              break;
+            }
           }
         }
         if (!mobId) continue;
@@ -228,8 +310,10 @@ describe('xp pacing budget (no forced grinding)', () => {
       const needed = xpNeeded(lo, hi);
       const available = budget.xp + budget.killXp;
       const headroom = available / needed;
-      expect(headroom, `${zone.id}: quests ${budget.count}, questXp ${budget.xp}, killXp ${Math.round(budget.killXp)}, needed ${needed}`)
-        .toBeGreaterThanOrEqual(1.0);
+      expect(
+        headroom,
+        `${zone.id}: quests ${budget.count}, questXp ${budget.xp}, killXp ${Math.round(budget.killXp)}, needed ${needed}`,
+      ).toBeGreaterThanOrEqual(1.0);
     });
   }
 

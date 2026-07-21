@@ -1,0 +1,14 @@
+{
+  "body": "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Unknown application</title><style>\n  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;\n    background:radial-gradient(circle at 50% 18%,#241910,#0a0805 70%);color:#ece2c4;\n    font-family:system-ui,sans-serif;padding:24px}\n  main{max-width:440px;width:100%;text-align:center;display:flex;flex-direction:column;gap:16px}\n  h1{color:#ffd100;font-size:24px;margin:0}\n  p{color:#c9bb92;margin:0;line-height:1.5}\n  .row{display:flex;gap:10px;justify-content:center}\n  button,a.btn{font:inherit;font-weight:700;padding:12px 22px;border-radius:8px;border:0;cursor:pointer;text-decoration:none}\n  .primary{color:#2a1d05;background:linear-gradient(#ffe27a,#e0a52a)}\n  .ghost{color:#ece2c4;background:#2a2114;border:1px solid #4a3a18}\n  input{font:inherit;font-size:16px;padding:12px;border-radius:8px;border:1px solid #4a3a18;background:#1b150c;color:#ece2c4;text-align:center;letter-spacing:2px}\n  .msg{min-height:20px;color:#ffb4a0}\n</style></head>\n<body><main><h1>Unknown application</h1><p>This client_id is not registered.</p></main></body></html>",
+  "headers": {
+    "cache-control": "no-store",
+    "content-type": "text/html; charset=utf-8",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-resource-policy": "same-origin",
+    "permissions-policy": "accelerometer=(), ambient-light-sensor=(), battery=(), bluetooth=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), hid=(), idle-detection=(), local-fonts=(), magnetometer=(), microphone=(), midi=(), payment=(), serial=(), usb=(), xr-spatial-tracking=()",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY"
+  },
+  "status": 400
+}

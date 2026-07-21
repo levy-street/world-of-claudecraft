@@ -1,0 +1,1340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#08080d" />
+  <title>World of ClaudeCraft - Merch</title>
+  <meta name="description" data-i18n-content="metaDescription" content="Official World of ClaudeCraft merchandise is being forged. The store is not live yet. When it opens, it will be announced only through our official channels. Anyone selling merch elsewhere is an impersonator." />
+
+  <link rel="canonical" href="https://worldofclaudecraft.com/merch" />
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="World of ClaudeCraft" />
+  <meta property="og:title" data-i18n-content="pageTitle" content="World of ClaudeCraft - Merch" />
+  <meta property="og:description" data-i18n-content="metaDescription" content="Official World of ClaudeCraft merchandise is coming soon. If a store is not announced on our official channels, it is not us." />
+  <meta property="og:url" content="https://worldofclaudecraft.com/merch" />
+  <meta property="og:image" content="https://worldofclaudecraft.com/woc_logo_square.webp" />
+  <meta property="og:image:alt" content="World of ClaudeCraft" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" data-i18n-content="pageTitle" content="World of ClaudeCraft - Merch" />
+  <meta name="twitter:description" data-i18n-content="metaDescription" content="Official World of ClaudeCraft merchandise is coming soon. If a store is not announced on our official channels, it is not us." />
+  <meta name="twitter:image" content="https://worldofclaudecraft.com/woc_logo_square.webp" />
+  <meta name="twitter:image:alt" content="World of ClaudeCraft" />
+
+  <!-- Structured data: declares the upcoming merch page and ties it to the brand,
+       so search + answer engines associate official merch with this realm only. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "World of ClaudeCraft - Merch",
+    "url": "https://worldofclaudecraft.com/merch",
+    "description": "Official World of ClaudeCraft merchandise is coming soon. If a store is not announced on our official channels, it is not us.",
+    "inLanguage": "en",
+    "isPartOf": { "@type": "WebSite", "name": "World of ClaudeCraft", "url": "https://worldofclaudecraft.com/" },
+    "about": {
+      "@type": "Organization",
+      "name": "World of ClaudeCraft",
+      "url": "https://worldofclaudecraft.com/",
+      "logo": "https://worldofclaudecraft.com/woc_logo_square.webp",
+      "sameAs": [
+        "https://x.com/WoClaudecraft",
+        "https://www.instagram.com/worldofclaudecraft/",
+        "https://www.tiktok.com/@worldofclaudecraft",
+        "https://www.youtube.com/@WoClaudeCraft",
+        "https://www.reddit.com/r/WorldofClaudecraft/",
+        "https://github.com/levy-street/world-of-claudecraft"
+      ]
+    }
+  }
+  </script>
+
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Alegreya:ital,wght@0,400;0,500;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* Every colour and reusable constant is a token here; nothing below :root
+       hard-codes a colour. RGB triplets (--c-*) exist so the same hue can be
+       composited at any alpha via rgba(var(--c-*), a) without repeating literals.
+       This page shares the design system of links.html so the realm's standalone
+       pages feel like one set. */
+    :root {
+      color-scheme: dark;
+
+      /* colour channels (R, G, B) for alpha compositing */
+      --c-black: 0, 0, 0;
+      --c-white: 255, 255, 255;
+      --c-gold: 255, 209, 0;        /* primary accent */
+      --c-parch: 215, 181, 109;     /* parchment gold */
+      --c-deep: 5, 7, 12;           /* splash edge darken */
+      --c-ink-dark: 26, 20, 7;      /* ink on gold */
+      --c-hero-shade: 120, 86, 12;  /* hero lip shadow */
+      --c-hero-low: 202, 161, 47;   /* hero gradient base */
+
+      /* brand gold ramp */
+      --gold: rgb(var(--c-gold));
+      --gold-dim: #c8a838;
+      --gold-soft: #f3dfaa;
+      --gold-parch: rgb(var(--c-parch));
+      --gold-hi: #fff3cf;
+
+      /* ink / text */
+      --ink: #f0ebd8;
+      --muted: #998d6a;
+      --muted-safe: #c4b899;
+      --ink-on-gold: rgb(var(--c-ink-dark));
+
+      /* lines / borders / focus */
+      --border: #6f5a2a;
+      --border-default: #4e3d1d;
+      --focus: var(--gold-soft);
+      --line: rgba(var(--c-parch), 0.38);
+      --line-soft: rgba(var(--c-parch), 0.14);
+
+      /* verified wax seal */
+      --wax: #7c1f1a;
+      --wax-rim: #a83a2c;
+
+      /* surfaces */
+      --bg-0: #08080d;
+      --bg-1: #050509;
+      --bg-photo: #080b12;
+      --surface-top: rgba(20, 20, 30, 0.94);
+      --surface-bottom: rgba(6, 6, 11, 0.96);
+      --row-top: #1b1b26;
+      --row-bottom: #101019;
+      --row-top-hover: #23232f;
+      --row-bottom-hover: #14141d;
+
+      /* hero gilded plate */
+      --hero-top: #ffe87a;
+      --hero-mid: rgb(var(--c-gold));
+      --hero-bottom: rgb(var(--c-hero-low));
+      --hero-border: #e9c54a;
+      --hero-lip: #6f5212;
+
+      /* radii / spacing / motion */
+      --r-sm: 4px;
+      --r-md: 8px;
+      --r-pill: 999px;
+      --sp-1: 4px;
+      --sp-2: 8px;
+      --sp-3: 16px;
+      --sp-4: 24px;
+      --gap-row: 10px;
+      --pad-page: clamp(16px, 4vw, 40px);
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --dur: 0.25s;
+
+      /* type */
+      --font-display: 'Cinzel', 'Palatino Linotype', Palatino, Georgia, serif;
+      --font-ui: 'Alegreya Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --font-serif: 'Alegreya', 'Palatino Linotype', Palatino, Georgia, serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      /* Explicit track so the column tracks the viewport, not the content's
+         max-content width; without this the centered console can spill at <360px. */
+      grid-template-columns: minmax(0, 1fr);
+      place-items: center;
+      overflow-x: hidden;
+      color: var(--ink);
+      font-family: var(--font-ui);
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      padding:
+        max(var(--pad-page), env(safe-area-inset-top))
+        max(var(--pad-page), env(safe-area-inset-right))
+        max(var(--pad-page), env(safe-area-inset-bottom))
+        max(var(--pad-page), env(safe-area-inset-left));
+      background:
+        linear-gradient(90deg, rgba(var(--c-deep), 0.86), rgba(var(--c-deep), 0.40) 52%, rgba(var(--c-deep), 0.88)),
+        radial-gradient(circle at 50% 30%, rgba(var(--c-gold), 0.14), transparent 42%),
+        var(--bg-photo) url("/loading-screen.jpg") center / cover no-repeat;
+    }
+
+    /* Parallax only where a fine pointer exists; avoids iOS background jank. */
+    @media (hover: hover) and (pointer: fine) {
+      body { background-attachment: fixed; }
+    }
+
+    /* CRT scanline + bottom vignette (decorative, out of the a11y tree). */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(var(--c-white), 0.022) 50%, rgba(var(--c-black), 0.03) 50%),
+        radial-gradient(circle at 50% 92%, rgba(var(--c-black), 0.55), transparent 46%);
+      background-size: 100% 4px, auto;
+    }
+
+    /* Faint torch glow that breathes (disabled under reduced motion). */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 16%, rgba(var(--c-gold), 0.10), transparent 38%);
+      animation: torch 7s ease-in-out infinite;
+    }
+    @keyframes torch { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
+
+    /* ---------- skip link + screen-reader helper ---------- */
+    .skip {
+      position: absolute;
+      left: 10px;
+      top: -64px;
+      z-index: 20;
+      padding: 10px 16px;
+      border-radius: var(--r-pill);
+      background: var(--gold);
+      color: var(--ink-on-gold);
+      font: 700 13px/1 var(--font-ui);
+      text-decoration: none;
+      transition: top var(--dur) var(--ease);
+    }
+    .skip:focus { top: 10px; outline: 2px solid var(--gold-soft); outline-offset: 2px; }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ---------- the console panel ---------- */
+    .console {
+      position: relative;
+      z-index: 1;
+      width: min(560px, 100%);
+      margin: 0 auto;
+      padding: clamp(24px, 5vw, 40px) clamp(20px, 4vw, 36px);
+      border: 1px solid var(--line);
+      border-radius: var(--r-md);
+      /* High-alpha tint keeps text on a controlled dark base for WCAG AA, while a
+         hint of the splash still bleeds through the blur for the glass feel. */
+      background: linear-gradient(170deg, var(--surface-top), var(--surface-bottom));
+      backdrop-filter: blur(14px) saturate(1.05);
+      -webkit-backdrop-filter: blur(14px) saturate(1.05);
+      box-shadow:
+        0 26px 90px rgba(var(--c-black), 0.55),
+        0 0 0 1px rgba(var(--c-black), 0.6),
+        inset 0 1px 0 rgba(var(--c-white), 0.07),
+        inset 0 0 60px rgba(var(--c-black), 0.35);
+    }
+    /* Carved double-bezel inlay. */
+    .console::before {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      pointer-events: none;
+      border: 1px solid rgba(var(--c-gold), 0.16);
+      border-radius: 6px;
+    }
+
+    /* ---------- crest / header ---------- */
+    .crest { text-align: center; }
+    .logo {
+      display: block;
+      width: min(360px, 82%);
+      height: auto;
+      margin: 0 auto clamp(14px, 3vw, 22px);
+      filter: drop-shadow(0 10px 28px rgba(var(--c-black), 0.66));
+    }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 0 0 8px;
+      color: var(--gold-parch);
+      font: 700 12px/1 var(--font-ui);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before, .eyebrow::after {
+      content: "";
+      width: 28px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-dim));
+    }
+    .eyebrow::after { background: linear-gradient(90deg, var(--gold-dim), transparent); }
+
+    h1.title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(30px, 6.5vw, 46px);
+      line-height: 1.02;
+      letter-spacing: 0.01em;
+      color: var(--gold-soft); /* solid fallback before the gilded clip */
+      text-shadow: 0 2px 0 rgba(var(--c-black), 0.6), 0 0 26px rgba(var(--c-gold), 0.18);
+      background: linear-gradient(180deg, var(--gold-hi), var(--gold-soft) 42%, var(--gold-dim) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* "Coming soon" badge under the title. */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 14px auto 0;
+      padding: 6px 14px;
+      border: 1px solid rgba(var(--c-gold), 0.36);
+      border-radius: var(--r-pill);
+      background: linear-gradient(180deg, rgba(var(--c-gold), 0.10), rgba(var(--c-gold), 0.03));
+      color: var(--gold-soft);
+      font: 700 11.5px/1 var(--font-ui);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .badge__dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 8px rgba(var(--c-gold), 0.7);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 0.5; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.1); } }
+
+    .tagline {
+      margin: 14px auto 0;
+      max-width: 42ch;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: clamp(14.5px, 3.4vw, 16px);
+      line-height: 1.55;
+      color: var(--ink);
+    }
+
+    .rule {
+      position: relative;
+      width: 70%;
+      height: 1px;
+      margin: clamp(16px, 3vw, 22px) auto;
+      background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    }
+    .rule::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      background: var(--gold);
+      transform: translate(-50%, -50%) rotate(45deg);
+      box-shadow: 0 0 8px rgba(var(--c-gold), 0.6);
+    }
+
+    /* ---------- the ward (anti-scam decree) ---------- */
+    .ward {
+      display: flex;
+      gap: var(--sp-3);
+      align-items: flex-start;
+      margin: clamp(18px, 3.5vw, 26px) 0;
+      padding: 16px 18px;
+      border: 1px solid rgba(var(--c-gold), 0.30);
+      border-left: 3px solid var(--gold);
+      border-radius: var(--r-sm);
+      background: linear-gradient(180deg, rgba(var(--c-gold), 0.07), rgba(var(--c-gold), 0.02));
+      box-shadow: inset 0 1px 0 rgba(var(--c-white), 0.05);
+    }
+    .ward__sigil {
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      color: var(--gold);
+      filter: drop-shadow(0 0 10px rgba(var(--c-gold), 0.35));
+    }
+    .ward__title {
+      margin: 0 0 5px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      color: var(--gold-soft);
+    }
+    .ward__body {
+      margin: 0;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 14.5px;
+      line-height: 1.55;
+      color: var(--ink);
+    }
+    .ward__body strong { color: var(--gold); font-weight: 700; font-style: normal; }
+    @media (max-width: 480px) {
+      .ward { flex-direction: column; align-items: center; text-align: center; }
+    }
+
+    /* ---------- the preview (what is being forged) ---------- */
+    .preview { margin-top: clamp(16px, 3vw, 22px); }
+    .preview__head {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 0 0 12px;
+      color: var(--gold-parch);
+      font: 700 12px/1 var(--font-ui);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .preview__head::before, .preview__head::after {
+      content: "";
+      width: 22px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-dim));
+    }
+    .preview__head::after { background: linear-gradient(90deg, var(--gold-dim), transparent); }
+
+    .items {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap-row);
+    }
+
+    /* A static, non-interactive row: same plate look as a link button but no
+       hover lift, focus ring, or pointer affordance (there is nothing to buy yet). */
+    .item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      min-height: 56px;
+      padding: 12px 16px;
+      border: 1px solid var(--border-default);
+      border-radius: var(--r-sm);
+      background: linear-gradient(180deg, var(--row-top), var(--row-bottom));
+      box-shadow:
+        inset 0 1px 0 rgba(var(--c-white), 0.05),
+        inset 0 -2px 0 rgba(var(--c-black), 0.45);
+    }
+    .item__icon {
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--border-default);
+      background: radial-gradient(120% 120% at 50% 35%, rgba(var(--c-gold), 0.10), rgba(var(--c-black), 0.25));
+      box-shadow: inset 0 1px 0 rgba(var(--c-white), 0.05);
+      color: var(--gold-parch);
+    }
+    .item__icon .ic { width: 22px; height: 22px; display: block; }
+    .item__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 auto; overflow: hidden; }
+    .item__label {
+      font: 700 16px/1.15 var(--font-ui);
+      letter-spacing: 0.02em;
+      color: var(--gold-soft);
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .item__desc {
+      font-family: var(--font-serif);
+      font-size: 13px;
+      line-height: 1.2;
+      color: var(--muted-safe);
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .item__tag {
+      flex: 0 0 auto;
+      padding: 3px 9px;
+      border: 1px solid rgba(var(--c-gold), 0.30);
+      border-radius: var(--r-pill);
+      font: 700 10px/1 var(--font-ui);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold-parch);
+      background: rgba(var(--c-gold), 0.06);
+    }
+
+    /* ---------- the menu (real CTAs) ---------- */
+    .menu { margin-top: clamp(18px, 3.5vw, 26px); }
+    .menu:focus { outline: none; }
+    .rows {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap-row);
+    }
+
+    .btn {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      min-height: 56px;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--ink);
+      text-decoration: none;
+      background: linear-gradient(180deg, var(--row-top), var(--row-bottom));
+      box-shadow:
+        inset 0 1px 0 rgba(var(--c-white), 0.06),
+        inset 0 -2px 0 rgba(var(--c-black), 0.5),
+        0 2px 0 rgba(var(--c-black), 0.6);
+      transition:
+        transform var(--dur) var(--ease),
+        border-color var(--dur) var(--ease),
+        box-shadow var(--dur) var(--ease),
+        background var(--dur) var(--ease);
+    }
+
+    .btn__icon {
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--border-default);
+      background: radial-gradient(120% 120% at 50% 35%, rgba(var(--c-gold), 0.10), rgba(var(--c-black), 0.25));
+      box-shadow: inset 0 1px 0 rgba(var(--c-white), 0.05);
+      color: var(--gold-parch);
+      transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+    }
+    .btn__icon .ic { width: 22px; height: 22px; display: block; }
+
+    .btn__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 auto; overflow: hidden; }
+    .btn__label {
+      font: 700 16px/1.15 var(--font-ui);
+      letter-spacing: 0.02em;
+      color: var(--gold-soft);
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .btn__handle {
+      font-family: var(--font-serif);
+      font-size: 13px;
+      line-height: 1.2;
+      color: var(--muted-safe);
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .btn__chev {
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      width: 16px;
+      height: 16px;
+      color: var(--gold-dim);
+      opacity: 0.55;
+      transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+    }
+    .btn__chev svg { width: 14px; height: 14px; display: block; }
+
+    @media (hover: hover) {
+      .btn:hover {
+        border-color: var(--gold-dim);
+        background: linear-gradient(180deg, var(--row-top-hover), var(--row-bottom-hover));
+        transform: translateY(-1px);
+        box-shadow:
+          0 0 0 1px rgba(var(--c-gold), 0.18),
+          inset 0 1px 0 rgba(var(--c-white), 0.07),
+          0 6px 18px rgba(var(--c-black), 0.5),
+          0 0 22px rgba(var(--c-gold), 0.10);
+      }
+      .btn:hover .btn__icon { color: var(--gold); border-color: var(--gold-dim); }
+      .btn:hover .btn__chev { opacity: 1; transform: translateX(3px); }
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 3px;
+      border-color: var(--gold-dim);
+    }
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: inset 0 2px 6px rgba(var(--c-black), 0.6), inset 0 1px 0 rgba(var(--c-white), 0.04);
+    }
+
+    /* ---------- the hero plate (Follow for the drop) ---------- */
+    .btn--hero {
+      min-height: 66px;
+      margin-bottom: clamp(14px, 3vw, 20px);
+      border-radius: var(--r-md);
+      overflow: hidden;
+      border: 1px solid var(--hero-border);
+      color: var(--ink-on-gold);
+      background: linear-gradient(180deg, var(--hero-top) 0%, var(--hero-mid) 42%, var(--hero-bottom) 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(var(--c-white), 0.55),
+        inset 0 -3px 0 rgba(var(--c-hero-shade), 0.55),
+        0 6px 0 var(--hero-lip),
+        0 10px 28px rgba(var(--c-black), 0.5),
+        0 0 30px rgba(var(--c-gold), 0.24);
+      animation: breathe 3.2s ease-in-out infinite;
+    }
+    .btn--hero .btn__icon {
+      width: 44px;
+      height: 44px;
+      border-color: rgba(var(--c-hero-shade), 0.5);
+      background: radial-gradient(120% 120% at 50% 35%, rgba(var(--c-white), 0.45), rgba(var(--c-hero-low), 0.25));
+      color: var(--ink-on-gold);
+      box-shadow: inset 0 1px 0 rgba(var(--c-white), 0.5);
+    }
+    .btn--hero .btn__icon .ic { width: 28px; height: 28px; }
+    .btn--hero .btn__label {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(17px, 4.2vw, 22px);
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+      color: var(--ink-on-gold);
+      text-shadow: 0 1px 0 rgba(var(--c-white), 0.35);
+      /* The hero label wraps instead of truncating on very narrow phones
+         (overrides the nowrap/ellipsis shared with the secondary rows). */
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+    }
+    .btn--hero .btn__handle { color: rgba(var(--c-ink-dark), 0.82); font-style: normal; }
+    .btn--hero .btn__chev { color: var(--ink-on-gold); opacity: 0.6; }
+
+    /* Sheen sweep across the gilded plate. */
+    .btn--hero::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 40%;
+      transform: skewX(-18deg) translateX(-160%);
+      background: linear-gradient(90deg, transparent, rgba(var(--c-white), 0.5), transparent);
+      animation: sheen 4.5s var(--ease) infinite;
+      pointer-events: none;
+    }
+    @keyframes sheen {
+      0% { transform: skewX(-18deg) translateX(-160%); }
+      55%, 100% { transform: skewX(-18deg) translateX(360%); }
+    }
+    @keyframes breathe {
+      0%, 100% {
+        box-shadow:
+          inset 0 1px 0 rgba(var(--c-white), 0.55),
+          inset 0 -3px 0 rgba(var(--c-hero-shade), 0.55),
+          0 6px 0 var(--hero-lip),
+          0 10px 28px rgba(var(--c-black), 0.5),
+          0 0 26px rgba(var(--c-gold), 0.22);
+      }
+      50% {
+        box-shadow:
+          inset 0 1px 0 rgba(var(--c-white), 0.55),
+          inset 0 -3px 0 rgba(var(--c-hero-shade), 0.55),
+          0 6px 0 var(--hero-lip),
+          0 10px 28px rgba(var(--c-black), 0.5),
+          0 0 40px rgba(var(--c-gold), 0.40);
+      }
+    }
+    @media (hover: hover) {
+      .btn--hero:hover { filter: brightness(1.04); transform: translateY(-2px); }
+    }
+    .btn--hero:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 3px; }
+    .btn--hero:active {
+      transform: translateY(4px);
+      box-shadow:
+        inset 0 1px 0 rgba(var(--c-white), 0.55),
+        inset 0 -2px 0 rgba(var(--c-hero-shade), 0.55),
+        0 2px 0 var(--hero-lip),
+        0 4px 14px rgba(var(--c-black), 0.5),
+        0 0 30px rgba(var(--c-gold), 0.3);
+    }
+
+    /* ---------- footer ---------- */
+    .foot {
+      margin-top: clamp(18px, 3.5vw, 24px);
+      padding-top: var(--sp-3);
+      border-top: 1px solid var(--line-soft);
+      text-align: center;
+    }
+    .foot__note {
+      margin: 0 0 6px;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 13px;
+      color: var(--muted-safe);
+    }
+    .foot__copy {
+      margin: 0;
+      font-family: var(--font-ui);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      color: var(--muted-safe);
+      opacity: 0.85;
+    }
+
+    /* ---------- small screens ---------- */
+    @media (max-width: 560px) {
+      .console { padding: 22px 16px; }
+      .logo { width: 86%; }
+      body { background-position: center; }
+    }
+
+    /* ---------- user preferences ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    @media (prefers-contrast: more) {
+      body { background: var(--bg-1); }
+      body::before, body::after { display: none; }
+      .console {
+        background: var(--bg-1);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        border-color: var(--gold-soft);
+      }
+      h1.title {
+        background: none;
+        -webkit-text-fill-color: var(--gold-soft);
+        color: var(--gold-soft);
+      }
+      .ward { background: rgba(var(--c-black), 0.5); border-color: var(--gold-soft); }
+      .item, .btn { border-color: var(--gold-dim); }
+    }
+
+    @media (forced-colors: active) {
+      .console::before, body::before, body::after { display: none; }
+      h1.title {
+        background: none;
+        -webkit-text-fill-color: CanvasText;
+        color: CanvasText;
+      }
+      .item, .btn { border-color: CanvasText; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#menu" data-i18n="skip">Skip to updates</a>
+
+  <main class="console" aria-labelledby="title">
+    <header class="crest">
+      <img class="logo" src="/worldofclaudecraft-logo.png" alt="World of ClaudeCraft" data-i18n-alt="logoAlt" />
+      <p class="eyebrow" data-i18n="eyebrow">Merchandise</p>
+      <h1 id="title" data-i18n="heading">The Armory Opens Soon</h1>
+      <p class="badge"><span class="badge__dot" aria-hidden="true"></span><span data-i18n="badge">Coming soon</span></p>
+      <p class="tagline" data-i18n="tagline">Official World of ClaudeCraft gear is being forged. The store is not open yet, but it will be soon.</p>
+      <div class="rule" aria-hidden="true"></div>
+    </header>
+
+    <section class="ward" role="note" aria-labelledby="ward-title">
+      <svg class="ward__sigil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M12 2.5 19 5v6c0 4.6-3.1 7.9-7 9.8C8.1 18.9 5 15.6 5 11V5l7-2.5Z" />
+        <path d="m8.7 11.7 2.4 2.4 4.3-4.8" />
+      </svg>
+      <div>
+        <h2 id="ward-title" class="ward__title" data-i18n="wardTitle">Buy only through our official channels.</h2>
+        <p class="ward__body" data-i18n-html="wardBody">When the store opens, it will be announced only on the channels listed on our official links page. Anyone selling World of ClaudeCraft merch anywhere else, or sending you a store link, is an <strong>impersonator</strong>. Report them to the mods.</p>
+      </div>
+    </section>
+
+    <section class="preview" aria-labelledby="preview-title">
+      <h2 id="preview-title" class="preview__head" data-i18n="previewTitle">In the forge</h2>
+      <ul class="items">
+        <li class="item">
+          <span class="item__icon" aria-hidden="true">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M8 3 4 6l2 3 2-1v10h8V8l2 1 2-3-4-3-2 2H10L8 3Z"/></svg>
+          </span>
+          <span class="item__text">
+            <span class="item__label" data-i18n="itemTabardLabel">Guild Tabard Tee</span>
+            <span class="item__desc" data-i18n="itemTabardDesc">Wear your class colors</span>
+          </span>
+          <span class="item__tag" data-i18n="itemTag">Soon</span>
+        </li>
+        <li class="item">
+          <span class="item__icon" aria-hidden="true">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M9 3 4 6v5l2 1v7h12v-7l2-1V6l-5-3-3 3-3-3Z"/><path d="M12 6v4"/></svg>
+          </span>
+          <span class="item__text">
+            <span class="item__label" data-i18n="itemHoodieLabel">Adventurer's Hoodie</span>
+            <span class="item__desc" data-i18n="itemHoodieDesc">For long nights in the dungeon</span>
+          </span>
+          <span class="item__tag" data-i18n="itemTag">Soon</span>
+        </li>
+        <li class="item">
+          <span class="item__icon" aria-hidden="true">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M5 8h11v8a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V8Z"/><path d="M16 10h2a2 2 0 0 1 0 4h-2"/></svg>
+          </span>
+          <span class="item__text">
+            <span class="item__label" data-i18n="itemMugLabel">Tavern Mug</span>
+            <span class="item__desc" data-i18n="itemMugDesc">Refill your mana</span>
+          </span>
+          <span class="item__tag" data-i18n="itemTag">Soon</span>
+        </li>
+        <li class="item">
+          <span class="item__icon" aria-hidden="true">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false"><rect x="5" y="3" width="14" height="18" rx="1"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
+          </span>
+          <span class="item__text">
+            <span class="item__label" data-i18n="itemPosterLabel">Realm Map Poster</span>
+            <span class="item__desc" data-i18n="itemPosterDesc">Chart every zone</span>
+          </span>
+          <span class="item__tag" data-i18n="itemTag">Soon</span>
+        </li>
+      </ul>
+    </section>
+
+    <nav id="menu" class="menu" tabindex="-1" aria-label="Merch updates" data-i18n-aria="menuLabel">
+      <a class="btn btn--hero" href="https://worldofclaudecraft.com/links" target="_blank" rel="noopener noreferrer">
+        <span class="btn__icon" aria-hidden="true">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M12 3.5 14.6 9l6 .5-4.6 3.9 1.5 5.9L12 16.9 6.5 19.3 8 13.4 3.4 9.5l6-.5L12 3.5Z"/></svg>
+        </span>
+        <span class="btn__text">
+          <span class="btn__label" data-i18n="followLabel">Follow for the Drop</span>
+          <span class="btn__handle" data-i18n="followSub">worldofclaudecraft.com/links</span>
+        </span>
+        <span class="btn__chev" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6"/></svg>
+        </span>
+        <span class="sr-only" data-i18n="opensNewTab"> (opens in new tab)</span>
+      </a>
+
+      <ul class="rows">
+        <li>
+          <a class="btn btn--row" href="https://worldofclaudecraft.com/" target="_blank" rel="noopener noreferrer">
+            <span class="btn__icon" aria-hidden="true">
+              <svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2Zm0 1.5a8.5 8.5 0 1 1 0 17 8.5 8.5 0 0 1 0-17Z"/><path d="M10 8.25v7.5a.5.5 0 0 0 .76.43l6.2-3.75a.5.5 0 0 0 0-.86l-6.2-3.75A.5.5 0 0 0 10 8.25Z"/></svg>
+            </span>
+            <span class="btn__text">
+              <span class="btn__label" data-i18n="playLabel">Play the Game</span>
+              <span class="btn__handle" data-i18n="playSub">worldofclaudecraft.com</span>
+            </span>
+            <span class="btn__chev" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6"/></svg>
+            </span>
+            <span class="sr-only" data-i18n="opensNewTab"> (opens in new tab)</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <footer class="foot">
+      <p class="foot__note" data-i18n="footNote">No store is live yet. If anyone sells you merch today, it is not us.</p>
+      <p class="foot__copy" data-i18n="copyright">2026 World of ClaudeCraft</p>
+    </footer>
+  </main>
+
+  <script>
+    (() => {
+      // Self-contained 14-locale copy map. These standalone pages ship outside the
+      // app bundle, so they do NOT use t(); every locale must be filled here in the
+      // same change (no build-time English-fill backstop). The loader only writes a
+      // key when present, so a missing locale would silently leak the English default.
+      const copy = {
+        en: {
+          pageTitle: "World of ClaudeCraft - Merch",
+          metaDescription: "Official World of ClaudeCraft merchandise is coming soon. If a store is not announced on our official channels, it is not us.",
+          logoAlt: "World of ClaudeCraft",
+          skip: "Skip to updates",
+          eyebrow: "Merchandise",
+          heading: "The Armory Opens Soon",
+          badge: "Coming soon",
+          tagline: "Official World of ClaudeCraft gear is being forged. The store is not open yet, but it will be soon.",
+          wardTitle: "Buy only through our official channels.",
+          wardBody: "When the store opens, it will be announced only on the channels listed on our official links page. Anyone selling World of ClaudeCraft merch anywhere else, or sending you a store link, is an <strong>impersonator</strong>. Report them to the mods.",
+          previewTitle: "In the forge",
+          itemTabardLabel: "Guild Tabard Tee",
+          itemTabardDesc: "Wear your class colors",
+          itemHoodieLabel: "Adventurer's Hoodie",
+          itemHoodieDesc: "For long nights in the dungeon",
+          itemMugLabel: "Tavern Mug",
+          itemMugDesc: "Refill your mana",
+          itemPosterLabel: "Realm Map Poster",
+          itemPosterDesc: "Chart every zone",
+          itemTag: "Soon",
+          menuLabel: "Merch updates",
+          followLabel: "Follow for the Drop",
+          followSub: "worldofclaudecraft.com/links",
+          playLabel: "Play the Game",
+          playSub: "worldofclaudecraft.com",
+          opensNewTab: " (opens in new tab)",
+          footNote: "No store is live yet. If anyone sells you merch today, it is not us.",
+          copyright: "2026 World of ClaudeCraft"
+        },
+        es: {
+          pageTitle: "World of ClaudeCraft - Mercancía",
+          metaDescription: "La mercancía oficial de World of ClaudeCraft llegará pronto. Si una tienda no se anuncia en nuestros canales oficiales, no somos nosotros.",
+          logoAlt: "World of ClaudeCraft",
+          skip: "Saltar a las novedades",
+          eyebrow: "Mercancía",
+          heading: "La armería abre pronto",
+          badge: "Próximamente",
+          tagline: "El equipamiento oficial de World of ClaudeCraft se está forjando. La tienda aún no está abierta, pero lo estará pronto.",
+          wardTitle: "Compra solo a través de nuestros canales oficiales.",
+          wardBody: "Cuando la tienda abra, se anunciará únicamente en los canales que figuran en nuestra página de enlaces oficiales. Cualquiera que venda mercancía de World of ClaudeCraft en otro lugar, o que te envíe un enlace a una tienda, es un <strong>impostor</strong>. Repórtalo ante los moderadores.",
+          previewTitle: "En la forja",
+          itemTabardLabel: "Camiseta con tabardo de gremio",
+          itemTabardDesc: "Lleva los colores de tu clase",
+          itemHoodieLabel: "Sudadera de aventurero",
+          itemHoodieDesc: "Para largas noches en la mazmorra",
+          itemMugLabel: "Jarra de taberna",
+          itemMugDesc: "Recarga tu maná",
+          itemPosterLabel: "Póster del mapa del reino",
+          itemPosterDesc: "Traza cada zona",
+          itemTag: "Pronto",
+          menuLabel: "Novedades de la mercancía",
+          followLabel: "Síguenos para el lanzamiento",
+          followSub: "worldofclaudecraft.com/links",
+          playLabel: "Juega ahora",
+          playSub: "worldofclaudecraft.com",
+          opensNewTab: " (se abre en una pestaña nueva)",
+          footNote: "Todavía no hay ninguna tienda activa. Si alguien te vende mercancía hoy, no somos nosotros.",
+          copyright: "2026 World of ClaudeCraft"
+        },
+        es_ES: {
+          pageTitle: "World of ClaudeCraft - Mercancía",
+          metaDescription: "La mercancía oficial de World of ClaudeCraft llegará pronto. Si una tienda no se anuncia en nuestros canales oficiales, no somos nosotros.",
+          logoAlt: "World of ClaudeCraft",
+          skip: "Saltar a las novedades",
+          eyebrow: "Mercancía",
+          heading: "La armería abre pronto",
+          badge: "Próximamente",
+          tagline: "El equipo oficial de World of ClaudeCraft se está forjando. La tienda aún no está abierta, pero lo estará pronto.",
+          wardTitle: "Compra solo a través de nuestros canales oficiales.",
+          wardBody: "Cuando la tienda abra, se anunciará únicamente en los canales que aparecen en nuestra página de enlaces oficiales. Cualquiera que venda mercancía de World of ClaudeCraft en otro sitio, o que te envíe un enlace a una tienda, es un <strong>impostor</strong>. Denúncialo a los moderadores.",
+          previewTitle: "En la fragua",
+          itemTabardLabel: "Camiseta con tabardo de gremio",
+          itemTabardDesc: "Luce los colores de tu clase",
+          itemHoodieLabel: "Sudadera de aventurero",
+          itemHoodieDesc: "Para largas noches en la mazmorra",
+          itemMugLabel: "Jarra de taberna",
+          itemMugDesc: "Recarga tu maná",
+          itemPosterLabel: "Póster del mapa del reino",
+          itemPosterDesc: "Cartografía cada zona",
+          itemTag: "Pronto",
+          menuLabel: "Novedades de la mercancía",
+          followLabel: "Síguenos para el lanzamiento",
+          followSub: "worldofclaudecraft.com/links",
+          playLabel: "Jugar",
+          playSub: "worldofclaudecraft.com",
+          opensNewTab: " (se abre en una pestaña nueva)",
+          footNote: "Todavía no hay ninguna tienda activa. Si alguien te vende mercancía hoy, no somos nosotros.",
+          copyright: "2026 World of ClaudeCraft"
+        },
+        fr_FR: {
+          pageTitle: "World of ClaudeCraft - Boutique",
+          metaDescription: "Les produits officiels de World of ClaudeCraft arrivent bientôt. Si une boutique n'est pas annoncée sur nos canaux officiels, ce n'est pas nous.",
+          logoAlt: "World of ClaudeCraft",
+          skip: "Aller aux actualités",
+          eyebrow: "Boutique",
+          heading: "L'armurerie ouvre bientôt",
+          badge: "Bientôt disponible",
+          tagline: "L'équipement officiel de World of ClaudeCraft est en cours de forge. La boutique n'est pas encore ouverte, mais elle le sera bientôt.",
+          wardTitle: "N'achetez que via nos canaux officiels.",
+          wardBody: "À l'ouverture de la boutique, elle sera annoncée uniquement sur les canaux figurant sur notre page de liens officiels. Quiconque vend des produits World of ClaudeCraft ailleurs, ou vous envoie un lien de boutique, est un <strong>imposteur</strong>. Signalez-le aux modérateurs.",
+          previewTitle: "À la forge",
+          itemTabardLabel: "T-shirt tabard de guilde",
+          itemTabardDesc: "Portez les couleurs de votre classe",
+          itemHoodieLabel: "Sweat à capuche d'aventurier",
+          itemHoodieDesc: "Pour les longues nuits dans le donjon",
+          itemMugLabel: "Chope de taverne",
+          itemMugDesc: "Refaites le plein de mana",
+          itemPosterLabel: "Affiche de la carte du royaume",
+          itemPosterDesc: "Cartographiez chaque zone",
+          itemTag: "Bientôt",
+          menuLabel: "Actualités de la boutique",
+          followLabel: "Suivez-nous pour la sortie",
+          followSub: "worldofclaudecraft.com/links",
+          playLabel: "Jouer",
+          playSub: "worldofclaudecraft.com",
+          opensNewTab: " (s'ouvre dans un nouvel onglet)",
+          footNote: "Aucune boutique n'est encore en ligne. Si quelqu'un vous vend des produits aujourd'hui, ce n'est pas nous.",
+          copyright: "2026 World of ClaudeCraft"
+        },
+        fr_CA: {
+          pageTitle: "World of ClaudeCraft - Boutique",
+          metaDescription: "Les produits officiels de World of ClaudeCraft arrivent bientôt. Si une boutique n'est pas annoncée sur nos canaux officiels, ce n'est pas nous.",
+          logoAlt: "World of ClaudeCraft",
+          skip: "Aller aux nouveautés",
+          eyebrow: "Boutique",
+          heading: "L'armurerie ouvre bientôt",
+          badge: "Bientôt disponible",
+          tagline: "L'équipement officiel de World of ClaudeCraft est en cours de forge. La boutique n'est pas encore ouverte, mais elle le sera bientôt.",
+          wardTitle: "N'achetez que par nos canaux officiels.",
+          wardBody: "À l'ouverture de la boutique, elle sera annoncée uniquement sur les canaux figurant sur notre page de liens officiels. Quiconque vend des produits World of ClaudeCraft ailleurs, ou vous envoie un lien de boutique, est un <strong>imposteur</strong>. Signalez-le aux modérateurs.",
+          previewTitle: "À la forge",
+          itemTabardLabel: "T-shirt tabard de guilde",
+          itemTabardDesc: "Portez les couleurs de votre classe",
+          itemHoodieLabel: "Hoodie d'aventurier",
+          itemHoodieDesc: "Pour les longues nuits dans le donjon",
+          itemMugLabel: "Chope de taverne",
+          itemMugDesc: "Refaites le plein de mana",
+          itemPosterLabel: "Affiche de la carte du royaume",
+          itemPosterDesc: "Cartographiez chaque zone",
+          itemTag: "Bientôt",
+          menuLabel: "Nouveautés de la boutique",
+          followLabel: "Suivez-nous pour la sortie",
+          followSub: "worldofclaudecraft.com/links",
+          playLabel: "Jouer",
+          playSub: "worldofclaudecraft.com",
+          opensNewTab: " (s'ouvre dans un nouvel onglet)",
+          footNote: "Aucune boutique n'est encore en ligne. Si quelqu'un vous vend des produits aujourd'hui, ce n'est pas nous.",
+          copyright: "2026 World of ClaudeCraft"
+        },
+        en_CA: {
+          pageTitle: "World of ClaudeCraft - Merch",
+          metaDescription: "Official World of ClaudeCraft merchandise is coming soon. If a store is not announced on our official channels, it is not us.",
+          logoAlt: "World of ClaudeCraft",
+          skip: "Skip to updates",
+          eyebrow: "Merchandise",
+          heading: "The Armoury Opens Soon",
+          badge: "Coming soon",
+          tagline: "Official World of ClaudeCraft gear is being forged. The store is not open yet, but it will be soon.",
+          wardTitle: "Buy only through our official channels.",
+          wardBody: "When the store opens, it will be announced only on the channels listed on our official links page. Anyone selling World of ClaudeCraft merch anywhere else, or sending you a store link, is an <strong>impersonator</strong>. Report them to the mods.",
+          previewTitle: "In the forge",
+          itemTabardLabel: "Guild Tabard Tee",
+          itemTabardDesc: "Wear your class colours",
+          itemHoodieLabel: "Adventurer's Hoodie",
+          itemHoodieDesc: "For long nights in the dungeon",
+          itemMugLabel: "Tavern Mug",
+          itemMugDesc: "Refill your mana",
+          itemPosterLabel: "Realm Map Poster",
+          itemPosterDesc: "Chart every zone",
+          itemTag: "Soon",
+          menuLabel: "Merch updates",
+          followLabel: "Follow for the Drop",
+          followSub: "worldofclaudecraft.com/links",
+          playLabel: "Play the Game",
+          playSub: "worldofclaudecraft.com",
+          opensNewTab: " (opens in new tab)",
+          footNote: "No store is live yet. If anyone sells you merch today, it is not us.",
+          copyright: "2026 World of ClaudeCraft"
+        },
+        it_IT: {
+          pageTitle: "World of ClaudeCraft - Merchandise",
+          metaDescription: "Il merchandise ufficiale di World of ClaudeCraft sta arrivando. Se un negozio non viene annunciato sui nostri canali ufficiali, non siamo noi.",
+          logoAlt: "World of ClaudeCraft",
+          skip: "Vai agli aggiornamenti",
+          eyebrow: "Merchandise",
+          heading: "L'armeria apre presto",
+          badge: "In arrivo",
+          tagline: "L'equipaggiamento ufficiale di World of ClaudeCraft è in fase di forgiatura. Il negozio non è ancora aperto, ma lo sarà presto.",
+          wardTitle: "Acquista solo tramite i nostri canali ufficiali.",
+          wardBody: "Quando il negozio aprirà, verrà annunciato solo sui canali elencati nella nostra pagina dei link ufficiali. Chiunque venda merchandise di World of ClaudeCraft altrove, o ti invii il link di un negozio, è un <strong>impostore</strong>. Segnalalo ai moderatori.",
+          previewTitle: "Nella fucina",
+          itemTabardLabel: "Maglietta con tabarro della gilda",
+          itemTabardDesc: "Indossa i colori della tua classe",
+          itemHoodieLabel: "Felpa dell'avventuriero",
+          itemHoodieDesc: "Per le lunghe notti nel dungeon",
+          itemMugLabel: "Boccale della taverna",
+          itemMugDesc: "Ricarica il tuo mana",
+          itemPosterLabel: "Poster della mappa del reame",
+          itemPosterDesc: "Traccia ogni zona",
+          itemTag: "Presto",
+          menuLabel: "Aggiornamenti sul merchandise",
+          followLabel: "Seguici per il lancio",
+          followSub: "worldofclaudecraft.com/links",
+          playLabel: "Gioca",
+          playSub: "worldofclaudecraft.com",
+          opensNewTab: " (si apre in una nuova scheda)",
+          footNote: "Nessun negozio è ancora attivo. Se oggi qualcuno ti vende del merchandise, non siamo noi.",
+          copyright: "2026 World of ClaudeCraft"
+        },
+        de_DE: {
+          pageTitle: "World of ClaudeCraft - Merch",
+          metaDescription: "Offizieller World-of-ClaudeCraft-Merch kommt bald. Wenn ein Shop nicht über unsere offiziellen Kanäle angekündigt wird, sind wir das nicht.",
+          logoAlt: "World of ClaudeCraft",
+          skip: "Zu den Neuigkeiten springen",
+          eyebrow: "Merchandise",
+          heading: "Die Waffenkammer öffnet bald",
+          badge: "Demnächst",
+          tagline: "Offizielle World-of-ClaudeCraft-Ausrüstung wird gerade geschmiedet. Der Shop ist noch nicht geöffnet, aber bald ist es so weit.",
+          wardTitle: "Kaufe nur über unsere offiziellen Kanäle.",
+          wardBody: "Wenn der Shop öffnet, wird er ausschließlich über die Kanäle angekündigt, die auf unserer offiziellen Linkseite stehen. Wer World-of-ClaudeCraft-Merch anderswo verkauft oder dir einen Shop-Link schickt, ist ein <strong>Betrüger</strong>. Melde ihn den Moderatoren.",
+          previewTitle: "In der Schmiede",
+          itemTabardLabel: "Gilden-Wappenrock-Shirt",
+          itemTabardDesc: "Trage die Farben deiner Klasse",
+          itemHoodieLabel: "Abenteurer-Hoodie",
+          itemHoodieDesc: "Für lange Nächte im Verlies",
+          itemMugLabel: "Tavernen-Krug",
+          itemMugDesc: "Fülle dein Mana auf",
+          itemPosterLabel: "Reichskarten-Poster",
+          itemPosterDesc: "Kartiere jede Zone",
+          itemTag: "Bald",
+          menuLabel: "Merch-Neuigkeiten",
+          followLabel: "Folge uns für den Drop",
+          followSub: "worldofclaudecraft.com/links",
+          playLabel: "Spiel spielen",
+          playSub: "worldofclaudecraft.com",
+          opensNewTab: " (wird in einem neuen Tab geöffnet)",
+          footNote: "Noch ist kein Shop online. Wenn dir heute jemand Merch verkauft, sind wir das nicht.",
+          copyright: "2026 World of ClaudeCraft"
+        },
+        zh_CN: {
+          pageTitle: "World of ClaudeCraft - 周边商城",
+          metaDescription: "World of ClaudeCraft 官方周边即将上线。如果某个商城没有在我们的官方渠道公布，那就不是我们。",
+          logoAlt: "World of ClaudeCraft",
+          skip: "跳到最新动态",
+          eyebrow: "周边商品",
+          heading: "军械库即将开启",
+          badge: "即将上线",
+          tagline: "World of ClaudeCraft 的官方装备正在锻造中。商城尚未开放，但很快就会上线。",
+          wardTitle: "只通过我们的官方渠道购买。",
+          wardBody: "商城开放时，只会在我们官方链接页面所列的渠道上公布。任何在其他地方出售 World of ClaudeCraft 周边，或向你发送商城链接的人，都是<strong>冒充者</strong>。请向管理员举报。",
+          previewTitle: "锻造中",
+          itemTabardLabel: "公会纹章 T 恤",
+          itemTabardDesc: "穿上你职业的颜色",
+          itemHoodieLabel: "冒险者连帽衫",
+          itemHoodieDesc: "陪你度过地下城的漫漫长夜",
+          itemMugLabel: "酒馆马克杯",
+          itemMugDesc: "补满你的法力",
+          itemPosterLabel: "王国地图海报",
+          itemPosterDesc: "绘制每一个区域",
+          itemTag: "即将",
+          menuLabel: "周边动态",
+          followLabel: "关注我们获取上新",
+          followSub: "worldofclaudecraft.com/links",
+          playLabel: "开始游戏",
+          playSub: "worldofclaudecraft.com",
+          opensNewTab: "（在新标签页中打开）",
+          footNote: "目前还没有任何商城上线。如果今天有人向你出售周边，那不是我们。",
+          copyright: "2026 World of ClaudeCraft"
+        },
+        zh_TW: {
+          pageTitle: "World of ClaudeCraft - 周邊商城",
+          metaDescription: "World of ClaudeCraft 官方周邊即將上線。如果某個商城沒有在我們的官方管道公布，那就不是我們。",
+          logoAlt: "World of ClaudeCraft",
+          skip: "跳到最新消息",
+          eyebrow: "周邊商品",
+          heading: "軍械庫即將開啟",
+          badge: "即將上線",
+          tagline: "World of ClaudeCraft 的官方裝備正在鍛造中。商城尚未開放，但很快就會上線。",
+          wardTitle: "只透過我們的官方管道購買。",
+          wardBody: "商城開放時，只會在我們官方連結頁面所列的管道上公布。任何在其他地方販售 World of ClaudeCraft 周邊，或向你傳送商城連結的人，都是<strong>冒充者</strong>。請向管理員檢舉。",
+          previewTitle: "鍛造中",
+          itemTabardLabel: "公會紋章 T 恤",
+          itemTabardDesc: "穿上你職業的顏色",
+          itemHoodieLabel: "冒險者連帽衫",
+          itemHoodieDesc: "陪你度過地下城的漫漫長夜",
+          itemMugLabel: "酒館馬克杯",
+          itemMugDesc: "補滿你的法力",
+          itemPosterLabel: "王國地圖海報",
+          itemPosterDesc: "繪製每一個區域",
+          itemTag: "即將",
+          menuLabel: "周邊消息",
+          followLabel: "追蹤我們掌握上新",
+          followSub: "worldofclaudecraft.com/links",
+          playLabel: "開始遊戲",
+          playSub: "worldofclaudecraft.com",
+          opensNewTab: "（在新分頁中開啟）",
+          footNote: "目前還沒有任何商城上線。如果今天有人向你販售周邊，那不是我們。",
+          copyright: "2026 World of ClaudeCraft"
+        },
+        ko_KR: {
+          pageTitle: "World of ClaudeCraft - 굿즈",
+          metaDescription: "World of ClaudeCraft 공식 굿즈가 곧 출시됩니다. 어떤 상점이 공식 채널에 공지되지 않았다면, 그것은 저희가 아닙니다.",
+          logoAlt: "World of ClaudeCraft",
+          skip: "소식으로 건너뛰기",
+          eyebrow: "굿즈",
+          heading: "무기고가 곧 열립니다",
+          badge: "출시 예정",
+          tagline: "World of ClaudeCraft 공식 장비를 제작하고 있습니다. 상점은 아직 열리지 않았지만 곧 열립니다.",
+          wardTitle: "반드시 공식 채널을 통해서만 구매하세요.",
+          wardBody: "상점이 열리면 공식 링크 페이지에 나열된 채널을 통해서만 공지됩니다. 다른 곳에서 World of ClaudeCraft 굿즈를 판매하거나 상점 링크를 보내는 사람은 <strong>사칭범</strong>입니다. 운영진에게 신고해 주세요.",
+          previewTitle: "제작 중",
+          itemTabardLabel: "길드 휘장 티셔츠",
+          itemTabardDesc: "당신의 직업 색을 입으세요",
+          itemHoodieLabel: "모험가 후드티",
+          itemHoodieDesc: "던전에서의 긴 밤을 위해",
+          itemMugLabel: "선술집 머그컵",
+          itemMugDesc: "마나를 다시 채우세요",
+          itemPosterLabel: "왕국 지도 포스터",
+          itemPosterDesc: "모든 지역을 그려보세요",
+          itemTag: "곧",
+          menuLabel: "굿즈 소식",
+          followLabel: "출시 소식 받기",
+          followSub: "worldofclaudecraft.com/links",
+          playLabel: "게임 플레이",
+          playSub: "worldofclaudecraft.com",
+          opensNewTab: " (새 탭에서 열림)",
+          footNote: "아직 운영 중인 상점은 없습니다. 오늘 누군가 굿즈를 판매한다면 저희가 아닙니다.",
+          copyright: "2026 World of ClaudeCraft"
+        },
+        ja_JP: {
+          pageTitle: "World of ClaudeCraft - グッズ",
+          metaDescription: "World of ClaudeCraft の公式グッズがまもなく登場します。公式チャンネルで告知されていないストアは、私たちではありません。",
+          logoAlt: "World of ClaudeCraft",
+          skip: "最新情報へスキップ",
+          eyebrow: "グッズ",
+          heading: "武器庫はまもなく開店",
+          badge: "近日公開",
+          tagline: "World of ClaudeCraft の公式装備を鍛造中です。ストアはまだ開いていませんが、もうすぐ開店します。",
+          wardTitle: "購入は必ず公式チャンネルから。",
+          wardBody: "ストアが開く際は、公式リンクページに掲載されたチャンネルでのみ告知されます。それ以外の場所で World of ClaudeCraft のグッズを販売したり、ストアのリンクを送ってくる人物は<strong>なりすまし</strong>です。モデレーターに通報してください。",
+          previewTitle: "鍛造中",
+          itemTabardLabel: "ギルドタバード Tシャツ",
+          itemTabardDesc: "あなたのクラスの色をまとおう",
+          itemHoodieLabel: "冒険者パーカー",
+          itemHoodieDesc: "ダンジョンでの長い夜に",
+          itemMugLabel: "酒場のマグカップ",
+          itemMugDesc: "マナを補充しよう",
+          itemPosterLabel: "王国マップポスター",
+          itemPosterDesc: "すべてのゾーンを描こう",
+          itemTag: "近日",
+          menuLabel: "グッズの最新情報",
+          followLabel: "発売情報をフォロー",
+          followSub: "worldofclaudecraft.com/links",
+          playLabel: "ゲームをプレイ",
+          playSub: "worldofclaudecraft.com",
+          opensNewTab: "（新しいタブで開きます）",
+          footNote: "まだ稼働中のストアはありません。今日グッズを売ってくる人がいたら、それは私たちではありません。",
+          copyright: "2026 World of ClaudeCraft"
+        },
+        pt_BR: {
+          pageTitle: "World of ClaudeCraft - Loja",
+          metaDescription: "Os produtos oficiais de World of ClaudeCraft estão chegando. Se uma loja não for anunciada em nossos canais oficiais, não somos nós.",
+          logoAlt: "World of ClaudeCraft",
+          skip: "Pular para as novidades",
+          eyebrow: "Produtos",
+          heading: "A armaria abre em breve",
+          badge: "Em breve",
+          tagline: "Os equipamentos oficiais de World of ClaudeCraft estão sendo forjados. A loja ainda não está aberta, mas estará em breve.",
+          wardTitle: "Compre somente pelos nossos canais oficiais.",
+          wardBody: "Quando a loja abrir, ela será anunciada apenas nos canais listados na nossa página de links oficiais. Qualquer pessoa que venda produtos de World of ClaudeCraft em outro lugar, ou que envie um link de loja, é um <strong>impostor</strong>. Denuncie aos moderadores.",
+          previewTitle: "Na forja",
+          itemTabardLabel: "Camiseta tabardo de guilda",
+          itemTabardDesc: "Use as cores da sua classe",
+          itemHoodieLabel: "Moletom de aventureiro",
+          itemHoodieDesc: "Para as longas noites na masmorra",
+          itemMugLabel: "Caneca de taverna",
+          itemMugDesc: "Reabasteça sua mana",
+          itemPosterLabel: "Pôster do mapa do reino",
+          itemPosterDesc: "Mapeie cada zona",
+          itemTag: "Em breve",
+          menuLabel: "Novidades da loja",
+          followLabel: "Siga para o lançamento",
+          followSub: "worldofclaudecraft.com/links",
+          playLabel: "Jogar",
+          playSub: "worldofclaudecraft.com",
+          opensNewTab: " (abre em uma nova aba)",
+          footNote: "Nenhuma loja está no ar ainda. Se alguém te vender produtos hoje, não somos nós.",
+          copyright: "2026 World of ClaudeCraft"
+        },
+        ru_RU: {
+          pageTitle: "World of ClaudeCraft - Мерч",
+          metaDescription: "Официальный мерч World of ClaudeCraft скоро появится. Если магазин не анонсирован на наших официальных каналах, это не мы.",
+          logoAlt: "World of ClaudeCraft",
+          skip: "Перейти к новостям",
+          eyebrow: "Мерч",
+          heading: "Оружейная скоро откроется",
+          badge: "Скоро",
+          tagline: "Официальная экипировка World of ClaudeCraft уже куётся. Магазин ещё не открыт, но это произойдёт совсем скоро.",
+          wardTitle: "Покупайте только через наши официальные каналы.",
+          wardBody: "Когда магазин откроется, об этом сообщат только на каналах, указанных на нашей странице официальных ссылок. Любой, кто продаёт мерч World of ClaudeCraft где-либо ещё или присылает вам ссылку на магазин, является <strong>самозванцем</strong>. Сообщите о нём модераторам.",
+          previewTitle: "В кузнице",
+          itemTabardLabel: "Футболка с гильдейским табардом",
+          itemTabardDesc: "Носите цвета своего класса",
+          itemHoodieLabel: "Худи искателя приключений",
+          itemHoodieDesc: "Для долгих ночей в подземелье",
+          itemMugLabel: "Таверная кружка",
+          itemMugDesc: "Восполните свою ману",
+          itemPosterLabel: "Постер с картой королевства",
+          itemPosterDesc: "Нанесите на карту каждую зону",
+          itemTag: "Скоро",
+          menuLabel: "Новости мерча",
+          followLabel: "Следите за выходом",
+          followSub: "worldofclaudecraft.com/links",
+          playLabel: "Играть",
+          playSub: "worldofclaudecraft.com",
+          opensNewTab: " (откроется в новой вкладке)",
+          footNote: "Пока ни один магазин не работает. Если сегодня кто-то продаёт вам мерч, это не мы.",
+          copyright: "2026 World of ClaudeCraft"
+        }
+      };
+
+      const supported = Object.keys(copy);
+      const normalize = (value) => (value ? value.replace(/-/g, "_") : "");
+      const params = new URLSearchParams(window.location.search);
+      const requested = normalize(params.get("lang"));
+      let saved = "";
+      try { saved = normalize(localStorage.getItem("locale")); } catch (e) { saved = ""; }
+      const browser = normalize(navigator.language);
+      const language = supported.includes(requested)
+        ? requested
+        : supported.includes(saved)
+          ? saved
+          : supported.includes(browser)
+            ? browser
+            : "en";
+      const strings = copy[language] || copy.en;
+
+      document.documentElement.lang = language.replace(/_/g, "-");
+      if (strings.pageTitle) document.title = strings.pageTitle;
+
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.getAttribute("data-i18n");
+        if (key && strings[key] != null) el.textContent = strings[key];
+      });
+      document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+        const key = el.getAttribute("data-i18n-html");
+        if (key && strings[key] != null) el.innerHTML = strings[key];
+      });
+      document.querySelectorAll("[data-i18n-alt]").forEach((el) => {
+        const key = el.getAttribute("data-i18n-alt");
+        if (key && strings[key] != null) el.setAttribute("alt", strings[key]);
+      });
+      document.querySelectorAll("[data-i18n-aria]").forEach((el) => {
+        const key = el.getAttribute("data-i18n-aria");
+        if (key && strings[key] != null) el.setAttribute("aria-label", strings[key]);
+      });
+      document.querySelectorAll("[data-i18n-content]").forEach((el) => {
+        const key = el.getAttribute("data-i18n-content");
+        if (key && strings[key] != null) el.setAttribute("content", strings[key]);
+      });
+    })();
+  </script>
+</body>
+</html>

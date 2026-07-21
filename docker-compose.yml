@@ -21,7 +21,14 @@ services:
   # then open http://localhost:8787 — or put a TLS reverse proxy in front
   # for remote hosting (see README).
   game:
-    build: .
+    image: eastbrook-game:${EASTBROOK_IMAGE_TAG:-local}
+    build:
+      context: .
+      args:
+        # Build-time public client config inlined into the bundle (see .env.example).
+        VITE_TURNSTILE_SITEKEY: ${VITE_TURNSTILE_SITEKEY:-}
+        VITE_REOWN_PROJECT_ID: ${VITE_REOWN_PROJECT_ID:-}
+        VITE_WALLET_DISABLED: ${VITE_WALLET_DISABLED:-}
     container_name: eastbrook-game
     restart: unless-stopped
     depends_on:
@@ -30,15 +37,226 @@ services:
     environment:
       DATABASE_URL: postgres://eastbrook:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env. See .env.example.}@postgres:5432/eastbrook
       PORT: "8787"
+      # Runtime: node flags for the game process, chiefly the V8 heap ceiling
+      # (--max-old-space-size). Node sizes its default old-space from TOTAL SYSTEM
+      # memory, not from the container's cgroup limit, so on a box larger than
+      # mem_limit an unset heap flag lets V8 grow past the limit and get OOM-killed
+      # mid-tick by the kernel. Sizing the heap UNDER mem_limit means an overrun
+      # kills the container (which docker then restarts) instead of the host OOM
+      # killer wedging the box. Empty (unset) keeps node's own defaults: the
+      # recommended production value lives in .env.example, never baked in here.
+      NODE_OPTIONS: ${NODE_OPTIONS:-}
+      # Runtime: the realm player admission cap. A fresh WebSocket join is refused
+      # once the realm holds this many sessions (server/ws_auth.ts); /api/status
+      # advertises the value so the client realm list can show Full honestly. Empty
+      # (unset) yields the built-in default of 5000; an explicit 0 disables the cap.
+      MAX_PLAYERS_PER_REALM: ${MAX_PLAYERS_PER_REALM:-}
+      # Target the game server 302-redirects /wiki to when hit directly (not via the
+      # reverse proxy). Public origin in prod; localhost fallback for local dev.
+      WIKI_URL: ${WIKI_URL:-http://localhost:8080/wiki/index.php/Main_Page}
+      # Runtime public origin for server-generated absolute URLs such as player-card
+      # Open Graph images. Set per environment, for example dev vs production.
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-}
       USERNAME_BANLIST: ${USERNAME_BANLIST:-}
       USERNAME_BANLIST_FILE: ${USERNAME_BANLIST_FILE:-}
       CHAT_CENSOR_LIST: ${CHAT_CENSOR_LIST:-}
       CHAT_CENSOR_FILE: ${CHAT_CENSOR_FILE:-}
+      # Runtime: server-side Turnstile verification (see .env.example). Empty → gate off.
+      TURNSTILE_SECRET: ${TURNSTILE_SECRET:-}
+      # Runtime: native app attestation for iOS DeviceCheck and Google Play Integrity.
+      # Secrets are read from .env on the host and passed through to the container.
+      NATIVE_ATTESTATION_REQUIRED: ${NATIVE_ATTESTATION_REQUIRED:-}
+      GOOGLE_PLAY_INTEGRITY_SERVICE_ACCOUNT_JSON: ${GOOGLE_PLAY_INTEGRITY_SERVICE_ACCOUNT_JSON:-}
+      GOOGLE_PLAY_INTEGRITY_SIGNING_PEM: ${GOOGLE_PLAY_INTEGRITY_SIGNING_PEM:-}
+      GOOGLE_PLAY_INTEGRITY_PACKAGE_NAME: ${GOOGLE_PLAY_INTEGRITY_PACKAGE_NAME:-com.worldofclaudecraft}
+      GOOGLE_PLAY_INTEGRITY_CERT_DIGESTS: ${GOOGLE_PLAY_INTEGRITY_CERT_DIGESTS:-}
+      GOOGLE_PLAY_INTEGRITY_DEVICE_VERDICT: ${GOOGLE_PLAY_INTEGRITY_DEVICE_VERDICT:-MEETS_DEVICE_INTEGRITY}
+      APPLE_TEAM_ID: ${APPLE_TEAM_ID:-}
+      APPLE_BUNDLE_ID: ${APPLE_BUNDLE_ID:-com.worldofclaudecraft}
+      APPLE_DEVICECHECK_KEY_ID: ${APPLE_DEVICECHECK_KEY_ID:-}
+      APPLE_DEVICECHECK_SIGNING_PEM: ${APPLE_DEVICECHECK_SIGNING_PEM:-}
+      APPLE_DEVICECHECK_ENV: ${APPLE_DEVICECHECK_ENV:-production}
+      # Runtime: opt-in world-loop perf diagnostics (PERF_TICK_LOG=1): the 20 Hz
+      # heartbeat log line (tickHz, per-phase p95/max) plus over-budget stutter
+      # traces. Off by default so production logs stay quiet.
+      PERF_TICK_LOG: ${PERF_TICK_LOG:-}
+
+      # Runtime: bearer token that gates GET /metrics (server/http/health.ts).
+      # Empty (unset) leaves the endpoint feature-off (404); a non-empty value
+      # turns it on behind Authorization: Bearer <token>. Set on the host .env by
+      # the monitoring deploy so Prometheus can scrape the RED + process metrics.
+      METRICS_TOKEN: ${METRICS_TOKEN:-}
+      # Runtime: the ONLY gate on the deploy countdown endpoint (nothing
+      # restricts /internal/* to loopback), so treat it as a real secret.
+      RESTART_COUNTDOWN_SECRET: ${RESTART_COUNTDOWN_SECRET:-}
+      # Runtime: Discord OAuth + the secret-gated game <-> Discord bot channel.
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
+      DISCORD_GUILD_INVITE: ${DISCORD_GUILD_INVITE:-}
+      DISCORD_BOT_SECRET: ${DISCORD_BOT_SECRET:-}
+      # Runtime: the game server uses the bot token to auto-join a linking player to
+      # the official guild (guilds.join). Empty disables auto-join (verify-only).
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      # Runtime: GitHub OAuth for the in-game developer badge. Both id+secret must be
+      # set to enable "Link GitHub"; empty hides it exactly like Discord. GITHUB_REPO
+      # selects which repo's contributor stats back the badge (code default:
+      # levy-street/world-of-claudecraft); GITHUB_TOKEN lifts the GitHub API rate limit
+      # for the contributor + News/Releases fetches. See .env.example.
+      GITHUB_OAUTH_CLIENT_ID: ${GITHUB_OAUTH_CLIENT_ID:-}
+      GITHUB_OAUTH_CLIENT_SECRET: ${GITHUB_OAUTH_CLIENT_SECRET:-}
+      GITHUB_REPO: ${GITHUB_REPO:-}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      WOC_DAILY_REWARD_SERVICE_URL: ${WOC_DAILY_REWARD_SERVICE_URL:-}
+      WOC_DAILY_REWARD_SERVICE_SECRET: ${WOC_DAILY_REWARD_SERVICE_SECRET:-}
+      WOC_DAILY_REWARD_CONFIG_TTL_MS: ${WOC_DAILY_REWARD_CONFIG_TTL_MS:-}
+      WOC_ECONOMY_SERVICE_URL: ${WOC_ECONOMY_SERVICE_URL:-}
+      WOC_ECONOMY_INTERNAL_SECRET: ${WOC_ECONOMY_INTERNAL_SECRET:-}
+      SOLANA_RPC_URL: ${SOLANA_RPC_URL:-}
+      WOC_MINT: ${WOC_MINT:-}
+      META_CAPI_PIXEL_ID: ${META_CAPI_PIXEL_ID:-}
+      META_CAPI_ACCESS_TOKEN: ${META_CAPI_ACCESS_TOKEN:-}
+      META_CAPI_TEST_EVENT_CODE: ${META_CAPI_TEST_EVENT_CODE:-}
+      META_CAPI_API_VERSION: ${META_CAPI_API_VERSION:-}
+      # Runtime: outbound email (server/email/sender.ts). All empty → console
+      # transport (mail is logged, not sent). EMAIL_PROVIDER=ses selects AWS SES
+      # (needs EMAIL_SES_REGION or AWS_REGION plus EMAIL_FROM; credentials via the
+      # SDK default chain: IAM instance role, or the AWS_* keys below). Otherwise
+      # EMAIL_API_URL+EMAIL_API_KEY+EMAIL_FROM selects the generic HTTP transport.
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-}
+      EMAIL_FROM: ${EMAIL_FROM:-}
+      EMAIL_BASE_URL: ${EMAIL_BASE_URL:-}
+      EMAIL_SES_REGION: ${EMAIL_SES_REGION:-}
+      AWS_REGION: ${AWS_REGION:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      EMAIL_API_URL: ${EMAIL_API_URL:-}
+      EMAIL_API_KEY: ${EMAIL_API_KEY:-}
+      # Optional Steam account link and Book of Deeds achievement mirror.
+      STEAM_ENABLED: ${STEAM_ENABLED:-}
+      STEAM_APP_ID: ${STEAM_APP_ID:-}
+      STEAM_WEB_API_KEY: ${STEAM_WEB_API_KEY:-}
+      # Optional deployable SFX packs live outside the image. Export from SFX
+      # Studio, run its installer against the host overlay root, and this server
+      # reads only the stable runtime manifest plus immutable audio blobs here.
+      SFX_PACK_DIR: /app/sfx-runtime/audio/sfx
     # loopback-only: the TLS reverse proxy (Caddy) is the public entrance
     ports:
       - "127.0.0.1:8787:8787"
     volumes:
       - ${EASTBROOK_MEDIA_DIR:-./media-cache}:/app/dist/media
+      - ${EASTBROOK_SFX_DIR:-./sfx-runtime}:/app/sfx-runtime:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # Exec form with a node one-liner, deliberately unlike the CMD-SHELL healthcheck
+    # the postgres service uses above: the runtime image is alpine and has no curl or
+    # wget, but it does ship node. The probe hits /livez and nothing else. /livez
+    # reports a WEDGED game loop, not merely a live process, so it catches the failure
+    # `restart: unless-stopped` cannot see (that policy only acts on process exit), and
+    # it deliberately stays 200 while the server drains, so a graceful shutdown is never
+    # misread as a wedge. /readyz flips to 503 while draining and would do exactly that.
+    # The probe must exit nonzero on BOTH a non-200 status and a refused connection,
+    # hence the explicit statusCode check and the 'error' handler: a bare http.get exits
+    # 0 on a 503 and throws on a refusal. start_period covers a cold boot (the DB retry
+    # loop, the schema sweep, the cache warms); failures inside it do not spend retries.
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:8787/livez',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+      start_period: 60s
+    # Time docker allows between SIGTERM and SIGKILL. Covers the realistic shutdown
+    # path: the character/market/mail saves, ending play sessions, the bank-ledger and
+    # deed-record drains, the Steam mirror's 5s deadline, releasing character leases and
+    # closing the pool, with headroom over the runbook's `docker compose stop -t 60
+    # game` fallback. It is not a strict bound: an adversarial worst case (a character
+    # save riding the 65s driver backstop, plus the deadline-free FIFO drains) can still
+    # run past it and be killed.
+    stop_grace_period: 75s
+    # Container memory ceiling. The default suits a host with about 8 GiB of RAM: 5 GiB
+    # here holds the recommended 4096 MiB V8 heap (NODE_OPTIONS above) plus native and
+    # buffer overhead, and still leaves room for the database container and the OS.
+    # Resize it to the host you are running on. Without a ceiling a runaway game process
+    # can starve the database and the OS and take the whole host down rather than just
+    # itself. mem_limit is the direct runtime Compose Spec key
+    # and is honored unconditionally by `docker compose up`; prefer it over the
+    # swarm-shaped deploy.resources.limits.memory block, which Compose v2 does honor for
+    # `up` but which is the swarm surface (and was a silent no-op under compose v1).
+    mem_limit: 5g
+    # Pin swap to the memory limit so the container cannot lean on host swap: docker
+    # defaults total memory+swap to twice mem_limit when this is unset, so on a host with
+    # swap a leaking process would thrash up to 5g of swap before the OOM kill, which is
+    # slower and messier than the clean in-container kill the limit exists to produce.
+    memswap_limit: 5g
+
+  discord-bot:
+    image: eastbrook-game:${EASTBROOK_IMAGE_TAG:-local}
+    container_name: eastbrook-discord-bot
+    profiles:
+      - discord
+    restart: unless-stopped
+    depends_on:
+      game:
+        condition: service_started
+    environment:
+      GAME_SERVER_URL: http://game:8787
+      PUBLIC_GAME_URL: ${PUBLIC_GAME_URL:-http://localhost:8787}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
+      DISCORD_BOT_SECRET: ${DISCORD_BOT_SECRET:-}
+      DISCORD_VOICE_CHANNEL_ID: ${DISCORD_VOICE_CHANNEL_ID:-}
+      DISCORD_WELCOME_CHANNEL_ID: ${DISCORD_WELCOME_CHANNEL_ID:-}
+      DISCORD_TEST_CHANNEL_ID: ${DISCORD_TEST_CHANNEL_ID:-}
+      DISCORD_RELAY_CHANNEL_ID: ${DISCORD_RELAY_CHANNEL_ID:-}
+      DISCORD_ACTIVITY_CHANNEL_ID: ${DISCORD_ACTIVITY_CHANNEL_ID:-}
+      DISCORD_DAILY_REWARDS_CHANNEL_ID: ${DISCORD_DAILY_REWARDS_CHANNEL_ID:-}
+      DISCORD_INVITE_CHANNEL_ID: ${DISCORD_INVITE_CHANNEL_ID:-}
+      DISCORD_SYNC_NICKNAMES: ${DISCORD_SYNC_NICKNAMES:-1}
+    command: ["node", "dist-bot/bot.cjs"]
+
+  mediawiki-db:
+    image: mariadb:11
+    container_name: eastbrook-wiki-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MEDIAWIKI_DB_NAME:-mediawiki}
+      MYSQL_USER: ${MEDIAWIKI_DB_USER:-mediawiki}
+      MYSQL_PASSWORD: ${MEDIAWIKI_DB_PASSWORD:-mediawiki-change-me}
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    volumes:
+      - eastbrook_wikidb:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -u${MEDIAWIKI_DB_USER:-mediawiki} -p${MEDIAWIKI_DB_PASSWORD:-mediawiki-change-me} --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  mediawiki:
+    build:
+      context: .
+      dockerfile: mediawiki/Dockerfile
+    container_name: eastbrook-wiki
+    restart: unless-stopped
+    depends_on:
+      mediawiki-db:
+        condition: service_healthy
+    environment:
+      MEDIAWIKI_DB_HOST: mediawiki-db
+      MEDIAWIKI_DB_NAME: ${MEDIAWIKI_DB_NAME:-mediawiki}
+      MEDIAWIKI_DB_USER: ${MEDIAWIKI_DB_USER:-mediawiki}
+      MEDIAWIKI_DB_PASSWORD: ${MEDIAWIKI_DB_PASSWORD:-mediawiki-change-me}
+      MEDIAWIKI_ADMIN_USER: ${MEDIAWIKI_ADMIN_USER:-WikiAdmin}
+      MEDIAWIKI_ADMIN_PASS: ${MEDIAWIKI_ADMIN_PASS:-change-me-admin-password}
+      MEDIAWIKI_SECRET_KEY: ${MEDIAWIKI_SECRET_KEY:-local-dev-change-me-world-of-claudecraft}
+      MEDIAWIKI_UPGRADE_KEY: ${MEDIAWIKI_UPGRADE_KEY:-local-dev-upgrade-key}
+      MEDIAWIKI_SERVER: ${MEDIAWIKI_SERVER:-http://localhost:8080}
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - eastbrook_wiki_images:/var/www/html/images
 
 volumes:
   eastbrook_pgdata:
+  eastbrook_wikidb:
+  eastbrook_wiki_images:

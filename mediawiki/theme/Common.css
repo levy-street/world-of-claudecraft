@@ -1,0 +1,420 @@
+/* =========================================================================
+   World of Claudecraft Wiki — "Aged Grimoire" theme for Vector 2022.
+   Warm parchment reading surface, deep oak chrome, gold + wax-seal-red
+   accents, elegant serif display headings.
+   ========================================================================= */
+
+:root {
+  --woc-ink: #2a1c10;          /* primary text on parchment */
+  --woc-ink-soft: #5a4427;     /* secondary text */
+  --woc-parchment: #f3e8cc;    /* reading surface */
+  --woc-parchment-2: #ece0bf;  /* alt surface (zebra, facts) */
+  --woc-oak: #241710;          /* dark chrome base */
+  --woc-oak-2: #160e09;        /* darker chrome */
+  --woc-gold: #e7b54a;         /* primary accent */
+  --woc-gold-soft: #f0d28a;    /* accent text on dark */
+  --woc-seal: #8a1f1c;         /* wax-seal red */
+  --woc-rule: rgba(106, 74, 33, 0.30);
+  --woc-rule-strong: #9d7c43;
+  --woc-link: #1c5a7a;         /* lapis on parchment */
+  --woc-link-visited: #6a417e; /* aged plum */
+  --woc-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+}
+
+/* ---- Page backdrop: photo pushed back behind a dark "table" overlay ---- */
+html {
+  background: #0d0906;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(231, 181, 74, 0.10), rgba(13, 9, 6, 0) 55%),
+    linear-gradient(rgba(15, 10, 7, 0.80), rgba(11, 7, 5, 0.93)),
+    url('/wiki/resources/assets/woc-loading-screen.jpg') center top / cover fixed,
+    var(--woc-oak-2);
+  color: var(--woc-ink);
+}
+
+.mw-page-container,
+.vector-header-container,
+.vector-sticky-header,
+.mw-footer-container {
+  background: transparent;
+}
+
+/* ---- Top header bar ---- */
+/* warm the stark white masthead so it reads as part of the parchment page */
+.vector-header.mw-header {
+  background: linear-gradient(180deg, #f7efd9, #ece0bd);
+  border-bottom: 1px solid rgba(157, 124, 67, 0.6);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+}
+
+.mw-logo-wordmark,
+.mw-logo-tagline {
+  color: #b9831f;
+  font-family: var(--woc-display);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 0 rgba(255, 252, 240, 0.6);
+}
+
+/* keep the header search field crisp on the warm bar */
+.vector-header .cdx-text-input__input,
+.vector-header .cdx-search-input input {
+  background: #fffaf0;
+  border-color: rgba(157, 124, 67, 0.5);
+}
+
+/* ---- Reading surface ---- */
+.mw-body,
+.vector-page-titlebar,
+.vector-page-toolbar {
+  background: var(--woc-parchment);
+  color: var(--woc-ink);
+  border-color: var(--woc-rule-strong);
+}
+
+.mw-body {
+  background:
+    radial-gradient(120% 90% at 100% 0, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 60%),
+    var(--woc-parchment);
+  border: 1px solid var(--woc-rule-strong);
+  border-radius: 4px;
+  box-shadow:
+    0 1px 0 rgba(255, 246, 222, 0.5) inset,
+    0 22px 50px rgba(0, 0, 0, 0.42);
+}
+
+.vector-body {
+  color: var(--woc-ink);
+}
+
+/* ---- Side columns: dark oak panels ---- */
+/* NB: don't give .vector-settings panel chrome — an empty collapsed copy of
+   it lives in the right column and would render as a stray dark nub. */
+.vector-main-menu,
+.vector-toc,
+.vector-page-tools,
+.vector-appearance {
+  background: linear-gradient(180deg, rgba(45, 30, 19, 0.97), rgba(22, 14, 9, 0.98));
+  color: var(--woc-parchment);
+  border: 1px solid rgba(231, 181, 74, 0.28);
+  border-radius: 4px;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.34);
+  padding: 6px 10px 10px;
+}
+
+/* readable text + controls inside the dark side panels (incl. Appearance) */
+.vector-main-menu,
+.vector-main-menu *,
+.vector-toc,
+.vector-toc *,
+.vector-page-tools,
+.vector-page-tools *,
+.vector-appearance,
+.vector-appearance *,
+.vector-settings,
+.vector-settings * {
+  color: var(--woc-parchment);
+}
+
+.vector-main-menu a,
+.vector-toc a,
+.vector-page-tools a,
+.vector-appearance a {
+  color: var(--woc-gold-soft);
+}
+
+.vector-main-menu a:hover,
+.vector-toc a:hover,
+.vector-page-tools a:hover {
+  color: #fff;
+}
+
+.vector-toc .vector-toc-list-item-active > a,
+.vector-toc-list-item-active .vector-toc-text {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* section / landmark labels */
+.mw-logo-wordmark,
+.mw-logo-tagline,
+.vector-main-menu-landmark,
+.vector-toc-landmark,
+.vector-page-tools-landmark,
+.vector-pinnable-header-label,
+.vector-pinnable-header h2,
+.vector-pinnable-header h3 {
+  color: var(--woc-gold);
+}
+
+/* keep the Appearance widget's labels legible */
+.vector-settings .cdx-field__label,
+.vector-settings .cdx-label,
+.vector-settings legend,
+.vector-appearance legend,
+.vector-pinnable-header-label {
+  color: var(--woc-gold-soft) !important;
+}
+
+/* tone down the white pin / collapse toggle buttons that sit on the oak panels */
+.vector-main-menu .vector-pinnable-header-toggle-button,
+.vector-toc .vector-pinnable-header-toggle-button,
+.vector-page-tools .vector-pinnable-header-toggle-button,
+.vector-appearance .vector-pinnable-header-toggle-button,
+.vector-pinnable-header-toggle-button {
+  background: rgba(231, 181, 74, 0.12);
+  color: var(--woc-gold-soft);
+  border-radius: 4px;
+}
+
+.vector-pinnable-header-toggle-button:hover {
+  background: rgba(231, 181, 74, 0.24);
+}
+
+/* the header divider under "Contents"/"Appearance" defaults to light grey,
+   which paints a harsh line across the dark oak panels — soften to gold */
+.vector-pinnable-header {
+  border-bottom: 1px solid rgba(231, 181, 74, 0.22) !important;
+}
+
+/* ---- Typography ---- */
+.mw-first-heading,
+.mw-parser-output h1,
+.mw-parser-output h2,
+.mw-parser-output h3,
+.mw-parser-output h4 {
+  font-family: var(--woc-display);
+  color: #281607;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+}
+
+.mw-first-heading {
+  font-size: 2.45rem;
+  line-height: 1.12;
+  border-bottom: 2px solid var(--woc-gold);
+  padding-bottom: 0.25em;
+}
+
+.mw-parser-output h2 {
+  font-size: 1.6rem;
+  border-bottom: 1px solid var(--woc-rule);
+  padding-bottom: 0.22em;
+  margin-top: 1.4em;
+}
+
+.mw-parser-output h3 {
+  font-size: 1.22rem;
+  color: var(--woc-seal);
+  border: 0;
+}
+
+.mw-parser-output p,
+.mw-parser-output li {
+  line-height: 1.65;
+}
+
+/* ---- Links ---- */
+.mw-parser-output a,
+.mw-body-content a:not(.external):not(.image) {
+  color: var(--woc-link);
+  text-decoration-color: rgba(28, 90, 122, 0.4);
+  text-underline-offset: 2px;
+}
+
+.mw-parser-output a:visited {
+  color: var(--woc-link-visited);
+}
+
+.mw-parser-output a:hover {
+  color: #0f3e57;
+}
+
+.mw-parser-output a.new {
+  color: var(--woc-seal);
+}
+
+/* ---- Hero ---- */
+.woc-main,
+.woc-hero,
+.woc-card,
+.wikitable,
+.article-facts {
+  border-color: var(--woc-rule) !important;
+}
+
+.woc-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 264px;
+  gap: 22px;
+  padding: 26px 28px;
+  margin-bottom: 22px;
+  align-items: center;
+  background:
+    radial-gradient(140% 120% at 0 0, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 55%),
+    linear-gradient(180deg, #f6edd4, #ecddb7);
+  border: 1px solid var(--woc-rule-strong);
+  border-radius: 6px;
+  box-shadow:
+    0 1px 0 rgba(255, 250, 232, 0.7) inset,
+    0 16px 34px rgba(0, 0, 0, 0.22);
+}
+
+.woc-hero h1 {
+  margin: 0.08em 0 0.28em;
+  font-family: var(--woc-display);
+  font-size: 3rem;
+  line-height: 1.04;
+  color: #271404;
+  border: 0;
+}
+
+.woc-kicker {
+  margin: 0 0 6px;
+  color: var(--woc-seal);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.woc-hero p {
+  color: #43321b;
+  font-size: 1.02rem;
+}
+
+.woc-card {
+  display: grid;
+  place-items: center;
+  padding: 14px;
+  background: radial-gradient(120% 120% at 50% 0, #34221580, transparent 70%), linear-gradient(180deg, #2c1c13, #160d08);
+  border: 1px solid rgba(231, 181, 74, 0.42);
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3) inset, 0 12px 26px rgba(0, 0, 0, 0.4);
+}
+
+.woc-crest {
+  display: grid;
+  place-items: end center;
+  width: min(220px, 100%);
+  aspect-ratio: 1;
+  padding: 14px;
+  background:
+    linear-gradient(rgba(24, 15, 10, 0), rgba(24, 15, 10, 0.85)),
+    url('/wiki/resources/assets/worldofclaudecraft-logo.png') center / contain no-repeat;
+  color: var(--woc-gold-soft);
+  font-family: var(--woc-display);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* ---- Tables ---- */
+.wikitable,
+.article-facts {
+  background: var(--woc-parchment) !important;
+  border: 1px solid var(--woc-rule-strong) !important;
+  border-collapse: collapse;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+}
+
+.wikitable > * > tr > th,
+.wikitable > * > tr > td,
+.article-facts > * > tr > th,
+.article-facts > * > tr > td {
+  border: 1px solid var(--woc-rule) !important;
+  padding: 8px 12px;
+}
+
+/* column + top headers — light text on oak, now actually visible */
+.wikitable > * > tr > th,
+.article-facts > * > tr > th {
+  color: #fdeec8 !important;
+  background: linear-gradient(180deg, #4a3017, #2f1d0e) !important;
+  font-family: var(--woc-display);
+  font-weight: 600;
+  text-align: left;
+}
+
+/* row-header (key/value fact tables) gets a narrower, distinct tone */
+.article-facts > * > tr > th {
+  background: linear-gradient(180deg, #402a14, #281a0c) !important;
+  white-space: nowrap;
+  width: 1%;
+}
+
+.wikitable > * > tr:nth-child(even) > td,
+.article-facts > * > tr:nth-child(even) > td {
+  background: var(--woc-parchment-2);
+}
+
+/* ---- Categories / footer of article ---- */
+.catlinks {
+  background: rgba(64, 42, 20, 0.10);
+  border: 1px solid var(--woc-rule);
+  border-radius: 4px;
+  padding: 8px 12px;
+  color: var(--woc-ink-soft);
+}
+
+/* ---- Code / quotes ---- */
+.mw-parser-output pre,
+.mw-parser-output code,
+.mw-parser-output tt {
+  background: #efe2c0;
+  border: 1px solid var(--woc-rule);
+  border-radius: 4px;
+  color: #3a2710;
+}
+
+.mw-parser-output blockquote {
+  border-left: 3px solid var(--woc-gold);
+  background: rgba(231, 181, 74, 0.08);
+  padding: 0.5em 1em;
+  border-radius: 0 4px 4px 0;
+}
+
+/* ---- Site footer ---- */
+.mw-footer,
+.mw-footer li,
+.mw-footer-info,
+.mw-footer-places {
+  color: rgba(243, 232, 204, 0.72);
+}
+
+.mw-footer a {
+  color: var(--woc-gold-soft);
+}
+
+.mw-footer {
+  border-top: 1px solid rgba(231, 181, 74, 0.18);
+  margin-top: 8px;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 720px) {
+  .woc-hero {
+    grid-template-columns: 1fr;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .woc-hero h1 {
+    font-size: 2.1rem;
+  }
+
+  .woc-card {
+    max-width: 230px;
+    margin: 0 auto;
+  }
+
+  .mw-first-heading {
+    font-size: 1.9rem;
+  }
+}

@@ -1,25 +1,104 @@
-// Default (Mouse Camera off): WoW-style — WASD + A/D keyboard turn, Q/E strafe,
-// left-drag orbits, right-drag mouselooks, both buttons run forward.
-// Optional Mouse Camera (on): OSRS-style — WASD is camera-relative, A/D strafe,
-// mouse drag rotates the orbit (no pointer lock), no keyboard turn.
+// Default (Mouse Camera off): classic-MMO-style (WASD + A/D keyboard turn, Q/E strafe,
+// left-drag orbits, right-drag mouselooks, both buttons run forward).
+// Optional Mouse Camera (on): OSRS-style (WASD is camera-relative, A/D strafe,
+// mouse drag rotates the orbit (no pointer lock), no keyboard turn).
 // Shared: space jump, wheel zoom, Tab target, rebindable action bar, R autorun.
 
-import { Keybinds, actionKind } from './keybinds';
-import { cursorForHover, type HoverCursorKind } from './cursors';
 import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
+import { detectBrowserEngine } from './browser_env';
+import { cursorForHover, type HoverCursorKind } from './cursors';
+import { comboCode, isModifierCode, type Keybinds, makeCombo } from './keybinds';
+import {
+  inForcedPointerLockCooldown,
+  pointerLockNeedsSyncGesture,
+  shouldEngagePointerLock,
+  shouldEngagePointerLockOnMouseDown,
+  shouldReleasePointerLock,
+} from './pointer_lock';
+import { normalizePointerLookDelta } from './pointer_look_delta';
+import { clickPickFromMouseGesture, DEFAULT_CLICK_PICK_MAX_MS } from './pointer_pick';
+
+function detectPointerLockNeedsSyncGesture(): boolean {
+  try {
+    return pointerLockNeedsSyncGesture(navigator.userAgent);
+  } catch {
+    return false;
+  }
+}
 
 const BASE_LOOK_SENS = 0.0045;
 const TOUCH_LOOK_YAW_RATE = 3.2;
 const TOUCH_LOOK_PITCH_RATE = 2.2;
+// One-finger swipe-drag on the open canvas (mobile_controls.ts onSwipeLookMove)
+// felt sluggish next to the joystick look path: a full-screen-width swipe barely
+// turned the camera. This multiplier only scales that drag path, not mouselook
+// or the camera joystick, so desktop and the joystick are unaffected.
+const TOUCH_DRAG_SENS_MULT = 2.2;
+const TOUCH_JUMP_LATCH_MS = 220;
+// A keyboard jump press is latched the same way a touch tap is: a fast spacebar
+// tap can be pressed and released entirely between two 20Hz input samples (or
+// sim-tick gaps), so reading the raw key-held state silently drops it. Holding
+// the value above one full input/tick window (50ms) guarantees a grounded tick
+// observes the jump. Held jumps are unaffected (the key stays physically down).
+const KEY_JUMP_LATCH_MS = 150;
+const CAMERA_DRAG_START_DISTANCE = 18;
+const CAMERA_DRAG_START_MS = 140;
+
+type FullscreenDocument = Document & {
+  webkitFullscreenElement?: Element | null;
+};
+
+type ContextMenuTarget = {
+  tagName?: string;
+  isContentEditable?: boolean;
+  closest?: (selectors: string) => Element | null;
+};
 
 export interface InputCallbacks {
   onTab(): void;
+  onTargetFriendly(): void;
+  onCycleFriendly(): void;
+  // Pet-bar command (bound to Ctrl+1..5 by default): attack the current target,
+  // stop (passive stance), taunt, or set the defensive/aggressive stance.
+  onPet(action: 'attack' | 'stop' | 'taunt' | 'defensive' | 'aggressive'): void;
   onAbility(slot: number): void;
-  onUiKey(key: 'interact' | 'bags' | 'char' | 'spellbook' | 'questlog' | 'map' | 'nameplates' | 'escape' | 'chat' | 'meters' | 'social' | 'arena'): void;
+  // Action-bar slot key DOWN / UP, so a slot can HOLD to charge (the Vale Cup
+  // shoot) and release to fire. A tap is a down immediately followed by an up.
+  onAbilityDown(slot: number): void;
+  onAbilityUp(slot: number): void;
+  onUiKey(
+    key:
+      | 'interact'
+      | 'bags'
+      | 'char'
+      | 'spellbook'
+      | 'talents'
+      | 'questlog'
+      | 'map'
+      | 'nameplates'
+      | 'escape'
+      | 'chat'
+      | 'meters'
+      | 'social'
+      | 'arena'
+      | 'valecup'
+      | 'dungeonFinder'
+      | 'leaderboard'
+      | 'calendar'
+      | 'discord'
+      | 'deeds'
+      | 'professions'
+      | 'crafting'
+      | 'sheathe',
+  ): void;
+  onEmoteWheel(open: boolean): void;
   onClickPick(x: number, y: number, button: number): void;
+  /** Attack-move key pressed (only fires while Attack Move mode is on); x/y is the cursor. */
+  onAttackMove?(x: number, y: number): void;
   /** When false, edge actions (spells, UI keys) are ignored. */
   canUseGameKeys?: () => boolean;
+  onInputIntent?(kind: 'move' | 'look' | 'zoom'): void;
 }
 
 export interface TouchMoveInput {
@@ -27,6 +106,29 @@ export interface TouchMoveInput {
   back: boolean;
   strafeLeft: boolean;
   strafeRight: boolean;
+}
+
+export interface InputDebugState {
+  suspendMovement: boolean;
+  attackMoveEnabled: boolean;
+  mouseCameraEnabled: boolean;
+  activeElementTag: string;
+  keyCount: number;
+  keys: string[];
+  movementHeld: {
+    forward: boolean;
+    back: boolean;
+    turnLeft: boolean;
+    turnRight: boolean;
+    strafeLeft: boolean;
+    strafeRight: boolean;
+    jump: boolean;
+  };
+  leftDown: boolean;
+  rightDown: boolean;
+  cameraDragActive: boolean;
+  pointerLocked: boolean;
+  hoverActive: boolean;
 }
 
 export class Input {
@@ -40,51 +142,183 @@ export class Input {
   suspendMovement = false;
   // click-to-move (#95): a world destination the player clicked; the frame loop
   // walks toward it until arrival or until the player takes manual control.
-  // null when inactive. clickMoveStop is how close counts as "there".
+  // null when inactive. clickMoveTarget is the current waypoint; clickMoveGoal
+  // is the final clicked location or live entity position. clickMoveStop is how
+  // close counts as "there" at the final waypoint.
   clickMoveTarget: { x: number; z: number } | null = null;
+  clickMoveGoal: { x: number; z: number } | null = null;
+  clickMovePath: { x: number; z: number }[] = [];
+  clickMovePathIndex = 0;
+  clickMoveEntityId: number | null = null;
   clickMoveStop = 0.5;
+  clickMoveFacing: number | null = null;
+  clickMovePulse = 0;
+  clickMovePulseTarget: { x: number; z: number } | null = null;
+  // True while the current click-to-move was issued as an attack-move (walk to
+  // the point and auto-attack enemies). Set by setClickMoveTarget, cleared on stop.
+  clickMoveAttack = false;
+  // When on (the Attack Move setting), only the attack-move key itself is
+  // reserved. Other movement keys still work so enabling Attack Move cannot
+  // make WASD appear dead.
+  private attackMoveEnabled = false;
   /** Latest pointer position while over the canvas (for hover pick). */
   hoverX = 0;
   hoverY = 0;
   hoverActive = false;
   private hoverKind: HoverCursorKind = 'default';
   private mouseCameraEnabled = false;
+  // "Lock cursor while rotating" (settings: lockCursorOnRotate, default on).
+  // When on, an active camera drag pointer-locks the canvas so the OS cursor
+  // cannot reach the screen edge (camera freeze) or slip to a second monitor.
+  private lockCursorOnRotate = true;
   private dragDistance = 0;
+  private cameraDragActive = false;
+  private clickMoveMouseButton: 0 | 2 | null = null;
+  // +1 normal, -1 inverts the vertical mouselook axis (settings: invertLookY).
+  private lookPitchSign = 1;
   private downButton = -1;
   private pointerLockRequestedForDrag = false;
+  // Set when the browser itself force-unlocks the pointer (Escape, focus
+  // loss) while a drag button was still held; see inForcedPointerLockCooldown.
+  private forcedUnlockAt: number | null = null;
+  // Firefox rejects requestPointerLock() when it is deferred to a later
+  // mousemove; computed once since the browser cannot change mid-session.
+  private readonly needsSyncPointerLockGesture = detectPointerLockNeedsSyncGesture();
+  private downX = 0;
+  private downY = 0;
+  private downAt = 0;
   // one-shot key capture for the rebind UI: the next keydown is delivered here
   // (Escape cancels with null) instead of being dispatched as an action
   private captureCb: ((code: string | null) => void) | null = null;
   private controllerMoveInput: MoveInput | null = null;
   private controllerFacing: number | null = null;
+  private emoteWheelHeldCodes = new Set<string>();
+  // Advances only when the player starts or replaces movement. Releasing a held
+  // key/stick is not newer travel intent and must not invalidate a delayed
+  // successful interaction that should stop autorun.
+  private movementIntentRevision = 0;
+  // Physical key code -> action-bar slot currently held down, so key UP (or a
+  // blur) releases the matching slot (drives the hold-to-charge shoot).
+  private heldSlotCodes = new Map<string, number>();
   // mouse-look sensitivity, in radians per pixel of drag; the old fixed value
   // was BASE_LOOK_SENS — setCameraSpeed scales it from the settings menu
   private lookSensitivity = BASE_LOOK_SENS;
-  private touchMove: TouchMoveInput = { forward: false, back: false, strafeLeft: false, strafeRight: false };
+  // Gecko (Firefox) reports movementX/movementY in CSS pixels, not the physical
+  // pixels Chromium reports and the sensitivity is tuned against, so on a HiDPI
+  // display or under page zoom its mouselook runs at the wrong speed (#1834).
+  // Detected once (the engine never changes mid-session) and used to normalize
+  // each delta in onMouseMove; every other engine stays a pass-through.
+  private readonly isGeckoEngine =
+    typeof navigator !== 'undefined' &&
+    detectBrowserEngine(navigator.userAgent || '').engine === 'gecko';
+  private touchMove: TouchMoveInput = {
+    forward: false,
+    back: false,
+    strafeLeft: false,
+    strafeRight: false,
+  };
+  // Movement flags from the gamepad's left stick, OR'd into readMoveInput()
+  // alongside the touch joystick. The gamepad polls each frame (gamepad.ts).
+  private gamepadMove: TouchMoveInput = {
+    forward: false,
+    back: false,
+    strafeLeft: false,
+    strafeRight: false,
+  };
+  private touchJumpUntil = 0;
+  private keyJumpUntil = 0;
   private touchLookActive = false;
   private touchLookVector = { x: 0, y: 0 };
+  // multiplier on the touch look (camera joystick) rate; setTouchLookSpeed
+  // drives it from the settings menu. Mouselook uses lookSensitivity instead.
+  private touchLookSpeed = 1;
+  // +1 normal, -1 when the player inverts the touch camera's vertical axis
+  private touchPitchSign = 1;
 
-  constructor(private canvas: HTMLCanvasElement, private cb: InputCallbacks, private keybinds: Keybinds) {
+  constructor(
+    private canvas: HTMLCanvasElement,
+    private cb: InputCallbacks,
+    private keybinds: Keybinds,
+  ) {
     window.addEventListener('keydown', (e) => this.onKeyDown(e));
-    window.addEventListener('keyup', (e) => { this.keys.delete(e.code); });
+    window.addEventListener('keyup', (e) => this.onKeyUp(e));
     window.addEventListener('blur', () => this.releaseCapture('blur'));
     window.addEventListener('pointerup', (e) => this.onMouseUp(e));
     window.addEventListener('pointercancel', (e) => this.onMouseUp(e));
     document.addEventListener('pointerlockchange', () => {
-      if (!document.pointerLockElement) this.releaseCapture('pointerlock');
+      if (!document.pointerLockElement) {
+        // A forced unlock (Escape, or losing focus while locked) fires with a
+        // drag button still physically down: the ordinary end-of-drag
+        // exitPointerLock() call only ever runs after mouseup has already
+        // cleared leftDown/rightDown. This is not a hard guarantee though:
+        // setLockCursorOnRotate()/setMouseCameraEnabled() call
+        // exitPointerLock() directly and can fire mid-drag with a button
+        // still held, which reads here as a forced unlock too. The fallout is
+        // small (toggling one of those settings mid-drag suppresses the lock
+        // for the next ~1.3s on Firefox) and self-corrects once the drag
+        // ends, so it is an accepted trade-off rather than something worth
+        // threading extra state through to distinguish. Remember the forced
+        // unlock so the next requestPointerLock() attempt can skip Firefox's
+        // post-forced-unlock cooldown instead of failing silently mid-drag
+        // (#1834 recurrence).
+        if (this.leftDown || this.rightDown) this.forcedUnlockAt = performance.now();
+        this.releaseCapture('pointerlock');
+        return;
+      }
+      // A fast click can beat the async requestPointerLock() grant: the
+      // mousedown-synchronous request above (Firefox) or the drag-threshold
+      // request (Chromium) can resolve AFTER mouseup already ran, so nothing
+      // released it there. If the grant lands with no drag button currently
+      // held, drop it immediately rather than leaving the cursor stuck
+      // captured until the next press/release cycle.
+      if (
+        shouldReleasePointerLock({
+          anyButtonDown: this.leftDown || this.rightDown,
+          hasLock: document.pointerLockElement === this.canvas,
+        })
+      ) {
+        document.exitPointerLock();
+      }
+    });
+    // A denied request (e.g. the forced-unlock cooldown above, or any other
+    // rejection) otherwise leaves pointerLockRequestedForDrag wrongly set to
+    // true with no lock actually granted; without this the drag never
+    // reconsiders requesting the lock again for the rest of that press.
+    document.addEventListener('pointerlockerror', () => {
+      this.pointerLockRequestedForDrag = false;
+      // A denial is itself the strongest available evidence that we are
+      // inside Firefox's forced-unlock cooldown, whatever caused it: the
+      // pointerlockchange handler above only records forcedUnlockAt when a
+      // drag button happens to still be held at unlock time, which misses
+      // orderings where focus loss clears leftDown/rightDown before the
+      // unlock event fires (blur landing ahead of pointerlockchange, the
+      // likely ordering for a focus-loss forced unlock). Recording it here
+      // too makes the mechanism self-healing: the next drag attempt within
+      // the window skips the doomed request regardless of event ordering.
+      this.forcedUnlockAt = performance.now();
     });
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) this.releaseCapture('hidden');
     });
+    document.addEventListener('contextmenu', (e) => this.onContextMenu(e));
+    document.addEventListener('selectstart', (e) => this.onSelectStart(e));
     canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
     window.addEventListener('mouseup', (e) => this.onMouseUp(e));
     window.addEventListener('mousemove', (e) => this.onMouseMove(e));
-    canvas.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      this.camDist = Math.min(22, Math.max(3, this.camDist + Math.sign(e.deltaY) * 1.4));
-    }, { passive: false });
+    canvas.addEventListener(
+      'wheel',
+      (e) => {
+        e.preventDefault();
+        if (document.body.classList.contains('mobile-touch')) return;
+        this.zoomBy(Math.sign(e.deltaY) * 1.4);
+        this.noteIntent('zoom');
+      },
+      { passive: false },
+    );
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-    canvas.addEventListener('mouseenter', () => { this.hoverActive = true; });
+    canvas.addEventListener('mouseenter', () => {
+      this.hoverActive = true;
+    });
     canvas.addEventListener('mouseleave', () => {
       this.hoverActive = false;
       this.setHoverCursor('default');
@@ -92,9 +326,73 @@ export class Input {
     this.updateCursor();
   }
 
+  private onContextMenu(e: MouseEvent): void {
+    if (this.shouldSuppressContextMenu(e.target)) e.preventDefault();
+  }
+
+  private onSelectStart(e: Event): void {
+    const body = document.body;
+    if (!body?.classList.contains('game-active') || !body.classList.contains('mobile-touch'))
+      return;
+    if (this.isEditableContextTarget(e.target)) return;
+    e.preventDefault();
+  }
+
+  private shouldSuppressContextMenu(target: EventTarget | null): boolean {
+    const body = document.body;
+    if (body && !body.classList.contains('game-active')) return false;
+    if (this.isEditableContextTarget(target)) return false;
+    if (!body && target !== this.canvas && !this.isGameSurfaceTarget(target)) return false;
+    return true;
+  }
+
+  private isEditableContextTarget(target: EventTarget | null): boolean {
+    const el = this.contextMenuTarget(target);
+    if (!el) return false;
+    const tag = (el.tagName ?? '').toLowerCase();
+    return (
+      tag === 'input' ||
+      tag === 'textarea' ||
+      tag === 'select' ||
+      el.isContentEditable === true ||
+      !!el.closest?.('input, textarea, select, [contenteditable=""], [contenteditable="true"]')
+    );
+  }
+
+  private isGameSurfaceTarget(target: EventTarget | null): boolean {
+    const el = this.contextMenuTarget(target);
+    return !!el?.closest?.('#ui, #game-canvas, #nameplates');
+  }
+
+  private contextMenuTarget(target: EventTarget | null): ContextMenuTarget | null {
+    return target && typeof target === 'object' ? (target as ContextMenuTarget) : null;
+  }
+
+  /** Move the camera in/out, clamped to the zoom limits. */
+  zoomBy(delta: number): void {
+    this.camDist = Math.min(22, Math.max(3, this.camDist + delta));
+  }
+
   /** True while a mouse button is held for camera drag. */
   isDragging(): boolean {
     return this.leftDown || this.rightDown;
+  }
+
+  isCameraDragActive(): boolean {
+    return this.cameraDragActive;
+  }
+
+  cursorPoint(): { x: number; y: number } | null {
+    return this.hoverActive ? { x: this.hoverX, y: this.hoverY } : null;
+  }
+
+  setClickMoveMouseButton(button: 0 | 2 | null): void {
+    this.clickMoveMouseButton = button;
+    if (button !== null && this.downButton === button) {
+      this.cameraDragActive = false;
+      this.pointerLockRequestedForDrag = false;
+    }
+    this.updateCursor();
   }
 
   /** Update hand / sword / shield cursor from a hover pick (called once per frame). */
@@ -108,12 +406,80 @@ export class Input {
     return this.mouseCameraEnabled;
   }
 
+  isAttackMoveEnabled(): boolean {
+    return this.attackMoveEnabled;
+  }
+
+  setAttackMoveEnabled(on: boolean): void {
+    this.attackMoveEnabled = on;
+  }
+
+  debugState(): InputDebugState {
+    return {
+      suspendMovement: this.suspendMovement,
+      attackMoveEnabled: this.attackMoveEnabled,
+      mouseCameraEnabled: this.mouseCameraEnabled,
+      activeElementTag: (document.activeElement?.tagName ?? '').toLowerCase(),
+      keyCount: this.keys.size,
+      keys: [...this.keys].sort(),
+      movementHeld: {
+        forward: this.heldAction('forward'),
+        back: this.heldAction('back'),
+        turnLeft: this.heldAction('turnLeft'),
+        turnRight: this.heldAction('turnRight'),
+        strafeLeft: this.heldAction('strafeLeft'),
+        strafeRight: this.heldAction('strafeRight'),
+        jump: this.keybinds.codesForAction('jump').some((c) => this.keys.has(comboCode(c))),
+      },
+      leftDown: this.leftDown,
+      rightDown: this.rightDown,
+      cameraDragActive: this.cameraDragActive,
+      pointerLocked: document.pointerLockElement === this.canvas,
+      hoverActive: this.hoverActive,
+    };
+  }
+
+  setLockCursorOnRotate(on: boolean): void {
+    this.lockCursorOnRotate = on;
+    if (!on && document.pointerLockElement === this.canvas) {
+      document.exitPointerLock?.();
+    }
+  }
+
   setMouseCameraEnabled(on: boolean): void {
     this.mouseCameraEnabled = on;
     if (on && document.pointerLockElement === this.canvas) {
       document.exitPointerLock?.();
+      // Toggling mode mid-drag: drop the drag/lock state now rather than waiting
+      // for the async pointerlockchange, so the in-flight drag cannot leave the
+      // request flag latched (which would block re-acquiring the lock).
+      this.cameraDragActive = false;
+      this.pointerLockRequestedForDrag = false;
     }
     this.updateCursor();
+  }
+
+  setSuspendMovement(on: boolean): void {
+    if (this.suspendMovement === on) return;
+    this.suspendMovement = on;
+    if (!on) return;
+    // The held-open emote wheel itself counts as a modal (hud.isModalOpen()),
+    // so when its keys are down this suspension almost always IS the wheel. The
+    // stale-input clear below must not run then: it would close the wheel one
+    // frame after the bound key opened it, and drop still-held movement keys
+    // mid-emote. Nothing held is actually stale in that state, because onKeyUp
+    // is never modal-gated and releaseCapture handles focus loss. (Rare corner:
+    // the hud can close the wheel while the key is still physically down, e.g.
+    // Escape or clicking a slice mid-hold; a menu suspension inside that window
+    // also skips the clear, which just restores the pre-clear behavior of held
+    // movement resuming when the menu closes.)
+    if (this.emoteWheelHeldCodes.size > 0) return;
+    const hadHeldInput = this.keys.size > 0 || this.keyJumpUntil > 0;
+    this.keys.clear();
+    this.keyJumpUntil = 0;
+    // Suspending input drops any charging Vale Cup sport move (held Shoot etc.).
+    this.releaseHeldSlots();
+    if (hadHeldInput) this.noteIntent('move');
   }
 
   captureNextKey(cb: (code: string | null) => void): void {
@@ -124,42 +490,168 @@ export class Input {
     this.lookSensitivity = BASE_LOOK_SENS * mult;
   }
 
+  setTouchLookSpeed(mult: number): void {
+    this.touchLookSpeed = mult;
+  }
+
+  // Invert the vertical mouselook/touch-look axis. Applied to every pitch delta
+  // so the preference is consistent across mouse drag, pointer-lock, and touch.
+  setInvertLookY(on: boolean): void {
+    this.lookPitchSign = on ? -1 : 1;
+  }
+
   setTouchMove(move: TouchMoveInput): void {
+    const changed =
+      move.forward !== this.touchMove.forward ||
+      move.back !== this.touchMove.back ||
+      move.strafeLeft !== this.touchMove.strafeLeft ||
+      move.strafeRight !== this.touchMove.strafeRight;
+    const moving = move.forward || move.back || move.strafeLeft || move.strafeRight;
     this.touchMove = move;
     if (move.forward || move.back) this.autorun = false;
+    if (changed) {
+      if (moving) this.noteMovementIntent();
+      else this.noteIntent('move');
+    }
   }
 
   clearTouchMove(): void {
+    const changed =
+      this.touchMove.forward ||
+      this.touchMove.back ||
+      this.touchMove.strafeLeft ||
+      this.touchMove.strafeRight;
     this.touchMove = { forward: false, back: false, strafeLeft: false, strafeRight: false };
+    if (changed) this.noteIntent('move');
+  }
+
+  // A touch jump is momentary, but readMoveInput() is also used by camera/HUD
+  // helpers between sim ticks. Latch the tap briefly so those reads cannot eat
+  // the jump before the grounded movement tick sees it.
+  triggerTouchJump(): void {
+    this.touchJumpUntil = Math.max(this.touchJumpUntil, performance.now() + TOUCH_JUMP_LATCH_MS);
+  }
+
+  // Touch-reachable autorun toggle (the keyboard path is the 'autorun' edge action).
+  // Returns the new state so the on-screen button can reflect it.
+  toggleAutorun(): boolean {
+    this.autorun = !this.autorun;
+    this.noteMovementIntent();
+    return this.autorun;
+  }
+
+  // Idempotent autorun latch for analog inputs that have a one-way "engage"
+  // gesture, such as the mobile move joystick's top band.
+  setAutorun(on: boolean): boolean {
+    if (this.autorun !== on) this.noteMovementIntent();
+    this.autorun = on;
+    return this.autorun;
+  }
+
+  movementIntentVersion(): number {
+    return this.movementIntentRevision;
   }
 
   setTouchLook(active: boolean): void {
+    if (active !== this.touchLookActive) this.noteIntent('look');
     this.touchLookActive = active;
   }
 
   setTouchLookVector(v: { x: number; y: number }): void {
+    if (v.x !== this.touchLookVector.x || v.y !== this.touchLookVector.y) this.noteIntent('look');
     this.touchLookVector = v;
   }
 
+  // Flip the vertical axis of the touch camera (joystick + swipe-look) only;
+  // mouselook is unaffected. Off by default (see BOOL_SETTINGS.touchInvertLook).
+  setTouchInvertLook(on: boolean): void {
+    this.touchPitchSign = on ? -1 : 1;
+  }
+
   applyTouchLookDelta(dx: number, dy: number): void {
-    this.camYaw -= dx * this.lookSensitivity;
-    this.camPitch = Math.min(1.35, Math.max(-0.4, this.camPitch + dy * this.lookSensitivity));
+    const dragSens = this.lookSensitivity * TOUCH_DRAG_SENS_MULT;
+    this.camYaw -= dx * dragSens;
+    this.camPitch = Math.min(
+      1.35,
+      Math.max(-0.4, this.camPitch + this.touchPitchSign * dy * dragSens),
+    );
+    if (dx !== 0 || dy !== 0) this.noteIntent('look');
+  }
+
+  // --- Gamepad (poll-based) -------------------------------------------------
+  // The gamepad shares the touch joystick's movement path: its left-stick flags
+  // are OR'd into readMoveInput(). Set/cleared each poll by GamepadManager.
+  setGamepadMove(move: TouchMoveInput): void {
+    const changed =
+      move.forward !== this.gamepadMove.forward ||
+      move.back !== this.gamepadMove.back ||
+      move.strafeLeft !== this.gamepadMove.strafeLeft ||
+      move.strafeRight !== this.gamepadMove.strafeRight;
+    const moving = move.forward || move.back || move.strafeLeft || move.strafeRight;
+    this.gamepadMove = move;
+    if (move.forward || move.back) this.autorun = false;
+    if (changed) {
+      if (moving) this.noteMovementIntent();
+      else this.noteIntent('move');
+    }
+  }
+
+  clearGamepadMove(): void {
+    const changed =
+      this.gamepadMove.forward ||
+      this.gamepadMove.back ||
+      this.gamepadMove.strafeLeft ||
+      this.gamepadMove.strafeRight;
+    this.gamepadMove = { forward: false, back: false, strafeLeft: false, strafeRight: false };
+    if (changed) this.noteIntent('move');
+  }
+
+  // Latch a gamepad jump-button tap the same way touch jumps latch, so reads
+  // between sim ticks don't swallow it before the grounded tick sees it.
+  triggerGamepadJump(): void {
+    this.touchJumpUntil = Math.max(this.touchJumpUntil, performance.now() + TOUCH_JUMP_LATCH_MS);
+  }
+
+  // Apply the right-stick camera deltas (already in radians, computed by the
+  // pure stickToLook core). Clamps pitch to the same range as touch/mouse look.
+  applyGamepadLook(yawDelta: number, pitchDelta: number): void {
+    if (yawDelta === 0 && pitchDelta === 0) return;
+    this.camYaw += yawDelta;
+    this.camPitch = Math.min(1.35, Math.max(-0.4, this.camPitch + pitchDelta));
+    this.noteIntent('look');
   }
 
   updateTouchLook(dt: number): void {
     if (!this.touchLookActive) return;
-    this.camYaw -= this.touchLookVector.x * TOUCH_LOOK_YAW_RATE * dt;
-    this.camPitch = Math.min(1.35, Math.max(-0.4, this.camPitch + this.touchLookVector.y * TOUCH_LOOK_PITCH_RATE * dt));
+    this.camYaw -= this.touchLookVector.x * TOUCH_LOOK_YAW_RATE * this.touchLookSpeed * dt;
+    this.camPitch = Math.min(
+      1.35,
+      Math.max(
+        -0.4,
+        this.camPitch +
+          this.touchPitchSign *
+            this.touchLookVector.y *
+            TOUCH_LOOK_PITCH_RATE *
+            this.touchLookSpeed *
+            dt,
+      ),
+    );
+  }
+
+  /** Snap the orbit camera back behind the character (mobile recenter gesture). */
+  recenterCameraBehind(facing: number): void {
+    if (Number.isFinite(facing)) this.camYaw = facing;
+    this.camPitch = 0.32;
   }
 
   isMouselookActive(): boolean {
     if (this.mouseCameraEnabled) return this.touchLookActive;
-    return this.rightDown || this.touchLookActive;
+    return (this.rightDown && this.cameraDragActive) || this.touchLookActive;
   }
 
   setControllerMoveInput(input: unknown, facing?: unknown): void {
     this.controllerMoveInput = sanitizeMoveInput(input);
-    if (arguments.length > 1) this.controllerFacing = sanitizeMoveFacing(facing);
+    if (facing !== undefined) this.controllerFacing = sanitizeMoveFacing(facing);
   }
 
   setControllerFacing(facing: unknown): void {
@@ -171,86 +663,406 @@ export class Input {
     this.controllerFacing = null;
   }
 
+  setClickMoveTarget(
+    target: { x: number; z: number },
+    stopDistance: number,
+    entityId: number | null = null,
+    path: { x: number; z: number }[] = [target],
+    attack = false,
+  ): void {
+    this.applyClickMovePath(target, path);
+    this.clickMoveStop = stopDistance;
+    this.clickMoveEntityId = entityId;
+    this.clickMoveAttack = attack;
+    this.clickMoveFacing = null;
+    this.clickMovePulseTarget = target;
+    this.clickMovePulse++;
+    this.autorun = false;
+    this.noteMovementIntent();
+  }
+
+  rerouteClickMoveTarget(
+    target: { x: number; z: number },
+    path: { x: number; z: number }[] = [target],
+  ): void {
+    if (!this.clickMoveTarget) return;
+    this.applyClickMovePath(target, path);
+  }
+
+  advanceClickMoveWaypoint(): boolean {
+    if (!this.clickMoveTarget) return false;
+    if (this.clickMovePathIndex >= this.clickMovePath.length - 1) return false;
+    this.clickMovePathIndex++;
+    this.clickMoveTarget = this.clickMovePath[this.clickMovePathIndex];
+    return true;
+  }
+
+  isClickMoveFinalWaypoint(): boolean {
+    return !!this.clickMoveTarget && this.clickMovePathIndex >= this.clickMovePath.length - 1;
+  }
+
+  clearClickMove(): void {
+    if (!this.clickMoveTarget && this.clickMoveEntityId === null) return;
+    this.clickMoveTarget = null;
+    this.clickMoveGoal = null;
+    this.clickMovePath = [];
+    this.clickMovePathIndex = 0;
+    this.clickMoveEntityId = null;
+    this.clickMoveFacing = null;
+    this.clickMoveAttack = false;
+    this.noteIntent('move');
+  }
+
+  private applyClickMovePath(
+    target: { x: number; z: number },
+    path: { x: number; z: number }[],
+  ): void {
+    this.clickMoveGoal = target;
+    const cleaned = path.filter((p) => Number.isFinite(p.x) && Number.isFinite(p.z));
+    this.clickMovePath = cleaned.length > 0 ? cleaned : [target];
+    this.clickMovePathIndex = 0;
+    this.clickMoveTarget = this.clickMovePath[0];
+  }
+
   controllerFacingOverride(): number | null {
     return this.controllerFacing;
   }
 
-  private releaseCapture(_reason: string): void {
-    this.keys.clear();
+  private msSinceForcedUnlock(): number | null {
+    return this.forcedUnlockAt === null ? null : performance.now() - this.forcedUnlockAt;
+  }
+
+  private releaseCapture(reason: string): void {
+    const hadInput = this.keys.size > 0 || this.leftDown || this.rightDown;
+    // Always drop the mouse-drag state so a button can't stick "held".
     this.leftDown = false;
     this.rightDown = false;
+    this.cameraDragActive = false;
     this.downButton = -1;
     this.pointerLockRequestedForDrag = false;
+    // Focus loss (blur / tab hidden) means the OS will swallow the matching
+    // keyup, so we must forget held movement keys or they'd stick on. A pointer
+    // -lock exit is different: the window still has focus and keyup will fire
+    // normally, so clearing keys here would cancel a walk the instant a camera
+    // drag ends (every right/left-drag exits pointer lock on release).
+    if (reason !== 'pointerlock') this.keys.clear();
+    if (reason !== 'pointerlock' && this.emoteWheelHeldCodes.size > 0) {
+      this.emoteWheelHeldCodes.clear();
+      this.cb.onEmoteWheel(false);
+    }
+    if (reason !== 'pointerlock') this.releaseHeldSlots();
     this.updateCursor();
+    if (hadInput) this.noteIntent('move');
   }
 
   private updateCursor(): void {
-    this.canvas.style.cursor = cursorForHover(this.hoverKind, this.isDragging() || document.pointerLockElement === this.canvas);
+    this.canvas.style.cursor = cursorForHover(
+      this.hoverKind,
+      this.cameraDragActive || document.pointerLockElement === this.canvas,
+    );
+  }
+
+  private isBrowserFullscreen(): boolean {
+    const doc = document as FullscreenDocument;
+    return !!(document.fullscreenElement ?? doc.webkitFullscreenElement);
+  }
+
+  private pressDurationMs(): number {
+    return Math.max(0, performance.now() - this.downAt);
   }
 
   private onKeyDown(e: KeyboardEvent): void {
     if (e.repeat) return;
     if (this.captureCb) {
       e.preventDefault();
+      // Escape cancels the capture. A lone modifier keypress is ignored so the
+      // player can hold Shift/Ctrl/Alt and THEN press the real key to bind the
+      // whole chord (e.g. Shift+1); the chord is captured on that final key.
+      if (e.code === 'Escape') {
+        const cb = this.captureCb;
+        this.captureCb = null;
+        cb(null);
+        return;
+      }
+      if (isModifierCode(e.code)) return;
       const cb = this.captureCb;
       this.captureCb = null;
-      cb(e.code === 'Escape' ? null : e.code);
+      cb(makeCombo(e.code, { ctrl: e.ctrlKey, alt: e.altKey, shift: e.shiftKey, meta: e.metaKey }));
       return;
     }
     const tag = (document.activeElement?.tagName ?? '').toLowerCase();
     if (tag === 'input' || tag === 'textarea') return;
-    if (this.cb.canUseGameKeys && !this.cb.canUseGameKeys()) return;
-    if (e.code === 'Escape') { this.cb.onUiKey('escape'); return; }
-    if (e.code === 'Tab') e.preventDefault();
-    const action = this.keybinds.actionForCode(e.code);
-    if (action === null) return;
-    if (actionKind(action) === 'held') {
-      this.keys.add(e.code);
-      if (action === 'forward' || action === 'back') this.autorun = false;
+    if (e.code === 'Escape') {
+      this.cb.onUiKey('escape');
       return;
     }
-    this.dispatchEdge(action);
+    if (this.cb.canUseGameKeys && !this.cb.canUseGameKeys()) return;
+    if (e.code === 'Tab') e.preventDefault();
+    if (e.code === 'Space') e.preventDefault?.();
+    // The full modifier chord for this press (null if it is itself a bare
+    // modifier key, which never triggers an action on its own).
+    const combo = isModifierCode(e.code)
+      ? null
+      : makeCombo(e.code, { ctrl: e.ctrlKey, alt: e.altKey, shift: e.shiftKey, meta: e.metaKey });
+    // Attack Move mode: the bound chord (default A) issues an attack-move toward
+    // the cursor and wins over whatever movement action shares that key.
+    if (
+      this.attackMoveEnabled &&
+      this.hoverActive &&
+      combo &&
+      this.keybinds.codesForAction('attackMove').includes(combo)
+    ) {
+      e.preventDefault();
+      this.cb.onAttackMove?.(this.hoverX, this.hoverY);
+      return;
+    }
+    // Held (movement) actions match the physical key only, so a held modifier
+    // never stops movement (Shift+W still walks). Edge actions match the full
+    // chord, so Shift+1 is distinct from 1. Both may fire on one press — that is
+    // intentional (move while casting).
+    const held = this.keybinds.heldActionForCode(e.code);
+    if (held === 'emoteWheel') {
+      this.emoteWheelHeldCodes.add(e.code);
+      this.cb.onEmoteWheel(true);
+      e.preventDefault();
+    } else if (held !== null) {
+      this.keys.add(e.code);
+      if (held === 'forward' || held === 'back') this.autorun = false;
+      // Latch a jump press (e.repeat is filtered above, so this is the real
+      // edge) so a fast tap survives until a grounded movement tick samples it.
+      if (held === 'jump')
+        this.keyJumpUntil = Math.max(this.keyJumpUntil, performance.now() + KEY_JUMP_LATCH_MS);
+      this.noteMovementIntent();
+    }
+    const edge = combo ? this.keybinds.edgeActionForCombo(combo) : null;
+    if (edge !== null) {
+      // A matched chord that carries a modifier (Ctrl/Alt/Cmd) shadows a browser
+      // accelerator, e.g. Ctrl+number tab switching. Cancel the default so the
+      // game keeps the keypress. Some accelerators are not cancelable (Chrome and
+      // Edge reserve Ctrl+1..8 outright), but this reclaims the ones that are
+      // (Firefox) and is a no-op where there is nothing to cancel.
+      if (e.ctrlKey || e.altKey || e.metaKey) e.preventDefault?.();
+      // 'chat' focuses the composer textarea as a side effect of this very
+      // keydown. Left un-prevented, the browser still delivers the follow-up
+      // keypress (and its default newline insertion) to whichever element is
+      // focused AT THAT POINT, i.e. the composer we just focused, so Enter
+      // both opens chat and types a newline into it before the placeholder is
+      // ever seen. Cancel the default so the composer opens empty, but only
+      // when the key was not itself focused on a button: a button's own Enter
+      // activation is a real default action too, and it should still fire
+      // alongside chat opening, same as before this fix.
+      if (edge === 'chat' && tag !== 'button') e.preventDefault?.();
+      if (edge.startsWith('slot')) {
+        // Slot keys use DOWN/UP so a slot can hold to charge; the HUD decides
+        // whether a slot charges (shoot) or fires immediately (tap = down+up).
+        const slot = Number(edge.slice(4));
+        this.heldSlotCodes.set(e.code, slot);
+        this.cb.onAbilityDown(slot);
+      } else {
+        this.dispatchEdge(edge);
+      }
+    }
+  }
+
+  private onKeyUp(e: KeyboardEvent): void {
+    if (this.keys.delete(e.code)) this.noteIntent('move');
+    if (this.emoteWheelHeldCodes.delete(e.code) && this.emoteWheelHeldCodes.size === 0) {
+      this.cb.onEmoteWheel(false);
+      e.preventDefault();
+    }
+    const slot = this.heldSlotCodes.get(e.code);
+    if (slot !== undefined) {
+      this.heldSlotCodes.delete(e.code);
+      this.cb.onAbilityUp(slot);
+    }
+  }
+
+  // Release every held slot (fire onAbilityUp), e.g. on blur/menu, so a charge in
+  // progress cannot stick.
+  private releaseHeldSlots(): void {
+    if (this.heldSlotCodes.size === 0) return;
+    const slots = [...this.heldSlotCodes.values()];
+    this.heldSlotCodes.clear();
+    for (const slot of slots) this.cb.onAbilityUp(slot);
   }
 
   private dispatchEdge(action: string): void {
-    if (action.startsWith('slot')) { this.cb.onAbility(Number(action.slice(4))); return; }
+    if (action.startsWith('slot')) {
+      this.cb.onAbility(Number(action.slice(4)));
+      return;
+    }
     switch (action) {
-      case 'autorun': this.autorun = !this.autorun; return;
-      case 'target': this.cb.onTab(); return;
-      case 'interact': this.cb.onUiKey('interact'); return;
-      case 'bags': this.cb.onUiKey('bags'); return;
-      case 'char': this.cb.onUiKey('char'); return;
-      case 'spellbook': this.cb.onUiKey('spellbook'); return;
-      case 'questlog': this.cb.onUiKey('questlog'); return;
-      case 'map': this.cb.onUiKey('map'); return;
-      case 'nameplates': this.cb.onUiKey('nameplates'); return;
-      case 'meters': this.cb.onUiKey('meters'); return;
-      case 'social': this.cb.onUiKey('social'); return;
-      case 'arena': this.cb.onUiKey('arena'); return;
-      case 'chat': this.cb.onUiKey('chat'); return;
+      case 'autorun':
+        this.autorun = !this.autorun;
+        this.noteMovementIntent();
+        return;
+      case 'target':
+        this.cb.onTab();
+        return;
+      case 'targetFriendly':
+        this.cb.onTargetFriendly();
+        return;
+      case 'targetFriendlyNext':
+        this.cb.onCycleFriendly();
+        return;
+      case 'petAttack':
+        this.cb.onPet('attack');
+        return;
+      case 'petStop':
+        this.cb.onPet('stop');
+        return;
+      case 'petTaunt':
+        this.cb.onPet('taunt');
+        return;
+      case 'petDefensive':
+        this.cb.onPet('defensive');
+        return;
+      case 'petAggressive':
+        this.cb.onPet('aggressive');
+        return;
+      case 'interact':
+        this.cb.onUiKey('interact');
+        return;
+      case 'bags':
+        this.cb.onUiKey('bags');
+        return;
+      case 'crafting':
+        this.cb.onUiKey('crafting');
+        return;
+      case 'char':
+        this.cb.onUiKey('char');
+        return;
+      case 'spellbook':
+        this.cb.onUiKey('spellbook');
+        return;
+      case 'talents':
+        this.cb.onUiKey('talents');
+        return;
+      case 'questlog':
+        this.cb.onUiKey('questlog');
+        return;
+      case 'map':
+        this.cb.onUiKey('map');
+        return;
+      case 'nameplates':
+        this.cb.onUiKey('nameplates');
+        return;
+      case 'meters':
+        this.cb.onUiKey('meters');
+        return;
+      case 'social':
+        this.cb.onUiKey('social');
+        return;
+      case 'arena':
+        this.cb.onUiKey('arena');
+        return;
+      case 'dungeonFinder':
+        this.cb.onUiKey('dungeonFinder');
+        return;
+      case 'valecup':
+        this.cb.onUiKey('valecup');
+        return;
+      case 'leaderboard':
+        this.cb.onUiKey('leaderboard');
+        return;
+      case 'calendar':
+        this.cb.onUiKey('calendar');
+        return;
+      case 'discord':
+        this.cb.onUiKey('discord');
+        return;
+      case 'deeds':
+        this.cb.onUiKey('deeds');
+        return;
+      case 'professions':
+        this.cb.onUiKey('professions');
+        return;
+      case 'chat':
+        this.cb.onUiKey('chat');
+        return;
+      case 'sheathe':
+        this.cb.onUiKey('sheathe');
+        return;
     }
   }
 
   private onMouseDown(e: MouseEvent): void {
     if (e.button === 0) this.leftDown = true;
     if (e.button === 2) this.rightDown = true;
+    if (e.button === 0 || e.button === 2) e.preventDefault?.();
+    if (e.button === 0 || e.button === 2) this.noteIntent(e.button === 2 ? 'look' : 'move');
     this.downButton = e.button;
+    this.downX = e.clientX;
+    this.downY = e.clientY;
+    this.downAt = performance.now();
     this.dragDistance = 0;
+    this.cameraDragActive = false;
+    // Pointer lock is requested lazily once a drag actually begins (see
+    // onMouseMove) — NOT on every press, which spammed the browser "mouse
+    // capture" banner on every right-click used to attack/look (#116). That
+    // deferred mousemove call is denied by Firefox outside fullscreen (see
+    // needsSyncPointerLockGesture), so on Firefox it is instead requested
+    // synchronously right here, for either drag-capable button (left or
+    // right), excluding the click-to-move button. That preserves #116 fully
+    // only on Chromium: on Firefox, an ordinary click on a non-click-to-move
+    // button (e.g. right-click to loot/target/interact) still takes and
+    // releases the lock on every press, a visible flicker, because we cannot
+    // tell a click from the start of a drag until it has already moved. A
+    // genuine drag started on the click-to-move button also stays unfixed on
+    // Firefox (its lock request only ever comes from the denied mousemove
+    // path). Both are accepted trade-offs of restoring working camera drag on
+    // Firefox; see shouldEngagePointerLockOnMouseDown for the full reasoning.
     this.pointerLockRequestedForDrag = false;
+    if (
+      shouldEngagePointerLockOnMouseDown({
+        button: e.button,
+        clickMoveButton: this.clickMoveMouseButton,
+        needsSyncGesture: this.needsSyncPointerLockGesture,
+        lockOnRotate: this.lockCursorOnRotate,
+        alreadyLocked: document.pointerLockElement === this.canvas,
+      }) &&
+      !inForcedPointerLockCooldown({
+        needsSyncGesture: this.needsSyncPointerLockGesture,
+        msSinceForcedUnlock: this.msSinceForcedUnlock(),
+      })
+    ) {
+      this.pointerLockRequestedForDrag = true;
+      void this.canvas.requestPointerLock?.()?.catch?.(() => {});
+    }
     this.updateCursor();
   }
 
   private onMouseUp(e: MouseEvent): void {
-    const wasDrag = this.dragDistance > 5;
     if (e.button === 0) this.leftDown = false;
     if (e.button === 2) this.rightDown = false;
-    if (!this.mouseCameraEnabled && !this.leftDown && !this.rightDown && document.pointerLockElement) {
+    if (e.button === 0 || e.button === 2) this.noteIntent(e.button === 2 ? 'look' : 'move');
+    const wasCameraDrag = this.cameraDragActive;
+    const pick = wasCameraDrag
+      ? null
+      : clickPickFromMouseGesture({
+          button: e.button,
+          downButton: this.downButton,
+          downX: this.downX,
+          downY: this.downY,
+          upX: e.clientX,
+          upY: e.clientY,
+          movementDrag: this.dragDistance,
+          releaseOnCanvas: e.target === this.canvas || document.pointerLockElement === this.canvas,
+          pointerLocked: document.pointerLockElement === this.canvas,
+          pressDurationMs: performance.now() - this.downAt,
+        });
+    // Release the drag lock in both camera modes once no rotation button is
+    // held, so the OS cursor returns between drags for target/loot/UI clicking.
+    if (
+      shouldReleasePointerLock({
+        anyButtonDown: this.leftDown || this.rightDown,
+        hasLock: document.pointerLockElement === this.canvas,
+      })
+    ) {
       document.exitPointerLock();
     }
-    const onCanvas = e.target === this.canvas || document.pointerLockElement === this.canvas;
-    if (!wasDrag && e.button === this.downButton && onCanvas) {
-      this.cb.onClickPick(e.clientX, e.clientY, e.button);
-    }
+    if (pick) this.cb.onClickPick(pick.x, pick.y, pick.button);
+    if (!this.leftDown && !this.rightDown) this.cameraDragActive = false;
     this.downButton = -1;
     this.pointerLockRequestedForDrag = false;
     this.updateCursor();
@@ -262,36 +1074,129 @@ export class Input {
       this.hoverY = e.clientY;
     }
     if (!this.leftDown && !this.rightDown) return;
-    const mx = e.movementX ?? 0, my = e.movementY ?? 0;
+    // Normalize the raw movement delta to Chromium's physical-pixel unit so
+    // mouselook keeps the same speed and drag-start feel on Firefox, where the
+    // deltas arrive in CSS pixels (#1834). A no-op on Chromium/WebKit.
+    const { dx: mx, dy: my } = normalizePointerLookDelta({
+      movementX: e.movementX ?? 0,
+      movementY: e.movementY ?? 0,
+      isGecko: this.isGeckoEngine,
+      devicePixelRatio: typeof window !== 'undefined' ? window.devicePixelRatio : 1,
+    });
     if (mx === 0 && my === 0) return;
+    const heldMs = this.pressDurationMs();
+    if (this.downButton === this.clickMoveMouseButton && heldMs <= DEFAULT_CLICK_PICK_MAX_MS)
+      return;
     this.dragDistance += Math.abs(mx) + Math.abs(my);
-    if (!this.mouseCameraEnabled && this.dragDistance > 5 && !this.pointerLockRequestedForDrag) {
-      this.pointerLockRequestedForDrag = true;
-      this.canvas.requestPointerLock?.();
+    if (!this.cameraDragActive) {
+      if (this.dragDistance < CAMERA_DRAG_START_DISTANCE && heldMs < CAMERA_DRAG_START_MS) return;
+      this.cameraDragActive = true;
+      // Engage pointer lock the instant a press becomes a real camera drag, in
+      // BOTH camera modes, so rotation never begins with a free cursor that can
+      // reach the screen edge (movementX clamps to 0 and the camera freezes) or
+      // slip onto a second monitor. One lock per drag, none for a plain click
+      // (#116). Fullscreen uses the same lock path so right-drag mouselook
+      // behaves identically there.
+      if (
+        !this.pointerLockRequestedForDrag &&
+        shouldEngagePointerLock({
+          lockOnRotate: this.lockCursorOnRotate,
+          isFullscreen: this.isBrowserFullscreen(),
+          alreadyLocked: document.pointerLockElement === this.canvas,
+        }) &&
+        !inForcedPointerLockCooldown({
+          needsSyncGesture: this.needsSyncPointerLockGesture,
+          msSinceForcedUnlock: this.msSinceForcedUnlock(),
+        })
+      ) {
+        this.pointerLockRequestedForDrag = true;
+        this.canvas.requestPointerLock?.();
+      }
+      this.noteIntent('look');
+      this.updateCursor();
+      return;
     }
     this.camYaw -= mx * this.lookSensitivity;
-    this.camPitch = Math.min(1.35, Math.max(-0.4, this.camPitch + my * this.lookSensitivity));
+    this.camPitch = Math.min(
+      1.35,
+      Math.max(-0.4, this.camPitch + my * this.lookSensitivity * this.lookPitchSign),
+    );
+    if (mx !== 0 || my !== 0) this.noteIntent('look');
+  }
+
+  private noteIntent(kind: 'move' | 'look' | 'zoom'): void {
+    this.cb.onInputIntent?.(kind);
+  }
+
+  private noteMovementIntent(): void {
+    this.movementIntentRevision++;
+    this.noteIntent('move');
+  }
+
+  private isAttackMoveReservedCode(code: string): boolean {
+    return this.attackMoveEnabled && this.keybinds.codesForAction('attackMove').includes(code);
+  }
+
+  private heldAction(id: string): boolean {
+    // Held movement matches the physical key only: strip any modifier prefix so the
+    // bare e.code stored in `this.keys` still matches even if storage holds a stray
+    // modifier combo for a held action (a held modifier never blocks movement).
+    return this.keybinds
+      .codesForAction(id)
+      .some((c) => this.keys.has(comboCode(c)) && !this.isAttackMoveReservedCode(c));
   }
 
   readMoveInput(): MoveInput {
     if (this.suspendMovement) {
-      return { forward: false, back: false, turnLeft: false, turnRight: false, strafeLeft: false, strafeRight: false, jump: false };
+      // A game menu / modal is open (or chat is focused). Suppress held keys and
+      // pointer/touch/gamepad movement so menu keystrokes never leak into the
+      // world, but keep the latched autorun running: in a classic MMO the world
+      // never pauses, so opening the Esc menu lets you keep auto-running while
+      // you change a setting. The latch itself is untouched, and the next manual
+      // forward/back key press still clears it.
+      return {
+        forward: this.autorun,
+        back: false,
+        turnLeft: false,
+        turnRight: false,
+        strafeLeft: false,
+        strafeRight: false,
+        jump: false,
+      };
     }
     if (this.controllerMoveInput) return { ...this.controllerMoveInput };
-    const k = this.keys;
-    const held = (id: string) => this.keybinds.codesForAction(id).some((c) => k.has(c));
+    const held = (id: string) => this.heldAction(id);
     const bothButtons = this.leftDown && this.rightDown;
-    const forward = held('forward') || bothButtons || this.autorun || this.touchMove.forward;
-    const back = held('back') || this.touchMove.back;
-    const jump = held('jump');
+    const forward =
+      held('forward') ||
+      bothButtons ||
+      this.autorun ||
+      this.touchMove.forward ||
+      this.gamepadMove.forward;
+    const back = held('back') || this.touchMove.back || this.gamepadMove.back;
+    // Jump is not a WASD key, so it keeps working in Attack Move mode.
+    const jump =
+      this.keybinds.codesForAction('jump').some((c) => this.keys.has(comboCode(c))) ||
+      performance.now() <= this.touchJumpUntil ||
+      performance.now() <= this.keyJumpUntil;
 
     if (this.mouseCameraEnabled) {
       return {
-        forward, back, jump,
+        forward,
+        back,
+        jump,
         turnLeft: false,
         turnRight: false,
-        strafeLeft: held('strafeLeft') || held('turnLeft') || this.touchMove.strafeLeft,
-        strafeRight: held('strafeRight') || held('turnRight') || this.touchMove.strafeRight,
+        strafeLeft:
+          held('strafeLeft') ||
+          held('turnLeft') ||
+          this.touchMove.strafeLeft ||
+          this.gamepadMove.strafeLeft,
+        strafeRight:
+          held('strafeRight') ||
+          held('turnRight') ||
+          this.touchMove.strafeRight ||
+          this.gamepadMove.strafeRight,
       };
     }
 
@@ -299,9 +1204,19 @@ export class Input {
     const aHeld = held('turnLeft');
     const dHeld = held('turnRight');
     return {
-      forward, back, jump,
-      strafeLeft: held('strafeLeft') || (mouselook && aHeld) || this.touchMove.strafeLeft,
-      strafeRight: held('strafeRight') || (mouselook && dHeld) || this.touchMove.strafeRight,
+      forward,
+      back,
+      jump,
+      strafeLeft:
+        held('strafeLeft') ||
+        (mouselook && aHeld) ||
+        this.touchMove.strafeLeft ||
+        this.gamepadMove.strafeLeft,
+      strafeRight:
+        held('strafeRight') ||
+        (mouselook && dHeld) ||
+        this.touchMove.strafeRight ||
+        this.gamepadMove.strafeRight,
       turnLeft: !mouselook && aHeld,
       turnRight: !mouselook && dHeld,
     };

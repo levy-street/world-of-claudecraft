@@ -5,11 +5,14 @@ vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
+  touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
+  markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
-import { GameServer, ClientSession } from '../server/game';
+import { type ClientSession, GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import type { Entity } from '../src/sim/types';
 
@@ -88,6 +91,7 @@ function bareClient(pid: number): ClientWorld {
   const c: any = Object.create(ClientWorld.prototype);
   c.cfg = { seed: 20061, playerClass: 'warrior' };
   c.entities = new Map();
+  c.missingSince = new Map(); // despawn-grace bookkeeping (set by the real field initializer)
   c.playerId = pid;
   c.moveInput = {};
   c.inventory = [];
@@ -286,7 +290,9 @@ describe('crowd interest management', () => {
         broadcast(server);
         if (entRecord(lastSnap(viewerFc.sent), subject.pid)) updates++;
       }
-      expect(updates, `entities starve at +${extraTicks} ticks/broadcast`).toBeGreaterThanOrEqual(7);
+      expect(updates, `entities starve at +${extraTicks} ticks/broadcast`).toBeGreaterThanOrEqual(
+        7,
+      );
     }
   });
 
@@ -379,6 +385,60 @@ describe('crowd interest management', () => {
     expect(inKeep(snap, rogue.pid)).toBe(false);
   });
 
+  it('hides stealthed active duel opponents outside hostile detection range', () => {
+    const rogueFc = fakeWs();
+    const rogue = joinServer(server, rogueFc, 3, 'DuelSneak', 'rogue');
+    server.sim.setPlayerLevel(10, viewer.pid);
+    server.sim.setPlayerLevel(10, rogue.pid);
+    const v = server.sim.entities.get(viewer.pid)!;
+    placeAt(server, rogue.pid, v.pos.x + 30, v.pos.z);
+    server.sim.duelRequest(rogue.pid, viewer.pid);
+    server.sim.duelAccept(rogue.pid);
+    for (let i = 0; i < 20 * 5 && server.sim.duelFor(viewer.pid)?.state !== 'active'; i++)
+      server.sim.tick();
+    server.sim.castAbility('stealth', rogue.pid);
+
+    viewerFc.sent.length = 0;
+    step(server);
+    const snap = lastSnap(viewerFc.sent);
+
+    expect(
+      server.sim.isHostileTo(
+        server.sim.entities.get(viewer.pid)!,
+        server.sim.entities.get(rogue.pid)!,
+      ),
+    ).toBe(true);
+    expect(entRecord(snap, rogue.pid)).toBeNull();
+    expect(inKeep(snap, rogue.pid)).toBe(false);
+  });
+
+  it('hides stealthed active duel opponents even inside normal detection range', () => {
+    const rogueFc = fakeWs();
+    const rogue = joinServer(server, rogueFc, 3, 'CloseSneak', 'rogue');
+    server.sim.setPlayerLevel(10, viewer.pid);
+    server.sim.setPlayerLevel(10, rogue.pid);
+    const v = server.sim.entities.get(viewer.pid)!;
+    placeAt(server, rogue.pid, v.pos.x + 6, v.pos.z);
+    server.sim.duelRequest(rogue.pid, viewer.pid);
+    server.sim.duelAccept(rogue.pid);
+    for (let i = 0; i < 20 * 5 && server.sim.duelFor(viewer.pid)?.state !== 'active'; i++)
+      server.sim.tick();
+    server.sim.castAbility('stealth', rogue.pid);
+
+    viewerFc.sent.length = 0;
+    step(server);
+    const snap = lastSnap(viewerFc.sent);
+
+    expect(
+      server.sim.isHostileTo(
+        server.sim.entities.get(viewer.pid)!,
+        server.sim.entities.get(rogue.pid)!,
+      ),
+    ).toBe(true);
+    expect(entRecord(snap, rogue.pid)).toBeNull();
+    expect(inKeep(snap, rogue.pid)).toBe(false);
+  });
+
   it('keeps stationary npcs visible out to the legacy 120yd radius', () => {
     const npc = [...server.sim.entities.values()].find((e) => e.kind === 'npc')!;
     // viewer 110yd from the npc, subject player at the same distance
@@ -448,11 +508,41 @@ describe('client crowd protocol', () => {
     apply();
     expect(client.entities.has(subject.pid)).toBe(true);
 
-    placeAt(server, subject.pid, server.sim.entities.get(viewer.pid)!.pos.x, server.sim.entities.get(viewer.pid)!.pos.z + 150);
+    placeAt(
+      server,
+      subject.pid,
+      server.sim.entities.get(viewer.pid)!.pos.x,
+      server.sim.entities.get(viewer.pid)!.pos.z + 150,
+    );
     viewerFc.sent.length = 0;
     step(server);
     apply();
     expect(client.entities.has(subject.pid)).toBe(false);
+  });
+
+  it('prunes a previously visible duel opponent when they enter stealth', () => {
+    const rogueFc = fakeWs();
+    const rogue = joinServer(server, rogueFc, 3, 'ClientSneak', 'rogue');
+    server.sim.setPlayerLevel(10, viewer.pid);
+    server.sim.setPlayerLevel(10, rogue.pid);
+    const v = server.sim.entities.get(viewer.pid)!;
+    placeAt(server, rogue.pid, v.pos.x + 6, v.pos.z);
+
+    broadcast(server);
+    apply();
+    expect(client.entities.has(rogue.pid)).toBe(true);
+
+    server.sim.duelRequest(rogue.pid, viewer.pid);
+    server.sim.duelAccept(rogue.pid);
+    for (let i = 0; i < 20 * 5 && server.sim.duelFor(viewer.pid)?.state !== 'active'; i++)
+      server.sim.tick();
+    server.sim.castAbility('stealth', rogue.pid);
+
+    viewerFc.sent.length = 0;
+    step(server);
+    apply();
+
+    expect(client.entities.has(rogue.pid)).toBe(false);
   });
 
   it('merges lite records preserving identity fields', () => {

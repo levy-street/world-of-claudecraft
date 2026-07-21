@@ -85,7 +85,7 @@ CSS `background-image` everywhere (no `<img>` churn, no text labels):
 
 ---
 
-## 2. Style guide — "painted WoW icon" look
+## 2. Style guide — "painted classic-MMO icon" look
 
 ### 2.1 Compositor pipeline (every icon, in order)
 
@@ -228,6 +228,7 @@ Signature: `(ctx: CanvasRenderingContext2D, pal: IconPalette) => void`, ctx pre-
 |---|---|---|---|---|
 | heroic_strike | fury | sword | steel | glow |
 | battle_shout | fury | fist | gold | arcs |
+| demoralizing_shout | shadow | fist | steel | arcs |
 | charge | fury | boot, sword@br | steel | motion |
 | rend | blood | claw_slash | blood | drips |
 | thunder_clap | storm | lightning | sky | arcs |
@@ -436,7 +437,7 @@ Use it in `itemTooltip`, `renderBags`, `renderChar`, and quest reward rows.
 7. **hud.ts:1089** spellbook → `<div class="spell-icon" style="background-image:url(${iconDataUrl(def.iconId)});${locked ? 'filter:grayscale(1) brightness(0.5)' : ''}"></div>`.
 8. **index.html CSS**:
    - `.icon-label { position:absolute; inset:2px; border-radius:4px; background-size:cover; background-position:center; }`
-   - replace lines 143-144 (`.unusable/.oor` color rules) with WoW-style tints:
+   - replace lines 143-144 (`.unusable/.oor` color rules) with classic-MMO-style tints:
      `.action-btn.unusable .icon-label { filter: grayscale(.6) brightness(.55) sepia(.4) hue-rotate(190deg) saturate(2.2); }` (blue = no resource)
      `.action-btn.oor .icon-label { filter: grayscale(.4) brightness(.7) sepia(1) hue-rotate(-45deg) saturate(3); }` (red = out of range)
    - `.spell-icon`, `.item-icon`, `.buff`: add `background-size:cover; background-position:center;` and delete their `font-*`/text styles; add `.q-rare`/`.q-epic` from §5.2; replace `.buff.debuff` background rule with border colors from §5.1.

@@ -1,0 +1,264 @@
+name: PR AI assist
+
+# Informational, non-blocking jobs that help review a pull request. None is a required
+# check, and this workflow never replaces the deterministic CI gate in ci.yml.
+#
+#   screenshots        boots the Vite dev client headless and, ONLY when the diff has a
+#                       visual change, renders the sections it touches (a mapped window, or
+#                       the in-world HUD for a generic visual change), then embeds the PNGs
+#                       inline in a sticky PR comment. A non-visual diff captures nothing.
+#   codex-review        performs a static review through openai/codex-action. The trusted
+#                       base checkout supplies policy, while the nested PR checkout is
+#                       untrusted data and is never executed. Automatic review is limited
+#                       to same-repository PRs.
+#   post-codex-review   runs on a fresh host with GitHub write permission but no OpenAI
+#                       credential. It validates, redacts, and posts structured output.
+#                       Authorized maintainers can request a fork review with `/review`
+#                       or `/suggest <focus>` without executing fork code.
+#
+# Setup: store an OpenAI API key as the OPENAI_API_KEY repository secret. Optional
+# CODEX_REVIEW_MODEL, CODEX_REVIEW_EFFORT, and CODEX_CLI_VERSION repository variables
+# override action defaults. Never store a ChatGPT auth.json in CI. See docs/ai-pr-bot.md.
+
+on:
+  pull_request:
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-ai-${{ github.event.pull_request.number || github.event.issue.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    name: Screenshots of changes
+    runs-on: ubuntu-latest
+    # contents:write so the embedded screenshots can be uploaded to the bot-owned asset
+    # branch; pull-requests:write to post the comment. A fork PR still gets a read-only
+    # token, so both degrade to a no-op (the scripts handle it) and never block.
+    permissions:
+      contents: write
+      pull-requests: write
+    # issue_comment fires this workflow on every comment on any issue or PR; without this
+    # guard the full checkout + npm ci + Vite boot + puppeteer run would fire on every
+    # comment too, even though nothing in this job reads the comment.
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          # Full history so the diff against the PR base drives change-aware capture.
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The client imports committed-but-derived i18n tables at boot; regenerate to be safe.
+      - name: Generate i18n artifacts
+        run: npm run i18n:gen
+
+      - name: Resolve a Chrome binary
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium-browser || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then
+            echo "No system Chrome on PATH; installing a Chrome for Testing build."
+            CHROME="$(npx --yes puppeteer browsers install chrome | awk '{print $NF}')"
+          fi
+          echo "BROWSER_PATH=$CHROME" >> "$GITHUB_ENV"
+          echo "Using browser: $CHROME"
+
+      - name: Start the dev client
+        run: |
+          # strictPort: bind exactly 5173 or fail loudly, never silently bump the port.
+          npm run dev -- --host 127.0.0.1 --port 5173 --strictPort &
+          echo $! > .devpid
+          for i in $(seq 1 60); do
+            curl -sf http://127.0.0.1:5173 >/dev/null && { echo "dev client up"; break; }
+            sleep 2
+          done
+
+      # Change-aware capture: map the diff to the sections it touches (inventory, world map,
+      # or the in-world HUD for a generic visual change) and shoot only those. A diff with no
+      # visual change captures nothing. pr.diff is gitignored.
+      - name: Compute PR diff (for change-aware capture)
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: git diff --no-color "$BASE_SHA" "$HEAD_SHA" > pr.diff || true
+
+      - name: Capture screenshots
+        env:
+          GAME_URL: http://127.0.0.1:5173
+          SHOTS_DIR: pr-shots
+          DIFF_FILE: pr.diff
+        run: node scripts/pr_screenshots.mjs
+
+      - name: Stop the dev client
+        if: always()
+        run: kill "$(cat .devpid)" 2>/dev/null || true
+
+      # Host the PNGs on the bot asset branch and embed them inline in a sticky comment.
+      - name: Embed screenshots in a comment
+        if: always() && github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          SHOTS_DIR: pr-shots
+        run: node scripts/pr_comment_shots.mjs
+
+  codex-review:
+    name: AI review (Codex)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: >
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.head.repo.full_name == github.repository) ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request != null &&
+       contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) &&
+       (github.event.comment.body == '/review' || startsWith(github.event.comment.body, '/suggest ')))
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+    outputs:
+      pr_number: ${{ steps.context.outputs.pr_number }}
+      base_sha: ${{ steps.context.outputs.base_sha }}
+      head_sha: ${{ steps.context.outputs.head_sha }}
+      review_mode: ${{ steps.context.outputs.review_mode }}
+      request_comment_id: ${{ steps.context.outputs.request_comment_id }}
+      request_actor: ${{ steps.context.outputs.request_actor }}
+      codex_outcome: ${{ steps.codex.outcome }}
+      review_json: ${{ steps.codex.outputs.final-message }}
+    steps:
+      - name: Check out trusted reviewer code
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.repository.default_branch }}
+          path: trusted
+          fetch-depth: 1
+          persist-credentials: false
+
+      # The rollout PR cannot trust scripts that exist only in its own head. It skips
+      # cleanly; after merge, every later PR uses the trusted base copy.
+      - name: Check trusted reviewer availability
+        id: harness
+        run: |
+          if [ -f trusted/scripts/prepare_ai_review.mjs ] && \
+             [ -f trusted/.github/codex/prompts/pr-review.md ] && \
+             [ -f trusted/.github/codex/review-output.schema.json ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Trusted base does not contain the reviewer yet; skipping this rollout run."
+          fi
+
+      - name: Resolve and validate review context
+        id: context
+        if: steps.harness.outputs.enabled == 'true'
+        env:
+          AI_REVIEW_EVENT_PATH: ${{ github.event_path }}
+          AI_REVIEW_CONTEXT_FILE: ${{ runner.temp }}/ai-review-context.json
+          AI_REVIEW_API_URL: ${{ github.api_url }}
+          AI_REVIEW_REPOSITORY: ${{ github.repository }}
+          AI_REVIEW_TOKEN: ${{ github.token }}
+        run: node trusted/scripts/prepare_ai_review.mjs resolve
+
+      - name: Check out trusted base policy
+        if: steps.harness.outputs.enabled == 'true'
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.context.outputs.base_sha }}
+          path: policy
+          fetch-depth: 1
+          persist-credentials: false
+
+      # This checkout is attacker-controlled data. No file in it is executed.
+      - name: Check out PR head as nested untrusted data
+        if: steps.harness.outputs.enabled == 'true'
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ github.repository }}
+          ref: refs/pull/${{ steps.context.outputs.pr_number }}/head
+          path: review/untrusted/pr
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: false
+          lfs: false
+
+      - name: Build trusted static-review harness
+        if: steps.harness.outputs.enabled == 'true'
+        env:
+          AI_REVIEW_CONTEXT_FILE: ${{ runner.temp }}/ai-review-context.json
+          AI_REVIEW_PR_DIR: ${{ github.workspace }}/review/untrusted/pr
+          AI_REVIEW_HARNESS_DIR: ${{ github.workspace }}/review
+          AI_REVIEW_TRUSTED_DIR: ${{ github.workspace }}/trusted
+          AI_REVIEW_POLICY_DIR: ${{ github.workspace }}/policy
+          AI_REVIEW_CODEX_HOME: ${{ runner.temp }}/codex-review-home
+        run: node trusted/scripts/prepare_ai_review.mjs build
+
+      # Keep this as the final step. The next job receives output on a fresh runner.
+      - name: Run read-only Codex review
+        id: codex
+        if: steps.harness.outputs.enabled == 'true'
+        continue-on-error: true
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          codex-home: ${{ runner.temp }}/codex-review-home
+          codex-version: ${{ vars.CODEX_CLI_VERSION }}
+          model: ${{ vars.CODEX_REVIEW_MODEL }}
+          effort: ${{ vars.CODEX_REVIEW_EFFORT }}
+          working-directory: review
+          prompt-file: review/review-prompt.md
+          output-schema-file: trusted/.github/codex/review-output.schema.json
+          permission-profile: ":read-only"
+          safety-strategy: "drop-sudo"
+          codex-args: '["--ephemeral", "--skip-git-repo-check", "--ignore-rules", "--disable", "hooks"]'
+
+  post-codex-review:
+    name: Post AI review
+    runs-on: ubuntu-latest
+    needs: codex-review
+    if: >
+      always() &&
+      needs.codex-review.result != 'skipped' &&
+      needs.codex-review.result != 'cancelled' &&
+      needs.codex-review.outputs.pr_number != ''
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Check out trusted posting code
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.codex-review.outputs.base_sha }}
+          path: trusted
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Validate, redact, and post review
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          AI_REVIEW_PR_NUMBER: ${{ needs.codex-review.outputs.pr_number }}
+          AI_REVIEW_MODE: ${{ needs.codex-review.outputs.review_mode }}
+          AI_REVIEW_REQUEST_COMMENT_ID: ${{ needs.codex-review.outputs.request_comment_id }}
+          AI_REVIEW_REQUEST_ACTOR: ${{ needs.codex-review.outputs.request_actor }}
+          AI_REVIEW_CODEX_OUTCOME: ${{ needs.codex-review.outputs.codex_outcome }}
+          AI_REVIEW_FINAL_JSON: ${{ needs.codex-review.outputs.review_json }}
+        run: node trusted/scripts/post_ai_review.mjs

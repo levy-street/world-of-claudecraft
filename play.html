@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#050509" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="ClaudeCraft" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="screen-orientation" content="landscape" />
+<meta name="orientation" content="landscape" />
+<title data-i18n="seo.title">World of ClaudeCraft: Classic-Style Web MMO</title>
+<meta name="description" data-i18n-content="seo.description" content="Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared realm, level up classes, and defeat enemies!" />
+<meta name="robots" content="index, follow, max-image-preview:large" />
+<link rel="manifest" href="/manifest.webmanifest" />
+
+<!-- i18n stored-locale modulepreload (Lazy Locales). For a returning visitor
+     whose stored locale (localStorage key "locale") is non-English, inject a high-priority
+     <link rel="modulepreload"> for THAT locale's content-hashed chunk before the main
+     module parses, so the locale chunk is parser-discoverable and in flight early rather
+     than discovered only after main parses + runs its runtime-keyed dynamic import (the
+     main-then-locale waterfall). The production build templates the { locale: chunkUrl }
+     map over the build sentinel below (see scripts/i18n_modulepreload.mjs); in dev the
+     sentinel is undefined and the try/catch makes this a no-op. Reads ONLY
+     localStorage.locale, injects ONLY one
+     same-origin preload for the ONE stored locale - never speculative, no third-party
+     origin. crossorigin matches Vite's module request so the browser dedupes to one fetch. -->
+<script>
+  (function () {
+    try {
+      var loc = localStorage.getItem('locale');
+      if (!loc) return;
+      var map = __I18N_LOCALE_CHUNKS__;
+      var href = map && map[loc];
+      // Require a string so an attacker-set localStorage.locale ("__proto__" etc.) that
+      // resolves a prototype key to a non-URL value cannot reach link.href.
+      if (typeof href !== 'string') return;
+      var link = document.createElement('link');
+      link.rel = 'modulepreload';
+      link.href = href;
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+    } catch (e) {
+      // No stored locale / no templated map (dev) / storage blocked: do nothing.
+    }
+  })();
+</script>
+
+<!-- Cloudflare Turnstile (bot gate on login/registration). Rendered explicitly
+     by src/main.ts only when VITE_TURNSTILE_SITEKEY is configured. -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+<!-- Canonical URL -->
+<link rel="canonical" href="https://worldofclaudecraft.com/play" />
+
+<!-- GEO / Multilingual Alternates -->
+<link rel="alternate" hreflang="en" href="https://worldofclaudecraft.com/play" />
+<link rel="alternate" hreflang="es" href="https://worldofclaudecraft.com/play?lang=es" />
+<link rel="alternate" hreflang="es-ES" href="https://worldofclaudecraft.com/play?lang=es_ES" />
+<link rel="alternate" hreflang="fr-FR" href="https://worldofclaudecraft.com/play?lang=fr_FR" />
+<link rel="alternate" hreflang="fr-CA" href="https://worldofclaudecraft.com/play?lang=fr_CA" />
+<link rel="alternate" hreflang="en-CA" href="https://worldofclaudecraft.com/play?lang=en_CA" />
+<link rel="alternate" hreflang="it-IT" href="https://worldofclaudecraft.com/play?lang=it_IT" />
+<link rel="alternate" hreflang="de-DE" href="https://worldofclaudecraft.com/play?lang=de_DE" />
+<link rel="alternate" hreflang="zh-CN" href="https://worldofclaudecraft.com/play?lang=zh_CN" />
+<link rel="alternate" hreflang="zh-TW" href="https://worldofclaudecraft.com/play?lang=zh_TW" />
+<link rel="alternate" hreflang="ko-KR" href="https://worldofclaudecraft.com/play?lang=ko_KR" />
+<link rel="alternate" hreflang="ja-JP" href="https://worldofclaudecraft.com/play?lang=ja_JP" />
+<link rel="alternate" hreflang="pt-BR" href="https://worldofclaudecraft.com/play?lang=pt_BR" />
+<link rel="alternate" hreflang="ru-RU" href="https://worldofclaudecraft.com/play?lang=ru_RU" />
+<link rel="alternate" hreflang="cs-CZ" href="https://worldofclaudecraft.com/play?lang=cs_CZ" />
+<link rel="alternate" hreflang="nl-NL" href="https://worldofclaudecraft.com/play?lang=nl_NL" />
+<link rel="alternate" hreflang="pl-PL" href="https://worldofclaudecraft.com/play?lang=pl_PL" />
+<link rel="alternate" hreflang="id-ID" href="https://worldofclaudecraft.com/play?lang=id_ID" />
+<link rel="alternate" hreflang="tr-TR" href="https://worldofclaudecraft.com/play?lang=tr_TR" />
+<link rel="alternate" hreflang="sv-SE" href="https://worldofclaudecraft.com/play?lang=sv_SE" />
+<link rel="alternate" hreflang="vi-VN" href="https://worldofclaudecraft.com/play?lang=vi_VN" />
+<link rel="alternate" hreflang="da-DK" href="https://worldofclaudecraft.com/play?lang=da_DK" />
+<link rel="alternate" hreflang="x-default" href="https://worldofclaudecraft.com/play" />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="World of ClaudeCraft" />
+<meta property="og:title" data-i18n-content="seo.title" content="World of ClaudeCraft: Classic-Style Web MMO" />
+<meta property="og:description" data-i18n-content="seo.description" content="Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared realm, level up classes, and defeat enemies!" />
+<meta property="og:image" content="https://worldofclaudecraft.com/woc_logo_square.webp" />
+<meta property="og:url" content="https://worldofclaudecraft.com/play" />
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" data-i18n-content="seo.title" content="World of ClaudeCraft: Classic-Style Web MMO" />
+<meta name="twitter:description" data-i18n-content="seo.description" content="Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared realm, level up classes, and defeat enemies!" />
+<meta name="twitter:image" content="https://worldofclaudecraft.com/woc_logo_square.webp" />
+
+<!-- Structured Data (Schema.org JSON-LD VideoGame) -->
+<script id="structured-data" type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "World of ClaudeCraft",
+  "alternateName": "World of Claudecraft",
+  "genre": "MMORPG",
+  "playMode": "MultiPlayer",
+  "applicationCategory": "Game",
+  "operatingSystem": "Web Browser",
+  "url": "https://worldofclaudecraft.com/play",
+  "image": "https://worldofclaudecraft.com/woc_logo_square.webp",
+  "description": "Embark on an epic adventure in World of ClaudeCraft, a classic-style micro-MMO playable directly in your browser. Join a persistent shared realm, level up classes, and defeat enemies!",
+  "inLanguage": "en",
+  "sameAs": [
+    "https://github.com/levy-street/world-of-claudecraft",
+    "https://discord.com/invite/worldofclaudecraft"
+  ]
+}
+</script>
+
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="preload" as="image" href="/loading-screen.jpg" />
+<link rel="preload" as="image" href="./ui/cursors/gauntlet.png" />
+<link rel="preload" as="image" href="./ui/cursors/arrow.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..700&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Google tag (gtag.js) - skipped on localhost so dev sessions don't pollute analytics -->
+<script>
+  if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-BR5Z7GT7C2';
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function(){ dataLayer.push(arguments); };
+    gtag('js', new Date());
+    gtag('config', 'G-BR5Z7GT7C2');
+  }
+</script>
+<link rel="stylesheet" href="/src/styles/play.extra.css" />
+<style>
+  /* Game CSS now lives in src/styles/* (the CSS extraction). This inline block was
+     emptied: play.html previously carried a full, stale copy of the CSS that
+     (being unlayered) shadowed the shared @layer modules. With the block empty,
+     play.html renders from the same canonical src/styles layers as index.html (its
+     drift is reconciled). The one intentional per-entry difference, the
+     #rotate-device orientation gate, loads from play.extra.css
+     linked above. This inline block is intentionally empty. */
+</style>
+</head>
+<body data-start-panel="mode-select">
+  <!-- Skip links: the first focusable elements, visually hidden until focused (a11y
+       infra). Targets live inside #game-ui-template, cloned into the page in-game. -->
+  <a class="hud-skip" href="#ui" data-i18n="hudChrome.skipLinks.mainHud">Skip to Main HUD</a>
+  <a class="hud-skip" href="#chatlog" data-i18n="hudChrome.skipLinks.chat">Skip to Chat</a>
+  <canvas id="game-canvas"></canvas>
+  <div id="nameplates" aria-hidden="true"></div>
+  <img
+    id="intro-logo"
+    src="/worldofclaudecraft-logo.png"
+    data-i18n-alt="serverUnavailable.logoAlt"
+    alt="World of ClaudeCraft"
+    aria-hidden="true"
+  />
+
+  <template id="game-ui-template">
+  <div id="ui" tabindex="-1">
+    <!-- Off-screen polite live regions. The 3D world / game canvas is OUT of
+         a11y scope; these speak HUD text only. #combat-live: the throttled combat summary
+         (plus the FCT self-note, which has no combat-log line). #target-live: the new
+         target's name, announced once per target change. #chat-live: chat, kept here
+         (tab-independent) because #chatlog goes display:none on the combat tab and a
+         display:none live region is silent. -->
+    <div id="combat-live" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+    <div id="target-live" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+    <div id="chat-live" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+    <div id="perf-overlay" aria-hidden="true"></div>
+    <div id="click-move-marker" class="click-move-marker" aria-hidden="true">
+      <span class="ctm-arrow ctm-n"></span>
+      <span class="ctm-arrow ctm-e"></span>
+      <span class="ctm-arrow ctm-s"></span>
+      <span class="ctm-arrow ctm-w"></span>
+    </div>
+    <div id="target-frame" class="unitframe" role="group" data-i18n-aria="hudChrome.unitFrame.targetLabel" aria-label="Your Mark">
+      <div class="portrait-wrap">
+        <div class="portrait"><canvas id="tf-portrait" width="54" height="54"></canvas></div>
+        <div class="level-chip" id="tf-level"></div>
+        <div id="tf-elite-tag" data-i18n="hud.core.elite">ELITE</div>
+      </div>
+      <div class="uf-bars">
+        <div class="uf-name" id="tf-name"></div>
+        <div class="bar hp"><div class="bar-fill" id="tf-hp"></div><div class="bar-absorb" id="tf-absorb"></div><div class="bar-text" id="tf-hp-text"></div></div>
+        <div class="bar" id="tf-resource"><div class="bar-fill" id="tf-res"></div><div class="bar-text" id="tf-res-text"></div></div>
+        <div id="tf-castbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-i18n-aria="hudChrome.castBar.targetAria" aria-label="Unit Cast Bar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
+      </div>
+      <div class="uf-buffs" id="tf-debuffs"></div>
+      <!-- Target of Target (showTargetOfTarget option): the classic mini-frame showing
+           who the current target is targeting. A #target-frame child so it inherits the
+           target's children-zoom and hides with the whole frame when there is no target;
+           its own unit_frame painter toggles it flex/none when the target-of-target is
+           known/unknown. Portrait + name + hp bar only (no resource/cast/debuffs). -->
+      <div id="totarget-frame" class="unitframe totarget" role="group" data-i18n-aria="hudChrome.unitFrame.targetOfTargetLabel" aria-label="Mark's Mark">
+        <div class="portrait-wrap">
+          <div class="portrait"><canvas id="totf-portrait" width="54" height="54"></canvas></div>
+          <div class="level-chip" id="totf-level"></div>
+        </div>
+        <div class="uf-bars">
+          <div class="uf-name" id="totf-name"></div>
+          <div class="bar hp"><div class="bar-fill" id="totf-hp"></div><div class="bar-text" id="totf-hp-text"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="party-frames" role="group" data-i18n-aria="hudChrome.unitFrame.partyLabel" aria-label="Your Band"></div>
+
+    <div id="buff-bar"></div>
+    <div id="debuff-bar"></div>
+
+    <div id="ctx-menu" class="panel"></div>
+    <div id="prompt-stack"></div>
+    <div id="trade-window" class="window panel"></div>
+
+    <div id="castbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-i18n-aria="hudChrome.castBar.playerAria" aria-label="Your Cast Bar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
+    <div id="swingbar" aria-hidden="true"><div class="fill"></div><div class="label"></div></div>
+
+    <div id="minimap-wrap">
+      <div id="zone-label" data-i18n="entities.zones.eastbrook_vale.name">Eastbrook Vale</div>
+      <div id="minimap-disc">
+        <!-- Decorative canvas: the minimap pixels are not screen-readable, so the
+             canvas is aria-hidden, like #nameplates/#swingbar and the FCT nodes. Its textual
+             surface is the adjacent #zone-label + #minimap-coords (role=status), with the fully
+             accessible #map-window as the alternative, per the zone-label decision. -->
+        <canvas id="minimap" width="162" height="162" aria-hidden="true"></canvas>
+        <button id="raid-lockout" type="button" hidden data-i18n-title="hudChrome.raidLockout.title" data-i18n-aria="hudChrome.raidLockout.title" title="Raid Lockouts" aria-label="Raid Lockouts"></button>
+        <!-- Ravenpost envelope: visible while unread letters wait (role=status so
+             arrivals are announced; reading them still requires a mailbox). -->
+        <div id="mail-indicator" role="status" hidden data-icon="mail"><span class="mail-indicator-count">0</span></div>
+      </div>
+      <div id="minimap-clock" data-i18n-title="hudChrome.widgets.clockTitle" title="Local time — click to toggle 12/24-hour">--:--</div>
+      <div id="minimap-coords" data-i18n-title="hudChrome.widgets.worldCoordinates" data-i18n-aria="hudChrome.widgets.coordinates" title="Your current world coordinates" aria-label="Coordinates">0, 0</div>
+      <div id="compass" data-i18n-aria="hudChrome.widgets.heading" aria-label="Heading">
+        <div id="compass-strip"><div id="compass-track"></div></div>
+        <div id="compass-center"></div>
+        <div id="compass-heading">N</div>
+      </div>
+      <div id="minimap-zoom" data-i18n-aria="hudChrome.widgets.minimapZoom" aria-label="Minimap zoom">
+        <button class="minimap-zoom-btn" id="minimap-zoom-out" data-i18n-title="hud.core.zoomOut" data-i18n-aria="hud.core.zoomOut" title="Zoom out" aria-label="Zoom out minimap">&minus;</button>
+        <span id="minimap-zoom-label" aria-live="polite">1×</span>
+        <button class="minimap-zoom-btn" id="minimap-zoom-in" data-i18n-title="hud.core.zoomIn" data-i18n-aria="hud.core.zoomIn" title="Zoom in" aria-label="Zoom in minimap">+</button>
+      </div>
+    </div>
+
+    <div id="community-hud" data-i18n-aria="hud.core.communityLinks" aria-label="Community links">
+      <details id="community-menu">
+        <summary class="community-toggle" data-i18n-title="hud.core.communityLinks" data-i18n-aria="hud.core.communityLinks" title="Community links" aria-label="Community links">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7.5 11.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm9 0a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7ZM1.7 19.6c.5-3.6 2.6-5.5 5.8-5.5s5.3 1.9 5.8 5.5c.1.6-.4 1.1-1 1.1H2.7c-.6 0-1.1-.5-1-1.1Zm9.7-4.6c1.1-.7 2.8-.9 5.1-.9 3.2 0 5.3 1.9 5.8 5.5.1.6-.4 1.1-1 1.1h-6.6c-.3-2.3-1.4-4.2-3.3-5.7Z"/></svg>
+        </summary>
+        <div class="community-tray">
+          <!-- No Discord link here: the in-game HUD's single Discord entry point is
+               the Discord (U) icon-rail button (#mm-discord), which opens the richer
+               account-linking/rank panel and (for an unlinked player) still offers a
+               plain "join the server" action, so this tray does not duplicate it. -->
+          <a class="community-link github" href="https://github.com/levy-street/world-of-claudecraft" target="_blank" rel="noopener noreferrer" data-i18n-title="a11y.githubProject" data-i18n-aria="a11y.githubProject" title="Open the World of ClaudeCraft GitHub project" aria-label="Open the World of ClaudeCraft GitHub project">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            <span>GitHub</span>
+          </a>
+          <a class="community-link donate" href="https://ko-fi.com/worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            <span data-i18n="nav.donate">Donate</span>
+          </a>
+        </div>
+      </details>
+    </div>
+
+    <div id="right-tracker-stack">
+      <div id="quest-tracker"></div>
+      <div id="deed-tracker"></div>
+      <div id="delve-tracker"></div>
+    </div>
+
+    <div id="bottom-bar">
+      <div id="actionbar-row">
+        <div id="actionbar-stack">
+          <div id="player-frame" class="unitframe" role="group" tabindex="0" aria-haspopup="menu" data-i18n-aria="hudChrome.unitFrame.playerLabel" aria-label="Your Hero">
+            <div class="portrait-wrap">
+              <div class="portrait"><canvas id="pf-portrait" width="54" height="54"></canvas></div>
+              <div class="level-chip" id="pf-level">1</div>
+              <div class="combat-flash" id="pf-combat" data-i18n-title="hud.social.status.combat" data-i18n-aria="hud.social.status.combat" title="In Combat" aria-label="In Combat">⚔</div>
+              <div class="rest-indicator" id="pf-rest" data-i18n-title="hudChrome.rest.resting" data-i18n-aria="hudChrome.rest.resting" title="Resting" aria-label="Resting">z</div>
+            </div>
+            <div class="uf-bars">
+              <div class="uf-name" id="pf-name"></div>
+              <div class="combo-row" id="combo-row"></div>
+              <div class="bar hp"><div class="bar-fill" id="pf-hp"></div><div class="bar-absorb" id="pf-absorb"></div><div class="bar-text" id="pf-hp-text"></div></div>
+              <div class="bar mana" id="pf-resource"><div class="bar-fill" id="pf-res"></div><div class="bar-text" id="pf-res-text"></div><div class="low-resource-label" id="pf-low-resource"></div></div>
+            </div>
+          </div>
+          <div id="petbar" class="panel"></div>
+          <div id="xpbar"><div class="fill"></div><div class="rested"></div><div class="ticks"></div><div class="label"></div></div>
+          <div id="stancebar"></div>
+          <div id="actionbar3" class="panel"></div>
+          <div id="actionbar2" class="panel"></div>
+          <div id="actionbar" class="panel"></div>
+        </div>
+        <div id="meters-window" class="panel">
+          <div class="panel-title">
+            <span class="mt-tabs">
+              <button class="mt-tab on" data-tab="dmg" data-i18n="hud.meters.damageShort">Dmg</button>
+              <button class="mt-tab" data-tab="heal" data-i18n="hud.meters.healingShort">Heal</button>
+              <button class="mt-tab" data-tab="threat" data-i18n="hud.meters.threat">Threat</button>
+            </span>
+            <span>
+              <button class="x-btn mt-prev" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
+              <button class="x-btn mt-next" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
+              <button class="x-btn mt-close" data-i18n-title="hud.meters.close" data-i18n-aria="hud.meters.close" title="Close meters" aria-label="Close meters" data-icon="close"></button>
+            </span>
+          </div>
+          <div class="mt-view"></div>
+          <div class="mt-sub"></div>
+          <div class="mt-rows"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="chatlog-wrap">
+      <!-- Tabs (built-in Chat/Combat + player-added channel tabs + "add") are
+           rendered by the HUD (hud.ts initChatTabs); this stays empty. -->
+      <div id="chatlog-tabs" role="tablist"></div>
+      <div id="chatlog-frame" class="panel">
+        <!-- aria-live="off" overrides role="log"'s IMPLICIT polite so this pane (which
+             goes display:none on the combat tab) does not double-announce alongside the
+             tab-independent #chat-live region. role="log" + tabindex="-1" stay: it is still
+             the visible scrollback and the "skip to chat" landing target. -->
+        <div id="chatlog" class="chat-pane active" role="log" aria-live="off" tabindex="-1"></div>
+        <div id="combatlog" class="chat-pane"></div>
+      </div>
+      <!-- Mobile-only reply affordance (issue 1577 round 2 (8)): opening chat on
+           touch shows the log in a read state; this small button enters reply
+           mode (raises the keyboard and expands the composer). Hidden on desktop
+           and once reply mode is active. Reuses the existing chat action label. -->
+      <button type="button" id="mobile-chat-reply" data-i18n-title="hud.keybinds.actions.chat" data-i18n-aria="hud.keybinds.actions.chat" title="Open Chat" aria-label="Open Chat" data-icon="chat"><span data-i18n="hud.core.mobileChat">Chat</span></button>
+    </div>
+
+    <div id="quest-dialog" class="window panel"></div>
+    <div id="delve-board" class="window panel"></div>
+    <div id="lockpick-panel" class="window panel"></div>
+    <div id="delve-rite-panel" class="window panel"></div>
+    <div id="loot-window" class="window panel"></div>
+    <div id="bags" class="window panel"></div>
+    <div id="char-window" class="window panel"></div>
+    <div id="inspect-window" class="window panel"></div>
+    <div id="loot-settings-window" class="window panel" role="dialog" aria-labelledby="loot-settings-title"></div>
+    <div id="spellbook" class="window panel"></div>
+    <div id="talents-window" class="window panel"></div>
+    <div id="quest-log-window" class="window panel"></div>
+    <div id="crafting-window" class="window panel"></div>
+    <div id="vendor-window" class="window panel"></div>
+    <div id="train-window" class="window panel"></div>
+    <div id="card-duel-window" class="window panel"></div>
+    <div id="town-focus-window" class="window panel"></div>
+    <div id="map-window" class="window panel">
+      <button class="x-btn" id="map-close" data-i18n-title="hud.core.closeMap" data-i18n-aria="hud.core.closeMap" title="Close map" aria-label="Close map" data-icon="close"></button>
+      <div id="map-zoom">
+        <button class="map-zoom-btn" id="map-zoom-in" data-i18n-title="hud.core.zoomIn" data-i18n-aria="hud.core.zoomIn" title="Zoom in" aria-label="Zoom in">+</button>
+        <button class="map-zoom-btn" id="map-zoom-out" data-i18n-title="hud.core.zoomOut" data-i18n-aria="hud.core.zoomOut" title="Zoom out" aria-label="Zoom out">&minus;</button>
+      </div>
+      <canvas id="map-canvas" width="560" height="560" role="img" data-i18n-aria="hud.core.mapCanvasLabel" aria-label="Map"></canvas>
+      <span id="map-summary" class="visually-hidden" role="status" aria-live="polite"></span>
+    </div>
+    <div id="arena-window" class="window panel"></div>
+    <div id="dungeon-finder-window" class="window panel"></div>
+    <div id="dfinder-proposal-popup" class="panel"></div>
+    <div id="valecup-window" class="window panel"></div>
+    <div id="leaderboard-window" class="window panel"></div>
+    <div id="daily-rewards-window" class="window panel"></div>
+    <div id="claudium-window" class="window panel"></div>
+    <div id="market-window" class="window panel"></div>
+    <div id="mailbox-window" class="window panel"></div>
+    <div id="bank-window" class="window panel"></div>
+    <div id="deeds-window" class="window panel"></div>
+    <div id="professions-window" class="window panel"></div>
+    <div id="calendar-window" class="window panel"></div>
+    <div id="arena-status"></div>
+    <button type="button" id="vcup-indicator" data-i18n-title="hudChrome.vcup.indicatorOpen" data-i18n-aria="hudChrome.vcup.indicatorOpen" title="Open the Vale Cup window" aria-label="Open the Vale Cup window"></button>
+    <div id="options-menu" class="window panel"></div>
+    <div id="emote-editor" class="window panel"></div>
+    <div id="social-window" class="window panel"></div>
+    <div id="report-window" class="window panel"></div>
+    <div id="side-buttons">
+      <button id="daily-rewards-button" type="button" data-i18n-title="hudChrome.wocStore.title" data-i18n-aria="hudChrome.wocStore.title" title="WOC Store" aria-label="WOC Store"></button>
+      <button class="micro-btn" id="mm-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="keybind">c</span></button>
+      <button class="micro-btn" id="mm-spell" data-i18n-title="abilityUi.spellbook.title" data-i18n-aria="abilityUi.spellbook.title" title="Spellbook" aria-label="Spellbook" data-icon="spellbook"><span class="keybind">p</span></button>
+      <button class="micro-btn" id="mm-talents" data-i18n-title="game.talents.title" data-i18n-aria="game.talents.title" title="Talents" aria-label="Talents" data-icon="talents"><span class="keybind">n</span></button>
+      <button class="micro-btn" id="mm-town-focus" style="display:none" data-i18n-title="hudChrome.townFocus.title" data-i18n-aria="hudChrome.townFocus.title" title="Town Focus" aria-label="Town Focus" data-icon="map"></button>
+      <button class="micro-btn" id="mm-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="keybind">l</span></button>
+      <button class="micro-btn" id="mm-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="keybind">s-z</span></button>
+      <button type="button" class="micro-btn" id="mm-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="target"><span class="keybind">s-p</span></button>
+      <button class="micro-btn" id="mm-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="keybind">m</span></button>
+      <button class="micro-btn" id="mm-bag" data-i18n-title="itemUi.bags.title" data-i18n-aria="itemUi.bags.title" title="Bags" aria-label="Bags" data-icon="bags"><span class="keybind">b</span></button>
+      <button class="micro-btn" id="mm-crafting" data-i18n-title="hudChrome.crafting.title" data-i18n-aria="hudChrome.crafting.title" title="Crafting" aria-label="Crafting" data-icon="crafting"><span class="keybind">t</span></button>
+      <button class="micro-btn" id="mm-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="keybind">g</span></button>
+      <button class="micro-btn" id="mm-dfinder" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Dungeon Finder" aria-label="Dungeon Finder" data-icon="dfinder"><span class="keybind">Shift+I</span></button>
+      <button class="micro-btn" id="mm-valecup" data-i18n-title="hudChrome.keybinds.valecup" data-i18n-aria="hudChrome.keybinds.valecup" title="Vale Cup" aria-label="Vale Cup" data-icon="ball"><span class="keybind">y</span></button>
+      <button class="micro-btn" id="mm-cardduel" data-i18n-title="cardDuel.title" data-i18n-aria="cardDuel.title" title="Card Duel" aria-label="Card Duel" data-icon="cards"></button>
+      <button class="micro-btn" id="mm-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="keybind">k</span></button>
+      <button class="micro-btn" id="mm-emote" data-i18n-aria="hudChrome.emoteWheel.label" aria-label="Emotes" data-icon="emote"><span class="keybind">x</span></button>
+      <button class="micro-btn" id="mm-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" data-icon="music"></button>
+      <button class="micro-btn" id="mm-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="keybind">o</span></button>
+      <button class="micro-btn" id="mm-discord" hidden data-i18n-title="hudChrome.discord.title" data-i18n-aria="hudChrome.discord.title" title="Discord" aria-label="Discord" data-icon="discord"><span class="keybind">u</span></button>
+      <button class="micro-btn" id="mm-options" data-i18n-title="hud.options.gameMenu" data-i18n-aria="hud.options.gameMenu" title="Game Menu" aria-label="Game Menu" data-icon="menu"><span class="keybind">esc</span></button>
+    </div>
+    <div id="tooltip" class="panel"></div>
+
+    <div id="error-msg"></div>
+    <div id="quest-banner" aria-hidden="true"></div>
+    <div id="banner"></div>
+    <div id="low-health-vignette"></div>
+    <div id="subzone-banner"></div>
+
+    <div id="death-overlay">
+      <h2 data-i18n="hud.core.deathTitle">You have died.</h2>
+      <button class="btn" id="release-btn" data-i18n="hud.core.releaseSpirit">Release Spirit</button>
+    </div>
+    <!-- Ghost (spirit released): runs freely; this small non-blocking prompt appears
+         only when in reach of the corpse or the Pale Keeper. Mirrors index.html. -->
+    <div id="ghost-prompt">
+      <button type="button" class="btn" id="resurrect-corpse-btn" data-i18n="hudChrome.death.resurrectAtCorpse">Resurrect at Corpse</button>
+      <button type="button" class="btn" id="resurrect-healer-btn" data-i18n="hudChrome.death.resurrectAtHealer">The Pale Keeper (Keeper's Toll)</button>
+    </div>
+  </div>
+
+  <textarea id="chat-input" rows="1" maxlength="255" data-i18n-placeholder="hud.core.chatPlaceholder" placeholder="Say something... (/w name, /r, /p, /gu, /o, /general, /join world|lfg, /afk, /dnd)" autocomplete="off" autocapitalize="sentences" autocorrect="off" spellcheck="false" data-1p-ignore data-lpignore="true" data-bwignore data-form-type="other"></textarea>
+    <!-- Mobile-only keyboard-dismiss chevron: blurs #chat-input so the on-screen
+         keyboard drops WITHOUT closing chat (the log + composer stay visible). Shown
+         only under body.mobile-touch while chat is open (CSS). The down chevron reuses
+         the hydrated `next` triangle rotated 90deg, the same SVG-chevron pattern as the
+         consumables toggle (no unicode arrow). -->
+    <button type="button" id="chat-dismiss" data-i18n-title="hudChrome.mobile.hideKeyboard" data-i18n-aria="hudChrome.mobile.hideKeyboard" title="Hide keyboard" aria-label="Hide keyboard" data-icon="next"></button>
+  </template>
+
+  <!-- Discord panel lives OUTSIDE the game-ui-template so it exists in the DOM at
+       login and its listeners bind at init. Opened in-game via the U key on desktop
+       and the More tray's Discord button on touch. -->
+  <div id="discord-window" class="panel" hidden></div>
+
+  <!-- Shown when unlinking a Discord-provisioned account that has no real password yet:
+       the player must set one (username fixed, shown read-only) so the account stays
+       reachable after the link is removed. Kept top level (NOT inside #start-screen, which
+       is display:none in-game and a lower z-index:100 stacking context) so the modal shows
+       over the game and the in-game Discord panel when unlinking. Wired in main.ts. -->
+  <div id="discord-keep-modal" class="modal-backdrop" hidden>
+    <div class="confirm-modal panel auth-panel-premium" role="dialog" aria-modal="true" aria-labelledby="discord-keep-title">
+      <h2 id="discord-keep-title" data-i18n="hudChrome.discord.keep.title">Set a password</h2>
+      <p data-i18n="hudChrome.discord.keep.body">Your account signs in with Discord. Set a password so you can still log in with your username after unlinking.</p>
+      <div class="auth-field">
+        <label for="discord-keep-username" class="auth-label" data-i18n="hudChrome.discord.keep.usernameLabel">Your username</label>
+        <input id="discord-keep-username" type="text" autocomplete="username" readonly />
+      </div>
+      <div class="auth-field">
+        <label for="discord-keep-pass" class="auth-label" data-i18n="auth.password">Password</label>
+        <input id="discord-keep-pass" type="password" maxlength="128" autocomplete="new-password" data-i18n-placeholder="auth.passwordPlaceholder" placeholder="Enter password" />
+      </div>
+      <div class="auth-field">
+        <label for="discord-keep-confirm" class="auth-label" data-i18n="hudChrome.discord.keep.confirmLabel">Confirm password</label>
+        <input id="discord-keep-confirm" type="password" maxlength="128" autocomplete="new-password" />
+      </div>
+      <div id="discord-keep-error" class="auth-error" aria-live="polite"></div>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-secondary" id="btn-discord-keep-cancel" data-i18n="hudChrome.discord.keep.cancel">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btn-discord-keep-submit" data-i18n="hudChrome.discord.keep.submit">Set password and unlink</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mandatory recovery-email capture: shown on sign-in when the account has no
+       email on file yet. Not dismissable except by logging out; setting an address
+       is required to continue into the realm. -->
+  <div id="recovery-email-modal" class="modal-backdrop" hidden>
+    <div class="confirm-modal panel auth-panel-premium" role="dialog" aria-modal="true" aria-labelledby="recovery-email-title">
+      <h2 id="recovery-email-title" data-i18n="auth.recovery.title">Add a recovery email</h2>
+      <p data-i18n="auth.recovery.body">Set an email address so you can recover your account. We only use it to confirm you own this account if you ever need to reset your password.</p>
+      <div class="auth-field">
+        <label for="recovery-email-input" class="auth-label" data-i18n="auth.email">Email</label>
+        <input id="recovery-email-input" type="email" maxlength="254" autocomplete="email" data-i18n-placeholder="auth.emailPlaceholder" placeholder="you@example.com" />
+      </div>
+      <div id="recovery-email-error" class="auth-error" aria-live="polite"></div>
+      <div class="confirm-actions">
+        <button type="button" class="btn btn-secondary" id="btn-recovery-email-logout" data-i18n="auth.recovery.logOut">Log out</button>
+        <button type="button" class="btn btn-primary" id="btn-recovery-email-submit" data-i18n="auth.recovery.save">Save email</button>
+      </div>
+    </div>
+  </div>
+
+  <main id="start-screen">
+    <!-- World-entry crash recovery notice (src/game/entry_crash_guard.ts): parity with
+         index.html so a /play player who hit a process kill sees the same explanation
+         after the preset is stepped down. /play has no footer graphics selector, but the
+         in-game Options menu (reachable once in-world) is the graphics path the banner
+         body points to as well. -->
+    <div id="entry-guard-banner" class="entry-guard-banner" role="status" hidden>
+      <div class="entry-guard-text">
+        <strong class="entry-guard-title" data-i18n="entryGuard.title">Graphics lowered</strong>
+        <span class="entry-guard-body"></span>
+      </div>
+      <button type="button" class="entry-guard-dismiss" data-i18n="entryGuard.dismiss">Dismiss</button>
+    </div>
+    <!-- Keep the backdrop here at the top level so it spans the entire screen behind content -->
+    <div id="start-screen-backdrop" aria-hidden="true">
+      <!-- Looping cinematic background video; poster = static key-art for instant paint + fallback. -->
+      <!-- Same backdrop as the landing-page hero (index.html). The poster paints
+           instantly; the looping trailer is NOT eagerly fetched (no autoplay, no
+           preload, no <source>): main.ts attaches the source and plays only on
+           capable devices (see applyLandingBackdrop). Phones, Save-Data, reduced
+           motion, and high contrast keep the poster only. -->
+      <video id="bg-home" class="bg-trailer bg-home" loop muted playsinline preload="none" poster="/home-bg.png" aria-hidden="true" data-trailer-src="/home-bg.mp4"></video>
+      <div class="bg-trailer-scrim"></div>
+      <div class="portal-ring"></div>
+      <div class="portal-ring-reverse"></div>
+      <div class="nebula-overlay"></div>
+    </div>
+
+    <header class="homepage-header">
+      <div class="header-logo-container">
+        <button type="button" class="header-logo-btn" id="header-logo-btn" data-i18n-aria="a11y.goHome" data-i18n-title="a11y.goHome" aria-label="Go to homepage" title="Go to homepage">
+          <img class="header-logo" src="/icon-192.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
+        </button>
+      </div>
+      
+      <button type="button" class="mobile-menu-toggle" id="mobile-menu-toggle" data-i18n-aria="a11y.toggleMenu" aria-label="Toggle menu" aria-expanded="false">
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
+      
+      <div class="header-menu-container" id="header-menu-container">
+        <nav data-i18n-aria="a11y.mainNavigation" aria-label="Main navigation" class="homepage-nav">
+          <ul class="nav-list" role="list">
+            <li class="nav-item">
+              <button type="button" class="nav-link active" id="nav-btn-play" aria-selected="true" aria-pressed="true" data-i18n="nav.play">Play</button>
+            </li>
+            <li class="nav-item">
+              <button type="button" class="nav-link" id="nav-btn-highscores" aria-selected="false" aria-pressed="false" data-i18n="nav.highscores">High Scores</button>
+            </li>
+            <li class="nav-item">
+              <button type="button" class="nav-link" id="nav-btn-wiki" aria-selected="false" aria-pressed="false" data-i18n="nav.wiki">Wiki</button>
+            </li>
+            <li class="nav-item">
+              <button type="button" class="nav-link" id="nav-btn-news" aria-selected="false" aria-pressed="false" data-i18n="nav.news">News</button>
+            </li>
+            <li class="nav-item">
+              <button type="button" class="nav-link" id="nav-btn-download" aria-selected="false" aria-pressed="false" data-i18n="nav.download">Download</button>
+            </li>
+            <li class="nav-item">
+              <button type="button" class="nav-link" id="nav-btn-login" aria-selected="false" aria-pressed="false" data-i18n="nav.loginRegister">Login/Register</button>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="header-actions">
+          <button type="button" class="homepage-music-btn" id="homepage-music-toggle" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Music" aria-pressed="true" data-icon="music"></button>
+          <a class="donate-cta" href="https://ko-fi.com/worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            <span data-i18n="nav.donate">Donate</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div id="homepage-views-container">
+      <section id="hero-view" class="view-section" aria-hidden="false">
+        <h1 class="visually-hidden">World of ClaudeCraft</h1>
+        
+        <!-- Main Logo -->
+        <img class="main-logo" id="title-logo" src="/worldofclaudecraft-logo.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
+
+        <div id="mode-select">
+          <div class="play-console play-console-solo">
+            <!-- /play goes straight to the online realm: no Online/Offline selector on
+                 this entry (the landing page keeps it). The Play button commits directly
+                 to the online flow (login, or realm select when a session is restored). -->
+            <button type="button" class="btn-play" id="btn-play" data-i18n-aria="mode.playAria" aria-label="Play World of ClaudeCraft">
+              <span class="btn-play-sheen" aria-hidden="true"></span>
+              <span class="btn-play-label" data-i18n="mode.play">Play</span>
+            </button>
+            <div class="play-online-status">
+              <span class="server-dot" data-mode="online" aria-hidden="true"></span>
+              <b class="stats-value js-stat-accounts">…</b> <span data-i18n="stats.accountsCreated">Players</span>
+            </div>
+          </div>
+
+          <!-- Hidden, non-focusable compatibility trigger. Stable hook the automated
+               tours / E2E scripts use to drive the online flow directly. This entry is
+               online-only, so there is no #btn-offline here (index.html keeps both). -->
+          <button type="button" id="btn-online" class="play-compat-trigger" tabindex="-1" aria-hidden="true"></button>
+
+          <!-- Tip — part of the same play container (divider above). -->
+          <div class="play-tip">
+            <p id="performance-tip"><b data-i18n="mode.tipTitle">TIP:</b> <span data-i18n="mode.tipText">For the smoothest experience, turn off ad blocker extensions on this site. Community reports found some blockers can cause lag.</span></p>
+          </div>
+        </div>
+
+        <form id="login-panel" class="panel auth-panel auth-panel-premium" data-auth-mode="login" hidden novalidate>
+          <h2 class="auth-title" id="auth-title" data-i18n="auth.enterRealm">Enter the Realm</h2>
+          <!-- First-class onboarding: Continue with Discord at the top of the form. -->
+          <button type="button" class="btn" id="btn-login-discord" hidden style="width:100%;margin:4px 0 12px;background:linear-gradient(180deg,#5865f2,#404ac4);border-color:#2a2f7a;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;min-height:42px;">
+            <svg viewBox="0 0 127.14 96.36" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21a105.73 105.73 0 0 0 32.17 16.15 77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15zM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.04 12.69-11.43 12.69z"/></svg>
+            <span data-i18n="hudChrome.discord.loginCta">Continue with Discord</span>
+          </button>
+          <div id="auth-or-divider" class="auth-or" hidden><span data-i18n="hudChrome.discord.orEmail">or use email</span></div>
+
+          <div class="auth-field">
+            <label for="login-user" class="auth-label" data-i18n="auth.username">Username</label>
+            <div id="login-user-error" class="auth-field-error" aria-live="polite" data-i18n="auth.usernameError">Please enter your username.</div>
+            <input 
+              id="login-user" 
+              name="username"
+              type="text" 
+              maxlength="24" 
+              data-i18n-placeholder="auth.usernamePlaceholder"
+              placeholder="Enter username" 
+              autocomplete="username" 
+              required 
+              aria-describedby="login-user-error"
+            />
+          </div>
+
+          <div class="auth-field">
+            <label for="login-pass" class="auth-label" data-i18n="auth.password">Password</label>
+            <div id="login-pass-error" class="auth-field-error" aria-live="polite" data-i18n="auth.passwordError">Please enter your password.</div>
+            <div class="password-wrapper">
+              <input 
+                id="login-pass" 
+                name="password"
+                type="password" 
+                maxlength="128" 
+                data-i18n-placeholder="auth.passwordPlaceholder"
+                placeholder="Enter password" 
+                autocomplete="current-password" 
+                required 
+                aria-describedby="login-pass-error"
+              />
+              <button type="button" class="password-toggle" id="btn-toggle-password" data-i18n-aria="auth.showPassword" aria-label="Show password" aria-pressed="false">
+                <svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <line class="eye-slash" x1="2" y1="2" x2="22" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Email is captured at signup as the account recovery address. Shown in
+               register mode only; setAuthMode toggles its visibility + required. -->
+          <div class="auth-field" id="login-email-field" hidden>
+            <label for="login-email" class="auth-label" data-i18n="auth.email">Email</label>
+            <div id="login-email-error" class="auth-field-error" aria-live="polite" data-i18n="auth.emailError">Please enter a valid email address.</div>
+            <input
+              id="login-email"
+              name="email"
+              type="email"
+              maxlength="254"
+              data-i18n-placeholder="auth.emailPlaceholder"
+              placeholder="you@example.com"
+              autocomplete="email"
+              aria-describedby="login-email-error"
+            />
+          </div>
+
+          <!-- Cloudflare Turnstile widget mounts here when configured (src/main.ts). -->
+          <div id="cf-turnstile-container" class="auth-turnstile"></div>
+
+          <!-- Second-factor step: revealed when the server returns twoFactorRequired. -->
+          <div class="auth-field" id="login-2fa-field" hidden>
+            <label for="login-2fa-code" class="auth-label" data-i18n="auth.twoFactorLabel">Authentication code</label>
+            <input id="login-2fa-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="14" data-i18n-placeholder="auth.twoFactorPlaceholder" placeholder="6-digit or recovery code" />
+            <p class="account-hint" data-i18n="auth.twoFactorHint">Enter the code from your authenticator app, or one of your recovery codes.</p>
+          </div>
+
+          <div id="login-error" class="auth-error" aria-live="polite"></div>
+
+          <div class="auth-actions auth-actions-row">
+            <button type="button" class="btn btn-back" id="btn-login-back" data-i18n="auth.back">Back</button>
+            <button type="submit" class="btn btn-primary" id="btn-login" data-i18n="auth.logIn">Log In</button>
+          </div>
+          <p class="auth-switch">
+            <span id="auth-switch-prompt" data-i18n="auth.noAccountPrompt">New to the realm?</span>
+            <button type="button" class="auth-link" id="btn-auth-toggle" data-i18n="auth.createAccount">Create Account</button>
+          </p>
+        </form>
+
+        <div id="realm-panel" class="panel auth-panel auth-panel-premium" hidden>
+          <h2 class="auth-title"><span data-i18n="auth.realmList">Realm List</span> <span id="realm-list-user" class="cs-realm"></span></h2>
+          <div id="realm-list"><div class="realm-loading" data-i18n="auth.loadingRealms">Loading realms...</div></div>
+          <div class="auth-actions auth-actions-split">
+            <button type="button" class="btn btn-secondary" id="btn-realm-back" data-i18n="auth.back">Back</button>
+          </div>
+        </div>
+
+        <div id="charselect-panel" class="panel charselect-screen cs-wow" hidden>
+          <header class="cs-head">
+            <h2 class="auth-title cs-title"><span data-i18n="auth.characters">Characters:</span> <span id="charselect-user" class="gold"></span></h2>
+            <div class="cs-head-row">
+              <div class="cs-controls">
+                <div class="cs-realm-switch">
+                  <button type="button" id="btn-change-realm" class="cs-realm-btn" aria-haspopup="listbox" aria-expanded="false" data-i18n-aria="auth.changeRealm" aria-label="Change Realm">
+                    <span class="cs-realm-caption" data-i18n="auth.realm">Realm</span>
+                    <span id="charselect-realm" class="cs-realm-name"></span>
+                    <svg class="cs-realm-caret" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
+                  </button>
+                  <div id="cs-realm-menu" class="cs-realm-menu" role="listbox" data-i18n-aria="auth.realmList" aria-label="Realm List" hidden></div>
+                </div>
+                <div class="cs-sort-switch">
+                  <button type="button" id="cs-sort-btn" class="cs-realm-btn cs-sort-btn" aria-haspopup="listbox" aria-expanded="false" data-i18n-aria="character.sortByLabel" aria-label="Sort characters">
+                    <span class="cs-realm-caption" data-i18n="character.sortBy">Sort</span>
+                    <span id="cs-sort-current" class="cs-realm-name"></span>
+                    <svg class="cs-realm-caret" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
+                  </button>
+                  <div id="cs-sort-menu" class="cs-realm-menu cs-sort-menu" role="listbox" data-i18n-aria="character.sortMenuLabel" aria-label="Sort options" hidden></div>
+                </div>
+              </div>
+              <div class="cs-wallet cs-wallet-group">
+                <span class="cs-wallet-label" data-i18n="wallet.label">$WOC Wallet</span>
+                <div class="cs-wallet-main">
+                  <div class="cs-wallet-actions">
+                    <button type="button" class="wallet-cta" id="btn-wallet" data-i18n-title="wallet.connectTitle" data-i18n-aria="wallet.connectAria" title="Verify your Solana wallet" aria-label="Verify your Solana wallet">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v2"></path><path d="M3 7v10a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"></path><path d="M21 11h-4a2 2 0 0 0 0 4h4a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1Z"></path></svg>
+                      <span id="wallet-label" data-i18n="wallet.connect">Verify Wallet</span>
+                    </button>
+                    <span class="wallet-status" id="wallet-status" aria-live="polite" hidden></span>
+                    <button type="button" class="wallet-mini" id="btn-wallet-switch" data-i18n-title="wallet.switchTitle" data-i18n-aria="wallet.switchAria" title="Verify a different wallet" aria-label="Verify a different wallet" hidden>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+                      <span data-i18n="wallet.switch">Switch</span>
+                    </button>
+                    <button type="button" class="wallet-mini" id="btn-wallet-unlink" data-i18n-title="wallet.unlinkTitle" data-i18n-aria="wallet.unlinkAria" title="Remove wallet verification from this account" aria-label="Remove wallet verification from this account" hidden>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l2.12-2.12a5 5 0 0 0-7.07-7.07L11 4.93"></path><path d="M14 11a5 5 0 0 0-7.07 0L4.81 13.12a5 5 0 0 0 7.07 7.07L13 19.07"></path><path d="M3 3l18 18"></path></svg>
+                      <span data-i18n="wallet.unlink">Unlink</span>
+                    </button>
+                    <button type="button" class="wallet-mini" id="btn-wallet-signout" data-i18n-title="wallet.signOutTitle" data-i18n-aria="wallet.signOutAria" title="Disconnect the wallet app on this browser" aria-label="Disconnect the wallet app on this browser" hidden>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                      <span data-i18n="wallet.signOut">Disconnect</span>
+                    </button>
+                    <button type="button" class="wallet-mini" id="btn-wallet-hide" data-i18n-title="wallet.hideTitle" data-i18n-aria="wallet.hideAria" title="Hide wallet row on this screen" aria-label="Hide wallet row on this screen">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle><path d="M3 3l18 18"></path></svg>
+                      <span data-i18n="wallet.hide">Hide</span>
+                    </button>
+                  </div>
+                  <div class="cs-wallet-help" id="wallet-help" data-i18n="wallet.helpDisconnected">Verify a Solana wallet to enable holder flair and player-card badges. No transaction or SOL required.</div>
+                </div>
+              </div>
+              <div class="cs-wallet-hidden-note" id="wallet-hidden-note" role="status" aria-live="polite" hidden></div>
+              <div class="cs-wallet cs-github-group" id="cs-github-group" hidden>
+                <span class="cs-wallet-label" data-i18n="hudChrome.devBadge.title">Developer</span>
+                <div class="cs-wallet-main">
+                  <div class="cs-wallet-actions">
+                    <button type="button" class="wallet-cta" id="btn-github" data-i18n-title="hudChrome.devBadge.link.cta" data-i18n-aria="hudChrome.devBadge.link.cta" title="Link GitHub" aria-label="Link GitHub">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 .5C5.73.5.5 5.73.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.04 1.78 2.73 1.27 3.4.97.1-.75.4-1.27.73-1.56-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.05 11.05 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.41-5.26 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5Z"></path></svg>
+                      <span id="github-label" data-i18n="hudChrome.devBadge.link.cta">Link GitHub</span>
+                    </button>
+                    <span class="wallet-status" id="github-status" aria-live="polite" hidden></span>
+                    <button type="button" class="wallet-mini" id="btn-github-unlink" data-i18n-title="hudChrome.devBadge.unlink" data-i18n-aria="hudChrome.devBadge.unlink" title="Unlink GitHub" aria-label="Unlink GitHub" hidden>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l2.12-2.12a5 5 0 0 0-7.07-7.07L11 4.93"></path><path d="M14 11a5 5 0 0 0-7.07 0L4.81 13.12a5 5 0 0 0 7.07 7.07L13 19.07"></path><path d="M3 3l18 18"></path></svg>
+                      <span data-i18n="hudChrome.devBadge.unlink">Unlink GitHub</span>
+                    </button>
+                  </div>
+                  <div class="cs-wallet-help" id="github-help" data-i18n="hudChrome.devBadge.link.benefits">Link your GitHub to earn a developer badge for the pull requests you have had merged into the open-source repo.</div>
+                </div>
+              </div>
+              <div class="cs-wallet cs-steam-group" id="cs-steam-group" hidden>
+                <span class="cs-wallet-label" data-i18n="hudChrome.steam.title">Steam</span>
+                <div class="cs-wallet-main">
+                  <div class="cs-wallet-actions">
+                    <button type="button" class="wallet-cta" id="btn-steam-link" data-i18n-title="hudChrome.steam.link" data-i18n-aria="hudChrome.steam.link" title="Link Steam" aria-label="Link Steam" hidden>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16.5" cy="8" r="3.5"></circle><circle cx="7" cy="17" r="2.5"></circle><path d="M9.2 15.3 13.6 10.6"></path></svg>
+                      <span id="steam-label" data-i18n="hudChrome.steam.link">Link Steam</span>
+                    </button>
+                    <span class="wallet-status" id="steam-status" aria-live="polite" hidden></span>
+                    <button type="button" class="wallet-mini" id="btn-steam-unlink" data-i18n-title="hudChrome.steam.unlink" data-i18n-aria="hudChrome.steam.unlink" title="Unlink Steam" aria-label="Unlink Steam" hidden>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l2.12-2.12a5 5 0 0 0-7.07-7.07L11 4.93"></path><path d="M14 11a5 5 0 0 0-7.07 0L4.81 13.12a5 5 0 0 0 7.07 7.07L13 19.07"></path><path d="M3 3l18 18"></path></svg>
+                      <span data-i18n="hudChrome.steam.unlink">Unlink Steam</span>
+                    </button>
+                  </div>
+                  <div class="cs-wallet-help" id="steam-help" data-i18n="hudChrome.steam.benefits">Link your Steam account from the desktop app to mirror the deeds you earn into Steam achievements.</div>
+                </div>
+              </div>
+            </div>
+          </header>
+          <div class="cs-body">
+            <!-- Left: full-height character roster -->
+            <div class="cs-list-col">
+              <ul id="char-list" role="list"></ul>
+              <div class="cs-list-actions">
+                <button type="button" class="btn btn-primary" id="btn-charselect-enter" data-i18n="auth.enterWorld">Enter World</button>
+                <button type="button" class="btn btn-secondary" id="btn-charselect-back" data-i18n="auth.back">Back</button>
+                <button type="button" class="btn btn-primary cs-new-btn" id="btn-new-character" data-i18n="auth.newCharacter">New Character</button>
+              </div>
+            </div>
+            <!-- Right: selected character showcase -->
+            <div class="cs-detail-col">
+              <div class="char-preview-container cs-preview" id="online-preview-container">
+                <div class="cs-preview-name" id="charselect-preview-name" aria-live="polite"></div>
+                <canvas id="char-preview-canvas"></canvas>
+              </div>
+              <div id="charselect-class-details" class="class-details-panel" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="charcreate-panel" class="panel charselect-screen cs-wow" hidden>
+          <header class="cs-head">
+            <h2 class="auth-title cs-title" data-i18n="auth.createCharacter">Create a Character</h2>
+          </header>
+          <div class="cs-body cs-body-create">
+            <div class="cs-create-col">
+              <div class="char-create">
+                <div class="cs-section-header" data-i18n="auth.name">Name</div>
+                <div class="char-input-group">
+                  <input id="new-char-name" maxlength="16" data-i18n-placeholder="auth.characterNamePlaceholder" placeholder="Character Name" data-i18n-aria="auth.characterName" aria-label="Character Name" aria-describedby="charselect-error" autocomplete="off" />
+                  <div id="charselect-error" class="auth-error" aria-live="polite"></div>
+                </div>
+                <div class="cs-section-header" data-i18n="auth.class">Class</div>
+                <ul class="mini-class-row" role="list">
+                  <li class="mini-class" data-class="warrior" role="button" tabindex="0" data-i18n-aria="classes.warriorAria" data-i18n="classes.warrior" aria-label="Warrior class" aria-pressed="false">Warrior</li>
+                  <li class="mini-class" data-class="paladin" role="button" tabindex="0" data-i18n-aria="classes.paladinAria" data-i18n="classes.paladin" aria-label="Paladin class" aria-pressed="false">Paladin</li>
+                  <li class="mini-class" data-class="hunter" role="button" tabindex="0" data-i18n-aria="classes.hunterAria" data-i18n="classes.hunter" aria-label="Hunter class" aria-pressed="false">Hunter</li>
+                  <li class="mini-class" data-class="rogue" role="button" tabindex="0" data-i18n-aria="classes.rogueAria" data-i18n="classes.rogue" aria-label="Rogue class" aria-pressed="false">Rogue</li>
+                  <li class="mini-class" data-class="priest" role="button" tabindex="0" data-i18n-aria="classes.priestAria" data-i18n="classes.priest" aria-label="Priest class" aria-pressed="false">Priest</li>
+                  <li class="mini-class" data-class="shaman" role="button" tabindex="0" data-i18n-aria="classes.shamanAria" data-i18n="classes.shaman" aria-label="Shaman class" aria-pressed="false">Shaman</li>
+                  <li class="mini-class" data-class="mage" role="button" tabindex="0" data-i18n-aria="classes.mageAria" data-i18n="classes.mage" aria-label="Mage class" aria-pressed="false">Mage</li>
+                  <li class="mini-class" data-class="warlock" role="button" tabindex="0" data-i18n-aria="classes.warlockAria" data-i18n="classes.warlock" aria-label="Warlock class" aria-pressed="false">Warlock</li>
+                  <li class="mini-class" data-class="druid" role="button" tabindex="0" data-i18n-aria="classes.druidAria" data-i18n="classes.druid" aria-label="Druid class" aria-pressed="false">Druid</li>
+                </ul>
+                <div class="skin-picker">
+                  <div class="skin-picker-header" data-i18n="auth.appearance">Appearance</div>
+                  <div id="online-skin-row" class="skin-row" role="list" data-i18n-aria="auth.appearance" aria-label="Appearance"></div>
+                </div>
+                <div class="auth-actions cs-form-actions">
+                  <button class="btn btn-secondary" id="btn-charcreate-back" data-i18n="auth.back">Back</button>
+                  <button class="btn btn-primary" id="btn-create-char" data-i18n="auth.create">Create</button>
+                </div>
+              </div>
+            </div>
+            <div class="cs-detail-col">
+              <div class="char-preview-container cs-preview" id="charcreate-preview-container"></div>
+              <div id="charcreate-class-details" class="class-details-panel" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- This entry is online-only: the offline single-player flow (#offline-select)
+             lives on the landing page (index.html); /play goes straight to the online
+             realm. main.ts guards the offline wiring on element presence. -->
+      </section>
+
+      <section id="highscores-view" class="view-section" hidden aria-hidden="true">
+        <div class="parchment-panel hs-panel">
+          <div class="skeleton-icon-wrapper">
+            <svg viewBox="0 0 24 24" class="skeleton-svg-icon" aria-hidden="true">
+              <path fill="currentColor" d="M12 2C11.5 2 6 4 6 4V10C6 14.41 9.59 18 12 18.5C14.41 18 18 14.41 18 10V4C18 4 12.5 2 12 2M12 16.5C10.32 15.5 8 12.78 8 10V5.37L12 3.91L16 5.37V10C16 12.78 13.68 15.5 12 16.5Z"/>
+            </svg>
+          </div>
+          <h2 class="skeleton-title" data-i18n="highscores.title">High Scores Leaderboard</h2>
+          <p class="skeleton-desc" data-i18n="game.leaderboard.globalSubtitle">Top champions across all realms</p>
+          <div id="hs-leaderboard" class="hs-leaderboard" aria-live="polite">
+            <div class="hs-loading" data-i18n="game.leaderboard.loading">Loading rankings…</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="news-view" class="view-section" hidden aria-hidden="true">
+        <div class="parchment-panel news-panel">
+          <div class="skeleton-icon-wrapper">
+            <svg viewBox="0 0 24 24" class="skeleton-svg-icon" aria-hidden="true">
+              <path fill="currentColor" d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6m-2 0l-8 5l-8-5h16m0 12H4V8l8 5l8-5v10z"/>
+            </svg>
+          </div>
+          <h2 class="skeleton-title" data-i18n="news.title">News & Updates</h2>
+          <p class="skeleton-desc" data-i18n="news.desc">Read the latest patch notes, events, and community updates.</p>
+          <div id="news-feed" class="news-feed" aria-live="polite">
+            <div class="news-loading" data-i18n="news.loading">Loading the latest updates…</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="download-view" class="view-section" hidden aria-hidden="true">
+        <div class="parchment-panel skeleton-panel">
+          <div class="skeleton-icon-wrapper">
+            <svg viewBox="0 0 24 24" class="skeleton-svg-icon" aria-hidden="true">
+              <path fill="currentColor" d="M5 20h14v-2H5v2m14-9h-4V3H9v8H5l7 7l7-7z"/>
+            </svg>
+          </div>
+          <h2 class="skeleton-title" data-i18n="download.title">Download Desktop Launcher</h2>
+          <p class="skeleton-desc" data-i18n="download.desc">Get the standalone launcher for optimized performance and full-screen play.</p>
+          <div class="desktop-download-actions">
+            <a
+              class="btn btn-primary desktop-download-link"
+              data-platform="mac"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.28.0-mac-universal.dmg"
+              data-i18n="download.macCta"
+            >Download for macOS</a>
+            <a
+              class="btn btn-primary desktop-download-link"
+              data-platform="win"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.28.0-win.exe"
+              data-i18n="download.windowsCta"
+            >Download for Windows</a>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="delete-character-modal" class="modal-backdrop" hidden>
+      <div class="confirm-modal panel auth-panel-premium" role="dialog" aria-modal="true" aria-labelledby="delete-character-title">
+        <h2 id="delete-character-title" data-i18n="deleteCharacter.title">Delete Character</h2>
+        <p id="delete-character-body"></p>
+        <span id="delete-character-name" hidden></span>
+        <label for="delete-character-confirm" class="auth-label" data-i18n="deleteCharacter.confirmLabel">Type the character name to confirm</label>
+        <input id="delete-character-confirm" maxlength="16" autocomplete="off" />
+        <div id="delete-character-error" class="auth-error" aria-live="polite"></div>
+        <div class="confirm-actions">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-delete-character" data-i18n="deleteCharacter.cancel">Cancel</button>
+          <button type="button" class="btn btn-danger" id="btn-confirm-delete-character" disabled data-i18n="deleteCharacter.confirm">Delete Permanently</button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="homepage-footer">
+      <div class="footer-bar">
+      <div class="footer-left">
+      <div class="footer-social-row">
+        <a class="social-link" href="https://github.com/levy-street/world-of-claudecraft" target="_blank" rel="noopener noreferrer" data-i18n-aria="a11y.githubProject" aria-label="Open the World of ClaudeCraft GitHub project">
+          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          <span data-i18n="footer.githubLabel">Open Source Project</span>
+        </a>
+        <a class="social-link" href="https://discord.com/invite/worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-aria="a11y.discordCommunity" aria-label="Join the World of ClaudeCraft Discord community">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M20.32 4.37A19.8 19.8 0 0 0 15.36 2.8a13.66 13.66 0 0 0-.64 1.32 18.47 18.47 0 0 0-5.45 0 13.02 13.02 0 0 0-.65-1.32 19.73 19.73 0 0 0-4.96 1.58C.53 9.03-.32 13.56.1 18.02a19.9 19.9 0 0 0 6.08 3.08c.49-.67.93-1.38 1.3-2.13-.72-.27-1.41-.6-2.06-.98.17-.13.34-.26.5-.4a14.16 14.16 0 0 0 12.16 0c.16.14.33.27.5.4-.65.39-1.34.72-2.07.99.38.74.81 1.45 1.31 2.12a19.86 19.86 0 0 0 6.08-3.08c.5-5.17-.85-9.66-3.58-13.65ZM8.02 15.28c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Zm7.96 0c-1.18 0-2.15-1.08-2.15-2.41 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.33-.95 2.41-2.15 2.41Z"/></svg>
+          <span data-i18n="footer.discordLabel">Join the Discord</span>
+        </a>
+        <a class="social-link donate" href="https://ko-fi.com/worldofclaudecraft" target="_blank" rel="noopener noreferrer" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <span data-i18n="nav.donate">Donate</span>
+        </a>
+      </div>
+      <div id="game-version">v0.28.0</div>
+      </div>
+      <div class="footer-legal-row">
+        <a href="/terms" class="footer-link" data-i18n="footer.terms">Terms of Service</a>
+        <a href="/privacy" class="footer-link" data-i18n="footer.privacy">Privacy Policy</a>
+      </div>
+      <div class="footer-lang-row">
+        <div class="language-selector">
+          <label for="lang-select" class="visually-hidden" data-i18n="a11y.languageSelection">Language selection</label>
+          <select id="lang-select" class="lang-select-dropdown">
+            <option value="en">English (US)</option>
+            <option value="es">Español (LatAm)</option>
+            <option value="es_ES">Español (España)</option>
+            <option value="fr_FR">Français (France)</option>
+            <option value="fr_CA">Français (Canada)</option>
+            <option value="en_CA">English (Canada)</option>
+            <option value="it_IT">Italiano</option>
+            <option value="de_DE">Deutsch</option>
+            <option value="zh_CN">简体中文</option>
+            <option value="zh_TW">繁體中文</option>
+            <option value="ko_KR">한국어</option>
+            <option value="ja_JP">日本語</option>
+            <option value="pt_BR">Português (Brasil)</option>
+            <option value="ru_RU">Русский</option>
+            <option value="cs_CZ">Čeština</option>
+            <option value="nl_NL">Nederlands</option>
+            <option value="pl_PL">Polski</option>
+            <option value="id_ID">Bahasa Indonesia</option>
+            <option value="tr_TR">Türkçe</option>
+            <option value="sv_SE">Svenska</option>
+            <option value="vi_VN">Tiếng Việt</option>
+            <option value="da_DK">Dansk</option>
+          </select>
+          <span id="lang-select-status" class="visually-hidden" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+      </div>
+    </footer>
+  </main>
+
+  <div id="mobile-controls" data-i18n-aria="hud.core.mobileControls" aria-label="Mobile controls">
+    <div id="mobile-move-zone" aria-hidden="true"></div>
+    <div id="mobile-move-joystick" class="mobile-joystick" data-i18n-aria="hud.core.mobileMove" aria-label="Move">
+      <div id="mobile-autorun-target" class="mobile-autorun-target" aria-hidden="true" data-icon="autorun"></div>
+      <div id="mobile-move-stick" class="mobile-stick"></div>
+      <div class="mobile-joy-label" data-i18n="hud.core.mobileMove">Move</div>
+    </div>
+    <div id="mobile-camera-joystick" class="mobile-joystick" data-i18n-aria="hud.core.mobileCamera" aria-label="Camera">
+      <div id="mobile-camera-stick" class="mobile-stick"></div>
+      <div class="mobile-joy-label" data-i18n="hud.core.mobileCamera">Camera</div>
+    </div>
+    <div id="mobile-combat-controls">
+      <button class="mobile-btn" type="button" id="mobile-chat" data-i18n-title="hud.keybinds.actions.chat" data-i18n-aria="hud.keybinds.actions.chat" title="Open Chat" aria-label="Open Chat" data-icon="chat"><span class="mobile-label" data-i18n="hud.core.mobileChat">Chat</span></button>
+      <button class="mobile-btn" type="button" id="mobile-social" data-i18n-title="hud.keybinds.actions.social" data-i18n-aria="hud.keybinds.actions.social" title="Friends &amp; Guild" aria-label="Friends &amp; Guild" data-icon="social"><span class="mobile-label" data-i18n="hud.core.mobileSocial">Social</span></button>
+      <button class="mobile-btn" type="button" id="mobile-quest" data-i18n-title="questUi.log.title" data-i18n-aria="questUi.log.title" title="Quest Log" aria-label="Quest Log" data-icon="questlog"><span class="mobile-label" data-i18n="questUi.tracker.title">Quests</span></button>
+      <button class="mobile-btn" type="button" id="mobile-menu" data-i18n-title="hud.options.gameMenu" data-i18n-aria="hud.options.gameMenu" title="Game Menu" aria-label="Game Menu" data-icon="menu"><span class="mobile-label" data-i18n="hud.core.mobileSettings">Settings</span></button>
+      <button class="mobile-btn" type="button" id="mobile-more" data-i18n-title="hud.core.mobileMoreAria" data-i18n-aria="hud.core.mobileMoreAria" title="Show more menus" aria-label="Show more menus" data-icon="more"><span class="mobile-label" data-i18n="hud.core.mobileMore">More</span></button>
+    </div>
+    <div id="mobile-action-ring" data-i18n-aria="hudChrome.mobile.actionRing" aria-label="Combat actions">
+      <button class="mobile-action-slot" type="button" data-mobile-index="0"></button>
+      <button class="mobile-action-slot" type="button" data-mobile-index="1"></button>
+      <button class="mobile-action-slot" type="button" data-mobile-index="2"></button>
+      <button class="mobile-action-slot" type="button" data-mobile-index="3"></button>
+      <button class="mobile-action-slot" type="button" data-mobile-index="4"></button>
+      <button type="button" id="mobile-action-attack" data-icon="attack"></button>
+      <button type="button" id="mobile-target-cycle" data-i18n-title="hudChrome.mobile.targetCycle" data-i18n-aria="hudChrome.mobile.targetCycle" title="Swap target" aria-label="Swap target" data-icon="target"><span class="mobile-label" data-i18n="hudChrome.mobile.targetCycleShort">Target</span></button>
+      <button type="button" id="mobile-interact" data-i18n-title="hud.keybinds.actions.interact" data-i18n-aria="hud.keybinds.actions.interact" title="Interact / Loot" aria-label="Interact / Loot" data-icon="interact"><span class="mobile-label" data-i18n="hud.core.mobileUse">Use</span></button>
+      <button type="button" id="mobile-jump" data-i18n-title="hud.keybinds.actions.jump" data-i18n-aria="hud.keybinds.actions.jump" title="Jump" aria-label="Jump" data-icon="jump"><span class="mobile-label" data-i18n="hudChrome.mobile.jump">Jump</span></button>
+      <button type="button" id="mobile-action-page-toggle" data-i18n-aria="hudChrome.mobile.actionPageToggle" aria-label="Switch action page" data-icon="swap"><span class="mobile-action-page-indicator"></span></button>
+    </div>
+    <!-- Consumables quick bar: a slim chevron chip right of the Chat/Social/More
+         trio; tapping it expands a row of the carried potions/elixirs/food/drink
+         (auto-populated, no setup) so touch players can quaff mid-fight without
+         the More > Bags full-screen detour. Collapsed by default, session-only. -->
+    <div id="mobile-consumables" role="group" data-i18n-aria="hudChrome.bags.filterConsumable" aria-label="Consumables">
+      <button type="button" id="mobile-consumables-toggle" data-i18n-title="hudChrome.bags.filterConsumable" data-i18n-aria="hudChrome.bags.filterConsumable" title="Consumables" aria-label="Consumables" aria-expanded="false" data-icon="next"></button>
+      <div id="mobile-consumables-row">
+        <button class="mobile-consumable-slot" type="button" data-consumable-index="0"></button>
+        <button class="mobile-consumable-slot" type="button" data-consumable-index="1"></button>
+        <button class="mobile-consumable-slot" type="button" data-consumable-index="2"></button>
+        <button class="mobile-consumable-slot" type="button" data-consumable-index="3"></button>
+        <button class="mobile-consumable-slot" type="button" data-consumable-index="4"></button>
+        <button class="mobile-consumable-slot" type="button" data-consumable-index="5"></button>
+      </div>
+    </div>
+      <div id="mobile-extra-controls" class="window panel" role="dialog" aria-modal="true" aria-labelledby="mobile-more-title">
+        <div class="panel-title">
+          <span id="mobile-more-title" data-i18n="hud.core.mobileMore">More</span>
+          <button type="button" class="x-btn" id="mobile-more-close" data-i18n-title="hud.options.returnToGame" data-i18n-aria="hud.options.returnToGame" title="Return to Game" aria-label="Return to Game" data-icon="close"></button>
+        </div>
+        <div id="mobile-extra-grid">
+          <button type="button" class="mobile-btn" id="mobile-discord" hidden data-i18n-title="hudChrome.discord.title" data-i18n-aria="hudChrome.discord.title" title="Discord" aria-label="Discord" data-icon="discord"><span class="mobile-label" data-i18n="hudChrome.discord.title">Discord</span></button>
+          <button type="button" class="mobile-btn" id="mobile-donate" data-i18n-title="a11y.donateProject" data-i18n-aria="a11y.donateProject" title="Support the project" aria-label="Donate to support World of ClaudeCraft" data-icon="donate"><span class="mobile-label" data-i18n="nav.donate">Donate</span></button>
+          <button class="mobile-btn" id="mobile-emote" data-i18n-title="hudChrome.emoteWheel.label" data-i18n-aria="hudChrome.emoteWheel.label" title="Emotes" aria-label="Emotes" data-icon="emote"><span class="mobile-label" data-i18n="hudChrome.emoteWheel.label">Emotes</span></button>
+          <button class="mobile-btn" id="mobile-arena" data-i18n-title="hud.keybinds.actions.arena" data-i18n-aria="hud.keybinds.actions.arena" title="Arena (Ashen Coliseum)" aria-label="Arena (Ashen Coliseum)" data-icon="arena"><span class="mobile-label" data-i18n="hud.core.mobileArena">Arena</span></button>
+          <button class="mobile-btn" id="mobile-dfinder" data-i18n-title="hudChrome.finder.title" data-i18n-aria="hudChrome.finder.title" title="Dungeon Finder" aria-label="Dungeon Finder" data-icon="dfinder"><span class="mobile-label" data-i18n="hudChrome.finder.title">Dungeon Finder</span></button>
+          <button class="mobile-btn" id="mobile-valecup" data-i18n-title="hudChrome.keybinds.valecup" data-i18n-aria="hudChrome.keybinds.valecup" title="Vale Cup" aria-label="Vale Cup" data-icon="ball"><span class="mobile-label" data-i18n="hudChrome.vcup.mobileLabel">Cup</span></button>
+          <button class="mobile-btn" id="mobile-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="mobile-label" data-i18n="hud.keybinds.actions.char">Character</span></button>
+          <button class="mobile-btn" id="mobile-bags" data-i18n-title="hud.keybinds.actions.bags" data-i18n-aria="hud.keybinds.actions.bags" title="Bags" aria-label="Bags" data-icon="bags"><span class="mobile-label" data-i18n="hud.keybinds.actions.bags">Bags</span></button>
+          <button class="mobile-btn" id="mobile-crafting" data-i18n-title="hudChrome.crafting.title" data-i18n-aria="hudChrome.crafting.title" title="Crafting" aria-label="Crafting" data-icon="crafting"><span class="mobile-label" data-i18n="hudChrome.crafting.title">Crafting</span></button>
+          <button class="mobile-btn" id="mobile-spellbook" data-i18n-title="abilityUi.spellbook.title" data-i18n-aria="abilityUi.spellbook.title" title="Spellbook" aria-label="Spellbook" data-icon="spellbook"><span class="mobile-label" data-i18n="abilityUi.spellbook.title">Spellbook</span></button>
+          <button class="mobile-btn" id="mobile-talents" data-i18n-title="game.talents.title" data-i18n-aria="game.talents.title" title="Talents" aria-label="Talents" data-icon="talents"><span class="mobile-label" data-i18n="game.talents.title">Talents</span></button>
+          <button class="mobile-btn" id="mobile-map" data-i18n-title="hud.keybinds.actions.map" data-i18n-aria="hud.keybinds.actions.map" title="World Map" aria-label="World Map" data-icon="map"><span class="mobile-label" data-i18n="hud.core.mobileMap">Map</span></button>
+          <button class="mobile-btn" id="mobile-leaderboard" data-i18n-title="game.leaderboard.title" data-i18n-aria="game.leaderboard.title" title="Leaderboard" aria-label="Leaderboard" data-icon="leaderboard"><span class="mobile-label" data-i18n="hudChrome.mobile.leaderboard">Ranks</span></button>
+          <button type="button" class="mobile-btn" id="mobile-daily-rewards" data-i18n-title="hudChrome.dailyRewards.title" data-i18n-aria="hudChrome.dailyRewards.title" title="Daily Rewards" aria-label="Daily Rewards" data-icon="chest"><span class="mobile-label" data-i18n="hudChrome.mobile.dailyRewards">Rewards</span></button>
+          <button type="button" class="mobile-btn" id="mobile-deeds" data-i18n-title="hudChrome.deeds.title" data-i18n-aria="hudChrome.deeds.title" title="Book of Deeds" aria-label="Book of Deeds" data-icon="book"><span class="mobile-label" data-i18n="hudChrome.mobile.deeds">Deeds</span></button>
+          <button type="button" class="mobile-btn" id="mobile-professions" data-i18n-title="hudChrome.professions.title" data-i18n-aria="hudChrome.professions.title" title="Professions" aria-label="Professions" data-icon="target"><span class="mobile-label" data-i18n="hudChrome.mobile.professions">Professions</span></button>
+          <button class="mobile-btn active" id="mobile-nameplates" data-i18n-title="hud.keybinds.actions.nameplates" data-i18n-aria="hud.keybinds.actions.nameplates" title="Toggle nameplates" aria-label="Toggle nameplates" data-icon="nameplates"><span class="mobile-label" data-i18n="hudChrome.mobile.nameplates">Names</span></button>
+          <button class="mobile-btn" id="mobile-music" data-i18n-title="hud.options.music" data-i18n-aria="hud.options.music" title="Music" aria-label="Toggle music" data-icon="music"><span class="mobile-label" data-i18n="hud.options.music">Music</span></button>
+          <button class="mobile-btn" id="mobile-haptics" data-i18n-title="hudChrome.mobile.toggleHaptics" data-i18n-aria="hudChrome.mobile.toggleHaptics" title="Toggle haptic feedback" aria-label="Toggle haptic feedback" aria-pressed="true" data-icon="vibrate"><span class="mobile-label" data-i18n="hudChrome.mobile.haptics">Haptics</span></button>
+        </div>
+      </div>
+  </div>
+  <div id="mobile-window-backdrop" aria-hidden="true"></div>
+  <div id="mobile-preflight" role="dialog" aria-modal="true" aria-labelledby="mobile-preflight-title">
+    <div class="preflight-panel">
+      <h2 id="mobile-preflight-title" data-i18n="mobilePreflight.title">Play in Landscape Fullscreen</h2>
+      <p id="mobile-preflight-detail"></p>
+      <ol id="mobile-preflight-steps"></ol>
+      <button class="btn" id="mobile-preflight-continue" data-i18n="mobilePreflight.continue">Continue to Game</button>
+    </div>
+  </div>
+  <div id="rotate-device" role="alert">
+    <div>
+      <div class="rotate-icon" aria-hidden="true">↻</div>
+      <div class="rotate-title" data-i18n="mobilePreflight.rotateTitle">Rotate to Landscape</div>
+      <div class="rotate-sub" data-i18n="mobilePreflight.rotateSub">Portrait mode is not supported. Rotate your device to landscape to continue.</div>
+    </div>
+  </div>
+
+  <div id="loading-screen">
+    <img class="ls-logo" src="/worldofclaudecraft-logo.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
+    <div class="ls-progress">
+      <div class="ls-bar"><div id="ls-fill"></div></div>
+      <div id="ls-status" data-i18n="loading.enteringWorld">Entering the world...</div>
+      <div id="ls-tip"></div>
+      <div id="ls-slow-hint" data-i18n="loading.slowConnection" role="status" aria-live="polite">This is taking longer than usual. Check your internet connection.</div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

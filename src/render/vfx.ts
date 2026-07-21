@@ -20,6 +20,38 @@ function hdr(k: number): number {
   return GFX.composer ? k : 1;
 }
 
+// Per-school projectile colors, cached: a bolt burst used to allocate three
+// THREE.Color per launch. spawn() copies components into the attribute buffers
+// (and update() copies before mutating), never retaining the reference, so the
+// cached instances are effectively immutable. Keyed on GFX.composer so a tier
+// flip rebuilds the HDR-boosted variants.
+const projectileColorCache = new Map<
+  string,
+  { base: THREE.Color; core: THREE.Color; trail: THREE.Color }
+>();
+let projectileColorComposer: boolean | null = null;
+function projectileSchoolColors(school: string): {
+  base: THREE.Color;
+  core: THREE.Color;
+  trail: THREE.Color;
+} {
+  if (projectileColorComposer !== GFX.composer) {
+    projectileColorCache.clear();
+    projectileColorComposer = GFX.composer;
+  }
+  let c = projectileColorCache.get(school);
+  if (!c) {
+    const base = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff);
+    c = {
+      base,
+      core: base.clone().multiplyScalar(hdr(2.5)),
+      trail: base.clone().multiplyScalar(hdr(1.4)),
+    };
+    projectileColorCache.set(school, c);
+  }
+  return c;
+}
+
 // ---------------------------------------------------------------------------
 // Sprite atlas: 16 cherry-picked Kenney sprites in a 4x4 grid. Order defines
 // the cell index used by the shader — append only.
@@ -29,26 +61,52 @@ const ATLAS_GRID = 4;
 const ATLAS_CELL = 256;
 
 const SPRITE_FILES = [
-  'light_01', 'light_02', 'flare_01', 'spark_04',
-  'spark_06', 'star_07', 'magic_01', 'magic_04',
-  'twirl_01', 'flame_03', 'fire_01', 'smoke_05',
-  'trace_05', 'slash_02', 'dirt_02', 'circle_05',
+  'light_01',
+  'light_02',
+  'flare_01',
+  'spark_04',
+  'spark_06',
+  'star_07',
+  'magic_01',
+  'magic_04',
+  'twirl_01',
+  'flame_03',
+  'fire_01',
+  'smoke_05',
+  'trace_05',
+  'slash_02',
+  'dirt_02',
+  'circle_05',
 ] as const;
 
 // Named cell indices (keep in sync with SPRITE_FILES order)
 const SPR = {
-  glowSoft: 0, glowCore: 1, flash: 2, sparkle: 3,
-  sparkBurst: 4, star: 5, magicWisp: 6, magicRune: 7,
-  twirl: 8, flame: 9, firePuff: 10, smoke: 11,
-  trace: 12, slash: 13, debris: 14, ring: 15,
+  glowSoft: 0,
+  glowCore: 1,
+  flash: 2,
+  sparkle: 3,
+  sparkBurst: 4,
+  star: 5,
+  magicWisp: 6,
+  magicRune: 7,
+  twirl: 8,
+  flame: 9,
+  firePuff: 10,
+  smoke: 11,
+  trace: 12,
+  slash: 13,
+  debris: 14,
+  ring: 15,
 } as const;
 
 const spriteImages: (TexImageSource | null)[] = SPRITE_FILES.map(() => null);
 for (let i = 0; i < SPRITE_FILES.length; i++) {
-  registerPreload(loadTexture(`/vfx/${SPRITE_FILES[i]}.png`, { srgb: true }).then((tex) => {
-    spriteImages[i] = tex.image as TexImageSource;
-    return tex;
-  }));
+  registerPreload(
+    loadTexture(`/vfx/${SPRITE_FILES[i]}.png`, { srgb: true }).then((tex) => {
+      spriteImages[i] = tex.image as TexImageSource;
+      return tex;
+    }),
+  );
 }
 
 // Compose the atlas once. Any cell whose PNG is unavailable (e.g. unit tests
@@ -69,8 +127,12 @@ function buildAtlasTexture(): THREE.CanvasTexture {
       ctx.drawImage(img as CanvasImageSource, x, y, ATLAS_CELL, ATLAS_CELL);
     } else {
       const g = ctx.createRadialGradient(
-        x + ATLAS_CELL / 2, y + ATLAS_CELL / 2, 2,
-        x + ATLAS_CELL / 2, y + ATLAS_CELL / 2, ATLAS_CELL / 2,
+        x + ATLAS_CELL / 2,
+        y + ATLAS_CELL / 2,
+        2,
+        x + ATLAS_CELL / 2,
+        y + ATLAS_CELL / 2,
+        ATLAS_CELL / 2,
       );
       g.addColorStop(0, 'rgba(255,255,255,1)');
       g.addColorStop(0.4, 'rgba(255,255,255,0.5)');
@@ -109,6 +171,21 @@ interface Projectile {
   ttl: number;
   coreSprite: number;
   trailSprite: number;
+  // When set, the flying head renders as a short jagged electric bolt streak
+  // (a lightning "bolt-shaped" projectile) instead of a smooth glowing comet.
+  lightning?: boolean;
+  // Visual heft multiplier (Pyroblast's heavyBolt = 2): scales the comet core,
+  // trail and impact flash; mechanics and speed are untouched.
+  scale?: number;
+}
+
+interface BubbleBeam {
+  sourceId: number;
+  targetId: number;
+  remaining: number;
+  group: THREE.Group;
+  core: THREE.Mesh;
+  water: THREE.Mesh;
 }
 
 // fire reads as flame tongues; everything else as sparkling magic
@@ -134,9 +211,21 @@ export class Vfx {
   private rotAttr: Float32Array;
   private head = 0;
   private projectiles: Projectile[] = [];
+  private bubbleBeams: BubbleBeam[] = [];
   private tmpColor = new THREE.Color();
+  private tmpDirection = new THREE.Vector3();
+  private readonly beamUp = new THREE.Vector3(0, 1, 0);
+  // fireworkBurst palette scratch, reused across shells (spawn() copies
+  // components, never retaining the reference): a goal volley allocates
+  // no Color objects.
+  private fwCols: THREE.Color[] = [];
+  private fwFlash = new THREE.Color();
+  private quality = 1;
 
-  constructor(scene: THREE.Scene, private anchor: EntityAnchor) {
+  constructor(
+    private scene: THREE.Scene,
+    private anchor: EntityAnchor,
+  ) {
     this.pos = new Float32Array(CAPACITY * 3);
     this.vel = new Float32Array(CAPACITY * 3);
     this.col = new Float32Array(CAPACITY * 3);
@@ -211,6 +300,7 @@ export class Vfx {
       `,
     });
     this.points = new THREE.Points(geo, mat);
+    this.points.userData.renderCategory = 'vfx';
     this.points.frustumCulled = false;
     this.points.renderOrder = 5;
     scene.add(this.points);
@@ -221,18 +311,89 @@ export class Vfx {
     mat.uniforms.uScale.value = heightPx / (2 * Math.tan((fovDeg * Math.PI) / 360));
   }
 
+  setQuality(level: number): void {
+    this.quality = Math.min(1, Math.max(0, Number.isFinite(level) ? level : 1));
+  }
+
+  prewarm(at: THREE.Vector3): void {
+    const sprites = Object.values(SPR);
+    for (let i = 0; i < sprites.length; i++) {
+      const a = (i / sprites.length) * Math.PI * 2;
+      this.spawn(
+        at.x + Math.sin(a) * 1.2,
+        at.y + 0.6 + (i % 4) * 0.25,
+        at.z + Math.cos(a) * 1.2,
+        0,
+        0,
+        0,
+        i % 3 === 0 ? 0xffd28a : i % 3 === 1 ? 0x8ed2ff : 0xd98aff,
+        0.35 + (i % 4) * 0.08,
+        1.0,
+        0,
+        sprites[i],
+        0,
+      );
+    }
+    this.update(0);
+  }
+
+  clear(): void {
+    this.projectiles.length = 0;
+    for (let i = this.bubbleBeams.length - 1; i >= 0; i--) this.removeBubbleBeam(i);
+    this.life.fill(0);
+    this.size.fill(0);
+    this.alphaAttr.fill(0);
+    const geo = this.points.geometry;
+    (geo.attributes.aSize as THREE.BufferAttribute).needsUpdate = true;
+    (geo.attributes.aAlpha as THREE.BufferAttribute).needsUpdate = true;
+  }
+
+  private scaledCount(count: number): number {
+    if (count <= 1) return count;
+    const scale = 0.45 + 0.55 * this.quality;
+    return Math.max(1, Math.min(count, Math.round(count * scale)));
+  }
+
+  private emitChance(ratePerSecond: number, dt: number): boolean {
+    return Math.random() <= dt * ratePerSecond * (0.35 + 0.65 * this.quality);
+  }
+
+  // Frame-rate-independent variant for continuous auras: emitChance caps at one
+  // spawn per frame, which starves a steady aura on a slow frame (a 15 fps
+  // client would show a third of the particles a 60 fps client does). Returns
+  // the whole expected count plus a Bernoulli draw on the fraction.
+  private emitCount(ratePerSecond: number, dt: number): number {
+    const expected = dt * ratePerSecond * (0.35 + 0.65 * this.quality);
+    const n = Math.floor(expected);
+    return n + (Math.random() <= expected - n ? 1 : 0);
+  }
+
   private spawn(
-    x: number, y: number, z: number,
-    vx: number, vy: number, vz: number,
-    color: THREE.Color | number, size: number, lifetime: number, gravity = 0,
-    sprite: number = SPR.glowSoft, rot: number = Math.random() * Math.PI * 2,
+    x: number,
+    y: number,
+    z: number,
+    vx: number,
+    vy: number,
+    vz: number,
+    color: THREE.Color | number,
+    size: number,
+    lifetime: number,
+    gravity = 0,
+    sprite: number = SPR.glowSoft,
+    rot: number = Math.random() * Math.PI * 2,
   ): void {
     const i = this.head;
     this.head = (this.head + 1) % CAPACITY;
-    this.pos[i * 3] = x; this.pos[i * 3 + 1] = y; this.pos[i * 3 + 2] = z;
-    this.vel[i * 3] = vx; this.vel[i * 3 + 1] = vy; this.vel[i * 3 + 2] = vz;
+    this.pos[i * 3] = x;
+    this.pos[i * 3 + 1] = y;
+    this.pos[i * 3 + 2] = z;
+    this.vel[i * 3] = vx;
+    this.vel[i * 3 + 1] = vy;
+    this.vel[i * 3 + 2] = vz;
     this.tmpColor.set(color as THREE.ColorRepresentation);
-    this.col[i * 3] = this.tmpColor.r; this.col[i * 3 + 1] = this.tmpColor.g; this.col[i * 3 + 2] = this.tmpColor.b;
+    this.col[i * 3] = this.tmpColor.r;
+    this.col[i * 3 + 1] = this.tmpColor.g;
+    this.col[i * 3 + 2] = this.tmpColor.b;
     this.size[i] = size;
     this.life[i] = lifetime;
     this.maxLife[i] = lifetime;
@@ -246,39 +407,366 @@ export class Vfx {
   // High-level effects
   // ---------------------------------------------------------------------
 
-  projectile(sourceId: number, targetId: number, school: string): void {
+  projectile(sourceId: number, targetId: number, school: string, scale = 1): void {
     const from = this.anchor(sourceId, 0.62);
     if (!from) return;
-    const color = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff);
+    const colors = projectileSchoolColors(school);
     const sprites = projectileSprites(school);
     this.projectiles.push({
       pos: from.clone(),
       targetId,
-      color,
-      coreColor: color.clone().multiplyScalar(hdr(2.5)),
-      trailColor: color.clone().multiplyScalar(hdr(1.4)),
+      color: colors.base,
+      coreColor: colors.core,
+      trailColor: colors.trail,
       speed: 26,
       ttl: 3,
       coreSprite: sprites.core,
       trailSprite: sprites.trail,
+      scale,
     });
+  }
+
+  beam(sourceId: number, targetId: number, school: string): void {
+    const from = this.anchor(sourceId, 0.62);
+    const to = this.anchor(targetId, 0.55);
+    if (!from || !to) return;
+    const color = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.9));
+    const dir = to.clone().sub(from);
+    const len = dir.length();
+    if (len <= 0.001) return;
+    dir.multiplyScalar(1 / len);
+    const steps = Math.min(30, Math.max(8, Math.ceil(len / 1.25)));
+    for (let i = 0; i <= steps; i++) {
+      const f = i / steps;
+      const jitter = (Math.random() - 0.5) * 0.18;
+      const x = from.x + (to.x - from.x) * f + (Math.random() - 0.5) * 0.12;
+      const y = from.y + (to.y - from.y) * f + jitter;
+      const z = from.z + (to.z - from.z) * f + (Math.random() - 0.5) * 0.12;
+      this.spawn(x, y, z, -dir.x * 0.8, 0.08, -dir.z * 0.8, color, 0.34, 0.18, 0, SPR.glowCore);
+    }
+    this.spawn(to.x, to.y, to.z, 0, 0.2, 0, color, 0.9, 0.2, 0, SPR.magicRune);
+  }
+
+  /** Water Jet's sustained hose: a bright liquid core surrounded by larger
+   * ring-shaped bubbles that rise as they travel between both moving anchors. */
+  bubbleBeam(sourceId: number, targetId: number, duration: number): void {
+    const existing = this.bubbleBeams.find((b) => b.sourceId === sourceId);
+    if (duration <= 0) {
+      if (existing) {
+        this.removeBubbleBeam(this.bubbleBeams.indexOf(existing));
+      }
+      return;
+    }
+    if (existing) {
+      existing.targetId = targetId;
+      existing.remaining = duration;
+      return;
+    }
+    const geometry = new THREE.CylinderGeometry(1, 1, 1, 10, 1, false);
+    const water = new THREE.Mesh(
+      geometry,
+      new THREE.MeshBasicMaterial({
+        color: 0x42bfe8,
+        transparent: true,
+        opacity: 0.48,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      }),
+    );
+    const core = new THREE.Mesh(
+      geometry,
+      new THREE.MeshBasicMaterial({
+        color: 0xc5f7ff,
+        transparent: true,
+        opacity: 0.88,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      }),
+    );
+    water.renderOrder = 5;
+    core.renderOrder = 6;
+    const group = new THREE.Group();
+    group.userData.renderCategory = 'vfx';
+    group.add(water, core);
+    this.scene.add(group);
+    this.bubbleBeams.push({ sourceId, targetId, remaining: duration, group, core, water });
+  }
+
+  private removeBubbleBeam(index: number): void {
+    const stream = this.bubbleBeams[index];
+    if (!stream) return;
+    this.scene.remove(stream.group);
+    stream.water.geometry.dispose();
+    (stream.water.material as THREE.Material).dispose();
+    (stream.core.material as THREE.Material).dispose();
+    this.bubbleBeams.splice(index, 1);
+  }
+
+  // Chain Heal's signature arc: a bright green cord that lifts in a gentle parabola
+  // from the source ally to the target, denser and softer than a nuke beam so it
+  // reads as flowing healing water rather than crackling lightning. Each hop of the
+  // chain emits one; the per-target heal glow (healGlow, on the heal2 event) lands
+  // the burst at each ally, so this method only draws the connecting cord.
+  chainHealArc(sourceId: number, targetId: number): void {
+    const from = this.anchor(sourceId, 0.62);
+    const to = this.anchor(targetId, 0.55);
+    if (!from || !to) return;
+    const core = new THREE.Color(0xbaf7a0).multiplyScalar(hdr(2.4));
+    const soft = new THREE.Color(0x86e86a).multiplyScalar(hdr(1.7));
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const dz = to.z - from.z;
+    const len = Math.hypot(dx, dz);
+    if (len <= 0.001 && Math.abs(dy) <= 0.001) return;
+    // Arc height scales with distance so a long jump bows more; capped so a short
+    // hop still curves. The lift peaks at the midpoint (sin(pi*f)).
+    const lift = Math.min(1.6, 0.5 + len * 0.12);
+    const steps = Math.min(34, Math.max(12, Math.ceil(len / 0.8)));
+    for (let i = 0; i <= steps; i++) {
+      const f = i / steps;
+      const arc = Math.sin(f * Math.PI) * lift;
+      const jitterX = (Math.random() - 0.5) * 0.1;
+      const jitterZ = (Math.random() - 0.5) * 0.1;
+      // Alternate a bright core sprite and a soft glow so the cord has depth.
+      const bright = i % 2 === 0;
+      this.spawn(
+        from.x + dx * f + jitterX,
+        from.y + dy * f + arc + (Math.random() - 0.5) * 0.08,
+        from.z + dz * f + jitterZ,
+        0,
+        0.4,
+        0,
+        bright ? core : soft,
+        bright ? 0.42 : 0.55,
+        0.5 + Math.random() * 0.18,
+        -0.4,
+        bright ? SPR.glowCore : SPR.glowSoft,
+      );
+    }
+    // A few rising sparkles along the cord for the living-water feel.
+    const sparkles = this.scaledCount(8);
+    for (let i = 0; i < sparkles; i++) {
+      const f = Math.random();
+      const arc = Math.sin(f * Math.PI) * lift;
+      this.spawn(
+        from.x + dx * f + (Math.random() - 0.5) * 0.3,
+        from.y + dy * f + arc + 0.1,
+        from.z + dz * f + (Math.random() - 0.5) * 0.3,
+        0,
+        1.3 + Math.random() * 0.8,
+        0,
+        core,
+        0.28,
+        0.55 + Math.random() * 0.3,
+        -1.4,
+        SPR.sparkle,
+      );
+    }
+  }
+
+  // it arrives, no flash-then-wait), but its flying head renders as a short jagged
+  // blue-white electric streak instead of a round glowing comet (the shape is
+  // drawn in the projectile update loop). Original procedural effect (no assets).
+  lightningProjectile(sourceId: number, targetId: number): void {
+    const from = this.anchor(sourceId, 0.62);
+    if (!from) return;
+    this.projectiles.push({
+      pos: from.clone(),
+      targetId,
+      color: new THREE.Color(0x66b8ff).multiplyScalar(hdr(1.7)), // electric blue (impact tint)
+      coreColor: new THREE.Color(0xeaf6ff).multiplyScalar(hdr(3.0)), // hot white-blue head
+      trailColor: new THREE.Color(0x3f9bff).multiplyScalar(hdr(1.9)), // crackle
+      speed: 26,
+      ttl: 3,
+      coreSprite: SPR.glowCore,
+      trailSprite: SPR.sparkle,
+      lightning: true,
+    });
+  }
+
+  // A talent proc arming: a tight ascending double-helix of bright motes around
+  // the caster with a star flash at the chest. Reads as "your next cast is
+  // charged" without covering the character. Original procedural effect.
+  procSurge(entityId: number, school: string): void {
+    const at = this.anchor(entityId, 0.5);
+    if (!at) return;
+    const core = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffe9a0).multiplyScalar(hdr(2.6));
+    const soft = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffe9a0).multiplyScalar(hdr(1.5));
+    const steps = this.scaledCount(40);
+    for (let i = 0; i < steps; i++) {
+      const f = i / steps;
+      const a = f * Math.PI * 4; // two full turns
+      const r = 0.55 - f * 0.25; // helix tightens as it climbs
+      for (const phase of [0, Math.PI]) {
+        this.spawn(
+          at.x + Math.cos(a + phase) * r,
+          at.y - 0.6 + f * 1.7,
+          at.z + Math.sin(a + phase) * r,
+          -Math.cos(a + phase) * 0.3,
+          1.6 + f * 0.8,
+          -Math.sin(a + phase) * 0.3,
+          phase === 0 ? core : soft,
+          0.48,
+          0.6 + f * 0.35,
+          -0.5,
+          phase === 0 ? SPR.sparkle : SPR.glowSoft,
+        );
+      }
+    }
+    // the chest flash that sells the moment
+    this.spawn(at.x, at.y + 0.2, at.z, 0, 0.6, 0, core, 1.8, 0.5, 0, SPR.star);
+  }
+
+  // A ward appearing: an expanding translucent dome ring at chest height plus a
+  // slow rain of glints along its shell. Used for absorb procs and the
+  // cheat-death save. Original procedural effect.
+  wardBloom(entityId: number, school: string): void {
+    const at = this.anchor(entityId, 0.55);
+    if (!at) return;
+    const core = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffdf80).multiplyScalar(hdr(2.2));
+    const rim = new THREE.Color(0xfff6d8).multiplyScalar(hdr(1.6));
+    const ringN = this.scaledCount(34);
+    for (let i = 0; i < ringN; i++) {
+      const a = (i / ringN) * Math.PI * 2;
+      // ring expands outward at the waist, drifting slightly up
+      this.spawn(
+        at.x + Math.cos(a) * 0.4,
+        at.y,
+        at.z + Math.sin(a) * 0.4,
+        Math.cos(a) * 2.4,
+        0.7,
+        Math.sin(a) * 2.4,
+        i % 2 === 0 ? core : rim,
+        0.62,
+        0.7,
+        -0.6,
+        SPR.ring,
+      );
+    }
+    const glints = this.scaledCount(10);
+    for (let i = 0; i < glints; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.5 + Math.random() * 0.35;
+      this.spawn(
+        at.x + Math.cos(a) * r,
+        at.y + 0.9 + Math.random() * 0.5,
+        at.z + Math.sin(a) * r,
+        0,
+        -0.5 - Math.random() * 0.4,
+        0,
+        rim,
+        0.26,
+        0.7 + Math.random() * 0.3,
+        0,
+        SPR.sparkle,
+      );
+    }
+    this.spawn(at.x, at.y + 0.3, at.z, 0, 0.4, 0, core, 2.2, 0.45, 0, SPR.flash);
+  }
+
+  // A stored heal-echo firing: a fountain of life-green motes bursting upward
+  // from the saved ally, collapsing back like a heartbeat. Original effect.
+  echoBurst(entityId: number, school: string): void {
+    const at = this.anchor(entityId, 0.4);
+    if (!at) return;
+    const green = new THREE.Color(0x9cf58e).multiplyScalar(hdr(2.4));
+    const gold = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffe9a0).multiplyScalar(hdr(1.8));
+    const n = this.scaledCount(38);
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const up = 2.2 + Math.random() * 1.8;
+      const out = 0.4 + Math.random() * 0.8;
+      this.spawn(
+        at.x,
+        at.y + 0.1,
+        at.z,
+        Math.cos(a) * out,
+        up,
+        Math.sin(a) * out,
+        i % 3 === 0 ? gold : green,
+        0.5,
+        0.7 + Math.random() * 0.3,
+        -6.5, // strong gravity: the fountain collapses back down
+        i % 2 === 0 ? SPR.sparkle : SPR.glowSoft,
+      );
+    }
+    this.spawn(at.x, at.y + 0.5, at.z, 0, 1.2, 0, green, 1.7, 0.45, 0, SPR.star);
+  }
+
+  // A DoT detonation (Earthen Jolt eating Cinder Jolt): a fast ground-level
+  // shockwave ring plus an ember shower in the DoT's school color. Original.
+  detonate(entityId: number, school: string): void {
+    const at = this.anchor(entityId, 0.15);
+    if (!at) return;
+    const hot = new THREE.Color(SCHOOL_COLORS[school] ?? 0xff8844).multiplyScalar(hdr(2.8));
+    const ember = new THREE.Color(SCHOOL_COLORS[school] ?? 0xff8844).multiplyScalar(hdr(1.6));
+    const ringN = this.scaledCount(28);
+    for (let i = 0; i < ringN; i++) {
+      const a = (i / ringN) * Math.PI * 2;
+      this.spawn(
+        at.x + Math.cos(a) * 0.2,
+        at.y + 0.05,
+        at.z + Math.sin(a) * 0.2,
+        Math.cos(a) * 5.5,
+        0.3,
+        Math.sin(a) * 5.5,
+        hot,
+        0.6,
+        0.5,
+        -0.8,
+        SPR.ring,
+      );
+    }
+    const embers = this.scaledCount(26);
+    for (let i = 0; i < embers; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = 1.2 + Math.random() * 2.4;
+      this.spawn(
+        at.x,
+        at.y + 0.3,
+        at.z,
+        Math.cos(a) * sp,
+        2.5 + Math.random() * 2.5,
+        Math.sin(a) * sp,
+        ember,
+        0.3,
+        0.5 + Math.random() * 0.35,
+        -7.5,
+        i % 2 === 0 ? SPR.firePuff : SPR.debris,
+      );
+    }
+    this.spawn(at.x, at.y + 0.4, at.z, 0, 0.8, 0, hot, 2.4, 0.42, 0, SPR.flash);
   }
 
   burst(at: THREE.Vector3, school: string, count = 18, power = 1): void {
     const c = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.6));
     const isFire = school === 'fire';
-    for (let i = 0; i < count; i++) {
+    const scaledCount = this.scaledCount(count);
+    for (let i = 0; i < scaledCount; i++) {
       const a = Math.random() * Math.PI * 2;
       const up = Math.random() * 0.9 + 0.1;
       const sp = (2 + Math.random() * 4.5) * power;
       // fire bursts read as flame puffs; everything else as spark showers
       const sprite = isFire
-        ? (i % 3 === 0 ? SPR.firePuff : SPR.flame)
-        : (i % 3 === 0 ? SPR.star : i % 2 === 0 ? SPR.sparkle : SPR.sparkBurst);
+        ? i % 3 === 0
+          ? SPR.firePuff
+          : SPR.flame
+        : i % 3 === 0
+          ? SPR.star
+          : i % 2 === 0
+            ? SPR.sparkle
+            : SPR.sparkBurst;
       this.spawn(
-        at.x, at.y, at.z,
-        Math.sin(a) * sp, up * sp * 0.8, Math.cos(a) * sp,
-        c, 0.34 + Math.random() * 0.3 * power, 0.45 + Math.random() * 0.35, 7,
+        at.x,
+        at.y,
+        at.z,
+        Math.sin(a) * sp,
+        up * sp * 0.8,
+        Math.cos(a) * sp,
+        c,
+        0.34 + Math.random() * 0.3 * power,
+        0.45 + Math.random() * 0.35,
+        7,
         sprite,
       );
     }
@@ -295,14 +783,77 @@ export class Vfx {
     const c = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.6));
     // one expanding rune ring at the centre sells the shockwave
     this.spawn(at.x, at.y + 0.3, at.z, 0, 0.3, 0, c, 1.5, 0.4, 0, SPR.ring, 0);
-    for (let i = 0; i < 34; i++) {
-      const a = (i / 34) * Math.PI * 2;
+    const count = this.scaledCount(34);
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * Math.PI * 2;
       const sp = 11 + Math.random() * 3;
       this.spawn(
-        at.x, at.y + 0.25, at.z, Math.sin(a) * sp, 1.2, Math.cos(a) * sp, c, 0.5, 0.55, 6,
+        at.x,
+        at.y + 0.25,
+        at.z,
+        Math.sin(a) * sp,
+        1.2,
+        Math.cos(a) * sp,
+        c,
+        0.5,
+        0.55,
+        6,
         i % 4 === 0 ? SPR.magicRune : SPR.sparkle,
       );
     }
+  }
+
+  shoutwave(centerId: number, colorHex: number): void {
+    const at = this.anchor(centerId, 0.12);
+    if (!at) return;
+    const bright = new THREE.Color(colorHex).multiplyScalar(hdr(1.7));
+    const dim = new THREE.Color(colorHex).multiplyScalar(hdr(0.9));
+    this.spawn(at.x, at.y + 0.25, at.z, 0, 0.25, 0, bright, 2, 0.45, 0, SPR.ring, 0);
+    const count = this.scaledCount(52);
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2 + Math.random() * 0.12;
+      const speed = 9.5 + Math.random() * 2;
+      const flame = i % 3 === 0;
+      this.spawn(
+        at.x + Math.sin(angle) * 0.5,
+        at.y + 0.15,
+        at.z + Math.cos(angle) * 0.5,
+        Math.sin(angle) * speed,
+        flame ? 1.4 + Math.random() * 0.8 : 0.35,
+        Math.cos(angle) * speed,
+        flame ? bright : dim,
+        flame ? 0.85 : 0.55,
+        0.8,
+        flame ? -1.5 : 3,
+        flame ? SPR.flame : SPR.sparkle,
+      );
+    }
+    this.spawn(at.x, at.y + 1.25, at.z, 0, 2.4, 0, bright, 1.5, 0.4, 0, SPR.flash, 0);
+    this.spawn(at.x, at.y + 1, at.z, 0, 1.2, 0, dim, 1.1, 0.5, 0, SPR.firePuff);
+  }
+
+  recklessFlame(entityId: number, dt: number): void {
+    if (!this.emitChance(26, dt)) return;
+    const at = this.anchor(entityId, 0.25);
+    if (!at) return;
+    const hot = new THREE.Color(0xff2a12).multiplyScalar(hdr(1.5));
+    const ember = new THREE.Color(0xff6a2a).multiplyScalar(hdr(1));
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 0.28 + Math.random() * 0.18;
+    const flame = Math.random() < 0.65;
+    this.spawn(
+      at.x + Math.sin(angle) * radius,
+      at.y + Math.random() * 0.9,
+      at.z + Math.cos(angle) * radius,
+      Math.sin(angle) * 0.15,
+      1.1 + Math.random() * 0.9,
+      Math.cos(angle) * 0.15,
+      flame ? hot : ember,
+      flame ? 0.5 : 0.3,
+      0.55,
+      -1.2,
+      flame ? SPR.flame : SPR.firePuff,
+    );
   }
 
   healGlow(targetId: number): void {
@@ -310,13 +861,20 @@ export class Vfx {
     if (!at) return;
     const green = new THREE.Color(0xbaf7a0).multiplyScalar(hdr(1.8));
     const gold = new THREE.Color(0xffe9a0).multiplyScalar(hdr(1.8));
-    for (let i = 0; i < 22; i++) {
+    for (let i = 0; i < this.scaledCount(22); i++) {
       const a = Math.random() * Math.PI * 2;
       const r = 0.4 + Math.random() * 0.7;
       this.spawn(
-        at.x + Math.sin(a) * r, at.y + Math.random() * 0.4, at.z + Math.cos(a) * r,
-        Math.sin(a) * 0.25, 1.6 + Math.random() * 1.4, Math.cos(a) * 0.25,
-        i % 3 === 0 ? green : gold, 0.3 + Math.random() * 0.25, 0.9 + Math.random() * 0.5, -1.2,
+        at.x + Math.sin(a) * r,
+        at.y + Math.random() * 0.4,
+        at.z + Math.cos(a) * r,
+        Math.sin(a) * 0.25,
+        1.6 + Math.random() * 1.4,
+        Math.cos(a) * 0.25,
+        i % 3 === 0 ? green : gold,
+        0.3 + Math.random() * 0.25,
+        0.9 + Math.random() * 0.5,
+        -1.2,
         i % 2 === 0 ? SPR.star : SPR.sparkle,
       );
     }
@@ -325,12 +883,21 @@ export class Vfx {
   buffSwirl(targetId: number, color = 0xffe9a0): void {
     const at = this.anchor(targetId, 0.2);
     if (!at) return;
-    for (let i = 0; i < 14; i++) {
-      const a = (i / 14) * Math.PI * 2;
+    const count = this.scaledCount(14);
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * Math.PI * 2;
       this.spawn(
-        at.x + Math.sin(a) * 0.85, at.y + 0.2, at.z + Math.cos(a) * 0.85,
-        -Math.cos(a) * 1.6, 2.1, Math.sin(a) * 1.6,
-        color, 0.3, 0.8, -1.5, SPR.magicWisp,
+        at.x + Math.sin(a) * 0.85,
+        at.y + 0.2,
+        at.z + Math.cos(a) * 0.85,
+        -Math.cos(a) * 1.6,
+        2.1,
+        Math.sin(a) * 1.6,
+        color,
+        0.3,
+        0.8,
+        -1.5,
+        SPR.magicWisp,
       );
     }
   }
@@ -350,66 +917,310 @@ export class Vfx {
     if (!at) return;
     const white = new THREE.Color(0xfff8e0).multiplyScalar(hdr(1.8));
     const gold = new THREE.Color(0xffd14d).multiplyScalar(hdr(1.8));
-    for (let i = 0; i < 46; i++) {
+    for (let i = 0; i < this.scaledCount(46); i++) {
       const a = Math.random() * Math.PI * 2;
       const r = 0.3 + Math.random() * 0.9;
       this.spawn(
-        at.x + Math.sin(a) * r, at.y + Math.random() * 0.3, at.z + Math.cos(a) * r,
-        0, 4.5 + Math.random() * 3.5, 0,
-        i % 4 === 0 ? white : gold, 0.42, 1.1 + Math.random() * 0.4, -1,
+        at.x + Math.sin(a) * r,
+        at.y + Math.random() * 0.3,
+        at.z + Math.cos(a) * r,
+        0,
+        4.5 + Math.random() * 3.5,
+        0,
+        i % 4 === 0 ? white : gold,
+        0.42,
+        1.1 + Math.random() * 0.4,
+        -1,
         i % 3 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+  }
+
+  // Vale Cup celebration: one team-colored firework shell (per-particle colors,
+  // the levelUpPillar/burst pattern). The renderer staggers several calls per
+  // goal to read as a volley; colors alternate through the scoring nation's
+  // flag palette. A slow confetti sprinkle rides along under lighter gravity.
+  fireworkBurst(at: THREE.Vector3, colors: readonly number[], count = 46, power = 1): void {
+    const colCount = Math.max(1, colors.length);
+    while (this.fwCols.length < colCount) this.fwCols.push(new THREE.Color());
+    for (let i = 0; i < colCount; i++) {
+      this.fwCols[i].setHex(colors.length > 0 ? colors[i] : 0xffd14d).multiplyScalar(hdr(1.8));
+    }
+    const cols = this.fwCols;
+    // the report flash
+    this.spawn(
+      at.x,
+      at.y,
+      at.z,
+      0,
+      0.3,
+      0,
+      this.fwFlash.setHex(0xfff6e0).multiplyScalar(hdr(2.2)),
+      1.5 * power,
+      0.2,
+      0,
+      SPR.flash,
+    );
+    const n = this.scaledCount(count);
+    for (let i = 0; i < n; i++) {
+      // even-ish spherical shell
+      const u = Math.random() * 2 - 1;
+      const a = Math.random() * Math.PI * 2;
+      const s = Math.sqrt(Math.max(0, 1 - u * u));
+      const sp = (6 + Math.random() * 2.6) * power;
+      this.spawn(
+        at.x,
+        at.y,
+        at.z,
+        Math.cos(a) * s * sp,
+        u * sp * 0.85 + 1.2,
+        Math.sin(a) * s * sp,
+        cols[i % colCount],
+        0.4 + Math.random() * 0.2,
+        0.95 + Math.random() * 0.5,
+        4.5,
+        i % 3 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+    // confetti flecks: slower, tumbling, longer-lived
+    const confetti = this.scaledCount(Math.round(count * 0.4));
+    for (let i = 0; i < confetti; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = (1.5 + Math.random() * 2) * power;
+      this.spawn(
+        at.x,
+        at.y,
+        at.z,
+        Math.sin(a) * sp,
+        Math.random() * 1.5,
+        Math.cos(a) * sp,
+        cols[(i + 1) % colCount],
+        0.22,
+        1.4 + Math.random() * 0.6,
+        1.6,
+        SPR.debris,
       );
     }
   }
 
   // continuous emitters (called per frame)
   castSparkle(entityId: number, school: string, dt: number): void {
-    if (Math.random() > dt * 30) return;
+    if (!this.emitChance(30, dt)) return;
     const at = this.anchor(entityId, 0.66);
     if (!at) return;
     const c = SCHOOL_COLORS[school] ?? 0xffffff;
     const a = Math.random() * Math.PI * 2;
     this.spawn(
-      at.x + Math.sin(a) * 0.5, at.y, at.z + Math.cos(a) * 0.5,
-      0, 0.9 + Math.random(), 0,
-      c, 0.26, 0.5, -0.5,
+      at.x + Math.sin(a) * 0.5,
+      at.y,
+      at.z + Math.cos(a) * 0.5,
+      0,
+      0.9 + Math.random(),
+      0,
+      c,
+      0.26,
+      0.5,
+      -0.5,
       school === 'fire' ? SPR.flame : SPR.magicWisp,
     );
   }
 
+  // Shapeshift-form aura (continuous, called per frame while the form aura is
+  // on). Each form reads distinctly at a glance: metamorph = flame tongues +
+  // stray embers, moonkin = drifting star motes, shadowform = gloom wisps +
+  // smoke curls.
+  formAura(entityId: number, form: 'metamorph' | 'moonkin' | 'shadowform', dt: number): void {
+    if (form === 'metamorph') {
+      const n = this.emitCount(48, dt);
+      if (!n) return;
+      const at = this.anchor(entityId, 0.3);
+      if (!at) return;
+      for (let k = 0; k < n; k++) {
+        const a = Math.random() * Math.PI * 2;
+        // wide ring: Metamorphosis also grows the body (Entity.scale), so the
+        // flames must clear the fattened silhouette or they vanish inside it
+        const r = 0.6 + Math.random() * 0.45;
+        const ember = Math.random() < 0.45;
+        this.spawn(
+          at.x + Math.sin(a) * r,
+          at.y + Math.random() * 0.9,
+          at.z + Math.cos(a) * r,
+          Math.sin(a) * 0.25,
+          0.9 + Math.random() * 0.8,
+          Math.cos(a) * 0.25,
+          ember ? 0xffe08a : 0xffa040,
+          ember ? 0.24 : 0.62,
+          0.8 + Math.random() * 0.4,
+          -0.3,
+          ember ? SPR.sparkBurst : SPR.flame,
+          (Math.random() - 0.5) * 0.6,
+        );
+      }
+      return;
+    }
+    if (form === 'moonkin') {
+      const n = this.emitCount(30, dt);
+      if (!n) return;
+      const at = this.anchor(entityId, 0.55);
+      if (!at) return;
+      for (let k = 0; k < n; k++) {
+        const a = Math.random() * Math.PI * 2;
+        const r = 0.45 + Math.random() * 0.5;
+        this.spawn(
+          at.x + Math.sin(a) * r,
+          at.y + (Math.random() - 0.3) * 0.8,
+          at.z + Math.cos(a) * r,
+          Math.sin(a) * 0.15,
+          0.35 + Math.random() * 0.5,
+          Math.cos(a) * 0.15,
+          Math.random() < 0.35 ? 0xd98aff : 0xfff2c0,
+          0.24 + Math.random() * 0.18,
+          1.1 + Math.random() * 0.5,
+          -0.15,
+          SPR.star,
+        );
+      }
+      return;
+    }
+    // shadowform: dark wisps curling around the silhouette, the odd smoke curl
+    const n = this.emitCount(24, dt);
+    if (!n) return;
+    const at = this.anchor(entityId, 0.45);
+    if (!at) return;
+    for (let k = 0; k < n; k++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.4 + Math.random() * 0.4;
+      const smoke = Math.random() < 0.25;
+      this.spawn(
+        at.x + Math.sin(a) * r,
+        at.y + (Math.random() - 0.2) * 0.7,
+        at.z + Math.cos(a) * r,
+        -Math.cos(a) * 0.6,
+        0.4 + Math.random() * 0.5,
+        Math.sin(a) * 0.6,
+        smoke ? 0x3a2a55 : 0x9a5df0,
+        smoke ? 0.5 : 0.34,
+        0.85 + Math.random() * 0.5,
+        -0.2,
+        smoke ? SPR.smoke : SPR.magicWisp,
+      );
+    }
+  }
+
   swimRipple(at: THREE.Vector3, dt: number): void {
-    if (Math.random() > dt * 9) return;
+    if (!this.emitChance(9, dt)) return;
     const a = Math.random() * Math.PI * 2;
     this.spawn(
-      at.x + Math.sin(a) * 0.5, at.y + 0.55, at.z + Math.cos(a) * 0.5,
-      Math.sin(a) * 1.2, 1.1, Math.cos(a) * 1.2,
-      0xcfe9ff, 0.3, 0.55, 5, SPR.glowSoft,
+      at.x + Math.sin(a) * 0.5,
+      at.y + 0.55,
+      at.z + Math.cos(a) * 0.5,
+      Math.sin(a) * 1.2,
+      1.1,
+      Math.cos(a) * 1.2,
+      0xcfe9ff,
+      0.3,
+      0.55,
+      5,
+      SPR.glowSoft,
     );
   }
 
   campfireEmber(at: THREE.Vector3, dt: number): void {
-    if (Math.random() > dt * 6) return;
+    if (!this.emitChance(6, dt)) return;
     if (Math.random() < 0.3) {
       // faint additive smoke puff drifting off the flame tip
       this.spawn(
-        at.x + (Math.random() - 0.5) * 0.3, at.y + 1.0, at.z + (Math.random() - 0.5) * 0.3,
-        (Math.random() - 0.5) * 0.35, 0.8 + Math.random() * 0.5, (Math.random() - 0.5) * 0.35,
-        0x36322e, 0.7 + Math.random() * 0.5, 1.8 + Math.random() * 0.9, -0.25, SPR.smoke,
+        at.x + (Math.random() - 0.5) * 0.3,
+        at.y + 1.0,
+        at.z + (Math.random() - 0.5) * 0.3,
+        (Math.random() - 0.5) * 0.35,
+        0.8 + Math.random() * 0.5,
+        (Math.random() - 0.5) * 0.35,
+        0x36322e,
+        0.7 + Math.random() * 0.5,
+        1.8 + Math.random() * 0.9,
+        -0.25,
+        SPR.smoke,
       );
       return;
     }
     // flame-tongue embers, mostly upright with a little flicker tilt
     this.spawn(
-      at.x + (Math.random() - 0.5) * 0.5, at.y + 0.5, at.z + (Math.random() - 0.5) * 0.5,
-      (Math.random() - 0.5) * 0.5, 1.6 + Math.random() * 1.2, (Math.random() - 0.5) * 0.5,
-      Math.random() < 0.4 ? 0xffd14d : 0xff7a2a, 0.2, 1.0 + Math.random() * 0.6, -0.4,
-      SPR.flame, (Math.random() - 0.5) * 0.6,
+      at.x + (Math.random() - 0.5) * 0.5,
+      at.y + 0.5,
+      at.z + (Math.random() - 0.5) * 0.5,
+      (Math.random() - 0.5) * 0.5,
+      1.6 + Math.random() * 1.2,
+      (Math.random() - 0.5) * 0.5,
+      Math.random() < 0.4 ? 0xffd14d : 0xff7a2a,
+      0.2,
+      1.0 + Math.random() * 0.6,
+      -0.4,
+      SPR.flame,
+      (Math.random() - 0.5) * 0.6,
     );
   }
 
   // ---------------------------------------------------------------------
 
   update(dt: number): void {
+    for (let i = this.bubbleBeams.length - 1; i >= 0; i--) {
+      const stream = this.bubbleBeams[i];
+      stream.remaining -= dt;
+      const from = this.anchor(stream.sourceId, 0.58);
+      const to = this.anchor(stream.targetId, 0.52);
+      if (!from || !to || stream.remaining <= 0) {
+        this.removeBubbleBeam(i);
+        continue;
+      }
+      const dx = to.x - from.x;
+      const dy = to.y - from.y;
+      const dz = to.z - from.z;
+      const len = Math.hypot(dx, dy, dz);
+      if (len <= 0.001) continue;
+      stream.group.position.set(from.x + dx * 0.5, from.y + dy * 0.5, from.z + dz * 0.5);
+      this.tmpDirection.set(dx / len, dy / len, dz / len);
+      stream.group.quaternion.setFromUnitVectors(this.beamUp, this.tmpDirection);
+      const pulse = 1 + Math.sin(stream.remaining * 13) * 0.08;
+      stream.water.scale.set(0.22 * pulse, len, 0.22 * pulse);
+      stream.core.scale.set(0.075, len * 1.002, 0.075);
+      for (let n = 0; n < this.emitCount(36, dt); n++) {
+        const f = Math.random();
+        const bubble = Math.random() < 0.38;
+        const radius = bubble ? 0.14 : 0.08;
+        this.spawn(
+          from.x + dx * f + (Math.random() - 0.5) * radius,
+          from.y + dy * f + (Math.random() - 0.5) * radius,
+          from.z + dz * f + (Math.random() - 0.5) * radius,
+          (dx / len) * 1.1 + (Math.random() - 0.5) * 0.35,
+          0.35 + Math.random() * 0.6,
+          (dz / len) * 1.1 + (Math.random() - 0.5) * 0.35,
+          bubble ? 0xd5f8ff : 0x91eaff,
+          bubble ? 0.28 + Math.random() * 0.22 : 0.18 + Math.random() * 0.14,
+          bubble ? 0.65 : 0.28,
+          -0.15,
+          bubble ? SPR.ring : SPR.glowCore,
+        );
+      }
+      // A soft splash at the victim keeps the channel endpoint readable.
+      for (let n = 0; n < this.emitCount(8, dt); n++) {
+        const a = Math.random() * Math.PI * 2;
+        this.spawn(
+          to.x,
+          to.y,
+          to.z,
+          Math.sin(a) * (0.7 + Math.random()),
+          0.8 + Math.random(),
+          Math.cos(a) * (0.7 + Math.random()),
+          0xd5f8ff,
+          0.25 + Math.random() * 0.18,
+          0.45,
+          1.4,
+          SPR.ring,
+        );
+      }
+    }
+
     // projectiles home on their (moving) target
     for (let i = this.projectiles.length - 1; i >= 0; i--) {
       const pr = this.projectiles[i];
@@ -425,29 +1236,124 @@ export class Vfx {
       if (dist <= Math.max(0.7, step)) {
         // impact: school-tinted cross-flash + burst that survives a 30fps frame
         this.tmpColor.copy(pr.color).multiplyScalar(hdr(1.6));
-        this.spawn(target.x, target.y, target.z, 0, 0.5, 0, this.tmpColor, 1.1, 0.22, 0, SPR.flash);
-        for (let k = 0; k < 22; k++) {
+        const sc = pr.scale ?? 1;
+        this.spawn(
+          target.x,
+          target.y,
+          target.z,
+          0,
+          0.5,
+          0,
+          this.tmpColor,
+          1.1 * sc,
+          0.22,
+          0,
+          SPR.flash,
+        );
+        for (let k = 0; k < this.scaledCount(22); k++) {
           const a = Math.random() * Math.PI * 2;
           const sp = 2.5 + Math.random() * 4;
           this.spawn(
-            target.x, target.y, target.z,
-            Math.sin(a) * sp, Math.random() * 3, Math.cos(a) * sp,
-            this.tmpColor, 0.44, 0.55, 7,
+            target.x,
+            target.y,
+            target.z,
+            Math.sin(a) * sp,
+            Math.random() * 3,
+            Math.cos(a) * sp,
+            this.tmpColor,
+            0.44,
+            0.55,
+            7,
             k % 2 === 0 ? SPR.sparkle : SPR.sparkBurst,
           );
         }
         this.projectiles.splice(i, 1);
         continue;
       }
+      const ux = dir.x / dist; // unit travel direction (before the step scale below)
+      const uy = dir.y / dist;
+      const uz = dir.z / dist;
       dir.multiplyScalar(step / dist);
       pr.pos.add(dir);
-      // bright HDR core (blooms into a comet) + sparkling trail
-      this.spawn(pr.pos.x, pr.pos.y, pr.pos.z, 0, 0, 0, pr.coreColor, 1.0, 0.12, 0, pr.coreSprite);
-      this.spawn(
-        pr.pos.x + (Math.random() - 0.5) * 0.25, pr.pos.y + (Math.random() - 0.5) * 0.25, pr.pos.z + (Math.random() - 0.5) * 0.25,
-        (Math.random() - 0.5) * 0.8, 0.4, (Math.random() - 0.5) * 0.8,
-        pr.trailColor, 0.32, 0.6, 1.5, pr.trailSprite,
-      );
+      if (pr.lightning) {
+        // The flying head is a short jagged electric streak trailing back along
+        // the travel direction: a few segments, each kicked perpendicular for the
+        // zig-zag, so it reads as a lightning bolt shape rather than a round comet.
+        const ph = Math.hypot(ux, uz) || 1;
+        const perpX = -uz / ph;
+        const perpZ = ux / ph;
+        let lat = 0;
+        let vy = 0;
+        for (let s = 0; s < 5; s++) {
+          lat = lat * 0.45 + (Math.random() - 0.5) * 0.75;
+          vy = vy * 0.45 + (Math.random() - 0.5) * 0.55;
+          const back = s * 0.55;
+          const x = pr.pos.x - ux * back + perpX * lat;
+          const y = pr.pos.y - uy * back + vy;
+          const z = pr.pos.z - uz * back + perpZ * lat;
+          const head = s === 0;
+          this.spawn(
+            x,
+            y,
+            z,
+            0,
+            0,
+            0,
+            head ? pr.coreColor : pr.color,
+            head ? 0.5 : 0.36,
+            0.13,
+            0,
+            SPR.glowCore,
+          );
+          this.spawn(x, y, z, 0, 0, 0, pr.trailColor, head ? 0.7 : 0.5, 0.15, 0, SPR.glowSoft);
+        }
+        // an occasional crackle spark flung off the head
+        if (Math.random() < 0.6) {
+          this.spawn(
+            pr.pos.x + (Math.random() - 0.5) * 0.3,
+            pr.pos.y + (Math.random() - 0.5) * 0.3,
+            pr.pos.z + (Math.random() - 0.5) * 0.3,
+            (Math.random() - 0.5) * 1.4,
+            0.3,
+            (Math.random() - 0.5) * 1.4,
+            pr.trailColor,
+            0.22,
+            0.3,
+            1.5,
+            SPR.sparkle,
+          );
+        }
+      } else {
+        // bright HDR core (blooms into a comet) + sparkling trail
+        this.spawn(
+          pr.pos.x,
+          pr.pos.y,
+          pr.pos.z,
+          0,
+          0,
+          0,
+          pr.coreColor,
+          1.0 * (pr.scale ?? 1),
+          0.12,
+          0,
+          pr.coreSprite,
+        );
+        if (Math.random() < 0.35 + 0.65 * this.quality) {
+          this.spawn(
+            pr.pos.x + (Math.random() - 0.5) * 0.25,
+            pr.pos.y + (Math.random() - 0.5) * 0.25,
+            pr.pos.z + (Math.random() - 0.5) * 0.25,
+            (Math.random() - 0.5) * 0.8,
+            0.4,
+            (Math.random() - 0.5) * 0.8,
+            pr.trailColor,
+            0.32 * (pr.scale ?? 1),
+            0.6,
+            1.5,
+            pr.trailSprite,
+          );
+        }
+      }
     }
 
     // advance the pool

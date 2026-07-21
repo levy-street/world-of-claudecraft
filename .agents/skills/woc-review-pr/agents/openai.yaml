@@ -1,0 +1,6 @@
+interface:
+  display_name: "Review World of ClaudeCraft PR"
+  short_description: "Review an actual PR diff without posting by default"
+  default_prompt: "Use $woc-review-pr to inspect this World of ClaudeCraft pull request and draft evidence-backed review feedback."
+policy:
+  allow_implicit_invocation: true

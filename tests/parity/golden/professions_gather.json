@@ -1,0 +1,1402 @@
+{
+  "scenario": "professions_gather",
+  "seed": 3,
+  "sampleEvery": 20,
+  "ticks": 6,
+  "coverage": [
+    "class:warrior (gatherer)",
+    "granted harvest: exactly two rng draws (rarity roll then rare-event roll)",
+    "cooldown denial: zero rng draws",
+    "proficiency-0 grant: common rarity, fungible zone material (copper_ore)",
+    "max-proficiency wood harvest: rarity ladder off the proficiency ceiling",
+    "rare gather event: hunted hit in the herb window, gatherRareEvent fanout + x5 signed yield",
+    "gatherResult qty/rareEvent payload fields"
+  ],
+  "draws": 212,
+  "drawDigest": "1a92925a",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 416,
+      "state": "28f12f87",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 415,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 415
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 100,
+          "id": 415,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 416,
+      "state": "9a898bcc",
+      "events": "ac045378",
+      "rng": {
+        "draws": 2,
+        "digest": "bfe7b728"
+      },
+      "label": "harvest-ore-common-and-denial",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 21
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "copper_ore",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "gather:eastbrook_vale:ore"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 415,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "copper_ore"
+            }
+          ],
+          "lifetimeXp": 21,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {
+            "ore_eastbrook_1": 120
+          },
+          "pendingGatherGrants": [
+            {
+              "amount": 1,
+              "professionId": "mining"
+            }
+          ],
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "xp": 21
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 415
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 4.705663,
+          "fiveSecondRule": 99,
+          "hp": 100,
+          "id": 415,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -70,
+            "y": 4.705663,
+            "z": -53
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 2,
+      "time": 0.1,
+      "nextId": 416,
+      "state": "41de7a20",
+      "events": "f1898110",
+      "rng": {
+        "draws": 7,
+        "digest": "cbece765"
+      },
+      "label": "harvest-wood-max-proficiency",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 12,
+            "xpGained": 42
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "copper_ore",
+              "eastbrook_buckler",
+              "ironbark_log",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "gather:eastbrook_vale:ore",
+              "gather:eastbrook_vale:wood"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "exp_first_ore",
+              ""
+            ],
+            [
+              "prog_first_harvest",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 415,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {
+            "logging": 100,
+            "mining": 1
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "copper_ore"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "ironbark_log"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "ironbark_log"
+            }
+          ],
+          "lifetimeXp": 42,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {
+            "ore_eastbrook_1": 120,
+            "wood_eastbrook_1": 120.1
+          },
+          "pendingGatherGrants": [
+            {
+              "amount": 1,
+              "professionId": "logging"
+            }
+          ],
+          "recipesGrandfathered": true,
+          "renown": 10,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "xp": 42
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.9,
+              "school": "physical",
+              "sourceId": 415
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 3.675258,
+          "fiveSecondRule": 99.1,
+          "hp": 88,
+          "id": 415,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -62,
+            "y": 3.675258,
+            "z": 8
+          },
+          "potionCooldownUntil": -1,
+          "resource": 2.2,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 4,
+      "time": 0.2,
+      "nextId": 416,
+      "state": "d02509b3",
+      "events": "00a6b070",
+      "rng": {
+        "draws": 212,
+        "digest": "1a92925a"
+      },
+      "label": "rare-event-window",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 19,
+            "levelUps": 2,
+            "xpGained": 2022
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "copper_ore",
+              "eastbrook_buckler",
+              "ironbark_log",
+              "recruit_tunic",
+              "silverleaf_herb",
+              "worn_sword"
+            ],
+            "visited": [
+              "gather:eastbrook_vale:herb",
+              "gather:eastbrook_vale:ore",
+              "gather:eastbrook_vale:wood",
+              "gather_event:moonlit_bloom"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "exp_first_ore",
+              ""
+            ],
+            [
+              "exp_first_timber",
+              ""
+            ],
+            [
+              "prog_first_harvest",
+              ""
+            ],
+            [
+              "prog_logging_100",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 415,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {
+            "logging": 101,
+            "mining": 1
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "copper_ore"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "ironbark_log"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "ironbark_log"
+            },
+            {
+              "count": 20,
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 20,
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 20,
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 20,
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 19,
+              "itemId": "silverleaf_herb"
+            }
+          ],
+          "lifetimeXp": 2022,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {
+            "herb_eastbrook_1": 120.2,
+            "ore_eastbrook_1": 120,
+            "wood_eastbrook_1": 120.1
+          },
+          "pendingGatherGrants": [
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            },
+            {
+              "amount": 1,
+              "professionId": "herbalism"
+            }
+          ],
+          "recipesGrandfathered": true,
+          "renown": 25,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "xp": 722
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 54,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.8,
+              "school": "physical",
+              "sourceId": 415
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "comboUntil": -1,
+          "critChance": 0.061,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.061,
+          "fallStartY": -8.5,
+          "fiveSecondRule": 99.2,
+          "hp": 176,
+          "id": 415,
+          "inCombat": true,
+          "kind": "player",
+          "level": 3,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 176,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -86,
+            "y": -8.5,
+            "z": 90
+          },
+          "potionCooldownUntil": -1,
+          "resource": 4.125,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 22,
+            "armor": 172,
+            "int": 10,
+            "spi": 11,
+            "sta": 27,
+            "str": 27
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 6,
+      "time": 0.3,
+      "nextId": 416,
+      "state": "4eea1d7a",
+      "events": "f7c264db",
+      "rng": {
+        "draws": 212,
+        "digest": "1a92925a"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageTaken": 19,
+            "levelUps": 2,
+            "xpGained": 2022
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "copper_ore",
+              "eastbrook_buckler",
+              "ironbark_log",
+              "recruit_tunic",
+              "silverleaf_herb",
+              "worn_sword"
+            ],
+            "visited": [
+              "gather:eastbrook_vale:herb",
+              "gather:eastbrook_vale:ore",
+              "gather:eastbrook_vale:wood",
+              "gather_event:moonlit_bloom"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "chr_vale_gatherer",
+              ""
+            ],
+            [
+              "exp_first_herb",
+              ""
+            ],
+            [
+              "exp_first_ore",
+              ""
+            ],
+            [
+              "exp_first_timber",
+              ""
+            ],
+            [
+              "prog_first_harvest",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_herbalism_100",
+              ""
+            ],
+            [
+              "prog_logging_100",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 415,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {
+            "herbalism": 100,
+            "logging": 101,
+            "mining": 1
+          },
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 1,
+              "itemId": "copper_ore"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "ironbark_log"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "ironbark_log"
+            },
+            {
+              "count": 20,
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 1,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 20,
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 20,
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 20,
+              "itemId": "silverleaf_herb"
+            },
+            {
+              "count": 19,
+              "itemId": "silverleaf_herb"
+            }
+          ],
+          "lifetimeXp": 2022,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {
+            "herb_eastbrook_1": 120.2,
+            "ore_eastbrook_1": 120,
+            "wood_eastbrook_1": 120.1
+          },
+          "recipesGrandfathered": true,
+          "renown": 50,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "xp": 722
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 54,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3599.7,
+              "school": "physical",
+              "sourceId": 415
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 0.1,
+          "comboUntil": -1,
+          "critChance": 0.061,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.061,
+          "fallStartY": -5.25,
+          "fiveSecondRule": 99.3,
+          "hp": 176,
+          "id": 415,
+          "inCombat": true,
+          "kind": "player",
+          "level": 3,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 176,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -86,
+            "y": -5.25,
+            "z": 90
+          },
+          "potionCooldownUntil": -1,
+          "resource": 4.125,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 22,
+            "armor": 172,
+            "int": 10,
+            "spi": 11,
+            "sta": 27,
+            "str": 27
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    }
+  ]
+}

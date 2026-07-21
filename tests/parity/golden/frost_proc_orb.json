@@ -1,0 +1,728 @@
+{
+  "scenario": "frost_proc_orb",
+  "seed": 43,
+  "sampleEvery": 20,
+  "ticks": 84,
+  "coverage": [
+    "class:mage (committed frost)",
+    "Frozen Orb pulse damage + Icicle generation",
+    "Fingers of Frost proc draw from frostbolt",
+    "Brain Freeze proc draw from frostbolt"
+  ],
+  "draws": 180,
+  "drawDigest": "1a2d5a02",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 416,
+      "state": "153900ab",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 415,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 54,
+          "id": 415,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 54,
+          "maxResource": 195,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 195,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 13,
+          "stats": {
+            "agi": 12,
+            "armor": 57,
+            "int": 25,
+            "spi": 22,
+            "sta": 14,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        }
+      ]
+    },
+    {
+      "tick": 20,
+      "time": 1,
+      "nextId": 417,
+      "state": "daad9d41",
+      "events": "b3bf3c94",
+      "rng": {
+        "draws": 1,
+        "digest": "e1d88b80"
+      }
+    },
+    {
+      "tick": 40,
+      "time": 2,
+      "nextId": 417,
+      "state": "4b9b99df",
+      "events": "a0731888",
+      "rng": {
+        "draws": 2,
+        "digest": "5ab9e87d"
+      }
+    },
+    {
+      "tick": 60,
+      "time": 3,
+      "nextId": 417,
+      "state": "048aec94",
+      "events": "5e74ed68",
+      "rng": {
+        "draws": 82,
+        "digest": "a2a056cd"
+      }
+    },
+    {
+      "tick": 80,
+      "time": 4,
+      "nextId": 417,
+      "state": "37f98030",
+      "events": "7d892437",
+      "rng": {
+        "draws": 152,
+        "digest": "a592d606"
+      }
+    },
+    {
+      "tick": 84,
+      "time": 4.2,
+      "nextId": 417,
+      "state": "58660c6e",
+      "events": "c711fca1",
+      "rng": {
+        "draws": 180,
+        "digest": "1a2d5a02"
+      },
+      "label": "frost-procs",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 207
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "dummyDamage": 207
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 415,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "frost"
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "auras": [
+            {
+              "duration": 30,
+              "id": "icicles",
+              "kind": "icicles",
+              "name": "Icicles",
+              "remaining": 29.95,
+              "school": "frost",
+              "sourceId": 415,
+              "stacks": 5
+            },
+            {
+              "duration": 15,
+              "id": "fingers_of_frost",
+              "kind": "fingers_of_frost",
+              "name": "Fingers of Frost",
+              "remaining": 14.95,
+              "school": "frost",
+              "sourceId": 415,
+              "stacks": 1
+            },
+            {
+              "duration": 15,
+              "id": "brain_freeze",
+              "kind": "brain_freeze",
+              "name": "Brain Freeze",
+              "remaining": 14.95,
+              "school": "frost",
+              "sourceId": 415
+            }
+          ],
+          "castTotal": 2.5,
+          "combatTimer": 0.05,
+          "comboUntil": -1,
+          "cooldowns": [
+            [
+              "frozen_orb",
+              40.8
+            ]
+          ],
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 0.25,
+          "hp": 418,
+          "id": 415,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1436,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 146,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "targetId": 416,
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "auras": [
+            {
+              "duration": 2.5,
+              "id": "frozen_orb_slow",
+              "kind": "slow",
+              "name": "Frozen Orb",
+              "remaining": 2.25,
+              "school": "frost",
+              "sourceId": 415,
+              "value": 0.7
+            },
+            {
+              "duration": 9,
+              "id": "frostbolt_slow",
+              "kind": "slow",
+              "name": "Rimelance",
+              "remaining": 8.95,
+              "school": "frost",
+              "sourceId": 415,
+              "value": 0.6
+            }
+          ],
+          "combatTimer": 0.05,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 499793,
+          "id": 416,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 2,
+            "y": 1.5,
+            "z": 2
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 500000,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 2
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 2
+          },
+          "stats": {},
+          "tappedById": 415,
+          "templateId": "training_dummy",
+          "threat": [
+            [
+              415,
+              207
+            ]
+          ],
+          "weapon": {
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 84,
+      "time": 4.2,
+      "nextId": 417,
+      "state": "58660c6e",
+      "events": "741638a5",
+      "rng": {
+        "draws": 180,
+        "digest": "1a2d5a02"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 207
+          },
+          "craftSkills": {},
+          "craftThrottle": {},
+          "deedStats": {
+            "counters": {
+              "dummyDamage": 207
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 415,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "frost"
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "auras": [
+            {
+              "duration": 30,
+              "id": "icicles",
+              "kind": "icicles",
+              "name": "Icicles",
+              "remaining": 29.95,
+              "school": "frost",
+              "sourceId": 415,
+              "stacks": 5
+            },
+            {
+              "duration": 15,
+              "id": "fingers_of_frost",
+              "kind": "fingers_of_frost",
+              "name": "Fingers of Frost",
+              "remaining": 14.95,
+              "school": "frost",
+              "sourceId": 415,
+              "stacks": 1
+            },
+            {
+              "duration": 15,
+              "id": "brain_freeze",
+              "kind": "brain_freeze",
+              "name": "Brain Freeze",
+              "remaining": 14.95,
+              "school": "frost",
+              "sourceId": 415
+            }
+          ],
+          "castTotal": 2.5,
+          "combatTimer": 0.05,
+          "comboUntil": -1,
+          "cooldowns": [
+            [
+              "frozen_orb",
+              40.8
+            ]
+          ],
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 0.25,
+          "hp": 418,
+          "id": 415,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 418,
+          "maxResource": 1506,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1436,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 41,
+          "stats": {
+            "agi": 12,
+            "armor": 146,
+            "int": 82,
+            "spi": 60,
+            "sta": 33,
+            "str": 10
+          },
+          "targetId": 416,
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aiState": "idle",
+          "auras": [
+            {
+              "duration": 2.5,
+              "id": "frozen_orb_slow",
+              "kind": "slow",
+              "name": "Frozen Orb",
+              "remaining": 2.25,
+              "school": "frost",
+              "sourceId": 415,
+              "value": 0.7
+            },
+            {
+              "duration": 9,
+              "id": "frostbolt_slow",
+              "kind": "slow",
+              "name": "Rimelance",
+              "remaining": 8.95,
+              "school": "frost",
+              "sourceId": 415,
+              "value": 0.6
+            }
+          ],
+          "combatTimer": 0.05,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 499793,
+          "id": 416,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 2,
+            "y": 1.5,
+            "z": 2
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 500000,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 2
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 2
+          },
+          "stats": {},
+          "tappedById": 415,
+          "templateId": "training_dummy",
+          "threat": [
+            [
+              415,
+              207
+            ]
+          ],
+          "weapon": {
+            "speed": 2
+          }
+        }
+      ]
+    }
+  ]
+}

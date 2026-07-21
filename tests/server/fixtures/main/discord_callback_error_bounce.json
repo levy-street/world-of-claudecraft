@@ -1,0 +1,12 @@
+{
+  "body": "<!doctype html><html><head><meta charset=\"utf-8\"><title>World of ClaudeCraft</title>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<style>body{background:#14100a;color:#fff6df;font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}main{text-align:center;padding:24px}</style>\n</head><body><main><p id=\"m\">Connecting Discord...</p></main><script>\n(function(){\n  var p = {\"ok\":false,\"mode\":\"login\",\"error\":\"not_configured\"};\n  try {\n    if (p.ok && p.mode === 'login' && p.token) {\n      localStorage.setItem('woc_session', JSON.stringify({ token: p.token, username: p.username }));\n    } else if (p.ok && p.mode === 'login' && p.choose && p.linkToken) {\n      // First-time login: stash the one-time link token + Discord name so the SPA\n      // can show the \"create new / link existing\" chooser after the redirect.\n      localStorage.setItem('woc_discord_choice', JSON.stringify({ linkToken: p.linkToken, username: p.username || '', ts: Date.now() }));\n    }\n  } catch (e) {}\n  var msg = { source: 'woc-discord', ok: p.ok, mode: p.mode, error: p.error || null };\n  if (window.opener) {\n    try { window.opener.postMessage(msg, location.origin); } catch (e) {}\n    setTimeout(function(){ try { window.close(); } catch (e) {} location.replace('/'); }, 200);\n  } else {\n    location.replace('/');\n  }\n})();\n</script></body></html>",
+  "headers": {
+    "content-type": "text/html; charset=utf-8",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-resource-policy": "same-origin",
+    "permissions-policy": "accelerometer=(), ambient-light-sensor=(), battery=(), bluetooth=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), hid=(), idle-detection=(), local-fonts=(), magnetometer=(), microphone=(), midi=(), payment=(), serial=(), usb=(), xr-spatial-tracking=()",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "x-content-type-options": "nosniff"
+  },
+  "status": 503
+}

@@ -1,7 +1,7 @@
 {
-  "name": "World of Claudecraft",
-  "short_name": "Claudecraft",
-  "description": "World of Claudecraft mobile realm",
+  "name": "World of ClaudeCraft",
+  "short_name": "ClaudeCraft",
+  "description": "World of ClaudeCraft mobile realm",
   "start_url": "/",
   "scope": "/",
   "display": "fullscreen",
@@ -9,6 +9,12 @@
   "background_color": "#050509",
   "theme_color": "#050509",
   "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/icon-192.png",
       "sizes": "192x192",

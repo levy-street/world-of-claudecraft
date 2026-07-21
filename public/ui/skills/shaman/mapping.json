@@ -1,0 +1,81 @@
+{
+  "class": "shaman",
+  "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+  "iconSize": 128,
+  "sourcePacks": [
+    "100-rpg-skill-icons",
+    "100-skill-icons-pack-for-rpg",
+    "earth-magician-skill-icons (earth abilities)",
+    "aeromancer (evaluated, unused)"
+  ],
+  "runtimeDir": "public/ui/skills/shaman",
+  "abilities": [
+    {
+      "abilityId": "lightning_bolt",
+      "sourcePack": "skill100",
+      "sourceFile": "skill icon 70.png",
+      "output": "lightning_bolt.webp"
+    },
+    {
+      "abilityId": "rockbiter_weapon",
+      "sourcePack": "earth-magician",
+      "sourceFile": "23.png",
+      "output": "rockbiter_weapon.webp"
+    },
+    {
+      "abilityId": "healing_wave",
+      "sourcePack": "skill100",
+      "sourceFile": "skill icon 73.png",
+      "output": "healing_wave.webp"
+    },
+    {
+      "abilityId": "earth_shock",
+      "sourcePack": "earth-magician",
+      "sourceFile": "12.png",
+      "output": "earth_shock.webp"
+    },
+    {
+      "abilityId": "lightning_shield",
+      "sourcePack": "rpg100",
+      "sourceFile": "skill 12.png",
+      "output": "lightning_shield.webp"
+    },
+    {
+      "abilityId": "flame_shock",
+      "sourcePack": "skill100",
+      "sourceFile": "skill icon 31.png",
+      "output": "flame_shock.webp"
+    },
+    {
+      "abilityId": "flametongue_weapon",
+      "sourcePack": "rpg100",
+      "sourceFile": "skill 64.png",
+      "output": "flametongue_weapon.webp"
+    },
+    {
+      "abilityId": "frost_shock",
+      "sourcePack": "rpg100",
+      "sourceFile": "skill 83.png",
+      "output": "frost_shock.webp"
+    },
+    {
+      "abilityId": "frostbrand_weapon",
+      "sourcePack": "rpg100",
+      "sourceFile": "skill 20.png",
+      "output": "frostbrand_weapon.webp"
+    },
+    {
+      "abilityId": "ghost_wolf",
+      "sourcePack": "rpg100",
+      "sourceFile": "skill 32.png",
+      "output": "ghost_wolf.webp"
+    },
+    {
+      "abilityId": "stormstrike",
+      "sourcePack": "skill100",
+      "sourceFile": "skill icon 65.png",
+      "output": "stormstrike.webp"
+    }
+  ],
+  "deferredStayProcedural": {}
+}

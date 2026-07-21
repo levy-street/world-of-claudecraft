@@ -1,0 +1,81 @@
+name: Bug report
+description: Report something that isn't working the way it should
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the sections
+        below so we can reproduce and fix it quickly.
+
+        > Not a native English speaker? Write in whatever language you're
+        > comfortable with and we'll manage. The contributing guide is available in
+        > [many languages](https://github.com/levy-street/world-of-claudecraft/blob/main/CONTRIBUTING.md),
+        > and you can always ask on [Discord](https://discord.com/invite/worldofclaudecraft).
+  - type: checkboxes
+    attributes:
+      label: Before you start
+      options:
+        - label: I searched [existing issues](https://github.com/levy-street/world-of-claudecraft/issues) and didn't find a duplicate.
+          required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug.
+      placeholder: When I do X, Y happens instead of Z.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How can we make the bug happen?
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. See the error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Where did this happen?
+      options:
+        - Offline (single-player in the browser)
+        - Online (multiplayer server)
+        - Self-hosted server
+        - Headless / RL environment
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device
+      options:
+        - Desktop
+        - Mobile (phone / tablet)
+        - Both
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser / OS
+      description: e.g. "Chrome 124 on macOS 14", "Safari on iOS 17"
+    validations:
+      required: false
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots, recordings, or console logs
+      description: Drag images or videos here. Console errors (open the browser console with F12) are very helpful.
+    validations:
+      required: false

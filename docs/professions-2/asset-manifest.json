@@ -1,0 +1,374 @@
+{
+  "meta": {
+    "feature": "Professions 2.0",
+    "date": "2026-07-16",
+    "purpose": "Every designer-replaceable art slot this feature ships. All slots ship with procedural placeholders (the game's icon compositor or existing GLBs), so nothing blocks on art. Designers replace slots by delivering files per deliveryFormat; the pipeline and fallback behavior below mirror the shipped deeds icon pipeline (docs/achievements/icon-brief.md is the precedent).",
+    "deliveryFormat": {
+      "icons": "512x512 transparent-background PNG, sRGB, painted style matching the existing item/deed icon sets, named exactly <asset id>.png. The converter downscales to a 128px square WebP (q82) served from public/ui/<set>/; WebP becomes the committed source of truth. Icons must read clearly at 46px (desktop button) and 40px (mobile).",
+      "worldProps": "GLB (glTF binary), CC0 or licensed with a CREDITS.md row, low-poly matching the KayKit-adjacent world style. The models/props asset-budget group allows 4 MiB total; every GLB needs a media-manifest regen and a registerPreload entry.",
+      "chromeGlyphs": "Monochrome inline SVG (single path preferred), added to the svgIcon registry; used only for secondary controls, never primary destinations."
+    },
+    "pipeline": "Icons: drop PNGs into public/ui/professions/ (new set), run the professions converter (cloned from scripts/convert_item_icons_webp.mjs at Phase 5; regenerates the checked-in id set; a bijection test pins art to wiring). Item-family icons instead go to public/ui/items/ via npm run assets:items and ITEM_IMAGE_IDS. Deed crests go to public/ui/deeds/ via npm run assets:deeds.",
+    "fallback": "Every icon id has a procedural recipe (icons.ts r() helper) or an automatic kind/keyword fallback, so an unshipped slot renders a coherent placeholder, never a blank.",
+    "styleNotes": "Classic dark-fantasy: blue-black grounds, antique gold accents, warm parchment light. No emoji-style art, no flat modern glyphs for painted slots, no text baked into icons (localization). Palette and mood notes per asset below."
+  },
+  "categories": [
+    {
+      "name": "Profession icons (painted, public/ui/professions/)",
+      "note": "Used as the wheel-window ring nodes, crafting-window section headers, and tooltip headers. One per craft on the ten-craft wheel; the six deep crafts are priority 1, the shallow three priority 3 (engineering counts as deep for tools).",
+      "assets": [
+        {
+          "id": "prof_weaponcrafting",
+          "name": "Weaponcrafting",
+          "description": "A sword blade mid-forge across an anvil horn, ember glow",
+          "palette": "steel blue, ember orange, antique gold rim",
+          "priority": 1
+        },
+        {
+          "id": "prof_armorcrafting",
+          "name": "Armorcrafting",
+          "description": "A breastplate with a raised hammer, rivet detail",
+          "palette": "gunmetal, warm bronze",
+          "priority": 1
+        },
+        {
+          "id": "prof_tailoring",
+          "name": "Tailoring",
+          "description": "A bone needle drawing gold thread through folded cloth",
+          "palette": "deep indigo cloth, parchment thread",
+          "priority": 1
+        },
+        {
+          "id": "prof_leatherworking",
+          "name": "Leatherworking",
+          "description": "A curved skinning knife over a stretched hide",
+          "palette": "russet leather, dark walnut",
+          "priority": 1
+        },
+        {
+          "id": "prof_cooking",
+          "name": "Cooking",
+          "description": "A steaming ladle over a hearth pot",
+          "palette": "copper pot, warm firelight",
+          "priority": 1
+        },
+        {
+          "id": "prof_alchemy",
+          "name": "Alchemy",
+          "description": "A round-bottom flask mid-swirl with rising motes",
+          "palette": "emerald liquid, violet motes",
+          "priority": 1
+        },
+        {
+          "id": "prof_engineering",
+          "name": "Engineering",
+          "description": "Interlocked brass gears with a small wrench",
+          "palette": "brass, oiled iron",
+          "priority": 1
+        },
+        {
+          "id": "prof_enchanting",
+          "name": "Enchanting",
+          "description": "A rune-etched rod trailing arcane ribbon",
+          "palette": "arcane violet, silver",
+          "priority": 3
+        },
+        {
+          "id": "prof_jewelcrafting",
+          "name": "Jewelcrafting",
+          "description": "A faceted gem in a jeweler's clamp catching light",
+          "palette": "sapphire, gold prongs",
+          "priority": 3
+        },
+        {
+          "id": "prof_inscription",
+          "name": "Inscription",
+          "description": "A quill inking a glowing glyph on parchment",
+          "palette": "parchment, ink black, gold glyph",
+          "priority": 3
+        }
+      ],
+      "size": "512px source PNG, served 128px WebP",
+      "usedIn": ["professions wheel window", "crafting window section headers", "tooltips"]
+    },
+    {
+      "name": "Gathering skill icons (painted, public/ui/professions/)",
+      "assets": [
+        {
+          "id": "gather_mining",
+          "name": "Mining",
+          "description": "A pick striking an ore seam with a spark",
+          "palette": "slate, copper spark",
+          "priority": 1
+        },
+        {
+          "id": "gather_logging",
+          "name": "Logging",
+          "description": "A woodaxe sunk into a rings-visible stump",
+          "palette": "bark brown, pale ringwood",
+          "priority": 1
+        },
+        {
+          "id": "gather_herbalism",
+          "name": "Herbalism",
+          "description": "A sprig with three leaves and one luminous bloom",
+          "palette": "deep green, moonpetal white",
+          "priority": 1
+        },
+        {
+          "id": "gather_fishing",
+          "name": "Fishing",
+          "description": "A hooked fish curling above water rings",
+          "palette": "river blue, silver scale",
+          "priority": 1
+        }
+      ],
+      "size": "512px source PNG, served 128px WebP",
+      "usedIn": ["professions wheel window", "character window gathering rows"]
+    },
+    {
+      "name": "Archetype crests (painted, public/ui/professions/)",
+      "note": "The identity art: shown on the wheel window identity panel, the attunement quest preview, and the title tooltip. Wave-one four are priority 1; the six future pairs are deferred but listed so the whole set can be commissioned in one sitting (deeds-brief convention).",
+      "assets": [
+        {
+          "id": "archetype_smith",
+          "name": "The Smith",
+          "description": "Crossed hammer and sword over an anvil, shield-crest framing",
+          "palette": "forge orange on gunmetal, gold frame",
+          "priority": 1
+        },
+        {
+          "id": "archetype_outfitter",
+          "name": "The Outfitter",
+          "description": "Needle and skinning knife crossed over a folded cloak",
+          "palette": "indigo and russet, gold frame",
+          "priority": 1
+        },
+        {
+          "id": "archetype_apothecary",
+          "name": "The Apothecary",
+          "description": "Flask pouring into a hearth pot, herb sprig behind",
+          "palette": "emerald and copper, gold frame",
+          "priority": 1
+        },
+        {
+          "id": "archetype_bombardier",
+          "name": "The Bombardier",
+          "description": "A round bomb with a lit fuse over crossed gears",
+          "palette": "iron black, fuse gold, ember",
+          "priority": 1
+        },
+        { "id": "archetype_trapper", "name": "The Trapper", "deferred": true },
+        { "id": "archetype_mageweaver", "name": "The Mageweaver", "deferred": true },
+        { "id": "archetype_arcanist", "name": "The Arcanist", "deferred": true },
+        { "id": "archetype_gembinder", "name": "The Gembinder", "deferred": true },
+        { "id": "archetype_bladewright", "name": "The Bladewright", "deferred": true },
+        { "id": "archetype_cogsmith", "name": "The Cogsmith", "deferred": true }
+      ],
+      "size": "512px source PNG, served 128px WebP",
+      "usedIn": [
+        "professions wheel window identity panel",
+        "attunement quest preview",
+        "title tooltip"
+      ]
+    },
+    {
+      "name": "Masterwork and provenance marks",
+      "assets": [
+        {
+          "id": "masterwork_seal",
+          "name": "Masterwork seal",
+          "kind": "icon-overlay",
+          "description": "A small eight-point gold burst seal, legible as a corner overlay at 16 to 24px on top of any item icon; also shown large in the masterwork toast",
+          "palette": "antique gold on transparent",
+          "size": "512px source PNG; must survive downscale to 20px",
+          "usedIn": [
+            "item tooltips",
+            "bag slot corner overlay",
+            "masterwork toast",
+            "zone-chat broadcast row"
+          ],
+          "priority": 1
+        },
+        {
+          "id": "makers_mark_glyph",
+          "name": "Maker's mark",
+          "kind": "chrome-glyph",
+          "description": "A tiny quill-stroke signature flourish rendered inline before the crafter's name in tooltips; monochrome SVG in the svgIcon registry (currentColor)",
+          "palette": "currentColor",
+          "size": "single-path SVG, 16px box",
+          "usedIn": ["item tooltip 'Crafted by' line"],
+          "priority": 2
+        }
+      ]
+    },
+    {
+      "name": "Material item icons (painted, public/ui/items/ via npm run assets:items)",
+      "note": "Phase 4 and Phase 10 introduce real gathered materials and craft reagents. Exact item ids land with those phases and get appended here; every one has a procedural fallback from item kind + name keywords, so this batch is deliberately LAST to commission. Families and approximate counts below.",
+      "families": [
+        {
+          "family": "ores and bars",
+          "count": "6 to 9 (3 tiers x ore/bar, plus rare variants)",
+          "palette": "copper, iron slate, thorium glow"
+        },
+        { "family": "logs and lumber", "count": "3 to 5", "palette": "bark, cut grain" },
+        { "family": "herbs", "count": "4 to 6", "palette": "greens with one luminous accent each" },
+        {
+          "family": "fibers and cloth",
+          "count": "3 to 4 (plant fiber, bolt tiers)",
+          "palette": "flax, undyed linen, dyed bolt"
+        },
+        { "family": "hides and leathers", "count": "3 to 4", "palette": "russet, tanned tan" },
+        {
+          "family": "fish",
+          "count": "4 to 6 (zone catches + the rare)",
+          "palette": "river silver, one iridescent rare"
+        },
+        {
+          "family": "monster components",
+          "count": "4 to 6 (hide, silk, venom sac, fang, meat, replacing quest-item collisions)",
+          "palette": "muted organics"
+        }
+      ],
+      "size": "512px source PNG, served 128px WebP",
+      "priority": 3
+    },
+    {
+      "name": "Station world props (GLB, public/models/props/)",
+      "note": "One prop per typed station, placed beside its master NPC. anvil.glb already exists (reuse for the forge); a campfire prop exists for field cooking. Keep the whole batch within the 4 MiB models/props budget; CC0 preferred with CREDITS.md rows.",
+      "assets": [
+        {
+          "id": "prop_station_forge",
+          "name": "Forge station",
+          "description": "Anvil + quench barrel + small coal hearth cluster",
+          "reuse": "anvil.glb exists; hearth/barrel are the new pieces",
+          "priority": 1
+        },
+        {
+          "id": "prop_station_kitchens",
+          "name": "Kitchens station",
+          "description": "Brick stove with hanging pots and a prep table",
+          "priority": 1
+        },
+        {
+          "id": "prop_station_apothecary",
+          "name": "Apothecary station",
+          "description": "Bench with alembic, shelf of bottles",
+          "priority": 1
+        },
+        {
+          "id": "prop_station_tannery",
+          "name": "Tannery station",
+          "description": "Hide stretching rack and a dye vat",
+          "priority": 1
+        },
+        {
+          "id": "prop_station_loom",
+          "name": "Loom station",
+          "description": "Standing loom with warp threads and a cloth roll",
+          "priority": 1
+        },
+        {
+          "id": "prop_station_toolworks",
+          "name": "Toolworks station",
+          "description": "Workbench with vise, gear pile, hanging tools",
+          "priority": 2
+        }
+      ],
+      "size": "GLB, each roughly 0.3 to 0.6 MiB, batch under the 4 MiB props budget",
+      "usedIn": ["world render beside master NPCs", "station minimap marker anchor"]
+    },
+    {
+      "name": "Master NPC appearances",
+      "note": "Ships on existing KayKit character GLBs via NPC_KEYS (npc_smith and npc_villager exist). No new art required for wave one; optional bespoke costume textures listed as a deferred nice-to-have.",
+      "assets": [
+        {
+          "id": "npc_master_costumes",
+          "name": "Master NPC costume set",
+          "description": "Six themed tints/attachments (smith apron, cook's hat, alchemist satchel, tanner gloves, weaver shawl, engineer goggles) on the existing character rigs",
+          "deferred": true,
+          "priority": 3
+        }
+      ]
+    },
+    {
+      "name": "Deed crests for new profession deeds (public/ui/deeds/ via npm run assets:deeds)",
+      "note": "Follows the existing deeds icon brief format exactly (docs/achievements/icon-brief.md). Ids land with Phase 15; category crest fallback covers them until art arrives.",
+      "assets": [
+        {
+          "id": "deed_prof_first_craft",
+          "name": "First Craft",
+          "description": "A single finished sword on an anvil, first light",
+          "priority": 2
+        },
+        {
+          "id": "deed_prof_first_masterwork",
+          "name": "First Masterwork",
+          "description": "The masterwork seal bursting over an open palm",
+          "priority": 2
+        },
+        {
+          "id": "deed_prof_first_attunement",
+          "name": "Attuned",
+          "description": "A guild letter with a wax seal, broken open",
+          "priority": 2
+        },
+        {
+          "id": "deed_prof_rare_catch",
+          "name": "The Rare Catch",
+          "description": "An iridescent koi mid-leap over moonlit water",
+          "priority": 2
+        },
+        {
+          "id": "deed_prof_tier_milestones",
+          "name": "Tier milestone set (per-craft, count lands Phase 15)",
+          "deferred": true,
+          "priority": 3
+        },
+        {
+          "id": "deed_prof_specialist",
+          "name": "Specialist (first 75-skill specialization, any craft)",
+          "description": "A masterfully kept tool resting on a velvet cloth",
+          "priority": 3
+        },
+        {
+          "id": "deed_prof_rare_finds",
+          "name": "Rare find set (pristine vein, ancient heartwood, moonlit bloom, perfect specimen)",
+          "deferred": true,
+          "priority": 3
+        }
+      ],
+      "size": "512px source PNG, served 128px WebP"
+    },
+    {
+      "name": "Minimap and map markers (painter work, not image files)",
+      "note": "Station markers render via the minimap painter with --color-minimap-* tokens (a new marker variant in the discriminated union), NOT as image assets. Listed here so designers know the shapes to expect and can propose glyph refinements later.",
+      "assets": [
+        {
+          "id": "marker_station",
+          "name": "Station marker",
+          "description": "A small anvil-silhouette dot variant per station type; must stay legible at minimap scale and identical across graphics tiers",
+          "priority": 2
+        },
+        {
+          "id": "marker_pristine_vein",
+          "name": "Pristine vein marker",
+          "description": "The existing gather-node marker with a brief glint accent (reduced-motion aware); the ore flavor of the rare-event marker family",
+          "priority": 2
+        },
+        {
+          "id": "marker_ancient_heartwood",
+          "name": "Ancient heartwood marker",
+          "description": "The wood flavor of the rare-event marker family, same glint treatment as the pristine vein",
+          "priority": 2
+        },
+        {
+          "id": "marker_moonlit_bloom",
+          "name": "Moonlit bloom marker",
+          "description": "The herb flavor of the rare-event marker family, same glint treatment as the pristine vein",
+          "priority": 2
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "note": "All player-class models from the paid full pack (KayKit Adventurers 2.0 + Character Animations 1.1). v2 character GLBs ship zero embedded clips, so animations are merged from the Rig_Medium_*.glb libraries (addClipsFrom) and renamed back to the engine's existing clip vocabulary. Paladin uses the with-helmet variant. v2 chars carry NO built-in weapon meshes (weapons are attached via the manifest instead).",
+  "defaults": {
+    "type": "character",
+    "maxTex": 512,
+    "addClipsFrom": [
+      "tmp/asset_src/kaykit/KayKit Character Animations 1.1/Animations/gltf/Rig_Medium/Rig_Medium_General.glb",
+      "tmp/asset_src/kaykit/KayKit Character Animations 1.1/Animations/gltf/Rig_Medium/Rig_Medium_MovementBasic.glb",
+      "tmp/asset_src/kaykit/KayKit Character Animations 1.1/Animations/gltf/Rig_Medium/Rig_Medium_MovementAdvanced.glb",
+      "tmp/asset_src/kaykit/KayKit Character Animations 1.1/Animations/gltf/Rig_Medium/Rig_Medium_CombatMelee.glb",
+      "tmp/asset_src/kaykit/KayKit Character Animations 1.1/Animations/gltf/Rig_Medium/Rig_Medium_CombatRanged.glb",
+      "tmp/asset_src/kaykit/KayKit Character Animations 1.1/Animations/gltf/Rig_Medium/Rig_Medium_Simulation.glb"
+    ],
+    "renameClips": {
+      "Idle_A": "Idle",
+      "Melee_1H_Attack_Chop": "1H_Melee_Attack_Chop",
+      "Melee_1H_Attack_Slice_Diagonal": "1H_Melee_Attack_Slice_Diagonal",
+      "Melee_2H_Attack_Chop": "2H_Melee_Attack_Chop",
+      "Melee_Dualwield_Attack_Chop": "Dualwield_Melee_Attack_Chop",
+      "Ranged_2H_Shoot": "2H_Ranged_Shoot",
+      "Ranged_Magic_Spellcasting": "Spellcasting",
+      "Ranged_Magic_Shoot": "Spellcast_Shoot",
+      "Ranged_Magic_Raise": "Spellcast_Raise",
+      "Cheering": "Cheer",
+      "Melee_Block": "Block"
+    },
+    "keepClips": [
+      "Idle", "Walking_A", "Running_A", "Walking_Backwards", "Running_Strafe_Left", "Running_Strafe_Right",
+      "1H_Melee_Attack_Chop", "1H_Melee_Attack_Slice_Diagonal", "2H_Melee_Attack_Chop", "Dualwield_Melee_Attack_Chop",
+      "2H_Ranged_Shoot", "Spellcasting", "Spellcast_Shoot", "Spellcast_Raise",
+      "Block", "Hit_A", "Death_A", "Jump_Idle", "Lie_Idle", "Sit_Floor_Down", "Sit_Floor_Idle", "Cheer"
+    ]
+  },
+  "items": [
+    { "src": "tmp/asset_src/kaykit/KayKit Adventurers 2.0/Characters/gltf/Knight.glb",        "out": "models/chars/players/knight.glb" },
+    { "src": "tmp/asset_src/kaykit/KayKit Adventurers 2.0/Characters/gltf/Mage.glb",          "out": "models/chars/players/mage.glb" },
+    { "src": "tmp/asset_src/kaykit/KayKit Adventurers 2.0/Characters/gltf/Barbarian.glb",     "out": "models/chars/players/barbarian.glb" },
+    { "src": "tmp/asset_src/kaykit/KayKit Adventurers 2.0/Characters/gltf/Rogue.glb",         "out": "models/chars/players/rogue.glb" },
+    { "src": "tmp/asset_src/kaykit/KayKit Adventurers 2.0/Characters/gltf/Rogue_Hooded.glb",  "out": "models/chars/players/rogue_hooded.glb" },
+    { "src": "tmp/asset_src/kaykit/KayKit Adventurers 2.0/Characters/gltf/Druid.glb",         "out": "models/chars/players/druid.glb" },
+    { "src": "tmp/asset_src/kaykit/KayKit Adventurers 2.0/Characters/gltf/Ranger.glb",        "out": "models/chars/players/ranger.glb" },
+    { "src": "tmp/asset_src/kaykit/Paladin/characters/gltf/Paladin_with_Helmet.glb",          "out": "models/chars/players/paladin.glb" }
+  ]
+}

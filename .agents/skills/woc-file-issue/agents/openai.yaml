@@ -1,0 +1,6 @@
+interface:
+  display_name: "File World of ClaudeCraft Issue"
+  short_description: "Draft and explicitly create a focused GitHub issue"
+  default_prompt: "Use $woc-file-issue to prepare and create a World of ClaudeCraft GitHub issue from this request."
+policy:
+  allow_implicit_invocation: false

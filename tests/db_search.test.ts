@@ -11,7 +11,7 @@ vi.mock('pg', () => ({
   }),
 }));
 
-import { searchCharacters } from '../server/db';
+import { SCHEMA, searchCharacters } from '../server/db';
 import { SOCIAL_SCHEMA } from '../server/social_db';
 
 beforeEach(() => {
@@ -19,6 +19,12 @@ beforeEach(() => {
 });
 
 describe('character typeahead search', () => {
+  it('adds the realm column before indexes that depend on it', () => {
+    expect(SCHEMA).toContain('ALTER TABLE characters ADD COLUMN IF NOT EXISTS realm');
+    expect(SCHEMA.indexOf('ADD COLUMN IF NOT EXISTS realm'))
+      .toBeLessThan(SCHEMA.indexOf('CREATE INDEX IF NOT EXISTS characters_lifetime_xp'));
+  });
+
   it('creates a realm-scoped lower-name prefix index', () => {
     expect(SOCIAL_SCHEMA).toContain('CREATE INDEX IF NOT EXISTS characters_realm_lower_name_prefix');
     expect(SOCIAL_SCHEMA).toContain('ON characters (realm, lower(name) text_pattern_ops)');

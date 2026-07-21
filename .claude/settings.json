@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/ensure-hooks.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/qa-stop.sh",
+            "timeout": 30,
+            "statusMessage": "QA stop-gate: scanning the diff for forbidden characters and test debris"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -9,9 +9,12 @@
 // threat — synced online as the top entries) and marks who the mob is
 // actually targeting (aggroTargetId). For finished encounters whose mob is
 // gone, it falls back to each member's damage on that mob.
-import type { IWorld } from '../world_api';
-import type { SimEvent } from '../sim/types';
+
 import { CLASSES } from '../sim/data';
+import type { SimEvent } from '../sim/types';
+import type { IWorld } from '../world_api';
+import { tEntity } from './entity_i18n';
+import { formatNumber, type TranslationKey, t } from './i18n';
 
 const ENCOUNTER_END_SECONDS = 5;
 const HISTORY_CAP = 8;
@@ -36,14 +39,22 @@ export interface Encounter {
   /** mob entity id with the most party damage (threat tab subject) */
   mainMobId: number | null;
   mainMobName: string;
+  /** template id of the threat-subject mob, so its name localizes at render time */
+  mainMobTemplateId: string | null;
   /** maxHp of the biggest mob damaged — used to pick the label */
   biggestMobHp: number;
 }
 
 function newEncounter(now: number): Encounter {
   return {
-    label: 'Combat', startedAt: now, duration: 0, tallies: new Map(),
-    mainMobId: null, mainMobName: '', biggestMobHp: -1,
+    label: 'Combat',
+    startedAt: now,
+    duration: 0,
+    tallies: new Map(),
+    mainMobId: null,
+    mainMobName: '',
+    mainMobTemplateId: null,
+    biggestMobHp: -1,
   };
 }
 
@@ -57,12 +68,32 @@ export class MeterData {
     this.allTime = { ...newEncounter(now), label: 'All (session)' };
   }
 
-  private tally(enc: Encounter, pid: number, name: string, cls: string | null): MemberTally {
+  private tally(
+    enc: Encounter,
+    pid: number,
+    name: string,
+    cls: string | null,
+    partyPids: Set<number>,
+  ): MemberTally {
     let t = enc.tallies.get(pid);
-    if (!t) {
-      t = { pid, name, cls, dmg: 0, heal: 0, dmgByMob: new Map() };
-      enc.tallies.set(pid, t);
+    if (t) return t;
+    // a reconnect issues the same character a new entity id mid-encounter; find
+    // its previous row by name and re-key it instead of starting a duplicate.
+    // Only treat a name match as a reconnect when the old pid is no longer a
+    // live party member: pet names come from their template/tamed-target name
+    // and are not unique, so two live same-named pets must stay separate
+    // rows instead of ping-ponging the merge back and forth.
+    for (const [oldPid, existing] of enc.tallies) {
+      if (existing.name === name && oldPid !== pid && !partyPids.has(oldPid)) {
+        enc.tallies.delete(oldPid);
+        existing.pid = pid;
+        existing.cls = cls ?? existing.cls;
+        enc.tallies.set(pid, existing);
+        return existing;
+      }
     }
+    t = { pid, name, cls, dmg: 0, heal: 0, dmgByMob: new Map() };
+    enc.tallies.set(pid, t);
     return t;
   }
 
@@ -84,9 +115,10 @@ export class MeterData {
         const src = world.entities.get(ev.sourceId);
         const member = world.partyInfo?.members.find((m) => m.pid === ev.sourceId);
         const name = member?.name ?? src?.name ?? `#${ev.sourceId}`;
-        const cls = member?.cls ?? (ev.sourceId === world.player.id ? world.player.templateId : null);
+        const cls =
+          member?.cls ?? (ev.sourceId === world.player.id ? world.player.templateId : null);
         for (const enc of [this.current, this.allTime]) {
-          const t = this.tally(enc, ev.sourceId, name, cls);
+          const t = this.tally(enc, ev.sourceId, name, cls, partyPids);
           t.dmg += ev.amount;
           if (enc === this.current) {
             t.dmgByMob.set(ev.targetId, (t.dmgByMob.get(ev.targetId) ?? 0) + ev.amount);
@@ -97,6 +129,7 @@ export class MeterData {
           this.current.biggestMobHp = target.maxHp;
           this.current.label = target.name;
           this.current.mainMobName = target.name;
+          this.current.mainMobTemplateId = target.templateId;
           this.current.mainMobId = ev.targetId;
         }
       }
@@ -106,7 +139,7 @@ export class MeterData {
       const name = member?.name ?? src?.name ?? `#${ev.sourceId}`;
       const cls = member?.cls ?? (ev.sourceId === world.player.id ? world.player.templateId : null);
       for (const enc of [this.current, this.allTime]) {
-        this.tally(enc, ev.sourceId, name, cls).heal += ev.amount;
+        this.tally(enc, ev.sourceId, name, cls, partyPids).heal += ev.amount;
       }
     }
   }
@@ -118,7 +151,12 @@ export class MeterData {
     if ((now - this.lastActivity) / 1000 < ENCOUNTER_END_SECONDS) return;
     // quiet for a while — but a mob still chasing a member keeps it open
     for (const e of world.entities.values()) {
-      if (e.kind === 'mob' && !e.dead && e.aggroTargetId !== null && partyPids.has(e.aggroTargetId)) {
+      if (
+        e.kind === 'mob' &&
+        !e.dead &&
+        e.aggroTargetId !== null &&
+        partyPids.has(e.aggroTargetId)
+      ) {
         return;
       }
     }
@@ -143,7 +181,16 @@ export class MeterData {
 
 type Tab = 'dmg' | 'heal' | 'threat';
 
-const TAB_LABEL: Record<Tab, string> = { dmg: 'Damage', heal: 'Healing', threat: 'Threat' };
+const TAB_LABEL_KEY: Record<Tab, TranslationKey> = {
+  dmg: 'hud.meters.damage',
+  heal: 'hud.meters.healing',
+  threat: 'hud.meters.threat',
+};
+const TAB_SHORT_LABEL_KEY: Record<Tab, TranslationKey> = {
+  dmg: 'hud.meters.damageShort',
+  heal: 'hud.meters.healingShort',
+  threat: 'hud.meters.threat',
+};
 
 export class Meters {
   private data: MeterData;
@@ -155,6 +202,7 @@ export class Meters {
   private rowsEl: HTMLElement;
   private titleEl: HTMLElement;
   private subEl: HTMLElement;
+  private hintEl: HTMLElement;
 
   constructor(private world: IWorld) {
     this.data = new MeterData(performance.now());
@@ -162,16 +210,26 @@ export class Meters {
     this.rowsEl = this.root.querySelector('.mt-rows') as HTMLElement;
     this.titleEl = this.root.querySelector('.mt-view') as HTMLElement;
     this.subEl = this.root.querySelector('.mt-sub') as HTMLElement;
+    this.hintEl = this.root.querySelector('.mt-hint') as HTMLElement;
     for (const tab of ['dmg', 'heal', 'threat'] as Tab[]) {
-      (this.root.querySelector(`.mt-tab[data-tab="${tab}"]`) as HTMLElement).addEventListener('click', () => {
+      const tabButton = this.root.querySelector(`.mt-tab[data-tab="${tab}"]`) as HTMLElement;
+      tabButton.textContent = t(TAB_SHORT_LABEL_KEY[tab]);
+      tabButton.addEventListener('click', () => {
         this.tab = tab;
         this.refreshTabs();
         this.render(true);
       });
     }
-    (this.root.querySelector('.mt-prev') as HTMLElement).addEventListener('click', () => this.page(1));
-    (this.root.querySelector('.mt-next') as HTMLElement).addEventListener('click', () => this.page(-1));
-    (this.root.querySelector('.mt-close') as HTMLElement).addEventListener('click', () => this.toggle());
+    const prev = this.root.querySelector('.mt-prev') as HTMLElement;
+    const next = this.root.querySelector('.mt-next') as HTMLElement;
+    const close = this.root.querySelector('.mt-close') as HTMLElement;
+    prev.setAttribute('title', t('hud.meters.olderSegment'));
+    next.setAttribute('title', t('hud.meters.newerSegment'));
+    close.setAttribute('title', t('hud.meters.close'));
+    close.setAttribute('aria-label', t('hud.meters.close'));
+    prev.addEventListener('click', () => this.page(1));
+    next.addEventListener('click', () => this.page(-1));
+    close.addEventListener('click', () => this.toggle());
     this.refreshTabs();
   }
 
@@ -222,42 +280,81 @@ export class Meters {
   private viewedEncounter(): { enc: Encounter | null; viewName: string } {
     const h = this.data.history;
     if (this.viewIdx === h.length + 1 || (this.viewIdx > 0 && h.length === 0)) {
-      return { enc: this.data.allTime, viewName: 'All (session)' };
+      return { enc: this.data.allTime, viewName: t('hud.meters.allSession') };
     }
     if (this.viewIdx === 0) {
       const enc = this.data.current ?? h[0] ?? null;
-      return { enc, viewName: this.data.current ? 'Current' : enc ? 'Last fight' : 'Current' };
+      return {
+        enc,
+        viewName: this.data.current
+          ? t('hud.meters.current')
+          : enc
+            ? t('hud.meters.lastFight')
+            : t('hud.meters.current'),
+      };
     }
-    return { enc: h[this.viewIdx - 1] ?? null, viewName: `Fight -${this.viewIdx}` };
+    return {
+      enc: h[this.viewIdx - 1] ?? null,
+      viewName: t('hud.meters.fightIndex', { index: this.viewIdx }),
+    };
   }
 
   render(force = false): void {
     if (!this.isOpen && !force) return;
     this.lastRender = performance.now();
     const { enc, viewName } = this.viewedEncounter();
-    this.titleEl.textContent = `${TAB_LABEL[this.tab]} — ${viewName}`;
+    this.titleEl.textContent = t('hud.meters.title', {
+      tab: t(TAB_LABEL_KEY[this.tab]),
+      view: viewName,
+    });
 
     if (!enc || enc.tallies.size === 0) {
-      this.subEl.textContent = 'No combat recorded yet.';
+      this.subEl.textContent = t('hud.meters.noCombat');
+      // The auto-show hint only makes sense on the live "current" segment of the
+      // damage/healing tabs: on the Threat tab, or on a finished History / All
+      // (session) segment, the copy ("rows appear once your party deals damage",
+      // "this segment closes after combat ends") is wrong. Its own element (its
+      // own single t() key), never concatenated into subEl.
+      const showHint = this.viewIdx === 0 && this.tab !== 'threat';
+      this.hintEl.textContent = showHint ? t('hudChrome.meters.autoShowHint') : '';
+      this.hintEl.style.display = showHint ? 'block' : 'none';
       this.rowsEl.innerHTML = '';
       return;
     }
+    this.hintEl.textContent = '';
+    this.hintEl.style.display = 'none';
 
     const isThreat = this.tab === 'threat';
     const mob = isThreat && enc.mainMobId !== null ? this.world.entities.get(enc.mainMobId) : null;
     const aggroPid = mob && !mob.dead ? mob.aggroTargetId : null;
+    const mobName = enc.mainMobTemplateId
+      ? tEntity({ kind: 'mob', id: enc.mainMobTemplateId, field: 'name' })
+      : enc.mainMobName;
+    const encounterLabel =
+      enc.label === 'Combat' || enc.label === 'All (session)' ? viewName : mobName;
     this.subEl.textContent = isThreat
-      ? (enc.mainMobName ? `Target: ${enc.mainMobName}` : 'No target engaged.')
-      : `${enc.label} — ${fmtDuration(enc.duration)}`;
+      ? enc.mainMobName
+        ? t('hud.meters.target', { name: mobName })
+        : t('hud.meters.noTargetEngaged')
+      : t('hud.meters.segmentSummary', {
+          label: encounterLabel,
+          duration: fmtDuration(enc.duration),
+        });
 
     const liveThreat = mob && !mob.dead && mob.threat.size > 0 ? mob.threat : null;
     const rows = [...enc.tallies.values()]
       .map((t) => ({
         t,
-        value: this.tab === 'dmg' ? t.dmg
-          : this.tab === 'heal' ? t.heal
-          : liveThreat ? liveThreat.get(t.pid) ?? 0
-          : (enc.mainMobId !== null ? t.dmgByMob.get(enc.mainMobId) ?? 0 : 0),
+        value:
+          this.tab === 'dmg'
+            ? t.dmg
+            : this.tab === 'heal'
+              ? t.heal
+              : liveThreat
+                ? (liveThreat.get(t.pid) ?? 0)
+                : enc.mainMobId !== null
+                  ? (t.dmgByMob.get(enc.mainMobId) ?? 0)
+                  : 0,
       }))
       .filter((r) => r.value > 0)
       .sort((a, b) => b.value - a.value);
@@ -275,12 +372,10 @@ export class Meters {
       const label = document.createElement('span');
       label.className = 'mt-label';
       const hasAggro = isThreat && aggroPid === t.pid;
-      label.textContent = `${hasAggro ? '⚔ ' : ''}${t.name}`;
+      label.textContent = t.name;
       const num = document.createElement('span');
       num.className = 'mt-num';
-      num.textContent = isThreat
-        ? fmtNum(value)
-        : `${fmtNum(value)} (${fmtNum(value / enc.duration)}/s)`;
+      num.textContent = isThreat ? fmtNum(value) : fmtPerSecondRow(value, value / enc.duration);
       if (hasAggro) row.classList.add('aggro');
       row.append(fill, label, num);
       this.rowsEl.appendChild(row);
@@ -288,13 +383,35 @@ export class Meters {
   }
 }
 
+// Compact damage/heal/threat number. Digits route through formatNumber so the
+// numerals/decimal mark follow the active locale, while the classic English
+// k/m suffixes + thresholds are preserved (useGrouping:false keeps the readout
+// byte-identical to the historical `toFixed(1)`/`Math.round` form in en).
 function fmtNum(v: number): string {
-  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}m`;
-  if (v >= 10_000) return `${(v / 1000).toFixed(1)}k`;
-  return `${Math.round(v)}`;
+  if (v >= 1_000_000)
+    return `${formatNumber(v / 1_000_000, { minimumFractionDigits: 1, maximumFractionDigits: 1, useGrouping: false })}m`;
+  if (v >= 10_000)
+    return `${formatNumber(v / 1000, { minimumFractionDigits: 1, maximumFractionDigits: 1, useGrouping: false })}k`;
+  return formatNumber(Math.round(v), { maximumFractionDigits: 0, useGrouping: false });
 }
 
+// "{rate}/s" cell, e.g. "1.2k/s" — the /s unit comes from the localizable key.
+function fmtPerSecond(v: number): string {
+  return t('hudChrome.meters.perSecond', { value: fmtNum(v) });
+}
+
+// "{total} ({rate}/s)" cell, e.g. "12.3k (1.2k/s)". Defined at module scope so
+// the imported t() is in view (the render loop shadows `t` with a tally row).
+function fmtPerSecondRow(total: number, rate: number): string {
+  return t('hudChrome.meters.perSecondRow', { total: fmtNum(total), rate: fmtPerSecond(rate) });
+}
+
+// "Xm Ys" / "Ys" duration; the m/s units come from localizable keys, digits via
+// formatNumber.
 function fmtDuration(s: number): string {
   const m = Math.floor(s / 60);
-  return m > 0 ? `${m}m ${Math.round(s % 60)}s` : `${Math.round(s)}s`;
+  const num = (n: number) => formatNumber(n, { maximumFractionDigits: 0, useGrouping: false });
+  return m > 0
+    ? t('hudChrome.meters.minutesSeconds', { m: num(m), s: num(Math.round(s % 60)) })
+    : t('hudChrome.meters.seconds', { s: num(Math.round(s)) });
 }

@@ -1,0 +1,636 @@
+{
+  "defaults": {
+    "type": "static"
+  },
+  "items": [
+    {
+      "src": "tmp/asset_src/poly_pirate/palm_tree_1.glb",
+      "out": "models/biome/beach_palm_1.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_pirate/palm_tree_2.glb",
+      "out": "models/biome/beach_palm_2.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_pirate/palm_tree_3.glb",
+      "out": "models/biome/beach_palm_3.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_pirate/dock.glb",
+      "out": "models/biome/beach_dock.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_pirate/dock_broken.glb",
+      "out": "models/biome/beach_dock_broken.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_pirate/small_ship.glb",
+      "out": "models/biome/beach_ship.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_pirate/chest_closed.glb",
+      "out": "models/biome/beach_chest.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_pirate/chest_gold.glb",
+      "out": "models/biome/beach_chest_gold.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_pirate/barrel.glb",
+      "out": "models/biome/beach_barrel.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_pirate/anchor.glb",
+      "out": "models/biome/beach_anchor.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_pirate/cannon.glb",
+      "out": "models/biome/beach_cannon.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_pirate/rocks_1.glb",
+      "out": "models/biome/beach_rocks_1.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_pirate/rocks_2.glb",
+      "out": "models/biome/beach_rocks_2.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_pirate/beach_house.glb",
+      "out": "models/biome/beach_house.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_pirate/large_bone.glb",
+      "out": "models/biome/beach_bone.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kenney/survival-kit/Models/GLB format/tent.glb",
+      "out": "models/biome/camp_tent.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/survival-kit/Models/GLB format/tent-canvas.glb",
+      "out": "models/biome/camp_tent_canvas.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/survival-kit/Models/GLB format/bedroll.glb",
+      "out": "models/biome/camp_bedroll.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/survival-kit/Models/GLB format/bedroll-packed.glb",
+      "out": "models/biome/camp_bedroll_packed.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/survival-kit/Models/GLB format/campfire-pit.glb",
+      "out": "models/biome/camp_fire_pit.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/survival-kit/Models/GLB format/campfire-stand.glb",
+      "out": "models/biome/camp_fire_stand.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/survival-kit/Models/GLB format/campfire-fishing-stand.glb",
+      "out": "models/biome/camp_fishing_stand.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/survival-kit/Models/GLB format/signpost.glb",
+      "out": "models/biome/camp_signpost.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/survival-kit/Models/GLB format/rock-sand-a.glb",
+      "out": "models/biome/beach_rock_sand_a.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/survival-kit/Models/GLB format/rock-sand-b.glb",
+      "out": "models/biome/beach_rock_sand_b.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/survival-kit/Models/GLB format/rock-sand-c.glb",
+      "out": "models/biome/beach_rock_sand_c.glb"
+    },
+    {
+      "src": "tmp/asset_src/poly_fish/dolphin.glb",
+      "out": "models/biome/sea_dolphin.glb",
+      "type": "character",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_fish/shark.glb",
+      "out": "models/biome/sea_shark.glb",
+      "type": "character",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_fish/manta_ray.glb",
+      "out": "models/biome/sea_manta_ray.glb",
+      "type": "character",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_fish/whale.glb",
+      "out": "models/biome/sea_whale.glb",
+      "type": "character",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_fish/clownfish.glb",
+      "out": "models/biome/sea_clownfish.glb",
+      "type": "character",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_fish/blue_tang.glb",
+      "out": "models/biome/sea_blue_tang.glb",
+      "type": "character",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_fish/puffer.glb",
+      "out": "models/biome/sea_puffer.glb",
+      "type": "character",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_fish/swordfish.glb",
+      "out": "models/biome/sea_swordfish.glb",
+      "type": "character",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_fish/anglerfish.glb",
+      "out": "models/biome/sea_anglerfish.glb",
+      "type": "character",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_fish/koi.glb",
+      "out": "models/biome/sea_koi.glb",
+      "type": "character",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/kenney/watercraft-kit/Models/GLB format/boat-sail-a.glb",
+      "out": "models/biome/sea_boat_sail_a.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/watercraft-kit/Models/GLB format/boat-sail-b.glb",
+      "out": "models/biome/sea_boat_sail_b.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/watercraft-kit/Models/GLB format/boat-fishing-small.glb",
+      "out": "models/biome/sea_boat_fishing.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/watercraft-kit/Models/GLB format/boat-row-large.glb",
+      "out": "models/biome/sea_rowboat_large.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/watercraft-kit/Models/GLB format/buoy.glb",
+      "out": "models/biome/sea_buoy.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/watercraft-kit/Models/GLB format/buoy-flag.glb",
+      "out": "models/biome/sea_buoy_flag.glb"
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/canyon/cactus_tall_1.glb",
+      "out": "models/biome/desert_cactus_tall_1.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/canyon/cactus_tall_3.glb",
+      "out": "models/biome/desert_cactus_tall_2.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/canyon/cactus_small_1.glb",
+      "out": "models/biome/desert_cactus_small.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/canyon/cactus_flat_1.glb",
+      "out": "models/biome/desert_cactus_flat.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/canyon/desert_tree_1.glb",
+      "out": "models/biome/desert_tree.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/canyon/rock_formation_1.glb",
+      "out": "models/biome/desert_rock_formation_1.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/canyon/rock_formation_5.glb",
+      "out": "models/biome/desert_rock_formation_2.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/canyon/rock_formation_7.glb",
+      "out": "models/biome/desert_rock_formation_3.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/canyon/rock_boulder_1.glb",
+      "out": "models/biome/desert_boulder_1.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/canyon/rock_boulder_3.glb",
+      "out": "models/biome/desert_boulder_2.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/canyon/rock_platform_1.glb",
+      "out": "models/biome/desert_mesa_1.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/canyon/rock_platform_2.glb",
+      "out": "models/biome/desert_mesa_2.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/quaternius_megakit/x/Medieval Village MegaKit[Standard]/glTF/Prop_Wagon.gltf",
+      "out": "models/biome/city_wagon.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_megakit/x/Medieval Village MegaKit[Standard]/glTF/Prop_Crate.gltf",
+      "out": "models/biome/city_crate.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_megakit/x/Medieval Village MegaKit[Standard]/glTF/Prop_MetalFence_Simple.gltf",
+      "out": "models/biome/city_fence_metal.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_megakit/x/Medieval Village MegaKit[Standard]/glTF/Prop_MetalFence_Ornament.gltf",
+      "out": "models/biome/city_fence_ornament.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_megakit/x/Medieval Village MegaKit[Standard]/glTF/Prop_WoodenFence_Single.gltf",
+      "out": "models/biome/city_fence_wood.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_megakit/x/Medieval Village MegaKit[Standard]/glTF/Prop_Vine1.gltf",
+      "out": "models/biome/city_vine_1.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_megakit/x/Medieval Village MegaKit[Standard]/glTF/Prop_Vine5.gltf",
+      "out": "models/biome/city_vine_2.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_megakit/x/Medieval Village MegaKit[Standard]/glTF/Wall_Arch.gltf",
+      "out": "models/biome/city_arch.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_megakit/x/Medieval Village MegaKit[Standard]/glTF/Stairs_Exterior_Straight.gltf",
+      "out": "models/biome/city_stairs.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit_hexagon/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/green/building_castle_green.gltf",
+      "out": "models/biome/hex_castle.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit_hexagon/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/green/building_church_green.gltf",
+      "out": "models/biome/hex_church.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit_hexagon/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/green/building_tavern_green.gltf",
+      "out": "models/biome/hex_tavern.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit_hexagon/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/green/building_market_green.gltf",
+      "out": "models/biome/hex_market.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit_hexagon/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/green/building_windmill_green.gltf",
+      "out": "models/biome/hex_windmill.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit_hexagon/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/green/building_blacksmith_green.gltf",
+      "out": "models/biome/hex_blacksmith.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit_hexagon/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/green/building_home_A_green.gltf",
+      "out": "models/biome/hex_home_a.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit_hexagon/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/green/building_home_B_green.gltf",
+      "out": "models/biome/hex_home_b.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit_hexagon/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/green/building_tower_A_green.gltf",
+      "out": "models/biome/hex_tower.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit_hexagon/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/green/building_well_green.gltf",
+      "out": "models/biome/hex_well.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit_hexagon/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/neutral/wall_straight.gltf",
+      "out": "models/biome/hex_wall.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit_hexagon/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/buildings/neutral/building_bridge_A.gltf",
+      "out": "models/biome/hex_bridge.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit_hexagon/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/tiles/base/hex_grass.gltf",
+      "out": "models/biome/hex_tile_grass.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit_hexagon/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/tiles/base/hex_water.gltf",
+      "out": "models/biome/hex_tile_water.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit_hexagon/KayKit-Medieval-Hexagon-Pack-1.0-main/addons/kaykit_medieval_hexagon_pack/Assets/gltf/tiles/roads/hex_road_A.gltf",
+      "out": "models/biome/hex_tile_road.glb",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kenney/modular-dungeon-kit/Models/GLB format/corridor.glb",
+      "out": "models/biome/dungeon_corridor.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/modular-dungeon-kit/Models/GLB format/corridor-corner.glb",
+      "out": "models/biome/dungeon_corridor_corner.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/modular-dungeon-kit/Models/GLB format/corridor-end.glb",
+      "out": "models/biome/dungeon_corridor_end.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/modular-dungeon-kit/Models/GLB format/corridor-intersection.glb",
+      "out": "models/biome/dungeon_corridor_cross.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/modular-dungeon-kit/Models/GLB format/room-small.glb",
+      "out": "models/biome/dungeon_room_small.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/modular-dungeon-kit/Models/GLB format/stairs.glb",
+      "out": "models/biome/dungeon_stairs.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/modular-dungeon-kit/Models/GLB format/gate.glb",
+      "out": "models/biome/dungeon_gate.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/modular-dungeon-kit/Models/GLB format/gate-metal-bars.glb",
+      "out": "models/biome/dungeon_gate_bars.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/modular-dungeon-kit/Models/GLB format/gate-door.glb",
+      "out": "models/biome/dungeon_gate_door.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/mini-dungeon/Models/GLB format/trap.glb",
+      "out": "models/biome/dungeon_trap.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/mini-dungeon/Models/GLB format/wood-structure.glb",
+      "out": "models/biome/dungeon_wood_structure.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/mini-dungeon/Models/GLB format/wood-support.glb",
+      "out": "models/biome/dungeon_wood_support.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/mini-dungeon/Models/GLB format/column.glb",
+      "out": "models/biome/dungeon_column_small.glb"
+    },
+    {
+      "src": "tmp/asset_src/kenney/mini-dungeon/Models/GLB format/banner.glb",
+      "out": "models/biome/dungeon_banner.glb"
+    },
+    {
+      "src": "tmp/asset_src/poly_dungeons/wall_modular.glb",
+      "out": "models/biome/dungeon_wall_stone.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_dungeons/arch_door.glb",
+      "out": "models/biome/dungeon_arch_door.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_dungeons/arch.glb",
+      "out": "models/biome/dungeon_arch_stone.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_dungeons/column.glb",
+      "out": "models/biome/dungeon_pillar_stone.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_dungeons/floor_tile.glb",
+      "out": "models/biome/dungeon_floor_tile.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_dungeons/banner_wall.glb",
+      "out": "models/biome/dungeon_banner_wall.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_dungeons/trap_door.glb",
+      "out": "models/biome/dungeon_trap_door.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_dungeons/horse_statue.glb",
+      "out": "models/biome/dungeon_statue_horse.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_dungeons/cobweb.glb",
+      "out": "models/biome/dungeon_cobweb.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/poly_dungeons/coin_piles.glb",
+      "out": "models/biome/dungeon_coins.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/mines/mine_cart_a.glb",
+      "out": "models/biome/cave_cart_a.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/mines/mine_cart_b.glb",
+      "out": "models/biome/cave_cart_b.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/mines/rail_straight.glb",
+      "out": "models/biome/cave_rail_straight.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/mines/rail_corner.glb",
+      "out": "models/biome/cave_rail_corner.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/mines/rail_ramp.glb",
+      "out": "models/biome/cave_rail_ramp.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/mines/ladder_tall.glb",
+      "out": "models/biome/cave_ladder.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/mines/cave_rocks_a.glb",
+      "out": "models/biome/cave_rocks_a.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/mines/cave_rocks_c.glb",
+      "out": "models/biome/cave_rocks_b.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/mines/cave_pillar_a.glb",
+      "out": "models/biome/cave_pillar.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/mines/cave_entrance.glb",
+      "out": "models/biome/cave_entrance.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/mines/mine_entrance.glb",
+      "out": "models/biome/cave_mine_entrance.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/mines/mine_post.glb",
+      "out": "models/biome/cave_post.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/mines/mine_platform.glb",
+      "out": "models/biome/cave_platform.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/loafbrr_split/mines/mine_stairs.glb",
+      "out": "models/biome/cave_stairs.glb",
+      "maxTex": 256
+    },
+    {
+      "src": "tmp/asset_src/ambientcg/recompressed/Ground054_Color.jpg",
+      "out": "textures/terrain/Ground054_Color.jpg",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/ambientcg/recompressed/Ground054_NormalGL.jpg",
+      "out": "textures/terrain/Ground054_NormalGL.jpg",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/ambientcg/recompressed/Ground095A_Color.jpg",
+      "out": "textures/terrain/Ground095A_Color.jpg",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/ambientcg/recompressed/Ground095A_NormalGL.jpg",
+      "out": "textures/terrain/Ground095A_NormalGL.jpg",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/ambientcg/recompressed/Ground093A_Color.jpg",
+      "out": "textures/terrain/Ground093A_Color.jpg",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/ambientcg/recompressed/Ground093A_NormalGL.jpg",
+      "out": "textures/terrain/Ground093A_NormalGL.jpg",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/ambientcg/recompressed/Rock029_Color.jpg",
+      "out": "textures/terrain/Rock029_Color.jpg",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/ambientcg/recompressed/Rock029_NormalGL.jpg",
+      "out": "textures/terrain/Rock029_NormalGL.jpg",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/ambientcg/recompressed/Lava004_Color.jpg",
+      "out": "textures/terrain/Lava004_Color.jpg",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/ambientcg/recompressed/Lava004_NormalGL.jpg",
+      "out": "textures/terrain/Lava004_NormalGL.jpg",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/ambientcg/recompressed/Gravel024_Color.jpg",
+      "out": "textures/terrain/Gravel024_Color.jpg",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/ambientcg/recompressed/Gravel024_NormalGL.jpg",
+      "out": "textures/terrain/Gravel024_NormalGL.jpg",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/ambientcg/recompressed/Rock035_Color.jpg",
+      "out": "textures/terrain/Rock035_Color.jpg",
+      "type": "copy"
+    },
+    {
+      "src": "tmp/asset_src/ambientcg/recompressed/Rock035_NormalGL.jpg",
+      "out": "textures/terrain/Rock035_NormalGL.jpg",
+      "type": "copy"
+    }
+  ]
+}

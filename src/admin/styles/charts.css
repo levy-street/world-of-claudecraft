@@ -1,0 +1,79 @@
+/* @layer components: the charts grid plus the BarChart/LineChart SVG primitives and
+   the range-tab selector. Imported after components.css so within-layer source order
+   is preserved. */
+@layer components {
+  #charts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 620px));
+    gap: 18px;
+    justify-content: start;
+  }
+  @media (max-width: 1800px) {
+    #charts {
+      grid-template-columns: repeat(2, minmax(0, 620px));
+    }
+  }
+  @media (max-width: 1200px) {
+    #charts {
+      grid-template-columns: minmax(0, 620px);
+    }
+  }
+  @media (max-width: 800px) {
+    #charts {
+      grid-template-columns: 1fr;
+    }
+  }
+  .chart svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .chart .bar {
+    fill: var(--gold-dim);
+  }
+  .chart .bar:hover {
+    fill: var(--gold);
+  }
+  .chart .line {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .chart .line.primary {
+    stroke: var(--gold);
+  }
+  .chart .line.secondary {
+    stroke: #8cc7ff;
+    stroke-width: 2;
+    opacity: 0.9;
+  }
+  .chart .line-hit {
+    fill: transparent;
+    stroke: transparent;
+  }
+  .chart .axis {
+    fill: var(--text-dim);
+    font-size: 9px;
+  }
+  .range-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 10px;
+  }
+  .range-tab {
+    min-height: 40px;
+    border: 1px solid #4a3920;
+    background: #1a130d;
+    color: var(--text);
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+  }
+  .range-tab.active {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    background: #241a0e;
+  }
+}

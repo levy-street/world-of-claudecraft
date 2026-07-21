@@ -1,0 +1,165 @@
+/* @layer components: moderation detail (report meta, flat action buttons, danger
+   variants, account admin controls, action prompt) and the mod-confirm dialog.
+   Imported last among the components modules so within-layer source order is
+   preserved. */
+@layer components {
+  #moderation-detail {
+    margin-top: 12px;
+  }
+  .mod-report {
+    margin-top: 12px;
+  }
+  .mod-report-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 6px 12px;
+    font-size: 12px;
+    color: var(--text-soft);
+  }
+  .mod-details {
+    margin: 10px 0;
+    padding: 10px;
+    background: var(--surface-inset);
+    border: 1px solid var(--border-subtle);
+    border-radius: 4px;
+    white-space: pre-wrap;
+  }
+  .mod-actions,
+  .mod-account-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 10px 0;
+  }
+  .mod-actions button,
+  .mod-account-actions button,
+  .mod-account-note button,
+  .ip-block button,
+  .ip-add button,
+  #blocked-ips table button {
+    padding: 5px 10px;
+    background: var(--btn-flat-bg);
+    color: var(--text-soft);
+    border: 1px solid var(--border-soft);
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .mod-actions button:hover,
+  .mod-account-actions button:hover,
+  .mod-account-note button:not(:disabled):hover,
+  .ip-block button:hover,
+  .ip-add button:hover,
+  #blocked-ips table button:hover {
+    color: var(--text-bright);
+    border-color: var(--gold-dim);
+  }
+  .mod-account-note button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .ip-block .danger,
+  .ip-add .danger,
+  .mod-account-actions .danger {
+    border-color: var(--color-danger-border);
+    color: var(--color-danger);
+  }
+  .ip-block .danger:hover,
+  .ip-add .danger:hover,
+  .mod-account-actions .danger:hover {
+    border-color: var(--color-danger);
+    color: var(--text-bright);
+  }
+  .account-admin-controls {
+    align-items: stretch;
+    padding: 10px;
+    background: var(--surface-sunken);
+    border: 1px solid var(--border-subtle);
+    border-radius: 4px;
+  }
+  .account-status {
+    flex: 1 0 100%;
+    color: var(--text-soft);
+    font-size: var(--font-size-base);
+  }
+  .moderation-reason {
+    flex: 1 0 100%;
+    color: var(--text-dim);
+    font-size: 12px;
+  }
+  .moderation-action-prompt {
+    margin: 10px 0;
+  }
+  .moderation-prompt-fields {
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .moderation-prompt-fields label {
+    display: grid;
+    gap: 4px;
+    color: var(--text-dim);
+    font-size: var(--font-size-small);
+  }
+  .moderation-prompt-fields input {
+    width: 100%;
+  }
+
+  .mod-confirm {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #8a6f2d;
+    border-radius: 4px;
+    background: #171207;
+  }
+  .mod-confirm h4 {
+    font-family: var(--title-font);
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .mod-confirm dl {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 4px 8px;
+    font-size: 12px;
+  }
+  .mod-confirm dt {
+    color: var(--text-dim);
+  }
+  .mod-confirm dd {
+    color: var(--text);
+  }
+  .mod-confirm .confirm-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .mod-confirm button {
+    min-width: 78px;
+    padding: 6px 12px;
+    background: linear-gradient(#2a2112, #15100b);
+    color: var(--text);
+    border: 1px solid #6f5a2a;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1.1;
+  }
+  .mod-confirm button:hover {
+    color: var(--text-bright);
+    border-color: var(--gold-dim);
+  }
+  .mod-confirm button:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .mod-confirm button[data-confirm-moderation] {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  .mod-confirm .danger {
+    border-color: var(--color-danger-border);
+    color: var(--color-danger);
+  }
+}

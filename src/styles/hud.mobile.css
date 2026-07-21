@@ -1,0 +1,4886 @@
+/* hud.mobile.css: the in-game mobile-touch layer (touch controls, mobile layout,
+   landscape/portrait rules), extracted verbatim from the index.html inline <style>.
+   Wrapped in @layer hud-mobile, which is ordered AFTER shell (see the
+   barrel): the inline mobile block originally beat every shell rule (it was
+   unlayered), and several of its rules (mobile #mode-select / .play-console /
+   #btn-play, and the char-select panel layout) override pre-game shell elements, so
+   the mobile layer must outrank shell, not sit before it. Both game entries load it
+   via the barrel.
+
+   NOTE the layer name is hud-mobile, NOT "hud.mobile": a DOT in a @layer name means
+   a SUBLAYER (hud.mobile would be the "mobile" sublayer of the early "hud" layer,
+   which loses to shell). A flat hyphenated name keeps it a top-level layer after
+   shell.
+
+   The #rotate-device orientation GATE is the one genuine per-entry difference
+   (landscape-only in-game): index suppresses the overlay in-game
+   (index.extra.css) while play shows it in portrait (play.extra.css). Its
+   per-entry rules live in those .extra files (layers ordered after this one), NOT
+   here, so neither leaks across entries. The shared #start-screen/#mobile-preflight
+   game-active hide and the base/styling of #rotate-device stay here. */
+@layer hud-mobile {
+  /* Endfield-inspired glass chrome tokens: dark-fantasy gold-brown palette kept,
+     but permanent chrome (action row, quick-access rail, the More tray) reads as
+     translucent glass over the world instead of solid opaque wood/stone panels. */
+  body.mobile-touch {
+    --mobile-glass-bg: linear-gradient(160deg, #201d13b8, #0b0a08c7);
+    --mobile-glass-border: #cba43d8c;
+    --mobile-glass-blur: 8px;
+    /* Mobile chrome-scale: shrink the persistent HUD chrome (unit frames, minimap,
+       cast/swing bars, buff/debuff, party, the thumb clusters) to 0.85x so more of
+       the game world shows through. It composes multiplicatively WITH the user's own
+       Options sliders (--btn-scale / --joy-scale, both default 1.0), never replaces
+       them, and is folded into each sizing calc below. The 40px interactive touch
+       floor is never scaled: where 0.85x would dip a control under 40px, the calc is
+       clamped with max()/clamp() so the effective size holds at 40px. */
+    --mobile-chrome-scale: 0.85;
+  }
+  /* ---------- mobile touch controls (runtime-gated with body.mobile-touch + game-active) ---------- */
+  #mobile-controls {
+    display: none;
+  }
+  #mobile-preflight {
+    display: none;
+  }
+  #rotate-device {
+    display: none;
+  }
+  body.mobile-touch.game-active #start-screen,
+  body.mobile-touch.game-active #mobile-preflight {
+    display: none !important;
+    pointer-events: none !important;
+  }
+  body.mobile-touch.game-active:not(.mobile-more-open) #mobile-extra-controls {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  body.mobile-touch #game-canvas {
+    touch-action: none;
+  }
+  /* The shared Fire, Chronomancy and Frost phoenix keeps its desktop artwork
+     proportions while taking less of the phone battlefield. The root is
+     already draggable, and scale composes with its independent translate. */
+  body.mobile-touch #proc-overlay {
+    scale: 0.2;
+  }
+  /* The HUD overlay must let one-finger panning reach scrollable windows (Bag,
+     Market, etc.) on iOS: Safari intersects touch-action down the ancestor
+     chain, so `none` here would block child scroll containers and a child's
+     own `pan-y` could not re-enable it. `pan-x pan-y` still blocks pinch/
+     double-tap zoom (also guarded globally in preventMobileZoom). */
+  body.mobile-touch #ui {
+    touch-action: pan-x pan-y;
+  }
+  body.mobile-touch.game-active,
+  body.mobile-touch.game-active #ui,
+  body.mobile-touch.game-active #nameplates,
+  body.mobile-touch.game-active #mobile-controls,
+  body.mobile-touch.game-active #mobile-controls *,
+  body.mobile-touch.game-active #bottom-bar,
+  body.mobile-touch.game-active #bottom-bar *,
+  body.mobile-touch.game-active .action-btn,
+  body.mobile-touch.game-active .mobile-btn {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+  body.mobile-touch.game-active input,
+  body.mobile-touch.game-active textarea,
+  body.mobile-touch.game-active select,
+  body.mobile-touch.game-active [contenteditable=""],
+  body.mobile-touch.game-active [contenteditable="true"] {
+    user-select: text;
+    -webkit-user-select: text;
+    -webkit-touch-callout: default;
+  }
+  body.mobile-touch.game-active #mobile-controls {
+    position: absolute;
+    /* Size from the shared --app-vw/--app-vh box (the one #game-canvas, html/body,
+       #ui, and #nameplates use), NOT `inset: 0`: inset resolves against the initial
+       containing block, and whenever that disagrees with the JS-synced app viewport
+       (device emulation, pinch zoom, a mid-resize snapshot) the joysticks and combat
+       buttons anchor to a different bottom edge than the action bar and drift into
+       the middle of the screen. One box for every full-screen HUD layer. */
+    left: 0;
+    top: 0;
+    width: var(--app-vw);
+    height: var(--app-vh);
+    display: block;
+    pointer-events: none;
+    z-index: 60;
+    opacity: var(--touch-opacity, 1);
+  }
+  body.mobile-touch.game-active #ui {
+    z-index: 80;
+  }
+  body.mobile-touch.mobile-more-open #mobile-controls {
+    z-index: 140;
+  }
+  body.mobile-touch.game-active #ui,
+  body.mobile-touch.game-active #nameplates,
+  body.mobile-touch.game-active #mobile-controls {
+    overflow: hidden;
+    scrollbar-width: none;
+  }
+  body.mobile-touch.game-active #ui::-webkit-scrollbar,
+  body.mobile-touch.game-active #nameplates::-webkit-scrollbar,
+  body.mobile-touch.game-active #mobile-controls::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+  body.mobile-touch.game-active::-webkit-scrollbar {
+    height: 0;
+  }
+  body.mobile-touch.game-active *::-webkit-scrollbar {
+    height: 0;
+  }
+  body.mobile-touch.game-active *::-webkit-scrollbar:horizontal {
+    height: 0;
+    display: none;
+  }
+  /* Move joystick: looking around is swipe-drag-anywhere on the canvas
+     (onSwipeLookDown/Move/End in mobile_controls.ts), the way most modern
+     touch action games do it; the camera/look joystick is hidden by default
+     and opt-in via settings.mobileCameraJoystick (see #mobile-camera-joystick
+     below). */
+  body.mobile-touch .mobile-joystick {
+    position: absolute;
+    left: max(18px, env(safe-area-inset-left));
+    bottom: calc(26px + env(safe-area-inset-bottom));
+    /* 140px wheel (landscape tier: 128px): sized to the mobile-MOBA convention
+       (Wild Rift-class games run the movement wheel at roughly a third of the
+       landscape viewport height; the old 122/100px sat nearer a quarter). The
+       floating capture zone stays FIXED at min(30vw, 132px), which the wheel
+       overhangs at rest; the wheel carries its own pointer listeners so that
+       overhang is live, and on touch the wheel spawns centered under the
+       thumb, unclamped (mobile_controls.ts onMoveDown). */
+    /* Issue 1577 round 2 (3): trimmed from 140px to a smaller default wheel so
+       the movement pad takes less of the bottom-left corner on a phone. The
+       floating capture zone (#mobile-move-zone) is unchanged, and the Joystick
+       Size setting (--joy-scale) still scales from here. */
+    width: 118px;
+    height: 118px;
+    border-radius: 50%;
+    pointer-events: auto;
+    touch-action: none;
+    border: 2px solid #b7a35a80;
+    background: radial-gradient(circle at 50% 50%, #1b1b2960 0%, #0b0b1280 62%, #0505089a 100%);
+    box-shadow:
+      0 3px 18px #0008,
+      inset 0 1px 0 #ffffff12,
+      inset 0 0 26px #0008;
+    opacity: 0.4;
+    transition: opacity 0.18s ease;
+    /* Joystick Size setting: grow/shrink from the anchored bottom corner so the
+       pad stays in the same screen position while resizing. --joy-scale is set
+       on #mobile-controls by applySetting('joystickScale'). */
+    transform: scale(calc(var(--joy-scale, 1) * var(--mobile-chrome-scale, 1)));
+    transform-origin: left bottom;
+  }
+  body.mobile-touch .mobile-joystick.active {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.mobile-touch .mobile-joystick {
+      transition: none;
+    }
+  }
+  body.mobile-touch .mobile-joystick::before {
+    content: "";
+    position: absolute;
+    inset: 32px;
+    border-radius: 50%;
+    border: 1px solid #ffffff18;
+  }
+  /* Floating move joystick: a lower-left capture zone lets the thumb land
+     anywhere; the joystick rests dimmed at home until touched, then springs to
+     the touch point with a gold "engaged" glow. */
+  body.mobile-touch #mobile-move-zone {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: min(30vw, 132px);
+    min-width: 112px;
+    max-width: 132px;
+    height: min(36vh, 172px);
+    pointer-events: auto;
+    touch-action: none;
+    z-index: 1;
+  }
+  /* While chat is shown (both log and composer visible together), the movement
+     joystick is fully hidden rather than just ignoring touches: it frees the
+     screen space chat now occupies and avoids any accidental movement input
+     while the player is reading/typing. It reappears the instant chat is
+     toggled closed again. */
+  body.mobile-touch.mobile-chat-open #mobile-move-zone {
+    display: none;
+  }
+  body.mobile-touch #mobile-move-joystick {
+    opacity: 0.5;
+    transition: opacity 0.12s linear;
+  }
+  body.mobile-touch #mobile-move-joystick.floating {
+    opacity: 1;
+    bottom: auto;
+    left: 0;
+    transition: none;
+    /* Scale about the centre while floating: JS positions the UNtransformed
+       box centered on the touch point, so a corner origin would shift the
+       scaled wheel off the thumb at any Joystick Size other than 1. The
+       at-rest rule keeps left bottom so the resting pad hugs its corner. */
+    transform-origin: center;
+  }
+  body.mobile-touch #mobile-move-joystick.active {
+    border-color: var(--gold);
+    box-shadow:
+      0 3px 18px #0008,
+      inset 0 1px 0 #ffffff12,
+      inset 0 0 26px #0008,
+      0 0 16px 3px #e3c66a55;
+  }
+  body.mobile-touch #mobile-autorun-target {
+    position: absolute;
+    left: 50%;
+    top: -104px;
+    width: 48px;
+    height: 48px;
+    border: 2px solid #b7a35a00;
+    border-radius: 50%;
+    color: #f6e7ad;
+    background: radial-gradient(circle at 35% 30%, #57451ccf, #161108e8 72%);
+    box-shadow:
+      0 0 0 1px #0009,
+      inset 0 1px 0 #ffffff20,
+      0 0 16px #0008;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 14px) scale(0.72);
+    transition:
+      opacity 0.12s ease,
+      transform 0.12s ease,
+      border-color 0.12s ease,
+      box-shadow 0.12s ease;
+  }
+  body.mobile-touch #mobile-autorun-target .ui-icon {
+    width: 24px;
+    height: 24px;
+  }
+  body.mobile-touch #mobile-autorun-target.near,
+  body.mobile-touch #mobile-autorun-target.locked {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+    border-color: #d8c46bb8;
+  }
+  body.mobile-touch #mobile-autorun-target.locked {
+    top: 50%;
+    z-index: 1;
+    transform: translate(-50%, -50%) scale(1);
+    color: #fff7c7;
+    border-color: var(--gold);
+    box-shadow:
+      0 0 0 1px #0009,
+      inset 0 1px 0 #ffffff24,
+      0 0 18px #e3c66a99;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.mobile-touch #mobile-autorun-target {
+      transition: none;
+    }
+  }
+  /* Hidden by default (settings.mobileCameraJoystick, def false): swipe-look on
+     open gameplay space is the primary camera path (plan decision 2). Hidden
+     means no reserved layout space and mobile_controls.ts's onCameraDown no-ops
+     while disabled, so a hidden joystick never eats a touch either. */
+  body.mobile-touch:not(.mobile-camera-joystick-on) #mobile-camera-joystick {
+    display: none;
+  }
+  body.mobile-touch #mobile-camera-joystick {
+    /* Stacked above the move joystick on the LEFT side, not the ring's
+       bottom-right corner, so an opted-in joystick never overlaps the paged
+       action ring cluster (#mobile-action-ring, bottom-right, up to ~290px
+       tall). */
+    left: max(18px, env(safe-area-inset-left));
+    right: auto;
+    bottom: calc(176px + env(safe-area-inset-bottom));
+    transform-origin: left bottom;
+  }
+  body.mobile-touch #mobile-camera-joystick.recentering {
+    animation: mobile-recenter-pulse 0.22s ease-out;
+  }
+  @keyframes mobile-recenter-pulse {
+    0% {
+      box-shadow:
+        0 3px 18px #0008,
+        inset 0 1px 0 #ffffff12,
+        inset 0 0 26px #0008;
+      border-color: #b7a35a80;
+    }
+    45% {
+      box-shadow:
+        0 0 22px 4px #e3d47588,
+        inset 0 0 26px #0008;
+      border-color: #e3d475e0;
+    }
+    100% {
+      box-shadow:
+        0 3px 18px #0008,
+        inset 0 1px 0 #ffffff12,
+        inset 0 0 26px #0008;
+      border-color: #b7a35a80;
+    }
+  }
+  body.mobile-touch .mobile-stick {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 62px;
+    height: 62px;
+    margin: -31px 0 0 -31px;
+    border-radius: 50%;
+    border: 2px solid #e3d475b8;
+    background: radial-gradient(circle at 35% 30%, #867ab6aa, #1d1d2b9a 70%);
+    box-shadow:
+      0 2px 10px #0009,
+      inset 0 1px 0 #ffffff1c;
+    transition: transform 0.06s linear;
+  }
+  body.mobile-touch .mobile-joy-label {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -18px;
+    text-align: center;
+    font-size: 9px;
+    color: #c8b888;
+    text-shadow: 1px 1px 2px #000;
+  }
+  body.mobile-touch #mobile-combat-controls {
+    position: absolute;
+    left: max(12px, env(safe-area-inset-left));
+    top: max(8px, env(safe-area-inset-top));
+    transform: scale(calc(var(--btn-scale, 1) * var(--mobile-chrome-scale, 1)));
+    transform-origin: left top;
+    display: grid;
+    /* Chat, Social, Quests, Settings, More: the low-priority row sits alone at
+       TOP-LEFT, far from both thumb clusters (movement cluster bottom-left,
+       combat ring bottom-right) and off the top-centre band (pet bar, banners).
+       Its single 54px row clears the target frame seat below it (top + 72px),
+       so a live target never renders under the buttons. */
+    grid-template-columns: repeat(5, 58px);
+    gap: 12px;
+    pointer-events: auto;
+    align-items: start;
+    z-index: 30;
+  }
+  body.mobile-touch .mobile-btn {
+    width: 58px;
+    height: 54px;
+    border: 1px solid var(--mobile-glass-border, #cba43d8c);
+    border-radius: 50%;
+    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
+    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    color: #eee8ff;
+    cursor: var(--cursor-point);
+    font-size: 22px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 8px #0009;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    transition: opacity 0.35s ease;
+  }
+  body.mobile-touch .mobile-btn .ui-icon {
+    width: 22px;
+    height: 22px;
+  }
+  body.mobile-touch #mobile-more {
+    position: static;
+    z-index: 19;
+  }
+  body.mobile-touch #mobile-more .ui-icon {
+    transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  body.mobile-touch.mobile-more-open #mobile-more .ui-icon {
+    transform: rotate(38deg);
+  }
+  body.mobile-touch .mobile-btn:active {
+    transform: translateY(1px);
+    border-color: var(--gold);
+    color: #fff;
+  }
+  body.mobile-touch .mobile-btn.is-on {
+    border-color: var(--gold);
+    color: #fff;
+  }
+  body.mobile-touch .mobile-btn:not(.is-on)#mobile-haptics {
+    opacity: 0.55;
+  }
+  body.mobile-touch .mobile-btn .mobile-label {
+    display: block;
+    margin-top: 1px;
+    font-size: 8px;
+    font-family: var(--ui-font);
+    color: #bfb28a;
+  }
+
+  /* ---------- mobile window backdrop ---------- */
+  /* Phase 4 of the mobile combat HUD rework: a static full-screen dim layer
+     (#mobile-window-backdrop, in both index.html and play.html) shown whenever a
+     window is open on touch, so a menu explicitly blocks touches to whatever is
+     behind it instead of relying on DOM occlusion order (several windows are
+     translucent / don't fully cover the viewport). Hidden by default and on
+     desktop (no body.mobile-touch): this pass only blocks touches, it does not
+     close windows on tap.
+     Stacking: #mobile-controls sits at z-index 60 (game-active, above), and #ui
+     (the container every `.window` lives inside) rises to z-index 90 only while
+     body.mobile-window-open (see the `#ui` rule above). The backdrop sits at 85:
+     above the base HUD chrome (#mobile-controls at 60, #ui at its normal 80) but
+     below #ui's window-open z-index, so it always renders under the open window
+     it is meant to dim behind, never on top of it. */
+  #mobile-window-backdrop {
+    display: none;
+  }
+  body.mobile-touch.mobile-window-open #mobile-window-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 85;
+    background: rgba(3, 4, 7, 0.55);
+    pointer-events: auto;
+  }
+
+  /* ---------- mobile action ring (paged combat buttons) ---------- */
+  /* Phase 1 of the mobile combat HUD rework: a bottom-right thumb cluster that
+     makes the existing hotbar castable on touch (desktop drag/drop keybinds are
+     unusable on a phone). One fixed primary Attack toggle (castSlot(0), unpaged),
+     5 paged action buttons (7 pages covering hotbar source slots 1-33, see
+     mobile_action_page_view.ts), a page-cycle toggle, and the Target swap
+     helper. The ring supersedes the desktop #actionbar/#actionbar2/#actionbar3 rows under
+     body.mobile-touch (hidden below); xpbar/player-frame/petbar keep rendering
+     (their own mobile rules are untouched).
+
+
+     GEOMETRY: the 5 paged buttons sit on one circular arc centred on the attack
+     button's centre, a quarter sweep from due-left (180deg) to due-up (90deg) in
+     22.5deg steps, so every adjacent pair has the same centre distance
+     (chord = 2 * R * sin(11.25deg), tuned per tier to action-size + ~10px so
+     buttons never crowd or overlap and nothing pokes past the screen edge; the
+     numeric factors below are cos/sin of 157.5/135/112.5deg). Use (180deg, due
+     left), Target swap (135deg, the up-left diagonal) and the page toggle
+     (90deg, due up over the attack button, to Target's upper right) nest in
+     the crescent hollow at --mobile-ring-hollow from the attack centre; every
+     seat stays inside the ring box, so nothing overhangs the screen edge.
+     Sizing hooks: --mobile-ring-* are scoped to #mobile-action-ring and
+     re-tuned per layout tier (see the tiers section); --btn-scale
+     (actionButtonScale) and --touch-opacity (touchOpacity) are reused
+     directly, not forked. */
+  body.mobile-touch #mobile-action-ring {
+    /* Chrome-scale folded into every ring size var (the arc offsets below are
+       expressed in these vars, so the whole cluster shrinks proportionally and keeps
+       its equal-chord geometry). Standard-tier sizes all stay >= 40px at 0.85x
+       (smallest: toggle 52 * 0.85 = 44.2), so no clamp is needed here. */
+    --mobile-ring-attack-size: calc(100px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-action-size: calc(64px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-radius: calc(190px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-toggle-size: calc(52px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-secondary-size: calc(56px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-hollow: calc(104px * var(--mobile-chrome-scale, 1));
+    position: absolute;
+    right: max(18px, env(safe-area-inset-right));
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    width: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) +
+      var(--mobile-ring-action-size) /
+      2
+    );
+    height: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) +
+      var(--mobile-ring-action-size) /
+      2
+    );
+    transform-origin: right bottom;
+    transform: scale(var(--btn-scale, 1));
+    opacity: var(--touch-opacity, 1);
+    pointer-events: none;
+    z-index: 31;
+  }
+  body.mobile-touch #mobile-action-ring > button {
+    position: absolute;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #4a3d1d;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #2d3048d8, #11121ed8 72%);
+    color: #eee8ff;
+    cursor: var(--cursor-point);
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 8px #0009;
+  }
+  /* Primary attack toggle: bottom-right anchor of the cluster, largest button. */
+  body.mobile-touch #mobile-action-attack {
+    right: 0;
+    bottom: 0;
+    width: var(--mobile-ring-attack-size);
+    height: var(--mobile-ring-attack-size);
+    color: #ffdf9c;
+    border-color: #8b4e2c;
+  }
+  /* The 5 paged action buttons: one clean quarter-circle crescent left-and-up
+     of the attack button (pure CSS positioning, no JS layout). Each button's
+     centre is at angle 180 - 22.5 * i deg on the --mobile-ring-radius circle
+     around the attack centre; right/bottom below are that centre math expanded
+     (right = attack/2 + R * cos - action/2, bottom = attack/2 + R * sin -
+     action/2), so the arc holds at every tier/setting size combination and no
+     button ever leaves the viewport (all offsets stay non-negative). */
+  body.mobile-touch .mobile-action-slot {
+    width: var(--mobile-ring-action-size);
+    height: var(--mobile-ring-action-size);
+  }
+  body.mobile-touch .mobile-action-slot[data-mobile-index="0"] {
+    right: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) -
+      var(--mobile-ring-action-size) /
+      2
+    );
+    bottom: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-action-size) / 2);
+  }
+  body.mobile-touch .mobile-action-slot[data-mobile-index="1"] {
+    right: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) *
+      0.9239 -
+      var(--mobile-ring-action-size) /
+      2
+    );
+    bottom: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) *
+      0.3827 -
+      var(--mobile-ring-action-size) /
+      2
+    );
+  }
+  body.mobile-touch .mobile-action-slot[data-mobile-index="2"] {
+    right: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) *
+      0.7071 -
+      var(--mobile-ring-action-size) /
+      2
+    );
+    bottom: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) *
+      0.7071 -
+      var(--mobile-ring-action-size) /
+      2
+    );
+  }
+  body.mobile-touch .mobile-action-slot[data-mobile-index="3"] {
+    right: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) *
+      0.3827 -
+      var(--mobile-ring-action-size) /
+      2
+    );
+    bottom: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) *
+      0.9239 -
+      var(--mobile-ring-action-size) /
+      2
+    );
+  }
+  body.mobile-touch .mobile-action-slot[data-mobile-index="4"] {
+    right: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-action-size) / 2);
+    bottom: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) -
+      var(--mobile-ring-action-size) /
+      2
+    );
+  }
+  /* The crescent-hollow trio between the attack button and the arc, all on
+     the --mobile-ring-hollow circle in 45deg steps: Use (interact/loot) due
+     left at 180deg, Target swap (Tab-cycle) on the up-left 45deg diagonal at
+     135deg, and the page-swap badge due up at 90deg over the attack button
+     (the seat to Target's upper right). The numeric factors are cos/sin of
+     those angles (0 and 1 terms folded away). Chord between neighbours:
+     2 * hollow * sin(22.5deg) = 79.6px at the standard 104px hollow,
+     comfortably past the 52-56px circles at every tier. */
+  body.mobile-touch #mobile-target-cycle {
+    right: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-hollow) *
+      0.7071 -
+      var(--mobile-ring-secondary-size) /
+      2
+    );
+    bottom: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-hollow) *
+      0.7071 -
+      var(--mobile-ring-secondary-size) /
+      2
+    );
+  }
+  body.mobile-touch #mobile-action-ring #mobile-interact {
+    right: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-hollow) -
+      var(--mobile-ring-secondary-size) /
+      2
+    );
+    bottom: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-secondary-size) / 2);
+  }
+  /* Jump: a right-thumb seat on the ring's bottom row, one arc-seat past the
+     180deg action slot on Use's row, so a player can hold the move joystick
+     with the left thumb and jump with the right. Its circle-edge gap to that
+     slot EQUALS Use's gap on the other side (Use gap = radius - hollow -
+     secondary/2 - action/2, so Jump's centre lands at 2 * radius - hollow
+     from the attack centre), keeping the bottom row visually even-spaced at
+     every tier. */
+  body.mobile-touch #mobile-action-ring #mobile-jump {
+    right: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) *
+      2 -
+      var(--mobile-ring-hollow) -
+      var(--mobile-ring-secondary-size) /
+      2
+    );
+    bottom: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-secondary-size) / 2);
+  }
+  body.mobile-touch #mobile-target-cycle,
+  body.mobile-touch #mobile-action-ring #mobile-interact,
+  body.mobile-touch #mobile-action-ring #mobile-jump {
+    width: var(--mobile-ring-secondary-size);
+    height: var(--mobile-ring-secondary-size);
+    color: #ffdf9c;
+    border-color: #8b4e2c;
+  }
+  body.mobile-touch #mobile-target-cycle:active,
+  body.mobile-touch #mobile-action-ring #mobile-interact:active,
+  body.mobile-touch #mobile-action-ring #mobile-jump:active {
+    border-color: var(--gold);
+    color: #fff;
+  }
+  body.mobile-touch #mobile-target-cycle .ui-icon,
+  body.mobile-touch #mobile-action-ring #mobile-interact .ui-icon,
+  body.mobile-touch #mobile-action-ring #mobile-jump .ui-icon {
+    width: 22px;
+    height: 22px;
+  }
+  body.mobile-touch #mobile-target-cycle .mobile-label,
+  body.mobile-touch #mobile-action-ring #mobile-interact .mobile-label,
+  body.mobile-touch #mobile-action-ring #mobile-jump .mobile-label {
+    display: block;
+    margin-top: 1px;
+    font-size: 8px;
+    font-family: var(--ui-font);
+    color: #d8b98a;
+  }
+  /* Page-cycle toggle: the gold swap badge at the hollow trio's 90deg seat
+     (due up over the attack centre on the --mobile-ring-hollow circle, to the
+     Target button's upper right), spaced a full 45deg chord off Target and
+     clear of the arc's top button so a page flip never fat-fingers a cast.
+     The face is the current page number in the same gold as the attack/Target
+     accents, over a small swap-arrows glyph (the ordering is CSS `order`:
+     hydrateIcons prepends the SVG, the number must still read first). */
+  body.mobile-touch #mobile-action-page-toggle {
+    right: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);
+    bottom: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-hollow) -
+      var(--mobile-ring-toggle-size) /
+      2
+    );
+    width: var(--mobile-ring-toggle-size);
+    height: var(--mobile-ring-toggle-size);
+    font-family: var(--ui-font);
+    color: #ffdf9c;
+    border-color: #8b4e2c;
+  }
+  body.mobile-touch #mobile-action-page-toggle .mobile-action-page-indicator {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1;
+    text-shadow: 1px 1px 2px #000;
+  }
+  body.mobile-touch #mobile-action-page-toggle .ui-icon {
+    order: 2;
+    width: 15px;
+    height: 15px;
+    margin-top: 2px;
+    color: #d8b98a;
+  }
+  body.mobile-touch #mobile-action-page-toggle:active {
+    border-color: var(--gold);
+    color: #fff;
+  }
+  /* Cooldown sweep + used-flash + state dimming reuse the SAME classes/structure
+     as .action-btn (cd-overlay height% sweep, .empty/.unusable/.oor/.queued),
+     scoped here so no desktop selector changes. */
+  body.mobile-touch #mobile-action-ring button .icon-label {
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+  }
+  /* The primary attack toggle paints no background-image on its .icon-label
+     (hud.ts's ring icon resolver special-cases ATTACK_ICON_KEY to an empty
+     string), so the plain data-icon="attack" SVG hydrateIcons() already
+     inserted as the button's first child shows through instead, matching the
+     Target swap button's glyph. The button's own flex centering positions
+     it; only sizing is needed here, as a percentage of the sizing var so it
+     stays proportional across the standard/tablet ring scales. */
+  body.mobile-touch #mobile-action-attack .ui-icon {
+    width: 44%;
+    height: 44%;
+    color: #ffdf9c;
+  }
+  body.mobile-touch #mobile-action-ring button .cd-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0;
+    border-radius: 0 0 50% 50%;
+    background: #000a;
+    pointer-events: none;
+  }
+  /* The cooldown sweep is a rectangle whose TOP corners are square, so on a
+     near-full sweep (every GCD tick) it poked outside the circular button as
+     a dark square. Clip every ring button to its own circle; children (label,
+     count, cdtext) all sit inside the circle already. */
+  body.mobile-touch #mobile-action-ring > button {
+    overflow: hidden;
+  }
+  /* Press feedback on the attack toggle and the 5 paged slots, matching the
+     Target/Use/page-toggle trio (which already had :active rules): a tap
+     must visibly acknowledge even before the used-flash lands. */
+  body.mobile-touch #mobile-action-attack:active,
+  body.mobile-touch .mobile-action-slot:active {
+    border-color: var(--gold);
+  }
+  /* Long-press-to-pick-up state for the ring's touch swap (bindMobileRingDrag):
+     a steady border + glow, never a scale transform (motion-sickness rule), on
+     both the picked-up source slot and whichever slot the finger is currently
+     over. Mirrors the desktop .action-btn.drop-target treatment. */
+  body.mobile-touch .mobile-action-slot.drop-target {
+    border-color: #7fd1ff;
+    box-shadow: 0 0 8px #7fd1ff88;
+  }
+  body.mobile-touch #mobile-action-ring button .cdtext {
+    position: relative;
+    font-size: 15px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+  }
+  body.mobile-touch #mobile-action-ring button .item-count {
+    position: absolute;
+    right: 4px;
+    bottom: 2px;
+    font-size: 11px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+  }
+  body.mobile-touch #mobile-action-ring button .keybind {
+    display: none;
+  }
+  body.mobile-touch #mobile-action-ring button.empty .icon-label {
+    background-image: none;
+  }
+  body.mobile-touch #mobile-action-ring button.empty {
+    opacity: 0.4;
+  }
+  body.mobile-touch #mobile-action-ring button.unusable {
+    filter: grayscale(0.6);
+    opacity: 0.6;
+  }
+  body.mobile-touch #mobile-action-ring button.oor {
+    border-color: #a33;
+  }
+  body.mobile-touch #mobile-action-ring button.queued {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 12px #ffd100aa,
+      inset 0 0 0 1px #ffd10077;
+  }
+  body.mobile-touch #mobile-action-ring button.empowered {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 14px #ffd100dd,
+      inset 0 0 0 1px #fff0a6aa;
+    animation: action-empowered-pulse 1.15s ease-in-out infinite;
+  }
+  body.mobile-touch #mobile-action-ring button.used {
+    border-color: var(--gold);
+  }
+  /* Page-switch icon transition: gated behind prefers-reduced-motion so the icon
+     swap when cycling pages does not animate for a motion-sensitive player. */
+  @media (prefers-reduced-motion: no-preference) {
+    body.mobile-touch .mobile-action-slot .icon-label {
+      transition: opacity 0.12s ease;
+    }
+  }
+  /* Consumables quick bar: a quiet chevron chip docked right of the top-left
+     trio that expands a row of the carried potions/elixirs/food/drink
+     (auto-populated by consumable_bar_view.ts, painted by the shared action
+     bar painter, so the cd-overlay/count/state classes below mirror the
+     ring's). Collapsed by default and session-only: the row shows only under
+     body.mobile-consumables-open, and empty slots collapse away so the open
+     row is exactly as wide as what the player carries. The left anchor adds
+     the bar's SCALED width (5 columns + 4 gaps) to the bar's own safe-area
+     anchor so a grown --btn-scale never slides the bar under the chip. */
+  body.mobile-touch #mobile-consumables {
+    position: absolute;
+    left: calc(
+      max(12px, env(safe-area-inset-left)) +
+      338px *
+      var(--btn-scale, 1) *
+      var(--mobile-chrome-scale, 1) +
+      10px
+    );
+    top: max(8px, env(safe-area-inset-top));
+    /* Right reservation sized for the WORST-CASE visual overhang: flex-wrap
+       decides on the untransformed layout width, but the container then scales
+       by --btn-scale (max 1.3) from left top, so the painted row extends past
+       its layout edge by (scale - 1) x row width. 260px keeps the scaled row
+       clear of everything in #ui above it (buff column at right 98px+, the
+       daily-chest rail, the minimap corner): on an 844px landscape phone,
+       (844 - 260 - left(1.3)) x 1.3 + left(1.3) = 684 = the buff column edge. */
+    right: calc(260px + env(safe-area-inset-right));
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    /* The container spans the top band; only its BUTTONS take touches, so an
+       empty stretch stays camera-draggable (touch_router matches the target's
+       closest #mobile-consumables, which pointer-events: none prevents). */
+    pointer-events: none;
+    transform: scale(var(--btn-scale, 1));
+    transform-origin: left top;
+    z-index: 30;
+  }
+  body.mobile-touch #mobile-consumables-toggle {
+    /* Width stays a hard 40px (the touch floor is never scaled); only the height
+       folds in chrome-scale (54 * 0.85 = 45.9, still >= 40). The portrait override
+       below keeps its own 44px height. */
+    width: 40px;
+    height: calc(54px * var(--mobile-chrome-scale, 1));
+    padding: 0;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    border: 1px solid var(--mobile-glass-border, #cba43d8c);
+    border-radius: 12px;
+    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
+    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    color: #d8b98a;
+    cursor: var(--cursor-point);
+    opacity: 0.85;
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 8px #0009;
+  }
+  body.mobile-touch #mobile-consumables-toggle .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    body.mobile-touch #mobile-consumables-toggle .ui-icon {
+      transition: transform 0.12s ease;
+    }
+  }
+  body.mobile-touch.mobile-consumables-open #mobile-consumables-toggle {
+    opacity: 1;
+    border-color: var(--gold-dim);
+    color: #ffdf9c;
+  }
+  body.mobile-touch.mobile-consumables-open #mobile-consumables-toggle .ui-icon {
+    transform: rotate(90deg);
+  }
+  /* The open row extends RIGHTWARD from the toggle chip along the top band
+     (restored by owner request; v0.23.0 had dropped it BELOW the chip to leave the
+     top-centre band to the pet bar). It is a single nowrap line so it never wraps
+     down over the world. The two pet classes still own the top-centre line while a
+     pet is out (body.mobile-pet-active), so the row then drops one band to clear the
+     pet bar; overlap in every state is gated by the pet-bar top-band probe. */
+  body.mobile-touch #mobile-consumables-row {
+    display: none;
+    position: absolute;
+    top: 0;
+    /* Anchor to the RIGHT edge of the 40px toggle (its first child), not the
+       container: #mobile-consumables is a wide stretched band (left..right:260px),
+       so `left: 100%` would fling the row to the far right edge and off a 740px
+       viewport. 40px (toggle width) + 6px gap flows it just past the toggle. */
+    left: calc(40px + 6px);
+    right: auto;
+    gap: 8px;
+  }
+  /* Pet classes: the pet bar sits on the top-centre line, so the row (which flows
+     right across the centre) drops below the toggle while a pet is out. Still
+     sideways + nowrap, just one band lower. */
+  body.mobile-touch.mobile-pet-active #mobile-consumables-row {
+    top: calc(100% + 6px);
+  }
+  body.mobile-touch.mobile-consumables-open #mobile-consumables-row {
+    display: flex;
+    flex-wrap: nowrap;
+  }
+  body.mobile-touch .mobile-consumable-slot {
+    position: relative;
+    /* 48 * 0.85 = 40.8, still clear of the 40px touch floor. */
+    width: calc(48px * var(--mobile-chrome-scale, 1));
+    height: calc(48px * var(--mobile-chrome-scale, 1));
+    padding: 0;
+    flex: none;
+    pointer-events: auto;
+    border: 1px solid var(--mobile-glass-border, #cba43d8c);
+    border-radius: 50%;
+    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
+    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    color: #eee8ff;
+    cursor: var(--cursor-point);
+    overflow: hidden;
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 8px #0009;
+  }
+  body.mobile-touch .mobile-consumable-slot:active {
+    border-color: var(--gold);
+  }
+  /* Same cd-overlay/count/state structure as the ring buttons (shared painter). */
+  body.mobile-touch .mobile-consumable-slot .icon-label {
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+  }
+  body.mobile-touch .mobile-consumable-slot .cd-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 0;
+    border-radius: 0 0 50% 50%;
+    background: #000a;
+    pointer-events: none;
+  }
+  body.mobile-touch .mobile-consumable-slot .cdtext {
+    position: relative;
+    font-size: 13px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+  }
+  body.mobile-touch .mobile-consumable-slot .item-count {
+    position: absolute;
+    right: 4px;
+    bottom: 2px;
+    font-size: 11px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+    pointer-events: none;
+  }
+  body.mobile-touch .mobile-consumable-slot .keybind {
+    display: none;
+  }
+  body.mobile-touch .mobile-consumable-slot.empty {
+    display: none;
+  }
+  body.mobile-touch .mobile-consumable-slot.unusable {
+    filter: grayscale(0.6);
+    opacity: 0.6;
+  }
+  body.mobile-touch .mobile-consumable-slot.used {
+    border-color: var(--gold);
+  }
+  body.mobile-touch #mobile-extra-controls {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    bottom: auto;
+    --mobile-more-open-transform: translate(-50%, -50%);
+    --mobile-more-closed-transform: translate(-50%, -46%) scale(0.96);
+    transform: var(--mobile-more-closed-transform);
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    width: min(440px, calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+    --window-pad: 10px;
+    pointer-events: none;
+    z-index: 100;
+    border: 1px solid var(--mobile-glass-border);
+    border-radius: 10px;
+    background: var(--mobile-glass-bg);
+    -webkit-backdrop-filter: blur(calc(var(--mobile-glass-blur) * 1.5));
+    backdrop-filter: blur(calc(var(--mobile-glass-blur) * 1.5));
+    box-shadow:
+      0 8px 28px #000d,
+      inset 0 1px 0 #ffffff12;
+    /* Centre-screen modal (the More button lives in the top-left trio now, so
+       the menu opens under the middle of the screen instead of stacking on the
+       trigger): cap to the safe viewport so short landscape phones can
+       scroll the full menu without hiding rows behind controls or browser chrome.
+       No --ui-scale division: this drawer is a <body>-level window OUTSIDE the
+       zoomed #ui (see the --window-scale note in layout.css). */
+    max-width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
+    max-height: calc(var(--app-vh) - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    will-change: transform, opacity;
+    transition:
+      opacity 150ms ease,
+      transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      visibility 0s linear 180ms;
+  }
+  body.mobile-touch.mobile-more-open #mobile-extra-controls {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: var(--mobile-more-open-transform);
+    transition:
+      opacity 150ms ease,
+      transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      visibility 0s;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.mobile-touch #mobile-extra-controls,
+    body.mobile-touch #mobile-more .ui-icon {
+      transition: none;
+    }
+  }
+  body.mobile-touch #mobile-extra-controls .panel-title {
+    /* 48px, not the old 32px: the close button is a 40x40 absolute-pinned touch
+       target now (it no longer props the header height from the flex flow), so
+       the header itself must be at least as tall as the target. */
+    min-height: 48px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    cursor: move;
+    touch-action: none;
+  }
+  body.mobile-touch #mobile-extra-controls .panel-title .x-btn {
+    /* Meet the 40x40 mobile touch floor (was 32x28), matching the general
+       body.mobile-touch .x-btn rule. */
+    min-width: 40px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* Issue 1577 round 2 (4): 4 columns instead of 3 so each More-tray button is a
+     bit narrower (the tray holds a long list of verbs, and the wide 3-up pills
+     were bulkier than they needed to be). */
+  body.mobile-touch #mobile-extra-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    /* No chrome-scale here: the More tray is a TRANSIENT modal, not persistent
+       chrome, so shrinking it frees no world view. Keep its pills at the 40px
+       touch floor regardless of the persistent-HUD chrome scale. */
+    grid-auto-rows: 40px;
+    gap: 6px;
+  }
+  body.mobile-touch #mobile-extra-controls .mobile-btn {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 8px;
+    font-size: 14px;
+    /* The base .mobile-btn's border-radius: 50% is meant for the near-square
+       combat/hotbar buttons; on this wide row it computes a squashed oval
+       (elliptical corner radii bigger than the box is tall). A pill needs the
+       radius capped at half the height so the ends are true semicircles and
+       the sides stay straight. */
+    border-radius: 20px;
+  }
+  body.mobile-touch #mobile-extra-controls .mobile-label {
+    display: inline;
+    margin: 0;
+    font-size: 9px;
+    color: #e6d8ae;
+  }
+  body.mobile-touch #mobile-extra-controls .mobile-btn .ui-icon {
+    flex: 0 0 18px;
+  }
+  /* A toggle tray button (e.g. Nameplates) glows gold while its feature is on. */
+  body.mobile-touch #mobile-extra-controls .mobile-btn.active {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 8px #ffd10066,
+      inset 0 0 6px #ffd10033;
+  }
+  body.mobile-touch #mobile-extra-controls .mobile-btn.active .mobile-label {
+    color: var(--gold);
+  }
+  /* music toggle: a diagonal slash over the note signals "off" (mirrors #mm-music) */
+  body.mobile-touch #mobile-music {
+    position: relative;
+  }
+  body.mobile-touch #mobile-music.mm-muted::after {
+    content: "";
+    position: absolute;
+    left: 21px;
+    top: 50%;
+    width: 24px;
+    height: 2px;
+    border-radius: 2px;
+    background: #f0e8d2;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.7);
+    transform: translate(-50%, -50%) rotate(-45deg);
+    pointer-events: none;
+  }
+  body.mobile-touch #bottom-bar {
+    left: calc(max(18px, env(safe-area-inset-left)) + 172px);
+    right: calc(max(18px, env(safe-area-inset-right)) + 172px);
+    bottom: calc(64px + env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    z-index: 18;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+  body.mobile-touch #actionbar-row {
+    pointer-events: auto;
+    width: 100%;
+    min-width: 0;
+  }
+  /* #bottom-bar is not the hotbar (that is already hidden on touch above);
+     it docks the player frame / petbar / meters-window / stancebar stack. Only
+     bags and the character sheet are CSS-verified to cover the ENTIRE mobile
+     viewport (10px/0 inset on every edge, see the near-fullscreen block
+     below), matching the existing "covering the frame is fine here" tradeoff
+     already accepted for those two windows specifically. Every other game
+     window (loot, lockpick, delve-rite, loot-settings, map, quest-log,
+     vendor, ...) only pins its edges/top on touch and leaves real screen
+     visible below, so hiding the frame there would hide HP/resource while
+     combat continues. body.mobile-fullscreen-window-open is computed in
+     Hud.syncAnyWindowOpenState via isMobileFullscreenWindowOpen. */
+  body.mobile-touch.mobile-fullscreen-window-open #bottom-bar {
+    display: none;
+  }
+  body.mobile-touch #xpbar {
+    display: none;
+  }
+  body.mobile-touch #player-frame {
+    --xp-ring-start: 210deg;
+    --xp-ring-arc: 360deg;
+  }
+  body.mobile-touch #player-frame::before {
+    content: "";
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    width: 73px;
+    height: 73px;
+    z-index: 2;
+    opacity: 0.96;
+    pointer-events: none;
+    border-radius: 50%;
+    background: conic-gradient(
+      from var(--xp-ring-start),
+      #b85eff 0deg calc(var(--xp-fill, 0) * 360deg),
+      rgba(125, 88, 158, 0.34) calc(var(--xp-fill, 0) * 360deg) var(--xp-ring-arc),
+      transparent var(--xp-ring-arc) 360deg
+    );
+    box-shadow: 0 0 8px rgba(184, 94, 255, 0.28);
+    -webkit-mask: radial-gradient(
+      farthest-side,
+      transparent calc(100% - 7px),
+      #000 calc(100% - 6px)
+    );
+    mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+  }
+  body.mobile-touch #player-frame:has(#xpbar.overflow)::before {
+    background: conic-gradient(
+      from var(--xp-ring-start),
+      #ffe27a 0deg calc(var(--xp-fill, 0) * 360deg),
+      rgba(184, 144, 42, 0.34) calc(var(--xp-fill, 0) * 360deg) var(--xp-ring-arc),
+      transparent var(--xp-ring-arc) 360deg
+    );
+    box-shadow: 0 0 9px rgba(245, 200, 67, 0.34);
+  }
+  body.mobile-touch #xpbar .fill,
+  body.mobile-touch #xpbar .ticks {
+    display: none;
+  }
+  body.mobile-touch #xpbar .label {
+    display: none;
+  }
+  /* Issue 1577 (6): both bars are anchored directly above the player frame and
+     match its rendered width exactly (300px times the #player-frame scale
+     below, 0.82 here) instead of their own independent min()-clamped width, so
+     the bar ends line up with the frame instead of floating narrower/wider. */
+  body.mobile-touch #castbar {
+    position: fixed;
+    left: 50%;
+    /* Centred just above the bottom-centre #player-frame (14px inset + its
+       scaled ~48px height + a gap), the classic seat: with Chat/More moved to
+       the top-left trio the band over the player frame is free again, and the old
+       left-strip seat now belongs to Jump's hollow seat around the joystick
+       (a cast bar rendered behind a button, z 19 vs 30, was unreadable). */
+    bottom: calc(68px + env(safe-area-inset-bottom));
+    width: calc(300px * 0.82 * var(--mobile-chrome-scale, 1));
+    min-width: 0;
+    height: 6px;
+    transform: translateX(-50%);
+    z-index: 19;
+    border-width: 1px;
+    border-radius: 2px;
+    opacity: 0.9;
+  }
+  body.mobile-touch #castbar .label {
+    display: none;
+  }
+  /* The swing timer had no mobile seat at all (unlike #castbar above): it fell
+     back to the desktop `bottom: 234px` fixed value, which on a short mobile
+     landscape viewport lands mid-screen and covers enemy nameplates and their
+     HP bars during melee combat. Give it the same bottom-center seat as the
+     cast bar, stacked just above it so a melee swing and a cast/channel never
+     overlap each other either. */
+  body.mobile-touch #swingbar {
+    position: fixed;
+    left: 50%;
+    bottom: calc(76px + env(safe-area-inset-bottom));
+    width: calc(300px * 0.82 * var(--mobile-chrome-scale, 1));
+    min-width: 0;
+    height: 5px;
+    transform: translateX(-50%);
+    z-index: 19;
+    border-width: 1px;
+    border-radius: 2px;
+    opacity: 0.9;
+  }
+  body.mobile-touch #swingbar .label {
+    display: none;
+  }
+  body.mobile-touch #actionbar-row {
+    display: block;
+  }
+  body.mobile-touch #actionbar-stack {
+    width: 100%;
+    min-width: 0;
+  }
+  body.mobile-touch #petbar {
+    position: fixed;
+    left: 50%;
+    top: max(8px, env(safe-area-inset-top));
+    transform: translateX(-50%);
+    align-self: auto;
+    margin: 0;
+    z-index: 28;
+    pointer-events: auto;
+  }
+  /* Daily chest (issue 1577): the top-right rail button used to sit right next
+     to the minimap and overlap the buff/debuff bars at the landscape breakpoint.
+     It is folded into the More tray (#mobile-daily-rewards, styled with the rest
+     of #mobile-extra-grid) instead, so the whole #side-buttons rail (every
+     .micro-btn on it is already hidden below) and the standalone chest button
+     are hidden on mobile; the desktop rail and #daily-rewards-window are
+     untouched. */
+  body.mobile-touch #side-buttons {
+    display: none;
+  }
+  body.mobile-touch #daily-rewards-button {
+    display: none !important;
+  }
+  /* Idle-fade (mobile_chrome_fade.ts arms .mobile-chrome-idle on body after a
+     stretch of no touch): recedes the low-frequency chrome (the top-left
+     Chat/Social/More trio and the daily-chest rail), instantly restored on
+     the next touch. Deliberately
+     excludes the action ring and both joysticks -- cosmetic declutter only,
+     never the actionable info the graphics fairness rule protects (HP/target/
+     cast bars aren't in this selector list). */
+  body.mobile-touch.mobile-chrome-idle #mobile-combat-controls .mobile-btn,
+  body.mobile-touch.mobile-chrome-idle #mobile-consumables-toggle {
+    opacity: 0.5;
+  }
+  /* Chat has full contrast while open: when the player is deliberately using chat
+     (body.mobile-chat-open), the log, tabs, composer, and the Chat button itself stay
+     at full opacity even if the idle-fade class is still armed on <body>. The log /
+     tabs / composer are not in the fade's selector list, so this rule pins them (they
+     must never read as mid-fade while chat is up).
+     The Chat button is a HARDER case: it IS #mobile-combat-controls .mobile-btn, so the
+     idle fade above (specificity: 1 id + 3 classes) out-specifies a plain
+     body.mobile-touch.mobile-chat-open #mobile-chat pin (1 id + 2 classes) and the chat
+     button would stay faded while typing (OS keyboard taps are not page pointerdowns,
+     so .mobile-chrome-idle stays armed during a reply). Its full-contrast pin therefore
+     carries the SECOND id (#mobile-combat-controls #mobile-chat), giving it 2 ids to the
+     fade's 1, so opacity 1 wins. This is TEXT/control contrast only; it does NOT touch
+     the deliberate reply-mode chat-background fade (--chat-opacity below). */
+  body.mobile-touch.mobile-chat-open #chatlog-wrap,
+  body.mobile-touch.mobile-chat-open #chatlog-tabs,
+  body.mobile-touch.mobile-chat-open #chat-input,
+  body.mobile-touch.mobile-chat-open #mobile-chat {
+    opacity: 1;
+  }
+  body.mobile-touch.mobile-chat-open #mobile-combat-controls #mobile-chat {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.mobile-touch #mobile-combat-controls .mobile-btn {
+      transition: none;
+    }
+  }
+  /* The optional action bars are desktop-only. The mobile action ring above
+     owns ability casting on touch and pages through all three rows. */
+  body.mobile-touch #actionbar3 {
+    display: none;
+  }
+  body.mobile-touch #actionbar2 {
+    display: none;
+  }
+  /* The mobile action ring (above) supersedes every desktop bar: it makes the
+     hotbar castable on touch, so the scaled desktop rows would only duplicate
+     it. #actionbar-stack siblings (xpbar/player-frame/petbar) are untouched and
+     keep rendering via their own existing mobile rules elsewhere in this file.
+     All bars stay display:none, so no layout/sizing/drag/hover/state rule for
+     their contents is reachable here; that styling lives only in hud.css. */
+  body.mobile-touch #actionbar {
+    display: none;
+  }
+  /* The community-links rail (Discord/GitHub/Donate) is hidden in-game on
+     touch: its two-person toggle icon under the minimap read as a Friends
+     button next to the real Social button in the top-left trio. The links
+     stay reachable on desktop and from the homepage; the More tray's Discord
+     button covers the in-game path where configured. */
+  body.mobile-touch #community-hud {
+    display: none;
+  }
+  /* Issue uiux-overlap: the chatbox's .panel border reads as clutter on the
+     small touch viewport, so mobile drops the hard line while keeping the
+     desktop rule (base.css .panel) untouched. Mobile border restyle adds a soft
+     outer glow in its place instead: richer than a flat line, but still no hard
+     edge competing with the world behind it. */
+  body.mobile-touch #chatlog-frame {
+    border: none;
+    outline: none;
+    box-shadow:
+      0 0 12px #00000080,
+      0 0 0 1px color-mix(in srgb, var(--gold-dim) 35%, transparent);
+  }
+  body.mobile-touch #chatlog-wrap {
+    left: max(10px, env(safe-area-inset-left));
+    /* Shifted up from the action-bar area for a little more breathing room from
+       the bottom edge (was 160px, then 180px). The tab strip below now meets the
+       40px touch floor (was a 0.92-scaled ~20px), which adds ~18px of tab height
+       ABOVE the frame (tabs sit above the bottom-anchored log), so the seat drops
+       back to 162px to keep the tab strip's TOP, and thus its clearance from the
+       composer above, exactly where it sat with the short tabs. */
+    bottom: calc(162px + env(safe-area-inset-bottom));
+    width: min(calc(340px * var(--mobile-chrome-scale, 1)), calc(100vw - 20px));
+    display: none;
+    z-index: 24;
+  }
+  /* New model: tapping the Chat icon opens a centered READ panel; the composer is a
+     desktop-style bar at the TOP of that panel (main.ts moves #chat-input into
+     #chatlog-wrap as its first child on mobile), sitting above the tabs + log. Tapping
+     the composer bar raises the keyboard to type; hiding the keyboard returns to this read
+     view. Only the Chat icon closes the panel. One --mobile-chat-w var sizes the panel +
+     composer. Desktop is untouched; the long-press peek keeps its small bottom-left glance
+     (it clears mobile-chat-open, so none of this applies to it). */
+  body.mobile-touch.mobile-chat-open {
+    --mobile-chat-w: min(560px, calc(100vw - 24px));
+  }
+  body.mobile-touch.mobile-chat-open #chatlog-wrap {
+    display: flex;
+    flex-direction: column;
+    left: 50%;
+    right: auto;
+    /* Read view (keyboard down): a LARGE centered panel. Top clears the top-left
+       Chat/Social/More trio (a ~54px row scaled up to ~1.1x) so the Chat button stays
+       tappable ABOVE the panel to close it. The bottom is player-resizable: dragging the
+       bottom handle sets --mobile-chat-bottom (the bottom inset), clamped so the panel
+       keeps a usable minimum height and never runs off-screen. top + bottom + height:auto
+       stretches the panel between them. Default bottom is small so the panel is big. */
+    top: calc(max(8px, env(safe-area-inset-top)) + 64px);
+    bottom: calc(
+      env(safe-area-inset-bottom) +
+      clamp(12px, var(--mobile-chat-bottom, 52px), calc(100vh - 320px))
+    );
+    transform: translateX(-50%);
+    width: var(--mobile-chat-w);
+    height: auto;
+    /* In front of the sibling in-HUD frames (the ~19-45 z band) inside #ui; #ui itself
+       (z 80 on the touch HUD) already sits above #mobile-controls (z 60). */
+    z-index: 50;
+  }
+  /* The composer bar is the panel's first child (above the tabs + log), sized to the
+     panel width. It FLOWS in the flex column (not absolutely positioned / docked); order
+     -1 keeps it first even if it were inserted elsewhere. Reset the base composer's
+     absolute seat + chevron padding, and force off iOS Safari's native light textarea
+     appearance so it stays a dark panel bar (not a white box). */
+  body.mobile-touch.mobile-chat-open #chat-input {
+    position: static;
+    order: -1;
+    flex: 0 0 auto;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    transform: none;
+    width: 100%;
+    margin: 0 0 6px 0;
+    padding: 9px 12px;
+    min-height: 40px;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #0d0d14f2;
+    color: #e8e8e8;
+    border: 1px solid var(--gold-dim, #6f5a2a);
+    border-radius: 8px;
+  }
+  /* Mobile chat resize handle (hud.ts creates it as a BODY-LEVEL element): a visible grab
+     bar pinned to the open panel's bottom edge via the SAME --mobile-chat-bottom var, so it
+     tracks the panel with no JS. A very high z-index keeps it above any overlay (the mystery
+     white bar included), and touch-action:none makes a drag a resize, not a scroll. Shown
+     only while the read panel is open. */
+  .chat-mobile-resize {
+    display: none;
+  }
+  body.mobile-touch.mobile-chat-open .chat-mobile-resize {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    width: var(--mobile-chat-w);
+    /* Straddle the panel's bottom edge: the 30px bar is centred on the edge (edge - 15px). */
+    bottom: calc(
+      env(safe-area-inset-bottom) +
+      clamp(12px, var(--mobile-chat-bottom, 52px), calc(100vh - 320px)) -
+      15px
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    z-index: 300;
+    touch-action: none;
+    cursor: ns-resize;
+    pointer-events: auto;
+    border-radius: 0 0 8px 8px;
+    background: color-mix(in srgb, var(--panel-base, #14121c) 82%, transparent);
+    box-shadow: inset 0 1px 0 #ffffff10;
+  }
+  body.mobile-touch.mobile-chat-open .chat-mobile-resize::before {
+    content: "";
+    width: 56px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--gold-dim, #6f5a2a);
+    box-shadow:
+      0 0 0 1px #00000066,
+      inset 0 1px 0 #ffffff33;
+  }
+  /* The tab strip keeps its natural height; the log frame fills the rest of the panel
+     (the ~4-line strip cap only applies while closed or peeking). */
+  body.mobile-touch.mobile-chat-open #chatlog-tabs {
+    flex: 0 0 auto;
+  }
+  body.mobile-touch.mobile-chat-open #chatlog-frame {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+    max-height: none;
+  }
+  /* Bottom-anchor the log so recent lines sit at the BOTTOM of the pane (nearest the
+     input bar), not clustered at the top of a mostly-empty frame. margin-top:auto pushes
+     content down when there is slack and collapses to 0 on overflow (no top clipping the
+     way justify-content:flex-end would). Scoped to the open touch chat; desktop untouched. */
+  body.mobile-touch.mobile-chat-open #chatlog-frame .chat-pane.active {
+    display: flex;
+    flex-direction: column;
+  }
+  body.mobile-touch.mobile-chat-open #chatlog-frame .chat-pane.active > :first-child {
+    margin-top: auto;
+  }
+  /* Long-pressing the Chat button toggles a read-only peek at the log without
+     raising the keyboard composer. It must not eat taps meant for the world. */
+  body.mobile-touch.mobile-chatlog-peek #chatlog-wrap {
+    display: block;
+    pointer-events: none;
+  }
+  body.mobile-touch.mobile-chatlog-peek #mobile-chat {
+    border-color: var(--gold);
+    box-shadow:
+      0 0 0 1px var(--gold),
+      0 0 10px #c9a84d66;
+  }
+  /* Issue 1577 round 2 (6): cap the visible chat history to about 4 lines on
+     mobile (it scrolls for more) so the log stays a compact strip instead of a
+     tall panel. Height tracks the Chat Text Size setting (--chat-font-scale) so
+     4 lines stays 4 lines at any text size. */
+  body.mobile-touch #chatlog-frame {
+    height: calc(11px * var(--chat-font-scale, 1) * 1.4 * 4 + 10px);
+  }
+  body.mobile-touch #chatlog-tabs {
+    /* No down-scale on touch: the desktop 0.92 shrank the 22px tabs to ~20px, far
+       below the 40px tap floor. The tabs are sized up to the floor instead (below),
+       so the strip renders at its natural (unscaled) size here. */
+    transform: none;
+    /* The chat-box move gesture is desktop-only (onChatBoxMoveStart bails on mobile),
+       so allow a horizontal touch-pan here to reach tabs that overflow the strip
+       (its scrollbar is hidden for the classic look). */
+    touch-action: pan-x;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Chat tabs meet the 40px touch floor on mobile (they were the desktop 22px tabs
+     scaled 0.92). Larger text too, and the strip stays a single nowrap pan-x row
+     with the sticky + button (base rules in hud.css, pinned by
+     tests/chat_tab_strip.test.ts). */
+  body.mobile-touch .chat-tab {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 16px;
+  }
+  body.mobile-touch .chat-tab-add {
+    min-width: 40px;
+    justify-content: center;
+    font-size: 18px;
+  }
+  /* The composer used to inherit the log's left-edge seat (left: max(10px,
+     ...)), which read as parked in the corner rather than the centered
+     typing box a player expects when they actually tap Chat to type (the log
+     itself stays left-anchored above the world nameplates; only the active
+     composer centers). Centered horizontally instead, independent of the
+     safe-area inset the left-anchored log still needs. */
+  body.mobile-touch #chat-input {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    /* Shifted up to match the log's new resting position above (was 296px). */
+    bottom: calc(316px + env(safe-area-inset-bottom));
+    width: min(calc(360px * var(--mobile-chrome-scale, 1)), calc(100vw - 40px));
+    min-height: 40px;
+    box-sizing: border-box;
+    font-size: 16px;
+    /* Reserve room for the 40px keyboard-dismiss chevron overlaid at the composer's
+       right edge: without it, typed text runs under the chevron and a caret tap in the
+       last 40px lands on the button. box-sizing: border-box keeps the outer width fixed. */
+    padding-right: 46px;
+  }
+  /* The in-app keyboard-dismiss chevron (#chat-dismiss) is hidden in the current model:
+     the OS keyboard's own hide key drops the keyboard and returns to the read view, and
+     the Chat icon closes the panel. The button stays in the template (harmless), it is
+     just never shown on mobile. */
+  body.mobile-touch #chat-dismiss {
+    display: none;
+  }
+  /* Once the on-screen keyboard opens (mobile-keyboard-open, toggled by
+     keyboard_viewport_applier.ts off the visualViewport resize), the whole panel (composer
+     bar + tabs + log) re-lays as a flex column filling the space ABOVE the keyboard: the
+     composer stays at the TOP, the tab strip keeps its natural height, and the log frame
+     flexes to fill the rest. No composer reservation is needed, since the composer is a
+     flow item inside the panel (from the open rule above), not a separately-docked bar. */
+  body.mobile-touch.mobile-keyboard-open.mobile-chat-open #chatlog-wrap {
+    top: max(6px, env(safe-area-inset-top));
+    bottom: auto;
+    /* A DEFINITE height (not a top+bottom stretch): the visible-above-keyboard band
+       (--mobile-keyboard-visible-vh) minus the top inset and an 8px gap above the keyboard
+       line, so the panel never sits under the keyboard. */
+    height: calc(
+      var(--mobile-keyboard-visible-vh, 100vh) -
+      max(6px, env(safe-area-inset-top)) -
+      8px
+    );
+  }
+  /* The low-priority Chat/Social/More trio yields while the keyboard is up: the panel top
+     rises to the safe-area top and would otherwise sit over it (and the panel, in #ui z 80,
+     paints above the trio anyway). Fairness-neutral menu chrome; it returns the instant the
+     keyboard drops. */
+  body.mobile-touch.mobile-keyboard-open.mobile-chat-open #mobile-combat-controls {
+    display: none;
+  }
+  /* The open chat frame stays a solid, readable panel (it uses the player's normal Chat
+     Background Opacity, --chat-opacity default 0.95). An earlier build faded it to ~0.14
+     while replying "to see the world behind it"; on a real device that made the chatbox
+     nearly invisible, which is the opposite of what an open chat wants. Glancing at the
+     log without opening it is the long-press peek's job instead. */
+  /* Own HP/mana lives bottom-center, the one part of the screen every other
+     mobile element deliberately leaves empty (move joystick bottom-left,
+     combat cluster + hotbar bottom-right, low-frequency verbs + minimap rail
+     top corners) -- keeping the HUD as unobtrusive as possible while still
+     putting the player's own vitals where the thumb never has to look away
+     from center to check them. justify-content stays flex-start (not
+     centered): the container itself is centered on screen via left/transform,
+     but internally the portrait must stay flush at the container's own
+     origin, since the XP ring (#player-frame::before) is positioned relative
+     to that origin, not to the portrait element. */
+  body.mobile-touch #player-frame {
+    position: fixed;
+    left: 50%;
+    top: auto;
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    z-index: 21;
+    width: 300px;
+    margin: 0;
+    display: flex;
+    justify-content: flex-start;
+    transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
+    transform-origin: center bottom;
+  }
+  body.mobile-touch #player-frame .portrait-wrap {
+    z-index: 3;
+  }
+  body.mobile-touch #player-frame .uf-bars {
+    position: relative;
+    z-index: 1;
+    width: 224px;
+    max-width: 224px;
+    flex: none;
+  }
+  body.mobile-touch #target-frame {
+    left: max(20px, calc(env(safe-area-inset-left) + 10px));
+    top: calc(max(8px, env(safe-area-inset-top)) + 72px);
+    transform: scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
+    transform-origin: left top;
+  }
+  /* Issue 1577 (1): party frames used to stack in a single column no matter the
+     size, so a full party ate more vertical space than a landscape phone can
+     spare. The adaptive double-stack now lives on the .party-rows WRAPPER (below),
+     not on #party-frames itself: the container is a simple top-to-bottom column
+     (collapse chip, the rows wrapper, master-loot control), so the
+     chip always sits alone on its own line and no member frame can auto-flow beside
+     it (the pre-wrapper grid put the chip in column 1 and flowed a member frame into
+     column 1 row 2 / column 2 row 1, one of them beside the chip). */
+  body.mobile-touch #party-frames {
+    position: fixed;
+    left: max(20px, calc(env(safe-area-inset-left) + 10px));
+    top: calc(max(8px, env(safe-area-inset-top)) + 74px);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: auto;
+    z-index: 5;
+  }
+  /* The member-rows wrapper carries the adaptive double-stack the container used to: a
+     CSS grid with grid-auto-flow: column and 2 explicit rows does the adaptive part with
+     no branching logic in JS (1-2 members fill only column 1, 3-4 wrap into column 2),
+     growing HORIZONTALLY instead of vertically. It sits below the chip in the container
+     column, so the chip is never a grid sibling of the member frames. This mobile grid
+     overrides the desktop display: contents (later @layer + higher specificity). */
+  body.mobile-touch #party-frames .party-rows {
+    display: grid;
+    zoom: 1;
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(2, auto);
+    column-gap: 4px;
+    row-gap: 0;
+    max-width: calc(100dvw - max(20px, calc(env(safe-area-inset-left) + 10px)) - 10px);
+    max-height: calc(100dvh - max(8px, env(safe-area-inset-top)) - 129px);
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  /* A real raid must not inherit the party-only two-row column flow: with nine
+     visible allies that would create five columns and run off a portrait phone.
+     Raid presentation fills two bounded columns top-to-bottom instead. */
+  body.mobile-touch #party-frames.party-style-raid .party-rows {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, calc(112px * var(--mobile-chrome-scale, 1))));
+    grid-template-rows: none;
+  }
+  /* A real raid must not inherit the party-only two-row column flow: with nine
+     visible allies that would create five columns and run off a portrait phone.
+     Raid presentation fills two bounded columns top-to-bottom instead. */
+  body.mobile-touch #party-frames.party-style-raid .party-rows {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, calc(112px * var(--mobile-chrome-scale, 1))));
+    grid-template-rows: none;
+  }
+  body.mobile-touch #party-frames.below-target {
+    /* +135px (was 130px): the collapse chip is the container's first child now, so keep
+       it clear of the target frame's bottom edge (the same +5px nudge as landscape). */
+    top: calc(max(8px, env(safe-area-inset-top)) + 135px);
+  }
+  body.mobile-touch #party-frames.below-target .party-rows {
+    max-height: calc(100dvh - max(8px, env(safe-area-inset-top)) - 190px);
+  }
+  /* party rows are role="button" tap targets (tap to target a member), so they
+     must clear the 40x40 mobile touch floor, not the compact desktop
+     raid-frame height. Base and landscape both move 30/25px up to 40px.
+     Width is trimmed from the old single-column 132px to compensate for the new
+     double-stack layout (issue 1577 (2)) so two columns still fit a phone width. */
+  body.mobile-touch #party-frames .party-frame {
+    width: calc(112px * var(--mobile-chrome-scale, 1));
+    min-height: 40px;
+    padding: 3px 6px;
+    border-radius: 0;
+    border-bottom-width: 1px;
+    /* Mobile border restyle: keeps the interior shading, adds the same
+       double-line hairline treatment as the other mobile windows above. */
+    box-shadow:
+      inset 0 0 10px rgba(0, 0, 0, 0.35),
+      inset 0 0 0 1px var(--gold-dim);
+  }
+  /* Issue 1577 round 2 (1): the party frame's opaque black panel (the shared
+     .uf-bars --panel-bg at ~0.95 alpha) reads as a heavy black slab on a phone.
+     Swap it for the translucent glass the rest of the mobile chrome uses (same
+     gradient hue, low alpha, plus the glass blur) so the frames sit lightly over
+     the world instead of blacking it out. Mobile only; desktop .uf-bars keeps
+     its solid panel. */
+  body.mobile-touch #party-frames .party-frame .uf-bars {
+    background: linear-gradient(170deg, #15151f66 0%, #0b0b1266 60%, #08080d66 100%);
+    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+  }
+  /* Round the top corners of the FIRST member frame and pull every later one up 1px.
+     Keyed on :first-of-type (the first .party-frame div) rather than :first-child,
+     because the collapse chip (a <button>) is now the container's first child, so the
+     top member row is no longer :first-child; :first-of-type still selects it whether
+     or not the chip precedes it (the chip is a button, the rows are divs). */
+  body.mobile-touch #party-frames .party-frame:first-of-type {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+  body.mobile-touch #party-frames .party-frame:not(:first-of-type) {
+    margin-top: -1px;
+  }
+  body.mobile-touch #party-frames .party-frame .pfm-name {
+    min-height: 14px;
+    gap: 3px;
+    font-size: 10px;
+    line-height: 1.1;
+  }
+  body.mobile-touch #party-frames .party-frame .pfm-id {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+  body.mobile-touch #party-frames .pfm-crest {
+    width: 12px;
+    height: 12px;
+    margin-right: 2px;
+    border-radius: 2px;
+    flex: 0 0 auto;
+  }
+  body.mobile-touch #party-frames .party-frame .pfm-meta {
+    gap: 2px;
+  }
+  body.mobile-touch #party-frames .party-frame .pfm-name .lead,
+  body.mobile-touch #party-frames .party-frame .pf-badge {
+    font-size: 9px;
+  }
+  body.mobile-touch #party-frames .party-frame .bar {
+    height: 5px;
+    margin-top: 1px;
+  }
+  /* The desktop .pfm-auras is an absolute bottom-right corner overlay (right:2px,
+     bottom:2px, overflow:hidden). On the compact ~40px mobile member row the 16px
+     desktop icons crowd the name/HP, so shrink them and cap the strip to a small
+     corner cluster that stays clear of the member name. Overflow:hidden and the
+     absolute positioning are inherited from the desktop rule. */
+  body.mobile-touch #party-frames .party-frame .pfm-auras {
+    max-width: 60%;
+    gap: 1px;
+  }
+  body.mobile-touch #party-frames .pfm-auras .buff {
+    width: 13px;
+    height: 13px;
+  }
+  body.mobile-touch #party-frames.party-style-raid .party-frame {
+    height: max(40px, var(--party-frame-height, 42px));
+    min-height: 40px;
+    padding: 0;
+  }
+  body.mobile-touch #party-frames.party-style-raid .party-frame .bar.hp {
+    height: auto;
+    margin: 0;
+  }
+  body.mobile-touch #party-frames.party-style-raid .party-frame > .bar:not(.hp) {
+    height: 3px;
+    margin: 0;
+  }
+  /* The mobile-only collapse chip (a "Party" disclosure header) the party painter
+     seats first in #party-frames while in a party on the touch HUD. Collapsed by
+     default (a persisted USER choice, never a graphics-tier signal): only the chip
+     shows; the member frames reveal when the container gains
+     .party-expanded. The chip reuses the glass look + chevron rotate of the
+     consumables toggle. Never rendered on desktop (the painter builds it only under
+     body.mobile-touch), so the desktop stack is unchanged. */
+  body.mobile-touch #party-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 40px;
+    min-height: 40px;
+    /* margin-bottom 5px (>= the 4px interactive touch gap the audit now enforces between
+       the chip and each member frame): the chip is a flex-column sibling ABOVE the rows
+       wrapper, so this bottom margin is the clearance between the chip and the topmost
+       member frame in the expanded stack. */
+    margin: 0 0 5px;
+    padding: 6px 12px;
+    border: 1px solid var(--mobile-glass-border, #cba43d8c);
+    border-radius: 8px;
+    background: var(--mobile-glass-bg, linear-gradient(160deg, #23212de3, #0e0d10eb));
+    -webkit-backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    backdrop-filter: blur(var(--mobile-glass-blur, 8px));
+    color: #d8b98a;
+    cursor: var(--cursor-point);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 8px #0009;
+  }
+  body.mobile-touch #party-chip:active {
+    border-color: var(--gold);
+    color: #fff;
+  }
+  body.mobile-touch #party-chip .ui-icon {
+    width: 11px;
+    height: 11px;
+    flex: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    body.mobile-touch #party-chip .ui-icon {
+      transition: transform 0.12s ease;
+    }
+  }
+  /* Expanded: the chevron points down and the frames show. On mobile the member rows
+     show ONLY while the container carries .party-expanded, so BOTH the
+     collapsed state (chip present, not expanded) AND the chat-yield state (chip removed
+     while chat is open) hide the whole stack, leaving the chip (if present) as the only
+     party UI. On desktop this rule never applies (no body.mobile-touch), so the desktop
+     stack is unchanged. */
+  body.mobile-touch #party-frames.party-expanded #party-chip {
+    border-color: var(--gold-dim);
+    color: #ffdf9c;
+  }
+  body.mobile-touch #party-frames.party-expanded #party-chip .ui-icon {
+    transform: rotate(90deg);
+  }
+  body.mobile-touch #party-frames:not(.party-expanded) .party-frame {
+    display: none;
+  }
+  body.mobile-touch #buff-bar {
+    right: max(10px, env(safe-area-inset-right));
+    top: max(140px, env(safe-area-inset-top));
+    max-width: calc(180px * var(--mobile-chrome-scale, 1));
+  }
+  body.mobile-touch #debuff-bar {
+    right: max(20px, calc(env(safe-area-inset-right) + 10px));
+    top: calc(max(140px, env(safe-area-inset-top)) + 36px);
+    max-width: calc(180px * var(--mobile-chrome-scale, 1));
+  }
+  body.mobile-touch #minimap-wrap {
+    right: max(20px, calc(env(safe-area-inset-right) + 10px));
+    top: max(8px, env(safe-area-inset-top));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: scale(calc(0.94 * var(--mobile-chrome-scale, 1)));
+    transform-origin: right top;
+  }
+  body.mobile-touch #zone-label {
+    order: 0;
+  }
+  body.mobile-touch #minimap-disc {
+    order: 1;
+  }
+  body.mobile-touch #minimap-coords {
+    order: 2;
+  }
+  body.mobile-touch #compass {
+    order: 3;
+  }
+  body.mobile-touch #minimap-clock {
+    position: static;
+    order: 4;
+    transform: none;
+    margin: 5px auto 0;
+  }
+  /* The minimap wrapper is scaled down on touch, so counter-scale the disc
+     controls and place them in a row below the aura strip, left of the map. */
+  body.mobile-touch #raid-lockout {
+    left: auto;
+    right: calc(100% + 10px);
+    top: 156px;
+    bottom: auto;
+    width: 44px;
+    height: 44px;
+    border-width: 2px;
+    transform: scale(1.25);
+    transform-origin: right top;
+  }
+  body.mobile-touch #raid-lockout svg {
+    width: 24px;
+    height: 24px;
+  }
+  body.mobile-touch #mail-indicator {
+    right: calc(100% + 74px);
+    top: 156px;
+    bottom: auto;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 999px;
+    border-width: 2px;
+    transform: scale(1.25);
+    transform-origin: right top;
+  }
+  body.mobile-touch #mail-indicator .ui-icon {
+    width: 22px;
+    height: 22px;
+  }
+  body.mobile-touch #mail-indicator .mail-indicator-count {
+    position: absolute;
+    right: 3px;
+    top: 2px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 3px;
+    border-radius: 999px;
+    font-size: 11px;
+    line-height: 16px;
+  }
+  body.mobile-touch #minimap-zoom {
+    display: none;
+  }
+  body.mobile-touch #compass-heading {
+    display: none;
+  }
+  body.mobile-touch #right-tracker-stack {
+    right: max(10px, env(safe-area-inset-right));
+    top: max(150px, env(safe-area-inset-top));
+    width: calc(190px * var(--mobile-chrome-scale, 1));
+  }
+  body.mobile-touch #quest-tracker {
+    font-size: 11px;
+  }
+  body.mobile-touch #meters-window {
+    position: fixed;
+    left: calc(max(18px, env(safe-area-inset-left)) + 132px);
+    right: auto;
+    top: auto;
+    bottom: calc(31px + env(safe-area-inset-bottom));
+    width: min(220px, calc(50vw - 144px));
+    min-width: 142px;
+    max-height: min(170px, calc(var(--app-vh) / var(--ui-scale, 1) - 128px));
+    /* Scroll vertically instead of clipping: the empty-state discoverability
+       hint can wrap to several lines in this narrow column, and a clipped hint
+       with no scroll affordance would silently hide it. */
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 25;
+  }
+  /* Left-handed mirror: swap the move joystick (and the utility cluster and
+     action ring that hug the two corners, see below) so the movement stick
+     sits under the right thumb. Opt-in via the "Left-handed Touch" toggle in
+     Key Bindings; the centred Chat/More pair stays put. */
+  body.mobile-touch.mobile-left-handed .mobile-joystick {
+    left: auto;
+    right: max(18px, env(safe-area-inset-right));
+  }
+  /* The floating-joystick capture zone follows the joystick's mirrored home so
+     a right thumb can land anywhere near the stick (and so the zone never sits
+     under the mirrored action ring on the left). */
+  body.mobile-touch.mobile-left-handed #mobile-move-zone {
+    left: auto;
+    right: 0;
+  }
+  /* The paged action ring (Phase 1) lives bottom-right, the same corner the
+     move joystick mirrors to above. Pin the ring to the LEFT in left-handed
+     mode instead so it moves under the (now-right) move thumb's opposite hand
+     and stops overlapping it; mirror every absolutely positioned ring child by
+     swapping its right: offset to the identical left: expression so the
+     crescent arcs for a left thumb instead of a right one. */
+  body.mobile-touch.mobile-left-handed #mobile-action-ring {
+    left: max(18px, env(safe-area-inset-left));
+    right: auto;
+    transform-origin: left bottom;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-action-attack {
+    left: 0;
+    right: auto;
+  }
+  body.mobile-touch.mobile-left-handed .mobile-action-slot[data-mobile-index="0"] {
+    left: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) -
+      var(--mobile-ring-action-size) /
+      2
+    );
+    right: auto;
+  }
+  body.mobile-touch.mobile-left-handed .mobile-action-slot[data-mobile-index="1"] {
+    left: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) *
+      0.9239 -
+      var(--mobile-ring-action-size) /
+      2
+    );
+    right: auto;
+  }
+  body.mobile-touch.mobile-left-handed .mobile-action-slot[data-mobile-index="2"] {
+    left: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) *
+      0.7071 -
+      var(--mobile-ring-action-size) /
+      2
+    );
+    right: auto;
+  }
+  body.mobile-touch.mobile-left-handed .mobile-action-slot[data-mobile-index="3"] {
+    left: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) *
+      0.3827 -
+      var(--mobile-ring-action-size) /
+      2
+    );
+    right: auto;
+  }
+  body.mobile-touch.mobile-left-handed .mobile-action-slot[data-mobile-index="4"] {
+    left: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-action-size) / 2);
+    right: auto;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-action-page-toggle {
+    left: calc(var(--mobile-ring-attack-size) / 2 - var(--mobile-ring-toggle-size) / 2);
+    right: auto;
+  }
+  /* Target swap and Use keep their crescent-hollow seats, mirrored with the
+     ring (same cos factors as their right-handed rules: 0.7071 for Target at
+     135deg, due left for Use at 180deg). */
+  body.mobile-touch.mobile-left-handed #mobile-target-cycle {
+    left: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-hollow) *
+      0.7071 -
+      var(--mobile-ring-secondary-size) /
+      2
+    );
+    right: auto;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-interact {
+    left: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-hollow) -
+      var(--mobile-ring-secondary-size) /
+      2
+    );
+    right: auto;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-action-ring #mobile-jump {
+    left: calc(
+      var(--mobile-ring-attack-size) /
+      2 +
+      var(--mobile-ring-radius) *
+      2 -
+      var(--mobile-ring-hollow) -
+      var(--mobile-ring-secondary-size) /
+      2
+    );
+    right: auto;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-camera-joystick {
+    /* Left-handed mirrors the move joystick to the right (above) AND the ring
+       (this section, above) to the left, so the camera joystick's non-left-
+       handed LEFT home is now occupied by the mirrored ring. Stack it above the
+       move joystick's new right-side home instead (matching the non-left-handed
+       stacking geometry mirrored), so an opted-in joystick never collides with
+       either the move stick or the ring. */
+    right: max(18px, env(safe-area-inset-right));
+    left: auto;
+    bottom: calc(176px + env(safe-area-inset-bottom));
+    transform-origin: right bottom;
+  }
+  body.mobile-touch.mobile-left-handed #mobile-extra-controls {
+    left: 50%;
+    right: auto;
+  }
+  /* (No left-handed #castbar mirror: the bar is centre-anchored above the
+     player frame, symmetric by construction.) */
+  body.mobile-touch.mobile-left-handed #meters-window {
+    left: auto;
+    right: calc(max(18px, env(safe-area-inset-right)) + 132px);
+  }
+  body.mobile-touch #banner {
+    top: 18%;
+    max-width: calc(100vw - 24px);
+    font-size: calc(26px * var(--mobile-chrome-scale, 1));
+    line-height: 1.12;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  /* Vale Cup notification compaction (mobile). The desktop indicator (top:70px) and
+     in-match strip (top:64px, min-width 260px, 24px score) carry no touch rules, so
+     on a short landscape phone they float as a large upper-middle band. Compact both
+     hard and seat them against the very top edge (the #banner recipe above is the
+     precedent) so they hug the frame. Behaviour is unchanged: no dismissal is added
+     and the strip stays pointer-events:none (components.css). The arena-status
+     stacking exception (components.css #arena-status[style*="block"] ~ #vcup-indicator)
+     keeps a higher specificity, so when an arena match is live it still nudges the
+     compacted indicator below the arena banner. */
+  body.mobile-touch #vcup-indicator {
+    top: calc(env(safe-area-inset-top) + 6px);
+    gap: 4px;
+    padding: 2px 8px;
+    font-size: 10px;
+  }
+  body.mobile-touch #vcup-indicator .vcupi-title {
+    font-size: 10px;
+    letter-spacing: 0.2px;
+  }
+  body.mobile-touch #vcup-indicator .vcupi-score {
+    font-size: 12px;
+  }
+  body.mobile-touch #vcup-indicator .vcupi-clock {
+    font-size: 9.5px;
+  }
+  body.mobile-touch #vcup-match-hud {
+    top: calc(env(safe-area-inset-top) + 6px);
+    min-width: auto;
+    gap: 1px;
+    padding: 3px 10px 2px;
+  }
+  body.mobile-touch #vcup-match-hud .vcuph-row {
+    gap: 8px;
+  }
+  body.mobile-touch #vcup-match-hud .vcuph-side {
+    min-width: 0;
+    gap: 4px;
+  }
+  body.mobile-touch #vcup-match-hud .vcuph-name {
+    font-size: 10px;
+  }
+  body.mobile-touch #vcup-match-hud .vcuph-score {
+    font-size: 16px;
+    min-width: 16px;
+  }
+  body.mobile-touch #vcup-match-hud .vcuph-colon {
+    margin: 0 3px;
+    font-size: 13px;
+  }
+  body.mobile-touch #vcup-match-hud .vcuph-clock {
+    font-size: 10px;
+  }
+  body.mobile-touch #vcup-match-hud .vcuph-phase {
+    font-size: 10px;
+  }
+  /* The Vale Cup indicator/strip hug the top edge, but they yield the top-centre
+     line to whatever else needs it: the sideways consumables row when it is open
+     (no pet), and the pet bar when a pet is out. Drop one band in either case; drop
+     a second band when BOTH a pet is out (pet bar on the top line) AND the row is
+     open (it took the pet bar's usual second band), so the three never stack. */
+  body.mobile-touch.mobile-consumables-open #vcup-indicator,
+  body.mobile-touch.mobile-pet-active #vcup-indicator,
+  body.mobile-touch.mobile-consumables-open #vcup-match-hud,
+  body.mobile-touch.mobile-pet-active #vcup-match-hud {
+    top: calc(env(safe-area-inset-top) + 64px);
+  }
+  body.mobile-touch.mobile-pet-active.mobile-consumables-open #vcup-indicator,
+  body.mobile-touch.mobile-pet-active.mobile-consumables-open #vcup-match-hud {
+    top: calc(env(safe-area-inset-top) + 122px);
+  }
+  body.mobile-touch .window {
+    max-width: calc(var(--app-vw, 100vw) / var(--window-scale, 1) - 20px);
+    /* --window-scale, never --ui-scale: this generic rule also governs the
+       body-level windows OUTSIDE the zoomed #ui (the confirm/input dialog),
+       which pin --window-scale to 1 (see the shell note in layout.css). */
+    max-height: calc(var(--app-vh) / var(--window-scale, 1) - 40px);
+    padding-bottom: max(var(--window-pad), calc(18px + env(safe-area-inset-bottom)));
+    box-sizing: border-box;
+  }
+  /* Mobile border restyle: every mobile window (.window.panel covers bags,
+     character, talents, quest log, spellbook, loot, and every other modal window)
+     swaps the desktop's single flat 2px gold line (base.css .panel) for a richer
+     double-line, beveled look built purely from the existing gold/border tokens
+     (no new hardcoded colors): a thin dark outer hairline, a bright gold-dim inner
+     hairline one pixel in, an inner top highlight for the beveled edge, and a soft
+     drop shadow. Purely cosmetic (no layout change, box-shadow does not affect
+     box size) and fully static, no shimmer/animation, so prefers-reduced-motion
+     is a non-issue here. */
+  body.mobile-touch .window.panel {
+    border-color: var(--border);
+    box-shadow:
+      0 0 0 1px #000c,
+      inset 0 0 0 1px var(--gold-dim),
+      inset 0 1px 0 #ffffff1f,
+      0 3px 14px #000a;
+  }
+  /* The mobile close button is a 40x40 touch target pinned in the header's
+     top-right corner (absolute, see the .window > .panel-title shell rule in
+     layout.css), so reserve inline-end room for it: the title must never slide
+     under it, and the header must be at least as tall as the target. */
+  body.mobile-touch .window > .panel-title {
+    padding-inline: var(--window-pad) 52px;
+    min-height: 48px;
+  }
+  body.mobile-touch #leaderboard-window,
+  body.mobile-touch #daily-rewards-window {
+    z-index: 95;
+  }
+  /* Issue 1577 round 2 (5): the Daily Rewards window's entries (intro, the daily
+     summary, the spin section, the Verify Wallet card, tasks, leaderboard) used
+     to stack in a single tall column, wasting the wide landscape viewport and
+     forcing a long scroll. Flow them into 2 balanced columns; break-inside:avoid
+     keeps each card whole across the column break. */
+  body.mobile-touch #daily-rewards-window:not(.store-active) .dr-body {
+    column-count: 2;
+    column-gap: 12px;
+  }
+  body.mobile-touch #daily-rewards-window:not(.store-active) .dr-body > * {
+    break-inside: avoid;
+    margin-bottom: 10px;
+  }
+  body.mobile-touch #daily-rewards-window {
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    overflow: hidden;
+  }
+  body.mobile-touch #daily-rewards-window .woc-store-body {
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 116px);
+    padding: 10px;
+  }
+  body.mobile-touch .woc-store-tabs button {
+    min-width: 112px;
+    min-height: 44px;
+    padding: 0 12px;
+  }
+  body.mobile-touch .woc-store-hero {
+    grid-template-columns: 1fr;
+    min-height: 190px;
+    padding: 18px;
+    background:
+      linear-gradient(90deg, rgb(3 10 16 / 96%), rgb(4 17 27 / 76%)),
+      url("/claudium/claudium_coin_hero_3q.webp") 100% 50% / 190px auto no-repeat;
+  }
+  body.mobile-touch .woc-store-balance {
+    width: min(190px, 100%);
+  }
+  body.mobile-touch .woc-store-balance button,
+  body.mobile-touch .woc-store-card button {
+    min-height: 40px;
+  }
+  body.mobile-touch .woc-store-section-title {
+    align-items: start;
+    flex-direction: column;
+    gap: 4px;
+  }
+  body.mobile-touch .woc-store-section-title small {
+    text-align: left;
+  }
+  body.mobile-touch .woc-store-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* Season 1 Armory: two-up cards; the inspect panel stacks viewport over codex
+     so the lore stays scrollable under the 3D stage. */
+  body.mobile-touch .armory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  body.mobile-touch .armory-inspect {
+    grid-template-columns: minmax(0, 1fr);
+    max-height: calc(100dvh - 24px);
+  }
+  body.mobile-touch .armory-inspect-stage {
+    min-height: 250px;
+  }
+  body.mobile-touch .armory-inspect-panel {
+    border-top: 1px solid var(--rarity);
+    border-left: none;
+  }
+  /* Touch-target floor: the desktop toggles are compact; give thumbs 40px. */
+  body.mobile-touch .armory-mode-toggle button,
+  body.mobile-touch .armory-scene-toggle button {
+    min-height: 40px;
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+  body.mobile-touch .armory-inspect-actions button {
+    min-height: 44px;
+  }
+  /* The game is landscape-only on touch. Keep a complete Armory card within
+     the store scrollport instead of stretching two square previews across the
+     full phone width. The inspect dialog uses that same wide viewport as two
+     columns, reserving a fixed footer for Buy / Apply / Detach while only the
+     lore copy scrolls. */
+  @media (orientation: landscape) {
+    body.mobile-touch .woc-store-hero {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      min-height: 118px;
+      padding: 12px 14px;
+    }
+    body.mobile-touch .woc-store-balance {
+      align-self: center;
+    }
+    body.mobile-touch .armory-section {
+      margin-top: 10px;
+    }
+    body.mobile-touch .armory-section > header {
+      padding: 6px 8px;
+    }
+    body.mobile-touch .armory-grid {
+      grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+      gap: 8px;
+      padding: 8px;
+    }
+    body.mobile-touch .armory-card {
+      width: 100%;
+      max-width: 116px;
+      justify-self: center;
+    }
+    body.mobile-touch .armory-card-copy {
+      gap: 2px;
+      padding: 6px 7px 7px;
+    }
+    body.mobile-touch .armory-inspect-overlay {
+      padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
+        max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    }
+    body.mobile-touch .armory-inspect {
+      grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.8fr);
+      grid-template-rows: minmax(0, 1fr);
+      width: min(920px, 100%);
+      height: 100%;
+      max-height: none;
+    }
+    body.mobile-touch .armory-inspect-stage {
+      min-width: 0;
+      min-height: 0;
+    }
+    body.mobile-touch .armory-inspect-panel {
+      min-width: 0;
+      min-height: 0;
+      gap: 6px;
+      padding: 12px;
+      overflow: hidden;
+      border-top: none;
+      border-left: 1px solid var(--rarity);
+    }
+    body.mobile-touch .armory-inspect-details {
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 0;
+      padding-inline-end: 40px;
+      overflow-y: auto;
+    }
+    body.mobile-touch .armory-lore {
+      padding: 8px 10px;
+    }
+    body.mobile-touch .armory-inspect-actions {
+      flex: 0 0 auto;
+      gap: 8px;
+      margin-top: 0;
+      padding-top: 8px;
+    }
+  }
+  body.mobile-touch .woc-store-card {
+    min-height: 214px;
+  }
+  body.mobile-touch .woc-store-card > img {
+    height: 140px;
+  }
+  body.mobile-touch .woc-store-card-copy {
+    grid-template-columns: 1fr;
+  }
+  body.mobile-touch .woc-store-card button {
+    width: 100%;
+    justify-content: center;
+  }
+  @media (max-width: 520px) {
+    body.mobile-touch .woc-store-grid {
+      grid-template-columns: 1fr;
+    }
+    body.mobile-touch .woc-store-card > img {
+      height: 180px;
+    }
+  }
+  body.mobile-touch.mobile-window-open #ui {
+    z-index: 90;
+  }
+  /* ---------- mobile sheet base (shared near-fullscreen window pin) ---------- */
+  /* Phase 4 of the mobile combat HUD rework: the common near-fullscreen "sheet"
+     every big menu window pins to on touch, consolidated from separate per-window
+     copies of the same left/right/top/transform/overflow declarations. Every
+     window below still gets its own exception rule where its real layout differs
+     (a centered clamp width for quest-log/vendor/quest-dialog/spellbook/
+     options-menu, the vendor split-screen state, the bags bottom reservation,
+     the char-window left pin), so this base only carries what they all agree on:
+     edge-pinned within the 10px safe margin, box-sizing so the pin math includes
+     the border, and internal scroll. #market-window is the one window that keeps
+     this exact pin as its FINAL state (its own rule below only adds height/
+     overflow), everything else layers a further exception on top. */
+  body.mobile-touch #options-menu,
+  body.mobile-touch #quest-log-window,
+  body.mobile-touch #spellbook,
+  body.mobile-touch #vendor-window,
+  body.mobile-touch #train-window,
+  body.mobile-touch #market-window,
+  body.mobile-touch #quest-dialog,
+  body.mobile-touch #calendar-window,
+  body.mobile-touch #crafting-window,
+  body.mobile-touch #mailbox-window,
+  body.mobile-touch #emote-editor,
+  body.mobile-touch #arena-window,
+  body.mobile-touch #dungeon-finder-window,
+  body.mobile-touch #valecup-window,
+  body.mobile-touch #card-duel-window,
+  body.mobile-touch #delve-board,
+  body.mobile-touch #leaderboard-window,
+  body.mobile-touch #loot-settings-window,
+  body.mobile-touch #town-focus-window,
+  body.mobile-touch #dev-command-window,
+  body.mobile-touch #claudium-window {
+    left: 10px;
+    right: 10px;
+    top: 10px;
+    width: auto;
+    transform: none;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+  body.mobile-touch #dev-command-window {
+    height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    max-height: none;
+    overflow: hidden;
+  }
+  /* The LIST owns the tracks (rows subgrid into it, see components.css), so the
+     tighter mobile template lands on the list; the cap column wraps below. */
+  body.mobile-touch .profession-skill-list {
+    grid-template-columns: minmax(82px, 1fr) 34px minmax(68px, auto);
+  }
+  body.mobile-touch .profession-skill-row > :last-child {
+    grid-column: 1 / -1;
+  }
+  /* The cap value wraps to its own line per row on mobile (no cap column
+     exists), so the Cap column header would float over nothing: hide it. */
+  body.mobile-touch .profession-skill-header > :last-child {
+    display: none;
+  }
+  body.mobile-touch .qd-profession-choice select {
+    min-height: 40px;
+  }
+  body.mobile-touch .dev-command-header {
+    padding: 10px 54px 9px 12px;
+  }
+  body.mobile-touch .dev-command-header h2 {
+    font-size: 20px;
+  }
+  body.mobile-touch .dev-command-header p {
+    display: none;
+  }
+  body.mobile-touch .dev-command-toolbar {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 8px 10px;
+  }
+  body.mobile-touch .dev-command-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  body.mobile-touch .dev-command-tabs button,
+  body.mobile-touch .dev-command-run {
+    min-height: 40px;
+  }
+  body.mobile-touch .dev-command-grid {
+    grid-template-columns: 1fr;
+    padding: 9px 10px;
+  }
+  body.mobile-touch .dev-command-card {
+    min-height: 78px;
+    padding: 10px;
+  }
+  body.mobile-touch .dev-command-footer {
+    justify-content: flex-end;
+    min-height: 34px;
+    padding: 7px 10px;
+  }
+  body.mobile-touch .dev-command-footer > span {
+    display: none;
+  }
+  body.mobile-touch #claudium-window .cl-body {
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 78px);
+    padding: 10px;
+  }
+  body.mobile-touch #claudium-window .cl-balance {
+    grid-template-columns: 72px 1fr;
+    gap: 10px;
+    min-height: 86px;
+    padding: 8px 12px 8px 6px;
+  }
+  body.mobile-touch #claudium-window .cl-balance-art {
+    width: 72px;
+    height: 70px;
+  }
+  body.mobile-touch #claudium-window .cl-wallet-balances {
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr 1fr;
+    justify-items: start;
+  }
+  body.mobile-touch #claudium-window .cl-wallet-connect {
+    grid-template-columns: 1fr;
+  }
+  body.mobile-touch #claudium-window .cl-wallet-connect button {
+    grid-column: 1;
+    grid-row: auto;
+    min-height: 40px;
+  }
+  body.mobile-touch #claudium-window .cl-rail {
+    min-height: 44px;
+    padding: 7px 8px;
+    font-size: 12px;
+  }
+  body.mobile-touch #claudium-window .cl-sku-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  body.mobile-touch #claudium-window .cl-sku {
+    min-height: 236px;
+    padding: 0 8px 10px;
+  }
+  body.mobile-touch #claudium-window .cl-pack-art {
+    min-height: 118px;
+    margin: 0 -8px 4px;
+  }
+  body.mobile-touch #claudium-window .cl-pack-art img {
+    width: 112px;
+    height: 108px;
+  }
+  body.mobile-touch #claudium-window .cl-sku-buy {
+    min-height: 40px;
+  }
+  body.mobile-touch #claudium-window .cl-body {
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 78px);
+    padding: 10px;
+  }
+  body.mobile-touch #claudium-window .cl-balance {
+    grid-template-columns: 72px 1fr;
+    gap: 10px;
+    min-height: 86px;
+    padding: 8px 12px 8px 6px;
+  }
+  body.mobile-touch #claudium-window .cl-balance-art {
+    width: 72px;
+    height: 70px;
+  }
+  body.mobile-touch #claudium-window .cl-wallet-balances {
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr 1fr;
+    justify-items: start;
+  }
+  body.mobile-touch #claudium-window .cl-rail {
+    min-height: 44px;
+    padding: 7px 8px;
+    font-size: 12px;
+  }
+  body.mobile-touch #claudium-window .cl-sku-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  body.mobile-touch #claudium-window .cl-sku {
+    min-height: 236px;
+    padding: 0 8px 10px;
+  }
+  body.mobile-touch #claudium-window .cl-pack-art {
+    min-height: 118px;
+    margin: 0 -8px 4px;
+  }
+  body.mobile-touch #claudium-window .cl-pack-art img {
+    width: 112px;
+    height: 108px;
+  }
+  body.mobile-touch #claudium-window .cl-sku-buy {
+    min-height: 40px;
+  }
+  @media (orientation: landscape) {
+    body.mobile-touch #claudium-window .cl-body:has(> .cl-wallet-connect) {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: stretch;
+      gap: 10px;
+    }
+    body.mobile-touch
+      #claudium-window
+      .cl-body:has(> .cl-wallet-connect)
+      > :not(.cl-balance, .cl-wallet-connect) {
+      grid-column: 1 / -1;
+    }
+    body.mobile-touch #claudium-window .cl-wallet-connect {
+      margin-top: 0;
+    }
+  }
+  body.mobile-touch #vendor-window {
+    max-height: calc(58vh - 20px);
+  }
+  /* The Market carries a tab strip plus the filter selects, which stack to a tall
+     single column on mobile; the vendor's 58vh cap would leave the flex:1 listing
+     body (#market-body) zero height, so it collapsed and could not be scrolled.
+     Give the window the full available height (like #trade-window) so the listing
+     body keeps a usable, touch-scrollable height under the header. */
+  body.mobile-touch #market-window {
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    overflow: hidden;
+  }
+  /* Floor the listing body so it keeps a usable, touch-scrollable height even when
+     the subtype filter adds a third stacked row on a short landscape screen. (On a
+     very short viewport the window's overflow:hidden can still clip below this floor,
+     but the body scrolls internally, so it never collapses to the old zero height.) */
+  body.mobile-touch #market-body {
+    min-height: 96px;
+  }
+  body.mobile-touch .mkt-filters,
+  body.mobile-touch .mkt-filters.has-subtype {
+    grid-template-columns: 1fr;
+  }
+  body.mobile-touch .mkt-select-btn {
+    min-height: 40px;
+    font-size: 16px;
+  }
+  body.mobile-touch .mkt-select-option {
+    min-height: 40px;
+    font-size: 16px;
+  }
+  /* Phase 5: the tall list windows (mailbox, calendar) are flex columns with an
+     inner scroll body (#mailbox-body, .cal-day-pane) and overflow:hidden on the
+     shell. Edge-pinned they take the full available height (the #market-window
+     template) so the inner body keeps a usable, touch-scrollable height under the
+     header instead of the sheet's overflow-y:auto fighting the inner flex scroll. */
+  body.mobile-touch #mailbox-window,
+  body.mobile-touch #calendar-window {
+    height: auto;
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    overflow: hidden;
+  }
+  /* The leaderboard body (.lb-body) has its own 56vh scroll; cap the whole sheet to
+     the viewport so a long board never runs the window past the bottom edge. */
+  body.mobile-touch #leaderboard-window {
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+  }
+  /* Loot Settings is a small dialog; JS docks it beside the party frames on desktop
+     but on touch it joins the sheet. Its select is the one interactive control, so
+     the sheet pin plus the touch floor below is all it needs (no reflow hazard). */
+  /* Inspect (player profile) on mobile: a full-width, scrollable window with the
+     gear stacked into a single one-item-per-row list, so each item name reads in
+     full instead of being squeezed into two narrow columns. */
+  body.mobile-touch #inspect-window {
+    left: 10px;
+    right: 10px;
+    top: 10px;
+    width: auto;
+    max-width: calc(100vw - 20px);
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    transform: none;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+  body.mobile-touch .inspect-paperdoll {
+    flex-direction: column;
+  }
+  body.mobile-touch .inspect-paperdoll .equip-col {
+    width: 100%;
+  }
+  /* Drop the right column's mirrored layout so every row reads left to right. */
+  body.mobile-touch .inspect-paperdoll .equip-col-right .equip-slot {
+    flex-direction: row;
+    text-align: left;
+  }
+  body.mobile-touch #social-window,
+  body.mobile-touch #trade-window {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-width: calc(100vw - 20px);
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+  body.mobile-touch #social-window {
+    bottom: 10px;
+    height: min(560px, calc(var(--app-vh) / var(--ui-scale, 1) - 20px));
+  }
+  body.mobile-touch #trade-window {
+    top: 10px;
+    transform: none;
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    overflow-y: auto;
+  }
+  body.mobile-touch #trade-window .trade-cols {
+    flex-direction: column;
+  }
+  /* Issue 1577 round 2 (9): the bags window used to reserve 72px at the bottom to
+     keep clear of the player frame below it. The player frame is fine to cover
+     while the (modal, world-input-blocking) bag window is open, so drop the
+     reservation to the plain 10px safe margin and let the grid use the full
+     height. Only #bags changes here: #char-window / #talents-window keep their
+     own layouts, and the vendor-split #bags rule below keeps its reservation. */
+  body.mobile-touch #bags {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    max-height: none;
+    /* The base .window max-width clamp divides by --window-scale, not --ui-scale,
+       so it under-fills this inset-driven full-screen state below uiScale 1
+       (~83% width at 0.85). Full-screen is the insets' job; drop the clamp, as
+       the paired group rules already do. */
+    max-width: none;
+    box-sizing: border-box;
+    overflow: hidden;
+    /* Managed windows receive an inline desktop z-index. Bags is a modal sheet
+       here, so this scoped override must beat that inline value while leaving
+       desktop Need/Greed above its compact Bags window. */
+    z-index: 95 !important;
+  }
+  body.mobile-touch #bags .bag-grid {
+    min-height: 150px;
+  }
+  body.mobile-touch :is(.bag-grid, .bank-scroll, .soc-body, .ql-detail-body) {
+    padding-bottom: max(18px, calc(12px + env(safe-area-inset-bottom)));
+    scroll-padding-bottom: max(18px, calc(12px + env(safe-area-inset-bottom)));
+    box-sizing: border-box;
+  }
+  body.mobile-touch .bag-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.mobile-touch .bag-chip {
+    flex: 0 0 auto;
+  }
+  body.mobile-touch #social-window .soc-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.mobile-touch #social-window .soc-tab {
+    flex: 0 0 auto;
+    min-width: max-content;
+    padding-inline: 10px;
+    white-space: nowrap;
+  }
+  /* The desktop landscape layout lays friend/guild/ignore/block rows out in up
+     to two columns (`.soc-body`'s `grid-template-columns: repeat(auto-fill,
+     minmax(260px, 1fr))`); on a touch-narrow window that always collapses on
+     its own, but pin it explicitly so a stacked single column is guaranteed
+     regardless of the computed width, matching every other mobile list in
+     this window (raid groups collapse the same way below, on this same
+     `body.mobile-touch` selector rather than a viewport media query, since
+     it is the WINDOW's width, not the viewport's, that decides). */
+  body.mobile-touch #social-window .soc-body {
+    grid-template-columns: 1fr;
+  }
+  body.mobile-touch .raid-groups {
+    grid-template-columns: 1fr;
+  }
+  body.mobile-touch .raid-group {
+    border-top: 1px solid #3d3218;
+    padding-top: 6px;
+  }
+  body.mobile-touch .raid-group:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  body.mobile-touch .vendor-item,
+  body.mobile-touch .bag-item,
+  body.mobile-touch .mkt-tab,
+  body.mobile-touch .mkt-btn,
+  body.mobile-touch .mkt-list-btn,
+  body.mobile-touch #loot-window .btn,
+  body.mobile-touch .loot-roll-btn,
+  body.mobile-touch .soc-tab,
+  body.mobile-touch .soc-x,
+  body.mobile-touch .soc-sugg-item,
+  body.mobile-touch .trade-item.mine,
+  body.mobile-touch #social-window .btn,
+  body.mobile-touch #trade-window .btn {
+    min-height: 40px;
+    font-size: 16px;
+  }
+  /* Short landscape phones keep only actionable roll cards (hud.ts filters the
+     answered watch rows). The desktop vote monitor is useful context, but its
+     multi-row strip makes one mobile card taller than the rail's usable height
+     and pushes Need/Greed/Pass below the fold. Results still land in loot chat. */
+  body.mobile-touch .loot-roll-votes {
+    display: none;
+  }
+  body.mobile-touch .soc-add input,
+  body.mobile-touch .trade-money input {
+    min-height: 40px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  body.mobile-touch .soc-x,
+  body.mobile-touch .soc-name.soc-link {
+    min-width: 40px;
+  }
+  body.mobile-touch .soc-name.soc-link {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    white-space: normal;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+  }
+  body.mobile-touch .x-btn {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+  body.mobile-touch #player-card-modal .pc-pose,
+  body.mobile-touch #player-card-modal .pc-wallet-toggle,
+  body.mobile-touch #player-card-modal .pc-actions .btn {
+    min-height: 40px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  body.mobile-touch #player-card-modal .pc-link-input {
+    font-size: 16px;
+  }
+  /* Mobile enemy select tooltip: compact and anchored from hud.ts to the left of
+     the minimap so it does not cover the bottom-right action controls. */
+  body.mobile-touch #tooltip.mob-tooltip {
+    max-width: min(
+      188px,
+      calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right))
+    );
+    padding: 5px 7px;
+    line-height: 1.25;
+    font-size: calc(10px * var(--tooltip-scale, 1));
+  }
+  body.mobile-touch #tooltip.mob-tooltip .tt-title {
+    font-size: calc(12px * var(--tooltip-scale, 1));
+    line-height: 1.1;
+  }
+  body.mobile-touch #tooltip.mob-tooltip .tt-sub,
+  body.mobile-touch #tooltip.mob-tooltip .tt-red,
+  body.mobile-touch #tooltip.mob-tooltip .tt-green,
+  body.mobile-touch #tooltip.mob-tooltip .tt-quest-name,
+  body.mobile-touch #tooltip.mob-tooltip .tt-quest-obj {
+    font-size: calc(10px * var(--tooltip-scale, 1));
+    line-height: 1.2;
+  }
+  /* Char/talents mobile redo: the user explicitly prefers the character and
+     talents windows covering the ENTIRE mobile screen over the old
+     partial-sheet layout, so both go full-screen landscape-first overlays
+     (inset 0, own scroll) instead of pinning to a corner with a reserved
+     player-frame band. Covering the frame is fine here: the window itself is
+     modal (it already traps focus / blocks world input), so nothing actionable
+     is hidden behind it. */
+  body.mobile-touch #char-window {
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    transform: none;
+    width: auto;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  /* The character sheet docks its bags companion side by side on touch, exactly like
+     the bank cluster (body.bank-open above): a full-height panel split 50/50 at the
+     viewport centre, driven by body.char-bags-paired (hud.ts syncCharBagsPairing).
+     Without it the bags would cover the paperdoll on a phone and the drag-to-equip
+     gesture would have no visible socket to land on. The bank/vendor clusters own the
+     bags companion when they are up, so the pure core stands down there. */
+  body.mobile-touch.char-bags-paired #char-window,
+  body.mobile-touch.char-bags-paired #bags {
+    position: fixed;
+    top: max(10px, env(safe-area-inset-top));
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    width: auto;
+    max-width: none;
+    max-height: none;
+    transform: none;
+    box-sizing: border-box;
+    z-index: 95;
+  }
+  /* Sheet LEFT (its own body scrolls), bags RIGHT (the .bag-grid scrolls). */
+  body.mobile-touch.char-bags-paired #char-window {
+    left: max(10px, env(safe-area-inset-left));
+    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    overflow-y: auto;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 1px;
+  }
+  body.mobile-touch.char-bags-paired #bags {
+    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    right: max(10px, env(safe-area-inset-right));
+    overflow: hidden;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 0;
+  }
+  /* The six category chips wrap to two rows at half-viewport width and eat the grid,
+     so keep them one horizontally scrollable row inside the cluster (the bank pairing
+     does the same); nothing is hidden and every chip keeps its full tap height. */
+  body.mobile-touch.char-bags-paired #bags .bag-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.mobile-touch.char-bags-paired #bags .bag-chip {
+    flex: 0 0 auto;
+  }
+  /* Keep the character sheet in one vertical flow on touch. Vertical scrolling is
+     acceptable here, while CSS multi-column can create off-screen columns in short
+     landscape viewports and force horizontal scrolling. */
+  body.mobile-touch #char-window {
+    column-count: auto;
+    column-width: auto;
+    column-gap: normal;
+  }
+  body.mobile-touch #char-window > * {
+    break-inside: avoid;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  body.mobile-touch #char-window > .char-stats {
+    margin-top: 6px;
+  }
+  body.mobile-touch #char-window .paperdoll {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  body.mobile-touch #char-window .char-model-panel {
+    min-width: 0;
+  }
+  @media (orientation: landscape) {
+    body.mobile-touch #char-window {
+      padding-left: calc(var(--window-pad) + env(safe-area-inset-left));
+    }
+    body.mobile-touch #char-window .char-model-panel {
+      flex: 0 1 180px;
+      width: 180px;
+      min-height: 132px;
+      height: 132px;
+    }
+    body.mobile-touch #char-window .char-model-preview {
+      min-height: 0;
+    }
+    body.mobile-touch #char-window .char-skin-row {
+      padding: 4px 0 5px;
+    }
+  }
+  body.mobile-touch #char-window .char-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+  body.mobile-touch #char-window .char-stats .stat-cell {
+    min-width: 0;
+    max-width: 100%;
+    margin-inline: 0;
+    overflow-wrap: anywhere;
+  }
+  /* Narrow the flanking equip columns so both fit beside the model on a phone. */
+  body.mobile-touch .equip-col {
+    width: 108px;
+  }
+  body.mobile-touch .equip-slot .slot-name {
+    font-size: 9px;
+  }
+  body.mobile-touch .equip-slot .slot-item {
+    font-size: 10px;
+  }
+  /* Phones (the long-press peek audience, same body.mobile-touch gate attachTooltip
+     uses) get a comfortable >=40px long-press target per .stat-cell. Symmetric
+     vertical padding both reaches the touch floor and optically centers the single
+     line, so no flex is needed; the -5px side margins are unchanged, preserving the
+     hover/focus pill's bleed into the 12px column gap. Because the sizing applies in
+     every state (rest/hover/focus alike), rows still never reflow between states, and
+     the compact desktop sheet (no mobile-touch) is untouched. */
+  body.mobile-touch .char-stats .stat-cell {
+    min-height: 40px;
+    box-sizing: border-box;
+    padding: 10px 5px;
+    margin: 0 -5px;
+  }
+  body.mobile-touch .mkt-price-row {
+    flex-wrap: wrap;
+  }
+  body.mobile-touch .mkt-price-row .coininput {
+    min-height: 40px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  body.mobile-touch #quest-log-window,
+  body.mobile-touch #quest-dialog {
+    max-width: calc(100vw - 20px);
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+  }
+  /* Shared centered-sheet exception: these windows sit centered (not edge-pinned
+     like the base above) with an internal scroll area, differing only in target
+     width between the two size groups below. Consolidated from separate per-group
+     copies of the same left/right/top/transform declarations; every rule here
+     stays a "mobile sheet base" exception, and both groups still reset transform
+     (the left-pin transform guard, tests/mobile_window_transform.test.ts, only
+     applies to left-pinned windows, not these centered ones, but translateX(-50%)
+     is declared explicitly here regardless so neither group inherits a stale
+     value). */
+  body.mobile-touch #train-window,
+  body.mobile-touch #quest-log-window,
+  body.mobile-touch #vendor-window,
+  body.mobile-touch #quest-dialog,
+  body.mobile-touch #spellbook,
+  body.mobile-touch #options-menu,
+  body.mobile-touch #options-menu.kb-wide,
+  body.mobile-touch #options-menu.perf-wide {
+    left: 50%;
+    right: auto;
+    top: 12px;
+    transform: translateX(-50%);
+  }
+  /* Wider size group: quest-log/vendor/train/quest-dialog carry longer scrollable
+     lists (quest text, vendor stock, the training ladder) so they claim more of
+     the viewport width. The train window also scrolls internally here: it is a
+     standalone centered card (never the vendor's split-screen bags pairing). */
+  body.mobile-touch #train-window,
+  body.mobile-touch #quest-log-window,
+  body.mobile-touch #vendor-window,
+  body.mobile-touch #quest-dialog {
+    width: clamp(320px, 76vw, 680px);
+    max-width: calc(100vw - 20px);
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 92px);
+  }
+  body.mobile-touch #train-window {
+    overflow-y: auto;
+  }
+  /* Narrower size group: spellbook rows and the options form controls read fine
+     at a tighter width, so these stay a compact centered card rather than
+     stretching to the wider group's clamp. */
+  body.mobile-touch #spellbook,
+  body.mobile-touch #options-menu,
+  body.mobile-touch #options-menu.kb-wide,
+  body.mobile-touch #options-menu.perf-wide {
+    width: min(560px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 92px);
+  }
+  body.mobile-touch.vendor-open #vendor-window,
+  body.mobile-touch.vendor-open #bags {
+    position: fixed;
+    top: max(10px, env(safe-area-inset-top));
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    width: auto;
+    max-width: none;
+    max-height: none;
+    transform: none;
+    box-sizing: border-box;
+    z-index: 95;
+  }
+  /* The 50/50 split point: #ui's zoom multiplies every author length, so a raw
+     50vw only lands on the real viewport centre at uiScale 1 (the halves gap
+     above 1, overlap below 1). Divide the shared --app-vw box by the live scale
+     so both halves tile at any uiScale (the window-shell coordinate model). */
+  body.mobile-touch.vendor-open #vendor-window {
+    left: max(10px, env(safe-area-inset-left));
+    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    display: block;
+    overflow-y: auto;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 1px;
+  }
+  body.mobile-touch.vendor-open #bags {
+    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    right: max(10px, env(safe-area-inset-right));
+    overflow: hidden;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 0;
+  }
+  body.mobile-touch.vendor-open #vendor-window .panel-title,
+  body.mobile-touch.vendor-open #bags .panel-title {
+    height: 47px;
+    min-height: 47px;
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+    box-sizing: border-box;
+  }
+  body.mobile-touch.vendor-open #vendor-window .panel-title .x-btn {
+    display: none;
+  }
+  /* The bank docks its bags companion side by side on touch exactly like the
+     vendor cluster: a divided full-height panel split 50/50 at the viewport
+     centre. This standalone block is also the neutralizer for the desktop
+     body.bank-open transforms (components.css) on mobile; the hud-mobile layer
+     outranks components, so transform:none wins over the desktop dock. */
+  body.mobile-touch #bank-window {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    /* Full-height like standalone #bags (issue 1577 round 2 (9)): the player frame
+       is fine to cover while a modal, world-input-blocking window is open. The
+       bank-open 50/50 pairing below keeps its 72px reservation, mirroring the
+       vendor-split rule that change deliberately kept. */
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    max-height: none;
+    /* Drop the base .window max-width clamp (it divides by --window-scale, not
+       --ui-scale, and under-fills this full-screen state below uiScale 1). */
+    max-width: none;
+    box-sizing: border-box;
+    overflow: hidden;
+    z-index: 95;
+  }
+  body.mobile-touch.bank-open #bank-window,
+  body.mobile-touch.bank-open #bags {
+    position: fixed;
+    top: max(10px, env(safe-area-inset-top));
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    width: auto;
+    max-width: none;
+    max-height: none;
+    transform: none;
+    box-sizing: border-box;
+    z-index: 95;
+  }
+  /* Bank LEFT: unlike the vendor (a display:block window that scrolls as a whole),
+     #bank-window is a flex column whose .bank-scroll region (grid + bonus tail) is
+     the internal scroll container, so the panel itself stays overflow:hidden and
+     the region scrolls, mirroring #bags. */
+  body.mobile-touch.bank-open #bank-window {
+    left: max(10px, env(safe-area-inset-left));
+    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    overflow: hidden;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 1px;
+  }
+  body.mobile-touch.bank-open #bags {
+    left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    right: max(10px, env(safe-area-inset-right));
+    overflow: hidden;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 0;
+  }
+  body.mobile-touch.bank-open #bank-window .panel-title,
+  body.mobile-touch.bank-open #bags .panel-title {
+    height: 47px;
+    min-height: 47px;
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+    box-sizing: border-box;
+  }
+  /* The bank's own x-btn hides under the pairing (mirrors the vendor's hidden LEFT
+     x-btn); the visible bags x-btn closes the whole cluster (bags_window.ts), and
+     the bank still auto-closes on walk-away and peels on Esc for keyboard users. */
+  body.mobile-touch.bank-open #bank-window .panel-title .x-btn {
+    display: none;
+  }
+  /* Short landscape phones: the six category chips wrap to two rows at half-viewport
+     width and eat the grid (a sub-row sliver at 360px tall). Keep them one
+     horizontally scrollable row INSIDE the bank cluster only (both panels, so the
+     pair stays visually consistent; the vendor cluster and standalone bags keep the
+     family wrap). Nothing is hidden: every chip stays reachable by scroll and keeps
+     its full tap height. */
+  body.mobile-touch #bank-window .bag-chips,
+  body.mobile-touch.bank-open #bags .bag-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  body.mobile-touch #bank-window .bag-chip,
+  body.mobile-touch.bank-open #bags .bag-chip {
+    flex: 0 0 auto;
+  }
+  /* Short landscape phones: the 50/50 pairing box (viewport minus the 10px top
+     inset and the 72px tray reservation) cannot hold the full-toolbar chrome, the
+     two-row grid floor (components.css .bank-scroll), AND the buy row, so the buy
+     row clipped below the window edge once the vault had items (empty vaults drop
+     the search/chips toolbar, which is how the Phase 7 checks missed it). The grid
+     floor yields to one cell row, and to a sliver while the transient deposit-all
+     status line borrows its height, so the transactional buy row keeps its
+     always-visible contract; the grid itself scrolls. */
+  @media (max-height: 480px) {
+    body.mobile-touch #bank-window .bank-scroll {
+      min-height: 44px;
+    }
+    body.mobile-touch #bank-window:has(.bank-status) .bank-scroll {
+      min-height: 13px;
+    }
+    body.mobile-touch #bank-window .bank-buy-row {
+      margin-top: 4px;
+    }
+  }
+  /* ---------- mobile deeds (standalone window + tracker) ---------- */
+  /* The Book of Deeds follows the bank's STANDALONE full-screen convention on
+     touch (it has no companion panel, so no 50/50 pairing): fixed inside the
+     safe-area insets, transform reset (neutralizing the desktop centering),
+     max-width unclamped (the base .window clamp divides by --window-scale, not
+     --ui-scale, and under-fills below uiScale 1). The entry list
+     (.deeds-scroll) is the internal scroll container; the title bar, summary,
+     category chips, and filter bar stay pinned chrome. */
+  body.mobile-touch #deeds-window {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    /* The generic mobile .window rule pads the bottom for the safe area;
+       this window is already inset-pinned on all four edges, so that rule
+       would double count the inset and eat the short-landscape height
+       budget below. */
+    padding-bottom: var(--window-pad);
+    overflow: hidden;
+    z-index: 95;
+  }
+  /* Category navigation collapses from the desktop sidebar to ONE horizontally
+     scrollable chip row (the bank chip idiom). Nothing hidden: every chip
+     stays reachable by scroll and keeps its full 40px tap height (the
+     components.css touch floor on .deeds-cat). */
+  body.mobile-touch #deeds-window .deeds-body {
+    flex-direction: column;
+    min-height: 0;
+  }
+  body.mobile-touch #deeds-window .deeds-rail {
+    flex: none;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    gap: 4px;
+    padding-bottom: 2px;
+  }
+  body.mobile-touch #deeds-window .deeds-cat {
+    flex: 0 0 auto;
+  }
+  /* The Titles divider is a column-rail idiom; in the chip row it reads as a
+     plain sibling chip. */
+  body.mobile-touch #deeds-window .deeds-cat-titles {
+    margin-top: 0;
+    border-top-color: transparent;
+    border-radius: 4px;
+  }
+  body.mobile-touch #deeds-window .deeds-cat-titles.active {
+    border-top-color: #6a5320;
+  }
+  /* Short landscape phones: the pinned chrome (title bar, summary, recent and
+     nearest strips, chip row, filter bar) can eat the whole panel height and
+     clip the filter bar below the window edge. The strips tighten and the
+     entry list yields to roughly one visible card and scrolls; the
+     components.css 100px floor is what must give, or the flex column pushes
+     the filter bar out (the bank's clipped buy row, which hid exactly because
+     a fresh character DROPS the recent/nearest strips, so verify with the
+     strips present AND absent). */
+  @media (max-height: 480px) {
+    body.mobile-touch #deeds-window .deeds-body {
+      min-height: 44px;
+    }
+    body.mobile-touch #deeds-window .deeds-scroll {
+      min-height: 44px;
+    }
+    body.mobile-touch #deeds-window .deeds-summary {
+      padding: 1px 0 2px;
+    }
+    body.mobile-touch #deeds-window .deeds-recent,
+    body.mobile-touch #deeds-window .deeds-nearest {
+      padding-bottom: 2px;
+    }
+  }
+  /* Watchlist tracker on phones: compact rows, the list capped (it is
+     glanceable decoration, the Book itself carries the full watch set) so the
+     strip can never run down into the bottom combat cluster. On the compact
+     tier (every real landscape phone, mobile_hud_layout.ts) the rows fold away
+     entirely and the header stays as a count chip; hud.ts routes that tap to
+     the Book of Deeds window instead of the invisible collapse toggle. */
+  body.mobile-touch #deed-tracker {
+    font-size: 11px;
+  }
+  body.mobile-touch #deed-tracker .dt-list {
+    max-height: 88px;
+    overflow: hidden;
+  }
+  body.mobile-touch.hud-mobile-compact #deed-tracker .dt-list {
+    display: none;
+  }
+  body.mobile-touch.hud-mobile-compact #deed-tracker .dt-chevron {
+    display: none;
+  }
+  /* ---------- mobile professions (standalone window) ---------- */
+  /* The Professions window follows the deeds/bank STANDALONE full-screen
+     convention on touch (no companion panel, so no 50/50 pairing): fixed
+     inside the safe-area insets, transform reset (neutralizing the desktop
+     centering), max-width unclamped (the base .window clamp divides by
+     --window-scale, not --ui-scale, and under-fills below uiScale 1). The
+     single .prof-scroll column is the internal scroll container (the window
+     has no desktop rail to collapse); the title bar stays pinned chrome and
+     the close button keeps the shared 40px x-btn tap floor. */
+  body.mobile-touch #professions-window {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    /* The generic mobile .window rule pads the bottom for the safe area; this
+       window is already inset-pinned on all four edges, so that rule would
+       double count the inset. */
+    padding-bottom: var(--window-pad);
+    overflow: hidden;
+    z-index: 95;
+  }
+  /* Phones get a slightly smaller wheel so the craft list keeps the height
+     budget in short landscape. */
+  body.mobile-touch #professions-window .prof-ring {
+    width: 180px;
+    height: 180px;
+  }
+  /* On touch, stack the categories back into a single column so the large
+     touch targets keep their full width. */
+  body.mobile-touch .kb-cols {
+    grid-template-columns: 1fr;
+    gap: 0 0;
+  }
+  /* Performance panel on touch: a roomier width than the cramped default, then
+     stacked rows (label on its own line, control full-width below) so every
+     control is a comfortable, uncluttered touch target. Single column already. */
+  body.mobile-touch #options-menu.perf-wide {
+    width: min(640px, calc(100vw - 24px));
+  }
+  body.mobile-touch .perf-card {
+    padding: 8px 15px 14px;
+  }
+  /* Options/settings row heights (Phase 4, presentation only): every touch-gated
+     settings row (graphics/audio/interface panels via settingsViewShell's bare
+     .set-rows > .set-row, PLUS the .perf-master/.perf-card row variants below)
+     gets a comfortable touch floor and lets its label wrap instead of clipping,
+     rather than the desktop 3-column fixed-width grid. 56px for rows carrying a
+     slider or toggle control (the vast majority; a slider thumb needs the extra
+     vertical room to avoid a cramped drag target), 44px for the plainer note/
+     lang-select rows. options_view.ts itself is untouched, this is CSS only. */
+  body.mobile-touch .set-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    min-height: 44px;
+    padding: 6px 4px;
+  }
+  body.mobile-touch .set-row:has(.set-slider),
+  body.mobile-touch .set-row:has(.set-toggle) {
+    min-height: 56px;
+  }
+  body.mobile-touch .set-name {
+    flex: 1 1 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    font-size: 13.5px;
+  }
+  body.mobile-touch .set-slider {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  body.mobile-touch .set-toggle {
+    flex: 0 0 auto;
+    min-height: 40px;
+  }
+  /* The master header stays centered + prominent on touch too. */
+  body.mobile-touch .perf-master {
+    text-align: center;
+  }
+  body.mobile-touch .perf-master .set-row {
+    justify-content: center;
+    padding: 2px 0;
+  }
+  body.mobile-touch .perf-master .set-name {
+    flex: 0 1 auto;
+    font-size: 14px;
+  }
+  body.mobile-touch .perf-master .set-toggle {
+    flex: 0 0 auto;
+    min-height: 40px;
+  }
+  body.mobile-touch .perf-card .set-row {
+    padding: 9px 0;
+  }
+  /* Cancel the desktop grid-column placements so children flow in the flex row. */
+  body.mobile-touch .perf-card .set-row > * {
+    grid-column: auto;
+  }
+  body.mobile-touch .perf-card .set-name {
+    flex: 1 1 100%;
+    font-size: 13.5px;
+  }
+  body.mobile-touch .perf-card .set-slider {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  body.mobile-touch .perf-card .set-val {
+    flex: 0 0 auto;
+    min-width: 46px;
+  }
+  /* Toggle/color sit on their own line, pinned right; swatch row goes full width. */
+  body.mobile-touch .perf-card .set-toggle,
+  body.mobile-touch .perf-card .set-color {
+    margin-left: auto;
+  }
+  body.mobile-touch .perf-card .perf-swatches {
+    flex: 1 1 100%;
+  }
+  /* Comfortable >=44px touch targets for the preset + metric-chip grids. */
+  body.mobile-touch .perf-presets .perf-preset-btn,
+  body.mobile-touch .perf-chips .set-choice-btn {
+    min-height: 44px;
+    font-size: 14px;
+  }
+  body.mobile-touch .perf-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+  body.mobile-touch .perf-footer .btn {
+    min-height: 44px;
+  }
+  /* Compact centered Talents sheet. The specialization picker is intentionally
+     three-up in every orientation so all specs remain visible and tappable
+     without a horizontal or vertical selection gesture. */
+  body.mobile-touch #talents-window {
+    position: fixed;
+    left: 50%;
+    right: auto;
+    top: 50%;
+    bottom: auto;
+    width: min(620px, calc(var(--app-vw) / var(--window-scale, 1) - 20px));
+    max-width: calc(var(--app-vw) / var(--window-scale, 1) - 20px);
+    max-height: calc(var(--app-vh) / var(--window-scale, 1) - 20px);
+    transform: translate(-50%, -50%);
+    overflow-x: hidden;
+    overflow-y: hidden;
+    z-index: 95 !important;
+  }
+  body.mobile-touch #talents-window #tal-body {
+    width: 100%;
+    min-height: 0;
+    max-height: max(150px, min(360px, calc(var(--app-vh) / var(--window-scale, 1) - 180px)));
+    overflow: auto;
+  }
+  body.mobile-touch #talents-window .panel-title {
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    font-size: 13px;
+  }
+  body.mobile-touch #talents-window .tal-tabs {
+    margin: 4px 0;
+  }
+  body.mobile-touch #talents-window .tal-tab {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 4px 6px;
+  }
+  body.mobile-touch #talents-window .ts-specs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    min-height: 0;
+    gap: 6px;
+    margin: 6px 0;
+  }
+  body.mobile-touch #talents-window .ts-panel {
+    padding: 8px 4px;
+    aspect-ratio: auto;
+    min-height: 150px;
+  }
+  body.mobile-touch #talents-window .ts-panel-head {
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+  body.mobile-touch #talents-window .ts-panel .ts-icon {
+    width: 36px;
+    height: 36px;
+  }
+  body.mobile-touch #talents-window .ts-name {
+    font-size: 11px;
+    overflow-wrap: anywhere;
+  }
+  body.mobile-touch #talents-window .ts-role {
+    font-size: 8px;
+  }
+  body.mobile-touch #talents-window .ts-det-desc,
+  body.mobile-touch #talents-window .ts-det-meta,
+  body.mobile-touch #talents-window .ts-det-mastery,
+  body.mobile-touch #talents-window .ts-ex-block {
+    display: none;
+  }
+  body.mobile-touch #talents-window .ts-view-talents {
+    min-height: 40px;
+    margin-top: auto;
+    padding: 4px 3px;
+    font-size: 9px;
+    line-height: 1.15;
+  }
+  body.mobile-touch #talents-window .tal-loadout-btn {
+    min-height: 40px;
+    padding: 5px 9px;
+  }
+  body.mobile-touch #spellbook [data-close] {
+    min-width: 40px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+  /* Desktop lays the spell list out as a landscape grid; touch stays a single
+     scrollable column so the existing 40x40px tap targets below keep working. */
+  body.mobile-touch #spellbook .spell-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  body.mobile-touch #spellbook .spell-row {
+    min-height: 52px;
+    padding-right: 4px;
+  }
+  body.mobile-touch #spellbook .spell-hotbar-toggle {
+    min-width: 40px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 40px;
+    border: 2px solid #4a3d1d;
+    border-radius: 7px;
+    background: radial-gradient(circle at 35% 30%, #2d3048e0, #11121ee0 72%);
+    color: var(--gold);
+    font: 700 22px / 1 var(--ui-font);
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 2px 6px #0008;
+  }
+  body.mobile-touch #spellbook .spell-hotbar-toggle.remove {
+    color: #ffcf9c;
+    border-color: #8b4e2c;
+  }
+  body.mobile-touch #spellbook .spell-hotbar-toggle:disabled {
+    opacity: 0.45;
+  }
+  body.mobile-touch #spellbook .spellbook-reset {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+  /* Touch-only mobile action-ring page label on bar-assigned spellbook rows
+     (Phase 4). Small, unobtrusive: it only exists to point a touch player at
+     the ring page holding the ability they just added. */
+  body.mobile-touch #spellbook .spell-mobile-page {
+    flex: 0 0 auto;
+    align-self: center;
+    margin-inline-start: 4px;
+    padding: 2px 6px;
+    border: 1px solid #4a3d1d;
+    border-radius: 4px;
+    font-size: 10px;
+    color: #c8b888;
+    white-space: nowrap;
+  }
+  body.mobile-touch #quest-dialog .qd-list-item,
+  body.mobile-touch #quest-log-window .ql-item,
+  body.mobile-touch #quest-dialog .btn,
+  body.mobile-touch #quest-log-window .btn,
+  body.mobile-touch #quest-dialog [data-close],
+  body.mobile-touch #quest-log-window [data-close] {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 16px;
+  }
+  body.mobile-touch #quest-dialog .qd-text,
+  body.mobile-touch #quest-log-window .qd-text,
+  body.mobile-touch #quest-dialog .qd-obj,
+  body.mobile-touch #quest-log-window .qd-obj,
+  body.mobile-touch #quest-log-window .ql-empty {
+    font-size: 16px;
+  }
+  body.mobile-touch #quest-log-window .ql-cols {
+    gap: var(--spacing-sm);
+    min-width: 0;
+  }
+  body.mobile-touch #quest-log-window .ql-list {
+    width: min(42%, 220px);
+    min-width: 0;
+  }
+  body.mobile-touch #quest-log-window .ql-detail {
+    min-width: 0;
+    /* The components-layer 70ch/100ch reading-measure cap doesn't bind at
+       phone widths (screen is already narrower than the cap), but it does
+       bind on a tablet-width touch sheet, leaving dead space next to the
+       list. This just makes that literal by letting the pane use the full
+       width the sheet gives it. */
+    max-width: none;
+  }
+  /* Dropping the components-layer `.ql-detail { max-height: 380px }` (the
+     landscape relayout) removes mobile's own internal scroll region too:
+     `.ql-detail` has no height context here (`.ql-cols` is an unbounded flex
+     row), so `.ql-detail-body`'s `overflow-y: auto` never has anything to
+     clip, and the sheet's own `overflow-y: auto` (mobile sheet base, above)
+     becomes the only scroll for a long quest, list included. This is an
+     intentional switch to the same single-outer-scroll model the desktop
+     window already uses (see quest_log_landscape_layout.test.ts), not an
+     oversight: for a long quest, the whole sheet now scrolls together with
+     the list, rather than only the detail pane scrolling internally. The
+     `.ql-detail-body` safe-area padding below stays harmless dead weight for
+     the case a future change reintroduces a bounded height here. */
+  body.mobile-touch #quest-log-window .ql-detail-body {
+    min-width: 0;
+  }
+  body.mobile-touch #options-menu .btn {
+    min-height: 40px;
+    padding-top: 9px;
+    padding-bottom: 9px;
+    font-size: 16px;
+  }
+  body.mobile-touch #report-window {
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    box-sizing: border-box;
+  }
+  body.mobile-touch #report-window select,
+  body.mobile-touch #report-window textarea {
+    min-height: 40px;
+    font-size: 16px;
+  }
+  body.mobile-touch #report-window [data-close],
+  body.mobile-touch #report-window .btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  body.mobile-touch #ctx-menu .ctx-item {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    font-size: 16px;
+  }
+  body.mobile-touch #ctx-menu {
+    box-sizing: border-box;
+    max-height: calc(var(--app-vh, 100vh) / var(--ui-scale, 1) - 20px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Phase 5 touch floors: the interactive descendants of the newly sheeted windows
+     that render below the 40px tap target on desktop. Only the controls that need it
+     are listed here; each window's list rows, primary buttons, and text inputs
+     already meet the floor in their base rules (mailbox rows/action/send buttons and
+     16px inputs, calendar cells, delve-board tabs/tiers/companions/shop buttons,
+     valecup bracket/nation/role pickers, crafting .vendor-item via the shared rule). */
+  /* Arena: the small bracket tabs and the join/leave .btn (base .btn is padding-only). */
+  body.mobile-touch #arena-window .arena-bracket,
+  body.mobile-touch #arena-window .btn {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  /* Vale Cup: the join/leave .btn and the guild-record toggle (its pickers already
+     carry a pointer:coarse floor). */
+  body.mobile-touch #valecup-window .btn,
+  body.mobile-touch #valecup-window .vcup-guild-toggle {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  /* Mailbox: the folder tab strip and the "back to inbox" link. The Send-tab
+     parcel chip is now a non-interactive span (the +/- stepper and remove
+     button are the real controls); their own pointer: coarse 40x40 floor
+     lives in components.css next to .mail-parcel-step / .mail-parcel-remove-btn,
+     the same convention as .yh-toggle. */
+  body.mobile-touch #mailbox-window .mail-tab,
+  body.mobile-touch #mailbox-window .mail-back {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  /* Calendar: the month prev/next nav, the per-event delete, and the add-event button. */
+  body.mobile-touch #calendar-window .cal-nav-btn,
+  body.mobile-touch #calendar-window .cal-event-del,
+  body.mobile-touch #calendar-window .cal-add-btn {
+    min-width: 40px;
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  /* Emote editor: the footer Done .btn (the emote items are already 58px tall). */
+  body.mobile-touch #emote-editor .btn {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  /* Leaderboard: the Players/Guilds/Devs tab bar. */
+  body.mobile-touch #leaderboard-window .lb-tab {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  /* Loot Settings: the loot-mode / threshold selects (40px + 16px iOS no-zoom). */
+  body.mobile-touch #loot-settings-window select {
+    min-height: 40px;
+    font-size: 16px;
+  }
+  /* Fill the full available viewport height instead of a small fixed-size centered
+     box (issue: mobile Social window left most of the screen empty). Anchored from
+     the top safe area down to the bottom safe area, same full-height sheet pattern
+     as #bags: Social is a modal overlay (world input blocked while open), so it is
+     fine to extend behind the mobile bottom controls the same way #bags does.
+     #social-window lives inside #ui, which applies `zoom: var(--ui-scale)`, so a
+     raw `100dvh` renders scaled by that zoom (e.g. 960px at uiScale 1.2 on an
+     800px-tall viewport) rather than the real screen height. `--app-vh` is the
+     unscaled viewport-height box every other window's max-height divides by
+     `--ui-scale`; the safe-area offsets that make up the rest of this calc need
+     the same division so they land at their real screen size once zoom re-scales
+     them back up. */
+  body.mobile-touch #social-window {
+    left: 50%;
+    right: auto;
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    bottom: auto;
+    width: min(430px, calc(var(--app-vw) / var(--ui-scale, 1) - 20px));
+    height: auto;
+    max-height: calc(
+      var(--app-vh) /
+      var(--ui-scale, 1) -
+      (max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1)) -
+      (max(10px, env(safe-area-inset-bottom)) / var(--ui-scale, 1))
+    );
+    transform: translateX(-50%);
+    box-sizing: border-box;
+    z-index: 45;
+  }
+  body.mobile-touch #map-window {
+    left: 50%;
+    top: calc(46% - env(safe-area-inset-bottom));
+    width: min(330px, calc(var(--app-vw) / var(--ui-scale, 1) - 32px));
+    max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 32px);
+    /* The variable, not raw padding, like every other window (the map has no
+       sticky header today, but keeping it in the --window-pad system means
+       adding one later cannot silently misalign; see layout.css). */
+    --window-pad: 8px;
+    transform: translate(-50%, -50%);
+  }
+  body.mobile-touch.mobile-map-quest-open {
+    --mobile-map-quest-stack-top: max(10px, env(safe-area-inset-top));
+    --mobile-map-quest-log-max-height: clamp(
+      88px,
+      calc(var(--app-vh) / var(--ui-scale, 1) - 150px),
+      118px
+    );
+    --mobile-map-quest-stack-gap: 8px;
+  }
+  body.mobile-touch.mobile-map-quest-open #quest-log-window {
+    top: var(--mobile-map-quest-stack-top);
+    max-height: var(--mobile-map-quest-log-max-height);
+    overflow: auto;
+  }
+  body.mobile-touch.mobile-map-quest-open #map-window {
+    top: calc(
+      var(--mobile-map-quest-stack-top) +
+      var(--mobile-map-quest-log-max-height) +
+      var(--mobile-map-quest-stack-gap)
+    );
+    transform: translateX(-50%);
+    width: min(
+      46vw,
+      300px,
+      calc(
+        var(--app-vh) -
+        var(--mobile-map-quest-log-max-height) -
+        var(--mobile-map-quest-stack-gap) -
+        22px
+      )
+    );
+  }
+  body.mobile-touch #map-canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  body.mobile-touch #map-close {
+    right: 5px;
+    top: 5px;
+  }
+  /* the map +/- zoom buttons are touch controls on mobile; raise them to the
+     40x40 floor (desktop is 32x32). box-sizing keeps the 2px border inside the box. */
+  body.mobile-touch .map-zoom-btn {
+    min-width: 40px;
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  body.mobile-touch #controls-hint {
+    max-width: min(360px, 92vw);
+    margin-top: 18px;
+    line-height: 1.45;
+    font-size: 10px;
+  }
+  body.mobile-touch #mode-select {
+    width: 100%;
+    max-width: min(
+      440px,
+      calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right))
+    );
+    margin-inline: auto;
+    padding: 20px 18px 18px;
+  }
+  body.mobile-touch .play-console {
+    width: 100%;
+    gap: 16px;
+  }
+  body.mobile-touch .btn-play {
+    font-size: 21px;
+    letter-spacing: 2px;
+    min-height: 60px;
+    padding: 14px 32px;
+  }
+  body.mobile-touch[data-start-panel="realm-panel"] #homepage-views-container,
+  body.mobile-touch[data-start-panel="charselect-panel"] #homepage-views-container,
+  body.mobile-touch[data-start-panel="login-panel"] #homepage-views-container {
+    align-items: center;
+  }
+  body.mobile-touch[data-start-panel="realm-panel"] #hero-view,
+  body.mobile-touch[data-start-panel="charselect-panel"] #hero-view,
+  body.mobile-touch[data-start-panel="login-panel"] #hero-view {
+    justify-content: center;
+    min-height: calc(var(--app-vh) - 178px);
+  }
+  body.native-app.mobile-touch[data-start-panel="realm-panel"] #homepage-views-container,
+  body.native-app.mobile-touch[data-start-panel="charselect-panel"] #homepage-views-container,
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #homepage-views-container {
+    padding-top: max(8px, env(safe-area-inset-top));
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+  body.native-app.mobile-touch[data-start-panel="realm-panel"] #hero-view,
+  body.native-app.mobile-touch[data-start-panel="charselect-panel"] #hero-view,
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #hero-view {
+    gap: 10px;
+    min-height: calc(var(--app-vh) - 108px);
+  }
+  body.native-app.mobile-touch[data-start-panel="realm-panel"] #title-logo,
+  body.native-app.mobile-touch[data-start-panel="charselect-panel"] #title-logo,
+  body.native-app.mobile-touch[data-start-panel="login-panel"] #title-logo {
+    width: min(220px, 30vw);
+    margin-bottom: 4px;
+  }
+  body.mobile-touch .realm-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 10px;
+  }
+  body.mobile-touch .realm-row > div:first-child {
+    min-width: 0;
+  }
+  body.mobile-touch .realm-name,
+  body.mobile-touch .realm-sub {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  body.mobile-touch .realm-name .rn-chars,
+  body.mobile-touch .realm-name .rn-rec {
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: middle;
+  }
+  body.mobile-touch .realm-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 2px;
+    min-width: 48px;
+  }
+  body.mobile-touch .realm-type,
+  body.mobile-touch .realm-pop {
+    min-width: 0;
+    line-height: 1.1;
+    text-align: right;
+    white-space: nowrap;
+  }
+  body.mobile-touch .realm-pop {
+    font-size: 11px;
+  }
+  body.mobile-touch .portal-ring,
+  body.mobile-touch .portal-ring-reverse,
+  body.mobile-touch .nebula-overlay {
+    animation: none;
+  }
+  body.mobile-touch .portal-ring,
+  body.mobile-touch .portal-ring-reverse {
+    filter: none;
+    opacity: 0.18;
+  }
+  body.mobile-touch .nebula-overlay {
+    mix-blend-mode: normal;
+    opacity: 0.78;
+  }
+  body.mobile-touch .embers-container {
+    display: none;
+  }
+  body.mobile-touch .class-row {
+    grid-template-columns: repeat(2, minmax(138px, 1fr));
+    gap: 8px;
+    width: min(340px, 92vw);
+  }
+  body.mobile-touch .class-card {
+    padding: 9px 8px 8px;
+  }
+  body.mobile-touch #title-logo {
+    width: min(252px, 52vw);
+    margin-bottom: 18px;
+  }
+  body.mobile-preflight-open #mobile-preflight.visible {
+    position: fixed;
+    inset: 0;
+    z-index: 250;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right))
+      max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+    background: radial-gradient(circle at 50% 42%, #12172bf2, #030407f8 74%);
+    pointer-events: auto;
+  }
+  #mobile-preflight .preflight-panel {
+    width: min(440px, 92vw);
+    max-height: min(520px, 88vh);
+    overflow: auto;
+    padding: 22px 22px 20px;
+    border: 1px solid #c9a84d88;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #171a25f7, #0a0b10fa);
+    box-shadow:
+      0 18px 60px #000d,
+      inset 0 1px 0 #ffffff14;
+    color: var(--color-text-light);
+    text-align: left;
+  }
+  #mobile-preflight h2 {
+    margin: 0 0 8px;
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-size: 24px;
+    font-weight: 400;
+    text-align: center;
+  }
+  #mobile-preflight-detail {
+    margin: 0 0 14px;
+    color: #f0dfab;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: center;
+  }
+  #mobile-preflight-steps {
+    margin: 0 0 18px 18px;
+    padding: 0;
+    color: #cfc09a;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+  #mobile-preflight-steps li {
+    margin-bottom: 7px;
+  }
+  #mobile-preflight-continue {
+    width: 100%;
+  }
+  body.mobile-touch.game-active #rotate-device {
+    position: absolute;
+    inset: 0;
+    z-index: 190;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: radial-gradient(circle at 50% 45%, #161826f0, #040509f6);
+    color: #f5e7b2;
+    font-family: var(--title-font);
+    padding: 28px;
+    text-shadow: 1px 1px 3px #000;
+    pointer-events: auto;
+  }
+  #rotate-device .rotate-icon {
+    font-size: 48px;
+    margin-bottom: 14px;
+  }
+  #rotate-device .rotate-title {
+    color: var(--gold);
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+  #rotate-device .rotate-sub {
+    font-family: var(--ui-font);
+    font-size: 13px;
+    color: var(--color-accent);
+    line-height: 1.45;
+  }
+
+  @media (orientation: landscape) {
+    body.mobile-touch[data-start-panel="mode-select"] #homepage-views-container {
+      align-items: center;
+      padding-top: max(8px, env(safe-area-inset-top));
+      padding-bottom: max(8px, env(safe-area-inset-bottom));
+    }
+    body.mobile-touch[data-start-panel="charselect-panel"] #homepage-views-container,
+    body.mobile-touch[data-start-panel="charcreate-panel"] #homepage-views-container,
+    body.mobile-touch[data-start-panel="login-panel"] #homepage-views-container,
+    body.mobile-touch[data-start-panel="discord-choice-panel"] #homepage-views-container,
+    body.mobile-touch[data-start-panel="realm-panel"] #homepage-views-container,
+    body.mobile-touch[data-start-panel="offline-select"] #homepage-views-container {
+      padding-top: max(8px, env(safe-area-inset-top));
+      padding-bottom: max(8px, env(safe-area-inset-bottom));
+    }
+    body.mobile-touch[data-start-panel="mode-select"] #hero-view {
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      min-height: calc(var(--app-vh) - 96px);
+    }
+    body.mobile-touch[data-start-panel="login-panel"] #hero-view,
+    body.mobile-touch[data-start-panel="discord-choice-panel"] #hero-view,
+    body.mobile-touch[data-start-panel="realm-panel"] #hero-view,
+    body.mobile-touch[data-start-panel="offline-select"] #hero-view {
+      justify-content: flex-start;
+      min-height: calc(var(--app-vh) - 86px);
+    }
+    /* Charselect/charcreate float their header entirely out of flow (see
+       shell.css), so unlike the panels above they get the FULL viewport height
+       here, not height-minus-header. */
+    body.mobile-touch[data-start-panel="charselect-panel"] #hero-view,
+    body.mobile-touch[data-start-panel="charcreate-panel"] #hero-view {
+      justify-content: flex-start;
+      min-height: var(--app-vh);
+    }
+    /* Same treatment as charselect/charcreate above: on a short landscape
+       phone viewport the marketing lockup costs more height than these
+       auth/roster panels can spare, so it drops entirely rather than just
+       shrinking (issue uiux-overlap fix 4). */
+    body.mobile-touch[data-start-panel="charselect-panel"] #title-logo,
+    body.mobile-touch[data-start-panel="charcreate-panel"] #title-logo,
+    body.mobile-touch[data-start-panel="login-panel"] #title-logo,
+    body.mobile-touch[data-start-panel="discord-choice-panel"] #title-logo,
+    body.mobile-touch[data-start-panel="realm-panel"] #title-logo,
+    body.mobile-touch[data-start-panel="offline-select"] #title-logo {
+      display: none;
+    }
+    body.mobile-touch[data-start-panel="mode-select"] #title-logo {
+      width: min(176px, 24vw);
+      margin: 0;
+      flex: 0 0 auto;
+    }
+    body.mobile-touch[data-start-panel="mode-select"] #mode-select {
+      width: min(
+        620px,
+        calc(100vw - 232px - env(safe-area-inset-left) - env(safe-area-inset-right))
+      );
+      max-width: none;
+      padding: 14px;
+    }
+    body.mobile-touch[data-start-panel="mode-select"] #token-ca,
+    body.mobile-touch[data-start-panel="mode-select"] .play-tip,
+    body.mobile-touch[data-start-panel="mode-select"] .official-site-copy {
+      display: none;
+    }
+    body.mobile-touch[data-start-panel="charselect-panel"] .official-site-copy,
+    body.mobile-touch[data-start-panel="charcreate-panel"] .official-site-copy {
+      display: none;
+    }
+    body.mobile-touch .play-console {
+      width: 100%;
+      max-width: none;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(140px, 0.46fr);
+      align-items: stretch;
+      gap: 10px;
+    }
+    body.mobile-touch .server-select-caption {
+      margin-bottom: 5px;
+    }
+    body.mobile-touch .server-select-trigger {
+      min-height: 56px;
+      height: 100%;
+      padding: 9px 12px;
+    }
+    body.mobile-touch .server-select-menu {
+      top: calc(100% + 6px);
+    }
+    body.mobile-touch .server-select-option {
+      padding: 9px 10px;
+    }
+    body.mobile-touch .server-opt-desc {
+      line-height: 1.25;
+    }
+    body.mobile-touch .btn-play {
+      width: 100%;
+      min-height: 56px;
+      padding: 10px 18px;
+      font-size: 20px;
+    }
+    body.mobile-touch .mobile-joystick {
+      width: 128px;
+      height: 128px;
+      bottom: calc(15px + env(safe-area-inset-bottom));
+      opacity: 0.72;
+      border-color: #d2bd6a66;
+    }
+    body.mobile-touch #mobile-move-joystick {
+      left: max(24px, calc(env(safe-area-inset-left) + 12px));
+    }
+    /* #mobile-move-joystick is an ID selector, which outranks the class-based
+       left-handed swap rule (.mobile-left-handed .mobile-joystick) on
+       specificity alone -- without this override the joystick silently never
+       swaps sides in landscape (pre-existing bug, fixed on the v0.22.0 base
+       and re-applied here for the landscape offsets this block owns). */
+    body.mobile-touch.mobile-left-handed #mobile-move-joystick {
+      left: auto;
+      right: max(24px, calc(env(safe-area-inset-right) + 12px));
+    }
+    body.mobile-touch #mobile-camera-joystick {
+      left: max(20px, env(safe-area-inset-left));
+    }
+    body.mobile-touch .mobile-joystick::before {
+      inset: 29px;
+    }
+    body.mobile-touch .mobile-stick {
+      width: 56px;
+      height: 56px;
+      margin: -28px 0 0 -28px;
+    }
+    body.mobile-touch .mobile-joy-label {
+      bottom: -15px;
+      font-size: 8px;
+      color: #d7c987aa;
+    }
+    body.mobile-touch #mobile-combat-controls {
+      top: max(6px, env(safe-area-inset-top));
+      grid-template-columns: repeat(5, 54px);
+      gap: 10px;
+    }
+    /* Landscape bar is 5x54px + 4x10px gaps = 310px wide; keep the chip docked
+       just past it on the same compressed top line. */
+    body.mobile-touch #mobile-consumables {
+      left: calc(
+        max(12px, env(safe-area-inset-left)) +
+        310px *
+        var(--btn-scale, 1) *
+        var(--mobile-chrome-scale, 1) +
+        10px
+      );
+      top: max(6px, env(safe-area-inset-top));
+    }
+    body.mobile-touch .mobile-btn {
+      width: 54px;
+      height: 48px;
+      font-size: 20px;
+      background: radial-gradient(circle at 35% 30%, #2d3048bf, #11121ec2 72%);
+    }
+    body.mobile-touch #mobile-extra-controls {
+      left: 50%;
+      --mobile-more-open-transform: translateX(-50%);
+      --mobile-more-closed-transform: translate(-50%, 10px) scale(0.96);
+      /* True vertical centering (the base rule's top:50%/translate(-50%,-50%))
+         let this 4-row, 16-pill grid grow tall enough on a short landscape
+         viewport to overlap the fixed bottom control row (Autorun/Jump/combat
+         cluster), which reserves no layout space of its own. Anchor from the
+         top instead so the drawer's height is measured against the space
+         actually free above that row, not the whole viewport.
+         !important: the shared window-drag code (hud.ts, pointerdown on any
+         .panel-title) freezes a window's CURRENT computed inset/transform into
+         an inline style the first time its title bar is pressed, same as any
+         desktop window; that inline style otherwise wins over this rule and
+         reintroduces the overlap it exists to prevent. This panel is not meant
+         to be draggable on mobile at all (it is excluded from the resize grip
+         via window_resize.ts's NON_RESIZABLE_WINDOW_IDS), so pinning its
+         landscape position here is correct regardless. */
+      top: max(8px, env(safe-area-inset-top)) !important;
+      bottom: auto !important;
+      transform: var(--mobile-more-closed-transform) !important;
+      --window-pad: 8px;
+      /* No --ui-scale division: body-level window outside the zoomed #ui.
+         120px clears the bottom control row (Autorun/Jump/combat cluster +
+         labels), which sits outside normal layout flow so nothing else
+         reserves space for it. */
+      max-height: calc(
+        var(--app-vh) -
+        120px -
+        env(safe-area-inset-top) -
+        env(safe-area-inset-bottom)
+      );
+    }
+    body.mobile-touch.mobile-more-open #mobile-extra-controls {
+      transform: var(--mobile-more-open-transform) !important;
+    }
+    body.mobile-touch #mobile-extra-grid {
+      /* 4 columns in landscape too (issue 1577 round 2 (4)), matching the base
+         tier so each More-tray pill stays narrow on a wide landscape phone.
+         No chrome-scale on the rows (see the base-tier rule): transient modal,
+         always held at the 40px floor. */
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-auto-rows: 40px;
+      gap: 5px;
+    }
+    /* The base square map can dip into the fixed Jump/Interact/combat row on a
+       short landscape phone. Top-anchor it and reserve a right rail so the
+       close and zoom buttons do not sit on top of the drawn map. */
+    body.mobile-touch #map-window {
+      --mobile-map-size: min(60vw, 420px, calc(var(--app-vh) - 104px));
+      --mobile-map-rail: 58px;
+      top: max(10px, env(safe-area-inset-top));
+      transform: translateX(-50%);
+      width: min(
+        calc(var(--mobile-map-size) + var(--mobile-map-rail)),
+        calc(var(--app-vw) / var(--ui-scale, 1) - 32px)
+      );
+    }
+    body.mobile-touch #map-window #map-canvas {
+      width: var(--mobile-map-size);
+      max-width: calc(100% - var(--mobile-map-rail));
+    }
+    body.mobile-touch #map-window #map-zoom {
+      right: 8px;
+      bottom: 8px;
+    }
+    body.mobile-touch.mobile-map-quest-open #map-window {
+      --mobile-map-size: min(
+        52vw,
+        320px,
+        calc(
+          var(--app-vh) -
+          var(--mobile-map-quest-log-max-height) -
+          var(--mobile-map-quest-stack-gap) -
+          22px
+        )
+      );
+      top: calc(
+        var(--mobile-map-quest-stack-top) +
+        var(--mobile-map-quest-log-max-height) +
+        var(--mobile-map-quest-stack-gap)
+      );
+      width: min(
+        calc(var(--mobile-map-size) + var(--mobile-map-rail)),
+        calc(var(--app-vw) / var(--ui-scale, 1) - 32px)
+      );
+    }
+    body.mobile-touch.mobile-left-handed #mobile-extra-controls {
+      left: 50%;
+      right: auto;
+    }
+    body.mobile-touch #mobile-extra-controls .mobile-btn {
+      width: 100%;
+      height: 40px;
+      font-size: 13px;
+      padding: 0 7px;
+      border-radius: 20px;
+    }
+    body.mobile-touch #mobile-extra-controls .mobile-label {
+      font-size: 9px;
+    }
+    body.mobile-touch #bottom-bar {
+      left: calc(max(20px, env(safe-area-inset-left)) + 164px);
+      right: calc(max(20px, env(safe-area-inset-right)) + 164px);
+      bottom: calc(57px + env(safe-area-inset-bottom));
+    }
+    body.mobile-touch #xpbar {
+      display: none;
+    }
+    body.mobile-touch #player-frame::before {
+      left: -5px;
+      top: -5px;
+      width: 73px;
+      height: 73px;
+      -webkit-mask: radial-gradient(
+        farthest-side,
+        transparent calc(100% - 7px),
+        #000 calc(100% - 6px)
+      );
+      mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+    }
+    body.mobile-touch #castbar {
+      /* Centred above the bottom-centre player frame like the base rule, one
+         notch lower to match the shorter landscape frame band. Width matches
+         the landscape #player-frame's rendered width (300px * 0.6 below). */
+      bottom: calc(62px + env(safe-area-inset-bottom));
+      width: calc(300px * 0.6 * var(--mobile-chrome-scale, 1));
+      min-width: 0;
+      height: 5px;
+    }
+    body.mobile-touch #swingbar {
+      /* Same landscape notch as #castbar above, stacked one bar-height higher
+         so the two never overlap when both are active. */
+      bottom: calc(70px + env(safe-area-inset-bottom));
+      width: calc(300px * 0.6 * var(--mobile-chrome-scale, 1));
+      min-width: 0;
+      height: 4px;
+    }
+    body.mobile-touch #petbar {
+      top: max(6px, env(safe-area-inset-top));
+      /* No scale(0.88) on landscape: it shrank the 40px pet command buttons to
+         ~35px, below the 40px touch floor. Keep them full-size (the two-group bar
+         still fits the top-centre band on the narrowest 740px landscape phone). */
+      transform: translateX(-50%);
+    }
+    body.mobile-touch #chatlog-wrap {
+      left: max(10px, env(safe-area-inset-left));
+      /* Shifted up slightly for better breathing room from the bottom edge
+         (was 112px). */
+      bottom: calc(132px + env(safe-area-inset-bottom));
+      width: min(calc(330px * var(--mobile-chrome-scale, 1)), 44vw);
+    }
+    body.mobile-touch #chatlog-frame {
+      /* 4-line cap in landscape too (issue 1577 round 2 (6)). */
+      height: calc(11px * var(--chat-font-scale, 1) * 1.4 * 4 + 8px);
+    }
+    body.mobile-touch #chat-input {
+      /* Centered horizontally, same rationale as the portrait rule above:
+         the log stays left-anchored, only the active composer centers. Seated a
+         clear gap ABOVE the resting log (the composer stacks over the log on
+         mobile). The log wrap here docks at bottom 132px and stands ~110px tall
+         (40px tab strip + the 4-line frame), so its top edge is ~242px up; 250px
+         keeps the composer's bottom edge a ~8px gap clear of it (was 233px, which
+         dipped ~8px into the tab strip). The compact tier raises the log further
+         and re-seats this below. */
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%);
+      bottom: calc(250px + env(safe-area-inset-bottom));
+      width: min(calc(330px * var(--mobile-chrome-scale, 1)), 44vw);
+    }
+    /* The dismiss chevron tracks the shared --mobile-chat-w in every orientation, so
+       the portrait-level rule already seats it correctly here (no landscape override). */
+    body.mobile-touch #player-frame {
+      left: 50%;
+      top: auto;
+      bottom: calc(10px + env(safe-area-inset-bottom));
+      width: 300px;
+      transform: translateX(-50%) scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
+    }
+    body.mobile-touch #player-frame .uf-bars {
+      width: 224px;
+      max-width: 224px;
+    }
+    body.mobile-touch #target-frame {
+      left: max(6px, env(safe-area-inset-left));
+      top: calc(max(6px, env(safe-area-inset-top)) + 56px);
+      transform: scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
+    }
+    body.mobile-touch #party-frames {
+      left: max(6px, env(safe-area-inset-left));
+      top: calc(max(6px, env(safe-area-inset-top)) + 58px);
+    }
+    body.mobile-touch #party-frames .party-rows {
+      max-width: calc(100dvw - max(6px, env(safe-area-inset-left)) - 10px);
+      max-height: calc(100dvh - max(6px, env(safe-area-inset-top)) - 113px);
+    }
+    body.mobile-touch #party-frames.below-target {
+      /* +105px (was 100px): the collapse chip is now the container's first child, and
+         a chip crowding the scaled target frame reads as a mis-tap pair; the extra 5px
+         keeps the chip clear of the target frame's bottom edge (>= 4px). */
+      top: calc(max(6px, env(safe-area-inset-top)) + 105px);
+    }
+    body.mobile-touch #party-frames.below-target .party-rows {
+      max-height: calc(100dvh - max(6px, env(safe-area-inset-top)) - 160px);
+    }
+    /* keep the 40x40 touch floor in landscape too (was 25px); width matches the
+       base double-stack tier (issue 1577 (2), a further trim from the old
+       single-column 118px so two columns stay comfortably on-screen). */
+    body.mobile-touch #party-frames .party-frame {
+      width: calc(100px * var(--mobile-chrome-scale, 1));
+      min-height: 40px;
+      padding: 2px 5px;
+    }
+    body.mobile-touch #party-frames .party-frame .pfm-name {
+      min-height: 12px;
+      font-size: 9px;
+    }
+    body.mobile-touch #party-frames .pfm-crest {
+      width: 10px;
+      height: 10px;
+    }
+    body.mobile-touch #party-frames .party-frame .bar {
+      height: 4px;
+    }
+    body.mobile-touch #buff-bar {
+      right: calc(98px + env(safe-area-inset-right));
+      top: max(8px, env(safe-area-inset-top));
+      max-width: 160px;
+      transform: scale(calc(0.85 * var(--mobile-chrome-scale, 1)));
+      transform-origin: right top;
+    }
+    body.mobile-touch #debuff-bar {
+      right: calc(98px + env(safe-area-inset-right));
+      top: calc(max(8px, env(safe-area-inset-top)) + 32px);
+      max-width: 160px;
+      transform: scale(calc(0.85 * var(--mobile-chrome-scale, 1)));
+      transform-origin: right top;
+    }
+    body.mobile-touch #minimap-wrap {
+      right: max(6px, env(safe-area-inset-right));
+      top: max(6px, env(safe-area-inset-top));
+      transform: scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
+    }
+    body.mobile-touch #raid-lockout,
+    body.mobile-touch #mail-indicator {
+      top: 94px;
+      transform: scale(1.27);
+    }
+    body.mobile-touch #quest-tracker {
+      display: none;
+    }
+    body.mobile-touch #meters-window {
+      position: fixed;
+      left: calc(max(20px, env(safe-area-inset-left)) + 112px);
+      right: auto;
+      top: auto;
+      bottom: calc(26px + env(safe-area-inset-bottom));
+      width: min(190px, calc(50vw - 142px));
+      min-width: 128px;
+      max-height: min(135px, calc(var(--app-vh) / var(--ui-scale, 1) - 112px));
+      transform: none;
+    }
+    body.mobile-touch #banner {
+      top: 18%;
+      max-width: calc(100vw - 24px);
+      font-size: calc(26px * var(--mobile-chrome-scale, 1));
+      line-height: 1.12;
+      text-align: center;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    body.mobile-touch #subzone-banner {
+      top: 25%;
+      font-size: 18px;
+    }
+    body.mobile-touch #error-msg {
+      top: 16%;
+      font-size: 16px;
+    }
+    body.mobile-touch #mobile-preflight .preflight-panel {
+      width: min(520px, 84vw);
+      padding: 18px 22px;
+    }
+    body.mobile-touch #mobile-preflight h2 {
+      font-size: 22px;
+    }
+    body.mobile-touch #mobile-preflight-detail {
+      font-size: 12px;
+    }
+    body.mobile-touch #mobile-preflight-steps {
+      font-size: 11px;
+    }
+    /* Keep the footer compact below the full-width, internally scrollable body. */
+    body.mobile-touch #talents-window > .tal-foot {
+      margin-top: 0;
+      padding-top: 4px;
+    }
+  }
+  /* Re-homed from the char-select responsive block in shell.css: narrow-width
+     repositioning of the in-game community HUD + quest
+     tracker. Layer hud.mobile sits after components, so these still beat the HUD
+     base; nothing in shell competes once removed there. */
+  @media (max-width: 860px) {
+    #community-hud {
+      top: auto;
+    }
+    #right-tracker-stack {
+      top: 260px;
+      right: 12px;
+      width: 190px;
+    }
+  }
+
+  /* ---------- mobile hud layout tiers ---------- */
+  /* Phase 3 of the mobile combat HUD rework: src/ui/mobile_hud_layout.ts resolves
+     a responsive tier (compact/standard/tablet) from the live viewport, and
+     src/game/mobile_hud_layout_applier.ts stamps exactly one of the three
+     classes below onto body alongside the existing tier-independent rules in
+     this file. Standard is the baseline (no overrides needed here, the rest of
+     hud.mobile.css already targets it); compact and tablet layer ON TOP of that
+     baseline and of the existing portrait media blocks above, they do not
+     replace them. Every rule here stays under body.mobile-touch.
+     hud-menu-open / hud-chat-open mirror mobile-window-open / mobile-chat-open
+     (the applier reads those to build its input) so a tier rule can react to
+     "a menu is open" without re-deriving that state. */
+  body.mobile-touch.hud-mobile-compact #chatlog-wrap {
+    width: min(calc(240px * var(--mobile-chrome-scale, 1)), calc(100vw - 20px));
+    /* Shifted up slightly to match the standard/landscape tiers above (was 140px). */
+    bottom: calc(160px + env(safe-area-inset-bottom));
+  }
+  body.mobile-touch.hud-mobile-compact #chatlog-frame {
+    /* 4-line cap on compact phones too (issue 1577 round 2 (6)). */
+    height: calc(11px * var(--chat-font-scale, 1) * 1.4 * 4 + 6px);
+  }
+  /* Compact re-seats the composer to clear its own (higher) log wrap: the wrap docks at
+     bottom 160px and stands ~108px tall (40px tabs + the 4-line frame), so its top edge
+     is ~268px up. The landscape composer's 250px seat above would dip ~18px into the tab
+     strip here, and the older 233px seat overlapped it by ~34px (the resting half of the
+     owner's overlap report). 276px keeps the composer's bottom edge a ~8px gap above the
+     log; on the shortest phones that lifts it over the target-frame band, a pre-existing
+     short-viewport constraint the overlap audit still notes (never a hard fail). */
+  body.mobile-touch.hud-mobile-compact #chat-input {
+    bottom: calc(276px + env(safe-area-inset-bottom));
+  }
+  /* Compact (phones: width <= 700 or height <= 480, i.e. the primary case) uses the same
+     centered, in-front, PLAYER-RESIZABLE panel as the other tiers; the closed-seat
+     width/bottom rules above would otherwise pin the open chat to a narrow fixed strip. The
+     bottom MUST use the same --mobile-chat-bottom clamp as the base open rule, or the resize
+     handle moves but the panel does not (the bug that hid the resize on real phones). */
+  body.mobile-touch.hud-mobile-compact.mobile-chat-open #chatlog-wrap {
+    width: var(--mobile-chat-w);
+    bottom: calc(
+      env(safe-area-inset-bottom) +
+      clamp(12px, var(--mobile-chat-bottom, 52px), calc(100vh - 320px))
+    );
+  }
+  body.mobile-touch.hud-mobile-compact.mobile-chat-open #chatlog-frame {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+    max-height: none;
+  }
+  body.mobile-touch.hud-mobile-compact.mobile-chat-open #chat-input {
+    bottom: calc(env(safe-area-inset-bottom) + 68px);
+  }
+  body.mobile-touch.hud-mobile-compact #right-tracker-stack {
+    width: calc(148px * var(--mobile-chrome-scale, 1));
+    top: max(96px, env(safe-area-inset-top));
+  }
+  body.mobile-touch.hud-mobile-compact #quest-tracker {
+    font-size: 10px;
+  }
+  body.mobile-touch.hud-mobile-compact #minimap-wrap {
+    /* Keep compact phones slightly tighter than the landscape baseline while
+       still making the minimap materially larger than the old 0.44 scale. */
+    transform: scale(calc(0.57 * var(--mobile-chrome-scale, 1)));
+  }
+  /* A short landscape phone (the compact tier's primary trigger) has too little
+     vertical room for a full chat log AND the action ring at once; drop the log
+     out of flow entirely unless the player has it explicitly open. Keys on the
+     LIVE mobile-chat-open / mobile-chatlog-peek body classes (toggled
+     synchronously by mobile_controls.ts), not the applier-mirrored hud-chat-open
+     (which only refreshes on viewport syncs, so it would lag a chat toggle), and
+     exempts the long-press log peek so peeking still works on compact. */
+  body.mobile-touch.hud-mobile-compact:not(.mobile-chat-open):not(.mobile-chatlog-peek)
+  #chatlog-wrap {
+    display: none;
+  }
+  /* Compact (short landscape phones): shrink the whole combat cluster and hug
+     the corner tighter so the arc's top button and the page toggle above the
+     attack button clear the top-right minimap/chest strip even on a 360px-tall
+     viewport (the 0.57 minimap above is the other half of that budget). The
+     radius keeps the equal-chord arc rule: 160 * 2 * sin(11.25deg) = 62.4 =
+     action-size 54 + an 8.4px edge gap. Every var also folds in the 0.85
+     mobile-chrome-scale; the toggle (46 * 0.85 = 39.1) is clamped back to the 40px
+     touch floor with max(), and target/use (50 * 0.85 = 42.5) clear it. */
+  body.mobile-touch.hud-mobile-compact #mobile-action-ring {
+    --mobile-ring-attack-size: calc(84px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-action-size: calc(54px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-radius: calc(160px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-toggle-size: max(40px, calc(46px * var(--mobile-chrome-scale, 1)));
+    --mobile-ring-secondary-size: calc(50px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-hollow: calc(88px * var(--mobile-chrome-scale, 1));
+    right: max(14px, env(safe-area-inset-right));
+    bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+  /* The 40px touch floor above is shorter than the toggle's natural scaled size,
+     so its border-box inner height (40px - 2 * 2px border = 36px) is tighter than
+     the standard/tablet tiers. The base page-indicator digit (20px text + a 2px
+     icon gap + a 15px icon = 37px) overflowed that by a hair, and the button's
+     circular overflow:hidden (added for the cooldown-sweep clip, see above)
+     clipped the digit's top pixels instead of showing it in full. Shrink the
+     digit to fit the compact floor with room to spare. */
+  body.mobile-touch.hud-mobile-compact #mobile-action-page-toggle .mobile-action-page-indicator {
+    font-size: 15px;
+  }
+  body.mobile-touch.hud-mobile-compact.mobile-left-handed #mobile-action-ring {
+    left: max(14px, env(safe-area-inset-left));
+    right: auto;
+  }
+  /* Compact phones: Jump's ring-row seat reaches to ~437px from the left on a
+     740px viewport, into the centred player frame's right tail (280..460).
+     Nudge the frame and BOTH its bars 40px left, together, so the pair stays
+     visually centred-ish while Jump keeps a clear circle on every profile.
+     swingbar joined this rule alongside castbar (issue 1577 (6)): it was
+     missing here, so on this tier it drifted 40px off the player frame's left
+     edge even though its width already matched. */
+  /* Nudged further right (was -40px) to clear more of the left-side joystick
+     zone; castbar/swingbar move with it so they stay centred above it. */
+  body.mobile-touch.hud-mobile-compact #player-frame {
+    left: calc(50% - 15px);
+  }
+  body.mobile-touch.hud-mobile-compact #castbar,
+  body.mobile-touch.hud-mobile-compact #swingbar {
+    left: calc(50% - 15px);
+  }
+  /* Narrowest compact phones (galaxy-s8-class 740px and below): at that width the
+     centred frame's right tail (right edge ~445) runs into Jump's ring crescent
+     (its circle centre sits only ~82px right of viewport centre on so narrow a
+     screen), overlapping the button by ~18px. The -15px seat above clears Jump
+     fine from 844px up (34px+), so key the extra left nudge to <=800px only, and
+     shift the frame plus BOTH its bars together to -44px. That drops the frame's
+     right edge to ~416 (an ~11px clear circle to Jump) while its left edge only
+     reaches ~236, still ~104px clear of the fixed 132px-wide move-joystick
+     capture zone: it keeps the round-4 joystick-zone clearance AND clears the
+     jump crescent, the two constraints that pull the frame in opposite directions
+     on a very narrow viewport. 844/915/932 stay on the -15px seat above.
+     Landscape-gated: the crescent geometry that justifies the nudge only exists
+     in landscape; a portrait phone at these widths keeps the tier's base seat
+     instead of an off-centre frame. */
+  @media (max-width: 800px) and (orientation: landscape) {
+    body.mobile-touch.hud-mobile-compact #player-frame,
+    body.mobile-touch.hud-mobile-compact #castbar,
+    body.mobile-touch.hud-mobile-compact #swingbar {
+      left: calc(50% - 44px);
+    }
+  }
+  /* Tablet: a large viewport can afford a bigger, easier-to-hit cluster than
+     the standard baseline; reuses the ring's own sizing hooks (a tier value on
+     top of the settings scale, not a fork of it). Radius keeps the same chord
+     rule: 226 * 2 * sin(11.25deg) = 88 = action-size 76 + a 12px edge gap. */
+  body.mobile-touch.hud-mobile-tablet #mobile-action-ring {
+    --mobile-ring-attack-size: calc(116px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-action-size: calc(76px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-radius: calc(226px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-toggle-size: calc(56px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-secondary-size: calc(60px * var(--mobile-chrome-scale, 1));
+    --mobile-ring-hollow: calc(123px * var(--mobile-chrome-scale, 1));
+  }
+  body.mobile-touch.hud-mobile-tablet #right-tracker-stack {
+    width: calc(220px * var(--mobile-chrome-scale, 1));
+  }
+  /* Tablet: unlike compact, the frame has no left nudge here, so on a 4:3 tablet
+     (1024x768) the centred frame's right edge (~602) grazes the tablet-tier Jump
+     crescent (60px circle, left edge ~589), leaving only ~2px, below the 4px
+     interactive floor. A small -10px nudge of the frame plus BOTH its bars (kept
+     in lockstep so the swing/cast bars stay centred over the frame, as in round 4)
+     opens that to ~8px on 1024x768. It is inconsequential on the wider tablet
+     profile (1920x1080), where Jump sits hundreds of px clear regardless.
+     Landscape-gated for the same reason as the compact narrow-width nudge:
+     portrait keeps the centred base seat. */
+  @media (orientation: landscape) {
+    body.mobile-touch.hud-mobile-tablet #player-frame,
+    body.mobile-touch.hud-mobile-tablet #castbar,
+    body.mobile-touch.hud-mobile-tablet #swingbar {
+      left: calc(50% - 10px);
+    }
+  }
+
+  /* ---------- floating combat text (mobile) ----------
+     The phone screen is small and the FCT stack crowds the fight, so on touch we
+     shrink the numbers and shorten the rise. These are COSMETIC richness tweaks
+     only (size + travel distance), never the number itself, so they stay within
+     the graphics-settings fairness rule. Desktop hud.css is left byte-identical:
+     we duplicate the keyframes with -mobile names (per the compositor-animation
+     rule in hud.css, the translate rise must stay a static keyframe animation, no
+     var() inside keyframes) and override ONLY font-size and animation-name here,
+     so font-weight, text-shadow, colour and the centring translate all inherit.
+     This hud-mobile layer outranks the components/hud layers, so no !important. */
+  @keyframes fct-rise-mobile {
+    from {
+      opacity: 1;
+      translate: -50% -50%;
+    }
+    to {
+      opacity: 0;
+      translate: -50% calc(-50% - 56px);
+    }
+  }
+  @keyframes fct-crit-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+      scale: 1;
+    }
+    15% {
+      scale: 1.5;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 62px);
+      scale: 1;
+    }
+  }
+  body.mobile-touch .fct {
+    font-size: calc(14px * var(--fct-scale, 1));
+    animation-name: fct-rise-mobile;
+  }
+  body.mobile-touch .fct.crit {
+    font-size: calc(20px * var(--fct-scale, 1));
+    animation-name: fct-crit-mobile;
+  }
+  /* Preserve the low-tier crit shed (hud.css swaps the crit pop for the plain
+     rise at data-fx-level=low): our layer would otherwise re-apply fct-crit-mobile,
+     so re-point the low tier at the non-crit mobile rise here too. */
+  :root[data-fx-level="low"] body.mobile-touch .fct.crit {
+    animation-name: fct-rise-mobile;
+  }
+  @keyframes fct-xp-pop-mobile {
+    0% {
+      opacity: 1;
+      translate: -50% -50%;
+      scale: 1;
+    }
+    15% {
+      scale: 1.2;
+    }
+    100% {
+      opacity: 0;
+      translate: -50% calc(-50% - 56px);
+      scale: 1;
+    }
+  }
+  /* Same treatment as .fct.crit above: the mobile .fct-xp/.fct-rested-xp selectors
+     are more specific than the desktop hud.css ones (body.mobile-touch adds a
+     selector), so they must be re-declared here or the desktop pop/size is lost
+     on touch. */
+  body.mobile-touch .fct-xp,
+  body.mobile-touch .fct-rested-xp {
+    font-size: calc(17px * var(--fct-scale, 1));
+    animation-name: fct-xp-pop-mobile;
+  }
+  :root[data-fx-level="low"] body.mobile-touch .fct-xp,
+  :root[data-fx-level="low"] body.mobile-touch .fct-rested-xp {
+    animation-name: fct-rise-mobile;
+  }
+
+  /* ---------- Dungeon Finder (mobile) ---------- */
+  /* One navigable pane: the catalogue rail and the detail never compete for
+     width; the painter's df-pane-* class picks which one shows, and the Back
+     button (hidden on desktop) returns to the list.
+     No `display` on the root here: the closed state (components.css) and the
+     painter's inline `flex` on open own it; a layer rule that forced `block`
+     would both re-show the closed window at boot and defeat the flex-column
+     bounds while open. */
+  body.mobile-touch #dungeon-finder-window {
+    max-height: calc(100% - 20px);
+  }
+  body.mobile-touch #dungeon-finder-window .df-body {
+    overflow: visible;
+    min-height: auto;
+  }
+  body.mobile-touch #dungeon-finder-window .df-body-catalogue {
+    display: block;
+  }
+  body.mobile-touch #dungeon-finder-window .df-cols {
+    display: block;
+  }
+  body.mobile-touch #dungeon-finder-window .df-rail,
+  body.mobile-touch #dungeon-finder-window .df-detail {
+    max-height: none;
+    overflow: visible;
+  }
+  body.mobile-touch #dungeon-finder-window .df-pane-list .df-detail {
+    display: none;
+  }
+  body.mobile-touch #dungeon-finder-window .df-pane-detail .df-rail {
+    display: none;
+  }
+  body.mobile-touch #dungeon-finder-window .df-back {
+    display: inline-block;
+  }
+  /* Bottom action bar: the primary queue action stays reachable by thumb. */
+  body.mobile-touch #dungeon-finder-window .df-footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--panel-bg, #17120a);
+    padding: 4px 0;
+  }
+  /* 40x40 touch floor for every tappable finder control. */
+  body.mobile-touch #dungeon-finder-window .df-tab,
+  body.mobile-touch #dungeon-finder-window .df-row,
+  body.mobile-touch #dungeon-finder-window .df-role,
+  body.mobile-touch #dungeon-finder-window .df-opt,
+  body.mobile-touch #dungeon-finder-window .df-tag,
+  body.mobile-touch #dungeon-finder-window .df-map-btn,
+  body.mobile-touch #dungeon-finder-window .btn,
+  body.mobile-touch #dungeon-finder-window select,
+  body.mobile-touch #dfinder-proposal-popup .btn {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+}

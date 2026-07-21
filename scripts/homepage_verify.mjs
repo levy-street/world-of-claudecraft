@@ -45,7 +45,7 @@ async function main() {
   page.on('console', (msg) => {
     if (msg.type() === 'error') {
       const text = msg.text();
-      if (text.includes('502') || text.includes('Bad Gateway') || text.includes('Failed to load resource')) {
+      if (text.includes('502') || text.includes('Bad Gateway') || text.includes('project-stats')) {
         console.log(`Ignoring transient browser startup network error: ${text}`);
         return;
       }
@@ -78,7 +78,6 @@ async function main() {
     const views = [
       { id: '#hero-view', btn: '#nav-btn-play' },
       { id: '#highscores-view', btn: '#nav-btn-highscores' },
-      { id: '#wiki-view', btn: '#nav-btn-wiki' },
       { id: '#news-view', btn: '#nav-btn-news' },
       { id: '#download-view', btn: '#nav-btn-download' }
     ];
@@ -185,28 +184,6 @@ async function main() {
       throw new Error(`Expected Spanish stats title to be "Estado del Reino", got "${espRealmStatusText}"`);
     }
 
-    // Go to Wiki view and check controls guide title translation
-    console.log('Switching to Wiki view to check translations...');
-    await page.click('#nav-btn-wiki');
-    await new Promise((r) => setTimeout(r, 300));
-
-    const espWikiTitle = await page.evaluate(() => {
-      const el = document.querySelector('#wiki-view .wiki-guide-intro h2');
-      return el ? el.textContent.trim() : '';
-    });
-    console.log(`Spanish Wiki Title: "${espWikiTitle}"`);
-    if (espWikiTitle !== 'Wiki y Guía del Juego') {
-      throw new Error(`Expected Spanish Wiki Title to be "Wiki y Guía del Juego", got "${espWikiTitle}"`);
-    }
-
-    const espControlsTitle = await page.evaluate(() => {
-      const el = document.querySelector('#wiki-view .controls-guide-title');
-      return el ? el.textContent.trim() : '';
-    });
-    console.log(`Spanish Controls Title: "${espControlsTitle}"`);
-    if (espControlsTitle !== 'Guía de Controles') {
-      throw new Error(`Expected Spanish Controls Title to be "Guía de Controles", got "${espControlsTitle}"`);
-    }
 
     // Switch back to English (en)
     console.log('Switching back to English (en)...');
@@ -227,13 +204,13 @@ async function main() {
     }
 
     // Verify back in English
-    const engWikiTitle = await page.evaluate(() => {
-      const el = document.querySelector('#wiki-view .wiki-guide-intro h2');
+    const engStatusTitle = await page.evaluate(() => {
+      const el = document.querySelector('#project-stats-panel h2');
       return el ? el.textContent.trim() : '';
     });
-    console.log(`English Wiki Title restored: "${engWikiTitle}"`);
-    if (engWikiTitle !== 'Game Wiki & Guide') {
-      throw new Error(`Expected English Wiki Title to be "Game Wiki & Guide", got "${engWikiTitle}"`);
+    console.log(`English Status Title restored: "${engStatusTitle}"`);
+    if (engStatusTitle !== 'Realm Status') {
+      throw new Error(`Expected English stats title to be "Realm Status", got "${engStatusTitle}"`);
     }
 
     // 4. Verify all new target languages from i18n via URL query parameters
@@ -259,8 +236,9 @@ async function main() {
       await page.goto(langUrl, { waitUntil: 'networkidle0', timeout: 15000 });
       
       const currentHtmlLang = await page.evaluate(() => document.documentElement.lang);
-      if (currentHtmlLang !== langCheck.code) {
-        throw new Error(`Expected html lang to be "${langCheck.code}", got "${currentHtmlLang}"`);
+      const expectedHtmlLang = langCheck.code.replace('_', '-');
+      if (currentHtmlLang !== expectedHtmlLang) {
+        throw new Error(`Expected html lang to be "${expectedHtmlLang}", got "${currentHtmlLang}"`);
       }
 
       const playText = await page.evaluate(() => {

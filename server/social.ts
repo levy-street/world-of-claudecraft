@@ -8,6 +8,9 @@
 // whoever happens to be online without knowing about sockets). game.ts wires
 // the real Postgres + socket implementations in.
 
+import type { ChatSenderFlair } from '../src/sim/account_flair';
+import type { PlayerClass } from '../src/sim/types';
+
 export type GuildRank = 'leader' | 'officer' | 'member';
 
 // Where a character is and what they're doing, for friend/guild rosters.
@@ -19,6 +22,8 @@ export type PresenceStatus = 'online' | 'combat' | 'dungeon' | 'dead';
 export interface Presence {
   zone: string;
   status: PresenceStatus;
+  x?: number;
+  z?: number;
 }
 
 export interface CharRef {
@@ -33,16 +38,39 @@ export interface CharInfo extends CharRef {
 }
 
 export interface FriendEntry extends CharInfo {
+  // The selected Book of Deeds title: a deed id (never display text; the
+  // client localizes through deed_i18n), null when untitled.
+  activeTitle: string | null;
   online: boolean;
   zone?: string;
   status?: PresenceStatus;
+  x?: number;
+  z?: number;
 }
 
 export interface GuildMemberEntry extends CharInfo {
   rank: GuildRank;
+  // ISO-8601 timestamp of the member's most recent world-entry, or null if never
+  // recorded. Serialized server-side (server/social_db.ts) and shown in the roster.
+  lastLogin: string | null;
+  // The selected Book of Deeds title (a deed id, null untitled), as on FriendEntry.
+  activeTitle: string | null;
   online: boolean;
   zone?: string;
   status?: PresenceStatus;
+  x?: number;
+  z?: number;
+}
+
+// One guild calendar event. `day` is a UTC 'YYYY-MM-DD'; `hour` is 0-23 UTC
+// or null for an all-day event; `createdBy` is the author's display name.
+export interface GuildEventRow {
+  id: number;
+  day: string;
+  hour: number | null;
+  title: string;
+  note: string;
+  createdBy: string;
 }
 
 export interface GuildView {
@@ -50,11 +78,13 @@ export interface GuildView {
   name: string;
   rank: GuildRank;
   members: GuildMemberEntry[];
+  events: GuildEventRow[];
 }
 
 export interface SocialSnapshot {
   friends: FriendEntry[];
   blocks: CharRef[];
+  ignores: CharRef[];
   guild: GuildView | null;
 }
 
@@ -63,29 +93,76 @@ export interface SocialSnapshot {
 export interface SocialDb {
   findCharacterByName(name: string): Promise<CharInfo | null>;
   getCharacter(id: number): Promise<CharInfo | null>;
-  // friends (one-directional, WoW-classic style: no acceptance needed)
+  // friends (one-directional, classic style: no acceptance needed)
   addFriend(charId: number, friendId: number): Promise<void>;
   removeFriend(charId: number, friendId: number): Promise<void>;
-  listFriends(charId: number): Promise<CharInfo[]>;
+  // activeTitle is the friend's selected Book of Deeds title (a deed id the
+  // client localizes, never English; the charactersForDeedsBoard read shape).
+  listFriends(charId: number): Promise<(CharInfo & { activeTitle: string | null })[]>;
   whoFriended(charId: number): Promise<number[]>; // reverse lookup
   // blocks (one-directional ignore)
   addBlock(charId: number, blockedId: number): Promise<void>;
   removeBlock(charId: number, blockedId: number): Promise<void>;
   listBlocks(charId: number): Promise<CharRef[]>;
   blockedIds(charId: number): Promise<number[]>;
+  // ignores (one-directional, chat-only; may coexist with a friendship)
+  addIgnore(charId: number, ignoredId: number): Promise<void>;
+  removeIgnore(charId: number, ignoredId: number): Promise<void>;
+  listIgnores(charId: number): Promise<CharRef[]>;
+  ignoredIds(charId: number): Promise<number[]>;
   // guilds (a character belongs to at most one)
-  createGuild(name: string): Promise<number>; // returns guild id; throws on duplicate name
+  // create the guild and seat its leader in one transaction, so a racing or
+  // duplicate create packet can never orphan a leaderless guild
+  createGuildWithLeader(
+    name: string,
+    leaderId: number,
+  ): Promise<{ guildId: number } | { error: 'name_taken' | 'already_in_guild' }>;
   deleteGuild(id: number): Promise<void>;
-  guildMembership(charId: number): Promise<{ guildId: number; guildName: string; rank: GuildRank } | null>;
-  addGuildMember(guildId: number, charId: number, rank: GuildRank): Promise<void>;
+  guildMembership(
+    charId: number,
+  ): Promise<{ guildId: number; guildName: string; rank: GuildRank } | null>;
+  // seat a member atomically, enforcing the cap under concurrent accepts
+  addGuildMemberAtomic(
+    guildId: number,
+    charId: number,
+    rank: GuildRank,
+    limit: number,
+  ): Promise<'ok' | 'full' | 'already_member' | 'no_guild'>;
   removeGuildMember(charId: number): Promise<void>;
   setGuildRank(charId: number, rank: GuildRank): Promise<void>;
-  guildMembers(guildId: number): Promise<(CharInfo & { rank: GuildRank })[]>;
+  guildMembers(
+    guildId: number,
+  ): Promise<
+    (CharInfo & { rank: GuildRank; lastLogin: string | null; activeTitle: string | null })[]
+  >;
+  // guild calendar events (the event calendar's guild lane)
+  guildEvents(guildId: number, fromDay: string): Promise<GuildEventRow[]>;
+  guildEventCount(guildId: number, fromDay: string): Promise<number>;
+  createGuildEvent(
+    guildId: number,
+    creatorId: number,
+    day: string,
+    hour: number | null,
+    title: string,
+    note: string,
+  ): Promise<number>;
+  deleteGuildEvent(eventId: number, guildId: number): Promise<boolean>;
+  pruneGuildEvents(guildId: number, beforeDay: string): Promise<void>;
 }
 
 export interface SocialActor {
   characterId: number;
   name: string;
+  // The actor's selected Book of Deeds title (a deed id, never display text),
+  // read from the LIVE sim meta by the caller (game.ts actorFor). Absent when
+  // the actor has no live meta or no title: an untitled relay line beats a
+  // stale db read. SocialService itself stays sim-ignorant.
+  activeTitle?: string | null;
+  // The actor's class, read from the LIVE sim meta the same way activeTitle
+  // is: guild/officer chat has no live entity for most recipients (guildmates
+  // are frequently far outside interest scope), so the class rides the relay
+  // event exactly like the title rather than being looked up client-side.
+  cls?: PlayerClass;
 }
 
 // Presence + delivery, provided by game.ts. Keeps this module ignorant of
@@ -103,19 +180,96 @@ export interface SocialTransport {
   pushSnapshot(characterId: number): void;
   // a character's block set changed; refresh the in-memory chat filter
   onBlocksChanged(characterId: number, blockedIds: number[]): void;
+  // a character's ignore set changed; refresh the in-memory chat filter
+  onIgnoresChanged(characterId: number, ignoredIds: number[]): void;
+  // the character just FOUNDED a guild (create committed, never a join or a
+  // refused create): the transport owner credits the founder's deed stat
+  // (guildsFounded is the one server-produced DeedStatKey; see its doc in
+  // src/sim/types.ts)
+  onGuildFounded(characterId: number): void;
+  // true if `recipientId` has `senderCharacterId` on their BLOCK list, so
+  // guild/officer chat can honour the same filter say/whisper already apply
+  isBlocking(recipientId: number, senderCharacterId: number): boolean;
+  // true if `recipientId` has `senderCharacterId` on their IGNORE list. Guild and
+  // officer chat fan out through deliver() and never pass the routeEvents chat
+  // filter, so they must consult the ignore list here, exactly as for blocks.
+  isIgnoringChat(recipientId: number, senderCharacterId: number): boolean;
+  // The sender's operator-set account flair (AI mark + streamer links), or undefined
+  // for an ordinary player. For the SAME reason as isIgnoringChat above: guild and
+  // officer chat never pass through routeEvents (which attaches flair to every other
+  // chat channel), so without this a guild line from a streamer would arrive bare.
+  chatFlairFor(senderCharacterId: number): ChatSenderFlair | undefined;
 }
 
 export type SocialEvent =
   | { type: 'log'; text: string; color?: string }
   | { type: 'error'; text: string }
-  | { type: 'chat'; from: string; text: string; channel: 'guild' | 'officer' }
-  | { type: 'guildInvite'; fromName: string; guildName: string };
+  // `flair` mirrors the SimEvent chat variant (src/sim/types.ts): the SENDER's
+  // account flair, attached at fan-out and absent for an ordinary player.
+  // fromTitle mirrors the sim chat event's optional field (a deed id the
+  // client localizes through deed_i18n, never display text); omitted for an
+  // untitled sender.
+  // classId mirrors the sim chat event's optional field the same way: the
+  // sender's class, absent only when the actor has no live meta.
+  | {
+      type: 'chat';
+      from: string;
+      fromTitle?: string;
+      text: string;
+      channel: 'guild' | 'officer';
+      flair?: ChatSenderFlair;
+      classId?: PlayerClass;
+    }
+  | { type: 'guildInvite'; fromName: string; guildName: string }
+  // Structured guild-calendar outcome; the client renders the visible line
+  // from the code (the sim's mailResult convention, so no server English here).
+  | { type: 'calendarResult'; code: CalendarResultCode }
+  // A guildmate's or followed friend's marquee deed unlock. Carries the deed
+  // ID only, never English (the client composes the line from deed_i18n plus
+  // its own chrome key, the calendarResult convention).
+  | { type: 'deedBroadcast'; characterName: string; deedId: string };
+
+export type CalendarResultCode =
+  | 'created'
+  | 'removed'
+  | 'notInGuild'
+  | 'notOfficer'
+  | 'badInput'
+  | 'calendarFull'
+  | 'eventGone';
 
 const FRIEND_LIMIT = 50;
 const BLOCK_LIMIT = 50;
+const IGNORE_LIMIT = 50;
 const GUILD_MEMBER_LIMIT = 100;
 const GUILD_INVITE_TTL_MS = 60_000;
 const GUILD_MESSAGE_MAX = 200;
+// Guild calendar: caps + input bounds. Events are UTC-day keyed ('YYYY-MM-DD',
+// matching the sim's utcDay convention) and may be booked up to a year out.
+const GUILD_EVENT_LIMIT = 25; // upcoming events per guild
+const GUILD_EVENT_TITLE_MAX = 48;
+const GUILD_EVENT_NOTE_MAX = 160;
+const GUILD_EVENT_HORIZON_DAYS = 366;
+const GUILD_EVENT_KEEP_PAST_DAYS = 2; // yesterday stays visible across timezones
+
+const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function shiftDay(iso: string, days: number): string {
+  const d = new Date(`${iso}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+// A well-formed, real calendar day inside the booking window (both UTC).
+export function validateGuildEventDay(day: string, todayIso: string): string | null {
+  if (!DAY_RE.test(day)) return null;
+  const parsed = new Date(`${day}T00:00:00Z`);
+  if (Number.isNaN(parsed.getTime())) return null;
+  if (parsed.toISOString().slice(0, 10) !== day) return null; // e.g. 2026-02-30 rolls over
+  if (day < shiftDay(todayIso, -1)) return null;
+  if (day > shiftDay(todayIso, GUILD_EVENT_HORIZON_DAYS)) return null;
+  return day;
+}
 
 export function validateGuildName(name: string): string | null {
   const trimmed = String(name ?? '').trim();
@@ -126,10 +280,17 @@ export function validateGuildName(name: string): string | null {
   return trimmed;
 }
 
-const RANK_LABEL: Record<GuildRank, string> = { leader: 'Guild Master', officer: 'Officer', member: 'Member' };
+const RANK_LABEL: Record<GuildRank, string> = {
+  leader: 'Guild Master',
+  officer: 'Officer',
+  member: 'Member',
+};
 
 export class SocialService {
-  private pendingGuildInvites = new Map<number, { guildId: number; guildName: string; fromName: string; expiresAt: number }>();
+  private pendingGuildInvites = new Map<
+    number,
+    { guildId: number; guildName: string; fromName: string; expiresAt: number }
+  >();
 
   constructor(
     private readonly db: SocialDb,
@@ -142,14 +303,19 @@ export class SocialService {
   // -------------------------------------------------------------------------
 
   async snapshot(charId: number): Promise<SocialSnapshot> {
-    const [friends, blocks, membership] = await Promise.all([
+    const [friends, blocks, ignores, membership] = await Promise.all([
       this.db.listFriends(charId),
       this.db.listBlocks(charId),
+      this.db.listIgnores(charId),
       this.db.guildMembership(charId),
     ]);
     let guild: GuildView | null = null;
     if (membership) {
-      const members = await this.db.guildMembers(membership.guildId);
+      const fromDay = shiftDay(this.todayIso(), -GUILD_EVENT_KEEP_PAST_DAYS);
+      const [members, events] = await Promise.all([
+        this.db.guildMembers(membership.guildId),
+        this.db.guildEvents(membership.guildId, fromDay),
+      ]);
       guild = {
         id: membership.guildId,
         name: membership.guildName,
@@ -157,6 +323,7 @@ export class SocialService {
         members: members
           .map((m) => ({ ...m, ...this.presence(m.id) }))
           .sort((a, b) => rankOrder(a.rank) - rankOrder(b.rank) || a.name.localeCompare(b.name)),
+        events,
       };
     }
     return {
@@ -164,14 +331,23 @@ export class SocialService {
         .map((f) => ({ ...f, ...this.presence(f.id) }))
         .sort((a, b) => Number(b.online) - Number(a.online) || a.name.localeCompare(b.name)),
       blocks,
+      ignores,
       guild,
     };
   }
 
   // Collapse a character's online presence into the fields a roster row needs.
-  private presence(charId: number): { online: boolean; zone?: string; status?: PresenceStatus } {
+  private presence(charId: number): {
+    online: boolean;
+    zone?: string;
+    status?: PresenceStatus;
+    x?: number;
+    z?: number;
+  } {
     const loc = this.tx.locationOf(charId);
-    return loc ? { online: true, zone: loc.zone, status: loc.status } : { online: false };
+    return loc
+      ? { online: true, zone: loc.zone, status: loc.status, x: loc.x, z: loc.z }
+      : { online: false };
   }
 
   private push(charId: number): void {
@@ -190,9 +366,15 @@ export class SocialService {
   // reporting the right error to the actor. Returns null on failure.
   private async resolveTarget(actor: SocialActor, name: string): Promise<CharInfo | null> {
     const wanted = String(name ?? '').trim();
-    if (!wanted) { this.err(actor.characterId, 'Specify a character name.'); return null; }
+    if (!wanted) {
+      this.err(actor.characterId, 'Specify a character name.');
+      return null;
+    }
     const target = await this.db.findCharacterByName(wanted);
-    if (!target) { this.err(actor.characterId, `No character named '${wanted}' exists.`); return null; }
+    if (!target) {
+      this.err(actor.characterId, `No character named '${wanted}' exists.`);
+      return null;
+    }
     return target;
   }
 
@@ -203,10 +385,30 @@ export class SocialService {
   async friendAdd(actor: SocialActor, name: string): Promise<void> {
     const target = await this.resolveTarget(actor, name);
     if (!target) return;
-    if (target.id === actor.characterId) { this.err(actor.characterId, 'You cannot befriend yourself.'); return; }
+    if (target.id === actor.characterId) {
+      this.err(actor.characterId, 'You cannot befriend yourself.');
+      return;
+    }
+    // friends and ignore are mutually exclusive — blockAdd drops an ignored
+    // player from your friends, so friendAdd must refuse the reverse, or a
+    // player could end up both ignored and friended at once.
+    const blocks = await this.db.listBlocks(actor.characterId);
+    if (blocks.some((b) => b.id === target.id)) {
+      this.err(
+        actor.characterId,
+        `You are blocking ${target.name}. Remove them from your block list first.`,
+      );
+      return;
+    }
     const friends = await this.db.listFriends(actor.characterId);
-    if (friends.some((f) => f.id === target.id)) { this.err(actor.characterId, `${target.name} is already your friend.`); return; }
-    if (friends.length >= FRIEND_LIMIT) { this.err(actor.characterId, 'Your friends list is full.'); return; }
+    if (friends.some((f) => f.id === target.id)) {
+      this.err(actor.characterId, `${target.name} is already your friend.`);
+      return;
+    }
+    if (friends.length >= FRIEND_LIMIT) {
+      this.err(actor.characterId, 'Your friends list is full.');
+      return;
+    }
     await this.db.addFriend(actor.characterId, target.id);
     this.info(actor.characterId, `${target.name} added to friends.`);
     this.push(actor.characterId);
@@ -214,7 +416,15 @@ export class SocialService {
 
   async friendRemove(actor: SocialActor, name: string): Promise<void> {
     const target = await this.db.findCharacterByName(String(name ?? '').trim());
-    if (!target) { this.err(actor.characterId, `No character named '${name}' on your friends list.`); return; }
+    if (!target) {
+      this.err(actor.characterId, `No character named '${name}' on your friends list.`);
+      return;
+    }
+    const friends = await this.db.listFriends(actor.characterId);
+    if (!friends.some((f) => f.id === target.id)) {
+      this.err(actor.characterId, `${target.name} is not on your friends list.`);
+      return;
+    }
     await this.db.removeFriend(actor.characterId, target.id);
     this.info(actor.characterId, `${target.name} removed from friends.`);
     this.push(actor.characterId);
@@ -227,11 +437,13 @@ export class SocialService {
     const notified = new Set<number>();
     for (const watcherId of watchers) {
       if (!this.tx.isOnline(watcherId)) continue;
-      this.tx.deliver(watcherId, [{
-        type: 'log',
-        text: online ? `${actor.name} has come online.` : `${actor.name} has gone offline.`,
-        color: '#7fd4ff',
-      }]);
+      this.tx.deliver(watcherId, [
+        {
+          type: 'log',
+          text: online ? `${actor.name} has come online.` : `${actor.name} has gone offline.`,
+          color: '#7fd4ff',
+        },
+      ]);
       this.push(watcherId);
       notified.add(watcherId);
     }
@@ -256,25 +468,118 @@ export class SocialService {
   async blockAdd(actor: SocialActor, name: string): Promise<void> {
     const target = await this.resolveTarget(actor, name);
     if (!target) return;
-    if (target.id === actor.characterId) { this.err(actor.characterId, 'You cannot ignore yourself.'); return; }
+    if (target.id === actor.characterId) {
+      this.err(actor.characterId, 'You cannot block yourself.');
+      return;
+    }
     const blocks = await this.db.listBlocks(actor.characterId);
-    if (blocks.some((b) => b.id === target.id)) { this.err(actor.characterId, `${target.name} is already ignored.`); return; }
-    if (blocks.length >= BLOCK_LIMIT) { this.err(actor.characterId, 'Your ignore list is full.'); return; }
+    if (blocks.some((b) => b.id === target.id)) {
+      this.err(actor.characterId, `${target.name} is already blocked.`);
+      return;
+    }
+    if (blocks.length >= BLOCK_LIMIT) {
+      this.err(actor.characterId, 'Your block list is full.');
+      return;
+    }
     await this.db.addBlock(actor.characterId, target.id);
-    // ignoring someone also drops them from your friends list
+    // blocking someone also drops them from your friends list
     await this.db.removeFriend(actor.characterId, target.id);
-    this.info(actor.characterId, `${target.name} is now ignored.`);
+    this.info(actor.characterId, `${target.name} is now blocked.`);
     this.tx.onBlocksChanged(actor.characterId, await this.db.blockedIds(actor.characterId));
     this.push(actor.characterId);
   }
 
   async blockRemove(actor: SocialActor, name: string): Promise<void> {
     const target = await this.db.findCharacterByName(String(name ?? '').trim());
-    if (!target) { this.err(actor.characterId, `No character named '${name}' on your ignore list.`); return; }
+    if (!target) {
+      this.err(actor.characterId, `No character named '${name}' on your block list.`);
+      return;
+    }
+    const blocks = await this.db.listBlocks(actor.characterId);
+    if (!blocks.some((b) => b.id === target.id)) {
+      this.err(actor.characterId, `${target.name} is not on your block list.`);
+      return;
+    }
     await this.db.removeBlock(actor.characterId, target.id);
-    this.info(actor.characterId, `${target.name} is no longer ignored.`);
+    this.info(actor.characterId, `${target.name} is no longer blocked.`);
     this.tx.onBlocksChanged(actor.characterId, await this.db.blockedIds(actor.characterId));
     this.push(actor.characterId);
+  }
+
+  // "/blocklist": echo the blocked names back to the actor.
+  async blockList(actor: SocialActor): Promise<void> {
+    const blocks = await this.db.listBlocks(actor.characterId);
+    if (blocks.length === 0) {
+      this.info(actor.characterId, 'Your block list is empty.');
+      return;
+    }
+    this.info(
+      actor.characterId,
+      `Blocked (${blocks.length}): ${blocks.map((b) => b.name).join(', ')}`,
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // Ignores (chat-only). A block is the heavy tool: it also drops invites, mail,
+  // whispers, and /who visibility. An ignore only hides their public chat from
+  // you, so unlike a block it deliberately does NOT evict them from your friends
+  // list: ignoring a chatty friend is a normal thing to want.
+  //
+  // NOT called a "mute": a mute in this game is the ADMIN account silence
+  // (/mute "<name>" <minutes>, accounts.chat_muted_until), which is a staff
+  // moderation action against a player, not a player's own preference.
+  // -------------------------------------------------------------------------
+
+  async ignoreAdd(actor: SocialActor, name: string): Promise<void> {
+    const target = await this.resolveTarget(actor, name);
+    if (!target) return;
+    if (target.id === actor.characterId) {
+      this.err(actor.characterId, 'You cannot ignore yourself.');
+      return;
+    }
+    const ignores = await this.db.listIgnores(actor.characterId);
+    if (ignores.some((i) => i.id === target.id)) {
+      this.err(actor.characterId, `${target.name} is already ignored.`);
+      return;
+    }
+    if (ignores.length >= IGNORE_LIMIT) {
+      this.err(actor.characterId, 'Your ignore list is full.');
+      return;
+    }
+    await this.db.addIgnore(actor.characterId, target.id);
+    this.info(actor.characterId, `${target.name} is now ignored.`);
+    this.tx.onIgnoresChanged(actor.characterId, await this.db.ignoredIds(actor.characterId));
+    this.push(actor.characterId);
+  }
+
+  async ignoreRemove(actor: SocialActor, name: string): Promise<void> {
+    const target = await this.db.findCharacterByName(String(name ?? '').trim());
+    if (!target) {
+      this.err(actor.characterId, `No character named '${name}' on your ignore list.`);
+      return;
+    }
+    const ignores = await this.db.listIgnores(actor.characterId);
+    if (!ignores.some((i) => i.id === target.id)) {
+      this.err(actor.characterId, `${target.name} is not on your ignore list.`);
+      return;
+    }
+    await this.db.removeIgnore(actor.characterId, target.id);
+    this.info(actor.characterId, `${target.name} is no longer ignored.`);
+    this.tx.onIgnoresChanged(actor.characterId, await this.db.ignoredIds(actor.characterId));
+    this.push(actor.characterId);
+  }
+
+  // "/ignorelist": echo the ignored names back to the actor as a chat readout.
+  async ignoreList(actor: SocialActor): Promise<void> {
+    const ignores = await this.db.listIgnores(actor.characterId);
+    if (ignores.length === 0) {
+      this.info(actor.characterId, 'Your ignore list is empty.');
+      return;
+    }
+    this.info(
+      actor.characterId,
+      `Ignored (${ignores.length}): ${ignores.map((i) => i.name).join(', ')}`,
+    );
   }
 
   // -------------------------------------------------------------------------
@@ -283,51 +588,114 @@ export class SocialService {
 
   async guildCreate(actor: SocialActor, rawName: string): Promise<void> {
     const name = validateGuildName(rawName);
-    if (!name) { this.err(actor.characterId, 'Guild names are 3-24 letters (spaces allowed).'); return; }
-    if (await this.db.guildMembership(actor.characterId)) { this.err(actor.characterId, 'You are already in a guild.'); return; }
-    let guildId: number;
-    try {
-      guildId = await this.db.createGuild(name);
-    } catch {
-      this.err(actor.characterId, `A guild named '${name}' already exists.`);
+    if (!name) {
+      this.err(actor.characterId, 'Guild names are 3-24 letters (spaces allowed).');
       return;
     }
-    await this.db.addGuildMember(guildId, actor.characterId, 'leader');
-    this.info(actor.characterId, `You found the guild <${name}>! You are its Guild Master.`, '#40ff7f');
+    const result = await this.db.createGuildWithLeader(name, actor.characterId);
+    if ('error' in result) {
+      this.err(
+        actor.characterId,
+        result.error === 'name_taken'
+          ? `A guild named '${name}' already exists.`
+          : 'You are already in a guild.',
+      );
+      return;
+    }
+    // Founder credit rides the transport seam: soc_guild_founded reads the
+    // guildsFounded deed stat, which only this success arm may ever produce
+    // (a refused create above must never reach it).
+    this.tx.onGuildFounded(actor.characterId);
+    this.info(
+      actor.characterId,
+      `You found the guild <${name}>! You are its Guild Master.`,
+      '#40ff7f',
+    );
     this.push(actor.characterId);
   }
 
   async guildInvite(actor: SocialActor, name: string): Promise<void> {
     const membership = await this.db.guildMembership(actor.characterId);
-    if (!membership) { this.err(actor.characterId, 'You are not in a guild.'); return; }
-    if (membership.rank === 'member') { this.err(actor.characterId, 'Only officers and the Guild Master may invite.'); return; }
+    if (!membership) {
+      this.err(actor.characterId, 'You are not in a guild.');
+      return;
+    }
+    if (membership.rank === 'member') {
+      this.err(actor.characterId, 'Only officers and the Guild Master may invite.');
+      return;
+    }
     const target = await this.resolveTarget(actor, name);
     if (!target) return;
-    if (target.id === actor.characterId) { this.err(actor.characterId, 'You are already in the guild.'); return; }
-    if (!this.tx.isOnline(target.id)) { this.err(actor.characterId, `${target.name} must be online to be invited.`); return; }
-    if (await this.db.guildMembership(target.id)) { this.err(actor.characterId, `${target.name} is already in a guild.`); return; }
+    if (target.id === actor.characterId) {
+      this.err(actor.characterId, 'You are already in the guild.');
+      return;
+    }
+    if (!this.tx.isOnline(target.id)) {
+      this.err(actor.characterId, `${target.name} must be online to be invited.`);
+      return;
+    }
+    if (await this.db.guildMembership(target.id)) {
+      this.err(actor.characterId, `${target.name} is already in a guild.`);
+      return;
+    }
+    const existing = this.pendingGuildInvites.get(target.id);
+    if (existing && existing.expiresAt >= this.now()) {
+      this.err(actor.characterId, `${target.name} already has a pending guild invitation.`);
+      return;
+    }
     const members = await this.db.guildMembers(membership.guildId);
-    if (members.length >= GUILD_MEMBER_LIMIT) { this.err(actor.characterId, 'Your guild is full.'); return; }
+    if (members.length >= GUILD_MEMBER_LIMIT) {
+      this.err(actor.characterId, 'Your guild is full.');
+      return;
+    }
+    // A target who has the inviter on their ignore list never sees the invite.
+    // From the inviter's side this is indistinguishable from an ordinary
+    // decline (guildDecline is silent): the usual confirmation, then nothing.
+    // No pending state is created, so other guilds can still invite the target.
+    if (this.tx.isBlocking(target.id, actor.characterId)) {
+      this.info(actor.characterId, `You have invited ${target.name} to the guild.`);
+      return;
+    }
     this.pendingGuildInvites.set(target.id, {
       guildId: membership.guildId,
       guildName: membership.guildName,
       fromName: actor.name,
       expiresAt: this.now() + GUILD_INVITE_TTL_MS,
     });
-    this.tx.deliver(target.id, [{ type: 'guildInvite', fromName: actor.name, guildName: membership.guildName }]);
+    this.tx.deliver(target.id, [
+      { type: 'guildInvite', fromName: actor.name, guildName: membership.guildName },
+    ]);
     this.info(actor.characterId, `You have invited ${target.name} to the guild.`);
   }
 
   async guildAccept(actor: SocialActor): Promise<void> {
     const invite = this.pendingGuildInvites.get(actor.characterId);
     this.pendingGuildInvites.delete(actor.characterId);
-    if (!invite || invite.expiresAt < this.now()) { this.err(actor.characterId, 'The guild invitation has expired.'); return; }
-    if (await this.db.guildMembership(actor.characterId)) { this.err(actor.characterId, 'You are already in a guild.'); return; }
-    const members = await this.db.guildMembers(invite.guildId);
-    if (members.length === 0) { this.err(actor.characterId, 'That guild no longer exists.'); return; }
-    if (members.length >= GUILD_MEMBER_LIMIT) { this.err(actor.characterId, 'That guild is full.'); return; }
-    await this.db.addGuildMember(invite.guildId, actor.characterId, 'member');
-    await this.broadcastGuild(invite.guildId, [{ type: 'log', text: `${actor.name} has joined the guild.`, color: '#40ff7f' }]);
+    if (!invite || invite.expiresAt < this.now()) {
+      this.err(actor.characterId, 'The guild invitation has expired.');
+      return;
+    }
+    const result = await this.db.addGuildMemberAtomic(
+      invite.guildId,
+      actor.characterId,
+      'member',
+      GUILD_MEMBER_LIMIT,
+    );
+    if (result === 'no_guild') {
+      this.err(actor.characterId, 'That guild no longer exists.');
+      return;
+    }
+    if (result === 'already_member') {
+      this.err(actor.characterId, 'You are already in a guild.');
+      return;
+    }
+    if (result === 'full') {
+      this.err(actor.characterId, 'That guild is full.');
+      return;
+    }
+    await this.broadcastGuild(invite.guildId, [
+      { type: 'log', text: `${actor.name} has joined the guild.`, color: '#40ff7f' },
+    ]);
     await this.pushGuild(invite.guildId);
   }
 
@@ -337,53 +705,85 @@ export class SocialService {
 
   async guildLeave(actor: SocialActor): Promise<void> {
     const membership = await this.db.guildMembership(actor.characterId);
-    if (!membership) { this.err(actor.characterId, 'You are not in a guild.'); return; }
+    if (!membership) {
+      this.err(actor.characterId, 'You are not in a guild.');
+      return;
+    }
     const members = await this.db.guildMembers(membership.guildId);
     const others = members.filter((m) => m.id !== actor.characterId);
-    // WoW rule: the Guild Master cannot quit while others remain — they must
+    // classic-MMO rule: the Guild Master cannot quit while others remain — they must
     // hand leadership over (Promote to Guild Master) or disband the guild.
     if (membership.rank === 'leader' && others.length > 0) {
-      this.err(actor.characterId, 'As Guild Master you must promote a new leader or disband the guild before leaving.');
+      this.err(
+        actor.characterId,
+        'As Guild Master you must promote a new leader or disband the guild before leaving.',
+      );
       return;
     }
     await this.db.removeGuildMember(actor.characterId);
     if (others.length === 0) {
       // last member out: the guild ceases to exist
       await this.db.deleteGuild(membership.guildId);
-      this.info(actor.characterId, `You have left <${membership.guildName}>. The guild has disbanded.`, '#ffd100');
+      this.info(
+        actor.characterId,
+        `You have left <${membership.guildName}>. The guild has disbanded.`,
+        '#ffd100',
+      );
     } else {
-      await this.broadcastGuild(membership.guildId, [{ type: 'log', text: `${actor.name} has left the guild.`, color: '#ffd100' }]);
+      await this.broadcastGuild(membership.guildId, [
+        { type: 'log', text: `${actor.name} has left the guild.`, color: '#ffd100' },
+      ]);
       this.info(actor.characterId, `You have left <${membership.guildName}>.`);
       await this.pushGuild(membership.guildId);
     }
     this.push(actor.characterId);
   }
 
-  // WoW /gleader: hand the Guild Master title to another member. The former
+  // /gleader: hand the Guild Master title to another member. The former
   // leader steps down to Officer.
   async guildTransferLeader(actor: SocialActor, name: string): Promise<void> {
     const membership = await this.db.guildMembership(actor.characterId);
-    if (!membership) { this.err(actor.characterId, 'You are not in a guild.'); return; }
-    if (membership.rank !== 'leader') { this.err(actor.characterId, 'Only the Guild Master may promote a new leader.'); return; }
+    if (!membership) {
+      this.err(actor.characterId, 'You are not in a guild.');
+      return;
+    }
+    if (membership.rank !== 'leader') {
+      this.err(actor.characterId, 'Only the Guild Master may promote a new leader.');
+      return;
+    }
     const target = await this.db.findCharacterByName(String(name ?? '').trim());
-    if (!target || target.id === actor.characterId) { this.err(actor.characterId, `No such guild member '${name}'.`); return; }
+    if (!target || target.id === actor.characterId) {
+      this.err(actor.characterId, `No such guild member '${name}'.`);
+      return;
+    }
     const targetMembership = await this.db.guildMembership(target.id);
     if (!targetMembership || targetMembership.guildId !== membership.guildId) {
-      this.err(actor.characterId, `${target.name} is not in your guild.`); return;
+      this.err(actor.characterId, `${target.name} is not in your guild.`);
+      return;
     }
     await this.db.setGuildRank(target.id, 'leader');
     await this.db.setGuildRank(actor.characterId, 'officer');
     await this.broadcastGuild(membership.guildId, [
-      { type: 'log', text: `${target.name} is now the Guild Master of <${membership.guildName}>.`, color: '#ffd100' },
+      {
+        type: 'log',
+        text: `${target.name} is now the Guild Master of <${membership.guildName}>.`,
+        color: '#ffd100',
+      },
     ]);
     await this.pushGuild(membership.guildId);
   }
 
-  // WoW /gdisband: the Guild Master dissolves the entire guild.
+  // /gdisband: the Guild Master dissolves the entire guild.
   async guildDisband(actor: SocialActor): Promise<void> {
     const membership = await this.db.guildMembership(actor.characterId);
-    if (!membership) { this.err(actor.characterId, 'You are not in a guild.'); return; }
-    if (membership.rank !== 'leader') { this.err(actor.characterId, 'Only the Guild Master may disband the guild.'); return; }
+    if (!membership) {
+      this.err(actor.characterId, 'You are not in a guild.');
+      return;
+    }
+    if (membership.rank !== 'leader') {
+      this.err(actor.characterId, 'Only the Guild Master may disband the guild.');
+      return;
+    }
     const members = await this.db.guildMembers(membership.guildId);
     await this.db.deleteGuild(membership.guildId);
     for (const m of members) {
@@ -396,68 +796,263 @@ export class SocialService {
 
   async guildKick(actor: SocialActor, name: string): Promise<void> {
     const membership = await this.db.guildMembership(actor.characterId);
-    if (!membership) { this.err(actor.characterId, 'You are not in a guild.'); return; }
-    if (membership.rank === 'member') { this.err(actor.characterId, 'Only officers and the Guild Master may remove members.'); return; }
+    if (!membership) {
+      this.err(actor.characterId, 'You are not in a guild.');
+      return;
+    }
+    if (membership.rank === 'member') {
+      this.err(actor.characterId, 'Only officers and the Guild Master may remove members.');
+      return;
+    }
     const target = await this.db.findCharacterByName(String(name ?? '').trim());
-    if (!target) { this.err(actor.characterId, `No character named '${name}'.`); return; }
-    if (target.id === actor.characterId) { this.err(actor.characterId, 'Use Leave Guild to remove yourself.'); return; }
+    if (!target) {
+      this.err(actor.characterId, `No character named '${name}'.`);
+      return;
+    }
+    if (target.id === actor.characterId) {
+      this.err(actor.characterId, 'Use Leave Guild to remove yourself.');
+      return;
+    }
     const targetMembership = await this.db.guildMembership(target.id);
     if (!targetMembership || targetMembership.guildId !== membership.guildId) {
-      this.err(actor.characterId, `${target.name} is not in your guild.`); return;
+      this.err(actor.characterId, `${target.name} is not in your guild.`);
+      return;
     }
-    if (targetMembership.rank === 'leader') { this.err(actor.characterId, 'You cannot remove the Guild Master.'); return; }
+    if (targetMembership.rank === 'leader') {
+      this.err(actor.characterId, 'You cannot remove the Guild Master.');
+      return;
+    }
     if (targetMembership.rank === 'officer' && membership.rank !== 'leader') {
-      this.err(actor.characterId, 'Only the Guild Master may remove an officer.'); return;
+      this.err(actor.characterId, 'Only the Guild Master may remove an officer.');
+      return;
     }
     await this.db.removeGuildMember(target.id);
     if (this.tx.isOnline(target.id)) {
       this.info(target.id, `You have been removed from <${membership.guildName}>.`, '#ffd100');
       this.push(target.id);
     }
-    await this.broadcastGuild(membership.guildId, [{ type: 'log', text: `${target.name} has been removed from the guild by ${actor.name}.`, color: '#ffd100' }]);
+    await this.broadcastGuild(membership.guildId, [
+      {
+        type: 'log',
+        text: `${target.name} has been removed from the guild by ${actor.name}.`,
+        color: '#ffd100',
+      },
+    ]);
     await this.pushGuild(membership.guildId);
   }
 
   async guildSetRank(actor: SocialActor, name: string, rank: GuildRank): Promise<void> {
     const membership = await this.db.guildMembership(actor.characterId);
-    if (!membership) { this.err(actor.characterId, 'You are not in a guild.'); return; }
-    if (membership.rank !== 'leader') { this.err(actor.characterId, 'Only the Guild Master may change ranks.'); return; }
-    if (rank === 'leader') { this.err(actor.characterId, 'Use a guild transfer to hand over leadership.'); return; }
+    if (!membership) {
+      this.err(actor.characterId, 'You are not in a guild.');
+      return;
+    }
+    if (membership.rank !== 'leader') {
+      this.err(actor.characterId, 'Only the Guild Master may change ranks.');
+      return;
+    }
+    if (rank === 'leader') {
+      this.err(actor.characterId, 'Use a guild transfer to hand over leadership.');
+      return;
+    }
     const target = await this.db.findCharacterByName(String(name ?? '').trim());
-    if (!target || target.id === actor.characterId) { this.err(actor.characterId, `No such guild member '${name}'.`); return; }
+    if (!target || target.id === actor.characterId) {
+      this.err(actor.characterId, `No such guild member '${name}'.`);
+      return;
+    }
     const targetMembership = await this.db.guildMembership(target.id);
     if (!targetMembership || targetMembership.guildId !== membership.guildId) {
-      this.err(actor.characterId, `${target.name} is not in your guild.`); return;
+      this.err(actor.characterId, `${target.name} is not in your guild.`);
+      return;
     }
-    if (targetMembership.rank === rank) { this.err(actor.characterId, `${target.name} is already ${RANK_LABEL[rank]}.`); return; }
+    if (targetMembership.rank === rank) {
+      this.err(actor.characterId, `${target.name} is already ${RANK_LABEL[rank]}.`);
+      return;
+    }
     await this.db.setGuildRank(target.id, rank);
-    await this.broadcastGuild(membership.guildId, [{ type: 'log', text: `${target.name} is now ${RANK_LABEL[rank]}.`, color: '#40ff7f' }]);
+    await this.broadcastGuild(membership.guildId, [
+      { type: 'log', text: `${target.name} is now ${RANK_LABEL[rank]}.`, color: '#40ff7f' },
+    ]);
     await this.pushGuild(membership.guildId);
   }
 
   async guildChat(actor: SocialActor, rawText: string): Promise<boolean> {
-    const text = String(rawText ?? '').trim().slice(0, GUILD_MESSAGE_MAX);
+    const text = String(rawText ?? '')
+      .trim()
+      .slice(0, GUILD_MESSAGE_MAX);
     if (!text) return false;
     const membership = await this.db.guildMembership(actor.characterId);
-    if (!membership) { this.err(actor.characterId, 'You are not in a guild.'); return false; }
-    await this.broadcastGuild(membership.guildId, [{ type: 'chat', from: actor.name, text, channel: 'guild' }]);
+    if (!membership) {
+      this.err(actor.characterId, 'You are not in a guild.');
+      return false;
+    }
+    // Built once for the whole fan-out, title and flair included: both belong to the
+    // sender, not the recipient, so they are identical for every member who receives
+    // the line.
+    const event: SocialEvent = {
+      type: 'chat',
+      from: actor.name,
+      ...(actor.activeTitle ? { fromTitle: actor.activeTitle } : {}),
+      ...(actor.cls ? { classId: actor.cls } : {}),
+      text,
+      channel: 'guild',
+      flair: this.tx.chatFlairFor(actor.characterId),
+    };
+    const members = await this.db.guildMembers(membership.guildId);
+    for (const m of members) {
+      if (!this.tx.isOnline(m.id)) continue;
+      // a player who blocks or ignores the speaker does not see their guild chat
+      // (the speaker always sees their own line); mirrors say/whisper filtering.
+      // Guild chat never passes through routeEvents, so the ignore check has to
+      // happen here or ignoring a guildmate would do nothing in this channel.
+      if (m.id !== actor.characterId && this.tx.isBlocking(m.id, actor.characterId)) continue;
+      if (m.id !== actor.characterId && this.tx.isIgnoringChat(m.id, actor.characterId)) continue;
+      this.tx.deliver(m.id, [event]);
+    }
     return true;
   }
 
-  // WoW officer chat (/o): officers + Guild Master only, delivered to the same.
+  // Fan one marquee deed unlock out to the earner's online guildmates and the
+  // players who friended the earner (friends are one-directional: whoever put
+  // the earner on THEIR list chose to follow them, the position-push rule).
+  // Pure delivery: the caller (game.ts) has already applied the marquee bar,
+  // the retro gate, and the earner's opt-out; this resolves the audience and
+  // filters it BIDIRECTIONALLY: each recipient's block list is honoured like
+  // guild chat (a deed unlock is not chat, so the lighter chat-only ignore does
+  // not hide it), and the earner's own block list also excludes a recipient
+  // (blockAdd only unfriends the earner's edge, so a blocked follower would
+  // otherwise stay in whoFriended and keep hearing these). The earner never
+  // receives it (their own toast is client-side from the sim event).
+  async broadcastDeedUnlock(actor: SocialActor, deedId: string): Promise<void> {
+    const event: SocialEvent = { type: 'deedBroadcast', characterName: actor.name, deedId };
+    const [membership, followerIds, earnerBlockedIds] = await Promise.all([
+      this.db.guildMembership(actor.characterId),
+      this.db.whoFriended(actor.characterId),
+      this.db.blockedIds(actor.characterId),
+    ]);
+    const earnerBlocked = new Set(earnerBlockedIds);
+    const audience = new Set<number>(followerIds);
+    if (membership) {
+      for (const m of await this.db.guildMembers(membership.guildId)) audience.add(m.id);
+    }
+    for (const id of audience) {
+      if (id === actor.characterId) continue;
+      if (!this.tx.isOnline(id)) continue;
+      if (this.tx.isBlocking(id, actor.characterId)) continue;
+      if (earnerBlocked.has(id)) continue;
+      this.tx.deliver(id, [event]);
+    }
+  }
+
+  // Officer chat (/o): officers + Guild Master only, delivered to the same.
   async officerChat(actor: SocialActor, rawText: string): Promise<boolean> {
-    const text = String(rawText ?? '').trim().slice(0, GUILD_MESSAGE_MAX);
+    const text = String(rawText ?? '')
+      .trim()
+      .slice(0, GUILD_MESSAGE_MAX);
     if (!text) return false;
     const membership = await this.db.guildMembership(actor.characterId);
-    if (!membership) { this.err(actor.characterId, 'You are not in a guild.'); return false; }
-    if (membership.rank === 'member') { this.err(actor.characterId, 'Only officers and the Guild Master can use officer chat.'); return false; }
+    if (!membership) {
+      this.err(actor.characterId, 'You are not in a guild.');
+      return false;
+    }
+    if (membership.rank === 'member') {
+      this.err(actor.characterId, 'Only officers and the Guild Master can use officer chat.');
+      return false;
+    }
+    const event: SocialEvent = {
+      type: 'chat',
+      from: actor.name,
+      ...(actor.activeTitle ? { fromTitle: actor.activeTitle } : {}),
+      ...(actor.cls ? { classId: actor.cls } : {}),
+      text,
+      channel: 'officer',
+      flair: this.tx.chatFlairFor(actor.characterId),
+    };
     const members = await this.db.guildMembers(membership.guildId);
     for (const m of members) {
       if ((m.rank === 'officer' || m.rank === 'leader') && this.tx.isOnline(m.id)) {
-        this.tx.deliver(m.id, [{ type: 'chat', from: actor.name, text, channel: 'officer' }]);
+        // honour the recipient's block and ignore lists, just like guild/say/whisper
+        if (m.id !== actor.characterId && this.tx.isBlocking(m.id, actor.characterId)) continue;
+        if (m.id !== actor.characterId && this.tx.isIgnoringChat(m.id, actor.characterId)) continue;
+        this.tx.deliver(m.id, [event]);
       }
     }
     return true;
+  }
+
+  // -------------------------------------------------------------------------
+  // Guild calendar events
+  // -------------------------------------------------------------------------
+
+  private todayIso(): string {
+    return new Date(this.now()).toISOString().slice(0, 10);
+  }
+
+  private calendarResult(charId: number, code: CalendarResultCode): void {
+    this.tx.deliver(charId, [{ type: 'calendarResult', code }]);
+  }
+
+  async guildEventCreate(
+    actor: SocialActor,
+    input: { day: string; hour: number | null; title: string; note: string },
+  ): Promise<void> {
+    const membership = await this.db.guildMembership(actor.characterId);
+    if (!membership) {
+      this.calendarResult(actor.characterId, 'notInGuild');
+      return;
+    }
+    if (membership.rank === 'member') {
+      this.calendarResult(actor.characterId, 'notOfficer');
+      return;
+    }
+    const today = this.todayIso();
+    const day = validateGuildEventDay(String(input.day ?? ''), today);
+    const title = String(input.title ?? '')
+      .trim()
+      .slice(0, GUILD_EVENT_TITLE_MAX);
+    const note = String(input.note ?? '')
+      .trim()
+      .slice(0, GUILD_EVENT_NOTE_MAX);
+    const hour =
+      input.hour === null || !Number.isFinite(input.hour)
+        ? null
+        : Math.max(0, Math.min(23, Math.floor(input.hour)));
+    if (!day || title.length === 0) {
+      this.calendarResult(actor.characterId, 'badInput');
+      return;
+    }
+    // Housekeeping: long-past events fall off whenever a new one is booked.
+    await this.db.pruneGuildEvents(
+      membership.guildId,
+      shiftDay(today, -GUILD_EVENT_KEEP_PAST_DAYS),
+    );
+    const upcoming = await this.db.guildEventCount(membership.guildId, today);
+    if (upcoming >= GUILD_EVENT_LIMIT) {
+      this.calendarResult(actor.characterId, 'calendarFull');
+      return;
+    }
+    await this.db.createGuildEvent(membership.guildId, actor.characterId, day, hour, title, note);
+    this.calendarResult(actor.characterId, 'created');
+    await this.pushGuild(membership.guildId);
+  }
+
+  async guildEventRemove(actor: SocialActor, eventId: number): Promise<void> {
+    const membership = await this.db.guildMembership(actor.characterId);
+    if (!membership) {
+      this.calendarResult(actor.characterId, 'notInGuild');
+      return;
+    }
+    if (membership.rank === 'member') {
+      this.calendarResult(actor.characterId, 'notOfficer');
+      return;
+    }
+    const removed = await this.db.deleteGuildEvent(eventId, membership.guildId);
+    if (!removed) {
+      this.calendarResult(actor.characterId, 'eventGone');
+      return;
+    }
+    this.calendarResult(actor.characterId, 'removed');
+    await this.pushGuild(membership.guildId);
   }
 
   // Deliver events to every online member of a guild.

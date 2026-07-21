@@ -1,0 +1,8 @@
+{
+  "note": "KayKit 'Bits' packs (dungeon / resource / tools) — bulk gltf→glb conversion. Each gltf references a co-located shared texture atlas by URI, so the converter embeds the texture into every output glb (single self-contained file). type:static (geometry-safe), maxTex:512 webp. Run: node scripts/assets/build_assets.mjs scripts/assets/specs/asset_bits.json   (add --shard i/n to parallelize). Raw inputs under tmp/asset_src are gitignored; only the public/models outputs are committed.",
+  "items": [
+    { "srcDir": "tmp/asset_src/dungeon",   "outDir": "models/dungeon_bits",  "type": "static", "maxTex": 512 },
+    { "srcDir": "tmp/asset_src/resources", "outDir": "models/resource_bits", "type": "static", "maxTex": 512 },
+    { "srcDir": "tmp/asset_src/tools",     "outDir": "models/tools_bits",    "type": "static", "maxTex": 512 }
+  ]
+}

@@ -1,0 +1,6 @@
+interface:
+  display_name: "World of ClaudeCraft Feature Plan"
+  short_description: "Plan large features as testable vertical slices"
+  default_prompt: "Use $woc-feature-plan to prepare a phased, model-neutral implementation plan for this World of ClaudeCraft feature."
+policy:
+  allow_implicit_invocation: false

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="refresh" content="30" />
-  <title>World of Claudecraft - Realm Unavailable</title>
+  <title>World of ClaudeCraft - World Unavailable</title>
   <style>
     :root {
       color-scheme: dark;
@@ -75,6 +75,7 @@
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.16em;
+      text-indent: 0.16em;
       text-transform: uppercase;
     }
 
@@ -135,14 +136,158 @@
 </head>
 <body>
   <main aria-labelledby="realm-title">
-    <img class="logo" src="/worldofclaudecraft-logo.png" alt="World of Claudecraft" />
-    <p class="eyebrow">Realm maintenance</p>
-    <h1 id="realm-title">The realm is temporarily unavailable.</h1>
-    <p>
+    <img class="logo" src="/worldofclaudecraft-logo.png" alt="World of ClaudeCraft" data-i18n-alt="logoAlt" />
+    <p class="eyebrow" data-i18n="eyebrow">World maintenance</p>
+    <h1 id="realm-title" data-i18n="heading">The world is temporarily unavailable.</h1>
+    <p data-i18n="body">
       We are restarting the game service and expect Claudemoon to return shortly.
       This page will keep checking automatically.
     </p>
-    <div class="status" aria-live="polite">Back soon</div>
+    <div class="status" aria-live="polite" data-i18n="status">Back soon</div>
   </main>
+  <script>
+    (() => {
+      const copy = {
+        en: {
+          title: "World of ClaudeCraft - World Unavailable",
+          logoAlt: "World of ClaudeCraft",
+          eyebrow: "World maintenance",
+          heading: "The world is temporarily unavailable.",
+          body: "We are restarting the game service and expect Claudemoon to return shortly. This page will keep checking automatically.",
+          status: "Back soon"
+        },
+        es: {
+          title: "World of ClaudeCraft - Reino no disponible",
+          logoAlt: "World of ClaudeCraft",
+          eyebrow: "Mantenimiento del reino",
+          heading: "El reino no está disponible temporalmente.",
+          body: "Estamos reiniciando el servicio del juego y esperamos que Claudemoon vuelva pronto. Esta página seguirá comprobándolo automáticamente.",
+          status: "Volvemos pronto"
+        },
+        es_ES: {
+          title: "World of ClaudeCraft - Reino no disponible",
+          logoAlt: "World of ClaudeCraft",
+          eyebrow: "Mantenimiento del reino",
+          heading: "El reino no está disponible temporalmente.",
+          body: "Estamos reiniciando el servicio del juego y esperamos que Claudemoon vuelva pronto. Esta página seguirá comprobándolo automáticamente.",
+          status: "Volvemos pronto"
+        },
+        fr_FR: {
+          title: "World of ClaudeCraft - Royaume indisponible",
+          logoAlt: "World of ClaudeCraft",
+          eyebrow: "Maintenance du royaume",
+          heading: "Le royaume est temporairement indisponible.",
+          body: "Nous redémarrons le service de jeu et Claudemoon devrait revenir bientôt. Cette page continuera de vérifier automatiquement.",
+          status: "Bientôt de retour"
+        },
+        fr_CA: {
+          title: "World of ClaudeCraft - Royaume indisponible",
+          logoAlt: "World of ClaudeCraft",
+          eyebrow: "Maintenance du royaume",
+          heading: "Le royaume est temporairement indisponible.",
+          body: "Nous redémarrons le service de jeu et Claudemoon devrait revenir sous peu. Cette page continuera de vérifier automatiquement.",
+          status: "De retour bientôt"
+        },
+        en_CA: {
+          title: "World of ClaudeCraft - Realm Unavailable",
+          logoAlt: "World of ClaudeCraft",
+          eyebrow: "Realm maintenance",
+          heading: "The realm is temporarily unavailable.",
+          body: "We are restarting the game service and expect Claudemoon to return shortly. This page will keep checking automatically.",
+          status: "Back soon"
+        },
+        it_IT: {
+          title: "World of ClaudeCraft - Reame non disponibile",
+          logoAlt: "World of ClaudeCraft",
+          eyebrow: "Manutenzione del reame",
+          heading: "Il reame è temporaneamente non disponibile.",
+          body: "Stiamo riavviando il servizio di gioco e prevediamo che Claudemoon torni a breve. Questa pagina continuerà a controllare automaticamente.",
+          status: "Torna presto"
+        },
+        de_DE: {
+          title: "World of ClaudeCraft - Realm nicht verfügbar",
+          logoAlt: "World of ClaudeCraft",
+          eyebrow: "Realmwartung",
+          heading: "Der Realm ist vorübergehend nicht verfügbar.",
+          body: "Wir starten den Spieldienst neu und erwarten, dass Claudemoon bald zurückkehrt. Diese Seite prüft automatisch weiter.",
+          status: "Bald zurück"
+        },
+        zh_CN: {
+          title: "World of ClaudeCraft - 服务器不可用",
+          logoAlt: "World of ClaudeCraft",
+          eyebrow: "服务器维护",
+          heading: "服务器暂时不可用。",
+          body: "我们正在重启游戏服务，Claudemoon 应会很快恢复。此页面会自动继续检查。",
+          status: "即将恢复"
+        },
+        zh_TW: {
+          title: "World of ClaudeCraft - 伺服器不可用",
+          logoAlt: "World of ClaudeCraft",
+          eyebrow: "伺服器維護",
+          heading: "伺服器暫時不可用。",
+          body: "我們正在重新啟動遊戲服務，Claudemoon 應會很快恢復。此頁面會自動持續檢查。",
+          status: "即將恢復"
+        },
+        ko_KR: {
+          title: "World of ClaudeCraft - 렐름 이용 불가",
+          logoAlt: "World of ClaudeCraft",
+          eyebrow: "렐름 점검",
+          heading: "렐름을 일시적으로 이용할 수 없습니다.",
+          body: "게임 서비스를 재시작하고 있으며 Claudemoon은 곧 돌아올 예정입니다. 이 페이지는 자동으로 계속 확인합니다.",
+          status: "곧 돌아옵니다"
+        },
+        ja_JP: {
+          title: "World of ClaudeCraft - レルム利用不可",
+          logoAlt: "World of ClaudeCraft",
+          eyebrow: "レルムメンテナンス",
+          heading: "レルムは一時的に利用できません。",
+          body: "ゲームサービスを再起動しています。Claudemoonはまもなく戻る予定です。このページは自動的に確認を続けます。",
+          status: "まもなく復帰"
+        },
+        pt_BR: {
+          title: "World of ClaudeCraft - Reino indisponível",
+          logoAlt: "World of ClaudeCraft",
+          eyebrow: "Manutenção do reino",
+          heading: "O reino está temporariamente indisponível.",
+          body: "Estamos reiniciando o serviço do jogo e esperamos que Claudemoon volte em breve. Esta página continuará verificando automaticamente.",
+          status: "Voltamos em breve"
+        },
+        ru_RU: {
+          title: "World of ClaudeCraft - мир недоступен",
+          logoAlt: "World of ClaudeCraft",
+          eyebrow: "Технические работы",
+          heading: "Мир временно недоступен.",
+          body: "Мы перезапускаем игровой сервис и ожидаем, что Claudemoon скоро вернется. Эта страница продолжит проверку автоматически.",
+          status: "Скоро вернется"
+        }
+      };
+      const supported = Object.keys(copy);
+      const normalize = (value) => value ? value.replace("-", "_") : "";
+      const params = new URLSearchParams(window.location.search);
+      const requested = normalize(params.get("lang"));
+      const saved = normalize(localStorage.getItem("locale"));
+      const browser = normalize(navigator.language);
+      const language = supported.includes(requested)
+        ? requested
+        : supported.includes(saved)
+          ? saved
+          : supported.includes(browser)
+            ? browser
+            : browser.startsWith("es")
+              ? "es"
+              : "en";
+      const strings = copy[language] || copy.en;
+      document.documentElement.lang = language.replace("_", "-");
+      document.title = strings.title;
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.getAttribute("data-i18n");
+        if (key && strings[key]) el.textContent = strings[key];
+      });
+      document.querySelectorAll("[data-i18n-alt]").forEach((el) => {
+        const key = el.getAttribute("data-i18n-alt");
+        if (key && strings[key]) el.setAttribute("alt", strings[key]);
+      });
+    })();
+  </script>
 </body>
 </html>

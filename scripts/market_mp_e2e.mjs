@@ -47,7 +47,7 @@ async function enter(page, charName, cls, mode) {
     await sleep(700);
   }
   await page.evaluate((name) => {
-    [...document.querySelectorAll('.char-row')].find((r) => r.querySelector('.char-name')?.textContent === name)?.querySelector('button')?.click();
+    [...document.querySelectorAll('.char-row')].find((r) => r.querySelector('.char-name')?.textContent === name)?.querySelector('.enter-world-btn')?.click();
   }, charName);
   await page.waitForFunction(() => window.__game?.world?.entities?.size > 5, { timeout: 20000, polling: 500 });
   await sleep(500);

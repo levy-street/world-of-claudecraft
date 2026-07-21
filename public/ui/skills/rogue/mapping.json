@@ -1,0 +1,119 @@
+{
+  "class": "rogue",
+  "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+  "iconSize": 128,
+  "sourcePack": "tmp/asset_src/thief-skill-icons (CraftPix premium)",
+  "runtimeDir": "public/ui/skills/rogue",
+  "abilities": [
+    {
+      "abilityId": "sinister_strike",
+      "sourceFile": "37.png",
+      "output": "sinister_strike.webp"
+    },
+    {
+      "abilityId": "eviscerate",
+      "sourceFile": "19.png",
+      "output": "eviscerate.webp"
+    },
+    {
+      "abilityId": "backstab",
+      "sourceFile": "43.png",
+      "output": "backstab.webp"
+    },
+    {
+      "abilityId": "gouge",
+      "sourceFile": "31.png",
+      "output": "gouge.webp"
+    },
+    {
+      "abilityId": "cheap_shot",
+      "sourceFile": "21.png",
+      "output": "cheap_shot.webp"
+    },
+    {
+      "abilityId": "evasion",
+      "sourceFile": "41.png",
+      "output": "evasion.webp"
+    },
+    {
+      "abilityId": "slice_and_dice",
+      "sourceFile": "46.png",
+      "output": "slice_and_dice.webp"
+    },
+    {
+      "abilityId": "sprint",
+      "sourceFile": "17.png",
+      "output": "sprint.webp"
+    },
+    {
+      "abilityId": "crippling_poison",
+      "sourceFile": "30.png",
+      "output": "crippling_poison.webp"
+    },
+    {
+      "abilityId": "kidney_shot",
+      "sourceFile": "12.png",
+      "output": "kidney_shot.webp"
+    },
+    {
+      "abilityId": "ambush",
+      "sourceFile": "50.png",
+      "output": "ambush.webp"
+    },
+    {
+      "abilityId": "rupture",
+      "sourceFile": "29.png",
+      "output": "rupture.webp"
+    },
+    {
+      "abilityId": "vanish",
+      "sourceFile": "27.png",
+      "output": "vanish.webp"
+    },
+    {
+      "abilityId": "instant_poison",
+      "sourceFile": "28.png",
+      "output": "instant_poison.webp"
+    },
+    {
+      "abilityId": "adrenaline_rush",
+      "sourceFile": "39.png",
+      "output": "adrenaline_rush.webp"
+    },
+    {
+      "abilityId": "deadly_poison",
+      "sourceFile": "36.png",
+      "output": "deadly_poison.webp"
+    },
+    {
+      "abilityId": "stealth",
+      "sourceFile": "44.png",
+      "output": "stealth.webp"
+    },
+    {
+      "abilityId": "sap",
+      "sourcePack": "generic-skill100",
+      "sourceFile": "skill icon 30.png",
+      "output": "sap.webp"
+    },
+    {
+      "abilityId": "expose_armor",
+      "sourcePack": "generic-skill100",
+      "sourceFile": "skill icon 68.png",
+      "output": "expose_armor.webp"
+    },
+    {
+      "abilityId": "garrote",
+      "sourcePack": "_Missing_Icons_Rouge",
+      "sourceFile": "44.png",
+      "output": "garrote.webp"
+    },
+    {
+      "abilityId": "blind",
+      "sourcePack": "_Missing_Icons_Rouge",
+      "sourceFile": "49.png",
+      "output": "blind.webp"
+    }
+  ],
+  "deferredStayProcedural": {}
+}

@@ -23,7 +23,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const shot = (name) => page.screenshot({ path: `tmp/exp_${name}.png` });
 
 await page.goto(URL, { waitUntil: 'networkidle0', timeout: 30000 });
-await page.click('#btn-offline');
+await page.evaluate(() => document.querySelector('#btn-offline').click());
 await sleep(200);
 await page.type('#char-name', 'ShamanName');
 await page.click('#offline-select .mini-class[data-class="shaman"]'); // the user plays with lightning bolt

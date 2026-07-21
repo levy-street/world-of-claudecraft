@@ -21,7 +21,7 @@ page.on('console', (msg) => {
 });
 
 await page.goto(URL, { waitUntil: 'networkidle0', timeout: 30000 });
-await page.click('#btn-offline');
+await page.evaluate(() => document.querySelector('#btn-offline').click());
 await new Promise((r) => setTimeout(r, 200));
 await page.type('#char-name', 'Adventurer');
 await page.screenshot({ path: 'tmp/01_start.png' });

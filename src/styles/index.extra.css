@@ -1,0 +1,346 @@
+/* index.extra.css: per-entry CSS for the index.html game entry, loaded only by
+   index.html (via a <link> in its <head>). It declares the canonical @layer order
+   up front (idempotent with the barrel) so the layer slots resolve regardless of
+   which sheet the browser parses first.
+
+   The ONLY per-entry rule today is the #rotate-device orientation gate.
+   index.html uses the same mobile gameplay contract as play.html: portrait is
+   not supported in-game, so the rotate overlay is shown whenever a touch device
+   is game-active in portrait. Layer name is flat (index-extra), NOT dotted, so
+   it is a top-level layer placed last by the order below, after hud-mobile. */
+@layer tokens, base, layout, components, hud, shell, hud-mobile, index-extra, play-extra;
+
+@layer index-extra {
+  @media (orientation: portrait) {
+    body.mobile-touch.game-active #rotate-device {
+      display: flex;
+    }
+  }
+}
+
+/* ── Discord integration ───────────────────────────────────────────────────── */
+/* "or use email" divider under the first-class Continue with Discord button. */
+.auth-or {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  color: var(--color-text-muted, #9a8f70);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.auth-or[hidden] {
+  display: none;
+}
+.auth-or::before,
+.auth-or::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: #463a1c;
+}
+/* The shared .auth-or has a bottom-only margin, which leaves the first-login chooser's
+   "already have an account?" divider hugging the Create button instead of centered
+   between the two choices. Give it symmetric vertical margin so it sits centered. */
+#discord-choice-panel .auth-or {
+  margin: 10px 0;
+}
+/* Linked-Discord PFP next to a nameplate name (and the inspect-card discord pfp). */
+.np-discord {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  margin-right: 3px;
+  border-radius: 50%;
+  border: 1.5px solid #5865f2;
+  object-fit: cover;
+  box-shadow: 0 1px 1px #000;
+}
+.inspect-discord-pfp {
+  border: 1.5px solid #5865f2 !important;
+}
+.inspect-discord-role {
+  color: #cfe0ff;
+}
+.inspect-dev-login {
+  color: #9fe6c2;
+}
+
+/* Unread-claimable badge on the side-rail Discord button. */
+#mm-discord {
+  position: relative;
+}
+
+/* Discord info line under the target frame healthbar (nickname + tag chips). */
+.uf-discord {
+  display: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+}
+.uf-discord.show {
+  display: flex;
+}
+.uf-dc-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff6df;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.uf-dc-name img {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid #5865f2;
+  object-fit: cover;
+}
+.uf-dc-chip {
+  font-size: 9.5px;
+  line-height: 1.4;
+  padding: 0 5px;
+  border-radius: 7px;
+  background: #2a2414;
+  color: #d8cba0;
+  border: 1px solid #463a1c;
+}
+.uf-dc-chip.role {
+  color: #100;
+  font-weight: 700;
+  background: var(--role, #888);
+  border-color: transparent;
+}
+.uf-dc-chip.rank {
+  color: #cfe0ff;
+}
+/* developer-badge chip on the target frame */
+.uf-dc-chip.dev {
+  color: #d7ffe9;
+}
+
+/* "!" community-command autocomplete dropdown above the chat input. */
+.chat-cmd-menu {
+  position: fixed;
+  z-index: 70;
+  background: #14110a;
+  border: 1px solid #463a1c;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px -6px #000a;
+  overflow: hidden;
+  max-height: 240px;
+  overflow-y: auto;
+}
+.chat-cmd-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 7px 10px;
+  cursor: var(--cursor-point, pointer);
+}
+.chat-cmd-row.on {
+  background: #2a2f7a;
+}
+.chat-cmd-id {
+  color: #8b9bff;
+  font-weight: 700;
+  font-size: 13px;
+  flex: none;
+  min-width: 56px;
+}
+.chat-cmd-row.on .chat-cmd-id {
+  color: #cfe0ff;
+}
+.chat-cmd-label {
+  color: #f0e6c8;
+  font-size: 13px;
+  flex: none;
+}
+.chat-cmd-hint {
+  color: var(--color-text-muted, #9a8f70);
+  font-size: 11px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* Unlinked "Link your Discord" CTA banner, pinned top-center, dismissible. */
+#discord-cta-banner {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(620px, 94vw);
+  padding: 8px 10px 8px 14px;
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(180deg, #5865f2, #4149b8);
+  border: 1px solid #2a2f7a;
+  box-shadow:
+    0 6px 20px -6px #000a,
+    0 0 0 1px #ffffff14 inset;
+}
+#discord-cta-banner[hidden] {
+  display: none;
+}
+#discord-cta-banner .dc-cta-logo {
+  flex: none;
+  opacity: 0.95;
+}
+#discord-cta-banner .dc-cta-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+#discord-cta-banner .dc-cta-title {
+  font-weight: 700;
+  font-size: 13.5px;
+}
+#discord-cta-banner .dc-cta-stats {
+  font-size: 11.5px;
+  opacity: 0.9;
+}
+#discord-cta-banner .dc-cta-btn {
+  flex: none;
+  min-height: 34px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 12.5px;
+  color: #2a2f7a;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+}
+#discord-cta-banner .dc-cta-btn:hover {
+  background: #eef0ff;
+}
+#discord-cta-banner .dc-cta-x {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: #ffffff22;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+}
+#discord-cta-banner .dc-cta-x:hover {
+  background: #ffffff3a;
+}
+/* World-entry crash recovery notice (entry_crash_guard): same fixed top-center slot as
+   the Discord CTA, amber to read as a warning rather than a promo. Shown at boot only
+   after a crash-recovery downgrade, so the two banners do not stack in practice. */
+#entry-guard-banner {
+  position: fixed;
+  /* iOS-scoped notice: respect the notch/status bar (matches the HUD's inset idiom). */
+  top: max(10px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 201;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(620px, 94vw);
+  padding: 10px 10px 10px 14px;
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(180deg, #8a6116, #6b4a0e);
+  border: 1px solid #52380a;
+  box-shadow:
+    0 6px 20px -6px #000a,
+    0 0 0 1px #ffffff14 inset;
+}
+#entry-guard-banner[hidden] {
+  display: none;
+}
+#entry-guard-banner .entry-guard-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+#entry-guard-banner .entry-guard-title {
+  font-weight: 700;
+  font-size: 14px;
+}
+#entry-guard-banner .entry-guard-body {
+  font-size: 13px;
+  opacity: 0.95;
+}
+#entry-guard-banner .entry-guard-dismiss {
+  flex: none;
+  min-height: 40px;
+  padding: 6px 14px;
+  border-radius: 9px;
+  border: 1px solid #ffffff3a;
+  background: #ffffff1c;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+#entry-guard-banner .entry-guard-dismiss:hover {
+  background: #ffffff30;
+}
+/* The recovery banner and the Discord CTA share the fixed top-center slot. The recovery
+   notice is a rare, must-read boot message, so suppress the promotional CTA while it is
+   up (entry_guard_banner.ts toggles body.entry-guard-open); the CTA returns once the
+   banner is dismissed. Class + id outranks the CTA's own id rule, so no !important. */
+body.entry-guard-open #discord-cta-banner {
+  display: none;
+}
+/* Phones: the desktop flex row squeezes the title column down to one word per line
+   (the fixed logo/button/dismiss starve it) and the vertically centered button then
+   overlaps it. Re-flow to a grid (logo + title + dismiss on top, the link button
+   full-width below) so the title gets the leftover space and wraps normally, with
+   mobile-floor (>=40px) tap targets. Gated on coarse-pointer too, not just a narrow
+   width, so landscape phones get the same layout (per src/ui/CLAUDE.md). */
+@media (max-width: 560px), (pointer: coarse) {
+  #discord-cta-banner {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "logo text close"
+      "btn  btn  btn";
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 8px;
+    width: min(94vw, 440px);
+  }
+  #discord-cta-banner .dc-cta-logo {
+    grid-area: logo;
+  }
+  #discord-cta-banner .dc-cta-text {
+    grid-area: text;
+  }
+  #discord-cta-banner .dc-cta-x {
+    grid-area: close;
+    align-self: start;
+    width: 40px;
+    height: 40px;
+  }
+  #discord-cta-banner .dc-cta-btn {
+    grid-area: btn;
+    width: 100%;
+    min-height: 40px;
+  }
+  #discord-cta-banner .dc-cta-title {
+    font-size: 12.5px;
+  }
+}

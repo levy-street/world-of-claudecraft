@@ -1,58 +1,94 @@
-import { ITEMS, QUESTS, QUEST_ORDER, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
-import { Sim } from './sim';
-import { Entity, GCD, angleTo, dist2d, normAngle, xpForLevel, MAX_LEVEL } from './types';
+import { CLASSES, ITEMS, QUEST_ORDER, QUESTS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
+import type { Sim } from './sim';
+import {
+  angleTo,
+  dist2d,
+  type Entity,
+  GCD,
+  MAX_LEVEL,
+  normAngle,
+  questObjectiveRequired,
+  xpForLevel,
+} from './types';
 
 // ---------------------------------------------------------------------------
 // Discrete action space for RL agents.
 // Movement actions are "held" for the duration of one env step (frame-skip).
 // ---------------------------------------------------------------------------
 
+// Ability slots must cover the largest class kit so the RL agent can observe
+// and cast every ability a player can learn. Derived from CLASSES (not a fixed
+// constant) so adding abilities to any class can never silently leave high
+// learn-order slots unreachable. See abilitiesKnownAt(): one entry per ability.
+const ABILITY_SLOTS = Math.max(...Object.values(CLASSES).map((c) => c.abilities.length));
+
 export const ACTIONS = [
-  'noop',          // 0
-  'forward',       // 1
-  'back',          // 2
-  'turn_left',     // 3
-  'turn_right',    // 4
-  'strafe_left',   // 5
-  'strafe_right',  // 6
-  'jump',          // 7  (forward+jump)
-  'target_nearest',// 8
-  'attack',        // 9  start auto-attack on current target
-  'ability_1',     // 10  abilities index the learned list in learn order
-  'ability_2',     // 11
-  'ability_3',     // 12
-  'ability_4',     // 13
-  'ability_5',     // 14
-  'ability_6',     // 15
-  'ability_7',     // 16
-  'ability_8',     // 17
-  'ability_9',     // 18
-  'ability_10',    // 19
-  'interact',      // 20 loot corpse / pick up object / talk to quest npc
-  'stop',          // 21 stop moving + stop attacking
-  'eat_drink',     // 22 consume best food (or water for mana classes) from bags
+  'noop', // 0
+  'forward', // 1
+  'back', // 2
+  'turn_left', // 3
+  'turn_right', // 4
+  'strafe_left', // 5
+  'strafe_right', // 6
+  'jump', // 7  (forward+jump)
+  'target_nearest', // 8
+  'attack', // 9  start auto-attack on current target
+  // abilities index the learned list in learn order: ability_1 .. ability_N
+  ...Array.from({ length: ABILITY_SLOTS }, (_, i) => `ability_${i + 1}`),
+  'interact', // loot corpse / pick up object / talk to quest npc
+  'stop', // stop moving + stop attacking
+  'eat_drink', // consume best food (or water for mana classes) from bags
 ] as const;
 
 export const NUM_ACTIONS = ACTIONS.length;
-const ABILITY_SLOTS = 10;
 
 export function applyAction(sim: Sim, action: number): void {
   const inp = sim.moveInput;
-  inp.forward = false; inp.back = false; inp.turnLeft = false; inp.turnRight = false;
-  inp.strafeLeft = false; inp.strafeRight = false; inp.jump = false;
+  inp.forward = false;
+  inp.back = false;
+  inp.turnLeft = false;
+  inp.turnRight = false;
+  inp.strafeLeft = false;
+  inp.strafeRight = false;
+  inp.jump = false;
   const name = ACTIONS[action] ?? 'noop';
   switch (name) {
-    case 'forward': inp.forward = true; break;
-    case 'back': inp.back = true; break;
-    case 'turn_left': inp.turnLeft = true; inp.forward = true; break;
-    case 'turn_right': inp.turnRight = true; inp.forward = true; break;
-    case 'strafe_left': inp.strafeLeft = true; break;
-    case 'strafe_right': inp.strafeRight = true; break;
-    case 'jump': inp.jump = true; inp.forward = true; break;
-    case 'target_nearest': sim.targetNearestEnemy(); break;
-    case 'attack': sim.startAutoAttack(); break;
-    case 'interact': sim.interact(); break;
-    case 'stop': sim.stopAutoAttack(); break;
+    case 'forward':
+      inp.forward = true;
+      break;
+    case 'back':
+      inp.back = true;
+      break;
+    case 'turn_left':
+      inp.turnLeft = true;
+      inp.forward = true;
+      break;
+    case 'turn_right':
+      inp.turnRight = true;
+      inp.forward = true;
+      break;
+    case 'strafe_left':
+      inp.strafeLeft = true;
+      break;
+    case 'strafe_right':
+      inp.strafeRight = true;
+      break;
+    case 'jump':
+      inp.jump = true;
+      inp.forward = true;
+      break;
+    case 'target_nearest':
+      sim.targetNearestEnemy();
+      break;
+    case 'attack':
+      sim.startAutoAttack();
+      break;
+    case 'interact':
+      sim.interact();
+      break;
+    case 'stop':
+      sim.stopAutoAttack();
+      break;
     case 'eat_drink': {
       const p = sim.player;
       const wantMana = p.resourceType === 'mana' && p.resource < p.maxResource * 0.5;
@@ -60,20 +96,34 @@ export function applyAction(sim: Sim, action: number): void {
       for (const s of sim.inventory) {
         const def = ITEMS[s.itemId];
         if (!def) continue;
-        if (wantMana && def.kind === 'drink') { sim.useItem(s.itemId); break; }
-        if (wantHp && def.kind === 'food') { sim.useItem(s.itemId); break; }
+        if (wantMana && def.kind === 'drink') {
+          sim.useItem(s.itemId);
+          break;
+        }
+        if (wantHp && def.kind === 'food') {
+          sim.useItem(s.itemId);
+          break;
+        }
       }
       break;
     }
-    case 'noop': break;
+    case 'noop':
+      break;
     default: {
       if (name.startsWith('ability_')) {
         sim.castAbilityBySlot(parseInt(name.slice(8), 10) - 1);
       }
     }
   }
-  // If the player is dead, any action releases the spirit.
-  if (sim.player.dead) sim.releaseSpirit();
+  // If the player is dead, any action releases the spirit and resurrects at the
+  // graveyard's Spirit Healer. An RL bot has no corpse-run policy, so the in-place
+  // Spirit Healer resurrect (with Resurrection Sickness at level 10+) is what keeps
+  // the episode going; without the resurrect the bot would be stuck a permanent ghost
+  // (releaseSpirit now raises a ghost rather than instantly respawning).
+  if (sim.player.dead) {
+    sim.releaseSpirit();
+    sim.resurrectAtSpiritHealer();
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -96,7 +146,9 @@ export function encodeObs(sim: Sim): number[] {
   obs.push(p.level / MAX_LEVEL);
   obs.push(p.level >= MAX_LEVEL ? 1 : sim.xp / xpForLevel(p.level));
   obs.push(clamp(p.pos.x / WORLD_MAX_X, -1, 1));
-  obs.push(clamp((p.pos.z - (WORLD_MIN_Z + WORLD_MAX_Z) / 2) / ((WORLD_MAX_Z - WORLD_MIN_Z) / 2), -1, 1));
+  obs.push(
+    clamp((p.pos.z - (WORLD_MIN_Z + WORLD_MAX_Z) / 2) / ((WORLD_MAX_Z - WORLD_MIN_Z) / 2), -1, 1),
+  );
   obs.push(Math.sin(p.facing));
   obs.push(Math.cos(p.facing));
   obs.push(p.gcdRemaining / GCD);
@@ -111,7 +163,10 @@ export function encodeObs(sim: Sim): number[] {
   // --- abilities (10 x 2 = 20) ---
   for (let i = 0; i < ABILITY_SLOTS; i++) {
     const known = sim.known[i];
-    if (!known) { obs.push(0, 0); continue; }
+    if (!known) {
+      obs.push(0, 0);
+      continue;
+    }
     const cd = p.cooldowns.get(known.def.id) ?? 0;
     const ready = cd <= 0 && p.resource >= known.cost && (known.def.offGcd || p.gcdRemaining <= 0);
     obs.push(ready ? 1 : 0);
@@ -126,7 +181,10 @@ export function encodeObs(sim: Sim): number[] {
     obs.push(1);
     obs.push(target.hp / Math.max(1, target.maxHp));
     obs.push(clamp((target.level - p.level) / 5, -1, 1));
-    obs.push(clamp(d / 40, 0, 1));
+    // distance shares the d/40 scale used for nearby mobs and the interactable
+    // below; clamp to the same 1.5 ceiling (the 60-unit observation radius) so a
+    // target beyond 40 units stays distinguishable instead of saturating at 1
+    obs.push(clamp(d / 40, 0, 1.5));
     obs.push(Math.sin(rel));
     obs.push(Math.cos(rel));
     obs.push(target.hostile ? 1 : 0);
@@ -184,8 +242,13 @@ export function encodeObs(sim: Sim): number[] {
     const qp = sim.questLog.get(qid);
     if (qp) {
       const quest = QUESTS[qid];
-      let total = 0, have = 0;
-      quest.objectives.forEach((obj, i) => { total += obj.count; have += Math.min(qp.counts[i], obj.count); });
+      let total = 0,
+        have = 0;
+      quest.objectives.forEach((_objective, i) => {
+        const required = questObjectiveRequired(quest, qp, i);
+        total += required;
+        have += Math.min(qp.counts[i], required);
+      });
       obs.push(total > 0 ? have / total : 0);
     } else {
       obs.push(state === 'done' ? 1 : 0);

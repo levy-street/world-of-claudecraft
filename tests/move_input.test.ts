@@ -66,6 +66,7 @@ describe('agent movement channel', () => {
     input.controllerMoveInput = null;
     input.controllerFacing = null;
     input.touchMove = { forward: false, back: false, strafeLeft: false, strafeRight: false };
+    input.gamepadMove = { forward: false, back: false, strafeLeft: false, strafeRight: false };
 
     input.keys.add('KeyW');
     expect(input.readMoveInput().forward).toBe(true);

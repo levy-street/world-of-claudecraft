@@ -1,0 +1,57 @@
+name: Feature request
+description: Suggest a new feature, ability, zone, or quality-of-life improvement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing an idea! Tell us about the problem you'd like to solve
+        That helps us design the right thing, not just the first thing.
+
+        > You're welcome to write in your own language. The contributing guide is
+        > available in [many languages](https://github.com/levy-street/world-of-claudecraft/blob/main/CONTRIBUTING.md),
+        > and you can chat with us on [Discord](https://discord.com/invite/worldofclaudecraft).
+  - type: checkboxes
+    attributes:
+      label: Before you start
+      options:
+        - label: I searched [existing issues](https://github.com/levy-street/world-of-claudecraft/issues) and didn't find a duplicate.
+          required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: What's frustrating or missing today? Describe the player or developer experience.
+      placeholder: As a player, I can't ... so I have to ...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What would you like to see? Sketches, examples, or references to classic MMOs are welcome.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you thought about, and why this one seems best.
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of the game does this touch? (Best guess is fine.)
+      options:
+        - Gameplay / combat / classes
+        - Content (zones, dungeons, quests, items)
+        - UI / HUD
+        - Mobile / touch controls
+        - Multiplayer / server / social
+        - Localization / translations
+        - RL environment / headless
+        - Other / not sure
+    validations:
+      required: false

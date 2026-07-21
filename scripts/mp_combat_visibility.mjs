@@ -38,7 +38,7 @@ async function enter(page, charName, cls, fresh) {
   await page.evaluate((name) => {
     const rows = [...document.querySelectorAll('.char-row')];
     const row = rows.find((r) => r.querySelector('.char-name').textContent === name);
-    row.querySelector('button').click();
+    row.querySelector('.enter-world-btn').click();
   }, charName);
   await page.waitForFunction(() => window.__game?.online?.connected, { timeout: 15000 });
   await page.bringToFront();
