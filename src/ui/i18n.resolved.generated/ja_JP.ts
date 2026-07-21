@@ -1690,7 +1690,8 @@ export const ja_JP: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "レベル{level} {family}",
@@ -2088,7 +2089,11 @@ export const ja_JP: EnTranslations = {
       "blockSearchPlaceholder": "プレイヤー名",
       "blockAction": "ブロック",
       "nowBlocking": "{name} をブロックしました。",
-      "stopBlockingTitle": "{name} のブロックを解除"
+      "stopBlockingTitle": "{name} のブロックを解除",
+      "onlineHeader": "オンライン ({n})",
+      "offlineHeader": "オフライン ({n})",
+      "hideOffline": "オフラインを非表示",
+      "hideOfflineTitle": "オフラインのギルドメンバーを非表示"
     },
     "gathering": {
       "title": "採集",
@@ -5868,7 +5873,8 @@ export const ja_JP: EnTranslations = {
         "offline": "オフライン",
         "combat": "戦闘中",
         "dungeon": "ダンジョン内",
-        "dead": "死亡"
+        "dead": "死亡",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {

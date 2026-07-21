@@ -2653,11 +2653,9 @@
       margin-top: 0;
     }
   }
-  body.mobile-touch #vendor-window {
-    max-height: calc(58vh - 20px);
-  }
   /* The Market carries a tab strip plus the filter selects, which stack to a tall
-     single column on mobile; the vendor's 58vh cap would leave the flex:1 listing
+     single column on mobile; a shorter clamp (like the vendor window's own,
+     see the comment on #vendor-window below) would leave the flex:1 listing
      body (#market-body) zero height, so it collapsed and could not be scrolled.
      Give the window the full available height (like #trade-window) so the listing
      body keeps a usable, touch-scrollable height under the header.
@@ -2881,6 +2879,14 @@
     border-top: 0;
     padding-top: 0;
   }
+  /* The desktop landscape grid auto-fills up to 4 tiles per row (fewer once the
+     window's own width cap shrinks it to avoid the bags column, see the
+     #vendor-window comment in components.css); a touch viewport is narrower
+     and the tap-target floor below needs the room, so collapse to 2 columns
+     (still several per row, never a single portrait list again). */
+  body.mobile-touch .vendor-goods-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   body.mobile-touch .vendor-item,
   body.mobile-touch .bag-item,
   body.mobile-touch .mkt-tab,
@@ -2890,6 +2896,7 @@
   body.mobile-touch .loot-roll-btn,
   body.mobile-touch .soc-tab,
   body.mobile-touch .soc-x,
+  body.mobile-touch .soc-hide-offline,
   body.mobile-touch .soc-sugg-item,
   body.mobile-touch .trade-item.mine,
   body.mobile-touch #social-window .btn,
@@ -3157,7 +3164,34 @@
   body.mobile-touch #quest-dialog {
     width: clamp(320px, 76vw, 680px);
     max-width: calc(100vw - 20px);
+  }
+  body.mobile-touch #quest-log-window,
+  body.mobile-touch #quest-dialog {
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 92px);
+  }
+  /* The vendor goods grid used to stop well short of the bottom of the screen
+     (a shorter clamp shared with quest-log/quest-dialog), leaving the character
+     and player HUD elements visible underneath. The vendor window is already a
+     modal that blocks world input while open (same reasoning as #char-window
+     above), so it is fine to run all the way top to bottom instead: only the
+     12px top offset from the centered-sheet base and a matching bottom margin
+     are reserved. #vendor-window lives inside #ui, which carries
+     `zoom: var(--ui-scale)` (ui_scale.ts): a raw dvh value resolves against the
+     real viewport and is then multiplied by that zoom, overshooting the bottom
+     edge above scale 1 and falling short below it. Divide by --window-scale,
+     not --ui-scale (the base .window clamp in layout.css and the generic
+     mobile clamp at hud.mobile.css:2228-2232 both divide by --window-scale,
+     never --ui-scale, for exactly this reason: --window-scale is the one that
+     pins to 1 for the fixed-shell mobile app groups, see the shell note in
+     layout.css). Equal in value here since #vendor-window is not one of those
+     groups, but consistent with the stated contract. */
+  body.mobile-touch #vendor-window {
+    max-height: calc(
+      var(--app-vh) /
+      var(--window-scale, 1) -
+      12px -
+      max(10px, env(safe-area-inset-bottom))
+    );
   }
   body.mobile-touch #train-window {
     overflow-y: auto;

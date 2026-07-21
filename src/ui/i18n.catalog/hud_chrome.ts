@@ -1730,6 +1730,9 @@ export const hudChromeStrings = {
     // to the bracket only, not the mob name text.
     mobLevel: '{level}',
     mobEliteLevel: '{level}+',
+    // /afk tag prefixed to a player's overhead name (nameplate_painter.ts wraps
+    // it in angle brackets: "<AFK> Name"). Short label, not a sentence.
+    afkTag: 'AFK',
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
   // name (colored by the nameplate con-color), then "Level N <type>" ({family}
@@ -2187,6 +2190,13 @@ export const hudChromeStrings = {
     blockAction: 'Block',
     nowBlocking: 'Blocked {name}.',
     stopBlockingTitle: 'Stop blocking {name}',
+    // Guild roster grouping: members are split into an online group over an offline
+    // group, each header carrying its member count ({n}, formatted). The hide-offline
+    // toggle is a persisted USER choice that suppresses the offline group.
+    onlineHeader: 'Online ({n})',
+    offlineHeader: 'Offline ({n})',
+    hideOffline: 'Hide offline',
+    hideOfflineTitle: 'Hide offline guild members',
   },
   // Gathering proficiency section on the character sheet (#1124). Profession
   // display names mirror src/sim/content/professions.ts (GatheringProfessionId).

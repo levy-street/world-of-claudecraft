@@ -408,6 +408,7 @@ export { computeQuestState } from './quests/quest_commands';
 
 import { completeCurrentQuestsForDev, completeQuestForDev } from './quests/dev_quest_commands';
 import * as arenaMod from './social/arena';
+import { clearAfkOnMove } from './social/away';
 import type { CardDuelMatch } from './social/card_duel';
 import * as cardDuelMod from './social/card_duel';
 import * as duelMod from './social/duel';
@@ -4825,6 +4826,9 @@ export class Sim {
       mv.jump
     ) {
       meta.lastActiveTick = this.tickCount;
+      // Moving under your own input clears an AFK flag (classic behavior); a
+      // no-op unless the player is currently AFK. Do Not Disturb survives.
+      clearAfkOnMove(this.ctx, meta, p);
     }
     if (advanceHeroicLeap(this.ctx, p)) return;
     if (this.updateChargeMovement(p)) return;

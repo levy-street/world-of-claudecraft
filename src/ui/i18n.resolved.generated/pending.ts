@@ -14,6 +14,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -35,13 +36,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
     "hudChrome.interfaceTabs.general",
-    "hudChrome.professions.nextUnlockMastered"
+    "hudChrome.nameplate.afkTag",
+    "hudChrome.professions.nextUnlockMastered",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "es_ES": [
     "abilityUi.cast.gathering",
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -63,13 +70,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
     "hudChrome.interfaceTabs.general",
-    "hudChrome.professions.nextUnlockMastered"
+    "hudChrome.nameplate.afkTag",
+    "hudChrome.professions.nextUnlockMastered",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "fr_FR": [
     "abilityUi.cast.gathering",
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -91,13 +104,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
     "hudChrome.interfaceTabs.general",
-    "hudChrome.professions.nextUnlockMastered"
+    "hudChrome.nameplate.afkTag",
+    "hudChrome.professions.nextUnlockMastered",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "fr_CA": [
     "abilityUi.cast.gathering",
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -119,7 +138,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
     "hudChrome.interfaceTabs.general",
-    "hudChrome.professions.nextUnlockMastered"
+    "hudChrome.nameplate.afkTag",
+    "hudChrome.professions.nextUnlockMastered",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "en_CA": [],
   "it_IT": [
@@ -127,6 +151,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -148,13 +173,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
     "hudChrome.interfaceTabs.general",
-    "hudChrome.professions.nextUnlockMastered"
+    "hudChrome.nameplate.afkTag",
+    "hudChrome.professions.nextUnlockMastered",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "de_DE": [
     "abilityUi.cast.gathering",
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -176,17 +207,35 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
     "hudChrome.interfaceTabs.general",
-    "hudChrome.professions.nextUnlockMastered"
+    "hudChrome.nameplate.afkTag",
+    "hudChrome.professions.nextUnlockMastered",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hud.social.status.afk",
+    "hudChrome.nameplate.afkTag"
+  ],
+  "zh_TW": [
+    "hud.social.status.afk",
+    "hudChrome.nameplate.afkTag"
+  ],
+  "ko_KR": [
+    "hud.social.status.afk",
+    "hudChrome.nameplate.afkTag"
+  ],
+  "ja_JP": [
+    "hud.social.status.afk",
+    "hudChrome.nameplate.afkTag"
+  ],
   "pt_BR": [
     "abilityUi.cast.gathering",
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -208,14 +257,23 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
     "hudChrome.interfaceTabs.general",
-    "hudChrome.professions.nextUnlockMastered"
+    "hudChrome.nameplate.afkTag",
+    "hudChrome.professions.nextUnlockMastered",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hud.social.status.afk",
+    "hudChrome.nameplate.afkTag"
+  ],
   "cs_CZ": [
     "abilityUi.cast.gathering",
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -237,13 +295,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
     "hudChrome.interfaceTabs.general",
-    "hudChrome.professions.nextUnlockMastered"
+    "hudChrome.nameplate.afkTag",
+    "hudChrome.professions.nextUnlockMastered",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "nl_NL": [
     "abilityUi.cast.gathering",
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -265,13 +329,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
     "hudChrome.interfaceTabs.general",
-    "hudChrome.professions.nextUnlockMastered"
+    "hudChrome.nameplate.afkTag",
+    "hudChrome.professions.nextUnlockMastered",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "pl_PL": [
     "abilityUi.cast.gathering",
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -293,13 +363,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
     "hudChrome.interfaceTabs.general",
-    "hudChrome.professions.nextUnlockMastered"
+    "hudChrome.nameplate.afkTag",
+    "hudChrome.professions.nextUnlockMastered",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "id_ID": [
     "abilityUi.cast.gathering",
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -321,13 +397,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
     "hudChrome.interfaceTabs.general",
-    "hudChrome.professions.nextUnlockMastered"
+    "hudChrome.nameplate.afkTag",
+    "hudChrome.professions.nextUnlockMastered",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "tr_TR": [
     "abilityUi.cast.gathering",
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -349,13 +431,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
     "hudChrome.interfaceTabs.general",
-    "hudChrome.professions.nextUnlockMastered"
+    "hudChrome.nameplate.afkTag",
+    "hudChrome.professions.nextUnlockMastered",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "sv_SE": [
     "abilityUi.cast.gathering",
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -377,13 +465,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
     "hudChrome.interfaceTabs.general",
-    "hudChrome.professions.nextUnlockMastered"
+    "hudChrome.nameplate.afkTag",
+    "hudChrome.professions.nextUnlockMastered",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "vi_VN": [
     "abilityUi.cast.gathering",
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -405,13 +499,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
     "hudChrome.interfaceTabs.general",
-    "hudChrome.professions.nextUnlockMastered"
+    "hudChrome.nameplate.afkTag",
+    "hudChrome.professions.nextUnlockMastered",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ],
   "da_DK": [
     "abilityUi.cast.gathering",
     "entities.letters.mastery_reset_notice.body",
     "entities.letters.mastery_reset_notice.sender",
     "entities.letters.mastery_reset_notice.subject",
+    "hud.social.status.afk",
     "hudChrome.crafting.difficultyMinimal",
     "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
@@ -433,6 +533,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
     "hudChrome.interfaceTabs.general",
-    "hudChrome.professions.nextUnlockMastered"
+    "hudChrome.nameplate.afkTag",
+    "hudChrome.professions.nextUnlockMastered",
+    "hudChrome.social.hideOffline",
+    "hudChrome.social.hideOfflineTitle",
+    "hudChrome.social.offlineHeader",
+    "hudChrome.social.onlineHeader"
   ]
 };

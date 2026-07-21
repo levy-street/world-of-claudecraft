@@ -1690,7 +1690,8 @@ export const pl_PL: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "Poziom {level}: {family}",
@@ -2088,7 +2089,11 @@ export const pl_PL: EnTranslations = {
       "blockSearchPlaceholder": "Nazwa gracza",
       "blockAction": "Zablokuj",
       "nowBlocking": "{name} zablokowany.",
-      "stopBlockingTitle": "Odblokuj gracza {name}"
+      "stopBlockingTitle": "Odblokuj gracza {name}",
+      "onlineHeader": "Online ({n})",
+      "offlineHeader": "Offline ({n})",
+      "hideOffline": "Hide offline",
+      "hideOfflineTitle": "Hide offline guild members"
     },
     "gathering": {
       "title": "Zbieractwo",
@@ -5868,7 +5873,8 @@ export const pl_PL: EnTranslations = {
         "offline": "Niedostępny",
         "combat": "W walce",
         "dungeon": "W lochu",
-        "dead": "Martwy"
+        "dead": "Martwy",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {

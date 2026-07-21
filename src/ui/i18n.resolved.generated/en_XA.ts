@@ -1690,7 +1690,8 @@ export const en_XA: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "[{level}]",
-      "mobEliteLevel": "[{level}+]"
+      "mobEliteLevel": "[{level}+]",
+      "afkTag": "[ÁƑĶ]"
     },
     "mobTooltip": {
       "levelFamily": "[Ļéʋéļ {level} {family}]",
@@ -2088,7 +2089,11 @@ export const en_XA: EnTranslations = {
       "blockSearchPlaceholder": "[Þļáýéŕ ñáɱé]",
       "blockAction": "[Ɓļóçķ]",
       "nowBlocking": "[Ɓļóçķéð {name}.]",
-      "stopBlockingTitle": "[Šţóþ ƀļóçķíñĝ {name}]"
+      "stopBlockingTitle": "[Šţóþ ƀļóçķíñĝ {name}]",
+      "onlineHeader": "[Óñļíñé ({n})]",
+      "offlineHeader": "[Óƒƒļíñé ({n})]",
+      "hideOffline": "[Ĥíðé óƒƒļíñé]",
+      "hideOfflineTitle": "[Ĥíðé óƒƒļíñé ĝúíļð ɱéɱƀéŕš]"
     },
     "gathering": {
       "title": "[Ĝáţĥéŕíñĝ]",
@@ -5868,7 +5873,8 @@ export const en_XA: EnTranslations = {
         "offline": "[Óƒƒļíñé]",
         "combat": "[Íñ Çóɱƀáţ]",
         "dungeon": "[Íñ Ðúñĝéóñ]",
-        "dead": "[Ðéáð]"
+        "dead": "[Ðéáð]",
+        "afk": "[Áŵáý]"
       },
       "statusWithZone": "[{status} - {zone}]",
       "ranks": {

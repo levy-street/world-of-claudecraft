@@ -185,6 +185,12 @@
     --scrollbar-border: #7c6233;
     --app-vw: 100vw;
     --app-vh: 100vh;
+    /* #bags' own reservation half-width + gap (components.css), hoisted here so
+       any OTHER centred window that must not slide under the bottom-right bags
+       column (the vendor Goods window's width cap is the first consumer) reads
+       the SAME numbers instead of re-deriving a copy that can drift out of sync. */
+    --bags-bar-half: 306px;
+    --bags-gap: 12px;
     /* effects tier (wired by src/ui/ui_effects_applier.ts from the pure
        src/game/ui_effects_profile.ts resolver): data-fx-level (low | medium | high
        | ultra) is stamped on the document root, and these three tokens are written

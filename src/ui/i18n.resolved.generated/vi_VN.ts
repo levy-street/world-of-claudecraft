@@ -1690,7 +1690,8 @@ export const vi_VN: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "{family} cấp {level}",
@@ -2088,7 +2089,11 @@ export const vi_VN: EnTranslations = {
       "blockSearchPlaceholder": "Tên người chơi",
       "blockAction": "Chặn",
       "nowBlocking": "Đã chặn {name}.",
-      "stopBlockingTitle": "Bỏ chặn {name}"
+      "stopBlockingTitle": "Bỏ chặn {name}",
+      "onlineHeader": "Online ({n})",
+      "offlineHeader": "Offline ({n})",
+      "hideOffline": "Hide offline",
+      "hideOfflineTitle": "Hide offline guild members"
     },
     "gathering": {
       "title": "Thu thập",
@@ -5868,7 +5873,8 @@ export const vi_VN: EnTranslations = {
         "offline": "Ngoại Tuyến",
         "combat": "Đang Chiến Đấu",
         "dungeon": "Trong Hầm Ngục",
-        "dead": "Đã Chết"
+        "dead": "Đã Chết",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {

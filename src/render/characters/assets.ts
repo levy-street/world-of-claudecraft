@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
+import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { loadGltf, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
@@ -20,8 +21,8 @@ import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from '.
 import {
   type AttachDef,
   characterPreloadUrls,
-  itemOffhandModelUrl,
   itemWeaponModelUrl,
+  offhandModelUrl,
   SKIN_EMISSIVE,
   SKINS,
   VISUALS,
@@ -384,11 +385,17 @@ function swapAttachDef(
   return url ? { url, bone: base.bone } : base;
 }
 
+// The AttachDef for the actual equipped offhand. Its model is the offhand item's
+// own, EXCEPT when the active mainhand skin mirrors onto it (a matching-type
+// offhand weapon), in which case the offhand renders the skin too.
+// Shields, held offhands (orbs/tomes), and different-type weapons never mirror
+// (offhandModelUrl gates it on the pure rule) and keep their item model.
 function offhandAttachDef(
   base: AttachDef,
   offhandItemId: string | null | undefined,
+  weaponSkinId: string | null | undefined = null,
 ): AttachDef | null {
-  const url = itemOffhandModelUrl(offhandItemId);
+  const url = offhandModelUrl(offhandItemId, weaponSkinId);
   return url ? { url, bone: base.bone } : null;
 }
 
@@ -648,12 +655,14 @@ function attachTargetBone(
 
 // Attach every authored prop: swappable slots take the equipped item's model (or an
 // applied weapon skin, which wins); the actual offhand slot takes the equipped
-// offhand's model (or nothing while none is equipped); every other attachment is
-// fixed (the warlock's spellbook offhand), except the hunter's fixed RANGED attach,
-// which a bow/crossbow skin replaces in place. The rogue lists both hand slots so a
-// dagger shows in both. A manifest/bone mismatch ships without that prop. Returns
-// the WEAPON payload roots (the swap + ranged-swap ones), the set rarity VFX and
-// orientation pins ride; the offhand payload has its own cycle (setHeldOffhand).
+// offhand's model (or the same skin mirrored onto a matching-type weapon,
+// or nothing while none is equipped); every other attachment is fixed (the warlock's
+// spellbook offhand), except the hunter's fixed RANGED attach, which a bow/crossbow
+// skin replaces in place. The rogue lists both hand slots so a dagger shows in both.
+// A manifest/bone mismatch ships without that prop. Returns the WEAPON payload roots
+// (the swap + ranged-swap ones), plus a skin-mirrored offhand payload, the set
+// rarity VFX and orientation pins ride; a NON-mirrored offhand has its own cycle
+// (setHeldOffhand) and stays out of the returned set.
 function attachAllProps(
   root: THREE.Object3D,
   def: VisualDef,
@@ -663,6 +672,11 @@ function attachAllProps(
   offhandItemId: string | null = null,
 ): THREE.Object3D[] {
   const attachments = visibleAttachmentsForGraphics(def);
+  // A skin mirrored onto the offhand rides the same rarity-VFX + material path as
+  // the mainhand skin, so its payload joins the returned set (the caller runs the
+  // VFX/isolation pass over these). A plain offhand (shield/held-offhand/different
+  // -type weapon) stays out, untouched.
+  const offhandSkinned = offhandMirrorsWeaponSkin(weaponSkinId, offhandItemId);
   const payloads: THREE.Object3D[] = [];
   for (let i = 0; i < attachments.length; i++) {
     const base = attachments[i];
@@ -672,14 +686,14 @@ function attachAllProps(
     const att = isSwap
       ? swapAttachDef(base, weaponItemId, weaponSkinId)
       : isOffhandSwap
-        ? offhandAttachDef(base, offhandItemId)
+        ? offhandAttachDef(base, offhandItemId, weaponSkinId)
         : (rangedSkinAttachDef(base, weaponSkinId) ?? base);
     if (!att) continue;
     const bone = attachTargetBone(root, att, stowed);
     if (!bone) continue;
     const swapKind = isOffhandSwap ? 'offhand' : isWeapon ? 'mainhand' : null;
     const payload = attachProp(root, bone, att, swapKind, stowed);
-    if (isWeapon) payloads.push(payload);
+    if (isWeapon || (isOffhandSwap && offhandSkinned)) payloads.push(payload);
   }
   return payloads;
 }
@@ -724,12 +738,16 @@ export function setHeldWeapon(
   return payloads;
 }
 
-/** Replace only the actual offhand attachment, honoring an active sheathe.
- *  Mainhand item/cosmetic models and their rarity VFX remain untouched. */
+/** Replace only the actual offhand attachment, honoring an active sheathe. The
+ *  offhand renders its own item model UNLESS the active mainhand skin mirrors onto
+ *  it (a matching-type weapon), in which case it shows the skin (and the
+ *  caller must run the rarity-VFX/material pass over the returned payload). Mainhand
+ *  item/cosmetic models and their rarity VFX remain untouched. */
 export function setHeldOffhand(
   root: THREE.Object3D,
   def: VisualDef,
   offhandItemId: string | null,
+  weaponSkinId: string | null = null,
   stowed = false,
 ): THREE.Object3D[] {
   if (def.offhandSlot === undefined) return [];
@@ -741,7 +759,7 @@ export function setHeldOffhand(
 
   const base = def.attach?.[def.offhandSlot];
   if (!base) return [];
-  const att = offhandAttachDef(base, offhandItemId);
+  const att = offhandAttachDef(base, offhandItemId, weaponSkinId);
   if (!att) return [];
   const bone = attachTargetBone(root, att, stowed);
   return bone ? [attachProp(root, bone, att, 'offhand', stowed)] : [];

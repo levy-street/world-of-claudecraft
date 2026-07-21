@@ -4560,9 +4560,56 @@
   }
 
   /* ---------- vendor ---------- */
-  /* vendor */
+  /* vendor: landscape layout. The goods/buyback lists used to be one
+     full-width row per item in a narrow 400px column, so a modest stock
+     forced a tall, mostly-empty-looking scroll. Widen the window and lay
+     the rows out as tiles in a multi-column grid (.vendor-goods-grid) so it
+     reads like a real shop counter instead of a portrait list (issue:
+     vendor relayout to landscape grid). The sell-junk button, buyback
+     section title, empty state and hint stay full-width outside the grid.
+     #vendor-window is centred (left: 50%; translateX(-50%), layout.css) while
+     the always-open #bags companion is centred in its own bottom-right gap
+     (#bags left: calc((100% + 50% + --bags-bar-half + --bags-gap -
+     --bags-micro-r) / 2), then translateX(-50%)), so a flat 92vw or a
+     viewport-minus-constant cap both eventually let the widened window slide
+     UNDER bags (maintainer review rounds 1-5 on PR #2101). Solving that #bags
+     left-edge algebra for the largest vendor half-width that still clears it
+     (at #bags' steady-state 310px width, once --bags-slot-w is no longer the
+     binding constraint) collapses to a single line in terms of the SAME
+     --bags-bar-half token #bags reads off :root: half-width <= 0.25 * VW +
+     (--bags-bar-half - 360px) / 2, i.e. full width <= 0.5 * VW +
+     --bags-bar-half - 360px (the constants fold --bags-micro-r's fixed 50px
+     term and #bags' own 310px/2 half-width; --bags-gap cancels out of the
+     --bags-micro-r subtraction, so it does not need to appear here). #vendor-
+     window lives inside #ui, which carries `zoom: var(--ui-scale)`, so
+     --app-vw (the real, unscaled viewport) must be divided by --window-scale
+     before it is combined with --bags-bar-half, an author length already
+     living in the zoomed space: without the division the two sides are in
+     different units and the cap silently stops clearing bags at any
+     --ui-scale other than 1 (maintainer review round 4). The 2px slack over
+     the exact boundary keeps the two windows from touching edge-to-edge. The
+     floor keeps the window no narrower than the pre-PR fixed 400px: the
+     vendor window is top-anchored (top: 12px, layout.css) while #bags is
+     bottom-anchored (bottom: 6px), so at widths this small the failure mode
+     is never horizontal overlap with the bottom-right bags column, only the
+     window itself; the min() cap above still wins on any viewport where
+     clearing bags needs more than 400px. */
   #vendor-window {
-    width: 400px;
+    width: max(
+      400px,
+      min(
+        860px,
+        calc(0.5 * (var(--app-vw, 100vw) / var(--window-scale)) + var(--bags-bar-half) - 362px)
+      )
+    );
+  }
+  .vendor-goods-grid {
+    display: grid;
+    /* auto-fill instead of a fixed repeat(4, ...): once the width cap above
+       shrinks the window on a narrower viewport, the grid drops to 3 or 2
+       columns on its own rather than squeezing 4 undersized tiles. */
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 6px;
   }
   .vendor-item {
     display: flex;
@@ -4578,12 +4625,25 @@
     font-family: var(--ui-font);
     text-align: left;
   }
+  /* Inside the grid, a tile stacks icon over name over price rather than a
+     left-to-right row, so several fit per line at the window's new width. */
+  .vendor-goods-grid .vendor-item {
+    flex-direction: column;
+    justify-content: flex-start;
+    text-align: center;
+    gap: 4px;
+    padding: 8px 6px;
+  }
   .vendor-item:hover {
     background: #ffffff10;
   }
   .vendor-item .vi-name {
     font-size: 12px;
     flex: 1;
+  }
+  .vendor-goods-grid .vendor-item .vi-name {
+    flex: none;
+    width: 100%;
   }
   .vendor-item .vi-price {
     font-size: 11px;
@@ -4815,8 +4875,8 @@
   /* ---------- bags ---------- */
   /* bags, centred in the bottom gap between the action cluster and micro-menu */
   #bags {
-    --bags-bar-half: 306px;
-    --bags-gap: 12px;
+    /* --bags-bar-half / --bags-gap now live on :root (tokens.css) so the vendor
+       Goods window's width cap reads the SAME reservation instead of a copy. */
     --bags-micro-r: calc(16px + 34px + var(--bags-gap));
     --bags-slot-w: max(
       180px,
@@ -6195,6 +6255,7 @@
   }
   .soc-tab:focus-visible,
   .soc-x:focus-visible,
+  .soc-hide-offline:focus-visible,
   .soc-name.soc-link:focus-visible,
   .soc-sugg-item:focus-visible,
   .trade-item.mine:focus-visible {
@@ -6271,6 +6332,10 @@
   }
   .soc-dot.dead {
     background: #888;
+  }
+  .soc-dot.afk {
+    background: #d8a94b;
+    box-shadow: 0 0 5px #d8a94baa;
   }
   /* name column flexes and ellipsis-truncates so it never pushes the other columns */
   .soc-id {
@@ -6472,6 +6537,59 @@
   .soc-guild-head .gm {
     color: var(--color-text-muted);
     font-size: 11px;
+  }
+  /* Guild roster: the persisted "hide offline" toggle (an aria-pressed button with a
+     checkbox-like indicator) and the online/offline group sub-headers. */
+  .soc-hide-offline {
+    /* Span the responsive .soc-body grid so the toggle sits on its own row (a break
+       above the groups), but render at content width, left-aligned. */
+    grid-column: 1 / -1;
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 2px 4px 6px;
+    padding: 5px 9px;
+    font-size: 12px;
+    font-family: var(--title-font);
+    color: var(--color-text-muted);
+    background: #1a1410;
+    border: 1px solid #463a1c;
+    border-radius: 4px;
+    cursor: var(--cursor-point);
+  }
+  .soc-hide-offline:hover {
+    color: var(--gold);
+  }
+  .soc-hide-offline.on {
+    color: var(--gold);
+    border-color: #6f5a2a;
+  }
+  .soc-hide-box {
+    width: 12px;
+    height: 12px;
+    flex: none;
+    border: 1px solid #6f5a2a;
+    border-radius: 3px;
+    background: #120e0a;
+  }
+  .soc-hide-offline.on .soc-hide-box {
+    background: var(--gold);
+    box-shadow: inset 0 0 0 2px #120e0a;
+  }
+  .soc-group-head {
+    /* Full-width band so the online/offline groups stack cleanly instead of
+       interleaving across the responsive two-column .soc-body grid. */
+    grid-column: 1 / -1;
+    margin: 8px 0 2px;
+    padding: 4px 4px 3px;
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    border-top: 1px solid #3d3218;
+  }
+  .soc-group-head:first-of-type {
+    border-top: 0;
   }
   /* Raid tab: the two groups sit side by side in the landscape window (falling
      back to stacked on mobile-touch). It escapes the `.soc-body` grid flow

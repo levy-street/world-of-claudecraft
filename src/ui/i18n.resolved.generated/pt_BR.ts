@@ -1690,7 +1690,8 @@ export const pt_BR: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "{family} de nível {level}",
@@ -2088,7 +2089,11 @@ export const pt_BR: EnTranslations = {
       "blockSearchPlaceholder": "Nome do jogador",
       "blockAction": "Bloquear",
       "nowBlocking": "{name} bloqueado.",
-      "stopBlockingTitle": "Parar de bloquear {name}"
+      "stopBlockingTitle": "Parar de bloquear {name}",
+      "onlineHeader": "Online ({n})",
+      "offlineHeader": "Offline ({n})",
+      "hideOffline": "Hide offline",
+      "hideOfflineTitle": "Hide offline guild members"
     },
     "gathering": {
       "title": "Coleta",
@@ -5868,7 +5873,8 @@ export const pt_BR: EnTranslations = {
         "offline": "Offline",
         "combat": "Em combate",
         "dungeon": "Em masmorra",
-        "dead": "Morto"
+        "dead": "Morto",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {

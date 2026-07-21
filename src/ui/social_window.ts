@@ -27,11 +27,14 @@ import { deedTitleText } from './deed_i18n';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
+import { loadGuildHideOffline, saveGuildHideOffline } from './guild_hide_offline';
 import { formatDateTime, formatNumber, t, tPlural } from './i18n';
 import { localizeZone } from './server_i18n';
 import {
   blockRows,
   friendRows,
+  type GuildRow,
+  guildRosterItems,
   guildView,
   ignoreRows,
   raidView,
@@ -89,6 +92,8 @@ function statusLabel(status: string | undefined): string {
       return t('hud.social.status.dungeon');
     case 'dead':
       return t('hud.social.status.dead');
+    case 'afk':
+      return t('hud.social.status.afk');
     default:
       return t('hud.social.status.online');
   }
@@ -126,6 +131,10 @@ export class SocialWindow {
   } = { field: '', items: [], index: -1 };
   // The element to refocus when the window closes (WCAG 2.2 AA focus return).
   private returnFocus: HTMLElement | null = null;
+  // Guild-tab "hide offline members" toggle: a persisted USER choice (guild presence
+  // is actionable info, never gated on graphics tier). Loaded once; the delegated body
+  // handler flips + persists it and refreshes the list in place.
+  private hideOffline = loadGuildHideOffline();
 
   constructor(private readonly deps: SocialWindowDeps) {}
 
@@ -276,6 +285,20 @@ export class SocialWindow {
       this.deps.startWhisper(node.dataset.whisper ?? '');
       return;
     }
+    // The guild-tab hide-offline toggle: flip + persist the USER choice, then refresh
+    // the roster in place (no structural change, so refreshList not a full render).
+    if (node.dataset.act === 'toggle-hide-offline') {
+      this.hideOffline = !this.hideOffline;
+      saveGuildHideOffline(this.hideOffline);
+      this.refreshList();
+      // refreshList swaps the body innerHTML, destroying the button that was just
+      // activated; restore keyboard focus to the freshly rendered toggle so repeated
+      // keyboard presses keep working (WCAG 2.2 AA focus management).
+      (
+        this.deps.root().querySelector('[data-act="toggle-hide-offline"]') as HTMLElement | null
+      )?.focus();
+      return;
+    }
     const w = this.deps.world();
     const act = node.dataset.act;
     const name = node.dataset.name ?? '';
@@ -389,50 +412,61 @@ export class SocialWindow {
     const g = view.guild;
     const guildCount = formatNumber(g.memberCount, { maximumFractionDigits: 0 });
     const head = `<div class="soc-guild-head">&lt;${esc(g.name)}&gt; <span class="gm">${esc(tPlural('hudChrome.plurals.guildMembers', g.memberCount, { rank: rankLabel(g.rank), count: guildCount }))}</span></div>`;
-    const rows = g.rows
-      .map((m) => {
-        // Offline rows carry a "last seen" line: a locale-formatted date/time,
-        // or the localized "never" when no login has been recorded.
-        const lastSeenWhen = m.lastLogin
-          ? formatDateTime(new Date(m.lastLogin), { dateStyle: 'medium', timeStyle: 'short' })
-          : t('hudChrome.social.lastSeenNever');
-        const meta = m.online
-          ? `<span class="zone">${esc(m.zone ? localizeZone(m.zone) : '')}</span><br>${esc(statusLabel(m.status))}`
-          : `${esc(t('hud.social.status.offline'))}<br>${esc(t('hudChrome.social.lastSeen', { when: lastSeenWhen }))}`;
-        // The title sits AFTER the rank chip so the chip stays glued to the
-        // name; the ellipsized .soc-name cell trims the title tail first.
-        const memberTitle = m.activeTitle ? deedTitleText(m.activeTitle) : '';
-        const memberTitleSpan = memberTitle
-          ? `<span class="soc-title">${esc(memberTitle)}</span>`
-          : '';
-        const nameInner = `${esc(m.name)}<span class="rank">${esc(rankLabel(m.rank))}</span>${memberTitleSpan}`;
-        const name =
-          m.online && !m.self
-            ? `<button type="button" class="soc-name soc-link" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${nameInner}</button>`
-            : `<span class="soc-name">${nameInner}</span>`;
-        let actions = m.canWhisper
-          ? `<button type="button" class="soc-x" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${svgIcon('whisper')}</button>`
-          : '';
-        if (m.canTransfer)
-          actions += `<button type="button" class="soc-x" data-act="gtransfer" data-name="${esc(m.name)}" title="${esc(t('hud.social.makeGuildMasterTitle', { name: m.name }))}">${svgIcon('crown')}</button>`;
-        if (m.canPromote)
-          actions += `<button type="button" class="soc-x" data-act="promote" data-name="${esc(m.name)}" title="${esc(t('hud.social.promoteTitle', { name: m.name }))}">▲</button>`;
-        if (m.canDemote)
-          actions += `<button type="button" class="soc-x" data-act="demote" data-name="${esc(m.name)}" title="${esc(t('hud.social.demoteTitle', { name: m.name }))}">▼</button>`;
-        if (m.canKick)
-          actions += `<button type="button" class="soc-x" data-act="gkick" data-name="${esc(m.name)}" title="${esc(t('hud.social.removeGuildTitle', { name: m.name }))}">${svgIcon('close')}</button>`;
-        const tip = esc(dotTitle(m.online, m.status, m.zone));
-        return (
-          `<div class="soc-row">` +
-          `<span class="soc-dot ${m.dot === 'off' ? '' : m.dot}" title="${tip}"></span>` +
-          `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(m.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(m.cls) }))}</span></span>` +
-          `<span class="soc-meta" title="${tip}">${meta}</span>` +
-          (actions ? `<span class="soc-actions">${actions}</span>` : '') +
-          `</div>`
-        );
-      })
+    // The persisted "hide offline" toggle: a pressed-state button (a single click event
+    // through the delegated body handler, unlike a label+checkbox that double-fires).
+    const toggle =
+      `<button type="button" class="soc-hide-offline${this.hideOffline ? ' on' : ''}" data-act="toggle-hide-offline" aria-pressed="${this.hideOffline ? 'true' : 'false'}" title="${esc(t('hudChrome.social.hideOfflineTitle'))}">` +
+      `<span class="soc-hide-box" aria-hidden="true"></span>${esc(t('hudChrome.social.hideOffline'))}</button>`;
+    // Online-first grouping with per-group count headers; the offline group (header +
+    // rows) is suppressed when the toggle is on. Empty groups emit no header.
+    const body = guildRosterItems(g.rows, this.hideOffline)
+      .map((item) =>
+        item.kind === 'header'
+          ? `<div class="soc-group-head">${esc(t(item.group === 'online' ? 'hudChrome.social.onlineHeader' : 'hudChrome.social.offlineHeader', { n: formatNumber(item.count, { maximumFractionDigits: 0 }) }))}</div>`
+          : this.guildMemberRowHtml(item.row),
+      )
       .join('');
-    return head + rows;
+    return head + toggle + body;
+  }
+
+  private guildMemberRowHtml(m: GuildRow): string {
+    // Offline rows carry a "last seen" line: a locale-formatted date/time,
+    // or the localized "never" when no login has been recorded.
+    const lastSeenWhen = m.lastLogin
+      ? formatDateTime(new Date(m.lastLogin), { dateStyle: 'medium', timeStyle: 'short' })
+      : t('hudChrome.social.lastSeenNever');
+    const meta = m.online
+      ? `<span class="zone">${esc(m.zone ? localizeZone(m.zone) : '')}</span><br>${esc(statusLabel(m.status))}`
+      : `${esc(t('hud.social.status.offline'))}<br>${esc(t('hudChrome.social.lastSeen', { when: lastSeenWhen }))}`;
+    // The title sits AFTER the rank chip so the chip stays glued to the
+    // name; the ellipsized .soc-name cell trims the title tail first.
+    const memberTitle = m.activeTitle ? deedTitleText(m.activeTitle) : '';
+    const memberTitleSpan = memberTitle ? `<span class="soc-title">${esc(memberTitle)}</span>` : '';
+    const nameInner = `${esc(m.name)}<span class="rank">${esc(rankLabel(m.rank))}</span>${memberTitleSpan}`;
+    const name =
+      m.online && !m.self
+        ? `<button type="button" class="soc-name soc-link" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${nameInner}</button>`
+        : `<span class="soc-name">${nameInner}</span>`;
+    let actions = m.canWhisper
+      ? `<button type="button" class="soc-x" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${svgIcon('whisper')}</button>`
+      : '';
+    if (m.canTransfer)
+      actions += `<button type="button" class="soc-x" data-act="gtransfer" data-name="${esc(m.name)}" title="${esc(t('hud.social.makeGuildMasterTitle', { name: m.name }))}">${svgIcon('crown')}</button>`;
+    if (m.canPromote)
+      actions += `<button type="button" class="soc-x" data-act="promote" data-name="${esc(m.name)}" title="${esc(t('hud.social.promoteTitle', { name: m.name }))}">▲</button>`;
+    if (m.canDemote)
+      actions += `<button type="button" class="soc-x" data-act="demote" data-name="${esc(m.name)}" title="${esc(t('hud.social.demoteTitle', { name: m.name }))}">▼</button>`;
+    if (m.canKick)
+      actions += `<button type="button" class="soc-x" data-act="gkick" data-name="${esc(m.name)}" title="${esc(t('hud.social.removeGuildTitle', { name: m.name }))}">${svgIcon('close')}</button>`;
+    const tip = esc(dotTitle(m.online, m.status, m.zone));
+    return (
+      `<div class="soc-row">` +
+      `<span class="soc-dot ${m.dot === 'off' ? '' : m.dot}" title="${tip}"></span>` +
+      `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(m.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(m.cls) }))}</span></span>` +
+      `<span class="soc-meta" title="${tip}">${meta}</span>` +
+      (actions ? `<span class="soc-actions">${actions}</span>` : '') +
+      `</div>`
+    );
   }
 
   private raidHtml(): string {

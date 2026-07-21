@@ -62,6 +62,16 @@ describe('mobile window layout CSS', () => {
     );
   });
 
+  it('scales the vendor window bottom clamp by --window-scale instead of a raw dvh', () => {
+    const start = mobileCss.indexOf('body.mobile-touch #vendor-window {\n    max-height:');
+    expect(start).toBeGreaterThan(0);
+    const block = mobileCss.slice(start, mobileCss.indexOf('}', start));
+    expect(block).toContain(
+      'max-height: calc(\n      var(--app-vh) /\n      var(--window-scale, 1) -\n      12px -\n      max(10px, env(safe-area-inset-bottom))\n    );',
+    );
+    expect(block).not.toContain('100dvh');
+  });
+
   it('places the Claudium wallet card beside the balance in mobile landscape', () => {
     expect(mobileCss).toContain(`@media (orientation: landscape) {
     body.mobile-touch #claudium-window .cl-body:has(> .cl-wallet-connect) {

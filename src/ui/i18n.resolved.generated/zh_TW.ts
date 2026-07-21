@@ -1690,7 +1690,8 @@ export const zh_TW: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "等級 {level} {family}",
@@ -2088,7 +2089,11 @@ export const zh_TW: EnTranslations = {
       "blockSearchPlaceholder": "玩家名稱",
       "blockAction": "封鎖",
       "nowBlocking": "已封鎖 {name}。",
-      "stopBlockingTitle": "取消對 {name} 的封鎖"
+      "stopBlockingTitle": "取消對 {name} 的封鎖",
+      "onlineHeader": "在線 ({n})",
+      "offlineHeader": "離線 ({n})",
+      "hideOffline": "隱藏離線",
+      "hideOfflineTitle": "隱藏離線公會成員"
     },
     "gathering": {
       "title": "採集",
@@ -5868,7 +5873,8 @@ export const zh_TW: EnTranslations = {
         "offline": "離線",
         "combat": "戰鬥中",
         "dungeon": "地城中",
-        "dead": "死亡"
+        "dead": "死亡",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {

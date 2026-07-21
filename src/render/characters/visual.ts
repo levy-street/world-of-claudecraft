@@ -4,6 +4,7 @@
 // mid-distance band. All geometry/materials are shared caches — dispose()
 // only releases mixer bindings.
 import * as THREE from 'three';
+import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
 import { GFX } from '../gfx';
@@ -700,12 +701,32 @@ export class CharacterVisual {
     this.reattachHeldWeapon();
   }
 
-  /** Swap the actual offhand without disturbing the mainhand cosmetic pipeline. */
+  /** Swap the actual offhand. When neither the old nor the new offhand mirrors the
+   *  active weapon skin, this is the lean path that never disturbs the mainhand
+   *  cosmetic pipeline (its rarity VFX keep running). When the offhand crosses into,
+   *  out of, or between skin-mirrored states (a matching-type weapon), it
+   *  routes through the full re-attach so the offhand gains or loses the skin model
+   *  and its rarity VFX in step with the mainhand. */
   setOffhand(offhandItemId: string | null): void {
     if (offhandItemId === this.offhandItemId) return;
+    if (this.def.offhandSlot === undefined) {
+      this.offhandItemId = offhandItemId;
+      return;
+    }
+    const wasMirrored = offhandMirrorsWeaponSkin(this.weaponSkinId, this.offhandItemId);
     this.offhandItemId = offhandItemId;
-    if (this.def.offhandSlot === undefined) return;
-    const payloads = setHeldOffhand(this.model, this.def, offhandItemId, this.stow.attached);
+    const nowMirrored = offhandMirrorsWeaponSkin(this.weaponSkinId, this.offhandItemId);
+    if (wasMirrored || nowMirrored) {
+      this.reattachHeldWeapon();
+      return;
+    }
+    const payloads = setHeldOffhand(
+      this.model,
+      this.def,
+      offhandItemId,
+      this.weaponSkinId,
+      this.stow.attached,
+    );
     for (const payload of payloads) {
       applyMaterials(
         payload,
@@ -730,8 +751,12 @@ export class CharacterVisual {
     this.reattachHeldWeapon();
   }
 
-  /** Re-attach the weapon slots (gear swap / skin change), honoring an active
-   *  sheathe so a weapon swapped while stowed lands on the back, not the hand. */
+  /** Re-attach BOTH held hands (gear swap / skin change), honoring an active
+   *  sheathe so a weapon swapped while stowed lands on the back, not the hand. The
+   *  offhand re-attaches with skin awareness: when the active skin mirrors onto a
+   *  matching-type offhand weapon, that payload joins the skin VFX/material
+   *  set; a shield, held offhand, or different-type weapon re-attaches with its own
+   *  model and stays out of that set (pixel-untouched). */
   private reattachHeldWeapon(): void {
     this.disposeWeaponVfx();
     this.disposeWeaponSkinMaterials();
@@ -742,6 +767,16 @@ export class CharacterVisual {
       this.weaponSkinId,
       this.stow.attached,
     );
+    const offPayloads = setHeldOffhand(
+      this.model,
+      this.def,
+      this.offhandItemId,
+      this.weaponSkinId,
+      this.stow.attached,
+    );
+    if (offhandMirrorsWeaponSkin(this.weaponSkinId, this.offhandItemId)) {
+      payloads.push(...offPayloads);
+    }
     this.finishWeaponAttach(payloads);
   }
 

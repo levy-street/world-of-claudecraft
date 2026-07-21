@@ -1690,7 +1690,8 @@ export const tr_TR: EnTranslations = {
     },
     "nameplate": {
       "mobLevel": "{level}",
-      "mobEliteLevel": "{level}+"
+      "mobEliteLevel": "{level}+",
+      "afkTag": "AFK"
     },
     "mobTooltip": {
       "levelFamily": "Seviye {level} {family}",
@@ -2088,7 +2089,11 @@ export const tr_TR: EnTranslations = {
       "blockSearchPlaceholder": "Oyuncu adı",
       "blockAction": "Engelle",
       "nowBlocking": "{name} engellendi.",
-      "stopBlockingTitle": "{name} engelini kaldır"
+      "stopBlockingTitle": "{name} engelini kaldır",
+      "onlineHeader": "Online ({n})",
+      "offlineHeader": "Offline ({n})",
+      "hideOffline": "Hide offline",
+      "hideOfflineTitle": "Hide offline guild members"
     },
     "gathering": {
       "title": "Toplama",
@@ -5868,7 +5873,8 @@ export const tr_TR: EnTranslations = {
         "offline": "Çevrimdışı",
         "combat": "Çatışmada",
         "dungeon": "Zindanda",
-        "dead": "Ölü"
+        "dead": "Ölü",
+        "afk": "Away"
       },
       "statusWithZone": "{status} - {zone}",
       "ranks": {

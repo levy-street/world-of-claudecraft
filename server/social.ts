@@ -17,7 +17,7 @@ export type GuildRank = 'leader' | 'officer' | 'member';
 // `realm` is the world/shard the character lives on (stored per character so
 // it survives logout and is ready for future cross-realm play); `zone` and
 // `status` are only meaningful while the character is online.
-export type PresenceStatus = 'online' | 'combat' | 'dungeon' | 'dead';
+export type PresenceStatus = 'online' | 'combat' | 'dungeon' | 'dead' | 'afk';
 
 export interface Presence {
   zone: string;

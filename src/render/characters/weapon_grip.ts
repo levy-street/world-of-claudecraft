@@ -180,7 +180,16 @@ export function variantGripTransform(
   override?: WeaponGripOverride,
 ): GripTransform {
   const clamp = height > 1e-3 ? Math.min(1, maxHeight / height) : 1;
-  const [ox, oy, oz] = override?.pos ?? [0, 0, 0];
+  const [px, oy, pz] = override?.pos ?? [0, 0, 0];
+  // The per-weapon offset is authored against the RIGHT hand, whose base
+  // orientation is a 180-degree turn about Y from the off-hand's. Express the same
+  // hand-local nudge in the off-hand frame by turning it the same way: negate X
+  // and Z (Y is the shared along-bone lift). Without this, a large override (a
+  // legendary sword skin, pos ~ [-0.18, _, -0.27]) shoves the off-hand model right
+  // off the grip. An absent or X/Z-free override is unchanged, so scale-only skins
+  // and every right-hand weapon stay byte-identical.
+  const ox = left ? -px : px;
+  const oz = left ? -pz : pz;
   const base: [number, number, number, number] = left ? [0, 0, 0, 1] : [0, 1, 0, 0];
   let quaternion = base;
   if (override?.rot) {

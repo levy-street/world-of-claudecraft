@@ -19,7 +19,7 @@ const componentsCss = readFileSync(join(root, 'src/styles/components.css'), 'utf
 const socialWindow = readFileSync(join(root, 'src/ui/social_window.ts'), 'utf8');
 
 // the online presence statuses the server sends and the client turns into a dot class
-const ONLINE_STATUSES = ['online', 'combat', 'dungeon', 'dead'];
+const ONLINE_STATUSES = ['online', 'combat', 'dungeon', 'dead', 'afk'];
 
 describe('social presence dot styling (#100)', () => {
   it('every online status has a matching .soc-dot CSS color rule', () => {

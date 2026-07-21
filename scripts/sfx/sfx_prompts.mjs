@@ -552,9 +552,21 @@ export const SFX = [
     prompt: 'A crackling campfire with popping embers and steady flames. Seamless loop, no music.',
   },
   {
+    // Real recording (not ElevenLabs), custom-authored to loop cleanly
+    // through the runtime's own loop=true playback (no seam crossfade of
+    // its own, see src/game/sfx.ts's loop()): the hammer rhythm deliberately
+    // breaks pattern instead of repeating a fixed beat, and 375ms of true
+    // silence on each side, after the strike decay rings out, absorbs both
+    // the splice points and MP3 encoder priming/padding at the wrap. custom
+    // is load-bearing here: it is what makes conform preserve the author's
+    // own mix level (preserveLoudness) instead of retargeting integrated
+    // LUFS toward the generated-content target, which would otherwise clamp
+    // this percussive, high-crest-factor recording's gain down hard trying
+    // to hit -14 LUFS under a -6dBFS peak ceiling built for synthetic clips.
     key: 'amb_forge',
-    duration: 6,
+    duration: 14,
     loop: true,
+    custom: true,
     prompt:
       'A blacksmith forge: a roaring furnace with rhythmic hammer strikes ringing on an anvil. Seamless loop, no music.',
   },
