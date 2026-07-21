@@ -1,0 +1,44 @@
+{
+  "name": "@wocc/diem-pool",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DIEM compute delegation pool for World of ClaudeCraft - providers register scoped Venice API keys, the game routes inference through the pool, usage is metered and settled daily in Claudium.",
+  "scripts": {
+    "dev": "next dev -p 3100",
+    "build": "next build",
+    "start": "next start -p 3100",
+    "worker": "tsx src/workers/index.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:seed": "tsx prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "overrides": {
+    "postcss": "^8.5.10"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.10.0",
+    "bs58": "^6.0.0",
+    "bullmq": "^5.34.0",
+    "ioredis": "^5.4.2",
+    "next": "^15.5.20",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "tweetnacl": "^1.0.3",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "prisma": "^6.10.0",
+    "puppeteer-core": "^25.3.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
+  }
+}

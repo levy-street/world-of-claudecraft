@@ -388,6 +388,9 @@ export default defineConfig({
     //   *.test.ts under a temp root); excluding it keeps a crashed golden run's orphan emitted
     //   test out of a bare `vitest run`. The golden test runs its emitted test through a child
     //   vitest with an explicit --config override so this exclude does not block it.
+    // - services/* are standalone sibling services with their own package.json and
+    //   vitest config; the root run must not sweep their tests up without their own
+    //   dependencies installed (they run in their own CI job).
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
@@ -398,6 +401,7 @@ export default defineConfig({
       'tmp/**',
       'tests/browser/**',
       '**/*.browser.test.ts',
+      'services/**',
     ],
   },
 });
