@@ -1930,6 +1930,10 @@ export const hudChromeStrings = {
       legend: 'LEGEND',
       shill: 'SHILL',
     },
+    // Chat anti-impersonation disclosure: the hover/aria text on the colored
+    // [Role] tag beside a staff member's chat name (wordy, M16: the five
+    // non-Latin fills land in this same change).
+    roleTagChatTitle: 'Verified server role: {role}',
     guildMember: 'Verified member',
     notMember: 'Not in the server yet',
     joinCta: 'Join the Discord',

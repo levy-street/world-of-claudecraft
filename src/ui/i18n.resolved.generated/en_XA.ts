@@ -1839,6 +1839,7 @@ export const en_XA: EnTranslations = {
         "legend": "[ĻÉĜÉÑÐ]",
         "shill": "[ŠĤÍĻĻ]"
       },
+      "roleTagChatTitle": "[Ʋéŕíƒíéð šéŕʋéŕ ŕóļé: {role}]",
       "guildMember": "[Ʋéŕíƒíéð ɱéɱƀéŕ]",
       "notMember": "[Ñóţ íñ ţĥé šéŕʋéŕ ýéţ]",
       "joinCta": "[Ĵóíñ ţĥé Ðíšçóŕð]",

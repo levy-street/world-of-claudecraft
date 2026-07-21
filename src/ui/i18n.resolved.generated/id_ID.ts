@@ -1839,6 +1839,7 @@ export const id_ID: EnTranslations = {
         "legend": "LEGENDA",
         "shill": "PENDUKUNG"
       },
+      "roleTagChatTitle": "Verified server role: {role}",
       "guildMember": "Anggota terverifikasi",
       "notMember": "Belum berada di server",
       "joinCta": "Gabung Discord",

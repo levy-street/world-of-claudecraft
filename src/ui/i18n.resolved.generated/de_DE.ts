@@ -1839,6 +1839,7 @@ export const de_DE: EnTranslations = {
         "legend": "LEGENDE",
         "shill": "WERBETROMMEL"
       },
+      "roleTagChatTitle": "Verified server role: {role}",
       "guildMember": "Verifiziertes Mitglied",
       "notMember": "Noch nicht auf dem Server",
       "joinCta": "Tritt dem Discord bei",

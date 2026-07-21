@@ -1839,6 +1839,7 @@ export const ja_JP: EnTranslations = {
         "legend": "レジェンド",
         "shill": "サポーター"
       },
+      "roleTagChatTitle": "認証済みサーバーロール: {role}",
       "guildMember": "認証済みメンバー",
       "notMember": "まだサーバーに参加していません",
       "joinCta": "Discordに参加",

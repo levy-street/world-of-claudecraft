@@ -15,6 +15,7 @@ import {
   CHAT_MESSAGE_TOKEN,
   CHAT_NAME_TOKEN,
   chatAiTagEl,
+  chatRoleTagEl,
   chatStreamerBadgeEl,
 } from '../src/ui/hud/chat/chat_line';
 
@@ -23,13 +24,14 @@ const template = (prefix: string) => `${prefix}${CHAT_NAME_TOKEN}: ${CHAT_MESSAG
 
 function line(
   rendered: string,
-  opts: { ai?: boolean; streamer?: boolean; name?: string; message?: string } = {},
+  opts: { ai?: boolean; streamer?: boolean; role?: string; name?: string; message?: string } = {},
 ) {
   const div = document.createElement('div');
   const sender = document.createElement('span');
   sender.className = 'chat-player-name';
   sender.textContent = opts.name ?? 'Zyx';
   appendChatLineParts(div, rendered, {
+    roleTag: chatRoleTagEl(document, opts.role),
     aiTag: opts.ai ? chatAiTagEl(document) : null,
     streamerBadge: opts.streamer
       ? chatStreamerBadgeEl(document, { twitch: 'https://twitch.tv/zyx' })
@@ -180,5 +182,46 @@ describe('chat line streamer badge placement', () => {
     expect(el.getAttribute('role')).toBe('img');
     expect(el.getAttribute('aria-label')).toBeTruthy();
     expect(el.innerHTML).not.toContain('twitch.tv/zyx');
+  });
+});
+
+describe('chat line staff-role tag (anti-impersonation disclosure)', () => {
+  it('renders no tag for a sender with no role or an unknown wire key', () => {
+    expect(line(template('[General] ')).querySelector('.chat-role-tag')).toBeNull();
+    // a bad wire value draws nothing rather than an empty bracket pair
+    expect(
+      line(template('[General] '), { role: 'notarealrole' }).querySelector('.chat-role-tag'),
+    ).toBeNull();
+  });
+
+  it('renders the colored tag first among the marks, immediately before the name', () => {
+    const div = line(template('[General] '), { role: 'coredevs', ai: true });
+    const tag = div.querySelector<HTMLElement>('.chat-role-tag');
+    const ai = div.querySelector('.ai-tag');
+    const sender = div.querySelector('.chat-player-name');
+
+    expect(tag?.textContent).toBe('[Core Dev]');
+    // catalog color, inline, so chat matches the nameplate tint for the role
+    expect(tag?.style.color).toBeTruthy();
+    // order: role tag, then [AI], then the name; channel prefix stays ahead
+    expect(tag?.nextSibling).toBe(ai);
+    expect(ai?.nextSibling).toBe(sender);
+    expect(div.textContent).toBe('[General] [Core Dev][AI]Zyx: hello');
+  });
+
+  it('announces the MEANING to assistive tech (role=img + aria-label), like the [AI] tag', () => {
+    const div = line(template(''), { role: 'mods' });
+    const tag = div.querySelector('.chat-role-tag');
+    expect(tag?.getAttribute('role')).toBe('img');
+    expect(tag?.getAttribute('aria-label')).toContain('[Mod]'.slice(1, -1));
+    expect(tag?.getAttribute('aria-label')).not.toBe('[Mod]');
+  });
+
+  it('keeps the tag in the fallback line when a locale mangles both slots', () => {
+    const div = line('no slots at all', { role: 'levyst' });
+    const tag = div.querySelector('.chat-role-tag');
+    const sender = div.querySelector('.chat-player-name');
+    expect(tag).not.toBeNull();
+    expect(tag?.nextSibling).toBe(sender);
   });
 });

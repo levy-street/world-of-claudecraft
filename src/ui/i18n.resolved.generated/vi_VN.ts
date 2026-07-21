@@ -1839,6 +1839,7 @@ export const vi_VN: EnTranslations = {
         "legend": "HUYỀN THOẠI",
         "shill": "QUẢNG BÁ VIÊN"
       },
+      "roleTagChatTitle": "Verified server role: {role}",
       "guildMember": "Thành viên đã xác minh",
       "notMember": "Chưa tham gia máy chủ",
       "joinCta": "Tham gia Discord",

@@ -1839,6 +1839,7 @@ export const zh_TW: EnTranslations = {
         "legend": "傳奇",
         "shill": "擁護者"
       },
+      "roleTagChatTitle": "已驗證的伺服器身分組: {role}",
       "guildMember": "已驗證成員",
       "notMember": "尚未加入伺服器",
       "joinCta": "加入 Discord",

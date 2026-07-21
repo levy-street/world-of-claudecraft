@@ -1839,6 +1839,7 @@ export const cs_CZ: EnTranslations = {
         "legend": "LEGENDA",
         "shill": "HLASATEL"
       },
+      "roleTagChatTitle": "Verified server role: {role}",
       "guildMember": "Ověřený člen",
       "notMember": "Zatím nejsi na serveru",
       "joinCta": "Připojit se na Discord",

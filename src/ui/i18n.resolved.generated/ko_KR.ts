@@ -1839,6 +1839,7 @@ export const ko_KR: EnTranslations = {
         "legend": "전설",
         "shill": "홍보대사"
       },
+      "roleTagChatTitle": "인증된 서버 역할: {role}",
       "guildMember": "인증된 멤버",
       "notMember": "아직 서버에 없음",
       "joinCta": "Discord 참여하기",

@@ -294,6 +294,7 @@ import {
   CHAT_MESSAGE_TOKEN,
   CHAT_NAME_TOKEN,
   chatAiTagEl,
+  chatRoleTagEl,
   chatStreamerBadgeEl,
 } from './hud/chat/chat_line';
 import { type ChatClock, clampChatClock, formatChatTimestamp } from './hud/chat/chat_timestamp';
@@ -10295,6 +10296,10 @@ export class Hud {
     const streamerBadge = chatStreamerBadgeEl(document, flair?.links);
     const rendered = t(templateKey, { name: CHAT_NAME_TOKEN, message: CHAT_MESSAGE_TOKEN });
     appendChatLineParts(div, rendered, {
+      // The staff/special-role disclosure tag, resolved only from the
+      // server-stamped flair (never from a local entity), so it cannot be
+      // spoofed by anything a client controls.
+      roleTag: chatRoleTagEl(document, flair?.role),
       aiTag: flair?.ai ? chatAiTagEl(document) : null,
       streamerBadge,
       sender,

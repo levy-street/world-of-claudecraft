@@ -665,6 +665,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.playerMenu.profileUnavailable': '找不到 {name} 的資料。',
   'hudChrome.playerMenu.aiTag': '[AI]',
   'hudChrome.playerMenu.aiTagTitle': 'AI 操作的帳號',
+  'hudChrome.discord.roleTagChatTitle': '已驗證的伺服器身分組: {role}',
   'hudChrome.playerMenu.streamerBadgeTitle': '認證主播',
   'hudChrome.playerMenu.watchTwitch': '在 Twitch 觀看',
   'hudChrome.playerMenu.watchX': '在 X 檢視',

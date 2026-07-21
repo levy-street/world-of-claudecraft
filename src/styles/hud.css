@@ -4977,6 +4977,16 @@
   #chatlog .ai-tag {
     margin-right: 3px;
   }
+  /* Staff/special-role chat tag ([Levy St], [Core Dev], ...): the color comes
+     inline from the shared role catalog (chat matches the nameplate tint), so
+     this rule only sets weight, spacing, and the legibility halo.
+     GAMEPLAY-NEUTRAL like .ai-tag above: identity disclosure, never actionable
+     state, so no tier or setting may hide it. */
+  #chatlog .chat-role-tag {
+    font-weight: 700;
+    margin-right: 3px;
+    text-shadow: 1px 1px 2px #000;
+  }
   /* Player-menu header. The tag is nested INSIDE .ctx-title-name (the header is a
      flex row with a 9px gap, so a sibling would drift away from the name it
      qualifies). The header font is the display serif, which the bracketed literal

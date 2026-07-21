@@ -1839,6 +1839,7 @@ export const tr_TR: EnTranslations = {
         "legend": "EFSANE",
         "shill": "SAVUNUCU"
       },
+      "roleTagChatTitle": "Verified server role: {role}",
       "guildMember": "Onaylı üye",
       "notMember": "Henüz sunucuda değil",
       "joinCta": "Discord'a katıl",

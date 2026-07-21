@@ -6199,7 +6199,14 @@ export class GameServer {
     for (const ev of events) {
       if (ev.type !== 'chat') continue;
       const flair = this.chatFlairForPid(ev.fromPid);
-      if (flair) ev.flair = flair;
+      // The sender's top staff/special Discord role (the anti-impersonation
+      // chat tag) is composed here from the SENDER's entity rather than folded
+      // into the cached session.chatFlair: e.discordRole is written by the
+      // bot's members-meta push on its own cadence, so reading it live at
+      // fan-out cannot go stale. Allocates only for role holders.
+      const role = this.sim.entities.get(ev.fromPid)?.discordRole;
+      if (role) ev.flair = { ...flair, role };
+      else if (flair) ev.flair = flair;
     }
     // ignore list: social invites from blocked senders are resolved once per
     // batch (dropped for every session and declined in the sim), not per
