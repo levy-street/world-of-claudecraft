@@ -5296,7 +5296,9 @@ export class Sim {
       // client plays a single heal_impact right here, at the moment it lands,
       // instead of once per tick for the whole duration. amount:0 keeps this
       // sound-only (FCT/combat log/heal meters/heal-glow VFX all gate on
-      // amount > 0 or crit, so this never double-counts real ticks).
+      // amount > 0 or crit, so this never double-counts real ticks). Confirmed
+      // in-game on Priest and Druid, Frenzied Regeneration included (see the
+      // hud.ts heal2 case for the one exception this feeds into).
       this.emit({
         type: 'heal2',
         sourceId: aura.sourceId,

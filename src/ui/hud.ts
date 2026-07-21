@@ -8615,7 +8615,10 @@ export class Hud {
         // moment instead, so ticks stay silent. Frenzied Regeneration is the one
         // exception (explicitly kept ticking): a Bear Form self-heal, never
         // aimed at anyone else, so the repeat doesn't read as spammy the way a
-        // party HoT does.
+        // party HoT does. Confirmed in-game on Priest (Renew) and Druid
+        // (Rejuvenation, Regrowth, Frenzied Regeneration): the others land once
+        // on application and stay silent for the rest of their duration;
+        // Frenzied Regeneration keeps ticking exactly as before.
         const isHot = ev.type === 'heal2' && ev.hot === true;
         if (isHot && ev.abilityId !== 'frenzied_regeneration') return;
         this.combat('heal_impact', tgt.pos.x, tgt.pos.y, tgt.pos.z, 1.0, { cooldown: 0.1 });
