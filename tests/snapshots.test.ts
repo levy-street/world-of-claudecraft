@@ -4520,6 +4520,23 @@ describe('negotiated stable timer wire v2', () => {
     expect(client.player.abilityCharges?.stable_cast?.recharge).toBeCloseTo(4.75, 5);
     expect(client.nodeHarvestableByMe('stable_node')).toBe(false);
 
+    // A Temporal Hourglass window re-ships achr every tick while the unchanged
+    // counts stay delta-omitted: the accelerated deadline must land even with
+    // NO achg in the snapshot (the decode is deliberately not gated on achg;
+    // a nested decode silently dropped these and froze the strip at 1x).
+    const accelerated = {
+      ...later,
+      tick: later.tick + 1,
+      time: later.time + 0.05,
+      self: { id: session.pid, achr: { stable_cast: [3, 5] } },
+    };
+    (client as any).applySnapshot(accelerated);
+    expect(client.player.abilityCharges?.stable_cast?.recharge).toBeCloseTo(
+      3 - accelerated.time,
+      5,
+    );
+    expect(client.player.abilityCharges?.stable_cast?.charges).toBe(1);
+
     player.auras.length = 0;
     player.cooldowns.clear();
     player.abilityCharges.stable_cast.charges = 2;

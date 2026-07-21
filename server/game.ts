@@ -5612,7 +5612,7 @@ export class GameServer {
         p.abilityCharges
           ? Object.fromEntries(
               Object.entries(p.abilityCharges)
-                .filter(([, v]) => v.recharge > 0)
+                .filter(([, v]) => v.recharge > 0 && Number.isFinite(v.recharge))
                 .map(([k, v]) => [k, [v.recharge, v.rechargeLength]]),
             )
           : {},
