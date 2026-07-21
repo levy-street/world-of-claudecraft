@@ -280,4 +280,14 @@ describe('Ascendant Sigils holder badges', () => {
       'inspect-holder-badge inspect-holder-halo inspect-holder-halo-strong',
     );
   });
+
+  it('embeds the band II Leviathan full-creature glyph', () => {
+    const leviathan = holderTierByIndex(8)!;
+    expect(leviathan.name).toBe('Leviathan');
+    const svg = decode(leviathan);
+    // The bioluminescent flank light and the glowing eye pupil are part of the
+    // Leviathan glyph.
+    expect(svg).toContain('#b99bff');
+    expect(svg).toContain('#e8dcff');
+  });
 });

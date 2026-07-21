@@ -208,11 +208,13 @@
     --cursor-hand: var(--cursor-arrow);
     --cursor-sword: var(--cursor-point);
     --cursor-shield: var(--cursor-point);
-    /* $WOC holder-tier badge halo (the static "stand out" glow). The hue is
-       supplied per tier by the nameplate/inspect painter via --holder-glow; these
-       two tunables set the blur strength only, frozen from in-game nameplate
-       screenshots: subtle for bands I-III, moderately stronger for the two band IV
-       regalia (Worldbearer, Sovereign). Cosmetic-only and static (no per-frame cost). */
+    /* Badge halo (the static "stand out" glow), shared by the holder and
+       contributor ladders. The hue is supplied per tier by the nameplate/inspect
+       painter via --holder-glow / --dev-glow; these two tunables set the blur
+       strength only, frozen from in-game nameplate screenshots: subtle for the
+       ordinary rungs, moderately stronger for the apex rungs (holder band IV
+       regalia; the significant-contributor dev tiers). Cosmetic and static (no
+       per-frame cost). */
     --holder-halo: 2.5px;
     --holder-halo-strong: 4px;
   }

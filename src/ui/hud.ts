@@ -190,7 +190,12 @@ import {
 } from './deeds_view';
 import { DeedsWindow } from './deeds_window';
 import { DevCommandWindow } from './dev_command_window';
-import { devTierBadgeDataUrl, devTierByIndex, devTierDisplayName } from './dev_tier';
+import {
+  devCardBadgeClass,
+  devTierBadgeDataUrl,
+  devTierByIndex,
+  devTierDisplayName,
+} from './dev_tier';
 import { discordRoleTagLabel } from './discord_role_tag';
 import { discordStatusBadgeDataUrl, discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
@@ -12525,7 +12530,7 @@ export class Hud {
       : '';
     const devHtml = devTierDef
       ? `<div class="inspect-holder">` +
-        `<img class="inspect-holder-badge" src="${devTierBadgeDataUrl(devTierDef)}" alt="" draggable="false">` +
+        `<img class="${devCardBadgeClass(devTierDef)}" style="--dev-glow:${devTierDef.glow}" src="${devTierBadgeDataUrl(devTierDef)}" alt="" draggable="false">` +
         `<div class="inspect-holder-text">` +
         `<div class="inspect-holder-name">${esc(devTierDisplayName(devTierDef))}</div>` +
         `<div class="inspect-holder-sub">${esc(devSub)}</div>` +

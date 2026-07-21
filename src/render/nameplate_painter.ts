@@ -26,6 +26,7 @@ import {
   devTierByIndex,
   devTierDisplayName,
   devTierNameOutlineColor,
+  isSignificantDevTier,
 } from '../ui/dev_tier';
 import { discordRoleTagLabel } from '../ui/discord_role_tag';
 import { tEntity } from '../ui/entity_i18n';
@@ -496,9 +497,17 @@ export class NameplatePainter {
     if (def) {
       v.devTierEl.src = devTierBadgeDataUrl(def, 32);
       v.devTierEl.title = t('hudChrome.devBadge.badgeTitle', { tier: devTierDisplayName(def) });
+      // Static per-tier halo, mirroring the holder badge: the tier glow hue drives
+      // a CSS drop-shadow whose strength is the shared named tunable, stronger for
+      // the two significant-contributor rungs (Architect, Worldwright). Cosmetic and
+      // static, written on the tier cheap-diff (never per frame), like src above.
+      v.devTierEl.style.setProperty('--dev-glow', def.glow);
+      v.devTierEl.classList.toggle('np-dev-tier-strong', isSignificantDevTier(def.index));
       v.devTierEl.style.display = '';
     } else {
       v.devTierEl.removeAttribute('src');
+      v.devTierEl.style.removeProperty('--dev-glow');
+      v.devTierEl.classList.remove('np-dev-tier-strong');
       v.devTierEl.style.display = 'none';
     }
   }

@@ -561,12 +561,40 @@ const BAND2: Record<Band2Key, BandArt> = {
       `<path d="M16 39.5c3.5 2.6 8 3.7 12.6 3.4" fill="none" stroke="#5fb2ff" stroke-width="1.6" stroke-linecap="round" stroke-opacity="0.9"/>`,
   },
   leviathan: {
-    mat: { hi: '#a884ff', mid: '#6a3ce0', lo: '#2a1266', faceHi: '#3b1c85', faceLo: '#1c0c47' },
+    // Band II capstone: a full-mass leviathan coiled inside the amethyst gem, the
+    // only Band II badge with a whole creature (roaring maw, crest spikes, dorsal
+    // fins, belly plates, tail fluke, and bioluminescent flank lights).
+    mat: { hi: '#a884ff', mid: '#5c2ed1', lo: '#1e0b52', faceHi: '#2c1370', faceLo: '#120735' },
     glyph:
-      `<path d="M13 41c3.8 0 5.4-6.4 9.6-6.4 4 0 5 6.4 9.4 6.4 4.2 0 5.2-9.6 9.8-9.6 3.4 0 4.6 4.4 7.2 5.4" fill="none" stroke="${CREAM}" stroke-width="4.2" stroke-linecap="round"/>` +
-      `<path d="M45.5 27.5c1.6-3.6 5.2-5.4 9-5-1 3.6-3.4 6.2-7 7Z" fill="${CREAM}"/>` +
-      `<circle cx="50.6" cy="25.4" r="1.7" fill="#2a1266"/>` +
-      `<path d="M17 46.6c4 1.8 8.6 2.2 13 1.2" fill="none" stroke="#a884ff" stroke-width="1.6" stroke-linecap="round" stroke-opacity="0.9"/>`,
+      // faint abyss ring
+      `<circle cx="32" cy="33" r="18.5" fill="none" stroke="#a884ff" stroke-opacity="0.12" stroke-width="1.1"/>` +
+      // dorsal spikes along the back (outer edge of the arch)
+      `<path d="M16.5 26.5 L12.3 24.6 L15.2 29.5 Z" fill="${CREAM}"/>` +
+      `<path d="M14.6 33.5 L12.1 36.8 L16 37.4 Z" fill="${CREAM}"/>` +
+      `<path d="M18.3 43 L16.4 47.2 L21.2 46 Z" fill="${CREAM}"/>` +
+      // the body: one thick tapering arch, closed fill = mass
+      `<path d="M28 20.5 C18.5 23 13.5 30 15 38 C16.5 45.5 24 50.5 33 50.5 C39.5 50.5 44.5 48 47.5 43.5 C48.8 41.2 48 38.6 45.2 38.4 C43.8 42.2 39.5 44.8 34 45 C26.5 45.2 21.8 41.5 20.8 35.5 C20 30.2 23.5 25.5 29.5 23.8 Z" fill="${CREAM}"/>` +
+      `<path d="M28 20.5 C18.5 23 13.5 30 15 38 C16.5 45.5 24 50.5 33 50.5 C39.5 50.5 44.5 48 47.5 43.5 C48.8 41.2 48 38.6 45.2 38.4 C43.8 42.2 39.5 44.8 34 45 C26.5 45.2 21.8 41.5 20.8 35.5 C20 30.2 23.5 25.5 29.5 23.8 Z" fill="none" stroke="#1e0b52" stroke-opacity="0.55" stroke-width="1.4" stroke-linejoin="round"/>` +
+      // belly plates across the inner curve
+      `<path d="M20.9 31 L16.2 29.5 M20.7 36.5 L15.8 36.9 M22.5 41.5 L18.6 44 M27.5 44.6 L25.6 48.9 M33.5 45 L33.3 49.6 M39 44.2 L41 48.2" stroke="#5c2ed1" stroke-opacity="0.75" stroke-width="1.7" fill="none"/>` +
+      // tail fluke fan, contained against the right edge
+      `<path d="M45.8 39.5 L51.8 36.2 L50.4 41.4 Z" fill="${CREAM}"/>` +
+      `<path d="M46.6 41.8 L51.4 44.6 L47.3 45.8 Z" fill="${CREAM}"/>` +
+      // head: heavy skull, roaring open maw, fangs, crest spikes
+      `<path d="M26.5 20.8 C26 15.4 30.5 11.8 35.8 12.2 C41 12.6 45.6 14.4 47.8 16.8 L37.6 19.7 L46.8 24.8 C44.2 27.8 39.2 28.8 34.8 27.2 L36.4 24 L31.5 25.6 C28.6 24.8 26.8 23.2 26.5 20.8 Z" fill="${CREAM}"/>` +
+      // fangs in the maw gap
+      `<path d="M41.2 17.9 L41.9 20.8 L43.6 18.4 Z" fill="${CREAM}"/>` +
+      `<path d="M41.6 23.8 L42.5 20.9 L44.4 23.4 Z" fill="${CREAM}"/>` +
+      // crest spikes off the skull, short to stay inside the pinched top
+      `<path d="M29.5 13.4 L26.6 9.8 L31.4 11 Z" fill="${CREAM}"/>` +
+      `<path d="M33.4 12.2 L32.6 7.6 L36.2 10.6 Z" fill="${CREAM}"/>` +
+      // fierce eye: angular brow over a glowing pupil
+      `<path d="M31.2 16.2 L36.2 15.4 L35.8 17 Z" fill="#5c2ed1"/>` +
+      `<circle cx="33.8" cy="17.6" r="1.5" fill="#5c2ed1"/>` +
+      `<circle cx="33.8" cy="17.6" r="0.6" fill="#e8dcff"/>` +
+      // bioluminescent spots along the flank
+      `<circle cx="18.6" cy="31.5" r="1.3" fill="#b99bff"/>` +
+      `<circle cx="22" cy="40.8" r="1.3" fill="#b99bff"/>`,
   },
 };
 
