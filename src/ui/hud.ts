@@ -8609,8 +8609,16 @@ export class Hud {
       case 'heal':
       case 'heal2': {
         const tgt = sim.entities.get(ev.targetId);
-        if (tgt)
-          this.combat('heal_impact', tgt.pos.x, tgt.pos.y, tgt.pos.z, 1.0, { cooldown: 0.1 });
+        if (!tgt) return;
+        // A HoT tick fires this every couple seconds for its whole duration; the
+        // one-shot application cue (Sim.applyAura) now covers the "heal landed"
+        // moment instead, so ticks stay silent. Frenzied Regeneration is the one
+        // exception (explicitly kept ticking): a Bear Form self-heal, never
+        // aimed at anyone else, so the repeat doesn't read as spammy the way a
+        // party HoT does.
+        const isHot = ev.type === 'heal2' && ev.hot === true;
+        if (isHot && ev.abilityId !== 'frenzied_regeneration') return;
+        this.combat('heal_impact', tgt.pos.x, tgt.pos.y, tgt.pos.z, 1.0, { cooldown: 0.1 });
         return;
       }
       case 'aura': {

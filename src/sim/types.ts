@@ -3440,6 +3440,15 @@ export type SimEvent = { pid?: number } & (
       amount: number;
       crit: boolean;
       ability: string;
+      // Set only by a HoT's periodic tick (auras.ts), never a direct cast or the
+      // one-shot application emit below: the client uses this to silence the
+      // repeated per-tick sound (see hud.ts), since a HoT fires this every couple
+      // seconds for its whole duration and the full heal_impact hit read as spam.
+      hot?: boolean;
+      // The aura's ability id (Aura.id), set on both the per-tick emit and the
+      // one-shot application emit (Sim.applyAura) so the client can except one
+      // specific HoT (Frenzied Regeneration) from the tick-silencing above.
+      abilityId?: string;
     }
   // visual-only cue for the renderer: spell projectiles, channel beams, dot
   // ticks, aoe novas, and the ranged-mob windup telegraph ('windup' fires at
