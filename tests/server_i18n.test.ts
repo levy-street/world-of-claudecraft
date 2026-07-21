@@ -288,6 +288,28 @@ describe('chat-moderation strings round-trip through localizeServerText', () => 
   });
 });
 
+// The on-chain activity announcements broadcast via /internal/onchain-event are
+// fully dynamic and locale-neutral; the [WOC] RULE recognizes them deliberately and
+// returns them unchanged (identity localization), so they never fall through to a
+// null-match warning. English-only is an accepted limitation.
+describe('on-chain activity announcements are recognized (identity localization)', () => {
+  const lines = [
+    '[WOC] Burned 25,000 WOC ($4.38). Total burned 442,072 WOC.',
+    '[WOC] Cloaked in Infinity sold for 250,000 WOC ($43.75).',
+    '[WOC] 500 Claudium bought with 5 USDC ($5.00).',
+  ];
+  it('matches every kind across locales and returns the line as-is', async () => {
+    for (const lang of supportedLanguages) {
+      await ensureLocaleLoaded(lang);
+      setLanguage(lang);
+      for (const line of lines) {
+        expect(localizeServerText(line), `${lang}: ${line}`).toBe(line);
+      }
+    }
+    setLanguage('en');
+  });
+});
+
 // localizeServerDuration is module-private; exercise it through the filter-mute RULE
 // whose build() calls it. These duration strings are exactly what server/game.ts's
 // formatDuration emits ("1 minute" / "5 minutes" / "1 hour" / "3 days").

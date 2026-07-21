@@ -101,6 +101,8 @@ const DISCORD_HEADERS = { 'x-woc-discord-secret': DISCORD_SECRET };
 // arms per the dual-edit rule).
 const EXPECTED_ROUTES: ReadonlyArray<readonly [Method, string]> = [
   ['POST', '/internal/restart-countdown'],
+  ['POST', '/internal/onchain-event'],
+  ['GET', '/internal/onchain/feed'],
   ['GET', '/internal/discord/flex'],
   ['GET', '/internal/discord/roles'],
   ['POST', '/internal/discord/presence'],
@@ -243,8 +245,8 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 
 describe('internal route registration', () => {
-  it('registers exactly 12 routes matching the legacy method+path ladder', () => {
-    expect(routes).toHaveLength(12);
+  it('registers exactly 14 routes matching the legacy method+path ladder', () => {
+    expect(routes).toHaveLength(14);
     const actual = routes.map((r) => `${r.method} ${r.path}`).sort();
     const expected = EXPECTED_ROUTES.map(([m, p]) => `${m} ${p}`).sort();
     expect(actual).toEqual(expected);

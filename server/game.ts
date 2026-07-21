@@ -6504,6 +6504,16 @@ export class GameServer {
     }
   }
 
+  /**
+   * Announce an on-chain ecosystem event (a $WOC burn, a $WOC sale, a Claudium
+   * purchase) into this realm's chat as a system line. The text is prebuilt by the
+   * pure renderRealmLine (server/onchain_feed.ts); this only fans it to clients,
+   * so the internal ingress route can stay free of the live GameServer instance.
+   */
+  announceOnchain(line: string): void {
+    this.broadcastSystem(line);
+  }
+
   // force the next snapshot to carry quest state even when a quest command
   // changed nothing, so stale client UI converges back to the server's truth
   private resyncQuests(session: ClientSession): void {

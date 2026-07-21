@@ -1962,6 +1962,12 @@ for (const key of Object.keys(DICT.en)) {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  // On-chain ecosystem activity announcements (broadcastSystem via the bot's
+  // /internal/onchain-event ingress). The line is fully dynamic (amounts, USD,
+  // token, item, running total) and locale-neutral, so it is recognized here as an
+  // identity localization: matched deliberately (not left to fall through) and
+  // returned as-is, English for now. Fuller keying is future work.
+  { re: /^\[WOC\] .+$/, build: (m) => m[0] },
   {
     re: /^You found the guild <([^>]+)>! You are its Guild Master\.$/,
     build: (m) => tServer('guild.founded', { name: m[1] }),
