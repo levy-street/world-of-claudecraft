@@ -217,7 +217,12 @@ import {
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
 import { gatherDeniedLineKey } from './gathering_view';
-import { holderTierBadgeDataUrl, holderTierByIndex, holderTierDisplayName } from './holder_tier';
+import {
+  holderCardBadgeClass,
+  holderTierBadgeDataUrl,
+  holderTierByIndex,
+  holderTierDisplayName,
+} from './holder_tier';
 import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
 import { ActionBarController } from './hud/action_bar/action_bar_controller';
 import {
@@ -12470,7 +12475,7 @@ export class Hud {
     const tierDef = holderTierByIndex(e.holderTier ?? 0);
     const holderHtml = tierDef
       ? `<div class="inspect-holder">` +
-        `<img class="inspect-holder-badge" src="${holderTierBadgeDataUrl(tierDef)}" alt="" draggable="false">` +
+        `<img class="${holderCardBadgeClass(tierDef)}" style="--holder-glow:${tierDef.glow}" src="${holderTierBadgeDataUrl(tierDef)}" alt="" draggable="false">` +
         `<div class="inspect-holder-text">` +
         `<div class="inspect-holder-name">${esc(holderTierDisplayName(tierDef))}</div>` +
         `<div class="inspect-holder-sub">${e.holderBalance ? esc(t('wallet.balanceAmount', { amount: formatNumber(e.holderBalance, { maximumFractionDigits: 0 }) })) : esc(t('wallet.holder'))}</div>` +

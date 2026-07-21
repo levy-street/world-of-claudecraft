@@ -33,6 +33,7 @@ import {
   holderTierBadgeDataUrl,
   holderTierByIndex,
   holderTierDisplayName,
+  holderTierIsRegalia,
 } from '../ui/holder_tier';
 import { formatNumber, getLanguage, t } from '../ui/i18n';
 import { raidMarkerDataUrl } from '../ui/icons';
@@ -470,9 +471,18 @@ export class NameplatePainter {
     if (def) {
       v.tierEl.src = holderTierBadgeDataUrl(def, 32);
       v.tierEl.title = t('wallet.holderTierTitle', { tier: holderTierDisplayName(def) });
+      // Static per-tier halo (the "stand out" knob): the tier glow hue drives a
+      // CSS drop-shadow whose strength is a named CSS tunable (--holder-halo /
+      // --holder-halo-strong), moderately stronger for the two band IV regalia.
+      // Cosmetic-only and static, written here on the tier cheap-diff (never per
+      // frame), like the src/title/display above.
+      v.tierEl.style.setProperty('--holder-glow', def.glow);
+      v.tierEl.classList.toggle('np-tier-regalia', holderTierIsRegalia(def));
       v.tierEl.style.display = '';
     } else {
       v.tierEl.removeAttribute('src');
+      v.tierEl.style.removeProperty('--holder-glow');
+      v.tierEl.classList.remove('np-tier-regalia');
       v.tierEl.style.display = 'none';
     }
   }

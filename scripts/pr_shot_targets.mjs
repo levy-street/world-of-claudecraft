@@ -1329,6 +1329,105 @@ export const TARGETS = [
       return {};
     },
   },
+  {
+    // $WOC holder-tier badges (Ascendant Sigils reskin). Stages a row of players
+    // whose holderTier spans all four bands (coin, gem, sigil, regalia) so one
+    // frame shows the ladder on real nameplates, over a bright and a darkened
+    // scene (exposure is dropped for the dark variant; the DOM badges float over
+    // the canvas and stay bright, which is the whole legibility test), a close-up
+    // for badge detail, and the inspect/player-card surface.
+    key: 'holder-tier',
+    label: '$WOC holder-tier badges (Ascendant Sigils)',
+    // .ts-suffixed so the substring match does not also fire on holder_tier.test.ts.
+    when: ['ui/holder_tier.ts', 'render/nameplate_painter.ts'],
+    variants: [
+      { key: 'ladder-bright' },
+      { key: 'ladder-dark' },
+      { key: 'closeup' },
+      { key: 'card' },
+    ],
+    async capture(page, variant) {
+      const mode = variant?.key ?? 'ladder-bright';
+      const staged = await page.evaluate((mode) => {
+        const g = window.__game;
+        const sim = g?.sim;
+        const p = sim?.player;
+        if (!g || !sim || !p) return { ok: false, reason: 'offline world is unavailable' };
+        // A ladder spanning every band: Ember/Gilded (coins), Whale (gem),
+        // Titanforged/Worldforger (sigils), Worldbearer/Sovereign (regalia).
+        const LADDER = [
+          { tier: 1, name: 'Emberlyn', cls: 'mage', bal: 1 },
+          { tier: 5, name: 'Goldwyn', cls: 'paladin', bal: 10000 },
+          { tier: 7, name: 'Whalimir', cls: 'warrior', bal: 1000000 },
+          { tier: 12, name: 'Titanys', cls: 'druid', bal: 50000000 },
+          { tier: 16, name: 'Forgemara', cls: 'priest', bal: 90000000 },
+          { tier: 17, name: 'Worlding', cls: 'hunter', bal: 100000000 },
+          { tier: 18, name: 'Sovryn', cls: 'rogue', bal: 1000000000 },
+        ];
+        const set = mode === 'card' ? [LADDER[6]] : mode === 'closeup' ? LADDER.slice(4) : LADDER;
+        // Verified-empty open terrain so nothing clutters the row.
+        p.pos.x = -200;
+        p.pos.z = 0;
+        const spacing = mode === 'closeup' ? 3.4 : 4;
+        const ids = [];
+        set.forEach((row, i) => {
+          const pid = sim.addPlayer(row.cls, row.name);
+          const e = sim.entities.get(pid);
+          if (!e) return;
+          e.level = 60;
+          e.holderTier = row.tier;
+          e.holderBalance = row.bal;
+          e.hp = e.maxHp;
+          e.dead = false;
+          e.pos.x = p.pos.x + (i - (set.length - 1) / 2) * spacing;
+          e.pos.z = p.pos.z + (mode === 'closeup' ? 6 : 9);
+          e.pos.y = p.pos.y;
+          ids.push(pid);
+        });
+        p.facing = 0; // look +z toward the line-up
+        g.input.camYaw = 0;
+        g.input.camPitch = mode === 'closeup' ? 0.14 : 0.3;
+        g.input.camDist = mode === 'closeup' ? 6.5 : 22;
+        // Darken the 3D scene for the dark variant: the DOM nameplate badges are
+        // positioned over the canvas, so they keep full brightness while the world
+        // behind them goes dark. A display-only harness tweak, not shipped code.
+        g.renderer.setBrightness(mode === 'ladder-dark' ? 0.1 : 1);
+        window.__ladderIds = ids;
+        window.__ladderCardPid = mode === 'card' ? ids[0] : null;
+        return { ok: true, count: ids.length };
+      }, mode);
+      if (!staged.ok) throw new Error(staged.reason);
+      await wait(1200);
+      // Re-assert pose right before the shot so no drift/fall/combat sneaks in.
+      await page.evaluate(() => {
+        const g = window.__game;
+        const p = g.sim.player;
+        (window.__ladderIds || []).forEach((id) => {
+          const e = g.sim.entities.get(id);
+          if (!e) return;
+          e.hp = e.maxHp;
+          e.dead = false;
+          e.inCombat = false;
+          e.pos.y = p.pos.y;
+        });
+      });
+      if (mode === 'card') {
+        const shown = await page.evaluate(() => {
+          const g = window.__game;
+          const pid = window.__ladderCardPid;
+          if (pid == null) return false;
+          g.hud.openInspect(pid);
+          const el = document.querySelector('#inspect-window');
+          return !!el && getComputedStyle(el).display !== 'none';
+        });
+        if (!shown) throw new Error('inspect/player-card window did not open');
+        await wait(400);
+        return { clip: '#inspect-window' };
+      }
+      await wait(300);
+      return {};
+    },
+  },
 ];
 
 // Map a list of changed file paths to the targets they imply (deduped, registry order).
