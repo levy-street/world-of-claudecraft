@@ -8421,7 +8421,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Hobi: {craft}',
   'hudChrome.professions.identityHeader': 'Kimlik',
   'hudChrome.professions.majorsLabel': 'Ana dallar: {a} ve {b}',
-  'hudChrome.professions.nextUnlockMax': 'Maksimum beceride',
   'hudChrome.professions.nextUnlockSpecialized':
     "{points} Uzmanlaşmış'a işaret ediyor: malzeme maliyetlerinde düşüş",
   'hudChrome.professions.nextUnlockTier':

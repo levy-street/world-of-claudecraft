@@ -39,9 +39,13 @@ export function decideGatherNodeAction(
 ): GatherNodeVerdict {
   const d = dist2d(playerPos, { x: nodePos.x, y: playerPos.y, z: nodePos.z });
   if (d > INTERACT_RANGE) return 'too_far';
-  // Between range and readiness, mirroring the sim's own harvestNode gate
-  // order (professions/gathering.ts): a locked node reads as locked, not as
-  // "not respawned", and the shared canGatherTier comparator decides.
+  // Deliberate divergence from the sim's authoritative order: harvestNode
+  // checks respawn readiness BEFORE the tool gate (a cooling node never emits
+  // gatherDenied; pinned in tests/gather_node_harvest.test.ts), while this
+  // pre-gate reports the lock first so a locked node reads as locked, not as
+  // "not respawned" (the tool shortfall is the durable, actionable fact; the
+  // client-order pin lives in tests/gather_node_interact.test.ts). The shared
+  // canGatherTier comparator decides both layers.
   if (toolGate && !canGatherTier(toolGate.viewerToolTier, toolGate.nodeTier)) return 'tool_tier';
   if (!ready) return 'not_ready';
   return 'harvest';

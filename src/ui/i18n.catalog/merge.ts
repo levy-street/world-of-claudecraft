@@ -493,7 +493,12 @@ const mergePetHud = {
 const mergeStringsEn = {
   abilityUi: {
     ...abilityStrings.en.abilityUi,
-    cast: { fishing: 'Fishing', demonHeal: 'Demon Heal', thunzharrStormcall: 'Stormcall' },
+    cast: {
+      fishing: 'Fishing',
+      gathering: 'Gathering',
+      demonHeal: 'Demon Heal',
+      thunzharrStormcall: 'Stormcall',
+    },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,
       clearHint: 'Shift-right-click or Shift-Delete to clear',

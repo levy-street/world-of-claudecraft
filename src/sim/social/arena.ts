@@ -915,6 +915,11 @@ export function readyArenaFighter(ctx: SimContext, e: Entity, opts: { clearPrep:
   e.castRemaining = 0;
   e.castTargetId = null;
   e.channeling = false;
+  // Phase 12b hidden per-cast state ends with the cast it belongs to (the
+  // parity samplers rely on inert values outside a live cast).
+  e.gatherCastNodeId = '';
+  e.fishBiteAtTick = 0;
+  e.fishReelDeadlineTick = 0;
   e.comboPoints = 0;
   e.comboUntil = -1;
   e.gcdRemaining = 0;

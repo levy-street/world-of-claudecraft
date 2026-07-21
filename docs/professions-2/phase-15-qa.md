@@ -23,6 +23,17 @@ final audit of the entire Professions 2.0 packet, ending with the teardown offer
   bite-and-reel flow in the scripted playthrough; the legacy burn-down disposition
   (LEGACY_GOLD_POSITIVE_RECIPE_IDS) is recorded per member with the typed-reagent
   cross-check applied first.
+- The second 2026-07-20 block (mastery and provenance): the deed additions landed
+  (fishing's deed, prog_master_gatherer counting fishing, mastery deeds at the RESOLVED
+  caps with the approved titles; grep the catalog for any 300 threshold: one hit is a
+  finding); every FINAL-marked tuning row (masterwork constants, specialization,
+  rare-event shared knob) is byte-unchanged from its recorded value; deed triggers no-op
+  on re-crossings after the 12c reset (extend the 12c suite, do not trust it); the wiki
+  hits the per-skill detail bar with generated tables (spot-check three generated numbers
+  against src/sim/ content AND three prose claims against real behavior), publishes exact
+  numbers per the transparency policy, and every new guide.* key is English-only with the
+  guide-scoped M16 exemption in place and the release-tier gate still hard-failing
+  pending rows; the faucet review's three named rows carry real evidence.
 
 ## QA Starter Prompt
 

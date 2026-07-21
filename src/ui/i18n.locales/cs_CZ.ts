@@ -8347,7 +8347,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Hobby: {craft}',
   'hudChrome.professions.identityHeader': 'Identita',
   'hudChrome.professions.majorsLabel': 'Hlavní: {a} a {b}',
-  'hudChrome.professions.nextUnlockMax': 'Při maximální zručnosti',
   'hudChrome.professions.nextUnlockSpecialized':
     '{points} bodů do specializace: náklady na materiál klesnou',
   'hudChrome.professions.nextUnlockTier':

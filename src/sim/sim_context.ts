@@ -665,6 +665,9 @@ export interface SimContextCallbacks {
   startAutoAttack(pid?: number): void;
   revivePet(pid?: number): void;
   completeFishing(p: Entity, meta: PlayerMeta): void;
+  // Gather cast completion (Professions 2.0 Phase 12b): updateCasting routes a
+  // finished GATHER_CAST_ID cast here, exactly like completeFishing above.
+  completeGatherCast(p: Entity, meta: PlayerMeta): void;
   applyDemonHealTick(owner: Entity): void;
 
   // C4b effect dispatch (src/sim/combat/effect_dispatch.ts) consumes these; all stay
@@ -1221,6 +1224,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     startAutoAttack: host.startAutoAttack,
     revivePet: host.revivePet,
     completeFishing: host.completeFishing,
+    completeGatherCast: host.completeGatherCast,
     applyDemonHealTick: host.applyDemonHealTick,
     awardCombo: host.awardCombo,
     meleeSwing: host.meleeSwing,

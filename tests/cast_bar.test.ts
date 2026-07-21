@@ -64,6 +64,24 @@ describe('overhead cast bar', () => {
     expect(unknown.label).toBe('made_up_spell');
   });
 
+  it('renders fishing as a CONSTANT full waiting bar and the gather cast as a normal fill (Phase 12b)', () => {
+    // The fishing fill is pinned at 1 REGARDLESS of the broadcast decay: the
+    // bar must carry no session-progress information (the bite is the bobber
+    // plus the cue). castRemaining 7.5 of 15 would fill 0.5 on the generic
+    // path; fishing must stay 1.
+    const fish = castBarState(
+      caster({ castingAbility: 'fishing', castRemaining: 7.5, castTotal: 15 }),
+    );
+    expect(fish.fill).toBe(1);
+    // The gather cast rides the generic filling path (public state, honest
+    // bar): 1.25 of 2.5 remaining reads as half done.
+    const gather = castBarState(
+      caster({ castingAbility: 'gathering', castRemaining: 1.25, castTotal: 2.5 }),
+    );
+    expect(gather.fishing).toBe(false);
+    expect(gather.fill).toBe(0.5);
+  });
+
   it('carries custom raid mechanic cast ids for renderer localization', () => {
     const rage = castBarState(
       caster({

@@ -86,6 +86,7 @@ import {
   type VcSharedCupInfo,
   type VcViewerReadout,
 } from '../src/world_api';
+import { type ActionBarLayout, sanitizeActionBarLayout } from '../src/world_api/action_bar';
 import { recordOnlineSample } from './admin_db';
 import { offensiveName } from './auth';
 import { recordBankOp } from './bank_ledger';
@@ -130,6 +131,7 @@ import {
   saveMailState,
   saveMarketState,
   setAccountWeaponSkinLoadout,
+  setCharacterHotbarLayout,
   touchCharacterLogin,
   walletForAccount,
 } from './db';
@@ -717,6 +719,12 @@ export interface ClientSession {
     priorGm: boolean;
     stowedPet: PetState | null;
   } | null;
+  // The character's stored action-bar layout as loaded at join (already
+  // bounds-validated), or null when the character has never saved one. Sent to
+  // the owning client exactly once via the `hbl` self field (self-scoped: never
+  // an entity/broadcast field), then frozen; subsequent client saves persist to
+  // the DB and never re-echo here. null wires as an explicit "seed from local".
+  initialHotbarLayout: ActionBarLayout | null;
 }
 
 interface SentEntityVersions {
@@ -1283,6 +1291,10 @@ export class GameServer {
   // state row. Keep one FIFO per account so rapid apply/detach commands cannot
   // commit on separate pool clients in reverse order and resurrect stale state.
   private readonly weaponSkinLoadoutSaveQueues = new Map<number, Promise<void>>();
+  // Action-bar layout is a whole-record replacement in its own character column.
+  // One FIFO per character so a burst of debounced client saves cannot commit on
+  // separate pool clients in reverse order and persist a stale layout.
+  private readonly hotbarLayoutSaveQueues = new Map<number, Promise<void>>();
   // Serializes every write of the single global Market blob (the 30s autosave
   // and the leave-path combined save). Both serialize the whole market; without
   // a queue their transactions could commit out of capture order and persist an
@@ -2573,6 +2585,23 @@ export class GameServer {
     });
   }
 
+  private enqueueHotbarLayoutSave(characterId: number, layout: ActionBarLayout): void {
+    const previous = this.hotbarLayoutSaveQueues.get(characterId);
+    const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
+      await setCharacterHotbarLayout(characterId, layout);
+    });
+    this.hotbarLayoutSaveQueues.set(characterId, run);
+    const cleanup = (): void => {
+      if (this.hotbarLayoutSaveQueues.get(characterId) === run) {
+        this.hotbarLayoutSaveQueues.delete(characterId);
+      }
+    };
+    void run.then(cleanup, (err) => {
+      console.error('failed to save hotbar layout:', err);
+      cleanup();
+    });
+  }
+
   join(
     ws: WebSocket,
     accountId: number,
@@ -2597,6 +2626,10 @@ export class GameServer {
         // the character state via addPlayer. Absent on a resume and for callers that
         // pass no meta (tests, the bot-detector overlay), which keep the saved value.
         bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
+        // The character's stored action-bar layout (characters.hotbar_layout),
+        // passed through from the join handler's DB read. Untrusted at rest, so
+        // it is re-validated here before it reaches the client.
+        hotbarLayout?: ActionBarLayout | null;
       } = {},
   ): ClientSession | { error: string } {
     // Anti-bot: cap simultaneous online characters per account. Accounts can
@@ -2724,6 +2757,8 @@ export class GameServer {
       spectating: null,
       jailed: state?.jail ?? null,
       jailVisit: null,
+      // Re-validate the stored layout (untrusted at rest) before it can wire out.
+      initialHotbarLayout: sanitizeActionBarLayout(meta.hotbarLayout),
     };
     if (session.jailed) this.teleportJailedSession(session);
     this.ipSessionCounts.set(sessionIp, (this.ipSessionCounts.get(sessionIp) ?? 0) + 1);
@@ -4163,6 +4198,15 @@ export class GameServer {
       case 'stow_weapon':
         sim.toggleWeaponStow(pid);
         break;
+      // Per-character action-bar layout upload (untrusted client input). Validate
+      // + bound the payload; a malformed/oversized layout is dropped silently
+      // (never crashes the session). A clean layout is persisted to the
+      // character's own JSONB column via the per-character FIFO save queue.
+      case 'save_hotbar_layout': {
+        const layout = sanitizeActionBarLayout(msg.layout);
+        if (layout) this.enqueueHotbarLayoutSave(session.characterId, layout);
+        break;
+      }
       // Skin-select event lock-in. The Sim re-validates the skin against the
       // rank it rolled and consumes the event token; a forged claim no-ops.
       case 'claim_event_skin':
@@ -5718,6 +5762,12 @@ export class GameServer {
         loadouts: meta.loadouts,
         activeLoadout: meta.activeLoadout,
       });
+      // IWorldActionBar login restore (self-scoped, never a broadcast/entity
+      // field): the VIEWER's own stored layout, or an explicit null meaning "the
+      // server has no copy, seed from this device". Bound to the frozen join-time
+      // value, so lastSent-diffing sends it exactly once and a later client save
+      // never round-trips back to clobber an in-flight edit.
+      maybe('hbl', session.initialHotbarLayout);
       // Vale Cup sport-kit flag ({ role } | null): while set, the client's
       // action bar rebuilds the role kit instead of the class kit. Rides the
       // wireRev-gated block because the sim bumps wireRev on BOTH the kickoff

@@ -2100,6 +2100,8 @@ export const sv_SE: EnTranslations = {
       "gatherLine": "Du samlar: {name}.",
       "gatherLineQty": "Du samlar in: {name} x{qty}.",
       "catchLine": "You reel in: {name}",
+      "biteLine": "Something takes the bait!",
+      "gotAwayLine": "It got away.",
       "nodeName": {
         "ore": "Ore Vein",
         "wood": "Timber Stand",
@@ -2167,7 +2169,7 @@ export const sv_SE: EnTranslations = {
       "tierPipAria": "Nivå {tier}",
       "nextUnlockTier": "{points} poäng till nästa nivå: mästerverksodds förbättras",
       "nextUnlockSpecialized": "{points} poäng till Specialiserad: materialkostnaderna sjunker",
-      "nextUnlockMax": "Med maximal skicklighet",
+      "nextUnlockMastered": "Mastered, for now",
       "perkSpecializedLine": "{craft}: Specialiserade, materialkostnader -{pct}%",
       "perkSpecializedAt": "Specialiserad på {threshold} skicklighet",
       "switchCost": "Nästa arketypbyte kostar {cost} botgöringspoäng",
@@ -2247,6 +2249,7 @@ export const sv_SE: EnTranslations = {
       "skillReqLine": "Kräver {craft} {skill}",
       "difficultyFull": "Full skicklighetsvinst",
       "difficultyReduced": "Minskad färdighetsvinst",
+      "difficultyMinimal": "Minimal skill gain",
       "difficultyNone": "Ingen färdighetsvinst",
       "stationBadge": "Station",
       "stationOutOfRangeNamed": "Flytta till {station} för att skapa detta.",
@@ -5973,6 +5976,7 @@ export const sv_SE: EnTranslations = {
     },
     "cast": {
       "fishing": "Fiske",
+      "gathering": "Gathering",
       "demonHeal": "Demonläkning",
       "thunzharrStormcall": "Stormrop"
     }
@@ -10898,6 +10902,11 @@ export const sv_SE: EnTranslations = {
         "sender": "Hantverksgillet",
         "subject": "Ditt arbete med rustningssmide och ingenjörskonst",
         "body": "Hantverkare,\n\nBud når gillet av ditt arbete i rustningssmide och ingenjörskonst: plåtar nitade och kugghjul satta, de två hantverken matar varandra. Närliggande hantverk som arbetats tillsammans markerar en hand redo för inställning. Sök upp Smed Haldren, rustningsmannen i Eastbrook: han talar för mästarna för tillfället. Bevisa ditt hantverk för honom med arbete av dina egna händer, och han kommer att se dina två huvudyrken anpassade.\n\nI god ställning,\nHantverksgillet"
+      },
+      "mastery_reset_notice": {
+        "sender": "The Guildhall",
+        "subject": "Your craft, made honest",
+        "body": "Guildmate,\n\nThe guild has adopted a new reckoning of mastery. Every hand starts the climb again: your craft skills and your gathering proficiencies have been set to zero.\n\nEverything else is yours, untouched: your recipes, your tools and materials, your bank and gold, your attunements and titles, your deeds and renown, your quests and mail.\n\nThe climb is honest now. Cheap work will not carry you. Seek harder recipes, richer veins, and deeper waters.\n\nWith respect,\nThe Guildhall"
       }
     },
     "itemSets": {

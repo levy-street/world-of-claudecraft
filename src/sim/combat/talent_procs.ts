@@ -102,20 +102,23 @@ function fireOne(
       }
       player.resource = Math.min(player.maxResource, player.resource + response.amount);
       break;
-    case 'heal':
+    case 'heal': {
+      const recipient = response.target === 'self' ? player : subject;
       ctx.applyHeal(
         player,
-        subject,
+        recipient,
         response.amountPctSourceMaxHp !== undefined
           ? Math.round(player.maxHp * response.amountPctSourceMaxHp)
           : response.amountPctMaxHp !== undefined
-            ? Math.round(subject.maxHp * response.amountPctMaxHp)
+            ? Math.round(recipient.maxHp * response.amountPctMaxHp)
             : (response.amount ?? 0),
         def.name,
       );
       break;
-    case 'absorb':
-      ctx.applyAura(subject, {
+    }
+    case 'absorb': {
+      const recipient = response.target === 'self' ? player : subject;
+      ctx.applyAura(recipient, {
         id: def.id,
         name: def.name,
         kind: 'absorb',
@@ -123,7 +126,7 @@ function fireOne(
         duration: response.duration,
         value:
           response.amountPctMaxHp !== undefined
-            ? Math.round(subject.maxHp * response.amountPctMaxHp)
+            ? Math.round(recipient.maxHp * response.amountPctMaxHp)
             : (response.amount ?? 0),
         sourceId: player.id,
         school: def.school ?? 'holy',
@@ -131,11 +134,12 @@ function fireOne(
       ctx.emit({
         type: 'spellfx',
         sourceId: player.id,
-        targetId: subject.id,
+        targetId: recipient.id,
         school: def.school ?? 'holy',
         fx: 'wardBloom',
       });
       break;
+    }
     case 'aura':
       ctx.applyAura(player, {
         id: def.id,

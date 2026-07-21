@@ -71,6 +71,44 @@ function teleportOntoNode(sim: Sim, pid: number, nodeId: string) {
   p.prevPos = { ...p.pos };
 }
 
+// Phase 12b: a harvest is a short cast, not an instant grant. These helpers
+// drive both shapes: castAndComplete runs the REAL loop (harvestNode starts
+// the cast, the tick path routes completion), with mobs despawned first
+// because mob damage cancels a gather cast mid-drive; completeCastNow mirrors
+// the lifecycle completion arm synchronously (clear the cast fields exactly
+// as updateCasting does, then route to ctx.completeGatherCast) so draw-count
+// and event-shape pins stay on the untouched deterministic rng stream with
+// zero world ticks in between.
+function despawnMobs(sim: Sim) {
+  for (const e of sim.entities.values()) {
+    if (e.kind !== 'mob') continue;
+    e.dead = true;
+    e.hp = 0;
+    e.aiState = 'dead';
+    e.respawnTimer = 9999;
+    e.corpseTimer = 9999;
+    e.inCombat = false;
+  }
+}
+
+function castAndComplete(sim: Sim, nodeId: string, pid: number): boolean {
+  despawnMobs(sim);
+  if (!sim.harvestNode(nodeId, pid)) return false;
+  const p = mustEntity(sim, pid);
+  for (let i = 0; i < 80 && p.castingAbility; i++) sim.tick();
+  if (p.castingAbility) throw new Error('gather cast never completed');
+  sim.tick(); // drain the completion tick's queued proficiency grant
+  return true;
+}
+
+function completeCastNow(sim: Sim, pid: number) {
+  const p = mustEntity(sim, pid);
+  const meta = mustMeta(sim, pid);
+  p.castingAbility = null;
+  p.castRemaining = 0;
+  sim.ctx.completeGatherCast(p, meta);
+}
+
 const NODE_ID = GATHER_NODES[0].id;
 
 // Which material this node grants since Phase 4 (zone x type matrix): the
@@ -87,8 +125,7 @@ describe('gather node harvest (#1121)', () => {
     const entry = NODE_HARVEST_TABLE[node.type];
 
     const before = sim.countItem(NODE_MATERIAL.itemId, pid);
-    expect(sim.harvestNode(NODE_ID, pid)).toBe(true);
-    sim.tick();
+    expect(castAndComplete(sim, NODE_ID, pid)).toBe(true);
     expect(sim.countItem(NODE_MATERIAL.itemId, pid)).toBe(before + 1);
   });
 
@@ -119,9 +156,8 @@ describe('gather node harvest (#1121)', () => {
     const node = mustNode(NODE_ID);
     const entry = NODE_HARVEST_TABLE[node.type];
 
-    // Player A harvests first.
-    sim.harvestNode(NODE_ID, pidA);
-    sim.tick();
+    // Player A harvests first (the full cast-to-completion loop).
+    expect(castAndComplete(sim, NODE_ID, pidA)).toBe(true);
     expect(sim.countItem(NODE_MATERIAL.itemId, pidA)).toBe(1);
     // Player A's own node is now on cooldown for A.
     expect(sim.nodeHarvestableByMeFor(NODE_ID, pidA)).toBe(false);
@@ -129,8 +165,7 @@ describe('gather node harvest (#1121)', () => {
     // Player B, who never harvested yet, is still able to harvest the SAME
     // node: A's harvest never touched B's timer (no gather rush denial).
     expect(sim.nodeHarvestableByMeFor(NODE_ID, pidB)).toBe(true);
-    sim.harvestNode(NODE_ID, pidB);
-    sim.tick();
+    expect(castAndComplete(sim, NODE_ID, pidB)).toBe(true);
     expect(sim.countItem(NODE_MATERIAL.itemId, pidB)).toBe(1);
     // B is now on cooldown for B; A's cooldown is unaffected by B harvesting:
     // it stays on the same denial it already had before B ever harvested.
@@ -145,13 +180,12 @@ describe('gather node harvest (#1121)', () => {
     const node = mustNode(NODE_ID);
     const entry = NODE_HARVEST_TABLE[node.type];
 
-    sim.harvestNode(NODE_ID, pid);
-    sim.tick();
+    expect(castAndComplete(sim, NODE_ID, pid)).toBe(true);
     expect(sim.countItem(NODE_MATERIAL.itemId, pid)).toBe(1);
 
     // Immediately harvesting again is denied: this player's own timer has not
-    // elapsed yet.
-    sim.harvestNode(NODE_ID, pid);
+    // elapsed yet (the deny fires at cast START; no cast ever begins).
+    expect(sim.harvestNode(NODE_ID, pid)).toBe(false);
     sim.tick();
     expect(sim.countItem(NODE_MATERIAL.itemId, pid)).toBe(1);
 
@@ -162,8 +196,7 @@ describe('gather node harvest (#1121)', () => {
     sim.time += entry.respawnSeconds + 1;
     sim.tick();
     expect(sim.nodeHarvestableByMeFor(NODE_ID, pid)).toBe(true);
-    sim.harvestNode(NODE_ID, pid);
-    sim.tick();
+    expect(castAndComplete(sim, NODE_ID, pid)).toBe(true);
     expect(sim.countItem(NODE_MATERIAL.itemId, pid)).toBe(2);
   });
 
@@ -177,8 +210,7 @@ describe('gather node harvest (#1121)', () => {
       const sim = makeWorld();
       const pid = sim.addPlayer('warrior', 'Det');
       teleportOntoNode(sim, pid, NODE_ID);
-      sim.harvestNode(NODE_ID, pid);
-      sim.tick();
+      castAndComplete(sim, NODE_ID, pid);
       const node = mustNode(NODE_ID);
       const entry = NODE_HARVEST_TABLE[node.type];
       // Advance to just short of the respawn window and record readiness,
@@ -220,11 +252,10 @@ describe('gather node harvest (#1121)', () => {
     const before = sim
       .professionsStateFor(pid)
       .skills.find((s) => s.professionId === entry.professionId)?.skill;
-    sim.harvestNode(NODE_ID, pid);
-    // The grant is queued this tick and drained on the next tick's per-player
-    // pass (same cadence as every other pendingGatherGrant drain), so tick
-    // once to let it land before asserting.
-    sim.tick();
+    // The grant is queued at cast COMPLETION and drained on the tick path
+    // (same cadence as every other pendingGatherGrant drain); castAndComplete
+    // ticks through the cast and that drain before asserting.
+    expect(castAndComplete(sim, NODE_ID, pid)).toBe(true);
     const after = sim
       .professionsStateFor(pid)
       .skills.find((s) => s.professionId === entry.professionId)?.skill;
@@ -238,8 +269,7 @@ describe('gather node harvest (#1121)', () => {
     const meta = mustMeta(sim, pid);
     const before = meta.xp;
 
-    sim.harvestNode(NODE_ID, pid);
-    sim.tick();
+    expect(castAndComplete(sim, NODE_ID, pid)).toBe(true);
 
     expect(meta.xp).toBeGreaterThan(before);
   });
@@ -252,8 +282,7 @@ describe('gather node harvest (#1121)', () => {
     const meta = mustMeta(sim, pid);
     const before = meta.xp;
 
-    sim.harvestNode(NODE_ID, pid);
-    sim.tick();
+    expect(castAndComplete(sim, NODE_ID, pid)).toBe(true);
 
     expect(meta.xp).toBe(before);
   });
@@ -323,16 +352,19 @@ describe('gather node harvest (#1121)', () => {
     // The harvest rolls pull from the SHARED sim rng, so a draw on a denial
     // would advance the whole sim's stream and desync every downstream roll.
     // harvestNode dispatches synchronously and nothing ticks inside this
-    // bracket, so every counted draw belongs to the harvest path. Phase 4
-    // pinned contract: a granted harvest is exactly TWO draws, draw #1 the
-    // rarity roll (#1122), draw #2 the rare-event roll (gather_events.ts),
-    // regardless of the outcome of either.
+    // bracket, so every counted draw belongs to the harvest path. Phase 12b
+    // moved the Phase 4 pair to cast COMPLETION: the cast start is draw-free,
+    // and completion spends exactly TWO draws, draw #1 the rarity roll
+    // (#1122), draw #2 the rare-event roll (gather_events.ts), regardless of
+    // the outcome of either.
     let draws = 0;
     (sim as unknown as { rng: { setObserver(fn: () => void): void } }).rng.setObserver(() => {
       draws++;
     });
 
-    sim.harvestNode(NODE_ID, pid); // granted: the rarity draw plus the rare-event draw
+    sim.harvestNode(NODE_ID, pid); // granted: the cast starts, draw-free
+    expect(draws).toBe(0);
+    completeCastNow(sim, pid); // completion: the rarity draw plus the rare-event draw
     expect(draws).toBe(2);
 
     draws = 0;
@@ -363,6 +395,7 @@ describe('gather-completion event for audio (#1729)', () => {
 
     sim.drainEvents();
     sim.harvestNode(NODE_ID, pid);
+    completeCastNow(sim, pid);
     const gather = sim.drainEvents().find((e) => e.type === 'gatherResult');
     if (gather?.type !== 'gatherResult') throw new Error('expected a gatherResult event');
     // Personal: carries the acting player's pid so the server routes it only to
@@ -395,6 +428,7 @@ describe('gather-completion event for audio (#1729)', () => {
 
     sim.drainEvents();
     sim.harvestNode(NODE_ID, pid);
+    completeCastNow(sim, pid);
     const gather = sim.drainEvents().find((e) => e.type === 'gatherResult');
     if (gather?.type !== 'gatherResult') throw new Error('expected a gatherResult event');
     expect(gather.rarity).not.toBe('common');
@@ -435,6 +469,7 @@ describe('gather-completion event for audio (#1729)', () => {
       teleportOntoNode(sim, pid, NODE_ID);
       sim.drainEvents();
       sim.harvestNode(NODE_ID, pid);
+      completeCastNow(sim, pid);
       return sim.drainEvents().find((e) => e.type === 'gatherResult');
     };
     expect(run()).toEqual(run());
@@ -490,6 +525,13 @@ describe('lockout prevention: pre-phase nodes stay bare-hands harvestable (Phase
         sim.drainEvents().some((e) => e.type === 'gatherDenied'),
         id,
       ).toBe(false);
+      // Phase 12b: a successful interaction STARTS a cast; drop it so the
+      // next node's attempt is not denied as busy (this lockout pin is about
+      // access, not grants).
+      const p = mustEntity(sim, pid);
+      p.castingAbility = null;
+      p.castRemaining = 0;
+      p.gatherCastNodeId = '';
     }
   });
 
@@ -523,6 +565,9 @@ describe('node tool gate ordering (Phase 12)', () => {
     teleportOntoNode(sim, pid, T2);
     sim.addItem('iron_mining_pick', 1, pid);
     expect(sim.harvestNode(T2, pid)).toBe(true);
+    // Complete the cast: Phase 12b consumes the respawn timer at completion
+    // (inside resolveHarvest), never at the cast start.
+    completeCastNow(sim, pid);
     // Drop the pick: the second attempt is both cooling AND tool-short.
     const meta = mustMeta(sim, pid);
     meta.inventory = meta.inventory.filter((s) => s.itemId !== 'iron_mining_pick');
@@ -563,6 +608,8 @@ describe('node tool gate ordering (Phase 12)', () => {
     sim.rng.setObserver(() => draws++);
     try {
       expect(sim.harvestNode(NODE_ID, pid)).toBe(true);
+      expect(draws).toBe(0); // the cast start is draw-free
+      completeCastNow(sim, pid);
     } finally {
       sim.rng.setObserver(null);
     }
@@ -588,7 +635,8 @@ describe('Phase 12 determinism (same seed, same drive)', () => {
       sim.drainEvents();
       sim.harvestNode('ore_mirefen_t2', pid); // denied: bare hands at a tier-2 vein
       sim.addItem('iron_mining_pick', 1, pid);
-      sim.harvestNode('ore_mirefen_t2', pid); // granted
+      sim.harvestNode('ore_mirefen_t2', pid); // granted: the cast starts
+      completeCastNow(sim, pid); // the two draws and the grant land here
       // A wolf corpse harvest beside the vein (the tier-1 corpse path).
       const template = MOBS.forest_wolf;
       const p = mustEntity(sim, pid);
@@ -600,12 +648,21 @@ describe('Phase 12 determinism (same seed, same drive)', () => {
       sim.entities.set(wolf.id, wolf);
       sim.harvestCorpse(wolf.id, ['hide'], pid);
       // A band-capped catch: band-1 proficiency with no rod resolves band 0.
+      // The draw count proves the arm is LIVE (completeFishing has no water
+      // gate of its own, but an early-return regression would leave it 0).
       meta.gatheringProficiency.fishing = 150;
-      completeFishing(sim.ctx, p, meta);
+      let fishDraws = 0;
+      sim.rng.setObserver(() => fishDraws++);
+      try {
+        completeFishing(sim.ctx, p, meta);
+      } finally {
+        sim.rng.setObserver(null);
+      }
       events.push(...sim.drainEvents());
       sim.tick();
       return {
         events,
+        fishDraws,
         ore: sim.countItem('iron_ore', pid),
         proficiency: { ...meta.gatheringProficiency },
         nodeReady: sim.nodeHarvestableByMeFor('ore_mirefen_t2', pid),
@@ -619,6 +676,8 @@ describe('Phase 12 determinism (same seed, same drive)', () => {
     expect(a.events.some((e) => (e as { type: string }).type === 'gatherResult')).toBe(true);
     expect(a.ore).toBeGreaterThanOrEqual(1);
     expect(a.nodeReady).toBe(false);
+    // Non-degenerate fishing arm: exactly the one band-table draw ran.
+    expect(a.fishDraws).toBe(1);
   });
 });
 
@@ -740,10 +799,20 @@ describe('node tool gating over the live server (Phase 12)', () => {
     expect(sb.pid).not.toBe(sa.pid);
     expect(deliveredEvents(fcB).some((ev) => ev.type === 'gatherDenied')).toBe(false);
 
-    // Granted with the pick: the per-player cooldown mirrors over the ncd
-    // self-delta into the real ClientWorld, exactly as for a tier-1 node.
+    // Granted with the pick: the interact starts a gather cast whose
+    // castStart routes over the wire (2.5 s: tier-2 pick at a tier-2 vein
+    // buys nothing, band 0), and once the live loop completes the cast the
+    // per-player cooldown mirrors over the ncd self-delta into the real
+    // ClientWorld, exactly as for a tier-1 node.
+    despawnMobs(server.sim);
     server.sim.addItem('iron_mining_pick', 1, sa.pid);
     expect(server.sim.harvestNode('ore_mirefen_t2', sa.pid)).toBe(true);
+    (server as any).routeEvents(server.sim.drainEvents());
+    expect(deliveredEvents(fcA)).toContainEqual(
+      expect.objectContaining({ type: 'castStart', ability: 'gathering', time: 2.5 }),
+    );
+    for (let i = 0; i < 80 && e.castingAbility; i++) server.sim.tick();
+    expect(e.castingAbility).toBe(null);
     server.sim.tick();
     (server as any).broadcastSnapshots();
     const client = bareClient(sa.pid);

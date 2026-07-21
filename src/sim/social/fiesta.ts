@@ -302,6 +302,11 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   e.castRemaining = 0;
   e.castTargetId = null;
   e.channeling = false;
+  // Phase 12b hidden per-cast state ends with the cast it belongs to (the
+  // parity samplers rely on inert values outside a live cast).
+  e.gatherCastNodeId = '';
+  e.fishBiteAtTick = 0;
+  e.fishReelDeadlineTick = 0;
   e.autoAttack = false;
   e.queuedOnSwing = null;
   delete e.queuedOnSwingFree;

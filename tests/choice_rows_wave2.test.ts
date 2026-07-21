@@ -266,6 +266,28 @@ describe('warlock wave 2 choice rows', () => {
     expect(p.auras.some((a) => a.id === 'wlk_curse_mastery')).toBe(false);
   });
 
+  it('Hellglass Ward shields the warlock on the 3rd damaging cast, never the mob', () => {
+    const { sim, p } = rig('warlock', 20, { 20: 'wlk_r20_grimoire_of_haste' });
+    const mob = addTargetMob(sim);
+    // Hold the mob still so nothing consumes the ward while the casts settle.
+    mob.auras.push({
+      id: 'test_hold',
+      name: 'Test Hold',
+      kind: 'stun',
+      remaining: 600,
+      duration: 600,
+      value: 0,
+      sourceId: p.id,
+      school: 'shadow',
+    });
+    for (let i = 0; i < 3; i++) castAndSettle(sim, 'shadow_bolt');
+    expect(mob.dead).toBe(false);
+    expect(p.auras.some((a) => a.id === 'wlk_grimoire_of_carnage' && a.kind === 'absorb')).toBe(
+      true,
+    );
+    expect(mob.auras.some((a) => a.id === 'wlk_grimoire_of_carnage')).toBe(false);
+  });
+
   it('Deepened Hex and defensive pact hooks change live combat outcomes', () => {
     const hit = (withDot: boolean) => {
       const { sim } = rig('warlock', 20, { 14: 'wlk_r14_amplify_curse' });

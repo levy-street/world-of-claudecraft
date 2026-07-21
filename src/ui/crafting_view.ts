@@ -16,6 +16,7 @@ import {
   comboEligibility,
 } from '../sim/professions/combo_eligibility';
 import type { StationType } from '../sim/professions/stations';
+import { MINIMAL_TIER_MULTIPLIER, REDUCED_TIER_MULTIPLIER } from '../sim/professions/wheel';
 import type { InvSlot, ItemDef } from '../sim/types';
 
 export interface RecipeDefLike {
@@ -40,11 +41,13 @@ export interface RecipeDefLike {
 
 /** The skill-GAIN outlook for crafting a recipe, mirroring the sim's
  *  tier-progress multiplier at the gainCraftSkill call site in
- *  src/sim/professions/crafting.ts: 'full' (multiplier 1), 'reduced' (0.5,
- *  one tier under capability), 'none' (0: two-plus tiers under capability,
- *  or the recipe tier is above the archetype ceiling). Purely informational,
- *  never an admission gate: there is no skillReq gate on crafting. */
-export type CraftDifficulty = 'full' | 'reduced' | 'none';
+ *  src/sim/professions/crafting.ts: the Phase 12c four-state mastery curve.
+ *  'full' (multiplier 1), 'reduced' (REDUCED_TIER_MULTIPLIER, one tier under
+ *  capability), 'minimal' (MINIMAL_TIER_MULTIPLIER, two tiers under),
+ *  'none' (0: three-plus tiers under capability, or the recipe tier is above
+ *  the archetype ceiling). Purely informational, never an admission gate:
+ *  there is no skillReq gate on crafting. */
+export type CraftDifficulty = 'full' | 'reduced' | 'minimal' | 'none';
 
 export interface CraftingReagentRow {
   itemId: string;
@@ -171,7 +174,13 @@ export function buildCraftingView(
       recipe.skillReq,
     );
     const difficulty: CraftDifficulty =
-      multiplier === 0 ? 'none' : multiplier === 1 ? 'full' : 'reduced';
+      multiplier === 0
+        ? 'none'
+        : multiplier === REDUCED_TIER_MULTIPLIER
+          ? 'reduced'
+          : multiplier === MINIMAL_TIER_MULTIPLIER
+            ? 'minimal'
+            : 'full';
     const station = recipe.stationType
       ? {
           required: true as const,

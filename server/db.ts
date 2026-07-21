@@ -9,6 +9,7 @@ import { LEADERBOARD_MAX } from '../src/sim/leaderboard_page';
 import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
+import type { ActionBarLayout } from '../src/world_api/action_bar';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import type { BankBonusFacts } from './bank_entitlements';
 import { seedChatFilterDefaults } from './chat_filter_db';
@@ -216,6 +217,14 @@ ALTER TABLE characters ADD COLUMN IF NOT EXISTS realm TEXT NOT NULL DEFAULT '${R
 -- "last seen" readout on offline guild-roster rows. Nullable: a character that
 -- has never entered the world since this column was added reads NULL.
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS last_login TIMESTAMPTZ;
+-- Per-character action-bar layout (JSONB). This is client PRESENTATION state (a
+-- remap over learned abilities + item shortcuts), NOT deterministic gameplay
+-- state, so it lives in its own additive column rather than the sim-owned state
+-- blob: keeping it out of CharacterState leaves sim serialization byte-identical
+-- and the offline Sim host-agnostic. Nullable/absent until the character first
+-- saves one; the server treats the value as opaque and re-validates its bounds
+-- (sanitizeActionBarLayout) on both read and write.
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS hotbar_layout JSONB;
 -- Max-Level XP Overflow leaderboard: indexed lifetime-XP sort key. The first
 -- index serves the realm-scoped in-game panel; the second serves the global
 -- (cross-realm) home-page board. Both are expression indexes on the bare
@@ -2449,6 +2458,9 @@ export interface CharacterRow {
   force_rename: boolean;
   last_played?: Date | string | null;
   playtime_seconds?: string | number | null;
+  // Per-character action-bar layout (own JSONB column, not the sim state blob).
+  // Opaque to the server beyond bounds validation; only the join path selects it.
+  hotbar_layout?: ActionBarLayout | null;
 }
 
 // The account's "top" character on this realm (highest level, then lifetime XP),
@@ -2502,10 +2514,24 @@ export async function getCharacter(
   characterId: number,
 ): Promise<CharacterRow | null> {
   const res = await pool.query(
-    'SELECT id, account_id, name, class, level, state, is_gm, force_rename FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
+    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, hotbar_layout FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
     [characterId, accountId, REALM],
   );
   return res.rows[0] ?? null;
+}
+
+/** Persist a character's action-bar layout in its dedicated JSONB column. The
+ *  layout is already sanitized/bounded by the caller (server-side, untrusted
+ *  client input); stored as an opaque document, replaced whole (last write wins).
+ *  Parameterized: characterId is $1, the JSON document is $2. */
+export async function setCharacterHotbarLayout(
+  characterId: number,
+  layout: ActionBarLayout,
+): Promise<void> {
+  await pool.query('UPDATE characters SET hotbar_layout = $2::jsonb WHERE id = $1', [
+    characterId,
+    JSON.stringify(layout),
+  ]);
 }
 
 // Active character names on this realm for the public character sitemap, ranked

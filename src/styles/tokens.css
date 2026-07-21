@@ -208,6 +208,44 @@
     --cursor-hand: var(--cursor-arrow);
     --cursor-sword: var(--cursor-point);
     --cursor-shield: var(--cursor-point);
+
+    /* Badge halo (the static "stand out" glow), shared by the holder and
+       contributor ladders. The hue is supplied per tier by the nameplate/inspect
+       painter via --holder-glow / --dev-glow; these two tunables set the blur
+       strength only, frozen from in-game nameplate screenshots: subtle for the
+       ordinary rungs, moderately stronger for the apex rungs (holder band IV
+       regalia; the significant-contributor dev tiers). Cosmetic and static (no
+       per-frame cost). */
+    --holder-halo: 2.5px;
+    --holder-halo-strong: 4px;
+
+    /* DESIGN.md section 4.3's gold ramp (adopted 2026-07-15), the exact classic-
+       preset hex values. Purely additive: no existing --gold/--border consumer is
+       retuned. Only the #options-menu.perf-wide gilded ornament (below, and
+       src/ui/perf_ornament_svg.ts) reads these today; a future repo-wide DESIGN.md
+       Phase 1 token pass can reuse these names verbatim. */
+    --color-gold-900: #4a2f10;
+    --color-gold-800: #6b4517;
+    --color-gold-700: #926321;
+    --color-gold-600: #bc8732;
+    --color-gold-500: #d8a645;
+    --color-gold-400: #f0c86d;
+    --color-gold-300: #ffe5a3;
+
+    /* Performance Overlay gilded-ornament shape defaults. perf_ornament_svg.ts
+       overwrites these with the real generated mask-image/gradient values once at
+       boot (applyPerfOrnamentVars, called next to hydrateIcons() in main.ts); an
+       unset custom property makes mask-image compute to `none`, which would show
+       the pseudo-element's `background` as an opaque rectangle over the title/edge
+       instead of just doing nothing, so every one of these needs a real (if inert)
+       fallback rather than being left undefined. */
+    --perf-ornament-corner: linear-gradient(transparent, transparent);
+    --perf-ornament-mid-edge: linear-gradient(transparent, transparent);
+    --perf-ornament-edge-top: linear-gradient(transparent, transparent);
+    --perf-ornament-edge-bottom: linear-gradient(transparent, transparent);
+    --perf-ornament-edge-left: linear-gradient(transparent, transparent);
+    --perf-ornament-edge-right: linear-gradient(transparent, transparent);
+    --perf-ornament-gilt: var(--color-gold-700);
   }
 
   /* Glass is dropped WHOLE-RULE at the low effect tier: a universal removal
@@ -222,5 +260,25 @@
   :root[data-fx-level="low"] *::after {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
+  }
+
+  /* Performance Overlay's gilded ornament is purely cosmetic (a mask-image
+     finish, never actionable information), so it is shed at the low effect tier
+     the same way glass is dropped above: one rule resets every --perf-ornament-*
+     custom property back to its no-op fallback, with no per-selector override
+     needed. --perf-ornament-gilt keeps a flat-color fallback (it is consumed as a
+     whole `background`, not a mask, so it must resolve to something paintable).
+     !important: applyPerfOrnamentVars() (perf_ornament_svg.ts) writes these same
+     properties as a plain (non-important) INLINE style on documentElement, which
+     otherwise always beats a normal-priority stylesheet rule regardless of
+     selector specificity; only an important author declaration outranks it. */
+  :root[data-fx-level="low"] {
+    --perf-ornament-corner: linear-gradient(transparent, transparent) !important;
+    --perf-ornament-mid-edge: linear-gradient(transparent, transparent) !important;
+    --perf-ornament-edge-top: linear-gradient(transparent, transparent) !important;
+    --perf-ornament-edge-bottom: linear-gradient(transparent, transparent) !important;
+    --perf-ornament-edge-left: linear-gradient(transparent, transparent) !important;
+    --perf-ornament-edge-right: linear-gradient(transparent, transparent) !important;
+    --perf-ornament-gilt: var(--color-gold-700) !important;
   }
 }

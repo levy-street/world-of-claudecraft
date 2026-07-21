@@ -5825,6 +5825,29 @@
     display: block;
     filter: drop-shadow(0 1px 2px #000);
   }
+  /* $WOC holder badge halo on the player card: same static per-tier glow as the
+     nameplate (hue via inline --holder-glow, strength from the tokens.css
+     tunables), stronger for the two band IV regalia. Only the holder badge opts
+     in (via .inspect-holder-halo), never the shared Discord badges. */
+  .inspect-holder-badge.inspect-holder-halo {
+    filter: drop-shadow(0 1px 2px #000)
+      drop-shadow(0 0 var(--holder-halo) var(--holder-glow, transparent));
+  }
+  .inspect-holder-badge.inspect-holder-halo.inspect-holder-halo-strong {
+    filter: drop-shadow(0 1px 2px #000)
+      drop-shadow(0 0 var(--holder-halo-strong) var(--holder-glow, transparent));
+  }
+  /* Contributor (dev-tier) badge halo on the inspect card: same shared strength
+     tunables, hue via inline --dev-glow, stronger for the significant tiers. Only
+     the dev badge opts in (via .inspect-dev-halo), never the shared Discord badges. */
+  .inspect-holder-badge.inspect-dev-halo {
+    filter: drop-shadow(0 1px 2px #000)
+      drop-shadow(0 0 var(--holder-halo) var(--dev-glow, transparent));
+  }
+  .inspect-holder-badge.inspect-dev-halo.inspect-dev-halo-strong {
+    filter: drop-shadow(0 1px 2px #000)
+      drop-shadow(0 0 var(--holder-halo-strong) var(--dev-glow, transparent));
+  }
   .inspect-holder-text {
     display: flex;
     flex-direction: column;

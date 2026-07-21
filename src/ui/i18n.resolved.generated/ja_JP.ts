@@ -2100,6 +2100,8 @@ export const ja_JP: EnTranslations = {
       "gatherLine": "{name}を採集した。",
       "gatherLineQty": "{name}を{qty}個採集した。",
       "catchLine": "{name}を釣り上げた",
+      "biteLine": "何かが食いついた！",
+      "gotAwayLine": "逃げられてしまった。",
       "nodeName": {
         "ore": "鉱脈",
         "wood": "立木",
@@ -2167,7 +2169,7 @@ export const ja_JP: EnTranslations = {
       "tierPipAria": "ティア {tier}",
       "nextUnlockTier": "次のティアまであと {points}：傑作の成功率が上がります",
       "nextUnlockSpecialized": "専門化まであと {points}：素材コストが下がります",
-      "nextUnlockMax": "技能は最大です",
+      "nextUnlockMastered": "マスターしました（今のところ）",
       "perkSpecializedLine": "{craft}：専門化、素材コスト -{pct}%",
       "perkSpecializedAt": "技能 {threshold} で専門化します",
       "switchCost": "次のアーキタイプ切り替えには償いが {cost} 必要です",
@@ -2247,6 +2249,7 @@ export const ja_JP: EnTranslations = {
       "skillReqLine": "{craft} {skill} が必要",
       "difficultyFull": "技能上昇（全量）",
       "difficultyReduced": "技能上昇（減少）",
+      "difficultyMinimal": "技能上昇（微量）",
       "difficultyNone": "技能上昇なし",
       "stationBadge": "製作拠点",
       "stationOutOfRangeNamed": "{station}に移動して製作してください。",
@@ -5973,6 +5976,7 @@ export const ja_JP: EnTranslations = {
     },
     "cast": {
       "fishing": "釣り",
+      "gathering": "採集",
       "demonHeal": "悪魔の治癒",
       "thunzharrStormcall": "嵐の呼び声"
     }
@@ -10898,6 +10902,11 @@ export const ja_JP: EnTranslations = {
         "sender": "製作ギルド",
         "subject": "防具鍛冶と工作の腕前について",
         "body": "職人へ\n\n防具鍛冶と工作に励むあなたの評判がギルドに届いています。板金を鋲で留め、歯車を調え、二つの技が互いを高め合っていると。隣り合う技を共に磨く手は、調律の備えができた証です。イーストブルックの鍛冶師ハルドレンを訪ねてください。今は彼が親方たちの代弁を務めています。自らの手がけた仕事で腕前を示せば、彼がその二つの技をあなたの主専攻として調律してくれるでしょう。\n\n敬意を込めて、\n製作ギルド"
+      },
+      "mastery_reset_notice": {
+        "sender": "ギルド会館",
+        "subject": "腕前に、偽りなし",
+        "body": "ギルドの同志へ\n\nギルドは熟練の新しい尺度を定めました。誰もが登り直しです。あなたの製作スキルと採集熟練度はゼロに戻されました。\n\nそれ以外はすべて、手つかずのままあなたのものです。レシピ、道具と素材、銀行と所持金、調律と称号、功績と名声、クエストと郵便。\n\nこれからの登りにごまかしは利きません。安い仕事では上へは行けません。より難しいレシピを、より豊かな鉱脈を、より深い水を求めてください。\n\n敬意を込めて、\nギルド会館"
       }
     },
     "itemSets": {

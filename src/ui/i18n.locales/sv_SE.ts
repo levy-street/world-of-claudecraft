@@ -8411,7 +8411,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Hobby: {craft}',
   'hudChrome.professions.identityHeader': 'Identitet',
   'hudChrome.professions.majorsLabel': 'Huvudämnen: {a} och {b}',
-  'hudChrome.professions.nextUnlockMax': 'Med maximal skicklighet',
   'hudChrome.professions.nextUnlockSpecialized':
     '{points} poäng till Specialiserad: materialkostnaderna sjunker',
   'hudChrome.professions.nextUnlockTier':

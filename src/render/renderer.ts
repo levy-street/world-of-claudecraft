@@ -80,6 +80,7 @@ import { objectDisplayName } from './entity_labels';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
 import { type FireballTravelVisual, syncFireballTravelVisual } from './fireball_travel_visual';
 import { buildFish, type FishView } from './fish';
+import { FishingBobberVisual } from './fishing_bobber';
 import {
   buildFoliage,
   buildFoliageMaterialPrewarmGroup,
@@ -1064,6 +1065,7 @@ export class Renderer {
   private temporalHourglassGroundVisuals!: TemporalHourglassGroundVisuals;
   private readonly mageBarrierStateScratch: MageBarrierState = { theme: 'frost', value: 0 };
   private glacialFrontVisual!: GlacialFrontVisual;
+  private fishingBobbers!: FishingBobberVisual;
   private weather: Weather;
   private weatherOn = true;
   private audioSink: SpatialAudioSink | null = null;
@@ -1691,6 +1693,9 @@ export class Renderer {
     this.glacialFrontVisual = new GlacialFrontVisual(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
+    // Fishing bobbers: one float per fishing entity in view; the personal
+    // fishingBite event flips the owner's into the bite state (handleEvent).
+    this.fishingBobbers = new FishingBobberVisual(this.scene);
     // Meteor falls + Rune of Power circles (see src/render/mage_ground_fx.ts);
     // a landing meteor detonates with the same burst an aimed blast uses.
     this.mageGroundFx = new MageGroundFx(
@@ -3493,6 +3498,13 @@ export class Renderer {
       case 'delveEntered':
         this.prebuildDelveInteriors(ev.delveId);
         break;
+      case 'fishingBite': {
+        // Personal bite signal (Professions 2.0 Phase 12b): only the angler's
+        // own client receives it, so flipping their bobber into the bite
+        // state here is correct (bystanders keep the idle float).
+        this.fishingBobbers.bite(ev.pid);
+        break;
+      }
       case 'yumiTeleport': {
         // Arcane burst at both ends of the cat's blink (the event is personal
         // per participant; ignore copies addressed to other local pids so an
@@ -5462,6 +5474,7 @@ export class Renderer {
     this.updateClickMarkers(dt);
     this.updateAoeRings(dt);
     this.recklessSkulls.update(dt);
+    this.fishingBobbers.update(dt, this.sim.entities, this.sim.cfg.seed);
     this.updateGroundAimReticle(dt);
     // dev-only Tab-target cone overlay: re-drape the front cone on the terrain
     // under the local player, oriented to the model's rendered facing.

@@ -2100,6 +2100,8 @@ export const nl_NL: EnTranslations = {
       "gatherLine": "Jij verzamelt: {name}.",
       "gatherLineQty": "Je verzamelt: {name} x{qty}.",
       "catchLine": "You reel in: {name}",
+      "biteLine": "Something takes the bait!",
+      "gotAwayLine": "It got away.",
       "nodeName": {
         "ore": "Ore Vein",
         "wood": "Timber Stand",
@@ -2167,7 +2169,7 @@ export const nl_NL: EnTranslations = {
       "tierPipAria": "Niveau {tier}",
       "nextUnlockTier": "Nog {points} punten tot het volgende niveau: de kans op meesterwerk stijgt",
       "nextUnlockSpecialized": "Nog {points} punten tot Gespecialiseerd: materiaalkosten dalen",
-      "nextUnlockMax": "Op maximale vaardigheid",
+      "nextUnlockMastered": "Mastered, for now",
       "perkSpecializedLine": "{craft}: Gespecialiseerd, materiaalkosten -{pct}%",
       "perkSpecializedAt": "Gespecialiseerd in {threshold} vaardigheid",
       "switchCost": "De volgende archetypewissel kost {cost} boetepunten",
@@ -2247,6 +2249,7 @@ export const nl_NL: EnTranslations = {
       "skillReqLine": "Vereist {craft} {skill}",
       "difficultyFull": "Volledige vaardigheidswinst",
       "difficultyReduced": "Verminderde vaardigheidswinst",
+      "difficultyMinimal": "Minimal skill gain",
       "difficultyNone": "Geen vaardigheidswinst",
       "stationBadge": "Station",
       "stationOutOfRangeNamed": "Ga naar {station} om dit te maken.",
@@ -5973,6 +5976,7 @@ export const nl_NL: EnTranslations = {
     },
     "cast": {
       "fishing": "Vissen",
+      "gathering": "Gathering",
       "demonHeal": "Demonengenezing",
       "thunzharrStormcall": "Stormroep"
     }
@@ -10898,6 +10902,11 @@ export const nl_NL: EnTranslations = {
         "sender": "Het Ambachtsgilde",
         "subject": "Jouw werk in pantserbewerking en techniek",
         "body": "Ambachtelijk,\n\nHet bericht bereikt de gilde van jouw werk in pantserbewerking en techniek: platen geklonken en tandwielen uitgelijnd, waarbij de twee ambachten elkaar voeden. Naburige ambachten die samenwerken, markeren een hand die klaar is voor afstemming. Zoek Smid Haldren, de pantsersmid van Eastbrook: hij spreekt voorlopig namens de meesters. Bewijs hem uw vak met uw eigen handen, en hij zal zien dat uw twee hoofdvakken op elkaar zijn afgestemd.\n\nMet achting,\nHet Ambachtsgilde"
+      },
+      "mastery_reset_notice": {
+        "sender": "The Guildhall",
+        "subject": "Your craft, made honest",
+        "body": "Guildmate,\n\nThe guild has adopted a new reckoning of mastery. Every hand starts the climb again: your craft skills and your gathering proficiencies have been set to zero.\n\nEverything else is yours, untouched: your recipes, your tools and materials, your bank and gold, your attunements and titles, your deeds and renown, your quests and mail.\n\nThe climb is honest now. Cheap work will not carry you. Seek harder recipes, richer veins, and deeper waters.\n\nWith respect,\nThe Guildhall"
       }
     },
     "itemSets": {

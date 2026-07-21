@@ -43,6 +43,7 @@ import {
   type Entity,
   type EquipSlot,
   FISHING_CAST_ID,
+  GATHER_CAST_ID,
   isFormAuraKind,
   MAX_LEVEL,
   MELEE_RANGE,
@@ -558,7 +559,15 @@ export function castingReadout(e: Entity): string {
   const remaining = e.castRemaining.toFixed(1);
   const total = e.castTotal.toFixed(1);
   if (e.castingAbility === FISHING_CAST_ID) {
-    return `You are fishing — ${remaining}s of ${total}s remaining.`;
+    // Honest with no bite leak (Phase 12b): the fixed-cast countdown died
+    // with the bite minigame, and a countdown here would leak session
+    // timing, so the readout names the waiting state and nothing more.
+    return 'You are fishing. Waiting for a bite.';
+  }
+  if (e.castingAbility === GATHER_CAST_ID) {
+    // The gather cast is public state (castRemaining/castTotal broadcast),
+    // so an honest countdown is safe here, unlike the fishing arm above.
+    return `You are gathering: ${remaining}s of ${total}s remaining.`;
   }
   const name = ABILITIES[e.castingAbility]?.name ?? e.castingAbility;
   const verb = e.channeling ? 'Channeling' : 'Casting';

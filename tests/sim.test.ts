@@ -14,7 +14,6 @@ import { Sim } from '../src/sim/sim';
 import {
   dist2d,
   FISHING_CAST_ID,
-  FISHING_CAST_TIME,
   MAX_LEVEL,
   meleeMissChance,
   mobXpValue,
@@ -1163,30 +1162,43 @@ describe('food, drink, vendor', () => {
     );
   });
 
-  it('starts a five-second fishing cast near and facing Mirror Lake', () => {
+  it('starts the capped fishing session near and facing Mirror Lake with the one bite-delay draw', () => {
     const sim = makeSim('warrior');
     const spot = mirrorLakeFishingSpot(sim.cfg.seed);
     teleportTo(sim, spot.x, spot.z);
     sim.player.facing = spot.facing;
     sim.addItem('simple_fishing_pole', 1);
     sim.events = [];
-    sim.useItem('simple_fishing_pole');
+    // Phase 12b: the cast start draws EXACTLY the one hidden bite delay; the
+    // visible timer is the constant session cap and leaks nothing.
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      sim.useItem('simple_fishing_pole');
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(draws).toBe(1);
     expect(sim.player.castingAbility).toBe(FISHING_CAST_ID);
-    expect(sim.player.castTotal).toBe(FISHING_CAST_TIME);
-    expect(sim.player.castRemaining).toBe(FISHING_CAST_TIME);
+    // Literal 15, not the imported constant: the broadcast session cap is a
+    // wire-visible contract, so this pin must red if the constant moves (the
+    // packet's constant-self-comparison trap).
+    expect(sim.player.castTotal).toBe(15);
+    expect(sim.player.castRemaining).toBe(15);
     expect(sim.player.channeling).toBe(false);
     expect(sim.events).toContainEqual(
       expect.objectContaining({
         type: 'castStart',
         ability: FISHING_CAST_ID,
-        time: FISHING_CAST_TIME,
+        time: 15,
       }),
     );
   });
 
-  it('rolls the fishing catch table only when the cast completes', () => {
+  it('rolls the fishing catch table only at a reel press inside the bite window', () => {
     const sim = makeSim('warrior');
     const spot = mirrorLakeFishingSpot(sim.cfg.seed);
+    despawnMobs(sim);
     teleportTo(sim, spot.x, spot.z);
     sim.player.facing = spot.facing;
     sim.addItem('simple_fishing_pole', 1);
@@ -1194,14 +1206,25 @@ describe('food, drink, vendor', () => {
     sim.useItem('simple_fishing_pole');
     expect(valeCatchCount(sim)).toBe(0);
 
+    // Tick the LIVE loop to the bite (the hidden seeded delay caps at 8 s);
+    // nothing rolls and nothing lands while the line is merely waiting.
     const events: SimEvent[] = [];
-    for (let i = 0; i < 20 * 6 && sim.player.castingAbility; i++) events.push(...sim.tick());
+    for (let i = 0; i < 20 * 10 && !events.some((e) => e.type === 'fishingBite'); i++) {
+      events.push(...sim.tick());
+    }
+    expect(events.some((e) => e.type === 'fishingBite')).toBe(true);
+    expect(valeCatchCount(sim)).toBe(0);
+    expect(sim.player.castingAbility).toBe(FISHING_CAST_ID);
 
+    // The reel press inside the window resolves the single table draw (which
+    // may still be the empty-hook row) and ends the session.
+    sim.events = [];
+    sim.useItem('simple_fishing_pole');
     const catchCount = valeCatchCount(sim);
     expect(sim.player.castingAbility).toBe(null);
     expect(catchCount === 1 || catchCount === 0).toBe(true);
     if (catchCount === 0) {
-      expect(events).toContainEqual(
+      expect(sim.events).toContainEqual(
         expect.objectContaining({
           type: 'log',
           text: 'No fish are biting.',
@@ -1227,12 +1250,20 @@ describe('food, drink, vendor', () => {
     sim.useItem('simple_fishing_pole');
     expect(sim.player.castingAbility).toBe(FISHING_CAST_ID);
 
+    // Drive the bite, then reel: the codfather force-lands at the reel press
+    // (its early return rolls no table), never before it.
     const events: SimEvent[] = [];
-    for (let i = 0; i < 20 * 6 && sim.player.castingAbility; i++) events.push(...sim.tick());
-
+    for (let i = 0; i < 20 * 10 && !events.some((e) => e.type === 'fishingBite'); i++) {
+      events.push(...sim.tick());
+    }
+    expect(events.some((e) => e.type === 'fishingBite')).toBe(true);
+    expect(sim.countItem('the_codfather')).toBe(0);
+    sim.events = [];
+    sim.useItem('simple_fishing_pole'); // the reel
+    expect(sim.events).toContainEqual(expect.objectContaining({ type: 'castStop', success: true }));
     expect(sim.player.castingAbility).toBe(null);
-    expect(events).toContainEqual(expect.objectContaining({ type: 'castStop', success: true }));
     expect(sim.countItem('the_codfather')).toBe(1);
+    sim.tick();
     expect(sim.questState('q_the_codfather')).toBe('ready');
     expect(sim.countItem('simple_fishing_pole')).toBe(1);
   });
@@ -1245,7 +1276,11 @@ describe('food, drink, vendor', () => {
     deepfenSim.player.facing = deepfenSpot.facing;
     deepfenSim.addItem('simple_fishing_pole', 1);
     deepfenSim.useItem('simple_fishing_pole');
-    for (let i = 0; i < 20 * 6 && deepfenSim.player.castingAbility; i++) deepfenSim.tick();
+    const events: SimEvent[] = [];
+    for (let i = 0; i < 20 * 10 && !events.some((e) => e.type === 'fishingBite'); i++) {
+      events.push(...deepfenSim.tick());
+    }
+    deepfenSim.useItem('simple_fishing_pole'); // reel: at most a normal table catch
     expect(deepfenSim.countItem('the_codfather')).toBe(0);
   });
 
@@ -1262,7 +1297,11 @@ describe('food, drink, vendor', () => {
     mirrorSim.player.facing = mirrorSpot.facing;
     mirrorSim.addItem('simple_fishing_pole', 1);
     mirrorSim.useItem('simple_fishing_pole');
-    for (let i = 0; i < 20 * 6 && mirrorSim.player.castingAbility; i++) mirrorSim.tick();
+    const events: SimEvent[] = [];
+    for (let i = 0; i < 20 * 10 && !events.some((e) => e.type === 'fishingBite'); i++) {
+      events.push(...mirrorSim.tick());
+    }
+    mirrorSim.useItem('simple_fishing_pole'); // reel: at most a normal table catch
     expect(mirrorSim.countItem('the_codfather')).toBe(0);
   });
 

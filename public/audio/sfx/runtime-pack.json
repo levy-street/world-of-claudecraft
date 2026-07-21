@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "6356e133aee9c5ba2024269c399d70488cb071421fad7b8e8074cdb31c7acb03",
-  "catalogHash": "4b1d98a68cf3a2759583c1da903648130ef74ecce4486e324c247a1180d95b01",
+  "bundleId": "ee5853afb5dc2fd6333846b3cb3cf017e233bce934a379a03728768e992a275c",
+  "catalogHash": "af777ce2c4dff9a3c7b5577936f2f7cfe871a35b0276173d3f03d880a2603d55",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -3233,6 +3233,78 @@
           "url": "/audio/sfx/ui_fiesta_word_3.mp3?v=23c7b5bd7717",
           "bytes": 16970,
           "sha256": "23c7b5bd7717b27bab447e6a41a484b0aaa923d9d0f3c99275877a1340aaa809"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_fish_bite": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_fish_bite.mp3?v=e35376cdc03d",
+          "bytes": 18224,
+          "sha256": "e35376cdc03d4cd41a9377c600b12caff2ec56523e92a6f7dde059baea5d2dce"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_fish_cast": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_fish_cast.mp3?v=93c009333ef2",
+          "bytes": 15716,
+          "sha256": "93c009333ef2e01a11c7f73b0e654a23b6d3726e6105fa584d0ea4a23bd6e5cd"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_fish_reel": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_fish_reel.mp3?v=132ca07893df",
+          "bytes": 18224,
+          "sha256": "132ca07893dfd39a0fb2bd74f241a9752b0d4701d66d79a597b9af70a52d64fd"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_gather_cast": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_gather_cast.mp3?v=7c2be6a5c0fd",
+          "bytes": 13835,
+          "sha256": "7c2be6a5c0fd46fe577f79a5ac32f0686811258e02a54274f095267d1faf8803"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_gather_rare": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_gather_rare.mp3?v=43ede340f746",
+          "bytes": 20732,
+          "sha256": "43ede340f7468eef32a4c406957df0ccdc265033ae070c650f12cc5894d4e8b7"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_gather_strike": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_gather_strike.mp3?v=a3ff9792a000",
+          "bytes": 13835,
+          "sha256": "a3ff9792a0005baff282aa5a6b7524e5fe7e093926cf7a5b494d4a2becdc3d2c"
         }
       ],
       "gain": 1,

@@ -10,8 +10,15 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "abilityUi.cast.gathering",
+    "entities.letters.mastery_reset_notice.body",
+    "entities.letters.mastery_reset_notice.sender",
+    "entities.letters.mastery_reset_notice.subject",
+    "hudChrome.crafting.difficultyMinimal",
+    "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
+    "hudChrome.gathering.gotAwayLine",
     "hudChrome.gathering.nodeName.herb",
     "hudChrome.gathering.nodeName.ore",
     "hudChrome.gathering.nodeName.wood",
@@ -27,11 +34,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.chat",
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
-    "hudChrome.interfaceTabs.general"
+    "hudChrome.interfaceTabs.general",
+    "hudChrome.professions.nextUnlockMastered"
   ],
   "es_ES": [
+    "abilityUi.cast.gathering",
+    "entities.letters.mastery_reset_notice.body",
+    "entities.letters.mastery_reset_notice.sender",
+    "entities.letters.mastery_reset_notice.subject",
+    "hudChrome.crafting.difficultyMinimal",
+    "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
+    "hudChrome.gathering.gotAwayLine",
     "hudChrome.gathering.nodeName.herb",
     "hudChrome.gathering.nodeName.ore",
     "hudChrome.gathering.nodeName.wood",
@@ -47,11 +62,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.chat",
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
-    "hudChrome.interfaceTabs.general"
+    "hudChrome.interfaceTabs.general",
+    "hudChrome.professions.nextUnlockMastered"
   ],
   "fr_FR": [
+    "abilityUi.cast.gathering",
+    "entities.letters.mastery_reset_notice.body",
+    "entities.letters.mastery_reset_notice.sender",
+    "entities.letters.mastery_reset_notice.subject",
+    "hudChrome.crafting.difficultyMinimal",
+    "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
+    "hudChrome.gathering.gotAwayLine",
     "hudChrome.gathering.nodeName.herb",
     "hudChrome.gathering.nodeName.ore",
     "hudChrome.gathering.nodeName.wood",
@@ -67,11 +90,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.chat",
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
-    "hudChrome.interfaceTabs.general"
+    "hudChrome.interfaceTabs.general",
+    "hudChrome.professions.nextUnlockMastered"
   ],
   "fr_CA": [
+    "abilityUi.cast.gathering",
+    "entities.letters.mastery_reset_notice.body",
+    "entities.letters.mastery_reset_notice.sender",
+    "entities.letters.mastery_reset_notice.subject",
+    "hudChrome.crafting.difficultyMinimal",
+    "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
+    "hudChrome.gathering.gotAwayLine",
     "hudChrome.gathering.nodeName.herb",
     "hudChrome.gathering.nodeName.ore",
     "hudChrome.gathering.nodeName.wood",
@@ -87,12 +118,20 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.chat",
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
-    "hudChrome.interfaceTabs.general"
+    "hudChrome.interfaceTabs.general",
+    "hudChrome.professions.nextUnlockMastered"
   ],
   "en_CA": [],
   "it_IT": [
+    "abilityUi.cast.gathering",
+    "entities.letters.mastery_reset_notice.body",
+    "entities.letters.mastery_reset_notice.sender",
+    "entities.letters.mastery_reset_notice.subject",
+    "hudChrome.crafting.difficultyMinimal",
+    "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
+    "hudChrome.gathering.gotAwayLine",
     "hudChrome.gathering.nodeName.herb",
     "hudChrome.gathering.nodeName.ore",
     "hudChrome.gathering.nodeName.wood",
@@ -108,11 +147,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.chat",
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
-    "hudChrome.interfaceTabs.general"
+    "hudChrome.interfaceTabs.general",
+    "hudChrome.professions.nextUnlockMastered"
   ],
   "de_DE": [
+    "abilityUi.cast.gathering",
+    "entities.letters.mastery_reset_notice.body",
+    "entities.letters.mastery_reset_notice.sender",
+    "entities.letters.mastery_reset_notice.subject",
+    "hudChrome.crafting.difficultyMinimal",
+    "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
+    "hudChrome.gathering.gotAwayLine",
     "hudChrome.gathering.nodeName.herb",
     "hudChrome.gathering.nodeName.ore",
     "hudChrome.gathering.nodeName.wood",
@@ -128,15 +175,23 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.chat",
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
-    "hudChrome.interfaceTabs.general"
+    "hudChrome.interfaceTabs.general",
+    "hudChrome.professions.nextUnlockMastered"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "abilityUi.cast.gathering",
+    "entities.letters.mastery_reset_notice.body",
+    "entities.letters.mastery_reset_notice.sender",
+    "entities.letters.mastery_reset_notice.subject",
+    "hudChrome.crafting.difficultyMinimal",
+    "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
+    "hudChrome.gathering.gotAwayLine",
     "hudChrome.gathering.nodeName.herb",
     "hudChrome.gathering.nodeName.ore",
     "hudChrome.gathering.nodeName.wood",
@@ -152,12 +207,20 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.chat",
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
-    "hudChrome.interfaceTabs.general"
+    "hudChrome.interfaceTabs.general",
+    "hudChrome.professions.nextUnlockMastered"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "abilityUi.cast.gathering",
+    "entities.letters.mastery_reset_notice.body",
+    "entities.letters.mastery_reset_notice.sender",
+    "entities.letters.mastery_reset_notice.subject",
+    "hudChrome.crafting.difficultyMinimal",
+    "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
+    "hudChrome.gathering.gotAwayLine",
     "hudChrome.gathering.nodeName.herb",
     "hudChrome.gathering.nodeName.ore",
     "hudChrome.gathering.nodeName.wood",
@@ -173,11 +236,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.chat",
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
-    "hudChrome.interfaceTabs.general"
+    "hudChrome.interfaceTabs.general",
+    "hudChrome.professions.nextUnlockMastered"
   ],
   "nl_NL": [
+    "abilityUi.cast.gathering",
+    "entities.letters.mastery_reset_notice.body",
+    "entities.letters.mastery_reset_notice.sender",
+    "entities.letters.mastery_reset_notice.subject",
+    "hudChrome.crafting.difficultyMinimal",
+    "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
+    "hudChrome.gathering.gotAwayLine",
     "hudChrome.gathering.nodeName.herb",
     "hudChrome.gathering.nodeName.ore",
     "hudChrome.gathering.nodeName.wood",
@@ -193,11 +264,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.chat",
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
-    "hudChrome.interfaceTabs.general"
+    "hudChrome.interfaceTabs.general",
+    "hudChrome.professions.nextUnlockMastered"
   ],
   "pl_PL": [
+    "abilityUi.cast.gathering",
+    "entities.letters.mastery_reset_notice.body",
+    "entities.letters.mastery_reset_notice.sender",
+    "entities.letters.mastery_reset_notice.subject",
+    "hudChrome.crafting.difficultyMinimal",
+    "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
+    "hudChrome.gathering.gotAwayLine",
     "hudChrome.gathering.nodeName.herb",
     "hudChrome.gathering.nodeName.ore",
     "hudChrome.gathering.nodeName.wood",
@@ -213,11 +292,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.chat",
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
-    "hudChrome.interfaceTabs.general"
+    "hudChrome.interfaceTabs.general",
+    "hudChrome.professions.nextUnlockMastered"
   ],
   "id_ID": [
+    "abilityUi.cast.gathering",
+    "entities.letters.mastery_reset_notice.body",
+    "entities.letters.mastery_reset_notice.sender",
+    "entities.letters.mastery_reset_notice.subject",
+    "hudChrome.crafting.difficultyMinimal",
+    "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
+    "hudChrome.gathering.gotAwayLine",
     "hudChrome.gathering.nodeName.herb",
     "hudChrome.gathering.nodeName.ore",
     "hudChrome.gathering.nodeName.wood",
@@ -233,11 +320,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.chat",
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
-    "hudChrome.interfaceTabs.general"
+    "hudChrome.interfaceTabs.general",
+    "hudChrome.professions.nextUnlockMastered"
   ],
   "tr_TR": [
+    "abilityUi.cast.gathering",
+    "entities.letters.mastery_reset_notice.body",
+    "entities.letters.mastery_reset_notice.sender",
+    "entities.letters.mastery_reset_notice.subject",
+    "hudChrome.crafting.difficultyMinimal",
+    "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
+    "hudChrome.gathering.gotAwayLine",
     "hudChrome.gathering.nodeName.herb",
     "hudChrome.gathering.nodeName.ore",
     "hudChrome.gathering.nodeName.wood",
@@ -253,11 +348,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.chat",
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
-    "hudChrome.interfaceTabs.general"
+    "hudChrome.interfaceTabs.general",
+    "hudChrome.professions.nextUnlockMastered"
   ],
   "sv_SE": [
+    "abilityUi.cast.gathering",
+    "entities.letters.mastery_reset_notice.body",
+    "entities.letters.mastery_reset_notice.sender",
+    "entities.letters.mastery_reset_notice.subject",
+    "hudChrome.crafting.difficultyMinimal",
+    "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
+    "hudChrome.gathering.gotAwayLine",
     "hudChrome.gathering.nodeName.herb",
     "hudChrome.gathering.nodeName.ore",
     "hudChrome.gathering.nodeName.wood",
@@ -273,11 +376,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.chat",
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
-    "hudChrome.interfaceTabs.general"
+    "hudChrome.interfaceTabs.general",
+    "hudChrome.professions.nextUnlockMastered"
   ],
   "vi_VN": [
+    "abilityUi.cast.gathering",
+    "entities.letters.mastery_reset_notice.body",
+    "entities.letters.mastery_reset_notice.sender",
+    "entities.letters.mastery_reset_notice.subject",
+    "hudChrome.crafting.difficultyMinimal",
+    "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
+    "hudChrome.gathering.gotAwayLine",
     "hudChrome.gathering.nodeName.herb",
     "hudChrome.gathering.nodeName.ore",
     "hudChrome.gathering.nodeName.wood",
@@ -293,11 +404,19 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.chat",
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
-    "hudChrome.interfaceTabs.general"
+    "hudChrome.interfaceTabs.general",
+    "hudChrome.professions.nextUnlockMastered"
   ],
   "da_DK": [
+    "abilityUi.cast.gathering",
+    "entities.letters.mastery_reset_notice.body",
+    "entities.letters.mastery_reset_notice.sender",
+    "entities.letters.mastery_reset_notice.subject",
+    "hudChrome.crafting.difficultyMinimal",
+    "hudChrome.gathering.biteLine",
     "hudChrome.gathering.catchLine",
     "hudChrome.gathering.fishing",
+    "hudChrome.gathering.gotAwayLine",
     "hudChrome.gathering.nodeName.herb",
     "hudChrome.gathering.nodeName.ore",
     "hudChrome.gathering.nodeName.wood",
@@ -313,6 +432,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.interfaceTabs.chat",
     "hudChrome.interfaceTabs.combat",
     "hudChrome.interfaceTabs.frames",
-    "hudChrome.interfaceTabs.general"
+    "hudChrome.interfaceTabs.general",
+    "hudChrome.professions.nextUnlockMastered"
   ]
 };

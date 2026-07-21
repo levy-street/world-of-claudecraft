@@ -2100,6 +2100,8 @@ export const da_DK: EnTranslations = {
       "gatherLine": "Du samler: {name}.",
       "gatherLineQty": "Du samler: {name} x{qty}.",
       "catchLine": "You reel in: {name}",
+      "biteLine": "Something takes the bait!",
+      "gotAwayLine": "It got away.",
       "nodeName": {
         "ore": "Ore Vein",
         "wood": "Timber Stand",
@@ -2167,7 +2169,7 @@ export const da_DK: EnTranslations = {
       "tierPipAria": "Niveau {tier}",
       "nextUnlockTier": "{points} point til næste niveau: mesterværk odds forbedres",
       "nextUnlockSpecialized": "{points} point til Specialiseret: materialeomkostningerne falder",
-      "nextUnlockMax": "Ved maksimal dygtighed",
+      "nextUnlockMastered": "Mastered, for now",
       "perkSpecializedLine": "{craft}: Specialiseret, materialeomkostninger -{pct}%",
       "perkSpecializedAt": "Specialiseret i {threshold} færdigheder",
       "switchCost": "Næste arketypeskift koster {cost} bodspoint",
@@ -2247,6 +2249,7 @@ export const da_DK: EnTranslations = {
       "skillReqLine": "Kræver {craft} {skill}",
       "difficultyFull": "Fuld færdighedsforøgelse",
       "difficultyReduced": "Reduceret færdighedsforøgelse",
+      "difficultyMinimal": "Minimal skill gain",
       "difficultyNone": "Ingen færdighedsforøgelse",
       "stationBadge": "Station",
       "stationOutOfRangeNamed": "Flyt til {station} for at lave dette.",
@@ -5973,6 +5976,7 @@ export const da_DK: EnTranslations = {
     },
     "cast": {
       "fishing": "Fiskeri",
+      "gathering": "Gathering",
       "demonHeal": "Dæmonhelbredelse",
       "thunzharrStormcall": "Stormkald"
     }
@@ -10898,6 +10902,11 @@ export const da_DK: EnTranslations = {
         "sender": "Håndværkerlauget",
         "subject": "Dit arbejde inden for rustning og teknik",
         "body": "håndværker,\n\nBud når lauget af dit arbejde inden for rustning og teknik: plader nittet og tandhjul justeret, de to håndværk nærer hinanden. Nabohåndværk, der arbejdes sammen, markerer en hånd, der er klar til afstemning. Opsøg Smed Haldren, rustningsmanden fra Eastbrook: han taler for mestrene for nu. Bevis dit håndværk for ham med arbejde af dine egne hænder, og han vil se dine to hovedfag afstemt.\n\nMed venlig hilsen,\nHåndværkerlauget"
+      },
+      "mastery_reset_notice": {
+        "sender": "The Guildhall",
+        "subject": "Your craft, made honest",
+        "body": "Guildmate,\n\nThe guild has adopted a new reckoning of mastery. Every hand starts the climb again: your craft skills and your gathering proficiencies have been set to zero.\n\nEverything else is yours, untouched: your recipes, your tools and materials, your bank and gold, your attunements and titles, your deeds and renown, your quests and mail.\n\nThe climb is honest now. Cheap work will not carry you. Seek harder recipes, richer veins, and deeper waters.\n\nWith respect,\nThe Guildhall"
       }
     },
     "itemSets": {

@@ -9,7 +9,12 @@
 // types.ts, from #1164) with the display metadata (name/icon/description)
 // the `/dev gather` chat cheat and a future UI need; category/maxSkill are
 // the fields later profession issues (#1120/#1125/#1126/#1140) read against.
-// maxSkill follows the classic 1-300 profession skill scale.
+// maxSkill (Professions 2.0 Phase 12c) is an ENFORCED per-profession cap over
+// the classic skill scale: it ends where shipped content ends and rises with
+// future zones by data edit alone. Enforcement lives at the four gain/load
+// arms (wheel.ts gainCraftSkill/normalizeCraftSkills, gathering.ts
+// drainGatheringGrants/normalizeGatheringProficiency); at cap, actions still
+// resolve, proc, and yield, only skill gain stops.
 import type { StationDef, StationType } from '../professions/stations';
 import type { ProfessionRecord } from '../professions/types';
 import { ZONE1_ZONE } from './zone1';
@@ -29,7 +34,7 @@ export const GATHERING_PROFESSIONS: Record<GatheringProfessionId, GatheringProfe
   mining: {
     id: 'mining',
     category: 'gathering',
-    maxSkill: 300,
+    maxSkill: 100,
     name: 'Mining',
     icon: 'mining',
     description: 'Extracting ore and stone from nodes found in the wild.',
@@ -37,7 +42,7 @@ export const GATHERING_PROFESSIONS: Record<GatheringProfessionId, GatheringProfe
   logging: {
     id: 'logging',
     category: 'gathering',
-    maxSkill: 300,
+    maxSkill: 100,
     name: 'Logging',
     icon: 'logging',
     description: 'Felling timber from trees found across the zones.',
@@ -45,7 +50,7 @@ export const GATHERING_PROFESSIONS: Record<GatheringProfessionId, GatheringProfe
   herbalism: {
     id: 'herbalism',
     category: 'gathering',
-    maxSkill: 300,
+    maxSkill: 100,
     name: 'Herbalism',
     icon: 'herbalism',
     description: 'Collecting herbs and plants growing in the wild.',
@@ -53,7 +58,7 @@ export const GATHERING_PROFESSIONS: Record<GatheringProfessionId, GatheringProfe
   fishing: {
     id: 'fishing',
     category: 'gathering',
-    maxSkill: 300,
+    maxSkill: 200,
     name: 'Fishing',
     icon: 'fishing',
     description: 'Reeling catches from the rivers and lakes across the zones.',
@@ -233,21 +238,25 @@ export interface CraftDef {
   id: string;
   name: string;
   pole: CraftPole;
+  /** Enforced skill cap for this craft (Phase 12c): where shipped content
+   *  ends. Enforced at wheel.ts gainCraftSkill and normalizeCraftSkills;
+   *  at cap, crafts still resolve and proc, only skill gain stops. */
+  maxSkill: number;
 }
 
 // Fixed ring order (index is the ring position). Opposite crafts sit 5 positions
 // apart; adjacent crafts sit 1 position apart on either side.
 export const CRAFT_RING: CraftDef[] = [
-  { id: 'engineering', name: 'Engineering', pole: 'Experimental' },
-  { id: 'alchemy', name: 'Alchemy', pole: 'Experimental' },
-  { id: 'cooking', name: 'Cooking', pole: 'Cross-cutting' },
-  { id: 'leatherworking', name: 'Leatherworking', pole: 'Formal' },
-  { id: 'tailoring', name: 'Tailoring', pole: 'Formal' },
-  { id: 'inscription', name: 'Inscription', pole: 'Cross-cutting' },
-  { id: 'enchanting', name: 'Enchanting', pole: 'Cross-cutting' },
-  { id: 'jewelcrafting', name: 'Jewelcrafting', pole: 'Material' },
-  { id: 'weaponcrafting', name: 'Weaponcrafting', pole: 'Material' },
-  { id: 'armorcrafting', name: 'Armorcrafting', pole: 'Material' },
+  { id: 'engineering', name: 'Engineering', pole: 'Experimental', maxSkill: 125 },
+  { id: 'alchemy', name: 'Alchemy', pole: 'Experimental', maxSkill: 125 },
+  { id: 'cooking', name: 'Cooking', pole: 'Cross-cutting', maxSkill: 125 },
+  { id: 'leatherworking', name: 'Leatherworking', pole: 'Formal', maxSkill: 125 },
+  { id: 'tailoring', name: 'Tailoring', pole: 'Formal', maxSkill: 125 },
+  { id: 'inscription', name: 'Inscription', pole: 'Cross-cutting', maxSkill: 125 },
+  { id: 'enchanting', name: 'Enchanting', pole: 'Cross-cutting', maxSkill: 125 },
+  { id: 'jewelcrafting', name: 'Jewelcrafting', pole: 'Material', maxSkill: 125 },
+  { id: 'weaponcrafting', name: 'Weaponcrafting', pole: 'Material', maxSkill: 125 },
+  { id: 'armorcrafting', name: 'Armorcrafting', pole: 'Material', maxSkill: 125 },
 ];
 
 const RING_SIZE = CRAFT_RING.length;
@@ -281,6 +290,12 @@ export function oppositeCraft(craftId: string): CraftDef {
 /** Lookup a craft definition by id. */
 export function craftById(craftId: string): CraftDef {
   return CRAFT_RING[indexOf(craftId)];
+}
+
+/** The enforced skill cap for one craft (Phase 12c), read off its CRAFT_RING
+ *  record. Throws on an unknown craft id, same as craftById. */
+export function craftMaxSkillFor(craftId: string): number {
+  return craftById(craftId).maxSkill;
 }
 
 // The tier-4/5 tool recipes formerly stubbed here (#1135's inert

@@ -533,7 +533,11 @@ describe('corpse premium-arm tool gating (Professions 2.0 Phase 12)', () => {
     try {
       body();
     } finally {
-      tiers[component] = prior;
+      // A future component absent from the table must restore to ABSENT, not
+      // to a present-but-undefined key (which would surprise the literal set
+      // pin below and any Object.keys comparison).
+      if (prior === undefined) delete tiers[component];
+      else tiers[component] = prior;
     }
   }
 
@@ -620,6 +624,32 @@ describe('corpse premium-arm tool gating (Professions 2.0 Phase 12)', () => {
     ]);
   });
 
+  it('an owned tier-2 tool restores the premium pull at a raised family tier (seed 5)', () => {
+    // The canHarvestMonsterMaterial SUCCESS branch with a real tool: the
+    // deny/downgrade arms above never prove a tool actually re-opens the
+    // premium pull once a family tier rises.
+    const { sim, internals, a, mob } = soloRig(5);
+    sim.addItem('mithril_mining_pick', 1, a); // any-profession owned-best covers tier 2
+    sim.drainEvents();
+    let draws = 0;
+    withTier('hide', 2, () => {
+      sim.rng.setObserver(() => draws++);
+      try {
+        sim.harvestCorpse(mob.id, ['hide'], a);
+      } finally {
+        sim.rng.setObserver(null);
+      }
+    });
+    // Same two draws as the bare-handed arms: the success branch adds none.
+    expect(draws).toBe(2);
+    expect(sim.drainEvents().some((e) => e.type === 'gatherDenied')).toBe(false);
+    const meta = internals.players.get(a)!;
+    const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
+    expect(specimen?.instance?.signer).toBe('Alpha');
+    expect(sim.countItem('rough_hide', a)).toBe(3);
+    expect(mob.harvestClaimedBy).toBe(a);
+  });
+
   it('at most ONE gatherDenied per harvest command, even with several denied families (seed 11)', () => {
     // Seed 11 pre-verified against soloRig: BOTH wolf families (hide and
     // fang) roll signable on an untagged harvest, so raising both tiers
@@ -649,6 +679,33 @@ describe('corpse premium-arm tool gating (Professions 2.0 Phase 12)', () => {
     expect(sim.countItem('pristine_hide', a)).toBe(0);
     expect(meta.inventory.some((s) => s.instance?.signer)).toBe(false);
     expect(mob.harvestClaimedBy).toBe(a);
+  });
+
+  it('the single event is tiered off the FIRST failing family in yield order (seed 11)', () => {
+    // hide precedes fang in the wolf's yield order, so asymmetric raised
+    // tiers discriminate FIRST from min/max/last: (hide 2, fang 3) emits 2
+    // (ruling out max and last), the mirror (hide 3, fang 2) emits 3 (ruling
+    // out min). Same pre-hunted seed-11 rig as the dedupe arm above.
+    const first = soloRig(11);
+    first.sim.drainEvents();
+    withTier('hide', 2, () => {
+      withTier('fang', 3, () => {
+        first.sim.harvestCorpse(first.mob.id, undefined, first.a);
+      });
+    });
+    expect(first.sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
+      { type: 'gatherDenied', pid: first.a, surface: 'corpse', requiredTier: 2 },
+    ]);
+    const mirror = soloRig(11);
+    mirror.sim.drainEvents();
+    withTier('hide', 3, () => {
+      withTier('fang', 2, () => {
+        mirror.sim.harvestCorpse(mirror.mob.id, undefined, mirror.a);
+      });
+    });
+    expect(mirror.sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
+      { type: 'gatherDenied', pid: mirror.a, surface: 'corpse', requiredTier: 3 },
+    ]);
   });
 });
 

@@ -17,6 +17,18 @@ at least one consumer recipe in the same phase (the wolf_fang no-dead-materials 
 bind-on-trade PRIMITIVE, landed here applied to those typed reagents as its first live consumer
 (never a dormant stub, the 2033 lesson) so Phase 14b can extend it to commissioned gear.
 
+The SECOND 2026-07-20 block (mastery and provenance; state.md is the authority) then settles
+this phase's pacing and its one flagged decision, and inserts Phases 12c and 12d ahead of it:
+- Phase 12c MUST land first: this phase inherits the shared action throttle (crafting,
+  disenchant, enchant-apply, and salvage draw from one 10-per-60s window) and the
+  quality-tiered soft-ceiling enchanting gain model already wired in the sim; this phase makes
+  the actions reachable, never re-invents their pacing.
+- The staves/wands typed-reagent bucket is RESOLVED: the WEAPON bucket, no cloth special case.
+- The typed-reagent yields are APPROVED numbers in state.md Tuning targets (dust 1 to 2,
+  essence 1 plus a secondary, exactly 1 shard per epic mapping the heroic faucet one to one).
+- Community draft PR #2134 (which wires disenchant end to end) is OUT of consideration by
+  maintainer ruling: do not absorb, rebase, or reconcile it; build on the packet's own seam.
+
 ## Context pointers
 
 - `docs/professions-2/state.md`: locked decisions, the validation matrix, and the key-surfaces row
@@ -68,6 +80,9 @@ the newest by version sort (git branch -r --list "origin/release/*" | sort -V | 
 starts a fresh branch or worktree, base it on that branch; if the feature branch already exists, merge
 that release branch into it NOW, resolve conflicts, and run the release-merge-audit skill on the merge
 before proceeding. Never base work on main or an older release branch than the newest.
+Phases 12c and 12d must be LANDED first (the second 2026-07-20 block): verify the shared
+action throttle seam and the enchanting soft-ceiling gain arm exist in the sim (grep the
+constants state.md's Phase 12c surfaces entry records); if absent, stop.
 Then run git status; the tree must be clean (a concurrent session may share this
 checkout); if it is dirty with work you did not create, stop and ask. Scan Claude Code memory
 (the MEMORY.md index) for: the node25 gate rule (run npm run gate under Node 24), combo recipes
@@ -117,11 +132,11 @@ Agent content deliverables (the 2026-07-20 typed-reagent amendments):
   quality; disenchanting a RARE OR ABOVE piece ADDITIONALLY yields one type-keyed secondary
   material. Armor keys off the existing ArmorType (cloth/leather/mail: three materials);
   weapons key off the sim-side weapon-kind taxonomy (WEAPON_TYPE_BY_ITEM /
-  ItemWeaponType), bucketed to a small material set (exact bucketing is yours EXCEPT
-  staves and wands, whose bucket assignment is a FLAGGED maintainer decision: surface it,
-  do not default it). Cooking and alchemy are deliberately excluded from the typed family
-  on both sides: their outputs never disenchant and their recipes are not the sanctioned
-  consumers.
+  ItemWeaponType), bucketed to a small material set (exact bucketing is yours; the
+  staves/wands assignment is RESOLVED per the 2026-07-20 mastery amendments: the WEAPON
+  bucket, no cloth special case). Cooking and alchemy are deliberately excluded from the
+  typed family on both sides: their outputs never disenchant and their recipes are not the
+  sanctioned consumers. Yields use the APPROVED numbers in state.md Tuning targets.
 - NO DEAD MATERIALS (the wolf_fang rule): every typed material ships WITH at least one
   consumer recipe in this same phase (enchanting recipes or deep-craft recipes consuming
   it); a typed material with zero consumers is a blocking review finding, not a follow-up.
@@ -228,8 +243,10 @@ STEP 5 - ACCEPTANCE CRITERIA (do not mark complete until all check):
       universal ladder; sub-rare disenchants are byte-identical to today.
 - [ ] Every typed material has at least one consumer recipe in this phase, pinned by a
       referential test (the wolf_fang rule).
-- [ ] The staves/wands bucket assignment is surfaced as a flagged maintainer decision, not
-      defaulted.
+- [ ] Staves and wands disenchant in the WEAPON bucket per the resolved decision.
+- [ ] Disenchant, enchant-apply, and salvage draw from the Phase 12c shared throttle
+      window, and their gains run the quality-tiered soft-ceiling model (verify inherited
+      behavior end to end; do not re-implement it).
 - [ ] The bind-on-trade primitive is LIVE against the typed rare+ reagents: first trade
       stamps boundTo, a second trade is refused with a localized deny id, both hosts.
 - [ ] All validation rows above are green; the mobile screenshot is committed.

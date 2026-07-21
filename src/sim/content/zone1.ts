@@ -1175,7 +1175,9 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     completionText:
       'A lighter choice, but a useful one. Follow that curiosity as far as rare work will take it.',
     objectives: [{ type: 'gather', nodeType: 'herb', count: 3, label: 'Herb patch harvested' }],
-    xpReward: 75,
+    // Phase 12c: 0 XP on purpose. The hobby switch is a repeatable identity
+    // toggle; any XP on it becomes a farmable trickle, so it pays nothing.
+    xpReward: 0,
     copperReward: 0,
     itemRewards: {},
     requiresQuest: 'q_prof_intro',

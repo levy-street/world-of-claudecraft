@@ -101,8 +101,10 @@ landed. Therefore every UI phase in this packet:
 
 Phases 1 to 7 are the fun kernel; 8 to 15 are wave one (the 2026-07-20
 timing and economy amendments inserted Phases 12b and 14b without
-renumbering; the remaining order is 12, 12b, 13, 14, 14b, 15, and the
-state.md amendments block is the authority for their rulings). End of Phase 7 is
+renumbering, and the SECOND 2026-07-20 block, mastery and provenance,
+inserted 12c and 12d after the 12b QA; the remaining order is 12c, 12d,
+13, 14, 14b, 15, and the state.md amendments blocks are the authority for
+their rulings). End of Phase 7 is
 the vertical-slice checkpoint (see README). Phase 6 depends on Phases 2 and
 4, not on Phase 5, and may run ahead of the wheel window if the
 design-language rollout stalls Phase 5. The 2026-07-17 design-review
@@ -128,6 +130,8 @@ Phase 1.
 | 11 | Fishing joins the framework | Fishing proficiency + catch rarity ladder feeding cooking | sim, content, ui |
 | 12 | Base tool tier gating | Node tiers; tool tier + skill gates; tools matter; effects stay parked | sim, content, tests |
 | 12b | Gathering rhythm | Gather cast scaled by tool tier and band; the fishing bite minigame with rod synergy; placeholder cues; the pin-cost appendix | sim, ui, tests |
+| 12c | The Mastery Curve | The four-state curve replaces the free floor; enforced per-profession caps as content data; the one-time skill reset with its keep ledger; the shared action throttle; quality-tiered enchanting gains | sim, content, ui, tests |
+| 12d | Provenance and the harvest loop | Identical-payload material stacking (bags and bank); Gathered by copy, bag marker, downgrade notice; one interact loots AND harvests with a decoupled corpse lifecycle; mail attachment expiry; #2139 and the rename signer sweep | sim, ui, server, tests |
 | 13 | Enchanting reachable | Disenchant, enchant-apply, and salvage on IWorld/wire/UI in both hosts; typed reagents with same-phase consumers; the bind-on-trade primitive | world_api, net, server, ui, content |
 | 14 | Attunement quests and nudges | Lore quests, work orders, and tier mail at the masters; nudges; celebration; the learnable-at-a-master hint | content, sim, ui |
 | 14b | Commissions and the Maker's Bond | Opt-in commission crafts bind on first trade; master unbind gold sink; resolves #1298 semantics | sim, world_api, net, server, ui |

@@ -9486,6 +9486,174 @@
     grid-template-columns: 1fr;
   }
 
+  /* ---------- performance overlay gilded ornament (pilot) ---------- */
+  /* A hand-gilded filigree frame, scoped strictly to #options-menu.perf-wide (the
+     Performance sub-view only): does not touch the shared .panel/.window
+     primitive or any other window. Shapes come from perf_ornament_svg.ts
+     (applyPerfOrnamentVars, called once at boot); colors read the new
+     --color-gold-* ramp (tokens.css) and --perf-ornament-* mask vars, never a
+     literal hex. See the PR body for why this is scoped narrowly rather than
+     landed as a DESIGN.md-phase-ordered, repo-wide chrome retune. */
+  #options-menu.perf-wide {
+    /* The base .panel border stays fully transparent (not `border: 0`, which
+       would reflow the box): the gilded ::before below is the only visible
+       frame color, so there is no flat border peeking through the noisy
+       ribbon's thin spots. A more generous radius than the shared .panel's
+       6px, scoped to just this window, matches the reference's visibly
+       rounded frame; --perf-ornament-* below inherits it automatically.
+       The base .panel also hardcodes a literal `outline: 1px solid #000`
+       and a non-inset `0 2px 16px #000c` drop shadow: outlines ignore
+       border-color, so that thin black ring stayed visible right outside
+       the gilded frame no matter what the border said. The corner motif's
+       filigree linework (unlike a solid block) leaves real gaps, so both
+       read as a stray black border showing through/around the gold. Drop
+       the outline and the outer shadow layer here; the two inset layers
+       stay so the panel keeps its inward depth. */
+    border-color: transparent;
+    border-radius: 30px;
+    outline: none;
+    box-shadow:
+      inset 0 0 24px #0006,
+      inset 0 1px 0 #ffffff14;
+    /* The corner motif's ink reaches roughly 60px in from each corner (the
+       84px mask box's spiral/tendril geometry, measured against the real
+       render). The base .window pads its body content (and so the footer,
+       its last child) by only --window-pad (12px), which put the footer
+       buttons under the bottom corners. Scoped padding-bottom override
+       clears it; left/right stay at --window-pad since the body's own
+       content never runs that close to the top corners (only the sticky
+       header does, handled below). */
+    padding-bottom: 64px;
+  }
+  #options-menu.perf-wide::before {
+    content: "";
+    position: absolute;
+    /* Negative inset: the gilded frame sits just OUTSIDE the dark panel's own
+       edge (a hand-gilded frame wraps a picture, it does not sit inset a few
+       pixels inside it), not flush with `inset: 0`. */
+    inset: -5px;
+    /* Above .window > .panel-title's position:sticky (z-index: 6, layout.css):
+       otherwise the sticky header paints over the top edge/corners the moment
+       the window opens, hiding the ornament on exactly that one side. */
+    z-index: 7;
+    pointer-events: none;
+    border-radius: inherit;
+    background: var(--perf-ornament-gilt);
+    /* Each edge references its OWN distinct token (never the same token
+       reused for two mask-position slots): a real Chromium bug means a
+       mask-image list that repeats the identical url() value at two
+       different positions only paints the FIRST occurrence (see
+       applyPerfOrnamentVars' doc comment in perf_ornament_svg.ts). */
+    -webkit-mask-image:
+      var(--perf-ornament-corner), var(--perf-ornament-mid-edge), var(--perf-ornament-edge-top),
+      var(--perf-ornament-edge-bottom), var(--perf-ornament-edge-left),
+      var(--perf-ornament-edge-right);
+    mask-image:
+      var(--perf-ornament-corner), var(--perf-ornament-mid-edge), var(--perf-ornament-edge-top),
+      var(--perf-ornament-edge-bottom), var(--perf-ornament-edge-left),
+      var(--perf-ornament-edge-right);
+    -webkit-mask-position:
+      top left,
+      top right,
+      bottom left,
+      bottom right,
+      center top,
+      center bottom,
+      left center,
+      right center,
+      top,
+      bottom,
+      left,
+      right;
+    mask-position:
+      top left,
+      top right,
+      bottom left,
+      bottom right,
+      center top,
+      center bottom,
+      left center,
+      right center,
+      top,
+      bottom,
+      left,
+      right;
+    -webkit-mask-size:
+      84px 84px,
+      84px 84px,
+      84px 84px,
+      84px 84px,
+      44px 44px,
+      44px 44px,
+      44px 44px,
+      44px 44px,
+      96px 12px,
+      96px 12px,
+      12px 96px,
+      12px 96px;
+    mask-size:
+      84px 84px,
+      84px 84px,
+      84px 84px,
+      84px 84px,
+      44px 44px,
+      44px 44px,
+      44px 44px,
+      44px 44px,
+      96px 12px,
+      96px 12px,
+      12px 96px,
+      12px 96px;
+    -webkit-mask-repeat:
+      no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat,
+      repeat-x, repeat-x, repeat-y, repeat-y;
+    mask-repeat:
+      no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat,
+      repeat-x, repeat-x, repeat-y, repeat-y;
+  }
+  /* Title text and its underline read as gilt too, warmer than the shared
+     .panel-title gold so the pilot window's header visibly matches its own
+     frame rather than the generic chrome gold. Deliberately does NOT touch
+     position/z-index: the base `.window > .panel-title` rule (layout.css)
+     already sets `position: sticky; z-index: 6`, below the ornament's
+     z-index: 7 (below), so the corner ornament paints correctly over the
+     title's own opaque background at the top corners. An earlier version of
+     this rule raised the title to z-index: 8, which put its solid
+     background ABOVE the ornament and silently hid the top-left/top-right
+     corner flourish entirely; verified live via a getBoundingClientRect +
+     forced-z-index probe before landing this fix. */
+  #options-menu.perf-wide .panel-title {
+    color: var(--color-gold-400);
+    border-bottom-color: var(--color-gold-700);
+    /* Room for the corner motif's ~60px ink reach along the top edge (the
+       84px mask box): the base `.window > .panel-title` rule starts the
+       back-button/title at just --window-pad (12px) and pins the close
+       button's inset-inline-end at 8px (layout.css), both squarely inside
+       the ornament's footprint at the top-left/top-right corners. Widening
+       both sides here keeps the title text and the close control clear of
+       the gold on every corner. */
+    padding-left: 64px;
+    padding-right: 118px;
+  }
+  /* The close button itself (never the back button, which stays at the
+     inline start next to the now-padded title): move its absolute inset
+     in by the same ~60px the ornament needs, so the button box never sits
+     under the top-right corner's ink. */
+  #options-menu.perf-wide .panel-title > .x-btn:not(.back-btn) {
+    inset-inline-end: 64px;
+  }
+  /* forced-colors: active strips background/mask layers (WCAG contract, see
+     src/ui/CLAUDE.md); restore a plain system-color border so the window frame
+     stays visible in high-contrast mode instead of vanishing with the mask. */
+  @media (forced-colors: active) {
+    #options-menu.perf-wide {
+      border-color: CanvasText;
+    }
+    #options-menu.perf-wide::before {
+      display: none;
+    }
+  }
+
   /* ---------- emote wheel ---------- */
   #emote-wheel {
     position: absolute;

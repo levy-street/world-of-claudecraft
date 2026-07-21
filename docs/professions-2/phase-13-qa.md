@@ -69,8 +69,14 @@ PHASE-SPECIFIC QA EMPHASIS (probe these directly, not just by reading):
   armor type and at least one weapon per bucket; prove the hybrid split (secondary at rare+,
   none below) and that a sub-rare disenchant is byte-identical to pre-phase output. Run the
   no-dead-materials referential pin and mutation-check it (a typed material stripped of its
-  consumer must red). Confirm the staves/wands bucket was flagged to the maintainer, not
-  silently defaulted (check state.md OPEN items or the resolved decision row).
+  consumer must red). Confirm staves and wands landed in the WEAPON bucket per the
+  resolved decision (the 2026-07-20 mastery amendments; a cloth special case is a
+  finding), and that the yields match the APPROVED Tuning targets numbers.
+- Inherited pacing (the 2026-07-20 mastery amendments): spam disenchant against the
+  Phase 12c SHARED throttle window (crafting and disenchant starve each other; a second
+  parallel window is a finding); verify the quality-tiered soft-ceiling gains live on the
+  now-reachable actions (an epic disenchant above a pre-archetype ceiling grants the
+  ceiling rate, never zero); confirm nothing in this phase re-implemented pacing locally.
 - Bind-on-trade, probed live: trade a typed rare+ reagent to a second player (stamps
   boundTo), attempt the onward trade (refused, localized deny id, both hosts), and verify
   the enforcement arm is generic over the instance payload (Phase 14b extends it to gear:

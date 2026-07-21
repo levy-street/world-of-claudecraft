@@ -334,7 +334,7 @@ export class ProfessionsWindow {
   }
 
   private nextUnlockText(unlock: CraftNextUnlock): string {
-    if (unlock.kind === 'max') return t('hudChrome.professions.nextUnlockMax');
+    if (unlock.kind === 'mastered') return t('hudChrome.professions.nextUnlockMastered');
     if (unlock.kind === 'specialized')
       return t('hudChrome.professions.nextUnlockSpecialized', {
         points: this.fmt(unlock.pointsRemaining),

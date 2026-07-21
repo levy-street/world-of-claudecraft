@@ -2100,6 +2100,8 @@ export const vi_VN: EnTranslations = {
       "gatherLine": "Bạn tập hợp: {name}.",
       "gatherLineQty": "Bạn tập hợp: {name} x{qty}.",
       "catchLine": "You reel in: {name}",
+      "biteLine": "Something takes the bait!",
+      "gotAwayLine": "It got away.",
       "nodeName": {
         "ore": "Ore Vein",
         "wood": "Timber Stand",
@@ -2167,7 +2169,7 @@ export const vi_VN: EnTranslations = {
       "tierPipAria": "Cấp {tier}",
       "nextUnlockTier": "{points} chỉ ra cấp độ tiếp theo: tỷ lệ thành công được cải thiện",
       "nextUnlockSpecialized": "{points} chỉ vào Chuyên ngành: giảm chi phí nguyên vật liệu",
-      "nextUnlockMax": "Ở kỹ năng tối đa",
+      "nextUnlockMastered": "Mastered, for now",
       "perkSpecializedLine": "{craft}: Chi phí chuyên môn, vật tư -{pct}%",
       "perkSpecializedAt": "Chuyên về kỹ năng {threshold}",
       "switchCost": "Lần đổi nguyên mẫu tiếp theo tốn {cost} điểm chuộc lỗi",
@@ -2247,6 +2249,7 @@ export const vi_VN: EnTranslations = {
       "skillReqLine": "Yêu cầu {craft} {skill}",
       "difficultyFull": "Đạt được kỹ năng đầy đủ",
       "difficultyReduced": "Giảm khả năng nhận được kỹ năng",
+      "difficultyMinimal": "Minimal skill gain",
       "difficultyNone": "Không đạt được kỹ năng",
       "stationBadge": "Bàn chế tác",
       "stationOutOfRangeNamed": "Di chuyển đến {station} để chế tạo cái này.",
@@ -5973,6 +5976,7 @@ export const vi_VN: EnTranslations = {
     },
     "cast": {
       "fishing": "Câu Cá",
+      "gathering": "Gathering",
       "demonHeal": "Quỷ Trị Liệu",
       "thunzharrStormcall": "Tiếng Gọi Bão"
     }
@@ -10898,6 +10902,11 @@ export const vi_VN: EnTranslations = {
         "sender": "Hội chế tạo",
         "subject": "Công việc của bạn trong lĩnh vực Chế tạo áo giáp và Kỹ thuật",
         "body": "nghệ nhân,\n\nHiệp hội biết đến công việc của bạn trong lĩnh vực Chế tạo áo giáp và Kỹ thuật: các tấm được tán đinh và các bánh răng được căn chỉnh, hai nghề này hỗ trợ lẫn nhau. Những nghề thủ công lân cận cùng nhau làm việc đánh dấu một bàn tay sẵn sàng hòa hợp. Hãy tìm kiếm Thợ Rèn Haldren, thợ chế tác giáp của Eastbrook: hiện tại anh ấy đang đại diện cho các bậc thầy. Hãy chứng minh kỹ năng của bạn với anh ấy bằng chính tay bạn làm, và anh ấy sẽ thấy hai chuyên ngành của bạn hòa hợp với nhau.\n\nTrân trọng,\nHội chế tạo"
+      },
+      "mastery_reset_notice": {
+        "sender": "The Guildhall",
+        "subject": "Your craft, made honest",
+        "body": "Guildmate,\n\nThe guild has adopted a new reckoning of mastery. Every hand starts the climb again: your craft skills and your gathering proficiencies have been set to zero.\n\nEverything else is yours, untouched: your recipes, your tools and materials, your bank and gold, your attunements and titles, your deeds and renown, your quests and mail.\n\nThe climb is honest now. Cheap work will not carry you. Seek harder recipes, richer veins, and deeper waters.\n\nWith respect,\nThe Guildhall"
       }
     },
     "itemSets": {

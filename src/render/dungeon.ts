@@ -1579,10 +1579,18 @@ export class DungeonInteriors {
     }
   }
 
-  // Sanctum chamber waists: solid wall blocks built from stretched kit walls
-  // (cap flush at |x|=6 so the visual never intrudes into the 10u passage),
-  // plus a ritual arch spanning the centre passage.
+  // Chamber waists use variant-specific geometry derived from their authored
+  // stub OBBs so their visible footprint stays aligned with collision.
   private placeStubs(p: Placements, stubs: WallStub[], variant: Variant): void {
+    if (variant === 'arena') {
+      // Arena cover is a narrow full-height wall rather than the large
+      // sanctum chamber mass. The centered KayKit wall is 4u long and 1u
+      // thick, so these scales map its visual bounds exactly onto the OBB.
+      for (const s of stubs) {
+        p.add('wall', s.x, 0, s.z, Math.PI / 2, [s.hd / 2, MODULE_SCALE, s.hw * 2]);
+      }
+      return;
+    }
     if (variant === 'delve_bell') {
       // Bell Niche: each stub is a solid pier (hw x hd OBB) flush against the
       // side wall, dividing the deep handbell alcoves. Render the aisle-facing

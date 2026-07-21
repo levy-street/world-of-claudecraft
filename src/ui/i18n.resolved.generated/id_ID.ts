@@ -2100,6 +2100,8 @@ export const id_ID: EnTranslations = {
       "gatherLine": "Anda mengumpulkan: {name}.",
       "gatherLineQty": "Anda mengumpulkan: {name} x{qty}.",
       "catchLine": "You reel in: {name}",
+      "biteLine": "Something takes the bait!",
+      "gotAwayLine": "It got away.",
       "nodeName": {
         "ore": "Ore Vein",
         "wood": "Timber Stand",
@@ -2167,7 +2169,7 @@ export const id_ID: EnTranslations = {
       "tierPipAria": "Tingkat {tier}",
       "nextUnlockTier": "{points} menunjuk ke tingkat berikutnya: peluang karya besar meningkat",
       "nextUnlockSpecialized": "{points} menunjuk ke Khusus: biaya material turun",
-      "nextUnlockMax": "Pada keterampilan maksimal",
+      "nextUnlockMastered": "Mastered, for now",
       "perkSpecializedLine": "{craft}: Khusus, biaya material -{pct}%",
       "perkSpecializedAt": "Mengkhususkan diri pada keterampilan {threshold}",
       "switchCost": "Peralihan arketipe berikutnya membutuhkan {cost} poin penebusan",
@@ -2247,6 +2249,7 @@ export const id_ID: EnTranslations = {
       "skillReqLine": "Membutuhkan {craft} {skill}",
       "difficultyFull": "Peningkatan keterampilan penuh",
       "difficultyReduced": "Mengurangi perolehan keterampilan",
+      "difficultyMinimal": "Minimal skill gain",
       "difficultyNone": "Tidak ada perolehan keterampilan",
       "stationBadge": "Tempat Kerja Kerajinan",
       "stationOutOfRangeNamed": "Pindah ke {station} untuk membuat ini.",
@@ -5973,6 +5976,7 @@ export const id_ID: EnTranslations = {
     },
     "cast": {
       "fishing": "Memancing",
+      "gathering": "Gathering",
       "demonHeal": "Penyembuhan Iblis",
       "thunzharrStormcall": "Panggilan Badai"
     }
@@ -10898,6 +10902,11 @@ export const id_ID: EnTranslations = {
         "sender": "Persatuan Perajin",
         "subject": "Pekerjaan Anda di bidang Pembuatan Zirah dan Teknik",
         "body": "Perajin,\n\nKabar sampai ke Persekutuan tentang pekerjaan Anda di bidang Pembuatan Zirah dan Teknik: pelat-pelat dipaku dan roda gigi dipasang, kedua kerajinan itu saling memberi makan. Kerajinan tetangga bekerja sama menandai tangan yang siap untuk penyelarasan. Carilah Pandai Besi Haldren, pembuat zirah di Eastbrook: dia mewakili para master untuk saat ini. Buktikan keahlian Anda kepadanya dengan karya tangan Anda sendiri, dan dia akan melihat dua keahlian utama Anda selaras.\n\nHormat kami,\nPersatuan Perajin"
+      },
+      "mastery_reset_notice": {
+        "sender": "The Guildhall",
+        "subject": "Your craft, made honest",
+        "body": "Guildmate,\n\nThe guild has adopted a new reckoning of mastery. Every hand starts the climb again: your craft skills and your gathering proficiencies have been set to zero.\n\nEverything else is yours, untouched: your recipes, your tools and materials, your bank and gold, your attunements and titles, your deeds and renown, your quests and mail.\n\nThe climb is honest now. Cheap work will not carry you. Seek harder recipes, richer veins, and deeper waters.\n\nWith respect,\nThe Guildhall"
       }
     },
     "itemSets": {

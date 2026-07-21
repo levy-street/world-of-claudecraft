@@ -96,11 +96,25 @@ function route(server: GameServer, events: SimEvent[]): void {
   (server as any).routeEvents(events);
 }
 
+// Phase 12b: harvestNode STARTS a gather cast; the draws, grant, and events
+// land at completion. Mirror the lifecycle completion arm synchronously so
+// the hunted rng stream stays free of world-tick noise (the
+// gather_rare_events.test.ts completeCastNow idiom).
+function completeCastNow(server: GameServer, pid: number): void {
+  const p = server.sim.entities.get(pid);
+  const meta = server.sim.players.get(pid);
+  if (!p || !meta) throw new Error('missing player');
+  p.castingAbility = null;
+  p.castRemaining = 0;
+  server.sim.ctx.completeGatherCast(p, meta);
+}
+
 describe('gather events over the live server (Professions 2.0 Phase 4)', () => {
   it('a real harvest delivers gatherResult (with qty and rareEvent) to the harvesting client only', () => {
     const { server, fcA, fcB, fcC, sa } = liveSetup();
 
     expect(server.sim.harvestNode(NODE_ID, sa.pid)).toBe(true);
+    completeCastNow(server, sa.pid);
     route(server, server.sim.drainEvents());
 
     const mine = deliveredEvents(fcA).filter((e) => e.type === 'gatherResult');
@@ -135,6 +149,7 @@ describe('gather events over the live server (Professions 2.0 Phase 4)', () => {
       meta.inventory.length = 0;
       delete meta.nodeHarvestReadyAt[NODE_ID];
       expect(server.sim.harvestNode(NODE_ID, sa.pid)).toBe(true);
+      completeCastNow(server, sa.pid);
       const events = server.sim.drainEvents();
       if (events.some((e) => e.type === 'gatherRareEvent')) hitEvents = events;
     }

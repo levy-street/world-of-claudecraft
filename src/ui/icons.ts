@@ -3627,6 +3627,11 @@ export const QUALITY_COLOR: Record<string, string> = {
   legendary: '#ff8000',
 };
 
+// The house gold accent (--gold in src/styles/tokens.css, the masterwork seal
+// idiom): the named TS-side twin for painters that inline-style a color and
+// cannot read the CSS custom property. Keep the two values in lockstep.
+export const GOLD_ACCENT_COLOR = '#ffd100';
+
 // ---------------------------------------------------------------------------
 // Photographic weapon icons
 //

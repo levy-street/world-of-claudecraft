@@ -39,8 +39,8 @@ import type { Entity } from '../types';
 import {
   berserkerCritDamage,
   dist2d,
-  FISHING_CAST_ID,
   isConsuming,
+  isNonSpellCast,
   MAX_LEVEL,
   mobXpValue,
   NYTHRAXIS_BOSS_ID,
@@ -886,7 +886,10 @@ export function dealDamage(
       amount > 0 &&
       kind === 'hit'
     ) {
-      if (target.castingAbility === FISHING_CAST_ID) ctx.cancelCast(target);
+      // A non-spell cast (fishing/gather) cancels outright instead of pushing
+      // back. The Demon Heal channel is deliberately NOT folded in: it takes
+      // the normal channel pushback below, as today.
+      if (isNonSpellCast(target.castingAbility)) ctx.cancelCast(target);
       else if (!ignoresDamagePushback(ctx, target, target.castingAbility)) ctx.pushbackCast(target);
     }
   }
@@ -1011,6 +1014,13 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   e.ccDr.clear();
   e.castingAbility = null;
   e.castTargetId = null;
+  // Phase 12b hidden per-cast state: death ends any gather/fishing session, so
+  // the fields must return to inert here too (the parity samplers rely on them
+  // being 0/'' at every sampled frame outside a live cast; cancelCast owns the
+  // ordinary cancel paths, but a lethal non-hit tick reaches death directly).
+  e.gatherCastNodeId = '';
+  e.fishBiteAtTick = 0;
+  e.fishReelDeadlineTick = 0;
   ctx.emit({ type: 'death', entityId: e.id, killerId: killer?.id ?? -1 });
 
   // a dead mob keeps no raid marker — respawnMob reuses the same entity id,

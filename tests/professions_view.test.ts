@@ -5,12 +5,12 @@
 // nudges, tutorial) survives into the composed window model unchanged.
 
 import { describe, expect, it } from 'vitest';
-import { CRAFT_RING, PERK_THRESHOLDS } from '../src/sim/content/professions';
+import { CRAFT_RING, craftMaxSkillFor, PERK_THRESHOLDS } from '../src/sim/content/professions';
+import { TIER_SKILL_STEP } from '../src/sim/professions/wheel';
 import {
   buildProfessionsView,
   buildRingLayout,
   buildSkillBar,
-  CRAFT_MAX_SKILL,
   craftNextUnlock,
   type ProfessionsViewInput,
   professionsRefreshSig,
@@ -84,7 +84,7 @@ function craftRow(model: ReturnType<typeof buildProfessionsView>, craftId: strin
 
 describe('buildProfessionsView: model construction', () => {
   it('builds the full model from a Sim-shaped identity', () => {
-    const model = view(attunedIdentity, [{ professionId: 'mining', skill: 30, maxSkill: 300 }]);
+    const model = view(attunedIdentity, [{ professionId: 'mining', skill: 30, maxSkill: 100 }]);
     expect(model.mode).toBe('full');
     expect(model.simplified).toBeNull();
     expect(model.identity.state).toBe('attuned');
@@ -92,7 +92,7 @@ describe('buildProfessionsView: model construction', () => {
     expect(model.crafts.map((c) => c.identity.craftId)).toEqual(RING_ORDER);
     // Bars derive from the same skill the identity row carries.
     for (const row of model.crafts) expect(row.bar.skill).toBe(row.identity.skill);
-    expect(model.gathering).toEqual([{ professionId: 'mining', bar: buildSkillBar(30, 300) }]);
+    expect(model.gathering).toEqual([{ professionId: 'mining', bar: buildSkillBar(30, 100) }]);
   });
 
   it('builds a coherent syncing model from the pre-cprof ClientWorld shape', () => {
@@ -115,14 +115,15 @@ describe('buildProfessionsView: model construction', () => {
 
   it('passes injected gathering rows through in order with their own caps', () => {
     // No hardcoded id set: a Phase 11 fishing row flows through unchanged, and
-    // each row derives pips from its own maxSkill.
+    // each row derives pips from its own maxSkill. The fixtures carry the
+    // RESOLVED content caps (100 gathering, 200 fishing).
     const model = view(attunedIdentity, [
-      { professionId: 'herbalism', skill: 55, maxSkill: 300 },
-      { professionId: 'fishing', skill: 30, maxSkill: 100 },
+      { professionId: 'herbalism', skill: 55, maxSkill: 100 },
+      { professionId: 'fishing', skill: 30, maxSkill: 200 },
     ]);
     expect(model.gathering.map((g) => g.professionId)).toEqual(['herbalism', 'fishing']);
-    expect(model.gathering[0].bar).toMatchObject({ pipSlots: 12, tierIndex: 2 });
-    expect(model.gathering[1].bar).toMatchObject({ pipSlots: 4, tierIndex: 1 });
+    expect(model.gathering[0].bar).toMatchObject({ pipSlots: 4, tierIndex: 2 });
+    expect(model.gathering[1].bar).toMatchObject({ pipSlots: 8, tierIndex: 1 });
   });
 });
 
@@ -191,57 +192,83 @@ describe('ring layout', () => {
 });
 
 describe('tier pips and perks', () => {
+  // The enforced per-profession content cap the craft rows now derive from
+  // (content/professions.ts craftMaxSkillFor, Phase 12c). Deliberate literal
+  // pin below: silent content drift in the cap must fail here, not re-derive.
+  const CRAFT_CAP = craftMaxSkillFor('engineering');
+
   it('steps tiers at every 25-skill boundary', () => {
-    expect(buildSkillBar(24, CRAFT_MAX_SKILL)).toMatchObject({
+    expect(buildSkillBar(24, CRAFT_CAP)).toMatchObject({
       tierIndex: 0,
       filledPips: 0,
       pointsToNextTier: 1,
     });
-    expect(buildSkillBar(24, CRAFT_MAX_SKILL).tierFraction).toBeCloseTo(24 / 25, 12);
-    expect(buildSkillBar(25, CRAFT_MAX_SKILL)).toMatchObject({
+    expect(buildSkillBar(24, CRAFT_CAP).tierFraction).toBeCloseTo(24 / 25, 12);
+    expect(buildSkillBar(25, CRAFT_CAP)).toMatchObject({
       tierIndex: 1,
       filledPips: 1,
       pointsToNextTier: 25,
       tierFraction: 0,
     });
-    expect(buildSkillBar(49, CRAFT_MAX_SKILL)).toMatchObject({ tierIndex: 1, pointsToNextTier: 1 });
-    expect(buildSkillBar(50, CRAFT_MAX_SKILL)).toMatchObject({
+    expect(buildSkillBar(49, CRAFT_CAP)).toMatchObject({ tierIndex: 1, pointsToNextTier: 1 });
+    expect(buildSkillBar(50, CRAFT_CAP)).toMatchObject({
       tierIndex: 2,
       pointsToNextTier: 25,
     });
-    expect(buildSkillBar(74, CRAFT_MAX_SKILL)).toMatchObject({ tierIndex: 2, pointsToNextTier: 1 });
-    expect(buildSkillBar(75, CRAFT_MAX_SKILL)).toMatchObject({
+    expect(buildSkillBar(74, CRAFT_CAP)).toMatchObject({ tierIndex: 2, pointsToNextTier: 1 });
+    expect(buildSkillBar(75, CRAFT_CAP)).toMatchObject({
       tierIndex: 3,
       pointsToNextTier: 25,
     });
   });
 
-  it('gives 12 pip slots at the 300 display cap and zero fraction at max', () => {
-    expect(CRAFT_MAX_SKILL).toBe(300);
-    expect(buildSkillBar(0, CRAFT_MAX_SKILL).pipSlots).toBe(12);
-    expect(buildSkillBar(300, CRAFT_MAX_SKILL)).toMatchObject({
-      pipSlots: 12,
-      filledPips: 12,
+  it('display-floors fractional skill and ceils points-to-go (never a fake crossing)', () => {
+    // Fractional mastery gains (0.5 / 0.25 arms) must never round a readout
+    // over an uncrossed threshold: 74.75 reads 74 with 1 to go, not 75 with 0.
+    expect(buildSkillBar(74.75, CRAFT_CAP)).toMatchObject({
+      skill: 74,
+      tierIndex: 2,
+      pointsToNextTier: 1,
+    });
+    // The exact fraction still drives the bar geometry.
+    expect(buildSkillBar(74.75, CRAFT_CAP).tierFraction).toBeCloseTo(24.75 / 25, 12);
+    expect(craftNextUnlock('weaponcrafting', 74.75)).toMatchObject({
+      kind: 'specialized',
+      pointsRemaining: 1,
+    });
+    expect(craftNextUnlock('weaponcrafting', 30.5)).toMatchObject({
+      kind: 'tier',
+      pointsRemaining: 20,
+    });
+  });
+
+  it('gives 5 pip slots at the 125 craft cap and zero fraction at cap', () => {
+    expect(CRAFT_CAP).toBe(125);
+    expect(buildSkillBar(0, CRAFT_CAP).pipSlots).toBe(5);
+    expect(buildSkillBar(125, CRAFT_CAP)).toMatchObject({
+      pipSlots: 5,
+      filledPips: 5,
       tierFraction: 0,
     });
   });
 
-  it('derives the overall bar fill in the core, clamped to the display cap', () => {
-    expect(buildSkillBar(0, CRAFT_MAX_SKILL).fillFraction).toBe(0);
-    expect(buildSkillBar(132, CRAFT_MAX_SKILL).fillFraction).toBeCloseTo(132 / 300, 12);
-    expect(buildSkillBar(300, CRAFT_MAX_SKILL).fillFraction).toBe(1);
-    // Sim craft skill is uncapped; the presentational fill must clamp.
-    expect(buildSkillBar(450, CRAFT_MAX_SKILL).fillFraction).toBe(1);
-    // Gathering rows use their own maxSkill.
-    expect(buildSkillBar(45, 300).fillFraction).toBeCloseTo(0.15, 12);
+  it('derives the overall bar fill in the core from the per-profession cap', () => {
+    expect(buildSkillBar(0, CRAFT_CAP).fillFraction).toBe(0);
+    // In-range fixture: 60 / 125 = 0.48.
+    expect(buildSkillBar(60, CRAFT_CAP).fillFraction).toBeCloseTo(0.48, 12);
+    expect(buildSkillBar(125, CRAFT_CAP).fillFraction).toBe(1);
+    // Gathering rows use their own resolved maxSkill (fishing caps at 200):
+    // 45 / 200 = 0.225.
+    expect(buildSkillBar(45, 200).fillFraction).toBeCloseTo(0.225, 12);
   });
 
-  it('saturates pips, fill, and fraction above the display cap', () => {
-    // Sim craft skill is uncapped (wheel.ts gainCraftSkill), so a mirrored
-    // skill above 300 must clamp every bar-facing field, not just fillFraction.
-    expect(buildSkillBar(450, CRAFT_MAX_SKILL)).toMatchObject({
-      pipSlots: 12,
-      filledPips: 12,
+  it('saturates pips, fill, and fraction at exactly the cap', () => {
+    // The cap is ENFORCED sim-side since Phase 12c (wheel.ts gainCraftSkill,
+    // normalizeCraftSkills), so the view only ever receives already-clamped
+    // values; the bar must read fully saturated at exactly the cap.
+    expect(buildSkillBar(CRAFT_CAP, CRAFT_CAP)).toMatchObject({
+      pipSlots: 5,
+      filledPips: 5,
       tierFraction: 0,
       fillFraction: 1,
     });
@@ -313,18 +340,47 @@ describe('craftNextUnlock', () => {
     });
   });
 
-  it('reports max at the display cap and throws on an unknown craft', () => {
-    expect(craftNextUnlock('engineering', 299)).toEqual({
+  it('reports mastered at the content cap and throws on an unknown craft', () => {
+    // One below the 125 cap still points at the cap boundary tier (5 pips).
+    expect(craftNextUnlock('engineering', 124)).toEqual({
       kind: 'tier',
-      targetTier: 12,
+      targetTier: 5,
       pointsRemaining: 1,
     });
-    expect(craftNextUnlock('engineering', CRAFT_MAX_SKILL)).toEqual({ kind: 'max' });
+    expect(craftNextUnlock('engineering', craftMaxSkillFor('engineering'))).toEqual({
+      kind: 'mastered',
+    });
     expect(() => craftNextUnlock('fishing', 0)).toThrow();
   });
 
-  it('stays max above the display cap, not only exactly at it', () => {
-    expect(craftNextUnlock('engineering', CRAFT_MAX_SKILL + 150)).toEqual({ kind: 'max' });
+  it('stays mastered above the cap, not only exactly at it', () => {
+    expect(craftNextUnlock('engineering', craftMaxSkillFor('engineering') + 150)).toEqual({
+      kind: 'mastered',
+    });
+  });
+
+  it('never advertises a milestone above the cap, for any craft and skill', () => {
+    // The whole point of the mastered state: below the cap every arm's
+    // implied target boundary sits at or under the cap, and at or past the
+    // cap the arm is always mastered, never an unreachable carrot.
+    for (const craft of CRAFT_RING) {
+      const cap = craftMaxSkillFor(craft.id);
+      for (let skill = 0; skill < cap; skill++) {
+        const unlock = craftNextUnlock(craft.id, skill);
+        expect(unlock.kind, `${craft.id} at ${skill}`).not.toBe('mastered');
+        if (unlock.kind === 'tier') {
+          expect(
+            unlock.targetTier * TIER_SKILL_STEP,
+            `${craft.id} at ${skill}`,
+          ).toBeLessThanOrEqual(cap);
+        } else if (unlock.kind === 'specialized') {
+          expect(skill + unlock.pointsRemaining, `${craft.id} at ${skill}`).toBeLessThanOrEqual(
+            cap,
+          );
+        }
+      }
+      expect(craftNextUnlock(craft.id, cap)).toEqual({ kind: 'mastered' });
+    }
   });
 });
 
@@ -402,7 +458,7 @@ describe('progressive disclosure', () => {
 });
 
 describe('professionsRefreshSig', () => {
-  const gathering = [{ professionId: 'mining', skill: 12, maxSkill: 300 }];
+  const gathering = [{ professionId: 'mining', skill: 12, maxSkill: 100 }];
   function input(over: Partial<CraftingIdentityView> = {}): ProfessionsViewInput {
     return {
       identity: identity({ craftSkills: { ...ZERO_SKILLS, cooking: 30 }, ...over }),
@@ -448,13 +504,13 @@ describe('professionsRefreshSig', () => {
     expect(
       professionsRefreshSig({
         ...input(),
-        gathering: [{ professionId: 'mining', skill: 13, maxSkill: 300 }],
+        gathering: [{ professionId: 'mining', skill: 13, maxSkill: 100 }],
       }),
     ).not.toBe(base);
     expect(
       professionsRefreshSig({
         ...input(),
-        gathering: [...gathering, { professionId: 'fishing', skill: 0, maxSkill: 300 }],
+        gathering: [...gathering, { professionId: 'fishing', skill: 0, maxSkill: 200 }],
       }),
     ).not.toBe(base);
     expect(professionsRefreshSig(input(), ['craft:alchemy'])).not.toBe(base);
@@ -463,7 +519,7 @@ describe('professionsRefreshSig', () => {
     expect(
       professionsRefreshSig({
         ...input(),
-        gathering: [{ professionId: 'mining', skill: 12, maxSkill: 450 }],
+        gathering: [{ professionId: 'mining', skill: 12, maxSkill: 200 }],
       }),
     ).not.toBe(base);
   });

@@ -91,23 +91,43 @@
   .np-ai.ai-tag {
     display: inline-block;
   }
-  /* $WOC holder-tier flair badge, inline to the left of a player's name */
+  /* $WOC holder-tier flair badge, inline to the left of a player's name. The
+     legibility outline is layered with a static per-tier halo (the "stand out"
+     knob): the glow hue comes from the painter via --holder-glow, the blur
+     strength from the named --holder-halo tunable in tokens.css. No animation, so
+     it is reduced-motion safe. Falls back to transparent (no halo) when unset. */
   .np-tier {
     display: inline-block;
     width: 15px;
     height: 15px;
     vertical-align: middle;
     margin-right: 3px;
-    filter: drop-shadow(0 1px 1px #000);
+    filter: drop-shadow(0 1px 1px #000)
+      drop-shadow(0 0 var(--holder-halo) var(--holder-glow, transparent));
   }
-  /* developer-badge flair, inline to the left of a player's name */
+  /* Band IV regalia (Worldbearer, Sovereign): a moderately stronger halo. */
+  .np-tier.np-tier-regalia {
+    filter: drop-shadow(0 1px 1px #000)
+      drop-shadow(0 0 var(--holder-halo-strong) var(--holder-glow, transparent));
+  }
+  /* developer-badge flair, inline to the left of a player's name. Mirrors the
+     holder badge: a legibility outline plus a static per-tier halo, the hue from
+     the painter via --dev-glow and the blur strength from the shared --holder-halo
+     tunable (tokens.css). No animation, so it is reduced-motion safe. Falls back to
+     transparent (no halo) when unset. */
   .np-dev-tier {
     display: inline-block;
     width: 15px;
     height: 15px;
     vertical-align: middle;
     margin-right: 3px;
-    filter: drop-shadow(0 1px 1px #000);
+    filter: drop-shadow(0 1px 1px #000)
+      drop-shadow(0 0 var(--holder-halo) var(--dev-glow, transparent));
+  }
+  /* Significant-contributor rungs (Architect, Worldwright): a stronger halo. */
+  .np-dev-tier.np-dev-tier-strong {
+    filter: drop-shadow(0 1px 1px #000)
+      drop-shadow(0 0 var(--holder-halo-strong) var(--dev-glow, transparent));
   }
   /* significant-contributor name outline: a steady halo layered over whatever
      name color applies (Discord staff or default). The colour is supplied by the

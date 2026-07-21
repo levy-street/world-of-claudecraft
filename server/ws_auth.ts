@@ -297,6 +297,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       adminPermissions,
       clientSeed,
       timerWireVersion,
+      // The character's stored action-bar layout, sent once to the owning client
+      // so it restores at login on any device (game.join re-validates it).
+      hotbarLayout: character.hotbar_layout ?? null,
     };
     // Two genuinely concurrent handshakes for one character would race to stamp
     // the lease nonce; admit only the first and refuse the rest (never queue).

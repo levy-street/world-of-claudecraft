@@ -23,6 +23,7 @@
 import { arenaOrigin, DELVES, instanceOrigin, MOBS, PROPS, QUESTS } from '../../src/sim/data';
 import { createMob } from '../../src/sim/entity';
 import { solveLockActions } from '../../src/sim/lockpick';
+import { gatherCastDurationSec } from '../../src/sim/professions/gathering';
 import { Sim } from '../../src/sim/sim';
 import { addThreat } from '../../src/sim/threat';
 import {
@@ -4341,28 +4342,41 @@ function professionsCraft(seed = 21): Scenario {
   };
 }
 
-// Gathering (Professions 2.0 Phase 4): the zone-material harvest path. Pins the
-// two-draw-per-harvest contract (draw #1 rollMaterialRarity, draw #2
-// rollGatherRareEvent) in the draw-order digest, the zero-draw cooldown denial,
-// the proficiency-0 fungible grant, the max-proficiency signed yield, and a
-// hunted rare-event hit (gatherRareEvent zone broadcast + x5 signed yield +
-// gatherResult qty/rareEvent payload) inside a fixed 100-harvest window.
+// Gathering (Professions 2.0 Phase 4, re-shaped for the Phase 12b gather
+// cast): the zone-material harvest path. harvestNode now STARTS a cast
+// (draw-free) and the draws, grant, and events land at completion on the
+// tick path, so every harvest ticks the cast out with the exact duration
+// from the shipped constants. Pins the completion-time two-draw contract
+// (draw #1 rollMaterialRarity, draw #2 rollGatherRareEvent) in the
+// draw-order digest, the zero-draw cooldown denial, the proficiency-0
+// fungible grant, the max-proficiency signed yield, and a hunted rare-event
+// hit (gatherRareEvent zone broadcast + x5 signed yield + gatherResult
+// qty/rareEvent payload) inside a fixed 100-harvest window. The cast loop
+// ticks ~5000 times, so frames ride the labelled snapshots plus a coarse
+// cadence (the heavy-scenario budget precedent).
 //
-// Seed HUNTED (bounded scan from seed 1 upward over this exact drive sequence,
-// not committed) so the herb window's rare-event draw hits inside the recorded
-// run with no bags-full denial; only the found literal is pinned here.
-function professionsGather(seed = 3): Scenario {
+// Seed HUNTED (bounded scan from seed 1 upward over this exact drive
+// sequence, not committed) so the herb window's rare-event draw hits inside
+// the recorded run with all 102 casts resolving: no bags-full denial and no
+// cast-cancelling interference; only the found literal is pinned here.
+function professionsGather(seed = 1): Scenario {
+  // Worst-case gather cast: tier-1 node, bare hands, band 0. Shorter casts
+  // (band reductions as proficiency accrues) still complete inside this
+  // fixed window; surplus ticks are plain world ticks.
+  const castTicks = Math.ceil(gatherCastDurationSec(1, 1, 0) / DT) + 1;
   return {
     name: 'professions_gather',
     coverage: [
       'class:warrior (gatherer)',
-      'granted harvest: exactly two rng draws (rarity roll then rare-event roll)',
-      'cooldown denial: zero rng draws',
+      'gather cast start: harvestNode begins the cast draw-free',
+      'granted harvest at cast completion: exactly two rng draws (rarity roll then rare-event roll)',
+      'cooldown denial: zero rng draws, no cast',
       'proficiency-0 grant: common rarity, fungible zone material (copper_ore)',
       'max-proficiency wood harvest: rarity ladder off the proficiency ceiling',
       'rare gather event: hunted hit in the herb window, gatherRareEvent fanout + x5 signed yield',
       'gatherResult qty/rareEvent payload fields',
     ],
+    sampleEvery: 500,
     build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
       const sim = rec.sim as AnySim;
@@ -4370,11 +4384,26 @@ function professionsGather(seed = 3): Scenario {
       const meta = sim.players.get(pid) as any;
       const p = sim.player as AnyEntity;
 
-      // Phase 1: proficiency-0 ore harvest (common, fungible grant) plus an
-      // immediate second attempt denied by the player's own cooldown, which
-      // must add ZERO draws to the digest.
+      // No mob interference: mob damage cancels a gather cast mid-drive, so
+      // the drive silences the world's mobs up front (deterministic,
+      // recorded state, the test-suite despawnMobs idiom).
+      for (const e of (sim.entities as Map<number, AnyEntity>).values()) {
+        if (e.kind !== 'mob') continue;
+        e.dead = true;
+        e.hp = 0;
+        e.aiState = 'dead';
+        e.respawnTimer = 9999;
+        e.corpseTimer = 9999;
+        e.inCombat = false;
+      }
+
+      // Phase 1: proficiency-0 ore harvest (common, fungible grant, resolved
+      // at cast completion on the tick path) plus a post-completion second
+      // attempt denied by the player's own cooldown, which must add ZERO
+      // draws to the digest.
       teleport(sim, p, -70, -53); // ore_eastbrook_1
       sim.harvestNode('ore_eastbrook_1', pid);
+      rec.tick(castTicks); // the cast completes inside this window
       sim.harvestNode('ore_eastbrook_1', pid); // denied: own timer, no draw
       rec.snapshot('harvest-ore-common-and-denial');
       rec.tick(2);
@@ -4385,17 +4414,31 @@ function professionsGather(seed = 3): Scenario {
       meta.gatheringProficiency.logging = 100;
       teleport(sim, p, -62, 8); // wood_eastbrook_1
       sim.harvestNode('wood_eastbrook_1', pid);
+      rec.tick(castTicks);
       rec.snapshot('harvest-wood-max-proficiency');
       rec.tick(2);
 
-      // Phase 3: the rare-event window. Repeated herb harvests with the
+      // Phase 3: the rare-event window. Repeated herb casts with the
       // per-player cooldown cleared advance the shared stream exactly two
-      // draws per harvest; the hunted seed hits the 1/90 rare event inside
-      // this fixed window (gatherRareEvent + the forced-signed x5 yield).
+      // draws per completed harvest. Two per-iteration resets keep the
+      // 100-cast window from ever hitting the bags-full deny at a cast
+      // start (which would skip a harvest and shift the stream): the
+      // proficiency reset pins the window at band 0 (the pre-12b window ran
+      // at an undrained proficiency 0 anyway), and the retention filter
+      // sheds the accumulating common stacks while keeping the NEWEST eight
+      // signed instances, so a hunted hit's forced-signed x5 yield (all
+      // moonlit-bloom silverleaf) survives into the final inventory sample
+      // even when the window hits more than once. The hunted seed's FIRST
+      // rare event lands inside this window (gatherRareEvent + x5 yield).
       teleport(sim, p, -86, 90); // herb_eastbrook_1
       for (let i = 0; i < 100; i++) {
+        meta.gatheringProficiency.herbalism = 0;
+        meta.inventory = meta.inventory
+          .filter((s: any) => s.instance?.signer !== undefined)
+          .slice(-8);
         delete meta.nodeHarvestReadyAt.herb_eastbrook_1;
         sim.harvestNode('herb_eastbrook_1', pid);
+        rec.tick(castTicks);
       }
       rec.snapshot('rare-event-window');
       rec.tick(2);

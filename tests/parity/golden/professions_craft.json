@@ -440,7 +440,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "adb889ba",
+      "state": "d7b261a5",
       "events": "a39a1866",
       "rng": {
         "draws": 2,
@@ -474,7 +474,7 @@
           },
           "craftSkills": {
             "alchemy": 1,
-            "tailoring": 201
+            "tailoring": 200
           },
           "craftThrottle": {
             "count": 2
@@ -625,7 +625,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "1befd9c7",
+      "state": "ce411798",
       "events": "c3a1794c",
       "rng": {
         "draws": 3,
@@ -659,7 +659,7 @@
           },
           "craftSkills": {
             "alchemy": 2,
-            "tailoring": 201
+            "tailoring": 200
           },
           "craftThrottle": {
             "count": 3
@@ -808,7 +808,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 416,
-      "state": "1befd9c7",
+      "state": "ce411798",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -842,7 +842,7 @@
           },
           "craftSkills": {
             "alchemy": 2,
-            "tailoring": 201
+            "tailoring": 200
           },
           "craftThrottle": {
             "count": 3

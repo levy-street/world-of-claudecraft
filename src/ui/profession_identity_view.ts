@@ -81,9 +81,11 @@ export function buildProfessionIdentityView(
       role === 'major' ? 'unlimited' : role === 'hobby' || role === 'unattuned' ? 'rare' : 'common';
     return {
       craftId: craft.id,
-      skill,
+      // Display-honest under fractional mastery gains: floor the readout,
+      // ceil the points-to-go (74.75 reads 74 with 1 to go, never 75 with 0).
+      skill: Math.floor(skill),
       tier,
-      pointsToNextTier: TIER_SKILL_STEP - remainder,
+      pointsToNextTier: Math.ceil(TIER_SKILL_STEP - remainder),
       role,
       ceiling,
       dormantKnowledge: role === 'dormant' && skill > 0,

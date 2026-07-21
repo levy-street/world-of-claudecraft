@@ -2100,6 +2100,8 @@ export const de_DE: EnTranslations = {
       "gatherLine": "Sie sammeln: {name}.",
       "gatherLineQty": "Sie sammeln: {name} x{qty}.",
       "catchLine": "You reel in: {name}",
+      "biteLine": "Something takes the bait!",
+      "gotAwayLine": "It got away.",
       "nodeName": {
         "ore": "Ore Vein",
         "wood": "Timber Stand",
@@ -2167,7 +2169,7 @@ export const de_DE: EnTranslations = {
       "tierPipAria": "Stufe {tier}",
       "nextUnlockTier": "Noch {points} Punkte bis zur nächsten Stufe: Meisterwerkchance steigt",
       "nextUnlockSpecialized": "Noch {points} Punkte bis zur Spezialisierung: Materialkosten sinken",
-      "nextUnlockMax": "Mit maximalem Können",
+      "nextUnlockMastered": "Mastered, for now",
       "perkSpecializedLine": "{craft}: Spezialisiert, Materialkosten -{pct}%",
       "perkSpecializedAt": "Spezialisiert auf die Fertigkeit {threshold}",
       "switchCost": "Der nächste Archetypwechsel kostet {cost} Sühnepunkte",
@@ -2247,6 +2249,7 @@ export const de_DE: EnTranslations = {
       "skillReqLine": "Erfordert {craft} {skill}",
       "difficultyFull": "Voller Fähigkeitsgewinn",
       "difficultyReduced": "Reduzierter Fähigkeitsgewinn",
+      "difficultyMinimal": "Minimal skill gain",
       "difficultyNone": "Kein Fähigkeitsgewinn",
       "stationBadge": "Station",
       "stationOutOfRangeNamed": "Begib dich zur {station}, um dies herzustellen.",
@@ -5973,6 +5976,7 @@ export const de_DE: EnTranslations = {
     },
     "cast": {
       "fishing": "Angeln",
+      "gathering": "Gathering",
       "demonHeal": "Dämonenheilung",
       "thunzharrStormcall": "Sturmruf"
     }
@@ -10898,6 +10902,11 @@ export const de_DE: EnTranslations = {
         "sender": "Die Handwerksgilde",
         "subject": "Ihre Arbeit im Rüstungsbau und im Ingenieurwesen",
         "body": "Handwerker,\n\nDie Nachricht erreicht die Gilde von eurer Arbeit im Rüstungsbau und im Ingenieurswesen: Platten vernietet und Zahnräder bearbeitet, die beiden Handwerke ergänzen sich gegenseitig. Benachbarte Handwerke, die zusammengearbeitet wurden, kennzeichnen eine Hand, die zur Einstimmung bereit ist. Suchen Sie Schmied Haldren auf, den Rüstungsschmied von Eastbrook: Er spricht vorerst für die Meister. Beweisen Sie ihm Ihr Können mit der Arbeit Ihrer eigenen Hände, und er wird dafür sorgen, dass Ihre beiden Hauptfächer aufeinander abgestimmt sind.\n\nIn gutem Ansehen,\nDie Handwerksgilde"
+      },
+      "mastery_reset_notice": {
+        "sender": "The Guildhall",
+        "subject": "Your craft, made honest",
+        "body": "Guildmate,\n\nThe guild has adopted a new reckoning of mastery. Every hand starts the climb again: your craft skills and your gathering proficiencies have been set to zero.\n\nEverything else is yours, untouched: your recipes, your tools and materials, your bank and gold, your attunements and titles, your deeds and renown, your quests and mail.\n\nThe climb is honest now. Cheap work will not carry you. Seek harder recipes, richer veins, and deeper waters.\n\nWith respect,\nThe Guildhall"
       }
     },
     "itemSets": {
