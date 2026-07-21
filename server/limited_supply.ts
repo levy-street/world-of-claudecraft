@@ -49,6 +49,8 @@ export class LimitedSupplyService {
   private readonly supplyByItem = new Map<string, number>();
   // itemId -> ready-to-hand-out leased serials.
   private readonly pools = new Map<string, number[]>();
+  // Items with a refill already queued on the FIFO (see scheduleRefill).
+  private readonly refillPending = new Set<string>();
   // Serializes every background DB write (refill, mint, release) into one
   // per-process FIFO, like server/bank_ledger.ts: the loop never awaits it, a
   // rejected write logs and never blocks or reorders, and it can never throw into
@@ -86,9 +88,21 @@ export class LimitedSupplyService {
   claim(itemId: string): number | null {
     if (!this.ready) return null;
     const pool = this.pools.get(itemId);
-    if (!pool || pool.length === 0) return null;
+    if (!pool) return null;
+    if (pool.length === 0) {
+      // An empty pool is either a genuinely exhausted supply or a refill that
+      // failed earlier, and from here the two are indistinguishable. Retry
+      // either way. Without this the only refill triggers are init() and a
+      // SUCCESSFUL claim, so one rejected fillBuffer (enqueue logs and swallows
+      // it) would leave the pool empty for the rest of the process lifetime:
+      // the relic stops minting on this realm and every winner silently gets the
+      // fallback instead. Retrying also lets a realm that emptied against a
+      // genuinely spent supply pick up serials another realm later released.
+      this.scheduleRefill(itemId);
+      return null;
+    }
     const serial = pool.shift() as number;
-    this.enqueue(() => this.fillBuffer(itemId));
+    this.scheduleRefill(itemId);
     return serial;
   }
 
@@ -132,6 +146,26 @@ export class LimitedSupplyService {
       if (serial === null) return; // supply exhausted: leave the buffer short
       pool.push(serial);
     }
+  }
+
+  // Queue one refill for an item, unless one is already pending. Past the cap the
+  // boss keeps rolling and claim() runs on every kill, so without this throttle a
+  // hot empty pool would pile up one doomed lease attempt per kill on the FIFO.
+  // Bounded to a single in-flight refill per item, which is enough: fillBuffer
+  // always tops up to the target, so one pending refill subsumes any number of
+  // claims that arrive before it runs.
+  private scheduleRefill(itemId: string): void {
+    if (this.refillPending.has(itemId)) return;
+    this.refillPending.add(itemId);
+    this.enqueue(async () => {
+      try {
+        await this.fillBuffer(itemId);
+      } finally {
+        // Clear on failure too, or a single rejection would re-create exactly
+        // the permanent stall this scheduling exists to prevent.
+        this.refillPending.delete(itemId);
+      }
+    });
   }
 
   // Chain a background DB task onto the FIFO tail. Failures are logged and swallowed

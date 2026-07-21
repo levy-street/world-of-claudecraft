@@ -236,3 +236,135 @@ describe('limited relics: end-to-end through rollLoot', () => {
     expect(minted).toBe(true);
   });
 });
+
+// Two defects the PR review caught in the append phase, plus the invariant that
+// makes the fix non-obvious: the consolation drop is an ORDINARY item that also
+// lives in the boss's own table, so it must obey the same rules every other drop
+// obeys, while a MINTED relic must obey none of them (skipping or substituting a
+// minted copy would burn a hard-capped serial that can never be re-issued).
+describe('limited relics: the fallback obeys the boss table rules', () => {
+  const FALLBACK = 'soulflame_cowl';
+  const HEROIC_FALLBACK = 'heroic_soulflame_cowl';
+
+  // Roll only the limited phase, with the caller-side context appendLimitedDrops
+  // now takes: the kill's awarded-item set and its heroic resolver.
+  function rollWithContext(opts: {
+    seed: number;
+    heroicClaim: boolean;
+    exhaust: string[];
+    awarded: Set<string>;
+  }): LootSlot[] {
+    const sim = makeSim(1);
+    sim.rng = new Rng(opts.seed);
+    for (const id of opts.exhaust) limitedLedger(sim).set(id, ITEMS[id].limitedSupply ?? 0);
+    const items: LootSlot[] = [];
+    const mob = createMob(-1, MOBS[NYX], MOBS[NYX].minLevel, { x: 0, y: 0, z: 0 });
+    const heroicItem = (id: string): string => {
+      if (!opts.heroicClaim) return id;
+      const variant = ITEMS[`heroic_${id}`];
+      return variant ? variant.id : id;
+    };
+    appendLimitedDrops(
+      sim.ctx,
+      mob,
+      items,
+      opts.heroicClaim,
+      (itemId) => ({ itemId, count: 1 }),
+      opts.awarded,
+      heroicItem,
+    );
+    return items;
+  }
+
+  // Find a seed whose crown roll wins, so the assertions below are not vacuous.
+  function winningSeed(heroicClaim: boolean): number {
+    for (let seed = 1; seed < 400; seed++) {
+      const items = rollWithContext({
+        seed,
+        heroicClaim,
+        exhaust: [CROWN, EMBER],
+        awarded: new Set(),
+      });
+      if (items.some((s) => s.itemId === FALLBACK || s.itemId === HEROIC_FALLBACK)) return seed;
+    }
+    throw new Error('no seed produced a capped-crown fallback');
+  }
+
+  it('does not hand out a second copy of an item the same kill already awarded', () => {
+    const seed = winningSeed(false);
+    // Sanity: with nothing awarded yet, the capped crown yields the fallback.
+    expect(
+      rollWithContext({
+        seed,
+        heroicClaim: false,
+        exhaust: [CROWN, EMBER],
+        awarded: new Set(),
+      }).map((s) => s.itemId),
+    ).toContain(FALLBACK);
+
+    // Now the same kill's normal table already dropped that exact item. The
+    // consolation must stand down rather than duplicate it.
+    const items = rollWithContext({
+      seed,
+      heroicClaim: false,
+      exhaust: [CROWN, EMBER],
+      awarded: new Set([FALLBACK]),
+    });
+    expect(items.filter((s) => s.itemId === FALLBACK)).toHaveLength(0);
+  });
+
+  it('records the consolation it awarded so a later phase cannot duplicate it', () => {
+    const seed = winningSeed(false);
+    const awarded = new Set<string>();
+    const items = rollWithContext({ seed, heroicClaim: false, exhaust: [CROWN, EMBER], awarded });
+    expect(items.map((s) => s.itemId)).toContain(FALLBACK);
+    expect(awarded.has(FALLBACK)).toBe(true);
+  });
+
+  it('upgrades the consolation to its Heroic variant on a heroic claim', () => {
+    expect(ITEMS[HEROIC_FALLBACK]).toBeTruthy();
+    const seed = winningSeed(true);
+    const ids = rollWithContext({
+      seed,
+      heroicClaim: true,
+      exhaust: [CROWN, EMBER],
+      awarded: new Set(),
+    }).map((s) => s.itemId);
+    // The whole point: on heroic, every other drop from this corpse upgrades, so
+    // the consolation must not land a tier below the same item from the normal table.
+    expect(ids).toContain(HEROIC_FALLBACK);
+    expect(ids).not.toContain(FALLBACK);
+  });
+
+  it('never skips or substitutes a MINTED relic, whatever the kill already awarded', () => {
+    // Supply intact, so the crown mints. Even with both the relic id and its
+    // fallback already "awarded", the serialed copy must still be handed over:
+    // dropping it would consume a capped serial and grant nothing.
+    for (let seed = 1; seed < 400; seed++) {
+      const items = rollWithContext({
+        seed,
+        heroicClaim: false,
+        exhaust: [EMBER],
+        awarded: new Set([CROWN, FALLBACK, HEROIC_FALLBACK]),
+      });
+      const crown = items.find((s) => s.itemId === CROWN);
+      if (!crown) continue;
+      expect(crown.instance?.serial).toBe(1);
+      return;
+    }
+    throw new Error('no seed minted a crown');
+  });
+
+  it('leaves the world-boss path (no awarded set, no heroic) unchanged', () => {
+    // The world boss appends personalFor slots per contributor, so a shared
+    // awarded-set would wrongly block a second contributor's copy. That caller
+    // passes neither argument; the phase must still work.
+    const sim = makeSim(1);
+    sim.rng = new Rng(7);
+    const items: LootSlot[] = [];
+    const mob = createMob(-1, MOBS[NYX], MOBS[NYX].minLevel, { x: 0, y: 0, z: 0 });
+    expect(() =>
+      appendLimitedDrops(sim.ctx, mob, items, false, (itemId) => ({ itemId, count: 1 })),
+    ).not.toThrow();
+  });
+});

@@ -238,3 +238,94 @@ describe('LimitedSupplyService: cross-realm cap (one ledger, two realms)', () =>
     expect([...minted].sort((x, y) => x - y)).toEqual([1, 2, 3, 4, 5]);
   });
 });
+
+// A transient lease failure must not permanently stop this realm minting.
+// enqueue() logs and swallows a rejected background write, so before the fix the
+// ONLY refill triggers were init() and a SUCCESSFUL claim: one failed refill left
+// the pool empty, every later claim took the empty-pool early return without
+// scheduling anything, and the relic silently degraded to its fallback forever.
+describe('LimitedSupplyService: buffer recovery after a failed refill', () => {
+  // Wraps the fake so a chosen number of leaseSerial calls reject before it heals.
+  class FlakyDb extends FakeLimitedSupplyDb {
+    failuresLeft = 0;
+    override async leaseSerial(itemId: string, realm: string): Promise<number | null> {
+      if (this.failuresLeft > 0) {
+        this.failuresLeft -= 1;
+        throw new Error('transient lease failure');
+      }
+      return super.leaseSerial(itemId, realm);
+    }
+  }
+
+  it('re-warms the buffer after a transient lease failure instead of stalling forever', async () => {
+    const db = new FlakyDb();
+    const errors: string[] = [];
+    const svc = new LimitedSupplyService(db, 'r1', {
+      bufferTarget: 1,
+      onError: (message) => errors.push(message),
+    });
+    await svc.init(CAPS);
+    expect(svc.bufferedCount(ITEM)).toBe(1);
+
+    // Drain the warm serial, then make its refill fail.
+    expect(svc.claim(ITEM)).toBe(1);
+    db.failuresLeft = 1;
+    await settle();
+    expect(errors.length).toBeGreaterThan(0); // the refill really did fail
+    expect(svc.bufferedCount(ITEM)).toBe(0);
+
+    // The database is healthy again. A claim on the empty pool still returns null
+    // (the sim awards the fallback for THIS kill), but it must schedule a refill.
+    expect(svc.claim(ITEM)).toBeNull();
+    await settle();
+    expect(svc.bufferedCount(ITEM)).toBe(1);
+
+    // The next kill mints again, and supply continues from where it left off.
+    expect(svc.claim(ITEM)).toBe(2);
+  });
+
+  it('keeps retrying so a realm can pick up serials another realm released back', async () => {
+    // One shared ledger, two realm processes. r2 drains the whole supply, so r1's
+    // pool empties on a genuinely exhausted cap. When r2 gracefully releases its
+    // unclaimed buffer, r1 must be able to pick those serials up.
+    const db = new FakeLimitedSupplyDb();
+    const small = [{ itemId: ITEM, supply: 2 }];
+    const r1 = new LimitedSupplyService(db, 'r1', { bufferTarget: 1 });
+    const r2 = new LimitedSupplyService(db, 'r2', { bufferTarget: 1 });
+    await r1.init(small);
+    await r2.init(small);
+
+    // Both hold one buffered serial; drain r1's and let its refill find nothing.
+    expect(r1.claim(ITEM)).not.toBeNull();
+    await settle();
+    expect(r1.bufferedCount(ITEM)).toBe(0);
+    // Exhausted: a claim returns null and does not invent a serial.
+    expect(r1.claim(ITEM)).toBeNull();
+    await settle();
+    expect(r1.bufferedCount(ITEM)).toBe(0);
+
+    // r2 shuts down gracefully and returns its unclaimed serial to the pool.
+    await r2.releaseAll();
+
+    // r1 retries and picks it up rather than staying dark for the process life.
+    expect(r1.claim(ITEM)).toBeNull(); // this claim schedules the retry
+    await settle();
+    expect(r1.bufferedCount(ITEM)).toBe(1);
+    expect(r1.claim(ITEM)).not.toBeNull();
+  });
+
+  it('bounds the retry to one in-flight refill per item on a hot empty pool', async () => {
+    // Past the cap the boss keeps rolling, so claim() is called on every kill.
+    // Each claim must not pile up an unbounded queue of doomed lease attempts.
+    const db = new FakeLimitedSupplyDb();
+    const svc = new LimitedSupplyService(db, 'r1', { bufferTarget: 1 });
+    await svc.init([{ itemId: ITEM, supply: 1 }]);
+    expect(svc.claim(ITEM)).toBe(1);
+    await settle();
+    const before = db.leaseCalls;
+    // Ten claims against an exhausted supply, all before the FIFO drains.
+    for (let i = 0; i < 10; i++) expect(svc.claim(ITEM)).toBeNull();
+    await settle();
+    expect(db.leaseCalls - before).toBeLessThanOrEqual(2);
+  });
+});

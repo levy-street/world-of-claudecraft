@@ -311,10 +311,20 @@ export function rollLoot(
   // draw above, so only a kill of a limited-drop boss adds draws, and always at
   // the tail. A win mints a serialed slot through the shared corpse pool (shared
   // rights, so a raid rolls need/greed on it like any drop).
-  appendLimitedDrops(ctx, mob, items, heroicClaim, (itemId) => ({
-    itemId,
-    count: 1,
-  }));
+  // Hand the phase this kill's awarded set and heroic resolver so the past-cap
+  // consolation is deduped and upgraded exactly like a normal table drop.
+  appendLimitedDrops(
+    ctx,
+    mob,
+    items,
+    heroicClaim,
+    (itemId) => ({
+      itemId,
+      count: 1,
+    }),
+    awardedItemIds,
+    heroicItem,
+  );
   if (copper > 0 || items.length > 0) {
     mob.loot = { copper, items };
     mob.lootable = true;
@@ -328,23 +338,55 @@ export function rollLoot(
 // personalFor slot in rollWorldBossLoot); the minted serial is layered onto it.
 // Entries flagged heroicOnly are skipped WITHOUT drawing rng outside a heroic
 // claim, so a normal-difficulty kill's draw order never depends on them.
+//
+// A resolved drop is one of two very different things, and they take opposite
+// paths below:
+//
+//   - A MINTED relic (carries drop.instance). Globally unique by serial, drawn
+//     from a hard cap. It is never deduped and never variant-swapped: the serial
+//     is already spent by the time we get here, so skipping the push would burn
+//     one of a fixed world supply and hand the player nothing in return.
+//   - The CONSOLATION past the cap (no instance). An ordinary item that, for
+//     every registered fallback, ALSO lives in this same boss's loot table. It
+//     must therefore obey the two rules the normal roll obeys: upgrade to the
+//     Heroic variant on a heroic claim, and never be a second copy of something
+//     this kill already awarded.
+//
+// `awardedItemIds` and `heroicItem` come from the caller's roll (rollLoot).
+// rollWorldBossLoot passes neither: its drops are personalFor slots, one per
+// contributor, so a shared awarded-set would wrongly suppress a second
+// contributor's copy, and a world boss is never a heroic claim.
 export function appendLimitedDrops(
   ctx: SimContext,
   mob: Entity,
   items: LootSlot[],
   heroicClaim: boolean,
   makeSlot: (itemId: string) => LootSlot,
+  awardedItemIds?: Set<string>,
+  heroicItem?: (id: string) => string,
 ): void {
   const entries = LIMITED_DROPS[mob.templateId];
   if (!entries) return;
   for (const entry of entries) {
     if (entry.heroicOnly && !heroicClaim) continue;
+    // The chance draw stays ahead of every branch below, so the decisions added
+    // here can never shift the global rng draw order (the parity goldens).
     if (!ctx.rng.chance(entry.chance)) continue;
     const drop = resolveRolledDrop(ctx, entry.itemId);
     if (!drop) continue;
-    const slot = makeSlot(drop.itemId);
-    if (drop.instance) slot.instance = drop.instance;
-    items.push(slot);
+    if (drop.instance) {
+      const slot = makeSlot(drop.itemId);
+      slot.instance = drop.instance;
+      items.push(slot);
+      continue;
+    }
+    const fallbackId = heroicItem ? heroicItem(drop.itemId) : drop.itemId;
+    if (awardedItemIds?.has(drop.itemId) || awardedItemIds?.has(fallbackId)) continue;
+    items.push(makeSlot(fallbackId));
+    // Register BOTH ids, matching the roll-group path: a later phase keyed on
+    // either the base or the heroic id must see this copy as already awarded.
+    awardedItemIds?.add(drop.itemId);
+    awardedItemIds?.add(fallbackId);
   }
 }
 
