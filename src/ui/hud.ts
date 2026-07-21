@@ -126,6 +126,7 @@ import { type AuraEffectInput, auraEffectDescriptor } from './aura_effect';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import { type AurasDeps, createAurasView } from './auras_view';
 import { attachAvatarFallback } from './avatar_fallback';
+import { BagItemActionMenu, CTX_MENU_PICKER_CLASS } from './bag_item_action_menu';
 import { bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
 import { BankWindow } from './bank_window';
@@ -191,12 +192,18 @@ import {
 import { DeedsWindow } from './deeds_window';
 import { DevCommandWindow } from './dev_command_window';
 import { devTierByIndex, devTierDisplayName } from './dev_tier';
+import { bindDialogKeyActivation } from './dialog_key_activation';
 import { discordRoleTagLabel } from './discord_role_tag';
 import { discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
 import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
 import { emoteIconUrl } from './emote_icons';
+import {
+  applyEnchantResultToast,
+  disenchantResultToast,
+  salvageResultToast,
+} from './enchanting_view';
 import {
   classDisplayName,
   dungeonDisplayName,
@@ -3560,6 +3567,31 @@ export class Hud {
     isTouchHud: () => document.body.classList.contains('mobile-touch'),
     markEquipDropTargets: (itemId) => this.charWindow.markDropTargets(itemId),
     dropOnEquipSlot: (itemId, slot) => this.charWindow.dropOnEquipSlot(itemId, slot),
+    openItemActionMenu: (def, itemId, x, y, runDefault) =>
+      this.bagItemActionMenu.open(def, itemId, x, y, runDefault),
+  });
+  // Bag-item action menu (Professions 2.0 Phase 13): the right-click / touch
+  // menu that surfaces Disenchant / Salvage / Apply Enchant on a bag stack.
+  // Composes the shared #ctx-menu popup family (placePopupAt + keepPopupOnScreen,
+  // bindContextMenuActions) and the one confirm-dialog family; the bags window
+  // opens it via the openItemActionMenu dep above.
+  private readonly bagItemActionMenu = new BagItemActionMenu({
+    world: () => this.sim,
+    ctxMenu: {
+      element: () => $('#ctx-menu'),
+      place: (element, x, y, reserveRight, reserveBottom) => {
+        this.placePopupAt(element, x, y, reserveRight, reserveBottom);
+        this.keepPopupOnScreen(element);
+      },
+      bind: (onActivate) => this.bindContextMenuActions(onActivate),
+    },
+    confirmDialog: (title, body, okText, cancelText, onOk) =>
+      this.confirmDialog(title, body, okText, cancelText, onOk),
+    slotName: (slot) => itemSlotName(slot),
+    isMobileLayout: () => this.isMobileLayout(),
+    afterAction: () => {
+      if ($('#bags').style.display !== 'none') this.renderBags();
+    },
   });
   // World Market window painter (market_view.ts core + market_window.ts painter).
   // It composes the shared presentation bag (icon/money/tooltip) and owns the
@@ -9006,6 +9038,48 @@ export class Hud {
           this.showError(t(gatherDowngradeLineKey(ev.lost)));
           break;
         }
+        case 'disenchantResult': {
+          // Enchanting disenchant outcome (Professions 2.0 Phase 13): text-free,
+          // so enchanting_view.ts maps the event to its key + sink and the item
+          // name interpolates. The grant hub's own 'loot' events already print
+          // the material yield lines, so success is a distinct action line (the
+          // gatherResult pattern), never a second receive notification.
+          const toast = disenchantResultToast(ev);
+          const item = ITEMS[ev.itemId];
+          const params = { item: item ? itemDisplayName(item) : ev.itemId };
+          if (toast.sink === 'log') this.log(t(toast.key, params), '#7fdc4f');
+          else this.showError(t(toast.key));
+          break;
+        }
+        case 'salvageResult': {
+          // Enchanting salvage outcome (Professions 2.0 Phase 13): same shape as
+          // disenchantResult above.
+          const toast = salvageResultToast(ev);
+          const item = ITEMS[ev.itemId];
+          const params = { item: item ? itemDisplayName(item) : ev.itemId };
+          if (toast.sink === 'log') this.log(t(toast.key, params), '#7fdc4f');
+          else this.showError(t(toast.key));
+          break;
+        }
+        case 'enchantResult': {
+          // Apply-enchant outcome (Professions 2.0 Phase 13): the success line
+          // names the item AND the enchant (enchantName.<id>, its first render
+          // sink); every deny is an error toast.
+          const toast = applyEnchantResultToast(ev);
+          const item = ITEMS[ev.itemId];
+          if (toast.sink === 'log') {
+            this.log(
+              t(toast.key, {
+                item: item ? itemDisplayName(item) : ev.itemId,
+                enchant: t(`hudChrome.enchantName.${ev.enchantId}` as TranslationKey),
+              }),
+              '#7fdc4f',
+            );
+          } else {
+            this.showError(t(toast.key));
+          }
+          break;
+        }
         case 'fishingResult': {
           // Reel-in feedback line (Professions 2.0 Phase 11), colored by the
           // caught item's quality. Identical on every graphics tier (player
@@ -10406,6 +10480,7 @@ export class Hud {
       'Target is too far away to trade.': 'hud.errors.tradeTooFar',
       'The trade request has expired.': 'hud.errors.tradeExpired',
       'Trade failed: items or money no longer available.': 'hud.errors.tradeFailed',
+      'That item is bound and cannot be traded.': 'hud.errors.tradeBound',
       'That quest is not available.': 'questUi.errors.unavailable',
       'That quest is not in your log.': 'questUi.errors.notInLog',
       'That quest is not complete.': 'questUi.errors.incomplete',
@@ -11787,6 +11862,7 @@ export class Hud {
     // both or a purchase confirmation opens invisibly underneath.
     el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 95));
     this.confirmTrap = this.focusManager.open({ root: () => el });
+    bindDialogKeyActivation(el);
     el.querySelector<HTMLElement>('[data-ok]')?.focus();
     const close = () => {
       this.confirmTrap?.release();
@@ -11848,6 +11924,7 @@ export class Hud {
       `</div>`;
     document.body.appendChild(el);
     this.confirmTrap = this.focusManager.open({ root: () => el });
+    bindDialogKeyActivation(el);
     const input = el.querySelector('.cd-input') as HTMLInputElement | HTMLTextAreaElement;
     const close = () => {
       this.confirmTrap?.release();
@@ -12278,6 +12355,7 @@ export class Hud {
 
   private openSelfContextMenu(x: number, y: number, opener: HTMLElement | null = null): void {
     const el = $('#ctx-menu');
+    el.classList.remove(CTX_MENU_PICKER_CLASS);
     this.ctxMenuOpener = opener;
     const party = this.sim.partyInfo;
     let html = `<div class="ctx-title ctx-title-player">${portraitChipHtml({ cls: this.sim.cfg.playerClass, skin: this.sim.player.skin ?? 0, name: this.sim.player.name, variant: 'sm' })}<span class="ctx-title-name">${esc(this.sim.player.name)}</span></div>`;
@@ -12430,6 +12508,7 @@ export class Hud {
 
   openContextMenu(pid: number, name: string, x: number, y: number): void {
     const el = $('#ctx-menu');
+    el.classList.remove(CTX_MENU_PICKER_CLASS);
     const party = this.sim.partyInfo;
     const isLeader = party?.leader === this.sim.playerId;
     const isMember = !!party?.members.some((m) => m.pid === pid);
@@ -12674,6 +12753,7 @@ export class Hud {
   openMarkerMenu(entityId: number, name: string, x: number, y: number): void {
     if (!this.sim.partyInfo) return;
     const el = $('#ctx-menu');
+    el.classList.remove(CTX_MENU_PICKER_CLASS);
     const current = this.sim.markerFor(entityId);
     let html = `<div class="ctx-title">${esc(name)}</div>`;
     for (let i = 0; i < RAID_MARKER_LABEL_KEYS.length; i++) {
@@ -12708,6 +12788,7 @@ export class Hud {
 
   openPetMenu(_entityId: number, name: string, dead: boolean, x: number, y: number): void {
     const el = $('#ctx-menu');
+    el.classList.remove(CTX_MENU_PICKER_CLASS);
     const isWarlock = this.sim.cfg.playerClass === 'warlock';
     let html = `<div class="ctx-title">${esc(name)}</div>`;
     html += `<div class="ctx-item" data-act="rename">${esc(t('hud.pet.rename'))}</div>`;
@@ -12754,6 +12835,7 @@ export class Hud {
     opener?: HTMLElement,
   ): void {
     const el = $('#ctx-menu');
+    el.classList.remove(CTX_MENU_PICKER_CLASS);
     // Clicking the same name twice closes the menu. Without this branch, the
     // outside-click dismiss refuses to close a menu whose opener was clicked
     // (it treats the opener as "inside"), so the second click would silently
@@ -12994,7 +13076,9 @@ export class Hud {
   }
 
   closeContextMenu(): void {
-    $('#ctx-menu').style.display = 'none';
+    const el = $('#ctx-menu');
+    el.style.display = 'none';
+    el.classList.remove(CTX_MENU_PICKER_CLASS);
     this.ctxMenuOpener = null;
   }
 

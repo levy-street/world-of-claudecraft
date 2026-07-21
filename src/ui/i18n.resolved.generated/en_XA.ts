@@ -2166,6 +2166,49 @@ export const en_XA: EnTranslations = {
       "tailoring": "[Ţáíļóŕíñĝ]",
       "leatherworking": "[Ļéáţĥéŕŵóŕķíñĝ]"
     },
+    "enchantName": {
+      "enchant_weapon_might": "[Éñçĥáñţ Ŵéáþóñ - Ɱíĝĥţ]",
+      "enchant_weapon_intellect": "[Éñçĥáñţ Ŵéáþóñ - Šþéļļþóŵéŕ]",
+      "enchant_helmet_fortitude": "[Éñçĥáñţ Ĥéļɱéţ - Ƒóŕţíţúðé]",
+      "enchant_neck_spirit": "[Éñçĥáñţ Ñéçķļáçé - Šþíŕíţ]",
+      "enchant_shoulder_agility": "[Éñçĥáñţ Šĥóúļðéŕš - Áĝíļíţý]",
+      "enchant_chest_stamina": "[Éñçĥáñţ Çĥéšţ - Šţáɱíñá]",
+      "enchant_waist_stamina": "[Éñçĥáñţ Ɓéļţ - Šţáɱíñá]",
+      "enchant_legs_stamina": "[Éñçĥáñţ Ļéĝš - Šţáɱíñá]",
+      "enchant_gloves_agility": "[Éñçĥáñţ Ĝļóʋéš - Áĝíļíţý]",
+      "enchant_gloves_intellect": "[Éñçĥáñţ Ĝļóʋéš - Šþéļļþóŵéŕ]",
+      "enchant_feet_agility": "[Éñçĥáñţ Ɓóóţš - Áĝíļíţý]",
+      "enchant_ring_spirit": "[Éñçĥáñţ Ŕíñĝ - Šþíŕíţ]",
+      "enchant_weapon_agility": "[Éñçĥáñţ Ŵéáþóñ - Áĝíļíţý]",
+      "enchant_helmet_intellect": "[Éñçĥáñţ Ĥéļɱéţ - Íñţéļļéçţ]",
+      "enchant_helmet_armor": "[Éñçĥáñţ Ĥéļɱéţ - Ŕéíñƒóŕçéɱéñţ]",
+      "enchant_neck_intellect": "[Éñçĥáñţ Ñéçķļáçé - Íñţéļļéçţ]",
+      "enchant_neck_agility": "[Éñçĥáñţ Ñéçķļáçé - Áĝíļíţý]",
+      "enchant_shoulder_strength": "[Éñçĥáñţ Šĥóúļðéŕš - Šţŕéñĝţĥ]",
+      "enchant_shoulder_intellect": "[Éñçĥáñţ Šĥóúļðéŕš - Íñţéļļéçţ]",
+      "enchant_chest_spirit": "[Éñçĥáñţ Çĥéšţ - Šþíŕíţ]",
+      "enchant_chest_armor": "[Éñçĥáñţ Çĥéšţ - Ŕéíñƒóŕçéɱéñţ]",
+      "enchant_waist_strength": "[Éñçĥáñţ Ɓéļţ - Šţŕéñĝţĥ]",
+      "enchant_waist_agility": "[Éñçĥáñţ Ɓéļţ - Áĝíļíţý]",
+      "enchant_legs_intellect": "[Éñçĥáñţ Ļéĝš - Íñţéļļéçţ]",
+      "enchant_gloves_strength": "[Éñçĥáñţ Ĝļóʋéš - Šţŕéñĝţĥ]",
+      "enchant_feet_strength": "[Éñçĥáñţ Ɓóóţš - Šţŕéñĝţĥ]",
+      "enchant_feet_stamina": "[Éñçĥáñţ Ɓóóţš - Šţáɱíñá]",
+      "enchant_ring_strength": "[Éñçĥáñţ Ŕíñĝ - Šţŕéñĝţĥ]",
+      "enchant_ring_agility": "[Éñçĥáñţ Ŕíñĝ - Áĝíļíţý]",
+      "enchant_ring_intellect": "[Éñçĥáñţ Ŕíñĝ - Íñţéļļéçţ]",
+      "enchant_weapon_greater_might": "[Éñçĥáñţ Ŵéáþóñ - Ĝŕéáţéŕ Ɱíĝĥţ]",
+      "enchant_weapon_greater_spellpower": "[Éñçĥáñţ Ŵéáþóñ - Ĝŕéáţéŕ Šþéļļþóŵéŕ]",
+      "enchant_helmet_greater_fortitude": "[Éñçĥáñţ Ĥéļɱéţ - Ĝŕéáţéŕ Ƒóŕţíţúðé]",
+      "enchant_chest_greater_stamina": "[Éñçĥáñţ Çĥéšţ - Ĝŕéáţéŕ Šţáɱíñá]",
+      "enchant_legs_greater_stamina": "[Éñçĥáñţ Ļéĝš - Ĝŕéáţéŕ Šţáɱíñá]",
+      "enchant_gloves_greater_agility": "[Éñçĥáñţ Ĝļóʋéš - Ĝŕéáţéŕ Áĝíļíţý]",
+      "enchant_weapon_runed_edge": "[Éñçĥáñţ Ŵéáþóñ - Ŕúñéð Éðĝé]",
+      "enchant_weapon_runed_focus": "[Éñçĥáñţ Ŵéáþóñ - Ŕúñéð Ƒóçúš]",
+      "enchant_chest_runeweave": "[Éñçĥáñţ Çĥéšţ - Ŕúñéŵéáʋé]",
+      "enchant_legs_runed_hide": "[Éñçĥáñţ Ļéĝš - Ŕúñéð Ĥíðé]",
+      "enchant_helmet_runed_links": "[Éñçĥáñţ Ĥéļɱéţ - Ŕúñéð Ļíñķš]"
+    },
     "professions": {
       "title": "[Þŕóƒéššíóñš]",
       "close": "[Çļóšé þŕóƒéššíóñš]",
@@ -2276,6 +2319,37 @@ export const en_XA: EnTranslations = {
       "gatheredBy": "[Ĝáţĥéŕéð ƀý {name}]",
       "masterworkSeal": "[Ɱášţéŕŵóŕķ]",
       "enchantedLine": "[Éñçĥáñţéð]"
+    },
+    "itemMenu": {
+      "use": "[Úšé]",
+      "equip": "[Éɋúíþ]",
+      "disenchant": "[Ðíšéñçĥáñţ]",
+      "salvage": "[Šáļʋáĝé]",
+      "applyEnchant": "[Áþþļý Éñçĥáñţ]"
+    },
+    "enchanting": {
+      "disenchantedLine": "[Ýóú ðíšéñçĥáñţ {item}.]",
+      "salvagedLine": "[Ýóú šáļʋáĝé {item}.]",
+      "enchantAppliedLine": "[Ýóú éñçĥáñţ {item} ŵíţĥ {enchant}.]",
+      "notHeld": "[Ýóú ðó ñóţ ĥáʋé ţĥáţ íţéɱ.]",
+      "notDisenchantable": "[Ýóú çáññóţ ðíšéñçĥáñţ ţĥáţ.]",
+      "notSalvageable": "[Ýóú çáññóţ šáļʋáĝé ţĥáţ.]",
+      "disenchantThrottled": "[Ýóú áŕé ðíšéñçĥáñţíñĝ ţóó ɋúíçķļý. Ŵáíţ á ɱóɱéñţ áñð ţŕý áĝáíñ.]",
+      "salvageThrottled": "[Ýóú áŕé šáļʋáĝíñĝ ţóó ɋúíçķļý. Ŵáíţ á ɱóɱéñţ áñð ţŕý áĝáíñ.]",
+      "enchantThrottled": "[Ýóú áŕé éñçĥáñţíñĝ ţóó ɋúíçķļý. Ŵáíţ á ɱóɱéñţ áñð ţŕý áĝáíñ.]",
+      "enchantWrongSlot": "[Ţĥáţ éñçĥáñţ çáññóţ ƀé áþþļíéð ţó ţĥáţ íţéɱ.]",
+      "enchantUnknown": "[Ţĥáţ éñçĥáñţ ðóéš ñóţ éẋíšţ.]",
+      "enchantInsufficient": "[Ýóú ðó ñóţ ĥáʋé ţĥé ɱáţéŕíáļš ƒóŕ ţĥáţ éñçĥáñţ.]",
+      "disenchantConfirmTitle": "[Ðíšéñçĥáñţ {item}?]",
+      "disenchantConfirmBody": "[Ţĥíš ðéšţŕóýš {item} áñð ýíéļðš áŕçáñé ɱáţéŕíáļš. Ţĥíš çáññóţ ƀé úñðóñé.]",
+      "disenchantConfirmBodySpecial": "[Ţĥíš ðéšţŕóýš á šþéçíáļ çóþý óƒ {item} (šíĝñéð, ɱášţéŕŵóŕķ, óŕ éñçĥáñţéð) áñð ýíéļðš áŕçáñé ɱáţéŕíáļš. Ţĥíš çáññóţ ƀé úñðóñé.]",
+      "salvageConfirmTitle": "[Šáļʋáĝé {item}?]",
+      "salvageConfirmBody": "[Ţĥíš ðéšţŕóýš {item} áñð ýíéļðš çŕáƒţíñĝ ɱáţéŕíáļš. Ţĥíš çáññóţ ƀé úñðóñé.]",
+      "salvageConfirmBodySpecial": "[Ţĥíš ðéšţŕóýš á šþéçíáļ çóþý óƒ {item} (šíĝñéð, ɱášţéŕŵóŕķ, óŕ éñçĥáñţéð) áñð ýíéļðš çŕáƒţíñĝ ɱáţéŕíáļš. Ţĥíš çáññóţ ƀé úñðóñé.]",
+      "pickerTitle": "[Áþþļý Éñçĥáñţ]",
+      "targetTitle": "[Çĥóóšé áñ íţéɱ ţó éñçĥáñţ]",
+      "noEnchants": "[Ñó éñçĥáñţ úšéš ţĥíš ŕéáĝéñţ.]",
+      "noTargets": "[Ñó éļíĝíƀļé íţéɱ ţó éñçĥáñţ.]"
     },
     "training": {
       "title": "[Ţŕáíñíñĝ: {name}]",
@@ -5714,7 +5788,8 @@ export const en_XA: EnTranslations = {
       "tradeInProgress": "[Á ţŕáðé íš áļŕéáðý íñ þŕóĝŕéšš.]",
       "tradeTooFar": "[Ţáŕĝéţ íš ţóó ƒáŕ áŵáý ţó ţŕáðé.]",
       "tradeExpired": "[Ţĥé ţŕáðé ŕéɋúéšţ ĥáš éẋþíŕéð.]",
-      "tradeFailed": "[Ţŕáðé ƒáíļéð: íţéɱš óŕ ɱóñéý ñó ļóñĝéŕ áʋáíļáƀļé.]"
+      "tradeFailed": "[Ţŕáðé ƒáíļéð: íţéɱš óŕ ɱóñéý ñó ļóñĝéŕ áʋáíļáƀļé.]",
+      "tradeBound": "[Ţĥáţ íţéɱ íš ƀóúñð áñð çáññóţ ƀé ţŕáðéð.]"
     },
     "logs": {
       "standUp": "[Ýóú šţáñð úþ.]",
@@ -8607,6 +8682,21 @@ export const en_XA: EnTranslations = {
       },
       "wildsoul_maul": {
         "name": "[Ŵíļðšóúļ Ɱáúļ]"
+      },
+      "resonant_thread": {
+        "name": "[Ŕéšóñáñţ Ţĥŕéáð]"
+      },
+      "resonant_hide": {
+        "name": "[Ŕéšóñáñţ Ĥíðé]"
+      },
+      "resonant_links": {
+        "name": "[Ŕéšóñáñţ Ļíñķš]"
+      },
+      "resonant_steel": {
+        "name": "[Ŕéšóñáñţ Šţééļ]"
+      },
+      "resonant_timber": {
+        "name": "[Ŕéšóñáñţ Ţíɱƀéŕ]"
       },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"

@@ -2166,6 +2166,49 @@ export const ru_RU: EnTranslations = {
       "tailoring": "Портняжное дело",
       "leatherworking": "Кожевничество"
     },
+    "enchantName": {
+      "enchant_weapon_might": "Зачарование оружия - Мощь",
+      "enchant_weapon_intellect": "Зачарование оружия - Сила заклинаний",
+      "enchant_helmet_fortitude": "Зачарование шлема - Стойкость",
+      "enchant_neck_spirit": "Зачарование ожерелья - Дух",
+      "enchant_shoulder_agility": "Зачарование наплечников - Ловкость",
+      "enchant_chest_stamina": "Зачарование нагрудника - Выносливость",
+      "enchant_waist_stamina": "Зачарование пояса - Выносливость",
+      "enchant_legs_stamina": "Зачарование поножей - Выносливость",
+      "enchant_gloves_agility": "Зачарование перчаток - Ловкость",
+      "enchant_gloves_intellect": "Зачарование перчаток - Сила заклинаний",
+      "enchant_feet_agility": "Зачарование сапог - Ловкость",
+      "enchant_ring_spirit": "Зачарование кольца - Дух",
+      "enchant_weapon_agility": "Зачарование оружия - Ловкость",
+      "enchant_helmet_intellect": "Зачарование шлема - Интеллект",
+      "enchant_helmet_armor": "Зачарование шлема - Укрепление",
+      "enchant_neck_intellect": "Зачарование ожерелья - Интеллект",
+      "enchant_neck_agility": "Зачарование ожерелья - Ловкость",
+      "enchant_shoulder_strength": "Зачарование наплечников - Сила",
+      "enchant_shoulder_intellect": "Зачарование наплечников - Интеллект",
+      "enchant_chest_spirit": "Зачарование нагрудника - Дух",
+      "enchant_chest_armor": "Зачарование нагрудника - Укрепление",
+      "enchant_waist_strength": "Зачарование пояса - Сила",
+      "enchant_waist_agility": "Зачарование пояса - Ловкость",
+      "enchant_legs_intellect": "Зачарование поножей - Интеллект",
+      "enchant_gloves_strength": "Зачарование перчаток - Сила",
+      "enchant_feet_strength": "Зачарование сапог - Сила",
+      "enchant_feet_stamina": "Зачарование сапог - Выносливость",
+      "enchant_ring_strength": "Зачарование кольца - Сила",
+      "enchant_ring_agility": "Зачарование кольца - Ловкость",
+      "enchant_ring_intellect": "Зачарование кольца - Интеллект",
+      "enchant_weapon_greater_might": "Зачарование оружия - Высшая мощь",
+      "enchant_weapon_greater_spellpower": "Зачарование оружия - Высшая сила заклинаний",
+      "enchant_helmet_greater_fortitude": "Зачарование шлема - Высшая стойкость",
+      "enchant_chest_greater_stamina": "Зачарование нагрудника - Высшая выносливость",
+      "enchant_legs_greater_stamina": "Зачарование поножей - Высшая выносливость",
+      "enchant_gloves_greater_agility": "Зачарование перчаток - Высшая ловкость",
+      "enchant_weapon_runed_edge": "Зачарование оружия - Рунная кромка",
+      "enchant_weapon_runed_focus": "Зачарование оружия - Рунное средоточие",
+      "enchant_chest_runeweave": "Зачарование нагрудника - Рунное плетение",
+      "enchant_legs_runed_hide": "Зачарование поножей - Рунная шкура",
+      "enchant_helmet_runed_links": "Зачарование шлема - Рунные звенья"
+    },
     "professions": {
       "title": "Профессии",
       "close": "Закрыть профессии",
@@ -2276,6 +2319,37 @@ export const ru_RU: EnTranslations = {
       "gatheredBy": "Сборщик: {name}",
       "masterworkSeal": "Шедевр",
       "enchantedLine": "Зачаровано"
+    },
+    "itemMenu": {
+      "use": "Use",
+      "equip": "Надеть",
+      "disenchant": "Распылить",
+      "salvage": "Разобрать",
+      "applyEnchant": "Наложить чары"
+    },
+    "enchanting": {
+      "disenchantedLine": "Вы распыляете {item}.",
+      "salvagedLine": "Вы разбираете {item}.",
+      "enchantAppliedLine": "Вы накладываете на {item} чары «{enchant}».",
+      "notHeld": "У вас нет этого предмета.",
+      "notDisenchantable": "Это нельзя распылить.",
+      "notSalvageable": "Это нельзя разобрать.",
+      "disenchantThrottled": "Вы распыляете слишком быстро. Подождите немного и попробуйте снова.",
+      "salvageThrottled": "Вы разбираете слишком быстро. Подождите немного и попробуйте снова.",
+      "enchantThrottled": "Вы зачаровываете слишком быстро. Подождите немного и попробуйте снова.",
+      "enchantWrongSlot": "Эти чары нельзя наложить на этот предмет.",
+      "enchantUnknown": "Таких чар не существует.",
+      "enchantInsufficient": "У вас нет материалов для этих чар.",
+      "disenchantConfirmTitle": "Распылить {item}?",
+      "disenchantConfirmBody": "Это уничтожит {item} и даст тайные материалы. Действие необратимо.",
+      "disenchantConfirmBodySpecial": "Это уничтожит особый экземпляр предмета {item} (подписанный, шедевр или зачарованный) и даст тайные материалы. Действие необратимо.",
+      "salvageConfirmTitle": "Разобрать {item}?",
+      "salvageConfirmBody": "Это уничтожит {item} и даст ремесленные материалы. Действие необратимо.",
+      "salvageConfirmBodySpecial": "Это уничтожит особый экземпляр предмета {item} (подписанный, шедевр или зачарованный) и даст ремесленные материалы. Действие необратимо.",
+      "pickerTitle": "Наложить чары",
+      "targetTitle": "Выберите предмет для зачарования",
+      "noEnchants": "Нет чар, использующих этот реагент.",
+      "noTargets": "Нет подходящего предмета для зачарования."
     },
     "training": {
       "title": "Обучение: {name}",
@@ -5714,7 +5788,8 @@ export const ru_RU: EnTranslations = {
       "tradeInProgress": "Обмен уже идет.",
       "tradeTooFar": "Цель слишком далеко для обмена.",
       "tradeExpired": "Запрос обмена истек.",
-      "tradeFailed": "Обмен не удался: предметы или деньги больше недоступны."
+      "tradeFailed": "Обмен не удался: предметы или деньги больше недоступны.",
+      "tradeBound": "Этот предмет привязан и не может быть обменян."
     },
     "logs": {
       "standUp": "Вы встаете.",
@@ -8607,6 +8682,21 @@ export const ru_RU: EnTranslations = {
       },
       "wildsoul_maul": {
         "name": "Молот дикой души"
+      },
+      "resonant_thread": {
+        "name": "Резонирующая нить"
+      },
+      "resonant_hide": {
+        "name": "Резонирующая шкура"
+      },
+      "resonant_links": {
+        "name": "Резонирующие звенья"
+      },
+      "resonant_steel": {
+        "name": "Резонирующая сталь"
+      },
+      "resonant_timber": {
+        "name": "Резонирующая древесина"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

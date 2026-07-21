@@ -63,6 +63,11 @@ describe('disenchant', () => {
   });
 
   it('yield scales with rarity: the qualityIdx AND derived-tier terms make an epic strictly outyield a common with the same rng draw', () => {
+    // Phase 13 scope note: this pins the disenchantYield HELPER, which since
+    // the typed-reagent amendment is the SUB-RARE arm only (resolveDisenchant
+    // grants fixed counts at rare+; the resolve-level per-quality counts are
+    // pinned in professions_typed_reagents.test.ts). The helper keeps both
+    // terms protected exactly as before.
     // Same seed for both, so the rng draws (the +0/+1 bonus term) line up
     // identically; only quality differs. Both fake items have no explicit
     // requiredLevel and no derivable itemSourceLevel, so requiredLevelFor
@@ -90,7 +95,9 @@ describe('disenchant', () => {
     sim.addItem('eastbrook_arming_sword', 1, sim.playerId);
     sim.disenchantItem('eastbrook_arming_sword');
     expect(sim.lastDisenchantResult?.ok).toBe(true);
-    expect(disenchantItem(sim.ctx, 'nonexistent_item_id').ok).toBe(false);
+    const denied = disenchantItem(sim.ctx, 'nonexistent_item_id');
+    expect(denied.ok).toBe(false);
+    expect(denied.reason).toBe('unknown_item');
   });
 
   // Regression for review #1712 point 2: crafting.ts grants every rare-or-better

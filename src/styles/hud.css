@@ -4933,6 +4933,39 @@
     background-repeat: no-repeat;
     background-position: center;
   }
+  /* Bag-item action menu (Professions 2.0 Phase 13): the Apply Enchant picker
+     rows carry a dim meta sub-line (target slot + reagent affordability), and an
+     unaffordable enchant row is shown but not selectable (aria-disabled), so the
+     player can see what a reagent unlocks before they have it. */
+  #ctx-menu .ctx-item-meta {
+    display: block;
+    margin-top: 2px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  #ctx-menu .ctx-item[aria-disabled="true"] {
+    color: var(--color-text-muted);
+    cursor: default;
+  }
+  #ctx-menu .ctx-item[aria-disabled="true"]:hover {
+    background: none;
+    color: var(--color-text-muted);
+  }
+  /* Apply Enchant picker sizing (Phase 13 QA, maintainer direction): the full
+     enchant list plus per-row meta sub-lines outgrew the shared popup's natural
+     size and ran nearly the whole viewport. The picker states alone (the
+     painter-managed ctx-menu-picker modifier) take a wider, height-capped,
+     scrolling box; the shared base block above, and with it the player/chat
+     menus, keeps its exact sizing. placePopupAt reserves the capped box and
+     keepPopupOnScreen still clamps it fully on-screen. */
+  #ctx-menu.ctx-menu-picker {
+    box-sizing: border-box;
+    min-width: 280px;
+    max-width: 400px;
+    max-height: min(60vh, 560px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
 
   /* ---------- ai account tag ---------- */
   /* ONE class for all three surfaces the operator-set AI mark lands on: the chat

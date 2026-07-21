@@ -1,3 +1,4 @@
+import { CTX_MENU_PICKER_CLASS } from '../../bag_item_action_menu';
 import { esc } from '../../esc';
 import { type TranslationKey, t } from '../../i18n';
 import { encodeItemLink, encodeQuestLink } from '../quest/quest_link';
@@ -302,6 +303,7 @@ export class ChatWindowController {
 
   private openChannelMenu(x: number, y: number, opener: HTMLElement): void {
     const menu = this.deps.contextMenu.element;
+    menu.classList.remove(CTX_MENU_PICKER_CLASS);
     this.deps.contextMenu.setOpener(opener);
     let html = `<div class="ctx-title">${esc(t('hud.core.chatChannels.addTitle'))}</div>`;
     const checkMark = ` ${String.fromCharCode(0x2713)}`;

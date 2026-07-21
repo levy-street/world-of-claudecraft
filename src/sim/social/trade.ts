@@ -22,6 +22,43 @@ import { dist2d, type InvSlot, type ItemInstancePayload } from '../types';
 // the drift sweep cancels an open session once they wander past TRADE_RANGE + 4.
 const TRADE_RANGE = 10;
 
+// The one trade-locked predicate (Professions 2.0 Phase 13). A copy is
+// trade-locked once its payload carries boundTo: a bound instance stays with
+// its owner and is never offered, revalidated-in, or consumed by a swap.
+// (bindOnTrade only ARMS the lock; boundTo is the applied lock, stamped on the
+// recipient's copy in grantOffer below.) Used at the three trade sites: the
+// offerable-count gate in tradeSetOffer, the confirm-time revalidation in
+// offerCovered, and the removal preference in removeOffer/fitsAfterSwap.
+function isTradeLocked(instance: ItemInstancePayload | undefined): boolean {
+  return instance?.boundTo !== undefined;
+}
+
+// How many held copies of itemId are trade-locked (boundTo set). A bound copy
+// is always instanced, so this only ever counts instanced slots; a plain stack
+// never contributes. Kept as a SUBTRACTION from ctx.countItem (offerableCount
+// below) rather than a direct unbound sum so the count stays correct against
+// any inventory hub: the offline Sim keeps its slots on meta.inventory, but a
+// decoupled test ctx may store copies elsewhere and leave meta.inventory empty,
+// where the bound count is simply zero and every copy is offerable.
+function boundCount(meta: PlayerMeta, itemId: string): number {
+  let n = 0;
+  // `?? []`: a decoupled test ctx (tests/heroic_soulbound.test.ts's fake) may
+  // model counts elsewhere and carry NO inventory array at all; per the
+  // documented intent above, its bound count is simply zero.
+  for (const s of meta.inventory ?? []) {
+    if (s.itemId === itemId && isTradeLocked(s.instance)) n += s.count;
+  }
+  return n;
+}
+
+// The count of itemId the player may actually trade: the raw held total minus
+// the trade-locked copies. tradeSetOffer and offerCovered gate on this instead
+// of the raw held total so a bound copy is never offered nor passes final
+// validation.
+function offerableCount(ctx: SimContext, meta: PlayerMeta, itemId: string): number {
+  return ctx.countItem(itemId, meta.entityId) - boundCount(meta, itemId);
+}
+
 export function tradeRequest(ctx: SimContext, targetPid: number, pid?: number): void {
   const r = ctx.resolve(pid);
   const target = ctx.players.get(targetPid);
@@ -106,10 +143,24 @@ export function tradeSetOffer(
     merged.set(slot.itemId, (merged.get(slot.itemId) ?? 0) + count);
   }
   const cleaned: InvSlot[] = [];
+  // Phase 13: the offerable count EXCLUDES trade-locked copies. When the raw
+  // held count covers the offered count but the unbound count does not, the
+  // player is trying to trade a bound copy: deny ONCE for the whole offer and
+  // clamp that line to the unbound copies they can actually give (dropping it
+  // entirely when none is unbound). The def-level quest/soulbound silent drop
+  // above stays exactly as-is.
+  let boundDenied = false;
   for (const [itemId, count] of merged) {
     if (ctx.countItem(itemId, r.meta.entityId) < count) continue;
+    const unbound = offerableCount(ctx, r.meta, itemId);
+    if (unbound < count) {
+      boundDenied = true;
+      if (unbound > 0) cleaned.push({ itemId, count: unbound });
+      continue;
+    }
     cleaned.push({ itemId, count });
   }
+  if (boundDenied) ctx.error(r.meta.entityId, 'That item is bound and cannot be traded.');
   const offer = {
     items: cleaned,
     copper: Math.max(0, Math.min(Math.floor(copper), r.meta.copper)),
@@ -141,7 +192,13 @@ type PendingGrant = { itemId: string; plainCount: number; instances: ItemInstanc
 function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): PendingGrant[] {
   const grants: PendingGrant[] = [];
   for (const s of items) {
-    const instances = removePreferFungible(ctx, s.itemId, s.count, fromPid);
+    // Phase 13: a trade removal NEVER consumes a trade-locked copy. The offer
+    // was already clamped to the unbound count (tradeSetOffer / offerCovered),
+    // so enough unbound copies exist; the skip predicate is defence in depth so
+    // removePreferFungible's highest-index-first walk spares a bound copy even
+    // if one sits above an unbound one. Every OTHER caller passes no predicate
+    // and keeps its byte-identical behavior.
+    const instances = removePreferFungible(ctx, s.itemId, s.count, fromPid, isTradeLocked);
     grants.push({ itemId: s.itemId, plainCount: s.count - instances.length, instances });
   }
   return grants;
@@ -150,7 +207,19 @@ function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): Pendin
 function grantOffer(ctx: SimContext, grants: PendingGrant[], toPid: number): void {
   for (const g of grants) {
     if (g.plainCount > 0) ctx.addItem(g.itemId, g.plainCount, toPid);
-    for (const instance of g.instances) ctx.addItemInstance(g.itemId, instance, toPid);
+    for (const instance of g.instances) {
+      // Bind-on-trade stamp (Phase 13): a payload armed with bindOnTrade locks
+      // to the recipient the first time it changes hands. The instances here
+      // are per-unit deep clones (removeItem's contract; the final unit of a
+      // fully-consumed slot is the original, whose slot is already gone), so
+      // stamping boundTo in place is safe and never aliases a surviving stack.
+      // Generic over the payload: any future bind-on-trade good rides this same
+      // arm with nothing item-specific here.
+      if (instance.bindOnTrade === true && instance.boundTo === undefined) {
+        instance.boundTo = toPid;
+      }
+      ctx.addItemInstance(g.itemId, instance, toPid);
+    }
   }
 }
 
@@ -212,11 +281,23 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
       let remaining = s.count - plainCount;
       for (let i = giver.inventory.length - 1; i >= 0 && remaining > 0; i--) {
         const g = giver.inventory[i];
-        if (g.itemId !== s.itemId || !g.instance) continue;
+        // Skip trade-locked copies here too (Phase 13): the real transfer
+        // (removeOffer) spares them, so the capacity model must walk the same
+        // unbound instanced slots or it would mis-estimate the receiver's slots.
+        if (g.itemId !== s.itemId || !g.instance || isTradeLocked(g.instance)) continue;
+        // Model the payload AS IT ARRIVES: grantOffer stamps boundTo onto an
+        // armed copy on this first trade, and a stamped payload merges
+        // differently than the giver's pre-stamp copy (#2139: a capacity
+        // pre-check that disagrees with the real grant re-opens the overflow
+        // class, in both directions).
+        const arrival =
+          g.instance.bindOnTrade === true && g.instance.boundTo === undefined
+            ? { ...g.instance, boundTo: meta.entityId }
+            : g.instance;
         const take = Math.min(g.count, remaining);
         remaining -= take;
-        if (countFit(scratch, capacity, s.itemId, take, g.instance) < take) return false;
-        addStacked(scratch, s.itemId, take, g.instance);
+        if (countFit(scratch, capacity, s.itemId, take, arrival) < take) return false;
+        addStacked(scratch, s.itemId, take, arrival);
       }
       // Stock the giver's inventory list does not surface (a stubbed store in
       // tests, or a desynced offer the final validation above already
@@ -276,12 +357,17 @@ export function tradeCancel(ctx: SimContext, pid?: number): void {
 }
 
 // true when the player's bags cover the offered totals per item, summing
-// duplicate slots — a per-slot check would let duplicates each pass alone
+// duplicate slots: a per-slot check would let duplicates each pass alone.
+// Phase 13: counts against the UNBOUND copies only (unboundCount), the same
+// exclusion tradeSetOffer applies, so a copy bound between set-offer and
+// confirm can never slip through final validation into the swap.
 function offerCovered(ctx: SimContext, items: InvSlot[], pid: number): boolean {
+  const meta = ctx.players.get(pid);
   const totals = new Map<string, number>();
   for (const s of items) totals.set(s.itemId, (totals.get(s.itemId) ?? 0) + s.count);
   for (const [itemId, count] of totals) {
-    if (ctx.countItem(itemId, pid) < count) return false;
+    const available = meta ? offerableCount(ctx, meta, itemId) : ctx.countItem(itemId, pid);
+    if (available < count) return false;
   }
   return true;
 }

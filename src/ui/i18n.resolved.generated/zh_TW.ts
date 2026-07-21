@@ -2166,6 +2166,49 @@ export const zh_TW: EnTranslations = {
       "tailoring": "裁縫",
       "leatherworking": "製皮"
     },
+    "enchantName": {
+      "enchant_weapon_might": "附魔武器 - 威力",
+      "enchant_weapon_intellect": "附魔武器 - 法術強度",
+      "enchant_helmet_fortitude": "附魔頭部 - 堅韌",
+      "enchant_neck_spirit": "附魔頸部 - 精神",
+      "enchant_shoulder_agility": "附魔肩部 - 敏捷",
+      "enchant_chest_stamina": "附魔胸部 - 耐力",
+      "enchant_waist_stamina": "附魔腰部 - 耐力",
+      "enchant_legs_stamina": "附魔腿部 - 耐力",
+      "enchant_gloves_agility": "附魔手部 - 敏捷",
+      "enchant_gloves_intellect": "附魔手部 - 法術強度",
+      "enchant_feet_agility": "附魔腳部 - 敏捷",
+      "enchant_ring_spirit": "附魔手指 - 精神",
+      "enchant_weapon_agility": "附魔武器 - 敏捷",
+      "enchant_helmet_intellect": "附魔頭部 - 智力",
+      "enchant_helmet_armor": "附魔頭部 - 強化",
+      "enchant_neck_intellect": "附魔頸部 - 智力",
+      "enchant_neck_agility": "附魔頸部 - 敏捷",
+      "enchant_shoulder_strength": "附魔肩部 - 力量",
+      "enchant_shoulder_intellect": "附魔肩部 - 智力",
+      "enchant_chest_spirit": "附魔胸部 - 精神",
+      "enchant_chest_armor": "附魔胸部 - 強化",
+      "enchant_waist_strength": "附魔腰部 - 力量",
+      "enchant_waist_agility": "附魔腰部 - 敏捷",
+      "enchant_legs_intellect": "附魔腿部 - 智力",
+      "enchant_gloves_strength": "附魔手部 - 力量",
+      "enchant_feet_strength": "附魔腳部 - 力量",
+      "enchant_feet_stamina": "附魔腳部 - 耐力",
+      "enchant_ring_strength": "附魔手指 - 力量",
+      "enchant_ring_agility": "附魔手指 - 敏捷",
+      "enchant_ring_intellect": "附魔手指 - 智力",
+      "enchant_weapon_greater_might": "附魔武器 - 強效威力",
+      "enchant_weapon_greater_spellpower": "附魔武器 - 強效法術強度",
+      "enchant_helmet_greater_fortitude": "附魔頭部 - 強效堅韌",
+      "enchant_chest_greater_stamina": "附魔胸部 - 強效耐力",
+      "enchant_legs_greater_stamina": "附魔腿部 - 強效耐力",
+      "enchant_gloves_greater_agility": "附魔手部 - 強效敏捷",
+      "enchant_weapon_runed_edge": "附魔武器 - 符文鋒刃",
+      "enchant_weapon_runed_focus": "附魔武器 - 符文聚能",
+      "enchant_chest_runeweave": "附魔胸部 - 符文織紋",
+      "enchant_legs_runed_hide": "附魔腿部 - 符文獸皮",
+      "enchant_helmet_runed_links": "附魔頭部 - 符文鎖環"
+    },
     "professions": {
       "title": "專業",
       "close": "關閉專業",
@@ -2276,6 +2319,37 @@ export const zh_TW: EnTranslations = {
       "gatheredBy": "採集者：{name}",
       "masterworkSeal": "傑作",
       "enchantedLine": "已附魔"
+    },
+    "itemMenu": {
+      "use": "Use",
+      "equip": "裝備",
+      "disenchant": "分解",
+      "salvage": "拆解",
+      "applyEnchant": "施加附魔"
+    },
+    "enchanting": {
+      "disenchantedLine": "你分解了 {item}。",
+      "salvagedLine": "你拆解了 {item}。",
+      "enchantAppliedLine": "你為 {item} 施加了 {enchant}。",
+      "notHeld": "你沒有那件物品。",
+      "notDisenchantable": "你無法分解那件物品。",
+      "notSalvageable": "你無法拆解那件物品。",
+      "disenchantThrottled": "你分解得太快了。請稍候再試。",
+      "salvageThrottled": "你拆解得太快了。請稍候再試。",
+      "enchantThrottled": "你附魔得太快了。請稍候再試。",
+      "enchantWrongSlot": "該附魔無法施加於那件物品。",
+      "enchantUnknown": "該附魔不存在。",
+      "enchantInsufficient": "你沒有該附魔所需的材料。",
+      "disenchantConfirmTitle": "分解 {item}？",
+      "disenchantConfirmBody": "這會摧毀 {item} 並產出奧術材料。此操作無法復原。",
+      "disenchantConfirmBodySpecial": "這會摧毀一件特殊的 {item}（署名、傑作或已附魔）並產出奧術材料。此操作無法復原。",
+      "salvageConfirmTitle": "拆解 {item}？",
+      "salvageConfirmBody": "這會摧毀 {item} 並產出製作材料。此操作無法復原。",
+      "salvageConfirmBodySpecial": "這會摧毀一件特殊的 {item}（署名、傑作或已附魔）並產出製作材料。此操作無法復原。",
+      "pickerTitle": "施加附魔",
+      "targetTitle": "選擇要附魔的物品",
+      "noEnchants": "沒有附魔會用到此材料。",
+      "noTargets": "沒有可附魔的合適物品。"
     },
     "training": {
       "title": "訓練：{name}",
@@ -5714,7 +5788,8 @@ export const zh_TW: EnTranslations = {
       "tradeInProgress": "已有交易正在進行。",
       "tradeTooFar": "目標太遠，無法交易。",
       "tradeExpired": "交易請求已過期。",
-      "tradeFailed": "交易失敗：物品或金錢已不可用。"
+      "tradeFailed": "交易失敗：物品或金錢已不可用。",
+      "tradeBound": "該物品已綁定，無法交易。"
     },
     "logs": {
       "standUp": "你站了起來。",
@@ -8607,6 +8682,21 @@ export const zh_TW: EnTranslations = {
       },
       "wildsoul_maul": {
         "name": "荒野之魂重錘"
+      },
+      "resonant_thread": {
+        "name": "共鳴絲線"
+      },
+      "resonant_hide": {
+        "name": "共鳴獸皮"
+      },
+      "resonant_links": {
+        "name": "共鳴鎖環"
+      },
+      "resonant_steel": {
+        "name": "共鳴鋼材"
+      },
+      "resonant_timber": {
+        "name": "共鳴木材"
       },
       "conjured_water4": {
         "name": "魔法泉水"

@@ -3962,12 +3962,39 @@
     min-height: 40px;
     font-size: 16px;
   }
+  /* The mobile window sheet forces z-index 95 (see the managed-window override
+     above), which buries the base #ctx-menu at 90: a Phase 13 bag-item action
+     menu opened from inside the fullscreen Bags sheet rendered BEHIND it. The
+     popup is transient and always the active interaction, so on touch it sits
+     one step above the sheet. Desktop keeps the base 90 untouched. */
+  body.mobile-touch #ctx-menu {
+    z-index: 96;
+  }
+  /* An Apply Enchant picker row (Professions 2.0 Phase 13) carries a dim meta
+     sub-line; the flex row above would seat it inline beside the enchant name
+     on a narrow menu, so a meta-bearing row stacks instead. */
+  body.mobile-touch #ctx-menu .ctx-item:has(.ctx-item-meta) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
   body.mobile-touch #ctx-menu {
     box-sizing: border-box;
     max-height: calc(var(--app-vh, 100vh) / var(--ui-scale, 1) - 20px);
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
+  }
+  /* Apply Enchant picker sizing on touch (Phase 13 QA, maintainer direction):
+     the base cap above only stops OVERFLOW, so the full-list picker still
+     filled essentially the whole screen. The picker states take a tighter cap
+     (landscape play is the ~390px-tall class of viewport, so a fraction of the
+     app viewport, scaled like the base rule) and a bounded width; the box
+     scrolls within it. */
+  body.mobile-touch #ctx-menu.ctx-menu-picker {
+    max-height: calc(var(--app-vh, 100vh) / var(--ui-scale, 1) * 0.6);
+    min-width: 280px;
+    max-width: min(420px, 86vw);
+    overflow-y: auto;
   }
   /* Phase 5 touch floors: the interactive descendants of the newly sheeted windows
      that render below the 40px tap target on desktop. Only the controls that need it

@@ -2166,6 +2166,49 @@ export const ko_KR: EnTranslations = {
       "tailoring": "재봉",
       "leatherworking": "가죽세공"
     },
+    "enchantName": {
+      "enchant_weapon_might": "무기 마법부여 - 위력",
+      "enchant_weapon_intellect": "무기 마법부여 - 주문력",
+      "enchant_helmet_fortitude": "투구 마법부여 - 강건함",
+      "enchant_neck_spirit": "목걸이 마법부여 - 정신력",
+      "enchant_shoulder_agility": "어깨 마법부여 - 민첩성",
+      "enchant_chest_stamina": "갑옷 마법부여 - 체력",
+      "enchant_waist_stamina": "허리띠 마법부여 - 체력",
+      "enchant_legs_stamina": "다리 마법부여 - 체력",
+      "enchant_gloves_agility": "장갑 마법부여 - 민첩성",
+      "enchant_gloves_intellect": "장갑 마법부여 - 주문력",
+      "enchant_feet_agility": "신발 마법부여 - 민첩성",
+      "enchant_ring_spirit": "반지 마법부여 - 정신력",
+      "enchant_weapon_agility": "무기 마법부여 - 민첩성",
+      "enchant_helmet_intellect": "투구 마법부여 - 지능",
+      "enchant_helmet_armor": "투구 마법부여 - 강화",
+      "enchant_neck_intellect": "목걸이 마법부여 - 지능",
+      "enchant_neck_agility": "목걸이 마법부여 - 민첩성",
+      "enchant_shoulder_strength": "어깨 마법부여 - 힘",
+      "enchant_shoulder_intellect": "어깨 마법부여 - 지능",
+      "enchant_chest_spirit": "갑옷 마법부여 - 정신력",
+      "enchant_chest_armor": "갑옷 마법부여 - 강화",
+      "enchant_waist_strength": "허리띠 마법부여 - 힘",
+      "enchant_waist_agility": "허리띠 마법부여 - 민첩성",
+      "enchant_legs_intellect": "다리 마법부여 - 지능",
+      "enchant_gloves_strength": "장갑 마법부여 - 힘",
+      "enchant_feet_strength": "신발 마법부여 - 힘",
+      "enchant_feet_stamina": "신발 마법부여 - 체력",
+      "enchant_ring_strength": "반지 마법부여 - 힘",
+      "enchant_ring_agility": "반지 마법부여 - 민첩성",
+      "enchant_ring_intellect": "반지 마법부여 - 지능",
+      "enchant_weapon_greater_might": "무기 마법부여 - 상급 위력",
+      "enchant_weapon_greater_spellpower": "무기 마법부여 - 상급 주문력",
+      "enchant_helmet_greater_fortitude": "투구 마법부여 - 상급 강건함",
+      "enchant_chest_greater_stamina": "갑옷 마법부여 - 상급 체력",
+      "enchant_legs_greater_stamina": "다리 마법부여 - 상급 체력",
+      "enchant_gloves_greater_agility": "장갑 마법부여 - 상급 민첩성",
+      "enchant_weapon_runed_edge": "무기 마법부여 - 룬 칼날",
+      "enchant_weapon_runed_focus": "무기 마법부여 - 룬 집중",
+      "enchant_chest_runeweave": "갑옷 마법부여 - 룬 직조",
+      "enchant_legs_runed_hide": "다리 마법부여 - 룬 가죽",
+      "enchant_helmet_runed_links": "투구 마법부여 - 룬 사슬"
+    },
     "professions": {
       "title": "전문 기술",
       "close": "전문 기술 닫기",
@@ -2276,6 +2319,37 @@ export const ko_KR: EnTranslations = {
       "gatheredBy": "채집자: {name}",
       "masterworkSeal": "걸작",
       "enchantedLine": "마법부여됨"
+    },
+    "itemMenu": {
+      "use": "Use",
+      "equip": "장착",
+      "disenchant": "마력 추출",
+      "salvage": "분해",
+      "applyEnchant": "마법부여 적용"
+    },
+    "enchanting": {
+      "disenchantedLine": "{item}의 마력을 추출했습니다.",
+      "salvagedLine": "{item}을(를) 분해했습니다.",
+      "enchantAppliedLine": "{item}에 {enchant}을(를) 부여했습니다.",
+      "notHeld": "해당 아이템을 가지고 있지 않습니다.",
+      "notDisenchantable": "해당 아이템은 마력을 추출할 수 없습니다.",
+      "notSalvageable": "해당 아이템은 분해할 수 없습니다.",
+      "disenchantThrottled": "너무 빠르게 마력을 추출하고 있습니다. 잠시 후 다시 시도하세요.",
+      "salvageThrottled": "너무 빠르게 분해하고 있습니다. 잠시 후 다시 시도하세요.",
+      "enchantThrottled": "너무 빠르게 마법부여하고 있습니다. 잠시 후 다시 시도하세요.",
+      "enchantWrongSlot": "그 마법부여는 해당 아이템에 적용할 수 없습니다.",
+      "enchantUnknown": "해당 마법부여가 존재하지 않습니다.",
+      "enchantInsufficient": "해당 마법부여에 필요한 재료가 없습니다.",
+      "disenchantConfirmTitle": "{item}의 마력을 추출하시겠습니까?",
+      "disenchantConfirmBody": "{item}을(를) 파괴하고 비전 재료를 얻습니다. 되돌릴 수 없습니다.",
+      "disenchantConfirmBodySpecial": "특별한 {item} 사본(서명됨, 걸작 또는 마법부여됨)을 파괴하고 비전 재료를 얻습니다. 되돌릴 수 없습니다.",
+      "salvageConfirmTitle": "{item}을(를) 분해하시겠습니까?",
+      "salvageConfirmBody": "{item}을(를) 파괴하고 제작 재료를 얻습니다. 되돌릴 수 없습니다.",
+      "salvageConfirmBodySpecial": "특별한 {item} 사본(서명됨, 걸작 또는 마법부여됨)을 파괴하고 제작 재료를 얻습니다. 되돌릴 수 없습니다.",
+      "pickerTitle": "마법부여 적용",
+      "targetTitle": "마법부여할 아이템을 선택하세요",
+      "noEnchants": "이 재료를 사용하는 마법부여가 없습니다.",
+      "noTargets": "마법부여할 수 있는 아이템이 없습니다."
     },
     "training": {
       "title": "훈련: {name}",
@@ -5714,7 +5788,8 @@ export const ko_KR: EnTranslations = {
       "tradeInProgress": "이미 거래가 진행 중입니다.",
       "tradeTooFar": "대상이 너무 멀어 거래할 수 없습니다.",
       "tradeExpired": "거래 요청이 만료되었습니다.",
-      "tradeFailed": "거래 실패: 아이템이나 돈을 더 이상 사용할 수 없습니다."
+      "tradeFailed": "거래 실패: 아이템이나 돈을 더 이상 사용할 수 없습니다.",
+      "tradeBound": "그 아이템은 귀속되어 거래할 수 없습니다."
     },
     "logs": {
       "standUp": "일어섰습니다.",
@@ -8607,6 +8682,21 @@ export const ko_KR: EnTranslations = {
       },
       "wildsoul_maul": {
         "name": "야생영혼 철퇴"
+      },
+      "resonant_thread": {
+        "name": "공명의 실"
+      },
+      "resonant_hide": {
+        "name": "공명의 가죽"
+      },
+      "resonant_links": {
+        "name": "공명의 사슬"
+      },
+      "resonant_steel": {
+        "name": "공명의 강철"
+      },
+      "resonant_timber": {
+        "name": "공명의 목재"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

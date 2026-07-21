@@ -2331,6 +2331,54 @@ export const hudChromeStrings = {
     tailoring: 'Tailoring',
     leatherworking: 'Leatherworking',
   },
+  // Per-enchant display names (Professions 2.0 Phase 13), keyed by the same
+  // enchant id as content/enchants.ts ENCHANTS; keep both in sync. This is the
+  // FIRST render sink for EnchantDef.name (it never rendered before), resolved
+  // by enchant_apply_view.ts enchantNameKey in the Apply Enchant picker; never
+  // the raw def name in the DOM.
+  enchantName: {
+    enchant_weapon_might: 'Enchant Weapon - Might',
+    enchant_weapon_intellect: 'Enchant Weapon - Spellpower',
+    enchant_helmet_fortitude: 'Enchant Helmet - Fortitude',
+    enchant_neck_spirit: 'Enchant Necklace - Spirit',
+    enchant_shoulder_agility: 'Enchant Shoulders - Agility',
+    enchant_chest_stamina: 'Enchant Chest - Stamina',
+    enchant_waist_stamina: 'Enchant Belt - Stamina',
+    enchant_legs_stamina: 'Enchant Legs - Stamina',
+    enchant_gloves_agility: 'Enchant Gloves - Agility',
+    enchant_gloves_intellect: 'Enchant Gloves - Spellpower',
+    enchant_feet_agility: 'Enchant Boots - Agility',
+    enchant_ring_spirit: 'Enchant Ring - Spirit',
+    enchant_weapon_agility: 'Enchant Weapon - Agility',
+    enchant_helmet_intellect: 'Enchant Helmet - Intellect',
+    enchant_helmet_armor: 'Enchant Helmet - Reinforcement',
+    enchant_neck_intellect: 'Enchant Necklace - Intellect',
+    enchant_neck_agility: 'Enchant Necklace - Agility',
+    enchant_shoulder_strength: 'Enchant Shoulders - Strength',
+    enchant_shoulder_intellect: 'Enchant Shoulders - Intellect',
+    enchant_chest_spirit: 'Enchant Chest - Spirit',
+    enchant_chest_armor: 'Enchant Chest - Reinforcement',
+    enchant_waist_strength: 'Enchant Belt - Strength',
+    enchant_waist_agility: 'Enchant Belt - Agility',
+    enchant_legs_intellect: 'Enchant Legs - Intellect',
+    enchant_gloves_strength: 'Enchant Gloves - Strength',
+    enchant_feet_strength: 'Enchant Boots - Strength',
+    enchant_feet_stamina: 'Enchant Boots - Stamina',
+    enchant_ring_strength: 'Enchant Ring - Strength',
+    enchant_ring_agility: 'Enchant Ring - Agility',
+    enchant_ring_intellect: 'Enchant Ring - Intellect',
+    enchant_weapon_greater_might: 'Enchant Weapon - Greater Might',
+    enchant_weapon_greater_spellpower: 'Enchant Weapon - Greater Spellpower',
+    enchant_helmet_greater_fortitude: 'Enchant Helmet - Greater Fortitude',
+    enchant_chest_greater_stamina: 'Enchant Chest - Greater Stamina',
+    enchant_legs_greater_stamina: 'Enchant Legs - Greater Stamina',
+    enchant_gloves_greater_agility: 'Enchant Gloves - Greater Agility',
+    enchant_weapon_runed_edge: 'Enchant Weapon - Runed Edge',
+    enchant_weapon_runed_focus: 'Enchant Weapon - Runed Focus',
+    enchant_chest_runeweave: 'Enchant Chest - Runeweave',
+    enchant_legs_runed_hide: 'Enchant Legs - Runed Hide',
+    enchant_helmet_runed_links: 'Enchant Helmet - Runed Links',
+  },
   // Professions window (Professions 2.0 Phase 5): the read-only craft-wheel
   // window. Craft and pair NAMES resolve through craftName / archetypePair
   // above; these keys are the window's own chrome. Wording follows the
@@ -2480,6 +2528,52 @@ export const hudChromeStrings = {
     // Generic enchanted marker: EnchantDef.name has no localized display
     // surface yet, so the tooltip marks the state without naming the enchant.
     enchantedLine: 'Enchanted',
+  },
+  // Bag-item context menu verbs (Professions 2.0 Phase 13): the row labels for
+  // the right-click / touch action menu (bag_item_context_menu.ts). The first
+  // row mirrors the classic left-click action (equip gear, use everything else);
+  // the rest are the eligible Phase 13 actions.
+  itemMenu: {
+    use: 'Use',
+    equip: 'Equip',
+    disenchant: 'Disenchant',
+    salvage: 'Salvage',
+    applyEnchant: 'Apply Enchant',
+  },
+  // Enchanting actions (Professions 2.0 Phase 13): the result toasts for the
+  // disenchant / apply-enchant / salvage commands (enchanting_view.ts maps each
+  // text-free SimEvent to one of these), the destroy-confirm copy (a stronger
+  // body when the copy consumed is special), and the Apply Enchant picker chrome.
+  // Each throttled key names ITS OWN action: the 10-per-60s throttle is shared
+  // with crafting and gathering, so a generic "crafting is busy" line would
+  // mis-attribute the deny.
+  enchanting: {
+    disenchantedLine: 'You disenchant {item}.',
+    salvagedLine: 'You salvage {item}.',
+    enchantAppliedLine: 'You enchant {item} with {enchant}.',
+    notHeld: 'You do not have that item.',
+    notDisenchantable: 'You cannot disenchant that.',
+    notSalvageable: 'You cannot salvage that.',
+    disenchantThrottled: 'You are disenchanting too quickly. Wait a moment and try again.',
+    salvageThrottled: 'You are salvaging too quickly. Wait a moment and try again.',
+    enchantThrottled: 'You are enchanting too quickly. Wait a moment and try again.',
+    enchantWrongSlot: 'That enchant cannot be applied to that item.',
+    enchantUnknown: 'That enchant does not exist.',
+    enchantInsufficient: 'You do not have the materials for that enchant.',
+    disenchantConfirmTitle: 'Disenchant {item}?',
+    disenchantConfirmBody:
+      'This destroys {item} and yields arcane materials. This cannot be undone.',
+    disenchantConfirmBodySpecial:
+      'This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields arcane materials. This cannot be undone.',
+    salvageConfirmTitle: 'Salvage {item}?',
+    salvageConfirmBody:
+      'This destroys {item} and yields crafting materials. This cannot be undone.',
+    salvageConfirmBodySpecial:
+      'This destroys a special copy of {item} (signed, masterwork, or enchanted) and yields crafting materials. This cannot be undone.',
+    pickerTitle: 'Apply Enchant',
+    targetTitle: 'Choose an item to enchant',
+    noEnchants: 'No enchant uses this reagent.',
+    noTargets: 'No eligible item to enchant.',
   },
   // Recipe training window (Professions 2.0 Phase 9): a station master
   // teaches trainer-acquisition recipes for a tier-priced copper fee

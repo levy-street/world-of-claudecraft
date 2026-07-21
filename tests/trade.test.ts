@@ -339,26 +339,28 @@ describe('trade module (direct, no Sim)', () => {
     expect(instanced?.instance).toEqual(instance);
   });
 
-  it('keeps full payloads (signer/charges/rolled/enchant/boundTo) for instances in both directions', () => {
+  it('keeps full payloads (signer/charges/rolled/enchant) for instances in both directions', () => {
     // The phase acceptance criterion end to end: side A's offer mixes a plain
     // copy with a fully-loaded instanced copy while side B offers a different
     // instanced item in the SAME trade, so tradeConfirm's second offer leg
     // (offerB, b to a) moves an instance too, and every payload field
     // (signer, charges, rolled incl. the Phase 2 masterwork marker, the enchant
-    // marker, boundTo) must land intact on the right receiver's granted item.
+    // marker) must land intact on the right receiver's granted item. boundTo is
+    // deliberately NOT set here: Professions 2.0 Phase 13 made boundTo the
+    // trade-lock marker, so a copy carrying it can no longer be offered at all
+    // (that behavior lives in professions_typed_reagents.test.ts's bind-on-trade
+    // suite); a freely tradeable instance never carries boundTo.
     const instA = {
       signer: 'Ayla',
       charges: { lifesteal: 2 },
       rolled: { stats: { atk: 3 }, masterwork: true },
       enchant: 'flame_weapon',
-      boundTo: 1,
     };
     const instB = {
       signer: 'Borin',
       charges: { warmth: 5 },
       rolled: { stats: { sta: 2 }, masterwork: true },
       enchant: 'hearth_ward',
-      boundTo: 2,
     };
     const { ctx, players } = makeInstancedTradeCtx(
       [

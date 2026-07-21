@@ -80,6 +80,52 @@ export interface MasterworkView {
   crafter: number;
 }
 
+// Salvage-result surface (Professions 2.0 Phase 13): the outcome of one
+// salvageItem command, mirrored from the server's `salvageResult` event (and
+// the `salv` self-delta) so the client renders a toast/log without deciding the
+// outcome itself. Ids + values only, string-free per the seam rule. Shape
+// matches src/sim/professions/salvage.ts SalvageResult. `null` until the first
+// salvage attempt of the session.
+export interface SalvageResultView {
+  ok: boolean;
+  itemId: string;
+  materialItemId?: string;
+  count?: number;
+  reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled';
+}
+
+// Disenchant-result surface (Professions 2.0 Phase 13): mirrors
+// src/sim/professions/enchanting.ts DisenchantResult, including the typed
+// bind-on-trade secondary a rare-or-better disenchant also yields
+// (secondaryItemId/secondaryCount, absent on every sub-rare success and on a
+// rare+ piece with no typed material). `null` until the first disenchant attempt
+// of the session.
+export interface DisenchantResultView {
+  ok: boolean;
+  itemId: string;
+  materialItemId?: string;
+  count?: number;
+  secondaryItemId?: string;
+  secondaryCount?: number;
+  reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled';
+}
+
+// Apply-enchant-result surface (Professions 2.0 Phase 13): mirrors
+// src/sim/professions/enchanting.ts ApplyEnchantResult. `null` until the first
+// apply-enchant attempt of the session.
+export interface ApplyEnchantResultView {
+  ok: boolean;
+  itemId: string;
+  enchantId: string;
+  reason?:
+    | 'unknown_item'
+    | 'unknown_enchant'
+    | 'wrong_slot'
+    | 'not_held'
+    | 'insufficient_materials'
+    | 'throttled';
+}
+
 // The professions read-surface facet (#1164, extended by #1121/#1127/#1129). `Sim`
 // (src/sim/sim.ts `professionsState`/`professionsStateFor`) and `ClientWorld`
 // (src/net/online.ts, mirrored from the `prof` wire delta) both implement
@@ -160,4 +206,22 @@ export interface IWorldProfessions {
   // client never predicts placement or reasons about tick domains). The slot
   // is transient either way: never serialized into the character save.
   activeMobileStationCraft: string | null;
+  // Enchanting profession commands (Professions 2.0 Phase 13): disenchant a held
+  // eligible weapon/armor piece into arcane materials, apply an enchant to a held
+  // copy, or salvage a held piece into generic materials. Server-authoritative:
+  // Sim re-validates ownership/eligibility/throttle inside the resolvers
+  // (src/sim/professions/enchanting.ts and salvage.ts) and nothing is trusted from
+  // the client; ClientWorld sends the disenchant_item/apply_enchant/salvage_item
+  // wire command and never decides the outcome.
+  disenchantItem(itemId: string): void;
+  applyEnchant(itemId: string, enchantId: string): void;
+  salvageItem(itemId: string): void;
+  // The local viewer's most recent enchanting-action outcomes, mirrored from the
+  // pid-scoped disenchantResult/enchantResult/salvageResult event and the
+  // denc/ench/salv self-delta (both feed the same field: the event is the
+  // immediacy arm, the delta the convergence arm). `null` before the first such
+  // attempt this session.
+  lastDisenchantResult: DisenchantResultView | null;
+  lastEnchantResult: ApplyEnchantResultView | null;
+  lastSalvageResult: SalvageResultView | null;
 }

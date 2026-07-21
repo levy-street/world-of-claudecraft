@@ -69,6 +69,7 @@ function windowFor(inventory: InvSlot[]): HTMLElement {
     isTouchHud: () => false,
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
+    openItemActionMenu: noop,
   };
   new BagsWindow(deps).render();
   return root;

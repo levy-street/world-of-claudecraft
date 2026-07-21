@@ -6939,35 +6939,80 @@ export class Sim {
     const result = salvageItemImpl(this.ctx, itemId, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastSalvageResult = result;
+    // Emit the pid-scoped, text-free outcome (Phase 13), same immediacy arm as
+    // craftItem's craftResult: the online client mirrors it into lastSalvageResult
+    // for a toast/log without deciding the result. Single-surface doctrine: NO
+    // ctx.error from the resolver, or a deny would print twice.
+    this.emit({
+      type: 'salvageResult',
+      ok: result.ok,
+      itemId: result.itemId,
+      materialItemId: result.materialItemId,
+      count: result.count,
+      reason: result.reason,
+      pid: meta?.entityId,
+    });
   }
 
-  // The local viewer's most recent salvage-result, or null before their
-  // first salvage attempt this session. Same not-yet-wired-onto-IWorld
-  // status as the salvageItem command above.
+  // IWorld read surface (IWorldProfessions, Phase 13): the local viewer's most
+  // recent salvage-result, or null before their first salvage attempt this
+  // session. `lastSalvageResultFor` is the per-player form the server's `salv`
+  // self-delta reads (server/game.ts), modeled on activeMobileStationCraftFor.
   get lastSalvageResult(): SalvageResult | null {
-    return this.players.get(this.primaryId)?.lastSalvageResult ?? null;
+    return this.lastSalvageResultFor(this.primaryId);
   }
 
-  // Enchanting profession commands: same thin-delegate/stash-result/not-yet-
-  // wired-onto-IWorld shape as salvageItem/lastSalvageResult above.
+  lastSalvageResultFor(pid: number): SalvageResult | null {
+    return this.players.get(pid)?.lastSalvageResult ?? null;
+  }
+
+  // Enchanting profession commands (IWorldProfessions, Phase 13): same thin-
+  // delegate/stash-result/emit shape as salvageItem/craftItem above.
   disenchantItem(itemId: string, pid?: number): void {
     const result = disenchantItemImpl(this.ctx, itemId, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastDisenchantResult = result;
+    this.emit({
+      type: 'disenchantResult',
+      ok: result.ok,
+      itemId: result.itemId,
+      materialItemId: result.materialItemId,
+      count: result.count,
+      secondaryItemId: result.secondaryItemId,
+      secondaryCount: result.secondaryCount,
+      reason: result.reason,
+      pid: meta?.entityId,
+    });
   }
 
   get lastDisenchantResult(): DisenchantResult | null {
-    return this.players.get(this.primaryId)?.lastDisenchantResult ?? null;
+    return this.lastDisenchantResultFor(this.primaryId);
+  }
+
+  lastDisenchantResultFor(pid: number): DisenchantResult | null {
+    return this.players.get(pid)?.lastDisenchantResult ?? null;
   }
 
   applyEnchant(itemId: string, enchantId: string, pid?: number): void {
     const result = applyEnchantImpl(this.ctx, itemId, enchantId, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastEnchantResult = result;
+    this.emit({
+      type: 'enchantResult',
+      ok: result.ok,
+      itemId: result.itemId,
+      enchantId: result.enchantId,
+      reason: result.reason,
+      pid: meta?.entityId,
+    });
   }
 
   get lastEnchantResult(): ApplyEnchantResult | null {
-    return this.players.get(this.primaryId)?.lastEnchantResult ?? null;
+    return this.lastEnchantResultFor(this.primaryId);
+  }
+
+  lastEnchantResultFor(pid: number): ApplyEnchantResult | null {
+    return this.players.get(pid)?.lastEnchantResult ?? null;
   }
 
   private maybeAutoEquip(itemId: string, meta: PlayerMeta): void {

@@ -933,6 +933,15 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // change so any future emit added here lands under the drift guard from
     // day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/action_throttle.ts'), 'utf8'),
+    // Professions 2.0 Phase 13: the typed disenchant-secondary mapper. It emits
+    // no player text itself (a pure def -> material-id mapping consumed by
+    // enchanting.ts), but every new sim module joins the scan list in the same
+    // change so any future emit added here lands under the drift guard from
+    // day one.
+    fs.readFileSync(
+      path.resolve(process.cwd(), 'src/sim/professions/disenchant_reagents.ts'),
+      'utf8',
+    ),
     // Professions 2.0 Phase 12d: the identical-payload stack-merge predicate.
     // It emits no player text itself (pure stacking bookkeeping consumed by
     // bags/bank/trade/sim), but every new sim module joins the scan list in

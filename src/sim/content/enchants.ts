@@ -357,4 +357,63 @@ export const ENCHANTS: Record<string, EnchantDef> = {
     ],
     statBonus: { agi: 9 },
   },
+
+  // --- Runed tier (Professions 2.0 Phase 13): the ONLY sink for the typed
+  // disenchant secondaries (resonant_steel/timber/thread/hide/links,
+  // src/sim/professions/disenchant_reagents.ts), so no typed material is a
+  // dead-end currency. Each costs arcane_essence x2 plus one typed reagent and
+  // sits BETWEEN the base and Greater magnitude on its slot+axis, never above
+  // the Greater value there (a rare-sourced step, not the shard-sourced top
+  // tier). One consumer per material: steel->runed_edge, timber->runed_focus,
+  // thread->runeweave, hide->runed_hide, links->runed_links. ---
+  enchant_weapon_runed_edge: {
+    id: 'enchant_weapon_runed_edge',
+    name: 'Enchant Weapon - Runed Edge',
+    itemSlot: 'mainhand',
+    reagents: [
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'resonant_steel', count: 1 },
+    ],
+    statBonus: { str: 6 },
+  },
+  enchant_weapon_runed_focus: {
+    id: 'enchant_weapon_runed_focus',
+    name: 'Enchant Weapon - Runed Focus',
+    itemSlot: 'mainhand',
+    reagents: [
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'resonant_timber', count: 1 },
+    ],
+    statBonus: { int: 6 },
+  },
+  enchant_chest_runeweave: {
+    id: 'enchant_chest_runeweave',
+    name: 'Enchant Chest - Runeweave',
+    itemSlot: 'chest',
+    reagents: [
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'resonant_thread', count: 1 },
+    ],
+    statBonus: { spi: 10 },
+  },
+  enchant_legs_runed_hide: {
+    id: 'enchant_legs_runed_hide',
+    name: 'Enchant Legs - Runed Hide',
+    itemSlot: 'legs',
+    reagents: [
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'resonant_hide', count: 1 },
+    ],
+    statBonus: { agi: 8 },
+  },
+  enchant_helmet_runed_links: {
+    id: 'enchant_helmet_runed_links',
+    name: 'Enchant Helmet - Runed Links',
+    itemSlot: 'helmet',
+    reagents: [
+      { itemId: 'arcane_essence', count: 2 },
+      { itemId: 'resonant_links', count: 1 },
+    ],
+    statBonus: { sta: 10 },
+  },
 };

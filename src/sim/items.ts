@@ -37,6 +37,7 @@ import type { SimContext } from './sim_context';
 import {
   CONSUME_DURATION,
   CONSUME_TICKS,
+  cloneItemInstancePayload,
   dist2d,
   type Entity,
   type EquipSlot,
@@ -93,18 +94,50 @@ function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
 // ctx.removeItem there would eat the enchanted copy first when both exist.
 // sellItem/discardItem below and trade.ts's drop arm route through this instead
 // so "sell/discard/trade one" prefers the plain copy a player almost always means.
+// The optional `skip` predicate (Professions 2.0 Phase 13) spares any instanced
+// copy it matches from removal: the trade swap passes it to never consume a
+// trade-locked (boundTo-set) copy. Absent, the function is byte-identical to
+// before: fungible first, then ctx.removeItem for the remainder. Only the
+// skip-aware path walks the inventory itself (removeItem cannot skip), and it
+// mirrors removeItem's highest-index-first order and clone-on-survival return
+// contract exactly, so a caller mutating a returned payload (the trade
+// bind-on-trade stamp) never aliases a surviving stack's shared payload.
 export function removePreferFungible(
   ctx: SimContext,
   itemId: string,
   count: number,
   pid?: number,
+  skip?: (instance: ItemInstancePayload) => boolean,
 ): ItemInstancePayload[] {
   const fungibleAvailable = ctx.countFungibleItem(itemId, pid);
   const fungibleTake = Math.min(fungibleAvailable, count);
   if (fungibleTake > 0) ctx.removeFungibleItem(itemId, fungibleTake, pid);
   const remaining = count - fungibleTake;
   if (remaining <= 0) return [];
-  return ctx.removeItem(itemId, remaining, pid);
+  if (!skip) return ctx.removeItem(itemId, remaining, pid);
+  const r = ctx.resolve(pid);
+  if (!r) return [];
+  const { meta } = r;
+  const consumed: ItemInstancePayload[] = [];
+  let left = remaining;
+  for (let i = meta.inventory.length - 1; i >= 0 && left > 0; i--) {
+    const s = meta.inventory[i];
+    if (s.itemId !== itemId || !s.instance || skip(s.instance)) continue;
+    const take = Math.min(s.count, left);
+    for (let unit = 0; unit < take; unit++) {
+      const finalUnitOfSlot = take >= s.count && unit === take - 1;
+      consumed.push(finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance));
+    }
+    s.count -= take;
+    left -= take;
+    if (s.count <= 0) meta.inventory.splice(i, 1);
+  }
+  // Same post-removal hook the inventory hub's removeItem fires. Optional-called
+  // so a decoupled test ctx that models inventory but omits the hook (its own
+  // removeItem does the same) is not forced to stub it; the live SimContext
+  // always provides it.
+  ctx.onInventoryChangedForQuests?.(meta);
+  return consumed;
 }
 
 export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: number): void {

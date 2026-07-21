@@ -1653,6 +1653,52 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 55,
   },
 
+  // --- Typed disenchant secondaries (Professions 2.0 Phase 13) -------------
+  // A rare-or-better disenchant yields, alongside the universal ladder material
+  // above, exactly one typed secondary keyed by the salvaged piece's material
+  // (src/sim/professions/disenchant_reagents.ts): armor by its armor class,
+  // weapons by family. Each is the sole reagent of one always-known ENCHANTS
+  // row (content/enchants.ts), so none is a dead-end currency. They are granted
+  // bind-on-trade (ItemInstancePayload.bindOnTrade), so a disenchant windfall
+  // stays with the disenchanter rather than being freely resold. Same 'junk'
+  // reuse as the arcane materials (this repo has no dedicated material kind);
+  // all quality 'rare', so sellAllJunk (poor-only) never sweeps them.
+  resonant_thread: {
+    id: 'resonant_thread',
+    name: 'Resonant Thread',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 40,
+  },
+  resonant_hide: {
+    id: 'resonant_hide',
+    name: 'Resonant Hide',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 40,
+  },
+  resonant_links: {
+    id: 'resonant_links',
+    name: 'Resonant Links',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 40,
+  },
+  resonant_steel: {
+    id: 'resonant_steel',
+    name: 'Resonant Steel',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 40,
+  },
+  resonant_timber: {
+    id: 'resonant_timber',
+    name: 'Resonant Timber',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 40,
+  },
+
   // --- Quartermaster's Consignment ---------------------------------------
   // A standing line of practical adventuring gear. The Merchant keeps eight
   // pieces stocked on the World Market (see seedHouseListings); four more are

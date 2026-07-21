@@ -2166,6 +2166,49 @@ export const ja_JP: EnTranslations = {
       "tailoring": "裁縫",
       "leatherworking": "皮革加工"
     },
+    "enchantName": {
+      "enchant_weapon_might": "武器エンチャント - 剛力",
+      "enchant_weapon_intellect": "武器エンチャント - 呪文威力",
+      "enchant_helmet_fortitude": "頭エンチャント - 堅牢",
+      "enchant_neck_spirit": "首エンチャント - 精神力",
+      "enchant_shoulder_agility": "肩エンチャント - 敏捷性",
+      "enchant_chest_stamina": "胸エンチャント - スタミナ",
+      "enchant_waist_stamina": "腰エンチャント - スタミナ",
+      "enchant_legs_stamina": "脚エンチャント - スタミナ",
+      "enchant_gloves_agility": "手エンチャント - 敏捷性",
+      "enchant_gloves_intellect": "手エンチャント - 呪文威力",
+      "enchant_feet_agility": "足エンチャント - 敏捷性",
+      "enchant_ring_spirit": "指エンチャント - 精神力",
+      "enchant_weapon_agility": "武器エンチャント - 敏捷性",
+      "enchant_helmet_intellect": "頭エンチャント - 知力",
+      "enchant_helmet_armor": "頭エンチャント - 強化",
+      "enchant_neck_intellect": "首エンチャント - 知力",
+      "enchant_neck_agility": "首エンチャント - 敏捷性",
+      "enchant_shoulder_strength": "肩エンチャント - 筋力",
+      "enchant_shoulder_intellect": "肩エンチャント - 知力",
+      "enchant_chest_spirit": "胸エンチャント - 精神力",
+      "enchant_chest_armor": "胸エンチャント - 強化",
+      "enchant_waist_strength": "腰エンチャント - 筋力",
+      "enchant_waist_agility": "腰エンチャント - 敏捷性",
+      "enchant_legs_intellect": "脚エンチャント - 知力",
+      "enchant_gloves_strength": "手エンチャント - 筋力",
+      "enchant_feet_strength": "足エンチャント - 筋力",
+      "enchant_feet_stamina": "足エンチャント - スタミナ",
+      "enchant_ring_strength": "指エンチャント - 筋力",
+      "enchant_ring_agility": "指エンチャント - 敏捷性",
+      "enchant_ring_intellect": "指エンチャント - 知力",
+      "enchant_weapon_greater_might": "武器エンチャント - 上級剛力",
+      "enchant_weapon_greater_spellpower": "武器エンチャント - 上級呪文威力",
+      "enchant_helmet_greater_fortitude": "頭エンチャント - 上級堅牢",
+      "enchant_chest_greater_stamina": "胸エンチャント - 上級スタミナ",
+      "enchant_legs_greater_stamina": "脚エンチャント - 上級スタミナ",
+      "enchant_gloves_greater_agility": "手エンチャント - 上級敏捷性",
+      "enchant_weapon_runed_edge": "武器エンチャント - ルーンの刃",
+      "enchant_weapon_runed_focus": "武器エンチャント - ルーンの焦点",
+      "enchant_chest_runeweave": "胸エンチャント - ルーン織り",
+      "enchant_legs_runed_hide": "脚エンチャント - ルーンの獣皮",
+      "enchant_helmet_runed_links": "頭エンチャント - ルーンの鎖"
+    },
     "professions": {
       "title": "専門技能",
       "close": "専門技能を閉じる",
@@ -2276,6 +2319,37 @@ export const ja_JP: EnTranslations = {
       "gatheredBy": "採集者：{name}",
       "masterworkSeal": "傑作",
       "enchantedLine": "エンチャント済み"
+    },
+    "itemMenu": {
+      "use": "Use",
+      "equip": "装備する",
+      "disenchant": "魔力分解",
+      "salvage": "解体",
+      "applyEnchant": "エンチャントを付与"
+    },
+    "enchanting": {
+      "disenchantedLine": "{item}を魔力分解した。",
+      "salvagedLine": "{item}を解体した。",
+      "enchantAppliedLine": "{item}に{enchant}をエンチャントした。",
+      "notHeld": "そのアイテムを所持していません。",
+      "notDisenchantable": "それは魔力分解できません。",
+      "notSalvageable": "それは解体できません。",
+      "disenchantThrottled": "魔力分解が速すぎます。少し待ってからもう一度お試しください。",
+      "salvageThrottled": "解体が速すぎます。少し待ってからもう一度お試しください。",
+      "enchantThrottled": "エンチャントが速すぎます。少し待ってからもう一度お試しください。",
+      "enchantWrongSlot": "そのエンチャントはそのアイテムには付与できません。",
+      "enchantUnknown": "そのエンチャントは存在しません。",
+      "enchantInsufficient": "そのエンチャントに必要な素材がありません。",
+      "disenchantConfirmTitle": "{item}を魔力分解しますか？",
+      "disenchantConfirmBody": "{item}を破壊し、秘術素材を得ます。この操作は元に戻せません。",
+      "disenchantConfirmBodySpecial": "特別な{item}（銘入り、傑作、またはエンチャント済み）を破壊し、秘術素材を得ます。この操作は元に戻せません。",
+      "salvageConfirmTitle": "{item}を解体しますか？",
+      "salvageConfirmBody": "{item}を破壊し、製作素材を得ます。この操作は元に戻せません。",
+      "salvageConfirmBodySpecial": "特別な{item}（銘入り、傑作、またはエンチャント済み）を破壊し、製作素材を得ます。この操作は元に戻せません。",
+      "pickerTitle": "エンチャントを付与",
+      "targetTitle": "エンチャントするアイテムを選択",
+      "noEnchants": "この素材を使うエンチャントはありません。",
+      "noTargets": "エンチャントできるアイテムがありません。"
     },
     "training": {
       "title": "訓練：{name}",
@@ -5714,7 +5788,8 @@ export const ja_JP: EnTranslations = {
       "tradeInProgress": "すでに取引が進行中です。",
       "tradeTooFar": "対象が遠すぎて取引できません。",
       "tradeExpired": "取引リクエストは期限切れです。",
-      "tradeFailed": "取引失敗: アイテムまたは所持金が利用できません。"
+      "tradeFailed": "取引失敗: アイテムまたは所持金が利用できません。",
+      "tradeBound": "そのアイテムはバインドされているため取引できません。"
     },
     "logs": {
       "standUp": "立ち上がりました。",
@@ -8607,6 +8682,21 @@ export const ja_JP: EnTranslations = {
       },
       "wildsoul_maul": {
         "name": "野生魂の大槌"
+      },
+      "resonant_thread": {
+        "name": "共鳴の糸"
+      },
+      "resonant_hide": {
+        "name": "共鳴の獣皮"
+      },
+      "resonant_links": {
+        "name": "共鳴の鎖"
+      },
+      "resonant_steel": {
+        "name": "共鳴の鋼"
+      },
+      "resonant_timber": {
+        "name": "共鳴の木材"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"
