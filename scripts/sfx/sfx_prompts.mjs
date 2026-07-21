@@ -220,6 +220,24 @@ export const SFX = [
     prompt:
       "A human warrior's final pained death cry as he collapses to the ground. Single death cry fading out.",
   },
+  {
+    key: 'player_eat_food',
+    custom: true,
+    duration: 2.2,
+    prompt: 'A person taking a bite of food and chewing. Single bite, no music.',
+  },
+  {
+    key: 'player_drink_water',
+    custom: true,
+    duration: 1.7,
+    prompt: 'A person drinking water from a waterskin, swallowing. Single gulp, no music.',
+  },
+  {
+    key: 'player_drink_potion',
+    custom: true,
+    duration: 1.0,
+    prompt: 'A person uncorking a small vial and quaffing a potion in one gulp. No music.',
+  },
 
   // --- Spell casts (looping while channeling) ------------------------------
   {

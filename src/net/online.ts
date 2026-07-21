@@ -2756,11 +2756,29 @@ export class ClientWorld implements IWorld {
       e.hasteRating = s.hrat ?? 0;
       e.hitRating = s.hirat ?? 0;
       e.weapon = s.weapon ?? e.weapon;
+      // ticksElapsed is a sim-internal sfx-cadence counter (consume_sfx.ts):
+      // the client never derives a sound decision from this local shadow (the
+      // server's heal SimEvents already carry sfxTick), so 0 is an inert
+      // placeholder here, same as the other display-only zeros above.
       e.eating = s.eat
-        ? { itemId: '', kind: 'food', hpPer2s: 0, manaPer2s: 0, remaining: s.eat.remaining }
+        ? {
+            itemId: '',
+            kind: 'food',
+            hpPer2s: 0,
+            manaPer2s: 0,
+            remaining: s.eat.remaining,
+            ticksElapsed: 0,
+          }
         : null;
       e.drinking = s.drk
-        ? { itemId: '', kind: 'drink', hpPer2s: 0, manaPer2s: 0, remaining: s.drk.remaining }
+        ? {
+            itemId: '',
+            kind: 'drink',
+            hpPer2s: 0,
+            manaPer2s: 0,
+            remaining: s.drk.remaining,
+            ticksElapsed: 0,
+          }
         : null;
       // IWorldProgressionXp facet (W7) self-decode: xp/lxp/rxp/prk ride every
       // self-frame (?? 0); milestones is delta-guarded (omitted keeps the prior

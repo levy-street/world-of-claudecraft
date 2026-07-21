@@ -3128,13 +3128,21 @@ function c3AuraRunner(): Scenario {
       p.fiveSecondRule = 99;
       p.hp = Math.max(1, p.maxHp - 600);
       p.resource = Math.max(0, p.maxResource - 300);
-      p.eating = { itemId: 'parity_food', kind: 'food', hpPer2s: 90, manaPer2s: 0, remaining: 6 };
+      p.eating = {
+        itemId: 'parity_food',
+        kind: 'food',
+        hpPer2s: 90,
+        manaPer2s: 0,
+        remaining: 6,
+        ticksElapsed: 0,
+      };
       p.drinking = {
         itemId: 'parity_drink',
         kind: 'drink',
         hpPer2s: 0,
         manaPer2s: 50,
         remaining: 6,
+        ticksElapsed: 0,
       };
       p.auras.push(
         aura({

@@ -120,6 +120,26 @@ describe('items.useItem', () => {
     expect(sim.countItem('spring_water', pid)).toBe(0);
   });
 
+  it('sitting down to eat/drink emits an immediate sound-only heal (source + sfxTick), before any regen tick', () => {
+    const sim = makeWorld();
+    const { pid, p } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('baked_bread', 1, pid);
+    sim.addItem('spring_water', 1, pid);
+
+    sim.drainEvents();
+    items.useItem(ctx, 'baked_bread', pid);
+    const eatHeals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal');
+    expect(eatHeals).toHaveLength(1);
+    expect(eatHeals[0]).toMatchObject({ source: 'food', sfxTick: true, amount: 0 });
+
+    sim.drainEvents();
+    items.useItem(ctx, 'spring_water', pid);
+    const drinkHeals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal');
+    expect(drinkHeals).toHaveLength(1);
+    expect(drinkHeals[0]).toMatchObject({ source: 'drink', sfxTick: true, amount: 0 });
+  });
+
   it('potion heals up to the deficit and arms the shared cooldown', () => {
     const sim = makeWorld();
     const { pid, p } = vendorPlayer(sim);
@@ -131,6 +151,36 @@ describe('items.useItem', () => {
     expect(p.hp).toBe(p.maxHp); // 90 potion clamped to the 50 deficit
     expect(p.potionCooldownUntil).toBeGreaterThan(0);
     expect(sim.countItem('minor_healing_potion', pid)).toBe(0);
+  });
+
+  it('a potion heal emits source:potion (distinct from a generic heal_impact)', () => {
+    const sim = makeWorld();
+    const { pid, p } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('minor_healing_potion', 1, pid);
+    p.hp = p.maxHp - 50;
+
+    sim.drainEvents();
+    items.useItem(ctx, 'minor_healing_potion', pid);
+    const heals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal');
+    expect(heals).toHaveLength(1);
+    expect(heals[0]).toMatchObject({ source: 'potion', amount: 50 });
+  });
+
+  it('a pure-mana potion still emits source:potion, amount 0 (sound-only, no floating heal number)', () => {
+    const sim = makeWorld();
+    const { pid, p } = vendorPlayer(sim);
+    const ctx = ctxOf(sim);
+    sim.addItem('minor_mana_potion', 1, pid);
+    p.resourceType = 'mana';
+    p.resource = p.maxResource - 50;
+    p.hp = p.maxHp; // full: no hp portion of this potion applies
+
+    sim.drainEvents();
+    items.useItem(ctx, 'minor_mana_potion', pid);
+    const heals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal');
+    expect(heals).toHaveLength(1);
+    expect(heals[0]).toMatchObject({ source: 'potion', amount: 0 });
   });
 
   it('shares one 2-minute cooldown across all potions and materializes the remaining timer', () => {

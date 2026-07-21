@@ -28,6 +28,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { shouldFireConsumeTickSfx } from '../consume_sfx';
 import { pctValue, recalcPlayerStats } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -111,13 +112,28 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
   for (const slot of ['eating', 'drinking'] as const) {
     const c = p[slot];
     if (!c) continue;
+    let healed = 0;
     if (c.hpPer2s > 0 && p.hp < p.maxHp) {
-      const heal = Math.min(Math.round(c.hpPer2s * ctx.healingTakenMult(p)), p.maxHp - p.hp);
-      p.hp += heal;
-      ctx.emit({ type: 'heal', targetId: p.id, amount: heal });
+      healed = Math.min(Math.round(c.hpPer2s * ctx.healingTakenMult(p)), p.maxHp - p.hp);
+      p.hp += healed;
     }
     if (c.manaPer2s > 0 && p.resourceType === 'mana') {
       p.resource = Math.min(p.maxResource, p.resource + c.manaPer2s);
+    }
+    c.ticksElapsed += 1;
+    const sfxTick = shouldFireConsumeTickSfx(c.ticksElapsed);
+    // Emit on every tick that actually healed (unchanged FCT/log cadence) OR
+    // on the designated sound tick, even at full hp/mana: otherwise a
+    // full-health character eating would make no sound at all. A tick that is
+    // BOTH still emits just once (amount carries the real heal, if any).
+    if (healed > 0 || sfxTick) {
+      ctx.emit({
+        type: 'heal',
+        targetId: p.id,
+        amount: healed,
+        source: c.kind,
+        sfxTick,
+      });
     }
     c.remaining -= 2;
     if (c.remaining <= 0) p[slot] = null;

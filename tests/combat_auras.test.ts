@@ -168,7 +168,14 @@ describe('auras: updateRegen', () => {
     const meta = sim.players.get(p.id) as PlayerMeta;
     p.inCombat = false;
     p.hp = Math.max(1, p.maxHp - 500);
-    p.eating = { itemId: 'food', kind: 'food', hpPer2s: 90, manaPer2s: 0, remaining: 6 };
+    p.eating = {
+      itemId: 'food',
+      kind: 'food',
+      hpPer2s: 90,
+      manaPer2s: 0,
+      remaining: 6,
+      ticksElapsed: 0,
+    };
     sim.tickCount = 40; // a multiple of 40 so the regen body runs
     const hp0 = p.hp;
     updateRegen(sim.ctx, p, meta);
@@ -182,12 +189,79 @@ describe('auras: updateRegen', () => {
     const meta = sim.players.get(p.id) as PlayerMeta;
     p.inCombat = false;
     p.hp = Math.max(1, p.maxHp - 500);
-    p.eating = { itemId: 'food', kind: 'food', hpPer2s: 90, manaPer2s: 0, remaining: 6 };
+    p.eating = {
+      itemId: 'food',
+      kind: 'food',
+      hpPer2s: 90,
+      manaPer2s: 0,
+      remaining: 6,
+      ticksElapsed: 0,
+    };
     sim.tickCount = 41; // not a multiple of 40
     const hp0 = p.hp;
     updateRegen(sim.ctx, p, meta);
     expect(p.hp).toBe(hp0);
     expect(p.eating?.remaining).toBe(6); // untouched
+  });
+
+  it('tags a healing eat tick with source:food and sfxTick only on the 3rd real tick', () => {
+    const sim = makeSim();
+    const p = sim.player as AnyEntity;
+    const meta = sim.players.get(p.id) as PlayerMeta;
+    p.inCombat = false;
+    p.hp = Math.max(1, p.maxHp - 500);
+    p.eating = {
+      itemId: 'food',
+      kind: 'food',
+      hpPer2s: 10,
+      manaPer2s: 0,
+      remaining: 18,
+      ticksElapsed: 0,
+    };
+    sim.tickCount = 0;
+    const sfxTicks: boolean[] = [];
+    for (let i = 0; i < 9; i++) {
+      sim.tickCount = 40 * (i + 1);
+      sim.drainEvents();
+      updateRegen(sim.ctx, p, meta);
+      const heals = (sim.drainEvents() as any[]).filter(
+        (e) => e.type === 'heal' && e.source === 'food',
+      );
+      expect(heals).toHaveLength(1); // still healing every tick (hp never caps here)
+      expect(heals[0].sfxTick).toBe((i + 1) % 3 === 0);
+      sfxTicks.push(heals[0].sfxTick);
+    }
+    expect(sfxTicks).toEqual([false, false, true, false, false, true, false, false, true]);
+  });
+
+  it('a full-hp eat tick still emits a sound-only event on the sfx tick, but stays silent otherwise', () => {
+    const sim = makeSim();
+    const p = sim.player as AnyEntity;
+    const meta = sim.players.get(p.id) as PlayerMeta;
+    p.inCombat = false;
+    p.hp = p.maxHp; // already full: the heal amount is always 0
+    p.eating = {
+      itemId: 'food',
+      kind: 'food',
+      hpPer2s: 10,
+      manaPer2s: 0,
+      remaining: 18,
+      ticksElapsed: 0,
+    };
+    // Tick 1 and 2: not a sfx tick, already full hp -> no emit at all.
+    for (const n of [1, 2]) {
+      sim.tickCount = 40 * n;
+      sim.drainEvents();
+      updateRegen(sim.ctx, p, meta);
+      expect((sim.drainEvents() as any[]).filter((e) => e.type === 'heal')).toHaveLength(0);
+    }
+    // Tick 3: the sfx tick, still full hp -> one sound-only (amount 0) emit.
+    sim.tickCount = 40 * 3;
+    sim.drainEvents();
+    updateRegen(sim.ctx, p, meta);
+    const heals = (sim.drainEvents() as any[]).filter((e) => e.type === 'heal');
+    expect(heals).toHaveLength(1);
+    expect(heals[0]).toMatchObject({ source: 'food', sfxTick: true, amount: 0 });
   });
 });
 

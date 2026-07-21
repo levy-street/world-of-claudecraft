@@ -118,10 +118,24 @@ describe('overhead cast bar', () => {
 // the target's whole story, so eat/drink rides here, not on castBarState. The core
 // stays i18n-free, emitting only the `mode` discriminator the painter localizes.
 function food(remaining: number): Consuming {
-  return { itemId: 'roasted_boar', kind: 'food', hpPer2s: 40, manaPer2s: 0, remaining };
+  return {
+    itemId: 'roasted_boar',
+    kind: 'food',
+    hpPer2s: 40,
+    manaPer2s: 0,
+    remaining,
+    ticksElapsed: 0,
+  };
 }
 function drink(remaining: number): Consuming {
-  return { itemId: 'spring_water', kind: 'drink', hpPer2s: 0, manaPer2s: 30, remaining };
+  return {
+    itemId: 'spring_water',
+    kind: 'drink',
+    hpPer2s: 0,
+    manaPer2s: 30,
+    remaining,
+    ticksElapsed: 0,
+  };
 }
 
 describe('overhead eat/drink overlay', () => {
@@ -232,6 +246,7 @@ describe('ClientWorld-vs-Sim parity', () => {
       hpPer2s: 0,
       manaPer2s: 0,
       remaining: 9,
+      ticksElapsed: 0,
     };
     const clientDrink: Consuming = {
       itemId: '',
@@ -239,6 +254,7 @@ describe('ClientWorld-vs-Sim parity', () => {
       hpPer2s: 0,
       manaPer2s: 0,
       remaining: 5,
+      ticksElapsed: 0,
     };
     const sim = consumeBarState(simEat, simDrink);
     const client = consumeBarState(clientEat, clientDrink);
