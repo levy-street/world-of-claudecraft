@@ -1242,6 +1242,9 @@ export const nl_NL: EnTranslations = {
       "joinChannels": "Tip: typ /join world of /join lfg om te chatten met spelers over de hele wereld."
     },
     "itemHeroicTag": "[HELDHAFTIG]",
+    "limitedRelicSupply": "Limited relic: only {count} will ever exist",
+    "limitedRelicSerial": "Relic {serial} of {supply}",
+    "limitedRelicClaim": "{name} has claimed {item}, relic {serial} of {supply}.",
     "itemSoulbound": "Zielsgebonden",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -9185,6 +9188,27 @@ export const nl_NL: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Lendenbescherming van de Stormroeper"
+      },
+      "emberfall_edge": {
+        "name": "Emberfall Edge"
+      },
+      "crown_of_the_thornpeak_scourge": {
+        "name": "Crown of the Thornpeak Scourge"
+      },
+      "thunzharrs_stormheart": {
+        "name": "Thunzharr's Stormheart"
+      },
+      "sealed_vault_signet_crypt": {
+        "name": "Sealed Signet of the Hollow Crypt"
+      },
+      "sealed_vault_signet_bastion": {
+        "name": "Sealed Signet of the Sunken Bastion"
+      },
+      "sealed_vault_signet_temple": {
+        "name": "Sealed Signet of the Drowned Temple"
+      },
+      "sealed_vault_signet_sanctum": {
+        "name": "Sealed Signet of the Gravewyrm Sanctum"
       }
     },
     "mobs": {

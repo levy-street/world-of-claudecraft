@@ -1242,6 +1242,9 @@ export const ko_KR: EnTranslations = {
       "joinChannels": "팁: /join world 또는 /join lfg를 입력하면 월드 전역의 플레이어와 대화할 수 있습니다."
     },
     "itemHeroicTag": "[영웅]",
+    "limitedRelicSupply": "한정 유물: 전 세계에 {count}개만 존재",
+    "limitedRelicSerial": "유물 {serial} / {supply}",
+    "limitedRelicClaim": "{name}님이 {item}을(를) 획득했습니다. 유물 {serial} / {supply}.",
     "itemSoulbound": "귀속",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -9185,6 +9188,27 @@ export const ko_KR: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "폭풍소환사의 허리보호구"
+      },
+      "emberfall_edge": {
+        "name": "잿불낙하의 칼날"
+      },
+      "crown_of_the_thornpeak_scourge": {
+        "name": "가시봉우리 재앙의 왕관"
+      },
+      "thunzharrs_stormheart": {
+        "name": "툰자르의 폭풍심장"
+      },
+      "sealed_vault_signet_crypt": {
+        "name": "공허한 지하묘의 봉인 인장"
+      },
+      "sealed_vault_signet_bastion": {
+        "name": "가라앉은 요새의 봉인 인장"
+      },
+      "sealed_vault_signet_temple": {
+        "name": "물에 잠긴 신전의 봉인 인장"
+      },
+      "sealed_vault_signet_sanctum": {
+        "name": "무덤벌레 성소의 봉인 인장"
       }
     },
     "mobs": {

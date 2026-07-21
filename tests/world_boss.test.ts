@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MOBS } from '../src/sim/data';
+import { ITEMS, MOBS } from '../src/sim/data';
 import { respawnMob } from '../src/sim/mob/lifecycle';
 import { resetEvadingMob } from '../src/sim/mob/locomotion';
 import { combatProfileForMob, scaledDefaultMobMeleeRange } from '../src/sim/mob_combat';
@@ -382,10 +382,15 @@ describe('world boss personal loot', () => {
       killWith(sim, boss, pids);
       const items = boss.loot?.items ?? [];
       for (const pid of pids) {
-        // The guaranteed Inert Storm Shard is a trophy, not a gear drop; every other
-        // personal slot is a Tier-2 set piece from a roll group.
+        // The guaranteed Inert Storm Shard is a trophy, not a gear drop; the
+        // limited-supply relic (Thunzharr's Stormheart) is an independent
+        // bonus roll with its own cap, not part of the Tier-2 gear roll groups.
+        // Every OTHER personal slot is a Tier-2 set piece from a roll group.
         const gear = items.filter(
-          (s) => (s.personalFor ?? []).includes(pid) && s.itemId !== 'inert_storm_shard',
+          (s) =>
+            (s.personalFor ?? []).includes(pid) &&
+            s.itemId !== 'inert_storm_shard' &&
+            ITEMS[s.itemId]?.limitedSupply === undefined,
         );
         expect(gear.length).toBeLessThanOrEqual(1);
         if (gear.length === 1) anyGearDropped = true;

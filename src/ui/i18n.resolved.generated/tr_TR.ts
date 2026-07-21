@@ -1242,6 +1242,9 @@ export const tr_TR: EnTranslations = {
       "joinChannels": "İpucu: Dünya genelindeki oyuncularla sohbet etmek için /join world ya da /join lfg yaz."
     },
     "itemHeroicTag": "[KAHRAMANCA]",
+    "limitedRelicSupply": "Limited relic: only {count} will ever exist",
+    "limitedRelicSerial": "Relic {serial} of {supply}",
+    "limitedRelicClaim": "{name} has claimed {item}, relic {serial} of {supply}.",
     "itemSoulbound": "Ruha Bağlı",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -9185,6 +9188,27 @@ export const tr_TR: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "Fırtınaçağıranın Bel Koruyucusu"
+      },
+      "emberfall_edge": {
+        "name": "Emberfall Edge"
+      },
+      "crown_of_the_thornpeak_scourge": {
+        "name": "Crown of the Thornpeak Scourge"
+      },
+      "thunzharrs_stormheart": {
+        "name": "Thunzharr's Stormheart"
+      },
+      "sealed_vault_signet_crypt": {
+        "name": "Sealed Signet of the Hollow Crypt"
+      },
+      "sealed_vault_signet_bastion": {
+        "name": "Sealed Signet of the Sunken Bastion"
+      },
+      "sealed_vault_signet_temple": {
+        "name": "Sealed Signet of the Drowned Temple"
+      },
+      "sealed_vault_signet_sanctum": {
+        "name": "Sealed Signet of the Gravewyrm Sanctum"
       }
     },
     "mobs": {

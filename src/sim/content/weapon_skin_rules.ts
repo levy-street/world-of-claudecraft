@@ -20,6 +20,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   worn_sword: 'sword',
   ironedge_longsword: 'sword',
   thorium_warblade: 'sword',
+  emberfall_edge: 'sword',
   redbrook_blade: 'sword',
   valeborn_spellblade: 'sword',
   eastbrook_arming_sword: 'sword',

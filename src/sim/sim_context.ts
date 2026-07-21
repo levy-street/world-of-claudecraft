@@ -264,6 +264,14 @@ export interface SimContextCallbacks {
   // the boundary (the authoritative server uses its realm-local 3 AM daily reset), so
   // the sim core never reads a time zone; offline/headless fall back to a flat 24h day.
   raidResetMs(nowMs: number): number;
+  // Mint allocator for limited-supply drops (ItemDef.limitedSupply): the next
+  // 1-based serial for the item, or null when the supply is exhausted (the loot
+  // roll then awards the item's registered fallback; see loot/limited_gate.ts).
+  // Routes to `Sim.claimLimitedSerial`, which prefers the host-injected
+  // SimConfig.claimLimitedSerial (the server's cross-realm serial lease pool)
+  // and falls back to the per-world in-memory ledger (Sim.limitedMints)
+  // offline/headless. Synchronous, draws no rng and no wall clock.
+  claimLimitedSerial(itemId: string): number | null;
   instanceKeyFor(pid: number): string;
   instanceOriginOf(inst: InstanceSlot): { x: number; z: number };
   instanceClaimIdAt(pos: Vec3): number | null;
@@ -1048,6 +1056,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     error: host.error,
     lockoutNowMs: host.lockoutNowMs,
     raidResetMs: host.raidResetMs,
+    claimLimitedSerial: host.claimLimitedSerial,
     instanceKeyFor: host.instanceKeyFor,
     instanceOriginOf: host.instanceOriginOf,
     instanceClaimIdAt: host.instanceClaimIdAt,

@@ -21,6 +21,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   mistcallers_edge: 'sword_e',
   zealotsbane_blade: 'sword_e',
   kingsbane_last_oath: 'sword_f', // LEGENDARY: the flaming blade (exclusive)
+  emberfall_edge: 'adv_sword_1handed', // LEGENDARY relic (limited supply)
   valeborn_spellblade: 'sword_g', // crystalline
   maldrecs_soulbinder: 'sword_g',
   highwatch_warblade: 'adv_sword_1handed',

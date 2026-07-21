@@ -1141,6 +1141,16 @@ export const hudChromeStrings = {
   // (content/heroic_variants.ts), e.g. "Epic Armor [HEROIC]". The variant shares the
   // base item's name; this tag is the only heroic marker, shown in gold.
   itemHeroicTag: '[HEROIC]',
+  // Tooltip line on a limited-supply relic (content/limited_drops.ts): the hard
+  // global cap, shown on every copy. {count} is the total that will ever exist.
+  limitedRelicSupply: 'Limited relic: only {count} will ever exist',
+  // Tooltip line on a MINTED relic copy that carries its own serial number
+  // (ItemInstancePayload.serial): "Relic {serial} of {supply}".
+  limitedRelicSerial: 'Relic {serial} of {supply}',
+  // Chat line when a limited relic is claimed. Offline the client renders this
+  // from the limitedMint event; {item} is a [[i:id]] link token. Online the
+  // realm-wide broadcast (server_i18n limitedRelicClaimBroadcast) supersedes it.
+  limitedRelicClaim: '{name} has claimed {item}, relic {serial} of {supply}.',
   // Tooltip marker for a soulbound item (bound to its owner: cannot be traded, mailed,
   // listed, sold, or destroyed). Currency-like reward tokens (Heroic Marks) carry this.
   itemSoulbound: 'Soulbound',

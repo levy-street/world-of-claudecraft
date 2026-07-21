@@ -183,9 +183,11 @@ describe('combat-rating tier ladder', () => {
     }
 
     // The 8 Nythraxis set pieces plus the 4 offhand-slot / two-hander epics
-    // (bonewrought_greatsword/bulwark, direfang_greatblade, wraithfire_orb).
+    // (bonewrought_greatsword/bulwark, direfang_greatblade, wraithfire_orb), plus
+    // the 2 raid-tier limited relics that land here (the Crown of the Thornpeak
+    // Scourge and Thunzharr's Stormheart, content/limited_drops.ts).
     const ilvl29 = allGear.filter((item) => itemLevel(item) === 29);
-    expect(ilvl29).toHaveLength(12);
+    expect(ilvl29).toHaveLength(14);
     for (const item of ilvl29) expect(ratingValues(item), item.id).toEqual([20]);
 
     const directHeroicRaidWeapons = new Set([

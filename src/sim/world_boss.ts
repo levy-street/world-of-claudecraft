@@ -19,6 +19,7 @@
 // loot entries in array order) so the parity gate's rng draw-order log stays stable.
 
 import { MOBS } from './data';
+import { appendLimitedDrops } from './loot/loot_roll';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { Entity, LootSlot } from './types';
@@ -235,6 +236,16 @@ export function rollWorldBossLoot(ctx: SimContext, mob: Entity, contributors: Pl
       if (entry.itemId)
         items.push({ itemId: entry.itemId, count: 1, personalFor: [meta.entityId] });
     }
+    // Limited-supply relics for the world boss: each eligible contributor gets an
+    // independent per-relic roll (append-only, one ctx.rng.chance each, AFTER the
+    // draws above). The global supply gates who actually mints a serial; everyone
+    // else past the cap gets the registered fallback. personalFor slots, so each
+    // contributor loots their own copy without a shared roll.
+    appendLimitedDrops(ctx, mob, items, false, (itemId) => ({
+      itemId,
+      count: 1,
+      personalFor: [meta.entityId],
+    }));
   }
   if (copper > 0 || items.length > 0) {
     mob.loot = { copper, items };

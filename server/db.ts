@@ -22,6 +22,7 @@ import type { RankedDeedsAccount } from './deeds_board';
 import { DISCORD_SCHEMA } from './discord_db';
 import { GITHUB_SCHEMA } from './github_db';
 import { isUniqueViolation } from './http_util';
+import { LIMITED_SUPPLY_SCHEMA } from './limited_supply_db';
 import { MAPS_SCHEMA } from './maps_db';
 import {
   LEGACY_MARKET_KEY,
@@ -1006,6 +1007,11 @@ export async function ensureSchema(): Promise<void> {
     // FK-references accounts(id), so it runs after SCHEMA. Applied unconditionally
     // (idempotent), like the Discord tables.
     await client.query(GITHUB_SCHEMA);
+    // Limited-supply relic ledger (cross-realm serial allocation for the
+    // true-scarcity drops). No FK to realm-scoped tables; keyed by item id and a
+    // realm string. Applied unconditionally (idempotent) so the tables exist
+    // before the first relic ever drops. See server/limited_supply_db.ts.
+    await client.query(LIMITED_SUPPLY_SCHEMA);
     // Tier-2 global rate-limit backstop table (pg-backed fixed-window counters,
     // one row per (policy, key)) for the multi-realm deployment. Applied
     // unconditionally (idempotent), like the Discord/GitHub tables. See

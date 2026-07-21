@@ -1242,6 +1242,9 @@ export const ja_JP: EnTranslations = {
       "joinChannels": "ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。"
     },
     "itemHeroicTag": "[ヒロイック]",
+    "limitedRelicSupply": "限定遺物：世界に {count} 個のみ",
+    "limitedRelicSerial": "遺物 {serial} / {supply}",
+    "limitedRelicClaim": "{name} が {item} を手に入れた。遺物 {serial} / {supply}。",
     "itemSoulbound": "魂縛",
     "itemSet": {
       "header": "{name} ({have}/{total})",
@@ -9185,6 +9188,27 @@ export const ja_JP: EnTranslations = {
       },
       "stormcallers_waistguard": {
         "name": "嵐呼びの腰当て"
+      },
+      "emberfall_edge": {
+        "name": "燼落の刃"
+      },
+      "crown_of_the_thornpeak_scourge": {
+        "name": "荊峰の災厄の冠"
+      },
+      "thunzharrs_stormheart": {
+        "name": "サンザールの嵐の心臓"
+      },
+      "sealed_vault_signet_crypt": {
+        "name": "虚ろな地下墓所の封印指輪"
+      },
+      "sealed_vault_signet_bastion": {
+        "name": "沈んだ砦の封印指輪"
+      },
+      "sealed_vault_signet_temple": {
+        "name": "水没した神殿の封印指輪"
+      },
+      "sealed_vault_signet_sanctum": {
+        "name": "墓竜の聖所の封印指輪"
       }
     },
     "mobs": {
