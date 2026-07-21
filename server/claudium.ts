@@ -31,6 +31,8 @@ import {
   claudiumSkus,
   claudiumSpend,
   claudiumStore,
+  claudiumSupply,
+  claudiumSupplyHistory,
   parseNativeRail,
 } from './claudium_proxy';
 import { accountAndScopeForToken, moderationStatusForAccount } from './db';
@@ -137,6 +139,37 @@ export async function handleClaudiumApi(
   }
   if (req.method === 'GET' && path === '/api/claudium/history') {
     return json(res, 200, await claudiumHistory(account));
+  }
+  if (req.method === 'GET' && path === '/api/claudium/supply') {
+    return json(res, 200, await claudiumSupply());
+  }
+  if (req.method === 'GET' && path === '/api/claudium/supply/history') {
+    // The window is chosen by the client, but bounded HERE: an unbounded range
+    // with a tiny bucket would make the service scan and bucket the whole
+    // ledger. Range caps at 90 days and the bucket floors at 1 minute; the
+    // service clamps again independently, so neither side trusts the other.
+    // A blank param ("?untilMs=") is not null and Number('') is 0, which passes
+    // Number.isFinite, so treat blank as absent rather than as zero.
+    const numParam = (key: string, fallback: number): number => {
+      const raw = url.searchParams.get(key);
+      return raw === null || raw.trim() === '' ? fallback : Number(raw);
+    };
+    const untilMs = numParam('untilMs', Date.now());
+    const sinceMs = numParam('sinceMs', untilMs - 7 * 86_400_000);
+    const bucketMs = numParam('bucketMs', 3_600_000);
+    if (!Number.isFinite(untilMs) || !Number.isFinite(sinceMs) || !Number.isFinite(bucketMs)) {
+      return json(res, 200, { points: [], bucketMs: null, sinceMs: null, untilMs: null });
+    }
+    const boundedSince = Math.max(sinceMs, untilMs - 90 * 86_400_000);
+    return json(
+      res,
+      200,
+      await claudiumSupplyHistory({
+        sinceMs: boundedSince,
+        untilMs,
+        bucketMs: Math.max(bucketMs, 60_000),
+      }),
+    );
   }
   if (req.method === 'POST' && path === '/api/claudium/purchase') {
     const body = (await readBody(req).catch(() => ({}))) as Record<string, unknown>;
@@ -289,6 +322,20 @@ export const routes: RouteDef[] = [
   {
     method: 'GET',
     path: '/api/claudium/history',
+    surface: 'api',
+    middleware: [activeGuard],
+    handler: claudiumHandler,
+  },
+  {
+    method: 'GET',
+    path: '/api/claudium/supply/history',
+    surface: 'api',
+    middleware: [activeGuard],
+    handler: claudiumHandler,
+  },
+  {
+    method: 'GET',
+    path: '/api/claudium/supply',
     surface: 'api',
     middleware: [activeGuard],
     handler: claudiumHandler,

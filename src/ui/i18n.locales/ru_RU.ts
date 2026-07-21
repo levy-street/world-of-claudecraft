@@ -6622,4 +6622,23 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.inspectArtAlt': 'Предпросмотр: {name}',
   'hudChrome.claudium.tryOnStopButton': 'Прекратить примерку',
   'hudChrome.claudium.tryOnActiveNote': 'Примерка на вашем персонаже. Это не даёт предмет.',
+  'hudChrome.claudium.tabSupply': 'Предложение',
+  'hudChrome.claudium.supplyTitle': 'Клаудиум в обращении',
+  'hudChrome.claudium.supplyLoading': 'Загрузка данных о предложении...',
+  'hudChrome.claudium.supplyError':
+    'Не удалось загрузить данные о предложении. Попробуйте ещё раз.',
+  'hudChrome.claudium.supplyUnavailable': 'Данные о предложении сейчас недоступны.',
+  'hudChrome.claudium.supplyInExistence': 'В обращении {amount}',
+  'hudChrome.claudium.supplyUsdValue': 'Стоимость {amount}',
+  'hudChrome.claudium.supplyIssued': 'Всего выпущено',
+  'hudChrome.claudium.supplySunk': 'Всего потрачено или отменено',
+  'hudChrome.claudium.supplyHolders': 'Держат {n} аккаунтов',
+  'hudChrome.claudium.supplyChangeUp': 'Рост на {amount} за период',
+  'hudChrome.claudium.supplyChangeDown': 'Снижение на {amount} за период',
+  'hudChrome.claudium.supplyChangeFlat': 'Без изменений за период',
+  'hudChrome.claudium.supplyChartLabel': 'Предложение Клаудиума за выбранный период',
+  'hudChrome.claudium.supplyChartEmpty': 'За этот период изменений не было.',
+  'hudChrome.claudium.supplyRangeLabel': 'Период графика',
+  'hudChrome.claudium.supplyFootnote':
+    'Учитывает весь Клаудиум на всех аккаунтах, суммируется из реестра в реальном времени.',
 };

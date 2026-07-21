@@ -171,6 +171,7 @@ import type {
   ClaudiumQuotePayload,
   ClaudiumRedeemPayload,
   ClaudiumSnapshot,
+  ClaudiumSupplyPayload,
 } from './claudium_window';
 import { ClaudiumWindow } from './claudium_window';
 import { formatClockTime } from './clock';
@@ -464,6 +465,12 @@ export interface ClaudiumHooks {
   giftcardConfirm(reference: string, signature: string): Promise<ClaudiumGiftConfirmPayload>;
   /** Fetch one newest-first page of the caller's Claudium ledger. */
   historyPage(limit: number, before?: string): Promise<ClaudiumHistoryPayload>;
+  /** Fetch the economy-wide supply totals plus the curve for one window. */
+  supply(query: {
+    sinceMs: number;
+    untilMs: number;
+    bucketMs: number;
+  }): Promise<ClaudiumSupplyPayload>;
 }
 
 export interface BugReportPayload {
@@ -3716,6 +3723,22 @@ export class Hud {
     historyPage: (limit, before) =>
       this.claudiumHooks?.historyPage(limit, before) ??
       Promise.resolve<ClaudiumHistoryPayload>({ entries: [], nextCursor: null }),
+    // No hooks means the service is off: resolve the all-null supply so the
+    // panel renders its unavailable state rather than a fabricated zero.
+    supply: (query) =>
+      this.claudiumHooks?.supply(query) ??
+      Promise.resolve<ClaudiumSupplyPayload>({
+        supply: {
+          circulating: null,
+          issued: null,
+          sunk: null,
+          holders: null,
+          usdPerClaudium: null,
+          atMs: null,
+        },
+        points: [],
+        serviceWindow: null,
+      }),
     ...this.windowFocus('#claudium-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
   });

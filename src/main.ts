@@ -1781,6 +1781,21 @@ async function startGame(
         const page = await economy.historyPage({ limit, before });
         return { entries: page.entries, nextCursor: page.nextCursor };
       },
+      // Economy-wide supply: the totals and the curve for one window. Fetched as
+      // a pair so the headline and the chart always describe the same read.
+      supply: async (query) => {
+        const [supply, history] = await Promise.all([
+          economy.supply(),
+          economy.supplyHistory(query),
+        ]);
+        // Carry the service's OWN window through: points are stamped at their
+        // bucket floor, so only the window they were computed for can place
+        // them correctly. Falling back to the requested window keeps the chart
+        // plottable if the service omitted it.
+        const sinceMs = history.sinceMs ?? query.sinceMs;
+        const untilMs = history.untilMs ?? query.untilMs;
+        return { supply, points: history.points, serviceWindow: { sinceMs, untilMs } };
+      },
     });
   }
   function interactKey(): void {

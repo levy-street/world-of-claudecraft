@@ -185,6 +185,34 @@ export interface ClaudiumHistoryPage {
   nextCursor: string | null;
 }
 
+/**
+ * Economy-wide Claudium supply. Not scoped to the caller: the same figure for
+ * every player. All null when the service is off, so the panel can tell "we
+ * cannot say" apart from a genuine zero.
+ */
+export interface ClaudiumSupply {
+  circulating: number | null;
+  issued: number | null;
+  sunk: number | null;
+  holders: number | null;
+  usdPerClaudium: number | null;
+  atMs: number | null;
+}
+
+/** One point on the supply curve. */
+export interface ClaudiumSupplyPoint {
+  atMs: number;
+  circulating: number;
+}
+
+/** The supply curve over a window; empty points when the service is off. */
+export interface ClaudiumSupplyHistory {
+  points: ClaudiumSupplyPoint[];
+  bucketMs: number | null;
+  sinceMs: number | null;
+  untilMs: number | null;
+}
+
 /** The gift-card redeem result: credited amount + resulting balance, or a reason. */
 export interface ClaudiumGiftCardRedeem {
   credited: boolean;
@@ -221,6 +249,20 @@ const OFF_PURCHASE: ClaudiumPurchase = {
   stripe: null,
   woc: null,
   reason: 'unavailable',
+};
+const OFF_SUPPLY: ClaudiumSupply = {
+  circulating: null,
+  issued: null,
+  sunk: null,
+  holders: null,
+  usdPerClaudium: null,
+  atMs: null,
+};
+const OFF_SUPPLY_HISTORY: ClaudiumSupplyHistory = {
+  points: [],
+  bucketMs: null,
+  sinceMs: null,
+  untilMs: null,
 };
 const OFF_CONFIRM: ClaudiumConfirm = { credited: false, balance: null, reason: 'unavailable' };
 const OFF_SPEND: ClaudiumSpend = {
@@ -370,6 +412,33 @@ export class EconomyClient {
     const q = new URLSearchParams({ limit: String(input.limit) });
     if (input.before) q.set('before', input.before);
     return this.get(`/api/claudium/history/page?${q.toString()}`, OFF_HISTORY);
+  }
+
+  /**
+   * Economy-wide supply totals. Live aggregates of the service ledger, never a
+   * sampled snapshot, so this cannot drift from the balances it sums. Returns
+   * the all-null off state when the service is unreachable.
+   */
+  supply(): Promise<ClaudiumSupply> {
+    return this.get('/api/claudium/supply', OFF_SUPPLY);
+  }
+
+  /**
+   * The supply curve over a window, reconstructed from the ledger. Inactive
+   * buckets are omitted (supply did not change), so a consumer drawing a
+   * continuous line carries the previous value forward.
+   */
+  supplyHistory(input: {
+    sinceMs: number;
+    untilMs: number;
+    bucketMs: number;
+  }): Promise<ClaudiumSupplyHistory> {
+    const q = new URLSearchParams({
+      sinceMs: String(Math.trunc(input.sinceMs)),
+      untilMs: String(Math.trunc(input.untilMs)),
+      bucketMs: String(Math.trunc(input.bucketMs)),
+    });
+    return this.get(`/api/claudium/supply/history?${q.toString()}`, OFF_SUPPLY_HISTORY);
   }
 }
 

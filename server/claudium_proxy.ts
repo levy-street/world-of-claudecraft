@@ -100,6 +100,35 @@ export interface ClaudiumHistoryResult {
   entries: ClaudiumHistoryEntry[];
 }
 
+/**
+ * Economy-wide supply. Every figure is a live aggregate of the service ledger,
+ * never a sampled snapshot. All null when the service is off, so the window
+ * renders its empty state rather than a fabricated zero (a real zero total and
+ * an unreachable service must not look alike).
+ */
+export interface ClaudiumSupplyResult {
+  circulating: number | null;
+  issued: number | null;
+  sunk: number | null;
+  holders: number | null;
+  usdPerClaudium: number | null;
+  atMs: number | null;
+}
+
+/** One point on the supply curve. */
+export interface ClaudiumSupplyPoint {
+  atMs: number;
+  circulating: number;
+}
+
+/** The supply curve over a window. Empty points when the service is off. */
+export interface ClaudiumSupplyHistoryResult {
+  points: ClaudiumSupplyPoint[];
+  bucketMs: number | null;
+  sinceMs: number | null;
+  untilMs: number | null;
+}
+
 /** One cosmetic-store row: the item and its Claudium cost, both from the service. */
 export interface ClaudiumStoreItem {
   itemId: string;
@@ -180,6 +209,71 @@ export async function claudiumBalance(accountId: string): Promise<ClaudiumBalanc
     path: `balance/${encodeURIComponent(accountId)}`,
   });
   return { balance: typeof data?.balance === 'number' ? data.balance : null };
+}
+
+/** Read a finite number off an untrusted service payload, else null. */
+function num(value: unknown): number | null {
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+/**
+ * GET supply. Economy-wide, so it takes no accountId: the caller is still
+ * authenticated (the route sits behind activeGuard), but the figure is the same
+ * for everyone. All-null when the service is off.
+ */
+export async function claudiumSupply(): Promise<ClaudiumSupplyResult> {
+  const data = await callService<{
+    circulating: number;
+    issued: number;
+    sunk: number;
+    holders: number;
+    usdPerClaudium: number;
+    atMs: number;
+  }>({ method: 'GET', path: 'supply' });
+  return {
+    circulating: num(data?.circulating),
+    issued: num(data?.issued),
+    sunk: num(data?.sunk),
+    holders: num(data?.holders),
+    usdPerClaudium: num(data?.usdPerClaudium),
+    atMs: num(data?.atMs),
+  };
+}
+
+/**
+ * GET supply/history over a window. Points are dropped unless both fields are
+ * finite numbers, so a malformed payload yields an empty chart rather than NaN
+ * coordinates that would blank the canvas.
+ */
+export async function claudiumSupplyHistory(args: {
+  sinceMs: number;
+  untilMs: number;
+  bucketMs: number;
+}): Promise<ClaudiumSupplyHistoryResult> {
+  const query = new URLSearchParams({
+    sinceMs: String(Math.trunc(args.sinceMs)),
+    untilMs: String(Math.trunc(args.untilMs)),
+    bucketMs: String(Math.trunc(args.bucketMs)),
+  });
+  const data = await callService<{
+    points: Array<{ atMs: unknown; circulating: unknown }>;
+    bucketMs: number;
+    sinceMs: number;
+    untilMs: number;
+  }>({ method: 'GET', path: `supply/history?${query.toString()}` });
+  const raw = Array.isArray(data?.points) ? data.points : [];
+  const points: ClaudiumSupplyPoint[] = [];
+  for (const p of raw) {
+    const atMs = num(p?.atMs);
+    const circulating = num(p?.circulating);
+    if (atMs !== null && circulating !== null) points.push({ atMs, circulating });
+  }
+  return {
+    points,
+    bucketMs: num(data?.bucketMs),
+    sinceMs: num(data?.sinceMs),
+    untilMs: num(data?.untilMs),
+  };
 }
 
 /** GET price/:rail. Prices null when the service is off (buy disabled). */
