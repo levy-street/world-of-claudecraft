@@ -3214,11 +3214,11 @@
   #tooltip .tt-row .tt-armor.tt-armor-bad {
     color: #ff5040;
   }
-  /* Weapon type (Sword/Dagger/Mace/...) on the slot line: kept the muted tt-sub
-     color, NOT brightened or class-colored like armor weight. Any class can equip
-     most weapon types, so this is an at-a-glance identity cue, not a can-I-use-it
-     warning. */
-  #tooltip .tt-row .tt-weapon-type {
+  /* Weapon type (Sword/Dagger/Mace/...): its own plain line under the quality/kind
+     line, above the slot. Keeps the muted tt-sub color, deliberately NOT brightened
+     or class-colored like armor weight: any class can equip most weapon types, so
+     this is an at-a-glance identity cue, not a can-I-use-it warning. */
+  #tooltip .tt-weapon-type {
     color: var(--color-text-muted);
   }
   /* One-line aura effect summary under the tooltip title (buff/debuff hover). */
