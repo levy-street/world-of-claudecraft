@@ -14,15 +14,16 @@ it is recognizable at 16px.
 
 ## Material
 Polished platinum / white-silver metal with soft specular highlights. Central gem core of
-violet-to-cyan arcane glow (energy, not a jewel logo). Subtle inner light bloom. Not chrome,
-not gold. Premium mint-coin finish, gently magical.
+blue-essence-to-cyan arcane glow (energy, not a jewel logo), a vivid League-of-Legends blue
+essence. Ethereal blue dust and particle bloom drift around it. Subtle inner light bloom. Not
+chrome, not gold. Premium mint-coin finish, gently magical.
 
 ## Palette (hex)
 - Platinum base:      #D8DCE6
 - Platinum highlight: #F4F6FB
 - Platinum shadow:    #8A90A6
-- Arcane violet:      #6B3FD4
-- Arcane violet deep: #3B2170
+- Essence blue:       #2E7BE4
+- Essence blue deep:  #143A8C
 - Arcane cyan core:   #35E0D6
 - Cyan glow:          #7FF6EE
 - Gold accent (rare): #E8C15A   (thin, ties to the world; never dominant)
@@ -35,4 +36,4 @@ moves (credit/redeem), never anxious (pending/loading stays serene).
 ## Consistency rule
 Generate ONE hero coin first, lock it, then use it as the reference image for the icon
 family, denomination stacks, animations (image-to-video), and gift-card faces so the SAME
-coin appears everywhere. Same bezel, same sigil, same violet-cyan core, same platinum.
+coin appears everywhere. Same bezel, same sigil, same blue-cyan core, same platinum.

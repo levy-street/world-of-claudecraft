@@ -286,6 +286,9 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/claudium/skus' },
     { method: 'GET', path: '/api/claudium/store' },
     { method: 'GET', path: '/api/claudium/history' },
+    // Economy-wide supply: the only Claudium reads not scoped to the caller.
+    { method: 'GET', path: '/api/claudium/supply' },
+    { method: 'GET', path: '/api/claudium/supply/history' },
     { method: 'POST', path: '/api/claudium/purchase' },
     { method: 'POST', path: '/api/claudium/purchase/woc/confirm' },
     { method: 'POST', path: '/api/claudium/spend' },

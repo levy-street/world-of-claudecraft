@@ -2106,6 +2106,94 @@
     color: var(--color-text-muted);
     font-size: 12px;
   }
+  /* Supply panel: the economy-wide total, its curve, and supporting figures.
+     The headline carries the weight; the chart is a supporting sparkline, so it
+     is sized in relative units and never forces the window wider. */
+  .cl-supply-headline {
+    margin: 8px 0 4px;
+  }
+  .cl-supply-total {
+    margin: 0;
+    color: var(--color-gold);
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .cl-supply-usd {
+    margin: 2px 0 0;
+    color: var(--color-text-muted);
+    font-size: 12px;
+  }
+  .cl-supply-ranges {
+    display: flex;
+    gap: 6px;
+    margin: 10px 0 6px;
+  }
+  .cl-supply-chart {
+    position: relative;
+    width: 100%;
+    margin: 4px 0;
+  }
+  .cl-supply-chart svg {
+    display: block;
+    width: 100%;
+    height: 140px;
+    overflow: visible;
+  }
+  .cl-supply-grid {
+    stroke: var(--color-border-default);
+    stroke-width: 1;
+    opacity: 0.35;
+  }
+  .cl-supply-area {
+    fill: var(--color-primary-glow);
+    opacity: 0.4;
+  }
+  .cl-supply-line {
+    fill: none;
+    stroke: var(--color-gold);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .cl-supply-head {
+    fill: var(--color-gold);
+    vector-effect: non-scaling-stroke;
+  }
+  .cl-supply-axis {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2px;
+    color: var(--color-text-muted);
+    font-size: 10px;
+  }
+  .cl-supply-change {
+    margin: 4px 0 0;
+    color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  .cl-supply-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    margin: 8px 0 0;
+  }
+  .cl-supply-stat {
+    display: flex;
+    gap: 6px;
+    font-size: 11px;
+  }
+  .cl-supply-stat-label {
+    color: var(--color-text-muted);
+  }
+  .cl-supply-stat-value {
+    color: var(--color-text-light);
+  }
+  .cl-supply-foot {
+    margin: 8px 0 0;
+    color: var(--color-text-muted);
+    font-size: 10px;
+  }
   /* Tabs (D4): read as a segmented tab strip, the pressed tab in gold. */
   .cl-tabs {
     display: flex;

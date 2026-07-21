@@ -47,6 +47,14 @@ import {
   type CosmeticPreview,
 } from './claudium_inspect_view';
 import {
+  buildClaudiumSupplyModel,
+  type ClaudiumSupplyInput,
+  type ClaudiumSupplyModel,
+  type ClaudiumSupplyPointInput,
+  type ClaudiumSupplyRange,
+  claudiumSupplyQuery,
+} from './claudium_supply_view';
+import {
   buildClaudiumQuotePanel,
   buildClaudiumView,
   type ClaudiumNativeQuoteInput,
@@ -179,6 +187,28 @@ export interface ClaudiumWindowDeps {
    * cursor from the prior page; omit it for the first page.
    */
   historyPage?(limit: number, before?: string): Promise<ClaudiumHistoryPayload>;
+  /**
+   * Fetch the economy-wide supply totals plus the curve over one window. Unlike
+   * every other dep here this is NOT scoped to the caller: it is the same figure
+   * for every player. Absent when the service is off.
+   */
+  supply?(query: {
+    sinceMs: number;
+    untilMs: number;
+    bucketMs: number;
+  }): Promise<ClaudiumSupplyPayload>;
+}
+
+/** The service supply read: economy-wide totals plus the curve for one window. */
+export interface ClaudiumSupplyPayload {
+  supply: ClaudiumSupplyInput;
+  points: ClaudiumSupplyPointInput[];
+  /**
+   * The window the service actually computed `points` for, carried through
+   * verbatim. The view plots against THIS, never a locally recomputed window.
+   * Null when the service is off.
+   */
+  serviceWindow: { sinceMs: number; untilMs: number } | null;
 }
 
 const EMPTY_SNAPSHOT: ClaudiumSnapshot = {
@@ -188,7 +218,11 @@ const EMPTY_SNAPSHOT: ClaudiumSnapshot = {
   storeItems: [],
 };
 
-type Tab = 'buy' | 'gift' | 'history' | 'redeem';
+type Tab = 'buy' | 'gift' | 'history' | 'redeem' | 'supply';
+
+/** The supply chart's SVG user-space box. Normalized [0,1] maps into this. */
+const SUPPLY_PLOT_W = 320;
+const SUPPLY_PLOT_H = 140;
 
 /** The gift wizard phase: collecting the draft, quoting, paying, or done. */
 type GiftPhase = 'compose' | 'review' | 'pending' | 'success' | 'error';
@@ -235,6 +269,15 @@ export class ClaudiumWindow {
   private historyLoaded = false;
   private historyError = false;
   private historyFilter: ClaudiumHistoryReason | 'all' = 'all';
+  // ---- Supply state ----
+  // The last service read, kept whole so a range switch repaints from the same
+  // totals while only the curve refetches.
+  private supplyData: ClaudiumSupplyPayload | null = null;
+  private supplyRange: ClaudiumSupplyRange = '7d';
+  private supplyLoading = false;
+  private supplyLoaded = false;
+  private supplyError = false;
+  private supplySeq = 0;
   // ---- Cosmetic-store inspect + try-on state ----
   // The SKU currently open in the inspect detail view (null = the store list).
   private inspectItemId: string | null = null;
@@ -380,6 +423,7 @@ export class ClaudiumWindow {
       tab('buy', t('hudChrome.claudium.tabBuy')) +
       tab('gift', t('hudChrome.claudium.tabGift')) +
       tab('history', t('hudChrome.claudium.tabHistory')) +
+      tab('supply', t('hudChrome.claudium.tabSupply')) +
       tab('redeem', t('hudChrome.claudium.tabRedeem')) +
       `</div>`
     );
@@ -391,6 +435,8 @@ export class ClaudiumWindow {
         return this.giftTabHtml();
       case 'history':
         return this.historyTabHtml();
+      case 'supply':
+        return this.supplyTabHtml();
       case 'redeem':
         return this.redeemTabHtml(view);
       default:
@@ -1196,6 +1242,192 @@ export class ClaudiumWindow {
     return t('hudChrome.claudium.timeDays', { n: formatNumber(day) });
   }
 
+  // ---- Supply tab -------------------------------------------------------------
+  //
+  // Economy-wide, unlike every other tab: this is the same figure for every
+  // player. The pure core (claudium_supply_view.ts) owns availability, the USD
+  // conversion at the service peg, and the chart geometry; this method only
+  // formats and emits markup. The chart is inline SVG rather than canvas because
+  // the panel repaints on interaction, not per frame, so it needs no DPR backing
+  // store or write-elision, and SVG stays crisp at any HUD scale.
+
+  private supplyTabHtml(): string {
+    const title = `<section class="cl-section"><h3>${esc(t('hudChrome.claudium.supplyTitle'))}</h3>`;
+    if (this.supplyError) {
+      return (
+        title +
+        `<p class="cl-rail-note" role="status">${esc(t('hudChrome.claudium.supplyError'))}</p>` +
+        `<div class="cl-pay-actions"><button type="button" class="cl-rail" data-supply-retry>${esc(t('hudChrome.claudium.retryButton'))}</button></div>` +
+        `</section>`
+      );
+    }
+    if (!this.supplyLoaded && this.supplyLoading) {
+      return (
+        title +
+        `<p class="cl-empty" role="status">${esc(t('hudChrome.claudium.supplyLoading'))}</p></section>`
+      );
+    }
+    if (!this.supplyData) {
+      return (
+        title +
+        `<p class="cl-empty" role="status">${esc(t('hudChrome.claudium.supplyUnavailable'))}</p></section>`
+      );
+    }
+
+    const model = buildClaudiumSupplyModel({
+      supply: this.supplyData.supply,
+      points: this.supplyData.points,
+      range: this.supplyRange,
+      // The window the data was fetched for, NOT a fresh clock: a repaint must
+      // not slide the plot forward and shed points off its left edge.
+      serviceWindow: this.supplyData.serviceWindow,
+    });
+    if (!model.available) {
+      return (
+        title +
+        `<p class="cl-empty" role="status">${esc(t('hudChrome.claudium.supplyUnavailable'))}</p></section>`
+      );
+    }
+    return (
+      title +
+      this.supplyHeadlineHtml(model) +
+      this.supplyRangeHtml(model) +
+      this.supplyChartHtml(model) +
+      this.supplyStatsHtml(model) +
+      `<p class="cl-supply-foot">${esc(t('hudChrome.claudium.supplyFootnote'))}</p>` +
+      `</section>`
+    );
+  }
+
+  /** The big number: total in existence, plus its value at the service peg. */
+  private supplyHeadlineHtml(model: ClaudiumSupplyModel): string {
+    const amount = formatNumber(model.circulating ?? 0, { maximumFractionDigits: 0 });
+    const usd =
+      model.circulatingUsd !== null
+        ? `<p class="cl-supply-usd">${esc(
+            t('hudChrome.claudium.supplyUsdValue', {
+              amount: formatNumber(model.circulatingUsd, {
+                style: 'currency',
+                currency: 'USD',
+                maximumFractionDigits: 2,
+              }),
+            }),
+          )}</p>`
+        : '';
+    return (
+      `<div class="cl-supply-headline">` +
+      `<p class="cl-supply-total">${esc(t('hudChrome.claudium.supplyInExistence', { amount }))}</p>` +
+      usd +
+      `</div>`
+    );
+  }
+
+  /** The 24h / 7d / 30d selector, mirroring the range options from the core. */
+  private supplyRangeHtml(model: ClaudiumSupplyModel): string {
+    const label = (id: ClaudiumSupplyRange): string => {
+      if (id === '24h') return t('hudChrome.claudium.supplyRange24h');
+      if (id === '7d') return t('hudChrome.claudium.supplyRange7d');
+      return t('hudChrome.claudium.supplyRange30d');
+    };
+    const buttons = model.rangeOptions
+      .map(
+        (opt) =>
+          `<button type="button" class="cl-rail${opt.selected ? ' cl-rail-on' : ''}" ` +
+          `data-supply-range="${opt.id}" aria-pressed="${opt.selected ? 'true' : 'false'}">` +
+          `${esc(label(opt.id))}</button>`,
+      )
+      .join('');
+    return (
+      `<div class="cl-supply-ranges" role="group" ` +
+      `aria-label="${esc(t('hudChrome.claudium.supplyRangeLabel'))}">${buttons}</div>`
+    );
+  }
+
+  /**
+   * The curve itself. The core hands over normalized [0,1] points with y already
+   * flipped, so this only scales into the SVG box and joins them. An `img` role
+   * plus a label keeps it announced as one figure rather than as loose numbers.
+   */
+  private supplyChartHtml(model: ClaudiumSupplyModel): string {
+    const chart = model.chart;
+    if (!chart || chart.points.length === 0) {
+      return `<p class="cl-empty" role="status">${esc(t('hudChrome.claudium.supplyChartEmpty'))}</p>`;
+    }
+    const sx = (x: number): string => (x * SUPPLY_PLOT_W).toFixed(2);
+    const sy = (y: number): string => (y * SUPPLY_PLOT_H).toFixed(2);
+    const line = chart.points.map((p) => `${sx(p.x)},${sy(p.y)}`).join(' ');
+    // Close the path down to the baseline so the area under the curve can be
+    // tinted, matching the rest of the Claudium panels.
+    const first = chart.points[0];
+    const last = chart.points[chart.points.length - 1];
+    const area = `${sx(first.x)},${SUPPLY_PLOT_H} ${line} ${sx(last.x)},${SUPPLY_PLOT_H}`;
+    const gridlines = chart.valueLabels
+      .map(
+        (g) =>
+          `<line class="cl-supply-grid" x1="0" y1="${sy(g.at)}" x2="${SUPPLY_PLOT_W}" y2="${sy(g.at)}" />`,
+      )
+      .join('');
+    const label = t('hudChrome.claudium.supplyChartLabel');
+    return (
+      `<div class="cl-supply-chart">` +
+      `<svg viewBox="0 0 ${SUPPLY_PLOT_W} ${SUPPLY_PLOT_H}" preserveAspectRatio="none" ` +
+      `role="img" aria-label="${esc(label)}">` +
+      gridlines +
+      `<polygon class="cl-supply-area" points="${area}" />` +
+      `<polyline class="cl-supply-line" points="${line}" />` +
+      `<circle class="cl-supply-head" cx="${sx(last.x)}" cy="${sy(last.y)}" r="3" />` +
+      `</svg>` +
+      this.supplyAxisHtml(model) +
+      `</div>`
+    );
+  }
+
+  /** The value axis (top and bottom bounds) plus the window delta. */
+  private supplyAxisHtml(model: ClaudiumSupplyModel): string {
+    const chart = model.chart;
+    if (!chart) return '';
+    const round = (v: number): string => formatNumber(Math.round(v), { maximumFractionDigits: 0 });
+    const change = this.supplyChangeText(model);
+    return (
+      `<div class="cl-supply-axis">` +
+      `<span class="cl-supply-axis-hi">${esc(round(chart.maxCirculating))}</span>` +
+      `<span class="cl-supply-axis-lo">${esc(round(chart.minCirculating))}</span>` +
+      `</div>` +
+      `<p class="cl-supply-change" role="status">${esc(change)}</p>`
+    );
+  }
+
+  /** Net movement across the window, phrased by direction. */
+  private supplyChangeText(model: ClaudiumSupplyModel): string {
+    const delta = model.changeInWindow;
+    if (delta === null || delta === 0) return t('hudChrome.claudium.supplyChangeFlat');
+    const amount = formatNumber(Math.abs(delta), { maximumFractionDigits: 0 });
+    return delta > 0
+      ? t('hudChrome.claudium.supplyChangeUp', { amount })
+      : t('hudChrome.claudium.supplyChangeDown', { amount });
+  }
+
+  /** The supporting totals: lifetime issued, lifetime sunk, and holder count. */
+  private supplyStatsHtml(model: ClaudiumSupplyModel): string {
+    const row = (labelKey: TranslationKey, value: string): string =>
+      `<div class="cl-supply-stat">` +
+      `<span class="cl-supply-stat-label">${esc(t(labelKey))}</span>` +
+      `<span class="cl-supply-stat-value">${esc(value)}</span>` +
+      `</div>`;
+    const n = (v: number | null): string =>
+      v === null ? '' : formatNumber(v, { maximumFractionDigits: 0 });
+    const parts: string[] = [];
+    if (model.issued !== null) parts.push(row('hudChrome.claudium.supplyIssued', n(model.issued)));
+    if (model.sunk !== null) parts.push(row('hudChrome.claudium.supplySunk', n(model.sunk)));
+    if (model.holders !== null) {
+      parts.push(
+        `<div class="cl-supply-stat"><span class="cl-supply-stat-label">` +
+          `${esc(t('hudChrome.claudium.supplyHolders', { n: n(model.holders) }))}</span></div>`,
+      );
+    }
+    return parts.length > 0 ? `<div class="cl-supply-stats">${parts.join('')}</div>` : '';
+  }
+
   // ---- Redeem tab -------------------------------------------------------------
 
   private redeemTabHtml(view: ClaudiumView): string {
@@ -1238,7 +1470,8 @@ export class ClaudiumWindow {
     body.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const raw = btn.dataset.tab;
-        const next: Tab = raw === 'redeem' || raw === 'gift' || raw === 'history' ? raw : 'buy';
+        const next: Tab =
+          raw === 'redeem' || raw === 'gift' || raw === 'history' || raw === 'supply' ? raw : 'buy';
         if (next === this.tab) return;
         // Leaving the buy tab abandons any open inspect + active try-on preview.
         this.stopTryOn();
@@ -1249,7 +1482,24 @@ export class ClaudiumWindow {
         if (next === 'history' && !this.historyLoaded && !this.historyLoading) {
           void this.loadHistory(view, false);
         }
+        // Same for supply: the economy read only happens once the tab is asked for.
+        if (next === 'supply' && !this.supplyLoaded && !this.supplyLoading) {
+          void this.loadSupply(view);
+        }
       });
+    });
+    body.querySelectorAll<HTMLButtonElement>('[data-supply-range]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const raw = btn.dataset.supplyRange;
+        const next: ClaudiumSupplyRange = raw === '24h' || raw === '30d' ? raw : '7d';
+        if (next === this.supplyRange) return;
+        this.supplyRange = next;
+        // The curve is window-scoped, so a new range needs a new read.
+        void this.loadSupply(view);
+      });
+    });
+    body.querySelector<HTMLButtonElement>('[data-supply-retry]')?.addEventListener('click', () => {
+      void this.loadSupply(view);
     });
     body.querySelectorAll<HTMLButtonElement>('[data-rail]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -1516,6 +1766,43 @@ export class ClaudiumWindow {
   // ---- History async flow -----------------------------------------------------
 
   /** Load a page of history. `more` uses the current cursor and appends; else resets. */
+  /**
+   * Read the economy-wide supply for the active range. The window is derived by
+   * the pure core so the fetch and the plot always agree on their bounds. A
+   * failure sets the error state and keeps the panel mounted; it never throws
+   * into the caller, matching the fail-closed contract of every Claudium dep.
+   */
+  private async loadSupply(view: ClaudiumView): Promise<void> {
+    if (!this.deps.supply) return;
+    // Seq-guard (same idiom as the native quote): only the NEWEST request may
+    // settle the state. Deliberately no in-flight early return, so switching
+    // range always issues a fresh read; the superseded response drops out below
+    // and the newer one owns clearing supplyLoading.
+    const seq = ++this.supplySeq;
+    this.supplyLoading = true;
+    this.supplyError = false;
+    this.paint(view);
+    let payload: ClaudiumSupplyPayload;
+    try {
+      payload = await this.deps.supply(claudiumSupplyQuery(this.supplyRange, Date.now()));
+    } catch {
+      if (seq !== this.supplySeq) return; // a newer request owns the state
+      this.supplyLoading = false;
+      this.supplyError = true;
+      if (this.isOpen) this.paint(view);
+      return;
+    }
+    if (seq !== this.supplySeq) return; // superseded; the newer one settles it
+    // Clear the in-flight flag even when the window closed mid-fetch. Bailing
+    // out with supplyLoading still true would wedge the tab: nothing supersedes
+    // this request, the lazy-load guard refuses to retry, and the panel renders
+    // its loading state with no retry button for the rest of the session.
+    this.supplyData = payload;
+    this.supplyLoading = false;
+    this.supplyLoaded = true;
+    if (this.isOpen) this.paint(view);
+  }
+
   private async loadHistory(view: ClaudiumView, more: boolean): Promise<void> {
     if (!this.deps.historyPage || this.historyLoading) return;
     this.historyLoading = true;
