@@ -609,7 +609,8 @@ export const en_XA: EnTranslations = {
         "staff": "[Šţáƒƒ]",
         "wand": "[Ŵáñð]",
         "bow": "[Ɓóŵ]",
-        "crossbow": "[Çŕóššƀóŵ]"
+        "crossbow": "[Çŕóššƀóŵ]",
+        "polearm": "[Þóļéáŕɱ]"
       },
       "badge": {
         "flagship": "[Ƒļáĝšĥíþ]",

@@ -388,6 +388,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.wand': '마법봉',
   'hudChrome.wocStore.wtype.bow': '활',
   'hudChrome.wocStore.wtype.crossbow': '석궁',
+  'hudChrome.wocStore.wtype.polearm': '장창',
   'hudChrome.wocStore.badge.flagship': '플래그십',
   'hudChrome.wocStore.badge.hero': '영웅',
   'hudChrome.wocStore.inspectAria': '{item} 살펴보기',

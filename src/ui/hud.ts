@@ -483,6 +483,7 @@ import {
   wocBalanceVerified,
 } from './wallet_balance';
 import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
+import { weaponTypeLabelKey } from './weapon_type_label';
 import {
   installWindowDrag,
   isWindowDragPreviewMutation,
@@ -4520,11 +4521,20 @@ export class Hud {
           ? t('itemUi.slots.twoHand')
           : itemSlotName(item.slot);
       const armorTypeKey = itemArmorTypeLabelKey(item);
+      // Weapons show their type (Sword/Dagger/Mace/...) on the same right side,
+      // so a player can tell a dagger from a sword at a glance (rogues need
+      // daggers). Unlike armor weight it is NOT colored by class: any class can
+      // equip most weapon types and the rules are archetype-based, so a red type
+      // label would mislead. Null only for a non-weapon or unclassified id, in
+      // which case the slot line renders without a type rather than a broken chip.
+      const weaponTypeKey = item.kind === 'weapon' ? weaponTypeLabelKey(item.id) : null;
       if (armorTypeKey) {
         // Red armor type = the viewing player's class cannot wear this armor weight
         // (e.g. a mage hovering Mail), so they know it is not for them at a glance.
         const badClass = canEquipItem(this.sim.cfg.playerClass, item) ? '' : ' tt-armor-bad';
         html += `<div class="tt-sub tt-row"><span>${esc(slotName)}</span><span class="tt-armor${badClass}">${esc(t(armorTypeKey))}</span></div>`;
+      } else if (weaponTypeKey) {
+        html += `<div class="tt-sub tt-row"><span>${esc(slotName)}</span><span class="tt-weapon-type">${esc(t(weaponTypeKey))}</span></div>`;
       } else {
         html += `<div class="tt-sub">${esc(slotName)}</div>`;
       }
@@ -4563,8 +4573,9 @@ export class Hud {
         }),
       )}</div>`;
       html += `<div class="tt-stat">${esc(t('itemUi.tooltip.dps', { dps: itemNumber(dps, 1) }))}</div>`;
-      if (item.weapon.dagger)
-        html += `<div class="tt-sub">${esc(t('itemUi.tooltip.dagger'))}</div>`;
+      // The weapon type (incl. Dagger) now appears on the slot line above like
+      // every other weapon, so the old standalone "Dagger" sub-line is gone. The
+      // item.weapon.dagger DATA field still drives Backstab; only this line went.
     }
     if (item.stats) {
       for (const [k, v] of Object.entries(item.stats)) {

@@ -609,7 +609,8 @@ export const nl_NL: EnTranslations = {
         "staff": "Staf",
         "wand": "Toverstaf",
         "bow": "Boog",
-        "crossbow": "Kruisboog"
+        "crossbow": "Kruisboog",
+        "polearm": "Polearm"
       },
       "badge": {
         "flagship": "Vlaggenschip",

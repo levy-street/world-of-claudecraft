@@ -609,7 +609,8 @@ export const ja_JP: EnTranslations = {
         "staff": "杖",
         "wand": "ワンド",
         "bow": "弓",
-        "crossbow": "クロスボウ"
+        "crossbow": "クロスボウ",
+        "polearm": "ポールアーム"
       },
       "badge": {
         "flagship": "フラッグシップ",

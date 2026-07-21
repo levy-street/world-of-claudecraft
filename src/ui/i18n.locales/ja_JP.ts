@@ -383,6 +383,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.wand': 'ワンド',
   'hudChrome.wocStore.wtype.bow': '弓',
   'hudChrome.wocStore.wtype.crossbow': 'クロスボウ',
+  'hudChrome.wocStore.wtype.polearm': 'ポールアーム',
   'hudChrome.wocStore.badge.flagship': 'フラッグシップ',
   'hudChrome.wocStore.badge.hero': 'ヒーロー',
   'hudChrome.wocStore.inspectAria': '{item}を詳しく見る',

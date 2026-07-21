@@ -609,7 +609,8 @@ export const cs_CZ: EnTranslations = {
         "staff": "Hůl",
         "wand": "Hůlka",
         "bow": "Luk",
-        "crossbow": "Kuše"
+        "crossbow": "Kuše",
+        "polearm": "Polearm"
       },
       "badge": {
         "flagship": "Vlajkový",

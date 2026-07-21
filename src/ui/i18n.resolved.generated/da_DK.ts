@@ -609,7 +609,8 @@ export const da_DK: EnTranslations = {
         "staff": "Stav",
         "wand": "Tryllestav",
         "bow": "Bue",
-        "crossbow": "Armbrøst"
+        "crossbow": "Armbrøst",
+        "polearm": "Polearm"
       },
       "badge": {
         "flagship": "Flagskib",

@@ -609,7 +609,8 @@ export const sv_SE: EnTranslations = {
         "staff": "Stav",
         "wand": "Trollstav",
         "bow": "Båge",
-        "crossbow": "Armborst"
+        "crossbow": "Armborst",
+        "polearm": "Polearm"
       },
       "badge": {
         "flagship": "Flaggskepp",

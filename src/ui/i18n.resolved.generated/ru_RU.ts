@@ -609,7 +609,8 @@ export const ru_RU: EnTranslations = {
         "staff": "Посох",
         "wand": "Жезл",
         "bow": "Лук",
-        "crossbow": "Арбалет"
+        "crossbow": "Арбалет",
+        "polearm": "Древковое оружие"
       },
       "badge": {
         "flagship": "Флагман",

@@ -609,7 +609,8 @@ export const zh_TW: EnTranslations = {
         "staff": "法杖",
         "wand": "魔杖",
         "bow": "弓",
-        "crossbow": "弩"
+        "crossbow": "弩",
+        "polearm": "長柄武器"
       },
       "badge": {
         "flagship": "旗艦",

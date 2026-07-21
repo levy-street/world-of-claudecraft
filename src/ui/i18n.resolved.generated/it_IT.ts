@@ -609,7 +609,8 @@ export const it_IT: EnTranslations = {
         "staff": "Personale",
         "wand": "Bacchetta",
         "bow": "Arco",
-        "crossbow": "Balestra"
+        "crossbow": "Balestra",
+        "polearm": "Polearm"
       },
       "badge": {
         "flagship": "Pezzo forte",

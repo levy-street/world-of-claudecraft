@@ -233,6 +233,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.wand': '魔杖',
   'hudChrome.wocStore.wtype.bow': '弓',
   'hudChrome.wocStore.wtype.crossbow': '弩',
+  'hudChrome.wocStore.wtype.polearm': '长柄武器',
   'hudChrome.wocStore.badge.flagship': '旗舰',
   'hudChrome.wocStore.badge.hero': '英雄',
   'hudChrome.wocStore.inspectAria': '查看{item}',

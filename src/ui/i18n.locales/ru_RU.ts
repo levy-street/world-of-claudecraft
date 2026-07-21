@@ -383,6 +383,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.wtype.wand': 'Жезл',
   'hudChrome.wocStore.wtype.bow': 'Лук',
   'hudChrome.wocStore.wtype.crossbow': 'Арбалет',
+  'hudChrome.wocStore.wtype.polearm': 'Древковое оружие',
   'hudChrome.wocStore.badge.flagship': 'Флагман',
   'hudChrome.wocStore.badge.hero': 'Герой',
   'hudChrome.wocStore.inspectAria': 'Осмотреть {item}',

@@ -609,7 +609,8 @@ export const vi_VN: EnTranslations = {
         "staff": "Trượng",
         "wand": "Đũa phép",
         "bow": "Cung",
-        "crossbow": "Nỏ"
+        "crossbow": "Nỏ",
+        "polearm": "Polearm"
       },
       "badge": {
         "flagship": "Chủ lực",

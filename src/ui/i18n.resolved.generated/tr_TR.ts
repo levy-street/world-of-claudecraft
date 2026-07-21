@@ -609,7 +609,8 @@ export const tr_TR: EnTranslations = {
         "staff": "Asa",
         "wand": "Değnek",
         "bow": "Yay",
-        "crossbow": "Arbalet"
+        "crossbow": "Arbalet",
+        "polearm": "Polearm"
       },
       "badge": {
         "flagship": "Amiral gemisi",

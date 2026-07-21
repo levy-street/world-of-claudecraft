@@ -609,7 +609,8 @@ export const fr_CA: EnTranslations = {
         "staff": "Bâton",
         "wand": "Baguette",
         "bow": "Arc",
-        "crossbow": "Arbalète"
+        "crossbow": "Arbalète",
+        "polearm": "Polearm"
       },
       "badge": {
         "flagship": "Produit phare",

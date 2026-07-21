@@ -85,6 +85,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.hideOfflineTitle",
     "hudChrome.social.offlineHeader",
     "hudChrome.social.onlineHeader",
+    "hudChrome.wocStore.wtype.polearm",
     "stats.charactersCreated"
   ],
   "es_ES": [
@@ -163,6 +164,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.hideOfflineTitle",
     "hudChrome.social.offlineHeader",
     "hudChrome.social.onlineHeader",
+    "hudChrome.wocStore.wtype.polearm",
     "stats.charactersCreated"
   ],
   "fr_FR": [
@@ -241,6 +243,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.hideOfflineTitle",
     "hudChrome.social.offlineHeader",
     "hudChrome.social.onlineHeader",
+    "hudChrome.wocStore.wtype.polearm",
     "stats.charactersCreated"
   ],
   "fr_CA": [
@@ -319,6 +322,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.hideOfflineTitle",
     "hudChrome.social.offlineHeader",
     "hudChrome.social.onlineHeader",
+    "hudChrome.wocStore.wtype.polearm",
     "stats.charactersCreated"
   ],
   "en_CA": [],
@@ -398,6 +402,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.hideOfflineTitle",
     "hudChrome.social.offlineHeader",
     "hudChrome.social.onlineHeader",
+    "hudChrome.wocStore.wtype.polearm",
     "stats.charactersCreated"
   ],
   "de_DE": [
@@ -476,6 +481,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.hideOfflineTitle",
     "hudChrome.social.offlineHeader",
     "hudChrome.social.onlineHeader",
+    "hudChrome.wocStore.wtype.polearm",
     "stats.charactersCreated"
   ],
   "zh_CN": [
@@ -570,6 +576,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.hideOfflineTitle",
     "hudChrome.social.offlineHeader",
     "hudChrome.social.onlineHeader",
+    "hudChrome.wocStore.wtype.polearm",
     "stats.charactersCreated"
   ],
   "ru_RU": [
@@ -652,6 +659,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.hideOfflineTitle",
     "hudChrome.social.offlineHeader",
     "hudChrome.social.onlineHeader",
+    "hudChrome.wocStore.wtype.polearm",
     "stats.charactersCreated"
   ],
   "nl_NL": [
@@ -730,6 +738,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.hideOfflineTitle",
     "hudChrome.social.offlineHeader",
     "hudChrome.social.onlineHeader",
+    "hudChrome.wocStore.wtype.polearm",
     "stats.charactersCreated"
   ],
   "pl_PL": [
@@ -808,6 +817,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.hideOfflineTitle",
     "hudChrome.social.offlineHeader",
     "hudChrome.social.onlineHeader",
+    "hudChrome.wocStore.wtype.polearm",
     "stats.charactersCreated"
   ],
   "id_ID": [
@@ -886,6 +896,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.hideOfflineTitle",
     "hudChrome.social.offlineHeader",
     "hudChrome.social.onlineHeader",
+    "hudChrome.wocStore.wtype.polearm",
     "stats.charactersCreated"
   ],
   "tr_TR": [
@@ -964,6 +975,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.hideOfflineTitle",
     "hudChrome.social.offlineHeader",
     "hudChrome.social.onlineHeader",
+    "hudChrome.wocStore.wtype.polearm",
     "stats.charactersCreated"
   ],
   "sv_SE": [
@@ -1042,6 +1054,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.hideOfflineTitle",
     "hudChrome.social.offlineHeader",
     "hudChrome.social.onlineHeader",
+    "hudChrome.wocStore.wtype.polearm",
     "stats.charactersCreated"
   ],
   "vi_VN": [
@@ -1120,6 +1133,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.hideOfflineTitle",
     "hudChrome.social.offlineHeader",
     "hudChrome.social.onlineHeader",
+    "hudChrome.wocStore.wtype.polearm",
     "stats.charactersCreated"
   ],
   "da_DK": [
@@ -1198,6 +1212,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.hideOfflineTitle",
     "hudChrome.social.offlineHeader",
     "hudChrome.social.onlineHeader",
+    "hudChrome.wocStore.wtype.polearm",
     "stats.charactersCreated"
   ]
 };

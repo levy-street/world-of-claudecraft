@@ -609,7 +609,8 @@ export const es: EnTranslations = {
         "staff": "Bastón",
         "wand": "Varita",
         "bow": "Arco",
-        "crossbow": "Ballesta"
+        "crossbow": "Ballesta",
+        "polearm": "Polearm"
       },
       "badge": {
         "flagship": "Emblemático",

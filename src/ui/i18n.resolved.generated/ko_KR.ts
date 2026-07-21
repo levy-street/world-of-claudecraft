@@ -609,7 +609,8 @@ export const ko_KR: EnTranslations = {
         "staff": "지팡이",
         "wand": "마법봉",
         "bow": "활",
-        "crossbow": "석궁"
+        "crossbow": "석궁",
+        "polearm": "장창"
       },
       "badge": {
         "flagship": "플래그십",

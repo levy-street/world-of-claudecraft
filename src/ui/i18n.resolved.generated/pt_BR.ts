@@ -609,7 +609,8 @@ export const pt_BR: EnTranslations = {
         "staff": "Cajado",
         "wand": "Varinha",
         "bow": "Arco",
-        "crossbow": "Besta"
+        "crossbow": "Besta",
+        "polearm": "Polearm"
       },
       "badge": {
         "flagship": "Destaque",

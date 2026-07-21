@@ -609,7 +609,8 @@ export const en_CA: EnTranslations = {
         "staff": "Staff",
         "wand": "Wand",
         "bow": "Bow",
-        "crossbow": "Crossbow"
+        "crossbow": "Crossbow",
+        "polearm": "Polearm"
       },
       "badge": {
         "flagship": "Flagship",

@@ -609,7 +609,8 @@ export const id_ID: EnTranslations = {
         "staff": "Tongkat",
         "wand": "Tongkat sihir",
         "bow": "Busur",
-        "crossbow": "Busur silang"
+        "crossbow": "Busur silang",
+        "polearm": "Polearm"
       },
       "badge": {
         "flagship": "Unggulan",

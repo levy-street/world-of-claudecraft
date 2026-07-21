@@ -189,6 +189,7 @@ export const hudChromeStrings = {
       wand: 'Wand',
       bow: 'Bow',
       crossbow: 'Crossbow',
+      polearm: 'Polearm',
     },
     badge: {
       flagship: 'Flagship',

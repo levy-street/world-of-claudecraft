@@ -609,7 +609,8 @@ export const de_DE: EnTranslations = {
         "staff": "Stab",
         "wand": "Zauberstab",
         "bow": "Bogen",
-        "crossbow": "Armbrust"
+        "crossbow": "Armbrust",
+        "polearm": "Polearm"
       },
       "badge": {
         "flagship": "Flaggschiff",

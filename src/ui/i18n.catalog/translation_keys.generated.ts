@@ -6360,6 +6360,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.wocStore.wtype.crossbow'
   | 'hudChrome.wocStore.wtype.dagger'
   | 'hudChrome.wocStore.wtype.mace'
+  | 'hudChrome.wocStore.wtype.polearm'
   | 'hudChrome.wocStore.wtype.staff'
   | 'hudChrome.wocStore.wtype.sword'
   | 'hudChrome.wocStore.wtype.wand'
