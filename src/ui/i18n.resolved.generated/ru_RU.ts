@@ -2535,6 +2535,12 @@ export const ru_RU: EnTranslations = {
       "lbEmpty": "В рейтинге пока нет летописцев.",
       "broadcastsLabel": "Делиться деяниями с гильдией и друзьями",
       "titledName": "{name} [{title}]"
+    },
+    "browserNotice": {
+      "title": "Heads up: unsupported browser",
+      "body": "You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.",
+      "downloadDesktop": "Get the desktop app",
+      "dismiss": "Continue in browser"
     }
   },
   "gatherEvent": {

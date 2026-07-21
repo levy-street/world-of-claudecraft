@@ -7633,3 +7633,76 @@
     }
   }
 }
+
+/* ---------- unsupported-browser notice ---------- */
+#browser-notice {
+  position: fixed;
+  top: calc(var(--spacing-md) + 56px + env(safe-area-inset-top, 0px));
+  right: var(--spacing-md);
+  z-index: 260;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-width: min(420px, calc(100vw - 2 * var(--spacing-md)));
+  padding: var(--spacing-md);
+  background: linear-gradient(180deg, rgba(21, 21, 31, 0.96) 0%, rgba(11, 11, 18, 0.98) 100%);
+  border: 1px solid var(--color-warning, #b8860b);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  color: var(--color-text-light);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.5;
+}
+#browser-notice[hidden] {
+  display: none;
+}
+#browser-notice .browser-notice-title {
+  display: block;
+  font-size: 14px;
+  color: var(--color-warning, #d4a017);
+}
+#browser-notice .browser-notice-body {
+  display: block;
+  color: var(--color-text-muted);
+}
+#browser-notice .browser-notice-download {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--color-primary, #8b6914);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-light);
+  font: inherit;
+  font-size: 12px;
+  text-align: center;
+  text-decoration: none;
+  cursor: var(--cursor-point);
+}
+#browser-notice .browser-notice-download:hover {
+  background: var(--color-primary-hover, #a07d1a);
+  text-decoration: none;
+}
+#browser-notice .browser-notice-dismiss {
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  cursor: var(--cursor-point);
+}
+#browser-notice .browser-notice-dismiss:hover {
+  border-color: var(--color-primary);
+}
+#browser-notice .browser-notice-dismiss:focus-visible {
+  outline: 3px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+@media (pointer: coarse) {
+  #browser-notice .browser-notice-download,
+  #browser-notice .browser-notice-dismiss {
+    min-height: 40px;
+  }
+}
