@@ -51,6 +51,16 @@ const UI_CUES = {
   cardReveal: 'ui_card_reveal',
   cardRoundPush: 'ui_card_round_push',
   cardShuffle: 'ui_card_shuffle',
+  // Gathering rhythm placeholders (Professions 2.0 Phase 12b, issue #2208):
+  // deterministic synth cues until real recordings land. fishBite is the one
+  // gameplay-timing cue of the family (the reel window opens with it), so it
+  // rides the ungated play() arm; the rest are feedback notifications.
+  gatherCast: 'ui_gather_cast',
+  gatherStrike: 'ui_gather_strike',
+  gatherRare: 'ui_gather_rare',
+  fishCast: 'ui_fish_cast',
+  fishBite: 'ui_fish_bite',
+  fishReel: 'ui_fish_reel',
 } as const;
 
 type UiCue =
@@ -253,6 +263,34 @@ export class GameAudio {
 
   cardShuffle(): void {
     this.play(UI_CUES.cardShuffle);
+  }
+
+  // Gathering rhythm (Professions 2.0 Phase 12b). All of these are personal
+  // feedback notifications EXCEPT fishBite: the bite opens the live reel
+  // window, so it is a gameplay-timing cue (the ready-check/duel-countdown
+  // category) and deliberately ignores the Interface & Feedback toggle.
+  gatherCast(): void {
+    this.playFeedback(UI_CUES.gatherCast);
+  }
+
+  gatherStrike(): void {
+    this.playFeedback(UI_CUES.gatherStrike);
+  }
+
+  gatherRare(): void {
+    this.playFeedback(UI_CUES.gatherRare);
+  }
+
+  fishCast(): void {
+    this.playFeedback(UI_CUES.fishCast);
+  }
+
+  fishBite(): void {
+    this.play(UI_CUES.fishBite);
+  }
+
+  fishReel(): void {
+    this.playFeedback(UI_CUES.fishReel);
   }
 }
 

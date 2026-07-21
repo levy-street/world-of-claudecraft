@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { ZONE1_QUESTS } from '../src/sim/content/zone1';
 import { GATHER_NODES } from '../src/sim/data';
 import { ARCHETYPE_PAIR_TARGETS, normalizeArchetypeState } from '../src/sim/professions/archetype';
 import { Sim } from '../src/sim/sim';
@@ -255,5 +256,17 @@ describe('live profession attunement quests', () => {
     });
     expect(first.lastCraft?.ok).toBe(true);
     expect(run()).toEqual(first);
+  });
+});
+
+// Phase 12c appendix row: the hobby-switch quest pays no XP. It is a
+// repeatable identity toggle; any XP on it becomes a farmable trickle
+// (gather 3 herbs, toggle, repeat), so the reward re-pins to 0 while the
+// quest itself stays repeatable.
+describe('q_prof_hobby_switch reward shape (Phase 12c)', () => {
+  it('grants 0 XP and stays repeatable', () => {
+    const quest = ZONE1_QUESTS[HOBBY_QUEST];
+    expect(quest.xpReward).toBe(0);
+    expect(quest.repeatable).toBe(true);
   });
 });

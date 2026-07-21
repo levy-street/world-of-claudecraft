@@ -29,8 +29,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // stow_weapon, Dungeon Finder, inv_move, the release's Card Duel minigame
 // (card_queue_join/leave, play_card, card_forfeit), and Professions 2.0
 // Phase 8's place_mobile_station and Phase 9's train_recipe.
-const EXPECTED_SEND_COUNT = 158;
-const EXPECTED_DISPATCH_COUNT = 167;
+const EXPECTED_SEND_COUNT = 159;
+const EXPECTED_DISPATCH_COUNT = 168;
 const EXPECTED_DISPATCH_ONLY_COUNT = 9;
 
 // The chat sub-channel routing switch (server/game.ts `switch

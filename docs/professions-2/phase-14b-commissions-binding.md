@@ -13,10 +13,16 @@ face-to-face by construction), and the masters already run gold-sink services. A
 2026-07-20 timing and economy amendments (state.md is the authority); tracked as issue #2207,
 which links #1298.
 
+The three flagged maintainer decisions are RESOLVED by the second 2026-07-20 block (mastery
+and provenance; the OPEN items rows carry the rationale): the Maker's Bond binds to the
+CHARACTER; opt-in item classes are equipment only (weapon, armor, held_offhand); the unbind
+fee is tier-scaled on the training-fee family (2500 / 10000 / 40000 copper by quality tier,
+clamp-to-last). STEP 0's gate is satisfied; implement exactly these.
+
 ## Context pointers
 
 - `docs/professions-2/state.md`: the 2026-07-20 timing and economy amendments block (the
-  authority), the OPEN items rows for this phase's three flagged maintainer decisions, and the
+  authority), the OPEN items rows RESOLVING this phase's three maintainer decisions, and the
   locked economy pillars (crafted below the raid floor; NPCs only sink gold).
 - `docs/professions-2/progress.md`: the Phase 14b status row and checklist.
 - `docs/professions-2/phase-13-enchanting.md`: the bind-on-trade PRIMITIVE this phase extends
@@ -60,10 +66,10 @@ STEP 0 - PRE-FLIGHT:
   docs/professions-2/progress.md Notes.
 - Memory scan (MEMORY.md index): node25-breaks-jsdom-gate, combo-recipes-broken-online (the
   2033 stub trap), design-language-program, the professions packet entries.
-- THE THREE FLAGGED MAINTAINER DECISIONS MUST BE RESOLVED IN STATE.MD BEFORE CODING:
-  character-vs-account binding, which item classes may opt in, and unbind pricing. If any is
-  still an OPEN item, stop and ask; never decide them silently (they are flagged, not
-  defaulted).
+- THE THREE MAINTAINER DECISIONS ARE RESOLVED (2026-07-20 mastery amendments; read the
+  state.md OPEN items rows verbatim): character binding, equipment-only opt-in classes,
+  the tier-scaled unbind fee ladder. Verify the rows still read RESOLVED; if any has been
+  reopened, stop and ask; never decide them silently.
 - Phase 13 must be LANDED (it owns the bind-on-trade primitive). Verify its trade-gate arm
   exists (grep the enforcement site it recorded in state.md); if absent, stop.
 

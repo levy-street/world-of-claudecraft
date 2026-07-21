@@ -8400,7 +8400,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Hobby: {craft}',
   'hudChrome.professions.identityHeader': 'Identitet',
   'hudChrome.professions.majorsLabel': 'Hovedfag: {a} og {b}',
-  'hudChrome.professions.nextUnlockMax': 'Ved maksimal dygtighed',
   'hudChrome.professions.nextUnlockSpecialized':
     '{points} point til Specialiseret: materialeomkostningerne falder',
   'hudChrome.professions.nextUnlockTier':

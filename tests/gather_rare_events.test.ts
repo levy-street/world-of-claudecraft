@@ -34,6 +34,20 @@ function mustNode(nodeId: string) {
   return node;
 }
 
+// Phase 12b: harvestNode STARTS a gather cast; the draws, grant, and events
+// land at completion. The hunts below advance the shared rng stream only, so
+// completion is driven synchronously the way the lifecycle does it (clear the
+// cast fields, then route to ctx.completeGatherCast): zero world ticks, the
+// deterministic stream untouched between iterations.
+function completeCastNow(sim: Sim, pid: number) {
+  const p = sim.entities.get(pid);
+  const meta = sim.players.get(pid);
+  if (!p || !meta) throw new Error('missing player for completeCastNow');
+  p.castingAbility = null;
+  p.castRemaining = 0;
+  sim.ctx.completeGatherCast(p, meta);
+}
+
 describe('gather rare events: cadence knob + flavor mapping (Phase 4)', () => {
   it('pins the shared cadence and yield constants', () => {
     // Load-bearing tuning literals (state.md: roughly 1 rare event per zone
@@ -240,6 +254,7 @@ describe('rare events through Sim.harvestNode (all three flavors)', () => {
       meta.inventory.length = 0;
       delete meta.nodeHarvestReadyAt[nodeId];
       expect(sim.harvestNode(nodeId, pid)).toBe(true);
+      completeCastNow(sim, pid);
       const events = sim.drainEvents();
       const rare = events.find((e) => e.type === 'gatherRareEvent');
       if (rare && rare.type === 'gatherRareEvent') {
@@ -343,6 +358,7 @@ describe('rarity-floor signing through Sim.harvestNode', () => {
       meta.inventory.length = 0;
       delete meta.nodeHarvestReadyAt[nodeId];
       expect(sim.harvestNode(nodeId, pid)).toBe(true);
+      completeCastNow(sim, pid);
       const gather = sim.drainEvents().find((e) => e.type === 'gatherResult');
       if (gather?.type !== 'gatherResult') throw new Error('expected gatherResult');
       if (want(gather.rarity, gather.rareEvent)) return { meta, gather };
@@ -420,6 +436,7 @@ describe('grant truncation at the command boundary (full bags)', () => {
         meta.inventory.push({ itemId: 'bone_fragments', count: 1 });
       delete meta.nodeHarvestReadyAt[nodeId];
       expect(sim.harvestNode(nodeId, pid)).toBe(true);
+      completeCastNow(sim, pid);
       const events = sim.drainEvents();
       const gather = events.find((e) => e.type === 'gatherResult');
       if (gather?.type !== 'gatherResult') throw new Error('expected gatherResult');
@@ -455,6 +472,7 @@ describe('grant truncation at the command boundary (full bags)', () => {
       meta.inventory.push({ itemId: 'copper_ore', count: 15 });
       delete meta.nodeHarvestReadyAt[nodeId];
       if (!sim.harvestNode(nodeId, pid)) continue;
+      completeCastNow(sim, pid);
       const events = sim.drainEvents();
       const gather = events.find((e) => e.type === 'gatherResult');
       if (gather?.type !== 'gatherResult') throw new Error('expected gatherResult');
@@ -488,6 +506,7 @@ describe('grant truncation at the command boundary (full bags)', () => {
       meta.inventory.push({ itemId: 'copper_ore', count: 19 });
       delete meta.nodeHarvestReadyAt[nodeId];
       if (!sim.harvestNode(nodeId, pid)) continue;
+      completeCastNow(sim, pid);
       const events = sim.drainEvents();
       const gather = events.find((e) => e.type === 'gatherResult');
       if (gather?.type !== 'gatherResult') throw new Error('expected gatherResult');

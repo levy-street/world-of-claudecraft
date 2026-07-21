@@ -2911,6 +2911,7 @@ const ALL_DELTA_KEYS = [
   'duel',
   'equip',
   'gprof',
+  'hbl',
   'honor',
   'inv',
   'lhonor',
@@ -3128,6 +3129,12 @@ function dirtyEveryDeltaField(): {
     mechChromaIds: ['amber_crimson'],
     weaponSkinIds: [],
     weaponSkinLoadout: {},
+  };
+  // Session-scoped stored action-bar layout (`hbl`, self-only): set the frozen
+  // join-time copy so the heavy self block wires it once.
+  leader.initialHotbarLayout = {
+    v: 1,
+    forms: { normal: { bar: [{ type: 'ability', id: 'heroic_strike' }], attack: null } },
   };
 
   // Player Entity fields.
@@ -3352,12 +3359,14 @@ describe('full self-state snapshot delta fixture', () => {
     // untouched node (never in the map) still reads ready.
     expect(client.nodeHarvestableByMe(GATHER_NODES[0].id)).toBe(false);
     expect(client.nodeHarvestableByMe('not_a_real_node')).toBe(true);
+    // Phase 12c stage 2 appendix re-pin: the enforced per-profession caps
+    // (mining/logging/herbalism 100, fishing 200) replace the old uniform 300.
     expect(client.professionsState).toEqual({
       skills: [
-        { professionId: 'mining', skill: 6, maxSkill: 300 },
-        { professionId: 'logging', skill: 0, maxSkill: 300 },
-        { professionId: 'herbalism', skill: 0, maxSkill: 300 },
-        { professionId: 'fishing', skill: 0, maxSkill: 300 },
+        { professionId: 'mining', skill: 6, maxSkill: 100 },
+        { professionId: 'logging', skill: 0, maxSkill: 100 },
+        { professionId: 'herbalism', skill: 0, maxSkill: 100 },
+        { professionId: 'fishing', skill: 0, maxSkill: 200 },
       ],
     }); // prof -> professionsState
     expect(client.craftingIdentity).toMatchObject({
@@ -3399,6 +3408,16 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.talentSpec).toBe('arms');
     expect(client.loadouts).toEqual([{ name: 'PvP', alloc: { spec: 'arms', rows: {} }, bar: [] }]);
     expect(client.activeLoadout).toBe(0);
+    // hbl -> the login action-bar restore (self-only, resolved once on the first
+    // self payload). A stored server layout arrives as a 'server' win; like tal
+    // it is asserted directly (no TERSE_TO_IWORLD rename entry).
+    expect(client.takeActionBarLayoutRestore()).toEqual({
+      source: 'server',
+      layout: {
+        v: 1,
+        forms: { normal: { bar: [{ type: 'ability', id: 'heroic_strike' }], attack: null } },
+      },
+    });
 
     // vcup + vcupb -> cupInfo (merged from both fragments; neither key alone
     // equals the full CupInfo, so both are excluded from TERSE_TO_IWORLD and
@@ -3504,9 +3523,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 50 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(50);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(50);
+  it('ALL_DELTA_KEYS contains exactly 51 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(51);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(51);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -3525,7 +3544,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('vcupb')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
-    expect(scraped.size).toBe(50);
+    expect(scraped.size).toBe(51);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

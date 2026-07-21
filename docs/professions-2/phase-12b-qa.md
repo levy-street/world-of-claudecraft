@@ -5,6 +5,31 @@ cue routing) for correctness, missing tests, dead code, determinism, three-host 
 completeness, and, uniquely for this phase, faithful execution of the phase file's Pin-cost
 appendix.
 
+As-landed inputs (2026-07-20, swept from the phase build; read the phase file's As landed
+block and state.md's Phase 12b entry before auditing):
+- The bite-state storage choice: three transient Entity fields (fishBiteAtTick,
+  fishReelDeadlineTick, gatherCastNodeId); the module-local-map cleanup arm in the coverage
+  charter below is therefore MOOT (no eviction discipline exists to audit; audit the
+  cancel-path clears instead).
+- Pin moves land OUTSIDE the appendix by design in two classes, and are NOT blocking
+  findings. Cue-census extensions for the six new cues: game_audio 14 to 20,
+  sfx_manifest 181/36 to 187/42, and the Phase 11 gather_event_i18n "fishingResult is
+  cue-free" pin re-pinned to "plays only the reel cue" (the phase mandates the reel cue;
+  the loot-hub cue absence is still pinned). The synchronous-drive family (an appendix
+  inventory miss found and recorded at build time): gather_rare_events,
+  gather_rare_event_online, prof_intro_quest, and profession_quest_objectives, each
+  re-driven through cast completion via a local completeCastNow helper. Audit all of
+  them for decisiveness, then treat them as the additive-extension class (the Phase 9
+  command census precedent), not appendix violations. Any OTHER unlisted pin move stays
+  BLOCKING.
+- The reel arm lives in startFishing's busy gate, not items.ts useItem's generic busy
+  branch (the useItem fishing arms route to startFishing first); audit the re-press paths
+  there.
+- tests/gather_open_gate.test.ts and tests/gather_node_online.test.ts are deliberately
+  unchanged (reasons in the phase file's As landed block); the online arms live in
+  gather_node_harvest's live GameServer describe and gather_node_interact's new describe.
+  Auditing their absence THERE is in scope; their absence in the two unchanged files is not.
+
 ## QA Starter Prompt
 
 ```

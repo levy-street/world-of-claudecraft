@@ -31,6 +31,8 @@ import { isDispellableAura } from '../aura_classify';
 import { ITEMS, isDelvePos, MOBS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
+import { FISH_REEL_WINDOW_ROD_BONUS_SEC, FISH_REEL_WINDOW_SEC } from '../professions/fishing';
+import { bestOwnedGatherToolTier } from '../professions/tools';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -48,7 +50,9 @@ import {
   dist2d,
   FACING_HOLD_DIST,
   FISHING_CAST_ID,
+  GATHER_CAST_ID,
   isFormAuraKind,
+  isNonSpellCast,
   MELEE_ARC,
   MELEE_RANGE,
   MIN_GCD,
@@ -223,20 +227,57 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       return;
     }
   }
-  // a silence breaks an in-progress spell, but never the fishing cast or a
-  // physical channel (e.g. an aimed-shot kind) — those aren't spells.
-  if (isSilenced(p) && p.castingAbility !== FISHING_CAST_ID) {
+  // a silence breaks an in-progress spell, but never a non-spell cast (the
+  // fishing/gather sentinels) or a physical channel (e.g. an aimed-shot
+  // kind): those aren't spells. Demon Heal folds into the same short-circuit
+  // explicitly: it was already exempt here via failed ability resolution (its
+  // sentinel resolves to no ability), so the comparison is byte-identical.
+  if (
+    isSilenced(p) &&
+    !(isNonSpellCast(p.castingAbility) || p.castingAbility === DEMON_HEAL_CAST_ID)
+  ) {
     const cast = ctx.resolvedAbility(p.castingAbility, p.id);
     if (cast && cast.def.school !== 'physical') {
       cancelCast(ctx, p);
       return;
     }
   }
-  // a school lockout breaks an in-progress spell only when it matches the locked school.
-  if (p.castingAbility !== FISHING_CAST_ID) {
+  // a school lockout breaks an in-progress spell only when it matches the
+  // locked school; non-spell casts are exempt. Demon Heal folds in exactly as
+  // in the silence arm above (already exempt via failed ability resolution).
+  if (!(isNonSpellCast(p.castingAbility) || p.castingAbility === DEMON_HEAL_CAST_ID)) {
     const cast = ctx.resolvedAbility(p.castingAbility, p.id);
     if (cast && cast.def.school !== 'physical' && isLockedOut(p, cast.def.school)) {
       cancelCast(ctx, p);
+      return;
+    }
+  }
+  // Fishing bite minigame (Phase 12b): the hidden seeded bite and the
+  // server-authoritative reel deadline, resolved in sim ticks (the lockpick
+  // stepDeadlineTick precedent; the client never reports a timeout). The
+  // bite arm falls THROUGH to the generic decrement below, so a
+  // direct-assigned fishing cast (the parity cancel drives, hidden state
+  // inert) decays exactly as before. Draws no rng on any path.
+  if (p.castingAbility === FISHING_CAST_ID) {
+    if (p.fishBiteAtTick > 0 && ctx.tickCount >= p.fishBiteAtTick) {
+      // The bite: text-free personal event (bobber bite state plus the
+      // always-audible cue). The reel window re-scans the rod at bite time,
+      // so the widened window follows the rod actually held at the bite.
+      ctx.emit({ type: 'fishingBite', pid: p.id });
+      p.fishBiteAtTick = 0;
+      const rodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
+      const windowSec = FISH_REEL_WINDOW_SEC + FISH_REEL_WINDOW_ROD_BONUS_SEC * (rodTier - 1);
+      p.fishReelDeadlineTick = ctx.tickCount + Math.ceil(windowSec / DT);
+    } else if (p.fishReelDeadlineTick > 0 && ctx.tickCount > p.fishReelDeadlineTick) {
+      // The miss ("it got away"), firing at deadline + 1: the reel re-press
+      // stays valid while tickCount <= deadline (startFishing's reel arm).
+      // Ends the cast with zero draws and no loss; recast immediately.
+      ctx.emit({ type: 'fishingGotAway', pid: p.id });
+      p.castingAbility = null;
+      p.castRemaining = 0;
+      p.fishBiteAtTick = 0;
+      p.fishReelDeadlineTick = 0;
+      ctx.emit({ type: 'castStop', entityId: p.id, success: false });
       return;
     }
   }
@@ -291,9 +332,27 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     const castId = p.castingAbility;
     p.castingAbility = null;
     p.castRemaining = 0;
-    ctx.emit({ type: 'castStop', entityId: p.id, success: true });
+    // Defensive fishing end (Phase 12b): the session cap is unreachable in
+    // real flow (max bite delay plus max reel window end every session well
+    // before FISHING_SESSION_CAP_SEC), and a direct-assigned drive that
+    // ticks a fishing cast out simply gets away, same shape as the miss arm
+    // above. The catch table is never rolled here anymore.
     if (castId === FISHING_CAST_ID) {
-      ctx.completeFishing(p, meta);
+      ctx.emit({ type: 'fishingGotAway', pid: p.id });
+      p.fishBiteAtTick = 0;
+      p.fishReelDeadlineTick = 0;
+      ctx.emit({ type: 'castStop', entityId: p.id, success: false });
+      return;
+    }
+    ctx.emit({ type: 'castStop', entityId: p.id, success: true });
+    // Gather cast completion (Phase 12b): route to the gathering module and
+    // return before fireQueuedCast, like fishing above (a press can never
+    // queue against a non-spell cast, see castAbility's queue exemption).
+    // NOTE castStop success reflects the CAST finishing, not the grant: a
+    // completion whose re-validation denies (too far, respawn, bags) still
+    // stopped successfully; the denial renders through its own error line.
+    if (castId === GATHER_CAST_ID) {
+      ctx.completeGatherCast(p, meta);
       return;
     }
     // Ice Floes (mage choice row): a COMPLETED hard cast spends one protected
@@ -389,6 +448,13 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   // an interrupted cast never completed, so its queued follow-up is dropped too
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
+  // Phase 12b hidden per-cast state: unconditional inert writes (all three
+  // are already '' / 0 on every non-fishing/gather cancel path), so every
+  // existing cancel stays byte-identical while a cancelled gather or fishing
+  // cast can never leak a stale node id or bite deadline into a later cast.
+  p.gatherCastNodeId = '';
+  p.fishBiteAtTick = 0;
+  p.fishReelDeadlineTick = 0;
   ctx.emit({ type: 'castStop', entityId: p.id, success: false });
 }
 
@@ -503,7 +569,9 @@ export function castAbility(
   // casts on MOVE INPUT). Everything else keeps the classic rules. No rng.
   const blinkThrough =
     p.castingAbility !== null &&
-    p.castingAbility !== FISHING_CAST_ID &&
+    // Non-spell casts (fishing/gather) never blink through. Demon Heal is
+    // deliberately NOT folded here: blink-through during its channel is live.
+    !isNonSpellCast(p.castingAbility) &&
     ability.castTime === 0 &&
     (ability.usableWhileCasting === true ||
       (abilityId === 'blink' && ctx.playerMods(meta).global.blinkCast > 0));
@@ -511,10 +579,12 @@ export function castAbility(
     if (!blinkThrough) {
       // classic-era spell queue: a press during the tail of the current cast
       // queues instead of erroring, and updateCasting fires it on cast completion.
-      // Fishing is exempt (like the silence/lockout guards above): completeFishing
-      // never calls fireQueuedCast, so a press queued against it would strand and
-      // misfire on a later, unrelated cast.
-      if (p.castRemaining <= CAST_QUEUE_WINDOW_SEC && p.castingAbility !== FISHING_CAST_ID) {
+      // Non-spell casts (fishing/gather) are exempt (like the silence/lockout
+      // guards above): their completion paths never call fireQueuedCast, so a
+      // press queued against one would strand and misfire on a later, unrelated
+      // cast. Demon Heal is deliberately NOT folded: its channel completion
+      // fires the queue, so queuing against it works today.
+      if (p.castRemaining <= CAST_QUEUE_WINDOW_SEC && !isNonSpellCast(p.castingAbility)) {
         p.queuedCastAbility = abilityId;
         p.queuedCastAim = aim ?? null;
         return;

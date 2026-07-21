@@ -57,6 +57,7 @@
 //                                          union of the facets.
 // ---------------------------------------------------------------------------
 
+import type { IWorldActionBar } from './world_api/action_bar';
 import type { IWorldBank } from './world_api/bank';
 import type { IWorldCardMinigame } from './world_api/card_minigame';
 import type { IWorldChat } from './world_api/chat';
@@ -118,6 +119,13 @@ export type StableCooldownWire =
   | readonly [expiresAt: number, recoveryRate: number, acceleratedUntil: number];
 
 // --- facet aux-type + value re-exports (each travels with its facet file) ---
+export type {
+  ActionBarFormLayout,
+  ActionBarLayout,
+  ActionBarLayoutForm,
+  ActionBarLayoutRestore,
+  ActionBarSlotAction,
+} from './world_api/action_bar';
 export type { BankBonusSource, BankInfo } from './world_api/bank';
 export type { CardMinigameInfo } from './world_api/card_minigame';
 export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
@@ -237,6 +245,7 @@ export interface IWorld
     IWorldBank,
     IWorldValeCup,
     IWorldDungeonFinder,
+    IWorldActionBar,
     IWorldDeeds {}
 
 // ---------------------------------------------------------------------------
@@ -430,6 +439,9 @@ export const COMMAND_NAMES = [
   // Recipe training (Professions 2.0 Phase 9): learn a trainer-taught recipe
   // at its craft's station (Sim.trainRecipe via professions/training.ts).
   'train_recipe',
+  // Per-character action-bar layout persistence: the owning client uploads its
+  // full arranged layout (debounced) so it restores at login on any device.
+  'save_hotbar_layout',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -498,6 +510,7 @@ export type WorldFacet =
   | 'IWorldBank'
   | 'IWorldValeCup'
   | 'IWorldDungeonFinder'
+  | 'IWorldActionBar'
   | 'IWorldDeeds';
 
 export const COMMAND_FACETS = {
@@ -683,4 +696,7 @@ export const COMMAND_FACETS = {
   // design). deedsEarned/deedStats/renown/activeTitle are snapshot reads (no
   // send, untagged).
   deed_set_title: 'IWorldDeeds',
+  // IWorldActionBar: the debounced action-bar layout upload. takeActionBarLayoutRestore
+  // is a login-time read (no send, untagged).
+  save_hotbar_layout: 'IWorldActionBar',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

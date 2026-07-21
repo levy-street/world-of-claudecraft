@@ -291,6 +291,48 @@ describe('crafting window Phase 6 QA pins', () => {
     expect(difficulty?.textContent).toBe('No skill gain');
   });
 
+  it('maps the four difficulty states to the classic tints with their labels (Phase 12c)', () => {
+    // The classic four-color read: orange (QUALITY_COLOR.legendary), the
+    // house gold yellow (--gold in styles/tokens.css, the masterwork seal
+    // idiom), green (QUALITY_COLOR.uncommon), gray (QUALITY_COLOR.poor).
+    const rows = [
+      { difficulty: 'full' as const, tint: '#ff8000', label: 'Full skill gain' },
+      { difficulty: 'reduced' as const, tint: '#ffd100', label: 'Reduced skill gain' },
+      { difficulty: 'minimal' as const, tint: '#1eff00', label: 'Minimal skill gain' },
+      { difficulty: 'none' as const, tint: '#9d9d9d', label: 'No skill gain' },
+    ];
+    for (const { difficulty, tint, label } of rows) {
+      const parent = document.createElement('div');
+      renderCraftingWindow(
+        parent,
+        {
+          recipes: [
+            {
+              recipeId: `tint_${difficulty}`,
+              professionId: 'cooking',
+              resultItemId: 'tint_result',
+              resultCount: 1,
+              reagents: [],
+              skillReq: 25,
+              difficulty,
+              station: null,
+              craftable: true,
+            },
+          ],
+        },
+        deps(),
+      );
+      const el = parent.querySelector<HTMLElement>('.crafting-difficulty');
+      expect(el?.getAttribute('data-difficulty'), difficulty).toBe(difficulty);
+      expect(el?.getAttribute('style'), difficulty).toContain(tint);
+      // Never color-only: the localized label rides inside the tinted span.
+      expect(el?.textContent, difficulty).toBe(label);
+    }
+    // The minimal state binds the NEW catalog key, full-literal for the
+    // key scanner, alongside its three siblings.
+    expect(craftingWindow).toContain("minimal: 'hudChrome.crafting.difficultyMinimal'");
+  });
+
   it('an IN-RANGE station row keeps the badge, drops the dashed style and the note', () => {
     const parent = document.createElement('div');
     renderCraftingWindow(

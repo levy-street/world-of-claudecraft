@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { decideGatherNodeAction, handleGatherNodeInteract } from '../src/game/gather_node_interact';
-import { INTERACT_RANGE } from '../src/sim/types';
+import { GATHER_NODES } from '../src/sim/content/gather_nodes';
+import { nodeMaterialFor } from '../src/sim/professions/gathering';
+import { Sim } from '../src/sim/sim';
+import { GATHER_CAST_ID, INTERACT_RANGE } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
 
 describe('decideGatherNodeAction', () => {
   const nodePos = { x: 100, z: 200 };
@@ -209,5 +213,30 @@ describe('handleGatherNodeInteract', () => {
     ).resolves.toBe(false);
     expect(calls).toEqual(['node_a']);
     expect(errors).toEqual([]);
+  });
+});
+
+// Phase 12b: the sim command behind the interact helper starts a gather CAST
+// and still returns true (starting the cast IS the successful interaction for
+// the #1982 autorun-stop contract the helper relies on). The pure decision
+// helpers above are cast-agnostic by design; this arm pins the seam they sit
+// on against the real Sim.
+describe('the real harvestNode behind the helper (Phase 12b cast start)', () => {
+  it('a successful interact starts the gather cast and returns true before any grant', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Interactor');
+    const node = GATHER_NODES[0];
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing entity');
+    p.pos.x = node.pos.x;
+    p.pos.z = node.pos.z;
+    p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
+    p.prevPos = { ...p.pos };
+    expect(sim.harvestNode(node.id, pid)).toBe(true);
+    expect(p.castingAbility).toBe(GATHER_CAST_ID);
+    // Fresh player, bare hands, band 0, tier-1 node: the 2.5 s base literal.
+    expect(p.castTotal).toBe(2.5);
+    // The grant has NOT landed yet: it belongs to cast completion.
+    expect(sim.countItem(nodeMaterialFor(node.type, node.zoneId).itemId, pid)).toBe(0);
   });
 });

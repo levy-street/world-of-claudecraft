@@ -2098,6 +2098,8 @@ export const fr_CA: EnTranslations = {
       "gatherLine": "Vous rassemblez : {name}.",
       "gatherLineQty": "Vous rassemblez : {name} x{qty}.",
       "catchLine": "You reel in: {name}",
+      "biteLine": "Something takes the bait!",
+      "gotAwayLine": "It got away.",
       "nodeName": {
         "ore": "Ore Vein",
         "wood": "Timber Stand",
@@ -2165,7 +2167,7 @@ export const fr_CA: EnTranslations = {
       "tierPipAria": "Niveau {tier}",
       "nextUnlockTier": "{points} pointe vers le niveau suivant : les chances de chef-d'œuvre s'améliorent",
       "nextUnlockSpecialized": "{points} points avant la spécialisation : les coûts des matériaux diminuent",
-      "nextUnlockMax": "Au maximum de compétence",
+      "nextUnlockMastered": "Mastered, for now",
       "perkSpecializedLine": "{craft} : coûts de matériaux spécialisés -{pct}%",
       "perkSpecializedAt": "Spécialisé dans la compétence {threshold}",
       "switchCost": "Le prochain changement d’archétype coûte {cost} points d’expiation",
@@ -2245,6 +2247,7 @@ export const fr_CA: EnTranslations = {
       "skillReqLine": "Nécessite {craft} {skill}",
       "difficultyFull": "Gain de compétence complet",
       "difficultyReduced": "Gain de compétences réduit",
+      "difficultyMinimal": "Minimal skill gain",
       "difficultyNone": "Aucun gain de compétence",
       "stationBadge": "Poste",
       "stationOutOfRangeNamed": "Déplacez-vous vers le {station} pour le fabriquer.",
@@ -5971,6 +5974,7 @@ export const fr_CA: EnTranslations = {
     },
     "cast": {
       "fishing": "Pêche",
+      "gathering": "Gathering",
       "demonHeal": "Soin démoniaque",
       "thunzharrStormcall": "Appel de la tempête"
     }
@@ -10896,6 +10900,11 @@ export const fr_CA: EnTranslations = {
         "sender": "La guilde des artisans",
         "subject": "Votre travail dans la fabrication d'armures et l'ingénierie",
         "body": "Artisan,\n\nLa nouvelle parvient à la Guilde au sujet de votre travail en matière de fabrication d'armures et d'ingénierie : plaques rivetées et engrenages rectifiés, les deux métiers se nourrissant mutuellement. Les métiers voisins travaillés ensemble marquent une main prête à l’harmonisation. Cherchez le Forgeron Haldren, l'armurier d'Eastbrook : il parle pour l'instant au nom des maîtres. Prouvez-lui votre métier avec le travail de vos propres mains, et il verra vos deux spécialisations en harmonie.\n\nEn règle,\nLa guilde des artisans"
+      },
+      "mastery_reset_notice": {
+        "sender": "The Guildhall",
+        "subject": "Your craft, made honest",
+        "body": "Guildmate,\n\nThe guild has adopted a new reckoning of mastery. Every hand starts the climb again: your craft skills and your gathering proficiencies have been set to zero.\n\nEverything else is yours, untouched: your recipes, your tools and materials, your bank and gold, your attunements and titles, your deeds and renown, your quests and mail.\n\nThe climb is honest now. Cheap work will not carry you. Seek harder recipes, richer veins, and deeper waters.\n\nWith respect,\nThe Guildhall"
       }
     },
     "itemSets": {

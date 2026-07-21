@@ -8510,7 +8510,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Hobi: {craft}',
   'hudChrome.professions.identityHeader': 'Identitas',
   'hudChrome.professions.majorsLabel': 'Jurusan: {a} dan {b}',
-  'hudChrome.professions.nextUnlockMax': 'Pada keterampilan maksimal',
   'hudChrome.professions.nextUnlockSpecialized':
     '{points} menunjuk ke Khusus: biaya material turun',
   'hudChrome.professions.nextUnlockTier':

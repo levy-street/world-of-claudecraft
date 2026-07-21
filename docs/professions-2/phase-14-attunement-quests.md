@@ -103,11 +103,20 @@ Agent content deliverables:
 - One repeatable work-order quest per master (six total; the 2026-07-17 amendment): a
   cadence-capped craft-objective turn-in ("the master needs N of X") on QuestDef.repeatable
   plus the 2039 craft objective, consuming that master's craft materials: a recurring
-  material sink with a face on it. Rewards use the state.md work-order tuning target
-  (MAINTAINER numbers; stop and ask if they are still absent; never gold-positive against
-  the input vendor value) and the cadence cap reuses the nudge cadence pattern so the loop
-  can never become an unbounded XP or gold faucet (the q_prof_hobby_switch lesson in
-  state.md OPEN items).
+  material sink with a face on it. Rewards use the RESOLVED formula in state.md Tuning
+  targets (the 2026-07-20 mastery amendments: coin = floor(0.5 * summed input vendor SELL
+  value) plus standard repeatable-quest XP for the level band; vendoring always pays more
+  gold by construction, so the loop is never gold-optimal) and the cadence cap reuses the
+  nudge cadence pattern so the loop can never become an unbounded XP or gold faucet (the
+  q_prof_hobby_switch lesson, resolved to 0 XP in Phase 12c).
+- Master voices (the 2026-07-20 mastery amendments; approved sketches, maintainer vetoes
+  wording in the PR review). Every quest, work order, and letter this phase writes speaks
+  in its master's voice: forgemistress_darva, a stern forge veteran, warm underneath,
+  praise earned not given; cook_marlow, jovial, feeds everyone, thinks in food metaphors;
+  weaver_ottilie, precise and quietly proud, measures twice; tinker_gizzel, manic
+  enthusiasm, tangents mid-sentence, loves volatile things slightly too much;
+  tanner_hesk, taciturn, few words, judges by hands not talk; alchemist_verane, an aloof
+  scholar with dry wit and exact warnings.
 
 Agent sim deliverables:
 - Switch cost wiring: the escalation formula resolves in the sim through the make-amends

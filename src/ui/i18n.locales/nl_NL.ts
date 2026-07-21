@@ -8514,7 +8514,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Hobby: {craft}',
   'hudChrome.professions.identityHeader': 'Identiteit',
   'hudChrome.professions.majorsLabel': 'Hoofdvakken: {a} en {b}',
-  'hudChrome.professions.nextUnlockMax': 'Op maximale vaardigheid',
   'hudChrome.professions.nextUnlockSpecialized':
     'Nog {points} punten tot Gespecialiseerd: materiaalkosten dalen',
   'hudChrome.professions.nextUnlockTier':

@@ -2,6 +2,7 @@ import {
   GUILD_TREND_LETTERS,
   HEROIC_MARK_LETTER,
   type LetterDef,
+  MASTERY_RESET_LETTER,
   QUEST_LETTERS,
   WELCOME_LETTER,
 } from '../sim/content/letters';
@@ -264,6 +265,9 @@ const LETTER_IDS = [
   'guild_trend_jewelcrafting_weaponcrafting',
   'guild_trend_weaponcrafting_armorcrafting',
   'guild_trend_armorcrafting_engineering',
+  // The one-time mastery reset notice (Professions 2.0 Phase 12c,
+  // MASTERY_RESET_LETTER in src/sim/content/letters.ts).
+  'mastery_reset_notice',
 ] as const;
 
 type MobId = (typeof MOB_IDS)[number];
@@ -399,6 +403,7 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
   const lettersById: Record<string, LetterDef> = {
     [WELCOME_LETTER.letterId]: WELCOME_LETTER,
     [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
+    [MASTERY_RESET_LETTER.letterId]: MASTERY_RESET_LETTER,
   };
   for (const letter of Object.values(QUEST_LETTERS)) lettersById[letter.letterId] = letter;
   for (const letter of Object.values(GUILD_TREND_LETTERS)) lettersById[letter.letterId] = letter;

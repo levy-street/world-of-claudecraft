@@ -40,9 +40,9 @@ import {
   dist2d,
   type Entity,
   type EquipSlot,
-  FISHING_CAST_ID,
   INTERACT_RANGE,
   type ItemInstancePayload,
+  isNonSpellCast,
   POTION_COOLDOWN,
 } from './types';
 import { vendorStackSize } from './vendor_stack';
@@ -344,7 +344,10 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     ctx.openSkinSelect(meta, def.use.catalog ?? 'class', itemId);
     return;
   }
-  if (p.castingAbility === FISHING_CAST_ID) {
+  // A running non-spell cast (fishing/gather) blocks other item use. The
+  // Demon Heal channel is deliberately NOT folded in: items stay usable
+  // during it, as today.
+  if (isNonSpellCast(p.castingAbility)) {
     ctx.error(meta.entityId, 'You are busy.');
     return;
   }

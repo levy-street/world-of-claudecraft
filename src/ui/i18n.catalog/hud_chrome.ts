@@ -2213,6 +2213,12 @@ export const hudChromeStrings = {
     // already prints "You receive:" for the same catch, so this line must
     // never regress into that wording (nor into gatherLine's).
     catchLine: 'You reel in: {name}',
+    // Bite minigame lines (Professions 2.0 Phase 12b), rendered from the
+    // text-free personal fishingBite / fishingGotAway SimEvents. biteLine
+    // keeps the bite moment visible in the log (never sound-only,
+    // accessibility); gotAwayLine is the no-cost miss.
+    biteLine: 'Something takes the bait!',
+    gotAwayLine: 'It got away.',
     // Base tool tier gating (Professions 2.0 Phase 12). The sim's gatherDenied
     // SimEvent and the node hover tooltip are both text-free at the source:
     // every line here is composed client-side off structured fields, keyed per
@@ -2310,7 +2316,7 @@ export const hudChromeStrings = {
     tierPipAria: 'Tier {tier}',
     nextUnlockTier: '{points} points to the next tier: masterwork odds improve',
     nextUnlockSpecialized: '{points} points to Specialized: material costs drop',
-    nextUnlockMax: 'At maximum skill',
+    nextUnlockMastered: 'Mastered, for now',
     perkSpecializedLine: '{craft}: Specialized, material costs -{pct}%',
     perkSpecializedAt: 'Specializes at {threshold} skill',
     switchCost: 'Next archetype switch costs {cost} amends',
@@ -2418,6 +2424,7 @@ export const hudChromeStrings = {
     skillReqLine: 'Requires {craft} {skill}',
     difficultyFull: 'Full skill gain',
     difficultyReduced: 'Reduced skill gain',
+    difficultyMinimal: 'Minimal skill gain',
     difficultyNone: 'No skill gain',
     stationBadge: 'Station',
     // Phase 8 (supersedes the retired stationOutOfRange key): the crafting

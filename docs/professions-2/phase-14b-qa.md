@@ -68,6 +68,11 @@ PHASE-SPECIFIC QA EMPHASIS:
 - The legacy silent soulbound drop must be behaviorally unchanged unless state.md records a
   deliberate decision otherwise.
 - Prime directive: non-commission trades are byte-identical to pre-phase behavior, pinned.
+- The three RESOLVED decisions (the 2026-07-20 mastery amendments) landed exactly as
+  recorded: the bond binds to the CHARACTER (not the account), only weapon / armor /
+  held_offhand kinds can opt in (probe a consumable and a material: the opt-in must be
+  impossible, not merely hidden), and the unbind fee ladder is 2500 / 10000 / 40000
+  copper by quality tier with clamp-to-last, charged exactly once.
 
 Multi-agent review dispatch: apply the Review Dispatch Matrix in
 docs/professions-2/implementation-plan.md over the phase diff (privacy-security-review

@@ -61,6 +61,30 @@ export const HEROIC_MARK_LETTER: LetterDef = {
   delaySeconds: 0,
 };
 
+// The one-time mastery reset notice (Professions 2.0 Phase 12c): sent by the
+// tick mail phase to every pre-curve character whose load-time normalize just
+// zeroed their craft skills and gathering proficiencies (see
+// src/sim/professions/mastery_reset.ts; the literal id here is pinned equal
+// to its MASTERY_RESET_LETTER_ID). One-shot per character via the
+// CharacterState masteryResetApplied flag, the mailWelcomed precedent.
+export const MASTERY_RESET_LETTER: LetterDef = {
+  letterId: 'mastery_reset_notice',
+  senderName: 'The Guildhall',
+  subject: 'Your craft, made honest',
+  body:
+    'Guildmate,\n\n' +
+    'The guild has adopted a new reckoning of mastery. Every hand starts the ' +
+    'climb again: your craft skills and your gathering proficiencies have ' +
+    'been set to zero.\n\n' +
+    'Everything else is yours, untouched: your recipes, your tools and ' +
+    'materials, your bank and gold, your attunements and titles, your deeds ' +
+    'and renown, your quests and mail.\n\n' +
+    'The climb is honest now. Cheap work will not carry you. Seek harder ' +
+    'recipes, richer veins, and deeper waters.\n\n' +
+    'With respect,\nThe Guildhall',
+  delaySeconds: 0,
+};
+
 // Quest follow-up letters: the questgiver writes to you a little while after
 // the turn-in. Keyed by quest id; quests without an entry send nothing.
 export const QUEST_LETTERS: Record<string, LetterDef> = {

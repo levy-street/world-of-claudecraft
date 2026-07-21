@@ -2098,6 +2098,8 @@ export const en: EnTranslations = {
       "gatherLine": "You gather: {name}.",
       "gatherLineQty": "You gather: {name} x{qty}.",
       "catchLine": "You reel in: {name}",
+      "biteLine": "Something takes the bait!",
+      "gotAwayLine": "It got away.",
       "nodeName": {
         "ore": "Ore Vein",
         "wood": "Timber Stand",
@@ -2165,7 +2167,7 @@ export const en: EnTranslations = {
       "tierPipAria": "Tier {tier}",
       "nextUnlockTier": "{points} points to the next tier: masterwork odds improve",
       "nextUnlockSpecialized": "{points} points to Specialized: material costs drop",
-      "nextUnlockMax": "At maximum skill",
+      "nextUnlockMastered": "Mastered, for now",
       "perkSpecializedLine": "{craft}: Specialized, material costs -{pct}%",
       "perkSpecializedAt": "Specializes at {threshold} skill",
       "switchCost": "Next archetype switch costs {cost} amends",
@@ -2245,6 +2247,7 @@ export const en: EnTranslations = {
       "skillReqLine": "Requires {craft} {skill}",
       "difficultyFull": "Full skill gain",
       "difficultyReduced": "Reduced skill gain",
+      "difficultyMinimal": "Minimal skill gain",
       "difficultyNone": "No skill gain",
       "stationBadge": "Station",
       "stationOutOfRangeNamed": "Move to the {station} to craft this.",
@@ -5971,6 +5974,7 @@ export const en: EnTranslations = {
     },
     "cast": {
       "fishing": "Fishing",
+      "gathering": "Gathering",
       "demonHeal": "Demon Heal",
       "thunzharrStormcall": "Stormcall"
     }
@@ -10896,6 +10900,11 @@ export const en: EnTranslations = {
         "sender": "The Crafting Guild",
         "subject": "Your work in Armorcrafting and Engineering",
         "body": "Artisan,\n\nWord reaches the Guild of your work in Armorcrafting and Engineering: plates riveted and gears trued, the two crafts feeding one another. Neighboring crafts worked together mark a hand ready for attunement. Seek out Smith Haldren, the armorer of Eastbrook: he speaks for the masters for now. Prove your craft to him with work of your own hands, and he will see your two majors attuned.\n\nIn good standing,\nThe Crafting Guild"
+      },
+      "mastery_reset_notice": {
+        "sender": "The Guildhall",
+        "subject": "Your craft, made honest",
+        "body": "Guildmate,\n\nThe guild has adopted a new reckoning of mastery. Every hand starts the climb again: your craft skills and your gathering proficiencies have been set to zero.\n\nEverything else is yours, untouched: your recipes, your tools and materials, your bank and gold, your attunements and titles, your deeds and renown, your quests and mail.\n\nThe climb is honest now. Cheap work will not carry you. Seek harder recipes, richer veins, and deeper waters.\n\nWith respect,\nThe Guildhall"
       }
     },
     "itemSets": {

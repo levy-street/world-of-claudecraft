@@ -107,7 +107,8 @@ describe('sampled GameAudio facade', () => {
     audio.setFeedbackEnabled(false);
     expect(audio.feedbackEnabled).toBe(false);
 
-    // The interface/feedback cues fall silent (loot, level, quest, whisper, etc.).
+    // The interface/feedback cues fall silent (loot, level, quest, whisper,
+    // etc.), including five of the six Phase 12b gathering-rhythm cues.
     const feedback = [
       'coin',
       'levelUp',
@@ -119,21 +120,30 @@ describe('sampled GameAudio facade', () => {
       'arenaLoss',
       'error',
       'invitePrompt',
+      'gatherCast',
+      'gatherStrike',
+      'gatherRare',
+      'fishCast',
+      'fishReel',
     ] as const;
     for (const m of feedback) audio[m]();
     expect(sfxMock.playUi).not.toHaveBeenCalled();
 
     // Direct-affordance cues (you clicked/opened) and gameplay-timing cues (duel
-    // countdown, fiesta) are NOT gated, so they still play.
+    // countdown, fiesta, the fishing BITE that opens the live reel window) are
+    // NOT gated, so they still play. fishBite on this arm is a fairness
+    // contract: the reaction window must never be silenceable.
     audio.click();
     audio.bagOpen();
     audio.duelCountdownTick();
     audio.fiestaWave();
+    audio.fishBite();
     expect(sfxMock.playUi.mock.calls.map(([k]) => k)).toEqual([
       'ui_click',
       'ui_bag_open',
       'ui_duel_countdown',
       'ui_fiesta_wave',
+      'ui_fish_bite',
     ]);
 
     // Re-enabling restores the feedback cues.
@@ -182,11 +192,13 @@ describe('sampled GameAudio facade', () => {
 });
 
 describe('deterministic UI SFX catalog', () => {
-  it('adds 14 unique UI cues to the authoritative studio inventory', () => {
+  it('adds 20 unique UI cues to the authoritative studio inventory', () => {
+    // 14 pre-12b cues plus the six Phase 12b gathering-rhythm placeholders
+    // (ui_gather_cast/strike/rare, ui_fish_cast/bite/reel), issue #2208.
     const keys = UI_SFX_CATALOG.map((cue: { key: string }) => cue.key);
     const fullCatalogKeys = new Set(SFX.map((cue: { key: string }) => cue.key));
 
-    expect(keys).toHaveLength(14);
+    expect(keys).toHaveLength(20);
     expect(new Set(keys).size).toBe(keys.length);
     expect(keys.every((key: string) => key.startsWith('ui_'))).toBe(true);
     expect(UI_SFX_CATALOG.every((cue: { generator: string }) => cue.generator === 'ffmpeg')).toBe(

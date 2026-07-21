@@ -320,6 +320,7 @@ function makeCtx() {
     startAutoAttack: vi.fn(),
     revivePet: vi.fn(),
     completeFishing: vi.fn(),
+    completeGatherCast: vi.fn(),
     applyDemonHealTick: vi.fn(),
     awardCombo: vi.fn(),
     meleeSwing: vi.fn(() => false),

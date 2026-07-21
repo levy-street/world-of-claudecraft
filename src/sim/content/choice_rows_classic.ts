@@ -1913,7 +1913,17 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
                 n: 3,
                 abilities: warlockDamagingFireOrShadowSpellAbilityIds,
               },
-              responses: [{ kind: 'absorb', amount: 90, duration: 10, name: 'Hellglass Ward' }],
+              // target: 'self': the triggering casts are hostile, so the ward
+              // must land on the warlock, never the enemy hit by the 3rd cast.
+              responses: [
+                {
+                  kind: 'absorb',
+                  amount: 90,
+                  duration: 10,
+                  name: 'Hellglass Ward',
+                  target: 'self',
+                },
+              ],
             },
           },
         },

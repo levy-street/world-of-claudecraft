@@ -20,6 +20,7 @@ import { removePreferFungible } from '../items';
 import type { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import type { ItemDef } from '../types';
+import { recordAction, withinActionThrottle } from './action_throttle';
 
 const QUALITY_ORDER: readonly NonNullable<ItemDef['quality']>[] = [
   'poor',
@@ -77,7 +78,7 @@ export interface SalvageResult {
   itemId: string;
   materialItemId?: string;
   count?: number;
-  reason?: 'unknown_item' | 'not_salvageable' | 'not_held';
+  reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled';
 }
 
 /**
@@ -90,10 +91,18 @@ export function resolveSalvage(ctx: SimContext, pid: number, itemId: string): Sa
   if (!def) return { ok: false, itemId, reason: 'unknown_item' };
   if (!isSalvageable(def)) return { ok: false, itemId, reason: 'not_salvageable' };
   if (ctx.countItem(itemId, pid) < 1) return { ok: false, itemId, reason: 'not_held' };
+  const meta = ctx.players.get(pid);
+  // Phase 12c shared action throttle (action_throttle.ts): salvage draws
+  // from the same 10-per-60s budget as crafting, checked (no side effect
+  // beyond the window's own natural rollover) before anything is consumed.
+  if (meta && !withinActionThrottle(meta, ctx.time)) {
+    return { ok: false, itemId, reason: 'throttled' };
+  }
   removePreferFungible(ctx, itemId, 1, pid);
   const materialItemId = SALVAGE_MATERIAL_BY_QUALITY[def.quality ?? 'common'] ?? 'bone_fragments';
   const count = salvageYield(def, ctx.rng);
   ctx.addItem(materialItemId, count, pid);
+  if (meta) recordAction(meta);
   return { ok: true, itemId, materialItemId, count };
 }
 

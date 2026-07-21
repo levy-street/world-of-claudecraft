@@ -121,7 +121,14 @@ STOPPING RULES:
 - Work orders (the 2026-07-17 amendment): each master offers its repeatable work order; a
   loop of immediate re-turn-ins is BOUNDED by the cadence cap and never gold-positive
   against the input vendor value; the turn-in consumes the materials (a recurring sink,
-  not a faucet); probe the loop with a real repeated turn-in, not a formula read.
+  not a faucet); probe the loop with a real repeated turn-in, not a formula read. The
+  rewards implement the RESOLVED formula from state.md Tuning targets (the 2026-07-20
+  mastery amendments: coin = floor(0.5 * summed input vendor SELL value) plus standard
+  repeatable XP); verify at least one order's arithmetic against real vendor values, and
+  verify vendoring the same materials pays strictly more.
+- Master voices (the 2026-07-20 mastery amendments): quest, work-order, and letter text
+  matches each master's approved voice sketch in the phase file; flag copy that reads
+  voice-neutral or swaps voices between masters.
 - Tier-crossing mail (the 2026-07-17 amendment): exactly one letter per tier per major
   craft, from the archetype's anchor master; re-crossings, hobby and dormant crossings,
   unattuned characters, and repeated loads deliver none.

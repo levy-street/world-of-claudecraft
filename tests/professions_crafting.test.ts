@@ -520,7 +520,7 @@ describe('tiered mastery gating (#1128)', () => {
     expect(gained).toBeLessThan(1);
   });
 
-  it('crafting two or more tiers below capability grants zero skill progress', () => {
+  it('crafting two tiers below capability grants the minimal trickle; three or more grants zero (Phase 12c)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     // Set weaponcrafting as the active archetype so its empowerment ceiling (#1129/#1203) is
@@ -534,28 +534,39 @@ describe('tiered mastery gating (#1128)', () => {
 
     expect(result.ok).toBe(true);
     const meta = (sim as any).players.get(pid);
-    expect(meta.craftSkills.weaponcrafting).toBe(75);
+    // Two tiers below capability: the green minimal state, 75 + 0.25.
+    expect(meta.craftSkills.weaponcrafting).toBe(75.25);
+
+    // Three tiers below (skill 100, tier-4 capability vs the tier-1 recipe)
+    // is gray: zero progress.
+    setSkill(sim, pid, 'weaponcrafting', 100);
+    grantItem(sim, 'bone_fragments', 1, pid);
+    expect(resolveCraftForRecipe((sim as any).ctx, pid, tier1Recipe).ok).toBe(true);
+    expect(meta.craftSkills.weaponcrafting).toBe(100);
   });
 
-  it('common-tier crafting always grants its full floor, regardless of capability', () => {
+  it('common-tier crafting rides the same mastery curve: the tier-0 free floor is retired (Phase 12c)', () => {
     const lowCapSim = makeSim();
     const lowPid = lowCapSim.playerId;
     grantItem(lowCapSim, 'spider_leg', 1, lowPid);
     const commonRecipe = recipeById('recipe_tough_jerky')!;
     expect(commonRecipe.skillReq).toBe(0);
 
+    // At capability tier 0 a common recipe is still orange: the full point.
     resolveCraftForRecipe((lowCapSim as any).ctx, lowPid, commonRecipe);
     const lowMeta = (lowCapSim as any).players.get(lowPid);
     expect(lowMeta.craftSkills.cooking).toBe(1);
 
+    // At tier-4 capability the same common recipe is gray: zero progress
+    // (this arm pinned the retired free floor's 101 before Phase 12c).
     const highCapSim = makeSim();
     const highPid = highCapSim.playerId;
-    setSkill(highCapSim, highPid, 'cooking', 100); // high tier capability
+    setSkill(highCapSim, highPid, 'cooking', 100);
     grantItem(highCapSim, 'spider_leg', 1, highPid);
 
     resolveCraftForRecipe((highCapSim as any).ctx, highPid, commonRecipe);
     const highMeta = (highCapSim as any).players.get(highPid);
-    expect(highMeta.craftSkills.cooking).toBe(101); // still the full floor point
+    expect(highMeta.craftSkills.cooking).toBe(100);
   });
 });
 

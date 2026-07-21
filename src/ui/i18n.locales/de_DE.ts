@@ -8591,7 +8591,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Hobby: {craft}',
   'hudChrome.professions.identityHeader': 'Identität',
   'hudChrome.professions.majorsLabel': 'Hauptfächer: {a} und {b}',
-  'hudChrome.professions.nextUnlockMax': 'Mit maximalem Können',
   'hudChrome.professions.nextUnlockSpecialized':
     'Noch {points} Punkte bis zur Spezialisierung: Materialkosten sinken',
   'hudChrome.professions.nextUnlockTier':

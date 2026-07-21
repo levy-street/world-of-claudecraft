@@ -51,6 +51,8 @@ starter prompt.
 | 11 | [Fishing joins the framework](phase-11-fishing.md) | [QA](phase-11-qa.md) |
 | 12 | [Base tool tier gating](phase-12-tool-gating.md) | [QA](phase-12-qa.md) |
 | 12b | [Gathering rhythm](phase-12b-gathering-rhythm.md) | [QA](phase-12b-qa.md) |
+| 12c | [The Mastery Curve](phase-12c-mastery-curve.md) | [QA](phase-12c-qa.md) |
+| 12d | [Provenance and the harvest loop](phase-12d-provenance-stacking.md) | [QA](phase-12d-qa.md) |
 | 13 | [Enchanting reachable](phase-13-enchanting.md) | [QA](phase-13-qa.md) |
 | 14 | [Attunement quests and nudges](phase-14-attunement-quests.md) | [QA](phase-14-qa.md) |
 | 14b | [Commissions and the Maker's Bond](phase-14b-commissions-binding.md) | [QA](phase-14b-qa.md) |
@@ -72,5 +74,7 @@ tracked on epic #1866, not in this packet; salvage wiring moved INTO
 Phase 13 by the 2026-07-17 design-review amendments recorded in state.md,
 and the 2026-07-20 timing and economy amendments inserted Phases 12b
 (Gathering rhythm) and 14b (Commissions and the Maker's Bond) without
-renumbering; the state.md amendments block is the authority for both
-passes.
+renumbering; the SECOND 2026-07-20 block (mastery and provenance)
+inserted Phases 12c (The Mastery Curve) and 12d (Provenance and the
+harvest loop) after the 12b QA; the state.md amendments blocks are the
+authority for all three passes.

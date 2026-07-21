@@ -2098,6 +2098,8 @@ export const cs_CZ: EnTranslations = {
       "gatherLine": "Shromažďujete: {name}.",
       "gatherLineQty": "Shromažďujete: {name} x{qty}.",
       "catchLine": "You reel in: {name}",
+      "biteLine": "Something takes the bait!",
+      "gotAwayLine": "It got away.",
       "nodeName": {
         "ore": "Ore Vein",
         "wood": "Timber Stand",
@@ -2165,7 +2167,7 @@ export const cs_CZ: EnTranslations = {
       "tierPipAria": "Úroveň {tier}",
       "nextUnlockTier": "{points} bodů do další úrovně: šance na mistrovské dílo se zvýší",
       "nextUnlockSpecialized": "{points} bodů do specializace: náklady na materiál klesnou",
-      "nextUnlockMax": "Při maximální zručnosti",
+      "nextUnlockMastered": "Mastered, for now",
       "perkSpecializedLine": "{craft}: specializováno, náklady na materiál -{pct} %",
       "perkSpecializedAt": "Specializace při dovednosti {threshold}",
       "switchCost": "Další změna archetypu stojí {cost} bodů nápravy",
@@ -2245,6 +2247,7 @@ export const cs_CZ: EnTranslations = {
       "skillReqLine": "Vyžaduje {craft} {skill}",
       "difficultyFull": "Plný zisk dovedností",
       "difficultyReduced": "Snížený zisk dovedností",
+      "difficultyMinimal": "Minimal skill gain",
       "difficultyNone": "Žádný zisk dovedností",
       "stationBadge": "Stanice",
       "stationOutOfRangeNamed": "Chcete-li to vytvořit, přejděte do {station}.",
@@ -5971,6 +5974,7 @@ export const cs_CZ: EnTranslations = {
     },
     "cast": {
       "fishing": "Rybaření",
+      "gathering": "Gathering",
       "demonHeal": "Léčení démona",
       "thunzharrStormcall": "Volání bouře"
     }
@@ -10896,6 +10900,11 @@ export const cs_CZ: EnTranslations = {
         "sender": "Řemeslnický cech",
         "subject": "Tvá práce v zbrojnictví a strojírenství",
         "body": "Řemeslníku,\n\nCech se doslechl o tvé práci v zbrojnictví a strojírenství: pláty se nýtovaly a ozubená kola se seřizovala, dvě řemesla se navzájem doplňují. Propojení příbuzných řemesel svědčí o ruce připravené ke sladění. Vyhledej kováře Haldrena, zbrojíře z Eastbrooku: prozatím zastupuje mistry. Dokaž mu své umění dílem vlastních rukou a on zajistí sladění tvých dvou hlavních oborů.\n\nS úctou,\nŘemeslnický cech"
+      },
+      "mastery_reset_notice": {
+        "sender": "The Guildhall",
+        "subject": "Your craft, made honest",
+        "body": "Guildmate,\n\nThe guild has adopted a new reckoning of mastery. Every hand starts the climb again: your craft skills and your gathering proficiencies have been set to zero.\n\nEverything else is yours, untouched: your recipes, your tools and materials, your bank and gold, your attunements and titles, your deeds and renown, your quests and mail.\n\nThe climb is honest now. Cheap work will not carry you. Seek harder recipes, richer veins, and deeper waters.\n\nWith respect,\nThe Guildhall"
       }
     },
     "itemSets": {

@@ -1416,19 +1416,24 @@ describe('enchanting skill-gain sites', () => {
   // addItem marks the player dirty on FIRST discovery of an item id, which
   // would mask a missing site mark (a veteran who long since discovered the
   // dust gets no discovery mark from the disenchant yield).
-  function stagedAt74(sim: Sim): PlayerMeta {
+  // Phase 12c re-pin: enchanting gains are quality-tiered now, so a common
+  // sword/dust action at capability 2 (skill 50-74.75) grants the green 0.25
+  // (min(common 0, pre-archetype ceiling 2) = 0, two tiers below), not the
+  // retired flat 1. Staging at 74.75 keeps the threshold crossing exact:
+  // 74.75 + 0.25 = 75.
+  function stagedJustUnderThreshold(sim: Sim): PlayerMeta {
     const meta = sim.players.get(sim.playerId)!;
     sim.addItem('eastbrook_arming_sword', 1, sim.playerId);
     sim.addItem('arcane_dust', 5, sim.playerId);
     sim.tick();
     expect(meta.deedsEarned.has('prog_craft_specialist')).toBe(false);
-    meta.craftSkills.enchanting = 74;
+    meta.craftSkills.enchanting = 74.75;
     return meta;
   }
 
   it('a disenchant that lifts enchanting skill over a craftSkill threshold grants after the tick', () => {
     const sim = makeSim();
-    const meta = stagedAt74(sim);
+    const meta = stagedJustUnderThreshold(sim);
     sim.disenchantItem('eastbrook_arming_sword');
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     expect(meta.craftSkills.enchanting).toBe(75);
@@ -1438,7 +1443,7 @@ describe('enchanting skill-gain sites', () => {
 
   it('an apply-enchant that lifts enchanting skill over the threshold grants after the tick', () => {
     const sim = makeSim();
-    const meta = stagedAt74(sim);
+    const meta = stagedJustUnderThreshold(sim);
     sim.applyEnchant('eastbrook_arming_sword', 'enchant_weapon_might');
     expect(sim.lastEnchantResult?.ok).toBe(true);
     expect(meta.craftSkills.enchanting).toBe(75);

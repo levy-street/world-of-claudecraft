@@ -40,7 +40,7 @@ import {
   armorReduction,
   DT,
   ENRAGE_DMG_DONE,
-  FISHING_CAST_ID,
+  isNonSpellCast,
   MELEE_ARC,
   MELEE_CLASSES,
   normAngle,
@@ -855,7 +855,9 @@ export function runEffects(
         break;
       }
       case 'interrupt': {
-        if (!target || target.castingAbility === null || target.castingAbility === FISHING_CAST_ID)
+        // Non-spell casts (fishing/gather) are interrupt-immune. The Demon
+        // Heal channel is deliberately NOT folded in: it stays interruptible.
+        if (!target || target.castingAbility === null || isNonSpellCast(target.castingAbility))
           break;
         if (p.kind === 'player' && target.kind === 'player' && !ctx.isHostileTo(p, target)) break;
         // Resolve per-player when possible (rank/mods), but fall back to the

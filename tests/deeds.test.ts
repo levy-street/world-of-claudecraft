@@ -471,6 +471,12 @@ describe('retro on join', () => {
       delveClears: { 'collapsed_reliquary:normal': 2 },
       craftSkills: { cooking: 3 },
       gatheringProficiency: { mining: 1 },
+      // A curve-era blob (Professions 2.0 Phase 12c): without this flag the
+      // one-time mastery reset zeroes both skill maps at load, BEFORE the
+      // retro sweep runs, and the skill-proof inferences under test would
+      // (correctly) see nothing. The pre-curve arm is pinned in
+      // tests/professions_mastery_reset.test.ts.
+      masteryResetApplied: true,
     };
   }
 

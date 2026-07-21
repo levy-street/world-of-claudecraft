@@ -123,6 +123,45 @@ describe('sim-level node access gating (Professions 2.0 Phase 12)', () => {
     return { sim, pid };
   }
 
+  // Phase 12b: harvestNode starts a gather cast. The unlock arms tick the
+  // REAL loop through to the grant (mobs despawned first: mob damage cancels
+  // a gather cast), and every deny arm pins that the denial is rng-free AND
+  // starts no cast (deny-is-rng-free holds at cast START).
+  function despawnMobs(sim: Sim) {
+    for (const e of sim.entities.values()) {
+      if (e.kind !== 'mob') continue;
+      e.dead = true;
+      e.hp = 0;
+      e.aiState = 'dead';
+      e.respawnTimer = 9999;
+      e.corpseTimer = 9999;
+      e.inCombat = false;
+    }
+  }
+
+  function castAndComplete(sim: Sim, nodeId: string, pid: number): boolean {
+    despawnMobs(sim);
+    if (!sim.harvestNode(nodeId, pid)) return false;
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing entity');
+    for (let i = 0; i < 80 && p.castingAbility; i++) sim.tick();
+    if (p.castingAbility) throw new Error('gather cast never completed');
+    sim.tick(); // drain the completion tick's queued proficiency grant
+    return true;
+  }
+
+  function expectDeniedDrawFreeNoCast(sim: Sim, nodeId: string, pid: number) {
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      expect(sim.harvestNode(nodeId, pid)).toBe(false);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(draws).toBe(0);
+    expect(sim.entities.get(pid)?.castingAbility ?? null).toBe(null);
+  }
+
   it('a bare-hands harvest of a tier-2 vein is denied: no rng, no timer, no grant, one exact event', () => {
     const { sim, pid } = simAtNode(T2_ORE);
     const meta = sim.players.get(pid);
@@ -136,8 +175,10 @@ describe('sim-level node access gating (Professions 2.0 Phase 12)', () => {
     } finally {
       sim.rng.setObserver(null);
     }
-    // The gate is rng-free and sits before both harvest draws.
+    // The gate is rng-free, sits before both harvest draws, and never
+    // starts the Phase 12b gather cast.
     expect(draws).toBe(0);
+    expect(sim.entities.get(pid)?.castingAbility ?? null).toBe(null);
     // Exact field shape: text-free, personal, professionId present on the
     // node surface (the fixed Phase 12 interface contract).
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
@@ -153,7 +194,7 @@ describe('sim-level node access gating (Professions 2.0 Phase 12)', () => {
     const { sim, pid } = simAtNode(T2_ORE);
     sim.addItem('iron_mining_pick', 1, pid);
     sim.drainEvents();
-    expect(sim.harvestNode(T2_ORE, pid)).toBe(true);
+    expect(castAndComplete(sim, T2_ORE, pid)).toBe(true);
     expect(sim.countItem('iron_ore', pid)).toBeGreaterThanOrEqual(1);
     expect(sim.nodeHarvestableByMeFor(T2_ORE, pid)).toBe(false);
     expect(sim.drainEvents().some((e) => e.type === 'gatherDenied')).toBe(false);
@@ -163,14 +204,16 @@ describe('sim-level node access gating (Professions 2.0 Phase 12)', () => {
     const { sim, pid } = simAtNode(T2_ORE);
     sim.addItem('felling_axe', 1, pid); // logging tier 2
     sim.drainEvents();
-    expect(sim.harvestNode(T2_ORE, pid)).toBe(false);
+    expectDeniedDrawFreeNoCast(sim, T2_ORE, pid);
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
       { type: 'gatherDenied', pid, surface: 'node', professionId: 'mining', requiredTier: 2 },
     ]);
-    // Sanity arm: the same axe DOES unlock a tier-2 wood stand.
+    // Sanity arm: the same axe DOES unlock a tier-2 wood stand (ticked
+    // through the cast to the grant).
     const wood = simAtNode(T2_WOOD);
     wood.sim.addItem('felling_axe', 1, wood.pid);
-    expect(wood.sim.harvestNode(T2_WOOD, wood.pid)).toBe(true);
+    expect(castAndComplete(wood.sim, T2_WOOD, wood.pid)).toBe(true);
+    expect(wood.sim.countItem('elderwood_log', wood.pid)).toBeGreaterThanOrEqual(1);
   });
 
   it('owned-best picks the highest tier among multiple owned tools of one profession', () => {
@@ -181,8 +224,43 @@ describe('sim-level node access gating (Professions 2.0 Phase 12)', () => {
     const meta = sim.players.get(pid);
     if (!meta) throw new Error('missing meta');
     expect(bestOwnedGatherToolTier(meta.inventory, 'mining', ITEMS)).toBe(3);
-    expect(sim.harvestNode(T3_ORE, pid)).toBe(true);
+    expect(castAndComplete(sim, T3_ORE, pid)).toBe(true);
     expect(sim.countItem('thorium_ore', pid)).toBeGreaterThanOrEqual(1);
+  });
+
+  it('an owned tool one tier short still denies, and the event carries the real node tier (3)', () => {
+    const { sim, pid } = simAtNode(T3_ORE);
+    sim.addItem('iron_mining_pick', 1, pid); // mining tier 2 at a tier-3 vein
+    sim.drainEvents();
+    expectDeniedDrawFreeNoCast(sim, T3_ORE, pid);
+    // requiredTier must be the node's tier, not a constant: every other deny
+    // pin in the suite reads 2, so this arm is the guard against a
+    // hardcoded-2 (or viewer-tier-plus-1) regression lying in the toast.
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
+      { type: 'gatherDenied', pid, surface: 'node', professionId: 'mining', requiredTier: 3 },
+    ]);
+  });
+
+  it('the herbalism arm denies and unlocks through the real harvestNode like the others', () => {
+    const T2_HERB = 'herb_mirefen_t2';
+    const bare = simAtNode(T2_HERB);
+    bare.sim.drainEvents();
+    expectDeniedDrawFreeNoCast(bare.sim, T2_HERB, bare.pid);
+    expect(bare.sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
+      {
+        type: 'gatherDenied',
+        pid: bare.pid,
+        surface: 'node',
+        professionId: 'herbalism',
+        requiredTier: 2,
+      },
+    ]);
+    const tooled = simAtNode(T2_HERB);
+    tooled.sim.addItem('bronze_sickle', 1, tooled.pid); // herbalism tier 2
+    tooled.sim.drainEvents();
+    expect(castAndComplete(tooled.sim, T2_HERB, tooled.pid)).toBe(true);
+    expect(tooled.sim.countItem('goldleaf_herb', tooled.pid)).toBeGreaterThanOrEqual(1);
+    expect(tooled.sim.drainEvents().some((e) => e.type === 'gatherDenied')).toBe(false);
   });
 
   it('mixed-profession bags resolve per profession: mining tier 3 never lends logging its tier', () => {
@@ -194,7 +272,7 @@ describe('sim-level node access gating (Professions 2.0 Phase 12)', () => {
     expect(bestOwnedGatherToolTier(meta.inventory, 'mining', ITEMS)).toBe(3);
     expect(bestOwnedGatherToolTier(meta.inventory, 'logging', ITEMS)).toBe(1);
     sim.drainEvents();
-    expect(sim.harvestNode(T2_WOOD, pid)).toBe(false);
+    expectDeniedDrawFreeNoCast(sim, T2_WOOD, pid);
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
       { type: 'gatherDenied', pid, surface: 'node', professionId: 'logging', requiredTier: 2 },
     ]);

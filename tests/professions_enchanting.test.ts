@@ -11,6 +11,9 @@ import { removePreferFungible } from '../src/sim/items';
 import {
   disenchantItem,
   disenchantYield,
+  ENCHANTING_GAIN_TIER_BY_QUALITY,
+  ENCHANTING_SKILL_GAIN,
+  enchantGainTier,
   isDisenchantable,
   isEnchantedInstance,
   resolveApplyEnchant,
@@ -633,5 +636,103 @@ describe('ENCHANTS table integrity', () => {
     expect(ENCHANTS.enchant_weapon_greater_might.statBonus.str).toBe(8);
     sim.equipItem('eastbrook_arming_sword');
     expect(sim.player.stats.str).toBe(baseStr + 8);
+  });
+});
+
+// Phase 12c: enchanting gains are quality-tiered under the SOFT archetype
+// ceiling (archetype.ts enchantingGainMultiplier). The flat-1-per-action rule
+// is retired: ENCHANTING_SKILL_GAIN stays 1 but is now the BASE, multiplied
+// by the four-state curve over min(input tier, archetype ceiling). The pure
+// min()/curve arms live in archetype_ceiling.test.ts; these pin the resolver
+// wiring and the content maps.
+describe('quality-tiered enchanting gains (Phase 12c)', () => {
+  it('pins the base gain and the quality-to-tier map to literals', () => {
+    expect(ENCHANTING_SKILL_GAIN).toBe(1);
+    expect(ENCHANTING_GAIN_TIER_BY_QUALITY).toEqual({
+      poor: 0,
+      common: 0,
+      uncommon: 1,
+      rare: 2,
+      epic: 3,
+      legendary: 4,
+    });
+  });
+
+  it('derives an enchant gain tier from its reagent defs (dust 0, essence 1, shard 2)', () => {
+    // EnchantDef carries no tier field: the existing tier notion is the
+    // arcane reagent ladder, read off the reagent ITEM DEFS' quality (max
+    // over the list). Pin the three material qualities so a def re-tune
+    // cannot silently reshuffle every enchant's gain tier.
+    expect(ITEMS.arcane_dust.quality).toBe('common');
+    expect(ITEMS.arcane_essence.quality).toBe('uncommon');
+    expect(ITEMS.arcane_shard.quality).toBe('rare');
+    expect(enchantGainTier(ENCHANTS.enchant_weapon_might)).toBe(0);
+    expect(enchantGainTier(ENCHANTS.enchant_chest_stamina)).toBe(1);
+    expect(enchantGainTier(ENCHANTS.enchant_weapon_greater_might)).toBe(2);
+  });
+
+  it('a fresh disenchanter still gains the full point from a common piece (orange at capability 0)', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid)!;
+    sim.addItem('eastbrook_arming_sword', 1, pid);
+    expect(resolveDisenchant(sim.ctx, pid, 'eastbrook_arming_sword').ok).toBe(true);
+    // Derivation: base 1 * curve(capability 0, min(common 0, pre-archetype
+    // ceiling 2) = 0) = 1 (at/above capability -> full).
+    expect(meta.craftSkills.enchanting).toBe(1);
+  });
+
+  it('commons gray out at capability 3 (skill 75): the disenchant still succeeds with zero gain', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid)!;
+    meta.craftSkills.enchanting = 75; // capability 3
+    sim.addItem('eastbrook_arming_sword', 1, pid);
+    const result = resolveDisenchant(sim.ctx, pid, 'eastbrook_arming_sword');
+    // Zero gain must never block the action itself: the item is consumed and
+    // the material granted exactly as before.
+    expect(result.ok).toBe(true);
+    expect(sim.countItem('eastbrook_arming_sword', pid)).toBe(0);
+    // Derivation: min(common 0, ceiling 2) = 0, three tiers below capability
+    // 3 -> gray 0.
+    expect(meta.craftSkills.enchanting).toBe(75);
+  });
+
+  it('an epic disenchant under the pre-archetype rare ceiling grants the rare-tier gain, never zero', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid)!;
+    meta.craftSkills.enchanting = 75; // capability 3
+    expect(ITEMS.morthens_cryptforged_hauberk.quality).toBe('epic');
+    sim.addItem('morthens_cryptforged_hauberk', 1, pid);
+    expect(resolveDisenchant(sim.ctx, pid, 'morthens_cryptforged_hauberk').ok).toBe(true);
+    // Derivation: min(epic 3, pre-archetype ceiling 2) = 2, one tier below
+    // capability 3 -> yellow 0.5 (the SOFT ceiling: crafting's hard rule
+    // would have zeroed a tier-3 recipe here).
+    expect(meta.craftSkills.enchanting).toBe(75.5);
+  });
+
+  it('the apply arm reads the enchant tier: a Greater enchant outgains a dust enchant at capability 1', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid)!;
+    meta.craftSkills.enchanting = 25; // capability 1
+    sim.addItem('eastbrook_arming_sword', 1, pid);
+    sim.addItem('arcane_dust', 5, pid);
+    expect(
+      resolveApplyEnchant(sim.ctx, pid, 'eastbrook_arming_sword', 'enchant_weapon_might').ok,
+    ).toBe(true);
+    // Derivation: dust enchant tier 0, one below capability 1 -> yellow 0.5.
+    expect(meta.craftSkills.enchanting).toBe(25.5);
+    sim.addItem('eastbrook_arming_sword', 1, pid);
+    sim.addItem('arcane_shard', 1, pid);
+    sim.addItem('arcane_essence', 2, pid);
+    expect(
+      resolveApplyEnchant(sim.ctx, pid, 'eastbrook_arming_sword', 'enchant_weapon_greater_might')
+        .ok,
+    ).toBe(true);
+    // Derivation: shard-derived tier 2 (still capability 1 at skill 25.5),
+    // at/above capability -> full 1. Total 25.5 + 1 = 26.5.
+    expect(meta.craftSkills.enchanting).toBe(26.5);
   });
 });

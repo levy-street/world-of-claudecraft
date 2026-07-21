@@ -8441,7 +8441,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Sở thích: {craft}',
   'hudChrome.professions.identityHeader': 'Danh tính',
   'hudChrome.professions.majorsLabel': 'Chuyên ngành: {a} và {b}',
-  'hudChrome.professions.nextUnlockMax': 'Ở kỹ năng tối đa',
   'hudChrome.professions.nextUnlockSpecialized':
     '{points} chỉ vào Chuyên ngành: giảm chi phí nguyên vật liệu',
   'hudChrome.professions.nextUnlockTier':

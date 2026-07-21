@@ -10,6 +10,59 @@ Phase 12 tool tiers, it deliberately re-pins a known, pre-briefed set of timing 
 Pin-cost appendix below), and none of the content phases depend on it. Approved by the
 2026-07-20 timing and economy amendments (state.md is the authority); tracked as issue #2206.
 
+As landed (2026-07-20, authoritative over the Starter Prompt below where they differ; the
+full surfaces record is state.md's Phase 12b entry):
+- The reel re-press does NOT land in items.ts useItem's generic busy branch: the useItem
+  fishing arms route to ctx.startFishing BEFORE that guard, so the reel arm lives inside
+  startFishing's own busy gate (command census unchanged either way). A re-press before the
+  bite or after the deadline keeps the busy error.
+- The parity storage decision: three transient Entity fields (fishBiteAtTick,
+  fishReelDeadlineTick, gatherCastNodeId), inert-initialized, cleared on every end path;
+  no exclude-list change; only professions_gather regenerated (hunted seed 1 under the
+  re-shaped drive; the drive silences mobs, resets the herb window to band 0 per iteration,
+  and keeps the newest eight signed instances so the window never hits bags-full).
+- DEMON_HEAL_CAST_ID folded ONLY at the silence and lockout sites (byte-identical: it was
+  already exempt there via failed ability resolution); everywhere else it stays deliberately
+  ad hoc (the state.md entry lists each site with its live-behavior reason).
+- The tool gate is deliberately NOT re-checked at gather-cast completion (held at cast
+  start); completion re-validates exactly range, respawn, and capacity.
+- The codfather cast SHIPS as 1 draw at cast start (no quest special-case in startFishing)
+  plus 0 at the reel (early return preserved), per the appendix's either-is-fine row.
+- FISHING_CAST_TIME retired in favor of FISHING_SESSION_CAP_SEC = 15, a constant cast-bar
+  cap carrying zero bite information; the fishing cast bar renders a constant full waiting
+  bar, and the /cast fishing readout shows no countdown ('You are fishing. Waiting for a
+  bite.', em dash dropped, landed via the scripts/i18n_blocked_seed.mjs registry seed).
+- No fishing bobber existed before this phase: src/render/fishing_bobber.ts is NEW
+  (renderer-owned, idle bob for any fishing entity in view, owner-only bite state off the
+  personal event, preset-identical).
+- Additive pin moves landed OUTSIDE the Pin-cost appendix, all forced by mandated new
+  behavior, none a weakening, in two classes. CUE-CENSUS EXTENSIONS for the six new
+  PLACEHOLDER cues: tests/game_audio.test.ts 14 to 20 and tests/sfx_manifest.test.ts
+  181-key/36-ui to 187/42; plus the Phase 11 gather_event_i18n pin "fishingResult is
+  cue-free" re-pinned to "plays only the reel cue" (audio.fishReel present,
+  audio.lootItem absent). THE SYNCHRONOUS-DRIVE FAMILY (an APPENDIX INVENTORY MISS: four
+  files drive harvestNode as synchronously as gather_node_harvest's listed describes, but
+  the appendix never listed them; each re-driven through cast completion via a local
+  completeCastNow helper mirroring the lifecycle arm, coverage extended, nothing
+  weakened): tests/gather_rare_events.test.ts (found by the review coverage pass),
+  tests/gather_rare_event_online.test.ts, tests/prof_intro_quest.test.ts, and
+  tests/profession_quest_objectives.test.ts (the last three caught by the FULL GATE, the
+  recurring full-gate-catches-what-the-matrix-missed class). The appendix is otherwise
+  CLOSED and fully executed; per the standing rule it must be re-inventoried by any later
+  phase that adds pins in its blast radius.
+- tests/gather_open_gate.test.ts and tests/gather_node_online.test.ts are deliberately
+  unchanged (the former is corpse-focused with a stub harvestNode and corpse timing is out
+  of scope; the latter is a pure ClientWorld ncd-mirror suite); the online
+  castStart-wire-shape and completion-grant arms live in gather_node_harvest's live
+  GameServer describe, and the interact-starts-a-cast arm in gather_node_interact.test.ts.
+- Predicate-consumer precision (QA wording correction, 2026-07-20): of the eleven
+  exemption sites, SEVEN consume the isNonSpellCast boolean directly (casting_lifecycle
+  silence/lockout/blink-through/spell-queue, effect_dispatch interrupt immunity, damage
+  cancel-not-pushback, items useItem busy guard) and FOUR are id-discriminating by
+  construction, comparing the sentinels individually beside it (casting_lifecycle
+  completion routing, castingReadout, castBarState, castDisplayName). The Starter
+  Prompt's "all eleven route through the shared predicate" reads as the former only.
+
 ## Context pointers
 
 - `docs/professions-2/state.md`: the 2026-07-20 timing and economy amendments block (the
@@ -245,7 +298,10 @@ STOPPING RULES:
 
 Every test, literal, and golden this phase is EXPECTED to move, so the implementer re-pins
 deliberately instead of discovering the blast radius mid-flight. Anything outside this list
-that reds is a defect in the change, not an accepted cost.
+that reds is a defect in the change, not an accepted cost. Re-inventoried by the Phase 12
+QA session against the Phase 12 merge (a57e43b78) plus the QA PR's own pins: the last
+three rows below cover the pins that landed AFTER the original inventory point and keep
+this list closed.
 
 - `tests/professions_fishing.test.ts`, describe "fishing one-draw rng contract (pin 2)": the
   one-draw-per-cast contract ("draws exactly one rng value per normal cast, including the
@@ -320,3 +376,40 @@ that reds is a defect in the change, not an accepted cost.
   pinned callback-name list in tests/sim_context.test.ts (the Phase 7 trap).
 - The wire: castRem/castTot ride dynamicFields only while castingAbility is set; the gather
   cast reuses that shape for free. Do NOT add any bite field beside them.
+- (post-inventory, Phase 12 + its QA) `tests/professions_fishing.test.ts`, describe
+  "fishing band tool cap (Professions 2.0 Phase 12)": the five literal-sequence arms (the
+  three rod-cap arms, the pole-only proficiency-0 byte-identity walk, and the QA's "a high
+  rod never buys bands" proficiency-arm pin) re-record under the new draw order exactly
+  like pins 1 and 6, same band-discriminating-window trap; and "useItem on each new rod
+  starts the standard fishing cast" pins the cast start at FISHING_CAST_ID with the
+  castStart emit, so it re-pins to the new bite cast-start shape.
+- (post-inventory, Phase 12 + its QA) `tests/professions_tools.test.ts`, describe
+  "sim-level node access gating (Professions 2.0 Phase 12)": the deny, unlock, owned-best,
+  requiredTier-3, and herbalism arms drive harvestNode synchronously with exact
+  gatherDenied shapes and a zero-draw deny pin; extend them to the new cast entry point
+  (extend, do not orphan), and the deny-is-rng-free property must hold at cast START (a
+  denied attempt draws nothing and starts no cast).
+- (post-inventory, Phase 12 + its QA) `tests/gather_node_harvest.test.ts`, describes
+  "node tool gate ordering (Phase 12)" and "Phase 12 determinism (same seed, same drive)":
+  the deny-order pins (respawn before tool gate, tool gate before bags-full) and the
+  hot-path exactly-two-draws pin re-home to the cast-completion shape; the determinism
+  drive re-shapes under the cast, and its fishDraws liveness pin (completeFishing called
+  directly, bypassing startFishing, exactly one table draw) survives only while the reel
+  keeps its single draw, re-pin consciously if that draw moves. The corpse premium-arm
+  suite (tests/corpse_harvest_sim.test.ts) is OUTSIDE this phase's blast radius: 12b adds
+  no corpse timing.
+- (post-inventory, Phase 12b QA, 2026-07-20) The QA pass added pins inside this
+  appendix's blast radius (the standing re-inventory rule; all additive, nothing
+  weakened, every one mutation-verified): tests/gathering_rhythm.test.ts gained the
+  deadline-tick no-miss arm (the tick phase runs AT the deadline and must not miss; a
+  `>` to `>=` flip previously survived the suite), a cast-end-clears describe pinning
+  cancelCast (with the stale-deadline instant-reel scenario), arena reset, fiesta down,
+  and the defensive session-cap end, the useItem busy-guard gather arm, and same-draw
+  rod-synergy literals (seed 4242 first cast: bare 127 / tier-2 107 / tier-3 87 ticks,
+  decisive on the reduction in both directions); tests/game_audio.test.ts gained the six
+  cue ROUTING pins (five feedback-gated, fishBite on the always-audible arm);
+  tests/cast_bar.test.ts pins fishing fill 1 under broadcast decay plus the gather
+  honest fill; tests/gather_event_i18n.test.ts re-tightened the fishingResult arm to
+  exactly one cue (exact-set form); tests/sim.test.ts re-pinned castTotal/castRemaining/
+  castStart.time to the literal 15 (constant-self-comparison removal); and
+  tests/gather_node_interact.test.ts pinned the 2.5 s base-duration literal.

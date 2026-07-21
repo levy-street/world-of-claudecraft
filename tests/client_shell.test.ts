@@ -103,6 +103,13 @@ const actionBarControllerTs = readFileSync(
   new URL('../src/ui/hud/action_bar/action_bar_controller.ts', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
+// The per-form storage key scheme (incl. the `_seeded` / `_blank_v1` markers) is
+// shared with the layout-sync module so server-restore writes cannot drift from
+// the keys the controller loads.
+const actionBarLayoutSyncTs = readFileSync(
+  new URL('../src/ui/hud/action_bar/action_bar_layout_sync.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 // The Esc options menu was extracted to options_view.ts (the declarative menu
 // model) + options_window.ts (the painter); the menu guard reads the
 // model rather than the old inline hud.ts main-menu builder.
@@ -2196,7 +2203,10 @@ describe('client HTML shell', () => {
   });
 
   it('migrates a pre-existing form bar at most once via a per-form seeded marker', () => {
-    expect(actionBarControllerTs).toContain('_seeded');
+    // The `_seeded` marker suffix lives in the shared key-scheme module; the
+    // controller gates seeding on it via formBarSeededKey.
+    expect(actionBarLayoutSyncTs).toContain('_seeded');
+    expect(actionBarControllerTs).toContain('actionBarFormSeededKey(this.slotMapKey(form))');
     expect(actionBarControllerTs).toContain('shouldSeedFormBar(parsed, normalActions, false)');
   });
 

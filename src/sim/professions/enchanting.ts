@@ -37,22 +37,43 @@
 // Math.random/Date.now (uses ctx.rng only), host-agnostic so it runs
 // offline, on the server, and in the headless RL env unchanged.
 
-import { ENCHANTS } from '../content/enchants';
+import { ENCHANTS, type EnchantDef } from '../content/enchants';
 import { ITEMS } from '../data';
 import { requiredLevelFor } from '../item_level_req';
 import type { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import { cloneItemInstancePayload, type ItemDef, type ItemInstancePayload } from '../types';
+import { recordAction, withinActionThrottle } from './action_throttle';
+import { enchantingGainMultiplier } from './archetype';
 import { gainCraftSkill } from './wheel';
 
 // #1712 round-3 review: neither action previously called gainCraftSkill, so
 // craftSkills.enchanting stayed 0 forever, permanently locking the
 // specialization recharge discount (professions/tools.ts) and the Enchanter
-// archetype's own craft out of any progression. Flat gain, same shape as
-// crafting.ts's CRAFT_SKILL_GAIN: no tier-ceiling clamp on OUTPUT (v1 scope,
-// same as salvage.ts, which also does not participate in the archetype
-// ceiling machinery), just the skill counter itself moving.
-const ENCHANTING_SKILL_GAIN = 1;
+// archetype's own craft out of any progression. Phase 12c: this is now the
+// BASE gain, multiplied by enchantingGainMultiplier (archetype.ts): the
+// input's quality tier, soft-clamped to the archetype ceiling, run through
+// the four-state mastery curve, same shape as crafting.ts's
+// CRAFT_SKILL_GAIN * craftSkillGainMultiplier.
+export const ENCHANTING_SKILL_GAIN = 1;
+
+// The gain tier each ItemQuality maps to (Phase 12c quality-tiered
+// enchanting gains): the input's rarity IS its difficulty, on the same
+// tier-index ladder the archetype ceilings use (common=0, uncommon=1,
+// rare=2, epic=3, legendary=4; poor has nothing arcane about it and scores
+// with common). Feeds enchantingGainMultiplier for both arms below: the
+// disenchanted item's def quality on the disenchant arm, the applied
+// enchant's reagent-derived tier (enchantGainTier) on the apply arm.
+export const ENCHANTING_GAIN_TIER_BY_QUALITY: Readonly<
+  Record<NonNullable<ItemDef['quality']>, number>
+> = Object.freeze({
+  poor: 0,
+  common: 0,
+  uncommon: 1,
+  rare: 2,
+  epic: 3,
+  legendary: 4,
+});
 
 const QUALITY_ORDER: readonly NonNullable<ItemDef['quality']>[] = [
   'poor',
@@ -116,12 +137,29 @@ export function disenchantYield(def: ItemDef, rng: Rng): number {
   return qualityIdx + tierBonus + 1 + bonus;
 }
 
+/** The gain tier of one enchant for the apply arm: EnchantDef carries no
+ *  tier/quality field of its own, so the existing tier notion is the
+ *  reagent ladder the two-layer table is built on (arcane_dust base,
+ *  arcane_essence mid, arcane_shard Greater): the MAX reagent item-def
+ *  quality, mapped through ENCHANTING_GAIN_TIER_BY_QUALITY (same
+ *  max-over-reagents convention as material_tier.ts). Today that reads
+ *  dust-only enchants as tier 0, essence-consuming ones as tier 1, and the
+ *  shard-consuming Greater tier as tier 2. */
+export function enchantGainTier(enchant: EnchantDef): number {
+  let tier = 0;
+  for (const reagent of enchant.reagents) {
+    const quality = ITEMS[reagent.itemId]?.quality;
+    if (quality) tier = Math.max(tier, ENCHANTING_GAIN_TIER_BY_QUALITY[quality]);
+  }
+  return tier;
+}
+
 export interface DisenchantResult {
   ok: boolean;
   itemId: string;
   materialItemId?: string;
   count?: number;
-  reason?: 'unknown_item' | 'not_disenchantable' | 'not_held';
+  reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled';
 }
 
 /** Resolve one disenchant attempt: denies (no side effect) if the item id is
@@ -137,13 +175,35 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
   if (!def) return { ok: false, itemId, reason: 'unknown_item' };
   if (!isDisenchantable(def)) return { ok: false, itemId, reason: 'not_disenchantable' };
   if (ctx.countEnchantableItem(itemId, pid) < 1) return { ok: false, itemId, reason: 'not_held' };
+  const meta = ctx.players.get(pid);
+  // Phase 12c shared action throttle (action_throttle.ts): disenchant draws
+  // from the same 10-per-60s budget as crafting, checked (no side effect
+  // beyond the window's own natural rollover) before anything is consumed.
+  if (meta && !withinActionThrottle(meta, ctx.time)) {
+    return { ok: false, itemId, reason: 'throttled' };
+  }
   ctx.removeEnchantableItem(itemId, 1, pid);
   const materialItemId = DISENCHANT_MATERIAL_BY_QUALITY[def.quality ?? 'common'] ?? 'arcane_dust';
   const count = disenchantYield(def, ctx.rng);
   ctx.addItem(materialItemId, count, pid);
-  const meta = ctx.players.get(pid);
   if (meta) {
-    gainCraftSkill(meta.craftSkills, 'enchanting', ENCHANTING_SKILL_GAIN);
+    // Phase 12c quality-tiered gain: the disenchanted item's def quality is
+    // the input tier, soft-clamped to the archetype ceiling and run through
+    // the four-state curve. A zero (gray) gain never blocks the action.
+    const inputTier = ENCHANTING_GAIN_TIER_BY_QUALITY[def.quality ?? 'common'];
+    gainCraftSkill(
+      meta.craftSkills,
+      'enchanting',
+      ENCHANTING_SKILL_GAIN *
+        enchantingGainMultiplier(
+          meta.craftSkills,
+          meta.archetype.activeArchetype,
+          meta.archetype.pairedMajor,
+          meta.archetype.hobbyCraft,
+          inputTier,
+        ),
+    );
+    recordAction(meta);
     // The skill gain feeds the craftSkill deed triggers, so the site marks
     // the player dirty itself (the crafting.ts craftItem contract).
     ctx.markDeedsDirty(meta.entityId);
@@ -170,7 +230,8 @@ export interface ApplyEnchantResult {
     | 'unknown_enchant'
     | 'wrong_slot'
     | 'not_held'
-    | 'insufficient_materials';
+    | 'insufficient_materials'
+    | 'throttled';
 }
 
 /** Resolve one apply-enchant attempt against a HELD (bagged, not currently
@@ -213,6 +274,14 @@ export function resolveApplyEnchant(
       return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
     }
   }
+  const meta = ctx.players.get(pid);
+  // Phase 12c shared action throttle (action_throttle.ts): enchant-apply
+  // draws from the same 10-per-60s budget as crafting, checked (no side
+  // effect beyond the window's own natural rollover) before anything is
+  // consumed.
+  if (meta && !withinActionThrottle(meta, ctx.time)) {
+    return { ok: false, itemId, enchantId, reason: 'throttled' };
+  }
   const [consumed] = ctx.removeEnchantableItem(itemId, 1, pid);
   for (const reagent of enchant.reagents) ctx.removeItem(reagent.itemId, reagent.count, pid);
   const merged: ItemInstancePayload = consumed
@@ -236,9 +305,24 @@ export function resolveApplyEnchant(
   // copies stay enchantable while double-enchant stays blocked.
   merged.enchant = enchant.id;
   ctx.addItemInstance(itemId, merged, pid);
-  const meta = ctx.players.get(pid);
   if (meta) {
-    gainCraftSkill(meta.craftSkills, 'enchanting', ENCHANTING_SKILL_GAIN);
+    // Phase 12c quality-tiered gain: the applied enchant's reagent-derived
+    // tier (enchantGainTier above) is the input tier, soft-clamped to the
+    // archetype ceiling and run through the four-state curve. A zero (gray)
+    // gain never blocks the action.
+    gainCraftSkill(
+      meta.craftSkills,
+      'enchanting',
+      ENCHANTING_SKILL_GAIN *
+        enchantingGainMultiplier(
+          meta.craftSkills,
+          meta.archetype.activeArchetype,
+          meta.archetype.pairedMajor,
+          meta.archetype.hobbyCraft,
+          enchantGainTier(enchant),
+        ),
+    );
+    recordAction(meta);
     // The skill gain feeds the craftSkill deed triggers, so the site marks
     // the player dirty itself (the crafting.ts craftItem contract).
     ctx.markDeedsDirty(meta.entityId);

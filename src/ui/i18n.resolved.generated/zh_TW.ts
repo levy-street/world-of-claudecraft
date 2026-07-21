@@ -2098,6 +2098,8 @@ export const zh_TW: EnTranslations = {
       "gatherLine": "你採集了：{name}。",
       "gatherLineQty": "你採集了：{name} x{qty}。",
       "catchLine": "你釣上了：{name}",
+      "biteLine": "有東西上鉤了！",
+      "gotAwayLine": "牠跑掉了。",
       "nodeName": {
         "ore": "礦脈",
         "wood": "林木",
@@ -2165,7 +2167,7 @@ export const zh_TW: EnTranslations = {
       "tierPipAria": "階級 {tier}",
       "nextUnlockTier": "距離下一階級還差 {points} 點：打造大師之作的機率將提升",
       "nextUnlockSpecialized": "距離專精還差 {points} 點：材料消耗將降低",
-      "nextUnlockMax": "已達技能上限",
+      "nextUnlockMastered": "已精通，暫時如此",
       "perkSpecializedLine": "{craft}：專精，材料消耗 -{pct}%",
       "perkSpecializedAt": "技能達到 {threshold} 後專精",
       "switchCost": "下次切換原型需要 {cost} 點補償",
@@ -2245,6 +2247,7 @@ export const zh_TW: EnTranslations = {
       "skillReqLine": "需要{craft} {skill}",
       "difficultyFull": "完整技能成長",
       "difficultyReduced": "技能成長減少",
+      "difficultyMinimal": "微量技能成長",
       "difficultyNone": "無技能成長",
       "stationBadge": "製作站",
       "stationOutOfRangeNamed": "前往{station}即可製作該物品。",
@@ -5971,6 +5974,7 @@ export const zh_TW: EnTranslations = {
     },
     "cast": {
       "fishing": "釣魚",
+      "gathering": "採集",
       "demonHeal": "惡魔治療",
       "thunzharrStormcall": "風暴召喚"
     }
@@ -10896,6 +10900,11 @@ export const zh_TW: EnTranslations = {
         "sender": "工匠公會",
         "subject": "關於你的護甲鍛造與工程學",
         "body": "工匠：\n\n你鑽研護甲鍛造與工程學的名聲已傳到公會：鉚好甲片，校準齒輪，兩門技藝相輔相成。能同時打磨相鄰兩門技藝的手，正是準備好調諧的手。請到東溪鎮拜訪哈德倫鐵匠：眼下由他代諸位大師發言。用親手做出的成果向他證明你的技藝，他便會把這兩門技藝調諧為你的主修。\n\n謹此，\n工匠公會"
+      },
+      "mastery_reset_notice": {
+        "sender": "公會會館",
+        "subject": "你的手藝，從此作數",
+        "body": "公會同仁：\n\n公會已啟用全新的技藝衡量之法。人人從頭攀登：你的製作技能與採集熟練度已歸零。\n\n其餘一切分毫未動，仍歸你所有：你的配方、工具與材料、銀行與金幣、調諧與頭銜、功績與名望、任務與郵件。\n\n如今的攀登童叟無欺。廉價的活計再也帶不動你。去尋求更難的配方、更富的礦脈、更深的水域吧。\n\n謹致敬意，\n公會會館"
       }
     },
     "itemSets": {
