@@ -327,7 +327,7 @@ describe('below-target CSS derives from the measured bottom', () => {
   it('desktop: pushed rows are viewport-bounded and scroll (10-raid off-screen case)', () => {
     const rule = hudCss.match(/#party-frames\.below-target \.party-rows \{([^}]*)\}/)?.[1] ?? '';
     expect(rule).toContain(
-      'max-height: max(40px, calc((var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 6px) / var(--party-frame-scale, 1)));',
+      'max-height: max(40px, calc((var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 12px + var(--party-rows-frame-pad)) / var(--party-frame-scale, 1)));',
     );
     expect(rule).toContain('overflow: auto;');
   });
@@ -338,8 +338,9 @@ describe('below-target CSS derives from the measured bottom', () => {
     // frame whenever a target is selected, overflow or not. The padding gives
     // that paint room; the equal negative margin keeps the frames in place.
     const rule = hudCss.match(/#party-frames\.below-target \.party-rows \{([^}]*)\}/)?.[1] ?? '';
-    expect(rule).toContain('padding: 6px;');
-    expect(rule).toContain('margin: -6px;');
+    expect(rule).toContain('--party-rows-frame-pad: 6px;');
+    expect(rule).toContain('padding: var(--party-rows-frame-pad);');
+    expect(rule).toContain('margin: calc(-1 * var(--party-rows-frame-pad));');
   });
 
   it('strip box owns its hanging timer text (wrap row gap + last-row padding)', () => {
@@ -355,7 +356,7 @@ describe('below-target CSS derives from the measured bottom', () => {
       'top: calc(var(--party-below-target-bottom, calc(max(8px, env(safe-area-inset-top)) + 127px)) + 8px);',
     );
     expect(hudMobileCss).toContain(
-      'max-height: max(40px, calc(var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 2px));',
+      'max-height: max(40px, calc(var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 8px + var(--party-rows-frame-pad, 6px)));',
     );
     expect(hudMobileCss).not.toContain('top: calc(max(8px, env(safe-area-inset-top)) + 135px);');
     // The old fixed screen-bottom reserve must not return alongside the

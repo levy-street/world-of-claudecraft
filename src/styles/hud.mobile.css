@@ -1751,12 +1751,20 @@
        rows exist yet, and then there is nothing to bound. Overflow keeps the
        hidden rows reachable by scroll. One tier-free rule: the measured
        sensors already reflect the landscape metrics.
-       The gap term is 2px, not the intended 8px, because this tier inherits
-       the base below-target rule's padding/margin (the keyline and focus-ring
-       clearance), whose negative margin lifts the measured rows top by 6px;
-       2px + 6px is the 8px gap. That inheritance also fixes the same
-       outline/ring clipping on mobile, which predates this change. */
-    max-height: max(40px, calc(var(--party-rows-limit, 100dvh) - var(--party-rows-top, 0px) - 2px));
+       This tier inherits the base below-target rule's padding/margin (the
+       keyline and focus-ring clearance, which also fixes the same
+       outline/ring clipping on mobile, predating this change); its negative
+       margin lifts the measured rows top by --party-rows-frame-pad, so the
+       calc adds the pad back and states the intended 8px gap literally. */
+    max-height: max(
+      40px,
+      calc(
+        var(--party-rows-limit, 100dvh) -
+        var(--party-rows-top, 0px) -
+        8px +
+        var(--party-rows-frame-pad, 6px)
+      )
+    );
   }
   /* party rows are role="button" tap targets (tap to target a member), so they
      must clear the 40x40 mobile touch floor, not the compact desktop
