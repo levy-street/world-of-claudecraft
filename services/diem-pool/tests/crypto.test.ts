@@ -12,7 +12,7 @@ const OTHER_KEY = 'b'.repeat(64);
 
 describe('AES-256-GCM key envelope', () => {
   it('round-trips arbitrary secrets', () => {
-    for (const secret of ['vn_key_1234567890abcdef', '🔑 unicode', 'x'.repeat(500)]) {
+    for (const secret of ['vn_key_1234567890abcdef', 'key unicode \u{1F511}', 'x'.repeat(500)]) {
       expect(decryptSecret(encryptSecret(secret, KEY), KEY)).toBe(secret);
     }
   });

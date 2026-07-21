@@ -1,6 +1,6 @@
-// DIEM delegation pool — Prisma schema
+// DIEM delegation pool - Prisma schema
 //
-// Money columns: USD amounts are DECIMAL (never floats) — usage costs carry
+// Money columns: USD amounts are DECIMAL (never floats) - usage costs carry
 // 8 fractional digits because single calls can cost fractions of a cent.
 // Claudium amounts are integers (it is an indivisible in-game currency).
 
@@ -14,7 +14,7 @@ datasource db {
 }
 
 // Allowlisted upstream vendors with pinned base URLs. Providers can never
-// supply their own endpoint — see docs/PLAN-byok-multi-vendor.md §7.
+// supply their own endpoint - see docs/PLAN-byok-multi-vendor.md §7.
 enum Vendor {
   venice
   openai

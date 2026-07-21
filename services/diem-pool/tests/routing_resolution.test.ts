@@ -57,7 +57,7 @@ describe('foldClassMap', () => {
     expect(foldClassMap([...rows].reverse()).get('fast')?.get('kimi')).toBe('moonshot-v1-8k');
   });
 
-  it('skips inactive rows entirely — an inactive best does not shadow the runner-up', () => {
+  it('skips inactive rows entirely - an inactive best does not shadow the runner-up', () => {
     const map = foldClassMap([
       row('fast', 'openai', 'gpt-4o-mini', 10, false),
       row('fast', 'openai', 'gpt-4.1-mini', 20),

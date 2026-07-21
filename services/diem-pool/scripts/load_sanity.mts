@@ -53,5 +53,5 @@ latencies.sort((a, b) => a - b);
 const pct = (p: number) => latencies[Math.min(latencies.length - 1, Math.floor((p / 100) * latencies.length))];
 console.log(`requests: ${N}  concurrency: ${C}  errors: ${errors}`);
 console.log(`wall: ${(wallMs / 1000).toFixed(2)}s  throughput: ${(latencies.length / (wallMs / 1000)).toFixed(1)} req/s`);
-console.log(`latency ms — p50: ${pct(50).toFixed(1)}  p95: ${pct(95).toFixed(1)}  p99: ${pct(99).toFixed(1)}  max: ${latencies[latencies.length - 1].toFixed(1)}`);
+console.log(`latency ms - p50: ${pct(50).toFixed(1)}  p95: ${pct(95).toFixed(1)}  p99: ${pct(99).toFixed(1)}  max: ${latencies[latencies.length - 1].toFixed(1)}`);
 process.exit(errors === 0 ? 0 : 1);

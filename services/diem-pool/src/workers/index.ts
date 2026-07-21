@@ -4,7 +4,7 @@
 try {
   process.loadEnvFile('.env');
 } catch {
-  /* no .env file — rely on real environment variables */
+  /* no .env file - rely on real environment variables */
 }
 
 import { Queue, Worker } from 'bullmq';
@@ -20,7 +20,7 @@ async function main(): Promise<void> {
     { every: 30 * 60 * 1000 },
     { name: 'health-probe', opts: { attempts: 2, backoff: { type: 'exponential', delay: 30_000 } } },
   );
-  // Settlement MUST eventually run for every day — a transient DB failure at
+  // Settlement MUST eventually run for every day - a transient DB failure at
   // midnight retries with backoff instead of silently waiting a full day.
   await queue.upsertJobScheduler(
     'daily-settlement',

@@ -5,7 +5,7 @@ const globalForRedis = globalThis as unknown as { redis?: Redis };
 
 /**
  * App-side Redis client (rate limiting, health checks). Configured to FAIL
- * FAST: with Redis down, commands reject immediately instead of queueing —
+ * FAST: with Redis down, commands reject immediately instead of queueing -
  * callers fail open rather than hanging requests. BullMQ uses its own
  * connections (workers/queues.ts) with the blocking-friendly settings it
  * requires.

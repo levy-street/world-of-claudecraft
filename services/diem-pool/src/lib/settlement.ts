@@ -1,13 +1,13 @@
-// Daily settlement math. Pure functions — the BullMQ worker supplies data and
+// Daily settlement math. Pure functions - the BullMQ worker supplies data and
 // persists results, so every rule here is unit-testable without a database.
 //
 // Reward pipeline per provider for a settled UTC day:
 //   base      = floor(consumedUsd * claudiumPerUsd * rewardMultiplier)
-//               — consumed compute only; rewardMultiplier is the per-vendor knob
-//   afterMult = floor(base * multiplier)                     — 1.25x at a 30-day healthy streak
-//   standby   = floor(unusedCapacityUsd * standbyRate)       — only if ACTIVE + healthy all
+//               - consumed compute only; rewardMultiplier is the per-vendor knob
+//   afterMult = floor(base * multiplier)                     - 1.25x at a 30-day healthy streak
+//   standby   = floor(unusedCapacityUsd * standbyRate)       - only if ACTIVE + healthy all
 //               day AND the vendor is standby-eligible (stake-backed Venice
-//               capacity only — a free-to-declare BYOK budget earns no standby)
+//               capacity only - a free-to-declare BYOK budget earns no standby)
 //   prelim    = afterMult + standby
 // Then the anti-whale cap: when at least `minProvidersForCap` providers earned
 // something, nobody keeps more than `maxDailyShare` of the day's total
@@ -117,7 +117,7 @@ export function utcDay(now: Date, daysAgo = 0): Date {
 /**
  * When a settled reward becomes spendable. null = vests immediately
  * (stake-backed vendors); otherwise midnight UTC `vestingDays` after the
- * settled day — the BYOK fraud window.
+ * settled day - the BYOK fraud window.
  */
 export function vestingDate(settledDayUtc: Date, vestingDays: number): Date | null {
   if (vestingDays <= 0) return null;

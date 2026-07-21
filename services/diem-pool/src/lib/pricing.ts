@@ -22,7 +22,7 @@ export function computeCostUsd(rate: ModelRate, promptTokens: number, completion
 
 /**
  * Seed rates (USD per 1M tokens) from each vendor's published pricing at time
- * of writing. The live table is admin-editable — treat this as a starting
+ * of writing. The live table is admin-editable - treat this as a starting
  * point and sync against the vendors' pricing pages after deploy.
  */
 export const SEED_PRICING_BY_VENDOR: Record<string, Record<string, ModelRate>> = {

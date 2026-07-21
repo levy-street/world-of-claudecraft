@@ -6,7 +6,7 @@ import { getAdapter } from '@/lib/vendors';
 import type { VendorName } from '@/lib/vendors/config';
 
 // 30-minute health probe via each provider's vendor adapter (GET /models
-// equivalent — auth-exercising, zero tokens).
+// equivalent - auth-exercising, zero tokens).
 //   401/403            → INVALID (key revoked upstream) + pending rewards voided
 //   429 / errors ×2    → DEGRADED (skipped by routing until it probes healthy)
 //   healthy            → ACTIVE (recovers DEGRADED), failure counter reset
@@ -40,7 +40,7 @@ export async function runHealthProbes(now: Date = new Date()): Promise<void> {
             await voidPendingRewards(p.id, 'health probe: key revoked upstream');
             break;
           default: {
-            // rate_limited / error — degrade only on repeat, matching routing.
+            // rate_limited / error - degrade only on repeat, matching routing.
             const updated = await prisma.provider.update({
               where: { id: p.id },
               data: { consecutiveFailures: { increment: 1 }, lastProbeAt: now },

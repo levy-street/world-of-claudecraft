@@ -1,7 +1,7 @@
 try {
   process.loadEnvFile('.env');
 } catch {
-  /* no .env file — rely on real environment variables */
+  /* no .env file - rely on real environment variables */
 }
 
 import { PrismaClient, type ModelClass, type Vendor } from '@prisma/client';

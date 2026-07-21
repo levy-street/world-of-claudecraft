@@ -53,7 +53,7 @@ export default async function LeaderboardPage() {
             {usage.length === 0 && (
               <tr>
                 <td colSpan={6} className="muted">
-                  No compute served yet — be the first.
+                  No compute served yet - be the first.
                 </td>
               </tr>
             )}

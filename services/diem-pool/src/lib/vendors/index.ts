@@ -9,7 +9,7 @@ import {
 import { anthropicChat, anthropicProbe, anthropicValidateKey } from './anthropic';
 import type { VendorName } from './config';
 
-// Adapter registry. Base URLs are pinned from env — providers can never
+// Adapter registry. Base URLs are pinned from env - providers can never
 // supply their own endpoint (usage-minting / SSRF; see the BYOK plan §7).
 //
 // Venice, OpenAI, and Kimi share the OpenAI-compatible transport in

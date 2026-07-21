@@ -1,4 +1,4 @@
-// Pure vendor policy + trust-ramp logic (no I/O — unit-testable).
+// Pure vendor policy + trust-ramp logic (no I/O - unit-testable).
 // DB rows in VendorConfig override these defaults; see policies.ts.
 
 export type VendorName = 'venice' | 'openai' | 'anthropic' | 'kimi';
@@ -10,7 +10,7 @@ export interface VendorPolicy {
   enabled: boolean;
   /** Applied to the base Claudium reward: floor(usd × CLAUDIUM_PER_USD × this). */
   rewardMultiplier: number;
-  /** Standby pay on unused capacity — only sound for stake-backed (Venice)
+  /** Standby pay on unused capacity - only sound for stake-backed (Venice)
    *  capacity; a free-to-declare BYOK budget must never earn standby. */
   standbyEligible: boolean;
   /** Days before settled rewards vest (0 = instant). Fraud window for BYOK. */
@@ -75,7 +75,7 @@ export function effectiveCapacityUsd(
 
 /**
  * Cheap key-shape sanity per vendor, checked before the paid validation call.
- * Returns an error string or null. Deliberately loose — vendors evolve
+ * Returns an error string or null. Deliberately loose - vendors evolve
  * prefixes; the real gate is the upstream validation call.
  */
 export function keyShapeError(vendor: VendorName, key: string): string | null {

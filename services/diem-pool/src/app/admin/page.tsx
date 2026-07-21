@@ -3,7 +3,7 @@
 import { useCallback, useState } from 'react';
 
 // Admin console: pool overview, pricing editor, kill switch. Gated by
-// ADMIN_TOKEN — the token is held in component state only and sent as
+// ADMIN_TOKEN - the token is held in component state only and sent as
 // `x-admin-token` on every call; the server does the actual gating.
 
 interface AdminProvider {
@@ -156,7 +156,7 @@ export default function AdminPage() {
             </div>
             <p>
               <button className={overview.routingPaused ? '' : 'danger'} onClick={() => void toggleKillSwitch()}>
-                {overview.routingPaused ? 'Resume routing' : 'KILL SWITCH — pause all routing'}
+                {overview.routingPaused ? 'Resume routing' : 'KILL SWITCH - pause all routing'}
               </button>
             </p>
           </div>
@@ -218,7 +218,7 @@ export default function AdminPage() {
                     <td>{p.vendor}</td>
                     <td className={`status-${p.status}`}>{p.status}</td>
                     <td>{p.trustTier}</td>
-                    <td>{p.keyLast4 ? `…${p.keyLast4}` : '—'}</td>
+                    <td>{p.keyLast4 ? `…${p.keyLast4}` : '-'}</td>
                     <td>
                       ${p.todayConsumedUsd.toFixed(3)} / ${p.dailyCapacityUsd.toFixed(0)}
                     </td>
@@ -226,7 +226,7 @@ export default function AdminPage() {
                     <td>{p.consecutiveFailures}</td>
                     <td className={p.flagged ? 'error' : ''}>
                       {p.suspicionScore.toFixed(2)}
-                      {p.flagged ? ' ⚠' : ''}
+                      {p.flagged ? ' (flagged)' : ''}
                     </td>
                   </tr>
                 ))}

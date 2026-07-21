@@ -32,7 +32,7 @@ export function decryptSecret(envelope: string, keyHex: string): string {
   const [, ivB64, ctB64, tagB64] = parts;
   const decipher = createDecipheriv('aes-256-gcm', key, Buffer.from(ivB64, 'base64'));
   decipher.setAuthTag(Buffer.from(tagB64, 'base64'));
-  // GCM auth failure throws here — tampered ciphertext never decrypts silently.
+  // GCM auth failure throws here - tampered ciphertext never decrypts silently.
   return Buffer.concat([decipher.update(Buffer.from(ctB64, 'base64')), decipher.final()]).toString(
     'utf8',
   );

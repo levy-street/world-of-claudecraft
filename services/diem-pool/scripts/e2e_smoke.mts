@@ -1,6 +1,6 @@
-// E2E smoke: exercises the whole delegation flow — registration, weighted
+// E2E smoke: exercises the whole delegation flow - registration, weighted
 // routing, metering, settlement idempotency, kill switch, revocation, house
-// fallback — against a running stack. DESTRUCTIVE: wipes pool tables first,
+// fallback - against a running stack. DESTRUCTIVE: wipes pool tables first,
 // so point it at a scratch database only.
 //
 //   node scripts/mock_venice.mjs &        # mock upstream on :4567
@@ -47,10 +47,10 @@ async function clearRateLimits(): Promise<void> {
 
 let failures = 0;
 function check(name: string, cond: boolean, detail?: unknown) {
-  if (cond) console.log(`  ✓ ${name}`);
+  if (cond) console.log(`  [ok] ${name}`);
   else {
     failures++;
-    console.error(`  ✗ ${name}`, detail ?? '');
+    console.error(`  [fail] ${name}`, detail ?? '');
   }
 }
 
@@ -147,13 +147,13 @@ async function infer(extra: Record<string, unknown> = {}) {
   });
 }
 
-console.log('— health endpoint —');
+console.log('- health endpoint -');
 {
   const h = await api('/api/health');
   check('health: 200 with db+redis ok on a clean stack', h.status === 200 && h.body.db.ok && h.body.redis.ok, h.body);
 }
 
-console.log('— registration —');
+console.log('- registration -');
 const alpha = await register('Alpha Provider', 10, 'vn_alpha_key_0123456789abcdefgh');
 const beta = await register('Beta Provider', 40, 'vn_beta_key_0123456789abcdefghi');
 
@@ -192,7 +192,7 @@ const beta = await register('Beta Provider', 40, 'vn_beta_key_0123456789abcdefgh
   check('invalid Venice key rejected (422)', res.status === 422, res.body);
 }
 
-console.log('— inference routing & metering —');
+console.log('- inference routing & metering -');
 check('missing shared secret rejected', (await api('/api/internal/inference', { method: 'POST', body: '{}' })).status === 401);
 
 const served: Record<string, number> = {};
@@ -219,7 +219,7 @@ check('leaderboard has 2 truncated-wallet entries',
   lb.body.leaderboard.length === 2 && lb.body.leaderboard.every((r: any) => r.wallet.includes('…')),
   lb.body);
 
-console.log('— settlement (run as if the day ended) —');
+console.log('- settlement (run as if the day ended) -');
 const { runDailySettlement } = await import('../src/workers/settle');
 const fakeTomorrow = new Date(Date.now() + 86_400_000);
 await runDailySettlement(fakeTomorrow);
@@ -241,14 +241,14 @@ const counts = await q.getJobCounts('waiting', 'completed', 'delayed');
 check('settlement events emitted once per provider (deduped)', counts.waiting + counts.completed === 2, counts);
 await q.close();
 
-console.log('— kill switch —');
+console.log('- kill switch -');
 await api('/api/admin/killswitch', { method: 'POST', headers: { 'x-admin-token': ADMIN }, body: JSON.stringify({ paused: true }) });
 check('paused routing returns 503', (await infer()).status === 503);
 await api('/api/admin/killswitch', { method: 'POST', headers: { 'x-admin-token': ADMIN }, body: JSON.stringify({ paused: false }) });
 check('resumed routing returns 200', (await infer()).status === 200);
 check('admin without token rejected', (await api('/api/admin/overview')).status === 401);
 
-console.log('— revocation & house fallback —');
+console.log('- revocation & house fallback -');
 {
   const { nonce, signedMessage } = await signNonce(alpha.wallet, alpha.secretKey, 'revoke');
   const res = await api(`/api/providers/${alpha.id}/key`, {
@@ -274,7 +274,7 @@ console.log('— revocation & house fallback —');
 const overview = await api('/api/admin/overview', { headers: { 'x-admin-token': ADMIN } });
 check('admin overview reflects revocations', overview.body.statusCounts.REVOKED === 2, overview.body.statusCounts);
 
-console.log('— failover & DEGRADED —');
+console.log('- failover & DEGRADED -');
 await clearRateLimits();
 // Flaky passes registration's 1-token validation, then 500s on real traffic.
 // 10x capacity makes it the certain first pick for the next requests.
@@ -297,7 +297,7 @@ for (const label of ['first', 'second'] as const) {
   );
 }
 
-console.log('— concurrent metering exactness —');
+console.log('- concurrent metering exactness -');
 const { utcDay } = await import('../src/lib/settlement');
 const spendKey = { providerId_date: { providerId: good.id, date: utcDay(new Date()) } };
 const spendBefore = await prisma.providerDailySpend.findUnique({ where: spendKey });
@@ -315,7 +315,7 @@ check(
   check('request counter delta is exactly 20', deltaReqs === 20, deltaReqs);
 }
 
-console.log('— multi-vendor (BYOK) registration —');
+console.log('- multi-vendor (BYOK) registration -');
 await clearRateLimits();
 const oai = await registerWith(null, 'OpenAI Rig', 'openai', 'sk-oai-good-0123456789abcdefghij', { dailyBudgetUsd: 40 });
 const anth = await registerWith(null, 'Anthropic Rig', 'anthropic', 'sk-ant-good-0123456789abcdefgh', { dailyBudgetUsd: 30 });
@@ -343,7 +343,7 @@ await registerWith({ wallet: oai.wallet, secretKey: oai.secretKey }, 'OpenAI Rig
   check('wallet holds one key per vendor', multi.body.keys?.length === 2, multi.body.keys?.length);
 }
 
-console.log('— model-class routing across vendors —');
+console.log('- model-class routing across vendors -');
 const FAST_MODELS: Record<string, string> = {
   venice: 'llama-3.2-3b',
   openai: 'gpt-4o-mini',
@@ -408,7 +408,7 @@ const FAST_MODELS: Record<string, string> = {
   );
 }
 
-console.log('— BYOK quota exhaustion —');
+console.log('- BYOK quota exhaustion -');
 await clearRateLimits();
 const oaiQuota = await registerWith(null, 'Quota Rig', 'openai', 'sk-oai-quota-later-0123456789ab', { dailyBudgetUsd: 40 });
 {
@@ -429,7 +429,7 @@ const oaiQuota = await registerWith(null, 'Quota Rig', 'openai', 'sk-oai-quota-l
   );
 }
 
-console.log('— per-vendor kill switch —');
+console.log('- per-vendor kill switch -');
 {
   await api('/api/admin/vendors', {
     method: 'PUT',
@@ -453,7 +453,7 @@ console.log('— per-vendor kill switch —');
   check('vendor re-enabled via admin API', put.status === 200 && put.body.enabled === true, put.body);
 }
 
-console.log('— vesting lifecycle & voiding —');
+console.log('- vesting lifecycle & voiding -');
 {
   const { runDailySettlement: settleAgain, runVesting } = await import('../src/workers/settle');
   const { Queue } = await import('bullmq');
@@ -528,10 +528,10 @@ console.log('— vesting lifecycle & voiding —');
   await evq.close();
 }
 
-console.log('— stolen-key simulation (health probe INVALID voids pending) —');
+console.log('- stolen-key simulation (health probe INVALID voids pending) -');
 {
   await clearRateLimits();
-  // A key that validated fine at registration, then got killed upstream —
+  // A key that validated fine at registration, then got killed upstream -
   // the signature of a stolen key once the victim notices.
   const dying = await registerWith(null, 'Dying Rig', 'openai', 'sk-oai-dies-later-0123456789abc', {
     dailyBudgetUsd: 10,
@@ -561,7 +561,7 @@ console.log('— stolen-key simulation (health probe INVALID voids pending) —'
   check('going INVALID voids the pending rewards', ledger?.status === 'VOIDED', ledger?.status);
 }
 
-console.log('— admin pricing editor —');
+console.log('- admin pricing editor -');
 {
   const put = await api('/api/admin/pricing', {
     method: 'PUT',
@@ -579,7 +579,7 @@ console.log('— admin pricing editor —');
   check('pricing PUT without token rejected', noAuth.status === 401);
 }
 
-console.log('— input validation —');
+console.log('- input validation -');
 check('unknown purpose rejected (400)', (await infer({ purpose: 'crypto_mining' })).status === 400);
 check(
   'payload without messages rejected (400)',
@@ -590,7 +590,7 @@ check('malformed JSON body rejected (400)', (
   await api('/api/providers/register', { method: 'POST', body: 'not-json{' })
 ).status === 400);
 
-console.log('— rate limiting —');
+console.log('- rate limiting -');
 await clearRateLimits();
 {
   const codes: number[] = [];
@@ -609,7 +609,7 @@ await clearRateLimits();
   );
 }
 
-console.log('— health endpoint (post-settlement) —');
+console.log('- health endpoint (post-settlement) -');
 {
   const h = await api('/api/health');
   check(

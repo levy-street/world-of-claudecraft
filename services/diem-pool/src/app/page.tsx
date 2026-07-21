@@ -140,7 +140,7 @@ export default function ProviderDashboard() {
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? 'registration failed');
       setApiKey('');
-      setMsg({ kind: 'ok', text: `Registered — ${vendor} key …${body.keyLast4} is in the pool.` });
+      setMsg({ kind: 'ok', text: `Registered - ${vendor} key …${body.keyLast4} is in the pool.` });
       await refresh(wallet);
     } catch (err) {
       setMsg({ kind: 'error', text: err instanceof Error ? err.message : 'registration failed' });
@@ -176,7 +176,7 @@ export default function ProviderDashboard() {
     <>
       <h1>Delegate your AI compute</h1>
       <p className="muted">
-        Stake DIEM on Venice — or bring your own OpenAI, Anthropic, or Kimi key — and the game
+        Stake DIEM on Venice - or bring your own OpenAI, Anthropic, or Kimi key - and the game
         routes NPC dialogue, quests and dungeon-master inference through your capacity. You earn
         Claudium for compute actually served. Non-custodial: keys are encrypted, revocable
         anytime, and never shown again. New bring-your-own keys ramp up over their first weeks
@@ -219,7 +219,7 @@ export default function ProviderDashboard() {
         stats?.keys.map((key) => (
           <div className="panel" key={key.id}>
             <h2>
-              {key.vendor}: {key.displayName} —{' '}
+              {key.vendor}: {key.displayName} -{' '}
               <span className={`status-${key.status}`}>{key.status}</span>
               {key.keyLast4 && <span className="muted"> (key …{key.keyLast4})</span>}
             </h2>

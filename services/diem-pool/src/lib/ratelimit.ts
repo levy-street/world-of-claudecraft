@@ -2,7 +2,7 @@ import type { Redis } from 'ioredis';
 
 // Fixed-window rate limiting. Backed by Redis in production so limits hold
 // across instances; with Redis unreachable the call sites fail open (and log)
-// rather than falling back — MemoryCounterStore exists as the test double.
+// rather than falling back - MemoryCounterStore exists as the test double.
 
 export interface CounterStore {
   /** Increment `key` inside the current window, returning the new count. */

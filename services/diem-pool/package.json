@@ -2,7 +2,7 @@
   "name": "@wocc/diem-pool",
   "version": "0.1.0",
   "private": true,
-  "description": "DIEM compute delegation pool for World of ClaudeCraft — providers register scoped Venice API keys, the game routes inference through the pool, usage is metered and settled daily in Claudium.",
+  "description": "DIEM compute delegation pool for World of ClaudeCraft - providers register scoped Venice API keys, the game routes inference through the pool, usage is metered and settled daily in Claudium.",
   "scripts": {
     "dev": "next dev -p 3100",
     "build": "next build",

@@ -4,10 +4,10 @@ import { redactSecrets } from './crypto';
 // Error classification drives routing decisions, so it is centralized here.
 
 export type VeniceErrorKind =
-  | 'auth' // 401/403 — key revoked or invalid → provider INVALID
+  | 'auth' // 401/403 - key revoked or invalid → provider INVALID
   | 'insufficient_credit' // daily DIEM credit exhausted → treat capacity as spent
   | 'rate_limited' // 429 without a credit hint → retryable, then degrade
-  | 'bad_request' // 4xx caused by our payload — do NOT fail over, surface it
+  | 'bad_request' // 4xx caused by our payload - do NOT fail over, surface it
   | 'server' // upstream 5xx → retry/fail over
   | 'network'; // fetch/timeout → retry/fail over
 

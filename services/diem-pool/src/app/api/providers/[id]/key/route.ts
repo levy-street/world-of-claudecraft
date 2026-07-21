@@ -36,7 +36,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     where: { id: provider.id },
     data: { encryptedKey: null, keyLast4: null, status: 'REVOKED' },
   });
-  // Unvested BYOK rewards die with the key (fraud window — see BYOK plan §6).
+  // Unvested BYOK rewards die with the key (fraud window - see BYOK plan §6).
   await voidPendingRewards(provider.id, 'key revoked by provider');
   invalidatePoolCache();
 

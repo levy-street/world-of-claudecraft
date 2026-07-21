@@ -5,18 +5,18 @@
 //
 //   weight(p) = max(0, dailyCapacityUsd * headroom - spentTodayUsd)
 //
-// headroom defaults to 0.9 — we stop routing at ~90% of declared capacity to
+// headroom defaults to 0.9 - we stop routing at ~90% of declared capacity to
 // leave slack for metering estimation error vs Venice's own accounting.
 //
 // Smooth WRR per pick: every candidate's counter increases by its weight, the
 // highest counter wins and pays back the total weight. Over N picks each
 // provider is selected in exact proportion to its weight, without the bursts
-// plain WRR produces, and picks are deterministic given the same state —
+// plain WRR produces, and picks are deterministic given the same state -
 // which is what the unit tests assert.
 //
 // Weights are quantized to micro-dollars (integers) so counter arithmetic is
 // exact. Failover order after the primary pick is by remaining budget
-// descending (ties broken by id) — a failed provider's counters are left
+// descending (ties broken by id) - a failed provider's counters are left
 // as-is, so a transient failure doesn't distort long-run proportions.
 
 export type ProviderStatusLike = 'ACTIVE' | 'DEGRADED' | 'REVOKED' | 'INVALID';
@@ -76,7 +76,7 @@ export class WeightedRouter {
   }
 
   /**
-   * Primary pick plus failover candidates, best-budget-first — the order the
+   * Primary pick plus failover candidates, best-budget-first - the order the
    * inference service walks when upstream calls fail. `max` bounds how many
    * distinct providers one request may burn through.
    */

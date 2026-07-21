@@ -17,11 +17,11 @@ export type ModelClassName = z.infer<typeof modelClassSchema>;
 // OpenAI-style chat payload. Validated fields are the ones we depend on;
 // passthrough() lets callers use any other standard parameter (top_p, stop,
 // response_format, …) without us maintaining the full surface. `stream` is
-// stripped at the Venice client — v1 is non-streaming.
+// stripped at the Venice client - v1 is non-streaming.
 export const chatPayloadSchema = z
   .object({
     // Optional when the request carries a modelClass; when present it pins
-    // routing — "vendor:model" targets that vendor, a bare model is Venice
+    // routing - "vendor:model" targets that vendor, a bare model is Venice
     // (the pre-multi-vendor contract).
     model: z.string().min(1).max(120).optional(),
     messages: z
@@ -46,7 +46,7 @@ export const inferenceRequestSchema = z
     purpose: purposeSchema,
     /** Game-facing model tier, resolved per vendor via ModelClassMap. */
     modelClass: modelClassSchema.optional(),
-    /** Game account that triggered the call — feeds self-dealing detection. */
+    /** Game account that triggered the call - feeds self-dealing detection. */
     gameAccountId: z.string().min(1).max(128).optional(),
   })
   .refine((r) => r.modelClass !== undefined || r.payload.model !== undefined, {

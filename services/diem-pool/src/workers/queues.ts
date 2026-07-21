@@ -21,7 +21,7 @@ export function getSettlementEventsQueue(): Queue {
 }
 
 export interface SettlementEvent {
-  /** Consumers must dedupe on (providerId, date) — delivery is at-least-once. */
+  /** Consumers must dedupe on (providerId, date) - delivery is at-least-once. */
   providerId: string;
   wallet: string;
   vendor: VendorName;

@@ -16,7 +16,7 @@ const envSchema = z.object({
 
   // POOL_-prefixed on purpose: bare OPENAI_BASE_URL / ANTHROPIC_BASE_URL are
   // common ambient variables (SDKs, dev tooling) and .env files never
-  // override real environment variables — an operator's shell must not be
+  // override real environment variables - an operator's shell must not be
   // able to silently redirect pool traffic.
   POOL_OPENAI_BASE_URL: z.string().url().default('https://api.openai.com/v1'),
   OPENAI_VALIDATION_MODEL: z.string().default('gpt-4o-mini'),

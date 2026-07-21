@@ -17,7 +17,7 @@ import { getSettlementEventsQueue, type SettlementEvent } from './queues';
 // then vests any pending rewards whose fraud window has elapsed.
 //
 // Idempotency model:
-//  - Ledger rows upsert on (providerId, date) — always safe to re-run. The
+//  - Ledger rows upsert on (providerId, date) - always safe to re-run. The
 //    upsert's update branch never touches status/vestAt, so a re-run can
 //    never resurrect a VOIDED row or un-vest a VESTED one.
 //  - Streak bumps / tier promotion / suspicion scores / unhealthyToday resets
@@ -121,7 +121,7 @@ export async function runDailySettlement(now: Date = new Date()): Promise<void> 
             status: vestAt ? 'PENDING' : 'VESTED',
             vestAt,
           },
-          // Never touch status/vestAt on re-run — a VOIDED or VESTED row
+          // Never touch status/vestAt on re-run - a VOIDED or VESTED row
           // must not be reopened by settling the same day twice.
           update: amounts,
         });
@@ -154,7 +154,7 @@ export async function runDailySettlement(now: Date = new Date()): Promise<void> 
 /**
  * Vest matured PENDING rewards: emit the credit event (queue jobId dedupes),
  * then flip PENDING→VESTED. Runs right after settlement each midnight; a
- * crash between emit and flip re-emits next run — at-least-once, consumers
+ * crash between emit and flip re-emits next run - at-least-once, consumers
  * dedupe on (providerId, date).
  */
 export async function runVesting(now: Date = new Date()): Promise<void> {

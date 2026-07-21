@@ -1,4 +1,4 @@
-// Browser UI E2E: drives the real dashboard pages in headless Chromium —
+// Browser UI E2E: drives the real dashboard pages in headless Chromium -
 // provider connect/register/revoke (with an injected test wallet that signs
 // with a real ed25519 key), admin login/kill-switch/pricing editor, and the
 // public leaderboard. Run after (or instead of) e2e_smoke.mts against the
@@ -22,10 +22,10 @@ const CHROMIUM = process.env.CHROMIUM_PATH ?? '/opt/pw-browsers/chromium';
 
 let failures = 0;
 function check(name: string, cond: boolean, detail?: unknown) {
-  if (cond) console.log(`  ✓ ${name}`);
+  if (cond) console.log(`  [ok] ${name}`);
   else {
     failures++;
-    console.error(`  ✗ ${name}`, detail ?? '');
+    console.error(`  [fail] ${name}`, detail ?? '');
   }
 }
 
@@ -132,7 +132,7 @@ const page = await browser.newPage();
 page.on('dialog', (d) => void d.accept()); // revoke confirm()
 
 // Injected test wallet: connect() yields a fresh Solana address; signMessage
-// signs with the matching ed25519 key via a Node-side bridge — the page runs
+// signs with the matching ed25519 key via a Node-side bridge - the page runs
 // the exact same code path a real Phantom user exercises.
 const kp = nacl.sign.keyPair();
 const wallet = bs58.encode(kp.publicKey);
@@ -155,7 +155,7 @@ await page.evaluateOnNewDocument(`
   };
 `);
 
-console.log('— leaderboard page —');
+console.log('- leaderboard page -');
 await page.goto(`${BASE}/leaderboard`, { waitUntil: 'networkidle0' });
 check('renders title', await waitForText(page, 'Compute Champions of the Realm'));
 check(
@@ -163,7 +163,7 @@ check(
   await page.evaluate(() => /…/.test(document.body.innerText)),
 );
 
-console.log('— provider dashboard: connect → register (venice + openai) → stats → revoke —');
+console.log('- provider dashboard: connect → register (venice + openai) → stats → revoke -');
 await page.goto(`${BASE}/`, { waitUntil: 'networkidle0' });
 check('connect wallet reveals the attach-key form',
   await clickAndExpect(page, 'Connect wallet', 'Attach an API key'));
@@ -173,7 +173,7 @@ await fillInput(page, 'Display name', 'UI Test Rig');
 await fillInput(page, 'API key', 'vn_ui_test_key_0123456789abcdef');
 await fillInput(page, 'Staked DIEM', '12');
 check('venice register flow completes (nonce → sign → validate → store)',
-  await clickAndExpect(page, 'Sign & register', 'Registered — venice key …cdef'));
+  await clickAndExpect(page, 'Sign & register', 'Registered - venice key …cdef'));
 check('key card renders status and capacity',
   (await waitForText(page, 'ACTIVE')) && (await waitForText(page, 'consumed today (of $12.00 cap)')));
 check('key card shows Claudium and trust tier tiles',
@@ -185,7 +185,7 @@ await fillInput(page, 'Display name', 'UI OpenAI Rig');
 await fillInput(page, 'API key', 'sk-oai-ui-good-0123456789abcdef');
 await fillInput(page, 'Daily donation budget', '15');
 check('openai register flow completes',
-  await clickAndExpect(page, 'Sign & register', 'Registered — openai key …cdef'));
+  await clickAndExpect(page, 'Sign & register', 'Registered - openai key …cdef'));
 check('both key cards visible', (await waitForText(page, 'venice: UI Test Rig')) && (await waitForText(page, 'openai: UI OpenAI Rig')));
 check('BYOK card shows the NEW trust tier', await waitForText(page, 'NEW'));
 
@@ -195,7 +195,7 @@ check('status flips to REVOKED', await waitForText(page, 'REVOKED'));
 check('revoked vendor is offered for registration again',
   await waitForText(page, 'Attach an API key'));
 
-console.log('— admin console —');
+console.log('- admin console -');
 await page.goto(`${BASE}/admin`, { waitUntil: 'networkidle0' });
 await fillInput(page, 'Admin token', 'wrong-token');
 check('wrong token is rejected', await clickAndExpect(page, 'Load', 'bad admin token'));
@@ -204,7 +204,7 @@ await fillInput(page, 'Admin token', process.env.ADMIN_TOKEN!);
 check('overview loads with routing live',
   await clickAndExpect(page, 'Load', 'pool spend today'));
 check('provider table lists the UI test provider', await waitForText(page, 'UI Test Rig'));
-// The vendors rows commit a beat after the overview does — wait for their
+// The vendors rows commit a beat after the overview does - wait for their
 // buttons, not just the panel header, before clicking into them.
 check('vendors panel renders all policies',
   (await waitForText(page, 'Trust ramp')) && (await waitForText(page, 'Disable')));
@@ -219,7 +219,7 @@ check('vendor re-enabled', await clickRowButton(page, 'kimi') && (await (async (
 })()));
 
 check('kill switch pauses routing',
-  await clickAndExpect(page, 'KILL SWITCH — pause all routing', 'PAUSED'));
+  await clickAndExpect(page, 'KILL SWITCH - pause all routing', 'PAUSED'));
 check('resume restores routing', await clickAndExpect(page, 'Resume routing', 'live'));
 
 await selectOption(page, 'Vendor', 'kimi');

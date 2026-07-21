@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { NextRequest } from 'next/server';
 
-// Real NextRequest objects through the real gates — only env is fixtured.
+// Real NextRequest objects through the real gates - only env is fixtured.
 
 const ENV_FIXTURE = {
   DATABASE_URL: 'postgresql://test:test@127.0.0.1:5432/test',

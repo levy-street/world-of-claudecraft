@@ -85,7 +85,7 @@ export function invalidatePoolCache(): void {
 
 /**
  * Fold class-map rows into the best (lowest priority number wins) active
- * concrete model per (class, vendor). Pure — exported for tests.
+ * concrete model per (class, vendor). Pure - exported for tests.
  */
 export function foldClassMap(
   rows: Array<{ class: string; vendor: string; model: string; priority: number; active: boolean }>,
@@ -148,7 +148,7 @@ async function getRate(vendor: VendorName, model: string): Promise<ModelRate> {
     if (!warned.has(key)) {
       warned.add(key);
       console.warn(
-        `[pricing] no active pricing for "${key}" — metering at conservative fallback rates; add it in the admin pricing table`,
+        `[pricing] no active pricing for "${key}" - metering at conservative fallback rates; add it in the admin pricing table`,
       );
     }
     return FALLBACK_RATE;
@@ -219,7 +219,7 @@ async function meterOrWarn(
   } catch (err) {
     console.error(
       `[inference] METERING FAILED for provider=${providerId ?? 'house'} vendor=${vendor} model=${result.model} ` +
-        `tokens=${result.usage.promptTokens}/${result.usage.completionTokens} — response served but unrewarded:`,
+        `tokens=${result.usage.promptTokens}/${result.usage.completionTokens} - response served but unrewarded:`,
       err,
     );
   }
@@ -262,7 +262,7 @@ async function onHardFailure(provider: Provider): Promise<void> {
     where: { id: provider.id },
     data: { consecutiveFailures: { increment: 1 } },
   });
-  // `provider` is the cached row — keep it in sync so onSuccess's write-skip
+  // `provider` is the cached row - keep it in sync so onSuccess's write-skip
   // and the 2-strike threshold see failures accrued within the cache TTL.
   provider.consecutiveFailures = updated.consecutiveFailures;
   if (updated.consecutiveFailures >= 2 && updated.status === 'ACTIVE') {
@@ -363,7 +363,7 @@ export async function routeInference(input: InferenceInput): Promise<InferenceOu
           await markCreditExhausted(provider, effectiveCap(provider), now);
           continue;
         case 'bad_request':
-          // Our payload is at fault — failing over would just repeat it.
+          // Our payload is at fault - failing over would just repeat it.
           return {
             status: err.status ?? 400,
             body: { error: 'upstream rejected request', detail: redactSecrets(err.message, [apiKey]) },

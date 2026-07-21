@@ -1,4 +1,4 @@
-# WoCC compute delegation pool — one image, two roles:
+# WoCC compute delegation pool - one image, two roles:
 #   web    (default CMD): migrate then serve Next.js on $PORT
 #   worker (override CMD with `npm run worker`): BullMQ health/settlement jobs
 FROM node:22-alpine AS build

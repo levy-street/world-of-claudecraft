@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 /**
  * Provider dashboard stats: every key the wallet has attached (one per
- * vendor) plus wallet-level totals. Read-only, no key material — everything
+ * vendor) plus wallet-level totals. Read-only, no key material - everything
  * here is as public as the leaderboard, so no signature required to view.
  */
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ wallet: string }> }) {

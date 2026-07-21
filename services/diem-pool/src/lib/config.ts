@@ -1,6 +1,6 @@
 import { prisma } from './db';
 
-// SystemConfig-backed runtime flags. Kept tiny — this is an ops kill switch,
+// SystemConfig-backed runtime flags. Kept tiny - this is an ops kill switch,
 // not a feature-flag system.
 
 const ROUTING_PAUSED_KEY = 'routing_paused';

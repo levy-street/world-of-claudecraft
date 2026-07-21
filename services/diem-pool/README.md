@@ -11,20 +11,20 @@ Either way it is non-custodial: keys are validated with a ~1-token call,
 encrypted at rest, revocable anytime, and never shown again. The game routes
 NPC dialogue, quest generation, dungeon-master and agent-player inference
 through the pool by **model class**, meters actual consumed compute per
-provider, and settles nightly in Claudium (internal ledger — no on-chain
+provider, and settles nightly in Claudium (internal ledger - no on-chain
 transfer in v1).
 
 Because BYOK keys spend real money, they carry extra fraud controls
 (design: `docs/PLAN-byok-multi-vendor.md`):
 
-- **Trust ramp** — a new key routes at most $2/day regardless of its declared
+- **Trust ramp** - a new key routes at most $2/day regardless of its declared
   budget, $25/day after 7 healthy days, uncapped at 30 (`TRUST_CAP_*`).
-- **Reward vesting** — BYOK Claudium settles as PENDING and vests 7 days
+- **Reward vesting** - BYOK Claudium settles as PENDING and vests 7 days
   later; a key that goes INVALID upstream (stolen-key signature) or is
   revoked **voids** its unvested rewards.
-- **No standby pay** — only stake-backed Venice capacity earns the standby
+- **No standby pay** - only stake-backed Venice capacity earns the standby
   rate; a free-to-declare BYOK budget pays only for consumed compute.
-- **Pinned endpoints** — vendors are an allowlist with pool-configured base
+- **Pinned endpoints** - vendors are an allowlist with pool-configured base
   URLs; providers can never point us at their own server.
 
 ## Delegation flow
@@ -70,12 +70,12 @@ sequenceDiagram
 
 ## Stack
 
-- **Next.js 15 (App Router)** — API routes + provider/admin dashboard
-- **PostgreSQL + Prisma** — providers, usage metering, reward ledger
-- **BullMQ + Redis** — health probes (30 min), daily settlement (00:00 UTC),
+- **Next.js 15 (App Router)** - API routes + provider/admin dashboard
+- **PostgreSQL + Prisma** - providers, usage metering, reward ledger
+- **BullMQ + Redis** - health probes (30 min), daily settlement (00:00 UTC),
   `settlement-events` outbox queue
-- **Zod** — validation on every route
-- **tweetnacl + bs58** — Solana wallet signature verification
+- **Zod** - validation on every route
+- **tweetnacl + bs58** - Solana wallet signature verification
 
 ## Setup
 
@@ -104,7 +104,7 @@ npm run worker              # BullMQ worker (separate terminal)
 npm test
 npm run typecheck
 
-# Optional full-stack verification (DESTRUCTIVE — scratch DB only): mock
+# Optional full-stack verification (DESTRUCTIVE - scratch DB only): mock
 # Venice upstream + real registration/routing/settlement flow end to end.
 node scripts/mock_venice.mjs &          # set VENICE_BASE_URL=http://127.0.0.1:4567/api/v1
 npx tsx scripts/e2e_smoke.mts           # API-level: 60+ checks incl. failover & concurrency
@@ -151,7 +151,7 @@ weight(p) = max(0, dailyCapacityUsd × SPEND_HEADROOM − spentTodayUsd)
   leaving slack for metering-vs-Venice estimation error.
 - Per pick, every candidate's counter grows by its weight; the max counter
   wins and pays back the total. Selection is exactly proportional over time,
-  burst-free, and deterministic — see `tests/router.test.ts`.
+  burst-free, and deterministic - see `tests/router.test.ts`.
 - Failure handling: one same-key retry on retryable errors (5xx/network/429),
   then failover to the next-best-budget provider (max 3 providers per
   request). Two consecutive hard failures → `DEGRADED` (skipped until a
@@ -164,9 +164,9 @@ weight(p) = max(0, dailyCapacityUsd × SPEND_HEADROOM − spentTodayUsd)
 
 | Step | Rule |
 | --- | --- |
-| Base | `floor(consumedUsd × CLAUDIUM_PER_USD × vendorMultiplier)` — consumed compute only, never pledged capacity; the per-vendor multiplier is admin-tunable (default 1.0×) |
+| Base | `floor(consumedUsd × CLAUDIUM_PER_USD × vendorMultiplier)` - consumed compute only, never pledged capacity; the per-vendor multiplier is admin-tunable (default 1.0×) |
 | Uptime bonus | ×`UPTIME_MULTIPLIER` (1.25) once `consecutiveHealthyDays ≥ 30` |
-| Standby | `floor(unusedCapacityUsd × STANDBY_CLAUDIUM_PER_USD_CAPACITY)` for providers ACTIVE and healthy all day — **standby-eligible (Venice) vendors only** |
+| Standby | `floor(unusedCapacityUsd × STANDBY_CLAUDIUM_PER_USD_CAPACITY)` for providers ACTIVE and healthy all day - **standby-eligible (Venice) vendors only** |
 | Cap | nobody keeps more than `MAX_DAILY_SHARE` (20%) of the day's total uncapped emission |
 | Vesting | Venice rows vest instantly; BYOK rows settle PENDING and vest after `vestingDays` (7); INVALID/revoked keys void their PENDING rows |
 
@@ -178,7 +178,7 @@ pending or voided rows.
 Notes:
 
 - The cap only engages when at least `MIN_PROVIDERS_FOR_CAP` (default 5)
-  providers earned that day — with a tiny pool a literal 20%-of-total cap
+  providers earned that day - with a tiny pool a literal 20%-of-total cap
   would zero out most of the emission (a lone provider could never earn more
   than 20% of its own reward). Set it to 1 for the literal rule.
 - Settlement is **idempotent**: ledger rows upsert on `(providerId, date)`;
@@ -187,7 +187,7 @@ Notes:
   never double-pays or double-bumps.
 - Each settlement emits a message on the `settlement-events` BullMQ queue and
   (optionally) an HMAC-signed webhook (`x-wocc-signature`) to
-  `GAME_WEBHOOK_URL`. Delivery is at-least-once — the game backend must
+  `GAME_WEBHOOK_URL`. Delivery is at-least-once - the game backend must
   dedupe on `(providerId, date)` before crediting Claudium.
 
 ## Security model
@@ -199,14 +199,14 @@ Notes:
   service.
 - **Provider mutations** (register/revoke): one-time server-issued nonce
   (10 min TTL, atomically consumed) + ed25519 wallet signature over a
-  server-built message that binds action, wallet, and nonce — replay- and
+  server-built message that binds action, wallet, and nonce - replay- and
   purpose-confusion-proof.
 - **Internal inference**: constant-time shared-secret check
   (`x-internal-secret`); everything else is rejected.
 - **Rate limits**: registration per-IP and per-wallet (Redis fixed windows).
 - **Self-dealing**: each settlement scores providers by the share of their
   usage coming from their single busiest game account (`suspicionScore`,
-  flagged at ≥0.6 in the admin panel — no auto-ban in v1).
+  flagged at ≥0.6 in the admin panel - no auto-ban in v1).
 - **Kill switch**: admin toggle pauses all routing instantly.
 
 ## Surfaces
@@ -255,18 +255,18 @@ rollbacks (redeploy the previous image) are safe in either direction.
   warn/error logs mark every degraded path: `[ratelimit]` fail-open,
   `[pricing]` unknown-model fallback, `[inference] METERING FAILED`,
   `[settle]`/`[health]`/`[worker]` job outcomes.
-- **Rollback**: deploys are stateless — roll back by redeploying the previous
+- **Rollback**: deploys are stateless - roll back by redeploying the previous
   image. The schema is a single additive migration (`prisma migrate deploy`
   is idempotent); settlement re-runs are idempotent by design. For incidents,
   the admin kill switch stops all routing instantly without a deploy, and
   individual providers can be revoked.
 - **Job resilience**: scheduled jobs retry with exponential backoff
   (settlement: 5 attempts from midnight UTC; probes: 2). A settlement missed
-  entirely (worker down) is picked up safely later — run
+  entirely (worker down) is picked up safely later - run
   `runDailySettlement()` for the missed date or just let ops re-fire; the
   `SettlementRun` guard prevents double-pay.
 - **Data retention**: nonces are pruned automatically after a day.
-  `UsageEvent` grows with traffic (one row per inference call) — the reward
+  `UsageEvent` grows with traffic (one row per inference call) - the reward
   ledger only needs daily sums, so archive/partition events older than your
   audit window once volume warrants it.
 - **Dependencies**: `package-lock.json` pins the tree; `npm audit` is clean
@@ -282,7 +282,7 @@ checked against the real Venice API before money-equivalent rewards ship:
   The Venice/OpenAI/Kimi/Anthropic adapters encode each vendor's documented
   auth, request/response, and error conventions (including OpenAI's
   `insufficient_quota` 429s and Anthropic's 529/credit-balance errors), and
-  the E2E suite exercises them against dialect-accurate mocks — but a pass
+  the E2E suite exercises them against dialect-accurate mocks - but a pass
   against each real API with a funded key is required before launch.
 - **Venice balance shapes are assumed, not verified.** `src/lib/venice.ts`
   sniffs a few plausible balance headers (`parseBalanceUsd`) and otherwise
@@ -290,7 +290,7 @@ checked against the real Venice API before money-equivalent rewards ship:
   Venice responses and adapt; until then a provider can over-declare
   capacity (bounded by `MAX_DECLARED_DIEM`, and metering still only pays for
   actually-served compute).
-- **Anthropic translation covers text chat only** — tool/function messages
+- **Anthropic translation covers text chat only** - tool/function messages
   and image parts are rejected as `bad_request` rather than silently
   dropped; extend `translateRequest` when the game needs them.
 - **Seeded model pricing is a snapshot** (`prisma/seed.ts`), not live data.
@@ -300,10 +300,10 @@ checked against the real Venice API before money-equivalent rewards ship:
 - **`purpose: image_gen` is tagged and metered but routed through
   `/chat/completions`** like everything else; wiring Venice's image endpoint
   is follow-up work.
-- **Streaming is not supported** — the router forces `stream: false` so the
+- **Streaming is not supported** - the router forces `stream: false` so the
   `usage` block is always present for metering.
 - **Self-dealing detection is a heuristic** (top-account share of daily
-  usage), surfaced in admin only — it flags, it does not prove or ban.
+  usage), surfaced in admin only - it flags, it does not prove or ban.
 - **The wallet flow is verified with an injected test wallet**
   (`scripts/ui_e2e.mts`) that implements the Phantom `connect`/`signMessage`
   interface with real ed25519 signatures; a pass against the actual Phantom
@@ -312,5 +312,5 @@ checked against the real Venice API before money-equivalent rewards ship:
 ## Non-goals (v1)
 
 - No on-chain Claudium settlement (internal ledger only)
-- No custodial DIEM pooling — we never hold tokens
+- No custodial DIEM pooling - we never hold tokens
 - No provider payouts in $WOC

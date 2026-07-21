@@ -1,11 +1,11 @@
 # Plan: BYOK Multi-Vendor Compute Pool (OpenAI, Anthropic, Kimi, …)
 
 Extend the DIEM delegation pool so players can attach **their own API keys
-from other AI vendors** — OpenAI, Anthropic, Kimi (Moonshot), and future
-OpenAI-compatible providers — and earn Claudium for the compute the game
+from other AI vendors** - OpenAI, Anthropic, Kimi (Moonshot), and future
+OpenAI-compatible providers - and earn Claudium for the compute the game
 actually consumes through them.
 
-Status: **Phases 1–2 implemented** (schema, adapters for OpenAI/Kimi/Anthropic,
+Status: **Phases 1-2 implemented** (schema, adapters for OpenAI/Kimi/Anthropic,
 model classes, trust ramp, vesting/voiding, per-vendor admin controls, full
 test coverage). Phase 3 items (multiplier tuning UI, fraud view, image/vision
 classes, streaming) remain future work. Deviations from this design are noted
@@ -18,7 +18,7 @@ in the README's Known-limitations section.
 Everything else in this plan follows from these.
 
 **(a) The economics invert.** A Venice/DIEM key spends a *daily-refreshing
-credit* backed by staked tokens — the provider's marginal cost per request is
+credit* backed by staked tokens - the provider's marginal cost per request is
 zero, and unused capacity genuinely "expires", which is why the standby rate
 exists. An OpenAI/Anthropic/Kimi key spends the provider's **real, non-refreshing
 money**. Consequences:
@@ -36,7 +36,7 @@ money**. Consequences:
 
 **(b) The fraud surface inverts.** With DIEM keys the worst case is a dead
 key. With real-money keys the pool becomes attractive for **laundering stolen
-API keys into game currency** — stolen OpenAI/Anthropic keys are a
+API keys into game currency** - stolen OpenAI/Anthropic keys are a
 commodity, and "attach stolen key → farm Claudium → key dies when the victim
 notices" is the obvious attack. Mitigations are a first-class part of this
 design (§7), not a bolt-on:
@@ -64,7 +64,7 @@ export type Vendor = 'venice' | 'openai' | 'anthropic' | 'kimi';
 
 export interface VendorAdapter {
   vendor: Vendor;
-  /** Pinned upstream base URL — never provider-supplied. */
+  /** Pinned upstream base URL - never provider-supplied. */
   baseUrl: string;
   /** ~1-token spend call proving the key is real AND funded. */
   validateKey(key: string): Promise<{ ok: true } | { ok: false; reason: string }>;
@@ -83,7 +83,7 @@ export interface VendorAdapter {
 
 Error classification stays the shared `VeniceError`-style taxonomy
 (`auth | insufficient_credit | rate_limited | bad_request | server | network`)
-— the router logic (retry once → fail over → 2 strikes → DEGRADED; credit
+- the router logic (retry once → fail over → 2 strikes → DEGRADED; credit
 exhausted → pin spend to budget) is already vendor-agnostic and unchanged.
 
 Per-vendor specifics the adapters own:
@@ -91,7 +91,7 @@ Per-vendor specifics the adapters own:
 | | auth | endpoint | usage fields | credit-exhausted signal | quirks |
 |---|---|---|---|---|---|
 | **Venice** | `Bearer` | `/chat/completions` | `prompt_tokens`/`completion_tokens` | 429 + credit hint | existing behavior, unchanged |
-| **OpenAI** | `Bearer sk-…` | `api.openai.com/v1/chat/completions` | same | 429 with `code: "insufficient_quota"` (must be classified by body code, not status — plain 429 is retryable, quota is not) | `GET /v1/models` probe |
+| **OpenAI** | `Bearer sk-…` | `api.openai.com/v1/chat/completions` | same | 429 with `code: "insufficient_quota"` (must be classified by body code, not status - plain 429 is retryable, quota is not) | `GET /v1/models` probe |
 | **Anthropic** | `x-api-key` + `anthropic-version` | `api.anthropic.com/v1/messages` | `input_tokens`/`output_tokens` | 400 "credit balance is too low" | request translation: top-level `system`, `max_tokens` required (default per model class), response `content` blocks → OpenAI `choices[0].message`; 529 `overloaded_error` → retryable server |
 | **Kimi (Moonshot)** | `Bearer sk-…` | `api.moonshot.ai/v1/chat/completions` | OpenAI-compatible | quota error code in body | essentially the OpenAI adapter with a different base URL + key-prefix redaction |
 
@@ -104,7 +104,7 @@ parameterized by base URL; Anthropic is the only real translation work.
 enum Vendor { venice openai anthropic kimi }
 
 model Provider {
-  // wallet loses @unique — a wallet may attach one key per vendor
+  // wallet loses @unique - a wallet may attach one key per vendor
   wallet  String
   vendor  Vendor  @default(venice)
   // renamed semantics: staked capacity (venice) OR donated budget (BYOK)
@@ -149,7 +149,7 @@ model VendorConfig {   // admin-editable per-vendor economics + kill switch
 
 Migration is additive: existing rows backfill `vendor = venice`,
 `status = VESTED`. The `@@unique([wallet, vendor])` swap needs one careful
-migration step (drop old unique, add compound) — zero data movement.
+migration step (drop old unique, add compound) - zero data movement.
 
 ## 4. Routing changes
 
@@ -165,7 +165,7 @@ POST /api/internal/inference
   back-compat and pins routing to that vendor.
 - Eligibility gains one filter: provider's vendor must have an active
   `ModelClassMap` entry for the requested class *and* `VendorConfig.enabled`.
-- Weight function is unchanged (`remaining budget × headroom`) — it already
+- Weight function is unchanged (`remaining budget × headroom`) - it already
   expresses "route where the most donated capacity remains". Effective
   capacity becomes `min(dailyCapacityUsd, trustTierCap)` (§7).
 - The adapter substitutes the vendor's concrete model (highest-priority
@@ -180,15 +180,15 @@ POST /api/internal/inference
   - `smart` (dungeon_master): gpt-4.1 · claude-sonnet-4-5 · kimi-k2-thinking · deepseek-r1-671b
 
 Note the incentive nuance: expensive vendors burn budget faster and earn
-more Claudium per request — which is correct, reward ∝ dollars contributed.
+more Claudium per request - which is correct, reward ∝ dollars contributed.
 
 ## 5. Metering & pricing
 
-- `getRate(vendor, model)` — pricing cache keys on the pair; seeds from each
+- `getRate(vendor, model)` - pricing cache keys on the pair; seeds from each
   vendor's published pricing (snapshot, admin-synced, same as today).
   Conservative fallback + warn-once behavior unchanged.
 - `costUsd` math unchanged (micro-USD integer arithmetic).
-- Per-vendor spend is what the *vendor* charges — provider's real cost —
+- Per-vendor spend is what the *vendor* charges - provider's real cost -
   which is exactly what we want to reward.
 
 ## 6. Settlement & reward changes
@@ -206,7 +206,7 @@ vesting   = vc.vestingDays == 0 ? VESTED now : PENDING until date + vestingDays
 - Settlement writes PENDING rows for BYOK vendors; a new daily **vesting
   step** (same worker, after settlement) flips rows whose `vestAt` has
   passed to VESTED and emits the `settlement-events` message + webhook *at
-  vesting time* — the game credits Claudium only for vested rows. Venice
+  vesting time* - the game credits Claudium only for vested rows. Venice
   keeps `vestingDays = 0` (today's behavior, event at settlement).
 - **Voiding**: when a provider goes INVALID (401 upstream) or is revoked
   with pending rewards, PENDING rows are marked VOIDED and never emitted.
@@ -220,9 +220,9 @@ vesting   = vc.vestingDays == 0 ? VESTED now : PENDING until date + vestingDays
 
 | Attack | Mitigation |
 |---|---|
-| **Stolen key laundering** (attach stolen sk-…, farm, key dies) | Trust ramp (below) limits daily exposure; 7-day vesting means rewards from a key that dies young are VOIDED; INVALID-triggered voiding; admin fraud view (keys that died within vesting window, voided totals per wallet); wallet-level strikes — repeated dead keys freeze the wallet from re-registration. |
+| **Stolen key laundering** (attach stolen sk-…, farm, key dies) | Trust ramp (below) limits daily exposure; 7-day vesting means rewards from a key that dies young are VOIDED; INVALID-triggered voiding; admin fraud view (keys that died within vesting window, voided totals per wallet); wallet-level strikes - repeated dead keys freeze the wallet from re-registration. |
 | **Fake upstream / usage minting** (point pool at own server returning fat `usage`) | Impossible by construction: vendors are an allowlist with pinned base URLs; no provider-supplied endpoints in v1. |
-| **Standby farming** (declare huge budget, serve nothing) | Standby is Venice-only (`standbyEligible=false` for BYOK). Declared BYOK budget earns nothing by itself — only consumed compute pays. |
+| **Standby farming** (declare huge budget, serve nothing) | Standby is Venice-only (`standbyEligible=false` for BYOK). Declared BYOK budget earns nothing by itself - only consumed compute pays. |
 | **Self-dealing** (own game account spams NPC chat through own key) | Existing `suspicionScore` (top-account share) unchanged and now per key; game-side per-account inference quotas remain the primary throttle. |
 | **Trust-ramp evasion via many wallets** | Per-IP and per-wallet registration rate limits (existing); one key per (wallet, vendor); game-account linkage means farming still requires aged game accounts. |
 | **Key probing/enumeration through us** | Validation calls only after nonce+signature auth and rate limits (existing flow, unchanged). |
@@ -231,8 +231,8 @@ vesting   = vc.vestingDays == 0 ? VESTED now : PENDING until date + vestingDays
 
 | tier | condition | effective daily routing cap |
 |---|---|---|
-| NEW | 0–6 healthy days | min(declared, **$2**) |
-| ESTABLISHED | 7–29 healthy days | min(declared, **$25**) |
+| NEW | 0-6 healthy days | min(declared, **$2**) |
+| ESTABLISHED | 7-29 healthy days | min(declared, **$25**) |
 | TRUSTED | 30+ healthy days | declared |
 
 Tier promotion happens in settlement (it already owns streak bookkeeping);
@@ -252,26 +252,26 @@ any INVALID/streak reset demotes to NEW.
 - Leaderboard: unchanged ranking (lifetime $ served) + a vendor badge;
   optional per-vendor filter tab.
 - Admin: per-vendor pool overview, per-vendor kill switch (`VendorConfig.enabled`
-  — global kill switch unchanged), pricing table gains vendor column, model
+  - global kill switch unchanged), pricing table gains vendor column, model
   class map editor, fraud view (voided rewards, young-dead keys).
 - Health endpoint: per-vendor provider counts + per-vendor enabled flags.
 
 ## 9. Rollout phases
 
-**Phase 1 — framework + OpenAI-compatible vendors** (the bulk):
+**Phase 1 - framework + OpenAI-compatible vendors** (the bulk):
 schema migration + adapter layer + OpenAI + Kimi adapters (shared
 implementation), model classes, trust ramp, vesting, standby restriction,
 register/dashboard vendor support, mock-upstream E2E for both dialects.
 
-**Phase 2 — Anthropic**: Messages-API translation adapter (request/response
+**Phase 2 - Anthropic**: Messages-API translation adapter (request/response
 mapping, 529 handling, required max_tokens), its pricing seeds and class
 mappings, translation unit tests against recorded response shapes.
 
-**Phase 3 — polish**: per-vendor reward multiplier tuning UI, fraud-view
+**Phase 3 - polish**: per-vendor reward multiplier tuning UI, fraud-view
 refinements, optional per-vendor house keys, image_gen/vision classes,
 streaming (still off in v1).
 
-Each phase ships behind `VendorConfig.enabled` — vendors flip on
+Each phase ships behind `VendorConfig.enabled` - vendors flip on
 independently, and a misbehaving vendor flips off without a deploy.
 
 ## 10. Testing plan
@@ -286,7 +286,7 @@ independently, and a misbehaving vendor flips off without a deploy.
   vesting transitions (PENDING→VESTED at date, →VOIDED on INVALID), voiding
   idempotency, cap across mixed vendors.
 - **E2E**: mock upstream grows OpenAI-quota and Anthropic-dialect
-  personalities; scenarios — multi-vendor registration per wallet, class
+  personalities; scenarios - multi-vendor registration per wallet, class
   routing lands on the right vendor+model, cross-vendor failover, stolen-key
   simulation (key dies day 2 → pending rewards VOIDED, wallet flagged),
   trust-ramp cap enforcement, vendor kill switch.
@@ -295,12 +295,12 @@ independently, and a misbehaving vendor flips off without a deploy.
 
 ## 11. Open questions (recommended defaults chosen above)
 
-1. Reward premium for real-money compute — launch multipliers all at 1.0×
+1. Reward premium for real-money compute - launch multipliers all at 1.0×
    and tune with data, or launch BYOK at 1.25× to bootstrap supply?
    *Recommendation: 1.0×, tune later; the admin knob makes it a config change.*
-2. Vesting length — 7 days balances fraud window vs provider patience.
+2. Vesting length - 7 days balances fraud window vs provider patience.
    Shorten for TRUSTED providers later?
-3. Should Venice also move to vesting for uniformity? *Recommendation: no —
+3. Should Venice also move to vesting for uniformity? *Recommendation: no -
    stake-backed keys don't have the stolen-key economics.*
-4. Which vendor first — OpenAI (largest key population) or Kimi (cheapest
+4. Which vendor first - OpenAI (largest key population) or Kimi (cheapest
    per token)? They ship together in Phase 1 since they share an adapter.

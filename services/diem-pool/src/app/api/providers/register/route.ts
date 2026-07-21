@@ -46,13 +46,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'rate limited' }, { status: 429 });
     }
   } catch (err) {
-    // Redis down → fail open (signature + nonce still gate), but log it —
+    // Redis down → fail open (signature + nonce still gate), but log it -
     // silent fail-open is invisible in an incident.
     console.error('[ratelimit] redis unavailable, failing open:', (err as Error).message);
   }
 
   // Nonce is consumed before signature verification so a bad signature still
-  // burns it — an attacker can't brute-force signatures against one nonce.
+  // burns it - an attacker can't brute-force signatures against one nonce.
   if (!(await consumeNonce(walletAddress, 'register', nonce))) {
     return NextResponse.json({ error: 'unknown, expired, or already-used nonce' }, { status: 401 });
   }
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
   });
   if (existing && (existing.status === 'ACTIVE' || existing.status === 'DEGRADED')) {
     return NextResponse.json(
-      { error: `wallet already has an active ${vendor} key — revoke it first` },
+      { error: `wallet already has an active ${vendor} key - revoke it first` },
       { status: 409 },
     );
   }

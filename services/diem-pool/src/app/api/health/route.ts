@@ -10,13 +10,13 @@ export const dynamic = 'force-dynamic';
 // Settlement runs at 00:00 UTC for the previous day; if the newest completed
 // run is older than yesterday, the worker is stuck and ops should know.
 function settlementStale(lastCompleted: Date | null, now: Date): boolean {
-  if (!lastCompleted) return false; // fresh install — nothing to have settled
+  if (!lastCompleted) return false; // fresh install - nothing to have settled
   return lastCompleted.getTime() < utcDay(now, 1).getTime();
 }
 
 /**
  * Unauthenticated liveness/readiness probe for load balancers and alerting.
- * Exposes component status and coarse counts only — no provider data.
+ * Exposes component status and coarse counts only - no provider data.
  * 200 = fully healthy; 503 = at least one component down or stale.
  */
 export async function GET() {

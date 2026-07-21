@@ -33,7 +33,7 @@ function day(overrides: Partial<ProviderDay> & { providerId: string }): Provider
   };
 }
 
-describe('computeSettlement — base reward', () => {
+describe('computeSettlement - base reward', () => {
   it('pays floor(consumedUsd * CLAUDIUM_PER_USD) on consumed compute only', () => {
     const [row] = computeSettlement(
       [day({ providerId: 'a', consumedUsd: 0.567, healthyAllDay: false })],
@@ -53,7 +53,7 @@ describe('computeSettlement — base reward', () => {
   });
 });
 
-describe('computeSettlement — uptime multiplier', () => {
+describe('computeSettlement - uptime multiplier', () => {
   it('applies 1.25x at a 30-day streak', () => {
     const [row] = computeSettlement(
       [day({ providerId: 'a', consumedUsd: 1, consecutiveHealthyDays: 30, healthyAllDay: false })],
@@ -82,7 +82,7 @@ describe('computeSettlement — uptime multiplier', () => {
   });
 });
 
-describe('computeSettlement — per-vendor economics', () => {
+describe('computeSettlement - per-vendor economics', () => {
   it('applies the vendor reward multiplier to the base', () => {
     const [row] = computeSettlement(
       [day({ providerId: 'a', consumedUsd: 1, healthyAllDay: false, rewardMultiplier: 1.5 })],
@@ -117,7 +117,7 @@ describe('computeSettlement — per-vendor economics', () => {
   });
 });
 
-describe('computeSettlement — standby rate', () => {
+describe('computeSettlement - standby rate', () => {
   it('pays the standby rate on unused capacity for healthy ACTIVE providers', () => {
     const [row] = computeSettlement(
       [day({ providerId: 'a', dailyCapacityUsd: 10, consumedUsd: 4 })],
@@ -140,7 +140,7 @@ describe('computeSettlement — standby rate', () => {
   });
 });
 
-describe('computeSettlement — per-provider emission cap', () => {
+describe('computeSettlement - per-provider emission cap', () => {
   it('caps a dominant provider at MAX_DAILY_SHARE of total emission', () => {
     const rows = computeSettlement(
       [
@@ -185,7 +185,7 @@ describe('computeSettlement — per-provider emission cap', () => {
 
 describe('settlement idempotency', () => {
   // Models the worker's persistence contract: upsert keyed on
-  // (providerId, date) — the property that makes re-runs safe.
+  // (providerId, date) - the property that makes re-runs safe.
   class FakeLedger {
     rows = new Map<string, SettlementRow>();
     writes = 0;

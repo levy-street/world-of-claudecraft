@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'invalid Solana wallet address' }, { status: 400 });
   }
 
-  // Nonce issuance is cheap but unauthenticated — keep a loose per-IP lid on it.
+  // Nonce issuance is cheap but unauthenticated - keep a loose per-IP lid on it.
   const env = getEnv();
   try {
     const rl = await checkRateLimit(
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     if (!rl.allowed) return NextResponse.json({ error: 'rate limited' }, { status: 429 });
   } catch (err) {
     // Redis unavailable → fail open (signature auth still protects
-    // mutations), but say so — silent fail-open is invisible in an incident.
+    // mutations), but say so - silent fail-open is invisible in an incident.
     console.error('[ratelimit] redis unavailable, failing open:', (err as Error).message);
   }
 

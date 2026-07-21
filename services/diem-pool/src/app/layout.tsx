@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <header className="topbar">
-          <span className="brand">⚔️ WoCC DIEM Pool</span>
+          <span className="brand">WoCC DIEM Pool</span>
           <nav>
             <Link href="/">Provider</Link>
             <Link href="/leaderboard">Leaderboard</Link>
