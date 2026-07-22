@@ -639,7 +639,12 @@ export class MailboxWindow {
     }
     const itemControls = new Map<
       string,
-      { minus?: HTMLButtonElement; plus?: HTMLButtonElement; remove?: HTMLButtonElement }
+      {
+        minus?: HTMLButtonElement;
+        plus?: HTMLButtonElement;
+        qty?: HTMLInputElement;
+        remove?: HTMLButtonElement;
+      }
     >();
     for (const slot of this.attachments) {
       const item = ITEMS[slot.itemId];
@@ -659,6 +664,7 @@ export class MailboxWindow {
       const controls: {
         minus?: HTMLButtonElement;
         plus?: HTMLButtonElement;
+        qty?: HTMLInputElement;
         remove?: HTMLButtonElement;
       } = {};
       if (owned > 1) {
@@ -724,6 +730,7 @@ export class MailboxWindow {
         chip.appendChild(step);
         controls.minus = minus;
         controls.plus = plus;
+        controls.qty = qty;
       }
       const remove = document.createElement('button');
       remove.type = 'button';
@@ -747,18 +754,25 @@ export class MailboxWindow {
     if (focusKey) {
       const [itemId, role] = focusKey.split(':');
       const controls = itemControls.get(itemId);
+      // The qty input matters most here: a number input's arrow keys fire
+      // `change` WITHOUT blurring, so the repaint runs while the input is
+      // focused; falling through to Remove would turn the player's next
+      // Enter/Space into removing the parcel mid-adjustment.
       const preferred = controls
         ? role === 'minus'
           ? controls.minus
           : role === 'plus'
             ? controls.plus
-            : controls.remove
+            : role === 'qty'
+              ? controls.qty
+              : controls.remove
         : undefined;
       // The just-activated control (or its whole item) can vanish on rebuild
       // (disabled at a bound, or the stepper dropped once owned <= 1): fall
       // back to the nearest still-focusable control for the same item.
-      let target: HTMLButtonElement | undefined;
+      let target: HTMLButtonElement | HTMLInputElement | undefined;
       if (preferred && !preferred.disabled) target = preferred;
+      else if (controls?.qty) target = controls.qty;
       else if (controls?.minus && !controls.minus.disabled) target = controls.minus;
       else if (controls?.plus && !controls.plus.disabled) target = controls.plus;
       else target = controls?.remove;

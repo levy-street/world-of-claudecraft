@@ -137,6 +137,23 @@ describe('mailbox: the typeable parcel quantity field', () => {
     expect((root.querySelector('#mail-to') as HTMLInputElement).value).toBe('Mira');
   });
 
+  it('restores focus to the qty input after an arrow-key change, never the Remove button', () => {
+    // A number input's arrow keys fire `change` WITHOUT blurring, so the
+    // repaint runs while the input is focused. Before the fix the restore
+    // switch knew only minus/plus/remove, fell through to Remove, and the
+    // player's next Enter/Space removed the parcel mid-adjustment.
+    const { win, root } = openSendTab([WOLF_FANG]);
+    win.stageParcel('wolf_fang');
+    const input = qtyInput(root);
+    input.focus();
+    expect(document.activeElement).toBe(input);
+    input.value = '2';
+    input.dispatchEvent(new Event('change'));
+    const restored = document.activeElement as HTMLElement;
+    expect(restored.className).toBe('mail-parcel-qty-input');
+    expect(restored.className).not.toContain('remove');
+  });
+
   it('keeps the +/- steppers working alongside the input', () => {
     const { win, root } = openSendTab([WOLF_FANG]);
     win.stageParcel('wolf_fang');
