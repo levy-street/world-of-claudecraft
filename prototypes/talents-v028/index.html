@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A mobile-first design review for the Hunter, Shaman, and Priest v0.28.0 class updates."
+    />
+    <title>Class Design Lab | v0.28.0</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="data.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body data-class="hunter">
+    <a class="skip-link" href="#main-content">Skip to class design</a>
+
+    <header class="site-header">
+      <div class="header-grid">
+        <div class="title-block">
+          <p class="eyebrow">World of ClaudeCraft / v0.28.0 owner review</p>
+          <h1>Choose a class.<br /><span>See the decision.</span></h1>
+          <p class="intro">
+            Nine specialization directions, one shared talent framework, and no hidden extra
+            resource bars. This is a design preview, not final balance.
+          </p>
+        </div>
+
+        <aside class="release-card" aria-label="Review status">
+          <div class="release-line">
+            <span class="status-light" aria-hidden="true"></span>
+            <span>Design review ready</span>
+          </div>
+          <dl>
+            <div>
+              <dt>Foundation</dt>
+              <dd>PR #2163 merged</dd>
+            </div>
+            <div>
+              <dt>Target</dt>
+              <dd>release/v0.28.0</dd>
+            </div>
+            <div>
+              <dt>Layout</dt>
+              <dd>Mobile first</dd>
+            </div>
+          </dl>
+        </aside>
+      </div>
+
+      <nav class="class-tabs" id="class-tabs" aria-label="Choose a class"></nav>
+    </header>
+
+    <main id="main-content">
+      <section class="spec-navigation section-shell" aria-labelledby="spec-nav-title">
+        <div class="section-kicker">
+          <span>01</span>
+          <p id="spec-nav-title">Choose a specialization</p>
+        </div>
+        <div class="spec-picker" id="spec-picker" role="group" aria-label="Specializations"></div>
+      </section>
+
+      <section class="spec-hero section-shell" aria-labelledby="spec-name">
+        <div class="spec-copy">
+          <div class="spec-label-row">
+            <span class="class-mark" id="class-mark" aria-hidden="true">H</span>
+            <p id="spec-role">Pet damage</p>
+          </div>
+          <h2 id="spec-name">Packlord</h2>
+          <p class="thesis" id="spec-thesis"></p>
+          <div class="decision-card">
+            <p class="mini-label">The decision</p>
+            <p id="spec-decision"></p>
+          </div>
+        </div>
+
+        <div class="identity-panel">
+          <div>
+            <p class="mini-label">Tracking</p>
+            <p class="resource-name" id="spec-resource"></p>
+          </div>
+          <div class="ownership-columns">
+            <div>
+              <p class="mini-label">Spec exclusive</p>
+              <ul id="exclusive-list"></ul>
+            </div>
+            <div>
+              <p class="mini-label">Shared backbone</p>
+              <ul id="shared-list"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="rotation-section section-shell" aria-labelledby="rotation-title">
+        <div class="section-heading">
+          <div class="section-kicker">
+            <span>02</span>
+            <p>Walk the rotation</p>
+          </div>
+          <div class="rotation-controls" aria-label="Rotation preview controls">
+            <button type="button" class="text-button" id="rotation-reset">Reset</button>
+            <button type="button" class="text-button" id="rotation-next">Next beat</button>
+            <button type="button" class="primary-button" id="rotation-play">Play loop</button>
+          </div>
+        </div>
+
+        <div class="rotation-grid">
+          <ol class="rotation-steps" id="rotation-steps"></ol>
+
+          <div class="action-stage">
+            <div class="action-stage-header">
+              <div>
+                <p class="mini-label">Compact action bar</p>
+                <p id="rotation-status" aria-live="polite">Ready to begin</p>
+              </div>
+              <div class="legend" aria-label="Action ownership legend">
+                <span><i class="legend-dot shared"></i>Shared</span>
+                <span><i class="legend-dot exclusive"></i>Exclusive</span>
+              </div>
+            </div>
+            <div class="action-bar" id="action-bar"></div>
+            <p class="mobile-note">
+              Core actions remain reachable in one thumb-width row. Utility and talent actions
+              stay outside the required damage or healing loop.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="talent-section section-shell" aria-labelledby="talent-title">
+        <div class="section-heading talent-heading">
+          <div>
+            <div class="section-kicker">
+              <span>03</span>
+              <p>Build the talent rows</p>
+            </div>
+            <h2 id="talent-title">One choice per job</h2>
+          </div>
+          <div class="build-count" id="build-count" aria-live="polite">0 / 6 selected</div>
+        </div>
+
+        <p class="talent-intro">
+          Movement at 5, defense at 8, control at 11, kit amplification at 14, a major power at
+          17, and a build-defining capstone at 20. Select one option from each row.
+        </p>
+        <div class="talent-rows" id="talent-rows"></div>
+      </section>
+
+      <section class="compare-section section-shell" aria-labelledby="compare-title">
+        <div class="section-kicker">
+          <span>04</span>
+          <p id="compare-title">The class at a glance</p>
+        </div>
+        <div class="compare-grid" id="compare-grid"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <p class="eyebrow">Review source</p>
+        <p>Mechanics and values remain authoritative in the class PRDs.</p>
+      </div>
+      <nav aria-label="Design documents">
+        <a id="class-doc-link" href="../../docs/design/hunter-v028-class-design.md">Class design</a>
+        <a href="../../docs/prd/owned-class-spells-v028-review-guide.md">Review guide</a>
+        <a href="../../docs/prd/owned-class-spells-v028-implementation.md">Implementation plan</a>
+      </nav>
+    </footer>
+  </body>
+</html>
