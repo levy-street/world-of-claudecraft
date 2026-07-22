@@ -31,6 +31,15 @@ export interface CraftingIdentityView {
   // appearing here; full knownness is this set plus the empty-acquisition arm
   // of src/sim/professions/crafting.ts isRecipeKnown over static content.
   knownRecipes: readonly string[];
+  // Repeatable work orders currently inside their cooldown window (Professions
+  // 2.0 Phase 14), SORTED so the JSON form is a stable cprof signature. The
+  // SERVER computes this against ITS tickCount (the activeMobileStationCraft
+  // precedent: tick-domain state is resolved server-side, never predicted by the
+  // client) and it rides the existing cprof delta; the online client feeds it
+  // into computeQuestState so a work order on cooldown shows unavailable there
+  // too. Offline the Sim ignores this field and re-derives the set from live
+  // PlayerMeta.questCadence. Absent on a pre-Phase-14 server payload.
+  cadenceBlockedQuests?: readonly string[];
 }
 
 // Static content read: the common-tier recipe list (issue #1127). A plain

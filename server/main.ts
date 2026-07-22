@@ -95,7 +95,6 @@ import {
   type ArenaLeaderRow,
   accountAndScopeForToken,
   accountById,
-  accountForToken,
   acquireCharacterLease,
   bankBonusFactsForAccount,
   type CharacterRow,
@@ -985,7 +984,8 @@ async function bearerAccount(req: http.IncomingMessage): Promise<number | null> 
   const auth = req.headers.authorization ?? '';
   const m = /^Bearer ([a-f0-9]{64})$/.exec(auth);
   if (!m) return null;
-  return accountForToken(m[1]);
+  const info = await accountAndScopeForToken(m[1]);
+  return info?.accountId ?? null;
 }
 
 // Account + token scope for the bearer (or null when unauthenticated). The scope
@@ -1452,7 +1452,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       // via exchange, so create requires a full active session too
       // (bearerActiveAccount: read and companion tokens answer 403 'this token
       // is read-only'), where the pre-fix handler resolved the scope-blind
-      // accountForToken. Mirrored on
+      // identity-only token resolver. Mirrored on
       // the RouteDef twin (server/desktop_login_routes.ts); the
       // desktopLoginCreateFullScope known deviation records the change.
       const accountId = await bearerActiveAccount(req, res);
@@ -2025,7 +2025,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     }
     if (req.method === 'POST' && url === '/api/account/logout') {
       const callerToken = bearerToken(req);
-      if (!callerToken || (await accountForToken(callerToken)) === null)
+      if (!callerToken || (await accountAndScopeForToken(callerToken)) === null)
         return json(res, 401, { error: 'not authenticated', code: 'auth.required' });
       return handleAccountLogout(res, callerToken);
     }
@@ -2959,7 +2959,7 @@ export async function startServer(): Promise<http.Server> {
   const wss = new WebSocketServer({ noServer: true, maxPayload: WS_MAX_PAYLOAD_BYTES });
   const wsAuth = createWsAuth({
     game,
-    accountForToken,
+    accountAndScopeForToken,
     moderationStatusForAccount,
     getCharacter,
     chatMuteStatusForAccount,

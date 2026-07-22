@@ -7,8 +7,8 @@
 
 import type { StationType } from '../sim/professions/stations';
 import { craftNameText } from './char_window';
-import type { CraftDifficulty, CraftingView } from './crafting_view';
-import { itemDisplayName } from './entity_i18n';
+import type { CraftDifficulty, CraftingView, CraftLearnHint } from './crafting_view';
+import { itemDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { GOLD_ACCENT_COLOR, QUALITY_COLOR } from './icons';
@@ -63,12 +63,16 @@ export interface CraftingWindowDeps extends PainterHostPresentation {
   onClose(): void;
 }
 
-/** Paint the crafting panel from a prepared view. */
+/** Paint the crafting panel from a prepared view. `learnHints` (Phase 14) maps a
+ *  craft id to the station + master where the viewer can learn recipes they have
+ *  not learned; a section renders its "learnable at a master" hint iff its craft
+ *  is present. */
 export function renderCraftingWindow(
   el: HTMLElement,
   view: CraftingView,
   deps: CraftingWindowDeps,
   identity?: ProfessionIdentityModel,
+  learnHints: ReadonlyMap<string, CraftLearnHint> = new Map(),
 ): void {
   deps.hideTooltip();
   const scrollTop = el.scrollTop;
@@ -106,6 +110,22 @@ export function renderCraftingWindow(
     section.className = 'vendor-section-title';
     section.textContent = craftNameText(professionId);
     el.appendChild(section);
+
+    // Phase 14 "learnable at a master" hint: shown once under the section when
+    // the viewer has unlearned trainer recipes for this craft, naming the
+    // resident master (entity i18n) and their station. Informational text (no
+    // tap target), identical on every graphics preset (never tier-gated).
+    const learnHint = learnHints.get(professionId);
+    if (learnHint) {
+      const hint = document.createElement('div');
+      hint.className = 'crafting-learn-hint';
+      hint.textContent = t('hudChrome.crafting.learnMoreAtStation', {
+        master: tEntity({ kind: 'npc', id: learnHint.masterNpcId, field: 'name' }),
+        station: stationNameText(learnHint.stationType),
+        craft: craftNameText(professionId),
+      });
+      el.appendChild(hint);
+    }
 
     for (const row of rows) {
       const item = document.createElement('div');

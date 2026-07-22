@@ -86,11 +86,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Hur är det med en kortduell? Bäst av tre, vinnaren tar skryträtten.',
   'entities.npcs.card_master.name': 'Kortmästare',
   'entities.npcs.card_master.title': 'Slumpmakare',
-  'entities.quests.q_archetype_acceptance.completion':
-    'Löftet håller. Dessa två hantverk är nu dina ämnen, och kunskapen om det motstående hantverket blir ditt hobby.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Malmåder skördad',
-  'entities.quests.q_archetype_acceptance.text':
-    'Skicklighet är kunskap, {playerName}, men inriktning är ett löfte. Välj två angränsande hantverk vars metoder du vill bära som dina ämnen, och ta sedan med mig malm bearbetad i Dalen med dina egna händer.',
   'entities.quests.q_prof_hobby_switch.completion':
     'Ett lättare val, men ett nyttigt sådant. Följ den nyfikenheten så långt sällsynt arbete kan bära den.',
   'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Örtfläck skördad',
@@ -102,10 +97,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.objectives.0.label': 'Malmåder skördad',
   'entities.quests.q_prof_intro.text':
     'Varje själ i Östbäck arbetar ett hantverk utöver svärdet, {playerName}. Det finns malmådrar i klipporna runt Koppargropen, sydväst om staden. Gå och sving en hacka och arbeta 5 av dem själv; jag ska kunna se skillnaden.',
-  'entities.quests.q_prof_make_amends.completion':
-    'Den gamla rytmen återvänder. Ditt tidigare par är aktivt igen.',
-  'entities.quests.q_prof_make_amends.text':
-    'Du har burit det paret förut, {playerName}. Att återvända är inget nytt löfte. Hjälp till att hålla Dalsvägen fri, och arbetet ska påminna dina händer om vad de en gång visste.',
   'gpuNotice.bodyDesktop':
     'Spelet körs utan GPU-acceleration och kommer att vara långsamt. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.',
   'gpuNotice.bodyWeb':
@@ -7109,9 +7100,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': 'Mål',
   'hudChrome.options.mobileCameraJoystick': 'Kamera joystick',
   'hudChrome.options.mobileLeftHanded': 'Vänsterhänt layout',
-  'entities.quests.q_archetype_acceptance.title': 'Ett hantverk att kalla ditt eget',
-  'entities.quests.q_prof_make_amends.title': 'Att göra gott',
-  'entities.quests.q_prof_make_amends.objectives.0.label': 'Skogsvarg dödad',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Varje låda, kista och krimskrams är i tryggt förvar hos Förgyllda kassakistan.',
   'entities.npcs.bursar_aldous_crane.name': 'Kamrer Aldous Crane',

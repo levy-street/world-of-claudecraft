@@ -99,11 +99,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Un Duel de cartes vous tente ? Deux manches gagnantes sur trois, et le vainqueur remporte la gloire.',
   'entities.npcs.card_master.name': 'Maître des cartes',
   'entities.npcs.card_master.title': 'Marchand du hasard',
-  'entities.quests.q_archetype_acceptance.completion':
-    'La promesse tient. Ces deux métiers sont désormais vos majeures, et le savoir qui leur est opposé devient votre passe-temps.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Filon de minerai récolté',
-  'entities.quests.q_archetype_acceptance.text':
-    'Le savoir est connaissance, {playerName}, mais la communion est une promesse. Choisissez deux métiers voisins dont vous porterez les méthodes comme majeures, puis apportez-moi du minerai travaillé dans le Val de vos propres mains.',
   'entities.quests.q_prof_hobby_switch.completion':
     'Un choix plus léger, mais utile. Suivez cette curiosité aussi loin que le travail rare saura vous mener.',
   'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Parcelle de plantes récoltée',
@@ -115,10 +110,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.objectives.0.label': 'Filon de minerai récolté',
   'entities.quests.q_prof_intro.text':
     "Chaque âme à Eastbrook exerce un métier en plus de l'épée, {playerName}. Il y a des filons de minerai dans les rochers autour de la Mine de cuivre, au sud-ouest de la ville. Allez manier un pic et travailler 5 d'entre eux de vos propres mains ; je verrai la différence.",
-  'entities.quests.q_prof_make_amends.completion':
-    "L'ancien rythme revient. Votre ancienne paire est à nouveau active.",
-  'entities.quests.q_prof_make_amends.text':
-    "Vous avez déjà porté cette paire, {playerName}. Y revenir n'est pas un nouveau serment. Aidez à dégager la route du Val, et le travail rappellera à vos mains ce qu'elles savaient autrefois.",
   'gpuNotice.bodyDesktop':
     'Le jeu fonctionne sans accélération GPU et sera lent. Mettez à jour vos pilotes graphiques, puis redémarrez le jeu. Sous Windows, définissez également le jeu sur Performances élevées dans Paramètres, Système, Affichage, Graphiques.',
   'gpuNotice.bodyWeb':
@@ -7681,9 +7672,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': 'Cible',
   'hudChrome.options.mobileCameraJoystick': 'Manette de caméra',
   'hudChrome.options.mobileLeftHanded': 'Disposition pour gaucher',
-  'entities.quests.q_archetype_acceptance.title': 'Un métier qui vous appartient',
-  'entities.quests.q_prof_make_amends.title': 'Faire amende honorable',
-  'entities.quests.q_prof_make_amends.objectives.0.label': 'Loup des forêts tué',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Chaque caisse, chaque coffret et chaque babiole est en sécurité au Coffre doré.',
   'entities.npcs.bursar_aldous_crane.name': 'Trésorier Aldous Crane',

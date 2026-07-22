@@ -3,6 +3,7 @@
 // the wall against ogres, waking elementals, and the open chanting of the
 // Wyrmcult at the Gravewyrm Sanctum gates.
 
+import { WORK_ORDER_CADENCE_TICKS } from '../professions/cadence';
 import type {
   CampDef,
   GroundObjectDef,
@@ -1220,7 +1221,9 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     pos: { x: 8.5, z: 658 },
     facing: -0.4,
     color: 0x58b09c,
-    questIds: [],
+    // Professions 2.0 Phase 14: the Highwatch apothecary master runs the
+    // repeatable alchemy work order.
+    questIds: ['q_prof_workorder_apothecary'],
     vendorItems: [
       'minor_healing_potion',
       'minor_mana_potion',
@@ -1887,6 +1890,29 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     minLevel: 20,
     suggestedPlayers: 10,
   },
+  // Repeatable craft work order (Professions 2.0 Phase 14): Alchemist Verane
+  // buys goldleaf on the shared cadence (WORK_ORDER_CADENCE_TICKS); the collect
+  // turn-in consumes the herbs. copperReward is floor(0.5 * summed sell value of
+  // the requested herbs); xpReward matches the make-amends repeatable band.
+  q_prof_workorder_apothecary: {
+    id: 'q_prof_workorder_apothecary',
+    name: 'Apothecary Work Order',
+    giverNpcId: 'alchemist_verane',
+    turnInNpcId: 'alchemist_verane',
+    text: "My shelves require goldleaf, and the market's stock is, predictably, adulterated. Bring me six goldleaf herbs, unbruised, and you will be compensated precisely. Bruised leaves will be declined, so mind your satchel.",
+    completionText:
+      'Acceptable. Potent, and properly handled. Your payment, counted to the coin. Do not let it go to your head, that is a different reagent.',
+    objectives: [
+      { type: 'collect', itemId: 'goldleaf_herb', count: 6, label: 'Goldleaf Herb delivered' },
+    ],
+    xpReward: 100,
+    // floor(0.5 * 6 * 15) = 45 (goldleaf_herb sellValue 15).
+    copperReward: 45,
+    itemRewards: {},
+    repeatable: true,
+    shareable: false,
+    repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
+  },
 };
 
 export const ZONE3_QUEST_ORDER = [
@@ -1923,6 +1949,7 @@ export const ZONE3_QUEST_ORDER = [
   'q_nythraxis_sealed_crypt',
   'q_nythraxis_bound_guardian',
   'q_nythraxis_scourges_end',
+  'q_prof_workorder_apothecary',
 ];
 
 // ---------------------------------------------------------------------------

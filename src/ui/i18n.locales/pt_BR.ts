@@ -99,11 +99,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Que tal um Duelo de Cartas? Melhor de três, quem vence fica com os direitos de se gabar.',
   'entities.npcs.card_master.name': 'Mestre das Cartas',
   'entities.npcs.card_master.title': 'Distribuidor do Acaso',
-  'entities.quests.q_archetype_acceptance.completion':
-    'A promessa se mantém. Esses dois ofícios agora são seus principais, e o conhecimento oposto a eles torna-se seu passatempo.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Veio de minério extraído',
-  'entities.quests.q_archetype_acceptance.text':
-    'Habilidade é conhecimento, {playerName}, mas afinidade é uma promessa. Escolha dois ofícios vizinhos cujas técnicas você carregará como seus principais, depois traga-me minério trabalhado do Vale com suas próprias mãos.',
   'entities.quests.q_prof_hobby_switch.completion':
     'Uma escolha mais leve, mas útil. Siga essa curiosidade até onde o trabalho raro puder levá-la.',
   'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Canteiro de ervas colhido',
@@ -115,10 +110,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.objectives.0.label': 'Veio de minério extraído',
   'entities.quests.q_prof_intro.text':
     'Toda alma em Eastbrook exerce um ofício além da espada, {playerName}. Há veios de minério nas rochas ao redor da Escavação de Cobre, a sudoeste da cidade. Vá bater com uma picareta e trabalhe 5 deles você mesmo; eu saberei a diferença.',
-  'entities.quests.q_prof_make_amends.completion':
-    'O ritmo antigo retorna. Seu par anterior está ativo novamente.',
-  'entities.quests.q_prof_make_amends.text':
-    'Você já carregou esse par antes, {playerName}. Retornar não é um voto novo. Ajude a manter o caminho do Vale livre, e o trabalho lembrará às suas mãos o que elas já souberam.',
   'gpuNotice.bodyDesktop':
     'O jogo está funcionando sem aceleração de GPU e ficará lento. Atualize os drivers de placa de vídeo e reinicie o jogo. No Windows, defina o jogo como Alto desempenho em Configurações > Sistema > Vídeo > Gráficos.',
   'gpuNotice.bodyWeb':
@@ -7238,9 +7229,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': 'Alvo',
   'hudChrome.options.mobileCameraJoystick': 'Joystick da câmera',
   'hudChrome.options.mobileLeftHanded': 'Layout para canhotos',
-  'entities.quests.q_archetype_acceptance.title': 'Um ofício para chamar de seu',
-  'entities.quests.q_prof_make_amends.title': 'Fazendo as pazes',
-  'entities.quests.q_prof_make_amends.objectives.0.label': 'Lobo da Floresta morto',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Cada caixote, cofre e bugiganga está a salvo com a Arca Dourada.',
   'entities.npcs.bursar_aldous_crane.name': 'Tesoureiro Aldous Crane',

@@ -99,11 +99,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Ti va un Duello di Carte? Al meglio dei tre turni, il vincitore si porta a casa i vanti.',
   'entities.npcs.card_master.name': 'Maestro delle Carte',
   'entities.npcs.card_master.title': 'Mercante del Caso',
-  'entities.quests.q_archetype_acceptance.completion':
-    'La promessa tiene. Questi due mestieri sono ora i tuoi principali, e la conoscenza opposta a essi diventa il tuo passatempo.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Filone di minerale raccolto',
-  'entities.quests.q_archetype_acceptance.text':
-    "La competenza è conoscenza, {playerName}, ma l'attunement è una promessa. Scegli due mestieri vicini che porterai come principali, poi portami del minerale lavorato dalla Valle con le tue mani.",
   'entities.quests.q_prof_hobby_switch.completion':
     'Una scelta più leggera, ma utile. Segui quella curiosità fin dove i lavori rari ti porteranno.',
   'entities.quests.q_prof_hobby_switch.objectives.0.label': "Aiuola d'erbe raccolta",
@@ -115,10 +110,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.objectives.0.label': 'Filone di minerale raccolto',
   'entities.quests.q_prof_intro.text':
     'Ogni anima di Eastbrook lavora un mestiere oltre alla spada, {playerName}. Ci sono filoni di minerale nelle rocce intorno alla Cava di Rame, a sudovest della città. Vai a dare qualche picconata e lavorane 5 tu stesso, intendiamoci; saprò vedere la differenza.',
-  'entities.quests.q_prof_make_amends.completion':
-    'Il vecchio ritmo ritorna. La tua coppia precedente è attiva di nuovo.',
-  'entities.quests.q_prof_make_amends.text':
-    'Hai già portato quella coppia prima, {playerName}. Tornare non è un voto nuovo. Aiuta a mantenere libera la strada della Valle, e il lavoro ricordera alle tue mani ciò che una volta sapevano.',
   'gpuNotice.bodyDesktop':
     'Il gioco sta girando senza accelerazione GPU e sarà lento. Aggiorna i driver grafici, poi riavvia il gioco. Su Windows, imposta anche il gioco su Prestazioni elevate in Impostazioni > Sistema > Schermo > Grafica.',
   'gpuNotice.bodyWeb':
@@ -7266,9 +7257,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': 'Bersaglio',
   'hudChrome.options.mobileCameraJoystick': 'Joystick della fotocamera',
   'hudChrome.options.mobileLeftHanded': 'Disposizione per mancini',
-  'entities.quests.q_archetype_acceptance.title': 'Un mestiere da chiamare tuo',
-  'entities.quests.q_prof_make_amends.title': 'Fare ammenda',
-  'entities.quests.q_prof_make_amends.objectives.0.label': 'Lupo della Foresta ucciso',
   'entities.npcs.bursar_aldous_crane.name': 'Economo Aldous Crane',
   'entities.npcs.bursar_aldous_crane.title': 'Il Forziere Dorato',
   'entities.npcs.bursar_aldous_crane.greeting':

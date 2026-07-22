@@ -21,7 +21,12 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   guess; see the P0 comment in `manifest.ts` and
   `tests/render_asset_preload.test.ts`). `prepareVisual(key)` memoizes
   normalize transform, resolved clips, click-capsule radius, and a baked
-  idle-pose geo (far-LOD/shadow proxy).
+  idle-pose geo (far-LOD/shadow proxy). `charactersReady()` is a narrower gate
+  than the site-wide `assetsReady()`: only this file's boot GLBs + skin atlases,
+  with its own retry loop (delayed, backed off between outer attempts) so a
+  transient failure anywhere else on the site can never permanently blank the
+  landing character-creation preview (`src/main.ts` awaits it there instead of
+  `assetsReady()`; see `tests/character_preview_boot.test.ts`).
 - `asset_miss_log.ts`: once-per-key dev logging for character-asset failures in
   per-frame render paths; `createCharacterVisual` returns null on such a
   failure so callers skip the view for the frame instead of stalling the

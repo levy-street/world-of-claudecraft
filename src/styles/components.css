@@ -4970,6 +4970,16 @@
   .crafting-station-badge.out-of-range {
     border-style: dashed;
   }
+  /* Phase 14 discoverability: the per-section "learnable at a master" hint,
+     shown under a craft section when the viewer has unlearned trainer recipes
+     for that craft. Muted guidance text, informational only (no tap target),
+     identical on every graphics preset. */
+  .crafting-learn-hint {
+    margin: 2px 0 6px;
+    color: var(--color-text-muted);
+    font-size: 10.5px;
+    line-height: 1.4;
+  }
   .vendor-empty {
     padding: 5px;
     font-size: 11px;
@@ -4981,6 +4991,37 @@
     margin-top: 8px;
     border-top: 1px solid #463a1c;
     padding-top: 6px;
+  }
+
+  /* ---------- profession first-tier tutorial (Phase 14) ---------- */
+  /* The once-ever explainer modal (profession_tutorial_window.ts), reusing the
+     confirm-dialog modal family (.window.panel shell, .cd-body/.cd-actions). A
+     bounded, centered modal; body-appended (see the layout.css --window-scale:1
+     group), and the JS floors its z-index above the mobile sheet (the
+     scoped-popup 96 rule). Sized from existing tokens, no new ones. */
+  #profession-tutorial {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 380px;
+    --window-pad: 14px;
+  }
+  #profession-tutorial .cd-body {
+    padding: 10px 0;
+  }
+  #profession-tutorial .cd-para {
+    margin: 0 0 8px;
+    color: var(--color-text-light);
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+  #profession-tutorial .cd-para:last-child {
+    margin-bottom: 0;
+  }
+  #profession-tutorial .cd-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
   }
 
   /* ---------- train window ---------- */

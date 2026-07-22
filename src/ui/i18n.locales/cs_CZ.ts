@@ -86,11 +86,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Jak by byl Karetní souboj? Na tři kola, vítěz získá právo chlubit se.',
   'entities.npcs.card_master.name': 'Karetní mistr',
   'entities.npcs.card_master.title': 'Rozdavač osudu',
-  'entities.quests.q_archetype_acceptance.completion':
-    'Slib platí. Tyto dva řemeslné obory jsou nyní tvoje hlavní a znalosti naproti nim se stanou tvým koníčkem.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Vytěžena rudná žíla',
-  'entities.quests.q_archetype_acceptance.text':
-    'Znalost je vědomost, {playerName}, ale ladění je slib. Zvol si dvě sousední řemesla, jejichž metody budeš nést jako svá hlavní, a pak mi přines rudu zpracovanou ve Vale vlastníma rukama.',
   'entities.quests.q_prof_hobby_switch.completion':
     'Lehčí volba, ale užitečná. Následuj tu zvídavost tak daleko, jak vzácná práce dovolí.',
   'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Sklizena bylinkářská záplata',
@@ -102,10 +97,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.objectives.0.label': 'Vytěžena rudná žíla',
   'entities.quests.q_prof_intro.text':
     'Každá duše v Eastbrooku pracuje kromě meče i v nějakém řemesle, {playerName}. V skalách kolem Měděného dolu jihozápadně od města jsou rudné žíly. Jdi si sám zamasat krumpáčem a vytěž jich 5; věř mi, poznám rozdíl.',
-  'entities.quests.q_prof_make_amends.completion':
-    'Starý rytmus se vrací. Tvůj dřívější pár je opět aktivní.',
-  'entities.quests.q_prof_make_amends.text':
-    'Ten pár jsi nesl(a) i dříve, {playerName}. Návrat není nový slib. Pomoz udržovat silnici v Údolí průjezdnou a práce tvým rukám připomene, co kdysi uměly.',
   'gpuNotice.bodyDesktop':
     'Hra běží bez grafické akcelerace a bude pomalá. Aktualizuj ovladače grafiky a restartuj hru. Ve Windows nastav hru na Vysoký výkon v Nastavení, Systém, Displej, Grafika.',
   'gpuNotice.bodyWeb':
@@ -5530,7 +5521,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_aldrics_fallen_star.text':
     'Viděl jsem, jak ze západního nebe spadl kámen, {playerName}. Udeřil do stěny močálu a vybuchl jako výheň, daleko za vdovím houštím. Jdi na západ, najdi, co přežilo výbuch, a přines mi cokoli, co nepatří do tohoto světa.',
   'entities.quests.q_aldrics_fallen_star.title': 'Aldricova spadlá hvězda',
-  'entities.quests.q_archetype_acceptance.title': 'Vlastní řemeslo',
   'entities.quests.q_bandits.completion':
     'O deset nožů ve tmě méně. Vezmi si tohle, zasloužíš si to.',
   'entities.quests.q_bandits.objectives.0.label': 'Bandita z údolí zabit',
@@ -5840,8 +5830,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_palecoil.text':
     'Jeden tvar v plese není žádný utopený člověk. Had barvy kosti klouže po hluboké římse, kde začínají schody, Sethrael, říkají jí opisy, Bledá spirála, vlastní strážná šelma měsíce. Dokud střeží tu vodu, nikdo se k bráně živý nedostane. Sestup na římsu a zabij ji, {playerName}. Vezmi její srdeční šupinu, abych věděl, že je hotovo.',
   'entities.quests.q_palecoil.title': 'Sethrael Bledá spirála',
-  'entities.quests.q_prof_make_amends.objectives.0.label': 'Lesní vlk zabit',
-  'entities.quests.q_prof_make_amends.title': 'Náprava',
   'entities.quests.q_prowler_pelts.completion': 'Dobré silné kožešiny. Hráz teď přežije nás oba.',
   'entities.quests.q_prowler_pelts.objectives.0.label': 'Kožešina slatinného plížence',
   'entities.quests.q_prowler_pelts.text':

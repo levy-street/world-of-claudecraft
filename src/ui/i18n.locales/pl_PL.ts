@@ -86,11 +86,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Masz ochotę na Pojedynek Karciany? Do trzech razy sztuka, zwycięzca bierze chwałę.',
   'entities.npcs.card_master.name': 'Mistrz Kart',
   'entities.npcs.card_master.title': 'Rozdający Los',
-  'entities.quests.q_archetype_acceptance.completion':
-    'Obietnica zostaje dotrzymana. Te dwa rzemiosła stają się teraz twoimi specjalizacjami, a wiedza po przeciwnej stronie kręgu staje się twoim hobby.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Żyła rudy wydobyta',
-  'entities.quests.q_archetype_acceptance.text':
-    'Umiejętność to wiedza, {playerName}, lecz dostrojenie to obietnica. Wybierz dwa sąsiadujące rzemiosła, których metody będziesz nosić jako swoje specjalizacje, a potem przynieś mi rudę wydobytą w Dolinie własnymi rękami.',
   'entities.quests.q_prof_hobby_switch.completion':
     'Lżejszy wybór, ale przydatny. Podążaj za tą ciekawością, tak daleko jak rzadka praca może ją zaprowadzić.',
   'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Łan ziół zebrany',
@@ -102,10 +97,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.objectives.0.label': 'Żyła rudy wydobyta',
   'entities.quests.q_prof_intro.text':
     'Każda dusza w Eastbrook uprawia jakiś fach oprócz miecza, {playerName}. W skałach wokół Miedzianego Wykopu, na południowym zachodzie od miasta, są żyły rudy. Idź i wydobądź własnoręcznie 5 z nich; poznam różnicę.',
-  'entities.quests.q_prof_make_amends.completion':
-    'Dawny rytm powraca. Twoja poprzednia para rzemiosł jest znów aktywna.',
-  'entities.quests.q_prof_make_amends.text':
-    'Nosiłeś już tę parę, {playerName}. Powrót nie jest nową przysięgą. Pomóż utrzymać drogę w Dolinie w czystości, a praca przypomni twoim rękom, co kiedyś umiały.',
   'gpuNotice.bodyDesktop':
     'Gra działa bez akceleracji GPU i będzie wolna. Zaktualizuj sterowniki karty graficznej, a następnie zrestartuj grę. W systemie Windows ustaw grę na Wysoką wydajność w Ustawienia > System > Ekran > Grafika.',
   'gpuNotice.bodyWeb':
@@ -7152,9 +7143,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': 'Cel',
   'hudChrome.options.mobileCameraJoystick': 'Joystick aparatu',
   'hudChrome.options.mobileLeftHanded': 'Układ leworęczny',
-  'entities.quests.q_archetype_acceptance.title': 'Rzemiosło, które możesz nazwać własnym',
-  'entities.quests.q_prof_make_amends.title': 'Zadośćuczynienie',
-  'entities.quests.q_prof_make_amends.objectives.0.label': 'Leśny Wilk zabity',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Każda skrzynia, kufer i błyskotka są bezpieczne w Złoconej Szkatule.',
   'entities.npcs.bursar_aldous_crane.name': 'Skarbnik Aldous Crane',

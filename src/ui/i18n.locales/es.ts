@@ -84,11 +84,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     '¿Un Duelo de Cartas? Al mejor de tres; el ganador se lleva los derechos de presumir.',
   'entities.npcs.card_master.name': 'Maestro de Cartas',
   'entities.npcs.card_master.title': 'Repartidor del Azar',
-  'entities.quests.q_archetype_acceptance.completion':
-    'La promesa se mantiene. Estos dos oficios son ahora tus especializaciones principales, y el conocimiento contrario a ellos pasa a ser tu afición.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Veta de mineral extraída',
-  'entities.quests.q_archetype_acceptance.text':
-    'La destreza es conocimiento, {playerName}, pero la sintonización es una promesa. Elige dos oficios vecinos cuyos métodos llevarás como especializaciones principales, luego tráeme mineral trabajado del Valle con tus propias manos.',
   'entities.quests.q_prof_hobby_switch.completion':
     'Una elección más ligera, pero útil. Sigue esa curiosidad tan lejos como las obras de calidad rara te lleven.',
   'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Mata de hierba recolectada',
@@ -100,10 +95,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.objectives.0.label': 'Veta de mineral extraída',
   'entities.quests.q_prof_intro.text':
     'Cada alma en Eastbrook trabaja un oficio además de la espada, {playerName}. Hay vetas de mineral en las rocas alrededor de la Excavación de Cobre, al suroeste del pueblo. Ve a golpear con el pico y trabaja 5 de ellas tú mismo; lo sabré.',
-  'entities.quests.q_prof_make_amends.completion':
-    'El ritmo antiguo regresa. Tu anterior par de oficios está activo de nuevo.',
-  'entities.quests.q_prof_make_amends.text':
-    'Ya has llevado antes ese par, {playerName}. Volver no es un voto nuevo. Ayuda a mantener despejado el camino del Valle, y el trabajo recordará a tus manos lo que una vez supieron.',
   'gpuNotice.bodyDesktop':
     'El juego se ejecuta sin aceleración de GPU y será lento. Actualiza los controladores de gráficos y reinicia el juego. En Windows, establece también el juego como Alto rendimiento en Configuración > Sistema > Pantalla > Gráficos.',
   'gpuNotice.bodyWeb':
@@ -7260,9 +7251,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': 'Objetivo',
   'hudChrome.options.mobileCameraJoystick': 'Palanca de mando de la cámara',
   'hudChrome.options.mobileLeftHanded': 'Diseño para zurdos',
-  'entities.quests.q_archetype_acceptance.title': 'Un oficio que puedes llamar tuyo',
-  'entities.quests.q_prof_make_amends.title': 'Hacer las paces',
-  'entities.quests.q_prof_make_amends.objectives.0.label': 'Lobo del bosque matado',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Cada cajón, cofre y baratija está a salvo en el Arca Dorada.',
   'entities.npcs.bursar_aldous_crane.name': 'Tesorero Aldous Crane',

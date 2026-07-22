@@ -146,9 +146,9 @@ import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
 import { assetsReady } from './render/assets/preload';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
-import { preloadMechAssets } from './render/characters/assets';
+import { charactersReady, preloadMechAssets } from './render/characters/assets';
 import { skinCount } from './render/characters/manifest';
-import { playerPortraitDataUrl } from './render/characters/portrait';
+import { onPortraitsReady, playerPortraitDataUrl } from './render/characters/portrait';
 import { installWebGLContextRelease } from './render/context_release';
 import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
 import { Renderer } from './render/renderer';
@@ -3497,8 +3497,10 @@ function renderSkinPicker(
   });
 }
 
-/** Give each class button a small portrait preview of that class (run once
- *  character assets are ready so portraits render synchronously). */
+/** Give each class button a small portrait preview of that class. Wired to
+ *  {@link onPortraitsReady} so it runs once portrait.ts's own asset barrier
+ *  resolves (portraits render synchronously from then on); one-shot per chip
+ *  via the .mini-class-portrait guard below, so it is safe to call again. */
 function decorateClassChips(): void {
   document
     .querySelectorAll<HTMLElement>('#charcreate-panel .mini-class, #offline-select .mini-class')
@@ -8962,38 +8964,60 @@ function wireStartScreens(): void {
     syncLandingGraphicsSelect();
   });
 
-  // Initialize 3D character preview once assets are ready
-  assetsReady().then(() => {
-    // Resolve each panel defensively: play.html (online-only) has no #offline-select.
-    const activePanelId = ['#charselect-panel', '#offline-select'].find((id) => {
-      const panel = $(id) as HTMLElement | null;
-      return panel !== null && !panel.hasAttribute('hidden');
-    });
-    const containerId =
-      activePanelId === '#offline-select'
-        ? '#offline-preview-container'
-        : '#online-preview-container';
-    const container = $(containerId);
-    const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
-    if (container && canvas) {
-      characterPreview = new CharacterPreview(container, canvas);
-      // If a token auto-login already rendered the roster and selected a
-      // character before assets finished, show its real appearance; otherwise
-      // fall back to the selected class chip (create/offline panels).
-      if (charselectSelected) {
-        characterPreview.setAppearance(charselectAppearance(charselectSelected));
-      } else {
-        const selSelector =
-          activePanelId === '#offline-select'
-            ? '#offline-select .mini-class.sel'
-            : '#charcreate-panel .mini-class.sel';
-        const selEl = document.querySelector(selSelector) as HTMLElement | null;
-        const cls = selEl ? (selEl.dataset.class as PlayerClass) : 'warrior';
-        characterPreview.setClass(cls);
+  // Give each class chip its portrait as soon as portrait.ts's own (separate,
+  // wider) character-asset barrier resolves, independent of the 3D preview
+  // below. portraitsReady() latches once and decorateClassChips() is one-shot
+  // per chip, so gating this off charactersReady()'s narrower, retried set
+  // (as the 3D preview below does) left it permanently false whenever a
+  // transient failure landed in the wider set portrait.ts actually waits on:
+  // the preview would recover (that is charactersReady()'s job) but every
+  // class chip stayed a plain label for the rest of the page's life.
+  onPortraitsReady(decorateClassChips);
+
+  // Initialize 3D character preview once its assets are ready. Gated on the
+  // narrower charactersReady() (with its own retries), not the site-wide
+  // assetsReady(): that single shared promise covers EVERY registered preload
+  // (terrain, dungeon, foliage, ...), so an unrelated failure there must never
+  // permanently blank the character-creation preview. This previously used
+  // assetsReady().then() with no failure handler at all, so on a cold,
+  // first-visit cache a single transient asset failure anywhere on the site
+  // silently stranded the preview forever (issue: new players saw no
+  // character model on their first load; a reload "fixed" it only because the
+  // browser's HTTP cache was warm by then).
+  charactersReady()
+    .then(() => {
+      // Resolve each panel defensively: play.html (online-only) has no #offline-select.
+      const activePanelId = ['#charselect-panel', '#offline-select'].find((id) => {
+        const panel = $(id) as HTMLElement | null;
+        return panel !== null && !panel.hasAttribute('hidden');
+      });
+      const containerId =
+        activePanelId === '#offline-select'
+          ? '#offline-preview-container'
+          : '#online-preview-container';
+      const container = $(containerId);
+      const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
+      if (container && canvas) {
+        characterPreview = new CharacterPreview(container, canvas);
+        // If a token auto-login already rendered the roster and selected a
+        // character before assets finished, show its real appearance; otherwise
+        // fall back to the selected class chip (create/offline panels).
+        if (charselectSelected) {
+          characterPreview.setAppearance(charselectAppearance(charselectSelected));
+        } else {
+          const selSelector =
+            activePanelId === '#offline-select'
+              ? '#offline-select .mini-class.sel'
+              : '#charcreate-panel .mini-class.sel';
+          const selEl = document.querySelector(selSelector) as HTMLElement | null;
+          const cls = selEl ? (selEl.dataset.class as PlayerClass) : 'warrior';
+          characterPreview.setClass(cls);
+        }
       }
-    }
-    decorateClassChips();
-  });
+    })
+    .catch((err: unknown) => {
+      console.error('character preview assets failed to load, preview will stay blank:', err);
+    });
 }
 
 // Looping home-page theme. Browsers block audio autoplay until a user gesture,

@@ -86,11 +86,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Mau Duel Kartu? Tiga babak terbaik, pemenang mendapat hak membual.',
   'entities.npcs.card_master.name': 'Ahli Kartu',
   'entities.npcs.card_master.title': 'Penyebar Nasib',
-  'entities.quests.q_archetype_acceptance.completion':
-    'Janji itu terpenuhi. Kedua kerajinan ini kini menjadi bidang utamamu, dan pengetahuan di hadapannya menjadi hobimu.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Urat bijih dipanen',
-  'entities.quests.q_archetype_acceptance.text':
-    'Keahlian adalah pengetahuan, {playerName}, namun penyelarasan adalah sebuah janji. Pilih dua kerajinan bertetangga yang caranya akan kamu emban sebagai bidang utama, lalu bawakan aku bijih yang kamu kerjakan dari Lembah dengan tanganmu sendiri.',
   'entities.quests.q_prof_hobby_switch.completion':
     'Pilihan yang lebih ringan, namun berguna. Ikuti rasa ingin tahumu sejauh karya langka dapat membawanya.',
   'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Petak herba dipanen',
@@ -102,10 +97,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.objectives.0.label': 'Urat bijih dipanen',
   'entities.quests.q_prof_intro.text':
     'Setiap jiwa di Eastbrook menekuni perdagangan selain pedang, {playerName}. Ada urat bijih di bebatuan sekitar Galian Tembaga, barat daya kota. Pergi ayunkan beliung dan kerjakan 5 di antaranya sendiri, ingat; aku tahu bedanya.',
-  'entities.quests.q_prof_make_amends.completion':
-    'Irama lama kembali. Pasangan lamamu aktif kembali.',
-  'entities.quests.q_prof_make_amends.text':
-    'Kamu pernah membawa pasangan itu sebelumnya, {playerName}. Kembali bukan sumpah baru. Bantu jaga jalan Lembah tetap bersih, dan pekerjaan itu akan mengingatkan tanganmu apa yang pernah mereka ketahui.',
   'gpuNotice.bodyDesktop':
     'Permainan berjalan tanpa akselerasi GPU dan akan lambat. Perbarui driver grafismu, lalu nyalakan ulang permainan. Di Windows, juga atur permainan ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis.',
   'gpuNotice.bodyWeb':
@@ -7240,9 +7231,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': 'Target',
   'hudChrome.options.mobileCameraJoystick': 'Joystick kamera',
   'hudChrome.options.mobileLeftHanded': 'Tata letak kidal',
-  'entities.quests.q_archetype_acceptance.title': 'Sebuah Kerajinan untuk Disebut Milik Anda',
-  'entities.quests.q_prof_make_amends.title': 'Membuat Perubahan',
-  'entities.quests.q_prof_make_amends.objectives.0.label': 'Serigala Hutan dibunuh',
   'entities.npcs.bursar_aldous_crane.name': 'Bendahara Aldous Crane',
   'entities.npcs.bursar_aldous_crane.title': 'Brankas Bersepuh Emas',
   'entities.npcs.bursar_aldous_crane.greeting':

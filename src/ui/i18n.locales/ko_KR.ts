@@ -3828,18 +3828,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_mogger.completion':
     '마침내 모거가 죽었습니다. 이스트브룩의 들판은 더 안전해졌고, 당신은 전할 만한 이야기를 하나 더 안고 계곡을 떠납니다.',
   'entities.quests.q_mogger.objectives.0.label': '모거 처치',
-  'entities.quests.q_archetype_acceptance.title': '스스로 택하는 기술',
-  'entities.quests.q_archetype_acceptance.text':
-    '기술은 지식이지만, {playerName}, 조율은 약속이라네. 서로 이웃한 두 기술을 주 전공으로 선택하고, 계곡에서 직접 캔 광석을 가져오게.',
-  'entities.quests.q_archetype_acceptance.completion':
-    '약속이 맺어졌네. 이제 이 두 기술이 자네의 주 전공이고, 그 맞은편의 지식은 취미가 되었네.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': '광맥 채굴',
-  'entities.quests.q_prof_make_amends.title': '속죄',
-  'entities.quests.q_prof_make_amends.text':
-    '이 조합은 전에 익힌 적이 있군, {playerName}. 돌아가는 것은 새로운 맹세가 아니지. 계곡 길을 안전하게 지키는 일을 돕고, 손이 예전에 알던 감각을 되찾게.',
-  'entities.quests.q_prof_make_amends.completion':
-    '옛 감각이 돌아왔네. 이전 조합이 다시 활성화되었어.',
-  'entities.quests.q_prof_make_amends.objectives.0.label': '숲늑대 처치',
   'entities.quests.q_prof_hobby_switch.title': '색다른 취미',
   'entities.quests.q_prof_hobby_switch.text':
     '주 전공에는 맹세가 필요하지만, 취미는 호기심이 어디로 향하는지만 묻지, {playerName}. 약초를 조금 채집하고 두 주 전공의 맞은편 기술 중 무엇을 익힐지 정하게.',
@@ -7289,6 +7277,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.',
   'hudChrome.crafting.throttled': '너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.',
   'hudChrome.crafting.recipeNotLearned': '아직 그 제작법을 배우지 않았습니다.',
+  // Professions 2.0 Phase 14 (M16 non-Latin fills).
+  'hudChrome.crafting.attunementReturnCost':
+    '이 조합을 떠나면 나중에 다시 돌아올 때 속죄 과제 {cost}개가 필요합니다.',
+  'hudChrome.crafting.learnMoreAtStation':
+    '{station}의 {master}이(가) 더 많은 {craft} 제작법을 가르쳐 줄 수 있습니다.',
+  'hudChrome.crafting.trendNudge':
+    '당신의 솜씨가 {archetype} 쪽으로 기울고 있습니다. 그 조율 임무는 {master}에게 있습니다.',
+  'hudChrome.crafting.trendNudgeNoMaster':
+    '당신의 솜씨가 {archetype} 쪽으로 기울고 있습니다. 그 길을 택하려면 공예 명인을 찾으세요.',
+  'hudChrome.crafting.attunedZoneLine': '{name}님이 {archetype}(으)로 조율했습니다!',
+  'hudChrome.crafting.attunedBanner': '조율 완료: {title}',
+  'hudChrome.crafting.tierTutorial.title': '첫 티어',
+  'hudChrome.crafting.tierTutorial.tierCap':
+    '기술은 숙련도 {skill}에서 첫 티어에 도달하며, 티어가 오를수록 만들 수 있는 것이 좋아집니다. 하지만 기술이 희귀 이상의 작품을 만들 수 있는 것은 그것이 당신의 두 주 전공 중 하나일 때뿐입니다.',
+  'hudChrome.crafting.tierTutorial.radar':
+    '당신의 전문 기술은 바퀴를 이룹니다. 인접한 한 쌍에 조율하면 그 두 기술은 상한 없는 주 전공이 되고, 바퀴 반대편의 한 기술은 희귀 상한의 취미가 되며, 나머지는 비활성 상태가 됩니다. 그 지식은 유지되지만 다시 택하기 전까지는 일반 상한이 적용됩니다.',
+  'hudChrome.crafting.tierTutorial.masters':
+    '마을의 공예 명인들이 조율 임무를 제공합니다. 준비가 되면 찾아가 당신의 조합을 선택하세요. 배운 것은 결코 사라지지 않습니다.',
+  'hudChrome.crafting.tierTutorial.dismiss': '알겠습니다',
   'hudChrome.crafting.skillReqLine': '{craft} {skill} 필요',
   'hudChrome.crafting.difficultyFull': '숙련도 전량 상승',
   'hudChrome.crafting.difficultyReduced': '숙련도 상승 감소',
@@ -8489,4 +8496,171 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.targetTitle': '마법부여할 아이템을 선택하세요',
   'hudChrome.enchanting.noEnchants': '이 재료를 사용하는 마법부여가 없습니다.',
   'hudChrome.enchanting.noTargets': '마법부여할 수 있는 아이템이 없습니다.',
+  // Professions 2.0 Phase 14 attunement quests + master tier letters (ko_KR M16 fills).
+  'entities.quests.q_prof_attune_smith.title': '대장장이의 약속',
+  'entities.quests.q_prof_attune_smith.text':
+    '강철은 흔들리는 손을 용서하지 않지. 그러니 무엇을 맹세하기 전에 분명히 일러 두겠다. 내 화로에 몸을 맡기면 무기 제작과 방어구 제작이 네 두 주 전공이 되고, 희귀 등급 작업 너머로 끌고 갈 수 있는 기술은 그 둘뿐이다. 수레바퀴 반대편의 기술은 취미로 곁에 남아 희귀 등급까지만 닿고 더는 못 간다. 나머지 생업이 불타 사라지는 것은 아니다, {playerName}. 그저 조용히 잠들어, 네가 다시 부를 때까지 잠든 채로 있을 뿐이다. 그리고 망치가 떨어지기 전에 알아 두어라. 이 짝을 버리고 다른 짝으로 옮겼다가 돌아오려면 정직한 노동으로 기어 돌아와야 한다. 처음 돌아올 땐 적 다섯을 쓰러뜨리고, 다음엔 여덟, 그다음엔 열하나, 벗어날수록 매번 더 무거워진다. 아직 여기 서 있느냐? 그렇다면 베일에서 네 손으로 직접 캐낸 광맥 셋을 가져오너라. 그러면 약속이 맺어진 것으로 하겠다.',
+  'entities.quests.q_prof_attune_smith.completion':
+    '좋은 광석이고, 그것을 다룰 좋은 손이로군. 이제 무기 제작과 방어구 제작은 네가 통달할 몫이다. 나머지는 스스로 얻어 내라.',
+  'entities.quests.q_prof_attune_smith.objectives.0.label': '광맥 채굴',
+  'entities.quests.q_prof_attune_outfitter.title': '의복 장인의 자',
+  'entities.quests.q_prof_attune_outfitter.text':
+    '자르기 전에 값을 재어라, 그것이 내 베틀의 첫 번째 규칙이다. 나를 택하면 가죽세공과 재봉이 네 두 주 전공이 되어 희귀 등급 작업 너머로 끌고 갈 수 있는 짝이 되고, 그 맞은편 기술은 취미로 곁에 남아 희귀 등급까지 닿은 뒤 그 자리에 머문다. 네가 잠시 내려놓는 생업은 풀려 흩어지는 것이 아니라, {playerName}, 그저 개켜 넣어 두는 것이니 다시 손에 잡을 때까지 잠들어 있을 뿐이다. 다만 분명히 새겨 두어라. 이 짝을 떠났다가 훗날 되찾고자 하면 돌아오는 길은 매번 더 길어지는 노동으로 치러야 한다. 처음엔 넷을 솎아 내고, 다음엔 여덟, 그다음엔 열하나, 언제나 조금씩 더. 마음을 정했다면 흑거미줄 잠복자 넷을 솎아 그 실을 베틀로 가져오너라. 좋은 실이 있어야 좋은 옷이 시작되는 법이니.',
+  'entities.quests.q_prof_attune_outfitter.completion':
+    '고른 실, 고른 손이로군. 이제 가죽세공과 재봉은 네 솜씨가 닿는 데까지 끌고 갈 수 있는 네 것이다. 두 번 재어라, 그러면 결코 너를 저버리지 않을 것이다.',
+  'entities.quests.q_prof_attune_outfitter.objectives.0.label': '흑거미줄 잠복자 처치',
+  'entities.quests.q_prof_attune_apothecary.title': '간직할 만한 요리법',
+  'entities.quests.q_prof_attune_apothecary.text':
+    '좋은 요리는 서로 어울리는 두 가지 맛이지, 좋은 기술도 마찬가지라네, {playerName}. 나와 함께 앉으면 연금술과 요리가 자네의 두 주 전공이 되어, 희귀 등급 작업 너머까지 뭉근히 끓일 수 있는 둘이 된다네. 수레바퀴 저편의 기술은 자네의 취미라, 희귀 등급까지 간을 맞추고 그 이상 불은 올리지 않지. 나머지 생업은 식료품 창고에 넣어 두는 셈이야. 잠들어 있을 뿐 상하지 않으니, 다시 꺼낼 때 언제든 그대로일세. 냄비가 아직 식어 있을 때 미리 일러 두지. 다른 짝으로 떠돌다 돌아오는 일은 점점 커지는 잡일이야. 처음엔 짐승 다섯을 처리하고, 다음엔 여덟, 그다음엔 열하나, 한 그릇 더할 때마다 무거워진다네. 그래도 군침이 도나? 그렇다면 야생 멧돼지 넷을 잡아 오게. 제대로 된 부엌은 좋은 고기에서 시작하는 법이니.',
+  'entities.quests.q_prof_attune_apothecary.completion':
+    '이거야말로 고기가 제대로 붙은 시작이로군. 이제 연금술과 요리는 자네가 원하는 만큼 높이 요리할 수 있는 자네 것일세. 배고플 때 또 오게.',
+  'entities.quests.q_prof_attune_apothecary.objectives.0.label': '야생 멧돼지 사냥',
+  'entities.quests.q_prof_attune_bombardier.title': '불안정한 계약',
+  'entities.quests.q_prof_attune_bombardier.text':
+    '오, 오, 좋은 거, 요란한 거 원하지, 응? 들어 봐, 들어 봐, 째깍거리는 건 아무것도 만지기 전에 말이야. 한마디만 하면 기계공학과 연금술이 네 두 주 전공이 되고, 희귀 등급 작업 너머로 밀어붙일 수 있는 건 딱 그 둘뿐이야(바로 거기서 재밌어지거든, 날 믿어). 반대편 기술은 취미로 주머니에 넣어 둬, 희귀 등급까지만, 더는 안 돼, 삐치지 말고. 네 다른 생업? 사라진 거 아니야, {playerName}, 그냥 낮잠 자는 거야, 잠들어 있는 거지, 언제든 깨우면 돼. 그런데(언제나 그런데가 있지, 도화선 붙잡아) 이 짝을 내팽개치고 나중에 뒤뚱뒤뚱 돌아오면 땀값이 쌓여. 처음엔 다섯을 쓰러뜨리고, 다음엔 여덟, 그다음엔 열하나, 더, 더, 겁먹고 발 뺄 때마다 매번. 할래? 할 거야? 그럼 가서 약초 군락 셋을 뜯어 와, 불안정한 놈들로, 어느 거냐고 묻지 마, 충분히 믿으면 다 조금씩 불안정하니까.',
+  'entities.quests.q_prof_attune_bombardier.completion':
+    '하. 시약이야, 진짜배기, 게다가 손가락도 다 붙어 있어, 좋아, 좋아. 기계공학과 연금술, 네 거야, 가서 후회할 만한 걸 하나 만들어 봐. 어서 가.',
+  'entities.quests.q_prof_attune_bombardier.objectives.0.label': '약초 군락 채집',
+  'entities.quests.q_prof_amends_smith.title': '다시 화로 앞으로',
+  'entities.quests.q_prof_amends_smith.text':
+    '그래, 다시 화로 앞으로 돌아왔군. 서운하지 않은 척은 않겠다, {playerName}. 하지만 나는 공정한 손이고, 일 또한 공정하다. 돌아오는 값은 알 테지. 노동이다, 그리고 벗어난 횟수만큼 매번 더 무거운. 북쪽 길을 물어뜯는 늑대들을 쓰러뜨려라. 그 팔놀림이 이 짝이 한때 네 팔에 무엇을 요구했는지 다시 일깨워 줄 것이다.',
+  'entities.quests.q_prof_amends_smith.completion':
+    '손에 다시 박자가 돌아왔군. 무기 제작과 방어구 제작이 다시 네 주 전공이다. 떠나는 것을 버릇 들이지 마라.',
+  'entities.quests.q_prof_amends_smith.objectives.0.label': '숲늑대 처치',
+  'entities.quests.q_prof_amends_outfitter.title': '다시 이은 실',
+  'entities.quests.q_prof_amends_outfitter.text':
+    '결국 다시 내 베틀 앞이로군. 원한은 없다, {playerName}. 다만 실은 자신을 놓아 버린 손을 기억하고, 그것을 다시 잡는 값은 매번 더 길게 재어진다. 서쪽 숲을 뒤덮은 흑거미줄 잠복자들을 솎아 내라. 그 노동이 좋은 실을 다시 만지기 전에 네 손을 가라앉혀 줄 것이다.',
+  'entities.quests.q_prof_amends_outfitter.completion':
+    '다시 흔들림이 없군. 가죽세공과 재봉이 주 전공으로 네 손에 돌아왔다. 이번에는 떠돌기 전에 두 번 재어라.',
+  'entities.quests.q_prof_amends_outfitter.objectives.0.label': '흑거미줄 잠복자 처치',
+  'entities.quests.q_prof_amends_apothecary.title': '다시 화덕 위로',
+  'entities.quests.q_prof_amends_apothecary.text':
+    '이런, 누가 다시 내 냄비 앞에 왔나 보게. 서운한 것 없네, {playerName}, 부엌에는 늘 자리가 있으니까. 다만 걸어 나갈 때마다 외상값이 길어지는 건 자네도 알 테지. 동쪽 초원의 야생 멧돼지를 솎아 오게. 정직한 땀이 첫 번째 재료이고, 그것이 자네 손에 이 일을 다시 일깨워 줄 걸세.',
+  'entities.quests.q_prof_amends_apothecary.completion':
+    '옛 맛이 다시 나는군. 연금술과 요리가 주 전공으로 자네 화덕 위에 돌아왔네. 이번엔 좀 오래 머물게.',
+  'entities.quests.q_prof_amends_apothecary.objectives.0.label': '야생 멧돼지 사냥',
+  'entities.quests.q_prof_amends_bombardier.title': '불어나는 장부',
+  'entities.quests.q_prof_amends_bombardier.text':
+    '돌아왔구나, 하, 다들 결국 돌아와, 요란한 건 끌어당기는 힘이 있거든, 응? 나야 삐치지 않아, {playerName}, 그런데 장부, 아 그 장부, 네가 빠져나갈 때마다 불어나, 돌아올 때마다 더, 그게 공평한 거지. 가서 굴착장의 깊은바위 채굴꾼들을 싹 치워 줘, 땀 먼저, 불꽃은 나중, 그게 방금 내가 만든 규칙이야.',
+  'entities.quests.q_prof_amends_bombardier.completion':
+    '바로 그거야, 손이 다시 근질거리지. 기계공학과 연금술, 다시 주 전공이야, 어서, 가서 한 방 터뜨려. 이번엔 좀 붙어 있어 봐, 응?',
+  'entities.quests.q_prof_amends_bombardier.objectives.0.label': '깊은바위 채굴꾼 소탕',
+  'entities.quests.q_prof_workorder_forge.title': '화로 작업 의뢰',
+  'entities.quests.q_prof_workorder_forge.text':
+    '화로는 늘 먹여 달라 보채지, {playerName}. 구리 광석 여덟 덩이를 가져오면 그 수고에 값을 치러 주겠다. 격식은 없다, 그저 광석과 동전뿐이다.',
+  'entities.quests.q_prof_workorder_forge.completion':
+    '좋은 무게에 찌꺼기도 없군. 여기 네 몫이다. 화로는 머지않아 또 배고파질 게다.',
+  'entities.quests.q_prof_workorder_forge.objectives.0.label': '구리 광석 납품',
+  'entities.quests.q_prof_workorder_kitchens.title': '주방 작업 의뢰',
+  'entities.quests.q_prof_workorder_kitchens.text':
+    '내 식료품 창고가 헐쑥해 보이는군, {playerName}. 그리고 헐쑥한 창고는 심술궂은 요리사를 만들지. 야생 고기 여덟 덩이를 가져다주면 자네 몫의 동전이 있네. 덤으로 변치 않는 내 고마움도 있고. 값어치는 덜하지만 맛은 더 좋다네.',
+  'entities.quests.q_prof_workorder_kitchens.completion':
+    '이제야 창고가 가득하군. 여기 자네 삯일세. 가방이 또 묵직해지면 다시 오게.',
+  'entities.quests.q_prof_workorder_kitchens.objectives.0.label': '야생 고기 납품',
+  'entities.quests.q_prof_workorder_loom.title': '베틀 작업 의뢰',
+  'entities.quests.q_prof_workorder_loom.text':
+    '베틀이 비었고, 노는 손은 대낮을 허비하지, {playerName}. 거미 비단 여섯 타래를 가져오면 동전 한 닢까지 헤아려 공정한 삯을 치러 주겠다.',
+  'entities.quests.q_prof_workorder_loom.completion':
+    '고운 실에, 고르게 자았군. 정확히 헤아린 네 동전이다. 베틀이 고마워하고, 나 또한 그렇다.',
+  'entities.quests.q_prof_workorder_loom.objectives.0.label': '거미 비단 납품',
+  'entities.quests.q_prof_workorder_toolworks.title': '공방 작업 의뢰',
+  'entities.quests.q_prof_workorder_toolworks.text':
+    '자루에 손잡이에 개머리판까지, 나무를 마치 한물간 물건처럼 써 대는데, 절대 안 그래, 나무는 영원하다고, {playerName}. 무쇠껍질나무 통나무 여덟 개를 끌고 오면 값을 쳐 주지, 동전, 진짜 동전, 인심 쓰는 게 아니라, 약속해, 대체로.',
+  'entities.quests.q_prof_workorder_toolworks.completion':
+    '완벽해, 완벽해, 결도 곧고 썩지도 않았어. 자, 네 동전, 봐, 나는 약속을 지키지(대체로). 나무에 발이 걸리거든 더 가져와.',
+  'entities.quests.q_prof_workorder_toolworks.objectives.0.label': '무쇠껍질나무 통나무 납품',
+  'entities.quests.q_prof_workorder_tannery.title': '무두질장 작업 의뢰',
+  'entities.quests.q_prof_workorder_tannery.text':
+    '통이 비었다. 거친 가죽 여덟 장을 가져와라. 가져오면 동전.',
+  'entities.quests.q_prof_workorder_tannery.completion':
+    '좋은 가죽이다. 삯은 공정하다. 더 생기면 또.',
+  'entities.quests.q_prof_workorder_tannery.objectives.0.label': '거친 가죽 납품',
+  'entities.quests.q_prof_workorder_apothecary.title': '약방 작업 의뢰',
+  'entities.quests.q_prof_workorder_apothecary.text':
+    '내 선반에는 금빛잎이 필요하고, 시장의 물건은 예상대로 불순물이 섞여 있다. 금빛잎 약초 여섯을 멍들지 않은 채로 가져오면 정확히 값을 치러 주겠다. 멍든 잎은 받지 않으니, 가방을 잘 간수해라.',
+  'entities.quests.q_prof_workorder_apothecary.completion':
+    '받을 만하군. 효능도 있고, 다룸새도 제대로다. 동전 단위까지 헤아린 네 삯이다. 우쭐하지는 마라, 그건 전혀 다른 시약의 일이니.',
+  'entities.quests.q_prof_workorder_apothecary.objectives.0.label': '금빛잎 약초 납품',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_1.subject': '눈여겨볼 불씨 하나',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_1.body':
+    '네 주 전공 하나가 이제 고급 등급 작업에 이르렀다는 소식이 내 화로에 닿았다. 긴 오르막에서 가장 낮은 디딤대이지만, 너는 그것을 부탁이 아니라 모루 앞에서 얻어 냈다. 불을 뜨겁게 지켜라.',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_2.subject':
+    '희귀 등급 작업, 스스로 얻은',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_2.body':
+    '네 주 전공 하나가 희귀 등급 작업에 이르렀다고 하더군. 그 디딤대에서 어설픈 손들은 떨어져 나가고 진짜 대장장이만 남는다. 너는 아직 서 있다. 좋다.',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_3.subject': '이제 쇠가 네게 응한다',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_3.body':
+    '네 주 전공 하나가 희귀 등급을 넘어 제법 묵직한 작업에 올라섰다. 쇠는 그런 손에 응하며, 더는 맞서지 않는다. 칭찬에 팔이 물러지게 두지 마라.',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_4.subject': '사다리 꼭대기 가까이',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_4.body':
+    '네 주 전공 하나가 통달 바로 한 디딤대 아래에 서 있다. 내가 아는 손 중 이 높이에 닿은 이는 드물고, 여기서 날을 지켜 낸 이는 더 드물다. 오르막을 끝까지 올라라.',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_5.subject': '마침내, 통달',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_5.body':
+    '네 주 전공 하나가 통달에 이르렀다. 손이 오를 수 있는 가장 높은 곳이다. 나는 칭찬을 헤프게 하지 않으니 이 말은 한 번만 하겠다. 화로가 너를 자랑스러워한다. 이제 가서 불에게 새로운 것을 가르쳐라.',
+  'entities.letters.prof_tier_leatherworking_tailoring_1.subject': '고른 첫 줄',
+  'entities.letters.prof_tier_leatherworking_tailoring_1.body':
+    '네 주 전공 하나가 고급 등급 작업에 이르렀다고 길드가 적어 두었다. 수많은 줄 가운데 첫 줄에 지나지 않으나, 고르고 반듯하다. 다음 줄도 그만큼 신중히 재어라.',
+  'entities.letters.prof_tier_leatherworking_tailoring_2.subject': '잘 재어 낸 희귀 등급 작업',
+  'entities.letters.prof_tier_leatherworking_tailoring_2.body':
+    '네 주 전공 하나가 희귀 등급 작업에 올랐다. 그 자리에서는 부주의한 손이 놓친 한 땀 한 땀을 다 드러내는데, 네 손은 그렇지 않았다. 나는 조용히 흡족하다.',
+  'entities.letters.prof_tier_leatherworking_tailoring_3.subject': '무늬가 또렷해진다',
+  'entities.letters.prof_tier_leatherworking_tailoring_3.body':
+    '네 주 전공 하나가 희귀 등급을 넘어 한층 정교한 작업에 들어섰다. 이 경지의 손에는 무늬가 또렷해지고, 더는 어림하지 않아도 된다. 계속 두 번씩 재어라.',
+  'entities.letters.prof_tier_leatherworking_tailoring_4.subject': '꼭대기에서 한 줄',
+  'entities.letters.prof_tier_leatherworking_tailoring_4.body':
+    '네 주 전공 하나가 통달에서 한 줄 모자란 자리에 앉아 있다. 마지막 줄은 언제나 고르게 지키기가 가장 어렵다. 지금 서두르지 마라.',
+  'entities.letters.prof_tier_leatherworking_tailoring_5.subject': '마지막 한 땀',
+  'entities.letters.prof_tier_leatherworking_tailoring_5.body':
+    '네 주 전공 하나가 통달에 이르렀다. 나는 무엇이든 그러하듯 네 솜씨를 두 번 재었고, 흔들림이 없었다. 마지막 한 땀을 이토록 깔끔하게 매듭짓는 손은 드물다. 나는 자랑스럽고, 그런 말을 가볍게 하지 않는다.',
+  'entities.letters.prof_tier_alchemy_cooking_1.subject': '앞날의 맛보기',
+  'entities.letters.prof_tier_alchemy_cooking_1.body':
+    '자네 주 전공 하나가 고급 등급 작업에 이르렀다는 소식이 내 주방까지 흘러왔네. 첫 맛일 뿐 그 이상은 아니지만, 기대할 만한 맛이야. 냄비를 계속 저어 두게.',
+  'entities.letters.prof_tier_alchemy_cooking_2.subject': '희귀 등급 작업, 눌어붙은 자리 하나 없이',
+  'entities.letters.prof_tier_alchemy_cooking_2.body':
+    '자네 주 전공 하나가 뭉근히 끓어 희귀 등급 작업까지 올랐다더군. 그 불에서 대부분의 요리사는 음식을 태워 먹는데, 자네는 그러지 않았어. 좀 앉게, 다만 오래는 말고.',
+  'entities.letters.prof_tier_alchemy_cooking_3.subject': '이제야 제대로 요리로군',
+  'entities.letters.prof_tier_alchemy_cooking_3.body':
+    '자네 주 전공 하나가 보글보글 희귀 등급을 넘어 진짜 깊은 맛에 들어섰네. 흔히들 말하듯, 이제야 제대로 요리로군. 대담하게 간을 맞추고 계속 맛을 보게.',
+  'entities.letters.prof_tier_alchemy_cooking_4.subject': '잔칫상에서 한 코스 모자란',
+  'entities.letters.prof_tier_alchemy_cooking_4.body':
+    '자네 주 전공 하나가 통달에서 딱 한 코스 모자라네. 마지막 한 코스는 언제나 가장 진하고, 또 넘치게 하기 가장 쉽지. 국자를 쥔 손을 흔들리지 말게.',
+  'entities.letters.prof_tier_alchemy_cooking_5.subject': '통달, 뜨겁게 차려 낸',
+  'entities.letters.prof_tier_alchemy_cooking_5.body':
+    '자네 주 전공 하나가 통달에 이르렀네. 온 식료품 창고에서 가장 높은 선반이지. 나야 누구든 먹이지만, 요리로 여기까지 올라오는 이는 드물어. 정말로, 자네가 자랑스럽네. 이제 가서 식탁 앞에서 눈물 쏟게 할 무언가를 만들어 보게.',
+  'entities.letters.prof_tier_engineering_alchemy_1.subject': '첫 불꽃이야, 하',
+  'entities.letters.prof_tier_engineering_alchemy_1.body':
+    '어이, 숫자가 그러는데 네 주 전공 하나가 방금 고급 등급 작업을 찍었대, 별거 아냐, 쬐끄맣지, 그래도 팡 터졌잖아, 응? 첫 불꽃이 늘 제일 귀엽지. 불꽃 더. 가.',
+  'entities.letters.prof_tier_engineering_alchemy_2.subject': '희귀, 오, 희귀',
+  'entities.letters.prof_tier_engineering_alchemy_2.body':
+    '네 주 전공 하나가 희귀 등급 작업까지 올랐다더라, 그리고 희귀부터가 제대로 위험해지기 시작하는 데야(좋은 쪽으로). 대부분은 재밌어지기 전에 그만두거든. 넌 아니야. 하.',
+  'entities.letters.prof_tier_engineering_alchemy_3.subject': '이제부터 요란해진다',
+  'entities.letters.prof_tier_engineering_alchemy_3.body':
+    '네 주 전공 하나가 희귀 등급을 뻥 뚫고 진지한 영역으로 넘어갔어, 오 여기서부터 요란해지는 거야. 지금 멈추지 마, 뭘 하든, 기세가 전부야, 도화선도 그렇고.',
+  'entities.letters.prof_tier_engineering_alchemy_4.subject': '꼭대기에서 한 디딤대, 딱 하나',
+  'entities.letters.prof_tier_engineering_alchemy_4.body':
+    '네 주 전공 하나가 통달 바로 한 디딤대 아래야, 하나, 딱 하나, 웅웅 울리는 거 느껴져? 마지막 한 걸음이 제일 큰 폭발이야. 눈 깜빡이지 마.',
+  'entities.letters.prof_tier_engineering_alchemy_5.subject': '통달이야, 콰광',
+  'entities.letters.prof_tier_engineering_alchemy_5.body':
+    '네 주 전공 하나가 통달을 찍었어, 바로 그 꼭대기, 콰광, 사다리 통째로, 끝. 나는 칭찬 같은 거 안 나눠 줘, 도화선을 나눠 주지, 그런데 여기, 둘 다 받아. 넌 눈부시고 살짝 무서워. 가서 산들이 조마조마하게 만들어.',
+  // Professions 2.0 Phase 14 master tier-letter senders (localized NPC names).
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_1.sender': '단조사 다르바',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_2.sender': '단조사 다르바',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_3.sender': '단조사 다르바',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_4.sender': '단조사 다르바',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_5.sender': '단조사 다르바',
+  'entities.letters.prof_tier_leatherworking_tailoring_1.sender': '직조공 오틸리에',
+  'entities.letters.prof_tier_leatherworking_tailoring_2.sender': '직조공 오틸리에',
+  'entities.letters.prof_tier_leatherworking_tailoring_3.sender': '직조공 오틸리에',
+  'entities.letters.prof_tier_leatherworking_tailoring_4.sender': '직조공 오틸리에',
+  'entities.letters.prof_tier_leatherworking_tailoring_5.sender': '직조공 오틸리에',
+  'entities.letters.prof_tier_alchemy_cooking_1.sender': '요리사 말로우',
+  'entities.letters.prof_tier_alchemy_cooking_2.sender': '요리사 말로우',
+  'entities.letters.prof_tier_alchemy_cooking_3.sender': '요리사 말로우',
+  'entities.letters.prof_tier_alchemy_cooking_4.sender': '요리사 말로우',
+  'entities.letters.prof_tier_alchemy_cooking_5.sender': '요리사 말로우',
+  'entities.letters.prof_tier_engineering_alchemy_1.sender': '땜장이 기즐',
+  'entities.letters.prof_tier_engineering_alchemy_2.sender': '땜장이 기즐',
+  'entities.letters.prof_tier_engineering_alchemy_3.sender': '땜장이 기즐',
+  'entities.letters.prof_tier_engineering_alchemy_4.sender': '땜장이 기즐',
+  'entities.letters.prof_tier_engineering_alchemy_5.sender': '땜장이 기즐',
 };

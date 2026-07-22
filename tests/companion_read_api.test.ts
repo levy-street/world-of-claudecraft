@@ -5,7 +5,7 @@
 // is additive with old tokens reading 'full'. main.ts cannot be imported (it
 // boots a server + connects to Postgres on import), so the route coverage is
 // verified structurally rather than over a live socket.
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -16,6 +16,19 @@ process.env.DATABASE_URL ||= 'postgres://test:test@localhost:5432/test';
 const { scopeAllowsMutation, scopeAllowsRead, SCHEMA } = await import('../server/db');
 
 const MAIN = readFileSync(join(__dirname, '..', 'server', 'main.ts'), 'utf8');
+const SERVER_DIR = join(__dirname, '..', 'server');
+
+function serverTypeScriptFiles(dir: string): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) return serverTypeScriptFiles(path);
+    return entry.isFile() && entry.name.endsWith('.ts') ? [path] : [];
+  });
+}
+
+function stripComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+}
 
 describe('token scope policy', () => {
   it('only a full token may mutate', () => {
@@ -39,6 +52,21 @@ describe('migration is additive; old tokens read full', () => {
     // The DEFAULT 'full' on the additive column is what makes every token that
     // predates the scope column read back as a full session.
     expect(SCHEMA).toContain("scope TEXT NOT NULL DEFAULT 'full'");
+  });
+  it('rejects new token rows whose scope is outside the closed scope vocabulary', () => {
+    expect(SCHEMA).toMatch(
+      /CONSTRAINT auth_tokens_scope_check CHECK \(scope IN \('full', 'read'\)\) NOT VALID/,
+    );
+  });
+});
+
+describe('legacy scope-blind resolver removal', () => {
+  it('has no production reference to the removed accountForToken helper', () => {
+    const offenders = serverTypeScriptFiles(SERVER_DIR)
+      .filter((file) => /\baccountForToken\b/.test(stripComments(readFileSync(file, 'utf8'))))
+      .map((file) => file.slice(SERVER_DIR.length + 1))
+      .sort();
+    expect(offenders).toEqual([]);
   });
 });
 

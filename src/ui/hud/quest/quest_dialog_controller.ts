@@ -393,14 +393,22 @@ export class QuestDialogController {
         if (quest.completionEffect?.type === 'switchHobby') {
           return t('hudChrome.crafting.hobbyPreview', { hobby: craftNameText(target) });
         }
-        const preview = buildAttunementPreview(target, identity.craftSkills);
+        const preview = buildAttunementPreview(target, identity.craftSkills, identity.switchCount);
         if (!preview) return '';
-        return t('hudChrome.crafting.attunementPreview', {
+        // The pre-commit picture: majors, hobby, and retained-but-dormant
+        // knowledge, PLUS the escalating make-amends return cost (Phase 14,
+        // closing the 2039 gap). Two complete localized sentences joined, the
+        // combo line + status precedent (crafting_window.ts).
+        const base = t('hudChrome.crafting.attunementPreview', {
           title: archetypeTitleText(preview.target),
           majorA: craftNameText(preview.majors[0]),
           majorB: craftNameText(preview.majors[1]),
           hobby: craftNameText(preview.hobbyCraft),
         });
+        const returnCost = t('hudChrome.crafting.attunementReturnCost', {
+          cost: this.deps.text.number(preview.returnCost),
+        });
+        return `${base} ${returnCost}`;
       };
       const initialPreview = professionTargets[0]
         ? professionPreviewText(professionTargets[0])

@@ -38,8 +38,8 @@
     },
     "vendorBuyback": [{ "itemId": "baked_bread", "count": 1 }],
     "questLog": [
-      { "questId": "q_fixture_active", "counts": [3, 1], "state": "active" },
-      { "questId": "q_fixture_ready", "counts": [5], "state": "ready" }
+      { "questId": "q_spiders", "counts": [3, 1], "state": "active" },
+      { "questId": "q_wolves", "counts": [5], "state": "ready" }
     ],
     "questsDone": ["q_fixture_done"],
     "arenaRating": 1650,

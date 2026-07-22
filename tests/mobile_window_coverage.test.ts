@@ -87,6 +87,8 @@ const MOBILE_WINDOW_EXCEPTIONS: Record<string, string> = {
     'cursor-popped by design: the loot roll popup spawns at the drop, not as a docked sheet',
   'confirm-dialog':
     'small centered modal (dynamic, reused by the input dialog); the base .window centering is correct on touch',
+  'profession-tutorial':
+    'small centered modal (dynamic, the Phase 14 first-tier tutorial); centered and clamped by its own base #profession-tutorial rule plus the shared .window viewport clamp, with its z-index floored above the mobile sheet (96) in JS',
   'delve-rite-panel': 'in-run gameplay overlay, not a menu window that docks to a sheet',
   'lockpick-panel': 'in-run gameplay overlay, not a menu window that docks to a sheet',
   'daily-rewards-window':

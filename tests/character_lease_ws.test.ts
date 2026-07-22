@@ -63,7 +63,7 @@ function makeDeps(opts: { joinResult?: any; hasSession?: boolean; acquireResult?
   };
   const deps: any = {
     game,
-    accountForToken: vi.fn(async () => 1),
+    accountAndScopeForToken: vi.fn(async () => ({ accountId: 1, scope: 'full' as const })),
     moderationStatusForAccount: vi.fn(async () => ({ locked: false, chatStrikes: 0 })),
     getCharacter: vi.fn(async () => character),
     chatMuteStatusForAccount: vi.fn(async () => ({ mutedUntil: null, reason: null })),
@@ -119,8 +119,8 @@ describe('ws auth character load lease', () => {
   });
 
   it('acquires with the AUTHENTICATED account id, never the client-sent character id', async () => {
-    // Distinct fixtures: getCharacter yields character 7, accountForToken yields
-    // account 1, so a positional swap of the two args cannot pass unnoticed.
+    // Distinct fixtures: getCharacter yields character 7, the scoped token lookup
+    // yields account 1, so a positional swap of the two args cannot pass unnoticed.
     const { deps, acquireSpy, joinSpy } = makeDeps();
     const { ws } = fakeWs();
 

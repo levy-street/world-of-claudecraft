@@ -3,6 +3,7 @@ import {
   archetypePairId,
   craftsForPairTarget,
   defaultHobbyForPair,
+  requiredAmendsProgress,
 } from '../sim/professions/archetype';
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import type { CraftingIdentityView } from '../world_api/professions';
@@ -35,6 +36,11 @@ export interface ProfessionIdentityModel {
     hobbyCraft: string | null;
     attunedPairCount: number;
     returnCount: number;
+    // The make-amends cost to return to an abandoned pair right now
+    // (requiredAmendsProgress(returnCount) = 5 + 3 * returnCount): the shared
+    // switch-cost-at-rest value professions_view.ts also derives, surfaced so
+    // the identity card can show the same figure without a second formula.
+    returnCost: number;
   };
   skills: ProfessionSkillRow[];
   tutorial: { targetSkill: number } | null;
@@ -51,6 +57,11 @@ export interface AttunementPreview {
   hobbyCeiling: 'rare';
   otherCeiling: 'common';
   retainsAllSkill: true;
+  // What a FUTURE return to this pair would cost in make-amends progress if the
+  // player later leaves it: requiredAmendsProgress(switchCount), the same shared
+  // formula professions_view.ts's switch-cost-at-rest line uses. Closes the 2039
+  // review gap (the pre-commit picture omitted the escalating return cost).
+  returnCost: number;
 }
 
 export function buildProfessionIdentityView(
@@ -108,6 +119,7 @@ export function buildProfessionIdentityView(
       hobbyCraft: identity.hobbyCraft,
       attunedPairCount: identity.attunedPairs.length,
       returnCount: identity.switchCount,
+      returnCost: requiredAmendsProgress(identity.switchCount),
     },
     skills,
     tutorial: skills.some((row) => row.tier >= 1) ? null : { targetSkill: TIER_SKILL_STEP },
@@ -118,6 +130,7 @@ export function buildProfessionIdentityView(
 export function buildAttunementPreview(
   target: string,
   craftSkills: Readonly<Record<string, number>>,
+  switchCount = 0,
 ): AttunementPreview | null {
   const pair = craftsForPairTarget(target);
   if (!pair) return null;
@@ -129,5 +142,6 @@ export function buildAttunementPreview(
     hobbyCeiling: 'rare',
     otherCeiling: 'common',
     retainsAllSkill: true,
+    returnCost: requiredAmendsProgress(switchCount),
   };
 }

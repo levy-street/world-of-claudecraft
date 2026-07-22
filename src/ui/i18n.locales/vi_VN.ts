@@ -86,11 +86,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Muốn thử Đấu Bài không? Chơi ba ván, người thắng lấy quyền khoe.',
   'entities.npcs.card_master.name': 'Bậc Thầy Bài',
   'entities.npcs.card_master.title': 'Kẻ Chia Bài May Rủi',
-  'entities.quests.q_archetype_acceptance.completion':
-    'Lời hứa đã giữ. Hai kỹ nghệ này nay là chuyên ngành của bạn, và kiến thức đối diện với chúng trở thành sở thích của bạn.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Mỏ quặng đã khai thác',
-  'entities.quests.q_archetype_acceptance.text':
-    'Kỹ năng là kiến thức, {playerName}, nhưng thụ ngộ là một lời hứa. Hãy chọn hai kỹ nghệ liền kề mà bạn sẽ mang theo làm chuyên ngành, rồi mang cho ta quặng được khai thác từ Thung Lũng bằng đôi tay của chính bạn.',
   'entities.quests.q_prof_hobby_switch.completion':
     'Một lựa chọn nhẹ nhàng hơn, nhưng hữu ích. Hãy theo đuổi sự tò mò đó đến khi công việc hiếm có đưa nó đi xa nhất.',
   'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Mảnh thảo dược đã thu hoạch',
@@ -102,10 +97,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.objectives.0.label': 'Mỏ quặng đã khai thác',
   'entities.quests.q_prof_intro.text':
     'Mỗi người ở Eastbrook đều làm một nghề ngoài kiếm, {playerName}. Có những mỏ quặng trong các tảng đá quanh Hố Đồng, phía tây nam thị trấn. Hãy cầm cuốc và tự tay khai thác 5 mỏ, nhé; ta sẽ biết sự khác biệt.',
-  'entities.quests.q_prof_make_amends.completion':
-    'Nhịp điệu cũ trở lại. Đôi kỹ nghệ trước của bạn đã hoạt động trở lại.',
-  'entities.quests.q_prof_make_amends.text':
-    'Bạn đã mang đôi kỹ nghệ đó trước đây rồi, {playerName}. Quay lại không phải là lời thề mới. Hãy giúp giữ con đường Thung Lũng thông thoáng, và công việc sẽ nhắc đôi tay bạn nhớ lại điều chúng từng biết.',
   'gpuNotice.bodyDesktop':
     'Trò chơi đang chạy mà không có tăng tốc GPU và sẽ chậm. Hãy cập nhật trình điều khiển đồ họa, sau đó khởi động lại trò chơi. Trên Windows, hãy đặt trò chơi thành Hiệu suất cao trong Cài đặt > Hệ thống > Màn hình > Đồ họa.',
   'gpuNotice.bodyWeb':
@@ -7172,9 +7163,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': 'Mục tiêu',
   'hudChrome.options.mobileCameraJoystick': 'Cần điều khiển máy ảnh',
   'hudChrome.options.mobileLeftHanded': 'Bố cục thuận tay trái',
-  'entities.quests.q_archetype_acceptance.title': 'Một nghề để gọi riêng của bạn',
-  'entities.quests.q_prof_make_amends.title': 'Sửa đổi',
-  'entities.quests.q_prof_make_amends.objectives.0.label': 'Sói rừng bị giết',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Mọi thùng hàng, rương tiền, và món trang sức đều an toàn trong tay Két Sắt Mạ Vàng.',
   'entities.npcs.bursar_aldous_crane.name': 'Thủ Quỹ Aldous Crane',

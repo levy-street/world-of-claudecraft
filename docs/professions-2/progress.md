@@ -39,7 +39,7 @@ Update this file at the end of every implementation and QA session. Statuses:
 | 12d QA | Verify provenance and the harvest loop | complete (PASS, zero blocking) | 2026-07-21 | 2026-07-21 |
 | 13 | Enchanting reachable | complete (PR #2269 merged into release/v0.29.0) | 2026-07-21 | 2026-07-21 |
 | 13 QA | Verify enchanting reachable | complete (PASS, zero blocking) | 2026-07-21 | 2026-07-21 |
-| 14 | Attunement quests and nudges | not started | | |
+| 14 | Attunement quests and nudges | complete (PR pending review) | 2026-07-21 | 2026-07-21 |
 | 14 QA | Verify attunement quests and nudges | not started | | |
 | 14b | Commissions and the Maker's Bond | not started | | |
 | 14b QA | Verify commissions and the Maker's Bond | not started | | |
@@ -564,12 +564,18 @@ fixes, mobile ctx-menu stacking fix, screenshots, docs.
 - [x] Inherited 12c pacing verified: the shared throttle and quality-tiered gains govern the newly reachable actions (online cross-action attribution pinned)
 
 ### Phase 14: Attunement quests and nudges
-- [ ] Acceptance lore quests at the masters for all four wave-one archetypes
-- [ ] Repeatable-quest support; make-amends wired; cheap-first-switch costs
-- [ ] Trend nudges (chat first, Guild letter voice); attunement summary explains everything before commit
-- [ ] Work-order quests per master (cadence-capped) and one-shot-per-tier master mail
-- [ ] Title celebration on attunement
-- [ ] The crafting-window "learnable at a master" hint (shown exactly when unlearned trainer recipes exist, via the shared viewer predicates)
+Built 2026-07-21 on feature/professions-2-phase-14-attunement, phase-start
+8b7bd4596 (the Phase 13 QA merge). Commit train: content (lore + amends +
+work-order quests, tier letters, retirement), sim (pairId narrowing,
+cadence, nudges, tier mail, celebration events), ui (preview return cost,
+event renders, tutorial panel, hint row), tests (economics, online
+routing, coverage closure), review fixes, screenshots, docs.
+- [x] Acceptance lore quests at the masters for all four wave-one archetypes (pairId-narrowed selection; per-master availability matrix pinned)
+- [x] Repeatable-quest support; make-amends wired; cheap-first-switch costs (5 then 8, through the quest path)
+- [x] Trend nudges (chat first, Guild letter voice); attunement summary explains everything before commit (returnCost on quest dialog and identity card, both hosts)
+- [x] Work-order quests per master (cadence-capped, never gold-positive, pinned against live item data) and one-shot-per-tier master mail (baseline-armed, migration-safe)
+- [x] Title celebration on attunement (banner with the archetype pair title + attunedZone broadcast; the deed itself stays Phase 15)
+- [x] The crafting-window "learnable at a master" hint (shown exactly when unlearned trainer recipes exist, via the shared viewer predicates)
 
 ### Phase 14b: Commissions and the Maker's Bond
 - [ ] Commission opt-in at craft; the marker rides the instance in both hosts
@@ -1345,3 +1351,70 @@ probes itself (confirm-dialog keyboard arc, picker captures).
 - Deferred as maintainer calls: salvage skill-gain absence (by design?),
   mid-trade enchant not resetting accept flags, all-enchanted disenchant
   row UX, generic mail/market bound-deny copy (#1146).
+
+Phase 14 (2026-07-21): built. Phase-start commit 8b7bd4596 (the Phase 13
+QA merge PR #2273, the release/v0.29.0 tip); branch
+feature/professions-2-phase-14-attunement in a fresh worktree. Four-agent
+build (content, sim, ui, tests) plus a five-reviewer dispatch-matrix pass
+(architecture, cross-platform-sync, frontend-seam, migration-safety,
+privacy-security; database-performance skipped, no database work in the
+diff). Review outcome: one CRITICAL (migration-safety) caught and fixed
+test-first: retiring the placeholder quests made unknown questLog ids
+fatal on the next inventory/credit/interact deref, so the load path now
+prunes unknown quest ids (tests/quest_log_normalization.test.ts); one
+frontend should-fix (the Esc-path managed close orphaned the tutorial
+modal's focus trap) fixed on the confirm-dialog precedent; the
+architecture should-fix dissolved on verification (the celebration-less
+acceptArchetypeQuest/switchArchetype IWorld members have no UI caller and
+are ClientWorld no-ops, already on the Phase 15 retirement list).
+Decisions recorded in state.md New surfaces: the attunePair pairId
+whitelist NARROWING, the zero-default-omission persistence trio with its
+rollback caveat, the non-wave-one no-return-path consequence, the
+in-memory nudge cadence restart reset, and the letterId derivation.
+Deferred: nothing. #1295's arms are complete (issue already closed);
+#2058's quests arm lands here (close by hand at merge if the maintainer
+agrees the stations parent is satisfied by Phases 8+9+14).
+
+Phase 14 QA (2026-07-21): PASS with followups, one real fix. QA diff
+8b7bd4596..3219f69cd (build phase-start to the PR #2280 merge, the
+release/v0.29.0 tip); fix branch fix/professions-2-phase-14-qa. Every
+deliverable and STEP 5 acceptance criterion verified against real code;
+validation rows green (tsc, the content and sim matrix rows, the 2039
+attunement suites, the S3 guard with all four new sim modules plus
+quest_commands.ts on the scan list, i18n completeness, wiki:content and
+i18n:gen freshness, ci:changed, parity goldens unchanged). Fan-out:
+STEP 1 context loader, a 10-agent audit Workflow (correctness, test
+coverage, dead code, plus architecture, cross-platform-sync,
+frontend-seam, migration-safety, privacy-security,
+database-performance, qa-checklist), then 5 parallel test writers; the
+correctness agent walked a live offline Sim through nudge, attune,
+celebration, cheap switch, escalating amends, whitelist rejection, and
+a real repeated work-order turn-in at the exact boundary tick.
+- REAL FIX (sim, test-first): the amends escalation could be dodged by
+  banking. resolvedCounts is stamped at accept and turn-in never
+  re-resolves it, and new-pair attunes are free (switchCount stays 0),
+  so a player with three pairs in history could hold both open amends
+  quests at counts [5] and turn the second in after the first return
+  raised switchCount, paying 5 where a fresh accept resolves 8. The
+  shared computeQuestState now hides every OTHER attunePair-effect
+  quest while one is active (one pending identity transition at a
+  time), on both hosts and the server accept gate alike.
+- Coverage arms closed test-first by the audit: the online cprof
+  UNBLOCK arm (a lapsed window empties cadenceBlockedQuests on a set
+  SHRINK re-emit, end to end into the bareClient mirror), a second full
+  work-order accept-and-turn-in cycle, cadence load-clamp and arm
+  boundaries, the single-cadence-constant catalog pin (a second
+  repeatCadenceTicks value would silently mis-clamp on tick-reset
+  load), tier-mail over-cap and skill-drop re-cross negatives, the
+  above-threshold trend nudge (deliberate lower-bar semantics), the
+  optimistic-state cadence and busy-gate cases, the mid-quest 'active'
+  matrix arm, the HUD render sink for all four text-free events (raw
+  pairId can never leak to chat), and tutorial Esc reachability.
+- Deferred to #2285 (all cosmetic/hygiene): the veteran first-tier
+  tutorial baseline decision, a work-order cooldown legibility line,
+  tier-mail unknown-key load hardening, serialize-time cadence pruning.
+- Verified-not-refixed accepted consequences: zone celebration
+  broadcast noise (the masterworkZone precedent), the in-memory nudge
+  cadence restart reset, the v0.29.0 rollback key-drop caveat, the
+  non-wave-one no-return-path pin, and the ClientWorld no-op legacy
+  members awaiting Phase 15 retirement.

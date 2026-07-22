@@ -14,7 +14,7 @@
 // server/db.ts builds a pg Pool at module load and throws if DATABASE_URL is unset;
 // reports.ts (via perf_report.ts) imports it, so set a dummy URL. The pool never
 // connects: insertClientPerfReport / recordSitePresence are vi.fn fakes, and the
-// happy-path requests carry no bearer so perf-report's accountForToken / getCharacter
+// happy-path requests carry no bearer so perf-report's scoped lookup / getCharacter
 // reads are never reached.
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase15_telemetry';
 
@@ -30,7 +30,7 @@ import { routes } from '../../server/reports';
 import { type FakeRes, fakeCtx } from './helpers';
 
 // perf-report self-reads its body and, for an authed caller only, reads
-// accountForToken / getCharacter; our happy-path requests carry no bearer, so only
+// accountAndScopeForToken / getCharacter; our happy-path requests carry no bearer, so only
 // insertClientPerfReport is reached. Replace it with a fake; the ...actual spread
 // keeps every other db export real.
 vi.mock('../../server/db', async (importActual) => {

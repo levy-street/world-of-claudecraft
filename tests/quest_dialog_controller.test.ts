@@ -226,42 +226,50 @@ describe('QuestDialogController', () => {
   });
 
   it('previews and dispatches the selected profession attunement target', () => {
-    const smith = npc(32, 'smith_haldren');
-    smith.questIds = ['q_archetype_acceptance'];
-    const test = harness(smith, 'available');
-    test.controller.open(smith.id);
-    test.element.querySelector<HTMLButtonElement>('[data-quest="q_archetype_acceptance"]')?.click();
+    // Phase 14: each wave-one attune quest pins one pair, so the Smith acceptance
+    // quest at Forgemistress Darva narrows the selector to exactly its pair.
+    const darva = npc(32, 'forgemistress_darva');
+    darva.questIds = ['q_prof_attune_smith'];
+    const test = harness(darva, 'available');
+    test.controller.open(darva.id);
+    test.element.querySelector<HTMLButtonElement>('[data-quest="q_prof_attune_smith"]')?.click();
 
     const select = test.element.querySelector<HTMLSelectElement>('[data-profession-selection]');
     const preview = test.element.querySelector<HTMLElement>('[data-profession-preview]');
-    expect(select?.options).toHaveLength(10);
+    // The pinned pair is the only legal target for an unattuned player.
+    expect(select?.options).toHaveLength(1);
     expect(preview?.textContent).toBeTruthy();
 
     if (!select) throw new Error('profession selector missing');
-    // The option labels lead with the pair archetype name and keep both craft
-    // names visible, e.g. "Bladewright (Jewelcrafting + Weaponcrafting)".
-    const option = [...select.options].find((o) => o.value === 'jewelcrafting+weaponcrafting');
-    expect(option?.textContent).toBe('Bladewright (Jewelcrafting + Weaponcrafting)');
-    select.value = 'jewelcrafting+weaponcrafting';
+    // The single option leads with the pair archetype name and keeps both craft
+    // names visible: "Smith (Weaponcrafting + Armorcrafting)".
+    const option = [...select.options].find((o) => o.value === 'weaponcrafting+armorcrafting');
+    expect(option?.textContent).toBe('Smith (Weaponcrafting + Armorcrafting)');
+    select.value = 'weaponcrafting+armorcrafting';
     select.dispatchEvent(new Event('change'));
-    // The preview names the pair title and both major crafts.
-    expect(preview?.textContent).toContain('Bladewright');
-    expect(preview?.textContent).toContain('Jewelcrafting');
+    // The preview names the pair title, both major crafts, and the make-amends
+    // return cost (Phase 14 preview completeness).
+    expect(preview?.textContent).toContain('Smith');
     expect(preview?.textContent).toContain('Weaponcrafting');
+    expect(preview?.textContent).toContain('Armorcrafting');
+    expect(preview?.textContent).toContain('make-amends');
 
     test.element.querySelector<HTMLButtonElement>('.btn')?.click();
     expect(test.acceptQuest).toHaveBeenCalledWith(
-      'q_archetype_acceptance',
-      'jewelcrafting+weaponcrafting',
+      'q_prof_attune_smith',
+      'weaponcrafting+armorcrafting',
     );
   });
 
   it('keeps the accept action disabled when a profession quest has no target', () => {
-    const smith = npc(33, 'smith_haldren');
-    smith.questIds = ['q_prof_make_amends'];
-    const test = harness(smith, 'available');
-    test.controller.open(smith.id);
-    test.element.querySelector<HTMLButtonElement>('[data-quest="q_prof_make_amends"]')?.click();
+    // Phase 14: the make-amends return quest at Forgemistress Darva is only
+    // legal for a pair the character has held before, so an unattuned player
+    // (no history) sees zero targets and a disabled accept.
+    const darva = npc(33, 'forgemistress_darva');
+    darva.questIds = ['q_prof_amends_smith'];
+    const test = harness(darva, 'available');
+    test.controller.open(darva.id);
+    test.element.querySelector<HTMLButtonElement>('[data-quest="q_prof_amends_smith"]')?.click();
 
     const select = test.element.querySelector<HTMLSelectElement>('[data-profession-selection]');
     const accept = test.element.querySelector<HTMLButtonElement>('.btn');

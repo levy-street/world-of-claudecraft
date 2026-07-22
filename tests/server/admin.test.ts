@@ -8,8 +8,8 @@
 // pins:
 //  - the FROZEN envelope contract (a success body, an error body, a data:{ ok:true }
 //    body) and that surface 'admin' + meta.envelope 'admin' select serializeAdmin;
-//  - the requireAdmin gate: db-free 401 on a missing bearer, 401 on a non-admin, and
-//    a valid admin reaches the handler (no read-only-scope 403, no moderation gate);
+//  - the requireAdmin gate: db-free 401 on a missing bearer, 401 on a read token or
+//    non-admin, and a valid full-scope admin reaches the handler;
 //  - the admin.login limiter: its own in-handler rateLimited (429), the 401 bad-cred
 //    and 403 no-admin-access shapes, all anonymous (no requireAdmin);
 //  - the operator :id loader: a valid id reaches the handler, a NaN id 422s;
@@ -61,6 +61,7 @@ const BEARER = `Bearer ${'a'.repeat(64)}`;
 // The admin caller the gate resolves the bearer to; isAdminAccount(id) returns true
 // ONLY for this id, so a moderation target (a different id) reads as a non-admin.
 const ADMIN_ACCOUNT_ID = 7;
+const fullToken = (accountId = ADMIN_ACCOUNT_ID) => ({ accountId, scope: 'full' as const });
 // The admin-login per-minute ceiling (server/admin.ts ADMIN_LOGIN_MAX_PER_MINUTE).
 const ADMIN_LOGIN_MAX = 10;
 // A frozen instant so a limiter drain sits inside one 60s window.
@@ -92,7 +93,7 @@ const allowedRateLimit = (): ReturnType<NonNullable<AdminDbBundle['rateLimited']
 // target reads as a normal account). Extra reads are layered per test.
 function authedAdminDb(overrides: DbOverrides = {}): void {
   setDb({
-    accountForToken: async () => ADMIN_ACCOUNT_ID,
+    accountAndScopeForToken: async () => fullToken(),
     adminRolesForAccount: async (id: number) =>
       id === ADMIN_ACCOUNT_ID ? { username: 'op', roles: ['superadmin'] } : null,
     isAdminAccount: async (id: number) => id === ADMIN_ACCOUNT_ID,
@@ -279,19 +280,22 @@ describe('admin envelope contract (frozen)', () => {
 
 describe('requireAdmin gate', () => {
   it('401s a missing bearer DB-free with the legacy admin body', async () => {
-    const accountForToken = vi.fn(async () => ADMIN_ACCOUNT_ID);
+    const accountAndScopeForToken = vi.fn(async () => fullToken());
     const adminRolesForAccount = vi.fn(async () => ({ username: 'op', roles: ['superadmin'] }));
-    setDb({ accountForToken, adminRolesForAccount });
+    setDb({ accountAndScopeForToken, adminRolesForAccount });
     installAdminRuntime();
     const r = await runRoute('GET', '/admin/api/overview');
     expect(r.status).toBe(401);
     expect(r.body).toEqual({ success: false, data: null, error: 'admin authentication required' });
     // A missing bearer never reaches the token lookup.
-    expect(accountForToken).not.toHaveBeenCalled();
+    expect(accountAndScopeForToken).not.toHaveBeenCalled();
   });
 
   it('401s a valid bearer whose account is NOT staff (no roles)', async () => {
-    setDb({ accountForToken: async () => 42, adminRolesForAccount: async () => null });
+    setDb({
+      accountAndScopeForToken: async () => fullToken(42),
+      adminRolesForAccount: async () => null,
+    });
     installAdminRuntime();
     const r = await runRoute('GET', '/admin/api/overview', { headers: { authorization: BEARER } });
     expect(r.status).toBe(401);
@@ -300,13 +304,34 @@ describe('requireAdmin gate', () => {
 
   it('401s a bearer that resolves to no account', async () => {
     setDb({
-      accountForToken: async () => null,
+      accountAndScopeForToken: async () => null,
       adminRolesForAccount: async () => ({ username: 'op', roles: ['superadmin'] }),
     });
     installAdminRuntime();
     const r = await runRoute('GET', '/admin/api/overview', { headers: { authorization: BEARER } });
     expect(r.status).toBe(401);
     expect(r.body).toEqual({ success: false, data: null, error: 'admin authentication required' });
+  });
+
+  it('401s a staff read token before role resolution or the handler', async () => {
+    const adminRolesForAccount = vi.fn(async () => ({ username: 'op', roles: ['superadmin'] }));
+    setDb({
+      accountAndScopeForToken: async () => ({
+        accountId: ADMIN_ACCOUNT_ID,
+        scope: 'read' as const,
+      }),
+      adminRolesForAccount,
+    });
+    installAdminRuntime();
+
+    const r = await runRoute('GET', '/admin/api/overview', {
+      headers: { authorization: BEARER },
+    });
+
+    expect(r.status).toBe(401);
+    expect(r.body).toEqual({ success: false, data: null, error: 'admin authentication required' });
+    expect(r.reached).toBe(false);
+    expect(adminRolesForAccount).not.toHaveBeenCalled();
   });
 
   it('lets a valid admin through to the handler', async () => {
@@ -2160,7 +2185,7 @@ describe('reset-password RouteDef handler (accounts.password)', () => {
     // The actor holds accounts.password via the plain admin role, but the target
     // reads as staff (isAdminAccount true), so the reset is refused.
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async (id: number) =>
         id === ADMIN_ACCOUNT_ID ? { username: 'op', roles: ['admin'] } : null,
       isAdminAccount: async () => true,
@@ -2185,7 +2210,7 @@ describe('reset-password RouteDef handler (accounts.password)', () => {
   it('is denied 403 by the central gate for a moderator (accounts.password not held)', async () => {
     const deps = resetDeps();
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       ...deps,
     });
@@ -2245,7 +2270,7 @@ describe('account flair (AI mark + streamer links)', () => {
     const setAccountAiFlag = vi.fn(async () => {});
     const setAccountStreamerFlair = vi.fn(async () => {});
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['viewer'] }),
       setAccountAiFlag,
       setAccountStreamerFlair,
@@ -2282,7 +2307,7 @@ describe('account flair (AI mark + streamer links)', () => {
     // The REAL setAccountAiFlag runs (not overridden), so the transaction and its
     // audit row are the ones production issues.
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       loadAccountFlair,
     });
@@ -2311,7 +2336,7 @@ describe('account flair (AI mark + streamer links)', () => {
   it('audits an AI-mark write with no reason (non-punitive: a reason is optional)', async () => {
     const db = recordingPoolClient();
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       loadAccountFlair: async () => LIVE_FLAIR,
     });
@@ -2389,7 +2414,7 @@ describe('account flair (AI mark + streamer links)', () => {
     const db = recordingPoolClient();
     const loadAccountFlair = vi.fn(async () => LIVE_FLAIR);
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       loadAccountFlair,
     });
@@ -2419,7 +2444,7 @@ describe('account flair (AI mark + streamer links)', () => {
       links: { twitch: 'https://twitch.tv/someone', youtube: 'https://youtu.be/abc' },
     };
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       loadAccountFlair: async () => live,
     });
@@ -2465,7 +2490,7 @@ describe('account flair (AI mark + streamer links)', () => {
     // The row after the flag is switched off: links intact, flag down.
     const flagOff: AccountFlair = { ai: false, streamer: false, links: storedLinks };
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       loadAccountFlair: async () => flagOff,
     });
@@ -2503,7 +2528,7 @@ describe('account flair (AI mark + streamer links)', () => {
     const links = { twitch: 'https://twitch.tv/someone' };
     const already: AccountFlair = { ai: false, streamer: true, links };
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       loadAccountFlair: async () => already,
     });
@@ -2533,7 +2558,7 @@ describe('account flair (AI mark + streamer links)', () => {
   it('leaves the stored links ALONE when the body omits the links key', async () => {
     const db = recordingPoolClient();
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       loadAccountFlair: async () => ({ ai: false, streamer: false, links: {} }),
     });
@@ -2556,7 +2581,7 @@ describe('account flair (AI mark + streamer links)', () => {
   it('clears the links only on an EXPLICIT empty bag', async () => {
     const db = recordingPoolClient();
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       loadAccountFlair: async () => ({ ai: false, streamer: true, links: {} }),
     });
@@ -2574,7 +2599,7 @@ describe('account flair (AI mark + streamer links)', () => {
 
   it('surfaces a db failure as a 400 without pushing anything live', async () => {
     setDb({
-      accountForToken: async () => ADMIN_ACCOUNT_ID,
+      accountAndScopeForToken: async () => fullToken(),
       adminRolesForAccount: async () => ({ username: 'op', roles: ['moderator'] }),
       setAccountAiFlag: async () => {
         throw new Error('boom');

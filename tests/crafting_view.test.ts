@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { archetypeCeilingFor } from '../src/sim/professions/archetype';
 import type { StationType } from '../src/sim/professions/stations';
+import { stationTypeForCraft } from '../src/sim/professions/stations';
 import {
   MINIMAL_TIER_MULTIPLIER,
   REDUCED_TIER_MULTIPLIER,
@@ -13,6 +15,7 @@ import {
   buildCraftingView,
   type CraftDifficulty,
   type CraftingIdentityLike,
+  craftLearnHints,
   type RecipeDefLike,
 } from '../src/ui/crafting_view';
 
@@ -523,5 +526,42 @@ describe('buildCraftingView station gate (Phase 8, formerly the #1297 hub boolea
     );
     const after = [inventory, recipes, items, craftSkills, identity].map((v) => JSON.stringify(v));
     expect(after).toEqual(snapshots);
+  });
+});
+
+describe('craftLearnHints (Phase 14 discoverability)', () => {
+  const trainerRecipeIdsFor = (craft: string): string[] =>
+    ALL_RECIPES.filter((r) => r.professionId === craft && r.acquisition?.includes('trainer')).map(
+      (r) => r.id,
+    );
+
+  it('hints a craft with unlearned trainer recipes at its station and master (positive)', () => {
+    // Nothing learned: every stationed craft with a trainer recipe is hinted,
+    // naming its station type and resident master.
+    const hints = craftLearnHints([]);
+    expect(trainerRecipeIdsFor('weaponcrafting').length).toBeGreaterThan(0);
+    expect(hints.get('weaponcrafting')).toEqual({
+      stationType: 'forge',
+      masterNpcId: 'forgemistress_darva',
+    });
+  });
+
+  it('drops the hint once every trainer recipe of the craft is known (fully-trained negative)', () => {
+    const known = trainerRecipeIdsFor('weaponcrafting');
+    expect(known.length).toBeGreaterThan(0);
+    expect(craftLearnHints(known).has('weaponcrafting')).toBe(false);
+  });
+
+  it('never hints a craft with no physical station, and stays safe for unknown crafts', () => {
+    const hints = craftLearnHints([]);
+    // Every hinted craft resolves to the station type it was paired with.
+    for (const [craft, hint] of hints) {
+      expect(stationTypeForCraft(craft)).toBe(hint.stationType);
+      expect(hint.masterNpcId).toBeTruthy();
+    }
+    // jewelcrafting has no station master, so it is never hinted even unlearned;
+    // a bogus craft id is simply absent (no crash, no entry).
+    expect(hints.has('jewelcrafting')).toBe(false);
+    expect(hints.has('not-a-craft')).toBe(false);
   });
 });

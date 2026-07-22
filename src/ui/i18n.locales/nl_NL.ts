@@ -86,11 +86,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Zin in een Kaartduel? Beste van drie, de winnaar pakt de praatrechten.',
   'entities.npcs.card_master.name': 'Kaartmeester',
   'entities.npcs.card_master.title': 'Verdeler van het Lot',
-  'entities.quests.q_archetype_acceptance.completion':
-    'De belofte staat. Deze twee ambachten zijn nu je hoofdambachten, en de kennis die er tegenover staat wordt je liefhebberij.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Ertsslagader geoogst',
-  'entities.quests.q_archetype_acceptance.text':
-    'Vaardigheid is kennis, {playerName}, maar afstemming is een belofte. Kies twee naburige ambachten waarvan je de methoden als je hoofdambachten zult dragen, en breng me dan erts dat je zelf met je eigen handen uit het Dal hebt gewonnen.',
   'entities.quests.q_prof_hobby_switch.completion':
     'Een lichtere keuze, maar een nuttige. Volg die nieuwsgierigheid zo ver als zeldzaam werk haar draagt.',
   'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Kruidenveld geoogst',
@@ -102,10 +97,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.objectives.0.label': 'Ertsslagader geoogst',
   'entities.quests.q_prof_intro.text':
     'Elke ziel in Oostbeekdal beoefent een ambacht naast het zwaard, {playerName}. Er zijn ertsslagaders in de rotsen rond de Kopergat, ten zuidwesten van de stad. Ga zelf een houweel zwaaien en bewerk er 5; ik zie het verschil.',
-  'entities.quests.q_prof_make_amends.completion':
-    'Het oude ritme keert terug. Je vroegere ambachtspaar is opnieuw actief.',
-  'entities.quests.q_prof_make_amends.text':
-    'Je hebt dat paar eerder gedragen, {playerName}. Terugkeren is geen nieuwe gelofte. Help de Dalweg vrijhouden, en het werk zal je handen herinneren wat ze ooit kenden.',
   'gpuNotice.bodyDesktop':
     "Het spel draait zonder GPU-versnelling en zal traag zijn. Werk je grafische stuurprogramma's bij en herstart het spel. Stel op Windows ook het spel in op Hoge prestaties via Instellingen, Systeem, Beeldscherm, Afbeeldingen.",
   'gpuNotice.bodyWeb':
@@ -7192,9 +7183,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': 'Doel',
   'hudChrome.options.mobileCameraJoystick': 'Camerajoystick',
   'hudChrome.options.mobileLeftHanded': 'Linkshandige indeling',
-  'entities.quests.q_archetype_acceptance.title': 'Een ambacht dat u het uwe kunt noemen',
-  'entities.quests.q_prof_make_amends.title': 'Het goedmaken',
-  'entities.quests.q_prof_make_amends.objectives.0.label': 'Boswolf gedood',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Elke kist, koffer en snuisterij is veilig bij de Vergulde Geldkist.',
   'entities.npcs.bursar_aldous_crane.name': 'Thesaurier Aldous Crane',

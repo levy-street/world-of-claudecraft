@@ -1273,6 +1273,87 @@ export const TARGETS = [
     },
   },
   {
+    key: 'attunement-legibility',
+    label: 'Attunement legibility: quest-dialog preview with return cost, first-tier tutorial',
+    when: [
+      'ui/hud/quest/quest_dialog_controller',
+      'sim/quests/profession_quest_effects',
+      'ui/profession_tutorial_window',
+      'ui/profession_identity_view.ts',
+    ],
+    // The Phase 14 legibility rule: the full pre-commit picture (majors, hobby,
+    // dormancy, and the escalating make-amends return cost) must be visible in
+    // the lore-quest dialog BEFORE the player commits, and the one-time tier
+    // tutorial must fire at the first tier-1 crossing. The quest variants shoot
+    // the q_prof_attune_smith detail at Forgemistress Darva for a fresh
+    // unattuned character; the tutorial variant crosses weaponcrafting to
+    // skill 26 and lets the REAL 1 Hz sweep emit the event that opens the panel.
+    variants: [
+      { key: 'quest-desktop' },
+      { key: 'quest-mobile', mobile: true },
+      { key: 'tutorial-desktop', tutorial: true },
+      { key: 'tutorial-mobile', tutorial: true, mobile: true },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      if (variant?.tutorial) {
+        const armed = await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          const meta = sim?.players?.get(sim.primaryId);
+          if (!meta) return { ok: false, reason: 'no primary player meta' };
+          meta.craftSkills = { ...meta.craftSkills, weaponcrafting: 26 };
+          return { ok: true };
+        });
+        if (!armed.ok) throw new Error(`tutorial setup failed: ${armed.reason}`);
+        // The prof-nudges sweep runs at 1 Hz on sim ticks; the panel opens on
+        // the resulting profTierTutorial event, so poll rather than guess.
+        const open = await pollForSize(page, '#profession-tutorial');
+        if (!open) throw new Error('profession tutorial did not open');
+        return { clip: '#profession-tutorial' };
+      }
+      // Quest-dialog variants: stand beside Darva (the dialog auto-closes on
+      // distance like the train window) and open her quest list, then the
+      // lore-quest detail row.
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const master = [...sim.entities.values()].find(
+          (e) => e.templateId === 'forgemistress_darva',
+        );
+        if (!master) return { ok: false, reason: 'no forgemistress_darva entity' };
+        const p = sim.player;
+        if (p?.pos) {
+          p.pos.x = master.pos.x;
+          p.pos.z = master.pos.z - 2;
+        }
+        const el = document.querySelector('#quest-dialog');
+        if (el) el.style.display = 'none';
+        game.hud.openQuestDialog(master.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`quest-dialog setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#quest-dialog');
+      if (!open) throw new Error('quest dialog did not open');
+      await page.evaluate(() => {
+        document.querySelector('#quest-dialog [data-quest="q_prof_attune_smith"]')?.click();
+      });
+      await wait(400);
+      // The detail must carry the pinned-pair preview with the return-cost
+      // sentence (the whole point of the shot).
+      const hasPreview = await page.evaluate(() =>
+        Boolean(document.querySelector('#quest-dialog [data-profession-preview]')),
+      );
+      if (!hasPreview) throw new Error('attunement preview line missing from the quest detail');
+      return { clip: '#quest-dialog' };
+    },
+  },
+  {
     key: 'station-props',
     label: 'Crafting-station scenery (Eastbrook forge)',
     when: ['render/stations', 'src/sim/content/professions'],

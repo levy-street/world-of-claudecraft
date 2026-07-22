@@ -2459,6 +2459,11 @@ export const hudChromeStrings = {
       'Result: {title} title; {majorA} and {majorB} become uncapped majors; {hobby} becomes the rare-capped hobby; all other skill knowledge is retained but capped at common while dormant.',
     hobbyPreview:
       'Result: {hobby} becomes the rare-capped hobby. Both majors and all retained skill values stay unchanged.',
+    // Professions 2.0 Phase 14: the escalating make-amends return cost, shown in
+    // the attunement preview and on the identity card (closes the 2039 preview
+    // gap). {cost} is requiredAmendsProgress at rest.
+    attunementReturnCost:
+      'If you leave this pair, returning to it later costs {cost} make-amends tasks.',
     identity: {
       title: 'Crafting Identity',
       syncing: 'Waiting for your crafting identity from the realm.',
@@ -2520,9 +2525,40 @@ export const hudChromeStrings = {
     // Phase 8 (supersedes the retired stationOutOfRange key): the crafting
     // window's out-of-range row note, naming WHICH station to walk to.
     stationOutOfRangeNamed: 'Move to the {station} to craft this.',
+    // Professions 2.0 Phase 14: the per-section "learnable at a master"
+    // discoverability hint, shown when the viewer has unlearned trainer recipes
+    // for a craft. {master} is the resident master's name (entity i18n),
+    // {station} the localized stationName.* value, {craft} the craftName.* value.
+    learnMoreAtStation: '{master} at the {station} can teach you more {craft} recipes.',
     masterworkToast: 'Masterwork! {name}',
     masterworkZoneLine: '{crafter} crafted a masterwork {name}!',
     tierUpToast: '{craft} advanced to tier {tier}!',
+    // Professions 2.0 Phase 14 attunement + trend events (profession_event_lines
+    // _core.ts). Trend nudge: the soft in-world hint that an unattuned crafter's
+    // skills lean toward a pair; {archetype} is the pair's archetype title,
+    // {master} the anchor master's name (the noMaster variant for the six ring
+    // pairs with no seated master). attunedZoneLine mirrors masterworkZoneLine;
+    // attunedBanner is the personal celebration banner naming the earned title.
+    trendNudge:
+      'Your hands are leaning toward the {archetype}. Its attunement waits with {master}.',
+    trendNudgeNoMaster:
+      'Your hands are leaning toward the {archetype}. Seek a craft master to take it up.',
+    attunedZoneLine: '{name} has attuned as {archetype}!',
+    attunedBanner: 'Attuned: {title}',
+    // The one-time first-tier tutorial panel (profession_tutorial_view.ts),
+    // fired the first time any craft crosses tier 1. Explains the tier cap that
+    // just bit, the craft-wheel identity concept, and that masters offer
+    // attunement quests. {skill} is the first-tier threshold.
+    tierTutorial: {
+      title: 'Your First Tier',
+      tierCap:
+        'A craft reaches its first tier at {skill} skill, and each tier improves what it can make. But a craft only climbs past rare work once it is one of your two majors.',
+      radar:
+        'Your professions form a wheel. Attune to an adjacent pair and those two crafts become uncapped majors, one craft across the wheel becomes a rare-capped hobby, and the rest lie dormant: their knowledge kept, but capped at common until you take them up again.',
+      masters:
+        'Craft masters in the towns offer attunement quests. Visit one to choose your pair whenever you are ready. Nothing you have learned is ever lost.',
+      dismiss: 'Got it',
+    },
     makersMark: 'Crafted by {name}',
     // Phase 12d: the gathered-material sibling of makersMark, resolved by item
     // KIND (item_instance_tooltip.ts isGatheredProvenanceKind); same signer

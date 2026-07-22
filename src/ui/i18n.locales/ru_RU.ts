@@ -3873,18 +3873,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_mogger.completion':
     'Моггер наконец мертв. Поля Истврука стали безопаснее, а вы покидаете долину с еще одной историей, достойной пересказа.',
   'entities.quests.q_mogger.objectives.0.label': 'Моггер убит',
-  'entities.quests.q_archetype_acceptance.title': 'Ремесло по душе',
-  'entities.quests.q_archetype_acceptance.text':
-    'Мастерство — это знание, {playerName}, а настройка — обещание. Выберите два соседних ремесла, которые станут вашими основными, а затем принесите мне руду, добытую вами в долине.',
-  'entities.quests.q_archetype_acceptance.completion':
-    'Обещание скреплено. Эти два ремесла теперь ваши основные, а знание напротив них стало вашим увлечением.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Рудная жила разработана',
-  'entities.quests.q_prof_make_amends.title': 'Искупление',
-  'entities.quests.q_prof_make_amends.text':
-    'Вы уже владели этой парой ремёсел, {playerName}. Возвращение — не новая клятва. Помогите расчистить дорогу в долине, и работа напомнит вашим рукам прежние навыки.',
-  'entities.quests.q_prof_make_amends.completion':
-    'Прежний ритм вернулся. Ваша старая пара ремёсел снова активна.',
-  'entities.quests.q_prof_make_amends.objectives.0.label': 'Лесной волк убит',
   'entities.quests.q_prof_hobby_switch.title': 'Другое увлечение',
   'entities.quests.q_prof_hobby_switch.text':
     'Главные ремёсла требуют клятвы. Увлечение лишь спрашивает, куда ведёт твоё любопытство, {playerName}. Собери немного трав и реши, какое ремесло напротив твоих главных специальностей ты хочешь развивать.',
@@ -7428,6 +7416,25 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.throttled':
     'Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.',
   'hudChrome.crafting.recipeNotLearned': 'Вы еще не изучили этот рецепт.',
+  // Professions 2.0 Phase 14 (M16 non-Latin fills).
+  'hudChrome.crafting.attunementReturnCost':
+    'Если вы покинете эту пару, возвращение к ней позже обойдётся в {cost} заданий искупления.',
+  'hudChrome.crafting.learnMoreAtStation':
+    '{master} у станции «{station}» научит вас новым рецептам ремесла «{craft}».',
+  'hudChrome.crafting.trendNudge':
+    'Ваши руки склоняются к пути «{archetype}». Настройка на него ждёт у {master}.',
+  'hudChrome.crafting.trendNudgeNoMaster':
+    'Ваши руки склоняются к пути «{archetype}». Найдите мастера ремесла, чтобы встать на него.',
+  'hudChrome.crafting.attunedZoneLine': '{name} настроился как «{archetype}»!',
+  'hudChrome.crafting.attunedBanner': 'Настройка: {title}',
+  'hudChrome.crafting.tierTutorial.title': 'Ваш первый ранг',
+  'hudChrome.crafting.tierTutorial.tierCap':
+    'Ремесло достигает первого ранга при навыке {skill}, и каждый ранг улучшает то, что можно создать. Но превзойти работу редкого качества ремесло может, лишь став одним из двух ваших главных.',
+  'hudChrome.crafting.tierTutorial.radar':
+    'Ваши ремёсла образуют колесо. Настройтесь на соседнюю пару, и эти два ремесла станут главными без потолка, одно ремесло напротив станет увлечением с потолком редкого качества, а остальные уснут: их знания сохранятся, но будут ограничены обычным качеством, пока вы снова не возьмётесь за них.',
+  'hudChrome.crafting.tierTutorial.masters':
+    'Мастера ремёсел в городах дают задания настройки. Зайдите к одному из них, когда будете готовы, и выберите свою пару. Ничто из выученного не теряется.',
+  'hudChrome.crafting.tierTutorial.dismiss': 'Понятно',
   'hudChrome.crafting.skillReqLine': 'Требуется {craft} {skill}',
   'hudChrome.crafting.difficultyFull': 'Полный рост навыка',
   'hudChrome.crafting.difficultyReduced': 'Сниженный рост навыка',
@@ -8661,4 +8668,176 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.targetTitle': 'Выберите предмет для зачарования',
   'hudChrome.enchanting.noEnchants': 'Нет чар, использующих этот реагент.',
   'hudChrome.enchanting.noTargets': 'Нет подходящего предмета для зачарования.',
+  // Professions 2.0 Phase 14 attunement quests + master tier letters (ru_RU M16 fills).
+  'entities.quests.q_prof_attune_smith.title': 'Обещание кузнеца',
+  'entities.quests.q_prof_attune_smith.text':
+    'Сталь не прощает блуждающей руки, потому скажу прямо, прежде чем ты дашь клятву. Скрепи себя с моей кузней, и оружейное дело с бронным делом станут твоими двумя основными ремёслами, единственными, что ты сможешь вести дальше работы редкого качества. Ремесло напротив них по кругу осядет как твоё увлечение, доведённое до редкого качества и не выше. Остальные твои ремёсла не сгорают, {playerName}: они просто затихают, дремлют, пока ты не позовёшь их обратно. И знай ещё до того, как падёт молот: бросишь эту пару ради другой, и возвращаться придётся честным трудом, пять врагов повержены в первый раз по возвращении, восемь в следующий, одиннадцать после, и всё больше с каждым уходом. Всё ещё стоишь тут? Тогда принеси мне три рудные жилы, добытые в Долине собственными руками, и будем считать обещание скреплённым.',
+  'entities.quests.q_prof_attune_smith.completion':
+    'Хорошая руда и хорошие руки, чтобы её обработать. Оружейное дело и бронное дело теперь твои, осваивай их до мастерства. Остальное заслужи.',
+  'entities.quests.q_prof_attune_smith.objectives.0.label': 'Рудная жила разработана',
+  'entities.quests.q_prof_attune_outfitter.title': 'Мерка экипировщика',
+  'entities.quests.q_prof_attune_outfitter.text':
+    'Отмерь цену, прежде чем резать, таково первое правило у моего станка. Выбери меня, и кожевничество с портняжным делом станут твоими двумя основными ремёслами, парой, которую ты сможешь вести дальше работы редкого качества; ремесло напротив них осядет как твоё увлечение, доведённое до редкого качества и оставленное там. Ремёсла, что ты отложишь, не распускаются, {playerName}, лишь убираются в сторону, дремлют, пока ты не возьмёшься за них вновь. Но будь уверен: покинешь эту пару, а после захочешь вернуть, и дорога домой оплачивается трудом, что удлиняется всякий раз, сперва пятеро истреблённых, затем восемь, затем одиннадцать, и каждый раз немного больше. Если решено, истреби четырёх пауков-скрытней Сейблвеба и принеси их шёлк к станку, ведь всякий добрый наряд начинается с доброй нити.',
+  'entities.quests.q_prof_attune_outfitter.completion':
+    'Ровная нить, ровная рука. Кожевничество и портняжное дело теперь твои, неси их так далеко, как достанет твоё умение. Отмеряй дважды, и они тебя не подведут.',
+  'entities.quests.q_prof_attune_outfitter.objectives.0.label': 'Паук-скрытень Сейблвеба истреблён',
+  'entities.quests.q_prof_attune_apothecary.title': 'Рецепт, что стоит хранить',
+  'entities.quests.q_prof_attune_apothecary.text':
+    'Всякое доброе блюдо, это два вкуса, что созданы друг для друга, и доброе ремесло такое же, {playerName}. Присядь со мной, и алхимия с кулинарией станут твоими двумя основными ремёслами, теми, что ты сможешь томить дальше работы редкого качества; ремесло на дальней стороне круга, это твоё увлечение, приправленное до редкого качества и не горячее. Остальные твои ремёсла постоят в кладовой, дремлют, не портятся, готовы, как только ты за ними вернёшься. Честно предупреждаю, пока котёл ещё холодный: уйдёшь к другой паре, и возвращение станет заботой, что растёт, пятеро зверей улажены в первый раз, восемь в следующий, одиннадцать в тот, что после, и всё тяжелее с каждой порцией. Всё ещё голоден до этого? Тогда добудь мне четырёх диких кабанов, ведь стоящая кухня начинается с хорошего мяса.',
+  'entities.quests.q_prof_attune_apothecary.completion':
+    'Вот это начало, с мясцом. Алхимия и кулинария теперь твои, готовь на них так высоко, как захочешь. Возвращайся голодным.',
+  'entities.quests.q_prof_attune_apothecary.objectives.0.label': 'Дикий кабан добыт',
+  'entities.quests.q_prof_attune_bombardier.title': 'Взрывоопасная договорённость',
+  'entities.quests.q_prof_attune_bombardier.text':
+    'О, о, тебе нужно то самое, громкое, да? Слушай, слушай, прежде чем трогать что-нибудь тикающее: только скажи, и инженерное дело с алхимией станут твоими двумя основными ремёслами, единственными, что ты сможешь толкать дальше работы редкого качества (вот тут и начинается ВЕСЕЛЬЕ, поверь мне). Ремесло напротив ляжет тебе в карман увлечением, до редкого качества и не дальше, не дуйся. Остальные твои ремёсла? Не пропали, {playerName}, просто дремлют, буди их когда угодно. Но (всегда есть но, придержи фитиль) бросишь эту пару и приковыляешь обратно позже, и это будет стоить пота, что копится, пять штук уложены в первый раз, восемь в следующий, одиннадцать после, больше, больше, всякий раз, как струсишь. Да? ДА? Тогда иди набери мне три участка трав, взрывоопасных, не спрашивай каких, они все немножко взрывоопасны, если хорошенько поверить.',
+  'entities.quests.q_prof_attune_bombardier.completion':
+    'ХА. Реактивы, настоящие, и все пальцы на месте, хорошо, хорошо. Инженерное дело и алхимия, твои, иди смастери что-нибудь, что об этом пожалеет. Ступай.',
+  'entities.quests.q_prof_attune_bombardier.objectives.0.label': 'Собран участок трав',
+  'entities.quests.q_prof_amends_smith.title': 'Снова к кузне',
+  'entities.quests.q_prof_amends_smith.text':
+    'Значит, ты вернулся к кузне. Не стану притворяться, что это не задевает, {playerName}, но рука у меня честная, и работа честная. Ты знаешь цену возвращения: труд, и его тем больше, чем чаще ты уходил. Уложи волков, что терзают северную дорогу, и этот замах напомнит твоим рукам, чего когда-то требовала эта пара.',
+  'entities.quests.q_prof_amends_smith.completion':
+    'Ритм снова в твоих руках. Оружейное дело и бронное дело опять твои основные ремёсла. Не заводи привычку уходить.',
+  'entities.quests.q_prof_amends_smith.objectives.0.label': 'Лесной волк убит',
+  'entities.quests.q_prof_amends_outfitter.title': 'Нити воссоединены',
+  'entities.quests.q_prof_amends_outfitter.text':
+    'Всё же снова у моего станка. Я не держу обиды, {playerName}, но нить помнит руку, что её отпустила, и цена, чтобы взяться за неё вновь, отмеряется длиннее всякий раз. Истреби пауков-скрытней Сейблвеба, что заполонили западный лес, и этот труд успокоит твои руки, прежде чем они снова коснутся доброго шёлка.',
+  'entities.quests.q_prof_amends_outfitter.completion':
+    'Снова твёрдо. Кожевничество и портняжное дело возвращаются к тебе основными ремёслами. На этот раз отмерь дважды, прежде чем уходить.',
+  'entities.quests.q_prof_amends_outfitter.objectives.0.label': 'Паук-скрытень Сейблвеба истреблён',
+  'entities.quests.q_prof_amends_apothecary.title': 'Снова на плите',
+  'entities.quests.q_prof_amends_apothecary.text':
+    'Ну, гляди-ка, кто вернулся к моему котлу. Без обид, {playerName}, на кухне всегда найдётся место, но ты знаешь, что счёт растёт всякий раз, как ты уходишь. Ступай проредить диких кабанов на восточном лугу, ведь честный пот, это первый ингредиент, и он напомнит твоим рукам о работе.',
+  'entities.quests.q_prof_amends_apothecary.completion':
+    'Вот он, прежний вкус. Алхимия и кулинария снова на твоей плите как основные ремёсла. На этот раз задержись подольше.',
+  'entities.quests.q_prof_amends_apothecary.objectives.0.label': 'Дикий кабан добыт',
+  'entities.quests.q_prof_amends_bombardier.title': 'Гроссбух растёт',
+  'entities.quests.q_prof_amends_bombardier.text':
+    'Ты ВЕРНУЛСЯ, ха, они всегда возвращаются, у громких штук есть притяжение, да? От меня никакого ворчания, {playerName}, но гроссбух, ох, гроссбух, он пухнет всякий раз, как ты сбегаешь, больше с каждым возвращением, и это только справедливо. Иди вычисти для меня глубокоскальных копателей из раскопа, сперва пот, потом искры, вот правило, которое я только что выдумал.',
+  'entities.quests.q_prof_amends_bombardier.completion':
+    'ВОТ оно, зуд снова в твоих руках. Инженерное дело и алхимия, опять основные, давай, иди устрой грохот. Постарайся на этот раз усидеть на месте, а?',
+  'entities.quests.q_prof_amends_bombardier.objectives.0.label':
+    'Глубокоскальный копатель истреблён',
+  'entities.quests.q_prof_workorder_forge.title': 'Наряд на работу: кузня',
+  'entities.quests.q_prof_workorder_forge.text':
+    'Кузню всегда надо кормить, {playerName}. Принеси мне восемь кусков медной руды, и я прослежу, чтобы тебе заплатили за груз. Без церемоний, только руда и монеты.',
+  'entities.quests.q_prof_workorder_forge.completion':
+    'Хороший вес, без шлака. Вот твоя доля. Кузня довольно скоро снова проголодается.',
+  'entities.quests.q_prof_workorder_forge.objectives.0.label': 'Медная руда доставлена',
+  'entities.quests.q_prof_workorder_kitchens.title': 'Наряд на работу: кухни',
+  'entities.quests.q_prof_workorder_kitchens.text':
+    'Моя кладовая опустела, {playerName}, а от пустых кладовых повара делаются ворчливыми. Принеси мне восемь кусков мяса дичи, и тебе за это будут монеты, а ещё моя вечная благодарность, что стоит поменьше, зато вкуснее.',
+  'entities.quests.q_prof_workorder_kitchens.completion':
+    'Вот теперь кладовая полна. Вот твоя плата. Возвращайся, когда сумки снова потяжелеют.',
+  'entities.quests.q_prof_workorder_kitchens.objectives.0.label': 'Мясо дичи доставлено',
+  'entities.quests.q_prof_workorder_loom.title': 'Наряд на работу: ткацкий станок',
+  'entities.quests.q_prof_workorder_loom.text':
+    'Станок стоит без дела, а праздные руки тратят дневной свет впустую, {playerName}. Принеси мне шесть мотков паучьего шёлка, и я заплачу по честной ставке, отсчитанной до последней медной монеты.',
+  'entities.quests.q_prof_workorder_loom.completion':
+    'Прекрасный шёлк, ровно спрядён. Твои монеты, отмерены точно. Станок благодарит тебя, и я тоже.',
+  'entities.quests.q_prof_workorder_loom.objectives.0.label': 'Паучий шёлк доставлен',
+  'entities.quests.q_prof_workorder_toolworks.title': 'Наряд на работу: мастерская',
+  'entities.quests.q_prof_workorder_toolworks.text':
+    'Топорища, рукояти, ложа, я извожу дерево так, будто оно выходит из моды, а оно НЕ выходит, дерево вечно, {playerName}. Притащи мне восемь брёвен железнокорого дерева, и я тебе заплачу, монетой, настоящей монетой, не услугой, обещаю, почти.',
+  'entities.quests.q_prof_workorder_toolworks.completion':
+    'Отлично, отлично, ровная текстура, без гнили. Вот, твои монеты, видишь, я держу слово (почти). Тащи ещё, как споткнёшься о дерево.',
+  'entities.quests.q_prof_workorder_toolworks.objectives.0.label':
+    'Бревно железнокорого дерева доставлено',
+  'entities.quests.q_prof_workorder_tannery.title': 'Наряд на работу: дубильня',
+  'entities.quests.q_prof_workorder_tannery.text':
+    'Чаны пусты. Принеси восемь грубых шкур. Монеты, когда принесёшь.',
+  'entities.quests.q_prof_workorder_tannery.completion':
+    'Хорошие шкуры. Честная плата. Ещё, когда будут.',
+  'entities.quests.q_prof_workorder_tannery.objectives.0.label': 'Грубая шкура доставлена',
+  'entities.quests.q_prof_workorder_apothecary.title': 'Наряд на работу: аптека',
+  'entities.quests.q_prof_workorder_apothecary.text':
+    'Моим полкам нужен золотолист, а товар на рынке, что предсказуемо, разбавлен подделкой. Принеси мне шесть трав золотолиста, не помятых, и тебе воздастся ровно по счёту. Помятые листья будут отклонены, так что следи за своей сумкой.',
+  'entities.quests.q_prof_workorder_apothecary.completion':
+    'Приемлемо. Сильнодействующий и обращались с ним как должно. Твоя плата, отсчитана до монеты. Только не давай этому ударить в голову, это уже другой реактив.',
+  'entities.quests.q_prof_workorder_apothecary.objectives.0.label': 'Трава золотолист доставлена',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_1.subject': 'Искра, что стоит отметить',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_1.body':
+    'До моей кузни дошла весть, что одно из твоих основных ремёсел держится теперь на работе необычного качества. Это самая нижняя ступень долгого подъёма, но ты заслужил её у наковальни, а не выпрашиванием. Держи огонь жарким.',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_2.subject':
+    'Работа редкого качества, и заслуженная',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_2.body':
+    'Мне сказали, что одно из твоих основных ремёсел достигло работы редкого качества. Это та ступень, где неряшливые руки отсеиваются, а настоящие кузнецы остаются на ногах. Ты всё ещё на ногах. Хорошо.',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_3.subject':
+    'Металл теперь тебе отвечает',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_3.body':
+    'Одно из твоих основных ремёсел поднялось выше редкого качества, в серьёзную работу. Металл отвечает такой руке, больше не противится ей. Не дай похвале размягчить твою руку.',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_4.subject': 'Почти на вершине лестницы',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_4.body':
+    'Одно из твоих основных ремёсел стоит в одной ступени от мастерства. Немногие руки из тех, что я знала, достигали этой высоты, и ещё меньше сохраняли здесь свою остроту. Заверши подъём.',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_5.subject': 'Мастерство, наконец',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_5.body':
+    'Одно из твоих основных ремёсел достигло мастерства, высшего, куда может подняться рука. Я не раздаю похвалу задаром, потому услышь это единожды: кузня тобой гордится. А теперь ступай, научи огонь чему-нибудь новому.',
+  'entities.letters.prof_tier_leatherworking_tailoring_1.subject': 'Ровный первый ряд',
+  'entities.letters.prof_tier_leatherworking_tailoring_1.body':
+    'Гильдия отмечает, что одно из твоих основных ремёсел достигло работы необычного качества. Это лишь первый ряд из многих, но он ровен и верен. Отмерь следующий так же тщательно.',
+  'entities.letters.prof_tier_leatherworking_tailoring_2.subject':
+    'Работа редкого качества, хорошо отмеренная',
+  'entities.letters.prof_tier_leatherworking_tailoring_2.body':
+    'Одно из твоих основных ремёсел поднялось до работы редкого качества. Именно там небрежная рука выдаёт каждую спущенную петлю, а твоя не выдала. Я тихо довольна.',
+  'entities.letters.prof_tier_leatherworking_tailoring_3.subject': 'Узор проясняется',
+  'entities.letters.prof_tier_leatherworking_tailoring_3.body':
+    'Одно из твоих основных ремёсел прошло редкое качество и вошло в работу потоньше. Узор проясняется для руки на этом уровне, больше никаких догадок. Продолжай отмерять дважды.',
+  'entities.letters.prof_tier_leatherworking_tailoring_4.subject': 'Один ряд до вершины',
+  'entities.letters.prof_tier_leatherworking_tailoring_4.body':
+    'Одно из твоих основных ремёсел в одном ряду от мастерства. Последний ряд всегда труднее всего удержать ровным. Не спеши теперь.',
+  'entities.letters.prof_tier_leatherworking_tailoring_5.subject': 'Последний стежок',
+  'entities.letters.prof_tier_leatherworking_tailoring_5.body':
+    'Одно из твоих основных ремёсел достигло мастерства. Я отмерила твою работу дважды, как отмеряю всё, и она держит. Немногие руки завязывают последний стежок так чисто. Я горжусь, а я не говорю такого впустую.',
+  'entities.letters.prof_tier_alchemy_cooking_1.subject': 'Вкус того, что грядёт',
+  'entities.letters.prof_tier_alchemy_cooking_1.body':
+    'До моей кухни доносится весть, что одно из твоих основных ремёсел достигло работы необычного качества. Это первый вкус, не более, но многообещающий. Не давай котлу остывать.',
+  'entities.letters.prof_tier_alchemy_cooking_2.subject':
+    'Работа редкого качества, и без подгоревших краёв',
+  'entities.letters.prof_tier_alchemy_cooking_2.body':
+    'Мне говорят, что одно из твоих основных ремёсел дотомилось до работы редкого качества. Это тот жар, на котором большинство поваров сжигают блюдо, а ты нет. Присядь, но ненадолго.',
+  'entities.letters.prof_tier_alchemy_cooking_3.subject': 'Вот теперь ты готовишь',
+  'entities.letters.prof_tier_alchemy_cooking_3.body':
+    'Одно из твоих основных ремёсел пробулькало сквозь редкое качество к настоящей глубине. Вот теперь ты готовишь, как говорится. Приправляй смело и пробуй почаще.',
+  'entities.letters.prof_tier_alchemy_cooking_4.subject': 'Одно блюдо до пира',
+  'entities.letters.prof_tier_alchemy_cooking_4.body':
+    'Одному из твоих основных ремёсел не хватает единственного блюда до мастерства. Последнее всегда самое насыщенное и его легче всего переборщить. Держи руку с половником твёрдой.',
+  'entities.letters.prof_tier_alchemy_cooking_5.subject': 'Мастерство, подано горячим',
+  'entities.letters.prof_tier_alchemy_cooking_5.body':
+    'Одно из твоих основных ремёсел достигло мастерства, самой верхней полки всей кладовой. Я кормлю всех, но немногие дотягивают готовкой досюда. Горжусь тобой, честно. А теперь ступай, сготовь что-нибудь, от чего они расплачутся за столом.',
+  'entities.letters.prof_tier_engineering_alchemy_1.subject': 'ПЕРВАЯ искра, ха',
+  'entities.letters.prof_tier_engineering_alchemy_1.body':
+    'Эй, цифры говорят, что одно из твоих основных ремёсел только что дало работу необычного качества, мелочь, крохи, но оно ХЛОПНУЛО, да? Первая искра всегда самая милая. Больше искр. Пошёл.',
+  'entities.letters.prof_tier_engineering_alchemy_2.subject': 'Редкое, о, РЕДКОЕ',
+  'entities.letters.prof_tier_engineering_alchemy_2.body':
+    'Мне говорят, одно из твоих основных ремёсел поднялось до работы редкого качества, а редкое, это где всё становится по-настоящему опасным (в хорошем смысле). Большинство рук сдаются до самого веселья. Но не ты. ХА.',
+  'entities.letters.prof_tier_engineering_alchemy_3.subject': 'Вот теперь станет громко',
+  'entities.letters.prof_tier_engineering_alchemy_3.body':
+    'Одно из твоих основных ремёсел проскочило редкое качество прямо в серьёзные штуки, о, вот тут и становится ГРОМКО. Не останавливайся теперь, что бы ты ни делал, разгон, это всё, ещё фитили.',
+  'entities.letters.prof_tier_engineering_alchemy_4.subject': 'Одна ступень, ОДНА, до вершины',
+  'entities.letters.prof_tier_engineering_alchemy_4.body':
+    'Одно из твоих основных ремёсел в ОДНОЙ ступени от мастерства, одной, единственной, чувствуешь, как гудит? Последний шаг, это самый большой грохот. Не моргай.',
+  'entities.letters.prof_tier_engineering_alchemy_5.subject': 'МАСТЕРСТВО, бабах',
+  'entities.letters.prof_tier_engineering_alchemy_5.body':
+    'Одно из твоих основных ремёсел достигло мастерства, самой ВЕРХУШКИ, бабах, вся лестница, готово. Я не раздаю похвалу, я раздаю фитили, но вот, бери и то и другое: ты блистателен и слегка пугающ. Иди, заставь горы понервничать.',
+  // Professions 2.0 Phase 14 master tier-letter senders (localized NPC names).
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_1.sender': 'Мастерица кузни Дарва',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_2.sender': 'Мастерица кузни Дарва',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_3.sender': 'Мастерица кузни Дарва',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_4.sender': 'Мастерица кузни Дарва',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_5.sender': 'Мастерица кузни Дарва',
+  'entities.letters.prof_tier_leatherworking_tailoring_1.sender': 'Ткачиха Оттилия',
+  'entities.letters.prof_tier_leatherworking_tailoring_2.sender': 'Ткачиха Оттилия',
+  'entities.letters.prof_tier_leatherworking_tailoring_3.sender': 'Ткачиха Оттилия',
+  'entities.letters.prof_tier_leatherworking_tailoring_4.sender': 'Ткачиха Оттилия',
+  'entities.letters.prof_tier_leatherworking_tailoring_5.sender': 'Ткачиха Оттилия',
+  'entities.letters.prof_tier_alchemy_cooking_1.sender': 'Повар Марлоу',
+  'entities.letters.prof_tier_alchemy_cooking_2.sender': 'Повар Марлоу',
+  'entities.letters.prof_tier_alchemy_cooking_3.sender': 'Повар Марлоу',
+  'entities.letters.prof_tier_alchemy_cooking_4.sender': 'Повар Марлоу',
+  'entities.letters.prof_tier_alchemy_cooking_5.sender': 'Повар Марлоу',
+  'entities.letters.prof_tier_engineering_alchemy_1.sender': 'Механик Гиззел',
+  'entities.letters.prof_tier_engineering_alchemy_2.sender': 'Механик Гиззел',
+  'entities.letters.prof_tier_engineering_alchemy_3.sender': 'Механик Гиззел',
+  'entities.letters.prof_tier_engineering_alchemy_4.sender': 'Механик Гиззел',
+  'entities.letters.prof_tier_engineering_alchemy_5.sender': 'Механик Гиззел',
 };

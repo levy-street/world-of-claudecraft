@@ -3,6 +3,7 @@
 // trolls dig into barrow-mounds, and Vael the Fogbinder waits in the
 // Sunken Bastion.
 
+import { WORK_ORDER_CADENCE_TICKS } from '../professions/cadence';
 import type {
   CampDef,
   GroundObjectDef,
@@ -726,7 +727,9 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     pos: { x: -11, z: 315.5 },
     facing: 2.3,
     color: 0x8a5a2a,
-    questIds: [],
+    // Professions 2.0 Phase 14: the Fenbridge tannery master runs the repeatable
+    // leatherworking work order.
+    questIds: ['q_prof_workorder_tannery'],
     // Phase 9 station stocking: thorium_ore is the premium reagent the
     // tannery station's own recipe (recipe_duskhide_wraps) consumes.
     vendorItems: [
@@ -1168,6 +1171,28 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     minLevel: 12,
     suggestedPlayers: 5,
   },
+  // Repeatable craft work order (Professions 2.0 Phase 14): Tanner Hesk takes
+  // rough hides for coin on the shared cadence (WORK_ORDER_CADENCE_TICKS); the
+  // collect turn-in consumes them. copperReward is floor(0.5 * summed sell value
+  // of the requested hides); xpReward matches the make-amends repeatable band.
+  q_prof_workorder_tannery: {
+    id: 'q_prof_workorder_tannery',
+    name: 'Tannery Work Order',
+    giverNpcId: 'tanner_hesk',
+    turnInNpcId: 'tanner_hesk',
+    text: 'Vats are empty. Bring eight rough hides. Coin when you do.',
+    completionText: 'Good hides. Fair pay. Again when you have more.',
+    objectives: [
+      { type: 'collect', itemId: 'rough_hide', count: 8, label: 'Rough Hide delivered' },
+    ],
+    xpReward: 100,
+    // floor(0.5 * 8 * 5) = 20 (rough_hide sellValue 5).
+    copperReward: 20,
+    itemRewards: {},
+    repeatable: true,
+    shareable: false,
+    repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
+  },
 };
 
 export const ZONE2_QUEST_ORDER = [
@@ -1194,6 +1219,7 @@ export const ZONE2_QUEST_ORDER = [
   'q_bastion_door',
   'q_olen',
   'q_mistcaller',
+  'q_prof_workorder_tannery',
 ];
 
 // ---------------------------------------------------------------------------

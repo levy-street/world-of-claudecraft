@@ -135,7 +135,7 @@ import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter } from './cast_bar_painter';
 import { charBagsPaired } from './char_bags_pairing_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
-import { CharWindow, craftNameText } from './char_window';
+import { archetypeTitleText, CharWindow, craftNameText } from './char_window';
 import { activeCharacterAppearancePreview } from './character_appearance';
 import {
   ignoreKey,
@@ -170,7 +170,7 @@ import {
   type CraftTierUp,
   observeCraftSkillsForTierUps,
 } from './craft_celebration_view';
-import { buildCraftingView } from './crafting_view';
+import { buildCraftingView, craftLearnHints } from './crafting_view';
 import { renderCraftingWindow, stationNameText } from './crafting_window';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
@@ -421,7 +421,10 @@ import {
   procOverlayState,
 } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
+import { type ProfessionEventInput, planProfessionEvent } from './profession_event_lines_core';
 import { buildProfessionIdentityView } from './profession_identity_view';
+import { buildProfessionTutorialModel } from './profession_tutorial_view';
+import { renderProfessionTutorial } from './profession_tutorial_window';
 import { ProfessionsWindow } from './professions_window';
 import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
@@ -1397,6 +1400,8 @@ export class Hud {
   private readonly playerCard: PlayerCardController;
   // Shared by the confirm + input modals (one #confirm-dialog id; they never coexist).
   private confirmTrap: FocusTrapHandle | null = null;
+  // The Phase 14 first-tier tutorial modal's focus trap (#profession-tutorial).
+  private professionTutorialTrap: FocusTrapHandle | null = null;
   private meters: Meters;
   private tutorial = new TutorialOverlay();
   private lastPetBarSig = '';
@@ -2553,6 +2558,12 @@ export class Hud {
         this.confirmTrap?.release();
         this.confirmTrap = null;
         el.remove();
+        break;
+      case 'profession-tutorial':
+        // Route through closeProfessionTutorial so the focus trap is released
+        // (focus returns to the opener, WCAG 2.2 AA) and the modal is removed,
+        // never left hidden with a live trap (the confirm-dialog precedent).
+        this.closeProfessionTutorial();
         break;
       case 'options-menu':
         this.closeOptions();
@@ -8980,6 +8991,16 @@ export class Hud {
           );
           break;
         }
+        case 'profTrendNudge':
+        case 'profTierTutorial':
+        case 'attuned':
+        case 'attunedZone':
+          // The four Professions 2.0 Phase 14 text-free events, rendered
+          // through the profession_event_lines plan (chat line / banner /
+          // tutorial panel). Thin: the plan owns every decision, this arm only
+          // executes it.
+          this.handleProfessionEvent(ev);
+          break;
         case 'gatherResult': {
           // Harvest feedback line (Professions 2.0 Phase 4), colored by rolled
           // material rarity. Identical on every graphics tier (player feedback
@@ -10145,6 +10166,79 @@ export class Hud {
     if (plan.playSound) audio.achievement();
   }
 
+  // The four Professions 2.0 Phase 14 text-free events, rendered through the
+  // pure plan (profession_event_lines.ts). Thin consumer: the plan decides which
+  // chat line / banner / panel; this only resolves the localized archetype title
+  // and master/celebrant names and paints. The banner arm reuses the
+  // craft-celebration render family (showBanner + polite announcer + one
+  // achievement cue, motion trimmed under reduced motion).
+  private handleProfessionEvent(ev: ProfessionEventInput): void {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const plan = planProfessionEvent(ev, reducedMotion);
+    switch (plan.kind) {
+      case 'trendNudge': {
+        const archetype = archetypeTitleText(plan.pairId);
+        this.log(
+          plan.masterNpcId !== null
+            ? t('hudChrome.crafting.trendNudge', {
+                archetype,
+                master: tEntity({ kind: 'npc', id: plan.masterNpcId, field: 'name' }),
+              })
+            : t('hudChrome.crafting.trendNudgeNoMaster', { archetype }),
+          '#c8b888',
+        );
+        break;
+      }
+      case 'tierTutorial':
+        this.openProfessionTutorial();
+        break;
+      case 'attunedZone':
+        this.log(
+          t('hudChrome.crafting.attunedZoneLine', {
+            name: plan.celebrantName,
+            archetype: archetypeTitleText(plan.pairId),
+          }),
+          QUALITY_COLOR.epic,
+        );
+        break;
+      case 'attunement': {
+        const text = t('hudChrome.crafting.attunedBanner', {
+          title: archetypeTitleText(plan.pairId),
+        });
+        // Phase 15 deed hook: a per-archetype deed unlock will fire from this
+        // same attunement moment; today it is a pure celebration banner.
+        this.showBanner(text, plan.motion);
+        this.combatAnnouncer.push(text, performance.now());
+        if (plan.playSound) audio.achievement();
+        break;
+      }
+    }
+  }
+
+  // The one-time first-tier tutorial modal (Phase 14): fired by profTierTutorial
+  // (the sim guarantees once-ever). Reuses the confirm-dialog modal family via
+  // the profession_tutorial_window painter; the Hud owns the focus trap and the
+  // z-index floor above the mobile sheet, the confirmDialog precedent.
+  private openProfessionTutorial(): void {
+    this.professionTutorialTrap?.release(false);
+    this.professionTutorialTrap = null;
+    const el = renderProfessionTutorial(buildProfessionTutorialModel(), {
+      onClose: () => this.closeProfessionTutorial(),
+    });
+    this.bringWindowToFront(el);
+    // Above the mobile sheet (z-95) and the armory inspect overlay (z-90): the
+    // Phase 13 scoped-popup floor, so the one-shot never opens buried.
+    el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 96));
+    this.professionTutorialTrap = this.focusManager.open({ root: () => el });
+    el.querySelector<HTMLElement>('.cd-ok')?.focus();
+  }
+
+  private closeProfessionTutorial(): void {
+    this.professionTutorialTrap?.release();
+    this.professionTutorialTrap = null;
+    document.getElementById('profession-tutorial')?.remove();
+  }
+
   // The earned moment, planned purely (deeds_view buildDeedUnlockPlan) so the
   // batching rules stay unit-pinned: each fresh unlock gets a gold log line
   // (the durable copy) and title rewards a second hint line; the single
@@ -11253,6 +11347,9 @@ export class Hud {
         onClose: () => this.closeCrafting(),
       },
       buildProfessionIdentityView(this.sim.craftingIdentity),
+      // Per-section "learnable at a master" hints: crafts with unlearned
+      // trainer recipes, off the same mirrored knownRecipes set (both hosts).
+      craftLearnHints(this.sim.craftingIdentity.knownRecipes),
     );
   }
 

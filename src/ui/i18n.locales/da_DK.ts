@@ -86,11 +86,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Har du lyst til en Kortduel? Bedst af tre, vinderen får pralerrettighederne.',
   'entities.npcs.card_master.name': 'Kortmester',
   'entities.npcs.card_master.title': 'Tilfældets Udeler',
-  'entities.quests.q_archetype_acceptance.completion':
-    'Løftet holder. Disse to håndværk er nu dine hovedfag, og den viden, der er modsat dem, bliver din hobby.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Malmåre høstet',
-  'entities.quests.q_archetype_acceptance.text':
-    'Færdighed er viden, {playerName}, men indstilling er et løfte. Vælg to nabohåndværk, som du vil bære som dine hovedfag, og bring mig så malm, bearbejdet fra Dalen med dine egne hænder.',
   'entities.quests.q_prof_hobby_switch.completion':
     'Et lettere valg, men et nyttigt et. Følg den nysgerrighed så langt, som sjældent arbejde kan føre den.',
   'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Urteplette høstet',
@@ -102,10 +97,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.objectives.0.label': 'Malmåre høstet',
   'entities.quests.q_prof_intro.text':
     'Enhver sjæl i Østbæk arbejder med et håndværk udover sværdet, {playerName}. Der er malmårer i klipperne omkring Kobbergraven, sydvest for byen. Gå sving en hakke og bearbejd 5 af dem selv, forstået; jeg vil kende forskel.',
-  'entities.quests.q_prof_make_amends.completion':
-    'Den gamle rytme vender tilbage. Dit tidligere par er aktivt igen.',
-  'entities.quests.q_prof_make_amends.text':
-    'Du har båret det par før, {playerName}. At vende tilbage er intet nyt løfte. Hjælp med at holde Dalsvejen fri, og arbejdet vil minde dine hænder om, hvad de engang kendte.',
   'gpuNotice.bodyDesktop':
     'Spillet kører uden GPU-acceleration og vil være langsomt. Opdater dine grafikdrivere og genstart derefter spillet. På Windows skal du også indstille spillet til Høj ydeevne under Indstillinger, System, Skærm, Grafik.',
   'gpuNotice.bodyWeb':
@@ -7093,9 +7084,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': 'Mål',
   'hudChrome.options.mobileCameraJoystick': 'Kamera joystick',
   'hudChrome.options.mobileLeftHanded': 'Venstrehånds layout',
-  'entities.quests.q_archetype_acceptance.title': 'Et håndværk at kalde dit eget',
-  'entities.quests.q_prof_make_amends.title': 'Gøre bod',
-  'entities.quests.q_prof_make_amends.objectives.0.label': 'Skovulv dræbt',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Hver kasse, hvert skrin og hvert smykke er i sikkerhed hos Det Forgyldte Pengeskrin.',
   'entities.npcs.bursar_aldous_crane.name': 'Skatmester Aldous Crane',

@@ -2496,9 +2496,21 @@ export interface QuestDef {
   // Repeatable quests remain in questsDone as history but become available
   // again when they are not active.
   repeatable?: boolean;
+  // Repeatable-quest cooldown window in TICKS (Professions 2.0 Phase 14): after a
+  // successful turn-in the quest is unavailable for this many ticks (work orders
+  // use professions/cadence.ts WORK_ORDER_CADENCE_TICKS). Only meaningful with
+  // `repeatable`; absent means no cooldown (available again immediately).
+  repeatCadenceTicks?: number;
   // Typed, server-authoritative profession transition applied only by the
   // validated turn-in path. The selected target is persisted on QuestProgress.
-  completionEffect?: { type: 'attunePair'; mode: 'new' | 'return' } | { type: 'switchHobby' };
+  // `pairId` (Professions 2.0 Phase 14): a per-pair attune quest pins its ONE
+  // canonical pair id (archetype.ts archetypePairId / ARCHETYPE_PAIR_TARGETS), so
+  // the quest offers and validates only that pair; absent means the quest offers
+  // every mode-legal pair (the pre-Phase-14 single-quest behavior). Typed `string`
+  // (the pair id vocabulary is CRAFT_RING-derived at runtime, not a literal union).
+  completionEffect?:
+    | { type: 'attunePair'; mode: 'new' | 'return'; pairId?: string }
+    | { type: 'switchHobby' };
   // Resolve the first objective's count from the character's return history at
   // acceptance time. The snapshotted value stays stable while the quest is active.
   resolvedObjectiveCounts?: 'archetypeAmends';
@@ -3780,6 +3792,41 @@ export type SimEvent = { pid?: number } & (
       zoneId: string;
       nodeType: GatherNodeType;
       itemId: string;
+    }
+  // Trend nudge (Professions 2.0 Phase 14): a soft, at-most-once-per-window
+  // reminder that an unattuned crafter's skills are leaning toward an adjacent
+  // pair (professions/prof_nudges.ts). Personal (pid = the crafter) and
+  // text-free on purpose (the gatherDenied idiom): the client renders its own
+  // localized line off `pairId` (the archetypePair.* name table). The letter-
+  // voice follow-up at the crossing threshold stays the Guild trend letter; this
+  // is the lighter in-world hint that can fire below that threshold.
+  | { type: 'profTrendNudge'; pid: number; pairId: string }
+  // First-tier tutorial (Professions 2.0 Phase 14): fired exactly once per
+  // character, the first time ANY craft skill crosses tier 1
+  // (professions/prof_nudges.ts). Personal (pid = the crafter) and text-free:
+  // the client renders its own one-shot tier-up explainer. Carries no ids beyond
+  // the recipient; the persisted one-shot flag guarantees it never re-fires.
+  | { type: 'profTierTutorial'; pid: number }
+  // Attunement celebration, personal copy (Professions 2.0 Phase 14): a
+  // quest-validated pair attunement (new OR return) landed for this player
+  // (professions/attunement_events.ts). Personal (pid = the celebrant) and
+  // text-free: the client renders its own localized line off `pairId`.
+  | { type: 'attuned'; pid: number; pairId: string }
+  // Attunement celebration, zone broadcast (Professions 2.0 Phase 14): the soft
+  // zone-wide copy of an attunement, one per overworld player currently in the
+  // celebrant's zone INCLUDING the celebrant, `pid` being the RECIPIENT (the
+  // masterworkZone/gatherRareEvent fanout idiom); celebrantPid/celebrantName
+  // identify the newly attuned player. Skipped entirely for an instanced
+  // celebrant (the personal `attuned` event alone fires there). Ids plus names
+  // only, text-free on purpose (celebrantName mirrors masterworkZone's
+  // crafterName precedent): the client renders its own localized line.
+  | {
+      type: 'attunedZone';
+      pid: number;
+      celebrantPid: number;
+      celebrantName: string;
+      pairId: string;
+      zoneId: string;
     }
 );
 

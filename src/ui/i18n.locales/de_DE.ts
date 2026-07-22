@@ -99,11 +99,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Lust auf einen Kartenkampf? Wer zwei von drei Runden gewinnt, darf sich brüsten.',
   'entities.npcs.card_master.name': 'Kartenmeister',
   'entities.npcs.card_master.title': 'Händler des Zufalls',
-  'entities.quests.q_archetype_acceptance.completion':
-    'Das Versprechen gilt. Diese beiden Handwerke sind nun deine Hauptberufe, und das Wissen auf der anderen Seite wird zu deinem Hobby.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Erzader abgebaut',
-  'entities.quests.q_archetype_acceptance.text':
-    'Können ist Wissen, {playerName}, doch Abstimmung ist ein Versprechen. Wähle zwei benachbarte Handwerke, deren Methoden du als deine Hauptberufe trägst, und bring mir dann Erz, das du im Tal mit eigenen Händen bearbeitet hast.',
   'entities.quests.q_prof_hobby_switch.completion':
     'Eine leichtere Wahl, aber eine nützliche. Folge dieser Neugier, so weit sie seltene Arbeit trägt.',
   'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Kräuterpflanze geerntet',
@@ -115,10 +110,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.objectives.0.label': 'Erzader abgebaut',
   'entities.quests.q_prof_intro.text':
     'Jede Seele in Eastbrook betreibt neben dem Schwert noch ein Handwerk, {playerName}. Im Gestein rund um die Kupferschürfe südwestlich der Stadt gibt es Erzadern. Geh selbst mit der Spitzhacke ran und bearbeite 5 davon; ich werde den Unterschied merken.',
-  'entities.quests.q_prof_make_amends.completion':
-    'Der alte Rhythmus kehrt zurück. Dein früheres Paar ist wieder aktiv.',
-  'entities.quests.q_prof_make_amends.text':
-    'Du hast dieses Paar bereits getragen, {playerName}. Zurückzukehren ist kein neues Gelöbnis. Hilf, den Weg durch das Tal freizuhalten, und die Arbeit wird deinen Händen in Erinnerung rufen, was sie einst kannten.',
   'gpuNotice.bodyDesktop':
     'Das Spiel läuft ohne GPU-Beschleunigung und wird langsam sein. Aktualisiere deine Grafiktreiber und starte das Spiel neu. Unter Windows stelle das Spiel außerdem unter Einstellungen > System > Anzeige > Grafik auf Hohe Leistung ein.',
   'gpuNotice.bodyWeb':
@@ -7295,9 +7286,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': 'Ziel',
   'hudChrome.options.mobileCameraJoystick': 'Kamera-Joystick',
   'hudChrome.options.mobileLeftHanded': 'Linkshänder-Layout',
-  'entities.quests.q_archetype_acceptance.title': 'Ein Handwerk, das Sie Ihr Eigen nennen können',
-  'entities.quests.q_prof_make_amends.title': 'Wiedergutmachung leisten',
-  'entities.quests.q_prof_make_amends.objectives.0.label': 'Waldwolf getötet',
   'entities.npcs.bursar_aldous_crane.greeting':
     'Jede Kiste, jede Truhe und jedes Kleinod ist bei der Vergoldeten Schatulle sicher.',
   'entities.npcs.bursar_aldous_crane.name': 'Kämmerer Aldous Crane',

@@ -1551,6 +1551,80 @@ tables, i18n key namespaces, files created)
   holdings and ends in a safe localized deny (UX polish candidate);
   mail and market deny copy for bound-only holdings stays the generic
   notEnoughItems (defer to #1146).
+- Phase 14 (built 2026-07-21, phase start 8b7bd4596, branch
+  feature/professions-2-phase-14-attunement): attunement quests, nudges,
+  work orders, tier mail, and the legibility layer. Quests: four lore
+  quests q_prof_attune_{smith,outfitter,apothecary,bombardier} (xp 150,
+  non-repeatable, no prerequisite: the masters are independent entry
+  points) on the four zone-1 anchor masters
+  (forgemistress_darva/weaver_ottilie/cook_marlow/tinker_gizzel), four
+  repeatable make-amends quests q_prof_amends_{same} (xp 100, mode
+  'return', resolvedObjectiveCounts archetypeAmends), six work orders
+  q_prof_workorder_{forge,kitchens,loom,toolworks,tannery,apothecary}
+  (repeatable, coin = floor(0.5 * summed input vendor sell value):
+  16/16/15/16/20/45 copper, xp 100, cadence-capped). The retired
+  placeholder rows q_archetype_acceptance and q_prof_make_amends are
+  GONE (content, i18n keys, every locale fill); unknown quest ids in a
+  loaded questLog are now PRUNED at load (normalize-on-load, pinned by
+  tests/quest_log_normalization.test.ts), which is what keeps
+  mid-placeholder-quest production saves loading cleanly. DECISION: the
+  attunePair completionEffect gained an optional pairId that NARROWS the
+  2039 selection whitelist to the quest's pair (never widens; recorded
+  here per the stopping rule). Consequence, accepted: pre-phase
+  characters attuned to a non-wave-one ring pair have no return path
+  until later archetype phases land; nothing crashes, pinned.
+  Mechanisms: src/sim/professions/cadence.ts (WORK_ORDER_CADENCE_TICKS
+  36000, NUDGE_CADENCE_TICKS 18000, QuestDef.repeatCadenceTicks, load
+  clamp so tick resets never brick a quest), prof_nudges.ts (1 Hz sweep:
+  text-free profTrendNudge SimEvent on the Phase 7 classifier for
+  unattuned characters, in-memory cadence that deliberately resets on
+  restart; profTierTutorial one-shot at the first tier-1 crossing,
+  persisted flag), tier_mail.ts (1 Hz sweep: one-shot-per-tier-per-major
+  congratulation letters from MASTER_TIER_LETTERS, per-craft
+  tierMailSent map with SILENT BASELINE ARMING so deploy migration and
+  fresh attunes never mail retroactively; top tier only on multi-tier
+  jumps; unknown pairs skipped), attunement_events.ts (personal
+  'attuned' + zone 'attunedZone' text-free SimEvents on the
+  masterworkZone pattern, both modes). Letters: MASTER_TIER_LETTERS in
+  content/letters.ts, 4 wave-one pairs x tiers 1..5, letterId derives as
+  'prof_tier_' + pairId with '+' to '_' + '_' + tier (the guild_trend
+  derivation, validation loop pinned); registered in both UI registries;
+  five non-Latin fills incl. localized senders. Wire: NO new IWorld
+  member, delta key, or command (census 259/54 unchanged);
+  cadenceBlockedQuests rides the existing cprof view field
+  (world_api/professions.ts), server-computed, display-mirrored,
+  re-validated server-side on accept. Persistence: questCadence,
+  tierMailSent, profTierTutorialSent on characters.state with
+  zero-default omission (zero golden regen). ROLLBACK CAVEAT: a
+  v0.29.0 reader ignores and silently drops the three new keys on
+  re-save; benign by design (tier mail re-baselines silently, the
+  tutorial can re-fire once, a work-order window frees early). UI: pure
+  cores profession_event_lines_core.ts + profession_tutorial_view.ts
+  (UI_PURE_CORES) with the tutorial modal on the confirm-dialog keyboard
+  family at z 96 over the mobile sheet; attunement preview returnCost (5
+  + 3 * switchCount) on the quest dialog AND identity card pre-commit;
+  the crafting-window learnable-at-a-master hint row through the shared
+  train_view knownness predicates + the station registry; celebration
+  banner on the craft-celebration family showing the archetype pair
+  title (no nameplate surface, per the Phase 1 QA drift note); i18n
+  namespace hudChrome.crafting.* (11 new keys), all events text-free so
+  no sim_i18n matcher rows were needed. NOTE: the legacy IWorld members
+  acceptArchetypeQuest/switchArchetype (no UI caller, ClientWorld
+  no-ops) do not celebrate or baseline-arm; they stay on the Phase 15
+  retirement list. #1295's described arms are complete (the issue was
+  already closed administratively). Phase 14 QA addition (branch
+  fix/professions-2-phase-14-qa): computeQuestState gained the
+  one-pending-identity-transition gate: while any attunePair-effect
+  quest is active, every OTHER attunePair-effect quest reports
+  'unavailable' in both hosts (the shared function; the server accept
+  path rides questState). Closes the banked-amends escalation dodge:
+  resolvedCounts is stamped at accept and turn-in never re-resolves it,
+  and new-pair attunes leave switchCount untouched, so banking two open
+  amends quests completed the second at a stale cheaper count. Pinned in
+  tests/profession_attunement_quests.test.ts (live path, abandon reopen,
+  escalated re-resolve at 8) and tests/quest_state_optimistic.test.ts
+  (mirror arm); switchHobby and plain quests stay outside the gate. QA
+  deferrals live in #2285.
 - Phase 14b: (planned) the commission marker, bind-on-first-trade
   enforcement, the master unbind service; the three maintainer decisions
   are RESOLVED in OPEN items (character binding, equipment-only opt-in

@@ -1385,6 +1385,7 @@ export class ClientWorld implements IWorld {
     amendsProgress: 0,
     amendsRequired: 0,
     knownRecipes: [],
+    cadenceBlockedQuests: [],
   };
   // Gathering profession proficiency (Mining/Logging/Herbalism, #1119), mirrored
   // from the `gprof` self-wire delta below (the real read surface; see
@@ -2781,6 +2782,11 @@ export class ClientWorld implements IWorld {
           // (its JSON diff fires on the sorted array changing). The ?? []
           // keeps a pre-Phase-9 server's payload loading cleanly.
           knownRecipes: [...(cprof.knownRecipes ?? [])],
+          // Phase 14: the server-computed work-order cooldown set (against ITS
+          // tickCount). questState() feeds it into computeQuestState so a work
+          // order on cooldown shows unavailable on the client too. The ?? []
+          // keeps a pre-Phase-14 server's payload loading cleanly.
+          cadenceBlockedQuests: [...(cprof.cadenceBlockedQuests ?? [])],
         };
         this.activeArchetype = this.craftingIdentity.activeArchetype;
         this.archetypeSwitchCount = this.craftingIdentity.switchCount;
@@ -2858,6 +2864,13 @@ export class ClientWorld implements IWorld {
 
   questState(questId: string): QuestState {
     const identity = this.craftingIdentity;
+    // Phase 14: the server-computed work-order cooldown set rides cprof and gates
+    // computeQuestState here exactly as it does server-side (the offline Sim
+    // re-derives the same set from live PlayerMeta.questCadence).
+    const cadenceBlocked =
+      identity && identity.cadenceBlockedQuests && identity.cadenceBlockedQuests.length > 0
+        ? new Set(identity.cadenceBlockedQuests)
+        : undefined;
     return optimisticQuestState(
       questId,
       this.questLog,
@@ -2877,6 +2890,7 @@ export class ClientWorld implements IWorld {
             amendsProgress: identity.amendsProgress,
           }
         : undefined,
+      cadenceBlocked,
     );
   }
 

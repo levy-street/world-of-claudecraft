@@ -31,6 +31,8 @@ export function optimisticQuestState(
   pendingQuestCommands: Map<string, 'accept' | 'turnin'>,
   playerLevel: number,
   professionState?: ArchetypeState,
+  // The server-computed work-order cooldown set (Phase 14), mirrored via cprof.
+  withinCadence?: ReadonlySet<string>,
 ): QuestState {
   let effectiveDone = questsDone;
   if (pendingQuestCommands.size > 0) {
@@ -41,7 +43,14 @@ export function optimisticQuestState(
       }
     }
   }
-  const state = computeQuestState(questId, questLog, effectiveDone, playerLevel, professionState);
+  const state = computeQuestState(
+    questId,
+    questLog,
+    effectiveDone,
+    playerLevel,
+    professionState,
+    withinCadence,
+  );
   const pending = pendingQuestCommands.get(questId);
   if (
     (pending === 'accept' && state === 'available') ||

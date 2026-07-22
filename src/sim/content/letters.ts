@@ -295,3 +295,181 @@ for (const pairId of Object.keys(GUILD_TREND_LETTERS)) {
     throw new Error(`GUILD_TREND_LETTERS has unknown pair ${pairId}`);
   }
 }
+
+// Master tier-milestone letters (Professions 2.0 Phase 14): when one of a
+// character's two attuned majors first reaches a tier milestone, the anchor
+// master of that pair sends the matching congratulation. Keyed by the canonical
+// archetype pair id (ARCHETYPE_PAIR_TARGETS) so the sender can look the set up
+// directly from the active pair, then by tier 1..5 (25/50/75/100/125 skill =
+// uncommon/rare/.../mastery work). Only the four wave-one pairs have seated
+// masters, so only they carry tier letters. Each letterId derives mechanically
+// from the pair, mirroring the GUILD_TREND_LETTERS family: 'prof_tier_' plus the
+// canonical pairId with its '+' replaced by '_' plus the tier (e.g.
+// prof_tier_weaponcrafting_armorcrafting_3). The module-load loop below pins that
+// derivation. Bodies stay craft-generic since each archetype empowers two majors,
+// and carry no copper or items. Ids are append-only, like every other letter here.
+export const MASTER_TIER_LETTERS: Record<string, Record<number, LetterDef>> = {
+  'weaponcrafting+armorcrafting': {
+    1: {
+      letterId: 'prof_tier_weaponcrafting_armorcrafting_1',
+      senderName: 'Forgemistress Darva',
+      subject: 'A spark worth noting',
+      body: 'Word reaches my forge that one of your majors now holds at uncommon work. It is the smallest rung on a long climb, but you earned it at the anvil, not by asking. Keep the fire hot.',
+    },
+    2: {
+      letterId: 'prof_tier_weaponcrafting_armorcrafting_2',
+      senderName: 'Forgemistress Darva',
+      subject: 'Rare work, and earned',
+      body: 'They tell me a major of yours has reached rare work. That is the rung where sloppy hands fall away and the real smiths are left standing. You are still standing. Good.',
+    },
+    3: {
+      letterId: 'prof_tier_weaponcrafting_armorcrafting_3',
+      senderName: 'Forgemistress Darva',
+      subject: 'The metal answers you now',
+      body: 'A major of yours has climbed past rare into serious work. The metal answers a hand like that, no longer fighting it. Do not let the praise soften your arm.',
+    },
+    4: {
+      letterId: 'prof_tier_weaponcrafting_armorcrafting_4',
+      senderName: 'Forgemistress Darva',
+      subject: 'Near the top of the ladder',
+      body: 'One of your majors stands a single rung below mastery. Few hands I have known reach this height, and fewer keep their edge here. Finish the climb.',
+    },
+    5: {
+      letterId: 'prof_tier_weaponcrafting_armorcrafting_5',
+      senderName: 'Forgemistress Darva',
+      subject: 'Mastery, at last',
+      body: 'A major of yours has reached mastery, the highest a hand can climb. I do not give praise freely, so hear this once: the forge is proud of you. Now go teach the fire something new.',
+    },
+  },
+  'leatherworking+tailoring': {
+    1: {
+      letterId: 'prof_tier_leatherworking_tailoring_1',
+      senderName: 'Weaver Ottilie',
+      subject: 'An even first row',
+      body: 'The guild notes that one of your majors has reached uncommon work. It is only the first row of many, but it is even and true. Measure the next as carefully.',
+    },
+    2: {
+      letterId: 'prof_tier_leatherworking_tailoring_2',
+      senderName: 'Weaver Ottilie',
+      subject: 'Rare work, well measured',
+      body: 'A major of yours has climbed to rare work. That is where a careless hand shows every dropped stitch, and yours has not. I am quietly pleased.',
+    },
+    3: {
+      letterId: 'prof_tier_leatherworking_tailoring_3',
+      senderName: 'Weaver Ottilie',
+      subject: 'The pattern comes clear',
+      body: 'One of your majors has passed rare into finer work. The pattern comes clear to a hand at this level, no more guessing. Keep measuring twice.',
+    },
+    4: {
+      letterId: 'prof_tier_leatherworking_tailoring_4',
+      senderName: 'Weaver Ottilie',
+      subject: 'One row from the top',
+      body: 'A major of yours sits one row short of mastery. The last row is always the hardest to keep even. Do not rush it now.',
+    },
+    5: {
+      letterId: 'prof_tier_leatherworking_tailoring_5',
+      senderName: 'Weaver Ottilie',
+      subject: 'The last stitch',
+      body: 'A major of yours has reached mastery. I measured your work twice, as I measure everything, and it holds. Few hands ever tie the last stitch this cleanly. I am proud, and I do not say so lightly.',
+    },
+  },
+  'alchemy+cooking': {
+    1: {
+      letterId: 'prof_tier_alchemy_cooking_1',
+      senderName: 'Cook Marlow',
+      subject: 'A taste of things to come',
+      body: 'Word drifts back to my kitchen that one of your majors has reached uncommon work. It is a first taste, nothing more, but a promising one. Keep the pot moving.',
+    },
+    2: {
+      letterId: 'prof_tier_alchemy_cooking_2',
+      senderName: 'Cook Marlow',
+      subject: 'Rare work, and no burnt edges',
+      body: 'They tell me a major of yours has simmered up to rare work. That is the heat where most cooks scorch the dish, and you did not. Sit, but not for long.',
+    },
+    3: {
+      letterId: 'prof_tier_alchemy_cooking_3',
+      senderName: 'Cook Marlow',
+      subject: 'Now you are cooking',
+      body: 'One of your majors has bubbled past rare into real depth. Now you are cooking, as they say. Season boldly and keep tasting.',
+    },
+    4: {
+      letterId: 'prof_tier_alchemy_cooking_4',
+      senderName: 'Cook Marlow',
+      subject: 'One course from the feast',
+      body: 'A major of yours is a single course short of mastery. The last one is always the richest and the easiest to overdo. Steady hands on the ladle.',
+    },
+    5: {
+      letterId: 'prof_tier_alchemy_cooking_5',
+      senderName: 'Cook Marlow',
+      subject: 'Mastery, served hot',
+      body: 'A major of yours has reached mastery, the top shelf of the whole pantry. I feed everyone, but few ever cook their way up here. Proud of you, truly. Now go make something that makes them weep at the table.',
+    },
+  },
+  'engineering+alchemy': {
+    1: {
+      letterId: 'prof_tier_engineering_alchemy_1',
+      senderName: 'Tinker Gizzel',
+      subject: 'FIRST spark, ha',
+      body: 'Oi, the numbers say one of your majors just hit uncommon work, small potatoes, tiny, but it POPPED, yes? First spark is always the cutest. More sparks. Go.',
+    },
+    2: {
+      letterId: 'prof_tier_engineering_alchemy_2',
+      senderName: 'Tinker Gizzel',
+      subject: 'Rare, oh, RARE',
+      body: 'They tell me a major of yours climbed to rare work, and rare is where it starts getting properly dangerous (the good kind). Most hands quit before the fun. Not you. HA.',
+    },
+    3: {
+      letterId: 'prof_tier_engineering_alchemy_3',
+      senderName: 'Tinker Gizzel',
+      subject: 'Now it gets loud',
+      body: 'One of your majors blew past rare into the serious stuff, oh this is where it gets LOUD. Do not stop now, whatever you do, momentum is everything, also fuses.',
+    },
+    4: {
+      letterId: 'prof_tier_engineering_alchemy_4',
+      senderName: 'Tinker Gizzel',
+      subject: 'One rung, ONE, from the top',
+      body: 'A major of yours is ONE rung under mastery, one, singular, do you feel it humming? The last step is the biggest bang. Do not blink.',
+    },
+    5: {
+      letterId: 'prof_tier_engineering_alchemy_5',
+      senderName: 'Tinker Gizzel',
+      subject: 'MASTERY, kaboom',
+      body: 'A major of yours hit mastery, the very TOP, kaboom, the whole ladder, done. I do not hand out praise, I hand out fuses, but here, take both: you are brilliant and slightly terrifying. Go make the mountains nervous.',
+    },
+  },
+};
+
+// The four wave-one adjacent pairs that have a seated anchor master, a subset of
+// ARCHETYPE_PAIR_TARGETS. Only these carry tier letters.
+const MASTER_TIER_PAIRS: readonly string[] = [
+  'weaponcrafting+armorcrafting',
+  'leatherworking+tailoring',
+  'alchemy+cooking',
+  'engineering+alchemy',
+];
+
+// Guard the tier-letter set against the ring the same way GUILD_TREND_LETTERS is
+// guarded: every wave-one pair must be a real ARCHETYPE_PAIR_TARGET, present with
+// tiers 1..5, and each letterId must derive from the canonical pairId, so a
+// renamed pair or a mistyped id fails loudly at load rather than orphaning a
+// letter or its localized copy.
+for (const pairId of MASTER_TIER_PAIRS) {
+  if (!ARCHETYPE_PAIR_TARGETS.includes(pairId)) {
+    throw new Error(`MASTER_TIER_LETTERS names unknown pair ${pairId}`);
+  }
+  const byTier = MASTER_TIER_LETTERS[pairId];
+  if (!byTier) throw new Error(`MASTER_TIER_LETTERS is missing pair ${pairId}`);
+  for (let tier = 1; tier <= 5; tier++) {
+    const letter = byTier[tier];
+    if (!letter) throw new Error(`MASTER_TIER_LETTERS ${pairId} is missing tier ${tier}`);
+    const expectedId = `prof_tier_${pairId.replace('+', '_')}_${tier}`;
+    if (letter.letterId !== expectedId) {
+      throw new Error(`MASTER_TIER_LETTERS ${pairId} tier ${tier} letterId must be ${expectedId}`);
+    }
+  }
+}
+for (const pairId of Object.keys(MASTER_TIER_LETTERS)) {
+  if (!MASTER_TIER_PAIRS.includes(pairId)) {
+    throw new Error(`MASTER_TIER_LETTERS has unexpected pair ${pairId}`);
+  }
+}
