@@ -360,7 +360,10 @@ export class StableSelfTimerWireCache {
    *  hourglass window: the cache then rebuilds per tick (bandwidth only, the
    *  re-sent deadline keeps the client exact at snapshot cadence). The
    *  encodeCooldowns [deadline, rate, until] tuple is deliberately NOT
-   *  replicated here for that rare dev/chronomancy window. */
+   *  replicated here for that rare dev/chronomancy window, and neither is the
+   *  aura encoder's paused branch: nothing in the sim pauses a charge-pool
+   *  recharge today, so a plain deadline is always live. If a pause mechanic
+   *  ever reaches recharges, this encoder needs the aura treatment. */
   encodeChargeRecharges(
     ownerId: number,
     abilityCharges: Entity['abilityCharges'],

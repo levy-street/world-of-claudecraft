@@ -2652,18 +2652,21 @@ export class ClientWorld implements IWorld {
           const rec = e.abilityCharges[k];
           const pair = s.achr[k] as unknown;
           if (!rec || !Array.isArray(pair)) continue;
-          const deadline = Number(pair[0]);
+          // pair[0]'s meaning depends on the wire mode: an absolute sim-time
+          // DEADLINE on the stable wire, raw REMAINING seconds on legacy.
+          const rawPair0 = Number(pair[0]);
           const len = Number(pair[1]);
           const remaining =
             timerWire.mode === 'stable'
               ? timerWire.time !== null
-                ? stableDeadlineRemaining(deadline, timerWire.time)
+                ? stableDeadlineRemaining(rawPair0, timerWire.time)
                 : null
-              : deadline;
+              : rawPair0;
           if (remaining !== null && remaining > 0 && len > 0) {
             rec.recharge = remaining;
             rec.rechargeLength = len;
-            if (stable) this.stableChargeRecharges?.set(k, [deadline, len]);
+            // Retention stores the DEADLINE form (stable mode only).
+            if (stable) this.stableChargeRecharges?.set(k, [rawPair0, len]);
           }
         }
       }

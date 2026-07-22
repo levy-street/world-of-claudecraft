@@ -4600,6 +4600,9 @@ describe('negotiated stable timer wire v2', () => {
     player.cooldowns.clear();
     player.abilityCharges.stable_cast.charges = 2;
     player.abilityCharges.stable_cast.recharge = 0;
+    // recharges[] mirrors the real refill invariant (auras.ts empties the
+    // per-charge timers when the pool fills); the encoder only reads
+    // `recharge`, but the fixture should never model a state the sim cannot be in.
     player.abilityCharges.stable_cast.recharges = [];
     meta.nodeHarvestReadyAt.stable_node = server.sim.time - 1;
     fc.sent.length = 0;
