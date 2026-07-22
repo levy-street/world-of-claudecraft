@@ -5509,6 +5509,15 @@
   #market-indicator[hidden] {
     display: none;
   }
+  #market-indicator:hover,
+  #market-indicator:focus-visible {
+    color: #d8c89a;
+    border-color: #c9a86a;
+    outline: none;
+  }
+  #market-indicator:focus-visible {
+    box-shadow: 0 0 0 2px var(--gold);
+  }
   #market-indicator .ui-icon {
     width: 14px;
     height: 14px;

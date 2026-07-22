@@ -7743,7 +7743,10 @@ export class Hud {
   }
 
   private initMarketIndicator(): void {
-    const el = $('#market-indicator') as HTMLButtonElement;
+    // Null-guarded (the raid-lockout init pattern): a game entry missing the
+    // badge markup must degrade to no badge, never abort the rest of HUD init.
+    const el = $('#market-indicator') as HTMLButtonElement | null;
+    if (!el) return;
     this.marketIndicatorEl = el;
     const activate = () => {
       // At the Merchant the coin opens the World Market (the same gate the

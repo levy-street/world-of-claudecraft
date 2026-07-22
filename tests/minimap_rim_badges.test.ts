@@ -43,4 +43,18 @@ describe('minimap rim badges', () => {
       `rim badges share a corner: ${RIM_BADGE_SELECTORS.map((s, i) => `${s} at ${corners[i]}`).join(', ')}`,
     ).toBe(corners.length);
   });
+
+  // Both game entries carry their own copy of the minimap cluster markup, and
+  // tests/entry_window_parity.test.ts scans only `.window panel` divs, so a rim
+  // badge shipped to one entry passes every other gate while the other entry
+  // silently loses it (or worse, its HUD init throws on the missing element).
+  it('ships every rim badge in both game entries', () => {
+    for (const entry of ['index.html', 'play.html']) {
+      const html = readFileSync(new URL(`../${entry}`, import.meta.url), 'utf8');
+      for (const selector of RIM_BADGE_SELECTORS) {
+        const id = selector.slice(1);
+        expect(html, `${entry} is missing ${selector}`).toContain(`id="${id}"`);
+      }
+    }
+  });
 });
