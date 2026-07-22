@@ -312,7 +312,6 @@ export const COMMAND_NAMES = [
   'harvest_node',
   'craft_item',
   'place_mobile_station',
-  'disenchant_item',
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',

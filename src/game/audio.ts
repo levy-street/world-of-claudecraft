@@ -96,7 +96,12 @@ const UI_CUES = {
   masterwork: 'ui_masterwork',
   disenchant: 'ui_craft_disenchant',
   salvage: 'ui_craft_salvage',
-  enchant: 'ui_craft_enchant',
+  // Reuses the same recording as craftByFamily.enchanting above (one
+  // enchanting-profession take, no separate apply-enchant recording): that
+  // craftByFamily slot never actually fires (see its comment), so there is
+  // no conflict sharing the file with the real applyEnchant/enchantResult
+  // action here.
+  enchant: 'ui_craft_enchanting',
 } as const;
 
 type UiCue =

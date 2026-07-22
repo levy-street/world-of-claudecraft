@@ -9489,14 +9489,6 @@ export class Hud {
           if (ev.finderPid === sim.playerId) audio.achievement();
           break;
         }
-        // No client UI calls disenchantItem() yet (the wire/event plumbing
-        // landed ahead of the trigger, 2026-07-18); this case exists so the
-        // sound is ready to fire the moment a UI trigger is built, no further
-        // plumbing needed then.
-        case 'disenchantResult': {
-          if (ev.ok) audio.disenchant();
-          break;
-        }
         case 'lootRoll': {
           this.lootRolls.showRoll(ev);
           break;

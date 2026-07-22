@@ -773,11 +773,6 @@ export const SFX = [
   // break-any-item-for-generic-materials action (src/sim/professions/
   // salvage.ts), separate from disenchant's rare+ arcane-materials path.
   { key: 'ui_craft_salvage', custom: true },
-
-  // Apply-enchant proc (custom recording): the enchanting profession's
-  // apply-an-enchant-onto-a-held-copy action (src/sim/professions/
-  // enchanting.ts applyEnchant).
-  { key: 'ui_craft_enchant', custom: true },
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

@@ -22,6 +22,22 @@ function mustEntity(sim: Sim, pid: number): Entity {
   return entity;
 }
 
+// A gather cast (Professions 2.0 Phase 12b) runs multiple real ticks, during
+// which a nearby mob's damage can interrupt it (castStop, success: false);
+// the gathering_rhythm.test.ts idiom silences mobs first so a cast survives
+// to completion deterministically.
+function despawnMobs(sim: Sim): void {
+  for (const e of sim.entities.values()) {
+    if (e.kind !== 'mob') continue;
+    e.dead = true;
+    e.hp = 0;
+    e.aiState = 'dead';
+    e.respawnTimer = 9999;
+    e.corpseTimer = 9999;
+    e.inCombat = false;
+  }
+}
+
 function makeWorld(seed = 42) {
   return new Sim({ seed, playerClass: 'warrior', noPlayer: true });
 }
@@ -48,11 +64,18 @@ describe('professions grants suppress the generic loot audio cue, not the text',
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Miner');
     teleportOntoNode(sim, pid, NODE_ID);
+    despawnMobs(sim);
 
+    // harvestNode only STARTS the gather cast (Professions 2.0 Phase 12b);
+    // the actual grant lands later via completeGatherCast once the cast
+    // timer runs out. GATHER_CAST_BASE_SEC (2.5s) is the longest possible
+    // cast, so 3 seconds of ticks always clears it.
     expect(sim.harvestNode(NODE_ID, pid)).toBe(true);
-    const events = lootEvents(sim.tick());
-    expect(events.length).toBeGreaterThan(0);
-    for (const ev of events) {
+    const events: SimEvent[] = [];
+    for (let i = 0; i < 20 * 3; i++) events.push(...sim.tick());
+    const loot = lootEvents(events);
+    expect(loot.length).toBeGreaterThan(0);
+    for (const ev of loot) {
       expect(ev.silent).toBe(true);
       expect(ev.text).toContain('You receive:');
     }

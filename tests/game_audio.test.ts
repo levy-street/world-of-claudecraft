@@ -225,6 +225,12 @@ describe('sampled GameAudio facade', () => {
     ]);
   });
 
+  it('plays the apply-enchant cue on its own key', () => {
+    const audio = new GameAudio();
+    audio.enchant();
+    expect(sfxMock.playUi).toHaveBeenLastCalledWith('ui_craft_enchanting', { jitter: false });
+  });
+
   it('plays the masterwork sting as its own cue, layered by the caller alongside craftSuccess', () => {
     const audio = new GameAudio();
 
@@ -275,13 +281,15 @@ describe('sampled GameAudio facade', () => {
 });
 
 describe('deterministic UI SFX catalog', () => {
-  it('adds 20 unique UI cues to the authoritative studio inventory', () => {
-    // 14 prior cues plus the six gathering-rhythm placeholders
-    // (ui_gather_cast/strike/rare, ui_fish_cast/bite/reel), issue #2208.
+  it('adds 18 unique UI cues to the authoritative studio inventory', () => {
+    // 14 pre-12b cues plus the four remaining Phase 12b gathering-rhythm
+    // placeholders (ui_gather_cast, ui_fish_cast/bite/reel), issue #2208.
+    // ui_gather_strike/rare were retired here once real per-node-type +
+    // rarity-tier recordings replaced them (src/game/audio.ts).
     const keys = UI_SFX_CATALOG.map((cue: { key: string }) => cue.key);
     const fullCatalogKeys = new Set(SFX.map((cue: { key: string }) => cue.key));
 
-    expect(keys).toHaveLength(20);
+    expect(keys).toHaveLength(18);
     expect(new Set(keys).size).toBe(keys.length);
     expect(keys.every((key: string) => key.startsWith('ui_'))).toBe(true);
     expect(UI_SFX_CATALOG.every((cue: { generator: string }) => cue.generator === 'ffmpeg')).toBe(

@@ -63,14 +63,18 @@ describe('the generic loot cue respects ev.silent', () => {
 });
 
 describe('disenchantResult audio wiring', () => {
-  // No client UI calls disenchantItem() yet (as of 2026-07-18: the sim event/
-  // IWorld/wire plumbing landed ahead of a UI trigger), but the sound is
-  // wired and ready the moment one exists.
+  // disenchantItem is called from the bag item action menu
+  // (src/ui/bag_item_action_menu.ts); the success (toast.sink === 'log') arm
+  // plays audio.disenchant(), a denial (showError) never does.
   it('plays the disenchant cue on a successful disenchant, not on a denial', () => {
     const start = hud.indexOf("case 'disenchantResult':");
     expect(start).toBeGreaterThan(-1);
     const end = hud.indexOf('break;', start);
     const body = hud.slice(start, end);
-    expect(body).toContain('if (ev.ok) audio.disenchant();');
+    expect(body).toContain("if (toast.sink === 'log') {");
+    expect(body).toContain('audio.disenchant();');
+    // The disenchant call must sit inside the log (success) arm, before the
+    // else (showError/denial) branch.
+    expect(body.indexOf('audio.disenchant();')).toBeLessThan(body.indexOf('else'));
   });
 });
