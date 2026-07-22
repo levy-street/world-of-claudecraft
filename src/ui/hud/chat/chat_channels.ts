@@ -163,6 +163,27 @@ export function composeWhisperReply(typed: string): string {
   return `/r ${text}`;
 }
 
+// The specific target of an explicit whisper command (/w, /whisper, /t, /tell): the
+// first whitespace-delimited token after the command. This is what lets the chat input
+// KEEP whispering the same player after you whisper them, instead of snapping back to
+// the previous standing channel (the reported bug). Multi-word names resolve server-side
+// (longest-online-name match), so the first token is what the client re-sends. A `/r`
+// reply returns null (its target is the last whisperer, known only to the server), as
+// does any non-whisper line.
+export function whisperTargetName(line: string): string | null {
+  const m = /^\/(?:w|whisper|t|tell)\s+(\S+)/i.exec(line.trim());
+  return m ? m[1] : null;
+}
+
+// Compose the text sent for a plain line typed while a specific whisper target is sticky
+// (after an explicit /w to that player): keep whispering them. An explicit slash command
+// the player typed still wins, mirroring composeChatLine / composeWhisperReply.
+export function composeWhisperTo(name: string, typed: string): string {
+  const text = typed.trim();
+  if (!text || text.startsWith('/')) return text;
+  return `/w ${name} ${text}`;
+}
+
 // The standing channel the actually-sent line reached, used to update the sticky
 // "last used" send channel so the next opened input (on the All tab) defaults
 // there. Plain text (no leading slash) went to `say`. An explicit slash command
