@@ -247,6 +247,7 @@ const RENDER_PURE_CORES = [
   'src/render/camera_boom_core.ts',
   'src/render/camera_director_core.ts',
   'src/render/camera_feel_core.ts',
+  'src/render/target_focus_core.ts',
   'src/render/cast_bar.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/stations_core.ts',

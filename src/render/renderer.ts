@@ -176,6 +176,7 @@ import { freezeStaticMatrices } from './static_matrix';
 import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
+import { createTargetFocus, selectionPulse, stepTargetFocus } from './target_focus_core';
 import {
   syncTemporalHourglassVisual,
   TemporalHourglassGroundVisuals,
@@ -947,6 +948,8 @@ export class Renderer {
   // Player-pose mirror from last frame: any change while a directive runs is
   // manual camera input (or the follow system), which cancels the directive.
   private readonly camMirror = { yaw: Number.NaN, pitch: Number.NaN, dist: Number.NaN };
+  // Target-acquisition presentation: selection flourish clock + focus lean.
+  private readonly targetFocus = createTargetFocus();
   // Death-drift arming: only an alive-to-dead EDGE of the SAME viewed entity
   // arms one drift (a spectate switch onto a corpse never does), and a
   // cancelled drift stays cancelled for that death.
@@ -5637,11 +5640,16 @@ export class Renderer {
           ringPos.needsUpdate = true;
           this.selectionRingTicks.position.y = 0.08; // ticks float just above the footing
         }
-        this.selectionRingTicks.rotation.y += dt * SELECTION_RING_SPIN; // slow reticle spin
+        // Acquire flourish: the ring blooms in from oversized with a brief
+        // brightness flash while the reticle ticks whip and settle into the
+        // slow spin (a no-op once the pulse settles / under reduced motion).
+        const acquire = selectionPulse(this.targetFocus);
+        this.selectionRing.scale.setScalar(target.scale * acquire.scale);
+        this.selectionRingTicks.rotation.y += dt * (SELECTION_RING_SPIN + acquire.spin);
         const ringMat = this.selectionRingMat;
         ringMat.color.setHex(this.isHostileSelectionTarget(target) ? 0xcc2222 : 0xd4af37);
         if (!this.lowGfx) ringMat.color.multiplyScalar(SELECTION_RING_BOOST); // subtle bloom edge
-        ringMat.opacity = 0.78 + 0.2 * Math.sin(this.time * 4.5); // gentle pulse
+        ringMat.opacity = Math.min(1, 0.78 + 0.2 * Math.sin(this.time * 4.5) + 0.55 * acquire.glow);
         this.selectionRing.visible = true;
       } else {
         this.selectionRing.visible = false;
@@ -6339,6 +6347,19 @@ export class Renderer {
     }
     stepCameraFeel(this.camFeel, velX, velZ, dt, !reduce);
 
+    // Target focus: the acquire flourish clock plus the micro look-pivot lean
+    // toward the held target (weighted by how off-center it sits).
+    const focusTarget = p.targetId !== null ? this.sim.entities.get(p.targetId) : null;
+    stepTargetFocus(
+      this.targetFocus,
+      focusTarget ? focusTarget.id : null,
+      focusTarget ? focusTarget.pos.x - selfPos.x : 0,
+      focusTarget ? focusTarget.pos.z - selfPos.z : 0,
+      this.camYaw,
+      dt,
+      !reduce,
+    );
+
     // Flipping reduce motion on mid-directive blends any running move out.
     if (reduce) cancelCameraDirective(this.camDirector);
 
@@ -6389,9 +6410,9 @@ export class Renderer {
     // resolved so the ray origin can never sit inside a collider's pad
     // (which would blind the sweep and let the camera see through the wall),
     // and the min-distance clamp stays avatar-relative.
-    const px = this.camBoom.x + this.camFeel.leadX;
+    const px = this.camBoom.x + this.camFeel.leadX + this.targetFocus.focusX;
     const py = this.camBoom.y;
-    const pz = this.camBoom.z + this.camFeel.leadZ;
+    const pz = this.camBoom.z + this.camFeel.leadZ + this.targetFocus.focusZ;
     const eyeY = py + 2.0;
     const ax = selfPos.x;
     const ay = selfPos.y + 2.0;
