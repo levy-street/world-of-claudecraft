@@ -234,6 +234,7 @@ import {
   buildGatheringProficiencyRows,
   gatherDeniedLineKey,
   gatherDowngradeLineKey,
+  gatherRareTierFor,
   gatherToolNoNodeKey,
 } from './gathering_view';
 import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
@@ -9345,19 +9346,7 @@ export class Hud {
             QUALITY_COLOR[ev.rarity],
           );
           audio.gather(ev.nodeType);
-          // A rare event forces at least the epic stinger regardless of the
-          // rolled material rarity (a rare event is rarer than a legendary
-          // material roll at every proficiency level: GATHER_RARE_EVENT_CHANCE
-          // is a flat 1/90 draw, gather_events.ts), otherwise the stinger
-          // tracks the rolled tier 1:1; common/uncommon get no stinger.
-          const gatherRareTier =
-            ev.rarity === 'legendary'
-              ? 'legendary'
-              : ev.rarity === 'epic' || ev.rareEvent !== null
-                ? 'epic'
-                : ev.rarity === 'rare'
-                  ? 'rare'
-                  : null;
+          const gatherRareTier = gatherRareTierFor(ev.rarity, ev.rareEvent);
           if (gatherRareTier) audio.gatherRareTier(gatherRareTier);
           break;
         }

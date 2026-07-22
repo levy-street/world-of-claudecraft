@@ -124,4 +124,16 @@ describe('professions grants suppress the generic loot audio cue, not the text',
     expect(events.length).toBe(1);
     expect(events[0].silent).toBe(true);
   });
+
+  it('a salvage emits a silent loot event for the reclaimed material', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    sim.addItem('eastbrook_arming_sword', 1, pid);
+    sim.tick(); // drain the (loud) sword grant before isolating the salvage
+    sim.salvageItem('eastbrook_arming_sword', pid);
+    expect(sim.lastSalvageResult?.ok).toBe(true);
+    const events = lootEvents(sim.tick());
+    expect(events.length).toBe(1);
+    expect(events[0].silent).toBe(true);
+  });
 });
