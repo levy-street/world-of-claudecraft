@@ -16,6 +16,8 @@
 
 import type { StreamerLinks } from '../../../sim/account_flair';
 import { streamerLinkList } from '../../../sim/account_flair';
+import { specialRoleColor } from '../../../sim/discord_roles';
+import { discordRoleTagLabel } from '../../discord_role_tag';
 import { t } from '../../i18n';
 import { svgIcon } from '../../ui_icons';
 
@@ -25,6 +27,9 @@ export const CHAT_MESSAGE_TOKEN = '__WOC_CHAT_MESSAGE__';
 const SLOT_SPLIT_RE = new RegExp(`(${CHAT_NAME_TOKEN}|${CHAT_MESSAGE_TOKEN})`);
 
 export interface ChatLineParts {
+  /** the colored staff/special-role tag ([Levy St], [Core Dev], ...), drawn
+   * first among the name-slot marks; null for a sender with no special role */
+  roleTag: Node | null;
   /** the [AI] flair tag, drawn immediately before the name; null for a normal sender */
   aiTag: Node | null;
   /** the verified-streamer flair badge, drawn immediately before the name (after
@@ -54,6 +59,33 @@ export function chatAiTagEl(doc: Document): HTMLSpanElement {
   tag.title = t('hudChrome.playerMenu.aiTagTitle');
   tag.setAttribute('role', 'img');
   tag.setAttribute('aria-label', t('hudChrome.playerMenu.aiTagTitle'));
+  return tag;
+}
+
+/**
+ * The colored staff/special-role tag shown beside a staff member's chat name
+ * ([Levy St], [Core Dev], [Mod], ...), the anti-impersonation disclosure. The
+ * key arrives ONLY via the server-stamped ChatSenderFlair (a client cannot
+ * forge it), and both the label and color resolve through the same shared
+ * catalog the nameplates use, so chat and the world always agree on what a
+ * role looks like. Null for an unknown key, so a bad wire value draws nothing.
+ *
+ * Like the [AI] tag this is a DISCLOSURE, not decoration: role="img" plus an
+ * aria-label that states the MEANING (a verified server role), because a
+ * screen-reader user is exactly as impersonatable as a sighted one.
+ */
+export function chatRoleTagEl(doc: Document, roleKey: string | undefined): Node | null {
+  const label = discordRoleTagLabel(roleKey);
+  if (!label) return null;
+  const tag = doc.createElement('span');
+  tag.className = 'chat-role-tag';
+  tag.textContent = `[${label}]`;
+  const color = specialRoleColor(roleKey);
+  if (color) tag.style.color = color;
+  const title = t('hudChrome.discord.roleTagChatTitle', { role: label });
+  tag.title = title;
+  tag.setAttribute('role', 'img');
+  tag.setAttribute('aria-label', title);
   return tag;
 }
 
@@ -93,6 +125,7 @@ export function appendChatLineParts(
   let messageAppended = false;
   for (const part of rendered.split(SLOT_SPLIT_RE)) {
     if (part === CHAT_NAME_TOKEN) {
+      if (parts.roleTag) div.append(parts.roleTag);
       if (parts.aiTag) div.append(parts.aiTag);
       if (parts.streamerBadge) div.append(parts.streamerBadge);
       div.append(parts.sender);
@@ -106,6 +139,7 @@ export function appendChatLineParts(
   }
   if (senderAppended && messageAppended) return;
   div.textContent = '';
+  if (parts.roleTag) div.append(parts.roleTag);
   if (parts.aiTag) div.append(parts.aiTag);
   if (parts.streamerBadge) div.append(parts.streamerBadge);
   div.append(parts.sender, div.ownerDocument.createTextNode(': '));

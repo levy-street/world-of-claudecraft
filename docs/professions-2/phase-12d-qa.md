@@ -43,10 +43,15 @@ a hard 30-tool-call budget and report-first framing:
   gather, corpse rare+, specimen, masterwork, enchant-carried); the marker on desktop
   and mobile shots; the downgrade notice fires on the exact full-bag boundary and never
   otherwise; the S3 guard.
-- Companion-fix agent: reproduce the pre-fix #2139 overflow seed class and prove it
-  fixed; force-rename a character with signed items everywhere (bags, bank, mail
-  escrow, trade-received copies, equipped eqi) and prove every signer string, the
-  self-signed discount, and battlefield attribution follow the new name.
+- Companion-fix agent (as-landed scope, swept 2026-07-21): the filed #2139 overflow was
+  ALREADY dead at phase start (the Phase 10 QA grant-order fix guards it); the phase
+  pinned the hunted crossing case and made the signed-grant guards MERGE-AWARE
+  (bags.ts canGrantItemInstance), so verify the pin bites and the merge arm keeps the
+  signature at a full bag. Force-rename a character with signed items in its OWN blob
+  (bags, bank, equipped eqi) and prove every signer string, the self-signed discount,
+  and battlefield attribution follow the new name; mail escrow and market hold NO
+  instances by construction, and foreign-held (trade-received) copies keep the stale
+  name BY SCOPE (a flagged maintainer surface, not a defect).
 - Mail agent: expiry at exactly the boundary, the single return cycle, deletion only
   after it, system-mail exemption by class (author a new system letter and prove it
   never expires without touching an id list), pre-existing mail clocks starting at
@@ -57,6 +62,18 @@ filtering; resume truncated agents.
 
 STEP 3 - FIX: apply every BLOCKING and SHOULD-FIX finding test-first; rerun failed rows
 until green; commit with explicit paths, Conventional Commits with a body.
+- DIRECTED SHOULD-FIX (user, 2026-07-21, loot-window legibility; approved wording, land
+  it in this QA pass): rename the loot window's "Take All" button to "Take Loot" (the
+  old label promised the harvest too) and add tooltips to both buttons via the shared
+  attachTooltip idiom, hover and mobile long-press alike:
+  - Take Loot: "Takes the coins and dropped items. Does not use up the harvest."
+  - Harvest: "Gathers the checked components. Each corpse can be harvested once, first
+    come. Does not take the loot."
+  Plus the footer hint line (approved, not optional): "The interact key loots and
+  harvests in one press, using your town focus." on the loot window, the town-focus
+  hint-line idiom. The new strings are wordy (M16):
+  English catalog rows plus the five non-Latin overlay fills each. Pin the renamed
+  label and both tooltip bindings; the Harvest button id/behavior is unchanged.
 
 STEP 4 - UPDATE DOCS + MEMORY: progress.md QA row and verdict; state.md drift
 corrections; append the QA post-inventory to the phase file's as-landed block; record

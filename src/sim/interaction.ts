@@ -23,7 +23,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { bagCapacity, fitsAll } from './bags';
+import { bagCapacity, canGrantItemInstance, fitsAll } from './bags';
 import { HARVEST_COMPONENT_SPECIMENS, monsterMaterialTierFor } from './content/professions';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
@@ -36,7 +36,9 @@ import { isInRaidInstance } from './instances/dungeons';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
+  CORPSE_INTERACT_GRACE_SECONDS,
   distributeLootCopper,
+  hasPendingLootRollForMob,
   lootSlotVisibleTo,
   pruneCorpseLoot,
 } from './loot/loot_roll';
@@ -210,10 +212,13 @@ export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: num
  * professions/gathering.ts for the race-freedom argument.
  *
  * `components` (#1142) is the player's per-corpse focus pick: which tagged
- * component(s) to extract. Omitted, empty, or covering every tagged component
- * all spread the harvest across every tag (the #1141 behavior); picking fewer
- * concentrates the effort for a higher tier per component, per
- * resolveCorpseFocusHarvest in professions/gathering.ts.
+ * component(s) to extract. OMITTED (undefined, Phase 12d) resolves to the
+ * player's persistent town focus: the corpse tags holding allocation points
+ * (none focused falls through to the spread). An EXPLICIT array keeps the
+ * #1142 semantics: empty or covering every tagged component spreads across
+ * every tag (the #1141 behavior); picking fewer concentrates the effort for
+ * a higher tier per component, per resolveCorpseFocusHarvest in
+ * professions/gathering.ts.
  */
 export function harvestCorpse(
   ctx: SimContext,
@@ -256,8 +261,14 @@ export function harvestCorpse(
   // persistent town focus per component, fit cumulatively): a gate on less
   // could pass on a nearly-full stack and let the uncapped addItem spill past
   // capacity.
+  // Phase 12d omitted-components default: no explicit pick means the player's
+  // persistent town focus IS the pick (the focused subset of this corpse's
+  // tags; nothing focused spreads, exactly like an explicit empty pick). The
+  // derivation is rng-free, so a refused command below still draws nothing.
+  const chosen =
+    components ?? (componentTags ?? []).filter((tag) => (meta.townFocus[tag] ?? 0) > 0);
   const wanted: InvSlot[] = [];
-  for (const component of effectiveFocusComponents(componentTags ?? [], components ?? [])) {
+  for (const component of effectiveFocusComponents(componentTags ?? [], chosen)) {
     const wantedItemId = HARVEST_COMPONENT_ITEMS[component];
     if (!wantedItemId) continue;
     const maxQty = focusedHarvestQuantity('legendary', component, meta.townFocus);
@@ -285,7 +296,7 @@ export function harvestCorpse(
   // plain fungible grant, same as before this issue. One rarity roll per
   // yielded component, same one-draw-per-yield convention as
   // resolveCorpseFocusHarvest's own tier roll.
-  const yields = resolveCorpseFocusHarvest(componentTags ?? [], components ?? [], ctx.rng);
+  const yields = resolveCorpseFocusHarvest(componentTags ?? [], chosen, ctx.rng);
   // #1145 + Phase 10: one rarity roll per yielded component, independent of
   // the component's tier roll/bonus. For a family with a Pristine specimen
   // (HARVEST_COMPONENT_SPECIMENS), a rare-or-better roll grants the specimen
@@ -350,24 +361,53 @@ export function harvestCorpse(
   }
   // Signed-family components first: their plain FALLBACK still owns
   // pre-gate-reserved stack room, so they outrank the specimens, which are
-  // pure extras. Signed instances never merge into stacks (bags.ts
-  // addStacked, #1165): each needs a genuinely free slot, and with none the
-  // signed-family grant falls back to the plain fungible top-up (the
-  // signature truncates, the yield does not) while a specimen truncates
-  // outright, the same truncation contract harvestNode's signed grants
-  // follow.
+  // pure extras. A signed instance merges into a byte-equal same-signer stack
+  // (identical-payload stacking, Phase 12d; never a plain stack, #1165), so
+  // this gate accepts same-signer stack room OR a genuinely free slot
+  // (canGrantItemInstance, the countFit model harvestNode's signed grants
+  // share, #2139); with neither the signed-family grant falls back to the
+  // plain fungible top-up (the signature truncates, the yield does not) while
+  // a specimen truncates outright, the same truncation contract harvestNode's
+  // signed grants follow. Each downgrade tells the player via the text-free
+  // personal gatherDowngrade event, at most ONCE per harvest command (the
+  // toolDeniedEmitted idiom); the mark-lost arm runs first, so when both a
+  // signature and a jackpot are lost the single event reports the mark.
+  let downgradeEmitted = false;
   for (const grant of signedGrants) {
     if (grant.specimen) continue;
-    if (meta.inventory.length < bagCapacity(meta.bags)) {
-      ctx.addItemInstance(grant.itemId, { signer: meta.name }, meta.entityId);
+    const payload = { signer: meta.name };
+    if (canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), grant.itemId, payload)) {
+      ctx.addItemInstance(grant.itemId, payload, meta.entityId);
     } else {
       ctx.addItem(grant.itemId, grant.plainQty, meta.entityId);
+      if (!downgradeEmitted) {
+        downgradeEmitted = true;
+        ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'corpse', lost: 'mark' });
+      }
     }
   }
   for (const grant of signedGrants) {
     if (!grant.specimen) continue;
-    if (meta.inventory.length < bagCapacity(meta.bags)) {
-      ctx.addItemInstance(grant.itemId, { signer: meta.name }, meta.entityId);
+    const payload = { signer: meta.name };
+    if (canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), grant.itemId, payload)) {
+      ctx.addItemInstance(grant.itemId, payload, meta.entityId);
+    } else if (!downgradeEmitted) {
+      downgradeEmitted = true;
+      ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'corpse', lost: 'find' });
+    }
+  }
+  // Phase 12d lifecycle decoupling, the harvested half: with the claim spent
+  // the corpse owes nobody a harvest window anymore, so exhausted loot
+  // collapses it on the prune's fast arm while remaining loot keeps only a
+  // short owner window instead of the full decay. A pending need-greed roll
+  // owns the timer outright (its window outlives both clamps), matching
+  // pruneCorpseLoot's guard.
+  if (!hasPendingLootRollForMob(ctx, mobId)) {
+    if (!mob.loot || (mob.loot.copper <= 0 && mob.loot.items.length === 0)) {
+      mob.lootable = false;
+      mob.corpseTimer = Math.min(mob.corpseTimer, 4);
+    } else {
+      mob.corpseTimer = Math.min(mob.corpseTimer, CORPSE_INTERACT_GRACE_SECONDS);
     }
   }
 }
@@ -485,6 +525,16 @@ export function interact(ctx: SimContext, pid?: number): void {
     const target = ctx.entities.get(p.targetId);
     if (target && dist2d(p.pos, target.pos) <= INTERACT_RANGE + 2) {
       if (target.kind === 'mob' && target.lootable) {
+        // Phase 12d unified press, targeted arm: same composition as the
+        // proximity-scan arm below (harvest while the corpse still owes its
+        // unclaimed half, omitted components = the town focus default, then
+        // loot; separate calls so neither refusal blocks the other).
+        if (
+          isHarvestableCorpse(MOBS[target.templateId]?.componentTags) &&
+          target.harvestClaimedBy === null
+        ) {
+          harvestCorpse(ctx, target.id, undefined, p.id);
+        }
         lootCorpse(ctx, target.id, p.id);
         return;
       }
@@ -542,6 +592,16 @@ export function interact(ctx: SimContext, pid?: number): void {
   const obj = bestObj as Entity | null;
   const questEntity = bestQuestEntity as Entity | null;
   if (corpse) {
+    // Phase 12d unified press: one interact both harvests (while the corpse
+    // still owes its unclaimed harvest half; omitted components = the town
+    // focus default) and loots. Two separate calls on purpose: a harvest
+    // refusal never blocks the loot half, and vice versa.
+    if (
+      isHarvestableCorpse(MOBS[corpse.templateId]?.componentTags) &&
+      corpse.harvestClaimedBy === null
+    ) {
+      harvestCorpse(ctx, corpse.id, undefined, p.id);
+    }
     lootCorpse(ctx, corpse.id, p.id);
     return;
   }

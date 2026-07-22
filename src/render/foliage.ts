@@ -20,7 +20,7 @@ import {
   waterLevelAt,
   zoneBiomeAt,
 } from '../sim/world';
-import { loadGltf } from './assets/loader';
+import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
 import { grassTuftTexture } from './textures';
@@ -99,6 +99,7 @@ const MODEL_URLS = GFX.leanFoliage ? FOLIAGE_MODEL_URLS_LOW : FOLIAGE_MODEL_URLS
 
 // kick off fetches at import; buildFoliage assumes the cache is populated
 const loadedModels = new Map<string, GLTF>();
+const extractedParts = new Map<string, ModelPart[]>();
 for (const urls of Object.values(MODEL_URLS)) {
   for (const url of urls) {
     registerPreload(
@@ -443,6 +444,8 @@ function bakeGeometry(mesh: THREE.Mesh): THREE.BufferGeometry {
 }
 
 function extractParts(url: string): ModelPart[] {
+  const cached = extractedParts.get(url);
+  if (cached) return cached;
   const gltf = loadedModels.get(url);
   if (!gltf) throw new Error(`foliage model not preloaded: ${url}`);
   gltf.scene.updateMatrixWorld(true);
@@ -460,7 +463,14 @@ function extractParts(url: string): ModelPart[] {
   });
   if (parts.length === 0) throw new Error(`foliage model has no meshes: ${url}`);
   // draw barks before leaves: opaque first is kinder to early-z
-  return parts.sort((a, b) => Number(a.isLeaf) - Number(b.isLeaf));
+  parts.sort((a, b) => Number(a.isLeaf) - Number(b.isLeaf));
+  // The baked float geometry and converted materials are the renderer-owned
+  // representation. Drop both references to the original parsed scene so its
+  // duplicate source buffers can be collected; future extraction reuses this cache.
+  extractedParts.set(url, parts);
+  loadedModels.delete(url);
+  releaseGltf(url);
+  return parts;
 }
 
 // Upward-facing rock vertices blend toward `tint` (moss or snow dust) and the

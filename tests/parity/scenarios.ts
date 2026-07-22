@@ -4303,7 +4303,7 @@ function professionsCraft(seed = 21): Scenario {
 
       // Phase 1: DENIAL. No materials held -> insufficient_materials; the denial
       // path returns before the proc draw, so it draws zero rng.
-      sim.craftItem('recipe_minor_healing_potion', pid);
+      sim.craftItem('recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-denied');
 
       // Phase 2: plain deterministic craft. The single proc draw happens on the
@@ -4311,7 +4311,7 @@ function professionsCraft(seed = 21): Scenario {
       // effect is gated off; the output is the def quality (common).
       sim.addItem('linen_scrap', 1, pid);
       sim.addItem('spider_leg', 1, pid);
-      sim.craftItem('recipe_minor_healing_potion', pid);
+      sim.craftItem('recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-plain');
 
       // Phase 3: masterwork PROC. Tailoring as the active archetype (a MAJOR craft,
@@ -4329,14 +4329,14 @@ function professionsCraft(seed = 21): Scenario {
       // qualifies), mirroring the crafting suite's proc test.
       sim.addItemInstance('linen_scrap', { signer: meta.name }, pid);
       sim.addItem('spider_leg', 1, pid);
-      sim.craftItem('recipe_eastbrook_ritual_vestments', pid);
+      sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
       rec.snapshot('craft-masterwork');
 
       // Phase 4: one more plain craft so the golden shows the draw stream continuing
       // normally (one draw) after the proc.
       sim.addItem('linen_scrap', 1, pid);
       sim.addItem('spider_leg', 1, pid);
-      sim.craftItem('recipe_minor_healing_potion', pid);
+      sim.craftItem('recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-plain-2');
     },
   };

@@ -1353,7 +1353,7 @@ describe('station-bound craft counter (prog_tools_of_the_trade)', () => {
   it('a station-bound craft at the station bumps the counter and grants after the tick', () => {
     const sim = makeSim();
     const meta = stationCrafter(sim);
-    const result = craftItem(sim.ctx, STATION_RECIPE, meta.entityId);
+    const result = craftItem(sim.ctx, STATION_RECIPE, false, meta.entityId);
     expect(result.ok).toBe(true);
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(1);
     expect(meta.deedStats.counters.craftsPerformed).toBe(1);
@@ -1366,14 +1366,14 @@ describe('station-bound craft counter (prog_tools_of_the_trade)', () => {
     const meta = stationCrafter(sim);
     const e = entityOf(sim, meta);
     e.pos.z = toolworks.pos.z + STATION_RADIUS + 1;
-    const denied = craftItem(sim.ctx, STATION_RECIPE, meta.entityId);
+    const denied = craftItem(sim.ctx, STATION_RECIPE, false, meta.entityId);
     expect(denied.ok).toBe(false);
     expect(denied.reason).toBe('station_required');
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(0);
     expect(meta.deedStats.counters.craftsPerformed).toBe(0);
     // One step back inside the boundary, the same craft resolves and counts.
     e.pos.z = toolworks.pos.z + STATION_RADIUS - 1;
-    expect(craftItem(sim.ctx, STATION_RECIPE, meta.entityId).ok).toBe(true);
+    expect(craftItem(sim.ctx, STATION_RECIPE, false, meta.entityId).ok).toBe(true);
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(1);
     sim.tick();
     expect(meta.deedsEarned.has('prog_tools_of_the_trade')).toBe(true);
@@ -1385,7 +1385,7 @@ describe('station-bound craft counter (prog_tools_of_the_trade)', () => {
     // one level under now resolves, counts, and grants.
     const sim = makeSim();
     const meta = stationCrafter(sim, 19);
-    const result = craftItem(sim.ctx, STATION_RECIPE, meta.entityId);
+    const result = craftItem(sim.ctx, STATION_RECIPE, false, meta.entityId);
     expect(result.ok).toBe(true);
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(1);
     sim.tick();
@@ -1397,7 +1397,7 @@ describe('station-bound craft counter (prog_tools_of_the_trade)', () => {
     const meta = stationCrafter(sim);
     sim.ctx.addItem('bone_fragments', 2, meta.entityId);
     sim.ctx.addItem('linen_scrap', 1, meta.entityId);
-    const result = craftItem(sim.ctx, FIELD_RECIPE, meta.entityId);
+    const result = craftItem(sim.ctx, FIELD_RECIPE, false, meta.entityId);
     expect(result.ok).toBe(true);
     expect(meta.deedStats.counters.craftsPerformed).toBe(1);
     expect(meta.deedStats.counters.hubCraftsPerformed).toBe(0);

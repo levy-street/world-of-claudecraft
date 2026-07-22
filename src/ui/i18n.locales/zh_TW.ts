@@ -554,7 +554,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.result':
     '準備確認：{ready} 人就緒，{notReady} 人未準備，{noResponse} 人未回應。',
   'hudChrome.loot.chestTitle': '寶箱',
-  'hudChrome.loot.takeAllTooltip': '全部拾取：收取此戰利品視窗中的所有金幣和物品。',
+  'hudChrome.loot.takeLootButton': '拾取戰利品',
+  'hudChrome.loot.takeLootTooltip': '收取金幣和掉落的物品。不會用掉採集機會。',
+  'hudChrome.loot.unifiedPressHint': '按一次互動鍵即可同時拾取戰利品並按城鎮專注進行採集。',
   'hudChrome.itemTooltip.requiresLevel': '需要等級 {level}',
   'hudChrome.spellbook.addToBarAria': '將 {name} 加入動作列',
   'hudChrome.spellbook.removeFromBarAria': '將 {name} 從動作列移除',
@@ -664,6 +666,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.playerMenu.profileUnavailable': '找不到 {name} 的資料。',
   'hudChrome.playerMenu.aiTag': '[AI]',
   'hudChrome.playerMenu.aiTagTitle': 'AI 操作的帳號',
+  'hudChrome.discord.roleTagChatTitle': '已驗證的伺服器身分組: {role}',
   'hudChrome.playerMenu.streamerBadgeTitle': '認證主播',
   'hudChrome.playerMenu.watchTwitch': '在 Twitch 觀看',
   'hudChrome.playerMenu.watchX': '在 X 檢視',
@@ -734,8 +737,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestButton': '採集',
   'hudChrome.corpseHarvest.concentrateHint': '選擇的部位越少，每個部位的品質越高。',
   'hudChrome.corpseHarvest.alreadyHarvested': '這具屍體已經被採集過了。',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    '採集：從這具屍體取得製作材料（獸皮、尖牙、絲線等類似部位），與戰利品分開。任何人都可以採集，但每具屍體只能被一名玩家採集。',
+  'hudChrome.corpseHarvest.harvestTooltip':
+    '採集勾選的部位。每具屍體只能被採集一次，先到先得。不會拾取戰利品。',
   'hudChrome.corpseHarvest.componentAria': '採集{component}',
   'hudChrome.corpseHarvest.components.hide': '獸皮',
   'hudChrome.corpseHarvest.components.fang': '尖牙',
@@ -748,6 +751,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.title': '城鎮專注',
   'hudChrome.townFocus.hint':
     '專注點會在每種材料的基礎產出上疊加加成。未專注的材料保持基礎產出不變。',
+  'hudChrome.townFocus.tierHint':
+    '每在一種材料上投入{points}點專注，其採集品階就會提升一階，最多提升{steps}階；不足{points}點時仍會提高產出。',
+  'hudChrome.townFocus.townOnlyHint': '專注只能在城鎮中調整。',
   'hudChrome.townFocus.budgetLabel': '剩餘點數：{remaining} / {budget}',
   'hudChrome.townFocus.saveButton': '儲存專注',
   'hudChrome.townFocus.notInTownHint': '你必須在城鎮中才能設定專注。',
@@ -3686,17 +3692,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_mogger.completion':
     '莫格終於死了。東溪的田地更安全了，而你離開谷地時又多了一個值得傳頌的故事。',
   'entities.quests.q_mogger.objectives.0.label': '擊敗莫格',
-  'entities.quests.q_archetype_acceptance.title': '屬於你自己的技藝',
-  'entities.quests.q_archetype_acceptance.text':
-    '技藝是學識，{playerName}，而調諧是一份承諾。選擇兩門相鄰的技藝作為你的主修，再把你親手從谷地礦脈中採出的礦石帶給我。',
-  'entities.quests.q_archetype_acceptance.completion':
-    '承諾已經立下。這兩門技藝現為你的主修，與它們相對的技藝則成為你的嗜好。',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': '已開採礦脈',
-  'entities.quests.q_prof_make_amends.title': '彌補',
-  'entities.quests.q_prof_make_amends.text':
-    '你曾掌握過這組技藝，{playerName}。重拾舊途並非新的誓言。去幫忙清理谷地道路，讓勞作喚醒雙手曾經熟悉的節奏。',
-  'entities.quests.q_prof_make_amends.completion': '昔日的節奏回來了。你曾經的那組技藝再次生效。',
-  'entities.quests.q_prof_make_amends.objectives.0.label': '擊敗森林之狼',
   'entities.quests.q_prof_hobby_switch.title': '別樣消遣',
   'entities.quests.q_prof_hobby_switch.text':
     '主修技藝需要誓言。嗜好只問你的好奇心將去往何處，{playerName}。採集一些草藥，然後決定要鑽研哪一門與主修技藝相對的手藝。',
@@ -6874,6 +6869,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTierUnmet.logging': '你需要{tier}階伐木斧才能砍伐這片林木。',
   'hudChrome.gathering.toolTierUnmet.herbalism': '你需要{tier}階草藥鐮才能採集這片草藥叢。',
   'hudChrome.gathering.toolTierUnmetCorpse': '你需要{tier}階採集工具才能取得最上等的材料。',
+  'hudChrome.gathering.downgradeMark': '背包已滿：這份收穫未能留下採集者的印記。',
+  'hudChrome.gathering.downgradeFind': '背包已滿：一件完美的收穫溜走了。',
   'hudChrome.gathering.stateReady': '可採集',
   'hudChrome.gathering.stateCooldown': '恢復中',
   'gatherEvent.pristineVein': '{finder}挖到了一條純淨的礦脈！',
@@ -6937,6 +6934,23 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.comboRequirementUnmet': '你尚未達到該配方所需組合的兩項製造技能等級。',
   'hudChrome.crafting.throttled': '你製作得太快了，請稍等片刻後再試。',
   'hudChrome.crafting.recipeNotLearned': '你還沒有學會這個配方。',
+  // Professions 2.0 Phase 14 (M16 non-Latin fills).
+  'hudChrome.crafting.attunementReturnCost':
+    '若你離開這個組合，日後想要重歸需要完成 {cost} 項補償任務。',
+  'hudChrome.crafting.learnMoreAtStation': '{station}的{master}可以教你更多{craft}配方。',
+  'hudChrome.crafting.trendNudge': '你的雙手正傾向於{archetype}之道。其調諧任務在{master}處等候。',
+  'hudChrome.crafting.trendNudgeNoMaster':
+    '你的雙手正傾向於{archetype}之道。去尋找一位工藝大師來踏上此道吧。',
+  'hudChrome.crafting.attunedZoneLine': '{name}已調諧為{archetype}！',
+  'hudChrome.crafting.attunedBanner': '已調諧：{title}',
+  'hudChrome.crafting.tierTutorial.title': '你的第一個階級',
+  'hudChrome.crafting.tierTutorial.tierCap':
+    '一門技藝在技能 {skill} 時達到第一個階級，每提升一個階級都會改善其製作能力。但只有當某門技藝成為你兩門主修之一時，才能製作超越稀有品質的作品。',
+  'hudChrome.crafting.tierTutorial.radar':
+    '你的專業構成一個環輪。調諧到相鄰的一對，這兩門技藝便成為無上限的主修；環輪對面的一門技藝成為上限為稀有的嗜好；其餘技藝則進入休眠：知識仍會保留，但在你重新拾起之前上限為普通。',
+  'hudChrome.crafting.tierTutorial.masters':
+    '各城鎮的工藝大師提供調諧任務。準備好後去拜訪他們，選擇你的組合。你所學到的一切都不會失去。',
+  'hudChrome.crafting.tierTutorial.dismiss': '明白了',
   'hudChrome.crafting.skillReqLine': '需要{craft} {skill}',
   'hudChrome.crafting.difficultyFull': '完整技能成長',
   'hudChrome.crafting.difficultyReduced': '技能成長減少',
@@ -6947,6 +6961,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.masterworkZoneLine': '{crafter}製作出了傑作{name}！',
   'hudChrome.crafting.tierUpToast': '{craft}提升至階級 {tier}！',
   'hudChrome.crafting.makersMark': '製作者：{name}',
+  'hudChrome.bags.itemAriaInstanced': '{item}，數量 {count}，帶工匠印記的物品',
+  'hudChrome.crafting.gatheredBy': '採集者：{name}',
   'hudChrome.crafting.masterworkSeal': '傑作',
   'hudChrome.crafting.enchantedLine': '已附魔',
   'hudChrome.crafting.stationRequired': '必須位於{station}才能製作該物品。',
@@ -8012,4 +8028,265 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildgrowth_leggings.name': '荒野生長護腿',
   'entities.items.wildsoul_maul.name': '荒野之魂重錘',
   'hudChrome.professions.skillValue': '{skill} / {max}',
+  'entities.items.resonant_thread.name': '共鳴絲線',
+  'entities.items.resonant_hide.name': '共鳴獸皮',
+  'entities.items.resonant_links.name': '共鳴鎖環',
+  'entities.items.resonant_steel.name': '共鳴鋼材',
+  'entities.items.resonant_timber.name': '共鳴木材',
+  'hud.errors.tradeBound': '該物品已綁定，無法交易。',
+  'hudChrome.enchantName.enchant_weapon_might': '附魔武器 - 威力',
+  'hudChrome.enchantName.enchant_weapon_intellect': '附魔武器 - 法術強度',
+  'hudChrome.enchantName.enchant_helmet_fortitude': '附魔頭部 - 堅韌',
+  'hudChrome.enchantName.enchant_neck_spirit': '附魔頸部 - 精神',
+  'hudChrome.enchantName.enchant_shoulder_agility': '附魔肩部 - 敏捷',
+  'hudChrome.enchantName.enchant_chest_stamina': '附魔胸部 - 耐力',
+  'hudChrome.enchantName.enchant_waist_stamina': '附魔腰部 - 耐力',
+  'hudChrome.enchantName.enchant_legs_stamina': '附魔腿部 - 耐力',
+  'hudChrome.enchantName.enchant_gloves_agility': '附魔手部 - 敏捷',
+  'hudChrome.enchantName.enchant_gloves_intellect': '附魔手部 - 法術強度',
+  'hudChrome.enchantName.enchant_feet_agility': '附魔腳部 - 敏捷',
+  'hudChrome.enchantName.enchant_ring_spirit': '附魔手指 - 精神',
+  'hudChrome.enchantName.enchant_weapon_agility': '附魔武器 - 敏捷',
+  'hudChrome.enchantName.enchant_helmet_intellect': '附魔頭部 - 智力',
+  'hudChrome.enchantName.enchant_helmet_armor': '附魔頭部 - 強化',
+  'hudChrome.enchantName.enchant_neck_intellect': '附魔頸部 - 智力',
+  'hudChrome.enchantName.enchant_neck_agility': '附魔頸部 - 敏捷',
+  'hudChrome.enchantName.enchant_shoulder_strength': '附魔肩部 - 力量',
+  'hudChrome.enchantName.enchant_shoulder_intellect': '附魔肩部 - 智力',
+  'hudChrome.enchantName.enchant_chest_spirit': '附魔胸部 - 精神',
+  'hudChrome.enchantName.enchant_chest_armor': '附魔胸部 - 強化',
+  'hudChrome.enchantName.enchant_waist_strength': '附魔腰部 - 力量',
+  'hudChrome.enchantName.enchant_waist_agility': '附魔腰部 - 敏捷',
+  'hudChrome.enchantName.enchant_legs_intellect': '附魔腿部 - 智力',
+  'hudChrome.enchantName.enchant_gloves_strength': '附魔手部 - 力量',
+  'hudChrome.enchantName.enchant_feet_strength': '附魔腳部 - 力量',
+  'hudChrome.enchantName.enchant_feet_stamina': '附魔腳部 - 耐力',
+  'hudChrome.enchantName.enchant_ring_strength': '附魔手指 - 力量',
+  'hudChrome.enchantName.enchant_ring_agility': '附魔手指 - 敏捷',
+  'hudChrome.enchantName.enchant_ring_intellect': '附魔手指 - 智力',
+  'hudChrome.enchantName.enchant_weapon_greater_might': '附魔武器 - 強效威力',
+  'hudChrome.enchantName.enchant_weapon_greater_spellpower': '附魔武器 - 強效法術強度',
+  'hudChrome.enchantName.enchant_helmet_greater_fortitude': '附魔頭部 - 強效堅韌',
+  'hudChrome.enchantName.enchant_chest_greater_stamina': '附魔胸部 - 強效耐力',
+  'hudChrome.enchantName.enchant_legs_greater_stamina': '附魔腿部 - 強效耐力',
+  'hudChrome.enchantName.enchant_gloves_greater_agility': '附魔手部 - 強效敏捷',
+  'hudChrome.enchantName.enchant_weapon_runed_edge': '附魔武器 - 符文鋒刃',
+  'hudChrome.enchantName.enchant_weapon_runed_focus': '附魔武器 - 符文聚能',
+  'hudChrome.enchantName.enchant_chest_runeweave': '附魔胸部 - 符文織紋',
+  'hudChrome.enchantName.enchant_legs_runed_hide': '附魔腿部 - 符文獸皮',
+  'hudChrome.enchantName.enchant_helmet_runed_links': '附魔頭部 - 符文鎖環',
+  'hudChrome.itemMenu.equip': '裝備',
+  'hudChrome.itemMenu.disenchant': '分解',
+  'hudChrome.itemMenu.salvage': '拆解',
+  'hudChrome.itemMenu.applyEnchant': '施加附魔',
+  'hudChrome.enchanting.disenchantedLine': '你分解了 {item}。',
+  'hudChrome.enchanting.salvagedLine': '你拆解了 {item}。',
+  'hudChrome.enchanting.enchantAppliedLine': '你為 {item} 施加了 {enchant}。',
+  'hudChrome.enchanting.notHeld': '你沒有那件物品。',
+  'hudChrome.enchanting.notDisenchantable': '你無法分解那件物品。',
+  'hudChrome.enchanting.notSalvageable': '你無法拆解那件物品。',
+  'hudChrome.enchanting.disenchantThrottled': '你分解得太快了。請稍候再試。',
+  'hudChrome.enchanting.salvageThrottled': '你拆解得太快了。請稍候再試。',
+  'hudChrome.enchanting.enchantThrottled': '你附魔得太快了。請稍候再試。',
+  'hudChrome.enchanting.enchantWrongSlot': '該附魔無法施加於那件物品。',
+  'hudChrome.enchanting.enchantUnknown': '該附魔不存在。',
+  'hudChrome.enchanting.enchantInsufficient': '你沒有該附魔所需的材料。',
+  'hudChrome.enchanting.disenchantConfirmTitle': '分解 {item}？',
+  'hudChrome.enchanting.disenchantConfirmBody': '這會摧毀 {item} 並產出奧術材料。此操作無法復原。',
+  'hudChrome.enchanting.disenchantConfirmBodySpecial':
+    '這會摧毀一件特殊的 {item}（署名、傑作或已附魔）並產出奧術材料。此操作無法復原。',
+  'hudChrome.enchanting.salvageConfirmTitle': '拆解 {item}？',
+  'hudChrome.enchanting.salvageConfirmBody': '這會摧毀 {item} 並產出製作材料。此操作無法復原。',
+  'hudChrome.enchanting.salvageConfirmBodySpecial':
+    '這會摧毀一件特殊的 {item}（署名、傑作或已附魔）並產出製作材料。此操作無法復原。',
+  'hudChrome.enchanting.pickerTitle': '施加附魔',
+  'hudChrome.enchanting.targetTitle': '選擇要附魔的物品',
+  'hudChrome.enchanting.noEnchants': '沒有附魔會用到此材料。',
+  'hudChrome.enchanting.noTargets': '沒有可附魔的合適物品。',
+  // Professions 2.0 Phase 14 attunement quests + master tier letters (zh_TW M16 fills).
+  'entities.quests.q_prof_attune_smith.title': '鐵匠的誓約',
+  'entities.quests.q_prof_attune_smith.text':
+    '鋼鐵不寬待三心二意的手，所以在你立下任何誓言之前，我把話說明白。把自己託付給我的鍛爐，武器鍛造與護甲鍛造便成為你的兩門主修，也是唯一能讓你推進到稀有品質以上的技藝。與它們在技藝之輪對面的那一門，會安頓為你的嗜好，最多做到稀有便不再前進。你其餘的手藝不會就此燒盡，{playerName}：它們只是靜下來，陷入沉睡，直到你重新喚醒。趁鐵鎚落下之前記住這一點：拋下這一對去追別的，將來就得靠踏實的勞作一步步爬回來，第一次回頭得放倒五名敵人，第二次八名，再一次十一名，你越是遊移，代價越重。還站在這裡？那就親手從谷地開採三條礦脈的礦石帶來，這誓約便算締結。',
+  'entities.quests.q_prof_attune_smith.completion':
+    '好礦石，也有一雙能打理它的好手。武器鍛造與護甲鍛造如今任你精進了。其餘的，就靠你自己去掙。',
+  'entities.quests.q_prof_attune_smith.objectives.0.label': '已開採礦脈',
+  'entities.quests.q_prof_attune_outfitter.title': '製裝師的尺度',
+  'entities.quests.q_prof_attune_outfitter.text':
+    '下刀之前先量好代價，這是我織機前的第一條規矩。選擇我，製皮與裁縫便成為你的兩門主修，是你能推進到稀有品質以上的一對；與它們相對的那門技藝會安頓為你的嗜好，做到稀有便留在那裡。你擱下的手藝並沒有被拆散，{playerName}，只是收摺起來，陷入沉睡，直到你再度拾起。不過要想清楚：倘若你離開這一對，日後又想要回來，回家的路得用勞作償付，而且一次比一次長，起初剿除五隻，接著八隻，再來十一隻，總是多上那麼一點。若你心意已定，就剿除四隻玄網潛伏者，把牠們的絲帶回織機，因為每一件好衣裳，都始於一縷好線。',
+  'entities.quests.q_prof_attune_outfitter.completion':
+    '線腳勻整，手也穩。製皮與裁縫如今任你的本事能帶到多遠，就走多遠。量兩次，它們絕不會辜負你。',
+  'entities.quests.q_prof_attune_outfitter.objectives.0.label': '已剿除玄網潛伏者',
+  'entities.quests.q_prof_attune_apothecary.title': '值得留存的食譜',
+  'entities.quests.q_prof_attune_apothecary.text':
+    '每道好菜都是兩種天生相配的滋味，好技藝也是一樣，{playerName}。坐下來跟我學，鍊金術與烹飪便成為你的兩門主修，是你能慢燉到稀有品質以上的一對；技藝之輪另一頭的那門則是你的嗜好，調味到稀有便不再加火。你其餘的手藝就存進食櫥裡，陷入沉睡，卻不會壞掉，等你哪天去取，隨時都能派上用場。趁鍋子還沒熱先把醜話講明：跑去追別的一對，回家就成了一件越來越重的苦差事，第一次得料理五頭野獸，第二次八頭，再一次十一頭，每添一回都更沉。還嘴饞著這個？那就替我獵四頭野豬回來，因為一間像樣的廚房，總得先有好肉。',
+  'entities.quests.q_prof_attune_apothecary.completion':
+    '這才叫有肉的好開頭。鍊金術與烹飪如今任你想煮到多高就多高。餓著肚子再回來找我。',
+  'entities.quests.q_prof_attune_apothecary.objectives.0.label': '已獵殺野豬',
+  'entities.quests.q_prof_attune_bombardier.title': '一樁易爆的約定',
+  'entities.quests.q_prof_attune_bombardier.text':
+    '喔，喔，你想要好料的，會響的那種，對吧？聽好，聽好，在你碰任何滴答作響的東西之前：說一聲，工程學與鍊金術就成為你的兩門主修，也是你唯一能往稀有品質以上猛推的兩門（那才是好玩的地方，信我）。相對的那門技藝就塞進口袋當嗜好，做到稀有為止，別噘嘴。你其餘的手藝？沒消失，{playerName}，只是在打盹，陷入沉睡，你想喚醒就喚醒。可是（凡事總有個可是，先按住引信）拋下這一對，晚點又搖搖擺擺跑回來，可是要你付出越堆越高的汗水，第一次放倒五個，第二次八個，再來十一個，多，更多，每一次你臨陣退縮都是如此。要嗎？要嗎？那就去替我採三叢草藥，那種易爆的，別問是哪些，只要你信得夠深，它們全都有點易爆。',
+  'entities.quests.q_prof_attune_bombardier.completion':
+    '哈。試劑，真材實料的，手指還全都好好連著，好，好。工程學與鍊金術，歸你了，去做點會後悔的東西吧。快去快去。',
+  'entities.quests.q_prof_attune_bombardier.objectives.0.label': '已採集草藥叢',
+  'entities.quests.q_prof_amends_smith.title': '重返鍛爐',
+  'entities.quests.q_prof_amends_smith.text':
+    '這麼說，你又回到鍛爐了。我不會假裝這事不叫人心裡發刺，{playerName}，但我為人公道，這活計也公道。你清楚回頭的代價：勞作，而且你每遊移一次，代價就多一分。去放倒騷擾北路的群狼，那揮擊的手感，會讓你的雙臂想起這一對技藝當年對你的要求。',
+  'entities.quests.q_prof_amends_smith.completion':
+    '手上的節奏回來了。武器鍛造與護甲鍛造再度成為你的主修。別把離開養成習慣。',
+  'entities.quests.q_prof_amends_smith.objectives.0.label': '已擊殺森林狼',
+  'entities.quests.q_prof_amends_outfitter.title': '重接的線',
+  'entities.quests.q_prof_amends_outfitter.text':
+    '終究還是回到我的織機前了。我不記恨，{playerName}，但線記得曾放手的那雙手，而重新拾起它的代價，每一次都量得更長。去剿除擠滿西邊林子的玄網潛伏者，這番勞作會先安定你的雙手，然後才讓它們再碰上好絲。',
+  'entities.quests.q_prof_amends_outfitter.completion':
+    '又穩住了。製皮與裁縫作為主修重回你的手中。這一次，在你動念遊蕩之前，先量兩遍。',
+  'entities.quests.q_prof_amends_outfitter.objectives.0.label': '已剿除玄網潛伏者',
+  'entities.quests.q_prof_amends_apothecary.title': '重回爐灶',
+  'entities.quests.q_prof_amends_apothecary.text':
+    '瞧瞧，這不是又回到我的鍋邊了嗎。不記仇，{playerName}，廚房裡總有位子，但你也清楚，你每撂下它一次，這筆帳就記得更長。去把東邊草地上的野豬清一清，因為踏實的汗水才是第一味食材，它會讓你的雙手重新記起這門活計。',
+  'entities.quests.q_prof_amends_apothecary.completion':
+    '這才是熟悉的老味道。鍊金術與烹飪作為主修回到了你的爐灶上。這一回，多留一陣子吧。',
+  'entities.quests.q_prof_amends_apothecary.objectives.0.label': '已獵殺野豬',
+  'entities.quests.q_prof_amends_bombardier.title': '帳越記越長',
+  'entities.quests.q_prof_amends_bombardier.text':
+    '你回來了，哈，他們總會回來，會響的東西就是有股拉力，對吧？我不會擺臉色，{playerName}，可是那本帳，喔那本帳，你每溜走一回它就長一截，每回頭一次就多一點，這才公道嘛。去替我把礦坑裡的深岩掘地者清乾淨，先流汗，後冒火花，這是我剛剛才定下的規矩。',
+  'entities.quests.q_prof_amends_bombardier.completion':
+    '看，來了，你手上那股癢又回來了。工程學與鍊金術，又是主修了，去吧，去搞出一聲巨響。這次試著待著別跑，嗯？',
+  'entities.quests.q_prof_amends_bombardier.objectives.0.label': '已剿滅深岩掘地者',
+  'entities.quests.q_prof_workorder_forge.title': '鍛爐工單',
+  'entities.quests.q_prof_workorder_forge.text':
+    '鍛爐總是餓著要餵，{playerName}。給我帶八塊銅礦石來，我會照這趟的分量付你工錢。不搞排場，一手礦石，一手銀錢。',
+  'entities.quests.q_prof_workorder_forge.completion':
+    '分量足，沒夾渣。這是你該得的。鍛爐用不了多久又會餓了。',
+  'entities.quests.q_prof_workorder_forge.objectives.0.label': '已交付銅礦石',
+  'entities.quests.q_prof_workorder_kitchens.title': '廚房工單',
+  'entities.quests.q_prof_workorder_kitchens.text':
+    '我的儲肉間看著見底了，{playerName}，儲肉間一空，廚子就要鬧脾氣。替我張羅八份野味肉來，這裡頭有你的一份工錢，外加我永不熄滅的感激，那玩意兒不值幾個錢，滋味卻更好。',
+  'entities.quests.q_prof_workorder_kitchens.completion':
+    '這才叫塞滿的食櫥。這是你的酬勞。等你的行囊又沉了，再回來。',
+  'entities.quests.q_prof_workorder_kitchens.objectives.0.label': '已交付野味肉',
+  'entities.quests.q_prof_workorder_loom.title': '織機工單',
+  'entities.quests.q_prof_workorder_loom.text':
+    '織機空轉，閒著的手白費了日光，{playerName}。給我帶六束蜘蛛絲來，我會按公道的價碼付你，一枚銅板都算得清清楚楚。',
+  'entities.quests.q_prof_workorder_loom.completion':
+    '好絲，紡得勻。你的錢，分毫不差。織機謝你，我也謝你。',
+  'entities.quests.q_prof_workorder_loom.objectives.0.label': '已交付蜘蛛絲',
+  'entities.quests.q_prof_workorder_toolworks.title': '工具坊工單',
+  'entities.quests.q_prof_workorder_toolworks.text':
+    '柄、把手、槍托，我用木料的速度就像它要退流行似的，可它才不會呢，木頭是永恆的，{playerName}。給我搬八根鐵皮木原木來，我會付你錢，銀錢，真的銀錢，不是人情，我保證，大致上啦。',
+  'entities.quests.q_prof_workorder_toolworks.completion':
+    '完美，完美，紋理筆直，沒腐爛。喏，你的錢，瞧，我說話算話（大致上）。下回你絆到樹了，再多搬點來。',
+  'entities.quests.q_prof_workorder_toolworks.objectives.0.label': '已交付鐵皮木原木',
+  'entities.quests.q_prof_workorder_tannery.title': '鞣皮坊工單',
+  'entities.quests.q_prof_workorder_tannery.text': '鞣桶空了。帶八張粗糙的獸皮來。帶到就給錢。',
+  'entities.quests.q_prof_workorder_tannery.completion': '獸皮不錯。工錢公道。有多的再來。',
+  'entities.quests.q_prof_workorder_tannery.objectives.0.label': '已交付粗糙的獸皮',
+  'entities.quests.q_prof_workorder_apothecary.title': '藥劑坊工單',
+  'entities.quests.q_prof_workorder_apothecary.text':
+    '我的架上需要金葉，而市集上的貨色，不出所料，都摻了假。給我帶六株金葉草來，不得有損傷，我自會精確地付你報酬。有瘀損的葉片一概退回，所以留神你的袋子。',
+  'entities.quests.q_prof_workorder_apothecary.completion':
+    '可以接受。藥性足，也處置得當。你的報酬，一枚不差地算好了。別讓它沖昏了頭，那是另一種試劑的作用。',
+  'entities.quests.q_prof_workorder_apothecary.objectives.0.label': '已交付金葉草',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_1.subject': '值得一記的火星',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_1.body':
+    '消息傳到了我的鍛爐：你有一門主修如今站上了優秀品質的活計。這只是漫長攀登裡最低的一階，但你是在鐵砧上掙來的，不是靠開口討的。把爐火燒旺。',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_2.subject': '稀有的活計，掙來的',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_2.body':
+    '有人告訴我，你的一門主修已臻於稀有品質的活計。就是在這一階上，馬虎的手紛紛落隊，真正的鐵匠才站得住。你還站著。很好。',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_3.subject': '金屬如今聽你的',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_3.body':
+    '你的一門主修已越過稀有，攀進了真正硬底子的活計。金屬會回應這樣一雙手，不再與它較勁。別讓這幾句誇獎軟了你的臂膀。',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_4.subject': '已近梯頂',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_4.body':
+    '你有一門主修，只差一階便是精通。我所識得的手，攀到這個高度的沒幾雙，能在此處守住鋒芒的更少。把這趟攀登走完。',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_5.subject': '精通，終於',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_5.body':
+    '你的一門主修已臻於精通，這是一雙手所能攀上的最高處。我不輕易誇人，所以這句話只說一次：鍛爐以你為傲。現在，去教爐火點新東西吧。',
+  'entities.letters.prof_tier_leatherworking_tailoring_1.subject': '平整的第一行',
+  'entities.letters.prof_tier_leatherworking_tailoring_1.body':
+    '公會記下：你有一門主修已達優秀品質的活計。這不過是無數行裡的第一行，卻平整而準確。下一行也一樣仔細地量。',
+  'entities.letters.prof_tier_leatherworking_tailoring_2.subject': '稀有的活計，量得準',
+  'entities.letters.prof_tier_leatherworking_tailoring_2.body':
+    '你的一門主修已攀上稀有品質的活計。就是在這裡，粗心的手會露出每一處漏針，而你的手沒有。我心中默默欣慰。',
+  'entities.letters.prof_tier_leatherworking_tailoring_3.subject': '紋樣漸明',
+  'entities.letters.prof_tier_leatherworking_tailoring_3.body':
+    '你有一門主修已越過稀有，進入更精細的活計。到了這個層次，紋樣自會在手中漸漸清晰，不再靠猜。繼續量兩遍。',
+  'entities.letters.prof_tier_leatherworking_tailoring_4.subject': '離頂只差一行',
+  'entities.letters.prof_tier_leatherworking_tailoring_4.body':
+    '你的一門主修，離精通只差一行。最後一行，總是最難保持平整的。此刻切莫求快。',
+  'entities.letters.prof_tier_leatherworking_tailoring_5.subject': '最後一針',
+  'entities.letters.prof_tier_leatherworking_tailoring_5.body':
+    '你的一門主修已臻於精通。我把你的活計量了兩遍，一如我量度一切，它禁得起檢驗。能把最後一針收得這般俐落的手，寥寥無幾。我很自豪，而這話我不輕易出口。',
+  'entities.letters.prof_tier_alchemy_cooking_1.subject': '未來的一點嚐頭',
+  'entities.letters.prof_tier_alchemy_cooking_1.body':
+    '消息飄回了我的廚房：你有一門主修已達優秀品質的活計。這不過是頭一口嚐頭，卻是很有指望的一口。讓鍋子繼續動起來。',
+  'entities.letters.prof_tier_alchemy_cooking_2.subject': '稀有的活計，沒煮焦邊',
+  'entities.letters.prof_tier_alchemy_cooking_2.body':
+    '有人告訴我，你的一門主修已慢燉到稀有品質的活計。就是這把火候，多數廚子會把菜燒焦，你沒有。坐一會兒，可別坐太久。',
+  'entities.letters.prof_tier_alchemy_cooking_3.subject': '這下上道了',
+  'entities.letters.prof_tier_alchemy_cooking_3.body':
+    '你有一門主修已咕嘟冒泡越過稀有，煮出了真正的深度。這下才叫上道，人們常這麼說。放膽下味，也別忘了邊嚐邊調。',
+  'entities.letters.prof_tier_alchemy_cooking_4.subject': '離整席只差一道',
+  'entities.letters.prof_tier_alchemy_cooking_4.body':
+    '你的一門主修，離精通只差一道菜。最後那道，總是最濃郁、也最容易做過頭的。握勺的手要穩。',
+  'entities.letters.prof_tier_alchemy_cooking_5.subject': '精通，趁熱上桌',
+  'entities.letters.prof_tier_alchemy_cooking_5.body':
+    '你的一門主修已臻於精通，這是整座食櫥最高的那一格。我餵飽每一個人，可真正一路煮上這裡的沒幾個。以你為傲，真心的。現在，去做一道能讓人在餐桌上落淚的菜吧。',
+  'entities.letters.prof_tier_engineering_alchemy_1.subject': '第一顆火星，哈',
+  'entities.letters.prof_tier_engineering_alchemy_1.body':
+    '喂，數字說你有一門主修剛碰上優秀品質的活計，小意思，芝麻大，可它爆了一下，對吧？第一顆火星永遠最可愛。多來點火星。去。',
+  'entities.letters.prof_tier_engineering_alchemy_2.subject': '稀有，喔，稀有',
+  'entities.letters.prof_tier_engineering_alchemy_2.body':
+    '他們告訴我你有一門主修攀上了稀有品質的活計，而稀有正是開始真正變危險的地方（好的那種危險）。大多數人都在好玩的部分之前就放棄了。你沒有。哈。',
+  'entities.letters.prof_tier_engineering_alchemy_3.subject': '這下要響了',
+  'entities.letters.prof_tier_engineering_alchemy_3.body':
+    '你有一門主修一舉炸過了稀有，闖進了硬底子的東西，喔，這下要開始響了。無論如何現在都別停，衝勁就是一切，還有引信。',
+  'entities.letters.prof_tier_engineering_alchemy_4.subject': '離頂一階，就一階',
+  'entities.letters.prof_tier_engineering_alchemy_4.body':
+    '你的一門主修，就差一階便是精通，一階，就一階，你感覺到它在嗡嗡震動了嗎？最後一步就是最大的一聲巨響。眼睛別眨。',
+  'entities.letters.prof_tier_engineering_alchemy_5.subject': '精通，轟',
+  'entities.letters.prof_tier_engineering_alchemy_5.body':
+    '你的一門主修撞上了精通，最頂端，轟，整道梯子，登頂了。我不發誇獎，我發引信，不過這回，兩樣都拿去：你才華橫溢，還有點嚇人。去讓群山也緊張緊張吧。',
+  // Professions 2.0 Phase 14 master tier-letter senders (localized NPC names).
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_1.sender': '達爾瓦鍛造師',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_2.sender': '達爾瓦鍛造師',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_3.sender': '達爾瓦鍛造師',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_4.sender': '達爾瓦鍛造師',
+  'entities.letters.prof_tier_weaponcrafting_armorcrafting_5.sender': '達爾瓦鍛造師',
+  'entities.letters.prof_tier_leatherworking_tailoring_1.sender': '奧蒂莉織工',
+  'entities.letters.prof_tier_leatherworking_tailoring_2.sender': '奧蒂莉織工',
+  'entities.letters.prof_tier_leatherworking_tailoring_3.sender': '奧蒂莉織工',
+  'entities.letters.prof_tier_leatherworking_tailoring_4.sender': '奧蒂莉織工',
+  'entities.letters.prof_tier_leatherworking_tailoring_5.sender': '奧蒂莉織工',
+  'entities.letters.prof_tier_alchemy_cooking_1.sender': '馬洛廚師',
+  'entities.letters.prof_tier_alchemy_cooking_2.sender': '馬洛廚師',
+  'entities.letters.prof_tier_alchemy_cooking_3.sender': '馬洛廚師',
+  'entities.letters.prof_tier_alchemy_cooking_4.sender': '馬洛廚師',
+  'entities.letters.prof_tier_alchemy_cooking_5.sender': '馬洛廚師',
+  'entities.letters.prof_tier_engineering_alchemy_1.sender': '吉澤爾修補匠',
+  'entities.letters.prof_tier_engineering_alchemy_2.sender': '吉澤爾修補匠',
+  'entities.letters.prof_tier_engineering_alchemy_3.sender': '吉澤爾修補匠',
+  'entities.letters.prof_tier_engineering_alchemy_4.sender': '吉澤爾修補匠',
+  'entities.letters.prof_tier_engineering_alchemy_5.sender': '吉澤爾修補匠',
+  // Commissions and the Maker's Bond (Professions 2.0 Phase 14b).
+  'hudChrome.crafting.commissionToggle': '委託製品',
+  'hudChrome.crafting.commissionToggleHint': '將綁定給交易中第一個收到它的角色。',
+  'hudChrome.crafting.commissionUnbound': '委託製品：將綁定給第一位收貨人',
+  'hudChrome.crafting.commissionBound': '委託製品：已綁定給收貨人',
+  'hudChrome.unbind.title': '解綁：{name}',
+  'hudChrome.unbind.close': '關閉解綁',
+  'hudChrome.unbind.intro': '大師可以收取費用，解除委託製品的綁定。',
+  'hudChrome.unbind.empty': '你沒有已綁定的委託製品。',
+  'hudChrome.unbind.rowSub': '解除綁定；該製品會在下次交易時重新綁定。',
+  'hudChrome.unbind.unbindAria': '花費{fee}為{name}解綁',
+  'hudChrome.unbind.dialogOption': '解綁',
+  'hudChrome.unbind.dialogOptionAria': '請{name}為委託製品解綁',
+  'hudChrome.unbind.confirmTitle': '解綁委託製品',
+  'hudChrome.unbind.confirmBody': '花費{fee}為{name}解綁？',
+  'hudChrome.unbind.confirmOk': '解綁',
+  'hudChrome.unbind.confirmCancel': '取消',
+  'hudChrome.unbind.unbound': '已花費{fee}為{name}解綁。它會在下次交易時重新綁定。',
+  'hudChrome.unbind.notEligible': '該物品無法解綁。',
+  'hudChrome.unbind.notBound': '該物品未綁定。',
+  'hudChrome.unbind.cannotAfford': '你付不起解綁費用。',
+  'hudChrome.unbind.outOfRange': '你必須站在對應的工作臺旁才能解綁。',
 };

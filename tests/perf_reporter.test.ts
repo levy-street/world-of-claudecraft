@@ -101,6 +101,7 @@ function qualityBuckets(): NonNullable<PerfSnapshot['renderer']>['qualityBuckets
       maxPointLights: 6,
       activePointLights: 6,
       shadowMap: 4096,
+      nativeIosMemoryProfile: false,
     },
   };
 }
@@ -116,6 +117,7 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
     programsAfter: 18,
     texturesBefore: 40,
     texturesAfter: 52,
+    textureUploads: 12,
     compileMode: 'async',
     compileMs: 480,
     compileTimedOut: false,
@@ -215,7 +217,7 @@ function snapshot(): PerfSnapshot {
     },
     mainMs: { renderer: { count: 1, avg: 5, p95: 5, max: 5 } },
     renderer: {
-      graphicsConfigVersion: 15,
+      graphicsConfigVersion: 16,
       tier: 'high',
       qualityBuckets: qualityBuckets(),
       autoGovernor: true,
@@ -272,6 +274,7 @@ function snapshot(): PerfSnapshot {
       textures: 80,
       programs: 30,
       views: 40,
+      pooledVisuals: 4,
       foliage: {
         modelQuality: 1,
         modelBuckets: 64,
@@ -363,7 +366,7 @@ describe('perf reporter payload', () => {
     // reports medium; first-run device detection (main.ts) would persist a device tier, but
     // this unit constructs Settings directly with no persisted value.
     expect(body.graphicsPreset).toBe('medium');
-    expect(body.graphicsConfigVersion).toBe(15);
+    expect(body.graphicsConfigVersion).toBe(16);
     expect(body.gfxTier).toBe('high');
     expect(body.autoGovernor).toBe(true);
     expect(body.effectiveRenderScale).toBe(0.9);
@@ -373,7 +376,7 @@ describe('perf reporter payload', () => {
     expect(body.source).toBe('benchmark');
     expect(body.zoneOrScenario).toBe('bench_dense_foliage');
     expect(JSON.stringify(body.rawSummary)).not.toContain('Safari/605');
-    expect((body.rawSummary as { graphicsConfigVersion?: number }).graphicsConfigVersion).toBe(15);
+    expect((body.rawSummary as { graphicsConfigVersion?: number }).graphicsConfigVersion).toBe(16);
     expect(
       (body.rawSummary as { rendererQualityBuckets?: { levels?: { foliage?: number } } })
         .rendererQualityBuckets?.levels?.foliage,

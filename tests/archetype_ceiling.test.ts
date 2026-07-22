@@ -516,7 +516,7 @@ describe('archetype ceilings gate the masterwork effect (Phase 2: ceilings bind 
     const majorPid = major.playerId;
     major.acceptArchetypeQuest('tailoring');
     for (const r of recipe.reagents) major.addItem(r.itemId, r.count, majorPid);
-    const majorRun = observeDraws(major, () => major.craftItem(recipe.id, majorPid));
+    const majorRun = observeDraws(major, () => major.craftItem(recipe.id, false, majorPid));
     expect(majorRun.draws).toBe(1);
     expect(majorRun.roll).toBeLessThan(MASTERWORK_BASE_CHANCE); // the hunted premise
     expect(major.lastCraftResult?.masterwork).toBe(true);
@@ -547,7 +547,7 @@ describe('archetype ceilings gate the masterwork effect (Phase 2: ceilings bind 
     dormant.acceptArchetypeQuest(ARMOR);
     expect(metaOf(dormant, pid).archetype.hobbyCraft).toBe(STATE_HOBBY); // not tailoring: dormant
     for (const r of recipe.reagents) dormant.addItem(r.itemId, r.count, pid);
-    const run = observeDraws(dormant, () => dormant.craftItem(recipe.id, pid));
+    const run = observeDraws(dormant, () => dormant.craftItem(recipe.id, false, pid));
     expect(run.draws).toBe(1); // the proc draw is unconditional on success
     expect(run.roll).toBe(majorRun.roll); // the very roll that procced under the major
     expect(dormant.lastCraftResult?.ok).toBe(true);

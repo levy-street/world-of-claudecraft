@@ -192,3 +192,23 @@ describe('CharacterPreview.setClass', () => {
     );
   });
 });
+
+describe('CharacterPreview visual lifecycle', () => {
+  it('disposes the previous cloned rig before replacing it', () => {
+    const preview = Object.create(CharacterPreview.prototype) as CharacterPreview;
+    const state = preview as unknown as Record<string, unknown>;
+    const dispose = vi.fn();
+    const remove = vi.fn();
+    const add = vi.fn();
+    state.destroyed = false;
+    state.currentSkin = 0;
+    state.currentVisual = { root: {}, dispose };
+    state.characterGroup = { remove, add, rotation: { y: 1 } };
+
+    preview.setVisualKey('player_warrior');
+
+    expect(remove).toHaveBeenCalledOnce();
+    expect(dispose).toHaveBeenCalledOnce();
+    expect(add).toHaveBeenCalledOnce();
+  });
+});

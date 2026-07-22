@@ -435,7 +435,7 @@ describe('station reagent sourcing (prog_tools_of_the_trade completability)', ()
     // Phase 8: the craft happens at the recipe's own station (the Eastbrook
     // toolworks), not at Bree's counter; a walk, never another purchase.
     placeAt(sim, pid, toolworks.pos);
-    const result = craftItem(anySim.ctx, 'recipe_thorium_mining_pick', pid);
+    const result = craftItem(anySim.ctx, 'recipe_thorium_mining_pick', false, pid);
     expect(result.ok).toBe(true);
     expect(sim.countItem('thorium_mining_pick', pid)).toBe(1);
     expect(sim.countItem('thorium_ore', pid)).toBe(0);

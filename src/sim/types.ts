@@ -914,6 +914,14 @@ export interface ItemInstancePayload {
   enchant?: string;
   /** Player id (Entity id) this specific copy is bound to. */
   boundTo?: number;
+  /** Arms the bind-on-trade lock: a copy carrying this binds to the recipient
+   *  (boundTo set) the first time it changes hands in a player trade
+   *  (social/trade.ts grantOffer), after which it can never be traded again.
+   *  Generic (Phase 13 disenchant secondaries are its first consumer; Phase 14b
+   *  commissioned gear reuses it); the trade arm keys only on this flag and
+   *  boundTo, nothing item-specific. Additive and JSONB-safe: an absent flag is
+   *  an ordinary freely-tradeable instance. */
+  bindOnTrade?: boolean;
 }
 
 export interface InvSlot {
@@ -2488,9 +2496,21 @@ export interface QuestDef {
   // Repeatable quests remain in questsDone as history but become available
   // again when they are not active.
   repeatable?: boolean;
+  // Repeatable-quest cooldown window in TICKS (Professions 2.0 Phase 14): after a
+  // successful turn-in the quest is unavailable for this many ticks (work orders
+  // use professions/cadence.ts WORK_ORDER_CADENCE_TICKS). Only meaningful with
+  // `repeatable`; absent means no cooldown (available again immediately).
+  repeatCadenceTicks?: number;
   // Typed, server-authoritative profession transition applied only by the
   // validated turn-in path. The selected target is persisted on QuestProgress.
-  completionEffect?: { type: 'attunePair'; mode: 'new' | 'return' } | { type: 'switchHobby' };
+  // `pairId` (Professions 2.0 Phase 14): a per-pair attune quest pins its ONE
+  // canonical pair id (archetype.ts archetypePairId / ARCHETYPE_PAIR_TARGETS), so
+  // the quest offers and validates only that pair; absent means the quest offers
+  // every mode-legal pair (the pre-Phase-14 single-quest behavior). Typed `string`
+  // (the pair id vocabulary is CRAFT_RING-derived at runtime, not a literal union).
+  completionEffect?:
+    | { type: 'attunePair'; mode: 'new' | 'return'; pairId?: string }
+    | { type: 'switchHobby' };
   // Resolve the first objective's count from the character's return history at
   // acceptance time. The snapshotted value stays stable while the quest is active.
   resolvedObjectiveCounts?: 'archetypeAmends';
@@ -3588,6 +3608,49 @@ export type SimEvent = { pid?: number } & (
         | 'throttled'
         | 'station_required';
     }
+  // Enchanting profession outcomes (Professions 2.0 Phase 13): mirror
+  // src/sim/professions/enchanting.ts DisenchantResult / ApplyEnchantResult and
+  // src/sim/professions/salvage.ts SalvageResult so the online client can reflect
+  // the local result of a disenchant_item / apply_enchant / salvage_item command
+  // without deciding it itself. Personal (emitted with pid = the actor's entity
+  // id, exactly like craftResult/trainResult above, which carry pid via the
+  // base `{ pid?: number }` on SimEvent rather than a re-declared field). Text-free
+  // on purpose (like craftResult above): the client renders its own localized copy
+  // off the structured fields, so no sim/server i18n matcher rule is needed.
+  // `reason` is absent on success. The typed bind-on-trade secondary a rare+
+  // disenchant yields rides secondaryItemId/secondaryCount (both absent on every
+  // sub-rare success and on a rare+ piece with no typed material).
+  | {
+      type: 'disenchantResult';
+      ok: boolean;
+      itemId: string;
+      materialItemId?: string;
+      count?: number;
+      secondaryItemId?: string;
+      secondaryCount?: number;
+      reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled';
+    }
+  | {
+      type: 'enchantResult';
+      ok: boolean;
+      itemId: string;
+      enchantId: string;
+      reason?:
+        | 'unknown_item'
+        | 'unknown_enchant'
+        | 'wrong_slot'
+        | 'not_held'
+        | 'insufficient_materials'
+        | 'throttled';
+    }
+  | {
+      type: 'salvageResult';
+      ok: boolean;
+      itemId: string;
+      materialItemId?: string;
+      count?: number;
+      reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled';
+    }
   // Recipe-training outcome (Professions 2.0 Phase 9): mirrors
   // professions/training.ts TrainResult so the online client can reflect the
   // local result of a train_recipe command without deciding it itself.
@@ -3606,6 +3669,27 @@ export type SimEvent = { pid?: number } & (
         | 'train_out_of_range'
         | 'train_tier_unmet'
         | 'train_cannot_afford';
+    }
+  // Maker's Bond unbind outcome (Professions 2.0 Phase 14b): mirrors
+  // professions/commission.ts UnbindResult so the online client can reflect
+  // the local result of an unbind_item command without deciding it itself.
+  // Personal (emitted with pid = the holder's entity id). Text-free on
+  // purpose (like trainResult above): the client derives the item name from
+  // itemId plus static content and formats `fee` itself, so the event
+  // carries NO display text. `reason` is absent on success AND on a
+  // malformed/unknown item id (the silent-deny arm); `fee` is the copper
+  // charged on ok, or the fee that WOULD apply on a deny (0 for the silent
+  // arm).
+  | {
+      type: 'unbindResult';
+      ok: boolean;
+      itemId: string;
+      reason?:
+        | 'unbind_not_eligible'
+        | 'unbind_not_bound'
+        | 'unbind_out_of_range'
+        | 'unbind_cannot_afford';
+      fee: number;
     }
   // Masterwork proc (Professions 2.0 Phase 2): a successful craft's single
   // output-side rng draw procced, minting a masterwork instance with baked
@@ -3669,6 +3753,20 @@ export type SimEvent = { pid?: number } & (
       requiredTier: number;
       professionId?: GatheringProfessionId;
     }
+  // Full-bag signed-grant downgrade (Professions 2.0 Phase 12d): a signed
+  // yield could not land in its signed form, so either the units arrived as a
+  // plain unsigned top-up (lost 'mark': the yield survived, the gatherer's
+  // mark did not) or a pure-extra specimen jackpot was dropped outright (lost
+  // 'find'). Personal (pid = the gatherer) and text-free on purpose (like
+  // gatherDenied above): the client composes its own localized copy off the
+  // structured fields. Emitted at most ONCE per harvest command (the
+  // gatherDenied dedupe idiom), even when several yields downgrade.
+  | {
+      type: 'gatherDowngrade';
+      pid: number;
+      surface: 'node' | 'corpse';
+      lost: 'mark' | 'find';
+    }
   // Fishing catch outcome (Professions 2.0 Phase 11): a landed catch emits
   // this so the client can log the reel-in feedback line for the acting
   // player. Personal (carries pid = the angler), emitted only on the
@@ -3715,6 +3813,41 @@ export type SimEvent = { pid?: number } & (
       zoneId: string;
       nodeType: GatherNodeType;
       itemId: string;
+    }
+  // Trend nudge (Professions 2.0 Phase 14): a soft, at-most-once-per-window
+  // reminder that an unattuned crafter's skills are leaning toward an adjacent
+  // pair (professions/prof_nudges.ts). Personal (pid = the crafter) and
+  // text-free on purpose (the gatherDenied idiom): the client renders its own
+  // localized line off `pairId` (the archetypePair.* name table). The letter-
+  // voice follow-up at the crossing threshold stays the Guild trend letter; this
+  // is the lighter in-world hint that can fire below that threshold.
+  | { type: 'profTrendNudge'; pid: number; pairId: string }
+  // First-tier tutorial (Professions 2.0 Phase 14): fired exactly once per
+  // character, the first time ANY craft skill crosses tier 1
+  // (professions/prof_nudges.ts). Personal (pid = the crafter) and text-free:
+  // the client renders its own one-shot tier-up explainer. Carries no ids beyond
+  // the recipient; the persisted one-shot flag guarantees it never re-fires.
+  | { type: 'profTierTutorial'; pid: number }
+  // Attunement celebration, personal copy (Professions 2.0 Phase 14): a
+  // quest-validated pair attunement (new OR return) landed for this player
+  // (professions/attunement_events.ts). Personal (pid = the celebrant) and
+  // text-free: the client renders its own localized line off `pairId`.
+  | { type: 'attuned'; pid: number; pairId: string }
+  // Attunement celebration, zone broadcast (Professions 2.0 Phase 14): the soft
+  // zone-wide copy of an attunement, one per overworld player currently in the
+  // celebrant's zone INCLUDING the celebrant, `pid` being the RECIPIENT (the
+  // masterworkZone/gatherRareEvent fanout idiom); celebrantPid/celebrantName
+  // identify the newly attuned player. Skipped entirely for an instanced
+  // celebrant (the personal `attuned` event alone fires there). Ids plus names
+  // only, text-free on purpose (celebrantName mirrors masterworkZone's
+  // crafterName precedent): the client renders its own localized line.
+  | {
+      type: 'attunedZone';
+      pid: number;
+      celebrantPid: number;
+      celebrantName: string;
+      pairId: string;
+      zoneId: string;
     }
 );
 

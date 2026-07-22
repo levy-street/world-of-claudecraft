@@ -510,8 +510,12 @@ export class MobileControls {
     this.bindHapticsToggle('mobile-haptics');
     this.bindButton('mobile-more', () => {
       const open = !document.body.classList.contains('mobile-more-open');
-      this.root?.classList.toggle('expanded', open);
-      document.body.classList.toggle('mobile-more-open', open);
+      if (!open) {
+        this.closeMoreModal();
+        return;
+      }
+      this.root?.classList.add('expanded');
+      document.body.classList.add('mobile-more-open');
       if (open) {
         const modal = document.getElementById('mobile-extra-controls');
         if (modal) {
@@ -580,6 +584,12 @@ export class MobileControls {
       triggerHaptic(HAPTIC_TAP, this.hapticsOn);
       if (button.closest('#mobile-extra-controls')) {
         this.closeMoreModal();
+        // Establish the More trigger as the destination window's return target
+        // before its synchronous callback captures focus. The body-class
+        // observer then releases the old More trap without restoring it and
+        // focuses the newly opened window, avoiding focus inside aria-hidden
+        // More content during the modal-to-modal handoff.
+        document.getElementById('mobile-more')?.focus();
       }
       cb();
     };

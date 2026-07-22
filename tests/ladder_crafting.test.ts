@@ -58,7 +58,7 @@ describe('ladder recipe execution sweep (all 54)', () => {
         }
       }
       placeAt(sim, pid, stationsOfType(recipe.stationType!)[0].pos);
-      sim.craftItem(recipe.id, pid);
+      sim.craftItem(recipe.id, false, pid);
       expect(meta.lastCraftResult?.ok, `${recipe.id}: ${meta.lastCraftResult?.reason}`).toBe(true);
       expect(sim.countItem(recipe.resultItemId, pid), `${recipe.id} output`).toBe(
         recipe.resultCount,

@@ -4,8 +4,9 @@
 // and wires the +/- steppers and Save/Close actions. Owns no state; Hud stays the
 // orchestrator (open/close + cross-window coordination).
 
+import { MAX_FOCUS_TIER_BONUS, POINTS_PER_TIER_BONUS } from '../sim/professions/focus';
 import { esc } from './esc';
-import { t } from './i18n';
+import { formatNumber, t } from './i18n';
 import type { TownFocusView } from './town_focus_view';
 import { svgIcon } from './ui_icons';
 
@@ -27,6 +28,21 @@ export function renderTownFocusWindow(
   hint.className = 'town-focus-hint';
   hint.textContent = t('hudChrome.townFocus.hint');
   el.appendChild(hint);
+
+  // Legibility hints (Phase 12d): the tier-shift rule and the town-only rule,
+  // parameterized off the real focus constants so the copy cannot rot.
+  const tierHint = document.createElement('div');
+  tierHint.className = 'town-focus-hint';
+  tierHint.textContent = t('hudChrome.townFocus.tierHint', {
+    points: formatNumber(POINTS_PER_TIER_BONUS, { maximumFractionDigits: 0 }),
+    steps: formatNumber(MAX_FOCUS_TIER_BONUS, { maximumFractionDigits: 0 }),
+  });
+  el.appendChild(tierHint);
+
+  const townOnlyHint = document.createElement('div');
+  townOnlyHint.className = 'town-focus-hint';
+  townOnlyHint.textContent = t('hudChrome.townFocus.townOnlyHint');
+  el.appendChild(townOnlyHint);
 
   if (!view.inTown) {
     const notInTown = document.createElement('div');

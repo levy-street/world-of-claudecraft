@@ -92,7 +92,7 @@ function runScenario(opts?: { crafterInInstanceSpace?: boolean }) {
   rng.setObserver(() => {
     draws++;
   });
-  sim.craftItem(RECIPE_ID, crafter);
+  sim.craftItem(RECIPE_ID, false, crafter);
   rng.setObserver(null);
   const events = sim.drainEvents();
   return {

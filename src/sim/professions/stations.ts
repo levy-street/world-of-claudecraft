@@ -51,6 +51,19 @@ export function isAtStation(pos: { x: number; z: number }, type: StationType): b
   return false;
 }
 
+/** True while `pos` sits within STATION_RADIUS of ANY static station,
+ *  whatever its type: the Maker's Bond unbind service gate (Professions 2.0
+ *  Phase 14b), which every station master offers regardless of craft. A
+ *  mobile station NEVER satisfies this, the training precedent. */
+export function isAtAnyStation(pos: { x: number; z: number }): boolean {
+  for (const station of STATIONS) {
+    const dx = pos.x - station.pos.x;
+    const dz = pos.z - station.pos.z;
+    if (dx * dx + dz * dz <= STATION_RADIUS * STATION_RADIUS) return true;
+  }
+  return false;
+}
+
 /** The station type serving `craftId`, or undefined for a craft with no
  *  physical station (jewelcrafting/inscription/enchanting today). */
 export function stationTypeForCraft(craftId: string): StationType | undefined {

@@ -20,7 +20,7 @@
 import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
 import { ITEMS } from '../sim/data';
-import type { EquipSlot, InvSlot } from '../sim/types';
+import type { EquipSlot, InvSlot, ItemDef } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   BAG_CATEGORIES,
@@ -33,6 +33,7 @@ import {
   parseBagFilter,
   serializeBagFilter,
 } from './bag_filter';
+import { bagItemHasContextActions } from './bag_item_context_menu';
 import {
   type BagDestroyAction,
   type BagMode,
@@ -48,7 +49,7 @@ import {
   resolveDepositSubmit,
 } from './bags_view';
 import { itemDisplayName } from './entity_i18n';
-import { dropRequiredLevel, isPaperdollDraggable, paperdollDropAction } from './equip_drop_core';
+import { isPaperdollDraggable } from './equip_drop_core';
 import { esc } from './esc';
 import { FOCUSABLE_SELECTOR } from './focus_manager';
 import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hud/action_bar/hotbar';
@@ -178,6 +179,17 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  window owns the paperdoll drop (and its refusals); this is the touch arm's way
    *  in, since a finger release has no drop event to land on that window. */
   dropOnEquipSlot(itemId: string, slot: EquipSlot): void;
+  /** Open the Phase 13 bag-item action menu (Disenchant / Salvage / Apply Enchant)
+   *  for a stack at a viewport point. `runDefault` runs the exact classic
+   *  left-click action for the clicked slot, so the menu's first row stays
+   *  byte-identical to a plain click. */
+  openItemActionMenu(
+    def: ItemDef,
+    itemId: string,
+    x: number,
+    y: number,
+    runDefault: () => void,
+  ): void;
 }
 
 export class BagsWindow {
@@ -504,14 +516,23 @@ export class BagsWindow {
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
       row.style.setProperty('--bag-slot-quality', qColor);
+      // An instanced stack's accessible name carries the per-copy flag the
+      // aria-hidden corner marker shows sighted players (the review's a11y
+      // arm); plain stacks keep the pre-12d label.
       row.setAttribute(
         'aria-label',
-        t('itemUi.bags.itemAria', {
+        t(s.instance ? 'hudChrome.bags.itemAriaInstanced' : 'itemUi.bags.itemAria', {
           item: itemName,
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
-      row.innerHTML = `${this.deps.itemIcon(item)}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      // The instanced-slot corner marker (Professions 2.0 Phase 12d): every
+      // per-copy stack (signed / enchanted / masterwork) shows a static corner
+      // tab on the cell itself, desktop and touch alike (no hover needed; the
+      // long-press tooltip stays the detail surface). Composes WITH the count
+      // badge: an instanced stack with count > 1 renders both.
+      const instanceMark = s.instance ? '<span class="bi-instance" aria-hidden="true"></span>' : '';
+      row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       row.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the stack (its
         // tooltip is already shown) instead of running its action (use / sell /
@@ -530,6 +551,15 @@ export class BagsWindow {
         }
         if (ev.shiftKey && bagShiftLinks(this.bagMode())) {
           this.deps.insertItemChatLink(s.itemId);
+          return;
+        }
+        // Touch has no right-click, so a tap on an item with a Phase 13 action
+        // (Disenchant / Salvage / Apply Enchant) opens the action menu instead of
+        // running the classic action directly; the menu's first row is that
+        // classic action, so nothing is lost. A plain item taps straight through,
+        // byte-identical to today. Long-press still peeks (handled above).
+        if (this.deps.isTouchHud() && this.itemMenuAvailable(item, s.itemId)) {
+          this.openItemMenuFor(item, s, ev);
           return;
         }
         this.runBagAction(item, s, ev);
@@ -557,10 +587,16 @@ export class BagsWindow {
           this.sellBagItem(s, ev);
           return;
         }
-        // Otherwise right-click runs the SAME action as left-click (use / equip),
-        // the classic binding. It no longer destroys: destroying is the drag-out
-        // gesture (drop the stack on the world), which opens the confirm prompt.
         ev.preventDefault();
+        // An item with a Phase 13 action (Disenchant / Salvage / Apply Enchant)
+        // opens the action menu, whose FIRST row is the classic left-click action
+        // so that binding survives. Every other item keeps today's behavior
+        // byte-identical: right-click runs the SAME action as left-click (use /
+        // equip), never a destroy (destroying is the drag-out-to-world gesture).
+        if (this.itemMenuAvailable(item, s.itemId)) {
+          this.openItemMenuFor(item, s, ev);
+          return;
+        }
         this.runBagAction(item, s, ev);
       });
       // Every bag stack is draggable now, not just the hotbar-eligible ones: the
@@ -868,6 +904,33 @@ export class BagsWindow {
       bankDeposit: this.deps.isBankOpen(),
       petFeed: this.deps.pendingPetFeed(),
     };
+  }
+
+  // Whether the Phase 13 action menu should open for this item. Offered ONLY in
+  // the plain-use default mode (never trade / mail / market / vendor / bank /
+  // pet-feed, whose own click owns the slot), mirroring bagDestroyAction's
+  // transactional-mode gate, and only when the item has an eligible action.
+  private itemMenuAvailable(item: ItemDef, itemId: string): boolean {
+    const mode = this.bagMode();
+    const inDefaultMode =
+      !mode.tradeOpen &&
+      !mode.mailAttach &&
+      !mode.marketSell &&
+      !mode.vendorOpen &&
+      !mode.bankDeposit &&
+      !mode.petFeed;
+    return inDefaultMode && bagItemHasContextActions(item, itemId);
+  }
+
+  // Open the action menu at the event's viewport point (falling back to the row
+  // box for a keyboard-activated click), passing the exact classic action for
+  // this slot as the menu's first row.
+  private openItemMenuFor(item: ItemDef, s: InvSlot, ev: MouseEvent): void {
+    this.deps.hideTooltip();
+    const rect = (ev.currentTarget as HTMLElement | null)?.getBoundingClientRect();
+    const x = ev.clientX || rect?.left || 0;
+    const y = ev.clientY || rect?.top || 0;
+    this.deps.openItemActionMenu(item, s.itemId, x, y, () => this.runBagAction(item, s, ev));
   }
 
   private sellBagItem(slot: InvSlot, ev: MouseEvent): void {

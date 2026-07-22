@@ -2,6 +2,7 @@ import {
   GUILD_TREND_LETTERS,
   HEROIC_MARK_LETTER,
   type LetterDef,
+  MASTER_TIER_LETTERS,
   MASTERY_RESET_LETTER,
   QUEST_LETTERS,
   WELCOME_LETTER,
@@ -231,8 +232,20 @@ const QUEST_IDS = [
   'q_nythraxis_bound_guardian',
   'q_nythraxis_scourges_end',
   'q_mogger',
-  'q_archetype_acceptance',
-  'q_prof_make_amends',
+  'q_prof_attune_smith',
+  'q_prof_attune_outfitter',
+  'q_prof_attune_apothecary',
+  'q_prof_attune_bombardier',
+  'q_prof_amends_smith',
+  'q_prof_amends_outfitter',
+  'q_prof_amends_apothecary',
+  'q_prof_amends_bombardier',
+  'q_prof_workorder_forge',
+  'q_prof_workorder_kitchens',
+  'q_prof_workorder_loom',
+  'q_prof_workorder_toolworks',
+  'q_prof_workorder_tannery',
+  'q_prof_workorder_apothecary',
   'q_prof_hobby_switch',
 ] as const;
 
@@ -268,6 +281,28 @@ const LETTER_IDS = [
   // The one-time mastery reset notice (Professions 2.0 Phase 12c,
   // MASTERY_RESET_LETTER in src/sim/content/letters.ts).
   'mastery_reset_notice',
+  // Master tier-milestone letters (Professions 2.0 Phase 14), one per anchor
+  // master per tier 1..5 (MASTER_TIER_LETTERS in src/sim/content/letters.ts).
+  'prof_tier_weaponcrafting_armorcrafting_1',
+  'prof_tier_weaponcrafting_armorcrafting_2',
+  'prof_tier_weaponcrafting_armorcrafting_3',
+  'prof_tier_weaponcrafting_armorcrafting_4',
+  'prof_tier_weaponcrafting_armorcrafting_5',
+  'prof_tier_leatherworking_tailoring_1',
+  'prof_tier_leatherworking_tailoring_2',
+  'prof_tier_leatherworking_tailoring_3',
+  'prof_tier_leatherworking_tailoring_4',
+  'prof_tier_leatherworking_tailoring_5',
+  'prof_tier_alchemy_cooking_1',
+  'prof_tier_alchemy_cooking_2',
+  'prof_tier_alchemy_cooking_3',
+  'prof_tier_alchemy_cooking_4',
+  'prof_tier_alchemy_cooking_5',
+  'prof_tier_engineering_alchemy_1',
+  'prof_tier_engineering_alchemy_2',
+  'prof_tier_engineering_alchemy_3',
+  'prof_tier_engineering_alchemy_4',
+  'prof_tier_engineering_alchemy_5',
 ] as const;
 
 type MobId = (typeof MOB_IDS)[number];
@@ -407,6 +442,9 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
   };
   for (const letter of Object.values(QUEST_LETTERS)) lettersById[letter.letterId] = letter;
   for (const letter of Object.values(GUILD_TREND_LETTERS)) lettersById[letter.letterId] = letter;
+  for (const byTier of Object.values(MASTER_TIER_LETTERS)) {
+    for (const letter of Object.values(byTier)) lettersById[letter.letterId] = letter;
+  }
   const letters = {} as LetterTranslations;
   orderedValues(LETTER_IDS, lettersById).forEach((letter) => {
     letters[letter.letterId as LetterId] = {

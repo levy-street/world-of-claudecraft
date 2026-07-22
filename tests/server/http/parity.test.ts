@@ -1355,6 +1355,24 @@ describe('/api + /internal late-arrival dispatch parity (legacy flag vs new flag
     expect(stableStringify(newCap)).toBe(stableStringify(oldCap));
   });
 
+  it('POST /internal/daily-rewards/finalize with a wrong secret is the fail-closed 401, identical old-vs-new', async () => {
+    const { oldCap, newCap } = await captureWithEnv({ [DAILY_ENV]: PARITY_SECRET }, () =>
+      makeReq({
+        method: 'POST',
+        url: '/internal/daily-rewards/finalize',
+        headers: { [DAILY_HEADER]: 'wrong-secret' },
+        body: { day: '2026-07-01' },
+      }),
+    );
+    expect(oldCap.status).toBe(401);
+    expect(JSON.parse(oldCap.body as string)).toEqual({
+      success: false,
+      data: null,
+      error: 'not authenticated',
+    });
+    expect(stableStringify(newCap)).toBe(stableStringify(oldCap));
+  });
+
   it('POST /internal/daily-rewards/pending-payouts with a wrong secret is the fail-closed 401, identical old-vs-new', async () => {
     const { oldCap, newCap } = await captureWithEnv({ [DAILY_ENV]: PARITY_SECRET }, () =>
       makeReq({

@@ -417,7 +417,7 @@ describe('draw-order determinism over a real Sim (Phase 2)', () => {
     const drawCounts: number[] = [];
     const craft = (recipeId: string) => {
       const before = draws;
-      sim.craftItem(recipeId, pid);
+      sim.craftItem(recipeId, false, pid);
       drawCounts.push(draws - before);
       return { ...sim.lastCraftResult! };
     };
@@ -506,7 +506,7 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
     const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false });
     const pid = sim.playerId;
     setup(sim, pid);
-    sim.craftItem('recipe_eastbrook_ritual_vestments', pid);
+    sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
     return { ...sim.lastCraftResult! };
   }
 

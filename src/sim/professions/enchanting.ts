@@ -26,12 +26,12 @@
 // tools.ts) and the Enchanter archetype eventually engage; the archetype
 // output-quality ceiling crafting.ts's craftItem enforces is NOT wired in
 // here yet (this action has no rollable output quality to clamp), matching
-// how salvage.ts also does not participate in that half of the wheel. Not
-// yet wired onto a server WS
-// command or a dedicated UI window (same not-yet-wired status salvageItem
-// documents on PlayerMeta.lastSalvageResult): a future issue extends
-// IWorldProfessions + ClientWorld + server/game.ts the way craft_item/
-// harvest_node already are, plus adds a target-item picker.
+// how salvage.ts also does not participate in that half of the wheel. Wired
+// through the full stack in Professions 2.0 Phase 13: the disenchant_item /
+// apply_enchant WS commands, the IWorldProfessions + ClientWorld
+// disenchantItem / applyEnchant members, and the src/ui bag-item action menu
+// plus Apply Enchant picker (bag_item_action_menu.ts), the way craft_item /
+// harvest_node already are.
 //
 // This module is `src/sim`-pure: no DOM/browser/Three.js imports, no
 // Math.random/Date.now (uses ctx.rng only), host-agnostic so it runs
@@ -45,6 +45,7 @@ import type { SimContext } from '../sim_context';
 import { cloneItemInstancePayload, type ItemDef, type ItemInstancePayload } from '../types';
 import { recordAction, withinActionThrottle } from './action_throttle';
 import { enchantingGainMultiplier } from './archetype';
+import { typedSecondaryFor } from './disenchant_reagents';
 import { gainCraftSkill } from './wheel';
 
 // #1712 round-3 review: neither action previously called gainCraftSkill, so
@@ -159,6 +160,15 @@ export interface DisenchantResult {
   itemId: string;
   materialItemId?: string;
   count?: number;
+  /** The typed, bind-on-trade secondary material a rare-or-better disenchant
+   *  also yields (disenchant_reagents.ts typedSecondaryFor). Set only on a
+   *  rare+ success whose piece has a typed material; absent on every sub-rare
+   *  success and on a rare+ piece with no typed material (jewelry). */
+  secondaryItemId?: string;
+  /** How many copies of secondaryItemId were granted: exactly 1 for a rare
+   *  piece, 1 or 2 (one rng draw) for an epic/legendary piece. Set iff
+   *  secondaryItemId is. */
+  secondaryCount?: number;
   reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled';
 }
 
@@ -183,14 +193,42 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
     return { ok: false, itemId, reason: 'throttled' };
   }
   ctx.removeEnchantableItem(itemId, 1, pid);
-  const materialItemId = DISENCHANT_MATERIAL_BY_QUALITY[def.quality ?? 'common'] ?? 'arcane_dust';
-  const count = disenchantYield(def, ctx.rng);
+  const quality = def.quality ?? 'common';
+  const materialItemId = DISENCHANT_MATERIAL_BY_QUALITY[quality] ?? 'arcane_dust';
+  // Yield model (Phase 13): sub-rare (common/uncommon) stays byte-identical to
+  // today, a single rng draw (disenchantYield's +0/+1 bonus) over a rolled
+  // count of the universal ladder material, and NO secondary. Rare+ shifts to a
+  // FIXED single primary plus a typed, bind-on-trade secondary
+  // (disenchant_reagents.ts typedSecondaryFor): rare grants exactly one
+  // secondary with NO rng draw; epic/legendary grants one or two via ONE draw
+  // (the existing next() < 0.5 ? bonus idiom). The secondary rides
+  // ctx.addItemInstance with a { bindOnTrade: true } payload so a disenchant
+  // windfall cannot be freely resold; the universal primary stays a plain
+  // ctx.addItem (dust/essence/shard never bind). A rare+ piece with no typed
+  // material (jewelry: no armor class) yields only the primary and draws no rng.
+  const isRarePlus = quality === 'rare' || quality === 'epic' || quality === 'legendary';
+  const secondaryItemId = typedSecondaryFor(def);
+  let count: number;
+  let secondaryCount: number | undefined;
+  if (isRarePlus) {
+    count = 1;
+    if (secondaryItemId) {
+      secondaryCount = quality === 'rare' ? 1 : ctx.rng.next() < 0.5 ? 1 : 2;
+    }
+  } else {
+    count = disenchantYield(def, ctx.rng);
+  }
   ctx.addItem(materialItemId, count, pid);
+  if (secondaryItemId && secondaryCount) {
+    for (let i = 0; i < secondaryCount; i++) {
+      ctx.addItemInstance(secondaryItemId, { bindOnTrade: true }, pid);
+    }
+  }
   if (meta) {
     // Phase 12c quality-tiered gain: the disenchanted item's def quality is
     // the input tier, soft-clamped to the archetype ceiling and run through
     // the four-state curve. A zero (gray) gain never blocks the action.
-    const inputTier = ENCHANTING_GAIN_TIER_BY_QUALITY[def.quality ?? 'common'];
+    const inputTier = ENCHANTING_GAIN_TIER_BY_QUALITY[quality];
     gainCraftSkill(
       meta.craftSkills,
       'enchanting',
@@ -208,7 +246,12 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
     // the player dirty itself (the crafting.ts craftItem contract).
     ctx.markDeedsDirty(meta.entityId);
   }
-  return { ok: true, itemId, materialItemId, count };
+  const result: DisenchantResult = { ok: true, itemId, materialItemId, count };
+  if (secondaryItemId && secondaryCount) {
+    result.secondaryItemId = secondaryItemId;
+    result.secondaryCount = secondaryCount;
+  }
+  return result;
 }
 
 /** Command entry point, mirroring professions/salvage.ts's salvageItem shape

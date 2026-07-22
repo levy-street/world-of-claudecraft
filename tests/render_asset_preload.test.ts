@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { characterPreloadUrls, manifestUrlsForGraphics } from '../src/render/characters/manifest';
 import { propPreloadInternalsForTest } from '../src/render/props';
@@ -64,5 +65,26 @@ describe('character preload set covers placement at every graphics tier (v0.16.0
         ).toBe(true);
       }
     }
+  });
+});
+
+describe('extracted world assets release their duplicate parsed glTF sources', () => {
+  it('caches foliage extraction before releasing the parsed source scene', () => {
+    const source = readFileSync(new URL('../src/render/foliage.ts', import.meta.url), 'utf8');
+    expect(source).toContain("import { loadGltf, releaseGltf } from './assets/loader';");
+    expect(source).toContain('const extractedParts = new Map<string, ModelPart[]>();');
+    expect(source).toContain('const cached = extractedParts.get(url);');
+    expect(source).toContain('loadedModels.delete(url);');
+    expect(source).toContain('releaseGltf(url);');
+  });
+
+  it('releases each prop source after its extracted geometry is cached', () => {
+    const source = readFileSync(new URL('../src/render/props.ts', import.meta.url), 'utf8');
+    expect(source).toContain("import { loadGltf, releaseGltf } from './assets/loader';");
+    expect(source).toContain('loadedProps.delete(key);');
+    expect(source).toContain('releaseGltf(def.url);');
+    expect(source).toContain(
+      "if (!loadedProps.has('delveEntrance2') && !extractCache.has('delveEntrance2')) continue;",
+    );
   });
 });

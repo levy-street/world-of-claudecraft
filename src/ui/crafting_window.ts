@@ -7,8 +7,8 @@
 
 import type { StationType } from '../sim/professions/stations';
 import { craftNameText } from './char_window';
-import type { CraftDifficulty, CraftingView } from './crafting_view';
-import { itemDisplayName } from './entity_i18n';
+import type { CraftDifficulty, CraftingView, CraftLearnHint } from './crafting_view';
+import { itemDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { GOLD_ACCENT_COLOR, QUALITY_COLOR } from './icons';
@@ -61,14 +61,24 @@ export interface CraftingWindowDeps extends PainterHostPresentation {
   hideTooltip(): void;
   onCraft(recipeId: string): void;
   onClose(): void;
+  /** Commission opt-in state (Professions 2.0 Phase 14b), held by the HUD so
+   *  it survives the window's staleness repaints: whether `recipeId` is
+   *  currently opted in, and the toggle callback the per-row checkbox fires.
+   *  The painter renders the control only on commissionEligible rows. */
+  commissionChecked(recipeId: string): boolean;
+  onToggleCommission(recipeId: string, on: boolean): void;
 }
 
-/** Paint the crafting panel from a prepared view. */
+/** Paint the crafting panel from a prepared view. `learnHints` (Phase 14) maps a
+ *  craft id to the station + master where the viewer can learn recipes they have
+ *  not learned; a section renders its "learnable at a master" hint iff its craft
+ *  is present. */
 export function renderCraftingWindow(
   el: HTMLElement,
   view: CraftingView,
   deps: CraftingWindowDeps,
   identity?: ProfessionIdentityModel,
+  learnHints: ReadonlyMap<string, CraftLearnHint> = new Map(),
 ): void {
   deps.hideTooltip();
   const scrollTop = el.scrollTop;
@@ -106,6 +116,22 @@ export function renderCraftingWindow(
     section.className = 'vendor-section-title';
     section.textContent = craftNameText(professionId);
     el.appendChild(section);
+
+    // Phase 14 "learnable at a master" hint: shown once under the section when
+    // the viewer has unlearned trainer recipes for this craft, naming the
+    // resident master (entity i18n) and their station. Informational text (no
+    // tap target), identical on every graphics preset (never tier-gated).
+    const learnHint = learnHints.get(professionId);
+    if (learnHint) {
+      const hint = document.createElement('div');
+      hint.className = 'crafting-learn-hint';
+      hint.textContent = t('hudChrome.crafting.learnMoreAtStation', {
+        master: tEntity({ kind: 'npc', id: learnHint.masterNpcId, field: 'name' }),
+        station: stationNameText(learnHint.stationType),
+        craft: craftNameText(professionId),
+      });
+      el.appendChild(hint);
+    }
 
     for (const row of rows) {
       const item = document.createElement('div');
@@ -205,6 +231,31 @@ export function renderCraftingWindow(
           `${row.result ? deps.itemTooltip(row.result) : ''}<div class="tt-sub">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${esc(reagentLines)}</div><div class="tt-sub">${esc(skillLine)} ${esc(difficultyLabel)}</div>${row.station ? `<div class="tt-sub">${esc(stationLabel)}${stationOutOfRange ? ` ${esc(stationOutOfRange)}` : ''}</div>` : ''}${comboLine ? `<div class="tt-sub">${esc(comboLine)} ${esc(comboStatus)}</div>` : ''}`,
       );
       item.appendChild(craftBtn);
+      // Commission opt-in (Professions 2.0 Phase 14b): a per-craft checkbox,
+      // off by default, rendered ONLY for the ruled-in equipment output kinds
+      // (crafting_view.ts commissionEligible, the sim's own predicate). A
+      // real <label>-wrapped <input> so the accessible name is free and the
+      // whole line is the tap target; checked state lives with the HUD
+      // (deps.commissionChecked) so a staleness repaint never unticks it.
+      if (row.commissionEligible) {
+        const commissionLabel = document.createElement('label');
+        commissionLabel.className = 'crafting-commission-row';
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = deps.commissionChecked(row.recipeId);
+        checkbox.addEventListener('change', () =>
+          deps.onToggleCommission(row.recipeId, checkbox.checked),
+        );
+        commissionLabel.appendChild(checkbox);
+        commissionLabel.appendChild(
+          document.createTextNode(` ${t('hudChrome.crafting.commissionToggle')}`),
+        );
+        deps.attachTooltip(
+          commissionLabel,
+          () => `<div class="tt-sub">${esc(t('hudChrome.crafting.commissionToggleHint'))}</div>`,
+        );
+        item.appendChild(commissionLabel);
+      }
       if (comboLine) {
         // Keep the reason outside the disabled button's whole-element opacity so
         // unattuned/wrong-pair/tier guidance retains readable contrast.

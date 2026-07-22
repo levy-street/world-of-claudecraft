@@ -296,7 +296,10 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
 describe('signed Pristine specimens (#1145, Phase 10)', () => {
   it('a rare-or-better harvest grants the signed specimen PLUS the plain component (seed 5)', () => {
     const { sim, internals, a, mob } = setup(5);
+    sim.drainEvents();
     sim.harvestCorpse(mob.id, ['hide'], a);
+    // The signed jackpot landed signed: no downgrade notice fires (Phase 12d).
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
     const meta = internals.players.get(a)!;
     // The regular component grants plain (fungible, unsigned), at its rolled
     // tier quantity: the specimen is now the signed jackpot, not the hide.
@@ -406,6 +409,7 @@ describe('signed Pristine specimens (#1145, Phase 10)', () => {
     const cap = bagCapacity(m.bags);
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
     expect(m.inventory.length).toBe(cap);
+    sim.drainEvents();
     sim.harvestCorpse(mob.id, ['fang'], a);
     expect(mob.harvestClaimedBy).toBe(a);
     expect(m.inventory.length).toBeLessThanOrEqual(cap);
@@ -415,6 +419,11 @@ describe('signed Pristine specimens (#1145, Phase 10)', () => {
     // sequence (proven by the unfixed code overflowing here), so the count
     // above the seeded 1 proves the plain fallback delivered the yield.
     expect(sim.countItem('wolf_fang', a)).toBeGreaterThan(1);
+    // Phase 12d: the unsigned fallback tells the player, exactly once, with
+    // the mark-lost arm (the yield survived, the signature did not).
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toEqual([
+      { type: 'gatherDowngrade', pid: a, surface: 'corpse', lost: 'mark' },
+    ]);
   });
 
   it('a slot-full specimen harvest truncates the specimen and keeps the plain yield (seed 5)', () => {
@@ -427,11 +436,63 @@ describe('signed Pristine specimens (#1145, Phase 10)', () => {
     const cap = bagCapacity(m.bags);
     m.inventory[0] = { itemId: 'rough_hide', count: 1 };
     expect(m.inventory.length).toBe(cap);
+    sim.drainEvents();
     sim.harvestCorpse(mob.id, ['hide'], a);
     expect(mob.harvestClaimedBy).toBe(a);
     expect(m.inventory.length).toBeLessThanOrEqual(cap);
     expect(m.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(false);
     expect(sim.countItem('rough_hide', a)).toBeGreaterThan(1);
+    // Phase 12d: the dropped jackpot tells the player, exactly once, with the
+    // find-lost arm (the plain yield survived, the pure extra did not).
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toEqual([
+      { type: 'gatherDowngrade', pid: a, surface: 'corpse', lost: 'find' },
+    ]);
+  });
+
+  it('one command losing a mark AND a find emits ONE downgrade, reporting the mark', () => {
+    // The dedupe pin (the toolDeniedEmitted idiom): a spread wolf harvest
+    // whose fang (no specimen: signed-or-plain) AND hide (specimen jackpot)
+    // rolls both clear the signable floor, against slot-full bags with
+    // partial stacks of both plain components, downgrades twice in one
+    // command: the fang signature falls back to the plain top-up (loop one,
+    // 'mark') and the hide jackpot truncates (loop two, 'find'). Exactly one
+    // event may fire, and the first loop runs first, so it reports 'mark'.
+    // The qualifying seed is hunted with a probe run (roomy bags: both signed
+    // grants land as instances, proving both rolls signable), then asserted
+    // on a FRESH same-seed world: the rarity draws are inventory-independent
+    // (pinned by the grant-order contract above), so the same seed reproduces
+    // the same rolls against the full bags.
+    for (let seed = 1; seed <= 200; seed++) {
+      const probe = setup(seed);
+      probe.sim.harvestCorpse(probe.mob.id, undefined, probe.a);
+      const pm = probe.internals.players.get(probe.a)!;
+      const fangSigned = pm.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance?.signer);
+      const hideJackpot = pm.inventory.some((s) => s.itemId === 'pristine_hide');
+      if (!fangSigned || !hideJackpot) continue;
+      const { sim, internals, a, mob } = setup(seed);
+      fillBags(sim, internals, a);
+      const m = internals.players.get(a)!;
+      const cap = bagCapacity(m.bags);
+      m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
+      m.inventory[1] = { itemId: 'rough_hide', count: 1 };
+      expect(m.inventory.length).toBe(cap);
+      sim.drainEvents();
+      sim.harvestCorpse(mob.id, undefined, a);
+      expect(mob.harvestClaimedBy).toBe(a);
+      expect(m.inventory.length).toBeLessThanOrEqual(cap);
+      // Both downgrades happened: no signed fang, no jackpot, both plain
+      // stacks absorbed their yields.
+      expect(m.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance)).toBe(false);
+      expect(m.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(false);
+      expect(sim.countItem('wolf_fang', a)).toBeGreaterThan(1);
+      expect(sim.countItem('rough_hide', a)).toBeGreaterThan(1);
+      // ... but exactly ONE event fired, reporting the first-loop mark loss.
+      expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toEqual([
+        { type: 'gatherDowngrade', pid: a, surface: 'corpse', lost: 'mark' },
+      ]);
+      return;
+    }
+    throw new Error('no seed with both fang and hide signable within 200');
   });
 });
 
@@ -490,6 +551,122 @@ describe('two-specimen-family harvest capacity contract (Phase 10 QA)', () => {
     expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
     expect(sim.countItem('game_meat', a)).toBeGreaterThanOrEqual(1);
     expect(m.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(false);
+  });
+});
+
+// #2139 companion (Phase 12d): the filed crossing case (zero free slots, a
+// partial PLAIN stack of the harvested component, a rare-plus roll on the
+// specimen-less fang family) predates the Phase 10 QA grant-order fix, so the
+// first pin below is the issue's acceptance case verified against the shipped
+// grant order. The rest pin the merge-aware signed guards: after
+// identical-payload stacking (stage 1) a slot-full bag holding a byte-equal
+// same-signer stack WITH room must keep the signature (the grant merges,
+// canGrantItemInstance), and only a bag with NEITHER merge room NOR a free
+// slot downgrades to the plain fallback and its gatherDowngrade notice.
+describe('corpse signed-guard capacity vs merge room (#2139, Phase 12d)', () => {
+  it('the filed crossing case: zero free slots + a partial plain stack tops up, never overflows', () => {
+    // Hunted seed, the dedupe-pin idiom: probe on roomy bags proves the fang
+    // roll clears the signable floor, then a FRESH same-seed world reproduces
+    // the same draws (they are inventory-independent, pinned by the
+    // grant-order contract above) against the issue's exact inventory shape.
+    for (let seed = 1; seed <= 200; seed++) {
+      const probe = setup(seed);
+      probe.sim.harvestCorpse(probe.mob.id, ['fang'], probe.a);
+      const pm = probe.internals.players.get(probe.a)!;
+      if (!pm.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance?.signer)) continue;
+      const { sim, internals, a, mob } = setup(seed);
+      fillBags(sim, internals, a);
+      const m = internals.players.get(a)!;
+      const cap = bagCapacity(m.bags);
+      m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
+      expect(m.inventory.length).toBe(cap);
+      sim.drainEvents();
+      sim.harvestCorpse(mob.id, ['fang'], a);
+      expect(mob.harvestClaimedBy).toBe(a);
+      // The issue's acceptance: never past capacity, and the yield arrived as
+      // the plain top-up (the signature truncated, the yield did not).
+      expect(m.inventory.length).toBeLessThanOrEqual(cap);
+      expect(m.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance)).toBe(false);
+      expect(sim.countItem('wolf_fang', a)).toBeGreaterThan(1);
+      return;
+    }
+    throw new Error('no seed with a signable fang roll within 200');
+  });
+
+  it('a slot-full bag with a same-signer stack WITH room keeps the signature: the grant merges (seed 5)', () => {
+    // Seed 5's fang roll clears the signable floor (pre-verified above). Slot
+    // 0 is the plain partial stack the pre-gate reserves against (and the
+    // would-be fallback target); slot 1 is the byte-equal same-signer stack
+    // whose room the merge-aware guard must accept with zero free slots.
+    const { sim, internals, a, mob } = setup(5);
+    fillBags(sim, internals, a);
+    const m = internals.players.get(a)!;
+    const cap = bagCapacity(m.bags);
+    m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
+    m.inventory[1] = { itemId: 'wolf_fang', count: 3, instance: { signer: 'Alpha' } };
+    expect(m.inventory.length).toBe(cap);
+    sim.drainEvents();
+    sim.harvestCorpse(mob.id, ['fang'], a);
+    expect(mob.harvestClaimedBy).toBe(a);
+    // The signed grant merged into the same-signer stack: one unit, no new
+    // slot, no overflow, and the plain stack was never topped up.
+    expect(m.inventory.length).toBe(cap);
+    const signed = m.inventory.find((s) => s.itemId === 'wolf_fang' && s.instance);
+    expect(signed?.instance?.signer).toBe('Alpha');
+    expect(signed?.count).toBe(4);
+    const plain = m.inventory.find((s) => s.itemId === 'wolf_fang' && !s.instance);
+    expect(plain?.count).toBe(1);
+    // The signature survived: no downgrade notice fires.
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
+  });
+
+  it('a slot-full bag with the same-signer stack AT its cap still falls back plain, at the boundary (seed 5)', () => {
+    // The boundary tick: the same-signer stack sits EXACTLY at stackSizeOf,
+    // so it offers zero merge room and the guard must refuse, top up the
+    // plain stack, and emit the mark-lost downgrade, never overflow.
+    const { sim, internals, a, mob } = setup(5);
+    fillBags(sim, internals, a);
+    const m = internals.players.get(a)!;
+    const cap = bagCapacity(m.bags);
+    const stack = stackSizeOf(ITEMS.wolf_fang);
+    m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
+    m.inventory[1] = { itemId: 'wolf_fang', count: stack, instance: { signer: 'Alpha' } };
+    expect(m.inventory.length).toBe(cap);
+    sim.drainEvents();
+    sim.harvestCorpse(mob.id, ['fang'], a);
+    expect(mob.harvestClaimedBy).toBe(a);
+    expect(m.inventory.length).toBe(cap);
+    const signed = m.inventory.find((s) => s.itemId === 'wolf_fang' && s.instance);
+    expect(signed?.count).toBe(stack);
+    const plain = m.inventory.find((s) => s.itemId === 'wolf_fang' && !s.instance);
+    expect(plain?.count).toBeGreaterThan(1);
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toEqual([
+      { type: 'gatherDowngrade', pid: a, surface: 'corpse', lost: 'mark' },
+    ]);
+  });
+
+  it('a slot-full specimen jackpot merges into a same-signer specimen stack instead of truncating (seed 5)', () => {
+    // The specimen arm shares the merge-aware guard: with the plain component
+    // topping up its own partial stack, the jackpot's only room is the
+    // byte-equal same-signer specimen stack, and it must land there signed
+    // (the pre-merge contract truncated it outright, lost: 'find').
+    const { sim, internals, a, mob } = setup(5);
+    fillBags(sim, internals, a);
+    const m = internals.players.get(a)!;
+    const cap = bagCapacity(m.bags);
+    m.inventory[0] = { itemId: 'rough_hide', count: 1 };
+    m.inventory[1] = { itemId: 'pristine_hide', count: 2, instance: { signer: 'Alpha' } };
+    expect(m.inventory.length).toBe(cap);
+    sim.drainEvents();
+    sim.harvestCorpse(mob.id, ['hide'], a);
+    expect(mob.harvestClaimedBy).toBe(a);
+    expect(m.inventory.length).toBe(cap);
+    const specimen = m.inventory.find((s) => s.itemId === 'pristine_hide');
+    expect(specimen?.instance?.signer).toBe('Alpha');
+    expect(specimen?.count).toBe(3);
+    // The plain component still arrived through its reserved top-up room.
+    expect(sim.countItem('rough_hide', a)).toBeGreaterThan(1);
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
   });
 });
 
@@ -925,5 +1102,47 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
     const cleared = client.entities.get(mob.id)!;
     expect(cleared.harvestClaimedBy).toBeNull();
     expect(corpseLootAvailability(cleared, sb.pid).harvestable).toBe(true);
+  });
+});
+
+// The omitted-components town-focus default (Phase 12d) depends on an ABSENT
+// wire field surviving the whole trip: ClientWorld.harvestCorpse(id) serializes
+// NO components key (JSON.stringify drops undefined), and the server dispatch
+// normalizes a missing or malformed field to undefined, never [], so
+// sim.harvestCorpse sees the omission and derives the town-focus pick.
+describe('harvestCorpse omitted components over the wire (Phase 12d)', () => {
+  function wireSetup() {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 91, 'Alpha');
+    return { server, session };
+  }
+
+  // The REAL client serializer, not a hand-built envelope: a bare ClientWorld
+  // with a capturing ws socket.
+  function clientRaw(id: number, components?: string[]): string {
+    const sent: string[] = [];
+    const client = bareClient(1);
+    (client as any).ws = { readyState: 1, send: (payload: string) => sent.push(payload) };
+    client.harvestCorpse(id, components);
+    expect(sent).toHaveLength(1);
+    return sent[0];
+  }
+
+  it('an omitted pick rides with NO components key and reaches harvestCorpse as undefined', () => {
+    const { server, session } = wireSetup();
+    const raw = clientRaw(4242);
+    expect(raw).not.toContain('components');
+    const spy = vi.spyOn(server.sim, 'harvestCorpse').mockImplementation(() => {});
+    (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+    expect(spy).toHaveBeenCalledWith(4242, undefined, session.pid);
+  });
+
+  it('an explicit pick passes through intact', () => {
+    const { server, session } = wireSetup();
+    const raw = clientRaw(4242, ['hide']);
+    const spy = vi.spyOn(server.sim, 'harvestCorpse').mockImplementation(() => {});
+    (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+    expect(spy).toHaveBeenCalledWith(4242, ['hide'], session.pid);
   });
 });

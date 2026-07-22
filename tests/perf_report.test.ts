@@ -2,12 +2,12 @@ import { EventEmitter } from 'node:events';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../server/db', () => ({
-  accountForToken: vi.fn(),
+  accountAndScopeForToken: vi.fn(),
   getCharacter: vi.fn(),
   insertClientPerfReport: vi.fn(async () => {}),
 }));
 
-import { accountForToken, getCharacter, insertClientPerfReport } from '../server/db';
+import { accountAndScopeForToken, getCharacter, insertClientPerfReport } from '../server/db';
 import { handlePerfReport, perfReportInternalsForTest } from '../server/perf_report';
 import { resetRateLimitClock, setRateLimitClock } from '../server/ratelimit';
 
@@ -59,7 +59,7 @@ beforeEach(() => {
 
 describe('perf report ingestion', () => {
   it('sanitizes and stores a bounded report with authenticated account context', async () => {
-    vi.mocked(accountForToken).mockResolvedValue(10);
+    vi.mocked(accountAndScopeForToken).mockResolvedValue({ accountId: 10, scope: 'full' });
     vi.mocked(getCharacter).mockResolvedValue({ id: 55 } as any);
     const res = fakeRes();
 
@@ -121,6 +121,31 @@ describe('perf report ingestion', () => {
         osFamily: 'macos',
         viewportBucket: 'large-1440x900',
         rawSummary: { truncated: true },
+      }),
+    );
+  });
+
+  it('stores a read-token report anonymously without resolving its character', async () => {
+    vi.mocked(accountAndScopeForToken).mockResolvedValue({ accountId: 10, scope: 'read' });
+    const res = fakeRes();
+
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'read-token-report',
+          characterId: 55,
+        },
+        { token: VALID_TOKEN },
+      ),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(getCharacter).not.toHaveBeenCalled();
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        accountId: null,
+        characterId: null,
       }),
     );
   });

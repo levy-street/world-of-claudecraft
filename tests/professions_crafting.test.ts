@@ -376,7 +376,7 @@ describe('craftItem command (#1127)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     grantItem(sim, 'spider_leg', 1, pid);
-    sim.craftItem('recipe_tough_jerky', pid);
+    sim.craftItem('recipe_tough_jerky', false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     expect(sim.lastCraftResult?.itemId).toBe('tough_jerky');
     // Phase 2: quality is the OUTPUT DEF quality (tough_jerky: common), and a
@@ -410,7 +410,7 @@ describe('craftItem command (#1127)', () => {
   it('denies a craft with an error event and leaves lastCraftResult reflecting the denial', () => {
     const sim = makeSim();
     const pid = sim.playerId;
-    sim.craftItem('recipe_tough_jerky', pid);
+    sim.craftItem('recipe_tough_jerky', false, pid);
     expect(sim.lastCraftResult?.ok).toBe(false);
     expect(sim.lastCraftResult?.reason).toBe('insufficient_materials');
   });
@@ -679,7 +679,7 @@ describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
     grantItem(sim, 'bone_fragments', 4, pid);
     grantItem(sim, 'linen_scrap', 2, pid);
 
-    sim.craftItem(comboRecipe.id, pid);
+    sim.craftItem(comboRecipe.id, false, pid);
 
     expect(sim.lastCraftResult?.ok).toBe(false);
     expect(sim.lastCraftResult?.reason).toBe('combo_requirement_unmet');
@@ -771,7 +771,7 @@ describe('craft-completion event carries audio-relevant data (#1729)', () => {
     sim.drainEvents();
     // The coordinator command (not the pure resolveCraft) is what emits the
     // craftResult event the client hooks audio onto.
-    sim.craftItem('recipe_tough_jerky', pid);
+    sim.craftItem('recipe_tough_jerky', false, pid);
     const craft = sim.drainEvents().find((e) => e.type === 'craftResult');
     if (craft?.type !== 'craftResult') throw new Error('expected a craftResult event');
     expect(craft.ok).toBe(true);
@@ -792,7 +792,7 @@ describe('craft-completion event carries audio-relevant data (#1729)', () => {
     const pid = sim.playerId;
     // No materials granted: the insufficient_materials denial path.
     sim.drainEvents();
-    sim.craftItem('recipe_tough_jerky', pid);
+    sim.craftItem('recipe_tough_jerky', false, pid);
     const craft = sim.drainEvents().find((e) => e.type === 'craftResult');
     if (craft?.type !== 'craftResult') throw new Error('expected a craftResult event');
     expect(craft.ok).toBe(false);
@@ -841,7 +841,7 @@ describe('masterwork proc (Professions 2.0 Phase 2)', () => {
     rng.setObserver(() => {
       draws++;
     });
-    sim.craftItem('recipe_eastbrook_ritual_vestments', pid);
+    sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
     rng.setObserver(null);
 
     // Still exactly one draw across the whole command path: the proc roll.
@@ -912,7 +912,7 @@ describe('masterwork proc (Professions 2.0 Phase 2)', () => {
       draws++;
       roll = value;
     });
-    sim.craftItem('recipe_eastbrook_chain_vest', pid);
+    sim.craftItem('recipe_eastbrook_chain_vest', false, pid);
     rng.setObserver(null);
 
     // The proc draw is unconditional on the success path: exactly one draw

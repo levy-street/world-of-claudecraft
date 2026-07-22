@@ -138,6 +138,10 @@ curl -fsS -X POST -H "x-woc-deploy-secret: <RESTART_COUNTDOWN_SECRET>" \
 sudo docker compose stop game
 #    On an older checkout whose compose file has no stop_grace_period, pass the
 #    window explicitly: sudo docker compose stop -t 60 game
+#    This normal stop followed by up -d --build replaces the process. It also
+#    terminates authenticated and linkdead sessions held in process memory, so an
+#    auth rollout needs no separate session cleanup. Do not leave an old game
+#    process serving alongside the rebuilt one.
 
 # 6. Rebuild and start. (`sudo docker compose build game` before step 4 shortens the
 #    outage: the image is then ready the moment the countdown ends.)

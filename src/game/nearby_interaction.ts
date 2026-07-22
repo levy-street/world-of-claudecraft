@@ -8,6 +8,9 @@ export interface NearbyInteractionWorld {
   playerId?: number;
   entities: ReadonlyMap<number, Entity>;
   lootCorpse(id: number): InteractionOutcome;
+  // Fire-and-forget half of the unified corpse press (Phase 12d); omitting the
+  // components argument selects the caller's town-focus default server-side.
+  harvestCorpse(id: number): void;
   delveInteract(id: number): InteractionOutcome;
   enterDungeon(dungeonId: string): InteractionOutcome;
   leaveDungeon(): InteractionOutcome;
@@ -76,7 +79,7 @@ export function tryNearbyInteraction(
       entity.kind === 'mob' &&
       entity.dead &&
       entity.lootable &&
-      corpseLootAvailability(entity, playerId, harvestStateReliable).hasLoot &&
+      corpseLootAvailability(entity, playerId, harvestStateReliable).canOpen &&
       distance < bestCorpseDistance
     ) {
       bestCorpse = entity.id;
@@ -104,7 +107,17 @@ export function tryNearbyInteraction(
   }
 
   if (bestCorpse !== null) {
-    return world.lootCorpse(bestCorpse);
+    const corpse = world.entities.get(bestCorpse);
+    if (!corpse) return false;
+    // Unified press (Phase 12d): harvest first, then loot, as two separate
+    // commands (processed in receipt order in the same server tick batch).
+    // Each half is gated on the availability predicate so a claimed or
+    // emptied half is never dispatched (no denial-toast spam); the server
+    // still revalidates both authoritatively.
+    const availability = corpseLootAvailability(corpse, playerId, harvestStateReliable);
+    if (availability.harvestable) world.harvestCorpse(bestCorpse);
+    if (availability.hasLoot) return world.lootCorpse(bestCorpse);
+    return availability.harvestable;
   }
   if (bestDelve !== null) {
     return world.delveInteract(bestDelve);

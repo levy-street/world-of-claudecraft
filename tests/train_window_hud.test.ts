@@ -18,9 +18,12 @@ const hudSource = readFileSync(resolve(__dirname, '../src/ui/hud.ts'), 'utf8');
 
 function trainResultArm(): string {
   const start = hudSource.indexOf("case 'trainResult': {");
-  const end = hudSource.indexOf("case 'masterwork': {", start);
+  // Phase 14b inserted the unbindResult arm between trainResult and
+  // masterwork; the slice ends at the NEXT case so the single-surface pins
+  // below stay scoped to the trainResult arm alone.
+  const end = hudSource.indexOf("case 'unbindResult': {", start);
   expect(start, 'trainResult case arm present in handleEvents').toBeGreaterThan(-1);
-  expect(end, 'trainResult arm precedes the masterwork arm').toBeGreaterThan(start);
+  expect(end, 'trainResult arm precedes the unbindResult arm').toBeGreaterThan(start);
   return hudSource.slice(start, end);
 }
 

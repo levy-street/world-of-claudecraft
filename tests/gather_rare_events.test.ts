@@ -283,14 +283,13 @@ describe('rare events through Sim.harvestNode (all three flavors)', () => {
     expect(gather.rarity).toBe('common');
     expect(gather.qty).toBe(GATHER_RARE_EVENT_YIELD_MULT);
 
-    // The yield landed as qty separate signed instances (forced signing on a
-    // common roll: the rare event, not the rarity floor, drives it).
+    // The yield landed as ONE merged signed stack (forced signing on a common
+    // roll: the rare event, not the rarity floor, drives it; identical-payload
+    // stacking, Phase 12d, merges the same-signer units into a single slot).
     const slots = meta.inventory.filter((s) => s.itemId === 'copper_ore');
-    expect(slots).toHaveLength(GATHER_RARE_EVENT_YIELD_MULT);
-    for (const slot of slots) {
-      expect(slot.count).toBe(1);
-      expect(slot.instance?.signer).toBe('Finder');
-    }
+    expect(slots).toHaveLength(1);
+    expect(slots[0].count).toBe(GATHER_RARE_EVENT_YIELD_MULT);
+    expect(slots[0].instance?.signer).toBe('Finder');
 
     // The dormant per-flavor deed mark (Phase 15 registers the deed).
     expect(meta.deedStats.visited.has('gather_event:pristine_vein')).toBe(true);
@@ -303,8 +302,9 @@ describe('rare events through Sim.harvestNode (all three flavors)', () => {
     expect(gather.rareEvent).toBe('ancient_heartwood');
     expect(gather.qty).toBe(GATHER_RARE_EVENT_YIELD_MULT);
     const slots = meta.inventory.filter((s) => s.itemId === 'ironbark_log');
-    expect(slots).toHaveLength(GATHER_RARE_EVENT_YIELD_MULT);
-    for (const slot of slots) expect(slot.instance?.signer).toBe('Finder');
+    expect(slots).toHaveLength(1);
+    expect(slots[0].count).toBe(GATHER_RARE_EVENT_YIELD_MULT);
+    expect(slots[0].instance?.signer).toBe('Finder');
     expect(meta.deedStats.visited.has('gather_event:ancient_heartwood')).toBe(true);
   });
 
@@ -315,8 +315,9 @@ describe('rare events through Sim.harvestNode (all three flavors)', () => {
     expect(gather.rareEvent).toBe('moonlit_bloom');
     expect(gather.qty).toBe(GATHER_RARE_EVENT_YIELD_MULT);
     const slots = meta.inventory.filter((s) => s.itemId === 'silverleaf_herb');
-    expect(slots).toHaveLength(GATHER_RARE_EVENT_YIELD_MULT);
-    for (const slot of slots) expect(slot.instance?.signer).toBe('Finder');
+    expect(slots).toHaveLength(1);
+    expect(slots[0].count).toBe(GATHER_RARE_EVENT_YIELD_MULT);
+    expect(slots[0].instance?.signer).toBe('Finder');
     expect(meta.deedStats.visited.has('gather_event:moonlit_bloom')).toBe(true);
   });
 
@@ -371,12 +372,12 @@ describe('rarity-floor signing through Sim.harvestNode', () => {
     const { meta, gather } = huntRarity((rarity, rareEvent) => rareEvent === null && rarity in QTY);
     expect(gather.rareEvent).toBeNull();
     expect(gather.qty).toBe(QTY[gather.rarity]);
+    // Identical-payload stacking (Phase 12d): the same-signer units merge into
+    // one signed stack at the qtyByRarity count instead of one slot per unit.
     const slots = meta.inventory.filter((s) => s.itemId === 'copper_ore');
-    expect(slots).toHaveLength(QTY[gather.rarity]);
-    for (const slot of slots) {
-      expect(slot.count).toBe(1);
-      expect(slot.instance?.signer).toBe('Prospector');
-    }
+    expect(slots).toHaveLength(1);
+    expect(slots[0].count).toBe(QTY[gather.rarity]);
+    expect(slots[0].instance?.signer).toBe('Prospector');
   });
 
   it('a rolled uncommon yield (rare event missed) stays an unsigned fungible stack of 2', () => {
@@ -425,14 +426,14 @@ describe('grant truncation at the command boundary (full bags)', () => {
     return { sim, pid, nodeId, meta };
   }
 
-  it('an oversized rare-event windfall truncates to the free slots and reports the granted count', () => {
+  it('an oversized rare-event windfall lands whole in one merged stack through one free slot', () => {
     const { sim, pid, nodeId, meta } = simAtOreNode();
     const capacity = bagCapacity(meta.bags);
     for (let i = 0; i < 2000; i++) {
-      // Each attempt starts with exactly TWO free slots (filler is a
+      // Each attempt starts with exactly ONE free slot (filler is a
       // non-copper junk id so nothing merges with the harvest yield).
       meta.inventory.length = 0;
-      for (let f = 0; f < capacity - 2; f++)
+      for (let f = 0; f < capacity - 1; f++)
         meta.inventory.push({ itemId: 'bone_fragments', count: 1 });
       delete meta.nodeHarvestReadyAt[nodeId];
       expect(sim.harvestNode(nodeId, pid)).toBe(true);
@@ -441,14 +442,18 @@ describe('grant truncation at the command boundary (full bags)', () => {
       const gather = events.find((e) => e.type === 'gatherResult');
       if (gather?.type !== 'gatherResult') throw new Error('expected gatherResult');
       if (gather.rareEvent === null) continue;
-      // The hit: resolved qty is at least x5, but only the two free slots
-      // absorb signed instances (instances never merge into stacks).
-      expect(gather.qty).toBe(2);
-      expect(gather.qty).toBeLessThan(GATHER_RARE_EVENT_YIELD_MULT);
+      // The hit: resolved qty is at least x5, and identical-payload stacking
+      // (Phase 12d) merges every same-signer unit into the single stack the
+      // one free slot opened, so the windfall no longer truncates per slot
+      // (the pre-12d contract granted one unit per free slot).
+      expect(gather.qty).toBeGreaterThanOrEqual(GATHER_RARE_EVENT_YIELD_MULT);
+      // The signed grant landed signed: no downgrade notice fires here.
+      expect(events.filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
       const copper = meta.inventory.filter((s) => s.itemId === 'copper_ore');
-      expect(copper).toHaveLength(2);
-      for (const slot of copper) expect(slot.instance?.signer).toBe('Packrat');
-      // Truncation, not overflow: the bag never exceeds capacity.
+      expect(copper).toHaveLength(1);
+      expect(copper[0].count).toBe(gather.qty);
+      expect(copper[0].instance?.signer).toBe('Packrat');
+      // Merged into the one opened slot, not overflowed: exactly at capacity.
       expect(meta.inventory.length).toBe(capacity);
       return;
     }
@@ -462,10 +467,12 @@ describe('grant truncation at the command boundary (full bags)', () => {
     meta.gatheringProficiency.mining = 100;
     for (let i = 0; i < 3000; i++) {
       // The crossing case: the bag is slot-full and the ONLY room is fungible
-      // top-up on a partial copper stack. That room passes the capacity
+      // top-up on a partial PLAIN copper stack. That room passes the capacity
       // pre-gate (ctx.canAddItem counts stack top-up), but a signed instance
-      // needs a genuinely free slot (instances never merge), so a signed roll
-      // here must fall back to an unsigned top-up grant, never overflow.
+      // never merges into a plain stack (identical-payload stacking still
+      // refuses payload-vs-no-payload) and the first signed unit needs a
+      // genuinely free slot, so a signed roll here must fall back to an
+      // unsigned top-up grant, never overflow.
       meta.inventory.length = 0;
       for (let f = 0; f < capacity - 1; f++)
         meta.inventory.push({ itemId: 'bone_fragments', count: 1 });
@@ -479,7 +486,12 @@ describe('grant truncation at the command boundary (full bags)', () => {
       // Truncation, not overflow, on EVERY iteration (fungible rolls included).
       expect(meta.inventory.length).toBeLessThanOrEqual(capacity);
       const wouldSign = gather.rareEvent !== null || isSignableMaterialRarity(gather.rarity);
-      if (!wouldSign) continue;
+      const downgrades = events.filter((e) => e.type === 'gatherDowngrade');
+      if (!wouldSign) {
+        // A fungible roll lost no signature: the downgrade notice never fires.
+        expect(downgrades).toHaveLength(0);
+        continue;
+      }
       // The signed-roll arm: no instance landed, the stack absorbed the
       // granted count, and gatherResult.qty reports that granted count.
       expect(meta.inventory.length).toBe(capacity);
@@ -487,6 +499,50 @@ describe('grant truncation at the command boundary (full bags)', () => {
       const stack = meta.inventory.find((s) => s.itemId === 'copper_ore' && !s.instance);
       expect(gather.qty).toBeGreaterThanOrEqual(1);
       expect(stack?.count).toBe(15 + gather.qty);
+      // Phase 12d: the unsigned fallback tells the player, exactly once, with
+      // the mark-lost arm (the yield survived, the signature did not).
+      expect(downgrades).toEqual([{ type: 'gatherDowngrade', pid, surface: 'node', lost: 'mark' }]);
+      return;
+    }
+    throw new Error('no signed roll within 3000 attempts');
+  });
+
+  it('a signed roll with zero free slots merges into a same-signer stack and keeps the signature', () => {
+    const { sim, pid, nodeId, meta } = simAtOreNode();
+    const capacity = bagCapacity(meta.bags);
+    // Max proficiency so signed (rare-or-better) rolls appear quickly.
+    meta.gatheringProficiency.mining = 100;
+    for (let i = 0; i < 3000; i++) {
+      // The merge arm of the crossing case above: still zero free slots, and
+      // the partial PLAIN stack still passes the fungible pre-gate, but a
+      // byte-equal same-signer stack now offers signed room. countFit models
+      // that merge room, so the signed units must land there signed instead
+      // of falling back to the unsigned top-up (#2139, merge-aware guards).
+      meta.inventory.length = 0;
+      for (let f = 0; f < capacity - 2; f++)
+        meta.inventory.push({ itemId: 'bone_fragments', count: 1 });
+      meta.inventory.push({ itemId: 'copper_ore', count: 15 });
+      meta.inventory.push({ itemId: 'copper_ore', count: 5, instance: { signer: 'Packrat' } });
+      delete meta.nodeHarvestReadyAt[nodeId];
+      if (!sim.harvestNode(nodeId, pid)) continue;
+      completeCastNow(sim, pid);
+      const events = sim.drainEvents();
+      const gather = events.find((e) => e.type === 'gatherResult');
+      if (gather?.type !== 'gatherResult') throw new Error('expected gatherResult');
+      // Never past capacity, on EVERY iteration (fungible rolls included).
+      expect(meta.inventory.length).toBeLessThanOrEqual(capacity);
+      const wouldSign = gather.rareEvent !== null || isSignableMaterialRarity(gather.rarity);
+      if (!wouldSign) continue;
+      // The signed arm: every granted unit merged into the same-signer stack
+      // (no new slot), the plain stack is untouched, and no downgrade fires.
+      expect(meta.inventory.length).toBe(capacity);
+      const signed = meta.inventory.find((s) => s.itemId === 'copper_ore' && s.instance);
+      expect(signed?.instance?.signer).toBe('Packrat');
+      expect(gather.qty).toBeGreaterThanOrEqual(1);
+      expect(signed?.count).toBe(5 + gather.qty);
+      const plain = meta.inventory.find((s) => s.itemId === 'copper_ore' && !s.instance);
+      expect(plain?.count).toBe(15);
+      expect(events.filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
       return;
     }
     throw new Error('no signed roll within 3000 attempts');

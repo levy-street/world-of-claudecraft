@@ -31,6 +31,7 @@ import { buildGatheringProficiencyRows } from './gathering_view';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { ItemDragState } from './item_drag_state';
+import { wornTooltipInstance } from './item_instance_tooltip';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { qualityGlowShadow } from './quality_glow';
@@ -308,8 +309,13 @@ export class CharWindow {
       this.deps.attachTooltip(row, () => {
         // Own worn copy's per-copy lines (seal, enchanted marker, maker's mark):
         // the self entity mirror carries equippedInstances in both worlds.
+        // Projected through wornTooltipInstance (Phase 14b) so the offline
+        // full payload renders exactly what the online eqi-trimmed mirror
+        // does: worn identity is signer/enchant/rolled, never the bond.
         const world = this.deps.world();
-        const instance = world.entities.get(world.playerId)?.equippedInstances?.[slot];
+        const instance = wornTooltipInstance(
+          world.entities.get(world.playerId)?.equippedInstances?.[slot],
+        );
         return `${this.deps.itemTooltip(item, instance)}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`;
       });
       // Corner x: a styled glyph control (not an in-game icon), revealed on

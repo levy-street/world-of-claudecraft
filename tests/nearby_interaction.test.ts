@@ -30,6 +30,9 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
       calls.push(`loot:${id}`);
       return true;
     },
+    harvestCorpse: (id: number) => {
+      calls.push(`harvestCorpse:${id}`);
+    },
     delveInteract: (id: number) => {
       calls.push(`delve:${id}`);
       return true;
@@ -292,5 +295,49 @@ describe('tryNearbyInteraction', () => {
 
     await expect(interact(r)).resolves.toBe(false);
     expect(r.calls).toEqual(['pickup:2']);
+  });
+});
+
+// Phase 12d unified corpse press: the interact key selects by canOpen (either
+// half remaining makes the corpse a target) and dispatches each half gated by
+// the availability predicate, harvest strictly before loot. The halves are
+// separate commands: a denied harvest never blocks the loot half.
+describe('tryNearbyInteraction unified corpse press (Phase 12d)', () => {
+  function wolfCorpse(overrides: Partial<Entity> = {}): Entity {
+    return entity({
+      id: 2,
+      kind: 'mob',
+      // forest_wolf carries componentTags (#1140): a harvestable corpse.
+      templateId: 'forest_wolf',
+      dead: true,
+      lootable: true,
+      loot: { copper: 1, items: [] },
+      pos: { x: 1, y: 0, z: 0 },
+      ...overrides,
+    });
+  }
+
+  it('dispatches BOTH halves on a corpse with loot and an unclaimed harvest, harvest first', () => {
+    const r = rig([wolfCorpse()]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['harvestCorpse:2', 'loot:2']);
+  });
+
+  it('dispatches loot only once the harvest claim is taken', () => {
+    const r = rig([wolfCorpse({ harvestClaimedBy: 9 })]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['loot:2']);
+  });
+
+  it('dispatches harvest only on a loot-exhausted corpse inside the grace window', () => {
+    const r = rig([wolfCorpse({ loot: null })]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['harvestCorpse:2']);
+  });
+
+  it('dispatches neither on a claimed lootless corpse: it is no target at all', () => {
+    const r = rig([wolfCorpse({ loot: null, harvestClaimedBy: 9 })]);
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
   });
 });

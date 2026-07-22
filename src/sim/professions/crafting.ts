@@ -73,10 +73,11 @@ import { recipeById } from '../content/recipes';
 import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import type { ItemDef } from '../types';
+import type { ItemDef, ItemInstancePayload } from '../types';
 import { recordAction, withinActionThrottle } from './action_throttle';
 import { archetypeCeilingFor, craftSkillGainMultiplier } from './archetype';
 import { comboEligibility } from './combo_eligibility';
+import { isCommissionEligible } from './commission';
 import { isSignableMaterialRarity, type MaterialRarity } from './gathering';
 import { masterworkBonusStats, masterworkBumpedQuality, masterworkProcChance } from './masterwork';
 import { materialTierBonusForReagents } from './material_tier';
@@ -120,6 +121,12 @@ export interface CraftResult {
   // instance (signer === the crafting player's own name) counted toward it,
   // reducing that reagent's required quantity by one for this craft.
   selfSignedBonusApplied?: boolean;
+  // Commissions (Professions 2.0 Phase 14b): true only when the opt-in flag
+  // was honored, i.e. the output is an eligible equipment kind and every
+  // granted copy was minted armed with bindOnTrade (commission.ts). Absent
+  // when the flag was not set AND when it was silently ignored for an
+  // ineligible output kind.
+  commission?: boolean;
   // Present only when !ok: a stable reason code, not player-facing prose (the
   // caller renders/localizes the denial).
   reason?:
@@ -302,6 +309,7 @@ export function resolveCraftForRecipe(
   ctx: SimContext,
   pid: number,
   recipe: ProfessionRecipeRecord,
+  commission = false,
 ): CraftResult {
   const meta = ctx.players.get(pid);
   // Phase 8 station gate (supersedes #1297's hub gate; the level arm retired
@@ -426,6 +434,13 @@ export function resolveCraftForRecipe(
     bumped !== null &&
     bumped.tier <= ceilingTier;
   const outputQuality = defOutputQuality(def);
+  // Commissions (Professions 2.0 Phase 14b): the opt-in flag arms every
+  // granted copy with the Phase 13 bind-on-trade primitive, but ONLY for the
+  // ruled-in equipment kinds (commission.ts isCommissionEligible). For any
+  // other output kind the flag is silently ignored (server authority: a
+  // tampered flag can never arm a potion), and a non-commission craft is
+  // byte-identical to the pre-phase behavior below.
+  const commissioned = commission && !!meta && isCommissionEligible(def);
   // Deterministic grant: every successful craft yields recipe.resultItemId.
   // #1149 signing rule preserved on the DEF quality: a single-copy output
   // whose def is rare-or-better is a signed instance so it carries an
@@ -435,18 +450,37 @@ export function resolveCraftForRecipe(
   // is always minted as ONE signed instance carrying the baked bonus stats;
   // a resultCount > 1 recipe grants the remainder plain, exactly as the
   // plain arm would. NEW crafts never write rolled.quality (retired for new
-  // writes; legacy payloads keep loading).
+  // writes; legacy payloads keep loading). A commissioned craft arms every
+  // copy (the player opted the CRAFT in, so a multi-copy output mints each
+  // remainder copy as its own armed instance; they stack byte-equal), and a
+  // commissioned sub-rare output forces the instance path a plain grant
+  // would skip. Commission never adds signer: the #1149 signing rule is
+  // untouched (the bond composes with the maker's mark, it does not extend
+  // it).
   if (meta && masterwork && bonusStats) {
-    ctx.addItemInstance(
-      recipe.resultItemId,
-      { signer: meta.name, rolled: { masterwork: true, stats: bonusStats } },
-      pid,
-    );
+    const payload: ItemInstancePayload = {
+      signer: meta.name,
+      rolled: { masterwork: true, stats: bonusStats },
+    };
+    if (commissioned) payload.bindOnTrade = true;
+    ctx.addItemInstance(recipe.resultItemId, payload, pid);
     if (recipe.resultCount > 1) {
-      ctx.addItem(recipe.resultItemId, recipe.resultCount - 1, pid);
+      if (commissioned) {
+        for (let i = 1; i < recipe.resultCount; i++) {
+          ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid);
+        }
+      } else {
+        ctx.addItem(recipe.resultItemId, recipe.resultCount - 1, pid);
+      }
     }
   } else if (meta && recipe.resultCount === 1 && isSignableMaterialRarity(outputQuality)) {
-    ctx.addItemInstance(recipe.resultItemId, { signer: meta.name }, pid);
+    const payload: ItemInstancePayload = { signer: meta.name };
+    if (commissioned) payload.bindOnTrade = true;
+    ctx.addItemInstance(recipe.resultItemId, payload, pid);
+  } else if (commissioned) {
+    for (let i = 0; i < recipe.resultCount; i++) {
+      ctx.addItemInstance(recipe.resultItemId, { bindOnTrade: true }, pid);
+    }
   } else {
     ctx.addItem(recipe.resultItemId, recipe.resultCount, pid);
   }
@@ -480,6 +514,7 @@ export function resolveCraftForRecipe(
     selfSignedBonusApplied,
   };
   if (masterwork) result.masterwork = true;
+  if (commissioned) result.commission = true;
   return result;
 }
 
@@ -497,10 +532,15 @@ function defOutputQuality(def: ItemDef | undefined): MaterialRarity {
 /** Pure resolution of one craft attempt against one recipe id, given an
  *  already-resolved player entity id: denies with `unknown_recipe` if the id
  *  does not resolve, otherwise delegates to `resolveCraftForRecipe`. */
-export function resolveCraft(ctx: SimContext, pid: number, recipeId: string): CraftResult {
+export function resolveCraft(
+  ctx: SimContext,
+  pid: number,
+  recipeId: string,
+  commission = false,
+): CraftResult {
   const recipe = recipeById(recipeId);
   if (!recipe) return { ok: false, recipeId, reason: 'unknown_recipe' };
-  return resolveCraftForRecipe(ctx, pid, recipe);
+  return resolveCraftForRecipe(ctx, pid, recipe, commission);
 }
 
 // Command entry point (behind the SimContext seam): resolves one player's
@@ -511,10 +551,17 @@ export function resolveCraft(ctx: SimContext, pid: number, recipeId: string): Cr
 // hudChrome.crafting.* catalog keys; this must not also emit a ctx.error
 // toast, or a denied craft prints twice and the second copy is unlocalized.
 // Runs on the deterministic tick the wire command arrives on, never off-tick.
-export function craftItem(ctx: SimContext, recipeId: string, pid?: number): CraftResult {
+// `commission` (Phase 14b) is the opt-in boolean off the craft command; the
+// resolve honors it only for eligible equipment outputs (commission.ts).
+export function craftItem(
+  ctx: SimContext,
+  recipeId: string,
+  commission = false,
+  pid?: number,
+): CraftResult {
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, recipeId, reason: 'unknown_recipe' };
-  const result = resolveCraft(ctx, r.meta.entityId, recipeId);
+  const result = resolveCraft(ctx, r.meta.entityId, recipeId, commission);
   if (result.ok) {
     ctx.bumpDeedStat(r.meta, 'craftsPerformed', 1);
     // A station-bound success already proved station presence in the

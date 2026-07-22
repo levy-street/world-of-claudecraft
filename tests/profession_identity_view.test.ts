@@ -53,6 +53,8 @@ describe('buildProfessionIdentityView', () => {
       hobbyCraft: 'leatherworking',
       attunedPairCount: 1,
       returnCount: 2,
+      // requiredAmendsProgress(2) = 5 + 3 * 2, the shared switch-cost-at-rest figure.
+      returnCost: 11,
     });
     expect(view.skills.find((row) => row.craftId === 'armorcrafting')).toMatchObject({
       role: 'major',
@@ -124,7 +126,25 @@ describe('buildAttunementPreview', () => {
       hobbyCeiling: 'rare',
       otherCeiling: 'common',
       retainsAllSkill: true,
+      // switchCount defaults to 0, so the return cost is the base 5.
+      returnCost: 5,
     });
+  });
+
+  it('escalates the return cost with the switch count (requiredAmendsProgress)', () => {
+    // 5 + 3 * switchCount, the shared switch-cost-at-rest formula.
+    expect(
+      buildAttunementPreview('weaponcrafting+armorcrafting', baseIdentity.craftSkills, 0)
+        ?.returnCost,
+    ).toBe(5);
+    expect(
+      buildAttunementPreview('weaponcrafting+armorcrafting', baseIdentity.craftSkills, 1)
+        ?.returnCost,
+    ).toBe(8);
+    expect(
+      buildAttunementPreview('weaponcrafting+armorcrafting', baseIdentity.craftSkills, 7)
+        ?.returnCost,
+    ).toBe(26);
   });
 
   it('returns null for a malformed or non-adjacent target', () => {

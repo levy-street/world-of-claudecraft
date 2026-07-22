@@ -382,7 +382,7 @@ describe('knowing vs crafting stay orthogonal (Phase 9 does not use-gate)', () =
     for (let i = 0; i < 4; i++) sim.addItem('thorium_ore', 1, pid);
     sim.addItem('mithril_mining_pick', 1, pid);
 
-    sim.craftItem(recipe.id, pid);
+    sim.craftItem(recipe.id, false, pid);
 
     expect(sim.countItem('thorium_mining_pick', pid)).toBe(1);
   });

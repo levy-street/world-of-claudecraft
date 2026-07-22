@@ -29,13 +29,14 @@ vi.mock('../server/woc_balance', () => ({
   cachedWocBalance: vi.fn(async () => balanceMock.value),
 }));
 
-import { resetDailyFinalizeGuardForTests } from '../server/daily_finalize_guard';
 import {
   addRewardDays,
+  currentDailyRewardDay,
   type DailyRewardRuntimeConfig,
   DailyRewardService,
   dailyRewardEligibility,
   dailyRewardPayoutSplits,
+  dailyRewardRuntimeConfig,
   nextUtcResetIso,
   resetDailyRewardPriceCacheForTests,
   rewardDayForDate,
@@ -180,6 +181,14 @@ class FakeDailyRewardDb implements DailyRewardDb {
   ): Promise<boolean> {
     if (this.spin) return false;
     this.spin = { outcomeKey, points, createdAt: '2026-06-30T00:00:00.000Z' };
+    this.events.push({
+      accountId: _accountId,
+      kind: 'spin',
+      points,
+      key: 'spin',
+      meta: { outcome: outcomeKey },
+    });
+    this.score += points;
     return true;
   }
   async addPoints(
@@ -199,12 +208,15 @@ class FakeDailyRewardDb implements DailyRewardDb {
   async recentPayouts(): Promise<DailyRewardPayoutRow[]> {
     return [];
   }
-  async finalizeDay(day: string): Promise<void> {
+  async finalizeDay(day: string): Promise<'finalized' | 'already_finalized'> {
     this.finalizeDayCalls++;
     // The real finalizeDay stamps the module-realm row, so the fake keys its
     // finalized set by (day, realm) the same way dayFinalized reads it: a
     // service that passed the wrong realm to dayFinalized would miss here.
-    this.finalizedDays.add(JSON.stringify([day, REALM]));
+    const key = JSON.stringify([day, REALM]);
+    if (this.finalizedDays.has(key)) return 'already_finalized';
+    this.finalizedDays.add(key);
+    return 'finalized';
   }
   async dayFinalized(day: string, realm: string): Promise<boolean> {
     this.dayFinalizedCalls++;
@@ -256,7 +268,7 @@ function rewardConfig(overrides: Partial<DailyRewardRuntimeConfig> = {}): DailyR
     wocUsdPrice: 0.5,
     solUsdPrice: 200,
     activeSeconds: 120,
-    dayStartUtcMinutes: 21 * 60,
+    dayStartUtcMinutes: 22 * 60,
     tasks: [
       {
         id: 'quest_completion',
@@ -285,10 +297,16 @@ function stubRewardConfig(config: Partial<DailyRewardRuntimeConfig> = {}) {
     'fetch',
     vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = new URL(String(input));
-      expect(url.pathname).toBe('/daily-config');
       const headers = (init?.headers ?? {}) as Record<string, string>;
       expect(headers['x-woc-daily-reward-secret']).toBe('secret');
-      return new Response(JSON.stringify(rewardConfig(config)), { status: 200 });
+      if (url.pathname === '/daily-schedule') {
+        return new Response(JSON.stringify({ dayStartUtcMinutes: 22 * 60 }), { status: 200 });
+      }
+      expect(url.pathname).toBe('/daily-config');
+      return new Response(
+        JSON.stringify({ day: url.searchParams.get('day'), ...rewardConfig(config) }),
+        { status: 200 },
+      );
     }),
   );
 }
@@ -302,7 +320,6 @@ describe('daily rewards', () => {
     // blocks that ensureActiveDay the SAME day/config would collide on one gate
     // key and silently stop calling db.ensureDay/db.seedTasks on a fresh FakeDb.
     resetDailyRewardSeedGateForTests();
-    resetDailyFinalizeGuardForTests();
     stubRewardConfig();
     walletMock.row = {
       account_id: 1,
@@ -459,6 +476,27 @@ describe('daily rewards', () => {
     ]);
   });
 
+  it('bounds remote task definitions before the sequential seed transaction', async () => {
+    const tasks = Array.from({ length: 120 }, (_, index) => ({
+      id: `task_${index}`,
+      type: 'quest_completion',
+      title: `Task ${index}`,
+      description: '',
+      points: 1,
+      basePoints: 1,
+      sortOrder: index,
+      active: true,
+      config: {},
+    }));
+    stubRewardConfig({ tasks });
+    const db = new FakeDailyRewardDb();
+
+    await new DailyRewardService(db).ensureActiveDay('2026-07-01');
+
+    expect(db.tasks).toHaveLength(100);
+    expect(db.tasks.at(-1)?.id).toBe('task_99');
+  });
+
   it('adds the current and next task names to Discord winner announcements', async () => {
     const db = new FakeDailyRewardDb();
     db.winnerAnnouncements = [
@@ -526,7 +564,6 @@ describe('daily rewards', () => {
       return new Response(JSON.stringify(rewardConfig({ tasks })), { status: 200 });
     });
     const service = new DailyRewardService(db);
-    vi.spyOn(service, 'finalizePreviousDay').mockResolvedValue();
 
     const result = (await service.discordWinnerAnnouncements(1)) as {
       days: Array<{ day: string; taskName: string; nextTaskName: string }>;
@@ -934,7 +971,7 @@ describe('daily rewards', () => {
       expect(db.events.filter((event) => event.kind === 'task')).toHaveLength(2);
       expect(db.score).toBe(50);
 
-      // A delayed replay arrives after the 21:00 UTC reward-day boundary. The match's
+      // A delayed replay arrives after the 22:00 UTC reward-day boundary. The match's
       // first completion time must remain stable, keeping the replay on the original day.
       vi.setSystemTime(new Date('2026-06-30T21:01:00.000Z'));
       const replay = await afterRestartService.recordValeCupResult(1, afterRestartResult);
@@ -1305,9 +1342,43 @@ describe('daily rewards', () => {
   });
 
   it('maps reward days to the configured UTC cycle boundary', () => {
-    expect(rewardDayForDate(new Date('2026-07-02T20:59:00.000Z'), 21 * 60)).toBe('2026-07-01');
-    expect(rewardDayForDate(new Date('2026-07-02T21:00:00.000Z'), 21 * 60)).toBe('2026-07-02');
-    expect(nextUtcResetIso('2026-07-02', 21 * 60)).toBe('2026-07-03T21:00:00.000Z');
+    expect(rewardDayForDate(new Date('2026-07-02T21:59:00.000Z'), 22 * 60)).toBe('2026-07-01');
+    expect(rewardDayForDate(new Date('2026-07-02T22:00:00.000Z'), 22 * 60)).toBe('2026-07-02');
+    expect(nextUtcResetIso('2026-07-02', 22 * 60)).toBe('2026-07-03T22:00:00.000Z');
+  });
+
+  it('uses 22:00 UTC as the local default when no payout service is configured', async () => {
+    delete process.env.WOC_DAILY_REWARD_SERVICE_URL;
+    resetDailyRewardPriceCacheForTests();
+    await expect(currentDailyRewardDay(new Date('2026-07-02T21:59:59.000Z'))).resolves.toBe(
+      '2026-07-01',
+    );
+    await expect(currentDailyRewardDay(new Date('2026-07-02T22:00:00.000Z'))).resolves.toBe(
+      '2026-07-02',
+    );
+  });
+
+  it('selects the reward day from the schedule before requesting that exact day config', async () => {
+    const requestedConfigDays: string[] = [];
+    vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input));
+      if (url.pathname === '/daily-schedule') {
+        return new Response(JSON.stringify({ dayStartUtcMinutes: 22 * 60 }), { status: 200 });
+      }
+      requestedConfigDays.push(url.searchParams.get('day') ?? '');
+      return new Response(
+        JSON.stringify({
+          day: url.searchParams.get('day'),
+          ...rewardConfig({ dayStartUtcMinutes: 21 * 60 }),
+        }),
+        { status: 200 },
+      );
+    });
+
+    await expect(currentDailyRewardDay(new Date('2026-07-02T21:22:00.000Z'))).resolves.toBe(
+      '2026-07-01',
+    );
+    expect(requestedConfigDays).toEqual(['2026-07-01']);
   });
 
   it('builds a locked view for non-eligible status', () => {
@@ -1339,66 +1410,110 @@ describe('daily rewards', () => {
     expect(view).toMatchObject({ kind: 'ready', locked: true, lockReason: 'under_minimum' });
   });
 
-  describe('ensure/seed gating', () => {
-    it('finalizes the previous day once, then the guard short-circuits repeat polls', async () => {
+  describe('explicit finalization and ensure/seed gating', () => {
+    it('finalizes only an explicitly requested closed day and leaves idempotency to the DB', async () => {
       const db = new FakeDailyRewardDb();
       const service = new DailyRewardService(db);
-      const now = new Date('2026-07-02T12:00:00.000Z');
-      await service.finalizePreviousDay(now);
-      await service.finalizePreviousDay(now);
-      // The finalize guard skips the second poll entirely: finalizeDay runs once,
-      // and the ensure/seed pair (also protected by the seed gate) runs once.
-      // Removing the guard's short-circuit makes finalizeDay run twice.
+      const now = new Date('2026-07-02T22:00:00.000Z');
+
+      await expect(service.finalizeRewardDay({ day: '2026-07-01' }, now)).resolves.toEqual({
+        ok: true,
+        day: '2026-07-01',
+        outcome: 'finalized',
+      });
+      await expect(service.finalizeRewardDay({ day: '2026-07-01' }, now)).resolves.toEqual({
+        ok: true,
+        day: '2026-07-01',
+        outcome: 'already_finalized',
+      });
       expect(db.finalizeDayCalls).toBe(1);
       expect(db.ensureDayCalls).toBe(1);
       expect(db.seedTasksCalls).toBe(1);
-      // The in-process guard also avoids the primary-key read on the warm poll:
-      // only the first poll issues dayFinalized. Deleting the hasFinalized()
-      // short-circuit (keeping the DB check) makes this two.
-      expect(db.dayFinalizedCalls).toBe(1);
-      // finalizeDay running exactly once is the winner-set freeze (the ranked
-      // winner scan is computed once); ensureDay running exactly once is the
-      // prize-pool freeze (prize_pool_usd is written once, not re-flipped per poll).
+      expect(db.dayFinalizedCalls).toBe(2);
     });
 
-    it('records the guard from a DB hit without re-running ensure or finalize', async () => {
-      const db = new FakeDailyRewardDb();
-      const service = new DailyRewardService(db);
-      const now = new Date('2026-07-02T12:00:00.000Z');
-      const previous = addRewardDays(rewardDayForDate(now, 1260), -1);
-      // Already finalized in the DB but not yet in the in-process guard. The
-      // composite key must use the service's own realm: dayFinalized only hits
-      // when the service passes REALM through, pinning the realm plumbing.
-      db.finalizedDays.add(JSON.stringify([previous, REALM]));
-      await service.finalizePreviousDay(now);
-      expect(db.ensureDayCalls).toBe(0);
-      expect(db.finalizeDayCalls).toBe(0);
-      // The first poll issued exactly one PK read to learn the day was finalized.
-      expect(db.dayFinalizedCalls).toBe(1);
-      // The guard is warm now, so a second poll does not even issue the PK read.
-      await service.finalizePreviousDay(now);
-      expect(db.ensureDayCalls).toBe(0);
-      expect(db.finalizeDayCalls).toBe(0);
-      expect(db.dayFinalizedCalls).toBe(1);
-    });
+    it.each(['2026-02-30', '2026-7-01', 'not-a-day'])(
+      'rejects invalid reward days without touching the database: %s',
+      async (day) => {
+        const db = new FakeDailyRewardDb();
+        const service = new DailyRewardService(db);
+        await expect(service.finalizeRewardDay({ day })).resolves.toEqual({
+          error: 'invalid reward day',
+          status: 400,
+        });
+        expect(db.ensureDayCalls).toBe(0);
+        expect(db.finalizeDayCalls).toBe(0);
+      },
+    );
 
-    it('does not re-fetch the previous-day config on repeated finalize polls', async () => {
+    it('rejects an active reward day before any database write, even if marked finalized', async () => {
       const db = new FakeDailyRewardDb();
+      db.finalizedDays.add(JSON.stringify(['2026-07-01', REALM]));
       const service = new DailyRewardService(db);
-      const daysFetched: string[] = [];
-      vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL) => {
-        daysFetched.push(new URL(String(input)).searchParams.get('day') ?? '');
-        return new Response(JSON.stringify(rewardConfig()), { status: 200 });
+      const now = new Date('2026-07-02T21:59:59.000Z');
+      await expect(service.finalizeRewardDay({ day: '2026-07-01' }, now)).resolves.toEqual({
+        error: 'reward day has not closed',
+        status: 409,
       });
-      const now = new Date('2026-07-02T12:00:00.000Z');
-      const previous = addRewardDays(rewardDayForDate(now, 1260), -1);
-      await service.finalizePreviousDay(now);
-      await service.finalizePreviousDay(now);
-      await service.finalizePreviousDay(now);
-      // Only the first poll fetched the previous day's config; once finalized, the
-      // guard keeps later polls from re-running ensureActiveDay and re-flipping the
-      // single-slot config cache to the previous day.
-      expect(daysFetched.filter((day) => day === previous)).toHaveLength(1);
+      expect(db.ensureDayCalls).toBe(0);
+      expect(db.finalizeDayCalls).toBe(0);
+      expect(db.dayFinalizedCalls).toBe(0);
+    });
+
+    it('rejects a future reward day before consulting finalized state', async () => {
+      const db = new FakeDailyRewardDb();
+      db.finalizedDays.add(JSON.stringify(['2026-07-03', REALM]));
+      const service = new DailyRewardService(db);
+      await expect(
+        service.finalizeRewardDay({ day: '2026-07-03' }, new Date('2026-07-02T22:00:00.000Z')),
+      ).resolves.toEqual({ error: 'reward day has not closed', status: 409 });
+      expect(db.dayFinalizedCalls).toBe(0);
+      expect(db.finalizeDayCalls).toBe(0);
+    });
+
+    it('fails closed when the authoritative config cannot be refreshed', async () => {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      vi.mocked(fetch).mockRejectedValue(new Error('offline'));
+      await expect(
+        service.finalizeRewardDay({ day: '2026-07-01' }, new Date('2026-07-02T22:00:00.000Z')),
+      ).resolves.toEqual({ error: 'daily reward config unavailable', status: 503 });
+      expect(db.ensureDayCalls).toBe(0);
+      expect(db.finalizeDayCalls).toBe(0);
+    });
+
+    it('bypasses a warm gameplay config cache when finalizing', async () => {
+      const targetDay = '2026-07-01';
+      await expect(dailyRewardRuntimeConfig(targetDay)).resolves.toMatchObject({
+        prizePoolUsd: 150,
+        dayStartUtcMinutes: 22 * 60,
+      });
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      vi.mocked(fetch).mockRejectedValue(new Error('authoritative source offline'));
+
+      await expect(
+        service.finalizeRewardDay({ day: targetDay }, new Date('2026-07-02T22:00:00.000Z')),
+      ).resolves.toEqual({ error: 'daily reward config unavailable', status: 503 });
+      expect(fetch).toHaveBeenCalledTimes(2);
+      expect(db.dayFinalizedCalls).toBe(0);
+      expect(db.finalizeDayCalls).toBe(0);
+    });
+
+    it.each([
+      ['missing fields', { day: '2026-07-01', prizePoolUsd: 150 }],
+      ['wrong day', { day: '2026-06-30', ...rewardConfig() }],
+      ['invalid tasks', { day: '2026-07-01', ...rewardConfig(), tasks: [{}] }],
+    ])('fails closed for a successful but %s config response', async (_label, payload) => {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify(payload), { status: 200 }));
+      await expect(
+        service.finalizeRewardDay({ day: '2026-07-01' }, new Date('2026-07-02T22:00:00.000Z')),
+      ).resolves.toEqual({ error: 'daily reward config unavailable', status: 503 });
+      expect(db.dayFinalizedCalls).toBe(0);
+      expect(db.ensureDayCalls).toBe(0);
+      expect(db.finalizeDayCalls).toBe(0);
     });
 
     it('seeds once across many recordOnlineMinute calls for the same day', async () => {

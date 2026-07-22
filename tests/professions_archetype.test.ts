@@ -5,10 +5,11 @@
 // PAIR (activeArchetype, the title craft the player swaps via quest, plus
 // pairedMajor, its ring-adjacent second major). See src/sim/professions/archetype.ts.
 //
-// NOTE: the quests behind this feature (zone-1 q_archetype_acceptance /
-// q_prof_make_amends / q_prof_hobby_switch) are wired live into the generic quest
-// accept/turn-in flow via completionEffect (src/sim/quests/profession_quest_effects.ts);
-// the quest-driven path is covered by tests/profession_attunement_quests.test.ts.
+// NOTE: the quests behind this feature (the per-master zone-1 q_prof_attune_* /
+// q_prof_amends_* pair plus q_prof_hobby_switch) are wired live into the generic
+// quest accept/turn-in flow via completionEffect
+// (src/sim/quests/profession_quest_effects.ts); the quest-driven path is covered
+// by tests/profession_attunement_quests.test.ts.
 // These tests exercise the STATE MACHINE directly via its sim entry points
 // (acceptArchetypeQuest / advanceAmendsProgress / switchArchetype).
 

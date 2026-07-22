@@ -19,10 +19,15 @@
 export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
   'views.required',
   'views.nearby',
+  'textures.scene',
   'programs.compile',
   'world.initial-frame',
   'render.settle-passes',
 ];
+
+export const CONSTRAINED_TEXTURE_BATCH_SIZE = 4;
+export const CONSTRAINED_TEXTURE_MAX_MS = 1200;
+export const CONSTRAINED_ENTRY_VIEW_RAMP_MS = 300;
 
 export interface PrewarmPolicyInput {
   /** GFX.constrainedMemory: the phone-class memory-ceiling profile is active. */
@@ -58,6 +63,10 @@ export interface PrewarmPolicy {
   skipMonolithCompile: boolean;
   /** Restrict the manifest to CONSTRAINED_PREWARM_KEEP. */
   minimalManifest: boolean;
+  /** Textures initialized before yielding the event loop; 0 uses the synchronous desktop path. */
+  textureBatchSize: number;
+  /** Maximum wall-clock time for the bounded constrained texture pass. */
+  textureMaxMs: number;
 }
 
 /**
@@ -78,6 +87,8 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
       compileBeforeFirstFrame: false,
       skipMonolithCompile: false,
       minimalManifest: false,
+      textureBatchSize: 0,
+      textureMaxMs: 0,
     };
   }
   return {
@@ -96,7 +107,32 @@ export function resolvePrewarmPolicy(input: PrewarmPolicyInput): PrewarmPolicy {
     compileBeforeFirstFrame: asyncCompileSupported,
     skipMonolithCompile: !asyncCompileSupported,
     minimalManifest: true,
+    textureBatchSize: CONSTRAINED_TEXTURE_BATCH_SIZE,
+    textureMaxMs: CONSTRAINED_TEXTURE_MAX_MS,
   };
+}
+
+/**
+ * Keep optional view creation out of the first live submit, then stream one
+ * view per frame for a short wall-clock window covered by the loading fade. Required
+ * player and target views bypass this budget in Renderer.createRequiredViews.
+ */
+export function constrainedEntryViewCreateBudget(
+  constrainedMemory: boolean,
+  runtimeElapsedMs: number,
+  baseBudget: number,
+): number {
+  const base = Math.max(0, Math.floor(baseBudget));
+  if (!constrainedMemory) return base;
+  if (runtimeElapsedMs <= 0) return 0;
+  if (runtimeElapsedMs <= CONSTRAINED_ENTRY_VIEW_RAMP_MS) return Math.min(1, base);
+  return base;
+}
+
+/** Remaining slots in the one total entry-view budget shared by required,
+ * persistent-portal, and nearby-view substeps. */
+export function remainingPrewarmViewBudget(maxViews: number, createdViews: number): number {
+  return Math.max(0, Math.floor(maxViews) - Math.max(0, Math.floor(createdViews)));
 }
 
 /** True when this manifest entry runs under the given policy. */

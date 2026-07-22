@@ -1041,6 +1041,11 @@ describe('coverage: each scenario fires its subsystem', () => {
     const signed = meta.inventory.filter(
       (s: any) => s.itemId === rare!.itemId && s.instance?.signer === meta.name,
     );
-    expect(signed.length).toBeGreaterThanOrEqual(rareGather!.qty);
+    // Identical-payload stacking (Phase 12d): the same-signer units merge into
+    // signed stacks, so count UNITS and pin that the merge actually collapsed
+    // them into far fewer slots than units (stack cap 20).
+    const signedUnits = signed.reduce((n: number, s: any) => n + s.count, 0);
+    expect(signedUnits).toBeGreaterThanOrEqual(rareGather!.qty);
+    expect(signed.length).toBeLessThanOrEqual(Math.ceil(signedUnits / 20));
   });
 });

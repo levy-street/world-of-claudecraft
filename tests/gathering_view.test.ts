@@ -16,6 +16,7 @@ import {
   buildNearbyGatherNodes,
   classifyGatherNode,
   gatherDeniedLineKey,
+  gatherDowngradeLineKey,
   isNodeToolLockedFor,
   viewerBestToolTier,
 } from '../src/ui/gathering_view';
@@ -172,6 +173,11 @@ describe('tool-tier lock dimension (Phase 12)', () => {
     // back to the profession-neutral corpse line.
     expect(gatherDeniedLineKey('node', 'fishing')).toBe('hudChrome.gathering.toolTierUnmetCorpse');
     expect(gatherDeniedLineKey('node')).toBe('hudChrome.gathering.toolTierUnmetCorpse');
+  });
+
+  it('gatherDowngradeLineKey maps each lost arm to its exact key (Phase 12d)', () => {
+    expect(gatherDowngradeLineKey('mark')).toBe('hudChrome.gathering.downgradeMark');
+    expect(gatherDowngradeLineKey('find')).toBe('hudChrome.gathering.downgradeFind');
   });
 });
 

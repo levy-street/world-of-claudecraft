@@ -1446,7 +1446,7 @@ export const ja_JP: EnTranslations = {
     "corpseHarvest": {
       "title": "採取",
       "harvestButton": "採取",
-      "harvestButtonTooltip": "採取：この死体から製作素材（毛皮、牙、絹糸など）を戦利品とは別に集めます。誰でも採取できますが、1体の死体を採取できるのは1人だけです。",
+      "harvestTooltip": "チェックした部位を採取します。各死体は早い者勝ちで一度だけ採取できます。戦利品は取りません。",
       "concentrateHint": "選ぶ部位が少ないほど、各部位の品質が高くなります。",
       "alreadyHarvested": "この死体はすでに採取されています。",
       "componentAria": "{component}を採取",
@@ -1464,6 +1464,8 @@ export const ja_JP: EnTranslations = {
     "townFocus": {
       "title": "町のフォーカス",
       "hint": "フォーカスポイントは各素材の基本産出量にボーナスを加算します。フォーカスしていない素材は基本産出量のままです。",
+      "tierHint": "素材にフォーカスを{points}ポイント割り振るごとに採取ティアが1段階上がります（最大{steps}段階）。{points}ポイント未満でも産出量は増えます。",
+      "townOnlyHint": "フォーカスは町の中でのみ変更できます。",
       "budgetLabel": "残りポイント：{remaining} / {budget}",
       "saveButton": "フォーカスを保存",
       "notInTownHint": "フォーカスを設定するには町にいる必要があります。",
@@ -1522,6 +1524,7 @@ export const ja_JP: EnTranslations = {
       "dragEquipHint": "キャラクターにドラッグして装備",
       "dragDestroyHint": "世界へドラッグして破壊",
       "reorderNeedsRecent": "絞り込みを解除し並び順を「最近」にすると持ち物を並べ替えられます",
+      "itemAriaInstanced": "{item}、数量 {count}、銘入りの品",
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
       "filterWeapon": "武器",
@@ -1687,7 +1690,9 @@ export const ja_JP: EnTranslations = {
     },
     "loot": {
       "chestTitle": "宝箱",
-      "takeAllTooltip": "すべて取る：この戦利品ウィンドウ内のすべてのお金とアイテムを回収します。"
+      "takeLootButton": "戦利品を取る",
+      "takeLootTooltip": "お金とドロップしたアイテムを受け取ります。採取の機会は消費しません。",
+      "unifiedPressHint": "相互作用キーを一度押すだけで、町のフォーカスに従って戦利品の回収と採取を同時に行います。"
     },
     "spellbook": {
       "addToBarAria": "{name}をアクションバーに追加",
@@ -1835,6 +1840,7 @@ export const ja_JP: EnTranslations = {
         "legend": "レジェンド",
         "shill": "サポーター"
       },
+      "roleTagChatTitle": "認証済みサーバーロール: {role}",
       "guildMember": "認証済みメンバー",
       "notMember": "まだサーバーに参加していません",
       "joinCta": "Discordに参加",
@@ -2128,6 +2134,8 @@ export const ja_JP: EnTranslations = {
         "herbalism": "この群生地を採取するにはティア{tier}の薬草鎌が必要です。"
       },
       "toolTierUnmetCorpse": "最高の素材を回収するにはティア{tier}の採集道具が必要です。",
+      "downgradeMark": "バッグが満杯です：収穫は採集者の印なしで収納されました。",
+      "downgradeFind": "バッグが満杯です：極上の獲物を逃してしまいました。",
       "stateReady": "採集可能",
       "stateCooldown": "再生中"
     },
@@ -2159,6 +2167,49 @@ export const ja_JP: EnTranslations = {
       "enchanting": "エンチャント",
       "tailoring": "裁縫",
       "leatherworking": "皮革加工"
+    },
+    "enchantName": {
+      "enchant_weapon_might": "武器エンチャント - 剛力",
+      "enchant_weapon_intellect": "武器エンチャント - 呪文威力",
+      "enchant_helmet_fortitude": "頭エンチャント - 堅牢",
+      "enchant_neck_spirit": "首エンチャント - 精神力",
+      "enchant_shoulder_agility": "肩エンチャント - 敏捷性",
+      "enchant_chest_stamina": "胸エンチャント - スタミナ",
+      "enchant_waist_stamina": "腰エンチャント - スタミナ",
+      "enchant_legs_stamina": "脚エンチャント - スタミナ",
+      "enchant_gloves_agility": "手エンチャント - 敏捷性",
+      "enchant_gloves_intellect": "手エンチャント - 呪文威力",
+      "enchant_feet_agility": "足エンチャント - 敏捷性",
+      "enchant_ring_spirit": "指エンチャント - 精神力",
+      "enchant_weapon_agility": "武器エンチャント - 敏捷性",
+      "enchant_helmet_intellect": "頭エンチャント - 知力",
+      "enchant_helmet_armor": "頭エンチャント - 強化",
+      "enchant_neck_intellect": "首エンチャント - 知力",
+      "enchant_neck_agility": "首エンチャント - 敏捷性",
+      "enchant_shoulder_strength": "肩エンチャント - 筋力",
+      "enchant_shoulder_intellect": "肩エンチャント - 知力",
+      "enchant_chest_spirit": "胸エンチャント - 精神力",
+      "enchant_chest_armor": "胸エンチャント - 強化",
+      "enchant_waist_strength": "腰エンチャント - 筋力",
+      "enchant_waist_agility": "腰エンチャント - 敏捷性",
+      "enchant_legs_intellect": "脚エンチャント - 知力",
+      "enchant_gloves_strength": "手エンチャント - 筋力",
+      "enchant_feet_strength": "足エンチャント - 筋力",
+      "enchant_feet_stamina": "足エンチャント - スタミナ",
+      "enchant_ring_strength": "指エンチャント - 筋力",
+      "enchant_ring_agility": "指エンチャント - 敏捷性",
+      "enchant_ring_intellect": "指エンチャント - 知力",
+      "enchant_weapon_greater_might": "武器エンチャント - 上級剛力",
+      "enchant_weapon_greater_spellpower": "武器エンチャント - 上級呪文威力",
+      "enchant_helmet_greater_fortitude": "頭エンチャント - 上級堅牢",
+      "enchant_chest_greater_stamina": "胸エンチャント - 上級スタミナ",
+      "enchant_legs_greater_stamina": "脚エンチャント - 上級スタミナ",
+      "enchant_gloves_greater_agility": "手エンチャント - 上級敏捷性",
+      "enchant_weapon_runed_edge": "武器エンチャント - ルーンの刃",
+      "enchant_weapon_runed_focus": "武器エンチャント - ルーンの焦点",
+      "enchant_chest_runeweave": "胸エンチャント - ルーン織り",
+      "enchant_legs_runed_hide": "脚エンチャント - ルーンの獣皮",
+      "enchant_helmet_runed_links": "頭エンチャント - ルーンの鎖"
     },
     "professions": {
       "title": "専門技能",
@@ -2220,6 +2271,7 @@ export const ja_JP: EnTranslations = {
       "pairOptionLabel": "{pair}（{craftA} + {craftB}）",
       "attunementPreview": "結果：{title}の称号を獲得し、{majorA}と{majorB}が上限なしの主専攻になります。{hobby}はレア上限の趣味になります。他の技能知識はすべて保持されますが、休眠中はコモン上限です。",
       "hobbyPreview": "結果：{hobby}がレア上限の趣味になります。二つの主専攻と保持済みの技能値は変わりません。",
+      "attunementReturnCost": "この組み合わせを離れると、後で戻るには償いの任務が {cost} 回必要になります。",
       "identity": {
         "title": "製作の専門性",
         "syncing": "サーバーから製作の専門性を受信しています。",
@@ -2263,12 +2315,60 @@ export const ja_JP: EnTranslations = {
       "difficultyNone": "技能上昇なし",
       "stationBadge": "製作拠点",
       "stationOutOfRangeNamed": "{station}に移動して製作してください。",
+      "learnMoreAtStation": "{station}の{master}が{craft}のレシピをさらに教えてくれます。",
       "masterworkToast": "傑作！{name}",
       "masterworkZoneLine": "{crafter}が傑作{name}を作り上げました！",
       "tierUpToast": "{craft}がティア {tier} に到達しました！",
+      "trendNudge": "あなたの腕は{archetype}へと傾いています。その調律の依頼は{master}のもとで待っています。",
+      "trendNudgeNoMaster": "あなたの腕は{archetype}へと傾いています。その道に進むには工芸の師匠を探しましょう。",
+      "attunedZoneLine": "{name}が{archetype}として調律しました！",
+      "attunedBanner": "調律完了：{title}",
+      "tierTutorial": {
+        "title": "最初のティア",
+        "tierCap": "技は技能 {skill} で最初のティアに達し、ティアが上がるごとに作れる物が向上します。ただし技がレアを超える作品を作れるのは、それがあなたの二つの主専攻の一つである場合だけです。",
+        "radar": "あなたの専門は輪を成します。隣り合う一対に調律すると、その二つの技は上限のない主専攻になり、輪の反対側の一つの技はレア上限の趣味になり、残りは休眠します。その知識は保持されますが、再び手に取るまではコモン上限です。",
+        "masters": "町の工芸の師匠が調律の依頼を出しています。準備ができたら訪ねて、あなたの組み合わせを選びましょう。学んだことが失われることは決してありません。",
+        "dismiss": "了解"
+      },
       "makersMark": "製作者：{name}",
+      "gatheredBy": "採集者：{name}",
       "masterworkSeal": "傑作",
-      "enchantedLine": "エンチャント済み"
+      "enchantedLine": "エンチャント済み",
+      "commissionToggle": "受注品として制作",
+      "commissionToggleHint": "取引で最初に受け取ったキャラクターにバインドされます。",
+      "commissionUnbound": "受注品：最初の受取人にバインドされる",
+      "commissionBound": "受注品：受取人にバインド済み"
+    },
+    "itemMenu": {
+      "use": "Use",
+      "equip": "装備する",
+      "disenchant": "魔力分解",
+      "salvage": "解体",
+      "applyEnchant": "エンチャントを付与"
+    },
+    "enchanting": {
+      "disenchantedLine": "{item}を魔力分解した。",
+      "salvagedLine": "{item}を解体した。",
+      "enchantAppliedLine": "{item}に{enchant}をエンチャントした。",
+      "notHeld": "そのアイテムを所持していません。",
+      "notDisenchantable": "それは魔力分解できません。",
+      "notSalvageable": "それは解体できません。",
+      "disenchantThrottled": "魔力分解が速すぎます。少し待ってからもう一度お試しください。",
+      "salvageThrottled": "解体が速すぎます。少し待ってからもう一度お試しください。",
+      "enchantThrottled": "エンチャントが速すぎます。少し待ってからもう一度お試しください。",
+      "enchantWrongSlot": "そのエンチャントはそのアイテムには付与できません。",
+      "enchantUnknown": "そのエンチャントは存在しません。",
+      "enchantInsufficient": "そのエンチャントに必要な素材がありません。",
+      "disenchantConfirmTitle": "{item}を魔力分解しますか？",
+      "disenchantConfirmBody": "{item}を破壊し、秘術素材を得ます。この操作は元に戻せません。",
+      "disenchantConfirmBodySpecial": "特別な{item}（銘入り、傑作、またはエンチャント済み）を破壊し、秘術素材を得ます。この操作は元に戻せません。",
+      "salvageConfirmTitle": "{item}を解体しますか？",
+      "salvageConfirmBody": "{item}を破壊し、製作素材を得ます。この操作は元に戻せません。",
+      "salvageConfirmBodySpecial": "特別な{item}（銘入り、傑作、またはエンチャント済み）を破壊し、製作素材を得ます。この操作は元に戻せません。",
+      "pickerTitle": "エンチャントを付与",
+      "targetTitle": "エンチャントするアイテムを選択",
+      "noEnchants": "この素材を使うエンチャントはありません。",
+      "noTargets": "エンチャントできるアイテムがありません。"
     },
     "training": {
       "title": "訓練：{name}",
@@ -2288,6 +2388,25 @@ export const ja_JP: EnTranslations = {
       "notTaughtHere": "そのレシピはここでは教えていません。",
       "alreadyKnown": "そのレシピはすでに習得しています。",
       "outOfRange": "訓練するには作業台のそばにいる必要があります。"
+    },
+    "unbind": {
+      "title": "バインド解除：{name}",
+      "close": "バインド解除を閉じる",
+      "intro": "親方は手数料と引き換えに受注品のバインドを解除できます。",
+      "empty": "バインドされた受注品を持っていません。",
+      "rowSub": "バインドを解除します。次の取引で再びバインドされます。",
+      "unbindAria": "{fee}で{name}のバインドを解除",
+      "dialogOption": "バインド解除",
+      "dialogOptionAria": "{name}に受注品のバインド解除を依頼",
+      "confirmTitle": "受注品のバインド解除",
+      "confirmBody": "{fee}で{name}のバインドを解除しますか？",
+      "confirmOk": "バインド解除",
+      "confirmCancel": "キャンセル",
+      "unbound": "{fee}で{name}のバインドを解除しました。次の取引で再びバインドされます。",
+      "notEligible": "そのアイテムはバインド解除できません。",
+      "notBound": "そのアイテムはバインドされていません。",
+      "cannotAfford": "バインド解除の手数料を支払えません。",
+      "outOfRange": "バインド解除するには作業台のそばにいる必要があります。"
     },
     "finder": {
       "title": "ダンジョンファインダー",
@@ -5707,7 +5826,8 @@ export const ja_JP: EnTranslations = {
       "tradeInProgress": "すでに取引が進行中です。",
       "tradeTooFar": "対象が遠すぎて取引できません。",
       "tradeExpired": "取引リクエストは期限切れです。",
-      "tradeFailed": "取引失敗: アイテムまたは所持金が利用できません。"
+      "tradeFailed": "取引失敗: アイテムまたは所持金が利用できません。",
+      "tradeBound": "そのアイテムはバインドされているため取引できません。"
     },
     "logs": {
       "standUp": "立ち上がりました。",
@@ -8600,6 +8720,21 @@ export const ja_JP: EnTranslations = {
       "wildsoul_maul": {
         "name": "野生魂の大槌"
       },
+      "resonant_thread": {
+        "name": "共鳴の糸"
+      },
+      "resonant_hide": {
+        "name": "共鳴の獣皮"
+      },
+      "resonant_links": {
+        "name": "共鳴の鎖"
+      },
+      "resonant_steel": {
+        "name": "共鳴の鋼"
+      },
+      "resonant_timber": {
+        "name": "共鳴の木材"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -10692,23 +10827,143 @@ export const ja_JP: EnTranslations = {
           }
         }
       },
-      "q_archetype_acceptance": {
-        "title": "己が選ぶべき技",
-        "text": "技とは知識だ、{playerName}。だが調律は誓いだ。隣り合う二つの技を主専攻として選び、谷で自ら採掘した鉱石を持ってこい。",
-        "completion": "誓いは結ばれた。この二つの技が今やお前の主専攻となり、その反対側の知識が趣味となる。",
+      "q_prof_attune_smith": {
+        "title": "鍛冶師の約定",
+        "text": "鋼は迷う手を許さん。だから誓いを立てる前に、はっきり言っておく。私の鍛冶場に身を捧げれば、武器鍛冶と防具鍛冶がお前の二つの主専攻になる。レアを超えて磨けるのはこの二つだけだ。輪の向かい側にある技は趣味として収まり、レアまで、それ以上は伸びん。ほかの技が焼き尽くされるわけではない、{playerName}。ただ静かになるだけ、お前が呼び戻すまで休眠するのだ。そして槌が振り下ろされる前に、これも覚えておけ。この組を捨てて別へ移れば、戻るときはまっとうな労苦を這って乗り越えることになる。最初に帰るときは敵を五体、次は八体、その次は十一体、迷うたびに増えていく。まだそこに立っているか。ならば渓谷の鉱脈を、自らの手で三か所掘り出して持ってこい。それで約定は成ったとしよう。",
+        "completion": "よい鉱石だ、そしてそれを扱うよい手だ。武器鍛冶と防具鍛冶は、これでお前が極めるものになった。残りは自分で勝ち取れ。",
         "objectives": {
           "0": {
             "label": "鉱脈を採掘"
           }
         }
       },
-      "q_prof_make_amends": {
-        "title": "償い",
-        "text": "その組み合わせは以前にも身につけていたな、{playerName}。戻ることは新たな誓いではない。谷の道の安全を守り、かつて手が覚えていた感覚を働きながら取り戻せ。",
-        "completion": "昔の感覚が戻った。以前の組み合わせが再び有効になった。",
+      "q_prof_attune_outfitter": {
+        "title": "装具師の寸法",
+        "text": "裁つ前に、まず費えを測る。それが私の織機での第一の掟です。私を選べば、皮革加工と裁縫があなたの二つの主専攻になります。レアを超えて携えられるのはこの組だけ。向かいにある技は趣味として収まり、レアまで、そこで留まります。脇へ置いた技はほどけてしまうわけではありません、{playerName}。ただ畳まれるだけ、あなたが再び手に取るまで休眠します。ただし、よく心を定めなさい。この組を離れ、後になって取り戻したくなれば、帰り道は労苦で贖うことになり、その労苦は毎回長くなります。初めは四体を間引き、次は八体、その次は十一体、いつも少しずつ増えていきます。心が決まったなら、セイブルウェブの潜伏者を四体間引き、その絹を織機まで持っておいでなさい。よい糸こそ、あらゆるよい衣の始まりです。",
+        "completion": "整った糸、整った手。皮革加工と裁縫は、あなたの技が届くかぎり遠くまで携えられるものになりました。二度測りなさい、そうすれば裏切られはしません。",
         "objectives": {
           "0": {
-            "label": "フォレストウルフを討伐"
+            "label": "セイブルウェブの潜伏者を討伐"
+          }
+        }
+      },
+      "q_prof_attune_apothecary": {
+        "title": "取っておく価値のあるレシピ",
+        "text": "よい料理はどれも、互いに寄り添う二つの味でできている。よい技も同じさ、{playerName}。俺と一緒に腰を据えれば、錬金術と料理がお前の二つの主専攻になる。レアを超えて煮込めるのはこの二つだけ。輪の向こう側の技は趣味だ、レアまで味付けして、それ以上は火を上げられん。残りの技は食料庫にしまっておくだけ、休眠しても腐りはせん、いつでも取り出せる。鍋がまだ冷たいうちに一言忠告だ。別の組へふらふら出ていけば、帰ってくるのはだんだん骨の折れる仕事になる。最初は五匹を片付け、次は八匹、その次は十一匹、おかわりのたびに重くなる。それでもまだ腹が減っているか。なら野生の猪を四頭狩ってこい。塩の効いた台所は、よい肉から始まるんだからな。",
+        "completion": "よし、これは肉のついた立派な出だしだ。錬金術と料理は、好きなだけ高く仕上げられるお前のものになった。また腹を空かせて戻ってこい。",
+        "objectives": {
+          "0": {
+            "label": "野生の猪を狩る"
+          }
+        }
+      },
+      "q_prof_attune_bombardier": {
+        "title": "不安定な取り決め",
+        "text": "おお、おお、いいやつが欲しいんだろ、うるさいやつ、そうだろ？ 聞け、聞け、カチカチ鳴るものに触る前にだ。ひと言そう言えば、工作と錬金術がお前の二つの主専攻になる。レアを超えて押し上げられるのはこの二つだけ（そこが楽しくなるとこだ、間違いない）。向かいの技はポケットに趣味として入れとけ、レアまで、それ以上はなし、ふくれるな。ほかの技か？ 消えやしないさ、{playerName}、ただ昼寝してるだけ、休眠だ、好きなときに起こせばいい。だがな（いつだって「だが」がある、導火線は握っとけ）この組を放り出して後からよたよた戻ってくれば、積み上がった汗で支払うことになる。最初は五つ片付けて、次は八つ、その次は十一、もっと、もっとだ、しり込みするたびに増えていく。やるか？ やるかっ？ なら薬草の群生地を三か所採ってこい、不安定なやつをな。どれかなんて聞くな、強く信じれば全部ちょっとは不安定なもんさ。",
+        "completion": "ハッ。試薬だ、本物の、しかも指は全部くっついたまま、いいぞ、いいぞ。工作と錬金術、お前のものだ、何か後悔するようなものを作ってこい。ほら行け。",
+        "objectives": {
+          "0": {
+            "label": "薬草の群生地を採集"
+          }
+        }
+      },
+      "q_prof_amends_smith": {
+        "title": "鍛冶場へ戻って",
+        "text": "鍛冶場へ戻ってきたな。胸に刺さらんふりはせん、{playerName}。だが私は公平な手だし、仕事もまた公平だ。戻る代償は分かっているな。労苦だ、迷ったぶんだけ毎回増える。北の道を荒らす狼を片付けてこい。その一振りが、この組がかつてお前の腕に何を求めたか、思い出させてくれるだろう。",
+        "completion": "手に律動が戻ったな。武器鍛冶と防具鍛冶は、再びお前の主専攻だ。去るのを癖にするなよ。",
+        "objectives": {
+          "0": {
+            "label": "森の狼を討伐"
+          }
+        }
+      },
+      "q_prof_amends_outfitter": {
+        "title": "再びつなぐ糸",
+        "text": "結局、私の織機に戻ってきましたね。恨みはありません、{playerName}。けれど糸は、手放した手を覚えているものです。そして取り直す代償は、毎回長く測り出されます。西の森にひしめくセイブルウェブの潜伏者を間引きなさい。その労苦が、よい絹に再び触れる前に、あなたの手を落ち着かせてくれるでしょう。",
+        "completion": "また落ち着きましたね。皮革加工と裁縫は、主専攻としてあなたの手に戻ります。今度こそ、さまよう前に二度測りなさい。",
+        "objectives": {
+          "0": {
+            "label": "セイブルウェブの潜伏者を討伐"
+          }
+        }
+      },
+      "q_prof_amends_apothecary": {
+        "title": "また竈の前へ",
+        "text": "おや、誰かと思えば俺の鍋の前に戻ってきたな。悪く思っちゃいないさ、{playerName}、台所にはいつだって席がある。だが出ていくたびに勘定が長くなるのは知ってるだろ。東の野原の野生の猪を間引いてこい。まっとうな汗こそ最初の材料だ、それがお前の手に仕事を思い出させてくれる。",
+        "completion": "ほら、昔なじみの味だ。錬金術と料理は、主専攻としてお前の竈に戻ってきた。今度はしばらくいてくれよ。",
+        "objectives": {
+          "0": {
+            "label": "野生の猪を狩る"
+          }
+        }
+      },
+      "q_prof_amends_bombardier": {
+        "title": "帳簿は膨らむ",
+        "text": "戻ってきたな、ハッ、みんな戻ってくる、うるさいやつには引力があるんだ、そうだろ？ 俺はふてくされたりしないさ、{playerName}。だが帳簿だ、ああ帳簿、お前が抜け出すたびに膨らむ、戻るたびに増える、それが公平ってもんだ。掘削場のディープロックの掘削者を片付けてこい。汗が先、火花は後、これは今さっき俺が作った掟だ。",
+        "completion": "そーれだ、あのむずむずがお前の手に戻ってきた。工作と錬金術、また主専攻だ、さあ、ドカンとやってこい。今度はじっとしてろよ、な？",
+        "objectives": {
+          "0": {
+            "label": "ディープロックの掘削者を駆除"
+          }
+        }
+      },
+      "q_prof_workorder_forge": {
+        "title": "鍛冶場の受注",
+        "text": "鍛冶場はいつも餌を欲しがる、{playerName}。銅鉱石を八つ持ってくれば、その運びに見合った報酬を出す。儀式は要らん、鉱石と貨幣、それだけだ。",
+        "completion": "よい目方だ、鉱滓もない。これがお前の取り分だ。鍛冶場はまたすぐ腹を空かせるだろう。",
+        "objectives": {
+          "0": {
+            "label": "銅鉱石を納品"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens": {
+        "title": "厨房の受注",
+        "text": "俺の食料庫が寂しくなってきてな、{playerName}、寂しい食料庫は料理人を不機嫌にするんだ。野獣の肉を八切れ持ってきてくれ。貨幣も出すし、おまけに俺の尽きせぬ感謝もつく。そっちは値打ちは低いが、味はいいぞ。",
+        "completion": "よし、これで食料庫は満杯だ。これがお前の報酬だ。また袋が重くなったら戻ってこい。",
+        "objectives": {
+          "0": {
+            "label": "野獣の肉を納品"
+          }
+        }
+      },
+      "q_prof_workorder_loom": {
+        "title": "織機の受注",
+        "text": "織機が空回りし、遊ぶ手は日の光を無駄にします、{playerName}。蜘蛛の糸を六かせ持ってきなさい。公正な相場で、銅貨一枚まで数えてお支払いします。",
+        "completion": "よい絹、均一に紡がれています。あなたの貨幣、きっちり量りました。織機もあなたに礼を言います、私もです。",
+        "objectives": {
+          "0": {
+            "label": "蜘蛛の糸を納品"
+          }
+        }
+      },
+      "q_prof_workorder_toolworks": {
+        "title": "工房の受注",
+        "text": "柄、握り、銃床、木材なんてまるで流行遅れみたいにどんどん使うんだ、いや流行遅れじゃないぞ、木は永遠だ、{playerName}。アイアンバークの丸太を八本運んでこい、そしたら払う、貨幣で、本物の貨幣だ、貸しじゃないぞ、約束する、だいたいな。",
+        "completion": "完璧、完璧、まっすぐな木目、腐りもない。ほら、お前の貨幣だ、な、俺は約束を守るだろ（だいたいは）。木につまずいたら、もっと持ってこい。",
+        "objectives": {
+          "0": {
+            "label": "アイアンバークの丸太を納品"
+          }
+        }
+      },
+      "q_prof_workorder_tannery": {
+        "title": "鞣し場の受注",
+        "text": "桶が空だ。粗い獣皮を八枚持ってこい。持ってきたら貨幣を払う。",
+        "completion": "よい皮だ。相応の払いを。またあれば頼む。",
+        "objectives": {
+          "0": {
+            "label": "粗い獣皮を納品"
+          }
+        }
+      },
+      "q_prof_workorder_apothecary": {
+        "title": "調薬所の受注",
+        "text": "私の棚にはゴールドリーフが要る。そして市場の品は、予想どおり混ぜ物だらけだ。ゴールドリーフ草を六つ、傷めずに持ってきたまえ。そうすれば正確に対価を支払う。傷んだ葉は受け取らない。鞄の扱いには気をつけることだ。",
+        "completion": "及第点だ。効き目もあり、扱いも適切だ。対価は貨幣一枚まで数えてある。舞い上がるなよ。それはまた別の試薬の効能だ。",
+        "objectives": {
+          "0": {
+            "label": "ゴールドリーフ草を納品"
           }
         }
       },
@@ -11017,6 +11272,106 @@ export const ja_JP: EnTranslations = {
         "sender": "ギルド会館",
         "subject": "腕前に、偽りなし",
         "body": "ギルドの同志へ\n\nギルドは熟練の新しい尺度を定めました。誰もが登り直しです。あなたの製作スキルと採集熟練度はゼロに戻されました。\n\nそれ以外はすべて、手つかずのままあなたのものです。レシピ、道具と素材、銀行と所持金、調律と称号、功績と名声、クエストと郵便。\n\nこれからの登りにごまかしは利きません。安い仕事では上へは行けません。より難しいレシピを、より豊かな鉱脈を、より深い水を求めてください。\n\n敬意を込めて、\nギルド会館"
+      },
+      "prof_tier_weaponcrafting_armorcrafting_1": {
+        "sender": "鍛冶長ダルヴァ",
+        "subject": "記すに値する火花",
+        "body": "お前の主専攻の一つが、いまアンコモンの仕事に届いたと私の鍛冶場に報せが来た。長い登りの、いちばん低い段にすぎん。だがお前はそれを金床の上で勝ち取ったのだ、頼んでではなく。火を絶やすな。"
+      },
+      "prof_tier_weaponcrafting_armorcrafting_2": {
+        "sender": "鍛冶長ダルヴァ",
+        "subject": "レアの仕事、勝ち取ったもの",
+        "body": "お前の主専攻の一つがレアの仕事に達したと聞いた。そこは雑な手が落ちていき、本物の鍛冶師だけが立ち続ける段だ。お前はまだ立っている。よし。"
+      },
+      "prof_tier_weaponcrafting_armorcrafting_3": {
+        "sender": "鍛冶長ダルヴァ",
+        "subject": "金属が応えるようになった",
+        "body": "お前の主専攻の一つが、レアを超えて本格の仕事へ登った。金属はそういう手にはもう抗わず、応えてくれる。褒め言葉で腕を鈍らせるなよ。"
+      },
+      "prof_tier_weaponcrafting_armorcrafting_4": {
+        "sender": "鍛冶長ダルヴァ",
+        "subject": "梯子の頂近く",
+        "body": "お前の主専攻の一つが、マスターまであと一段のところに立っている。私が知る手のうち、この高さに届く者はわずか、ここで切れ味を保てる者はさらに少ない。登り切れ。"
+      },
+      "prof_tier_weaponcrafting_armorcrafting_5": {
+        "sender": "鍛冶長ダルヴァ",
+        "subject": "ついに、マスターへ",
+        "body": "お前の主専攻の一つが、手の登れる最も高いところ、マスターに達した。私は褒め言葉を安売りせん。だから一度だけ言おう。鍛冶場はお前を誇りに思う。さあ、火に何か新しいことを教えてこい。"
+      },
+      "prof_tier_leatherworking_tailoring_1": {
+        "sender": "織り手オッティリー",
+        "subject": "整った最初の一列",
+        "body": "あなたの主専攻の一つがアンコモンの仕事に達したと、ギルドが記しました。数多くの列の、ほんの最初の一列にすぎません。けれど、整い、狂いがありません。次も同じだけ丁寧に測りなさい。"
+      },
+      "prof_tier_leatherworking_tailoring_2": {
+        "sender": "織り手オッティリー",
+        "subject": "レアの仕事、よく測られて",
+        "body": "あなたの主専攻の一つがレアの仕事まで登りました。そこは不注意な手なら落とした縫い目がことごとく露わになる段です。あなたの手はそうではなかった。静かに、うれしく思います。"
+      },
+      "prof_tier_leatherworking_tailoring_3": {
+        "sender": "織り手オッティリー",
+        "subject": "型がはっきり見えてくる",
+        "body": "あなたの主専攻の一つが、レアを超えてより精緻な仕事へ進みました。この域の手には型がはっきり見え、もう当て推量は要りません。二度測ることを続けなさい。"
+      },
+      "prof_tier_leatherworking_tailoring_4": {
+        "sender": "織り手オッティリー",
+        "subject": "頂まであと一列",
+        "body": "あなたの主専攻の一つが、マスターまであと一列のところにあります。最後の一列は、いつも整えたまま保つのがいちばん難しいもの。今、急いではいけません。"
+      },
+      "prof_tier_leatherworking_tailoring_5": {
+        "sender": "織り手オッティリー",
+        "subject": "最後のひと針",
+        "body": "あなたの主専攻の一つがマスターに達しました。私は何であれそうするように、あなたの仕事を二度測りました。狂いはありません。最後のひと針をこれほど清らかに結べる手は、めったにありません。誇りに思います。そして、それを軽々しく口にはしません。"
+      },
+      "prof_tier_alchemy_cooking_1": {
+        "sender": "料理人マーロウ",
+        "subject": "これから来るものの味見",
+        "body": "お前の主専攻の一つがアンコモンの仕事に達したと、俺の台所まで噂が漂ってきた。ほんの最初の味見、それだけのことだが、見込みのある味だ。鍋を動かし続けろ。"
+      },
+      "prof_tier_alchemy_cooking_2": {
+        "sender": "料理人マーロウ",
+        "subject": "レアの仕事、焦げひとつなく",
+        "body": "お前の主専攻の一つがレアの仕事まで煮詰まったと聞いた。そこは料理人のほとんどが皿を焦がす火加減だ。お前は焦がさなかった。座っていいぞ、ただし長くはな。"
+      },
+      "prof_tier_alchemy_cooking_3": {
+        "sender": "料理人マーロウ",
+        "subject": "さあ、腕が乗ってきた",
+        "body": "お前の主専攻の一つが、レアを超えて本物の深みまで沸いてきた。いわゆる、腕が乗ってきたってやつだ。大胆に味付けして、味見を続けろ。"
+      },
+      "prof_tier_alchemy_cooking_4": {
+        "sender": "料理人マーロウ",
+        "subject": "宴まであと一皿",
+        "body": "お前の主専攻の一つが、マスターまであと一皿のところにいる。最後の一皿は、いつだっていちばん濃厚で、いちばんやりすぎやすい。玉杓子を持つ手は落ち着けてな。"
+      },
+      "prof_tier_alchemy_cooking_5": {
+        "sender": "料理人マーロウ",
+        "subject": "マスター、熱いうちに一皿",
+        "body": "お前の主専攻の一つがマスターに達した、食料庫まるごとの最上段だ。俺は誰にでも飯を食わせるが、料理でここまで登ってくる者はわずかだ。誇りに思うよ、本当にな。さあ、食卓で皆を泣かせるようなものを作ってこい。"
+      },
+      "prof_tier_engineering_alchemy_1": {
+        "sender": "からくり師ギッゼル",
+        "subject": "最初の火花、ハッ",
+        "body": "おい、数字によればお前の主専攻の一つが、いまアンコモンの仕事に届いたぞ、ちっぽけ、ちんまり、だがパチッと弾けた、そうだろ？ 最初の火花はいつだっていちばん可愛いんだ。もっと火花を。行け。"
+      },
+      "prof_tier_engineering_alchemy_2": {
+        "sender": "からくり師ギッゼル",
+        "subject": "レア、おお、レアだ",
+        "body": "お前の主専攻の一つがレアの仕事まで登ったと聞いた。レアってのは、ちゃんと危なくなり始めるとこだ（いい意味のやつな）。たいていの手は楽しくなる前にやめちまう。お前は違う。ハッ。"
+      },
+      "prof_tier_engineering_alchemy_3": {
+        "sender": "からくり師ギッゼル",
+        "subject": "ここからうるさくなるぞ",
+        "body": "お前の主専攻の一つが、レアを吹っ飛ばして本気の領域に入った、おお、ここからうるさくなるぞ。今は止まるな、何があってもだ、勢いがすべてだ、あと導火線もな。"
+      },
+      "prof_tier_engineering_alchemy_4": {
+        "sender": "からくり師ギッゼル",
+        "subject": "頂まであと一段、一段だ",
+        "body": "お前の主専攻の一つが、マスターまであと一段、一つだ、たったの一つ、うなりが感じられるか？ 最後の一歩がいちばんデカい炸裂だ。まばたきするなよ。"
+      },
+      "prof_tier_engineering_alchemy_5": {
+        "sender": "からくり師ギッゼル",
+        "subject": "マスター、ドカン",
+        "body": "お前の主専攻の一つがマスターに到達した、まさに頂点、ドカン、梯子まるごと、登り切りだ。俺は褒め言葉なんて配らん、配るのは導火線だ、だがほら、両方持っていけ。お前は見事だし、ちょっとばかり恐ろしい。山々を怯えさせてこい。"
       }
     },
     "itemSets": {

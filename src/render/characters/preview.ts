@@ -10,9 +10,14 @@ import {
   previewAppearanceVisual,
 } from './preview_appearance';
 import { PREVIEW_FRAMING, type PreviewFramingName } from './preview_framing';
+import { characterPreviewFrameVisible, resolveCharacterPreviewPolicy } from './preview_policy';
 import { CharacterVisual } from './visual';
 
 export type { PreviewAppearance } from './preview_appearance';
+
+export interface CharacterPreviewOptions {
+  constrainedMemory?: boolean;
+}
 
 const PREVIEW_ANIM_STATE = {
   speed: 0,
@@ -51,18 +56,23 @@ export class CharacterPreview {
   private isDragging = false;
   private previousMouseX = 0;
 
-  constructor(container: HTMLElement, canvas: HTMLCanvasElement) {
+  constructor(
+    container: HTMLElement,
+    canvas: HTMLCanvasElement,
+    options: CharacterPreviewOptions = {},
+  ) {
     this.container = container;
     this.canvas = canvas;
+    const policy = resolveCharacterPreviewPolicy(options.constrainedMemory === true);
 
     // 1. Initialize WebGLRenderer
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       alpha: true,
-      antialias: true,
-      preserveDrawingBuffer: true,
+      antialias: policy.antialias,
+      preserveDrawingBuffer: policy.preserveDrawingBuffer,
     });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, policy.pixelRatioCap));
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight, false);
     this.renderer.shadowMap.enabled = false; // Preview doesn't need heavy shadows
     // Hand this context back on page teardown (see context_release.ts).
@@ -156,7 +166,7 @@ export class CharacterPreview {
     // Clean up current visual if it exists
     if (this.currentVisual) {
       this.characterGroup.remove(this.currentVisual.root);
-      // CharacterVisual dispose only releases mixer listeners
+      this.currentVisual.dispose();
       this.currentVisual = null;
     }
 
@@ -298,6 +308,18 @@ export class CharacterPreview {
     if (this.destroyed) return;
     this.animationFrameId = requestAnimationFrame(this.animate);
 
+    if (
+      !characterPreviewFrameVisible(
+        this.canvas.isConnected,
+        this.container.clientWidth,
+        this.container.clientHeight,
+      )
+    ) {
+      // Drain the clock while hidden so reopening cannot produce a large animation step.
+      this.clock.getDelta();
+      return;
+    }
+
     const dt = Math.min(this.clock.getDelta(), 0.1); // cap dt to prevent huge jumps
 
     // No idle auto-rotation: the character holds its face-on pose (the classic
@@ -318,10 +340,11 @@ export class CharacterPreview {
    *
    * The live preview canvas is borrowed for one synchronous render: we save the
    * renderer size, camera, and group rotation; frame a tighter portrait at the
-   * requested pixel size; read the pixels (preserveDrawingBuffer makes this
-   * reliable); then restore everything and re-render so the visible preview is
-   * untouched. Because nothing awaits between the off-pose render and the
-   * restore, the browser never paints the intermediate frame.
+   * requested pixel size; read the pixels immediately from that explicit render;
+   * then restore everything and re-render so the visible preview is untouched.
+   * Because nothing awaits between the off-pose render and the restore, the
+   * browser never paints the intermediate frame. This also works with the
+   * constrained transient framebuffer, whose contents need not survive a paint.
    */
   captureCloseup(
     opts: {

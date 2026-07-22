@@ -43,6 +43,11 @@ describe('profession identity card painter contract', () => {
     // armorcrafting is the Smith pair); the skill rows render craft names.
     expect(card?.textContent).toContain('Smith');
     expect(card?.textContent).toContain('Armorcrafting');
+    // Phase 14: the attuned card surfaces the make-amends return cost
+    // (requiredAmendsProgress(1) = 8, the switch-cost-at-rest figure).
+    const returnCost = card?.querySelector('.profession-identity-returncost');
+    expect(returnCost?.textContent).toContain('make-amends');
+    expect(returnCost?.textContent).toContain('8');
     // One visual column-header row over the skill list, hidden from the
     // accessibility tree (each row reads as the full skillAria sentence).
     const header = card?.querySelectorAll<HTMLElement>('.profession-skill-header');
@@ -61,6 +66,8 @@ describe('profession identity card painter contract', () => {
     expect(parent.textContent).toContain('Waiting for your crafting identity');
     // The syncing card has no skill rows, so no floating header row either.
     expect(parent.querySelectorAll('.profession-skill-header')).toHaveLength(0);
+    // No return-cost line while syncing or unattuned (only shown once attuned).
+    expect(parent.querySelectorAll('.profession-identity-returncost')).toHaveLength(0);
   });
 
   it('renders combo guidance outside the faded disabled craft button', () => {
@@ -79,6 +86,7 @@ describe('profession identity card painter contract', () => {
             difficulty: 'reduced',
             station: null,
             craftable: false,
+            commissionEligible: false,
             comboRequirement: {
               craftA: 'armorcrafting',
               craftB: 'weaponcrafting',
@@ -98,6 +106,8 @@ describe('profession identity card painter contract', () => {
         moneyHtml: vi.fn(() => ''),
         itemTooltip: vi.fn(() => ''),
         attachTooltip: vi.fn(),
+        commissionChecked: () => false,
+        onToggleCommission: vi.fn(),
       },
     );
 
@@ -142,6 +152,7 @@ describe('profession identity card painter contract', () => {
             difficulty: 'full',
             station: { required: true, type: 'toolworks', inRange: false },
             craftable: false,
+            commissionEligible: false,
           },
         ],
       },
@@ -153,6 +164,8 @@ describe('profession identity card painter contract', () => {
         moneyHtml: vi.fn(() => ''),
         itemTooltip: vi.fn(() => ''),
         attachTooltip: vi.fn(),
+        commissionChecked: () => false,
+        onToggleCommission: vi.fn(),
       },
     );
 
@@ -171,6 +184,65 @@ describe('profession identity card painter contract', () => {
     expect(button?.getAttribute('aria-label')).toContain('Move to the Toolworks to craft this.');
     // Full-gain difficulty still renders its text label (never color-only).
     expect(button?.querySelector('.crafting-difficulty')?.textContent).toBe('Full skill gain');
+  });
+
+  it('renders the Phase 14 learn-at-master hint under a hinted craft section only', () => {
+    const parent = document.createElement('div');
+    renderCraftingWindow(
+      parent,
+      {
+        recipes: [
+          {
+            recipeId: 'known_weapon',
+            professionId: 'weaponcrafting',
+            resultItemId: 'known_weapon_result',
+            resultCount: 1,
+            reagents: [],
+            skillReq: 0,
+            difficulty: 'full',
+            station: null,
+            craftable: true,
+            commissionEligible: false,
+          },
+          {
+            recipeId: 'known_armor',
+            professionId: 'armorcrafting',
+            resultItemId: 'known_armor_result',
+            resultCount: 1,
+            reagents: [],
+            skillReq: 0,
+            difficulty: 'full',
+            station: null,
+            craftable: true,
+            commissionEligible: false,
+          },
+        ],
+      },
+      {
+        hideTooltip: vi.fn(),
+        onCraft: vi.fn(),
+        onClose: vi.fn(),
+        itemIcon: vi.fn(() => ''),
+        moneyHtml: vi.fn(() => ''),
+        itemTooltip: vi.fn(() => ''),
+        attachTooltip: vi.fn(),
+        commissionChecked: () => false,
+        onToggleCommission: vi.fn(),
+      },
+      undefined,
+      // Only weaponcrafting is hinted; armorcrafting is not in the map.
+      new Map([
+        ['weaponcrafting', { stationType: 'forge' as const, masterNpcId: 'forgemistress_darva' }],
+      ]),
+    );
+
+    const hints = parent.querySelectorAll<HTMLElement>('.crafting-learn-hint');
+    // Exactly one hint, and it names the master (entity i18n), the station, and
+    // the craft.
+    expect(hints).toHaveLength(1);
+    expect(hints[0].textContent).toBe(
+      'Forgemistress Darva at the Forge can teach you more Weaponcrafting recipes.',
+    );
   });
 
   it('renders localized visible identity, cap, tutorial, and nudge text', () => {
@@ -215,6 +287,8 @@ describe('crafting window Phase 6 QA pins', () => {
     moneyHtml: vi.fn(() => ''),
     itemTooltip: vi.fn(() => ''),
     attachTooltip: vi.fn(),
+    commissionChecked: () => false,
+    onToggleCommission: vi.fn(),
   });
   const comboRow = (unmetCrafts: string[]) => ({
     recipes: [
@@ -228,6 +302,7 @@ describe('crafting window Phase 6 QA pins', () => {
         difficulty: 'reduced' as const,
         station: null,
         craftable: false,
+        commissionEligible: false,
         comboRequirement: {
           craftA: 'armorcrafting',
           craftB: 'weaponcrafting',
@@ -282,6 +357,7 @@ describe('crafting window Phase 6 QA pins', () => {
             difficulty: 'none' as const,
             station: null,
             craftable: true,
+            commissionEligible: false,
           },
         ],
       },
@@ -318,6 +394,7 @@ describe('crafting window Phase 6 QA pins', () => {
               difficulty,
               station: null,
               craftable: true,
+              commissionEligible: false,
             },
           ],
         },
@@ -350,6 +427,7 @@ describe('crafting window Phase 6 QA pins', () => {
             difficulty: 'full' as const,
             station: { required: true, type: 'forge' as const, inRange: true },
             craftable: true,
+            commissionEligible: false,
           },
         ],
       },
@@ -378,6 +456,7 @@ describe('crafting window Phase 6 QA pins', () => {
             difficulty: 'full' as const,
             station: { required: true, type: 'forge' as const, inRange: false },
             craftable: false,
+            commissionEligible: false,
           },
         ],
       },

@@ -2153,6 +2153,16 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
   {
     dispatcher: DISPATCH.internal,
     method: 'POST',
+    path: '/internal/daily-rewards/finalize',
+    handler: 'handleDailyRewardInternalApi arm: /internal/daily-rewards/finalize',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.secretDailyReward,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.internal,
+    method: 'POST',
     path: '/internal/daily-rewards/pending-payouts',
     handler: 'handleDailyRewardInternalApi arm: /internal/daily-rewards/pending-payouts',
     contentType: PROBLEM_JSON,

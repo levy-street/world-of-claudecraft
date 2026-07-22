@@ -86,11 +86,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Kart Düellosu ister misin? Üçte iki galip gelen övünme hakkını kazanır.',
   'entities.npcs.card_master.name': 'Kart Ustası',
   'entities.npcs.card_master.title': 'Şans Dağıtıcısı',
-  'entities.quests.q_archetype_acceptance.completion':
-    'Söz yerini buldu. Bu iki zanaat artık ana dallarındır; karşısındaki bilgi ise hobine dönüşür.',
-  'entities.quests.q_archetype_acceptance.objectives.0.label': 'Maden damarı işlendi',
-  'entities.quests.q_archetype_acceptance.text':
-    "Beceri bilgidir, {playerName}, ama uyum bir sözdür. Yöntemlerini ana dal olarak taşıyacağın iki komşu zanaatı seç, ardından Vadi'den kendi ellerinle işlediğin cevheri bana getir.",
   'entities.quests.q_prof_hobby_switch.completion':
     'Daha hafif bir tercih ama işe yarar bir tercih. O merakı nadir işlerin götüreceği yere kadar takip et.',
   'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Ot tarlası toplandı',
@@ -102,10 +97,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.objectives.0.label': 'Maden damarı işlendi',
   'entities.quests.q_prof_intro.text':
     "Eastbrook'taki her ruh kılıcın yanı sıra bir zanaat da icra eder, {playerName}. Kasabanın güneybatısındaki Bakır Kazısı'nın çevresindeki kayalarda maden damarları var. Git bir kazma salla ve bunlardan 5'ini kendin işle; dikkat et, farkı anlayabilirim.",
-  'entities.quests.q_prof_make_amends.completion':
-    'Eski ritim geri döndü. Eski çiftin bir kez daha etkin.',
-  'entities.quests.q_prof_make_amends.text':
-    'O çifti daha önce taşıdın, {playerName}. Geri dönmek yeni bir yemin değil. Vadi yolunu temiz tutmaya yardım et; iş, ellerinin bir zamanlar ne bildiğini hatırlatacak.',
   'gpuNotice.bodyDesktop':
     "Oyun GPU hızlandırması olmadan çalışıyor ve yavaş olacak. Grafik sürücülerini güncelleyip oyunu yeniden başlat. Windows'ta ayrıca Ayarlar > Sistem > Ekran > Grafikler altında oyunu Yüksek performans olarak ayarla.",
   'gpuNotice.bodyWeb':
@@ -7149,9 +7140,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.targetCycleShort': 'Hedef',
   'hudChrome.options.mobileCameraJoystick': "Kamera joystick'i",
   'hudChrome.options.mobileLeftHanded': 'Solak düzen',
-  'entities.quests.q_archetype_acceptance.title': 'Kendinize Ait Bir Zanaat',
-  'entities.quests.q_prof_make_amends.title': 'Değişiklikler Yapmak',
-  'entities.quests.q_prof_make_amends.objectives.0.label': 'Orman kurdu öldürüldü',
   'entities.npcs.bursar_aldous_crane.greeting':
     "Her sandık, her çekmece, her biblo Yaldızlı Kasa'da güvendedir.",
   'entities.npcs.bursar_aldous_crane.name': 'Veznedar Aldous Crane',
@@ -7659,11 +7647,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.claudium.unavailable':
     'Claudium mağazası şu anda kullanılamıyor. Bakiyeniz ve satın alımlarınız etkilenmez; lütfen kısa süre sonra tekrar kontrol edin.',
   'hudChrome.claudium.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
-    'Hasat: Bu cesetten işçilik malzemelerini (deri, diş, ipek ve benzeri bileşenler) herhangi bir ganimetten ayrı olarak toplayın. Herkes hasat yapabilir; belirli bir cesedi yalnızca bir oyuncu toplayabilir.',
   'hudChrome.deeds.openBookHint': "Yiğitlikler Kitabı'nı açın",
-  'hudChrome.loot.takeAllTooltip':
-    "Tümü'yi alın: bu ganimet penceresindeki tüm paraları ve eşyaları toplayın.",
   'hudChrome.statInfo.desc.warfare':
     'Oyunculara verilen hasarı {increase}% artırır ve oyunculardan alınan hasarı {reduction}% azaltır.',
   'hudChrome.statInfo.names.warfare': 'Harp',

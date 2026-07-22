@@ -118,6 +118,23 @@ describe('hud gatherDenied case stays an error toast only (source pin)', () => {
   });
 });
 
+describe('hud gatherDowngrade case mirrors the gatherDenied toast-only pattern (source pin)', () => {
+  const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+  const caseStart = source.indexOf("case 'gatherDowngrade'");
+  const block = source.slice(caseStart, source.indexOf('break;', caseStart));
+
+  it('maps the lost arm through the pure key mapper into showError', () => {
+    expect(caseStart).toBeGreaterThan(-1);
+    expect(block).toContain('this.showError(');
+    expect(block).toContain('gatherDowngradeLineKey(ev.lost)');
+  });
+
+  it('adds no log line and no audio cue (toast only, the double-feedback trap)', () => {
+    expect(block).not.toContain('this.log(');
+    expect(block).not.toContain('audio.');
+  });
+});
+
 describe('minimap painter locked tint (source pin)', () => {
   it('the locked tint replaces the state COLOR while both state arms keep their silhouette', () => {
     // Fairness-adjacent composition pin: the painter must pick the locked

@@ -106,6 +106,8 @@ export type DailyRewardPayoutAttemptClaimResult =
   | { outcome: 'not_found' }
   | { outcome: 'invalid_status'; status: string };
 
+export type DailyRewardFinalizeOutcome = 'finalized' | 'already_finalized';
+
 export interface DailyRewardWinnerAnnouncement {
   day: string;
   realm: string;
@@ -146,7 +148,11 @@ export interface DailyRewardDb {
     meta?: Record<string, unknown>,
   ): Promise<boolean>;
   recentPayouts(limit: number): Promise<DailyRewardPayoutRow[]>;
-  finalizeDay(day: string, prizePoolUsd: number, splits: readonly number[]): Promise<void>;
+  finalizeDay(
+    day: string,
+    prizePoolUsd: number,
+    splits: readonly number[],
+  ): Promise<DailyRewardFinalizeOutcome>;
   dayFinalized(day: string, realm: string): Promise<boolean>;
   pendingPayouts(limit: number, day?: string): Promise<DailyRewardInternalPayoutRow[]>;
   unannouncedWinnerDays(limit: number): Promise<DailyRewardWinnerAnnouncement[]>;
@@ -286,6 +292,16 @@ export const DAILY_REWARD_BAN_FOR_ACCOUNT_SQL = `SELECT reason, expires_at
          ) restrictions
         ORDER BY priority
         LIMIT 1`;
+
+export const DAILY_REWARD_OPEN_DAY_LOCK_SQL = `SELECT finalized_at
+   FROM daily_reward_days
+  WHERE day = $1 AND realm = $2
+  FOR SHARE`;
+
+export const DAILY_REWARD_FINALIZE_DAY_SQL = `UPDATE daily_reward_days
+    SET finalized_at = now()
+  WHERE day = $1 AND realm = $2 AND finalized_at IS NULL
+  RETURNING 1`;
 
 export class PgDailyRewardDb implements DailyRewardDb {
   async banForAccount(
@@ -577,14 +593,52 @@ export class PgDailyRewardDb implements DailyRewardDb {
     outcomeKey: string,
     points: number,
   ): Promise<boolean> {
-    const res = await pool.query(
-      `INSERT INTO daily_reward_spins (day, realm, account_id, outcome_key, points)
-       SELECT $1, $2, $3, $4, $5
-       WHERE NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts WHERE account_id = $3)
-       ON CONFLICT (day, realm, account_id) DO NOTHING`,
-      [day, REALM, accountId, outcomeKey, points],
-    );
-    return (res.rowCount ?? 0) > 0;
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      const openDay = await client.query(DAILY_REWARD_OPEN_DAY_LOCK_SQL, [day, REALM]);
+      if (!openDay.rows[0] || openDay.rows[0].finalized_at !== null) {
+        await client.query('ROLLBACK');
+        return false;
+      }
+      const spin = await client.query(
+        `INSERT INTO daily_reward_spins (day, realm, account_id, outcome_key, points)
+         SELECT $1, $2, $3, $4, $5
+         WHERE NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts WHERE account_id = $3)
+         ON CONFLICT (day, realm, account_id) DO NOTHING`,
+        [day, REALM, accountId, outcomeKey, points],
+      );
+      if ((spin.rowCount ?? 0) === 0) {
+        await client.query('ROLLBACK');
+        return false;
+      }
+      const event = await client.query(
+        `INSERT INTO daily_reward_events
+          (day, realm, account_id, kind, points, idempotency_key, meta)
+         SELECT $1, $2, $3, 'spin', $4, 'spin', $5::jsonb
+         WHERE NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts WHERE account_id = $3)`,
+        [day, REALM, accountId, points, JSON.stringify({ outcome: outcomeKey })],
+      );
+      if ((event.rowCount ?? 0) === 0) {
+        await client.query('ROLLBACK');
+        return false;
+      }
+      await client.query(
+        `INSERT INTO daily_reward_scores (day, realm, account_id, points)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (day, realm, account_id) DO UPDATE
+            SET points = daily_reward_scores.points + EXCLUDED.points,
+                updated_at = now()`,
+        [day, REALM, accountId, Math.max(0, Math.floor(points))],
+      );
+      await client.query('COMMIT');
+      return true;
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => undefined);
+      throw err;
+    } finally {
+      client.release();
+    }
   }
 
   async addPoints(
@@ -598,6 +652,14 @@ export class PgDailyRewardDb implements DailyRewardDb {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
+      // Share-lock the day row before every ledger/score write. finalizeDay's
+      // conditional UPDATE takes the conflicting row lock, establishing one
+      // database-authoritative cutoff across all game processes.
+      const openDay = await client.query(DAILY_REWARD_OPEN_DAY_LOCK_SQL, [day, REALM]);
+      if (!openDay.rows[0] || openDay.rows[0].finalized_at !== null) {
+        await client.query('ROLLBACK');
+        return false;
+      }
       const event = await client.query(
         `INSERT INTO daily_reward_events
           (day, realm, account_id, kind, points, idempotency_key, meta)
@@ -658,16 +720,19 @@ export class PgDailyRewardDb implements DailyRewardDb {
     return res.rows.map(payoutRow);
   }
 
-  async finalizeDay(day: string, prizePoolUsd: number, splits: readonly number[]): Promise<void> {
+  async finalizeDay(
+    day: string,
+    prizePoolUsd: number,
+    splits: readonly number[],
+  ): Promise<DailyRewardFinalizeOutcome> {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
-      await client.query(
-        `UPDATE daily_reward_days
-            SET finalized_at = COALESCE(finalized_at, now())
-          WHERE day = $1 AND realm = $2`,
-        [day, REALM],
-      );
+      const finalized = await client.query(DAILY_REWARD_FINALIZE_DAY_SQL, [day, REALM]);
+      if ((finalized.rowCount ?? 0) === 0) {
+        await client.query('COMMIT');
+        return 'already_finalized';
+      }
       const winners = await client.query(
         `SELECT s.account_id, a.username, wl.pubkey AS wallet_pubkey, s.points,
                 row_number() OVER (ORDER BY s.points DESC, s.updated_at ASC, s.account_id ASC) AS rank
@@ -703,6 +768,7 @@ export class PgDailyRewardDb implements DailyRewardDb {
         );
       }
       await client.query('COMMIT');
+      return 'finalized';
     } catch (err) {
       await client.query('ROLLBACK').catch(() => undefined);
       throw err;

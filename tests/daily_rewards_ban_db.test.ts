@@ -140,6 +140,7 @@ describe('Daily Rewards ban query enforcement', () => {
     const query = vi
       .fn()
       .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [{ '?column?': 1 }], rowCount: 1 })
       .mockResolvedValueOnce({ rows: [] })
       .mockResolvedValue({ rows: [] });
     const release = vi.fn();
@@ -160,20 +161,29 @@ describe('Daily Rewards ban query enforcement', () => {
   });
 
   it('prevents point and spin writes after a ban races an eligibility check', async () => {
-    mocks.query.mockResolvedValue({ rows: [], rowCount: 0 });
-    const transactionQuery = vi
-      .fn()
-      .mockResolvedValueOnce({ rows: [] })
-      .mockResolvedValueOnce({ rows: [], rowCount: 0 })
-      .mockResolvedValue({ rows: [] });
+    const transactionQuery = vi.fn(async (sql: string) => {
+      if (String(sql).includes('SELECT finalized_at')) {
+        return { rows: [{ finalized_at: null }], rowCount: 1 };
+      }
+      if (String(sql).includes('INSERT INTO daily_reward_spins')) return { rows: [], rowCount: 1 };
+      if (String(sql).includes('INSERT INTO daily_reward_events')) return { rows: [], rowCount: 1 };
+      return { rows: [], rowCount: 1 };
+    });
     mocks.connect.mockResolvedValue({ query: transactionQuery, release: vi.fn() });
     const db = new PgDailyRewardDb();
 
     await db.recordSpin('2026-07-11', 9, 's20', 20);
     await db.addPoints('2026-07-11', 9, 'task', 10, 'task:1');
 
-    expect(mocks.query.mock.calls[0][0]).toContain('WHERE NOT EXISTS');
-    expect(transactionQuery.mock.calls[1][0]).toContain('WHERE NOT EXISTS');
+    const statements = transactionQuery.mock.calls.map(([sql]) => String(sql));
+    expect(statements.find((sql) => sql.includes('daily_reward_spins'))).toContain(
+      'WHERE NOT EXISTS',
+    );
+    expect(
+      statements.some(
+        (sql) => sql.includes('daily_reward_events') && sql.includes('WHERE NOT EXISTS'),
+      ),
+    ).toBe(true);
   });
 });
 
@@ -181,6 +191,65 @@ describe('Daily Rewards finalize read and score writes', () => {
   beforeEach(() => {
     mocks.query.mockReset();
     mocks.connect.mockReset();
+  });
+
+  it('commits a spin claim, event, and score as one transaction', async () => {
+    const query = vi
+      .fn()
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [{ finalized_at: null }], rowCount: 1 })
+      .mockResolvedValueOnce({ rows: [], rowCount: 1 })
+      .mockResolvedValueOnce({ rows: [], rowCount: 1 })
+      .mockResolvedValueOnce({ rows: [], rowCount: 1 })
+      .mockResolvedValueOnce({ rows: [] });
+    const release = vi.fn();
+    mocks.connect.mockResolvedValue({ query, release });
+
+    await expect(new PgDailyRewardDb().recordSpin('2026-07-11', 9, 's20', 20)).resolves.toBe(true);
+
+    const statements = query.mock.calls.map(([sql]) => String(sql));
+    expect(statements[0]).toBe('BEGIN');
+    expect(statements[1]).toContain('SELECT finalized_at');
+    expect(statements[2]).toContain('INSERT INTO daily_reward_spins');
+    expect(statements[3]).toContain('INSERT INTO daily_reward_events');
+    expect(statements[4]).toContain('INSERT INTO daily_reward_scores');
+    expect(statements[5]).toBe('COMMIT');
+    expect(statements).not.toContain('ROLLBACK');
+    expect(release).toHaveBeenCalledOnce();
+  });
+
+  it('rolls back the spin claim when the event insert is rejected', async () => {
+    const query = vi
+      .fn()
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [{ finalized_at: null }], rowCount: 1 })
+      .mockResolvedValueOnce({ rows: [], rowCount: 1 })
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 })
+      .mockResolvedValueOnce({ rows: [] });
+    mocks.connect.mockResolvedValue({ query, release: vi.fn() });
+
+    await expect(new PgDailyRewardDb().recordSpin('2026-07-11', 9, 's20', 20)).resolves.toBe(false);
+
+    const statements = query.mock.calls.map(([sql]) => String(sql));
+    expect(statements.at(-1)).toBe('ROLLBACK');
+    expect(statements.some((sql) => sql.includes('INSERT INTO daily_reward_scores'))).toBe(false);
+    expect(statements).not.toContain('COMMIT');
+  });
+
+  it('rejects a finalized day before creating any spin state', async () => {
+    const query = vi
+      .fn()
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [{ finalized_at: new Date() }], rowCount: 1 })
+      .mockResolvedValueOnce({ rows: [] });
+    mocks.connect.mockResolvedValue({ query, release: vi.fn() });
+
+    await expect(new PgDailyRewardDb().recordSpin('2026-07-11', 9, 's20', 20)).resolves.toBe(false);
+
+    const statements = query.mock.calls.map(([sql]) => String(sql));
+    expect(statements).toHaveLength(3);
+    expect(statements[2]).toBe('ROLLBACK');
+    expect(statements.some((sql) => sql.includes('daily_reward_spins'))).toBe(false);
   });
 
   it('reads the finalized flag using the realm argument, not the module realm', async () => {
@@ -206,6 +275,7 @@ describe('Daily Rewards finalize read and score writes', () => {
     const query = vi
       .fn()
       .mockResolvedValueOnce({ rows: [] }) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ finalized_at: null }], rowCount: 1 }) // open day lock
       .mockResolvedValueOnce({ rows: [], rowCount: 1 }) // event insert proceeds
       .mockResolvedValueOnce({ rows: [] }) // score UPSERT
       .mockResolvedValue({ rows: [] }); // COMMIT
@@ -227,6 +297,7 @@ describe('Daily Rewards finalize read and score writes', () => {
     const query = vi
       .fn()
       .mockResolvedValueOnce({ rows: [] }) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ finalized_at: null }], rowCount: 1 }) // open day lock
       .mockResolvedValueOnce({ rows: [], rowCount: 1 }) // event insert proceeds
       .mockResolvedValue({ rows: [] }); // COMMIT
     mocks.connect.mockResolvedValue({ query, release: vi.fn() });
@@ -263,6 +334,40 @@ describe('Daily Rewards finalize read and score writes', () => {
     expect(sql).toContain('ON CONFLICT (day, realm) DO UPDATE');
     expect(sql).toContain('WHERE daily_reward_days.finalized_at IS NULL');
     expect(mocks.query.mock.calls[0][1]).toEqual(['2026-07-11', 'test-realm', 150, 0.5]);
+  });
+
+  it('makes finalization a conditional one-time database transition', async () => {
+    const query = vi
+      .fn()
+      .mockResolvedValueOnce({ rows: [] }) // BEGIN
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 }) // already finalized
+      .mockResolvedValueOnce({ rows: [] }); // COMMIT
+    mocks.connect.mockResolvedValue({ query, release: vi.fn() });
+
+    await expect(new PgDailyRewardDb().finalizeDay('2026-07-11', 150, [1])).resolves.toBe(
+      'already_finalized',
+    );
+    const statements = query.mock.calls.map(([sql]) => String(sql));
+    expect(statements[1]).toContain('finalized_at IS NULL');
+    expect(statements[1]).toContain('RETURNING 1');
+    expect(statements.some((sql) => sql.includes('FROM daily_reward_scores'))).toBe(false);
+  });
+
+  it('rejects score writes after the day has finalized', async () => {
+    const query = vi
+      .fn()
+      .mockResolvedValueOnce({ rows: [] }) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ finalized_at: new Date() }], rowCount: 1 }) // closed day
+      .mockResolvedValueOnce({ rows: [] }); // ROLLBACK
+    mocks.connect.mockResolvedValue({ query, release: vi.fn() });
+
+    await expect(
+      new PgDailyRewardDb().addPoints('2026-07-11', 9, 'task', 10, 'task:late'),
+    ).resolves.toBe(false);
+    const statements = query.mock.calls.map(([sql]) => String(sql));
+    expect(statements[1]).toContain('FOR SHARE');
+    expect(statements.some((sql) => sql.includes('daily_reward_events'))).toBe(false);
+    expect(statements).toContain('ROLLBACK');
   });
 });
 

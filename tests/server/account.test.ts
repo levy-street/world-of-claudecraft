@@ -334,16 +334,19 @@ describe('activeGuard', () => {
 
 describe('logoutGuard', () => {
   it('401s a missing Authorization header with NO db read', async () => {
-    const accountForToken = vi.fn(async () => 7);
-    setAccountDbForTests({ accountForToken });
+    const accountAndScopeForToken = vi.fn(async () => ({
+      accountId: 7,
+      scope: 'full' as const,
+    }));
+    setAccountDbForTests({ accountAndScopeForToken });
     const r = await runChain([logoutGuard], fakeCtx({}));
     expect(r).toMatchObject({ reached: false, status: 401 });
     expect(r.body).toEqual({ error: 'not authenticated', code: 'auth.required' });
-    expect(accountForToken).not.toHaveBeenCalled();
+    expect(accountAndScopeForToken).not.toHaveBeenCalled();
   });
 
-  it('401s a present-but-unknown token (accountForToken -> null)', async () => {
-    setAccountDbForTests({ accountForToken: async () => null });
+  it('401s a present-but-unknown token (scoped lookup -> null)', async () => {
+    setAccountDbForTests({ accountAndScopeForToken: async () => null });
     const r = await runChain([logoutGuard], fakeCtx({ headers: { authorization: BEARER } }));
     expect(r).toMatchObject({ reached: false, status: 401 });
     expect(r.body).toEqual({ error: 'not authenticated', code: 'auth.required' });
@@ -353,7 +356,10 @@ describe('logoutGuard', () => {
     // A read-only OR locked account still logs out: the guard never reads the scope
     // or the moderation status, unlike activeGuard.
     const moderationStatusForAccount = vi.fn(async () => modStatus({ locked: true }));
-    setAccountDbForTests({ accountForToken: async () => 7, moderationStatusForAccount });
+    setAccountDbForTests({
+      accountAndScopeForToken: async () => ({ accountId: 7, scope: 'read' }),
+      moderationStatusForAccount,
+    });
     const r = await runChain([logoutGuard], fakeCtx({ headers: { authorization: BEARER } }));
     expect(r.reached).toBe(true);
     expect(moderationStatusForAccount).not.toHaveBeenCalled();

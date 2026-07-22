@@ -5,6 +5,7 @@ import { createMob } from '../src/sim/entity';
 import {
   activeLootRolls,
   awardSharedLootItem,
+  CORPSE_INTERACT_GRACE_SECONDS,
   distributeLootCopper,
   lootRollGroupStatus,
   lootSlotVisibleTo,
@@ -532,9 +533,44 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
     expect(lootSlotVisibleTo({ itemId: 'x', count: 1 }, 6)).toBe(true);
   });
 
-  it('pruneCorpseLoot clears an emptied corpse and clamps the corpse timer down', () => {
+  it('pruneCorpseLoot keeps an emptied corpse open for its unclaimed harvest (grace arm)', () => {
+    // Phase 12d: forest_wolf carries componentTags and the claim is untaken,
+    // so the emptied corpse stays lootable for the interact-grace window
+    // instead of collapsing (the respawn gate ends it at corpseTimer 0).
     const sim = makeSim();
     const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.corpseTimer = 60;
+    mob.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
+    sim.entities.set(mob.id, mob);
+    pruneCorpseLoot(sim.ctx, mob);
+    expect(mob.loot).toBeNull();
+    expect(mob.lootable).toBe(true);
+    expect(CORPSE_INTERACT_GRACE_SECONDS).toBe(30);
+    expect(mob.corpseTimer).toBe(CORPSE_INTERACT_GRACE_SECONDS);
+  });
+
+  it('pruneCorpseLoot collapses an emptied corpse whose harvest claim is spent (fast arm)', () => {
+    const sim = makeSim();
+    const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.corpseTimer = 60;
+    mob.harvestClaimedBy = 7;
+    mob.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
+    sim.entities.set(mob.id, mob);
+    pruneCorpseLoot(sim.ctx, mob);
+    expect(mob.loot).toBeNull();
+    expect(mob.lootable).toBe(false);
+    expect(mob.corpseTimer).toBe(4);
+  });
+
+  it('pruneCorpseLoot collapses an emptied corpse with no harvest half at all (fast arm)', () => {
+    // warlock_imp carries no componentTags (#1140): nothing to keep open for.
+    expect(MOBS.warlock_imp.componentTags).toBeUndefined();
+    const sim = makeSim();
+    const mob = createMob(sim.nextId++, MOBS.warlock_imp, 2, { x: 0, y: 0, z: 0 });
     mob.dead = true;
     mob.lootable = true;
     mob.corpseTimer = 60;

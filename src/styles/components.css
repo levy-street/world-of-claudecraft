@@ -1366,16 +1366,23 @@
   }
 
   /* ---------- quest log ---------- */
-  /* quest log */
+  /* quest log: widened to a landscape shape so the detail pane gets real
+     reading width instead of wrapping narrow, and the detail's own max-height
+     cap is dropped so it flows with the window's single outer scroll instead
+     of a second, nested 380px scroll region. No max-width override here: the
+     shared `.window` clamp (layout.css) already bounds width against the
+     JS-synced app viewport, divided by --window-scale; a per-window override
+     using raw 100vw would disagree with that clamp and can overflow at higher
+     ui-scale. */
   #quest-log-window {
-    width: 520px;
+    width: 880px;
   }
   #quest-log-window .ql-cols {
     display: flex;
     gap: 12px;
   }
   .ql-list {
-    width: 180px;
+    width: 220px;
     border-right: 1px solid #463a1c;
     padding-right: 8px;
   }
@@ -1401,7 +1408,13 @@
   .ql-detail {
     flex: 1;
     font-size: 12px;
-    max-height: 380px;
+    max-height: none;
+    /* Reading-measure cap: the pane sits beside the 220px list inside the 880px
+       window, leaving roughly 616px of content width. 70ch undershot that badly
+       (~420-460px at this pane's 12px font), leaving 150px-plus of dead space
+       next to the list. 100ch uses most of the available width while still
+       capping line length on wider viewports. */
+    max-width: 100ch;
     min-height: 0;
     display: flex;
     flex-direction: column;
@@ -4957,6 +4970,16 @@
   .crafting-station-badge.out-of-range {
     border-style: dashed;
   }
+  /* Phase 14 discoverability: the per-section "learnable at a master" hint,
+     shown under a craft section when the viewer has unlearned trainer recipes
+     for that craft. Muted guidance text, informational only (no tap target),
+     identical on every graphics preset. */
+  .crafting-learn-hint {
+    margin: 2px 0 6px;
+    color: var(--color-text-muted);
+    font-size: 10.5px;
+    line-height: 1.4;
+  }
   .vendor-empty {
     padding: 5px;
     font-size: 11px;
@@ -4968,6 +4991,37 @@
     margin-top: 8px;
     border-top: 1px solid #463a1c;
     padding-top: 6px;
+  }
+
+  /* ---------- profession first-tier tutorial (Phase 14) ---------- */
+  /* The once-ever explainer modal (profession_tutorial_window.ts), reusing the
+     confirm-dialog modal family (.window.panel shell, .cd-body/.cd-actions). A
+     bounded, centered modal; body-appended (see the layout.css --window-scale:1
+     group), and the JS floors its z-index above the mobile sheet (the
+     scoped-popup 96 rule). Sized from existing tokens, no new ones. */
+  #profession-tutorial {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 380px;
+    --window-pad: 14px;
+  }
+  #profession-tutorial .cd-body {
+    padding: 10px 0;
+  }
+  #profession-tutorial .cd-para {
+    margin: 0 0 8px;
+    color: var(--color-text-light);
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+  #profession-tutorial .cd-para:last-child {
+    margin-bottom: 0;
+  }
+  #profession-tutorial .cd-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
   }
 
   /* ---------- train window ---------- */
@@ -4988,6 +5042,31 @@
      row is informational, never interactive, so it drops the hover affordance. */
   .train-row.train-locked:disabled {
     opacity: 0.45;
+  }
+
+  /* ---------- Maker's Bond unbind window (Professions 2.0 Phase 14b) ---------- */
+  /* The station master's unbind service: same vendor-family row classes as the
+     train window above; only the intro line lives here, styled from existing
+     tokens (no new tokens, no new hex). */
+  #unbind-window {
+    width: 400px;
+  }
+  .unbind-intro {
+    display: block;
+    padding: 4px 6px 6px;
+  }
+
+  /* Commission opt-in row in the crafting window (Professions 2.0 Phase 14b):
+     a per-recipe label-wrapped checkbox under the Craft button, reusing the
+     combo-note footprint so the recipe card keeps its rhythm. */
+  .crafting-commission-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 6px 4px;
+    font-size: 11px;
+    color: var(--gold);
+    cursor: pointer;
   }
   .train-row.train-known {
     cursor: default;
@@ -5173,6 +5252,21 @@
     text-shadow:
       0 1px 2px #000,
       0 0 3px #000;
+    pointer-events: none;
+  }
+  /* Instanced-copy marker (Professions 2.0 Phase 12d): a static gold corner
+     tab on every per-copy (signed/enchanted/masterwork) stack, always visible
+     on the cell itself on desktop and touch (information-add, identical on
+     every graphics preset, so no --fx-* gate). Top-left, clear of the
+     bottom-right count badge. */
+  .bag-item .bi-instance {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 11px;
+    height: 11px;
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+    background: var(--color-accent);
     pointer-events: none;
   }
   .bag-item.empty {
@@ -6273,11 +6367,21 @@
      notice, and add-row footer flow inside the scrolling .window-body, matching the
      pre-frame whole-panel scroll. */
 
-  /* Quest log: the two panes (list + measure-capped detail) fill the scrolling
-     body. The frame body owns the outer scroll; the list scrolls with it and the
-     detail caps its own reading measure. */
+  /* Quest log: the two panes (list + detail) fill the scrolling body. The
+     frame body owns the outer scroll; the list scrolls with it. Widened to
+     the same 880px landscape footprint as the live #quest-log-window rule
+     above, and the detail pane's reading-measure cap widened to use the
+     extra width instead of leaving it narrow inside a much wider window.
+     No max-width override: the shared `.window` clamp already bounds width
+     against the JS-synced app viewport (see the live rule above for why).
+     NOTE: this `.window-body` ancestor is never actually mounted (the
+     `window_frame.ts` "AAA window-frame adoption" painter that would have
+     mounted it was reverted); only the ungated `width` rule above is live.
+     Kept in sync with the live rule anyway so a future frame-phase revival
+     does not silently regress this window; do not delete it as dead code
+     without checking that history first. */
   #quest-log-window {
-    width: 520px;
+    width: 880px;
   }
   #quest-log-window .window-body .ql-cols {
     display: flex;
@@ -6287,7 +6391,7 @@
   }
   #quest-log-window .window-body .ql-detail {
     max-height: none;
-    max-width: 46ch;
+    max-width: 100ch;
   }
   #quest-log-window .window-footer .btn {
     min-width: 0;

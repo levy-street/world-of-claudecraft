@@ -1112,7 +1112,9 @@ describe('boss loot and encounter resets', () => {
     sim.lootCorpse(mob.id, b);
     expect(sim.countItem('boar_hide', b)).toBe(1);
     expect(mob.loot).toBeNull();
-    expect(mob.lootable).toBe(false);
+    // Phase 12d: the emptied boar corpse stays lootable through its
+    // unclaimed-harvest grace window instead of collapsing immediately.
+    expect(mob.lootable).toBe(true);
   });
 
   it('personal loot remains claimable after party rights are gone without granting shared loot', () => {

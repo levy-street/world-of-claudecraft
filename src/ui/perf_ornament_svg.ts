@@ -23,11 +23,15 @@
 // only a small radius wobble, while the gilt gradient below supplies the
 // "hand-applied, unevenly toned" color read.
 
-function polarX(cx: number, r: number, deg: number): number {
+// polarX/polarY and mulberry32 are exported for reuse by other hand-drawn
+// ornament consumers (e.g. minimap_gilded_ornament.ts) that need the SAME
+// seeded-noise vocabulary this file established, rather than a second
+// implementation of polar coordinates or a PRNG.
+export function polarX(cx: number, r: number, deg: number): number {
   return cx + r * Math.cos((deg * Math.PI) / 180);
 }
 
-function polarY(cy: number, r: number, deg: number): number {
+export function polarY(cy: number, r: number, deg: number): number {
   return cy + r * Math.sin((deg * Math.PI) / 180);
 }
 
@@ -46,7 +50,7 @@ function svgDataUri(inner: string, viewBoxSize: number): string {
 /** mulberry32: a small, fast, deterministic PRNG. Presentation-only (this file
  * never runs in src/sim/, so the sim's Math.random ban does not apply); used
  * to pick noise-harmonic parameters once at generation time, not per-frame. */
-function mulberry32(seed: number): () => number {
+export function mulberry32(seed: number): () => number {
   let a = seed | 0;
   return () => {
     a = (a + 0x6d2b79f5) | 0;

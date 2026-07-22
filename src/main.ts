@@ -31,10 +31,16 @@ import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import {
   clearEntryProbe,
   ENTRY_PROBE_STABLE_MS,
+  type EntryDiagnostics,
+  persistEntryRecoveryLog,
   planEntryCrashRecovery,
   readEntryProbeRaw,
-  stampEntryProbe,
 } from './game/entry_crash_guard';
+import {
+  checkpointActiveEntryDiagnostics,
+  createEntryDiagnosticsController,
+  stopActiveEntryDiagnostics,
+} from './game/entry_diagnostics';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
@@ -63,6 +69,7 @@ import {
   useTouchInterface,
 } from './game/mobile_controls';
 import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
+import { watchMobileMoreState } from './game/mobile_more_diagnostics';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
@@ -80,6 +87,7 @@ import {
 import { sfx } from './game/sfx';
 import { initSoftwareRenderNotice } from './game/software_render_notice';
 import {
+  decideSpawnCinematic,
   recordSkipTap,
   type SpawnCinematic,
   spawnCinematicFor,
@@ -102,6 +110,7 @@ import {
   desktopWalletManagerView,
   disconnectDesktopWalletSession,
 } from './net/desktop_wallet_manager';
+import { shouldEnterDiscordOnboarding } from './net/discord_onboarding_gate';
 import { EconomyClient, newIdempotencyKey, startClaudiumPurchase } from './net/economy_sdk';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
@@ -145,9 +154,9 @@ import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
 import { assetsReady } from './render/assets/preload';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
-import { preloadMechAssets } from './render/characters/assets';
+import { charactersReady, preloadMechAssets } from './render/characters/assets';
 import { skinCount } from './render/characters/manifest';
-import { playerPortraitDataUrl } from './render/characters/portrait';
+import { onPortraitsReady, playerPortraitDataUrl } from './render/characters/portrait';
 import { installWebGLContextRelease } from './render/context_release';
 import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
 import { Renderer } from './render/renderer';
@@ -252,6 +261,7 @@ import {
   stopSlowConnectionWatch,
 } from './ui/loading_slow_hint';
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
+import { applyMinimapOrnamentVars } from './ui/minimap_gilded_ornament';
 import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
@@ -333,6 +343,7 @@ let charselectSelected: CharacterSummary | null = null;
 // playing on) to auto-enter, then consumed by refreshCharacters once its list
 // has loaded (mobile WebView-reload resume; see src/net/resume_play.ts).
 let pendingResume: { characterId: number; realm: string } | null = null;
+let stopMobileMoreDiagnostics: (() => void) | null = null;
 let homepageMusic: HTMLAudioElement | null = null;
 let homepageMusicStarted = false;
 let homepageMusicMuted = readHomepageMusicMuted();
@@ -1032,16 +1043,107 @@ async function startGame(
   });
   uiEffectsApplier.applyNow();
   let renderer!: Renderer;
+  let rendererReady = false;
   let hud!: Hud;
   const autoLoot = new AutoLoot();
   const perf = createPerfMonitor(null);
+  const baseEntryDiagnostics = (): EntryDiagnostics => {
+    const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+    return {
+      version: __APP_VERSION__,
+      build: __APP_BUILD_ID__,
+      native: isNativeRuntime(),
+      platform: mobilePlatform(),
+      engine: startupBrowserEnv.engine,
+      preset: settings.get('graphicsPreset'),
+      presetLabel: graphicsPresetLabel(settings.get('graphicsPreset')),
+      viewport: `${window.innerWidth}x${window.innerHeight}`,
+      screen: `${screen.width}x${screen.height}`,
+      devicePixelRatio: window.devicePixelRatio,
+      hardwareConcurrency: navigator.hardwareConcurrency,
+      ...(typeof memory === 'number' ? { deviceMemoryGb: memory } : {}),
+    };
+  };
+  const renderEntryDiagnostics = (): EntryDiagnostics => {
+    if (!rendererReady) return baseEntryDiagnostics();
+    const stats = renderer.perfStats();
+    const frameStats = stats.lastFrame;
+    const heaviestCategory = frameStats
+      ? Object.entries(frameStats.renderDiagnostics.categories).reduce<
+          [string, (typeof frameStats.renderDiagnostics.categories)[string]] | null
+        >((heaviest, entry) => {
+          if (!heaviest || entry[1].triangles > heaviest[1].triangles) return entry;
+          return heaviest;
+        }, null)
+      : null;
+    return {
+      ...baseEntryDiagnostics(),
+      tier: stats.tier,
+      constrainedMemory: GFX.constrainedMemory,
+      nativeIosMemoryProfile: GFX.nativeIosMemoryProfile,
+      dynamicShadows: GFX.dynamicShadows,
+      shadowMap: GFX.shadowMap,
+      msaaSamples: GFX.msaaSamples,
+      dprCap: GFX.pixelRatioCap,
+      pixelRatio: stats.pixelRatio,
+      renderScale: stats.renderScale,
+      effectiveRenderScale: stats.effectiveRenderScale,
+      calls: stats.calls,
+      triangles: stats.triangles,
+      geometries: stats.geometries,
+      textures: stats.textures,
+      programs: stats.programs,
+      views: stats.views,
+      pooledVisuals: stats.pooledVisuals,
+      glVendor: stats.glVendor,
+      glRenderer: stats.glRenderer,
+      contextLost: stats.contextLost,
+      contextRestored: stats.contextRestored,
+      governorMode: stats.renderBudget.mode,
+      governorReason: stats.renderBudget.reason,
+      governorPressure: stats.renderBudget.pressure,
+      grassLevel: stats.qualityBuckets.levels.grass,
+      foliageLevel: stats.qualityBuckets.levels.foliage,
+      lightingLevel: stats.qualityBuckets.levels.lighting,
+      lastSubmitStallMs: stats.renderBudget.lastSubmitStallMs,
+      recentSubmitStalls: stats.renderBudget.recentSubmitStalls,
+      ...(frameStats
+        ? {
+            frameMs: frameStats.phaseMs.total,
+            submitMs: frameStats.phaseMs.submit,
+            visibleViews: frameStats.visibleViews,
+            grassTufts: frameStats.foliage.grassVisibleTufts,
+            createdViews: frameStats.createdViews,
+            createdViewTypes: frameStats.createdViewTypes.join(','),
+            candidateViews: frameStats.candidateViews,
+            heaviestCategory: heaviestCategory?.[0] ?? '',
+            heaviestTriangles: heaviestCategory?.[1].triangles ?? 0,
+          }
+        : {}),
+    };
+  };
+  const entryDiagnostics = createEntryDiagnosticsController({
+    baseSnapshot: baseEntryDiagnostics,
+    renderSnapshot: renderEntryDiagnostics,
+  });
+  canvas.addEventListener('webglcontextlost', () => {
+    entryDiagnostics.checkpoint('webgl-context-lost', {
+      ...renderEntryDiagnostics(),
+      contextLost: rendererReady ? renderer.perfStats().contextLost + 1 : 1,
+    });
+    console.warn('[entry-diag] WebGL context lost during or after world entry');
+  });
+  canvas.addEventListener('webglcontextrestored', () => {
+    entryDiagnostics.checkpoint('webgl-context-restored');
+    console.info('[entry-diag] WebGL context restored during or after world entry');
+  });
   // World-entry crash guard: persist a probe RIGHT BEFORE the synchronous scene build.
   // If phone WebKit kills the WebContent process during the build (no event, no error,
   // just a reload), the next boot finds the probe still armed and steps the graphics
   // preset down one tier (see the recovery block in wireStartScreens). Cleared once the
   // entry demonstrably survives, on the handled failure path below, and whenever the
   // page is hidden (a backgrounded eviction is NOT an entry crash).
-  stampEntryProbe(settings.get('graphicsPreset'), Date.now());
+  entryDiagnostics.start(settings.get('graphicsPreset'));
   // Dev-channel diagnostic (English on purpose): grep "[entry-guard]" in the WebView
   // inspector / device console to isolate crash-at-entry causes on real hardware.
   console.info(
@@ -1050,6 +1152,7 @@ async function startGame(
   );
   try {
     renderer = new Renderer(world, canvas, nameplates);
+    rendererReady = true;
     renderer.setAudioSink(sfx);
     renderer.showDevBadges = settings.get('showDevBadges');
     renderer.showOwnNameplate = settings.get('showOwnNameplate');
@@ -1063,32 +1166,40 @@ async function startGame(
     // was ACTUALLY built at (vs the preset logged above), plus the memory-profile knobs.
     console.info(
       `[entry-guard] scene built: tier=${GFX.tier} constrainedMemory=${GFX.constrainedMemory} ` +
-        `shadowMap=${GFX.shadowMap} msaa=${GFX.msaaSamples} dprCap=${GFX.pixelRatioCap}`,
+        `nativeIosMemoryProfile=${GFX.nativeIosMemoryProfile} ` +
+        `pooledVisualCap=${GFX.maxPooledCharacterVisuals} ` +
+        `dynamicShadows=${GFX.dynamicShadows} shadowMap=${GFX.shadowMap} ` +
+        `msaa=${GFX.msaaSamples} dprCap=${GFX.pixelRatioCap}`,
     );
+    entryDiagnostics.checkpoint('renderer-built');
     // One-time software-rendering notice (WARP/SwiftShader): the Renderer
     // constructor ran initGfxTier, so the adapter verdict is resolved by now.
     initSoftwareRenderNotice(DESKTOP_APP);
     hud = new Hud(world, renderer, keybinds, {
       dailyRewardsEnabled: !NATIVE_APP,
       devCommandsEnabled: import.meta.env.DEV,
+      constrainedMemory: GFX.constrainedMemory,
     });
     perf.setHud(hud);
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
     applyPerfOrnamentVars(); // Performance Overlay window's gilded corner/edge masks
+    applyMinimapOrnamentVars(); // minimap disc's gilded ring
+    entryDiagnostics.checkpoint('hud-built');
   } catch (err) {
     // e.g. WebGL context creation failure: surface it instead of leaving the
     // loading screen up forever. A HANDLED failure is not a process kill, so the
     // crash probe must not survive to cost the player a graphics tier next boot.
-    clearEntryProbe();
+    entryDiagnostics.stop();
     console.warn('[entry-guard] scene build failed with a handled error; probe cleared', err);
     fatalOverlay(t('loading.rendererFailed', { error: technicalErrorMessage(err) }));
     return;
   }
   // The build survived; give the post-build tail (first-frame texture uploads and
-  // shader compiles) time to settle before declaring the entry stable.
+  // shader compiles) time to settle before declaring the entry stable. Keep the
+  // controller armed without periodic writes so named runtime UI checkpoints can
+  // still identify a silent foreground WebContent termination.
   window.setTimeout(() => {
-    clearEntryProbe();
-    console.info('[entry-guard] world entry stable; probe cleared');
+    entryDiagnostics.markStable('[entry-guard] world entry stable; runtime probe armed');
   }, ENTRY_PROBE_STABLE_MS);
 
   // Offline only: expose the dev "2v2 Fiesta vs Bots" practice toggle to the HUD.
@@ -1407,6 +1518,24 @@ async function startGame(
   // this is wired); the Target button cycles targets via the Tab path below.
   hud.onMobileAttackNearest = () => attackNearest();
 
+  let lastOptionsOpen = hud.optionsOpen;
+  let lastCharacterOpen = hud.characterOpen;
+  let lastQuestDialogOpen = hud.questDialogOpen;
+  const syncCharacterOpenDiagnostics = (): void => {
+    const characterOpen = hud.characterOpen;
+    if (characterOpen === lastCharacterOpen) return;
+    lastCharacterOpen = characterOpen;
+    entryDiagnostics.checkpoint(characterOpen ? 'character-open' : 'character-closed');
+    console.info(`[entry-diag] character ${characterOpen ? 'opened' : 'closed'}`);
+  };
+  const syncQuestDialogOpenDiagnostics = (): void => {
+    const questDialogOpen = hud.questDialogOpen;
+    if (questDialogOpen === lastQuestDialogOpen) return;
+    lastQuestDialogOpen = questDialogOpen;
+    entryDiagnostics.checkpoint(questDialogOpen ? 'quest-dialog-open' : 'quest-dialog-closed');
+    console.info(`[entry-diag] quest dialog ${questDialogOpen ? 'opened' : 'closed'}`);
+  };
+
   const mobileControls = new MobileControls(input, {
     onCycleTarget: () => world.tabTarget(),
     onJump: () => input.triggerTouchJump(),
@@ -1423,7 +1552,10 @@ async function startGame(
     onDungeonFinder: () => hud.toggleDungeonFinder(),
     onValeCup: () => hud.toggleValeCup(),
     onQuestLog: () => hud.toggleQuestLog(),
-    onCharacter: () => hud.toggleChar(),
+    onCharacter: () => {
+      hud.toggleChar();
+      syncCharacterOpenDiagnostics();
+    },
     onBags: () => hud.toggleBags(),
     onCrafting: () => hud.toggleCrafting(),
     onSpellbook: () => hud.toggleSpellbook(),
@@ -1452,6 +1584,38 @@ async function startGame(
     },
   });
   mobileControls.start();
+  const syncOverlayDiagnostics = (): void => {
+    syncCharacterOpenDiagnostics();
+    syncQuestDialogOpenDiagnostics();
+    const optionsOpen = hud.optionsOpen;
+    if (optionsOpen !== lastOptionsOpen) {
+      lastOptionsOpen = optionsOpen;
+      entryDiagnostics.checkpoint(optionsOpen ? 'settings-open' : 'settings-closed');
+      console.info(`[entry-diag] settings ${optionsOpen ? 'opened' : 'closed'}`);
+    }
+  };
+  hud.onQuestDialogStateChange = (open) => {
+    lastQuestDialogOpen = open;
+    entryDiagnostics.checkpoint(open ? 'quest-dialog-open' : 'quest-dialog-closed');
+    console.info(`[entry-diag] quest dialog ${open ? 'opened' : 'closed'}`);
+    syncOverlayDiagnostics();
+  };
+  stopMobileMoreDiagnostics?.();
+  stopMobileMoreDiagnostics = watchMobileMoreState(document.body, (open) => {
+    syncOverlayDiagnostics();
+    // An action inside More may synchronously open another focus-managed
+    // window before this observer microtask runs. In that handoff, release the
+    // older More trap without restoring focus behind the destination window.
+    hud.syncMobileMoreDialog(open, open || !hud.isWindowOpen());
+    if (open) {
+      // Treat the touch-only More tray as an explicit interaction: cancel autorun
+      // so tapping its controls cannot leave the player moving unexpectedly.
+      input.setAutorun(false);
+      mobileControls.syncAutorun(false);
+    }
+    entryDiagnostics.checkpoint(open ? 'mobile-more-open' : 'mobile-more-closed');
+    console.info(`[entry-diag] mobile More ${open ? 'opened' : 'closed'}`);
+  });
   hud.onResurrectAtSpiritHealer = () => {
     void stopAutorunForInteraction(world.resurrectAtSpiritHealer(), input, mobileControls);
   };
@@ -2036,7 +2200,11 @@ async function startGame(
         assembleBugReportMeta({
           build: `${__APP_VERSION__} (${__APP_BUILD_ID__})`,
           userAgent: navigator.userAgent,
-          viewport: { w: window.innerWidth, h: window.innerHeight, dpr: window.devicePixelRatio },
+          viewport: {
+            w: window.innerWidth,
+            h: window.innerHeight,
+            dpr: window.devicePixelRatio,
+          },
           zone: zoneBiomeAt(world.player.pos.z),
           level: world.player.level,
           // Entity has no `cls`; the player's class is its templateId (see Entity).
@@ -2047,7 +2215,11 @@ async function startGame(
         api.submitBugReport({
           characterId: online.characterId,
           characterName: world.player.name,
-          pos: { x: world.player.pos.x, y: world.player.pos.y, z: world.player.pos.z },
+          pos: {
+            x: world.player.pos.x,
+            y: world.player.pos.y,
+            z: world.player.pos.z,
+          },
           description: payload.description,
           screenshot: payload.screenshot,
           meta: payload.meta,
@@ -2060,7 +2232,10 @@ async function startGame(
     // fail closed; the SDK itself returns typed unavailable states, never throws.
     // The game therefore boots and plays with the service OFF: snapshot() resolves
     // to the disabled state and the window renders its empty notice.
-    const economy = new EconomyClient({ token: () => api.token, base: api.base });
+    const economy = new EconomyClient({
+      token: () => api.token,
+      base: api.base,
+    });
     const wocBalanceBaseUnits = (balance: number | null): string | null => {
       if (balance === null || !Number.isFinite(balance) || balance < 0) return null;
       return String(Math.floor(balance * 1_000_000));
@@ -2112,7 +2287,11 @@ async function startGame(
             balance,
             skus,
             nativeRails,
-            walletBalances: { solLamports: null, usdcBaseUnits: null, wocBaseUnits: null },
+            walletBalances: {
+              solLamports: null,
+              usdcBaseUnits: null,
+              wocBaseUnits: null,
+            },
             nativePrices: skus.map((row) => ({
               sku: row.sku,
               solAmountBase: null,
@@ -2310,7 +2489,10 @@ async function startGame(
     return findPlayerPath(world.cfg.seed, world.player.pos, target, undefined, true, true);
   }
 
-  function resolvedClickMoveTarget(target: { x: number; z: number }): { x: number; z: number } {
+  function resolvedClickMoveTarget(target: { x: number; z: number }): {
+    x: number;
+    z: number;
+  } {
     // swim: keep a clicked water destination instead of snapping it to shore.
     return resolvePlayerDestination(world.cfg.seed, target, true);
   }
@@ -2882,6 +3064,7 @@ async function startGame(
     if (frameDt > 0.25) frameDt = 0.25;
     perf.frame(frameDt);
     syncPerfOverlay(frameDt, now);
+    syncOverlayDiagnostics();
 
     // freeze movement while the game menu is up so WASD doesn't walk the
     // character behind it (other windows stay non-modal, as before); the
@@ -2898,8 +3081,12 @@ async function startGame(
     perf.trace('input.updateTouchLook', () => input.updateTouchLook(frameDt), {
       frameDtMs: frameDt * 1000,
     });
-    perf.trace('input.gamepad', () => gamepad.poll(frameDt), { frameDtMs: frameDt * 1000 });
-    perf.trace('input.hoverCursor', () => updateHoverCursor(), { active: input.hoverActive });
+    perf.trace('input.gamepad', () => gamepad.poll(frameDt), {
+      frameDtMs: frameDt * 1000,
+    });
+    perf.trace('input.hoverCursor', () => updateHoverCursor(), {
+      active: input.hoverActive,
+    });
     perf.markInputFrame(performance.now());
 
     const mouselook = intro === null && input.isMouselookActive() && !movementFrozen();
@@ -2987,17 +3174,22 @@ async function startGame(
         visualFacingFor(input.readMoveInput(), movementFacing ?? offlineSim.player.facing) ??
         movementFacing;
       perf.time('renderer', () =>
-        perf.trace('renderer.sync', () => renderer.sync(acc / DT, frameDt, offlineRenderFacing), {
-          mode: 'offline',
-          views: renderer.views.size,
-          alpha: acc / DT,
-        }),
+        perf.trace(
+          'renderer.sync',
+          () => renderer.sync(acc / DT, frameDt, offlineRenderFacing, 0, null),
+          {
+            mode: 'offline',
+            views: renderer.views.size,
+            alpha: acc / DT,
+          },
+        ),
       );
       perf.trace('ui.clickMoveMarker', () => updateClickMoveMarker());
       perf.markInputVisible(performance.now());
       if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
       perf.time('hud', () => perf.trace('hud.update', () => hud.update(), { mode: 'offline' }));
       perf.tick(now);
+      entryDiagnostics.renderedFrame(now);
       return;
     }
 
@@ -3152,6 +3344,7 @@ async function startGame(
     if (settings.get('walkByAutoloot')) autoLoot.run(world, now);
     perf.time('hud', () => perf.trace('hud.update', () => hud.update(), { mode: 'online' }));
     perf.tick(now);
+    entryDiagnostics.renderedFrame(now);
   }
   const controller = {
     move(moveInput: unknown, facing?: unknown) {
@@ -3246,13 +3439,18 @@ async function startGame(
   const osReducedMotion =
     typeof window.matchMedia === 'function' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (
-    playIntro &&
-    !introSeen &&
-    world.player.level <= 1 &&
-    !settings.get('reduceMotion') &&
-    !osReducedMotion
-  ) {
+  const introPolicy = decideSpawnCinematic({
+    requested: playIntro,
+    seen: introSeen,
+    playerLevel: world.player.level,
+    reducedMotion: settings.get('reduceMotion') || osReducedMotion,
+    native: isNativeRuntime(),
+    platform: mobilePlatform(),
+    engine: startupBrowserEnv.engine,
+    constrainedMemory: GFX.constrainedMemory,
+    graphicsPreset: settings.get('graphicsPreset'),
+  });
+  if (introPolicy.play) {
     intro = {
       cinematic: spawnCinematicFor({
         yaw: input.camYaw,
@@ -3264,12 +3462,45 @@ async function startGame(
     setIntroUiHidden(true);
     window.addEventListener('keydown', skipIntro, true);
     window.addEventListener('pointerdown', skipIntro, true);
+  } else {
+    if (introPolicy.reason === 'constrained-ios-webkit') {
+      console.info(
+        `[entry-guard] spawn cinematic suppressed: constrained native iOS WebKit ` +
+          `preset=${settings.get('graphicsPreset')} tier=${GFX.tier}`,
+      );
+    }
   }
   input.setSuspendMovement(true);
   await nextPaint();
+  entryDiagnostics.checkpoint('prewarm-start', {
+    ...renderEntryDiagnostics(),
+    prewarmEntry: 'initial',
+  });
   try {
-    await renderer.prewarmInitialScene();
+    const prewarm = await renderer.prewarmInitialScene({
+      onEntryStart: (id, category) =>
+        entryDiagnostics.checkpoint('prewarm-start', {
+          ...renderEntryDiagnostics(),
+          prewarmEntry: id,
+          prewarmCategory: category,
+        }),
+    });
+    entryDiagnostics.checkpoint('prewarm-complete', {
+      ...renderEntryDiagnostics(),
+      prewarmElapsedMs: prewarm.elapsedMs,
+      prewarmCompileMode: prewarm.compileMode,
+      prewarmCompileMs: prewarm.compileMs,
+      prewarmCompileTimedOut: prewarm.compileTimedOut,
+      prewarmTimedOut: prewarm.timedOut,
+      prewarmProgramsAfter: prewarm.programsAfter,
+      prewarmTexturesAfter: prewarm.texturesAfter,
+      prewarmTextureUploads: prewarm.textureUploads,
+    });
   } catch (err) {
+    entryDiagnostics.checkpoint('prewarm-complete', {
+      ...renderEntryDiagnostics(),
+      prewarmFailed: true,
+    });
     console.warn('Renderer prewarm failed', err);
   }
   await nextPaint();
@@ -3278,6 +3509,7 @@ async function startGame(
   // cut to the game only once the first frame is actually on screen
   requestAnimationFrame(() =>
     requestAnimationFrame(() => {
+      entryDiagnostics.checkpoint('first-paint');
       hideLoadingScreen();
       // Start the intro clock as the loading screen begins to fade: the camera
       // holds the opening pose until now, so the fade doubles as the cut in.
@@ -3494,8 +3726,10 @@ function renderSkinPicker(
   });
 }
 
-/** Give each class button a small portrait preview of that class (run once
- *  character assets are ready so portraits render synchronously). */
+/** Give each class button a small portrait preview of that class. Wired to
+ *  {@link onPortraitsReady} so it runs once portrait.ts's own asset barrier
+ *  resolves (portraits render synchronously from then on); one-shot per chip
+ *  via the .mini-class-portrait guard below, so it is safe to call again. */
 function decorateClassChips(): void {
   document
     .querySelectorAll<HTMLElement>('#charcreate-panel .mini-class, #offline-select .mini-class')
@@ -3962,7 +4196,9 @@ function paintAccountPortal(
   const since = $('#account-member-since');
   since.textContent = model.header.memberSinceIso
     ? t('hudChrome.account.memberSince', {
-        date: formatDateTime(new Date(model.header.memberSinceIso), { dateStyle: 'medium' }),
+        date: formatDateTime(new Date(model.header.memberSinceIso), {
+          dateStyle: 'medium',
+        }),
       })
     : '';
   $('#account-char-count').textContent = t('hudChrome.account.charactersCount', {
@@ -4285,7 +4521,9 @@ function setupSecuritySection(): void {
   ($('#account-export-btn') as HTMLElement).addEventListener('click', async () => {
     try {
       const bundle = await api.exportData();
-      const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(bundle, null, 2)], {
+        type: 'application/json',
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -4892,6 +5130,10 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     clearInterval(poll);
     clearCardProviders();
     hideReconnectOverlay();
+    checkpointActiveEntryDiagnostics('connection-lost', { fatal: true });
+    stopActiveEntryDiagnostics();
+    clearEntryProbe();
+    console.warn('[entry-diag] connection ended; entry probe cleared');
     // The session ended for good (retries exhausted, kick, takeover, auth fail):
     // fatalOverlay clears the resume marker so a reload does not loop back into
     // a dead session. Exception: a duplicate-session conflict means the
@@ -4905,9 +5147,19 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
   // an unexpected drop is not fatal: the server holds the character in-world
   // (linkdead) while ClientWorld auto-reconnects, so just veil the game until
   // the world resumes; onDisconnect above fires if the retries run out
-  world.onConnectionLost = (attempt, maxAttempts, nextRetryAtMs) =>
+  world.onConnectionLost = (attempt, maxAttempts, nextRetryAtMs) => {
+    checkpointActiveEntryDiagnostics('connection-lost', {
+      attempt,
+      maxAttempts,
+    });
+    console.warn(`[entry-diag] connection lost attempt=${attempt}/${maxAttempts}`);
     showReconnectOverlay(attempt, maxAttempts, nextRetryAtMs);
-  world.onReconnected = () => hideReconnectOverlay();
+  };
+  world.onReconnected = () => {
+    checkpointActiveEntryDiagnostics('connection-restored');
+    console.info('[entry-diag] connection restored');
+    hideReconnectOverlay();
+  };
 }
 
 // CLASS_DETAILS / SIGNATURE_ABILITIES live in a pure module so a Vitest guard
@@ -5006,7 +5258,10 @@ function renderClassDetails(
   // Bind class color as a custom property for clean styling
   panel.style.setProperty('--class-color', classColorHex);
 
-  const statsList: { nameKey: TranslationKey; key: keyof typeof classDef.baseStats }[] = [
+  const statsList: {
+    nameKey: TranslationKey;
+    key: keyof typeof classDef.baseStats;
+  }[] = [
     { nameKey: 'classDetails.labels.strength', key: 'str' },
     { nameKey: 'classDetails.labels.agility', key: 'agi' },
     { nameKey: 'classDetails.labels.stamina', key: 'sta' },
@@ -5236,7 +5491,9 @@ function updateSeoMetadata(lang: SupportedLanguage): void {
             url: canonicalHref,
             inLanguage: languageTag(lang),
             description: t('seo.description'),
-            publisher: { '@id': 'https://worldofclaudecraft.com/#organization' },
+            publisher: {
+              '@id': 'https://worldofclaudecraft.com/#organization',
+            },
           },
           {
             '@type': 'Organization',
@@ -5259,7 +5516,9 @@ function updateSeoMetadata(lang: SupportedLanguage): void {
             image: 'https://worldofclaudecraft.com/woc_logo_square.webp',
             description: t('seo.description'),
             inLanguage: languageTag(lang),
-            publisher: { '@id': 'https://worldofclaudecraft.com/#organization' },
+            publisher: {
+              '@id': 'https://worldofclaudecraft.com/#organization',
+            },
             sameAs,
           },
         ],
@@ -5940,8 +6199,14 @@ function walletAddressLabel(address: string, linked: boolean, balance: number | 
   if (balance !== null) {
     const balanceText = walletBalanceText(balance);
     return linked
-      ? t('wallet.connectedLinkedWithBalance', { balance: balanceText, address: short })
-      : t('wallet.connectedWithBalance', { balance: balanceText, address: short });
+      ? t('wallet.connectedLinkedWithBalance', {
+          balance: balanceText,
+          address: short,
+        })
+      : t('wallet.connectedWithBalance', {
+          balance: balanceText,
+          address: short,
+        });
   }
   return linked
     ? t('wallet.connectedLinked', { address: short })
@@ -5952,7 +6217,10 @@ function walletHelpText(address: string, linked: boolean, balance: number | null
   const short = shortenAddress(address);
   if (linked) {
     return balance !== null
-      ? t('wallet.helpLinkedWithBalance', { balance: walletBalanceText(balance), address: short })
+      ? t('wallet.helpLinkedWithBalance', {
+          balance: walletBalanceText(balance),
+          address: short,
+        })
       : t('wallet.helpLinked', { address: short });
   }
   if (!api.token) {
@@ -6117,7 +6385,9 @@ function updateWalletButton(): void {
     btn.title = t('wallet.verifyTitle');
     btn.setAttribute(
       'aria-label',
-      t('wallet.verifyAddressAria', { address: shortenAddress(connectedAddress) }),
+      t('wallet.verifyAddressAria', {
+        address: shortenAddress(connectedAddress),
+      }),
     );
     setWalletStatus(null);
     setWalletHelp(walletHelpText(connectedAddress, false, connectedWocBalance), 'attention');
@@ -6286,9 +6556,15 @@ function startDiscordOAuth(mode: 'login' | 'link'): void {
     // LOGIN from the auth screen: a FULL-PAGE redirect, not a popup. The popup's
     // window.opener is severed by the cross-origin hop to Discord (COOP), so the
     // result never returns; a same-tab redirect always lands the callback, which
-    // writes the session + onboard flag and reloads us into play.
+    // writes the session + onboard flag and reloads us into play. The desktop shell
+    // opens THIS login screen at /desktop-login in the OS browser (electron/main.cjs
+    // openDesktopLogin, via shell.openExternal), never inside Electron itself, so
+    // NATIVE_APP/DESKTOP_APP are both false here: the signal that this is a desktop
+    // handoff is the page we are ON, not the runtime. Pass it through so the callback
+    // bounces back to /desktop-login (which mints the worldofclaudecraft:// deep-link
+    // code, see completeDesktopBrowserLogin) instead of the plain web '/'.
     void api
-      .discordStart('login')
+      .discordStart('login', false, '', undefined, isDesktopLoginPage())
       .then(({ url }) => {
         window.location.href = url;
       })
@@ -6444,7 +6720,11 @@ function startGithubOAuth(): void {
 // needed for a deliberate cancel) versus a real failure.
 window.addEventListener('message', (e: MessageEvent) => {
   if (e.origin !== location.origin) return;
-  const d = e.data as { source?: string; ok?: boolean; error?: string | null } | null;
+  const d = e.data as {
+    source?: string;
+    ok?: boolean;
+    error?: string | null;
+  } | null;
   if (d?.source !== 'woc-github') return;
   githubPopup?.close();
   githubPopup = null;
@@ -6903,7 +7183,11 @@ function readDiscordChoice(): ExternalAuthLoginChoice | null {
   }
   if (!raw) return null;
   try {
-    const d = JSON.parse(raw) as { linkToken?: unknown; username?: unknown; ts?: unknown };
+    const d = JSON.parse(raw) as {
+      linkToken?: unknown;
+      username?: unknown;
+      ts?: unknown;
+    };
     const fresh = typeof d.ts === 'number' && Date.now() - d.ts < DISCORD_CHOICE_TTL_MS;
     if (typeof d.linkToken === 'string' && d.linkToken && fresh) {
       return {
@@ -7018,7 +7302,9 @@ async function completeDesktopWalletVerifyFlow(): Promise<void> {
   let verificationFailed = false;
   try {
     setWalletFlowStatus('connect');
-    const authorization = await authorizeDesktopWalletInBrowser({ kind: 'link' });
+    const authorization = await authorizeDesktopWalletInBrowser({
+      kind: 'link',
+    });
     if (authorization.kind !== 'link') throw new Error('invalid wallet link authorization');
     setWalletFlowStatus('verify');
     const result = await api.linkWallet(
@@ -8450,12 +8736,13 @@ function wireStartScreens(): void {
     if (el) el.textContent = msg;
   };
   // A chooser path that minted a session: persist it and drop straight into play.
-  const finishDiscordChoice = () => {
+  const finishDiscordChoice = async () => {
     clearDiscordChoice();
     pendingDiscordChoice = null;
     discordChoiceError('');
     api.saveSession();
     enterLoggedInChrome();
+    if (await completeDesktopBrowserLogin()) return;
     void refreshWalletLinkStatus();
     void refreshGithubLinkStatus();
     void refreshSteamLinkStatus(api);
@@ -8591,7 +8878,7 @@ function wireStartScreens(): void {
             discordChoiceError(t('auth.twoFactorHint'));
             return;
           }
-          finishDiscordChoice();
+          return finishDiscordChoice();
         })
         .catch(onDiscordChoiceError)
         .finally(() => setDiscordChoiceBusy(false));
@@ -8644,7 +8931,9 @@ function wireStartScreens(): void {
   // loop, and tell the player what happened. Scoped to iOS/native
   // runtimes, the environments where the OS reload makes the crash otherwise invisible;
   // elsewhere the probe is only logged (and cleared: it is a one-shot signal).
-  const entryRecovery = planEntryCrashRecovery(readEntryProbeRaw(), Date.now());
+  const entryRecoveryAt = Date.now();
+  const entryRecovery = planEntryCrashRecovery(readEntryProbeRaw(), entryRecoveryAt);
+  if (entryRecovery) persistEntryRecoveryLog(entryRecovery, entryRecoveryAt);
   clearEntryProbe();
   if (entryRecovery) {
     if (isNativeRuntime() || mobilePlatform() === 'ios') {
@@ -8657,7 +8946,10 @@ function wireStartScreens(): void {
       console.warn(
         `[entry-guard] previous world entry crashed ${Math.round(entryRecovery.ageMs / 1000)}s ` +
           `ago at preset=${entryRecovery.from}; graphics now preset=${entryRecovery.to}, ` +
-          'resume marker cleared',
+          `resume marker cleared; checkpoint=${entryRecovery.checkpoint ?? 'not-recorded'} ` +
+          `checkpointAgeMs=${entryRecovery.checkpointAgeMs ?? -1} ` +
+          `diagnostics=${JSON.stringify(entryRecovery.diagnostics ?? {})}; retained in ` +
+          'localStorage.woc_entry_last_recovery',
       );
       // Wait for the boot locale so the banner body never paints in the wrong language.
       void ensureLocaleLoaded(getLanguage()).then(
@@ -8734,8 +9026,12 @@ function wireStartScreens(): void {
     void refreshSteamLinkStatus(api);
     // (Discord status is refreshed by enterLoggedInChrome above.)
     // A just-completed Discord login lands straight in play; capture a recovery
-    // email first if the Discord grant did not provide one.
-    if (discordOnboarding) void maybePromptRecoveryEmail().then(() => enterOnlinePlayFlow());
+    // email first if the Discord grant did not provide one. The desktop-login
+    // handoff page must mint its code, never race into online play, so this arm
+    // is gated the same way the resume guard above is.
+    if (shouldEnterDiscordOnboarding(discordOnboarding, isDesktopLoginPage())) {
+      void maybePromptRecoveryEmail().then(() => enterOnlinePlayFlow());
+    }
     if (isDesktopLoginPage()) void completeDesktopBrowserLogin();
   } else {
     enterLoggedOutChrome();
@@ -8748,17 +9044,34 @@ function wireStartScreens(): void {
   // no-op when no session is in play, so it is safe to register unconditionally.
   const restampResumeMarker = () => {
     if (document.visibilityState === 'hidden') {
+      console.info('[entry-diag] page hidden; entry probe cleared as a lifecycle transition');
       refreshPlayMarker(Date.now());
       // A page that leaves the foreground mid-entry was not killed by a foreground
       // memory spike: a later eviction while backgrounded (or a deliberate reload,
       // which also fires pagehide) must not read as an entry crash next boot.
+      stopActiveEntryDiagnostics();
       clearEntryProbe();
     }
   };
   document.addEventListener('visibilitychange', restampResumeMarker);
-  window.addEventListener('pagehide', () => {
+  window.addEventListener('pageshow', (event) => {
+    console.info(`[entry-diag] pageshow persisted=${event.persisted}`);
+  });
+  window.addEventListener('pagehide', (event) => {
+    console.info(`[entry-diag] pagehide persisted=${event.persisted}; entry probe cleared`);
     refreshPlayMarker(Date.now());
+    stopActiveEntryDiagnostics();
     clearEntryProbe();
+  });
+  window.addEventListener('error', (event) => {
+    const errorType = event.error instanceof Error ? event.error.name : 'unknown';
+    checkpointActiveEntryDiagnostics('window-error', { errorType });
+    console.warn(`[entry-diag] window error during entry type=${errorType}`);
+  });
+  window.addEventListener('unhandledrejection', (event) => {
+    const errorType = event.reason instanceof Error ? event.reason.name : typeof event.reason;
+    checkpointActiveEntryDiagnostics('unhandled-rejection', { errorType });
+    console.warn(`[entry-diag] unhandled rejection during entry type=${errorType}`);
   });
 
   // Header Logo click listener to return to homepage
@@ -8948,38 +9261,62 @@ function wireStartScreens(): void {
     syncLandingGraphicsSelect();
   });
 
-  // Initialize 3D character preview once assets are ready
-  assetsReady().then(() => {
-    // Resolve each panel defensively: play.html (online-only) has no #offline-select.
-    const activePanelId = ['#charselect-panel', '#offline-select'].find((id) => {
-      const panel = $(id) as HTMLElement | null;
-      return panel !== null && !panel.hasAttribute('hidden');
-    });
-    const containerId =
-      activePanelId === '#offline-select'
-        ? '#offline-preview-container'
-        : '#online-preview-container';
-    const container = $(containerId);
-    const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
-    if (container && canvas) {
-      characterPreview = new CharacterPreview(container, canvas);
-      // If a token auto-login already rendered the roster and selected a
-      // character before assets finished, show its real appearance; otherwise
-      // fall back to the selected class chip (create/offline panels).
-      if (charselectSelected) {
-        characterPreview.setAppearance(charselectAppearance(charselectSelected));
-      } else {
-        const selSelector =
-          activePanelId === '#offline-select'
-            ? '#offline-select .mini-class.sel'
-            : '#charcreate-panel .mini-class.sel';
-        const selEl = document.querySelector(selSelector) as HTMLElement | null;
-        const cls = selEl ? (selEl.dataset.class as PlayerClass) : 'warrior';
-        characterPreview.setClass(cls);
+  // Give each class chip its portrait as soon as portrait.ts's own (separate,
+  // wider) character-asset barrier resolves, independent of the 3D preview
+  // below. portraitsReady() latches once and decorateClassChips() is one-shot
+  // per chip, so gating this off charactersReady()'s narrower, retried set
+  // (as the 3D preview below does) left it permanently false whenever a
+  // transient failure landed in the wider set portrait.ts actually waits on:
+  // the preview would recover (that is charactersReady()'s job) but every
+  // class chip stayed a plain label for the rest of the page's life.
+  onPortraitsReady(decorateClassChips);
+
+  // Initialize 3D character preview once its assets are ready. Gated on the
+  // narrower charactersReady() (with its own retries), not the site-wide
+  // assetsReady(): that single shared promise covers EVERY registered preload
+  // (terrain, dungeon, foliage, ...), so an unrelated failure there must never
+  // permanently blank the character-creation preview. This previously used
+  // assetsReady().then() with no failure handler at all, so on a cold,
+  // first-visit cache a single transient asset failure anywhere on the site
+  // silently stranded the preview forever (issue: new players saw no
+  // character model on their first load; a reload "fixed" it only because the
+  // browser's HTTP cache was warm by then).
+  charactersReady()
+    .then(() => {
+      // Resolve each panel defensively: play.html (online-only) has no #offline-select.
+      const activePanelId = ['#charselect-panel', '#offline-select'].find((id) => {
+        const panel = $(id) as HTMLElement | null;
+        return panel !== null && !panel.hasAttribute('hidden');
+      });
+      const containerId =
+        activePanelId === '#offline-select'
+          ? '#offline-preview-container'
+          : '#online-preview-container';
+      const container = $(containerId);
+      const canvas = $('#char-preview-canvas') as HTMLCanvasElement | null;
+      if (container && canvas) {
+        characterPreview = new CharacterPreview(container, canvas, {
+          constrainedMemory: NATIVE_APP,
+        });
+        // If a token auto-login already rendered the roster and selected a
+        // character before assets finished, show its real appearance; otherwise
+        // fall back to the selected class chip (create/offline panels).
+        if (charselectSelected) {
+          characterPreview.setAppearance(charselectAppearance(charselectSelected));
+        } else {
+          const selSelector =
+            activePanelId === '#offline-select'
+              ? '#offline-select .mini-class.sel'
+              : '#charcreate-panel .mini-class.sel';
+          const selEl = document.querySelector(selSelector) as HTMLElement | null;
+          const cls = selEl ? (selEl.dataset.class as PlayerClass) : 'warrior';
+          characterPreview.setClass(cls);
+        }
       }
-    }
-    decorateClassChips();
-  });
+    })
+    .catch((err: unknown) => {
+      console.error('character preview assets failed to load, preview will stay blank:', err);
+    });
 }
 
 // Looping home-page theme. Browsers block audio autoplay until a user gesture,

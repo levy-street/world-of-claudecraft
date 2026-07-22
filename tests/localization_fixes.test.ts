@@ -933,6 +933,55 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // change so any future emit added here lands under the drift guard from
     // day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/action_throttle.ts'), 'utf8'),
+    // Professions 2.0 Phase 13: the typed disenchant-secondary mapper. It emits
+    // no player text itself (a pure def -> material-id mapping consumed by
+    // enchanting.ts), but every new sim module joins the scan list in the same
+    // change so any future emit added here lands under the drift guard from
+    // day one.
+    fs.readFileSync(
+      path.resolve(process.cwd(), 'src/sim/professions/disenchant_reagents.ts'),
+      'utf8',
+    ),
+    // Professions 2.0 Phase 12d: the identical-payload stack-merge predicate.
+    // It emits no player text itself (pure stacking bookkeeping consumed by
+    // bags/bank/trade/sim), but every new sim module joins the scan list in
+    // the same change so any future emit added here lands under the drift
+    // guard from day one.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/item_instance_merge.ts'), 'utf8'),
+    // Professions 2.0 Phase 12d: the force-rename instance-signer sweep. It
+    // emits no player text itself (pure signer bookkeeping the rename handler
+    // consumes), but every new sim module joins the scan list in the same
+    // change so any future emit added here lands under the drift guard from
+    // day one.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/character_rename.ts'), 'utf8'),
+    // Professions 2.0 Phase 14: the ticks-based cadence primitive. Pure timing
+    // helpers (no SimContext, no emits), but every new sim module joins the scan
+    // list in the same change so any future emit lands under the drift guard.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/cadence.ts'), 'utf8'),
+    // Professions 2.0 Phase 14: the tier-crossing master mail sweep. It emits no
+    // inline player text (the congratulation is an authored letter in
+    // content/letters.ts, localized by letterId through entity i18n), but every
+    // new sim module joins the scan list in the same change.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/tier_mail.ts'), 'utf8'),
+    // Professions 2.0 Phase 14: the trend-nudge / first-tier-tutorial sweep. It
+    // emits only TEXT-FREE personal events (profTrendNudge/profTierTutorial); the
+    // client renders the localized lines. Scanned so any future inline emit lands
+    // under the drift guard from day one.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/prof_nudges.ts'), 'utf8'),
+    // Professions 2.0 Phase 14: the attunement celebration events. Emits only
+    // TEXT-FREE personal + zone events (attuned/attunedZone); the client renders
+    // the localized lines. Scanned so any future inline emit lands under the guard.
+    fs.readFileSync(
+      path.resolve(process.cwd(), 'src/sim/professions/attunement_events.ts'),
+      'utf8',
+    ),
+    // Professions 2.0 Phase 14b: Commissions and the Maker's Bond (the
+    // commission eligibility rule, the unbind fee ladder, and the unbind
+    // service resolver). It emits only the TEXT-FREE personal unbindResult
+    // event (via the Sim facade); the client renders the localized lines.
+    // Scanned so any future inline emit lands under the drift guard from day
+    // one.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/commission.ts'), 'utf8'),
     // #2033 (PR 2039): the quest command bodies (accept/share/abandon/turn-in guards +
     // the accepted/abandoned/completed logs). The two profession-choice denials
     // ("That profession choice is not available." / "... no longer available.") have

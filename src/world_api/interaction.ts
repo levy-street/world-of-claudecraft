@@ -5,8 +5,10 @@ export interface IWorldInteraction {
   lootCorpse(id: number): WorldInteractionOutcome;
   autoLoot(id: number): void;
   // `components`: the player's per-corpse focus pick (#1142), which tagged
-  // component(s) to extract. Omitted, empty, or covering every tagged
-  // component all spread the harvest across every tag (pre-#1142 behavior).
+  // component(s) to extract. OMITTED (Phase 12d) resolves server-side to the
+  // caller's persistent town focus: the corpse tags holding allocation points
+  // (none focused spreads). An EXPLICIT array keeps the #1142 semantics:
+  // empty or covering every tagged component spreads across every tag.
   harvestCorpse(id: number, components?: string[]): void;
   pickUpObject(id: number): WorldInteractionOutcome;
   // #1143: the caller's persistent town focus allocation (component type ->

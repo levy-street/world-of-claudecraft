@@ -21,6 +21,7 @@ import type {
   AccountCosmetics,
   AccountModerationStatus,
   CharacterRow,
+  TokenScope,
 } from './db';
 import type { GameServer } from './game';
 
@@ -69,7 +70,9 @@ function rejectHandshake(ws: WebSocket, error: string): void {
 
 export interface WsAuthDeps {
   game: GameServer;
-  accountForToken: (token: string) => Promise<number | null>;
+  accountAndScopeForToken: (
+    token: string,
+  ) => Promise<{ accountId: number; scope: TokenScope } | null>;
   moderationStatusForAccount: (accountId: number) => Promise<AccountModerationStatus>;
   getCharacter: (accountId: number, characterId: number) => Promise<CharacterRow | null>;
   chatMuteStatusForAccount: (accountId: number) => Promise<AccountChatMuteStatus>;
@@ -134,7 +137,7 @@ export interface WsAuthHandlers {
 export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
   const {
     game,
-    accountForToken,
+    accountAndScopeForToken,
     moderationStatusForAccount,
     getCharacter,
     chatMuteStatusForAccount,
@@ -245,11 +248,12 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     // strings, booleans, and unknown future versions stay on the legacy wire.
     const timerWireVersion: 1 | typeof STABLE_TIMER_WIRE_VERSION =
       msg.timerWire === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
-    const accountId = await accountForToken(token);
-    if (accountId === null || !Number.isFinite(characterId)) {
+    const account = await accountAndScopeForToken(token);
+    if (account === null || account.scope !== 'full' || !Number.isFinite(characterId)) {
       rejectHandshake(ws, WS_AUTH_ERROR.notAuthenticated);
       return;
     }
+    const accountId = account.accountId;
     const status = await moderationStatusForAccount(accountId);
     if (status.locked) {
       rejectHandshake(ws, status.message);

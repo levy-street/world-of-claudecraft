@@ -42,6 +42,7 @@
 // takes no req/res and is the one authority; the client never decides ownership.
 
 import type * as http from 'node:http';
+import { rekeyInstanceSigner } from '../src/sim/character_rename';
 import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { normalizeCharName, offensiveName } from './auth';
@@ -59,6 +60,7 @@ import {
   moderationStatusForAccount,
   reclaimDeactivatedName,
   renameCharacter,
+  saveCharacterState,
   scopeAllowsMutation,
 } from './db';
 import { recentDeedsForCharacter } from './deeds_db';
@@ -199,6 +201,7 @@ const REAL_CHARACTERS_DB = {
   createCharacterCapped,
   reclaimDeactivatedName,
   renameCharacter,
+  saveCharacterState,
   deleteCharacter,
   lifetimeXpStanding,
   guildNameForCharacter,
@@ -508,6 +511,20 @@ async function renameHandler(ctx: Ctx): Promise<void> {
     }
     if (rt.rekeyMailOwner(character.id, character.name, c.name)) {
       await rt.saveMail();
+    }
+    // The renamed character's OWN signed instances (bags, bank, equipped) still
+    // carry the old signer name in their persisted blob; sweep it so the
+    // self-signed crafting discount, Battlefield Experience attribution, and
+    // the eqi inspect wire follow the new name. Only the persisted blob needs
+    // the sweep: the market/mail rekeys above reach WORLD state that lives in
+    // the running server regardless of sessions, but a character's live
+    // entity/meta exists only while joined, and the isCharacterOnline gate
+    // above guarantees there is none at rename time. Foreign-held copies
+    // signed with the old name live in other characters' blobs and are out of
+    // scope. renameCharacter's RETURNING row carries the current blob, and the
+    // no-nonce save is safe for the same offline reason.
+    if (c.state && rekeyInstanceSigner(c.state, character.name, c.name)) {
+      await charactersDb.saveCharacterState(c.id, c.level, c.state);
     }
     json(ctx.res, 200, {
       id: c.id,

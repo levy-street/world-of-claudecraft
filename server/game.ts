@@ -30,6 +30,7 @@ import {
 } from '../src/sim/data';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { parseRelayCommand } from '../src/sim/discord_relay';
+import { specialRoleChatTag } from '../src/sim/discord_roles';
 import {
   isInJailCage,
   JAIL_CENTER,
@@ -568,6 +569,12 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   'summonPet',
   'dismissPet',
   'summonDemon',
+  // Maker's Bond unbind (Professions 2.0 Phase 14b): a successful unbind can
+  // clear boundTo IN PLACE (the single-copy arm emits no loot event), so the
+  // result event itself must re-diff the heavy self keys or the holder's inv
+  // mirror goes stale until the staggered refresh. Also refreshes the purse
+  // for the fee debit.
+  'unbindResult',
 ]);
 
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
@@ -879,8 +886,11 @@ function identityFields(e: Entity): Record<string, unknown> {
     // payload, riding the identity record (wireCacheFor diffs the identity
     // JSON, so an equip/unequip of an instanced piece re-emits automatically).
     // Data minimization: only the cosmetic inspect fields (signer, enchant,
-    // rolled) leave the server; boundTo and charges are gameplay state no
-    // inspecting client needs and never ride this key.
+    // rolled) leave the server; boundTo, charges, and the Phase 13 bindOnTrade
+    // arm are gameplay state no inspecting client needs and never ride this key.
+    // The pub allowlist below (signer/enchant/rolled ONLY) is what enforces this,
+    // so a new non-cosmetic ItemInstancePayload field is excluded by construction;
+    // the owner still sees their own payload in full via the self `inv` mirror.
     let eqi: Record<string, unknown> | undefined;
     for (const [slot, inst] of Object.entries(e.equippedInstances)) {
       if (!inst) continue;
@@ -4153,7 +4163,37 @@ export class GameServer {
         );
         break;
       case 'craft_item':
-        if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, pid);
+        // `commission` (Professions 2.0 Phase 14b): a strict boolean-true
+        // check (the dispatch type-guard rule); anything else reads as false.
+        // The sim honors it only for eligible equipment outputs and mints the
+        // bindOnTrade arm itself, so nothing here trusts client data.
+        if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, msg.commission === true, pid);
+        break;
+      // Enchanting profession commands (Professions 2.0 Phase 13): the sim
+      // resolvers re-validate ownership/eligibility/throttle (nothing trusted
+      // from the client); the outcome reaches this client as the pid-scoped
+      // disenchantResult/enchantResult/salvageResult event plus the denc/ench/salv
+      // self-delta. A successful action emits a `loot` event (a HEAVY_SELF_EVENTS
+      // member) via the inventory hub, so the self inventory refreshes exactly like
+      // a craft; no explicit dirty-marking is needed here.
+      case 'disenchant_item':
+        if (typeof msg.item === 'string') sim.disenchantItem(msg.item, pid);
+        break;
+      case 'apply_enchant':
+        if (typeof msg.item === 'string' && typeof msg.enchant === 'string')
+          sim.applyEnchant(msg.item, msg.enchant, pid);
+        break;
+      case 'salvage_item':
+        if (typeof msg.item === 'string') sim.salvageItem(msg.item, pid);
+        break;
+      case 'unbind_item':
+        // Maker's Bond unbind service (Professions 2.0 Phase 14b): the sim
+        // resolver re-validates eligibility/bound-ness/station range/fee
+        // (nothing trusted from the client); the outcome reaches this client
+        // as the pid-scoped text-free unbindResult event, a HEAVY_SELF_EVENTS
+        // member so the cleared payload and the fee debit re-diff the self
+        // inv/purse mirrors on the next snapshot.
+        if (typeof msg.item === 'string') sim.unbindItem(msg.item, pid);
         break;
       case 'place_mobile_station':
         if (typeof msg.craft === 'string') sim.placeMobileStation(msg.craft, pid);
@@ -5721,6 +5761,15 @@ export class GameServer {
     // naturally flips to null the tick a station lapses and the client never
     // reasons about tick domains. Small scalar, diffed per tick like atitle.
     maybe('mst', this.sim.activeMobileStationCraftFor(anchorSession.pid));
+    // The viewer's own most recent enchanting-action outcomes (Professions 2.0
+    // Phase 13), or null. Small per-player reads diffed per tick like the other
+    // scalars above (a successful action already refreshed the self inventory via
+    // its loot event); the convergence arm for lastDisenchantResult/lastEnchantResult/
+    // lastSalvageResult, alongside the pid-scoped disenchantResult/enchantResult/
+    // salvageResult event. See TERSE_TO_IWORLD/ALL_DELTA_KEYS in tests/snapshots.test.ts.
+    maybe('denc', this.sim.lastDisenchantResultFor(anchorSession.pid));
+    maybe('ench', this.sim.lastEnchantResultFor(anchorSession.pid));
+    maybe('salv', this.sim.lastSalvageResultFor(anchorSession.pid));
     maybe('tfocus', this.sim.townFocusFor(anchorSession.pid));
     // Raw gathering-profession proficiency map (IWorld `gatheringProficiency`,
     // #1119), a second small read alongside `prof` for the ORIGINAL flat-map
@@ -6170,7 +6219,19 @@ export class GameServer {
     for (const ev of events) {
       if (ev.type !== 'chat') continue;
       const flair = this.chatFlairForPid(ev.fromPid);
-      if (flair) ev.flair = flair;
+      // The sender's top STAFF Discord role (the anti-impersonation chat tag)
+      // is composed here from the SENDER's entity rather than folded into the
+      // cached session.chatFlair: e.discordRole is written by the bot's
+      // members-meta push on its own cadence, so reading it live at fan-out
+      // cannot go stale. Gated on the catalog's chatTag flag so community
+      // roles (Artist, Content Creator, LEGEND, SHILL) stay nameplate-only
+      // and the chat tag remains a pure authority signal. Allocates only for
+      // staff senders.
+      const role = this.sim.entities.get(ev.fromPid)?.discordRole;
+      // `flair` may be undefined here; spreading undefined is a spec-defined
+      // no-op, so a role-only sender yields a clean { role } object.
+      if (role && specialRoleChatTag(role)) ev.flair = { ...flair, role };
+      else if (flair) ev.flair = flair;
     }
     // ignore list: social invites from blocked senders are resolved once per
     // batch (dropped for every session and declined in the sim), not per

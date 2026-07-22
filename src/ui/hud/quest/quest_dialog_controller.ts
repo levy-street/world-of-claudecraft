@@ -53,10 +53,12 @@ export interface QuestDialogControllerDeps {
   openVendor(npcId: number): void;
   openHeroicVendor(npcId: number): void;
   openTrain(npcId: number): void;
+  openUnbind(npcId: number): void;
   openMarket(): void;
   openDelveBoard(npcId: number): void;
   openValeCup(): void;
   openCardDuel(): void;
+  onOpenChange(open: boolean): void;
   voice: {
     play(key: string): void;
     isPlaying(): boolean;
@@ -71,8 +73,13 @@ export class QuestDialogController {
   private trap: FocusTrapHandle | null = null;
   private openedAt = 0;
   private voiceNpcId: number | null = null;
+  private openState = false;
 
   constructor(private readonly deps: QuestDialogControllerDeps) {}
+
+  get isOpen(): boolean {
+    return this.openState;
+  }
 
   open(npcId: number): void {
     const world = this.deps.world();
@@ -89,6 +96,7 @@ export class QuestDialogController {
       this.deps.openChronicles();
       return;
     }
+    this.beginOpen();
     this.openedAt = this.deps.now();
     this.ensureFocusTrap();
     this.deps.closeTransient();
@@ -100,6 +108,7 @@ export class QuestDialogController {
   openLinked(questId: string, fromPid?: number): void {
     const quest = QUESTS[questId];
     if (!quest) return;
+    this.beginOpen();
     this.npcId = null;
     this.ensureFocusTrap();
     this.deps.closeTransient();
@@ -155,6 +164,10 @@ export class QuestDialogController {
     this.deps.hideTooltip();
     this.trap?.release(restoreFocus);
     this.trap = null;
+    if (this.openState) {
+      this.openState = false;
+      this.deps.onOpenChange(false);
+    }
   }
 
   refresh(): void {
@@ -204,6 +217,12 @@ export class QuestDialogController {
     if (this.deps.element.style.display !== 'block') {
       this.trap = this.deps.openFocusTrap(() => this.deps.element);
     }
+  }
+
+  private beginOpen(): void {
+    if (this.openState) return;
+    this.openState = true;
+    this.deps.onOpenChange(true);
   }
 
   private renderGossip(npc: Entity, closeIfEmpty = false): void {
@@ -285,6 +304,10 @@ export class QuestDialogController {
     }
     if (hasTraining) {
       html += `<button type="button" class="qd-list-item" data-train="1" aria-label="${esc(t('hudChrome.training.dialogOptionAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.training.dialogOption'))}</button>`;
+      // Maker's Bond unbind service (Professions 2.0 Phase 14b): every
+      // station master offers it beside training (the same isStationMasterNpc
+      // gate, so the empty-menu check needs no new arm).
+      html += `<button type="button" class="qd-list-item" data-unbind="1" aria-label="${esc(t('hudChrome.unbind.dialogOptionAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.unbind.dialogOption'))}</button>`;
     }
     if (hasMarket) {
       html += `<button type="button" class="qd-list-item" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
@@ -318,6 +341,7 @@ export class QuestDialogController {
     this.bindRoute('[data-vendor]', () => this.deps.openVendor(npc.id));
     this.bindRoute('[data-heroic-shop]', () => this.deps.openHeroicVendor(npc.id));
     this.bindRoute('[data-train]', () => this.deps.openTrain(npc.id));
+    this.bindRoute('[data-unbind]', () => this.deps.openUnbind(npc.id));
     this.bindRoute('[data-market]', this.deps.openMarket);
     this.bindRoute('[data-delve-board]', () => this.deps.openDelveBoard(npc.id));
     this.bindRoute('[data-vcup]', this.deps.openValeCup);
@@ -393,14 +417,22 @@ export class QuestDialogController {
         if (quest.completionEffect?.type === 'switchHobby') {
           return t('hudChrome.crafting.hobbyPreview', { hobby: craftNameText(target) });
         }
-        const preview = buildAttunementPreview(target, identity.craftSkills);
+        const preview = buildAttunementPreview(target, identity.craftSkills, identity.switchCount);
         if (!preview) return '';
-        return t('hudChrome.crafting.attunementPreview', {
+        // The pre-commit picture: majors, hobby, and retained-but-dormant
+        // knowledge, PLUS the escalating make-amends return cost (Phase 14,
+        // closing the 2039 gap). Two complete localized sentences joined, the
+        // combo line + status precedent (crafting_window.ts).
+        const base = t('hudChrome.crafting.attunementPreview', {
           title: archetypeTitleText(preview.target),
           majorA: craftNameText(preview.majors[0]),
           majorB: craftNameText(preview.majors[1]),
           hobby: craftNameText(preview.hobbyCraft),
         });
+        const returnCost = t('hudChrome.crafting.attunementReturnCost', {
+          cost: this.deps.text.number(preview.returnCost),
+        });
+        return `${base} ${returnCost}`;
       };
       const initialPreview = professionTargets[0]
         ? professionPreviewText(professionTargets[0])

@@ -270,16 +270,15 @@ describe('main.ts resume wiring', () => {
 
   it('re-stamps on hide and pagehide via the freshness-gated refresh', () => {
     expect(mainTs).toContain(
-      "if (document.visibilityState === 'hidden') {\n      refreshPlayMarker(Date.now());",
+      "if (document.visibilityState === 'hidden') {\n      console.info('[entry-diag] page hidden; entry probe cleared as a lifecycle transition');\n      refreshPlayMarker(Date.now());",
     );
-    expect(mainTs).toContain(
-      "window.addEventListener('pagehide', () => {\n    refreshPlayMarker(Date.now());",
-    );
+    expect(mainTs).toContain("window.addEventListener('pagehide', (event) => {");
+    expect(mainTs).toContain('console.info(`[entry-diag] pagehide persisted=');
     // The same hide/pagehide moments also disarm the world-entry crash probe: leaving
     // the foreground (or a deliberate reload) is not a foreground entry crash, so it
     // must never cost the player a graphics tier (entry_crash_guard.ts).
     expect(mainTs).toContain(
-      "window.addEventListener('pagehide', () => {\n    refreshPlayMarker(Date.now());\n    clearEntryProbe();\n  });",
+      'refreshPlayMarker(Date.now());\n    stopActiveEntryDiagnostics();\n    clearEntryProbe();',
     );
   });
 });

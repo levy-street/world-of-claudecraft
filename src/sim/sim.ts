@@ -16,7 +16,15 @@ import type {
   PlayerProfessionsView,
 } from '../world_api';
 import * as bagsMod from './bags';
-import { addStacked, BAG_SOCKETS, bagCapacity, canAddItem, migrationBagsFor } from './bags';
+import {
+  addStacked,
+  BAG_SOCKETS,
+  bagCapacity,
+  canAddItem,
+  instancedCountCap,
+  migrationBagsFor,
+  stackSizeOf,
+} from './bags';
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
 import { lineOfSightClear, resolveMovement, resolvePosition } from './colliders';
@@ -197,6 +205,7 @@ import { canEquipItem, resolveEquipSlot } from './equipment_rules';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
 import * as interaction from './interaction';
+import { canStackInstancePayloads } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
 import type { JailState } from './jail';
@@ -280,6 +289,13 @@ import {
   switchArchetype as switchArchetypeImpl,
 } from './professions/archetype';
 import {
+  type CadenceMap,
+  cadenceBlockedKeys,
+  clampCadenceOnLoad,
+  WORK_ORDER_CADENCE_TICKS,
+} from './professions/cadence';
+import { unbindItem as unbindItemImpl } from './professions/commission';
+import {
   type AcquireRecipeResult,
   acquireRecipe as acquireRecipeImpl,
   type CraftResult,
@@ -313,7 +329,9 @@ import {
   type MobileCraftingStation,
   placeMobileStationForPlayer,
 } from './professions/mobile_station';
+import { updateProfNudges } from './professions/prof_nudges';
 import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
+import { normalizeTierMailOnLoad, updateTierMail } from './professions/tier_mail';
 import { grandfatherKnownRecipes, resolveTrain, type TrainResult } from './professions/training';
 import type { ProfessionRecipeRecord as RecipeDef } from './professions/types';
 import {
@@ -1157,6 +1175,29 @@ export interface PlayerMeta {
   // the craft-trend sweep books the letter (professions/guild_letter.ts).
   // Persisted in CharacterState so no later load can re-send it.
   guildLetterSent: boolean;
+  // Repeatable work-order cooldowns (Professions 2.0 Phase 14): quest id -> the
+  // tick at/after which it is available again (professions/cadence.ts). A Map so
+  // an empty default canonicalizes to an inert `[]` in the parity sampler (no
+  // golden churn). Persisted in CharacterState with zero-default omission; loaded
+  // through clampCadenceOnLoad so a tick-counter reset can never brick a quest.
+  questCadence: CadenceMap;
+  // Per-major acknowledged craft tier (Professions 2.0 Phase 14): craft id -> the
+  // highest tier the tier-crossing mail sweep has already congratulated
+  // (professions/tier_mail.ts). A Map (empty -> inert `[]`, no golden churn),
+  // persisted with zero-default omission. Only the active pair's two majors are
+  // ever recorded; baseline arming keeps deploy migration and fresh attunement
+  // silent.
+  tierMailSent: Map<string, number>;
+  // One-time first-tier tutorial sent (Professions 2.0 Phase 14): flipped when a
+  // character's first craft skill crosses tier 1 (professions/prof_nudges.ts).
+  // Persisted in CharacterState so no later load can re-fire it (the
+  // guildLetterSent idiom).
+  profTierTutorialSent: boolean;
+  // In-memory trend-nudge cadence (Professions 2.0 Phase 14). TRANSIENT: never
+  // serialized (a restart reopens the window, deliberately: the nudge is a hint,
+  // not an award), and empty at construction and on load, so the parity sampler
+  // sees an inert `[]`. Keyed by professions/prof_nudges.ts TREND_NUDGE_KEY.
+  profNudgeCadence: CadenceMap;
   // Delve meta progression (persisted in CharacterState).
   delveMarks: number;
   delveClears: Record<string, number>;
@@ -1331,6 +1372,19 @@ export interface CharacterState {
   // Guild trend letter already sent (optional so pre-phase-7 saves load
   // cleanly and receive at most one letter when their crafts qualify).
   guildLetterSent?: boolean;
+  // Repeatable work-order cooldowns (Professions 2.0 Phase 14; JSONB, quest id ->
+  // availableAt tick). Written only when non-empty (zero-default omission), so
+  // pre-Phase-14 and no-work-order saves stay byte-equal; loaded through
+  // clampCadenceOnLoad (tick-reset safe).
+  questCadence?: Record<string, number>;
+  // Per-major acknowledged craft tier (Professions 2.0 Phase 14; JSONB, craft id
+  // -> tier). Written only when non-empty (zero-default omission), so
+  // pre-Phase-14 and unattuned saves stay byte-equal.
+  tierMailSent?: Record<string, number>;
+  // First-tier tutorial already sent (Professions 2.0 Phase 14; JSONB, optional
+  // so pre-Phase-14 saves load cleanly and fire it once when they first qualify).
+  // Written only when true (zero-default omission).
+  profTierTutorialSent?: boolean;
   // World-boss loot lockouts now ride `raidLockouts` (keyed worldboss:<mobId>). The
   // legacy per-day `worldBossDaily` field is intentionally dropped: pre-migration saves
   // that still carry it just ignore it (a player locked at deploy may loot once more, a
@@ -2149,6 +2203,10 @@ export class Sim {
       marketQuery: defaultMarketQuery(),
       mailWelcomed: false,
       guildLetterSent: false,
+      questCadence: new Map(),
+      tierMailSent: new Map(),
+      profTierTutorialSent: false,
+      profNudgeCadence: new Map(),
       archetype: emptyArchetypeState(),
       delveMarks: 0,
       delveClears: {},
@@ -2208,7 +2266,16 @@ export class Sim {
           cloneItemInstancePayload(inst),
         ]),
       );
-      meta.inventory = s.inventory.map(cloneInvSlot);
+      // The shared tamper ceiling (bags.ts instancedCountCap, same rule as the
+      // bank arm below): a counted instanced slot loads capped at what
+      // identical-payload merges could legitimately have built, and a
+      // charge-bearing payload stays one-per-slot, so a hand-edited count can
+      // never launder into independent copies via a later deposit or trade.
+      meta.inventory = s.inventory.map((raw) => {
+        const slot = cloneInvSlot(raw);
+        slot.count = Math.min(slot.count, instancedCountCap(ITEMS[slot.itemId], slot.instance));
+        return slot;
+      });
       if (s.bags === undefined) {
         // PRE-BAG save: the character earned this space under the infinite
         // inventory, so grant + equip bags that cover it (lowest quality tier
@@ -2231,7 +2298,14 @@ export class Sim {
       // field and sanitizes to an empty bank). See bank.ts sanitizeBankState.
       meta.bank = sanitizeBankState(s.bank);
       for (const q of s.questLog) {
-        if (q.state !== 'done')
+        // Prune unknown quest ids at load (normalize on load, never crash): a save
+        // mid a since-deleted quest (e.g. the Phase 14 retirement of
+        // q_archetype_acceptance / q_prof_make_amends) must not leave a live
+        // questLog entry whose id is absent from QUESTS, or the next quest-touching
+        // tick op dereferences QUESTS[qp.questId].objectives and TypeErrors inside
+        // the server tick (quest_credit.ts + interactNpcForQuests). questsDone is
+        // membership-only (never dereferenced), so it is preserved as history below.
+        if (q.state !== 'done' && QUESTS[q.questId])
           meta.questLog.set(q.questId, {
             questId: q.questId,
             counts: [...q.counts],
@@ -2286,6 +2360,19 @@ export class Sim {
       }
       meta.mailWelcomed = s.mailWelcomed === true;
       meta.guildLetterSent = s.guildLetterSent === true;
+      // Phase 14 work-order cooldowns: clamp every stored availableAt to
+      // tickCount + WORK_ORDER_CADENCE_TICKS so a tick-counter reset (fresh
+      // offline Sim, server restart) can never leave a quest bricked; past-due
+      // keys drop out (the record shrinks back to empty and re-omits from saves).
+      meta.questCadence = clampCadenceOnLoad(
+        s.questCadence,
+        this.tickCount,
+        WORK_ORDER_CADENCE_TICKS,
+      );
+      // Phase 14 acknowledged tiers: valid finite non-negative entries only; a
+      // missing craft re-baselines silently on the next tier-mail sweep.
+      meta.tierMailSent = normalizeTierMailOnLoad(s.tierMailSent);
+      meta.profTierTutorialSent = s.profTierTutorialSent === true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
@@ -2949,6 +3036,16 @@ export class Sim {
       heroicDaily: { date: meta.heroicDaily.date, marked: [...meta.heroicDaily.marked] },
       mailWelcomed: meta.mailWelcomed,
       guildLetterSent: meta.guildLetterSent,
+      // Phase 14: all three written only when non-empty/true (zero-default
+      // omission), so a character with no work orders, no attunement, and no
+      // tutorial serializes byte-identically to a pre-Phase-14 save.
+      ...(meta.questCadence.size > 0
+        ? { questCadence: Object.fromEntries(meta.questCadence) }
+        : {}),
+      ...(meta.tierMailSent.size > 0
+        ? { tierMailSent: Object.fromEntries(meta.tierMailSent) }
+        : {}),
+      ...(meta.profTierTutorialSent ? { profTierTutorialSent: true } : {}),
       townFocus: { ...meta.townFocus },
       // World-boss lockouts serialize via raidLockouts (above), not a separate field.
       // Book of Deeds: every field conditional (absent while empty/null/zero)
@@ -4456,6 +4553,16 @@ export class Sim {
     // letter via ctx.mailAuthoredLetter), so appending it inside the mail
     // phase cannot fork the draw order.
     updateGuildTrendLetters(this.ctx);
+    // The tier-crossing master mail sweep (Professions 2.0 Phase 14): books a
+    // congratulatory letter when an attuned character's active-pair major
+    // crosses a tier. Draws ZERO rng and emits nothing itself (books a letter
+    // via ctx.mailAuthoredLetter), so its mail-phase position cannot fork the
+    // draw order.
+    updateTierMail(this.ctx);
+    // The profession nudge sweep (Professions 2.0 Phase 14): the trend nudge and
+    // first-tier tutorial personal events. Draws ZERO rng (it only emits events,
+    // which draw nothing), so its mail-phase position cannot fork the draw order.
+    updateProfNudges(this.ctx);
     // The one-time mastery reset notice (Professions 2.0 Phase 12c): drains
     // the transient pendingMasteryResetNotice flag the load-time reset branch
     // set. Draws ZERO rng and emits nothing itself (it only books a letter
@@ -6556,14 +6663,23 @@ export class Sim {
   }
 
   // Grant a single non-fungible copy of `itemId` carrying an instance payload
-  // (#1165: signer/charges/rolled/boundTo). Always its own slot entry (count 1),
-  // never merged with an existing plain or differently-instanced stack.
+  // (#1165: signer/charges/rolled/boundTo). Identical-payload stacking (Phase
+  // 12d): the copy merges into an existing slot whose payload is byte-equal
+  // under canStackInstancePayloads (so a charge-bearing payload stays
+  // one-per-slot) with stack room; otherwise it takes its own slot entry. It
+  // never merges with a plain or differently-instanced stack.
   addItemInstance(itemId: string, instance: ItemInstancePayload, pid?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta } = r;
     const def = ITEMS[itemId];
-    meta.inventory.push({ itemId, count: 1, instance });
+    const stack = stackSizeOf(def);
+    const mergeTarget = meta.inventory.find(
+      (s) =>
+        s.itemId === itemId && s.count < stack && canStackInstancePayloads(s.instance, instance),
+    );
+    if (mergeTarget) mergeTarget.count += 1;
+    else meta.inventory.push({ itemId, count: 1, instance });
     // Discovery ledger: the instance's rolled quality (gathered rares) beats
     // the static def quality for the quality-first marks.
     deedsMod.markItemDiscovered(this.ctx, meta, itemId, instance.rolled?.quality);
@@ -6575,11 +6691,16 @@ export class Sim {
     this.ctx.onInventoryChangedForQuests(meta);
   }
 
-  // Returns the `instance` payload of every instanced slot actually consumed
-  // (highest-index/most-recently-added slot first, matching the removal
-  // order below), so a caller that needs to attribute an effect to the
-  // SPECIFIC copy removed (e.g. #1149 Battlefield Experience) never guesses
-  // at a different slot than the one this call actually took from.
+  // Returns the `instance` payload of every instanced UNIT actually consumed
+  // (highest-index/most-recently-added slot first, matching the removal order
+  // below; one entry PER UNIT, since an identical-payload stack holds many
+  // units behind one payload object), so a caller that needs to attribute an
+  // effect to the SPECIFIC copy removed (e.g. #1149 Battlefield Experience)
+  // never guesses at a different slot than the one this call actually took
+  // from. Payloads are deep-cloned whenever the slot RETAINS units after the
+  // removal: a caller that mutates a returned payload (enchanting is the live
+  // case) must never alias the surviving stack's shared payload. The final
+  // unit of a fully-consumed slot returns the original object.
   removeItem(itemId: string, count: number, pid?: number): ItemInstancePayload[] {
     const consumedInstances: ItemInstancePayload[] = [];
     const r = this.resolve(pid);
@@ -6588,8 +6709,15 @@ export class Sim {
     for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
       const s = meta.inventory[i];
       if (s.itemId !== itemId) continue;
-      if (s.instance) consumedInstances.push(s.instance);
       const take = Math.min(s.count, count);
+      if (s.instance) {
+        for (let unit = 0; unit < take; unit++) {
+          const finalUnitOfSlot = take >= s.count && unit === take - 1;
+          consumedInstances.push(
+            finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance),
+          );
+        }
+      }
       s.count -= take;
       count -= take;
       if (s.count <= 0) meta.inventory.splice(i, 1);
@@ -6642,7 +6770,7 @@ export class Sim {
   // stacks (matching removeFungibleItem's ordering within that subset) and only
   // reaches for an instanced-but-unenchanted copy once no fungible copy is left.
   // Never removes an already-enchanted copy (isEnchantedInstance). Returns the
-  // `instance` payload of every instanced slot actually consumed (matching
+  // `instance` payload of every instanced unit actually consumed (matching
   // removeItem's return contract) so a caller applying an enchant can merge a
   // crafted copy's signer/masterwork/legacy rolled.quality into the
   // freshly-enchanted instance instead of silently dropping them (#1712
@@ -6661,12 +6789,18 @@ export class Sim {
       count -= take;
       if (s.count <= 0) meta.inventory.splice(i, 1);
     }
-    // Pass 2: instanced copies that are not already enchanted.
+    // Pass 2: instanced copies that are not already enchanted. Per-unit
+    // returns with the same clone-on-survival rule removeItem follows: the
+    // enchant path mutates the payload it gets back, so a surviving stack's
+    // shared payload must never be aliased out.
     for (let i = meta.inventory.length - 1; i >= 0 && count > 0; i--) {
       const s = meta.inventory[i];
       if (s.itemId !== itemId || !s.instance || isEnchantedInstance(s.instance)) continue;
-      consumedInstances.push(s.instance);
       const take = Math.min(s.count, count);
+      for (let unit = 0; unit < take; unit++) {
+        const finalUnitOfSlot = take >= s.count && unit === take - 1;
+        consumedInstances.push(finalUnitOfSlot ? s.instance : cloneItemInstancePayload(s.instance));
+      }
       s.count -= take;
       count -= take;
       if (s.count <= 0) meta.inventory.splice(i, 1);
@@ -6772,9 +6906,12 @@ export class Sim {
   // src/sim/professions/crafting.ts, resolved on the deterministic tick the
   // command arrives on, same as harvestNode/buyItem/useItem above. Stashes
   // the outcome on the resolved player's PlayerMeta so the IWorld
-  // lastCraftResult read surface (below) reflects it.
-  craftItem(recipeId: string, pid?: number): void {
-    const result = craftItemImpl(this.ctx, recipeId, pid);
+  // lastCraftResult read surface (below) reflects it. `commission` (Phase
+  // 14b) is the boolean opt-in off the craft command; the resolve honors it
+  // only for eligible equipment outputs and mints the bindOnTrade arm
+  // server-side (professions/commission.ts), never off client data.
+  craftItem(recipeId: string, commission?: boolean, pid?: number): void {
+    const result = craftItemImpl(this.ctx, recipeId, commission === true, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastCraftResult = result;
     this.emit({
@@ -6855,6 +6992,29 @@ export class Sim {
     });
   }
 
+  // Maker's Bond unbind command (Professions 2.0 Phase 14b): a thin entry
+  // beside trainRecipe above. professions/commission.ts owns the resolve
+  // (the resolveTrain deny-order doctrine: a duplicate command resolves
+  // unbind_not_bound before any charging arm, so it never re-charges) AND
+  // the mutation (fee charged exactly once, boundTo cleared on exactly one
+  // copy, every other payload marker untouched). The outcome surfaces ONLY
+  // through the personal text-free unbindResult event (the trainRecipe
+  // single-surface doctrine: no ctx.error toast, or the deny would print
+  // twice); the payload change itself converges through the self inventory
+  // mirror in both hosts.
+  unbindItem(itemId: string, pid?: number): void {
+    const result = unbindItemImpl(this.ctx, itemId, pid);
+    const meta = this.players.get(pid ?? this.primaryId);
+    this.emit({
+      type: 'unbindResult',
+      ok: result.ok,
+      itemId: result.itemId,
+      reason: result.reason,
+      fee: result.fee,
+      pid: meta?.entityId,
+    });
+  }
+
   // IWorld read surface (IWorldProfessions, Phase 8): the craft id of the
   // local viewer's own ACTIVE mobile station, or null when none is placed or
   // the placed one has expired (tick-domain expiry, checked live).
@@ -6894,35 +7054,80 @@ export class Sim {
     const result = salvageItemImpl(this.ctx, itemId, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastSalvageResult = result;
+    // Emit the pid-scoped, text-free outcome (Phase 13), same immediacy arm as
+    // craftItem's craftResult: the online client mirrors it into lastSalvageResult
+    // for a toast/log without deciding the result. Single-surface doctrine: NO
+    // ctx.error from the resolver, or a deny would print twice.
+    this.emit({
+      type: 'salvageResult',
+      ok: result.ok,
+      itemId: result.itemId,
+      materialItemId: result.materialItemId,
+      count: result.count,
+      reason: result.reason,
+      pid: meta?.entityId,
+    });
   }
 
-  // The local viewer's most recent salvage-result, or null before their
-  // first salvage attempt this session. Same not-yet-wired-onto-IWorld
-  // status as the salvageItem command above.
+  // IWorld read surface (IWorldProfessions, Phase 13): the local viewer's most
+  // recent salvage-result, or null before their first salvage attempt this
+  // session. `lastSalvageResultFor` is the per-player form the server's `salv`
+  // self-delta reads (server/game.ts), modeled on activeMobileStationCraftFor.
   get lastSalvageResult(): SalvageResult | null {
-    return this.players.get(this.primaryId)?.lastSalvageResult ?? null;
+    return this.lastSalvageResultFor(this.primaryId);
   }
 
-  // Enchanting profession commands: same thin-delegate/stash-result/not-yet-
-  // wired-onto-IWorld shape as salvageItem/lastSalvageResult above.
+  lastSalvageResultFor(pid: number): SalvageResult | null {
+    return this.players.get(pid)?.lastSalvageResult ?? null;
+  }
+
+  // Enchanting profession commands (IWorldProfessions, Phase 13): same thin-
+  // delegate/stash-result/emit shape as salvageItem/craftItem above.
   disenchantItem(itemId: string, pid?: number): void {
     const result = disenchantItemImpl(this.ctx, itemId, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastDisenchantResult = result;
+    this.emit({
+      type: 'disenchantResult',
+      ok: result.ok,
+      itemId: result.itemId,
+      materialItemId: result.materialItemId,
+      count: result.count,
+      secondaryItemId: result.secondaryItemId,
+      secondaryCount: result.secondaryCount,
+      reason: result.reason,
+      pid: meta?.entityId,
+    });
   }
 
   get lastDisenchantResult(): DisenchantResult | null {
-    return this.players.get(this.primaryId)?.lastDisenchantResult ?? null;
+    return this.lastDisenchantResultFor(this.primaryId);
+  }
+
+  lastDisenchantResultFor(pid: number): DisenchantResult | null {
+    return this.players.get(pid)?.lastDisenchantResult ?? null;
   }
 
   applyEnchant(itemId: string, enchantId: string, pid?: number): void {
     const result = applyEnchantImpl(this.ctx, itemId, enchantId, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastEnchantResult = result;
+    this.emit({
+      type: 'enchantResult',
+      ok: result.ok,
+      itemId: result.itemId,
+      enchantId: result.enchantId,
+      reason: result.reason,
+      pid: meta?.entityId,
+    });
   }
 
   get lastEnchantResult(): ApplyEnchantResult | null {
-    return this.players.get(this.primaryId)?.lastEnchantResult ?? null;
+    return this.lastEnchantResultFor(this.primaryId);
+  }
+
+  lastEnchantResultFor(pid: number): ApplyEnchantResult | null {
+    return this.players.get(pid)?.lastEnchantResult ?? null;
   }
 
   private maybeAutoEquip(itemId: string, meta: PlayerMeta): void {
@@ -8981,6 +9186,13 @@ export class Sim {
       // cprof delta diff (server/game.ts maybe()) re-emits exactly when the
       // set actually changes, never on Set iteration order.
       knownRecipes: [...(this.players.get(pid)?.knownRecipes ?? [])].sort(),
+      // Work orders on cooldown, resolved against THIS host's tickCount (Phase
+      // 14). Sorted, so the cprof diff re-emits only on arm/expiry, and the
+      // online client feeds it into its local computeQuestState.
+      cadenceBlockedQuests: cadenceBlockedKeys(
+        this.players.get(pid)?.questCadence ?? new Map(),
+        this.tickCount,
+      ),
     };
   }
 

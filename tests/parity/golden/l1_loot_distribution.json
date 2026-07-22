@@ -9,8 +9,8 @@
     "everyone-passes returnLootRollItemToCorpse",
     "looter-takes-all common item + personal-loot visibility"
   ],
-  "draws": 4,
-  "drawDigest": "270cc372",
+  "draws": 3,
+  "drawDigest": "0f82d0c2",
   "frames": [
     {
       "tick": 0,
@@ -920,7 +920,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 419,
-      "state": "4d8bdfe1",
+      "state": "4199b31c",
       "events": "880460b2",
       "rng": {
         "draws": 3,
@@ -1321,7 +1321,7 @@
           "aiState": "idle",
           "combatTimer": 99,
           "comboUntil": -1,
-          "corpseTimer": 4,
+          "corpseTimer": 30,
           "critChance": 0.05,
           "dead": true,
           "detonateTimer": "Infinity",
@@ -1339,6 +1339,7 @@
             416,
             417
           ],
+          "lootable": true,
           "maxHp": 54,
           "moveSpeed": 8,
           "onGround": true,
@@ -1373,11 +1374,11 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 419,
-      "state": "06abf351",
+      "state": "4c38f4d9",
       "events": "741638a5",
       "rng": {
-        "draws": 4,
-        "digest": "270cc372"
+        "draws": 3,
+        "digest": "0f82d0c2"
       },
       "label": "final",
       "players": [
@@ -1623,7 +1624,6 @@
           "fiveSecondRule": 99.15,
           "hp": 100,
           "id": 415,
-          "inCombat": true,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1772,12 +1772,12 @@
           }
         },
         {
-          "aggroTargetId": 415,
-          "aiState": "chase",
-          "combatTimer": 99.05,
+          "aiState": "idle",
+          "combatTimer": 99,
           "comboUntil": -1,
-          "corpseTimer": 3.95,
+          "corpseTimer": 29.9,
           "critChance": 0.05,
+          "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "fallStartY": 1.603905,
@@ -1785,15 +1785,15 @@
           "hostile": true,
           "hp": 54,
           "id": 418,
-          "inCombat": true,
           "kind": "mob",
-          "leashAnchor": {
-            "x": 20,
-            "y": 1.603905,
-            "z": 22
-          },
           "level": 2,
           "lootFfaTimer": "Infinity",
+          "lootRecipientIds": [
+            415,
+            416,
+            417
+          ],
+          "lootable": true,
           "maxHp": 54,
           "moveSpeed": 8,
           "onGround": true,
@@ -1805,7 +1805,7 @@
             "z": 22
           },
           "potionCooldownUntil": -1,
-          "respawnTimer": -0.1,
+          "respawnTimer": -0.15,
           "spawnPos": {
             "x": 20,
             "y": 1.603905,
@@ -1814,14 +1814,8 @@
           "stats": {
             "armor": 10
           },
+          "tappedById": 415,
           "templateId": "forest_wolf",
-          "threat": [
-            [
-              415,
-              1
-            ]
-          ],
-          "wanderTimer": 7.207434,
           "weapon": {
             "max": 6,
             "min": 4,

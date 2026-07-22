@@ -58,6 +58,13 @@ const LOOT_ROLL_TIMEOUT = 60;
 // refreshes the roll to a fresh LOOT_ROLL_TIMEOUT need/greed window.
 const MASTER_LOOT_TIMEOUT = 300;
 
+// Phase 12d lifecycle decoupling: how long (seconds) a corpse stays open for
+// its remaining half once one half is consumed, an unclaimed harvest after the
+// loot empties (pruneCorpseLoot) or leftover loot after the harvest claim is
+// spent (harvestCorpse). Shorter than the full decay window, longer than the
+// both-halves-consumed fast collapse below.
+export const CORPSE_INTERACT_GRACE_SECONDS = 30;
+
 // The server-authoritative pending need-greed roll record. Sim-internal (the public
 // projection clients see is LootRollPrompt); the `pendingLootRolls` map lives on Sim
 // and is reached through the SimContext seam.
@@ -782,7 +789,7 @@ export function lootSlotVisibleTo(slot: LootSlot, pid: number): boolean {
   return slot.openToAll || !slot.personalFor || slot.personalFor.includes(pid);
 }
 
-function hasPendingLootRollForMob(ctx: SimContext, mobId: number): boolean {
+export function hasPendingLootRollForMob(ctx: SimContext, mobId: number): boolean {
   return [...ctx.pendingLootRolls.values()].some((roll) => roll.mobId === mobId);
 }
 
@@ -799,6 +806,16 @@ export function pruneCorpseLoot(ctx: SimContext, mob: Entity): void {
       return;
     }
     mob.loot = null;
+    // Phase 12d: an emptied corpse that still owes an unclaimed harvest stays
+    // open for a short grace window (empty loot rows plus the picker; the
+    // respawn gate in mob/locomotion.ts collapses it at corpseTimer 0). Only
+    // a corpse with both halves consumed, or no harvest half at all, takes
+    // the fast arm.
+    if (MOBS[mob.templateId]?.componentTags?.length && mob.harvestClaimedBy === null) {
+      mob.lootable = true;
+      mob.corpseTimer = Math.min(mob.corpseTimer, CORPSE_INTERACT_GRACE_SECONDS);
+      return;
+    }
     mob.lootable = false;
     mob.corpseTimer = Math.min(mob.corpseTimer, 4);
   }

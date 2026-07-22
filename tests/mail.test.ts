@@ -8,6 +8,7 @@ import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_MARK_LETTER, QUEST_LETTERS, WELCOME_LETTER } from '../src/sim/content/letters';
 import { MAILBOXES } from '../src/sim/content/mailboxes';
 import {
+  MAIL_ATTACHMENT_EXPIRY_SECONDS,
   MAIL_DELIVERY_SECONDS,
   MAIL_MAX_ATTACHMENTS,
   MAIL_POSTAGE,
@@ -293,7 +294,7 @@ describe('taking attachments against bag capacity (finding 2)', () => {
     expect(empty?.items ?? []).toHaveLength(0);
   });
 
-  it('does not start the expiry clock while a partially-taken letter still holds parcels', () => {
+  it('does not start the emptied clock while a partially-taken letter still holds parcels', () => {
     const sim = makeWorld();
     const alice = sim.addPlayer('warrior', 'Alice');
     const bob = sim.addPlayer('mage', 'Bob');
@@ -303,6 +304,7 @@ describe('taking attachments against bag capacity (finding 2)', () => {
     aliceMeta.copper = 10_000;
     sim.addItem('roasted_boar', 2, alice);
     moveToMailbox(sim, alice);
+    const sentAt = sim.time;
     sim.mailSend('Bob', 'Held', 'Wait for room.', 0, [{ itemId: 'roasted_boar', count: 2 }], alice);
     tickFor(sim, MAIL_DELIVERY_SECONDS + 2);
 
@@ -315,8 +317,9 @@ describe('taking attachments against bag capacity (finding 2)', () => {
     // biome-ignore lint/suspicious/noExplicitAny: reach into the book to inspect the raw expiry.
     const raw = (sim.postOffice as any).mail.find((m: { id: number }) => m.id === gift.id);
     expect(raw.items).toHaveLength(1);
-    // Attachments remain, so the expiry clock is still paused (Infinity).
-    expect(Number.isFinite(raw.expiresAt)).toBe(false);
+    // Attachments remain: the letter stays on its original attachment window,
+    // neither emptied-clock started nor window restarted by the partial take.
+    expect(raw.expiresAt).toBe(sentAt + MAIL_ATTACHMENT_EXPIRY_SECONDS);
   });
 });
 

@@ -10,14 +10,17 @@
 //
 // DOM-free and i18n-free so tests/crafting_view.test.ts can drive it directly.
 
+import { ALL_RECIPES } from '../sim/content/recipes';
 import { craftSkillGainMultiplier } from '../sim/professions/archetype';
 import {
   type ComboEligibilityReason,
   comboEligibility,
 } from '../sim/professions/combo_eligibility';
-import type { StationType } from '../sim/professions/stations';
+import { isCommissionEligible } from '../sim/professions/commission';
+import { type StationType, stationsOfType, stationTypeForCraft } from '../sim/professions/stations';
 import { MINIMAL_TIER_MULTIPLIER, REDUCED_TIER_MULTIPLIER } from '../sim/professions/wheel';
 import type { InvSlot, ItemDef } from '../sim/types';
+import { isRecipeKnownForViewer } from './hud/vendor/train_view';
 
 export interface RecipeDefLike {
   id: string;
@@ -89,6 +92,13 @@ export interface CraftingRecipeRow {
    *  (for a station-bound recipe) the player is in station range: the "Craft"
    *  action is enabled. The server re-validates every gate on craft. */
   craftable: boolean;
+  /** Commission opt-in visibility (Professions 2.0 Phase 14b): true iff the
+   *  result def is one of the ruled-in equipment kinds (weapon, armor,
+   *  held_offhand; src/sim/professions/commission.ts, the SAME predicate the
+   *  sim's craft resolver honors, so the control can never show where the
+   *  flag would be ignored). The painter renders the per-craft checkbox only
+   *  on these rows; the server re-validates eligibility on craft. */
+  commissionEligible: boolean;
 }
 
 export interface CraftingView {
@@ -199,6 +209,7 @@ export function buildCraftingView(
       skillReq: recipe.skillReq,
       difficulty,
       station,
+      commissionEligible: isCommissionEligible(items[recipe.resultItemId]),
       craftable:
         reagentRows.every((r) => r.satisfied) &&
         eligibility?.ok !== false &&
@@ -206,4 +217,44 @@ export function buildCraftingView(
     };
   });
   return { recipes: rows };
+}
+
+/** One craft's "learnable at a master" pointer: the station type that serves it
+ *  and the resident master's NPC template id (the painter localizes the master
+ *  name through entity i18n and the station name through the station-name
+ *  table). */
+export interface CraftLearnHint {
+  stationType: StationType;
+  masterNpcId: string;
+}
+
+/**
+ * Crafts that have at least one trainer-taught recipe the viewer has NOT
+ * learned, mapped to the station type serving that craft (stationTypeForCraft)
+ * and the resident master (the station registry). Drives the crafting window's
+ * per-section "learnable at a master" discoverability hint (Professions 2.0
+ * Phase 14): a section renders the hint iff its craft is in this map.
+ *
+ * Uses the SHARED isRecipeKnownForViewer predicate (train_view.ts), never a
+ * second knownness rule, so the hint can never disagree with the train ladder
+ * or the crafting window's known-recipe filter. A craft with no physical
+ * station (or no seated master) is never hinted: trainer recipes only exist for
+ * stationed crafts, and there would be no master to point at. Read-only over
+ * static content plus the viewer's mirrored known set (both hosts carry
+ * knownRecipes on cprof, so no new IWorld member is needed).
+ */
+export function craftLearnHints(knownRecipes: readonly string[]): Map<string, CraftLearnHint> {
+  const known = new Set(knownRecipes);
+  const hints = new Map<string, CraftLearnHint>();
+  for (const recipe of ALL_RECIPES) {
+    if (hints.has(recipe.professionId)) continue;
+    if (!recipe.acquisition?.includes('trainer')) continue;
+    if (isRecipeKnownForViewer(recipe, known)) continue;
+    const stationType = stationTypeForCraft(recipe.professionId);
+    if (!stationType) continue;
+    const station = stationsOfType(stationType)[0];
+    if (!station) continue;
+    hints.set(recipe.professionId, { stationType, masterNpcId: station.masterNpcId });
+  }
+  return hints;
 }

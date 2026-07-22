@@ -114,9 +114,6 @@
   body.mobile-touch.game-active #ui {
     z-index: 80;
   }
-  body.mobile-touch.mobile-more-open #mobile-controls {
-    z-index: 140;
-  }
   body.mobile-touch.game-active #ui,
   body.mobile-touch.game-active #nameplates,
   body.mobile-touch.game-active #mobile-controls {
@@ -1194,6 +1191,20 @@
     pointer-events: auto;
     width: 100%;
     min-width: 0;
+  }
+  /* #bottom-bar is not the hotbar (that is already hidden on touch above);
+     it docks the player frame / petbar / meters-window / stancebar stack. Only
+     bags and the character sheet are CSS-verified to cover the ENTIRE mobile
+     viewport (10px/0 inset on every edge, see the near-fullscreen block
+     below), matching the existing "covering the frame is fine here" tradeoff
+     already accepted for those two windows specifically. Every other game
+     window (loot, lockpick, delve-rite, loot-settings, map, quest-log,
+     vendor, ...) only pins its edges/top on touch and leaves real screen
+     visible below, so hiding the frame there would hide HP/resource while
+     combat continues. body.mobile-fullscreen-window-open is computed in
+     Hud.syncAnyWindowOpenState via isMobileFullscreenWindowOpen. */
+  body.mobile-touch.mobile-fullscreen-window-open #bottom-bar {
+    display: none;
   }
   body.mobile-touch #xpbar {
     display: none;
@@ -2459,6 +2470,7 @@
   body.mobile-touch #spellbook,
   body.mobile-touch #vendor-window,
   body.mobile-touch #train-window,
+  body.mobile-touch #unbind-window,
   body.mobile-touch #market-window,
   body.mobile-touch #quest-dialog,
   body.mobile-touch #calendar-window,
@@ -3227,6 +3239,7 @@
      is declared explicitly here regardless so neither group inherits a stale
      value). */
   body.mobile-touch #train-window,
+  body.mobile-touch #unbind-window,
   body.mobile-touch #quest-log-window,
   body.mobile-touch #vendor-window,
   body.mobile-touch #quest-dialog,
@@ -3244,6 +3257,7 @@
      the viewport width. The train window also scrolls internally here: it is a
      standalone centered card (never the vendor's split-screen bags pairing). */
   body.mobile-touch #train-window,
+  body.mobile-touch #unbind-window,
   body.mobile-touch #quest-log-window,
   body.mobile-touch #vendor-window,
   body.mobile-touch #quest-dialog {
@@ -3278,8 +3292,21 @@
       max(10px, env(safe-area-inset-bottom))
     );
   }
-  body.mobile-touch #train-window {
+  body.mobile-touch #train-window,
+  body.mobile-touch #unbind-window {
     overflow-y: auto;
+  }
+  /* Commission opt-in row (Professions 2.0 Phase 14b): the label is the tap
+     target and the desktop 11px/2px-padding footprint sits far under the
+     40x40 touch floor (src/ui/CLAUDE.md), so on touch the whole row grows to
+     the floor and the native checkbox itself gets a finger-sized box. */
+  body.mobile-touch .crafting-commission-row {
+    min-height: 40px;
+    font-size: 13px;
+  }
+  body.mobile-touch .crafting-commission-row input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
   }
   /* Narrower size group: spellbook rows and the options form controls read fine
      at a tighter width, so these stay a compact centered card rather than
@@ -3854,7 +3881,25 @@
   }
   body.mobile-touch #quest-log-window .ql-detail {
     min-width: 0;
+    /* The components-layer 70ch/100ch reading-measure cap doesn't bind at
+       phone widths (screen is already narrower than the cap), but it does
+       bind on a tablet-width touch sheet, leaving dead space next to the
+       list. This just makes that literal by letting the pane use the full
+       width the sheet gives it. */
+    max-width: none;
   }
+  /* Dropping the components-layer `.ql-detail { max-height: 380px }` (the
+     landscape relayout) removes mobile's own internal scroll region too:
+     `.ql-detail` has no height context here (`.ql-cols` is an unbounded flex
+     row), so `.ql-detail-body`'s `overflow-y: auto` never has anything to
+     clip, and the sheet's own `overflow-y: auto` (mobile sheet base, above)
+     becomes the only scroll for a long quest, list included. This is an
+     intentional switch to the same single-outer-scroll model the desktop
+     window already uses (see quest_log_landscape_layout.test.ts), not an
+     oversight: for a long quest, the whole sheet now scrolls together with
+     the list, rather than only the detail pane scrolling internally. The
+     `.ql-detail-body` safe-area padding below stays harmless dead weight for
+     the case a future change reintroduces a bounded height here. */
   body.mobile-touch #quest-log-window .ql-detail-body {
     min-width: 0;
   }
@@ -3904,12 +3949,39 @@
     min-height: 40px;
     font-size: 16px;
   }
+  /* The mobile window sheet forces z-index 95 (see the managed-window override
+     above), which buries the base #ctx-menu at 90: a Phase 13 bag-item action
+     menu opened from inside the fullscreen Bags sheet rendered BEHIND it. The
+     popup is transient and always the active interaction, so on touch it sits
+     one step above the sheet. Desktop keeps the base 90 untouched. */
+  body.mobile-touch #ctx-menu {
+    z-index: 96;
+  }
+  /* An Apply Enchant picker row (Professions 2.0 Phase 13) carries a dim meta
+     sub-line; the flex row above would seat it inline beside the enchant name
+     on a narrow menu, so a meta-bearing row stacks instead. */
+  body.mobile-touch #ctx-menu .ctx-item:has(.ctx-item-meta) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
   body.mobile-touch #ctx-menu {
     box-sizing: border-box;
     max-height: calc(var(--app-vh, 100vh) / var(--ui-scale, 1) - 20px);
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
+  }
+  /* Apply Enchant picker sizing on touch (Phase 13 QA, maintainer direction):
+     the base cap above only stops OVERFLOW, so the full-list picker still
+     filled essentially the whole screen. The picker states take a tighter cap
+     (landscape play is the ~390px-tall class of viewport, so a fraction of the
+     app viewport, scaled like the base rule) and a bounded width; the box
+     scrolls within it. */
+  body.mobile-touch #ctx-menu.ctx-menu-picker {
+    max-height: calc(var(--app-vh, 100vh) / var(--ui-scale, 1) * 0.6);
+    min-width: 280px;
+    max-width: min(420px, 86vw);
+    overflow-y: auto;
   }
   /* Phase 5 touch floors: the interactive descendants of the newly sheeted windows
      that render below the 40px tap target on desktop. Only the controls that need it

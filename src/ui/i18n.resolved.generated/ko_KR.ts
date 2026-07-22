@@ -1446,7 +1446,7 @@ export const ko_KR: EnTranslations = {
     "corpseHarvest": {
       "title": "채집",
       "harvestButton": "채집",
-      "harvestButtonTooltip": "채집: 이 시체에서 전리품과 별개로 제작 재료(가죽, 송곳니, 실크 등)를 모읍니다. 누구나 채집할 수 있지만, 하나의 시체는 한 명의 플레이어만 채집할 수 있습니다.",
+      "harvestTooltip": "선택한 부위를 채집합니다. 각 시체는 선착순으로 한 번만 채집할 수 있습니다. 전리품은 가져가지 않습니다.",
       "concentrateHint": "선택한 부위가 적을수록 부위당 등급이 더 높아집니다.",
       "alreadyHarvested": "이 시체는 이미 채집되었습니다.",
       "componentAria": "{component} 채집",
@@ -1464,6 +1464,8 @@ export const ko_KR: EnTranslations = {
     "townFocus": {
       "title": "마을 집중",
       "hint": "집중 포인트는 각 재료의 기본 산출량에 보너스를 더합니다. 집중하지 않은 재료는 기본 산출량 그대로 유지됩니다.",
+      "tierHint": "재료 하나에 집중 {points}포인트를 투자할 때마다 채집 등급이 한 단계 오릅니다(최대 {steps}단계). {points}포인트 미만이라도 산출량은 늘어납니다.",
+      "townOnlyHint": "집중은 마을 안에서만 변경할 수 있습니다.",
       "budgetLabel": "남은 포인트: {remaining} / {budget}",
       "saveButton": "집중 저장",
       "notInTownHint": "집중을 설정하려면 마을에 있어야 합니다.",
@@ -1522,6 +1524,7 @@ export const ko_KR: EnTranslations = {
       "dragEquipHint": "캐릭터로 끌어다 놓아 장착",
       "dragDestroyHint": "세계로 끌어내어 파괴",
       "reorderNeedsRecent": "가방을 정리하려면 필터를 해제하고 최근 순으로 정렬하세요",
+      "itemAriaInstanced": "{item}, 수량 {count}, 제작자 표식이 있는 사본",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
       "filterWeapon": "무기",
@@ -1687,7 +1690,9 @@ export const ko_KR: EnTranslations = {
     },
     "loot": {
       "chestTitle": "상자",
-      "takeAllTooltip": "모두 가져가기: 이 전리품 창의 모든 돈과 아이템을 가져갑니다."
+      "takeLootButton": "전리품 가져가기",
+      "takeLootTooltip": "돈과 떨어진 아이템을 가져갑니다. 채집 기회는 소모되지 않습니다.",
+      "unifiedPressHint": "상호작용 키를 한 번 누르면 마을 집중에 따라 전리품 획득과 채집을 함께 수행합니다."
     },
     "spellbook": {
       "addToBarAria": "{name}을(를) 행동 단축바에 추가",
@@ -1835,6 +1840,7 @@ export const ko_KR: EnTranslations = {
         "legend": "전설",
         "shill": "홍보대사"
       },
+      "roleTagChatTitle": "인증된 서버 역할: {role}",
       "guildMember": "인증된 멤버",
       "notMember": "아직 서버에 없음",
       "joinCta": "Discord 참여하기",
@@ -2128,6 +2134,8 @@ export const ko_KR: EnTranslations = {
         "herbalism": "이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다."
       },
       "toolTierUnmetCorpse": "최상급 재료를 회수하려면 {tier}티어 채집 도구가 필요합니다.",
+      "downgradeMark": "가방이 가득 찼습니다: 수확물이 채집자의 표식 없이 보관되었습니다.",
+      "downgradeFind": "가방이 가득 찼습니다: 최상급 수확물을 놓쳐 버렸습니다.",
       "stateReady": "채집 가능",
       "stateCooldown": "재생성 중"
     },
@@ -2159,6 +2167,49 @@ export const ko_KR: EnTranslations = {
       "enchanting": "마법부여",
       "tailoring": "재봉",
       "leatherworking": "가죽세공"
+    },
+    "enchantName": {
+      "enchant_weapon_might": "무기 마법부여 - 위력",
+      "enchant_weapon_intellect": "무기 마법부여 - 주문력",
+      "enchant_helmet_fortitude": "투구 마법부여 - 강건함",
+      "enchant_neck_spirit": "목걸이 마법부여 - 정신력",
+      "enchant_shoulder_agility": "어깨 마법부여 - 민첩성",
+      "enchant_chest_stamina": "갑옷 마법부여 - 체력",
+      "enchant_waist_stamina": "허리띠 마법부여 - 체력",
+      "enchant_legs_stamina": "다리 마법부여 - 체력",
+      "enchant_gloves_agility": "장갑 마법부여 - 민첩성",
+      "enchant_gloves_intellect": "장갑 마법부여 - 주문력",
+      "enchant_feet_agility": "신발 마법부여 - 민첩성",
+      "enchant_ring_spirit": "반지 마법부여 - 정신력",
+      "enchant_weapon_agility": "무기 마법부여 - 민첩성",
+      "enchant_helmet_intellect": "투구 마법부여 - 지능",
+      "enchant_helmet_armor": "투구 마법부여 - 강화",
+      "enchant_neck_intellect": "목걸이 마법부여 - 지능",
+      "enchant_neck_agility": "목걸이 마법부여 - 민첩성",
+      "enchant_shoulder_strength": "어깨 마법부여 - 힘",
+      "enchant_shoulder_intellect": "어깨 마법부여 - 지능",
+      "enchant_chest_spirit": "갑옷 마법부여 - 정신력",
+      "enchant_chest_armor": "갑옷 마법부여 - 강화",
+      "enchant_waist_strength": "허리띠 마법부여 - 힘",
+      "enchant_waist_agility": "허리띠 마법부여 - 민첩성",
+      "enchant_legs_intellect": "다리 마법부여 - 지능",
+      "enchant_gloves_strength": "장갑 마법부여 - 힘",
+      "enchant_feet_strength": "신발 마법부여 - 힘",
+      "enchant_feet_stamina": "신발 마법부여 - 체력",
+      "enchant_ring_strength": "반지 마법부여 - 힘",
+      "enchant_ring_agility": "반지 마법부여 - 민첩성",
+      "enchant_ring_intellect": "반지 마법부여 - 지능",
+      "enchant_weapon_greater_might": "무기 마법부여 - 상급 위력",
+      "enchant_weapon_greater_spellpower": "무기 마법부여 - 상급 주문력",
+      "enchant_helmet_greater_fortitude": "투구 마법부여 - 상급 강건함",
+      "enchant_chest_greater_stamina": "갑옷 마법부여 - 상급 체력",
+      "enchant_legs_greater_stamina": "다리 마법부여 - 상급 체력",
+      "enchant_gloves_greater_agility": "장갑 마법부여 - 상급 민첩성",
+      "enchant_weapon_runed_edge": "무기 마법부여 - 룬 칼날",
+      "enchant_weapon_runed_focus": "무기 마법부여 - 룬 집중",
+      "enchant_chest_runeweave": "갑옷 마법부여 - 룬 직조",
+      "enchant_legs_runed_hide": "다리 마법부여 - 룬 가죽",
+      "enchant_helmet_runed_links": "투구 마법부여 - 룬 사슬"
     },
     "professions": {
       "title": "전문 기술",
@@ -2220,6 +2271,7 @@ export const ko_KR: EnTranslations = {
       "pairOptionLabel": "{pair} ({craftA} + {craftB})",
       "attunementPreview": "결과: {title} 칭호를 얻고, {majorA}와 {majorB}가 상한 없는 주 전공이 됩니다. {hobby}는 희귀 상한의 취미가 됩니다. 다른 기술 지식은 모두 유지되지만 비활성 상태에서는 일반 상한이 적용됩니다.",
       "hobbyPreview": "결과: {hobby}가 희귀 상한의 취미가 됩니다. 두 주 전공과 유지된 모든 기술 수치는 그대로입니다.",
+      "attunementReturnCost": "이 조합을 떠나면 나중에 다시 돌아올 때 속죄 과제 {cost}개가 필요합니다.",
       "identity": {
         "title": "제작 정체성",
         "syncing": "서버에서 제작 정체성을 불러오고 있습니다.",
@@ -2263,12 +2315,60 @@ export const ko_KR: EnTranslations = {
       "difficultyNone": "숙련도 상승 없음",
       "stationBadge": "제작 거점",
       "stationOutOfRangeNamed": "{station}(으)로 이동하여 제작하세요.",
+      "learnMoreAtStation": "{station}의 {master}이(가) 더 많은 {craft} 제작법을 가르쳐 줄 수 있습니다.",
       "masterworkToast": "걸작! {name}",
       "masterworkZoneLine": "{crafter}님이 걸작 {name}을(를) 제작했습니다!",
       "tierUpToast": "{craft} 티어 {tier} 달성!",
+      "trendNudge": "당신의 솜씨가 {archetype} 쪽으로 기울고 있습니다. 그 조율 임무는 {master}에게 있습니다.",
+      "trendNudgeNoMaster": "당신의 솜씨가 {archetype} 쪽으로 기울고 있습니다. 그 길을 택하려면 공예 명인을 찾으세요.",
+      "attunedZoneLine": "{name}님이 {archetype}(으)로 조율했습니다!",
+      "attunedBanner": "조율 완료: {title}",
+      "tierTutorial": {
+        "title": "첫 티어",
+        "tierCap": "기술은 숙련도 {skill}에서 첫 티어에 도달하며, 티어가 오를수록 만들 수 있는 것이 좋아집니다. 하지만 기술이 희귀 이상의 작품을 만들 수 있는 것은 그것이 당신의 두 주 전공 중 하나일 때뿐입니다.",
+        "radar": "당신의 전문 기술은 바퀴를 이룹니다. 인접한 한 쌍에 조율하면 그 두 기술은 상한 없는 주 전공이 되고, 바퀴 반대편의 한 기술은 희귀 상한의 취미가 되며, 나머지는 비활성 상태가 됩니다. 그 지식은 유지되지만 다시 택하기 전까지는 일반 상한이 적용됩니다.",
+        "masters": "마을의 공예 명인들이 조율 임무를 제공합니다. 준비가 되면 찾아가 당신의 조합을 선택하세요. 배운 것은 결코 사라지지 않습니다.",
+        "dismiss": "알겠습니다"
+      },
       "makersMark": "제작자: {name}",
+      "gatheredBy": "채집자: {name}",
       "masterworkSeal": "걸작",
-      "enchantedLine": "마법부여됨"
+      "enchantedLine": "마법부여됨",
+      "commissionToggle": "주문 제작품으로 제작",
+      "commissionToggleHint": "거래로 처음 받는 캐릭터에게 귀속됩니다.",
+      "commissionUnbound": "주문 제작품: 첫 수령인에게 귀속됩니다",
+      "commissionBound": "주문 제작품: 수령인에게 귀속되어 있습니다"
+    },
+    "itemMenu": {
+      "use": "Use",
+      "equip": "장착",
+      "disenchant": "마력 추출",
+      "salvage": "분해",
+      "applyEnchant": "마법부여 적용"
+    },
+    "enchanting": {
+      "disenchantedLine": "{item}의 마력을 추출했습니다.",
+      "salvagedLine": "{item}을(를) 분해했습니다.",
+      "enchantAppliedLine": "{item}에 {enchant}을(를) 부여했습니다.",
+      "notHeld": "해당 아이템을 가지고 있지 않습니다.",
+      "notDisenchantable": "해당 아이템은 마력을 추출할 수 없습니다.",
+      "notSalvageable": "해당 아이템은 분해할 수 없습니다.",
+      "disenchantThrottled": "너무 빠르게 마력을 추출하고 있습니다. 잠시 후 다시 시도하세요.",
+      "salvageThrottled": "너무 빠르게 분해하고 있습니다. 잠시 후 다시 시도하세요.",
+      "enchantThrottled": "너무 빠르게 마법부여하고 있습니다. 잠시 후 다시 시도하세요.",
+      "enchantWrongSlot": "그 마법부여는 해당 아이템에 적용할 수 없습니다.",
+      "enchantUnknown": "해당 마법부여가 존재하지 않습니다.",
+      "enchantInsufficient": "해당 마법부여에 필요한 재료가 없습니다.",
+      "disenchantConfirmTitle": "{item}의 마력을 추출하시겠습니까?",
+      "disenchantConfirmBody": "{item}을(를) 파괴하고 비전 재료를 얻습니다. 되돌릴 수 없습니다.",
+      "disenchantConfirmBodySpecial": "특별한 {item} 사본(서명됨, 걸작 또는 마법부여됨)을 파괴하고 비전 재료를 얻습니다. 되돌릴 수 없습니다.",
+      "salvageConfirmTitle": "{item}을(를) 분해하시겠습니까?",
+      "salvageConfirmBody": "{item}을(를) 파괴하고 제작 재료를 얻습니다. 되돌릴 수 없습니다.",
+      "salvageConfirmBodySpecial": "특별한 {item} 사본(서명됨, 걸작 또는 마법부여됨)을 파괴하고 제작 재료를 얻습니다. 되돌릴 수 없습니다.",
+      "pickerTitle": "마법부여 적용",
+      "targetTitle": "마법부여할 아이템을 선택하세요",
+      "noEnchants": "이 재료를 사용하는 마법부여가 없습니다.",
+      "noTargets": "마법부여할 수 있는 아이템이 없습니다."
     },
     "training": {
       "title": "훈련: {name}",
@@ -2288,6 +2388,25 @@ export const ko_KR: EnTranslations = {
       "notTaughtHere": "그 제조법은 여기서 가르치지 않습니다.",
       "alreadyKnown": "이미 알고 있는 제조법입니다.",
       "outOfRange": "훈련하려면 작업대 옆에 있어야 합니다."
+    },
+    "unbind": {
+      "title": "귀속 해제: {name}",
+      "close": "귀속 해제 닫기",
+      "intro": "장인은 수수료를 받고 주문 제작품의 귀속을 해제해 줍니다.",
+      "empty": "귀속된 주문 제작품이 없습니다.",
+      "rowSub": "귀속을 해제합니다. 다음 거래에서 다시 귀속됩니다.",
+      "unbindAria": "{fee}(으)로 {name} 귀속 해제",
+      "dialogOption": "귀속 해제",
+      "dialogOptionAria": "{name}에게 주문 제작품 귀속 해제 요청",
+      "confirmTitle": "주문 제작품 귀속 해제",
+      "confirmBody": "{fee}(으)로 {name}의 귀속을 해제하시겠습니까?",
+      "confirmOk": "귀속 해제",
+      "confirmCancel": "취소",
+      "unbound": "{fee}(으)로 {name}의 귀속을 해제했습니다. 다음 거래에서 다시 귀속됩니다.",
+      "notEligible": "그 아이템은 귀속을 해제할 수 없습니다.",
+      "notBound": "그 아이템은 귀속되어 있지 않습니다.",
+      "cannotAfford": "귀속 해제 수수료를 지불할 수 없습니다.",
+      "outOfRange": "귀속을 해제하려면 작업대 옆에 있어야 합니다."
     },
     "finder": {
       "title": "던전 찾기",
@@ -5707,7 +5826,8 @@ export const ko_KR: EnTranslations = {
       "tradeInProgress": "이미 거래가 진행 중입니다.",
       "tradeTooFar": "대상이 너무 멀어 거래할 수 없습니다.",
       "tradeExpired": "거래 요청이 만료되었습니다.",
-      "tradeFailed": "거래 실패: 아이템이나 돈을 더 이상 사용할 수 없습니다."
+      "tradeFailed": "거래 실패: 아이템이나 돈을 더 이상 사용할 수 없습니다.",
+      "tradeBound": "그 아이템은 귀속되어 거래할 수 없습니다."
     },
     "logs": {
       "standUp": "일어섰습니다.",
@@ -8600,6 +8720,21 @@ export const ko_KR: EnTranslations = {
       "wildsoul_maul": {
         "name": "야생영혼 철퇴"
       },
+      "resonant_thread": {
+        "name": "공명의 실"
+      },
+      "resonant_hide": {
+        "name": "공명의 가죽"
+      },
+      "resonant_links": {
+        "name": "공명의 사슬"
+      },
+      "resonant_steel": {
+        "name": "공명의 강철"
+      },
+      "resonant_timber": {
+        "name": "공명의 목재"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -10692,23 +10827,143 @@ export const ko_KR: EnTranslations = {
           }
         }
       },
-      "q_archetype_acceptance": {
-        "title": "스스로 택하는 기술",
-        "text": "기술은 지식이지만, {playerName}, 조율은 약속이라네. 서로 이웃한 두 기술을 주 전공으로 선택하고, 계곡에서 직접 캔 광석을 가져오게.",
-        "completion": "약속이 맺어졌네. 이제 이 두 기술이 자네의 주 전공이고, 그 맞은편의 지식은 취미가 되었네.",
+      "q_prof_attune_smith": {
+        "title": "대장장이의 약속",
+        "text": "강철은 흔들리는 손을 용서하지 않지. 그러니 무엇을 맹세하기 전에 분명히 일러 두겠다. 내 화로에 몸을 맡기면 무기 제작과 방어구 제작이 네 두 주 전공이 되고, 희귀 등급 작업 너머로 끌고 갈 수 있는 기술은 그 둘뿐이다. 수레바퀴 반대편의 기술은 취미로 곁에 남아 희귀 등급까지만 닿고 더는 못 간다. 나머지 생업이 불타 사라지는 것은 아니다, {playerName}. 그저 조용히 잠들어, 네가 다시 부를 때까지 잠든 채로 있을 뿐이다. 그리고 망치가 떨어지기 전에 알아 두어라. 이 짝을 버리고 다른 짝으로 옮겼다가 돌아오려면 정직한 노동으로 기어 돌아와야 한다. 처음 돌아올 땐 적 다섯을 쓰러뜨리고, 다음엔 여덟, 그다음엔 열하나, 벗어날수록 매번 더 무거워진다. 아직 여기 서 있느냐? 그렇다면 베일에서 네 손으로 직접 캐낸 광맥 셋을 가져오너라. 그러면 약속이 맺어진 것으로 하겠다.",
+        "completion": "좋은 광석이고, 그것을 다룰 좋은 손이로군. 이제 무기 제작과 방어구 제작은 네가 통달할 몫이다. 나머지는 스스로 얻어 내라.",
         "objectives": {
           "0": {
             "label": "광맥 채굴"
           }
         }
       },
-      "q_prof_make_amends": {
-        "title": "속죄",
-        "text": "이 조합은 전에 익힌 적이 있군, {playerName}. 돌아가는 것은 새로운 맹세가 아니지. 계곡 길을 안전하게 지키는 일을 돕고, 손이 예전에 알던 감각을 되찾게.",
-        "completion": "옛 감각이 돌아왔네. 이전 조합이 다시 활성화되었어.",
+      "q_prof_attune_outfitter": {
+        "title": "의복 장인의 자",
+        "text": "자르기 전에 값을 재어라, 그것이 내 베틀의 첫 번째 규칙이다. 나를 택하면 가죽세공과 재봉이 네 두 주 전공이 되어 희귀 등급 작업 너머로 끌고 갈 수 있는 짝이 되고, 그 맞은편 기술은 취미로 곁에 남아 희귀 등급까지 닿은 뒤 그 자리에 머문다. 네가 잠시 내려놓는 생업은 풀려 흩어지는 것이 아니라, {playerName}, 그저 개켜 넣어 두는 것이니 다시 손에 잡을 때까지 잠들어 있을 뿐이다. 다만 분명히 새겨 두어라. 이 짝을 떠났다가 훗날 되찾고자 하면 돌아오는 길은 매번 더 길어지는 노동으로 치러야 한다. 처음엔 넷을 솎아 내고, 다음엔 여덟, 그다음엔 열하나, 언제나 조금씩 더. 마음을 정했다면 흑거미줄 잠복자 넷을 솎아 그 실을 베틀로 가져오너라. 좋은 실이 있어야 좋은 옷이 시작되는 법이니.",
+        "completion": "고른 실, 고른 손이로군. 이제 가죽세공과 재봉은 네 솜씨가 닿는 데까지 끌고 갈 수 있는 네 것이다. 두 번 재어라, 그러면 결코 너를 저버리지 않을 것이다.",
+        "objectives": {
+          "0": {
+            "label": "흑거미줄 잠복자 처치"
+          }
+        }
+      },
+      "q_prof_attune_apothecary": {
+        "title": "간직할 만한 요리법",
+        "text": "좋은 요리는 서로 어울리는 두 가지 맛이지, 좋은 기술도 마찬가지라네, {playerName}. 나와 함께 앉으면 연금술과 요리가 자네의 두 주 전공이 되어, 희귀 등급 작업 너머까지 뭉근히 끓일 수 있는 둘이 된다네. 수레바퀴 저편의 기술은 자네의 취미라, 희귀 등급까지 간을 맞추고 그 이상 불은 올리지 않지. 나머지 생업은 식료품 창고에 넣어 두는 셈이야. 잠들어 있을 뿐 상하지 않으니, 다시 꺼낼 때 언제든 그대로일세. 냄비가 아직 식어 있을 때 미리 일러 두지. 다른 짝으로 떠돌다 돌아오는 일은 점점 커지는 잡일이야. 처음엔 짐승 다섯을 처리하고, 다음엔 여덟, 그다음엔 열하나, 한 그릇 더할 때마다 무거워진다네. 그래도 군침이 도나? 그렇다면 야생 멧돼지 넷을 잡아 오게. 제대로 된 부엌은 좋은 고기에서 시작하는 법이니.",
+        "completion": "이거야말로 고기가 제대로 붙은 시작이로군. 이제 연금술과 요리는 자네가 원하는 만큼 높이 요리할 수 있는 자네 것일세. 배고플 때 또 오게.",
+        "objectives": {
+          "0": {
+            "label": "야생 멧돼지 사냥"
+          }
+        }
+      },
+      "q_prof_attune_bombardier": {
+        "title": "불안정한 계약",
+        "text": "오, 오, 좋은 거, 요란한 거 원하지, 응? 들어 봐, 들어 봐, 째깍거리는 건 아무것도 만지기 전에 말이야. 한마디만 하면 기계공학과 연금술이 네 두 주 전공이 되고, 희귀 등급 작업 너머로 밀어붙일 수 있는 건 딱 그 둘뿐이야(바로 거기서 재밌어지거든, 날 믿어). 반대편 기술은 취미로 주머니에 넣어 둬, 희귀 등급까지만, 더는 안 돼, 삐치지 말고. 네 다른 생업? 사라진 거 아니야, {playerName}, 그냥 낮잠 자는 거야, 잠들어 있는 거지, 언제든 깨우면 돼. 그런데(언제나 그런데가 있지, 도화선 붙잡아) 이 짝을 내팽개치고 나중에 뒤뚱뒤뚱 돌아오면 땀값이 쌓여. 처음엔 다섯을 쓰러뜨리고, 다음엔 여덟, 그다음엔 열하나, 더, 더, 겁먹고 발 뺄 때마다 매번. 할래? 할 거야? 그럼 가서 약초 군락 셋을 뜯어 와, 불안정한 놈들로, 어느 거냐고 묻지 마, 충분히 믿으면 다 조금씩 불안정하니까.",
+        "completion": "하. 시약이야, 진짜배기, 게다가 손가락도 다 붙어 있어, 좋아, 좋아. 기계공학과 연금술, 네 거야, 가서 후회할 만한 걸 하나 만들어 봐. 어서 가.",
+        "objectives": {
+          "0": {
+            "label": "약초 군락 채집"
+          }
+        }
+      },
+      "q_prof_amends_smith": {
+        "title": "다시 화로 앞으로",
+        "text": "그래, 다시 화로 앞으로 돌아왔군. 서운하지 않은 척은 않겠다, {playerName}. 하지만 나는 공정한 손이고, 일 또한 공정하다. 돌아오는 값은 알 테지. 노동이다, 그리고 벗어난 횟수만큼 매번 더 무거운. 북쪽 길을 물어뜯는 늑대들을 쓰러뜨려라. 그 팔놀림이 이 짝이 한때 네 팔에 무엇을 요구했는지 다시 일깨워 줄 것이다.",
+        "completion": "손에 다시 박자가 돌아왔군. 무기 제작과 방어구 제작이 다시 네 주 전공이다. 떠나는 것을 버릇 들이지 마라.",
         "objectives": {
           "0": {
             "label": "숲늑대 처치"
+          }
+        }
+      },
+      "q_prof_amends_outfitter": {
+        "title": "다시 이은 실",
+        "text": "결국 다시 내 베틀 앞이로군. 원한은 없다, {playerName}. 다만 실은 자신을 놓아 버린 손을 기억하고, 그것을 다시 잡는 값은 매번 더 길게 재어진다. 서쪽 숲을 뒤덮은 흑거미줄 잠복자들을 솎아 내라. 그 노동이 좋은 실을 다시 만지기 전에 네 손을 가라앉혀 줄 것이다.",
+        "completion": "다시 흔들림이 없군. 가죽세공과 재봉이 주 전공으로 네 손에 돌아왔다. 이번에는 떠돌기 전에 두 번 재어라.",
+        "objectives": {
+          "0": {
+            "label": "흑거미줄 잠복자 처치"
+          }
+        }
+      },
+      "q_prof_amends_apothecary": {
+        "title": "다시 화덕 위로",
+        "text": "이런, 누가 다시 내 냄비 앞에 왔나 보게. 서운한 것 없네, {playerName}, 부엌에는 늘 자리가 있으니까. 다만 걸어 나갈 때마다 외상값이 길어지는 건 자네도 알 테지. 동쪽 초원의 야생 멧돼지를 솎아 오게. 정직한 땀이 첫 번째 재료이고, 그것이 자네 손에 이 일을 다시 일깨워 줄 걸세.",
+        "completion": "옛 맛이 다시 나는군. 연금술과 요리가 주 전공으로 자네 화덕 위에 돌아왔네. 이번엔 좀 오래 머물게.",
+        "objectives": {
+          "0": {
+            "label": "야생 멧돼지 사냥"
+          }
+        }
+      },
+      "q_prof_amends_bombardier": {
+        "title": "불어나는 장부",
+        "text": "돌아왔구나, 하, 다들 결국 돌아와, 요란한 건 끌어당기는 힘이 있거든, 응? 나야 삐치지 않아, {playerName}, 그런데 장부, 아 그 장부, 네가 빠져나갈 때마다 불어나, 돌아올 때마다 더, 그게 공평한 거지. 가서 굴착장의 깊은바위 채굴꾼들을 싹 치워 줘, 땀 먼저, 불꽃은 나중, 그게 방금 내가 만든 규칙이야.",
+        "completion": "바로 그거야, 손이 다시 근질거리지. 기계공학과 연금술, 다시 주 전공이야, 어서, 가서 한 방 터뜨려. 이번엔 좀 붙어 있어 봐, 응?",
+        "objectives": {
+          "0": {
+            "label": "깊은바위 채굴꾼 소탕"
+          }
+        }
+      },
+      "q_prof_workorder_forge": {
+        "title": "화로 작업 의뢰",
+        "text": "화로는 늘 먹여 달라 보채지, {playerName}. 구리 광석 여덟 덩이를 가져오면 그 수고에 값을 치러 주겠다. 격식은 없다, 그저 광석과 동전뿐이다.",
+        "completion": "좋은 무게에 찌꺼기도 없군. 여기 네 몫이다. 화로는 머지않아 또 배고파질 게다.",
+        "objectives": {
+          "0": {
+            "label": "구리 광석 납품"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens": {
+        "title": "주방 작업 의뢰",
+        "text": "내 식료품 창고가 헐쑥해 보이는군, {playerName}. 그리고 헐쑥한 창고는 심술궂은 요리사를 만들지. 야생 고기 여덟 덩이를 가져다주면 자네 몫의 동전이 있네. 덤으로 변치 않는 내 고마움도 있고. 값어치는 덜하지만 맛은 더 좋다네.",
+        "completion": "이제야 창고가 가득하군. 여기 자네 삯일세. 가방이 또 묵직해지면 다시 오게.",
+        "objectives": {
+          "0": {
+            "label": "야생 고기 납품"
+          }
+        }
+      },
+      "q_prof_workorder_loom": {
+        "title": "베틀 작업 의뢰",
+        "text": "베틀이 비었고, 노는 손은 대낮을 허비하지, {playerName}. 거미 비단 여섯 타래를 가져오면 동전 한 닢까지 헤아려 공정한 삯을 치러 주겠다.",
+        "completion": "고운 실에, 고르게 자았군. 정확히 헤아린 네 동전이다. 베틀이 고마워하고, 나 또한 그렇다.",
+        "objectives": {
+          "0": {
+            "label": "거미 비단 납품"
+          }
+        }
+      },
+      "q_prof_workorder_toolworks": {
+        "title": "공방 작업 의뢰",
+        "text": "자루에 손잡이에 개머리판까지, 나무를 마치 한물간 물건처럼 써 대는데, 절대 안 그래, 나무는 영원하다고, {playerName}. 무쇠껍질나무 통나무 여덟 개를 끌고 오면 값을 쳐 주지, 동전, 진짜 동전, 인심 쓰는 게 아니라, 약속해, 대체로.",
+        "completion": "완벽해, 완벽해, 결도 곧고 썩지도 않았어. 자, 네 동전, 봐, 나는 약속을 지키지(대체로). 나무에 발이 걸리거든 더 가져와.",
+        "objectives": {
+          "0": {
+            "label": "무쇠껍질나무 통나무 납품"
+          }
+        }
+      },
+      "q_prof_workorder_tannery": {
+        "title": "무두질장 작업 의뢰",
+        "text": "통이 비었다. 거친 가죽 여덟 장을 가져와라. 가져오면 동전.",
+        "completion": "좋은 가죽이다. 삯은 공정하다. 더 생기면 또.",
+        "objectives": {
+          "0": {
+            "label": "거친 가죽 납품"
+          }
+        }
+      },
+      "q_prof_workorder_apothecary": {
+        "title": "약방 작업 의뢰",
+        "text": "내 선반에는 금빛잎이 필요하고, 시장의 물건은 예상대로 불순물이 섞여 있다. 금빛잎 약초 여섯을 멍들지 않은 채로 가져오면 정확히 값을 치러 주겠다. 멍든 잎은 받지 않으니, 가방을 잘 간수해라.",
+        "completion": "받을 만하군. 효능도 있고, 다룸새도 제대로다. 동전 단위까지 헤아린 네 삯이다. 우쭐하지는 마라, 그건 전혀 다른 시약의 일이니.",
+        "objectives": {
+          "0": {
+            "label": "금빛잎 약초 납품"
           }
         }
       },
@@ -11017,6 +11272,106 @@ export const ko_KR: EnTranslations = {
         "sender": "길드 회관",
         "subject": "정직해진 장인의 길",
         "body": "길드 동료에게,\n\n길드가 숙련을 새로이 헤아리기로 했습니다. 모두가 처음부터 다시 오릅니다. 그대의 제작 기술과 채집 숙련도는 0으로 되돌아갔습니다.\n\n그 밖의 모든 것은 손대지 않은 채 그대의 것입니다. 제조법, 도구와 재료, 은행과 골드, 조율과 칭호, 업적과 명성, 퀘스트와 우편까지.\n\n이제 오르는 길에 눈속임은 없습니다. 값싼 일은 그대를 올려 주지 못합니다. 더 어려운 제조법, 더 풍부한 광맥, 더 깊은 물을 찾으십시오.\n\n경의를 담아,\n길드 회관"
+      },
+      "prof_tier_weaponcrafting_armorcrafting_1": {
+        "sender": "단조사 다르바",
+        "subject": "눈여겨볼 불씨 하나",
+        "body": "네 주 전공 하나가 이제 고급 등급 작업에 이르렀다는 소식이 내 화로에 닿았다. 긴 오르막에서 가장 낮은 디딤대이지만, 너는 그것을 부탁이 아니라 모루 앞에서 얻어 냈다. 불을 뜨겁게 지켜라."
+      },
+      "prof_tier_weaponcrafting_armorcrafting_2": {
+        "sender": "단조사 다르바",
+        "subject": "희귀 등급 작업, 스스로 얻은",
+        "body": "네 주 전공 하나가 희귀 등급 작업에 이르렀다고 하더군. 그 디딤대에서 어설픈 손들은 떨어져 나가고 진짜 대장장이만 남는다. 너는 아직 서 있다. 좋다."
+      },
+      "prof_tier_weaponcrafting_armorcrafting_3": {
+        "sender": "단조사 다르바",
+        "subject": "이제 쇠가 네게 응한다",
+        "body": "네 주 전공 하나가 희귀 등급을 넘어 제법 묵직한 작업에 올라섰다. 쇠는 그런 손에 응하며, 더는 맞서지 않는다. 칭찬에 팔이 물러지게 두지 마라."
+      },
+      "prof_tier_weaponcrafting_armorcrafting_4": {
+        "sender": "단조사 다르바",
+        "subject": "사다리 꼭대기 가까이",
+        "body": "네 주 전공 하나가 통달 바로 한 디딤대 아래에 서 있다. 내가 아는 손 중 이 높이에 닿은 이는 드물고, 여기서 날을 지켜 낸 이는 더 드물다. 오르막을 끝까지 올라라."
+      },
+      "prof_tier_weaponcrafting_armorcrafting_5": {
+        "sender": "단조사 다르바",
+        "subject": "마침내, 통달",
+        "body": "네 주 전공 하나가 통달에 이르렀다. 손이 오를 수 있는 가장 높은 곳이다. 나는 칭찬을 헤프게 하지 않으니 이 말은 한 번만 하겠다. 화로가 너를 자랑스러워한다. 이제 가서 불에게 새로운 것을 가르쳐라."
+      },
+      "prof_tier_leatherworking_tailoring_1": {
+        "sender": "직조공 오틸리에",
+        "subject": "고른 첫 줄",
+        "body": "네 주 전공 하나가 고급 등급 작업에 이르렀다고 길드가 적어 두었다. 수많은 줄 가운데 첫 줄에 지나지 않으나, 고르고 반듯하다. 다음 줄도 그만큼 신중히 재어라."
+      },
+      "prof_tier_leatherworking_tailoring_2": {
+        "sender": "직조공 오틸리에",
+        "subject": "잘 재어 낸 희귀 등급 작업",
+        "body": "네 주 전공 하나가 희귀 등급 작업에 올랐다. 그 자리에서는 부주의한 손이 놓친 한 땀 한 땀을 다 드러내는데, 네 손은 그렇지 않았다. 나는 조용히 흡족하다."
+      },
+      "prof_tier_leatherworking_tailoring_3": {
+        "sender": "직조공 오틸리에",
+        "subject": "무늬가 또렷해진다",
+        "body": "네 주 전공 하나가 희귀 등급을 넘어 한층 정교한 작업에 들어섰다. 이 경지의 손에는 무늬가 또렷해지고, 더는 어림하지 않아도 된다. 계속 두 번씩 재어라."
+      },
+      "prof_tier_leatherworking_tailoring_4": {
+        "sender": "직조공 오틸리에",
+        "subject": "꼭대기에서 한 줄",
+        "body": "네 주 전공 하나가 통달에서 한 줄 모자란 자리에 앉아 있다. 마지막 줄은 언제나 고르게 지키기가 가장 어렵다. 지금 서두르지 마라."
+      },
+      "prof_tier_leatherworking_tailoring_5": {
+        "sender": "직조공 오틸리에",
+        "subject": "마지막 한 땀",
+        "body": "네 주 전공 하나가 통달에 이르렀다. 나는 무엇이든 그러하듯 네 솜씨를 두 번 재었고, 흔들림이 없었다. 마지막 한 땀을 이토록 깔끔하게 매듭짓는 손은 드물다. 나는 자랑스럽고, 그런 말을 가볍게 하지 않는다."
+      },
+      "prof_tier_alchemy_cooking_1": {
+        "sender": "요리사 말로우",
+        "subject": "앞날의 맛보기",
+        "body": "자네 주 전공 하나가 고급 등급 작업에 이르렀다는 소식이 내 주방까지 흘러왔네. 첫 맛일 뿐 그 이상은 아니지만, 기대할 만한 맛이야. 냄비를 계속 저어 두게."
+      },
+      "prof_tier_alchemy_cooking_2": {
+        "sender": "요리사 말로우",
+        "subject": "희귀 등급 작업, 눌어붙은 자리 하나 없이",
+        "body": "자네 주 전공 하나가 뭉근히 끓어 희귀 등급 작업까지 올랐다더군. 그 불에서 대부분의 요리사는 음식을 태워 먹는데, 자네는 그러지 않았어. 좀 앉게, 다만 오래는 말고."
+      },
+      "prof_tier_alchemy_cooking_3": {
+        "sender": "요리사 말로우",
+        "subject": "이제야 제대로 요리로군",
+        "body": "자네 주 전공 하나가 보글보글 희귀 등급을 넘어 진짜 깊은 맛에 들어섰네. 흔히들 말하듯, 이제야 제대로 요리로군. 대담하게 간을 맞추고 계속 맛을 보게."
+      },
+      "prof_tier_alchemy_cooking_4": {
+        "sender": "요리사 말로우",
+        "subject": "잔칫상에서 한 코스 모자란",
+        "body": "자네 주 전공 하나가 통달에서 딱 한 코스 모자라네. 마지막 한 코스는 언제나 가장 진하고, 또 넘치게 하기 가장 쉽지. 국자를 쥔 손을 흔들리지 말게."
+      },
+      "prof_tier_alchemy_cooking_5": {
+        "sender": "요리사 말로우",
+        "subject": "통달, 뜨겁게 차려 낸",
+        "body": "자네 주 전공 하나가 통달에 이르렀네. 온 식료품 창고에서 가장 높은 선반이지. 나야 누구든 먹이지만, 요리로 여기까지 올라오는 이는 드물어. 정말로, 자네가 자랑스럽네. 이제 가서 식탁 앞에서 눈물 쏟게 할 무언가를 만들어 보게."
+      },
+      "prof_tier_engineering_alchemy_1": {
+        "sender": "땜장이 기즐",
+        "subject": "첫 불꽃이야, 하",
+        "body": "어이, 숫자가 그러는데 네 주 전공 하나가 방금 고급 등급 작업을 찍었대, 별거 아냐, 쬐끄맣지, 그래도 팡 터졌잖아, 응? 첫 불꽃이 늘 제일 귀엽지. 불꽃 더. 가."
+      },
+      "prof_tier_engineering_alchemy_2": {
+        "sender": "땜장이 기즐",
+        "subject": "희귀, 오, 희귀",
+        "body": "네 주 전공 하나가 희귀 등급 작업까지 올랐다더라, 그리고 희귀부터가 제대로 위험해지기 시작하는 데야(좋은 쪽으로). 대부분은 재밌어지기 전에 그만두거든. 넌 아니야. 하."
+      },
+      "prof_tier_engineering_alchemy_3": {
+        "sender": "땜장이 기즐",
+        "subject": "이제부터 요란해진다",
+        "body": "네 주 전공 하나가 희귀 등급을 뻥 뚫고 진지한 영역으로 넘어갔어, 오 여기서부터 요란해지는 거야. 지금 멈추지 마, 뭘 하든, 기세가 전부야, 도화선도 그렇고."
+      },
+      "prof_tier_engineering_alchemy_4": {
+        "sender": "땜장이 기즐",
+        "subject": "꼭대기에서 한 디딤대, 딱 하나",
+        "body": "네 주 전공 하나가 통달 바로 한 디딤대 아래야, 하나, 딱 하나, 웅웅 울리는 거 느껴져? 마지막 한 걸음이 제일 큰 폭발이야. 눈 깜빡이지 마."
+      },
+      "prof_tier_engineering_alchemy_5": {
+        "sender": "땜장이 기즐",
+        "subject": "통달이야, 콰광",
+        "body": "네 주 전공 하나가 통달을 찍었어, 바로 그 꼭대기, 콰광, 사다리 통째로, 끝. 나는 칭찬 같은 거 안 나눠 줘, 도화선을 나눠 주지, 그런데 여기, 둘 다 받아. 넌 눈부시고 살짝 무서워. 가서 산들이 조마조마하게 만들어."
       }
     },
     "itemSets": {

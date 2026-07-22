@@ -9,7 +9,7 @@
 // 20 Hz tick loop (sim.ts `tick()`, next to `updateRested`), so a grant only
 // ever takes effect on the deterministic tick path, never out of band.
 
-import { bagCapacity } from '../bags';
+import { bagCapacity, countFit } from '../bags';
 import { GATHER_NODES } from '../content/gather_nodes';
 import {
   GATHERING_PROFESSION_IDS,
@@ -451,21 +451,29 @@ export function completeGatherCast(ctx: SimContext, p: Entity, meta: PlayerMeta)
     return fit;
   };
   if (signed) {
-    // Signed instances never merge into stacks (bags.ts addStacked, #1165):
-    // each unit is its own slot, so EVERY unit (the first included) needs a
-    // genuinely free slot and an oversized rare-event windfall truncates
-    // instead of overflowing the bag. The fungible pre-gate above can pass on
-    // stack top-up room alone, so when no free slot exists the yield falls
-    // back to an unsigned top-up grant (the truncation contract wins over
-    // signing in that self-inflicted edge; the crossing-case pin lives in
+    // A signed instance merges only into a byte-equal same-signer stack
+    // (identical-payload stacking, Phase 12d; never a plain stack, #1165):
+    // countFit with the payload counts that merge room plus free slots, so a
+    // rare-event windfall lands whole once a single slot (or same-signer
+    // stack room) is open, where the pre-12d contract needed one free slot
+    // per unit. The fungible pre-gate above can pass on plain-stack top-up
+    // room alone, so when no signed unit fits the yield falls back to an
+    // unsigned top-up grant (the truncation contract wins over signing in
+    // that self-inflicted edge; the crossing-case pin lives in
     // tests/gather_rare_events.test.ts).
     const capacity = bagCapacity(meta.bags);
-    for (let i = 0; i < qty; i++) {
-      if (meta.inventory.length >= capacity) break;
+    const fit = countFit(meta.inventory, capacity, itemId, qty, { signer: meta.name });
+    for (let i = 0; i < fit; i++) {
       ctx.addItemInstance(itemId, { signer: meta.name }, meta.entityId);
       grantedQty++;
     }
-    if (grantedQty === 0) grantedQty = grantFungibleFit();
+    if (grantedQty === 0) {
+      grantedQty = grantFungibleFit();
+      // Phase 12d: the yield survived as a plain top-up but its signature did
+      // not; tell the player (a text-free personal event, the gatherDenied
+      // idiom; one signed batch per harvest, so no dedupe flag is needed).
+      ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'node', lost: 'mark' });
+    }
   } else {
     grantedQty = grantFungibleFit();
   }

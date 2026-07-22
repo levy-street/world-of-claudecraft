@@ -313,7 +313,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 416,
-      "state": "9d57a664",
+      "state": "6ccb5f6b",
       "events": "0cbf2fd6",
       "rng": {
         "draws": 4,
@@ -401,14 +401,7 @@
               "itemId": "copper_ore"
             },
             {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "ironbark_log"
-            },
-            {
-              "count": 1,
+              "count": 2,
               "instance": {
                 "signer": "Adventurer"
               },
@@ -501,7 +494,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 416,
-      "state": "53af4b86",
+      "state": "28b07bab",
       "events": "317c4472",
       "rng": {
         "draws": 18,
@@ -512,7 +505,7 @@
       "tick": 1000,
       "time": 50,
       "nextId": 416,
-      "state": "76a1e70a",
+      "state": "6f87f93f",
       "events": "081d42bd",
       "rng": {
         "draws": 38,
@@ -523,7 +516,7 @@
       "tick": 1500,
       "time": 75,
       "nextId": 416,
-      "state": "bdea370c",
+      "state": "309ef361",
       "events": "44375188",
       "rng": {
         "draws": 58,
@@ -534,7 +527,7 @@
       "tick": 2000,
       "time": 100,
       "nextId": 416,
-      "state": "67d6c6b5",
+      "state": "d944a81e",
       "events": "1b048b0b",
       "rng": {
         "draws": 78,
@@ -545,7 +538,7 @@
       "tick": 2500,
       "time": 125,
       "nextId": 416,
-      "state": "6bb904b6",
+      "state": "1105c6f3",
       "events": "ad6cc66a",
       "rng": {
         "draws": 96,
@@ -556,7 +549,7 @@
       "tick": 3000,
       "time": 150,
       "nextId": 416,
-      "state": "47f7fe88",
+      "state": "04794151",
       "events": "403b75aa",
       "rng": {
         "draws": 116,
@@ -567,7 +560,7 @@
       "tick": 3500,
       "time": 175,
       "nextId": 416,
-      "state": "902f4121",
+      "state": "0af331f6",
       "events": "b886c6dd",
       "rng": {
         "draws": 136,
@@ -578,7 +571,7 @@
       "tick": 4000,
       "time": 200,
       "nextId": 416,
-      "state": "4fbbe91a",
+      "state": "daed3017",
       "events": "0c67840f",
       "rng": {
         "draws": 156,
@@ -589,7 +582,7 @@
       "tick": 4500,
       "time": 225,
       "nextId": 416,
-      "state": "8f56a928",
+      "state": "b7ee38b4",
       "events": "028d608a",
       "rng": {
         "draws": 176,
@@ -600,7 +593,7 @@
       "tick": 5000,
       "time": 250,
       "nextId": 416,
-      "state": "cfae831b",
+      "state": "ca7ccd5f",
       "events": "561d7bfa",
       "rng": {
         "draws": 194,
@@ -611,7 +604,7 @@
       "tick": 5206,
       "time": 260.3,
       "nextId": 416,
-      "state": "515ffdaf",
+      "state": "f20e894f",
       "events": "bf373fcc",
       "rng": {
         "draws": 204,
@@ -709,56 +702,14 @@
           "heroicDaily": {},
           "inventory": [
             {
-              "count": 1,
+              "count": 2,
               "instance": {
                 "signer": "Adventurer"
               },
-              "itemId": "silverleaf_herb"
+              "itemId": "ironbark_log"
             },
             {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
+              "count": 15,
               "instance": {
                 "signer": "Adventurer"
               },
@@ -856,7 +807,7 @@
       "tick": 5208,
       "time": 260.4,
       "nextId": 416,
-      "state": "c100d106",
+      "state": "12d1c916",
       "events": "741638a5",
       "rng": {
         "draws": 204,
@@ -954,56 +905,14 @@
           "heroicDaily": {},
           "inventory": [
             {
-              "count": 1,
+              "count": 2,
               "instance": {
                 "signer": "Adventurer"
               },
-              "itemId": "silverleaf_herb"
+              "itemId": "ironbark_log"
             },
             {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
-              "instance": {
-                "signer": "Adventurer"
-              },
-              "itemId": "silverleaf_herb"
-            },
-            {
-              "count": 1,
+              "count": 15,
               "instance": {
                 "signer": "Adventurer"
               },

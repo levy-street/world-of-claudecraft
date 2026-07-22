@@ -5,13 +5,19 @@
 //
 // Loading contract: fetches kick off at module import and register with the
 // preload registry; main.ts awaits assetsReady() before the Renderer exists,
-// so everything here can assume resolved GLTFs synchronously afterwards.
+// so everything here can assume resolved GLTFs synchronously afterwards. The
+// landing character-creation preview is the one exception: it awaits the
+// narrower charactersReady() below instead (this file's boot GLBs + skin
+// atlases only, with its own retries), since gating it on the site-wide
+// assetsReady() left an unrelated preload failure anywhere on the site
+// permanently blanking it on a cold, first-visit cache.
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
+import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { loadGltf, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { addRimGlow, GFX } from '../gfx';
@@ -477,6 +483,45 @@ for (const [key, list] of Object.entries(SKINS)) {
   for (const u of list) if (u) bootSkinUrls.add(u);
 }
 for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
+
+/** Resolve once every boot-time character GLB + skin atlas is cached, retrying
+ *  whatever is still missing instead of depending on the site-wide assetsReady()
+ *  barrier. That barrier is one shared promise over EVERY registered preload
+ *  (terrain, dungeon, foliage, ...): an unrelated failure there must not sink the
+ *  character-creation preview, and loadGltf/loadTexture already evict a failed
+ *  URL from their own cache on rejection, so a fresh call here genuinely
+ *  re-fetches rather than re-awaiting a permanently rejected promise. A transient
+ *  failure is far more likely on a cold, first-visit cache (no warm HTTP cache to
+ *  fall back on), which is exactly when this matters most.
+ *
+ *  Each outer attempt here already follows loadGltf's own three inner attempts
+ *  (400/800ms backoff, see load_retry.ts), so a URL that reaches this loop's
+ *  retry has already spent that whole window failing. Waiting again before the
+ *  next outer attempt (same schedule, reused) widens the retry window instead
+ *  of hammering a still-flaky connection three more times back to back in one
+ *  tick. */
+export async function charactersReady(maxAttempts = 3): Promise<void> {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const missingGltf = preloadUrls.filter((u) => !gltfByUrl.has(assetUrl(u)));
+    const missingSkins = [...bootSkinUrls].filter((u) => !skinTexByUrl.has(u));
+    if (missingGltf.length === 0 && missingSkins.length === 0) return;
+    if (attempt > 1) {
+      await new Promise((resolve) => setTimeout(resolve, gltfRetryDelayMs(attempt)));
+    }
+    const results = await Promise.allSettled([
+      ...missingGltf.map((u) => loadGltf(u).then((g) => void gltfByUrl.set(u, g))),
+      ...missingSkins.map((u) => loadSkinTexInto(u, skinTexByUrl)),
+    ]);
+    if (attempt === maxAttempts) {
+      const failed = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
+      if (failed.length > 0) {
+        throw new Error(
+          `character preview assets failed to load (${failed.length}): ${failed.map((f) => String(f.reason)).join('; ')}`,
+        );
+      }
+    }
+  }
+}
 
 /** Resolved skin texture for a visual key + skin index, or null for the model's
  *  embedded default (index 0, unknown key, or an atlas that is not loaded yet). */

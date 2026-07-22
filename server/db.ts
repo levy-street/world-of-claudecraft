@@ -178,6 +178,24 @@ const LIFETIME_XP_EXPR = "((state->>'lifetimeXp')::bigint)";
 export const ELIGIBLE_ACCOUNT_SQL =
   'a.banned_at IS NULL AND (a.suspended_until IS NULL OR a.suspended_until <= now())';
 
+// Additive scope-domain hardening for auth_tokens. NOT VALID avoids a table
+// scan and tolerates any historical bad rows during deploy, while PostgreSQL
+// still enforces the constraint for every new or updated row. Runtime token
+// decoding independently fails closed on historical values outside this set.
+// Exported so the opt-in real-Postgres migration test executes this exact DDL.
+export const AUTH_TOKENS_SCOPE_CONSTRAINT_SQL = `DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'auth_tokens_scope_check'
+      AND conrelid = 'auth_tokens'::regclass
+  ) THEN
+    ALTER TABLE auth_tokens
+      ADD CONSTRAINT auth_tokens_scope_check CHECK (scope IN ('full', 'read')) NOT VALID;
+  END IF;
+END $$;`;
+
 export const SCHEMA = `
 CREATE TABLE IF NOT EXISTS accounts (
   id SERIAL PRIMARY KEY,
@@ -200,6 +218,7 @@ CREATE INDEX IF NOT EXISTS auth_tokens_account ON auth_tokens(account_id);
 -- token in the account portal so a user can revoke a specific one.
 ALTER TABLE auth_tokens ADD COLUMN IF NOT EXISTS scope TEXT NOT NULL DEFAULT 'full';
 ALTER TABLE auth_tokens ADD COLUMN IF NOT EXISTS label TEXT;
+${AUTH_TOKENS_SCOPE_CONSTRAINT_SQL}
 CREATE TABLE IF NOT EXISTS characters (
   id SERIAL PRIMARY KEY,
   account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
@@ -1492,18 +1511,11 @@ export async function saveToken(
   );
 }
 
-export async function accountForToken(token: string): Promise<number | null> {
-  const res = await pool.query(
-    'SELECT account_id FROM auth_tokens WHERE token = $1 AND expires_at > now()',
-    [token],
-  );
-  return res.rows[0]?.account_id ?? null;
-}
-
-// Account + scope for a live token. Mirrors accountForToken but also returns the
-// token's scope so read routes can accept 'read'|'full' while mutating routes
-// (via bearerActiveAccount) reject anything that is not 'full'. Old tokens
-// predating the scope column read as 'full' via the column default.
+// Account + scope for a live token. Every caller receives the authority context:
+// read routes may accept both scopes, while mutation and privileged boundaries
+// require exact full scope. Unknown database values fail closed instead of being
+// promoted to full authority. Such a historical token also cannot authenticate
+// its own logout; account-level revocation remains available to clear the row.
 export async function accountAndScopeForToken(
   token: string,
 ): Promise<{ accountId: number; scope: TokenScope } | null> {
@@ -1513,7 +1525,8 @@ export async function accountAndScopeForToken(
   );
   const row = res.rows[0];
   if (!row) return null;
-  return { accountId: row.account_id, scope: row.scope === 'read' ? 'read' : 'full' };
+  if (row.scope !== 'full' && row.scope !== 'read') return null;
+  return { accountId: row.account_id, scope: row.scope };
 }
 
 export interface AccountInfoRow {

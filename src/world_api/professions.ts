@@ -31,6 +31,15 @@ export interface CraftingIdentityView {
   // appearing here; full knownness is this set plus the empty-acquisition arm
   // of src/sim/professions/crafting.ts isRecipeKnown over static content.
   knownRecipes: readonly string[];
+  // Repeatable work orders currently inside their cooldown window (Professions
+  // 2.0 Phase 14), SORTED so the JSON form is a stable cprof signature. The
+  // SERVER computes this against ITS tickCount (the activeMobileStationCraft
+  // precedent: tick-domain state is resolved server-side, never predicted by the
+  // client) and it rides the existing cprof delta; the online client feeds it
+  // into computeQuestState so a work order on cooldown shows unavailable there
+  // too. Offline the Sim ignores this field and re-derives the set from live
+  // PlayerMeta.questCadence. Absent on a pre-Phase-14 server payload.
+  cadenceBlockedQuests?: readonly string[];
 }
 
 // Static content read: the common-tier recipe list (issue #1127). A plain
@@ -80,6 +89,52 @@ export interface MasterworkView {
   crafter: number;
 }
 
+// Salvage-result surface (Professions 2.0 Phase 13): the outcome of one
+// salvageItem command, mirrored from the server's `salvageResult` event (and
+// the `salv` self-delta) so the client renders a toast/log without deciding the
+// outcome itself. Ids + values only, string-free per the seam rule. Shape
+// matches src/sim/professions/salvage.ts SalvageResult. `null` until the first
+// salvage attempt of the session.
+export interface SalvageResultView {
+  ok: boolean;
+  itemId: string;
+  materialItemId?: string;
+  count?: number;
+  reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled';
+}
+
+// Disenchant-result surface (Professions 2.0 Phase 13): mirrors
+// src/sim/professions/enchanting.ts DisenchantResult, including the typed
+// bind-on-trade secondary a rare-or-better disenchant also yields
+// (secondaryItemId/secondaryCount, absent on every sub-rare success and on a
+// rare+ piece with no typed material). `null` until the first disenchant attempt
+// of the session.
+export interface DisenchantResultView {
+  ok: boolean;
+  itemId: string;
+  materialItemId?: string;
+  count?: number;
+  secondaryItemId?: string;
+  secondaryCount?: number;
+  reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled';
+}
+
+// Apply-enchant-result surface (Professions 2.0 Phase 13): mirrors
+// src/sim/professions/enchanting.ts ApplyEnchantResult. `null` until the first
+// apply-enchant attempt of the session.
+export interface ApplyEnchantResultView {
+  ok: boolean;
+  itemId: string;
+  enchantId: string;
+  reason?:
+    | 'unknown_item'
+    | 'unknown_enchant'
+    | 'wrong_slot'
+    | 'not_held'
+    | 'insufficient_materials'
+    | 'throttled';
+}
+
 // The professions read-surface facet (#1164, extended by #1121/#1127/#1129). `Sim`
 // (src/sim/sim.ts `professionsState`/`professionsStateFor`) and `ClientWorld`
 // (src/net/online.ts, mirrored from the `prof` wire delta) both implement
@@ -104,7 +159,14 @@ export interface IWorldProfessions {
   recipeList: readonly RecipeDef[];
   lastCraftResult: CraftResultView | null;
   lastMasterwork: MasterworkView | null;
-  craftItem(recipeId: string): void;
+  // `commission` (Professions 2.0 Phase 14b): the per-craft Maker's Bond
+  // opt-in. A boolean flag ONLY (the standing wire invariant: no command
+  // ingests a client-supplied ItemInstancePayload; the bindOnTrade arm and
+  // the boundTo stamp are minted server-side). Honored solely for the
+  // ruled-in equipment output kinds (src/sim/professions/commission.ts
+  // isCommissionEligible); silently ignored otherwise. Omitted/false sends
+  // a wire message byte-identical to the pre-phase form.
+  craftItem(recipeId: string, commission?: boolean): void;
   craftingIdentity: CraftingIdentityView;
   // Active archetype identity (#1129). null before the acceptance quest.
   activeArchetype: string | null;
@@ -160,4 +222,33 @@ export interface IWorldProfessions {
   // client never predicts placement or reasons about tick domains). The slot
   // is transient either way: never serialized into the character save.
   activeMobileStationCraft: string | null;
+  // Enchanting profession commands (Professions 2.0 Phase 13): disenchant a held
+  // eligible weapon/armor piece into arcane materials, apply an enchant to a held
+  // copy, or salvage a held piece into generic materials. Server-authoritative:
+  // Sim re-validates ownership/eligibility/throttle inside the resolvers
+  // (src/sim/professions/enchanting.ts and salvage.ts) and nothing is trusted from
+  // the client; ClientWorld sends the disenchant_item/apply_enchant/salvage_item
+  // wire command and never decides the outcome.
+  disenchantItem(itemId: string): void;
+  applyEnchant(itemId: string, enchantId: string): void;
+  salvageItem(itemId: string): void;
+  // Maker's Bond unbind service (Professions 2.0 Phase 14b): clear the
+  // boundTo lock on ONE held bound copy of `itemId`, for the tier-scaled
+  // gold fee, while standing at any static crafting station (every station
+  // master offers the service). Server-authoritative: Sim validates via
+  // src/sim/professions/commission.ts resolveUnbind (eligible equipment
+  // kind, a bound copy held, station range, fee) and charges exactly once
+  // on success; ClientWorld sends the unbind_item command and never decides
+  // the outcome. The result surfaces through the personal text-free
+  // `unbindResult` event; the cleared payload converges via the self
+  // inventory mirror.
+  unbindItem(itemId: string): void;
+  // The local viewer's most recent enchanting-action outcomes, mirrored from the
+  // pid-scoped disenchantResult/enchantResult/salvageResult event and the
+  // denc/ench/salv self-delta (both feed the same field: the event is the
+  // immediacy arm, the delta the convergence arm). `null` before the first such
+  // attempt this session.
+  lastDisenchantResult: DisenchantResultView | null;
+  lastEnchantResult: ApplyEnchantResultView | null;
+  lastSalvageResult: SalvageResultView | null;
 }

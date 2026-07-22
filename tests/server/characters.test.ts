@@ -798,6 +798,96 @@ describe('rename handler', () => {
     expect(saveMail).not.toHaveBeenCalled();
   });
 
+  it("sweeps the renamed character's own instance signers and persists the swept blob", async () => {
+    // Phase 12d: the RETURNING row carries the persisted blob; the handler
+    // rewrites ONLY the character's own old-name signers across bags, bank,
+    // and the equipped-instance map, leaves foreign-signed copies alone,
+    // keeps a count-3 same-signer stack as one slot at count 3, and saves
+    // the swept state back before responding.
+    const blob = st({
+      inventory: [
+        { itemId: 'bone_fragments', count: 3, instance: { signer: 'Oldname' } },
+        { itemId: 'bone_fragments', count: 1, instance: { signer: 'SomeoneElse' } },
+      ],
+      bank: {
+        inventory: [{ itemId: 'iron_bar', count: 1, instance: { signer: 'Oldname' } }],
+        purchasedSlots: 0,
+        bonusSlots: 0,
+      },
+      equipmentInstance: { chest: { signer: 'Oldname', enchant: 'ench_minor_stamina' } },
+    });
+    const renamed = charRow({ id: 5, name: 'Newname', level: 8, force_rename: false, state: blob });
+    const saveCharacterState = vi.fn(
+      async (_characterId: number, _level: number, _state: CharacterState) => true,
+    );
+    setCharactersDbForTests({ renameCharacter: async () => renamed, saveCharacterState });
+    installRuntime({ isCharacterOnline: () => false });
+
+    const character = charRow({ id: 5, name: 'Oldname', level: 8, force_rename: true });
+    const res = await callHandler('POST', '/api/characters/:id/rename', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(character),
+      body: { name: 'Newname' },
+    });
+    expect(res.status).toBe(200);
+    expect(saveCharacterState).toHaveBeenCalledTimes(1);
+    expect(saveCharacterState).toHaveBeenCalledWith(5, 8, blob);
+    const saved = saveCharacterState.mock.calls[0][2];
+    expect(saved.inventory).toEqual([
+      { itemId: 'bone_fragments', count: 3, instance: { signer: 'Newname' } },
+      { itemId: 'bone_fragments', count: 1, instance: { signer: 'SomeoneElse' } },
+    ]);
+    expect(saved.bank?.inventory).toEqual([
+      { itemId: 'iron_bar', count: 1, instance: { signer: 'Newname' } },
+    ]);
+    expect(saved.equipmentInstance).toEqual({
+      chest: { signer: 'Newname', enchant: 'ench_minor_stamina' },
+    });
+  });
+
+  it('skips the state save when no held instance carried the old name', async () => {
+    const blob = st({
+      inventory: [{ itemId: 'bone_fragments', count: 1, instance: { signer: 'SomeoneElse' } }],
+    });
+    const renamed = charRow({ id: 5, name: 'Newname', force_rename: false, state: blob });
+    const saveCharacterState = vi.fn(
+      async (_characterId: number, _level: number, _state: CharacterState) => true,
+    );
+    setCharactersDbForTests({ renameCharacter: async () => renamed, saveCharacterState });
+    installRuntime({ isCharacterOnline: () => false });
+
+    const character = charRow({ id: 5, name: 'Oldname', force_rename: true });
+    const res = await callHandler('POST', '/api/characters/:id/rename', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(character),
+      body: { name: 'Newname' },
+    });
+    expect(res.status).toBe(200);
+    expect(saveCharacterState).not.toHaveBeenCalled();
+    // The foreign-signed copy passed through the no-op sweep untouched.
+    expect(blob.inventory).toEqual([
+      { itemId: 'bone_fragments', count: 1, instance: { signer: 'SomeoneElse' } },
+    ]);
+  });
+
+  it('skips the state save when the renamed row carries no state blob', async () => {
+    const renamed = charRow({ id: 5, name: 'Newname', force_rename: false, state: null });
+    const saveCharacterState = vi.fn(
+      async (_characterId: number, _level: number, _state: CharacterState) => true,
+    );
+    setCharactersDbForTests({ renameCharacter: async () => renamed, saveCharacterState });
+    installRuntime({ isCharacterOnline: () => false });
+
+    const character = charRow({ id: 5, name: 'Oldname', force_rename: true });
+    const res = await callHandler('POST', '/api/characters/:id/rename', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(character),
+      body: { name: 'Newname' },
+    });
+    expect(res.status).toBe(200);
+    expect(saveCharacterState).not.toHaveBeenCalled();
+  });
+
   it('400s an invalid new name (normalizeCharName -> null) before the force_rename gate', async () => {
     // The owned character IS force_rename-flagged, so a bad name must be rejected on
     // its own merits (400), never let through by the flag. renameCharacter must not run.

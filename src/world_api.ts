@@ -442,6 +442,18 @@ export const COMMAND_NAMES = [
   // Per-character action-bar layout persistence: the owning client uploads its
   // full arranged layout (debounced) so it restores at login on any device.
   'save_hotbar_layout',
+  // Enchanting profession actions (Professions 2.0 Phase 13): disenchant a held
+  // piece into arcane materials, apply an enchant to a held copy, or salvage a
+  // held piece into generic materials (Sim.disenchantItem/applyEnchant/salvageItem
+  // via src/sim/professions/enchanting.ts and salvage.ts).
+  'disenchant_item',
+  'apply_enchant',
+  'salvage_item',
+  // Maker's Bond unbind service (Professions 2.0 Phase 14b): clear the
+  // boundTo trade lock on one held bound commission piece for the
+  // tier-scaled gold fee (Sim.unbindItem via src/sim/professions/
+  // commission.ts).
+  'unbind_item',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
