@@ -159,6 +159,13 @@ export type ProcTrigger =
   | { on: 'shieldConsumed'; ability: string }
   | { on: 'hotExpired'; ability: string }
   | { on: 'bigHitTaken'; hpFrac: number; icd: number }
+  | {
+      on: 'meleeHit';
+      abilities: string[];
+      auraKind?: AuraKind;
+      icd?: number;
+      chance?: number;
+    }
   | { on: 'meleeSwingWhile'; auraKind: string; icd?: number; chance?: number }
   | { on: 'thornsReflect'; ability: string };
 
@@ -171,7 +178,12 @@ export type ProcResponse =
       costPct?: number;
     }
   | { kind: 'cooldownRefund'; ability: string; seconds: number | 'reset' }
-  | { kind: 'resource'; amount: number; resourceType?: ResourceType }
+  | ({ kind: 'resource'; resourceType?: ResourceType } & (
+      | { amount: number; pctMax?: never }
+      | { amount?: never; pctMax: number }
+    ))
+  | { kind: 'stackAura'; aura: AuraKind; maxStacks: number; duration: number }
+  | { kind: 'addAuraCharges'; ability: string; amount: number; maxCharges: number }
   // The pct-of-max-health variants (phase-2 defensive pass) override the flat
   // number when present. Most scale with the wearer; source scaling is for
   // shields whose proc owner can differ from the protected ally.
@@ -180,6 +192,7 @@ export type ProcResponse =
       amount?: number;
       amountPctMaxHp?: number;
       amountPctSourceMaxHp?: number;
+      applyTo?: 'self';
     }
   | { kind: 'absorb'; amount?: number; amountPctMaxHp?: number; duration: number; name: string }
   | {
@@ -219,6 +232,7 @@ export interface SpecDef {
   icon: string;
   description: string;
   signature: string;
+  extraGrants?: string[];
   mastery: { name: string; description: string; effect: TalentEffect };
 }
 
@@ -686,6 +700,7 @@ export function computeTalentModifiers(
     modifiers.spec = spec.id;
     modifiers.role = spec.role;
     modifiers.grants.push({ ability: spec.signature, rank: 1 });
+    for (const ability of spec.extraGrants ?? []) modifiers.grants.push({ ability, rank: 1 });
     accumulateTalentEffect(modifiers, spec.mastery.effect, Math.min(1, Math.max(0, level) / 20));
     accumulateTalentEffect(modifiers, specBaselineFor(cls, spec.id));
   }

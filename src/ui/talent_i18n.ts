@@ -9130,6 +9130,8 @@ function procTriggerDescription(
       return `${abilityName(trigger.ability)}: 0 s`;
     case 'bigHitTaken':
       return `>= ${formatPercent(trigger.hpFrac, lang)} ${text.statLabels.maxHpPct} (${seconds(trigger.icd, lang)} ${text.statLabels.cooldown})`;
+    case 'meleeHit':
+      return `${text.statLabels.meleeDmgPct}: ${abilityList(trigger.abilities)}`;
     case 'meleeSwingWhile':
       return `${text.statLabels.meleeDmgPct} @ ${t('hudChrome.auraEffect.imbue')}`;
     case 'thornsReflect':
@@ -9155,7 +9157,15 @@ function procResponseDescription(
     case 'cooldownRefund':
       return `${abilityName(response.ability)}: -${response.seconds === 'reset' ? formatPercent(1, lang) : seconds(response.seconds, lang)} ${text.statLabels.cooldown}`;
     case 'resource':
-      return `+${formatNumber(response.amount, lang)} ${t('classDetails.labels.resource')}`;
+      return `+${
+        response.amount !== undefined
+          ? formatNumber(response.amount, lang)
+          : formatPercent(response.pctMax, lang)
+      } ${t('classDetails.labels.resource')}`;
+    case 'stackAura':
+      return `x${formatNumber(response.maxStacks, lang)} (${seconds(response.duration, lang)})`;
+    case 'addAuraCharges':
+      return `${abilityName(response.ability)}: +${formatNumber(response.amount, lang)}`;
     case 'heal': {
       const healValue =
         response.amountPctSourceMaxHp !== undefined
