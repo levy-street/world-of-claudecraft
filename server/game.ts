@@ -6209,6 +6209,8 @@ export class GameServer {
       // and the chat tag remains a pure authority signal. Allocates only for
       // staff senders.
       const role = this.sim.entities.get(ev.fromPid)?.discordRole;
+      // `flair` may be undefined here; spreading undefined is a spec-defined
+      // no-op, so a role-only sender yields a clean { role } object.
       if (role && specialRoleChatTag(role)) ev.flair = { ...flair, role };
       else if (flair) ev.flair = flair;
     }
