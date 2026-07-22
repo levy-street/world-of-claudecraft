@@ -238,15 +238,26 @@ describe('GET /api/me/characters (read-scoped my-characters list)', () => {
   it('is gated by bearerReadAccount and reuses the shared list payload', () => {
     const idx = MAIN.indexOf("url === '/api/me/characters'");
     expect(idx).toBeGreaterThanOrEqual(0);
-    const block = MAIN.slice(idx, idx + 250);
+    // Bound the block at the NEXT route branch (not a fixed width): the list
+    // call is multi-line since it gained the Armory loadout argument, and the
+    // bearerActiveAccount exclusion below must not swallow the next route.
+    const end = MAIN.indexOf('if (url ===', idx + 1);
+    const block = MAIN.slice(idx, end === -1 ? idx + 500 : end);
     expect(block).toContain('bearerReadAccount(req, res)');
-    expect(block).toContain('characterListPayload(await listCharacters(accountId))');
+    // The list payload call gained the account Armory loadout argument (the
+    // char-select preview resolves the active weapon skin per character).
+    expect(block).toContain('characterListPayload(');
+    expect(block).toContain('await listCharacters(accountId)');
+    expect(block).toContain('(await loadAccountCosmetics(accountId)).weaponSkinLoadout');
     expect(block).not.toContain('bearerActiveAccount');
   });
 
   it('returns the same shape as GET /api/characters (both call characterListPayload)', () => {
-    const calls = (MAIN.match(/characterListPayload\(await listCharacters\(accountId\)\)/g) ?? [])
-      .length;
+    const calls = (
+      MAIN.match(
+        /characterListPayload\(\s*await listCharacters\(accountId\),\s*\(await loadAccountCosmetics\(accountId\)\)\.weaponSkinLoadout,\s*\)/g,
+      ) ?? []
+    ).length;
     expect(calls).toBe(2); // /api/me/characters and the full-session GET /api/characters
   });
 
