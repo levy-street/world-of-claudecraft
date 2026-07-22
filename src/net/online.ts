@@ -170,6 +170,9 @@ export interface CharacterSummary {
   skinCatalog?: 'class' | 'mech';
   mainhandItemId?: string | null;
   offhandItemId?: string | null;
+  /** The account's active Armory weapon skin for this character (server-resolved
+   *  per class + mainhand). Optional for back-compat like the fields above. */
+  weaponSkinId?: string | null;
 }
 
 function stringList(value: unknown): string[] {

@@ -43,6 +43,7 @@
 
 import type * as http from 'node:http';
 import { rekeyInstanceSigner } from '../src/sim/character_rename';
+import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
 import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { normalizeCharName, offensiveName } from './auth';
@@ -57,6 +58,7 @@ import {
   lifetimeXpRankForCharacter,
   lifetimeXpStanding,
   listCharacters,
+  loadAccountCosmetics,
   moderationStatusForAccount,
   reclaimDeactivatedName,
   renameCharacter,
@@ -195,6 +197,7 @@ function useRuntime(): CharactersRuntime {
 
 const REAL_CHARACTERS_DB = {
   accountAndScopeForToken,
+  loadAccountCosmetics,
   moderationStatusForAccount,
   listCharacters,
   getCharacter,
@@ -247,6 +250,7 @@ function toSheetRank(rank: { rank: number; total: number } | null): SheetRank | 
 function buildCharacterList(
   chars: CharacterRow[],
   isOnline: (characterId: number) => boolean,
+  weaponSkinLoadout: Record<string, string>,
 ): unknown {
   return {
     realm: REALM,
@@ -265,6 +269,15 @@ function buildCharacterList(
       skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
       mainhandItemId: c.state?.equipment?.mainhand ?? null,
       offhandItemId: c.state?.equipment?.offhand ?? null,
+      // The account's active Armory weapon skin for THIS character's class and
+      // held mainhand (the same shared rule the world and paperdoll use), so
+      // the char-select turntable matches the in-world render. Loadout is
+      // account state; resolution is per character.
+      weaponSkinId: resolveActiveWeaponSkin(
+        c.class,
+        c.state?.equipment?.mainhand ?? null,
+        weaponSkinLoadout,
+      ),
     })),
   };
 }
@@ -345,14 +358,16 @@ function requireOwnedCharacter(notFoundBody: Record<string, unknown>): Middlewar
 async function meCharactersHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
   const chars = await charactersDb.listCharacters(ctxAccountId(ctx));
-  json(ctx.res, 200, buildCharacterList(chars, rt.isCharacterOnline));
+  const cosmetics = await charactersDb.loadAccountCosmetics(ctxAccountId(ctx));
+  json(ctx.res, 200, buildCharacterList(chars, rt.isCharacterOnline, cosmetics.weaponSkinLoadout));
 }
 
 /** GET /api/characters: full-session list (byte-identical body to me/characters). */
 async function listCharactersHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
   const chars = await charactersDb.listCharacters(ctxAccountId(ctx));
-  json(ctx.res, 200, buildCharacterList(chars, rt.isCharacterOnline));
+  const cosmetics = await charactersDb.loadAccountCosmetics(ctxAccountId(ctx));
+  json(ctx.res, 200, buildCharacterList(chars, rt.isCharacterOnline, cosmetics.weaponSkinLoadout));
 }
 
 /** POST /api/characters: validate, create the capped character, reclaim a freed name once. */

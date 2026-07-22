@@ -5175,6 +5175,7 @@ function charselectAppearance(c: CharacterSummary): PreviewAppearance {
     skinCatalog: c.skinCatalog ?? 'class',
     mainhandItemId: c.mainhandItemId ?? null,
     offhandItemId: c.offhandItemId ?? null,
+    weaponSkinId: c.weaponSkinId ?? null,
   };
 }
 

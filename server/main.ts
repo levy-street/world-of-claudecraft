@@ -6,6 +6,7 @@ import * as http from 'node:http';
 import * as path from 'node:path';
 import { WebSocketServer } from 'ws';
 import { DEEDS } from '../src/sim/content/deeds';
+import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
@@ -942,7 +943,10 @@ function toSheetRank(rank: { rank: number; total: number } | null): SheetRank | 
 
 // The character-list response shared by the full-session GET /api/characters and
 // the read-scoped GET /api/me/characters, so both stay byte-identical.
-function characterListPayload(chars: CharacterRow[]): {
+function characterListPayload(
+  chars: CharacterRow[],
+  weaponSkinLoadout: Record<string, string>,
+): {
   realm: string;
   characters: {
     id: number;
@@ -957,6 +961,7 @@ function characterListPayload(chars: CharacterRow[]): {
     skinCatalog: 'class' | 'mech';
     mainhandItemId: string | null;
     offhandItemId: string | null;
+    weaponSkinId: string | null;
   }[];
 } {
   return {
@@ -976,6 +981,13 @@ function characterListPayload(chars: CharacterRow[]): {
       skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
       mainhandItemId: c.state?.equipment?.mainhand ?? null,
       offhandItemId: c.state?.equipment?.offhand ?? null,
+      // The account's active Armory skin for this character's class + mainhand
+      // (kept byte-identical with the RouteDef arm's buildCharacterList).
+      weaponSkinId: resolveActiveWeaponSkin(
+        c.class,
+        c.state?.equipment?.mainhand ?? null,
+        weaponSkinLoadout,
+      ),
     })),
   };
 }
@@ -1471,13 +1483,27 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'GET' && url === '/api/me/characters') {
       const accountId = await bearerReadAccount(req, res);
       if (accountId === null) return;
-      return json(res, 200, characterListPayload(await listCharacters(accountId)));
+      return json(
+        res,
+        200,
+        characterListPayload(
+          await listCharacters(accountId),
+          (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
+        ),
+      );
     }
     if (url === '/api/characters') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
       if (req.method === 'GET') {
-        return json(res, 200, characterListPayload(await listCharacters(accountId)));
+        return json(
+          res,
+          200,
+          characterListPayload(
+            await listCharacters(accountId),
+            (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
+          ),
+        );
       }
       if (req.method === 'POST') {
         const body = await readBody(req);

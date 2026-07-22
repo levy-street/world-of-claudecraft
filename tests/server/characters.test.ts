@@ -121,6 +121,14 @@ function authedDb(overrides: DbOverrides = {}): void {
   setCharactersDbForTests({
     accountAndScopeForToken: scopeOf('full'),
     moderationStatusForAccount: async () => modStatus(),
+    // The list payload resolves the account's Armory loadout per character;
+    // default to no cosmetics so unrelated tests stay Postgres-free.
+    loadAccountCosmetics: async () => ({
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
+    }),
     ...overrides,
   });
 }
@@ -335,7 +343,17 @@ describe('character list handlers', () => {
       last_played: null,
       playtime_seconds: null,
     });
-    setCharactersDbForTests({ listCharacters: async () => [rowA, rowB] });
+    setCharactersDbForTests({
+      listCharacters: async () => [rowA, rowB],
+      // A sword skin in the account loadout: resolves onto the warrior's held
+      // worn_sword and NOT onto the stateless mage (no mainhand, null skin).
+      loadAccountCosmetics: async () => ({
+        completedQuestIds: [],
+        mechChromaIds: [],
+        weaponSkinIds: ['ice_fang_sword'],
+        weaponSkinLoadout: { sword: 'ice_fang_sword' },
+      }),
+    });
     // Online status comes from the injected runtime: row 1 online, row 2 offline.
     installRuntime({ isCharacterOnline: (id) => id === 1 });
 
@@ -355,6 +373,7 @@ describe('character list handlers', () => {
           skinCatalog: 'mech',
           mainhandItemId: 'worn_sword',
           offhandItemId: 'eastbrook_buckler',
+          weaponSkinId: 'ice_fang_sword',
         },
         {
           id: 2,
@@ -369,6 +388,7 @@ describe('character list handlers', () => {
           skinCatalog: 'class',
           mainhandItemId: null,
           offhandItemId: null,
+          weaponSkinId: null,
         },
       ],
     };
