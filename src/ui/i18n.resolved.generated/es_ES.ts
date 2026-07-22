@@ -1965,6 +1965,7 @@ export const es_ES: EnTranslations = {
       "removeParcelAria": "Quitar {item} de la carta",
       "parcelQtyDecreaseAria": "Enviar un {item} menos",
       "parcelQtyIncreaseAria": "Enviar un {item} más",
+      "parcelQtyAria": "Quantity of {item} to send",
       "sendButton": "Enviar carta",
       "postageNote": "Franqueo: {amount}. El cuervo vuela durante unos {seconds}s.",
       "arrivedBanner": "El cuervo ha aterrizado: correo de {name}.",

@@ -1965,6 +1965,7 @@ export const da_DK: EnTranslations = {
       "removeParcelAria": "Fjern {item} fra brevet",
       "parcelQtyDecreaseAria": "Send én {item} mindre",
       "parcelQtyIncreaseAria": "Send én {item} mere",
+      "parcelQtyAria": "Quantity of {item} to send",
       "sendButton": "Send brev",
       "postageNote": "Porto: {amount}. Ravnen er undervejs i omtrent {seconds}s.",
       "arrivedBanner": "Ravnen er landet: post fra {name}.",

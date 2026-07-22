@@ -1965,6 +1965,7 @@ export const ru_RU: EnTranslations = {
       "removeParcelAria": "Убрать {item} из письма",
       "parcelQtyDecreaseAria": "Отправить на один {item} меньше",
       "parcelQtyIncreaseAria": "Отправить на один {item} больше",
+      "parcelQtyAria": "Количество {item} для отправки",
       "sendButton": "Отправить письмо",
       "postageNote": "Почтовый сбор: {amount}. Ворон летит около {seconds} с.",
       "arrivedBanner": "Ворон прилетел: письмо от {name}.",

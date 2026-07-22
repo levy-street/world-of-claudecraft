@@ -1965,6 +1965,7 @@ export const id_ID: EnTranslations = {
       "removeParcelAria": "Keluarkan {item} dari surat",
       "parcelQtyDecreaseAria": "Kirim satu {item} lebih sedikit",
       "parcelQtyIncreaseAria": "Kirim satu {item} lebih banyak",
+      "parcelQtyAria": "Quantity of {item} to send",
       "sendButton": "Kirim surat",
       "postageNote": "Perangko: {amount}. Gagak terbang selama sekitar {seconds} detik.",
       "arrivedBanner": "Gagak telah mendarat: surat dari {name}.",

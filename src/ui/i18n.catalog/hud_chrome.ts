@@ -2066,6 +2066,9 @@ export const hudChromeStrings = {
     removeParcelAria: 'Remove {item} from the letter',
     parcelQtyDecreaseAria: 'Send one fewer {item}',
     parcelQtyIncreaseAria: 'Send one more {item}',
+    // The chip's typeable quantity field (wordy, M16: the five non-Latin
+    // fills land in this same change).
+    parcelQtyAria: 'Quantity of {item} to send',
     sendButton: 'Send letter',
     postageNote: 'Postage: {amount}. The raven flies for about {seconds}s.',
     arrivedBanner: 'The raven has landed: mail from {name}.',

@@ -1965,6 +1965,7 @@ export const fr_CA: EnTranslations = {
       "removeParcelAria": "Retirer {item} de la lettre",
       "parcelQtyDecreaseAria": "Envoyer un {item} de moins",
       "parcelQtyIncreaseAria": "Envoyer un {item} de plus",
+      "parcelQtyAria": "Quantity of {item} to send",
       "sendButton": "Envoyer la lettre",
       "postageNote": "Affranchissement : {amount}. Le corbeau vole environ {seconds}s.",
       "arrivedBanner": "Le corbeau s'est posé : du courrier de {name}.",

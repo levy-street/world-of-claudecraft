@@ -5802,6 +5802,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.mailbox.indicatorTip'
   | 'hudChrome.mailbox.noSubject'
   | 'hudChrome.mailbox.openAria'
+  | 'hudChrome.mailbox.parcelQtyAria'
   | 'hudChrome.mailbox.parcelQtyDecreaseAria'
   | 'hudChrome.mailbox.parcelQtyIncreaseAria'
   | 'hudChrome.mailbox.parcelsHint'

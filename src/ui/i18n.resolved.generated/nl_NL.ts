@@ -1965,6 +1965,7 @@ export const nl_NL: EnTranslations = {
       "removeParcelAria": "Verwijder {item} uit de brief",
       "parcelQtyDecreaseAria": "Eén {item} minder versturen",
       "parcelQtyIncreaseAria": "Eén {item} meer versturen",
+      "parcelQtyAria": "Quantity of {item} to send",
       "sendButton": "Brief versturen",
       "postageNote": "Porto: {amount}. De raaf vliegt ongeveer {seconds}s.",
       "arrivedBanner": "De raaf is geland: post van {name}.",

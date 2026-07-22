@@ -1965,6 +1965,7 @@ export const vi_VN: EnTranslations = {
       "removeParcelAria": "Gỡ {item} khỏi lá thư",
       "parcelQtyDecreaseAria": "Gửi bớt một {item}",
       "parcelQtyIncreaseAria": "Gửi thêm một {item}",
+      "parcelQtyAria": "Quantity of {item} to send",
       "sendButton": "Gửi thư",
       "postageNote": "Bưu phí: {amount}. Quạ thư bay mất khoảng {seconds} giây.",
       "arrivedBanner": "Quạ thư đã đáp xuống: thư từ {name}.",

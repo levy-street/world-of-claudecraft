@@ -1965,6 +1965,7 @@ export const tr_TR: EnTranslations = {
       "removeParcelAria": "{item} paketini mektuptan çıkar",
       "parcelQtyDecreaseAria": "Bir adet daha az {item} gönder",
       "parcelQtyIncreaseAria": "Bir adet daha fazla {item} gönder",
+      "parcelQtyAria": "Quantity of {item} to send",
       "sendButton": "Mektubu Gönder",
       "postageNote": "Posta ücreti: {amount}. Kuzgun yaklaşık {seconds} saniye uçar.",
       "arrivedBanner": "Kuzgun kondu: {name} sana posta gönderdi.",

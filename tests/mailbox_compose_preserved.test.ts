@@ -92,3 +92,56 @@ describe('mailbox: staging a parcel preserves the typed compose form', () => {
     expect(to.value).toBe('Mira');
   });
 });
+
+describe('mailbox: the typeable parcel quantity field', () => {
+  function qtyInput(root: HTMLElement): HTMLInputElement {
+    return root.querySelector('.mail-parcel-qty-input') as HTMLInputElement;
+  }
+  function typeQty(root: HTMLElement, value: string): void {
+    const input = qtyInput(root);
+    input.value = value;
+    input.dispatchEvent(new Event('change'));
+  }
+
+  it('commits a typed quantity through the real change event', () => {
+    const { win, root } = openSendTab([WOLF_FANG]);
+    win.stageParcel('wolf_fang');
+    typeQty(root, '3');
+    // the repaint normalizes the field to the committed value
+    expect(qtyInput(root).value).toBe('3');
+  });
+
+  it('clamps over-stock and floor-and-clamps junk to the legal 1..owned range', () => {
+    const { win, root } = openSendTab([WOLF_FANG]); // owns 4
+    win.stageParcel('wolf_fang');
+    typeQty(root, '999');
+    expect(qtyInput(root).value).toBe('4');
+    typeQty(root, '0');
+    expect(qtyInput(root).value).toBe('1');
+  });
+
+  it('restores the staged count for garbage input instead of accepting it', () => {
+    const { win, root } = openSendTab([WOLF_FANG]);
+    win.stageParcel('wolf_fang');
+    typeQty(root, '3');
+    typeQty(root, '');
+    expect(qtyInput(root).value).toBe('3');
+  });
+
+  it('preserves the typed compose form across a quantity commit (same contract as attach)', () => {
+    const { win, root } = openSendTab([WOLF_FANG]);
+    const to = root.querySelector('#mail-to') as HTMLInputElement;
+    to.value = 'Mira';
+    win.stageParcel('wolf_fang');
+    typeQty(root, '2');
+    expect((root.querySelector('#mail-to') as HTMLInputElement).value).toBe('Mira');
+  });
+
+  it('keeps the +/- steppers working alongside the input', () => {
+    const { win, root } = openSendTab([WOLF_FANG]);
+    win.stageParcel('wolf_fang');
+    typeQty(root, '2');
+    (root.querySelectorAll('.mail-parcel-step')[1] as HTMLButtonElement).click(); // plus
+    expect(qtyInput(root).value).toBe('3');
+  });
+});

@@ -1965,6 +1965,7 @@ export const de_DE: EnTranslations = {
       "removeParcelAria": "{item} aus dem Brief entfernen",
       "parcelQtyDecreaseAria": "Ein Stück weniger von {item} senden",
       "parcelQtyIncreaseAria": "Ein Stück mehr von {item} senden",
+      "parcelQtyAria": "Quantity of {item} to send",
       "sendButton": "Brief senden",
       "postageNote": "Porto: {amount}. Der Rabe ist etwa {seconds}s unterwegs.",
       "arrivedBanner": "Der Rabe ist gelandet: Post von {name}.",

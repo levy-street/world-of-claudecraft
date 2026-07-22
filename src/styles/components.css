@@ -10649,6 +10649,27 @@
     text-align: center;
     font-variant-numeric: tabular-nums;
   }
+  /* The typeable quantity field that replaced the read-only value span: sized
+     to the same slot between the +/- steppers, spinner chrome suppressed (the
+     steppers ARE the spinner). */
+  .mail-parcel-qty-input {
+    width: 40px;
+    padding: 1px 2px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+    background: #ffffff10;
+    border: 1px solid #ffffff26;
+    border-radius: 4px;
+    color: var(--color-text);
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+  .mail-parcel-qty-input::-webkit-outer-spin-button,
+  .mail-parcel-qty-input::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
   .mail-parcel-step {
     display: inline-flex;
     align-items: center;

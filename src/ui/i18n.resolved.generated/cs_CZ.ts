@@ -1965,6 +1965,7 @@ export const cs_CZ: EnTranslations = {
       "removeParcelAria": "Odebrat {item} z dopisu",
       "parcelQtyDecreaseAria": "Odeslat o jeden kus {item} méně",
       "parcelQtyIncreaseAria": "Odeslat o jeden kus {item} více",
+      "parcelQtyAria": "Quantity of {item} to send",
       "sendButton": "Odeslat dopis",
       "postageNote": "Poštovné: {amount}. Havran poletí asi {seconds} s.",
       "arrivedBanner": "Havran přistál: pošta od {name}.",

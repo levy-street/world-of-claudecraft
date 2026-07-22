@@ -6726,6 +6726,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.removeParcelAria': '從信件中移除 {item}',
   'hudChrome.mailbox.parcelQtyDecreaseAria': '少寄一個{item}',
   'hudChrome.mailbox.parcelQtyIncreaseAria': '多寄一個{item}',
+  'hudChrome.mailbox.parcelQtyAria': '要寄出的{item}數量',
   'hudChrome.mailbox.sendButton': '寄出信件',
   'hudChrome.mailbox.postageNote': '郵資：{amount}。渡鴉飛行約 {seconds} 秒。',
   'hudChrome.mailbox.arrivedBanner': '渡鴉已降落：來自 {name} 的郵件。',

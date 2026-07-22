@@ -1965,6 +1965,7 @@ export const ko_KR: EnTranslations = {
       "removeParcelAria": "편지에서 {item} 제거",
       "parcelQtyDecreaseAria": "{item} 하나 적게 보내기",
       "parcelQtyIncreaseAria": "{item} 하나 더 보내기",
+      "parcelQtyAria": "보낼 {item} 수량",
       "sendButton": "편지 보내기",
       "postageNote": "우편 요금: {amount}. 까마귀가 약 {seconds}초 동안 날아갑니다.",
       "arrivedBanner": "까마귀가 도착했습니다: {name}의 우편.",

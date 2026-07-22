@@ -1965,6 +1965,7 @@ export const pl_PL: EnTranslations = {
       "removeParcelAria": "Usuń {item} z listu",
       "parcelQtyDecreaseAria": "Wyślij o jedną sztukę {item} mniej",
       "parcelQtyIncreaseAria": "Wyślij o jedną sztukę {item} więcej",
+      "parcelQtyAria": "Quantity of {item} to send",
       "sendButton": "Wyślij list",
       "postageNote": "Opłata pocztowa: {amount}. Kruk leci około {seconds} s.",
       "arrivedBanner": "Kruk wylądował: poczta od {name}.",
