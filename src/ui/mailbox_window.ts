@@ -135,7 +135,12 @@ export class MailboxWindow {
     if (count < 1) return;
     this.attachments.push({ itemId, count });
     audio.click();
-    this.render();
+    // Targeted repaint, NOT this.render(): the full render rebuilds the send
+    // form via innerHTML with empty inputs, wiping the typed recipient,
+    // subject, body, and coin amounts the moment a parcel was attached. The
+    // stepper and remove paths already repaint this way (#1695); attach was
+    // the one parcel mutation still running the full rebuild.
+    this.renderParcels();
   }
 
   /**
