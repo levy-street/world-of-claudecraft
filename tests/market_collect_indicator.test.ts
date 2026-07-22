@@ -4,6 +4,7 @@
 // ClientWorld.marketCollectPending. Sale -> streamed true -> collect ->
 // streamed false, through the REAL server dispatch + snapshot encode and the
 // real ClientWorld decode.
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 
 // Mock the db layer so no Postgres is needed; wire/dispatch logic is under test.
@@ -183,5 +184,21 @@ describe('market collect indicator wire round-trip (mktU)', () => {
     expect(collected.self.mktU).toBe(0);
     (client as any).applySnapshot(collected);
     expect(client.marketCollectPending).toBe(false);
+  });
+});
+
+// Both game entries carry their own copy of the minimap cluster markup (the
+// offline index.html and the online play.html); the badge must exist in BOTH
+// or one host silently loses the indicator (there is no shared-markup guard).
+describe('market collect indicator markup parity', () => {
+  it('ships #market-indicator in both game entries', () => {
+    for (const entry of ['index.html', 'play.html']) {
+      const html = readFileSync(new URL(`../${entry}`, import.meta.url), 'utf8');
+      expect(html, `${entry} is missing the badge`).toContain('id="market-indicator"');
+      expect(html, `${entry} badge lost its icon`).toContain('data-icon="market"');
+      expect(html, `${entry} badge lost its localized tooltip`).toContain(
+        'data-i18n-title="hudChrome.marketIndicator.tip"',
+      );
+    }
   });
 });
