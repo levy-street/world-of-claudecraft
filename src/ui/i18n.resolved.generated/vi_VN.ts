@@ -1991,6 +1991,10 @@ export const vi_VN: EnTranslations = {
         "takeParcelsFirst": "Hãy lấy bưu kiện ra trước khi bỏ lá thư."
       }
     },
+    "marketIndicator": {
+      "aria": "World Market proceeds waiting",
+      "tip": "Proceeds are waiting for you at the Merchant."
+    },
     "bank": {
       "title": "Ngân Hàng",
       "subtitle": "Két Sắt Mạ Vàng",

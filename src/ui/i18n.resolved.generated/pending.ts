@@ -271,6 +271,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.whatBody",
     "guide.professions.whatHeading",
     "hudChrome.bags.itemAriaMasterwork",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "questUi.dialog.profIntroHint"
   ],
   "es_ES": [
@@ -535,6 +537,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.whatBody",
     "guide.professions.whatHeading",
     "hudChrome.bags.itemAriaMasterwork",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "questUi.dialog.profIntroHint"
   ],
   "fr_FR": [
@@ -799,6 +803,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.whatBody",
     "guide.professions.whatHeading",
     "hudChrome.bags.itemAriaMasterwork",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "questUi.dialog.profIntroHint"
   ],
   "fr_CA": [
@@ -1063,6 +1069,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.whatBody",
     "guide.professions.whatHeading",
     "hudChrome.bags.itemAriaMasterwork",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "questUi.dialog.profIntroHint"
   ],
   "en_CA": [],
@@ -1328,6 +1336,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.whatBody",
     "guide.professions.whatHeading",
     "hudChrome.bags.itemAriaMasterwork",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "questUi.dialog.profIntroHint"
   ],
   "de_DE": [
@@ -1592,6 +1602,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.whatBody",
     "guide.professions.whatHeading",
     "hudChrome.bags.itemAriaMasterwork",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "questUi.dialog.profIntroHint"
   ],
   "zh_CN": [
@@ -1876,6 +1888,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.whatBody",
     "guide.professions.whatHeading",
     "hudChrome.bags.itemAriaMasterwork",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "questUi.dialog.profIntroHint"
   ],
   "ru_RU": [
@@ -2145,6 +2159,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.whatBody",
     "guide.professions.whatHeading",
     "hudChrome.bags.itemAriaMasterwork",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "questUi.dialog.profIntroHint"
   ],
   "nl_NL": [
@@ -2409,6 +2425,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.whatBody",
     "guide.professions.whatHeading",
     "hudChrome.bags.itemAriaMasterwork",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "questUi.dialog.profIntroHint"
   ],
   "pl_PL": [
@@ -2673,6 +2691,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.whatBody",
     "guide.professions.whatHeading",
     "hudChrome.bags.itemAriaMasterwork",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "questUi.dialog.profIntroHint"
   ],
   "id_ID": [
@@ -2937,6 +2957,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.whatBody",
     "guide.professions.whatHeading",
     "hudChrome.bags.itemAriaMasterwork",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "questUi.dialog.profIntroHint"
   ],
   "tr_TR": [
@@ -3201,6 +3223,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.whatBody",
     "guide.professions.whatHeading",
     "hudChrome.bags.itemAriaMasterwork",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "questUi.dialog.profIntroHint"
   ],
   "sv_SE": [
@@ -3465,6 +3489,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.whatBody",
     "guide.professions.whatHeading",
     "hudChrome.bags.itemAriaMasterwork",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "questUi.dialog.profIntroHint"
   ],
   "vi_VN": [
@@ -3729,6 +3755,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.whatBody",
     "guide.professions.whatHeading",
     "hudChrome.bags.itemAriaMasterwork",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "questUi.dialog.profIntroHint"
   ],
   "da_DK": [
@@ -3993,6 +4021,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.professions.whatBody",
     "guide.professions.whatHeading",
     "hudChrome.bags.itemAriaMasterwork",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "questUi.dialog.profIntroHint"
   ]
 };

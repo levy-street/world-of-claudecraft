@@ -5749,6 +5749,9 @@ export class GameServer {
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market
     maybe('market', this.sim.marketInfoFor(anchorSession.pid));
+    // the lightweight collect-indicator bit streams ALWAYS (the mailU pattern),
+    // so the minimap badge lights anywhere while proceeds/items wait
+    maybe('mktU', this.sim.marketCollectPendingFor(anchorSession.pid) ? 1 : 0);
     maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
     maybe('mailU', this.sim.mailUnreadFor(anchorSession.pid));
     // bank info is null unless the player is standing at a banker, so it only

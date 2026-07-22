@@ -1991,6 +1991,10 @@ export const ko_KR: EnTranslations = {
         "takeParcelsFirst": "편지를 버리기 전에 소포를 먼저 꺼내세요."
       }
     },
+    "marketIndicator": {
+      "aria": "세계 시장 판매 대금 수령 대기",
+      "tip": "판매 대금이 상인에게서 수령을 기다리고 있습니다."
+    },
     "bank": {
       "title": "은행",
       "subtitle": "도금 금고",

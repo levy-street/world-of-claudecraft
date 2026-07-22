@@ -1991,6 +1991,10 @@ export const pt_BR: EnTranslations = {
         "takeParcelsFirst": "Retire as encomendas antes de descartar a carta."
       }
     },
+    "marketIndicator": {
+      "aria": "World Market proceeds waiting",
+      "tip": "Proceeds are waiting for you at the Merchant."
+    },
     "bank": {
       "title": "Banco",
       "subtitle": "A Arca Dourada",

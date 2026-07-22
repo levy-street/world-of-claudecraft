@@ -1991,6 +1991,10 @@ export const zh_CN: EnTranslations = {
         "takeParcelsFirst": "请先取出包裹再丢弃信件。"
       }
     },
+    "marketIndicator": {
+      "aria": "世界市场收益待领取",
+      "tip": "你的收益正在商人处等待领取。"
+    },
     "bank": {
       "title": "银行",
       "subtitle": "镀金保险箱",

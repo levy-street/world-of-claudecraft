@@ -1991,6 +1991,10 @@ export const sv_SE: EnTranslations = {
         "takeParcelsFirst": "Ta ut paketen innan du kastar brevet."
       }
     },
+    "marketIndicator": {
+      "aria": "World Market proceeds waiting",
+      "tip": "Proceeds are waiting for you at the Merchant."
+    },
     "bank": {
       "title": "Bank",
       "subtitle": "Förgyllda kassakistan",

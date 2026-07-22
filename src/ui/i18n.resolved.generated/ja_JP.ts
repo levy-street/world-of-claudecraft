@@ -1991,6 +1991,10 @@ export const ja_JP: EnTranslations = {
         "takeParcelsFirst": "手紙を捨てる前に小包を取り出してください。"
       }
     },
+    "marketIndicator": {
+      "aria": "世界市場の売上金が受け取り待ちです",
+      "tip": "売上金が商人のもとで受け取りを待っています。"
+    },
     "bank": {
       "title": "銀行",
       "subtitle": "金張りの金庫",

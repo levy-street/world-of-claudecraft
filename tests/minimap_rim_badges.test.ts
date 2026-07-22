@@ -13,7 +13,7 @@ const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf
   '\n',
 );
 
-const RIM_BADGE_SELECTORS = ['#raid-lockout', '#mail-indicator'];
+const RIM_BADGE_SELECTORS = ['#raid-lockout', '#mail-indicator', '#market-indicator'];
 
 // The base rule for each badge is the bare selector followed by "{" (the
 // pseudo-class, descendant, and [hidden] rules never match that shape), and

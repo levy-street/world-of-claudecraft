@@ -1991,6 +1991,10 @@ export const id_ID: EnTranslations = {
         "takeParcelsFirst": "Keluarkan bingkisannya dulu sebelum membuang surat itu."
       }
     },
+    "marketIndicator": {
+      "aria": "World Market proceeds waiting",
+      "tip": "Proceeds are waiting for you at the Merchant."
+    },
     "bank": {
       "title": "Bank",
       "subtitle": "Brankas Bersepuh Emas",

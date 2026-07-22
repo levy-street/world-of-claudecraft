@@ -1991,6 +1991,10 @@ export const fr_FR: EnTranslations = {
         "takeParcelsFirst": "Retirez les colis avant de jeter la lettre."
       }
     },
+    "marketIndicator": {
+      "aria": "World Market proceeds waiting",
+      "tip": "Proceeds are waiting for you at the Merchant."
+    },
     "bank": {
       "title": "Banque",
       "subtitle": "Le Coffre doré",

@@ -7029,6 +7029,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.arrivedLog': '{name}에게서 새 우편이 도착했습니다.',
   'hudChrome.mailbox.indicatorAria': '읽지 않은 우편: {count}',
   'hudChrome.mailbox.indicatorTip': '읽지 않은 편지가 {count}통 있습니다. 우편함에서 확인하세요.',
+  'hudChrome.marketIndicator.aria': '세계 시장 판매 대금 수령 대기',
+  'hudChrome.marketIndicator.tip': '판매 대금이 상인에게서 수령을 기다리고 있습니다.',
   'hudChrome.mailbox.clickAttach': '클릭하면 편지에 첨부됩니다.',
   'hudChrome.mailbox.cannotMail': '이 아이템은 우편으로 보낼 수 없습니다.',
   'hudChrome.mailbox.result.sent':

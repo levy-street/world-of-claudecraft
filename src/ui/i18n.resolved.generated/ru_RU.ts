@@ -1991,6 +1991,10 @@ export const ru_RU: EnTranslations = {
         "takeParcelsFirst": "Сначала заберите посылки, затем удаляйте письмо."
       }
     },
+    "marketIndicator": {
+      "aria": "Ожидает выручка с Мирового рынка",
+      "tip": "Выручка ждёт вас у Торговца."
+    },
     "bank": {
       "title": "Банк",
       "subtitle": "Золочёный сундук",
