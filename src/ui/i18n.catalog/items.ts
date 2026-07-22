@@ -66,7 +66,6 @@ const itemStringsEn = {
       ifYouEquip: 'If you equip this',
       damageSpeed: '{min} - {max} Damage Speed {speed}',
       dps: '({dps} damage per second)',
-      dagger: 'Dagger',
       armorStat: '{value} Armor',
       stat: '+{value} {stat}',
       useFood: 'Use: Restores {amount} health over {seconds} sec. Must remain seated while eating.',
@@ -263,7 +262,6 @@ export const itemStrings = {
         ifYouEquip: 'Si equipas esto',
         damageSpeed: '{min} - {max} de daño  Velocidad {speed}',
         dps: '({dps} de daño por segundo)',
-        dagger: 'Daga',
         armorStat: '{value} de armadura',
         stat: '+{value} {stat}',
         useFood:
@@ -426,7 +424,6 @@ export const itemStrings = {
         ifYouEquip: 'Si vous équipez ceci',
         damageSpeed: '{min} - {max} points de dégâts  Vitesse {speed}',
         dps: '({dps} dégâts par seconde)',
-        dagger: 'Dague',
         armorStat: '{value} armure',
         stat: '+{value} {stat}',
         useFood:
@@ -590,7 +587,6 @@ export const itemStrings = {
         ifYouEquip: 'Se equipaggi questo',
         damageSpeed: '{min} - {max} danni  Velocità {speed}',
         dps: '({dps} danni al secondo)',
-        dagger: 'Pugnale',
         armorStat: '{value} armatura',
         stat: '+{value} {stat}',
         useFood:
@@ -750,7 +746,6 @@ export const itemStrings = {
         ifYouEquip: 'Wenn du dies anlegst',
         damageSpeed: '{min} - {max} Schaden  Tempo {speed}',
         dps: '({dps} Schaden pro Sekunde)',
-        dagger: 'Dolch',
         armorStat: '{value} Rüstung',
         stat: '+{value} {stat}',
         useFood:
@@ -912,7 +907,6 @@ export const itemStrings = {
         ifYouEquip: '装备后',
         damageSpeed: '{min} - {max} 伤害  速度 {speed}',
         dps: '（每秒 {dps} 伤害）',
-        dagger: '匕首',
         armorStat: '{value} 护甲',
         stat: '+{value} {stat}',
         useFood: '使用：在 {seconds} 秒内恢复 {amount} 点生命值。进食时必须保持坐下。',
@@ -1067,7 +1061,6 @@ export const itemStrings = {
         ifYouEquip: '裝備後',
         damageSpeed: '{min} - {max} 傷害  速度 {speed}',
         dps: '（每秒 {dps} 傷害）',
-        dagger: '匕首',
         armorStat: '{value} 護甲',
         stat: '+{value} {stat}',
         useFood: '使用：在 {seconds} 秒內恢復 {amount} 點生命值。進食時必須保持坐下。',
@@ -1222,7 +1215,6 @@ export const itemStrings = {
         ifYouEquip: '이것을 착용하면',
         damageSpeed: '{min} - {max} 피해  속도 {speed}',
         dps: '(초당 피해 {dps})',
-        dagger: '단검',
         armorStat: '방어도 {value}',
         stat: '+{value} {stat}',
         useFood:
@@ -1381,7 +1373,6 @@ export const itemStrings = {
         ifYouEquip: 'これを装備すると',
         damageSpeed: '{min} - {max} ダメージ  速度 {speed}',
         dps: '（秒間 {dps} ダメージ）',
-        dagger: '短剣',
         armorStat: '防御力 {value}',
         stat: '+{value} {stat}',
         useFood:
@@ -1540,7 +1531,6 @@ export const itemStrings = {
         ifYouEquip: 'Se você equipar isto',
         damageSpeed: '{min} - {max} de dano  Velocidade {speed}',
         dps: '({dps} de dano por segundo)',
-        dagger: 'Adaga',
         armorStat: '{value} de armadura',
         stat: '+{value} {stat}',
         useFood:
@@ -1699,7 +1689,6 @@ export const itemStrings = {
         ifYouEquip: 'Если надеть это',
         damageSpeed: '{min} - {max} урона  Скорость {speed}',
         dps: '({dps} урона в секунду)',
-        dagger: 'Кинжал',
         armorStat: '{value} брони',
         stat: '+{value} {stat}',
         useFood:

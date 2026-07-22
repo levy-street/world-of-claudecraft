@@ -6103,7 +6103,6 @@ export const ru_RU: EnTranslations = {
       "ifYouEquip": "Если надеть это",
       "damageSpeed": "{min} - {max} урона Скорость {speed}",
       "dps": "({dps} урона в секунду)",
-      "dagger": "Кинжал",
       "armorStat": "{value} брони",
       "stat": "+{value} {stat}",
       "useFood": "Использование: восстанавливает {amount} здоровья за {seconds} сек. Нужно оставаться сидя во время еды.",

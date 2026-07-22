@@ -6120,7 +6120,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.clickUse': 'Kullanmak için tıkla',
   'itemUi.tooltip.clickUseInstant': 'Savaşta anında kullanmak için tıkla',
   'itemUi.tooltip.currentlyEquipped': 'Şu anda kuşanılmış',
-  'itemUi.tooltip.dagger': 'Hançer',
   'itemUi.tooltip.damageSpeed': '{min} - {max} Hasar Hız {speed}',
   'itemUi.tooltip.dps': '(saniyede {dps} hasar)',
   'itemUi.tooltip.ifYouEquip': 'Bunu kuşanırsan',

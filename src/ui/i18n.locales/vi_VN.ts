@@ -6151,7 +6151,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.clickUse': 'Nhấp để sử dụng',
   'itemUi.tooltip.clickUseInstant': 'Nhấp để dùng tức thời trong chiến đấu',
   'itemUi.tooltip.currentlyEquipped': 'Đang trang bị',
-  'itemUi.tooltip.dagger': 'Dao Găm',
   'itemUi.tooltip.damageSpeed': '{min} - {max} Sát Thương Tốc Độ {speed}',
   'itemUi.tooltip.dps': '({dps} sát thương mỗi giây)',
   'itemUi.tooltip.ifYouEquip': 'Nếu bạn trang bị món này',

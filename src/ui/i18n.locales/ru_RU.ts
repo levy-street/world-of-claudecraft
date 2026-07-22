@@ -2295,7 +2295,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.ifYouEquip': 'Если надеть это',
   'itemUi.tooltip.damageSpeed': '{min} - {max} урона Скорость {speed}',
   'itemUi.tooltip.dps': '({dps} урона в секунду)',
-  'itemUi.tooltip.dagger': 'Кинжал',
   'itemUi.tooltip.armorStat': '{value} брони',
   'itemUi.tooltip.stat': '+{value} {stat}',
   'itemUi.tooltip.useFood':

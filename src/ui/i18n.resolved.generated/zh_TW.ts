@@ -6103,7 +6103,6 @@ export const zh_TW: EnTranslations = {
       "ifYouEquip": "裝備後",
       "damageSpeed": "{min} - {max} 傷害 速度 {speed}",
       "dps": "（每秒 {dps} 傷害）",
-      "dagger": "匕首",
       "armorStat": "{value} 護甲",
       "stat": "+{value} {stat}",
       "useFood": "使用：在 {seconds} 秒內恢復 {amount} 點生命值。進食時必須保持坐下。",

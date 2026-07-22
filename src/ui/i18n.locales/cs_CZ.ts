@@ -1538,7 +1538,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.clickUse': 'Kliknutím použiješ',
   'itemUi.tooltip.clickUseInstant': 'Kliknutím okamžitě použiješ v boji',
   'itemUi.tooltip.currentlyEquipped': 'Právě vybaveno',
-  'itemUi.tooltip.dagger': 'Dýka',
   'itemUi.tooltip.damageSpeed': 'Poškození {min} - {max}, rychlost {speed}',
   'itemUi.tooltip.dps': '({dps} poškození za sekundu)',
   'itemUi.tooltip.ifYouEquip': 'Pokud si to vybavíš',

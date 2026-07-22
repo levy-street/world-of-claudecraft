@@ -6103,7 +6103,6 @@ export const nl_NL: EnTranslations = {
       "ifYouEquip": "Als je dit uitrust",
       "damageSpeed": "{min} - {max} Schade Snelheid {speed}",
       "dps": "({dps} schade per seconde)",
-      "dagger": "Dolk",
       "armorStat": "{value} Pantser",
       "stat": "+{value} {stat}",
       "useFood": "Gebruik: Herstelt {amount} levenskracht over {seconds} sec. Je moet blijven zitten tijdens het eten.",

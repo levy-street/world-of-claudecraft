@@ -6199,7 +6199,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.clickUse': 'Klik untuk memakai',
   'itemUi.tooltip.clickUseInstant': 'Klik untuk memakai seketika dalam pertempuran',
   'itemUi.tooltip.currentlyEquipped': 'Sedang dipakai',
-  'itemUi.tooltip.dagger': 'Belati',
   'itemUi.tooltip.damageSpeed': '{min} - {max} Kerusakan Kecepatan {speed}',
   'itemUi.tooltip.dps': '({dps} kerusakan per detik)',
   'itemUi.tooltip.ifYouEquip': 'Jika kamu memakai ini',

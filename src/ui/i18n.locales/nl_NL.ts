@@ -6141,7 +6141,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.clickUse': 'Klik om te gebruiken',
   'itemUi.tooltip.clickUseInstant': 'Klik om direct te gebruiken in gevecht',
   'itemUi.tooltip.currentlyEquipped': 'Momenteel uitgerust',
-  'itemUi.tooltip.dagger': 'Dolk',
   'itemUi.tooltip.damageSpeed': '{min} - {max} Schade Snelheid {speed}',
   'itemUi.tooltip.dps': '({dps} schade per seconde)',
   'itemUi.tooltip.ifYouEquip': 'Als je dit uitrust',

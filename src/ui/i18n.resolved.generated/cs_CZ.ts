@@ -6103,7 +6103,6 @@ export const cs_CZ: EnTranslations = {
       "ifYouEquip": "Pokud si to vybavíš",
       "damageSpeed": "Poškození {min} - {max}, rychlost {speed}",
       "dps": "({dps} poškození za sekundu)",
-      "dagger": "Dýka",
       "armorStat": "{value} brnění",
       "stat": "+{value} {stat}",
       "useFood": "Použití: Obnoví {amount} zdraví během {seconds} s. Při jídle musíš zůstat sedět.",

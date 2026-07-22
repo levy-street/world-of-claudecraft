@@ -6112,7 +6112,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.clickUse': 'Kliknij, aby użyć',
   'itemUi.tooltip.clickUseInstant': 'Kliknij, aby użyć natychmiast w walce',
   'itemUi.tooltip.currentlyEquipped': 'Aktualnie założone',
-  'itemUi.tooltip.dagger': 'Sztylet',
   'itemUi.tooltip.damageSpeed': '{min} - {max} obrażeń Szybkość {speed}',
   'itemUi.tooltip.dps': '({dps} obrażeń na sekundę)',
   'itemUi.tooltip.ifYouEquip': 'Jeśli to założysz',

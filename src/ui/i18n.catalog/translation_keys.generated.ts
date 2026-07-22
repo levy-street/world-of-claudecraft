@@ -6534,7 +6534,6 @@ export type TranslationKeyFlat =
   | 'itemUi.tooltip.clickUse'
   | 'itemUi.tooltip.clickUseInstant'
   | 'itemUi.tooltip.currentlyEquipped'
-  | 'itemUi.tooltip.dagger'
   | 'itemUi.tooltip.damageSpeed'
   | 'itemUi.tooltip.dps'
   | 'itemUi.tooltip.ifYouEquip'

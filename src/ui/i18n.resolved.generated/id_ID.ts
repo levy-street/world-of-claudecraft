@@ -6103,7 +6103,6 @@ export const id_ID: EnTranslations = {
       "ifYouEquip": "Jika kamu memakai ini",
       "damageSpeed": "{min} - {max} Kerusakan Kecepatan {speed}",
       "dps": "({dps} kerusakan per detik)",
-      "dagger": "Belati",
       "armorStat": "{value} Zirah",
       "stat": "+{value} {stat}",
       "useFood": "Pakai: Memulihkan {amount} nyawa selama {seconds} detik. Harus tetap duduk selama makan.",

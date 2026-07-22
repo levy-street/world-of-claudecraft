@@ -6073,7 +6073,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.clickUse': 'Klik for at bruge',
   'itemUi.tooltip.clickUseInstant': 'Klik for at bruge øjeblikkeligt i kamp',
   'itemUi.tooltip.currentlyEquipped': 'Aktuelt udrustet',
-  'itemUi.tooltip.dagger': 'Dolk',
   'itemUi.tooltip.damageSpeed': '{min} - {max} Skade Hastighed {speed}',
   'itemUi.tooltip.dps': '({dps} skade i sekundet)',
   'itemUi.tooltip.ifYouEquip': 'Hvis du udruster denne',

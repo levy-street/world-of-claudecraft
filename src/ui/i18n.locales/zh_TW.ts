@@ -2180,7 +2180,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.ifYouEquip': '裝備後',
   'itemUi.tooltip.damageSpeed': '{min} - {max} 傷害 速度 {speed}',
   'itemUi.tooltip.dps': '（每秒 {dps} 傷害）',
-  'itemUi.tooltip.dagger': '匕首',
   'itemUi.tooltip.armorStat': '{value} 護甲',
   'itemUi.tooltip.stat': '+{value} {stat}',
   'itemUi.tooltip.useFood': '使用：在 {seconds} 秒內恢復 {amount} 點生命值。進食時必須保持坐下。',

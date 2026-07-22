@@ -6103,7 +6103,6 @@ export const ko_KR: EnTranslations = {
       "ifYouEquip": "이것을 착용하면",
       "damageSpeed": "{min} - {max} 피해 속도 {speed}",
       "dps": "(초당 피해 {dps})",
-      "dagger": "단검",
       "armorStat": "방어도 {value}",
       "stat": "+{value} {stat}",
       "useFood": "사용 효과: {seconds}초에 걸쳐 생명력 {amount} 회복. 먹는 동안 앉아 있어야 합니다.",

@@ -2254,7 +2254,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.ifYouEquip': '이것을 착용하면',
   'itemUi.tooltip.damageSpeed': '{min} - {max} 피해 속도 {speed}',
   'itemUi.tooltip.dps': '(초당 피해 {dps})',
-  'itemUi.tooltip.dagger': '단검',
   'itemUi.tooltip.armorStat': '방어도 {value}',
   'itemUi.tooltip.stat': '+{value} {stat}',
   'itemUi.tooltip.useFood':

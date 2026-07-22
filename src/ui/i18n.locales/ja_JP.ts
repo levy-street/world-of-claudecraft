@@ -2271,7 +2271,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.ifYouEquip': 'これを装備すると',
   'itemUi.tooltip.damageSpeed': '{min} - {max} ダメージ 速度 {speed}',
   'itemUi.tooltip.dps': '（秒間 {dps} ダメージ）',
-  'itemUi.tooltip.dagger': '短剣',
   'itemUi.tooltip.armorStat': '防御力 {value}',
   'itemUi.tooltip.stat': '+{value} {stat}',
   'itemUi.tooltip.useFood':

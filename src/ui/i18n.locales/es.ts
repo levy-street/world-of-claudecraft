@@ -3206,7 +3206,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.ifYouEquip': 'Si equipas esto',
   'itemUi.tooltip.damageSpeed': '{min} - {max} de daño Velocidad {speed}',
   'itemUi.tooltip.dps': '({dps} de daño por segundo)',
-  'itemUi.tooltip.dagger': 'Daga',
   'itemUi.tooltip.armorStat': '{value} de armadura',
   'itemUi.tooltip.stat': '+{value} {stat}',
   'itemUi.tooltip.useFood':

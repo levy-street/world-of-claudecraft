@@ -6103,7 +6103,6 @@ export const de_DE: EnTranslations = {
       "ifYouEquip": "Wenn Ihr dies anlegt",
       "damageSpeed": "{min} - {max} Schaden Tempo {speed}",
       "dps": "({dps} Schaden pro Sekunde)",
-      "dagger": "Dolch",
       "armorStat": "{value} Rüstung",
       "stat": "+{value} {stat}",
       "useFood": "Benutzen: Stellt über {seconds} Sek. {amount} Gesundheit wieder her. Ihr müsst beim Essen sitzen bleiben.",

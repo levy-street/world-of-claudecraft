@@ -6103,7 +6103,6 @@ export const ja_JP: EnTranslations = {
       "ifYouEquip": "これを装備すると",
       "damageSpeed": "{min} - {max} ダメージ 速度 {speed}",
       "dps": "（秒間 {dps} ダメージ）",
-      "dagger": "短剣",
       "armorStat": "防御力 {value}",
       "stat": "+{value} {stat}",
       "useFood": "使用: {seconds}秒かけて体力を{amount}回復します。食事中は座ったままでいる必要があります。",

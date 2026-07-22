@@ -6103,7 +6103,6 @@ export const pt_BR: EnTranslations = {
       "ifYouEquip": "Se você equipar isto",
       "damageSpeed": "{min} - {max} de dano Velocidade {speed}",
       "dps": "({dps} de dano por segundo)",
-      "dagger": "Adaga",
       "armorStat": "{value} de armadura",
       "stat": "+{value} {stat}",
       "useFood": "Usar: restaura {amount} de vida ao longo de {seconds} s. É preciso permanecer sentado enquanto come.",

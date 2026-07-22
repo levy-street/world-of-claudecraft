@@ -6070,7 +6070,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.clickUse': 'Klicka för att använda',
   'itemUi.tooltip.clickUseInstant': 'Klicka för att använda omedelbart i strid',
   'itemUi.tooltip.currentlyEquipped': 'För närvarande utrustad',
-  'itemUi.tooltip.dagger': 'Dolk',
   'itemUi.tooltip.damageSpeed': '{min} - {max} Skada Hastighet {speed}',
   'itemUi.tooltip.dps': '({dps} skada per sekund)',
   'itemUi.tooltip.ifYouEquip': 'Om du utrustar detta',
