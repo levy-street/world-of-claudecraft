@@ -245,9 +245,10 @@ function toSheetRank(rank: { rank: number; total: number } | null): SheetRank | 
 /**
  * The character-list body shared by GET /api/characters and GET /api/me/characters, so
  * both stay byte-identical. `isOnline` comes from the injected runtime (a live-session
- * scan). Mirrors the legacy characterListPayload exactly.
+ * scan). The retained legacy arm (main.ts characterListPayload) DELEGATES here, so the
+ * two dispatch modes share one implementation and cannot diverge in payload shape.
  */
-function buildCharacterList(
+export function buildCharacterList(
   chars: CharacterRow[],
   isOnline: (characterId: number) => boolean,
   weaponSkinLoadout: Record<string, string>,
