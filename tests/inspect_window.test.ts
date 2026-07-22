@@ -44,6 +44,13 @@ describe('inspect_window: thin painter, deps-only Hud access', () => {
     expect(painter).toContain('this.deps.mountPreview(');
   });
 
+  it('feeds the inspected entity weapon skin to the turntable mount (Armory cosmetics)', () => {
+    // The wire wsk field is the SERVER-resolved active skin the world renders
+    // for that player; the inspect paperdoll must pass it through or a
+    // purchased skin silently vanishes on inspect.
+    expect(painter).toContain('weaponSkinId: e.weaponSkinId ?? null');
+  });
+
   it('feeds the entity skin catalog to the pure core and the turntable mount (mech rigs)', () => {
     // Remote entities carry skinCatalog on the wire (the `cat` identity field); the
     // mount must see it or a mech-cosmetic player renders as a class rig wearing a

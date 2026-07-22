@@ -42,6 +42,11 @@ export class CharacterPreview {
   private characterGroup: THREE.Group;
   private currentVisual: CharacterVisual | null = null;
   private currentSkin = 0;
+  // The active Armory weapon-skin cosmetic, persisted across visual rebuilds
+  // exactly like currentSkin so a class/appearance swap keeps the skinned
+  // weapon (the in-world renderer and the store preview both apply it; the
+  // paperdoll must match or a purchased skin reads as missing).
+  private currentWeaponSkinId: string | null = null;
   // Identity of the appearance last requested via setAppearance, so an async mech
   // re-apply can bail out if a newer selection superseded it.
   private appearanceSig: string | null = null;
@@ -139,6 +144,7 @@ export class CharacterPreview {
   setAppearance(a: PreviewAppearance): void {
     if (this.destroyed) return;
     this.currentSkin = a.skin;
+    this.currentWeaponSkinId = a.weaponSkinId ?? null;
     const sig = appearanceSignature(a);
     this.appearanceSig = sig;
     if (a.skinCatalog === 'mech' && !mechAssetsReady()) {
@@ -180,6 +186,9 @@ export class CharacterPreview {
         offhandItemId,
       );
       this.characterGroup.add(this.currentVisual.root);
+      // Re-apply the persisted weapon-skin cosmetic to the rebuilt visual (the
+      // constructor attaches the equipped item's own model).
+      if (this.currentWeaponSkinId) this.currentVisual.setWeaponSkin(this.currentWeaponSkinId);
 
       // Reset rotation on a class swap so every new character greets the player
       // FACE-ON (the classic character-screen pose); dragging still spins freely.
@@ -187,6 +196,14 @@ export class CharacterPreview {
     } catch (err) {
       console.error(`Failed to load preview character visual for ${visualKey}:`, err);
     }
+  }
+
+  /** Apply or clear the Armory weapon-skin cosmetic; persists across
+   *  setClass/setVisualKey rebuilds like the body skin. */
+  setWeaponSkin(weaponSkinId: string | null): void {
+    if (this.destroyed) return;
+    this.currentWeaponSkinId = weaponSkinId;
+    this.currentVisual?.setWeaponSkin(weaponSkinId);
   }
 
   /** Swap the previewed skin (alternate body texture); persists across setClass. */

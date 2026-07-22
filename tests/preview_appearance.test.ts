@@ -125,9 +125,35 @@ describe('appearanceSignature', () => {
     expect(appearanceSignature({ ...base, mainhandItemId: 'b' })).not.toBe(sig);
     expect(appearanceSignature({ ...base, offhandItemId: 'b' })).not.toBe(sig);
   });
+
+  it('changes when the Armory weapon skin changes (apply, swap, and remove)', () => {
+    // Without this, applying or removing a purchased skin while a preview is
+    // mounted elides as "same appearance" and the stale weapon model survives.
+    const base = appearance({ cls: 'rogue', skin: 2, mainhandItemId: 'a' });
+    const sig = appearanceSignature(base);
+    const skinned = appearanceSignature({ ...base, weaponSkinId: 'frostbite_dagger' });
+    expect(skinned).not.toBe(sig);
+    expect(appearanceSignature({ ...base, weaponSkinId: 'ashspark_dagger' })).not.toBe(skinned);
+    // absent and explicit-null are the SAME identity (both mean "no skin")
+    expect(appearanceSignature({ ...base, weaponSkinId: null })).toBe(sig);
+  });
 });
 
 describe('CharacterPreview.setAppearance', () => {
+  it('persists the appearance weapon skin so the rebuilt visual re-applies it', () => {
+    const { preview } = barePreview();
+    const state = preview as unknown as Record<string, unknown>;
+    preview.setAppearance(
+      appearance({ cls: 'rogue', mainhandItemId: 'a', weaponSkinId: 'frostbite_dagger' }),
+    );
+    // setVisualKey rebuilds the CharacterVisual and re-applies this field; the
+    // stub harness cannot build a real visual, so pin the persisted state that
+    // drives the re-apply.
+    expect(state.currentWeaponSkinId).toBe('frostbite_dagger');
+    preview.setAppearance(appearance({ cls: 'rogue', mainhandItemId: 'a' }));
+    expect(state.currentWeaponSkinId).toBeNull();
+  });
+
   it('re-applies the current mech appearance once its lazy assets are ready', async () => {
     const { preview, setVisualKey } = barePreview();
     const mech = appearance({

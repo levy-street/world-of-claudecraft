@@ -35,6 +35,7 @@ import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { recipeById } from '../sim/content/recipes';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
+import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
 import type { ZoneDef } from '../sim/data';
 import {
   ABILITIES,
@@ -11819,6 +11820,8 @@ export class Hud {
       previewKey?: string;
       mainhand: string | null;
       offhand: string | null;
+      /** The active Armory weapon-skin cosmetic (null = the item's own model). */
+      weaponSkinId: string | null;
       framing: PreviewFramingName;
     },
   ): void {
@@ -11840,6 +11843,7 @@ export class Hud {
       this.charPreview.setClass(opts.cls, opts.mainhand, opts.offhand);
     }
     this.charPreview.setSkin(opts.skin);
+    this.charPreview.setWeaponSkin(opts.weaponSkinId);
     this.charPreview.setFraming(opts.framing);
   }
 
@@ -11852,12 +11856,20 @@ export class Hud {
     skin: number,
     previewKey?: string,
   ): void {
+    const mainhand = this.sim.equipment.mainhand ?? null;
     this.mountSharedPreview(container, {
       cls,
       skin,
       previewKey,
-      mainhand: this.sim.equipment.mainhand ?? null,
+      mainhand,
       offhand: this.sim.equipment.offhand ?? null,
+      // The paperdoll wears the same Armory skin the world renders: resolved
+      // through the one shared rule (class + equipped mainhand + loadout).
+      weaponSkinId: resolveActiveWeaponSkin(
+        cls,
+        mainhand,
+        this.sim.accountCosmetics.weaponSkinLoadout,
+      ),
       framing: 'sheet',
     });
   }
@@ -11875,6 +11887,8 @@ export class Hud {
       skinCatalog: SkinCatalog;
       mainhand: string | null;
       offhand: string | null;
+      /** The inspected player's server-resolved active weapon skin (wire wsk). */
+      weaponSkinId: string | null;
     },
   ): void {
     const preview = activeCharacterAppearancePreview(params.cls, params.skin, params.skinCatalog);
@@ -11885,6 +11899,7 @@ export class Hud {
         previewKey: preview.visualKey === 'player_mech' ? preview.visualKey : undefined,
         mainhand: params.mainhand,
         offhand: params.offhand,
+        weaponSkinId: params.weaponSkinId,
         framing: 'inspect',
       });
     if (preview.visualKey !== 'player_mech') {
