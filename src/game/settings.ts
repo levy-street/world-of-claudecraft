@@ -267,6 +267,12 @@ export const BOOL_SETTINGS = {
   // red when the click lands on a hostile. Purely a local presentation cue; it
   // never touches sim state. Off removes the marker entirely.
   clickFeedback: { def: true },
+  // off by default (the classic behavior: a left-click on empty ground clears
+  // your target). When on, a ground left-click keeps the current target, so
+  // click-to-move players can reposition without deselecting; the target still
+  // drops by targeting something else, target death, or range/stealth as normal.
+  // Read by the pick handler via shouldClearTargetOnGroundClick (target_click.ts).
+  stickyTarget: { def: false },
   // off by default: swap the looping landing-page trailer for a static, dimmed,
   // high-contrast backdrop so the start-screen text stays legible (and the
   // 5.7 MB video is never fetched). Forced on regardless for phones / Save-Data /

@@ -473,6 +473,7 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
       boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
       boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
       boolToggle(s, 'mouseoverCast', 'hudChrome.options.mouseoverCast'),
+      boolToggle(s, 'stickyTarget', 'hudChrome.options.stickyTarget'),
       slider(s, 'fctScale', 'hud.options.fctScale'),
       boolToggle(s, 'showSecondaryActionBar', 'hudChrome.options.showSecondaryActionBar', {
         rerender: true,
