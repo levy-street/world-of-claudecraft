@@ -494,9 +494,9 @@ export const TARGETS = [
     label: 'Item tooltip: weapon type on the slot line (Dagger / Polearm)',
     when: ['ui/weapon_type_label'],
     // Grant a spread of weapons, open bags, hover one: the new type label reads
-    // right-aligned on the slot line (mirroring the armor-weight row). The dagger
-    // variant is the headline case (rogues need daggers, and it replaces the old
-    // standalone "Dagger" sub-line); the polearm variant shows the added label.
+    // on its own plain line above the slot line. The dagger variant is the
+    // headline case (rogues need daggers, and it replaces the old standalone
+    // "Dagger" sub-line); the polearm variant shows the added label.
     // Full-frame shot: the tooltip renders beside the bags window and a single
     // selector clip cannot union the two rects.
     variants: [
