@@ -1114,6 +1114,11 @@ export const zh_CN: EnTranslations = {
         "refundLog": "投注作废，已退还你的 {amount} 本金。"
       }
     },
+    "actionBar": {
+      "title": "动作条",
+      "lock": "锁定动作条",
+      "unlock": "解锁动作条"
+    },
     "options": {
       "clickMoveLeft": "左键",
       "clickMoveRight": "右键",
@@ -1153,6 +1158,7 @@ export const zh_CN: EnTranslations = {
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",
+      "lockActionBars": "锁定动作条",
       "showThirdActionBar": "显示第三动作条",
       "showTargetOfTarget": "显示目标的目标",
       "showAttackButton": "显示攻击按钮",

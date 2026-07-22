@@ -1114,6 +1114,11 @@ export const da_DK: EnTranslations = {
         "refundLog": "Væddemål annulleret, din indsats på {amount} blev returneret."
       }
     },
+    "actionBar": {
+      "title": "Action Bars",
+      "lock": "Lock Action Bars",
+      "unlock": "Unlock Action Bars"
+    },
     "options": {
       "clickMoveLeft": "Venstreklik",
       "clickMoveRight": "Højreklik",
@@ -1153,6 +1158,7 @@ export const da_DK: EnTranslations = {
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Vis sekundær handlingslinje",
+      "lockActionBars": "Lock Action Bars",
       "showThirdActionBar": "Vis tredje handlingslinje",
       "showTargetOfTarget": "Vis målets mål",
       "showAttackButton": "Vis angrebsknap",

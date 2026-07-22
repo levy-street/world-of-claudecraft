@@ -1114,6 +1114,11 @@ export const cs_CZ: EnTranslations = {
         "refundLog": "Sázky zrušeny, tvůj vklad {amount} byl vrácen."
       }
     },
+    "actionBar": {
+      "title": "Action Bars",
+      "lock": "Lock Action Bars",
+      "unlock": "Unlock Action Bars"
+    },
     "options": {
       "clickMoveLeft": "Levé kliknutí",
       "clickMoveRight": "Pravé kliknutí",
@@ -1153,6 +1158,7 @@ export const cs_CZ: EnTranslations = {
       "itemLevelLine": "Úroveň předmětu {level}",
       "itemScoreLine": "Skóre {score}",
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
+      "lockActionBars": "Lock Action Bars",
       "showThirdActionBar": "Zobrazit třetí panel akcí",
       "showTargetOfTarget": "Zobrazit cíl cíle",
       "showAttackButton": "Zobrazit tlačítko útoku",

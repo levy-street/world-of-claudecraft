@@ -172,6 +172,12 @@ describe('options_window: interface tab split', () => {
       expect(methodBody(sig), `${sig} must not touch interfaceTab`).not.toContain('interfaceTab');
     }
   });
+
+  it('refreshes a visible Interface panel after a contextual setting change', () => {
+    expect(painter).toMatch(
+      /refreshInterfaceControls\(\): void \{\s*if \(this\.isOpen && this\.view === 'interface'\) this\.renderInterface\(\);/,
+    );
+  });
 });
 
 // The exact control-dispatch wiring. The pure value coercion is unit-tested in

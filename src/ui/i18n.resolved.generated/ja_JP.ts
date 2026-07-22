@@ -1114,6 +1114,11 @@ export const ja_JP: EnTranslations = {
         "refundLog": "ベット無効、賭け金{amount}を返却しました。"
       }
     },
+    "actionBar": {
+      "title": "アクションバー",
+      "lock": "アクションバーをロック",
+      "unlock": "アクションバーのロックを解除"
+    },
     "options": {
       "clickMoveLeft": "左クリック",
       "clickMoveRight": "右クリック",
@@ -1153,6 +1158,7 @@ export const ja_JP: EnTranslations = {
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
+      "lockActionBars": "アクションバーをロック",
       "showThirdActionBar": "3本目のアクションバーを表示",
       "showTargetOfTarget": "ターゲットのターゲットを表示",
       "showAttackButton": "攻撃ボタンを表示",

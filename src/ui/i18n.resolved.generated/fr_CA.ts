@@ -1114,6 +1114,11 @@ export const fr_CA: EnTranslations = {
         "refundLog": "Paris annulés, votre mise de {amount} vous a été rendue."
       }
     },
+    "actionBar": {
+      "title": "Action Bars",
+      "lock": "Lock Action Bars",
+      "unlock": "Unlock Action Bars"
+    },
     "options": {
       "clickMoveLeft": "Clic gauche",
       "clickMoveRight": "Clic droit",
@@ -1153,6 +1158,7 @@ export const fr_CA: EnTranslations = {
       "itemLevelLine": "Niveau d'objet {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Afficher la barre d'action secondaire",
+      "lockActionBars": "Lock Action Bars",
       "showThirdActionBar": "Afficher la troisième barre d'action",
       "showTargetOfTarget": "Afficher la cible de la cible",
       "showAttackButton": "Afficher le bouton d'attaque",

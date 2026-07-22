@@ -313,6 +313,7 @@ describe('Interface & Comfort settings pack', () => {
     expect(s.get('showDevBadges')).toBe(true);
     expect(s.get('showDailyRewardsChest')).toBe(true);
     expect(s.get('showSecondaryActionBar')).toBe(false);
+    expect(s.get('lockActionBars')).toBe(false);
     expect(s.get('showThirdActionBar')).toBe(false);
     expect(s.get('invertLookY')).toBe(false);
   });
@@ -336,18 +337,21 @@ describe('Interface & Comfort settings pack', () => {
     s.set('showWalletOnCharacterScreen', false);
     s.set('showWalletOnPlayerCard', false);
     s.set('showDevBadges', false);
+    s.set('lockActionBars', true);
     // a fresh instance reads the same backing store
     expect(new Settings().get('reduceMotion')).toBe(true);
     expect(new Settings().get('showFps')).toBe(true);
     expect(new Settings().get('showWalletOnCharacterScreen')).toBe(false);
     expect(new Settings().get('showWalletOnPlayerCard')).toBe(false);
     expect(new Settings().get('showDevBadges')).toBe(false);
+    expect(new Settings().get('lockActionBars')).toBe(true);
     s.reset();
     expect(s.get('reduceMotion')).toBe(false);
     expect(s.get('showFps')).toBe(false);
     expect(s.get('showWalletOnCharacterScreen')).toBe(true);
     expect(s.get('showWalletOnPlayerCard')).toBe(true);
     expect(s.get('showDevBadges')).toBe(true);
+    expect(s.get('lockActionBars')).toBe(false);
     expect(s.get('invertLookY')).toBe(false);
     expect(s.get('frostedPanels')).toBe(false);
   });

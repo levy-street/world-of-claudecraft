@@ -109,7 +109,7 @@ describe('spellbook_window: the Attack row is draggable onto the action bar', ()
     // (the natural gesture other spells support) got nothing. It now drags too.
     const attackStart = code.indexOf('private appendAttackRow(');
     const attackRow = code.slice(attackStart, code.indexOf('private appendRow(', attackStart));
-    expect(attackRow).toContain('el.draggable = true');
+    expect(attackRow).toContain('el.draggable = !this.deps.actionBarsLocked()');
   });
 
   it('writes the dedicated Attack marker MIME on dragstart (not an encoded action)', () => {
@@ -216,8 +216,17 @@ describe('spellbook_window: hud.update() refresh call site', () => {
     // guard does not cover this path: without these, the open spellbook's toggles
     // would stop tracking the bar (the whole reason this path is not-cold).
     expect(code).toContain("btn.setAttribute('aria-pressed'");
-    expect(code).toContain('const disabled = !onBar && !hasFree');
+    expect(code).toContain('const disabled = locked || (!onBar && !hasFree)');
     expect(code).toContain('if (btn.disabled !== disabled) btn.disabled = disabled');
+  });
+
+  it('keeps lock changes inside the allocation-free repaint gate', () => {
+    expect(code).toContain('const locked = this.deps.actionBarsLocked()');
+    expect(code).toContain('if (locked !== this.lastActionBarsLocked) return true');
+    expect(code).toContain('this.lastActionBarsLocked = locked');
+    expect(code).not.toContain(
+      "this.deps.root().querySelector<HTMLButtonElement>('[data-reset-bar]')",
+    );
   });
 
   it('elides the toggle writes to on-bar flips only, per row', () => {

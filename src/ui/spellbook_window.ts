@@ -103,6 +103,8 @@ export interface SpellbookWindowDeps {
   barActions(): readonly HotbarAction[];
   /** The action bar has at least one empty slot. */
   hasFreeSlot(): boolean;
+  /** Layout edits are disabled while the player has locked the action bars. */
+  actionBarsLocked(): boolean;
   /** The Attack toggle currently occupies bar slot 0 (showAttackButton on). */
   attackOnBar(): boolean;
   /** Restore (true) or remove (false) the Attack toggle on bar slot 0; routes
@@ -170,12 +172,14 @@ export class SpellbookWindow {
   // them, because it only hides the root (the nodes stay attached and correct, and
   // re-opening re-renders anyway).
   private attackToggle: HTMLButtonElement | null = null;
+  private resetBarButton: HTMLButtonElement | null = null;
   private readonly rowToggles: RowToggle[] = [];
   // The action-bar state those toggles were painted from. Everything the refresh
   // writes is a function of exactly these three, so an unchanged frame has nothing
   // to paint; see takeControlChange.
   private lastAttackOnBar = false;
   private lastHasFree = false;
+  private lastActionBarsLocked: boolean | null = null;
   private readonly lastSlotIds: (string | null)[] = [];
 
   constructor(private readonly deps: SpellbookWindowDeps) {}
@@ -371,7 +375,9 @@ export class SpellbookWindow {
       list.appendChild(empty);
     }
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    const resetBtn = el.querySelector('[data-reset-bar]');
+    const resetBtn = el.querySelector<HTMLButtonElement>('[data-reset-bar]');
+    this.resetBarButton = resetBtn;
+    if (resetBtn) resetBtn.disabled = this.deps.actionBarsLocked();
     resetBtn?.addEventListener('pointerdown', (ev) => ev.stopPropagation());
     resetBtn?.addEventListener('click', (ev) => {
       ev.preventDefault();
@@ -428,10 +434,12 @@ export class SpellbookWindow {
   private takeControlChange(): boolean {
     const attackOnBar = this.deps.attackOnBar();
     const hasFree = this.deps.hasFreeSlot();
+    const locked = this.deps.actionBarsLocked();
     const actions = this.deps.barActions();
-    if (!this.controlsMoved(attackOnBar, hasFree, actions)) return false;
+    if (!this.controlsMoved(attackOnBar, hasFree, locked, actions)) return false;
     this.lastAttackOnBar = attackOnBar;
     this.lastHasFree = hasFree;
+    this.lastActionBarsLocked = locked;
     this.lastSlotIds.length = 0;
     for (const action of actions) this.lastSlotIds.push(slotAbilityId(action));
     return true;
@@ -440,10 +448,12 @@ export class SpellbookWindow {
   private controlsMoved(
     attackOnBar: boolean,
     hasFree: boolean,
+    locked: boolean,
     actions: readonly HotbarAction[],
   ): boolean {
     if (attackOnBar !== this.lastAttackOnBar) return true;
     if (hasFree !== this.lastHasFree) return true;
+    if (locked !== this.lastActionBarsLocked) return true;
     if (actions.length !== this.lastSlotIds.length) return true;
     for (let i = 0; i < actions.length; i++) {
       if (slotAbilityId(actions[i]) !== this.lastSlotIds[i]) return true;
@@ -455,6 +465,10 @@ export class SpellbookWindow {
   // refs render() collected. Runs only behind one of the two entry points above,
   // never on an unchanged frame.
   private paintHotbarControls(): void {
+    const locked = this.lastActionBarsLocked ?? false;
+    if (this.resetBarButton && this.resetBarButton.disabled !== locked) {
+      this.resetBarButton.disabled = locked;
+    }
     // The Attack toggle tracks the Interface showAttackButton setting, which can
     // flip while the window is open (the options window, or a right-click on the
     // slot-0 button itself). Same elision discipline as the ability toggles:
@@ -462,6 +476,9 @@ export class SpellbookWindow {
     const attackBtn = this.attackToggle;
     if (attackBtn) {
       const onBar = this.lastAttackOnBar;
+      if (attackBtn.disabled !== locked) attackBtn.disabled = locked;
+      const attackRow = attackBtn.closest<HTMLElement>('.spell-row');
+      if (attackRow && attackRow.draggable === locked) attackRow.draggable = !locked;
       if ((attackBtn.getAttribute('aria-pressed') === 'true') !== onBar) {
         attackBtn.textContent = onBar ? '-' : '+';
         attackBtn.classList.toggle('remove', onBar);
@@ -507,14 +524,17 @@ export class SpellbookWindow {
       // on-bar flip (the bar filling up disables every off-bar row's add control
       // while no row's membership moved). Diffed against the live property so a
       // repaint writes only the rows that actually flipped.
-      const disabled = !onBar && !hasFree;
+      const disabled = locked || (!onBar && !hasFree);
       if (btn.disabled !== disabled) btn.disabled = disabled;
+      const row = btn.closest<HTMLElement>('.spell-row');
+      if (row && row.draggable === locked) row.draggable = !locked;
     }
   }
 
   /** Drop the toggle refs whose nodes the next render() is about to replace. */
   private forgetToggles(): void {
     this.attackToggle = null;
+    this.resetBarButton = null;
     this.rowToggles.length = 0;
   }
 
@@ -549,6 +569,7 @@ export class SpellbookWindow {
       }),
     );
     toggle.setAttribute('aria-pressed', onBar ? 'true' : 'false');
+    toggle.disabled = this.deps.actionBarsLocked();
     toggle.addEventListener('pointerdown', (ev) => ev.stopPropagation());
     toggle.addEventListener('click', (ev) => {
       ev.preventDefault();
@@ -565,8 +586,12 @@ export class SpellbookWindow {
     // id, so it cannot ride the HotbarAction path: the dragstart carries the dedicated
     // Attack marker MIME, which the action bar accepts by turning showAttackButton back
     // on (restoring Attack to slot 0). The +/- toggle above stays for touch/keyboard.
-    el.draggable = true;
+    el.draggable = !this.deps.actionBarsLocked();
     el.addEventListener('dragstart', (e) => {
+      if (this.deps.actionBarsLocked()) {
+        e.preventDefault();
+        return;
+      }
       if (e.dataTransfer) {
         e.dataTransfer.setData(HOTBAR_ATTACK_MIME, '1');
         e.dataTransfer.effectAllowed = 'move';
@@ -627,7 +652,7 @@ export class SpellbookWindow {
         ),
       );
       toggle.setAttribute('aria-pressed', row.onBar ? 'true' : 'false');
-      toggle.disabled = row.toggleDisabled;
+      toggle.disabled = this.deps.actionBarsLocked() || row.toggleDisabled;
       // Touch-only page label (Phase 4): names which mobile action-ring page
       // (Phase 1) this bar-assigned row's slot falls on, so a touch player who
       // added it from the spellbook knows where to find it on the ring. Desktop
@@ -660,8 +685,12 @@ export class SpellbookWindow {
       // walking the whole list for `.spell-hotbar-toggle` on every frame.
       this.rowToggles.push({ abilityId: known.def.id, btn: toggle });
       el.appendChild(toggle);
-      el.draggable = true;
+      el.draggable = !this.deps.actionBarsLocked();
       el.addEventListener('dragstart', (e) => {
+        if (this.deps.actionBarsLocked()) {
+          e.preventDefault();
+          return;
+        }
         const action = { type: 'ability' as const, id: known.def.id };
         this.deps.setDragAction(action);
         this.writeDraggedAction(e.dataTransfer, action);
