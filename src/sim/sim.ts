@@ -27,7 +27,13 @@ import {
 } from './bags';
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
-import { lineOfSightClear, resolveMovement, resolvePosition } from './colliders';
+import {
+  lineOfSightClear,
+  moverHeight,
+  resolveMovement,
+  resolvePosition,
+  seatGroundedAt,
+} from './colliders';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
 import { auraReplacementConflicts } from './combat/aura_stacking';
 import {
@@ -5385,9 +5391,13 @@ export class Sim {
       if (blocked) break; // hit a wall: stop the shove here
     }
     if (moved <= 0) return 0;
-    target.pos.x = cx;
-    target.pos.z = cz;
-    target.pos.y = groundHeight(cx, cz, this.cfg.seed);
+    // Support-aware seat: a victim shoved along crate tops stays on them, and
+    // one shoved through a passed-over prop footprint is nudged clear instead
+    // of being embedded at terrain height inside it.
+    const seat = seatGroundedAt(this.cfg.seed, cx, cz, BODY_RADIUS, target.pos.y);
+    target.pos.x = seat.x;
+    target.pos.z = seat.z;
+    target.pos.y = seat.y;
     target.vy = 0;
     target.onGround = true;
     target.fallStartY = target.pos.y;
@@ -8801,7 +8811,22 @@ export class Sim {
     ignoreFences = false,
   ): { x: number; z: number } {
     const run = isDelvePos(nx) || isDelvePos(e.pos.x) ? this.delveRunForEntity(e) : undefined;
-    const res = resolveMovement(this.cfg.seed, fromX, fromZ, nx, nz, r, ignoreFences, run?.modules);
+    // Parkour heights are a PLAYER traversal mechanic: only players pass over
+    // low prop tops. Mobs/pets/NPCs keep full-height collision (their y rides
+    // the terrain every tick, so a height-gated pass would let them clip
+    // through protruding rock bodies and jitter at buried-rock rims).
+    const mover = e.kind === 'player' ? moverHeight(e) : undefined;
+    const res = resolveMovement(
+      this.cfg.seed,
+      fromX,
+      fromZ,
+      nx,
+      nz,
+      r,
+      ignoreFences,
+      run?.modules,
+      mover,
+    );
     if (!run) return res;
     const clamped = this.clampDelveModuleBounds(run, res.x, res.z, r);
     return this.clampDelveDoors(run, clamped.x, clamped.z, r);
@@ -8810,7 +8835,8 @@ export class Sim {
   // Point resolution for mob wander / blocked checks, with the same delve layering.
   private resolveMovePoint(nx: number, nz: number, r: number, e: Entity): { x: number; z: number } {
     const run = isDelvePos(nx) || isDelvePos(e.pos.x) ? this.delveRunForEntity(e) : undefined;
-    const res = resolvePosition(this.cfg.seed, nx, nz, r, false, run?.modules);
+    const mover = e.kind === 'player' ? moverHeight(e) : undefined;
+    const res = resolvePosition(this.cfg.seed, nx, nz, r, false, run?.modules, mover);
     if (!run) return res;
     const clamped = this.clampDelveModuleBounds(run, res.x, res.z, r);
     return this.clampDelveDoors(run, clamped.x, clamped.z, r);

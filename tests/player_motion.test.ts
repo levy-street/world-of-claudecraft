@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isBlocked, resolveMovement } from '../src/sim/colliders';
+import { isBlocked, moverHeight, resolveMovement } from '../src/sim/colliders';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
 import type { Entity, MoveInput } from '../src/sim/types';
@@ -39,8 +39,8 @@ function clientDeps(seed: number): PlayerMotionDeps {
   return {
     seed,
     moveSpeedMult: (e) => moveSpeedMult(e, 0),
-    resolveMove: (fromX, fromZ, nx, nz, r, _e, ignoreFences) =>
-      resolveMovement(seed, fromX, fromZ, nx, nz, r, ignoreFences),
+    resolveMove: (fromX, fromZ, nx, nz, r, e, ignoreFences) =>
+      resolveMovement(seed, fromX, fromZ, nx, nz, r, ignoreFences, undefined, moverHeight(e)),
     resolvedAbility: () => null,
     cancelCast: () => {},
     standUp: () => {},

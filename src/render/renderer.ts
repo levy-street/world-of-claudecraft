@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
-import { cameraOcclusion } from '../sim/colliders';
+import { cameraOcclusion, supportHeightAt } from '../sim/colliders';
 import {
   ABILITIES,
   ARENA_SLOT_COUNT,
@@ -5438,13 +5438,17 @@ export class Renderer {
       // hitches transiently lift the sampled pose off the terrain, and a
       // single-frame false positive flips the base state to `jump` and back,
       // replaying the jump clip's crouch (the world-entry anim glitch).
-      if (
-        e.kind === 'player' &&
-        e.onGround &&
-        !swimming &&
-        ay - groundHeight(ax, az, this.sim.cfg.seed) > AIRBORNE_EPS
-      ) {
-        v.airborneHeurFrames++;
+      // The standing surface is the terrain OR a standable prop top under the
+      // feet (parkour: crates/rocks are walkable), else a player perched on a
+      // crate would read as permanently airborne and loop the jump pose.
+      if (e.kind === 'player' && e.onGround && !swimming) {
+        const heurSeed = this.sim.cfg.seed;
+        const standY = Math.max(
+          groundHeight(ax, az, heurSeed),
+          supportHeightAt(heurSeed, ax, az, 0.5, ay + 0.01),
+        );
+        if (ay - standY > AIRBORNE_EPS) v.airborneHeurFrames++;
+        else v.airborneHeurFrames = 0;
       } else {
         v.airborneHeurFrames = 0;
       }
@@ -5617,7 +5621,10 @@ export class Renderer {
           this.selRingZ = cz;
           this.selRingScale = target.scale;
           const seed = this.sim.cfg.seed;
-          const gy = groundHeight(cx, cz, seed);
+          // A target standing on a prop top (crate/rock) gets the ring on that
+          // surface, not buried at terrain height under it.
+          const supportY = supportHeightAt(seed, cx, cz, 0.5, tv.group.position.y + 0.01);
+          const gy = Math.max(groundHeight(cx, cz, seed), supportY);
           this.selectionRing.position.set(cx, gy, cz);
           this.selectionRing.scale.setScalar(target.scale);
           const drape = drapeRingLocalY(
@@ -5627,7 +5634,7 @@ export class Renderer {
             gy,
             target.scale,
             0.08,
-            (sx, sz) => groundHeight(sx, sz, seed),
+            (sx, sz) => Math.max(groundHeight(sx, sz, seed), supportY),
             this.selectionRingDrapeY,
           );
           const ringPos = this.selectionRingMesh.geometry.getAttribute(

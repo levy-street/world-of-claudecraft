@@ -46,6 +46,20 @@ export interface CircleCollider {
    * when they cross the eye-to-camera segment instead of zooming in.
    */
   camGhost?: boolean;
+  /**
+   * Absolute world-space top of the PHYSICAL obstacle for movement (parkour):
+   * a mover whose feet reach this height passes over instead of being walled
+   * (see `passesOver`). Distinct from `cameraTopY`, which is occlusion-only
+   * and often includes flames/roofs taller than the solid body. Undefined =
+   * full-height, blocks at any altitude (buildings, trees, wells).
+   */
+  moveTopY?: number;
+  /**
+   * A mover may stand ON `moveTopY` (crates, rocks): the top feeds
+   * `supportHeightAt` (landing/walking surface) and grants the airborne
+   * mantle lift, so a jump at the rim hoists the body onto the top.
+   */
+  standable?: boolean;
 }
 
 export interface ObbCollider {
@@ -59,6 +73,10 @@ export interface ObbCollider {
   cameraTopY?: number;
   /** See {@link CircleCollider.camGhost}. */
   camGhost?: boolean;
+  /** See {@link CircleCollider.moveTopY}. */
+  moveTopY?: number;
+  /** See {@link CircleCollider.standable}. */
+  standable?: boolean;
   /**
    * Low fence rail: a grounded mover collides normally, but a mover that is
    * airborne above the rail (see `FENCE_RAIL_HEIGHT`) jumps clear of it. Set on
@@ -68,6 +86,51 @@ export interface ObbCollider {
 }
 
 export type Collider = CircleCollider | ObbCollider;
+
+// ---------------------------------------------------------------------------
+// Parkour heights (movement-blocking tops, mantle, standable support)
+// ---------------------------------------------------------------------------
+
+/**
+ * How far above a mover's feet a STANDABLE top may still sit and be treated as
+ * passable while airborne: the mantle assist. A jump whose apex falls short of
+ * a crate rim by up to this much still carries the body over, and the support
+ * snap in the movement kernel then seats the feet on the top (the vault).
+ */
+export const MANTLE_REACH = 0.55;
+/** Float slack when comparing feet height against a collider top. */
+const MOVE_TOP_EPS = 1e-3;
+// How much of the body radius must overlap a standable top before it supports
+// the mover: standing needs the center meaningfully over the prop, while the
+// full collision radius still gates entry, so a jump can graze past a rim
+// without being captured by it.
+const SUPPORT_OVERLAP = 0.5;
+// Physical movement tops (yards above the prop's ground). The camera/sight
+// tops above stay untouched: cameraTopY for a campfire includes the flame,
+// but the SOLID obstacle is only the log pile, which is what a jump clears.
+// Exported so tests pin against the one authoritative value.
+export const CRATE_TOP = 1.35;
+export const CAMPFIRE_MOVE_TOP = 0.55;
+export const ROCK_TOP_PER_SCALE = 1.25;
+
+/** The mover's feet altitude plus how much standable lift it gets (the
+ * airborne mantle assist). Both hosts derive it from the SAME entity fields so
+ * the server sim and the client self extrapolator gate colliders identically. */
+export interface MoverHeight {
+  y: number;
+  lift: number;
+}
+
+export function moverHeight(e: { pos: { y: number }; onGround: boolean }): MoverHeight {
+  return { y: e.pos.y, lift: e.onGround ? 0 : MANTLE_REACH };
+}
+
+// Does the mover pass clean over this collider? Full-height colliders
+// (moveTopY undefined) never pass; standable tops grant the mantle lift.
+function passesOver(c: Collider, mover: MoverHeight | undefined): boolean {
+  if (!mover || c.moveTopY === undefined) return false;
+  return c.moveTopY <= mover.y + (c.standable ? mover.lift : 0) + MOVE_TOP_EPS;
+}
 
 function topY(seed: number, x: number, z: number, height: number): number {
   return groundHeight(x, z, seed) + height;
@@ -160,9 +223,29 @@ function staticWorldColliders(seed: number): Collider[] {
       camGhost: true,
     });
   for (const [x, z] of PROPS.crates)
-    out.push({ type: 'circle', x, z, r: 0.65, cameraTopY: topY(seed, x, z, 1.35), camGhost: true });
+    out.push({
+      type: 'circle',
+      x,
+      z,
+      r: 0.65,
+      cameraTopY: topY(seed, x, z, 1.35),
+      camGhost: true,
+      moveTopY: topY(seed, x, z, CRATE_TOP),
+      standable: true,
+    });
   for (const [x, z] of PROPS.campfires)
-    out.push({ type: 'circle', x, z, r: 0.85, cameraTopY: topY(seed, x, z, 1.45), camGhost: true });
+    out.push({
+      type: 'circle',
+      x,
+      z,
+      r: 0.85,
+      cameraTopY: topY(seed, x, z, 1.45),
+      camGhost: true,
+      // The log pile is the solid part; the flame above it is not a wall. A
+      // jump clears the fire, walking through it stays blocked, and it is
+      // deliberately NOT standable (no perching inside the fire).
+      moveTopY: topY(seed, x, z, CAMPFIRE_MOVE_TOP),
+    });
   for (const [x, z] of PROPS.mudHuts)
     out.push({ type: 'circle', x, z, r: 1.1, cameraTopY: topY(seed, x, z, 12.5), camGhost: true });
   for (const ruin of PROPS.ruinRings) {
@@ -202,7 +285,9 @@ function staticWorldColliders(seed: number): Collider[] {
           x: d.x,
           z: d.z,
           r: 0.7 * d.scale,
-          cameraTopY: topY(seed, d.x, d.z, 1.25 * d.scale),
+          cameraTopY: topY(seed, d.x, d.z, ROCK_TOP_PER_SCALE * d.scale),
+          moveTopY: topY(seed, d.x, d.z, ROCK_TOP_PER_SCALE * d.scale),
+          standable: true,
         });
     } else {
       // tree trunks only — canopies don't block
@@ -393,6 +478,7 @@ function resolveAgainst(
   z: number,
   r: number,
   ignoreFences = false,
+  mover?: MoverHeight,
 ): { x: number; z: number } {
   let px = x,
     pz = z;
@@ -400,6 +486,7 @@ function resolveAgainst(
     let moved = false;
     for (const c of list) {
       if (ignoreFences && c.type === 'obb' && c.isFence) continue;
+      if (passesOver(c, mover)) continue;
       const res = pushOut(c, px, pz, r);
       if (res) {
         px = res.x;
@@ -430,7 +517,9 @@ function instanceLocal(x: number, z: number): { ox: number; oz: number; interior
 }
 
 // Resolve a movement destination against all static geometry. Movers slide
-// along obstacles. `r` is the body radius.
+// along obstacles. `r` is the body radius. `mover` (feet height + mantle
+// lift) lets a jumping/standing body pass over low prop tops; omitted, every
+// collider blocks at any height (mobs, pathfinding, legacy callers).
 export function resolvePosition(
   seed: number,
   x: number,
@@ -438,6 +527,7 @@ export function resolvePosition(
   r = 0.5,
   ignoreFences = false,
   delveModules?: readonly string[],
+  mover?: MoverHeight,
 ): { x: number; z: number } {
   if (isYumiMazePos(x)) {
     const o = yumiMazeOriginAt(z);
@@ -467,7 +557,75 @@ export function resolvePosition(
   const key = `${Math.floor(x / GRID_CELL)},${Math.floor(z / GRID_CELL)}`;
   const list = grid.cells.get(key);
   if (!list) return { x, z };
-  return resolveAgainst(list, x, z, r, ignoreFences);
+  return resolveAgainst(list, x, z, r, ignoreFences, mover);
+}
+
+/**
+ * Highest STANDABLE prop top under the body at (x,z) that sits at or below
+ * `maxY`: the walking/landing surface the movement kernel maxes against the
+ * terrain. Grounded movers pass their feet height (exact: a taller prop beside
+ * you never levitates you); airborne movers add MANTLE_REACH so a jump at a
+ * rim seats on top. Open-world grid only: instanced interiors have no props.
+ * Returns -Infinity when nothing supports.
+ */
+export function supportHeightAt(
+  seed: number,
+  x: number,
+  z: number,
+  r: number,
+  maxY: number,
+): number {
+  if (isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x) || x > DUNGEON_X_THRESHOLD) {
+    return -Infinity;
+  }
+  const grid = gridFor(seed);
+  const list = grid.cells.get(`${Math.floor(x / GRID_CELL)},${Math.floor(z / GRID_CELL)}`);
+  if (!list) return -Infinity;
+  let best = -Infinity;
+  const reachR = r * SUPPORT_OVERLAP;
+  for (const c of list) {
+    if (!c.standable || c.moveTopY === undefined) continue;
+    if (c.moveTopY > maxY + MOVE_TOP_EPS || c.moveTopY <= best) continue;
+    if (c.type === 'circle') {
+      const dx = x - c.x,
+        dz = z - c.z;
+      const reach = c.r + reachR;
+      if (dx * dx + dz * dz < reach * reach) best = c.moveTopY;
+    } else {
+      const local = rotY(x - c.x, z - c.z, -c.rot);
+      if (Math.abs(local.x) < c.hw + reachR && Math.abs(local.z) < c.hd + reachR) {
+        best = c.moveTopY;
+      }
+    }
+  }
+  return best;
+}
+
+/**
+ * Grounded seat for an INSTANT relocation end point (heroic leap landing,
+ * knockback end): the height-gated sweep that produced (x,z) may have passed
+ * over low props, so a plain terrain re-seat could embed the body inside one.
+ * Stand on a standable top under the point when the mover's previous feet
+ * reached it; otherwise nudge full-height out of any overlapped collider and
+ * seat on the terrain there. A clear point is returned unchanged.
+ */
+export function seatGroundedAt(
+  seed: number,
+  x: number,
+  z: number,
+  r: number,
+  prevFeetY: number,
+): { x: number; z: number; y: number } {
+  const ground = groundHeight(x, z, seed);
+  // Instanced regions have no prop tops and their own bounds/door clamps
+  // (applied by the caller's sweep): plain terrain seat there, untouched.
+  if (isYumiMazePos(x) || isDelvePos(x) || isArenaPos(x) || x > DUNGEON_X_THRESHOLD) {
+    return { x, z, y: ground };
+  }
+  const support = supportHeightAt(seed, x, z, r, prevFeetY + MOVE_TOP_EPS);
+  if (support > ground) return { x, z, y: support };
+  const res = resolvePosition(seed, x, z, r);
+  return { x: res.x, z: res.z, y: groundHeight(res.x, res.z, seed) };
 }
 
 function crossesFence(fromX: number, fromZ: number, toX: number, toZ: number, r: number): boolean {
@@ -508,11 +666,12 @@ export function resolveMovement(
   r = 0.5,
   ignoreFences = false,
   delveModules?: readonly string[],
+  mover?: MoverHeight,
 ): { x: number; z: number } {
   const dx = toX - fromX;
   const dz = toZ - fromZ;
   const d = Math.hypot(dx, dz);
-  if (d < 1e-6) return resolvePosition(seed, toX, toZ, r, ignoreFences, delveModules);
+  if (d < 1e-6) return resolvePosition(seed, toX, toZ, r, ignoreFences, delveModules, mover);
   const steps = Math.max(1, Math.ceil(d / 0.2));
   let x = fromX,
     z = fromZ;
@@ -521,7 +680,7 @@ export function resolveMovement(
     const nextX = fromX + dx * t;
     const nextZ = fromZ + dz * t;
     if (!ignoreFences && crossesFence(x, z, nextX, nextZ, r)) break;
-    const resolved = resolvePosition(seed, nextX, nextZ, r, ignoreFences, delveModules);
+    const resolved = resolvePosition(seed, nextX, nextZ, r, ignoreFences, delveModules, mover);
     x = resolved.x;
     z = resolved.z;
     if (Math.hypot(x - nextX, z - nextZ) > r * 0.25) {

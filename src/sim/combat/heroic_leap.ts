@@ -1,3 +1,4 @@
+import { seatGroundedAt } from '../colliders';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { SimContext } from '../sim_context';
 import { type AbilityDef, DT, type Entity, type Vec3 } from '../types';
@@ -30,6 +31,7 @@ function wasExternallyRelocated(entity: Entity): boolean {
 }
 
 export function sweptLanding(ctx: SimContext, entity: Entity, aim: Vec3): Vec3 {
+  const fromFeetY = entity.pos.y;
   const fromX = entity.pos.x;
   const fromZ = entity.pos.z;
   const dx = aim.x - fromX;
@@ -69,11 +71,11 @@ export function sweptLanding(ctx: SimContext, entity: Entity, aim: Vec3): Vec3 {
     }
   }
 
-  return {
-    x: safeX,
-    y: groundHeight(safeX, safeZ, ctx.cfg.seed),
-    z: safeZ,
-  };
+  // Support-aware seat: the player-height sweep above passes over low props,
+  // so the end point may sit on a crate/rock top (land ON it) or inside a
+  // passed-over footprint (nudge clear) instead of embedding at terrain.
+  const seat = seatGroundedAt(ctx.cfg.seed, safeX, safeZ, PLAYER_BODY_RADIUS, fromFeetY);
+  return { x: seat.x, y: seat.y, z: seat.z };
 }
 
 /** Instant relocation through the same collision/terrain sweep as Heroic Leap. */

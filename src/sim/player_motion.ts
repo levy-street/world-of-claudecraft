@@ -17,6 +17,7 @@
 // deps at the identical call site, so the Sim's global draw order is unchanged
 // by the extraction.
 
+import { MANTLE_REACH, supportHeightAt } from './colliders';
 import { isRooted, isStunned } from './combat/cc';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import { GHOST_RUN_MULT } from './spirit';
@@ -40,6 +41,15 @@ import {
 export const BACKPEDAL_MULT = 0.65;
 export const GRAVITY = 16;
 export const JUMP_VELOCITY = 6; // apex = v^2/2g ≈ 1.125 yd
+// Airborne steering: held movement keys accelerate the air velocity toward the
+// wish direction at this rate (yd/s^2), capped at the wish speed. Enough to
+// meaningfully adjust a jump arc (full authority in ~0.35 s of a ~0.75 s arc)
+// without letting a knockback be cancelled outright.
+export const AIR_CONTROL_ACCEL = 20;
+// Coyote time: seconds after WALKING off a ledge (never after a jump) during
+// which a jump still fires. Stateless on purpose: a walk-off starts at vy = 0,
+// so "recently left the ledge" is exactly vy > -GRAVITY * COYOTE_TIME.
+export const COYOTE_TIME = 0.15;
 // Re-exported by sim.ts for social/chat_readouts.ts (the /falling readout shares
 // the landing-damage threshold with the fall-damage model below).
 export const FALL_SAFE_DISTANCE = 12; // yards of free fall before damage
@@ -188,9 +198,20 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   }
 
   const movingOnGround = moving && (p.onGround || swimming);
+  // Air control: held keys steer the airborne velocity toward the wish vector.
+  // Also what lets a jump STARTED in place drift forward, and a fall off a
+  // ledge stay steerable, instead of the old frozen-at-takeoff trajectory.
+  const airSteering = moving && !p.onGround && !swimming;
   const slide = steepGround ? terrainDownhill(p.pos.x, p.pos.z, deps.seed) : null;
-  if (slide || movingOnGround || (!p.onGround && (p.vx !== 0 || p.vz !== 0))) {
+  if (slide || movingOnGround || airSteering || (!p.onGround && (p.vx !== 0 || p.vz !== 0))) {
     if (slide && p.castingAbility) deps.cancelCast(p);
+    if (airSteering) {
+      const accel = AIR_CONTROL_ACCEL * DT;
+      const dvx = wishX * wishSpeed - p.vx;
+      const dvz = wishZ * wishSpeed - p.vz;
+      p.vx += Math.max(-accel, Math.min(accel, dvx));
+      p.vz += Math.max(-accel, Math.min(accel, dvz));
+    }
     const stepX = slide ? slide.x * STEEP_SLIDE_SPEED : movingOnGround ? wishX * wishSpeed : p.vx;
     const stepZ = slide ? slide.z * STEEP_SLIDE_SPEED : movingOnGround ? wishZ * wishSpeed : p.vz;
     let nx = p.pos.x + stepX * DT;
@@ -249,6 +270,21 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
 
   // Vertical: jumping, gravity, swimming, fall damage
   const ground = groundHeight(p.pos.x, p.pos.z, deps.seed);
+  // The surface the body rests on: the terrain, or a standable prop top
+  // (crate, rock) under the feet. Grounded the query is exact (a taller prop
+  // beside the body never lifts it); airborne it reaches MANTLE_REACH above
+  // the feet, so a jump that carries the body over a rim seats on the top:
+  // the mantle. Away from props this IS the terrain height.
+  const support = Math.max(
+    ground,
+    supportHeightAt(
+      deps.seed,
+      p.pos.x,
+      p.pos.z,
+      BODY_RADIUS,
+      p.pos.y + (p.onGround ? 0 : MANTLE_REACH),
+    ),
+  );
   const deepWater = ground < waterLevelAt(p.pos.x, p.pos.z) - SWIM_DEPTH;
   if (deepWater && p.pos.y <= swimSurfaceY(p.pos.x, p.pos.z) + 0.05) {
     // treading water at the surface
@@ -269,7 +305,20 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     }
     return;
   }
-  if (inp.jump && p.onGround && !isRooted(p) && !steepGround) {
+  // Coyote window: within COYOTE_TIME of WALKING off a ledge (vy starts at 0
+  // there and only gravity has touched it since; a jump sets `jumping`), the
+  // jump still fires, so running off a crate or a bank never eats the input.
+  // Denied while the body hangs over unwalkably steep terrain: a steep-slide
+  // carrying the player off a cliff lip must stay the uncontrollable drop the
+  // grounded steepGround gate enforces, not become a steerable mid-air jump.
+  const coyote =
+    !p.onGround &&
+    !p.jumping &&
+    !swimming &&
+    p.vy <= 0 &&
+    p.vy > -GRAVITY * COYOTE_TIME &&
+    terrainSteepnessAt(p.pos.x, p.pos.z, deps.seed) <= MAX_CLIMB_SLOPE;
+  if (inp.jump && (p.onGround || coyote) && !isRooted(p) && !steepGround) {
     p.vy = JUMP_VELOCITY * jumpMult(p);
     p.vx = wishX * wishSpeed;
     p.vz = wishZ * wishSpeed;
@@ -292,40 +341,46 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
       p.fallStartY = p.pos.y;
       return;
     }
-    if (p.pos.y <= ground) {
-      p.pos.y = ground;
+    if (p.pos.y <= support) {
+      // Landing surface: the terrain, or a standable prop top the body is
+      // over. When the support sits ABOVE the feet (within MANTLE_REACH,
+      // gated by the query above) this snap-up IS the mantle: the body hoists
+      // onto the crate/rock rim it jumped at.
+      p.pos.y = support;
       p.vy = 0;
       p.vx = 0;
       p.vz = 0;
       p.onGround = true;
       p.jumping = false;
-      const drop = p.fallStartY - ground;
+      const drop = p.fallStartY - support;
       if (drop > FALL_SAFE_DISTANCE) {
         const dmg = Math.round(p.maxHp * (drop - FALL_SAFE_DISTANCE) * 0.07);
         if (dmg > 0) deps.dealDamage(null, p, dmg, false, 'physical', 'Falling', 'hit', true);
       }
-      p.fallStartY = ground;
+      p.fallStartY = support;
     }
   } else {
     // Distinguish a walkable downhill slope from a genuine cliff/ledge. The
-    // drop the ground can take in one tick scales with how far we moved: a
+    // drop the surface can take in one tick scales with how far we moved: a
     // slope no steeper than MAX_CLIMB_SLOPE (the same gate that blocks uphill
     // climbs) is walkable, so we snap down to follow it instead of falling.
     // Only a steeper-than-walkable drop counts as walking off a ledge. The
     // 0.4 base keeps a near-stationary player snapped over tiny terrain noise.
     const run = Math.hypot(p.pos.x - p.prevPos.x, p.pos.z - p.prevPos.z);
     const maxStepDown = 0.4 + run * MAX_CLIMB_SLOPE;
-    if (ground < p.pos.y - maxStepDown) {
-      // walked off a ledge (not a jump), so fences still block
+    if (support < p.pos.y - maxStepDown) {
+      // Walked off a ledge or a prop top (not a jump), so fences still block.
+      // Momentum carries: the horizontal velocity this tick keeps driving the
+      // fall (steerable via air control) instead of dropping dead straight.
       p.onGround = false;
       p.jumping = false;
-      p.vx = 0;
-      p.vz = 0;
+      p.vx = (p.pos.x - p.prevPos.x) / DT;
+      p.vz = (p.pos.z - p.prevPos.z) / DT;
       p.vy = 0;
       p.fallStartY = p.pos.y;
     } else {
-      p.pos.y = ground;
-      p.fallStartY = ground;
+      p.pos.y = support;
+      p.fallStartY = support;
     }
   }
 
@@ -333,11 +388,13 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // block the CENTER from climbing a wall, but nothing keeps the body's WIDTH
   // clear of one, so standing at (or strafing along) a wall foot buries the near
   // side of the model. Only on settled ground (a fall/ledge is resolved above),
-  // and never onto ground steeper than the climb limit (a rare terrace corner:
-  // a tick's clip beats being shoved onto a wall). Lives in the kernel so the
-  // server Sim and the client self-predictor apply it identically; no-op on open
-  // ground and on flat instanced floors.
-  if (p.onGround && !isSwimming(p, deps.seed)) {
+  // never while standing on a prop top (the standoff reseats onto TERRAIN
+  // height, which would yank the body off its crate/rock), and never onto
+  // ground steeper than the climb limit (a rare terrace corner: a tick's clip
+  // beats being shoved onto a wall). Lives in the kernel so the server Sim and
+  // the client self-predictor apply it identically; no-op on open ground and
+  // on flat instanced floors.
+  if (p.onGround && p.pos.y <= ground + 1e-3 && !isSwimming(p, deps.seed)) {
     const s = terrainWallStandoff(p.pos.x, p.pos.z, deps.seed, BODY_RADIUS, MAX_CLIMB_SLOPE);
     if (s.x !== p.pos.x || s.z !== p.pos.z) {
       const resolved = deps.resolveMove(p.pos.x, p.pos.z, s.x, s.z, BODY_RADIUS, p, false);
