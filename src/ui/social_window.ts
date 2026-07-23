@@ -306,8 +306,9 @@ export class SocialWindow {
                 : this.ignoreHtml();
     if (draft) {
       const next = body.querySelector('input[data-field="gmotd"]') as HTMLInputElement | null;
-      // A demotion mid-draft disables the fresh input; drop the draft then.
-      if (next && !next.disabled) {
+      // A demotion mid-draft removes the edit row entirely (editor-only), so
+      // `next` is null then and the draft is dropped.
+      if (next) {
         next.value = draft.value;
         if (draft.focused) {
           next.focus();
@@ -380,12 +381,13 @@ export class SocialWindow {
   }
 
   // Send the billboard edit up through IWorld. Empty is allowed (clears the
-  // billboard); the server owns the rank/mute/rate/content gates and the clamp.
+  // billboard); the input only exists for editors, and either way the server
+  // owns the real rank/mute/rate/content gates and the clamp.
   private saveBillboard(): void {
     const input = this.deps
       .root()
       .querySelector('input[data-field="gmotd"]') as HTMLInputElement | null;
-    if (!input || input.disabled) return;
+    if (!input) return;
     this.deps.world().guildSetMotd(input.value);
   }
 
@@ -489,9 +491,14 @@ export class SocialWindow {
   // The guild billboard: the officer-set message pinned between the guild head
   // and the roster. PLAIN ESCAPED TEXT only, deliberately: the message is
   // player-controlled, so it is never linkified or rendered as HTML (phishing /
-  // XSS surface; nothing else in chat linkifies either). The edit input is
-  // disabled for rank 'member' (UX only; the server enforces the real gate).
+  // XSS surface; nothing else in chat linkifies either). The message div IS the
+  // read view, so the edit row (input + save) renders only for editors (leader
+  // and officer, UX only; the server enforces the real gate): a member never
+  // sees a disabled duplicate of the text above it. With no message set,
+  // members get no billboard box at all; editors keep it (empty-state line +
+  // input) so the feature is discoverable and the first message can be written.
   private billboardHtml(g: NonNullable<GuildView['guild']>): string {
+    if (!g.motd && !g.canEditMotd) return '';
     const message = g.motd
       ? `<div class="soc-billboard-msg">${esc(g.motd)}</div>`
       : `<div class="soc-billboard-msg empty">${esc(t('hudChrome.social.billboard.empty'))}</div>`;
@@ -500,13 +507,12 @@ export class SocialWindow {
         ? `<div class="soc-billboard-by">${esc(t('hudChrome.social.billboard.setBy', { name: g.motdSetBy }))}</div>`
         : '';
     const inputLabel = esc(t('hudChrome.social.billboard.inputLabel'));
-    const edit =
-      `<div class="soc-billboard-edit">` +
-      `<input maxlength="${GUILD_MOTD_MAX}" value="${esc(g.motd)}" aria-label="${inputLabel}" placeholder="${esc(t('hudChrome.social.billboard.placeholder'))}" data-field="gmotd"${g.canEditMotd ? '' : ' disabled'} autocomplete="off" spellcheck="false"/>` +
-      (g.canEditMotd
-        ? `<button type="button" class="btn" data-act="gmotd-save">${esc(t('hudChrome.social.billboard.save'))}</button>`
-        : '') +
-      `</div>`;
+    const edit = g.canEditMotd
+      ? `<div class="soc-billboard-edit">` +
+        `<input maxlength="${GUILD_MOTD_MAX}" value="${esc(g.motd)}" aria-label="${inputLabel}" placeholder="${esc(t('hudChrome.social.billboard.placeholder'))}" data-field="gmotd" autocomplete="off" spellcheck="false"/>` +
+        `<button type="button" class="btn" data-act="gmotd-save">${esc(t('hudChrome.social.billboard.save'))}</button>` +
+        `</div>`
+      : '';
     return (
       `<div class="soc-billboard">` +
       `<div class="soc-billboard-label">${esc(t('hudChrome.social.billboard.label'))}</div>` +

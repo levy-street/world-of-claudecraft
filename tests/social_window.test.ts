@@ -209,12 +209,18 @@ describe('social_window: guild billboard', () => {
     expect(section).not.toContain('innerHTML');
   });
 
-  it('disables the edit input for non-editors and gates the save button on canEditMotd', () => {
-    expect(painter).toContain(`g.canEditMotd ? '' : ' disabled'`);
+  it('renders the edit row (input + save) only for editors, never a disabled duplicate', () => {
+    // The message div is the read view; a member must not get a grayed-out
+    // copy of it in an input. UX only: the server enforces the real rank gate.
+    expect(painter).toContain('const edit = g.canEditMotd');
     expect(painter).toContain('data-act="gmotd-save"');
-    // the save dispatch re-checks disabled, so a member cannot save via devtools
-    // un-hiding (UX only either way: the server enforces the real rank gate)
-    expect(painter).toContain('if (!input || input.disabled) return;');
+    expect(painter).not.toContain("' disabled'");
+  });
+
+  it('renders no billboard box at all for a member when no message is set', () => {
+    // With no motd there is nothing to read; only editors keep the box (the
+    // empty-state line + input) so the first message can be written.
+    expect(painter).toContain("if (!g.motd && !g.canEditMotd) return '';");
   });
 
   it('names the input cap after the server clamp instead of a bare literal', () => {
