@@ -359,44 +359,64 @@ export const TARGETS = [
     // the gain ladder (commons two tiers below = minimal green, a known
     // rung-25 recipe = reduced yellow, a known rung-50 recipe = full orange),
     // and ceiling-state switches to the armorcrafting tab where the 75 row
-    // sits above the pre-attunement ceiling (none, gray).
+    // sits above the pre-attunement ceiling (none, gray). The discount
+    // variants stage the #1134 specialization scene: an armorcrafter at
+    // skill 80 holding EXACTLY the discounted reagent amounts for the chain
+    // vest (listed 4 copper / 9 flux, charged 3 / 7 at the 0.8 multiplier),
+    // so the reagent line and the Craft gate show the discounted requirement.
     variants: [
       { key: 'desktop' },
       { key: 'mobile', mobile: true },
       { key: 'desktop-four-states', fourStates: true },
       { key: 'desktop-ceiling-state', fourStates: true, selectTab: 'armorcrafting' },
+      { key: 'desktop-discount', discount: true, selectTab: 'armorcrafting' },
+      { key: 'mobile-discount', discount: true, mobile: true, selectTab: 'armorcrafting' },
     ],
     // Grant a spread of reagents across a few professions so several recipes read
     // craftable, force-hide then toggle so the open is deterministic, and clip to
     // the window.
     async capture(page, variant) {
-      await page.evaluate((fourStates) => {
-        document.querySelector('#gpu-notice')?.remove();
-        const sim = window.__game?.sim;
-        const ids = ['bone_fragments', 'linen_scrap', 'spider_leg'];
-        for (const id of ids) {
-          try {
-            sim?.addItem(id, 10);
-          } catch {}
-        }
-        if (fourStates) {
-          const meta = sim?.players?.get(sim.primaryId);
-          if (meta) {
-            meta.craftSkills = { ...meta.craftSkills, weaponcrafting: 60 };
-            meta.knownRecipes.add('recipe_ironedge_longsword');
-            meta.knownRecipes.add('recipe_thorium_warblade');
+      await page.evaluate(
+        (staging) => {
+          document.querySelector('#gpu-notice')?.remove();
+          const sim = window.__game?.sim;
+          const ids = ['bone_fragments', 'linen_scrap', 'spider_leg'];
+          for (const id of ids) {
+            try {
+              sim?.addItem(id, 10);
+            } catch {}
           }
-        }
-        const el = document.querySelector('#crafting-window');
-        if (el) el.style.display = 'none';
-        window.__game?.hud?.toggleCrafting?.();
-      }, Boolean(variant?.fourStates));
+          if (staging.fourStates) {
+            const meta = sim?.players?.get(sim.primaryId);
+            if (meta) {
+              meta.craftSkills = { ...meta.craftSkills, weaponcrafting: 60 };
+              meta.knownRecipes.add('recipe_ironedge_longsword');
+              meta.knownRecipes.add('recipe_thorium_warblade');
+            }
+          }
+          if (staging.discount) {
+            try {
+              sim?.addItem('copper_ore', 3);
+              sim?.addItem('smithing_flux', 7);
+            } catch {}
+            const meta = sim?.players?.get(sim.primaryId);
+            if (meta) meta.craftSkills = { ...meta.craftSkills, armorcrafting: 80 };
+          }
+          const el = document.querySelector('#crafting-window');
+          if (el) el.style.display = 'none';
+          window.__game?.hud?.toggleCrafting?.();
+        },
+        {
+          fourStates: Boolean(variant?.fourStates),
+          discount: Boolean(variant?.discount),
+        },
+      );
       // A first-open crafting window with several icon-bearing recipe rows takes
       // noticeably longer to lay out in headless swiftshader than the plain-list
       // bags/map windows do (getBoundingClientRect can report 0x0 for 2-4s), so
       // poll for a real size instead of guessing a fixed wait.
       const open = await pollForSize(page, '#crafting-window');
-      if (open && variant?.fourStates) {
+      if (open && (variant?.fourStates || variant?.discount)) {
         // Staging mid-tier craft skills trips the once-ever first-tier
         // explainer modal over the window, on a drain-window delay rather
         // than synchronously; poll-dismiss it so the shot frames the recipe
@@ -420,7 +440,7 @@ export const TARGETS = [
         }, variant.selectTab);
         await wait(300);
       }
-      if (open && (variant?.mobile || variant?.fourStates)) {
+      if (open && (variant?.mobile || variant?.fourStates || variant?.discount)) {
         // The identity card fills the top of the window (all of it on the short
         // landscape viewport); scroll the first recipe section into view so the
         // legibility rows, and for four-states the whole difficulty ladder
