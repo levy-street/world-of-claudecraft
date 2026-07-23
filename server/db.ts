@@ -1277,6 +1277,17 @@ export async function loadAccountCosmetics(accountId: number): Promise<AccountCo
   return normalizeAccountCosmeticsRow(res.rows[0]);
 }
 
+/** Read only the bounded weapon-skin loadout needed by character-list previews. */
+export async function loadAccountWeaponSkinLoadout(
+  accountId: number,
+): Promise<Record<string, string>> {
+  const res = await pool.query(
+    'SELECT loadout FROM account_weapon_cosmetics WHERE account_id = $1',
+    [accountId],
+  );
+  return stringRecord(res.rows[0]?.loadout);
+}
+
 /**
  * The account's operator-set flair (AI mark + streamer links). The stored JSONB is
  * treated as untrusted: the row always goes back through normalizeAccountFlair, so

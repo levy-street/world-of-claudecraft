@@ -6,6 +6,7 @@ import { mechAssetsReady, preloadMechAssets } from './assets';
 import type { WeaponLayoutOverride } from './manifest';
 import {
   appearanceSignature,
+  DEFAULT_HEAD_APPEARANCE,
   type PreviewAppearance,
   previewAppearanceVisual,
 } from './preview_appearance';
@@ -42,6 +43,11 @@ export class CharacterPreview {
   private characterGroup: THREE.Group;
   private currentVisual: CharacterVisual | null = null;
   private currentSkin = 0;
+  private currentFace = DEFAULT_HEAD_APPEARANCE.face;
+  private currentHairStyle = DEFAULT_HEAD_APPEARANCE.hairStyle;
+  private currentBeard = DEFAULT_HEAD_APPEARANCE.beard;
+  private currentHairColor: number | undefined = undefined;
+  private currentFaceColor: number | undefined = undefined;
   // The active Armory weapon-skin cosmetic, persisted across visual rebuilds
   // exactly like currentSkin so a class/appearance swap keeps the skinned
   // weapon (the in-world renderer and the store preview both apply it; the
@@ -129,6 +135,9 @@ export class CharacterPreview {
     // A class-driven selection (create/offline picker, or a panel switch) supersedes
     // any pending async mech re-apply, so invalidate the tracked appearance.
     this.appearanceSig = null;
+    // Creation/offline previews are not persisted roster appearances. Do not
+    // carry an Armory skin from the previously selected online character.
+    this.currentWeaponSkinId = null;
     const weapon = weaponItemId !== undefined ? weaponItemId : (CLASSES[cls].startWeapon ?? null);
     const offhand =
       offhandItemId !== undefined ? offhandItemId : (CLASSES[cls].startOffhand ?? null);
@@ -144,6 +153,11 @@ export class CharacterPreview {
   setAppearance(a: PreviewAppearance): void {
     if (this.destroyed) return;
     this.currentSkin = a.skin;
+    this.currentFace = a.face ?? 0;
+    this.currentHairStyle = a.hairStyle ?? 0;
+    this.currentBeard = a.beard ?? false;
+    this.currentHairColor = a.hairColor;
+    this.currentFaceColor = a.faceColor;
     this.currentWeaponSkinId = a.weaponSkinId ?? null;
     const sig = appearanceSignature(a);
     this.appearanceSig = sig;
@@ -184,6 +198,11 @@ export class CharacterPreview {
         weaponItemId,
         weaponOverride,
         offhandItemId,
+        this.currentHairStyle,
+        this.currentBeard,
+        this.currentHairColor,
+        this.currentFaceColor,
+        this.currentFace,
       );
       this.characterGroup.add(this.currentVisual.root);
       // Re-apply the persisted weapon-skin cosmetic to the rebuilt visual (the
@@ -214,6 +233,25 @@ export class CharacterPreview {
     this.appearanceSig = null;
     this.currentSkin = skinIndex;
     this.currentVisual?.setSkin(skinIndex);
+  }
+
+  /** Swap the previewed head look (face + hairstyle/beard + hair/face colour);
+   *  persists across setClass. */
+  setCosmetics(
+    hairStyle: number,
+    beard: boolean,
+    hairColor?: number,
+    faceColor?: number,
+    face = 0,
+  ): void {
+    if (this.destroyed) return;
+    this.appearanceSig = null;
+    this.currentFace = face;
+    this.currentHairStyle = hairStyle;
+    this.currentBeard = beard;
+    this.currentHairColor = hairColor;
+    this.currentFaceColor = faceColor;
+    this.currentVisual?.setCosmetics(hairStyle, beard, hairColor, faceColor, face);
   }
 
   /** Dynamically shift the canvas to a new container */

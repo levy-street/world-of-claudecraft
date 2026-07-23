@@ -65,6 +65,11 @@ export interface InspectEntity {
   equippedInstances: Partial<Record<EquipSlot, ItemInstancePayload>>;
   /** The server-resolved active Armory weapon skin (wire wsk), render-only. */
   weaponSkinId?: string | null;
+  face?: number;
+  hairStyle?: number;
+  beard?: boolean;
+  hairColor?: number;
+  faceColor?: number;
   holderTier?: number;
   holderBalance?: number;
   discordTier?: number;
@@ -109,6 +114,11 @@ export interface InspectWindowDeps extends PainterHostPresentation {
       mainhand: string | null;
       weaponSkinId: string | null;
       offhand: string | null;
+      face?: number;
+      hairStyle?: number;
+      beard?: boolean;
+      hairColor?: number;
+      faceColor?: number;
     },
   ): void;
 }
@@ -222,6 +232,11 @@ export class InspectWindow {
         mainhand: e.equippedItems.mainhand ?? null,
         offhand: e.equippedItems.offhand ?? null,
         weaponSkinId: e.weaponSkinId ?? null,
+        face: e.face,
+        hairStyle: e.hairStyle,
+        beard: e.beard,
+        hairColor: e.hairColor,
+        faceColor: e.faceColor,
       });
     }
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());

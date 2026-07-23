@@ -4,6 +4,7 @@ import { mechHeldWeaponOverride } from '../src/render/characters/manifest';
 import { CharacterPreview } from '../src/render/characters/preview';
 import {
   appearanceSignature,
+  DEFAULT_HEAD_APPEARANCE,
   type PreviewAppearance,
   previewAppearanceVisual,
 } from '../src/render/characters/preview_appearance';
@@ -82,6 +83,10 @@ beforeEach(() => {
 });
 
 describe('previewAppearanceVisual', () => {
+  it('uses the same clean-shaven defaults as character creation and persistence', () => {
+    expect(DEFAULT_HEAD_APPEARANCE).toEqual({ face: 0, hairStyle: 0, beard: false });
+  });
+
   it('uses the class rig for a class-catalog character and holds its mainhand', () => {
     const v = previewAppearanceVisual(
       appearance({ cls: 'rogue', mainhandItemId: 'dagger_x', offhandItemId: 'dagger_y' }),
@@ -136,6 +141,11 @@ describe('appearanceSignature', () => {
     expect(appearanceSignature({ ...base, skinCatalog: 'mech' })).not.toBe(sig);
     expect(appearanceSignature({ ...base, mainhandItemId: 'b' })).not.toBe(sig);
     expect(appearanceSignature({ ...base, offhandItemId: 'b' })).not.toBe(sig);
+    expect(appearanceSignature({ ...base, face: 1 })).not.toBe(sig);
+    expect(appearanceSignature({ ...base, hairStyle: 2 })).not.toBe(sig);
+    expect(appearanceSignature({ ...base, beard: true })).not.toBe(sig);
+    expect(appearanceSignature({ ...base, hairColor: 0x112233 })).not.toBe(sig);
+    expect(appearanceSignature({ ...base, faceColor: 0x445566 })).not.toBe(sig);
   });
 
   it('changes when the Armory weapon skin changes (apply, swap, and remove)', () => {
@@ -285,6 +295,13 @@ describe('CharacterPreview.setVisualKey: the weapon-skin rebuild contract', () =
   it('leaves the skin path untouched when none is persisted (char-create stays bare)', () => {
     const preview = rawPreview(null);
     preview.setVisualKey('player_rogue', 'rusty_dagger', null, null);
+    const built = visualDoubles.built.at(-1) as { setWeaponSkin: ReturnType<typeof vi.fn> };
+    expect(built.setWeaponSkin).not.toHaveBeenCalled();
+  });
+
+  it('clears a roster weapon skin when switching to class creation', () => {
+    const preview = rawPreview('frostbite_dagger');
+    preview.setClass('rogue');
     const built = visualDoubles.built.at(-1) as { setWeaponSkin: ReturnType<typeof vi.fn> };
     expect(built.setWeaponSkin).not.toHaveBeenCalled();
   });

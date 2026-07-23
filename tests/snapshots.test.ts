@@ -181,6 +181,39 @@ describe('self stat wire round-trip', () => {
     expect(client.player.hitRating).toBe(30);
   });
 
+  it('mirrors head cosmetics from a full entity record onto the decoded entity', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', playerName: 'Other' });
+    sim.setPlayerHead(sim.playerId, 3, true, 0x112233, 0x445566, 1);
+    const wire = wireEntity(sim.player);
+    expect(wire).toMatchObject({ fac: 1, hs: 3, bd: 1, hcl: 0x112233, fcl: 0x445566 });
+
+    const client = bareClient(sim.playerId + 1000);
+    const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
+    internals.applySnapshot({
+      t: 'snap',
+      ents: [wire],
+    });
+    const e = client.entities.get(sim.playerId);
+    expect(e?.face).toBe(1);
+    expect(e?.hairStyle).toBe(3);
+    expect(e?.beard).toBe(true);
+    expect(e?.hairColor).toBe(0x112233);
+    expect(e?.faceColor).toBe(0x445566);
+  });
+
+  it('preserves black as an explicit head tint on the wire', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', playerName: 'BlackTint' });
+    sim.setPlayerHead(sim.playerId, 0, false, 0x000000, 0x000000, 0);
+    const wire = wireEntity(sim.player);
+    expect(wire).toMatchObject({ hcl: 0, fcl: 0 });
+
+    const client = bareClient(sim.playerId + 1000);
+    const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
+    internals.applySnapshot({ t: 'snap', ents: [wire] });
+    expect(client.entities.get(sim.playerId)?.hairColor).toBe(0);
+    expect(client.entities.get(sim.playerId)?.faceColor).toBe(0);
+  });
+
   it('backfills WARFARE fractions when an older server sends the legacy six-field stats shape', () => {
     const client = bareClient(1);
     const internals = client as unknown as { applySnapshot(snapshot: unknown): void };

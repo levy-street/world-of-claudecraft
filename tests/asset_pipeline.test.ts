@@ -784,11 +784,11 @@ describe('asset library registry parsers', () => {
     const library = await libraryImport;
     const src = readFileSync(join(ROOT, 'src/render/characters/manifest.ts'), 'utf8');
     const map = library.parseVisualUrls(src);
-    expect(map.get('models/chars/players/knight.glb')).toContain('player_warrior');
+    expect(map.get('models/chars/players/warrior_v02.glb')).toContain('player_warrior');
     expect(map.get('models/creatures/wolf_basic.glb')).toEqual(
       expect.arrayContaining(['form_cat', 'mob_wolf']),
     );
-    // Attach urls are attributed too (the knight's default sword).
+    // Attach urls are attributed too (the warrior's default sword).
     expect(map.get('models/weapons/sword_1handed.glb')).toContain('player_warrior');
   });
 
@@ -796,15 +796,11 @@ describe('asset library registry parsers', () => {
     const library = await libraryImport;
     const src = readFileSync(join(ROOT, 'src/render/characters/manifest.ts'), 'utf8');
     const map = library.parseSkinsMap(src);
-    const knightA = map.get('textures/skins/knight/alt_a.png') ?? [];
-    expect(knightA).toEqual(expect.arrayContaining([{ key: 'player_warrior', index: 1 }]));
-    // mage.glb atlases serve priest, mage, and warlock.
-    const mageA = map.get('textures/skins/mage/alt_a.png') ?? [];
-    expect(mageA.map((s: { key: string }) => s.key).sort()).toEqual([
-      'player_mage',
-      'player_priest',
-      'player_warlock',
-    ]);
+    // The v02 warrior body ships its own chroma atlases (index 0 = embedded default = null).
+    const crimson = map.get('textures/skins/warrior/crimson.webp') ?? [];
+    expect(crimson).toEqual(expect.arrayContaining([{ key: 'player_warrior', index: 1 }]));
+    const azure = map.get('textures/skins/warrior/azure.webp') ?? [];
+    expect(azure).toEqual(expect.arrayContaining([{ key: 'player_warrior', index: 2 }]));
   });
 
   it('parses MECH_CHROMAS ids and ranks from the sim data', async () => {
@@ -827,10 +823,10 @@ describe('asset library registry parsers', () => {
     expect(swordA.registration.gripFamily).toBe('VAR_SWORD');
     expect(swordA.registration.itemIds).toContain('worn_sword');
     expect(swordA.registration.icon).toBe('ui/weapons/sword_a.jpg');
-    const knight = assets.find(
-      (a: { path: string }) => a.path === 'models/chars/players/knight.glb',
+    const warrior = assets.find(
+      (a: { path: string }) => a.path === 'models/chars/players/warrior_v02.glb',
     );
-    expect(knight.registration.visualKeys).toContain('player_warrior');
-    expect(knight.registration.referenced).toBe(true);
+    expect(warrior.registration.visualKeys).toContain('player_warrior');
+    expect(warrior.registration.referenced).toBe(true);
   });
 });

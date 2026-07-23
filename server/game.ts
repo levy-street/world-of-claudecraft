@@ -868,6 +868,14 @@ function identityFields(e: Entity): Record<string, unknown> {
   const out: Record<string, unknown> = { k: e.kind, tid: e.templateId, nm: e.name, lv: e.level };
   if (e.skinCatalog === 'mech') out.cat = 'mech';
   if (e.skin) out.sk = e.skin;
+  // Head cosmetics (render-only, like sk): sent only when non-default, so an
+  // unset head (NPCs, default players) adds nothing. hairColor/faceColor use
+  // !== undefined since 0x000000 (black) is a valid tint.
+  if (e.face) out.fac = e.face;
+  if (e.hairStyle) out.hs = e.hairStyle;
+  if (e.beard) out.bd = 1;
+  if (e.hairColor !== undefined) out.hcl = e.hairColor;
+  if (e.faceColor !== undefined) out.fcl = e.faceColor;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held weapon model (render-only)
   if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)

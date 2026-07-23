@@ -166,7 +166,10 @@ sudo docker compose logs game --since 10m
 ```
 
 A container that never leaves `starting`, or that flips to `unhealthy`, is telling
-you the world loop is not completing passes: roll back rather than leaving it up.
+you the world loop is not completing passes: stop it rather than leaving it up. A
+binary rollback is safe only if the new release has accepted no traffic. After it
+has accepted traffic, follow every forward-only warning under Operational notes;
+fix forward instead of starting an older binary that cannot preserve the new state.
 
 Players online during the restart are disconnected for a few seconds and
 can log straight back in; the server saves all characters on shutdown.
@@ -205,11 +208,19 @@ instead (see `.env.example`).
 A nightly `pg_dump` runs at 03:15 UTC via `/etc/cron.d/eastbrook-backup`,
 writing gzipped dumps to `/var/backups/eastbrook/` and keeping 14 days.
 
-Restore (stack must be up):
+Restore a nightly plain-SQL backup (the database container must be up and every
+game process must be stopped). Recreate the database first and make `psql` stop
+on the first error so a partial restore can never be mistaken for success:
 
 ```bash
+set -euo pipefail
+sudo docker compose stop game
+sudo docker exec eastbrook-db psql -U eastbrook -d postgres -v ON_ERROR_STOP=1 \
+  -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'eastbrook' AND pid <> pg_backend_pid();" \
+  -c 'DROP DATABASE IF EXISTS eastbrook;' \
+  -c 'CREATE DATABASE eastbrook OWNER eastbrook;'
 gunzip -c /var/backups/eastbrook/eastbrook-2026-06-10.sql.gz \
-  | sudo docker exec -i eastbrook-db psql -U eastbrook eastbrook
+  | sudo docker exec -i eastbrook-db psql -U eastbrook -d eastbrook -v ON_ERROR_STOP=1
 ```
 
 For off-box safety, sync the directory to S3 occasionally:
@@ -226,6 +237,14 @@ For off-box safety, sync the directory to S3 occasionally:
   cannot honor future expiry times. Operators must either remove still-active timed bans
   before rollback or explicitly accept that they will become permanent until manually
   unbanned. Do not alter the nullable `expires_at` column during rollback.
+- **Head-cosmetic state rollout is forward-only**: the release that adds `face`,
+  `hairStyle`, `beard`, `hairColor`, and `faceColor` reconstructs those values in the
+  character JSONB serializer. A binary from before this support ignores them while loading
+  and removes them on its next autosave, leave, or shutdown save. Stop every realm before
+  upgrading, never mix old and new game processes on one database, and do not roll back the
+  game binary after the new version has accepted traffic. This is a strictly forward-only
+  rollout: once traffic reaches the new version, fix forward. Starting an older binary will
+  silently reset saved head appearances on its next save and is not a supported rollback.
 - **Bank ledger audit**: `node scripts/bank_audit.mjs` (reads `DATABASE_URL` from the
   environment) replays the append-only `bank_ledger` against live character bank state
   and exits non-zero on any discrepancy. Run it after an economy incident or a restore.

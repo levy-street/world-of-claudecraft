@@ -14,6 +14,7 @@ import {
   paginateGuildLeaderboard,
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
+import type { HeadAppearance } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
@@ -78,7 +79,7 @@ import { bankLedgerIdle } from './bank_ledger';
 import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
 import { createCachedRead } from './cached_read';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
-import { buildCharacterList, configureCharactersRuntime } from './characters';
+import { buildCharacterList, configureCharactersRuntime, parseHeadAppearance } from './characters';
 import {
   claudiumPreAuthMutationRateLimited,
   configureClaudiumRuntime,
@@ -122,6 +123,7 @@ import {
   listCharacters,
   listCompanionTokens,
   loadAccountCosmetics,
+  loadAccountWeaponSkinLoadout,
   loadWorldState,
   moderationStatusForAccount,
   pool,
@@ -428,9 +430,20 @@ function initialCharacterState(
   cls: PlayerClass,
   name: string,
   skin: number,
+  head?: HeadAppearance,
 ): import('../src/sim/sim').CharacterState {
   const sim = new Sim({ seed: 20061, playerClass: cls, playerName: name });
   sim.setPlayerSkin(sim.playerId, skin);
+  if (head) {
+    sim.setPlayerHead(
+      sim.playerId,
+      head.hairStyle ?? 0,
+      head.beard ?? false,
+      head.hairColor,
+      head.faceColor,
+      head.face ?? 0,
+    );
+  }
   const character = sim.serializeCharacter(sim.playerId);
   if (!character) throw new Error('failed to serialize initial character');
   return character;
@@ -1456,7 +1469,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         200,
         characterListPayload(
           await listCharacters(accountId),
-          (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
+          await loadAccountWeaponSkinLoadout(accountId),
         ),
       );
     }
@@ -1469,7 +1482,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           200,
           characterListPayload(
             await listCharacters(accountId),
-            (await loadAccountCosmetics(accountId)).weaponSkinLoadout,
+            await loadAccountWeaponSkinLoadout(accountId),
           ),
         );
       }
@@ -1503,13 +1516,14 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           0,
           Math.min(7, Math.floor(typeof body.skin === 'number' ? body.skin : 0)),
         );
+        const head = parseHeadAppearance(body as Record<string, unknown>);
         const create = () =>
           createCharacterCapped(
             accountId,
             name,
             body.class,
             10,
-            initialCharacterState(body.class, name, skin),
+            initialCharacterState(body.class, name, skin, head),
           );
         const created = (c: NonNullable<Awaited<ReturnType<typeof createCharacterCapped>>>) =>
           json(res, 200, {

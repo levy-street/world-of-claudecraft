@@ -44,7 +44,7 @@
 import type * as http from 'node:http';
 import { rekeyInstanceSigner } from '../src/sim/character_rename';
 import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
-import type { CharacterState } from '../src/sim/sim';
+import type { CharacterState, HeadAppearance } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { normalizeCharName, offensiveName } from './auth';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
@@ -58,7 +58,7 @@ import {
   lifetimeXpRankForCharacter,
   lifetimeXpStanding,
   listCharacters,
-  loadAccountCosmetics,
+  loadAccountWeaponSkinLoadout,
   moderationStatusForAccount,
   reclaimDeactivatedName,
   renameCharacter,
@@ -139,6 +139,27 @@ const VALID_CLASSES: readonly string[] = [
 ];
 /** Highest selectable skin index (mirrors the legacy Math.min(7, ...) clamp). */
 const MAX_SKIN = 7;
+// Loose upper bounds for the head-cosmetic indices; the renderer range-guards the
+// hair list and face set, so these only cap absurd stored values (anti-abuse).
+const MAX_HAIR = 15;
+const MAX_FACE = 3;
+
+/** Validate the optional head-cosmetic appearance from a create body: type-check
+ *  each field, floor + clamp the indices, and clamp the colour tints to 24-bit.
+ *  Omitted/invalid fields drop out so the character falls back to the default. */
+export function parseHeadAppearance(body: Record<string, unknown>): HeadAppearance {
+  const head: HeadAppearance = {};
+  if (typeof body.hairStyle === 'number' && Number.isFinite(body.hairStyle))
+    head.hairStyle = Math.max(0, Math.min(MAX_HAIR, Math.floor(body.hairStyle)));
+  if (typeof body.beard === 'boolean') head.beard = body.beard;
+  if (typeof body.face === 'number' && Number.isFinite(body.face))
+    head.face = Math.max(0, Math.min(MAX_FACE, Math.floor(body.face)));
+  if (typeof body.hairColor === 'number' && Number.isFinite(body.hairColor))
+    head.hairColor = Math.max(0, Math.min(0xffffff, Math.floor(body.hairColor)));
+  if (typeof body.faceColor === 'number' && Number.isFinite(body.faceColor))
+    head.faceColor = Math.max(0, Math.min(0xffffff, Math.floor(body.faceColor)));
+  return head;
+}
 const BEARER_PATTERN = /^Bearer ([a-f0-9]{64})$/;
 
 // ---------------------------------------------------------------------------
@@ -162,7 +183,12 @@ export interface CharactersRuntime {
   /** game.saveMail: persist the Ravenpost mail book after a rekey. */
   saveMail(): Promise<void>;
   /** main.ts initialCharacterState: the serialized fresh-character state for create. */
-  initialCharacterState(cls: PlayerClass, name: string, skin: number): CharacterState;
+  initialCharacterState(
+    cls: PlayerClass,
+    name: string,
+    skin: number,
+    head?: HeadAppearance,
+  ): CharacterState;
   /** main.ts publicOrigin: canonical share origin for the owner-sheet URLs. */
   publicOrigin(req: http.IncomingMessage): string;
 }
@@ -197,7 +223,7 @@ function useRuntime(): CharactersRuntime {
 
 const REAL_CHARACTERS_DB = {
   accountAndScopeForToken,
-  loadAccountCosmetics,
+  loadAccountWeaponSkinLoadout,
   moderationStatusForAccount,
   listCharacters,
   getCharacter,
@@ -248,6 +274,35 @@ function toSheetRank(rank: { rank: number; total: number } | null): SheetRank | 
  * scan). The retained legacy arm (main.ts characterListPayload) DELEGATES here, so the
  * two dispatch modes share one implementation and cannot diverge in payload shape.
  */
+/** One character-list row shared by the RouteDef and retained legacy dispatchers. */
+export function characterListEntry(
+  c: CharacterRow,
+  online: boolean,
+  weaponSkinId: string | null,
+): Record<string, unknown> {
+  const state = c.state;
+  return {
+    id: c.id,
+    name: c.name,
+    class: c.class,
+    level: c.level,
+    skin: state?.skin ?? 0,
+    online,
+    forceRename: c.force_rename,
+    lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
+    playtimeSeconds: Number(c.playtime_seconds ?? 0),
+    skinCatalog: state?.skinCatalog === 'mech' ? 'mech' : 'class',
+    mainhandItemId: state?.equipment?.mainhand ?? null,
+    offhandItemId: state?.equipment?.offhand ?? null,
+    weaponSkinId,
+    ...(state?.face !== undefined ? { face: state.face } : {}),
+    ...(state?.hairStyle !== undefined ? { hairStyle: state.hairStyle } : {}),
+    ...(state?.beard !== undefined ? { beard: state.beard } : {}),
+    ...(state?.hairColor !== undefined ? { hairColor: state.hairColor } : {}),
+    ...(state?.faceColor !== undefined ? { faceColor: state.faceColor } : {}),
+  };
+}
+
 export function buildCharacterList(
   chars: CharacterRow[],
   isOnline: (characterId: number) => boolean,
@@ -255,31 +310,13 @@ export function buildCharacterList(
 ): unknown {
   return {
     realm: REALM,
-    characters: chars.map((c) => ({
-      id: c.id,
-      name: c.name,
-      class: c.class,
-      level: c.level,
-      skin: c.state?.skin ?? 0,
-      online: isOnline(c.id),
-      forceRename: c.force_rename,
-      lastPlayed: c.last_played ? new Date(c.last_played).toISOString() : null,
-      playtimeSeconds: Number(c.playtime_seconds ?? 0),
-      // Keep the migrated RouteDef byte-identical with the retained legacy arm:
-      // character select renders the same body and held items as the live world.
-      skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
-      mainhandItemId: c.state?.equipment?.mainhand ?? null,
-      offhandItemId: c.state?.equipment?.offhand ?? null,
-      // The account's active Armory weapon skin for THIS character's class and
-      // held mainhand (the same shared rule the world and paperdoll use), so
-      // the char-select turntable matches the in-world render. Loadout is
-      // account state; resolution is per character.
-      weaponSkinId: resolveActiveWeaponSkin(
-        c.class,
-        c.state?.equipment?.mainhand ?? null,
-        weaponSkinLoadout,
+    characters: chars.map((c) =>
+      characterListEntry(
+        c,
+        isOnline(c.id),
+        resolveActiveWeaponSkin(c.class, c.state?.equipment?.mainhand ?? null, weaponSkinLoadout),
       ),
-    })),
+    ),
   };
 }
 
@@ -359,16 +396,16 @@ function requireOwnedCharacter(notFoundBody: Record<string, unknown>): Middlewar
 async function meCharactersHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
   const chars = await charactersDb.listCharacters(ctxAccountId(ctx));
-  const cosmetics = await charactersDb.loadAccountCosmetics(ctxAccountId(ctx));
-  json(ctx.res, 200, buildCharacterList(chars, rt.isCharacterOnline, cosmetics.weaponSkinLoadout));
+  const weaponSkinLoadout = await charactersDb.loadAccountWeaponSkinLoadout(ctxAccountId(ctx));
+  json(ctx.res, 200, buildCharacterList(chars, rt.isCharacterOnline, weaponSkinLoadout));
 }
 
 /** GET /api/characters: full-session list (byte-identical body to me/characters). */
 async function listCharactersHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
   const chars = await charactersDb.listCharacters(ctxAccountId(ctx));
-  const cosmetics = await charactersDb.loadAccountCosmetics(ctxAccountId(ctx));
-  json(ctx.res, 200, buildCharacterList(chars, rt.isCharacterOnline, cosmetics.weaponSkinLoadout));
+  const weaponSkinLoadout = await charactersDb.loadAccountWeaponSkinLoadout(ctxAccountId(ctx));
+  json(ctx.res, 200, buildCharacterList(chars, rt.isCharacterOnline, weaponSkinLoadout));
 }
 
 /** POST /api/characters: validate, create the capped character, reclaim a freed name once. */
@@ -394,13 +431,14 @@ async function createCharacterHandler(ctx: Ctx): Promise<void> {
     0,
     Math.min(MAX_SKIN, Math.floor(typeof body.skin === 'number' ? body.skin : 0)),
   );
+  const head = parseHeadAppearance(body);
   const create = () =>
     charactersDb.createCharacterCapped(
       accountId,
       name,
       cls,
       CHARACTER_LIMIT,
-      rt.initialCharacterState(cls, name, skin),
+      rt.initialCharacterState(cls, name, skin, head),
     );
   const respondCreated = (c: CharacterRow): void => {
     gameMetricsCounters().characterCreated();

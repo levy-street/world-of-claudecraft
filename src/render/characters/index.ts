@@ -7,8 +7,9 @@ import { logAssetMissOnce } from './asset_miss_log';
 import { mechHeldWeaponOverride, visualKeyFor } from './manifest';
 import { CharacterVisual } from './visual';
 
+export { writeCastingAnimState } from './anim_state';
 export { CharacterPreview } from './preview';
-export type { PreviewAppearance } from './preview_appearance';
+export { DEFAULT_HEAD_APPEARANCE, type PreviewAppearance } from './preview_appearance';
 export type { PreviewFramingName } from './preview_framing';
 export type { AnimState } from './visual';
 export { CharacterVisual, setWeaponVfxViewportHeight } from './visual';
@@ -41,6 +42,13 @@ export function createCharacterVisual(
       formKey ? null : e.mainhandItemId,
       weaponOverride,
       formKey ? null : e.offhandItemId,
+      // head cosmetics only apply to the base body, not shapeshift forms.
+      // Beard defaults OFF: a character that never picked one renders clean-shaven.
+      formKey ? 0 : (e.hairStyle ?? 0),
+      formKey ? false : (e.beard ?? false),
+      formKey ? undefined : e.hairColor,
+      formKey ? undefined : e.faceColor,
+      formKey ? 0 : (e.face ?? 0),
     );
   } catch (err) {
     // key the dedupe on visual key PLUS message: two models failing with an

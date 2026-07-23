@@ -35,7 +35,7 @@ import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
-import type { ResolvedAbility } from '../sim/sim';
+import type { HeadAppearance, ResolvedAbility } from '../sim/sim';
 import { parseTalentAllocation } from '../sim/talent_allocation_input';
 import { repairTalentLoadouts } from '../sim/talent_loadouts';
 import {
@@ -173,6 +173,11 @@ export interface CharacterSummary {
   /** The account's active Armory weapon skin for this character (server-resolved
    *  per class + mainhand). Optional for back-compat like the fields above. */
   weaponSkinId?: string | null;
+  face?: number;
+  hairStyle?: number;
+  beard?: boolean;
+  hairColor?: number;
+  faceColor?: number;
 }
 
 function stringList(value: unknown): string[] {
@@ -725,8 +730,13 @@ export class Api {
     return data.characters;
   }
 
-  async createCharacter(name: string, cls: PlayerClass, skin = 0): Promise<void> {
-    await this.post('/api/characters', { name, class: cls, skin });
+  async createCharacter(
+    name: string,
+    cls: PlayerClass,
+    skin = 0,
+    head?: HeadAppearance,
+  ): Promise<void> {
+    await this.post('/api/characters', { name, class: cls, skin, ...(head ?? {}) });
   }
 
   async renameCharacter(characterId: number, name: string): Promise<void> {
@@ -2286,6 +2296,12 @@ export class ClientWorld implements IWorld {
         e.name = w.nm;
         e.level = w.lv;
         e.skin = w.sk ?? 0;
+        // Head cosmetics (identity fields; absent on a full record = default look).
+        e.face = w.fac ?? 0;
+        e.hairStyle = w.hs ?? 0;
+        e.beard = !!w.bd;
+        e.hairColor = typeof w.hcl === 'number' ? w.hcl : undefined;
+        e.faceColor = typeof w.fcl === 'number' ? w.fcl : undefined;
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.offhandItemId = w.oh ?? null; // equipped offhand → held weapon model (render-only)
         e.weaponSkinId = w.wsk ?? null; // active weapon-skin cosmetic (render-only)

@@ -2977,7 +2977,6 @@
     /* Appearance swatches as the left column (the "race" slot: one race, many
        looks). display:flex is restated because the create panel's base
        .cs-create-col .skin-row is a 4-up grid. */
-    #offline-select.cs-wow .skin-row,
     body:not(.mobile-touch) #charcreate-panel.cs-wow .skin-row {
       position: absolute;
       left: 26px;
@@ -2988,6 +2987,74 @@
       gap: 12px;
       width: auto;
       z-index: 3;
+    }
+    /* The create form is flattened with display:contents above, so the head
+       controls need their own stage dock just like chroma and class details.
+       Keep it beside the narrow chroma rail and scroll within the safe vertical
+       band instead of colliding with the title/name or bottom class rail. */
+    body:not(.mobile-touch) #charcreate-panel.cs-wow #charcreate-head-row {
+      position: absolute;
+      left: 102px;
+      top: 130px;
+      bottom: 140px;
+      z-index: 3;
+      width: 240px;
+      max-width: 240px;
+      margin: 0;
+      padding: 2px 8px 2px 2px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      pointer-events: auto;
+      scrollbar-width: thin;
+    }
+    /* Offline CHROMA group: labelled, on the right just left of the class panel;
+       swatches wrap 2-up as plain colour dots. */
+    #offline-select.cs-wow #offline-chroma-group {
+      position: absolute;
+      right: 400px;
+      top: 92px;
+      z-index: 3;
+      align-items: flex-start;
+    }
+    #offline-select.cs-wow #offline-skin-row {
+      position: static;
+      transform: none;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 14px;
+      width: auto;
+      max-width: 138px;
+    }
+    /* Head groups spread across the left/centre (mockup): BEARD far-left, FACE
+       centre-left, HAIR below FACE. The row is a click-through positioning layer
+       so its empty area never blocks the turntable behind it. */
+    #offline-select.cs-wow #offline-head-row {
+      position: absolute;
+      left: 0;
+      top: 60px;
+      width: 620px;
+      height: 620px;
+      z-index: 3;
+      pointer-events: none;
+    }
+    #offline-select.cs-wow .head-group {
+      position: absolute;
+      pointer-events: auto;
+    }
+    #offline-select.cs-wow .head-group-beard {
+      left: 48px;
+      top: 40px;
+    }
+    #offline-select.cs-wow .head-group-face {
+      left: 300px;
+      top: 40px;
+      width: 208px;
+    }
+    #offline-select.cs-wow .head-group-hair {
+      left: 300px;
+      top: 224px;
+      width: 240px;
     }
     /* The create panel's portrait swatches size to their grid cell; give them
        a fixed medallion size in the column. */
@@ -3423,8 +3490,23 @@
         gap: 8px;
       }
       #offline-select.cs-wow .skin-swatch {
-        width: 50px;
-        height: 50px;
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
+      }
+      #offline-select.cs-wow #offline-chroma-group {
+        right: auto;
+        left: 410px;
+      }
+      #offline-select.cs-wow #offline-head-row {
+        width: 540px;
+      }
+      #offline-select.cs-wow .head-group-face,
+      #offline-select.cs-wow .head-group-hair {
+        left: 170px;
+      }
+      #offline-select.cs-wow .head-group-hair {
+        top: 170px;
       }
       #offline-select.cs-wow .class-details-panel {
         top: 108px;
@@ -3515,6 +3597,134 @@
     border-color: var(--class-color, #33c1f1);
     color: #fff;
     box-shadow: 0 0 9px var(--class-color, #33c1f1);
+  }
+  /* Chroma swatch: a plain armour-colour dot (no portrait). */
+  .skin-swatch-color {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    background: var(--skin-swatch, #808080);
+  }
+  .head-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+    margin: 4px 0 2px;
+    min-height: 0;
+    max-width: 232px;
+  }
+  .head-row:empty {
+    display: none;
+  }
+  /* a labelled customization group: gold game-font header over a wrap row of chips */
+  .head-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .head-group-title {
+    font-family: var(--font-heading);
+    /* Subtitle scale (same heading font + gold): the old 24px competed with the
+       character name and class chips; this reads as a section label instead. */
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-gold, #ffd100);
+  }
+  .head-group-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .head-toggle {
+    min-height: 52px;
+    min-width: 52px;
+    padding: 0 18px;
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--color-text-secondary, #b9b9c7);
+    font-size: 17px;
+    font-weight: 500;
+    cursor: var(--cursor-point);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      border-color 0.12s,
+      box-shadow 0.12s,
+      color 0.12s;
+  }
+  .head-toggle:hover,
+  .head-toggle:focus-visible {
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #fff;
+  }
+  .head-toggle[aria-pressed="true"] {
+    border-color: var(--class-color, #69ccf0);
+    color: #fff;
+    box-shadow: 0 0 9px var(--class-color, #69ccf0);
+  }
+  /* .head-row prefix beats the `.auth-panel input` / `.char-create input`
+     full-width form rules so the swatches stay small square chips. */
+  .head-row .head-color {
+    flex: 0 0 auto;
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    padding: 2px;
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    cursor: var(--cursor-point);
+  }
+  .head-row .head-color:hover,
+  .head-row .head-color:focus-visible {
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  .head-skin {
+    flex: 0 0 auto;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.18);
+    background: var(--skin-swatch, #d9a878);
+    cursor: var(--cursor-point);
+    transition:
+      border-color 0.12s,
+      box-shadow 0.12s;
+  }
+  .head-skin:hover,
+  .head-skin:focus-visible {
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  .head-skin[aria-pressed="true"] {
+    border-color: var(--class-color, #69ccf0);
+    box-shadow: 0 0 9px var(--class-color, #69ccf0);
+  }
+  @media (forced-colors: active) {
+    .skin-swatch-color,
+    .head-skin {
+      width: auto;
+      min-width: 52px;
+      padding: 0 8px;
+      border-radius: 8px;
+      background: Canvas;
+      color: CanvasText;
+    }
+    .skin-swatch-color::after,
+    .head-skin::after {
+      content: attr(aria-label);
+      font-size: 11px;
+    }
+    .skin-swatch-color[aria-pressed="true"],
+    .head-skin[aria-pressed="true"] {
+      border: 3px solid Highlight;
+      font-weight: 700;
+    }
   }
   .skin-unequip-btn {
     min-height: 34px;

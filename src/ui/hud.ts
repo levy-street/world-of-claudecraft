@@ -18,9 +18,12 @@ import {
 import { voice, voiceDistanceGain } from '../game/voice';
 import type { ClaudiumStoreItem } from '../net/economy_sdk';
 import { castBarState, consumeBarState } from '../render/cast_bar';
-import { CharacterPreview, type PreviewFramingName } from '../render/characters';
+import {
+  CharacterPreview,
+  type PreviewAppearance,
+  type PreviewFramingName,
+} from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
-import { mechHeldWeaponOverride } from '../render/characters/manifest';
 import { onPortraitsReady } from '../render/characters/portrait';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
 import type { Renderer } from '../render/renderer';
@@ -11989,6 +11992,11 @@ export class Hud {
       offhand: string | null;
       /** The active Armory weapon-skin cosmetic (null = the item's own model). */
       weaponSkinId: string | null;
+      face?: number;
+      hairStyle?: number;
+      beard?: boolean;
+      hairColor?: number;
+      faceColor?: number;
       framing: PreviewFramingName;
     },
   ): void {
@@ -12001,16 +12009,20 @@ export class Hud {
     } else {
       this.charPreview.setContainer(container);
     }
-    if (opts.previewKey) {
-      // Mech is class-agnostic; mirror the wearer class's hand layout so the
-      // paperdoll matches the in-world render.
-      const override = opts.previewKey === 'player_mech' ? mechHeldWeaponOverride(opts.cls) : null;
-      this.charPreview.setVisualKey(opts.previewKey, opts.mainhand, override, opts.offhand);
-    } else {
-      this.charPreview.setClass(opts.cls, opts.mainhand, opts.offhand);
-    }
-    this.charPreview.setSkin(opts.skin);
-    this.charPreview.setWeaponSkin(opts.weaponSkinId);
+    const appearance: PreviewAppearance = {
+      cls: opts.cls,
+      skin: opts.skin,
+      skinCatalog: opts.previewKey === 'player_mech' ? 'mech' : 'class',
+      mainhandItemId: opts.mainhand,
+      offhandItemId: opts.offhand,
+      weaponSkinId: opts.weaponSkinId,
+      face: opts.face,
+      hairStyle: opts.hairStyle,
+      beard: opts.beard,
+      hairColor: opts.hairColor,
+      faceColor: opts.faceColor,
+    };
+    this.charPreview.setAppearance(appearance);
     this.charPreview.setFraming(opts.framing);
   }
 
@@ -12037,6 +12049,11 @@ export class Hud {
         mainhand,
         this.sim.accountCosmetics.weaponSkinLoadout,
       ),
+      face: this.sim.player.face,
+      hairStyle: this.sim.player.hairStyle,
+      beard: this.sim.player.beard,
+      hairColor: this.sim.player.hairColor,
+      faceColor: this.sim.player.faceColor,
       framing: 'sheet',
     });
   }
@@ -12056,6 +12073,11 @@ export class Hud {
       offhand: string | null;
       /** The inspected player's server-resolved active weapon skin (wire wsk). */
       weaponSkinId: string | null;
+      face?: number;
+      hairStyle?: number;
+      beard?: boolean;
+      hairColor?: number;
+      faceColor?: number;
     },
   ): void {
     const preview = activeCharacterAppearancePreview(params.cls, params.skin, params.skinCatalog);
@@ -12067,6 +12089,11 @@ export class Hud {
         mainhand: params.mainhand,
         offhand: params.offhand,
         weaponSkinId: params.weaponSkinId,
+        face: params.face,
+        hairStyle: params.hairStyle,
+        beard: params.beard,
+        hairColor: params.hairColor,
+        faceColor: params.faceColor,
         framing: 'inspect',
       });
     if (preview.visualKey !== 'player_mech') {

@@ -2182,10 +2182,11 @@ export interface AbilityDef {
   projectileFx?: 'lightning' | 'heavyBolt';
   // Instant-cast VISUAL cue (renderer-only; the sim just emits a spellfx with it):
   // 'shout' plays the caster's roar one-shot + an expanding ground shockwave ring
-  // (the warrior shouts); 'flourish' plays the ability-mapped one-shot clip
-  // (manifest attackByAbility) with no particles: a pure cast gesture. Emitted on
-  // the successful instant resolution.
-  castFx?: 'shout' | 'weaponAura' | 'flourish';
+  // (the warrior shouts); 'gesture' / 'flourish' / 'weaponAura' play the
+  // ability-mapped one-shot clip (manifest attackByAbility) with no particles: a
+  // pure cast gesture, and play NOTHING if the class has no clip for it (never a
+  // fallback swing or emote). Emitted on the successful instant resolution.
+  castFx?: 'shout' | 'weaponAura' | 'flourish' | 'gesture';
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   // Damage scaling source for the flat directDamage / DoT / AoE riders. Default:
   // non-physical damage scales with Spell Power; physical damage scales with melee
@@ -2976,6 +2977,17 @@ export interface Entity {
   color: number;
   skinCatalog: SkinCatalog; // player appearance catalog: class texture set or cosmetic body.
   skin: number; // player appearance: index into SKINS[visualKey]; 0 = default. synced in identity fields.
+  // Cosmetic head customization (players only, render-only). hairStyle indexes
+  // VisualDef.cosmetics.hair (0 = default); beard toggles the facial-hair mesh.
+  // Chosen at character creation (offline + online), persisted in CharacterState,
+  // and synced in identity fields (hs/bd/fc/hc/fcol). The sim never reads them.
+  face?: number; // 0 = default/male face, 1 = female, etc. (index into cosmetics.faces)
+  hairStyle?: number;
+  beard?: boolean;
+  // Cosmetic colour tints (hex 0xRRGGBB). hairColor recolours the hair+beard+brow
+  // group; faceColor multiplies the face/skin. undefined = the model default.
+  hairColor?: number;
+  faceColor?: number;
   // Equipped mainhand item id (players only; null otherwise). Render-only: the
   // client maps it to a held weapon model. Recomputed in recalcPlayerStats and
   // synced in identity fields (terse `mh`). The sim never reads it for gameplay.
@@ -3465,6 +3477,9 @@ export type SimEvent = { pid?: number } & (
         | 'shout'
         | 'weaponAura'
         | 'flourish'
+        // Generic dedicated-clip cast gesture (any class): plays the ability's
+        // attackByAbility clip once, or nothing. Renderer-only, no mechanic.
+        | 'gesture'
         // Talent-moment effects: a proc arming (procSurge), a ward appearing
         // (wardBloom), a stored heal-echo firing (echoBurst), and a DoT being
         // detonated (detonate). Visual-only; whole-JSON wire needs no schema change.

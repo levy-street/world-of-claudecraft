@@ -1275,6 +1275,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   },
   taunt: {
     id: 'taunt',
+    castFx: 'gesture', // dedicated Taunt clip on the warrior rig
     name: 'Goad',
     class: 'warrior',
     learnLevel: 5,
@@ -5053,6 +5054,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // warrior abilities, not talents) ------
   pummel: {
     id: 'pummel',
+    castFx: 'gesture', // dedicated kick clip (2H_Kick) on the warrior rig
     name: 'Jawcrack',
     class: 'warrior',
     learnLevel: 8,
@@ -5679,6 +5681,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
   // Core kit (learned outright), not a talent choice.
   kick: {
     id: 'kick',
+    castFx: 'gesture', // dedicated kick clip (2H_Kick) on the rogue rig
     name: 'Boot',
     class: 'rogue',
     learnLevel: 10,

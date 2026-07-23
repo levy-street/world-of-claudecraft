@@ -21,6 +21,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   type CharactersRuntime,
   configureCharactersRuntime,
+  parseHeadAppearance,
   resetCharactersDbForTests,
   resetCharactersRuntimeForTests,
   routes,
@@ -123,12 +124,7 @@ function authedDb(overrides: DbOverrides = {}): void {
     moderationStatusForAccount: async () => modStatus(),
     // The list payload resolves the account's Armory loadout per character;
     // default to no cosmetics so unrelated tests stay Postgres-free.
-    loadAccountCosmetics: async () => ({
-      completedQuestIds: [],
-      mechChromaIds: [],
-      weaponSkinIds: [],
-      weaponSkinLoadout: {},
-    }),
+    loadAccountWeaponSkinLoadout: async () => ({}),
     ...overrides,
   });
 }
@@ -327,6 +323,11 @@ describe('character list handlers', () => {
       state: st({
         skin: 3,
         skinCatalog: 'mech',
+        face: 1,
+        hairStyle: 3,
+        beard: true,
+        hairColor: 0x112233,
+        faceColor: 0x445566,
         equipment: { mainhand: 'worn_sword', offhand: 'eastbrook_buckler' },
       }),
       force_rename: false,
@@ -343,16 +344,12 @@ describe('character list handlers', () => {
       last_played: null,
       playtime_seconds: null,
     });
+    const loadAccountWeaponSkinLoadout = vi.fn(async () => ({ sword: 'ice_fang_sword' }));
     setCharactersDbForTests({
       listCharacters: async () => [rowA, rowB],
       // A sword skin in the account loadout: resolves onto the warrior's held
       // worn_sword and NOT onto the stateless mage (no mainhand, null skin).
-      loadAccountCosmetics: async () => ({
-        completedQuestIds: [],
-        mechChromaIds: [],
-        weaponSkinIds: ['ice_fang_sword'],
-        weaponSkinLoadout: { sword: 'ice_fang_sword' },
-      }),
+      loadAccountWeaponSkinLoadout,
     });
     // Online status comes from the injected runtime: row 1 online, row 2 offline.
     installRuntime({ isCharacterOnline: (id) => id === 1 });
@@ -374,6 +371,11 @@ describe('character list handlers', () => {
           mainhandItemId: 'worn_sword',
           offhandItemId: 'eastbrook_buckler',
           weaponSkinId: 'ice_fang_sword',
+          face: 1,
+          hairStyle: 3,
+          beard: true,
+          hairColor: 0x112233,
+          faceColor: 0x445566,
         },
         {
           id: 2,
@@ -402,6 +404,9 @@ describe('character list handlers', () => {
 
     expect(me.status).toBe(200);
     expect(full.status).toBe(200);
+    expect(loadAccountWeaponSkinLoadout).toHaveBeenCalledTimes(2);
+    expect(loadAccountWeaponSkinLoadout).toHaveBeenNthCalledWith(1, 7);
+    expect(loadAccountWeaponSkinLoadout).toHaveBeenNthCalledWith(2, 7);
     expect(me.body).toEqual(expected);
     // Byte-identical: the two arms share buildCharacterList, so the serialized JSON matches.
     expect(JSON.stringify(me.body)).toBe(JSON.stringify(full.body));
@@ -724,7 +729,8 @@ describe('create handler', () => {
     });
     expect(res.status).toBe(200);
     expect(bodyRecord(res.body).skin).toBe(expected);
-    expect(initialCharacterState).toHaveBeenCalledWith('warrior', 'Clamped', expected);
+    // The parsed head appearance rides as the 4th arg; empty here (no head fields).
+    expect(initialCharacterState).toHaveBeenCalledWith('warrior', 'Clamped', expected, {});
   });
 });
 
@@ -1320,5 +1326,33 @@ describe('routes table', () => {
       const route = routeFor(method as Method, path);
       expect(route.meta?.requireOwned).toEqual({ kind: 'character', ownerScope: 'account' });
     }
+  });
+});
+
+describe('parseHeadAppearance', () => {
+  it('parses valid head fields verbatim', () => {
+    expect(
+      parseHeadAppearance({
+        hairStyle: 3,
+        beard: true,
+        face: 1,
+        hairColor: 0x112233,
+        faceColor: 0x445566,
+      }),
+    ).toEqual({ hairStyle: 3, beard: true, face: 1, hairColor: 0x112233, faceColor: 0x445566 });
+  });
+
+  it('clamps out-of-range indices and 24-bit colours', () => {
+    expect(parseHeadAppearance({ hairStyle: 99, face: 99, hairColor: 0x1000000 })).toEqual({
+      hairStyle: 15,
+      face: 3,
+      hairColor: 0xffffff,
+    });
+    expect(parseHeadAppearance({ hairStyle: -3 })).toEqual({ hairStyle: 0 });
+  });
+
+  it('drops wrong-typed and absent fields (falls back to the model default)', () => {
+    expect(parseHeadAppearance({ hairStyle: 'x', beard: 'yes', face: null })).toEqual({});
+    expect(parseHeadAppearance({})).toEqual({});
   });
 });
