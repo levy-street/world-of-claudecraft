@@ -112,6 +112,7 @@ function makeCtx() {
     get players() {
       return players;
     },
+    questEscortRuns: new Map(),
     get cfg() {
       return cfg;
     },

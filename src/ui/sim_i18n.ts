@@ -186,6 +186,65 @@ const baseEnTable = {
   'groundPickup.monumentNorthDeny': 'The forgotten verse waits for a reader with a reason.',
   'groundPickup.monumentNorthEnough':
     'You have already read what the forgotten monument remembers.',
+  // Northern realm route landmarks. These English entries keep the exact
+  // matcher aware of variable-routed sim text while release locale fills are pending.
+  'groundPickup.frostveilCairnTarnDeny': 'The lake cairn is sealed beneath a skin of unbroken ice.',
+  'groundPickup.frostveilCairnTarnEnough':
+    'The Glacier Tarn cairn already burns with a steady blue light.',
+  'groundPickup.frostveilCairnFenDeny':
+    "The marsh cairn gives no answer without a watcher's charge.",
+  'groundPickup.frostveilCairnFenEnough': 'The Shiverfen cairn is already awake and watching.',
+  'groundPickup.frostveilCairnTerraceDeny': 'The terrace cairn is silent beneath the driving snow.',
+  'groundPickup.frostveilCairnTerraceEnough': 'The Howling Terrace cairn needs no further tending.',
+  'groundPickup.amberfallLanternOrchardDeny':
+    'The orchard lantern has no flame to offer an unbidden hand.',
+  'groundPickup.amberfallLanternOrchardEnough':
+    'The Orchard harvest lantern is already glowing gold.',
+  'groundPickup.amberfallLanternMereDeny':
+    'The mere lantern stays dark until its keeper begins the round.',
+  'groundPickup.amberfallLanternMereEnough': 'The Great Mere harvest lantern is already alight.',
+  'groundPickup.amberfallLanternMonolithDeny': 'Cold green fire withdraws from your touch.',
+  'groundPickup.amberfallLanternMonolithEnough':
+    'The Monolith harvest lantern has yielded all it can tell you.',
+  'groundPickup.willowfenMarkerBogshineDeny':
+    "The reed marker is sunk too deep to turn without the fenward's leave.",
+  'groundPickup.willowfenMarkerBogshineEnough':
+    'The Bogshine reed marker already points toward safe ground.',
+  'groundPickup.willowfenMarkerWillowweepDeny':
+    'The carved reeds resist being turned without cause.',
+  'groundPickup.willowfenMarkerWillowweepEnough':
+    'The Willowweep reed marker already shows the homeward path.',
+  'groundPickup.willowfenMarkerDrowsyDeny': 'Something beneath the mud holds the marker fast.',
+  'groundPickup.willowfenMarkerDrowsyEnough':
+    'The Drowsy Strand reed marker is set firmly in place.',
+  'groundPickup.nightbloomAnchorMoonwellDeny': 'The moonwell rune reflects only an empty sky.',
+  'groundPickup.nightbloomAnchorMoonwellEnough': 'You have already read the Moonwell dream anchor.',
+  'groundPickup.nightbloomAnchorGloamfieldDeny':
+    'The gloamfield rune will not settle into a readable shape.',
+  'groundPickup.nightbloomAnchorGloamfieldEnough':
+    'You have already read the Gloamfield dream anchor.',
+  'groundPickup.nightbloomAnchorBarrowDeny':
+    'The barrow rune closes like an eye when you approach.',
+  'groundPickup.nightbloomAnchorBarrowEnough':
+    'You have already read the Sleepless Barrow dream anchor.',
+  'groundPickup.galecrestSignalDownsDeny': 'The storm post will not sound for an unannounced hand.',
+  'groundPickup.galecrestSignalDownsEnough':
+    'The Howling Downs storm post has already given its note.',
+  'groundPickup.galecrestSignalTarnDeny': 'The tarn post is still and refuses your grip.',
+  'groundPickup.galecrestSignalTarnEnough': 'The Mirror Tarn storm post has already answered.',
+  'groundPickup.galecrestSignalWrecksDeny': 'A drowned bell tone warns you away from the post.',
+  'groundPickup.galecrestSignalWrecksEnough':
+    'The Wreckfield storm post has already sounded its warning.',
+  'groundPickup.palmreachWaymarkStrandDeny': 'Vines hold the shell marker shut around its secret.',
+  'groundPickup.palmreachWaymarkStrandEnough':
+    'The Palm Strand waymark is already clear and shining.',
+  'groundPickup.palmreachWaymarkVinefallDeny':
+    "The overgrown waymark will not open without a trailblazer's purpose.",
+  'groundPickup.palmreachWaymarkVinefallEnough':
+    'The Vinefall waymark already shows the reopened trail.',
+  'groundPickup.palmreachWaymarkLagoonDeny':
+    'The lagoon waymark sleeps beneath salt and flowering vines.',
+  'groundPickup.palmreachWaymarkLagoonEnough': 'The Sapphire Lagoon waymark is already awake.',
   'error.vcupDeserter': 'The Groundskeeper remembers. Come back later.',
   'error.vcupPartyTooBig': 'That bracket needs a smaller party.',
   'error.vcupNoNation': 'Pick a banner nation first.',

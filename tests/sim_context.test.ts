@@ -266,6 +266,7 @@ function makeFakeHost() {
       return entities;
     },
     players: new Map(),
+    questEscortRuns: new Map(),
     primaryId: -1,
     tradeInvites: new Map(),
     duelInvites: new Map(),

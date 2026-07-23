@@ -5,7 +5,7 @@
 // never drift from shipped content.
 
 import { describe, expect, it } from 'vitest';
-import { CAMPS, GATHER_NODES, GROUND_OBJECTS, MOBS, QUESTS } from '../src/sim/data';
+import { CAMPS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from '../src/sim/data';
 import { questObjectiveAreas, questObjectivesForMob } from '../src/sim/quest_targets';
 import type { QuestDef, QuestProgress } from '../src/sim/types';
 
@@ -160,6 +160,29 @@ describe('questObjectiveAreas', () => {
     }
   });
 
+  it('marks the traveler start and every waypoint of an escort route', () => {
+    const quest = QUESTS.q_farshore_ferrywalk;
+    const objectiveIndex = quest.objectives.findIndex((objective) => objective.type === 'escort');
+    const objective = quest.objectives[objectiveIndex];
+    expect(objective?.type).toBe('escort');
+    if (objective?.type !== 'escort') return;
+
+    const traveler = NPCS[objective.targetNpcId];
+    expect(traveler).toBeTruthy();
+    if (!traveler) return;
+    const areas = questObjectiveAreas(activeLog(quest));
+    const route = [traveler.pos, ...objective.path];
+    for (const point of route) {
+      const area = areas.find(
+        (candidate) => candidate.center.x === point.x && candidate.center.z === point.z,
+      );
+      expect(area, `escort route point ${point.x},${point.z} should have an area`).toBeTruthy();
+      expect(area?.objectives).toContainEqual({
+        questId: quest.id,
+        objectiveIndex,
+      });
+    }
+  });
   it('never emits duplicate circles across a multi-quest log', () => {
     const log = new Map<string, QuestProgress>();
     for (const q of Object.values(QUESTS)) {

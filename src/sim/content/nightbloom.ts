@@ -178,10 +178,131 @@ export const NIGHTBLOOM_MOBS: Record<string, MobTemplate> = {
     color: 0xb8cce8,
   },
 };
-export const NIGHTBLOOM_NPCS: Record<string, NpcDef> = {};
-export const NIGHTBLOOM_QUESTS: Record<string, QuestDef> = {};
-export const NIGHTBLOOM_QUEST_ORDER: string[] = [];
-export const NIGHTBLOOM_ITEMS: Record<string, ItemDef> = {};
+export const NIGHTBLOOM_NPCS: Record<string, NpcDef> = {
+  dreamkeeper_luma: {
+    id: 'dreamkeeper_luma',
+    name: 'Dreamkeeper Luma',
+    title: 'Warden of Moonrest',
+    pos: { x: -370, z: 1420 },
+    facing: Math.PI,
+    color: 0x9270b7,
+    questIds: ['q_nightbloom_vigil', 'q_nightbloom_barrow_crown'],
+    greeting:
+      'Nightbloom is not asleep, $C. It is dreaming, and tonight the dream has begun to bare its teeth.',
+  },
+  stargazer_oril: {
+    id: 'stargazer_oril',
+    name: 'Stargazer Oril',
+    title: 'Keeper of the Standing Vigil',
+    pos: { x: -272, z: 1538 },
+    facing: Math.PI,
+    color: 0x8268a8,
+    questIds: ['q_nightbloom_vigil', 'q_nightbloom_dream_anchors', 'q_nightbloom_barrow_crown'],
+    greeting:
+      'The stars above the Vigil are wrong by one. I have counted them a hundred times, and the missing light is under our feet.',
+  },
+};
+export const NIGHTBLOOM_QUESTS: Record<string, QuestDef> = {
+  q_nightbloom_vigil: {
+    id: 'q_nightbloom_vigil',
+    name: 'A Star Missing',
+    giverNpcId: 'dreamkeeper_luma',
+    turnInNpcId: 'stargazer_oril',
+    text: 'Oril keeps the Standing Vigil beyond Gloamfield and has sent no star count for three nights. Find the stargazer among the ancient stones and ask what shadow has silenced the signal.',
+    completionText:
+      'Luma still trusts my count. Good. Help me trace the missing star through the anchors that hold Nightbloom in its gentle dream.',
+    objectives: [
+      { type: 'interact', targetNpcId: 'stargazer_oril', count: 1, label: 'Stargazer Oril found' },
+    ],
+    xpReward: 5000,
+    copperReward: 2400,
+    itemRewards: {},
+    minLevel: 19,
+  },
+  q_nightbloom_dream_anchors: {
+    id: 'q_nightbloom_dream_anchors',
+    name: 'Anchors of the Dream',
+    giverNpcId: 'stargazer_oril',
+    turnInNpcId: 'stargazer_oril',
+    text: 'Read the moon runes at the Moonwell, Gloamfield, and the Sleepless Barrow. Each anchor should hold one bright reflection. If one reflects darkness, we will know where the lost star fell.',
+    completionText:
+      'The barrow rune showed a crown instead of a star. Its old king has taken the missing light and used it to wake his court.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'nightbloom_anchor_moonwell',
+        count: 1,
+        label: 'Moonwell dream anchor read',
+      },
+      {
+        type: 'interact',
+        targetObjectItemId: 'nightbloom_anchor_gloamfield',
+        count: 1,
+        label: 'Gloamfield dream anchor read',
+      },
+      {
+        type: 'interact',
+        targetObjectItemId: 'nightbloom_anchor_barrow',
+        count: 1,
+        label: 'Sleepless Barrow dream anchor read',
+      },
+    ],
+    xpReward: 6200,
+    copperReward: 3400,
+    itemRewards: {},
+    requiresQuest: 'q_nightbloom_vigil',
+    minLevel: 19,
+  },
+  q_nightbloom_barrow_crown: {
+    id: 'q_nightbloom_barrow_crown',
+    name: 'The Crown Below',
+    giverNpcId: 'stargazer_oril',
+    turnInNpcId: 'dreamkeeper_luma',
+    text: 'The Barrow King has stolen a star from the dream and set it in his crown. Enter the Sleepless Barrow, defeat the risen king, and let Nightbloom forget his name again.',
+    completionText:
+      'There is the missing light, back in the sky. Nightbloom dreams softly again because you walked where the rest of us feared to wake.',
+    objectives: [
+      { type: 'kill', targetMobId: 'barrow_king', count: 1, label: 'Barrow King defeated' },
+    ],
+    xpReward: 7600,
+    copperReward: 5200,
+    itemRewards: {},
+    requiresQuest: 'q_nightbloom_dream_anchors',
+    minLevel: 20,
+    suggestedPlayers: 2,
+  },
+};
+export const NIGHTBLOOM_QUEST_ORDER: string[] = [
+  'q_nightbloom_vigil',
+  'q_nightbloom_dream_anchors',
+  'q_nightbloom_barrow_crown',
+];
+export const NIGHTBLOOM_ITEMS: Record<string, ItemDef> = {
+  nightbloom_anchor_moonwell: {
+    id: 'nightbloom_anchor_moonwell',
+    name: 'Moonwell Dream Anchor',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_nightbloom_dream_anchors',
+    noVendorSell: true,
+  },
+  nightbloom_anchor_gloamfield: {
+    id: 'nightbloom_anchor_gloamfield',
+    name: 'Gloamfield Dream Anchor',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_nightbloom_dream_anchors',
+    noVendorSell: true,
+  },
+  nightbloom_anchor_barrow: {
+    id: 'nightbloom_anchor_barrow',
+    name: 'Barrow Dream Anchor',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_nightbloom_dream_anchors',
+    noVendorSell: true,
+  },
+};
 export const NIGHTBLOOM_CAMPS: CampDef[] = [
   { mobId: 'moonfleece_grazer', center: { x: -436, z: 1466 }, radius: 12, count: 4 },
   { mobId: 'moonfleece_grazer', center: { x: -320, z: 1446 }, radius: 10, count: 3 },
@@ -190,7 +311,23 @@ export const NIGHTBLOOM_CAMPS: CampDef[] = [
   { mobId: 'nightkin_stargazer', center: { x: -272, z: 1538 }, radius: 8, count: 3 },
   { mobId: 'barrow_king', center: { x: -360, z: 1650 }, radius: 5, count: 1 },
 ];
-export const NIGHTBLOOM_OBJECTS: GroundObjectDef[] = [];
+export const NIGHTBLOOM_OBJECTS: GroundObjectDef[] = [
+  {
+    itemId: 'nightbloom_anchor_moonwell',
+    name: 'Moonwell Dream Anchor',
+    positions: [{ x: -290, z: 1380 }],
+  },
+  {
+    itemId: 'nightbloom_anchor_gloamfield',
+    name: 'Gloamfield Dream Anchor',
+    positions: [{ x: -444, z: 1496 }],
+  },
+  {
+    itemId: 'nightbloom_anchor_barrow',
+    name: 'Barrow Dream Anchor',
+    positions: [{ x: -330, z: 1650 }],
+  },
+];
 
 export const NIGHTBLOOM_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),

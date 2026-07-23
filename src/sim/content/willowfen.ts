@@ -198,10 +198,131 @@ export const WILLOWFEN_MOBS: Record<string, MobTemplate> = {
     color: 0xc8e0b8,
   },
 };
-export const WILLOWFEN_NPCS: Record<string, NpcDef> = {};
-export const WILLOWFEN_QUESTS: Record<string, QuestDef> = {};
-export const WILLOWFEN_QUEST_ORDER: string[] = [];
-export const WILLOWFEN_ITEMS: Record<string, ItemDef> = {};
+export const WILLOWFEN_NPCS: Record<string, NpcDef> = {
+  mayor_alda: {
+    id: 'mayor_alda',
+    name: 'Mayor Alda',
+    title: 'Speaker of Bridgemere',
+    pos: { x: -360, z: 362 },
+    facing: Math.PI,
+    color: 0x78975a,
+    questIds: ['q_willowfen_fenward', 'q_willowfen_croaker'],
+    greeting:
+      'The fen is friendly if you know where it sleeps. Lately, $C, it has been waking in all the wrong places.',
+  },
+  fenward_oli: {
+    id: 'fenward_oli',
+    name: 'Fenward Oli',
+    title: 'Keeper of the Reed Marks',
+    pos: { x: -444, z: 308 },
+    facing: Math.PI / 2,
+    color: 0x6e8d4e,
+    questIds: ['q_willowfen_fenward', 'q_willowfen_marker_round', 'q_willowfen_croaker'],
+    greeting:
+      'Step where the reeds bend, not where they point. One path takes you home and the other feeds the bogtoads.',
+  },
+};
+export const WILLOWFEN_QUESTS: Record<string, QuestDef> = {
+  q_willowfen_fenward: {
+    id: 'q_willowfen_fenward',
+    name: 'The Missing Fenward',
+    giverNpcId: 'mayor_alda',
+    turnInNpcId: 'fenward_oli',
+    text: 'Oli went to reset the reed marks and never returned. Cross the old bridge to the Lilymoors, find our fenward, and learn why every safe path now points toward deep water.',
+    completionText:
+      'Alda sent help at last. Something has turned every marker in the fen, and I have been too busy avoiding hungry mouths to turn them back.',
+    objectives: [
+      { type: 'interact', targetNpcId: 'fenward_oli', count: 1, label: 'Fenward Oli found' },
+    ],
+    xpReward: 5000,
+    copperReward: 2400,
+    itemRewards: {},
+    minLevel: 19,
+  },
+  q_willowfen_marker_round: {
+    id: 'q_willowfen_marker_round',
+    name: 'Reeds Point Home',
+    giverNpcId: 'fenward_oli',
+    turnInNpcId: 'fenward_oli',
+    text: 'Reset the carved markers at Bogshine Pools, Willowweep, and the Drowsy Flats. They stand beside the safest patches of ground, or they did before something big began moving them in the night.',
+    completionText:
+      'Mud on every post, and the same round scrape beneath each one. That old croaker is not sleeping anymore. It is herding travelers toward its hollow.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'willowfen_marker_bogshine',
+        count: 1,
+        label: 'Bogshine reed marker reset',
+      },
+      {
+        type: 'interact',
+        targetObjectItemId: 'willowfen_marker_willowweep',
+        count: 1,
+        label: 'Willowweep reed marker reset',
+      },
+      {
+        type: 'interact',
+        targetObjectItemId: 'willowfen_marker_drowsy',
+        count: 1,
+        label: 'Drowsy Flats reed marker reset',
+      },
+    ],
+    xpReward: 6200,
+    copperReward: 3400,
+    itemRewards: {},
+    requiresQuest: 'q_willowfen_fenward',
+    minLevel: 19,
+  },
+  q_willowfen_croaker: {
+    id: 'q_willowfen_croaker',
+    name: 'The Fen Stops Snoring',
+    giverNpcId: 'fenward_oli',
+    turnInNpcId: 'mayor_alda',
+    text: 'The Drowsy Croaker has learned that turned markers bring easy meals. Find the giant toad in the flats and put it back into the deep sleep its name promises.',
+    completionText:
+      'Bridgemere heard that final croak from here. The bridges are ours again, and Oli may finally stop shouting at the reeds.',
+    objectives: [
+      { type: 'kill', targetMobId: 'drowsy_croaker', count: 1, label: 'Drowsy Croaker defeated' },
+    ],
+    xpReward: 7600,
+    copperReward: 5200,
+    itemRewards: {},
+    requiresQuest: 'q_willowfen_marker_round',
+    minLevel: 20,
+    suggestedPlayers: 2,
+  },
+};
+export const WILLOWFEN_QUEST_ORDER: string[] = [
+  'q_willowfen_fenward',
+  'q_willowfen_marker_round',
+  'q_willowfen_croaker',
+];
+export const WILLOWFEN_ITEMS: Record<string, ItemDef> = {
+  willowfen_marker_bogshine: {
+    id: 'willowfen_marker_bogshine',
+    name: 'Bogshine Reed Marker',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_willowfen_marker_round',
+    noVendorSell: true,
+  },
+  willowfen_marker_willowweep: {
+    id: 'willowfen_marker_willowweep',
+    name: 'Willowweep Reed Marker',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_willowfen_marker_round',
+    noVendorSell: true,
+  },
+  willowfen_marker_drowsy: {
+    id: 'willowfen_marker_drowsy',
+    name: 'Drowsy Flats Reed Marker',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_willowfen_marker_round',
+    noVendorSell: true,
+  },
+};
 export const WILLOWFEN_CAMPS: CampDef[] = [
   { mobId: 'bogtoad', center: { x: -430, z: 270 }, radius: 10, count: 3 },
   { mobId: 'bogtoad', center: { x: -284, z: 316 }, radius: 10, count: 3 },
@@ -210,7 +331,23 @@ export const WILLOWFEN_CAMPS: CampDef[] = [
   { mobId: 'willow_sprite', center: { x: -316, z: 380 }, radius: 10, count: 2 },
   { mobId: 'drowsy_croaker', center: { x: -322, z: 496 }, radius: 5, count: 1 },
 ];
-export const WILLOWFEN_OBJECTS: GroundObjectDef[] = [];
+export const WILLOWFEN_OBJECTS: GroundObjectDef[] = [
+  {
+    itemId: 'willowfen_marker_bogshine',
+    name: 'Bogshine Reed Marker',
+    positions: [{ x: -286, z: 292 }],
+  },
+  {
+    itemId: 'willowfen_marker_willowweep',
+    name: 'Willowweep Reed Marker',
+    positions: [{ x: -430, z: 466 }],
+  },
+  {
+    itemId: 'willowfen_marker_drowsy',
+    name: 'Drowsy Flats Reed Marker',
+    positions: [{ x: -292, z: 496 }],
+  },
+];
 
 export const WILLOWFEN_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),

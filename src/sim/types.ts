@@ -2633,6 +2633,12 @@ export type QuestObjective =
       targetObjectItemId?: string;
       targetNpcId?: string;
     })
+  | (QuestObjectiveBase & {
+      type: 'escort';
+      targetNpcId: string;
+      path: { x: number; z: number }[];
+      ambushes: { atWaypoint: number; mobId: string; count: number }[];
+    })
   | (QuestObjectiveBase & { type: 'craft'; recipeId: string })
   | (QuestObjectiveBase & { type: 'gather' } & (
         | { nodeType: GatherNodeType; itemId?: string }

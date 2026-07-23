@@ -81,6 +81,79 @@ export const GROUND_PICKUP_LINES: Record<string, GroundPickupLines> = {
     deny: 'The ritual circle lies cold and dormant.',
     enough: 'The circle has nothing more to give you.',
   },
+  // Northern realm wayfinding objects
+  frostveil_cairn_tarn: {
+    deny: 'The lake cairn is sealed beneath a skin of unbroken ice.',
+    enough: 'The Glacier Tarn cairn already burns with a steady blue light.',
+  },
+  frostveil_cairn_fen: {
+    deny: "The marsh cairn gives no answer without a watcher's charge.",
+    enough: 'The Shiverfen cairn is already awake and watching.',
+  },
+  frostveil_cairn_terrace: {
+    deny: 'The terrace cairn is silent beneath the driving snow.',
+    enough: 'The Howling Terrace cairn needs no further tending.',
+  },
+  amberfall_lantern_orchard: {
+    deny: 'The orchard lantern has no flame to offer an unbidden hand.',
+    enough: 'The Orchard harvest lantern is already glowing gold.',
+  },
+  amberfall_lantern_mere: {
+    deny: 'The mere lantern stays dark until its keeper begins the round.',
+    enough: 'The Great Mere harvest lantern is already alight.',
+  },
+  amberfall_lantern_monolith: {
+    deny: 'Cold green fire withdraws from your touch.',
+    enough: 'The Monolith harvest lantern has yielded all it can tell you.',
+  },
+  willowfen_marker_bogshine: {
+    deny: "The reed marker is sunk too deep to turn without the fenward's leave.",
+    enough: 'The Bogshine reed marker already points toward safe ground.',
+  },
+  willowfen_marker_willowweep: {
+    deny: 'The carved reeds resist being turned without cause.',
+    enough: 'The Willowweep reed marker already shows the homeward path.',
+  },
+  willowfen_marker_drowsy: {
+    deny: 'Something beneath the mud holds the marker fast.',
+    enough: 'The Drowsy Strand reed marker is set firmly in place.',
+  },
+  nightbloom_anchor_moonwell: {
+    deny: 'The moonwell rune reflects only an empty sky.',
+    enough: 'You have already read the Moonwell dream anchor.',
+  },
+  nightbloom_anchor_gloamfield: {
+    deny: 'The gloamfield rune will not settle into a readable shape.',
+    enough: 'You have already read the Gloamfield dream anchor.',
+  },
+  nightbloom_anchor_barrow: {
+    deny: 'The barrow rune closes like an eye when you approach.',
+    enough: 'You have already read the Sleepless Barrow dream anchor.',
+  },
+  galecrest_signal_downs: {
+    deny: 'The storm post will not sound for an unannounced hand.',
+    enough: 'The Howling Downs storm post has already given its note.',
+  },
+  galecrest_signal_tarn: {
+    deny: 'The tarn post is still and refuses your grip.',
+    enough: 'The Mirror Tarn storm post has already answered.',
+  },
+  galecrest_signal_wrecks: {
+    deny: 'A drowned bell tone warns you away from the post.',
+    enough: 'The Wreckfield storm post has already sounded its warning.',
+  },
+  palmreach_waymark_strand: {
+    deny: 'Vines hold the shell marker shut around its secret.',
+    enough: 'The Palm Strand waymark is already clear and shining.',
+  },
+  palmreach_waymark_vinefall: {
+    deny: "The overgrown waymark will not open without a trailblazer's purpose.",
+    enough: 'The Vinefall waymark already shows the reopened trail.',
+  },
+  palmreach_waymark_lagoon: {
+    deny: 'The lagoon waymark sleeps beneath salt and flowering vines.',
+    enough: 'The Sapphire Lagoon waymark is already awake.',
+  },
   // the Veiled Hollow
   hollow_sealstone: {
     deny: 'The sealstone waits, its socket empty. You have nothing that fits it.',

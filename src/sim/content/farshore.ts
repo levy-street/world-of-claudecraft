@@ -174,8 +174,8 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
 // The defenders. Everyone left in Gullhaven knows what is happening and has
 // found their place in the holding of it: a commander, a scholar who reads
 // the breaks, a quartermaster, a surgeon, the bellkeeper who rings for aid,
-// and a fisher who has seen one too many. Quests arrive with the break
-// mechanic; for now the cast sets the siege and points the newcomer at it.
+// and a fisher who has seen one too many. Their quests lead newcomers from
+// the breach watch to a bellkeeper escort and the final hunt below the cliffs.
 export const FARSHORE_NPCS: Record<string, NpcDef> = {
   warden_coalfast: {
     id: 'warden_coalfast',
@@ -184,7 +184,7 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     pos: { x: 305, z: 66 },
     facing: 0,
     color: 0x8a4b2b,
-    questIds: [],
+    questIds: ['q_farshore_watch_meadow', 'q_farshore_horror'],
     greeting:
       'The breaks do not care that Gullhaven is small, $C. We hold this shore, or there is no shore left to hold. Stand with us and I will not forget it.',
   },
@@ -195,7 +195,7 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     pos: { x: 372, z: 2 },
     facing: Math.PI,
     color: 0x3f5f8a,
-    questIds: [],
+    questIds: ['q_farshore_watch_meadow', 'q_farshore_ferrywalk', 'q_farshore_horror'],
     greeting:
       'Every break sings before it opens, if you have the ear for it. I can hear three of them stirring on the island right now, and one of them is close.',
   },
@@ -228,7 +228,7 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     pos: { x: 252, z: 18 },
     facing: Math.PI / 2,
     color: 0x4a7b6b,
-    questIds: [],
+    questIds: ['q_farshore_ferrywalk'],
     greeting:
       'The bell is the only warning the breaks give us, $C. One toll for the fields, two for the cliffs, three when it is close enough that running will not help. Keep an ear on it, and it may keep you whole.',
   },
@@ -245,8 +245,85 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
   },
 };
 
-export const FARSHORE_QUESTS: Record<string, QuestDef> = {};
-export const FARSHORE_QUEST_ORDER: string[] = [];
+export const FARSHORE_QUESTS: Record<string, QuestDef> = {
+  q_farshore_watch_meadow: {
+    id: 'q_farshore_watch_meadow',
+    name: 'The Watch Beyond the Meadow',
+    giverNpcId: 'warden_coalfast',
+    turnInNpcId: 'riftwatch_ollun',
+    text: 'Ollun keeps watch beyond the meadow where the island first split. He has heard three breaks singing at once. Cross the old landing road, find him, and learn which one will open first.',
+    completionText:
+      'Coalfast sent another pair of ears. Good. The nearest break is following the watchbell, and Tam must carry it to a place where we can spring the trap.',
+    objectives: [
+      {
+        type: 'interact',
+        targetNpcId: 'riftwatch_ollun',
+        count: 1,
+        label: 'Riftwatch Ollun found',
+      },
+    ],
+    xpReward: 450,
+    copperReward: 180,
+    itemRewards: {},
+    minLevel: 3,
+  },
+  q_farshore_ferrywalk: {
+    id: 'q_farshore_ferrywalk',
+    name: 'Walk the Warning Bell',
+    giverNpcId: 'riftwatch_ollun',
+    turnInNpcId: 'riftwatch_ollun',
+    text: 'Tam will carry the watchbell from the Landing to my meadow post. The breaches will come for its sound. Escort the bellkeeper, hold the road when they attack, and bring the warning safely into our trap.',
+    completionText:
+      'The bell is in place and the break showed us its teeth. Now I know which scar to close first, and what guards it.',
+    objectives: [
+      {
+        type: 'escort',
+        targetNpcId: 'bellkeeper_tam',
+        count: 1,
+        label: 'Bellkeeper Tam escorted to the meadow watch',
+        path: [
+          { x: 252, z: 18 },
+          { x: 276, z: 42 },
+          { x: 305, z: 68 },
+          { x: 340, z: 32 },
+          { x: 372, z: 2 },
+        ],
+        ambushes: [
+          { atWaypoint: 1, mobId: 'breach_wretch', count: 2 },
+          { atWaypoint: 3, mobId: 'riftspawn', count: 2 },
+        ],
+      },
+    ],
+    xpReward: 700,
+    copperReward: 320,
+    itemRewards: {},
+    requiresQuest: 'q_farshore_watch_meadow',
+    minLevel: 4,
+  },
+  q_farshore_horror: {
+    id: 'q_farshore_horror',
+    name: 'The Sundered Horror',
+    giverNpcId: 'riftwatch_ollun',
+    turnInNpcId: 'warden_coalfast',
+    text: 'The bell drew out the master of the cliff break, a horror stitched from everything the rift has swallowed. Hunt it at the Sundered Cliffs, then tell Coalfast the island still has a shore worth holding.',
+    completionText:
+      'We heard the break close from Gullhaven. Farshore is still wounded, but today it stopped bleeding. You have our thanks, $N.',
+    objectives: [
+      { type: 'kill', targetMobId: 'sundered_horror', count: 1, label: 'Sundered Horror defeated' },
+    ],
+    xpReward: 1100,
+    copperReward: 500,
+    itemRewards: {},
+    requiresQuest: 'q_farshore_ferrywalk',
+    minLevel: 6,
+    suggestedPlayers: 2,
+  },
+};
+export const FARSHORE_QUEST_ORDER: string[] = [
+  'q_farshore_watch_meadow',
+  'q_farshore_ferrywalk',
+  'q_farshore_horror',
+];
 export const FARSHORE_ITEMS: Record<string, ItemDef> = {};
 export const FARSHORE_CAMPS: CampDef[] = [
   // the break-spawned hold the island's fringe; the redoubt keeps the town

@@ -179,9 +179,103 @@ export const WRAITHWOOD_MOBS: Record<string, MobTemplate> = {
     color: 0xc8d8c0,
   },
 };
-export const WRAITHWOOD_NPCS: Record<string, NpcDef> = {};
-export const WRAITHWOOD_QUESTS: Record<string, QuestDef> = {};
-export const WRAITHWOOD_QUEST_ORDER: string[] = [];
+export const WRAITHWOOD_NPCS: Record<string, NpcDef> = {
+  reeve_mara: {
+    id: 'reeve_mara',
+    name: 'Reeve Mara',
+    title: 'Keeper of Gallowmere',
+    pos: { x: 360, z: 1430 },
+    facing: Math.PI,
+    color: 0x7c6a68,
+    questIds: ['q_wraithwood_lost_lantern', 'q_wraithwood_lantern_walk', 'q_wraithwood_last_hunt'],
+    greeting: 'Keep a lantern close and your name closer, $C. The wood is fond of stealing both.',
+  },
+  lantern_iven: {
+    id: 'lantern_iven',
+    name: 'Lantern Iven',
+    title: 'Mournstone Lamplighter',
+    pos: { x: 280, z: 1484 },
+    facing: Math.PI / 2,
+    color: 0x9a7b5d,
+    questIds: ['q_wraithwood_lost_lantern', 'q_wraithwood_lantern_walk'],
+    greeting:
+      'A lantern keeps back ordinary darkness. For the rest, I carry salt, bells, and very quick feet.',
+  },
+};
+export const WRAITHWOOD_QUESTS: Record<string, QuestDef> = {
+  q_wraithwood_lost_lantern: {
+    id: 'q_wraithwood_lost_lantern',
+    name: 'A Lantern Gone Missing',
+    giverNpcId: 'reeve_mara',
+    turnInNpcId: 'lantern_iven',
+    text: "Iven left to relight Mournstone Chapel before dusk and never passed Widow's Thicket. Follow the western path, find our lamplighter, and do not answer if the trees call you by name.",
+    completionText:
+      'Mara sent you into the thicket after me? Brave of you both. The chapel lamps are still dark, and the wood has noticed.',
+    objectives: [
+      { type: 'interact', targetNpcId: 'lantern_iven', count: 1, label: 'Lantern Iven found' },
+    ],
+    xpReward: 5000,
+    copperReward: 2400,
+    itemRewards: {},
+    minLevel: 19,
+  },
+  q_wraithwood_lantern_walk: {
+    id: 'q_wraithwood_lantern_walk',
+    name: 'The Lantern Walk',
+    giverNpcId: 'lantern_iven',
+    turnInNpcId: 'reeve_mara',
+    text: 'The chapel flame is in this lantern, and every hungry thing in Wraithwood can smell it. Walk with me to Mournstone, $N. When the spiders descend or the wraiths close in, keep them away from the light.',
+    completionText:
+      'The Mournstone lamps are burning again. Every lost traveler in these woods now has a road home, including Iven.',
+    objectives: [
+      {
+        type: 'escort',
+        targetNpcId: 'lantern_iven',
+        count: 1,
+        label: 'Lantern Iven escorted to Mournstone Chapel',
+        path: [
+          { x: 280, z: 1484 },
+          { x: 315, z: 1508 },
+          { x: 360, z: 1532 },
+          { x: 338, z: 1576 },
+          { x: 300, z: 1620 },
+        ],
+        ambushes: [
+          { atWaypoint: 1, mobId: 'widowsilk_spinner', count: 2 },
+          { atWaypoint: 3, mobId: 'wood_wraith', count: 2 },
+        ],
+      },
+    ],
+    xpReward: 6200,
+    copperReward: 3400,
+    itemRewards: {},
+    requiresQuest: 'q_wraithwood_lost_lantern',
+    minLevel: 19,
+  },
+  q_wraithwood_last_hunt: {
+    id: 'q_wraithwood_last_hunt',
+    name: 'The Huntsman Hunted',
+    giverNpcId: 'reeve_mara',
+    turnInNpcId: 'reeve_mara',
+    text: 'The chapel light has drawn the Pale Huntsman from his clearing. He has stalked Gallowmere for generations, but tonight his path is plain. Follow it north and make this his final hunt.',
+    completionText:
+      'No horn answers from the clearing. At last, Wraithwood is only haunted by the ordinary dead.',
+    objectives: [
+      { type: 'kill', targetMobId: 'pale_huntsman', count: 1, label: 'Pale Huntsman defeated' },
+    ],
+    xpReward: 7600,
+    copperReward: 5200,
+    itemRewards: {},
+    requiresQuest: 'q_wraithwood_lantern_walk',
+    minLevel: 20,
+    suggestedPlayers: 2,
+  },
+};
+export const WRAITHWOOD_QUEST_ORDER: string[] = [
+  'q_wraithwood_lost_lantern',
+  'q_wraithwood_lantern_walk',
+  'q_wraithwood_last_hunt',
+];
 export const WRAITHWOOD_ITEMS: Record<string, ItemDef> = {};
 export const WRAITHWOOD_CAMPS: CampDef[] = [
   { mobId: 'widowsilk_spinner', center: { x: 282, z: 1478 }, radius: 10, count: 3 },

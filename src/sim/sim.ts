@@ -435,6 +435,11 @@ import {
   onRecipeCraftedForQuests,
 } from './quests/quest_credit';
 import {
+  type QuestEscortRun,
+  tryStartQuestEscort,
+  updateQuestEscorts,
+} from './quests/quest_escort';
+import {
   type NaturalRiftPortal,
   RIFT_PORTAL_FIRST_AT,
   updateRiftPortals as updateRiftPortalsImpl,
@@ -1566,6 +1571,8 @@ export class Sim {
   // reach it through the seam.
   private targeting!: Targeting;
   players = new Map<number, PlayerMeta>(); // keyed by entity id
+  // Open-world escort runtime. The quest log persists; active travelers do not.
+  questEscortRuns = new Map<string, QuestEscortRun>();
   // spatial indexes for radius queries; re-bucketed at the end of each tick
   // and kept roster-exact on spawn/despawn/teleport
   readonly grid = new SpatialGrid();
@@ -3799,6 +3806,9 @@ export class Sim {
       get players() {
         return sim.players;
       },
+      get questEscortRuns() {
+        return sim.questEscortRuns;
+      },
       get primaryId() {
         return sim.primaryId;
       },
@@ -4746,6 +4756,11 @@ export class Sim {
       }
     }
     lap?.('ent.misc');
+
+    // Escort movement and ambush spawning are rng-free. Newly spawned waves first
+    // act on the following tick because mob AI has already run.
+    updateQuestEscorts(this.ctx);
+    lap?.('questEscorts');
 
     // one pass over the entities collects every player a mob is engaged
     // with, instead of one full scan per player
@@ -7486,6 +7501,7 @@ export class Sim {
     // Book of Deeds: chronicler talks feed their visited mark; talking to any
     // other NPC resets the Saul consecutive-talk counter.
     deedsMod.onNpcTalkedForDeeds(this.ctx, meta, npc.templateId);
+    if (tryStartQuestEscort(this.ctx, npc, meta)) return;
     if (this.interactNpcForQuests(npc, meta)) return;
     for (const qid of npc.questIds) {
       const quest = QUESTS[qid];

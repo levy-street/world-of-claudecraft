@@ -170,6 +170,12 @@ export function questObjectiveAreas(
       const npc = obj.targetNpcId ? NPCS[obj.targetNpcId] : undefined;
       // fresh {x,z}: never alias the shared NPCS content the sim places from
       if (npc) push(ref, { x: npc.pos.x, z: npc.pos.z }, POINT_AREA_RADIUS);
+    } else if (obj.type === 'escort') {
+      const npc = NPCS[obj.targetNpcId];
+      if (npc) push(ref, { x: npc.pos.x, z: npc.pos.z }, POINT_AREA_RADIUS);
+      for (const waypoint of obj.path) {
+        push(ref, { x: waypoint.x, z: waypoint.z }, POINT_AREA_RADIUS);
+      }
     } else if (obj.type === 'gather' && obj.nodeType) {
       for (const node of GATHER_NODES) {
         if (node.type === obj.nodeType)

@@ -8986,5 +8986,301 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildheart_tuskblade.name': 'ワイルドハートの牙大剣',
   'entities.items.wildheart_hexwood_staff.name': '盆地の呪木杖',
   'entities.items.wildheart_fangknife.name': 'ズルガーの牙小刀',
+  // Northern realm quest arcs (M16 non-Latin fills).
+  'entities.npcs.captain_kaelra.name': 'ケイラ隊長',
+  'entities.npcs.captain_kaelra.title': 'ワームウォッチ司令官',
+  'entities.npcs.captain_kaelra.greeting':
+    '北へ向かうなら、一歩たりとも無駄にするな、{className}。敵は道よりずっと多い。',
+  'entities.npcs.scout_vaela.name': '斥候ヴェイラ',
+  'entities.npcs.scout_vaela.title': 'カルデラの先導者',
+  'entities.npcs.scout_vaela.greeting':
+    '砂丘は動き、トロルは動かず、ドレイクは両方を見ている。安全な道なら私について来い。',
+  'entities.npcs.matriarch_eira.name': '族母エイラ',
+  'entities.npcs.matriarch_eira.title': 'アイスマントルの代弁者',
+  'entities.npcs.matriarch_eira.greeting':
+    '氷はすべての足跡を覚えている、{className}。軽く歩き、よく耳を澄ませ。',
+  'entities.npcs.watcher_senn.name': '見張り人セン',
+  'entities.npcs.watcher_senn.title': 'オーロラの守護者',
+  'entities.npcs.watcher_senn.greeting':
+    'オーロラが美しいのは、その悲鳴が聞こえないからだ。今夜は警告している。',
+  'entities.npcs.reeve_elowen.name': '代官エロウェン',
+  'entities.npcs.reeve_elowen.title': 'ランタンメアの守り手',
+  'entities.npcs.reeve_elowen.greeting':
+    'アンバーフォールは感謝を忘れるまで恵みを与える。今季は古い借りが歩き出した。',
+  'entities.npcs.orchard_keeper_bram.name': '果樹園守ブラム',
+  'entities.npcs.orchard_keeper_bram.title': '黄金の枝の守り手',
+  'entities.npcs.orchard_keeper_bram.greeting':
+    '落ちた果実に気をつけろ。精霊には牙、狐には礼儀があり、どちらも君を丸裸にする。',
+  'entities.npcs.mayor_alda.name': '町長アルダ',
+  'entities.npcs.mayor_alda.title': 'ブリッジメアの代表',
+  'entities.npcs.mayor_alda.greeting':
+    '沼が眠る場所を知れば友好的だ。近頃は間違った場所で目を覚ます、{className}。',
+  'entities.npcs.fenward_oli.name': '沼守オリ',
+  'entities.npcs.fenward_oli.title': '葦標の守り手',
+  'entities.npcs.fenward_oli.greeting':
+    '葦が曲がる方へ進み、指す方へは行くな。一方は家へ、もう一方は沼蛙の腹へ続く。',
+  'entities.npcs.dreamkeeper_luma.name': '夢守ルマ',
+  'entities.npcs.dreamkeeper_luma.title': 'ムーンレストの守護者',
+  'entities.npcs.dreamkeeper_luma.greeting':
+    'ナイトブルームは眠っていない、{className}。夢を見ており、今夜その夢が牙をむいた。',
+  'entities.npcs.stargazer_oril.name': '星見オリル',
+  'entities.npcs.stargazer_oril.title': '立ち続ける見張りの守り手',
+  'entities.npcs.stargazer_oril.greeting':
+    '見張り場の星が一つ足りない。百回数えたが、消えた光は足元にある。',
+  'entities.npcs.reeve_mara.name': '代官マーラ',
+  'entities.npcs.reeve_mara.title': 'ギャロウメアの守り手',
+  'entities.npcs.reeve_mara.greeting':
+    '灯りを近く、名をもっと近くに置け、{className}。この森は両方を盗む。',
+  'entities.npcs.lantern_iven.name': '灯守イヴェン',
+  'entities.npcs.lantern_iven.title': 'モーンストーンの点灯人',
+  'entities.npcs.lantern_iven.greeting': '灯りは普通の闇を退ける。残りには塩と鈴と速い足を使う。',
+  'entities.npcs.harbormaster_pell.name': '港長ペル',
+  'entities.npcs.harbormaster_pell.title': 'ウィックハーバーの主',
+  'entities.npcs.harbormaster_pell.greeting':
+    '風が帽子を奪ったら諦めろ。船を奪ったなら、{className}、仕事の時間だ。',
+  'entities.npcs.beacon_keeper_ada.name': '灯台守エイダ',
+  'entities.npcs.beacon_keeper_ada.title': '古き灯の守り手',
+  'entities.npcs.beacon_keeper_ada.greeting':
+    '古い灯は船を導かない。どの難破船が海へ這い戻ろうとしているかを示す。',
+  'entities.npcs.tidecaller_miri.name': '潮呼びミリ',
+  'entities.npcs.tidecaller_miri.title': 'ドリフトヘイヴンの声',
+  'entities.npcs.tidecaller_miri.greeting':
+    '潮は借りた物を返す。だが密林はその礼儀を学ばなかった、{className}。',
+  'entities.npcs.trailblazer_cas.name': '道拓きカス',
+  'entities.npcs.trailblazer_cas.title': 'エメラルド密林の案内人',
+  'entities.npcs.trailblazer_cas.greeting':
+    '道は朝食までに草で覆われる。夜明けに印をつけ、夕食前にやり直す。',
+  'entities.npcs.steward_elian.name': '執事エリアン',
+  'entities.npcs.steward_elian.title': 'ヘッジウィックの守り手',
+  'entities.npcs.steward_elian.greeting':
+    'エヴァーガーデンの物はすべて配置済みだ、{className}。生垣が動くなら意図がある。',
+  'entities.npcs.maze_scholar_pip.name': '迷宮学者ピップ',
+  'entities.npcs.maze_scholar_pip.title': '生ける生垣の地図師',
+  'entities.npcs.maze_scholar_pip.greeting':
+    '十二年間、毎朝この迷宮を描いた。一度も地図どおりに留まってくれない。',
+  'entities.npcs.statue_keeper_bram.name': '彫像守ブラム',
+  'entities.npcs.statue_keeper_bram.title': '大理石の道の守護者',
+  'entities.npcs.statue_keeper_bram.greeting':
+    '今日は像が南を向く。昨日は噴水だった。明日の向きは考えたくない。',
+  'entities.npcs.rose_keeper_una.name': '薔薇守ウナ',
+  'entities.npcs.rose_keeper_una.title': '野薔薇の庭師',
+  'entities.npcs.rose_keeper_una.greeting':
+    '薔薇が歌う間は安全だ。静まったら棘が興味を持つ前に去れ。',
+  'entities.npcs.pond_keeper_sol.name': '池守ソル',
+  'entities.npcs.pond_keeper_sol.title': '花びら池の見張り',
+  'entities.npcs.pond_keeper_sol.greeting':
+    '池は迷宮の全経路を映す。今日は噴水の中庭へ続く道が一本多い。',
+  'entities.quests.q_drakewatch_dispatch.title': '北路の煙',
+  'entities.quests.q_drakewatch_dispatch.text':
+    'ヴェイラの報告が途絶え、北の篝火も消えた。灰の砂丘で彼女を探し、砦へ迫るものを突き止めろ。',
+  'entities.quests.q_drakewatch_dispatch.completion':
+    'ケイラの使いか。襲撃者とトロル、そしてカルデラを旋回する翼を見た。登り道で手を貸してくれ。',
+  'entities.quests.q_drakewatch_dispatch.objectives.0.label': '斥候ヴェイラを発見',
+  'entities.quests.q_drakewatch_long_climb.title': '長い登り道',
+  'entities.quests.q_drakewatch_long_climb.text':
+    'カルデラへの安全路を記す。灰骨とトロルが狙っている。同行して守ってくれ、{playerName}。',
+  'entities.quests.q_drakewatch_long_climb.completion':
+    'ヴェイラと道標、脅威の記録を持ち帰った。城壁の一個小隊より価値がある。',
+  'entities.quests.q_drakewatch_long_climb.objectives.0.label': 'ヴェイラをカルデラ縁へ護衛',
+  'entities.quests.q_drakewatch_wings.title': 'ドラゴンマウの翼',
+  'entities.quests.q_drakewatch_wings.text':
+    'エンバーウィングがカルデラを支配し、次は砦を試す。巣へ登り、飛び立つ前に倒せ。',
+  'entities.quests.q_drakewatch_wings.completion':
+    '屋根から影が消えた。今夜は空を見上げず眠れる。君の勝利だ、{playerName}。',
+  'entities.quests.q_drakewatch_wings.objectives.0.label': 'エンバーウィングを討伐',
+  'entities.quests.q_frostveil_aurora_call.title': 'オーロラの降りる場所',
+  'entities.quests.q_frostveil_aurora_call.text':
+    'センは嵐の前に三つの青い炎を送った。オーロラ階段で彼を探し、警告を聞け。',
+  'entities.quests.q_frostveil_aurora_call.completion':
+    '嵐を越えて来たなら、警告の正体を見ていけ。',
+  'entities.quests.q_frostveil_aurora_call.objectives.0.label': '見張り人センを発見',
+  'entities.quests.q_frostveil_three_cairns.title': '雪中の三つの石塚',
+  'entities.quests.q_frostveil_three_cairns.text':
+    '氷河湖、震え沼、唸る台地の結界石を調べろ。消えた光が嵐の侵入口を示す。',
+  'entities.quests.q_frostveil_three_cairns.completion':
+    '最後の石塚が暗い。嵐は空ではなく、台地から降りた巨体が引いてきた。',
+  'entities.quests.q_frostveil_three_cairns.objectives.0.label': '氷河湖の石塚を調査',
+  'entities.quests.q_frostveil_three_cairns.objectives.1.label': '震え沼の石塚を調査',
+  'entities.quests.q_frostveil_three_cairns.objectives.2.label': '唸る台地の石塚を調査',
+  'entities.quests.q_frostveil_shield_tracks.title': '盾ほど広い足跡',
+  'entities.quests.q_frostveil_shield_tracks.text':
+    'フロストメインが台地の結界を砕いた。光を追って町へ来る前に高地で狩れ。',
+  'entities.quests.q_frostveil_shield_tracks.completion':
+    '結界石は直せる。君はアイスマントルにもう一冬を与えた。',
+  'entities.quests.q_frostveil_shield_tracks.objectives.0.label': 'フロストメインを討伐',
+  'entities.quests.q_amberfall_orchard_road.title': '果樹園の道',
+  'entities.quests.q_amberfall_orchard_road.text':
+    '西の収穫灯が点いていない。黄金の枝の下でブラムを探し、闇の理由を聞け。',
+  'entities.quests.q_amberfall_orchard_road.completion':
+    '町からも闇が見えたのか。古い樹人が目覚める前に灯りを巡ろう。',
+  'entities.quests.q_amberfall_orchard_road.objectives.0.label': '果樹園守ブラムを発見',
+  'entities.quests.q_amberfall_lantern_round.title': '灯りの巡回',
+  'entities.quests.q_amberfall_lantern_round.text':
+    '果樹園、大沼、傾く石碑の三つの収穫灯を順に点け、森の動きを見ろ。',
+  'entities.quests.q_amberfall_lantern_round.completion':
+    '石碑の灯だけ緑だ。シンダーバウが丘で根を張り、炎を吸っている。',
+  'entities.quests.q_amberfall_lantern_round.objectives.0.label': '果樹園の灯を再点火',
+  'entities.quests.q_amberfall_lantern_round.objectives.1.label': '大沼の灯を再点火',
+  'entities.quests.q_amberfall_lantern_round.objectives.2.label': '石碑の灯を再点火',
+  'entities.quests.q_amberfall_cinderbough.title': '目覚めるシンダーバウ',
+  'entities.quests.q_amberfall_cinderbough.text':
+    '樹人が結界の炎を飲み込んだ。他の灯へ根を伸ばす前に倒せ。',
+  'entities.quests.q_amberfall_cinderbough.completion':
+    '灯は安定した。倒れた場所に三本の苗木を植え、優しい名を与えよう。',
+  'entities.quests.q_amberfall_cinderbough.objectives.0.label': 'シンダーバウを討伐',
+  'entities.quests.q_willowfen_fenward.title': '消えた沼守',
+  'entities.quests.q_willowfen_fenward.text':
+    'オリは葦標を直しに出て戻らない。百合の荒野で彼を探し、安全路が深水を指す理由を調べろ。',
+  'entities.quests.q_willowfen_fenward.completion':
+    '助けが来たか。何かが標を全部回し、私は腹を空かせた口を避けるので精一杯だった。',
+  'entities.quests.q_willowfen_fenward.objectives.0.label': '沼守オリを発見',
+  'entities.quests.q_willowfen_marker_round.title': '葦は家を指す',
+  'entities.quests.q_willowfen_marker_round.text':
+    '沼光の池、泣き柳、眠りの干潟の標を戻せ。夜に大きな何かが動かした。',
+  'entities.quests.q_willowfen_marker_round.completion':
+    '泥と丸い傷がある。老いた大蛙が旅人を巣へ追い込んでいる。',
+  'entities.quests.q_willowfen_marker_round.objectives.0.label': '沼光の葦標を修復',
+  'entities.quests.q_willowfen_marker_round.objectives.1.label': '泣き柳の葦標を修復',
+  'entities.quests.q_willowfen_marker_round.objectives.2.label': '眠りの干潟の葦標を修復',
+  'entities.quests.q_willowfen_croaker.title': '沼のいびきが止まる',
+  'entities.quests.q_willowfen_croaker.text':
+    'ドロウジー・クローカーは標で獲物を誘う。干潟で見つけ、名どおり眠らせろ。',
+  'entities.quests.q_willowfen_croaker.completion':
+    '最後の鳴き声は町まで届いた。橋は戻り、オリも葦へ怒鳴らずに済む。',
+  'entities.quests.q_willowfen_croaker.objectives.0.label': 'ドロウジー・クローカーを討伐',
+  'entities.quests.q_nightbloom_vigil.title': '消えた星',
+  'entities.quests.q_nightbloom_vigil.text':
+    'オリルの星の報告が三夜届かない。古い石の見張り場で彼を探し、沈黙の影を調べろ。',
+  'entities.quests.q_nightbloom_vigil.completion':
+    'ルマは私の数を信じている。夢を留める錨から消えた星を追おう。',
+  'entities.quests.q_nightbloom_vigil.objectives.0.label': '星見オリルを発見',
+  'entities.quests.q_nightbloom_dream_anchors.title': '夢の錨',
+  'entities.quests.q_nightbloom_dream_anchors.text':
+    '月井、黄昏野、眠らぬ墳墓の月印を読め。暗い反射が星の落ちた場所だ。',
+  'entities.quests.q_nightbloom_dream_anchors.completion':
+    '墳墓の印は星でなく王冠を映した。古王が光で宮廷を起こした。',
+  'entities.quests.q_nightbloom_dream_anchors.objectives.0.label': '月井の夢錨を読む',
+  'entities.quests.q_nightbloom_dream_anchors.objectives.1.label': '黄昏野の夢錨を読む',
+  'entities.quests.q_nightbloom_dream_anchors.objectives.2.label': '眠らぬ墳墓の夢錨を読む',
+  'entities.quests.q_nightbloom_barrow_crown.title': '地下の王冠',
+  'entities.quests.q_nightbloom_barrow_crown.text':
+    '墳墓王が夢から星を盗み王冠に据えた。王を倒し、ナイトブルームに再び名を忘れさせろ。',
+  'entities.quests.q_nightbloom_barrow_crown.completion':
+    '光は空へ戻った。皆が恐れた場所を歩いた君のおかげで、夜はまた穏やかに夢を見る。',
+  'entities.quests.q_nightbloom_barrow_crown.objectives.0.label': '墳墓王を討伐',
+  'entities.quests.q_wraithwood_lost_lantern.title': '消えた灯り',
+  'entities.quests.q_wraithwood_lost_lantern.text':
+    'イヴェンは礼拝堂へ向かい、寡婦の茂みを越えなかった。西道で探し、木に名を呼ばれても答えるな。',
+  'entities.quests.q_wraithwood_lost_lantern.completion':
+    'マーラが君を送ったか。礼拝堂は暗く、森はもう気づいている。',
+  'entities.quests.q_wraithwood_lost_lantern.objectives.0.label': '灯守イヴェンを発見',
+  'entities.quests.q_wraithwood_lantern_walk.title': '灯りの行進',
+  'entities.quests.q_wraithwood_lantern_walk.text':
+    '礼拝堂の火を森中が嗅ぎつけた。モーンストーンまで護衛し、灯りを守れ、{playerName}。',
+  'entities.quests.q_wraithwood_lantern_walk.completion':
+    '礼拝堂の灯が戻った。森で迷う者は皆、帰り道を得た。',
+  'entities.quests.q_wraithwood_lantern_walk.objectives.0.label': 'イヴェンを礼拝堂へ護衛',
+  'entities.quests.q_wraithwood_last_hunt.title': '狩人狩り',
+  'entities.quests.q_wraithwood_last_hunt.text':
+    '灯りが青白い狩人を誘い出した。北の足跡を追い、最後の狩りにしろ。',
+  'entities.quests.q_wraithwood_last_hunt.completion':
+    '空地から角笛は返らない。森を彷徨うのは普通の死者だけになった。',
+  'entities.quests.q_wraithwood_last_hunt.objectives.0.label': '青白い狩人を討伐',
+  'entities.quests.q_galecrest_beacon_orders.title': '古い灯台への命令',
+  'entities.quests.q_galecrest_beacon_orders.text':
+    '無人の古灯台が正午に光った。エイダを探し、古い灯を起こした影を調べろ。',
+  'entities.quests.q_galecrest_beacon_orders.completion':
+    '港からも見えたか。嵐柱が脅威の来た方角を教える。',
+  'entities.quests.q_galecrest_beacon_orders.objectives.0.label': '灯台守エイダを発見',
+  'entities.quests.q_galecrest_storm_signals.title': '烈風の信号',
+  'entities.quests.q_galecrest_storm_signals.text':
+    '唸る丘、鏡湖、難破原の嵐柱を鳴らせ。三音が沈没船を呼ぶものを示す。',
+  'entities.quests.q_galecrest_storm_signals.completion':
+    '難破原だけ第四の低音を返した。船体が裂ける音だ。番人が目覚めた。',
+  'entities.quests.q_galecrest_storm_signals.objectives.0.label': '唸る丘の嵐柱を鳴らす',
+  'entities.quests.q_galecrest_storm_signals.objectives.1.label': '鏡湖の嵐柱を鳴らす',
+  'entities.quests.q_galecrest_storm_signals.objectives.2.label': '難破原の嵐柱を鳴らす',
+  'entities.quests.q_galecrest_wreck_warden.title': '第四の音',
+  'entities.quests.q_galecrest_wreck_warden.text':
+    '難破船の番人が砂下の鐘を鳴らしている。砕けた船の間で見つけ、第四音を止めろ。',
+  'entities.quests.q_galecrest_wreck_warden.completion':
+    '港の鐘は元の音へ戻った。水夫はまだ恐れるが、死者の道案内は終わった。',
+  'entities.quests.q_galecrest_wreck_warden.objectives.0.label': '難破船の番人を討伐',
+  'entities.quests.q_palmreach_green_trail.title': '緑の道',
+  'entities.quests.q_palmreach_green_trail.text':
+    'カスは蔦滝への道を開きに密林へ入った。貝殻の印を追い、道を飲んだ原因を探せ。',
+  'entities.quests.q_palmreach_green_trail.completion':
+    'ミリの使いか。古い道標を起こし、蔦に埋められる前に道を戻そう。',
+  'entities.quests.q_palmreach_green_trail.objectives.0.label': '道拓きカスを発見',
+  'entities.quests.q_palmreach_waymarks.title': '密林が覚える道',
+  'entities.quests.q_palmreach_waymarks.text':
+    '椰子浜、蔦滝、蒼玉の潟の道標を解放せよ。三つが目覚めれば安全路が現れる。',
+  'entities.quests.q_palmreach_waymarks.completion':
+    '道標は沈んだ偶像へ向いた。守護者が刻まれた石を呼び戻している。',
+  'entities.quests.q_palmreach_waymarks.objectives.0.label': '椰子浜の道標を発見',
+  'entities.quests.q_palmreach_waymarks.objectives.1.label': '蔦滝の道標を発見',
+  'entities.quests.q_palmreach_waymarks.objectives.2.label': '蒼玉の潟の道標を発見',
+  'entities.quests.q_palmreach_idol_guardian.title': '偶像の帰還命令',
+  'entities.quests.q_palmreach_idol_guardian.text':
+    '偶像の守護者が道石を引き抜いている。沈んだ社で支配を断ち、海岸への道を守れ。',
+  'entities.quests.q_palmreach_idol_guardian.completion':
+    '貝殻の印が蔦滝まで輝く。パームリーチに道が戻った。',
+  'entities.quests.q_palmreach_idol_guardian.objectives.0.label': '偶像の守護者を討伐',
+  'entities.quests.q_evergarden_maze_mouth.title': '動いた迷宮',
+  'entities.quests.q_evergarden_maze_mouth.text':
+    'ピップは朝に迷宮を描きに出て戻らない。入口で探し、生垣が噴水へ傾く理由を聞け。',
+  'entities.quests.q_evergarden_maze_mouth.completion':
+    'エリアンも気づいたか。地図のせいではない。庭の三方から証言を集めよう。',
+  'entities.quests.q_evergarden_maze_mouth.objectives.0.label': '迷宮学者ピップを発見',
+  'entities.quests.q_evergarden_living_map.title': '三つの声の地図',
+  'entities.quests.q_evergarden_living_map.text':
+    '彫像のブラム、薔薇のウナ、池のソルに話を聞け。三つの目撃で地下の動きを描く。',
+  'entities.quests.q_evergarden_living_map.completion':
+    '像、薔薇、池の異変は噴水の中庭で交わる。トピアリーの雄牛が根を切った。',
+  'entities.quests.q_evergarden_living_map.objectives.0.label': '彫像守ブラムに聞く',
+  'entities.quests.q_evergarden_living_map.objectives.1.label': '薔薇守ウナに聞く',
+  'entities.quests.q_evergarden_living_map.objectives.2.label': '池守ソルに聞く',
+  'entities.quests.q_evergarden_bull.title': '噴水の中庭の雄牛',
+  'entities.quests.q_evergarden_bull.text':
+    'トピアリーの雄牛が生きた根で迷宮を引き込む。中庭で庭から切り離せ。',
+  'entities.quests.q_evergarden_bull.completion':
+    '生垣は正しい場所へ戻った。少なくとも今日は。静かな朝は君のおかげだ。',
+  'entities.quests.q_evergarden_bull.objectives.0.label': 'トピアリーの雄牛を討伐',
+  'entities.quests.q_farshore_watch_meadow.title': '草原の先の見張り',
+  'entities.quests.q_farshore_watch_meadow.text':
+    'オルンは三つの裂け目を同時に聞いた。古い上陸路を渡り、最初に開く裂け目を確かめろ。',
+  'entities.quests.q_farshore_watch_meadow.completion':
+    'コールファストの援軍か。近い裂け目は警鐘を追う。タムが罠まで運ぶ。',
+  'entities.quests.q_farshore_watch_meadow.objectives.0.label': '裂け目見オルンを発見',
+  'entities.quests.q_farshore_ferrywalk.title': '警鐘を運ぶ道',
+  'entities.quests.q_farshore_ferrywalk.text':
+    'タムが上陸地から見張り場へ警鐘を運ぶ。音を狙う怪物から護衛しろ。',
+  'entities.quests.q_farshore_ferrywalk.completion':
+    '鐘は所定の場所に着き、裂け目は牙を見せた。閉じるべき傷が分かった。',
+  'entities.quests.q_farshore_ferrywalk.objectives.0.label': '鐘守タムを草原の見張り場へ護衛',
+  'entities.quests.q_farshore_horror.title': '裂けた恐怖',
+  'entities.quests.q_farshore_horror.text':
+    '鐘が崖の裂け目の主を誘い出した。裂けた崖で倒し、海岸が残ったと報告しろ。',
+  'entities.quests.q_farshore_horror.completion':
+    '裂け目が閉じる音を聞いた。島は傷ついたままだが、今日は血が止まった。ありがとう、{playerName}。',
+  'entities.quests.q_farshore_horror.objectives.0.label': '裂けた恐怖を討伐',
+  'entities.items.frostveil_cairn_tarn.name': '氷河湖の結界石塚',
+  'entities.items.frostveil_cairn_fen.name': '震え沼の結界石塚',
+  'entities.items.frostveil_cairn_terrace.name': '台地の結界石塚',
+  'entities.items.amberfall_lantern_orchard.name': '果樹園の収穫灯',
+  'entities.items.amberfall_lantern_mere.name': '大沼の収穫灯',
+  'entities.items.amberfall_lantern_monolith.name': '石碑の収穫灯',
+  'entities.items.willowfen_marker_bogshine.name': '沼光の葦標',
+  'entities.items.willowfen_marker_willowweep.name': '泣き柳の葦標',
+  'entities.items.willowfen_marker_drowsy.name': '眠りの干潟の葦標',
+  'entities.items.nightbloom_anchor_moonwell.name': '月井の夢錨',
+  'entities.items.nightbloom_anchor_gloamfield.name': '黄昏野の夢錨',
+  'entities.items.nightbloom_anchor_barrow.name': '墳墓の夢錨',
+  'entities.items.galecrest_signal_downs.name': '丘の嵐柱',
+  'entities.items.galecrest_signal_tarn.name': '鏡湖の嵐柱',
+  'entities.items.galecrest_signal_wrecks.name': '難破原の嵐柱',
+  'entities.items.palmreach_waymark_strand.name': '椰子浜の道標',
+  'entities.items.palmreach_waymark_vinefall.name': '蔦滝の道標',
+  'entities.items.palmreach_waymark_lagoon.name': '蒼玉の潟の道標',
   'hudChrome.professions.skillValue': '{skill} / {max}',
 };

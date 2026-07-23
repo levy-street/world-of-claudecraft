@@ -190,10 +190,136 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     color: 0xa8b048,
   },
 };
-export const AMBERFALL_NPCS: Record<string, NpcDef> = {};
-export const AMBERFALL_QUESTS: Record<string, QuestDef> = {};
-export const AMBERFALL_QUEST_ORDER: string[] = [];
-export const AMBERFALL_ITEMS: Record<string, ItemDef> = {};
+export const AMBERFALL_NPCS: Record<string, NpcDef> = {
+  reeve_elowen: {
+    id: 'reeve_elowen',
+    name: 'Reeve Elowen',
+    title: 'Keeper of Lanternmere',
+    pos: { x: -360, z: 2072 },
+    facing: Math.PI,
+    color: 0xc58a3b,
+    questIds: ['q_amberfall_orchard_road', 'q_amberfall_cinderbough'],
+    greeting:
+      'Amberfall gives freely until someone forgets to give thanks. This season, too many old debts have come walking.',
+  },
+  orchard_keeper_bram: {
+    id: 'orchard_keeper_bram',
+    name: 'Orchard Keeper Bram',
+    title: 'Keeper of the Gilded Boughs',
+    pos: { x: -432, z: 1992 },
+    facing: Math.PI / 2,
+    color: 0xb66f2c,
+    questIds: ['q_amberfall_orchard_road', 'q_amberfall_lantern_round', 'q_amberfall_cinderbough'],
+    greeting:
+      'Mind the fallen fruit. The sprites have teeth, the foxes have manners, and both will rob you blind.',
+  },
+};
+export const AMBERFALL_QUESTS: Record<string, QuestDef> = {
+  q_amberfall_orchard_road: {
+    id: 'q_amberfall_orchard_road',
+    name: 'The Orchard Road',
+    giverNpcId: 'reeve_elowen',
+    turnInNpcId: 'orchard_keeper_bram',
+    text: 'Bram keeps the western orchard and should have lit the harvest lanterns by now. Take the road through the Goldmelt, find him beneath the gilded boughs, and ask why Lanternmere has gone dark.',
+    completionText:
+      'Elowen saw the dark from town? Then we are out of time. The lantern route must be walked before the old treants wake fully.',
+    objectives: [
+      {
+        type: 'interact',
+        targetNpcId: 'orchard_keeper_bram',
+        count: 1,
+        label: 'Orchard Keeper Bram found',
+      },
+    ],
+    xpReward: 4500,
+    copperReward: 2200,
+    itemRewards: {},
+    minLevel: 18,
+  },
+  q_amberfall_lantern_round: {
+    id: 'q_amberfall_lantern_round',
+    name: 'The Lantern Round',
+    giverNpcId: 'orchard_keeper_bram',
+    turnInNpcId: 'orchard_keeper_bram',
+    text: 'Three harvest lanterns bind the old roots: one in the orchard, one beside the Great Mere, and one beneath the Leaning Monolith. Rekindle them in that order and watch what moves in the trees.',
+    completionText:
+      'The first two flames burned gold, but the monolith lantern burned green. Cinderbough has rooted itself on the rise and is drinking their fire.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'amberfall_lantern_orchard',
+        count: 1,
+        label: 'Orchard lantern rekindled',
+      },
+      {
+        type: 'interact',
+        targetObjectItemId: 'amberfall_lantern_mere',
+        count: 1,
+        label: 'Great Mere lantern rekindled',
+      },
+      {
+        type: 'interact',
+        targetObjectItemId: 'amberfall_lantern_monolith',
+        count: 1,
+        label: 'Monolith lantern rekindled',
+      },
+    ],
+    xpReward: 5600,
+    copperReward: 3000,
+    itemRewards: {},
+    requiresQuest: 'q_amberfall_orchard_road',
+    minLevel: 18,
+  },
+  q_amberfall_cinderbough: {
+    id: 'q_amberfall_cinderbough',
+    name: 'Cinderbough Wakes',
+    giverNpcId: 'orchard_keeper_bram',
+    turnInNpcId: 'reeve_elowen',
+    text: 'The orchard treant on Cindermaple Rise has swallowed the warding flame and woken angry. Break Cinderbough before its roots reach the other lanterns, then carry the news to Elowen.',
+    completionText:
+      'The lanterns are steady again. We will plant three saplings where Cinderbough fell, and teach them kinder names.',
+    objectives: [
+      { type: 'kill', targetMobId: 'orchard_treant', count: 1, label: 'Cinderbough defeated' },
+    ],
+    xpReward: 7200,
+    copperReward: 4800,
+    itemRewards: {},
+    requiresQuest: 'q_amberfall_lantern_round',
+    minLevel: 19,
+    suggestedPlayers: 2,
+  },
+};
+export const AMBERFALL_QUEST_ORDER: string[] = [
+  'q_amberfall_orchard_road',
+  'q_amberfall_lantern_round',
+  'q_amberfall_cinderbough',
+];
+export const AMBERFALL_ITEMS: Record<string, ItemDef> = {
+  amberfall_lantern_orchard: {
+    id: 'amberfall_lantern_orchard',
+    name: 'Orchard Harvest Lantern',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_amberfall_lantern_round',
+    noVendorSell: true,
+  },
+  amberfall_lantern_mere: {
+    id: 'amberfall_lantern_mere',
+    name: 'Mere Harvest Lantern',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_amberfall_lantern_round',
+    noVendorSell: true,
+  },
+  amberfall_lantern_monolith: {
+    id: 'amberfall_lantern_monolith',
+    name: 'Monolith Harvest Lantern',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_amberfall_lantern_round',
+    noVendorSell: true,
+  },
+};
 export const AMBERFALL_CAMPS: CampDef[] = [
   { mobId: 'gilded_stag', center: { x: -300, z: 1976 }, radius: 12, count: 3 },
   { mobId: 'gilded_stag', center: { x: -420, z: 2020 }, radius: 11, count: 2 },
@@ -203,7 +329,23 @@ export const AMBERFALL_CAMPS: CampDef[] = [
   { mobId: 'mere_lurker', center: { x: -312, z: 2158 }, radius: 8, count: 2 },
   { mobId: 'mere_lurker', center: { x: -282, z: 2226 }, radius: 8, count: 2 },
 ];
-export const AMBERFALL_OBJECTS: GroundObjectDef[] = [];
+export const AMBERFALL_OBJECTS: GroundObjectDef[] = [
+  {
+    itemId: 'amberfall_lantern_orchard',
+    name: 'Orchard Harvest Lantern',
+    positions: [{ x: -432, z: 1992 }],
+  },
+  {
+    itemId: 'amberfall_lantern_mere',
+    name: 'Mere Harvest Lantern',
+    positions: [{ x: -360, z: 2132 }],
+  },
+  {
+    itemId: 'amberfall_lantern_monolith',
+    name: 'Monolith Harvest Lantern',
+    positions: [{ x: -276, z: 2230 }],
+  },
+];
 
 export const AMBERFALL_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),

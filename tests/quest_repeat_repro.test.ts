@@ -66,6 +66,9 @@ describe('no quest duplicates another (same giver + identical objectives)', () =
             case 'interact':
               target = `interact ${o.targetNpcId ?? o.targetObjectItemId}`;
               break;
+            case 'escort':
+              target = `escort ${o.targetNpcId}`;
+              break;
             case 'craft':
               target = `craft ${o.recipeId}`;
               break;

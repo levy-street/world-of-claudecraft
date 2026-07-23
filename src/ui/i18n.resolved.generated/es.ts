@@ -8816,6 +8816,60 @@ export const es: EnTranslations = {
       "wildheart_fangknife": {
         "name": "Fangknife of Zulgar"
       },
+      "frostveil_cairn_tarn": {
+        "name": "Tarn Warding Cairn"
+      },
+      "frostveil_cairn_fen": {
+        "name": "Fen Warding Cairn"
+      },
+      "frostveil_cairn_terrace": {
+        "name": "Terrace Warding Cairn"
+      },
+      "amberfall_lantern_orchard": {
+        "name": "Orchard Harvest Lantern"
+      },
+      "amberfall_lantern_mere": {
+        "name": "Mere Harvest Lantern"
+      },
+      "amberfall_lantern_monolith": {
+        "name": "Monolith Harvest Lantern"
+      },
+      "willowfen_marker_bogshine": {
+        "name": "Bogshine Reed Marker"
+      },
+      "willowfen_marker_willowweep": {
+        "name": "Willowweep Reed Marker"
+      },
+      "willowfen_marker_drowsy": {
+        "name": "Drowsy Flats Reed Marker"
+      },
+      "nightbloom_anchor_moonwell": {
+        "name": "Moonwell Dream Anchor"
+      },
+      "nightbloom_anchor_gloamfield": {
+        "name": "Gloamfield Dream Anchor"
+      },
+      "nightbloom_anchor_barrow": {
+        "name": "Barrow Dream Anchor"
+      },
+      "galecrest_signal_downs": {
+        "name": "Downs Storm Post"
+      },
+      "galecrest_signal_tarn": {
+        "name": "Tarn Storm Post"
+      },
+      "galecrest_signal_wrecks": {
+        "name": "Wreckfields Storm Post"
+      },
+      "palmreach_waymark_strand": {
+        "name": "Palmstrand Waymark"
+      },
+      "palmreach_waymark_vinefall": {
+        "name": "Vinefall Waymark"
+      },
+      "palmreach_waymark_lagoon": {
+        "name": "Lagoon Waymark"
+      },
       "conjured_water4": {
         "name": "Agua de Manantial Conjurada"
       },
@@ -10421,6 +10475,111 @@ export const es: EnTranslations = {
         "title": "Reader of Stones",
         "greeting": "The monuments out there have not spoken to anyone in an age. Perhaps they were waiting for fresh ears."
       },
+      "captain_kaelra": {
+        "name": "Captain Kaelra",
+        "title": "Wyrmwatch Commander",
+        "greeting": "Wyrmwatch has one road and too many enemies, {className}. If you are climbing north, make every step count."
+      },
+      "scout_vaela": {
+        "name": "Scout Vaela",
+        "title": "Caldera Pathfinder",
+        "greeting": "The dunes move, the trolls do not, and the drakes watch both. Stay close if you want the safe road."
+      },
+      "matriarch_eira": {
+        "name": "Matriarch Eira",
+        "title": "Voice of Icemantle",
+        "greeting": "The ice remembers every footstep, {className}. Walk lightly, listen closely, and Frostveil may let you pass."
+      },
+      "watcher_senn": {
+        "name": "Watcher Senn",
+        "title": "Aurora Warden",
+        "greeting": "The aurora is beautiful because you cannot hear it screaming. I can, and tonight it is warning us."
+      },
+      "reeve_elowen": {
+        "name": "Reeve Elowen",
+        "title": "Keeper of Lanternmere",
+        "greeting": "Amberfall gives freely until someone forgets to give thanks. This season, too many old debts have come walking."
+      },
+      "orchard_keeper_bram": {
+        "name": "Orchard Keeper Bram",
+        "title": "Keeper of the Gilded Boughs",
+        "greeting": "Mind the fallen fruit. The sprites have teeth, the foxes have manners, and both will rob you blind."
+      },
+      "mayor_alda": {
+        "name": "Mayor Alda",
+        "title": "Speaker of Bridgemere",
+        "greeting": "The fen is friendly if you know where it sleeps. Lately, {className}, it has been waking in all the wrong places."
+      },
+      "fenward_oli": {
+        "name": "Fenward Oli",
+        "title": "Keeper of the Reed Marks",
+        "greeting": "Step where the reeds bend, not where they point. One path takes you home and the other feeds the bogtoads."
+      },
+      "dreamkeeper_luma": {
+        "name": "Dreamkeeper Luma",
+        "title": "Warden of Moonrest",
+        "greeting": "Nightbloom is not asleep, {className}. It is dreaming, and tonight the dream has begun to bare its teeth."
+      },
+      "stargazer_oril": {
+        "name": "Stargazer Oril",
+        "title": "Keeper of the Standing Vigil",
+        "greeting": "The stars above the Vigil are wrong by one. I have counted them a hundred times, and the missing light is under our feet."
+      },
+      "reeve_mara": {
+        "name": "Reeve Mara",
+        "title": "Keeper of Gallowmere",
+        "greeting": "Keep a lantern close and your name closer, {className}. The wood is fond of stealing both."
+      },
+      "lantern_iven": {
+        "name": "Lantern Iven",
+        "title": "Mournstone Lamplighter",
+        "greeting": "A lantern keeps back ordinary darkness. For the rest, I carry salt, bells, and very quick feet."
+      },
+      "harbormaster_pell": {
+        "name": "Harbormaster Pell",
+        "title": "Master of Wickharbor",
+        "greeting": "If the wind takes your hat, let it go. If it takes a ship, {className}, then we have work to do."
+      },
+      "beacon_keeper_ada": {
+        "name": "Beacon Keeper Ada",
+        "title": "Keeper of the Old Light",
+        "greeting": "The old light does not guide ships anymore. It tells us which wrecks are trying to crawl back into the sea."
+      },
+      "tidecaller_miri": {
+        "name": "Tidecaller Miri",
+        "title": "Voice of Drifthaven",
+        "greeting": "The tide returns what it borrows. The jungle, {className}, has never learned that courtesy."
+      },
+      "trailblazer_cas": {
+        "name": "Trailblazer Cas",
+        "title": "Emerald Tangle Guide",
+        "greeting": "Every trail here grows over by breakfast. I mark them at dawn and start over before supper."
+      },
+      "steward_elian": {
+        "name": "Steward Elian",
+        "title": "Keeper of Hedgewick",
+        "greeting": "Everything in Evergarden is carefully placed, {className}. If a hedge moves, assume it meant to."
+      },
+      "maze_scholar_pip": {
+        "name": "Maze Scholar Pip",
+        "title": "Cartographer of Living Hedges",
+        "greeting": "I have drawn this maze every morning for twelve years. It has never once had the decency to stay drawn."
+      },
+      "statue_keeper_bram": {
+        "name": "Statue Keeper Bram",
+        "title": "Warden of the Marble Walk",
+        "greeting": "The statues face south today. Yesterday they faced the fountain. I prefer not to guess where they will look tomorrow."
+      },
+      "rose_keeper_una": {
+        "name": "Rose Keeper Una",
+        "title": "Tender of the Rose Wilds",
+        "greeting": "The roses are harmless when they sing. If they go quiet, leave before the thorns decide you are interesting."
+      },
+      "pond_keeper_sol": {
+        "name": "Pond Keeper Sol",
+        "title": "Watcher of Petal Pond",
+        "greeting": "The pond reflects every path through the maze. Today it shows one path too many, ending at the Fountain Court."
+      },
       "warden_coalfast": {
         "name": "Warden Coalfast",
         "title": "Redoubt Commander",
@@ -11453,6 +11612,348 @@ export const es: EnTranslations = {
         "objectives": {
           "0": {
             "label": "The seal set back in the sealstone"
+          }
+        }
+      },
+      "q_drakewatch_dispatch": {
+        "title": "Smoke on the North Road",
+        "text": "Vaela has not reported from the Cinder Dunes, and the watchfires beyond her post have gone dark. Follow the north road, find her among the ruined columns, and learn what is moving toward Wyrmwatch.",
+        "completion": "Kaelra sent you? Good. I found the raiders, the trolls, and something with wings circling the caldera. I could use another blade on the climb.",
+        "objectives": {
+          "0": {
+            "label": "Scout Vaela found"
+          }
+        }
+      },
+      "q_drakewatch_long_climb": {
+        "title": "The Long Climb",
+        "text": "I need to mark a safe line from the dunes to the caldera rim, but the Ashbone clan has scouts on the road and Trollmoot has sent hunters after me. Walk with me, {playerName}, and keep them off my back.",
+        "completion": "You brought Vaela home with a marked road and a count of every threat upon it. That is worth more than another squad behind these walls.",
+        "objectives": {
+          "0": {
+            "label": "Scout Vaela escorted to the caldera rim"
+          }
+        }
+      },
+      "q_drakewatch_wings": {
+        "title": "Wings Over Drakemaw",
+        "text": "Vaela marked the beast that drove the lesser drakes from the rim. The Emberwing hunts the whole caldera now, and soon it will test our walls. Climb to its roost and end the threat before it takes flight for Wyrmwatch.",
+        "completion": "The shadow has left our roofs. Tonight Wyrmwatch sleeps without looking up, and that is your victory, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Emberwing Drake slain"
+          }
+        }
+      },
+      "q_frostveil_aurora_call": {
+        "title": "Where the Aurora Touches",
+        "text": "Senn watches the lights from the Aurora Steps, beyond the tarn and the wolf packs. He sent a signal of three blue flames before the storm swallowed the ridge. Find him and bring Icemantle his warning.",
+        "completion": "You crossed the storm for a warning. Then you should see what the warning concerns before we carry it home.",
+        "objectives": {
+          "0": {
+            "label": "Watcher Senn found"
+          }
+        }
+      },
+      "q_frostveil_three_cairns": {
+        "title": "Three Cairns in the Snow",
+        "text": "Our warding stones at Glacier Tarn, Shiverfen, and the Howling Terraces should glow beneath the aurora. Touch each cairn and tell me which light has failed. That path will show us where the storm entered.",
+        "completion": "The last cairn is dark, then. The storm did not come from the sky at all. Something large walked down from the terraces and dragged the cold behind it.",
+        "objectives": {
+          "0": {
+            "label": "Glacier Tarn cairn inspected"
+          },
+          "1": {
+            "label": "Shiverfen cairn inspected"
+          },
+          "2": {
+            "label": "Howling Terraces cairn inspected"
+          }
+        }
+      },
+      "q_frostveil_shield_tracks": {
+        "title": "Tracks Broad as Shields",
+        "text": "The tracks beyond the final cairn are broad as shields. A Frostmane has claimed the terraces and shattered every ward it found. Hunt the yeti among the high ice before it follows our lights back to Icemantle.",
+        "completion": "The old cairns will be raised again, but their light would have led that beast straight to us. You have bought Icemantle another winter.",
+        "objectives": {
+          "0": {
+            "label": "Frostmane Yeti defeated"
+          }
+        }
+      },
+      "q_amberfall_orchard_road": {
+        "title": "The Orchard Road",
+        "text": "Bram keeps the western orchard and should have lit the harvest lanterns by now. Take the road through the Goldmelt, find him beneath the gilded boughs, and ask why Lanternmere has gone dark.",
+        "completion": "Elowen saw the dark from town? Then we are out of time. The lantern route must be walked before the old treants wake fully.",
+        "objectives": {
+          "0": {
+            "label": "Orchard Keeper Bram found"
+          }
+        }
+      },
+      "q_amberfall_lantern_round": {
+        "title": "The Lantern Round",
+        "text": "Three harvest lanterns bind the old roots: one in the orchard, one beside the Great Mere, and one beneath the Leaning Monolith. Rekindle them in that order and watch what moves in the trees.",
+        "completion": "The first two flames burned gold, but the monolith lantern burned green. Cinderbough has rooted itself on the rise and is drinking their fire.",
+        "objectives": {
+          "0": {
+            "label": "Orchard lantern rekindled"
+          },
+          "1": {
+            "label": "Great Mere lantern rekindled"
+          },
+          "2": {
+            "label": "Monolith lantern rekindled"
+          }
+        }
+      },
+      "q_amberfall_cinderbough": {
+        "title": "Cinderbough Wakes",
+        "text": "The orchard treant on Cindermaple Rise has swallowed the warding flame and woken angry. Break Cinderbough before its roots reach the other lanterns, then carry the news to Elowen.",
+        "completion": "The lanterns are steady again. We will plant three saplings where Cinderbough fell, and teach them kinder names.",
+        "objectives": {
+          "0": {
+            "label": "Cinderbough defeated"
+          }
+        }
+      },
+      "q_willowfen_fenward": {
+        "title": "The Missing Fenward",
+        "text": "Oli went to reset the reed marks and never returned. Cross the old bridge to the Lilymoors, find our fenward, and learn why every safe path now points toward deep water.",
+        "completion": "Alda sent help at last. Something has turned every marker in the fen, and I have been too busy avoiding hungry mouths to turn them back.",
+        "objectives": {
+          "0": {
+            "label": "Fenward Oli found"
+          }
+        }
+      },
+      "q_willowfen_marker_round": {
+        "title": "Reeds Point Home",
+        "text": "Reset the carved markers at Bogshine Pools, Willowweep, and the Drowsy Flats. They stand beside the safest patches of ground, or they did before something big began moving them in the night.",
+        "completion": "Mud on every post, and the same round scrape beneath each one. That old croaker is not sleeping anymore. It is herding travelers toward its hollow.",
+        "objectives": {
+          "0": {
+            "label": "Bogshine reed marker reset"
+          },
+          "1": {
+            "label": "Willowweep reed marker reset"
+          },
+          "2": {
+            "label": "Drowsy Flats reed marker reset"
+          }
+        }
+      },
+      "q_willowfen_croaker": {
+        "title": "The Fen Stops Snoring",
+        "text": "The Drowsy Croaker has learned that turned markers bring easy meals. Find the giant toad in the flats and put it back into the deep sleep its name promises.",
+        "completion": "Bridgemere heard that final croak from here. The bridges are ours again, and Oli may finally stop shouting at the reeds.",
+        "objectives": {
+          "0": {
+            "label": "Drowsy Croaker defeated"
+          }
+        }
+      },
+      "q_nightbloom_vigil": {
+        "title": "A Star Missing",
+        "text": "Oril keeps the Standing Vigil beyond Gloamfield and has sent no star count for three nights. Find the stargazer among the ancient stones and ask what shadow has silenced the signal.",
+        "completion": "Luma still trusts my count. Good. Help me trace the missing star through the anchors that hold Nightbloom in its gentle dream.",
+        "objectives": {
+          "0": {
+            "label": "Stargazer Oril found"
+          }
+        }
+      },
+      "q_nightbloom_dream_anchors": {
+        "title": "Anchors of the Dream",
+        "text": "Read the moon runes at the Moonwell, Gloamfield, and the Sleepless Barrow. Each anchor should hold one bright reflection. If one reflects darkness, we will know where the lost star fell.",
+        "completion": "The barrow rune showed a crown instead of a star. Its old king has taken the missing light and used it to wake his court.",
+        "objectives": {
+          "0": {
+            "label": "Moonwell dream anchor read"
+          },
+          "1": {
+            "label": "Gloamfield dream anchor read"
+          },
+          "2": {
+            "label": "Sleepless Barrow dream anchor read"
+          }
+        }
+      },
+      "q_nightbloom_barrow_crown": {
+        "title": "The Crown Below",
+        "text": "The Barrow King has stolen a star from the dream and set it in his crown. Enter the Sleepless Barrow, defeat the risen king, and let Nightbloom forget his name again.",
+        "completion": "There is the missing light, back in the sky. Nightbloom dreams softly again because you walked where the rest of us feared to wake.",
+        "objectives": {
+          "0": {
+            "label": "Barrow King defeated"
+          }
+        }
+      },
+      "q_wraithwood_lost_lantern": {
+        "title": "A Lantern Gone Missing",
+        "text": "Iven left to relight Mournstone Chapel before dusk and never passed Widow's Thicket. Follow the western path, find our lamplighter, and do not answer if the trees call you by name.",
+        "completion": "Mara sent you into the thicket after me? Brave of you both. The chapel lamps are still dark, and the wood has noticed.",
+        "objectives": {
+          "0": {
+            "label": "Lantern Iven found"
+          }
+        }
+      },
+      "q_wraithwood_lantern_walk": {
+        "title": "The Lantern Walk",
+        "text": "The chapel flame is in this lantern, and every hungry thing in Wraithwood can smell it. Walk with me to Mournstone, {playerName}. When the spiders descend or the wraiths close in, keep them away from the light.",
+        "completion": "The Mournstone lamps are burning again. Every lost traveler in these woods now has a road home, including Iven.",
+        "objectives": {
+          "0": {
+            "label": "Lantern Iven escorted to Mournstone Chapel"
+          }
+        }
+      },
+      "q_wraithwood_last_hunt": {
+        "title": "The Huntsman Hunted",
+        "text": "The chapel light has drawn the Pale Huntsman from his clearing. He has stalked Gallowmere for generations, but tonight his path is plain. Follow it north and make this his final hunt.",
+        "completion": "No horn answers from the clearing. At last, Wraithwood is only haunted by the ordinary dead.",
+        "objectives": {
+          "0": {
+            "label": "Pale Huntsman defeated"
+          }
+        }
+      },
+      "q_galecrest_beacon_orders": {
+        "title": "Orders for the Old Beacon",
+        "text": "The Old Beacon flashed at noon with no keeper on the lens. Climb east from Wickharbor, find Ada, and ask what can cast a shadow bright enough to wake that ancient light.",
+        "completion": "Pell saw it from the harbor, then. The storm posts will tell us whether the warning came from sea, sky, or something below both.",
+        "objectives": {
+          "0": {
+            "label": "Beacon Keeper Ada found"
+          }
+        }
+      },
+      "q_galecrest_storm_signals": {
+        "title": "Signals in the Gale",
+        "text": "Sound the storm posts on the Howling Downs, beside Mirror Tarn, and among the Wreckfields. Their three notes will locate the thing calling drowned ships toward shore.",
+        "completion": "Downs and tarn answered clear. The Wreckfields answered with a fourth note, deep as a hull breaking. Their warden is awake.",
+        "objectives": {
+          "0": {
+            "label": "Howling Downs storm post sounded"
+          },
+          "1": {
+            "label": "Mirror Tarn storm post sounded"
+          },
+          "2": {
+            "label": "Wreckfields storm post sounded"
+          }
+        }
+      },
+      "q_galecrest_wreck_warden": {
+        "title": "The Fourth Note",
+        "text": "The Wreck Warden is ringing drowned bells beneath the sand, and every storm will bring it more ships. Find the thing among the broken hulls and silence its fourth note.",
+        "completion": "The harbor bells sound like themselves again. Sailors will still fear Galecrest, but at least the dead have stopped giving directions.",
+        "objectives": {
+          "0": {
+            "label": "Wreck Warden defeated"
+          }
+        }
+      },
+      "q_palmreach_green_trail": {
+        "title": "The Green Trail",
+        "text": "Cas went into the Emerald Tangle to reopen the route to Vinefall. Follow the old shell markers inland, find the trailblazer, and learn what has made the jungle swallow a road overnight.",
+        "completion": "Miri sent you? Then Drifthaven still needs this road. Help me wake the old waymarks before the vines bury them for good.",
+        "objectives": {
+          "0": {
+            "label": "Trailblazer Cas found"
+          }
+        }
+      },
+      "q_palmreach_waymarks": {
+        "title": "A Road the Jungle Remembers",
+        "text": "Cut free the old waymarks at Palmstrand, Vinefall, and the Sapphire Lagoon. They are carved from idol stone, and if all three wake, the safe trail will reveal itself again.",
+        "completion": "The trail is open, but the marks all turned toward the Sunken Idol. Its guardian is calling every piece of carved stone home.",
+        "objectives": {
+          "0": {
+            "label": "Palmstrand waymark uncovered"
+          },
+          "1": {
+            "label": "Vinefall waymark uncovered"
+          },
+          "2": {
+            "label": "Sapphire Lagoon waymark uncovered"
+          }
+        }
+      },
+      "q_palmreach_idol_guardian": {
+        "title": "The Idol Calls Them Home",
+        "text": "The Idol Guardian is pulling every waystone from the earth and closing the trails behind it. Go to the drowned shrine, break its hold, and keep Palmreach connected to the shore.",
+        "completion": "The shell markers are shining from here to Vinefall. Palmreach has a road again, and Drifthaven has you to thank for it.",
+        "objectives": {
+          "0": {
+            "label": "Idol Guardian defeated"
+          }
+        }
+      },
+      "q_evergarden_maze_mouth": {
+        "title": "The Maze Has Moved",
+        "text": "Pip went to map the Great Maze before breakfast and has not returned for supper. Find the scholar at the maze mouth and ask why every hedge in Hedgewick is leaning toward the Fountain Court.",
+        "completion": "Elian noticed the lean too? Then my map is not the problem for once. We need three witnesses from three corners of the garden.",
+        "objectives": {
+          "0": {
+            "label": "Maze Scholar Pip found"
+          }
+        }
+      },
+      "q_evergarden_living_map": {
+        "title": "A Map with Three Voices",
+        "text": "Speak with Bram on the Statuary Walk, Una in the Rose Wilds, and Sol at Petal Pond. Each watches a different edge of the maze. Put their sightings together and we can map what is moving beneath it.",
+        "completion": "Statues turning, roses falling silent, and a new path in the pond. All three lines meet at the Fountain Court, where the Topiary Bull has broken its roots.",
+        "objectives": {
+          "0": {
+            "label": "Statue Keeper Bram consulted"
+          },
+          "1": {
+            "label": "Rose Keeper Una consulted"
+          },
+          "2": {
+            "label": "Pond Keeper Sol consulted"
+          }
+        }
+      },
+      "q_evergarden_bull": {
+        "title": "The Bull in the Fountain Court",
+        "text": "The Topiary Bull is dragging the maze inward one living root at a time. Enter the Fountain Court, cut the beast free from the garden, and give every path room to breathe again.",
+        "completion": "The hedges have settled back into their proper places. Proper for today, at least. Evergarden owes you one peaceful morning.",
+        "objectives": {
+          "0": {
+            "label": "Topiary Bull defeated"
+          }
+        }
+      },
+      "q_farshore_watch_meadow": {
+        "title": "The Watch Beyond the Meadow",
+        "text": "Ollun keeps watch beyond the meadow where the island first split. He has heard three breaks singing at once. Cross the old landing road, find him, and learn which one will open first.",
+        "completion": "Coalfast sent another pair of ears. Good. The nearest break is following the watchbell, and Tam must carry it to a place where we can spring the trap.",
+        "objectives": {
+          "0": {
+            "label": "Riftwatch Ollun found"
+          }
+        }
+      },
+      "q_farshore_ferrywalk": {
+        "title": "Walk the Warning Bell",
+        "text": "Tam will carry the watchbell from the Landing to my meadow post. The breaches will come for its sound. Escort the bellkeeper, hold the road when they attack, and bring the warning safely into our trap.",
+        "completion": "The bell is in place and the break showed us its teeth. Now I know which scar to close first, and what guards it.",
+        "objectives": {
+          "0": {
+            "label": "Bellkeeper Tam escorted to the meadow watch"
+          }
+        }
+      },
+      "q_farshore_horror": {
+        "title": "The Sundered Horror",
+        "text": "The bell drew out the master of the cliff break, a horror stitched from everything the rift has swallowed. Hunt it at the Sundered Cliffs, then tell Coalfast the island still has a shore worth holding.",
+        "completion": "We heard the break close from Gullhaven. Farshore is still wounded, but today it stopped bleeding. You have our thanks, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Sundered Horror defeated"
           }
         }
       },

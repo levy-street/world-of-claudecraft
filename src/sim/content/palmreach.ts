@@ -177,10 +177,135 @@ export const PALMREACH_MOBS: Record<string, MobTemplate> = {
     color: 0x9aa87e,
   },
 };
-export const PALMREACH_NPCS: Record<string, NpcDef> = {};
-export const PALMREACH_QUESTS: Record<string, QuestDef> = {};
-export const PALMREACH_QUEST_ORDER: string[] = [];
-export const PALMREACH_ITEMS: Record<string, ItemDef> = {};
+export const PALMREACH_NPCS: Record<string, NpcDef> = {
+  tidecaller_miri: {
+    id: 'tidecaller_miri',
+    name: 'Tidecaller Miri',
+    title: 'Voice of Drifthaven',
+    pos: { x: -300, z: 820 },
+    facing: Math.PI,
+    color: 0x4c9a8a,
+    questIds: ['q_palmreach_green_trail', 'q_palmreach_idol_guardian'],
+    greeting: 'The tide returns what it borrows. The jungle, $C, has never learned that courtesy.',
+  },
+  trailblazer_cas: {
+    id: 'trailblazer_cas',
+    name: 'Trailblazer Cas',
+    title: 'Emerald Tangle Guide',
+    pos: { x: -360, z: 980 },
+    facing: Math.PI,
+    color: 0x3f7f5a,
+    questIds: ['q_palmreach_green_trail', 'q_palmreach_waymarks', 'q_palmreach_idol_guardian'],
+    greeting:
+      'Every trail here grows over by breakfast. I mark them at dawn and start over before supper.',
+  },
+};
+export const PALMREACH_QUESTS: Record<string, QuestDef> = {
+  q_palmreach_green_trail: {
+    id: 'q_palmreach_green_trail',
+    name: 'The Green Trail',
+    giverNpcId: 'tidecaller_miri',
+    turnInNpcId: 'trailblazer_cas',
+    text: 'Cas went into the Emerald Tangle to reopen the route to Vinefall. Follow the old shell markers inland, find the trailblazer, and learn what has made the jungle swallow a road overnight.',
+    completionText:
+      'Miri sent you? Then Drifthaven still needs this road. Help me wake the old waymarks before the vines bury them for good.',
+    objectives: [
+      {
+        type: 'interact',
+        targetNpcId: 'trailblazer_cas',
+        count: 1,
+        label: 'Trailblazer Cas found',
+      },
+    ],
+    xpReward: 5000,
+    copperReward: 2400,
+    itemRewards: {},
+    minLevel: 19,
+  },
+  q_palmreach_waymarks: {
+    id: 'q_palmreach_waymarks',
+    name: 'A Road the Jungle Remembers',
+    giverNpcId: 'trailblazer_cas',
+    turnInNpcId: 'trailblazer_cas',
+    text: 'Cut free the old waymarks at Palmstrand, Vinefall, and the Sapphire Lagoon. They are carved from idol stone, and if all three wake, the safe trail will reveal itself again.',
+    completionText:
+      'The trail is open, but the marks all turned toward the Sunken Idol. Its guardian is calling every piece of carved stone home.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'palmreach_waymark_strand',
+        count: 1,
+        label: 'Palmstrand waymark uncovered',
+      },
+      {
+        type: 'interact',
+        targetObjectItemId: 'palmreach_waymark_vinefall',
+        count: 1,
+        label: 'Vinefall waymark uncovered',
+      },
+      {
+        type: 'interact',
+        targetObjectItemId: 'palmreach_waymark_lagoon',
+        count: 1,
+        label: 'Sapphire Lagoon waymark uncovered',
+      },
+    ],
+    xpReward: 6200,
+    copperReward: 3400,
+    itemRewards: {},
+    requiresQuest: 'q_palmreach_green_trail',
+    minLevel: 19,
+  },
+  q_palmreach_idol_guardian: {
+    id: 'q_palmreach_idol_guardian',
+    name: 'The Idol Calls Them Home',
+    giverNpcId: 'trailblazer_cas',
+    turnInNpcId: 'tidecaller_miri',
+    text: 'The Idol Guardian is pulling every waystone from the earth and closing the trails behind it. Go to the drowned shrine, break its hold, and keep Palmreach connected to the shore.',
+    completionText:
+      'The shell markers are shining from here to Vinefall. Palmreach has a road again, and Drifthaven has you to thank for it.',
+    objectives: [
+      { type: 'kill', targetMobId: 'idol_guardian', count: 1, label: 'Idol Guardian defeated' },
+    ],
+    xpReward: 7600,
+    copperReward: 5200,
+    itemRewards: {},
+    requiresQuest: 'q_palmreach_waymarks',
+    minLevel: 20,
+    suggestedPlayers: 2,
+  },
+};
+export const PALMREACH_QUEST_ORDER: string[] = [
+  'q_palmreach_green_trail',
+  'q_palmreach_waymarks',
+  'q_palmreach_idol_guardian',
+];
+export const PALMREACH_ITEMS: Record<string, ItemDef> = {
+  palmreach_waymark_strand: {
+    id: 'palmreach_waymark_strand',
+    name: 'Palmstrand Waymark',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_palmreach_waymarks',
+    noVendorSell: true,
+  },
+  palmreach_waymark_vinefall: {
+    id: 'palmreach_waymark_vinefall',
+    name: 'Vinefall Waymark',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_palmreach_waymarks',
+    noVendorSell: true,
+  },
+  palmreach_waymark_lagoon: {
+    id: 'palmreach_waymark_lagoon',
+    name: 'Lagoon Waymark',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_palmreach_waymarks',
+    noVendorSell: true,
+  },
+};
 export const PALMREACH_CAMPS: CampDef[] = [
   { mobId: 'tide_scuttler', center: { x: -456, z: 878 }, radius: 10, count: 3 },
   { mobId: 'tide_scuttler', center: { x: -252, z: 840 }, radius: 10, count: 3 },
@@ -190,7 +315,23 @@ export const PALMREACH_CAMPS: CampDef[] = [
   { mobId: 'canopy_weaver', center: { x: -426, z: 1120 }, radius: 10, count: 2 },
   { mobId: 'idol_guardian', center: { x: -256, z: 1090 }, radius: 5, count: 1 },
 ];
-export const PALMREACH_OBJECTS: GroundObjectDef[] = [];
+export const PALMREACH_OBJECTS: GroundObjectDef[] = [
+  {
+    itemId: 'palmreach_waymark_strand',
+    name: 'Palmstrand Waymark',
+    positions: [{ x: -460, z: 890 }],
+  },
+  {
+    itemId: 'palmreach_waymark_vinefall',
+    name: 'Vinefall Waymark',
+    positions: [{ x: -400, z: 1080 }],
+  },
+  {
+    itemId: 'palmreach_waymark_lagoon',
+    name: 'Lagoon Waymark',
+    positions: [{ x: -270, z: 950 }],
+  },
+];
 
 export const PALMREACH_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),

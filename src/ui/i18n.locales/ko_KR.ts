@@ -8974,5 +8974,302 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildheart_tuskblade.name': '야생심장 엄니대검',
   'entities.items.wildheart_hexwood_staff.name': '분지의 사술나무 지팡이',
   'entities.items.wildheart_fangknife.name': '줄가르의 송곳니칼',
+  // Northern realm quest arcs (M16 non-Latin fills).
+  'entities.npcs.captain_kaelra.name': '대장 케일라',
+  'entities.npcs.captain_kaelra.title': '웜워치 지휘관',
+  'entities.npcs.captain_kaelra.greeting':
+    '웜워치에는 길이 하나뿐인데 적은 너무 많다, {className}. 북쪽으로 간다면 모든 걸음에 의미를 두게.',
+  'entities.npcs.scout_vaela.name': '정찰병 베일라',
+  'entities.npcs.scout_vaela.title': '칼데라 길잡이',
+  'entities.npcs.scout_vaela.greeting':
+    '모래언덕은 움직이고 트롤은 그대로지만, 비룡은 둘 다 지켜보지. 안전한 길을 원하면 가까이 붙어.',
+  'entities.npcs.matriarch_eira.name': '대모 에이라',
+  'entities.npcs.matriarch_eira.title': '아이스맨틀의 목소리',
+  'entities.npcs.matriarch_eira.greeting':
+    '얼음은 모든 발자국을 기억한다, {className}. 가볍게 걷고 귀를 기울이면 프로스트베일이 길을 내줄 거야.',
+  'entities.npcs.watcher_senn.name': '감시자 센',
+  'entities.npcs.watcher_senn.title': '오로라 수호자',
+  'entities.npcs.watcher_senn.greeting':
+    '오로라가 아름다운 건 비명을 들을 수 없기 때문이지. 나는 들려. 오늘 밤 우리에게 경고하고 있어.',
+  'entities.npcs.reeve_elowen.name': '행정관 엘로웬',
+  'entities.npcs.reeve_elowen.title': '랜턴미어의 수호자',
+  'entities.npcs.reeve_elowen.greeting':
+    '앰버폴은 감사를 잊기 전까지 아낌없이 내어 주지. 이번 계절에는 오래된 빚이 너무 많이 걸어 돌아왔어.',
+  'entities.npcs.orchard_keeper_bram.name': '과수원지기 브람',
+  'entities.npcs.orchard_keeper_bram.title': '황금 가지의 수호자',
+  'entities.npcs.orchard_keeper_bram.greeting':
+    '떨어진 열매를 조심해. 요정에게는 이빨이, 여우에게는 예절이 있고 둘 다 네 것을 몽땅 훔치지.',
+  'entities.npcs.mayor_alda.name': '시장 알다',
+  'entities.npcs.mayor_alda.title': '브리지미어의 대변자',
+  'entities.npcs.mayor_alda.greeting':
+    '늪이 어디서 잠드는지 알면 친절한 곳이야. 요즘은 엉뚱한 곳에서 깨어나지만, {className}.',
+  'entities.npcs.fenward_oli.name': '늪지기 올리',
+  'entities.npcs.fenward_oli.title': '갈대 표식의 수호자',
+  'entities.npcs.fenward_oli.greeting':
+    '갈대가 굽는 곳을 밟고 가리키는 곳은 피하게. 한 길은 집으로, 다른 길은 늪두꺼비 배 속으로 이어져.',
+  'entities.npcs.dreamkeeper_luma.name': '꿈지기 루마',
+  'entities.npcs.dreamkeeper_luma.title': '문레스트의 수호자',
+  'entities.npcs.dreamkeeper_luma.greeting':
+    '나이트블룸은 잠든 게 아니야, {className}. 꿈꾸고 있지. 오늘 밤 그 꿈이 이빨을 드러냈어.',
+  'entities.npcs.stargazer_oril.name': '별지기 오릴',
+  'entities.npcs.stargazer_oril.title': '스탠딩 비질의 수호자',
+  'entities.npcs.stargazer_oril.greeting':
+    '비질 위의 별이 하나 모자라. 백 번을 세어도 같아. 사라진 빛은 우리 발밑에 있어.',
+  'entities.npcs.reeve_mara.name': '행정관 마라',
+  'entities.npcs.reeve_mara.title': '갤로미어의 수호자',
+  'entities.npcs.reeve_mara.greeting':
+    '등불은 가까이, 이름은 더 가까이 간직해, {className}. 이 숲은 둘 다 훔치길 좋아하니까.',
+  'entities.npcs.lantern_iven.name': '등불지기 이븐',
+  'entities.npcs.lantern_iven.title': '몬스톤 점등지기',
+  'entities.npcs.lantern_iven.greeting':
+    '등불은 평범한 어둠을 막아 주지. 나머지에는 소금과 방울, 그리고 아주 빠른 두 발이 필요해.',
+  'entities.npcs.harbormaster_pell.name': '항만장 펠',
+  'entities.npcs.harbormaster_pell.title': '윅하버의 주인',
+  'entities.npcs.harbormaster_pell.greeting':
+    '바람이 모자를 가져가면 보내 줘. 배를 가져갔다면, {className}, 우리가 일할 차례야.',
+  'entities.npcs.beacon_keeper_ada.name': '등대지기 에이다',
+  'entities.npcs.beacon_keeper_ada.title': '오래된 빛의 수호자',
+  'entities.npcs.beacon_keeper_ada.greeting':
+    '오래된 빛은 더 이상 배를 이끌지 않아. 어떤 난파선이 바다로 기어 돌아가려는지 알려 주지.',
+  'entities.npcs.tidecaller_miri.name': '파도소환사 미리',
+  'entities.npcs.tidecaller_miri.title': '드리프트헤이븐의 목소리',
+  'entities.npcs.tidecaller_miri.greeting':
+    '밀물은 빌린 것을 돌려줘. 하지만 밀림은 그런 예의를 배우지 못했지, {className}.',
+  'entities.npcs.trailblazer_cas.name': '개척자 카스',
+  'entities.npcs.trailblazer_cas.title': '에메랄드 탱글 길잡이',
+  'entities.npcs.trailblazer_cas.greeting':
+    '여기 길은 아침이면 다시 자라나. 새벽에 표시하고 저녁 전에 처음부터 시작하지.',
+  'entities.npcs.steward_elian.name': '관리인 엘리안',
+  'entities.npcs.steward_elian.title': '헤지윅의 수호자',
+  'entities.npcs.steward_elian.greeting':
+    '에버가든의 모든 것은 세심히 놓여 있어, {className}. 생울타리가 움직인다면 의도가 있다고 생각하게.',
+  'entities.npcs.maze_scholar_pip.name': '미로 학자 핍',
+  'entities.npcs.maze_scholar_pip.title': '살아 있는 생울타리 지도 제작자',
+  'entities.npcs.maze_scholar_pip.greeting':
+    '열두 해 동안 매일 아침 이 미로를 그렸어. 단 한 번도 그림 그대로 있어 준 적이 없지.',
+  'entities.npcs.statue_keeper_bram.name': '조각상지기 브람',
+  'entities.npcs.statue_keeper_bram.title': '대리석 길의 수호자',
+  'entities.npcs.statue_keeper_bram.greeting':
+    '오늘 조각상은 남쪽을 봐. 어제는 분수를 봤지. 내일 어디를 볼지는 생각하고 싶지 않아.',
+  'entities.npcs.rose_keeper_una.name': '장미지기 우나',
+  'entities.npcs.rose_keeper_una.title': '야생 장미의 정원사',
+  'entities.npcs.rose_keeper_una.greeting':
+    '장미가 노래할 때는 해롭지 않아. 조용해지면 가시가 너를 흥미롭게 여기기 전에 떠나.',
+  'entities.npcs.pond_keeper_sol.name': '연못지기 솔',
+  'entities.npcs.pond_keeper_sol.title': '꽃잎 연못의 감시자',
+  'entities.npcs.pond_keeper_sol.greeting':
+    '연못은 미로의 모든 길을 비춰. 오늘은 분수 정원에서 끝나는 길이 하나 더 보이는군.',
+  'entities.quests.q_drakewatch_dispatch.title': '북쪽 길의 연기',
+  'entities.quests.q_drakewatch_dispatch.text':
+    '베일라의 보고가 끊기고 북쪽 봉화도 꺼졌다. 잿빛 모래언덕에서 그녀를 찾아 웜워치로 다가오는 것이 무엇인지 밝혀라.',
+  'entities.quests.q_drakewatch_dispatch.completion':
+    '케일라가 보냈나? 습격자와 트롤, 칼데라를 도는 날개를 찾았어. 오르는 길에 칼 하나가 더 필요해.',
+  'entities.quests.q_drakewatch_dispatch.objectives.0.label': '정찰병 베일라 찾기',
+  'entities.quests.q_drakewatch_long_climb.title': '긴 오르막',
+  'entities.quests.q_drakewatch_long_climb.text':
+    '칼데라까지 안전한 길을 표시해야 하지만 잿뼈 부족과 트롤이 나를 쫓고 있어. 함께 걸으며 막아 줘, {playerName}.',
+  'entities.quests.q_drakewatch_long_climb.completion':
+    '베일라와 표시된 길, 모든 위협의 기록을 가져왔군. 성벽 뒤의 한 부대보다 값진 성과야.',
+  'entities.quests.q_drakewatch_long_climb.objectives.0.label': '베일라를 칼데라 가장자리까지 호위',
+  'entities.quests.q_drakewatch_wings.title': '드레이크모 위의 날개',
+  'entities.quests.q_drakewatch_wings.text':
+    '엠버윙이 작은 비룡을 몰아내고 칼데라를 차지했다. 성벽으로 날아오기 전에 둥지에서 처치해라.',
+  'entities.quests.q_drakewatch_wings.completion':
+    '지붕 위의 그림자가 사라졌어. 오늘 밤 웜워치는 하늘을 보지 않고 잠들 수 있겠군. 네 승리다, {playerName}.',
+  'entities.quests.q_drakewatch_wings.objectives.0.label': '엠버윙 비룡 처치',
+  'entities.quests.q_frostveil_aurora_call.title': '오로라가 닿는 곳',
+  'entities.quests.q_frostveil_aurora_call.text':
+    '센은 폭풍이 오기 전 세 개의 푸른 불꽃을 보냈다. 오로라 계단에서 그를 찾아 경고를 들어라.',
+  'entities.quests.q_frostveil_aurora_call.completion':
+    '경고를 들으러 폭풍을 건넜군. 그렇다면 무엇을 경고하는지 직접 보게.',
+  'entities.quests.q_frostveil_aurora_call.objectives.0.label': '감시자 센 찾기',
+  'entities.quests.q_frostveil_three_cairns.title': '눈 속의 세 돌무덤',
+  'entities.quests.q_frostveil_three_cairns.text':
+    '빙하 호수, 떨림 늪, 울부짖는 단구의 수호석을 살펴라. 꺼진 빛이 폭풍이 들어온 길을 알려 줄 것이다.',
+  'entities.quests.q_frostveil_three_cairns.completion':
+    '마지막 돌무덤이 어둡군. 폭풍은 하늘에서 온 게 아니야. 거대한 것이 단구에서 추위를 끌고 내려왔어.',
+  'entities.quests.q_frostveil_three_cairns.objectives.0.label': '빙하 호수 돌무덤 조사',
+  'entities.quests.q_frostveil_three_cairns.objectives.1.label': '떨림 늪 돌무덤 조사',
+  'entities.quests.q_frostveil_three_cairns.objectives.2.label': '울부짖는 단구 돌무덤 조사',
+  'entities.quests.q_frostveil_shield_tracks.title': '방패만 한 발자국',
+  'entities.quests.q_frostveil_shield_tracks.text':
+    '프로스트메인 설인이 단구를 차지하고 수호석을 부쉈다. 빛을 따라 아이스맨틀로 오기 전에 높은 얼음밭에서 사냥해라.',
+  'entities.quests.q_frostveil_shield_tracks.completion':
+    '돌무덤은 다시 세울 수 있어. 네가 아이스맨틀에 겨울 하나를 더 선물했군.',
+  'entities.quests.q_frostveil_shield_tracks.objectives.0.label': '프로스트메인 설인 처치',
+  'entities.quests.q_amberfall_orchard_road.title': '과수원 길',
+  'entities.quests.q_amberfall_orchard_road.text':
+    '브람은 서쪽 과수원의 수확등을 밝혔어야 한다. 황금 가지 아래에서 그를 찾아 랜턴미어가 어두운 이유를 물어라.',
+  'entities.quests.q_amberfall_orchard_road.completion':
+    '엘로웬도 마을에서 어둠을 봤나? 시간이 없어. 늙은 나무정령이 완전히 깨기 전에 등불 길을 돌아야 해.',
+  'entities.quests.q_amberfall_orchard_road.objectives.0.label': '과수원지기 브람 찾기',
+  'entities.quests.q_amberfall_lantern_round.title': '등불 순례',
+  'entities.quests.q_amberfall_lantern_round.text':
+    '과수원, 큰 늪, 기울어진 거석 아래의 수확등 세 개를 차례로 밝히고 숲에서 움직이는 것을 살펴라.',
+  'entities.quests.q_amberfall_lantern_round.completion':
+    '첫 두 불꽃은 금빛인데 거석의 불꽃은 초록빛이야. 신더바우가 언덕에 뿌리내리고 불을 마시고 있어.',
+  'entities.quests.q_amberfall_lantern_round.objectives.0.label': '과수원 등불 다시 밝히기',
+  'entities.quests.q_amberfall_lantern_round.objectives.1.label': '큰 늪 등불 다시 밝히기',
+  'entities.quests.q_amberfall_lantern_round.objectives.2.label': '거석 등불 다시 밝히기',
+  'entities.quests.q_amberfall_cinderbough.title': '깨어난 신더바우',
+  'entities.quests.q_amberfall_cinderbough.text':
+    '과수원 나무정령 신더바우가 수호 불꽃을 삼켰다. 뿌리가 다른 등불에 닿기 전에 쓰러뜨려라.',
+  'entities.quests.q_amberfall_cinderbough.completion':
+    '등불이 다시 고르게 타는군. 신더바우가 쓰러진 자리에 묘목 세 그루를 심고 더 다정한 이름을 주겠어.',
+  'entities.quests.q_amberfall_cinderbough.objectives.0.label': '신더바우 처치',
+  'entities.quests.q_willowfen_fenward.title': '사라진 늪지기',
+  'entities.quests.q_willowfen_fenward.text':
+    '올리가 갈대 표식을 고치러 떠나 돌아오지 않았다. 백합 황무지에서 그를 찾아 안전한 길이 깊은 물을 가리키는 이유를 알아내라.',
+  'entities.quests.q_willowfen_fenward.completion':
+    '알다가 드디어 도움을 보냈군. 누군가 모든 표식을 돌렸고 나는 굶주린 입을 피하느라 되돌릴 수 없었어.',
+  'entities.quests.q_willowfen_fenward.objectives.0.label': '늪지기 올리 찾기',
+  'entities.quests.q_willowfen_marker_round.title': '집을 가리키는 갈대',
+  'entities.quests.q_willowfen_marker_round.text':
+    '늪빛 웅덩이, 우는 버들, 졸린 갯벌의 표식을 바로잡아라. 밤마다 거대한 것이 안전한 땅에서 옮겼다.',
+  'entities.quests.q_willowfen_marker_round.completion':
+    '기둥마다 진흙과 둥근 긁힌 자국이 있어. 늙은 두꺼비가 여행자를 굴로 몰고 있군.',
+  'entities.quests.q_willowfen_marker_round.objectives.0.label': '늪빛 갈대 표식 복구',
+  'entities.quests.q_willowfen_marker_round.objectives.1.label': '우는 버들 갈대 표식 복구',
+  'entities.quests.q_willowfen_marker_round.objectives.2.label': '졸린 갯벌 갈대 표식 복구',
+  'entities.quests.q_willowfen_croaker.title': '코골이를 멈춘 늪',
+  'entities.quests.q_willowfen_croaker.text':
+    '졸린 울음꾼이 돌린 표식으로 쉬운 먹이를 부른다. 갯벌에서 거대 두꺼비를 찾아 이름처럼 깊이 재워라.',
+  'entities.quests.q_willowfen_croaker.completion':
+    '마지막 울음은 마을에서도 들렸어. 다리는 다시 우리 것이고 올리도 갈대에 소리치지 않아도 되겠군.',
+  'entities.quests.q_willowfen_croaker.objectives.0.label': '졸린 울음꾼 처치',
+  'entities.quests.q_nightbloom_vigil.title': '사라진 별',
+  'entities.quests.q_nightbloom_vigil.text':
+    '오릴의 별 관측 보고가 사흘 밤째 오지 않았다. 오래된 돌 사이에서 그를 찾아 신호를 잠재운 그림자를 밝혀라.',
+  'entities.quests.q_nightbloom_vigil.completion':
+    '루마는 아직 내 별 수를 믿는군. 꿈을 붙드는 닻을 따라 사라진 별을 추적하자.',
+  'entities.quests.q_nightbloom_vigil.objectives.0.label': '별지기 오릴 찾기',
+  'entities.quests.q_nightbloom_dream_anchors.title': '꿈의 닻',
+  'entities.quests.q_nightbloom_dream_anchors.text':
+    '달샘, 글롬필드, 잠들지 않는 고분의 달 룬을 읽어라. 어둠을 비추는 닻이 별이 떨어진 곳이다.',
+  'entities.quests.q_nightbloom_dream_anchors.completion':
+    '고분 룬은 별 대신 왕관을 비췄어. 옛 왕이 빛을 훔쳐 궁정을 깨웠군.',
+  'entities.quests.q_nightbloom_dream_anchors.objectives.0.label': '달샘 꿈의 닻 읽기',
+  'entities.quests.q_nightbloom_dream_anchors.objectives.1.label': '글롬필드 꿈의 닻 읽기',
+  'entities.quests.q_nightbloom_dream_anchors.objectives.2.label': '잠들지 않는 고분 꿈의 닻 읽기',
+  'entities.quests.q_nightbloom_barrow_crown.title': '땅 아래의 왕관',
+  'entities.quests.q_nightbloom_barrow_crown.text':
+    '고분 왕이 꿈에서 별을 훔쳐 왕관에 박았다. 그를 쓰러뜨리고 나이트블룸이 다시 이름을 잊게 해라.',
+  'entities.quests.q_nightbloom_barrow_crown.completion':
+    '사라진 빛이 하늘로 돌아왔어. 모두가 깨우길 두려워한 곳을 걸은 덕분에 나이트블룸은 다시 편히 꿈꾸겠군.',
+  'entities.quests.q_nightbloom_barrow_crown.objectives.0.label': '고분 왕 처치',
+  'entities.quests.q_wraithwood_lost_lantern.title': '사라진 등불',
+  'entities.quests.q_wraithwood_lost_lantern.text':
+    '이븐은 예배당의 불을 켜러 떠나 과부의 수풀을 지나지 못했다. 서쪽 길에서 찾고 나무가 이름을 불러도 답하지 마라.',
+  'entities.quests.q_wraithwood_lost_lantern.completion':
+    '마라가 나를 찾으라고 보냈나? 용감하군. 예배당은 여전히 어둡고 숲은 이미 알아챘어.',
+  'entities.quests.q_wraithwood_lost_lantern.objectives.0.label': '등불지기 이븐 찾기',
+  'entities.quests.q_wraithwood_lantern_walk.title': '등불 행진',
+  'entities.quests.q_wraithwood_lantern_walk.text':
+    '이 등불에 예배당의 불꽃이 있고 숲의 굶주린 것들이 냄새를 맡았어. 몬스톤까지 호위하며 빛을 지켜 줘, {playerName}.',
+  'entities.quests.q_wraithwood_lantern_walk.completion':
+    '예배당의 등이 다시 타오르는군. 숲에서 길 잃은 모두에게 집으로 가는 길이 생겼어.',
+  'entities.quests.q_wraithwood_lantern_walk.objectives.0.label': '이븐을 몬스톤 예배당까지 호위',
+  'entities.quests.q_wraithwood_last_hunt.title': '사냥꾼 사냥',
+  'entities.quests.q_wraithwood_last_hunt.text':
+    '예배당 불빛이 창백한 사냥꾼을 끌어냈다. 북쪽의 선명한 흔적을 따라가 마지막 사냥으로 만들어라.',
+  'entities.quests.q_wraithwood_last_hunt.completion':
+    '공터에서 뿔나팔이 답하지 않아. 이제 레이스우드에는 평범한 망자만 떠돌겠군.',
+  'entities.quests.q_wraithwood_last_hunt.objectives.0.label': '창백한 사냥꾼 처치',
+  'entities.quests.q_galecrest_beacon_orders.title': '오래된 봉화의 명령',
+  'entities.quests.q_galecrest_beacon_orders.text':
+    '지키는 이 없는 오래된 봉화가 정오에 빛났다. 에이다를 찾아 어떤 그림자가 고대의 빛을 깨웠는지 물어라.',
+  'entities.quests.q_galecrest_beacon_orders.completion':
+    '펠도 항구에서 봤군. 폭풍 기둥이 경고가 바다와 하늘, 혹은 둘 아래 어디서 왔는지 알려 줄 거야.',
+  'entities.quests.q_galecrest_beacon_orders.objectives.0.label': '등대지기 에이다 찾기',
+  'entities.quests.q_galecrest_storm_signals.title': '강풍 속 신호',
+  'entities.quests.q_galecrest_storm_signals.text':
+    '울부짖는 구릉, 거울 호수, 난파지대의 폭풍 기둥을 울려라. 세 음이 침몰한 배를 부르는 것을 찾아낼 것이다.',
+  'entities.quests.q_galecrest_storm_signals.completion':
+    '구릉과 호수는 맑게 답했지만 난파지대는 선체가 갈라지는 듯한 네 번째 저음을 냈어. 수호자가 깨어났군.',
+  'entities.quests.q_galecrest_storm_signals.objectives.0.label': '울부짖는 구릉 폭풍 기둥 울리기',
+  'entities.quests.q_galecrest_storm_signals.objectives.1.label': '거울 호수 폭풍 기둥 울리기',
+  'entities.quests.q_galecrest_storm_signals.objectives.2.label': '난파지대 폭풍 기둥 울리기',
+  'entities.quests.q_galecrest_wreck_warden.title': '네 번째 음',
+  'entities.quests.q_galecrest_wreck_warden.text':
+    '난파선 수호자가 모래 아래의 익사한 종을 울린다. 부서진 선체 사이에서 찾아 네 번째 음을 잠재워라.',
+  'entities.quests.q_galecrest_wreck_warden.completion':
+    '항구의 종이 다시 본래 소리를 내는군. 선원들은 여전히 두려워하겠지만 망자가 길을 알려 주지는 않을 거야.',
+  'entities.quests.q_galecrest_wreck_warden.objectives.0.label': '난파선 수호자 처치',
+  'entities.quests.q_palmreach_green_trail.title': '초록 길',
+  'entities.quests.q_palmreach_green_trail.text':
+    '카스는 바인폴 길을 다시 열려고 에메랄드 밀림으로 들어갔다. 오래된 조개 표식을 따라 그를 찾아 길을 삼킨 원인을 밝혀라.',
+  'entities.quests.q_palmreach_green_trail.completion':
+    '미리가 보냈나? 드리프트헤이븐에는 이 길이 필요해. 덩굴이 영영 묻기 전에 오래된 이정표를 깨우자.',
+  'entities.quests.q_palmreach_green_trail.objectives.0.label': '개척자 카스 찾기',
+  'entities.quests.q_palmreach_waymarks.title': '밀림이 기억하는 길',
+  'entities.quests.q_palmreach_waymarks.text':
+    '팜스트랜드, 바인폴, 사파이어 석호의 이정표를 덩굴에서 풀어라. 셋이 깨어나면 안전한 길이 드러날 것이다.',
+  'entities.quests.q_palmreach_waymarks.completion':
+    '길은 열렸지만 표식이 모두 가라앉은 우상을 향했어. 수호자가 조각된 돌을 집으로 부르고 있군.',
+  'entities.quests.q_palmreach_waymarks.objectives.0.label': '팜스트랜드 이정표 드러내기',
+  'entities.quests.q_palmreach_waymarks.objectives.1.label': '바인폴 이정표 드러내기',
+  'entities.quests.q_palmreach_waymarks.objectives.2.label': '사파이어 석호 이정표 드러내기',
+  'entities.quests.q_palmreach_idol_guardian.title': '우상이 부르는 귀환',
+  'entities.quests.q_palmreach_idol_guardian.text':
+    '우상 수호자가 이정표를 땅에서 뽑아 길을 닫고 있다. 가라앉은 사원에서 지배를 끊고 해안으로 가는 길을 지켜라.',
+  'entities.quests.q_palmreach_idol_guardian.completion':
+    '조개 표식이 바인폴까지 빛나는군. 팜리치에 길이 돌아왔어. 모두 네 덕분이야.',
+  'entities.quests.q_palmreach_idol_guardian.objectives.0.label': '우상 수호자 처치',
+  'entities.quests.q_evergarden_maze_mouth.title': '움직인 미로',
+  'entities.quests.q_evergarden_maze_mouth.text':
+    '핍은 아침에 대미로를 그리러 나가 저녁까지 돌아오지 않았다. 입구에서 찾아 생울타리가 분수 정원으로 기운 이유를 물어라.',
+  'entities.quests.q_evergarden_maze_mouth.completion':
+    '엘리안도 기울기를 봤나? 이번에는 내 지도가 문제가 아니군. 정원 세 모퉁이의 증인이 필요해.',
+  'entities.quests.q_evergarden_maze_mouth.objectives.0.label': '미로 학자 핍 찾기',
+  'entities.quests.q_evergarden_living_map.title': '세 목소리의 지도',
+  'entities.quests.q_evergarden_living_map.text':
+    '조각상의 브람, 장미밭의 우나, 꽃잎 연못의 솔에게 물어라. 세 목격담을 합치면 지하에서 움직이는 것을 그릴 수 있다.',
+  'entities.quests.q_evergarden_living_map.completion':
+    '조각상이 돌고 장미가 침묵하며 연못에 새 길이 생겼어. 세 선은 뿌리를 끊은 토피어리 황소에게 모이는군.',
+  'entities.quests.q_evergarden_living_map.objectives.0.label': '조각상지기 브람에게 묻기',
+  'entities.quests.q_evergarden_living_map.objectives.1.label': '장미지기 우나에게 묻기',
+  'entities.quests.q_evergarden_living_map.objectives.2.label': '연못지기 솔에게 묻기',
+  'entities.quests.q_evergarden_bull.title': '분수 정원의 황소',
+  'entities.quests.q_evergarden_bull.text':
+    '토피어리 황소가 살아 있는 뿌리로 미로를 안쪽으로 끌고 있다. 분수 정원에서 짐승을 정원과 갈라 놓아라.',
+  'entities.quests.q_evergarden_bull.completion':
+    '생울타리가 제자리로 돌아왔군. 적어도 오늘은 말이야. 에버가든이 평온한 아침 하나를 빚졌어.',
+  'entities.quests.q_evergarden_bull.objectives.0.label': '토피어리 황소 처치',
+  'entities.quests.q_farshore_watch_meadow.title': '초원 너머의 감시',
+  'entities.quests.q_farshore_watch_meadow.text':
+    '올룬은 섬이 처음 갈라진 초원 너머에서 균열 세 개의 노래를 들었다. 오래된 상륙로를 건너 먼저 열릴 것을 확인해라.',
+  'entities.quests.q_farshore_watch_meadow.completion':
+    '콜패스트가 귀를 하나 더 보냈군. 가까운 균열이 경고 종을 따르고 있어. 탐이 함정까지 옮겨야 해.',
+  'entities.quests.q_farshore_watch_meadow.objectives.0.label': '균열감시자 올룬 찾기',
+  'entities.quests.q_farshore_ferrywalk.title': '경고 종의 행진',
+  'entities.quests.q_farshore_ferrywalk.text':
+    '탐이 상륙지에서 초원 감시소까지 경고 종을 옮긴다. 소리를 노리는 균열의 괴물에게서 종지기를 호위해라.',
+  'entities.quests.q_farshore_ferrywalk.completion':
+    '종은 자리에 놓였고 균열은 이빨을 보였어. 이제 먼저 봉할 상처와 그것을 지키는 것을 알겠군.',
+  'entities.quests.q_farshore_ferrywalk.objectives.0.label': '종지기 탐을 초원 감시소까지 호위',
+  'entities.quests.q_farshore_horror.title': '갈라진 공포',
+  'entities.quests.q_farshore_horror.text':
+    '종이 균열이 삼킨 것들로 꿰맨 절벽의 주인을 끌어냈다. 갈라진 절벽에서 사냥하고 콜패스트에게 해안이 남았다고 알려라.',
+  'entities.quests.q_farshore_horror.completion':
+    '걸헤이븐에서도 균열이 닫히는 소리를 들었어. 파쇼어는 아직 다쳤지만 오늘은 피가 멎었군. 고맙다, {playerName}.',
+  'entities.quests.q_farshore_horror.objectives.0.label': '갈라진 공포 처치',
+  'entities.items.frostveil_cairn_tarn.name': '빙하 호수 수호 돌무덤',
+  'entities.items.frostveil_cairn_fen.name': '떨림 늪 수호 돌무덤',
+  'entities.items.frostveil_cairn_terrace.name': '단구 수호 돌무덤',
+  'entities.items.amberfall_lantern_orchard.name': '과수원 수확등',
+  'entities.items.amberfall_lantern_mere.name': '큰 늪 수확등',
+  'entities.items.amberfall_lantern_monolith.name': '거석 수확등',
+  'entities.items.willowfen_marker_bogshine.name': '늪빛 갈대 표식',
+  'entities.items.willowfen_marker_willowweep.name': '우는 버들 갈대 표식',
+  'entities.items.willowfen_marker_drowsy.name': '졸린 갯벌 갈대 표식',
+  'entities.items.nightbloom_anchor_moonwell.name': '달샘 꿈의 닻',
+  'entities.items.nightbloom_anchor_gloamfield.name': '글롬필드 꿈의 닻',
+  'entities.items.nightbloom_anchor_barrow.name': '고분 꿈의 닻',
+  'entities.items.galecrest_signal_downs.name': '구릉 폭풍 기둥',
+  'entities.items.galecrest_signal_tarn.name': '거울 호수 폭풍 기둥',
+  'entities.items.galecrest_signal_wrecks.name': '난파지대 폭풍 기둥',
+  'entities.items.palmreach_waymark_strand.name': '팜스트랜드 이정표',
+  'entities.items.palmreach_waymark_vinefall.name': '바인폴 이정표',
+  'entities.items.palmreach_waymark_lagoon.name': '석호 이정표',
   'hudChrome.professions.skillValue': '{skill} / {max}',
 };

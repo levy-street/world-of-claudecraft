@@ -181,9 +181,143 @@ export const EVERGARDEN_MOBS: Record<string, MobTemplate> = {
     color: 0x2e6a34,
   },
 };
-export const EVERGARDEN_NPCS: Record<string, NpcDef> = {};
-export const EVERGARDEN_QUESTS: Record<string, QuestDef> = {};
-export const EVERGARDEN_QUEST_ORDER: string[] = [];
+export const EVERGARDEN_NPCS: Record<string, NpcDef> = {
+  steward_elian: {
+    id: 'steward_elian',
+    name: 'Steward Elian',
+    title: 'Keeper of Hedgewick',
+    pos: { x: 320, z: 810 },
+    facing: Math.PI,
+    color: 0x6f9b5c,
+    questIds: ['q_evergarden_maze_mouth', 'q_evergarden_bull'],
+    greeting:
+      'Everything in Evergarden is carefully placed, $C. If a hedge moves, assume it meant to.',
+  },
+  maze_scholar_pip: {
+    id: 'maze_scholar_pip',
+    name: 'Maze Scholar Pip',
+    title: 'Cartographer of Living Hedges',
+    pos: { x: 360, z: 946 },
+    facing: Math.PI,
+    color: 0x84a85f,
+    questIds: ['q_evergarden_maze_mouth', 'q_evergarden_living_map', 'q_evergarden_bull'],
+    greeting:
+      'I have drawn this maze every morning for twelve years. It has never once had the decency to stay drawn.',
+  },
+  statue_keeper_bram: {
+    id: 'statue_keeper_bram',
+    name: 'Statue Keeper Bram',
+    title: 'Warden of the Marble Walk',
+    pos: { x: 360, z: 875 },
+    facing: Math.PI / 2,
+    color: 0xa7ad91,
+    questIds: [],
+    greeting:
+      'The statues face south today. Yesterday they faced the fountain. I prefer not to guess where they will look tomorrow.',
+  },
+  rose_keeper_una: {
+    id: 'rose_keeper_una',
+    name: 'Rose Keeper Una',
+    title: 'Tender of the Rose Wilds',
+    pos: { x: 270, z: 910 },
+    facing: -Math.PI / 2,
+    color: 0xb56f79,
+    questIds: [],
+    greeting:
+      'The roses are harmless when they sing. If they go quiet, leave before the thorns decide you are interesting.',
+  },
+  pond_keeper_sol: {
+    id: 'pond_keeper_sol',
+    name: 'Pond Keeper Sol',
+    title: 'Watcher of Petal Pond',
+    pos: { x: 440, z: 850 },
+    facing: Math.PI / 2,
+    color: 0x6c9c83,
+    questIds: [],
+    greeting:
+      'The pond reflects every path through the maze. Today it shows one path too many, ending at the Fountain Court.',
+  },
+};
+export const EVERGARDEN_QUESTS: Record<string, QuestDef> = {
+  q_evergarden_maze_mouth: {
+    id: 'q_evergarden_maze_mouth',
+    name: 'The Maze Has Moved',
+    giverNpcId: 'steward_elian',
+    turnInNpcId: 'maze_scholar_pip',
+    text: 'Pip went to map the Great Maze before breakfast and has not returned for supper. Find the scholar at the maze mouth and ask why every hedge in Hedgewick is leaning toward the Fountain Court.',
+    completionText:
+      'Elian noticed the lean too? Then my map is not the problem for once. We need three witnesses from three corners of the garden.',
+    objectives: [
+      {
+        type: 'interact',
+        targetNpcId: 'maze_scholar_pip',
+        count: 1,
+        label: 'Maze Scholar Pip found',
+      },
+    ],
+    xpReward: 5000,
+    copperReward: 2400,
+    itemRewards: {},
+    minLevel: 19,
+  },
+  q_evergarden_living_map: {
+    id: 'q_evergarden_living_map',
+    name: 'A Map with Three Voices',
+    giverNpcId: 'maze_scholar_pip',
+    turnInNpcId: 'maze_scholar_pip',
+    text: 'Speak with Bram on the Statuary Walk, Una in the Rose Wilds, and Sol at Petal Pond. Each watches a different edge of the maze. Put their sightings together and we can map what is moving beneath it.',
+    completionText:
+      'Statues turning, roses falling silent, and a new path in the pond. All three lines meet at the Fountain Court, where the Topiary Bull has broken its roots.',
+    objectives: [
+      {
+        type: 'interact',
+        targetNpcId: 'statue_keeper_bram',
+        count: 1,
+        label: 'Statue Keeper Bram consulted',
+      },
+      {
+        type: 'interact',
+        targetNpcId: 'rose_keeper_una',
+        count: 1,
+        label: 'Rose Keeper Una consulted',
+      },
+      {
+        type: 'interact',
+        targetNpcId: 'pond_keeper_sol',
+        count: 1,
+        label: 'Pond Keeper Sol consulted',
+      },
+    ],
+    xpReward: 6200,
+    copperReward: 3400,
+    itemRewards: {},
+    requiresQuest: 'q_evergarden_maze_mouth',
+    minLevel: 19,
+  },
+  q_evergarden_bull: {
+    id: 'q_evergarden_bull',
+    name: 'The Bull in the Fountain Court',
+    giverNpcId: 'maze_scholar_pip',
+    turnInNpcId: 'steward_elian',
+    text: 'The Topiary Bull is dragging the maze inward one living root at a time. Enter the Fountain Court, cut the beast free from the garden, and give every path room to breathe again.',
+    completionText:
+      'The hedges have settled back into their proper places. Proper for today, at least. Evergarden owes you one peaceful morning.',
+    objectives: [
+      { type: 'kill', targetMobId: 'the_topiary_bull', count: 1, label: 'Topiary Bull defeated' },
+    ],
+    xpReward: 7600,
+    copperReward: 5200,
+    itemRewards: {},
+    requiresQuest: 'q_evergarden_living_map',
+    minLevel: 20,
+    suggestedPlayers: 2,
+  },
+};
+export const EVERGARDEN_QUEST_ORDER: string[] = [
+  'q_evergarden_maze_mouth',
+  'q_evergarden_living_map',
+  'q_evergarden_bull',
+];
 export const EVERGARDEN_ITEMS: Record<string, ItemDef> = {};
 export const EVERGARDEN_CAMPS: CampDef[] = [
   { mobId: 'topiary_stag', center: { x: 364, z: 898 }, radius: 10, count: 3 },

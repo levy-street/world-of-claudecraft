@@ -193,10 +193,131 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     color: 0xf2f6fa,
   },
 };
-export const FROSTVEIL_NPCS: Record<string, NpcDef> = {};
-export const FROSTVEIL_QUESTS: Record<string, QuestDef> = {};
-export const FROSTVEIL_QUEST_ORDER: string[] = [];
-export const FROSTVEIL_ITEMS: Record<string, ItemDef> = {};
+export const FROSTVEIL_NPCS: Record<string, NpcDef> = {
+  matriarch_eira: {
+    id: 'matriarch_eira',
+    name: 'Matriarch Eira',
+    title: 'Voice of Icemantle',
+    pos: { x: -30, z: 1560 },
+    facing: Math.PI,
+    color: 0xa9c7db,
+    questIds: ['q_frostveil_aurora_call', 'q_frostveil_shield_tracks'],
+    greeting:
+      'The ice remembers every footstep, $C. Walk lightly, listen closely, and Frostveil may let you pass.',
+  },
+  watcher_senn: {
+    id: 'watcher_senn',
+    name: 'Watcher Senn',
+    title: 'Aurora Warden',
+    pos: { x: 30, z: 1740 },
+    facing: Math.PI,
+    color: 0x82b8c9,
+    questIds: ['q_frostveil_aurora_call', 'q_frostveil_three_cairns', 'q_frostveil_shield_tracks'],
+    greeting:
+      'The aurora is beautiful because you cannot hear it screaming. I can, and tonight it is warning us.',
+  },
+};
+export const FROSTVEIL_QUESTS: Record<string, QuestDef> = {
+  q_frostveil_aurora_call: {
+    id: 'q_frostveil_aurora_call',
+    name: 'Where the Aurora Touches',
+    giverNpcId: 'matriarch_eira',
+    turnInNpcId: 'watcher_senn',
+    text: 'Senn watches the lights from the Aurora Steps, beyond the tarn and the wolf packs. He sent a signal of three blue flames before the storm swallowed the ridge. Find him and bring Icemantle his warning.',
+    completionText:
+      'You crossed the storm for a warning. Then you should see what the warning concerns before we carry it home.',
+    objectives: [
+      { type: 'interact', targetNpcId: 'watcher_senn', count: 1, label: 'Watcher Senn found' },
+    ],
+    xpReward: 7500,
+    copperReward: 1800,
+    itemRewards: {},
+    minLevel: 17,
+  },
+  q_frostveil_three_cairns: {
+    id: 'q_frostveil_three_cairns',
+    name: 'Three Cairns in the Snow',
+    giverNpcId: 'watcher_senn',
+    turnInNpcId: 'watcher_senn',
+    text: 'Our warding stones at Glacier Tarn, Shiverfen, and the Howling Terraces should glow beneath the aurora. Touch each cairn and tell me which light has failed. That path will show us where the storm entered.',
+    completionText:
+      'The last cairn is dark, then. The storm did not come from the sky at all. Something large walked down from the terraces and dragged the cold behind it.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'frostveil_cairn_tarn',
+        count: 1,
+        label: 'Glacier Tarn cairn inspected',
+      },
+      {
+        type: 'interact',
+        targetObjectItemId: 'frostveil_cairn_fen',
+        count: 1,
+        label: 'Shiverfen cairn inspected',
+      },
+      {
+        type: 'interact',
+        targetObjectItemId: 'frostveil_cairn_terrace',
+        count: 1,
+        label: 'Howling Terraces cairn inspected',
+      },
+    ],
+    xpReward: 9500,
+    copperReward: 2800,
+    itemRewards: {},
+    requiresQuest: 'q_frostveil_aurora_call',
+    minLevel: 18,
+  },
+  q_frostveil_shield_tracks: {
+    id: 'q_frostveil_shield_tracks',
+    name: 'Tracks Broad as Shields',
+    giverNpcId: 'watcher_senn',
+    turnInNpcId: 'matriarch_eira',
+    text: 'The tracks beyond the final cairn are broad as shields. A Frostmane has claimed the terraces and shattered every ward it found. Hunt the yeti among the high ice before it follows our lights back to Icemantle.',
+    completionText:
+      'The old cairns will be raised again, but their light would have led that beast straight to us. You have bought Icemantle another winter.',
+    objectives: [
+      { type: 'kill', targetMobId: 'frostmane_yeti', count: 1, label: 'Frostmane Yeti defeated' },
+    ],
+    xpReward: 13000,
+    copperReward: 4400,
+    itemRewards: {},
+    requiresQuest: 'q_frostveil_three_cairns',
+    minLevel: 19,
+    suggestedPlayers: 2,
+  },
+};
+export const FROSTVEIL_QUEST_ORDER: string[] = [
+  'q_frostveil_aurora_call',
+  'q_frostveil_three_cairns',
+  'q_frostveil_shield_tracks',
+];
+export const FROSTVEIL_ITEMS: Record<string, ItemDef> = {
+  frostveil_cairn_tarn: {
+    id: 'frostveil_cairn_tarn',
+    name: 'Tarn Warding Cairn',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_frostveil_three_cairns',
+    noVendorSell: true,
+  },
+  frostveil_cairn_fen: {
+    id: 'frostveil_cairn_fen',
+    name: 'Fen Warding Cairn',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_frostveil_three_cairns',
+    noVendorSell: true,
+  },
+  frostveil_cairn_terrace: {
+    id: 'frostveil_cairn_terrace',
+    name: 'Terrace Warding Cairn',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_frostveil_three_cairns',
+    noVendorSell: true,
+  },
+};
 export const FROSTVEIL_CAMPS: CampDef[] = [
   { mobId: 'snowdrift_wolf', center: { x: 20, z: 1610 }, radius: 10, count: 3 },
   { mobId: 'snowdrift_wolf', center: { x: -60, z: 1690 }, radius: 10, count: 3 },
@@ -206,7 +327,23 @@ export const FROSTVEIL_CAMPS: CampDef[] = [
   { mobId: 'fen_sprite', center: { x: -84, z: 1738 }, radius: 11, count: 3 },
   { mobId: 'frostmane_yeti', center: { x: 96, z: 1816 }, radius: 6, count: 1 },
 ];
-export const FROSTVEIL_OBJECTS: GroundObjectDef[] = [];
+export const FROSTVEIL_OBJECTS: GroundObjectDef[] = [
+  {
+    itemId: 'frostveil_cairn_tarn',
+    name: 'Tarn Warding Cairn',
+    positions: [{ x: 60, z: 1640 }],
+  },
+  {
+    itemId: 'frostveil_cairn_fen',
+    name: 'Fen Warding Cairn',
+    positions: [{ x: -90, z: 1760 }],
+  },
+  {
+    itemId: 'frostveil_cairn_terrace',
+    name: 'Terrace Warding Cairn',
+    positions: [{ x: 70, z: 1810 }],
+  },
+];
 
 export const FROSTVEIL_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),

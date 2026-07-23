@@ -20,7 +20,8 @@ const GROUND_PICKUP_KEYS = (Object.keys(DICT.en) as (keyof typeof DICT.en)[]).fi
 // hand-authored), so per the project i18n model (a contributor adds English; the
 // maintainer fills every locale at release) these keys are English-recognized by
 // the EXACT matcher below but not yet hand-translated in every locale like the
-// older lines. They are the one documented pending set until that release fill.
+// older lines. Veiled Hollow and the northern landmarks are the documented
+// pending sets until their release locale fills.
 const PENDING_LOCALE_KEYS = new Set<string>([
   'groundPickup.hollowSealstoneDeny',
   'groundPickup.hollowSealstoneEnough',
@@ -30,6 +31,42 @@ const PENDING_LOCALE_KEYS = new Set<string>([
   'groundPickup.monumentCourtEnough',
   'groundPickup.monumentNorthDeny',
   'groundPickup.monumentNorthEnough',
+  'groundPickup.frostveilCairnTarnDeny',
+  'groundPickup.frostveilCairnTarnEnough',
+  'groundPickup.frostveilCairnFenDeny',
+  'groundPickup.frostveilCairnFenEnough',
+  'groundPickup.frostveilCairnTerraceDeny',
+  'groundPickup.frostveilCairnTerraceEnough',
+  'groundPickup.amberfallLanternOrchardDeny',
+  'groundPickup.amberfallLanternOrchardEnough',
+  'groundPickup.amberfallLanternMereDeny',
+  'groundPickup.amberfallLanternMereEnough',
+  'groundPickup.amberfallLanternMonolithDeny',
+  'groundPickup.amberfallLanternMonolithEnough',
+  'groundPickup.willowfenMarkerBogshineDeny',
+  'groundPickup.willowfenMarkerBogshineEnough',
+  'groundPickup.willowfenMarkerWillowweepDeny',
+  'groundPickup.willowfenMarkerWillowweepEnough',
+  'groundPickup.willowfenMarkerDrowsyDeny',
+  'groundPickup.willowfenMarkerDrowsyEnough',
+  'groundPickup.nightbloomAnchorMoonwellDeny',
+  'groundPickup.nightbloomAnchorMoonwellEnough',
+  'groundPickup.nightbloomAnchorGloamfieldDeny',
+  'groundPickup.nightbloomAnchorGloamfieldEnough',
+  'groundPickup.nightbloomAnchorBarrowDeny',
+  'groundPickup.nightbloomAnchorBarrowEnough',
+  'groundPickup.galecrestSignalDownsDeny',
+  'groundPickup.galecrestSignalDownsEnough',
+  'groundPickup.galecrestSignalTarnDeny',
+  'groundPickup.galecrestSignalTarnEnough',
+  'groundPickup.galecrestSignalWrecksDeny',
+  'groundPickup.galecrestSignalWrecksEnough',
+  'groundPickup.palmreachWaymarkStrandDeny',
+  'groundPickup.palmreachWaymarkStrandEnough',
+  'groundPickup.palmreachWaymarkVinefallDeny',
+  'groundPickup.palmreachWaymarkVinefallEnough',
+  'groundPickup.palmreachWaymarkLagoonDeny',
+  'groundPickup.palmreachWaymarkLagoonEnough',
 ]);
 
 describe('ground-pickup line localization (the S3-invisible surface)', () => {
@@ -40,8 +77,8 @@ describe('ground-pickup line localization (the S3-invisible surface)', () => {
     }
   });
 
-  it('covers 42 distinct lines with groundPickup.* keys', () => {
-    expect(GROUND_PICKUP_KEYS.length).toBe(42);
+  it('covers 78 distinct lines with groundPickup.* keys', () => {
+    expect(GROUND_PICKUP_KEYS.length).toBe(78);
   });
 
   it('pins a known literal per representative locale', () => {

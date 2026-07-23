@@ -8816,6 +8816,60 @@ export const zh_CN: EnTranslations = {
       "wildheart_fangknife": {
         "name": "祖尔加的獠牙匕首"
       },
+      "frostveil_cairn_tarn": {
+        "name": "冰湖守护石堆"
+      },
+      "frostveil_cairn_fen": {
+        "name": "寒沼守护石堆"
+      },
+      "frostveil_cairn_terrace": {
+        "name": "台地守护石堆"
+      },
+      "amberfall_lantern_orchard": {
+        "name": "果园丰收灯"
+      },
+      "amberfall_lantern_mere": {
+        "name": "大沼丰收灯"
+      },
+      "amberfall_lantern_monolith": {
+        "name": "石碑丰收灯"
+      },
+      "willowfen_marker_bogshine": {
+        "name": "沼光芦苇路标"
+      },
+      "willowfen_marker_willowweep": {
+        "name": "泣柳芦苇路标"
+      },
+      "willowfen_marker_drowsy": {
+        "name": "困倦滩芦苇路标"
+      },
+      "nightbloom_anchor_moonwell": {
+        "name": "月井梦锚"
+      },
+      "nightbloom_anchor_gloamfield": {
+        "name": "暮野梦锚"
+      },
+      "nightbloom_anchor_barrow": {
+        "name": "古冢梦锚"
+      },
+      "galecrest_signal_downs": {
+        "name": "丘地风暴柱"
+      },
+      "galecrest_signal_tarn": {
+        "name": "镜湖风暴柱"
+      },
+      "galecrest_signal_wrecks": {
+        "name": "沉船原风暴柱"
+      },
+      "palmreach_waymark_strand": {
+        "name": "棕榈滩路标"
+      },
+      "palmreach_waymark_vinefall": {
+        "name": "藤瀑路标"
+      },
+      "palmreach_waymark_lagoon": {
+        "name": "潟湖路标"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -10421,6 +10475,111 @@ export const zh_CN: EnTranslations = {
         "title": "读石者",
         "greeting": "外面那些石碑已经许久不曾对人开口。也许它们正等着新的耳朵。"
       },
+      "captain_kaelra": {
+        "name": "凯拉队长",
+        "title": "龙望堡指挥官",
+        "greeting": "龙望堡只有一条路，敌人却数不清，{className}。若你要向北攀行，就让每一步都有价值。"
+      },
+      "scout_vaela": {
+        "name": "斥候维拉",
+        "title": "火山口探路者",
+        "greeting": "沙丘会移动，巨魔不会，飞龙则盯着两者。想走安全路就跟紧我。"
+      },
+      "matriarch_eira": {
+        "name": "族母艾拉",
+        "title": "冰幔之声",
+        "greeting": "冰层记得每一个脚印，{className}。轻轻走，仔细听，霜幕或许会让你通过。"
+      },
+      "watcher_senn": {
+        "name": "守望者森恩",
+        "title": "极光守卫",
+        "greeting": "极光之所以美丽，是因为你听不见它的尖叫。我听得见，而今夜它在警告我们。"
+      },
+      "reeve_elowen": {
+        "name": "执政官埃洛温",
+        "title": "灯沼守护者",
+        "greeting": "琥珀谷慷慨赐予，直到有人忘记感恩。这个季节，太多旧债走回来了。"
+      },
+      "orchard_keeper_bram": {
+        "name": "果园守卫布拉姆",
+        "title": "鎏金枝守护者",
+        "greeting": "小心落果。精灵有牙，狐狸有礼貌，而两者都会把你抢个精光。"
+      },
+      "mayor_alda": {
+        "name": "镇长阿尔达",
+        "title": "桥沼发言人",
+        "greeting": "只要知道沼泽在哪里沉睡，它就很友善。最近它总在错误的地方醒来，{className}。"
+      },
+      "fenward_oli": {
+        "name": "沼卫奥利",
+        "title": "芦苇路标守护者",
+        "greeting": "踩芦苇弯向的地方，别踩它指向的地方。一条路带你回家，另一条路拿你喂蟾蜍。"
+      },
+      "dreamkeeper_luma": {
+        "name": "守梦者露玛",
+        "title": "月憩镇守卫",
+        "greeting": "夜绽原并未沉睡，{className}。它正在做梦，而今夜的梦开始露出獠牙。"
+      },
+      "stargazer_oril": {
+        "name": "观星者奥里尔",
+        "title": "长明岗守护者",
+        "greeting": "长明岗上方少了一颗星。我数过百次，缺失的光就在我们脚下。"
+      },
+      "reeve_mara": {
+        "name": "执政官玛拉",
+        "title": "绞木镇守护者",
+        "greeting": "灯笼要贴身，名字要记牢，{className}。这片树林喜欢把两样都偷走。"
+      },
+      "lantern_iven": {
+        "name": "提灯人伊文",
+        "title": "哀石点灯人",
+        "greeting": "灯笼能挡住寻常黑暗。至于其余的，我带着盐、铃铛和一双快腿。"
+      },
+      "harbormaster_pell": {
+        "name": "港务长佩尔",
+        "title": "烛港之主",
+        "greeting": "风吹走帽子就随它去。若吹走一艘船，{className}，那就是我们的工作了。"
+      },
+      "beacon_keeper_ada": {
+        "name": "灯塔守卫艾达",
+        "title": "古灯守护者",
+        "greeting": "古灯不再为船只引路。它告诉我们哪些沉船正试图爬回海里。"
+      },
+      "tidecaller_miri": {
+        "name": "唤潮者米莉",
+        "title": "漂港之声",
+        "greeting": "潮水会归还借走的一切。丛林却从未学会这种礼貌，{className}。"
+      },
+      "trailblazer_cas": {
+        "name": "开路者卡斯",
+        "title": "翡翠密林向导",
+        "greeting": "这里每条小径到早饭时都会长满。我黎明做标记，晚饭前又得重来。"
+      },
+      "steward_elian": {
+        "name": "管事埃利安",
+        "title": "篱镇守护者",
+        "greeting": "永恒花园里的一切都经过精心摆放，{className}。若树篱移动，先假定它是故意的。"
+      },
+      "maze_scholar_pip": {
+        "name": "迷宫学者皮普",
+        "title": "活篱制图师",
+        "greeting": "我每天早晨绘制这座迷宫，已经十二年了。它从未肯老实留在图上。"
+      },
+      "statue_keeper_bram": {
+        "name": "雕像守卫布拉姆",
+        "title": "大理石步道守卫",
+        "greeting": "雕像今天面朝南方，昨天还朝着喷泉。我不想猜它们明天会看哪里。"
+      },
+      "rose_keeper_una": {
+        "name": "玫瑰守卫乌娜",
+        "title": "野玫瑰园丁",
+        "greeting": "玫瑰歌唱时没有危险。若它们突然安静，在荆棘对你产生兴趣前离开。"
+      },
+      "pond_keeper_sol": {
+        "name": "池塘守卫索尔",
+        "title": "花瓣池守望者",
+        "greeting": "池水映出迷宫的每条路。今天却多出一条，终点在喷泉庭院。"
+      },
       "warden_coalfast": {
         "name": "守望者·煤耐",
         "title": "堡垒指挥官",
@@ -11453,6 +11612,348 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "封印已放回封印石"
+          }
+        }
+      },
+      "q_drakewatch_dispatch": {
+        "title": "北路烽烟",
+        "text": "维拉没有从灰烬沙丘回报，前方烽火也熄灭了。沿北路找到她，查明什么正在逼近龙望堡。",
+        "completion": "凯拉派你来的？很好。我找到了袭击者、巨魔，还有盘旋在火山口上的东西。我需要一把同行的利刃。",
+        "objectives": {
+          "0": {
+            "label": "找到斥候维拉"
+          }
+        }
+      },
+      "q_drakewatch_long_climb": {
+        "title": "漫长攀登",
+        "text": "我要标出通往火山口的安全路线，但灰骨氏族和巨魔猎手都盯上了我。陪我走，{playerName}，别让它们靠近。",
+        "completion": "你带着维拉、路线标记和完整的威胁记录回来了。这比城墙后再多一支小队更有价值。",
+        "objectives": {
+          "0": {
+            "label": "护送斥候维拉抵达火山口边缘"
+          }
+        }
+      },
+      "q_drakewatch_wings": {
+        "title": "龙喉上空之翼",
+        "text": "烬翼赶走了边缘的幼龙，很快就会试探我们的城墙。登上巢穴，在它飞向龙望堡前终结威胁。",
+        "completion": "阴影已离开屋顶。今晚龙望堡不必仰望天空入睡，这是你的胜利，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "击杀烬翼飞龙"
+          }
+        }
+      },
+      "q_frostveil_aurora_call": {
+        "title": "极光触地之处",
+        "text": "森恩在极光阶地观测天光，暴雪前发出三束蓝焰。找到他，把警告带回冰幔。",
+        "completion": "你冒着暴雪来取警告。那就先亲眼看看它所指的威胁吧。",
+        "objectives": {
+          "0": {
+            "label": "找到守望者森恩"
+          }
+        }
+      },
+      "q_frostveil_three_cairns": {
+        "title": "雪中三石堆",
+        "text": "检查冰川湖、颤寒沼和呼啸台地的守护石堆。哪一盏光熄灭，暴雪就从哪里闯入。",
+        "completion": "最后的石堆熄灭了。暴雪并非来自天空，而是被某个巨物从台地拖了下来。",
+        "objectives": {
+          "0": {
+            "label": "检查冰川湖石堆"
+          },
+          "1": {
+            "label": "检查颤寒沼石堆"
+          },
+          "2": {
+            "label": "检查呼啸台地石堆"
+          }
+        }
+      },
+      "q_frostveil_shield_tracks": {
+        "title": "盾牌般宽的足迹",
+        "text": "霜鬃雪人占据了台地并砸碎守护石。在它循光抵达冰幔前，把它猎杀在高地冰原。",
+        "completion": "旧石堆会重新立起。你阻止了野兽沿光而来，为冰幔换来又一个冬天。",
+        "objectives": {
+          "0": {
+            "label": "击败霜鬃雪人"
+          }
+        }
+      },
+      "q_amberfall_orchard_road": {
+        "title": "果园之路",
+        "text": "布拉姆本该点亮西边果园的丰收灯。穿过融金隘口找到他，问清灯沼为何陷入黑暗。",
+        "completion": "埃洛温从镇上看见黑暗了？那就没时间了。老树人彻底苏醒前必须走完点灯路线。",
+        "objectives": {
+          "0": {
+            "label": "找到果园守卫布拉姆"
+          }
+        }
+      },
+      "q_amberfall_lantern_round": {
+        "title": "巡灯之行",
+        "text": "三盏丰收灯束缚着古根。依次重新点亮果园、大沼和斜碑下的灯，并留意树林中的动静。",
+        "completion": "前两盏是金焰，石碑旁却是绿焰。烬枝扎根高地，正在吸走灯火。",
+        "objectives": {
+          "0": {
+            "label": "重新点亮果园灯"
+          },
+          "1": {
+            "label": "重新点亮大沼灯"
+          },
+          "2": {
+            "label": "重新点亮石碑灯"
+          }
+        }
+      },
+      "q_amberfall_cinderbough": {
+        "title": "烬枝苏醒",
+        "text": "烬枫高地的树人吞下守护火焰并愤怒苏醒。在它的根触及其他灯火前击败烬枝。",
+        "completion": "灯火重新稳定。我们会在烬枝倒下之处种三棵树苗，教给它们更温柔的名字。",
+        "objectives": {
+          "0": {
+            "label": "击败烬枝"
+          }
+        }
+      },
+      "q_willowfen_fenward": {
+        "title": "失踪的沼卫",
+        "text": "奥利去重设芦苇路标后没有回来。穿过旧桥到睡莲荒地，查明安全道路为何都指向深水。",
+        "completion": "阿尔达终于派人来了。有人转动了所有路标，我忙着躲开饥饿的大嘴，根本来不及复原。",
+        "objectives": {
+          "0": {
+            "label": "找到沼卫奥利"
+          }
+        }
+      },
+      "q_willowfen_marker_round": {
+        "title": "芦苇指向归途",
+        "text": "重设沼光池、泣柳地和困倦滩的雕刻路标。它们曾立在安全地面旁，直到某个巨物夜里搬动它们。",
+        "completion": "每根柱子上都有泥，底下还有圆形刮痕。那只老蛙不睡了，它在把旅人赶向巢穴。",
+        "objectives": {
+          "0": {
+            "label": "重设沼光芦苇路标"
+          },
+          "1": {
+            "label": "重设泣柳芦苇路标"
+          },
+          "2": {
+            "label": "重设困倦滩芦苇路标"
+          }
+        }
+      },
+      "q_willowfen_croaker": {
+        "title": "沼泽不再打鼾",
+        "text": "困倦巨蛙学会用转动的路标引来食物。去滩地找到它，让它重新陷入名副其实的沉睡。",
+        "completion": "桥沼镇在这里都听见了最后一声蛙鸣。桥梁又属于我们，奥利也终于能停止对芦苇吼叫。",
+        "objectives": {
+          "0": {
+            "label": "击败困倦巨蛙"
+          }
+        }
+      },
+      "q_nightbloom_vigil": {
+        "title": "缺失的一颗星",
+        "text": "奥里尔在暮野外的长明岗守望，却连续三夜没有星数回报。找到他，查明什么阴影让信号沉寂。",
+        "completion": "露玛仍相信我的计数。帮我沿着固定夜绽梦境的锚点追踪那颗失星。",
+        "objectives": {
+          "0": {
+            "label": "找到观星者奥里尔"
+          }
+        }
+      },
+      "q_nightbloom_dream_anchors": {
+        "title": "梦境之锚",
+        "text": "读取月井、暮野和不眠古冢的月纹。若有一处映出黑暗，我们就知道失星落在何处。",
+        "completion": "古冢符文映出王冠而非星辰。旧王夺走失光，用它唤醒了自己的宫廷。",
+        "objectives": {
+          "0": {
+            "label": "读取月井梦锚"
+          },
+          "1": {
+            "label": "读取暮野梦锚"
+          },
+          "2": {
+            "label": "读取不眠古冢梦锚"
+          }
+        }
+      },
+      "q_nightbloom_barrow_crown": {
+        "title": "地底王冠",
+        "text": "古冢王从梦中偷走一颗星，嵌进王冠。进入不眠古冢击败他，让夜绽原再次忘记他的名字。",
+        "completion": "失去的光回到了天上。因为你走进我们不敢惊醒的地方，夜绽原再次安然入梦。",
+        "objectives": {
+          "0": {
+            "label": "击败古冢王"
+          }
+        }
+      },
+      "q_wraithwood_lost_lantern": {
+        "title": "失踪的灯笼",
+        "text": "伊文去哀石礼拜堂点灯，却没能穿过寡妇密林。沿西路找到他，树若叫你名字，千万别回答。",
+        "completion": "玛拉让你进密林找我？你们都很勇敢。礼拜堂仍是黑的，而树林已经注意到了。",
+        "objectives": {
+          "0": {
+            "label": "找到提灯人伊文"
+          }
+        }
+      },
+      "q_wraithwood_lantern_walk": {
+        "title": "提灯之行",
+        "text": "礼拜堂的火焰就在这盏灯里，林中每个饥饿的东西都闻得到。护送我到哀石，{playerName}，别让它们碰到灯火。",
+        "completion": "哀石的灯重新亮了。迷失在林中的每个旅人都有了归路，伊文也一样。",
+        "objectives": {
+          "0": {
+            "label": "护送提灯人伊文抵达哀石礼拜堂"
+          }
+        }
+      },
+      "q_wraithwood_last_hunt": {
+        "title": "猎杀猎人",
+        "text": "礼拜堂灯火引出了苍白猎手。循着清晰的足迹向北，让这次狩猎成为他的最后一次。",
+        "completion": "空地再没有号角回应。幽魂林终于只剩下普通的亡魂作祟。",
+        "objectives": {
+          "0": {
+            "label": "击败苍白猎手"
+          }
+        }
+      },
+      "q_galecrest_beacon_orders": {
+        "title": "古灯塔的命令",
+        "text": "古灯塔正午自行闪亮。向东攀上烛港外的高地找到艾达，查明什么阴影唤醒了远古光芒。",
+        "completion": "佩尔从港口也看见了。风暴柱会告诉我们，警告来自海、天，还是两者之下。",
+        "objectives": {
+          "0": {
+            "label": "找到灯塔守卫艾达"
+          }
+        }
+      },
+      "q_galecrest_storm_signals": {
+        "title": "狂风中的信号",
+        "text": "敲响呼啸丘、镜湖和沉船原的风暴柱。三种音调会定位那个把溺亡船只召向海岸的东西。",
+        "completion": "丘地和湖畔回应清晰，沉船原则多出第四声，像船体断裂一样低沉。守墓者醒了。",
+        "objectives": {
+          "0": {
+            "label": "敲响呼啸丘风暴柱"
+          },
+          "1": {
+            "label": "敲响镜湖风暴柱"
+          },
+          "2": {
+            "label": "敲响沉船原风暴柱"
+          }
+        }
+      },
+      "q_galecrest_wreck_warden": {
+        "title": "第四声",
+        "text": "沉船守卫在沙下敲响溺亡钟声，每场风暴都会送来更多船。去破船之间让第四声永远沉默。",
+        "completion": "港口钟声终于恢复正常。水手仍会畏惧风冠海岸，但至少死人不再为他们指路。",
+        "objectives": {
+          "0": {
+            "label": "击败沉船守卫"
+          }
+        }
+      },
+      "q_palmreach_green_trail": {
+        "title": "绿色小径",
+        "text": "卡斯进入翡翠密林重开藤瀑之路。沿旧贝壳标记找到他，查明丛林为何一夜吞掉道路。",
+        "completion": "米莉派你来的？那漂港仍需要这条路。帮我唤醒旧路标，别让藤蔓永远埋掉它们。",
+        "objectives": {
+          "0": {
+            "label": "找到开路者卡斯"
+          }
+        }
+      },
+      "q_palmreach_waymarks": {
+        "title": "丛林记得的道路",
+        "text": "解放棕榈滩、藤瀑和蓝宝石潟湖的旧路标。三座都苏醒，安全小径就会重新显现。",
+        "completion": "小径开放了，但所有路标都转向沉没神像。守卫正在召回每一块雕刻石。",
+        "objectives": {
+          "0": {
+            "label": "清理棕榈滩路标"
+          },
+          "1": {
+            "label": "清理藤瀑路标"
+          },
+          "2": {
+            "label": "清理蓝宝石潟湖路标"
+          }
+        }
+      },
+      "q_palmreach_idol_guardian": {
+        "title": "神像召它们归来",
+        "text": "神像守卫正把路石从地下拔出并封闭道路。前往沉没神殿打破它的控制，让棕榈之境保持与海岸相连。",
+        "completion": "贝壳标记一路亮到藤瀑。棕榈之境又有路了，漂港为此感谢你。",
+        "objectives": {
+          "0": {
+            "label": "击败神像守卫"
+          }
+        }
+      },
+      "q_evergarden_maze_mouth": {
+        "title": "迷宫移动了",
+        "text": "皮普早餐前去绘制大迷宫，晚饭时还没回来。在迷宫入口找到他，问清所有树篱为何倾向喷泉庭院。",
+        "completion": "埃利安也发现了？那这次不是我的地图有问题。我们需要花园三个角落的三位证人。",
+        "objectives": {
+          "0": {
+            "label": "找到迷宫学者皮普"
+          }
+        }
+      },
+      "q_evergarden_living_map": {
+        "title": "三种声音的地图",
+        "text": "询问雕像步道的布拉姆、野玫瑰地的乌娜和花瓣池的索尔。把三份目击拼在一起，画出地下移动之物。",
+        "completion": "雕像转身、玫瑰沉默、池中多路。三条线都汇向喷泉庭院，绿篱公牛在那里挣断了根。",
+        "objectives": {
+          "0": {
+            "label": "询问雕像守卫布拉姆"
+          },
+          "1": {
+            "label": "询问玫瑰守卫乌娜"
+          },
+          "2": {
+            "label": "询问池塘守卫索尔"
+          }
+        }
+      },
+      "q_evergarden_bull": {
+        "title": "喷泉庭院的公牛",
+        "text": "绿篱公牛正用活根把迷宫向内拖。进入喷泉庭院，将野兽从花园切除，让道路重新呼吸。",
+        "completion": "树篱回到了正确位置，至少今天如此。永恒花园欠你一个宁静的清晨。",
+        "objectives": {
+          "0": {
+            "label": "击败绿篱公牛"
+          }
+        }
+      },
+      "q_farshore_watch_meadow": {
+        "title": "草地之外的守望",
+        "text": "奥伦在岛屿初裂处守望，同时听见三道裂口歌唱。越过旧码头路找到他，确认哪一道会先开启。",
+        "completion": "煤岩又派来一双耳朵。最近的裂口正追随警钟，塔姆必须把钟带到我们的伏击点。",
+        "objectives": {
+          "0": {
+            "label": "找到裂隙守望者奥伦"
+          }
+        }
+      },
+      "q_farshore_ferrywalk": {
+        "title": "护送警钟",
+        "text": "塔姆要把警钟从码头带到草地岗哨，裂口会循声袭来。护送守钟人，挡住伏击，把警告安全送入陷阱。",
+        "completion": "钟已就位，裂口也露出了牙。现在我知道该先封哪道伤痕，以及什么在守护它。",
+        "objectives": {
+          "0": {
+            "label": "护送守钟人塔姆抵达草地岗哨"
+          }
+        }
+      },
+      "q_farshore_horror": {
+        "title": "裂岸恐魔",
+        "text": "钟声引出了悬崖裂口的主人，那是裂隙吞噬之物缝成的恐魔。在裂岸悬崖猎杀它，再告诉煤岩岛岸仍值得守护。",
+        "completion": "我们从鸥港听见裂口闭合。远岸岛仍有伤，但今天终于止血了。谢谢你，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "击败裂岸恐魔"
           }
         }
       },

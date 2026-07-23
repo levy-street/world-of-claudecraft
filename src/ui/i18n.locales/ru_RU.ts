@@ -9152,5 +9152,307 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildheart_tuskblade.name': 'Клыкастый клинок Дикого Сердца',
   'entities.items.wildheart_hexwood_staff.name': 'Посох колдовского дерева из Котловины',
   'entities.items.wildheart_fangknife.name': 'Клыковый нож Зулгара',
+  // Northern realm quest arcs (M16 non-Latin fills).
+  'entities.npcs.captain_kaelra.name': 'Капитан Каэлра',
+  'entities.npcs.captain_kaelra.title': 'Командир Драконьего Дозора',
+  'entities.npcs.captain_kaelra.greeting':
+    'У Драконьего Дозора одна дорога и слишком много врагов, {className}. Пусть каждый шаг на север будет не напрасен.',
+  'entities.npcs.scout_vaela.name': 'Разведчица Ваэла',
+  'entities.npcs.scout_vaela.title': 'Следопыт кальдеры',
+  'entities.npcs.scout_vaela.greeting':
+    'Дюны движутся, тролли нет, а драконы следят за всеми. Держись рядом, если хочешь пройти безопасно.',
+  'entities.npcs.matriarch_eira.name': 'Матриарх Эйра',
+  'entities.npcs.matriarch_eira.title': 'Голос Ледяной Мантии',
+  'entities.npcs.matriarch_eira.greeting':
+    'Лёд помнит каждый след, {className}. Иди легко, слушай внимательно, и Морозная Завеса пропустит тебя.',
+  'entities.npcs.watcher_senn.name': 'Дозорный Сенн',
+  'entities.npcs.watcher_senn.title': 'Страж сияния',
+  'entities.npcs.watcher_senn.greeting':
+    'Сияние прекрасно, потому что ты не слышишь его крика. Я слышу, и сегодня оно нас предупреждает.',
+  'entities.npcs.reeve_elowen.name': 'Староста Элоуэн',
+  'entities.npcs.reeve_elowen.title': 'Хранительница Фонарной Топи',
+  'entities.npcs.reeve_elowen.greeting':
+    'Янтарная Долина щедра, пока кто-то не забудет поблагодарить. В этом сезоне старые долги ожили.',
+  'entities.npcs.orchard_keeper_bram.name': 'Садовник Брам',
+  'entities.npcs.orchard_keeper_bram.title': 'Хранитель золотых ветвей',
+  'entities.npcs.orchard_keeper_bram.greeting':
+    'Берегись упавших плодов. У духов есть зубы, у лис манеры, и оба вида обчистят тебя.',
+  'entities.npcs.mayor_alda.name': 'Мэр Альда',
+  'entities.npcs.mayor_alda.title': 'Голос Мостовой Топи',
+  'entities.npcs.mayor_alda.greeting':
+    'Топь дружелюбна, если знаешь, где она спит. Но теперь она просыпается не там, где надо, {className}.',
+  'entities.npcs.fenward_oli.name': 'Болотный страж Оли',
+  'entities.npcs.fenward_oli.title': 'Хранитель тростниковых меток',
+  'entities.npcs.fenward_oli.greeting':
+    'Ступай туда, куда гнётся камыш, а не куда указывает. Одна тропа ведёт домой, другая кормит жаб.',
+  'entities.npcs.dreamkeeper_luma.name': 'Хранительница снов Лума',
+  'entities.npcs.dreamkeeper_luma.title': 'Страж Лунного Покоя',
+  'entities.npcs.dreamkeeper_luma.greeting':
+    'Ночноцвет не спит, {className}. Он видит сон, и сегодня этот сон обнажил клыки.',
+  'entities.npcs.stargazer_oril.name': 'Звездочёт Орил',
+  'entities.npcs.stargazer_oril.title': 'Хранитель Вечного Дозора',
+  'entities.npcs.stargazer_oril.greeting':
+    'Над Дозором не хватает одной звезды. Я считал сотню раз, и пропавший свет у нас под ногами.',
+  'entities.npcs.reeve_mara.name': 'Староста Мара',
+  'entities.npcs.reeve_mara.title': 'Хранительница Висельной Заводи',
+  'entities.npcs.reeve_mara.greeting':
+    'Держи фонарь близко, а имя ещё ближе, {className}. Лес любит красть и то и другое.',
+  'entities.npcs.lantern_iven.name': 'Фонарщик Ивен',
+  'entities.npcs.lantern_iven.title': 'Зажигатель Скорбного Камня',
+  'entities.npcs.lantern_iven.greeting':
+    'Фонарь сдерживает обычную тьму. Для прочего у меня есть соль, колокольцы и быстрые ноги.',
+  'entities.npcs.harbormaster_pell.name': 'Начальник порта Пелл',
+  'entities.npcs.harbormaster_pell.title': 'Хозяин Фитильной Гавани',
+  'entities.npcs.harbormaster_pell.greeting':
+    'Если ветер унёс шляпу, забудь о ней. Если корабль, {className}, тогда у нас работа.',
+  'entities.npcs.beacon_keeper_ada.name': 'Смотрительница Ада',
+  'entities.npcs.beacon_keeper_ada.title': 'Хранительница Старого Огня',
+  'entities.npcs.beacon_keeper_ada.greeting':
+    'Старый огонь больше не ведёт корабли. Он показывает, какие обломки пытаются уползти обратно в море.',
+  'entities.npcs.tidecaller_miri.name': 'Заклинательница приливов Мири',
+  'entities.npcs.tidecaller_miri.title': 'Голос Дрейфующей Гавани',
+  'entities.npcs.tidecaller_miri.greeting':
+    'Прилив возвращает всё взятое. Джунгли, {className}, так и не научились вежливости.',
+  'entities.npcs.trailblazer_cas.name': 'Первопроходец Кас',
+  'entities.npcs.trailblazer_cas.title': 'Проводник Изумрудной Чащи',
+  'entities.npcs.trailblazer_cas.greeting':
+    'Каждая тропа зарастает к завтраку. Я отмечаю их на рассвете и начинаю снова до ужина.',
+  'entities.npcs.steward_elian.name': 'Управляющий Элиан',
+  'entities.npcs.steward_elian.title': 'Хранитель Изгородника',
+  'entities.npcs.steward_elian.greeting':
+    'В Вечном Саду всё стоит на своём месте, {className}. Если изгородь движется, значит, так задумано.',
+  'entities.npcs.maze_scholar_pip.name': 'Исследователь лабиринта Пип',
+  'entities.npcs.maze_scholar_pip.title': 'Картограф живых изгородей',
+  'entities.npcs.maze_scholar_pip.greeting':
+    'Я рисую этот лабиринт каждое утро двенадцать лет. Он ни разу не остался на карте.',
+  'entities.npcs.statue_keeper_bram.name': 'Смотритель статуй Брам',
+  'entities.npcs.statue_keeper_bram.title': 'Страж Мраморной Аллеи',
+  'entities.npcs.statue_keeper_bram.greeting':
+    'Сегодня статуи смотрят на юг, вчера на фонтан. Не хочу гадать, куда они повернутся завтра.',
+  'entities.npcs.rose_keeper_una.name': 'Садовница Уна',
+  'entities.npcs.rose_keeper_una.title': 'Хранительница Диких Роз',
+  'entities.npcs.rose_keeper_una.greeting':
+    'Пока розы поют, они безвредны. Если замолчат, уходи, пока шипы не заинтересовались тобой.',
+  'entities.npcs.pond_keeper_sol.name': 'Смотритель пруда Сол',
+  'entities.npcs.pond_keeper_sol.title': 'Страж Лепесткового Пруда',
+  'entities.npcs.pond_keeper_sol.greeting':
+    'Пруд отражает все пути лабиринта. Сегодня в нём лишняя тропа к Фонтанному Двору.',
+  'entities.quests.q_drakewatch_dispatch.title': 'Дым над северной дорогой',
+  'entities.quests.q_drakewatch_dispatch.text':
+    'Ваэла не вернулась с Пепельных Дюн, а дальние костры погасли. Иди на север, найди её и узнай, что приближается к Дозору.',
+  'entities.quests.q_drakewatch_dispatch.completion':
+    'Каэлра прислала тебя? Хорошо. Здесь налётчики, тролли и крылатая тень над кальдерой. На подъёме пригодится клинок.',
+  'entities.quests.q_drakewatch_dispatch.objectives.0.label': 'Найти разведчицу Ваэлу',
+  'entities.quests.q_drakewatch_long_climb.title': 'Долгий подъём',
+  'entities.quests.q_drakewatch_long_climb.text':
+    'Я отмечу безопасный путь к кальдере, но за мной идут Пеплокостные и тролли. Проводи меня, {playerName}, и не подпускай их.',
+  'entities.quests.q_drakewatch_long_climb.completion':
+    'Ты вернул Ваэлу с картой пути и перечнем угроз. Это ценнее ещё одного отряда за стенами.',
+  'entities.quests.q_drakewatch_long_climb.objectives.0.label': 'Проводить Ваэлу к краю кальдеры',
+  'entities.quests.q_drakewatch_wings.title': 'Крылья над Драконьей Пастью',
+  'entities.quests.q_drakewatch_wings.text':
+    'Пламенное Крыло изгнало малых драконов и скоро нападёт на стены. Поднимись к гнезду и убей его первым.',
+  'entities.quests.q_drakewatch_wings.completion':
+    'Тень ушла с наших крыш. Сегодня Дозор уснёт, не глядя в небо. Это твоя победа, {playerName}.',
+  'entities.quests.q_drakewatch_wings.objectives.0.label': 'Убить Пламенного Дракона',
+  'entities.quests.q_frostveil_aurora_call.title': 'Где сияние касается земли',
+  'entities.quests.q_frostveil_aurora_call.text':
+    'Сенн наблюдает сияние на северных ступенях. Перед бурей он послал три синих огня. Найди его и принеси предупреждение.',
+  'entities.quests.q_frostveil_aurora_call.completion':
+    'Ты пересёк бурю ради предупреждения. Теперь увидь его причину своими глазами.',
+  'entities.quests.q_frostveil_aurora_call.objectives.0.label': 'Найти дозорного Сенна',
+  'entities.quests.q_frostveil_three_cairns.title': 'Три кургана в снегу',
+  'entities.quests.q_frostveil_three_cairns.text':
+    'Осмотри защитные камни у Ледникового Озера, Дрожащей Топи и Воющих Террас. Погасший свет покажет путь бури.',
+  'entities.quests.q_frostveil_three_cairns.completion':
+    'Последний камень тёмен. Буря пришла не с неба: нечто огромное спустилось с террас и привело холод.',
+  'entities.quests.q_frostveil_three_cairns.objectives.0.label': 'Осмотреть озёрный курган',
+  'entities.quests.q_frostveil_three_cairns.objectives.1.label': 'Осмотреть болотный курган',
+  'entities.quests.q_frostveil_three_cairns.objectives.2.label': 'Осмотреть курган на террасах',
+  'entities.quests.q_frostveil_shield_tracks.title': 'Следы шириной со щит',
+  'entities.quests.q_frostveil_shield_tracks.text':
+    'Морозногривый йети занял террасы и разбил защитные камни. Убей его среди льдов, пока он не пошёл на их свет.',
+  'entities.quests.q_frostveil_shield_tracks.completion':
+    'Курганы восстановят, но их свет привёл бы зверя к нам. Ты подарил Ледяной Мантии ещё одну зиму.',
+  'entities.quests.q_frostveil_shield_tracks.objectives.0.label': 'Победить Морозногривого йети',
+  'entities.quests.q_amberfall_orchard_road.title': 'Дорога в сад',
+  'entities.quests.q_amberfall_orchard_road.text':
+    'Брам должен был зажечь фонари западного сада. Найди его под золотыми ветвями и спроси, почему Фонарная Топь темна.',
+  'entities.quests.q_amberfall_orchard_road.completion':
+    'Элоуэн заметила тьму? Времени нет. Нужно пройти путь фонарей, пока старые древни не проснулись.',
+  'entities.quests.q_amberfall_orchard_road.objectives.0.label': 'Найти садовника Брама',
+  'entities.quests.q_amberfall_lantern_round.title': 'Обход фонарей',
+  'entities.quests.q_amberfall_lantern_round.text':
+    'Три фонаря сдерживают древние корни. Зажги огни в саду, у Великой Топи и под Наклонным Монолитом.',
+  'entities.quests.q_amberfall_lantern_round.completion':
+    'Два огня золотые, а огонь у монолита зелёный. Углеветвь укоренилась на холме и пьёт их пламя.',
+  'entities.quests.q_amberfall_lantern_round.objectives.0.label': 'Зажечь фонарь в саду',
+  'entities.quests.q_amberfall_lantern_round.objectives.1.label': 'Зажечь фонарь у топи',
+  'entities.quests.q_amberfall_lantern_round.objectives.2.label': 'Зажечь фонарь у монолита',
+  'entities.quests.q_amberfall_cinderbough.title': 'Пробуждение Углеветви',
+  'entities.quests.q_amberfall_cinderbough.text':
+    'Древень Углеветвь поглотил защитный огонь. Сломи его, пока корни не достигли остальных фонарей.',
+  'entities.quests.q_amberfall_cinderbough.completion':
+    'Фонари снова горят ровно. На месте Углеветви мы посадим три дерева и дадим им добрые имена.',
+  'entities.quests.q_amberfall_cinderbough.objectives.0.label': 'Победить Углеветвь',
+  'entities.quests.q_willowfen_fenward.title': 'Пропавший болотный страж',
+  'entities.quests.q_willowfen_fenward.text':
+    'Оли ушёл переставлять тростниковые метки и не вернулся. Найди его у Лилейных Пустошей и узнай, почему тропы ведут в воду.',
+  'entities.quests.q_willowfen_fenward.completion':
+    'Альда прислала помощь. Кто-то повернул все метки, а я едва успевал уворачиваться от голодных пастей.',
+  'entities.quests.q_willowfen_fenward.objectives.0.label': 'Найти болотного стража Оли',
+  'entities.quests.q_willowfen_marker_round.title': 'Камыш ведёт домой',
+  'entities.quests.q_willowfen_marker_round.text':
+    'Верни метки у Светлых Луж, Плачущих Ив и Сонных Отмелей. Ночью нечто большое сдвинуло их с безопасных мест.',
+  'entities.quests.q_willowfen_marker_round.completion':
+    'На столбах грязь и круглые царапины. Старая жаба не спит, а загоняет путников в своё логово.',
+  'entities.quests.q_willowfen_marker_round.objectives.0.label': 'Исправить метку у Светлых Луж',
+  'entities.quests.q_willowfen_marker_round.objectives.1.label': 'Исправить метку у Плачущих Ив',
+  'entities.quests.q_willowfen_marker_round.objectives.2.label':
+    'Исправить метку на Сонных Отмелях',
+  'entities.quests.q_willowfen_croaker.title': 'Топь больше не храпит',
+  'entities.quests.q_willowfen_croaker.text':
+    'Сонный Квакун поворачивает метки и заманивает пищу. Найди огромную жабу на отмелях и снова усыпи её.',
+  'entities.quests.q_willowfen_croaker.completion':
+    'Последний квак слышали даже в посёлке. Мосты снова наши, и Оли перестанет кричать на камыши.',
+  'entities.quests.q_willowfen_croaker.objectives.0.label': 'Победить Сонного Квакуна',
+  'entities.quests.q_nightbloom_vigil.title': 'Пропавшая звезда',
+  'entities.quests.q_nightbloom_vigil.text':
+    'Орил не передавал счёт звёзд три ночи. Найди его среди древних камней Вечного Дозора и узнай, что заглушило сигнал.',
+  'entities.quests.q_nightbloom_vigil.completion':
+    'Лума верит моему счёту. Помоги проследить пропавшую звезду по якорям сна.',
+  'entities.quests.q_nightbloom_vigil.objectives.0.label': 'Найти звездочёта Орила',
+  'entities.quests.q_nightbloom_dream_anchors.title': 'Якоря сна',
+  'entities.quests.q_nightbloom_dream_anchors.text':
+    'Прочти лунные руны у Лунного Колодца, Сумеречного Поля и Бессонного Кургана. Тёмное отражение укажет на звезду.',
+  'entities.quests.q_nightbloom_dream_anchors.completion':
+    'Руна кургана показала корону. Старый король украл свет и пробудил свой двор.',
+  'entities.quests.q_nightbloom_dream_anchors.objectives.0.label':
+    'Прочесть якорь у Лунного Колодца',
+  'entities.quests.q_nightbloom_dream_anchors.objectives.1.label':
+    'Прочесть якорь Сумеречного Поля',
+  'entities.quests.q_nightbloom_dream_anchors.objectives.2.label':
+    'Прочесть якорь Бессонного Кургана',
+  'entities.quests.q_nightbloom_barrow_crown.title': 'Корона под землёй',
+  'entities.quests.q_nightbloom_barrow_crown.text':
+    'Король Кургана украл звезду из сна и вставил её в корону. Победи его и позволь Ночноцвету забыть это имя.',
+  'entities.quests.q_nightbloom_barrow_crown.completion':
+    'Пропавший свет вернулся в небо. Ночноцвет снова спит спокойно благодаря твоей смелости.',
+  'entities.quests.q_nightbloom_barrow_crown.objectives.0.label': 'Победить Короля Кургана',
+  'entities.quests.q_wraithwood_lost_lantern.title': 'Пропавший фонарь',
+  'entities.quests.q_wraithwood_lost_lantern.text':
+    'Ивен шёл зажечь часовню, но не прошёл Вдовью Чащу. Найди его на западной тропе и не отвечай деревьям.',
+  'entities.quests.q_wraithwood_lost_lantern.completion':
+    'Мара послала тебя за мной? Смело. Часовня темна, и лес уже это заметил.',
+  'entities.quests.q_wraithwood_lost_lantern.objectives.0.label': 'Найти фонарщика Ивена',
+  'entities.quests.q_wraithwood_lantern_walk.title': 'Путь фонаря',
+  'entities.quests.q_wraithwood_lantern_walk.text':
+    'В этом фонаре огонь часовни, и весь лес чует его. Проводи меня к Скорбному Камню, {playerName}, и защити свет.',
+  'entities.quests.q_wraithwood_lantern_walk.completion':
+    'Огни часовни снова горят. Теперь у каждого заблудившегося путника есть дорога домой.',
+  'entities.quests.q_wraithwood_lantern_walk.objectives.0.label': 'Проводить Ивена к часовне',
+  'entities.quests.q_wraithwood_last_hunt.title': 'Охота на охотника',
+  'entities.quests.q_wraithwood_last_hunt.text':
+    'Свет выманил Бледного Охотника. Иди по следу на север и сделай эту охоту последней.',
+  'entities.quests.q_wraithwood_last_hunt.completion':
+    'Из рощи больше не отвечает рог. Теперь в Призрачном Лесу лишь обычные мертвецы.',
+  'entities.quests.q_wraithwood_last_hunt.objectives.0.label': 'Победить Бледного Охотника',
+  'entities.quests.q_galecrest_beacon_orders.title': 'Приказ Старому Маяку',
+  'entities.quests.q_galecrest_beacon_orders.text':
+    'Старый Маяк вспыхнул в полдень без смотрителя. Найди Аду и узнай, какая тень разбудила древний огонь.',
+  'entities.quests.q_galecrest_beacon_orders.completion':
+    'Пелл тоже видел вспышку. Грозовые столбы скажут, пришла угроза с моря, неба или снизу.',
+  'entities.quests.q_galecrest_beacon_orders.objectives.0.label': 'Найти смотрительницу Аду',
+  'entities.quests.q_galecrest_storm_signals.title': 'Сигналы в буре',
+  'entities.quests.q_galecrest_storm_signals.text':
+    'Ударь в столбы на Воющих Холмах, у Зеркального Озера и среди Обломков. Три ноты найдут зовущего корабли.',
+  'entities.quests.q_galecrest_storm_signals.completion':
+    'Холмы и озеро ответили чисто. Обломки дали четвёртую ноту, глубокую, как треск корпуса. Страж проснулся.',
+  'entities.quests.q_galecrest_storm_signals.objectives.0.label': 'Подать сигнал на Воющих Холмах',
+  'entities.quests.q_galecrest_storm_signals.objectives.1.label':
+    'Подать сигнал у Зеркального Озера',
+  'entities.quests.q_galecrest_storm_signals.objectives.2.label': 'Подать сигнал среди Обломков',
+  'entities.quests.q_galecrest_wreck_warden.title': 'Четвёртая нота',
+  'entities.quests.q_galecrest_wreck_warden.text':
+    'Страж Обломков звонит в утонувшие колокола. Найди его среди разбитых судов и заглуши четвёртую ноту.',
+  'entities.quests.q_galecrest_wreck_warden.completion':
+    'Портовые колокола снова звучат нормально. Моряки ещё боятся мыса, но мертвецы больше не указывают путь.',
+  'entities.quests.q_galecrest_wreck_warden.objectives.0.label': 'Победить Стража Обломков',
+  'entities.quests.q_palmreach_green_trail.title': 'Зелёная тропа',
+  'entities.quests.q_palmreach_green_trail.text':
+    'Кас ушёл открывать путь к Водопаду Лоз. Следуй по ракушкам, найди его и узнай, почему джунгли поглотили дорогу.',
+  'entities.quests.q_palmreach_green_trail.completion':
+    'Мири прислала тебя? Гавани нужна дорога. Помоги разбудить старые указатели, пока лозы их не похоронили.',
+  'entities.quests.q_palmreach_green_trail.objectives.0.label': 'Найти первопроходца Каса',
+  'entities.quests.q_palmreach_waymarks.title': 'Дорога, которую помнят джунгли',
+  'entities.quests.q_palmreach_waymarks.text':
+    'Освободи указатели у Пальмового Берега, Водопада Лоз и Сапфировой Лагуны. Три пробуждённых камня откроют путь.',
+  'entities.quests.q_palmreach_waymarks.completion':
+    'Путь открыт, но все камни повернулись к Затонувшему Идолу. Его страж зовёт резной камень домой.',
+  'entities.quests.q_palmreach_waymarks.objectives.0.label': 'Открыть указатель на берегу',
+  'entities.quests.q_palmreach_waymarks.objectives.1.label': 'Открыть указатель у водопада',
+  'entities.quests.q_palmreach_waymarks.objectives.2.label': 'Открыть указатель у лагуны',
+  'entities.quests.q_palmreach_idol_guardian.title': 'Идол зовёт их домой',
+  'entities.quests.q_palmreach_idol_guardian.text':
+    'Страж Идола вырывает путевые камни и закрывает тропы. Победи его в затонувшем святилище.',
+  'entities.quests.q_palmreach_idol_guardian.completion':
+    'Ракушки сияют до самого водопада. У Пальмового Предела снова есть дорога благодаря тебе.',
+  'entities.quests.q_palmreach_idol_guardian.objectives.0.label': 'Победить Стража Идола',
+  'entities.quests.q_evergarden_maze_mouth.title': 'Лабиринт сдвинулся',
+  'entities.quests.q_evergarden_maze_mouth.text':
+    'Пип ушёл наносить лабиринт на карту и не вернулся. Найди его у входа и узнай, почему изгороди клонятся к фонтану.',
+  'entities.quests.q_evergarden_maze_mouth.completion':
+    'Элиан тоже заметил? Значит, карта ни при чём. Нужны три свидетеля из разных уголков сада.',
+  'entities.quests.q_evergarden_maze_mouth.objectives.0.label': 'Найти исследователя Пипа',
+  'entities.quests.q_evergarden_living_map.title': 'Карта с тремя голосами',
+  'entities.quests.q_evergarden_living_map.text':
+    'Поговори с Брамом у статуй, Уной среди роз и Солом у пруда. Их наблюдения покажут движение под садом.',
+  'entities.quests.q_evergarden_living_map.completion':
+    'Статуи повернулись, розы молчат, в пруду новая тропа. Все линии ведут к Топиарному Быку во дворе.',
+  'entities.quests.q_evergarden_living_map.objectives.0.label': 'Расспросить смотрителя Брама',
+  'entities.quests.q_evergarden_living_map.objectives.1.label': 'Расспросить садовницу Уну',
+  'entities.quests.q_evergarden_living_map.objectives.2.label': 'Расспросить смотрителя Сола',
+  'entities.quests.q_evergarden_bull.title': 'Бык во дворе фонтана',
+  'entities.quests.q_evergarden_bull.text':
+    'Топиарный Бык стягивает лабиринт живыми корнями. Войди во двор, отсеки зверя от сада и освободи пути.',
+  'entities.quests.q_evergarden_bull.completion':
+    'Изгороди вернулись на места, по крайней мере сегодня. Вечный Сад обязан тебе тихим утром.',
+  'entities.quests.q_evergarden_bull.objectives.0.label': 'Победить Топиарного Быка',
+  'entities.quests.q_farshore_watch_meadow.title': 'Дозор за лугом',
+  'entities.quests.q_farshore_watch_meadow.text':
+    'Оллун слышит три разлома сразу. Перейди старую дорогу от причала, найди его и узнай, какой откроется первым.',
+  'entities.quests.q_farshore_watch_meadow.completion':
+    'Коулфаст прислал ещё пару ушей. Ближайший разлом идёт на звук колокола, и Тэм отнесёт его в ловушку.',
+  'entities.quests.q_farshore_watch_meadow.objectives.0.label': 'Найти дозорного Оллуна',
+  'entities.quests.q_farshore_ferrywalk.title': 'Путь тревожного колокола',
+  'entities.quests.q_farshore_ferrywalk.text':
+    'Тэм понесёт колокол к луговому посту. Разломы нападут на звук. Проводи звонаря и удержи дорогу.',
+  'entities.quests.q_farshore_ferrywalk.completion':
+    'Колокол на месте, и разлом показал зубы. Теперь я знаю, какую рану закрыть и кто её охраняет.',
+  'entities.quests.q_farshore_ferrywalk.objectives.0.label': 'Проводить звонаря Тэма к посту',
+  'entities.quests.q_farshore_horror.title': 'Расколотый ужас',
+  'entities.quests.q_farshore_horror.text':
+    'Колокол выманил хозяина утёса, сшитого из жертв разлома. Убей его у Расколотых Скал и доложи Коулфасту.',
+  'entities.quests.q_farshore_horror.completion':
+    'Мы слышали, как разлом закрылся. Дальний Берег ещё ранен, но сегодня кровь остановилась. Спасибо, {playerName}.',
+  'entities.quests.q_farshore_horror.objectives.0.label': 'Победить Расколотый Ужас',
+  'entities.items.frostveil_cairn_tarn.name': 'Озёрный защитный курган',
+  'entities.items.frostveil_cairn_fen.name': 'Болотный защитный курган',
+  'entities.items.frostveil_cairn_terrace.name': 'Защитный курган террас',
+  'entities.items.amberfall_lantern_orchard.name': 'Садовый фонарь урожая',
+  'entities.items.amberfall_lantern_mere.name': 'Болотный фонарь урожая',
+  'entities.items.amberfall_lantern_monolith.name': 'Фонарь урожая у монолита',
+  'entities.items.willowfen_marker_bogshine.name': 'Тростниковая метка Светлых Луж',
+  'entities.items.willowfen_marker_willowweep.name': 'Тростниковая метка Плачущих Ив',
+  'entities.items.willowfen_marker_drowsy.name': 'Тростниковая метка Сонных Отмелей',
+  'entities.items.nightbloom_anchor_moonwell.name': 'Якорь сна Лунного Колодца',
+  'entities.items.nightbloom_anchor_gloamfield.name': 'Якорь сна Сумеречного Поля',
+  'entities.items.nightbloom_anchor_barrow.name': 'Якорь сна Кургана',
+  'entities.items.galecrest_signal_downs.name': 'Грозовой столб холмов',
+  'entities.items.galecrest_signal_tarn.name': 'Грозовой столб озера',
+  'entities.items.galecrest_signal_wrecks.name': 'Грозовой столб обломков',
+  'entities.items.palmreach_waymark_strand.name': 'Указатель Пальмового Берега',
+  'entities.items.palmreach_waymark_vinefall.name': 'Указатель Водопада Лоз',
+  'entities.items.palmreach_waymark_lagoon.name': 'Указатель Лагуны',
   'hudChrome.professions.skillValue': '{skill} / {max}',
 };

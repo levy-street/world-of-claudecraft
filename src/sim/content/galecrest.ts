@@ -168,10 +168,140 @@ export const GALECREST_MOBS: Record<string, MobTemplate> = {
     color: 0x7a8a86,
   },
 };
-export const GALECREST_NPCS: Record<string, NpcDef> = {};
-export const GALECREST_QUESTS: Record<string, QuestDef> = {};
-export const GALECREST_QUEST_ORDER: string[] = [];
-export const GALECREST_ITEMS: Record<string, ItemDef> = {};
+export const GALECREST_NPCS: Record<string, NpcDef> = {
+  harbormaster_pell: {
+    id: 'harbormaster_pell',
+    name: 'Harbormaster Pell',
+    title: 'Master of Wickharbor',
+    pos: { x: 420, z: 360 },
+    facing: Math.PI,
+    color: 0x6f8790,
+    questIds: ['q_galecrest_beacon_orders', 'q_galecrest_wreck_warden'],
+    greeting:
+      'If the wind takes your hat, let it go. If it takes a ship, $C, then we have work to do.',
+  },
+  beacon_keeper_ada: {
+    id: 'beacon_keeper_ada',
+    name: 'Beacon Keeper Ada',
+    title: 'Keeper of the Old Light',
+    pos: { x: 498, z: 308 },
+    facing: Math.PI,
+    color: 0x8b9498,
+    questIds: [
+      'q_galecrest_beacon_orders',
+      'q_galecrest_storm_signals',
+      'q_galecrest_wreck_warden',
+    ],
+    greeting:
+      'The old light does not guide ships anymore. It tells us which wrecks are trying to crawl back into the sea.',
+  },
+};
+export const GALECREST_QUESTS: Record<string, QuestDef> = {
+  q_galecrest_beacon_orders: {
+    id: 'q_galecrest_beacon_orders',
+    name: 'Orders for the Old Beacon',
+    giverNpcId: 'harbormaster_pell',
+    turnInNpcId: 'beacon_keeper_ada',
+    text: 'The Old Beacon flashed at noon with no keeper on the lens. Climb east from Wickharbor, find Ada, and ask what can cast a shadow bright enough to wake that ancient light.',
+    completionText:
+      'Pell saw it from the harbor, then. The storm posts will tell us whether the warning came from sea, sky, or something below both.',
+    objectives: [
+      {
+        type: 'interact',
+        targetNpcId: 'beacon_keeper_ada',
+        count: 1,
+        label: 'Beacon Keeper Ada found',
+      },
+    ],
+    xpReward: 5000,
+    copperReward: 2400,
+    itemRewards: {},
+    minLevel: 19,
+  },
+  q_galecrest_storm_signals: {
+    id: 'q_galecrest_storm_signals',
+    name: 'Signals in the Gale',
+    giverNpcId: 'beacon_keeper_ada',
+    turnInNpcId: 'beacon_keeper_ada',
+    text: 'Sound the storm posts on the Howling Downs, beside Mirror Tarn, and among the Wreckfields. Their three notes will locate the thing calling drowned ships toward shore.',
+    completionText:
+      'Downs and tarn answered clear. The Wreckfields answered with a fourth note, deep as a hull breaking. Their warden is awake.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: 'galecrest_signal_downs',
+        count: 1,
+        label: 'Howling Downs storm post sounded',
+      },
+      {
+        type: 'interact',
+        targetObjectItemId: 'galecrest_signal_tarn',
+        count: 1,
+        label: 'Mirror Tarn storm post sounded',
+      },
+      {
+        type: 'interact',
+        targetObjectItemId: 'galecrest_signal_wrecks',
+        count: 1,
+        label: 'Wreckfields storm post sounded',
+      },
+    ],
+    xpReward: 6200,
+    copperReward: 3400,
+    itemRewards: {},
+    requiresQuest: 'q_galecrest_beacon_orders',
+    minLevel: 19,
+  },
+  q_galecrest_wreck_warden: {
+    id: 'q_galecrest_wreck_warden',
+    name: 'The Fourth Note',
+    giverNpcId: 'beacon_keeper_ada',
+    turnInNpcId: 'harbormaster_pell',
+    text: 'The Wreck Warden is ringing drowned bells beneath the sand, and every storm will bring it more ships. Find the thing among the broken hulls and silence its fourth note.',
+    completionText:
+      'The harbor bells sound like themselves again. Sailors will still fear Galecrest, but at least the dead have stopped giving directions.',
+    objectives: [
+      { type: 'kill', targetMobId: 'the_wreck_warden', count: 1, label: 'Wreck Warden defeated' },
+    ],
+    xpReward: 7600,
+    copperReward: 5200,
+    itemRewards: {},
+    requiresQuest: 'q_galecrest_storm_signals',
+    minLevel: 20,
+    suggestedPlayers: 2,
+  },
+};
+export const GALECREST_QUEST_ORDER: string[] = [
+  'q_galecrest_beacon_orders',
+  'q_galecrest_storm_signals',
+  'q_galecrest_wreck_warden',
+];
+export const GALECREST_ITEMS: Record<string, ItemDef> = {
+  galecrest_signal_downs: {
+    id: 'galecrest_signal_downs',
+    name: 'Downs Storm Post',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_galecrest_storm_signals',
+    noVendorSell: true,
+  },
+  galecrest_signal_tarn: {
+    id: 'galecrest_signal_tarn',
+    name: 'Tarn Storm Post',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_galecrest_storm_signals',
+    noVendorSell: true,
+  },
+  galecrest_signal_wrecks: {
+    id: 'galecrest_signal_wrecks',
+    name: 'Wreckfields Storm Post',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_galecrest_storm_signals',
+    noVendorSell: true,
+  },
+};
 export const GALECREST_CAMPS: CampDef[] = [
   { mobId: 'moor_ram', center: { x: 292, z: 312 }, radius: 11, count: 3 },
   { mobId: 'moor_ram', center: { x: 262, z: 360 }, radius: 10, count: 3 },
@@ -181,7 +311,23 @@ export const GALECREST_CAMPS: CampDef[] = [
   { mobId: 'shoal_scuttler', center: { x: 386, z: 622 }, radius: 9, count: 2 },
   { mobId: 'the_wreck_warden', center: { x: 330, z: 638 }, radius: 5, count: 1 },
 ];
-export const GALECREST_OBJECTS: GroundObjectDef[] = [];
+export const GALECREST_OBJECTS: GroundObjectDef[] = [
+  {
+    itemId: 'galecrest_signal_downs',
+    name: 'Downs Storm Post',
+    positions: [{ x: 280, z: 320 }],
+  },
+  {
+    itemId: 'galecrest_signal_tarn',
+    name: 'Tarn Storm Post',
+    positions: [{ x: 300, z: 560 }],
+  },
+  {
+    itemId: 'galecrest_signal_wrecks',
+    name: 'Wreckfields Storm Post',
+    positions: [{ x: 360, z: 650 }],
+  },
+];
 
 export const GALECREST_PROPS: ZonePropsDef = {
   ...emptyZoneProps(),

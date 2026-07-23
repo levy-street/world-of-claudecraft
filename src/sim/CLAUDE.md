@@ -85,6 +85,7 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `bags.ts` | pooled bag capacity: the backpack plus equipped bag items raise one flat slot budget |
 | `quests/quest_credit.ts` | kill/collect quest credit + turn-in readiness |
 | `quests/quest_commands.ts` | accept/abandon/turn-in verbs + `queueQuestLetter` (W4; dev arm in `quests/dev_quest_commands.ts`) |
+| `quests/quest_escort.ts` | session-only open-world escort runs: traveler start/reset, authored path + ambush tick, nearby participant credit, and transient attacker cleanup; draws NO rng |
 | `instances/dungeons.ts` | door triggers, enter/leave, instance slots, raid lockouts + raid gates, and the manual instance-reset lifecycle (`resetDungeonInstances` behind `/dungeon reset`, character-keyed cooldowns on the `dungeonResetLocks` primitive, `inheritDungeonResetLocks` on party join) |
 | `rift/runs.ts` + `rift/portals.ts` | procedural "Rift" run lifecycle (enter/descend/exit, floor gates, level-20 gate, Heroic Mark rewards) + the ranked (C/B/A/S) world-portal scheduler. See `docs/design/rift-portals.md` |
 | `instances/difficulty.ts` + `instances/heroic_vendor.ts` | heroic dungeons: tuning + `dungeonDifficulty`/`setDungeonDifficulty`, `awardHeroicMarks` and kill lockouts; the Heroic Quartermaster marks vendor |

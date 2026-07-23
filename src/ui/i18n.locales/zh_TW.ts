@@ -8572,5 +8572,302 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.wildheart_tuskblade.name': '荒野之心獠牙巨刃',
   'entities.items.wildheart_hexwood_staff.name': '盆地巫木法杖',
   'entities.items.wildheart_fangknife.name': '祖爾加的獠牙匕首',
+  // Northern realm quest arcs (M16 non-Latin fills).
+  'entities.npcs.captain_kaelra.name': '凱拉隊長',
+  'entities.npcs.captain_kaelra.title': '龍望堡指揮官',
+  'entities.npcs.captain_kaelra.greeting':
+    '龍望堡只有一條路，敵人卻數不清，{className}。若你要向北攀行，就讓每一步都有價值。',
+  'entities.npcs.scout_vaela.name': '斥候維拉',
+  'entities.npcs.scout_vaela.title': '火山口探路者',
+  'entities.npcs.scout_vaela.greeting':
+    '沙丘會移動，巨魔不會，飛龍則盯著兩者。想走安全路就跟緊我。',
+  'entities.npcs.matriarch_eira.name': '族母艾拉',
+  'entities.npcs.matriarch_eira.title': '冰幔之聲',
+  'entities.npcs.matriarch_eira.greeting':
+    '冰層記得每一個腳印，{className}。輕輕走，仔細聽，霜幕或許會讓你通過。',
+  'entities.npcs.watcher_senn.name': '守望者森恩',
+  'entities.npcs.watcher_senn.title': '極光守衛',
+  'entities.npcs.watcher_senn.greeting':
+    '極光之所以美麗，是因為你聽不見它的尖叫。我聽得見，而今夜它在警告我們。',
+  'entities.npcs.reeve_elowen.name': '執政官埃洛溫',
+  'entities.npcs.reeve_elowen.title': '燈沼守護者',
+  'entities.npcs.reeve_elowen.greeting':
+    '琥珀谷慷慨賜予，直到有人忘記感恩。這個季節，太多舊債走回來了。',
+  'entities.npcs.orchard_keeper_bram.name': '果園守衛布拉姆',
+  'entities.npcs.orchard_keeper_bram.title': '鎏金枝守護者',
+  'entities.npcs.orchard_keeper_bram.greeting':
+    '小心落果。精靈有牙，狐貍有禮貌，而兩者都會把你搶個精光。',
+  'entities.npcs.mayor_alda.name': '鎮長阿爾達',
+  'entities.npcs.mayor_alda.title': '橋沼發言人',
+  'entities.npcs.mayor_alda.greeting':
+    '只要知道沼澤在哪里沉睡，它就很友善。最近它總在錯誤的地方醒來，{className}。',
+  'entities.npcs.fenward_oli.name': '沼衛奧利',
+  'entities.npcs.fenward_oli.title': '蘆葦路標守護者',
+  'entities.npcs.fenward_oli.greeting':
+    '踩蘆葦彎向的地方，別踩它指向的地方。一條路帶你回家，另一條路拿你喂蟾蜍。',
+  'entities.npcs.dreamkeeper_luma.name': '守夢者露瑪',
+  'entities.npcs.dreamkeeper_luma.title': '月憩鎮守衛',
+  'entities.npcs.dreamkeeper_luma.greeting':
+    '夜綻原并未沉睡，{className}。它正在做夢，而今夜的夢開始露出獠牙。',
+  'entities.npcs.stargazer_oril.name': '觀星者奧里爾',
+  'entities.npcs.stargazer_oril.title': '長明崗守護者',
+  'entities.npcs.stargazer_oril.greeting':
+    '長明崗上方少了一顆星。我數過百次，缺失的光就在我們腳下。',
+  'entities.npcs.reeve_mara.name': '執政官瑪拉',
+  'entities.npcs.reeve_mara.title': '絞木鎮守護者',
+  'entities.npcs.reeve_mara.greeting':
+    '燈籠要貼身，名字要記牢，{className}。這片樹林喜歡把兩樣都偷走。',
+  'entities.npcs.lantern_iven.name': '提燈人伊文',
+  'entities.npcs.lantern_iven.title': '哀石點燈人',
+  'entities.npcs.lantern_iven.greeting':
+    '燈籠能擋住尋常黑暗。至于其余的，我帶著鹽、鈴鐺和一雙快腿。',
+  'entities.npcs.harbormaster_pell.name': '港務長佩爾',
+  'entities.npcs.harbormaster_pell.title': '燭港之主',
+  'entities.npcs.harbormaster_pell.greeting':
+    '風吹走帽子就隨它去。若吹走一艘船，{className}，那就是我們的工作了。',
+  'entities.npcs.beacon_keeper_ada.name': '燈塔守衛艾達',
+  'entities.npcs.beacon_keeper_ada.title': '古燈守護者',
+  'entities.npcs.beacon_keeper_ada.greeting':
+    '古燈不再為船只引路。它告訴我們哪些沉船正試圖爬回海里。',
+  'entities.npcs.tidecaller_miri.name': '喚潮者米莉',
+  'entities.npcs.tidecaller_miri.title': '漂港之聲',
+  'entities.npcs.tidecaller_miri.greeting':
+    '潮水會歸還借走的一切。叢林卻從未學會這種禮貌，{className}。',
+  'entities.npcs.trailblazer_cas.name': '開路者卡斯',
+  'entities.npcs.trailblazer_cas.title': '翡翠密林向導',
+  'entities.npcs.trailblazer_cas.greeting':
+    '這里每條小徑到早飯時都會長滿。我黎明做標記，晚飯前又得重來。',
+  'entities.npcs.steward_elian.name': '管事埃利安',
+  'entities.npcs.steward_elian.title': '籬鎮守護者',
+  'entities.npcs.steward_elian.greeting':
+    '永恒花園里的一切都經過精心擺放，{className}。若樹籬移動，先假定它是故意的。',
+  'entities.npcs.maze_scholar_pip.name': '迷宮學者皮普',
+  'entities.npcs.maze_scholar_pip.title': '活籬制圖師',
+  'entities.npcs.maze_scholar_pip.greeting':
+    '我每天早晨繪制這座迷宮，已經十二年了。它從未肯老實留在圖上。',
+  'entities.npcs.statue_keeper_bram.name': '雕像守衛布拉姆',
+  'entities.npcs.statue_keeper_bram.title': '大理石步道守衛',
+  'entities.npcs.statue_keeper_bram.greeting':
+    '雕像今天面朝南方，昨天還朝著噴泉。我不想猜它們明天會看哪里。',
+  'entities.npcs.rose_keeper_una.name': '玫瑰守衛烏娜',
+  'entities.npcs.rose_keeper_una.title': '野玫瑰園丁',
+  'entities.npcs.rose_keeper_una.greeting':
+    '玫瑰歌唱時沒有危險。若它們突然安靜，在荊棘對你產生興趣前離開。',
+  'entities.npcs.pond_keeper_sol.name': '池塘守衛索爾',
+  'entities.npcs.pond_keeper_sol.title': '花瓣池守望者',
+  'entities.npcs.pond_keeper_sol.greeting':
+    '池水映出迷宮的每條路。今天卻多出一條，終點在噴泉庭院。',
+  'entities.quests.q_drakewatch_dispatch.title': '北路烽煙',
+  'entities.quests.q_drakewatch_dispatch.text':
+    '維拉沒有從灰燼沙丘回報，前方烽火也熄滅了。沿北路找到她，查明什么正在逼近龍望堡。',
+  'entities.quests.q_drakewatch_dispatch.completion':
+    '凱拉派你來的？很好。我找到了襲擊者、巨魔，還有盤旋在火山口上的東西。我需要一把同行的利刃。',
+  'entities.quests.q_drakewatch_dispatch.objectives.0.label': '找到斥候維拉',
+  'entities.quests.q_drakewatch_long_climb.title': '漫長攀登',
+  'entities.quests.q_drakewatch_long_climb.text':
+    '我要標出通往火山口的安全路線，但灰骨氏族和巨魔獵手都盯上了我。陪我走，{playerName}，別讓它們靠近。',
+  'entities.quests.q_drakewatch_long_climb.completion':
+    '你帶著維拉、路線標記和完整的威脅記錄回來了。這比城墻后再多一支小隊更有價值。',
+  'entities.quests.q_drakewatch_long_climb.objectives.0.label': '護送斥候維拉抵達火山口邊緣',
+  'entities.quests.q_drakewatch_wings.title': '龍喉上空之翼',
+  'entities.quests.q_drakewatch_wings.text':
+    '燼翼趕走了邊緣的幼龍，很快就會試探我們的城墻。登上巢穴，在它飛向龍望堡前終結威脅。',
+  'entities.quests.q_drakewatch_wings.completion':
+    '陰影已離開屋頂。今晚龍望堡不必仰望天空入睡，這是你的勝利，{playerName}。',
+  'entities.quests.q_drakewatch_wings.objectives.0.label': '擊殺燼翼飛龍',
+  'entities.quests.q_frostveil_aurora_call.title': '極光觸地之處',
+  'entities.quests.q_frostveil_aurora_call.text':
+    '森恩在極光階地觀測天光，暴雪前發出三束藍焰。找到他，把警告帶回冰幔。',
+  'entities.quests.q_frostveil_aurora_call.completion':
+    '你冒著暴雪來取警告。那就先親眼看看它所指的威脅吧。',
+  'entities.quests.q_frostveil_aurora_call.objectives.0.label': '找到守望者森恩',
+  'entities.quests.q_frostveil_three_cairns.title': '雪中三石堆',
+  'entities.quests.q_frostveil_three_cairns.text':
+    '檢查冰川湖、顫寒沼和呼嘯臺地的守護石堆。哪一盞光熄滅，暴雪就從哪里闖入。',
+  'entities.quests.q_frostveil_three_cairns.completion':
+    '最后的石堆熄滅了。暴雪并非來自天空，而是被某個巨物從臺地拖了下來。',
+  'entities.quests.q_frostveil_three_cairns.objectives.0.label': '檢查冰川湖石堆',
+  'entities.quests.q_frostveil_three_cairns.objectives.1.label': '檢查顫寒沼石堆',
+  'entities.quests.q_frostveil_three_cairns.objectives.2.label': '檢查呼嘯臺地石堆',
+  'entities.quests.q_frostveil_shield_tracks.title': '盾牌般寬的足跡',
+  'entities.quests.q_frostveil_shield_tracks.text':
+    '霜鬃雪人占據了臺地并砸碎守護石。在它循光抵達冰幔前，把它獵殺在高地冰原。',
+  'entities.quests.q_frostveil_shield_tracks.completion':
+    '舊石堆會重新立起。你阻止了野獸沿光而來，為冰幔換來又一個冬天。',
+  'entities.quests.q_frostveil_shield_tracks.objectives.0.label': '擊敗霜鬃雪人',
+  'entities.quests.q_amberfall_orchard_road.title': '果園之路',
+  'entities.quests.q_amberfall_orchard_road.text':
+    '布拉姆本該點亮西邊果園的豐收燈。穿過融金隘口找到他，問清燈沼為何陷入黑暗。',
+  'entities.quests.q_amberfall_orchard_road.completion':
+    '埃洛溫從鎮上看見黑暗了？那就沒時間了。老樹人徹底蘇醒前必須走完點燈路線。',
+  'entities.quests.q_amberfall_orchard_road.objectives.0.label': '找到果園守衛布拉姆',
+  'entities.quests.q_amberfall_lantern_round.title': '巡燈之行',
+  'entities.quests.q_amberfall_lantern_round.text':
+    '三盞豐收燈束縛著古根。依次重新點亮果園、大沼和斜碑下的燈，并留意樹林中的動靜。',
+  'entities.quests.q_amberfall_lantern_round.completion':
+    '前兩盞是金焰，石碑旁卻是綠焰。燼枝扎根高地，正在吸走燈火。',
+  'entities.quests.q_amberfall_lantern_round.objectives.0.label': '重新點亮果園燈',
+  'entities.quests.q_amberfall_lantern_round.objectives.1.label': '重新點亮大沼燈',
+  'entities.quests.q_amberfall_lantern_round.objectives.2.label': '重新點亮石碑燈',
+  'entities.quests.q_amberfall_cinderbough.title': '燼枝蘇醒',
+  'entities.quests.q_amberfall_cinderbough.text':
+    '燼楓高地的樹人吞下守護火焰并憤怒蘇醒。在它的根觸及其他燈火前擊敗燼枝。',
+  'entities.quests.q_amberfall_cinderbough.completion':
+    '燈火重新穩定。我們會在燼枝倒下之處種三棵樹苗，教給它們更溫柔的名字。',
+  'entities.quests.q_amberfall_cinderbough.objectives.0.label': '擊敗燼枝',
+  'entities.quests.q_willowfen_fenward.title': '失蹤的沼衛',
+  'entities.quests.q_willowfen_fenward.text':
+    '奧利去重設蘆葦路標后沒有回來。穿過舊橋到睡蓮荒地，查明安全道路為何都指向深水。',
+  'entities.quests.q_willowfen_fenward.completion':
+    '阿爾達終于派人來了。有人轉動了所有路標，我忙著躲開饑餓的大嘴，根本來不及復原。',
+  'entities.quests.q_willowfen_fenward.objectives.0.label': '找到沼衛奧利',
+  'entities.quests.q_willowfen_marker_round.title': '蘆葦指向歸途',
+  'entities.quests.q_willowfen_marker_round.text':
+    '重設沼光池、泣柳地和困倦灘的雕刻路標。它們曾立在安全地面旁，直到某個巨物夜里搬動它們。',
+  'entities.quests.q_willowfen_marker_round.completion':
+    '每根柱子上都有泥，底下還有圓形刮痕。那只老蛙不睡了，它在把旅人趕向巢穴。',
+  'entities.quests.q_willowfen_marker_round.objectives.0.label': '重設沼光蘆葦路標',
+  'entities.quests.q_willowfen_marker_round.objectives.1.label': '重設泣柳蘆葦路標',
+  'entities.quests.q_willowfen_marker_round.objectives.2.label': '重設困倦灘蘆葦路標',
+  'entities.quests.q_willowfen_croaker.title': '沼澤不再打鼾',
+  'entities.quests.q_willowfen_croaker.text':
+    '困倦巨蛙學會用轉動的路標引來食物。去灘地找到它，讓它重新陷入名副其實的沉睡。',
+  'entities.quests.q_willowfen_croaker.completion':
+    '橋沼鎮在這里都聽見了最后一聲蛙鳴。橋梁又屬于我們，奧利也終于能停止對蘆葦吼叫。',
+  'entities.quests.q_willowfen_croaker.objectives.0.label': '擊敗困倦巨蛙',
+  'entities.quests.q_nightbloom_vigil.title': '缺失的一顆星',
+  'entities.quests.q_nightbloom_vigil.text':
+    '奧里爾在暮野外的長明崗守望，卻連續三夜沒有星數回報。找到他，查明什么陰影讓信號沉寂。',
+  'entities.quests.q_nightbloom_vigil.completion':
+    '露瑪仍相信我的計數。幫我沿著固定夜綻夢境的錨點追蹤那顆失星。',
+  'entities.quests.q_nightbloom_vigil.objectives.0.label': '找到觀星者奧里爾',
+  'entities.quests.q_nightbloom_dream_anchors.title': '夢境之錨',
+  'entities.quests.q_nightbloom_dream_anchors.text':
+    '讀取月井、暮野和不眠古冢的月紋。若有一處映出黑暗，我們就知道失星落在何處。',
+  'entities.quests.q_nightbloom_dream_anchors.completion':
+    '古冢符文映出王冠而非星辰。舊王奪走失光，用它喚醒了自己的宮廷。',
+  'entities.quests.q_nightbloom_dream_anchors.objectives.0.label': '讀取月井夢錨',
+  'entities.quests.q_nightbloom_dream_anchors.objectives.1.label': '讀取暮野夢錨',
+  'entities.quests.q_nightbloom_dream_anchors.objectives.2.label': '讀取不眠古冢夢錨',
+  'entities.quests.q_nightbloom_barrow_crown.title': '地底王冠',
+  'entities.quests.q_nightbloom_barrow_crown.text':
+    '古冢王從夢中偷走一顆星，嵌進王冠。進入不眠古冢擊敗他，讓夜綻原再次忘記他的名字。',
+  'entities.quests.q_nightbloom_barrow_crown.completion':
+    '失去的光回到了天上。因為你走進我們不敢驚醒的地方，夜綻原再次安然入夢。',
+  'entities.quests.q_nightbloom_barrow_crown.objectives.0.label': '擊敗古冢王',
+  'entities.quests.q_wraithwood_lost_lantern.title': '失蹤的燈籠',
+  'entities.quests.q_wraithwood_lost_lantern.text':
+    '伊文去哀石禮拜堂點燈，卻沒能穿過寡婦密林。沿西路找到他，樹若叫你名字，千萬別回答。',
+  'entities.quests.q_wraithwood_lost_lantern.completion':
+    '瑪拉讓你進密林找我？你們都很勇敢。禮拜堂仍是黑的，而樹林已經注意到了。',
+  'entities.quests.q_wraithwood_lost_lantern.objectives.0.label': '找到提燈人伊文',
+  'entities.quests.q_wraithwood_lantern_walk.title': '提燈之行',
+  'entities.quests.q_wraithwood_lantern_walk.text':
+    '禮拜堂的火焰就在這盞燈里，林中每個饑餓的東西都聞得到。護送我到哀石，{playerName}，別讓它們碰到燈火。',
+  'entities.quests.q_wraithwood_lantern_walk.completion':
+    '哀石的燈重新亮了。迷失在林中的每個旅人都有了歸路，伊文也一樣。',
+  'entities.quests.q_wraithwood_lantern_walk.objectives.0.label': '護送提燈人伊文抵達哀石禮拜堂',
+  'entities.quests.q_wraithwood_last_hunt.title': '獵殺獵人',
+  'entities.quests.q_wraithwood_last_hunt.text':
+    '禮拜堂燈火引出了蒼白獵手。循著清晰的足跡向北，讓這次狩獵成為他的最后一次。',
+  'entities.quests.q_wraithwood_last_hunt.completion':
+    '空地再沒有號角回應。幽魂林終于只剩下普通的亡魂作祟。',
+  'entities.quests.q_wraithwood_last_hunt.objectives.0.label': '擊敗蒼白獵手',
+  'entities.quests.q_galecrest_beacon_orders.title': '古燈塔的命令',
+  'entities.quests.q_galecrest_beacon_orders.text':
+    '古燈塔正午自行閃亮。向東攀上燭港外的高地找到艾達，查明什么陰影喚醒了遠古光芒。',
+  'entities.quests.q_galecrest_beacon_orders.completion':
+    '佩爾從港口也看見了。風暴柱會告訴我們，警告來自海、天，還是兩者之下。',
+  'entities.quests.q_galecrest_beacon_orders.objectives.0.label': '找到燈塔守衛艾達',
+  'entities.quests.q_galecrest_storm_signals.title': '狂風中的信號',
+  'entities.quests.q_galecrest_storm_signals.text':
+    '敲響呼嘯丘、鏡湖和沉船原的風暴柱。三種音調會定位那個把溺亡船只召向海岸的東西。',
+  'entities.quests.q_galecrest_storm_signals.completion':
+    '丘地和湖畔回應清晰，沉船原則多出第四聲，像船體斷裂一樣低沉。守墓者醒了。',
+  'entities.quests.q_galecrest_storm_signals.objectives.0.label': '敲響呼嘯丘風暴柱',
+  'entities.quests.q_galecrest_storm_signals.objectives.1.label': '敲響鏡湖風暴柱',
+  'entities.quests.q_galecrest_storm_signals.objectives.2.label': '敲響沉船原風暴柱',
+  'entities.quests.q_galecrest_wreck_warden.title': '第四聲',
+  'entities.quests.q_galecrest_wreck_warden.text':
+    '沉船守衛在沙下敲響溺亡鐘聲，每場風暴都會送來更多船。去破船之間讓第四聲永遠沉默。',
+  'entities.quests.q_galecrest_wreck_warden.completion':
+    '港口鐘聲終于恢復正常。水手仍會畏懼風冠海岸，但至少死人不再為他們指路。',
+  'entities.quests.q_galecrest_wreck_warden.objectives.0.label': '擊敗沉船守衛',
+  'entities.quests.q_palmreach_green_trail.title': '綠色小徑',
+  'entities.quests.q_palmreach_green_trail.text':
+    '卡斯進入翡翠密林重開藤瀑之路。沿舊貝殼標記找到他，查明叢林為何一夜吞掉道路。',
+  'entities.quests.q_palmreach_green_trail.completion':
+    '米莉派你來的？那漂港仍需要這條路。幫我喚醒舊路標，別讓藤蔓永遠埋掉它們。',
+  'entities.quests.q_palmreach_green_trail.objectives.0.label': '找到開路者卡斯',
+  'entities.quests.q_palmreach_waymarks.title': '叢林記得的道路',
+  'entities.quests.q_palmreach_waymarks.text':
+    '解放棕櫚灘、藤瀑和藍寶石潟湖的舊路標。三座都蘇醒，安全小徑就會重新顯現。',
+  'entities.quests.q_palmreach_waymarks.completion':
+    '小徑開放了，但所有路標都轉向沉沒神像。守衛正在召回每一塊雕刻石。',
+  'entities.quests.q_palmreach_waymarks.objectives.0.label': '清理棕櫚灘路標',
+  'entities.quests.q_palmreach_waymarks.objectives.1.label': '清理藤瀑路標',
+  'entities.quests.q_palmreach_waymarks.objectives.2.label': '清理藍寶石潟湖路標',
+  'entities.quests.q_palmreach_idol_guardian.title': '神像召它們歸來',
+  'entities.quests.q_palmreach_idol_guardian.text':
+    '神像守衛正把路石從地下拔出并封閉道路。前往沉沒神殿打破它的控制，讓棕櫚之境保持與海岸相連。',
+  'entities.quests.q_palmreach_idol_guardian.completion':
+    '貝殼標記一路亮到藤瀑。棕櫚之境又有路了，漂港為此感謝你。',
+  'entities.quests.q_palmreach_idol_guardian.objectives.0.label': '擊敗神像守衛',
+  'entities.quests.q_evergarden_maze_mouth.title': '迷宮移動了',
+  'entities.quests.q_evergarden_maze_mouth.text':
+    '皮普早餐前去繪制大迷宮，晚飯時還沒回來。在迷宮入口找到他，問清所有樹籬為何傾向噴泉庭院。',
+  'entities.quests.q_evergarden_maze_mouth.completion':
+    '埃利安也發現了？那這次不是我的地圖有問題。我們需要花園三個角落的三位證人。',
+  'entities.quests.q_evergarden_maze_mouth.objectives.0.label': '找到迷宮學者皮普',
+  'entities.quests.q_evergarden_living_map.title': '三種聲音的地圖',
+  'entities.quests.q_evergarden_living_map.text':
+    '詢問雕像步道的布拉姆、野玫瑰地的烏娜和花瓣池的索爾。把三份目擊拼在一起，畫出地下移動之物。',
+  'entities.quests.q_evergarden_living_map.completion':
+    '雕像轉身、玫瑰沉默、池中多路。三條線都匯向噴泉庭院，綠籬公牛在那里掙斷了根。',
+  'entities.quests.q_evergarden_living_map.objectives.0.label': '詢問雕像守衛布拉姆',
+  'entities.quests.q_evergarden_living_map.objectives.1.label': '詢問玫瑰守衛烏娜',
+  'entities.quests.q_evergarden_living_map.objectives.2.label': '詢問池塘守衛索爾',
+  'entities.quests.q_evergarden_bull.title': '噴泉庭院的公牛',
+  'entities.quests.q_evergarden_bull.text':
+    '綠籬公牛正用活根把迷宮向內拖。進入噴泉庭院，將野獸從花園切除，讓道路重新呼吸。',
+  'entities.quests.q_evergarden_bull.completion':
+    '樹籬回到了正確位置，至少今天如此。永恒花園欠你一個寧靜的清晨。',
+  'entities.quests.q_evergarden_bull.objectives.0.label': '擊敗綠籬公牛',
+  'entities.quests.q_farshore_watch_meadow.title': '草地之外的守望',
+  'entities.quests.q_farshore_watch_meadow.text':
+    '奧倫在島嶼初裂處守望，同時聽見三道裂口歌唱。越過舊碼頭路找到他，確認哪一道會先開啟。',
+  'entities.quests.q_farshore_watch_meadow.completion':
+    '煤巖又派來一雙耳朵。最近的裂口正追隨警鐘，塔姆必須把鐘帶到我們的伏擊點。',
+  'entities.quests.q_farshore_watch_meadow.objectives.0.label': '找到裂隙守望者奧倫',
+  'entities.quests.q_farshore_ferrywalk.title': '護送警鐘',
+  'entities.quests.q_farshore_ferrywalk.text':
+    '塔姆要把警鐘從碼頭帶到草地崗哨，裂口會循聲襲來。護送守鐘人，擋住伏擊，把警告安全送入陷阱。',
+  'entities.quests.q_farshore_ferrywalk.completion':
+    '鐘已就位，裂口也露出了牙。現在我知道該先封哪道傷痕，以及什么在守護它。',
+  'entities.quests.q_farshore_ferrywalk.objectives.0.label': '護送守鐘人塔姆抵達草地崗哨',
+  'entities.quests.q_farshore_horror.title': '裂岸恐魔',
+  'entities.quests.q_farshore_horror.text':
+    '鐘聲引出了懸崖裂口的主人，那是裂隙吞噬之物縫成的恐魔。在裂岸懸崖獵殺它，再告訴煤巖島岸仍值得守護。',
+  'entities.quests.q_farshore_horror.completion':
+    '我們從鷗港聽見裂口閉合。遠岸島仍有傷，但今天終于止血了。謝謝你，{playerName}。',
+  'entities.quests.q_farshore_horror.objectives.0.label': '擊敗裂岸恐魔',
+  'entities.items.frostveil_cairn_tarn.name': '冰湖守護石堆',
+  'entities.items.frostveil_cairn_fen.name': '寒沼守護石堆',
+  'entities.items.frostveil_cairn_terrace.name': '臺地守護石堆',
+  'entities.items.amberfall_lantern_orchard.name': '果園豐收燈',
+  'entities.items.amberfall_lantern_mere.name': '大沼豐收燈',
+  'entities.items.amberfall_lantern_monolith.name': '石碑豐收燈',
+  'entities.items.willowfen_marker_bogshine.name': '沼光蘆葦路標',
+  'entities.items.willowfen_marker_willowweep.name': '泣柳蘆葦路標',
+  'entities.items.willowfen_marker_drowsy.name': '困倦灘蘆葦路標',
+  'entities.items.nightbloom_anchor_moonwell.name': '月井夢錨',
+  'entities.items.nightbloom_anchor_gloamfield.name': '暮野夢錨',
+  'entities.items.nightbloom_anchor_barrow.name': '古冢夢錨',
+  'entities.items.galecrest_signal_downs.name': '丘地風暴柱',
+  'entities.items.galecrest_signal_tarn.name': '鏡湖風暴柱',
+  'entities.items.galecrest_signal_wrecks.name': '沉船原風暴柱',
+  'entities.items.palmreach_waymark_strand.name': '棕櫚灘路標',
+  'entities.items.palmreach_waymark_vinefall.name': '藤瀑路標',
+  'entities.items.palmreach_waymark_lagoon.name': '潟湖路標',
   'hudChrome.professions.skillValue': '{skill} / {max}',
 };
