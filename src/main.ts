@@ -141,6 +141,7 @@ import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
 import { presentationGate } from './game/presentation_gate';
+import { PokerPlaytestSession } from './game/poker_playtest_session';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
 import {
@@ -1535,6 +1536,7 @@ async function startGame(
       dailyRewardsEnabled: NATIVE_APP ? await walletCapabilityReady : true,
       devCommandsEnabled: import.meta.env.DEV,
       constrainedMemory: GFX.constrainedMemory,
+      pokerPlaytest: new PokerPlaytestSession(world.player.name),
     });
     mapMarkerPaletteLifecycle = installMapMarkerPaletteLifecycle(window, () =>
       hud.refreshMapMarkerArtPalette(),

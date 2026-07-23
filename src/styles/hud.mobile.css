@@ -3045,6 +3045,7 @@
   body.mobile-touch #dungeon-finder-window,
   body.mobile-touch #valecup-window,
   body.mobile-touch #card-duel-window,
+  body.mobile-touch #poker-playtest-window,
   body.mobile-touch #delve-board,
   body.mobile-touch #leaderboard-window,
   body.mobile-touch #loot-settings-window,
@@ -3058,6 +3059,10 @@
     transform: none;
     box-sizing: border-box;
     overflow-y: auto;
+  }
+  body.mobile-touch #poker-playtest-window .poker-action,
+  body.mobile-touch #poker-playtest-window .poker-reset {
+    min-height: 40px;
   }
   body.mobile-touch #dev-command-window {
     height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);

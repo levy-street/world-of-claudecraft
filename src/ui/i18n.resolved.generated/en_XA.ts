@@ -340,6 +340,40 @@ export const en_XA: EnTranslations = {
     "comboMeter": {
       "label": "[ÇÞ]"
     },
+    "pokerPlaytest": {
+      "title": "[Þóķéŕ]",
+      "close": "[Çļóšé Þóķéŕ]",
+      "note": "[Ļóçáļ þļáýţéšţ çĥíþš óñļý. Ñó Çóþþéŕ óŕ áççóúñţ ʋáļúé íš úšéð.]",
+      "chips": "[{amount} çĥíþš]",
+      "pot": "[Þóţ: {amount}]",
+      "noCards": "[Ñó çáŕðš]",
+      "emptySeat": "[Óþéñ]",
+      "dealerButton": "[Ðéáļéŕ ƀúţţóñ]",
+      "smallBlind": "[Šɱáļļ ƀļíñð]",
+      "bigBlind": "[Ɓíĝ ƀļíñð]",
+      "yourTurn": "[Ýóúŕ ţúŕñ]",
+      "dealerTurn": "[Ðéáļéŕ ţúŕñ]",
+      "handOver": "[Ĥáñð óʋéŕ. Ýóú ŕéçéíʋéð {amount} çĥíþš.]",
+      "winner": "[{name} Ŵóñ +{amount}]",
+      "nextRoundSoon": "[Ñéẋţ ĥáñð šţáŕţíñĝ...]",
+      "nextHand": "[Ñéẋţ ĥáñð]",
+      "reset": "[Ŕéšéţ çĥíþš]",
+      "actionWithAmount": "[{action} {amount}]",
+      "action": {
+        "fold": "[Ƒóļð]",
+        "check": "[Çĥéçķ]",
+        "call": "[Çáļļ]",
+        "bet": "[Ɓéţ]",
+        "raise": "[Ŕáíšé]",
+        "all-in": "[Áļļ-íñ]"
+      },
+      "street": {
+        "preflop": "[Þŕé-ƒļóþ]",
+        "flop": "[Ƒļóþ]",
+        "turn": "[Ţúŕñ]",
+        "river": "[Ŕíʋéŕ]"
+      }
+    },
     "spectate": {
       "banner": "[Šþéçţáţíñĝ {name}]"
     },

@@ -340,6 +340,40 @@ export const zh_CN: EnTranslations = {
     "comboMeter": {
       "label": "连击点"
     },
+    "pokerPlaytest": {
+      "title": "Poker",
+      "close": "Close Poker",
+      "note": "Local playtest chips only. No Copper or account value is used.",
+      "chips": "{amount} chips",
+      "pot": "Pot: {amount}",
+      "noCards": "No cards",
+      "emptySeat": "Open",
+      "dealerButton": "Dealer button",
+      "smallBlind": "Small blind",
+      "bigBlind": "Big blind",
+      "yourTurn": "Your turn",
+      "dealerTurn": "Dealer turn",
+      "handOver": "Hand over. You received {amount} chips.",
+      "winner": "{name} Won +{amount}",
+      "nextRoundSoon": "Next hand starting...",
+      "nextHand": "Next hand",
+      "reset": "Reset chips",
+      "actionWithAmount": "{action} {amount}",
+      "action": {
+        "fold": "Fold",
+        "check": "Check",
+        "call": "Call",
+        "bet": "Bet",
+        "raise": "Raise",
+        "all-in": "All-in"
+      },
+      "street": {
+        "preflop": "Pre-flop",
+        "flop": "Flop",
+        "turn": "Turn",
+        "river": "River"
+      }
+    },
     "spectate": {
       "banner": "正在观察 {name}"
     },

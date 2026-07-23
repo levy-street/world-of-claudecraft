@@ -182,6 +182,7 @@ import { blockLandingLogKey } from './block_landing_feedback_core';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
+import { type PokerPlaytestPort, PokerPlaytestWindow } from './poker_playtest_window';
 import { charBagsPaired } from './char_bags_pairing_core';
 import { charSheetRefreshSig } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
@@ -859,6 +860,7 @@ export interface HudFeatures {
   dailyRewardsEnabled: boolean;
   devCommandsEnabled?: boolean;
   constrainedMemory?: boolean;
+  pokerPlaytest?: PokerPlaytestPort;
 }
 
 export interface BugReportPayload {
@@ -2089,6 +2091,20 @@ export class Hud {
       ownAuraLabel: () => t('hudChrome.targetAuras.ownAura'),
       opacityLabel: (percent) => t('hudChrome.targetAuras.opacity', { percent }),
     });
+    this.pokerPlaytestWindow = features.pokerPlaytest
+      ? new PokerPlaytestWindow({
+          root: () => $('#poker-playtest-window'),
+          session: features.pokerPlaytest,
+          closeOthers: () => this.closeOtherWindows('#poker-playtest-window'),
+          sound: {
+            deal: () => audio.cardShuffle(),
+            turn: () => audio.cardReveal(),
+          },
+          schedule: (callback, delayMs) => window.setTimeout(callback, delayMs),
+          cancelSchedule: (id) => window.clearTimeout(id),
+          ...this.windowFocus('#poker-playtest-window'),
+        })
+      : null;
     this.actionBarController = new ActionBarController({
       storage: localStorage,
       playerClass: this.sim.cfg.playerClass,
@@ -2982,6 +2998,7 @@ export class Hud {
     $('#mm-dfinder').addEventListener('click', () => this.toggleDungeonFinder());
     $('#mm-valecup').addEventListener('click', () => this.toggleValeCup());
     $('#mm-cardduel').addEventListener('click', () => this.toggleCardDuel());
+    $('#mm-poker')?.addEventListener('click', () => this.togglePokerPlaytest());
     $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
     $('#mm-discord')?.addEventListener('click', () => this.discordHook?.());
     const emoteBtn = $('#mm-emote');
@@ -3493,6 +3510,9 @@ export class Hud {
       case 'card-duel-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.cardDuelWindow.close();
+        break;
+      case 'poker-playtest-window':
+        this.pokerPlaytestWindow?.close();
         break;
       case 'vendor-window':
         this.closeVendor();
@@ -4944,6 +4964,7 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#card-duel-window'),
     ...this.windowFocus('#card-duel-window'),
   });
+  private readonly pokerPlaytestWindow: PokerPlaytestWindow | null;
   // Persistent Vale Cup indicator button (queued / live-at-the-Sowfield states;
   // hidden inside my own match). Never tier-shed: queue position and the live
   // score are information, not cosmetics (gameplay-neutral graphics invariant).
@@ -10747,6 +10768,10 @@ export class Hud {
 
   toggleCardDuel(): void {
     this.cardDuelWindow.toggle();
+  }
+
+  togglePokerPlaytest(): void {
+    this.pokerPlaytestWindow?.toggle();
   }
 
   /** Offline builds enable the Vale Cup practice-vs-bots button (main.ts). */
