@@ -2772,8 +2772,13 @@
      (the reviewed regression on PR #2107: RARITY clipped, zero listings visible).
      Scroll the WHOLE sheet instead of clipping: overflow-y:auto here lets tabs,
      controls, and the listing body scroll together as one column, so nothing
-     under the fold is ever unreachable. */
+     under the fold is ever unreachable. height: auto releases the desktop
+     height: min(640px, ...) clamp (components.css) here too, not only in the
+     docked pairing below: the mobile sheet owns its height on every arm, so
+     the desktop clamp can never mis-size the sheet against the viewport (the
+     mailbox/calendar tall-list rule below makes the same move). */
   body.mobile-touch #market-window {
+    height: auto;
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     overflow-y: auto;
     overflow-x: hidden;
@@ -3481,8 +3486,16 @@
     overflow: hidden;
     z-index: 95;
   }
+  /* The paired-geometry box the bank AND market clusters share on touch (the
+     market copied the bank's desktop dock, body.market-open in components.css,
+     so it needs the same mobile neutralizer): full height above the 72px tray
+     reservation, with every desktop docking property (the translateX
+     transforms, the width/max-width/max-height clamps) overridden; the
+     hud-mobile layer outranks components, so these declarations win. */
   body.mobile-touch.bank-open #bank-window,
-  body.mobile-touch.bank-open #bags {
+  body.mobile-touch.bank-open #bags,
+  body.mobile-touch.market-open #market-window,
+  body.mobile-touch.market-open #bags {
     position: fixed;
     top: max(10px, env(safe-area-inset-top));
     bottom: calc(72px + env(safe-area-inset-bottom));
@@ -3505,7 +3518,8 @@
     border-bottom-right-radius: 0;
     border-right-width: 1px;
   }
-  body.mobile-touch.bank-open #bags {
+  body.mobile-touch.bank-open #bags,
+  body.mobile-touch.market-open #bags {
     left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
     right: max(10px, env(safe-area-inset-right));
     overflow: hidden;
@@ -3514,7 +3528,9 @@
     border-left: 0;
   }
   body.mobile-touch.bank-open #bank-window .panel-title,
-  body.mobile-touch.bank-open #bags .panel-title {
+  body.mobile-touch.bank-open #bags .panel-title,
+  body.mobile-touch.market-open #market-window .panel-title,
+  body.mobile-touch.market-open #bags .panel-title {
     height: 47px;
     min-height: 47px;
     padding-bottom: 6px;
@@ -3527,21 +3543,43 @@
   body.mobile-touch.bank-open #bank-window .panel-title .x-btn {
     display: none;
   }
+  /* Market LEFT half of the pairing (bags RIGHT is the shared rule above).
+     Unlike the bank (an internal .bank-scroll scroller behind overflow:hidden),
+     the market keeps its whole-sheet scroll model (PR #2107, see the
+     body.mobile-touch #market-window rationale above): the window itself is the
+     scroller, so height: auto releases the desktop 640px height clamp
+     (components.css) and lets the paired top/bottom pins size the sheet;
+     without it that clamp leaked through (the sheet base never declared
+     height) and squeezed the listings to a clipped sliver. The market keeps
+     its own x-btn: bags is an optional Sell-tab companion here (closing the
+     market deliberately leaves bags open), not the cluster's single close
+     control like the bank's. */
+  body.mobile-touch.market-open #market-window {
+    left: max(10px, env(safe-area-inset-left));
+    right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
+    height: auto;
+    overflow-y: auto;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 1px;
+  }
   /* Short landscape phones: the six category chips wrap to two rows at half-viewport
      width and eat the grid (a sub-row sliver at 360px tall). Keep them one
-     horizontally scrollable row INSIDE the bank cluster only (both panels, so the
-     pair stays visually consistent; the vendor cluster and standalone bags keep the
-     family wrap). Nothing is hidden: every chip stays reachable by scroll and keeps
-     its full tap height. */
+     horizontally scrollable row inside the bank AND market clusters (both panels, so
+     each pair stays visually consistent; the vendor cluster and standalone bags keep
+     the family wrap). Nothing is hidden: every chip stays reachable by scroll and
+     keeps its full tap height. */
   body.mobile-touch #bank-window .bag-chips,
-  body.mobile-touch.bank-open #bags .bag-chips {
+  body.mobile-touch.bank-open #bags .bag-chips,
+  body.mobile-touch.market-open #bags .bag-chips {
     flex-wrap: nowrap;
     overflow-x: auto;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
   }
   body.mobile-touch #bank-window .bag-chip,
-  body.mobile-touch.bank-open #bags .bag-chip {
+  body.mobile-touch.bank-open #bags .bag-chip,
+  body.mobile-touch.market-open #bags .bag-chip {
     flex: 0 0 auto;
   }
   /* Short landscape phones: the 50/50 pairing box (viewport minus the 10px top

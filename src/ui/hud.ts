@@ -2412,6 +2412,7 @@ export class Hud {
         !!charWindow && this.isWindowVisible(charWindow),
         document.body.classList.contains('vendor-open'),
         document.body.classList.contains('bank-open'),
+        document.body.classList.contains('market-open'),
         document.body.classList.contains('char-bags-paired'),
       ),
     );
@@ -11878,6 +11879,16 @@ export class Hud {
     if (document.body.classList.contains('mobile-touch') && this.bankWindow.isOpen) {
       document.body.classList.remove('bank-open');
     }
+    // The market cluster undocks the same way: a bags-only close (the bags x-btn
+    // or the tray toggle; the market keeps its own x-btn, bags is only its
+    // optional Sell-tab companion) must not leave the still-open market pinned
+    // to the left half of the mobile 50/50 pairing with nothing on the right.
+    // Dropping the class lets the standalone mobile sheet rule take the full
+    // width back; mobile-only exactly like the bank arm above (desktop
+    // deliberately keeps the docked offset until the market closes).
+    if (document.body.classList.contains('mobile-touch') && this.marketWindow.isOpen) {
+      document.body.classList.remove('market-open');
+    }
     // The char-sheet companion undocks too: with the bags gone the sheet takes the
     // full screen back rather than staying a half-width orphan.
     this.syncCharBagsPairing();
@@ -12006,6 +12017,9 @@ export class Hud {
     // onBagsClosed drops the class while the bank stays up; idempotent on desktop,
     // which never undocks).
     if (this.bankWindow.isOpen) document.body.classList.add('bank-open');
+    // Re-dock the market pairing the same way (its mobile undock in onBagsClosed
+    // mirrors the bank's; idempotent on desktop, which never undocks).
+    if (this.marketWindow.isOpen) document.body.classList.add('market-open');
     // Dock the char-sheet pairing when its companion opens (the touch cluster).
     this.syncCharBagsPairing();
     audio.bagOpen();
@@ -12097,6 +12111,7 @@ export class Hud {
       bagsShown: bagsWindowShown($('#bags').style.display),
       bankOpen: this.bankWindow.isOpen,
       vendorOpen: this.vendorOpen,
+      marketOpen: this.marketWindow.isOpen,
     });
     document.body.classList.toggle('char-bags-paired', paired);
   }

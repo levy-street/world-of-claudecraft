@@ -1841,8 +1841,11 @@ describe('client HTML shell', () => {
     // reach it. The window now scrolls the whole sheet (tabs, controls, and the
     // listing body together) instead of clipping, and #market-body sizes to its
     // natural content height rather than flexing to fill a fixed remainder.
+    // height: auto releases the desktop height clamp on the mobile sheet's
+    // standalone arm too (the market docking pair's mobile fix), so the sheet
+    // owns its height on every arm rather than inheriting min(640px, ...).
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #market-window {\n    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);\n    overflow-y: auto;\n    overflow-x: hidden;',
+      'body.mobile-touch #market-window {\n    height: auto;\n    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);\n    overflow-y: auto;\n    overflow-x: hidden;',
     );
     expect(hudMobileCss).toContain(
       'body.mobile-touch #market-body {\n    flex: none;\n    overflow-y: visible;\n    min-height: 0;',
