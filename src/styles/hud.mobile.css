@@ -1607,6 +1607,14 @@
     align-items: center;
     font-size: 16px;
   }
+  /* The system-filter toggle is hidden off the All view via
+     .chat-tab-sysfilter-hidden (JS toggles it, base rule in hud.css @layer
+     components). That earlier layer loses to the display: inline-flex above, so
+     mirror the hide here. The extra .chat-tab class outranks the base rule, so
+     this wins independent of source order. Pinned by tests/chat_tab_strip.test.ts. */
+  body.mobile-touch .chat-tab.chat-tab-sysfilter-hidden {
+    display: none;
+  }
   body.mobile-touch .chat-tab-add {
     min-width: 40px;
     justify-content: center;

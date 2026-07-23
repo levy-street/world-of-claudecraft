@@ -1998,10 +1998,19 @@
     font-size: 12px;
     text-shadow: 1px 1px 1px #000;
   }
-  .chat-tab.active {
+  .chat-tab.active,
+  .chat-tab-sysfilter[aria-pressed="true"] {
     color: var(--gold);
     border-color: #6f5a2a;
     background: linear-gradient(#2a2436, #161220);
+  }
+  /* The system-filter toggle rides just left of the "+" button; only relevant on
+     the All view, so hidden on the channel tabs (JS toggles the class). This lives
+     in @layer components; body.mobile-touch .chat-tab (display: inline-flex) sits in
+     the later @layer hud-mobile and would beat this hide there, so hud.mobile.css
+     mirrors it (same hazard the #chat-dismiss rule documents). */
+  .chat-tab-sysfilter-hidden {
+    display: none;
   }
   /* "add channel" (+) tab: square, icon-only, slightly de-emphasised. Sticks to
      the right edge so it stays inline and reachable even when the tabs scroll. */

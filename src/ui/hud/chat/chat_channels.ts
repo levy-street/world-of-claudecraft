@@ -224,6 +224,25 @@ export function sentLineTargetForHost(
   return sentLineTarget(line);
 }
 
+// The chat-log line visibility rule, shared by the per-channel tab filter and
+// the All-tab "hide system lines" toggle. `filterTab` is the active FILTER tab:
+// null for the built-in All/combat views (see chatFilterTab in the chat window
+// controller), else the bound channel a tab shows exclusively. `hideSystem` is
+// the All-tab opt-in that drops system/event lines (chan 'system': loot, XP,
+// zone welcome, quest/system notices) so player chat reads clean.
+//   - A channel-bound tab shows ONLY lines on that channel (chan === filterTab);
+//     hideSystem is irrelevant there (its own filter already excludes 'system').
+//   - The All view (filterTab null) shows everything, EXCEPT the system/event
+//     lines once hideSystem is on. Player-channel lines always stay visible.
+export function chatLineVisible(
+  filterTab: ChatOpenTab | null,
+  chan: string,
+  hideSystem: boolean,
+): boolean {
+  if (filterTab !== null) return chan === filterTab;
+  return !(hideSystem && chan === 'system');
+}
+
 // Persistence: the ordered list of channel tabs the player has opened. The
 // built-in `all` / `combat` views are implicit and not stored. Parsing is
 // defensive: unknown, duplicate, or malformed entries are dropped so a corrupt

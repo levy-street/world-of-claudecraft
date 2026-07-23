@@ -719,6 +719,9 @@ export const pl_PL: EnTranslations = {
       "clock24h": "24-godzinny",
       "note": "Poprzedza każdą nową linię czatu godziną jej nadejścia, np. [14:32]. Dotyczy tylko wiadomości odebranych przy włączonej opcji."
     },
+    "chatFilter": {
+      "chatOnly": "Chat Only"
+    },
     "chatWindow": {
       "move": "Przeciągnij, aby przesunąć okno czatu",
       "resize": "Przeciągnij, aby zmienić rozmiar okna czatu",

@@ -719,6 +719,9 @@ export const de_DE: EnTranslations = {
       "clock24h": "24-Stunden",
       "note": "Stellt jeder neuen Chatzeile die Uhrzeit ihres Eintreffens voran, z. B. [14:32]. Betrifft nur Nachrichten, die bei aktivierter Option empfangen werden."
     },
+    "chatFilter": {
+      "chatOnly": "Chat Only"
+    },
     "chatWindow": {
       "move": "Ziehen, um das Chatfenster zu verschieben",
       "resize": "Ziehen, um die Größe des Chatfensters zu ändern",

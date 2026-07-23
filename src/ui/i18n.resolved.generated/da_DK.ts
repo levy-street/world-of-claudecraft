@@ -719,6 +719,9 @@ export const da_DK: EnTranslations = {
       "clock24h": "24-timers",
       "note": "Sætter klokkeslættet for ankomst foran hver ny chatlinje, f.eks. [14:32]. Påvirker kun beskeder modtaget, mens indstillingen er slået til."
     },
+    "chatFilter": {
+      "chatOnly": "Chat Only"
+    },
     "chatWindow": {
       "move": "Træk for at flytte chatvinduet",
       "resize": "Træk for at ændre størrelse på chatvinduet",

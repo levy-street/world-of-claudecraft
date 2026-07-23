@@ -719,6 +719,9 @@ export const cs_CZ: EnTranslations = {
       "clock24h": "24hodinový",
       "note": "Přidá před každý nový řádek chatu čas, kdy dorazil, např. [14:32]. Ovlivní jen zprávy přijaté při zapnuté volbě."
     },
+    "chatFilter": {
+      "chatOnly": "Chat Only"
+    },
     "chatWindow": {
       "move": "Tažením přesuneš okno chatu",
       "resize": "Tažením změníš velikost okna chatu",

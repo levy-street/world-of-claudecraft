@@ -5,6 +5,7 @@ import {
   channelSendPrefix,
   chatChannelColor,
   chatInputTint,
+  chatLineVisible,
   chatOpenTabLabelKey,
   composeChatLine,
   composeWhisperReply,
@@ -349,5 +350,37 @@ describe('chat channel tabs — pure model', () => {
         }
       }
     });
+  });
+});
+
+describe('chatLineVisible: All-tab system filter + per-channel filter', () => {
+  it('on the All view with the toggle OFF, every line is visible (classic behavior)', () => {
+    // filterTab null = the All view. Nothing is ever hidden when hideSystem is off,
+    // including the system/event lines, matching the pre-toggle behavior exactly.
+    expect(chatLineVisible(null, 'system', false)).toBe(true);
+    expect(chatLineVisible(null, 'say', false)).toBe(true);
+    expect(chatLineVisible(null, 'party', false)).toBe(true);
+    expect(chatLineVisible(null, 'whisper', false)).toBe(true);
+  });
+
+  it('on the All view with the toggle ON, system lines hide but player chat stays', () => {
+    // Only chan 'system' (loot, XP, zone welcome, quest/system notices) is dropped;
+    // every real player channel remains visible so the All tab is still the catch-all.
+    expect(chatLineVisible(null, 'system', true)).toBe(false);
+    expect(chatLineVisible(null, 'say', true)).toBe(true);
+    expect(chatLineVisible(null, 'party', true)).toBe(true);
+    expect(chatLineVisible(null, 'general', true)).toBe(true);
+    expect(chatLineVisible(null, 'whisper', true)).toBe(true);
+  });
+
+  it('a channel tab shows only its own channel, regardless of the system toggle', () => {
+    // A bound tab (filterTab === channel) filters to that channel exactly; the All-tab
+    // toggle is irrelevant here (the channel filter already excludes 'system').
+    expect(chatLineVisible('party', 'party', false)).toBe(true);
+    expect(chatLineVisible('party', 'party', true)).toBe(true);
+    expect(chatLineVisible('party', 'say', false)).toBe(false);
+    expect(chatLineVisible('party', 'say', true)).toBe(false);
+    expect(chatLineVisible('party', 'system', false)).toBe(false);
+    expect(chatLineVisible('party', 'system', true)).toBe(false);
   });
 });

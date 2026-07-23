@@ -5299,6 +5299,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.charSheet.defense'
   | 'hudChrome.charSheet.offense'
   | 'hudChrome.character.modelPreview'
+  | 'hudChrome.chatFilter.chatOnly'
   | 'hudChrome.chatTimestamps.clock12h'
   | 'hudChrome.chatTimestamps.clock24h'
   | 'hudChrome.chatTimestamps.format'

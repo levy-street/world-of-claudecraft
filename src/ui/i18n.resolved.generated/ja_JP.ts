@@ -719,6 +719,9 @@ export const ja_JP: EnTranslations = {
       "clock24h": "24時間表記",
       "note": "新しいチャット行の先頭に受信時刻を付けます（例：[14:32]）。この設定がオンの間に受信したメッセージにのみ適用されます。"
     },
+    "chatFilter": {
+      "chatOnly": "Chat Only"
+    },
     "chatWindow": {
       "move": "ドラッグでチャットウィンドウを移動",
       "resize": "ドラッグでチャットウィンドウのサイズを変更",

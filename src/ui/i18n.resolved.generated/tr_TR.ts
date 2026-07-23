@@ -719,6 +719,9 @@ export const tr_TR: EnTranslations = {
       "clock24h": "24 saat",
       "note": "Her yeni sohbet satırının başına geldiği saati ekler, örn. [14:32]. Yalnızca seçenek açıkken alınan mesajları etkiler."
     },
+    "chatFilter": {
+      "chatOnly": "Chat Only"
+    },
     "chatWindow": {
       "move": "Sohbet penceresini taşımak için sürükleyin",
       "resize": "Sohbet penceresini yeniden boyutlandırmak için sürükleyin",

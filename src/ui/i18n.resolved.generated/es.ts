@@ -719,6 +719,9 @@ export const es: EnTranslations = {
       "clock24h": "24 horas",
       "note": "Antepone a cada nueva línea de chat la hora en que llegó, p. ej. [14:32]. Solo afecta a los mensajes recibidos mientras la opción está activada."
     },
+    "chatFilter": {
+      "chatOnly": "Chat Only"
+    },
     "chatWindow": {
       "move": "Arrastra para mover la ventana de chat",
       "resize": "Arrastra para cambiar el tamaño de la ventana de chat",

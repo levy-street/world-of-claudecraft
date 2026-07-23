@@ -719,6 +719,9 @@ export const nl_NL: EnTranslations = {
       "clock24h": "24-uurs",
       "note": "Zet voor elke nieuwe chatregel de tijd waarop deze binnenkwam, bijv. [14:32]. Heeft alleen invloed op berichten die binnenkomen terwijl de optie aanstaat."
     },
+    "chatFilter": {
+      "chatOnly": "Chat Only"
+    },
     "chatWindow": {
       "move": "Sleep om het chatvenster te verplaatsen",
       "resize": "Sleep om het chatvenster te vergroten of verkleinen",
