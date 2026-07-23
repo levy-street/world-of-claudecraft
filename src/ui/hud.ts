@@ -11604,6 +11604,7 @@ export class Hud {
         this.sim.craftSkills,
         this.sim.craftingIdentity,
         inRangeStations,
+        this.sim.player.name,
       ),
       {
         ...this.presentationBag,

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { archetypeCeilingFor } from '../src/sim/professions/archetype';
+import { requiredReagentCount } from '../src/sim/professions/crafting';
 import type { StationType } from '../src/sim/professions/stations';
 import { stationTypeForCraft } from '../src/sim/professions/stations';
 import {
@@ -10,6 +11,7 @@ import {
   tierForSkill,
   tierProgressMultiplier,
 } from '../src/sim/professions/wheel';
+import type { PlayerMeta } from '../src/sim/sim';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import {
   buildCraftingView,
@@ -103,6 +105,132 @@ describe('buildCraftingView', () => {
     buildCraftingView(recipes, inventory, items);
     expect(JSON.stringify(inventory)).toBe(inventorySnapshot);
     expect(JSON.stringify(recipes)).toBe(recipesSnapshot);
+  });
+});
+
+// The reagent line shows and gates on the DISCOUNTED requirement the sim
+// actually charges (requiredReagentCount: the #1145 self-signed reduction
+// composed with the #1134 specialization discount), never the raw listed
+// count, so the window can neither overstate the cost nor block a craft the
+// server would accept.
+describe('buildCraftingView discounted reagent requirements (#1134/#1145)', () => {
+  const PLAYER = 'Testchar';
+  // PERK_THRESHOLDS: specialization at skill 75, materialDiscountPct 0.2.
+  const specializedSkills = { cooking: 75 };
+  const noIdentity: CraftingIdentityLike = {
+    synced: true,
+    activeArchetype: null,
+    pairedMajor: null,
+    hobbyCraft: null,
+  };
+
+  function reagentRow(
+    listed: number,
+    inventory: InvSlot[],
+    craftSkills: Record<string, number>,
+    playerName?: string,
+  ) {
+    const items = table(item('bone_fragments'), item('recipe_disc_result'));
+    const view = buildCraftingView(
+      [recipe('recipe_disc', [{ itemId: 'bone_fragments', count: listed }])],
+      inventory,
+      items,
+      craftSkills,
+      noIdentity,
+      new Set<StationType>(),
+      playerName,
+    );
+    return { row: view.recipes[0], reagent: view.recipes[0].reagents[0] };
+  }
+
+  it('a specialized crafter sees the discounted requirement and the row gates on it (listed 4 shows 3)', () => {
+    // Holding exactly the discounted amount: the raw-count view says short
+    // (3 < 4) and disables Craft; the sim charges 3 and would accept. This is
+    // the red case the fix exists for.
+    const inventory: InvSlot[] = [{ itemId: 'bone_fragments', count: 3 }];
+    const { row, reagent } = reagentRow(4, inventory, specializedSkills, PLAYER);
+    expect(reagent).toMatchObject({ required: 3, have: 3, satisfied: true });
+    expect(row.craftable).toBe(true);
+  });
+
+  it('the specialization discount applies even when no player name is passed', () => {
+    // No name only disables the SELF-SIGNED check; the #1134 discount reads
+    // craftSkills alone and must still show.
+    const inventory: InvSlot[] = [{ itemId: 'bone_fragments', count: 3 }];
+    const { row, reagent } = reagentRow(4, inventory, specializedSkills);
+    expect(reagent).toMatchObject({ required: 3, satisfied: true });
+    expect(row.craftable).toBe(true);
+  });
+
+  it('a listed count of 1 floors at required 1 under every discount', () => {
+    const signed: InvSlot[] = [
+      { itemId: 'bone_fragments', count: 1, instance: { signer: PLAYER } },
+    ];
+    expect(reagentRow(1, signed, specializedSkills, PLAYER).reagent.required).toBe(1);
+    expect(reagentRow(1, signed, {}, PLAYER).reagent.required).toBe(1);
+    expect(
+      reagentRow(1, [{ itemId: 'bone_fragments', count: 1 }], specializedSkills, PLAYER).reagent
+        .required,
+    ).toBe(1);
+  });
+
+  it('a self-signed instance of the reagent reduces required by 1; another name does not', () => {
+    const selfSigned: InvSlot[] = [
+      { itemId: 'bone_fragments', count: 4, instance: { signer: PLAYER } },
+    ];
+    expect(reagentRow(4, selfSigned, {}, PLAYER).reagent.required).toBe(3);
+    // Someone ELSE's signed material behaves like a plain unsigned one.
+    const otherSigned: InvSlot[] = [
+      { itemId: 'bone_fragments', count: 4, instance: { signer: 'Someoneelse' } },
+    ];
+    expect(reagentRow(4, otherSigned, {}, PLAYER).reagent.required).toBe(4);
+  });
+
+  it('both discounts compose: listed 4, self-signed to 3, times 0.8 floors to 2', () => {
+    const selfSigned: InvSlot[] = [
+      { itemId: 'bone_fragments', count: 2, instance: { signer: PLAYER } },
+    ];
+    const { row, reagent } = reagentRow(4, selfSigned, specializedSkills, PLAYER);
+    expect(reagent).toMatchObject({ required: 2, have: 2, satisfied: true });
+    expect(row.craftable).toBe(true);
+  });
+
+  it('non-specialized with no self-signed material: required equals the listed count', () => {
+    const inventory: InvSlot[] = [{ itemId: 'bone_fragments', count: 3 }];
+    const { row, reagent } = reagentRow(4, inventory, { cooking: 74 }, PLAYER);
+    expect(reagent).toMatchObject({ required: 4, have: 3, satisfied: false });
+    expect(row.craftable).toBe(false);
+  });
+
+  it('divergence guard: the view required equals the sim requiredReagentCount for identical inputs', () => {
+    const cases: { listed: number; inventory: InvSlot[]; skills: Record<string, number> }[] = [
+      { listed: 4, inventory: [{ itemId: 'bone_fragments', count: 3 }], skills: specializedSkills },
+      {
+        listed: 4,
+        inventory: [{ itemId: 'bone_fragments', count: 4, instance: { signer: PLAYER } }],
+        skills: {},
+      },
+      {
+        listed: 4,
+        inventory: [{ itemId: 'bone_fragments', count: 2, instance: { signer: PLAYER } }],
+        skills: specializedSkills,
+      },
+      { listed: 1, inventory: [{ itemId: 'bone_fragments', count: 1 }], skills: specializedSkills },
+      { listed: 5, inventory: [], skills: {} },
+    ];
+    for (const c of cases) {
+      const meta = { name: PLAYER, inventory: c.inventory } as unknown as PlayerMeta;
+      const simRequired = requiredReagentCount(
+        meta,
+        { itemId: 'bone_fragments', count: c.listed },
+        c.skills,
+        'cooking',
+      ).count;
+      const { reagent } = reagentRow(c.listed, c.inventory, c.skills, PLAYER);
+      expect(reagent.required, `listed ${c.listed} skills ${JSON.stringify(c.skills)}`).toBe(
+        simRequired,
+      );
+    }
   });
 });
 

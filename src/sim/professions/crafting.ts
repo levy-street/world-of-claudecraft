@@ -73,7 +73,7 @@ import { recipeById } from '../content/recipes';
 import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import type { ItemDef, ItemInstancePayload } from '../types';
+import type { InvSlot, ItemDef, ItemInstancePayload } from '../types';
 import { recordAction, withinActionThrottle } from './action_throttle';
 import { archetypeCeilingFor, craftSkillGainMultiplier } from './archetype';
 import { comboEligibility } from './combo_eligibility';
@@ -204,10 +204,23 @@ export function acquireRecipeForRecipe(
   return { ok: true, recipeId };
 }
 
+/** Whether `inventory` holds a slot for `itemId` carrying a signed instance
+ *  stamped with `playerName` (a self-gathered signed material). The
+ *  host-agnostic form of the #1145 self-signed predicate: no PlayerMeta, so
+ *  the crafting window's view core (src/ui/crafting_view.ts) consumes the
+ *  SAME check the sim charges by, and the two can never diverge. */
+export function holdsSelfSignedInstance(
+  inventory: readonly InvSlot[],
+  playerName: string,
+  itemId: string,
+): boolean {
+  return inventory.some((s) => s.itemId === itemId && s.instance?.signer === playerName);
+}
+
 /** Whether `meta` holds an inventory slot for `itemId` carrying a signed
  *  instance stamped with `meta`'s OWN name (a self-gathered signed material). */
 function hasSelfSignedInstance(meta: PlayerMeta, itemId: string): boolean {
-  return meta.inventory.some((s) => s.itemId === itemId && s.instance?.signer === meta.name);
+  return holdsSelfSignedInstance(meta.inventory, meta.name, itemId);
 }
 
 /** Whether `meta` holds an inventory slot for `itemId` carrying a signed
@@ -243,10 +256,29 @@ export function requiredReagentCount(
   craftSkills: CraftSkillState,
   professionId: string,
 ): RequiredReagentResult {
-  const afterSelfSigned =
-    meta && hasSelfSignedInstance(meta, reagent.itemId)
-      ? Math.max(1, reagent.count - 1)
-      : reagent.count;
+  return requiredReagentCountFor(
+    !!meta && hasSelfSignedInstance(meta, reagent.itemId),
+    reagent,
+    craftSkills,
+    professionId,
+  );
+}
+
+/**
+ * The count math behind `requiredReagentCount`, with the #1145 self-signed
+ * fact resolved by the caller (holdsSelfSignedInstance above) instead of read
+ * off a PlayerMeta. Host-agnostic and draw-free, exported so the crafting
+ * window's view core computes its displayed requirement and Craft gate with
+ * the SAME function the sim's availability check and consumption use, the
+ * single-surface doctrine the difficulty label already follows.
+ */
+export function requiredReagentCountFor(
+  hasSelfSigned: boolean,
+  reagent: ProfessionReagent,
+  craftSkills: CraftSkillState,
+  professionId: string,
+): RequiredReagentResult {
+  const afterSelfSigned = hasSelfSigned ? Math.max(1, reagent.count - 1) : reagent.count;
   const multiplier = materialCostMultiplier(craftSkills, professionId);
   return {
     count: Math.max(1, Math.floor(afterSelfSigned * multiplier)),

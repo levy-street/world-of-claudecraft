@@ -17,6 +17,7 @@ import {
   comboEligibility,
 } from '../sim/professions/combo_eligibility';
 import { isCommissionEligible } from '../sim/professions/commission';
+import { holdsSelfSignedInstance, requiredReagentCountFor } from '../sim/professions/crafting';
 import { type StationType, stationsOfType, stationTypeForCraft } from '../sim/professions/stations';
 import { MINIMAL_TIER_MULTIPLIER, REDUCED_TIER_MULTIPLIER } from '../sim/professions/wheel';
 import type { InvSlot, ItemDef } from '../sim/types';
@@ -127,7 +128,10 @@ function countInInventory(inventory: readonly InvSlot[], itemId: string): number
  * currently in range of (station-bound recipes: physical stations
  * plus the own active mobile station, precomputed once per repaint by the
  * HUD via stations.ts inRangeStationTypes; defaults to empty, i.e. out of
- * range of everything, so station-free callers need not pass it). Read-only:
+ * range of everything, so station-free callers need not pass it), and the
+ * local player's name (the #1145 self-signed reduction: defaults to null,
+ * meaning the self-signed check never matches; the #1134 specialization
+ * discount still applies from craftSkills either way). Read-only:
  * never mutates any of its inputs.
  */
 export function buildCraftingView(
@@ -142,6 +146,7 @@ export function buildCraftingView(
     hobbyCraft: null,
   },
   inRangeStations: ReadonlySet<StationType> = new Set(),
+  playerName: string | null = null,
 ): CraftingView {
   // One mutable copy for the sim-side pure functions (their CraftSkills
   // parameter is mutable-typed); they never write it, this is typing only.
@@ -149,12 +154,23 @@ export function buildCraftingView(
   const rows: CraftingRecipeRow[] = recipes.map((recipe) => {
     const reagentRows: CraftingReagentRow[] = recipe.reagents.map((reagent) => {
       const have = countInInventory(inventory, reagent.itemId);
+      // The requirement the sim actually charges: the SAME shared
+      // requiredReagentCountFor the resolver's availability check and
+      // consumption use (crafting.ts, #1134 specialization discount composed
+      // with the #1145 self-signed reduction), so the displayed count and the
+      // Craft gate can never diverge from what a craft consumes.
+      const required = requiredReagentCountFor(
+        playerName !== null && holdsSelfSignedInstance(inventory, playerName, reagent.itemId),
+        reagent,
+        skills,
+        recipe.professionId,
+      ).count;
       return {
         itemId: reagent.itemId,
         item: items[reagent.itemId],
-        required: reagent.count,
+        required,
         have,
-        satisfied: have >= reagent.count,
+        satisfied: have >= required,
       };
     });
     const combo = recipe.comboRequirement;
