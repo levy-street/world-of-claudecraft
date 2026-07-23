@@ -593,6 +593,7 @@ describe('FCT colour tokens: the .fct-<token> hex stays byte-faithful to the old
     'fct-damage-done-auto': '#fff',
     'fct-damage-done-ability': '#ffe97a',
     'fct-damage-taken': '#ff5544',
+    'fct-absorb': '#9fd7ff',
     'fct-heal': '#3ce63c',
     'fct-xp': '#d9a3ff',
     'fct-rested-xp': '#6db8ff',
@@ -648,6 +649,12 @@ describe('Enhanced FCT visual language', () => {
     expect(css).toMatch(/\.fct-heal\s*\{[^}]*color:\s*var\(--color-text-success\)/);
     expect(css).toMatch(/\.fct-parry-other\s*\{[^}]*color:\s*var\(--color-mana\)/);
     expect(css).toMatch(/\.fct-block-other\s*\{[^}]*color:\s*var\(--color-accent\)/);
+    expect(css).toMatch(
+      /\.fct-miss-self,\s*\.fct-dodge-self,\s*\.fct-parry-self\s*\{[^}]*color:\s*#bbb/,
+    );
+    expect(css).toMatch(
+      /\.fct-miss-other,\s*\.fct-dodge-other,\s*\.fct-parry-other,\s*\.fct-damage-done-auto\s*\{[^}]*color:\s*#fff/,
+    );
   });
 
   it('gives avoidance words their own deflection motion and makes low-tier crit static', () => {
@@ -661,10 +668,12 @@ describe('Enhanced FCT visual language', () => {
 it('keeps information visible without translation under both reduced-motion channels', () => {
   const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
   expect(css).toMatch(
-    /body\.reduce-motion\s+\.fct\s*\{[^}]*animation-name:\s*fct-static\s*!important[^}]*animation-duration:\s*var\(--dur-fct\)\s*!important/,
+    /body\.reduce-motion\s+\.fct\s*\{[^}]*animation:\s*none\s*!important[^}]*opacity:\s*1/,
   );
   expect(css).toMatch(
-    /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.fct\s*\{[^}]*animation-name:\s*fct-static\s*!important/,
+    /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.fct\s*\{[^}]*animation:\s*none\s*!important[^}]*opacity:\s*1/,
   );
+  expect(css).toMatch(/body\.reduce-motion\s+\.fct::before,[\s\S]*?display:\s*none\s*!important/);
+  expect(css).toMatch(/@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.fct::before,[\s\S]*?display:\s*none\s*!important/);
   expect(css).toMatch(/@keyframes\s+fct-static[\s\S]*?translate:\s*-50%\s+-50%/);
 });

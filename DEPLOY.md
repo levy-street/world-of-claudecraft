@@ -112,13 +112,13 @@ sudo git -C private/bot_detector pull
 #    host has spare and create the exact memory pressure the game service's
 #    mem_limit exists to prevent. 2g is ample for this tree's npm ci and tsc; the
 #    swap bound matches so the gate cannot push the host into swap either.
-sudo docker run --rm --memory 2g --memory-swap 2g -v /opt/eastbrook:/src:ro -w /app node:22-alpine \
+sudo docker run --rm --memory 2g --memory-swap 2g -v /opt/eastbrook:/src:ro -w /app node:26-slim \
   sh -c 'cp -a /src/. /app && find /app \( -name .git -o -name .env \) -prune -exec rm -rf {} + && npm ci --ignore-scripts --no-audit --no-fund && npx tsc --noEmit'
 #    Red means STOP, do not deploy: the image would build fine and fail at runtime.
 #    One exception: exit code 137 means the container hit the 2g memory bound (a
 #    gate-environment failure, not a type error); raise the bound or run the gate
 #    off-box, do not skip it.
-#    (On a host that does have Node 22 on PATH, `npm ci --ignore-scripts && npx tsc
+#    (On a host that does have Node 26 on PATH, `npm ci --ignore-scripts && npx tsc
 #    --noEmit` in the checkout runs the same type check, but WITHOUT the container's
 #    memory bound; on the live box prefer the containerized form above.)
 
@@ -138,6 +138,10 @@ curl -fsS -X POST -H "x-woc-deploy-secret: <RESTART_COUNTDOWN_SECRET>" \
 sudo docker compose stop game
 #    On an older checkout whose compose file has no stop_grace_period, pass the
 #    window explicitly: sudo docker compose stop -t 60 game
+#    This normal stop followed by up -d --build replaces the process. It also
+#    terminates authenticated and linkdead sessions held in process memory, so an
+#    auth rollout needs no separate session cleanup. Do not leave an old game
+#    process serving alongside the rebuilt one.
 
 # 6. Rebuild and start. (`sudo docker compose build game` before step 4 shortens the
 #    outage: the image is then ready the moment the countdown ends.)
@@ -295,12 +299,6 @@ For off-box safety, sync the directory to S3 occasionally:
   the host `.env` into the game container. The key is a secret: it must never
   appear in logs or client code. Linking is a cosmetic mirror for deed
   achievements only; login with Steam does not exist.
-- **Season 1 Armory promo card (welcome screen)**: **off until configured**: the
-  welcome screen shows the Season 1 Armory store promo card only when
-  `ARMORY_PROMO_ENABLED=1` is set in the game server runtime env. The flag is
-  read by `server/welcome.ts` (behind a short in-process cache) and served to
-  signed-in clients via `GET /api/welcome/flags`; the client-side half of the
-  gate lives in `src/ui/store_promo_card.ts`.
 - **Claudium economy service**: `WOC_ECONOMY_SERVICE_URL` is resolved by the
   game server. Use `http://127.0.0.1:8798/v1/claudium/` only when both services
   run directly on the host. For the Compose game container with a host-run
@@ -408,7 +406,10 @@ For off-box safety, sync the directory to S3 occasionally:
   worth noticing rather than a routine boot.
 - **Env hygiene: no empty numeric placeholders.** A SET-BUT-EMPTY numeric env
   line (`CHAT_LOG_RETENTION_DAYS=`, `PORT=`, `MAX_WS_PER_IP_HARD=`,
-  `PERF_REPORT_RETENTION_DAYS=`) now means the DEFAULT, not `0`. Before the
+  `PERF_REPORT_RETENTION_DAYS=`, `DAILY_REWARD_EVENTS_RETENTION_DAYS=`,
+  `ONLINE_SAMPLES_RETENTION_DAYS=`, `SITE_PRESENCE_RETENTION_DAYS=`,
+  `PLAY_SESSION_RETENTION_DAYS=`, `ACCOUNT_IP_ASSOCIATION_RETENTION_DAYS=`) now means
+  the DEFAULT, not `0`. Before the
   validated config loader, `CHAT_LOG_RETENTION_DAYS=` resolved to `0` (keep chat
   logs forever); the same line now resolves to the 90-day default and pruning
   turns ON. Audit deployed env files for empty placeholder lines: delete the
@@ -431,6 +432,48 @@ For off-box safety, sync the directory to S3 occasionally:
     honestly); an explicit `0` disables the cap entirely. The default is a guard rail,
     not a capacity estimate: what a realm can actually carry depends on the host, so
     measure yours and set the number you measured.
+  - `DAILY_REWARD_EVENTS_RETENTION_DAYS=`, `ONLINE_SAMPLES_RETENTION_DAYS=`,
+    `SITE_PRESENCE_RETENTION_DAYS=`, `PLAY_SESSION_RETENTION_DAYS=`, and
+    `ACCOUNT_IP_ASSOCIATION_RETENTION_DAYS=` (empty) follow the
+    `CHAT_LOG_RETENTION_DAYS` contract exactly: an empty line means the default,
+    and an explicit `0` is keep-forever.
+  - `RETENTION_SWEEP_UTC_HOUR=` and `RETENTION_SWEEP_MAX_ROWS_PER_RUN=` are NOT
+    keep-forever-shaped: their raw value is trimmed, so an empty or whitespace line
+    also reads as the DEFAULT, but an explicit `0` is a live value: a 00:00 UTC
+    sweep hour, or a zero-row budget that disables the nightly sweep.
+- **Nightly retention sweep.** The batched retention prunes run once per UTC day
+  at `RETENTION_SWEEP_UTC_HOUR` (default 05:00 UTC) behind a database advisory
+  lock, so with several processes on one database exactly one of them sweeps.
+  Deletes run as small back-to-back batches under a per-table row budget
+  (`RETENTION_SWEEP_MAX_ROWS_PER_RUN`), so raising the budget for a catch-up
+  should be done deliberately, in a quiet window. The last-swept day is recorded
+  in the database, so a restart or deploy later the same day does not re-run the
+  sweep at peak. One timing caveat: the sweep fires on the first poll (about a
+  minute after listen) whenever the process boots past the sweep hour on a day
+  whose sweep has not yet recorded itself, so the first deploy of this feature,
+  or any deploy landing before that day's sweep has run, performs the catch-up
+  at deploy time rather than at the off-peak hour. Deploy off-peak, or set
+  `RETENTION_SWEEP_MAX_ROWS_PER_RUN=0` for the deploy and restore it afterward.
+  After a rollback to an older binary, the admin overview's
+  all-time online peak can read lower until you roll forward again: the folded
+  value is preserved, the older reader just does not consult it. Rollback
+  caveat: binaries older than the sweep run one unbatched chat-log prune at
+  boot, before listen and with no error containment, so a large chat-log
+  backlog (budget-capped nights, or a stretch with the row budget set to 0)
+  can make that boot delete time out and the old binary fail to start. Before
+  rolling back to a pre-sweep binary, let the sweep catch up (or drain the
+  backlog manually in bounded batches) so the old boot prune has little to do.
+  Play-session rollback caveats, same shape: once play sessions have folded,
+  a binary older than the fold reads lifetime playtime lower by the folded
+  amount (character select and the admin views; the rollup rows are preserved,
+  the older readers just do not consult them), and its boot recreates the
+  daily-rewards exclusion view without the association arm, so accounts whose
+  banned-IP sessions already folded regain daily-reward eligibility until you
+  roll forward again. Folded raw session rows themselves are recoverable only
+  from the nightly database dump. The first sweep after this feature deploys
+  also performs the largest fold it will ever do (the whole backlog, budget-
+  capped per night), so the deploy-time catch-up guidance above applies with
+  extra weight.
 - Logs: `sudo docker compose -f /opt/eastbrook/docker-compose.yml logs -f game`.
 - If the instance ever feels tight, stop, change instance type,
   start. Everything lives in Docker plus one EBS volume, so nothing

@@ -11,6 +11,7 @@
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { CAST_COMPLETE_EPS, DT } from '../types';
+import { onThornsReflect } from './talent_procs';
 
 export interface ThornsState {
   charges?: number; // remaining charges; undefined => unlimited (legacy thorns)
@@ -67,6 +68,7 @@ export function applyThornsReaction(ctx: SimContext, defender: Entity, attacker:
         undefined,
         false,
       );
+      if (defender.kind === 'player') onThornsReflect(ctx, defender, a.id);
     }
   }
   for (let i = defender.auras.length - 1; i >= 0; i--) {

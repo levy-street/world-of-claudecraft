@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  inForcedPointerLockCooldown,
   pointerLockNeedsSyncGesture,
   shouldEngagePointerLock,
   shouldEngagePointerLockOnMouseDown,
@@ -132,5 +133,43 @@ describe('shouldEngagePointerLockOnMouseDown', () => {
 
   it('does not re-engage when already locked', () => {
     expect(shouldEngagePointerLockOnMouseDown({ ...base, alreadyLocked: true })).toBe(false);
+  });
+});
+
+describe('inForcedPointerLockCooldown', () => {
+  // Regression for #1834 recurring: a player who presses Escape mid-drag (or
+  // alt-tabs) force-unlocks the pointer while still holding the mouse button.
+  // The very next drag attempt on Firefox lands inside Firefox's own
+  // post-forced-unlock cooldown and is silently denied, so callers must skip
+  // the doomed requestPointerLock() call during this window.
+
+  it('is in cooldown right after a forced unlock, on the browser that needs the sync gesture', () => {
+    expect(inForcedPointerLockCooldown({ needsSyncGesture: true, msSinceForcedUnlock: 0 })).toBe(
+      true,
+    );
+  });
+
+  it('stays in cooldown just under the threshold', () => {
+    expect(inForcedPointerLockCooldown({ needsSyncGesture: true, msSinceForcedUnlock: 1299 })).toBe(
+      true,
+    );
+  });
+
+  it('clears once the cooldown has elapsed', () => {
+    expect(inForcedPointerLockCooldown({ needsSyncGesture: true, msSinceForcedUnlock: 1300 })).toBe(
+      false,
+    );
+  });
+
+  it('never applies when there has been no forced unlock this session', () => {
+    expect(inForcedPointerLockCooldown({ needsSyncGesture: true, msSinceForcedUnlock: null })).toBe(
+      false,
+    );
+  });
+
+  it('never applies on a browser that does not need the synchronous gesture (Chromium)', () => {
+    expect(inForcedPointerLockCooldown({ needsSyncGesture: false, msSinceForcedUnlock: 0 })).toBe(
+      false,
+    );
   });
 });

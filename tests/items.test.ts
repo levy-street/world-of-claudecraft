@@ -1,9 +1,11 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import * as items from '../src/sim/items';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import { type Entity, POTION_COOLDOWN, type SimEvent } from '../src/sim/types';
+import { type Entity, type ItemDef, POTION_COOLDOWN, type SimEvent } from '../src/sim/types';
 
 // Direct tests for the extracted inventory/vendor module (W2). They call the module
 // functions with the real SimContext the Sim built in its ctor (the same seam the thin
@@ -359,21 +361,45 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     const { pid, meta } = vendorPlayer(sim);
     const ctx = ctxOf(sim);
     meta.copper = 0;
-    sim.addItem('wolf_fang', 2, pid); // poor, sellValue 4 -> 8
+    // wolf_fang is a crafting reagent now (quality common, never
+    // swept), so this sweep uses mudfin_scale as its gray fodder.
+    sim.addItem('mudfin_scale', 2, pid); // poor, sellValue 5 -> 10
     sim.addItem('bandit_bandana', 1, pid); // poor, sellValue 6
+    sim.addItem('wolf_fang', 1, pid); // reagent (common, white) -> kept
     sim.addItem('apprentice_staff', 1, pid); // not poor -> kept
     sim.drainEvents();
 
     items.sellAllJunk(ctx, pid);
-    expect(sim.countItem('wolf_fang', pid)).toBe(0);
+    expect(sim.countItem('mudfin_scale', pid)).toBe(0);
     expect(sim.countItem('bandit_bandana', pid)).toBe(0);
+    expect(sim.countItem('wolf_fang', pid)).toBe(1);
     expect(sim.countItem('apprentice_staff', pid)).toBe(1);
-    expect(meta.copper).toBe(2 * 4 + 6); // 14
-    expect(meta.vendorBuyback.some((s) => s.itemId === 'wolf_fang' && s.count === 2)).toBe(true);
+    expect(meta.copper).toBe(2 * 5 + 6); // 16
+    expect(meta.vendorBuyback.some((s) => s.itemId === 'mudfin_scale' && s.count === 2)).toBe(true);
     const summary = sim
       .drainEvents()
       .filter((e) => e.type === 'loot' && /^Sold \d+ junk item/.test((e as { text: string }).text));
     expect(summary).toHaveLength(1);
+  });
+
+  it('junkSellableSlot is the one sweep rule: every arm decides, and the HUD preview consumes it', () => {
+    // The predicate is shared by sellAllJunk and the vendor preview in
+    // hud.ts renderVendor; per-arm decisiveness here plus the source pin
+    // below keep the two surfaces from ever drifting apart again.
+    const gray: ItemDef = ITEMS.mudfin_scale;
+    const slot = { count: 1 };
+    expect(items.junkSellableSlot(gray, slot)).toBe(true);
+    expect(items.junkSellableSlot(undefined, slot)).toBe(false);
+    expect(items.junkSellableSlot(ITEMS.wolf_fang, slot)).toBe(false); // common, not poor
+    expect(items.junkSellableSlot({ ...gray, kind: 'quest' } as ItemDef, slot)).toBe(false);
+    expect(items.junkSellableSlot({ ...gray, noVendorSell: true }, slot)).toBe(false);
+    expect(items.junkSellableSlot({ ...gray, soulbound: true }, slot)).toBe(false);
+    expect(items.junkSellableSlot(gray, { count: 0 })).toBe(false);
+    expect(items.junkSellableSlot(gray, { count: 1, instance: { boundTo: 7 } })).toBe(false);
+    expect(items.junkSellableSlot(gray, { count: 1, instance: { signer: 'Ana' } })).toBe(true);
+
+    const hud = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    expect(hud).toContain('junkSellableSlot(ITEMS[slot.itemId], slot)');
   });
 
   it('buyBackItem repurchases via the silent add, spends copper, and clears the buyback slot', () => {

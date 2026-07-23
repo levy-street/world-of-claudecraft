@@ -17,7 +17,7 @@
 //
 // Phase 4 of the mobile combat HUD rework adds an optional `mobilePage` per row:
 // which mobile action-ring page (Phase 1, mobile_action_page_view.ts) the row's
-// bar slot falls on, so the touch-only painter can label it ("Page 1" to "Page 4").
+// bar slot falls on, so the touch-only painter can label it ("Page 1" to "Page 7").
 // The page math is NOT duplicated here: sourceSlotsForMobilePage is imported
 // from mobile_action_page_view.ts and this module only looks up which page's
 // slot set contains the row's barSlot.
@@ -45,7 +45,7 @@ export interface SpellbookRow {
   toggleDisabled: boolean;
   /** The mobile action-ring page (0-indexed) this row's bar slot falls on, or
    *  null when the row is off-bar or its slot is outside the ring's reachable
-   *  span (slot 0 / the attack toggle or desktop-only slots 21-22). Touch-only
+   *  span (slot 0 / the attack toggle or beyond slot 33). Touch-only
    *  presentation; desktop rendering ignores this field. */
   mobilePage: number | null;
 }
@@ -80,6 +80,14 @@ export interface SpellbookInput {
   attackOnBar: boolean;
   /** The class has per-form bars (druid), so the reset-bar button is shown. */
   hasFormBars: boolean;
+  /** The player's committed spec, or null/undefined. Abilities another spec would
+   *  gate away (a wrong `specs`, or this spec in `excludeSpecs`) are dropped so the
+   *  book never dangles a "Trainable at level X" the committed spec can never
+   *  learn. No committed spec keeps the whole kit, since any spec is still open. */
+  spec?: string | null;
+  /** The player's level, gating `excludeSpecsAtLevel` hand-offs. Omitted = the
+   *  exclusion always applies, the pre-hand-off behavior. */
+  level?: number;
   /** Optional: the hotbar's ability id per bar slot (index 0 = barSlot 1, matching
    *  Hud.hotbarActions' own index = barSlot-1 convention), used to derive each
    *  row's mobilePage. Omitted (or an ability id not found here) yields
@@ -95,9 +103,31 @@ export interface SpellbookInput {
  * data, so the offline Sim and the online ClientWorld mirror produce identical
  * rows.
  */
+/** Can the committed spec ever learn this ability? Mirrors the sim's
+ *  specs / excludeSpecs gate (classes.ts abilitiesKnownAt). A null spec keeps
+ *  everything (nothing is committed yet). */
+function specCanLearn(abilityId: string, spec: string | null | undefined, level?: number): boolean {
+  if (!spec) return true;
+  const def = ABILITIES[abilityId];
+  if (!def) return true;
+  if (def.specs && !def.specs.includes(spec)) return false;
+  if (
+    def.excludeSpecs?.includes(spec) &&
+    (level === undefined || level >= (def.excludeSpecsAtLevel ?? 0))
+  )
+    return false;
+  return true;
+}
+
 export function buildSpellbookView(input: SpellbookInput): SpellbookView {
   const barIds = new Set(input.barAbilityIds);
-  const rows: SpellbookRow[] = input.abilities.map((abilityId) => {
+  const knownIds = new Set(input.known.map((k) => k.def.id));
+  // An already-learned ability always keeps its row (it exists regardless of the
+  // gate); only never-learnable trainable rows are dropped.
+  const learnable = input.abilities.filter(
+    (id) => knownIds.has(id) || specCanLearn(id, input.spec, input.level),
+  );
+  const rows: SpellbookRow[] = learnable.map((abilityId) => {
     const known = input.known.find((k) => k.def.id === abilityId) ?? null;
     const onBar = known !== null && barIds.has(abilityId);
     return {
@@ -123,7 +153,7 @@ export function buildSpellbookView(input: SpellbookInput): SpellbookView {
  * The mobile action-ring page (0-indexed) whose source slots
  * (sourceSlotsForMobilePage) contain this ability's bar slot, or null when the
  * slot lookup is missing, the ability isn't on the bar, or its slot sits outside
- * every page's span (slot 0's attack toggle or desktop-only slots 21-22).
+ * every page's span (slot 0's attack toggle or beyond slot 33).
  */
 function mobilePageForAbility(
   abilityId: string,

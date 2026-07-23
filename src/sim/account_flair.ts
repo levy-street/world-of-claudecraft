@@ -43,6 +43,11 @@ export interface PlayerFlair {
 export interface ChatSenderFlair {
   ai?: true;
   links?: StreamerLinks;
+  /** The sender's top staff/special Discord role key (discord_roles.ts), the
+   *  anti-impersonation chat tag. Server-stamped from the sender's entity at
+   *  fan-out (the bot's members-meta push is the only writer of that field), so
+   *  a client can never forge it. */
+  role?: string;
 }
 
 // Frozen: this is aliased onto every session as the "no flair" default rather

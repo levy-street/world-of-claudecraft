@@ -12,9 +12,21 @@ const h = vi.hoisted(() => {
   // and throws when it is null. Answer that one query from a mutable flag so a test
   // can flip it to null to exercise the throw; every other query returns empty rows
   // (the existing assertions only inspect `calls`, so they are unaffected).
-  const state = { rateLimitsExists: true, invalidMetricsIndexExists: false };
+  const state = {
+    rateLimitsExists: true,
+    invalidMetricsIndexExists: false,
+    failOpenIndexCreate: false,
+  };
   const query = vi.fn((sql: string) => {
     calls.push(String(sql));
+    // A test flips this flag to simulate an interrupted concurrent index
+    // build, exercising the post-commit loop's unlock-in-finally guarantee.
+    if (
+      state.failOpenIndexCreate &&
+      String(sql).includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_open_character')
+    ) {
+      return Promise.reject(new Error('index build interrupted'));
+    }
     // The invalid-carcass check for the post-commit metrics index build; a test
     // flips the flag to exercise the repair arm. Checked before the to_regclass
     // arm because the check SQL also resolves the index via to_regclass.
@@ -57,6 +69,7 @@ vi.mock('pg', () => ({
   }),
 }));
 
+import { CONCURRENT_INDEX_MIGRATIONS } from '../server/concurrent_indexes';
 import { closeMarketWriteGateForTests, ensureSchema, saveMarketState } from '../server/db';
 import { RATELIMIT_PRUNE_SQL } from '../server/ratelimit_db';
 import type { MarketSave } from '../src/sim/sim';
@@ -68,6 +81,7 @@ describe('ensureSchema wires every schema module at boot', () => {
     h.calls.length = 0;
     h.state.rateLimitsExists = true;
     h.state.invalidMetricsIndexExists = false;
+    h.state.failOpenIndexCreate = false;
     h.clientConfigs.length = 0;
   });
 
@@ -333,6 +347,15 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(rewardEventsIndex).toBeGreaterThan(concurrentIndex);
     expect(rewardEventsIndex).toBeLessThan(sessionUnlock);
     expect(h.calls[rewardEventsIndex]).toContain('WHERE points > 0');
+    // The open-sessions partial index builds third, still inside the session
+    // lock; its partial predicate is what keeps the index tiny (open sessions
+    // are a sliver of the table), so pin it alongside the ordering.
+    const openIdx = h.calls.findIndex((sql) =>
+      sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_open_character'),
+    );
+    expect(openIdx).toBeGreaterThan(rewardEventsIndex);
+    expect(openIdx).toBeLessThan(sessionUnlock);
+    expect(h.calls[openIdx]).toContain('WHERE ended_at IS NULL');
   });
 
   it('drops an INVALID metrics-index carcass before rebuilding it (a killed CONCURRENTLY build self-heals)', async () => {
@@ -352,6 +375,97 @@ describe('ensureSchema wires every schema module at boot', () => {
     );
     expect(drop).toBeGreaterThan(sessionLock);
     expect(drop).toBeLessThan(create);
+    // The open-sessions entry self-heals the same way: its carcass drop runs
+    // under the session lock, before its own rebuild.
+    const openDrop = h.calls.findIndex((sql) =>
+      sql.includes('DROP INDEX CONCURRENTLY IF EXISTS play_sessions_open_character'),
+    );
+    const openCreate = h.calls.findIndex((sql) =>
+      sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_open_character'),
+    );
+    expect(openDrop).toBeGreaterThan(sessionLock);
+    expect(openDrop).toBeLessThan(openCreate);
+  });
+
+  it('releases the session advisory lock when a concurrent index build fails', async () => {
+    // The post-commit loop has no per-entry containment (a failed build kills
+    // the boot, same as before the loop), but the finally must still release
+    // the session lock or every OTHER process's boot wedges behind it.
+    h.state.failOpenIndexCreate = true;
+    await expect(ensureSchema()).rejects.toThrow('index build interrupted');
+    const failedCreate = h.calls.findIndex((sql) =>
+      sql.includes('CREATE INDEX CONCURRENTLY IF NOT EXISTS play_sessions_open_character'),
+    );
+    const unlock = h.calls.findIndex((sql) => sql.includes('pg_advisory_unlock($1)'));
+    expect(failedCreate).toBeGreaterThan(-1);
+    expect(unlock).toBeGreaterThan(failedCreate);
+  });
+
+  it('applies the play-session retention schema after the metrics schema and before the relocated exclusion view', async () => {
+    // The exclusion view's association arm reads account_ip_associations, which
+    // PLAY_SESSION_RETENTION_SCHEMA creates, so on a FRESH boot the view must be
+    // created after the retention schema (the view moved out of the core SCHEMA
+    // constant for exactly this dependency). All of it runs before COMMIT, inside
+    // the one boot transaction.
+    await ensureSchema();
+    const metricsIdx = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS player_account_facts'),
+    );
+    const retentionIdx = h.calls.findIndex((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS play_session_totals'),
+    );
+    const viewIdx = h.calls.findIndex((sql) =>
+      sql.includes('CREATE OR REPLACE VIEW daily_reward_excluded_accounts'),
+    );
+    const commitIdx = h.calls.indexOf('COMMIT');
+    expect(metricsIdx).toBeGreaterThan(-1);
+    expect(retentionIdx).toBeGreaterThan(metricsIdx);
+    expect(viewIdx).toBeGreaterThan(retentionIdx);
+    expect(commitIdx).toBeGreaterThan(viewIdx);
+    // The relocated view actually carries the association arm (not a stale copy
+    // that predates the fold-forward retention).
+    expect(h.calls[viewIdx]).toContain('account_ip_associations');
+    expect(h.calls[viewIdx]).toContain('JOIN daily_reward_ip_bans');
+  });
+
+  it('the play-session retention DDL is entirely guarded, additive, and non-destructive', async () => {
+    // The retention rollup DDL is applied as one multi-statement query. Scope
+    // every scan to that ONE call's SQL string: the joined call log legitimately
+    // carries destructive keywords elsewhere (the metrics block's sanctioned
+    // DROP CONSTRAINT reconcile), which a broad scan would trip on.
+    await ensureSchema();
+    const retentionDdl = h.calls.find((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS play_session_totals'),
+    );
+    expect(retentionDdl).toBeDefined();
+    if (retentionDdl) {
+      expect(retentionDdl).toContain('CREATE TABLE IF NOT EXISTS play_session_totals');
+      expect(retentionDdl).toContain('CREATE TABLE IF NOT EXISTS account_ip_associations');
+      // The ban-evasion probe index and the aging prune's batch-predicate index.
+      expect(retentionDdl).toContain('CREATE INDEX IF NOT EXISTS account_ip_associations_ip');
+      expect(retentionDdl).toContain(
+        'CREATE INDEX IF NOT EXISTS account_ip_associations_last_seen',
+      );
+      // Both rollup tables cascade with their account (the privacy contract).
+      expect(retentionDdl.split('REFERENCES accounts(id) ON DELETE CASCADE').length - 1).toBe(2);
+      // Guarded-only DDL (the Discord-block negatives): case-insensitive so a
+      // future lowercase (or mixed-case) destructive statement cannot slip past.
+      expect(retentionDdl).not.toMatch(/CREATE TABLE (?!IF NOT EXISTS)/i);
+      expect(retentionDdl).not.toMatch(/CREATE (?:UNIQUE )?INDEX (?!IF NOT EXISTS)/i);
+      expect(retentionDdl).not.toMatch(/ADD COLUMN (?!IF NOT EXISTS)/i);
+      expect(retentionDdl).not.toMatch(/\b(?:DROP|TRUNCATE|ALTER COLUMN)\b/i);
+    }
+  });
+
+  it('the concurrent-index migration list pins its entry names and order', () => {
+    // Order is load-bearing and deliberate (the boot coordinator builds these
+    // post-commit, in list order, under the session advisory lock); new entries
+    // append, never reorder.
+    expect(CONCURRENT_INDEX_MIGRATIONS.map((m) => m.name)).toEqual([
+      'play_sessions_account_started_id',
+      'daily_reward_events_account_day_created_id',
+      'play_sessions_open_character',
+    ]);
   });
 
   it('applies the rate-limit schema idempotently (a second boot re-issues the same DDL)', async () => {

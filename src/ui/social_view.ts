@@ -49,7 +49,7 @@ export interface FriendRow {
   cls: string;
   level: number;
   online: boolean;
-  /** Status dot kind: 'off' | 'online' | 'combat' | 'dungeon' | 'dead'. */
+  /** Status dot kind: 'off' | 'online' | 'combat' | 'dungeon' | 'dead' | 'afk'. */
   dot: string;
   status: string | undefined;
   zone: string | undefined;
@@ -157,6 +157,39 @@ export function guildView(social: SocialInfo | null, myName: string): GuildView 
     };
   });
   return { guild: { name: guild.name, rank: me, memberCount: guild.members.length, rows } };
+}
+
+export type GuildRosterGroup = 'online' | 'offline';
+
+/** A guild-roster render item for the grouped view: either a group HEADER carrying
+ *  the group's member count, or a single MEMBER row. */
+export type GuildRosterItem =
+  | { kind: 'header'; group: GuildRosterGroup; count: number }
+  | { kind: 'member'; row: GuildRow };
+
+/**
+ * Group a guild roster online-first: an "online" header (+ count) over the online
+ * members, then an "offline" header (+ count) over the offline members. Preserves
+ * the source order within each group (guildView's secondary sort). Empty groups emit
+ * NO header (never an empty "Offline (0)"), so an all-online or all-offline roster
+ * renders exactly one group. `hideOffline` drops the offline header AND its rows
+ * entirely (the online header's count still reflects the real online membership, since
+ * the filter only suppresses the offline group's rendering). A DOM-free, i18n-free
+ * pure projection: the painter localizes each header and formats the count.
+ */
+export function guildRosterItems(rows: GuildRow[], hideOffline: boolean): GuildRosterItem[] {
+  const online = rows.filter((r) => r.online);
+  const offline = rows.filter((r) => !r.online);
+  const items: GuildRosterItem[] = [];
+  if (online.length > 0) {
+    items.push({ kind: 'header', group: 'online', count: online.length });
+    for (const row of online) items.push({ kind: 'member', row });
+  }
+  if (!hideOffline && offline.length > 0) {
+    items.push({ kind: 'header', group: 'offline', count: offline.length });
+    for (const row of offline) items.push({ kind: 'member', row });
+  }
+  return items;
 }
 
 export interface RaidMemberRow {

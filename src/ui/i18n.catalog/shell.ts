@@ -30,6 +30,11 @@ export const shellStrings = {
       discordCommunity: 'Join the World of ClaudeCraft Discord community',
       donateProject: 'Donate to support World of ClaudeCraft',
     },
+    entryGuard: {
+      title: 'Graphics lowered',
+      body: 'The game closed unexpectedly while entering the world, so graphics are now set to {preset}. You can change this in the graphics selector below or in the in-game Options.',
+      dismiss: 'Dismiss',
+    },
     loading: {
       world: 'Loading world...',
       worldProgress: 'Loading world... {done}/{total}',
@@ -39,7 +44,10 @@ export const shellStrings = {
       rendererFailed: 'Could not start the renderer: try reloading. {error}',
       enterTimeout: 'Could not enter world. The connection timed out. Is the game server running?',
       connectionLost: 'Connection to the server was lost.',
-      reconnecting: 'Connection lost. Reconnecting...',
+      reconnectingAttempt:
+        'Connection lost. Reconnecting... (attempt {attempt}/{maxAttempts}, retrying in {seconds}s)',
+      reconnectingNow: 'Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})',
+      slowConnection: 'This is taking longer than usual. Check your internet connection.',
       connectionRejected: 'The server closed the connection.',
       realmFull: 'This world is full right now. Please try again in a few minutes.',
       tooManyConnections:
@@ -288,29 +296,6 @@ export const shellStrings = {
       heading: 'The world is temporarily unavailable.',
       body: 'We are restarting the game service and expect Claudemoon to return shortly. This page will keep checking automatically.',
       status: 'Back soon',
-    },
-    welcome: {
-      back: 'Welcome back, {name}',
-      level: 'Level {level}',
-      lastPlayed: 'Last played {when}',
-      continue: 'Enter World',
-      continueHint: 'Enter to continue, Esc to skip',
-      continueHintTouch: 'Tap to continue',
-      discord: {
-        title: 'The community lives on Discord',
-        sub: 'Patch previews, events, dev chat, and 2 bonus bank slots for linking.',
-        join: 'Join our Discord',
-      },
-      chest: {
-        ready: 'Daily chest ready',
-      },
-      armory: {
-        cta: 'Enter and browse the Armory',
-      },
-      news: {
-        new: 'New',
-        viewAll: 'View all updates on GitHub',
-      },
     },
   },
   es: {

@@ -80,6 +80,8 @@ describe('standardized percent raid buffs', () => {
     const near = sim.addPlayer('warrior', 'Near');
     const far = sim.addPlayer('rogue', 'Far');
     formParty(sim, mage, [near, far]);
+    // The mage rework moved Aether Insight from learnLevel 1 to 3 (e0842ee38).
+    sim.setPlayerLevel(3, mage);
     teleport(sim, mage, 0, 0);
     teleport(sim, near, 5, 0);
     teleport(sim, far, 500, 500); // hundreds of yards away: still gets the buff
@@ -107,6 +109,8 @@ describe('standardized percent raid buffs', () => {
   it('a solo caster with no party still buffs itself', () => {
     const sim = makeWorld();
     const mage = sim.addPlayer('mage', 'Solo');
+    // The mage rework moved Aether Insight from learnLevel 1 to 3 (e0842ee38).
+    sim.setPlayerLevel(3, mage);
     const intBefore = sim.entities.get(mage)!.stats.int;
     ready(sim, mage);
     sim.castAbility('arcane_intellect', mage);

@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.27.0",
+  "version": "0.29.0",
   "private": true,
   "license": "MIT",
   "author": {
@@ -61,6 +61,7 @@
     "assets:items": "node scripts/convert_item_icons_webp.mjs",
     "assets:skills": "node scripts/convert_skill_icons_webp.mjs",
     "assets:deeds": "node scripts/convert_deed_icons_webp.mjs",
+    "assets:professions": "node scripts/convert_profession_icons_webp.mjs",
     "build:env": "esbuild headless/env_server.ts --bundle --platform=node --format=cjs --outfile=dist-env/env_server.cjs",
     "env": "npm run build:env && node dist-env/env_server.cjs",
     "bench": "npm run build:env && node dist-env/env_server.cjs --bench",
@@ -107,9 +108,9 @@
     "n8ao": "^1.10.1",
     "obscenity": "^0.4.6",
     "pg": "^8.21.0",
-    "postprocessing": "^6.36.0",
+    "postprocessing": "6.36.0",
     "prom-client": "15.1.3",
-    "three": "^0.185.1",
+    "three": "^0.165.0",
     "tweetnacl": "1.0.3",
     "ws": "^8.21.0"
   },
@@ -125,7 +126,7 @@
     "@testing-library/svelte": "^5.4.2",
     "@types/node": "^26.1.1",
     "@types/pg": "^8.20.0",
-    "@types/three": "^0.185.1",
+    "@types/three": "^0.165.0",
     "@types/ws": "^8.18.1",
     "@typescript/native": "npm:typescript@^7.0.2",
     "@vitest/browser": "4.1.10",

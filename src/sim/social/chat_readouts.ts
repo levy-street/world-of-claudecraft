@@ -43,6 +43,7 @@ import {
   type Entity,
   type EquipSlot,
   FISHING_CAST_ID,
+  GATHER_CAST_ID,
   isFormAuraKind,
   MAX_LEVEL,
   MELEE_RANGE,
@@ -290,7 +291,12 @@ export function overpowerReadout(ctx: SimContext, e: Entity, meta: PlayerMeta): 
 // only one is ever active, so the first match is the answer.
 export function formReadout(e: Entity): string {
   const form = e.auras.find(
-    (a) => isFormAuraKind(a.kind) || a.kind === 'defensive_stance' || a.kind === 'stealth',
+    (a) =>
+      isFormAuraKind(a.kind) ||
+      a.kind === 'battle_stance' ||
+      a.kind === 'berserker_stance' ||
+      a.kind === 'defensive_stance' ||
+      a.kind === 'stealth',
   );
   if (!form) return 'You are not in any form or stance.';
   if (form.kind === 'stealth') return 'You are stealthed.';
@@ -434,6 +440,7 @@ export function questReadout(meta: PlayerMeta): string {
 export function gearReadout(meta: PlayerMeta): string {
   const slots: [EquipSlot, string][] = [
     ['mainhand', 'Main Hand'],
+    ['offhand', 'Off Hand'],
     ['helmet', 'Helmet'],
     ['shoulder', 'Shoulder'],
     ['chest', 'Chest'],
@@ -552,7 +559,15 @@ export function castingReadout(e: Entity): string {
   const remaining = e.castRemaining.toFixed(1);
   const total = e.castTotal.toFixed(1);
   if (e.castingAbility === FISHING_CAST_ID) {
-    return `You are fishing — ${remaining}s of ${total}s remaining.`;
+    // Honest with no bite leak: the fixed-cast countdown died
+    // with the bite minigame, and a countdown here would leak session
+    // timing, so the readout names the waiting state and nothing more.
+    return 'You are fishing. Waiting for a bite.';
+  }
+  if (e.castingAbility === GATHER_CAST_ID) {
+    // The gather cast is public state (castRemaining/castTotal broadcast),
+    // so an honest countdown is safe here, unlike the fishing arm above.
+    return `You are gathering: ${remaining}s of ${total}s remaining.`;
   }
   const name = ABILITIES[e.castingAbility]?.name ?? e.castingAbility;
   const verb = e.channeling ? 'Channeling' : 'Casting';
@@ -615,22 +630,11 @@ export function talentsReadout(meta: PlayerMeta, e: Entity): string {
   if (total <= 0)
     return `You have not unlocked talents yet — they begin at level ${FIRST_TALENT_LEVEL}.`;
   const spent = pointsSpent(meta.talents);
-  // Split spent points by tree (cold path: walk the allocation once on demand).
-  const byId = new Map(ct.nodes.map((n) => [n.id, n] as const));
-  let classPts = 0;
-  let specPts = 0;
-  for (const id in meta.talents.ranks) {
-    const node = byId.get(id);
-    if (!node) continue;
-    if (node.tree === 'class') classPts += meta.talents.ranks[id];
-    else specPts += meta.talents.ranks[id];
-  }
   const specName = meta.talents.spec
     ? (ct.specs.find((s) => s.id === meta.talents.spec)?.name ?? meta.talents.spec)
     : null;
   const head = specName ?? 'no specialization';
-  const breakdown = specName ? `Class ${classPts}, ${specName} ${specPts}` : `Class ${classPts}`;
   const unspent = total - spent;
   const tail = unspent > 0 ? ` ${unspent} unspent.` : '';
-  return `Talents: ${head} — ${spent}/${total} points spent (${breakdown}).${tail}`;
+  return `Talents: ${head} - ${spent}/${total} rows selected.${tail}`;
 }

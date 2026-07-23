@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { CRAFT_RING } from '../src/sim/content/professions';
+import { craftSkillGainMultiplier } from '../src/sim/professions/archetype';
 import {
   emptyCraftSkills,
   gainCraftSkill,
+  MINIMAL_TIER_MULTIPLIER,
   normalizeCraftSkills,
   tierCapability,
   tierForSkill,
@@ -95,26 +97,62 @@ describe('tier capability mapping and progress curve (#1128)', () => {
     expect(tierCapability(skills, 'alchemy')).toBe(0);
   });
 
-  it('common tier (recipeTier 0) is always full, regardless of capability', () => {
+  // The four-state mastery curve (orange/yellow/green/gray)
+  // replaces the three-state curve and its tier-0 free floor. The tier-0 rows
+  // changed value BY DESIGN: tierProgressMultiplier(5, 0) was 1 (free floor)
+  // and is now 0 (gray); (3, 1) was 0 and is now 0.25 (green).
+  it('orange (tiersBelow <= 0): at or above capability is full progress, tier 0 included', () => {
     expect(tierProgressMultiplier(0, 0)).toBe(1);
-    expect(tierProgressMultiplier(5, 0)).toBe(1);
-  });
-
-  it('at or above capability is full progress', () => {
     expect(tierProgressMultiplier(1, 1)).toBe(1);
     expect(tierProgressMultiplier(1, 2)).toBe(1);
+    expect(tierProgressMultiplier(0, 4)).toBe(1);
   });
 
-  it('exactly one tier below capability is reduced but non-zero', () => {
-    const belowOne = tierProgressMultiplier(2, 1);
-    expect(belowOne).toBeGreaterThan(0);
-    expect(belowOne).toBeLessThan(1);
-    expect(tierProgressMultiplier(3, 2)).toBe(belowOne);
+  it('yellow (tiersBelow === 1): exactly one tier below capability is reduced (0.5)', () => {
+    expect(tierProgressMultiplier(2, 1)).toBe(0.5);
+    expect(tierProgressMultiplier(3, 2)).toBe(0.5);
+    expect(tierProgressMultiplier(1, 0)).toBe(0.5); // tier 0 rides the same curve now
   });
 
-  it('two or more tiers below capability is zero', () => {
-    expect(tierProgressMultiplier(3, 1)).toBe(0);
+  it('green (tiersBelow === 2): exactly two tiers below capability is minimal (0.25)', () => {
+    expect(tierProgressMultiplier(3, 1)).toBe(0.25); // was 0 under the three-state curve
+    expect(tierProgressMultiplier(4, 2)).toBe(0.25);
+    expect(tierProgressMultiplier(2, 0)).toBe(0.25);
+  });
+
+  it('gray (tiersBelow >= 3): three or more tiers below capability is zero', () => {
     expect(tierProgressMultiplier(4, 1)).toBe(0);
+    expect(tierProgressMultiplier(3, 0)).toBe(0);
+    expect(tierProgressMultiplier(5, 0)).toBe(0); // was 1 under the retired free floor
+  });
+
+  it('pins MINIMAL_TIER_MULTIPLIER at its literal value', () => {
+    expect(MINIMAL_TIER_MULTIPLIER).toBe(0.25);
+  });
+
+  it('craftSkillGainMultiplier walks the curve at the exact skill boundaries (24/25, 49/50, 74/75)', () => {
+    // An unlimited-ceiling identity (craftId as the active archetype) so the
+    // pins bind the raw curve, never the archetype ceiling.
+    const at = (skill: number, skillReq: number): number => {
+      const skills = emptyCraftSkills();
+      skills.cooking = skill;
+      return craftSkillGainMultiplier(skills, 'cooking', null, 'cooking', null, skillReq);
+    };
+    // A tier-0 recipe (skillReq 0) steps down one curve state per tier bucket.
+    expect(at(24, 0)).toBe(1); // capability tier 0: orange
+    expect(at(25, 0)).toBe(0.5); // tier 1: yellow
+    expect(at(49, 0)).toBe(0.5);
+    expect(at(50, 0)).toBe(0.25); // tier 2: green
+    expect(at(74, 0)).toBe(0.25);
+    expect(at(75, 0)).toBe(0); // tier 3: gray
+    // The tier-appropriate ladder stays orange across every boundary: the
+    // recipe tier that matches the new capability always grants full.
+    expect(at(24, 0)).toBe(1);
+    expect(at(25, 25)).toBe(1);
+    expect(at(49, 25)).toBe(1);
+    expect(at(50, 50)).toBe(1);
+    expect(at(74, 50)).toBe(1);
+    expect(at(75, 75)).toBe(1);
   });
 });
 

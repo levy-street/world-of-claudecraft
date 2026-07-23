@@ -32,7 +32,7 @@ import {
   type Vec3,
 } from '../types';
 import {
-  applyHeroicMobTuning,
+  applyDungeonMobTuning,
   claimDifficultyForDungeon,
   mobLevelForDungeonDifficulty,
   mobTemplateForDungeonDifficulty,
@@ -527,7 +527,7 @@ function claimInstance(
       level,
       ctx.groundPos(origin.x + spawn.x, origin.z + spawn.z),
     );
-    applyHeroicMobTuning(mob, inst.dungeonId, difficulty);
+    applyDungeonMobTuning(mob, inst.dungeonId, difficulty);
     mob.facing = Math.PI; // face the entrance
     mob.prevFacing = mob.facing;
     ctx.addEntity(mob);

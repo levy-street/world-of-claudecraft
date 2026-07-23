@@ -212,6 +212,10 @@ describe('reconcile through GameServer.join', () => {
       questLog: [],
       questsDone: [],
       craftSkills: { leatherworking: 5 },
+      // A curve-era blob: without the flag the 12c mastery reset zeroes
+      // craftSkills BEFORE the retro sweep reads them, and the inference this
+      // test exists to replay would (correctly) not fire for pre-curve saves.
+      masteryResetApplied: true,
     };
     const fc = fakeWs();
     const session = server.join(fc.ws as never, 7, 42, 'Crafter', 'warrior', state as never);

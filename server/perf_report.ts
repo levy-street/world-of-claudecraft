@@ -1,6 +1,6 @@
 import type * as http from 'node:http';
 import {
-  accountForToken,
+  accountAndScopeForToken,
   type ClientPerfReportInsert,
   getCharacter,
   insertClientPerfReport,
@@ -272,7 +272,8 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
 async function authenticatedAccountId(req: http.IncomingMessage): Promise<number | null> {
   const m = /^Bearer ([a-f0-9]{64})$/.exec(req.headers.authorization ?? '');
   if (!m) return null;
-  return accountForToken(m[1]);
+  const info = await accountAndScopeForToken(m[1]);
+  return info?.scope === 'full' ? info.accountId : null;
 }
 
 async function authenticatedCharacterId(

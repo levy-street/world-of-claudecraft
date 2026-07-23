@@ -16,7 +16,7 @@
 import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import {
   computeTalentModifiers,
-  emptyAllocation,
+  repairAllocation,
   specLabel,
   type TalentAllocation,
   type TalentModifiers,
@@ -162,14 +162,12 @@ export function splitCopper(copper: number): MoneySplit {
   return { gold: Math.floor(c / 10000), silver: Math.floor(c / 100) % 100, copper: c % 100 };
 }
 
-function normalizeAllocation(state: CharacterState): TalentAllocation {
-  const a = state.talents;
-  if (!a || typeof a !== 'object') return emptyAllocation();
-  return {
-    spec: typeof a.spec === 'string' ? a.spec : null,
-    ranks: a.ranks && typeof a.ranks === 'object' ? a.ranks : {},
-    choices: a.choices && typeof a.choices === 'object' ? a.choices : {},
-  };
+function normalizeAllocation(
+  cls: PlayerClass,
+  state: CharacterState,
+  level: number,
+): TalentAllocation {
+  return repairAllocation(cls, state.talents, level);
 }
 
 function talentMods(
@@ -180,7 +178,7 @@ function talentMods(
   try {
     // Pass the character's level so mastery level-scaling matches the live sim
     // (a sub-20 character's sheet must not report full-strength mastery stats).
-    return computeTalentModifiers(cls, normalizeAllocation(state), level);
+    return computeTalentModifiers(cls, normalizeAllocation(cls, state, level), level);
   } catch {
     return undefined; // never let a malformed allocation break a public read
   }
@@ -228,7 +226,7 @@ export function characterSheet(input: CharacterSheetInput): CharacterSheet {
     realm,
     class: cls,
     classLabel: CLASS_LABELS[cls] ?? cls,
-    spec: specLabel(cls, normalizeAllocation(state)),
+    spec: specLabel(cls, normalizeAllocation(cls, state, level)),
     level,
     virtualLevel: virtualLevel(lifetimeXp),
     prestigeRank: state.prestigeRank ?? 0,

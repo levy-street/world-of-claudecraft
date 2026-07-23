@@ -27,7 +27,7 @@
 
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
-import { pointsSpent, talentsFor } from './content/talents';
+import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, ZONES, zoneAt } from './data';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
 import type { ArenaMatch, InstanceSlot, PlayerMeta } from './sim';
@@ -45,7 +45,6 @@ import {
   type ItemDef,
   MAX_LEVEL,
   NYTHRAXIS_ROOM_RADIUS,
-  type PlayerClass,
 } from './types';
 
 // ---------------------------------------------------------------------------
@@ -682,20 +681,6 @@ function deedListForKeys(keys: ReadonlySet<string>): readonly string[] {
   return ids;
 }
 
-// pointsGate-8 node ids per class (the bottom row of every tree), computed
-// once from the static talent registry so prog_deep_roots never walks the
-// tree per evaluation.
-const capstoneNodeCache = new Map<PlayerClass, ReadonlySet<string>>();
-function capstoneNodes(cls: PlayerClass): ReadonlySet<string> {
-  let set = capstoneNodeCache.get(cls);
-  if (!set) {
-    const tree = talentsFor(cls);
-    set = new Set((tree?.nodes ?? []).filter((n) => n.pointsGate === 8).map((n) => n.id));
-    capstoneNodeCache.set(cls, set);
-  }
-  return set;
-}
-
 const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   prestigeRank: (m) => m.prestigeRank,
   talentPoints: (m) => pointsSpent(m.talents),
@@ -731,14 +716,7 @@ const MARK_CIRCUIT_DUNGEONS = [
 
 const FLAGS: Record<DeedFlagId, (meta: PlayerMeta, e: Entity) => boolean> = {
   talentSpecChosen: (m) => m.talents.spec !== null,
-  talentCapstone: (m) => {
-    const nodes = capstoneNodes(m.cls);
-    // Allocation-free walk (tick-tail predicate: no Object.entries tuples).
-    for (const nodeId in m.talents.ranks) {
-      if (m.talents.ranks[nodeId] > 0 && nodes.has(nodeId)) return true;
-    }
-    return false;
-  },
+  talentCapstone: (m) => typeof m.talents.rows[20] === 'string',
   hasRestedXp: (m) => m.restedXp > 0,
   // Guild membership is server-stamped onto the entity; offline it stays ''
   // (never satisfiable there, matching the offline-sandbox model).
@@ -1100,6 +1078,16 @@ export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta, player: E
   // never prove one.
   if (Object.entries(meta.craftSkills).some(([craftId, v]) => craftId !== 'enchanting' && v > 0)) {
     grantDeed(ctx, meta, 'prog_first_craft', { retro: true });
+  }
+  // Proof: attunedPairs records every archetype pair this character ever
+  // attuned (written only by professions/archetype.ts: attuneArchetypePair
+  // and the save-restore of that same history, both downstream of a real
+  // quest-validated attunement), so a non-empty history proves an attunement
+  // happened before the attunementsCompleted counter existed. Without this
+  // arm a veteran who attuned once and never switches would be PERMANENTLY
+  // stranded (attunement can be once-ever for a player who never switches).
+  if (meta.archetype.attunedPairs.length > 0) {
+    grantDeed(ctx, meta, 'prog_guildsworn', { retro: true });
   }
   // Proof: every ground object is a quest item whose pickup is denied unless
   // its quest is active (interaction.ts), so a done proving quest can only
@@ -1854,4 +1842,11 @@ export const VISITED_MARK_NAMESPACES = [
   'fiesta',
   'dungeon',
   'witness',
+  // Rare gather-event finds (the marks were authored dormant before their
+  // deed consumers): the three node flavors written by announceGatherRareEvent
+  // plus the corpse-harvest perfect_specimen jackpot. Registering the
+  // namespace also lets restoreDeedStats keep marks an older save
+  // already carries (they serialized fine but were dropped on load while the
+  // namespace was unregistered).
+  'gather_event',
 ] as const;

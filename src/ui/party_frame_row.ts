@@ -73,6 +73,7 @@ export interface PartyRow {
   // "Group n"); both are per-frame text the pool drives, the spans built once here.
   leadStar: HTMLElement;
   group: HTMLElement;
+  rewind: HTMLElement;
   incoming: HTMLElement;
   relocalize: () => void;
   /** Repaint the member's mini aura strip (its own keyed AurasPainter pool per row).
@@ -225,11 +226,13 @@ export function createPartyRow(
   hpFill.className = 'bar-fill';
   const hpAbsorb = doc.createElement('div');
   hpAbsorb.className = 'bar-absorb';
+  const rewind = doc.createElement('div');
+  rewind.className = 'pfm-rewind';
   const incoming = doc.createElement('div');
   incoming.className = 'pfm-incoming';
   const hpText = doc.createElement('span');
   hpText.className = 'pfm-hp-text';
-  hpBar.append(hpFill, incoming, hpAbsorb, hpText);
+  hpBar.append(hpFill, incoming, rewind, hpAbsorb, hpText);
 
   const resBar = doc.createElement('div');
   resBar.className = 'bar';
@@ -304,6 +307,7 @@ export function createPartyRow(
     badges: { dead: deadBadge, combat: combatBadge, oor: oorBadge, offline: offlineBadge },
     leadStar,
     group,
+    rewind,
     incoming,
     paintAuras,
   };

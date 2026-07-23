@@ -407,6 +407,93 @@ describe('ClientWorld visibilitychange reconnect (mobile background/foreground)'
   });
 });
 
+// onConnectionLost contract: added by this PR's reconnect-countdown feature to
+// feed the overlay a live attempt count and retry countdown. Deliberately
+// fired AFTER reconnectTimer is armed (see src/net/online.ts), specifically so
+// a throwing callback (creating/mutating DOM, starting an interval, resolving
+// a t() key) cannot leave reconnectAttempts incremented with no retry
+// scheduled. This suite pins both the call contract and that safety property.
+describe('ClientWorld onConnectionLost contract', () => {
+  afterEach(() => {
+    StubWebSocket.instances = [];
+    vi.restoreAllMocks();
+  });
+
+  it('fires with the correct attempt, maxAttempts, and an absolute nextRetryAtMs after a real drop', () => {
+    withDomStubs((doc, harness) => {
+      vi.spyOn(Math, 'random').mockReturnValue(0.5);
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const calls: Array<[number, number, number]> = [];
+      world.onConnectionLost = (attempt, maxAttempts, nextRetryAtMs) => {
+        calls.push([attempt, maxAttempts, nextRetryAtMs]);
+      };
+      const now = Date.now();
+      vi.setSystemTime(now);
+      const first = StubWebSocket.instances[0];
+      first.readyState = StubWebSocket.CLOSED;
+      first.onclose?.();
+
+      expect(calls.length).toBe(1);
+      const [attempt, maxAttempts, nextRetryAtMs] = calls[0];
+      expect(attempt).toBe(1);
+      expect(maxAttempts).toBe(40);
+      // Base 1000 * (0.5 + 0.5) = 1000: an ABSOLUTE timestamp, not the relative
+      // delay; passing the delay itself here would make the overlay's
+      // countdown immediately wrong by "now" milliseconds.
+      expect(nextRetryAtMs).toBe(now + 1_000);
+      expect(harness.timers.length).toBe(1);
+      world.close();
+    });
+  });
+
+  it('fires again with an updated nextRetryAtMs on the mobile-foreground fast-retry path', () => {
+    withDomStubs((doc, harness) => {
+      vi.spyOn(Math, 'random').mockReturnValueOnce(0.5).mockReturnValueOnce(0.75);
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const calls: Array<[number, number, number]> = [];
+      world.onConnectionLost = (attempt, maxAttempts, nextRetryAtMs) => {
+        calls.push([attempt, maxAttempts, nextRetryAtMs]);
+      };
+      const now = Date.now();
+      vi.setSystemTime(now);
+      const first = StubWebSocket.instances[0];
+      first.readyState = StubWebSocket.CLOSED;
+      first.onclose?.(); // long backoff scheduled, first call fires
+
+      doc.setVisible(true); // replaces it with the short spread retry
+      expect(calls.length).toBe(2);
+      // The overlay's countdown must track the NEW short spread delay (0.75 *
+      // 1000 = 750), not keep counting toward the original long backoff.
+      expect(calls[1][2]).toBe(now + 750);
+      world.close();
+    });
+  });
+
+  it('a throwing onConnectionLost does not prevent the already-armed retry from firing', () => {
+    withDomStubs((doc, harness) => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      world.onConnectionLost = () => {
+        throw new Error('boom (e.g. a DOM write or t() lookup failing)');
+      };
+      const first = StubWebSocket.instances[0];
+      first.readyState = StubWebSocket.CLOSED;
+
+      // socketClosed's onConnectionLost call is unguarded, so the throw
+      // propagates out of onclose the same way it would in a browser; only
+      // catching it here (as the real event-loop dispatch effectively does,
+      // since nothing downstream of onclose runs anyway) lets the test go on
+      // to prove the retry itself was already armed before the throw.
+      expect(() => first.onclose?.()).toThrow('boom');
+      expect((world as unknown as { reconnectAttempts: number }).reconnectAttempts).toBe(1);
+      expect(harness.timers.length).toBe(1);
+
+      harness.fire(harness.timers[0].id);
+      expect(StubWebSocket.instances.length).toBe(2);
+      world.close();
+    });
+  });
+});
+
 // The error-frame tolerance wiring: the pure predicates in reconnect_policy.ts
 // are unit-tested in linkdead.test.ts, but ClientWorld consuming them is real
 // behavior of its own. These drive onMessage with wire frames mid-reconnect and

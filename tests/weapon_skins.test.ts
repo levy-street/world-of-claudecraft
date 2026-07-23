@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { WEAPON_VFX } from '../src/render/weapon_vfx';
 import {
   eligibleClassesForWeaponSkinType,
+  offhandMirrorsWeaponSkin,
   resolveActiveWeaponSkin,
   skinnableWeaponTypesFor,
   WEAPON_TYPE_BY_ITEM,
@@ -138,9 +139,22 @@ describe('weapon type classification', () => {
     }
   });
 
+  it('every dagger-classified weapon carries the dagger gameplay flag', () => {
+    // The reverse of the check above: an item skinned as a dagger must also set
+    // weapon.dagger, the flag Backstab/Ambush (weaponStrike + requiresBehind) gate
+    // on in casting_lifecycle. Without it the item renders as a dagger but the
+    // positional rogue abilities reject it with "You must wield a dagger." This
+    // pins that the two dagger notions never drift apart (regression: mistcallers_fang).
+    for (const id of weaponIds) {
+      if (weaponTypeForItem(id) !== 'dagger') continue;
+      const def = ITEMS[id];
+      expect(def.kind === 'weapon' && def.weapon.dagger === true, id).toBe(true);
+    }
+  });
+
   it('heroic variants resolve through their base row', () => {
-    expect(weaponTypeForItem('heroic_moggers_shiv')).toBe('dagger');
-    expect(weaponTypeForItem('heroic_brutoks_maul')).toBe('mace');
+    expect(weaponTypeForItem('heroic_fang_of_korzul')).toBe('dagger');
+    expect(weaponTypeForItem('heroic_staff_of_velkhar')).toBe('staff');
   });
 });
 
@@ -174,6 +188,57 @@ describe('skin apply rule', () => {
     for (const skin of WEAPON_SKIN_LIST) {
       expect(reachable.has(skin.weaponType), `${skin.id} (${skin.weaponType})`).toBe(true);
     }
+  });
+});
+
+describe('offhand weapon-skin mirror rule', () => {
+  it('mirrors the skin onto a matching-type offhand weapon (rogue dual-wield)', () => {
+    // A rogue with two daggers and a dagger skin shows both blades skinned.
+    expect(offhandMirrorsWeaponSkin('frostbite_dagger', 'rusty_dagger')).toBe(true);
+    expect(offhandMirrorsWeaponSkin('ashspark_dagger', 'keen_dirk')).toBe(true);
+    expect(offhandMirrorsWeaponSkin('ice_fang_sword', 'crossroads_saber')).toBe(true);
+  });
+
+  it('mirrors onto a matching-type TWO-HAND offhand weapon (Fury dual-wield pair)', () => {
+    // Hand is deliberately not consulted: equipment_rules.canDualWieldTwoHand lets
+    // a Fury warrior offhand a two-hander, and the mainhand rule already skins a
+    // matching-type two-hander (greatswords classify as 'sword'), so the mirror
+    // must treat the offhand the same way or a Fury pair would render a skinned
+    // mainhand next to a bare offhand greatsword: the asymmetry this rule removes.
+    expect(WEAPON_TYPE_BY_ITEM.eastbrook_greatsword).toBe('sword');
+    expect(
+      resolveActiveWeaponSkin('warrior', 'eastbrook_greatsword', { sword: 'ice_fang_sword' }),
+    ).toBe('ice_fang_sword');
+    expect(offhandMirrorsWeaponSkin('ice_fang_sword', 'eastbrook_greatsword')).toBe(true);
+    // A different-type two-hander stays bare, same as the one-hand arm.
+    expect(offhandMirrorsWeaponSkin('frostbite_dagger', 'eastbrook_greatsword')).toBe(false);
+  });
+
+  it('leaves a different-type offhand weapon untouched', () => {
+    expect(offhandMirrorsWeaponSkin('frostbite_dagger', 'crossroads_saber')).toBe(false);
+    expect(offhandMirrorsWeaponSkin('ice_fang_sword', 'rusty_dagger')).toBe(false);
+  });
+
+  it('never mirrors onto a shield (armor, no weapon type)', () => {
+    expect(offhandMirrorsWeaponSkin('ice_fang_sword', 'eastbrook_buckler')).toBe(false);
+    expect(offhandMirrorsWeaponSkin('frostbite_dagger', 'highwatch_wallshield')).toBe(false);
+  });
+
+  it('never mirrors onto a held offhand (orb/tome, no weapon type)', () => {
+    expect(offhandMirrorsWeaponSkin('ice_fang_sword', 'wraithfire_orb')).toBe(false);
+  });
+
+  it('resolves a heroic-prefixed offhand item to its base weapon type', () => {
+    expect(offhandMirrorsWeaponSkin('frostbite_dagger', 'heroic_fang_of_korzul')).toBe(true);
+    expect(offhandMirrorsWeaponSkin('ice_fang_sword', 'heroic_fang_of_korzul')).toBe(false);
+  });
+
+  it('returns false for an unknown or absent skin, or an empty offhand', () => {
+    expect(offhandMirrorsWeaponSkin('not_a_skin', 'rusty_dagger')).toBe(false);
+    expect(offhandMirrorsWeaponSkin(null, 'rusty_dagger')).toBe(false);
+    expect(offhandMirrorsWeaponSkin(undefined, 'rusty_dagger')).toBe(false);
+    expect(offhandMirrorsWeaponSkin('frostbite_dagger', null)).toBe(false);
+    expect(offhandMirrorsWeaponSkin('frostbite_dagger', undefined)).toBe(false);
   });
 });
 
@@ -313,6 +378,28 @@ describe('grip override wiring (editor saves reach the game)', () => {
     expect(tuned.position[0]).toBeCloseTo(row?.pos?.[0] ?? 0, 5);
     expect(tuned.position[1]).toBeCloseTo(0.05 + (row?.pos?.[1] ?? 0), 5);
     expect(tuned.quaternion).not.toEqual(bare.quaternion);
+  });
+
+  it('mirrors a per-weapon offset onto the off-hand (X and Z flip, Y shared)', async () => {
+    // The override is authored against the right hand; the off-hand is the mirror
+    // image (a 180-degree turn about Y), so a large offset must flip X and Z or the
+    // off-hand model sits off the grip (a legendary sword skin on a dual-wielder).
+    const { variantGripTransform } = await import('../src/render/characters/weapon_grip');
+    const override = { pos: [-0.1787, -0.0279, -0.273] as [number, number, number] };
+    const right = variantGripTransform(1.2, false, 0.05, 1.6, override);
+    const left = variantGripTransform(1.2, true, 0.05, 1.6, override);
+    expect(left.position[0]).toBeCloseTo(-right.position[0], 5);
+    expect(left.position[2]).toBeCloseTo(-right.position[2], 5);
+    // Y is the along-bone lift, shared by both hands.
+    expect(left.position[1]).toBeCloseTo(right.position[1], 5);
+    // A scale-only override (ice_fang and friends) has no X/Z to flip, so the grip
+    // position is identical in both hands, off-hand skins render byte-identically.
+    const scaleOnlyR = variantGripTransform(1.2, false, 0.05, 1.6, { scale: 1.3 });
+    const scaleOnlyL = variantGripTransform(1.2, true, 0.05, 1.6, { scale: 1.3 });
+    for (let i = 0; i < 3; i++) {
+      expect(scaleOnlyL.position[i]).toBeCloseTo(scaleOnlyR.position[i], 5);
+      expect(scaleOnlyL.position[i]).toBeCloseTo([0, 0.05, 0][i], 5);
+    }
   });
 });
 

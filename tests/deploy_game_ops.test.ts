@@ -43,9 +43,9 @@ describe('Game container health and resource deploy contract', () => {
 
   // `restart: unless-stopped` only acts on process EXIT, so a wedged-but-alive server
   // stays in the load balancer until a human notices. This probe is the only signal
-  // docker has that the process is still doing its job. The runtime image is alpine with
-  // no curl and no wget, so the probe has to be the node one-liner in exec form; if it
-  // regresses to a CMD-SHELL curl the healthcheck fails permanently on a healthy server.
+  // docker has that the process is still doing its job. The runtime image is a Debian
+  // slim base with no curl and no wget, so the probe has to be the node one-liner in exec
+  // form; if it regresses to a CMD-SHELL curl the healthcheck fails permanently on a healthy server.
   it('probes /livez with an exec-form node one-liner (no curl exists in the image)', () => {
     expect(gameService).toContain(HEALTHCHECK_TEST_LINE);
   });

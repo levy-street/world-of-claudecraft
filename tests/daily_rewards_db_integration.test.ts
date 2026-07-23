@@ -4,6 +4,10 @@
 
 import { Pool } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import {
+  DAILY_REWARD_FINALIZE_DAY_SQL,
+  DAILY_REWARD_OPEN_DAY_LOCK_SQL,
+} from '../server/daily_rewards_db';
 import { DAILY_REWARD_EVENTS_CONCURRENT_INDEX_SQL } from '../server/daily_rewards_schema';
 
 const DB_URL = process.env.TEST_DATABASE_URL;
@@ -55,6 +59,12 @@ describeDb('Daily Rewards timed bans and event ledger (real Postgres)', () => {
           meta JSONB NOT NULL DEFAULT '{}'::jsonb,
           created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
           UNIQUE (day, realm, account_id, idempotency_key)
+        );
+        CREATE TABLE daily_reward_days (
+          day TEXT NOT NULL,
+          realm TEXT NOT NULL,
+          finalized_at TIMESTAMPTZ,
+          PRIMARY KEY (day, realm)
         );
         INSERT INTO accounts VALUES (1), (2), (3);
         INSERT INTO daily_reward_events (
@@ -122,6 +132,64 @@ describeDb('Daily Rewards timed bans and event ledger (real Postgres)', () => {
       ]);
     } finally {
       client.release();
+    }
+  });
+
+  it('allows exactly one concurrent finalizer to claim a day', async () => {
+    await pool.query(
+      `INSERT INTO ${SCHEMA}.daily_reward_days (day, realm) VALUES ('2026-07-17', 'eastbrook')`,
+    );
+    const first = await pool.connect();
+    const second = await pool.connect();
+    try {
+      await first.query(`SET search_path TO ${SCHEMA}`);
+      await second.query(`SET search_path TO ${SCHEMA}`);
+      await first.query('BEGIN');
+      await second.query('BEGIN');
+      const claimed = await first.query(DAILY_REWARD_FINALIZE_DAY_SQL, ['2026-07-17', 'eastbrook']);
+      const competing = second.query(DAILY_REWARD_FINALIZE_DAY_SQL, ['2026-07-17', 'eastbrook']);
+      await first.query('COMMIT');
+      const duplicate = await competing;
+      await second.query('COMMIT');
+      expect(claimed.rowCount).toBe(1);
+      expect(duplicate.rowCount).toBe(0);
+    } finally {
+      first.release();
+      second.release();
+    }
+  });
+
+  it('serializes an in-flight score writer ahead of finalization', async () => {
+    await pool.query(
+      `INSERT INTO ${SCHEMA}.daily_reward_days (day, realm) VALUES ('2026-07-18', 'eastbrook')`,
+    );
+    const writer = await pool.connect();
+    const finalizer = await pool.connect();
+    try {
+      await writer.query(`SET search_path TO ${SCHEMA}`);
+      await finalizer.query(`SET search_path TO ${SCHEMA}`);
+      await writer.query('BEGIN');
+      const openDay = await writer.query(DAILY_REWARD_OPEN_DAY_LOCK_SQL, [
+        '2026-07-18',
+        'eastbrook',
+      ]);
+      expect(openDay.rows[0].finalized_at).toBeNull();
+      const closing = finalizer.query(DAILY_REWARD_FINALIZE_DAY_SQL, ['2026-07-18', 'eastbrook']);
+      await writer.query(
+        `INSERT INTO daily_reward_events
+          (day, realm, account_id, kind, points, idempotency_key)
+         VALUES ('2026-07-18', 'eastbrook', 3, 'task', 10, 'race:writer')`,
+      );
+      await writer.query('COMMIT');
+      const finalized = await closing;
+      expect(finalized.rowCount).toBe(1);
+      const event = await finalizer.query(
+        `SELECT 1 FROM daily_reward_events WHERE idempotency_key = 'race:writer'`,
+      );
+      expect(event.rowCount).toBe(1);
+    } finally {
+      writer.release();
+      finalizer.release();
     }
   });
 });

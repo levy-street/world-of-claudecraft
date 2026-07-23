@@ -5,6 +5,7 @@ import { createMob } from '../src/sim/entity';
 import {
   activeLootRolls,
   awardSharedLootItem,
+  CORPSE_INTERACT_GRACE_SECONDS,
   distributeLootCopper,
   lootRollGroupStatus,
   lootSlotVisibleTo,
@@ -421,7 +422,7 @@ describe('loot_roll: group roll status + resolution broadcast (module entry)', (
     }
   });
 
-  it('broadcasts every need/greed roll to the whole party at resolution, then the winner line', () => {
+  it('reveals only the need rolls at resolution when anyone needed, then the winner line', () => {
     const { sim, a, b, c, rollId } = openRoll();
     submitLootRoll(sim.ctx, rollId, 'greed', b);
     submitLootRoll(sim.ctx, rollId, 'need', a);
@@ -433,9 +434,9 @@ describe('loot_roll: group roll status + resolution broadcast (module entry)', (
     for (const viewer of [a, b, c]) {
       const texts = lootTexts(viewer);
       const needLine = texts.find((t) => t.startsWith('Need Roll - '));
-      const greedLine = texts.find((t) => t.startsWith('Greed Roll - '));
       expect(needLine).toMatch(/^Need Roll - \d+ for \[\[i:greyjaw_hide_boots\]\] by Aaa$/);
-      expect(greedLine).toMatch(/^Greed Roll - \d+ for \[\[i:greyjaw_hide_boots\]\] by Bbb$/);
+      // A need makes the greed rolls outcome-irrelevant, so they are not revealed.
+      expect(texts.some((t) => t.startsWith('Greed Roll - '))).toBe(false);
       // Winner line still closes the roll, after the per-roller reveals.
       const winLine = texts.find((t) => t.includes(' wins '));
       expect(winLine).toMatch(/^Aaa wins \[\[i:greyjaw_hide_boots\]\] \(\d+\)$/);
@@ -445,6 +446,28 @@ describe('loot_roll: group roll status + resolution broadcast (module entry)', (
     expect(lootTexts(a).some((t) => t.includes('by Ccc'))).toBe(false);
     // Resolved roll leaves the group status.
     expect(lootRollGroupStatus(sim.ctx, a)).toHaveLength(0);
+  });
+
+  it('still reveals every greed roll to the whole party when nobody needed', () => {
+    const { sim, a, b, c, rollId } = openRoll();
+    submitLootRoll(sim.ctx, rollId, 'greed', a);
+    submitLootRoll(sim.ctx, rollId, 'greed', b);
+    submitLootRoll(sim.ctx, rollId, 'pass', c);
+    const lootTexts = (pid: number) =>
+      sim.events
+        .filter((e): e is Extract<SimEvent, { type: 'loot' }> => e.type === 'loot' && e.pid === pid)
+        .map((e) => e.text);
+    for (const viewer of [a, b, c]) {
+      const texts = lootTexts(viewer);
+      const greedLines = texts.filter((t) => t.startsWith('Greed Roll - '));
+      expect(greedLines).toHaveLength(2);
+      expect(greedLines[0]).toMatch(/^Greed Roll - \d+ for \[\[i:greyjaw_hide_boots\]\] by Aaa$/);
+      expect(greedLines[1]).toMatch(/^Greed Roll - \d+ for \[\[i:greyjaw_hide_boots\]\] by Bbb$/);
+      expect(texts.some((t) => t.startsWith('Need Roll - '))).toBe(false);
+      const winLine = texts.find((t) => t.includes(' wins '));
+      expect(winLine).toMatch(/^(Aaa|Bbb) wins \[\[i:greyjaw_hide_boots\]\] \(\d+\)$/);
+      expect(texts.indexOf(greedLines[1])).toBeLessThan(texts.indexOf(winLine as string));
+    }
   });
 
   it('hides a curate-phase master roll from the group status', () => {
@@ -510,9 +533,44 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
     expect(lootSlotVisibleTo({ itemId: 'x', count: 1 }, 6)).toBe(true);
   });
 
-  it('pruneCorpseLoot clears an emptied corpse and clamps the corpse timer down', () => {
+  it('pruneCorpseLoot keeps an emptied corpse open for its unclaimed harvest (grace arm)', () => {
+    // forest_wolf carries componentTags and the claim is untaken,
+    // so the emptied corpse stays lootable for the interact-grace window
+    // instead of collapsing (the respawn gate ends it at corpseTimer 0).
     const sim = makeSim();
     const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.corpseTimer = 60;
+    mob.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
+    sim.entities.set(mob.id, mob);
+    pruneCorpseLoot(sim.ctx, mob);
+    expect(mob.loot).toBeNull();
+    expect(mob.lootable).toBe(true);
+    expect(CORPSE_INTERACT_GRACE_SECONDS).toBe(30);
+    expect(mob.corpseTimer).toBe(CORPSE_INTERACT_GRACE_SECONDS);
+  });
+
+  it('pruneCorpseLoot collapses an emptied corpse whose harvest claim is spent (fast arm)', () => {
+    const sim = makeSim();
+    const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.corpseTimer = 60;
+    mob.harvestClaimedBy = 7;
+    mob.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
+    sim.entities.set(mob.id, mob);
+    pruneCorpseLoot(sim.ctx, mob);
+    expect(mob.loot).toBeNull();
+    expect(mob.lootable).toBe(false);
+    expect(mob.corpseTimer).toBe(4);
+  });
+
+  it('pruneCorpseLoot collapses an emptied corpse with no harvest half at all (fast arm)', () => {
+    // warlock_imp carries no componentTags (#1140): nothing to keep open for.
+    expect(MOBS.warlock_imp.componentTags).toBeUndefined();
+    const sim = makeSim();
+    const mob = createMob(sim.nextId++, MOBS.warlock_imp, 2, { x: 0, y: 0, z: 0 });
     mob.dead = true;
     mob.lootable = true;
     mob.corpseTimer = 60;

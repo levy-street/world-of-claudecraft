@@ -1,4 +1,4 @@
-// Masterwork event mirror parity (Professions 2.0 Phase 2, the #2033 liveness
+// Masterwork event mirror parity (Professions 2.0, the #2033 liveness
 // class): the `masterwork` SimEvent must be a LIVE mirror on both hosts. The
 // offline Sim stashes PlayerMeta.lastMasterwork when a craft procs, and the
 // online ClientWorld rebuilds lastMasterwork from the event stream alone, so
@@ -26,7 +26,9 @@ function craftMasterwork() {
   const pid = sim.playerId;
   for (let i = 0; i < 3; i++) sim.addItem('linen_scrap', 1, pid);
   sim.addItem('spider_leg', 1, pid);
-  sim.craftItem(RECIPE_ID, pid);
+  sim.addItem('homespun_cloth', 3, pid);
+  sim.addItem('spool_of_thread', 5, pid);
+  sim.craftItem(RECIPE_ID, false, pid);
   const events = sim.drainEvents().filter((ev) => ev.type === 'masterwork');
   return { sim, pid, events };
 }
@@ -97,7 +99,7 @@ describe('online ClientWorld host', () => {
   });
 
   it('the craftResult mirror carries the masterwork flag and rebuilds it per event', () => {
-    // applyCraftResultEvent (online.ts) must copy the Phase 2 `masterwork`
+    // applyCraftResultEvent (online.ts) must copy the `masterwork`
     // field into the lastCraftResult mirror: a dropped field here would leave
     // the online HUD unable to distinguish a proc, with every other test
     // (Sim-side only) still green.

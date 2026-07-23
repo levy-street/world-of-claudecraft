@@ -1,8 +1,9 @@
 // Content integration checks: referential integrity across the merged
 // content tables, and the XP pacing budget that keeps leveling 1-20 free of
-// forced grinding. These tests are content-shape tests — they run against
+// forced grinding. These tests are content-shape tests: they run against
 // whatever the content modules currently export, so they hold as zones grow.
 import { describe, expect, it } from 'vitest';
+import { CHOICE_ROW_LEVELS, CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import {
   ABILITIES,
   ALL_RECIPES,
@@ -25,12 +26,32 @@ import {
   ZONES,
 } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
-import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
+import { HARVEST_COMPONENT_ITEMS, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
 
 const WORLD_SEED = 20061; // production seed (main.ts / server/game.ts)
 const SCRIPTED_COLLECT_ITEMS = new Set(['the_codfather']);
+
+// The complete set of ways a collect-objective item can legitimately enter a
+// player's bags. The mob-loot / ground-object / scripted trio is the original
+// model, plus the two gathering acquisition paths the work-order
+// materials use: gather-node harvest (NODE_MATERIAL_TABLE grants copper_ore,
+// ironbark_log, goldleaf_herb in their zones) and corpse harvest
+// (HARVEST_COMPONENT_ITEMS maps a component tag to game_meat, spider_silk,
+// rough_hide, etc). Both the obtainability check and its negative control call
+// this one predicate, so the negative control proves the REAL model, not a copy.
+function collectItemAcquirable(itemId: string): boolean {
+  const fromLoot = Object.values(MOBS).some((m) => m.loot.some((l) => l.itemId === itemId));
+  const fromGround = GROUND_OBJECTS.some((g) => g.itemId === itemId);
+  const fromScript = SCRIPTED_COLLECT_ITEMS.has(itemId);
+  const fromNode = Object.values(NODE_MATERIAL_TABLE).some((byZone) =>
+    Object.values(byZone).some((row) => row.itemId === itemId),
+  );
+  const fromHarvest = Object.values(HARVEST_COMPONENT_ITEMS).includes(itemId);
+  return fromLoot || fromGround || fromScript || fromNode || fromHarvest;
+}
 
 describe('content referential integrity', () => {
   it('every quest reference resolves (NPCs, mobs, items, chains)', () => {
@@ -60,7 +81,11 @@ describe('content referential integrity', () => {
           }
           if (obj.itemId) {
             if (!ITEMS[obj.itemId]) problems.push(`${q.id}: gather item ${obj.itemId} missing`);
-            if (!Object.values(NODE_HARVEST_TABLE).some((entry) => entry.itemId === obj.itemId)) {
+            if (
+              !Object.values(NODE_MATERIAL_TABLE).some((byZone) =>
+                Object.values(byZone).some((row) => row.itemId === obj.itemId),
+              )
+            ) {
               problems.push(`${q.id}: gather item ${obj.itemId} has no node source`);
             }
           }
@@ -87,16 +112,27 @@ describe('content referential integrity', () => {
     for (const q of Object.values(QUESTS)) {
       for (const obj of q.objectives) {
         if (obj.type !== 'collect' || !obj.itemId) continue;
-        const fromLoot = Object.values(MOBS).some((m) =>
-          m.loot.some((l) => l.itemId === obj.itemId),
-        );
-        const fromGround = GROUND_OBJECTS.some((g) => g.itemId === obj.itemId);
-        const fromScript = SCRIPTED_COLLECT_ITEMS.has(obj.itemId);
-        if (!fromLoot && !fromGround && !fromScript)
+        if (!collectItemAcquirable(obj.itemId))
           problems.push(`${q.id}: ${obj.itemId} has no acquisition source`);
       }
     }
     expect(problems).toEqual([]);
+  });
+
+  it('the collect-obtainability model rejects a fabricated unobtainable item (negative control)', () => {
+    // Decisive guard so the widened model (with the gather-node and
+    // corpse-harvest paths for the work-order materials) can never go all-
+    // permissive: an item that lives in NO mob loot table, ground object,
+    // scripted set, gather-node material row, or corpse-harvest component map
+    // must still be classified unacquirable. The four real acquisition paths are
+    // re-proven acquirable here so a later refactor that drops a path reds this.
+    expect(collectItemAcquirable('totally_not_a_real_item_xyz')).toBe(false);
+    expect(collectItemAcquirable('copper_ore')).toBe(true); // gather-node material
+    expect(collectItemAcquirable('ironbark_log')).toBe(true); // gather-node material
+    expect(collectItemAcquirable('goldleaf_herb')).toBe(true); // gather-node material
+    expect(collectItemAcquirable('game_meat')).toBe(true); // corpse-harvest component
+    expect(collectItemAcquirable('spider_silk')).toBe(true); // corpse-harvest component
+    expect(collectItemAcquirable('rough_hide')).toBe(true); // corpse-harvest component
   });
 
   it('QUEST_ORDER covers every quest exactly once', () => {
@@ -223,6 +259,28 @@ describe('content referential integrity', () => {
         }
       }
     }
+  });
+});
+
+describe('talent row unlock progression', () => {
+  const unlockedRowsAt = (level: number): number =>
+    CHOICE_ROW_LEVELS.filter((rowLevel) => rowLevel <= level).length;
+
+  it('unlocks rows on the choice-row level schedule', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    for (const level of [1, 4, 5, 7, 8, 11, 14, 17, 20]) {
+      sim.setPlayerLevel(level);
+      expect(sim.talentPoints().total, `level ${level}`).toBe(unlockedRowsAt(level));
+    }
+  });
+
+  it('counts spent talents as picked rows, not old rank totals', () => {
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    sim.setPlayerLevel(20);
+    const r5 = CHOICE_ROWS.warrior.rows[0].options[0].id;
+    const r11 = CHOICE_ROWS.warrior.rows[2].options[1].id;
+    expect(sim.applyTalents({ spec: null, rows: { 5: r5, 11: r11 } })).toBe(true);
+    expect(sim.talentPoints()).toEqual({ total: CHOICE_ROW_LEVELS.length, spent: 2 });
   });
 });
 

@@ -5,6 +5,8 @@ import { dungeonDaisHasRaisedPlatform } from '../src/render/dungeon';
 import { isBlocked } from '../src/sim/colliders';
 import { DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
 import { NYTHRAXIS_LAYOUT } from '../src/sim/dungeon_layout';
+import { isShieldItem } from '../src/sim/equipment_rules';
+import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
 import { type Aura, dist2d, type Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -222,10 +224,21 @@ describe('Nythraxis raid encounter', () => {
     const origin = enterRaid(sim, pid);
     expect(sim.entities.get(pid)!.pos.x).toBeGreaterThan(3000);
     const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
-    expect(boss.maxHp).toBe(60000);
-    expect(boss.weapon.min).toBe(325);
-    expect(boss.weapon.max).toBe(507);
+    // Normal-raid retune (NORMAL_DUNGEON_TUNING): doubled health (was 60000)
+    // and the 5x per-mob damage multiplier (weapon was 325-507).
+    expect(boss.maxHp).toBe(120000);
+    expect(boss.weapon.min).toBe(1624);
+    expect(boss.weapon.max).toBe(2537);
     expect(visualKeyFor(boss)).toBe('skel_golem');
+    expect(
+      visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_warrior_add' } as Entity),
+    ).toBe('skel_warrior');
+    expect(visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_priest_add' } as Entity)).toBe(
+      'skel_necromancer',
+    );
+    expect(visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_rogue_add' } as Entity)).toBe(
+      'skel_rogue',
+    );
     expect(boss.scale).toBeGreaterThanOrEqual(3);
     expect(boss.facing).toBe(Math.PI);
     const wards = objects(sim, 'bastion_ward_stone', origin);
@@ -279,17 +292,26 @@ describe('Nythraxis raid encounter', () => {
     const loot = MOBS.nythraxis_scourge_of_thornpeak.loot.filter((entry) => entry.itemId);
     const groups = new Map<string, typeof loot>();
     for (const entry of loot) {
-      expect(entry.rollGroup).toMatch(/^nythraxis_drop_[1-4]$/);
+      expect(entry.rollGroup).toMatch(/^nythraxis_drop_[1-5]$/);
       const group = entry.rollGroup!;
       groups.set(group, [...(groups.get(group) ?? []), entry]);
       expect(ITEMS[entry.itemId!], entry.itemId).toBeTruthy();
     }
 
-    expect(groups.size).toBe(4);
-    for (const entries of groups.values()) {
+    expect(groups.size).toBe(5);
+    for (const [name, entries] of groups) {
       const total = entries.reduce((sum, entry) => sum + entry.chance, 0);
-      expect(total).toBeCloseTo(1, 5);
+      // nythraxis_drop_5 is the feral ladder's bonus draw (maul_of_the_scourged_wilds):
+      // a single independent 25% roll on top of the four guaranteed equipment
+      // groups, which keep their exact 1.00 partitions untouched.
+      if (name === 'nythraxis_drop_5') {
+        expect(entries.map((entry) => entry.itemId)).toEqual(['maul_of_the_scourged_wilds']);
+        expect(total).toBe(0.25);
+      } else {
+        expect(total).toBeCloseTo(1, 5);
+      }
     }
+    expect(ITEMS.maul_of_the_scourged_wilds.requiredClass).toEqual(['druid']);
 
     for (const itemId of ['deathless_heartwood', 'kingsbane_last_oath']) {
       const item = ITEMS[itemId];
@@ -319,6 +341,51 @@ describe('Nythraxis raid encounter', () => {
     expect(ITEMS.soulflame_mantle.requiredClass).toEqual(['mage', 'priest', 'warlock', 'druid']);
     expect(ITEMS.stormcallers_crown.requiredClass).toEqual(['shaman']);
     expect(ITEMS.stormcallers_spaulders.requiredClass).toEqual(['shaman']);
+  });
+
+  it('drops the offhand-slot and two-hander epics at item level 29 (raid source)', () => {
+    const loot = MOBS.nythraxis_scourge_of_thornpeak.loot;
+    for (const id of [
+      'bonewrought_greatsword',
+      'direfang_greatblade',
+      'bonewrought_bulwark',
+      'wraithfire_orb',
+    ]) {
+      const item = ITEMS[id];
+      expect(item.quality, id).toBe('epic');
+      // Raid source: 20 (boss level) + 6 (epic) + 3 (raid bonus) = item level 29,
+      // with the realized primary stats exactly on that tier's budget (the 2H
+      // weapons carry the doubled TWOHAND_STAT_MULT mainhand budget).
+      expect(itemLevel(item), id).toBe(29);
+      expect(primaryStatSum(item), id).toBe(expectedStatBudget(item));
+      expect(
+        loot.some((entry) => entry.itemId === id),
+        id,
+      ).toBe(true);
+    }
+    // The two-handers occupy both hands; the offhand pieces fill the slot the
+    // set never covered. The bulwark uses the v0.26 shield idiom (kind 'armor'
+    // + shield marker), the orb the held_offhand kind.
+    expect(ITEMS.bonewrought_greatsword).toMatchObject({ hand: 'twohand', slot: 'mainhand' });
+    expect(ITEMS.direfang_greatblade).toMatchObject({ hand: 'twohand', slot: 'mainhand' });
+    // A bespoke hunter lock: the agi 2H must never reach the rogue group.
+    expect(ITEMS.direfang_greatblade.requiredClass).toEqual(['hunter']);
+    expect(isShieldItem(ITEMS.bonewrought_bulwark)).toBe(true);
+    expect(ITEMS.bonewrought_bulwark).toMatchObject({
+      kind: 'armor',
+      armorType: 'mail',
+      slot: 'offhand',
+      shield: true,
+      blockValue: 30,
+    });
+    expect(ITEMS.wraithfire_orb).toMatchObject({ kind: 'held_offhand', slot: 'offhand' });
+    // The ilvl-29 raid seed rating (one rating at 20): Hit for the physical
+    // pieces, crit (never Hit) for the healer-inclusive caster orb.
+    expect(ITEMS.bonewrought_greatsword.hitRating).toBe(20);
+    expect(ITEMS.direfang_greatblade.hitRating).toBe(20);
+    expect(ITEMS.bonewrought_bulwark.hitRating).toBe(20);
+    expect(ITEMS.wraithfire_orb.critRating).toBe(20);
+    expect(ITEMS.wraithfire_orb.hitRating ?? 0).toBe(0);
   });
 
   it('keeps Nythraxis fixed at his throne facing the entrance before pull', () => {
@@ -1685,6 +1752,27 @@ describe('Nythraxis raid encounter', () => {
       add.swingTimer = 0;
       add.threat.set(tank.id, 1000);
     }
+    adds[0].auras.push({
+      id: 'fear_incap',
+      name: 'Fear',
+      kind: 'incapacitate',
+      remaining: 30,
+      duration: 30,
+      value: 0,
+      sourceId: tank.id,
+      school: 'shadow',
+    });
+    adds[1].auras.push({
+      id: 'polymorph',
+      name: 'Polymorph',
+      kind: 'polymorph',
+      remaining: 30,
+      duration: 30,
+      value: 0,
+      sourceId: tank.id,
+      school: 'arcane',
+    });
+    const transitionAddPositions = adds.map((add) => ({ ...add.pos }));
 
     boss.hp = Math.floor(boss.maxHp * 0.69);
     sim.tick();
@@ -1704,6 +1792,9 @@ describe('Nythraxis raid encounter', () => {
     ).toBe(false);
     expect(tank.hp).toBe(transitionHp);
     expect(boss.nythraxis?.phase).toBe('transition');
+    expect(adds.map((add, index) => dist2d(add.pos, transitionAddPositions[index]))).toEqual([
+      0, 0,
+    ]);
   });
 
   it('stuns active pets during the Aldric transition so they cannot keep attacking', () => {
@@ -1761,8 +1852,9 @@ describe('Nythraxis raid encounter', () => {
       (e) => e.kind === 'mob' && e.templateId === 'nythraxis_skeleton_warrior' && !e.dead,
     );
     expect(adds).toHaveLength(2);
-    expect(adds[0].weapon.min).toBe(159);
-    expect(adds[0].weapon.max).toBe(248);
+    // 5x normal-raid retune (weapon was 159-248 before the economy pass).
+    expect(adds[0].weapon.min).toBe(794);
+    expect(adds[0].weapon.max).toBe(1241);
   });
 
   it('stages Aldric transition dialogue without interrupting itself before Soul Rend opens phase two after a settle delay', () => {

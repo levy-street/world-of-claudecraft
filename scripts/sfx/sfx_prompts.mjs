@@ -552,9 +552,21 @@ export const SFX = [
     prompt: 'A crackling campfire with popping embers and steady flames. Seamless loop, no music.',
   },
   {
+    // Real recording (not ElevenLabs), custom-authored to loop cleanly
+    // through the runtime's own loop=true playback (no seam crossfade of
+    // its own, see src/game/sfx.ts's loop()): the hammer rhythm deliberately
+    // breaks pattern instead of repeating a fixed beat, and 375ms of true
+    // silence on each side, after the strike decay rings out, absorbs both
+    // the splice points and MP3 encoder priming/padding at the wrap. custom
+    // is load-bearing here: it is what makes conform preserve the author's
+    // own mix level (preserveLoudness) instead of retargeting integrated
+    // LUFS toward the generated-content target, which would otherwise clamp
+    // this percussive, high-crest-factor recording's gain down hard trying
+    // to hit -14 LUFS under a -6dBFS peak ceiling built for synthetic clips.
     key: 'amb_forge',
-    duration: 6,
+    duration: 14,
     loop: true,
+    custom: true,
     prompt:
       'A blacksmith forge: a roaring furnace with rhythmic hammer strikes ringing on an anvil. Seamless loop, no music.',
   },
@@ -582,7 +594,7 @@ export const SFX = [
     prompt: 'A soft muffled snowy wind, quiet and cold. Seamless loop, no music.',
   },
 
-  // --- Quest events (custom recordings, not ElevenLabs) --------------------
+  // --- Custom recordings (not ElevenLabs) ----------------------------------
   { key: 'quest_accept', custom: true },
   { key: 'quest_ready', custom: true },
   { key: 'quest_complete', custom: true },
@@ -624,6 +636,83 @@ export const SFX = [
   // sound fired for both real level-ups and every achievement, wearing thin
   // fast. See handleDeedUnlocks in src/ui/hud.ts.
   { key: 'ui_achievement', custom: true },
+  { key: 'temporal_clock', custom: true },
+
+  // Group ready-check three-note prompt (custom recording, not
+  // ElevenLabs/generated). Replaces the hardcoded three-oscillator procedural
+  // chime that used to live directly in src/game/audio.ts (readyCheck()).
+  { key: 'ui_ready_check', custom: true },
+
+  // Polymorph "sheep" transformation bleat (custom recording, not
+  // ElevenLabs/generated). Replaces the procedural saw/sine synth placeholder.
+  { key: 'ui_sheep', custom: true },
+
+  // Weapon stow toggle (Z key, custom recording, not ElevenLabs/generated).
+  // Replaces the procedural noise+tone synth pair that used to live directly
+  // in src/game/audio.ts (weaponSheathe()/weaponUnsheathe()).
+  { key: 'ui_weapon_sheathe', custom: true },
+  { key: 'ui_weapon_unsheathe', custom: true },
+
+  // Whisper notification (custom recording, a real tambourine hit, not
+  // ElevenLabs/generated). Replaces the old procedural "two glassy notes"
+  // placeholder; see the cue description below, still pending an update.
+  { key: 'ui_whisper', custom: true },
+
+  // Generic invalid-action buzz (custom recording, not ElevenLabs/generated).
+  // Replaces the old procedural "low interface buzz" placeholder. Covers
+  // every failure reason (cooldown, resource, range, everything else) with
+  // one rate-limited cue; splitting by failure reason was tried and
+  // deliberately reverted.
+  { key: 'ui_error', custom: true },
+
+  // Cosmetic/skin unlock chime (custom recording, not ElevenLabs/generated).
+  // Previously the Season 1 Armory skin-event claim flow reused ui_level_up
+  // (audio.levelUp()), so a real level-up and a cosmetic unlock sounded
+  // identical. See SkinEventController's lock-button handler in
+  // src/ui/hud/cosmetics/skin_event_controller.ts.
+  { key: 'ui_cosmetic_unlock', custom: true },
+
+  // Duel/arena start gong (custom recording, not ElevenLabs/generated).
+  // Vale Cup kickoff was split off to its own key (ui_vcup_kickoff) so this
+  // one stays real-duel/arena only; see the 'vcupKickoff' case in hud.ts.
+  { key: 'ui_duel_start', custom: true },
+
+  // Arena rating-loss defeat chime (custom recording, not ElevenLabs/generated).
+  // Upgrades the placeholder tone; see the 'arenaResult' loss branch in hud.ts.
+  { key: 'ui_arena_loss', custom: true },
+
+  // Generic interface click (custom recording, not ElevenLabs/generated).
+  // The single highest-frequency UI cue (100+ call sites: tabs, checkboxes,
+  // window buttons, dungeon-finder queue/role buttons, options changes).
+  { key: 'ui_click', custom: true },
+
+  // Currency reward ping (custom recording, not ElevenLabs/generated), three
+  // takes so the no-repeat-random picker rotates them (sell/buyback, mail
+  // postage, bank deposit/withdraw, trade completion).
+  { key: 'ui_coin', custom: true },
+
+  // Item pickup rustle/tick (custom recording, not ElevenLabs/generated),
+  // five takes so the no-repeat-random picker rotates them.
+  { key: 'ui_loot_item', custom: true },
+
+  // Duel/arena/Vale-Cup end cadence (custom recording, not ElevenLabs/generated).
+  { key: 'ui_duel_end', custom: true },
+
+  // Inventory bag close (custom recording, not ElevenLabs/generated).
+  { key: 'ui_bag_close', custom: true },
+
+  // Inventory bag open (custom recording, not ElevenLabs/generated).
+  { key: 'ui_bag_open', custom: true },
+
+  // Duel/arena/Vale-Cup countdown tick (custom recording, not ElevenLabs/generated).
+  { key: 'ui_duel_countdown', custom: true },
+
+  // Duel challenge / party invite / guild invite / arena queue pop / Vale
+  // Cup match-found (custom recording, not ElevenLabs/generated). Shared
+  // "a match is starting" vocabulary across all five, deliberately, per
+  // Jamie 2026-07-18: party and guild invite used to be the separate,
+  // misnamed ui_quest_accept (now retired).
+  { key: 'ui_duel_challenge', custom: true },
 
   // --- Wand auto-attacks (custom recordings, not ElevenLabs) ----------------
   // Distinct from the matching proj_<school> real-spell-cast sound, see
@@ -631,6 +720,14 @@ export const SFX = [
   { key: 'wand_arcane', custom: true },
   { key: 'wand_holy', custom: true },
   { key: 'wand_shadow', custom: true },
+
+  // --- Card Duel minigame (custom recordings, not ElevenLabs) --------------
+  // Match win/lose deliberately reuse ui_duel_end/ui_arena_loss, no dedicated
+  // recordings for those (see src/game/audio.ts).
+  { key: 'ui_card_play', custom: true },
+  { key: 'ui_card_reveal', custom: true },
+  { key: 'ui_card_round_push', custom: true },
+  { key: 'ui_card_shuffle', custom: true },
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

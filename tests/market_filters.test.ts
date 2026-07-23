@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type MarketQuery, marketItemMatches } from '../src/sim/market_query';
+import { type MarketQuery, marketItemMatches, sanitizeMarketQuery } from '../src/sim/market_query';
 import {
   MARKET_ARMOR_TYPE_FILTERS,
   MARKET_ITEM_TYPE_FILTERS,
@@ -19,8 +19,10 @@ function filterIds(ids: readonly string[], over: Partial<MarketQuery> = {}): str
 }
 
 describe('World Market filters', () => {
+  // wolf_fang became a crafting reagent (common, white), so the
+  // poor-quality exemplar here is mudfin_scale.
   const items = [
-    'wolf_fang',
+    'mudfin_scale',
     'bone_fragments',
     'keen_dirk',
     'greyjaw_pelt_cloak',
@@ -41,13 +43,16 @@ describe('World Market filters', () => {
     ]);
     expect(MARKET_ARMOR_TYPE_FILTERS).toEqual([
       'all',
+      'offhand',
       'helmet',
+      'neck',
       'shoulder',
       'chest',
       'waist',
       'legs',
       'gloves',
       'feet',
+      'ring',
     ]);
     expect(MARKET_WEAPON_TYPE_FILTERS).toEqual([
       'all',
@@ -58,7 +63,15 @@ describe('World Market filters', () => {
       'axe',
       'other',
     ]);
-    expect(MARKET_RARITY_FILTERS).toEqual(['all', 'poor', 'common', 'uncommon', 'rare', 'epic']);
+    expect(MARKET_RARITY_FILTERS).toEqual([
+      'all',
+      'poor',
+      'common',
+      'uncommon',
+      'rare',
+      'epic',
+      'legendary',
+    ]);
   });
 
   it('groups wearable armor separately from weapons and consumables', () => {
@@ -90,7 +103,7 @@ describe('World Market filters', () => {
 
   it('matches rarities by the game quality names', () => {
     // bone_fragments is a crafting reagent, so it is common (white), not poor.
-    expect(filterIds(items, { rarity: 'poor' })).toEqual(['wolf_fang']);
+    expect(filterIds(items, { rarity: 'poor' })).toEqual(['mudfin_scale']);
     expect(filterIds(items, { rarity: 'common' })).toEqual([
       'bone_fragments',
       'roasted_boar',
@@ -100,6 +113,18 @@ describe('World Market filters', () => {
       'keen_dirk',
       'greyjaw_pelt_cloak',
       'elixir_of_the_bear',
+    ]);
+  });
+
+  it('filters legendary-quality listings (the orange-name tier above epic)', () => {
+    const withLegendary = [...items, 'deathless_heartwood', 'kingsbane_last_oath'];
+    expect(filterIds(withLegendary, { rarity: 'legendary' })).toEqual([
+      'deathless_heartwood',
+      'kingsbane_last_oath',
+    ]);
+    expect(filterIds(withLegendary, { itemType: 'weapon', rarity: 'legendary' })).toEqual([
+      'deathless_heartwood',
+      'kingsbane_last_oath',
     ]);
   });
 
@@ -121,6 +146,39 @@ describe('World Market filters', () => {
     expect(filterIds(armor, { itemType: 'armor', subtype: 'chest' })).toEqual(['recruit_tunic']);
   });
 
+  it('narrows armor filters to the jewelry slots (neck and ring)', () => {
+    // Jewelry is kind 'armor' with slot 'ring'/'neck' (heroic vendor exemplars), so the
+    // shared slot predicate must sub-filter it like any other wearable slot.
+    const armor = ['seal_of_the_nine_oaths', 'yumis_keepsake_locket', 'recruit_tunic'];
+    expect(filterIds(armor, { itemType: 'armor', subtype: 'ring' })).toEqual([
+      'seal_of_the_nine_oaths',
+    ]);
+    expect(filterIds(armor, { itemType: 'armor', subtype: 'neck' })).toEqual([
+      'yumis_keepsake_locket',
+    ]);
+  });
+
+  it('narrows armor filters to the off-hand slot (shields and held offhands)', () => {
+    // The armor bucket admits armor-kind shields AND held_offhand items, both
+    // slot 'offhand', so the offhand subtype must return both kinds together.
+    const armor = [
+      'eastbrook_buckler',
+      'valefire_lantern',
+      'recruit_tunic',
+      'seal_of_the_nine_oaths',
+    ];
+    expect(filterIds(armor, { itemType: 'armor', subtype: 'offhand' })).toEqual([
+      'eastbrook_buckler',
+      'valefire_lantern',
+    ]);
+  });
+
+  it('keeps neck and ring subtypes through wire sanitization instead of falling back', () => {
+    expect(sanitizeMarketQuery({ itemType: 'armor', subtype: 'ring' }).subtype).toBe('ring');
+    expect(sanitizeMarketQuery({ itemType: 'armor', subtype: 'neck' }).subtype).toBe('neck');
+    expect(sanitizeMarketQuery({ itemType: 'armor', subtype: 'bogus' }).subtype).toBe('all');
+  });
+
   it('narrows weapon filters by weapon family', () => {
     const weapons = ['worn_sword', 'keen_dirk', 'gnarled_staff', 'training_mace', 'rusty_hatchet'];
     expect(filterIds(weapons, { itemType: 'weapon', subtype: 'sword' })).toEqual(['worn_sword']);
@@ -131,7 +189,7 @@ describe('World Market filters', () => {
   });
 
   it('matches an item name or id substring, and never an unknown item', () => {
-    expect(filterIds(items, { search: 'wolf' })).toEqual(['wolf_fang']);
+    expect(filterIds(items, { search: 'mudfin' })).toEqual(['mudfin_scale']);
     expect(filterIds(items, { search: 'ZZZNOMATCH' })).toEqual([]);
     // The server drops listings whose item it no longer knows, so the predicate rejects them.
     expect(marketItemMatches('not_a_real_item', q())).toBe(false);

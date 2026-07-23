@@ -64,6 +64,7 @@ export interface Overview {
   avgPlaytimeSeconds: number;
   peakOnlineToday: number;
   peakOnlineAllTime: number;
+  playersCap: number;
   siteUsersNow: number;
   server: ServerStats;
 }

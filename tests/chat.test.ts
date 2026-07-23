@@ -1014,6 +1014,55 @@ describe('/afk and /dnd presence', () => {
     const out = logEvents(sim.tick());
     expect(out.some((m) => m.pid === a && /no longer marked as away/.test(m.text))).toBe(true);
   });
+
+  it('/afk sets the entity display flag; /dnd does not; toggling clears it', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    const e = sim.entities.get(a)!;
+
+    expect(e.afk).toBe(false);
+    sim.chat('/afk', a);
+    sim.tick();
+    expect(e.afk).toBe(true); // the wire/nameplate/presence display bit
+
+    sim.chat('/afk', a); // repeat toggles off
+    sim.tick();
+    expect(e.afk).toBe(false);
+
+    // Do Not Disturb is a private state: it never lights the public AFK tag.
+    sim.chat('/dnd raiding', a);
+    sim.tick();
+    expect(sim.meta(a)!.away?.mode).toBe('dnd');
+    expect(e.afk).toBe(false);
+  });
+
+  it('moving under your own input clears AFK (Do Not Disturb survives)', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    sim.tick();
+    const e = sim.entities.get(a)!;
+
+    sim.chat('/afk', a);
+    sim.tick();
+    expect(e.afk).toBe(true);
+
+    sim.meta(a)!.moveInput.forward = true;
+    const moved = logEvents(sim.tick());
+    expect(e.afk).toBe(false);
+    expect(sim.meta(a)!.away).toBe(null);
+    expect(moved.some((m) => m.pid === a && /no longer Away From Keyboard/.test(m.text))).toBe(
+      true,
+    );
+
+    // Do Not Disturb is deliberate: movement leaves it in place.
+    sim.meta(a)!.moveInput.forward = false;
+    sim.chat('/dnd', a);
+    sim.tick();
+    sim.meta(a)!.moveInput.forward = true;
+    sim.tick();
+    expect(sim.meta(a)!.away?.mode).toBe('dnd');
+  });
 });
 
 // Direct unit tests for the extracted chat module (src/sim/social/chat.ts),
@@ -1330,6 +1379,11 @@ describe('chat speaker titles (Book of Deeds)', () => {
       expect(msgs.length, channel).toBeGreaterThan(0);
       for (const m of msgs) {
         expect(m.fromTitle, channel).toBe('prog_veteran');
+        // classId rides every player-sourced chat event the same way fromTitle
+        // does, and for the same reason: the HUD reads it off the event rather
+        // than off `IWorld.entities` (interest-scoped online), so a general/
+        // world/guild/lfg/whisper sender outside ~120yd still colors correctly.
+        expect(m.classId, channel).toBe('warrior');
       }
     }
   });
@@ -1344,6 +1398,8 @@ describe('chat speaker titles (Book of Deeds)', () => {
     expect(msgs.length).toBeGreaterThan(0);
     for (const m of msgs) {
       expect('fromTitle' in m).toBe(false);
+      // Unlike the title, class is never optional for a player sender.
+      expect(m.classId).toBe('warrior');
     }
   });
 
@@ -1373,6 +1429,7 @@ describe('chat speaker titles (Book of Deeds)', () => {
     for (const m of msgs) {
       expect(m.channel).toBe('yell');
       expect('fromTitle' in m).toBe(false);
+      expect('classId' in m).toBe(false);
     }
   });
 
@@ -1386,12 +1443,16 @@ describe('chat speaker titles (Book of Deeds)', () => {
     sim.chat('/w bet psst', a);
     const msgs = chatEvents(sim.tick());
     const echo = msgs.find((m) => m.to === 'Bet')!;
-    // from stays the sender; the title is the sender's even on the echo whose
-    // DISPLAYED name is the recipient (the client's toWhisper arm must not
-    // decorate the recipient with it).
+    // from stays the sender; the title AND classId are the sender's even on
+    // the echo whose DISPLAYED name is the recipient (the client's toWhisper
+    // arm must not decorate the recipient with either: see hud.ts's
+    // handleEvents 'whisper' case, which withholds fromPid/flair/fromTitle/
+    // classId entirely on this branch rather than passing the sender's own).
     expect(echo.from).toBe('Aleph');
     expect(echo.fromTitle).toBe('prog_veteran');
+    expect(echo.classId).toBe('warrior');
     const toTarget = msgs.find((m) => m.pid === b)!;
     expect(toTarget.fromTitle).toBe('prog_veteran');
+    expect(toTarget.classId).toBe('warrior');
   });
 });

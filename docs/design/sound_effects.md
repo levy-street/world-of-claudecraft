@@ -287,7 +287,10 @@ non-dummy, unmuted mob within `MOB_IDLE_SCAN_RADIUS` of the player and rolls
 each one independently
 against `MOB_IDLE_BASE_CHANCE`, damped by how many same-family mobs are
 clustered nearby (`idleDensityFactor`, `src/ui/mob_idle_sfx.ts`) so a dense
-pack does not all bark in the same sweep. A per-entity cooldown
+pack does not all bark in the same sweep. If several rolls succeed, exactly
+one is selected uniformly for an attempt. That fixed invariant bounds cold
+audio fetch/decode fan-out to one attempt per sweep on every client. A
+per-entity cooldown
 (`MOB_IDLE_PER_ENTITY_COOLDOWN_MS`) additionally rate-limits one mob's own
 repeats, stamped only when `sfx.playAt` reports the sound actually played
 (not merely attempted), so losing the shared per-key playback cooldown
@@ -328,16 +331,27 @@ Fiesta) and every world/spatial sound ignore the toggle.
 
 | keys | purpose |
 |---|---|
-| `ui_click`, `ui_error` | basic interaction and invalid-action feedback |
+| `ui_click`, `ui_error` | basic interaction and invalid-action feedback (every failure reason shares one `ui_error` cue, rate-limited to 1.5s via `sfx.playUi`'s `cooldown` option so repeatedly failing the same action does not spam it; splitting by failure reason was tried and deliberately reverted once it turned out `playUi` never actually enforced the cooldown option in the first place) |
 | `ui_bag_open`, `ui_bag_close` | inventory transitions |
 | `ui_coin`, `ui_loot_item` | currency and item rewards |
-| `ui_quest_accept`, `ui_quest_done`, `ui_level_up` | progression feedback |
+| `ui_quest_done`, `ui_level_up`, `ui_cosmetic_unlock` | progression feedback (cosmetic/skin unlocks split off from level-up so they no longer share a sound) |
 | `ui_achievement` | Book of Deeds unlock chime |
-| `ui_whisper`, `ui_sheep`, `ui_death` | message, transformation, and defeat events |
-| `ui_duel_challenge`, `ui_duel_countdown`, `ui_duel_start`, `ui_duel_end` | duel lifecycle |
+| `ui_whisper`, `ui_sheep`, `ui_death` | message, transformation, and defeat events (`ui_death` also covers Fiesta/Yumi/Vale Cup match-loss; Arena rating loss has its own `ui_arena_loss`) |
+| `ui_duel_challenge`, `ui_duel_countdown`, `ui_duel_start`, `ui_duel_end` | shared "a match is starting" lifecycle: a real duel and an Arena queue pop reuse this same family (deliberately, not a mixup). Vale Cup shares challenge/countdown/end but has its own kickoff cue, `ui_vcup_kickoff`, split off from `ui_duel_start` so a real duel-start recording does not also fire for the soccer minigame. Unlike most notification cues, this family is never silenced by the Interface & Feedback Sounds toggle (same category as the ready-check chime), since a real challenge is time-critical to respond to. Party invite, guild invite, and a resurrection offer play the same `ui_duel_challenge` clip through the separate `invitePrompt()` method instead (the old, separate, misnamed `ui_quest_accept` those used is retired): same sound, but gated by the toggle like a normal notification, since those prompts aren't time-critical the way a real challenge is. |
+| `ui_ready_check` | group ready-check three-note prompt |
+| `ui_weapon_sheathe`, `ui_weapon_unsheathe` | weapon stow toggle (Z key) |
 | `ui_fiesta_word_0` through `ui_fiesta_word_3` | escalating Fiesta takedown tiers |
 | `ui_fiesta_score_mine`, `ui_fiesta_score_other` | team score feedback |
 | `ui_fiesta_wave`, `ui_fiesta_augment`, `ui_fiesta_down`, `ui_fiesta_revive` | Fiesta round and player-state feedback |
+| `ui_card_play`, `ui_card_reveal` | Card Duel minigame (`src/sim/social/card_duel.ts`): a card played, and every round's simultaneous reveal. High-frequency (once per round each), multi-take. |
+| `ui_card_round_push` | Card Duel: layers on top of the reveal cue when a round ties (nobody scores), never a replacement for it |
+| `ui_card_shuffle` | Card Duel: the initial deal at match start AND a mid-match reshuffle (discard pile shuffled back into the deck once it empties), same cue for both moments |
+| `ui_gather_cast` | PLACEHOLDER (deterministic synth, issue #2208): the gather cast starting (Professions 2.0 Phase 12b), a soft tool wind-up |
+| `ui_gather_strike` | PLACEHOLDER (deterministic synth, issue #2208): the completed gather strike landing with the harvest |
+| `ui_gather_rare` | PLACEHOLDER (deterministic synth, issue #2208): rare-strike variant of `ui_gather_strike`, keyed off `gatherResult` rarity rare+ or a rare event |
+| `ui_fish_cast` | PLACEHOLDER (deterministic synth, issue #2208): the fishing line cast whoosh and plop |
+| `ui_fish_bite` | PLACEHOLDER (deterministic synth, issue #2208): the bite signal opening the reel window; the one gameplay-timing cue of this family, so it ignores the Interface & Feedback Sounds toggle (rides `play()`, never `playFeedback()`) |
+| `ui_fish_reel` | PLACEHOLDER (deterministic synth, issue #2208): the landed reel crank and splash |
 
 ---
 

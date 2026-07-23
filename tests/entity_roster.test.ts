@@ -92,6 +92,7 @@ function makeCtx() {
     get groundAoEs() {
       return groundAoEs;
     },
+    frozenOrbs: [],
     get dungeonDoorIds() {
       return dungeonDoorIds;
     },
@@ -127,6 +128,7 @@ function makeCtx() {
     pendingMobRespawns: [],
     partyInvites: new Map(),
     readyChecks: new Map(),
+    pendingResurrections: new Map(),
     chatTokens: new Map(),
     channelSubs: new Map(),
     emit,
@@ -170,6 +172,7 @@ function makeCtx() {
     applyKnockback: vi.fn(() => 0),
     diminishedCrowdControlDuration: vi.fn(() => null),
     hostilesInRadius: vi.fn(() => []),
+    friendliesInRadius: vi.fn(() => []),
     breakStealth: vi.fn(),
     applyTaunt: vi.fn(),
     summonPet: vi.fn(),
@@ -253,6 +256,7 @@ function makeCtx() {
     frenzyPackmates: vi.fn(),
     armDeathThroes: vi.fn(),
     refreshKnownAbilities: vi.fn(),
+    revalidateOffhandForSpec: vi.fn(),
     syncPetLevel: vi.fn(),
     moveToward: vi.fn(() => false),
     mobSwing: vi.fn(),
@@ -266,6 +270,7 @@ function makeCtx() {
     swingIntervalMult: vi.fn(() => 1),
     mobCanSwim: vi.fn(() => false),
     resolveMovePoint: vi.fn(() => ({ x: 0, z: 0 })),
+    resolveMove: vi.fn(() => ({ x: 0, z: 0 })),
     updatePet: vi.fn(),
     isDelveCompanionMob: vi.fn(() => false),
     updateDelveCompanion: vi.fn(),
@@ -315,6 +320,7 @@ function makeCtx() {
     startAutoAttack: vi.fn(),
     revivePet: vi.fn(),
     completeFishing: vi.fn(),
+    completeGatherCast: vi.fn(),
     applyDemonHealTick: vi.fn(),
     awardCombo: vi.fn(),
     meleeSwing: vi.fn(() => false),
@@ -329,6 +335,9 @@ function makeCtx() {
     setPlayerLevel: vi.fn(),
     notice: vi.fn(),
     spawnDevBot: vi.fn(),
+    spawnDevVendor: vi.fn(),
+    startCascadePlaytest: vi.fn(),
+    startDevSandbox: vi.fn(),
     seedDungeonFinderDev: vi.fn(() => ({ spawned: 0, note: 'ok' as const })),
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: vi.fn(),
@@ -345,6 +354,7 @@ function makeCtx() {
     // Ravenpost mail: the quest turn-in letter hook.
     queueQuestLetter: vi.fn(),
     mailHeroicMarks: vi.fn(),
+    mailAuthoredLetter: vi.fn(),
     applySetProcs: vi.fn(),
     // The Vale Cup sport-move arms.
     vcupBallKick: vi.fn(),

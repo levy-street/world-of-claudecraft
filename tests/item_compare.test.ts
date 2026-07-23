@@ -1,11 +1,18 @@
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import type { CoreStats, ItemDef } from '../src/sim/types';
 import { itemStatDeltas } from '../src/ui/item_compare';
 
 function armor(
   id: string,
   stats: Partial<CoreStats>,
-  ratings: Partial<{ pvpOffenseRating: number; pvpDefenseRating: number }> = {},
+  ratings: Partial<{
+    pvpOffenseRating: number;
+    pvpDefenseRating: number;
+    hitRating: number;
+    critRating: number;
+    hasteRating: number;
+  }> = {},
 ): ItemDef {
   return {
     id,
@@ -87,5 +94,46 @@ describe('itemStatDeltas', () => {
         equipped,
       ),
     ).toEqual([{ stat: 'warfare', delta: 10, decimals: 0 }]);
+  });
+
+  it('reports hit, crit and haste rating deltas in the item tooltip affix order', () => {
+    // The exact toEqual also pins hit-before-crit-before-haste, matching the
+    // base item tooltip's rating line order.
+    const candidate = armor('hitpiece', {}, { hitRating: 20, hasteRating: 10 });
+    const equipped = armor('critpiece', {}, { critRating: 20, hasteRating: 25 });
+    expect(itemStatDeltas(candidate, equipped)).toEqual([
+      { stat: 'hitRating', delta: 20, decimals: 0 },
+      { stat: 'critRating', delta: -20, decimals: 0 },
+      { stat: 'hasteRating', delta: -15, decimals: 0 },
+    ]);
+  });
+
+  it('treats a missing rating as zero (full value counts as a gain)', () => {
+    const candidate = armor('hasted', {}, { hasteRating: 25 });
+    const equipped = armor('plain', {});
+    expect(itemStatDeltas(candidate, equipped)).toEqual([
+      { stat: 'hasteRating', delta: 25, decimals: 0 },
+    ]);
+  });
+
+  it('suppresses zero rating deltas (equal ratings yield no lines)', () => {
+    const candidate = armor('a', {}, { critRating: 25 });
+    const equipped = armor('b', {}, { critRating: 25 });
+    expect(itemStatDeltas(candidate, equipped)).toEqual([]);
+  });
+
+  it('surfaces the rating difference between two real epic helmets', () => {
+    // The community report scenario: comparing gear that differs in ratings
+    // showed no rating rows at all. crownforged_dreadhelm carries hit rating,
+    // stormcallers_crown carries crit rating.
+    const dreadhelm = ITEMS.crownforged_dreadhelm;
+    const crown = ITEMS.stormcallers_crown;
+    expect(dreadhelm?.hitRating).toBe(20);
+    expect(crown?.critRating).toBe(20);
+    const byStat = Object.fromEntries(
+      itemStatDeltas(dreadhelm, crown).map((d) => [d.stat, d.delta]),
+    );
+    expect(byStat.hitRating).toBe(20);
+    expect(byStat.critRating).toBe(-20);
   });
 });

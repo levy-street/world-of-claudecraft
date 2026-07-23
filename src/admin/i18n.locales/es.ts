@@ -107,6 +107,7 @@ export const es: Record<string, string> = {
   'stats.onlineNow': 'en línea ahora',
   'stats.onlineAccounts': 'cuentas en línea',
   'stats.siteUsersNow': 'usuarios del sitio ahora',
+  'stats.playersCap': 'límite de jugadores',
   'stats.peakOnline': 'pico en línea',
   'stats.peakOnlineToday': 'pico en línea 24h',
   'stats.peakOnlineAllTime': 'pico en línea histórico',

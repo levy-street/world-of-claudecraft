@@ -94,6 +94,50 @@ export function shouldEngagePointerLockOnMouseDown(input: PointerLockMouseDownIn
   );
 }
 
+/**
+ * Cooldown Firefox enforces after it force-unlocks the pointer through its own
+ * default gesture (the Escape key, or the tab losing focus) rather than
+ * through our own `exitPointerLock()` call: a `requestPointerLock()` made
+ * during this window is denied outright, even with fresh transient
+ * activation from the very mousedown that would otherwise satisfy
+ * {@link pointerLockNeedsSyncGesture} (Mozilla bugzilla 1284785; the exact
+ * duration is undocumented upstream, this is an empirically safe upper
+ * bound). Chromium does not reproduce this denial in practice, so it is
+ * gated on Gecko the same way the sync-gesture requirement is.
+ */
+export const POINTER_LOCK_FORCED_UNLOCK_COOLDOWN_MS = 1300;
+
+export interface PointerLockForcedCooldownInput {
+  /** From {@link pointerLockNeedsSyncGesture}: true only on Gecko. */
+  needsSyncGesture: boolean;
+  /**
+   * Milliseconds since the pointer was last force-unlocked by the browser
+   * itself (Escape / focus loss) while a drag button was still held, or null
+   * if that has not happened yet this session.
+   */
+  msSinceForcedUnlock: number | null;
+}
+
+/**
+ * True while a fresh `requestPointerLock()` call is known to be doomed. A
+ * player who presses Escape mid-drag (to open the game menu, or just out of
+ * confusion when the cursor feels stuck) force-unlocks the pointer while
+ * still physically holding the mouse button; the very next drag attempt on
+ * Firefox then lands inside this cooldown and is silently denied, leaving
+ * `pointerLockRequestedForDrag` wrongly set with no lock actually granted and
+ * the camera freezing again the moment the cursor reaches an edge. Callers
+ * skip the doomed request during this window and let the drag continue
+ * unlocked instead: rotation still works away from the screen edge, so this
+ * only defers the anti-freeze guarantee rather than losing rotation outright.
+ */
+export function inForcedPointerLockCooldown(input: PointerLockForcedCooldownInput): boolean {
+  return (
+    input.needsSyncGesture &&
+    input.msSinceForcedUnlock !== null &&
+    input.msSinceForcedUnlock < POINTER_LOCK_FORCED_UNLOCK_COOLDOWN_MS
+  );
+}
+
 export interface PointerLockReleaseInput {
   /** Any camera-rotation mouse button still held. */
   anyButtonDown: boolean;

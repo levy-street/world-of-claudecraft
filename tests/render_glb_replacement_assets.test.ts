@@ -1,12 +1,12 @@
-// Guards the GLB replacement of the procedural critters/fish/gather-node/
+// Guards the GLB replacement of the procedural fish/gather-node/
 // mailbox/delve-prop models: every preload URL declared by the render modules
 // must point at a real file under public/models, and every referenced GLB
 // must have been picked up by the media manifest.
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { artisanRowPreloadInternalsForTest } from '../src/render/artisan_row_props';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
-import { critterPreloadInternalsForTest } from '../src/render/critters';
 import { marshDressingPreloadInternalsForTest } from '../src/render/delve_marsh_dressing';
 import { delvePropsPreloadInternalsForTest } from '../src/render/delve_props';
 import { doorPortalPreloadInternalsForTest } from '../src/render/door_portal';
@@ -14,6 +14,7 @@ import { fishPreloadInternalsForTest } from '../src/render/fish';
 import { gatherNodePreloadInternalsForTest } from '../src/render/gather_nodes';
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
+import { stationsPreloadInternalsForTest } from '../src/render/stations';
 import { yumiMazePreloadInternalsForTest } from '../src/render/yumi_maze';
 
 const publicDir = path.join(__dirname, '..', 'public');
@@ -28,12 +29,6 @@ function expectAssetExistsAndManifested(url: string): void {
 }
 
 describe('GLB-replacement asset preload sets resolve to real, manifested files', () => {
-  it('critter species assets', () => {
-    for (const url of Object.values(critterPreloadInternalsForTest.speciesAssetUrl)) {
-      expectAssetExistsAndManifested(url);
-    }
-  });
-
   it('leaping fish asset', () => {
     expectAssetExistsAndManifested(fishPreloadInternalsForTest.fishAssetUrl);
   });
@@ -72,6 +67,18 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('quest object assets', () => {
     for (const url of Object.values(questObjectPreloadInternalsForTest.questObjectUrl)) {
+      expectAssetExistsAndManifested(url);
+    }
+  });
+
+  it('artisan row prop assets', () => {
+    for (const url of Object.values(artisanRowPreloadInternalsForTest.assetUrl)) {
+      expectAssetExistsAndManifested(url);
+    }
+  });
+
+  it('crafting station prop assets (Professions 2.0)', () => {
+    for (const url of Object.values(stationsPreloadInternalsForTest.assetUrl)) {
       expectAssetExistsAndManifested(url);
     }
   });

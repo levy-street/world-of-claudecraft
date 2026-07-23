@@ -126,6 +126,7 @@ export function releasePlayerSpirit(ctx: SimContext, pid?: number): void {
   p.autoAttack = false;
   p.queuedOnSwing = null;
   delete p.queuedOnSwingFree;
+  delete p.queuedOnSwingCostMultiplier;
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
   p.combatTimer = 99;

@@ -4,7 +4,7 @@
 
 import { afterEach, describe, expect, it } from 'vitest';
 import { GATHER_NODES, QUESTS } from '../src/sim/data';
-import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
+import { nodeMaterialFor } from '../src/sim/professions/gathering';
 import { Sim } from '../src/sim/sim';
 import type { QuestDef, QuestObjective, QuestProgress } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -68,19 +68,20 @@ describe('craft quest objectives', () => {
     ]);
 
     // A denied matching attempt has no quest side effect.
-    sim.craftItem('recipe_minor_healing_potion', pid);
+    sim.craftItem('recipe_minor_healing_potion', false, pid);
     expect(sim.meta(pid)!.lastCraftResult?.reason).toBe('insufficient_materials');
     expect(qp.counts).toEqual([0]);
 
     // A successful but different recipe does not count.
     sim.addItem('spider_leg', 1, pid);
-    sim.craftItem('recipe_tough_jerky', pid);
+    sim.craftItem('recipe_tough_jerky', false, pid);
     expect(sim.meta(pid)!.lastCraftResult?.ok).toBe(true);
     expect(qp.counts).toEqual([0]);
 
     sim.addItem('linen_scrap', 1, pid);
     sim.addItem('spider_leg', 1, pid);
-    sim.craftItem('recipe_minor_healing_potion', pid);
+    sim.addItem('silverleaf_herb', 2, pid); // the reworked recipe's herb reagent
+    sim.craftItem('recipe_minor_healing_potion', false, pid);
 
     expect(sim.meta(pid)!.lastCraftResult?.ok).toBe(true);
     expect(qp.counts).toEqual([1]);
@@ -88,13 +89,27 @@ describe('craft quest objectives', () => {
   });
 });
 
+// harvestNode STARTS a gather cast; quest credit lands at
+// completion. Mirror the lifecycle completion arm synchronously (the
+// gather_rare_events.test.ts completeCastNow idiom) so these seed-stable
+// drives stay free of world-tick noise. Only called after a GRANTED start
+// (a denied attempt starts no cast).
+function completeCastNow(sim: Sim, pid: number): void {
+  const p = sim.entities.get(pid);
+  const meta = sim.players.get(pid);
+  if (!p || !meta) throw new Error('missing player');
+  p.castingAbility = null;
+  p.castRemaining = 0;
+  sim.ctx.completeGatherCast(p, meta);
+}
+
 describe('gather quest objectives', () => {
   it('matches node type and gathered material only after a granted harvest', () => {
     const { sim, pid, qp } = trackedSim([
       { type: 'gather', nodeType: 'ore', count: 1, label: 'Ore vein harvested' },
       {
         type: 'gather',
-        itemId: NODE_HARVEST_TABLE.ore.itemId,
+        itemId: nodeMaterialFor('ore', 'eastbrook_vale').itemId,
         count: 1,
         label: 'Ore material gathered',
       },
@@ -109,10 +124,12 @@ describe('gather quest objectives', () => {
     // A successful nonmatching gather still does not count.
     teleportOntoNode(sim, pid, wood.id);
     sim.harvestNode(wood.id, pid);
+    completeCastNow(sim, pid);
     expect(qp.counts).toEqual([0, 0]);
 
     teleportOntoNode(sim, pid, ore.id);
     sim.harvestNode(ore.id, pid);
+    completeCastNow(sim, pid);
     expect(qp.counts).toEqual([1, 1]);
     expect(qp.state).toBe('ready');
 

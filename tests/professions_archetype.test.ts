@@ -5,10 +5,11 @@
 // PAIR (activeArchetype, the title craft the player swaps via quest, plus
 // pairedMajor, its ring-adjacent second major). See src/sim/professions/archetype.ts.
 //
-// NOTE: the quests behind this feature (zone-1 q_archetype_acceptance /
-// q_prof_make_amends / q_prof_hobby_switch) are wired live into the generic quest
-// accept/turn-in flow via completionEffect (src/sim/quests/profession_quest_effects.ts);
-// the quest-driven path is covered by tests/profession_attunement_quests.test.ts.
+// NOTE: the quests behind this feature (the per-master zone-1 q_prof_attune_* /
+// q_prof_amends_* pair plus q_prof_hobby_switch) are wired live into the generic
+// quest accept/turn-in flow via completionEffect
+// (src/sim/quests/profession_quest_effects.ts); the quest-driven path is covered
+// by tests/profession_attunement_quests.test.ts.
 // These tests exercise the STATE MACHINE directly via its sim entry points
 // (acceptArchetypeQuest / advanceAmendsProgress / switchArchetype).
 
@@ -263,10 +264,10 @@ describe('archetype persistence: pairedMajor round trip and pre-pair save backfi
   });
 });
 
-// Direct pins for the ring-derived pair helpers the Professions 2.0 Phase 1
+// Direct pins for the ring-derived pair helpers the Professions 2.0
 // reorder introduced. The canonical pair id is a persisted save/wire format
 // (ArchetypeState.attunedPairs), so every arm below is pinned with literals.
-describe('archetypePairId canonicalization (Phase 1 pair identity)', () => {
+describe('archetypePairId canonicalization (pair identity)', () => {
   it('joins an adjacent pair in CRAFT_RING forward order regardless of argument order', () => {
     expect(archetypePairId('engineering', 'alchemy')).toBe('engineering+alchemy');
     expect(archetypePairId('alchemy', 'engineering')).toBe('engineering+alchemy');
@@ -286,7 +287,7 @@ describe('archetypePairId canonicalization (Phase 1 pair identity)', () => {
   });
 });
 
-describe('isAdjacentPairTarget / craftsForPairTarget (Phase 1 pair identity)', () => {
+describe('isAdjacentPairTarget / craftsForPairTarget (pair identity)', () => {
   it('accepts exactly the canonical orientation, never the reversed or pre-reorder form', () => {
     expect(isAdjacentPairTarget('weaponcrafting+armorcrafting')).toBe(true);
     // The pre-reorder canonical id of the same pair: recognized nowhere.
@@ -305,7 +306,7 @@ describe('isAdjacentPairTarget / craftsForPairTarget (Phase 1 pair identity)', (
   });
 });
 
-describe('hobbyCandidatesForPair (Phase 1 ring derivation)', () => {
+describe('hobbyCandidatesForPair (ring derivation)', () => {
   it('returns the two ring opposites in argument order for every selectable pair', () => {
     for (const target of ARCHETYPE_PAIR_TARGETS) {
       const pair = craftsForPairTarget(target);
@@ -329,7 +330,7 @@ describe('hobbyCandidatesForPair (Phase 1 ring derivation)', () => {
   });
 });
 
-describe('defaultHobbyForPair skill preference (Phase 1 hobby default)', () => {
+describe('defaultHobbyForPair skill preference (hobby default)', () => {
   it('tie-breaks by ring order when the retained skills are equal', () => {
     // leatherworking (ring index 3) beats tailoring (4) at zero skill.
     expect(defaultHobbyForPair('weaponcrafting', 'armorcrafting', {})).toBe('leatherworking');
@@ -364,7 +365,7 @@ function metaOf(sim: Sim) {
 const WEAPON_ARMOR = 'weaponcrafting+armorcrafting';
 const JEWEL_WEAPON = 'jewelcrafting+weaponcrafting';
 
-describe('attuneArchetypePair / canAttuneArchetypePair mode gating (Phase 1 transitions)', () => {
+describe('attuneArchetypePair / canAttuneArchetypePair mode gating (transitions)', () => {
   it('a first NEW attunement sets the full pair state without raising the return counter', () => {
     const sim = makeSim();
     expect(canAttuneArchetypePair(metaOf(sim).archetype, WEAPON_ARMOR, 'new')).toBe(true);
@@ -431,7 +432,7 @@ describe('attuneArchetypePair / canAttuneArchetypePair mode gating (Phase 1 tran
   });
 });
 
-describe('canSwitchHobby / switchHobby (Phase 1 hobby transitions)', () => {
+describe('canSwitchHobby / switchHobby (hobby transitions)', () => {
   it('switches only to the OTHER opposite candidate of the active pair', () => {
     const sim = makeSim();
     attuneArchetypePair(ctxOf(sim), sim.playerId, WEAPON_ARMOR, 'new');

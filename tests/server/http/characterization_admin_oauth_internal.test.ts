@@ -387,8 +387,10 @@ describe('characterization: internal handleInternalApi', () => {
 // -----------------------------------------------------------------------------
 describe('characterization: internal handleDailyRewardInternalApi (late-arrival backfill)', () => {
   const OPS_ROUTES = [
+    { path: '/internal/daily-rewards/finalize', name: 'daily_rewards_finalize' },
     { path: '/internal/daily-rewards/pending-payouts', name: 'daily_rewards_pending_payouts' },
     { path: '/internal/daily-rewards/payout-history', name: 'daily_rewards_payout_history' },
+    { path: '/internal/daily-rewards/leaderboard', name: 'daily_rewards_leaderboard' },
     { path: '/internal/daily-rewards/mark-payout', name: 'daily_rewards_mark_payout' },
     { path: '/internal/daily-rewards/void-payout', name: 'daily_rewards_void_payout' },
     { path: '/internal/daily-rewards/restore-payout', name: 'daily_rewards_restore_payout' },

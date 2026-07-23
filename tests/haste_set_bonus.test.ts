@@ -176,6 +176,9 @@ describe('spell haste shortens casts and channels', () => {
 
   it('a channel is shortened and its tick interval scales with it', () => {
     const { sim, p, pid } = player('mage');
+    // Aether Darts moved from the shared mage kit to Chronomancy after this
+    // release test was written; select that spec so the channel actually starts.
+    expect(sim.setSpec('arcane', pid)).toBe(true);
     spawnDummy(sim, p);
     p.resource = p.maxResource;
 
@@ -203,13 +206,15 @@ describe('melee / ranged haste shorten the swing interval', () => {
     const meta = sim.players.get(p.id)!;
     spawnDummy(sim, p);
     p.autoAttack = true;
+    // v0.27.1: meleeHaste lives in swingIntervalMult's one additive haste
+    // bucket, so the interval mult itself carries the set bonus (the timer no
+    // longer divides by it a second time in auto_attack).
+    const baseMult = sim.swingIntervalMult(p);
     p.meleeHaste = SET_HASTE_3PC;
+    expect(sim.swingIntervalMult(p)).toBeCloseTo(baseMult / (1 + SET_HASTE_3PC), 6);
     p.swingTimer = 0;
     updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(p.swingTimer).toBeCloseTo(
-      (p.weapon.speed * sim.swingIntervalMult(p)) / (1 + SET_HASTE_3PC),
-      6,
-    );
+    expect(p.swingTimer).toBeCloseTo(p.weapon.speed * sim.swingIntervalMult(p), 6);
   });
 
   it('ranged haste shortens the next auto-shot timer (hunter)', () => {

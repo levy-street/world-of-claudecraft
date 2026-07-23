@@ -38,6 +38,10 @@ describe('spellbook_window: WCAG chrome (rows + toggles + focus-return)', () => 
     expect(code).toContain('this.deps.addToBar(id)');
   });
 
+  it('keeps passive spellbook rows informational, without add or drag affordances', () => {
+    expect(code).toContain('known && isAbilityActionBarEligible(def)');
+  });
+
   it('keeps the reset-bar button gated on the form-bars flag', () => {
     expect(code).toContain('const resetBtnHtml = view.hasFormBars');
     expect(code).toContain('data-reset-bar');
@@ -82,6 +86,25 @@ describe('spellbook_window: the pinned Attack row', () => {
   it('keeps the per-frame refresh syncing the Attack toggle (options can flip it)', () => {
     expect(code).toContain("querySelector<HTMLButtonElement>('[data-attack-toggle]')");
     expect(code).toContain("attackBtn.setAttribute('aria-pressed'");
+  });
+});
+
+describe('spellbook_window: the Attack row is draggable onto the action bar', () => {
+  it('marks the Attack row draggable, like an ability row', () => {
+    // The row previously offered only the +/- toggle, so a player dragging Attack
+    // (the natural gesture other spells support) got nothing. It now drags too.
+    const attackStart = code.indexOf('private appendAttackRow(');
+    const attackRow = code.slice(attackStart, code.indexOf('private appendRow(', attackStart));
+    expect(attackRow).toContain('el.draggable = true');
+  });
+
+  it('writes the dedicated Attack marker MIME on dragstart (not an encoded action)', () => {
+    // Attack has no ability/item id, so it cannot ride the HotbarAction path; the
+    // dragstart carries the marker MIME the action bar recognizes.
+    const attackStart = code.indexOf('private appendAttackRow(');
+    const attackRow = code.slice(attackStart, code.indexOf('private appendRow(', attackStart));
+    expect(attackRow).toContain('HOTBAR_ATTACK_MIME');
+    expect(attackRow).toMatch(/dragstart/);
   });
 });
 

@@ -30,6 +30,17 @@ function statsFor(cls: PlayerClass, level: number, equipment: Record<string, str
 const dist2d = (a: { x: number; z: number }, b: { x: number; z: number }) =>
   Math.hypot(a.x - b.x, a.z - b.z);
 
+describe('heroic set item identity', () => {
+  it('shares the normal set id and carries the heroic variant marker', () => {
+    // This line uses the auto-generated heroic_<base> variants (heroic_variants.ts),
+    // marked via heroicOf, not the PTR-era bespoke <base>_heroic pieces with a
+    // standalone heroic flag.
+    expect(ITEMS.heroic_crownforged_dreadhelm.set).toBe(ITEMS.crownforged_dreadhelm.set);
+    expect(ITEMS.heroic_crownforged_dreadhelm.set).toBe('crownforged');
+    expect(ITEMS.heroic_crownforged_dreadhelm.heroicOf).toBe('crownforged_dreadhelm');
+  });
+});
+
 describe('aggregateSetBonuses (pure resolver)', () => {
   it('grants nothing below the 2-piece threshold', () => {
     const eff = aggregateSetBonuses(counts({ [SET_DEATHLORD]: 1 }));

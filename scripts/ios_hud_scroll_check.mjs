@@ -11,8 +11,9 @@
 // phone viewport (the only in-world orientation; portrait is blocked by the
 // #rotate-device nudge) so the real mobile CSS applies. Needs `npm run dev`.
 // Writes PNGs to tmp/.
-import puppeteer from 'puppeteer-core';
+
 import fs from 'node:fs';
+import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
@@ -22,46 +23,104 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,
   headless: 'new',
-  args: ['--window-size=1280,900', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--no-sandbox'],
+  args: [
+    '--window-size=1280,900',
+    '--use-angle=swiftshader',
+    '--enable-unsafe-swiftshader',
+    '--no-sandbox',
+  ],
   defaultViewport: { width: 1280, height: 900 },
 });
 const page = await browser.newPage();
 const errors = [];
 page.on('pageerror', (e) => errors.push('PAGEERROR: ' + e.message));
-page.on('console', (m) => { if (m.type() === 'error') errors.push('CONSOLE: ' + m.text()); });
+page.on('console', (m) => {
+  if (m.type() === 'error') errors.push('CONSOLE: ' + m.text());
+});
 
 await page.goto(URL, { waitUntil: 'networkidle0', timeout: 30000 });
 await page.evaluate(() => document.querySelector('#btn-offline').click());
-await page.waitForSelector('#offline-select .mini-class[data-class="warrior"]', { visible: true, timeout: 20000 });
+await page.waitForSelector('#offline-select .mini-class[data-class="warrior"]', {
+  visible: true,
+  timeout: 20000,
+});
 await wait(200);
 await page.evaluate(() => {
   document.querySelector('#char-name').value = 'Packrat';
   document.querySelector('#offline-select .mini-class[data-class="warrior"]').click();
   document.querySelector('#btn-start-offline').click();
 });
-await page.waitForFunction(() => window.__game?.sim?.entities?.size > 5, { timeout: 20000, polling: 200 });
+await page.waitForFunction(() => window.__game?.sim?.entities?.size > 5, {
+  timeout: 20000,
+  polling: 200,
+});
 await wait(1500);
 
 // Flood the bag (so it overflows) and the market (stand on the Merchant, list).
 await page.evaluate(() => {
   const sim = window.__game.sim;
-  const p = sim.player; p.maxHp = 99999; p.hp = 99999;
-  const bagItems = ['worn_sword', 'gnarled_staff', 'rusty_dagger', 'training_mace', 'rusty_hatchet',
-    'recruit_tunic', 'apprentice_robe', 'footpad_jerkin', 'redbrook_blade', 'apprentice_staff',
-    'keen_dirk', 'militia_vest', 'woven_robe', 'shadow_jerkin', 'oiled_boots', 'quilted_trousers',
-    'greyjaw_pelt_cloak', 'greyjaw_hide_boots', 'bristleback_maul', 'sableweb_slippers',
-    'cryptbone_greaves', 'cryptbone_helm', 'cryptbone_pauldrons', 'mistveil_cord', 'mistveil_grips',
-    'boundstone_helm', 'boundstone_girdle', 'gravewyrm_mantle', 'gravewyrm_gauntlets', 'baked_bread',
-    'minor_healing_potion', 'minor_mana_potion', 'lesser_healing_potion', 'healing_potion', 'mana_potion'];
-  for (const id of bagItems) { try { sim.addItem(id, 3); } catch {} }
+  const p = sim.player;
+  p.maxHp = 99999;
+  p.hp = 99999;
+  const bagItems = [
+    'worn_sword',
+    'gnarled_staff',
+    'rusty_dagger',
+    'training_mace',
+    'rusty_hatchet',
+    'recruit_tunic',
+    'apprentice_robe',
+    'footpad_jerkin',
+    'redbrook_blade',
+    'apprentice_staff',
+    'keen_dirk',
+    'militia_vest',
+    'woven_robe',
+    'shadow_jerkin',
+    'oiled_boots',
+    'quilted_trousers',
+    'greyjaw_pelt_cloak',
+    'greyjaw_hide_boots',
+    'bristleback_maul',
+    'sableweb_slippers',
+    'cryptbone_greaves',
+    'cryptbone_helm',
+    'cryptbone_pauldrons',
+    'mistveil_cord',
+    'mistveil_grips',
+    'boundstone_helm',
+    'boundstone_girdle',
+    'gravewyrm_mantle',
+    'gravewyrm_gauntlets',
+    'baked_bread',
+    'minor_healing_potion',
+    'minor_mana_potion',
+    'lesser_healing_potion',
+    'healing_potion',
+    'mana_potion',
+  ];
+  for (const id of bagItems) {
+    try {
+      sim.addItem(id, 3);
+    } catch {}
+  }
   try {
     const merchant = [...sim.entities.values()].find((e) => e.templateId === 'the_merchant');
     if (merchant) {
-      const at = (e, x, z) => { const q = sim.groundPos(x, z); e.pos = q; e.prevPos = { ...q }; };
-      at(p, merchant.pos.x, merchant.pos.z - 3.2); p.facing = 0; p.prevFacing = 0;
+      const at = (e, x, z) => {
+        const q = sim.groundPos(x, z);
+        e.pos = q;
+        e.prevPos = { ...q };
+      };
+      at(p, merchant.pos.x, merchant.pos.z - 3.2);
+      p.facing = 0;
+      p.prevFacing = 0;
       const goods = ['wolf_fang', 'wolf_pelt', 'spider_leg', 'keen_dirk', 'oiled_boots'];
       for (let i = 0; i < 6; i++) {
-        const pid = sim.addPlayer(['mage', 'rogue', 'priest', 'hunter'][i % 4], 'Seller' + 'ABCDEF'[i]);
+        const pid = sim.addPlayer(
+          ['mage', 'rogue', 'priest', 'hunter'][i % 4],
+          'Seller' + 'ABCDEF'[i],
+        );
         for (let j = 0; j < 10; j++) {
           const id = goods[(i + j) % goods.length];
           sim.addItem(id, 1, pid);
@@ -79,14 +138,16 @@ await page.setViewport({ width: 844, height: 390 });
 await page.evaluate(() => document.body.classList.add('mobile-touch'));
 await wait(200);
 
-const touchActionOf = (sel) => page.evaluate((s) => {
-  const el = document.querySelector(s);
-  return el ? getComputedStyle(el).touchAction : '(missing)';
-}, sel);
-const overflowsOf = (sel) => page.evaluate((s) => {
-  const el = document.querySelector(s);
-  return el ? el.scrollHeight > el.clientHeight + 1 : false;
-}, sel);
+const touchActionOf = (sel) =>
+  page.evaluate((s) => {
+    const el = document.querySelector(s);
+    return el ? getComputedStyle(el).touchAction : '(missing)';
+  }, sel);
+const overflowsOf = (sel) =>
+  page.evaluate((s) => {
+    const el = document.querySelector(s);
+    return el ? el.scrollHeight > el.clientHeight + 1 : false;
+  }, sel);
 
 const after = {};
 
@@ -95,18 +156,25 @@ const after = {};
 await page.evaluate(() => window.__game.hud.openMarket?.());
 await wait(500);
 after.uiTouchAction = await touchActionOf('#ui');
-after.marketBodyTouchAction = await touchActionOf('#market-body');
+after.marketWindowTouchAction = await touchActionOf('#market-window');
+// #market-body no longer owns the mobile scroll (the sheet base makes
+// #market-window the scroller instead, see hud.mobile.css), so assert against
+// the window, the element that actually scrolls, not the body it used to.
 after.marketOverflows = await overflowsOf('#market-body');
 // openMarket() opens the Bag alongside (drag-to-sell); hide it so the Market
 // list is the focus of this screenshot.
-await page.evaluate(() => { document.querySelector('#bags').style.display = 'none'; });
+await page.evaluate(() => {
+  document.querySelector('#bags').style.display = 'none';
+});
 await wait(100);
 await page.screenshot({ path: 'tmp/ios_market_after.png' });
 
 // AFTER, Bag: close the market, open the Bag. toggleBags() reads the inline
 // style.display (initially '' → treated as open), so force a closed baseline
 // first, then toggle to genuinely open it.
-await page.evaluate(() => { window.__game.hud.closeMarket?.(); });
+await page.evaluate(() => {
+  window.__game.hud.closeMarket?.();
+});
 await wait(150);
 await page.evaluate(() => {
   document.querySelector('#bags').style.display = 'none';
@@ -133,13 +201,16 @@ console.log('BEFORE (old `none` rule):', JSON.stringify(before));
 console.log('AFTER  (shipped fix):    ', JSON.stringify(after));
 // The fix is the touch-action flip on the shared #ui ancestor + non-blocking
 // values on each scroll body. Overflow is logged as supporting context.
-const pass = before.uiTouchAction === 'none'
-  && after.uiTouchAction !== 'none'
-  && after.bagGridTouchAction !== 'none'
-  && after.marketBodyTouchAction !== 'none';
-console.log(pass
-  ? `PASS: HUD overlay permits touch panning (bag overflows=${after.bagOverflows}, market overflows=${after.marketOverflows}).`
-  : 'FAIL: see values above.');
+const pass =
+  before.uiTouchAction === 'none' &&
+  after.uiTouchAction !== 'none' &&
+  after.bagGridTouchAction !== 'none' &&
+  after.marketWindowTouchAction !== 'none';
+console.log(
+  pass
+    ? `PASS: HUD overlay permits touch panning (bag overflows=${after.bagOverflows}, market overflows=${after.marketOverflows}).`
+    : 'FAIL: see values above.',
+);
 if (errors.length) console.log('PAGE ERRORS:\n' + errors.join('\n'));
 console.log('wrote tmp/ios_bag_before.png, tmp/ios_bag_after.png, tmp/ios_market_after.png');
 await browser.close();

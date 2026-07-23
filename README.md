@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.27.0-blue)](package.json)
+[![Version](https://img.shields.io/badge/version-0.29.0-blue)](package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -132,7 +132,7 @@ npm run server       # authoritative game server on :8787 (REST + WebSocket)
 npm run dev          # client dev server on :5173 (proxies /api and /ws)
 ```
 
-Open http://localhost:5173, choose **Play Online**, create an account, create a character, and Enter World. A Welcome Screen greets you while the realm connection establishes behind it: the latest release news with NEW badges for anything you have not seen, a Join our Discord strip, and, on the desktop web client, Daily Rewards and Season 1 Armory tiles; Continue enables once the connection is ready, and offline play opens through the same screen. Open a second tab and log in again to see each other in town. `Enter` opens chat. A real MediaWiki player wiki comes up alongside the Docker Compose stack at http://localhost:8080/wiki/; its seed pages are generated from current game content with `npm run wiki:seed`.
+Open http://localhost:5173, choose **Play Online**, create an account, create a character, and Enter World. The character-select screen shows the latest release news in its News & Updates panel, with NEW badges for anything you have not seen. Open a second tab and log in again to see each other in town. `Enter` opens chat. A real MediaWiki player wiki comes up alongside the Docker Compose stack at http://localhost:8080/wiki/; its seed pages are generated from current game content with `npm run wiki:seed`.
 
 What persists and how the server stays in charge:
 
@@ -362,6 +362,25 @@ Contributions of every kind are welcome: code, translations, bug reports, and do
 
 ## License
 
-The code is [MIT licensed](LICENSE), so fork it, remix it, and host your own world.
+**The code is [MIT licensed](LICENSE), so fork it, remix it, and host your own world.** That is the whole point, and nothing else on this page or on our website takes it back.
 
-The bundled third-party art assets (models, textures, HDRIs, fonts) keep their own licenses, mostly CC0 public domain, documented per pack in [CREDITS.md](CREDITS.md). Original sound recordings contributed by individual authors may carry their own terms (see the Audio section of [CREDITS.md](CREDITS.md)) rather than the project's default license.
+Three things are licensed separately, so it is worth thirty seconds to know which is which:
+
+| What | License | Can you redistribute it? |
+|---|---|---|
+| **Source code**, meaning all of it except the media assets carved out below | [MIT](LICENSE) | Yes. Commercially too. |
+| **Media assets**: models, textures, HDRIs, icons, sounds, fonts (mostly under `public/`) | Per asset, recorded in [CREDITS.md](CREDITS.md) | Mostly yes (most are CC0). Some are not, see below. |
+| **Name and branding**: "World of ClaudeCraft", "Levy Street", the logos | Not licensed | No. |
+
+**Fork it and host your own world. That works, and the assets are not in your way.** Most of what you see is CC0 public domain (KayKit, Quaternius, Kenney, ambientCG, Poly Haven), and our own generated props, creatures, backdrops and interface sounds ship with the project so a fork runs out of the box. You just can't lift those out and sell them as standalone art.
+
+Four things you would need to remove or replace before redistributing:
+
+- the **CraftPix class ability icons** under `public/ui/skills/` were purchased by Levy Street and **may not be redistributed**, so buy your own licence if you want to ship them;
+- the **@jamiecypher sound effects** are CC BY-NC 4.0, so share them non-commercially with credit, but the commercial grant runs to this project only;
+- the **store and prestige art** (Season 1 Armory, the Claudium set, Book of Deeds icons, the elite dragon emblem) is commissioned commercial art and **rights are reserved**;
+- a handful of **icons and recordings used with permission** need permission to pass on.
+
+[CREDITS.md](CREDITS.md) is the authoritative list, with a redistribution column per asset. Where an asset is listed there, that license controls over the project's MIT license. That register is still being completed, so a media asset missing from it is unrecorded rather than free: ask before relying on it. Source code is the other way around, and everything not carved out is MIT.
+
+Our [Terms of Service](https://worldofclaudecraft.com/terms) cover the hosted game that we run at worldofclaudecraft.com: accounts, conduct, virtual items. They do not restrict the rights the MIT License gives you in this source code.

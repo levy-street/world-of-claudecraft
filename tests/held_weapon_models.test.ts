@@ -2,14 +2,22 @@ import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import {
+  KAYKIT_SHIELD_ACCESSORIES,
+  KAYKIT_SHIELD_GRIPS,
+} from '../src/render/characters/held_item_grips';
+import {
+  itemOffhandModelUrl,
   itemWeaponModelUrl,
   manifestUrls,
   mechHeldWeaponOverride,
+  offhandModelUrl,
   VISUALS,
   weaponSkinModelUrl,
   weaponSkinModelUrls,
 } from '../src/render/characters/manifest';
 import { WEAPON_SKIN_LIST } from '../src/sim/content/weapon_skins';
+import { ITEMS } from '../src/sim/data';
+import { weaponHand } from '../src/sim/equipment_rules';
 import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 
 // The per-item held weapon models: each weapon item maps (via the shared
@@ -29,9 +37,118 @@ describe('held weapon models', () => {
   it('itemWeaponModelUrl resolves mapped items and ignores everything else', () => {
     expect(itemWeaponModelUrl('worn_sword')).toBe('models/weapons/sword_a.glb');
     expect(itemWeaponModelUrl('fen_reaver_glaive')).toBe('models/weapons/scythe.glb');
+    expect(itemWeaponModelUrl('eastbrook_greatsword')).toBe('models/weapons/adv_sword_2handed.glb');
+    expect(itemWeaponModelUrl('highwatch_greatsword')).toBe('models/weapons/adv_sword_2handed.glb');
+    expect(itemWeaponModelUrl('deathless_greatblade')).toBe(
+      'models/weapons/adv_sword_2handed_color.glb',
+    );
+    expect(itemWeaponModelUrl('heroic_wyrmfang_greatblade')).toBe(
+      'models/weapons/adv_sword_2handed_color.glb',
+    );
     expect(itemWeaponModelUrl('chest_armor_not_a_weapon')).toBeNull();
     expect(itemWeaponModelUrl(null)).toBeNull();
     expect(itemWeaponModelUrl(undefined)).toBeNull();
+  });
+
+  // COVERAGE: every equippable weapon must map to a held model. An unmapped item
+  // falls back asymmetrically in assets.ts: swapAttachDef keeps the class DEFAULT
+  // mainhand model (renders the wrong weapon) while offhandAttachDef returns null
+  // and attachAllProps silently skips the hand (renders nothing), so dual-wielding
+  // two copies of an unmapped one-hander showed only the mainhand.
+  it('every weapon item resolves a mainhand held model', () => {
+    const weapons = Object.values(ITEMS).filter((item) => item.kind === 'weapon');
+    expect(weapons.length).toBeGreaterThan(0);
+    const unmapped = weapons.filter((item) => itemWeaponModelUrl(item.id) === null);
+    expect(unmapped.map((item) => item.id)).toEqual([]);
+  });
+
+  // Anything that can sit in the offhand slot (a one-hander for a dual wielder, a
+  // fury two-hander, a shield) must resolve there too, or the hand renders empty.
+  // The held_offhand kind (caster orbs/tomes) is swept by the pin test below.
+  it('every offhand-capable weapon and shield resolves an offhand held model', () => {
+    const offhandCapable = Object.values(ITEMS).filter(
+      (item) =>
+        (item.kind === 'weapon' && weaponHand(item) !== 'mainhand') ||
+        (item.kind === 'armor' && item.slot === 'offhand' && item.shield === true),
+    );
+    expect(offhandCapable.length).toBeGreaterThan(0);
+    const unmapped = offhandCapable.filter((item) => itemOffhandModelUrl(item.id) === null);
+    expect(unmapped.map((item) => item.id)).toEqual([]);
+  });
+
+  // The wraithfire_orb (and its generated heroic clone) plus the valefire_lantern
+  // are the known held model gaps: the shared art set has no orb or lantern model
+  // to map them to, so they need new art, not a table row. Pinning the exact set
+  // makes the exception conscious: a future held_offhand item must either map to
+  // a model or extend this pin.
+  it('pins the held_offhand items without a model (orb and lantern)', () => {
+    const heldOffhands = Object.values(ITEMS).filter((item) => item.kind === 'held_offhand');
+    const unmapped = heldOffhands
+      .filter((item) => itemOffhandModelUrl(item.id) === null)
+      .map((item) => item.id)
+      .sort();
+    expect(unmapped).toEqual(['heroic_wraithfire_orb', 'valefire_lantern', 'wraithfire_orb']);
+  });
+
+  it('resolves actual offhands independently from the mainhand model', () => {
+    expect(itemOffhandModelUrl('eastbrook_buckler')).toBe('models/weapons/shield_round.glb');
+    expect(itemOffhandModelUrl('highwatch_wallshield')).toBe('models/weapons/shield_square.glb');
+    expect(itemOffhandModelUrl('rusty_dagger')).toBe('models/weapons/dagger_a.glb');
+    expect(itemOffhandModelUrl('heroic_fang_of_korzul')).toBe('models/weapons/dagger_c.glb');
+    expect(itemOffhandModelUrl('chest_armor_not_an_offhand')).toBeNull();
+    expect(itemOffhandModelUrl(null)).toBeNull();
+    expect(itemOffhandModelUrl(undefined)).toBeNull();
+  });
+
+  it('preloads every live shield model used by an actual offhand', () => {
+    const manifest = new Set(manifestUrls());
+    for (const url of [
+      itemOffhandModelUrl('eastbrook_buckler'),
+      itemOffhandModelUrl('highwatch_wallshield'),
+    ]) {
+      expect(url).not.toBeNull();
+      if (!url) continue;
+      expect(existsSync(`public/${url}`), `${url} missing`).toBe(true);
+      expect(manifest.has(url), `${url} missing from manifestUrls()`).toBe(true);
+    }
+  });
+
+  it('uses KayKit authored per-variant shield seats in both hands', () => {
+    const seats = [
+      [
+        'shield_round',
+        'Round_Shield',
+        {
+          position: [0, 0.017, 0.1771],
+          scale: 0.4413,
+        },
+      ],
+      [
+        'shield_square',
+        'Rectangle_Shield',
+        {
+          position: [0, 0.017, 0.1617],
+          scale: 0.5964,
+        },
+      ],
+      [
+        'shield_badge',
+        'Badge_Shield',
+        {
+          position: [0, -0.0123, 0.1341],
+          scale: 0.5108,
+        },
+      ],
+    ] as const;
+
+    for (const [file, node, grip] of seats) {
+      expect(KAYKIT_SHIELD_ACCESSORIES[file]).toBe(node);
+      expect(KAYKIT_SHIELD_GRIPS[node]).toEqual({
+        r: { ...grip, quaternion: [0, 1, 0, 0] },
+        l: { ...grip, quaternion: [0, 0, 0, 1] },
+      });
+    }
+    expect(KAYKIT_SHIELD_GRIPS).not.toHaveProperty('Shield');
   });
 
   // Every weapon variant must belong to a family that has a hand-grip mapping in
@@ -78,29 +195,60 @@ describe('held weapon models', () => {
         expect(def.weaponSlots?.includes(0), `${key} should swap its mainhand`).toBe(true);
       }
     }
-    // the rogue dual-wields: both hand slots swap so a dagger shows in BOTH hands
-    expect(VISUALS.player_rogue.weaponSlots).toEqual([0, 1]);
+    // The rogue dual-wields through independent mainhand and offhand slots.
+    expect(VISUALS.player_rogue.weaponSlots).toEqual([0]);
+    expect(VISUALS.player_rogue.offhandSlot).toBe(1);
   });
 
-  // The class-agnostic Combat Mech adopts the WEARER class's hand layout, so a
-  // rogue wearing the mech still dual-wields (weapon in both hands), while every
-  // single-wield class keeps the mech's own one-hand default (no override).
-  it('the Combat Mech mirrors a dual-wield class so a rogue mech holds both hands', () => {
+  it('gives winning Warrior one mainhand swap and one independent live offhand', () => {
+    expect(VISUALS.player_warrior.weaponSlots).toEqual([0]);
+    expect(VISUALS.player_warrior.offhandSlot).toBe(1);
+    expect(VISUALS.player_warrior.attach).toEqual([
+      { url: 'models/weapons/sword_1handed.glb', bone: 'handslot.r' },
+      { url: 'models/weapons/shield_round.glb', bone: 'handslot.l' },
+    ]);
+  });
+
+  it('keeps every real offhand independent from mainhand cosmetics', () => {
+    expect(VISUALS.player_rogue.offhandSlot).toBe(1);
+    expect(VISUALS.player_paladin).toMatchObject({
+      weaponSlots: [0],
+      offhandSlot: 1,
+      attach: [
+        { url: 'models/weapons/axe_1handed.glb', bone: 'handslot.r' },
+        { url: 'models/weapons/shield_square.glb', bone: 'handslot.l' },
+      ],
+    });
+    expect(VISUALS.player_shaman).toMatchObject({
+      weaponSlots: [0],
+      offhandSlot: 1,
+      attach: [
+        { url: 'models/weapons/axe_1handed.glb', bone: 'handslot.r' },
+        { url: 'models/weapons/shield_round.glb', bone: 'handslot.l' },
+      ],
+    });
+  });
+
+  // The class-agnostic Combat Mech adopts the wearer's real offhand layout, so
+  // rogues keep their second weapon and shield classes keep their shield.
+  it('the Combat Mech mirrors every class with an independent offhand', () => {
     const rogue = mechHeldWeaponOverride('rogue');
-    expect(rogue?.weaponSlots).toEqual([0, 1]);
+    expect(rogue?.weaponSlots).toEqual([0]);
+    expect(rogue?.offhandSlot).toBe(1);
     expect(rogue?.attach?.length).toBe(2);
-    for (const cls of [
-      'warrior',
-      'paladin',
-      'hunter',
-      'priest',
-      'mage',
-      'warlock',
-      'shaman',
-      'druid',
-    ] as const) {
-      expect(mechHeldWeaponOverride(cls), `${cls} should not dual-wield on the mech`).toBeNull();
+    expect(mechHeldWeaponOverride('paladin')?.offhandSlot).toBe(1);
+    expect(mechHeldWeaponOverride('shaman')?.offhandSlot).toBe(1);
+    for (const cls of ['hunter', 'priest', 'mage', 'warlock', 'druid'] as const) {
+      expect(mechHeldWeaponOverride(cls), `${cls} should keep the mech default`).toBeNull();
     }
+
+    const warrior = mechHeldWeaponOverride('warrior');
+    expect(warrior?.weaponSlots).toEqual([0]);
+    expect(warrior?.offhandSlot).toBe(1);
+    expect(warrior?.attach?.[1]).toEqual({
+      url: 'models/weapons/shield_round.glb',
+      bone: 'handslot.l',
+    });
   });
 });
 
@@ -114,6 +262,40 @@ describe('weapon skin held models', () => {
     expect(weaponSkinModelUrl('not_a_skin')).toBeNull();
     expect(weaponSkinModelUrl(null)).toBeNull();
     expect(weaponSkinModelUrl(undefined)).toBeNull();
+  });
+
+  // The offhand slot mirrors the active skin ONLY onto a matching-type weapon;
+  // everything else keeps its own item model. This is the render half of
+  // the pure offhandMirrorsWeaponSkin rule (its full truth table is in
+  // tests/weapon_skins.test.ts).
+  it('offhandModelUrl mirrors the skin onto a matching-type offhand weapon', () => {
+    // Dagger skin + offhand dagger: the offhand renders the SKIN model.
+    expect(offhandModelUrl('rusty_dagger', 'frostbite_dagger')).toBe(
+      weaponSkinModelUrl('frostbite_dagger'),
+    );
+    expect(offhandModelUrl('heroic_fang_of_korzul', 'ashspark_dagger')).toBe(
+      weaponSkinModelUrl('ashspark_dagger'),
+    );
+    // Sword skin + offhand one-hand sword: also mirrors.
+    expect(offhandModelUrl('crossroads_saber', 'ice_fang_sword')).toBe(
+      weaponSkinModelUrl('ice_fang_sword'),
+    );
+  });
+
+  it('offhandModelUrl keeps the item model for a non-matching offhand', () => {
+    // Different-type weapon, shield, and held offhand all fall back to the item.
+    expect(offhandModelUrl('crossroads_saber', 'frostbite_dagger')).toBe(
+      itemOffhandModelUrl('crossroads_saber'),
+    );
+    expect(offhandModelUrl('eastbrook_buckler', 'frostbite_dagger')).toBe(
+      itemOffhandModelUrl('eastbrook_buckler'),
+    );
+    // No skin at all: unchanged item resolution (the common case).
+    expect(offhandModelUrl('rusty_dagger', null)).toBe(itemOffhandModelUrl('rusty_dagger'));
+    expect(offhandModelUrl('eastbrook_buckler', null)).toBe(
+      itemOffhandModelUrl('eastbrook_buckler'),
+    );
+    expect(offhandModelUrl(null, 'frostbite_dagger')).toBeNull();
   });
 
   it('ships 29 distinct skin model urls, all in the boot preload manifest', () => {

@@ -4,7 +4,7 @@
 // merges those records into the flat tables the rest of the engine consumes,
 // and owns the world-layout constants.
 
-import { BASE_ITEMS, FISHING_RARE_ID, FISHING_TABLES } from './content/items';
+import { BASE_ITEMS } from './content/items';
 import type {
   CampDef,
   DelveDef,
@@ -24,7 +24,6 @@ import type {
 } from './types';
 
 export type { FishingEntry } from './content/items';
-export { FISHING_RARE_ID, FISHING_TABLES };
 
 import {
   BROTHER_HALVEN,
@@ -44,6 +43,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
+import { MAGE_PET_MOBS } from './content/mage_pets';
 import {
   ALL_RECIPES as ALL_RECIPES_CONTENT,
   COMMON_RECIPES as COMMON_RECIPES_CONTENT,
@@ -104,7 +104,7 @@ import {
   ZONE3_ROADS,
   ZONE3_ZONE,
 } from './content/zone3';
-import { DUNGEON_WALL_HW } from './dungeon_layout';
+import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from './dungeon_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
 
 export type { DelveShopEntry, DelveShopGate, DelveShopOffer } from './content/delves';
@@ -123,6 +123,7 @@ import { DELVE_ITEMS } from './content/delves/items';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
+import { PROFESSION_ITEMS } from './content/profession_items';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
 
@@ -139,6 +140,7 @@ function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef
 export type { ClassDef } from './content/classes';
 export { ABILITIES, abilitiesKnownAt, CLASSES } from './content/classes';
 export { GATHER_NODE_TYPES } from './content/gather_nodes';
+export { STATIONS } from './content/professions';
 // Re-export content shapes so existing `from './data'` imports keep working.
 export type {
   BiomeId,
@@ -160,6 +162,7 @@ export type {
 
 export const ITEMS: Record<string, ItemDef> = mergeItems(
   BASE_ITEMS,
+  PROFESSION_ITEMS,
   ZONE2_ITEMS,
   ZONE3_ITEMS,
   TEMPLE_ITEMS,
@@ -179,6 +182,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...ZONE3_MOBS,
   ...DUNGEON_MOBS,
   ...WARLOCK_PET_MOBS,
+  ...MAGE_PET_MOBS,
   ...TEMPLE_MOBS,
   ...TEMPLE_DUNGEON_MOBS,
   ...DELVE_MOBS,
@@ -436,7 +440,11 @@ export function dungeonAt(x: number): DungeonDef | null {
 // ---------------------------------------------------------------------------
 
 export const ARENA_X = 4200; // arena instances share this x; slots stack along z
-export const ARENA_X_MIN = ARENA_X; // x at/after this = an arena instance, not a dungeon
+// Include the complete west wall plus one yard of routing headroom. Collision,
+// line of sight, camera sweeps, and dungeon lookup all select their instance
+// geometry through this boundary, so using the centreline would leave the
+// arena's entire west half attached to the neighboring dungeon band.
+export const ARENA_X_MIN = ARENA_X - (DUNGEON_WALL_X + DUNGEON_WALL_HW + 1);
 export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
 const ARENA_Z0 = -1250;
 const ARENA_SLOT_SPACING = 120; // > the pit footprint (~44yd) so slots never overlap
@@ -474,10 +482,10 @@ export const CRYPT_SPAWNS = DUNGEONS.hollow_crypt.spawns;
 
 // ---------------------------------------------------------------------------
 // Delves, private party instances past the arena x-band (see docs/prd/delves.md).
-// DELVE_X_MIN must stay above ARENA_X_MIN (4000) and ARENA_X (4200).
+// DELVE_X_MIN must stay above the full arena footprint around ARENA_X.
 // ---------------------------------------------------------------------------
 
-// 4800 sits clear of the v0.10.0 layout: dungeons end at ARENA_X_MIN (4000) and
+// 4800 sits clear of the v0.10.0 layout: the widest dungeon ends west of
 // the arena pit is centred at ARENA_X (4200, ~±22u footprint). The delve band's
 // west edge (DELVE_BAND_X_MIN = 4773) leaves a comfortable margin past the arena.
 export const DELVE_X_MIN = 4800;

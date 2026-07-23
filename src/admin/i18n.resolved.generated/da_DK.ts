@@ -46,6 +46,7 @@ export const da_DK: AdminTranslations = {
   "stats.peakOnline": "spidsbelastning online",
   "stats.peakOnlineToday": "spidsbelastning online 24t",
   "stats.peakOnlineAllTime": "spidsbelastning online nogensinde",
+  "stats.playersCap": "spillergrænse",
   "stats.accounts": "konti",
   "stats.characters": "karakterer",
   "stats.newAccounts24h": "nye konti 24t",

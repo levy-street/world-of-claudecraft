@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { heroicVariantId } from '../src/sim/content/heroic_variants';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { enterDungeon } from '../src/sim/instances/dungeons';
-import { weaponDpsBudget } from '../src/sim/item_budget';
+import { TWOHAND_DPS_MULT, weaponDpsBudget } from '../src/sim/item_budget';
 import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
 import type { Entity, ItemDef } from '../src/sim/types';
@@ -130,17 +130,25 @@ describe('heroic loot flair: weapon dps tracks item level', () => {
   });
 
   it('every heroic-only raid weapon (item level 33) sits on the dps curve', () => {
-    const target = weaponDpsBudget(33);
     for (const id of RAID_WEAPONS) {
-      expect(itemLevel(ITEMS[id]), id).toBe(33);
+      const item = ITEMS[id];
+      expect(itemLevel(item), id).toBe(33);
+      // Two-handers ride the TWOHAND_DPS_MULT premium above the one-hand line
+      // (the v0.27.1 stat-for-dps tradeoff).
+      const isTwoHand = item.kind === 'weapon' && item.hand === 'twohand';
+      const target = weaponDpsBudget(33) * (isTwoHand ? TWOHAND_DPS_MULT : 1);
       expect(Math.abs(dps(id) - target), `${id} dps ${dps(id)}`).toBeLessThan(0.3);
     }
   });
 
-  it('the Gravewyrm Cleaver now out-dps the item-level-26 Wyrmfang Greatblade but stays under the legendaries', () => {
-    expect(dps('gravewyrm_cleaver')).toBeGreaterThan(dps('wyrmfang_greatblade'));
+  it('keeps the one-hand ladder ordered and the 2H premium inside its own ladder', () => {
+    // Within the one-hand line, higher item level still wins.
+    expect(dps('gravewyrm_cleaver')).toBeGreaterThan(weaponDpsBudget(26));
     expect(dps('gravewyrm_cleaver')).toBeLessThan(dps('kingsbane_last_oath'));
     expect(dps('mistcallers_fang')).toBeLessThan(dps('deathless_heartwood'));
+    // The 2H ladder ascends by tier too: the ilvl-26 Wyrmfang stays under the
+    // ilvl-33 Deathless Greatblade.
+    expect(dps('wyrmfang_greatblade')).toBeLessThan(dps('deathless_greatblade'));
   });
 
   it('a Heroic weapon variant scales its damage to its own item level', () => {
@@ -148,7 +156,9 @@ describe('heroic loot flair: weapon dps tracks item level', () => {
     expect(v).toBeDefined();
     const w = v!.weapon!;
     const d = (w.min + w.max) / 2 / w.speed;
-    expect(Math.abs(d - weaponDpsBudget(itemLevel(v!)!))).toBeLessThan(0.6);
+    const isTwoHand = v!.kind === 'weapon' && v!.hand === 'twohand';
+    const target = weaponDpsBudget(itemLevel(v!)!) * (isTwoHand ? TWOHAND_DPS_MULT : 1);
+    expect(Math.abs(d - target)).toBeLessThan(0.6);
   });
 });
 

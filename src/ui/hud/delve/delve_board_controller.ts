@@ -22,6 +22,13 @@ export interface DelveBoardControllerDeps {
   itemTooltip(item: ItemDef): string;
   delveName(delveId: string): string;
   preloadInterior(event: Extract<SimEvent, { type: 'delveEntered' }>): void;
+  confirmDialog(
+    title: string,
+    body: string,
+    okText: string,
+    cancelText: string,
+    onOk: () => void,
+  ): void;
 }
 
 /** Owns the delve board window, its local tab/tier state, and authoritative commands. */
@@ -221,9 +228,31 @@ export class DelveBoardController {
     this.deps.element.querySelectorAll<HTMLButtonElement>('[data-buy]').forEach((button) => {
       button.addEventListener('click', () => {
         if (button.disabled) return;
-        this.deps.world().delveBuyShopItem(delveId, button.dataset.buy ?? '');
+        this.requestShopPurchase(delveId, button.dataset.buy ?? '');
       });
     });
+  }
+
+  // Delve Marks purchases are instant and have no buyback, so a mis-tap is
+  // unrefundable: confirm before sending the exact pre-existing buy command.
+  // OK sends it once; cancel/Escape sends nothing.
+  private requestShopPurchase(delveId: string, itemId: string): void {
+    const offer = this.deps
+      .world()
+      .delveShopOffers(delveId)
+      .find((candidate) => candidate.itemId === itemId);
+    const item = ITEMS[itemId];
+    if (!offer || !item) return;
+    this.deps.confirmDialog(
+      t('delveUi.shop.buyConfirmTitle'),
+      t('delveUi.shop.buyConfirmBody', {
+        item: itemDisplayName(item),
+        marks: formatNumber(offer.marks, { maximumFractionDigits: 0 }),
+      }),
+      t('delveUi.shop.buyConfirmAccept'),
+      t('delveUi.shop.buyConfirmCancel'),
+      () => this.deps.world().delveBuyShopItem(delveId, itemId),
+    );
   }
 
   private bindDelveHandlers(delveId: string): void {

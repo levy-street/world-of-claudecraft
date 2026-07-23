@@ -31,6 +31,7 @@ import {
   requestGuildMembersPayload,
   rosterComplete,
   staleFlairedIds,
+  stripLevelSuffix,
   tierRoleName,
   topSpecialRoleKeyFor,
   voiceMembersForChannel,
@@ -372,6 +373,37 @@ describe('level-on-name nickname', () => {
 
   it('is idempotent when built from the same stable base', () => {
     expect(buildLevelNick('Aldric', 20, 'warrior')).toBe(buildLevelNick('Aldric', 20, 'warrior'));
+  });
+
+  it('replaces an existing suffix instead of compounding it', () => {
+    // Simulates a re-sync fed the CURRENT (already-suffixed) nick as its base,
+    // e.g. because the fallback chain reused the live Discord nick.
+    const first = buildLevelNick('Aldric', 20, 'warrior');
+    const second = buildLevelNick(first, 21, 'warrior');
+    expect(second).toBe(`Aldric${levelNickSuffix(21, 'warrior')}`);
+  });
+
+  it('collapses several stacked suffixes from a prior compounding bug down to one', () => {
+    // Simulates a name mangled by the old compounding bug: several suffixes
+    // (possibly from different classes/levels) stacked back to back.
+    const stacked =
+      'Enrik' +
+      levelNickSuffix(20, 'warrior').repeat(5) +
+      levelNickSuffix(2, 'warrior') +
+      levelNickSuffix(20, 'warrior');
+    expect(buildLevelNick(stacked, 20, 'warrior')).toBe(`Enrik${levelNickSuffix(20, 'warrior')}`);
+
+    const stackedMixed =
+      'jgyy' +
+      levelNickSuffix(1, 'rogue').repeat(3) +
+      levelNickSuffix(1, 'priest') +
+      levelNickSuffix(1, 'rogue').repeat(3) +
+      levelNickSuffix(1, 'priest').repeat(2);
+    expect(stripLevelSuffix(stackedMixed)).toBe('jgyy');
+  });
+
+  it('stripLevelSuffix leaves a name with no suffix unchanged', () => {
+    expect(stripLevelSuffix('Aldric')).toBe('Aldric');
   });
 });
 

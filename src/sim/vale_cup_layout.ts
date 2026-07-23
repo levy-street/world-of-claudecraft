@@ -177,7 +177,7 @@ export function isAtSowfield(x: number, z: number): boolean {
  * Inside the full stadium footprint including the flatten's falloff apron. This
  * is the same rectangle that keeps procedural trees/rocks off the shell
  * (world.ts generateDecorations), reused to keep wild grass tufts, ground
- * plants, and ambient critters off the pitch and its immediate surrounds so the
+ * plants and other ambient dressing off the pitch and its immediate surrounds so the
  * Sowfield reads as a proper mown football ground.
  */
 export function isInSowfieldShell(x: number, z: number): boolean {

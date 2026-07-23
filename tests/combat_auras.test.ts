@@ -64,6 +64,33 @@ describe('auras: isRejectedFriendlyNpcAura', () => {
   });
 });
 
+describe('auras: unbreakable control replacement', () => {
+  it('cannot be downgraded by an ordinary refresh and can refresh as protected', () => {
+    const sim = makeSim();
+    const p = sim.player;
+    const protectedStun = {
+      ...aura('stun', 0, { id: 'scripted_stun', sourceId: 9000 }),
+      unbreakableControl: true,
+    } as const;
+    sim.ctx.applyAura(p, protectedStun);
+
+    sim.ctx.applyAura(
+      p,
+      aura('stun', 0, {
+        id: 'scripted_stun',
+        sourceId: 9000,
+        remaining: 3,
+        duration: 3,
+      }),
+    );
+    expect(p.auras.filter((entry) => entry.id === 'scripted_stun')).toEqual([protectedStun]);
+
+    const refreshed = { ...protectedStun, remaining: 90, duration: 90 };
+    sim.ctx.applyAura(p, refreshed);
+    expect(p.auras.filter((entry) => entry.id === 'scripted_stun')).toEqual([refreshed]);
+  });
+});
+
 describe('auras: updateTimers', () => {
   it('decrements gcd, advances rule/combat timers, and expires cooldowns', () => {
     const sim = makeSim();

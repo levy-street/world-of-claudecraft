@@ -1,11 +1,13 @@
 // @vitest-environment jsdom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DELVES, NPCS } from '../src/sim/data';
+import { DELVES, NPCS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
 import type { Entity } from '../src/sim/types';
+import { craftNameText } from '../src/ui/char_window';
 import type { FocusTrapHandle } from '../src/ui/focus_manager';
 import { QuestDialogController } from '../src/ui/hud/quest/quest_dialog_controller';
+import { t } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
 
 function npc(id: number, templateId: string, x = 0): Entity {
@@ -81,6 +83,9 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
   const openDelveBoard = vi.fn();
   const openValeCup = vi.fn();
   const openCardDuel = vi.fn();
+  const openTrain = vi.fn();
+  const openUnbind = vi.fn();
+  const onOpenChange = vi.fn();
   const controller = new QuestDialogController({
     element,
     document,
@@ -113,6 +118,9 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
     openDelveBoard,
     openValeCup,
     openCardDuel,
+    openTrain,
+    openUnbind,
+    onOpenChange,
     voice,
   });
   return {
@@ -138,6 +146,9 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
     openDelveBoard,
     openValeCup,
     openCardDuel,
+    openTrain,
+    openUnbind,
+    onOpenChange,
   };
 }
 
@@ -157,12 +168,19 @@ describe('QuestDialogController', () => {
     expect(test.voice.play).toHaveBeenCalledWith(`greeting__${test.entity.templateId}`);
     expect(test.voice.setDistance).toHaveBeenCalledWith(0);
     expect(test.focusFirst).toHaveBeenCalledTimes(1);
+    expect(test.onOpenChange).toHaveBeenCalledWith(true);
+    expect(test.onOpenChange.mock.invocationCallOrder[0]).toBeLessThan(
+      test.voice.play.mock.invocationCallOrder[0],
+    );
+    expect(test.controller.isOpen).toBe(true);
 
     test.entity.pos.x = 9;
     test.controller.updateProximity();
 
     expect(test.element.style.display).toBe('none');
     expect(test.release).toHaveBeenCalledWith(true);
+    expect(test.onOpenChange).toHaveBeenLastCalledWith(false);
+    expect(test.controller.isOpen).toBe(false);
   });
 
   it('routes bankers and chroniclers through authoritative interaction without gossip', () => {
@@ -223,42 +241,102 @@ describe('QuestDialogController', () => {
   });
 
   it('previews and dispatches the selected profession attunement target', () => {
-    const smith = npc(32, 'smith_haldren');
-    smith.questIds = ['q_archetype_acceptance'];
-    const test = harness(smith, 'available');
-    test.controller.open(smith.id);
-    test.element.querySelector<HTMLButtonElement>('[data-quest="q_archetype_acceptance"]')?.click();
+    // Each wave-one attune quest pins one pair, so the Smith acceptance
+    // quest at Forgemistress Darva narrows the selector to exactly its pair.
+    const darva = npc(32, 'forgemistress_darva');
+    darva.questIds = ['q_prof_attune_smith'];
+    const test = harness(darva, 'available');
+    test.controller.open(darva.id);
+    test.element.querySelector<HTMLButtonElement>('[data-quest="q_prof_attune_smith"]')?.click();
 
     const select = test.element.querySelector<HTMLSelectElement>('[data-profession-selection]');
     const preview = test.element.querySelector<HTMLElement>('[data-profession-preview]');
-    expect(select?.options).toHaveLength(10);
+    // The pinned pair is the only legal target for an unattuned player.
+    expect(select?.options).toHaveLength(1);
     expect(preview?.textContent).toBeTruthy();
+    expect(preview?.getAttribute('aria-live')).toBe('polite');
+    expect(preview?.getAttribute('aria-atomic')).toBe('true');
 
     if (!select) throw new Error('profession selector missing');
-    // The option labels lead with the pair archetype name and keep both craft
-    // names visible, e.g. "Bladewright (Jewelcrafting + Weaponcrafting)".
-    const option = [...select.options].find((o) => o.value === 'jewelcrafting+weaponcrafting');
-    expect(option?.textContent).toBe('Bladewright (Jewelcrafting + Weaponcrafting)');
-    select.value = 'jewelcrafting+weaponcrafting';
+    // The single option leads with the pair archetype name and keeps both craft
+    // names visible: "Smith (Weaponcrafting + Armorcrafting)".
+    const option = [...select.options].find((o) => o.value === 'weaponcrafting+armorcrafting');
+    expect(option?.textContent).toBe('Smith (Weaponcrafting + Armorcrafting)');
+    select.value = 'weaponcrafting+armorcrafting';
     select.dispatchEvent(new Event('change'));
-    // The preview names the pair title and both major crafts.
-    expect(preview?.textContent).toContain('Bladewright');
-    expect(preview?.textContent).toContain('Jewelcrafting');
+    // The preview names the pair title, both major crafts, and the make-amends
+    // return cost (preview completeness).
+    expect(preview?.textContent).toContain('Smith');
     expect(preview?.textContent).toContain('Weaponcrafting');
+    expect(preview?.textContent).toContain('Armorcrafting');
+    expect(preview?.textContent).toContain('make-amends');
+    const smithCrest = preview?.querySelector<HTMLImageElement>('.qd-profession-crest');
+    expect(smithCrest?.getAttribute('src')).toBe('/ui/professions/archetype_smith.webp');
+    expect(smithCrest?.getAttribute('alt')).toBe('');
+
+    // The preview painter updates both the localized copy and its crest when
+    // the selection changes. Add a second canonical option to exercise that
+    // reusable select path even though this quest currently pins one pair.
+    const bombardier = document.createElement('option');
+    bombardier.value = 'engineering+alchemy';
+    bombardier.textContent = 'Bombardier';
+    select.appendChild(bombardier);
+    select.value = 'engineering+alchemy';
+    select.dispatchEvent(new Event('change'));
+    expect(preview?.textContent).toContain('Bombardier');
+    expect(
+      preview?.querySelector<HTMLImageElement>('.qd-profession-crest')?.getAttribute('src'),
+    ).toBe('/ui/professions/archetype_bombardier.webp');
+
+    // Restore the quest's legal pinned target before dispatching acceptance.
+    select.value = 'weaponcrafting+armorcrafting';
+    select.dispatchEvent(new Event('change'));
 
     test.element.querySelector<HTMLButtonElement>('.btn')?.click();
     expect(test.acceptQuest).toHaveBeenCalledWith(
-      'q_archetype_acceptance',
-      'jewelcrafting+weaponcrafting',
+      'q_prof_attune_smith',
+      'weaponcrafting+armorcrafting',
     );
   });
 
+  it('renders the real hobby-switch preview as localized copy with no archetype crest', () => {
+    const haldren = npc(33, 'smith_haldren');
+    haldren.questIds = ['q_prof_hobby_switch'];
+    const test = harness(haldren, 'available');
+    Object.assign(test.world.craftingIdentity, {
+      activeArchetype: 'armorcrafting',
+      pairedMajor: 'weaponcrafting',
+      hobbyCraft: 'leatherworking',
+      attunedPairs: ['weaponcrafting+armorcrafting'],
+    });
+
+    test.controller.open(haldren.id);
+    test.element.querySelector<HTMLButtonElement>('[data-quest="q_prof_hobby_switch"]')?.click();
+
+    const select = test.element.querySelector<HTMLSelectElement>('[data-profession-selection]');
+    const preview = test.element.querySelector<HTMLElement>('[data-profession-preview]');
+    if (!select) throw new Error('hobby profession selector missing');
+    expect([...select.options].map((option) => option.value)).toEqual(['tailoring']);
+    expect(preview?.textContent).toBe(
+      t('hudChrome.crafting.hobbyPreview', { hobby: craftNameText('tailoring') }),
+    );
+    expect(preview?.getAttribute('aria-live')).toBe('polite');
+    expect(preview?.getAttribute('aria-atomic')).toBe('true');
+    expect(preview?.querySelector('.qd-profession-crest')).toBeNull();
+
+    select.dispatchEvent(new Event('change'));
+    expect(preview?.querySelector('.qd-profession-crest')).toBeNull();
+  });
+
   it('keeps the accept action disabled when a profession quest has no target', () => {
-    const smith = npc(33, 'smith_haldren');
-    smith.questIds = ['q_prof_make_amends'];
-    const test = harness(smith, 'available');
-    test.controller.open(smith.id);
-    test.element.querySelector<HTMLButtonElement>('[data-quest="q_prof_make_amends"]')?.click();
+    // The make-amends return quest at Forgemistress Darva is only
+    // legal for a pair the character has held before, so an unattuned player
+    // (no history) sees zero targets and a disabled accept.
+    const darva = npc(34, 'forgemistress_darva');
+    darva.questIds = ['q_prof_amends_smith'];
+    const test = harness(darva, 'available');
+    test.controller.open(darva.id);
+    test.element.querySelector<HTMLButtonElement>('[data-quest="q_prof_amends_smith"]')?.click();
 
     const select = test.element.querySelector<HTMLSelectElement>('[data-profession-selection]');
     const accept = test.element.querySelector<HTMLButtonElement>('.btn');
@@ -308,6 +386,55 @@ describe('QuestDialogController', () => {
     expect(cardMaster.openCardDuel).toHaveBeenCalledTimes(1);
   });
 
+  it('a station master offers the Train option and routes it to openTrain', () => {
+    // Every STATIONS masterNpcId renders the [data-train] gossip option; the
+    // click routes the NPC ENTITY id (not the template id) to deps.openTrain.
+    const master = harness(npc(46, STATIONS[0].masterNpcId));
+    master.controller.open(46);
+    const button = master.element.querySelector<HTMLButtonElement>('[data-train]');
+    expect(button).not.toBeNull();
+    expect(button?.getAttribute('aria-label')).toBeTruthy();
+    button?.click();
+    expect(master.openTrain).toHaveBeenCalledWith(46);
+    expect(master.release).toHaveBeenCalledWith(false);
+  });
+
+  it('a non-master NPC renders no Train option', () => {
+    const masters = new Set(STATIONS.map((station) => station.masterNpcId));
+    const plainId = Object.values(NPCS).find(
+      (definition) => !definition.banker && !masters.has(definition.id),
+    )?.id;
+    if (!plainId) throw new Error('non-master NPC fixture not found');
+    const plain = harness(npc(47, plainId));
+    plain.controller.open(47);
+    expect(plain.element.querySelector('[data-train]')).toBeNull();
+  });
+
+  it('a station master offers the Unbind service and routes it to openUnbind', () => {
+    // Every station master offers the Maker's Bond unbind service beside
+    // training (the same isStationMasterNpc gate); the click routes the NPC
+    // ENTITY id to deps.openUnbind and releases the dialog.
+    const master = harness(npc(48, STATIONS[0].masterNpcId));
+    master.controller.open(48);
+    const button = master.element.querySelector<HTMLButtonElement>('[data-unbind]');
+    expect(button).not.toBeNull();
+    expect(button?.getAttribute('aria-label')).toBeTruthy();
+    button?.click();
+    expect(master.openUnbind).toHaveBeenCalledWith(48);
+    expect(master.release).toHaveBeenCalledWith(false);
+  });
+
+  it('a non-master NPC renders no Unbind option', () => {
+    const masters = new Set(STATIONS.map((station) => station.masterNpcId));
+    const plainId = Object.values(NPCS).find(
+      (definition) => !definition.banker && !masters.has(definition.id),
+    )?.id;
+    if (!plainId) throw new Error('non-master NPC fixture not found');
+    const plain = harness(npc(49, plainId));
+    plain.controller.open(49);
+    expect(plain.element.querySelector('[data-unbind]')).toBeNull();
+  });
+
   it('closes stale gossip when the authoritative NPC disappears', () => {
     const test = harness();
     test.controller.open(test.entity.id);
@@ -317,5 +444,36 @@ describe('QuestDialogController', () => {
 
     expect(test.element.style.display).toBe('none');
     expect(test.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('refreshIfChanged retires a lingering intro hint when attunement lands under the open dialog', () => {
+    // The online edge: the cprof identity mirror replaces craftingIdentity
+    // AFTER the gossip dialog opened, and no quest event fires for it. The
+    // stale hint self-healed only on reopen before the staleness probe.
+    const haldren = npc(51, 'smith_haldren');
+    const test = harness(haldren, 'available');
+    test.controller.open(haldren.id);
+    expect(test.element.querySelector('[data-prof-intro-hint]')).not.toBeNull();
+
+    (test.world.craftingIdentity.attunedPairs as string[]).push('weaponcrafting+armorcrafting');
+    test.controller.refreshIfChanged();
+
+    expect(test.element.querySelector('[data-prof-intro-hint]')).toBeNull();
+    expect(test.element.style.display).toBe('block');
+  });
+
+  it('refreshIfChanged never rebuilds the dialog DOM while the hint state is unchanged', () => {
+    // The dialog holds focus-trapped buttons: an unconditional slow-band
+    // rebuild would drop keyboard focus every second, so node identity must
+    // survive a no-change probe.
+    const haldren = npc(52, 'smith_haldren');
+    const test = harness(haldren, 'available');
+    test.controller.open(haldren.id);
+    const hintNode = test.element.querySelector('[data-prof-intro-hint]');
+    expect(hintNode).not.toBeNull();
+
+    test.controller.refreshIfChanged();
+
+    expect(test.element.querySelector('[data-prof-intro-hint]')).toBe(hintNode);
   });
 });

@@ -12,22 +12,10 @@ const MASTER_LIMIT = 0.749894; // -2.5 dBFS leaves MP3 true-peak headroom
 // These gains shape the source character before the fixed peak/LUFS conform
 // pass. They are not cross-clip runtime mix values.
 const MASTER_GAINS_DB = {
-  ui_click: 8.75,
-  ui_error: 8.08,
-  ui_bag_open: 17.44,
-  ui_bag_close: 15.95,
-  ui_coin: 4.89,
-  ui_loot_item: 20.6,
-  ui_quest_accept: 3.57,
   ui_quest_done: 0.8,
   ui_level_up: -0.37,
-  ui_whisper: 6.25,
-  ui_sheep: 6.49,
   ui_death: 5.58,
-  ui_duel_challenge: 3.81,
-  ui_duel_countdown: 8.85,
-  ui_duel_start: 0.46,
-  ui_duel_end: 1.86,
+  ui_vcup_kickoff: 0.46,
   ui_fiesta_word_0: 2.68,
   ui_fiesta_word_1: 2.55,
   ui_fiesta_word_2: 0.09,
@@ -38,6 +26,12 @@ const MASTER_GAINS_DB = {
   ui_fiesta_augment: 3.02,
   ui_fiesta_down: 6.66,
   ui_fiesta_revive: 4.01,
+  ui_gather_cast: 0,
+  ui_gather_strike: 0,
+  ui_gather_rare: 0,
+  ui_fish_cast: 0,
+  ui_fish_bite: 2.5,
+  ui_fish_reel: 0,
 };
 
 function tone(frequency, start, duration, gain, options = {}) {
@@ -88,35 +82,6 @@ function fiestaWord(tier, base) {
 }
 
 export const UI_SFX_SPECS = [
-  cue('ui_click', 0.5, 'Short crisp fantasy interface button click, clean and dry.', [
-    tone(1400, 0, 0.06, 0.24, { wave: 'square' }),
-    tone(900, 0.012, 0.05, 0.08, { wave: 'sine' }),
-  ]),
-  cue('ui_error', 0.5, 'Short low invalid-action interface buzz, clear but not harsh.', [
-    tone(230, 0, 0.16, 0.22, { wave: 'square', endFrequency: 180 }),
-    tone(175, 0.12, 0.15, 0.15, { wave: 'square' }),
-  ]),
-  cue('ui_bag_open', 0.5, 'Leather inventory bag opening with a soft metal clasp.', [
-    noise('pink', 0, 0.16, 0.16, { highpass: 130, lowpass: 1500 }),
-    tone(660, 0.045, 0.07, 0.11, { wave: 'triangle' }),
-  ]),
-  cue('ui_bag_close', 0.5, 'Leather inventory bag closing with a muted clasp.', [
-    noise('pink', 0, 0.14, 0.14, { highpass: 100, lowpass: 900 }),
-    tone(440, 0.02, 0.07, 0.1, { wave: 'triangle' }),
-  ]),
-  cue('ui_coin', 0.5, 'Two bright gold coin pings, compact fantasy reward cue.', [
-    tone(2200, 0, 0.12, 0.19, { wave: 'square' }),
-    tone(2800, 0.055, 0.16, 0.17, { wave: 'square' }),
-    tone(1100, 0, 0.2, 0.045, { wave: 'sine' }),
-  ]),
-  cue('ui_loot_item', 0.5, 'Soft item pickup rustle and compact inventory tick.', [
-    noise('pink', 0, 0.14, 0.16, { highpass: 500, lowpass: 1700 }),
-    tone(950, 0.025, 0.11, 0.055, { wave: 'triangle' }),
-  ]),
-  cue('ui_quest_accept', 0.6, 'Two-note rising fantasy quest accepted chime.', [
-    tone(660, 0, 0.22, 0.18, { wave: 'triangle' }),
-    tone(880, 0.1, 0.3, 0.17, { wave: 'triangle' }),
-  ]),
   cue('ui_quest_done', 0.75, 'Three-note ascending fantasy quest completion chime.', [
     tone(523, 0, 0.35, 0.16, { wave: 'triangle' }),
     tone(659, 0.12, 0.38, 0.16, { wave: 'triangle' }),
@@ -130,34 +95,17 @@ export const UI_SFX_SPECS = [
     tone(1046, 0.36, 0.52, 0.14, { wave: 'triangle' }),
     noise('white', 0.05, 0.78, 0.025, { highpass: 2600 }),
   ]),
-  cue('ui_whisper', 0.5, 'Private message notification with two delicate glassy notes.', [
-    tone(1175, 0, 0.12, 0.15),
-    tone(1568, 0.07, 0.16, 0.12),
-    noise('pink', 0.02, 0.19, 0.018, { highpass: 1700 }),
-  ]),
-  cue('ui_sheep', 0.65, 'Playful magical sheep transformation bleat-like synth cue.', [
-    tone(620, 0, 0.44, 0.18, { wave: 'saw', endFrequency: 520 }),
-    tone(1240, 0.015, 0.27, 0.04, { wave: 'sine', endFrequency: 1040 }),
-  ]),
   cue('ui_death', 1.5, 'Somber descending player defeat sting with a dark soft impact.', [
     tone(220, 0, 1.4, 0.2, { wave: 'saw', endFrequency: 55 }),
     noise('brown', 0, 1.2, 0.12, { lowpass: 360 }),
   ]),
-  cue('ui_duel_challenge', 0.9, 'Short two-note fantasy war horn announcing a duel challenge.', [
-    tone(196, 0, 0.4, 0.23, { wave: 'saw' }),
-    tone(294, 0.18, 0.52, 0.22, { wave: 'saw' }),
-  ]),
-  cue('ui_duel_countdown', 0.5, 'Tight bright duel countdown tick with a firm attack.', [
-    tone(880, 0, 0.08, 0.23, { wave: 'square' }),
-    tone(1760, 0, 0.05, 0.06, { wave: 'sine' }),
-  ]),
-  cue('ui_duel_start', 0.9, 'Compact fantasy duel-start gong with a bright cymbal wash.', [
-    tone(220, 0, 0.72, 0.24, { wave: 'triangle', endFrequency: 110 }),
-    noise('white', 0, 0.42, 0.09, { highpass: 1600 }),
-  ]),
-  cue('ui_duel_end', 0.65, 'Two-note resolved fantasy duel ending cadence.', [
-    tone(392, 0, 0.22, 0.2, { wave: 'triangle' }),
-    tone(523, 0.12, 0.36, 0.2, { wave: 'triangle' }),
+  // Placeholder: split off ui_duel_start so Vale Cup kickoff can get its own
+  // cue distinct from a real duel/arena start. Swap for a real recording
+  // whenever it's ready, same as every other custom cue here started out.
+  cue('ui_vcup_kickoff', 0.8, 'Bright arcade referee whistle and crowd swell kickoff cue.', [
+    tone(1600, 0, 0.14, 0.22, { wave: 'square' }),
+    tone(1900, 0.1, 0.14, 0.2, { wave: 'square' }),
+    noise('white', 0.2, 0.4, 0.05, { highpass: 1200 }),
   ]),
   fiestaWord(0, 523),
   fiestaWord(1, 587),
@@ -189,6 +137,43 @@ export const UI_SFX_SPECS = [
   cue('ui_fiesta_revive', 0.55, 'Quick optimistic upward arcade revive pop.', [
     tone(523, 0, 0.16, 0.19, { wave: 'triangle', endFrequency: 784 }),
     tone(784, 0.08, 0.25, 0.17, { wave: 'triangle' }),
+  ]),
+  // Gathering rhythm placeholders (Professions 2.0, issue #2208):
+  // deterministic synth stand-ins until real recordings land. Kept short,
+  // distinct, and quiet-friendly; ui_fish_bite alone is tuned to grab
+  // attention (it opens the live reel window) without being harsh.
+  cue('ui_gather_cast', 0.5, 'Soft low woody wind-up thump as a gathering swing begins.', [
+    tone(180, 0, 0.22, 0.16, { wave: 'triangle', endFrequency: 130 }),
+    noise('brown', 0, 0.16, 0.08, { lowpass: 500 }),
+  ]),
+  cue('ui_gather_strike', 0.5, 'Crisp single pick strike on stone with a dull body knock.', [
+    tone(1450, 0, 0.07, 0.15, { wave: 'square', endFrequency: 900 }),
+    tone(240, 0, 0.14, 0.14, { wave: 'sine', endFrequency: 160 }),
+    noise('white', 0, 0.09, 0.07, { highpass: 2200 }),
+  ]),
+  cue('ui_gather_rare', 0.8, 'Pick strike blooming into a small sparkling rare-find shimmer.', [
+    tone(1450, 0, 0.07, 0.13, { wave: 'square', endFrequency: 900 }),
+    tone(659, 0.1, 0.3, 0.13, { wave: 'triangle' }),
+    tone(988, 0.2, 0.36, 0.13, { wave: 'triangle' }),
+    noise('white', 0.12, 0.5, 0.03, { highpass: 3000 }),
+  ]),
+  cue('ui_fish_cast', 0.6, 'Quick airy line whoosh ending in a soft water plop.', [
+    noise('white', 0, 0.22, 0.05, { highpass: 900, lowpass: 5200 }),
+    tone(300, 0.24, 0.16, 0.16, { wave: 'sine', endFrequency: 120 }),
+    noise('brown', 0.24, 0.2, 0.06, { lowpass: 700 }),
+  ]),
+  cue('ui_fish_bite', 0.7, 'Bright double water bloop, urgent but round: a fish takes the bait.', [
+    tone(620, 0, 0.14, 0.24, { wave: 'sine', endFrequency: 340 }),
+    tone(740, 0.16, 0.18, 0.26, { wave: 'sine', endFrequency: 380 }),
+    tone(1480, 0.16, 0.12, 0.08, { wave: 'triangle' }),
+    noise('white', 0.14, 0.24, 0.035, { highpass: 1800, lowpass: 6000 }),
+  ]),
+  cue('ui_fish_reel', 0.7, 'Fast reel crank clicks under a small landing splash.', [
+    tone(980, 0, 0.05, 0.12, { wave: 'square' }),
+    tone(980, 0.09, 0.05, 0.12, { wave: 'square' }),
+    tone(980, 0.18, 0.05, 0.12, { wave: 'square' }),
+    tone(1180, 0.27, 0.05, 0.1, { wave: 'square' }),
+    noise('white', 0.3, 0.32, 0.06, { highpass: 1000, lowpass: 5500 }),
   ]),
 ].map((spec) => ({ ...spec, masterGainDb: MASTER_GAINS_DB[spec.key] }));
 

@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { TOOL_EFFECTS } from '../src/sim/content/professions';
-import { ITEMS, NPCS } from '../src/sim/data';
+import { GATHER_NODES, ITEMS, NPCS } from '../src/sim/data';
 import {
   applyEffectBonus,
+  BARE_HANDS_TOOL_TIER,
+  bestOwnedAnyGatherToolTier,
+  bestOwnedGatherToolTier,
   canGatherTier,
   canHarvestMonsterMaterial,
   depleteEffect,
@@ -17,7 +20,8 @@ import {
 } from '../src/sim/professions/tools';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
-import type { ItemDef } from '../src/sim/types';
+import type { InvSlot, ItemDef } from '../src/sim/types';
+import { terrainHeight } from '../src/sim/world';
 
 describe('gathering tool tier gating (#1123)', () => {
   it('a tier-1 tool cannot gather a tier-2 or higher node', () => {
@@ -92,15 +96,243 @@ describe('gathering tool tier gating (#1123)', () => {
     expect(isGatherToolUse(ITEMS.simple_fishing_pole.use)).toBe(false);
     expect(gatherToolTier(ITEMS.simple_fishing_pole, 'mining')).toBeUndefined();
   });
+});
 
-  it('using a gathering tool is a safe no-op until the gather-node system lands', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
-    const pid = sim.addPlayer('warrior', 'Aleph');
-    sim.tick();
+// Sim-level access gating (Professions 2.0): the gather-node system
+// is live, so the old "using a tool is a safe no-op" placeholder pin retired
+// into real outcome tests here (its useItem-no-op half re-homed in
+// tests/professions_fishing.test.ts beside the rod-cast arm). Owned-best
+// resolution scans bags (meta.inventory), no equip slot; bare hands floor to
+// tier 1, so only the NEW tier-2+ veins ever gate.
+describe('sim-level node access gating (Professions 2.0)', () => {
+  const T2_ORE = 'ore_mirefen_t2';
+  const T3_ORE = 'ore_thornpeak_t3';
+  const T2_WOOD = 'wood_thornpeak_t2';
 
-    sim.addItem('copper_mining_pick', 1, pid);
-    expect(() => sim.useItem('copper_mining_pick', pid)).not.toThrow();
-    expect(sim.countItem('copper_mining_pick', pid)).toBe(1);
+  function simAtNode(nodeId: string, seed = 42) {
+    const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Prospector');
+    const node = GATHER_NODES.find((n) => n.id === nodeId);
+    if (!node) throw new Error(`missing node ${nodeId}`);
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error(`missing entity ${pid}`);
+    p.pos.x = node.pos.x;
+    p.pos.z = node.pos.z;
+    p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
+    p.prevPos = { ...p.pos };
+    return { sim, pid };
+  }
+
+  // harvestNode starts a gather cast. The unlock arms tick the
+  // REAL loop through to the grant (mobs despawned first: mob damage cancels
+  // a gather cast), and every deny arm pins that the denial is rng-free AND
+  // starts no cast (deny-is-rng-free holds at cast START).
+  function despawnMobs(sim: Sim) {
+    for (const e of sim.entities.values()) {
+      if (e.kind !== 'mob') continue;
+      e.dead = true;
+      e.hp = 0;
+      e.aiState = 'dead';
+      e.respawnTimer = 9999;
+      e.corpseTimer = 9999;
+      e.inCombat = false;
+    }
+  }
+
+  function castAndComplete(sim: Sim, nodeId: string, pid: number): boolean {
+    despawnMobs(sim);
+    if (!sim.harvestNode(nodeId, pid)) return false;
+    const p = sim.entities.get(pid);
+    if (!p) throw new Error('missing entity');
+    for (let i = 0; i < 80 && p.castingAbility; i++) sim.tick();
+    if (p.castingAbility) throw new Error('gather cast never completed');
+    sim.tick(); // drain the completion tick's queued proficiency grant
+    return true;
+  }
+
+  function expectDeniedDrawFreeNoCast(sim: Sim, nodeId: string, pid: number) {
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      expect(sim.harvestNode(nodeId, pid)).toBe(false);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(draws).toBe(0);
+    expect(sim.entities.get(pid)?.castingAbility ?? null).toBe(null);
+  }
+
+  it('a bare-hands harvest of a tier-2 vein is denied: no rng, no timer, no grant, one exact event', () => {
+    const { sim, pid } = simAtNode(T2_ORE);
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('missing meta');
+    const invBefore = JSON.parse(JSON.stringify(meta.inventory));
+    sim.drainEvents();
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      expect(sim.harvestNode(T2_ORE, pid)).toBe(false);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    // The gate is rng-free, sits before both harvest draws, and never
+    // starts the gather cast.
+    expect(draws).toBe(0);
+    expect(sim.entities.get(pid)?.castingAbility ?? null).toBe(null);
+    // Exact field shape: text-free, personal, professionId present on the
+    // node surface (the fixed interface contract).
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
+      { type: 'gatherDenied', pid, surface: 'node', professionId: 'mining', requiredTier: 2 },
+    ]);
+    // The denial never consumed the player's respawn timer or touched bags.
+    expect(sim.nodeHarvestableByMeFor(T2_ORE, pid)).toBe(true);
+    expect(meta.inventory).toEqual(invBefore);
+    expect(sim.countItem('iron_ore', pid)).toBe(0);
+  });
+
+  it('the same player with the tier-2 pick in bags harvests the vein (grant lands, timer set)', () => {
+    const { sim, pid } = simAtNode(T2_ORE);
+    sim.addItem('iron_mining_pick', 1, pid);
+    sim.drainEvents();
+    expect(castAndComplete(sim, T2_ORE, pid)).toBe(true);
+    expect(sim.countItem('iron_ore', pid)).toBeGreaterThanOrEqual(1);
+    expect(sim.nodeHarvestableByMeFor(T2_ORE, pid)).toBe(false);
+    expect(sim.drainEvents().some((e) => e.type === 'gatherDenied')).toBe(false);
+  });
+
+  it('a wrong-profession tool does not unlock a node: the tier-2 axe leaves the ore vein denied', () => {
+    const { sim, pid } = simAtNode(T2_ORE);
+    sim.addItem('felling_axe', 1, pid); // logging tier 2
+    sim.drainEvents();
+    expectDeniedDrawFreeNoCast(sim, T2_ORE, pid);
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
+      { type: 'gatherDenied', pid, surface: 'node', professionId: 'mining', requiredTier: 2 },
+    ]);
+    // Sanity arm: the same axe DOES unlock a tier-2 wood stand (ticked
+    // through the cast to the grant).
+    const wood = simAtNode(T2_WOOD);
+    wood.sim.addItem('felling_axe', 1, wood.pid);
+    expect(castAndComplete(wood.sim, T2_WOOD, wood.pid)).toBe(true);
+    expect(wood.sim.countItem('elderwood_log', wood.pid)).toBeGreaterThanOrEqual(1);
+  });
+
+  it('owned-best picks the highest tier among multiple owned tools of one profession', () => {
+    const { sim, pid } = simAtNode(T3_ORE);
+    for (const id of ['copper_mining_pick', 'iron_mining_pick', 'mithril_mining_pick']) {
+      sim.addItem(id, 1, pid);
+    }
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('missing meta');
+    expect(bestOwnedGatherToolTier(meta.inventory, 'mining', ITEMS)).toBe(3);
+    expect(castAndComplete(sim, T3_ORE, pid)).toBe(true);
+    expect(sim.countItem('thorium_ore', pid)).toBeGreaterThanOrEqual(1);
+  });
+
+  it('an owned tool one tier short still denies, and the event carries the real node tier (3)', () => {
+    const { sim, pid } = simAtNode(T3_ORE);
+    sim.addItem('iron_mining_pick', 1, pid); // mining tier 2 at a tier-3 vein
+    sim.drainEvents();
+    expectDeniedDrawFreeNoCast(sim, T3_ORE, pid);
+    // requiredTier must be the node's tier, not a constant: every other deny
+    // pin in the suite reads 2, so this arm is the guard against a
+    // hardcoded-2 (or viewer-tier-plus-1) regression lying in the toast.
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
+      { type: 'gatherDenied', pid, surface: 'node', professionId: 'mining', requiredTier: 3 },
+    ]);
+  });
+
+  it('the herbalism arm denies and unlocks through the real harvestNode like the others', () => {
+    const T2_HERB = 'herb_mirefen_t2';
+    const bare = simAtNode(T2_HERB);
+    bare.sim.drainEvents();
+    expectDeniedDrawFreeNoCast(bare.sim, T2_HERB, bare.pid);
+    expect(bare.sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
+      {
+        type: 'gatherDenied',
+        pid: bare.pid,
+        surface: 'node',
+        professionId: 'herbalism',
+        requiredTier: 2,
+      },
+    ]);
+    const tooled = simAtNode(T2_HERB);
+    tooled.sim.addItem('bronze_sickle', 1, tooled.pid); // herbalism tier 2
+    tooled.sim.drainEvents();
+    expect(castAndComplete(tooled.sim, T2_HERB, tooled.pid)).toBe(true);
+    expect(tooled.sim.countItem('goldleaf_herb', tooled.pid)).toBeGreaterThanOrEqual(1);
+    expect(tooled.sim.drainEvents().some((e) => e.type === 'gatherDenied')).toBe(false);
+  });
+
+  it('mixed-profession bags resolve per profession: mining tier 3 never lends logging its tier', () => {
+    const { sim, pid } = simAtNode(T2_WOOD);
+    sim.addItem('mithril_mining_pick', 1, pid); // mining tier 3
+    sim.addItem('handaxe', 1, pid); // logging tier 1
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('missing meta');
+    expect(bestOwnedGatherToolTier(meta.inventory, 'mining', ITEMS)).toBe(3);
+    expect(bestOwnedGatherToolTier(meta.inventory, 'logging', ITEMS)).toBe(1);
+    sim.drainEvents();
+    expectDeniedDrawFreeNoCast(sim, T2_WOOD, pid);
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
+      { type: 'gatherDenied', pid, surface: 'node', professionId: 'logging', requiredTier: 2 },
+    ]);
+  });
+
+  it('bestOwnedGatherToolTier: the bare-hands floor, an items-lookup miss, and non-tool slots', () => {
+    expect(BARE_HANDS_TOOL_TIER).toBe(1);
+    expect(bestOwnedGatherToolTier([], 'mining', ITEMS)).toBe(BARE_HANDS_TOOL_TIER);
+    const junk: InvSlot[] = [
+      // An id with no ITEMS row (a stale save slot) must fall through, not throw.
+      { itemId: 'no_such_item_id', count: 1 },
+      { itemId: 'baked_bread', count: 5 },
+    ];
+    expect(bestOwnedGatherToolTier(junk, 'mining', ITEMS)).toBe(BARE_HANDS_TOOL_TIER);
+    const tools: InvSlot[] = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'mithril_mining_pick', count: 1 },
+      { itemId: 'iron_mining_pick', count: 1 },
+    ];
+    expect(bestOwnedGatherToolTier(tools, 'mining', ITEMS)).toBe(3);
+    expect(bestOwnedGatherToolTier(tools, 'logging', ITEMS)).toBe(BARE_HANDS_TOOL_TIER);
+  });
+
+  it('bestOwnedAnyGatherToolTier: the max across every gathering profession, floored at 1', () => {
+    expect(bestOwnedAnyGatherToolTier([], ITEMS)).toBe(BARE_HANDS_TOOL_TIER);
+    const mixed: InvSlot[] = [
+      { itemId: 'handaxe', count: 1 }, // logging 1
+      { itemId: 'iron_mining_pick', count: 1 }, // mining 2
+    ];
+    expect(bestOwnedAnyGatherToolTier(mixed, ITEMS)).toBe(2);
+    // Fishing rods are gatherTool items too, so they count for the any-tool max.
+    expect(
+      bestOwnedAnyGatherToolTier([{ itemId: 'silverstream_fishing_rod', count: 1 }], ITEMS),
+    ).toBe(3);
+  });
+
+  it('the tiered fishing rods are vendor gatherTool content on the exact pick pricing ladder', () => {
+    expect(gatherToolTier(ITEMS.ironreel_fishing_rod, 'fishing')).toBe(2);
+    expect(gatherToolTier(ITEMS.silverstream_fishing_rod, 'fishing')).toBe(3);
+    expect(ITEMS.ironreel_fishing_rod).toMatchObject({
+      kind: 'tool',
+      quality: 'common',
+      buyValue: 60,
+      sellValue: 10,
+    });
+    expect(ITEMS.silverstream_fishing_rod).toMatchObject({
+      kind: 'tool',
+      quality: 'uncommon',
+      buyValue: 150,
+      sellValue: 25,
+    });
+    // Same ladder as the tier-2/3 picks, by construction not coincidence.
+    expect(ITEMS.ironreel_fishing_rod.buyValue).toBe(ITEMS.iron_mining_pick.buyValue);
+    expect(ITEMS.silverstream_fishing_rod.buyValue).toBe(ITEMS.mithril_mining_pick.buyValue);
+    const stock = NPCS.trader_wilkes.vendorItems ?? [];
+    expect(stock).toContain('ironreel_fishing_rod');
+    expect(stock).toContain('silverstream_fishing_rod');
+    // The simple pole is untouched: not a gatherTool, effective tier 1 via
+    // the bare-hands floor (band 0 stays reachable with pole or bare hands).
+    expect(ITEMS.simple_fishing_pole.use).toEqual({ type: 'fishing' });
   });
 });
 
@@ -147,14 +379,14 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
   });
 
   it('a crafted tier-4/5 tool gates monster materials the same way a vendor tier-1/2/3 tool gates nodes', () => {
-    const thorium = gatherToolTier(ITEMS.thorium_mining_pick, 'mining') ?? -1;
-    const arcanite = gatherToolTier(ITEMS.arcanite_mining_pick, 'mining') ?? -1;
-    expect(thorium).toBe(4);
-    expect(arcanite).toBe(5);
-    expect(canHarvestMonsterMaterial(thorium, 3)).toBe(true);
-    expect(canHarvestMonsterMaterial(thorium, 4)).toBe(true);
-    expect(canHarvestMonsterMaterial(thorium, 5)).toBe(false);
-    expect(canHarvestMonsterMaterial(arcanite, 5)).toBe(true);
+    const osmiumPick = gatherToolTier(ITEMS.thorium_mining_pick, 'mining') ?? -1;
+    const glyphsteelPick = gatherToolTier(ITEMS.arcanite_mining_pick, 'mining') ?? -1;
+    expect(osmiumPick).toBe(4);
+    expect(glyphsteelPick).toBe(5);
+    expect(canHarvestMonsterMaterial(osmiumPick, 3)).toBe(true);
+    expect(canHarvestMonsterMaterial(osmiumPick, 4)).toBe(true);
+    expect(canHarvestMonsterMaterial(osmiumPick, 5)).toBe(false);
+    expect(canHarvestMonsterMaterial(glyphsteelPick, 5)).toBe(true);
   });
 
   it('infinite durability holds for crafted tiers too, not just vendor tiers', () => {

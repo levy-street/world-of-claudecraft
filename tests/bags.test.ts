@@ -87,6 +87,60 @@ describe('stack sizes and stacking math', () => {
     ]);
   });
 
+  it('an instanced add merges into a byte-equal slot and never into a plain one', () => {
+    const inv: InvSlot[] = [
+      { itemId: 'baked_bread', count: 5, instance: { signer: 'Ana' } },
+      { itemId: 'baked_bread', count: 5 },
+    ];
+    // Both slots occupied (capacity 2): the byte-equal signed stack is the only
+    // top-up room the signed add sees; the plain stack offers it none.
+    expect(countFit(inv, 2, 'baked_bread', 99, { signer: 'Ana' })).toBe(15);
+    addStacked(inv, 'baked_bread', 3, { signer: 'Ana' });
+    expect(inv).toEqual([
+      { itemId: 'baked_bread', count: 8, instance: { signer: 'Ana' } },
+      { itemId: 'baked_bread', count: 5 },
+    ]);
+    // A differently-signed add gets no top-up room from either slot.
+    expect(countFit(inv, 2, 'baked_bread', 1, { signer: 'Bru' })).toBe(0);
+  });
+
+  it('the merge stops AT the stack cap: room is exactly stackSize minus count', () => {
+    const inv: InvSlot[] = [{ itemId: 'baked_bread', count: 19, instance: { signer: 'Ana' } }];
+    expect(countFit(inv, 1, 'baked_bread', 99, { signer: 'Ana' })).toBe(1);
+    addStacked(inv, 'baked_bread', 1, { signer: 'Ana' });
+    expect(inv[0].count).toBe(20);
+    // At the cap the full stack offers zero room and a fresh add needs a slot.
+    expect(countFit(inv, 1, 'baked_bread', 1, { signer: 'Ana' })).toBe(0);
+  });
+
+  it('a charge-bearing payload gets one unit per fresh slot and never tops up its twin', () => {
+    const charged = { signer: 'Ana', charges: { zap: 2 } };
+    const inv: InvSlot[] = [
+      { itemId: 'baked_bread', count: 1, instance: { ...charged, charges: { zap: 2 } } },
+    ];
+    // capacity 3: the byte-equal charged slot offers NO room (mergeability),
+    // and each of the two free slots absorbs exactly one charged unit.
+    expect(countFit(inv, 3, 'baked_bread', 99, charged)).toBe(2);
+    addStacked(inv, 'baked_bread', 2, charged);
+    expect(inv).toHaveLength(3);
+    for (const s of inv) expect(s.count).toBe(1);
+  });
+
+  it('fresh instanced slots each carry their own deep clone of the payload', () => {
+    const payload = { signer: 'Ana', rolled: { stats: { str: 1 } } };
+    const inv: InvSlot[] = [];
+    // 25 mergeable copies split 20 + 5 across two fresh slots; a shared payload
+    // object between them (or with the caller) would alias rolled.stats.
+    addStacked(inv, 'baked_bread', 25, payload);
+    expect(inv).toHaveLength(2);
+    expect(inv[0].instance).toEqual(payload);
+    expect(inv[1].instance).toEqual(payload);
+    expect(inv[0].instance).not.toBe(inv[1].instance);
+    payload.rolled.stats.str = 99;
+    expect(inv[0].instance?.rolled?.stats?.str).toBe(1);
+    expect(inv[1].instance?.rolled?.stats?.str).toBe(1);
+  });
+
   it('fitsAll simulates the batch cumulatively', () => {
     const inv: InvSlot[] = [];
     expect(

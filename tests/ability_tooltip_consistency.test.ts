@@ -24,6 +24,7 @@ import {
   abilityOverTimeEffect,
   abilityPrimaryEffect,
   abilitySecondaryEffect,
+  abilityTemporalHourglassValues,
 } from '../src/ui/ability_damage';
 
 // Numbers in prose this guard cannot derive from data, each with its source of
@@ -38,6 +39,11 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // Bear form's "armor +90%" is the recalcPlayerStats multiplier (1.9) in
   // entity.ts, not the form effect's value.
   defensive_stance: [30],
+  // Battle Stance's rage multiplier is applied by resourceGainMultiplier.
+  battle_stance: [10],
+  // Valor Roar's Protection-only damage reduction is applied when the party
+  // maximum-health aura is created, rather than stored on its shared effect.
+  rallying_cry: [5],
   bear_form: [30, 90],
   // "compelled to attack you for 3 sec": the taunt compel window in threat.ts.
   taunt: [3],
@@ -53,6 +59,9 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // "Conjures 2 ...": the stack size hardcoded in casting_lifecycle.ts.
   conjure_water: [2],
   conjure_food: [2],
+  // Patch Up's dead-pet revive fraction is owned by the pet lifecycle branch;
+  // the living-pet HoT remains fully data-driven by the ability effect.
+  revive_pet: [35],
 };
 
 // Every resolved rank of every class ability (deduped by rank).
@@ -123,12 +132,12 @@ function proseNumbers(description: string): number[] {
 }
 
 const PLACEHOLDERS = /\$([a-zA-Z])/g;
-const SUPPORTED = new Set(['d', 'o', 'b', 't']);
+const SUPPORTED = new Set(['d', 'o', 'b', 't', 'h', 'e', 'p', 'g', 's', 'a']);
 
 describe('ability descriptions match their resolved effects', () => {
   const classes = Object.keys(CLASSES) as PlayerClass[];
 
-  it('uses only the supported placeholders ($d, $o, $b, $t)', () => {
+  it('uses only supported dynamic placeholders', () => {
     for (const a of Object.values(ABILITIES)) {
       for (const m of a.description.matchAll(PLACEHOLDERS)) {
         expect(SUPPORTED.has(m[1]), `${a.id}: unknown placeholder $${m[1]}`).toBe(true);
@@ -161,6 +170,12 @@ describe('ability descriptions match their resolved effects', () => {
           }
           if (desc.includes('$t')) {
             expect(abilityDurationValue(known), `${at}: $t has no timed effect`).not.toBeNull();
+          }
+          if (/\$(?:h|e|p|g|s|a)/.test(desc)) {
+            expect(
+              abilityTemporalHourglassValues(known),
+              `${at}: Hourglass placeholders have no temporalHourglass effect`,
+            ).not.toBeNull();
           }
         }
       }

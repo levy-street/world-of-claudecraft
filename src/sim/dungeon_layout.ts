@@ -191,7 +191,7 @@ export const ARENA_LAYOUT: DungeonLayout = {
     { x: 9, z: 14 },
   ],
   tombs: [],
-  // Low flanking fences along the side lanes, also mirrored about z=2.
+  // Narrow flanking cover walls along the side lanes, mirrored about z=2.
   stubs: [
     { x: -11, z: 2, hw: 0.6, hd: 4 },
     { x: 11, z: 2, hw: 0.6, hd: 4 },

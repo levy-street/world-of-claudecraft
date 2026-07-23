@@ -12,6 +12,8 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   // ---- swords (sword_a..g + the adv set; legendary/epic kept distinct) --------
   worn_sword: 'sword_a',
   eastbrook_arming_sword: 'sword_b',
+  ironedge_longsword: 'sword_b', // crafted (weaponcrafting tier 2)
+  thorium_warblade: 'adv_sword_1handed', // crafted; warblades share adv_sword_1handed
   gravecaller_blade: 'sword_c',
   emberfang_warblade: 'sword_c',
   redbrook_blade: 'sword_d',
@@ -22,10 +24,15 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   valeborn_spellblade: 'sword_g', // crystalline
   maldrecs_soulbinder: 'sword_g',
   highwatch_warblade: 'adv_sword_1handed',
+  eastbrook_greatsword: 'adv_sword_2handed',
+  highwatch_greatsword: 'adv_sword_2handed',
   verlans_oathblade: 'adv_sword_2handed',
   moonscale_saber: 'adv_sword_2handed',
   wyrmfang_greatblade: 'adv_sword_2handed_color', // EPIC: gold greatblade
+  deathless_greatblade: 'adv_sword_2handed_color', // EPIC: Heroic Nythraxis greatblade
   final_argument_greatblade: 'adv_sword_2handed_color', // WARFARE Strength main hand
+  bonewrought_greatsword: 'adv_sword_2handed_color', // EPIC: Nythraxis raid 2H
+  direfang_greatblade: 'adv_sword_2handed_color', // EPIC: Nythraxis hunter 2H
 
   // ---- daggers (only 4 models for ~21 daggers; spread as evenly as art allows)-
   rusty_dagger: 'dagger_a',
@@ -35,6 +42,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   caravan_warden_dirk: 'dagger_a',
   icevein_dirk: 'dagger_b',
   keen_dirk: 'dagger_b',
+  whetted_iron_dirk: 'dagger_b', // crafted; dirks share dagger_b
   mistbinder_kris: 'dagger_b',
   mirejaw_biteblade: 'dagger_b',
   cultist_flayer: 'dagger_b',
@@ -50,6 +58,9 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   sloomtooth_tidefang: 'adv_dagger',
   skullsplitter_dirk: 'adv_dagger',
   first_blood_razor: 'adv_dagger', // WARFARE Agility main hand
+  mirejaw_fang_knife: 'dagger_a', // knives share dagger_a (vale_carving_knife)
+  drowned_choir_fang: 'dagger_c', // fangs share dagger_c (fang_of_korzul)
+  mistcallers_fang: 'adv_dagger', // EPIC: Heroic Vael dagger
 
   // ---- staves (staff_a..d + adv_staff + adv_druid_staff) ----------------------
   gnarled_staff: 'staff_a',
@@ -63,22 +74,32 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   hollow_vigil_staff: 'staff_c',
   emberwood_staff: 'staff_d',
   ironvein_lantern_staff: 'staff_d',
+  elderwood_battle_staff: 'staff_d', // crafted (weaponcrafting tier 3)
   staff_of_velkhar: 'staff_d',
   vaels_mist_staff: 'adv_staff',
   ogre_bonecharm_staff: 'adv_staff',
+  briarroot_staff: 'staff_b', // feral ladder, zone-1 rung
+  cragthorn_greatstaff: 'staff_c', // feral ladder, zone-3 rung
+  nightfangs_greatstaff: 'adv_staff', // feral ladder, Korzul epic rung
   staff_of_the_gravewyrm: 'adv_druid_staff',
   deathless_heartwood: 'adv_druid_staff', // LEGENDARY druid relic (antler staff)
   drovers_staff: 'adv_druid_staff',
   emberglass_warstaff: 'adv_staff', // WARFARE caster main hand
+  lunar_tide_greatstaff: 'adv_staff', // EPIC: Heroic Ysolei staff
 
-  // ---- wands (1H caster: scepters / rods) -------------------------------------
+  // ---- wands (1H caster: scepters / rods / foci) ------------------------------
   drowned_tide_scepter: 'wand_a',
   drownedmoon_scepter: 'wand_b',
   palecoil_rod: 'adv_wand',
+  corpse_candle_focus: 'wand_a',
+  nhalias_litany_rod: 'wand_b',
+  stormcallers_focus: 'wand_b', // EPIC: Nythraxis raid caster focus
+  scepter_of_the_deathless_court: 'adv_wand', // EPIC: Nythraxis raid scepter
 
   // ---- maces (only 4 hammer models for ~9 maces) -----------------------------
   training_mace: 'hammer_a',
   bronzework_mace: 'hammer_a',
+  copper_flanged_mace: 'hammer_a', // crafted (weaponcrafting tier 1)
   moggers_copper_cudgel: 'hammer_b',
   crag_warden_cudgel: 'hammer_b',
   voss_sanctified_mace: 'hammer_c',
@@ -86,17 +107,27 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   bristleback_maul: 'hammer_d',
   brutoks_maul: 'hammer_d',
   drownedmoon_maul: 'hammer_d',
+  nhalias_bell_maul: 'hammer_d', // mauls share hammer_d
+  ironshod_maul: 'hammer_d', // crafted 2H maul
+  fenshadow_maul: 'hammer_d', // feral ladder maul
+  gravewyrm_thornmaul: 'hammer_d', // feral ladder maul
+  maul_of_the_scourged_wilds: 'hammer_d', // feral ladder, Nythraxis raid rung
+  wildsoul_maul: 'hammer_d', // feral ladder, heroic-only ilvl 31 rung
 
   // ---- axes (axe_a..d + adv axes) --------------------------------------------
   rusty_hatchet: 'axe_a',
+  copper_bearded_axe: 'axe_a', // crafted (weaponcrafting tier 1)
   drogmars_skullcleaver: 'axe_b',
   deacons_cleaver: 'axe_c',
   gorraks_cruel_chopper: 'axe_d',
+  arcanite_war_axe: 'axe_d', // crafted (weaponcrafting tier 3)
   gorraks_cleaver: 'adv_axe_1handed',
   tradesman_hatchet: 'adv_axe_1handed',
+  gravewyrm_cleaver: 'adv_axe_1handed', // EPIC: Heroic Korzul axe
   tunnelkings_spade: 'adv_axe_2handed',
 
   // ---- polearms --------------------------------------------------------------
   fen_reaver_glaive: 'scythe', // "Reaver" -> reaper scythe
   tidereaver_gaff: 'spear_a', // a gaff is a hooked spear
+  ironbark_boar_spear: 'spear_a', // crafted 2H spear
 };

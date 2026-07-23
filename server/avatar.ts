@@ -8,6 +8,7 @@
 // override this fallback (the route prefers the static file when present).
 
 import { deflateSync } from 'node:zlib';
+import { CLASSES } from '../src/sim/content/classes';
 import type { PlayerClass } from '../src/sim/types';
 
 export const PLAYER_CLASSES: readonly PlayerClass[] = [
@@ -24,18 +25,16 @@ export const PLAYER_CLASSES: readonly PlayerClass[] = [
 
 export const MAX_SKIN = 7;
 
-// Card-design class colors (shared palette in WORLD-OF-CLAUDECRAFT.md §6).
-const CLASS_COLOR: Record<PlayerClass, [number, number, number]> = {
-  warrior: [0xc7, 0x9c, 0x6e],
-  paladin: [0xf5, 0x8c, 0xba],
-  hunter: [0xab, 0xd4, 0x73],
-  rogue: [0xff, 0xf5, 0x69],
-  priest: [0xff, 0xff, 0xff],
-  shaman: [0x00, 0x70, 0xde],
-  mage: [0x69, 0xcc, 0xf0],
-  warlock: [0x94, 0x82, 0xc9],
-  druid: [0xff, 0x7d, 0x0a],
-};
+// Class colors derived from the ONE shared palette (CLASSES[cls].color), not a
+// manual copy: the avatar emblem ships on public profile pages and og:image
+// unfurls, so a drifting copy here is player-visible. Guarded together with the
+// other palette sites by tests/class_colors.test.ts.
+export const CLASS_COLOR = Object.fromEntries(
+  PLAYER_CLASSES.map((cls) => {
+    const c = CLASSES[cls].color;
+    return [cls, [(c >> 16) & 0xff, (c >> 8) & 0xff, c & 0xff]];
+  }),
+) as Record<PlayerClass, [number, number, number]>;
 
 export function isPlayerClass(s: string): s is PlayerClass {
   return (PLAYER_CLASSES as readonly string[]).includes(s);

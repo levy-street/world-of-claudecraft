@@ -62,9 +62,13 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 | `github.ts` (+ `github_oauth`/`github_db`/`github_contributors`) | GitHub contributor linking for the developer badge + merged-PR tally |
 | `oauth.ts`/`oauth_db.ts`, `character_sheet.ts`, `profile_page.ts`, `avatar.ts` | read-only companion API: OAuth code+PKCE and device grants (scope `character:read`), pure sheet normalizer, public SEO profile pages + generated avatars |
 | `maps.ts`/`maps_db.ts`/`maps_routes.ts`, `user_assets*.ts` | map editor: custom-map persistence with fork lineage / hardened player GLB uploads (both mirror the `SocialService`/`SocialDb` split) |
-| `tick_profiler.ts` / `tick_rate_meter.ts` / `client_perf_metrics_db.ts` | debugging the 50 ms budget: rolling per-phase loop timings, achieved wall-clock tick rate (the two can disagree, see the meter header), capped client-perf aggregates behind `/metrics` |
+| `tick_profiler.ts` / `tick_rate_meter.ts` | debugging the 50 ms budget: rolling per-phase loop timings, achieved wall-clock tick rate (the two can disagree, see the meter header) |
 | `mob_scan_tick_stats.ts` | folds the sim's per-tick mob-scan visit counters (`Sim.mobScanCounters`, observer-only) into the `PERF_TICK_LOG` heartbeat tokens (`aggroVisits=`/`threatVisits=`) and the admin tick-capture accumulators; `game.ts` keeps only the holder and the apply call |
 | `perf_report.ts` / `provider_usage.ts` | rate-limited client perf-report ingestion / process-local provider and usage telemetry for the admin dashboard |
+| `cached_read.ts` / `deeds_board_warm.ts` | the two shared-read cache shapes: single-key `createCachedRead` (TTL, single-flight, stale-on-error, joiner-refusing bust) / the extended `singleFlight(run, epochOf?)` for per-scope epoch-keyed board flights (see Hot paths) |
+| `retention_sweep.ts` | the advisory-locked, self-clocked nightly sweep of batched per-table prunes; every table that grows without bound registers here (see Hot paths) |
+| `concurrent_indexes.ts` | post-boot `CREATE INDEX CONCURRENTLY` seam for new indexes on big live tables |
+| `realm_readout_memo.ts` / `event_frame.ts` / `interest_candidates.ts` | broadcast build-once seams: per-pass realm readout memo (rides `maybeRaw`), serialize-once event frames (sent via `sendRaw`), per-cell shared interest gathering (see Hot paths) |
 
 ## Invariants, YOU MUST keep these
 - **Trust nothing from the client.** Movement intent + `cmd`s arrive over WS;
@@ -115,6 +119,52 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 - Leaderboards (`topLifetimeXp`, `topArenaRatings`) sort on JSONB expressions and
   are read through the **in-memory cache in main.ts**, never per-request under load.
 
+## Hot paths: shared reads, retention, broadcast
+One process serves a whole realm, so per-request and per-tick cost is what scales.
+Three seams keep it flat; use them, never re-invent them.
+
+- **Shared (viewer-identical) reads are cached with single-flight.** Two shapes:
+  `createCachedRead(refresh, {ttlMs})` (`cached_read.ts`) for a single-key read (TTL,
+  single-flight, stale-on-error, and a bust that refuses in-flight joiners), and the
+  extended `singleFlight(run, epochOf?)` (`deeds_board_warm.ts`) for per-scope board
+  flights keyed on `() => boardEpoch`, so the existing `bustBoardCaches` epoch bump also
+  evicts readers that joined mid-refresh. Exemplars: `admin_overview_cache.ts` (dual-arm
+  memo), `daily_rewards_board_cache.ts` (day-scoped), the leaderboard/guild/arena/deeds
+  flights in `main.ts`; pinned by `tests/server/board_read_single_flight.test.ts`.
+  Rules: a new endpoint whose response is identical for every caller (a board, a count,
+  an aggregate) reads through one of these two shapes, never a per-request `pool.query`;
+  anything a moderation action can change MUST be bust-wired in the same change (TTL
+  alone delays enforcement); a deliberately non-busted read (a moderation-invariant
+  COUNT) records why in a comment.
+
+- **Every table that grows without bound gets a retention story in the same change.**
+  The nightly sweep (`retention_sweep.ts`, registered after listen in `main.ts`) runs
+  batched prunes under a per-run budget; windows are env keys in `.env.example` (unset =
+  keep forever, deliberately fail-safe). A new per-event, per-session, or per-day table
+  either registers a prune primitive in its `*_db.ts` or carries an explicit
+  keep-forever comment at the DDL. Fold before deleting when readers need lifetime
+  history (`play_session_retention_db.ts` is the exemplar: an atomic fold-into-rollups
+  CTE, then delete). Prune SQL: batch via a LIMIT subquery; no ORDER BY unless the
+  cutoff column is indexed (unindexed, it plans a full sort per batch; pin the absence);
+  NOT EXISTS over NOT IN for referent guards (NOT IN falls off a work_mem cliff).
+
+- **SQL shape on hot paths.** A query the planner should serve from an expression index
+  must share the index's SQL text verbatim (one exported constant, e.g.
+  `LIFETIME_XP_EXPR`, used by both the query and the DDL). Hot views prefer plain UNION
+  arms over OR-joined EXISTS (`DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL`). Known-long
+  reads ride `runWithStatementTimeout` (see the `db.ts` timeout ladder), and new indexes
+  on big live tables go through `concurrent_indexes.ts`, never boot DDL.
+
+- **The broadcast loop builds shared things once per pass, never per session.** A
+  realm-wide viewer-independent readout builds and stringifies ONCE per pass via
+  `realm_readout_memo.ts` and rides `maybeRaw(...)` (the Vale Cup and dungeon-finder
+  boards are the tenants); events stringify once per batch (`event_frame.ts`) and go out
+  via `sendRaw`, never re-`send` per session; interest gathering scans each occupied
+  grid cell once (`interest_candidates.ts`) and re-applies each viewer's exact radius.
+  Refactors here prove byte-identity with pinned tests (`tests/bandwidth.test.ts`,
+  `tests/snapshots.test.ts`); cadence gates use a `>=` dueness tracker, never
+  `tickCount % N` (catch-up ticks stride past a modulo and stall the gate).
+
 ## Realms / auth / limits
 - **One process = one realm.** Characters/friends/guilds/presence are scoped to
   `REALM`; every realm process shares one `DATABASE_URL`. Schema setup is
@@ -149,7 +199,14 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
   pinned by `ALL_DELTA_KEYS` + `TERSE_TO_IWORLD` in `tests/snapshots.test.ts` (W0a),
   which owns the list and guards the `selfWireJson` (encode) to `applySnapshot`
   (decode) round-trip. A new heavy self field lands in `selfWireJson` (here) and
-  `applySnapshot` (`online.ts`) in one commit, and is added to that registry.
+  `applySnapshot` (`online.ts`) in one commit, and is added to that registry. A value
+  already serialized once realm-wide (the Vale Cup shared fragment on `vcupb`, built
+  and stringified a single time per broadcast pass by the realm-readout memo) rides
+  via `maybeRaw(...)` instead of `maybe(...)`, so the per-session diff reuses the one
+  memoized string rather than re-stringifying it for every viewer. The `vcup` and
+  `vcupb` keys are asserted directly in the round-trip test rather than mapped in
+  `TERSE_TO_IWORLD` (they merge back into one `cupInfo` on decode), the same way `tal`
+  fans out to several members and is asserted directly.
 
 - The PHYSICAL `game.ts` restructure (facet-ordered dispatch, per-facet command
   modules, a facet-aligned encoder) is workstream #4; until it lands, add new
@@ -232,3 +289,9 @@ then drives handlers via `routes` + `configureLeaderboardRuntime` + `fakeCtx`). 
 ## Never do this here
 - Never resolve gameplay (damage, drops, gold, XP) on the server outside the `Sim`.
 - Never widen WS `maxPayload` (16 KiB) or skip field validation: one socket must not be able to crash the loop or OOM the process.
+- Never serve a viewer-identical read with a per-request `pool.query`, and never leave a
+  moderation-visible cache without a bust wire (Hot paths above).
+- Never add a table that grows per event or session without a retention registration or
+  an explicit keep-forever comment at the DDL.
+- Never serialize a realm-identical broadcast payload per session: build once per pass,
+  reuse the bytes.

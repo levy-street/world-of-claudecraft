@@ -11,12 +11,13 @@
 // not something this module enforces at runtime.
 
 import {
+  GATHERING_PROFESSION_IDS,
   type GatheringProfessionId,
   TOOL_EFFECTS,
   type ToolEffectId,
 } from '../content/professions';
 import type { Rng } from '../rng';
-import type { ItemDef, ItemUse } from '../types';
+import type { InvSlot, ItemDef, ItemUse } from '../types';
 import type { MaterialRarity } from './gathering';
 import { type CraftSkillState, rechargeDiscountMultiplier } from './wheel';
 
@@ -62,6 +63,43 @@ export function canGatherTier(playerToolTier: number, nodeTier: number): boolean
 // gating and monster-material gating can never fall out of sync.
 export function canHarvestMonsterMaterial(toolTier: number, materialTier: number): boolean {
   return toolTierCovers(toolTier, materialTier);
+}
+
+// Owned-best tool resolution (Professions 2.0). Bare hands resolve to
+// effective tool tier 1: every tier-1 node/material (all pre-phase content)
+// stays gatherable with no tool at all, only tiers 2+ actually gate. `items`
+// is passed as a parameter (never imported) so this module stays a pure leaf.
+export const BARE_HANDS_TOOL_TIER = 1;
+
+// The best (highest) matching-profession gatherTool tier anywhere in the
+// player's bags, floored at BARE_HANDS_TOOL_TIER. Pure bag scan, no equip
+// slot: owning the tool is carrying it.
+export function bestOwnedGatherToolTier(
+  inventory: readonly InvSlot[],
+  professionId: GatheringProfessionId,
+  items: Readonly<Record<string, ItemDef>>,
+): number {
+  let best = BARE_HANDS_TOOL_TIER;
+  for (const slot of inventory) {
+    const tier = gatherToolTier(items[slot.itemId], professionId);
+    if (tier !== undefined && tier > best) best = tier;
+  }
+  return best;
+}
+
+// The best owned gatherTool tier across EVERY gathering profession, floored at
+// BARE_HANDS_TOOL_TIER. This is the corpse-harvest gate's input: a monster
+// material has no single owning profession, so any gathering tool counts.
+export function bestOwnedAnyGatherToolTier(
+  inventory: readonly InvSlot[],
+  items: Readonly<Record<string, ItemDef>>,
+): number {
+  let best = BARE_HANDS_TOOL_TIER;
+  for (const professionId of GATHERING_PROFESSION_IDS) {
+    const tier = bestOwnedGatherToolTier(inventory, professionId, items);
+    if (tier > best) best = tier;
+  }
+  return best;
 }
 
 // Tool effect slotting (#1136). Durability is modeled as a standalone counter

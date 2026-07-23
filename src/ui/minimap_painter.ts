@@ -57,6 +57,10 @@ const PLAYER_ARROW_OUTLINE_WIDTH = 1;
 // "actionable" against the dimmer, outline-less cooldown dot.
 const GATHER_NODE_READY_RADIUS = 3;
 const GATHER_NODE_COOLDOWN_RADIUS = 2;
+// Crafting station: an outlined diamond (rotated-square silhouette) so it reads
+// apart from the round gather dots and the axis-aligned loot/mob squares at
+// minimap scale. Half-diagonal in px.
+const STATION_DIAMOND_RADIUS = 3;
 
 // Party / player arrow triangle geometry (canvas-local, drawn under a rotation).
 const PARTY_ARROW_TIP_X = 6;
@@ -133,6 +137,8 @@ const MINIMAP_COLOR_TOKENS = {
   outline: '--color-minimap-outline',
   gatherReady: '--color-minimap-gather-ready',
   gatherCooldown: '--color-minimap-gather-cooldown',
+  gatherLocked: '--color-minimap-node-locked',
+  station: '--color-minimap-station',
 } as const;
 
 /** The resolved minimap marker colors for one redraw. */
@@ -398,9 +404,28 @@ export class MinimapPainter {
           ctx.stroke();
           ctx.restore();
           break;
+        case 'station':
+          // Tier-identical (fairness invariant): no preset or governor gating.
+          ctx.fillStyle = colors.station;
+          ctx.strokeStyle = colors.outline;
+          ctx.lineWidth = MARKER_OUTLINE_WIDTH;
+          ctx.beginPath();
+          ctx.moveTo(m.mx, m.my - STATION_DIAMOND_RADIUS);
+          ctx.lineTo(m.mx + STATION_DIAMOND_RADIUS, m.my);
+          ctx.lineTo(m.mx, m.my + STATION_DIAMOND_RADIUS);
+          ctx.lineTo(m.mx - STATION_DIAMOND_RADIUS, m.my);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          break;
         case 'gather-node':
+          // Tool-tier lock (Professions 2.0) composes with the
+          // respawn state: a locked node keeps the ready/cooldown silhouette
+          // (radius + outline) but the locked tint replaces the state color,
+          // so both dimensions stay readable at once. Actionable info on
+          // every graphics tier (fairness invariant: never preset-gated).
           if (m.ready) {
-            ctx.fillStyle = colors.gatherReady;
+            ctx.fillStyle = m.locked ? colors.gatherLocked : colors.gatherReady;
             ctx.strokeStyle = colors.outline;
             ctx.lineWidth = MARKER_OUTLINE_WIDTH;
             ctx.beginPath();
@@ -408,7 +433,7 @@ export class MinimapPainter {
             ctx.fill();
             ctx.stroke();
           } else {
-            ctx.fillStyle = colors.gatherCooldown;
+            ctx.fillStyle = m.locked ? colors.gatherLocked : colors.gatherCooldown;
             ctx.beginPath();
             ctx.arc(m.mx, m.my, GATHER_NODE_COOLDOWN_RADIUS, 0, FULL_CIRCLE);
             ctx.fill();

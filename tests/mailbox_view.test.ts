@@ -11,6 +11,7 @@ import {
   mailIndicatorView,
   mailSendBlocked,
   mailSendCost,
+  parseParcelQty,
   recipientSuggestions,
   wrappedSuggestionIndex,
 } from '../src/ui/mailbox_view';
@@ -200,5 +201,29 @@ describe('wrappedSuggestionIndex', () => {
 
   it('returns -1 for an empty list', () => {
     expect(wrappedSuggestionIndex(0, 1, 0)).toBe(-1);
+  });
+});
+
+describe('parseParcelQty: the typed quantity gate', () => {
+  it('clamps a typed value into 1..owned', () => {
+    expect(parseParcelQty('3', 5, 1)).toBe(3);
+    expect(parseParcelQty('999', 5, 1)).toBe(5);
+    expect(parseParcelQty('0', 5, 2)).toBe(1);
+    expect(parseParcelQty('-4', 5, 2)).toBe(1);
+  });
+
+  it('floors decimals and tolerates whitespace', () => {
+    expect(parseParcelQty(' 7.9 ', 10, 1)).toBe(7);
+  });
+
+  it('restores the fallback (clamped) for garbage or empty input', () => {
+    expect(parseParcelQty('', 5, 2)).toBe(2);
+    expect(parseParcelQty('abc', 5, 2)).toBe(2);
+    // a stale fallback above the owned ceiling still clamps down
+    expect(parseParcelQty('', 3, 9)).toBe(3);
+  });
+
+  it('never NaN-poisons: even NaN fallback resolves to a legal count', () => {
+    expect(parseParcelQty('abc', 5, Number.NaN)).toBe(1);
   });
 });

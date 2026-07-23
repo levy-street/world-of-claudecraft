@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
   DailyRewardDb,
@@ -28,14 +30,19 @@ vi.mock('../server/woc_balance', () => ({
 }));
 
 import {
+  addRewardDays,
+  currentDailyRewardDay,
   type DailyRewardRuntimeConfig,
   DailyRewardService,
   dailyRewardEligibility,
   dailyRewardPayoutSplits,
+  dailyRewardRuntimeConfig,
   nextUtcResetIso,
   resetDailyRewardPriceCacheForTests,
   rewardDayForDate,
 } from '../server/daily_rewards';
+import { resetDailyRewardSeedGateForTests } from '../server/daily_rewards_seed_gate';
+import { REALM } from '../server/realm';
 import { buildDailyRewardsView, dailyRewardTaskDescription } from '../src/ui/daily_rewards_view';
 
 class FakeDailyRewardDb implements DailyRewardDb {
@@ -52,14 +59,37 @@ class FakeDailyRewardDb implements DailyRewardDb {
     key: string;
     meta: Record<string, unknown>;
   }[] = [];
+  ensureDayCalls = 0;
+  seedTasksCalls = 0;
+  finalizeDayCalls = 0;
+  dayFinalizedCalls = 0;
+  scoreForAccountCalls = 0;
+  leaderboardSnapshotCalls = 0;
+  finalizedDays = new Set<string>();
+  // When > 0, the next seedTasks call throws (and decrements), simulating the
+  // seed transaction rolling back so the seed-gate retry path can be exercised.
+  failSeedTasksTimes = 0;
+  // Same hook for the ensureDay arm of the gated pair.
+  failEnsureDayTimes = 0;
 
-  async ensureDay(): Promise<void> {}
+  async ensureDay(): Promise<void> {
+    this.ensureDayCalls++;
+    if (this.failEnsureDayTimes > 0) {
+      this.failEnsureDayTimes--;
+      throw new Error('ensureDay upsert failed');
+    }
+  }
   async banForAccount(): Promise<{ reason: string; expiresAt: string | null } | null> {
     return this.banReason === null
       ? null
       : { reason: this.banReason, expiresAt: this.banExpiresAt };
   }
   async seedTasks(_day: string, tasks: DailyRewardTaskSeed[]): Promise<void> {
+    this.seedTasksCalls++;
+    if (this.failSeedTasksTimes > 0) {
+      this.failSeedTasksTimes--;
+      throw new Error('seedTasks transaction rolled back');
+    }
     this.tasks = tasks;
   }
   async tasksForAccount(_day: string, accountId: number): Promise<DailyRewardTaskRow[]> {
@@ -77,6 +107,7 @@ class FakeDailyRewardDb implements DailyRewardDb {
     }));
   }
   async scoreForAccount(): Promise<number> {
+    this.scoreForAccountCalls++;
     return this.score;
   }
   async tasksForType(_day: string, type: string): Promise<DailyRewardTaskRow[]> {
@@ -111,17 +142,16 @@ class FakeDailyRewardDb implements DailyRewardDb {
         event.meta.questId === questId,
     ).length;
   }
-  async rankForAccount(): Promise<number | null> {
-    return this.score > 0 ? 1 : null;
-  }
-  async leaderboard(): Promise<DailyRewardScoreRow[]> {
-    return this.score > 0 ? [{ accountId: 1, username: 'alice', points: this.score, rank: 1 }] : [];
-  }
-  async leaderboardRowForAccount(): Promise<DailyRewardScoreRow | null> {
-    return this.score > 0 ? { accountId: 1, username: 'alice', points: this.score, rank: 1 } : null;
-  }
   async leaderboardTotal(): Promise<number> {
     return this.score > 0 ? 1 : 0;
+  }
+  // When set, leaderboardSnapshot serves this list instead of the one-account
+  // derivation, letting a test exercise the rank > 10 viewer-row branch.
+  snapshotRows: DailyRewardScoreRow[] | null = null;
+  async leaderboardSnapshot(_day: string): Promise<DailyRewardScoreRow[]> {
+    this.leaderboardSnapshotCalls++;
+    if (this.snapshotRows !== null) return this.snapshotRows;
+    return this.score > 0 ? [{ accountId: 1, username: 'alice', points: this.score, rank: 1 }] : [];
   }
   async leaderboardPage(): Promise<{
     rows: DailyRewardScoreRow[];
@@ -130,7 +160,8 @@ class FakeDailyRewardDb implements DailyRewardDb {
     pageCount: number;
     total: number;
   }> {
-    const rows = await this.leaderboard();
+    const rows: DailyRewardScoreRow[] =
+      this.score > 0 ? [{ accountId: 1, username: 'alice', points: this.score, rank: 1 }] : [];
     return {
       rows,
       page: 0,
@@ -150,6 +181,14 @@ class FakeDailyRewardDb implements DailyRewardDb {
   ): Promise<boolean> {
     if (this.spin) return false;
     this.spin = { outcomeKey, points, createdAt: '2026-06-30T00:00:00.000Z' };
+    this.events.push({
+      accountId: _accountId,
+      kind: 'spin',
+      points,
+      key: 'spin',
+      meta: { outcome: outcomeKey },
+    });
+    this.score += points;
     return true;
   }
   async addPoints(
@@ -169,7 +208,20 @@ class FakeDailyRewardDb implements DailyRewardDb {
   async recentPayouts(): Promise<DailyRewardPayoutRow[]> {
     return [];
   }
-  async finalizeDay(): Promise<void> {}
+  async finalizeDay(day: string): Promise<'finalized' | 'already_finalized'> {
+    this.finalizeDayCalls++;
+    // The real finalizeDay stamps the module-realm row, so the fake keys its
+    // finalized set by (day, realm) the same way dayFinalized reads it: a
+    // service that passed the wrong realm to dayFinalized would miss here.
+    const key = JSON.stringify([day, REALM]);
+    if (this.finalizedDays.has(key)) return 'already_finalized';
+    this.finalizedDays.add(key);
+    return 'finalized';
+  }
+  async dayFinalized(day: string, realm: string): Promise<boolean> {
+    this.dayFinalizedCalls++;
+    return this.finalizedDays.has(JSON.stringify([day, realm]));
+  }
   async pendingPayouts(): Promise<DailyRewardInternalPayoutRow[]> {
     return [];
   }
@@ -216,7 +268,7 @@ function rewardConfig(overrides: Partial<DailyRewardRuntimeConfig> = {}): DailyR
     wocUsdPrice: 0.5,
     solUsdPrice: 200,
     activeSeconds: 120,
-    dayStartUtcMinutes: 21 * 60,
+    dayStartUtcMinutes: 22 * 60,
     tasks: [
       {
         id: 'quest_completion',
@@ -245,10 +297,16 @@ function stubRewardConfig(config: Partial<DailyRewardRuntimeConfig> = {}) {
     'fetch',
     vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = new URL(String(input));
-      expect(url.pathname).toBe('/daily-config');
       const headers = (init?.headers ?? {}) as Record<string, string>;
       expect(headers['x-woc-daily-reward-secret']).toBe('secret');
-      return new Response(JSON.stringify(rewardConfig(config)), { status: 200 });
+      if (url.pathname === '/daily-schedule') {
+        return new Response(JSON.stringify({ dayStartUtcMinutes: 22 * 60 }), { status: 200 });
+      }
+      expect(url.pathname).toBe('/daily-config');
+      return new Response(
+        JSON.stringify({ day: url.searchParams.get('day'), ...rewardConfig(config) }),
+        { status: 200 },
+      );
     }),
   );
 }
@@ -258,6 +316,10 @@ describe('daily rewards', () => {
     delete process.env.WOC_DAILY_REWARD_SERVICE_URL;
     delete process.env.WOC_DAILY_REWARD_SERVICE_SECRET;
     resetDailyRewardPriceCacheForTests();
+    // Both memos live at module scope, so without a per-test reset the several
+    // blocks that ensureActiveDay the SAME day/config would collide on one gate
+    // key and silently stop calling db.ensureDay/db.seedTasks on a fresh FakeDb.
+    resetDailyRewardSeedGateForTests();
     stubRewardConfig();
     walletMock.row = {
       account_id: 1,
@@ -414,6 +476,27 @@ describe('daily rewards', () => {
     ]);
   });
 
+  it('bounds remote task definitions before the sequential seed transaction', async () => {
+    const tasks = Array.from({ length: 120 }, (_, index) => ({
+      id: `task_${index}`,
+      type: 'quest_completion',
+      title: `Task ${index}`,
+      description: '',
+      points: 1,
+      basePoints: 1,
+      sortOrder: index,
+      active: true,
+      config: {},
+    }));
+    stubRewardConfig({ tasks });
+    const db = new FakeDailyRewardDb();
+
+    await new DailyRewardService(db).ensureActiveDay('2026-07-01');
+
+    expect(db.tasks).toHaveLength(100);
+    expect(db.tasks.at(-1)?.id).toBe('task_99');
+  });
+
   it('adds the current and next task names to Discord winner announcements', async () => {
     const db = new FakeDailyRewardDb();
     db.winnerAnnouncements = [
@@ -481,7 +564,6 @@ describe('daily rewards', () => {
       return new Response(JSON.stringify(rewardConfig({ tasks })), { status: 200 });
     });
     const service = new DailyRewardService(db);
-    vi.spyOn(service, 'finalizePreviousDay').mockResolvedValue();
 
     const result = (await service.discordWinnerAnnouncements(1)) as {
       days: Array<{ day: string; taskName: string; nextTaskName: string }>;
@@ -889,7 +971,7 @@ describe('daily rewards', () => {
       expect(db.events.filter((event) => event.kind === 'task')).toHaveLength(2);
       expect(db.score).toBe(50);
 
-      // A delayed replay arrives after the 21:00 UTC reward-day boundary. The match's
+      // A delayed replay arrives after the 22:00 UTC reward-day boundary. The match's
       // first completion time must remain stable, keeping the replay on the original day.
       vi.setSystemTime(new Date('2026-06-30T21:01:00.000Z'));
       const replay = await afterRestartService.recordValeCupResult(1, afterRestartResult);
@@ -1260,9 +1342,43 @@ describe('daily rewards', () => {
   });
 
   it('maps reward days to the configured UTC cycle boundary', () => {
-    expect(rewardDayForDate(new Date('2026-07-02T20:59:00.000Z'), 21 * 60)).toBe('2026-07-01');
-    expect(rewardDayForDate(new Date('2026-07-02T21:00:00.000Z'), 21 * 60)).toBe('2026-07-02');
-    expect(nextUtcResetIso('2026-07-02', 21 * 60)).toBe('2026-07-03T21:00:00.000Z');
+    expect(rewardDayForDate(new Date('2026-07-02T21:59:00.000Z'), 22 * 60)).toBe('2026-07-01');
+    expect(rewardDayForDate(new Date('2026-07-02T22:00:00.000Z'), 22 * 60)).toBe('2026-07-02');
+    expect(nextUtcResetIso('2026-07-02', 22 * 60)).toBe('2026-07-03T22:00:00.000Z');
+  });
+
+  it('uses 22:00 UTC as the local default when no payout service is configured', async () => {
+    delete process.env.WOC_DAILY_REWARD_SERVICE_URL;
+    resetDailyRewardPriceCacheForTests();
+    await expect(currentDailyRewardDay(new Date('2026-07-02T21:59:59.000Z'))).resolves.toBe(
+      '2026-07-01',
+    );
+    await expect(currentDailyRewardDay(new Date('2026-07-02T22:00:00.000Z'))).resolves.toBe(
+      '2026-07-02',
+    );
+  });
+
+  it('selects the reward day from the schedule before requesting that exact day config', async () => {
+    const requestedConfigDays: string[] = [];
+    vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input));
+      if (url.pathname === '/daily-schedule') {
+        return new Response(JSON.stringify({ dayStartUtcMinutes: 22 * 60 }), { status: 200 });
+      }
+      requestedConfigDays.push(url.searchParams.get('day') ?? '');
+      return new Response(
+        JSON.stringify({
+          day: url.searchParams.get('day'),
+          ...rewardConfig({ dayStartUtcMinutes: 21 * 60 }),
+        }),
+        { status: 200 },
+      );
+    });
+
+    await expect(currentDailyRewardDay(new Date('2026-07-02T21:22:00.000Z'))).resolves.toBe(
+      '2026-07-01',
+    );
+    expect(requestedConfigDays).toEqual(['2026-07-01']);
   });
 
   it('builds a locked view for non-eligible status', () => {
@@ -1292,6 +1408,412 @@ describe('daily rewards', () => {
       },
     });
     expect(view).toMatchObject({ kind: 'ready', locked: true, lockReason: 'under_minimum' });
+  });
+
+  describe('explicit finalization and ensure/seed gating', () => {
+    it('finalizes only an explicitly requested closed day and leaves idempotency to the DB', async () => {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      const now = new Date('2026-07-02T22:00:00.000Z');
+
+      await expect(service.finalizeRewardDay({ day: '2026-07-01' }, now)).resolves.toEqual({
+        ok: true,
+        day: '2026-07-01',
+        outcome: 'finalized',
+      });
+      await expect(service.finalizeRewardDay({ day: '2026-07-01' }, now)).resolves.toEqual({
+        ok: true,
+        day: '2026-07-01',
+        outcome: 'already_finalized',
+      });
+      expect(db.finalizeDayCalls).toBe(1);
+      expect(db.ensureDayCalls).toBe(1);
+      expect(db.seedTasksCalls).toBe(1);
+      expect(db.dayFinalizedCalls).toBe(2);
+    });
+
+    it.each(['2026-02-30', '2026-7-01', 'not-a-day'])(
+      'rejects invalid reward days without touching the database: %s',
+      async (day) => {
+        const db = new FakeDailyRewardDb();
+        const service = new DailyRewardService(db);
+        await expect(service.finalizeRewardDay({ day })).resolves.toEqual({
+          error: 'invalid reward day',
+          status: 400,
+        });
+        expect(db.ensureDayCalls).toBe(0);
+        expect(db.finalizeDayCalls).toBe(0);
+      },
+    );
+
+    it('rejects an active reward day before any database write, even if marked finalized', async () => {
+      const db = new FakeDailyRewardDb();
+      db.finalizedDays.add(JSON.stringify(['2026-07-01', REALM]));
+      const service = new DailyRewardService(db);
+      const now = new Date('2026-07-02T21:59:59.000Z');
+      await expect(service.finalizeRewardDay({ day: '2026-07-01' }, now)).resolves.toEqual({
+        error: 'reward day has not closed',
+        status: 409,
+      });
+      expect(db.ensureDayCalls).toBe(0);
+      expect(db.finalizeDayCalls).toBe(0);
+      expect(db.dayFinalizedCalls).toBe(0);
+    });
+
+    it('rejects a future reward day before consulting finalized state', async () => {
+      const db = new FakeDailyRewardDb();
+      db.finalizedDays.add(JSON.stringify(['2026-07-03', REALM]));
+      const service = new DailyRewardService(db);
+      await expect(
+        service.finalizeRewardDay({ day: '2026-07-03' }, new Date('2026-07-02T22:00:00.000Z')),
+      ).resolves.toEqual({ error: 'reward day has not closed', status: 409 });
+      expect(db.dayFinalizedCalls).toBe(0);
+      expect(db.finalizeDayCalls).toBe(0);
+    });
+
+    it('fails closed when the authoritative config cannot be refreshed', async () => {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      vi.mocked(fetch).mockRejectedValue(new Error('offline'));
+      await expect(
+        service.finalizeRewardDay({ day: '2026-07-01' }, new Date('2026-07-02T22:00:00.000Z')),
+      ).resolves.toEqual({ error: 'daily reward config unavailable', status: 503 });
+      expect(db.ensureDayCalls).toBe(0);
+      expect(db.finalizeDayCalls).toBe(0);
+    });
+
+    it('bypasses a warm gameplay config cache when finalizing', async () => {
+      const targetDay = '2026-07-01';
+      await expect(dailyRewardRuntimeConfig(targetDay)).resolves.toMatchObject({
+        prizePoolUsd: 150,
+        dayStartUtcMinutes: 22 * 60,
+      });
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      vi.mocked(fetch).mockRejectedValue(new Error('authoritative source offline'));
+
+      await expect(
+        service.finalizeRewardDay({ day: targetDay }, new Date('2026-07-02T22:00:00.000Z')),
+      ).resolves.toEqual({ error: 'daily reward config unavailable', status: 503 });
+      expect(fetch).toHaveBeenCalledTimes(2);
+      expect(db.dayFinalizedCalls).toBe(0);
+      expect(db.finalizeDayCalls).toBe(0);
+    });
+
+    it.each([
+      ['missing fields', { day: '2026-07-01', prizePoolUsd: 150 }],
+      ['wrong day', { day: '2026-06-30', ...rewardConfig() }],
+      ['invalid tasks', { day: '2026-07-01', ...rewardConfig(), tasks: [{}] }],
+    ])('fails closed for a successful but %s config response', async (_label, payload) => {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify(payload), { status: 200 }));
+      await expect(
+        service.finalizeRewardDay({ day: '2026-07-01' }, new Date('2026-07-02T22:00:00.000Z')),
+      ).resolves.toEqual({ error: 'daily reward config unavailable', status: 503 });
+      expect(db.dayFinalizedCalls).toBe(0);
+      expect(db.ensureDayCalls).toBe(0);
+      expect(db.finalizeDayCalls).toBe(0);
+    });
+
+    it('seeds once across many recordOnlineMinute calls for the same day', async () => {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      const base = new Date('2026-07-01T12:00:00.000Z').getTime();
+      for (let i = 0; i < 5; i++) {
+        await service.recordOnlineMinute(1, new Date(base + i * 60_000));
+      }
+      // Five online-minute recorders for one day issue the ensure/seed pair once,
+      // not five times. Removing the seed-gate consult makes this five.
+      expect(db.ensureDayCalls).toBe(1);
+      expect(db.seedTasksCalls).toBe(1);
+    });
+
+    it('shares one seed gate across status and the gameplay recorders', async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-07-01T12:00:00.000Z'));
+      try {
+        const db = new FakeDailyRewardDb();
+        const service = new DailyRewardService(db);
+        await service.status(1);
+        await service.recordQuestCompletion(1, null, 'quest_completion');
+        await service.recordArenaResult(1, {
+          won: true,
+          format: '2v2',
+          ratingBefore: 1500,
+          ratingAfter: 1520,
+        });
+        await service.recordValeCupResult(1, {
+          won: true,
+          bracket: 1,
+          matchId: 42,
+          completedAt: new Date('2026-07-01T12:01:00.000Z'),
+        });
+        // status plus three gameplay recorders for one day share one seed gate.
+        expect(db.ensureDayCalls).toBe(1);
+        expect(db.seedTasksCalls).toBe(1);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('reseeds when the config tasks change for the same day', async () => {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      await service.ensureActiveDay('2026-06-30');
+      expect(db.seedTasksCalls).toBe(1);
+      // A genuine config change (new tasks) must force a reseed for the same day.
+      resetDailyRewardPriceCacheForTests();
+      stubRewardConfig({
+        tasks: [
+          {
+            id: 'quest_push',
+            type: 'quest_completion',
+            title: 'Quest push',
+            description: 'Complete quests.',
+            points: 25,
+            sortOrder: 1,
+          },
+        ],
+      });
+      await service.ensureActiveDay('2026-06-30');
+      expect(db.seedTasksCalls).toBe(2);
+    });
+
+    it('reseeds when only the prize pool changes for the same day', async () => {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      await service.ensureActiveDay('2026-06-30');
+      expect(db.ensureDayCalls).toBe(1);
+      // Change ONLY prizePoolUsd (a config field ensureDay persists): the same day
+      // must reseed so the new prize pool is written, proving the gate key covers
+      // the day-config fields, not just the tasks signature.
+      resetDailyRewardPriceCacheForTests();
+      stubRewardConfig({ prizePoolUsd: 500 });
+      await service.ensureActiveDay('2026-06-30');
+      expect(db.ensureDayCalls).toBe(2);
+      expect(db.seedTasksCalls).toBe(2);
+    });
+
+    it('reseeds when only the WOC price changes for the same day', async () => {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      await service.ensureActiveDay('2026-06-30');
+      expect(db.ensureDayCalls).toBe(1);
+      // Change ONLY wocUsdPrice (a config field ensureDay persists): the same
+      // day must reseed. This pins the SERVICE passing the price through to the
+      // gate key; an ensureSeeded that stripped it (the unit key tests cannot
+      // see that seam) would silently skip persisting a genuine price change.
+      resetDailyRewardPriceCacheForTests();
+      stubRewardConfig({ wocUsdPrice: 0.75 });
+      await service.ensureActiveDay('2026-06-30');
+      expect(db.ensureDayCalls).toBe(2);
+      expect(db.seedTasksCalls).toBe(2);
+    });
+
+    it('retries the seed on the next call when the seed transaction fails', async () => {
+      const db = new FakeDailyRewardDb();
+      db.failSeedTasksTimes = 1;
+      const service = new DailyRewardService(db);
+      await expect(service.ensureActiveDay('2026-06-30')).rejects.toThrow(
+        'seedTasks transaction rolled back',
+      );
+      expect(db.tasks).toEqual([]);
+      // The gate did not cache the failure: the next call re-issues the write, so
+      // a transient seed failure never strands the day with unwritten tasks.
+      await service.ensureActiveDay('2026-06-30');
+      expect(db.seedTasksCalls).toBe(2);
+      expect(db.tasks.length).toBeGreaterThan(0);
+    });
+
+    it('retries the seed when the day upsert fails, not just the task write', async () => {
+      const db = new FakeDailyRewardDb();
+      db.failEnsureDayTimes = 1;
+      const service = new DailyRewardService(db);
+      await expect(service.ensureActiveDay('2026-06-30')).rejects.toThrow(
+        'ensureDay upsert failed',
+      );
+      expect(db.tasks).toEqual([]);
+      // The ensureDay arm of the gated pair fails the same way the seedTasks arm
+      // does: the key is never cached, and the next call re-issues both writes.
+      await service.ensureActiveDay('2026-06-30');
+      expect(db.ensureDayCalls).toBe(2);
+      expect(db.tasks.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('board cache and busts', () => {
+    // Passive expiry is deliberately NOT a bust trigger: a timed daily-reward
+    // ban lapsing via expires_at flips eligibility inside the excluded view
+    // (a read-side change with no write anywhere to hook), so it is accepted
+    // as TTL-bounded staleness, the same tradeoff as cross-process writes.
+    // The pins below are therefore complete over WRITES only.
+
+    it('serves repeated status reads from one board snapshot while per-account reads stay live', async () => {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      await service.status(1);
+      expect(db.leaderboardSnapshotCalls).toBe(1);
+      await service.status(1);
+      // The second status inside the TTL window reuses the snapshot...
+      expect(db.leaderboardSnapshotCalls).toBe(1);
+      // ...while the per-account reads ran again (they are never cached).
+      expect(db.scoreForAccountCalls).toBe(2);
+    });
+
+    it('does not bust the board for a zero-point online-minute event', async () => {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      await service.status(1);
+      await service.recordOnlineMinute(1);
+      await service.status(1);
+      // A zero-point event never changes the ranked board (every ranked read
+      // filters points > 0): dropping the points > 0 guard reds here.
+      expect(db.leaderboardSnapshotCalls).toBe(1);
+    });
+
+    it('does not bust the board when a duplicate event records nothing', async () => {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      await service.status(1);
+      expect(db.leaderboardSnapshotCalls).toBe(1);
+      const first = await service.recordQuestCompletion(1, 101, 'wolf_hunt');
+      expect(first).toBe(10);
+      await service.status(1);
+      expect(db.leaderboardSnapshotCalls).toBe(2);
+      // Identical inputs dedupe in addPoints (recorded false): no new event
+      // row landed, so nothing on the board changed.
+      const second = await service.recordQuestCompletion(1, 101, 'wolf_hunt');
+      expect(second).toBe(0);
+      await service.status(1);
+      // 2, not 3: dropping the recorded === true guard reds here.
+      expect(db.leaderboardSnapshotCalls).toBe(2);
+    });
+
+    it('busts the board when a gameplay recorder lands new points', async () => {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      const before = await service.status(1);
+      expect(before.rank).toBeNull();
+      expect(db.leaderboardSnapshotCalls).toBe(1);
+      await service.recordQuestCompletion(1, 101, 'wolf_hunt');
+      const after = await service.status(1);
+      // The recorder busted the snapshot, so the next status refetched and the
+      // new points are visible immediately, never TTL-delayed.
+      expect(db.leaderboardSnapshotCalls).toBe(2);
+      expect(after.rank).toBe(1);
+      expect(after.leaderboardTotal).toBe(1);
+    });
+
+    it('serves the rank > 10 viewer row from the same snapshot, never a second query', async () => {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      // Ten scorers ahead of alice: her rank is 11, so status() takes the
+      // conditional viewer-row branch beyond the top-10 slice.
+      const ahead = Array.from({ length: 10 }, (_, i) => ({
+        accountId: 101 + i,
+        username: `scorer${i + 1}`,
+        points: 1_000 - i,
+        rank: i + 1,
+      }));
+      db.snapshotRows = [...ahead, { accountId: 1, username: 'alice', points: 5, rank: 11 }];
+      const status = await service.status(1);
+      // The viewer row must be a derivation of the ONE snapshot. The direct
+      // per-status ranked reads were deleted from DailyRewardDb outright, so
+      // reverting the service to this.db.leaderboardRowForAccount no longer
+      // even compiles; the snapshot-call and length pins below guard the
+      // derivation itself.
+      expect(db.leaderboardSnapshotCalls).toBe(1);
+      expect(status.rank).toBe(11);
+      expect(status.leaderboardTotal).toBe(11);
+      expect(status.leaderboard).toHaveLength(11);
+      const viewer = status.leaderboard[10];
+      expect(viewer).toEqual({ rank: 11, name: 'alice', points: 5, me: true });
+    });
+
+    it('routes every point write through the one busting wrapper', () => {
+      // Source pin: exactly ONE this.db.addPoints call site exists in the
+      // service, inside recordPoints. A recorder reverting to a direct
+      // this.db.addPoints call would skip the bust and leave its event class
+      // TTL-stale on the board; this catches all seven current recorder
+      // sites and any future one without per-site tests.
+      const src = readFileSync(resolve(__dirname, '../server/daily_rewards.ts'), 'utf8');
+      expect(src.match(/this\.db\.addPoints\(/g) ?? []).toHaveLength(1);
+      const start = src.indexOf('private async recordPoints(');
+      expect(start).toBeGreaterThan(-1);
+      const body = src.slice(start, src.indexOf('\n  }', start));
+      expect(body).toContain('this.db.addPoints(');
+    });
+
+    it('constructs the board cache with the shared 30s TTL constant', () => {
+      // Source pin: the service must pass DAILY_REWARD_BOARD_TTL_MS itself.
+      // The constructor defaults to the same constant, so every behavioral
+      // suite stays green under a divergent literal here (bust-driven tests
+      // ignore TTL; reuse tests pass under any longer one), yet the 30s
+      // ceiling is the cross-process delisting bound the bust doctrine
+      // leans on. Wrap-tolerant: the argument may sit on either line.
+      const src = readFileSync(resolve(__dirname, '../server/daily_rewards.ts'), 'utf8');
+      const start = src.indexOf('new DailyRewardBoardCache(');
+      expect(start).toBeGreaterThan(-1);
+      const construction = src.slice(start, src.indexOf(');', start));
+      expect(construction).toMatch(/ttlMs:\s*DAILY_REWARD_BOARD_TTL_MS/);
+    });
+
+    it('scopes the cache per service instance, never at module level', async () => {
+      // Two services over two fakes: each must refresh its OWN snapshot and
+      // serve its own board. A regression to a module-scoped cache would
+      // serve db1's board to service2 (and skip db2's refresh entirely);
+      // this pins the isolation directly instead of leaning on in-file test
+      // order and wall-clock TTL luck.
+      const db1 = new FakeDailyRewardDb();
+      const db2 = new FakeDailyRewardDb();
+      db1.score = 40;
+      db2.score = 0;
+      const service1 = new DailyRewardService(db1);
+      const service2 = new DailyRewardService(db2);
+      const status1 = await service1.status(1);
+      const status2 = await service2.status(1);
+      expect(db1.leaderboardSnapshotCalls).toBe(1);
+      expect(db2.leaderboardSnapshotCalls).toBe(1);
+      expect(status1.rank).toBe(1);
+      expect(status2.rank).toBeNull();
+      expect(status1.leaderboard).toHaveLength(1);
+      expect(status2.leaderboard).toHaveLength(0);
+    });
+
+    it('busts the board when a spin is recorded even if its point event dedupes', async () => {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      await service.status(1);
+      expect(db.leaderboardSnapshotCalls).toBe(1);
+      // Pre-plant the spin's idempotency key so addPoints records nothing:
+      // the only bust left on the spin path is the recordSpin one.
+      db.events.push({ accountId: 1, kind: 'spin', points: 0, key: 'spin', meta: {} });
+      const result = await service.spin(1);
+      expect('error' in result).toBe(false);
+      // The internal status refetched: dropping the recordSpin bust reds here.
+      expect(db.leaderboardSnapshotCalls).toBe(2);
+    });
+
+    it('returns post-spin board state from the spin call itself', async () => {
+      const db = new FakeDailyRewardDb();
+      const service = new DailyRewardService(db);
+      // Cache a rank-null, empty-board snapshot first.
+      const before = await service.status(1);
+      expect(before.rank).toBeNull();
+      vi.spyOn(Math, 'random').mockReturnValueOnce(0); // outcome s20, 20 points
+      const result = await service.spin(1);
+      expect('error' in result).toBe(false);
+      if ('error' in result) return;
+      // Both busts land before the internal status read, so the spin response
+      // reflects the just-recorded points; a bust moved after (or racing) the
+      // internal status would serve the stale rank-null board here.
+      expect(result.rank).toBe(1);
+      expect(result.leaderboard).toEqual([
+        expect.objectContaining({ rank: 1, name: 'alice', points: 20, me: true }),
+      ]);
+      expect(result.leaderboardTotal).toBe(1);
+    });
   });
 
   it('marks Arena and Vale Cup task descriptions with the 1v1 restriction', () => {

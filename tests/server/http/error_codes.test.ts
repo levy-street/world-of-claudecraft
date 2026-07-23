@@ -72,7 +72,6 @@ const EXPECTED_CODES = [
   'steam.already_linked',
   'steam.account_taken',
   'steam.upstream',
-  'welcome.invalid_input',
 ];
 
 describe('ERROR_CODES catalog', () => {

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { petFollow, petPickTarget, petRangedAttack, updatePet } from '../src/sim/pet/pet_ai';
+import {
+  petFollow,
+  petPickTarget,
+  petRangedAttack,
+  startWaterJet,
+  updatePet,
+} from '../src/sim/pet/pet_ai';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -168,6 +174,88 @@ describe('pet_ai module (P1a) — direct unit tests', () => {
     }
     expect(landed).toBe(true);
     expect(target.hp).toBeLessThan(target.maxHp); // the bolt never misses (crit-only roll)
+  });
+
+  it('Water Jet is a real channel that slows, blocks bolts, and breaks out of range', () => {
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    const target = wildHostile(sim, [pet.id]);
+    pet.templateId = 'water_elemental';
+    pet.petMode = 'defensive';
+    pet.aggroTargetId = target.id;
+    isolate(sim, [pid, pet.id, target.id]);
+    place(owner, 0, 0);
+    place(pet, 1, 0);
+    place(target, 10, 0);
+    const ranged = {
+      range: 25,
+      school: 'frost' as const,
+      jet: { total: 30, duration: 4, interval: 1, slow: 0.6, cooldown: 8 },
+    };
+    startWaterJet(sim.ctx, pet, target, ranged.jet);
+    const start = sim.drainEvents();
+    expect(start.some((e) => e.type === 'spellfx' && e.fx === 'bubbleBeam')).toBe(true);
+    expect(pet.castingAbility).toBe('water_jet');
+    expect(pet.channeling).toBe(true);
+    expect(
+      target.auras.some(
+        (a) => a.id === 'water_jet_slow' && a.sourceId === pet.id && a.value === 0.6,
+      ),
+    ).toBe(true);
+
+    const remaining = pet.castRemaining;
+    updatePet(sim.ctx, pet);
+    expect(pet.castRemaining).toBeLessThan(remaining);
+    expect(sim.drainEvents().some((e) => e.type === 'spellfx' && e.fx === 'projectile')).toBe(
+      false,
+    );
+
+    place(target, 40, 0);
+    updatePet(sim.ctx, pet);
+    expect(pet.castingAbility).toBeNull();
+    expect(pet.channeling).toBe(false);
+    expect(target.auras.some((a) => a.id === 'water_jet' || a.id === 'water_jet_slow')).toBe(false);
+    expect(
+      sim
+        .drainEvents()
+        .some((e) => e.type === 'spellfx' && e.fx === 'bubbleBeam' && e.duration === 0),
+    ).toBe(true);
+  });
+
+  it('auto-casts Water Jet on cooldown only while its autocast is armed', () => {
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    const target = wildHostile(sim, [pet.id]);
+    pet.templateId = 'water_elemental';
+    pet.petMode = 'defensive';
+    pet.aggroTargetId = target.id;
+    isolate(sim, [pid, pet.id, target.id]);
+    place(owner, 0, 0);
+    place(pet, 1, 0);
+    place(target, 8, 0); // inside the 25yd jet range
+    pet.petTauntTimer = 0; // the jet reuses petTauntTimer as its cooldown: available
+
+    // Autocast OFF: the AI does its ranged attacks but never starts the jet itself.
+    pet.petAutoWaterJet = false;
+    updatePet(sim.ctx, pet);
+    expect(pet.castingAbility).not.toBe('water_jet');
+
+    // Arm autocast: the next AI tick with the jet off cooldown starts the channel.
+    pet.petAutoWaterJet = true;
+    pet.petTauntTimer = 0;
+    updatePet(sim.ctx, pet);
+    expect(pet.castingAbility).toBe('water_jet');
+    expect(pet.channeling).toBe(true);
+  });
+
+  it('setPetAutoWaterJet toggles the flag on a jet-bearing pet', () => {
+    const { sim, pid } = world();
+    const pet = adopt(sim, pid);
+    pet.templateId = 'water_elemental';
+    sim.setPetAutoWaterJet(true, pid);
+    expect(pet.petAutoWaterJet).toBe(true);
+    sim.setPetAutoWaterJet(false, pid);
+    expect(pet.petAutoWaterJet).toBe(false);
   });
 
   it('petFollow clears the cached path once the pet is at heel distance', () => {

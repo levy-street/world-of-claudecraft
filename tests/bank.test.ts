@@ -207,6 +207,42 @@ describe('deposit rules', () => {
     });
   });
 
+  it('a deposit merges into an existing byte-equal bank stack and a withdraw merges back', () => {
+    const sim = makeSim();
+    const m = meta(sim);
+    // Seed the bank with a signed stack of 2, then deposit another byte-equal copy.
+    sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
+    sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
+    sim.bankDeposit(m.inventory.findIndex((s) => s.itemId === 'wolf_fang' && s.instance));
+    sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
+    sim.bankDeposit(m.inventory.findIndex((s) => s.itemId === 'wolf_fang' && s.instance));
+    const banked = m.bank.inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(banked).toHaveLength(1);
+    expect(banked[0].count).toBe(3);
+    expect(banked[0].instance).toEqual({ signer: 'Ana' });
+    // The return trip: with a byte-equal stack already in the bags, the
+    // withdrawal merges back instead of opening a second carried slot.
+    sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
+    sim.bankWithdraw(m.bank.inventory.findIndex((s) => s.instance));
+    const carried = m.inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(carried).toHaveLength(1);
+    expect(carried[0].count).toBe(4);
+    expect(carried[0].instance).toEqual({ signer: 'Ana' });
+    expect(m.bank.inventory.some((s) => s.itemId === 'wolf_fang')).toBe(false);
+  });
+
+  it('a differently-signed deposit still lands in its own bank slot', () => {
+    const sim = makeSim();
+    const m = meta(sim);
+    sim.addItemInstance('wolf_fang', { signer: 'Ana' }, sim.playerId);
+    sim.bankDeposit(m.inventory.findIndex((s) => s.itemId === 'wolf_fang'));
+    sim.addItemInstance('wolf_fang', { signer: 'Bru' }, sim.playerId);
+    sim.bankDeposit(m.inventory.findIndex((s) => s.itemId === 'wolf_fang'));
+    const banked = m.bank.inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(banked).toHaveLength(2);
+    expect(banked.map((s) => s.instance?.signer).sort()).toEqual(['Ana', 'Bru']);
+  });
+
   it('refuses a deposit at capacity and refuses a partial-fit deposit entirely (all-or-nothing)', () => {
     const sim = makeSim();
     const m = meta(sim);
@@ -476,6 +512,50 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     expect(src).toEqual([]);
     expect(dst).toHaveLength(2);
     expect(dst[1]).toEqual({ itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana' } });
+  });
+
+  it('merges an instanced move into a byte-equal destination stack', () => {
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } }];
+    const dst: InvSlot[] = [
+      { itemId: 'wolf_fang', count: 5 },
+      { itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana' } },
+    ];
+    // Destination is at capacity: only the byte-equal stack's room admits it.
+    expect(moveBetweenContainers(src, 0, undefined, dst, 2)).toEqual({ moved: 3 });
+    expect(src).toEqual([]);
+    expect(dst).toEqual([
+      { itemId: 'wolf_fang', count: 5 },
+      { itemId: 'wolf_fang', count: 5, instance: { signer: 'Ana' } },
+    ]);
+  });
+
+  it('refuses an instanced move all-or-nothing when the byte-equal room cannot take it whole', () => {
+    // 19 + 3 would overflow the 20-cap stack and no free slot exists: nothing moves.
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } }];
+    const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 19, instance: { signer: 'Ana' } }];
+    const srcSnap = clone(src);
+    const dstSnap = clone(dst);
+    expect(moveBetweenContainers(src, 0, undefined, dst, 1)).toEqual({
+      moved: 0,
+      refusal: 'no_fit',
+    });
+    expect(src).toEqual(srcSnap);
+    expect(dst).toEqual(dstSnap);
+    // AT the boundary: exactly one unit of room admits exactly a one-unit move.
+    const one: InvSlot[] = [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana' } }];
+    expect(moveBetweenContainers(one, 0, undefined, dst, 1)).toEqual({ moved: 1 });
+    expect(dst).toEqual([{ itemId: 'wolf_fang', count: 20, instance: { signer: 'Ana' } }]);
+  });
+
+  it('a differently-signed instanced move still demands its own free destination slot', () => {
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Bru' } }];
+    const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana' } }];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 1)).toEqual({
+      moved: 0,
+      refusal: 'no_fit',
+    });
+    expect(moveBetweenContainers(src, 0, undefined, dst, 2)).toEqual({ moved: 1 });
+    expect(dst).toHaveLength(2);
   });
 
   it('refuses a distinct-item move into a full destination (no_fit) and mutates nothing', () => {
@@ -870,11 +950,13 @@ describe('sanitizeBankState', () => {
     ]);
   });
 
-  it('clamps count to Math.max(1, floor) and forces instanced entries to count 1', () => {
+  it('clamps count to Math.max(1, floor) and caps an instanced entry at its stack size', () => {
     const raw = {
       inventory: [
         { itemId: 'wolf_fang', count: -5 },
         { itemId: 'wolf_fang', count: 2.9 },
+        // worn_sword is an UNSTACKED weapon (stackSize 1): the pre-12d force-1
+        // behavior falls out of the stack-cap clamp.
         { itemId: 'worn_sword', count: 5, instance: { signer: 'Ana' } },
       ],
       purchasedSlots: 0,
@@ -884,6 +966,35 @@ describe('sanitizeBankState', () => {
     expect(out[0].count).toBe(1);
     expect(out[1].count).toBe(2);
     expect(out[2]).toEqual({ itemId: 'worn_sword', count: 1, instance: { signer: 'Ana' } });
+  });
+
+  it('preserves a counted instanced stack while still flooring and capping garbage', () => {
+    const raw = {
+      inventory: [
+        // A legitimate identical-payload stack: count survives the load intact.
+        { itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } },
+        // AT the cap (stackSize 20) survives; one past it clamps back to 20
+        // (a merge can only ever have reached the cap).
+        { itemId: 'wolf_fang', count: 20, instance: { signer: 'Ana' } },
+        { itemId: 'wolf_fang', count: 21, instance: { signer: 'Ana' } },
+        // Garbage floors to 1 exactly like the fungible arm.
+        { itemId: 'wolf_fang', count: -5, instance: { signer: 'Ana' } },
+        // A charge-bearing payload stays one-per-slot regardless of count: a
+        // counted stack shares ONE payload object, so a tampered count would
+        // mint shared-charge copies.
+        { itemId: 'wolf_fang', count: 4, instance: { signer: 'Ana', charges: { zap: 2 } } },
+        // An unknown item def (removed content) is dormant recoverable data:
+        // the merge-legal ceiling does not apply (12d QA), but the charge cap
+        // still does (the shared-payload dupe guard is def-independent).
+        { itemId: 'unknown_id_xyz', count: 30, instance: { signer: 'Ana' } },
+        { itemId: 'unknown_id_xyz', count: 4, instance: { charges: { zap: 1 } } },
+      ],
+      purchasedSlots: 0,
+      bonusSlots: 0,
+    };
+    const out = sanitizeBankState(raw).inventory;
+    expect(out.map((s) => s.count)).toEqual([3, 20, 20, 1, 1, 30, 1]);
+    expect(out[0]).toEqual({ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } });
   });
 
   it('floors purchasedSlots to a multiple of 6 within [0, 72]', () => {

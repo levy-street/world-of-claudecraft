@@ -118,8 +118,10 @@ const simFiles = walk(simRoot);
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/proc_overlay_view.ts',
   'src/ui/camera_prompt_core.ts',
   'src/ui/chat_ignore_core.ts',
+  'src/ui/daily_rewards_launcher_core.ts',
   'src/ui/char_bags_pairing_core.ts',
   'src/ui/equip_drop_core.ts',
   'src/ui/log_event_route.ts',
@@ -128,7 +130,9 @@ const UI_PURE_CORES = [
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',
+  'src/ui/party_below_target_core.ts',
   'src/ui/party_collapse.ts',
+  'src/ui/guild_hide_offline.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/low_health.ts',
   'src/ui/low_resource.ts',
@@ -136,34 +140,48 @@ const UI_PURE_CORES = [
   'src/ui/compass.ts',
   'src/ui/coords.ts',
   'src/ui/hud/quest/quest_tracker.ts',
+  'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/stat_tooltip_view.ts',
   'src/ui/target_portrait_view.ts',
   'src/ui/target_rank_view.ts',
   'src/ui/mob_tooltip_view.ts',
+  'src/ui/player_tooltip_view.ts',
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
   'src/ui/tab_strip_view.ts',
   'src/ui/bags_view.ts',
+  'src/ui/bag_item_context_menu.ts',
+  'src/ui/enchant_apply_view.ts',
+  'src/ui/enchanting_view.ts',
   'src/ui/bank_view.ts',
   'src/ui/item_set_tooltip_view.ts',
   'src/ui/weapon_proc_view.ts',
   'src/ui/options_view.ts',
   'src/ui/hud/vendor/vendor_view.ts',
   'src/ui/hud/vendor/heroic_vendor_view.ts',
+  'src/ui/hud/vendor/train_view.ts',
+  'src/ui/hud/vendor/unbind_view.ts',
   'src/ui/card_duel_view.ts',
   'src/ui/claudium_view.ts',
   'src/ui/woc_store_view.ts',
   'src/ui/wallet_connection_view.ts',
   'src/ui/hud/loot/loot_roll_status_view.ts',
   'src/ui/hud/loot/loot_settings_view.ts',
+  'src/ui/craft_celebration_view.ts',
   'src/ui/crafting_view.ts',
+  'src/ui/profession_event_lines_core.ts',
   'src/ui/profession_identity_view.ts',
+  'src/ui/profession_tutorial_view.ts',
+  'src/ui/professions_view.ts',
   'src/ui/market_view.ts',
   'src/ui/mailbox_view.ts',
   'src/ui/calendar_view.ts',
   'src/ui/char_view.ts',
+  'src/ui/char_stats_view.ts',
+  'src/ui/inspect_view.ts',
+  'src/ui/quality_glow.ts',
   'src/ui/map_pinch_zoom_core.ts',
   'src/ui/map_window_view.ts',
   'src/ui/map_quest_list_view.ts',
@@ -187,10 +205,14 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/questlog_view.ts',
   'src/ui/swing_timer.ts',
   'src/ui/unit_frame.ts',
+  'src/ui/stance_bar_view.ts',
   'src/ui/hud/action_bar/action_bar_view.ts',
+  'src/ui/hud/action_bar/action_bar_layout_core.ts',
+  'src/ui/hud/action_bar/action_bar_visibility_core.ts',
   'src/ui/hud/action_bar/mobile_action_page_view.ts',
   'src/ui/hud/action_bar/consumable_bar_view.ts',
   'src/ui/mobile_hud_layout.ts',
+  'src/ui/mobile_fullscreen_window_core.ts',
   'src/ui/auras_view.ts',
   'src/ui/minimap_markers.ts',
   'src/ui/gathering_view.ts',
@@ -208,7 +230,8 @@ const UI_PURE_CORES = [
   'src/ui/hud/loot/corpse_harvest_view.ts',
   'src/ui/town_focus_view.ts',
   'src/ui/pet_action_icons.ts',
-  'src/ui/welcome_screen_view.ts',
+  'src/ui/loading_slow_hint_core.ts',
+  'src/ui/reconnect_status_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
 ].map((rel) => join(repoRoot, rel));
@@ -222,12 +245,21 @@ const UI_PURE_CORES = [
 // water_core (the shore-depth sample shared by build + editor setLevel) follow
 // the same contract for the map editor's realtime terrain/water edits.
 const RENDER_PURE_CORES = [
+  'src/render/camera_boom_core.ts',
+  'src/render/camera_director_core.ts',
+  'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
+  'src/render/fishing_bobber_core.ts',
+  'src/render/stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
+  'src/render/env_prefilter_core.ts',
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
+  'src/render/prewarm_policy.ts',
   'src/render/terrain_region_core.ts',
   'src/render/water_core.ts',
+  'src/render/warrior_cast_fx_core.ts',
+  'src/render/characters/weapon_attack_style_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)
@@ -239,18 +271,21 @@ const RENDER_PURE_CORES = [
 // updating this list) fails the cross-check instead of silently escaping the
 // reverse-completeness guard.
 const BARE_NAMED = [
+  'src/render/prewarm_policy.ts',
   'src/ui/mob_idle_sfx.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',
   'src/ui/party_collapse.ts',
+  'src/ui/guild_hide_offline.ts',
   'src/ui/rest_indicator.ts',
   'src/ui/low_health.ts',
   'src/ui/low_resource.ts',
   'src/ui/clock.ts',
   'src/ui/compass.ts',
   'src/ui/coords.ts',
+  'src/ui/bag_item_context_menu.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/swing_timer.ts',
@@ -263,6 +298,7 @@ const BARE_NAMED = [
   'src/ui/log_event_route.ts',
   'src/ui/mobile_hud_layout.ts',
   'src/ui/pet_action_icons.ts',
+  'src/ui/quality_glow.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/render/cast_bar.ts',
@@ -327,7 +363,7 @@ describe('src/sim architecture invariants', () => {
 
 // ---------------------------------------------------------------------------
 // IWorld seam purity (W1b). The seam render/ui depend on is src/world_api.ts (the
-// aggregate interface + the COMMAND_NAMES wire table) plus every facet interface
+// aggregate interface + shared wire constants) plus every facet interface
 // under src/world_api/. W1 split IWorld into those files as a string-free,
 // TYPE-ONLY boundary: every host (render/ui/game/net) and the server talk to the
 // world ONLY through it, so it sits ABOVE them and must import nothing from
@@ -336,8 +372,9 @@ describe('src/sim architecture invariants', () => {
 // i18n/UI logic (no t()/tSim()/tServer()). Without this scan the facet files'
 // purity is convention-only; a later W6-W10 re-home could add a net/ui import or a
 // t() call to a facet and no gate would redden. This closes that gap. The one
-// blessed value site is COMMAND_NAMES (world_api.ts); string literals are NOT
-// banned (only imports + DOM + i18n calls are). chat.ts's OVERHEAD_EMOTES +
+// blessed value sites are local protocol constants such as COMMAND_NAMES and
+// STABLE_TIMER_WIRE_VERSION (world_api.ts); string literals are NOT banned (only
+// imports + DOM + i18n calls are). chat.ts's OVERHEAD_EMOTES +
 // isOverheadEmoteId derive their runtime id set from OVERHEAD_EMOTES itself
 // (not sim/types' OVERHEAD_EMOTE_IDS), so there is currently no sanctioned
 // runtime sim import; SANCTIONED_VALUE_SIM_IMPORTS below stays as the escape
@@ -469,6 +506,28 @@ describe('src/world_api IWorld seam purity invariants', () => {
     expect(
       violations,
       `the IWorld seam must run headless (no DOM globals):\n${violations.join('\n')}`,
+    ).toEqual([]);
+  });
+});
+
+describe('server host-layer import invariants', () => {
+  it('does not import browser host layers from the authoritative server', () => {
+    const serverRoot = join(repoRoot, 'server');
+    const violations: string[] = [];
+    for (const file of walk(serverRoot)) {
+      const src = stripComments(readFileSync(file, 'utf8'));
+      const specs: string[] = [];
+      for (const match of src.matchAll(IMPORT_RE)) specs.push(match[1]);
+      for (const match of src.matchAll(DYN_IMPORT_RE)) specs.push(match[1]);
+      for (const spec of specs) {
+        if (/(?:^|\/)(?:render|ui|game|net)\//.test(spec)) {
+          violations.push(`${relative(repoRoot, file)} imports '${spec}'`);
+        }
+      }
+    }
+    expect(
+      violations,
+      `the authoritative server must not import browser host layers:\n${violations.join('\n')}`,
     ).toEqual([]);
   });
 });

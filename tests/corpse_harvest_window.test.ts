@@ -30,7 +30,7 @@ function view(overrides: Partial<CorpseHarvestViewModel> = {}): CorpseHarvestVie
 describe('renderCorpseHarvestPicker: picker section', () => {
   it('appends one row per tagged component with the checkbox state from the view', () => {
     const container = document.createElement('div');
-    renderCorpseHarvestPicker(container, view(), { onHarvest: () => {} });
+    renderCorpseHarvestPicker(container, view(), { onHarvest: () => {}, attachTooltip: () => {} });
     expect(container.querySelector('.corpse-harvest')).not.toBeNull();
     const rows = container.querySelectorAll<HTMLElement>('.corpse-harvest-row');
     expect(rows.length).toBe(2);
@@ -41,28 +41,40 @@ describe('renderCorpseHarvestPicker: picker section', () => {
 
   it('renders nothing when the corpse has no harvestable components', () => {
     const container = document.createElement('div');
-    renderCorpseHarvestPicker(container, view({ rows: [] }), { onHarvest: () => {} });
+    renderCorpseHarvestPicker(container, view({ rows: [] }), {
+      onHarvest: () => {},
+      attachTooltip: () => {},
+    });
     expect(container.querySelector('.corpse-harvest')).toBeNull();
   });
 
   it('disables the harvest button when the view says so', () => {
     const container = document.createElement('div');
-    renderCorpseHarvestPicker(container, view({ harvestDisabled: true }), { onHarvest: () => {} });
+    renderCorpseHarvestPicker(container, view({ harvestDisabled: true }), {
+      onHarvest: () => {},
+      attachTooltip: () => {},
+    });
     expect(container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.disabled).toBe(true);
   });
 
-  it('exposes what Harvest does via a tooltip, distinct from Take All (playtester clarity)', () => {
+  it('exposes what Harvest does via the shared tooltip idiom, distinct from Take Loot', () => {
     const container = document.createElement('div');
-    renderCorpseHarvestPicker(container, view(), { onHarvest: () => {} });
+    const attachTooltip = vi.fn();
+    renderCorpseHarvestPicker(container, view(), { onHarvest: () => {}, attachTooltip });
     const btn = container.querySelector<HTMLButtonElement>('.corpse-harvest-btn');
-    expect(btn?.title).toBeTruthy();
-    expect(btn?.title.length).toBeGreaterThan(0);
+    // No native title: the shared idiom covers hover, mobile long-press, and
+    // keyboard focus, where a bare title attribute is hover-only.
+    expect(btn?.title).toBe('');
+    const call = attachTooltip.mock.calls.find(([target]) => target === btn);
+    expect(call?.[1]()).toBe(
+      'Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.',
+    );
   });
 
   it('reports exactly the currently-checked tags to onHarvest (the concentration/timing contract)', () => {
     const container = document.createElement('div');
     const onHarvest = vi.fn();
-    renderCorpseHarvestPicker(container, view(), { onHarvest });
+    renderCorpseHarvestPicker(container, view(), { onHarvest, attachTooltip: () => {} });
     // As rendered: only "hide" is checked.
     container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.click();
     expect(onHarvest).toHaveBeenLastCalledWith(['hide']);
@@ -79,7 +91,7 @@ describe('renderCorpseHarvestPicker: picker section', () => {
     renderCorpseHarvestPicker(
       container,
       view({ rows: [{ tag: 'hide', checked: false }], concentrated: false }),
-      { onHarvest },
+      { onHarvest, attachTooltip: () => {} },
     );
     container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.click();
     expect(onHarvest).toHaveBeenLastCalledWith([]);

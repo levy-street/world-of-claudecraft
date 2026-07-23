@@ -4,8 +4,8 @@
 // names, ability names, entity names) are passed as raw text to the *Text variants.
 // All interpolation goes through esc().
 
-import { t, type TranslationKey } from '../../ui/i18n';
 import { esc } from '../../ui/esc';
+import { type TranslationKey, t } from '../../ui/i18n';
 
 // ------------------------------------------------------------------ headings
 /** A page heading with an optional lead paragraph, both from catalog keys. */
@@ -35,6 +35,18 @@ export function sectionPair(headingKey: TranslationKey, bodyKey: TranslationKey)
 
 export function p(key: TranslationKey): string {
   return `<p>${esc(t(key))}</p>`;
+}
+/** One or more paragraphs from a single catalog key. The English value may carry
+ * several paragraphs separated by a blank line ('\n\n'); each renders as its own
+ * <p>. A locale fill without blank lines renders as one paragraph, so condensed
+ * fills stay structurally valid. Interpolation params pass straight to t(). */
+export function paras(key: TranslationKey, values?: Parameters<typeof t>[1]): string {
+  return t(key, values)
+    .split(/\n\s*\n/)
+    .map((chunk) => chunk.trim())
+    .filter((chunk) => chunk.length > 0)
+    .map((chunk) => `<p>${esc(chunk)}</p>`)
+    .join('');
 }
 export function pText(text: string): string {
   return `<p>${esc(text)}</p>`;
@@ -67,7 +79,11 @@ export function tagRow(inner: string): string {
 
 // --------------------------------------------------------------------- cards
 /** A title + body card from catalog keys (landing-style group card by default). */
-export function titleBodyCard(titleKey: TranslationKey, bodyKey: TranslationKey, cls = 'guide-group-card'): string {
+export function titleBodyCard(
+  titleKey: TranslationKey,
+  bodyKey: TranslationKey,
+  cls = 'guide-group-card',
+): string {
   return `<div class="${esc(cls)}"><h3>${esc(t(titleKey))}</h3><p>${esc(t(bodyKey))}</p></div>`;
 }
 
@@ -78,8 +94,15 @@ export interface CalloutOptions {
 }
 /** A callout box that separates a must-know note from body text. */
 export function callout(bodyHtml: string, opts: CalloutOptions = {}): string {
-  const variantClass = opts.variant === 'note' ? ' guide-callout-note' : opts.variant === 'warn' ? ' guide-callout-warn' : '';
-  const title = opts.titleKey ? `<span class="guide-callout-title">${esc(t(opts.titleKey))}</span>` : '';
+  const variantClass =
+    opts.variant === 'note'
+      ? ' guide-callout-note'
+      : opts.variant === 'warn'
+        ? ' guide-callout-warn'
+        : '';
+  const title = opts.titleKey
+    ? `<span class="guide-callout-title">${esc(t(opts.titleKey))}</span>`
+    : '';
   return `<div class="guide-callout${variantClass}">${title}${bodyHtml}</div>`;
 }
 
@@ -112,13 +135,14 @@ export function loreBeat(titleKey: TranslationKey, bodyKey: TranslationKey): str
 }
 
 // ------------------------------------------------------------- related links
-export interface RelatedLink { href: string; key: TranslationKey; }
+export interface RelatedLink {
+  href: string;
+  key: TranslationKey;
+}
 /** A "Related" block of cross-links at the foot of a page. */
 export function related(links: RelatedLink[]): string {
   if (!links.length) return '';
-  const items = links
-    .map((l) => `<li><a href="${esc(l.href)}">${esc(t(l.key))}</a></li>`)
-    .join('');
+  const items = links.map((l) => `<li><a href="${esc(l.href)}">${esc(t(l.key))}</a></li>`).join('');
   return `<nav class="guide-related" aria-label="${esc(t('guide.related'))}">
     <h2 class="guide-related-h">${esc(t('guide.related'))}</h2>
     <ul class="guide-related-list">${items}</ul>

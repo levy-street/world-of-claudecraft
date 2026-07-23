@@ -42,7 +42,7 @@ export interface SkinEventControllerDeps {
     bagOpen(): void;
     bagClose(): void;
     click(): void;
-    levelUp(): void;
+    cosmeticUnlock(): void;
   };
 }
 
@@ -297,7 +297,7 @@ export class SkinEventController {
       if (this.selected < 0 || lockButton.disabled) return;
       this.deps.world().claimEventSkin(this.selected);
       this.deps.showBanner(t('skinEvent.unlocked'));
-      this.deps.audio.levelUp();
+      this.deps.audio.cosmeticUnlock();
       this.close();
       this.deps.renderBagsIfOpen();
     });

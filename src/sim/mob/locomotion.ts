@@ -26,6 +26,7 @@
 // sibling targeting module are imported directly (already pure); everything that
 // touches not-yet-extracted Sim state routes through the seam.
 
+import { hasUnbreakableMovementLock } from '../combat/cc';
 import { VALE_CUP_BALL_TEMPLATE_ID } from '../content/vale_cup';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
@@ -51,6 +52,12 @@ import {
   type Vec3,
 } from '../types';
 import { groundHeight, waterLevelAt } from '../world';
+import {
+  cancelMobChargeDash,
+  resetMobCharge,
+  tryStartMobCharge,
+  updateMobChargeDash,
+} from './charge';
 import { updateMobCombatProfile } from './combat_profile';
 import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget } from './targeting';
@@ -74,6 +81,11 @@ const BODY_RADIUS = PLAYER_BODY_RADIUS;
 // full (mirrors the player out-of-combat window, so combat exits cleanly while the
 // damage meter keeps the finished segment's DPS).
 const DUMMY_RESET_SECONDS = 5;
+const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
+  'nythraxis_heroic_warrior_add',
+  'nythraxis_heroic_priest_add',
+  'nythraxis_heroic_rogue_add',
+]);
 
 export function updateMob(ctx: SimContext, mob: Entity): void {
   if (mob.dead) {
@@ -119,6 +131,11 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     if (mob.combatTimer >= DUMMY_RESET_SECONDS) {
       mob.inCombat = false;
       mob.hp = mob.maxHp;
+      mob.aiState = 'idle';
+      mob.aggroTargetId = null;
+      mob.forcedTargetId = null;
+      mob.forcedTargetTimer = 0;
+      clearThreat(mob);
     } else {
       mob.inCombat = true;
     }
@@ -187,7 +204,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // non-hostile mob is therefore a leak — exactly the "immortal, invalid
   // target" wolves players hit. Restore hostility so no mob can ever be left
   // permanently untargetable, whatever path corrupted it.
-  if (mob.templateId === NYTHRAXIS_ADD_ID && mob.despawnTimer !== undefined) {
+  if (
+    (mob.templateId === NYTHRAXIS_ADD_ID || NYTHRAXIS_HEROIC_ADD_IDS.has(mob.templateId)) &&
+    mob.despawnTimer !== undefined
+  ) {
     mob.hostile = false;
     mob.aiState = 'idle';
     mob.inCombat = false;
@@ -204,7 +224,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       mob.nythraxis &&
       (mob.nythraxis.phase === 'transition' ||
         mob.nythraxis.deathlessCastRemaining > 0 ||
-        mob.nythraxis.deathlessStunRemaining > 0);
+        mob.nythraxis.deathlessStunRemaining > 0 ||
+        (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0);
     if (isNythraxis) {
       ctx.updateNythraxisEncounter(mob);
       if (
@@ -212,7 +233,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         (mob.nythraxis &&
           (mob.nythraxis.phase === 'transition' ||
             mob.nythraxis.deathlessCastRemaining > 0 ||
-            mob.nythraxis.deathlessStunRemaining > 0))
+            mob.nythraxis.deathlessStunRemaining > 0 ||
+            (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0))
       )
         return;
     } else {
@@ -221,11 +243,16 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
 
   if (ctx.isStunned(mob)) {
+    // A total lockout (stun/stasis/incapacitate/polymorph) breaks an in-flight
+    // charge dash. This branch is the only mob code that runs while locked, so
+    // the dash cancel must live here: the dash step itself is never reached.
+    cancelMobChargeDash(mob);
     // A taunt/growl window is real-time: keep it counting down even while the mob
     // is stunned, since the stun path skips updateMobTarget where it normally ticks.
     tickForcedTarget(mob);
     if (ctx.updateFearMovement(mob)) return;
-    if (mob.auras.some((a) => a.kind === 'polymorph')) {
+    const polymorphAura = mob.auras.find((a) => a.kind === 'polymorph');
+    if (polymorphAura && !hasUnbreakableMovementLock(mob, polymorphAura)) {
       mob.wanderTimer -= DT;
       if (mob.wanderTimer <= 0) {
         mob.wanderTimer = ctx.rng.range(0.8, 2);
@@ -333,11 +360,18 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     }
     case 'chase':
     case 'attack': {
+      // A heroic charge dash in flight owns the mob's movement for the tick
+      // (mirrors the player's updateChargeMovement early return); it also ticks
+      // the charge cooldown, so this runs before the combat-profile runner on
+      // every engaged tick. Zero rng in every branch: inert for normal spawns.
+      if (updateMobChargeDash(ctx, mob)) break;
       const result = updateMobCombatProfile(ctx, mob, () => {
-        // The anti-kite snare and loud battle cries fire once per engaged tick,
-        // from either engaged state (mid-chase is the kite case they exist for).
+        // The anti-kite snare, loud battle cries, and the heroic charge trigger
+        // fire once per engaged tick, from either engaged state (mid-chase is
+        // the kite case they exist for).
         pulseAntiKiteSnare(ctx, mob);
         pulseLoudYell(ctx, mob);
+        tryStartMobCharge(ctx, mob);
       });
       if (result === 'runAttackMechanics') runMobAttackMechanics(ctx, mob);
       break;
@@ -668,6 +702,8 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.healedThisPull = false;
   mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
+  // Charge resets READY (cooldown 0), not telegraphed: the next pull opens with it.
+  resetMobCharge(mob);
   mob.aoeSlowTimer = MOBS[mob.templateId]?.aoeSlow?.every ?? 0;
   mob.loudYellTimer = MOBS[mob.templateId]?.battleYells?.every ?? 0;
   mob.loudYellIndex = 0;

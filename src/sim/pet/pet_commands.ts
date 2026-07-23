@@ -35,6 +35,7 @@
 // directly (already pure); everything that touches not-yet-extracted Sim state
 // routes through the seam.
 
+import { hasUnbreakableMovementLock } from '../combat/cc';
 import { DUNGEON_X_THRESHOLD, ITEMS, isDelvePos, MOBS } from '../data';
 import { createMob } from '../entity';
 import type { PetState } from '../sim';
@@ -49,6 +50,7 @@ import {
   PET_GROWL_INTERVAL,
   type PetMode,
 } from '../types';
+import { startWaterJet } from './pet_ai';
 
 // Slice-only tuning consts, moved verbatim from sim.ts with the slice.
 const PET_TAUNT_RANGE = 5;
@@ -65,6 +67,15 @@ const PET_NAME_RE = /^[A-Za-z][A-Za-z '-]{1,15}$/;
 // so the surfaced error must say why instead of implying the pet was lost.
 function noPetError(e: Entity, fallback = 'You have no pet.'): string {
   return isDelvePos(e.pos.x) ? 'Pets are not allowed inside the delves.' : fallback;
+}
+
+// Encounter-authored movement locks freeze the owner's direct command surface too.
+// This guard intentionally lives only on user-issued commands: passive pet AI and
+// system lifecycle operations (summon/restore/stow) remain encounter-owned.
+function petCommandBlockedByControl(ctx: SimContext, owner: Entity): boolean {
+  if (!hasUnbreakableMovementLock(owner)) return false;
+  ctx.error(owner.id, 'You are stunned.');
+  return true;
 }
 
 // -------------------------------------------------------------------------
@@ -143,6 +154,7 @@ export function serializePet(ctx: SimContext, ownerPid: number): PetState | null
     dead: pet.dead,
     mode: pet.petMode,
     autoTaunt: pet.petAutoTaunt,
+    autoWaterJet: pet.petAutoWaterJet,
   };
 }
 
@@ -185,6 +197,7 @@ export function restorePet(ctx: SimContext, owner: Entity, state: PetState): voi
   pet.petMode = state.mode ?? 'defensive';
   pet.petTauntTimer = 0;
   pet.petAutoTaunt = state.autoTaunt ?? false;
+  pet.petAutoWaterJet = state.autoWaterJet ?? false;
   pet.petManualTauntPending = false;
   pet.hostile = false;
   pet.aiState = state.dead ? 'dead' : 'idle';
@@ -258,6 +271,7 @@ export function completeTame(ctx: SimContext, p: Entity, target: Entity): void {
   pet.petMode = 'defensive';
   pet.petTauntTimer = 0;
   pet.petAutoTaunt = false;
+  pet.petAutoWaterJet = false;
   pet.petManualTauntPending = false;
   pet.hostile = false;
   pet.aiState = 'idle';
@@ -345,6 +359,7 @@ export function createDemonPet(
   pet.petMode = 'defensive';
   pet.petTauntTimer = 0;
   pet.petAutoTaunt = false;
+  pet.petAutoWaterJet = false;
   pet.petManualTauntPending = false;
   pet.hostile = false;
   pet.aiState = 'idle';
@@ -446,6 +461,7 @@ export function abandonPet(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Only hunters can abandon pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
     ctx.error(r.e.id, noPetError(r.e));
@@ -462,6 +478,7 @@ export function renamePet(ctx: SimContext, name: string, pid?: number): void {
     ctx.error(r.e.id, 'Only pet classes can rename pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
     ctx.error(r.e.id, noPetError(r.e));
@@ -486,6 +503,7 @@ export function revivePet(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Only pet classes can revive pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
     ctx.error(r.e.id, noPetError(r.e));
@@ -526,6 +544,7 @@ export function petAttack(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Only pet classes can command pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
@@ -549,12 +568,14 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Only pet classes can command pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
     ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
     return;
   }
+  if (MOBS[pet.templateId]?.petCanTaunt === false) return;
   if (pet.petTauntTimer > 0) {
     ctx.error(r.e.id, 'Pet taunt is not ready.');
     return;
@@ -581,6 +602,22 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
   pet.petTauntTimer = PET_GROWL_INTERVAL;
 }
 
+export function petWaterJet(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  if (petCommandBlockedByControl(ctx, r.e)) return;
+  const pet = petOf(ctx, r.e.id);
+  const jet = pet ? MOBS[pet.templateId]?.petRanged?.jet : undefined;
+  if (!pet || !jet || pet.dead || pet.castingAbility || pet.petTauntTimer > 0) return;
+  const target = r.e.targetId !== null ? ctx.entities.get(r.e.targetId) : null;
+  if (!target || target.dead || !ctx.isHostileTo(pet, target)) return;
+  const range = MOBS[pet.templateId]?.petRanged?.range ?? 0;
+  if (dist2d(pet.pos, target.pos) > range) return;
+  pet.aggroTargetId = target.id;
+  pet.inCombat = true;
+  startWaterJet(ctx, pet, target, jet);
+}
+
 export function feedPet(ctx: SimContext, itemId: string, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -588,6 +625,7 @@ export function feedPet(ctx: SimContext, itemId: string, pid?: number): void {
     ctx.error(r.e.id, 'Only hunters can feed pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   const pet = petOf(ctx, r.e.id);
   if (!pet) {
     ctx.error(r.e.id, noPetError(r.e, 'You have no living pet.'));
@@ -630,6 +668,7 @@ export function healPet(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Only warlocks can channel demon healing.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   if (r.e.dead) {
     ctx.error(r.e.id, 'You are dead.');
     return;
@@ -685,6 +724,7 @@ export function setPetMode(ctx: SimContext, mode: PetMode, pid?: number): void {
     ctx.error(r.e.id, 'Only pet classes can command pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
@@ -708,13 +748,43 @@ export function setPetAutoTaunt(ctx: SimContext, enabled: boolean, pid?: number)
     ctx.error(r.e.id, 'Only pet classes can command pets.');
     return;
   }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
   const pet = petOf(ctx, r.e.id, true);
   if (!pet) {
     ctx.error(r.e.id, noPetError(r.e));
     return;
   }
+  if (MOBS[pet.templateId]?.petCanTaunt === false) {
+    pet.petAutoTaunt = false;
+    return;
+  }
   pet.petAutoTaunt = enabled;
+}
+
+/** Autocast toggle for the Water Elemental's Water Jet (right-click / touch-hold on
+ *  the pet-bar button), the Water Jet twin of setPetAutoTaunt: while on, pet_ai
+ *  fires the jet the instant it is off cooldown with a valid target in range. Only
+ *  a pet that actually has a jet keeps the flag; anything else clears it. */
+export function setPetAutoWaterJet(ctx: SimContext, enabled: boolean, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  if (!isPetClass(r.meta.cls)) {
+    ctx.error(r.e.id, 'Only pet classes can command pets.');
+    return;
+  }
+  if (petCommandBlockedByControl(ctx, r.e)) return;
+  r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
+  const pet = petOf(ctx, r.e.id, true);
+  if (!pet) {
+    ctx.error(r.e.id, noPetError(r.e));
+    return;
+  }
+  if (!MOBS[pet.templateId]?.petRanged?.jet) {
+    pet.petAutoWaterJet = false;
+    return;
+  }
+  pet.petAutoWaterJet = enabled;
 }
 
 // -------------------------------------------------------------------------
@@ -727,6 +797,7 @@ export function setPetAutoTaunt(ctx: SimContext, enabled: boolean, pid?: number)
 export function petTauntReadout(ctx: SimContext, owner: Entity): string {
   const pet = petOf(ctx, owner.id);
   if (!pet) return 'You do not have a pet.';
+  if (MOBS[pet.templateId]?.petCanTaunt === false) return 'This pet cannot taunt.';
   if (pet.petTauntTimer <= 0) {
     return pet.petAutoTaunt
       ? `Your pet's Growl is ready. Auto-taunt is on.`

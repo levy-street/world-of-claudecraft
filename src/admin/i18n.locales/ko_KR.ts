@@ -159,6 +159,7 @@ export const ko_KR: Record<string, string> = {
   'stats.uptime': '가동 시간',
   'stats.avgTick': '평균 틱',
   'stats.serverRss': '서버 RSS',
+  'stats.playersCap': '플레이어 상한',
   'online.title': '접속 중인 플레이어',
   'online.refreshHint': '5초마다 새로고침',
   'online.empty': '현재 접속 중인 사용자 없음',

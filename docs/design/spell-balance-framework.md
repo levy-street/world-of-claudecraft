@@ -1,77 +1,110 @@
-# Spell & ability balance framework
+# Spell and Ability Balance Framework
 
-A repeatable, sim-driven way to answer "is this spell pulling its weight?" and to
-keep the kit balanced as Spell Power, haste, and content change. Two layers:
+Status: living measurement contract.
 
-| Layer | Tool | What it gives you |
+This framework defines how class power is measured. The complexity and talent rules live in
+`docs/design/class-design-rules.md`. The Frost and Fury application lives in
+`docs/design/frost-fury-rebalance.md`.
+
+## Existing tools
+
+| Tool | Current use | Current limitation |
 |---|---|---|
-| Analytical | `scripts/balance_report.mjs` | Fast per-spell metrics (spamDPS, dps/mana, effCast) for every caster spell, with class-median outlier flags. No sim needed. |
-| Empirical | `scripts/dummy_sim.mjs` | The REAL `Sim` driven against an immortal, pinned, passive **target dummy** (300s, infinite mana). Measures actual DPS per nuke (spam) and per class (priority rotation). Validates the analytical model. |
+| `scripts/balance_report.mjs` | Analytical caster spell comparison | It does not model a specialization rotation, melee, rage, pets, or raid buffs |
+| `scripts/dummy_sim.mjs` | Empirical direct-cast checks against the real simulation | It does not select a specialization and resets resources, so it is not a Fury or finite-mana authority |
+| `tests/spell_balance.test.ts` | Proportionality and no-strict-dominance regression checks | It does not enforce the cross-spec DPS band |
 
-Run them:
+Run the direct comparisons with `npx tsx scripts/balance_report.mjs` and
+`npx tsx scripts/dummy_sim.mjs`; pass a class such as `mage` to the latter to limit its output.
 
-```
-npx tsx scripts/balance_report.mjs        # analytical table, all caster classes
-npx tsx scripts/dummy_sim.mjs             # target-dummy DPS, all classes
-npx tsx scripts/dummy_sim.mjs mage        # one class
-```
+The existing scripts remain useful for identifying a direct spell that is strictly dominated by
+another direct spell. Their class-rotation rows must not be cited as Frost, Fury, or nine-class
+balance proof until the missing specialization and resource behavior is implemented.
 
-Both run a level-`MAX_LEVEL` reference caster so Spell Power and crit are realistic;
-they reuse the exact combat coefficients (`src/sim/spell_scaling.ts`) so the numbers
-match what a real fight does.
+## Required empirical profiles
 
-## The metrics
+Every damage specialization needs the same deterministic profiles:
 
-- **spamDPS** - damage per second if you cast ONLY this spell, respecting cast time,
-  GCD, cooldown, crit, and Spell Power (rider DoTs kept up). The single best "is
-  this nuke worth a global cooldown" number. Note: a *pure* DoT spammed is ~0 (each
-  recast resets its tick) - DoTs are valued by the rotation, not by spam.
-- **dps/mana** - sustain / efficiency.
-- **rotation DPS** - real single-target throughput: keep DoTs up, then spam the best
-  castable nuke. The class-parity number.
+| Profile | Duration | Targets | Purpose |
+|---|---:|---:|---|
+| Sustained | 180 sec | 1 | Rotation DPS and resource stability |
+| Burst | 60 sec | 1 | Cooldown stacking and opener ceiling |
+| Area | 60 sec | 5 | Cleave scaling and target caps |
 
-## The balancing rules
+Each profile fixes:
 
-1. **Proportionality.** A nuke's base damage should be roughly proportional to its
-   cast time, so every nuke's spamDPS is comparable. A spell that does *less* DPS
-   than a shorter-cast peer is a trap nobody casts. (Real classic-era spell math:
-   damage scales with cast time; this is also why the Spell Power coefficient is
-   `castTime / 3.5`.)
-2. **Burst premium.** A long, interruptible, mana-hungry cast may sit a little above
-   the filler's spamDPS (a reward for committing) - that is its niche.
-3. **Roles, not strict dominance.** Equal spamDPS is fine; differentiate by range,
-   school, instant-cast, DoT, or AoE. No spell should be strictly better than
-   another of the same role.
-4. **Class parity.** Rotation DPS should sit in a band across the damage classes.
-   `tests/spell_balance.test.ts` pins rules 1 and 3 as a regression guard.
+- Simulation seed.
+- Player level and specialization.
+- Gear and item level.
+- Talent selections.
+- Target armor, resistances, level, and position.
+- Resource regeneration rules.
+- Rotation policy.
+- External buffs and debuffs.
 
-## Findings (level 20, current tuning)
+The fixture never restores mana or rage each tick. If a profile requires an artificial resource
+condition, it must be named separately and cannot serve as the parity gate.
 
-Target-dummy single-target ROTATION DPS:
+## Required report
 
-| class | rotation DPS |
-|---|---|
-| warlock | ~48 (multi-DoT stacking) |
-| druid | ~41 (after Starfire fix) |
-| shaman | ~38 |
-| mage | ~36-46 (Frostbolt filler to Pyroblast burst) |
-| priest | ~32 (low; shadow spec especially) |
+The report contains:
 
-**Fixed in this pass (clear proportionality outliers):**
+- Total damage and DPS.
+- Main-hand and offhand white damage.
+- Damage by active ability.
+- Damage by proc, pet, copied output, and aura.
+- Resource generated, spent, expired, and wasted at cap.
+- Major offensive cooldown uptime.
+- Proc generation, consumption, expiration, and waste.
+- Random draw count and digest when the profile exercises randomness.
 
-- **Pyroblast** 75-100 -> **170-225** (+ DoT 24 -> 48). A 6s cast was doing 24.8
-  spamDPS vs Frostbolt's 41 - strictly worse than the 2.5s filler. Now 46.3: the
-  mage's hardest hit, a small premium over the filler for the long cast.
-- **Starfire** 60-74 -> **80-112**. A 3s cast doing 31.2 vs Wrath's (shorter) 41.7.
-  Now 40.8, on par with Wrath; lifts the druid rotation from ~35 to ~41.
+Source attribution follows the real simulation source ids. Autonomous pet damage and copied
+output cannot disappear from a player's report because their source entity differs from the
+player entity.
 
-**Flagged for a follow-up design pass (need judgement, not just a number):**
+## Balancing rules
 
-- **Class parity:** warlock (~48) is well above priest (~32). Warlock's stacked
-  DoTs (Corruption + Curse of Agony + Immolate) are strong; the priest kit is thin.
-- **Shadow priest** is much weaker than smite/holy: Mind Flay (~21) and Mind Blast
-  (~11 on an 8s CD) trail Smite (~38). Shadow needs its filler brought up.
-- **Shaman** has only one spammable nuke (Lightning Bolt); the shock line is all on
-  a shared cooldown, so its rotation is one-button.
+1. Proportionality: comparable direct attacks and spells pay for damage through cast time,
+   weapon speed, resource cost, cooldown, range, and risk.
+2. No strict dominance: an action that loses on damage, efficiency, mobility, and utility has no
+   legal role.
+3. One owner per output: each damage packet, proc, resource gain, and cooldown reduction names the
+   slot or talent that owns its budget.
+4. Class parity: the highest comparable damage specialization remains no more than 10 to 15 percent
+   above the lowest in sustained single-target DPS at the level cap.
+5. Burst visibility: burst is reported separately and cannot hide behind an acceptable sustained
+   average.
+6. Area payment: area strength comes from a lateral choice or target rule. It does not stack on
+   top of the strongest single-target build for free.
+7. Resource stability: a correct continuous rotation neither starves indefinitely nor remains at
+   the cap while its intended spender is available.
 
-Re-run the two scripts after any damage/coefficient change to re-check the table.
+## Level-band checks
+
+Level-cap parity is not enough for a short leveling game. Resource and action changes run at the
+spec-selection level and at representative later unlocks through the level cap. Each checkpoint
+uses gear intended for that level.
+
+For Warrior, report white DPS and rage per second by hand. For Mage, report finite-mana duration
+and proc cadence. A cap fix that breaks an early-level rotation is not complete.
+
+## Raid evidence
+
+Raid logs are used to identify suspicious profiles and to validate the result after a deterministic
+fix. Compare only parses with the same encounter, duration window, target count, relevant gear,
+and external buffs.
+
+Report median and upper-tail results rather than one maximum. Encounter-specific damage should be
+separated from class-owned damage where the log format permits it.
+
+## Change protocol
+
+1. Add or update the deterministic fixture and show the pre-change failure.
+2. Change one source of power.
+3. Show the same fixture passing.
+4. Run parity and deterministic replay checks.
+5. Re-run the three profiles.
+6. Record any remaining live-raid or PBE validation gap in the PR.
+
+Gameplay coefficients require a classic-era formula, a checked-in reference, or a measured result
+from this framework. A design preference alone is not numeric evidence.

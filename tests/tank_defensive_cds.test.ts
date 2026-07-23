@@ -1,5 +1,4 @@
 // Tank defensive cooldowns, one distinct mechanic per class:
-//   - Warrior Ironhold: a flat 40% damage-taken reduction (shield_wall).
 //   - Paladin Sacred Bulwark: a cheat-death that denies a lethal blow and restores 35%.
 //   - Druid Primal Reflexes: a dodge cooldown (buff_dodge), usable while shapeshifted.
 // Also covers the druid parity buff (Dire Bruin now +20% threat / +15% armor).
@@ -81,9 +80,8 @@ function startArenaMode(format: '1v1' | 'fiesta' | 'yumi3') {
 }
 
 describe('Tank defensive cooldowns: known by their class at 20', () => {
-  it('warrior knows Ironhold, paladin Sacred Bulwark, druid Primal Reflexes', () => {
+  it('paladin knows Sacred Bulwark, druid Primal Reflexes', () => {
     const CD: Record<string, string> = {
-      warrior: 'ironhold',
       paladin: 'sacred_bulwark',
       druid: 'primal_reflexes',
     };
@@ -95,14 +93,6 @@ describe('Tank defensive cooldowns: known by their class at 20', () => {
 
   it('pins costs, cooldowns, durations, values and off-GCD tuning', () => {
     const expected = [
-      {
-        cls: 'warrior',
-        id: 'ironhold',
-        cost: 10,
-        cooldown: 180,
-        duration: 8,
-        value: 0.4,
-      },
       {
         cls: 'paladin',
         id: 'sacred_bulwark',
@@ -136,50 +126,26 @@ describe('Tank defensive cooldowns: known by their class at 20', () => {
   });
 });
 
-describe('Ironhold (warrior): flat 40% mitigation', () => {
-  it('reduces direct and sourceless damage of every school, then expires', () => {
-    const { sim, p, pid } = make('warrior');
-    cast(sim, 'ironhold', pid);
-    expect(p.auras.some((a) => a.kind === 'shield_wall')).toBe(true);
-    const mob = spawnMob(sim, p, 3);
-    (p as any).maxHp = p.hp = 1_000_000;
-    for (const school of ['physical', 'fire', 'shadow']) {
-      const before = p.hp;
-      (sim as any).dealDamage(mob, p, 100, false, school, null, 'hit');
-      expect(before - p.hp).toBe(60); // 40% reduced
-    }
-    const beforeHazard = p.hp;
-    (sim as any).dealDamage(null, p, 100, false, 'nature', 'Hazard', 'hit');
-    expect(beforeHazard - p.hp).toBe(60);
-
-    const wall = p.auras.find((a) => a.kind === 'shield_wall')!;
-    const ticksUntilExpired = Math.ceil((wall.remaining + 0.1) * 20);
-    for (let i = 0; i < ticksUntilExpired; i++) sim.tick();
-    expect(p.auras.some((a) => a.kind === 'shield_wall')).toBe(false);
-  });
-
-  it('mitigates a real DoT tick even after its caster despawns', () => {
-    const { sim, p, pid } = make('warrior');
-    cast(sim, 'ironhold', pid);
-    const mob = spawnMob(sim, p, 3);
+describe('Generic shield-wall ward infrastructure', () => {
+  it('reduces all-school damage without depending on a specific ability id', () => {
+    const { sim, p } = make('warrior');
     p.maxHp = p.hp = 1_000_000;
     p.auras.push({
-      id: 'test_dot',
-      name: 'Test DoT',
-      kind: 'dot',
-      remaining: 1,
-      duration: 1,
-      value: 100,
-      tickInterval: 0.05,
-      tickTimer: 0.05,
-      sourceId: mob.id,
-      school: 'shadow',
+      id: 'test_generic_wall',
+      name: 'Test Generic Wall',
+      kind: 'shield_wall',
+      remaining: 8,
+      duration: 8,
+      value: 0.4,
+      sourceId: p.id,
+      school: 'physical',
     });
-    sim.entities.delete(mob.id);
-
-    const before = p.hp;
-    sim.tick();
-    expect(before - p.hp).toBe(60);
+    const mob = spawnMob(sim, p, 3);
+    for (const school of ['physical', 'fire', 'shadow'] as const) {
+      const before = p.hp;
+      (sim as any).dealDamage(mob, p, 100, false, school, null, 'hit');
+      expect(before - p.hp).toBe(60);
+    }
   });
 });
 
@@ -399,11 +365,12 @@ describe('Oakhide (druid): armor cooldown usable while shapeshifted', () => {
 });
 
 describe('Druid parity: Dire Bruin threat/armor buff', () => {
-  it('grants +20% threat and +15% armor', () => {
-    const druid = TALENTS.druid!;
-    const choice = druid.nodes.find((n: any) => n.id === 'feral_choice');
-    const bruin = choice?.choices?.find((c: any) => c.id === 'feral_choice_bear');
-    expect(bruin?.effect.global?.threatPct).toBe(0.2);
-    expect(bruin?.effect.stats?.armorPct).toBe(0.15);
+  it('grants +20% threat and +15% armor through the feral spec mastery', () => {
+    // Talents 2.0 retired the feral_choice_bear node; the bear-tank identity
+    // lives on the feral spec mastery, which carries the v0.27 Dire Bruin
+    // retune (threat 20%, armor 15%).
+    const feral = TALENTS.druid?.specs.find((s) => s.id === 'feral');
+    expect(feral?.mastery.effect.global?.threatPct).toBe(0.2);
+    expect(feral?.mastery.effect.stats?.armorPct).toBe(0.15);
   });
 });

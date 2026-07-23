@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { TIER_SKILL_STEP } from '../src/sim/professions/wheel';
 import {
   buildAttunementPreview,
   buildProfessionIdentityView,
@@ -26,6 +27,7 @@ const baseIdentity = {
   switchCount: 2,
   amendsProgress: 1,
   amendsRequired: 11,
+  knownRecipes: [],
 };
 
 describe('buildProfessionIdentityView', () => {
@@ -51,6 +53,8 @@ describe('buildProfessionIdentityView', () => {
       hobbyCraft: 'leatherworking',
       attunedPairCount: 1,
       returnCount: 2,
+      // requiredAmendsProgress(2) = 5 + 3 * 2, the shared switch-cost-at-rest figure.
+      returnCost: 11,
     });
     expect(view.skills.find((row) => row.craftId === 'armorcrafting')).toMatchObject({
       role: 'major',
@@ -82,6 +86,32 @@ describe('buildProfessionIdentityView', () => {
     });
     expect(buildProfessionIdentityView(baseIdentity).tutorial).toBeNull();
   });
+
+  it('display-floors fractional skill and ceils points-to-go on the card rows', () => {
+    // Fractional mastery gains never round a card readout over an uncrossed
+    // threshold: 74.75 reads 74 with 1 to go (the exact value still drives
+    // tierForSkill, so the tier stays 2).
+    const zero = Object.fromEntries(Object.keys(baseIdentity.craftSkills).map((id) => [id, 0]));
+    const view = buildProfessionIdentityView({
+      ...baseIdentity,
+      craftSkills: { ...zero, cooking: 74.75 },
+    });
+    const row = view.skills.find((r) => r.craftId === 'cooking');
+    expect(row).toMatchObject({ skill: 74, tier: 2, pointsToNextTier: 1 });
+  });
+
+  it('keeps the tutorial hint until the first tier-1 crossing, then never shows it again', () => {
+    const zero = Object.fromEntries(Object.keys(baseIdentity.craftSkills).map((id) => [id, 0]));
+    const withCooking = (skill: number) =>
+      buildProfessionIdentityView({ ...baseIdentity, craftSkills: { ...zero, cooking: skill } });
+    // One point short of tier 1 in the best craft: the hint still shows.
+    expect(withCooking(24).tutorial).toEqual({ targetSkill: TIER_SKILL_STEP });
+    // The first craft to reach skill 25 retires the hint...
+    expect(withCooking(25).tutorial).toBeNull();
+    // ...and it stays retired as skills keep growing.
+    expect(withCooking(80).tutorial).toBeNull();
+    expect(withCooking(300).tutorial).toBeNull();
+  });
 });
 
 describe('buildAttunementPreview', () => {
@@ -96,7 +126,25 @@ describe('buildAttunementPreview', () => {
       hobbyCeiling: 'rare',
       otherCeiling: 'common',
       retainsAllSkill: true,
+      // switchCount defaults to 0, so the return cost is the base 5.
+      returnCost: 5,
     });
+  });
+
+  it('escalates the return cost with the switch count (requiredAmendsProgress)', () => {
+    // 5 + 3 * switchCount, the shared switch-cost-at-rest formula.
+    expect(
+      buildAttunementPreview('weaponcrafting+armorcrafting', baseIdentity.craftSkills, 0)
+        ?.returnCost,
+    ).toBe(5);
+    expect(
+      buildAttunementPreview('weaponcrafting+armorcrafting', baseIdentity.craftSkills, 1)
+        ?.returnCost,
+    ).toBe(8);
+    expect(
+      buildAttunementPreview('weaponcrafting+armorcrafting', baseIdentity.craftSkills, 7)
+        ?.returnCost,
+    ).toBe(26);
   });
 
   it('returns null for a malformed or non-adjacent target', () => {

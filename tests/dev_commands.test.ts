@@ -138,6 +138,22 @@ describe('dev commands', () => {
     expect(sim.player.inCombat).toBe(false);
   });
 
+  it('mobilestation places through the REAL specialization gate, not around it', () => {
+    const sim = devSim();
+    const meta = (sim as any).players.get(sim.playerId);
+
+    // Unspecialized: the cheat saves the walk, never the gate (dev_commands.ts
+    // routes through placeMobileStationForPlayer).
+    sim.chat('/dev mobilestation engineering');
+    expect(meta.mobileStation).toBeNull();
+
+    meta.craftSkills.engineering = 75; // the specialization threshold (#1134)
+    sim.chat('/dev mobilestation ENGINEERING'); // the arm lowercases the craft id
+    expect(meta.mobileStation?.craftId).toBe('engineering');
+    // The IWorld read agrees while the station is active.
+    expect(sim.activeMobileStationCraft).toBe('engineering');
+  });
+
   it('is inert when dev commands are disabled', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: false });
     const beforeIds = [...sim.entities.keys()];

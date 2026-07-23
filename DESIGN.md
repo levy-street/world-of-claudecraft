@@ -527,8 +527,10 @@ Party rows (the third `UnitFramePainter` consumer: `party_frames.ts`, `party_fra
 ### 7.4 Action bars and XP
 
 The bottom stack keeps its structure: primary bar (12 slots, `Digit1` through `Equal`),
-optional secondary bar (`showSecondaryActionBar`), consumable slots, pet bar when a pet is
-out. All of it stays on the `ActionBarPainter` family with hotbar drag-and-drop.
+optional secondary bar (`showSecondaryActionBar`), optional third bar
+(`showThirdActionBar`, available while the secondary bar is visible), consumable slots,
+and the pet bar when a pet is out. All of it stays on the `ActionBarPainter` family with
+hotbar drag-and-drop.
 
 - Slot: 48px, radius `--radius-slot` (new token, 5px), 3px inset well (icon art renders at
   about 42px), bronze border, keybind cap top-right in the shared keycap style
@@ -1130,7 +1132,7 @@ only; behavior changes are named in the linked section.
 |---|---|---|
 | `#target-frame` | Restyle; MOVE to bottom-center (7.2) | 4 |
 | `#party-frames` | Restyle; add header, invite, targeted and ready-check states (7.3); `below-target` shift retires | 4 |
-| `#player-frame`, `#petbar`, `#xpbar`, `#actionbar`, `#actionbar2`, consumable slots | Restyle (7.2, 7.4) | 4 |
+| `#player-frame`, `#petbar`, `#xpbar`, `#actionbar`, `#actionbar2`, `#actionbar3`, consumable slots | Restyle (7.2, 7.4) | 4 |
 | `#castbar`, `#swingbar` | Restyle (10.5) | 4 |
 | `#buff-bar`, `#debuff-bar` (+ `aurasOnPlayerFrame` mode) | Restyle chips (phase 2); re-pin beside the grown minimap (7.5) | 2, 3 |
 | `#minimap-wrap` cluster (zone label, disc, clock, coords, compass, zoom, `#mail-indicator`, `#raid-lockout`) | Restyle; disc grows, satellites go circular (7.6) | 3 |

@@ -45,12 +45,6 @@ export interface RankedDeedsAccount {
   accountId: number;
   /** Sum of renown over the scoring set (distinct renown-bearing deed ids). */
   renown: number;
-  /** @deprecated Wire-compat only, removed next release (issue #2044): the
-   *  size of the scoring set, still computed so a stale client's column
-   *  renders real data. Never displayed by current clients; zero-renown deeds
-   *  are outside the SCORING set (never score, never move the tie-break), and
-   *  the player-facing completion count is src/sim/deeds_completion.ts. */
-  deedCount: number;
   /** When the account's current score was reached: max over the scoring set of
    *  each deed's EARLIEST earn (a re-earn on a second character adds no score,
    *  so it cannot move this either). Epoch ms. */
@@ -84,9 +78,9 @@ function earnedMs(earnedAt: Date | string): number {
 }
 
 interface AccountAgg {
-  /** Counted set: deed id -> the account's earliest earn of it (epoch ms). */
+  /** Scoring set: deed id -> the account's earliest earn of it (epoch ms). */
   deedFirstEarn: Map<string, number>;
-  /** Per character: its OWN counted set, for the display-character pick. */
+  /** Per character: its OWN scoring set, for the display-character pick. */
   charDeeds: Map<number, Set<string>>;
 }
 
@@ -154,7 +148,6 @@ export function computeDeedsBoard(
     ranked.push({
       accountId,
       renown,
-      deedCount: agg.deedFirstEarn.size,
       completionTime,
       displayCharacterId,
     });
@@ -204,7 +197,6 @@ export function buildDeedsBoardEntries(
       cls: display.class,
       level: display.level,
       renown: account.renown,
-      deedCount: account.deedCount,
       title: display.activeTitle,
     });
   }

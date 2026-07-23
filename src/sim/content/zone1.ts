@@ -2,6 +2,7 @@
 // wolves and boars, the bandit camp, and Brother Aldric's Gravecaller chain
 // leading to the Hollow Crypt.
 
+import { WORK_ORDER_CADENCE_TICKS } from '../professions/cadence';
 import type {
   CampDef,
   GroundObjectDef,
@@ -137,6 +138,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
       { itemId: 'greyjaw_fang', chance: 1, questId: 'q_greyjaw' },
       { itemId: 'wolf_fang', chance: 1 },
       { itemId: 'wolfhide_satchel', chance: 0.35 },
+      { itemId: 'acolyte_chain_grips', chance: 0.25 },
     ],
     scale: 1.25,
     color: 0x566061,
@@ -166,7 +168,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 0.85,
     color: 0x935116,
-    componentTags: ['hide', 'tusk'],
+    componentTags: ['hide', 'tusk', 'meat'],
   },
   webwood_spider: {
     id: 'webwood_spider',
@@ -195,6 +197,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
       { copper: 14, chance: 1 },
       { itemId: 'webwood_silk', chance: 0.55, questId: 'q_spiders' },
       { itemId: 'spider_leg', chance: 0.4 },
+      { itemId: 'mosshide_vest', chance: 0.12 },
     ],
     scale: 0.9,
     color: 0x4a235a,
@@ -236,6 +239,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
       { itemId: 'moggers_stomper_boots', chance: 0.3 },
       { itemId: 'moggers_shiv', chance: 0.25, rollGroup: 'mogger_chase' },
       { itemId: 'cryptstalker_jerkin', chance: 0.25, rollGroup: 'mogger_chase' },
+      { itemId: 'valefire_lantern', chance: 0.2 },
     ],
     scale: 1.28,
     color: 0x8e5b33,
@@ -307,6 +311,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
       { itemId: 'blessed_wax', chance: 0.45, questId: 'q_rite' },
       { itemId: 'linen_scrap', chance: 0.25 },
       { itemId: 'mossy_handwraps', chance: 0.15 },
+      { itemId: 'thornling_grips', chance: 0.15 },
     ],
     scale: 0.85,
     color: 0x9c640c,
@@ -341,6 +346,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
       { itemId: 'tunnelkings_spade', chance: 0.3 },
       { itemId: 'moggers_copper_cudgel', chance: 0.25, rollGroup: 'grix_tunnelking_chase' },
       { itemId: 'hollowbone_hauberk', chance: 0.25, rollGroup: 'grix_tunnelking_chase' },
+      { itemId: 'briarroot_staff', chance: 0.3 },
     ],
     scale: 1.15,
     color: 0xb9770e,
@@ -368,6 +374,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
     color: 0x943126,
     // A practiced thug flings a handful of road grit to foul your aim.
     blind: { chance: 0.25, miss: 0.3, duration: 5, name: 'Blinding Powder', school: 'physical' },
+    componentTags: ['cloth'],
   },
   restless_bones: {
     id: 'restless_bones',
@@ -496,6 +503,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
       { itemId: 'quilted_trousers', chance: 0.5 },
       { itemId: 'gorraks_cruel_chopper', chance: 0.25 },
       { itemId: 'gorraks_cleaver', chance: 0.3 },
+      { itemId: 'votive_chain_belt', chance: 0.3 },
     ],
     scale: 1.25,
     color: 0x6c3483,
@@ -556,6 +564,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'gathering_sickle',
       'bronze_sickle',
       'silverleaf_sickle',
+      'ironreel_fishing_rod',
+      'silverstream_fishing_rod',
     ],
     greeting: 'Fresh bread, clean water, fair prices. What can I get you?',
   },
@@ -596,12 +606,14 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     pos: { x: 7, z: 16.5 },
     facing: -2.7,
     color: 0x707b7c,
-    questIds: ['q_archetype_acceptance', 'q_prof_make_amends', 'q_prof_hobby_switch'],
+    questIds: ['q_prof_hobby_switch'],
     vendorItems: [
       'eastbrook_arming_sword',
+      'eastbrook_greatsword',
       'bronzework_mace',
       'vale_carving_knife',
       'hickory_shortstaff',
+      'eastbrook_buckler',
       'eastbrook_chain_vest',
       'valespun_robe',
       'tanned_leather_jerkin',
@@ -690,6 +702,118 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     questIds: [],
     greeting:
       'Every deed worth doing is worth writing down twice, $N: once for the ledger and once for the fireside.',
+  },
+  // Crafting-station masters (Professions 2.0): each stands 1 to 3
+  // units beside their station (content/professions.ts STATIONS) with a
+  // guard-safe camp margin (pinned in tests/professions_station_placement.test.ts).
+  forgemistress_darva: {
+    id: 'forgemistress_darva',
+    name: 'Forgemistress Darva',
+    title: 'Master of the Forge',
+    // Across the anvil from Smith Haldren, at the Eastbrook forge.
+    pos: { x: 5, z: 15 },
+    facing: -2.4,
+    color: 0xb5541c,
+    // Professions 2.0: the Smith pair's anchor master. Attunement and
+    // its escalating make-amends return live here now (moved off Smith Haldren),
+    // plus the repeatable forge work order.
+    questIds: ['q_prof_attune_smith', 'q_prof_amends_smith', 'q_prof_workorder_forge'],
+    // Station stocking: thorium_ore is the premium reagent the forge
+    // station's own recipe (recipe_sootscale_mantle) consumes, so the master
+    // sells it alongside quartermaster_bree (zone3).
+    vendorItems: [
+      'copper_mining_pick',
+      'iron_mining_pick',
+      'mithril_mining_pick',
+      'smithing_flux',
+      'thorium_ore',
+    ],
+    greeting: 'The forge answers to me, $C. Bring good ore and it will answer to you too.',
+  },
+  cook_marlow: {
+    id: 'cook_marlow',
+    name: 'Cook Marlow',
+    title: 'Master of the Kitchens',
+    // West side of the square, beside the kitchens station.
+    pos: { x: -12.5, z: 3 },
+    facing: Math.PI / 2,
+    color: 0xc98a4b,
+    // Professions 2.0: the Apothecary pair's (alchemy + cooking) anchor
+    // master. Attunement, make-amends return, and the repeatable kitchens work
+    // order live here.
+    questIds: ['q_prof_attune_apothecary', 'q_prof_amends_apothecary', 'q_prof_workorder_kitchens'],
+    vendorItems: [
+      'baked_bread',
+      'spring_water',
+      'roasted_boar',
+      'tough_jerky',
+      'brightwood_venison',
+      'cooking_salt',
+    ],
+    greeting: 'Nothing leaves my kitchens half-cooked, $C. Sit, eat, then get back out there.',
+  },
+  weaver_ottilie: {
+    id: 'weaver_ottilie',
+    name: 'Weaver Ottilie',
+    title: 'Master of the Loom',
+    // South of the well, beside the loom station.
+    pos: { x: -4, z: -9 },
+    facing: 0.8,
+    color: 0x7161a8,
+    // Professions 2.0: the Outfitter pair's (leatherworking + tailoring)
+    // anchor master. Attunement, make-amends return, and the repeatable loom work
+    // order live here.
+    questIds: ['q_prof_attune_outfitter', 'q_prof_amends_outfitter', 'q_prof_workorder_loom'],
+    // Station stocking: thorium_ore was stocked as the premium
+    // reagent of the loom's own recipe. An input rework later
+    // moved recipe_wardweave_cowl off osmium (silk plus premium herbs now),
+    // but the stock stays: removing a shipped vendor row is out of that
+    // rework's scope, and loom customers still buy it for the
+    // forge crafts next door.
+    vendorItems: [
+      'linen_pouch',
+      'travelers_knapsack',
+      'gathering_sickle',
+      'spool_of_thread',
+      'thorium_ore',
+    ],
+    greeting: 'Mind the threads, $C. A steady hand at the loom beats a strong one.',
+  },
+  tinker_gizzel: {
+    id: 'tinker_gizzel',
+    name: 'Tinker Gizzel',
+    title: 'Master of the Toolworks',
+    // Southeast corner of the square, beside the toolworks station.
+    pos: { x: 9.5, z: -14 },
+    facing: -0.8,
+    color: 0xb08d57,
+    // Professions 2.0: the Bombardier pair's (engineering + alchemy)
+    // anchor master. Attunement, make-amends return, and the repeatable toolworks
+    // work order live here.
+    questIds: [
+      'q_prof_attune_bombardier',
+      'q_prof_amends_bombardier',
+      'q_prof_workorder_toolworks',
+    ],
+    // Station stocking: the six premium reagents the toolworks
+    // recipes (TOOL_RECIPES) consume, previously sold only by
+    // quartermaster_bree (zone3).
+    vendorItems: [
+      'handaxe',
+      'felling_axe',
+      'ironbark_axe',
+      'bronze_sickle',
+      'silverleaf_sickle',
+      'simple_fishing_pole',
+      'thorium_ore',
+      'arcanite_bar',
+      'ashwood_log',
+      'elderwood_log',
+      'goldleaf_herb',
+      'sunpetal_herb',
+    ],
+    greeting:
+      'Springs, sprockets, and sharp edges, $C: the toolworks has whatever your hands lack.',
   },
 };
 
@@ -1030,44 +1154,241 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     minLevel: 6,
     suggestedPlayers: 3,
   },
-  // Profession attunement lives with Smith Haldren after the gathering intro.
-  // Every transition is selected on acceptance, persisted with the quest, and
-  // revalidated by the authoritative turn-in effect.
-  q_archetype_acceptance: {
-    id: 'q_archetype_acceptance',
-    name: 'A Craft to Call Your Own',
-    giverNpcId: 'smith_haldren',
-    turnInNpcId: 'smith_haldren',
-    text: 'Skill is knowledge, $N, but attunement is a promise. Choose two neighboring crafts whose methods you will carry as your majors, then bring me ore worked from the Vale with your own hands.',
+  // Profession attunement (Professions 2.0): each of the four wave-one
+  // archetype pairs has its own anchor master and its own fixed-pair acceptance
+  // quest, so the masters are independent entry points (no q_prof_intro gate).
+  // The chosen pair is carried on the quest's completionEffect.pairId; the
+  // authoritative turn-in effect revalidates it before attuning. Each acceptance
+  // quest's body states the whole bargain up front (which two crafts become
+  // majors, that a hobby slot exists, that other crafts go dormant not lost, and
+  // that returning to an abandoned pair later costs an escalating make-amends
+  // task) so the choice is legible before it is made.
+  q_prof_attune_smith: {
+    id: 'q_prof_attune_smith',
+    name: "The Smith's Promise",
+    giverNpcId: 'forgemistress_darva',
+    turnInNpcId: 'forgemistress_darva',
+    text: 'Steel does not forgive a wandering hand, so I will tell you plain before you swear anything. Bind yourself to my forge and Weaponcrafting and Armorcrafting become your two majors, the only crafts you may carry past rare work. The craft across the wheel from them settles in as your hobby, worked to rare and no further. Your other trades do not burn away, $N: they simply go quiet, dormant until you call them back. And know this before the hammer falls: leave this pair for another and you will crawl back through honest labor to return to it, five foes put down the first time you come home, eight the next, eleven after that, more each time you stray. Still standing here? Then bring me three veins of ore worked from the Vale with your own hands, and we will call the promise struck.',
     completionText:
-      'The promise holds. These two crafts are now your majors, and the knowledge opposite them becomes your hobby.',
+      'Good ore, and good hands to work it. Weaponcrafting and Armorcrafting are yours to master now. Earn the rest.',
     objectives: [{ type: 'gather', nodeType: 'ore', count: 3, label: 'Ore vein harvested' }],
     xpReward: 150,
     copperReward: 0,
     itemRewards: {},
-    requiresQuest: 'q_prof_intro',
-    repeatable: true,
     shareable: false,
-    completionEffect: { type: 'attunePair', mode: 'new' },
+    completionEffect: { type: 'attunePair', mode: 'new', pairId: 'weaponcrafting+armorcrafting' },
   },
-  q_prof_make_amends: {
-    id: 'q_prof_make_amends',
-    name: 'Making Amends',
-    giverNpcId: 'smith_haldren',
-    turnInNpcId: 'smith_haldren',
-    text: 'You have carried that pair before, $N. Returning is no fresh vow. Help keep the Vale road clear, and the work will remind your hands what they once knew.',
-    completionText: 'The old rhythm returns. Your former pair is active once more.',
+  q_prof_attune_outfitter: {
+    id: 'q_prof_attune_outfitter',
+    name: "The Outfitter's Measure",
+    giverNpcId: 'weaver_ottilie',
+    turnInNpcId: 'weaver_ottilie',
+    text: 'Measure the cost before you cut, that is the first rule at my loom. Choose me and Leatherworking and Tailoring become your two majors, the pair you may carry beyond rare work; the craft opposite them settles in as your hobby, taken to rare and left there. The trades you set aside are not unravelled, $N, only folded away, dormant until you take them up again. Be certain, though: should you leave this pair and later want it back, the way home is paid in labor that lengthens each time, five culled at first, then eight, then eleven, always a little more. If your mind is made, cull four webwood spiders and bring their silk to the loom, for good thread starts every good garment.',
+    completionText:
+      'Even thread, even hand. Leatherworking and Tailoring are yours to carry as far as your skill will reach. Measure twice, and they will not fail you.',
+    objectives: [
+      { type: 'kill', targetMobId: 'webwood_spider', count: 4, label: 'Webwood Spider culled' },
+    ],
+    xpReward: 150,
+    copperReward: 0,
+    itemRewards: {},
+    shareable: false,
+    completionEffect: { type: 'attunePair', mode: 'new', pairId: 'leatherworking+tailoring' },
+  },
+  q_prof_attune_apothecary: {
+    id: 'q_prof_attune_apothecary',
+    name: 'A Recipe Worth Keeping',
+    giverNpcId: 'cook_marlow',
+    turnInNpcId: 'cook_marlow',
+    text: 'Every good dish is two flavors that belong together, and so is a good craft, $N. Sit with me and Alchemy and Cooking become your two majors, the two you may simmer past rare work; the craft on the far side of the wheel is your hobby, seasoned up to rare and no hotter. The rest of your trades keep in the pantry, dormant, not spoiled, ready whenever you fetch them back. Fair warning while the pot is still cold: wander off to another pair and coming home is a chore that grows, five beasts seen to the first time, eight the next, eleven the time after, heavier with every helping. Still hungry for it? Then hunt me four wild boars, because a kitchen worth its salt starts with good meat.',
+    completionText:
+      'Now that is a start with some meat on it. Alchemy and Cooking are yours to cook as high as you like. Come back hungry.',
+    objectives: [{ type: 'kill', targetMobId: 'wild_boar', count: 4, label: 'Wild Boar hunted' }],
+    xpReward: 150,
+    copperReward: 0,
+    itemRewards: {},
+    shareable: false,
+    completionEffect: { type: 'attunePair', mode: 'new', pairId: 'alchemy+cooking' },
+  },
+  q_prof_attune_bombardier: {
+    id: 'q_prof_attune_bombardier',
+    name: 'A Volatile Arrangement',
+    giverNpcId: 'tinker_gizzel',
+    turnInNpcId: 'tinker_gizzel',
+    text: 'Oh, oh, you want the good stuff, the loud stuff, yes? Listen, listen, before you touch anything that ticks: say the word and Engineering and Alchemy become your two majors, the only two you get to push past rare work (that is where it gets FUN, trust me). The craft opposite goes in your pocket as a hobby, rare and no further, do not pout. Your other trades? Not gone, $N, just napping, dormant, wake them whenever you like. But (there is always a but, hold the fuse) ditch this pair and waddle back later and it costs you sweat that piles up, five things put down the first time, eight the next, eleven after, more, more, every single time you get cold feet. Yes? YES? Then go pick me three patches of herbs, the volatile ones, do not ask which, they are all a little volatile if you believe hard enough.',
+    completionText:
+      'HA. Reagents, real ones, and all your fingers still attached, good, good. Engineering and Alchemy, yours, go make something that regrets it. Off you go.',
+    objectives: [{ type: 'gather', nodeType: 'herb', count: 3, label: 'Herb patch harvested' }],
+    xpReward: 150,
+    copperReward: 0,
+    itemRewards: {},
+    shareable: false,
+    completionEffect: { type: 'attunePair', mode: 'new', pairId: 'engineering+alchemy' },
+  },
+  // Make-amends returns (Professions 2.0): repeatable, one per anchor
+  // master, taken only for a pair the character has held before. The first
+  // objective's count is resolved at accept time from the character's return
+  // history (resolvedObjectiveCounts 'archetypeAmends' -> 5 + 3 * switchCount),
+  // so the authored count is only a placeholder. The turn-in effect returns the
+  // former pair to active (attunePair mode 'return').
+  q_prof_amends_smith: {
+    id: 'q_prof_amends_smith',
+    name: 'Back to the Forge',
+    giverNpcId: 'forgemistress_darva',
+    turnInNpcId: 'forgemistress_darva',
+    text: 'So you have come back to the forge. I will not pretend it does not sting, $N, but I am a fair hand and the work is fair too. You know the price of returning: labor, and more of it each time you have strayed. Put down the wolves harrying the north road, and the swing of it will remind your arms what this pair once asked of them.',
+    completionText:
+      'The rhythm is back in your hands. Weaponcrafting and Armorcrafting are your majors once more. Do not make a habit of leaving.',
     objectives: [
       { type: 'kill', targetMobId: 'forest_wolf', count: 5, label: 'Forest Wolf slain' },
     ],
     xpReward: 100,
     copperReward: 0,
     itemRewards: {},
-    requiresQuest: 'q_prof_intro',
     repeatable: true,
     shareable: false,
     resolvedObjectiveCounts: 'archetypeAmends',
-    completionEffect: { type: 'attunePair', mode: 'return' },
+    completionEffect: {
+      type: 'attunePair',
+      mode: 'return',
+      pairId: 'weaponcrafting+armorcrafting',
+    },
+  },
+  q_prof_amends_outfitter: {
+    id: 'q_prof_amends_outfitter',
+    name: 'Threads Rejoined',
+    giverNpcId: 'weaver_ottilie',
+    turnInNpcId: 'weaver_ottilie',
+    text: 'Back at my loom after all. I hold no grudge, $N, but the thread remembers a hand that let it go, and the cost of taking it up again is measured out longer each time. Cull the webwood spiders crowding the western woods, and the labor will settle your hands before they touch good silk again.',
+    completionText:
+      'Steady again. Leatherworking and Tailoring return to your hands as majors. Measure twice this time before you wander.',
+    objectives: [
+      { type: 'kill', targetMobId: 'webwood_spider', count: 5, label: 'Webwood Spider culled' },
+    ],
+    xpReward: 100,
+    copperReward: 0,
+    itemRewards: {},
+    repeatable: true,
+    shareable: false,
+    resolvedObjectiveCounts: 'archetypeAmends',
+    completionEffect: { type: 'attunePair', mode: 'return', pairId: 'leatherworking+tailoring' },
+  },
+  q_prof_amends_apothecary: {
+    id: 'q_prof_amends_apothecary',
+    name: 'Back on the Stove',
+    giverNpcId: 'cook_marlow',
+    turnInNpcId: 'cook_marlow',
+    text: 'Well, look who is back at my pot. No hard feelings, $N, a kitchen always has room, but you know the tab runs longer every time you walk out on it. Go thin the wild boars in the east meadow, because honest sweat is the first ingredient, and it will remind your hands of the work.',
+    completionText:
+      'There is the old flavor. Alchemy and Cooking are back on your stove as majors. Stay a while this time.',
+    objectives: [{ type: 'kill', targetMobId: 'wild_boar', count: 5, label: 'Wild Boar hunted' }],
+    xpReward: 100,
+    copperReward: 0,
+    itemRewards: {},
+    repeatable: true,
+    shareable: false,
+    resolvedObjectiveCounts: 'archetypeAmends',
+    completionEffect: { type: 'attunePair', mode: 'return', pairId: 'alchemy+cooking' },
+  },
+  q_prof_amends_bombardier: {
+    id: 'q_prof_amends_bombardier',
+    name: 'The Ledger Grows',
+    giverNpcId: 'tinker_gizzel',
+    turnInNpcId: 'tinker_gizzel',
+    text: 'You came BACK, ha, they always come back, the loud stuff has a pull, yes? No sulking from me, $N, but the ledger, oh the ledger, it grows every time you skip out, more each return, that is only fair. Go clear the tunnel rats out of the dig for me, sweat first, sparks later, that is the rule I just made up.',
+    completionText:
+      'THERE it is, the itch is back in your hands. Engineering and Alchemy, majors again, go on, go make a bang. Try to stay put this time, eh?',
+    objectives: [
+      { type: 'kill', targetMobId: 'tunnel_rat', count: 5, label: 'Tunnel Rat exterminated' },
+    ],
+    xpReward: 100,
+    copperReward: 0,
+    itemRewards: {},
+    repeatable: true,
+    shareable: false,
+    resolvedObjectiveCounts: 'archetypeAmends',
+    completionEffect: { type: 'attunePair', mode: 'return', pairId: 'engineering+alchemy' },
+  },
+  // Repeatable craft work orders (Professions 2.0): a master takes a
+  // stack of their craft's staple material off your hands for coin, a light
+  // economy sink on a fixed cadence (repeatCadenceTicks WORK_ORDER_CADENCE_TICKS).
+  // The collect turn-in consumes the materials (turnInQuestCore removeItem).
+  // copperReward is floor(0.5 * summed vendor sell value of the requested
+  // materials); xpReward matches the only repeatable-quest precedent in the game,
+  // the make-amends band (100), since no zone-2/3 repeatable exists to scale to.
+  q_prof_workorder_forge: {
+    id: 'q_prof_workorder_forge',
+    name: 'Forge Work Order',
+    giverNpcId: 'forgemistress_darva',
+    turnInNpcId: 'forgemistress_darva',
+    text: 'The forge always wants feeding, $N. Bring me eight lumps of copper ore and I will see you paid for the haul. No ceremony, just ore and coin.',
+    completionText:
+      'Good weight, no slag. Here is your due. The forge will be hungry again soon enough.',
+    objectives: [
+      { type: 'collect', itemId: 'copper_ore', count: 8, label: 'Copper Ore delivered' },
+    ],
+    xpReward: 100,
+    // floor(0.5 * 8 * 4) = 16 (copper_ore sellValue 4).
+    copperReward: 16,
+    itemRewards: {},
+    repeatable: true,
+    shareable: false,
+    repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
+  },
+  q_prof_workorder_kitchens: {
+    id: 'q_prof_workorder_kitchens',
+    name: 'Kitchens Work Order',
+    giverNpcId: 'cook_marlow',
+    turnInNpcId: 'cook_marlow',
+    text: 'My larder is looking thin, $N, and thin larders make grumpy cooks. Fetch me eight cuts of game meat and there is coin in it for you, plus my undying gratitude, which is worth less but tastes better.',
+    completionText:
+      'Now that is a full pantry. Here is your pay. Come back when your bags are heavy again.',
+    objectives: [{ type: 'collect', itemId: 'game_meat', count: 8, label: 'Game Meat delivered' }],
+    xpReward: 100,
+    // floor(0.5 * 8 * 4) = 16 (game_meat sellValue 4).
+    copperReward: 16,
+    itemRewards: {},
+    repeatable: true,
+    shareable: false,
+    repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
+  },
+  q_prof_workorder_loom: {
+    id: 'q_prof_workorder_loom',
+    name: 'Loom Work Order',
+    giverNpcId: 'weaver_ottilie',
+    turnInNpcId: 'weaver_ottilie',
+    text: 'The loom runs dry and idle hands waste daylight, $N. Bring me six skeins of spider silk and I will pay you a fair rate, counted out to the copper.',
+    completionText:
+      'Fine silk, evenly spun. Your coin, exactly measured. The loom thanks you, and so do I.',
+    objectives: [
+      { type: 'collect', itemId: 'spider_silk', count: 6, label: 'Spider Silk delivered' },
+    ],
+    xpReward: 100,
+    // floor(0.5 * 6 * 5) = 15 (spider_silk sellValue 5).
+    copperReward: 15,
+    itemRewards: {},
+    repeatable: true,
+    shareable: false,
+    repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
+  },
+  q_prof_workorder_toolworks: {
+    id: 'q_prof_workorder_toolworks',
+    name: 'Toolworks Work Order',
+    giverNpcId: 'tinker_gizzel',
+    turnInNpcId: 'tinker_gizzel',
+    text: 'Hafts, handles, stocks, I go through wood like it is going out of style, which it is NOT, wood is eternal, $N. Haul me eight ironbark logs and I will pay you, coin, real coin, not a favor, I promise, mostly.',
+    completionText:
+      'Perfect, perfect, straight grain, no rot. Here, your coin, see, I keep my word (mostly). Bring more when you trip over a tree.',
+    objectives: [
+      { type: 'collect', itemId: 'ironbark_log', count: 8, label: 'Ironbark Log delivered' },
+    ],
+    xpReward: 100,
+    // floor(0.5 * 8 * 4) = 16 (ironbark_log sellValue 4).
+    copperReward: 16,
+    itemRewards: {},
+    repeatable: true,
+    shareable: false,
+    repeatCadenceTicks: WORK_ORDER_CADENCE_TICKS,
   },
   q_prof_hobby_switch: {
     id: 'q_prof_hobby_switch',
@@ -1078,7 +1399,9 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     completionText:
       'A lighter choice, but a useful one. Follow that curiosity as far as rare work will take it.',
     objectives: [{ type: 'gather', nodeType: 'herb', count: 3, label: 'Herb patch harvested' }],
-    xpReward: 75,
+    // 0 XP on purpose. The hobby switch is a repeatable identity
+    // toggle; any XP on it becomes a farmable trickle, so it pays nothing.
+    xpReward: 0,
     copperReward: 0,
     itemRewards: {},
     requiresQuest: 'q_prof_intro',
@@ -1108,8 +1431,18 @@ export const ZONE1_QUEST_ORDER = [
   'q_hollow',
   'q_gravecallers_trail',
   'q_mogger',
-  'q_archetype_acceptance',
-  'q_prof_make_amends',
+  'q_prof_attune_smith',
+  'q_prof_attune_outfitter',
+  'q_prof_attune_apothecary',
+  'q_prof_attune_bombardier',
+  'q_prof_amends_smith',
+  'q_prof_amends_outfitter',
+  'q_prof_amends_apothecary',
+  'q_prof_amends_bombardier',
+  'q_prof_workorder_forge',
+  'q_prof_workorder_kitchens',
+  'q_prof_workorder_loom',
+  'q_prof_workorder_toolworks',
   'q_prof_hobby_switch',
 ];
 

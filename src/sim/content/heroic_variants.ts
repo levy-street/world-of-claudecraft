@@ -19,10 +19,14 @@ import {
   primaryStatBudget,
   QUALITY_ILVL_BONUS,
   scaleWeaponDamage,
+  TWOHAND_DPS_MULT,
+  TWOHAND_STAT_MULT,
   weaponDpsBudget,
 } from '../item_budget';
 import type { ItemDef, MobTemplate } from '../types';
+import { DUNGEON_DEFS } from './dungeons';
 import { NYTHRAXIS_RAID_BOSS_ID, NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL } from './heroic_loot';
+import { TEMPLE_DUNGEON_DEFS } from './temple';
 
 // The id of the Heroic variant of a base item (a stable, pure prefix).
 export function heroicVariantId(baseId: string): string {
@@ -83,7 +87,13 @@ function applyRaidVariantRatings(variant: ItemDef, base: ItemDef): void {
 function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LEVEL): ItemDef {
   const quality = base.quality ?? 'common';
   const targetLevel = sourceLevel + (QUALITY_ILVL_BONUS[quality] ?? 0);
-  const targetBudget = primaryStatBudget(targetLevel, base.quality, base.slot);
+  const isTwoHand = base.kind === 'weapon' && base.hand === 'twohand';
+  const handMultiplier = isTwoHand ? TWOHAND_STAT_MULT : 1;
+  // Rounded like expectedStatBudget so variant budgets stay integral under the
+  // fractional TWOHAND_STAT_MULT.
+  const targetBudget = Math.round(
+    primaryStatBudget(targetLevel, base.quality, base.slot) * handMultiplier,
+  );
   const baseBudget = base.stats
     ? PRIMARY_STATS.reduce((sum, stat) => sum + (base.stats?.[stat] ?? 0), 0)
     : 0;
@@ -94,8 +104,9 @@ function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LE
     ? normalizePrimaryStats(base.stats, Math.max(targetBudget, baseBudget))
     : base.stats;
   // Weapon damage tracks item level too: scale the base weapon to the heroic-tier
-  // dps for this variant's item level, keeping its swing speed and spread. A base
-  // weapon already above that curve retains its realized dps.
+  // dps for this variant's item level (two-handers ride TWOHAND_DPS_MULT above the
+  // one-hand line), keeping its swing speed and spread. A base weapon already above
+  // that curve retains its realized dps.
   const variant = {
     ...base,
     id: heroicVariantId(base.id),
@@ -107,9 +118,10 @@ function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LE
   };
   if (base.weapon) {
     const baseDps = (base.weapon.min + base.weapon.max) / 2 / base.weapon.speed;
+    const curveDps = weaponDpsBudget(targetLevel) * (isTwoHand ? TWOHAND_DPS_MULT : 1);
     variant.weapon = {
       ...base.weapon,
-      ...scaleWeaponDamage(base.weapon, Math.max(weaponDpsBudget(targetLevel), baseDps)),
+      ...scaleWeaponDamage(base.weapon, Math.max(curveDps, baseDps)),
     };
   }
   // Heroic RAID variants (source level 27 -> item level 33/37) get the dual rating;
@@ -120,23 +132,47 @@ function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LE
   return variant as ItemDef;
 }
 
+// The five dungeon/raid instances that have a heroic difficulty. Only mobs that
+// spawn inside one of these instances can drop a heroic-upgraded variant.
+const HEROIC_INSTANCE_IDS = new Set([
+  'hollow_crypt',
+  'sunken_bastion',
+  'drowned_temple',
+  'gravewyrm_sanctum',
+  'nythraxis_boss_arena',
+]);
+
+const HEROIC_ELIGIBLE_MOBS = new Set<string>();
+for (const def of [...Object.values(DUNGEON_DEFS), ...Object.values(TEMPLE_DUNGEON_DEFS)]) {
+  if (!HEROIC_INSTANCE_IDS.has(def.id)) continue;
+  for (const spawn of def.spawns) HEROIC_ELIGIBLE_MOBS.add(spawn.mobId);
+}
+
 // Build a Heroic variant for every epic/rare EQUIPPABLE item that drops from a mob's
-// base loot table. Vendor jewelry, quest rewards, the item-level-31 heroic set
-// (appended via HEROIC_BOSS_LOOT, never a mob-loot entry), and non-gear are excluded
-// because they never appear in a MobTemplate.loot list.
+// base loot table, but only when the mob belongs to one of the heroic instances.
+// Vendor jewelry, quest rewards, the item-level-31 heroic set (appended via
+// HEROIC_BOSS_LOOT, never a mob-loot entry), outdoor drops, and non-gear are
+// excluded because they never appear in a heroic-eligible MobTemplate.loot list.
 export function buildHeroicVariants(
   items: Record<string, ItemDef>,
   mobs: Record<string, MobTemplate>,
 ): Record<string, ItemDef> {
   const eligible = new Set<string>();
   for (const mob of Object.values(mobs)) {
+    if (!HEROIC_ELIGIBLE_MOBS.has(mob.id)) continue;
     for (const entry of mob.loot ?? []) {
       const id = entry.itemId;
       if (!id) continue;
       const def = items[id];
       if (!def || def.heroicOf) continue; // skip missing ids and already-variants
       if (def.quality !== 'epic' && def.quality !== 'rare' && def.quality !== 'legendary') continue;
-      if (!def.slot || (def.kind !== 'armor' && def.kind !== 'weapon')) continue;
+      // Equippable combat gear only: armor (incl. shields), weapons, and held
+      // offhands, so every raid-boss normal drop has a heroic-claim upgrade.
+      if (
+        !def.slot ||
+        (def.kind !== 'armor' && def.kind !== 'weapon' && def.kind !== 'held_offhand')
+      )
+        continue;
       eligible.add(id);
     }
   }

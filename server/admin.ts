@@ -12,10 +12,10 @@ import {
   listModerationActions,
   listSharedIps,
   onlineHistory,
-  overviewCounts,
   registrationsByDay,
   sessionsByDay,
 } from './admin_db';
+import { readOverviewCounts } from './admin_overview_cache';
 import {
   type AdminPermission,
   ASSIGNABLE_ADMIN_ROLES,
@@ -50,8 +50,8 @@ import {
 } from './chat_filter_db';
 import { currentDailyRewardDay } from './daily_rewards';
 import {
+  accountAndScopeForToken,
   accountById,
-  accountForToken,
   accountMailTarget,
   findAccount,
   isAdminAccount,
@@ -106,9 +106,10 @@ import {
 } from './staff_db';
 import { PgUserAssetsDb } from './user_assets_db';
 
-// Admin API: everything under /admin/api/*. Auth is a bearer token whose
-// account has at least one staff role (accounts.admin_roles; is_admin stays
-// the derived "is staff" flag): the admin.* hostname is routing, not security.
+// Admin API: everything under /admin/api/*. Auth is an exact full-scope bearer
+// token whose account has at least one staff role (accounts.admin_roles;
+// is_admin stays the derived "is staff" flag): the admin.* hostname is routing,
+// not security.
 // Authorization is per route: every route is declared with a permission in
 // admin_routes.ts and gated centrally in handleAdminApi before any handler
 // runs, so a route absent from that table can never execute.
@@ -275,8 +276,9 @@ interface AdminIdentity {
 async function adminIdentity(req: http.IncomingMessage): Promise<AdminIdentity | null> {
   const m = /^Bearer ([a-f0-9]{64})$/.exec(req.headers.authorization ?? '');
   if (!m) return null;
-  const accountId = await accountForToken(m[1]);
-  if (accountId === null) return null;
+  const account = await accountAndScopeForToken(m[1]);
+  if (account === null || account.scope !== 'full') return null;
+  const accountId = account.accountId;
   const staff = await adminRolesForAccount(accountId);
   if (staff === null) return null;
   return {
@@ -829,12 +831,13 @@ export async function handleAdminApi(
     }
 
     if (path === '/admin/api/overview') {
-      const counts = await overviewCounts();
+      const counts = await readOverviewCounts();
       const serverStats = game.adminStats();
       return ok(res, {
         ...counts,
         peakOnlineToday: Math.max(counts.peakOnlineToday, serverStats.online),
         peakOnlineAllTime: Math.max(counts.peakOnlineAllTime, serverStats.online),
+        playersCap: adminPlayersCap(),
         server: {
           ...serverStats,
           peakOnline: Math.max(
@@ -1050,15 +1053,15 @@ export async function handleAdminApi(
 //    internal throw). The happy + guard paths never reach withErrors.
 //
 //  - AUTH is the legacy-body admin gate (createRequireAdmin), mirroring
-//    adminIdentity(req) EXACTLY (v0.22.0 staff roles): bearer -> accountForToken ->
-//    staff_db.adminRolesForAccount (fail closed; no roles means not staff), a
+//    adminIdentity(req) EXACTLY (v0.22.0 staff roles): bearer -> scoped token
+//    resolver (full required) -> staff_db.adminRolesForAccount (fail closed), a
 //    uniform 401 { ...error: 'admin authentication required' } on any failure, then
 //    the CENTRAL AUTHORIZATION gate: the route's declared permission resolves from
 //    ADMIN_ROUTE_PERMISSIONS (server/admin_routes.ts) against the concrete request
 //    path, fail-closed (unmapped -> 404 'unknown admin endpoint' / 405; missing
 //    permission -> 403), mirroring the legacy handleAdminApi preamble byte-for-byte.
-//    NO read-only-scope 403 and NO moderation gate (legacy admin auth applies
-//    neither). Mounted on every route except login (anonymous by design).
+//    Read-scope tokens receive the same uniform 401 as every other invalid admin
+//    credential. No moderation gate applies. Mounted on every route except login.
 //    requireAdmin runs BEFORE the :id / :action decode, so an unauthenticated
 //    malformed request 401s exactly as legacy did (auth precedes route/method).
 //
@@ -1146,6 +1149,31 @@ function useAdminRuntime(): AdminRuntime {
   return runtime;
 }
 
+// The realm player cap for the overview. It rides its OWN tiny seam, NOT AdminRuntime:
+// AdminRuntime is a Pick<GameServer> and main.ts injects the live GameServer by value,
+// but the cap is canonicalPlayersCap() (a main.ts module function, not a GameServer
+// method), so it cannot flow through the Pick. Both overview arms read this one accessor
+// so the field stays byte-identical across the legacy and RouteDef dispatch paths (the
+// dual-arm rule). Unlike useAdminRuntime, an unconfigured read returns 0 rather than
+// throwing: 0 is the same "cap disabled" sentinel canonicalPlayersCap emits, so a wiring
+// gap degrades one cosmetic StatCard to 0 instead of failing the whole overview response.
+let playersCapSource: (() => number) | null = null;
+
+/** Inject the realm player-cap source (canonicalPlayersCap) at boot. */
+export function configureAdminPlayersCap(fn: () => number): void {
+  playersCapSource = fn;
+}
+
+/** Clear the injected cap source so a unit test can install its own. */
+export function resetAdminPlayersCapForTests(): void {
+  playersCapSource = null;
+}
+
+/** The realm player cap for the overview, or 0 when unconfigured (cap disabled). */
+function adminPlayersCap(): number {
+  return playersCapSource ? playersCapSource() : 0;
+}
+
 // The DB reads/writes (plus the login-path auth + rate-limit primitives) the admin
 // route layer needs, bundled behind a test-only setter so they can be driven with a
 // fake and no Postgres; production never calls the setter. The same functions the
@@ -1170,7 +1198,10 @@ function makeRealAdminDb() {
     listModerationActions,
     listSharedIps,
     onlineHistory,
-    overviewCounts,
+    // Cache-backed (the shared admin overview memo; both dispatch arms read it):
+    // a setAdminDbForTests override still replaces this member outright, which
+    // bypasses the cache and keeps existing fakes exact.
+    overviewCounts: readOverviewCounts,
     registrationsByDay,
     sessionsByDay,
     listBugReports,
@@ -1195,7 +1226,7 @@ function makeRealAdminDb() {
     moderationQueue,
     moderationReportsForAccount,
     muteAccountChat,
-    accountForToken,
+    accountAndScopeForToken,
     accountMailTarget,
     findAccount,
     // Target-account staff check (the "admin accounts cannot be suspended / banned /
@@ -1260,7 +1291,7 @@ export function resetAdminDbForTests(): void {
   adminDbOverride = undefined;
 }
 
-// The admin-auth gate reads its two db functions (accountForToken,
+// The admin-auth gate reads its two db functions (accountAndScopeForToken and
 // adminRolesForAccount) off the active bundle, so a setAdminDbForTests fake drives
 // it too. AdminDb is a superset of AdminAuthDb, so the getter is assignable.
 const requireAdmin = createRequireAdmin((): AdminAuthDb => adminDb());
@@ -1316,6 +1347,7 @@ async function overviewHandler(ctx: Ctx): Promise<void> {
     ...counts,
     peakOnlineToday: Math.max(counts.peakOnlineToday, serverStats.online),
     peakOnlineAllTime: Math.max(counts.peakOnlineAllTime, serverStats.online),
+    playersCap: adminPlayersCap(),
     server: {
       ...serverStats,
       peakOnline: Math.max(serverStats.peakOnline, counts.peakOnlineAllTime, serverStats.online),

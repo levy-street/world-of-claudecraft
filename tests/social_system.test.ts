@@ -826,6 +826,32 @@ describe('guilds', () => {
     expect(a).toBe(b);
   });
 
+  it('stamps the sender class on guild and officer chat, omitted with no live meta', async () => {
+    // classId rides the guild/officer relay the same way fromTitle does (the
+    // same fix, for the same interest-scope reason): actorFor(session) reads
+    // it off the LIVE sim meta in game.ts, so a test actor built without a
+    // `cls` (no live meta) omits the key, and one built with it carries it.
+    await h.svc.guildCreate(h.actor(1), 'Knights');
+    await h.svc.guildInvite(h.actor(1), 'Bet');
+    await h.svc.guildAccept(h.actor(2));
+    h.tx.clear();
+    const withClass = { ...h.actor(1), cls: 'warrior' as const };
+    expect(await h.svc.guildChat(withClass, 'hail')).toBe(true);
+    for (const id of [1, 2]) {
+      const line = h.tx.eventsFor(id).find((e) => e.type === 'chat')!;
+      expect(line.type === 'chat' && line.classId).toBe('warrior');
+    }
+    h.tx.clear();
+    expect(await h.svc.guildChat(h.actor(1), 'no live meta')).toBe(true);
+    const noMeta = h.tx.eventsFor(2).find((e) => e.type === 'chat')!;
+    expect('classId' in noMeta).toBe(false);
+    await h.svc.guildSetRank(h.actor(1), 'Bet', 'officer');
+    h.tx.clear();
+    expect(await h.svc.officerChat(withClass, 'ranks')).toBe(true);
+    const officer = h.tx.eventsFor(2).find((e) => e.type === 'chat')!;
+    expect(officer.type === 'chat' && officer.classId).toBe('warrior');
+  });
+
   it('suppresses guild chat from a player the recipient ignores', async () => {
     await h.svc.guildCreate(h.actor(1), 'Knights');
     await h.svc.guildInvite(h.actor(1), 'Bet');

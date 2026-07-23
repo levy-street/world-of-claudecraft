@@ -58,6 +58,13 @@ const LOOT_ROLL_TIMEOUT = 60;
 // refreshes the roll to a fresh LOOT_ROLL_TIMEOUT need/greed window.
 const MASTER_LOOT_TIMEOUT = 300;
 
+// Lifecycle decoupling: how long (seconds) a corpse stays open for
+// its remaining half once one half is consumed, an unclaimed harvest after the
+// loot empties (pruneCorpseLoot) or leftover loot after the harvest claim is
+// spent (harvestCorpse). Shorter than the full decay window, longer than the
+// both-halves-consumed fast collapse below.
+export const CORPSE_INTERACT_GRACE_SECONDS = 30;
+
 // The server-authoritative pending need-greed roll record. Sim-internal (the public
 // projection clients see is LootRollPrompt); the `pendingLootRolls` map lives on Sim
 // and is reached through the SimContext seam.
@@ -704,10 +711,14 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
       ctx.emit({ type: 'loot', text: `Everyone passed on [[i:${roll.itemId}]].`, pid });
     return;
   }
-  // Reveal every roll, classic-style: one loot line per need/greed roller so the
-  // whole group can audit the outcome (passes were already visible live via
-  // lootRollGroupStatus and have no number to reveal).
-  for (const entry of entries) {
+  // Reveal one loot line per CONTENDING roller only: when anyone needed, need
+  // beats greed, so the greed numbers cannot affect the outcome and revealing
+  // them is noise. Nothing is hidden that matters: every choice (need, greed,
+  // pass) was already visible live via lootRollGroupStatus while the roll was
+  // open, and the winner line below still closes the roll. With no needers the
+  // greed rolls are the contest and all of them are revealed as before (passes
+  // have no number to reveal).
+  for (const entry of contenders) {
     const rollerName =
       ctx.players.get(entry.pid)?.name ?? roll.candidateNames.get(entry.pid) ?? 'Unknown';
     for (const pid of partyMembersForRoll(roll)) {
@@ -778,7 +789,7 @@ export function lootSlotVisibleTo(slot: LootSlot, pid: number): boolean {
   return slot.openToAll || !slot.personalFor || slot.personalFor.includes(pid);
 }
 
-function hasPendingLootRollForMob(ctx: SimContext, mobId: number): boolean {
+export function hasPendingLootRollForMob(ctx: SimContext, mobId: number): boolean {
   return [...ctx.pendingLootRolls.values()].some((roll) => roll.mobId === mobId);
 }
 
@@ -795,6 +806,16 @@ export function pruneCorpseLoot(ctx: SimContext, mob: Entity): void {
       return;
     }
     mob.loot = null;
+    // An emptied corpse that still owes an unclaimed harvest stays
+    // open for a short grace window (empty loot rows plus the picker; the
+    // respawn gate in mob/locomotion.ts collapses it at corpseTimer 0). Only
+    // a corpse with both halves consumed, or no harvest half at all, takes
+    // the fast arm.
+    if (MOBS[mob.templateId]?.componentTags?.length && mob.harvestClaimedBy === null) {
+      mob.lootable = true;
+      mob.corpseTimer = Math.min(mob.corpseTimer, CORPSE_INTERACT_GRACE_SECONDS);
+      return;
+    }
     mob.lootable = false;
     mob.corpseTimer = Math.min(mob.corpseTimer, 4);
   }

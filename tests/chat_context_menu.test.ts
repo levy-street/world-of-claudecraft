@@ -279,6 +279,16 @@ describe('self player context menu', () => {
     expect(leader.map((action) => action.id)).toContain('convert-raid');
     expect(leader.map((action) => action.id)).toContain('dungeon-difficulty');
   });
+
+  it('pins the exact portrait menu for a grouped non-leader', () => {
+    expect(
+      selfPlayerContextActions({
+        ...SELF_BASE,
+        inParty: true,
+        partySize: 3,
+      }).map((action) => action.id),
+    ).toEqual(['loot-settings', 'leave-party', 'close']);
+  });
 });
 
 // The streamer links are operator-entered text that ends up in window.open on every

@@ -78,7 +78,7 @@ describe('dungeon finder view core', () => {
   });
 
   it('lists every catalogued activity with strict level eligibility', () => {
-    const view = live(buildDungeonFinderView(input({ playerLevel: 8 })));
+    const view = live(buildDungeonFinderView(input({ playerLevel: 8, specRole: 'tank' })));
     expect(view.rows.map((r) => r.id)).toEqual(FINDER_ACTIVITIES.map((a) => a.id));
     const byId = new Map(view.rows.map((r) => [r.id, r]));
     expect(byId.get('hollow_crypt_normal')?.eligible).toBe(true);
@@ -86,10 +86,15 @@ describe('dungeon finder view core', () => {
     expect(byId.get('nythraxis_boss_arena_normal')?.blocked).toBe('level');
   });
 
-  it('flags the missing-spec gate at level 10+ and closes Quick Match', () => {
+  it('flags the missing-spec gate at level 5+ and closes Quick Match', () => {
     const view = live(buildDungeonFinderView(input({ playerLevel: 20, specRole: null })));
     expect(view.queue.needsSpec).toBe(true);
     expect(view.rows.find((r) => r.id === 'hollow_crypt_heroic')?.blocked).toBe('spec');
+    // The gate starts exactly at the spec unlock (level 5); level 4 is free of it.
+    const atFive = live(buildDungeonFinderView(input({ playerLevel: 5, specRole: null })));
+    expect(atFive.queue.needsSpec).toBe(true);
+    const atFour = live(buildDungeonFinderView(input({ playerLevel: 4, specRole: null })));
+    expect(atFour.queue.needsSpec).toBe(false);
   });
 
   it('selects the first activity by default and honors an explicit selection', () => {
@@ -185,7 +190,9 @@ describe('dungeon finder view core', () => {
 
   it('derives Quick Match state: staged checklist, leader gate, and canQueue', () => {
     const staged = live(
-      buildDungeonFinderView(input({ tab: 'queue', stagedActivityIds: ['hollow_crypt_normal'] })),
+      buildDungeonFinderView(
+        input({ tab: 'queue', specRole: 'tank', stagedActivityIds: ['hollow_crypt_normal'] }),
+      ),
     );
     expect(staged.queue.options.find((o) => o.id === 'hollow_crypt_normal')?.checked).toBe(true);
     expect(staged.queue.canQueue).toBe(true);
@@ -194,6 +201,7 @@ describe('dungeon finder view core', () => {
       buildDungeonFinderView(
         input({
           tab: 'queue',
+          specRole: 'tank',
           stagedActivityIds: ['hollow_crypt_normal'],
           party: { leader: 99, size: 2 },
         }),
@@ -206,6 +214,7 @@ describe('dungeon finder view core', () => {
       buildDungeonFinderView(
         input({
           tab: 'queue',
+          specRole: 'tank',
           info: makeInfo('sim', { queue: { activities: ['hollow_crypt_normal'], waited: 42 } }),
         }),
       ),
@@ -252,7 +261,9 @@ describe('dungeon finder view core', () => {
       members: [{ cls: 'warrior' as const, level: 8, role: 'tank' as const }],
     };
     // A tank-only viewer cannot fill the open slots.
-    const tankView = live(buildDungeonFinderView(input({ tab: 'board', board: [listing] })));
+    const tankView = live(
+      buildDungeonFinderView(input({ tab: 'board', specRole: 'tank', board: [listing] })),
+    );
     expect(tankView.board.listings[0].canApply).toBe(false);
     // A dps-capable viewer can.
     const dpsView = live(
@@ -262,6 +273,7 @@ describe('dungeon finder view core', () => {
           board: [listing],
           info: makeInfo('sim', { roles: ['dps'], eligibleRoles: ['dps'] }),
           playerClass: 'mage',
+          specRole: 'dps',
         }),
       ),
     );
@@ -274,6 +286,7 @@ describe('dungeon finder view core', () => {
           board: [listing],
           info: makeInfo('sim', { roles: ['dps'], myApplication: { listingId: 99 } }),
           playerClass: 'mage',
+          specRole: 'dps',
         }),
       ),
     );

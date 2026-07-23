@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { CRAFTING_HUB_MIN_LEVEL, CRAFTING_HUB_POS } from '../src/sim/content/professions';
+import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
 import {
   CASTER_HUB_RECIPES,
   COMBO_RECIPES,
   COMMON_RECIPES,
+  LADDER_RECIPES,
   recipeById,
   TOOL_RECIPES,
 } from '../src/sim/content/recipes';
@@ -14,6 +15,7 @@ import {
   resolveCraftForRecipe,
 } from '../src/sim/professions/crafting';
 import { MASTERWORK_CHANCE_CAP } from '../src/sim/professions/masterwork';
+import { stationsOfType } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import type { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
@@ -24,6 +26,19 @@ function makeSim(seed = 42) {
 
 function grantItem(sim: Sim, itemId: string, count: number, pid: number) {
   for (let i = 0; i < count; i++) sim.addItem(itemId, 1, pid);
+}
+
+// Station-bound recipes gate on POSITION only (the old level-20 hub
+// arm retired), so a harness just walks the player onto the recipe's station
+// (the STATIONS record, so a content re-placement can never strand this).
+function placeAtStationFor(sim: Sim, pid: number, recipeId: string) {
+  const stationType = recipeById(recipeId)?.stationType;
+  if (!stationType) throw new Error(`${recipeId} is not station-bound`);
+  const station = stationsOfType(stationType)[0];
+  const entity = (sim as any).entities.get(pid);
+  entity.pos.x = station.pos.x;
+  entity.pos.z = station.pos.z;
+  entity.prevPos = { ...entity.pos };
 }
 
 describe('recipe content (#1127)', () => {
@@ -63,14 +78,10 @@ describe('TOOL_RECIPES (#1135 de-stub): tier 4/5 tool recipes', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_thorium_mining_pick')!;
-    // #1297: TOOL_RECIPES are station-bound, so this recipe now also requires
-    // presence at the level-20 crafting hub (see professions_crafting_hub.test.ts
-    // for the gate's own dedicated coverage).
-    sim.setPlayerLevel(CRAFTING_HUB_MIN_LEVEL);
-    const entity = (sim as any).entities.get(pid);
-    entity.pos.x = CRAFTING_HUB_POS.x;
-    entity.pos.z = CRAFTING_HUB_POS.z;
-    entity.prevPos = { ...entity.pos };
+    // TOOL_RECIPES are station-bound (toolworks), so this recipe
+    // requires standing at that station; there is NO level arm anymore (see
+    // professions_crafting_hub.test.ts for the gate's dedicated coverage).
+    placeAtStationFor(sim, pid, recipe.id);
     grantItem(sim, 'thorium_ore', 4, pid);
     grantItem(sim, 'mithril_mining_pick', 1, pid);
 
@@ -97,16 +108,18 @@ describe('caster-stat (int/spi) crafting recipes', () => {
     expect(professionIds).toEqual(['armorcrafting', 'leatherworking', 'tailoring']);
     for (const recipe of casterCommon) {
       expect(recipe.skillReq).toBe(0);
-      expect(recipe.requiresHubStation).toBeUndefined();
+      expect(recipe.stationType).toBeUndefined();
     }
   });
 
-  it('CASTER_HUB_RECIPES defines one hub-gated int/spi piece per tailoring/leatherworking/armorcrafting', () => {
+  it('CASTER_HUB_RECIPES defines one station-bound int/spi piece per tailoring/leatherworking/armorcrafting', () => {
     expect(CASTER_HUB_RECIPES.length).toBe(3);
     const professionIds = CASTER_HUB_RECIPES.map((r) => r.professionId).sort();
     expect(professionIds).toEqual(['armorcrafting', 'leatherworking', 'tailoring']);
     for (const recipe of CASTER_HUB_RECIPES) {
-      expect(recipe.requiresHubStation).toBe(true);
+      // Each piece is bound to ITS OWN craft's station type
+      // (loom/tannery/forge), never someone else's.
+      expect(recipe.stationType).toBe(STATION_TYPE_BY_CRAFT[recipe.professionId]);
       expect(recipe.skillReq).toBeGreaterThan(0);
       expect(recipe.reagents.length).toBeGreaterThan(0);
     }
@@ -127,26 +140,28 @@ describe('caster-stat (int/spi) crafting recipes', () => {
     const recipe = recipeById('recipe_eastbrook_ritual_vestments')!;
     grantItem(sim, 'linen_scrap', 3, pid);
     grantItem(sim, 'spider_leg', 1, pid);
+    // The vestments recipe gained cloth and thread volume.
+    grantItem(sim, 'homespun_cloth', 3, pid);
+    grantItem(sim, 'spool_of_thread', 5, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
     expect(result.ok).toBe(true);
     expect(sim.countItem('linen_scrap', pid)).toBe(0);
     expect(sim.countItem('spider_leg', pid)).toBe(0);
+    expect(sim.countItem('homespun_cloth', pid)).toBe(0);
+    expect(sim.countItem('spool_of_thread', pid)).toBe(0);
     expect(sim.countItem('eastbrook_ritual_vestments', pid)).toBe(1);
   });
 
-  it('crafts the hub-tier armorcrafting caster piece once station-gated and reagents held', () => {
+  it('crafts the station-tier armorcrafting caster piece once at the forge with reagents held', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_sootscale_mantle')!;
-    sim.setPlayerLevel(CRAFTING_HUB_MIN_LEVEL);
-    const entity = (sim as any).entities.get(pid);
-    entity.pos.x = CRAFTING_HUB_POS.x;
-    entity.pos.z = CRAFTING_HUB_POS.z;
-    entity.prevPos = { ...entity.pos };
-    grantItem(sim, 'thorium_ore', 4, pid);
-    grantItem(sim, 'bone_fragments', 2, pid);
+    placeAtStationFor(sim, pid, recipe.id);
+    // Reagent volume rework outcome (osmium plus flux volume).
+    grantItem(sim, 'thorium_ore', 7, pid);
+    grantItem(sim, 'smithing_flux', 5, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
@@ -219,14 +234,17 @@ describe('resolveCraft (#1127)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_eastbrook_arming_sword')!;
-    grantItem(sim, 'bone_fragments', 2, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    // Reworked reagents (fang-hilted sword).
+    grantItem(sim, 'wolf_fang', 2, pid);
+    grantItem(sim, 'bone_fragments', 4, pid);
+    grantItem(sim, 'smithing_flux', 6, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
     expect(result.ok).toBe(true);
+    expect(sim.countItem('wolf_fang', pid)).toBe(0);
     expect(sim.countItem('bone_fragments', pid)).toBe(0);
-    expect(sim.countItem('linen_scrap', pid)).toBe(0);
+    expect(sim.countItem('smithing_flux', pid)).toBe(0);
     expect(sim.countItem('eastbrook_arming_sword', pid)).toBe(1);
   });
 
@@ -234,17 +252,19 @@ describe('resolveCraft (#1127)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_eastbrook_arming_sword')!;
-    // One bone_fragments short of the required 2.
-    grantItem(sim, 'bone_fragments', 1, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    // One wolf_fang short of the required 2; the other reagents held in full.
+    grantItem(sim, 'wolf_fang', 1, pid);
+    grantItem(sim, 'bone_fragments', 4, pid);
+    grantItem(sim, 'smithing_flux', 6, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
     expect(result.ok).toBe(false);
     expect(result.reason).toBe('insufficient_materials');
-    // Partial consumption never happens: both reagents untouched.
-    expect(sim.countItem('bone_fragments', pid)).toBe(1);
-    expect(sim.countItem('linen_scrap', pid)).toBe(1);
+    // Partial consumption never happens: every reagent untouched.
+    expect(sim.countItem('wolf_fang', pid)).toBe(1);
+    expect(sim.countItem('bone_fragments', pid)).toBe(4);
+    expect(sim.countItem('smithing_flux', pid)).toBe(6);
     expect(sim.countItem('eastbrook_arming_sword', pid)).toBe(0);
   });
 
@@ -252,15 +272,17 @@ describe('resolveCraft (#1127)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_eastbrook_arming_sword')!;
-    // Held bone_fragments (reagents[0]) in full, short on linen_scrap (reagents[1]).
-    grantItem(sim, 'bone_fragments', 2, pid);
+    // Held the earlier reagents in full, short on smithing_flux (the last one).
+    grantItem(sim, 'wolf_fang', 2, pid);
+    grantItem(sim, 'bone_fragments', 4, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
     expect(result.ok).toBe(false);
     expect(result.reason).toBe('insufficient_materials');
-    expect(sim.countItem('bone_fragments', pid)).toBe(2);
-    expect(sim.countItem('linen_scrap', pid)).toBe(0);
+    expect(sim.countItem('wolf_fang', pid)).toBe(2);
+    expect(sim.countItem('bone_fragments', pid)).toBe(4);
+    expect(sim.countItem('smithing_flux', pid)).toBe(0);
     expect(sim.countItem('eastbrook_arming_sword', pid)).toBe(0);
   });
 
@@ -311,7 +333,7 @@ describe('resolveCraft (#1127)', () => {
     // Same seed, same scenario: the full CraftResult (masterwork proc outcome
     // included) must be identical across runs.
     expect(a).toEqual(b);
-    // Phase 2: quality reports the OUTPUT DEF quality, a static fact of the
+    // Quality reports the OUTPUT DEF quality, a static fact of the
     // def (tough_jerky's def is common), identical for every craft of the
     // recipe at any seed.
     expect(a.quality).toBe('common');
@@ -353,7 +375,7 @@ describe('resolveCraft (#1127)', () => {
     rng.setObserver(null);
 
     expect(result.ok).toBe(true);
-    // Phase 2: the output quality no longer rolls; it is the def's own static
+    // The output quality no longer rolls; it is the def's own static
     // quality (tough_jerky: common), whatever the seed.
     expect(result.quality).toBe('common');
     // Exactly one draw per successful craft: the masterwork proc roll, held at
@@ -367,10 +389,10 @@ describe('craftItem command (#1127)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     grantItem(sim, 'spider_leg', 1, pid);
-    sim.craftItem('recipe_tough_jerky', pid);
+    sim.craftItem('recipe_tough_jerky', false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     expect(sim.lastCraftResult?.itemId).toBe('tough_jerky');
-    // Phase 2: quality is the OUTPUT DEF quality (tough_jerky: common), and a
+    // Quality is the OUTPUT DEF quality (tough_jerky: common), and a
     // plain deterministic craft never carries the masterwork flag.
     expect(sim.lastCraftResult?.quality).toBe('common');
     expect(sim.lastCraftResult?.masterwork).toBeUndefined();
@@ -379,14 +401,21 @@ describe('craftItem command (#1127)', () => {
 
   it('the IWorld recipeList read surface exposes every recipe, common, tool, and combo alike (#1132 review)', () => {
     const sim = makeSim();
-    const allIds = [...COMMON_RECIPES, ...TOOL_RECIPES, ...CASTER_HUB_RECIPES, ...COMBO_RECIPES]
+    const allIds = [
+      ...COMMON_RECIPES,
+      ...TOOL_RECIPES,
+      ...CASTER_HUB_RECIPES,
+      ...COMBO_RECIPES,
+      ...LADDER_RECIPES,
+    ]
       .map((r) => r.id)
       .sort();
     expect(sim.recipeList.length).toBe(
       COMMON_RECIPES.length +
         TOOL_RECIPES.length +
         CASTER_HUB_RECIPES.length +
-        COMBO_RECIPES.length,
+        COMBO_RECIPES.length +
+        LADDER_RECIPES.length,
     );
     expect(sim.recipeList.map((r) => r.id).sort()).toEqual(allIds);
   });
@@ -394,7 +423,7 @@ describe('craftItem command (#1127)', () => {
   it('denies a craft with an error event and leaves lastCraftResult reflecting the denial', () => {
     const sim = makeSim();
     const pid = sim.playerId;
-    sim.craftItem('recipe_tough_jerky', pid);
+    sim.craftItem('recipe_tough_jerky', false, pid);
     expect(sim.lastCraftResult?.ok).toBe(false);
     expect(sim.lastCraftResult?.reason).toBe('insufficient_materials');
   });
@@ -408,21 +437,25 @@ describe('self-gathered crafting bonus (#1145)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const meta = (sim as any).players.get(pid);
-    const recipe = recipeById('recipe_eastbrook_arming_sword')!; // needs bone_fragments x2, linen_scrap x1
+    // Reagents: wolf_fang x2, bone_fragments x4, smithing_flux x6.
+    const recipe = recipeById('recipe_eastbrook_arming_sword')!;
     // One self-signed bone_fragments (stamped with this player's own name) plus
-    // one plain bone_fragments: normally 2 would be required, the bonus drops it to 1.
+    // two plain bone_fragments: normally 4 would be required, the bonus drops
+    // it to 3; the other reagents are held in full.
     sim.addItemInstance('bone_fragments', { signer: meta.name }, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    grantItem(sim, 'bone_fragments', 2, pid);
+    grantItem(sim, 'wolf_fang', 2, pid);
+    grantItem(sim, 'smithing_flux', 6, pid);
 
     expect(hasRecipeMaterials((sim as any).ctx, recipe, pid)).toBe(true);
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
     expect(result.ok).toBe(true);
     expect(result.selfSignedBonusApplied).toBe(true);
-    // The single signed copy (the only bone_fragments held) was consumed as
-    // part of satisfying the reduced (1-unit) requirement.
+    // The signed copy plus both plain copies (the reduced 3-unit requirement)
+    // were all consumed.
     expect(sim.countItem('bone_fragments', pid)).toBe(0);
-    expect(sim.countItem('linen_scrap', pid)).toBe(0);
+    expect(sim.countItem('wolf_fang', pid)).toBe(0);
     expect(sim.countItem('eastbrook_arming_sword', pid)).toBe(1);
   });
 
@@ -432,9 +465,11 @@ describe('self-gathered crafting bonus (#1145)', () => {
     const recipe = recipeById('recipe_eastbrook_arming_sword')!;
     // Signed by someone else: does not count toward the crafter's own bonus.
     sim.addItemInstance('bone_fragments', { signer: 'SomeoneElse' }, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    grantItem(sim, 'bone_fragments', 2, pid);
+    grantItem(sim, 'wolf_fang', 2, pid);
+    grantItem(sim, 'smithing_flux', 6, pid);
 
-    // Still short: only 1 of the required 2 bone_fragments (no bonus reduction).
+    // Still short: only 3 of the required 4 bone_fragments (no bonus reduction).
     expect(hasRecipeMaterials((sim as any).ctx, recipe, pid)).toBe(false);
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
     expect(result.ok).toBe(false);
@@ -446,8 +481,9 @@ describe('self-gathered crafting bonus (#1145)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_eastbrook_arming_sword')!;
-    grantItem(sim, 'bone_fragments', 2, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    grantItem(sim, 'wolf_fang', 2, pid);
+    grantItem(sim, 'bone_fragments', 4, pid);
+    grantItem(sim, 'smithing_flux', 6, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
     expect(result.ok).toBe(true);
@@ -504,7 +540,7 @@ describe('tiered mastery gating (#1128)', () => {
     expect(gained).toBeLessThan(1);
   });
 
-  it('crafting two or more tiers below capability grants zero skill progress', () => {
+  it('crafting two tiers below capability grants the minimal trickle; three or more grants zero', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     // Set weaponcrafting as the active archetype so its empowerment ceiling (#1129/#1203) is
@@ -518,28 +554,39 @@ describe('tiered mastery gating (#1128)', () => {
 
     expect(result.ok).toBe(true);
     const meta = (sim as any).players.get(pid);
-    expect(meta.craftSkills.weaponcrafting).toBe(75);
+    // Two tiers below capability: the green minimal state, 75 + 0.25.
+    expect(meta.craftSkills.weaponcrafting).toBe(75.25);
+
+    // Three tiers below (skill 100, tier-4 capability vs the tier-1 recipe)
+    // is gray: zero progress.
+    setSkill(sim, pid, 'weaponcrafting', 100);
+    grantItem(sim, 'bone_fragments', 1, pid);
+    expect(resolveCraftForRecipe((sim as any).ctx, pid, tier1Recipe).ok).toBe(true);
+    expect(meta.craftSkills.weaponcrafting).toBe(100);
   });
 
-  it('common-tier crafting always grants its full floor, regardless of capability', () => {
+  it('common-tier crafting rides the same mastery curve: the tier-0 free floor is retired', () => {
     const lowCapSim = makeSim();
     const lowPid = lowCapSim.playerId;
     grantItem(lowCapSim, 'spider_leg', 1, lowPid);
     const commonRecipe = recipeById('recipe_tough_jerky')!;
     expect(commonRecipe.skillReq).toBe(0);
 
+    // At capability tier 0 a common recipe is still orange: the full point.
     resolveCraftForRecipe((lowCapSim as any).ctx, lowPid, commonRecipe);
     const lowMeta = (lowCapSim as any).players.get(lowPid);
     expect(lowMeta.craftSkills.cooking).toBe(1);
 
+    // At tier-4 capability the same common recipe is gray: zero progress
+    // (this arm pinned the retired free floor's 101).
     const highCapSim = makeSim();
     const highPid = highCapSim.playerId;
-    setSkill(highCapSim, highPid, 'cooking', 100); // high tier capability
+    setSkill(highCapSim, highPid, 'cooking', 100);
     grantItem(highCapSim, 'spider_leg', 1, highPid);
 
     resolveCraftForRecipe((highCapSim as any).ctx, highPid, commonRecipe);
     const highMeta = (highCapSim as any).players.get(highPid);
-    expect(highMeta.craftSkills.cooking).toBe(101); // still the full floor point
+    expect(highMeta.craftSkills.cooking).toBe(100);
   });
 });
 
@@ -574,8 +621,13 @@ describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
     sim.acceptArchetypeQuest('armorcrafting');
     setSkill(sim, pid, 'armorcrafting', 25);
     setSkill(sim, pid, 'weaponcrafting', 25);
-    grantItem(sim, 'bone_fragments', 4, pid);
-    grantItem(sim, 'linen_scrap', 2, pid);
+    // Acquisition switch: combo recipes are trainer-taught, so the
+    // fresh test player learns this one explicitly before crafting it.
+    (sim as any).players.get(pid).knownRecipes.add(comboRecipe.id);
+    grantItem(sim, 'arcanite_bar', 1, pid);
+    grantItem(sim, 'thorium_ore', 5, pid);
+    grantItem(sim, 'wolf_fang', 4, pid);
+    grantItem(sim, 'smithing_flux', 2, pid);
 
     const result = resolveCraftForRecipe((sim as any).ctx, pid, comboRecipe);
 
@@ -590,8 +642,10 @@ describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
     setSkill(sim, pid, 'armorcrafting', 100); // craftA very high
     setSkill(sim, pid, 'weaponcrafting', 0); // craftB missing entirely
     setSkill(sim, pid, 'cooking', 100); // unrelated craft, also very high
-    grantItem(sim, 'bone_fragments', 4, pid);
-    grantItem(sim, 'linen_scrap', 2, pid);
+    grantItem(sim, 'arcanite_bar', 1, pid);
+    grantItem(sim, 'thorium_ore', 5, pid);
+    grantItem(sim, 'wolf_fang', 4, pid);
+    grantItem(sim, 'smithing_flux', 2, pid);
 
     let draws = 0;
     const rng: Rng = (sim as any).ctx.rng;
@@ -608,8 +662,10 @@ describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
     // the draw can never migrate ahead of admission unnoticed.
     expect(draws).toBe(0);
     // Denied with no side effect: reagents untouched, no item granted.
-    expect(sim.countItem('bone_fragments', pid)).toBe(4);
-    expect(sim.countItem('linen_scrap', pid)).toBe(2);
+    expect(sim.countItem('arcanite_bar', pid)).toBe(1);
+    expect(sim.countItem('thorium_ore', pid)).toBe(5);
+    expect(sim.countItem('wolf_fang', pid)).toBe(4);
+    expect(sim.countItem('smithing_flux', pid)).toBe(2);
     expect(sim.countItem(comboRecipe.resultItemId, pid)).toBe(0);
   });
 
@@ -619,8 +675,10 @@ describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
     // No skill at all in either required craft; sky-high skill in a third,
     // unrelated craft never substitutes for either half of the pair.
     setSkill(sim, pid, 'cooking', 200);
-    grantItem(sim, 'bone_fragments', 4, pid);
-    grantItem(sim, 'linen_scrap', 2, pid);
+    grantItem(sim, 'arcanite_bar', 1, pid);
+    grantItem(sim, 'thorium_ore', 5, pid);
+    grantItem(sim, 'wolf_fang', 4, pid);
+    grantItem(sim, 'smithing_flux', 2, pid);
 
     const result = resolveCraftForRecipe((sim as any).ctx, pid, comboRecipe);
 
@@ -633,8 +691,10 @@ describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
     const pid = sim.playerId;
     setSkill(sim, pid, 'armorcrafting', 25); // meets minTier 1
     setSkill(sim, pid, 'weaponcrafting', 24); // one point short of tier 1
-    grantItem(sim, 'bone_fragments', 4, pid);
-    grantItem(sim, 'linen_scrap', 2, pid);
+    grantItem(sim, 'arcanite_bar', 1, pid);
+    grantItem(sim, 'thorium_ore', 5, pid);
+    grantItem(sim, 'wolf_fang', 4, pid);
+    grantItem(sim, 'smithing_flux', 2, pid);
 
     const result = resolveCraftForRecipe((sim as any).ctx, pid, comboRecipe);
 
@@ -646,10 +706,12 @@ describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     setSkill(sim, pid, 'armorcrafting', 25);
-    grantItem(sim, 'bone_fragments', 4, pid);
-    grantItem(sim, 'linen_scrap', 2, pid);
+    grantItem(sim, 'arcanite_bar', 1, pid);
+    grantItem(sim, 'thorium_ore', 5, pid);
+    grantItem(sim, 'wolf_fang', 4, pid);
+    grantItem(sim, 'smithing_flux', 2, pid);
 
-    sim.craftItem(comboRecipe.id, pid);
+    sim.craftItem(comboRecipe.id, false, pid);
 
     expect(sim.lastCraftResult?.ok).toBe(false);
     expect(sim.lastCraftResult?.reason).toBe('combo_requirement_unmet');
@@ -664,21 +726,25 @@ describe('self-gathered crafting bonus (#1145)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const meta = (sim as any).players.get(pid);
-    const recipe = recipeById('recipe_eastbrook_arming_sword')!; // needs bone_fragments x2, linen_scrap x1
+    // Reagents: wolf_fang x2, bone_fragments x4, smithing_flux x6.
+    const recipe = recipeById('recipe_eastbrook_arming_sword')!;
     // One self-signed bone_fragments (stamped with this player's own name) plus
-    // one plain bone_fragments: normally 2 would be required, the bonus drops it to 1.
+    // two plain bone_fragments: normally 4 would be required, the bonus drops
+    // it to 3; the other reagents are held in full.
     sim.addItemInstance('bone_fragments', { signer: meta.name }, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    grantItem(sim, 'bone_fragments', 2, pid);
+    grantItem(sim, 'wolf_fang', 2, pid);
+    grantItem(sim, 'smithing_flux', 6, pid);
 
     expect(hasRecipeMaterials((sim as any).ctx, recipe, pid)).toBe(true);
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
 
     expect(result.ok).toBe(true);
     expect(result.selfSignedBonusApplied).toBe(true);
-    // The single signed copy (the only bone_fragments held) was consumed as
-    // part of satisfying the reduced (1-unit) requirement.
+    // The signed copy plus both plain copies (the reduced 3-unit requirement)
+    // were all consumed.
     expect(sim.countItem('bone_fragments', pid)).toBe(0);
-    expect(sim.countItem('linen_scrap', pid)).toBe(0);
+    expect(sim.countItem('wolf_fang', pid)).toBe(0);
     expect(sim.countItem('eastbrook_arming_sword', pid)).toBe(1);
   });
 
@@ -688,9 +754,11 @@ describe('self-gathered crafting bonus (#1145)', () => {
     const recipe = recipeById('recipe_eastbrook_arming_sword')!;
     // Signed by someone else: does not count toward the crafter's own bonus.
     sim.addItemInstance('bone_fragments', { signer: 'SomeoneElse' }, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    grantItem(sim, 'bone_fragments', 2, pid);
+    grantItem(sim, 'wolf_fang', 2, pid);
+    grantItem(sim, 'smithing_flux', 6, pid);
 
-    // Still short: only 1 of the required 2 bone_fragments (no bonus reduction).
+    // Still short: only 3 of the required 4 bone_fragments (no bonus reduction).
     expect(hasRecipeMaterials((sim as any).ctx, recipe, pid)).toBe(false);
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
     expect(result.ok).toBe(false);
@@ -722,8 +790,9 @@ describe('self-gathered crafting bonus (#1145)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     const recipe = recipeById('recipe_eastbrook_arming_sword')!;
-    grantItem(sim, 'bone_fragments', 2, pid);
-    grantItem(sim, 'linen_scrap', 1, pid);
+    grantItem(sim, 'wolf_fang', 2, pid);
+    grantItem(sim, 'bone_fragments', 4, pid);
+    grantItem(sim, 'smithing_flux', 6, pid);
 
     const result = resolveCraft((sim as any).ctx, pid, recipe.id);
     expect(result.ok).toBe(true);
@@ -741,7 +810,7 @@ describe('craft-completion event carries audio-relevant data (#1729)', () => {
     sim.drainEvents();
     // The coordinator command (not the pure resolveCraft) is what emits the
     // craftResult event the client hooks audio onto.
-    sim.craftItem('recipe_tough_jerky', pid);
+    sim.craftItem('recipe_tough_jerky', false, pid);
     const craft = sim.drainEvents().find((e) => e.type === 'craftResult');
     if (craft?.type !== 'craftResult') throw new Error('expected a craftResult event');
     expect(craft.ok).toBe(true);
@@ -749,7 +818,7 @@ describe('craft-completion event carries audio-relevant data (#1729)', () => {
     // the crafter (delivered-to-acting-player acceptance criterion).
     expect(craft.pid).toBe(pid);
     // quality is present on a completed craft so the client can distinguish a
-    // rare-def result from a common one for a special cue. Phase 2: this is
+    // rare-def result from a common one for a special cue. This is
     // the OUTPUT DEF quality (tough_jerky's def is common), a static fact of
     // the def, so this exact value is seed-independent.
     expect(craft.quality).toBe('common');
@@ -762,7 +831,7 @@ describe('craft-completion event carries audio-relevant data (#1729)', () => {
     const pid = sim.playerId;
     // No materials granted: the insufficient_materials denial path.
     sim.drainEvents();
-    sim.craftItem('recipe_tough_jerky', pid);
+    sim.craftItem('recipe_tough_jerky', false, pid);
     const craft = sim.drainEvents().find((e) => e.type === 'craftResult');
     if (craft?.type !== 'craftResult') throw new Error('expected a craftResult event');
     expect(craft.ok).toBe(false);
@@ -771,13 +840,13 @@ describe('craft-completion event carries audio-relevant data (#1729)', () => {
   });
 });
 
-// Professions 2.0 Phase 2: the masterwork proc model. Craft outputs are
+// Professions 2.0: the masterwork proc model. Craft outputs are
 // deterministic (quality is the OUTPUT DEF quality, pinned above); the single
 // remaining output-side rng draw is the masterwork proc roll. These cases pin
 // the proc surface end to end: the CraftResult/craftResult-event flag, the
 // minted instance payload, the masterwork SimEvent, and the lastMasterwork
 // read surface, plus the miss arm's plain deterministic grant.
-describe('masterwork proc (Professions 2.0 Phase 2)', () => {
+describe('masterwork proc (Professions 2.0)', () => {
   // A maximum-chance scenario: tailoring as the active archetype (a MAJOR
   // craft, so the empowerment ceiling is unlimited), skill 200 (tier 8, far
   // above the recipe's tier 0), and a self-signed consumed reagent, so the
@@ -797,6 +866,10 @@ describe('masterwork proc (Professions 2.0 Phase 2)', () => {
     // for the proc-chance input.
     sim.addItemInstance('linen_scrap', { signer: meta.name }, pid);
     sim.addItem('spider_leg', 1, pid);
+    // Cloth and thread volume (discounted 2 and 4 needed;
+    // full counts granted, surplus is inert for these seam assertions).
+    sim.addItem('homespun_cloth', 3, pid);
+    sim.addItem('spool_of_thread', 5, pid);
     return { sim, pid, meta };
   }
 
@@ -811,7 +884,7 @@ describe('masterwork proc (Professions 2.0 Phase 2)', () => {
     rng.setObserver(() => {
       draws++;
     });
-    sim.craftItem('recipe_eastbrook_ritual_vestments', pid);
+    sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
     rng.setObserver(null);
 
     // Still exactly one draw across the whole command path: the proc roll.
@@ -871,9 +944,12 @@ describe('masterwork proc (Professions 2.0 Phase 2)', () => {
     sim.acceptArchetypeQuest('armorcrafting');
     const meta = (sim as any).players.get(pid);
     meta.craftSkills.armorcrafting = 200;
-    // One self-signed bone fragment satisfies the whole requirement (3 -> 2 ->
-    // floor(2 * 0.8) = 1), mirroring the proc case's chance inputs.
-    sim.addItemInstance('bone_fragments', { signer: meta.name }, pid);
+    // Reagents (copper_ore x4, smithing_flux x9): one self-signed
+    // copper_ore feeds the signed-reagent chance input, the plain grants cover
+    // the rest of the requirement, mirroring the proc case's chance inputs.
+    sim.addItemInstance('copper_ore', { signer: meta.name }, pid);
+    sim.addItem('copper_ore', 3, pid);
+    sim.addItem('smithing_flux', 9, pid);
     sim.drainEvents();
     let draws = 0;
     let roll = -1;
@@ -882,7 +958,7 @@ describe('masterwork proc (Professions 2.0 Phase 2)', () => {
       draws++;
       roll = value;
     });
-    sim.craftItem('recipe_eastbrook_chain_vest', pid);
+    sim.craftItem('recipe_eastbrook_chain_vest', false, pid);
     rng.setObserver(null);
 
     // The proc draw is unconditional on the success path: exactly one draw

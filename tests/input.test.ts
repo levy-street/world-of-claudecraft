@@ -531,6 +531,40 @@ describe('Input pointer lock', () => {
     expect(canvas.requestPointerLock).not.toHaveBeenCalled();
   });
 
+  it('on Firefox, a pointerlockerror alone starts the forced-unlock cooldown (review followup on #2131)', () => {
+    // A denied requestPointerLock() is itself the strongest evidence we are in
+    // Firefox's post-forced-unlock cooldown, even when the pointerlockchange
+    // handler never got a chance to record it (e.g. the drag flags were
+    // already cleared, such as by a blur ordering ahead of the unlock event).
+    // The pointerlockerror handler must record forcedUnlockAt too, so the very
+    // next synchronous mousedown request during the cooldown is skipped
+    // instead of firing again and getting denied a second time.
+    let now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+    const { canvas, documentListeners, canvasListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+
+    documentListeners.get('pointerlockerror')!({});
+
+    now += 200;
+    canvasListeners.get('mousedown')!({
+      button: 2,
+      clientX: 100,
+      clientY: 100,
+      preventDefault: vi.fn(),
+    });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
   it('on Chrome, does not request pointer lock synchronously on mousedown (deferred path keeps #116 fixed)', () => {
     const { canvas, canvasListeners } = makeInput(
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',

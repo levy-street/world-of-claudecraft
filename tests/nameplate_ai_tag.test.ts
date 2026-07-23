@@ -9,8 +9,9 @@
 // tag must appear. Drop `isAi` from the signature and this goes red.
 
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { NameplatePainter } from '../src/render/nameplate_painter';
+import { FRIENDLY } from '../src/render/reaction';
 import type { EntityView } from '../src/render/renderer';
 import type { Entity } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
@@ -56,6 +57,9 @@ function view(): EntityView {
   const nameplate = div('nameplate');
   const aiEl = document.createElement('span');
   aiEl.className = 'np-ai';
+  const levelEl = document.createElement('span');
+  levelEl.className = 'np-level';
+  levelEl.style.display = 'none';
   const group = new THREE.Group();
   group.position.set(0, 0, 0);
   return {
@@ -81,9 +85,12 @@ function view(): EntityView {
     devTierEl: img(),
     discordEl: img(),
     aiEl,
+    levelEl,
     nameplateDisplay: 'none',
     nameplateTransform: '',
     nameplateSig: '',
+    nameplateStateMask: 0,
+    nameplateFriendlyPet: false,
     nameplateHpWidth: '',
     nameplateScale: 1,
     nameplateBaseOpacity: '1',
@@ -92,12 +99,24 @@ function view(): EntityView {
     tierValue: 0,
     devTierValue: 0,
     discordAvatarSig: '',
+    levelSig: '',
   } as unknown as EntityView;
 }
 
 /** A painter looking straight at a target standing next to the viewer. */
-function harness(target: Entity) {
-  const me = entity({ id: 1, name: 'Me', pos: { x: 0, y: 0, z: 3 } as Entity['pos'] });
+function harness(
+  target: Entity,
+  options: {
+    me?: Partial<Entity>;
+    isHostilePlayer?: (e: Entity) => boolean;
+  } = {},
+) {
+  const me = entity({
+    id: 1,
+    name: 'Me',
+    pos: { x: 0, y: 0, z: 3 } as Entity['pos'],
+    ...options.me,
+  });
   const views = new Map<number, EntityView>();
   const v = view();
   views.set(target.id, v);
@@ -122,7 +141,8 @@ function harness(target: Entity) {
     showNameplates: () => true,
     showDevBadges: () => true,
     showOwnNameplate: () => false,
-    isHostilePlayer: () => false,
+    showPlayerNameplates: () => true,
+    isHostilePlayer: options.isHostilePlayer ?? (() => false),
   });
   return { painter, v };
 }
@@ -180,5 +200,184 @@ describe('nameplate [AI] account tag', () => {
     expect(v.nameEl.textContent).toContain('Streamer');
     expect(v.aiEl).not.toBe(v.nameEl);
     expect(v.aiEl.classList.contains('ai-tag')).toBe(true);
+  });
+});
+
+describe('nameplate state classes', () => {
+  const hotStateClasses = new Set([
+    'np-current-target',
+    'np-hostile',
+    'np-dead-enemy',
+    'np-my-pet',
+    'np-aggroed-on-me',
+  ]);
+
+  it('toggles combat-state classes for a targeted hostile dead lootable enemy', () => {
+    const target = entity({
+      id: 2,
+      kind: 'mob',
+      templateId: 'wolf',
+      dead: true,
+      lootable: true,
+      hostile: true,
+      aggroTargetId: 1,
+    });
+    const { painter, v } = harness(target, { me: { targetId: 2 } });
+    painter.update(true);
+
+    expect(v.nameplate.classList.contains('np-current-target')).toBe(true);
+    expect(v.nameplate.classList.contains('np-hostile')).toBe(true);
+    expect(v.nameplate.classList.contains('np-dead-enemy')).toBe(true);
+    expect(v.nameplate.classList.contains('np-aggroed-on-me')).toBe(true);
+    expect(v.nameplate.classList.contains('np-my-pet')).toBe(false);
+    expect(v.nameplate.classList.contains('np-friendly-pet')).toBe(false);
+  });
+
+  it('toggles pet-state classes for your friendly pet', () => {
+    const target = entity({
+      id: 2,
+      kind: 'mob',
+      templateId: 'wolf',
+      ownerId: 1,
+      hostile: false,
+    });
+    const { painter, v } = harness(target);
+    painter.update(true);
+
+    expect(v.nameplate.classList.contains('np-my-pet')).toBe(true);
+    expect(v.nameplate.classList.contains('np-friendly-pet')).toBe(true);
+    expect(v.nameplate.classList.contains('np-hostile')).toBe(false);
+  });
+
+  it('writes only changed hot-state classes across repeated frames', () => {
+    const target = entity({
+      id: 2,
+      kind: 'mob',
+      templateId: 'wolf',
+      hostile: true,
+    });
+    const { painter, v } = harness(target);
+    const toggle = vi.spyOn(v.nameplate.classList, 'toggle');
+
+    painter.update(true);
+    const firstHotWrites = toggle.mock.calls.filter(([cls]) => hotStateClasses.has(cls));
+    expect(firstHotWrites).toEqual([['np-hostile', true]]);
+
+    toggle.mockClear();
+    painter.update(false);
+    expect(toggle.mock.calls.filter(([cls]) => hotStateClasses.has(cls))).toEqual([]);
+
+    target.aggroTargetId = 1;
+    painter.update(true);
+    expect(toggle.mock.calls.filter(([cls]) => hotStateClasses.has(cls))).toEqual([
+      ['np-aggroed-on-me', true],
+    ]);
+  });
+
+  it('removes state once while hidden or offscreen and restores it when visible', () => {
+    const target = entity({
+      id: 2,
+      kind: 'mob',
+      templateId: 'wolf',
+      hostile: true,
+    });
+    const { painter, v } = harness(target);
+    const toggle = vi.spyOn(v.nameplate.classList, 'toggle');
+    const remove = vi.spyOn(v.nameplate.classList, 'remove');
+
+    painter.update(true);
+    toggle.mockClear();
+    remove.mockClear();
+
+    target.dead = true;
+    target.lootable = false;
+    painter.update(true);
+    expect(remove).toHaveBeenCalledWith(
+      'np-current-target',
+      'np-hostile',
+      'np-dead-enemy',
+      'np-my-pet',
+      'np-aggroed-on-me',
+    );
+    expect(v.nameplateStateMask).toBe(0);
+
+    remove.mockClear();
+    painter.update(true);
+    expect(remove).not.toHaveBeenCalled();
+
+    target.dead = false;
+    painter.update(true);
+    expect(toggle.mock.calls.filter(([cls]) => hotStateClasses.has(cls))).toEqual([
+      ['np-hostile', true],
+    ]);
+
+    toggle.mockClear();
+    remove.mockClear();
+    v.group.position.set(0, 0, 20);
+    painter.update(true);
+    expect(remove).toHaveBeenCalledTimes(1);
+    painter.update(true);
+    expect(remove).toHaveBeenCalledTimes(1);
+
+    v.group.position.set(0, 0, 0);
+    painter.update(true);
+    expect(toggle.mock.calls.filter(([cls]) => hotStateClasses.has(cls))).toEqual([
+      ['np-hostile', true],
+    ]);
+  });
+
+  it('writes pet classes only when ownership changes', () => {
+    const target = entity({
+      id: 2,
+      kind: 'mob',
+      templateId: 'wolf',
+      ownerId: 1,
+    });
+    const { painter, v } = harness(target);
+    const toggle = vi.spyOn(v.nameplate.classList, 'toggle');
+
+    painter.update(true);
+    expect(toggle.mock.calls).toContainEqual(['np-my-pet', true]);
+    expect(toggle.mock.calls).toContainEqual(['np-friendly-pet', true]);
+
+    toggle.mockClear();
+    painter.update(true);
+    expect(toggle.mock.calls.filter(([cls]) => cls === 'np-friendly-pet')).toEqual([]);
+
+    target.ownerId = null;
+    painter.update(true);
+    expect(toggle.mock.calls).toContainEqual(['np-my-pet', false]);
+    expect(toggle.mock.calls).toContainEqual(['np-friendly-pet', false]);
+  });
+});
+
+describe('nameplate level badge', () => {
+  it('shows, hides, and recolors the level badge as mob state changes', () => {
+    const target = entity({
+      id: 2,
+      kind: 'mob',
+      templateId: 'wolf',
+      level: 13,
+      hostile: true,
+    });
+    const { painter, v } = harness(target);
+
+    painter.update(true);
+    expect(v.levelEl.textContent).toBe('13');
+    expect(v.levelEl.style.display).toBe('');
+    expect(v.levelSig).toBe('13|#ff4444');
+
+    target.dead = true;
+    target.lootable = true;
+    painter.update(true);
+    expect(v.levelEl.style.display).toBe('none');
+
+    target.dead = false;
+    target.hostile = false;
+    target.ownerId = 1;
+    painter.update(true);
+    expect(v.levelEl.textContent).toBe('13');
+    expect(v.levelEl.style.display).toBe('');
+    expect(v.levelSig).toBe(`13|${FRIENDLY}`);
   });
 });

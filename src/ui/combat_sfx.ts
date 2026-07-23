@@ -129,7 +129,7 @@ export const MOB_VOICE_CUES = {
   },
 } as const satisfies Record<string, Record<MobVoiceAction, SfxId>>;
 
-type MobVoiceFamily = keyof typeof MOB_VOICE_CUES;
+type MobVoiceFamily = keyof typeof MOB_VOICE_CUES | 'water_elemental';
 const NO_CUE = (): boolean => false;
 
 // Templates that should share one recorded subfamily voice instead of each
@@ -220,6 +220,7 @@ export function playerSwingCueForDamage(event: DamageEvent, source: Entity | nul
 }
 
 export function mobVoiceFamily(templateId: string): MobVoiceFamily | null {
+  if (templateId === 'water_elemental') return 'water_elemental';
   if (templateId === 'wild_boar' || templateId === 'elder_bristleback') return 'boar';
   const family = MOBS[templateId]?.family;
   return family && family in MOB_VOICE_CUES ? (family as MobVoiceFamily) : null;
@@ -232,6 +233,13 @@ export function mobVoiceCue(
 ): string | null {
   const family = mobVoiceFamily(templateId);
   if (!family) return null;
+  if (family === 'water_elemental') {
+    // An owned summon: never an idle-bark candidate, and no idle buffer is
+    // staged for it, so the idle sweep must get null rather than a cue id
+    // that can never play.
+    if (action === 'idle') return null;
+    return `mob_water_elemental_${action === 'hurt' ? 'attack' : action}`;
+  }
   const subfamily = SUBFAMILY_ALIAS[templateId] ?? templateId;
   const specific = `mob_${family}_${subfamily}_${action}`;
   return hasCue(specific) ? specific : MOB_VOICE_CUES[family][action];
@@ -254,17 +262,36 @@ export function mobVoiceCueWithFallback(
   return mobVoiceCue(templateId, 'attack', hasCue);
 }
 
+/** Gates the generic `combat_crit` ding in hud.ts (played directly whenever
+ *  this returns true). A boss gets none: a crit sting is a wrong emotional
+ *  beat mid-boss-fight. The Training Dummy DOES still get the ding (2026-07-19
+ *  follow-up to #2116: the dummy soaks hits for the damage meter and was
+ *  never meant to react like a real fight with a pained hurt bark, but the
+ *  plain crit ding is fine and expected feedback while testing rotations
+ *  against it; see mobVoiceActionForDamage below for the hurt-bark-only
+ *  exclusion). */
 export function shouldPlayCritSfxForTarget(target: Entity): boolean {
   return target.kind !== 'mob' || !MOBS[target.templateId]?.boss;
 }
 
 /** The mob-voice action a damage event's target should react with, or null
  *  for anything that isn't a crit against a non-boss mob (a miss, an
- *  ordinary hit, a player target, a boss immune to crit stingers). Callers
- *  still gate the actual play through shouldPlayMobVoiceSfxForEntity (the
- *  Nythraxis mute list) before using the resolved cue. */
+ *  ordinary hit, a player target, a boss immune to crit stingers), OR the
+ *  Training Dummy specifically: it still gets the plain combat_crit ding
+ *  (shouldPlayCritSfxForTarget above), just never the pained hurt-bark
+ *  vocalization, since it soaks hits for the damage meter and was never
+ *  meant to react like a real fight. Callers still gate the actual play
+ *  through shouldPlayMobVoiceSfxForEntity (the Nythraxis mute list) before
+ *  using the resolved cue. */
 export function mobVoiceActionForDamage(event: DamageEvent, target: Entity): MobVoiceAction | null {
-  if (!event.crit || target.kind !== 'mob' || !shouldPlayCritSfxForTarget(target)) return null;
+  if (
+    !event.crit ||
+    target.kind !== 'mob' ||
+    !shouldPlayCritSfxForTarget(target) ||
+    MOBS[target.templateId]?.dummy
+  ) {
+    return null;
+  }
   return 'hurt';
 }
 

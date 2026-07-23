@@ -297,6 +297,43 @@ describe('terrain wall standoff', () => {
     expect(closest).toBeLessThan(2.0);
   });
 
+  it('keeps the Abandoned Crypt door clear of the mine-mound collider (door trigger 2.0yd)', () => {
+    // The crypt entrance reuses the "mine entrance" prop (rock mound + timber
+    // portal) for its visual, sharing the door's exact (x, z). The mound's
+    // collider circle must not swallow the door tile itself: a ghost can only
+    // ever re-enter through the walk-in proximity trigger (interact() refuses
+    // it while dead), so if the full collider stack (not just terrain) pushes
+    // every approach outside the 2.0yd trigger, no released spirit can ever
+    // get back in.
+    const door = { x: -152, z: 610 };
+    expect(isBlocked(SEED, door.x, door.z, PLAYER_BODY_RADIUS)).toBe(false);
+    let closest = Infinity;
+    for (let x = -156; x <= -148; x += 0.25) {
+      for (let z = 606; z <= 614; z += 0.25) {
+        if (isBlocked(SEED, x, z, PLAYER_BODY_RADIUS)) continue;
+        const s = resolvePosition(SEED, x, z, PLAYER_BODY_RADIUS);
+        if (isBlocked(SEED, s.x, s.z, PLAYER_BODY_RADIUS)) continue;
+        closest = Math.min(closest, Math.hypot(s.x - door.x, s.z - door.z));
+      }
+    }
+    expect(closest).toBeLessThan(2.0);
+  });
+
+  it('keeps the Abandoned Crypt mound collider matched to its visible rock pile', () => {
+    // Follow-up to the door-clear fix above: the mound circle must clear the
+    // door trigger WITHOUT drifting so far back that it disagrees with the
+    // rendered pile (src/render/props.ts), which would open a collision gap
+    // under the flanking boulders and wall off open ground behind them that
+    // no player ever needed to cross.
+    const door = { x: -152, z: 610 };
+    // A point inside the rendered flanking boulder (local (2.65, -2.3), r 1.75;
+    // world (-154.5, 607.5), rot PI/2) stays blocked under the tightened mound.
+    expect(isBlocked(SEED, -154.5, 607.5, PLAYER_BODY_RADIUS)).toBe(true);
+    // Open ground well behind the pile's rendered extent (local z < -8, past
+    // the farthest rock at z -4.15, r 2.35) is not swallowed by the collider.
+    expect(isBlocked(SEED, door.x - 9, door.z, PLAYER_BODY_RADIUS)).toBe(false);
+  });
+
   it('eases a player parked at a rim wall foot off it, end to end through the Sim', () => {
     // A cell the Sim itself treats as FLAT footing (terrainSteepnessAt well under
     // the limit, so no downhill slide and no move gate fires) that still has a
@@ -1075,7 +1112,9 @@ describe('boss loot and encounter resets', () => {
     sim.lootCorpse(mob.id, b);
     expect(sim.countItem('boar_hide', b)).toBe(1);
     expect(mob.loot).toBeNull();
-    expect(mob.lootable).toBe(false);
+    // The emptied boar corpse stays lootable through its
+    // unclaimed-harvest grace window instead of collapsing immediately.
+    expect(mob.lootable).toBe(true);
   });
 
   it('personal loot remains claimable after party rights are gone without granting shared loot', () => {
@@ -1653,6 +1692,54 @@ describe('warrior charge', () => {
     sim.tick();
     expect(p.chargeTargetId).toBe(null);
   });
+
+  it('does not bill or arm charge through unbreakable encounter control', () => {
+    const { sim, p, wolf } = chargeSetup();
+    const rageBefore = p.resource;
+    p.auras.push({
+      id: 'scripted_root',
+      name: 'Scripted Root',
+      kind: 'root',
+      remaining: 10,
+      duration: 10,
+      value: 0,
+      sourceId: 9000,
+      school: 'shadow',
+      unbreakableControl: true,
+    });
+
+    sim.castAbility('charge');
+
+    expect(p.chargeTargetId).toBe(null);
+    expect(p.resource).toBe(rageBefore);
+    expect(p.cooldowns.has('charge')).toBe(false);
+    expect(wolf.auras.some((a) => a.kind === 'stun')).toBe(false);
+  });
+
+  it('stops an in-flight charge when unbreakable encounter control lands', () => {
+    const { sim, p } = chargeSetup();
+    sim.castAbility('charge');
+    sim.tick();
+    expect(p.chargeTargetId).not.toBe(null);
+    const heldAt = { ...p.pos };
+    p.auras.push({
+      id: 'scripted_stun',
+      name: 'Scripted Stun',
+      kind: 'stun',
+      remaining: 10,
+      duration: 10,
+      value: 0,
+      sourceId: 9000,
+      school: 'shadow',
+      unbreakableControl: true,
+    });
+
+    sim.tick();
+
+    expect(p.chargeTargetId).toBe(null);
+    expect(p.pos.x).toBeCloseTo(heldAt.x, 5);
+    expect(p.pos.z).toBeCloseTo(heldAt.z, 5);
+  });
 });
 
 describe('mob tap rights', () => {
@@ -1730,7 +1817,10 @@ describe('aoe damage vs armor', () => {
   // other spell in the game.
   function aoeSetup(ability: string) {
     const sim = makeSim('mage');
-    (sim as any).grantXp(99999); // level up far past Arcane Explosion (lvl 14)
+    (sim as any).grantXp(99999); // level up far past Aetherburst (lvl 7)
+    // The mage rework spec-gated Aetherburst (arcane_explosion) to the arcane
+    // spec; a no-spec mage drops it from the known list, so commit first.
+    expect(sim.setSpec('arcane')).toBe(true);
     const p = sim.player;
     const wolf = [...sim.entities.values()].find(
       (e) => e.kind === 'mob' && e.templateId === 'forest_wolf' && !e.dead,

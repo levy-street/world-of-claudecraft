@@ -1,10 +1,7 @@
 // Tests for the Renown-tab pure core (deeds_leaderboard_view.ts):
 //  - the async state machine: loading / error / empty / ranked discriminators,
 //  - row derivation (rank, name, realm, class + knownClass, level, renown,
-//    and the TITLE passed through as a DEED ID, never text; the deprecated
-//    wire deedCount stays on the entry FIXTURE, pinning the wire shape a
-//    stale client still reads, and is deliberately NOT mapped onto rows,
-//    issue #2044),
+//    and the TITLE passed through as a DEED ID, never text),
 //  - the viewer's own row flagged `me` by the server-resolved account rank,
 //  - the server-resolved `self` standing passed through (null when absent;
 //    renown rides it from a current server and is absent from an older one),
@@ -31,7 +28,6 @@ function entry(over: Partial<DeedsLeaderboardEntry> = {}): DeedsLeaderboardEntry
     cls: 'warrior',
     level: 20,
     renown: 425,
-    deedCount: 37,
     title: 'prog_veteran',
     ...over,
   };
@@ -63,7 +59,7 @@ describe('buildDeedsLeaderboardView', () => {
       kind: 'page',
       page: page({
         leaders: [
-          entry({ rank: 1, name: 'Aldwin', renown: 425, deedCount: 37, title: 'prog_veteran' }),
+          entry({ rank: 1, name: 'Aldwin', renown: 425, title: 'prog_veteran' }),
           entry({ rank: 2, name: 'Berrin', realm: 'Duskhold', renown: 300, title: null }),
         ],
         total: 2,
@@ -72,8 +68,8 @@ describe('buildDeedsLeaderboardView', () => {
     const view = buildDeedsLeaderboardView(input);
     expect(view.kind).toBe('ranked');
     if (view.kind !== 'ranked') return;
-    // toEqual is exact: the deprecated wire deedCount on the input entries
-    // must NOT surface on the rows (Renown is the one ranked number).
+    // toEqual is exact: a row carries Renown as its one ranked number and
+    // nothing beyond the pinned shape (the ranked-surface rule).
     expect(view.rows).toEqual([
       {
         rank: 1,

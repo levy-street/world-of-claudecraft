@@ -62,10 +62,8 @@ const h = vi.hoisted(() => {
     tasksForType: vi.fn(async () => [] as unknown[]),
     scoreForAccount: vi.fn(async () => 0),
     onlineMinutesForAccount: vi.fn(async () => 0),
-    rankForAccount: vi.fn(async () => null),
-    leaderboard: vi.fn(async () => [] as unknown[]),
-    leaderboardRowForAccount: vi.fn(async () => null),
     leaderboardTotal: vi.fn(async () => 0),
+    leaderboardSnapshot: vi.fn(async () => [] as unknown[]),
     leaderboardPage: vi.fn(async (_day: string, page: number, pageSize: number) => ({
       rows: [] as unknown[],
       page,
@@ -78,7 +76,8 @@ const h = vi.hoisted(() => {
     addPoints: vi.fn(async () => true),
     questTaskCompletionCount: vi.fn(async () => 0),
     recentPayouts: vi.fn(async (_limit: number) => state.recentPayouts),
-    finalizeDay: vi.fn(async () => {}),
+    finalizeDay: vi.fn(async () => 'finalized' as const),
+    dayFinalized: vi.fn(async () => false),
     pendingPayouts: vi.fn(async (_limit: number) => state.pendingPayouts),
     unannouncedWinnerDays: vi.fn(async () => [] as unknown[]),
     markWinnersAnnounced: vi.fn(async () => true),
@@ -107,10 +106,8 @@ vi.mock('../../server/daily_rewards_db', async (importOriginal) => {
     tasksForType = h.db.tasksForType;
     scoreForAccount = h.db.scoreForAccount;
     onlineMinutesForAccount = h.db.onlineMinutesForAccount;
-    rankForAccount = h.db.rankForAccount;
-    leaderboard = h.db.leaderboard;
-    leaderboardRowForAccount = h.db.leaderboardRowForAccount;
     leaderboardTotal = h.db.leaderboardTotal;
+    leaderboardSnapshot = h.db.leaderboardSnapshot;
     leaderboardPage = h.db.leaderboardPage;
     spinForAccount = h.db.spinForAccount;
     recordSpin = h.db.recordSpin;
@@ -118,6 +115,7 @@ vi.mock('../../server/daily_rewards_db', async (importOriginal) => {
     questTaskCompletionCount = h.db.questTaskCompletionCount;
     recentPayouts = h.db.recentPayouts;
     finalizeDay = h.db.finalizeDay;
+    dayFinalized = h.db.dayFinalized;
     pendingPayouts = h.db.pendingPayouts;
     unannouncedWinnerDays = h.db.unannouncedWinnerDays;
     markWinnersAnnounced = h.db.markWinnersAnnounced;
@@ -148,6 +146,7 @@ vi.mock('../../server/woc_balance', async (importOriginal) => {
 });
 
 import {
+  bustDailyRewardBoardCache,
   DailyRewardService,
   dailyRewardService,
   resetDailyRewardDbForTests,
@@ -155,6 +154,7 @@ import {
   routes,
   setDailyRewardDbForTests,
 } from '../../server/daily_rewards';
+import { resetDailyRewardSeedGateForTests } from '../../server/daily_rewards_seed_gate';
 import { compose } from '../../server/http/compose';
 import { withErrors } from '../../server/http/middleware/with_errors';
 import type { Method, Middleware } from '../../server/http/types';
@@ -168,7 +168,7 @@ const OPS_SECRET_ENV = 'WOC_DAILY_REWARD_SERVICE_SECRET';
 const OPS_SECRET = 'ops-secret';
 const OPS_HEADERS = { [OPS_HEADER]: OPS_SECRET };
 
-// The ten routes, in declared order: four player reads/mutations and six payout ops.
+// The eleven routes, in declared order: four player reads/mutations and seven payout ops.
 const PLAYER_PATHS: ReadonlyArray<readonly [Method, string]> = [
   ['GET', '/api/daily-rewards'],
   ['GET', '/api/daily-rewards/leaderboard'],
@@ -176,6 +176,7 @@ const PLAYER_PATHS: ReadonlyArray<readonly [Method, string]> = [
   ['GET', '/api/daily-rewards/history'],
 ];
 const OPS_PATHS: ReadonlyArray<readonly [Method, string]> = [
+  ['POST', '/internal/daily-rewards/finalize'],
   ['POST', '/internal/daily-rewards/pending-payouts'],
   ['POST', '/internal/daily-rewards/payout-history'],
   ['POST', '/internal/daily-rewards/leaderboard'],
@@ -240,21 +241,33 @@ function stubPriceConfig(): void {
   resetDailyRewardPriceCacheForTests();
   vi.stubGlobal(
     'fetch',
-    vi.fn(
-      async () =>
-        new Response(
-          JSON.stringify({
-            minUsd: 20,
-            prizePoolUsd: 150,
-            wocUsdPrice: 0.5,
-            solUsdPrice: 200,
-            activeSeconds: 120,
-            dayStartUtcMinutes: 21 * 60,
-            tasks: [],
-          }),
-          { status: 200 },
+    vi.fn(async (input: RequestInfo | URL) => {
+      const url = new URL(String(input));
+      return new Response(
+        JSON.stringify(
+          url.pathname === '/daily-schedule'
+            ? { dayStartUtcMinutes: 22 * 60 }
+            : {
+                day: url.searchParams.get('day'),
+                minUsd: 20,
+                prizePoolUsd: 150,
+                wocUsdPrice: 0.5,
+                solUsdPrice: 200,
+                activeSeconds: 120,
+                dayStartUtcMinutes: 22 * 60,
+                tasks: [
+                  {
+                    id: 'quest_completion',
+                    type: 'quest_completion',
+                    title: 'Complete quests',
+                    points: 10,
+                  },
+                ],
+              },
         ),
-    ),
+        { status: 200 },
+      );
+    }),
   );
 }
 
@@ -348,6 +361,13 @@ beforeEach(() => {
   h.state.balance = null;
   resetDailyRewardDbForTests();
   resetDailyRewardPriceCacheForTests();
+  // Both memos live at module scope, so without a per-test reset an earlier test
+  // that seeds a (day, realm, config) key would let a later test skip the gated
+  // ensureDay/seedTasks pair (the ensureDayThrows case would never reach its throw).
+  resetDailyRewardSeedGateForTests();
+  // The routes drive the module-load singleton, whose instance board cache
+  // would otherwise leak a board snapshot across tests.
+  bustDailyRewardBoardCache();
   // Default: the gate secret and the config URL are unset, so the config falls back
   // (no fetch) and the ops gate fails closed unless a test opts in.
   delete process.env[OPS_SECRET_ENV];
@@ -374,6 +394,7 @@ describe('daily-rewards route table', () => {
       'GET /api/daily-rewards/leaderboard',
       'POST /api/daily-rewards/spin',
       'GET /api/daily-rewards/history',
+      'POST /internal/daily-rewards/finalize',
       'POST /internal/daily-rewards/pending-payouts',
       'POST /internal/daily-rewards/payout-history',
       'POST /internal/daily-rewards/leaderboard',
@@ -409,7 +430,7 @@ describe('daily-rewards route table', () => {
   it('shares one activeGuard across the player family and one gate across the ops family, distinct from each other', () => {
     const playerGuards = new Set(PLAYER_PATHS.map(([m, p]) => routeFor(m, p).middleware?.[0]));
     const opsGates = new Set(OPS_PATHS.map(([m, p]) => routeFor(m, p).middleware?.[0]));
-    // All four player routes carry the SAME guard instance; all six ops routes the SAME
+    // All four player routes carry the SAME guard instance; all seven ops routes the SAME
     // gate instance; the guard is not the gate.
     expect(playerGuards.size).toBe(1);
     expect(opsGates.size).toBe(1);
@@ -486,6 +507,24 @@ describe('player routes: thin-handler dispatch', () => {
     // The handler dispatched into the service (which touched the mocked db).
     expect(h.db.ensureDay).toHaveBeenCalled();
     expect(r.reached).toBe(true);
+  });
+
+  it('delivers the exported bust to the live module singleton, not a detached cache', async () => {
+    // Behavioral pin on the moderation-bust delivery link: main.ts's
+    // bustBoardCaches calls bustDailyRewardBoardCache(), which must reach
+    // the INSTANCE cache of the module-load dailyRewardService singleton
+    // (the one these routes drive). A regression to a module-level cache in
+    // the board-cache module, or a bust aimed at a second service instance,
+    // keeps the source-text pin green and fails only here.
+    await runRoute('GET', '/api/daily-rewards', { headers: { authorization: BEARER } });
+    await runRoute('GET', '/api/daily-rewards', { headers: { authorization: BEARER } });
+    // Fresh within the TTL: both requests share one snapshot refresh.
+    expect(h.db.leaderboardSnapshot).toHaveBeenCalledTimes(1);
+    bustDailyRewardBoardCache();
+    const r = await runRoute('GET', '/api/daily-rewards', { headers: { authorization: BEARER } });
+    expect(r.status).toBe(200);
+    // The exported bust emptied the singleton's cache: the next read refreshed.
+    expect(h.db.leaderboardSnapshot).toHaveBeenCalledTimes(2);
   });
 
   it('GET leaderboard answers 200 with the page payload and decodes page/pageSize leniently', async () => {
@@ -622,6 +661,27 @@ describe('ops routes: fail-closed secret gate', () => {
     });
   }
 
+  it('finalizes one explicit closed day before payout reads', async () => {
+    process.env[OPS_SECRET_ENV] = OPS_SECRET;
+    stubPriceConfig();
+    const r = await runRoute('POST', '/internal/daily-rewards/finalize', {
+      headers: OPS_HEADERS,
+      body: { day: '2026-07-01' },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      data: { ok: true, day: '2026-07-01', outcome: 'finalized' },
+      error: null,
+    });
+    expect(h.db.finalizeDay).toHaveBeenCalledWith(
+      '2026-07-01',
+      150,
+      [0.2, 0.15, 0.12, 0.1, 0.09, 0.08, 0.075, 0.07, 0.065, 0.05],
+    );
+    expect(h.db.pendingPayouts).not.toHaveBeenCalled();
+  });
+
   it('runs pending-payouts to a 200 admin envelope on the correct secret', async () => {
     process.env[OPS_SECRET_ENV] = OPS_SECRET;
     h.state.pendingPayouts = [payoutRow(1)];
@@ -636,6 +696,7 @@ describe('ops routes: fail-closed secret gate', () => {
     });
     expect(r.reached).toBe(true);
     expect(h.db.pendingPayouts).toHaveBeenCalledWith(20, undefined);
+    expect(h.db.finalizeDay).not.toHaveBeenCalled();
   });
 
   it('filters pending payouts to a validated reward day', async () => {

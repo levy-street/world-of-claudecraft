@@ -3,7 +3,11 @@ import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { DEEDS } from '../src/sim/content/deeds';
-import { QUEST_LETTERS } from '../src/sim/content/letters';
+import {
+  GUILD_TREND_LETTERS,
+  MASTER_TIER_LETTERS,
+  QUEST_LETTERS,
+} from '../src/sim/content/letters';
 import {
   ABILITIES,
   CLASSES,
@@ -70,6 +74,7 @@ import {
 import {
   hasTalentTitleOverride,
   renderTalentManifestEntry,
+  type TalentTranslationManifestEntry,
   talentTranslationManifest,
 } from '../src/ui/talent_i18n';
 
@@ -122,7 +127,10 @@ describe('i18n Localization Key Coverage', () => {
     );
   });
 
-  const placeholderPattern = /\b(TODO|TBD|FIXME|PLACEHOLDER|TRANSLATE|LOREM)\b/i;
+  // Case-sensitive on purpose: leftover markers are uppercase by convention,
+  // and the case-insensitive form false-fails ordinary vocabulary in several
+  // locales (Spanish and Portuguese "todo").
+  const placeholderPattern = /\b(TODO|TBD|FIXME|PLACEHOLDER|TRANSLATE|LOREM)\b/;
   const shellKeys: TranslationKey[] = [
     'seo.title',
     'seo.description',
@@ -394,6 +402,7 @@ describe('i18n Localization Key Coverage', () => {
     price: '1g 20s',
     proceeds: '95s',
     quality: 'Rare',
+    quest: 'A Trade for Every Hand',
     rating: 1513,
     range: 30,
     rank: 2,
@@ -838,7 +847,8 @@ describe('i18n Localization Key Coverage', () => {
     expect(classAbilityEntries).toHaveLength(
       Object.keys(CLASSES).length * 2 + Object.keys(ABILITIES).length * 2,
     );
-    expect(missingEntityTranslationsForGroups(['classAbility'])).toHaveLength(0);
+    const missingClassAbilities = missingEntityTranslationsForGroups(['classAbility']);
+    expect(missingClassAbilities, JSON.stringify(missingClassAbilities, null, 2)).toHaveLength(0);
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);
@@ -886,26 +896,26 @@ describe('i18n Localization Key Coverage', () => {
 
     // Hard data-regression pin. The sentinel check above proves the {buff} token
     // survives interpolation everywhere but is value-agnostic, so it cannot catch
-    // a silent balance change. commanding_shout is the ability the old blanket $b
-    // pin actually meant: its $b resolves to its rank-1 Stamina buff via the same
-    // picker hud.ts feeds the token. Pinning the literal fails if the datum (or
-    // the picker) changes, and rendering with it confirms the EN description
+    // a silent balance change. Iron Bellow is the winning Warrior's baseline
+    // raid-buff ability: its $b resolves to its rank-1 attack-power percentage via
+    // the same picker hud.ts feeds the token. Pinning the literal fails if the datum
+    // (or the picker) changes, and rendering with it confirms the EN description
     // interpolates the real number instead of a stale hardcoded one.
-    const commandingShout = abilitiesKnownAt('warrior', ABILITIES.commanding_shout.learnLevel).find(
-      (known) => known.def.id === 'commanding_shout' && known.rank === 1,
+    const battleShout = abilitiesKnownAt('warrior', ABILITIES.battle_shout.learnLevel).find(
+      (known) => known.def.id === 'battle_shout' && known.rank === 1,
     );
-    expect(commandingShout, 'commanding_shout rank 1 resolves').toBeTruthy();
-    const commandingShoutBuff = abilityBuffValue(commandingShout!);
-    expect(commandingShoutBuff, 'commanding_shout rank-1 Stamina buff').toBe(6);
+    if (!battleShout) throw new Error('battle_shout rank 1 did not resolve');
+    const battleShoutBuff = abilityBuffValue(battleShout);
+    expect(battleShoutBuff, 'battle_shout rank-1 attack-power buff').toBe(10);
     setLanguage('en');
-    const commandingShoutDesc = tEntity({
+    const battleShoutDesc = tEntity({
       kind: 'ability',
-      id: 'commanding_shout',
+      id: 'battle_shout',
       field: 'description',
-      values: { buff: String(commandingShoutBuff) },
+      values: { buff: String(battleShoutBuff) },
     });
-    expect(commandingShoutDesc).toContain('6');
-    expect(commandingShoutDesc).not.toContain('{buff}');
+    expect(battleShoutDesc).toContain('10');
+    expect(battleShoutDesc).not.toContain('{buff}');
   });
 
   it('should provide every item translation in every locale without canonical fallbacks', () => {
@@ -914,7 +924,8 @@ describe('i18n Localization Key Coverage', () => {
     // item name (see itemDisplayName), so they are not in the manifest.
     const namedItems = Object.values(ITEMS).filter((i) => !i.heroicOf).length;
     expect(itemEntries).toHaveLength(namedItems);
-    expect(missingEntityTranslationsForGroups(['classAbility', 'item'])).toHaveLength(0);
+    const missingItems = missingEntityTranslationsForGroups(['item']);
+    expect(missingItems, JSON.stringify(missingItems, null, 2)).toHaveLength(0);
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);
@@ -997,7 +1008,8 @@ describe('i18n Localization Key Coverage', () => {
 
     expect(missingEntityTranslationsForGroups(['classAbility', 'item'])).toHaveLength(0);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
-    expect(missingEntityTranslationsForGroups(['world'])).toHaveLength(0);
+    const missingWorld = missingEntityTranslationsForGroups(['world']);
+    expect(missingWorld, JSON.stringify(missingWorld, null, 2)).toHaveLength(0);
     expect(
       missingEntityTranslationsForGroups(['classAbility', 'item', 'itemSet', 'world']),
     ).toHaveLength(0);
@@ -1020,9 +1032,17 @@ describe('i18n Localization Key Coverage', () => {
       ZONES.reduce((sum, zone) => sum + zone.pois.length, 0) +
       Object.keys(DUNGEONS).length * 3 +
       Object.keys(DELVES).length * 3 +
-      // Ravenpost authored letters: welcome + Heroic Marks reward + quest
-      // letters, 3 fields each.
-      (2 + Object.keys(QUEST_LETTERS).length) * 3;
+      // Ravenpost authored letters: welcome + Heroic Marks reward + mastery
+      // reset notice + quest letters + Guild trend letters + master tier
+      // letters (keyed pair -> tier), 3 fields each.
+      (3 +
+        Object.keys(QUEST_LETTERS).length +
+        Object.keys(GUILD_TREND_LETTERS).length +
+        Object.values(MASTER_TIER_LETTERS).reduce(
+          (sum, tiers) => sum + Object.keys(tiers).length,
+          0,
+        )) *
+        3;
     expect(worldEntries).toHaveLength(expectedWorldCount);
 
     for (const lang of supportedLanguages) {
@@ -1194,33 +1214,44 @@ describe('i18n Localization Key Coverage', () => {
     // RELEASE-TIER ONLY: specific real-translation spot-checks (would render the
     // English fill, not these strings, for an untranslated key on a PR).
     if (RELEASE_TIER) {
+      const rowEntry = (
+        optionId: string,
+        field: 'name' | 'description',
+      ): TalentTranslationManifestEntry => {
+        const entry = talentEntries.find(
+          (candidate) => candidate.id.endsWith(`.${optionId}`) && candidate.field === field,
+        );
+        if (!entry) throw new Error(`Missing talent manifest entry: ${optionId}.${field}`);
+        return entry;
+      };
+      const requiredTalentEntry = (id: string, field: 'name' | 'description') => {
+        const entry = talentEntries.find(
+          (candidate) => candidate.id === id && candidate.field === field,
+        );
+        if (!entry) throw new Error(`Missing talent manifest entry: ${id}.${field}`);
+        return entry;
+      };
+
       setLanguage('es');
+      expect(renderTalentManifestEntry(rowEntry('war_row_double_charge', 'name'))).toContain(
+        'Carga doble',
+      );
       expect(
-        renderTalentManifestEntry(
-          talentEntries.find((entry) => entry.id === 'war_toughness' && entry.field === 'name')!,
-        ),
-      ).toContain('Dureza');
-      expect(
-        renderTalentManifestEntry(
-          talentEntries.find(
-            (entry) => entry.id === 'arms.mastery' && entry.field === 'description',
-          )!,
-        ),
+        renderTalentManifestEntry(rowEntry('war_row_blood_offering', 'description')),
       ).toContain('daño');
 
       setLanguage('zh_CN');
-      expect(
-        renderTalentManifestEntry(
-          talentEntries.find((entry) => entry.id === 'war_cruelty' && entry.field === 'name')!,
-        ),
-      ).toContain('残忍');
+      expect(renderTalentManifestEntry(rowEntry('war_row_blood_offering', 'name'))).toContain(
+        '战斗精通',
+      );
 
       setLanguage('ko_KR');
+      expect(renderTalentManifestEntry(rowEntry('war_row_second_wind', 'description'))).toContain(
+        '생명력',
+      );
       expect(
         renderTalentManifestEntry(
-          talentEntries.find(
-            (entry) => entry.id === 'prot_choice.pc_last_stand' && entry.field === 'description',
-          )!,
+          requiredTalentEntry('11.hun_r11_survival_instincts', 'description'),
         ),
       ).toContain('생명력');
     }
@@ -1281,7 +1312,9 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should provide deed content translations for every supported locale', () => {
     const deedEntries = deedTranslationManifest();
-    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 19);
+    // name + desc per deed, plus one title entry per title deed (30 as of
+    // Professions 2.0; tests/deeds_content.test.ts pins the count).
+    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 30);
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);

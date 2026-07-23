@@ -1,4 +1,4 @@
-import { closeSync, existsSync, openSync, readdirSync, readSync } from 'node:fs';
+import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -45,12 +45,61 @@ function isValidWebp(file: string): boolean {
   }
 }
 
+// Read dimensions directly from each WebP encoding mode. This rejects a valid
+// RIFF/WEBP container whose canvas silently drifted from the served 128px square.
+function webpSize(file: string): { width: number; height: number } {
+  const fd = openSync(file, 'r');
+  try {
+    const buf = Buffer.alloc(32);
+    readSync(fd, buf, 0, 32, 0);
+    const tag = buf.toString('ascii', 12, 16);
+    if (tag === 'VP8 ')
+      return { width: buf.readUInt16LE(26) & 0x3fff, height: buf.readUInt16LE(28) & 0x3fff };
+    if (tag === 'VP8L') {
+      const bits = buf.readUInt32LE(21);
+      return { width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1 };
+    }
+    if (tag === 'VP8X')
+      return {
+        width: (buf.readUIntLE(24, 3) & 0xffffff) + 1,
+        height: (buf.readUIntLE(27, 3) & 0xffffff) + 1,
+      };
+    throw new Error(`unknown webp chunk "${tag}" in ${file}`);
+  } finally {
+    closeSync(fd);
+  }
+}
+
 const committedIds = (): string[] =>
   existsSync(deedsDir)
     ? readdirSync(deedsDir)
         .filter((f) => path.extname(f).toLowerCase() === '.webp')
         .map((f) => path.basename(f, '.webp'))
     : [];
+
+function professionManifestDeedIds(): string[] {
+  const manifest = JSON.parse(
+    readFileSync(path.join(repoRoot, 'docs/design/professions-asset-manifest.json'), 'utf8'),
+  ) as unknown;
+  const ids: string[] = [];
+  const collect = (node: unknown): void => {
+    if (Array.isArray(node)) {
+      for (const item of node) collect(item);
+      return;
+    }
+    if (node === null || typeof node !== 'object') return;
+    const record = node as Record<string, unknown>;
+    if (
+      typeof record.id === 'string' &&
+      record.id.startsWith('deed_prof_') &&
+      typeof record.deedId === 'string'
+    )
+      ids.push(record.deedId);
+    for (const value of Object.values(record)) collect(value);
+  };
+  collect(manifest);
+  return [...new Set(ids)].sort();
+}
 
 // The deferred (account-level + currently-unearnable) and cut ids: the maintainer's icon set
 // ships PNGs for these, but the ingest script skips them (they are not live deeds), so no art may
@@ -72,6 +121,23 @@ const ORPHAN_IDS = [
 describe('Book of Deeds webp icons', () => {
   it('has art-backed deed ids wired (guards the fixture)', () => {
     expect(DEED_IMAGE_IDS.size).toBeGreaterThan(0);
+  });
+
+  it('ships painted crests for every profession deed declared by the feature manifest', () => {
+    const ids = professionManifestDeedIds();
+    expect(ids).toHaveLength(29);
+    for (const id of ids) {
+      expect(DEED_IMAGE_IDS.has(id), `${id} must be present in the generated deed registry`).toBe(
+        true,
+      );
+      expect(existsSync(path.join(deedsDir, `${id}.webp`)), `${id}.webp must be committed`).toBe(
+        true,
+      );
+      expect(webpSize(path.join(deedsDir, `${id}.webp`)), `${id}.webp dimensions`).toEqual({
+        width: 128,
+        height: 128,
+      });
+    }
   });
 
   it('A) DEED_IMAGE_IDS is an exact bijection with the committed .webp files', () => {

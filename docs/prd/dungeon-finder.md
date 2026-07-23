@@ -192,4 +192,3 @@ money, and counts use locale-aware formatters.
 7. Closed finder cost is effectively zero and unchanged open state causes no repeated DOM rebuild.
 8. Desktop and mobile flows meet the repository accessibility and visual QA contracts.
 9. Focused tests, architecture and localization guards, typecheck, builds, and `npm run gate` pass.
-

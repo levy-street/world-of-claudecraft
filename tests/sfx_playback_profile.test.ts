@@ -163,14 +163,16 @@ describe('SFX runtime playback profile', () => {
     expect(belowCeiling.gain).toBeGreaterThan(1);
     // A non-custom key has no computed ceiling to raise it above the old
     // flat 0dB max: the ceiling system is opt-in per key, not a blanket
-    // relaxation of the safety floor for everything.
+    // relaxation of the safety floor for everything. ui_quest_done, not
+    // ui_click/ui_sheep: those are real custom content now and each has its
+    // own computed ceiling.
     expect(() =>
       normalizeSfxGainMap({
         version: 1,
         categoryBaselineDb: {},
-        keyTrimDb: { ui_click: 5 },
+        keyTrimDb: { ui_quest_done: 5 },
       }),
-    ).toThrow('resolved gain for ui_click');
+    ).toThrow('resolved gain for ui_quest_done');
     expect(() => normalizeSfxSpeedMap({ version: 1, rateByKey: { foot_grass: '1.2' } })).toThrow(
       'finite number',
     );

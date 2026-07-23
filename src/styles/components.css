@@ -53,7 +53,7 @@
     min-height: 40px;
     font-size: 13px;
     background: #1a1410;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 3px;
     color: #c9b27a;
     cursor: pointer;
@@ -79,7 +79,7 @@
     padding: 6px 10px;
     font-size: 13px;
     background: #1a1410;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 3px;
     color: var(--gold);
     cursor: default;
@@ -111,7 +111,7 @@
     display: flex;
     gap: 4px;
     margin-bottom: 10px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
   }
   #delve-board .delve-tab {
     flex: 1;
@@ -145,7 +145,7 @@
     gap: 8px;
     padding: 6px;
     background: #1a1410;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 3px;
   }
   #delve-board .delve-shop-row.locked {
@@ -184,7 +184,7 @@
   }
   #delve-board .delve-shop-buy:disabled {
     color: #6b5e3a;
-    border-color: #463a1c;
+    border-color: var(--color-border-showcase);
     cursor: not-allowed;
   }
   #delve-board .delve-shop-buy:focus-visible {
@@ -248,7 +248,7 @@
     min-height: 48px;
     padding: 8px 12px;
     background: #1a1410;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     color: var(--gold);
     cursor: pointer;
@@ -374,7 +374,7 @@
     height: 170px;
     box-sizing: content-box;
     background: linear-gradient(#0d0a07, #161009);
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 5px;
   }
   #lockpick-panel .lp-track {
@@ -485,7 +485,7 @@
     min-width: 40px;
     padding: 6px 2px;
     background: #1a1410;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     color: var(--gold);
     cursor: pointer;
@@ -1037,60 +1037,116 @@
   }
 
   /* ---------- character window ---------- */
-  /* character window */
+  /* The showcase treatment: fixed-width staged model, 6/6 quality-glow sockets,
+     stat tiles + Offense/Defense panels, carded sections. */
   #char-window {
-    width: 600px;
+    width: 740px;
   }
+  /* Paperdoll: two flexing equipment columns flank a FIXED-WIDTH model stage. The
+     columns own all leftover width and each socket row floats centered in its band,
+     so the gap window-edge -> row unit matches the gap row unit -> stage (the band
+     centering contract). Shared with the inspect window, which reuses .paperdoll /
+     .equip-col / .equip-slot (inspect layout overrides live in shell.css). */
   .paperdoll {
     display: flex;
-    gap: 10px;
+    gap: 18px;
     align-items: flex-start;
+    padding-top: 12px;
   }
   .equip-col {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    width: 150px;
-    flex-shrink: 0;
+    gap: 15px;
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
   }
+  /* The right column mirrors: item name on the left, socket on the right. */
   .equip-col-right .equip-slot {
     flex-direction: row-reverse;
     text-align: right;
   }
   .equip-slot {
     display: flex;
-    gap: 7px;
+    gap: 10px;
     align-items: center;
-    width: 100%;
+    justify-content: center;
+    position: relative;
   }
+  /* Fixed-width text box so every row unit is the same width and its icon lands at
+     the identical x within the column (part of the centering contract). */
   .equip-slot > div {
+    flex: 0 0 100px;
     min-width: 0;
+  }
+  /* 44px socket, 2px quality-colored border; the soft quality glow is set inline by
+     the painter (quality_glow.ts), derived from the item's quality color. */
+  .equip-slot .item-icon {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    border-width: 2px;
+    border-radius: 7px;
   }
   .equip-slot .slot-name {
-    font-size: 10px;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
     color: var(--color-text-muted);
   }
+  /* Item names WRAP (never ellipsized) so a full name always reads. */
   .equip-slot .slot-item {
-    font-size: 11px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 11.5px;
+    line-height: 1.3;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
   }
+  /* Model stage: FIXED width so the columns flex around it (the centering
+     contract). The base carries only structure; the showcase treatment (keyline,
+     inset vignette, tinted haze, ground shadow) is layered per window, gold on the
+     character sheet below and class-colored on the inspect window (shell.css). */
   .char-model-panel {
-    flex: 1;
+    flex: 0 0 310px;
     min-width: 0;
-    min-height: 172px;
-    border: 1px solid #463a1c;
+    min-height: 330px;
+    position: relative;
     border-radius: 5px;
-    background: rgba(0, 0, 0, 0.28);
     overflow: hidden;
     display: flex;
     flex-direction: column;
+  }
+  #char-window .char-model-panel {
+    border: 1px solid #5a4a20;
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.8),
+      inset 0 0 60px rgba(0, 0, 0, 0.55);
+    background:
+      radial-gradient(
+        ellipse 62% 46% at 50% 58%,
+        rgba(255, 205, 110, 0.13),
+        rgba(255, 205, 110, 0.03) 55%,
+        transparent 72%
+      ),
+      linear-gradient(to bottom, rgba(20, 16, 8, 0.35), rgba(0, 0, 0, 0.5));
+  }
+  /* Ground-shadow ellipse under the model (a pseudo-element, no extra DOM). */
+  #char-window .char-model-panel::after {
+    content: "";
+    position: absolute;
+    left: 22%;
+    right: 22%;
+    bottom: 46px;
+    height: 26px;
+    background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(0, 0, 0, 0.55), transparent 70%);
+    pointer-events: none;
   }
   .char-model-preview {
     width: 100%;
     flex: 1;
     min-height: 0;
+    position: relative;
+    z-index: 1;
   }
   .char-model-preview canvas {
     display: block;
@@ -1103,14 +1159,106 @@
     margin: 0;
     padding: 6px 0 8px;
     flex-shrink: 0;
+    position: relative;
+    z-index: 1;
   }
+  /* Stats: five primary attribute tiles, then the Offense and Defense panels. */
+  .stat-panels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .stat-panel {
+    min-width: 0;
+    padding: 8px 12px 10px;
+    background: rgba(0, 0, 0, 0.24);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+  }
+  .sp-title {
+    font-variant: small-caps;
+    letter-spacing: 0.06em;
+    color: var(--gold);
+    font-size: 13px;
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--color-border-showcase);
+  }
+  /* Offense/Defense rows: label left, value right, no trailing colon (dropped by
+     the painter's colon-free stat cell). */
+  .stat-panel .stat-cell {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+  }
+  .stat-panel .stat-cell b {
+    color: #fff;
+    font-weight: normal;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Attributes: five bordered number tiles spanning the grid, big tabular value. */
+  .stat-panel.attrs-tiles {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px;
+    background: none;
+    border: none;
+  }
+  .attrs-tiles .sp-title {
+    display: none;
+  }
+  .attrs-tiles .stat-cell {
+    flex: 1;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 1px;
+    padding: 8px 4px 7px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+    background: rgba(0, 0, 0, 0.24);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+  }
+  .attrs-tiles .stat-cell b {
+    color: #fff;
+    font-weight: normal;
+    font-size: 21px;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Each stat cell opens the class-aware breakdown tooltip; the hover/focus pill is
+     color-only (no transform) per the motion rule, and keyboard focus gets the same
+     pill as hover. Background-only, so rows never reflow between states. */
+  .stat-panel .stat-cell,
+  .attrs-tiles .stat-cell {
+    cursor: help;
+    transition:
+      color 0.12s,
+      background-color 0.12s;
+  }
+  .stat-panel .stat-cell:hover,
+  .attrs-tiles .stat-cell:hover {
+    color: #fff;
+    background: rgba(255, 215, 120, 0.1);
+  }
+  .stat-panel .stat-cell:focus-visible,
+  .attrs-tiles .stat-cell:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+    color: #fff;
+    background: rgba(255, 215, 120, 0.14);
+  }
+  /* The Gathering section reuses the compact two-column readout (cp-stats). */
   .char-stats {
     font-size: 12px;
     line-height: 1.65;
     color: var(--color-text-muted);
-    margin-top: 10px;
-    border-top: 1px solid #463a1c;
-    padding-top: 8px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0 12px;
@@ -1119,34 +1267,28 @@
     color: #fff;
     font-weight: normal;
   }
-  /* Each stat is a hoverable/focusable cell that opens a class-aware breakdown
-     tooltip. The padding + matching negative margin turn the hover/focus tint into
-     a padded pill WITHOUT moving the text (layout-neutral: the margin box equals the
-     content box, so rows never reflow between states). Color/background only (no
-     transform) per the motion-sickness rule; keyboard focus gets the same pill as
-     hover so the affordance is identical for mouse and keyboard. */
-  .char-stats .stat-cell {
-    cursor: help;
-    border-radius: 4px;
-    padding: 1px 5px;
-    margin: -1px -5px;
-    transition:
-      color 0.12s,
-      background-color 0.12s;
+  .char-gather-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
   }
-  .char-stats .stat-cell:hover {
-    color: #fff;
-    background: rgba(255, 215, 120, 0.1);
+  .char-gather-icon {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
   }
-  .char-stats .stat-cell:focus-visible {
-    outline: 2px solid var(--color-border-focus);
-    outline-offset: 1px;
-    color: #fff;
-    background: rgba(255, 215, 120, 0.1);
+  .char-archetype-title-crest {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
   }
   /* Honor the OS-level reduced-motion preference too, not just the in-app toggle. */
   @media (prefers-reduced-motion: reduce) {
-    .char-stats .stat-cell {
+    .stat-panel .stat-cell,
+    .attrs-tiles .stat-cell {
       transition: none;
     }
   }
@@ -1154,7 +1296,7 @@
   /* ---------- spellbook ---------- */
   /* spellbook */
   #spellbook {
-    width: 430px;
+    width: 760px;
   }
   .spellbook-class,
   .spell-rank {
@@ -1162,9 +1304,17 @@
     font-size: 11px;
   }
   .spell-list {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 2px;
+  }
+  @media (min-width: 900px) {
+    body:not(.mobile-touch) .spell-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .spell-list > .spell-sub {
+    grid-column: 1 / -1;
   }
   .spell-row {
     display: flex;
@@ -1234,17 +1384,24 @@
   }
 
   /* ---------- quest log ---------- */
-  /* quest log */
+  /* quest log: widened to a landscape shape so the detail pane gets real
+     reading width instead of wrapping narrow, and the detail's own max-height
+     cap is dropped so it flows with the window's single outer scroll instead
+     of a second, nested 380px scroll region. No max-width override here: the
+     shared `.window` clamp (layout.css) already bounds width against the
+     JS-synced app viewport, divided by --window-scale; a per-window override
+     using raw 100vw would disagree with that clamp and can overflow at higher
+     ui-scale. */
   #quest-log-window {
-    width: 520px;
+    width: 880px;
   }
   #quest-log-window .ql-cols {
     display: flex;
     gap: 12px;
   }
   .ql-list {
-    width: 180px;
-    border-right: 1px solid #463a1c;
+    width: 220px;
+    border-right: 1px solid var(--color-border-showcase);
     padding-right: 8px;
   }
   .ql-item {
@@ -1269,7 +1426,13 @@
   .ql-detail {
     flex: 1;
     font-size: 12px;
-    max-height: 380px;
+    max-height: none;
+    /* Reading-measure cap: the pane sits beside the 220px list inside the 880px
+       window, leaving roughly 616px of content width. 70ch undershot that badly
+       (~420-460px at this pane's 12px font), leaving 150px-plus of dead space
+       next to the list. 100ch uses most of the available width while still
+       capping line length on wider viewports. */
+    max-width: 100ch;
     min-height: 0;
     display: flex;
     flex-direction: column;
@@ -1296,11 +1459,14 @@
     margin-top: var(--spacing-sm);
   }
 
-  /* post-cap progression: character-sheet block + milestone badges */
+  /* Specialization / Progression / Gathering sections: the same inset-card
+     treatment as the stat panels (all three wrap in .char-progression). */
   .char-progression {
     margin-top: 10px;
-    border-top: 1px solid #463a1c;
-    padding-top: 8px;
+    padding: 8px 12px 10px;
+    background: rgba(0, 0, 0, 0.24);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
   }
   .cp-title {
     font-family: var(--title-font);
@@ -1380,7 +1546,7 @@
     display: flex;
     gap: 2px;
     padding: 0 12px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
   }
   .woc-store-tabs button {
     min-height: 42px;
@@ -2182,7 +2348,7 @@
     font-size: 12px;
     color: #cabb8c;
     background: #ffffff08;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 3px;
     cursor: pointer;
   }
@@ -2203,7 +2369,7 @@
     font-size: 11px;
     letter-spacing: 0.3px;
     background: none;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
   }
   .lb-rank {
     text-align: center;
@@ -2240,7 +2406,7 @@
     position: sticky;
     bottom: 0;
     margin-top: 6px;
-    border-top: 1px solid #463a1c;
+    border-top: 1px solid var(--color-border-showcase);
     background: #160f08;
     padding-top: 4px;
   }
@@ -2299,7 +2465,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
     padding: 8px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     background: #ffffff08;
     border-radius: 4px;
   }
@@ -2396,7 +2562,7 @@
     gap: 10px;
     align-items: center;
     padding: 8px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     background: #120d08;
   }
@@ -2758,12 +2924,16 @@
     contain: paint;
     isolation: isolate;
   }
-  /* Promote these large layers only while they overlap. Keeping the promotion
-     conditional avoids permanently reserving two Retina-sized GPU surfaces. */
-  body.store-stack-open #daily-rewards-window,
-  body.store-stack-open #claudium-window {
-    will-change: transform;
-  }
+  /* Deliberately NO will-change promotion here, conditional or permanent. The
+     old body.store-stack-open rule dropped will-change in the same frame a
+     window's inline display flipped (the class recomputes from live window
+     visibility), racing Chromium's teardown of two Retina-sized promoted
+     layers at once; a layer stranded by that race composites as an opaque
+     near-black rectangle over the play area. Containment + isolation above
+     already scope invalidation, and a window drag promotes via its own live
+     transform, so the standing promotion bought nothing worth that risk.
+     body.store-stack-open itself is still maintained (hud.ts
+     syncAnyWindowOpenState) as the store-lifecycle diagnostic signal. */
   #claudium-window {
     width: min(940px, calc(100vw - 40px));
     max-height: calc(100vh - 40px);
@@ -2837,7 +3007,7 @@
   .cl-spinner {
     width: 18px;
     height: 18px;
-    border: 2px solid #463a1c;
+    border: 2px solid var(--color-border-showcase);
     border-top-color: #ffe27a;
     border-radius: 50%;
     animation: cl-spin 900ms linear infinite;
@@ -2962,7 +3132,7 @@
   .cl-rails {
     display: flex;
     gap: 2px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
   }
   .cl-rail {
     position: relative;
@@ -3155,7 +3325,7 @@
     align-items: center;
     gap: 8px;
     padding: 8px 10px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     background: #ffffff08;
   }
@@ -3222,7 +3392,7 @@
     gap: 12px;
     min-height: 48px;
     padding: 0 12px 0 16px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
     color: var(--gold);
     font-family: var(--title-font);
     font-size: 14px;
@@ -3255,14 +3425,23 @@
   }
 
   /* ---------- talents ---------- */
-  /* talents & specializations panel */
+  /* talents & specializations panel. Opens BIG (owner call: opening talents
+     should feel like an event): most of the viewport width plus a tall body,
+     WoW-frame style. Mobile keeps its own full-screen window treatment. */
   #talents-window {
-    width: min(600px, calc(100vw - 24px));
+    width: min(1160px, calc(100vw - 48px));
+  }
+  #talents-window #tal-body {
+    min-height: min(50vh, 540px);
   }
   .tal-tabs {
     display: flex;
     gap: 6px;
     margin: 8px 0 6px;
+  }
+  .tal-class-name {
+    color: var(--color-text-muted);
+    font-size: 11px;
   }
   .tal-tab {
     position: relative;
@@ -3278,7 +3457,7 @@
     font-family: var(--title-font);
     color: var(--color-text-muted);
     background: #1c1609;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     cursor: var(--cursor-point);
   }
@@ -3313,6 +3492,115 @@
     border-radius: 9px;
     font-family: var(--body-font);
   }
+  /* Talents V2 choice rows: six level bands, each with three mutually exclusive
+     options. Desktop keeps every band readable in one view; narrow touch layouts
+     stack the options inside the existing full-screen talents window. */
+  .tal-rows {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: min(48vh, 520px);
+    gap: 8px;
+    margin: 8px 0 4px;
+  }
+  .tal-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 12px;
+    background: rgb(0 0 0 / 18%);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .tal-row-lv {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 50%;
+    color: var(--gold);
+    font-size: 13px;
+  }
+  .tal-row-lv.locked {
+    border-color: var(--border);
+    color: var(--color-text-muted);
+  }
+  .tal-row-opts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    flex: 1;
+    min-width: 0;
+    gap: 12px;
+  }
+  .tal-row.locked .tal-row-opts {
+    opacity: 0.45;
+  }
+  .tal-row-opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    min-height: 48px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--panel-bg);
+    color: var(--color-text-light);
+    font: inherit;
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  .tal-row-opt img {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+  }
+  .tal-row-opt b {
+    overflow: hidden;
+    font-size: 13px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tal-row-opt:hover:not(:disabled) {
+    border-color: var(--gold-dim);
+  }
+  .tal-row-opt:focus-visible,
+  .tal-spec:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .tal-row-opt.picked {
+    border-color: var(--gold);
+    box-shadow: inset 0 0 0 1px var(--gold-dim);
+  }
+  .tal-row-opt.picked b {
+    color: var(--gold);
+  }
+  .tal-row-opt:disabled {
+    cursor: var(--cursor-arrow);
+  }
+  .tal-row-opt.pending {
+    opacity: 0.55;
+  }
+  .tal-row-opt.pending img {
+    filter: grayscale(0.8);
+  }
+  .tal-soon {
+    flex: 0 0 auto;
+    margin-left: auto;
+    padding: 2px 6px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--color-text-muted);
+    font-size: 10px;
+    font-style: normal;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
   .tal-head {
     display: flex;
     justify-content: space-between;
@@ -3330,167 +3618,238 @@
     padding: 0 8px 8px;
     margin: 0 -8px;
   }
-  .tal-tree {
-    position: relative;
-    margin: 6px auto;
-  }
-  .tal-arrows {
-    position: absolute;
-    left: 0;
-    top: 0;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .tal-node {
-    position: absolute;
-    width: 46px;
-    height: 46px;
+  /* WoW-style specialization grid: all specs shown at once as full panels. */
+  .ts-specs-grid {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: var(--cursor-point);
-    background: #15110a;
-    border: 2px solid #5a4a22;
-    color: #e8dcb0;
-    user-select: none;
-    box-sizing: border-box;
-    z-index: 1;
+    gap: 8px;
+    margin: 10px 0;
+    align-items: stretch;
+    /* Fill the tall talents body so every sheet has room for its bottom action. */
+    min-height: min(50vh, 540px);
   }
-  .tal-node .tal-icon {
-    position: absolute;
-    inset: 2px;
-    display: block;
-    background-color: #15110a;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 1;
-  }
-  .tal-node.circle {
-    border-radius: 50%;
-  }
-  .tal-node.circle .tal-icon {
-    border-radius: 50%;
-  }
-  .tal-node.square {
-    border-radius: 7px;
-  }
-  .tal-node.square .tal-icon {
-    border-radius: 5px;
-  }
-  .tal-node.octagon {
+  .ts-panel {
+    flex: 1 1 0;
+    min-width: 0;
+    /* The desktop window is intentionally tall; let the sheets stretch to its
+       full height instead of clipping the mastery/examples and View talents action. */
+    aspect-ratio: auto;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 14px 12px;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 8px;
+    background: #1a1409;
+    cursor: var(--cursor-point);
+    overflow: hidden;
   }
-  .tal-node.octagon .tal-icon {
-    inset: 3px;
-    border-radius: 6px;
-    clip-path: polygon(24% 0, 76% 0, 100% 24%, 100% 76%, 76% 100%, 24% 100%, 0 76%, 0 24%);
+  .ts-class-description {
+    max-width: 820px;
+    margin: 5px auto 8px;
+    color: #c8b888;
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: center;
   }
-  .tal-node.avail {
-    border-color: #b98b27;
-    box-shadow:
-      0 0 0 1px #0b0804,
-      0 0 7px #9a772855;
-  }
-  .tal-node.avail::after {
-    content: "+";
-    position: absolute;
-    left: -6px;
-    top: -7px;
-    min-width: 15px;
-    height: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #120d04;
-    background: #f5c843;
-    border: 1px solid #332403;
-    border-radius: 50%;
-    font: 700 12px / 1 var(--body-font);
-    z-index: 3;
-  }
-  .tal-node.filled {
-    border-color: #f5c843;
-    color: #fff;
+  .ts-panel.sel {
+    border-color: #ffd100;
     background: #2c2410;
     box-shadow:
-      inset 0 0 0 2px #120d04,
-      0 0 10px #b8902a99;
+      inset 0 0 0 1px #ffd10055,
+      0 0 12px #b8902a55;
   }
-  .tal-node.filled::after,
-  .tal-node.maxed::after {
-    content: "✓";
-    position: absolute;
-    left: -6px;
-    top: -7px;
-    min-width: 16px;
-    height: 16px;
+  .ts-panel-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .ts-panel .ts-icon {
+    width: 48px;
+    height: 48px;
+    flex: none;
+    border-radius: 7px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #120d04;
-    background: #ffd100;
-    border: 1px solid #332403;
-    border-radius: 50%;
-    font: 700 11px / 1 var(--body-font);
-    z-index: 3;
+    background: #15110a;
+    color: #fff;
+    border: 1px solid #5a4a22;
+    font:
+      30px / 1 "Apple Color Emoji",
+      "Segoe UI Emoji",
+      var(--body-font);
+    text-shadow: 0 1px 2px #000;
   }
-  .tal-node.maxed {
-    border-color: #ffe27a;
-    box-shadow:
-      inset 0 0 0 2px #120d04,
-      0 0 13px #ffd100cc;
+  .ts-panel .ts-icon.ts-icon-art {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: transparent;
+    font-size: 0;
+    text-shadow: none;
   }
-  .tal-node.maxed::after {
-    content: "★";
-    font-size: 10px;
+  .ts-panel.sel .ts-icon {
+    border-color: #ffd100;
+    box-shadow: 0 0 8px #ffd10066;
   }
-  .tal-node.locked {
-    opacity: 0.48;
-    filter: grayscale(0.75) brightness(0.72);
-    cursor: not-allowed;
-  }
-  .tal-node.dormant {
-    border-color: #ff6d5a;
-    box-shadow:
-      inset 0 0 0 2px #2a0905,
-      0 0 10px #c0392bcc;
-  }
-  .tal-node.dormant::after {
-    content: "!";
-    position: absolute;
-    left: -6px;
-    top: -7px;
-    min-width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff6e8;
-    /* literal, NOT --color-debuff: the value matches but a dormant-node warning badge is not a
-       combat debuff, and its sibling .tal-node.dormant border / shadow reds are literals too,
-       so keep the hand-tuned dormant-red palette cohesive. */
-    background: #c0392b;
-    border: 1px solid #3a0803;
-    border-radius: 50%;
-    font: 800 11px / 1 var(--body-font);
-    z-index: 3;
-  }
-  .tal-rank {
-    position: absolute;
-    right: -6px;
-    bottom: -7px;
-    min-width: 20px;
+  .ts-panel-title {
     text-align: center;
+    min-width: 0;
+  }
+  .ts-panel .ts-name {
+    font-size: 15px;
+    color: #fff;
+    font-family: var(--title-font);
+  }
+  .ts-panel .ts-role {
     font-size: 10px;
-    color: #fff6d5;
-    background: #171006;
-    border: 1px solid #ffd100;
-    border-radius: 8px;
-    padding: 0 4px;
-    line-height: 14px;
-    z-index: 4;
-    box-shadow: 0 1px 4px #000a;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  /* Spec panel detail body (description, meta chips, mastery, example strip):
+     restored from the warrior-overhaul styling the #1757 revert deleted; the
+     panel DOM (talents_window.ts paintSpecTab) and the hud.mobile.css
+     overrides always kept these class names. */
+  .ts-det-desc {
+    font-size: 14px;
+    color: #e8d6a0;
+    line-height: 1.5;
+    margin-bottom: 11px;
+    text-align: center;
+  }
+  /* Compact meta: primary attribute as a small content-hugging chip, complexity as a
+     lone colored line (no heavy box), matching the WoW-style spec screen reference. */
+  .ts-det-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 11px;
+  }
+  .ts-det-attr {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 7px;
+    padding: 4px 10px;
+    border: 1px solid #5a4a22;
+    border-radius: 5px;
+    background: #191207;
+  }
+  .ts-det-attr-cap,
+  .ts-det-cx-cap {
+    font-size: 10px;
+    color: #9a8a5a;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 600;
+  }
+  .ts-det-attr-val {
+    font-size: 14px;
+    color: #ffd97a;
+    font-weight: 700;
+  }
+  .ts-det-cx {
+    font-size: 13px;
+    font-weight: 700;
+    padding-left: 2px;
+  }
+  .ts-cx-low {
+    color: #7fc77f;
+  }
+  .ts-cx-medium {
+    color: var(--gold);
+  }
+  .ts-cx-high {
+    color: #e07a5a;
+  }
+  /* Standalone section heading (the example-abilities strip). */
+  .ts-det-label {
+    font-size: 12px;
+    color: #9a8a5a;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .ts-det-mastery {
+    font-size: 11px;
+    color: #c8b888;
+    margin: 0 0 8px;
+    padding: 6px 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    background: #14100a;
+  }
+  .ts-det-mastery b {
+    color: var(--gold);
+  }
+  /* The example strip + the primary action are the card's bottom group: push them
+     together to the bottom (margin-top:auto on the block) so the empty space is one
+     gap ABOVE them, not a big gap between the examples and the button. Centered. */
+  .ts-ex-block {
+    margin-top: auto;
+    text-align: center;
+  }
+  .ts-ex-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 4px 0 10px;
+  }
+  .ts-ex {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 64px;
+    gap: 3px;
+    cursor: var(--cursor-point);
+    border-radius: 6px;
+    outline: none;
+  }
+  .ts-ex:focus-visible {
+    box-shadow: 0 0 0 2px var(--gold);
+  }
+  .ts-ex-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    border: 1px solid #5a4a22;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: #15110a;
+  }
+  .ts-ex:hover .ts-ex-icon,
+  .ts-ex:focus-visible .ts-ex-icon {
+    border-color: var(--gold);
+  }
+  .ts-ex:hover .ts-ex-name {
+    color: #fff;
+  }
+  .ts-ex-name {
+    font-size: 9px;
+    color: #b8a878;
+    text-align: center;
+    line-height: 1.15;
+  }
+  .ts-view-talents {
+    display: block;
+    width: 100%;
+    margin-top: auto;
+    margin-right: 0;
+  }
+  /* When the example strip is present it already pins the bottom group, so the button
+     sits directly under it instead of taking its own auto gap. */
+  .ts-view-talents.has-ex {
+    margin-top: 0;
+  }
+  /* The currently-selected spec's button reads as the primary/committed action. */
+  .ts-view-talents.primary {
+    background: linear-gradient(#b8902a, #8a6a1c 55%, #6a4f12);
+    color: #fff;
+    border-color: #ffd100;
   }
   .tal-specs {
     display: flex;
@@ -3501,11 +3860,13 @@
     position: relative;
     flex: 1;
     padding: 8px 6px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 6px;
     background: #1a1409;
     cursor: var(--cursor-point);
     text-align: center;
+    color: inherit;
+    font: inherit;
   }
   .tal-spec.sel {
     border-color: #ffd100;
@@ -3547,28 +3908,44 @@
       var(--body-font);
     text-shadow: 0 1px 2px #000;
   }
+  .tal-spec .ts-icon.ts-icon-art {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
   .tal-spec.sel .ts-icon {
     border-color: #ffd100;
     box-shadow: 0 0 8px #ffd10066;
   }
   .tal-spec .ts-name {
+    display: block;
     font-size: 12px;
     color: #fff;
     font-family: var(--title-font);
     margin-top: 2px;
   }
   .tal-spec .ts-role {
+    display: block;
     font-size: 10px;
     color: var(--gold);
     text-transform: uppercase;
     letter-spacing: 0.4px;
+  }
+  .tal-spec .ts-action {
+    display: block;
+    margin-top: 6px;
+    color: var(--color-text-muted);
+    font-size: 10px;
+  }
+  .tal-spec.sel .ts-action {
+    color: var(--gold);
   }
   .tal-mastery {
     font-size: 11px;
     color: #c8b888;
     margin: 4px 2px 6px;
     padding: 6px 8px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     background: #14100a;
   }
@@ -3581,84 +3958,140 @@
     line-height: 1.35;
     color: #a99b76;
   }
+  /* The WoW-style loadout bar: one compact dropdown button, bottom-left; the
+     menu opens UPWARD (anchored above the button) with the saved builds and
+     the save/import/export/reset actions. */
   .tal-foot {
-    display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(170px, 0.9fr);
-    gap: 8px;
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
     margin-top: 10px;
-    border-top: 1px solid #463a1c;
+    border-top: 1px solid var(--color-border-showcase);
     padding-top: 8px;
   }
-  .tal-build-card {
-    display: grid;
-    gap: 6px;
-    align-content: start;
-    padding: 7px;
-    border: 1px solid #3f341a;
-    border-radius: 6px;
-    background: #120e08;
-    box-shadow: inset 0 0 0 1px #0008;
-  }
-  .tal-build-current {
-    background: #171208;
-    border-color: #59461d;
-  }
-  .tal-build-create {
-    background: #10120d;
-  }
-  .tal-build-head {
-    display: flex;
-    gap: 7px;
+  .tal-loadout-btn {
+    display: inline-flex;
     align-items: center;
-    justify-content: space-between;
-    min-width: 0;
-    color: var(--gold);
-    font-family: var(--title-font);
-    font-size: 12px;
-  }
-  .tal-build-head .ui-dd {
-    min-width: 132px;
-    flex: 1 1 150px;
-    font-family: var(--body-font);
-  }
-  .tal-build-actions {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  .tal-build-help {
-    font-size: 11px;
-    line-height: 1.35;
-    color: #a99b76;
-  }
-  .tal-foot .btn {
-    padding: 5px 10px;
-    font-size: 12px;
-  }
-  .tal-foot .btn.tal-primary {
-    border-color: #8f7025;
+    gap: 9px;
+    max-width: 260px;
+    padding: 6px 12px;
+    font: inherit;
+    font-size: 12.5px;
     color: #ffe6a8;
-    background: linear-gradient(#7a5f21, #4d3810);
+    background: linear-gradient(#3a2e14, #241a0c);
+    border: 1px solid #8f7025;
+    border-radius: 6px;
+    cursor: pointer;
   }
-  .tal-foot .btn.tal-secondary {
-    color: var(--color-text-muted);
-    border-color: #4b3d1d;
-    background: #171208;
+  .tal-loadout-btn:hover {
+    border-color: var(--gold);
   }
-  .tal-foot .btn[disabled] {
-    opacity: 0.45;
-    pointer-events: none;
-    cursor: not-allowed;
+  .tal-loadout-btn:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
   }
-  .tal-foot select,
-  .tal-foot input {
-    background: #14100a;
+  .tal-loadout-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tal-loadout-caret {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 6px solid var(--gold);
+    flex: 0 0 auto;
+  }
+  .tal-loadout-menu {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 6px);
+    min-width: 240px;
+    max-width: 320px;
+    padding: 5px;
+    background: linear-gradient(#1d1710, #120e08);
+    border: 1px solid #59461d;
+    border-radius: 7px;
+    box-shadow: 0 10px 26px -8px #000;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .tal-lo-row {
+    display: flex;
+    align-items: stretch;
+    gap: 2px;
+  }
+  .tal-lo-row.active .tal-lo-pick {
+    color: var(--gold);
+    background: #241c0c;
+  }
+  .tal-lo-item,
+  .tal-lo-pick {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    padding: 6px 9px;
+    font: inherit;
+    font-size: 12px;
     color: #e8dcb0;
-    border: 1px solid #463a1c;
-    border-radius: 4px;
-    font-size: 11px;
-    padding: 4px;
+    background: none;
+    border: 0;
+    border-radius: 5px;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .tal-lo-item:hover:not(:disabled),
+  .tal-lo-pick:hover {
+    background: #2a2110;
+    color: #ffe6a8;
+  }
+  .tal-lo-item:focus-visible,
+  .tal-lo-pick:focus-visible,
+  .tal-lo-del:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: -1px;
+  }
+  .tal-lo-item:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+  .tal-lo-new {
+    color: var(--gold);
+  }
+  .tal-lo-del {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 5px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+  }
+  .tal-lo-del:hover {
+    color: var(--color-hostile, #d8413f);
+    background: #2a1210;
+  }
+  .tal-lo-del svg {
+    width: 12px;
+    height: 12px;
+  }
+  .tal-lo-sep {
+    height: 1px;
+    margin: 4px 6px;
+    background: var(--color-border-showcase);
+  }
+  .tal-lo-empty {
+    padding: 6px 9px;
+    font-size: 11.5px;
+    color: var(--color-text-muted);
   }
   .tal-spacer {
     flex: 1;
@@ -3707,6 +4140,13 @@
     }
     .tal-spec .ts-role {
       font-size: 9px;
+    }
+    .tal-row {
+      flex-wrap: wrap;
+    }
+    .tal-row-opts {
+      grid-template-columns: 1fr;
+      flex-basis: 100%;
     }
   }
 
@@ -3888,98 +4328,6 @@
     bottom: auto;
     top: calc(100% + 4px);
   }
-  /* Choice-node option flyout */
-  .tal-choice-pop {
-    position: fixed;
-    z-index: 90;
-    width: 252px;
-    background: #1a140a;
-    border: 1px solid var(--gold);
-    border-radius: 6px;
-    box-shadow:
-      0 10px 24px #000c,
-      inset 0 0 0 1px #ffd10022;
-    padding: 5px;
-  }
-  .tal-choice-pop::before {
-    content: "";
-    position: absolute;
-    left: var(--tal-choice-caret-left, 50%);
-    top: -6px;
-    width: 10px;
-    height: 10px;
-    background: #1a140a;
-    border-left: 1px solid var(--gold);
-    border-top: 1px solid var(--gold);
-    transform: translateX(-50%) rotate(45deg);
-  }
-  .tal-choice-opt {
-    position: relative;
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-    padding: 8px 28px 8px 8px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    cursor: var(--cursor-point);
-  }
-  .tal-choice-opt:hover,
-  .tal-choice-opt:focus-visible {
-    background: #ffffff10;
-    border-color: #6f5a2a;
-  }
-  /* The roving choice-menu option is the keyboard centerpiece, so the focused
-     option gets the same steady, tokenized outline ring the rest of the chrome draws
-     on :focus-visible, not just the hover tint, so keyboard roving is
-     clearly visible. Inset offset keeps the ring inside the popup's scroll edge. */
-  .tal-choice-opt:focus-visible {
-    outline: 2px solid var(--color-border-focus);
-    outline-offset: -2px;
-  }
-  .tal-choice-opt.sel {
-    background: #2c2410;
-    border-color: var(--gold);
-    box-shadow: inset 0 0 0 1px #ffd10033;
-  }
-  .tal-choice-opt.sel::after {
-    content: "✓";
-    position: absolute;
-    right: 8px;
-    top: 8px;
-    width: 15px;
-    height: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #120d04;
-    background: #ffd100;
-    border-radius: 50%;
-    font: 700 10px / 1 var(--body-font);
-  }
-  .tco-icon {
-    width: 28px;
-    height: 28px;
-    flex: none;
-    border-radius: 4px;
-    display: block;
-    background-color: #15110a;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    border: 1px solid #5a4a22;
-  }
-  .tco-text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    font-size: 11px;
-    color: #c8b888;
-  }
-  .tco-text b {
-    color: #fff;
-    font-size: 12px;
-  }
-
   /* generic confirm dialog (prestige) */
   #confirm-dialog {
     left: 50%;
@@ -4280,7 +4628,7 @@
     font-size: 12.5px;
     color: var(--gold);
     background: #120d07;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 5px;
     font-family: var(--ui-font);
   }
@@ -4370,9 +4718,56 @@
   }
 
   /* ---------- vendor ---------- */
-  /* vendor */
+  /* vendor: landscape layout. The goods/buyback lists used to be one
+     full-width row per item in a narrow 400px column, so a modest stock
+     forced a tall, mostly-empty-looking scroll. Widen the window and lay
+     the rows out as tiles in a multi-column grid (.vendor-goods-grid) so it
+     reads like a real shop counter instead of a portrait list (issue:
+     vendor relayout to landscape grid). The sell-junk button, buyback
+     section title, empty state and hint stay full-width outside the grid.
+     #vendor-window is centred (left: 50%; translateX(-50%), layout.css) while
+     the always-open #bags companion is centred in its own bottom-right gap
+     (#bags left: calc((100% + 50% + --bags-bar-half + --bags-gap -
+     --bags-micro-r) / 2), then translateX(-50%)), so a flat 92vw or a
+     viewport-minus-constant cap both eventually let the widened window slide
+     UNDER bags (maintainer review rounds 1-5 on PR #2101). Solving that #bags
+     left-edge algebra for the largest vendor half-width that still clears it
+     (at #bags' steady-state 310px width, once --bags-slot-w is no longer the
+     binding constraint) collapses to a single line in terms of the SAME
+     --bags-bar-half token #bags reads off :root: half-width <= 0.25 * VW +
+     (--bags-bar-half - 360px) / 2, i.e. full width <= 0.5 * VW +
+     --bags-bar-half - 360px (the constants fold --bags-micro-r's fixed 50px
+     term and #bags' own 310px/2 half-width; --bags-gap cancels out of the
+     --bags-micro-r subtraction, so it does not need to appear here). #vendor-
+     window lives inside #ui, which carries `zoom: var(--ui-scale)`, so
+     --app-vw (the real, unscaled viewport) must be divided by --window-scale
+     before it is combined with --bags-bar-half, an author length already
+     living in the zoomed space: without the division the two sides are in
+     different units and the cap silently stops clearing bags at any
+     --ui-scale other than 1 (maintainer review round 4). The 2px slack over
+     the exact boundary keeps the two windows from touching edge-to-edge. The
+     floor keeps the window no narrower than the pre-PR fixed 400px: the
+     vendor window is top-anchored (top: 12px, layout.css) while #bags is
+     bottom-anchored (bottom: 6px), so at widths this small the failure mode
+     is never horizontal overlap with the bottom-right bags column, only the
+     window itself; the min() cap above still wins on any viewport where
+     clearing bags needs more than 400px. */
   #vendor-window {
-    width: 400px;
+    width: max(
+      400px,
+      min(
+        860px,
+        calc(0.5 * (var(--app-vw, 100vw) / var(--window-scale)) + var(--bags-bar-half) - 362px)
+      )
+    );
+  }
+  .vendor-goods-grid {
+    display: grid;
+    /* auto-fill instead of a fixed repeat(4, ...): once the width cap above
+       shrinks the window on a narrower viewport, the grid drops to 3 or 2
+       columns on its own rather than squeezing 4 undersized tiles. */
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 6px;
   }
   .vendor-item {
     display: flex;
@@ -4388,12 +4783,25 @@
     font-family: var(--ui-font);
     text-align: left;
   }
+  /* Inside the grid, a tile stacks icon over name over price rather than a
+     left-to-right row, so several fit per line at the window's new width. */
+  .vendor-goods-grid .vendor-item {
+    flex-direction: column;
+    justify-content: flex-start;
+    text-align: center;
+    gap: 4px;
+    padding: 8px 6px;
+  }
   .vendor-item:hover {
     background: #ffffff10;
   }
   .vendor-item .vi-name {
     font-size: 12px;
     flex: 1;
+  }
+  .vendor-goods-grid .vendor-item .vi-name {
+    flex: none;
+    width: 100%;
   }
   .vendor-item .vi-price {
     font-size: 11px;
@@ -4416,6 +4824,12 @@
   .vendor-item:disabled {
     opacity: 0.45;
     cursor: default;
+  }
+  /* An unaffordable fee (train and unbind rows emit .unaffordable) tints
+     like an unsatisfied cost everywhere else in the language; the row's
+     disabled opacity alone left the reason invisible. */
+  .vendor-item .vi-price.unaffordable {
+    color: var(--color-text-error);
   }
   .vendor-item:disabled:hover {
     background: transparent;
@@ -4450,10 +4864,126 @@
   .vendor-section-title {
     margin-top: 8px;
     padding-top: 7px;
-    border-top: 1px solid #463a1c;
+    border-top: 1px solid var(--color-border-showcase);
     color: var(--gold);
     font-family: var(--title-font);
     font-size: 12px;
+  }
+  /* Crafting window shell: a wide showcase-format window (the char/inspect
+     740px generation; 760px matches the spellbook). Column flex with the
+     title, identity card, and tab strip pinned while .crafting-body scrolls
+     (the mailbox inner-scroll model); the painter opens it with
+     display: flex, so the base .window overflow never fights the body pane. */
+  #crafting-window {
+    width: 760px;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  /* relative, not sticky: the shell no longer scrolls (the body pane does),
+     and the absolutely pinned close button needs its containing block to stay
+     the title bar. */
+  #crafting-window > .panel-title {
+    position: relative;
+    top: 0;
+    flex: none;
+    margin-bottom: 0;
+  }
+  /* The craft tab strip (the mail-tabs family, one tab per craft with known
+     recipes): art icon, craft name, and a muted recipe count. Selected state
+     is gold text over a gold underline; the strip wraps on narrow widths. */
+  .crafting-tabs {
+    flex: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 10px 0 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--color-border-showcase);
+  }
+  .crafting-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
+    font-size: 12px;
+    cursor: var(--cursor-point);
+  }
+  .crafting-tab:hover {
+    background: #ffffff0e;
+    color: var(--color-text-light);
+  }
+  .crafting-tab:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .crafting-tab.sel {
+    border-color: var(--color-border-showcase);
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--gold);
+    box-shadow: inset 0 -2px 0 #cc9a3c;
+  }
+  .crafting-tab-icon {
+    flex: 0 0 22px;
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    filter: drop-shadow(var(--art-shadow-sm));
+  }
+  .crafting-tab-count {
+    padding: 1px 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.3);
+    font-family: var(--ui-font);
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+  }
+  .crafting-tab.sel .crafting-tab-count {
+    color: var(--color-text-light);
+  }
+  /* The scrolling recipe pane: the selected craft's header, learn hint, and
+     recipe cards, breathing on an 8px rhythm. */
+  .crafting-body {
+    flex: 1 1 auto;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    padding: 10px 2px 2px 0;
+  }
+  /* A scroll pane's children must never flex-shrink: once the recipe list
+     overflows, a default-shrink card compresses below its content height and
+     its overflow:hidden clips the footer (the commission chip lost its
+     bottom half this way). Overflow belongs to the pane's scrollbar. */
+  .crafting-body > * {
+    flex-shrink: 0;
+  }
+  .crafting-body > .vendor-section-title {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+  .crafting-section-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    font-variant: small-caps;
+  }
+  .crafting-section-icon {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    filter: drop-shadow(var(--art-shadow-sm));
   }
   .qd-profession-choice {
     display: grid;
@@ -4473,23 +5003,71 @@
     font-family: var(--ui-font);
   }
   .qd-profession-preview {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     margin-bottom: 8px;
     color: var(--color-text-muted);
     font-size: 11px;
     line-height: 1.4;
   }
+  .qd-profession-crest {
+    flex: 0 0 46px;
+    width: 46px;
+    height: 46px;
+    object-fit: contain;
+  }
+  .qd-profession-preview-copy {
+    min-width: 0;
+  }
+  /* The crafting identity card, restyled to the showcase inset-card idiom
+     (char-window stat panels): dark inset fill, gold-brown hairline, 7px
+     radius. Two columns beside each other (narrative left, skill table
+     right) so the card reads as a compact hero, not a tall stack. */
   .profession-identity-card {
-    margin: 8px 0 10px;
-    padding: 10px;
-    border: 1px solid var(--color-border-default);
-    border-radius: 4px;
-    background: var(--color-bg-input);
+    flex: none;
+    display: flex;
+    gap: 16px;
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: rgba(0, 0, 0, 0.24);
+  }
+  .profession-identity-main {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .profession-identity-card .profession-skill-list {
+    flex: 1 1 0;
+    min-width: 0;
+    align-self: start;
   }
   .profession-identity-card h3 {
     margin: 0 0 8px;
     color: var(--gold);
     font-family: var(--title-font);
     font-size: 13px;
+    letter-spacing: 0.06em;
+    font-variant: small-caps;
+  }
+  .profession-archetype-crest {
+    filter: drop-shadow(var(--art-shadow-lg));
+  }
+  .profession-identity-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .profession-identity-heading h3 {
+    margin: 0;
+  }
+  .profession-archetype-crest {
+    flex: 0 0 46px;
+    width: 46px;
+    height: 46px;
+    object-fit: contain;
   }
   .profession-identity-summary {
     display: grid;
@@ -4545,18 +5123,138 @@
     font-size: 10px;
     line-height: 1.35;
   }
+  /* One recipe card (the showcase inset-card idiom): the whole first row stays
+     the Craft button (big target), with a quality-glow socket, a wrapping
+     display-font name, the reagent and skill lines, and the gold Craft chip
+     at the right; combo/station reasons and the commission opt-in dock under
+     it inside the same card. */
   .crafting-recipe-item {
     flex-wrap: wrap;
+    gap: 0;
+    padding: 0;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: rgba(0, 0, 0, 0.24);
+    overflow: hidden;
+  }
+  /* The recipe card rides .vendor-item for its base metrics, so the family's
+     .vendor-item:hover wash would REPLACE the card's inset fill on any hover
+     over the card (the pseudo-class rule outranks the single-class fill).
+     The card itself is not interactive (the Craft and commission chips carry
+     the affordances), so hover restates the fill with no wash. */
+  .vendor-item.crafting-recipe-item:hover {
+    background: rgba(0, 0, 0, 0.24);
   }
   .crafting-recipe-item > .vendor-item {
     flex: 1 0 100%;
+    gap: 10px;
+    padding: 9px 10px;
+    align-items: center;
+    border-radius: 0;
+  }
+  .crafting-recipe-socket {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    background: var(--color-bg-input);
+  }
+  .crafting-recipe-socket .item-icon {
+    width: 38px;
+    height: 38px;
+  }
+  .crafting-recipe-name {
+    display: block;
+    margin-bottom: 2px;
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: var(--color-text-light);
+    overflow-wrap: anywhere;
+  }
+  .crafting-reagent-line {
+    line-height: 1.4;
+  }
+  /* Unsatisfied reagents tint toward the error red; the have/required counts
+     in the text are the actual signal (the tint is a redundant hint). */
+  .crafting-reagent.unsat {
+    color: var(--color-text-error);
+  }
+  /* The Craft affordance chip: the gold-gradient primary the mailbox send
+     button established. It is decoration inside the row-button (the whole row
+     is the target); disabled rows desaturate it through the button opacity. */
+  .crafting-craft-chip {
+    flex: none;
+    align-self: center;
+    padding: 7px 16px;
+    border: 1px solid #6a5320;
+    border-radius: 5px;
+    background: linear-gradient(180deg, #e9c064, #b98a2e);
+    color: #1c1206;
+    font-family: var(--title-font);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .crafting-recipe-btn:hover:not(:disabled) .crafting-craft-chip {
+    filter: brightness(1.1);
+  }
+  .crafting-recipe-btn:disabled .crafting-craft-chip {
+    filter: grayscale(0.7);
   }
   .crafting-recipe-item > .crafting-combo-requirement {
     flex: 1 0 100%;
-    margin-top: 3px;
+    margin: 0;
+    padding: 4px 10px 7px;
     color: var(--color-text-muted);
-    font-size: 10px;
+    font-size: 10.5px;
     line-height: 1.35;
+  }
+  /* Legibility: the skill-req / difficulty / station line inside the
+     recipe button. The difficulty tint comes from the --color-craft-* tokens
+     via the data attribute (never an inline color) with its text label always
+     adjacent, so the info is never color-only; no new tap targets (the whole
+     row stays the button). */
+  .crafting-skill-line {
+    display: block;
+    margin-top: 2px;
+  }
+  .crafting-difficulty[data-difficulty="full"] {
+    color: var(--color-craft-full);
+  }
+  .crafting-difficulty[data-difficulty="reduced"] {
+    color: var(--color-craft-reduced);
+  }
+  .crafting-difficulty[data-difficulty="minimal"] {
+    color: var(--color-craft-minimal);
+  }
+  .crafting-difficulty[data-difficulty="none"] {
+    color: var(--color-craft-none);
+  }
+  .crafting-station-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 0 4px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 3px;
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .crafting-station-badge.out-of-range {
+    border-style: dashed;
+  }
+  /* Discoverability: the per-section "learnable at a master" hint,
+     shown under a craft section when the viewer has unlearned trainer recipes
+     for that craft. Muted guidance text, informational only (no tap target),
+     identical on every graphics preset. */
+  .crafting-learn-hint {
+    margin: 2px 0 6px;
+    color: var(--color-text-muted);
+    font-size: 10.5px;
+    line-height: 1.4;
   }
   .vendor-empty {
     padding: 5px;
@@ -4567,15 +5265,212 @@
     font-size: 11px;
     color: #c8b888;
     margin-top: 8px;
-    border-top: 1px solid #463a1c;
+    border-top: 1px solid var(--color-border-showcase);
     padding-top: 6px;
+  }
+
+  /* ---------- profession first-tier tutorial ---------- */
+  /* The once-ever explainer modal (profession_tutorial_window.ts), reusing the
+     confirm-dialog modal family (.window.panel shell, .cd-body/.cd-actions). A
+     bounded, centered modal; body-appended (see the layout.css --window-scale:1
+     group), and the JS floors its z-index above the mobile sheet (the
+     scoped-popup 96 rule). Sized from existing tokens, no new ones. */
+  #profession-tutorial {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 380px;
+    --window-pad: 14px;
+  }
+  #profession-tutorial .cd-body {
+    padding: 10px 0;
+  }
+  #profession-tutorial .cd-para {
+    margin: 0 0 8px;
+    color: var(--color-text-light);
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+  #profession-tutorial .cd-para:last-child {
+    margin-bottom: 0;
+  }
+  #profession-tutorial .cd-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+
+  /* ---------- train window ---------- */
+  /* Recipe training: the station master's teaching ladder. Rows keep the
+     vendor family's anatomy classes but ride the showcase inset-card idiom
+     of the crafting recipe cards (card fill and hairline per row, a
+     quality-glow socket, the tri-state pill, and the gold-gradient fee chip
+     on an affordable teachable row; an unaffordable fee keeps the plain
+     error-tint price so the block stays readable under the disabled
+     opacity). The unbind service below shares every card rule. */
+  #train-window {
+    width: 400px;
+  }
+  /* The craft section headers follow the crafting window's small-caps
+     treatment so the two teaching surfaces read as one family. */
+  #train-window .vendor-section-title {
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    font-variant: small-caps;
+  }
+  .train-row,
+  .unbind-row {
+    margin: 0 0 8px;
+    padding: 9px 10px;
+    gap: 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: rgba(0, 0, 0, 0.24);
+  }
+  /* The vendor family's hover rules predate the card migration: on the old
+     transparent rows they were a light wash or a no-op, but on a card they
+     REPLACE the inset fill (blanking it via .vendor-item:disabled:hover, or
+     swapping it via .vendor-item:hover), so the card restates its fill at
+     matching specificity, layering the hover wash over it on live rows. */
+  .train-row:hover:not(:disabled),
+  .unbind-row:hover:not(:disabled) {
+    background: linear-gradient(0deg, #ffffff10, #ffffff10), rgba(0, 0, 0, 0.24);
+  }
+  .train-row:disabled:hover,
+  .unbind-row:disabled:hover {
+    background: rgba(0, 0, 0, 0.24);
+  }
+  /* The shared quality-glow socket, sized down for the narrower service
+     windows (the crafting book's 44px socket crowds a 400px card). */
+  #train-window .crafting-recipe-socket,
+  #unbind-window .crafting-recipe-socket {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+  }
+  #train-window .crafting-recipe-socket .item-icon,
+  #unbind-window .crafting-recipe-socket .item-icon {
+    width: 30px;
+    height: 30px;
+  }
+  /* The gold-gradient action chip on an affordable service fee (the Craft
+     chip family): decoration inside the row button, the whole card stays
+     the target. */
+  .vi-price-chip {
+    flex: none;
+    align-self: center;
+    padding: 6px 12px;
+    border: 1px solid #6a5320;
+    border-radius: 5px;
+    background: linear-gradient(180deg, #e9c064, #b98a2e);
+    color: #1c1206;
+    font-family: var(--title-font);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .train-row:hover:not(:disabled) .vi-price-chip,
+  .unbind-row:hover:not(:disabled) .vi-price-chip {
+    filter: brightness(1.1);
+  }
+  /* The tri-state label rides the shared pill-chip idiom. */
+  .train-state {
+    font-family: var(--title-font);
+    font-size: 10px;
+    color: var(--gold);
+    padding: 2px 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+  }
+  /* Locked rows stay VISIBLE (the teaching ladder): grayed like a disabled
+     vendor row, with the named requirement on the .vi-sub line. The known
+     row is informational, never interactive, so it drops the hover affordance. */
+  .train-row.train-locked:disabled {
+    opacity: 0.45;
+  }
+
+  /* ---------- Maker's Bond unbind window (Professions 2.0) ---------- */
+  /* The station master's unbind service: shares the train window's card rules
+     above (.unbind-row rides the same inset-card, socket, and fee-chip
+     treatment); only the intro line lives here. */
+  #unbind-window {
+    width: 400px;
+  }
+  .unbind-intro {
+    display: block;
+    padding: 4px 6px 6px;
+    color: var(--color-text-muted);
+    font-size: 10.5px;
+    line-height: 1.4;
+  }
+
+  /* Commission opt-in in the crafting window: a per-recipe pill toggle-chip
+     (aria-pressed) in the card's chip language, right-aligned in the card
+     footer so it stacks under the gold Craft chip as one action column. The
+     quieter white-alpha interior hairline is deliberate (softer than the
+     card's outer keyline). The state pip doubles the pressed signal so the
+     armed state is never colour-only (aria-pressed carries it for AT). */
+  .crafting-commission-row {
+    flex: 1 0 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding: 6px 10px 8px;
+    border-top: 1px solid #ffffff0d;
+  }
+  .crafting-commission-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 26px;
+    padding: 4px 12px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
+    font-size: 11px;
+    cursor: var(--cursor-point);
+  }
+  .crafting-commission-chip:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  .crafting-commission-pip {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-input);
+  }
+  .crafting-commission-chip[aria-pressed="true"] {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    background: rgb(200 163 74 / 12%);
+  }
+  .crafting-commission-chip[aria-pressed="true"] .crafting-commission-pip {
+    border-color: var(--gold-dim);
+    background: var(--gold);
+  }
+  .train-row.train-known {
+    cursor: default;
+  }
+  .train-row.train-known:hover {
+    /* Keep the card fill, no hover wash: the known row is informational and
+       must not imply interactivity (transparent here would blank the card). */
+    background: rgba(0, 0, 0, 0.24);
+  }
+  .train-row.train-known .train-state {
+    opacity: 0.7;
   }
 
   /* ---------- bags ---------- */
   /* bags, centred in the bottom gap between the action cluster and micro-menu */
   #bags {
-    --bags-bar-half: 306px;
-    --bags-gap: 12px;
+    /* --bags-bar-half / --bags-gap now live on :root (tokens.css) so the vendor
+       Goods window's width cap reads the SAME reservation instead of a copy. */
     --bags-micro-r: calc(16px + 34px + var(--bags-gap));
     --bags-slot-w: max(
       180px,
@@ -4746,6 +5641,31 @@
       0 1px 2px #000,
       0 0 3px #000;
     pointer-events: none;
+  }
+  /* Instanced-copy marker (Professions 2.0): a static gold corner
+     tab on every per-copy (signed/enchanted/masterwork) stack, always visible
+     on the cell itself on desktop and touch (information-add, identical on
+     every graphics preset, so no --fx-* gate). Top-left, clear of the
+     bottom-right count badge. */
+  .bag-item .bi-instance {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 11px;
+    height: 11px;
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+    background: var(--color-accent);
+    pointer-events: none;
+  }
+  .bag-item .bi-masterwork-seal {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    pointer-events: none;
+    filter: drop-shadow(var(--art-shadow-sm));
   }
   .bag-item.empty {
     cursor: default;
@@ -4984,7 +5904,7 @@
     margin: 0 0 6px;
     padding: 4px 7px;
     border-radius: 4px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     background: #1c1812;
     color: var(--gold-dim);
     font-family: var(--ui-font);
@@ -5080,7 +6000,7 @@
     flex: none;
     margin-top: 8px;
     padding-top: 7px;
-    border-top: 1px solid #463a1c;
+    border-top: 1px solid var(--color-border-showcase);
     display: flex;
     justify-content: center;
   }
@@ -5357,8 +6277,8 @@
     gap: 8px;
     align-items: flex-start;
     padding: 7px;
-    border: 1px solid #4a3d26;
-    border-radius: 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
     background: linear-gradient(160deg, #17130c, #0c0a07);
   }
   .deed-card.earned {
@@ -5404,7 +6324,7 @@
   .deed-chip {
     font-size: 10.5px;
     padding: 1px 7px;
-    border-radius: 8px;
+    border-radius: 999px;
     font-family: var(--title-font);
     border: 1px solid #56472a;
     color: #d8c489;
@@ -5586,6 +6506,316 @@
     font-family: var(--title-font);
     margin-top: -2px;
   }
+  /* ---------- professions ---------- */
+  /* The Professions window: a cold, read-only identity browser (identity
+     card, craft wheel, ten skill bars with tier pips, perks readout, nudges,
+     gathering rows) over IWorldProfessions. Bar widths and ring node
+     positions are build-time inline writes; ring strokes carry
+     vector-effect="non-scaling-stroke" so these pixel widths survive the
+     unit-circle viewBox. Semantic colours come from tokens; the showcase
+     hairline is the shared --color-border-showcase token, and the remaining
+     inset-card cosmetics (rgba card fills, the ring stage haze) are
+     deliberate literals shared with the char-window showcase family. */
+  #professions-window {
+    width: 720px;
+    max-height: calc(var(--app-vh, 100vh) * 0.85 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  #professions-window .panel-title {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #professions-window .panel-title > span {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .prof-scroll {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 120px;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+  .prof-section-header {
+    margin: 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--color-border-showcase);
+    font-family: var(--title-font);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    font-variant: small-caps;
+    color: var(--gold);
+  }
+  /* Every section rides the showcase inset-card idiom (the char-window stat
+     panels): dark inset fill, gold-brown hairline, 7px radius. */
+  .prof-identity,
+  .prof-crafts,
+  .prof-perks,
+  .prof-gathering,
+  .prof-cta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 14px 12px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: rgba(0, 0, 0, 0.24);
+  }
+  /* The hero band: the identity card beside the wheel on its stage. */
+  .prof-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 264px;
+    gap: 12px;
+    align-items: stretch;
+  }
+  /* The wheel's stage: the char-window model-panel treatment (keyline, inner
+     vignette, warm radial haze, ground shadow), purely decorative around the
+     role="img" ring. */
+  .prof-ring-stage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 240px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background:
+      radial-gradient(ellipse 62% 46% at 50% 58%, rgba(216, 166, 69, 0.1), transparent 70%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.34));
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.55),
+      inset 0 0 40px rgba(0, 0, 0, 0.35);
+  }
+  .prof-pair-title {
+    font-family: var(--title-font);
+    font-size: 14px;
+    color: var(--gold);
+  }
+  .prof-archetype-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .prof-archetype-crest {
+    flex: 0 0 64px;
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+  }
+  .prof-archetype-copy {
+    min-width: 0;
+  }
+  .prof-identity-line,
+  .prof-identity-paragraph,
+  .prof-cta-line {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .prof-switch-cost,
+  .prof-tutorial {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .prof-ring {
+    position: relative;
+    flex: none;
+    width: 220px;
+    height: 220px;
+    margin: 4px auto;
+  }
+  .prof-ring-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .prof-ring-circle {
+    fill: none;
+    stroke: var(--color-border-default);
+    stroke-width: 2px;
+  }
+  .prof-ring-arc {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 3px;
+    stroke-linecap: round;
+  }
+  .prof-ring-chord {
+    stroke: var(--gold-dim);
+    stroke-width: 2px;
+    stroke-dasharray: 6 4;
+  }
+  .prof-ring-node {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    margin: -16px 0 0 -16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border-default);
+    border-radius: 50%;
+    background: var(--color-bg-dark);
+  }
+  .prof-ring-node img {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+  }
+  .prof-ring-node.role-major {
+    border-color: var(--gold);
+    box-shadow: 0 0 6px var(--color-primary-glow-heavy);
+  }
+  .prof-ring-node.role-hobby {
+    border-color: var(--gold-dim);
+  }
+  .prof-ring-node.role-dormant {
+    opacity: 0.55;
+  }
+  .prof-perk-list,
+  .prof-nudges {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  /* The craft (and gathering) rows lay out as a two-column grid on the wide
+     window, five rows tall instead of ten; minmax(0, 1fr) keeps long
+     localized names truncation-safe. */
+  .prof-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 16px;
+  }
+  .prof-craft-row,
+  .prof-gather-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 5px;
+    background: #ffffff05;
+  }
+  .prof-craft-icon {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 5px;
+  }
+  .prof-craft-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  /* The name line carries ONLY the name and the right-aligned value; chips
+     live on their own line below (the text-squish fix). */
+  .prof-craft-head {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 13px;
+  }
+  .prof-craft-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .prof-craft-chips {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .prof-craft-name {
+    font-family: var(--title-font);
+    color: var(--gold);
+  }
+  .role-dormant .prof-craft-name {
+    color: var(--color-text-muted);
+  }
+  .prof-role-badge,
+  .prof-ceiling {
+    font-size: 10px;
+    line-height: 1;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    padding: 4px 9px;
+    background: rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+  }
+  .role-major .prof-role-badge {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  .role-hobby .prof-role-badge {
+    color: var(--gold-dim);
+  }
+  .prof-skill-value {
+    margin-left: auto;
+    flex: none;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-light);
+  }
+  .prof-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .prof-bar {
+    display: inline-block;
+    flex: 1 1 auto;
+    height: 9px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 4px;
+    background: var(--color-bg-input);
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+  .prof-bar-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(180deg, var(--gold), var(--gold-dim) 85%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  }
+  .prof-pips {
+    display: inline-flex;
+    flex: none;
+    gap: 4px;
+  }
+  .prof-pip {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-input);
+  }
+  .prof-pip.filled {
+    background: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  .prof-next,
+  .prof-perk-line,
+  .prof-nudges li {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
   /* ---------- AAA window-frame adoption: master-detail windows (batch 2) ---------- */
   /* The quest log, mailbox, social panel, and spellbook adopt the shared
      window-frame grammar (src/ui/window_frame.ts; spec 6.1 + 8). Each mounts the
@@ -5618,11 +6848,21 @@
      notice, and add-row footer flow inside the scrolling .window-body, matching the
      pre-frame whole-panel scroll. */
 
-  /* Quest log: the two panes (list + measure-capped detail) fill the scrolling
-     body. The frame body owns the outer scroll; the list scrolls with it and the
-     detail caps its own reading measure. */
+  /* Quest log: the two panes (list + detail) fill the scrolling body. The
+     frame body owns the outer scroll; the list scrolls with it. Widened to
+     the same 880px landscape footprint as the live #quest-log-window rule
+     above, and the detail pane's reading-measure cap widened to use the
+     extra width instead of leaving it narrow inside a much wider window.
+     No max-width override: the shared `.window` clamp already bounds width
+     against the JS-synced app viewport (see the live rule above for why).
+     NOTE: this `.window-body` ancestor is never actually mounted (the
+     `window_frame.ts` "AAA window-frame adoption" painter that would have
+     mounted it was reverted); only the ungated `width` rule above is live.
+     Kept in sync with the live rule anyway so a future frame-phase revival
+     does not silently regress this window; do not delete it as dead code
+     without checking that history first. */
   #quest-log-window {
-    width: 520px;
+    width: 880px;
   }
   #quest-log-window .window-body .ql-cols {
     display: flex;
@@ -5632,7 +6872,7 @@
   }
   #quest-log-window .window-body .ql-detail {
     max-height: none;
-    max-width: 46ch;
+    max-width: 100ch;
   }
   #quest-log-window .window-footer .btn {
     min-width: 0;
@@ -5669,12 +6909,15 @@
   /* ---------- social ---------- */
   /* social: friends / guild / ignore */
   #social-window {
-    /* Wider than the other windows: the tab rail carries FIVE tabs (Friends,
-       Guild, Ignored, Blocked, Raid) whose labels are locale-sized, and the guild
+    /* Landscape shape: wide enough that the friend/guild/ignore/block lists lay
+       out as a two-column masonry (`.soc-body`'s `columns` below) instead of one
+       long stacked scroll, and the raid tab's two groups sit side by side
+       (`.raid-groups`). The tab rail still carries FIVE tabs (Friends, Guild,
+       Ignored, Blocked, Raid) whose labels are locale-sized, and the guild
        roster rows carry a name + rank + zone + last-seen line. */
-    width: 520px;
+    width: 760px;
     max-width: calc(100vw - 24px);
-    height: 560px;
+    height: 480px;
     max-height: calc(100vh - 24px);
     flex-direction: column;
     overflow-x: hidden;
@@ -5715,7 +6958,7 @@
     color: var(--color-text-muted);
     cursor: var(--cursor-point);
     background: #1a1410;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     text-align: center;
   }
@@ -5724,6 +6967,7 @@
   }
   .soc-tab:focus-visible,
   .soc-x:focus-visible,
+  .soc-hide-offline:focus-visible,
   .soc-name.soc-link:focus-visible,
   .soc-sugg-item:focus-visible,
   .trade-item.mine:focus-visible {
@@ -5735,11 +6979,32 @@
     border-color: #6f5a2a;
     background: linear-gradient(#2a2436, #161220);
   }
+  /* Multi-column landscape layout: a CSS grid (not CSS multicol) lays the
+     friends/guild/ignore/block rows out in up to two 260px columns while the
+     window is wide, and collapses back to one column on its own once the
+     available width drops below two 260px columns (no separate media query
+     needed; the mobile-touch override below still forces one column
+     explicitly since the window is pinned to `width: auto` there). CSS
+     multicol with a bounded, non-auto block size (this flex item's height
+     comes from the fixed-height `#social-window`) does not grow vertically:
+     it spills unreachable rows into extra inline columns that `overflow-x:
+     hidden` clips with no way to scroll to them, silently hiding friends past
+     roughly the first two columns' worth. Grid rows, by contrast, wrap and
+     keep growing the scrollable block axis. Rows flow left-to-right,
+     top-to-bottom by DOM order (`grid-auto-flow: row`, the default) so
+     reading order matches a plain list; the guild header and the empty/
+     notice states span the full width with `grid-column: 1 / -1` so they
+     read as one banner across both columns instead of only the first. */
   .soc-body {
     overflow-y: auto;
     overflow-x: hidden;
     flex: 1;
     min-height: 80px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    align-content: start;
+    row-gap: 4px;
+    column-gap: var(--spacing-md);
   }
   .soc-row {
     display: flex;
@@ -5779,6 +7044,10 @@
   }
   .soc-dot.dead {
     background: #888;
+  }
+  .soc-dot.afk {
+    background: #d8a94b;
+    box-shadow: 0 0 5px #d8a94baa;
   }
   /* name column flexes and ellipsis-truncates so it never pushes the other columns */
   .soc-id {
@@ -5905,7 +7174,7 @@
   .soc-add input {
     flex: 1;
     background: #120f0c;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     color: #f0ead8;
     padding: 5px 7px;
@@ -5964,31 +7233,94 @@
     font-size: 12px;
     padding: 10px 6px;
     text-align: center;
+    grid-column: 1 / -1;
   }
   .soc-empty-action {
     margin-top: 12px;
+    grid-column: 1 / -1;
   }
   .soc-guild-head {
     font-family: var(--title-font);
     color: var(--gold);
     font-size: 15px;
     padding: 2px 4px 6px;
+    grid-column: 1 / -1;
   }
   .soc-guild-head .gm {
     color: var(--color-text-muted);
     font-size: 11px;
   }
+  /* Guild roster: the persisted "hide offline" toggle (an aria-pressed button with a
+     checkbox-like indicator) and the online/offline group sub-headers. */
+  .soc-hide-offline {
+    /* Span the responsive .soc-body grid so the toggle sits on its own row (a break
+       above the groups), but render at content width, left-aligned. */
+    grid-column: 1 / -1;
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 2px 4px 6px;
+    padding: 5px 9px;
+    font-size: 12px;
+    font-family: var(--title-font);
+    color: var(--color-text-muted);
+    background: #1a1410;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    cursor: var(--cursor-point);
+  }
+  .soc-hide-offline:hover {
+    color: var(--gold);
+  }
+  .soc-hide-offline.on {
+    color: var(--gold);
+    border-color: #6f5a2a;
+  }
+  .soc-hide-box {
+    width: 12px;
+    height: 12px;
+    flex: none;
+    border: 1px solid #6f5a2a;
+    border-radius: 3px;
+    background: #120e0a;
+  }
+  .soc-hide-offline.on .soc-hide-box {
+    background: var(--gold);
+    box-shadow: inset 0 0 0 2px #120e0a;
+  }
+  .soc-group-head {
+    /* Full-width band so the online/offline groups stack cleanly instead of
+       interleaving across the responsive two-column .soc-body grid. */
+    grid-column: 1 / -1;
+    margin: 8px 0 2px;
+    padding: 4px 4px 3px;
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    border-top: 1px solid #3d3218;
+  }
+  .soc-group-head:first-of-type {
+    border-top: 0;
+  }
+  /* Raid tab: the two groups sit side by side in the landscape window (falling
+     back to stacked on mobile-touch). It escapes the `.soc-body` grid flow
+     above with `grid-column: 1 / -1` so it keeps its own explicit grid instead
+     of being placed into a `.soc-body` track. The stacked fallback is keyed on
+     `body.mobile-touch` (in hud.mobile.css), not a viewport media query here:
+     this window's own width, not the viewport's, decides when two 260px-ish
+     groups stop fitting, and a tablet-width touch viewport should stack the
+     same way a phone does rather than getting two undivided columns. */
   .raid-groups {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
+    grid-column: 1 / -1;
   }
+  /* No divider between the two side-by-side groups (a vertical rule would need
+     its own column-gap border trick); the stacked mobile-touch fallback in
+     hud.mobile.css restores the horizontal divider between them. */
   .raid-group {
-    border-top: 1px solid #3d3218;
-    padding-top: 6px;
-  }
-  .raid-group:first-child {
-    border-top: 0;
     padding-top: 0;
   }
   .raid-row .soc-actions {
@@ -6558,7 +7890,7 @@
     color: var(--gold);
     font-size: 12px;
     margin: 12px 0 5px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
     padding-bottom: 3px;
   }
   .arena-rank {
@@ -6818,7 +8150,7 @@
     color: var(--gold);
     font-size: 12px;
     margin: 12px 0 5px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
     padding-bottom: 3px;
   }
   .vcup-note {
@@ -7550,7 +8882,7 @@
   .vcupb-header {
     text-align: center;
     padding: 16px 18px 14px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
     background: linear-gradient(#2a1f0e, #1a130a 70%, #140e07);
     border-radius: 12px 12px 0 0;
   }
@@ -7650,7 +8982,7 @@
     font-size: 13px;
     font-weight: normal;
     color: var(--gold);
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
     padding-bottom: 5px;
   }
   .vcupb-roster {
@@ -7959,8 +9291,13 @@
   }
 
   /* ---------- The World Market (the Merchant's auction house) ---------- */
+  /* Widened from the old 560px tall single-column box into a landscape shape so
+     .mkt-list (below) can lay listings out in multiple columns instead of one
+     long stacked list; the .window shell's max-width clamp still shrinks this on
+     a narrow viewport, and .mkt-list's own auto-fill columns (plus the mobile
+     single-column override in hud.mobile.css) collapse back to one column there. */
   #market-window {
-    width: 560px;
+    width: 860px;
     height: min(640px, calc(85vh - 24px));
     display: none;
     flex-direction: column;
@@ -7975,6 +9312,40 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  /* Desktop docking pair with #bags (the bank-open pattern, see body.bank-open
+     above): opening the market force-opens bags alongside so items can be
+     clicked straight onto the Sell tab, but #market-window (centered) and
+     #bags (percentage-positioned off #ui independently) could overlap on
+     common laptop widths, covering the drop target (PR #2107 review round 4).
+     Pin both off the same 50% split with a fixed gap so they can never
+     collide, regardless of viewport width or either window's own size.
+     --bank-dock-gap is declared here (not inline literals) so BOTH sibling
+     windows inherit the same value, matching the body.bank-open pattern above. */
+  body.market-open {
+    --bank-dock-gap: 8px;
+  }
+  body.market-open #market-window {
+    left: 50%;
+    /* The generic .window max-width clamp (layout.css) is computed against the
+       FULL app viewport, so it never bites on the half the dock actually
+       leaves this window: at 860px wide plus the 320px bags companion plus
+       the gap, the pair needs ~1196px, and #market-window's left edge clips
+       outside #ui (overflow: hidden, base.css) on any common desktop width
+       below ~1752px (PR #2107 review round 4 follow-up). Re-clamp against
+       half the dock split instead, so the auto-fill listing grid degrades to
+       fewer columns instead of the window overflowing offscreen. */
+    max-width: calc(var(--app-vw, 100vw) / var(--window-scale) / 2 - var(--bank-dock-gap) - 8px);
+    transform: translateX(calc(-100% - var(--bank-dock-gap)));
+  }
+  body.market-open #bags {
+    left: 50%;
+    top: 10vh;
+    right: auto;
+    bottom: auto;
+    width: 320px;
+    max-height: calc(var(--app-vh, 100vh) * 0.85 / var(--window-scale) - 24px);
+    transform: translateX(var(--bank-dock-gap));
   }
   .mkt-tabs {
     display: flex;
@@ -8009,10 +9380,26 @@
     color: #9fdc7f;
     font-size: 10.5px;
   }
-  .mkt-search {
-    width: 100%;
-    box-sizing: border-box;
+  /* The search box and the type/subtype/rarity dropdowns are one control row: at 860px
+     wide, a full-width search box (or a filter row spanning the whole window) reads
+     oversized, so both are capped to a sensible max-width and sit side by side,
+     wrapping onto their own line only once the window narrows too much to fit them
+     (mobile, or a three-menu row once the subtype filter appears). */
+  .mkt-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-end;
     margin: 2px 0 8px;
+    position: relative;
+    z-index: 3;
+  }
+  .mkt-search {
+    flex: 1 1 200px;
+    max-width: 260px;
+    min-width: 0;
+    box-sizing: border-box;
+    margin: 0;
     padding: 7px 10px;
     font-size: 16px;
     background: #120d07;
@@ -8031,20 +9418,18 @@
     border-color: var(--color-border-focus);
   }
   .mkt-filters {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-wrap: wrap;
+    flex: 2 1 auto;
     gap: 8px;
-    margin: 0 0 8px;
-    position: relative;
-    z-index: 3;
-  }
-  .mkt-filters.has-subtype {
-    grid-template-columns: 1fr 1fr 1fr;
+    margin: 0;
   }
   .mkt-filter {
     display: flex;
     flex-direction: column;
     gap: 3px;
+    flex: 1 1 140px;
+    max-width: 220px;
     min-width: 0;
   }
   .mkt-filter span {
@@ -8173,6 +9558,26 @@
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
   }
+  /* The listing list itself: multiple columns of item cards (the landscape
+     relayout) instead of one long stacked column. auto-fill + a minmax floor
+     lets the count of columns follow the window's actual width (the shell's
+     max-width clamp on a narrow viewport, or the mobile-touch override below,
+     both naturally fall back to a single column without a hardcoded breakpoint
+     list here); each row still lays its own icon/name/price/button out as a
+     grid (below), it just now occupies one card cell instead of a full-width
+     stripe. The note/empty/pager children are not cards, so they span every
+     column. */
+  .mkt-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 4px 10px;
+    align-content: start;
+  }
+  .mkt-note,
+  .mkt-empty,
+  .mkt-page {
+    grid-column: 1 / -1;
+  }
   .mkt-note {
     font-size: 11.5px;
     color: #b6ad8c;
@@ -8188,6 +9593,7 @@
     padding: 5px 6px;
     border-radius: 4px;
     font-size: 12px;
+    min-height: 40px;
   }
   .mkt-row:hover {
     background: #ffffff0d;
@@ -8409,6 +9815,41 @@
     font-size: 11px;
     color: var(--color-text-muted);
   }
+  /* Interface panel tab strip (the shared WAI-ARIA tab family). Mirrors the
+     social-window tab look but scoped to .opt-tab so the two stay independent.
+     The four tabs share the row equally on desktop; the mobile sheet override in
+     hud.mobile.css keeps the 40px touch floor and scrolls if the sheet is very
+     narrow. */
+  .opt-tabs {
+    display: flex;
+    gap: 4px;
+    margin: 6px 0 10px;
+    flex: none;
+  }
+  .opt-tab {
+    flex: 1;
+    padding: 7px 4px;
+    font-size: 13px;
+    font-family: var(--title-font);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    background: #1a1410;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    text-align: center;
+  }
+  .opt-tab:hover {
+    color: var(--gold);
+  }
+  .opt-tab:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .opt-tab.on {
+    color: var(--gold);
+    border-color: #6f5a2a;
+    background: linear-gradient(#2a2436, #161220);
+  }
   .kb-rows {
     display: flex;
     flex-direction: column;
@@ -8447,7 +9888,7 @@
     letter-spacing: 0.5px;
     text-transform: uppercase;
     margin: 8px 0 4px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
     padding-bottom: 4px;
   }
   .kb-row {
@@ -8875,6 +10316,174 @@
     grid-template-columns: 1fr;
   }
 
+  /* ---------- performance overlay gilded ornament (pilot) ---------- */
+  /* A hand-gilded filigree frame, scoped strictly to #options-menu.perf-wide (the
+     Performance sub-view only): does not touch the shared .panel/.window
+     primitive or any other window. Shapes come from perf_ornament_svg.ts
+     (applyPerfOrnamentVars, called once at boot); colors read the new
+     --color-gold-* ramp (tokens.css) and --perf-ornament-* mask vars, never a
+     literal hex. See the PR body for why this is scoped narrowly rather than
+     landed as a DESIGN.md-phase-ordered, repo-wide chrome retune. */
+  #options-menu.perf-wide {
+    /* The base .panel border stays fully transparent (not `border: 0`, which
+       would reflow the box): the gilded ::before below is the only visible
+       frame color, so there is no flat border peeking through the noisy
+       ribbon's thin spots. A more generous radius than the shared .panel's
+       6px, scoped to just this window, matches the reference's visibly
+       rounded frame; --perf-ornament-* below inherits it automatically.
+       The base .panel also hardcodes a literal `outline: 1px solid #000`
+       and a non-inset `0 2px 16px #000c` drop shadow: outlines ignore
+       border-color, so that thin black ring stayed visible right outside
+       the gilded frame no matter what the border said. The corner motif's
+       filigree linework (unlike a solid block) leaves real gaps, so both
+       read as a stray black border showing through/around the gold. Drop
+       the outline and the outer shadow layer here; the two inset layers
+       stay so the panel keeps its inward depth. */
+    border-color: transparent;
+    border-radius: 30px;
+    outline: none;
+    box-shadow:
+      inset 0 0 24px #0006,
+      inset 0 1px 0 #ffffff14;
+    /* The corner motif's ink reaches roughly 60px in from each corner (the
+       84px mask box's spiral/tendril geometry, measured against the real
+       render). The base .window pads its body content (and so the footer,
+       its last child) by only --window-pad (12px), which put the footer
+       buttons under the bottom corners. Scoped padding-bottom override
+       clears it; left/right stay at --window-pad since the body's own
+       content never runs that close to the top corners (only the sticky
+       header does, handled below). */
+    padding-bottom: 64px;
+  }
+  #options-menu.perf-wide::before {
+    content: "";
+    position: absolute;
+    /* Negative inset: the gilded frame sits just OUTSIDE the dark panel's own
+       edge (a hand-gilded frame wraps a picture, it does not sit inset a few
+       pixels inside it), not flush with `inset: 0`. */
+    inset: -5px;
+    /* Above .window > .panel-title's position:sticky (z-index: 6, layout.css):
+       otherwise the sticky header paints over the top edge/corners the moment
+       the window opens, hiding the ornament on exactly that one side. */
+    z-index: 7;
+    pointer-events: none;
+    border-radius: inherit;
+    background: var(--perf-ornament-gilt);
+    /* Each edge references its OWN distinct token (never the same token
+       reused for two mask-position slots): a real Chromium bug means a
+       mask-image list that repeats the identical url() value at two
+       different positions only paints the FIRST occurrence (see
+       applyPerfOrnamentVars' doc comment in perf_ornament_svg.ts). */
+    -webkit-mask-image:
+      var(--perf-ornament-corner), var(--perf-ornament-mid-edge), var(--perf-ornament-edge-top),
+      var(--perf-ornament-edge-bottom), var(--perf-ornament-edge-left),
+      var(--perf-ornament-edge-right);
+    mask-image:
+      var(--perf-ornament-corner), var(--perf-ornament-mid-edge), var(--perf-ornament-edge-top),
+      var(--perf-ornament-edge-bottom), var(--perf-ornament-edge-left),
+      var(--perf-ornament-edge-right);
+    -webkit-mask-position:
+      top left,
+      top right,
+      bottom left,
+      bottom right,
+      center top,
+      center bottom,
+      left center,
+      right center,
+      top,
+      bottom,
+      left,
+      right;
+    mask-position:
+      top left,
+      top right,
+      bottom left,
+      bottom right,
+      center top,
+      center bottom,
+      left center,
+      right center,
+      top,
+      bottom,
+      left,
+      right;
+    -webkit-mask-size:
+      84px 84px,
+      84px 84px,
+      84px 84px,
+      84px 84px,
+      44px 44px,
+      44px 44px,
+      44px 44px,
+      44px 44px,
+      96px 12px,
+      96px 12px,
+      12px 96px,
+      12px 96px;
+    mask-size:
+      84px 84px,
+      84px 84px,
+      84px 84px,
+      84px 84px,
+      44px 44px,
+      44px 44px,
+      44px 44px,
+      44px 44px,
+      96px 12px,
+      96px 12px,
+      12px 96px,
+      12px 96px;
+    -webkit-mask-repeat:
+      no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat,
+      repeat-x, repeat-x, repeat-y, repeat-y;
+    mask-repeat:
+      no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat,
+      repeat-x, repeat-x, repeat-y, repeat-y;
+  }
+  /* Title text and its underline read as gilt too, warmer than the shared
+     .panel-title gold so the pilot window's header visibly matches its own
+     frame rather than the generic chrome gold. Deliberately does NOT touch
+     position/z-index: the base `.window > .panel-title` rule (layout.css)
+     already sets `position: sticky; z-index: 6`, below the ornament's
+     z-index: 7 (below), so the corner ornament paints correctly over the
+     title's own opaque background at the top corners. An earlier version of
+     this rule raised the title to z-index: 8, which put its solid
+     background ABOVE the ornament and silently hid the top-left/top-right
+     corner flourish entirely; verified live via a getBoundingClientRect +
+     forced-z-index probe before landing this fix. */
+  #options-menu.perf-wide .panel-title {
+    color: var(--color-gold-400);
+    border-bottom-color: var(--color-gold-700);
+    /* Room for the corner motif's ~60px ink reach along the top edge (the
+       84px mask box): the base `.window > .panel-title` rule starts the
+       back-button/title at just --window-pad (12px) and pins the close
+       button's inset-inline-end at 8px (layout.css), both squarely inside
+       the ornament's footprint at the top-left/top-right corners. Widening
+       both sides here keeps the title text and the close control clear of
+       the gold on every corner. */
+    padding-left: 64px;
+    padding-right: 118px;
+  }
+  /* The close button itself (never the back button, which stays at the
+     inline start next to the now-padded title): move its absolute inset
+     in by the same ~60px the ornament needs, so the button box never sits
+     under the top-right corner's ink. */
+  #options-menu.perf-wide .panel-title > .x-btn:not(.back-btn) {
+    inset-inline-end: 64px;
+  }
+  /* forced-colors: active strips background/mask layers (WCAG contract, see
+     src/ui/CLAUDE.md); restore a plain system-color border so the window frame
+     stays visible in high-contrast mode instead of vanishing with the mask. */
+  @media (forced-colors: active) {
+    #options-menu.perf-wide {
+      border-color: CanvasText;
+    }
+    #options-menu.perf-wide::before {
+      display: none;
+    }
+  }
+
   /* ---------- emote wheel ---------- */
   #emote-wheel {
     position: absolute;
@@ -8971,7 +10580,7 @@
   }
   .emote-editor-item {
     min-height: 58px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 6px;
     background: #15110a;
     color: var(--color-text-muted);
@@ -9067,21 +10676,29 @@
   /* Character-window / bags chrome that rode inline past the windows extraction;
      homed here beside the other window bodies under @layer components. */
   /* Per-slot Unequip affordance in the character window (paperdoll): a corner ×
-     glyph revealed on hover/focus (always shown on touch). Also right-click the
-     slot, or drag the piece onto the bags window. */
+     chip revealed on hover/focus (always shown on touch). Also right-click the
+     slot, or drag the piece onto the bags window.
+     CRITICAL: it is an ABSOLUTE corner overlay on the socket, NOT a flex child. As
+     a flex child it would grow the row unit and shove it toward the window edge,
+     breaking the band-centering contract; out of flow, the unit and its icon x are
+     untouched. It is anchored to the socket's top-outer corner per column (the row
+     unit is 154px wide = 44 icon + 10 gap + 100 text, centered in the band, so the
+     icon's outer edge sits ~77px from the row center). */
   .equip-slot .equip-unequip-btn {
-    margin-inline-start: auto;
+    position: absolute;
+    top: -7px;
+    z-index: 2;
     flex: none;
-    width: 40px;
-    height: 40px;
+    width: 22px;
+    height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    border: 1px solid rgba(202, 164, 114, 0.42);
-    background: rgba(60, 38, 28, 0.42);
+    border: 1px solid rgba(202, 164, 114, 0.5);
+    background: rgba(40, 26, 20, 0.85);
     color: var(--color-text-secondary, #d6c1a0);
-    font-size: 20px;
+    font-size: 13px;
     line-height: 1;
     font-weight: 600;
     cursor: var(--cursor-point);
@@ -9091,6 +10708,12 @@
       box-shadow 0.12s,
       color 0.12s,
       opacity 0.12s;
+  }
+  .equip-col:not(.equip-col-right) .equip-slot .equip-unequip-btn {
+    left: calc(50% - 88px);
+  }
+  .equip-col-right .equip-slot .equip-unequip-btn {
+    right: calc(50% - 88px);
   }
   .equip-slot:hover .equip-unequip-btn,
   .equip-slot:focus-within .equip-unequip-btn,
@@ -9506,6 +11129,27 @@
     min-width: 26px;
     text-align: center;
     font-variant-numeric: tabular-nums;
+  }
+  /* The typeable quantity field that replaced the read-only value span: sized
+     to the same slot between the +/- steppers, spinner chrome suppressed (the
+     steppers ARE the spinner). */
+  .mail-parcel-qty-input {
+    width: 40px;
+    padding: 1px 2px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+    background: #ffffff10;
+    border: 1px solid #ffffff26;
+    border-radius: 4px;
+    color: var(--color-text);
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+  .mail-parcel-qty-input::-webkit-outer-spin-button,
+  .mail-parcel-qty-input::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
   }
   .mail-parcel-step {
     display: inline-flex;
@@ -10072,7 +11716,7 @@
     font-size: 13px;
     border-radius: 5px;
     padding: 8px 14px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     background: #1a1410;
     color: #e9dcb6;
     cursor: var(--cursor-point);
@@ -10210,7 +11854,7 @@
     color: #6a5c34;
   }
   .dc-section {
-    border-top: 1px solid #463a1c;
+    border-top: 1px solid var(--color-border-showcase);
     padding-top: 10px;
   }
   .dc-h3 {
@@ -10378,7 +12022,7 @@
   .dc-widget-frame {
     width: 100%;
     height: 300px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 6px;
     margin-top: 10px;
     background: #1a1410;
@@ -10398,540 +12042,6 @@
     }
   }
 
-  /* ---------- welcome screen ----------
-     Visual fidelity target: the maintainer's design mock (a dusk in-world scene
-     behind panels built from the real tokens.css palette). Panel/text colors
-     resolve to existing --gold/--panel-bg/--color-* tokens; the decorative
-     one-offs (scene gradient stops, star flecks, ridge silhouettes, the
-     blurple/gold button gradients) are new literals scoped to this section,
-     same as the rest of this file (no CSS no-magic-values guard applies
-     outside painter TS; see src/styles/CLAUDE.md). No new tokens invented. */
-  #welcome-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 900;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    padding: 24px clamp(16px, 4vw, 48px);
-    background:
-      radial-gradient(900px 420px at 72% -8%, rgba(64, 52, 118, 0.55), transparent 62%),
-      radial-gradient(1100px 400px at 18% 112%, rgba(96, 66, 22, 0.5), transparent 60%),
-      linear-gradient(180deg, #10121f 0%, #151329 42%, #1b1430 68%, #0a0912 100%);
-    color: var(--color-text-light);
-    overflow-y: auto;
-  }
-  #welcome-screen[hidden] {
-    display: none;
-  }
-  #welcome-screen::before {
-    /* ridge silhouettes along the bottom, same trick as the mock's .scene::before */
-    content: "";
-    position: fixed;
-    inset: auto 0 0 0;
-    height: 46%;
-    background:
-      radial-gradient(58% 120% at 22% 128%, #050509 48%, transparent 50%),
-      radial-gradient(64% 130% at 84% 132%, #06060b 48%, transparent 50%);
-    opacity: 0.9;
-    pointer-events: none;
-  }
-  #welcome-screen::after {
-    /* soft vignette; an inset shadow leaves the center clear so it never
-       obscures panel content, only darkens the far edges. */
-    content: "";
-    position: fixed;
-    inset: 0;
-    box-shadow: inset 0 0 180px 60px rgba(0, 0, 0, 0.72);
-    pointer-events: none;
-  }
-  .ws-stars {
-    position: fixed;
-    top: 26px;
-    left: 18%;
-    width: 2px;
-    height: 2px;
-    border-radius: 50%;
-    background: #cfd3ff;
-    box-shadow:
-      16vw 14px 0 -0.4px #b9bff3,
-      34vw 40px 0 -0.6px #9aa0d8,
-      48vw 22px 0 -0.4px #cfd3ff,
-      62vw 54px 0 -0.7px #8d93cc,
-      72vw 16px 0 -0.5px #b9bff3,
-      6vw 70px 0 -0.7px #8d93cc;
-    opacity: 0.8;
-    pointer-events: none;
-  }
-  .ws-header {
-    width: 100%;
-    max-width: 1100px;
-    margin: 0 auto;
-    text-align: left;
-  }
-  .ws-welcome-back {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 27px;
-    color: var(--gold);
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
-  }
-  .ws-header-meta {
-    font-size: 14px;
-    color: var(--color-text-muted);
-    margin-top: 2px;
-  }
-  .ws-body {
-    display: flex;
-    gap: 18px;
-    flex: 1;
-    min-height: 0;
-    width: 100%;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  .ws-main {
-    flex: 1.65;
-    min-width: 0;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .ws-news-panel {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    background: var(--panel-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 209, 0, 0.06),
-      0 10px 28px rgba(0, 0, 0, 0.45);
-    padding: 16px 20px 12px;
-  }
-  .ws-panel-title {
-    flex: none;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 15px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--gold-dim);
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--color-border-default);
-    margin-bottom: 12px;
-  }
-  .ws-news {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    mask-image: linear-gradient(180deg, #000 0%, #000 88%, transparent 100%);
-    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 88%, transparent 100%);
-  }
-  /* Older releases (the latest stays a full .news-item article): a native
-     <details>/<summary> disclosure so expand-in-place needs no JS wiring,
-     same pattern as the guide FAQ (src/guide/pages/faq.ts). */
-  .ws-news-collapsed {
-    border: 1px solid var(--color-border-default);
-    border-radius: 6px;
-    margin-top: 8px;
-    padding: 8px 10px;
-    background: rgba(0, 0, 0, 0.2);
-  }
-  .ws-news-collapsed[open] {
-    padding-bottom: 10px;
-  }
-  .ws-news-collapsed-summary {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    cursor: pointer;
-    font-size: 13px;
-    min-height: 24px;
-    padding: 9px 2px;
-    list-style: none;
-  }
-  .ws-news-collapsed-summary::-webkit-details-marker {
-    display: none;
-  }
-  .ws-news-collapsed-version {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 700;
-  }
-  .ws-news-collapsed-version::before {
-    content: "\25b8";
-    display: inline-block;
-    color: var(--gold-dim);
-    font-size: 11px;
-    transition: transform 0.15s ease;
-  }
-  .ws-news-collapsed[open] .ws-news-collapsed-version::before {
-    transform: rotate(90deg);
-  }
-  .ws-news-collapsed-date {
-    color: var(--color-text-muted);
-    font-size: 12px;
-    flex: none;
-  }
-  .ws-news-collapsed .news-body {
-    margin-top: 8px;
-  }
-  .ws-news-view-all {
-    margin-top: 10px;
-    text-align: center;
-    font-size: 12px;
-  }
-  .ws-news-view-all a {
-    color: inherit;
-  }
-  .ws-discord-strip {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    background: var(--panel-bg);
-    border: 1px solid rgba(88, 101, 242, 0.5);
-    border-radius: 8px;
-    padding: 11px 16px;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 209, 0, 0.06),
-      0 10px 28px rgba(0, 0, 0, 0.45);
-  }
-  .ws-discord-strip[hidden] {
-    display: none;
-  }
-  .ws-discord-badge {
-    width: 36px;
-    height: 36px;
-    flex: none;
-    border-radius: 10px;
-    background:
-      radial-gradient(circle at 34% 46%, #fff 3.6px, transparent 4.4px),
-      radial-gradient(circle at 66% 46%, #fff 3.6px, transparent 4.4px), #5865f2;
-    box-shadow: 0 3px 12px rgba(88, 101, 242, 0.4);
-  }
-  .ws-discord-copy {
-    flex: 1;
-    min-width: 0;
-  }
-  .ws-discord-title {
-    font-weight: 700;
-    font-size: 14.5px;
-  }
-  .ws-discord-sub {
-    font-size: 12px;
-    color: var(--color-text-muted);
-  }
-  .btn-discord {
-    background: linear-gradient(180deg, #6a76f5, #5865f2 55%, #4652cc);
-    color: #fff;
-    border: 1px solid #3c46b0;
-    border-radius: 5px;
-    padding: 8px 16px;
-    min-height: 40px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow:
-      0 2px 10px rgba(88, 101, 242, 0.35),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  }
-  .ws-rail {
-    flex: 1;
-    max-width: 372px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .ws-armory-card[hidden],
-  .ws-chest-tile[hidden],
-  .ws-event-slot[hidden] {
-    display: none;
-  }
-  /* The Season 1 Armory card reuses store_promo_card.ts (the same component
-     shown above chat in-world), which normally overlays its copy on top of
-     the art. Here it gets the mock's image-on-top-then-copy-below layout,
-     scoped to this host so the in-world placement is untouched. */
-  #ws-armory-card .store-promo-card {
-    position: relative;
-    top: auto;
-    left: auto;
-    right: auto;
-    bottom: auto;
-    aspect-ratio: auto;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #8a6f33;
-    border-radius: 8px;
-    background: var(--panel-bg);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 209, 0, 0.06),
-      0 10px 28px rgba(0, 0, 0, 0.45);
-  }
-  #ws-armory-card .store-promo-card-open {
-    position: static;
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    height: auto;
-  }
-  #ws-armory-card .store-promo-card-open img {
-    position: static;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1000 / 590;
-  }
-  #ws-armory-card .store-promo-card-copy {
-    position: static;
-    max-width: 100%;
-    padding: 12px 14px 14px;
-    gap: 4px;
-    color: inherit;
-    text-align: left;
-    line-height: normal;
-    pointer-events: auto;
-    text-shadow: none;
-  }
-  #ws-armory-card .store-promo-card-season {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--gold-dim);
-  }
-  #ws-armory-card .store-promo-card-title {
-    margin-top: 0;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 21px;
-    letter-spacing: normal;
-    color: var(--color-text-light);
-  }
-  #ws-armory-card .store-promo-card-cta {
-    position: static;
-    display: inline-block;
-    align-self: flex-start;
-    margin: 6px 14px 14px;
-    min-width: 0;
-    max-width: none;
-    font-family: var(--font-ui);
-    font-size: 13.5px;
-    font-weight: 700;
-    color: #1a1608;
-    text-transform: none;
-    text-shadow: none;
-    background: linear-gradient(180deg, #ffe066, var(--gold) 45%, #cfa400);
-    border: 1px solid #8a6f33;
-    border-radius: 5px;
-    padding: 9px 14px;
-    box-shadow:
-      0 2px 10px rgba(255, 209, 0, 0.22),
-      inset 0 1px 0 rgba(255, 255, 255, 0.35);
-    pointer-events: none;
-  }
-  .ws-chest-tile {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--panel-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 13px;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 209, 0, 0.06),
-      0 10px 28px rgba(0, 0, 0, 0.45);
-  }
-  .ws-chest-icon {
-    width: 48px;
-    height: 48px;
-    flex: none;
-    object-fit: contain;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
-  }
-  .ws-chest-ready {
-    display: inline-flex;
-    align-items: center;
-    font-weight: 700;
-    font-size: 14.5px;
-    color: var(--color-text-light);
-  }
-  .ws-chest-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--color-friendly);
-    box-shadow: 0 0 8px rgba(159, 220, 127, 0.8);
-    margin-right: 6px;
-  }
-  .ws-event-slot {
-    min-height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 14px;
-    border: 1.5px dashed rgba(111, 90, 42, 0.6);
-    border-radius: 8px;
-    color: rgba(153, 141, 106, 0.7);
-    font-size: 12px;
-  }
-  .ws-footer {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    padding-top: 8px;
-    width: 100%;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  .ws-status {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 6px;
-    text-align: right;
-    font-size: 13px;
-    color: var(--color-text-muted);
-    min-width: 0;
-  }
-  .ws-spin {
-    flex: none;
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    border: 2px solid rgba(153, 141, 106, 0.35);
-    border-top-color: var(--gold-dim);
-    animation: ws-spin 0.9s linear infinite;
-  }
-  @keyframes ws-spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .ws-spin {
-      animation: none;
-    }
-  }
-  .ws-enter-wrap {
-    flex: 1;
-    text-align: center;
-  }
-  .ws-continue {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 200px;
-    min-height: 44px;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 19px;
-    letter-spacing: 0.06em;
-    color: #1a1608;
-    background: linear-gradient(180deg, #ffe066, var(--gold) 45%, #cfa400);
-    border: 1px solid #8a6f33;
-    border-radius: 6px;
-    padding: 12px 40px;
-    box-shadow:
-      0 4px 22px rgba(255, 209, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  }
-  .ws-continue:disabled {
-    background: linear-gradient(180deg, #2a2a38, #1b1b26);
-    color: var(--color-text-muted);
-    border-color: var(--color-border-default);
-    box-shadow: none;
-    cursor: default;
-  }
-  .ws-continue-hint {
-    font-size: 11.5px;
-    color: var(--color-text-muted);
-    margin-top: 6px;
-  }
-  .ws-version {
-    flex: 1;
-    text-align: right;
-    font-size: 11px;
-    font-variant-numeric: tabular-nums;
-    color: var(--color-text-muted);
-  }
-  @media (max-width: 860px), (pointer: coarse) {
-    /* The game is landscape-only on mobile (the #rotate-device gate blocks
-       portrait), so this is a short-viewport budget, not a narrow one:
-       compact the chrome around the news column instead of stacking it,
-       mirroring the mock's mobile frame (single-row bottom bar, smaller
-       type) rather than trading width for height nobody has spare. */
-    #welcome-screen {
-      padding: 14px clamp(12px, 4vw, 28px);
-      gap: 8px;
-    }
-    .ws-stars {
-      display: none;
-    }
-    .ws-header {
-      text-align: center;
-    }
-    .ws-welcome-back {
-      font-size: 20px;
-    }
-    .ws-header-meta {
-      font-size: 12px;
-    }
-    .ws-body {
-      flex-direction: column;
-      gap: 8px;
-    }
-    .ws-news-panel {
-      padding: 10px 14px 8px;
-    }
-    .ws-panel-title {
-      font-size: 11px;
-      padding-bottom: 6px;
-      margin-bottom: 8px;
-    }
-    .ws-discord-strip {
-      padding: 8px 12px;
-      gap: 10px;
-    }
-    /* Every .ws-rail child (armory/chest/event) is desktop-web-only per the
-       gating matrix, so the whole rail is dead weight on mobile: hiding it
-       (not just its children) stops it claiming a flex share and a .ws-body
-       gap it never uses, which otherwise starves the news panel's height on
-       a short landscape-phone viewport. */
-    .ws-rail {
-      display: none;
-    }
-    .ws-armory-card,
-    .ws-chest-tile,
-    .ws-event-slot {
-      display: none !important;
-    }
-    .ws-footer {
-      padding-top: 4px;
-    }
-    .ws-status,
-    .ws-version {
-      font-size: 11px;
-    }
-    .ws-continue {
-      font-size: 15px;
-      min-width: 160px;
-      padding: 10px 28px;
-    }
-    .ws-continue-hint {
-      font-size: 10px;
-      margin-top: 4px;
-    }
-  }
   /* ---------- developer command center ---------- */
   #dev-command-window {
     width: min(920px, calc(100vw - 48px));
@@ -11100,4 +12210,84 @@
     color: var(--color-text-muted);
     text-align: center;
   }
+}
+#talents-window .tal-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 4px;
+  overflow-y: auto;
+}
+#talents-window .tal-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+#talents-window .tal-row.locked {
+  opacity: 0.55;
+}
+#talents-window .tal-row-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 56px;
+  gap: 2px;
+}
+#talents-window .tal-row-lv {
+  font-family: var(--font-display, serif);
+  font-size: 18px;
+  color: var(--gold);
+}
+#talents-window .tal-row-lock {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+#talents-window .tal-row-opts {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+}
+#talents-window .tal-row-opt {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid var(--color-border, #6f5a2a);
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: var(--cursor-point);
+}
+#talents-window .tal-row-opt:hover:not(:disabled),
+#talents-window .tal-row-opt:focus-visible {
+  background: #ffffff10;
+  border-color: var(--gold);
+}
+#talents-window .tal-row-opt:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+#talents-window .tal-row-opt.picked {
+  background: #2c2410;
+  border-color: var(--gold);
+  box-shadow: inset 0 0 0 1px #ffd10033;
+}
+#talents-window .tal-row-opt:disabled {
+  cursor: default;
+}
+#talents-window .tal-row-opt img {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  object-fit: cover;
+  border-radius: 3px;
+}
+#talents-window .tal-row-opt b {
+  font-size: 12px;
+  line-height: 1.25;
+  font-weight: 600;
 }

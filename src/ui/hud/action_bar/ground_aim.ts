@@ -12,6 +12,17 @@ export interface GroundAimState {
 
 export const DEFAULT_GROUND_AOE_RADIUS = 6;
 
+/** Touch normally keeps instant target-feet casting, but Meteor needs an
+ * explicit terrain tap so it never falls on the caster merely for lacking a
+ * selected target. Desktop remains governed by the player's reticle setting. */
+export function shouldUseGroundAim(
+  abilityId: string,
+  mobileTouch: boolean,
+  desktopPreference: boolean,
+): boolean {
+  return mobileTouch ? abilityId === 'meteor' : desktopPreference;
+}
+
 export function createGroundAimState(): GroundAimState {
   return { activeAbilityId: null, activeSlot: null };
 }
@@ -60,6 +71,10 @@ export function clampAimToRange(
 }
 
 export function abilityAoeRadius(res: { effects: readonly AbilityEffect[] }): number {
-  const effect = res.effects.find((eff) => eff.type === 'aoeDamage' || eff.type === 'groundAoE');
+  const effect = res.effects.find(
+    (eff) =>
+      eff.type === 'aoeDamage' || eff.type === 'groundAoE' || eff.type === 'temporalHourglass',
+  );
+  if (effect?.type === 'temporalHourglass') return effect.captureRadius;
   return effect && 'radius' in effect ? effect.radius : DEFAULT_GROUND_AOE_RADIUS;
 }

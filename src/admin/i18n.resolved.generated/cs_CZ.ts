@@ -46,6 +46,7 @@ export const cs_CZ: AdminTranslations = {
   "stats.peakOnline": "maximum online",
   "stats.peakOnlineToday": "maximum online 24 h",
   "stats.peakOnlineAllTime": "maximum online celkem",
+  "stats.playersCap": "limit hráčů",
   "stats.accounts": "účty",
   "stats.characters": "postavy",
   "stats.newAccounts24h": "nové účty 24 h",

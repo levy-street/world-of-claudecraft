@@ -34,6 +34,12 @@ Everything else is a sibling module in one of these families:
 - `self_motion.ts`/`facing_smooth.ts`: pure display-only self layers (bounded
   online pose extrapolation + rate-limited self yaw; never touch world state,
   see `src/net/CLAUDE.md`).
+- `camera_boom_core.ts`/`camera_feel_core.ts`/`camera_director_core.ts`: the
+  AAA chase-camera feel stack `updateCamera` composes (spring-arm pivot lag,
+  look-ahead + FOV kicks + landing thump, directed zone-vista/death-drift
+  moves). All display-only, all gated by the reduced-motion switch; driven
+  from `renderer.ts` `updateCamera` and the hud event hooks
+  (`tests/camera_*_core.test.ts`).
 - `voxel_terrain.ts`: verification-only prototype (proposal #1611, driven by
   `scripts/`, NOT the live path); live terrain is `terrain.ts` sampling sim heights.
 
@@ -78,19 +84,9 @@ significant-contributor name glow lives there too. Narrow helpers:
   colour multipliers via `hdr()` so it blooms on composer tiers). Sprite atlas
   cells are append-only (`SPRITE_FILES`/`SPR` must stay in sync).
 - **Models are real GLB assets** (CC0 kits plus Tripo-generated models: props,
-  foliage, dungeon, critters, fish, gather nodes, mailbox, delve props,
+  foliage, dungeon, fish, gather nodes, mailbox, delve props,
   characters), loaded via `assets/loader.ts`, then baked/merged/instanced at
   build time.
-- **Creature GLBs take an explicit forward-yaw correction.** A Tripo creature
-  GLB's authored nose-to-tail axis is corrected per species via
-  `creatureForwardCorrectionYaw` (`critters.ts`), Box3 re-seated so its feet
-  sit at y=0, then wrapped in an outer `THREE.Group` so per-frame heading and
-  position writes never clobber the baked correction (the
-  `delve_props.ts`/`mailbox.ts` standalone-prop idiom). Never infer the
-  forward axis from a bounding-box long-axis heuristic: it measures the
-  widest silhouette, not nose-to-tail, and gets both the axis and the sign
-  wrong. Pinned by `tests/critters.test.ts`.
-
 ## Asset loading (`assets/`)
 `loader.ts` (`loadGltf`/`loadHdr`/`loadTexture`, one parse per URL) plus these
 rules, all CI-enforced:
@@ -107,7 +103,7 @@ rules, all CI-enforced:
 - **Every asset under `public/` must be in the media manifest** (regenerate via
   `node scripts/build_media_manifest.mjs generate`, automatic in `npm run build`).
   `tests/render_glb_replacement_assets.test.ts` fails on a GLB missing from
-  disk or the manifest; export a `*PreloadInternalsForTest` (see `critters.ts`)
+  disk or the manifest; export a `*PreloadInternalsForTest` (see `fish.ts`)
   so it covers your module.
 
 ## i18n: overhead labels are the only string surface here

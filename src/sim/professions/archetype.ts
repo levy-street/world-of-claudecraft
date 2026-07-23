@@ -27,7 +27,7 @@
 import { adjacentCrafts, CRAFT_RING, oppositeCraft } from '../content/professions';
 import { COMBO_RECIPES } from '../content/recipes';
 import type { SimContext } from '../sim_context';
-import { type CraftSkills, tierCapability } from './wheel';
+import { type CraftSkills, tierCapability, tierForSkill, tierProgressMultiplier } from './wheel';
 
 /** A character's active-archetype progression, persisted in CharacterState. */
 export interface ArchetypeState {
@@ -247,7 +247,7 @@ export function archetypeStateFor(ctx: SimContext, pid: number): ArchetypeState 
 }
 
 // Issue #1130 (re-scoped per the comment on the live issue, then pair-named
-// under the Professions 2.0 Phase 1 blueprint): a player's CURRENTLY-ACTIVE
+// under the Professions 2.0 blueprint): a player's CURRENTLY-ACTIVE
 // adjacent-pair attunement grants one named archetype title for that PAIR
 // (Smith for weaponcrafting+armorcrafting, Bombardier for engineering+alchemy,
 // and so on). There is no "Jack of All Trades" fallback under this model, since
@@ -347,6 +347,60 @@ export function archetypeCeilingFor(
   if (craftId === activeArchetype || craftId === pairedMajor) return Infinity;
   if (craftId === hobbyCraft) return RARE_CEILING_TIER;
   return COMMON_CEILING_TIER;
+}
+
+/** The crafting skill-gain multiplier: the ONE composition both the sim's
+ *  gainCraftSkill site (crafting.ts) and the crafting window's difficulty
+ *  label consume, so the window hint can never diverge from the authoritative
+ *  gain (#1129/#1148 doctrine). A recipe tier ABOVE this craft's ARCHETYPE
+ *  ceiling grants zero, full stop: that is what makes a dormant or hobby
+ *  craft's climb actually stop at its cap. The guard deliberately compares
+ *  against the archetype ceiling ALONE, never craftCeiling's
+ *  min-with-raw-capability: there is NO skillReq admission gate on crafting
+ *  (content/recipes.ts documents that resolveCraft does not read skillReq),
+ *  so a recipe tier above the player's RAW capability is the ordinary,
+ *  doc-confirmed climb ("full at or above capability: this is how capability
+ *  advances in the first place", wheel.ts). Below or at the ceiling, the
+ *  ordinary four-state curve (full at/above raw capability, reduced one tier
+ *  under, minimal two under, zero three-plus under) applies off raw
+ *  capability. */
+export function craftSkillGainMultiplier(
+  skills: CraftSkills,
+  activeArchetype: string | null,
+  pairedMajor: string | null,
+  craftId: string,
+  hobbyCraft: string | null,
+  skillReq: number,
+): number {
+  const ceilingTier = archetypeCeilingFor(activeArchetype, pairedMajor, craftId, hobbyCraft);
+  const recipeTier = tierForSkill(skillReq);
+  return recipeTier > ceilingTier
+    ? 0
+    : tierProgressMultiplier(tierCapability(skills, craftId), recipeTier);
+}
+
+/** The enchanting skill-gain multiplier (Professions 2.0):
+ *  quality-tiered input run through the same four-state curve as crafting,
+ *  but under the SOFT ceiling: above-ceiling input DEGRADES to the ceiling
+ *  tier (Math.min) instead of crafting's hard zero, so an epic disenchant
+ *  never grants zero merely for sitting above a pre-archetype ceiling, and
+ *  rarer input is always at least as good as commoner input (min is
+ *  monotone in `inputTier`, and tierProgressMultiplier is non-decreasing in
+ *  its recipe-tier argument). The hard-zero guard in
+ *  `craftSkillGainMultiplier` stays crafting-only: a recipe is a chosen
+ *  target, an input item is whatever the world dropped. */
+export function enchantingGainMultiplier(
+  skills: CraftSkills,
+  activeArchetype: string | null,
+  pairedMajor: string | null,
+  hobbyCraft: string | null,
+  inputTier: number,
+): number {
+  const ceilingTier = archetypeCeilingFor(activeArchetype, pairedMajor, 'enchanting', hobbyCraft);
+  return tierProgressMultiplier(
+    tierCapability(skills, 'enchanting'),
+    Math.min(inputTier, ceilingTier),
+  );
 }
 
 /** The actually-reachable tier ceiling for one craft: the lesser of the raw

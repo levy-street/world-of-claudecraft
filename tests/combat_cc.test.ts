@@ -7,14 +7,64 @@
 import { describe, expect, it } from 'vitest';
 import {
   blindMissBonus,
+  damageBreakThreshold,
+  hasUnbreakableMovementLock,
   isDisarmed,
   isLockedOut,
   isRooted,
   isSilenced,
   isStunned,
+  isUnbreakableControlAura,
   tonguesMult,
 } from '../src/sim/combat/cc';
-import type { Aura, Entity } from '../src/sim/types';
+import type { AbilityEffect, Aura, Entity } from '../src/sim/types';
+
+const directBreakableRoot: AbilityEffect = {
+  type: 'aoeRoot',
+  duration: 8,
+  radius: 10,
+  min: 6,
+  max: 7,
+  breakOnDamage: { maxHpPct: 0.15, min: 20, max: 60 },
+};
+
+const invalidBreakableRing: AbilityEffect = {
+  type: 'aoeRoot',
+  duration: 4,
+  radius: 6,
+  min: 0,
+  max: 0,
+  ring: { duration: 10, innerRadius: 4.5 },
+  // @ts-expect-error persistent ring roots must not silently accept a direct-root damage budget
+  breakOnDamage: { maxHpPct: 0.15, min: 20, max: 60 },
+};
+
+const invalidBreakableTrap: AbilityEffect = {
+  type: 'aoeRoot',
+  duration: 8,
+  radius: 2,
+  min: 0,
+  max: 0,
+  trap: { armTime: 1, lifetime: 60 },
+  // @ts-expect-error armed traps must not silently accept a direct-root damage budget
+  breakOnDamage: { maxHpPct: 0.15, min: 20, max: 60 },
+};
+
+const invalidBreakableStun: AbilityEffect = {
+  type: 'aoeRoot',
+  duration: 4,
+  radius: 8,
+  min: 6,
+  max: 7,
+  stun: true,
+  // @ts-expect-error stuns must not silently accept a direct-root damage budget
+  breakOnDamage: { maxHpPct: 0.15, min: 20, max: 60 },
+};
+
+void directBreakableRoot;
+void invalidBreakableRing;
+void invalidBreakableTrap;
+void invalidBreakableStun;
 
 function aura(kind: Aura['kind'], value = 1, extra: Partial<Aura> = {}): Aura {
   return {
@@ -56,6 +106,35 @@ describe('cc: isRooted', () => {
   });
   it('is false with no root/stun-family aura', () => {
     expect(isRooted(withAuras(aura('silence')))).toBe(false);
+  });
+});
+
+describe('cc: unbreakable encounter control', () => {
+  it('identifies protected auras and only movement-locking kinds stop relocation', () => {
+    for (const kind of ['stun', 'stasis', 'root', 'incapacitate', 'polymorph'] as const) {
+      const protectedAura = aura(kind, 0, { unbreakableControl: true });
+      expect(isUnbreakableControlAura(protectedAura)).toBe(true);
+      expect(hasUnbreakableMovementLock(withAuras(protectedAura))).toBe(true);
+      expect(hasUnbreakableMovementLock(withAuras(protectedAura), protectedAura)).toBe(false);
+    }
+
+    expect(
+      hasUnbreakableMovementLock(withAuras(aura('silence', 0, { unbreakableControl: true }))),
+    ).toBe(false);
+    expect(
+      hasUnbreakableMovementLock(withAuras(aura('slow', 0, { unbreakableControl: true }))),
+    ).toBe(false);
+    expect(hasUnbreakableMovementLock(withAuras(aura('root')))).toBe(false);
+  });
+});
+
+describe('cc: damageBreakThreshold', () => {
+  const budget = { maxHpPct: 0.15, min: 20, max: 60 };
+
+  it('rounds the health fraction and clamps both ends', () => {
+    expect(damageBreakThreshold(100, budget)).toBe(20);
+    expect(damageBreakThreshold(152, budget)).toBe(23);
+    expect(damageBreakThreshold(1_000, budget)).toBe(60);
   });
 });
 

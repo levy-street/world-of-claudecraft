@@ -1683,6 +1683,13 @@
     background: var(--color-border-default);
     border-radius: 4px;
   }
+  /* Character-select news feed: .cs-news-feed already scrolls as a whole,
+     so the per-article 460px cap would nest a second scrollbar inside it. */
+  .cs-news-feed .news-body {
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
+  }
   .news-body > :first-child {
     margin-top: 0;
   }
@@ -1730,6 +1737,67 @@
   .news-link:hover,
   .news-link:focus-visible {
     text-decoration: underline;
+  }
+
+  /* Compact feed (the character-select news panel): the latest release stays a
+     full .news-item article; older releases collapse to a native
+     <details>/<summary> disclosure so expand-in-place needs no JS wiring, same
+     pattern as the guide FAQ (src/guide/pages/faq.ts). */
+  .news-collapsed {
+    border: 1px solid var(--color-border-default);
+    border-radius: 6px;
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: rgba(0, 0, 0, 0.2);
+  }
+  .news-collapsed[open] {
+    padding-bottom: 10px;
+  }
+  .news-collapsed-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    min-height: 24px;
+    padding: 9px 2px;
+    list-style: none;
+  }
+  .news-collapsed-summary::-webkit-details-marker {
+    display: none;
+  }
+  .news-collapsed-version {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+  }
+  .news-collapsed-version::before {
+    content: "\25b8";
+    display: inline-block;
+    color: var(--gold-dim);
+    font-size: 11px;
+    transition: transform 0.15s ease;
+  }
+  .news-collapsed[open] .news-collapsed-version::before {
+    transform: rotate(90deg);
+  }
+  .news-collapsed-date {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    flex: none;
+  }
+  .news-collapsed .news-body {
+    margin-top: 8px;
+  }
+  .news-view-all {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 12px;
+  }
+  .news-view-all a {
+    color: inherit;
   }
 
   body.mobile-touch .news-item-head {
@@ -1969,6 +2037,20 @@
     text-align: center;
     text-shadow: 1px 1px 2px #000;
     min-height: 1.2em;
+  }
+  #ls-slow-hint {
+    max-width: min(480px, 80vw);
+    margin-top: 2px;
+    color: var(--color-text-error);
+    font-family: var(--font-ui);
+    font-size: 12px;
+    text-align: center;
+    text-shadow: 1px 1px 2px #000;
+    min-height: 2.4em;
+    visibility: hidden;
+  }
+  #ls-slow-hint.visible {
+    visibility: visible;
   }
 
   /* ---------- play console (realm selector + Play CTA) ---------- */
@@ -2593,31 +2675,31 @@
     margin-left: 0;
   }
   .mini-class[data-class="warrior"] {
-    --class-color: #c79c6e;
+    --class-color: #d67a54;
   }
   .mini-class[data-class="paladin"] {
-    --class-color: #f58cba;
+    --class-color: #f58ca0;
   }
   .mini-class[data-class="hunter"] {
-    --class-color: #abd473;
+    --class-color: #a6d84f;
   }
   .mini-class[data-class="rogue"] {
-    --class-color: #fff569;
+    --class-color: #fcee58;
   }
   .mini-class[data-class="priest"] {
-    --class-color: #ffffff;
+    --class-color: #c6d4f0;
   }
   .mini-class[data-class="shaman"] {
-    --class-color: #0070de;
+    --class-color: #4e8aea;
   }
   .mini-class[data-class="mage"] {
-    --class-color: #69ccf0;
+    --class-color: #33c1f1;
   }
   .mini-class[data-class="warlock"] {
-    --class-color: #9482c9;
+    --class-color: #a785e6;
   }
   .mini-class[data-class="druid"] {
-    --class-color: #ff7d0a;
+    --class-color: #ff8c1a;
   }
 
   .mini-class {
@@ -2702,7 +2784,7 @@
     body:not(.mobile-touch) #charselect-panel.cs-wow {
       --cs-stage-gutter: max(26px, calc((100vw - 1780px) / 2));
       --cs-roster-width: clamp(340px, 28vw, 440px);
-      --cs-details-width: var(--cs-roster-width);
+      --cs-details-width: clamp(380px, 30vw, 720px);
       --cs-dock-bottom: clamp(18px, 6.5vh, 96px);
       display: flex;
       flex-direction: column;
@@ -3143,35 +3225,91 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.45);
       transform: translateY(-1px);
     }
-    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel {
+    /* The news panel docks where the class-details sheet used to sit: the
+       left column of the full-bleed stage, mirroring the roster dock. */
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-panel {
       position: absolute;
-      left: var(--cs-stage-gutter);
+      left: clamp(24px, 2vw, 48px);
       top: 18px;
       bottom: var(--cs-dock-bottom);
       width: var(--cs-details-width);
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: color-mix(in srgb, var(--scrollbar-thumb) 42%, transparent) transparent;
-      background: #0d0d16d9;
+      height: auto;
+      background:
+        linear-gradient(180deg, rgba(255, 209, 0, 0.045), transparent 140px),
+        linear-gradient(180deg, rgba(18, 16, 28, 0.92) 0%, rgba(9, 8, 14, 0.94) 100%);
       border: 1px solid var(--color-border-default);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 209, 0, 0.08),
+        0 14px 36px rgba(0, 0, 0, 0.55);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
       border-radius: var(--radius-md);
-      padding: 14px;
+      padding: 18px 20px 14px;
       z-index: 2;
     }
-    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel::-webkit-scrollbar {
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-title {
+      font-size: 14px;
+      letter-spacing: 0.18em;
+      color: var(--gold);
+      border-bottom: 0;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-title::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--gold-dim), rgba(255, 209, 0, 0.06) 72%, transparent);
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-feed {
+      font-size: 13.5px;
+      line-height: 1.6;
+      padding-right: 6px;
+    }
+    /* The latest-release article blends into the panel (its own card border
+       inside the dock read as a box-in-a-box); the collapsed older rows keep
+       their bordered disclosure look. */
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-feed .news-item {
+      border: 0;
+      background: transparent;
+      padding: 2px 2px 10px 0;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-feed .news-item-title {
+      font-size: clamp(17px, 1vw, 20px);
+      color: var(--gold);
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-feed .news-body h1,
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-feed .news-body h2,
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-feed .news-body h3 {
+      font-size: 12.5px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin: 18px 0 6px;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-feed .news-body li {
+      margin: 4px 0;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-feed {
+      scrollbar-width: thin;
+      scrollbar-color: color-mix(in srgb, var(--scrollbar-thumb) 42%, transparent) transparent;
+    }
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-feed::-webkit-scrollbar {
       width: 6px;
     }
-    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel::-webkit-scrollbar-track {
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-feed::-webkit-scrollbar-track {
       background: transparent;
     }
-    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel::-webkit-scrollbar-thumb {
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-feed::-webkit-scrollbar-thumb {
       background: color-mix(in srgb, var(--scrollbar-thumb) 42%, transparent);
       border: 0;
       border-radius: 999px;
     }
-    body:not(.mobile-touch)
-      #charselect-panel.cs-wow
-      .class-details-panel::-webkit-scrollbar-thumb:hover {
+    body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-feed::-webkit-scrollbar-thumb:hover {
       background: color-mix(in srgb, var(--scrollbar-thumb) 68%, transparent);
     }
     body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-row {
@@ -3195,41 +3333,6 @@
     body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-delete-btn {
       justify-self: end;
     }
-    body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-grid {
-      grid-template-columns: minmax(0, 1fr);
-      gap: clamp(18px, 2vh, 28px);
-    }
-    body:not(.mobile-touch) #charselect-panel.cs-wow .details-spells-section {
-      grid-column: 1;
-      padding-top: clamp(6px, 1vh, 12px);
-    }
-    body:not(.mobile-touch) #charselect-panel.cs-wow .details-gear-row {
-      display: grid;
-      grid-template-columns: clamp(76px, 5vw, 92px) minmax(0, 1fr);
-      align-items: baseline;
-      gap: 12px;
-    }
-    body:not(.mobile-touch) #charselect-panel.cs-wow .details-gear-row .badge {
-      padding: 0;
-      border: 0;
-      border-radius: 0;
-      background: none;
-      text-transform: none;
-      line-height: 1.45;
-      white-space: normal;
-    }
-    body:not(.mobile-touch) #charselect-panel.cs-wow .details-gear-row .badge-resource::before {
-      content: "";
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      margin-right: 7px;
-      border-radius: 50%;
-      background: currentColor;
-      box-shadow: 0 0 7px currentColor;
-      vertical-align: 1px;
-    }
-
     /* The class summary's base type is sized for the small pre-game card
        (10px to 12px); on the full-screen stage it reads too small. Scale the
        whole details sheet up one step in every cs-wow panel. */
@@ -3409,9 +3512,9 @@
     color: #fff;
   }
   .skin-swatch.sel {
-    border-color: var(--class-color, #69ccf0);
+    border-color: var(--class-color, #33c1f1);
     color: #fff;
-    box-shadow: 0 0 9px var(--class-color, #69ccf0);
+    box-shadow: 0 0 9px var(--class-color, #33c1f1);
   }
   .skin-unequip-btn {
     min-height: 34px;
@@ -3832,7 +3935,6 @@
     box-shadow: 0 0 10px rgba(255, 209, 0, 0.2);
     outline: none;
   }
-
   .btn-secondary {
     background: linear-gradient(180deg, #1b1b26 0%, #0d0d14 100%);
     color: var(--color-text-light);
@@ -4159,7 +4261,7 @@
     margin: 8px 0 12px;
     max-height: 50vh;
     overflow-y: auto;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 5px;
   }
   .realm-loading {
@@ -4507,6 +4609,47 @@
     pointer-events: auto;
   }
 
+  /* Character-select "News & Updates" panel: lives in the class-details
+     sheet's old slot, shares its card chrome, but is always visible (no
+     fade-in handshake with a renderer) and scrolls its feed internally. */
+  .cs-news-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    box-sizing: border-box;
+    height: 520px;
+    background: linear-gradient(135deg, rgba(20, 20, 30, 0.96) 0%, rgba(10, 10, 15, 0.98) 100%);
+    border: 2px solid var(--color-border-default);
+    box-shadow:
+      inset 0 0 15px rgba(0, 0, 0, 0.8),
+      0 6px 20px rgba(0, 0, 0, 0.6);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    color: var(--color-text-light);
+    font-family: var(--font-sans);
+    text-align: left;
+  }
+  .cs-news-title {
+    flex: none;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-border-default);
+    margin-bottom: 12px;
+  }
+  .cs-news-feed {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    font-size: 13px;
+    mask-image: linear-gradient(180deg, #000 0%, #000 88%, transparent 100%);
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 88%, transparent 100%);
+  }
+
   .class-details-content {
     transition:
       opacity 0.15s ease-in-out,
@@ -4576,7 +4719,7 @@
     color: #c73c3c;
   }
   .class-details-role.role-ranged {
-    color: #abd473;
+    color: #a6d84f;
   }
   .class-details-role.role-healer {
     color: #58beea;
@@ -4700,15 +4843,15 @@
   }
 
   .badge-resource.resource-energy {
-    background: rgba(255, 245, 105, 0.12);
-    border-color: rgba(255, 245, 105, 0.4);
-    color: #fff569;
+    background: rgba(252, 238, 88, 0.12);
+    border-color: rgba(252, 238, 88, 0.4);
+    color: #fcee58;
   }
 
   .badge-resource.resource-rage {
-    background: rgba(199, 156, 110, 0.15);
-    border-color: rgba(199, 156, 110, 0.4);
-    color: #c79c6e;
+    background: rgba(214, 122, 84, 0.15);
+    border-color: rgba(214, 122, 84, 0.4);
+    color: #d67a54;
   }
 
   /* Signature Abilities Section */
@@ -5033,26 +5176,22 @@
     margin: 0;
     overflow: visible;
   }
-  body.mobile-touch #charselect-panel #charselect-class-details,
-  body.mobile-touch #charselect-panel #online-class-details {
-    flex: 1 1 auto;
+  body.mobile-touch #charselect-panel #charselect-news {
+    flex: none;
     width: 100%;
     height: auto;
     min-height: 0;
     max-height: none;
     margin-bottom: 0;
+  }
+  /* The page is the scroller on mobile: the feed renders at natural height
+     (no nested scroll region, no bottom fade hiding the tail mid-read). */
+  body.mobile-touch #charselect-panel .cs-news-feed {
+    flex: none;
+    min-height: 0;
     overflow: visible;
-  }
-  body.mobile-touch #charselect-panel #charselect-class-details .class-details-content,
-  body.mobile-touch #charselect-panel #online-class-details .class-details-content {
-    min-height: 100%;
-    height: auto;
-  }
-  body.mobile-touch #charselect-panel #charselect-class-details .class-details-grid,
-  body.mobile-touch #charselect-panel #online-class-details .class-details-grid {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
+    -webkit-mask-image: none;
+    mask-image: none;
   }
   body.mobile-touch .char-row {
     display: grid;
@@ -5605,31 +5744,31 @@
 
   /* Class color tokens, any element with data-class exposes --class-color */
   [data-class="warrior"] {
-    --class-color: #c79c6e;
+    --class-color: #d67a54;
   }
   [data-class="paladin"] {
-    --class-color: #f58cba;
+    --class-color: #f58ca0;
   }
   [data-class="hunter"] {
-    --class-color: #abd473;
+    --class-color: #a6d84f;
   }
   [data-class="rogue"] {
-    --class-color: #fff569;
+    --class-color: #fcee58;
   }
   [data-class="priest"] {
-    --class-color: #ffffff;
+    --class-color: #c6d4f0;
   }
   [data-class="shaman"] {
-    --class-color: #0070de;
+    --class-color: #4e8aea;
   }
   [data-class="mage"] {
-    --class-color: #69ccf0;
+    --class-color: #33c1f1;
   }
   [data-class="warlock"] {
-    --class-color: #9482c9;
+    --class-color: #a785e6;
   }
   [data-class="druid"] {
-    --class-color: #ff7d0a;
+    --class-color: #ff8c1a;
   }
 
   /* Portrait chip, a class-ringed headshot rendered from the 3D model.
@@ -5711,14 +5850,36 @@
     align-items: center;
     gap: 12px;
   }
+  /* Header meta wraps as pill chips beside the name (level/class, title, hobby,
+     honor). The name is the leading flex item; each chip follows. */
   .panel-title.char-title-portrait .char-title-text {
     flex: 1 1 auto;
     min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px 7px;
   }
+  .char-title-text .panel-subtitle {
+    display: inline-block;
+    margin: 0;
+    padding: 4px 9px;
+    font-size: 10.5px;
+    line-height: 1;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.3);
+  }
+  .char-title-text .panel-subtitle.char-archetype-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  /* The honor chip drops its special gold to the shared muted chip color, so it
+     reads as one of the header pills rather than a highlighted line. */
   .panel-title.char-title-portrait .char-honor-balance {
-    display: block;
-    color: var(--gold);
-    margin-top: var(--spacing-xs);
+    color: var(--color-text-muted);
+    margin-top: 0;
   }
   .panel-title.char-title-portrait .portrait-chip {
     flex: 0 0 auto;
@@ -5737,19 +5898,32 @@
     text-overflow: ellipsis;
   }
 
-  /* Inspect-other-player profile window */
+  /* Inspect-other-player profile ("Profile") window: the showcase language, same
+     socket / column / centering family as the character sheet (reused via
+     .paperdoll / .equip-col / .equip-slot). Only the class-colored model stage and
+     the compact header are inspect-specific. */
   #inspect-window {
-    width: 420px;
+    width: 740px;
   }
+  /* Compact rich-card header: name + level/class chip + badge rows (the big
+     portrait chip is dropped for the rich card; the remote card keeps it below). */
   .inspect-card {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 2px 2px 10px;
+    text-align: left;
+  }
+  /* The out-of-range remote card is unchanged: centered portrait + name + a plain
+     level/class line + optional guild. */
+  .inspect-card-remote {
     align-items: center;
     gap: 8px;
     padding: 18px 16px 8px;
     text-align: center;
   }
-  .inspect-card .portrait-chip {
+  .inspect-card-remote .portrait-chip {
     width: 132px;
     height: 132px;
   }
@@ -5758,9 +5932,27 @@
     font-size: 20px;
     color: #f0ead8;
   }
-  .inspect-meta {
-    font-size: 13px;
+  .inspect-title {
+    font-size: 12px;
     color: var(--color-text-muted);
+  }
+  /* The rich card shows level/class as a pill chip; the remote card keeps the
+     original plain line (unchanged). */
+  .inspect-meta {
+    display: inline-block;
+    padding: 4px 9px;
+    font-size: 10.5px;
+    line-height: 1;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.3);
+  }
+  .inspect-card-remote .inspect-meta {
+    padding: 0;
+    font-size: 13px;
+    border: none;
+    background: none;
   }
   /* $WOC holder-tier flair badge in the inspect/profile window */
   .inspect-holder {
@@ -5779,6 +5971,29 @@
     display: block;
     filter: drop-shadow(0 1px 2px #000);
   }
+  /* $WOC holder badge halo on the player card: same static per-tier glow as the
+     nameplate (hue via inline --holder-glow, strength from the tokens.css
+     tunables), stronger for the two band IV regalia. Only the holder badge opts
+     in (via .inspect-holder-halo), never the shared Discord badges. */
+  .inspect-holder-badge.inspect-holder-halo {
+    filter: drop-shadow(0 1px 2px #000)
+      drop-shadow(0 0 var(--holder-halo) var(--holder-glow, transparent));
+  }
+  .inspect-holder-badge.inspect-holder-halo.inspect-holder-halo-strong {
+    filter: drop-shadow(0 1px 2px #000)
+      drop-shadow(0 0 var(--holder-halo-strong) var(--holder-glow, transparent));
+  }
+  /* Contributor (dev-tier) badge halo on the inspect card: same shared strength
+     tunables, hue via inline --dev-glow, stronger for the significant tiers. Only
+     the dev badge opts in (via .inspect-dev-halo), never the shared Discord badges. */
+  .inspect-holder-badge.inspect-dev-halo {
+    filter: drop-shadow(0 1px 2px #000)
+      drop-shadow(0 0 var(--holder-halo) var(--dev-glow, transparent));
+  }
+  .inspect-holder-badge.inspect-dev-halo.inspect-dev-halo-strong {
+    filter: drop-shadow(0 1px 2px #000)
+      drop-shadow(0 0 var(--holder-halo-strong) var(--dev-glow, transparent));
+  }
   .inspect-holder-text {
     display: flex;
     flex-direction: column;
@@ -5794,37 +6009,49 @@
     font-size: 11px;
     color: var(--color-text-muted);
   }
-  /* Worn-gear paperdoll in the inspect/profile window (read-only). Reuses the
-     character-window .equip-col / .equip-slot styling, but the two columns flex
-     to share the narrower window instead of the char sheet's fixed 150px. */
+  /* Worn-gear paperdoll in the inspect/profile window (read-only). It reuses the
+     shared .paperdoll / .equip-col / .equip-slot showcase family (44px sockets,
+     wrapping names, flexing columns); only the class-colored model stage below is
+     inspect-specific. No unequip / drag affordances (another player's gear is
+     view-only), so no corner chip is painted here. */
   .inspect-equip {
-    margin: 4px 14px 12px;
-    padding-top: 10px;
-    border-top: 1px solid var(--color-border-default);
+    margin-top: 4px;
   }
   .inspect-equip-title {
     font-family: var(--title-font);
     font-size: 13px;
     color: var(--color-text-muted);
     text-align: center;
-    margin-bottom: 8px;
+    letter-spacing: 0.04em;
   }
-  .inspect-paperdoll {
-    justify-content: center;
-    gap: 8px;
+  /* The model stage takes the inspected player's CLASS color, delivered as the
+     --inspect-class-color custom property the painter sets. Fixed width so the
+     columns flex around it (the same band-centering contract as the sheet), and
+     taller than the sheet stage to frame the pulled-back inspect camera. */
+  #inspect-window .inspect-model-panel {
+    min-height: 400px;
+    border: 1px solid var(--inspect-class-color, #5a4a20);
+    box-shadow:
+      0 0 14px 0 color-mix(in srgb, var(--inspect-class-color, #5a4a20) 35%, transparent),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.8),
+      inset 0 0 60px rgba(0, 0, 0, 0.55);
+    background:
+      radial-gradient(
+        ellipse 62% 46% at 50% 58%,
+        color-mix(in srgb, var(--inspect-class-color, #5a4a20) 13%, transparent),
+        transparent 72%
+      ),
+      linear-gradient(to bottom, rgba(20, 16, 8, 0.35), rgba(0, 0, 0, 0.5));
   }
-  .inspect-paperdoll .equip-col {
-    width: auto;
-    flex: 1 1 0;
-    min-width: 0;
-  }
-  /* Read-only gear, so the item name WRAPS instead of ellipsizing: a viewer must be
-     able to read the whole name (the wider window gives it room). Overrides the
-     shared .equip-slot .slot-item nowrap/ellipsis used by the editable char sheet. */
-  .inspect-paperdoll .slot-item {
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
+  #inspect-window .inspect-model-panel::after {
+    content: "";
+    position: absolute;
+    left: 22%;
+    right: 22%;
+    bottom: 40px;
+    height: 26px;
+    background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(0, 0, 0, 0.55), transparent 70%);
+    pointer-events: none;
   }
 
   @media (min-width: 900px) {
@@ -5960,47 +6187,6 @@
       height: clamp(264px, 34vh, 360px);
       min-height: 264px;
     }
-
-    /* More prominent stats + signature abilities in the (now taller) showcase.
-       Scoped to #charselect-panel so the create screen's .cs-detail-col (same
-       renderClassDetails output, but no extra room) keeps the base sizing. */
-    #charselect-panel .cs-detail-col .details-section-title {
-      font-size: 13px;
-    }
-    #charselect-panel .cs-detail-col .details-stat-bar-row {
-      font-size: 12px;
-      margin-bottom: 8px;
-    }
-    #charselect-panel .cs-detail-col .details-stat-label {
-      width: 68px;
-    }
-    #charselect-panel .cs-detail-col .details-stat-bar-track {
-      height: 11px;
-    }
-    #charselect-panel .cs-detail-col .details-stat-val {
-      width: 22px;
-      font-size: 12px;
-    }
-    #charselect-panel .cs-detail-col .details-gear-row {
-      font-size: 12px;
-      margin-bottom: 10px;
-    }
-    #charselect-panel .cs-detail-col .badge {
-      font-size: 11px;
-      padding: 3px 8px;
-    }
-    #charselect-panel .cs-detail-col .details-spell-item {
-      font-size: 12px;
-      padding: 10px 14px;
-      gap: 12px;
-    }
-    #charselect-panel .cs-detail-col .details-spell-icon-img {
-      width: 40px;
-      height: 40px;
-    }
-    #charselect-panel .cs-detail-col .details-spell-text strong {
-      font-size: 13px;
-    }
   }
 
   body.mobile-touch .charselect-screen {
@@ -6066,6 +6252,18 @@
       overflow: hidden;
       padding: 0;
     }
+    /* charselect only: the news panel flows BELOW the roster/preview stage,
+       so the panel grows with it and the page scrolls; the .cs-body grid row
+       above keeps (roughly) the old one-screen height. charcreate keeps the
+       clamped, non-scrolling panel. */
+    body.mobile-touch #charselect-panel {
+      height: auto;
+      overflow: visible;
+    }
+    body.mobile-touch #charselect-panel .cs-body {
+      flex: 0 0 auto;
+      grid-template-rows: calc(min(560px, var(--app-vh) - 20px) - 118px) auto;
+    }
     body.mobile-touch #charselect-panel .auth-title,
     body.mobile-touch #charcreate-panel .auth-title {
       font-size: 18px;
@@ -6126,7 +6324,7 @@
     }
     /* charcreate's columns hold a single tall flow (name input, 9-class grid,
        appearance swatches, Back/Create actions) with no inner scroll container
-       of its own, unlike charselect (whose #char-list and #charselect-class-details
+       of its own, unlike charselect (whose #char-list and .cs-news-feed
        children scroll). Under the panel's min(560px, ...) height clamp that flow
        exceeds the column height on short landscape phones and, with overflow:hidden,
        clipped the Create button off with no way to reach it. Let the columns
@@ -6210,135 +6408,26 @@
       height: 40px;
     }
     body.mobile-touch #charselect-panel .cs-detail-col {
-      display: grid;
-      grid-template-columns: minmax(120px, 0.54fr) minmax(0, 1.46fr);
-      gap: 10px;
-      align-items: stretch;
-    }
-    body.mobile-touch #charselect-panel .cs-detail-col .cs-preview {
-      height: auto;
-      min-height: 0;
-      min-width: 0;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details {
-      box-sizing: border-box;
-      min-height: 0;
-      overflow-y: auto;
-      scrollbar-gutter: stable;
-      scrollbar-width: auto;
-      scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-      opacity: 1;
-      transform: none;
-      padding-right: 12px;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details::-webkit-scrollbar {
-      width: 10px;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details::-webkit-scrollbar-track {
-      background: var(--scrollbar-track);
-      border: 1px solid #35270f;
-      border-radius: 999px;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, var(--scrollbar-thumb) 0%, #3a2b10 100%);
-      border: 1px solid var(--scrollbar-border);
-      border-radius: 999px;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .class-details-content {
-      max-width: 100%;
-      min-height: 0;
-      height: auto;
-      overflow: visible;
-      gap: 5px;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .class-details-lore {
-      display: none;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .class-details-role {
-      display: none;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .class-details-grid {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      align-items: stretch;
-      max-width: 100%;
-      min-width: 0;
     }
-    body.mobile-touch #charselect-panel #charselect-class-details .class-details-grid > * {
-      max-width: 100%;
-      min-width: 0;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .details-spells-section {
-      min-width: 0;
-      padding-top: 2px;
-      padding-bottom: 4px;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .class-details-name {
-      font-size: 16px;
-      line-height: 1;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .details-section-title {
-      margin-bottom: 3px;
-      font-size: 10px;
-      line-height: 1.05;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .details-stat-bar-row {
-      min-width: 0;
-      margin-bottom: 2px;
-      gap: 6px;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .details-stat-label {
-      flex: 0 0 64px;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .details-stat-val {
-      flex: 0 0 22px;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .details-stat-label,
-    body.mobile-touch #charselect-panel #charselect-class-details .details-stat-val,
-    body.mobile-touch #charselect-panel #charselect-class-details .details-gear-row {
-      font-size: 10.5px;
-      margin-bottom: 3px;
-      line-height: 1.15;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .details-stat-bar-track {
+    body.mobile-touch #charselect-panel .cs-detail-col .cs-preview {
       flex: 1 1 auto;
-      height: 8px;
+      height: auto;
+      min-height: 110px;
       min-width: 0;
     }
-    body.mobile-touch #charselect-panel #charselect-class-details .details-gear-row {
-      max-width: 100%;
-      overflow-wrap: anywhere;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .details-spells-list {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 5px;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .details-spell-item {
+    body.mobile-touch #charselect-panel #charselect-news {
+      grid-column: 1 / -1;
       box-sizing: border-box;
-      width: 100%;
-      min-width: 0;
-      padding: 5px 7px;
-      gap: 6px;
+      width: auto;
+      margin: 0 10px 10px;
+      padding: 12px 14px;
     }
-    body.mobile-touch #charselect-panel #charselect-class-details .details-spell-icon-img {
-      width: 26px;
-      height: 26px;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .details-spell-text {
-      min-width: 0;
-      font-size: 10.5px;
-      line-height: 1.12;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .details-spell-text br {
-      display: none;
-    }
-    body.mobile-touch #charselect-panel #charselect-class-details .details-spell-text strong {
-      font-size: 11.5px;
+    body.mobile-touch #charselect-panel .cs-news-title {
+      font-size: 12px;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
     }
     body.mobile-touch #charcreate-panel .cs-body {
       grid-template-columns: minmax(310px, 0.95fr) minmax(360px, 1.05fr);
@@ -7188,14 +7277,14 @@
     gap: 12px;
     min-width: 0;
     min-height: 0;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 8px;
     background: #100d08;
     padding: 14px;
   }
   .se-roll-banner {
     flex: 0 0 auto;
-    border: 1px solid color-mix(in srgb, var(--tier-color, #fff) 45%, #463a1c);
+    border: 1px solid color-mix(in srgb, var(--tier-color, #fff) 45%, var(--color-border-showcase));
     border-radius: 8px;
     padding: 10px 12px;
     background: linear-gradient(180deg, #1b150d, #0f0c07);
@@ -7219,7 +7308,7 @@
     padding: 2px 8px 8px 2px;
   }
   .se-tier {
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 8px;
     background: #14110a;
     width: 100%;
@@ -7331,7 +7420,7 @@
     min-height: 0;
     display: flex;
     flex-direction: column;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 8px;
     background: #0f0d12;
     padding: 0;

@@ -18,7 +18,7 @@ Turns the player's keyboard/mouse/touch/gamepad into **movement intent** +
 | `mobile_controls.ts` | `MobileControls`: touch joysticks to `input.setTouchMove`/`setTouchLook`. |
 | `touch_router.ts` | Pure, DOM-free touch ownership router: `getTouchOwner`/`isInteractiveHudElement`/`isCameraDragAllowedAt` + a per-pointer `TouchOwnerLedger`, consumed by `mobile_controls.ts` to keep move/combat/camera/menu touches from fighting over the same finger. |
 | `audio.ts` | `GameAudio` (`audio` singleton): compatibility facade mapping non-positional UI/event methods to typed sampled `sfx.playUi()` cues. |
-| `music.ts` | `MusicDirector` (`music` singleton): procedural zone/combat soundtrack. |
+| `music.ts` / `music_tracks.ts` | `MusicDirector` (`music` singleton): streamed remastered zone/combat soundtrack (`public/audio/music/`, catalog + combat pick in `music_tracks.ts`); the note-data compositions and `MusicSynth` remain here for the music editor and offline render tooling. |
 | `sfx.ts` / `voice.ts` | `sfx` / `voice` singletons: play pre-rendered clips from `public/audio/` (spatial 3D SFX + NPC voice lines) via their `*_manifest.generated.ts`. |
 | `settings.ts` | `Settings`: persisted Esc-menu options. |
 | `click_move.ts` / `pointer_pick.ts` / `camera_follow.ts` | pure, DOM-free input/camera math extracted from the render loop so they unit-test in isolation |
@@ -33,11 +33,20 @@ Turns the player's keyboard/mouse/touch/gamepad into **movement intent** +
   callbacks; only `interactions.ts` and `autoloot.ts` touch the world, and only
   through the `IWorld`-shaped interfaces passed to them. Do not import
   `Sim`/`ClientWorld` here.
-- **`music.ts` synthesizes its soundtrack** in code via WebAudio. **`audio.ts` is
-  primarily a compatibility facade over `sfx.ts`:** personal UI/event methods
-  resolve to typed sampled `ui_*` cues. The release-specific `readyCheck()` chime
-  remains a small procedural WebAudio fallback until it has a dedicated sampled
-  catalog key. `sfx.ts` and `voice.ts` play pre-rendered clips under `public/audio/`
+- **`music.ts` streams the remastered soundtrack:** every zone and battle cue is
+  a looping mp3 media element (`public/audio/music/`, catalog in
+  `music_tracks.ts`) routed through one WebAudio graph and crossfaded by gain,
+  so playback downloads progressively and costs no synthesis CPU. Zone streams
+  are created lazily on first activation; both battle themes are warmed at
+  `init()` (a fight can start any moment) and each fight opens on one picked at
+  random; a keeper interval pauses fully-faded streams so an inaudible cue costs
+  no decoding or bandwidth. The note-data compositions and `MusicSynth` voices
+  stay in `music.ts` as the AUTHORING source: the music editor and
+  `scripts/render_music.mjs` consume them, and the shipped mp3s are remastered
+  renders of exactly those themes. **`audio.ts` is
+  a compatibility facade over `sfx.ts`:** every personal UI/event method resolves
+  to a typed sampled `ui_*` cue; there is no remaining procedural WebAudio bed.
+  `sfx.ts` and `voice.ts` play pre-rendered clips under `public/audio/`
   keyed off their `*_manifest.generated.ts`; a missing clip is a silent no-op (the
   dialogue/combat text stays the source of truth).
 - **`AudioContext` needs a user gesture**: `audio.init()`/`music.init()`/`sfx.init()`
@@ -107,9 +116,11 @@ into a pure module if needed), then the smallest change that turns it green.
   publish them through the SFX Studio or the deterministic UI generator. Tune
   cross-clip gain and speed through the Studio-backed checked-in maps, never by
   editing the generated manifest or baking those values into the asset.
-- **A new music cue/zone:** add a `MusicZone`, a `composeX()` theme, register it
-  in the `buildMusicThemes()` map (music.ts), and drive it from
-  `music.update(zone, inCombat)`.
+- **A new music cue/zone:** add a `MusicZone`, compose its theme (a `composeX()`
+  registered in `buildMusicThemes()`, music.ts) so the editor and render
+  pipeline know it, render and remaster it to `public/audio/music/<zone>.mp3`,
+  map it in `ZONE_STREAM_URLS` (music_tracks.ts, pinned by
+  `tests/music_tracks.test.ts`), and drive it from `music.update(zone, inCombat)`.
 
 ## Never
 - Never read `localStorage`/`window`/`AudioContext` from a constructor without a

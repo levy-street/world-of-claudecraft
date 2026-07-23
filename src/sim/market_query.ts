@@ -20,13 +20,16 @@ export const MARKET_ITEM_TYPE_FILTERS = [
 ] as const;
 export const MARKET_ARMOR_TYPE_FILTERS = [
   'all',
+  'offhand',
   'helmet',
+  'neck',
   'shoulder',
   'chest',
   'waist',
   'legs',
   'gloves',
   'feet',
+  'ring',
 ] as const;
 export const MARKET_WEAPON_TYPE_FILTERS = [
   'all',
@@ -37,7 +40,15 @@ export const MARKET_WEAPON_TYPE_FILTERS = [
   'axe',
   'other',
 ] as const;
-export const MARKET_RARITY_FILTERS = ['all', 'poor', 'common', 'uncommon', 'rare', 'epic'] as const;
+export const MARKET_RARITY_FILTERS = [
+  'all',
+  'poor',
+  'common',
+  'uncommon',
+  'rare',
+  'epic',
+  'legendary',
+] as const;
 
 // Listings per browse page (the count of OTHER sellers' listings shown at a time;
 // the player's own listings are always wired on top for quick reclaim).
@@ -96,7 +107,8 @@ function isCosmeticItem(item: ItemDef): boolean {
 function itemMatchesType(item: ItemDef, filter: MarketItemTypeFilter): boolean {
   if (filter === 'all') return true;
   if (filter === 'weapon') return item.kind === 'weapon' && item.slot === 'mainhand';
-  if (filter === 'armor') return item.kind === 'armor' && item.slot !== undefined;
+  if (filter === 'armor')
+    return (item.kind === 'armor' || item.kind === 'held_offhand') && item.slot !== undefined;
   if (filter === 'consumable')
     return (
       item.kind === 'food' ||
@@ -123,7 +135,8 @@ function weaponFamily(item: ItemDef): MarketWeaponTypeFilter {
 function itemMatchesSubtype(item: ItemDef, query: MarketQuery): boolean {
   const subtype = query.subtype ?? 'all';
   if (subtype === 'all') return true;
-  if (query.itemType === 'armor') return item.kind === 'armor' && item.slot === subtype;
+  if (query.itemType === 'armor')
+    return (item.kind === 'armor' || item.kind === 'held_offhand') && item.slot === subtype;
   if (query.itemType === 'weapon') return item.kind === 'weapon' && weaponFamily(item) === subtype;
   return true;
 }

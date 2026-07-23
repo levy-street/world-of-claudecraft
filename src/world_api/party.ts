@@ -35,6 +35,8 @@ export interface PartyMemberInfo {
   absorb?: number;
   /** Active specialization role, when known. Older snapshots omit it. */
   role?: 'tank' | 'healer' | 'dps';
+  /** Effective health Rewind could currently restore to this member. */
+  rewind?: number;
   /** 0 only when the realm reports this member linkdead/disconnected. */
   connected?: number;
   /** 1 while at least one living hostile mob is actively targeting this member. */

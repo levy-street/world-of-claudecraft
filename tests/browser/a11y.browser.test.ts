@@ -14,10 +14,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { TalentAllocation } from '../../src/sim/content/talents';
 import { ITEMS, QUESTS } from '../../src/sim/data';
+import { ALL_CLASSES } from '../../src/sim/types';
 import { ArenaWindow } from '../../src/ui/arena_window';
 import { BagsWindow } from '../../src/ui/bags_window';
 import { CharWindow } from '../../src/ui/char_window';
 import { FOCUSABLE_SELECTOR } from '../../src/ui/focus_manager';
+import { resolveActionBarVisibility } from '../../src/ui/hud/action_bar/action_bar_visibility_core';
 import { QuestLogWindow } from '../../src/ui/hud/quest/questlog_window';
 import { t } from '../../src/ui/i18n';
 import { LeaderboardWindow } from '../../src/ui/leaderboard_window';
@@ -136,21 +138,16 @@ describe('axe: talents window', () => {
   it('warrior talent tree is clean (dialog role + close button + tablist)', async () => {
     const root = host('talents-window');
     root.style.display = 'none';
-    let stage: TalentAllocation | null = null;
+    const allocation: TalentAllocation = { spec: null, rows: {} };
     const win = new TalentsWindow(
       stubDeps({
         root: () => root,
-        getStage: () => stage,
-        setStage: (s: TalentAllocation | null) => {
-          stage = s;
-        },
         playerClass: () => 'warrior',
-        totalPoints: () => 31,
-        currentAllocation: () => ({ ranks: {}, choices: {} }) as TalentAllocation,
+        playerLevel: () => 20,
+        currentAllocation: () => allocation,
         activeLoadout: () => -1,
         loadouts: () => [],
         currentBar: () => [],
-        buildDropdown: () => document.createElement('div'),
         captureFocus: () => null,
       }),
     );
@@ -158,6 +155,42 @@ describe('axe: talents window', () => {
     expect(root.getAttribute('role')).toBe('dialog');
     expect(root.querySelector('button[data-close]')).toBeTruthy();
     await expectClean(root);
+  });
+
+  it('puts every specialization role on its own line instead of joining the spec name', () => {
+    for (const cls of ALL_CLASSES) {
+      const root = host(`talents-window-${cls}`);
+      root.style.display = 'none';
+      const allocation: TalentAllocation = { spec: null, rows: {} };
+      const win = new TalentsWindow(
+        stubDeps({
+          root: () => root,
+          playerClass: () => cls,
+          playerLevel: () => 20,
+          currentAllocation: () => allocation,
+          activeLoadout: () => -1,
+          loadouts: () => [],
+          currentBar: () => [],
+          captureFocus: () => null,
+        }),
+      );
+      win.open();
+
+      const cards = Array.from(root.querySelectorAll<HTMLElement>('.ts-panel'));
+      expect(cards, `${cls} specialization cards`).toHaveLength(3);
+      for (const card of cards) {
+        const name = card.querySelector<HTMLElement>('.ts-name');
+        const role = card.querySelector<HTMLElement>('.ts-role');
+        expect(name, `${cls} spec name`).toBeTruthy();
+        expect(role, `${cls} spec role`).toBeTruthy();
+        expect(getComputedStyle(name!).display, `${cls} spec name display`).toBe('block');
+        expect(getComputedStyle(role!).display, `${cls} spec role display`).toBe('block');
+        expect(role!.getBoundingClientRect().top, `${cls} spec role line`).toBeGreaterThan(
+          name!.getBoundingClientRect().top,
+        );
+      }
+      root.remove();
+    }
   });
 });
 
@@ -231,7 +264,10 @@ describe('axe: spellbook window', () => {
     const win = new SpellbookWindow(
       stubDeps({
         root: () => root,
-        world: () => ({ cfg: { playerClass: 'warrior' }, known: [] }) as never,
+        // The render reads world.player.level for the spec/level learn gate
+        // (IWorld always carries a player); level 1 keeps every row locked.
+        world: () =>
+          ({ cfg: { playerClass: 'warrior' }, known: [], player: { level: 1 } }) as never,
         barAbilityIds: () => [],
         hasFreeSlot: () => true,
         hasFormBars: () => false,
@@ -293,6 +329,85 @@ describe('axe: options menu', () => {
     expect(root.getAttribute('aria-label')).toBe(t('hudChrome.perf.title'));
     expect(root.getAttribute('aria-labelledby')).toBeNull();
     await expectClean(root);
+  });
+
+  it('enables the third action row through the secondary row and preserves keyboard focus', () => {
+    const values: Record<string, number | boolean> = {
+      showSecondaryActionBar: false,
+      showThirdActionBar: false,
+    };
+    const settings = {
+      get: (key: string) => values[key] ?? false,
+      set: (key: string, value: number | boolean) => {
+        values[key] = value;
+        return value;
+      },
+    };
+    const hooks = {
+      settings,
+      onSettingChange: (key: string, value: number | boolean) => {
+        if (key !== 'showSecondaryActionBar' && key !== 'showThirdActionBar') return;
+        const visibility = resolveActionBarVisibility(
+          {
+            secondary: Boolean(values.showSecondaryActionBar),
+            third: Boolean(values.showThirdActionBar),
+          },
+          key,
+          Boolean(value),
+        );
+        values.showSecondaryActionBar = visibility.secondary;
+        values.showThirdActionBar = visibility.third;
+      },
+      theme: {
+        get: () => ({ preset: 'classic', custom: {} }),
+        setPreset: () => {},
+        setCustom: () => {},
+        resetCustom: () => {},
+      },
+      perfOverlay: { setPlacement: () => {} },
+    };
+    const root = host('options-menu');
+    root.style.display = 'none';
+    const win = new OptionsWindow(
+      stubDeps({
+        root: () => root,
+        world: () =>
+          ({
+            realm: 'Claudemoon',
+            player: { name: 'Aurelia', pos: { x: 0, y: 0, z: 0 } },
+          }) as never,
+        options: () => hooks as never,
+        bugReport: () => null,
+        buildDropdown: () => document.createElement('div'),
+        captureFocus: () => null,
+      }),
+    );
+    const toggle = (key: string) =>
+      root.querySelector<HTMLButtonElement>(`[data-setting-key="${key}"]`);
+
+    win.toggle();
+    const interfaceButton = Array.from(root.querySelectorAll<HTMLButtonElement>('.opt-btn')).find(
+      (button) => button.textContent === t('hud.options.interface'),
+    );
+    interfaceButton?.click();
+    // The Interface panel is tabbed; both action-bar toggles live under Combat.
+    root.querySelector<HTMLButtonElement>('.opt-tab[data-tab="combat"]')?.click();
+
+    expect(toggle('showThirdActionBar')?.disabled).toBe(true);
+    const secondary = toggle('showSecondaryActionBar');
+    secondary?.focus();
+    secondary?.click();
+    expect(values.showSecondaryActionBar).toBe(true);
+    expect(toggle('showThirdActionBar')?.disabled).toBe(false);
+    expect(document.activeElement).toBe(toggle('showSecondaryActionBar'));
+
+    toggle('showThirdActionBar')?.click();
+    expect(values.showThirdActionBar).toBe(true);
+    toggle('showSecondaryActionBar')?.click();
+    expect(values.showSecondaryActionBar).toBe(false);
+    expect(values.showThirdActionBar).toBe(false);
+    expect(toggle('showThirdActionBar')?.disabled).toBe(true);
+    expect(document.activeElement).toBe(toggle('showSecondaryActionBar'));
   });
 });
 

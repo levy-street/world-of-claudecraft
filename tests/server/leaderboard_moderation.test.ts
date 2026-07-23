@@ -19,7 +19,7 @@
 // exempt: it ranks GitHub identities with no game-account linkage.
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_board_moderation';
 
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { PoolClient, QueryResult } from 'pg';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -178,14 +178,15 @@ describe('every ranked board query embeds the fragment', () => {
     await expect(lifetimeXpRankForCharacter(42)).resolves.toEqual({ rank: 6, total: 10 });
   });
 
-  it('daily rewards: all five ranked reads agree on one population', async () => {
+  it('daily rewards: every ranked read agrees on one population', async () => {
     const db = new PgDailyRewardDb();
     const day = '2026-07-08';
     for (const read of [
-      () => db.leaderboard(day, 1, 10),
-      () => db.leaderboardRowForAccount(day, 1),
       () => db.leaderboardTotal(day),
-      () => db.rankForAccount(day, 1),
+      // The board-cache refresh read: every board read a player status
+      // assembles derives from this one snapshot, so it must gate on the
+      // same population as the live total and page reads.
+      () => db.leaderboardSnapshot(day),
     ]) {
       const sql = await capturedSql(read);
       expect(sql).toHaveLength(1);
@@ -293,34 +294,78 @@ describe('main.ts wiring', () => {
     expect(src).toContain('setOnAccountModerated(bustBoardCaches)');
     const start = src.indexOf('function bustBoardCaches');
     expect(start).toBeGreaterThan(-1);
-    const body = src.slice(start, src.indexOf('}', start));
-    // Players realm + global, guilds realm + global, and the deeds board:
-    // every cached scope. Arena is served uncached and the daily-rewards
-    // board reads per request, so neither appears here by design.
+    // Strip `//` line comments before the substring checks (keeping `://` protocol
+    // slashes), exactly like the sibling "bumps the board epoch" pin below: without
+    // this, commenting out a null-out line leaves its substring alive in the comment
+    // and the pin stays falsely green (the comment-gameable trap). The behavioral
+    // backstop for the WARM-cache null is board_read_single_flight's
+    // "a WARM arena cache is nulled by the bust" case.
+    const stripComments = (s: string): string => s.replace(/(^|[^:])\/\/.*$/gm, '$1');
+    const body = stripComments(src.slice(start, src.indexOf('}', start)));
+    // Players realm + global, guilds realm + global, BOTH arena formats, the deeds
+    // board, and the daily-rewards board (instance-scoped on its service singleton,
+    // busted through the exported bust): every cached, moderation-visible scope. The
+    // arena ladder is character-faced, so it is busted here now (it used to be served
+    // uncached, with nothing to bust).
     expect(body).toContain('leaderboardCache.realm = null');
     expect(body).toContain('leaderboardCache.global = null');
     expect(body).toContain('guildLeaderboardCache.realm = null');
     expect(body).toContain('guildLeaderboardCache.global = null');
+    expect(body).toContain("arenaLeaderboardCache['1v1'] = null");
+    expect(body).toContain("arenaLeaderboardCache['2v2'] = null");
     expect(body).toContain('deedsBoardCache = null');
+    expect(body).toContain('bustDailyRewardBoardCache()');
+  });
+
+  it('registers exactly one moderation hook (the composite bust covers every board)', () => {
+    // A second setOnAccountModerated call would silently REPLACE the first
+    // (last write wins), detaching whichever busts the earlier hook carried.
+    // Scanned across the whole server tree, not just main.ts, so a stray
+    // registration from any other production module reddens here too (the
+    // declaring module is exempt: its hits are the declaration itself).
+    const serverDir = resolve(__dirname, '../../server');
+    const walk = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+        if (entry.isDirectory()) return walk(resolve(dir, entry.name));
+        return entry.name.endsWith('.ts') ? [resolve(dir, entry.name)] : [];
+      });
+    const callers = walk(serverDir).flatMap((file) => {
+      if (file.endsWith('moderation_db.ts')) return [];
+      const count = readFileSync(file, 'utf8').split('setOnAccountModerated(').length - 1;
+      return count > 0 ? [{ file: file.slice(serverDir.length + 1), count }] : [];
+    });
+    expect(callers).toEqual([{ file: 'main.ts', count: 1 }]);
   });
 
   it('bumps the board epoch so an in-flight refresh cannot reinstall a pre-ban snapshot', () => {
     // The lost-bust race: a ban landing WHILE a board refresh is in flight would
     // be overwritten by that refresh's pre-ban snapshot for up to one TTL cycle.
-    // bustBoardCaches bumps a monotonic epoch, and each of the three player-derived
-    // refreshes captures the epoch before its first await and installs its result
-    // only if the epoch is unchanged, so the stale snapshot is declined.
+    // bustBoardCaches bumps a monotonic epoch, and each of the four player-derived
+    // refreshes (player, guild, deeds board, and now the arena ladder) captures the
+    // epoch before its first await and installs its result only if the epoch is
+    // unchanged, so the stale snapshot is declined.
     const src = readFileSync(resolve(__dirname, '../../server/main.ts'), 'utf8');
+    // Strip `//` line comments (keeping `://` protocol slashes) before every guard
+    // substring check below. Without this, a mutation that neutralizes a guard by
+    // commenting it out leaves the raw-source substring present in the comment and
+    // these pins go falsely green; the sibling board_read_single_flight wiring pins
+    // strip the same way.
+    const stripComments = (s: string): string => s.replace(/(^|[^:])\/\/.*$/gm, '$1');
     const bustStart = src.indexOf('function bustBoardCaches');
     expect(bustStart).toBeGreaterThan(-1);
-    const bustBody = src.slice(bustStart, src.indexOf('}', bustStart));
+    const bustBody = stripComments(src.slice(bustStart, src.indexOf('}', bustStart)));
     expect(bustBody).toContain('boardEpoch++');
-    for (const fn of ['refreshLeaderboard', 'refreshGuildLeaderboard', 'refreshDeedsBoard']) {
+    for (const fn of [
+      'refreshLeaderboard',
+      'refreshGuildLeaderboard',
+      'refreshDeedsBoard',
+      'refreshArena',
+    ]) {
       const start = src.indexOf(`async function ${fn}(`);
       expect(start, `${fn} not found`).toBeGreaterThan(-1);
       // The function body runs to its column-0 closing brace (every inner brace is
       // indented), so `\n}\n` after the signature bounds it.
-      const fnBody = src.slice(start, src.indexOf('\n}\n', start));
+      const fnBody = stripComments(src.slice(start, src.indexOf('\n}\n', start)));
       expect(fnBody, `${fn} must capture the epoch before its await`).toContain(
         'const epoch = boardEpoch;',
       );
@@ -328,5 +373,28 @@ describe('main.ts wiring', () => {
         'if (boardEpoch === epoch)',
       );
     }
+  });
+
+  it('the legacy arena and project-stats arms funnel into the shared getters and rate-limit', () => {
+    // Acceptance-criterion 1's legacy-arm half: the legacy main.ts branches reach the
+    // SAME cache getters the migrated RouteDef handlers use (so both arms share one
+    // cache), no longer inline the raw db reads, and carry the public-read limiter.
+    const src = readFileSync(resolve(__dirname, '../../server/main.ts'), 'utf8');
+    const stripComments = (s: string): string => s.replace(/(^|[^:])\/\/.*$/gm, '$1');
+
+    const arenaStart = src.indexOf("=== '/api/arena/leaderboard'");
+    expect(arenaStart).toBeGreaterThan(-1);
+    const arenaArm = stripComments(src.slice(arenaStart, src.indexOf('\n    }', arenaStart)));
+    expect(arenaArm).toContain('getArenaLeaderboard(format)');
+    expect(arenaArm).toContain('publicReadRateLimited(req)');
+    expect(arenaArm).not.toContain('topArenaRatings(');
+
+    const statsStart = src.indexOf("=== '/api/project-stats'");
+    expect(statsStart).toBeGreaterThan(-1);
+    const statsArm = stripComments(src.slice(statsStart, src.indexOf('\n    }', statsStart)));
+    expect(statsArm).toContain('getAccountsCreatedCount()');
+    expect(statsArm).toContain('getCharactersCreatedCount()');
+    expect(statsArm).toContain('publicReadRateLimited(req)');
+    expect(statsArm).not.toContain('getAccountsCount(');
   });
 });

@@ -67,7 +67,14 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase9_pa
 
 // routeHttpRequest is synchronous fire-and-forget (void apiEntry(req, res)), so a
 // dispatch must poll res.writableEnded before the captured triple is readable.
-const MAX_POLL_TICKS = 5000;
+const MAX_POLL_TICKS = 200_000;
+// The comment above assumes the dummy DATABASE_URL is unreachable so DB-touching
+// requests (the leaderboard corpus entries) reject fast. A contributor whose local
+// dev Postgres happens to be listening on the same port instead gets a REAL cold
+// boot (ensureSchema's advisory-lock DDL) plus real queries for the whole corpus,
+// which can outrun vitest's default 10s hookTimeout. Give this hook real headroom
+// so it is correct either way, not just when nothing answers on that port.
+const PARITY_HOOK_TIMEOUT_MS = 120_000;
 // The /api/perf dev gate reads process.env.ALLOW_DEV_COMMANDS per request.
 const DEV_COMMANDS_ENV = 'ALLOW_DEV_COMMANDS';
 // Content-Length header sentinel: far above the player-card byte cap, so the
@@ -155,6 +162,14 @@ const API_REQUEST_CORPUS: readonly ApiRequestSpec[] = [
   // GET is deferred to the ladder deletion). This pins it: a HEAD to a migrated
   // GET route must 404 on BOTH paths, with no divergence and no known-deviation.
   { name: 'leaderboard_head_404', method: 'HEAD', url: '/api/leaderboard' },
+
+  // Arena ladder + project-stats: a TTL cache now fronts each, so a cold-cache db
+  // error degrades deterministically (an empty ladder / accounts_created 0) on BOTH
+  // arms identically, graduating them out of the SKIPPED list into the byte-parity
+  // corpus. Rate-limited on both arms with the same public-read budget (isolate()
+  // resets the bucket per pass, so both arms see a fresh 200).
+  { name: 'arena_default', method: 'GET', url: '/api/arena/leaderboard' },
+  { name: 'project_stats', method: 'GET', url: '/api/project-stats' },
 
   // --- binary request class, player card (characterization block 5) -----------
   {
@@ -367,7 +382,7 @@ beforeAll(async () => {
 
   const fixtures = API_REQUEST_CORPUS.map(specToFixture);
   report = await runParity({ oldDispatch, newDispatch, fixtures });
-});
+}, PARITY_HOOK_TIMEOUT_MS);
 
 afterAll(async () => {
   const main = (await import('../../../server/main')) as MainModule;
@@ -1340,6 +1355,24 @@ describe('/api + /internal late-arrival dispatch parity (legacy flag vs new flag
     expect(stableStringify(newCap)).toBe(stableStringify(oldCap));
   });
 
+  it('POST /internal/daily-rewards/finalize with a wrong secret is the fail-closed 401, identical old-vs-new', async () => {
+    const { oldCap, newCap } = await captureWithEnv({ [DAILY_ENV]: PARITY_SECRET }, () =>
+      makeReq({
+        method: 'POST',
+        url: '/internal/daily-rewards/finalize',
+        headers: { [DAILY_HEADER]: 'wrong-secret' },
+        body: { day: '2026-07-01' },
+      }),
+    );
+    expect(oldCap.status).toBe(401);
+    expect(JSON.parse(oldCap.body as string)).toEqual({
+      success: false,
+      data: null,
+      error: 'not authenticated',
+    });
+    expect(stableStringify(newCap)).toBe(stableStringify(oldCap));
+  });
+
   it('POST /internal/daily-rewards/pending-payouts with a wrong secret is the fail-closed 401, identical old-vs-new', async () => {
     const { oldCap, newCap } = await captureWithEnv({ [DAILY_ENV]: PARITY_SECRET }, () =>
       makeReq({
@@ -1465,11 +1498,14 @@ describe('/api + /internal late-arrival dispatch parity (legacy flag vs new flag
 // -----------------------------------------------------------------------------
 // SKIPPED requests (present in characterization.test.ts or on the surface, but not
 // replayed here) and why:
-//   - GET /api/project-stats, GET /api/arena/leaderboard, GET /api/woc/balance,
-//     GET /api/email/unsubscribe?token=<non-empty>, GET /api/search WITH a bearer,
-//     and every populated leaderboard/character/account success body: all reach
-//     pool.query against the pool-less test db (hang or pool-500), so they are not
-//     db-free contract paths. Deferred exactly as characterization defers them.
+//   - GET /api/woc/balance, GET /api/email/unsubscribe?token=<non-empty>,
+//     GET /api/search WITH a bearer, and every populated leaderboard/character/
+//     account success body: all reach pool.query against the pool-less test db (hang
+//     or pool-500), so they are not db-free contract paths. Deferred exactly as
+//     characterization defers them. (GET /api/project-stats and
+//     GET /api/arena/leaderboard graduated OUT of this list: a TTL cache now fronts
+//     each, so the cold-cache read degrades deterministically and both are replayed
+//     old-vs-new in the corpus above.)
 //   - GET /api/auth/discord/callback SUCCESS bounce: embeds a live session token in
 //     inlined HTML the normalizer returns verbatim (non-deterministic + a privacy
 //     flag); only the error bounce is replayed.

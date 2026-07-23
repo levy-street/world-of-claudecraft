@@ -153,6 +153,158 @@ describe('auto_attack meleeSwing: the white-hit table', () => {
   });
 });
 
+describe('auto_attack meleeSwing: landed talent procs resolve before retaliation', () => {
+  const addImbue = (player: AnyEntity): void => {
+    player.auras.push({
+      id: 'test_imbue',
+      name: 'Test Imbue',
+      kind: 'imbue',
+      remaining: 30,
+      duration: 30,
+      value: 0,
+      sourceId: player.id,
+      school: 'nature',
+    });
+  };
+
+  const addThorns = (target: AnyEntity, value: number): void => {
+    target.auras.push({
+      id: 'test_thorns',
+      name: 'Punishing Thorns',
+      kind: 'thorns',
+      remaining: 30,
+      duration: 30,
+      value,
+      sourceId: target.id,
+      school: 'nature',
+    });
+  };
+
+  it('lets Imbued Lifeblood save its owner from otherwise lethal thorns', () => {
+    const { sim, p } = makeSim('shaman', 20, 1756);
+    expect(sim.applyTalents({ spec: null, rows: { 5: 'sha_r5_imbue_mastery' } })).toBe(true);
+    const mob = spawnDummy(sim, p, 1);
+    addImbue(p);
+    addThorns(mob, 10);
+    p.mainhandItemId = null;
+    p.hp = 5;
+    const events = capture(sim);
+    const draws: number[] = [];
+    sim.rng.setObserver((value: number) => draws.push(value));
+
+    const connected = meleeSwing(sim.ctx, p, mob, 0, null, { cannotBeDodged: true });
+    sim.rng.setObserver(null);
+
+    const healIndex = events.findIndex(
+      (event) => event.type === 'heal2' && event.ability === 'Imbued Lifeblood',
+    );
+    const thornsIndex = events.findIndex(
+      (event) =>
+        event.type === 'damage' &&
+        event.sourceId === mob.id &&
+        event.targetId === p.id &&
+        event.ability === 'Punishing Thorns',
+    );
+    expect(connected).toBe(true);
+    expect(healIndex).toBeGreaterThan(-1);
+    expect(thornsIndex).toBeGreaterThan(healIndex);
+    expect(p.dead).toBe(false);
+    expect(p.hp).toBeGreaterThan(0);
+    // Hit table, weapon roll, swing crit, then Lifeblood's normal heal-crit roll.
+    expect(draws).toHaveLength(4);
+  });
+
+  it.each([
+    {
+      name: 'Oathwheel cooldown refund',
+      cls: 'paladin' as const,
+      row: { 14: 'pal_r14_righteous_cause' },
+      prepare: (player: AnyEntity) => player.cooldowns.set('judgement', 5),
+      read: (player: AnyEntity) => player.cooldowns.get('judgement'),
+      expected: 4.5,
+    },
+    {
+      name: 'Imbued Tempo cooldown refund',
+      cls: 'shaman' as const,
+      row: { 14: 'sha_r14_weapon_fury' },
+      prepare: (player: AnyEntity) => player.cooldowns.set('earth_shock', 5),
+      read: (player: AnyEntity) => player.cooldowns.get('earth_shock'),
+      expected: 4.5,
+    },
+  ])('applies $name before thorns without changing the shared RNG trace', (testCase) => {
+    const run = (active: boolean) => {
+      const { sim, p } = makeSim(testCase.cls, 20, 26014);
+      if (active) {
+        expect(sim.applyTalents({ spec: null, rows: testCase.row })).toBe(true);
+      }
+      const mob = spawnDummy(sim, p, 1);
+      addImbue(p);
+      addThorns(mob, 1);
+      p.mainhandItemId = null;
+      testCase.prepare(p);
+      let valueAtRetaliation: unknown;
+      const dealDamage = sim.ctx.dealDamage;
+      sim.ctx.dealDamage = ((source: Entity | null, target: Entity, ...args: unknown[]) => {
+        if (source?.id === mob.id && target.id === p.id && args[3] === 'Punishing Thorns') {
+          valueAtRetaliation = testCase.read(p);
+        }
+        return (dealDamage as (...callArgs: unknown[]) => unknown)(source, target, ...args);
+      }) as typeof sim.ctx.dealDamage;
+      const draws: number[] = [];
+      sim.rng.setObserver((value: number) => draws.push(value));
+
+      const connected = meleeSwing(sim.ctx, p, mob, 0, null, { cannotBeDodged: true });
+      sim.rng.setObserver(null);
+
+      expect(connected).toBe(true);
+      return { draws, valueAtRetaliation };
+    };
+
+    const baseline = run(false);
+    const active = run(true);
+    expect(active.valueAtRetaliation).toBe(testCase.expected);
+    expect(active.draws).toEqual(baseline.draws);
+    expect(active.draws).toHaveLength(3);
+  });
+
+  it('Venom Dividend rolls its chance before thorns and pays only on success', () => {
+    // Balance pass: the flat 5-per-swing became the Combat Potency shape (20%
+    // chance for 10 energy), so the proc now draws exactly one rng roll per
+    // poisoned swing; the roll resolves before the thorns retaliation.
+    const run = (active: boolean) => {
+      const { sim, p } = makeSim('rogue', 20, 26014);
+      if (active) {
+        expect(sim.applyTalents({ spec: null, rows: { 14: 'rog_r14_deadly_brew' } })).toBe(true);
+      }
+      const mob = spawnDummy(sim, p, 1);
+      addImbue(p);
+      addThorns(mob, 1);
+      p.mainhandItemId = null;
+      p.resource = 0;
+      let valueAtRetaliation: unknown;
+      const dealDamage = sim.ctx.dealDamage;
+      sim.ctx.dealDamage = ((source: Entity | null, target: Entity, ...args: unknown[]) => {
+        if (source?.id === mob.id && target.id === p.id && args[3] === 'Punishing Thorns') {
+          valueAtRetaliation = p.resource;
+        }
+        return (dealDamage as (...callArgs: unknown[]) => unknown)(source, target, ...args);
+      }) as typeof sim.ctx.dealDamage;
+      const draws: number[] = [];
+      sim.rng.setObserver((value: number) => draws.push(value));
+      const connected = meleeSwing(sim.ctx, p, mob, 0, null, { cannotBeDodged: true });
+      sim.rng.setObserver(null);
+      expect(connected).toBe(true);
+      return { draws, valueAtRetaliation, resource: p.resource };
+    };
+
+    const baseline = run(false);
+    const active = run(true);
+    expect(active.draws).toHaveLength(baseline.draws.length + 1); // the chance roll
+    expect(active.valueAtRetaliation).toBe(active.resource); // resolved before thorns
+    expect([0, 10]).toContain(active.resource); // pays 10 or nothing, never 5
+  });
+});
+
 describe('auto_attack rangedSwing: Auto Shot vs Wand', () => {
   it('Auto Shot is a physical projectile (armor-mitigated)', () => {
     const { sim, p } = makeSim('hunter', 12);
@@ -241,6 +393,28 @@ describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
     expect(p.swingTimer).toBeCloseTo(p.weapon.speed * sim.swingIntervalMult(p));
   });
 
+  it('a ranged attacker whose swing timer is still up does NOT fire (once per weapon interval, not per tick)', () => {
+    // Regression (restored from the pre-revert payload): the dual-wield-aware
+    // guard sits AFTER the ranged branch, so a ranged attacker needs its own
+    // swing-timer gate before it or it re-enters and fires on all 20 ticks per
+    // second.
+    const { sim, p, meta } = makeSim('hunter', 12);
+    spawnDummy(sim, p, 8, 20);
+    p.autoAttack = true;
+    p.swingTimer = 0;
+    const shots = (evs: Ev[]): Ev[] =>
+      evs.filter((e) => e.type === 'spellfx' && e.fx === 'projectile' && e.sourceId === p.id);
+    // First tick: one legitimate shot fired, and the timer is armed to the interval.
+    const first = capture(sim);
+    updatePlayerAutoAttack(sim.ctx, p, meta);
+    expect(shots(first)).toHaveLength(1);
+    expect(p.swingTimer).toBeGreaterThan(0);
+    // Next 10 ticks (0.5s, still well inside a ~2.3s interval): no further shots.
+    const rest = capture(sim);
+    for (let i = 0; i < 10; i++) updatePlayerAutoAttack(sim.ctx, p, meta);
+    expect(shots(rest)).toHaveLength(0);
+  });
+
   it('the swing timer decrements every tick even while not auto-attacking', () => {
     const { sim, p, meta } = makeSim('warrior', 12);
     p.autoAttack = false;
@@ -315,6 +489,17 @@ describe('auto_attack start/stopAutoAttack', () => {
     startAutoAttack(sim.ctx, p.id);
     expect(p.autoAttack).toBe(true);
     expect(mob.aggroTargetId).toBe(p.id); // idle mob pulled into combat (ctx.aggroMob)
+  });
+
+  it('silently no-ops on a target that just died (no spurious "Invalid attack target." toast)', () => {
+    const { sim, p } = makeSim('warrior', 12);
+    const mob = spawnDummy(sim, p, 5, 2);
+    mob.dead = true; // the engaging spell landed the killing blow this same tick
+    p.targetId = mob.id;
+    const events = capture(sim);
+    startAutoAttack(sim.ctx, p.id);
+    expect(p.autoAttack).toBe(false); // no engage on a corpse
+    expect(events.some((e) => e.type === 'error')).toBe(false); // and NO error toast
   });
 
   it('stopAutoAttack clears the flag', () => {

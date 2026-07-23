@@ -46,6 +46,7 @@ export const id_ID: AdminTranslations = {
   "stats.peakOnline": "puncak daring",
   "stats.peakOnlineToday": "puncak daring 24j",
   "stats.peakOnlineAllTime": "puncak daring sepanjang masa",
+  "stats.playersCap": "batas pemain",
   "stats.accounts": "akun",
   "stats.characters": "karakter",
   "stats.newAccounts24h": "akun baru 24j",

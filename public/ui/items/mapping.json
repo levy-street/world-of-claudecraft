@@ -46,6 +46,46 @@
       "confidence": "high"
     },
     {
+      "itemId": "arcane_dust",
+      "name": "Chime Dust",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-11/masters/arcane_dust.png (accepted v2)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "arcane_essence",
+      "name": "Chime Essence",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-11/masters/arcane_essence.png (accepted v3)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "arcane_shard",
+      "name": "Chime Shard",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-11/masters/arcane_shard.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "arcanite_bar",
+      "name": "Glyphsteel Bar",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-6/masters/arcanite_bar.png (accepted v2)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "ashwood_log",
+      "name": "Ashwood Log",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-7/masters/ashwood_log.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "backpack",
       "name": "Backpack (implicit bag-bar slot; UI id, not an item)",
       "sourcePack": "woc_bags",
@@ -236,11 +276,27 @@
       "confidence": "medium"
     },
     {
+      "itemId": "cooking_salt",
+      "name": "Cooking Salt",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-10/masters/cooking_salt.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "copper_mining_pick",
       "name": "Copper Mining Pick",
       "sourcePack": "farming",
       "sourceFile": "2.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "copper_ore",
+      "name": "Copper Ore",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-6/masters/copper_ore.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "cracked_fetish",
@@ -488,6 +544,14 @@
       "confidence": "medium"
     },
     {
+      "itemId": "elderwood_log",
+      "name": "Highpine Log",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-7/masters/elderwood_log.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "elixir_of_the_bear",
       "name": "Elixir of the Bear",
       "sourcePack": "generic100b",
@@ -572,6 +636,14 @@
       "confidence": "high"
     },
     {
+      "itemId": "game_meat",
+      "name": "Game Meat",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-8/masters/game_meat.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "gathering_sickle",
       "name": "Gathering Sickle",
       "sourcePack": "farming",
@@ -593,8 +665,16 @@
       "confidence": "high"
     },
     {
+      "itemId": "glass_vial",
+      "name": "Glass Vial",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-10/masters/glass_vial.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "glimmerfin_koi",
-      "name": "Glimmerfin Koi",
+      "name": "Sunglint Koi",
       "sourcePack": "fishing",
       "sourceFile": "12.png",
       "confidence": "high"
@@ -605,6 +685,14 @@
       "sourcePack": "generic100b",
       "sourceFile": "59.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "goldleaf_herb",
+      "name": "Goldleaf Herb",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-7/masters/goldleaf_herb.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "grave_captain_voss",
@@ -776,6 +864,14 @@
       "confidence": "medium"
     },
     {
+      "itemId": "homespun_cloth",
+      "name": "Homespun Cloth",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-8/masters/homespun_cloth.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "imperial_crimson_armor_plate",
       "name": "Imperial Crimson",
       "sourcePack": "blacksmith",
@@ -804,11 +900,27 @@
       "confidence": "high"
     },
     {
+      "itemId": "iron_ore",
+      "name": "Iron Ore",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-6/masters/iron_ore.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "ironbark_axe",
       "name": "Ironbark Axe",
       "sourcePack": "farming",
       "sourceFile": "18.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "ironbark_log",
+      "name": "Ironbark Log",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-7/masters/ironbark_log.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "ivory_copper_armor_plate",
@@ -864,6 +976,14 @@
       "name": "Linen Pouch",
       "sourcePack": "woc_bags",
       "sourceFile": "WoC_Bag_03.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "silkspun_satchel",
+      "name": "Silkspun Satchel",
+      "sourcePack": "woc_bags",
+      "sourceFile": "WoC_Bag_03.png (hue-shifted silk recolor of the linen_pouch conversion; dedicated art welcome)",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
@@ -989,7 +1109,7 @@
     },
     {
       "itemId": "mithril_mining_pick",
-      "name": "Mithril Mining Pick",
+      "name": "Skysilver Mining Pick",
       "sourcePack": "farming",
       "sourceFile": "9.png",
       "confidence": "high"
@@ -1212,6 +1332,38 @@
       "confidence": "medium"
     },
     {
+      "itemId": "prime_cut",
+      "name": "Prime Cut",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-9/masters/prime_cut.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "pristine_hide",
+      "name": "Pristine Hide",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-9/masters/pristine_hide.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "pristine_silk",
+      "name": "Pristine Silk",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-9/masters/pristine_silk.png (accepted v3)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "pristine_venom_gland",
+      "name": "Pristine Venom Gland",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-9/masters/pristine_venom_gland.png (accepted v4)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "quilted_trousers",
       "name": "Quilted Trousers",
       "sourcePack": "greaves",
@@ -1317,6 +1469,46 @@
       "confidence": "medium"
     },
     {
+      "itemId": "resonant_hide",
+      "name": "Resonant Hide",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-12/masters/resonant_hide.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "resonant_links",
+      "name": "Resonant Links",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-12/masters/resonant_links.png (accepted v3)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "resonant_steel",
+      "name": "Resonant Steel",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-12/masters/resonant_steel.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "resonant_thread",
+      "name": "Resonant Thread",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-12/masters/resonant_thread.png (accepted v3)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "resonant_timber",
+      "name": "Resonant Timber",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-12/masters/resonant_timber.png (accepted v2)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "revenant_silk_robe",
       "name": "Revenant Silk Robe",
       "sourcePack": "armor",
@@ -1364,6 +1556,14 @@
       "sourcePack": "cooking",
       "sourceFile": "30.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "rough_hide",
+      "name": "Rough Hide",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-8/masters/rough_hide.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "roughspun_gloves",
@@ -1436,8 +1636,16 @@
       "confidence": "medium"
     },
     {
+      "itemId": "silverleaf_herb",
+      "name": "Sheenleaf Herb",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-7/masters/silverleaf_herb.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "silverleaf_sickle",
-      "name": "Silverleaf Sickle",
+      "name": "Sheenleaf Sickle",
       "sourcePack": "farming",
       "sourceFile": "5.png",
       "confidence": "high"
@@ -1462,6 +1670,14 @@
       "sourcePack": "armor",
       "sourceFile": "17.png",
       "confidence": "medium"
+    },
+    {
+      "itemId": "smithing_flux",
+      "name": "Smithing Flux",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-10/masters/smithing_flux.png (accepted v2)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "smoked_eel",
@@ -1506,6 +1722,30 @@
       "confidence": "high"
     },
     {
+      "itemId": "spider_leg",
+      "name": "Twitching Spider Leg",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-8/masters/spider_leg.png (accepted v2)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "spider_silk",
+      "name": "Spider Silk",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-8/masters/spider_silk.png (accepted v2)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "spool_of_thread",
+      "name": "Spool of Thread",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-10/masters/spool_of_thread.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "spring_water",
       "name": "Refreshing Spring Water",
       "sourcePack": "generic100b",
@@ -1521,7 +1761,7 @@
     },
     {
       "itemId": "stalkerhide_jerkin",
-      "name": "Stalkerhide Jerkin",
+      "name": "Prowlhide Jerkin",
       "sourcePack": "armor",
       "sourceFile": "20.png",
       "confidence": "medium"
@@ -1576,6 +1816,14 @@
       "confidence": "high"
     },
     {
+      "itemId": "sunpetal_herb",
+      "name": "Sunpetal Herb",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-7/masters/sunpetal_herb.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "supply_crate",
       "name": "Stolen Supply Crate",
       "sourcePack": "generic100b",
@@ -1597,11 +1845,27 @@
       "confidence": "high"
     },
     {
+      "itemId": "tanning_agent",
+      "name": "Tanning Agent",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-10/masters/tanning_agent.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "the_codfather",
       "name": "The Codfather",
       "sourcePack": "generic100b",
       "sourceFile": "14.png",
       "confidence": "medium"
+    },
+    {
+      "itemId": "thorium_ore",
+      "name": "Osmium Ore",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-6/masters/thorium_ore.png (accepted v3)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "tideguard_greaves",
@@ -1708,6 +1972,14 @@
       "sourcePack": "helmets",
       "sourceFile": "23.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "venom_gland",
+      "name": "Venom Gland",
+      "sourcePack": "woc_professions_art",
+      "sourceFile": "batch-8/masters/venom_gland.png (accepted v2)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
       "itemId": "wanderers_chestguard",

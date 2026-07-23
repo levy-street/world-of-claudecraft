@@ -100,6 +100,17 @@ export function freshMarker(
   return marker;
 }
 
+// Where a fresh marker routes the boot path. Auto-entering the WORLD is the
+// recovery for the involuntary mobile WebView eviction reload this module
+// exists for; a desktop browser reload is a deliberate navigation, so it lands
+// on the character-select screen (with the marker's realm remembered) instead
+// of warping the player straight back into the game.
+export type ResumeRoute = 'world' | 'charselect';
+
+export function resumeRoute(runtime: { nativeApp: boolean; mobileTouch: boolean }): ResumeRoute {
+  return runtime.nativeApp || runtime.mobileTouch ? 'world' : 'charselect';
+}
+
 // localStorage is unavailable in private mode / SSR / some WebViews; every
 // wrapper fails soft so a storage error can never break boot or play.
 function readRaw(): string | null {

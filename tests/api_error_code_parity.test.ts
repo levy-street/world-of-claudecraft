@@ -101,7 +101,6 @@ const KNOWN_CODES = [
   'steam.account_taken',
   'steam.upstream',
   'wallet.handoff_invalid',
-  'welcome.invalid_input',
 ];
 
 // The parametric contract pins: the matcher

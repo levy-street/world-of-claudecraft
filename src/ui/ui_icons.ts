@@ -64,7 +64,8 @@ export type UiIconName =
   | 'book'
   | 'cards'
   | 'trash'
-  | 'crafting';
+  | 'crafting'
+  | 'makers-mark';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -180,6 +181,11 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored anvil (the Crafting window): a horned top slab over a waisted
   // body and flared base, one solid silhouette so it reads at micro-button size
   crafting: '<path d="M60 102l90-11h300v85h-100l-30 92v97h68v54H124v-54h68v-97l-30-92h-12z"/>',
+  // World of ClaudeCraft maker's mark: the exact project-owned calligraphic
+  // stroke used beside a crafted copy's provenance line. Unlike the filled
+  // chrome glyphs above, this mark is intentionally an open currentColor line.
+  'makers-mark':
+    '<path d="M82 390C126 341 151 273 157 204C162 156 213 139 249 168C284 196 274 247 236 262C204 274 177 253 178 220C204 276 258 326 323 340C364 349 397 329 426 296C393 365 315 400 231 382C171 369 122 363 82 390" fill="none" stroke="currentColor" stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/>',
 };
 
 export function hasUiIcon(name: string): name is UiIconName {

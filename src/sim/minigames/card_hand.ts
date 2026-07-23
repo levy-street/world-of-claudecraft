@@ -45,14 +45,19 @@ export function createCardHand(rng: { next(): number }): CardHandState {
 
 // Draws one card into the hand, reshuffling the discard pile back into the
 // deck first if the deck is empty (deck+discard is a closed pool of 20).
-export function drawOne(rng: { next(): number }, state: CardHandState): void {
+// Returns whether this draw triggered a reshuffle, so a caller can play a
+// distinct shuffle cue for that (rarer) moment.
+export function drawOne(rng: { next(): number }, state: CardHandState): boolean {
+  let reshuffled = false;
   if (state.deck.length === 0) {
-    if (state.discard.length === 0) return;
+    if (state.discard.length === 0) return false;
     state.deck = shuffle(rng, state.discard);
     state.discard = [];
+    reshuffled = true;
   }
   const card = state.deck.pop();
   if (card !== undefined) state.hand.push(card);
+  return reshuffled;
 }
 
 // Plays (removes) one card by value from the hand into the discard pile.

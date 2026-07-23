@@ -15,6 +15,7 @@ import { describe, expect, it } from 'vitest';
 import { CLASSES } from '../src/sim/data';
 import type { ResolvedAbility } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
+import { ACTION_BAR_ABILITY_SLOTS } from '../src/ui/hud/action_bar/action_bar_layout_core';
 import { buildSpellbookView, type SpellbookInput } from '../src/ui/spellbook_view';
 
 // A class whose kit has at least two abilities, so we can exercise known/locked.
@@ -116,7 +117,7 @@ describe('buildSpellbookView: mobilePage derivation (Phase 4)', () => {
   // abilityIdByBarSlot index 0 = barSlot 1 (hotbarActions' own index = barSlot-1
   // convention). Build a slot array with KIT[0] parked on a given 1-indexed slot.
   const slotsWith = (abilityId: string, barSlot: number): (string | null)[] => {
-    const slots: (string | null)[] = new Array(22).fill(null);
+    const slots: (string | null)[] = new Array(ACTION_BAR_ABILITY_SLOTS).fill(null);
     slots[barSlot - 1] = abilityId;
     return slots;
   };
@@ -173,8 +174,15 @@ describe('buildSpellbookView: mobilePage derivation (Phase 4)', () => {
     }
   });
 
-  it('assigns null for desktop-only slots 21-22', () => {
-    for (const slot of [21, 22]) {
+  it('assigns pages 4 through 6 for the remaining secondary and third-row slots', () => {
+    for (const [slot, page] of [
+      [21, 4],
+      [22, 4],
+      [23, 4],
+      [26, 5],
+      [31, 6],
+      [33, 6],
+    ] as const) {
       const v = buildSpellbookView(
         input({
           known: [known('sim', KIT[0])],
@@ -182,7 +190,7 @@ describe('buildSpellbookView: mobilePage derivation (Phase 4)', () => {
           abilityIdByBarSlot: slotsWith(KIT[0], slot),
         }),
       );
-      expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage, `slot ${slot}`).toBeNull();
+      expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage, `slot ${slot}`).toBe(page);
     }
   });
 
@@ -191,7 +199,7 @@ describe('buildSpellbookView: mobilePage derivation (Phase 4)', () => {
       input({
         known: [known('sim', KIT[0])],
         barAbilityIds: [KIT[0]],
-        abilityIdByBarSlot: new Array(22).fill(null),
+        abilityIdByBarSlot: new Array(ACTION_BAR_ABILITY_SLOTS).fill(null),
       }),
     );
     expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage).toBeNull();
@@ -202,7 +210,7 @@ describe('buildSpellbookView: mobilePage derivation (Phase 4)', () => {
       input({
         known: [known('sim', KIT[0])],
         barAbilityIds: [],
-        abilityIdByBarSlot: new Array(22).fill(null),
+        abilityIdByBarSlot: new Array(ACTION_BAR_ABILITY_SLOTS).fill(null),
       }),
     );
     expect(v.rows.find((r) => r.abilityId === KIT[0])!.mobilePage).toBeNull();
@@ -220,7 +228,7 @@ describe('buildSpellbookView: ClientWorld-vs-Sim parity', () => {
   // state: a Sim-shaped known carrying extra fields the core ignores must yield the
   // same known-ness / rank / on-bar / disabled state as a ClientWorld-mirror shape.
   const derived = (shape: 'sim' | 'client') => {
-    const abilityIdByBarSlot: (string | null)[] = new Array(22).fill(null);
+    const abilityIdByBarSlot: (string | null)[] = new Array(ACTION_BAR_ABILITY_SLOTS).fill(null);
     abilityIdByBarSlot[19] = KIT[0];
     return buildSpellbookView(
       input({

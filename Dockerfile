@@ -1,11 +1,11 @@
-# World of Claudecraft game server — serves the built client, REST API and WebSocket
+# World of Claudecraft game server: serves the built client, REST API and WebSocket
 # world on one port. Pair with a postgres service (see docker-compose.yml).
 
-FROM node:22-alpine AS build
+FROM node:26-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
-COPY .browserslistrc tsconfig.json vite.config.ts svelte.config.js index.html admin.html play.html guide.html editor.html ./
+COPY .browserslistrc tsconfig.json vite.config.ts svelte.config.js index.html admin.html play.html guide.html editor.html wallet-handoff.html ./
 COPY src ./src
 COPY server ./server
 COPY bot ./bot
@@ -28,7 +28,7 @@ RUN VITE_TURNSTILE_SITEKEY="$VITE_TURNSTILE_SITEKEY" \
     VITE_WALLET_DISABLED="$VITE_WALLET_DISABLED" \
     npm run build && cp -a dist/media ./media-build && rm -rf dist/media && npm run build:server && npm run build:bot
 
-FROM node:22-alpine
+FROM node:26-slim
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /app/dist ./dist

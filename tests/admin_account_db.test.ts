@@ -1,28 +1,42 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mocks = vi.hoisted(() => ({
-  query: vi.fn(),
-}));
+const mocks = vi.hoisted(() => {
+  const query = vi.fn();
+  // A spy wrapper so a test can assert which reads take the heavy-allowance
+  // wrap (accountDetail's account row) and which stay plain pool reads
+  // (listAccounts), while still passing the wrapped read through to the same
+  // query spy so each test's mockResolvedValueOnce chain keeps its order.
+  const runWithStatementTimeout = vi.fn((_timeoutMs: number, fn: (q: typeof query) => unknown) =>
+    fn(query),
+  );
+  return { query, runWithStatementTimeout };
+});
 
 vi.mock('../server/db', () => ({
   pool: { query: mocks.query },
   DB_HEAVY_STATEMENT_TIMEOUT_MS: 60_000,
   // accountDetail runs its unbounded play_sessions aggregate on the raised
-  // allowance (server/admin_db.ts); pass the wrapped read straight through to
-  // the same spy so each test's mockResolvedValueOnce chain keeps its order.
-  runWithStatementTimeout: (_timeoutMs: number, fn: (q: typeof mocks.query) => unknown) =>
-    fn(mocks.query),
+  // allowance (server/admin_db.ts); the hoisted spy above forwards it to the
+  // shared query mock.
+  runWithStatementTimeout: mocks.runWithStatementTimeout,
 }));
 
 vi.mock('../server/realm', () => ({
   REALM: 'test-realm',
 }));
 
-import { accountDetail, dailyRewardPointEvents, listModerationActions } from '../server/admin_db';
+import {
+  accountDetail,
+  dailyRewardPointEvents,
+  listAccounts,
+  listModerationActions,
+} from '../server/admin_db';
 
 describe('admin account detail query', () => {
   beforeEach(() => {
     mocks.query.mockReset();
+    // mockClear only: the pass-through implementation must survive resets.
+    mocks.runWithStatementTimeout.mockClear();
   });
 
   it('returns recent moderation actions with their current admin identity', async () => {
@@ -94,6 +108,68 @@ describe('admin account detail query', () => {
     expect(mocks.query.mock.calls[3][0]).toContain('LIMIT 50');
     expect(mocks.query.mock.calls[0][0]).toContain('LEFT JOIN LATERAL');
     expect(mocks.query.mock.calls[0][0]).toContain('expires_at > now()');
+    // The wrapped account row folds the play_session_totals rollup into
+    // lifetime playtime, so the retention fold cannot shrink the admin-visible
+    // total when old play_sessions rows delete.
+    expect(mocks.query.mock.calls[0][0]).toContain(
+      'FROM play_session_totals t WHERE t.account_id = accounts.id',
+    );
+    // The ip-bans probe keeps an aged-out account-to-IP link visible through
+    // the association-ledger arm after the raw play_sessions rows fold away.
+    expect(mocks.query.mock.calls[4][0]).toContain('SELECT 1 FROM account_ip_associations assoc');
+  });
+
+  it('lists accounts through the plain pool read with the lifetime playtime rollup term', async () => {
+    mocks.query
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            id: 7,
+            username: 'alice',
+            created_at: '2026-01-01T00:00:00Z',
+            last_login: '2026-06-01T00:00:00Z',
+            is_admin: false,
+            banned_at: null,
+            suspended_until: null,
+            character_count: 2,
+            max_level: 12,
+            playtime_seconds: '3600',
+            is_ai: false,
+            is_streamer: false,
+          },
+        ],
+      })
+      .mockResolvedValueOnce({ rows: [{ total: 1 }] });
+
+    const page = await listAccounts('ali', 1, 25);
+
+    expect(page.rows).toEqual([
+      {
+        id: 7,
+        username: 'alice',
+        createdAt: '2026-01-01T00:00:00Z',
+        lastLogin: '2026-06-01T00:00:00Z',
+        isAdmin: false,
+        bannedAt: null,
+        suspendedUntil: null,
+        characterCount: 2,
+        maxLevel: 12,
+        playtimeSeconds: 3600,
+        isAi: false,
+        isStreamer: false,
+      },
+    ]);
+    expect(page.total).toBe(1);
+    // The listing carries the same rollup term against a.id, so lifetime
+    // playtime stays stable across the retention fold on this surface too.
+    expect(mocks.query.mock.calls[0][0]).toContain(
+      'FROM play_session_totals t WHERE t.account_id = a.id',
+    );
+    expect(mocks.query.mock.calls[0][1]).toEqual(['%ali%', 25, 0]);
+    // The listing read goes through pool.query directly on the default
+    // statement timeout; it must not silently grow the heavy-allowance wrap
+    // (its per-account subqueries are bounded, unlike accountDetail's).
+    expect(mocks.runWithStatementTimeout).not.toHaveBeenCalled();
   });
 
   it('returns positive point events for one account, reward day, and realm', async () => {

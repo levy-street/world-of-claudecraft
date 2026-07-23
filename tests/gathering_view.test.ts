@@ -7,11 +7,18 @@
 // property of this pure core, not of Sim's respawn timer itself).
 
 import { describe, expect, it } from 'vitest';
+import { GATHERING_PROFESSIONS, type GatheringProfessionId } from '../src/sim/content/professions';
 import { GATHER_NODES } from '../src/sim/data';
+import type { InvSlot } from '../src/sim/types';
 import {
   buildGatheringProficiencyRows,
+  buildGatherNodeTooltip,
   buildNearbyGatherNodes,
   classifyGatherNode,
+  gatherDeniedLineKey,
+  gatherDowngradeLineKey,
+  isNodeToolLockedFor,
+  viewerBestToolTier,
 } from '../src/ui/gathering_view';
 import type { IWorld } from '../src/world_api';
 
@@ -21,16 +28,22 @@ function makeWorld(opts: {
   pos?: { x: number; z: number };
   harvestable?: (nodeId: string) => boolean;
   proficiency?: Record<string, number>;
+  inventory?: InvSlot[];
 }): IWorld {
   const proficiency = opts.proficiency ?? {};
   return {
     player: { pos: opts.pos ?? { x: NODE.pos.x, z: NODE.pos.z } },
+    // buildNearbyGatherNodes resolves the locked dimension from the
+    // viewer's bags; an empty bag reads as the bare-hands tier-1 floor.
+    inventory: opts.inventory ?? [],
     nodeHarvestableByMe: opts.harvestable ?? (() => true),
     professionsState: {
+      // The rows carry the RESOLVED per-profession content caps
+      // (100 gathering, 200 fishing), matching what both worlds now emit.
       skills: Object.entries(proficiency).map(([professionId, skill]) => ({
         professionId,
         skill,
-        maxSkill: 300,
+        maxSkill: GATHERING_PROFESSIONS[professionId as GatheringProfessionId]?.maxSkill ?? 100,
       })),
     },
   } as unknown as IWorld;
@@ -88,11 +101,91 @@ describe('buildNearbyGatherNodes', () => {
   });
 });
 
+// The tool-tier access dimension. `locked` is SEPARATE from the
+// ready/cooldown respawn state so the minimap can compose both; the lock
+// resolves through the sim's own canGatherTier comparator against the
+// viewer's owned-best bag scan (bare hands floor to tier 1).
+describe('tool-tier lock dimension', () => {
+  // A literal NEW tier-2 vein; GATHER_NODES[0] stays the
+  // tier-1 arm.
+  const T2 = GATHER_NODES.find((n) => n.id === 'ore_mirefen_t2');
+  if (!T2) throw new Error('missing ore_mirefen_t2');
+  const PICK: InvSlot[] = [{ itemId: 'iron_mining_pick', count: 1 }];
+
+  it('viewerBestToolTier reads the IWorld bags: empty floors to 1, the pick lifts mining only', () => {
+    expect(viewerBestToolTier(makeWorld({}), 'mining')).toBe(1);
+    const world = makeWorld({ inventory: PICK });
+    expect(viewerBestToolTier(world, 'mining')).toBe(2);
+    expect(viewerBestToolTier(world, 'logging')).toBe(1);
+  });
+
+  it('isNodeToolLockedFor: a tier-2 node locks bare hands, unlocks with the pick; tier 1 never locks', () => {
+    expect(isNodeToolLockedFor(makeWorld({}), { type: 'ore', tier: 2 })).toBe(true);
+    expect(isNodeToolLockedFor(makeWorld({ inventory: PICK }), { type: 'ore', tier: 2 })).toBe(
+      false,
+    );
+    expect(isNodeToolLockedFor(makeWorld({}), { type: 'ore', tier: 1 })).toBe(false);
+  });
+
+  it('buildNearbyGatherNodes carries tier and both lock arms, independent of respawn state', () => {
+    const bare = buildNearbyGatherNodes(makeWorld({ pos: T2.pos }), 5);
+    const bareT2 = bare.find((n) => n.id === T2.id);
+    expect(bareT2).toMatchObject({ tier: 2, locked: true, state: 'ready' });
+    const tooled = buildNearbyGatherNodes(makeWorld({ pos: T2.pos, inventory: PICK }), 5);
+    expect(tooled.find((n) => n.id === T2.id)).toMatchObject({ tier: 2, locked: false });
+    // The tier-1 arm: never locked, even bare-handed.
+    const t1 = buildNearbyGatherNodes(makeWorld({}), 5).find((n) => n.id === NODE.id);
+    expect(t1).toMatchObject({ tier: 1, locked: false });
+    // Lock and respawn compose: a cooling t2 node reads locked AND cooldown.
+    const cooling = buildNearbyGatherNodes(
+      makeWorld({ pos: T2.pos, harvestable: (id) => id !== T2.id }),
+      5,
+    ).find((n) => n.id === T2.id);
+    expect(cooling).toMatchObject({ locked: true, state: 'cooldown' });
+  });
+
+  it('buildGatherNodeTooltip resolves the full model, and null for an unknown id', () => {
+    expect(buildGatherNodeTooltip(makeWorld({ pos: T2.pos }), T2.id)).toEqual({
+      type: 'ore',
+      professionId: 'mining',
+      tier: 2,
+      locked: true,
+      state: 'ready',
+    });
+    expect(
+      buildGatherNodeTooltip(makeWorld({ pos: T2.pos, inventory: PICK }), T2.id),
+    ).toMatchObject({ locked: false });
+    // A stale pick after a content change resolves to null, never a throw.
+    expect(buildGatherNodeTooltip(makeWorld({}), 'no_such_node_id')).toBeNull();
+  });
+
+  it('gatherDeniedLineKey maps surface + professionId to the exact key, falling back safely', () => {
+    expect(gatherDeniedLineKey('node', 'mining')).toBe('hudChrome.gathering.toolTierUnmet.mining');
+    expect(gatherDeniedLineKey('node', 'logging')).toBe(
+      'hudChrome.gathering.toolTierUnmet.logging',
+    );
+    expect(gatherDeniedLineKey('node', 'herbalism')).toBe(
+      'hudChrome.gathering.toolTierUnmet.herbalism',
+    );
+    expect(gatherDeniedLineKey('corpse')).toBe('hudChrome.gathering.toolTierUnmetCorpse');
+    // Unexpected shapes never reach t() with an untracked key: a node surface
+    // with fishing (no fishing world nodes) or a missing professionId falls
+    // back to the profession-neutral corpse line.
+    expect(gatherDeniedLineKey('node', 'fishing')).toBe('hudChrome.gathering.toolTierUnmetCorpse');
+    expect(gatherDeniedLineKey('node')).toBe('hudChrome.gathering.toolTierUnmetCorpse');
+  });
+
+  it('gatherDowngradeLineKey maps each lost arm to its exact key', () => {
+    expect(gatherDowngradeLineKey('mark')).toBe('hudChrome.gathering.downgradeMark');
+    expect(gatherDowngradeLineKey('find')).toBe('hudChrome.gathering.downgradeFind');
+  });
+});
+
 describe('buildGatheringProficiencyRows', () => {
   it('returns one row per gathering profession, in the fixed order', () => {
     const world = makeWorld({ proficiency: { mining: 3, logging: 0, herbalism: 7 } });
     const rows = buildGatheringProficiencyRows(world);
-    expect(rows.map((r) => r.professionId)).toEqual(['mining', 'logging', 'herbalism']);
+    expect(rows.map((r) => r.professionId)).toEqual(['mining', 'logging', 'herbalism', 'fishing']);
   });
 
   it('matches the input values exactly', () => {
@@ -102,6 +195,7 @@ describe('buildGatheringProficiencyRows', () => {
       { professionId: 'mining', value: 12 },
       { professionId: 'logging', value: 4 },
       { professionId: 'herbalism', value: 0 },
+      { professionId: 'fishing', value: 0 },
     ]);
   });
 

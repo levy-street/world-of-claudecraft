@@ -97,9 +97,17 @@ describe('druid spell pack — definitions', () => {
 });
 
 describe('druid spell pack — level gating', () => {
-  it('teaches nothing new before level 16 and everything by 20', () => {
+  it('gates each pack spell at its learn level and teaches everything by 20', () => {
+    // The choice-row unlock guard moved travel_form (11), bash (8), and rip (14)
+    // earlier so the rows that modify them are live at unlock; the rest of the
+    // pack still lands 16 to 20.
     const known15 = abilitiesKnownAt('druid', 15).map((k) => k.def.id);
-    for (const id of NEW_DRUID) expect(known15).not.toContain(id);
+    const stillLate = NEW_DRUID.filter((id) => !['travel_form', 'bash', 'rip'].includes(id));
+    for (const id of stillLate) expect(known15).not.toContain(id);
+    for (const id of NEW_DRUID) {
+      const before = abilitiesKnownAt('druid', ABILITIES[id].learnLevel - 1).map((k) => k.def.id);
+      expect(before, `${id} known too early`).not.toContain(id);
+    }
 
     const known20 = abilitiesKnownAt('druid', 20).map((k) => k.def.id);
     for (const id of NEW_DRUID) expect(known20).toContain(id);

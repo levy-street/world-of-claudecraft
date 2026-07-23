@@ -36,7 +36,10 @@ function isDevourableAura(a: Aura): boolean {
     (a.kind.startsWith('buff_') && a.value > 0) ||
     a.kind === 'hot' ||
     a.kind === 'absorb' ||
-    a.kind === 'imbue'
+    a.kind === 'imbue' ||
+    // Lifesap's regen surge is a rich beneficial aura: purgeable counterplay
+    // (the adversarial finding that it had none).
+    a.kind === 'resource_sap'
   );
 }
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { type CharacterSheetInput, characterSheet, splitCopper } from '../server/character_sheet';
 import type { CharacterRow } from '../server/db';
 import { DEEDS } from '../src/sim/content/deeds';
+import { talentsFor } from '../src/sim/content/talents';
 import { zoneAt } from '../src/sim/data';
 import { createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import type { CharacterState } from '../src/sim/sim';
@@ -86,6 +87,34 @@ describe('characterSheet: shared fields', () => {
       input({ row: makeRow('mage', 12, makeState({ lifetimeXp: undefined, level: 12 })) }),
     );
     expect(sheet.virtualLevel).toBe(12);
+  });
+
+  it('preserves a valid specialization while ignoring legacy point-tree state', () => {
+    const fury = talentsFor('warrior')?.specs.find((spec) => spec.id === 'fury');
+    if (!fury) throw new Error('warrior Fury fixture missing');
+    const canonical = characterSheet(
+      input({
+        row: makeRow('warrior', 20, makeState({ talents: { spec: 'fury', rows: {} } })),
+      }),
+    );
+    const legacy = characterSheet(
+      input({
+        row: makeRow(
+          'warrior',
+          20,
+          makeState({
+            talents: {
+              spec: 'fury',
+              ranks: {},
+              choices: {},
+            } as unknown as CharacterState['talents'],
+          }),
+        ),
+      }),
+    );
+
+    expect(canonical.spec).toBe(fury.name);
+    expect(legacy.spec).toBe(fury.name);
   });
 });
 

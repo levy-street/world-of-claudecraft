@@ -108,6 +108,7 @@
     <StatCard value={fmtNumber(overview.siteUsersNow)} label={t('stats.siteUsersNow')} />
     <StatCard value={fmtNumber(overview.peakOnlineToday)} label={t('stats.peakOnlineToday')} />
     <StatCard value={fmtNumber(overview.peakOnlineAllTime)} label={t('stats.peakOnlineAllTime')} />
+    <StatCard value={fmtNumber(overview.playersCap)} label={t('stats.playersCap')} />
     <StatCard value={fmtNumber(overview.activeAccountsToday)} label={t('stats.activeAccounts24h')} />
     <StatCard value={fmtNumber(overview.activeAccountsWeek)} label={t('stats.activeAccounts7d')} />
     <StatCard value={fmtNumber(overview.activeAccountsMonth)} label={t('stats.activeAccounts30d')} />

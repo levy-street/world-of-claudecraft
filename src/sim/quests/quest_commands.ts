@@ -27,6 +27,7 @@ import { bagCapacity, bagsFullError, countFit, removeStacked } from '../bags';
 import { QUESTS, questRewardItemId } from '../data';
 import { formatMoney } from '../format_money';
 import type { ArchetypeState } from '../professions/archetype';
+import { armCadence, cadenceBlockedKeys } from '../professions/cadence';
 import { questFallbackGrants } from '../quest_fallback';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -56,6 +57,11 @@ export function computeQuestState(
   questsDone: Set<string>,
   playerLevel: number,
   professionState?: ArchetypeState,
+  // The set of quest ids currently inside their repeat-cadence window.
+  // Built per-tick-domain by the caller (the Sim from PlayerMeta.questCadence +
+  // ctx.tickCount, the online client from the server-computed cprof mirror), so
+  // this shared decision point never reasons about tick domains itself.
+  withinCadence?: ReadonlySet<string>,
 ): QuestState {
   const qp = questLog.get(questId);
   if (qp) return qp.state === 'ready' ? 'ready' : 'active';
@@ -72,18 +78,39 @@ export function computeQuestState(
   ) {
     return 'unavailable';
   }
+  // One pending identity transition at a time: while any attunePair-effect
+  // quest is active, every OTHER attunePair-effect quest is unavailable.
+  // resolvedCounts is stamped at accept and turn-in never re-resolves it, so a
+  // banked second amends would complete at a stale cost after the first return
+  // raised switchCount, dodging the 5 + 3 * switchCount escalation. The gate
+  // lives here so both hosts and the server accept path share it (the quest
+  // already in the log returned 'active' above, so it never gates itself).
+  if (quest.completionEffect?.type === 'attunePair') {
+    for (const activeId of questLog.keys()) {
+      if (QUESTS[activeId]?.completionEffect?.type === 'attunePair') return 'unavailable';
+    }
+  }
+  // A repeatable work order inside its cooldown window is unavailable until it
+  // lapses (the turn-in armed it; the window is server-authoritative and mirrors
+  // to the online client via cprof).
+  if (withinCadence?.has(questId)) return 'unavailable';
   return 'available';
 }
 
 export function questState(ctx: SimContext, questId: string, pid?: number): QuestState {
   const r = ctx.resolve(pid);
   if (!r) return 'unavailable';
+  const withinCadence =
+    r.meta.questCadence.size > 0
+      ? new Set(cadenceBlockedKeys(r.meta.questCadence, ctx.tickCount))
+      : undefined;
   return computeQuestState(
     questId,
     r.meta.questLog,
     r.meta.questsDone,
     r.e.level,
     r.meta.archetype,
+    withinCadence,
   );
 }
 
@@ -310,6 +337,12 @@ export function turnInQuestCore(
   const rewardItem = questRewardItemId(quest, meta.cls);
   if (rewardItem) ctx.addItem(rewardItem, 1, meta.entityId);
   ctx.grantXp(quest.xpReward, meta);
+  // Arm the repeat-cadence window (work orders): the quest stays
+  // unavailable (computeQuestState) until now + repeatCadenceTicks, server-
+  // authoritative and persisted per character with zero-default omission.
+  if (quest.repeatCadenceTicks && quest.repeatCadenceTicks > 0) {
+    armCadence(meta.questCadence, questId, ctx.tickCount, quest.repeatCadenceTicks);
+  }
   ctx.emit({ type: 'questDone', questId, pid: meta.entityId });
   ctx.emit({
     type: 'log',

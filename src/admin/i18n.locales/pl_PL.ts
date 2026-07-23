@@ -104,6 +104,7 @@ export const pl_PL: Record<string, string> = {
   'stats.onlineAccounts': 'konta online',
   'stats.siteUsersNow': 'użytkownicy strony teraz',
   'stats.peakOnline': 'szczyt online',
+  'stats.playersCap': 'limit graczy',
   'stats.peakOnlineToday': 'szczyt online 24h',
   'stats.peakOnlineAllTime': 'szczyt online wszech czasów',
   'stats.accounts': 'konta',

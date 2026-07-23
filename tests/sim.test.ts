@@ -9,11 +9,11 @@ import {
   NPCS,
 } from '../src/sim/data';
 import { ACTIONS, applyAction, encodeObs, obsSize } from '../src/sim/obs';
+import { completeFishing } from '../src/sim/professions/fishing';
 import { Sim } from '../src/sim/sim';
 import {
   dist2d,
   FISHING_CAST_ID,
-  FISHING_CAST_TIME,
   MAX_LEVEL,
   meleeMissChance,
   mobXpValue,
@@ -181,19 +181,21 @@ describe('classic formulas', () => {
 
   it('abilities unlock at the right levels with ranks', () => {
     const w1 = abilitiesKnownAt('warrior', 1).map((k) => k.def.id);
-    expect(w1).toEqual(['heroic_strike', 'battle_shout']);
+    expect(w1).toEqual(['heroic_strike', 'battle_shout', 'battle_stance']);
     const w10 = abilitiesKnownAt('warrior', 10);
     expect(w10.map((k) => k.def.id)).toContain('overpower');
     const hs10 = w10.find((k) => k.def.id === 'heroic_strike')!;
     expect(hs10.rank).toBe(2);
-    const m8 = abilitiesKnownAt('mage', 8).map((k) => k.def.id);
-    expect(m8).toContain('polymorph');
-    expect(m8).not.toContain('frost_nova'); // level 10
+    // Bewitch trains at 7 in the reworked mage kit; Icebind at 5.
+    const m7 = abilitiesKnownAt('mage', 7).map((k) => k.def.id);
+    expect(m7).toContain('polymorph');
+    expect(m7).toContain('frost_nova');
   });
 
   it('ranks and new abilities carry the kit through the 10-20 band', () => {
-    // warrior: heroic strike rank 4 at 20; execute unlocks at 14, not before
-    expect(abilitiesKnownAt('warrior', 13).map((k) => k.def.id)).not.toContain('execute');
+    // warrior: Heroic Strike reaches rank 4 at 20; Early Grave unlocks at 12
+    expect(abilitiesKnownAt('warrior', 11).map((k) => k.def.id)).not.toContain('execute');
+    expect(abilitiesKnownAt('warrior', 12).map((k) => k.def.id)).toContain('execute');
     const w20 = abilitiesKnownAt('warrior', 20);
     expect(w20.map((k) => k.def.id)).toContain('execute');
     const hs20 = w20.find((k) => k.def.id === 'heroic_strike')!;
@@ -387,7 +389,9 @@ describe('combat', () => {
     wolf.level = 20;
     sim.player.resource = 0;
     (sim as any).dealDamage(wolf, sim.player, 30, false, 'physical', null, 'hit');
-    expect(sim.player.resource).toBeCloseTo(1, 5);
+    // Redesigned Warrior incoming rage is damage / attacker level, then the
+    // default Battle Stance raises rage generation by 10%.
+    expect(sim.player.resource).toBeCloseTo((30 / 20) * 1.1, 5);
   });
 
   it('mob can kill the player; release rises as a ghost, healer resurrects', () => {
@@ -538,6 +542,10 @@ describe('combat', () => {
     facePlayerAt(sim, wolf);
     for (let i = 0; i < 20 * 30 && !wolf.dead; i++) sim.tick();
     expect(wolf.dead).toBe(true);
+    // Consume BOTH halves (harvest then loot); a tagged corpse with
+    // an unclaimed harvest would otherwise hold its 30s grace window and defer
+    // the respawn past this loop.
+    sim.harvestCorpse(wolf.id);
     sim.lootCorpse(wolf.id);
     for (let i = 0; i < 20 * 10 && wolf.dead; i++) sim.tick();
     expect(wolf.dead).toBe(false);
@@ -599,7 +607,7 @@ describe('combat', () => {
     expect(wolf.auras.some((a: any) => a.kind === 'polymorph')).toBe(false);
   });
 
-  it('overpower requires a dodge proc', () => {
+  it('Redhand is usable without a dodge proc', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(10);
     const wolf = nearestMob(sim, 'forest_wolf');
@@ -608,13 +616,7 @@ describe('combat', () => {
     facePlayerAt(sim, wolf);
     sim.player.resource = 50;
     sim.castAbility('overpower');
-    let _events = sim.tick();
-    // without a dodge proc it errors
-    expect(sim.counters.damageDealt).toBe(0);
-    // simulate a dodge proc
-    sim.player.overpowerUntil = sim.time + 5;
-    sim.castAbility('overpower');
-    _events = sim.tick();
+    sim.tick();
     expect(sim.counters.damageDealt).toBeGreaterThan(0);
   });
 });
@@ -656,6 +658,8 @@ describe('spell pushback', () => {
 
   it('a hit shaves a quarter off a channel instead of cancelling it', () => {
     const { sim, wolf } = castingMage(8);
+    // Aether Darts is Chronomancy-gated in the reworked kit; commit the spec first.
+    sim.setSpec('arcane');
     sim.castAbility('arcane_missiles');
     expect(sim.player.channeling).toBe(true);
     const remBefore = sim.player.castRemaining;
@@ -1079,29 +1083,33 @@ describe('food, drink, vendor', () => {
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
     sim.copper = 0;
-    sim.addItem('wolf_fang', 2); // poor (gray), sellValue 4 -> 8
+    // wolf_fang is a crafting reagent now (quality common, never
+    // swept), so this sweep uses mudfin_scale as its gray fodder.
+    sim.addItem('mudfin_scale', 2); // poor (gray), sellValue 5 -> 10
     sim.addItem('bandit_bandana', 1); // poor (gray), sellValue 6
+    sim.addItem('wolf_fang', 1); // reagent (common, white) -> kept
     sim.addItem('apprentice_staff', 1); // not poor -> kept
     sim.addItem('boar_hide', 1); // quest item -> kept
 
     sim.sellAllJunk();
 
     // only the gray items leave the bags
-    expect(sim.countItem('wolf_fang')).toBe(0);
+    expect(sim.countItem('mudfin_scale')).toBe(0);
     expect(sim.countItem('bandit_bandana')).toBe(0);
+    expect(sim.countItem('wolf_fang')).toBe(1);
     expect(sim.countItem('apprentice_staff')).toBe(1);
     expect(sim.countItem('boar_hide')).toBe(1);
-    // proceeds = 2*4 + 6 = 14 copper
-    expect(sim.copper).toBe(14);
+    // proceeds = 2*5 + 6 = 16 copper
+    expect(sim.copper).toBe(16);
     // each sold gray stack is recorded for buyback
-    expect(sim.vendorBuyback.some((s) => s.itemId === 'wolf_fang' && s.count === 2)).toBe(true);
+    expect(sim.vendorBuyback.some((s) => s.itemId === 'mudfin_scale' && s.count === 2)).toBe(true);
     expect(sim.vendorBuyback.some((s) => s.itemId === 'bandit_bandana' && s.count === 1)).toBe(
       true,
     );
     // exactly one summary loot line (not one per stack)
     const sold = sim.events.filter((e) => e.type === 'loot' && /^Sold /.test(e.text));
     expect(sold).toHaveLength(1);
-    expect(sold[0]).toMatchObject({ text: 'Sold 3 junk items for 14c.' });
+    expect(sold[0]).toMatchObject({ text: 'Sold 3 junk items for 16c.' });
   });
 
   it('Sell Junk needs a vendor in range and no-ops cleanly with nothing to sell', () => {
@@ -1109,9 +1117,9 @@ describe('food, drink, vendor', () => {
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
 
     // far from any merchant: refuses, sells nothing
-    sim.addItem('wolf_fang', 1);
+    sim.addItem('mudfin_scale', 1);
     sim.sellAllJunk();
-    expect(sim.countItem('wolf_fang')).toBe(1);
+    expect(sim.countItem('mudfin_scale')).toBe(1);
     expect(sim.events).toContainEqual({
       type: 'error',
       text: 'There is no merchant nearby.',
@@ -1120,7 +1128,7 @@ describe('food, drink, vendor', () => {
 
     // at the vendor with no gray items: silent no-op (button is disabled in the UI)
     teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
-    sim.removeItem('wolf_fang', 1);
+    sim.removeItem('mudfin_scale', 1);
     sim.addItem('apprentice_staff', 1); // not gray
     sim.copper = 0;
     const before = sim.events.length;
@@ -1162,30 +1170,43 @@ describe('food, drink, vendor', () => {
     );
   });
 
-  it('starts a five-second fishing cast near and facing Mirror Lake', () => {
+  it('starts the capped fishing session near and facing Mirror Lake with the one bite-delay draw', () => {
     const sim = makeSim('warrior');
     const spot = mirrorLakeFishingSpot(sim.cfg.seed);
     teleportTo(sim, spot.x, spot.z);
     sim.player.facing = spot.facing;
     sim.addItem('simple_fishing_pole', 1);
     sim.events = [];
-    sim.useItem('simple_fishing_pole');
+    // The cast start draws EXACTLY the one hidden bite delay; the
+    // visible timer is the constant session cap and leaks nothing.
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      sim.useItem('simple_fishing_pole');
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(draws).toBe(1);
     expect(sim.player.castingAbility).toBe(FISHING_CAST_ID);
-    expect(sim.player.castTotal).toBe(FISHING_CAST_TIME);
-    expect(sim.player.castRemaining).toBe(FISHING_CAST_TIME);
+    // Literal 15, not the imported constant: the broadcast session cap is a
+    // wire-visible contract, so this pin must red if the constant moves (the
+    // packet's constant-self-comparison trap).
+    expect(sim.player.castTotal).toBe(15);
+    expect(sim.player.castRemaining).toBe(15);
     expect(sim.player.channeling).toBe(false);
     expect(sim.events).toContainEqual(
       expect.objectContaining({
         type: 'castStart',
         ability: FISHING_CAST_ID,
-        time: FISHING_CAST_TIME,
+        time: 15,
       }),
     );
   });
 
-  it('rolls the fishing catch table only when the cast completes', () => {
+  it('rolls the fishing catch table only at a reel press inside the bite window', () => {
     const sim = makeSim('warrior');
     const spot = mirrorLakeFishingSpot(sim.cfg.seed);
+    despawnMobs(sim);
     teleportTo(sim, spot.x, spot.z);
     sim.player.facing = spot.facing;
     sim.addItem('simple_fishing_pole', 1);
@@ -1193,14 +1214,25 @@ describe('food, drink, vendor', () => {
     sim.useItem('simple_fishing_pole');
     expect(valeCatchCount(sim)).toBe(0);
 
+    // Tick the LIVE loop to the bite (the hidden seeded delay caps at 8 s);
+    // nothing rolls and nothing lands while the line is merely waiting.
     const events: SimEvent[] = [];
-    for (let i = 0; i < 20 * 6 && sim.player.castingAbility; i++) events.push(...sim.tick());
+    for (let i = 0; i < 20 * 10 && !events.some((e) => e.type === 'fishingBite'); i++) {
+      events.push(...sim.tick());
+    }
+    expect(events.some((e) => e.type === 'fishingBite')).toBe(true);
+    expect(valeCatchCount(sim)).toBe(0);
+    expect(sim.player.castingAbility).toBe(FISHING_CAST_ID);
 
+    // The reel press inside the window resolves the single table draw (which
+    // may still be the empty-hook row) and ends the session.
+    sim.events = [];
+    sim.useItem('simple_fishing_pole');
     const catchCount = valeCatchCount(sim);
     expect(sim.player.castingAbility).toBe(null);
     expect(catchCount === 1 || catchCount === 0).toBe(true);
     if (catchCount === 0) {
-      expect(events).toContainEqual(
+      expect(sim.events).toContainEqual(
         expect.objectContaining({
           type: 'log',
           text: 'No fish are biting.',
@@ -1226,12 +1258,20 @@ describe('food, drink, vendor', () => {
     sim.useItem('simple_fishing_pole');
     expect(sim.player.castingAbility).toBe(FISHING_CAST_ID);
 
+    // Drive the bite, then reel: the codfather force-lands at the reel press
+    // (its early return rolls no table), never before it.
     const events: SimEvent[] = [];
-    for (let i = 0; i < 20 * 6 && sim.player.castingAbility; i++) events.push(...sim.tick());
-
+    for (let i = 0; i < 20 * 10 && !events.some((e) => e.type === 'fishingBite'); i++) {
+      events.push(...sim.tick());
+    }
+    expect(events.some((e) => e.type === 'fishingBite')).toBe(true);
+    expect(sim.countItem('the_codfather')).toBe(0);
+    sim.events = [];
+    sim.useItem('simple_fishing_pole'); // the reel
+    expect(sim.events).toContainEqual(expect.objectContaining({ type: 'castStop', success: true }));
     expect(sim.player.castingAbility).toBe(null);
-    expect(events).toContainEqual(expect.objectContaining({ type: 'castStop', success: true }));
     expect(sim.countItem('the_codfather')).toBe(1);
+    sim.tick();
     expect(sim.questState('q_the_codfather')).toBe('ready');
     expect(sim.countItem('simple_fishing_pole')).toBe(1);
   });
@@ -1244,7 +1284,11 @@ describe('food, drink, vendor', () => {
     deepfenSim.player.facing = deepfenSpot.facing;
     deepfenSim.addItem('simple_fishing_pole', 1);
     deepfenSim.useItem('simple_fishing_pole');
-    for (let i = 0; i < 20 * 6 && deepfenSim.player.castingAbility; i++) deepfenSim.tick();
+    const events: SimEvent[] = [];
+    for (let i = 0; i < 20 * 10 && !events.some((e) => e.type === 'fishingBite'); i++) {
+      events.push(...deepfenSim.tick());
+    }
+    deepfenSim.useItem('simple_fishing_pole'); // reel: at most a normal table catch
     expect(deepfenSim.countItem('the_codfather')).toBe(0);
   });
 
@@ -1261,7 +1305,11 @@ describe('food, drink, vendor', () => {
     mirrorSim.player.facing = mirrorSpot.facing;
     mirrorSim.addItem('simple_fishing_pole', 1);
     mirrorSim.useItem('simple_fishing_pole');
-    for (let i = 0; i < 20 * 6 && mirrorSim.player.castingAbility; i++) mirrorSim.tick();
+    const events: SimEvent[] = [];
+    for (let i = 0; i < 20 * 10 && !events.some((e) => e.type === 'fishingBite'); i++) {
+      events.push(...mirrorSim.tick());
+    }
+    mirrorSim.useItem('simple_fishing_pole'); // reel: at most a normal table catch
     expect(mirrorSim.countItem('the_codfather')).toBe(0);
   });
 
@@ -1364,7 +1412,7 @@ describe('food, drink, vendor', () => {
     // marsh/heights fish, and never an item outside the catch list.
     const valeIds = new Set(VALE_CATCHES);
     const preexisting = new Set(meta.inventory.map((s) => s.itemId)); // starter rations etc.
-    for (let i = 0; i < 400; i++) (sim as any).completeFishing(sim.player, meta);
+    for (let i = 0; i < 400; i++) completeFishing(sim.ctx, sim.player, meta);
     for (const slot of meta.inventory) {
       if (preexisting.has(slot.itemId)) continue;
       expect(valeIds.has(slot.itemId)).toBe(true);
@@ -1384,7 +1432,7 @@ describe('food, drink, vendor', () => {
       const caught: string[] = [];
       for (let i = 0; i < 30; i++) {
         const before = meta.inventory.reduce((n, s) => n + s.count, 0);
-        (sim as any).completeFishing(sim.player, meta);
+        completeFishing(sim.ctx, sim.player, meta);
         const after = meta.inventory.reduce((n, s) => n + s.count, 0);
         caught.push(after > before ? meta.inventory[meta.inventory.length - 1].itemId : 'nothing');
       }
@@ -1399,7 +1447,7 @@ describe('food, drink, vendor', () => {
     let sawRare = false;
     for (let i = 0; i < 400 && !sawRare; i++) {
       sim.events = [];
-      (sim as any).completeFishing(sim.player, meta);
+      completeFishing(sim.ctx, sim.player, meta);
       if (sim.events.some((e) => e.type === 'log' && /rare catch/i.test((e as any).text))) {
         sawRare = true;
         expect(sim.countItem('glimmerfin_koi')).toBeGreaterThan(0);
@@ -1478,13 +1526,17 @@ describe('food, drink, vendor', () => {
 describe('leveling', () => {
   it('levels up, heals to full, and learns new abilities', () => {
     const sim = makeSim('warrior');
-    expect(sim.known.map((k) => k.def.id)).toEqual(['heroic_strike', 'battle_shout']);
+    expect(sim.known.map((k) => k.def.id)).toEqual([
+      'heroic_strike',
+      'battle_shout',
+      'battle_stance',
+    ]);
     const _events: any[] = [];
     (sim as any).grantXp(xpForLevel(1) + xpForLevel(2) + xpForLevel(3) + 10);
     expect(sim.player.level).toBe(4);
     expect(sim.player.hp).toBe(sim.player.maxHp);
     expect(sim.known.map((k) => k.def.id)).toContain('charge');
-    expect(sim.known.map((k) => k.def.id)).toContain('rend');
+    expect(sim.known.map((k) => k.def.id)).toContain('overpower');
   });
 
   it('caps at max level', () => {

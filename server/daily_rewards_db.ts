@@ -3,14 +3,25 @@ import { REALM } from './realm';
 
 // Every ranked read below embeds ELIGIBLE_ACCOUNT_SQL: banned and suspended
 // accounts are delisted from the daily board (and stop inflating other
-// players' ranks) the same way as every other public board. All five ranked
+// players' ranks) the same way as every other public board. All the ranked
 // reads share the predicate so the page, the total, and the self rank always
-// agree on one population. These reads run per request (no board cache), so
-// the SQL exclusion alone delists immediately; there is nothing to bust.
-// The payout path embeds it too: finalizeDay selects winners from the same
-// population the board displays, and pendingPayouts rechecks eligibility at
-// pay time so a ban or suspension landing after finalization still blocks
-// the transfer.
+// agree on one population. PgDailyRewardDb itself stays uncached; the caching
+// seam is daily_rewards_board_cache.ts, which derives all four board reads a
+// player status assembles (the leaderboard top slice, the board total, the
+// viewer's rank, and the beyond-top-10 viewer row) from one TTL-cached
+// ranked snapshot (leaderboardSnapshot below), busted in-process on every
+// board-changing write and by the moderation hook, so in-process delisting
+// stays immediate while cross-process staleness is bounded by the cache TTL
+// (the same tradeoff the other public boards made in main.ts). The per-read
+// ranked SQL those derivations replaced is deliberately DELETED, not
+// retained: a revert to direct per-status db reads must reintroduce the
+// queries consciously instead of quietly rebinding to leftovers. finalizeDay,
+// pendingPayouts, and leaderboardPage stay always-live SQL: payout
+// correctness and the ops page tolerate no staleness.
+// The payout path embeds the predicate too: finalizeDay selects winners from
+// the same population the board displays, and pendingPayouts rechecks
+// eligibility at pay time so a ban or suspension landing after finalization
+// still blocks the transfer.
 
 export interface DailyRewardTaskRow {
   taskId: string;
@@ -95,6 +106,8 @@ export type DailyRewardPayoutAttemptClaimResult =
   | { outcome: 'not_found' }
   | { outcome: 'invalid_status'; status: string };
 
+export type DailyRewardFinalizeOutcome = 'finalized' | 'already_finalized';
+
 export interface DailyRewardWinnerAnnouncement {
   day: string;
   realm: string;
@@ -117,15 +130,13 @@ export interface DailyRewardDb {
     taskId: string,
     questId: string,
   ): Promise<number>;
-  rankForAccount(day: string, accountId: number): Promise<number | null>;
-  leaderboard(day: string, accountId: number, limit: number): Promise<DailyRewardScoreRow[]>;
-  leaderboardRowForAccount(day: string, accountId: number): Promise<DailyRewardScoreRow | null>;
   leaderboardPage(
     day: string,
     page: number,
     pageSize: number,
   ): Promise<DailyRewardLeaderboardPageRow>;
   leaderboardTotal(day: string): Promise<number>;
+  leaderboardSnapshot(day: string): Promise<DailyRewardScoreRow[]>;
   spinForAccount(day: string, accountId: number): Promise<DailyRewardSpinRow | null>;
   recordSpin(day: string, accountId: number, outcomeKey: string, points: number): Promise<boolean>;
   addPoints(
@@ -137,7 +148,12 @@ export interface DailyRewardDb {
     meta?: Record<string, unknown>,
   ): Promise<boolean>;
   recentPayouts(limit: number): Promise<DailyRewardPayoutRow[]>;
-  finalizeDay(day: string, prizePoolUsd: number, splits: readonly number[]): Promise<void>;
+  finalizeDay(
+    day: string,
+    prizePoolUsd: number,
+    splits: readonly number[],
+  ): Promise<DailyRewardFinalizeOutcome>;
+  dayFinalized(day: string, realm: string): Promise<boolean>;
   pendingPayouts(limit: number, day?: string): Promise<DailyRewardInternalPayoutRow[]>;
   unannouncedWinnerDays(limit: number): Promise<DailyRewardWinnerAnnouncement[]>;
   markWinnersAnnounced(day: string): Promise<boolean>;
@@ -247,12 +263,9 @@ function scoreRow(row: Record<string, unknown>): DailyRewardScoreRow {
   };
 }
 
-export class PgDailyRewardDb implements DailyRewardDb {
-  async banForAccount(
-    accountId: number,
-  ): Promise<{ reason: string; expiresAt: string | null } | null> {
-    const res = await pool.query(
-      `SELECT reason, expires_at
+// banForAccount's query text, exported so an integration suite can execute the
+// real text against a scoped schema.
+export const DAILY_REWARD_BAN_FOR_ACCOUNT_SQL = `SELECT reason, expires_at
          FROM (
            SELECT reason, expires_at, 0 AS priority
              FROM daily_reward_bans
@@ -263,17 +276,47 @@ export class PgDailyRewardDb implements DailyRewardDb {
              FROM accounts a
              JOIN daily_reward_ip_bans ib
                ON ib.ip_address = a.last_login_ip
-               OR EXISTS (
-                 SELECT 1
-                   FROM play_sessions ps
-                  WHERE ps.account_id = a.id AND ps.ip_address = ib.ip_address
-               )
             WHERE a.id = $1
+           UNION ALL
+           SELECT ib.reason, NULL::timestamptz AS expires_at, 1 AS priority
+             FROM play_sessions ps
+             JOIN daily_reward_ip_bans ib
+               ON ib.ip_address = ps.ip_address
+            WHERE ps.account_id = $1
+           UNION ALL
+           SELECT ib.reason, NULL::timestamptz AS expires_at, 1 AS priority
+             FROM account_ip_associations assoc
+             JOIN daily_reward_ip_bans ib
+               ON ib.ip_address = assoc.ip_address
+            WHERE assoc.account_id = $1
          ) restrictions
         ORDER BY priority
-        LIMIT 1`,
-      [accountId],
-    );
+        LIMIT 1`;
+
+export const DAILY_REWARD_OPEN_DAY_LOCK_SQL = `SELECT finalized_at
+   FROM daily_reward_days
+  WHERE day = $1 AND realm = $2
+  FOR SHARE`;
+
+export const DAILY_REWARD_FINALIZE_DAY_SQL = `UPDATE daily_reward_days
+    SET finalized_at = now()
+  WHERE day = $1 AND realm = $2 AND finalized_at IS NULL
+  RETURNING 1`;
+
+export class PgDailyRewardDb implements DailyRewardDb {
+  async banForAccount(
+    accountId: number,
+  ): Promise<{ reason: string; expiresAt: string | null } | null> {
+    // OR-free arms, mirroring the daily_reward_excluded_accounts view: the
+    // last-login and play-session IP probes are separate UNION ALL arms so each
+    // rides its own index path (an OR in the join forces a nested loop with a
+    // re-probed subquery on every eligibility check). LIMIT 1 makes the read
+    // dedup-insensitive, so UNION ALL skips the dedup sort, and ORDER BY
+    // priority keeps the account ban (with its real expiry) ahead of IP bans.
+    // The association arm keeps an ip-banned account excluded after its raw
+    // sessions age out of retention; the probe is PK-served
+    // (account_ip_associations leads on account_id).
+    const res = await pool.query(DAILY_REWARD_BAN_FOR_ACCOUNT_SQL, [accountId]);
     return res.rows[0]
       ? {
           reason: String(res.rows[0].reason),
@@ -283,14 +326,35 @@ export class PgDailyRewardDb implements DailyRewardDb {
   }
 
   async ensureDay(day: string, prizePoolUsd: number, wocUsdPrice: number | null): Promise<void> {
+    // The conflict update is fenced on the unfinalized day: once finalizeDay has
+    // stamped finalized_at, the announced prize pool is frozen at its
+    // finalize-time value, so a straggler event whose timestamp still maps to
+    // the finalized day (the seconds-wide window at rollover, or a restarted
+    // process with a cold seed gate) can no longer drift it.
     await pool.query(
       `INSERT INTO daily_reward_days (day, realm, prize_pool_usd, woc_usd_price)
        VALUES ($1, $2, $3, $4)
        ON CONFLICT (day, realm) DO UPDATE
           SET prize_pool_usd = EXCLUDED.prize_pool_usd,
-              woc_usd_price = COALESCE(EXCLUDED.woc_usd_price, daily_reward_days.woc_usd_price)`,
+              woc_usd_price = COALESCE(EXCLUDED.woc_usd_price, daily_reward_days.woc_usd_price)
+          WHERE daily_reward_days.finalized_at IS NULL`,
       [day, REALM, prizePoolUsd, wocUsdPrice],
     );
+  }
+
+  // A cheap primary-key read of the finalized flag, used by the finalize guard to
+  // skip re-running the whole finalize path once a day is done. It takes the
+  // realm as an argument (rather than the module REALM) so the guard's realm and
+  // this query's realm can never silently diverge.
+  async dayFinalized(day: string, realm: string): Promise<boolean> {
+    const result = await pool.query(
+      `SELECT 1
+         FROM daily_reward_days
+        WHERE day = $1 AND realm = $2 AND finalized_at IS NOT NULL
+        LIMIT 1`,
+      [day, realm],
+    );
+    return (result.rowCount ?? 0) > 0;
   }
 
   async seedTasks(day: string, tasks: DailyRewardTaskSeed[]): Promise<void> {
@@ -435,65 +499,6 @@ export class PgDailyRewardDb implements DailyRewardDb {
     return Number(res.rows[0]?.completions ?? 0);
   }
 
-  async rankForAccount(day: string, accountId: number): Promise<number | null> {
-    const res = await pool.query(
-      `WITH ranked AS (
-         SELECT account_id,
-                row_number() OVER (ORDER BY points DESC, updated_at ASC, account_id ASC) AS rank
-           FROM daily_reward_scores s
-          WHERE day = $1 AND realm = $2 AND points > 0
-            AND EXISTS (SELECT 1 FROM accounts a
-                         WHERE a.id = s.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
-            AND NOT EXISTS (
-              SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = s.account_id
-            )
-       )
-       SELECT rank FROM ranked WHERE account_id = $3`,
-      [day, REALM, accountId],
-    );
-    return res.rows[0] ? Number(res.rows[0].rank) : null;
-  }
-
-  async leaderboard(
-    day: string,
-    _accountId: number,
-    limit: number,
-  ): Promise<DailyRewardScoreRow[]> {
-    const res = await pool.query(
-      `SELECT s.account_id, a.username, s.points,
-              row_number() OVER (ORDER BY s.points DESC, s.updated_at ASC, s.account_id ASC) AS rank
-         FROM daily_reward_scores s
-         JOIN accounts a ON a.id = s.account_id
-        WHERE s.day = $1 AND s.realm = $2 AND s.points > 0
-          AND ${ELIGIBLE_ACCOUNT_SQL}
-          AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = s.account_id)
-        ORDER BY s.points DESC, s.updated_at ASC, s.account_id ASC
-        LIMIT $3`,
-      [day, REALM, Math.max(1, Math.min(100, limit))],
-    );
-    return res.rows.map(scoreRow);
-  }
-
-  async leaderboardRowForAccount(
-    day: string,
-    accountId: number,
-  ): Promise<DailyRewardScoreRow | null> {
-    const res = await pool.query(
-      `WITH ranked AS (
-         SELECT s.account_id, a.username, s.points,
-                row_number() OVER (ORDER BY s.points DESC, s.updated_at ASC, s.account_id ASC) AS rank
-           FROM daily_reward_scores s
-           JOIN accounts a ON a.id = s.account_id
-          WHERE s.day = $1 AND s.realm = $2 AND s.points > 0
-            AND ${ELIGIBLE_ACCOUNT_SQL}
-            AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = s.account_id)
-       )
-       SELECT account_id, username, points, rank FROM ranked WHERE account_id = $3`,
-      [day, REALM, accountId],
-    );
-    return res.rows[0] ? scoreRow(res.rows[0]) : null;
-  }
-
   async leaderboardTotal(day: string): Promise<number> {
     const res = await pool.query(
       `SELECT COUNT(*) AS total
@@ -507,6 +512,30 @@ export class PgDailyRewardDb implements DailyRewardDb {
       [day, REALM],
     );
     return Number(res.rows[0]?.total ?? 0);
+  }
+
+  // The one query a board-cache refresh runs: the FULL ranked list for the
+  // day, exactly the leaderboardPage() population and ordering with no LIMIT.
+  // Bounded by the day's positive scorers, so there is no artificial cap to
+  // desync the cached total from the cached rows. It runs on the plain pool
+  // (the default statement-timeout tier) DELIBERATELY, not the 60s
+  // runWithStatementTimeout heavy allowance the whole-realm JSONB board
+  // aggregates use: this read is day-scoped and index-served, and a runaway
+  // refresh should fail fast into stale-serve rather than pin a pooled
+  // client for a minute per retry.
+  async leaderboardSnapshot(day: string): Promise<DailyRewardScoreRow[]> {
+    const res = await pool.query(
+      `SELECT s.account_id, a.username, s.points,
+              row_number() OVER (ORDER BY s.points DESC, s.updated_at ASC, s.account_id ASC) AS rank
+         FROM daily_reward_scores s
+         JOIN accounts a ON a.id = s.account_id
+        WHERE s.day = $1 AND s.realm = $2 AND s.points > 0
+          AND ${ELIGIBLE_ACCOUNT_SQL}
+          AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = s.account_id)
+        ORDER BY s.points DESC, s.updated_at ASC, s.account_id ASC`,
+      [day, REALM],
+    );
+    return res.rows.map(scoreRow);
   }
 
   async leaderboardPage(
@@ -564,34 +593,31 @@ export class PgDailyRewardDb implements DailyRewardDb {
     outcomeKey: string,
     points: number,
   ): Promise<boolean> {
-    const res = await pool.query(
-      `INSERT INTO daily_reward_spins (day, realm, account_id, outcome_key, points)
-       SELECT $1, $2, $3, $4, $5
-       WHERE NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts WHERE account_id = $3)
-       ON CONFLICT (day, realm, account_id) DO NOTHING`,
-      [day, REALM, accountId, outcomeKey, points],
-    );
-    return (res.rowCount ?? 0) > 0;
-  }
-
-  async addPoints(
-    day: string,
-    accountId: number,
-    kind: string,
-    points: number,
-    idempotencyKey: string,
-    meta: Record<string, unknown> = {},
-  ): Promise<boolean> {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
+      const openDay = await client.query(DAILY_REWARD_OPEN_DAY_LOCK_SQL, [day, REALM]);
+      if (!openDay.rows[0] || openDay.rows[0].finalized_at !== null) {
+        await client.query('ROLLBACK');
+        return false;
+      }
+      const spin = await client.query(
+        `INSERT INTO daily_reward_spins (day, realm, account_id, outcome_key, points)
+         SELECT $1, $2, $3, $4, $5
+         WHERE NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts WHERE account_id = $3)
+         ON CONFLICT (day, realm, account_id) DO NOTHING`,
+        [day, REALM, accountId, outcomeKey, points],
+      );
+      if ((spin.rowCount ?? 0) === 0) {
+        await client.query('ROLLBACK');
+        return false;
+      }
       const event = await client.query(
         `INSERT INTO daily_reward_events
           (day, realm, account_id, kind, points, idempotency_key, meta)
-         SELECT $1, $2, $3, $4, $5, $6, $7::jsonb
-         WHERE NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts WHERE account_id = $3)
-         ON CONFLICT (day, realm, account_id, idempotency_key) DO NOTHING`,
-        [day, REALM, accountId, kind, points, idempotencyKey, JSON.stringify(meta)],
+         SELECT $1, $2, $3, 'spin', $4, 'spin', $5::jsonb
+         WHERE NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts WHERE account_id = $3)`,
+        [day, REALM, accountId, points, JSON.stringify({ outcome: outcomeKey })],
       );
       if ((event.rowCount ?? 0) === 0) {
         await client.query('ROLLBACK');
@@ -605,6 +631,69 @@ export class PgDailyRewardDb implements DailyRewardDb {
                 updated_at = now()`,
         [day, REALM, accountId, Math.max(0, Math.floor(points))],
       );
+      await client.query('COMMIT');
+      return true;
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => undefined);
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
+  async addPoints(
+    day: string,
+    accountId: number,
+    kind: string,
+    points: number,
+    idempotencyKey: string,
+    meta: Record<string, unknown> = {},
+  ): Promise<boolean> {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      // Share-lock the day row before every ledger/score write. finalizeDay's
+      // conditional UPDATE takes the conflicting row lock, establishing one
+      // database-authoritative cutoff across all game processes.
+      const openDay = await client.query(DAILY_REWARD_OPEN_DAY_LOCK_SQL, [day, REALM]);
+      if (!openDay.rows[0] || openDay.rows[0].finalized_at !== null) {
+        await client.query('ROLLBACK');
+        return false;
+      }
+      const event = await client.query(
+        `INSERT INTO daily_reward_events
+          (day, realm, account_id, kind, points, idempotency_key, meta)
+         SELECT $1, $2, $3, $4, $5, $6, $7::jsonb
+         WHERE NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts WHERE account_id = $3)
+         ON CONFLICT (day, realm, account_id, idempotency_key) DO NOTHING`,
+        [day, REALM, accountId, kind, points, idempotencyKey, JSON.stringify(meta)],
+      );
+      if ((event.rowCount ?? 0) === 0) {
+        await client.query('ROLLBACK');
+        return false;
+      }
+      const clamped = Math.max(0, Math.floor(points));
+      // Zero-point events (recordOnlineMinute's per-minute markers) keep their
+      // event-ledger row above (it is the online-minutes counter and the
+      // idempotency gate) but skip the score UPSERT entirely: nothing reads a
+      // zero score row (every ranked read filters points > 0 and scoreForAccount
+      // defaults to 0), and the skip removes one heap-tuple rewrite per online
+      // player per minute. The CASE below stays as a second lock on the same
+      // fairness invariant (a zero-point write, should one ever reach the
+      // UPSERT again, must not churn the ASC tie-break).
+      if (clamped > 0) {
+        await client.query(
+          `INSERT INTO daily_reward_scores (day, realm, account_id, points)
+           VALUES ($1, $2, $3, $4)
+           ON CONFLICT (day, realm, account_id) DO UPDATE
+              SET points = daily_reward_scores.points + EXCLUDED.points,
+                  updated_at = CASE
+                    WHEN EXCLUDED.points > 0 THEN now()
+                    ELSE daily_reward_scores.updated_at
+                  END`,
+          [day, REALM, accountId, clamped],
+        );
+      }
       await client.query('COMMIT');
       return true;
     } catch (err) {
@@ -631,16 +720,19 @@ export class PgDailyRewardDb implements DailyRewardDb {
     return res.rows.map(payoutRow);
   }
 
-  async finalizeDay(day: string, prizePoolUsd: number, splits: readonly number[]): Promise<void> {
+  async finalizeDay(
+    day: string,
+    prizePoolUsd: number,
+    splits: readonly number[],
+  ): Promise<DailyRewardFinalizeOutcome> {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
-      await client.query(
-        `UPDATE daily_reward_days
-            SET finalized_at = COALESCE(finalized_at, now())
-          WHERE day = $1 AND realm = $2`,
-        [day, REALM],
-      );
+      const finalized = await client.query(DAILY_REWARD_FINALIZE_DAY_SQL, [day, REALM]);
+      if ((finalized.rowCount ?? 0) === 0) {
+        await client.query('COMMIT');
+        return 'already_finalized';
+      }
       const winners = await client.query(
         `SELECT s.account_id, a.username, wl.pubkey AS wallet_pubkey, s.points,
                 row_number() OVER (ORDER BY s.points DESC, s.updated_at ASC, s.account_id ASC) AS rank
@@ -676,6 +768,7 @@ export class PgDailyRewardDb implements DailyRewardDb {
         );
       }
       await client.query('COMMIT');
+      return 'finalized';
     } catch (err) {
       await client.query('ROLLBACK').catch(() => undefined);
       throw err;
@@ -1152,4 +1245,49 @@ export class PgDailyRewardDb implements DailyRewardDb {
       client.release();
     }
   }
+}
+
+// Shared with daily_rewards.ts's cutoff derivation (this is the legal import
+// direction): both the prune below and the cutoff helper fail closed on any
+// day string that is not a plain YYYY-MM-DD.
+export const REWARD_DAY_SHAPE = /^\d{4}-\d{2}-\d{2}$/;
+
+// One bounded prune batch against the daily_reward_events audit ledger.
+// daily_reward_events.day is the REWARD-CLOCK day (its boundary sits at a
+// configured UTC offset, 21:00 UTC by default), NOT a plain UTC calendar
+// date, so this module never computes cutoffs: a naive now()-minus-N-days
+// here would cut at the wrong boundary, and calling the reward clock from
+// this file would invert the import direction (daily_rewards.ts imports from
+// this module; the reverse would cycle). The caller computes the cutoff via
+// currentDailyRewardDay + addRewardDays and passes a plain day string in.
+// Prunes ONLY the raw event ledger: daily_reward_scores and
+// daily_reward_spins are never touched, so a payout winner stays
+// reconstructible after events age out. One bounded batch per call; the
+// retention sweep drives iteration. day leads the UNIQUE
+// (day, realm, account_id, idempotency_key) index, so the day < $1 subquery
+// is index-served with no new DDL, and ORDER BY day keeps each batch on the
+// oldest days. A DELETE writes no index entries; the dead tuples' entries in
+// this table's three indexes (including the partial
+// daily_reward_events_account_day_created_id) are reclaimed later by
+// scan-time LP_DEAD hinting and autovacuum, a deferred cost the modest batch
+// size keeps small. Deliberately a standalone export, not a DailyRewardDb
+// method: the interface would force every test fake to stub it, and the
+// sweep is not a service-seam consumer.
+export async function pruneDailyRewardEventsBatch(
+  cutoffDay: string,
+  batchSize: number,
+): Promise<number> {
+  // A malformed cutoff must not delete anything: day is TEXT and compares
+  // lexicographically, so a stray non-day string could match every row.
+  if (!REWARD_DAY_SHAPE.test(cutoffDay)) return 0;
+  const res = await pool.query(
+    `DELETE FROM daily_reward_events
+      WHERE id IN (
+        SELECT id FROM daily_reward_events
+         WHERE day < $1
+         ORDER BY day
+         LIMIT $2)`,
+    [cutoffDay, Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
 }

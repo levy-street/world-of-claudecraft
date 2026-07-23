@@ -231,6 +231,18 @@ describe('market_view: sell states', () => {
     expect(reconstructed).toBe(170);
   });
 
+  it('caps the buyValue suggestion at 10x sell value for re-priced items', () => {
+    // tanned_leather_jerkin kept its historical shop buyValue (1600c) when the
+    // sellValue was re-priced to 80c, so a raw buyValue read
+    // would suggest a 20x ask. The cap clamps to sellValue * 10 = 800c (8s);
+    // convention-priced items (buyValue exactly 10x sell) are unaffected, which
+    // the healing_potion pin above proves (170c < its 320c cap, taken as-is).
+    const body = buildMarketSell('tanned_leather_jerkin', 1);
+    expect(body.state).toBe('form');
+    if (body.state !== 'form') return;
+    expect(body.form.suggested).toEqual({ gold: 0, silver: 8, copper: 0 });
+  });
+
   it('splits a high ask into nonzero gold via the sellValue*4 branch', () => {
     // deathlord_warplate has no buyValue, so the suggested ask is sellValue * 4 =
     // 9000 * 4 = 36000c, which splits to 3g 60s, exercising the gold floor-division

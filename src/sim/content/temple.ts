@@ -77,6 +77,7 @@ export const TEMPLE_MOBS: Record<string, MobTemplate> = {
       { copper: 80, chance: 1 },
       { itemId: 'drowned_offering', chance: 0.6, questId: 'q_drowned_choir' },
       { itemId: 'briny_idol', chance: 0.3 },
+      { itemId: 'tidehymn_slippers', chance: 0.1 },
     ],
     scale: 1.0,
     color: 0x6c8f8a,
@@ -101,6 +102,7 @@ export const TEMPLE_MOBS: Record<string, MobTemplate> = {
       { itemId: 'palecoil_heartscale', chance: 1, questId: 'q_palecoil' },
       { itemId: 'moonpale_scale', chance: 1 },
       { itemId: 'pale_pearl', chance: 0.5 },
+      { itemId: 'pearlward_aegis', chance: 0.2 },
     ],
     scale: 1.2,
     color: 0xbcd2e6,
@@ -128,6 +130,14 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 20,
     moveSpeed: 6.5,
     aggroRadius: 12,
+    charge: {
+      minRange: 5,
+      maxRange: 30,
+      cooldown: 12,
+      stunDuration: 0.5,
+      name: 'Onrush',
+      school: 'physical',
+    },
     loot: [
       { copper: 200, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.6 },
@@ -197,6 +207,14 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 22,
     moveSpeed: 6.5,
     aggroRadius: 12,
+    charge: {
+      minRange: 5,
+      maxRange: 30,
+      cooldown: 12,
+      stunDuration: 0.5,
+      name: 'Onrush',
+      school: 'physical',
+    },
     loot: [
       { copper: 260, chance: 1 },
       { itemId: 'pale_pearl', chance: 0.6 },
@@ -212,6 +230,10 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     maxLevel: 18,
     family: 'humanoid',
     elite: true,
+    // Named mid-boss: CC- and snare-immune on both difficulties (see morthen,
+    // src/sim/content/dungeons.ts).
+    ccImmune: true,
+    slowImmune: true,
     hpBase: 150,
     hpPerLevel: 26,
     dmgBase: 12,
@@ -254,6 +276,10 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     family: 'dragonkin',
     elite: true,
     boss: true,
+    // Boss rule: CC- and snare-immune on both difficulties (matches the other
+    // endgame-instance bosses; the heroic entity stamp stays as belt and braces).
+    ccImmune: true,
+    slowImmune: true,
     hpBase: 300,
     hpPerLevel: 38,
     dmgBase: 14,
@@ -686,6 +712,37 @@ export const TEMPLE_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     stats: { armor: 75, agi: 4, sta: 3 },
     sellValue: 1200,
+  },
+  // --- Class/spec gap fill (17-22 band padding + the first int/spi shield) ---
+  tidehymn_slippers: {
+    id: 'tidehymn_slippers',
+    name: 'Tidehymn Slippers',
+    kind: 'armor',
+    armorType: 'cloth',
+    slot: 'feet',
+    quality: 'uncommon',
+    // Drowned Votaries (level 16) -> item level 17, feet budget 4.
+    stats: { armor: 40, int: 2, spi: 2 },
+    sellValue: 430,
+  },
+  pearlward_aegis: {
+    id: 'pearlward_aegis',
+    name: 'Pearlward Aegis',
+    kind: 'armor',
+    armorType: 'mail',
+    slot: 'offhand',
+    shield: true,
+    quality: 'rare',
+    // Sethrael Palecoil (level 16 rare) -> item level 19, offhand budget 8.
+    // Shield armor is ~2x a same-tier mail chest (the buckler/wallshield rule,
+    // see bonewrought_bulwark); blockValue 12 sits between the wallshield (14)
+    // and the buckler (6) on the common ladder. The first int/spi shield, for
+    // holy paladins and restoration shamans; shields equip by the literal
+    // requiredClass list.
+    blockValue: 12,
+    stats: { armor: 240, int: 5, spi: 3 },
+    sellValue: 1700,
+    requiredClass: ['paladin', 'shaman'],
   },
 
   // --- junk (gray) ---

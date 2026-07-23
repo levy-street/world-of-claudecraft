@@ -1,17 +1,25 @@
-import type { QueryResult } from 'pg';
 import { normalizeAccountFlair, type StreamerLinks } from '../src/sim/account_flair';
-import { DB_HEAVY_STATEMENT_TIMEOUT_MS, pool, runWithStatementTimeout } from './db';
+import {
+  type ClientPerfSummaryBuckets,
+  cleanHours,
+  mapClientPerfSummaryRows,
+  PERF_SUMMARY_LIMITS,
+} from './client_perf_summary_shape';
+import {
+  DB_HEAVY_STATEMENT_TIMEOUT_MS,
+  loadWorldState,
+  pool,
+  runWithStatementTimeout,
+  saveWorldState,
+} from './db';
 import { REALM } from './realm';
-
-// The bound query runWithStatementTimeout hands its callback: one client, one
-// transaction, the raised statement timeout in force. Threading it into a private
-// read helper lets that helper run under the raised allowance without opening its
-// own transaction.
-type BoundQuery = (text: string, values?: unknown[]) => Promise<QueryResult>;
 
 // Read-side queries for the admin dashboard. All inputs are parameterized;
 // sort columns are whitelisted before they reach SQL.
 
+// Served to the admin Overview through the demand-driven 60s memo
+// (server/admin_overview_cache.ts): every field, including siteUsersNow's
+// "now", is as of the last memo refresh, up to ADMIN_OVERVIEW_TTL_MS stale.
 export interface OverviewCounts {
   accounts: number;
   characters: number;
@@ -31,9 +39,17 @@ export interface OverviewCounts {
 
 export async function overviewCounts(): Promise<OverviewCounts> {
   // A big multi-subquery aggregate over accounts / characters / play_sessions,
-  // driven on an interval by the business-metrics PeriodicCollector: run it on the
+  // request-driven through the admin overview cache (server/admin_overview_cache.ts),
+  // which bounds how often the admin Overview poll can re-run it: run it on the
   // raised allowance so a growing play_sessions table cannot trip the default
-  // statement timeout.
+  // statement timeout. peak_online_all_time is GREATEST of the retained sample
+  // window's live max and the folded world_state peak (foldOnlinePeak below), so
+  // a peak inside the retained window stays honest before the next fold and a
+  // pruned-away peak is never lost. Only foldOnlinePeak writes the peak key, but
+  // a tampered or corrupted stored value must degrade to 0 under the guarded
+  // cast, never take down the whole overview read; the digit-count bound in the
+  // regex is part of that guard (a digits-only value wider than int4 would pass
+  // a bare digit match and the ::int cast would then error out the whole read).
   const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
     query(
       `
@@ -55,14 +71,21 @@ export async function overviewCounts(): Promise<OverviewCounts> {
         WHERE a.created_at <= now() - interval '1 day'
           AND ps.started_at <= now()
           AND COALESCE(ps.ended_at, now()) > now() - interval '1 day')::int AS returning_accounts_today,
-      COALESCE((
-        SELECT sum(EXTRACT(EPOCH FROM (COALESCE(ended_at, now()) - started_at))) / NULLIF((SELECT count(*) FROM accounts), 0)
-        FROM play_sessions
-      ), 0)::bigint AS avg_playtime_seconds,
+      -- The rollup term keeps the average stable as old sessions fold forward.
+      COALESCE(
+        ((SELECT COALESCE(sum(EXTRACT(EPOCH FROM (COALESCE(ended_at, now()) - started_at))), 0) FROM play_sessions)
+         + (SELECT COALESCE(sum(playtime_seconds), 0) FROM play_session_totals))
+        / NULLIF((SELECT count(*) FROM accounts), 0),
+      0)::bigint AS avg_playtime_seconds,
       COALESCE((SELECT max(online_players) FROM admin_online_samples
         WHERE realm = $1 AND sampled_at > now() - interval '1 day'), 0)::int AS peak_online_today,
-      COALESCE((SELECT max(online_players) FROM admin_online_samples
-        WHERE realm = $1), 0)::int AS peak_online_all_time,
+      GREATEST(
+        COALESCE((SELECT max(online_players) FROM admin_online_samples
+          WHERE realm = $1), 0),
+        COALESCE((SELECT CASE WHEN data->>'peak' ~ '^[0-9]{1,9}$'
+            THEN (data->>'peak')::int ELSE 0 END FROM world_state
+          WHERE key = '${ONLINE_PEAK_WORLD_STATE_PREFIX}' || $1), 0)
+      )::int AS peak_online_all_time,
       (SELECT count(*) FROM site_presence_sessions
         WHERE last_seen_at > now() - interval '2 minutes')::int AS site_users_now
   `,
@@ -286,30 +309,135 @@ export async function onlineHistory(rangeInput: string): Promise<OnlineHistory> 
   };
 }
 
-export interface PerfAggregate {
-  sampleCount: number;
-  medianFps: number;
-  p95FrameMs: number;
-  p99FrameMs: number;
-  contextLossCount: number;
-  avgRenderScale: number;
-  avgEffectiveRenderScale: number;
+// Metrics retention primitives. One advisory-locked process runs the retention
+// sweep for the whole database: it folds each realm's all-time online peak into
+// world_state first, then deletes expired rows in bounded batches. The fold is
+// what makes pruning lossless for the admin Overview's all-time peak.
+
+// world_state key prefix for the folded per-realm all-time online peak.
+// Single-sourced across foldOnlinePeak and the overviewCounts reader SQL (a
+// drifting copy on either side would silently orphan the stored peak); it is a
+// compile-time constant interpolated into SQL text, never user input.
+export const ONLINE_PEAK_WORLD_STATE_PREFIX = 'admin_online_peak:';
+
+// Every realm with samples in this database, not just this process's REALM: the
+// retention sweep runs in one advisory-locked process on behalf of the whole
+// database, so it iterates every realm returned here. This is a FULL index-only
+// scan over admin_online_samples_realm_sampled (Postgres has no skip scan), so
+// it costs O(retained rows), not O(realms): fine exactly once per nightly run,
+// never on a hot path.
+export async function distinctOnlineSampleRealms(): Promise<string[]> {
+  const res = await pool.query('SELECT DISTINCT realm FROM admin_online_samples');
+  return res.rows.map((r) => String(r.realm));
 }
 
-export interface PerfBucket extends PerfAggregate {
-  key: string;
+// Fold the realm's live all-time online peak into world_state so pruning old
+// samples never loses it. GREATEST semantics: the stored value only ever rises,
+// and a fold that would not raise it writes nothing, so a no-op fold does not
+// churn world_state daily. This is a read-compare-write, not an atomic SQL
+// upsert: it is regression-safe only because the advisory-locked sweep is the
+// SOLE caller; a second concurrent caller could overwrite a higher stored peak
+// with a stale read. Errors intentionally propagate: the fold is the
+// lossless-prune precondition, so a failed fold must make the sweep skip this
+// realm's prune for the run.
+export async function foldOnlinePeak(realm: string): Promise<void> {
+  // Rides the realm-leading admin_online_samples_realm_sampled index.
+  const res = await pool.query(
+    'SELECT max(online_players)::int AS peak FROM admin_online_samples WHERE realm = $1',
+    [realm],
+  );
+  const live = res.rows[0]?.peak;
+  if (typeof live !== 'number' || !Number.isFinite(live)) return; // no samples: nothing to fold
+  const key = ONLINE_PEAK_WORLD_STATE_PREFIX + realm;
+  const stored = await loadWorldState<{ peak?: unknown }>(key);
+  const storedPeak =
+    typeof stored?.peak === 'number' && Number.isFinite(stored.peak) ? stored.peak : 0;
+  if (live <= storedPeak) return;
+  await saveWorldState(key, { peak: live });
 }
 
-export interface PerfSummary {
+// One bounded delete batch of expired admin_online_samples rows for one realm.
+// The table's only non-PK index leads on realm (admin_online_samples_realm_sampled),
+// so BOTH predicate arms are load-bearing: dropping the realm arm turns the
+// subquery into a sequential scan, and dropping the sampled_at bound would
+// delete every sample for the realm regardless of age. retentionDays <= 0 means
+// keep forever. Returns the deleted row count so the sweep can loop to a short
+// batch.
+export async function pruneOnlineSamplesBatch(
+  realm: string,
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
+  // A fractional value must clamp to at least one day, never floor to '0 days'.
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `DELETE FROM admin_online_samples
+      WHERE id IN (
+        SELECT id FROM admin_online_samples
+         WHERE realm = $1 AND sampled_at < now() - ($2 || ' days')::interval
+         ORDER BY sampled_at
+         LIMIT $3)`,
+    [realm, String(days), Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
+}
+
+// One bounded delete batch of expired admin_site_presence_samples rows (the
+// table is database-wide, no realm column); the sampled_at predicate rides
+// admin_site_presence_samples_sampled. retentionDays <= 0 means keep forever.
+export async function pruneSitePresenceSamplesBatch(
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
+  // A fractional value must clamp to at least one day, never floor to '0 days'.
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `DELETE FROM admin_site_presence_samples
+      WHERE id IN (
+        SELECT id FROM admin_site_presence_samples
+         WHERE sampled_at < now() - ($1 || ' days')::interval
+         ORDER BY sampled_at
+         LIMIT $2)`,
+    [String(days), Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
+}
+
+// One bounded delete batch of stale site_presence_sessions rows. The table's
+// PRIMARY KEY is visitor_id (there is no id column), so the batch subquery
+// selects visitor_id; the last_seen_at predicate rides
+// site_presence_sessions_last_seen. Shares one retention value with
+// pruneSitePresenceSamplesBatch in production, hence the parallel signature.
+// retentionDays <= 0 means keep forever.
+export async function pruneSitePresenceSessionsBatch(
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
+  // A fractional value must clamp to at least one day, never floor to '0 days'.
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `DELETE FROM site_presence_sessions
+      WHERE visitor_id IN (
+        SELECT visitor_id FROM site_presence_sessions
+         WHERE last_seen_at < now() - ($1 || ' days')::interval
+         ORDER BY last_seen_at
+         LIMIT $2)`,
+    [String(days), Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
+}
+
+// PerfAggregate and PerfBucket live in the pure shape module next to the row
+// mapper that produces them (client_perf_summary_shape.ts); re-exported so this
+// module keeps its read-model surface.
+export type { PerfAggregate, PerfBucket } from './client_perf_summary_shape';
+
+export interface PerfSummary extends ClientPerfSummaryBuckets {
   hours: number;
   generatedAt: string;
-  totals: PerfAggregate;
-  byPreset: PerfBucket[];
-  byGpu: PerfBucket[];
-  byBrowser: PerfBucket[];
-  byOs: PerfBucket[];
-  byScenario: PerfBucket[];
-  worstGpuBuckets: PerfBucket[];
 }
 
 export interface PerfRawRow {
@@ -354,10 +482,6 @@ export interface PerfRawRow {
   rawSummary: unknown;
 }
 
-function cleanHours(hours: number): number {
-  return Number.isFinite(hours) ? Math.min(168, Math.max(1, Math.floor(hours))) : 24;
-}
-
 function cleanPerfLimit(limit: number): number {
   return Number.isFinite(limit) ? Math.min(1000, Math.max(1, Math.floor(limit))) : 100;
 }
@@ -368,92 +492,66 @@ function cleanBeforeId(id: number | undefined): number | null {
   return n > 0 ? n : null;
 }
 
-function perfAggregateFromRow(r: Record<string, unknown>): PerfAggregate {
-  return {
-    sampleCount: Number(r.sample_count ?? 0),
-    medianFps: Number(r.median_fps ?? 0),
-    p95FrameMs: Number(r.p95_frame_ms ?? 0),
-    p99FrameMs: Number(r.p99_frame_ms ?? 0),
-    contextLossCount: Number(r.context_loss_count ?? 0),
-    avgRenderScale: Number(r.avg_render_scale ?? 0),
-    avgEffectiveRenderScale: Number(r.avg_effective_render_scale ?? 0),
-  };
-}
-
-async function perfAggregate(query: BoundQuery, hours: number): Promise<PerfAggregate> {
-  const res = await query(
-    `SELECT
-       count(*)::int AS sample_count,
-       COALESCE(percentile_cont(0.5) WITHIN GROUP (ORDER BY fps_avg), 0)::real AS median_fps,
-       COALESCE(percentile_cont(0.95) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p95_frame_ms,
-       COALESCE(percentile_cont(0.99) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p99_frame_ms,
-       COALESCE(sum(context_lost_count), 0)::int AS context_loss_count,
-       COALESCE(avg(render_scale), 0)::real AS avg_render_scale,
-       COALESCE(avg(effective_render_scale), 0)::real AS avg_effective_render_scale
-     FROM client_perf_reports
-     WHERE created_at > now() - ($1 || ' hours')::interval`,
-    [String(hours)],
-  );
-  return perfAggregateFromRow(res.rows[0] ?? {});
-}
-
-async function perfBuckets(
-  query: BoundQuery,
-  column: string,
-  hours: number,
-  limit: number,
-  worstFirst = false,
-): Promise<PerfBucket[]> {
-  const order = worstFirst ? 'p95_frame_ms DESC, sample_count DESC' : 'sample_count DESC, key ASC';
-  const res = await query(
-    `SELECT
-       ${column} AS key,
-       count(*)::int AS sample_count,
-       COALESCE(percentile_cont(0.5) WITHIN GROUP (ORDER BY fps_avg), 0)::real AS median_fps,
-       COALESCE(percentile_cont(0.95) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p95_frame_ms,
-       COALESCE(percentile_cont(0.99) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p99_frame_ms,
-       COALESCE(sum(context_lost_count), 0)::int AS context_loss_count,
-       COALESCE(avg(render_scale), 0)::real AS avg_render_scale,
-       COALESCE(avg(effective_render_scale), 0)::real AS avg_effective_render_scale
-     FROM client_perf_reports
-     WHERE created_at > now() - ($1 || ' hours')::interval
-     GROUP BY ${column}
-     ORDER BY ${order}
-     LIMIT $2`,
-    [String(hours), limit],
-  );
-  return res.rows.map((r) => ({ key: String(r.key ?? ''), ...perfAggregateFromRow(r) }));
-}
-
 export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
   const hours = cleanHours(hoursInput);
-  // Seven aggregate scans over client_perf_reports on an admin-triggered read; run
-  // them in ONE raised-timeout transaction (threading the bound query through the
-  // helpers) so a large table cannot trip the default statement timeout on any of
-  // them and the whole read holds a single pooled client instead of seven.
-  const [totals, byPreset, byGpu, byBrowser, byOs, byScenario, worstGpuBuckets] =
-    await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
-      Promise.all([
-        perfAggregate(query, hours),
-        perfBuckets(query, 'graphics_preset', hours, 20),
-        perfBuckets(query, 'gl_renderer_bucket', hours, 50),
-        perfBuckets(query, 'browser_family', hours, 20),
-        perfBuckets(query, 'os_family', hours, 20),
-        perfBuckets(query, 'zone_or_scenario', hours, 30),
-        perfBuckets(query, 'gl_renderer_bucket', hours, 20, true),
-      ]),
-    );
-  return {
-    hours,
-    generatedAt: new Date().toISOString(),
-    totals,
-    byPreset,
-    byGpu,
-    byBrowser,
-    byOs,
-    byScenario,
-    worstGpuBuckets,
-  };
+  // ONE raised-timeout statement (GROUPING SETS over client_perf_reports) replaces
+  // the former seven serialized reads: the () set is the totals row and each
+  // single-column set is one bucket list. Postgres computes BOTH orderings as
+  // window ranks per grouping set (volume: sample_count DESC with the key ASC
+  // tie-break under database collation; worst: p95 DESC, sample_count DESC) and
+  // the outer filter caps each set at its list limit, so only rows the response
+  // can show cross to Node. p99_frame_ms stays percentile_cont(0.99) over
+  // frame_p95_ms, a long-standing quirk preserved deliberately. The pure shape
+  // module (client_perf_summary_shape.ts) rebuilds the response from the flat rows.
+  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
+    query(
+      `WITH agg AS (
+         SELECT
+           graphics_preset,
+           gl_renderer_bucket,
+           browser_family,
+           os_family,
+           zone_or_scenario,
+           GROUPING(graphics_preset) AS g_preset,
+           GROUPING(gl_renderer_bucket) AS g_gpu,
+           GROUPING(browser_family) AS g_browser,
+           GROUPING(os_family) AS g_os,
+           GROUPING(zone_or_scenario) AS g_scenario,
+           count(*)::int AS sample_count,
+           COALESCE(percentile_cont(0.5) WITHIN GROUP (ORDER BY fps_avg), 0)::real AS median_fps,
+           COALESCE(percentile_cont(0.95) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p95_frame_ms,
+           COALESCE(percentile_cont(0.99) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p99_frame_ms,
+           COALESCE(sum(context_lost_count), 0)::int AS context_loss_count,
+           COALESCE(avg(render_scale), 0)::real AS avg_render_scale,
+           COALESCE(avg(effective_render_scale), 0)::real AS avg_effective_render_scale
+         FROM client_perf_reports
+         WHERE created_at > now() - ($1 || ' hours')::interval
+         GROUP BY GROUPING SETS ((), (graphics_preset), (gl_renderer_bucket), (browser_family), (os_family), (zone_or_scenario))
+       ),
+       ranked AS (
+         SELECT
+           agg.*,
+           (row_number() OVER (
+             PARTITION BY g_preset, g_gpu, g_browser, g_os, g_scenario
+             ORDER BY sample_count DESC, COALESCE(graphics_preset, gl_renderer_bucket, browser_family, os_family, zone_or_scenario) ASC
+           ))::int AS vol_rank,
+           (row_number() OVER (
+             PARTITION BY g_preset, g_gpu, g_browser, g_os, g_scenario
+             ORDER BY p95_frame_ms DESC, sample_count DESC
+           ))::int AS worst_rank
+         FROM agg
+       )
+       SELECT * FROM ranked
+       WHERE (g_preset + g_gpu + g_browser + g_os + g_scenario = 5)
+          OR (g_preset = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byPreset})
+          OR (g_gpu = 0 AND (vol_rank <= ${PERF_SUMMARY_LIMITS.byGpu} OR worst_rank <= ${PERF_SUMMARY_LIMITS.worstGpu}))
+          OR (g_browser = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byBrowser})
+          OR (g_os = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byOs})
+          OR (g_scenario = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byScenario})`,
+      [String(hours)],
+    ),
+  );
+  return { hours, generatedAt: new Date().toISOString(), ...mapClientPerfSummaryRows(res.rows) };
 }
 
 export async function clientPerfRaw(
@@ -755,8 +853,10 @@ export async function listAccounts(
               a.banned_at, a.suspended_until, a.is_ai, a.is_streamer,
               count(c.id)::int AS character_count,
               COALESCE(max(c.level), 0)::int AS max_level,
-              COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
-                        FROM play_sessions s WHERE s.account_id = a.id), 0)::bigint AS playtime_seconds
+              (COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
+                         FROM play_sessions s WHERE s.account_id = a.id), 0)
+               + COALESCE((SELECT sum(t.playtime_seconds)
+                           FROM play_session_totals t WHERE t.account_id = a.id), 0))::bigint AS playtime_seconds
        FROM accounts a
        LEFT JOIN characters c ON c.account_id = a.id
        WHERE a.username ILIKE $1
@@ -1138,8 +1238,10 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
                 active_daily_rewards_ban.daily_rewards_banned_at,
                 active_daily_rewards_ban.daily_rewards_ban_expires_at,
                 last_login_ip,
-                COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
-                          FROM play_sessions s WHERE s.account_id = accounts.id), 0)::bigint AS playtime_seconds
+                (COALESCE((SELECT sum(EXTRACT(EPOCH FROM (COALESCE(s.ended_at, now()) - s.started_at)))
+                           FROM play_sessions s WHERE s.account_id = accounts.id), 0)
+                 + COALESCE((SELECT sum(t.playtime_seconds)
+                             FROM play_session_totals t WHERE t.account_id = accounts.id), 0))::bigint AS playtime_seconds
          FROM accounts
          LEFT JOIN LATERAL (
            SELECT reason AS daily_rewards_ban_reason,
@@ -1178,6 +1280,11 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
        LIMIT 50`,
       [accountId],
     ),
+    // The moderation view's own IP-ban lookback, deliberately OR-shaped
+    // (admin-triggered, bounded to one account, off the hot path). The
+    // association arm keeps an aged-out link visible: once retention folds an
+    // account's old play_sessions rows into account_ip_associations, only that
+    // arm still ties the account to its banned IP.
     pool.query(
       `SELECT ib.ip_address, ib.reason, ib.created_at
          FROM daily_reward_ip_bans ib
@@ -1185,6 +1292,10 @@ export async function accountDetail(accountId: number): Promise<AccountDetail | 
            OR EXISTS (
              SELECT 1 FROM play_sessions ps
               WHERE ps.account_id = $1 AND ps.ip_address = ib.ip_address
+           )
+           OR EXISTS (
+             SELECT 1 FROM account_ip_associations assoc
+              WHERE assoc.account_id = $1 AND assoc.ip_address = ib.ip_address
            )
         ORDER BY ib.created_at DESC`,
       [accountId],

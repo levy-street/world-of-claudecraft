@@ -133,6 +133,85 @@ describe('singleFlight', () => {
   });
 });
 
+describe('singleFlight (epoch-aware, two-arg form)', () => {
+  // A deferred promise so a flight can be held in flight while epoch/joiner
+  // behavior is exercised, then released deterministically.
+  function deferred<T>(): { promise: Promise<T>; resolve: (value: T) => void } {
+    let resolve!: (value: T) => void;
+    const promise = new Promise<T>((res) => {
+      resolve = res;
+    });
+    return { promise, resolve };
+  }
+
+  it('with no epochOf, a later caller joins the in-flight run (epoch pins to 0)', async () => {
+    // The one-arg form is unchanged: two callers racing one cold window share it.
+    const d = deferred<string>();
+    const run = vi.fn(() => d.promise);
+    const shared = singleFlight(run);
+    const a = shared();
+    const b = shared();
+    expect(run).toHaveBeenCalledTimes(1); // b joined a's flight
+    d.resolve('one');
+    await expect(a).resolves.toBe('one');
+    await expect(b).resolves.toBe('one');
+  });
+
+  it('a changed epoch starts a fresh flight instead of joining the in-flight one', async () => {
+    let epoch = 0;
+    const first = deferred<string>();
+    const second = deferred<string>();
+    const run = vi
+      .fn<() => Promise<string>>()
+      .mockImplementationOnce(() => first.promise)
+      .mockImplementationOnce(() => second.promise);
+    const shared = singleFlight(run, () => epoch);
+    const a = shared(); // epoch 0, starts flight A
+    expect(run).toHaveBeenCalledTimes(1);
+    epoch = 1; // a bust bumped the epoch mid-flight
+    const b = shared(); // epoch 1 != 0 -> a FRESH flight, never a join
+    expect(run).toHaveBeenCalledTimes(2);
+    first.resolve('stale');
+    second.resolve('fresh');
+    await expect(a).resolves.toBe('stale');
+    await expect(b).resolves.toBe('fresh');
+  });
+
+  it('the stale flight settling does not clobber the newer flight slot', async () => {
+    let epoch = 0;
+    const first = deferred<string>();
+    const second = deferred<string>();
+    const third = deferred<string>();
+    const run = vi
+      .fn<() => Promise<string>>()
+      .mockImplementationOnce(() => first.promise)
+      .mockImplementationOnce(() => second.promise)
+      .mockImplementationOnce(() => third.promise);
+    const shared = singleFlight(run, () => epoch);
+    const a = shared(); // epoch 0, flight A
+    epoch = 1;
+    const b = shared(); // epoch 1, flight B (fresh)
+    expect(run).toHaveBeenCalledTimes(2);
+    // The STALE flight (A) settles FIRST. Its finally must clear only its OWN slot,
+    // and B now holds the slot under a different epoch, so it must be left intact.
+    first.resolve('stale');
+    await expect(a).resolves.toBe('stale');
+    // A joiner at the current epoch joins B (slot intact); it does NOT start a
+    // third flight. This reds if A's settle wrongly cleared B's slot.
+    const joiner = shared();
+    expect(run).toHaveBeenCalledTimes(2);
+    second.resolve('fresh');
+    await expect(b).resolves.toBe('fresh');
+    await expect(joiner).resolves.toBe('fresh');
+    // Once B settles, ITS finally clears the slot (its own epoch matches), so the
+    // next call starts a fresh flight: run invoked a third time.
+    const c = shared();
+    expect(run).toHaveBeenCalledTimes(3);
+    third.resolve('newest');
+    await expect(c).resolves.toBe('newest');
+  });
+});
+
 describe('server/main.ts wiring: both board read paths share one flight', () => {
   // Source scan (like the architecture guards): the warm loop fires every
   // LEADERBOARD_TTL_MS, the same interval as the cache TTL, so under demand a
@@ -155,6 +234,12 @@ describe('server/main.ts wiring: both board read paths share one flight', () => 
     // wrap into the shared flight. Anything else is a bypass.
     expect(src.match(/\brefreshDeedsBoard\b/g)).toHaveLength(2);
     expect(src).toContain('async function refreshDeedsBoard(');
-    expect(src).toContain('singleFlight(refreshDeedsBoard)');
+    // The wrap carries the boardEpoch getter (a moderation bust evicts in-flight
+    // joiners of the character-faced board). Comment-stripped then collapsed, so
+    // a commented-out wrap cannot satisfy the pin and the match survives biome
+    // wrapping; the eviction behavior itself is proven in
+    // tests/server/board_read_single_flight.test.ts.
+    const compactCode = src.replace(/(^|[^:])\/\/.*$/gm, '$1').replace(/\s+/g, '');
+    expect(compactCode).toContain('singleFlight(refreshDeedsBoard,()=>boardEpoch');
   });
 });

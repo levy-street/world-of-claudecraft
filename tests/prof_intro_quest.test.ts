@@ -7,7 +7,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { GATHER_NODES, NPCS, QUEST_ORDER, QUESTS } from '../src/sim/data';
-import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
+import { nodeMaterialFor } from '../src/sim/professions/gathering';
 import { Sim } from '../src/sim/sim';
 import { terrainHeight } from '../src/sim/world';
 
@@ -20,6 +20,20 @@ function teleportOntoNode(sim: Sim, pid: number, nodeId: string) {
   p.pos.z = node.pos.z;
   p.pos.y = terrainHeight(node.pos.x, node.pos.z, sim.cfg.seed);
   p.prevPos = { ...p.pos };
+}
+
+// harvestNode STARTS a gather cast; quest credit lands at
+// completion. Mirror the lifecycle completion arm synchronously (the
+// gather_rare_events.test.ts completeCastNow idiom) so these seed-stable
+// drives stay free of world-tick noise. Only called after a GRANTED start
+// (a denied attempt starts no cast).
+function completeCastNow(sim: Sim, pid: number): void {
+  const p = sim.entities.get(pid);
+  const meta = sim.players.get(pid);
+  if (!p || !meta) throw new Error('missing player');
+  p.castingAbility = null;
+  p.castRemaining = 0;
+  sim.ctx.completeGatherCast(p, meta);
 }
 
 describe('q_prof_intro content wiring', () => {
@@ -79,7 +93,8 @@ describe('q_prof_intro: mining, and only mining, satisfies the gather objective'
 
     expect(sim.countItem('chunk_of_ore', pid)).toBe(0);
     sim.harvestNode(ORE_NODE_ID, pid);
-    expect(sim.countItem(NODE_HARVEST_TABLE.ore.itemId, pid)).toBe(1);
+    completeCastNow(sim, pid);
+    expect(sim.countItem(nodeMaterialFor('ore', 'eastbrook_vale').itemId, pid)).toBe(1);
     expect(sim.countItem('chunk_of_ore', pid)).toBe(0);
     expect(sim.meta(pid)!.questLog.get('q_prof_intro')?.counts).toEqual([1]);
   });
@@ -90,6 +105,7 @@ describe('q_prof_intro: mining, and only mining, satisfies the gather objective'
     teleportOntoNode(sim, pid, ORE_NODE_ID);
     // Never accepted q_prof_intro.
     sim.harvestNode(ORE_NODE_ID, pid);
+    completeCastNow(sim, pid);
     sim.tick();
     expect(sim.countItem('chunk_of_ore', pid)).toBe(0);
   });
@@ -110,6 +126,7 @@ describe('q_prof_intro: mining, and only mining, satisfies the gather objective'
     oreNodes.forEach((node, index) => {
       teleportOntoNode(sim, pid, node.id);
       sim.harvestNode(node.id, pid);
+      completeCastNow(sim, pid);
       expect(sim.meta(pid)!.questLog.get('q_prof_intro')?.counts).toEqual([index + 1]);
     });
     expect(sim.questState('q_prof_intro', pid)).toBe('ready');

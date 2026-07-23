@@ -146,12 +146,20 @@ export interface MobileControlCallbacks {
   onDailyRewards(): void;
   /** Open the Book of Deeds window, folded into the More tray on mobile. */
   onDeeds(): void;
+  /** Open the Professions window, folded into the More tray on mobile. */
+  onProfessions(): void;
   /** Toggle world nameplates; returns the new on/off state to sync the button glow. */
   onNameplates(): boolean;
   /** Toggle background music; returns whether music is now enabled. */
   onMusic(): boolean;
   /** Double-tap the camera joystick: snap the camera back behind the character. */
   onRecenterCamera(): void;
+  /** Move an active ground-target reticle to this canvas point. Returns true when
+   * targeting owns the pointer, so the same drag never rotates the camera. */
+  onGroundAimMove(x: number, y: number): boolean;
+  /** Commit an active ground-target spell when the finger is released. Returns
+   * true when targeting consumed the gesture, so it cannot also recenter camera. */
+  onGroundAimTap(x: number, y: number): boolean;
 }
 
 /**
@@ -486,6 +494,7 @@ export class MobileControls {
     this.bindButton('mobile-leaderboard', () => this.callbacks.onLeaderboard());
     this.bindButton('mobile-daily-rewards', () => this.callbacks.onDailyRewards());
     this.bindButton('mobile-deeds', () => this.callbacks.onDeeds());
+    this.bindButton('mobile-professions', () => this.callbacks.onProfessions());
     const nameplatesBtn = document.getElementById('mobile-nameplates');
     this.bindButton('mobile-nameplates', () => {
       const on = this.callbacks.onNameplates();
@@ -501,8 +510,12 @@ export class MobileControls {
     this.bindHapticsToggle('mobile-haptics');
     this.bindButton('mobile-more', () => {
       const open = !document.body.classList.contains('mobile-more-open');
-      this.root?.classList.toggle('expanded', open);
-      document.body.classList.toggle('mobile-more-open', open);
+      if (!open) {
+        this.closeMoreModal();
+        return;
+      }
+      this.root?.classList.add('expanded');
+      document.body.classList.add('mobile-more-open');
       if (open) {
         const modal = document.getElementById('mobile-extra-controls');
         if (modal) {
@@ -571,6 +584,12 @@ export class MobileControls {
       triggerHaptic(HAPTIC_TAP, this.hapticsOn);
       if (button.closest('#mobile-extra-controls')) {
         this.closeMoreModal();
+        // Establish the More trigger as the destination window's return target
+        // before its synchronous callback captures focus. The body-class
+        // observer then releases the old More trap without restoring it and
+        // focuses the newly opened window, avoiding focus inside aria-hidden
+        // More content during the modal-to-modal handoff.
+        document.getElementById('mobile-more')?.focus();
       }
       cb();
     };
@@ -1015,7 +1034,8 @@ export class MobileControls {
     const target = e.target as unknown as TouchRouterTarget | null;
     const menuOpen = document.body.classList.contains('mobile-window-open');
     if (!isCameraDragAllowedAt(target, menuOpen)) return;
-    this.touchOwners.set(e.pointerId, 'camera');
+    const groundAimOwnsPointer = this.callbacks.onGroundAimMove(e.clientX, e.clientY);
+    this.touchOwners.set(e.pointerId, groundAimOwnsPointer ? 'groundAim' : 'camera');
     this.swipeLookPointer = e.pointerId;
     this.swipeLookStartX = e.clientX;
     this.swipeLookStartY = e.clientY;
@@ -1031,6 +1051,19 @@ export class MobileControls {
   }
 
   private onSwipeLookMove(e: PointerEvent): void {
+    if (
+      this.active &&
+      e.pointerId === this.swipeLookPointer &&
+      this.touchOwners.get(e.pointerId) === 'groundAim'
+    ) {
+      if (document.body.classList.contains('mobile-window-open')) {
+        this.releaseSwipeLook();
+        return;
+      }
+      this.callbacks.onGroundAimMove(e.clientX, e.clientY);
+      e.preventDefault();
+      return;
+    }
     if (
       !this.active ||
       e.pointerId !== this.swipeLookPointer ||
@@ -1060,8 +1093,16 @@ export class MobileControls {
   }
 
   private onSwipeLookEnd(e: PointerEvent): void {
+    const owner = this.touchOwners.get(e.pointerId);
     this.touchOwners.release(e.pointerId);
     if (e.pointerId !== this.swipeLookPointer) return;
+    if (owner === 'groundAim') {
+      e.preventDefault();
+      if (e.type === 'pointerup') this.callbacks.onGroundAimTap(e.clientX, e.clientY);
+      this.lastSwipeTapAt = 0;
+      this.releaseSwipeLook();
+      return;
+    }
     if (this.swipeLookActive) e.preventDefault();
     // Double-tap-to-recenter on the swipe-look path: the camera joystick is
     // opt-in (hidden by default, settings.mobileCameraJoystick), so this is
@@ -1070,6 +1111,11 @@ export class MobileControls {
     // quick succession recenter the camera, mirroring the joystick logic.
     const now = this.now();
     const quickTap = !this.swipeLookActive && now - this.swipeLookDownAt <= RECENTER_DOUBLE_TAP_MS;
+    if (quickTap && this.callbacks.onGroundAimTap(e.clientX, e.clientY)) {
+      this.lastSwipeTapAt = 0;
+      this.releaseSwipeLook();
+      return;
+    }
     if (quickTap && isRecenterDoubleTap(this.lastSwipeTapAt, now, this.swipeLookActive)) {
       this.callbacks.onRecenterCamera();
       this.lastSwipeTapAt = 0;

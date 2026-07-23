@@ -1,4 +1,4 @@
-// Masterwork proc model (Professions 2.0 Phase 2). The output quality roll is
+// Masterwork proc model (Professions 2.0). The output quality roll is
 // retired from the craft path: every successful craft yields its recipe's
 // declared output deterministically, and the ONLY output-side randomness is a
 // single masterwork proc draw (crafting.ts keeps that draw at the exact
@@ -15,7 +15,7 @@
 import { normalizePrimaryStats, PRIMARY_STATS, primaryStatBudget } from '../item_budget';
 import type { CoreStats, ItemDef, ItemSlot } from '../types';
 
-// Locked Phase 2 tuning, amended 2026-07-17: base chance at recipe-tier
+// Locked tuning, amended 2026-07-17: base chance at recipe-tier
 // parity, plus a small bump per tier of craft skill above the recipe's tier,
 // plus flat bonuses for a signed reagent (ANY player's signature, the
 // crafter's own included; the amendment widened this from self-signed-only so
@@ -42,10 +42,10 @@ export interface MasterworkChanceInput {
   // The crafter has reached the specialization threshold in the recipe's craft
   // (wheel.ts isSpecialized, content-driven, never hardcoded).
   specialized: boolean;
-  // Phase 10 material-tier hook: reserved additive chance input for
-  // material-tier quality feeding the proc. Always 0 until Phase 10 wires a
-  // real value; it participates in the sum today so wiring it later is purely
-  // a call-site change.
+  // Material-tier feed: additive chance from the consumed
+  // materials' tier (material_tier.ts materialTierBonusForReagents at the
+  // crafting.ts call site). A tier-0-only reagent list feeds exactly 0, so
+  // every tier-0-only scenario is unchanged.
   materialTierBonus?: number;
 }
 

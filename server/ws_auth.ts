@@ -15,12 +15,13 @@ import { randomUUID } from 'node:crypto';
 import type { EventEmitter } from 'node:events';
 import type * as http from 'node:http';
 import type { WebSocket, WebSocketServer } from 'ws';
-import type { BankBonusSource } from '../src/world_api';
+import { type BankBonusSource, STABLE_TIMER_WIRE_VERSION } from '../src/world_api';
 import type {
   AccountChatMuteStatus,
   AccountCosmetics,
   AccountModerationStatus,
   CharacterRow,
+  TokenScope,
 } from './db';
 import type { GameServer } from './game';
 
@@ -69,7 +70,9 @@ function rejectHandshake(ws: WebSocket, error: string): void {
 
 export interface WsAuthDeps {
   game: GameServer;
-  accountForToken: (token: string) => Promise<number | null>;
+  accountAndScopeForToken: (
+    token: string,
+  ) => Promise<{ accountId: number; scope: TokenScope } | null>;
   moderationStatusForAccount: (accountId: number) => Promise<AccountModerationStatus>;
   getCharacter: (accountId: number, characterId: number) => Promise<CharacterRow | null>;
   chatMuteStatusForAccount: (accountId: number) => Promise<AccountChatMuteStatus>;
@@ -134,7 +137,7 @@ export interface WsAuthHandlers {
 export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
   const {
     game,
-    accountForToken,
+    accountAndScopeForToken,
     moderationStatusForAccount,
     getCharacter,
     chatMuteStatusForAccount,
@@ -241,11 +244,16 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     const token = typeof msg.token === 'string' ? msg.token : '';
     const characterId = Number(msg.character ?? 'NaN');
     const clientSeed = typeof msg.clientSeed === 'string' ? msg.clientSeed : '';
-    const accountId = await accountForToken(token);
-    if (accountId === null || !Number.isFinite(characterId)) {
+    // Optional rolling-deploy capability. Exact numeric equality is deliberate:
+    // strings, booleans, and unknown future versions stay on the legacy wire.
+    const timerWireVersion: 1 | typeof STABLE_TIMER_WIRE_VERSION =
+      msg.timerWire === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
+    const account = await accountAndScopeForToken(token);
+    if (account === null || account.scope !== 'full' || !Number.isFinite(characterId)) {
       rejectHandshake(ws, WS_AUTH_ERROR.notAuthenticated);
       return;
     }
+    const accountId = account.accountId;
     const status = await moderationStatusForAccount(accountId);
     if (status.locked) {
       rejectHandshake(ws, status.message);
@@ -292,6 +300,10 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
       isAdmin,
       adminPermissions,
       clientSeed,
+      timerWireVersion,
+      // The character's stored action-bar layout, sent once to the owning client
+      // so it restores at login on any device (game.join re-validates it).
+      hotbarLayout: character.hotbar_layout ?? null,
     };
     // Two genuinely concurrent handshakes for one character would race to stamp
     // the lease nonce; admit only the first and refuse the rest (never queue).

@@ -117,7 +117,6 @@ export const API_ERROR_KEYS = {
   'steam.account_taken': 'apiError.steam.account_taken',
   'steam.upstream': 'apiError.steam.upstream',
   'wallet.handoff_invalid': 'apiError.wallet.handoff_invalid',
-  'welcome.invalid_input': 'apiError.welcome.invalid_input',
 } satisfies Record<string, TranslationKey>;
 
 /** The message of an Error, or the string form of any other thrown value. */

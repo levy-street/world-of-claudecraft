@@ -30,6 +30,7 @@ function entity(
 function harness(
   initialEntities: Entity[] = [],
   corpseAvailability = (mob: Entity) => corpseLootAvailability(mob, 7),
+  townFocus: Record<string, number> = {},
 ) {
   const element = document.createElement('div');
   element.id = 'loot-window';
@@ -42,6 +43,7 @@ function harness(
     entities,
     playerId: 7,
     player: { pos: { x: 0, y: 0, z: 0 } },
+    townFocus,
     lootCorpse,
     harvestCorpse,
     collectDelveChestLoot,
@@ -89,7 +91,7 @@ describe('LootWindowController', () => {
     document.body.className = '';
   });
 
-  it('renders only authoritative personal corpse loot and delegates Take All', () => {
+  it('renders only authoritative personal corpse loot and delegates Take Loot', () => {
     const mob = entity(10, {
       kind: 'mob',
       templateId: harvestMobId,
@@ -110,14 +112,30 @@ describe('LootWindowController', () => {
     expect(test.element.innerHTML).not.toContain(`data-item="${itemIds[1]}"`);
     expect(test.element.innerHTML).toContain('money:25');
     expect(test.placePopup).toHaveBeenCalledWith(test.element, 285, 270, 260, 280, 10, 10);
-    expect(test.attachTooltip).toHaveBeenCalledTimes(1);
+    // One visible item row plus the two buttons, all on the shared tooltip
+    // idiom (hover, mobile long-press, keyboard focus).
+    expect(test.attachTooltip).toHaveBeenCalledTimes(3);
 
-    const takeAll = test.element.querySelector<HTMLButtonElement>('.btn:not(.corpse-harvest-btn)');
-    expect(takeAll?.title).toBeTruthy();
-    expect(takeAll?.title).not.toBe(
-      test.element.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.title,
+    const takeLoot = test.element.querySelector<HTMLButtonElement>('.btn:not(.corpse-harvest-btn)');
+    const harvest = test.element.querySelector<HTMLButtonElement>('.corpse-harvest-btn');
+    // Legibility fix: the corpse arm's button is "Take Loot" (the
+    // old "Take All" label promised the harvest too); native title attributes
+    // stay empty so touch players are never without the tooltip.
+    expect(takeLoot?.textContent).toBe('Take Loot');
+    expect(takeLoot?.title).toBe('');
+    expect(harvest?.title).toBe('');
+    const tooltipFor = (el: Element | null | undefined) =>
+      test.attachTooltip.mock.calls.find(([target]) => target === el)?.[1]();
+    expect(tooltipFor(takeLoot)).toBe(
+      'Takes the coins and dropped items. Does not use up the harvest.',
     );
-    takeAll?.click();
+    expect(tooltipFor(harvest)).toBe(
+      'Gathers the checked components. Each corpse can be harvested once, first come. Does not take the loot.',
+    );
+    expect(test.element.querySelector('.town-focus-hint')?.textContent).toBe(
+      'The interact key loots and harvests in one press, using your town focus.',
+    );
+    takeLoot?.click();
 
     expect(test.lootCorpse).toHaveBeenCalledWith(10);
     expect(test.element.style.display).toBe('none');
@@ -163,6 +181,34 @@ describe('LootWindowController', () => {
     expect(test.element.style.display).toBe('none');
   });
 
+  it('pre-checks the town-focus components in the harvest picker', () => {
+    const tags = Object.values(MOBS).find((mob) => mob.componentTags?.length)!.componentTags!;
+    expect(tags.length).toBeGreaterThanOrEqual(2); // a strict focused subset must be expressible
+    const mob = entity(13, { kind: 'mob', templateId: harvestMobId, loot: null });
+    const test = harness([mob], (entry) => corpseLootAvailability(entry, 7), { [tags[0]]: 5 });
+
+    test.controller.openCorpse(13, 0, 0);
+
+    const boxes = [...test.element.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')];
+    expect(boxes.map((box) => [box.value, box.checked])).toEqual(
+      tags.map((tag) => [tag, tag === tags[0]]),
+    );
+  });
+
+  it('deselecting every pre-checked box still submits an explicit empty pick (spread)', () => {
+    const tags = Object.values(MOBS).find((mob) => mob.componentTags?.length)!.componentTags!;
+    const mob = entity(14, { kind: 'mob', templateId: harvestMobId, loot: null });
+    const test = harness([mob], (entry) => corpseLootAvailability(entry, 7), { [tags[0]]: 5 });
+
+    test.controller.openCorpse(14, 0, 0);
+    for (const box of test.element.querySelectorAll<HTMLInputElement>('.corpse-harvest-check')) {
+      box.checked = false;
+    }
+    test.element.querySelector<HTMLButtonElement>('.corpse-harvest-btn')?.click();
+
+    expect(test.harvestCorpse).toHaveBeenCalledWith(14, []);
+  });
+
   it('owns delve chest state and collection while empty rewards stay closed', () => {
     const chest = entity(20, { kind: 'object', templateId: 'delve_chest' });
     const test = harness([chest]);
@@ -174,6 +220,9 @@ describe('LootWindowController', () => {
     test.controller.openChest(20, [{ itemId: itemIds[0], count: 1 }]);
     expect(test.controller.hasOpenChest).toBe(true);
     expect(test.centerPopup).toHaveBeenCalledWith(test.element);
+    // The delve-chest arm keeps "Take All": there is no harvest half here, so
+    // "all" stays accurate (only the corpse arm was renamed to Take Loot).
+    expect(test.element.querySelector<HTMLButtonElement>('.btn')?.textContent).toBe('Take All');
     test.element.querySelector<HTMLButtonElement>('.btn')?.click();
 
     expect(test.collectDelveChestLoot).toHaveBeenCalledWith(20);

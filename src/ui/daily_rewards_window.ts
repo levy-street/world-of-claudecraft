@@ -90,6 +90,8 @@ export interface DailyRewardsWindowDeps {
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
   onVisibilityChange?(): void;
+  /** Fired once per actual close (not when already closed). */
+  onClose?(): void;
   onStatus?(status: DailyRewardStatus): void;
   onWalletConnect?(): void;
   storeEnabled?(): boolean;
@@ -141,6 +143,7 @@ export class DailyRewardsWindow {
 
   constructor(private readonly deps: DailyRewardsWindowDeps) {}
 
+  /** Whether the window is currently shown; lets the opener distinguish the toggle direction. */
   get isOpen(): boolean {
     return this.deps.root().style.display === 'block';
   }
@@ -196,6 +199,7 @@ export class DailyRewardsWindow {
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
     this.deps.onVisibilityChange?.();
+    this.deps.onClose?.();
   }
 
   async render(focus: 'open' | null = null): Promise<void> {
@@ -663,9 +667,20 @@ export class DailyRewardsWindow {
   }
 
   private loadingHtml(storeEnabled: boolean): string {
+    // A visible loading state until the first snapshot paints: the window shows
+    // an opaque body the moment it opens, and the snapshot fetch has no
+    // deadline, so an empty body would read as a large black box. The store
+    // variant is aria-hidden because the tab strip's data-woc-store-loading
+    // indicator already announces busy; the rewards-only variant has no tab
+    // strip, so its loading block is the live status itself.
+    const spinner = (label: string, live: boolean): string =>
+      `<div class="cl-loading"${live ? ' role="status" aria-live="polite"' : ' aria-hidden="true"'}>` +
+      `<span class="cl-spinner" aria-hidden="true"></span>` +
+      `<span>${esc(label)}</span>` +
+      `</div>`;
     return storeEnabled
-      ? '<div id="woc-store-panel" class="dr-body woc-store-body" role="tabpanel" aria-labelledby="woc-store-tab-store"></div>'
-      : '<div class="dr-body woc-store-body"></div>';
+      ? `<div id="woc-store-panel" class="dr-body woc-store-body" role="tabpanel" aria-labelledby="woc-store-tab-store">${spinner(t('hudChrome.wocStore.loading'), false)}</div>`
+      : `<div class="dr-body woc-store-body">${spinner(t('hudChrome.dailyRewards.loading'), true)}</div>`;
   }
 
   private syncStoreLoading(): void {
