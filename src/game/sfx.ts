@@ -49,9 +49,10 @@ const FORGE_AMBIENCE_GAIN = 0.625;
 // player, so a narrow value (tried 6/7/8/10/20) went silent even standing
 // right next to the forge once the camera's own offset was added in, a real
 // gotcha worth remembering before retuning this. 38 lands it: silent at the
-// PLAYER_START spawn point (2, -2), ~20.9 units from the forge, audible by
-// the time you reach Marshal Redbrook (4, 6) heading into town, and still 8
-// units narrower than the shared 46 default.
+// PLAYER_START spawn point (2, -2), where the camera listener sits ~31.8
+// units from the forge, audible by the time you reach Marshal Redbrook (4,
+// 6) heading into town, and still 8 units narrower than the shared 46
+// default.
 export const FORGE_MAX_DISTANCE = 38;
 const FOOTSTEP_CUES: Partial<Record<string, string>> = {
   grass: 'foot_grass',
@@ -112,7 +113,6 @@ interface PendingLoop {
   x?: number;
   y?: number;
   z?: number;
-  refDistance?: number;
   maxDistance?: number;
 }
 
@@ -612,10 +612,11 @@ class Sfx {
 
   /** Ensure a loop `id` is playing `key` at `target` gain; (x,y,z) makes it
    *  positional. Ramps gain smoothly; creating from scratch fades in from 0. */
-  // refDistance/maxDistance default to makePanner's own defaults (the shared
-  // REF_DISTANCE/MAX_DISTANCE), so every existing caller keeps its current
-  // audible range; only a caller that needs its own falloff (pointAmbient's
-  // 'forge' branch) passes an override.
+  // maxDistance defaults to makePanner's own default (the shared MAX_DISTANCE),
+  // so every existing caller keeps its current audible range; only a caller
+  // that needs its own falloff (pointAmbient's 'forge' branch) passes an
+  // override. refDistance has no caller that overrides it today; add it back
+  // if a future station ambience needs its own near-field radius.
   loop(
     id: string,
     key: string,
@@ -623,7 +624,6 @@ class Sfx {
     x?: number,
     y?: number,
     z?: number,
-    refDistance?: number,
     maxDistance?: number,
   ): void {
     const ctx = this.ctx,
@@ -648,7 +648,7 @@ class Sfx {
           this.pendingLoopVariants.delete(id);
           return;
         }
-        this.pendingLoops.set(id, { key, target, x, y, z, refDistance, maxDistance });
+        this.pendingLoops.set(id, { key, target, x, y, z, maxDistance });
         this.pendingLoopVariants.set(id, variantIndex);
         if (this.pendingLoopLoads.get(id) !== key) {
           this.pendingLoopLoads.set(id, key);
@@ -672,7 +672,6 @@ class Sfx {
               pending.x,
               pending.y,
               pending.z,
-              pending.refDistance,
               pending.maxDistance,
             );
           });
@@ -685,7 +684,7 @@ class Sfx {
       src.playbackRate.value = this.authoredPlaybackRate(key);
       const g = ctx.createGain();
       g.gain.value = 0;
-      const panner = positional ? this.makePanner(x, y, z, refDistance, maxDistance) : null;
+      const panner = positional ? this.makePanner(x, y, z, undefined, maxDistance) : null;
       if (panner) src.connect(g).connect(panner).connect(master);
       else src.connect(g).connect(master);
       src.start();
@@ -702,12 +701,11 @@ class Sfx {
       }
       // Keep an already-live loop's falloff current too, not just position:
       // ambience() calls loop() every frame for a nearby point source, so a
-      // tuning change to a refDistance/maxDistance override (e.g.
-      // FORGE_MAX_DISTANCE) takes effect on the NEXT frame rather than only
-      // for a loop that hasn't started yet.
-      const resolvedRef = refDistance ?? REF_DISTANCE;
+      // tuning change to a maxDistance override (e.g. FORGE_MAX_DISTANCE)
+      // takes effect on the NEXT frame rather than only for a loop that
+      // hasn't started yet.
       const resolvedMax = maxDistance ?? MAX_DISTANCE;
-      if (slot.panner.refDistance !== resolvedRef) slot.panner.refDistance = resolvedRef;
+      if (slot.panner.refDistance !== REF_DISTANCE) slot.panner.refDistance = REF_DISTANCE;
       if (slot.panner.maxDistance !== resolvedMax) slot.panner.maxDistance = resolvedMax;
     }
     // Only (re)arm the ramp when the target actually changes. loop() is called
@@ -842,7 +840,7 @@ class Sfx {
     }
     const key = source.kind === 'campfire' ? 'amb_campfire' : 'amb_forge';
     const gain = source.kind === 'forge' ? FORGE_AMBIENCE_GAIN : POINT_AMBIENCE_GAIN;
-    this.loop(source.id, key, gain, source.x, source.y, source.z, undefined, maxDistance);
+    this.loop(source.id, key, gain, source.x, source.y, source.z, maxDistance);
   }
 
   /** Cross-fade the global ambience loops to match the player's surroundings.

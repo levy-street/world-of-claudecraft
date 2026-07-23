@@ -304,12 +304,6 @@ describe('mount running audio', () => {
   });
 });
 
-// playAt's boolean return is the load-bearing contract behind the mob
-// idle-bark per-entity cooldown (src/ui/mob_idle_sfx.ts, hud.ts): a caller
-// stamps its own cooldown only when this returns true, so a false positive
-// here (returning true on a cooldown-blocked or unbuffered attempt) would
-// silently bench a mob for the full cooldown window over a bark that never
-// actually played, the exact bug the design's own doc comment warns about.
 describe('amb_forge: its own narrower audible distance', () => {
   beforeEach(() => {
     const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
@@ -355,8 +349,56 @@ describe('amb_forge: its own narrower audible distance', () => {
     const loops = (sfx as unknown as { loops: Map<string, unknown> }).loops;
     expect(loops.get('campfire-1')).toBeDefined();
   });
+
+  it('re-syncs an already-live loop panner to its override every frame, not only on creation', () => {
+    const withinRange = FORGE_MAX_DISTANCE - 1;
+    sfx.ambience('vale', false, null, false, 0, [
+      { id: 'forge-1', kind: 'forge', x: withinRange, y: 0, z: 0 },
+    ]);
+    const panner = forgeSlot()?.panner as { refDistance: number; maxDistance: number };
+    // Simulate drift: something else on the panner left maxDistance stale.
+    panner.maxDistance = MAX_DISTANCE;
+    expect(panner.maxDistance).not.toBe(FORGE_MAX_DISTANCE);
+
+    // ambience() calls loop() again next frame for the same live source.
+    sfx.ambience('vale', false, null, false, 0, [
+      { id: 'forge-1', kind: 'forge', x: withinRange, y: 0, z: 0 },
+    ]);
+    expect(panner.maxDistance).toBe(FORGE_MAX_DISTANCE);
+  });
+
+  it('carries the maxDistance override through the pending-load round trip', () => {
+    // A distinct id: the singleton sfx's loops/pendingLoops maps persist
+    // across tests, so reusing 'forge-1' here would hit the still-live slot
+    // from a sibling test's resync path instead of the pending-load branch.
+    const id = 'forge-pending';
+    // The outer beforeEach preloads amb_forge; remove it so this call takes
+    // the pending-load branch instead of creating the panner immediately.
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.delete('amb_forge');
+    sfx.loop(id, 'amb_forge', 1, 5, 0, 5, FORGE_MAX_DISTANCE);
+    const pendingLoops = (sfx as unknown as { pendingLoops: Map<string, { maxDistance?: number }> })
+      .pendingLoops;
+    const pending = pendingLoops.get(id);
+    expect(pending?.maxDistance).toBe(FORGE_MAX_DISTANCE);
+
+    // The buffer finishes loading; replay loop() with exactly what the
+    // pending record carried, the same value the real load callback reads.
+    buffers.set('amb_forge', { duration: 3 });
+    sfx.loop(id, 'amb_forge', 1, 5, 0, 5, pending?.maxDistance);
+    const loops = (sfx as unknown as { loops: Map<string, { panner: unknown }> }).loops;
+    const panner = loops.get(id)?.panner as { refDistance: number; maxDistance: number };
+    expect(panner.maxDistance).toBe(FORGE_MAX_DISTANCE);
+    expect(panner.refDistance).toBe(REF_DISTANCE);
+  });
 });
 
+// playAt's boolean return is the load-bearing contract behind the mob
+// idle-bark per-entity cooldown (src/ui/mob_idle_sfx.ts, hud.ts): a caller
+// stamps its own cooldown only when this returns true, so a false positive
+// here (returning true on a cooldown-blocked or unbuffered attempt) would
+// silently bench a mob for the full cooldown window over a bark that never
+// actually played, the exact bug the design's own doc comment warns about.
 describe('playAt return value', () => {
   it('returns false for an unbuffered key (kicks off the async load instead)', () => {
     expect(sfx.playAt('mob_beast_idle', 0, 0, 0)).toBe(false);
