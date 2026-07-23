@@ -239,6 +239,12 @@ const LOCKPICK_ACTIONS = new Set<PickAction>(['hardSet', 'set', 'steady', 'ease'
 const LEAVE_SAVE_MAX_ATTEMPTS = 5;
 const LEAVE_SAVE_RETRY_BASE_MS = 250;
 const LEAVE_SAVE_RETRY_MAX_MS = 4000;
+// How long an escrow-mutating market/mail command waits before its prompt
+// atomic save (scheduleEscrowSave) actually runs. Short enough to close the
+// crash window between it and a restart, long enough that a burst of commands
+// from one character (a few quick mail takes, list-then-cancel) coalesces
+// into a single write instead of one per command.
+const ESCROW_SAVE_DEBOUNCE_MS = 500;
 // Usage notices for the two PLAYER chat-suppression tiers. Kept as constants
 // because the S3 localization guard scans sendChatNotice literals, and
 // src/ui/server_i18n.ts carries the matching rules. (A "mute" is the ADMIN
@@ -1298,6 +1304,9 @@ export class GameServer {
   private socialPosTimer = 0;
   private saveAllInFlight: Promise<void> | null = null;
   private readonly characterSaveQueues = new Map<number, Promise<void>>();
+  // Debounce timers for the prompt atomic escrow save (scheduleEscrowSave),
+  // one per character id currently awaiting its coalesced write.
+  private readonly escrowSaveTimers = new Map<number, NodeJS.Timeout>();
   // Weapon-skin loadouts are whole-record replacements in their dedicated paid
   // state row. Keep one FIFO per account so rapid apply/detach commands cannot
   // commit on separate pool clients in reverse order and resurrect stale state.
@@ -2012,6 +2021,42 @@ export class GameServer {
     }
   }
 
+  // Market buy/list/cancel and mail send/take each mutate BOTH the acting
+  // character's own state (bags/copper) and the shared market/mail world_state
+  // blob in the same command. flushPeriodicSaves above persists those two
+  // pieces as INDEPENDENT unsynchronized 30s writes (saveAll, then saveMarket/
+  // saveMail), so a crash between them can restore the character and the
+  // escrow from different instants: a market_buy whose buyer character save
+  // (item granted, copper deducted) lands before the market blob write that
+  // removes the listing resurrects the listing after restart (item
+  // duplicated, seller's proceeds lost); mail_take has the mirror coin/item-
+  // dupe window. The leave path was already made atomic for exactly this
+  // reason (saveCharacterOnLeave -> saveCharacter(withMarket:true), which
+  // writes both through saveCharacterAndMarketState in one transaction).
+  // Call this right after such a command so that SAME atomic write runs
+  // promptly for the acting character instead of only ever riding the
+  // unsynchronized 30s pair (kept as the fallback for the everyday case).
+  // Debounced per character, and fire-and-forget like every other save call
+  // in this file: a burst of commands from one character (a few quick mail
+  // takes, list-then-cancel) coalesces into a single write, and a slow or
+  // failed save never blocks the command's own dispatch.
+  private scheduleEscrowSave(session: ClientSession): void {
+    const characterId = session.characterId;
+    const pending = this.escrowSaveTimers.get(characterId);
+    if (pending) clearTimeout(pending);
+    this.escrowSaveTimers.set(
+      characterId,
+      setTimeout(() => {
+        this.escrowSaveTimers.delete(characterId);
+        const live = this.sessionsByCharacterId.get(characterId);
+        if (!live || live.left) return; // logged off before the debounce fired
+        void this.saveCharacter(live, { withMarket: true }).catch((err) =>
+          console.error(`escrow save failed for ${live.name}:`, err),
+        );
+      }, ESCROW_SAVE_DEBOUNCE_MS),
+    );
+  }
+
   private enforceJailStates(): void {
     for (const session of this.clients.values()) {
       this.applyModeratorJailGate(session);
@@ -2103,6 +2148,8 @@ export class GameServer {
     if (this.playtimeInterval) clearInterval(this.playtimeInterval);
     if (this.dailyRewardActivityInterval) clearInterval(this.dailyRewardActivityInterval);
     if (this.keepaliveInterval) clearInterval(this.keepaliveInterval);
+    for (const timer of this.escrowSaveTimers.values()) clearTimeout(timer);
+    this.escrowSaveTimers.clear();
   }
 
   // Grant playtime reward points to each online account that has been ACTIVE (gave
@@ -3039,6 +3086,15 @@ export class GameServer {
     if (session.jailVisit) this.exitJailVisit(session, false);
     session.left = true;
     this.clients.delete(session.pid);
+    // The leave-flush below (saveCharacterOnLeave) already runs the same
+    // atomic character+market+mail write; drop any still-pending debounced
+    // escrow save for this character so it never fires a redundant write
+    // against a session that is already gone.
+    const escrowTimer = this.escrowSaveTimers.get(session.characterId);
+    if (escrowTimer) {
+      clearTimeout(escrowTimer);
+      this.escrowSaveTimers.delete(session.characterId);
+    }
     this.botDetector.releaseTrackingContext(session.botTrackingContext);
     this.releaseIpSession(session.ip);
     void this.recordOnlineSnapshot();
@@ -4797,13 +4853,22 @@ export class GameServer {
           Number.isFinite(msg.price)
         ) {
           sim.marketList(msg.item, msg.count, msg.price, pid);
+          // Escrows the listed goods out of this character's bags into the
+          // shared market blob: flush both promptly (see scheduleEscrowSave).
+          this.scheduleEscrowSave(session);
         }
         break;
       case 'market_buy':
-        if (typeof msg.id === 'number') sim.marketBuy(msg.id, pid);
+        if (typeof msg.id === 'number') {
+          sim.marketBuy(msg.id, pid);
+          this.scheduleEscrowSave(session);
+        }
         break;
       case 'market_cancel':
-        if (typeof msg.id === 'number') sim.marketCancel(msg.id, pid);
+        if (typeof msg.id === 'number') {
+          sim.marketCancel(msg.id, pid);
+          this.scheduleEscrowSave(session);
+        }
         break;
       case 'market_collect':
         sim.marketCollect(pid);
@@ -4865,6 +4930,9 @@ export class GameServer {
             items,
             pid,
           );
+          // Escrows coin/items out of the sender's bags into the shared mail
+          // blob: flush both promptly (see scheduleEscrowSave).
+          this.scheduleEscrowSave(session);
           break;
         }
         // Offline recipient: resolve against the character DB (realm-scoped),
@@ -4901,13 +4969,17 @@ export class GameServer {
               items,
               pid,
             );
+            this.scheduleEscrowSave(session);
             session.selfHeavyDirty = true;
           })
           .catch((err) => console.error('mail send resolve failed:', err));
         break;
       }
       case 'mail_take':
-        if (typeof msg.id === 'number') sim.mailTake(msg.id, pid);
+        if (typeof msg.id === 'number') {
+          sim.mailTake(msg.id, pid);
+          this.scheduleEscrowSave(session);
+        }
         break;
       case 'mail_delete':
         if (typeof msg.id === 'number') sim.mailDelete(msg.id, pid);
