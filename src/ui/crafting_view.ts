@@ -119,6 +119,10 @@ function countInInventory(inventory: readonly InvSlot[], itemId: string): number
   return n;
 }
 
+/** The two per-item inventory facts a reagent row needs (see the memo in
+ *  buildCraftingView). */
+type ReagentFacts = { have: number; selfSigned: boolean };
+
 /**
  * Build the structured crafting view from raw inputs: the recipe content list,
  * the local player's inventory, the item table (for display name/icon/
@@ -151,16 +155,36 @@ export function buildCraftingView(
   // One mutable copy for the sim-side pure functions (their CraftSkills
   // parameter is mutable-typed); they never write it, this is typing only.
   const skills = { ...craftSkills };
+  // Every known recipe is rowed on each rebuild and recipes share reagents
+  // (a craft's recipes pull from the same ore/flux pool), so the two
+  // O(inventory) probes per reagent (stack count plus the #1145 self-signed
+  // check) memoize per itemId. Only the per-ITEM facts are cached, never the
+  // required count (that also depends on the recipe: its professionId and
+  // this reagent's listed count), and the cache lives only for this one
+  // build, so a rebuild re-reads the live inventory through the same
+  // single-surface helpers.
+  const reagentFacts = new Map<string, ReagentFacts>();
+  const factsFor = (itemId: string): ReagentFacts => {
+    let facts = reagentFacts.get(itemId);
+    if (!facts) {
+      facts = {
+        have: countInInventory(inventory, itemId),
+        selfSigned: playerName !== null && holdsSelfSignedInstance(inventory, playerName, itemId),
+      };
+      reagentFacts.set(itemId, facts);
+    }
+    return facts;
+  };
   const rows: CraftingRecipeRow[] = recipes.map((recipe) => {
     const reagentRows: CraftingReagentRow[] = recipe.reagents.map((reagent) => {
-      const have = countInInventory(inventory, reagent.itemId);
+      const { have, selfSigned } = factsFor(reagent.itemId);
       // The requirement the sim actually charges: the SAME shared
       // requiredReagentCountFor the resolver's availability check and
       // consumption use (crafting.ts, #1134 specialization discount composed
       // with the #1145 self-signed reduction), so the displayed count and the
       // Craft gate can never diverge from what a craft consumes.
       const required = requiredReagentCountFor(
-        playerName !== null && holdsSelfSignedInstance(inventory, playerName, reagent.itemId),
+        selfSigned,
         reagent,
         skills,
         recipe.professionId,

@@ -232,6 +232,81 @@ describe('buildCraftingView discounted reagent requirements (#1134/#1145)', () =
       );
     }
   });
+
+  it('a shared reagent keeps per-recipe required counts (memoized facts are per item, not per row)', () => {
+    // Two recipes in ONE build pull the same reagent, so the inventory probes
+    // (have, self-signed) resolve once for the pair, but required must still
+    // differ per recipe: it also depends on the recipe's professionId, and
+    // only cooking is specialized here. A memo that cached the required
+    // count per itemId would collapse these to one value and fail.
+    const items = table(
+      item('bone_fragments'),
+      item('recipe_disc_a_result'),
+      item('recipe_disc_b_result'),
+    );
+    const inventory: InvSlot[] = [
+      { itemId: 'bone_fragments', count: 4, instance: { signer: PLAYER } },
+    ];
+    const view = buildCraftingView(
+      [
+        recipe('recipe_disc_a', [{ itemId: 'bone_fragments', count: 4 }]),
+        {
+          ...recipe('recipe_disc_b', [{ itemId: 'bone_fragments', count: 4 }]),
+          professionId: 'weaponcrafting',
+        },
+      ],
+      inventory,
+      items,
+      specializedSkills,
+      noIdentity,
+      new Set<StationType>(),
+      PLAYER,
+    );
+    const [cookingRow, weaponRow] = view.recipes;
+    // Cooking is specialized AND self-signed: 4 to 3, then floor(3 * 0.8) = 2.
+    expect(cookingRow.reagents[0]).toMatchObject({ required: 2, have: 4, satisfied: true });
+    // Weaponcrafting is not specialized: the self-signed reduction alone, 4 to 3.
+    expect(weaponRow.reagents[0]).toMatchObject({ required: 3, have: 4, satisfied: true });
+    expect(cookingRow.craftable).toBe(true);
+    expect(weaponRow.craftable).toBe(true);
+  });
+
+  it('cache-hit rows stay consistent: same profession shares identical facts, other reagents stay independent', () => {
+    // Three recipes in one build: two same-profession rows sharing a reagent
+    // must render identical have/required, and a third recipe's different
+    // reagent must keep its own facts (the memo keys by itemId only).
+    const items = table(
+      item('bone_fragments'),
+      item('linen_scrap'),
+      item('recipe_disc_c_result'),
+      item('recipe_disc_d_result'),
+      item('recipe_disc_e_result'),
+    );
+    const inventory: InvSlot[] = [
+      { itemId: 'bone_fragments', count: 3 },
+      { itemId: 'linen_scrap', count: 1 },
+    ];
+    const view = buildCraftingView(
+      [
+        recipe('recipe_disc_c', [{ itemId: 'bone_fragments', count: 4 }]),
+        recipe('recipe_disc_d', [{ itemId: 'bone_fragments', count: 4 }]),
+        recipe('recipe_disc_e', [{ itemId: 'linen_scrap', count: 3 }]),
+      ],
+      inventory,
+      items,
+      specializedSkills,
+      noIdentity,
+      new Set<StationType>(),
+      PLAYER,
+    );
+    const [first, second, third] = view.recipes;
+    // Same profession, same unsigned reagent: identical rows, floor(4 * 0.8) = 3.
+    expect(first.reagents[0]).toMatchObject({ required: 3, have: 3, satisfied: true });
+    expect(second.reagents[0]).toMatchObject({ required: 3, have: 3, satisfied: true });
+    // A different reagent keeps independent facts: floor(3 * 0.8) = 2 against have 1.
+    expect(third.reagents[0]).toMatchObject({ required: 2, have: 1, satisfied: false });
+    expect(third.craftable).toBe(false);
+  });
 });
 
 describe('buildCraftingView combo-recipe gate (#1132 review)', () => {
