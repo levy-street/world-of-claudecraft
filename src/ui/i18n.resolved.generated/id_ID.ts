@@ -1588,6 +1588,7 @@ export const id_ID: EnTranslations = {
       "victoryRush": "Terjangan Kemenangan siap digunakan",
       "maxHpPct": "Meningkatkan nyawa maksimum sebesar {pct}%",
       "temporalHourglass": "Kebal dan tidak dapat bertindak; memulihkan kesehatan dan mempercepat pemulihan jeda. Klik kanan untuk membatalkan.",
+      "temporalEcho": "Part of the Arcane damage you deal is drawn back through the echo to heal them",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
       "combustionCrit": "Mantra Api-mu selalu menghasilkan serangan kritis",
       "overloadNext": "Mantra berikutmu diperkuat {pct}% namun menghabiskan 50% lebih banyak mana",

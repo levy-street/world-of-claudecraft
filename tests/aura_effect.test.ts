@@ -222,4 +222,15 @@ describe('auraEffectDescriptor', () => {
       nums: {},
     });
   });
+
+  it('describes the Temporal Echo mark by its Arcane-to-healing conversion', () => {
+    // The mark's aura value is a placeholder 1 (types.ts): the conversion rate is a
+    // constant read at damage time and differs for the group echo, so the summary is
+    // wording-only with no rate, and never null (the bug: a blank buff tooltip).
+    expect(desc({ id: 'temporal_echo', kind: 'temporal_echo', value: 1 })).toEqual({
+      key: 'hudChrome.auraEffect.temporalEcho',
+    });
+    // The group (Cascada) echo rides the same kind, so it resolves the same summary.
+    expect(desc({ id: 'temporal_echo', kind: 'temporal_echo', value: 1 })).not.toBeNull();
+  });
 });

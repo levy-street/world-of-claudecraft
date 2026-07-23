@@ -1588,6 +1588,7 @@ export const sv_SE: EnTranslations = {
       "victoryRush": "Segerrus är redo",
       "maxHpPct": "Ökar maximal hälsa med {pct}%",
       "temporalHourglass": "Immun och oförmögen att handla; återställer hälsa och accelererar nedkylningsåterhämtning. Högerklicka för att avbryta.",
+      "temporalEcho": "Part of the Arcane damage you deal is drawn back through the echo to heal them",
       "tongues": "Erhöht Zauberzeit um {pct}%",
       "combustionCrit": "Dina Eld-besvärjelser kritikträffar alltid",
       "overloadNext": "Din nästa besvärjelse förstärks med {pct}% men kostar 50% mer mana",

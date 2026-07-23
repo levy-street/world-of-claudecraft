@@ -458,6 +458,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_hourglass.name': '懸停沙漏',
   'entities.abilities.temporal_hourglass.description':
     '在選定位置放置一個時間沙漏。置於敵人腳下時，在 PvE 中使其懸停 {hostilePveDuration} 秒，在 PvP 中懸停 {hostilePvpDuration} 秒；受到任何傷害都會解除效果。置於自己或隊伍盟友腳下時，進入 {duration} 秒的停滯，免疫傷害且無法行動，恢復 {healing}% 最大生命值，並使自己的冷卻恢復速度提高 {selfCooldownRecovery}%，盟友提高 {allyCooldownRecovery}%。若位置為空，沙漏會等待 {groundDuration} 秒並影響第一個踩上去的有效單位。增益光環可手動移除。',
+  'hudChrome.auraEffect.temporalEcho': '你造成的部分秘法傷害會透過回響被引導回來，治療他們。',
   'hudChrome.auraEffect.temporalHourglass':
     '免疫傷害且無法行動；恢復生命並加速冷卻。按右鍵可取消。',
   'hudChrome.auth.appleLoginCta': '透過 Apple 繼續',

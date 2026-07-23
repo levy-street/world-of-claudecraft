@@ -1588,6 +1588,7 @@ export const fr_CA: EnTranslations = {
       "victoryRush": "Élan de victoire est prêt",
       "maxHpPct": "Accroît les points de vie maximum de {pct}%",
       "temporalHourglass": "Immunisé et incapable d'agir ; restaure la vie et accélère la récupération des temps de recharge. Clic droit pour annuler.",
+      "temporalEcho": "Part of the Arcane damage you deal is drawn back through the echo to heal them",
       "tongues": "Accroît le temps d'incantation de {pct}%",
       "combustionCrit": "Vos sorts de Feu obtiennent toujours un coup critique",
       "overloadNext": "Votre prochain sort est amplifié de {pct} % mais coûte 50 % de mana en plus",

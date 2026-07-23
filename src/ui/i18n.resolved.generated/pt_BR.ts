@@ -1588,6 +1588,7 @@ export const pt_BR: EnTranslations = {
       "victoryRush": "Ímpeto da Vitória está pronto",
       "maxHpPct": "Aumenta a vida máxima em {pct}%",
       "temporalHourglass": "Imune e incapaz de agir; restaura vida e acelera a recuperação de recarga. Clique com o botão direito para cancelar.",
+      "temporalEcho": "Part of the Arcane damage you deal is drawn back through the echo to heal them",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
       "combustionCrit": "Seus feitiços de Fogo sempre causam acerto crítico",
       "overloadNext": "Seu próximo feitiço é amplificado em {pct}%, mas custa 50% mais mana",

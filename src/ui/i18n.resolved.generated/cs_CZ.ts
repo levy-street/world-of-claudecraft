@@ -1588,6 +1588,7 @@ export const cs_CZ: EnTranslations = {
       "victoryRush": "Vítězný nápor je připraven",
       "maxHpPct": "Zvyšuje maximální zdraví o {pct} %",
       "temporalHourglass": "Nezranitelný/á a neschopný/á jednat; obnovuje zdraví a urychluje obnovu cooldownu. Klikni pravým tlačítkem pro zrušení.",
+      "temporalEcho": "Part of the Arcane damage you deal is drawn back through the echo to heal them",
       "tongues": "Zvyšuje dobu sesílání o {pct} %",
       "combustionCrit": "Tvoje ohnivá kouzla vždy kriticky zasáhnou",
       "overloadNext": "Tvoje příští kouzlo je posíleno o {pct} %, ale stojí o 50 % více many",

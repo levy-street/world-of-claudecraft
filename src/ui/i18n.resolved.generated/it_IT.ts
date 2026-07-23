@@ -1588,6 +1588,7 @@ export const it_IT: EnTranslations = {
       "victoryRush": "Impeto della Vittoria è pronto",
       "maxHpPct": "Aumenta la salute massima del {pct}%",
       "temporalHourglass": "Immune e impossibilitato ad agire; ripristina la salute e accelera il recupero dei tempi di recupero. Clic destro per annullare.",
+      "temporalEcho": "Part of the Arcane damage you deal is drawn back through the echo to heal them",
       "tongues": "Aumenta il tempo di lancio del {pct}%",
       "combustionCrit": "I tuoi incantesimi del Fuoco colpiscono sempre criticamente",
       "overloadNext": "Il prossimo incantesimo è amplificato del {pct}% ma costa il 50% di mana in più",

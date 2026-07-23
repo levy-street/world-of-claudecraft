@@ -1588,6 +1588,7 @@ export const nl_NL: EnTranslations = {
       "victoryRush": "Overwinningsroes is gereed",
       "maxHpPct": "Verhoogt maximale gezondheid met {pct}%",
       "temporalHourglass": "Immuun en niet in staat te handelen; herstelt gezondheid en versnelt afkoeltijdherstel. Klik met rechts om te annuleren.",
+      "temporalEcho": "Part of the Arcane damage you deal is drawn back through the echo to heal them",
       "tongues": "Erhöht Zauberzeit um {pct}%",
       "combustionCrit": "Je Vuurspreuken treffen altijd kritiek",
       "overloadNext": "Je volgende spreuk wordt met {pct}% versterkt maar kost 50% meer mana",

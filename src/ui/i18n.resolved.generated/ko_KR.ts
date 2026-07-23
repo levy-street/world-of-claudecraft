@@ -1588,6 +1588,7 @@ export const ko_KR: EnTranslations = {
       "victoryRush": "연전연승을 사용할 수 있습니다",
       "maxHpPct": "최대 생명력이 {pct}% 증가합니다",
       "temporalHourglass": "피해에 면역이고 행동할 수 없습니다. 생명력을 회복하고 재사용 대기시간을 가속합니다. 우클릭으로 취소할 수 있습니다.",
+      "temporalEcho": "당신이 입히는 비전 피해의 일부가 잔향을 통해 되돌아와 대상을 치유합니다.",
       "tongues": "시전 시간을 {pct}% 증가시킵니다",
       "combustionCrit": "화염 주문이 항상 치명타로 적중합니다",
       "overloadNext": "다음 주문이 {pct}% 강화되지만 마나 소모가 50% 증가합니다",

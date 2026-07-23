@@ -1588,6 +1588,7 @@ export const tr_TR: EnTranslations = {
       "victoryRush": "Zafer Atılımı hazır",
       "maxHpPct": "Azami canı %{pct} artırır",
       "temporalHourglass": "Bağışık ve eylem yapamaz; canı yeniler ve bekleme süresi iyileşmesini hızlandırır. İptal etmek için sağ tıkla.",
+      "temporalEcho": "Part of the Arcane damage you deal is drawn back through the echo to heal them",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
       "combustionCrit": "Ateş büyülerin her zaman kritik vurur",
       "overloadNext": "Bir sonraki büyün {pct}% amplified edilir ama %50 daha fazla mana harcar",

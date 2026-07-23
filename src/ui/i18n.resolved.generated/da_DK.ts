@@ -1588,6 +1588,7 @@ export const da_DK: EnTranslations = {
       "victoryRush": "Sejrsrus er klar",
       "maxHpPct": "Øger maksimalt helbred med {pct}%",
       "temporalHourglass": "Immun og ude af stand til at handle; gendanner helbred og fremskynder nedkølingsgendannelse. Højreklik for at annullere.",
+      "temporalEcho": "Part of the Arcane damage you deal is drawn back through the echo to heal them",
       "tongues": "Erhöht Zauberzeit um {pct}%",
       "combustionCrit": "Dine Ild-trolddomme rammer altid kritisk",
       "overloadNext": "Din næste trolddom er forstærket med {pct}% men koster 50% mere mana",

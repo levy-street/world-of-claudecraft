@@ -462,6 +462,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_hourglass.name': 'Песочные часы остановки',
   'entities.abilities.temporal_hourglass.description':
     'Помещает временные песочные часы в выбранную точку. Под врагом они останавливают его на {hostilePveDuration} сек. в PvE или на {hostilePvpDuration} сек. в PvP; любой урон снимает эффект. Под вами или союзником из группы они создают стазис на {duration} сек., защищают от урона, запрещают действовать и восстанавливают {healing}% максимального здоровья. Ваши способности восстанавливаются на {selfCooldownRecovery}% быстрее, а способности союзника на {allyCooldownRecovery}% быстрее. На пустой земле часы ждут {groundDuration} сек. и воздействуют на первую допустимую цель, которая на них наступит. Положительный эффект можно снять вручную.',
+  'hudChrome.auraEffect.temporalEcho':
+    'Часть наносимого вами урона тайной магии возвращается через эхо и исцеляет цель.',
   'hudChrome.auraEffect.temporalHourglass':
     'Невосприимчивость к урону и невозможность действовать; восстанавливает здоровье и ускоряет способности. Щелкните правой кнопкой, чтобы отменить.',
   'hudChrome.auth.appleLoginCta': 'Продолжить с Apple',

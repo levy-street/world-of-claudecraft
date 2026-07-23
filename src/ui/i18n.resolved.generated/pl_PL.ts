@@ -1588,6 +1588,7 @@ export const pl_PL: EnTranslations = {
       "victoryRush": "Zryw zwycięstwa jest gotowy",
       "maxHpPct": "Zwiększa maksymalne zdrowie o {pct}%",
       "temporalHourglass": "Odporny i niezdolny do działania; przywraca zdrowie i przyspiesza regenerację czasu odnowienia. Kliknij prawym przyciskiem myszy, aby anulować.",
+      "temporalEcho": "Part of the Arcane damage you deal is drawn back through the echo to heal them",
       "tongues": "Erhöht Zauberzeit um {pct}%",
       "combustionCrit": "Twoje czary Ognia zawsze trafiają krytycznie",
       "overloadNext": "Twój następny czar jest wzmocniony o {pct}%, ale kosztuje 50% many więcej",

@@ -1588,6 +1588,7 @@ export const zh_CN: EnTranslations = {
       "victoryRush": "乘胜追击已就绪",
       "maxHpPct": "最大生命值提高 {pct}%",
       "temporalHourglass": "免疫伤害且无法行动；恢复生命并加速冷却。右键点击可取消。",
+      "temporalEcho": "你造成的部分奥术伤害会通过回响被引导回来，治疗他们。",
       "tongues": "施法时间延长 {pct}%",
       "combustionCrit": "你的火焰法术必定造成致命一击",
       "overloadNext": "下一个法术效果提高{pct}%，但法力消耗增加50%",

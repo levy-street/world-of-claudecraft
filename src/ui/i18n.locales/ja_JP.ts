@@ -462,6 +462,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_hourglass.name': '停止の砂時計',
   'entities.abilities.temporal_hourglass.description':
     '選択地点に時の砂時計を置きます。敵の足元では PvE で {hostilePveDuration} 秒、PvP で {hostilePvpDuration} 秒間停止させ、ダメージを受けると解除されます。自分またはパーティの味方の足元では {duration} 秒間の停滞となり、ダメージを受けず行動不能になり、最大体力の {healing}% を回復します。自分のクールダウンは {selfCooldownRecovery}%、味方は {allyCooldownRecovery}% 速く回復します。空の地面に置くと {groundDuration} 秒間待機し、最初に踏んだ有効な対象へ効果を与えます。強化効果は手動で解除できます。',
+  'hudChrome.auraEffect.temporalEcho':
+    'あなたが与える秘術ダメージの一部が残響を通じて引き戻され、対象を回復します。',
   'hudChrome.auraEffect.temporalHourglass':
     'ダメージを受けず行動不能になります。体力を回復し、クールダウンを加速します。右クリックで解除できます。',
   'hudChrome.auth.appleLoginCta': 'Appleで続ける',

@@ -312,6 +312,14 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       // Rallying Cry: value is the temporary max-health fraction.
       return { key: `${KEY}.maxHpPct`, nums: { pct: pctFromFrac(a.value) } };
 
+    // Chronomancy Temporal Echo mark: the ongoing effect is the Arcane-to-healing
+    // conversion (the small initial heal is a one-time cast effect, not the mark).
+    // The conversion rate lives on a constant read at damage time, not the aura
+    // value (types.ts), and differs for the group echo, so the summary states the
+    // mechanic without a rate rather than misciting one number for every mark.
+    case 'temporal_echo':
+      return { key: `${KEY}.temporalEcho` };
+
     default:
       return null;
   }

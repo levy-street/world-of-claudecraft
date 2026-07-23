@@ -1588,6 +1588,7 @@ export const ja_JP: EnTranslations = {
       "victoryRush": "勝利の追撃が使用可能",
       "maxHpPct": "最大体力を{pct}%上昇させる",
       "temporalHourglass": "ダメージを受けず行動不能になります。体力を回復し、クールダウンを加速します。右クリックで解除できます。",
+      "temporalEcho": "あなたが与える秘術ダメージの一部が残響を通じて引き戻され、対象を回復します。",
       "tongues": "詠唱時間を{pct}%増加させる",
       "combustionCrit": "火炎呪文が必ずクリティカルになる",
       "overloadNext": "次の呪文の効果が{pct}%増加するが、マナ消費が50%増える",

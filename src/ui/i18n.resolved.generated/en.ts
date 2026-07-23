@@ -1588,6 +1588,7 @@ export const en: EnTranslations = {
       "victoryRush": "Victory Rush is ready",
       "maxHpPct": "Increases maximum health by {pct}%",
       "temporalHourglass": "Immune and unable to act; restores health and accelerates cooldown recovery. Right-click to cancel.",
+      "temporalEcho": "Part of the Arcane damage you deal is drawn back through the echo to heal them",
       "tongues": "Increases casting time by {pct}%",
       "combustionCrit": "Your Fire spells always critically strike",
       "overloadNext": "Your next spell is amplified by {pct}% but costs 50% more mana",

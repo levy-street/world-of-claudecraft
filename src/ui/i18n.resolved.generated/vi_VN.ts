@@ -1588,6 +1588,7 @@ export const vi_VN: EnTranslations = {
       "victoryRush": "Đà Chiến Thắng đã sẵn sàng",
       "maxHpPct": "Tăng máu tối đa thêm {pct}%",
       "temporalHourglass": "Miễn nhiễm và không thể hành động; hồi phục máu và tăng tốc phục hồi thời gian hồi chiêu. Nhấp chuột phải để hủy bỏ.",
+      "temporalEcho": "Part of the Arcane damage you deal is drawn back through the echo to heal them",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
       "combustionCrit": "Các phép Lửa của bạn luôn chí mạng",
       "overloadNext": "Phép tiếp theo của bạn được khuếch đại {pct}% nhưng tốn thêm 50% mana",

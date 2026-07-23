@@ -1588,6 +1588,7 @@ export const de_DE: EnTranslations = {
       "victoryRush": "Siegesrausch ist bereit",
       "maxHpPct": "Erhöht maximale Gesundheit um {pct}%",
       "temporalHourglass": "Immun und handlungsunfähig; stellt Gesundheit wieder her und beschleunigt die Abklingzeit-Regeneration. Rechtsklick zum Abbrechen.",
+      "temporalEcho": "Part of the Arcane damage you deal is drawn back through the echo to heal them",
       "tongues": "Erhöht Zauberzeit um {pct}%",
       "combustionCrit": "Deine Feuerzauber treffen immer kritisch",
       "overloadNext": "Dein nächster Zauber wird um {pct}% verstärkt, kostet aber 50% mehr Mana",
