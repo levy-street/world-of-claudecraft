@@ -1075,9 +1075,14 @@ export class SocialService {
       this.motdResult(actor.characterId, 'notOfficer');
       return;
     }
-    const text = String(rawText ?? '')
+    let text = String(rawText ?? '')
       .trim()
       .slice(0, GUILD_MOTD_MAX);
+    // The clamp slices UTF-16 code units, so a boundary landing inside a
+    // surrogate pair (emoji-class codepoint) would store a lone surrogate that
+    // pg encodes as U+FFFD; drop the orphaned half instead.
+    const last = text.charCodeAt(text.length - 1);
+    if (last >= 0xd800 && last <= 0xdbff) text = text.slice(0, -1);
     await this.db.setGuildMotd(membership.guildId, text, text === '' ? '' : actor.name);
     this.motdResult(actor.characterId, 'set');
     await this.pushGuild(membership.guildId);

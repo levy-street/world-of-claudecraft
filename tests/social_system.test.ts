@@ -1356,6 +1356,17 @@ describe('guild billboard (motd)', () => {
     expect(snap.guild?.motd).toHaveLength(240);
   });
 
+  it('never stores a lone surrogate when the clamp lands inside an astral pair', async () => {
+    const h = await seatedGuild();
+    // 239 ascii chars + an astral codepoint (2 UTF-16 units): the 240 slice
+    // would cut the pair in half; the stored text drops the orphaned half.
+    await h.svc.guildSetMotd(h.actor(2), `${'x'.repeat(239)}\u{1F600}`);
+    const snap = await h.svc.snapshot(2);
+    expect(snap.guild?.motd).toBe('x'.repeat(239));
+    // and a well-formed message is untouched
+    expect([...(snap.guild?.motd ?? '')].every((c) => !/[\uD800-\uDFFF]/.test(c))).toBe(true);
+  });
+
   it('an empty (or whitespace-only) message clears the billboard and its attribution', async () => {
     const h = await seatedGuild();
     await h.svc.guildSetMotd(h.actor(2), 'Something');

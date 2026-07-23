@@ -68,7 +68,7 @@ function eventsOf(fc: FakeClient): any[] {
 // gates let the command through to the service at all (the service's own
 // rank/clamp logic is covered by tests/social_system.test.ts).
 function spyMotd(server: GameServer) {
-  const spy = vi.fn(async () => {});
+  const spy = vi.fn(async (_actor: { characterId: number; name: string }, _text: string) => {});
   (server as any).social.guildSetMotd = spy;
   return spy;
 }
