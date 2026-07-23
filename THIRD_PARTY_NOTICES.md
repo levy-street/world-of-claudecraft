@@ -7,6 +7,22 @@ This file records the third-party runtime dependency notices added for the
 wallet-linking feature. It is intentionally scoped to those new dependencies;
 the complete dependency graph remains pinned in `pnpm-lock.yaml`.
 
+## poker-ts
+
+The deterministic poker engine under `src/sim/poker/engine/` adapts the table
+model and public concepts from poker-ts 1.5.0, commit
+`1214cd8fc77ad78728be49cff477e19475abba7b`, by Claudijo Borovic. The adapted
+implementation replaces Node-only randomness and assertions, fixes hand and
+no-limit betting rules, adds strict persisted state validation, and exposes
+viewer-scoped snapshots for the shared browser, server, and headless sim.
+
+poker-ts is an MIT-licensed TypeScript port of Janko Dedic's MIT-licensed C++
+Poker library.
+
+License copy:
+
+- `third_party/licenses/poker-ts-mit.txt`
+
 ## Reown AppKit
 
 The wallet-linking client uses Reown AppKit. The installed `@reown/*` packages
