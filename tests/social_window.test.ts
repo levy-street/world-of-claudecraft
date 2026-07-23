@@ -11,6 +11,7 @@ const componentsCss = readFileSync(
   new URL('../src/styles/components.css', import.meta.url),
   'utf8',
 );
+const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
 
 describe('social_window: .soc-body layout never uses CSS multicol', () => {
   // Regression for a review finding on the wide-landscape relayout: `.soc-body` is a
@@ -235,5 +236,12 @@ describe('social_window: guild billboard', () => {
     expect(painter).toContain("if (node.dataset.act === 'gmotd-save') {");
     expect(painter).toContain(`input[data-field="gmotd"]`);
     expect(painter).toContain('this.saveBillboard()');
+  });
+
+  it('the edit input joins the mobile 40px touch floor (with .soc-add input)', () => {
+    // The mobile min-height/16px group in hud.mobile.css covers the footer
+    // inputs; the billboard edit input lives in the body and must be listed
+    // there too or it renders ~28px tall under coarse pointers.
+    expect(mobileCss).toContain('body.mobile-touch .soc-billboard-edit input');
   });
 });

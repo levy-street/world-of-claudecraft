@@ -3021,6 +3021,7 @@
     display: none;
   }
   body.mobile-touch .soc-add input,
+  body.mobile-touch .soc-billboard-edit input,
   body.mobile-touch .trade-money input {
     min-height: 40px;
     font-size: 16px;
