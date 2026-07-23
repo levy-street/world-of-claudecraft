@@ -1453,9 +1453,18 @@ export const ZONE1_QUEST_ORDER = [
 // ---------------------------------------------------------------------------
 
 export const ZONE1_CAMPS: CampDef[] = [
-  // Wolves: north woods
-  { mobId: 'forest_wolf', center: { x: -15, z: 55 }, radius: 22, count: 7 },
-  { mobId: 'forest_wolf', center: { x: 20, z: 70 }, radius: 20, count: 6 },
+  // Wolves: north woods. The two camps near the graveyard corpse-run used to be
+  // dense (7 and 6) AND overlapping, so a level 1-2 player who corpse-rezzed at
+  // 50% HP walked straight back into a 13-wolf blob whose packFrenzy chain-killed
+  // them (see #1908). They are thinned to 4 each and pulled apart so their spawn
+  // discs no longer overlap; the surplus pack moves deep north near Brightwood
+  // Glade, off the newbie corpse-run line. The zone's total wolf headcount is
+  // unchanged (4 + 4 + 5 = 13), which keeps world-gen's draw order byte-identical
+  // and every seed-pinned spawn/delve roll stable (same rule as the tail-appended
+  // ZONE1_CHAPEL_CAMPS below).
+  { mobId: 'forest_wolf', center: { x: -32, z: 50 }, radius: 22, count: 4 },
+  { mobId: 'forest_wolf', center: { x: 24, z: 64 }, radius: 20, count: 4 },
+  { mobId: 'forest_wolf', center: { x: 8, z: 130 }, radius: 16, count: 5 },
   { mobId: 'old_greyjaw', center: { x: 0, z: 95 }, radius: 8, count: 1 },
   // Boars: east meadow
   { mobId: 'wild_boar', center: { x: 55, z: 12 }, radius: 22, count: 6 },
