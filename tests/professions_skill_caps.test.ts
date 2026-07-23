@@ -1,4 +1,4 @@
-// Professions 2.0 Phase 12c stage 2: enforced per-profession skill caps as
+// Professions 2.0 stage 2: enforced per-profession skill caps as
 // content data. Every profession record carries maxSkill (crafts and
 // enchanting 125, mining/logging/herbalism 100, fishing 200), enforced at all
 // four arms: gainCraftSkill (gain time, covering crafting, enchanting, and
@@ -42,7 +42,7 @@ const mustMeta = (sim: Sim, pid: number): PlayerMeta => {
   return meta;
 };
 
-describe('cap literals as content data (Phase 12c stage 2)', () => {
+describe('cap literals as content data', () => {
   it('every craft on the ring, enchanting included, caps at 125', () => {
     for (const craft of CRAFT_RING) expect(craft.maxSkill).toBe(125);
   });

@@ -84,7 +84,7 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
     }
   });
 
-  it('crafting station prop assets (Professions 2.0 Phase 9)', () => {
+  it('crafting station prop assets (Professions 2.0)', () => {
     for (const url of Object.values(stationsPreloadInternalsForTest.assetUrl)) {
       expectAssetExistsAndManifested(url);
     }

@@ -299,7 +299,7 @@ export function recalcPlayerStats(
     }
     // Instance stat bonus: additive on top of the item's own base stats, from
     // this specific instance's rolled.stats: an enchant's bonus
-    // (src/sim/professions/enchanting.ts applyEnchant), a Phase 2 masterwork
+    // (src/sim/professions/enchanting.ts applyEnchant), a masterwork
     // copy's baked tier-delta bonus (src/sim/professions/masterwork.ts), or
     // both merged. The equip path carries the consumed inventory instance into
     // equipmentInstance (items.ts equipItem), so either applies on equip. A

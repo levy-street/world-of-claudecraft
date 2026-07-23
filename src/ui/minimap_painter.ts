@@ -419,7 +419,7 @@ export class MinimapPainter {
           ctx.stroke();
           break;
         case 'gather-node':
-          // Tool-tier lock (Professions 2.0 Phase 12) composes with the
+          // Tool-tier lock (Professions 2.0) composes with the
           // respawn state: a locked node keeps the ready/cooldown silhouette
           // (radius + outline) but the locked tint replaces the state color,
           // so both dimensions stay readable at once. Actionable info on

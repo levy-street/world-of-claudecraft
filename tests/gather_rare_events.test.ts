@@ -34,7 +34,7 @@ function mustNode(nodeId: string) {
   return node;
 }
 
-// Phase 12b: harvestNode STARTS a gather cast; the draws, grant, and events
+// harvestNode STARTS a gather cast; the draws, grant, and events
 // land at completion. The hunts below advance the shared rng stream only, so
 // completion is driven synchronously the way the lifecycle does it (clear the
 // cast fields, then route to ctx.completeGatherCast): zero world ticks, the
@@ -48,11 +48,12 @@ function completeCastNow(sim: Sim, pid: number) {
   sim.ctx.completeGatherCast(p, meta);
 }
 
-describe('gather rare events: cadence knob + flavor mapping (Phase 4)', () => {
+describe('gather rare events: cadence knob + flavor mapping', () => {
   it('pins the shared cadence and yield constants', () => {
-    // Load-bearing tuning literals (state.md: roughly 1 rare event per zone
-    // per 20 minutes at ~90 harvests per zone per 20 minutes); Phase 15 tunes
-    // per family, so a change must consciously re-pin here.
+    // Load-bearing tuning literals (roughly 1 rare event per zone per 20
+    // minutes at ~90 harvests per zone per 20 minutes); the cadence is ONE
+    // shared knob (a per-family split is deferred), so a change must
+    // consciously re-pin here.
     expect(GATHER_RARE_EVENT_CHANCE).toBe(1 / 90);
     expect(GATHER_RARE_EVENT_YIELD_MULT).toBe(5);
   });
@@ -260,14 +261,14 @@ describe('rare events through Sim.harvestNode (all three flavors)', () => {
       if (rare && rare.type === 'gatherRareEvent') {
         const gather = events.find((e) => e.type === 'gatherResult');
         if (gather?.type !== 'gatherResult') throw new Error('expected gatherResult on the hit');
-        return { sim, pid, meta, node, rare, gather, iteration: i };
+        return { sim, pid, meta, node, rare, gather, events, iteration: i };
       }
     }
     throw new Error(`no rare event within 2000 harvests of ${nodeId}`);
   }
 
   it('an ore node hit is a pristine vein: zone event, x5 yield, all units signed', () => {
-    const { pid, meta, rare, gather, node } = huntHit('ore_eastbrook_1');
+    const { pid, meta, rare, gather, node, events } = huntHit('ore_eastbrook_1');
     expect(rare.flavor).toBe('pristine_vein');
     expect(rare.nodeType).toBe('ore');
     expect(rare.itemId).toBe('copper_ore');
@@ -285,13 +286,20 @@ describe('rare events through Sim.harvestNode (all three flavors)', () => {
 
     // The yield landed as ONE merged signed stack (forced signing on a common
     // roll: the rare event, not the rarity floor, drives it; identical-payload
-    // stacking, Phase 12d, merges the same-signer units into a single slot).
+    // stacking merges the same-signer units into a single slot).
     const slots = meta.inventory.filter((s) => s.itemId === 'copper_ore');
     expect(slots).toHaveLength(1);
     expect(slots[0].count).toBe(GATHER_RARE_EVENT_YIELD_MULT);
     expect(slots[0].instance?.signer).toBe('Finder');
 
-    // The dormant per-flavor deed mark (Phase 15 registers the deed).
+    // The whole windfall is ONE batched loot line with the x5 suffix, never
+    // one line and cue per unit (the recorded loot-burst polish).
+    const lootLines = events
+      .filter((e) => e.type === 'loot')
+      .map((e) => (e as { text: string }).text);
+    expect(lootLines).toEqual(['You receive: Copper Ore x5.']);
+
+    // The per-flavor deed mark (deeds.ts registers a deed per flavor).
     expect(meta.deedStats.visited.has('gather_event:pristine_vein')).toBe(true);
   });
 
@@ -372,7 +380,7 @@ describe('rarity-floor signing through Sim.harvestNode', () => {
     const { meta, gather } = huntRarity((rarity, rareEvent) => rareEvent === null && rarity in QTY);
     expect(gather.rareEvent).toBeNull();
     expect(gather.qty).toBe(QTY[gather.rarity]);
-    // Identical-payload stacking (Phase 12d): the same-signer units merge into
+    // Identical-payload stacking: the same-signer units merge into
     // one signed stack at the qtyByRarity count instead of one slot per unit.
     const slots = meta.inventory.filter((s) => s.itemId === 'copper_ore');
     expect(slots).toHaveLength(1);
@@ -443,9 +451,9 @@ describe('grant truncation at the command boundary (full bags)', () => {
       if (gather?.type !== 'gatherResult') throw new Error('expected gatherResult');
       if (gather.rareEvent === null) continue;
       // The hit: resolved qty is at least x5, and identical-payload stacking
-      // (Phase 12d) merges every same-signer unit into the single stack the
+      // merges every same-signer unit into the single stack the
       // one free slot opened, so the windfall no longer truncates per slot
-      // (the pre-12d contract granted one unit per free slot).
+      // (the pre-stacking contract granted one unit per free slot).
       expect(gather.qty).toBeGreaterThanOrEqual(GATHER_RARE_EVENT_YIELD_MULT);
       // The signed grant landed signed: no downgrade notice fires here.
       expect(events.filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
@@ -499,8 +507,9 @@ describe('grant truncation at the command boundary (full bags)', () => {
       const stack = meta.inventory.find((s) => s.itemId === 'copper_ore' && !s.instance);
       expect(gather.qty).toBeGreaterThanOrEqual(1);
       expect(stack?.count).toBe(15 + gather.qty);
-      // Phase 12d: the unsigned fallback tells the player, exactly once, with
-      // the mark-lost arm (the yield survived, the signature did not).
+      // Downgrade notice: the unsigned fallback tells the player, exactly
+      // once, with the mark-lost arm (the yield survived, the signature did
+      // not).
       expect(downgrades).toEqual([{ type: 'gatherDowngrade', pid, surface: 'node', lost: 'mark' }]);
       return;
     }

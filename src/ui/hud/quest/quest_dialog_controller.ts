@@ -78,6 +78,10 @@ interface ProfessionPreviewContent {
 export class QuestDialogController {
   private npcId: number | null = null;
   private detailQuestId: string | null = null;
+  // The profession-intro hint visibility as of the last gossip render (null =
+  // no gossip list currently painted): the one identity-driven row in this
+  // dialog, so it is the whole staleness signature refreshIfChanged watches.
+  private lastIntroHintVisible: boolean | null = null;
   private trap: FocusTrapHandle | null = null;
   private openedAt = 0;
   private voiceNpcId: number | null = null;
@@ -169,6 +173,7 @@ export class QuestDialogController {
     this.deps.element.style.display = 'none';
     this.npcId = null;
     this.detailQuestId = null;
+    this.lastIntroHintVisible = null;
     this.deps.hideTooltip();
     this.trap?.release(restoreFocus);
     this.trap = null;
@@ -183,6 +188,21 @@ export class QuestDialogController {
     const npc = this.deps.world().entities.get(this.npcId);
     if (npc) this.renderGossip(npc);
     else this.close();
+  }
+
+  /** Repaint the open gossip list only when the profession-intro hint's
+   *  visibility flipped under it: online, the cprof identity mirror can land
+   *  AFTER the dialog opened (attunement retires the hint), and no quest
+   *  event fires for that edge. The quest-detail view never shows the hint
+   *  and is left alone; everything else in the gossip list repaints through
+   *  the quest event arms, so an unchanged signature never rebuilds the DOM
+   *  (the dialog holds focus-trapped buttons). */
+  refreshIfChanged(): void {
+    if (this.npcId === null || this.deps.element.style.display !== 'block') return;
+    if (this.detailQuestId !== null || this.lastIntroHintVisible === null) return;
+    const npc = this.deps.world().entities.get(this.npcId);
+    if (!npc) return;
+    if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible) this.refresh();
   }
 
   relocalize(): void {
@@ -233,6 +253,17 @@ export class QuestDialogController {
     this.deps.onOpenChange(true);
   }
 
+  /** The one rule for the intro hint row, shared by the gossip render and the
+   *  staleness probe so the two can never drift. */
+  private introHintVisibleFor(npc: Entity): boolean {
+    const world = this.deps.world();
+    return professionIntroHintVisible(
+      npc.templateId,
+      world.questState(PROF_INTRO_QUEST_ID),
+      world.craftingIdentity.attunedPairs.length > 0,
+    );
+  }
+
   private renderGossip(npc: Entity, closeIfEmpty = false): void {
     const world = this.deps.world();
     const definition = NPCS[npc.templateId];
@@ -256,7 +287,7 @@ export class QuestDialogController {
       )
       .map((progress) => progress.questId);
     const hasVendor = npc.vendorItems.length > 0;
-    // Station master (Professions 2.0 Phase 9): the resident master of a
+    // Station master (Professions 2.0): the resident master of a
     // crafting station (stations content masterNpcId) offers recipe training.
     const hasTraining = isStationMasterNpc(npc.templateId);
     const hasMarket = !!definition?.market;
@@ -292,18 +323,14 @@ export class QuestDialogController {
     const npcTitle = definition ? this.deps.text.npcTitle(definition.id) : '';
     let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(npcName)}<span class="quest-muted"> &lt;${esc(npcTitle)}&gt;</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="qd-text">"${esc(definition ? this.deps.text.npcGreeting(definition.id, world.cfg.playerClass, world.player.name) : t('questUi.dialog.greetingFallback'))}"</div>`;
-    // Locked-quest hint row (Phase 15 QA directed fix): a profession master's
+    // Locked-quest hint row: a profession master's
     // dialog points a pre-q_prof_intro viewer at the intro quest's giver, so
     // the Guild trend letter never lands on a greeting-plus-vendor dead end.
     // Non-interactive, the qd-req hint family; both names arrive through the
     // text port so they localize like every other dialog line.
-    if (
-      professionIntroHintVisible(
-        npc.templateId,
-        world.questState(PROF_INTRO_QUEST_ID),
-        world.craftingIdentity.attunedPairs.length > 0,
-      )
-    ) {
+    const introHintVisible = this.introHintVisibleFor(npc);
+    this.lastIntroHintVisible = introHintVisible;
+    if (introHintVisible) {
       html += `<div class="qd-req" data-prof-intro-hint="1">${esc(
         t('questUi.dialog.profIntroHint', {
           name: this.deps.text.npcName(QUESTS[PROF_INTRO_QUEST_ID].giverNpcId),
@@ -331,7 +358,7 @@ export class QuestDialogController {
     }
     if (hasTraining) {
       html += `<button type="button" class="qd-list-item" data-train="1" aria-label="${esc(t('hudChrome.training.dialogOptionAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.training.dialogOption'))}</button>`;
-      // Maker's Bond unbind service (Professions 2.0 Phase 14b): every
+      // Maker's Bond unbind service (Professions 2.0): every
       // station master offers it beside training (the same isStationMasterNpc
       // gate, so the empty-menu check needs no new arm).
       html += `<button type="button" class="qd-list-item" data-unbind="1" aria-label="${esc(t('hudChrome.unbind.dialogOptionAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.unbind.dialogOption'))}</button>`;
@@ -451,8 +478,8 @@ export class QuestDialogController {
         const preview = buildAttunementPreview(target, identity.craftSkills, identity.switchCount);
         if (!preview) return { text: '', crestUrl: null };
         // The pre-commit picture: majors, hobby, and retained-but-dormant
-        // knowledge, PLUS the escalating make-amends return cost (Phase 14,
-        // closing the 2039 gap). Two complete localized sentences joined, the
+        // knowledge, PLUS the escalating make-amends return cost (closing the
+        // 2039 gap). Two complete localized sentences joined, the
         // combo line + status precedent (crafting_window.ts).
         const base = t('hudChrome.crafting.attunementPreview', {
           title: archetypeTitleText(preview.target),

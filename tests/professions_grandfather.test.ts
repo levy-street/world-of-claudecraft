@@ -1,5 +1,5 @@
-// THE PHASE 9 GATE: the one-time grandfather union that keeps every
-// pre-Phase-9 recipe known to existing characters when the three combo
+// THE GRANDFATHER GATE: the one-time grandfather union that keeps every
+// pre-training recipe known to existing characters when the three combo
 // recipes flip to trainer-taught acquisition. A hand-frozen LEGACY save
 // (no recipesGrandfathered flag, no combo ids) must come out of the load
 // path knowing all 21 pre-training recipes and persist the flag; a FRESH
@@ -11,7 +11,7 @@ import { isRecipeKnown, resolveCraft } from '../src/sim/professions/crafting';
 import { grandfatherKnownRecipes, PRE_TRAINING_RECIPE_IDS } from '../src/sim/professions/training';
 import { type CharacterState, Sim } from '../src/sim/sim';
 
-// The 21 recipe ids that existed BEFORE Phase 9, as LITERALS (9 common, 6
+// The 21 recipe ids that existed BEFORE the training switch, as LITERALS (9 common, 6
 // tool, 3 caster hub, 3 combo): this list is a historical record and must
 // never grow when new recipes are authored, so the pin is spelled out rather
 // than derived from content.
@@ -39,7 +39,7 @@ const EXPECTED_PRE_TRAINING_IDS = [
   'recipe_volatile_flux_elixir',
 ];
 
-// A pre-Phase-9 save, frozen by hand: NO recipesGrandfathered flag, NO combo
+// A pre-training save, frozen by hand: NO recipesGrandfathered flag, NO combo
 // ids in knownRecipes (an empty learned set was the normal state before any
 // drop/quest acquisition content existed), craft skill present. Only the
 // required CharacterState fields plus the ones under test, so this fixture
@@ -75,7 +75,7 @@ function legacySave(): CharacterState {
 }
 
 describe('PRE_TRAINING_RECIPE_IDS (the frozen historical record)', () => {
-  it('is exactly the 21 literal pre-Phase-9 ids, frozen', () => {
+  it('is exactly the 21 literal pre-training ids, frozen', () => {
     expect([...PRE_TRAINING_RECIPE_IDS]).toEqual(EXPECTED_PRE_TRAINING_IDS);
     expect(PRE_TRAINING_RECIPE_IDS).toHaveLength(21);
     expect(Object.isFrozen(PRE_TRAINING_RECIPE_IDS)).toBe(true);
@@ -88,7 +88,7 @@ describe('PRE_TRAINING_RECIPE_IDS (the frozen historical record)', () => {
   });
 
   it('trained-not-known default: every recipe OUTSIDE the record carries a non-empty acquisition', () => {
-    // The Phase 10+ guard: a new recipe with no acquisition list would be
+    // The future-content guard: a new recipe with no acquisition list would be
     // silently known to everyone with no learn step. Today the outside set is
     // empty; the moment content grows, each new entry must carry a list.
     const preTraining = new Set(PRE_TRAINING_RECIPE_IDS);
@@ -96,7 +96,7 @@ describe('PRE_TRAINING_RECIPE_IDS (the frozen historical record)', () => {
       if (preTraining.has(recipe.id)) continue;
       expect(
         recipe.acquisition && recipe.acquisition.length > 0,
-        `${recipe.id} was authored after Phase 9 and must carry a non-empty acquisition list`,
+        `${recipe.id} was authored after the training switch and must carry a non-empty acquisition list`,
       ).toBe(true);
     }
   });
@@ -112,7 +112,7 @@ describe('PRE_TRAINING_RECIPE_IDS (the frozen historical record)', () => {
     }
     // And no OTHER recipe inside the frozen record gained a list: within the
     // 21 pre-training ids the acquisition switch stays scoped to the combos.
-    // Recipes OUTSIDE the record are Phase 10+ content and are required to
+    // Recipes OUTSIDE the record are later content and are required to
     // carry their own non-empty acquisition list (guarded above).
     const preTrainingIds = new Set(PRE_TRAINING_RECIPE_IDS);
     for (const recipe of ALL_RECIPES) {
@@ -150,7 +150,7 @@ describe('grandfatherKnownRecipes (pure, idempotent)', () => {
 });
 
 describe('legacy save load (the one-time union) and persistence', () => {
-  it('loading a pre-Phase-9 save unions all 21 ids and persists recipesGrandfathered true', () => {
+  it('loading a pre-training save unions all 21 ids and persists recipesGrandfathered true', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Legacy', { state: legacySave() });
     const meta = metaOf(sim, pid);
@@ -202,7 +202,7 @@ describe('legacy save load (the one-time union) and persistence', () => {
 
   it('the accepted rollback caveat, pinned: an old-code strip of the flag re-unions on return', () => {
     // A full CURRENT-shape blob (not the sparse fixture): serialize a fresh
-    // Phase 9 character (flag true, nothing learned), then model the
+    // post-switch character (flag true, nothing learned), then model the
     // documented old-code round-trip, which rebuilds CharacterState WITHOUT
     // the unknown recipesGrandfathered key while preserving knownRecipes.
     // Returning to new code must re-run the union: the three combos read
@@ -222,7 +222,7 @@ describe('legacy save load (the one-time union) and persistence', () => {
   });
 
   it('a save WITH the flag and an empty knownRecipes stays empty (no re-union)', () => {
-    // The flag, not the set contents, decides: a post-Phase-9 character who
+    // The flag, not the set contents, decides: a post-switch character who
     // has learned nothing must never be silently handed the combo recipes.
     const state = legacySave();
     state.recipesGrandfathered = true;

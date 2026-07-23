@@ -1,4 +1,4 @@
-// THE PHASE 12c ONE-TIME RESET, ONLINE (QA coverage closure): the offline
+// THE ONE-TIME MASTERY RESET, ONLINE: the offline
 // suite (tests/professions_mastery_reset.test.ts) pins the reset through
 // Sim.addPlayer directly; this suite pins the AUTHORITATIVE SERVER arm, the
 // same blob arriving through GameServer.join, so the one funnel claim (the

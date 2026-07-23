@@ -1,12 +1,12 @@
-// Typed disenchant secondaries (Professions 2.0 Phase 13): the rare-or-better
+// Typed disenchant secondaries (Professions 2.0): the rare-or-better
 // disenchant secondary material, keyed by the disenchanted piece's own material
 // so an armor set and a weapon set feed distinct reagent lines. Armor keys off
 // its armor class (cloth/leather/mail); a weapon keys off its family (a melee
 // bucket yields steel, a caster/ranged haft-or-stock bucket yields timber).
 // Below `rare` (and for a piece with no typed material, e.g. jewelry, which
 // carries no armor class) there is no typed secondary, so the caller grants
-// only the universal ladder material and stays byte-identical to the pre-Phase
-// 13 yield.
+// only the universal ladder material and stays byte-identical to the
+// pre-typed-secondary yield.
 //
 // A pure `src/sim` leaf: no SimContext, no rng, no clock, no DOM/Three/render/
 // ui/game/net imports (enforced by tests/architecture.test.ts). The
@@ -30,7 +30,7 @@ export const ARMOR_SECONDARY_BY_TYPE: Readonly<Record<string, string>> = {
 // stocks: staves, wands, bows, crossbows). Every other classified weapon
 // family, and any weapon with no WEAPON_TYPE_BY_ITEM classification, yields
 // resonant steel (the melee default). Staves and wands sitting in the WEAPON
-// (timber) bucket is a maintainer-resolved decision: timber is a weapon bucket,
+// (timber) bucket is a settled decision: timber is a weapon bucket,
 // not the cloth armor line.
 export const TIMBER_WEAPON_TYPES: ReadonlySet<string> = new Set([
   'staff',

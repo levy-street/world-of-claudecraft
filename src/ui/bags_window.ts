@@ -180,7 +180,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  window owns the paperdoll drop (and its refusals); this is the touch arm's way
    *  in, since a finger release has no drop event to land on that window. */
   dropOnEquipSlot(itemId: string, slot: EquipSlot): void;
-  /** Open the Phase 13 bag-item action menu (Disenchant / Salvage / Apply Enchant)
+  /** Open the bag-item action menu (Disenchant / Salvage / Apply Enchant)
    *  for a stack at a viewport point. `runDefault` runs the exact classic
    *  left-click action for the clicked slot, so the menu's first row stays
    *  byte-identical to a plain click. */
@@ -520,7 +520,7 @@ export class BagsWindow {
       row.style.setProperty('--bag-slot-quality', qColor);
       // An instanced stack's accessible name carries the per-copy flag the
       // aria-hidden corner marker shows sighted players (the review's a11y
-      // arm); plain stacks keep the pre-12d label.
+      // arm); plain stacks keep the plain label.
       const itemAriaKey = isMasterwork
         ? 'hudChrome.bags.itemAriaMasterwork'
         : s.instance
@@ -533,7 +533,7 @@ export class BagsWindow {
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
-      // The instanced-slot corner marker (Professions 2.0 Phase 12d): a plain
+      // The instanced-slot corner marker (Professions 2.0): a plain
       // signed/enchanted copy keeps the static tab, while a masterwork replaces
       // it with the authored seal (never both). Either treatment composes with
       // the count badge and stays visible without hover on desktop and touch.
@@ -563,7 +563,7 @@ export class BagsWindow {
           this.deps.insertItemChatLink(s.itemId);
           return;
         }
-        // Touch has no right-click, so a tap on an item with a Phase 13 action
+        // Touch has no right-click, so a tap on an item with an action
         // (Disenchant / Salvage / Apply Enchant) opens the action menu instead of
         // running the classic action directly; the menu's first row is that
         // classic action, so nothing is lost. A plain item taps straight through,
@@ -598,7 +598,7 @@ export class BagsWindow {
           return;
         }
         ev.preventDefault();
-        // An item with a Phase 13 action (Disenchant / Salvage / Apply Enchant)
+        // An item with an action (Disenchant / Salvage / Apply Enchant)
         // opens the action menu, whose FIRST row is the classic left-click action
         // so that binding survives. Every other item keeps today's behavior
         // byte-identical: right-click runs the SAME action as left-click (use /
@@ -916,7 +916,7 @@ export class BagsWindow {
     };
   }
 
-  // Whether the Phase 13 action menu should open for this item. Offered ONLY in
+  // Whether the action menu should open for this item. Offered ONLY in
   // the plain-use default mode (never trade / mail / market / vendor / bank /
   // pet-feed, whose own click owns the slot), mirroring bagDestroyAction's
   // transactional-mode gate, and only when the item has an eligible action.

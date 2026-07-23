@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 //
-// Phase 13 QA: pins the picker placement math in BagItemActionMenu.paint,
+// Pins the picker placement math in BagItemActionMenu.paint,
 // the one fix surface the CSS guard (tests/ctx_menu_picker_sizing.test.ts)
 // cannot see: the picker states reserve the CAPPED box (mirroring the CSS
 // max-height min(60vh, 560px)) plus the wider right reserve, while a plain
@@ -46,7 +46,7 @@ function harness(innerHeight: number) {
   return { el, placed, openPlain, openPicker };
 }
 
-describe('BagItemActionMenu.paint placement reserves (Phase 13 QA)', () => {
+describe('BagItemActionMenu.paint placement reserves', () => {
   it('a plain menu keeps the narrow reserve and the natural estimate, no modifier', () => {
     const h = harness(768);
     h.openPlain();
@@ -90,5 +90,27 @@ describe('BagItemActionMenu.paint placement reserves (Phase 13 QA)', () => {
     expect(h.el.classList.contains(CTX_MENU_PICKER_CLASS)).toBe(true);
     h.openPlain();
     expect(h.el.classList.contains(CTX_MENU_PICKER_CLASS)).toBe(false);
+  });
+
+  it('tints each unsatisfied picker reagent, keyed to its own shortfall', () => {
+    const h = harness(768);
+    h.openPicker();
+    const spans = [...h.el.querySelectorAll('.ctx-item-meta .ctx-reagent')];
+    expect(spans.length).toBeGreaterThan(0);
+    // The 99 held dust satisfies every dust line while a second reagent the
+    // inventory lacks is short, so both arms are live in one paint. The
+    // class is per-reagent: every marked span's have count is under its
+    // required count, every plain span's is not (the {name} x{have}/{required}
+    // line format carries both numbers).
+    const unsat = spans.filter((span) => span.classList.contains('unsat'));
+    const plain = spans.filter((span) => !span.classList.contains('unsat'));
+    expect(unsat.length).toBeGreaterThan(0);
+    expect(plain.length).toBeGreaterThan(0);
+    for (const span of spans) {
+      const m = (span.textContent ?? '').match(/x(\d+)\/(\d+)/);
+      expect(m, span.textContent ?? '').not.toBeNull();
+      const short = Number(m?.[1]) < Number(m?.[2]);
+      expect(span.classList.contains('unsat'), span.textContent ?? '').toBe(short);
+    }
   });
 });

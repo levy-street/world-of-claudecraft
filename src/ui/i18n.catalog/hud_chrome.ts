@@ -1396,7 +1396,7 @@ export const hudChromeStrings = {
   corpseHarvest: {
     title: 'Harvest',
     harvestButton: 'Harvest',
-    // Loot-window legibility reword (Phase 12d QA): states the once-per-corpse,
+    // Loot-window legibility reword: states the once-per-corpse,
     // first-come claim rule and that harvesting leaves the loot untouched.
     // Successor to the retired harvestButtonTooltip; a new key because the old
     // one carried reviewed fills in every locale (in-place rewords go stale).
@@ -1422,7 +1422,7 @@ export const hudChromeStrings = {
   townFocus: {
     title: 'Town Focus',
     hint: "Focus points add a bonus on top of every component's baseline yield. Unfocused components stay at baseline.",
-    // Phase 12d legibility: the tier-shift rule ({points} = POINTS_PER_TIER_BONUS,
+    // Tier legibility: the tier-shift rule ({points} = POINTS_PER_TIER_BONUS,
     // {steps} = MAX_FOCUS_TIER_BONUS) and the town-only rule, always visible.
     tierHint:
       'Every {points} points on a component raise its harvest tier one step, up to {steps} steps; fewer than {points} points still boost the yield.',
@@ -1526,7 +1526,7 @@ export const hudChromeStrings = {
     // that grid is a derived list, its squares hold no bag position, so honoring the drop
     // would move a stack the player never aimed at. Say so instead of doing nothing.
     reorderNeedsRecent: 'Clear the filter and sort by Recent to rearrange your bags',
-    // Accessible-name arm of the Phase 12d instanced-slot corner marker: the
+    // Accessible-name arm of the instanced-slot corner marker: the
     // visual tab is aria-hidden, so the per-copy flag rides the cell's label
     // (the tooltip on focus stays the detail surface).
     itemAriaInstanced: '{item}, quantity {count}, maker-marked copy',
@@ -1734,7 +1734,7 @@ export const hudChromeStrings = {
   // uses the chest's localized entity name); replaces a former hard-coded 'Chest'.
   loot: {
     chestTitle: 'Chest',
-    // Loot-window legibility reword (Phase 12d QA): the corpse arm's button is
+    // Loot-window legibility reword: the corpse arm's button is
     // "Take Loot" (the old "Take All" label promised the harvest too); the
     // delve-chest arm keeps itemUi.loot.takeAll, where "all" is accurate.
     // takeLootTooltip pairs with corpseHarvest.harvestTooltip so the two
@@ -2254,26 +2254,26 @@ export const hudChromeStrings = {
     // #1866: click/tap/interact-key error when a targeted node's per-viewer
     // respawn timer has not elapsed yet (IWorldProfessions#nodeHarvestableByMe).
     notReady: 'This resource node has not respawned for you yet.',
-    // Harvest feedback line (Professions 2.0 Phase 4), rendered from the
+    // Harvest feedback line (Professions 2.0), rendered from the
     // id-based gatherResult SimEvent. Deliberately worded APART from the
     // loot family: the grant hub's own 'loot' event already prints
     // "You receive:" for the same harvest, so this line must never regress
     // into that wording (divergence pin: tests/gather_event_i18n.test.ts).
     gatherLine: 'You gather: {name}.',
     gatherLineQty: 'You gather: {name} x{qty}.',
-    // Reel-in feedback line (Professions 2.0 Phase 11), rendered from the
+    // Reel-in feedback line (Professions 2.0), rendered from the
     // id-based fishingResult SimEvent. Like gatherLine above, deliberately
     // worded APART from the loot family: the grant hub's own 'loot' event
     // already prints "You receive:" for the same catch, so this line must
     // never regress into that wording (nor into gatherLine's).
     catchLine: 'You reel in: {name}',
-    // Bite minigame lines (Professions 2.0 Phase 12b), rendered from the
+    // Bite minigame lines (Professions 2.0), rendered from the
     // text-free personal fishingBite / fishingGotAway SimEvents. biteLine
     // keeps the bite moment visible in the log (never sound-only,
     // accessibility); gotAwayLine is the no-cost miss.
     biteLine: 'Something takes the bait!',
     gotAwayLine: 'It got away.',
-    // Base tool tier gating (Professions 2.0 Phase 12). The sim's gatherDenied
+    // Base tool tier gating (Professions 2.0). The sim's gatherDenied
     // SimEvent and the node hover tooltip are both text-free at the source:
     // every line here is composed client-side off structured fields, keyed per
     // profession (single-key interpolation, never concatenated fragments).
@@ -2300,7 +2300,7 @@ export const hudChromeStrings = {
     // harvest is gated by the best owned tool across ALL gathering
     // professions, so no single tool is named).
     toolTierUnmetCorpse: 'You need a tier {tier} gathering tool to recover the finest materials.',
-    // Full-bag signed-grant downgrade toasts (Phase 12d), rendered from the
+    // Full-bag signed-grant downgrade toasts, rendered from the
     // text-free personal gatherDowngrade SimEvent, one key per lost arm:
     // 'mark' (the yield arrived unsigned) and 'find' (the jackpot dropped).
     downgradeMark: "Bags full: the find was stored without its gatherer's mark.",
@@ -2309,7 +2309,7 @@ export const hudChromeStrings = {
     stateReady: 'Ready',
     stateCooldown: 'Respawning',
   },
-  // Archetype title chrome (#1130, pair-named under Professions 2.0 Phase 1):
+  // Archetype title chrome (#1130, pair-named under Professions 2.0):
   // `label` heads the character-sheet title line, `none` is shown before the
   // zone-1 acceptance quest has ever been completed (no "Jack of All Trades"
   // fallback, just untitled), and `hobbyLabel` heads the hobby line (#1294).
@@ -2319,7 +2319,7 @@ export const hudChromeStrings = {
     none: 'None',
     hobbyLabel: 'Hobby',
   },
-  // Pair-named archetype titles (Professions 2.0 Phase 1): one named title per
+  // Pair-named archetype titles (Professions 2.0): one named title per
   // selectable adjacent-pair attunement, keyed by the CANONICAL PAIR ID from
   // src/sim/professions/archetype.ts ARCHETYPE_PAIR_TARGETS (the two majors
   // joined by '+' in CRAFT_RING order); keep both in sync. These replace the
@@ -2329,12 +2329,12 @@ export const hudChromeStrings = {
     'alchemy+cooking': 'Apothecary',
     'cooking+leatherworking': 'Trapper',
     'leatherworking+tailoring': 'Outfitter',
-    'tailoring+inscription': 'Mageweaver',
+    'tailoring+inscription': 'Inkweaver',
     'inscription+enchanting': 'Arcanist',
     'enchanting+jewelcrafting': 'Gembinder',
     'jewelcrafting+weaponcrafting': 'Bladewright',
     'weaponcrafting+armorcrafting': 'Smith',
-    'armorcrafting+engineering': 'Cogsmith',
+    'armorcrafting+engineering': 'Gearwright',
   },
   // Per-craft display names, keyed by the same craft id as CRAFT_RING
   // (src/sim/content/professions.ts); keep both in sync. Used wherever a CRAFT
@@ -2352,7 +2352,7 @@ export const hudChromeStrings = {
     tailoring: 'Tailoring',
     leatherworking: 'Leatherworking',
   },
-  // Per-enchant display names (Professions 2.0 Phase 13), keyed by the same
+  // Per-enchant display names (Professions 2.0), keyed by the same
   // enchant id as content/enchants.ts ENCHANTS; keep both in sync. This is the
   // FIRST render sink for EnchantDef.name (it never rendered before), resolved
   // by enchant_apply_view.ts enchantNameKey in the Apply Enchant picker; never
@@ -2395,12 +2395,12 @@ export const hudChromeStrings = {
     enchant_legs_greater_stamina: 'Enchant Legs - Greater Stamina',
     enchant_gloves_greater_agility: 'Enchant Gloves - Greater Agility',
     enchant_weapon_runed_edge: 'Enchant Weapon - Runed Edge',
-    enchant_weapon_runed_focus: 'Enchant Weapon - Runed Focus',
-    enchant_chest_runeweave: 'Enchant Chest - Runeweave',
+    enchant_weapon_runed_focus: 'Enchant Weapon - Runed Sigil',
+    enchant_chest_runeweave: 'Enchant Chest - Runed Weave',
     enchant_legs_runed_hide: 'Enchant Legs - Runed Hide',
     enchant_helmet_runed_links: 'Enchant Helmet - Runed Links',
   },
-  // Professions window (Professions 2.0 Phase 5): the read-only craft-wheel
+  // Professions window (Professions 2.0): the read-only craft-wheel
   // window. Craft and pair NAMES resolve through craftName / archetypePair
   // above; these keys are the window's own chrome. Wording follows the
   // crafting identity card family (crafting.identity.*).
@@ -2431,6 +2431,8 @@ export const hudChromeStrings = {
     tutorialLine: 'Reach {target} skill in any craft to unlock your first tier.',
     ctaHeader: 'Next step',
     ctaRaise: 'Keep raising {craft}: {points} more points to the next tier.',
+    ctaRaiseSpecialized:
+      'Keep raising {craft}: {points} more points to Specialized, and material costs drop.',
     ctaStart: 'Craft or gather with any profession to begin.',
     unattunedIdentity:
       'You are not yet attuned to an archetype. Raise your crafts and complete an attunement to choose your pair.',
@@ -2462,7 +2464,7 @@ export const hudChromeStrings = {
     comboNotAttuned: 'Choose an archetype pair first.',
     comboWrongPair: 'Activate this exact pair to craft it.',
     comboTierUnmet: 'Raise both major crafts to the required tier.',
-    // Named tier_unmet guidance (Phase 6 QA): {crafts} is the localized
+    // Named tier_unmet guidance: {crafts} is the localized
     // craft-name list of ONLY the under-tier crafts, so the player can tell
     // which one to raise from the row alone. comboTierUnmet above stays the
     // defensive fallback when the eligibility result names no craft.
@@ -2476,7 +2478,7 @@ export const hudChromeStrings = {
       'Result: {title} title; {majorA} and {majorB} become uncapped majors; {hobby} becomes the rare-capped hobby; all other skill knowledge is retained but capped at common while dormant.',
     hobbyPreview:
       'Result: {hobby} becomes the rare-capped hobby. Both majors and all retained skill values stay unchanged.',
-    // Professions 2.0 Phase 14: the escalating make-amends return cost, shown in
+    // Professions 2.0: the escalating make-amends return cost, shown in
     // the attunement preview and on the identity card (closes the 2039 preview
     // gap). {cost} is requiredAmendsProgress at rest.
     attunementReturnCost:
@@ -2511,7 +2513,7 @@ export const hudChromeStrings = {
       dormantKnowledge:
         '{craft} knowledge is retained but dormant until its pair or hobby is active.',
     },
-    // Professions 2.0 Phase 8 (supersedes the retired notAtHub key): denied
+    // Professions 2.0 (supersedes the retired notAtHub key): denied
     // because the recipe is station-bound and the player is not at a station
     // of its type. {station} is the localized stationName.* value below.
     stationRequired: 'You must be at the {station} to craft that.',
@@ -2529,7 +2531,7 @@ export const hudChromeStrings = {
     throttled: 'You are crafting too quickly. Wait a moment and try again.',
     // #1299: the recipe exists but this player has not learned it yet.
     recipeNotLearned: 'You have not learned that recipe yet.',
-    // Professions 2.0 Phase 6: crafting window legibility (skill requirement
+    // Professions 2.0: crafting window legibility (skill requirement
     // line, skill-gain difficulty labels, hub-station badge) plus the
     // masterwork and tier-up celebration copy. Masterwork is a proc with
     // baked bonus stats; the copy never claims a quality-rank upgrade.
@@ -2539,10 +2541,10 @@ export const hudChromeStrings = {
     difficultyMinimal: 'Minimal skill gain',
     difficultyNone: 'No skill gain',
     stationBadge: 'Station',
-    // Phase 8 (supersedes the retired stationOutOfRange key): the crafting
+    // Supersedes the retired stationOutOfRange key: the crafting
     // window's out-of-range row note, naming WHICH station to walk to.
     stationOutOfRangeNamed: 'Move to the {station} to craft this.',
-    // Professions 2.0 Phase 14: the per-section "learnable at a master"
+    // Professions 2.0: the per-section "learnable at a master"
     // discoverability hint, shown when the viewer has unlearned trainer recipes
     // for a craft. {master} is the resident master's name (entity i18n),
     // {station} the localized stationName.* value, {craft} the craftName.* value.
@@ -2550,7 +2552,7 @@ export const hudChromeStrings = {
     masterworkToast: 'Masterwork! {name}',
     masterworkZoneLine: '{crafter} crafted a masterwork {name}!',
     tierUpToast: '{craft} advanced to tier {tier}!',
-    // Professions 2.0 Phase 14 attunement + trend events (profession_event_lines
+    // Professions 2.0 attunement + trend events (profession_event_lines
     // _core.ts). Trend nudge: the soft in-world hint that an unattuned crafter's
     // skills lean toward a pair; {archetype} is the pair's archetype title,
     // {master} the anchor master's name (the noMaster variant for the six ring
@@ -2577,7 +2579,7 @@ export const hudChromeStrings = {
       dismiss: 'Got it',
     },
     makersMark: 'Crafted by {name}',
-    // Phase 12d: the gathered-material sibling of makersMark, resolved by item
+    // The gathered-material sibling of makersMark, resolved by item
     // KIND (item_instance_tooltip.ts isGatheredProvenanceKind); same signer
     // payload, different wording.
     gatheredBy: 'Gathered by {name}',
@@ -2585,7 +2587,7 @@ export const hudChromeStrings = {
     // Generic enchanted marker: EnchantDef.name has no localized display
     // surface yet, so the tooltip marks the state without naming the enchant.
     enchantedLine: 'Enchanted',
-    // Commissions and the Maker's Bond (Professions 2.0 Phase 14b): the
+    // Commissions and the Maker's Bond (Professions 2.0): the
     // per-craft opt-in control in the crafting window, and the two tooltip
     // lines a commissioned copy renders beside the soulbound line. The bound
     // line deliberately names no one (boundTo is an entity id, not a stable
@@ -2595,10 +2597,10 @@ export const hudChromeStrings = {
     commissionUnbound: 'Commission piece: binds to the first recipient',
     commissionBound: 'Commission piece: bound to its recipient',
   },
-  // Bag-item context menu verbs (Professions 2.0 Phase 13): the row labels for
+  // Bag-item context menu verbs (Professions 2.0): the row labels for
   // the right-click / touch action menu (bag_item_context_menu.ts). The first
   // row mirrors the classic left-click action (equip gear, use everything else);
-  // the rest are the eligible Phase 13 actions.
+  // the rest are the eligible enchanting actions.
   itemMenu: {
     use: 'Use',
     equip: 'Equip',
@@ -2606,7 +2608,7 @@ export const hudChromeStrings = {
     salvage: 'Salvage',
     applyEnchant: 'Apply Enchant',
   },
-  // Enchanting actions (Professions 2.0 Phase 13): the result toasts for the
+  // Enchanting actions (Professions 2.0): the result toasts for the
   // disenchant / apply-enchant / salvage commands (enchanting_view.ts maps each
   // text-free SimEvent to one of these), the destroy-confirm copy (a stronger
   // body when the copy consumed is special), and the Apply Enchant picker chrome.
@@ -2641,7 +2643,7 @@ export const hudChromeStrings = {
     noEnchants: 'No enchant uses this reagent.',
     noTargets: 'No eligible item to enchant.',
   },
-  // Recipe training window (Professions 2.0 Phase 9): a station master
+  // Recipe training window (Professions 2.0): a station master
   // teaches trainer-acquisition recipes for a tier-priced copper fee
   // (src/sim/professions/training.ts). Recipe result names resolve through
   // the item table, craft names through craftName above, so these keys are
@@ -2672,8 +2674,8 @@ export const hudChromeStrings = {
     alreadyKnown: 'You already know that recipe.',
     outOfRange: 'You must be at the station to train.',
   },
-  // Maker's Bond unbind service window + result lines (Professions 2.0
-  // Phase 14b): the station master's second gossip service beside training.
+  // Maker's Bond unbind service window + result lines (Professions 2.0):
+  // the station master's second gossip service beside training.
   // Item NAMES resolve through entity i18n, never through these keys; the
   // fee formats via formatMoney.
   unbind: {

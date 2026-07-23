@@ -1,8 +1,8 @@
-// Professions 2.0 Phase 11: fishing as a full gathering proficiency, the
+// Professions 2.0: fishing as a full gathering proficiency, the
 // catch rarity band ladder, the one-draw rng contract, the text-free
 // fishingResult SimEvent, the live-server round trip (gprof mirror + event
 // routing), and the deliberately accepted gathering-deed drift. This file is
-// the primary Phase 11 home; the shipped fishing cast lifecycle itself stays
+// this arc's primary home; the shipped fishing cast lifecycle itself stays
 // pinned in tests/sim.test.ts.
 import { describe, expect, it, vi } from 'vitest';
 
@@ -110,7 +110,7 @@ function teleportToValeShore(sim: Sim): void {
   sim.player.facing = Math.atan2(0, LAKE.z - pz);
 }
 
-// Phase 12b live-loop cast: startFishing draws the ONE hidden bite delay, the
+// Live-loop cast: startFishing draws the ONE hidden bite delay, the
 // lifecycle's fishing arm fires the bite off the hidden tick deadline, and
 // the reel re-press (startFishing's reel arm) rolls the table. Ticks advance
 // by assigning sim.tickCount directly and calling the real updateCasting arm,
@@ -142,7 +142,7 @@ function catchSequenceLive(sim: Sim, meta: PlayerMeta, n: number): (string | nul
   return out;
 }
 
-// The literal band-0 catch sequence at seed 4242 under the Phase 12b LIVE
+// The literal band-0 catch sequence at seed 4242 under the shipped LIVE
 // loop (re-recorded from the shipped drive by the bite-hunt scratch script,
 // then spot-audited): each session consumes TWO draws, draw 2i the hidden
 // bite delay and draw 2i+1 the table walk against the SHIPPED Vale rows
@@ -220,8 +220,8 @@ const B1_SEQ_4242: (string | null)[] = [
 // table draw lands where band 1 yields the koi but band 2 yields tangled
 // weed (the hunted divergence index under the two-draw stream), so matching
 // this sequence proves the live path resolved FISHING_TABLES_BY_BAND[2], not
-// a band-1 collapse (Phase 11 QA: the top-band wiring was previously
-// unpinned on the live path).
+// a band-1 collapse (the top-band wiring was previously unpinned on the
+// live path).
 const B2_SEQ_4242: (string | null)[] = [
   TROUT,
   TROUT,
@@ -313,7 +313,7 @@ describe('fishing determinism (pin 1)', () => {
   });
 });
 
-describe('fishing draw contract (pin 2, the Phase 12b bite-and-reel shape)', () => {
+describe('fishing draw contract (pin 2, the bite-and-reel shape)', () => {
   it('a full session draws exactly two rng values: the bite delay at the cast, the table at the reel', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
@@ -494,13 +494,13 @@ describe('fishing proficiency accrual (pin 3)', () => {
     expect(sim.professionsStateFor(sim.playerId).skills).toContainEqual({
       professionId: 'fishing',
       skill: landed,
-      // Phase 12c stage 2 appendix re-pin: fishing's enforced cap is 200.
+      // The enforced fishing cap is 200.
       maxSkill: 200,
     });
   });
 });
 
-describe('fishing catch gain schedule (Professions 2.0 Phase 12c)', () => {
+describe('fishing catch gain schedule (Professions 2.0)', () => {
   it('fishingCatchGain walks the fractional schedule AT the half-band boundaries', () => {
     expect(fishingCatchGain(0, false)).toBe(1);
     expect(fishingCatchGain(49, false)).toBe(1);
@@ -718,7 +718,7 @@ describe('fishing band selection liveness (pin 6)', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 150;
-    // Phase 12: band 1 also needs the tier-2 rod in bags (the silent tool
+    // Band 1 also needs the tier-2 rod in bags (the silent tool
     // cap); the bag scan is rng-free. The rod narrows the bite-delay range
     // too, but the delay draw is consumed either way, so the table walk is
     // rod-independent given the band.
@@ -733,7 +733,7 @@ describe('fishing band selection liveness (pin 6)', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
     meta.gatheringProficiency.fishing = 200;
-    // Phase 12: band 2 needs the tier-3 rod (band b requires tool tier b + 1).
+    // Band 2 needs the tier-3 rod (band b requires tool tier b + 1).
     sim.addItem('silverstream_fishing_rod', 1);
     teleportToValeShore(sim);
     // Index 22 sits in the hunted band-discriminating window (weed here where
@@ -744,13 +744,13 @@ describe('fishing band selection liveness (pin 6)', () => {
   });
 });
 
-// Phase 12 band tool cap: catch band b requires an owned rod of tier b + 1
+// Band tool cap: catch band b requires an owned rod of tier b + 1
 // (canGatherTier(rodTier, b + 1)); the effective band is min(proficiency
 // band, best band the owned rod covers), capped SILENTLY (no event, no
 // denial: the cast still lands a band-capped catch). The simple pole is not a
 // gatherTool, so it floors to tier 1: band 0, the shipped table, stays
 // reachable with the pole or bare hands.
-describe('fishing band tool cap (Professions 2.0 Phase 12)', () => {
+describe('fishing band tool cap (Professions 2.0)', () => {
   it('proficiency 150 with NO rod silently caps to the band-0 table (literal sequence)', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
@@ -821,7 +821,7 @@ describe('fishing band tool cap (Professions 2.0 Phase 12)', () => {
       sim.events = [];
       sim.useItem(rodId);
       expect(sim.player.castingAbility, rodId).toBe(FISHING_CAST_ID);
-      // Phase 12b: the visible timer is the 15 s session cap (literal on
+      // The visible timer is the 15 s session cap (literal on
       // purpose), which carries no bite information.
       expect(sim.events).toContainEqual(
         expect.objectContaining({ type: 'castStart', ability: FISHING_CAST_ID, time: 15 }),
@@ -908,7 +908,7 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
     expect(meta.deedsEarned.has('chr_vale_first_cast')).toBe(true);
   });
 
-  it('ACCEPTED DRIFT (documented Phase 11 semantic): a first landed catch completes prog_first_harvest', () => {
+  it('ACCEPTED DRIFT (documented semantic): a first landed catch completes prog_first_harvest', () => {
     // prog_first_harvest ("Harvest your first gathering node", trigger
     // gathering amount 1) is now also satisfied by a first landed fishing
     // catch, without ever touching a world node: fishing is a full gathering
@@ -926,7 +926,7 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
     expect(meta.deedsEarned.has('prog_first_harvest')).toBe(true);
   });
 
-  it('ACCEPTED DRIFT (documented Phase 11 semantic): prog_master_gatherer counts fishing', () => {
+  it('ACCEPTED DRIFT (documented semantic): prog_master_gatherer counts fishing', () => {
     // The three-at-100 trigger counts EVERY gathering profession, so
     // mining + logging + fishing at 100 completes it without herbalism.
     const sim = makeSim(4242);
@@ -942,7 +942,7 @@ describe('fishing deeds through the extracted module path (pin 9)', () => {
     expect(meta.deedsEarned.has('prog_master_gatherer')).toBe(true);
   });
 
-  it('a fished glimmerfin koi logs the rare-catch line and completes col_glimmerfin', () => {
+  it('a fished sunglint koi logs the rare-catch line and completes col_glimmerfin', () => {
     // Acceptance criterion 3: the rare catch and its deed complete unchanged
     // through the extracted module path. col_glimmerfin is a collectItems
     // trigger riding the addItem collection path, so a real completeFishing
@@ -1050,7 +1050,7 @@ describe('startFishing arms through the extracted module path (pin 10)', () => {
     } finally {
       sim.rng.setObserver(null);
     }
-    // Phase 12b INVERTS the old zero-draw pin: the cast start now draws
+    // The live-loop cast INVERTS the old zero-draw pin: the cast start draws
     // EXACTLY the one hidden bite delay. The visible timer is the FIXED 15 s
     // session cap (literal on purpose: comparing against the imported
     // constant would pin nothing) and carries zero bite information.

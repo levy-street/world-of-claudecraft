@@ -1,4 +1,4 @@
-// Gather-node world-hover tooltip (Professions 2.0 Phase 12): desktop pointer
+// Gather-node world-hover tooltip (Professions 2.0): desktop pointer
 // only. Hovering an ore vein / timber stand / herb patch in the 3D scene shows
 // the node's name, its tool-tier requirement (tier 2+ only: tier 1 is the
 // bare-hands floor, so a requirement line would be false), and its per-viewer

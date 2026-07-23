@@ -247,7 +247,7 @@ export function archetypeStateFor(ctx: SimContext, pid: number): ArchetypeState 
 }
 
 // Issue #1130 (re-scoped per the comment on the live issue, then pair-named
-// under the Professions 2.0 Phase 1 blueprint): a player's CURRENTLY-ACTIVE
+// under the Professions 2.0 blueprint): a player's CURRENTLY-ACTIVE
 // adjacent-pair attunement grants one named archetype title for that PAIR
 // (Smith for weaponcrafting+armorcrafting, Bombardier for engineering+alchemy,
 // and so on). There is no "Jack of All Trades" fallback under this model, since
@@ -379,7 +379,7 @@ export function craftSkillGainMultiplier(
     : tierProgressMultiplier(tierCapability(skills, craftId), recipeTier);
 }
 
-/** The enchanting skill-gain multiplier (Professions 2.0 Phase 12c):
+/** The enchanting skill-gain multiplier (Professions 2.0):
  *  quality-tiered input run through the same four-state curve as crafting,
  *  but under the SOFT ceiling: above-ceiling input DEGRADES to the ceiling
  *  tier (Math.min) instead of crafting's hard zero, so an epic disenchant

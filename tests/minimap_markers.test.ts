@@ -370,13 +370,13 @@ describe('minimap corpse marker (ghost run)', () => {
   });
 });
 
-// Phase 12: the gather-node marker's locked dimension. The viewer stands ON
+// The gather-node marker's locked dimension. The viewer stands ON
 // the new tier-2 mirefen vein (ore_mirefen_t2), where the rim covers exactly
 // five nodes in GATHER_NODES order: ore_mirefen_1, ore_mirefen_3,
 // herb_mirefen_1, herb_mirefen_3 (all tier 1) and the tier-2 vein itself at
 // the map centre. Actionable info on every preset: locked resolves from the
 // bags, never a graphics knob.
-describe('gather-node markers: the locked dimension (Phase 12)', () => {
+describe('gather-node markers: the locked dimension', () => {
   const T2 = { x: 48, z: 352 }; // ore_mirefen_t2, pinned literally
 
   function makeGatherWorld(

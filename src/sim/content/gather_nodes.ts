@@ -227,15 +227,15 @@ export const GATHER_NODES: GatherNodeDef[] = [
     tier: 1,
   },
 
-  // Phase 12 tool-tier ramp. Zone 1 (eastbrook_vale) stays ALL tier 1: every
-  // pre-phase node above keeps tier 1, so nothing that was harvestable before
-  // this phase ever needs a tool. The ramp comes only from the NEW veins
+  // Tool-tier ramp. Zone 1 (eastbrook_vale) stays ALL tier 1: every node
+  // above keeps tier 1, so nothing harvestable there ever needs a tool. The
+  // ramp comes only from the NEW veins
   // below: mirefen_marsh gains one tier-2 node per type, thornpeak_heights
   // gains one tier-2 and one tier-3 node per type. Each sits a short walk
   // (5 to 20 yd) from the matching existing cluster of the same type, and
   // grants the zone's existing material via the zone-keyed
   // NODE_MATERIAL_TABLE: no new materials and no yield changes (deliberate;
-  // rhythm and richer yields are later phases).
+  // rhythm and richer yields are handled separately).
   {
     id: 'ore_mirefen_t2',
     zoneId: 'mirefen_marsh',

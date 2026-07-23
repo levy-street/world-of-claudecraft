@@ -6,11 +6,12 @@ import { Sim } from '../src/sim/sim';
 import { terrainHeight } from '../src/sim/world';
 import { COMMAND_NAMES } from '../src/world_api';
 
-// Phase 14 retired the single shared acceptance / make-amends quests in favor of
-// one attune + one make-amends quest per anchor master, each pinning its own
-// canonical pair. These re-pins exercise the same behaviors against the new
-// per-pair quest ids (behavior-equivalent; new Phase 14 coverage lives in the
-// professions_tier_mail / professions_nudges / professions_quest_cadence suites).
+// The per-master attunement model retired the single shared acceptance /
+// make-amends quests in favor of one attune + one make-amends quest per anchor
+// master, each pinning its own canonical pair. These re-pins exercise the same
+// behaviors against the per-pair quest ids (behavior-equivalent; further
+// coverage lives in the professions_tier_mail / professions_nudges /
+// professions_quest_cadence suites).
 const HOBBY_QUEST = 'q_prof_hobby_switch';
 // Canonical pair ids follow CRAFT_RING order (see archetypePairId); the smith and
 // outfitter pairs are two of the four wave-one anchor masters.
@@ -133,8 +134,8 @@ describe('live profession attunement quests', () => {
   });
 
   it('resolves amends availability without crashing when a non-wave-one pair is in history', () => {
-    // A player attuned before Phase 14 (via the retired un-narrowed acceptance
-    // quest) can hold any of the ten ring pairs. The four make-amends quests pin
+    // A player attuned under the retired un-narrowed acceptance
+    // quest can hold any of the ten ring pairs. The four make-amends quests pin
     // only the wave-one pairs, so a non-wave-one pair has no return path (an
     // accepted consequence, flagged in the PR body); the masters must still
     // resolve availability without crashing on the unrecognized history entry.
@@ -239,7 +240,7 @@ describe('live profession attunement quests', () => {
     expect(COMMAND_NAMES).not.toContain('advance_amends');
   });
 
-  // Phase 1 changed sim LOGIC, not just content data: the quest-effect
+  // The attunement flow changed sim LOGIC, not just content data: the quest-effect
   // transitions (profession_quest_effects.ts), the gather/craft quest-credit
   // arms (quest_credit.ts), the removed bespoke node quest grant
   // (gathering.ts), and the attunement-gated combo craft path (crafting.ts,
@@ -268,7 +269,7 @@ describe('live profession attunement quests', () => {
       attune(sim, SMITH_MASTER, 'q_prof_attune_smith', WEAPON_ARMOR);
       sim.addItem('linen_scrap', 1, pid);
       sim.addItem('spider_leg', 1, pid);
-      sim.addItem('silverleaf_herb', 2, pid); // Phase 15 reagent addition
+      sim.addItem('silverleaf_herb', 2, pid); // the reworked recipe's herb reagent
       sim.craftItem('recipe_minor_healing_potion', false, pid); // masterwork proc: draws rng
       acceptAt(sim, HOBBY_MASTER, HOBBY_QUEST, 'tailoring');
       completeAndTurnInAt(sim, HOBBY_MASTER, HOBBY_QUEST);
@@ -292,7 +293,7 @@ describe('live profession attunement quests', () => {
   });
 });
 
-// Phase 14 coverage: the tests above exercise the smith and outfitter as
+// Full-matrix coverage: the tests above exercise the smith and outfitter as
 // exemplars, but every wave-one anchor master must attune ITS pinned pair end to
 // end and expose the same availability matrix. These table-driven suites run all
 // four so a new master, a mis-pinned pairId, or a dropped celebration emit reds a
@@ -332,7 +333,7 @@ const MASTERS_WITH_OTHER = MASTERS.map((m, i) => ({
 }));
 
 describe.each(MASTERS)(
-  '$attuneQuest attunes its pinned pair end to end (Phase 14)',
+  '$attuneQuest attunes its pinned pair end to end',
   ({ master, attuneQuest, pair }) => {
     it('accepts, turns in, sets the pair active, and emits both celebration events', () => {
       const sim = makeSim();
@@ -360,7 +361,7 @@ describe.each(MASTERS)(
 );
 
 describe.each(MASTERS_WITH_OTHER)(
-  '$attuneQuest availability matrix (Phase 14)',
+  '$attuneQuest availability matrix',
   ({ master, attuneQuest, amendsQuest, pair, other }) => {
     it('is available unattuned, done with amends gated when current, amends-only-with-history when wrong', () => {
       const sim = makeSim();
@@ -390,11 +391,11 @@ describe.each(MASTERS_WITH_OTHER)(
   },
 );
 
-// Phase 12c appendix row: the hobby-switch quest pays no XP. It is a
+// The hobby-switch quest pays no XP. It is a
 // repeatable identity toggle; any XP on it becomes a farmable trickle
 // (gather 3 herbs, toggle, repeat), so the reward re-pins to 0 while the
 // quest itself stays repeatable.
-describe('q_prof_hobby_switch reward shape (Phase 12c)', () => {
+describe('q_prof_hobby_switch reward shape', () => {
   it('grants 0 XP and stays repeatable', () => {
     const quest = ZONE1_QUESTS[HOBBY_QUEST];
     expect(quest.xpReward).toBe(0);
@@ -402,7 +403,7 @@ describe('q_prof_hobby_switch reward shape (Phase 12c)', () => {
   });
 });
 
-// Phase 14 QA: one pending identity transition at a time. resolvedCounts is
+// One pending identity transition at a time. resolvedCounts is
 // stamped at ACCEPT (finalizeQuestAccept) and turn-in never re-resolves it, so
 // holding two attunePair quests at once lets the second complete at a stale
 // amends cost: new-pair attunes are free and leave switchCount at 0, so a
@@ -412,7 +413,7 @@ describe('q_prof_hobby_switch reward shape (Phase 12c)', () => {
 // hides every OTHER attunePair-effect quest while one is active, on both hosts
 // (the online mirror shares the function; the server accept gate rides
 // questState). switchHobby quests and plain quests are outside the gate.
-describe('attunePair quests block concurrent identity transitions (Phase 14 QA)', () => {
+describe('attunePair quests block concurrent identity transitions', () => {
   const APOTHECARY_PAIR = 'alchemy+cooking';
 
   it('hides other attune quests while one is active, and reopens them on abandon', () => {

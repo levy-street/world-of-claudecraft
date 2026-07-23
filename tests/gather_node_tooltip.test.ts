@@ -1,5 +1,5 @@
 // Gather-node tooltip copy surface + the hud gatherDenied binding (Professions
-// 2.0 Phase 12). The pure MODEL is covered in tests/gathering_view.test.ts;
+// 2.0). The pure MODEL is covered in tests/gathering_view.test.ts;
 // this file drives the i18n-composing half (gatherNodeTooltipHtml,
 // gatherNodeToolGateFor) directly, plus the hud.ts source pins in the
 // tests/gather_event_i18n.test.ts idiom (the event switch case must stay an

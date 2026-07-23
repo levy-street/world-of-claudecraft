@@ -42,6 +42,7 @@ import {
   type Entity,
   type EquipSlot,
   INTERACT_RANGE,
+  type ItemDef,
   type ItemInstancePayload,
   isNonSpellCast,
   POTION_COOLDOWN,
@@ -94,7 +95,7 @@ function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
 // ctx.removeItem there would eat the enchanted copy first when both exist.
 // sellItem/discardItem below and trade.ts's drop arm route through this instead
 // so "sell/discard/trade one" prefers the plain copy a player almost always means.
-// The optional `skip` predicate (Professions 2.0 Phase 13) spares any instanced
+// The optional `skip` predicate (Professions 2.0) spares any instanced
 // copy it matches from removal: the trade swap passes it to never consume a
 // trade-locked (boundTo-set) copy. Absent, the function is byte-identical to
 // before: fungible first, then ctx.removeItem for the remainder. Only the
@@ -259,7 +260,7 @@ export function equipItem(
     // Return the piece that was worn: if it carried an enchant, give it back
     // its own instanced slot (never merged into a plain stack, which would
     // silently drop the enchant; worn kinds are 1-per-slot, so the
-    // identical-payload merge arm addItemInstance grew in Phase 12d could
+    // identical-payload merge arm of addItemInstance could
     // never apply here anyway).
     if (oldInstance) meta.inventory.push({ itemId: old, count: 1, instance: oldInstance });
     else addItemSilent(old, 1, meta);
@@ -362,7 +363,7 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     ctx.startFishing(p, meta);
     return;
   }
-  // Phase 12: the tiered fishing rods are gatherTool items (their tier caps
+  // The tiered fishing rods are gatherTool items (their tier caps
   // the catch band, professions/fishing.ts) but must still CAST like the
   // simple pole, so a fishing-profession gatherTool use routes to the same
   // startFishing (which owns the dead/combat/busy/water gates, exactly as the
@@ -600,7 +601,7 @@ export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: numbe
     ctx.error(meta.entityId, 'You cannot sell quest items.');
     return;
   }
-  // Phase 15 QA directed fix (maintainer-approved 2026-07-22): a bound copy
+  // Vendor-sell bind guard: a bound copy
   // (instance payload carrying boundTo, the Maker's Bond trade lock) is never
   // vendor-sellable. Selling one recorded a PLAIN buyback row, so sell + buyback
   // laundered the piece into an unbound copy for a 0 copper spread, bypassing
@@ -640,6 +641,41 @@ export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: numbe
     text: `Sold ${def.name}${sellableCount > 1 ? ' x' + sellableCount : ''} for ${formatMoney(payout)}.`,
     pid: meta.entityId,
   });
+  // A mixed stack sold fewer copies than asked because the clamp above spared
+  // bound ones: say so in one info line instead of a silent partial (the
+  // maintainer-ruled replacement). keptCount counts only bound copies the
+  // player actually asked to sell, since sellCount is pre-clamped to
+  // `available`; a clean unbound sell emits nothing here.
+  const keptCount = sellCount - sellableCount;
+  if (keptCount > 0) {
+    ctx.emit({
+      type: 'loot',
+      text: `Kept ${keptCount} bound ${keptCount === 1 ? 'copy' : 'copies'}.`,
+      pid: meta.entityId,
+    });
+  }
+}
+
+// The junk-sweep eligibility rule for ONE bag slot, shared by the sim sweep
+// (sellAllJunk below) and the HUD vendor preview (hud.ts renderVendor) so the
+// two surfaces can never drift: gray quality, a sellable kind, and never a
+// soulbound def or a bound copy (instance payload carrying boundTo, the same
+// Maker's Bond gate sellItem applies). No poor-quality def binds or is
+// soulbound in shipped content; the instance arm closes the recorded future
+// hole before content can reopen the buyback wash.
+export function junkSellableSlot(
+  def: ItemDef | undefined,
+  slot: { count: number; instance?: ItemInstancePayload },
+): boolean {
+  return (
+    !!def &&
+    def.quality === 'poor' &&
+    def.kind !== 'quest' &&
+    !def.noVendorSell &&
+    !def.soulbound &&
+    slot.instance?.boundTo === undefined &&
+    slot.count > 0
+  );
 }
 
 // Bulk-sell every gray (poor-quality) item in the bags in one action, applying the
@@ -659,24 +695,22 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
     return;
   }
   const junk = meta.inventory
-    .filter((s) => {
-      const def = ITEMS[s.itemId];
-      return (
-        !!def &&
-        def.quality === 'poor' &&
-        def.kind !== 'quest' &&
-        !def.noVendorSell &&
-        !def.soulbound &&
-        s.count > 0
-      );
-    })
+    .filter((s) => junkSellableSlot(ITEMS[s.itemId], s))
     .map((s) => ({ itemId: s.itemId, count: s.count }));
   if (junk.length === 0) return; // nothing gray to sell; the vendor UI keeps the button disabled here
   let total = 0;
   let soldCount = 0;
   for (const { itemId, count } of junk) {
     const def = ITEMS[itemId]!;
-    ctx.removeItem(itemId, count, meta.entityId);
+    // Skip-aware removal: a spared bound slot sharing this itemId must never
+    // be the slot the removal walk consumes (plain removeItem cannot skip).
+    removePreferFungible(
+      ctx,
+      itemId,
+      count,
+      meta.entityId,
+      (instance) => instance.boundTo !== undefined,
+    );
     recordVendorBuyback(meta, itemId, count);
     total += def.sellValue * count;
     soldCount += count;

@@ -2,8 +2,8 @@ import { MOBS } from '../sim/data';
 import type { Entity } from '../sim/types';
 
 /** Resolve the exact corpse content the local player can open in the loot popup.
- *  `harvestStateReliable` is true on every production path since the Phase 4
- *  open-gate flip (no caller passes it: offline is sim-local truth, online
+ *  `harvestStateReliable` is true on every production path (no caller passes
+ *  it: offline is sim-local truth, online
  *  mirrors harvestClaimedBy via the hcb wire key). The parameter is a
  *  deliberately retained seam for a transport that cannot mirror harvest
  *  claims; its false arm stays pinned in tests/corpse_loot_availability.test.ts

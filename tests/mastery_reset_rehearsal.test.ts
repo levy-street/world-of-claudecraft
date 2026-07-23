@@ -1,7 +1,8 @@
-// THE PHASE 12c RESET REHEARSAL: a blob-diff sweep proving that load-then-
-// serialize applies EXACTLY the documented deltas to a character blob and
-// nothing else. Default mode runs a deterministic synthetic corpus (modern
-// 12b-era shape, legacy professions-key-only shape, over-cap values, minimal
+// THE ONE-TIME MASTERY RESET REHEARSAL: a blob-diff sweep proving that
+// load-then-serialize applies EXACTLY the documented deltas to a character
+// blob and nothing else. Default mode runs a deterministic synthetic corpus
+// (the modern gather-cast shape, the legacy professions-key-only shape,
+// over-cap values, minimal
 // fresh shape, and one with masteryResetApplied already true). Env-gated
 // mode: RESET_REHEARSAL_INPUT names a JSON file (an array of {id, state}
 // rows exported from a database copy) and the same sweep runs over every row
@@ -157,7 +158,7 @@ function rehearse(state: CharacterState, seed: number, playerClass = 'warrior'):
     violations.push('output blob is missing masteryResetApplied: true');
   }
 
-  // Arm 3 (completeness, Phase 12c QA): the two allowlist arms above only
+  // Arm 3 (completeness): the two allowlist arms above only
   // classify deltas that HAPPENED, so a partial reset (one map missed) sails
   // through them: the untouched map produces no delta at all. For a row the
   // reset should have applied to, require every craft-skill and gathering

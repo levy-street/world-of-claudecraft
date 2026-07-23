@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-// Pure-core pins for the crafting celebration plan (Professions 2.0 Phase 6):
+// Pure-core pins for the crafting celebration plan (Professions 2.0):
 // tier-crossing detection over craft-skill snapshots and the coalesced
 // banner / one-sound-per-drain / reduced-motion batching rules the HUD arm
 // consumes thinly (the buildDeedUnlockPlan contract shape).

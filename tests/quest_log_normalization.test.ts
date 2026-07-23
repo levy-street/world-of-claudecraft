@@ -4,7 +4,7 @@ import { onMobKilledForQuests } from '../src/sim/quests/quest_credit';
 import { Sim } from '../src/sim/sim';
 import type { Entity, QuestProgress } from '../src/sim/types';
 
-// Migration hazard (Professions 2.0 Phase 14): the load path copied every non-done
+// Migration hazard (Professions 2.0): the load path copied every non-done
 // questLog entry verbatim, without checking the id against QUESTS. Once
 // q_archetype_acceptance / q_prof_make_amends were retired, a production save that
 // was mid-either-quest loaded fine, then the next quest-touching tick op
@@ -13,7 +13,7 @@ import type { Entity, QuestProgress } from '../src/sim/types';
 // server tick. The fix prunes unknown active ids at load; questsDone (membership
 // only, never dereferenced) is preserved so history is intact.
 
-const RETIRED = 'q_archetype_acceptance'; // a real, now-deleted Phase 14 id
+const RETIRED = 'q_archetype_acceptance'; // a real, now-deleted id
 const SYNTHETIC = 'q_removed_synthetic'; // never a real id; outlives any future re-add
 const KNOWN = 'q_wolves'; // a real kill quest (kill 8 forest_wolf)
 

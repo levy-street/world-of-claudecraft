@@ -49,7 +49,7 @@ const SLOT_EMPTY_TEXT_COLOR = 'var(--color-slot-empty-text)';
 const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)';
 
 // The ten pair-archetype title keys (issue 1130, pair-named under Professions
-// 2.0 Phase 1), one per canonical pair id (see src/sim/professions/archetype.ts
+// 2.0), one per canonical pair id (see src/sim/professions/archetype.ts
 // ARCHETYPE_PAIR_TARGETS and getArchetypeTitle: the title identifier IS the
 // pair id). Every player-visible string is a t() key, so this is a literal
 // id-to-key table, never a built string.
@@ -153,7 +153,7 @@ export interface CharWindowDeps extends PainterHostPresentation {
 // Maps each gathering profession id to its hud_chrome display-name key (issue
 // 1124). String-keyed like the sibling professions_window.ts GATHERING_NAME_KEYS
 // (and this file's CRAFT_NAME_KEYS): an id with no key here renders no row
-// (fishing landed with Professions 2.0 Phase 11).
+// (fishing landed with Professions 2.0).
 const GATHERING_PROFESSION_LABEL_KEY: Record<string, TranslationKey> = {
   mining: 'hudChrome.gathering.mining',
   logging: 'hudChrome.gathering.logging',
@@ -317,7 +317,7 @@ export class CharWindow {
       this.deps.attachTooltip(row, () => {
         // Own worn copy's per-copy lines (seal, enchanted marker, maker's mark):
         // the self entity mirror carries equippedInstances in both worlds.
-        // Projected through wornTooltipInstance (Phase 14b) so the offline
+        // Projected through wornTooltipInstance so the offline
         // full payload renders exactly what the online eqi-trimmed mirror
         // does: worn identity is signer/enchant/rolled, never the bond.
         const world = this.deps.world();

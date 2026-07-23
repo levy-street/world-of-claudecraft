@@ -2025,7 +2025,7 @@ describe('client HTML shell', () => {
     );
     expect(mainTs).toContain("import { tryNearbyInteraction } from './game/nearby_interaction';");
     expect(mainTs).toContain('stopAutorunForInteraction(\n      tryNearbyInteraction(');
-    // Phase 4 open-gate flip: the trailing (online === null) override is gone,
+    // Open-gate flip: the trailing (online === null) override is gone,
     // so the helpers default harvestStateReliable = true (trusting the hcb
     // corpse-claim mirror online); the call now closes right after the
     // nothing-to-interact string.

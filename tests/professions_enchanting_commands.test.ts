@@ -1,4 +1,4 @@
-// Phase 13 enchanting COMMANDS across both worlds (the seam the content wave
+// Enchanting COMMANDS across both worlds (the seam the content wave
 // left un-wired): the Sim command methods (disenchantItem/applyEnchant/
 // salvageItem) each stash their outcome AND emit their pid-scoped, text-free
 // event exactly once; the live GameServer routes disenchant_item/apply_enchant/

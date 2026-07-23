@@ -1034,7 +1034,7 @@ describe('i18n Localization Key Coverage', () => {
       Object.keys(DELVES).length * 3 +
       // Ravenpost authored letters: welcome + Heroic Marks reward + mastery
       // reset notice + quest letters + Guild trend letters + master tier
-      // letters (Phase 14, keyed pair -> tier), 3 fields each.
+      // letters (keyed pair -> tier), 3 fields each.
       (3 +
         Object.keys(QUEST_LETTERS).length +
         Object.keys(GUILD_TREND_LETTERS).length +
@@ -1313,7 +1313,7 @@ describe('i18n Localization Key Coverage', () => {
   it('should provide deed content translations for every supported locale', () => {
     const deedEntries = deedTranslationManifest();
     // name + desc per deed, plus one title entry per title deed (30 as of
-    // Professions 2.0 Phase 15; tests/deeds_content.test.ts pins the count).
+    // Professions 2.0; tests/deeds_content.test.ts pins the count).
     expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 30);
 
     for (const lang of supportedLanguages) {

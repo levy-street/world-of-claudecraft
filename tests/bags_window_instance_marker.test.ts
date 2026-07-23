@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// The instanced-slot bag marker (Professions 2.0 Phase 12d): drives the real
+// The instanced-slot bag marker (Professions 2.0): drives the real
 // BagsWindow painter against a jsdom container (the vendor_window_painter
 // idiom) and pins the corner treatment on the CELL itself. An ordinary
 // per-copy payload renders .bi-instance; masterwork replaces that generic tab
@@ -74,7 +74,7 @@ function windowFor(inventory: InvSlot[]): HTMLElement {
   return root;
 }
 
-describe('bags grid instanced-slot marker (Phase 12d)', () => {
+describe('bags grid instanced-slot marker', () => {
   it('an instanced slot renders the corner marker; a plain slot does not', () => {
     const root = windowFor([
       { itemId: 'copper_ore', count: 1, instance: { signer: 'Anna' } },

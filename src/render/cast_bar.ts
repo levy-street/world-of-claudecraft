@@ -30,7 +30,7 @@ export function castBarState(e: Entity): CastBarState {
   // corpses, doors/crates, and idle entities show nothing; guard the divide too
   if (e.dead || e.kind === 'object' || !e.castingAbility || e.castTotal <= 0) return HIDDEN;
   const remaining = Math.max(0, Math.min(1, e.castRemaining / e.castTotal));
-  // Fishing (Professions 2.0 Phase 12b) renders a CONSTANT full waiting bar:
+  // Fishing (Professions 2.0) renders a CONSTANT full waiting bar:
   // the bite moment is the bobber + cue, and the bar must carry no bite (or
   // session-progress) information a modified client could read timing off.
   // The gather cast is an ordinary filling hardcast through the generic path.

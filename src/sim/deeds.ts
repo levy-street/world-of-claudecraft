@@ -1842,10 +1842,10 @@ export const VISITED_MARK_NAMESPACES = [
   'fiesta',
   'dungeon',
   'witness',
-  // Rare gather-event finds (Phase 4 authored the dormant marks, Phase 15
-  // reads them): the three node flavors written by announceGatherRareEvent
+  // Rare gather-event finds (the marks were authored dormant before their
+  // deed consumers): the three node flavors written by announceGatherRareEvent
   // plus the corpse-harvest perfect_specimen jackpot. Registering the
-  // namespace also lets restoreDeedStats keep marks a pre-Phase-15 save
+  // namespace also lets restoreDeedStats keep marks an older save
   // already carries (they serialized fine but were dropped on load while the
   // namespace was unregistered).
   'gather_event',

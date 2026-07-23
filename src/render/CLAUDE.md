@@ -34,6 +34,12 @@ Everything else is a sibling module in one of these families:
 - `self_motion.ts`/`facing_smooth.ts`: pure display-only self layers (bounded
   online pose extrapolation + rate-limited self yaw; never touch world state,
   see `src/net/CLAUDE.md`).
+- `camera_boom_core.ts`/`camera_feel_core.ts`/`camera_director_core.ts`: the
+  AAA chase-camera feel stack `updateCamera` composes (spring-arm pivot lag,
+  look-ahead + FOV kicks + landing thump, directed zone-vista/death-drift
+  moves). All display-only, all gated by the reduced-motion switch; driven
+  from `renderer.ts` `updateCamera` and the hud event hooks
+  (`tests/camera_*_core.test.ts`).
 - `voxel_terrain.ts`: verification-only prototype (proposal #1611, driven by
   `scripts/`, NOT the live path); live terrain is `terrain.ts` sampling sim heights.
 

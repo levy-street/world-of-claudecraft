@@ -1,4 +1,4 @@
-// Source pins over the Hud's Phase 14b Maker's Bond integration (the
+// Source pins over the Hud's Maker's Bond integration (the
 // train_window_hud.test.ts style: the wiring lives in the hud.ts coordinator,
 // so these pin the load-bearing snippets instead of booting the whole Hud):
 //  - the unbindResult event arm logs exactly one localized line per outcome,

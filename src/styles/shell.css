@@ -4261,7 +4261,7 @@
     margin: 8px 0 12px;
     max-height: 50vh;
     overflow-y: auto;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 5px;
   }
   .realm-loading {
@@ -5866,7 +5866,7 @@
     padding: 4px 9px;
     font-size: 10.5px;
     line-height: 1;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 999px;
     background: rgba(0, 0, 0, 0.3);
   }
@@ -5944,7 +5944,7 @@
     font-size: 10.5px;
     line-height: 1;
     color: var(--color-text-muted);
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 999px;
     background: rgba(0, 0, 0, 0.3);
   }
@@ -7277,14 +7277,14 @@
     gap: 12px;
     min-width: 0;
     min-height: 0;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 8px;
     background: #100d08;
     padding: 14px;
   }
   .se-roll-banner {
     flex: 0 0 auto;
-    border: 1px solid color-mix(in srgb, var(--tier-color, #fff) 45%, #463a1c);
+    border: 1px solid color-mix(in srgb, var(--tier-color, #fff) 45%, var(--color-border-showcase));
     border-radius: 8px;
     padding: 10px 12px;
     background: linear-gradient(180deg, #1b150d, #0f0c07);
@@ -7308,7 +7308,7 @@
     padding: 2px 8px 8px 2px;
   }
   .se-tier {
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 8px;
     background: #14110a;
     width: 100%;
@@ -7420,7 +7420,7 @@
     min-height: 0;
     display: flex;
     flex-direction: column;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 8px;
     background: #0f0d12;
     padding: 0;

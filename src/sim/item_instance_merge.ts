@@ -1,6 +1,6 @@
-// Identical-payload stacking (Professions 2.0 Phase 12d): the one predicate
+// Identical-payload stacking (Professions 2.0): the one predicate
 // deciding when two inventory slots of the same itemId may share a stack.
-// Before Phase 12d every instanced slot (#1165) sat one-per-slot at count 1;
+// Before this predicate every instanced slot (#1165) sat one-per-slot at count 1;
 // now byte-equal payloads (same signer, same rolled quality/stats/masterwork,
 // same enchant, same boundTo) merge up to the item's stack cap. bags.ts
 // countFit/addStacked, Sim.addItemInstance, bank.ts moveBetweenContainers,

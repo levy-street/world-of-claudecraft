@@ -207,8 +207,8 @@ export const DEEDS: Record<string, DeedDef> = {
   prog_master_gatherer: {
     id: 'prog_master_gatherer',
     name: 'Master Gatherer',
-    // Phase 15 reword (fishing joined the gathering ring in Phase 11, and the
-    // any-three trigger counts it): the desc now names all four professions.
+    // Desc reword (fishing joined the gathering ring, and the any-three
+    // trigger counts it): the desc names all four professions.
     // The trigger itself is untouched (rule 9); the stale locale desc fills
     // were dropped with the reword and refill at release (deed_i18n.locales,
     // English fallback until then).
@@ -1266,7 +1266,7 @@ export const DEEDS: Record<string, DeedDef> = {
   col_glimmerfin: {
     id: 'col_glimmerfin',
     name: 'Glimmer of Hope',
-    desc: 'Catch a Glimmerfin Koi.',
+    desc: 'Catch a Sunglint Koi.',
     category: 'collection',
     renown: 0,
     trigger: { kind: 'collectItems', itemIds: ['glimmerfin_koi'] },
@@ -1756,7 +1756,7 @@ export const DEEDS: Record<string, DeedDef> = {
   },
   exp_first_ore: {
     id: 'exp_first_ore',
-    name: 'Strike the Earth',
+    name: 'Pick Meets Stone',
     desc: 'Harvest your first ore node.',
     category: 'exploration',
     renown: 5,
@@ -1948,12 +1948,12 @@ export const DEEDS: Record<string, DeedDef> = {
   // Highwatch hub (zone3.ts), so this deed (and feat_book_complete through
   // it) is completable in live play. The vendor-to-craft-to-grant chain is
   // pinned by tests/professions_crafting_hub.test.ts. The stat key stays
-  // 'hubCraftsPerformed' (persisted): since Phase 8 it counts station-bound
+  // 'hubCraftsPerformed' (persisted): it counts station-bound
   // crafts at any station (see professions/crafting.ts craftItem).
   prog_tools_of_the_trade: {
     id: 'prog_tools_of_the_trade',
     name: 'Tools of the Trade',
-    // Phase 8 reword (stations replaced the single Highwatch hub): the stale
+    // Desc reword (stations replaced the single Highwatch hub): the stale
     // locale desc fills were dropped with it and refill at release
     // (deed_i18n.locales, English fallback until then).
     desc: 'Complete a craft at a crafting station.',
@@ -1986,7 +1986,7 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'stat', stat: 'cardDuelsWon', count: 1 },
   },
 
-  // Professions 2.0 Phase 15 additions (append-only tail, grouped by category
+  // Professions 2.0 additions (append-only tail, grouped by category
   // within this block only). Craft-skill thresholds reference ONLY resolved
   // caps or below: every CRAFT_RING craft caps at 125 (craftMaxSkillFor),
   // fishing at 200, the other gathering professions at 100
@@ -1996,12 +1996,12 @@ export const DEEDS: Record<string, DeedDef> = {
   // rather than shipping visible-but-unearnable.
   prog_guildsworn: {
     id: 'prog_guildsworn',
-    name: 'Guildsworn',
+    name: 'Craftsworn',
     desc: 'Attune yourself to an archetype pair and take up its trades in earnest.',
     category: 'progression',
     renown: 25,
     trigger: { kind: 'stat', stat: 'attunementsCompleted', count: 1 },
-    reward: { kind: 'title', text: 'Guildsworn' },
+    reward: { kind: 'title', text: 'Craftsworn' },
   },
   prog_masterwright: {
     id: 'prog_masterwright',

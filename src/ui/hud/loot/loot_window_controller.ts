@@ -70,8 +70,8 @@ export class LootWindowController {
     this.attachItemTooltips();
 
     if (hasLoot) {
-      // "Take Loot", not "Take All": the old label promised the harvest too
-      // (Phase 12d QA legibility fix). The delve-chest arm keeps Take All.
+      // "Take Loot", not "Take All": the old label promised the harvest too.
+      // The delve-chest arm keeps Take All.
       this.appendTakeButton(
         t('hudChrome.loot.takeLootButton'),
         () => {
@@ -83,7 +83,7 @@ export class LootWindowController {
     }
     if (harvestable && componentTags) {
       // Pre-check the caller's town focus: the same subset an omitted-components
-      // harvest resolves server-side (Phase 12d). Deselecting every box still
+      // harvest resolves server-side. Deselecting every box still
       // submits an explicit empty pick, which spreads.
       const focused = new Set(componentTags.filter((tag) => (world.townFocus[tag] ?? 0) > 0));
       renderCorpseHarvestPicker(this.deps.element, corpseHarvestView(componentTags, focused), {

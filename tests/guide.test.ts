@@ -59,8 +59,11 @@ import {
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { CAMPS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
-import { MARKET_CUT } from '../src/sim/market';
-import { WORK_ORDER_CADENCE_TICKS } from '../src/sim/professions/cadence';
+import { MARKET_CUT, MARKET_LISTING_DEPOSIT_COPPER } from '../src/sim/market';
+import {
+  WORK_ORDER_CADENCE_TICKS,
+  WORK_ORDER_PAYOUT_FRACTION,
+} from '../src/sim/professions/cadence';
 import { UNBIND_FEE_BY_QUALITY_TIER } from '../src/sim/professions/commission';
 import {
   ARMOR_SECONDARY_BY_TYPE,
@@ -1112,9 +1115,9 @@ describe('Guide corrected-prose pins', () => {
 });
 
 // ============================================================================
-// Professions reference accuracy (Professions 2.0 Phase 15 wiki arm).
+// Professions reference accuracy (Professions 2.0 wiki arm).
 //
-// NUMERIC-TRANSPARENCY CARVE-OUT, maintainer-resolved (the Phase 15 charter):
+// NUMERIC-TRANSPARENCY CARVE-OUT (a maintainer ruling):
 // the professions sections of the wiki publish EXACT numbers, skill
 // requirements, gain-state boundaries, band thresholds, caps, fees,
 // rare-event odds, and vendor prices, because a crafting reference that hides
@@ -1240,7 +1243,7 @@ describe('Guide professions generated content accuracy', () => {
     // gain fading at 75 / 100 / 125 (tier 2 recipe, TIER_SKILL_STEP 25).
     const wc = GUIDE_PROF_CRAFTS.find((c) => c.id === 'weaponcrafting');
     const warblade = wc?.recipes.find((r) => r.id === 'recipe_thorium_warblade');
-    expect(warblade?.name).toBe('Thorium Warblade');
+    expect(warblade?.name).toBe('Osmium Warblade');
     expect(warblade?.skillReq).toBe(50);
     expect(warblade?.station).toBe('forge');
     expect(warblade?.acquisition).toBe('trainer');
@@ -1343,7 +1346,7 @@ describe('Guide professions gathering accuracy', () => {
       tier: 3,
       toolTier: 3,
       count: 1,
-      material: 'Thorium Ore',
+      material: 'Osmium Ore',
     });
   });
 
@@ -1404,7 +1407,7 @@ describe('Guide professions gathering accuracy', () => {
       { below: 200, gain: 0.02 },
     ]);
     expect(f.junkCutoff).toBe(100);
-    expect(f.rareCatch).toBe('Glimmerfin Koi');
+    expect(f.rareCatch).toBe('Sunglint Koi');
     // Band tables mirror the sim tables row for row; weights sum to exactly
     // 100 per table, so the published pct IS the real probability; band b
     // needs rod tier b + 1.
@@ -1431,7 +1434,7 @@ describe('Guide professions gathering accuracy', () => {
     // 4 in Thornpeak (its odds never scale with skill).
     for (const band of f.bandTables) {
       for (const zone of band.zones) {
-        const koi = zone.rows.find((r) => r.name === 'Glimmerfin Koi');
+        const koi = zone.rows.find((r) => r.name === 'Sunglint Koi');
         expect(koi?.pct).toBe(zone.zone === 'Thornpeak Heights' ? 4 : 3);
       }
     }
@@ -1512,11 +1515,11 @@ describe('Guide professions enchanting and economy accuracy', () => {
       })),
     );
     expect(e.disenchantByQuality).toEqual([
-      { quality: 'common', material: 'Arcane Dust' },
-      { quality: 'uncommon', material: 'Arcane Dust' },
-      { quality: 'rare', material: 'Arcane Essence' },
-      { quality: 'epic', material: 'Arcane Shard' },
-      { quality: 'legendary', material: 'Arcane Shard' },
+      { quality: 'common', material: 'Chime Dust' },
+      { quality: 'uncommon', material: 'Chime Dust' },
+      { quality: 'rare', material: 'Chime Essence' },
+      { quality: 'epic', material: 'Chime Shard' },
+      { quality: 'legendary', material: 'Chime Shard' },
     ]);
     expect(e.typedSecondaries.armor).toEqual(
       Object.entries(ARMOR_SECONDARY_BY_TYPE).map(([armorType, m]) => ({
@@ -1547,6 +1550,7 @@ describe('Guide professions enchanting and economy accuracy', () => {
     expect(e.actionThrottle).toEqual({ windowSeconds: 60, maxActions: 10 });
     expect(e.marketCutPct).toBe(Math.round(MARKET_CUT * 100));
     expect(e.marketCutPct).toBe(5);
+    expect(e.listingDepositCopper).toBe(MARKET_LISTING_DEPOSIT_COPPER);
     expect(e.listingDepositCopper).toBe(0);
     expect(e.trainingFeeCopperByTier).toEqual([...TRAINING_FEE_BY_TIER]);
     expect(e.trainingFeeCopperByTier).toEqual([0, 2500, 10000, 40000, 160000]);
@@ -1575,6 +1579,11 @@ describe('Guide professions enchanting and economy accuracy', () => {
     const wo = GUIDE_PROF_ECONOMY.workOrders;
     expect(wo.cadenceMinutes).toBe(WORK_ORDER_CADENCE_TICKS / 20 / 60);
     expect(wo.cadenceMinutes).toBe(30);
+    // Literal arm first so the constant-derived checks below are never
+    // self-referential: the fraction itself is the pinned contract.
+    expect(WORK_ORDER_PAYOUT_FRACTION).toBe(0.5);
+    expect(wo.payoutPctOfVendorValue).toBe(WORK_ORDER_PAYOUT_FRACTION * 100);
+    expect(wo.payoutPctOfVendorValue).toBe(50);
     const simOrders = Object.values(QUESTS).filter(
       (q) =>
         q.repeatCadenceTicks === WORK_ORDER_CADENCE_TICKS &&
@@ -1592,10 +1601,11 @@ describe('Guide professions enchanting and economy accuracy', () => {
       expect(order.master).toBe(NPCS[quest.giverNpcId]?.name ?? '');
       expect(order.count).toBe(obj.count);
       expect(order.material).toBe(ITEMS[obj.itemId].name);
-      // The maintainer-resolved payout formula: floor(0.5 * vendor value).
+      // The payout formula, from the sim's own constant
+      // (its 0.5 value is literal-pinned above).
       const vendorValue = (ITEMS[obj.itemId].sellValue ?? 0) * obj.count;
       expect(order.coinCopper, `work order "${order.id}" coin off-formula`).toBe(
-        Math.floor(0.5 * vendorValue),
+        Math.floor(WORK_ORDER_PAYOUT_FRACTION * vendorValue),
       );
       expect(order.coinCopper).toBe(quest.copperReward ?? 0);
     }
@@ -1627,18 +1637,18 @@ describe('Guide professions pages and routes', () => {
     }
     // The craft page really renders its recipe rows.
     const weapon = professionsPage.render(ctx(['weaponcrafting']));
-    expect(weapon).toContain('Thorium Warblade');
+    expect(weapon).toContain('Osmium Warblade');
     expect((weapon.match(/class="guide-prof-recipe/g) ?? []).length).toBe(
       GUIDE_PROF_CRAFTS.find((c) => c.id === 'weaponcrafting')?.recipes.length,
     );
     // The enchanting route rides the craft module with its own sections.
     const ench = professionsPage.render(ctx(['enchanting']));
     expect(ench).toContain('Enchant Weapon - Runed Edge');
-    expect(ench).toContain('Arcane Shard');
+    expect(ench).toContain('Chime Shard');
     expect(ench).toContain('id="prof-disenchant"');
     // The fishing page renders all three band tables and the koi.
     const fishing = professionsPage.render(ctx(['fishing']));
-    expect(fishing).toContain('Glimmerfin Koi');
+    expect(fishing).toContain('Sunglint Koi');
     expect(fishing).toContain('id="fish-band-2"');
     // The economy page renders the work orders.
     const econ = professionsPage.render(ctx(['economy']));

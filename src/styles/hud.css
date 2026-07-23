@@ -2668,7 +2668,7 @@
   }
   .mt-tab {
     background: #1a1410;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 3px;
     color: var(--color-text-muted);
     font-size: 11px;
@@ -5026,7 +5026,7 @@
     color: var(--gold);
     font-size: 13px;
     padding: 3px 8px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
     margin-bottom: 4px;
   }
   #ctx-menu .ctx-item {
@@ -5056,7 +5056,7 @@
     background-repeat: no-repeat;
     background-position: center;
   }
-  /* Bag-item action menu (Professions 2.0 Phase 13): the Apply Enchant picker
+  /* Bag-item action menu (Professions 2.0): the Apply Enchant picker
      rows carry a dim meta sub-line (target slot + reagent affordability), and an
      unaffordable enchant row is shown but not selectable (aria-disabled), so the
      player can see what a reagent unlocks before they have it. */
@@ -5066,6 +5066,12 @@
     font-size: 11px;
     color: var(--color-text-muted);
   }
+  /* Per-reagent shortfall tint in the picker meta line (the crafting
+     window's reagent idiom): redundant beside the have/required counts the
+     text carries, so the tint is a hint, never the only signal. */
+  #ctx-menu .ctx-item-meta .ctx-reagent.unsat {
+    color: var(--color-text-error);
+  }
   #ctx-menu .ctx-item[aria-disabled="true"] {
     color: var(--color-text-muted);
     cursor: default;
@@ -5074,7 +5080,7 @@
     background: none;
     color: var(--color-text-muted);
   }
-  /* Apply Enchant picker sizing (Phase 13 QA, maintainer direction): the full
+  /* Apply Enchant picker sizing: the full
      enchant list plus per-row meta sub-lines outgrew the shared popup's natural
      size and ran nearly the whole viewport. The picker states alone (the
      painter-managed ctx-menu-picker modifier) take a wider, height-capped,
@@ -5284,7 +5290,7 @@
   }
   .trade-items {
     min-height: 120px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     padding: 4px;
     background: #0c0c12;

@@ -13,14 +13,398 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.bags.itemAriaMasterwork': '{item}, cantidad {count}, obra maestra',
+  'hudChrome.archetypePair.tailoring+inscription': 'Tejedormago',
+  'hudChrome.enchantName.enchant_weapon_runed_focus': 'Encantar arma - Sello Rúnico',
+  'hudChrome.professions.ctaRaiseSpecialized':
+    'Sigue subiendo {craft}: {points} puntos más para Especializado, y los costos de materiales bajan.',
+  'guide.professions.harvestBody':
+    'La recolección no se limita a los nodos. Muchas bestias abatidas pueden cosecharse una sola vez, el primero en llegar, para obtener pieles, colmillos, seda y carne directamente del cadáver junto a su botín ordinario; con una pulsación se abre todo a la vez. La elección también es tuya cada vez: extrae todo lo que ofrece el cadáver, o concéntrate en menos componentes y obtén una calidad notablemente superior de lo que sí tomas.\n\nUna tirada de cosecha rara o mejor en una familia portadora de ejemplares también otorga un ejemplar perfecto firmado (una Piel Prístina, Seda Prístina, Glándula de Veneno Prístina o Corte Primo) además del rendimiento ordinario, y registra Espécimen Perfecto en tu Libro de Gestas. Cualquier personaje puede cosechar, sin necesidad de entrenamiento, y cualquier herramienta de recolección que poseas cuenta para el tramo de calidad superior, sea del oficio que sea.',
+  'guide.professions.craftMasteryTitle': 'Cuánto tarda la maestría',
+  'guide.professions.craftMasteryBody':
+    'Expectativas honestas: el camino hasta el tope de 125 de un oficio requiere al menos 125 elaboraciones exitosas, ya que cada elaboración con ganancia completa avanza exactamente un punto, y en la práctica algo más a medida que las recetas pierden color entre un peldaño y otro del entrenador. La elaboración en sí es rápida; abastecerla es el viaje real, así que reserva varias tardes dedicadas a recolectar y elaborar por cada oficio.\n\nLos oficios de recolección alcanzan su tope de 100 a lo largo de un recorrido normal de subida de nivel si cosechas mientras viajas, aunque el tramo final pide los nodos de nivel superior del lejano norte. La Pesca es el camino largo por diseño: según su propio ritmo de ganancia, 200 de pericia equivale a más de tres mil capturas. El Pescador Maestro es un título que se gana durante una temporada de tardes tranquilas, no en un fin de semana.',
+  'guide.professions.archetypeChooseTitle': 'La carta del Gremio, y cambiar de opinión',
+  'guide.professions.archetypeChooseBody':
+    'No es necesario que busques nada de esto. Trabaja tus oficios, y en cuanto tus habilidades artesanales muestren claramente una inclinación hacia un par, el Gremio de Artesanos lo nota y envía una carta por cuervo nombrando al maestro que debes visitar y la misión que debes tomar. Llega una vez por personaje, y solo si aún no te has comprometido con un par.',
+  'guide.professions.archetypeSwitchBody':
+    'Una declaración tampoco es una condena de por vida. Un par que nunca has tenido es simplemente una misión de sintonización nueva, mientras que volver a un par del que te alejaste te pide que hagas las paces primero: cinco tareas la primera vez, y tres más por cada cambio que ya hayas realizado. La elección sigue siendo significativa sin cerrar nunca una puerta para siempre.',
+  'guide.professions.whatHeading': 'Un oficio junto a la espada',
+  'guide.professions.whatBody':
+    'Los oficios son la vida laboral del mundo: cuatro oficios de recolección que sacan materia prima directamente de la tierra, y un anillo de diez oficios de artesanía que la convierten en equipo, comidas, pociones y herramientas. Todo alimenta a otra cosa aquí. El mineral que minas se convierte en una espada, la espada recibe un encanto, y el encanto necesita polvo sacado de equipo viejo, así que un recolector, un artesano y un técnico son todos eslabones de una misma cadena.\n\nNo hay un límite de profesiones con el que agonizar. Cada personaje puede subir los ocho oficios de artesanía que tienen contenido hoy y los cuatro oficios de recolección al mismo tiempo; la única elección exclusiva es tu arquetipo, la identidad a la que eventualmente te comprometes, aunque una vez que te sintonizas los oficios que quedan inactivos dejan de avanzar. La habilidad nunca baja, y nada de lo que aprendes se te quita jamás.',
+  'guide.professions.ringHeading': 'El anillo de oficios',
+  'guide.professions.ringBody':
+    'Cada oficio con contenido hoy llega al tope de 125 de habilidad: Fabricación de armas, Fabricación de armaduras, Sastrería, Peletería, Cocina, Alquimia, Ingeniería y Encantación. Al llegar al tope el oficio sigue funcionando, las cosechas siguen dando, las elaboraciones siguen resolviéndose y las obras maestras pueden seguir ocurriendo; solo el número deja de subir. Elige una tarjeta abajo para ver la tabla completa de recetas y números de un oficio.',
+  'guide.professions.ringWaveNote':
+    'Dos oficios en la rueda, Joyería e Inscripción, tienen su lugar pero aún no tienen recetas. Esto es deliberado y no un descuido: su contenido llega con las zonas futuras, y los topes de arriba suben de la misma manera, así que un oficio al tope hoy es una ventaja de salida en esa expansión, no una línea de llegada.',
+  'guide.professions.capFmt': 'Tope {cap}',
+  'guide.professions.comingSoon': 'Sin recetas aún',
+  'guide.professions.gatherHubHeading': 'Recolección',
+  'guide.professions.gatherHubBody':
+    'Cuatro oficios de recolección alimentan el anillo desde el campo: Minería, Tala y Herboristería sacan mineral, madera y hierbas de la tierra y llegan al tope de 100 de pericia, mientras que la Pesca funciona con su propio ritmo de picar y cobrar hasta llegar a 200. Cada página abajo lleva los mapas exactos de nodos, las escaleras de herramientas y las probabilidades.',
+  'guide.professions.archetypesHeading': 'La rueda y sus arquetipos',
+  'guide.professions.archetypesBody':
+    'Los diez oficios de artesanía están en una rueda fija, y la geografía en esa rueda importa. Cada dos vecinos forman un par con nombre: Armero para Fabricación de armas y Fabricación de armaduras, Modisto para Peletería y Sastrería, Boticario para Alquimia y Cocina, Bombardero para Ingeniería y Alquimia, y seis más alrededor del anillo.\n\nSintonizarse con un par es una misión, no un clic en un menú. Hoy se pueden unir cuatro pares (Armero, Modisto, Boticario y Bombardero), cada uno anclado por un maestro residente en Eastbrook cuya misión de aceptación expone todo el trato antes de que lo aceptes. Hasta que declares, cada oficio avanza libremente con recetas hasta el nivel raro, así que puedes probar todo antes de elegir.\n\nUna vez que te sintonizas, tus dos oficios del par se convierten en tus especializaciones principales, sin tope hasta el máximo. El resto de la rueda no se apaga: un oficio opuesto a tus principales se queda como afición que sigue avanzando hasta el nivel raro (una misión repetible en la fragua del Armero Haldren te deja cambiar cuál es), y todos los demás oficios quedan inactivos. Un oficio inactivo conserva su habilidad y sus recetas comunes; simplemente deja de avanzar y nunca produce una obra maestra mientras descansa.',
+  'guide.professions.pairFmt': '{a} y {b}',
+  'guide.professions.curveHeading': 'La Curva de Maestría',
+  'guide.professions.curveBody':
+    'La ganancia de habilidad sigue una sola regla en todas partes: la Curva de Maestría de cuatro estados. Cada {step} puntos de habilidad es un nivel, y cada receta se puntúa según donde queda respecto al tuyo: en tu nivel o por encima otorga ganancia completa, un nivel por debajo otorga la mitad, dos por debajo un cuarto, y tres o más por debajo nada.\n\nLa ventana de artesanía pinta esto directamente en la lista de recetas con los colores clásicos: naranja para ganancia completa, amarillo para reducida, verde para un goteo, gris para nada. Las ganancias son deterministas, nunca un dado de subida de habilidad, así que la misma elaboración al mismo nivel siempre mueve tu habilidad exactamente la misma cantidad, y una receta que se pone amarilla es tu señal para aprender el siguiente peldaño.\n\nLa Recolección funciona con la misma curva y el mismo paso de nivel, puntuada contra el nodo en vez de una receta: los nodos fáciles se ponen grises a medida que los superas, y los nodos más ricos de las zonas posteriores son los que terminan el ascenso. La Pesca lleva su propio programa: un punto completo por captura por debajo de 50 de pericia, la mitad hasta 100, un décimo hasta 150, y una cola lenta hasta 200, sin que las capturas de basura enseñen nada desde 100 en adelante.',
+  'guide.professions.provenanceHeading': 'Procedencia',
+  'guide.professions.provenanceBody':
+    'El buen trabajo en este mundo recuerda a su artesano: las cosechas y elaboraciones de raro o mejor llegan firmadas (Recolectado por, Elaborado por), una obra maestra termina un nivel de calidad más alto con el nombre del artesano siempre en ella, y una pieza de encargo se vincula a su destinatario mediante el Vínculo del Artesano. La página de Economía de Artesanía tiene todas las reglas, desde firmas y apilado hasta tarifas de desvinculación.',
+  'guide.professions.stationsHeading': 'Estaciones y los tres centros',
+  'guide.professions.stationsBody':
+    'Seis estaciones especializadas sirven a los siete oficios vinculados a estación, distribuidas por los tres centros del pueblo. Eastbrook tiene la fragua (Fabricación de armas y Fabricación de armaduras la comparten), las cocinas, el telar y el taller de herramientas; Fenbridge tiene la curtiduría y Highwatch el boticario. Cada estación tiene un maestro residente junto a ella que enseña recetas, publica encargos de trabajo y ofrece el servicio de desvinculación.\n\nEl radio de trabajo es de 20 metros, aproximadamente el patio propio de la estación, así que elaboras parado junto al yunque y no desde el otro lado del pueblo. Joyería, Inscripción y Encantación no tienen estación: las dos primeras esperan sus recetas, y la Encantación funciona en cualquier lugar por diseño.',
+  'guide.professions.deedsHeading': 'Gestas que recuerdan el viaje',
+  'guide.professions.deedsBody':
+    'El Libro de Gestas acompaña cada paso de esto. Tu primera sintonización gana Juramentado del Oficio y tu primera obra maestra gana Gran Artesano, ambos usables como títulos. Cada uno de los ocho oficios con gestas marca una gesta hito a los 50 de habilidad y corona su tope con un título de Gran Maestro, mientras que la Pesca recibe Viejo Sal a los 100 de pericia y el título de Pescador Maestro a los 200.\n\nHay páginas más silenciosas también: gestas por tu primera cosecha y primera elaboración, por los hallazgos raros que la suerte te da en el campo, y por empezar el salvamento. Todo es cosmético, títulos y Renombre únicamente. Una gesta nunca otorga poder; solo prueba que estuviste allí.',
+  'guide.professions.startHeading': 'Por dónde empezar',
+  'guide.professions.startBody':
+    '¿Recién llegado a Eastbrook? Busca al Capataz Odell y acepta Un oficio para cada mano: te señalará las vetas de mineral alrededor de la Excavación de Cobre al suroeste del pueblo y te dará tus primeros callos. A partir de entonces, cosecha cada veta, arboleda y mata de hierba que encuentres mientras haces misiones; la pericia llega de forma natural a los viajeros.\n\nDe vuelta en el pueblo, pulsa T para abrir la ventana de artesanía y trabaja las recetas comunes que cada personaje conoce desde el principio. Visita a los maestros en la fragua, las cocinas, el telar y el taller de herramientas para ver qué enseñan, y acepta sus encargos de trabajo para obtener monedas constantes. Para cuando la carta del Gremio te encuentre, ya sabrás qué par se siente como hogar.',
+  'guide.professions.colStation': 'Estación',
+  'guide.professions.colHub': 'Centro',
+  'guide.professions.colMaster': 'Maestro',
+  'guide.professions.masterCellFmt': '{name}, {title}',
+  'guide.profPages.back': 'Volver a Oficios',
+  'guide.profPages.capLabel': 'Tope de habilidad',
+  'guide.profPages.stationLabel': 'Estación',
+  'guide.profPages.stationNone': 'No se necesita estación',
+  'guide.profPages.stationAnywhere': 'En cualquier lugar',
+  'guide.profPages.mastersLabel': 'Maestros',
+  'guide.profPages.masterFmt': '{name} ({hub})',
+  'guide.profPages.specializationLabel': 'Especialización',
+  'guide.profPages.specializationFact': 'Habilidad {at}: {pct}% de descuento en materiales',
+  'guide.profPages.matFmt': '{name} x{count}',
+  'guide.profPages.outputFmt': '{name} x{count}',
+  'guide.profPages.comboReq': 'Necesita {a} y {b}',
+  'guide.profPages.sourceTrainerFee': 'Entrenador, {fee}',
+  'guide.profPages.sourceTrainerFree': 'Entrenador, gratis',
+  'guide.profPages.sourceKnown': 'Conocido desde el principio',
+  'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.colRecipe': 'Receta',
+  'guide.profPages.colSkill': 'Habilidad',
+  'guide.profPages.colSource': 'Fuente',
+  'guide.profPages.colStation': 'Estación',
+  'guide.profPages.colMaterials': 'Materiales',
+  'guide.profPages.colQuality': 'Calidad',
+  'guide.profPages.colGain': 'La ganancia cae en',
+  'guide.profPages.colMaterial': 'Material',
+  'guide.profPages.colTool': 'Herramienta',
+  'guide.profPages.colTier': 'Nivel',
+  'guide.profPages.colPrice': 'Precio',
+  'guide.profPages.colZone': 'Zona',
+  'guide.profPages.colNodes': 'Nodos',
+  'guide.profPages.colNodeTier': 'Nivel del nodo',
+  'guide.profPages.colToolNeeded': 'Herramienta necesaria',
+  'guide.profPages.craftIntro.weaponcrafting':
+    'La forja de armas es el banco de armamento de la fragua de Eastbrook: hachas, mazas, hojas, lanzas e incluso el báculo de un lanzador, desde los iniciadores de cobre hasta las raras obras de osmio y glyfiacero. Un arma es la mejora que más se nota que un nivel puede comprar, así que un forjador de armas es el amigo que todo el mundo recuerda hacer.',
+  'guide.profPages.craftIntro.armorcrafting':
+    'La forja de armaduras trabaja la malla, la armadura más pesada que un artesano puede fabricar, desde las básicas de cobre remachado hasta el raro conjunto de escama de osmio, con un par de piezas con estadísticas de lanzador como complemento. Sus clientes son quienes se ponen donde caen los golpes.',
+  'guide.profPages.craftIntro.tailoring':
+    'La sastrería teje la tela de Intelecto y Espíritu en la que viven los lanzadores, desde los básicos de tela basta hasta el conjunto de tejido dorado y las obras raras de tejido solar, y cose la Bolsa de Seda Hilada, una bolsa de diez espacios que nadie rechaza.',
+  'guide.profPages.craftIntro.leatherworking':
+    'La peletería curte equipo de Agilidad y Aguante para las clases que esquivan en lugar de bloquear, desde los básicos de piel de Fenbridge hasta el raro conjunto mireguardián, y es el único oficio profundo que se entrena en el pantano.',
+  'guide.profPages.craftIntro.cooking':
+    'La cocina convierte la pesca del día en comidas que curan durante 18 segundos de descanso, la curación más barata del juego, desde el Tasajo Salado hasta el Gran Asado de Marlow. Todo el mundo come, así que ningún oficio es más universalmente bienvenido en un grupo.',
+  'guide.profPages.craftIntro.alchemy':
+    'La alquimia convierte hierbas, glándulas y vidrio en frascos que ganan combates: pociones de curación y maná para el momento en que las cosas salen mal, y elixires de aguante que permanecen en tu barra de mejoras durante toda una mazmorra.',
+  'guide.profPages.craftIntro.engineering':
+    'La ingeniería fabrica las herramientas que todo recolector serio acaba queriendo: los picos, hachas y hoces de nivel 4 y nivel 5 que ningún vendedor tendrá en existencia, cada una consumiendo la herramienta del nivel anterior.',
+  'guide.profPages.craftIntro.enchanting':
+    'El encantamiento desmonta el equipo y devuelve el poder: destruye piezas no deseadas para obtener materiales arcanos y luego úsalos para añadir una bonificación permanente de estadísticas a una pieza que quieras conservar. Sin estación, sin entrenador, y cualquiera puede empezar desde el primer día.',
+  'guide.profPages.craftProse.weaponcrafting.identityHeading': 'El filo que busca cada combatiente',
+  'guide.profPages.craftProse.weaponcrafting.identityBody':
+    'Alguien en cada grupo quiere el trabajo de este oficio, porque el peldaño raro solo ya cubre los tres gustos: el Mandoble de Osmio para cuerpo a cuerpo de Fuerza, el Hacha de Guerra de Glyfiacero para combatientes de Agilidad y el Báculo de Batalla de Pino Cumbre, un báculo de Intelecto y Espíritu para los de ropa.\n\nEn la rueda de oficios se sitúa entre la Forja de armaduras y la Joyería. Su identidad activa es el Herrero, el par de Forja de armas y Forja de armaduras, jurado ante la Maestra de la Fragua Darva en la fragua trabajando tres vetas de mineral con tus propias manos; el par Forjajoyero con la Joyería también está nombrado en la rueda, pero aún no puede jurarse, ya que la Joyería no tiene recetas hasta una expansión de zona posterior.',
+  'guide.profPages.craftProse.weaponcrafting.materialsHeading': 'Lo que bebe la forja',
+  'guide.profPages.craftProse.weaponcrafting.materialsBody':
+    'La Minería es la columna vertebral. El mineral de cobre sale de las vetas de nivel 1 del Valle de Eastbrook, el mineral de hierro del Pantano de Mirefen, y el mineral de osmio de las Alturas de Thornpeak, y cada peldaño de la escalera sube de la misma manera. La Tala importa más de lo que podrías esperar: la corteza de hierro afianza la lanza de jabalí, el fresno soporta el mazo, y un solo tronco de pino cumbre forma el bastón de batalla.\n\nEl resto viene de la caza y el mostrador. La piel áspera para los mangos se recolecta directamente de los cadáveres de lobos y jabalíes, los fragmentos de hueso caen de las muertes cotidianas, y la escalera de la forja quema Flujo de Fundición, 20 cobres el frasco donde Darva misma los vende. Si tu propia minería se retrasa, Darva vende mineral de osmio en la forja y el Artífice Gizzel tiene barras de glyfiacero en el taller de herramientas, a un precio que hace que tener amigos recolectores parezca barato.',
+  'guide.profPages.craftProse.weaponcrafting.ladderHeading': 'La escalera, peldaño a peldaño',
+  'guide.profPages.craftProse.weaponcrafting.ladderBody':
+    'Una receta de campo, la Espada de Armar de Eastbrook, la conoce todo el mundo desde el principio y se fabrica en cualquier lugar con botín de caza (un par de colmillos de lobo y fragmentos de hueso) más seis Fundentes de Forja del mostrador de la fragua. La escalera real son nueve recetas de entrenador en tres peldaños, todos vinculados a la fragua: el peldaño de cobre (hacha con barba, maza flangeada, lanza jabalí) es gratuito en habilidad 0, el peldaño de hierro (espada larga, mazo, daga) se abre en habilidad 25 por 25 de plata la receta y el peldaño de osmio (mandoble, hacha de guerra, báculo de batalla) se abre en habilidad 50 por 1 de oro cada uno. Darva enseña una receta en cuanto tu nivel en el oficio alcanza el suyo, así que cada peldaño se desbloquea exactamente cuando comienza su franja de habilidad.\n\nUna receta más va con el par: los Guanteletes del Dragón Sepulcro, una pieza combinada enseñada por el entrenador que solo un Herrero sintonizado con Forja de armas y Forja de armaduras ambas en habilidad 25 puede trabajar, y no necesita ninguna estación.',
+  'guide.profPages.craftProse.weaponcrafting.routeHeading':
+    'Obras maestras y una ruta de trabajo hasta 125',
+  'guide.profPages.craftProse.weaponcrafting.routeBody':
+    'Cualquier pieza con una línea de estadísticas real, que en esta escalera significa el peldaño de hierro en adelante, puede salir del yunque como obra maestra; los comunes de cobre sin estadísticas nunca activan el proc, porque no hay nada en ellos que mejorar. El hierro cuenta como material de nivel 1 para el bono de obra maestra, el pino cumbre y el glyfiacero como nivel 2, por lo que el peldaño superior activa el proc con un poco más de frecuencia.\n\nSube el peldaño de cobre hasta 25, aprende el peldaño de hierro el día que se abra y súbelo hasta 50, luego el peldaño de osmio hasta 75. Pasado 75 nada superior está disponible todavía, por lo que las recetas de osmio se reducen a la mitad y luego a un cuarto de ganancia: calcula aproximadamente 150 creaciones más para alcanzar el límite de 125, y recuerda el límite compartido de diez acciones de creación por minuto cuando te sientes a producir en masa.\n\nFinancia el ascenso conforme avanzas: la orden de trabajo de la forja de Darva acepta ocho minerales de cobre de tus manos cada 30 minutos a cambio de unas pocas monedas y experiencia de misión, y los peldaños de hierro y osmio se venden honestamente a los combatientes de cuerpo a cuerpo que suben de nivel. El Libro de Gestas marca Filo y Temple en habilidad 50 y corona al Gran Maestro Artesano de Armas en 125.',
+  'guide.profPages.craftProse.armorcrafting.identityHeading': 'Malla para la primera línea',
+  'guide.profPages.craftProse.armorcrafting.identityBody':
+    'La escalera de la forja de armaduras se lee como la carrera de un soldado: la sencilla cota de malla de cobre remachada, las grebas y los guanteletes para empezar, el peto de eslabones de hierro, los guardapiernas y las hombreras con sus primeras líneas de estadísticas reales, y el gran yelmo de escama de osmio raro, el peto y los leggings, piezas de Fuerza y Aguante con los mayores valores de armadura que un artesano puede fabricar.\n\nTiene también su lado más discreto: los Leggings Protegidos de Eastbrook, un campo común con estadísticas de lanzador, y el Manto de Escama de Horno, una rara malla de hombro con Intelecto y Espíritu en habilidad 75, mantienen a los portadores de malla de mente arcana en la lista de clientes. En la rueda se sitúa entre la Forja de armas y la Ingeniería; el par Herrero con la Forja de armas se jura ante la Maestra de la Fragua Darva, mientras que el par Engranajero con la Ingeniería está nombrado pero aún no tiene misión de juramento.',
+  'guide.profPages.craftProse.armorcrafting.materialsHeading': 'Mineral a sacos',
+  'guide.profPages.craftProse.armorcrafting.materialsBody':
+    'Ningún oficio consume mineral más rápido. El peto de eslabones de hierro solo ya requiere cinco minerales de hierro, y cada pieza de escama de osmio necesita tres o cuatro de osmio más una barra de glyfiacero, así que un forjador de armaduras serio extrae en el Pantano de Mirefen y las Alturas de Thornpeak o paga a quien lo hace. El cobre alimenta el primer peldaño, directamente de las vetas junto a la Excavación de Cobre.\n\nAlrededor del metal van las partes blandas: piel áspera recolectada de cadáveres de lobos y jabalíes, fragmentos de hueso y retales de lino de la caza ordinaria, y un frasco de Fundente de Forja (20 cobres en la fragua) en casi cada receta. Darva vende mineral de osmio en el mostrador para los impacientes.',
+  'guide.profPages.craftProse.armorcrafting.ladderHeading': 'Aprendiendo en la fragua de Darva',
+  'guide.profPages.craftProse.armorcrafting.ladderBody':
+    'Dos campos comunes, el Chaleco de Malla de Eastbrook y los Leggings Protegidos, se conocen desde el principio y se fabrican en cualquier lugar. La escalera del entrenador son nueve recetas en tres peldaños en la fragua de Eastbrook: el peldaño de cobre es gratuito en habilidad 0, el peldaño de eslabones de hierro cuesta 25 de plata por receta en habilidad 25 y el peldaño de escama de osmio cuesta 1 de oro cada uno en habilidad 50, pudiendo enseñar cada peldaño en cuanto tu nivel llega a él.\n\nMás allá de la escalera hay dos especiales. El Yelmo de Piedralímite es la receta combinada del Herrero, enseñada por el entrenador, sin necesidad de estación y realizable solo por un Herrero sintonizado con ambos oficios en habilidad 25. El Manto de Escama de Horno no necesita entrenador: todo el mundo lo conoce, pero en habilidad 75 y vinculado a la fragua, es la piedra angular de nivel 3 del oficio.',
+  'guide.profPages.craftProse.armorcrafting.routeHeading': 'Obras maestras y una ruta hasta 125',
+  'guide.profPages.craftProse.armorcrafting.routeBody':
+    'Desde el peldaño de eslabones de hierro en adelante, cada fabricación tiene posibilidad de generar obra maestra; los campos comunes de cobre solo para armadura no pueden activarse, ya que una obra maestra mejora las estadísticas y esas piezas no tienen ninguna. El hierro cuenta como material de nivel 1 para el efecto y el glyfiacero como nivel 2.\n\nLa subida es el viaje estándar de tres peldaños: cobre hasta 25, eslabones de hierro hasta 50, escama de osmio hasta 75, entrenando cada peldaño el día que se abre. Donde la Forja de armaduras tiene suerte es en el tramo después de 75: el Manto de Escama de Horno es una receta de nivel 3, por lo que da ganancia completa hasta 99 y la mitad después, lo que significa que los últimos cincuenta puntos tardan unas 75 fabricaciones en lugar de las 150 que necesita un oficio sin piedra angular. Cada manto cuesta siete minerales de osmio y cinco de Fundente de Forja, así que abastécete en Thornpeak y en el mostrador de la fragua antes de empezar la carrera.\n\nEl pedido de trabajo de Darva compra ocho minerales de cobre cada 30 minutos por monedas y XP, un buen uso para el mineral de bajo nivel que ya no necesitas. El Libro de Gestas marca Martillo y Placa en habilidad 50, y la Forja de Armaduras del Gran Maestro espera en el tope de 125.',
+  'guide.profPages.craftProse.tailoring.identityHeading':
+    'Tela para los lanzadores, bolsas para todos',
+  'guide.profPages.craftProse.tailoring.identityBody':
+    'La escalera sube desde los básicos de tela basta, pasando por el conjunto de tejido dorado, hasta el peldaño raro: el Atavío del Vinculaseda y las piezas de tejido solar. Su segundo oficio es universal: la Bolsa de Seda Hilada es una bolsa de diez espacios, y no hay clase, especialización ni nivel que no quiera más espacio en bolsa.\n\nEn la rueda la Sastrería se sitúa entre la Peletería y la Inscripción. Su par activo es el Pertrechador, Peletería y Sastrería juntas, jurado ante la Tejedora Ottilie en el telar de Eastbrook tras eliminar cuatro arañas de madera telada para obtener su seda; el par Tejedormago con la Inscripción está nombrado en la rueda pero espera las primeras recetas de la Inscripción antes de poder jurarse.',
+  'guide.profPages.craftProse.tailoring.materialsHeading': 'Hilo, seda y, sí, hierbas',
+  'guide.profPages.craftProse.tailoring.materialsBody':
+    'El telar funciona con lo que suelta la caza y lo que crecen los campos. Los retales de lino y la tela basta vienen de las muertes de humanoides, la seda de araña se recolecta de los cadáveres de arañas, y la pieza central del peldaño raro, el Atavío del Vinculaseda, necesita una Seda Prístina, el ejemplar firmado que aparece con suerte al cosechar un cadáver.\n\nLa herboristería alimenta a la sastrería más que a cualquier otro oficio de equipo: la hoja de brillo recorta las pantuflas, la hoja dorada colorea el conjunto de tejido dorado y el pétalo de sol enhebra todo el peldaño raro, así que un sastre que recoge sus propias hierbas ahorra constantemente. Un Carrete de Hilo cuesta 12 cobres de Ottilie, y el telar no pide metal alguno: incluso la piedra angular del Capuchón Tejidoguarda se teje con hierbas premium, Seda Prístina, seda de araña e hilo.',
+  'guide.profPages.craftProse.tailoring.ladderHeading': 'Aprendiendo en el telar de Ottilie',
+  'guide.profPages.craftProse.tailoring.ladderBody':
+    'Dos campos comunes, los Pantalones de Lana de Eastbrook y los Vestidos Rituales, se conocen desde el principio y se fabrican en cualquier lugar. La escalera del entrenador transcurre en el telar al sur del pozo de Eastbrook: el peldaño de tela basta (capucha, manoplas, pantuflas) es gratuito en habilidad 0, el peldaño de tejido dorado (túnica, leggings y la Bolsa de Seda Hilada) cuesta 25 de plata la receta en habilidad 25, y el peldaño raro (atavío, manto, calzado) cuesta 1 de oro cada uno en habilidad 50.\n\nEl Capuchón Tejidoguarda no necesita entrenador: todo el mundo lo conoce, pero está en habilidad 75 y vinculado al telar como la piedra angular de nivel 3 del oficio. Como en todas partes, Ottilie enseña una receta en cuanto tu nivel en Sastrería alcanza el propio de la receta.',
+  'guide.profPages.craftProse.tailoring.routeHeading': 'Obras maestras y una ruta hasta 125',
+  'guide.profPages.craftProse.tailoring.routeBody':
+    'Una Seda Prístina en el atavío cubre por sí sola la bonificación de reactivo firmado para obra maestra, y la hoja dorada y el pétalo de sol cuentan como materiales de nivel 1 y nivel 2 para el efecto, por lo que el peldaño raro es donde las probabilidades alcanzan su punto máximo. El trabajo simple y sin estadísticas como la bolsa nunca lo activa: una obra maestra mejora estadísticas, y una bolsa no tiene ninguna.\n\nCose el peldaño de tela basta hasta 25, entrena el tejido dorado el día que se abre y úsalo hasta 50, luego el peldaño raro hasta 75. Desde 75 el Capuchón Tejidoguarda toma el relevo: una receta de nivel 3, ganancia completa hasta 99 y la mitad después, unas 75 fabricaciones para los últimos cincuenta puntos, cada una costando dos Sedas Prístinas, cuatro sedas de araña, un par de hierbas de pétalo de sol y hoja dorada cada una, y dos hilos.\n\nHaz que la subida se pague sola: las bolsas se venden a literalmente todo el mundo, y el pedido de trabajo del telar de Ottilie compra seis sedas de araña cada 30 minutos. El Libro de Gestas marca Una Costura Fina en habilidad 50, con la Sastrería del Gran Maestro esperando en el tope de 125.',
+  'guide.profPages.craftProse.leatherworking.identityHeading': 'Cuero para los veloces',
+  'guide.profPages.craftProse.leatherworking.identityBody':
+    'La escalera sube desde los simples leggings, botas y cinturón de piel de Fenbridge, pasando por el jubón, la capucha y las hombreras de acechodepantano infrecuentes, hasta el raro conjunto mireguardián, el mejor cuero que un artesano puede cortar. Dos piezas de lanzador lo redondean: el campo común Piel de Druida de Eastbrook y las Vendas de Cuero Crepuscular en habilidad 75.\n\nEn la rueda se sitúa entre la Cocina y la Sastrería. Su par activo es el Pertrechador, Peletería y Sastrería, jurado ante la Tejedora Ottilie en Eastbrook; el par Trampero con la Cocina está nombrado en la rueda pero aún no tiene misión de juramento.',
+  'guide.profPages.craftProse.leatherworking.materialsHeading': 'La caza es la cosecha',
+  'guide.profPages.craftProse.leatherworking.materialsBody':
+    'La Peletería es el oficio donde tu ruta de subida de nivel y tu línea de suministro son la misma cosa: la piel áspera se recolecta directamente de los cadáveres portadores de piel, sobre todo lobos y jabalíes, y cada cadáver sirve a un solo recolector, el primero en llegar. Una tirada de cosecha rara o mejor también otorga una Piel Prístina, un ejemplar firmado que el Jubón de Mireguardián requiere, así que guarda cada una que encuentres.\n\nEl elenco de apoyo es pequeño: patas de araña y seda, tela basta de humanoides, un único mineral de osmio en cada pieza rara de mireguardián (seis en la piedra angular de las Vendas de Cuero Crepuscular), y un Agente de Curtido a 16 cobres en el mostrador de la tenería. El Curtidor Hesk también vende mineral de osmio, si prefieres no minarlo.',
+  'guide.profPages.craftProse.leatherworking.ladderHeading': 'Entrenado en Fenbridge',
+  'guide.profPages.craftProse.leatherworking.ladderBody':
+    'Aquí está la particularidad: la tenería se encuentra en Fenbridge, en el camino del Pantano de Mirefen, haciendo de la Peletería el único oficio profundo entrenado fuera de Eastbrook. El Curtidor Hesk enseña la escalera en sus cubas: el peldaño de piel de Fenbridge gratuito en habilidad 0, el peldaño de acechodepantano por 25 de plata la receta desde habilidad 25 y el peldaño de mireguardián por 1 de oro cada uno desde habilidad 50, abriéndose cada peldaño cuando tu nivel lo alcanza.\n\nDos recetas se saltan el entrenador: los campos comunes (el Jubón de Cuero Curtido y la Piel de Druida) se fabrican en cualquier lugar desde el principio, y las Vendas de Cuero Crepuscular las conoce todo el mundo pero están en habilidad 75 y vinculadas a la tenería. Ten en cuenta que el propio juramento del Pertrechador se hace de vuelta en Eastbrook con Ottilie; solo la enseñanza ocurre en el pantano.',
+  'guide.profPages.craftProse.leatherworking.routeHeading': 'Obras maestras y una ruta hasta 125',
+  'guide.profPages.craftProse.leatherworking.routeBody':
+    'Desde el peldaño de acechodepantano en adelante, cada fabricación tiene posibilidad de generar obra maestra, y la Piel Prístina en un Jubón de Mireguardián aporta la bonificación de reactivo firmado automáticamente; el osmio cuenta como material de nivel 1 para el efecto. Los campos comunes de piel sin estadísticas no pueden activarse.\n\nSúbelo de manera natural: cosecha cada lobo y jabalí que mates desde el nivel uno, fabrica el peldaño de piel hasta 25 donde estés, luego entrena en Fenbridge cuando las misiones te lleven al pantano de todos modos. El acechodepantano te lleva hasta 50 y el mireguardián hasta 75; pasado eso las Vendas de Cuero Crepuscular, una receta de nivel 3 con seis minerales de osmio, tres Pieles Prístinas, dos pieles ásperas y un Agente de Curtido, pagan ganancia completa hasta 99 y la mitad después, unas 75 fabricaciones para los últimos cincuenta puntos hasta el tope de 125.\n\nLa tenería de campo portátil importa más para este oficio que para cualquier otro: especialízate en 75 y una alforja de pieles se convierte en equipo terminado junto al fuego de campamento en lugar de un paseo de vuelta a Fenbridge. El pedido de trabajo de tenería de Hesk compra ocho pieles ásperas cada 30 minutos, un retorno ordenado por pieles que recolectabas de todos modos, y el Libro de Gestas marca el Oficio del Curtidor en habilidad 50 con la Peletería del Gran Maestro en el tope.',
+  'guide.profPages.craftProse.cooking.identityHeading': 'El puchero que alimenta al grupo',
+  'guide.profPages.craftProse.cooking.identityBody':
+    'Come una comida cocinada y te curará durante 18 segundos de descanso, que entre tirones es la curación más barata del juego. La escalera va desde un Pez de Río a la Plancha de 90 de salud hasta el Gran Asado de Marlow en 980, la mayor curación sentada que existe.\n\nEn la rueda, la Cocina se sitúa entre la Alquimia y la Peletería. Su par activo es el Boticario, Alquimia y Cocina, jurado ante la Cocinera Marlow en las cocinas de Eastbrook tras cazar cuatro jabalíes salvajes para el puchero; el par Trampero con la Peletería está nombrado en la rueda pero aún no tiene misión de juramento.',
+  'guide.profPages.craftProse.cooking.materialsHeading':
+    'Una despensa alimentada por la caña y el cuchillo',
+  'guide.profPages.craftProse.cooking.materialsBody':
+    'La pesca abastece los ingredientes principales, zona a zona: trucha espejo y pez de río de las aguas del Valle de Eastbrook, lucio de pantano y anguila de ciénaga de Mirefen, trucha escarcha y carpa pizarra de las Alturas de Thornpeak. Cada peldaño de la escalera cocina el pescado de su nivel, así que un cocinero que pesca nunca se queda sin nada.\n\nEl lado del carnicero viene de cadáveres cosechados: carne de caza de jabalíes y sus parientes, y, en una tirada de cosecha rara o mejor, un Corte Selecto firmado, la pieza central del gran asado. Las hierbas sazonan los mejores platos, un tronco de ashwood ahuma la anguila y la Sal de Cocina cuesta 8 cobres la bolsa en el propio puesto de Marlow.',
+  'guide.profPages.craftProse.cooking.ladderHeading': 'Del tasajo al gran asado',
+  'guide.profPages.craftProse.cooking.ladderBody':
+    'El Tasajo Salado es la receta de campo: conocida desde el principio, una pata de araña, elaborable en cualquier lugar, la comida de viaje de todo aventurero recién llegado. La escalera del entrenador cocina en las cocinas de Eastbrook al oeste de la plaza: el peldaño gratuito en habilidad 0 (el pez, el Pincho de Caza del Cazador, la Lucio de Pantano con Hierbas), el peldaño intermedio en habilidad 25 por 25 de plata la receta (Anguila Ahumada de Ashwood, Guiso de Caza con Hoja Dorada, Chowder de Trucha Escarcha), y el peldaño raro en habilidad 50 por 1 de oro cada uno (Cena de Carpa Plateada, Plato de Fiesta del Pescador, Gran Asado de Marlow).\n\nLos platos en lote estiran los ingredientes: la anguila ahumada y el guiso de caza sirven dos porciones por fabricación, y el plato de fiesta sirve tres. Marlow enseña cada peldaño en cuanto tu nivel en Cocina lo alcanza.',
+  'guide.profPages.craftProse.cooking.routeHeading':
+    'Especialización, no obras maestras, y la ruta hasta 125',
+  'guide.profPages.craftProse.cooking.routeBody':
+    'La Cocina es la excepción honesta a la historia de las obras maestras: una comida no tiene línea de estadísticas que mejorar, así que los platos nunca la generan, y ningún cocinero debería perseguirla. La maestría del oficio es la especialización en 75: un quinto menos de cada ingrediente, que se acumula rápido en los platos en lote, y una cocina de campo portátil para cocinar el festín justo a la puerta de la mazmorra.\n\nCocina lo que pescas: combina la subida con una sesión de pesca y las dos habilidades se alimentan mutuamente hasta arriba. El tasajo y el peldaño gratuito te llevan hasta 25 a un punto por fabricación, el peldaño intermedio hasta 50 y el peldaño raro hasta 75; pasado 75 aún no hay ningún plato superior, así que los platos raros se reducen a la mitad y luego a un cuarto de ganancia, aproximadamente 150 fabricaciones más hasta el tope. Trátalo como abastecimiento, no como grindeo: una hermandad come cada ración.\n\nEl pedido de trabajo de las cocinas de Marlow compra ocho carnes de caza cada 30 minutos por monedas y XP, y el Libro de Gestas marca Chef Experimentado en habilidad 50 en el camino hacia el título de Gran Maestro de Cocina en 125.',
+  'guide.profPages.craftProse.alchemy.identityHeading': 'Frascos que ganan combates',
+  'guide.profPages.craftProse.alchemy.identityBody':
+    'El oficio se trabaja en el boticario de Highwatch, hogar de la Alquimista Verane, Maestra del Boticario, quien enseña la escalera de recetas, vende Viales de Vidrio a 12 cobres y paga monedas por hierbas a través de su pedido de trabajo.\n\nEn la rueda de oficios, la Alquimia se sienta con los oficios de ensayo y error, junto a la Ingeniería por un lado y la Cocina por el otro. Eso le da dos identidades de par: el Bombardero (Ingeniería y Alquimia, tomado antes de Tinker Gizzel en Eastbrook) y el Boticario (Alquimia y Cocina, jurado ante la Cocinera Marlow). Sintonízate con cualquiera de los dos pares para hacer de la Alquimia una especialización principal y abrir la habilidad hasta su tope; hasta entonces funciona hasta el nivel raro como cualquier oficio no declarado.',
+  'guide.profPages.craftProse.alchemy.materialsHeading': 'Hierbas, glándulas y vidrio',
+  'guide.profPages.craftProse.alchemy.materialsBody':
+    'Cada poción necesita un Vial de Vidrio más las hierbas correspondientes a su peldaño: la hoja de brillo crece en el Valle de Eastbrook, la hoja dorada en el Pantano de Mirefen y el pétalo de sol en las Alturas de Thornpeak, una hierba por zona, así que tus frascos suben por el mundo junto a ti. La herboristería es la habilidad complementaria natural, aunque comprar a recolectores o en el mercado funciona igual de bien; las zonas más profundas tienen parcelas de nivel superior que requieren una hoz mejor, así que mantén tu herramienta al día si recolectas tú mismo.\n\nLa línea de elixires añade un ingrediente del cazador: Glándulas de Veneno recolectadas de cadáveres venenosos, y el elixir superior requiere una Glándula de Veneno Prístina, el raro ejemplar firmado que aparece con suerte al cosechar un cadáver. Si no recolectas tú mismo, esos son exactamente los bienes que vale la pena pedirle a un amigo cazador que traiga de vuelta.',
+  'guide.profPages.craftProse.alchemy.ladderHeading': 'La escalera de recetas',
+  'guide.profPages.craftProse.alchemy.ladderBody':
+    'Todo el mundo conoce la Poción de Curación Menor desde el principio y puede mezclarla en cualquier lugar, sin necesitar estación. La escalera real son nueve recetas enseñadas por Verane en el boticario, tres en cada peldaño: las recetas de habilidad 0 son gratuitas, el peldaño de habilidad 25 cuesta 25 de plata por receta y el peldaño de habilidad 50 cuesta 1 de oro por receta. Cada peldaño incluye una poción de curación, una poción de maná y un elixir de aguante, escalando desde los frascos comunes de hoja de brillo (120 de salud, 160 de maná), pasando por la hoja dorada infrecuente (200 de salud, 260 de maná), hasta la pétalo de sol rara (280 de salud, 360 de maná).\n\nLos elixires suben de la misma manera: el Elixir del Jabalí otorga 6 de Aguante durante 10 minutos, el Elixir Venenofuego otorga 9 durante 15 minutos, y el Elixir de la Serpiente otorga 12 durante 15 minutos, fabricando dos frascos por elaboración. Una receta más está aparte: el Elixir del Oso, una poción combinada que Verane enseña por 25 de plata una vez que tu Alquimia alcanza 25, elaborable en cualquier lugar, pero solo por un Bombardero sintonizado con Alquimia e Ingeniería ambas en 25.',
+  'guide.profPages.craftProse.alchemy.routeHeading': 'La ruta de un elaborador hasta 125',
+  'guide.profPages.craftProse.alchemy.routeBody':
+    'Las pociones y los elixires nunca generan obras maestras; ese efecto corresponde al equipo con estadísticas. Aunque tu nombre sí viaja: las raras pociones de pétalo de sol se elaboran de a un frasco y llegan firmadas con la marca del fabricante, mientras que el Elixir de la Serpiente de doble lote se queda sin firma. A habilidad 75 te especializas, y desde entonces cada receta de Alquimia cuesta un 20 por ciento menos de materiales.\n\nToma Herboristería desde temprano y recoge mientras subes de nivel: la hoja de brillo abunda en el Valle, y una vez que llegas al banco de Verane el peldaño gratuito te llevará limpiamente hasta habilidad 25 con hierbas que habrías recolectado de todos modos. Aprende el peldaño 25 en cuanto esté disponible, mueve tu recolección al pantano para la hoja dorada y deja que el pedido de trabajo de Verane (seis Hierbas de Hoja Dorada por 45 cobres, repetible cada 30 minutos) te devuelva algo de moneda mientras avanzas.\n\nDesde 50 en adelante, elabora pociones de pétalo de sol y lotes de Serpiente con hierbas de Thornpeak. El último tramo de 100 a 125 es un goteo deliberado, así que elabora lo que realmente se vende en lugar de quemar hierbas por el número, y recuerda que los consumibles son el único bien artesanal que todo el mundo vuelve a comprar para siempre. El Libro de Gestas marca Extrañas Pociones en habilidad 50 y Alquimia del Gran Maestro en el tope.',
+  'guide.profPages.craftProse.engineering.identityHeading':
+    'El monopolio del fabricante de herramientas',
+  'guide.profPages.craftProse.engineering.identityBody':
+    'El oficio se trabaja en el taller de herramientas en la esquina sureste de la Plaza de Eastbrook, hogar de Tinker Gizzel, Maestro del Taller de Herramientas. Los niveles 1 a 3 de cada línea de herramientas son existencias normales de vendedor; los niveles 4 y 5 solo existen a través de un ingeniero.\n\nEn la rueda se sitúa con los oficios de ensayo y error, junto a la Alquimia y la Forja de armaduras, dándole dos identidades de par: el Bombardero (Ingeniería y Alquimia, tomado ante el propio Gizzel) y el Engranajero (Forja de armaduras e Ingeniería, nombrado pero aún no puede jurarse). Una advertencia importa más aquí que en ningún otro lugar: ambos peldaños de recetas de la Ingeniería están por encima del techo de nivel raro bajo el que trabajan las aficiones y los artesanos no declarados, así que el número de habilidad solo avanza para un artesano cuyas especializaciones principales incluyan Ingeniería, que hoy en día significa el Bombardero. Cualquiera puede seguir fabricando las herramientas; un artesano no sintonizado simplemente no aprende nada al hacerlo.',
+  'guide.profPages.craftProse.engineering.materialsHeading': 'Reactivos y herramientas anteriores',
+  'guide.profPages.craftProse.engineering.materialsBody':
+    'Cada receta de herramienta consume la herramienta del nivel anterior más un material premium: cuatro Minerales de Osmio y un Pico de Minería de Plata Celeste se convierten en el Pico de Minería de Osmio, luego dos Barras de Glyfiacero y ese pico de osmio se convierten en el Pico de Minería de Glyfiacero, y las líneas de hacha y hoz siguen la misma forma con Troncos de Ashwood y Pino Cumbre, Hierbas de Hoja Dorada y Pétalo de Sol.\n\nGizzel tiene los seis reactivos premium en el taller si quieres velocidad sobre margen, pero el mineral, los troncos y las hierbas son todos recolectables en el Pantano de Mirefen y las Alturas de Thornpeak, y las existencias recolectadas son donde vive el beneficio. La excepción es la Barra de Glyfiacero, que solo se consigue del vendedor, así que cada herramienta de nivel glyfiacero lleva un costo fijo en monedas incorporado en su precio.',
+  'guide.profPages.craftProse.engineering.ladderHeading': 'La escalera de herramientas',
+  'guide.profPages.craftProse.engineering.ladderBody':
+    'Toda la escalera son seis recetas, todas vinculadas a la estación del taller de herramientas y todas conocidas automáticamente, sin tarifa de entrenador nunca: el pico, el hacha y la hoz de nivel 4 en habilidad 75, y las versiones de nivel 5 en habilidad 150. Ese segundo número no es un error de tipeo, y se sitúa por encima del tope actual de 125 a propósito: los requisitos de habilidad nunca bloquean una fabricación aquí, solo dan forma a la ganancia de habilidad, así que puedes fabricar una herramienta de nivel 5 el día que tengas sus reactivos y el nivel 4 anterior.\n\nCada herramienta terminada es de calidad rara o épica y sale firmada, por lo que tu nombre viaja por las zonas en los cinturones de herramientas de otros jugadores. La Ingeniería también sostiene la mitad de una receta combinada: el Elixir del Oso, elaborado por un Bombardero sintonizado con Ingeniería y Alquimia ambas en 25.',
+  'guide.profPages.craftProse.engineering.routeHeading': 'La ruta de un ingeniero hasta 125',
+  'guide.profPages.craftProse.engineering.routeBody':
+    'Las herramientas no tienen estadísticas de combate, así que nunca generan obras maestras; ese efecto corresponde al equipo con estadísticas. La especialización aún llega en habilidad 75: un 20 por ciento menos de materiales por fabricación, y un taller de herramientas de campo temporal que convierte cualquier viaje de recolección en un taller. La matemática de ganancia apenas se reduce aquí: las recetas de habilidad 75 pagan ganancia completa hasta 100 y la mitad después, y las recetas de habilidad 150 pagan ganancia completa hasta el tope de 125, así que la verdadera limitación son los reactivos y las monedas, nunca las recetas en gris.\n\nElige tu par primero, porque nada avanza sin él: toma la sintonización de Bombardero de Tinker Gizzel. Luego alimenta la escalera: sube Minería, Tala o Herboristería tú mismo o hazte amigo de recolectores, compra las herramientas de nivel 3 a los vendedores y trata el pedido de trabajo de Gizzel (ocho Troncos de Corteza de Hierro por 16 cobres, repetible cada 30 minutos) como dinero de bolsillo.\n\nLa Ingeniería es un oficio de prestigio de bajo volumen, aproximadamente un punto de habilidad por herramienta terminada, así que trata cada fabricación como existencias para vender. El argumento a tus clientes se escribe solo: cada nivel de herramienta por encima del propio del nodo reduce 0,4 segundos del tiempo de lanzamiento de recolección de 2,5 segundos (hasta un mínimo de 1,5 segundos), así que una herramienta de nivel 5 es una mejora de velocidad en cada nodo del mundo, y solo tú puedes fabricarla. El Libro de Gestas marca Engranajes y Resortes en habilidad 50 y la Ingeniería del Gran Maestro en 125.',
+  'guide.profPages.craftProse.enchanting.identityHeading': 'Equipo desmontado, poder devuelto',
+  'guide.profPages.craftProse.enchanting.identityBody':
+    'No hay estación, no hay entrenador y no hay lista de recetas que comprar: todos los encantamientos se conocen desde el principio, cualquiera puede desencantarlos desde el primer día y la habilidad llega a un tope de 125 como cualquier otro oficio.\n\nEn la rueda se sitúa entre la Inscripción y la Joyería, por lo que sus dos identidades de par son el Arcanista (Inscripción y Encantamiento) y el Gemoencantador (Encantamiento y Joyería). Ninguno puede jurarse todavía, ya que ambos vecinos esperan sus primeras recetas, así que hoy el Encantamiento sube como el oficio de todos: gratuito hasta el nivel raro antes de cualquier juramento, y una elección natural de afición para un Bombardero o un Boticario. Los encantadores también mantienen en marcha el mundo de la recolección: los tres efectos de herramienta para ranura son obra de los encantadores, y un artesano original recarga sus propios efectos con descuento, más aún una vez especializado.',
+  'guide.profPages.craftProse.enchanting.levelingHeading': 'Cómo sube el encantamiento',
+  'guide.profPages.craftProse.enchanting.levelingBody':
+    'Dos acciones hacen avanzar la habilidad: desencantar una pieza y aplicar un encantamiento. Cada éxito vale hasta un punto, escalado según la seriedad del trabajo: la rareza de la pieza que destruyes, o el nivel del reactivo del encantamiento que aplicas. Los desencantos comunes y los encantamientos solo de polvo puntúan como trabajo común; los desencantos infrecuentes y los encantamientos de esencia como infrecuentes; los desencantos raros y todos los encantamientos Rúnicos o Mayores como raros; los desencantos épicos y legendarios aún más.\n\nLa habitual reducción de maestría se aplica en franjas de 25 puntos, así que el trabajo de calidad común se vuelve gris en habilidad 75, el trabajo infrecuente en 100 y el trabajo de nivel raro exactamente en el tope de 125. El Encantamiento también tiene una ventaja propia: la entrada por encima del techo de tu arquetipo se redondea a la baja hasta ese techo en lugar de anularse, así que antes de sintonizarte, un desencantamiento épico simplemente puntúa como raro en lugar de no enseñar nada. Si el Encantamiento acaba dormido detrás de otra identidad, todo puntúa como trabajo común y la subida se estanca en 75; mantenlo como afición y el trabajo de nivel raro aún paga, solo más lento pasado 75.',
+  'guide.profPages.craftProse.enchanting.marketHeading':
+    'Copias encantadas, procedencia y el mercado',
+  'guide.profPages.craftProse.enchanting.marketBody':
+    'Aplicar un encantamiento consume una copia embolsada y sin equipar del objeto más los reactivos, y devuelve una copia encantada diferente; equípala y la bonificación acompaña a la pieza para siempre, a través de desequipamientos, viajes al banco y comercios. Un encantamiento por pieza: una copia encantada nunca puede encantarse de nuevo ni desencantarse, y vender, descartar y desencantar prefieren las copias simples primero, para que tu pieza terminada no se consuma por accidente. Las copias encantadas idénticamente incluso se apilan en tus bolsas.\n\nEl equipo de obra maestra y el encantamiento son amigos: una pieza de obra maestra sigue siendo completamente encantable, y el encantamiento se suma a la bonificación de obra maestra sin alterarla ni la firma del fabricante. Sumando todas las fuentes, una obra maestra firmada con un encantamiento Mayor es lo mejor que puede lograr una pieza artesanal, y aún así sigue por debajo del botín de banda por diseño.\n\nEn el mercado, el Mercado Mundial solo comercia con existencias simples y sin modificar, por lo que las piezas encantadas y firmadas cambian de manos cara a cara a través de la ventana de comercio. Los materiales son la mitad comerciable del oficio: el Polvo, la Esencia y los Fragmentos se listan libremente, publicar no cuesta nada y el Mercader toma solo el 5 por ciento de una venta completada. Eso hace que los dos ingresos clásicos del encantador sean vender materiales en el mercado y tomar la pieza de un cliente en comercio, encantarla y devolvérsela.',
+  'guide.profPages.howHeading': 'Cómo funciona la artesanía',
+  'guide.profPages.howBody':
+    'Abre la ventana de artesanía (tecla T por defecto) y cada receta que conoces aparece con lo que necesita y lo que tienes a mano. Las recetas de estación te piden estar a menos de 20 metros de la estación correcta en el pueblo, las recetas de campo se elaboran en cualquier lugar, y la Encantación nunca necesita estación. No hay dado de fallo: una elaboración con los materiales en mano siempre tiene éxito.\n\nDos pequeñas fricciones mantienen la economía honesta. Cada elaboración exitosa paga una tarifa de 2 cobres por punto del presupuesto de estadísticas del objeto, y las acciones de tipo artesanía comparten un ritmo: como máximo 10 elaboraciones, desencantamientos, encantamientos o salvamentos en cualquier periodo de 60 segundos. Ninguno de los dos molestará en una sesión normal; ambos evitan que un especialista al tope inunde el mercado.',
+  'guide.profPages.recipesHeading': 'Recetas',
+  'guide.profPages.recipesNote':
+    'Cada receta del oficio: su requisito exacto de habilidad y materiales, dónde se aprende y por qué tarifa, y los tres valores de habilidad donde su ganancia baja a la mitad, un cuarto y nada.',
+  'guide.profPages.masteryHeading': 'Ganancia de habilidad',
+  'guide.profPages.masteryBody':
+    'Cada receta de la ventana muestra su estado de ganancia en los colores clásicos: naranja significa ganancia completa, amarillo la mitad, verde un cuarto, gris nada. Los límites son exactos, cada {step} de habilidad es un nivel, y una receta pierde un color por cada nivel que queda por debajo del tuyo.\n\nComo las ganancias son deterministas (una elaboración de ganancia completa siempre te mueve exactamente un punto), puedes planear todo el ascenso desde la lista: trabaja un peldaño mientras esté naranja, aprende el siguiente cuando se ponga amarillo, y nunca gastes materiales en una elaboración gris esperando progreso. Al llegar al tope de {cap} el número se detiene, pero las recetas, la probabilidad de obra maestra y los beneficios siguen funcionando.',
+  'guide.profPages.masterworkHeading': 'Obras maestras',
+  'guide.profPages.masterworkBody':
+    'Cada elaboración exitosa es exactamente lo que promete la receta, y a veces un poco más: una obra maestra termina la misma pieza un nivel de calidad por encima, con las estadísticas adicionales integradas en el momento de la elaboración. Es solo un añadido, nunca una degradación, y se mantiene por debajo del umbral de banda, así que el equipo elaborado puede ser excelente sin reemplazar un botín de banda.\n\nLa probabilidad está publicada, no es un misterio: {base}% base, más {perTier}% por cada nivel que tu habilidad supera a la receta, más {signed}% cuando entra cualquier reactivo firmado, más {spec}% una vez que estás especializado, y los materiales de nivel más alto añaden entre un 1 y un 2% más; todo con tope en {cap}%. Solo una pieza con estadísticas reales puede mejorar, así que los comunes sin estadísticas, las herramientas y los consumibles nunca la activan; una elaboración inactiva nunca produce una, y una elaboración de afición no puede superar su techo raro como obra maestra.\n\nEl buen trabajo lleva el nombre de su artesano. Los productos raros o mejores de una sola copia están firmados (Elaborado por; los materiales recolectados llevan Recolectado por), una obra maestra siempre está firmada sin importar su calidad, y piezas firmadas idénticamente siguen apilándose. Una firma es una procedencia, no un candado: los bienes firmados se comercian libremente.',
+  'guide.profPages.trainingHeading': 'Entrenamiento',
+  'guide.profPages.trainingBody':
+    'Las recetas del entrenador vienen de los maestros residentes, enseñadas en sus estaciones. La regla es una sola línea: un maestro enseña una receta cuando tu nivel en el oficio ha alcanzado el nivel propio de la receta, y nada más lo bloquea, ni tu nivel de personaje, ni tu arquetipo. Los peldaños de la escalera del entrenador están hoy en habilidad 0, 25 y 50, así que un nuevo peldaño se abre con cada nivel que subes.\n\nLas tarifas son únicas y fijas por peldaño: el peldaño inicial es gratis, el peldaño de habilidad 25 cuesta {tier1} por receta, y el de habilidad 50 cuesta {tier2}. Debes estar en la estación real del maestro para entrenar, y una estación móvil nunca cuenta. Las recetas de campo comunes y las recetas de herramientas no necesitan entrenamiento; cada personaje las conoce desde el principio.',
+  'guide.profPages.specializationHeading': 'Especialización',
+  'guide.profPages.specializationBody':
+    'En la habilidad {at} este oficio te especializa, sin necesidad de misión: las recetas cuestan un {pct}% menos de materiales a partir de entonces, y la especialización añade su propio impulso a la probabilidad de obra maestra.\n\nLos especializados también aprenden a llevar el taller consigo: un artesano especializado puede montar una estación móvil en el campo durante diez minutos seguidos, de modo que las recetas de estación se pueden trabajar en la boca de la mina en vez de volver al pueblo. Sus límites son deliberados: nunca cuenta para entrenar con un maestro ni para desvincular una pieza de encargo, y expira con su temporizador la hayas usado o no.',
+  'guide.profPages.ench.disenchantHeading': 'Desencantamiento',
+  'guide.profPages.ench.disenchantNote':
+    'Desencantar toma cualquier arma o pieza de armadura de calidad común o mejor y consume una copia, nunca una que ya esté encantada. Las piezas comunes y poco comunes se procesan en un puñado de Polvo de Carillón, más rico para piezas más raras y de mayor nivel; a partir de raro, el rendimiento cambia de forma: exactamente una Esencia de Carillón de una pieza rara o un Fragmento de Carillón de una pieza épica o legendaria, más un secundario tipificado según el material del que estaba hecha la pieza.',
+  'guide.profPages.ench.typedHeading': 'Secundarios tipificados',
+  'guide.profPages.ench.typedNote':
+    'Los secundarios tipificados siguen el material: la armadura de tela produce Hilo Resonante, el cuero Piel Resonante, la cota de malla Eslabones Resonantes, las armas de cuerpo a cuerpo Acero Resonante, y los bastones, varitas, arcos y ballestas Madera Resonante. Una pieza rara da exactamente {rare}; una pieza épica o legendaria da {epicMin} o {epicMax}. Los anillos y collares no tienen clase de armadura, así que solo producen el material primario.\n\nPresta atención a la letra pequeña: los secundarios Resonantes se vinculan al intercambiar, así que cada uno puede cambiar de manos exactamente una vez, directamente del desencantador al encantador que lo usará. El Polvo, la Esencia y los Fragmentos no tienen esa restricción y se mueven como cualquier otro bien de intercambio.',
+  'guide.profPages.ench.colSource': 'Obtenido de',
+  'guide.profPages.ench.meleeWeapons': 'Armas de cuerpo a cuerpo',
+  'guide.profPages.ench.timberWeapons': 'Bastones, varitas, arcos y ballestas',
+  'guide.profPages.ench.enchantsHeading': 'Encantamientos',
+  'guide.profPages.ench.enchantsNote':
+    'Los encantamientos vienen en tres niveles. El nivel base funciona con Polvo de Carillón (con un poco de Esencia en el extremo superior) y cubre la ranura de arma más cada ranura de armadura, con suficientes opciones de estadísticas para que cada build encuentre algo para cada ranura. El nivel Mayor cuesta un Fragmento de Carillón más Esencia y es lo único para lo que sirven los Fragmentos: bonos más fuertes en las ranuras de mayor impacto.\n\nEntre ellos están los cinco encantamientos Rúnicos, uno por secundario tipificado, para que nada de lo que proceses sea un callejón sin salida: Filo Rúnico (arma, Fuerza, consume Acero Resonante), Foco Rúnico (arma, Intelecto, Madera Resonante), Tejido Rúnico (pecho, Espíritu, Hilo Resonante), Piel Rúnica (piernas, Agilidad, Piel Resonante) y Eslabones Rúnicos (casco, Aguante, Eslabones Resonantes). Cada uno también requiere dos Esencias de Carillón y queda entre sus hermanos base y Mayor en potencia; los bonos exactos están todos en la tabla siguiente.',
+  'guide.profPages.ench.colEnchant': 'Encantamiento',
+  'guide.profPages.ench.colSlot': 'Ranura',
+  'guide.profPages.ench.colTier': 'Nivel',
+  'guide.profPages.ench.colBonus': 'Bono',
+  'guide.profPages.ench.tier.base': 'Base',
+  'guide.profPages.ench.tier.runed': 'Rúnico',
+  'guide.profPages.ench.tier.greater': 'Mayor',
+  'guide.profPages.ench.salvageHeading': 'Desguace',
+  'guide.profPages.ench.salvageNote':
+    'El desguace es el primo para todos del desencantamiento: las mismas armas y armaduras, sin habilidad requerida ni ganada, devolviendo chatarra de artesanía corriente por calidad en lugar de nada arcano. Cualquiera puede hacerlo, encantador o no. Cuando tienes una pieza que vale la pena desmontar, la elección es simple: a partir de raro, el desencantamiento es estrictamente el mejor trato, mientras que en común los dos rendimientos se venden al vendedor por más o menos lo mismo, así que desguaza según el material que realmente necesites.',
+  'guide.profPages.ench.bonusFmt': '+{value} {stat}',
+  'guide.profPages.gatherIntro.mining':
+    'La Minería extrae mineral directamente de la roca del mundo: cobre en el Valle de Eastbrook, hierro en el Pantano de Mirefen y osmio en las Alturas de Thornpeak, que alimenta los oficios de la forja. Disponible para todos desde el nivel 1, sin ningún requisito, con su propio contador hasta un tope de 100.',
+  'guide.profPages.gatherIntro.logging':
+    'La Tala derriba madera de arboledas en las tres zonas: corteza de hierro en el Valle de Eastbrook, madera de ceniza en el Pantano de Mirefen y pino cumbre en las Alturas de Thornpeak, el material bruto para mangos, bastones y el banco del ingeniero. Disponible para todos desde el nivel 1, con su propio contador hasta un tope de 100.',
+  'guide.profPages.gatherIntro.herbalism':
+    'La Herboristería recoge lo que crece silvestre: hoja de brillo en el Valle de Eastbrook, hoja dorada en el Pantano de Mirefen y pétalo de sol en las Alturas de Thornpeak, la hoja y el tallo que mantienen activos los oficios del boticario. Disponible para todos desde el nivel 1, con su propio contador hasta un tope de 100.',
+  'guide.profPages.gatherIntro.fishing':
+    'La Pesca es la diferente entre los oficios de recolección, y la más profunda: un minijuego real de picar y cobrar, con sus propias tablas de captura en cada zona y un tope de pericia de 200, el doble que los demás. Compra una caña, mira hacia aguas abiertas y lanza.',
+  'guide.profPages.rhythmHeading': 'El ritmo de recolección',
+  'guide.profPages.rhythmBody':
+    'Una cosecha es un lanzamiento corto y visible, no una toma instantánea: {base} segundos base, nunca por debajo de un piso de {floor} segundo. Tener una herramienta por encima del nivel del nodo te acelera {tool} segundos por cada nivel que la superas, y cada franja de pericia que cruzas recorta otros {band} segundos; simplemente igualar el nivel del nodo te da acceso, pero son los niveles por encima del mismo los que te hacen rápido.\n\nUna bolsa llena rechaza amablemente el lanzamiento antes de que empiece, así que no se desperdicia nada a medias, y cada cosecha paga una pequeña porción de EXP de personaje, escalada por el nivel del nodo contra el tuyo igual que escala el EXP de matar: un nodo gris trivial no le enseña nada a un personaje al tope.',
+  'guide.profPages.gainBody':
+    'La ganancia es determinista, nunca un dado de subida de habilidad: un nodo en tu nivel de ganancia o por encima enseña un punto completo por cosecha, y cada {step} de pericia es un nivel puntuado contra el nodo. Los nodos de nivel 1 pagan completo por debajo de 25, la mitad hasta 49, un cuarto hasta 74, y nada desde 75; los nodos de nivel 2 pagan completo hasta 49; el único nodo de nivel 3 paga completo hasta 74 y la mitad hasta el tope de {cap}.\n\nLa ruta prevista es clara: aprende en los nodos iniciales del Valle, pasa a la ciénaga y termina el ascenso en las tierras altas de las Alturas de Thornpeak. Al llegar al tope el aprendizaje se detiene, pero los rendimientos no: un recolector al tope sigue extrayendo materiales de máxima calidad para siempre.',
+  'guide.profPages.nodesHeading': 'Nodos por zona',
+  'guide.profPages.nodesNote':
+    'Dónde están los nodos, su nivel, la herramienta que necesitan y qué producen. Cada nodo reaparece para ti {respawn} segundos después de tu propia cosecha, y ese temporizador es solo tuyo: otro recolector trabajando el mismo nodo nunca retrasa el tuyo, así que no hay carreras por nodos ni campamentos. Cada zona que subes en la escalera trae un material mejor de un terreno más exigente.',
+  'guide.profPages.toolsHeading': 'Herramientas',
+  'guide.profPages.toolsNote':
+    'Las manos vacías cuentan como herramienta de nivel 1, así que todos los nodos de nivel 1 del juego no necesitan herramienta alguna. La escalera de vendedores cubre los niveles 1 a 3; la herramienta solo tiene que estar en tu mochila, no hay ranura de equipamiento ni durabilidad, así que cada una es una compra de una sola vez. Solo importa el nivel para el acceso: el color de rareza de una herramienta es cosmético.\n\nPor encima de la escalera de vendedores hay dos herramientas elaboradas, de nivel 4 y nivel 5, fabricadas en el taller de herramientas por ingenieros y que ningún NPC vende. Ningún nodo actual necesita más de nivel 3, así que su valor ahora mismo es la velocidad: una herramienta de primer nivel reduce el lanzamiento a su piso en los nodos inferiores, y será el boleto de entrada cuando lleguen terrenos de nivel más alto.',
+  'guide.profPages.toolCrafted': 'Elaborada ({craft})',
+  'guide.profPages.toolVendor': '{name} ({hub})',
+  'guide.profPages.toolUnavailable': 'No se vende',
+  'guide.profPages.priceNone': 'No se vende',
+  'guide.profPages.toolTierReq': 'Herramienta de nivel {tier}',
+  'guide.profPages.bareHands': 'Manos desnudas',
+  'guide.profPages.yieldsHeading': 'Qué produce una cosecha',
+  'guide.profPages.yieldsBody':
+    'Cada cosecha tira una calidad para lo que otorga, y tu pericia es toda la historia de esa tirada. Un recolector nuevo siempre saca material común; cada punto de habilidad desplaza peso de forma constante desde el común hacia los grados más altos y nunca hacia atrás, hasta que al llegar al tope de 100 el grado común desaparece por completo: 60 por ciento poco común, 30 por ciento raro, 8 por ciento épico y 2 por ciento legendario, siempre.\n\nLa calidad también significa cantidad: una tirada común da 1 unidad, poco común y raro dan 2, épico 3, y legendario 4. Cualquier resultado raro, épico o legendario llega como una copia firmada marcada como Recolectado por ti: al tope, eso es cuatro de cada diez cosechas con tu nombre, y las reglas de procedencia en la página de Economía de Artesanía explican por qué los artesanos pagan de más exactamente por esas pilas.',
+  'guide.profPages.bandsHeading': 'Franjas de habilidad',
+  'guide.profPages.bandsBody':
+    'Las franjas de habilidad son la escala compartida de 0/100/200 sobre el contador de un oficio: cada franja que cruzas reduce el tiempo de lanzamiento de recolección, y en el caso de la pesca las franjas también seleccionan las tablas de captura (con la caña adecuada). Los oficios de tierra tienen un tope en 100, por lo que la franja 1 es su techo; solo la pesca alcanza la franja 2.',
+  'guide.profPages.bandFmt': 'Franja {band}: desde {at} de habilidad',
+  'guide.profPages.rareHeading': 'Hallazgos raros',
+  'guide.profPages.rareBody':
+    'Cada cosecha, sin importar tu habilidad, tiene una probabilidad de 1 entre {oneIn} de un hallazgo raro: una vena prístina en el mineral, duramen antiguo en la madera, una flor iluminada por la luna entre las hierbas. El hallazgo multiplica el rendimiento de esa cosecha {mult} veces, cada unidad llega firmada con tu nombre sin importar la calidad obtenida, y toda la zona se entera por nombre. Cada variante también inscribe su propia gesta de cero Renombre en tu Libro de Gestas, una marca de coleccionista que existe solo para demostrar que te pasó a ti.',
+  'guide.profPages.specimenBody':
+    'Guarda algo de espacio en la bolsa cuando vayas a recolectar: un hallazgo inesperado necesita huecos libres para llegar firmado; si no cabe, el rendimiento llega igual pero la firma se pierde. La cosecha de cadáveres tiene también su propio brazo de suerte: alrededor de {pct}% de las cosechas de cadáveres dan raro o mejor, firmando el rendimiento y, en las familias de especímenes, otorgando un espécimen perfecto firmado.',
+  'guide.profPages.gatherDeedsHeading': 'Gestas en el camino',
+  'guide.profPages.gatherDeeds.mining':
+    'Tu primer nodo de cualquier oficio gana Frutos del Campo, y el tope de 100 en Minería inscribe Mineral en la Sangre. Llegar a 100 en cualquiera de los tres entre Minería, Tala, Herboristería y Pesca añade Maestro Recolector con 25 de Renombre, y romper una vena prístina registra su propia marca de coleccionista. Nada de esto otorga poder: las gestas son títulos y Renombre, un registro de los caminos que has recorrido.',
+  'guide.profPages.gatherDeeds.logging':
+    'Tu primer nodo de cualquier oficio gana Frutos del Campo, y el tope de 100 en Tala inscribe Talador de Duramen. Llegar a 100 en cualquiera de los tres entre Minería, Tala, Herboristería y Pesca añade Maestro Recolector con 25 de Renombre, y un golpe de duramen antiguo registra su propia marca de coleccionista. Las gestas son títulos y Renombre únicamente, nunca poder.',
+  'guide.profPages.gatherDeeds.herbalism':
+    'Tu primer nodo de cualquier oficio gana Frutos del Campo, y el tope de 100 en Herboristería inscribe Maestro del Prado. Llegar a 100 en cualquiera de los tres entre Minería, Tala, Herboristería y Pesca añade Maestro Recolector con 25 de Renombre, y una flor iluminada por la luna registra su propia marca de coleccionista. Las gestas son títulos y Renombre únicamente, nunca poder.',
+  'guide.profPages.gatherDeeds.fishing':
+    'El hito de 100 inscribe Viejo Sal y el de 200 inscribe Pescador Maestro con su título, la cumbre misma del arte del pescador; la Pesca también cuenta para Maestro Recolector, que se gana con 100 en cualquiera de los tres oficios de recolección. Un primer pez de las aguas de cada zona llena su propia página, y el Koi Destello Solar registra Destello de Esperanza, así que los viajeros con una caña en el morral llenan su libro más rápido de lo que esperan.',
+  'guide.profPages.fish.startHeading': 'Primeros pasos',
+  'guide.profPages.fish.startBody':
+    'Una Caña de pescar sencilla cuesta 20 cobres de Pescador Brandt en Eastbrook (busca al Viejo Sal mirando el Lago Espejo con el ceño fruncido desde el borde este del pueblo); Tinker Gizzel, Abastecedor Hale en Fenbridge, y Intendente Bree en Highwatch también tienen cañas. Usa la caña mirando hacia agua lo bastante profunda para tener peces, hasta unos 24 metros por delante, y tu flotador sale disparado.\n\nNo puedes lanzar mientras estás en combate, nadando o muerto: lanzar desde la orilla es la postura prevista, y cualquier agua donde se pueda pescar funciona, en todas las zonas.',
+  'guide.profPages.fish.biteHeading': 'Picada y cobranza',
+  'guide.profPages.fish.biteBody':
+    'Tras el lanzamiento, una picada llega en un momento oculto entre {min} y {max} segundos; el tiempo de espera se decide cuando el sedal cae, así que no hay dos lanzamientos que se sientan exactamente iguales. Cuando el flotador pica tienes una ventana de {reel} segundos para presionar la caña de nuevo y cobrar: hazlo dentro de ella y la captura cae en tu bolsa, vacila más allá y el pez se escapa sin dejar nada. Una sesión completa tiene un tope de {cap} segundos, así que incluso un lanzamiento tranquilo se resuelve rápido.\n\nLas mejores cañas afinan ambos extremos del minijuego: cada nivel de caña por encima del primero recorta {rod} segundos de la espera máxima posible y agrega {reelRod} segundos a la ventana de cobranza, así que el Carrete de Hierro reduce la peor espera a 6.5 segundos con una ventana de 3.75 segundos, y el Arroyo Plateado a 5 y 4.5. Las picadas más rápidas nunca cambian sin importar lo que tengas, y una caña solo necesita estar en tus bolsas para contar.',
+  'guide.profPages.fish.scheduleHeading': 'Ganancia de pericia',
+  'guide.profPages.fish.scheduleNote':
+    'La ganancia de pesca sigue un programa fijo sin dados: un punto completo por captura por debajo de 50 de pericia, medio punto por debajo de 100, un décimo por debajo de 150, y un lento avance de 0.02 desde 150 hasta 200. Ese último tramo es un viaje de miles de capturas a propósito: el 200 es una declaración, no una parada en el camino a otra cosa.\n\nLa basura deja de enseñar del todo en {cutoff}: a partir de ahí, las algas y las botas son solo algas y botas. Cada captura efectiva gana al ritmo programado, así que pesca donde irías de todas formas y deja que el contador suba.',
+  'guide.profPages.fish.colProficiency': 'Pericia',
+  'guide.profPages.fish.colGain': 'Ganancia por captura',
+  'guide.profPages.fish.belowFmt': 'Por debajo de {below}',
+  'guide.profPages.fish.tablesHeading': 'Tablas de capturas',
+  'guide.profPages.fish.tablesNote':
+    'Tu pericia selecciona una de tres franjas de captura: franja 0 desde el principio, franja 1 en 100, franja 2 en 200; cada una desplaza peso fuera de basura y anzuelos vacíos hacia peces de verdad, zona por zona. Cada banda por encima de la primera también exige una caña: la franja 1 quiere la Carrete de hierro de nivel 2, la franja 2 la Arroyo plateado de nivel 3. Tu franja efectiva es la menor entre lo que tu habilidad ha ganado y lo que admite tu caña, y el tope es silencioso: con una caña inferior sigues pescando, solo con la tabla de la franja más baja, así que si tus capturas se sienten estancadas mientras tu habilidad sube, revisa la caña primero.\n\nLas aguas de cada zona guardan su propio par de peces de alimento, que curan más cuanto más profunda es la zona; todos son ingredientes de cocina y perfectamente buena comida para comer crudos recién sacados del sedal. El resto de la tabla es el impuesto del pescador: algas, la bota ocasional y el anzuelo vacío, que nunca desaparece del todo. El {rare} es la misma rareza en cada sedal, con probabilidades fijas que nunca cambian con la habilidad, así que el pescador más nuevo del muelle tiene las mismas chances que un Pescador Maestro.',
+  'guide.profPages.fish.bandHeading':
+    'Franja {band}: pericia {at} en adelante, nivel de caña {rod}',
+  'guide.profPages.fish.colCatch': 'Captura',
+  'guide.profPages.fish.colOdds': 'Probabilidad',
+  'guide.profPages.fish.pctFmt': '{pct}%',
+  'guide.profPages.fish.emptyHook': 'Nada pica',
+  'guide.profPages.fish.koiHeading': 'El Koi Destello Solar',
+  'guide.profPages.fish.koiBody':
+    'Cada cuerpo de agua del juego esconde el mismo premio: el Koi Destello Solar, un destello poco común en el sedal que vale 75 cobres para un vendedor y bastante más para tu orgullo. Sus probabilidades son un fijo 3 por ciento por captura conseguida (4 por ciento en las aguas frías de Thornpeak) en cualquier franja, y atrapar uno registra Destello de Esperanza en tu Libro de Gestas, una marca de coleccionista con Renombre cero. Cuando sucede, el registro se asegura de que lo sepas.',
+  'guide.profPages.econ.title': 'Economía de Artesanía',
+  'guide.profPages.econ.intro':
+    'Cómo fluyen las monedas a través de los oficios: las tarifas y sumideros exactos, qué se vende realmente, las reglas del Mercado Mundial, las órdenes de trabajo, los encargos y por qué el poder artesanal se detiene por debajo del suelo de la banda.',
+  'guide.profPages.econ.feesHeading': 'Tarifas y sumideros',
+  'guide.profPages.econ.feesNote':
+    'Una economía de jugadores sana necesita que las monedas salgan del mundo, y los oficios llevan varios de esos drenajes. Aprender una receta de un entrenador cuesta una tarifa única según su peldaño, cada creación exitosa paga una pequeña tarifa escalada al presupuesto de estadísticas de la pieza, y encima de esas están las tarifas de desvinculación y la comisión del Mercado.\n\nNinguna de estas monedas va a otro jugador: sale del juego por completo, que es lo que mantiene el valor de las monedas que el resto de ustedes ganan.',
+  'guide.profPages.econ.feeCraft': 'Tarifa de creación',
+  'guide.profPages.econ.feeCraftValue': '{fee} por punto de presupuesto del objeto',
+  'guide.profPages.econ.feeMarket': 'Comisión del mercado',
+  'guide.profPages.econ.feeMarketValue': '{pct}% de una venta completada',
+  'guide.profPages.econ.feeDeposit': 'Depósito de publicación',
+  'guide.profPages.econ.feeDepositValue': 'Ninguno',
+  'guide.profPages.econ.feeUnbind': 'Tarifa de desvinculación',
+  'guide.profPages.econ.feeUnbindValue': '{uncommon} poco común, {rare} raro, {epic} épico',
+  'guide.profPages.econ.trainingHeading': 'Tarifas de entrenamiento',
+  'guide.profPages.econ.trainingNote':
+    'Una tarifa fija por peldaño de receta, cobrada una vez cuando un maestro la enseña; los niveles superiores de la tabla esperan contenido futuro.',
+  'guide.profPages.econ.trainingTierFmt': 'Nivel {tier}: {fee}',
+  'guide.profPages.econ.free': 'Gratis',
+  'guide.profPages.econ.sellsHeading': 'Qué se vende y por qué',
+  'guide.profPages.econ.sellsBody':
+    'El negocio más estable son los consumibles, porque se agotan y se vuelven a comprar. Las pociones, la comida cocinada y los encantamientos desaparecen con el uso: un combatiente que compra una espada una vez comprará pociones de curación para siempre, y cada pieza de equipo nueva es una nueva oportunidad de vender un encantamiento.\n\nLas piezas de obra maestra son el extremo premium. No se pueden hacer a pedido, así que una de una pieza deseada tiene un recargo real, y tu firma en ella es publicidad ambulante. Los reactivos son el tercer pilar: materiales arcanos del desencantamiento, secundarios Resonantes tipificados que fluyen directamente del desencantador al encantador, y materiales recolectados firmados, por los que los artesanos que buscan procs de obra maestra pagan más de lo habitual.',
+  'guide.profPages.econ.marketHeading': 'El Mercado Mundial y su comisión',
+  'guide.profPages.econ.marketBody':
+    'El Mercado Mundial es el intercambio de todo el reino, administrado por el Mercader en Eastbrook y el Subastador Voss en Highwatch. Publicar es gratis: no hay depósito, y una publicación sin vender simplemente te regresa. La casa toma su comisión solo cuando algo realmente se vende: 5 por ciento del precio de venta, y el resto te espera para cobrarlo.\n\nUn límite importante: el Mercado solo intermedia bienes corrientes. Una copia firmada, de obra maestra, encantada o vinculada nunca entra en una publicación, por lo que las piezas especiales cambian de manos cara a cara en una ventana de intercambio, que lleva la identidad completa de un objeto, firma incluida. Ponles precio tú mismo; el Mercado solo te dice lo que vale la versión corriente.',
+  'guide.profPages.econ.workOrdersHeading': 'Órdenes de trabajo',
+  'guide.profPages.econ.workOrdersNote':
+    'Cada maestro de estación publica una orden de trabajo permanente: trae una pila del material básico de su oficio y te pagan en el momento, más un poco de experiencia de misión. El pago es deliberadamente un {pct}% de lo que un vendedor te daría por la misma pila, redondeado hacia abajo, así que una orden de trabajo nunca es la forma rentable de vender materiales, solo una razón para pasar por la estación.\n\nCada orden funciona con su propio temporizador de {minutes} minutos por personaje: entrega una y ese maestro no tiene nada más para ti hasta que el temporizador vuelva a dar la vuelta. Trátalas como un pequeño bono sobre materiales que ibas a recolectar de todas formas, no como un negocio.',
+  'guide.profPages.econ.colOrder': 'Orden de trabajo',
+  'guide.profPages.econ.colMaster': 'Maestro',
+  'guide.profPages.econ.colAsks': 'Pide',
+  'guide.profPages.econ.colPays': 'Paga',
+  'guide.profPages.econ.commissionsHeading': 'Encargos y el Vínculo del Artesano',
+  'guide.profPages.econ.commissionsBody':
+    'Un encargo es una creación hecha para alguien. Al crear un arma, una pieza de armadura u objeto de mano izquierda (una poción no puede llevar un vínculo), el artesano puede marcar la creación como encargo: la pieza terminada se comporta normalmente en manos del creador, pero en el momento en que cambia de manos en un intercambio queda vinculada a quien la recibió. Ese es el Vínculo del Artesano: el comprador obtiene su pieza, y la pieza no puede pasarse ni revenderse.\n\nLos vínculos no son para siempre, solo son costosos. Cualquier maestro de estación puede desvincular una pieza vinculada mientras estás en su estación (una estación móvil nunca ofrece el servicio), por una tarifa fijada por la calidad del objeto: 25 de plata para poco común, 1 de oro para raro, 4 de oro para épico, con un legendario pagando la tarifa épica y una pieza común de encargo la poco común.\n\nLa tarifa compra un estado limpio, no una cura: la pieza sigue siendo un encargo, así que se vuelve a vincular a quien la reciba en el siguiente intercambio, y todo lo demás sobre ella, firma, obra maestra y encantamientos, permanece intacto.',
+  'guide.profPages.econ.provenanceHeading': 'Trabajo firmado',
+  'guide.profPages.econ.provenanceBody':
+    'Algunos objetos llevan un nombre. Pasa el cursor sobre uno y el tooltip dice Recolectado por fulano en un material en bruto, o Creado por fulano en una pieza terminada: la misma marca, redactada según cómo llegó a ser el objeto. Una firma es parte del objeto mismo, viaja con él a través de intercambios y el banco, y nunca desaparece.\n\nLa recolección firma su mejor trabajo automáticamente: cualquier cosecha que saque raro o mejor llega firmada, los hallazgos raros firman toda su bonificación quíntuple, y el golpe de suerte de una cosecha de cadáver firma su rendimiento, especímenes prístinos incluidos. La artesanía firma siguiendo la misma línea: una producción de una sola copia de calidad rara o mejor se acuña firmada, y una obra maestra siempre firma sin importar su calidad, por lo que la versión más fina de cualquier pieza siempre nombra a su creador. Lo único que puede costarte una firma es una bolsa llena: una unidad firmada necesita espacio propio, o una pila firmada coincidente, para aterrizar en ella.\n\nUna pila de objetos comparte una identidad, por lo que dos copias solo se fusionan cuando cada marca coincide exactamente: mismo objeto, mismo firmante, mismas estadísticas de obra maestra, mismo encantamiento, mismo vínculo. Un tronco firmado nunca se une a una pila sin firmar en ninguna dirección (fusionarlos borraría el nombre de alguien), pero las cargas idénticas se fusionan felizmente, así que veinte minerales firmados por el mismo recolector caben en una sola pila y una bonificación no destroza tus bolsas.\n\nLas firmas recompensan a los artesanos: consumir cualquier reactivo firmado, quien sea que lo haya firmado, agrega 2 puntos porcentuales de probabilidad de obra maestra, y tener un reactivo firmado por tu propia mano reduce la cantidad requerida de ese reactivo en uno (nunca por debajo de uno). Tu propio trabajo raro o mejor firmado incluso sigue enseñándote: cuando una pieza que firmaste se desempeña en tus propias manos, una poción bebida en el momento correcto, un golpe de muerte asestado, armadura usada en una muerte, un pequeño flujo de habilidad regresa al oficio que lo creó, siempre que ese oficio sea uno de tus oficios principales activos.',
+  'guide.profPages.econ.collectorsHeading': 'Coleccionistas, trofeos y el precio de una historia',
+  'guide.profPages.econ.collectorsBody':
+    'Los vendedores son ciegos a la procedencia: un objeto firmado se vende a un PNJ exactamente por su precio base. La prima de una firma existe solo entre jugadores, que es precisamente lo que la hace interesante: una pila de mineral inesperado firmada por un recolector famoso, un Corte Primo de una cosecha afortunada, una hoja de obra maestra que nombra a un artesano que ya se retiró; todo vale lo que la memoria de alguien diga que vale.\n\nEl Libro de Gestas se inclina hacia el mismo instinto: Veta Prístina, Duramen Antiguo, Flor Iluminada por la Luna, Espécimen Perfecto y Destello de Esperanza son marcas de coleccionista con Renombre cero que existen únicamente para demostrar que un momento te sucedió a ti. Conserva el objeto que ganó la gesta y tienes el recibo. Nada de esto da poder; la procedencia no compra estadísticas ni gana combates, es el rastro en papel del juego de los buenos días.',
+  'guide.profPages.econ.throttleHeading': 'El límite de acciones',
+  'guide.profPages.econ.throttleBody':
+    'La producción tiene un techo: crear, desencantar, encantar y desguazar comparten un presupuesto de {actions} acciones exitosas por cada {seconds} segundos consecutivos. Un intento denegado no cuesta nada y no gasta presupuesto. Nunca lo notarás en el juego normal; existe para que un especialista al máximo con un banco lleno no pueda inundar el Mercado, independientemente de su habilidad o reservas.',
+  'guide.profPages.econ.doctrineHeading': 'Los jugadores comercian con jugadores',
+  'guide.profPages.econ.doctrineBody':
+    'La economía de artesanía se construye sobre una idea: los jugadores abastecen a los jugadores. Los recolectores alimentan a los artesanos, los artesanos alimentan a los jugadores de misiones y bandas, y los desencantadores alimentan a los encantadores, con vendedores y maestros de estación en los bordes para absorber chatarra y monedas en lugar de competir contigo. Si quieres ganar dinero con un oficio, tu cliente es una persona: aprende lo que otros jugadores consumen, pon precio frente al Mercado Mundial y trata los sistemas de PNJ como un suelo bajo tus precios, no como el mercado en sí.\n\nEl equipo artesanal está ajustado para quedar por debajo del suelo de la banda: incluso una obra maestra siempre está solo un nivel de calidad por encima de su receta, nunca más allá de legendario, y su presupuesto de estadísticas se mantiene por debajo de la banda de botín de la banda. La forja te prepara para el contenido más difícil; no lo reemplaza. Eso mantiene a artesanos, bandas y el mercado en un triángulo estable: el botín de banda sigue siendo aspiracional, y las piezas artesanales siguen siendo el mejor equipo que el dinero puede comprar.',
+  'guide.profPages.faq.title': 'Preguntas frecuentes sobre Oficios',
+  'guide.profPages.faq.intro': 'Respuestas rápidas a las preguntas que más hacen los artesanos.',
+  'guide.profPages.faq.q1': '¿Por qué mis objetos firmados no se apilan?',
+  'guide.profPages.faq.a1':
+    'Un objeto firmado es un objeto instanciado: lleva su propio pequeño registro (el firmante, cualquier calidad tirada, estadísticas de obra maestra, un encantamiento, un vínculo) en lugar de ser una copia anónima. Dos copias solo se fusionan en una pila cuando esos registros coinciden exactamente.\n\nEn la práctica: el mineral raro que recolectaste tú mismo se apila con más mineral raro que recolectaste tú mismo, porque ambos dicen Recolectado por ti y nada más difiere. El mismo material firmado por un amigo ocupa su propia ranura, y una copia corriente sin firmar nunca se fusiona en una pila firmada. Bolsas, banco e intercambio siguen esta única regla.',
+  'guide.profPages.faq.q2': '¿Las recetas comunes suben mi habilidad para siempre?',
+  'guide.profPages.faq.a2':
+    'No. Cada receta se puntúa según cuánto está por debajo de tu categoría actual en ese oficio, la lectura clásica de naranja, amarillo, verde, gris: ganancia completa en tu categoría o por encima, la mitad un nivel por debajo, un cuarto dos niveles por debajo, y nada tres o más por debajo. Las categorías son cada 25 de habilidad, por lo que las recetas gratuitas de habilidad 0 dejan de enseñarte algo a partir de habilidad 75.\n\nLos límites también son más bajos que el 300 clásico que podrías esperar: cada uno de los ocho oficios ganables tiene un límite de 125, Minería, Tala y Herboristería tienen un límite de 100, y la Pesca llega lejos con 200. Subir significa pasar a recetas de tu propia categoría, no machacar la más barata.',
+  'guide.profPages.faq.q3': '¿Cuál es la diferencia entre saquear y recolectar un cadáver?',
+  'guide.profPages.faq.a3':
+    'Una sola pulsación cubre ambas. Todo lo que un cadáver contiene, monedas y botín más cualquier componente recolectable, se abre en la misma ventana: el saqueo sigue las reglas normales de botín, y la recolección es el lado de los oficios, extrayendo materiales del cadáver mismo.\n\nLa recolección es de primero en llegar, de uso único: cada cadáver puede recolectarse exactamente una vez, por quien lo reclame primero, incluidos los que están en línea. Tu Enfoque del Pueblo determina lo que obtienes: mientras estés en un pueblo principal puedes distribuir 10 puntos de enfoque entre los tipos de componente que te interesan, y cada componente enfocado saca un nivel mejor (cada 5 puntos lo sube un escalón, como máximo dos escalones) y rinde más (10 por ciento por punto). Los componentes sin enfoque nunca empeoran.',
+  'guide.profPages.faq.q4': '¿Por qué está firmado mi Tronco de Corteza de Hierro?',
+  'guide.profPages.faq.a4':
+    'Tuviste un golpe de suerte. Aproximadamente 1 de cada 90 cosechas activa un evento de recolección raro (duramen antiguo en un árbol, una veta prístina en mineral, una flor iluminada por la luna en hierbas): multiplica el rendimiento cinco veces, firma cada unidad con tu nombre y anuncia el hallazgo a toda la zona. Un tiro de rareza rara o mejor en una cosecha ordinaria también firma el rendimiento.\n\nLos materiales firmados vale la pena conservarlos o venderlos caro: consumir cualquier reactivo firmado en una creación agrega un 2 por ciento a la probabilidad de obra maestra. Solo recuerda que se apilan únicamente con copias firmadas de manera idéntica, por lo que mantienen su propia ranura de bolsa.',
+  'guide.profPages.faq.q5': '¿Cómo desvínculo una pieza de encargo y cuánto cuesta?',
+  'guide.profPages.faq.a5':
+    'Ve a cualquier estación de artesanía con la pieza en tus bolsas y paga al maestro. La tarifa sigue la calidad del objeto: 25 de plata para una pieza poco común, 1 de oro para una rara, 4 de oro para una épica; una legendaria paga la tarifa épica, y una pieza común de encargo paga la tarifa poco común. Debe ser una estación real: una estación móvil nunca ofrece el servicio.\n\nLa tarifa compra un estado limpio, no una cura: la pieza sigue siendo un encargo, así que se vuelve a vincular a quien la reciba en el siguiente intercambio. Si varias copias vinculadas comparten una pila, se separa una copia y se desvincula por pago.',
+  'guide.profPages.faq.q6': '¿Dónde aprendo recetas y cuánto cuestan?',
+  'guide.profPages.faq.a6':
+    'Las nueve recetas de campo comunes y las recetas de herramientas las conocen todos desde el principio, y también tres capítulos finales vinculados a estación (el Manto de Escama de Horno, la Capucha Tejido Guardián y las Envolturas Crepúsculo), que no necesitan entrenador, solo su estación. Todo lo demás lo enseñan los maestros residentes en sus estaciones en los tres pueblos principales: la mayoría están en Eastbrook, el curtidor lleva la curtiduría en Fenbridge, y el alquimista lleva la botica en Highwatch.\n\nLas recetas de entrenadores vienen en peldaños en habilidad 0, 25 y 50, con precios de gratis, 25 de plata y 1 de oro como tarifa única. Un maestro enseña una receta una vez que tu categoría en ese oficio ha alcanzado la propia categoría de la receta, y debes estar en su estación para aprender: una estación móvil no cuenta.',
+  'guide.profPages.faq.q7': '¿Por qué mi recolección se volvió más lenta de repente?',
+  'guide.profPages.faq.a7':
+    'El lanzamiento de recolección comienza en 2.5 segundos y se reduce de dos maneras: 0.4 segundos por cada nivel de herramienta que tengas por encima del propio nivel del nodo, y 0.15 segundos por cada franja de pericia que hayas cruzado (en 100 y 200), con un mínimo de 1.5 segundos. Pasa de los nodos de nivel 1 a los de nivel 3 y tu superávit desaparece, por lo que el mismo pico vuelve a oscilar más lento. Tener exactamente el nivel requerido no compra velocidad; solo abre el nodo.\n\nLa ganancia de habilidad se desvanece de la misma manera que la artesanía: un nodo se vuelve gris conforme tu pericia supera su nivel (los nodos de nivel 1 no enseñan nada a partir de pericia 75), por lo que la respuesta a las ganancias lentas son nodos de nivel superior, que necesitan una herramienta de al menos su nivel (las manos vacías cuentan como nivel 1). La Pesca sigue su propia reducción gradual: ganancia completa por debajo de pericia 50, la mitad por debajo de 100, un goteo de 0.1 por debajo de 150 y 0.02 por debajo de 200, y las capturas de chatarra no enseñan nada a partir de 100.',
+  'guide.profPages.faq.q8': '¿Puedo crear objetos lejos del pueblo?',
+  'guide.profPages.faq.a8':
+    'En parte. Las nueve recetas de campo comunes (el arma, armadura, comida y pociones básicas de inicio) se crean en cualquier lugar, en cualquier momento. Todo lo que está por encima de ellas está vinculado a un tipo de estación: forja, cocinas, botica, curtiduría, telar o taller de herramientas, y debes estar a menos de 20 yardas de la estación para que la creación se complete.\n\nA habilidad 75 en un oficio te especializas, y junto con un descuento del 20 por ciento en materiales obtienes una estación móvil: colócala en el campo y permanece durante 10 minutos, sirviendo las recetas de ese oficio como si estuvieras en la real. La estación móvil es solo para crear: aprender recetas y desvincular encargos siempre requieren la verdadera estación en el pueblo.',
   'hud.combat.floatingParry': 'Parada',
   'hud.combat.parried': 'Tu {ability} es parada por {target}.',
+  'hud.logs.keptBoundOne': 'Se conservó {count} copia vinculada.',
+  'hud.logs.keptBoundMany': 'Se conservaron {count} copias vinculadas.',
   'hud.pet.waterJet': 'Chorro de Agua',
   'hud.pet.waterJetDesc':
     'Ordena a tu Elemental de Agua que canalice un chorro ralentizador durante 3 segundos. Tiempo de reutilización: 8 segundos. Haz clic derecho para lanzarlo automáticamente cada vez que esté disponible.',
   'hud.pet.waterJetTitle': 'Chorro de Agua',
   'hud.prompts.acceptResurrection': 'Aceptar Resurrección',
   'hud.prompts.resurrectionOffer': '{name} quiere devolverte a la vida. ¿Aceptas?',
+  'questUi.dialog.profIntroHint': 'Habla con {name} para "{quest}".',
   'itemUi.stats.parry': 'Parada',
   'apiError.wallet.handoff_invalid':
     'La autorización de la cartera ha caducado o no se ha podido verificar. Inténtalo de nuevo.',
@@ -80,10 +464,38 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.temporal_rewind.description':
     'Envía una onda arcana por tu grupo o banda, rebobinando el tiempo para restaurar el 30% del daño que cada aliado en un radio de 40 yardas sufrió durante los últimos 5 segundos (hasta el 35% de su salud máxima). No puede ser un efecto crítico. (Cronomancia)',
   'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.items.sootscale_mantle.name': 'Manto de Escama de Horno',
+  'entities.items.arcane_dust.name': 'Polvo de Carillón',
+  'entities.items.arcane_essence.name': 'Esencia de Carillón',
+  'entities.items.arcane_shard.name': 'Fragmento de Carillón',
+  'entities.items.stalkerhide_jerkin.name': 'Jubón de Piel de Merodeo',
+  'entities.items.mithril_mining_pick.name': 'Pico de Minería de Plata Celeste',
+  'entities.items.silverleaf_sickle.name': 'Hoz de Hoja de Brillo',
+  'entities.items.thorium_mining_pick.name': 'Pico de Minería de Osmio',
+  'entities.items.arcanite_mining_pick.name': 'Pico de Minería de Glyfiacero',
+  'entities.items.elderwood_axe.name': 'Hacha de Pino Cumbre',
+  'entities.items.thorium_ore.name': 'Mineral de Osmio',
+  'entities.items.arcanite_bar.name': 'Barra de Glyfiacero',
+  'entities.items.elderwood_log.name': 'Tronco de Pino Cumbre',
+  'entities.items.silverleaf_herb.name': 'Hierba Hoja de Brillo',
+  'entities.items.thorium_warblade.name': 'Hoja de guerra de Osmio',
+  'entities.items.arcanite_war_axe.name': 'Hacha de Guerra de Glyfiacero',
+  'entities.items.elderwood_battle_staff.name': 'Bastón de Batalla de Pino Cumbre',
+  'entities.items.thoriumscale_greathelm.name': 'Gran Yelmo de Escama de Osmio',
+  'entities.items.thoriumscale_cuirass.name': 'Coraza de Escama de Osmio',
+  'entities.items.thoriumscale_leggings.name': 'Leotardos de Escama de Osmio',
+  'entities.items.silverthread_slippers.name': 'Escarpines de Hilo Pálido',
+  'entities.items.goldweave_robe.name': 'Toga de Tejido Dorado',
+  'entities.items.goldweave_leggings.name': 'Leotardos de Tejido Dorado',
+  'entities.items.silverleaf_healing_draught.name': 'Brebaje curativo de hoja de brillo',
+  'entities.items.silverleaf_mana_draught.name': 'Brebaje de maná de hoja de brillo',
+  'entities.items.venomfire_elixir.name': 'Elixir Venenofuego',
+  'entities.items.glimmerfin_koi.name': 'Koi Destello Solar',
   'entities.npcs.card_master.greeting':
     '¿Un Duelo de Cartas? Al mejor de tres; el ganador se lleva los derechos de presumir.',
   'entities.npcs.card_master.name': 'Maestro de Cartas',
   'entities.npcs.card_master.title': 'Repartidor del Azar',
+  'entities.quests.q_stalker_pelts.title': 'Primera Escarcha en Highwatch',
   'entities.quests.q_prof_hobby_switch.completion':
     'Una elección más ligera, pero útil. Sigue esa curiosidad tan lejos como las obras de calidad rara te lleven.',
   'entities.quests.q_prof_hobby_switch.objectives.0.label': 'Mata de hierba recolectada',
@@ -119,14 +531,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.deedsPage.standingsNote':
     'Los reinos llevan un recuento continuo de Renombre entre cuentas: la tabla clasifica cuentas completas por Renombre acumulado, contando cada gesta una vez entre todos tus personajes, y muestra solo el Renombre, por lo que las gestas que no lo otorgan nunca mueven la clasificación aunque cuenten en tu Libro. Para ver quién ocupa qué posición, abre la Tabla de Clasificación dentro del juego y dirígete a su pestaña de Renombre; la clasificación vive allí, no en la wiki.',
   'hudChrome.archetypePair.alchemy+cooking': 'Boticario',
-  'hudChrome.archetypePair.armorcrafting+engineering': 'Mecanoforjador',
+  'hudChrome.archetypePair.armorcrafting+engineering': 'Engranajero',
   'hudChrome.archetypePair.cooking+leatherworking': 'Trampero',
   'hudChrome.archetypePair.enchanting+jewelcrafting': 'Gemoencantador',
   'hudChrome.archetypePair.engineering+alchemy': 'Bombardero',
   'hudChrome.archetypePair.inscription+enchanting': 'Arcanista',
   'hudChrome.archetypePair.jewelcrafting+weaponcrafting': 'Forjajoyero',
   'hudChrome.archetypePair.leatherworking+tailoring': 'Pertrechador',
-  'hudChrome.archetypePair.tailoring+inscription': 'Tejedormago',
   'hudChrome.archetypePair.weaponcrafting+armorcrafting': 'Herrero',
   'hudChrome.auraEffect.dmgDone': 'Aumenta el daño infligido un {pct}%',
   'hudChrome.auraEffect.dmgDoneReduce': 'Reduce el daño infligido un {pct}%',
@@ -612,14 +1023,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.pois.10.label': 'El Sembradal',
   'guide.nav.professions': 'Oficios',
   'guide.nav.valeCup': 'Copa del Valle',
-  'guide.professions.archetypeChooseBody':
-    'Declarar un arquetipo será un momento de historia: una misión que te acepta formalmente en esa identidad. Ese camino aún se está construyendo, así que por ahora cada personaje recorre el mundo con la elección todavía por delante, y mientras tanto cada oficio avanza hasta el nivel de calidad Raro.',
-  'guide.professions.archetypeChooseTitle': 'Elegir tu arquetipo',
-  'guide.professions.archetypeSwitchBody':
-    'Tampoco será una declaración una condena de por vida. El plan es un acto repetible de enmendar las cosas con tu antiguo oficio antes de adoptar uno nuevo, y la enmienda se vuelve más exigente cada vez que cambias, de modo que la elección siga teniendo peso en lugar de salir gratis. Como la propia declaración, aún está en camino.',
-  'guide.professions.craftMasteryBody':
-    'Fabricar con éxito aumenta tu habilidad en ese oficio, y la habilidad nunca deja bajo llave las recetas de un oficio: si conoces una receta y tienes sus materiales, puedes intentarla. Lo que la habilidad te compra, en cambio, es calidad: una mano experta produce un trabajo más fino. La única excepción son las recetas combinadas, que te piden haberte probado en ambos oficios antes de abrirse.',
-  'guide.professions.craftMasteryTitle': 'Habilidad y maestría',
   'guide.professions.intro':
     'Más allá del combate y las misiones, el mundo te recompensa por trabajar la tierra y la fragua: recolectar materias primas, convertirlas en equipo y bienes a lo largo de diez oficios de artesanía, y asentarte en una identidad como uno de los diez arquetipos que esos oficios representan.',
   'guide.valeCupPage.heading': 'La Copa del Valle',
@@ -4059,7 +4462,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.icevein_dirk.name': 'Puñal Vena de Hielo',
   'entities.items.highwatch_breastplate.name': 'Coraza de Highwatch',
   'entities.items.peakwool_robe.name': 'Toga de lana de cumbre',
-  'entities.items.stalkerhide_jerkin.name': 'Jubón de piel de acechador',
   'entities.items.cragwalker_boots.name': 'Botas Caminarrocas',
   'entities.items.windguard_leggings.name': 'Leotardos Guardavientos',
   'entities.items.ogre_toe_ring.name': 'Anillo de dedo de ogro',
@@ -4552,7 +4954,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_stalkers.completion':
     'Doce sombras menos en la cresta. Las patrullas respirarán esta noche.',
   'entities.quests.q_stalkers.objectives.0.label': 'Acechador de la cresta abatido',
-  'entities.quests.q_stalker_pelts.title': 'El invierno llega a Highwatch',
   'entities.quests.q_stalker_pelts.text':
     'El invierno de esta montaña derriba puertas, {playerName}. Ocho pieles de acechador forrarán capas para la muralla.',
   'entities.quests.q_stalker_pelts.completion':
@@ -4989,7 +5390,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread2.name': 'Hogaza Negra Conjurada',
   'entities.items.conjured_bread3.name': 'Pastel de Miel Conjurado',
   'entities.items.conjured_bread4.name': 'Pan de Festín Conjurado',
-  'entities.items.glimmerfin_koi.name': 'Koi de aletas brillantes',
   'entities.items.ironreel_fishing_rod.name': 'Caña de carrete de hierro',
   'entities.items.silverstream_fishing_rod.name': 'Caña del arroyo plateado',
   'entities.items.raw_bog_eel.name': 'Anguila de ciénaga cruda',
@@ -5035,23 +5435,15 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.monarch_crown_helm.name': 'Corona del Monarca',
   'entities.items.copper_mining_pick.name': 'Pico de Minería de Cobre',
   'entities.items.iron_mining_pick.name': 'Pico de Minería de Hierro',
-  'entities.items.mithril_mining_pick.name': 'Pico de Minería de Mithril',
   'entities.items.handaxe.name': 'Hacha de Mano',
   'entities.items.felling_axe.name': 'Hacha de Tala',
   'entities.items.ironbark_axe.name': 'Hacha de Corteza de Hierro',
   'entities.items.gathering_sickle.name': 'Hoz de Recolección',
   'entities.items.bronze_sickle.name': 'Hoz de Bronce',
-  'entities.items.silverleaf_sickle.name': 'Hoz de Hoja de Plata',
-  'entities.items.thorium_mining_pick.name': 'Pico de Minería de Torio',
-  'entities.items.arcanite_mining_pick.name': 'Pico de Minería de Arcanita',
   'entities.items.ashwood_axe.name': 'Hacha de Fresno',
-  'entities.items.elderwood_axe.name': 'Hacha de Madera Añeja',
   'entities.items.goldleaf_sickle.name': 'Hoz de Hoja Dorada',
   'entities.items.sunpetal_sickle.name': 'Hoz de Pétalo Solar',
-  'entities.items.thorium_ore.name': 'Mineral de Torio',
-  'entities.items.arcanite_bar.name': 'Barra de Arcanita',
   'entities.items.ashwood_log.name': 'Tronco de Ceniza',
-  'entities.items.elderwood_log.name': 'Tronco de Saúco',
   'entities.items.goldleaf_herb.name': 'Hierba Hoja de Oro',
   'entities.items.sunpetal_herb.name': 'Hierba Pétalo de Sol',
   'hud.core.chatChannels.add': 'Añadir canal de chat',
@@ -7578,9 +7970,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Consejo: desafía a otro jugador a un duelo amistoso o entra en la cola de la arena del Coliseo Cinéreo para poner a prueba tu configuración.',
   'loading.tips.talents':
     'Consejo: puedes restablecer tus talentos cuando estés fuera de combate, así que una elección temprana nunca es definitiva.',
-  'entities.items.arcane_dust.name': 'Polvo arcano',
-  'entities.items.arcane_essence.name': 'Esencia arcana',
-  'entities.items.arcane_shard.name': 'Fragmento arcano',
   'entities.items.chunk_of_ore.name': 'Trozo de mineral',
   'entities.quests.q_prof_intro.title': 'Un oficio para cada mano',
   'hudChrome.auth.appleChoiceExpired':
@@ -7704,8 +8093,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.professions.focusBody':
     'Cada pueblo principal mantiene un panel de Enfoque del pueblo para los recolectores de paso: párate en el pueblo, ábrelo junto al minimapa y dirige un pequeño presupuesto de puntos de enfoque hacia los tipos de componente que te interesan. Cuanto más enfoque des a un componente, más fino y rico saldrá de cada cadáver posterior; tu asignación acompaña a tu personaje dondequiera que vaya, y puedes reajustarla, gratis, en cualquier visita posterior al pueblo.',
   'guide.professions.focusTitle': 'Enfoque del pueblo',
-  'guide.professions.harvestBody':
-    'La recolección no se detiene en los nodos. De algunas bestias abatidas se pueden cosechar componentes, pieles, colmillos, seda y cosas más extrañas, directamente del cadáver junto a su botín corriente. Un solo recolector por muerte: la cosecha entera es de quien coseche primero. La elección es tuya cada vez, además: despoja cuanto ofrece el cadáver, o concéntrate en un único componente y toma un grado más fino de él. Cualquier personaje puede cosechar, sin necesidad de oficio ni entrenamiento, y un componente especialmente fino incluso lleva el nombre de quien lo cosechó.',
   'guide.professions.harvestTitle': 'Cosechar la propia cacería',
   'guide.search.typeAbility': 'Habilidad',
   'guide.search.typeDeed': 'Gesta',
@@ -8339,7 +8726,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.eastbrook_druids_hide.name': 'Pellejo del druida de Eastbrook',
   'entities.items.eastbrook_ritual_vestments.name': 'Vestiduras rituales de Eastbrook',
   'entities.items.eastbrook_warded_leggings.name': 'Perneras protegidas de Eastbrook',
-  'entities.items.sootscale_mantle.name': 'Manto de escamas de hollín',
   'entities.items.wardweave_cowl.name': 'Capucha de tejido protector',
   'hudChrome.claudium.railUsdc': 'USDC',
   'hudChrome.claudium.usdcBalance': 'Saldo en USDC: {amount}',
@@ -8406,7 +8792,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shatter.description':
     "Tus hechizos obtienen un 50% de probabilidad de golpe crítico contra objetivos congelados. Fingers of Frost y Winter's Chill cuentan como congelados. (Helada)",
   'entities.items.anglers_feast_platter.name': 'Plato de fiesta del pescador',
-  'entities.items.arcanite_war_axe.name': 'Hacha de guerra arcanita',
   'entities.items.ashwood_smoked_eel.name': 'Anguila ahumada de fresno',
   'entities.items.cooking_salt.name': 'Sal para cocinar',
   'entities.items.copper_bearded_axe.name': 'Hacha barbuda de cobre',
@@ -8414,7 +8799,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.copper_ore.name': 'Mineral de cobre',
   'entities.items.coppermail_gauntlets.name': 'Guanteletes de cota de cobre',
   'entities.items.coppermail_sabatons.name': 'Escarpes de cota de cobre',
-  'entities.items.elderwood_battle_staff.name': 'Bastón de batalla de Elderwood',
   'entities.items.elixir_of_the_boar.name': 'Elixir del jabalí',
   'entities.items.elixir_of_the_serpent.name': 'Elixir de la serpiente',
   'entities.items.fenbridge_hide_belt.name': 'Cinturón de piel Fenbridge',
@@ -8426,8 +8810,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.goldleaf_game_stew.name': 'Estofado de caza Goldleaf',
   'entities.items.goldleaf_healing_draught.name': 'Brebaje curativo de hoja dorada',
   'entities.items.goldleaf_mana_draught.name': 'Brebaje de maná de hoja dorada',
-  'entities.items.goldweave_leggings.name': 'Leotardos de tejido dorado',
-  'entities.items.goldweave_robe.name': 'Toga de tejido dorado',
   'entities.items.herbed_marsh_pike.name': 'Lucio de pantano con hierbas',
   'entities.items.homespun_cloth.name': 'Tela casera',
   'entities.items.homespun_hood.name': 'Capucha casera',
@@ -8458,10 +8840,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.silkbinders_raiment.name': 'Vestimenta de vinculador de seda',
   'entities.items.silkspun_satchel.name': 'Cartera hilada de seda',
   'entities.items.silvered_carp_supper.name': 'Cena de carpa plateada',
-  'entities.items.silverleaf_healing_draught.name': 'Brebaje curativo de hoja plateada',
-  'entities.items.silverleaf_herb.name': 'Hierba de hoja plateada',
-  'entities.items.silverleaf_mana_draught.name': 'Brebaje de maná de hoja plateada',
-  'entities.items.silverthread_slippers.name': 'Zapatillas de hilo plateado',
   'entities.items.smithing_flux.name': 'Flujo de herrería',
   'entities.items.spider_silk.name': 'Seda de araña',
   'entities.items.spool_of_thread.name': 'carrete de hilo',
@@ -8470,12 +8848,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.sunweave_mantle.name': 'Manto de tejido solar',
   'entities.items.sunweave_treads.name': 'Botines de tejido solar',
   'entities.items.tanning_agent.name': 'Agente curtiente',
-  'entities.items.thorium_warblade.name': 'Hoja de guerra de torio',
-  'entities.items.thoriumscale_cuirass.name': 'Coraza de escamas de torio',
-  'entities.items.thoriumscale_greathelm.name': 'Gran yelmo de escamas de torio',
-  'entities.items.thoriumscale_leggings.name': 'Leotardos de escamas de torio',
   'entities.items.venom_gland.name': 'Glándula venenosa',
-  'entities.items.venomfire_elixir.name': 'Elixir de fuego venenoso',
   'entities.items.whetted_iron_dirk.name': 'Puñal de hierro afilado',
   'entities.items.acolyte_chain_grips.name': 'Manoplas de cadena de acólito',
   'entities.items.briarroot_staff.name': 'Bastón de raíz de zarza',
@@ -8850,7 +9223,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_weapon_intellect': 'Encantar arma - Poder de hechizo',
   'hudChrome.enchantName.enchant_weapon_might': 'Encantar arma - Poder',
   'hudChrome.enchantName.enchant_weapon_runed_edge': 'Encantar arma - Filo rúnico',
-  'hudChrome.enchantName.enchant_weapon_runed_focus': 'Encantar arma - Foco rúnico',
   'hudChrome.enchanting.disenchantConfirmBody':
     'Esto destruye {item} y produce materiales arcanos. No se puede deshacer.',
   'hudChrome.enchanting.disenchantConfirmBodySpecial':

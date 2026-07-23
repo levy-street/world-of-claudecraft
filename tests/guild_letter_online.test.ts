@@ -1,5 +1,5 @@
-// The Guild trend letter over the live GameServer wire (Professions 2.0
-// Phase 7 QA): the offline delivery suite (tests/professions_trend.test.ts)
+// The Guild trend letter over the live GameServer wire (Professions 2.0):
+// the offline delivery suite (tests/professions_trend.test.ts)
 // pins the sweep through the real Sim, but nothing pinned that the SERVER-side
 // sweep books the letter and that the raven's mailArrived routes to only the
 // owning session over the real pump (sim.tick() returning the buffered
@@ -7,7 +7,7 @@
 // mirror (mailU) counting it. That is the 2033 stub-trap class of regression:
 // if mailArrived were dropped from routing or the letterId stripped on the
 // wire, every offline test would stay green. Modeled on the
-// masterwork_zone_broadcast session-routing suite (Phase 6 QA).
+// masterwork_zone_broadcast session-routing suite.
 import { describe, expect, it, vi } from 'vitest';
 
 // Mock the db layer so the live GameServer suite needs no Postgres; only the
@@ -86,7 +86,7 @@ describe('guild letter over the live GameServer wire (session routing)', () => {
       meta.craftSkills.armorcrafting = 12;
 
       // The REAL pump: tick returns the buffered emits, routeEvents fans them
-      // per session (the Phase 6 masterworkZone suite idiom).
+      // per session (the masterworkZone suite idiom).
       const route = (evs: SimEvent[]) =>
         (server as unknown as { routeEvents(e: SimEvent[]): void }).routeEvents(evs);
       for (let i = 0; i < DELIVERY_WINDOW_TICKS; i++) route(server.sim.tick());

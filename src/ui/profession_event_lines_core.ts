@@ -1,4 +1,4 @@
-// Pure, host-agnostic render plans for the four Phase 14 profession SimEvents
+// Pure, host-agnostic render plans for the four profession SimEvents
 // (professions/prof_nudges.ts + professions/attunement_events.ts): the trend
 // nudge, the first-tier tutorial trigger, and the personal + zone attunement
 // celebrations. The sim emits these text-free (ids and names only, the
@@ -41,7 +41,7 @@ export function attunementMasterForPair(pairId: string): string | null {
   return ATTUNEMENT_MASTER_BY_PAIR[pairId] ?? null;
 }
 
-/** The four Phase 14 profession events, narrowed to the fields the plan reads.
+/** The four profession events, narrowed to the fields the plan reads.
  *  The HUD passes its already-narrowed SimEvent (extra fields such as `pid` are
  *  structurally ignored here). */
 export type ProfessionEventInput =
@@ -66,12 +66,12 @@ export type ProfessionEventPlan =
   // Personal attunement celebration banner naming the earned archetype title
   // (pairId IS the archetypePairId title identifier). Mirrors the
   // craft_celebration_view banner arm: at most one celebration sound, motion
-  // gated by reducedMotion (information never is). Phase 15 deed hook: a per
+  // gated by reducedMotion (information never is). Deed hook: a per
   // archetype deed unlock will fire from this same moment; today it is a pure
   // celebration.
   | { kind: 'attunement'; pairId: string; playSound: boolean; motion: boolean };
 
-/** Map one Phase 14 profession event to its render plan. `reducedMotion` gates
+/** Map one profession event to its render plan. `reducedMotion` gates
  *  the attunement banner's motion flag only (the buildCraftCelebrationPlan
  *  contract); every other arm ignores it. */
 export function planProfessionEvent(

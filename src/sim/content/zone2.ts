@@ -717,7 +717,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     questIds: [],
     greeting: 'Mind the damp on the pages, $N. The fen eats more books than readers ever will.',
   },
-  // Crafting-station master (Professions 2.0 Phase 8): stands beside the
+  // Crafting-station master (Professions 2.0): stands beside the
   // Fenbridge tannery (content/professions.ts STATIONS), on the northwest
   // edge of town with a guard-safe camp margin.
   tanner_hesk: {
@@ -727,10 +727,10 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     pos: { x: -11, z: 315.5 },
     facing: 2.3,
     color: 0x8a5a2a,
-    // Professions 2.0 Phase 14: the Fenbridge tannery master runs the repeatable
+    // Professions 2.0: the Fenbridge tannery master runs the repeatable
     // leatherworking work order.
     questIds: ['q_prof_workorder_tannery'],
-    // Phase 9 station stocking: thorium_ore is the premium reagent the
+    // Station stocking: thorium_ore is the premium reagent the
     // tannery station's own recipe (recipe_duskhide_wraps) consumes.
     vendorItems: [
       'travelers_knapsack',
@@ -1171,7 +1171,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     minLevel: 12,
     suggestedPlayers: 5,
   },
-  // Repeatable craft work order (Professions 2.0 Phase 14): Tanner Hesk takes
+  // Repeatable craft work order (Professions 2.0): Tanner Hesk takes
   // rough hides for coin on the shared cadence (WORK_ORDER_CADENCE_TICKS); the
   // collect turn-in consumes them. copperReward is floor(0.5 * summed sell value
   // of the requested hides); xpReward matches the make-amends repeatable band.

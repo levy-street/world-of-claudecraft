@@ -1,4 +1,4 @@
-// Pure view core for the Phase 9 recipe-training window: master-to-station
+// Pure view core for the recipe-training window: master-to-station
 // resolution, the tri-state row predicate (known / teachable / locked,
 // mirroring isRecipeKnown + teachTierMet exactly), the always-present locked
 // ladder with its named requirement, the stable sort, fees and
@@ -123,7 +123,7 @@ describe('buildTrainView', () => {
 
   it('locked rows are ALWAYS present and carry the named tier requirement', () => {
     // Skill 0 everywhere: every trainer recipe above the free floor locks (the
-    // skillReq-0 Phase 10 ladder rungs stay teachable at tier 0), and each
+    // skillReq-0 ladder rungs stay teachable at tier 0), and each
     // locked row names its craft and the flat threshold tier * TIER_SKILL_STEP.
     // forgemistress_darva serves both forge crafts, so her locked ladder is the
     // two combo recipes plus the tier-1 (skillReq 25) and tier-2 (skillReq 50)

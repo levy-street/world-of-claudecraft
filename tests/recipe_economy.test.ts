@@ -1,12 +1,13 @@
-// Phase 10 recipe economy + ladder-shape gate (Professions 2.0). Phase 10 landed
-// LADDER_RECIPES (54 trainer recipes across six crafts at skillReq 0/25/50) plus
-// the new materials/specimens/vendor reagents in content/profession_items.ts.
+// Recipe economy + ladder-shape gate (Professions 2.0): LADDER_RECIPES (54
+// trainer recipes across six crafts at skillReq 0/25/50) plus the
+// materials/specimens/vendor reagents in content/profession_items.ts.
 // The locked economy decision: no recipe vendors above its input value. Several
-// PRE-Phase-10 recipes were grossly gold-positive, so the invariant carries a
+// PRE-LADDER recipes were grossly gold-positive, so the invariant carries a
 // FROZEN legacy exception list (never an escape hatch for new content). The
-// Phase 15 QA directed burn-down reworked the reagent lists of 10 of the 14
-// members gold-negative; the 4 residual members whose outputs cannot be
-// covered by sane, accessible inputs remain frozen below.
+// economy rework turned the reagent lists of 10 of the 14
+// members gold-negative; the last 4 (jerkin, vestments, druids hide, warded
+// leggings) closed through the maintainer-approved paired arm (input rework
+// plus an output sellValue re-price), so the frozen list below is EMPTY.
 import { describe, expect, it } from 'vitest';
 import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
 import { ALL_RECIPES, COMBO_RECIPES, LADDER_RECIPES, recipeById } from '../src/sim/content/recipes';
@@ -38,8 +39,8 @@ function outputValue(recipe: ProfessionRecipeRecord): number {
   return def.sellValue * recipe.resultCount;
 }
 
-// The legacy gold-positive exception list is EMPTY as of the Phase 15 QA
-// directed burn-down (maintainer-approved 2026-07-22): 10 of the original 14
+// The legacy gold-positive exception list is EMPTY as of the economy rework
+// (maintainer-approved 2026-07-22): 10 of the original 14
 // members were reworked gold-negative through INPUT-only reagent reworks, and
 // the last 4 (jerkin, vestments, druids hide, warded leggings) through the
 // approved paired arm: a zone-1-legal thematic input rework PLUS an output
@@ -70,7 +71,7 @@ describe('THE ECONOMY INVARIANT', () => {
       ).toBeLessThan(inputValue(recipe));
     }
     // Guard the enumeration is real (not an empty sweep): all recipes minus the
-    // frozen legacy ids (zero members since the Phase 15 burn-down completed).
+    // frozen legacy ids (zero members since the economy rework completed).
     expect(checked).toBe(ALL_RECIPES.length - LEGACY_GOLD_POSITIVE_RECIPE_IDS.size);
     expect(checked).toBeGreaterThan(0);
   });
@@ -78,7 +79,7 @@ describe('THE ECONOMY INVARIANT', () => {
   it('(a) every legacy member predates trainer acquisition (in PRE_TRAINING_RECIPE_IDS)', () => {
     const preTraining = new Set(PRE_TRAINING_RECIPE_IDS);
     for (const id of LEGACY_GOLD_POSITIVE_RECIPE_IDS) {
-      expect(preTraining.has(id), `${id} must be a pre-Phase-9 recipe`).toBe(true);
+      expect(preTraining.has(id), `${id} must be a pre-training-era recipe`).toBe(true);
     }
   });
 
@@ -217,7 +218,7 @@ describe('MATERIAL DEMAND COVERAGE', () => {
     expect([...liveYields].sort()).toEqual([...NODE_YIELDS].sort());
   });
 
-  it('every Phase 4 + Phase 10 material is consumed by at least one recipe', () => {
+  it('every material, specimen, and vendor reagent is consumed by at least one recipe', () => {
     for (const id of [...NODE_YIELDS, ...HARVEST_MATERIALS, ...SPECIMENS, ...VENDOR_REAGENTS]) {
       expect(allReagentIds.has(id), `${id} is never consumed by any recipe`).toBe(true);
     }
@@ -246,10 +247,10 @@ describe('LADDER SHAPE PINS', () => {
   ];
   const QUALITY_BY_RUNG: Record<number, string> = { 0: 'common', 25: 'uncommon', 50: 'rare' };
 
-  // Material bands (Phase 10 ladder design): a rung-50 (rare) recipe must not be
+  // Material bands (ladder design): a rung-50 (rare) recipe must not be
   // craftable from ONLY the top rare-band inputs; it must still consume something
   // below that tier so the low/mid gathering economy keeps its demand. The
-  // rare-band is the tier-3 gathered materials, the arcanite bar, and the rare
+  // rare-band is the tier-3 gathered materials, the glyphsteel bar, and the rare
   // specimens. NOTE the check is phrased as "not solely rare-band" rather than
   // "contains a low/mid material": recipe_anglers_feast_platter (a shipped rung-50
   // cooking recipe) consumes only mid-tier fish, sunpetal_herb, and cooking_salt,

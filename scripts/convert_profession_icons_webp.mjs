@@ -9,7 +9,8 @@
 // committed). WebP is the source of truth: no lossless original is kept, and nothing
 // converts at build time (this is a pre-commit tool, NOT wired into `npm run build`, so
 // CI never re-encodes). The file basename IS the asset id from
-// docs/professions-2/asset-manifest.json (profession, gathering, archetype, or masterwork),
+// docs/design/professions-asset-manifest.json (profession, gathering, archetype,
+// or masterwork),
 // and regenerates src/ui/profession_image_ids.ts from the committed WebPs. Re-running with
 // everything already WebP is a byte-stable no-op.
 //

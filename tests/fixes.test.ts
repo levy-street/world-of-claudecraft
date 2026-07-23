@@ -1112,7 +1112,7 @@ describe('boss loot and encounter resets', () => {
     sim.lootCorpse(mob.id, b);
     expect(sim.countItem('boar_hide', b)).toBe(1);
     expect(mob.loot).toBeNull();
-    // Phase 12d: the emptied boar corpse stays lootable through its
+    // The emptied boar corpse stays lootable through its
     // unclaimed-harvest grace window instead of collapsing immediately.
     expect(mob.lootable).toBe(true);
   });

@@ -1,4 +1,4 @@
-// Professions 2.0 Phase 12b (Gathering rhythm): the cross-cutting pins the
+// Professions 2.0 (Gathering rhythm): the cross-cutting pins the
 // phase file's tests deliverable names beyond the re-pinned appendix set.
 // The bite-delay draw-and-bounds contract, the rod synergy on both the delay
 // ceiling and the reel window, the reel deadline boundary, the hidden-state
@@ -457,7 +457,7 @@ describe('gather completion re-validation', () => {
   });
 });
 
-describe('node-tier-relative proficiency gain through the live cast loop (Phase 12c)', () => {
+describe('node-tier-relative proficiency gain through the live cast loop', () => {
   // The resolveHarvest call site queues gatherNodeGainMultiplier(proficiency,
   // node.tier) instead of the old flat 1. NODE is tier 1, so mining 50 sits
   // two gain tiers above it (green, 0.25) and mining 75 grays it out

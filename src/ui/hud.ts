@@ -60,6 +60,7 @@ import { specialRoleColor } from '../sim/discord_roles';
 import { canEquipItem, weaponHand } from '../sim/equipment_rules';
 import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
+import { junkSellableSlot } from '../sim/items';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { FOCUS_POINT_BUDGET, isInTownZone } from '../sim/professions/focus';
 import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/stations';
@@ -1280,12 +1281,12 @@ export class Hud {
   // at open, return focus on close (src/ui/CLAUDE.md focus contract).
   private readonly trainWindowFocus = this.windowFocus('#train-window');
   private trainOpenerFocus: HTMLElement | null = null;
-  // Maker's Bond unbind window (Professions 2.0 Phase 14b): the same
+  // Maker's Bond unbind window (Professions 2.0): the same
   // standalone trapping-window shape as the train window above.
   private openUnbindNpcId: number | null = null;
   private readonly unbindWindowFocus = this.windowFocus('#unbind-window');
   private unbindOpenerFocus: HTMLElement | null = null;
-  // Craft tier-up snapshot (Professions 2.0 Phase 6): the last SYNCED
+  // Craft tier-up snapshot (Professions 2.0): the last SYNCED
   // craftSkills observation handleEvents diffs for tier crossings. null until
   // the first synced observation, which initializes silently (no toasts for
   // history on login/join).
@@ -1304,11 +1305,16 @@ export class Hud {
   // online cprof or professions snapshot replaces stale archetype art/title
   // and Gathering numbers without repainting for attunedZone bystanders.
   private lastProfessionSurfaceSig = '';
-  // Commission opt-in state (Professions 2.0 Phase 14b): recipe ids whose
+  // Commission opt-in state (Professions 2.0): recipe ids whose
   // NEXT craft goes out with the commission flag. Held here (not in the
   // painter) so the crafting window's staleness repaints never untick a
   // checked box; consumed on craft, cleared on window close.
   private readonly craftCommissionOptIn = new Set<string>();
+  // The crafting window's selected craft tab. Held here (the commission-set
+  // precedent) so staleness repaints keep the player's tab; null means "no
+  // pick yet" and the painter falls back to the first tab. Cleared on close
+  // so reopening always starts at the front of the book.
+  private selectedCraftTab: string | null = null;
   private readonly delveBoard: DelveBoardController;
   private readonly delveTracker: DelveTrackerController;
   private readonly lockpickController: LockpickController;
@@ -1440,7 +1446,7 @@ export class Hud {
   private readonly playerCard: PlayerCardController;
   // Shared by the confirm + input modals (one #confirm-dialog id; they never coexist).
   private confirmTrap: FocusTrapHandle | null = null;
-  // The Phase 14 first-tier tutorial modal's focus trap (#profession-tutorial).
+  // The first-tier tutorial modal's focus trap (#profession-tutorial).
   private professionTutorialTrap: FocusTrapHandle | null = null;
   private meters: Meters;
   private tutorial = new TutorialOverlay();
@@ -3646,7 +3652,7 @@ export class Hud {
     openItemActionMenu: (def, itemId, x, y, runDefault) =>
       this.bagItemActionMenu.open(def, itemId, x, y, runDefault),
   });
-  // Bag-item action menu (Professions 2.0 Phase 13): the right-click / touch
+  // Bag-item action menu (Professions 2.0): the right-click / touch
   // menu that surfaces Disenchant / Salvage / Apply Enchant on a bag stack.
   // Composes the shared #ctx-menu popup family (placePopupAt + keepPopupOnScreen,
   // bindContextMenuActions) and the one confirm-dialog family; the bags window
@@ -4671,7 +4677,7 @@ export class Hud {
     if (isItemLevelEligible(item) && this.optionsHooks?.settings.get('showItemLevel')) {
       const level = itemLevel(item);
       if (level !== undefined) {
-        html += `<div class="tt-stat" style="color:#ffd100">${esc(
+        html += `<div class="tt-stat" style="color:var(--gold)">${esc(
           t('hudChrome.options.itemLevelLine', { level: itemNumber(level) }),
         )}</div>`;
         html += `<div class="tt-sub">${esc(
@@ -4682,14 +4688,14 @@ export class Hud {
     // Bound-to-owner marker (marks and other soulbound tokens): shown like the
     // classic "Soulbound" line so a player can see it cannot be traded or destroyed.
     if (item.soulbound) {
-      html += `<div class="tt-sub" style="color:#ffd100">${esc(t('hudChrome.itemSoulbound'))}</div>`;
+      html += `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemSoulbound'))}</div>`;
     }
-    // Maker's Bond lines (Professions 2.0 Phase 14b): the commission
+    // Maker's Bond lines (Professions 2.0): the commission
     // binds-on-first-trade warning or the bound lock, beside the def-level
     // soulbound line it parallels (item_instance_tooltip.ts owns the copy
     // rules, incl. the equipment-kind scope and the no-name doctrine).
     html += instanceBindingLines(instance, item.kind);
-    // Per-copy instance badges (Professions 2.0 Phase 2/6): the masterwork
+    // Per-copy instance badges (Professions 2.0): the masterwork
     // seal and the enchanted marker (item_instance_tooltip.ts owns the copy
     // rules, incl. never claiming a quality-rank upgrade).
     html += instanceBadgeLines(instance);
@@ -7102,14 +7108,14 @@ export class Hud {
       const townFocusBtn = document.getElementById('mm-town-focus');
       if (townFocusBtn) townFocusBtn.style.display = inTown ? '' : 'none';
       if (this.townFocusOpen) this.renderTownFocus();
-      // Crafting window staleness (Phase 6, re-signaled for Phase 8): the
+      // Crafting window staleness: the
       // window is a cold painter, so an open window repaints only when the
       // in-range station-type set changes (walking in/out of a station's
       // range, or the own mobile station appearing/expiring). Cheap distance
       // checks on the slow band; the server re-validates the gate on every
       // craft regardless.
       if (
-        $('#crafting-window').style.display === 'block' &&
+        $('#crafting-window').style.display === 'flex' &&
         stationTypesSignature(inRangeStationTypes(sim.player.pos, sim.activeMobileStationCraft)) !==
           this.lastCraftingStationSig
       )
@@ -7554,6 +7560,14 @@ export class Hud {
             this.showBanner(currentZoneName);
             this.log(t('hud.core.enteringZone', { zone: currentZoneName }), '#ffd100');
             this.logZoneWelcome(currentZone);
+            // Zone-entry vista: a slow up-and-out camera sweep over the new
+            // zone alongside the banner. Display-only, cancelled by any
+            // camera input, skipped in combat/while dead and under reduced
+            // motion (the renderer gates the latter). Online mirrors never
+            // set p.inCombat, so the recent-personal-combat-event window (the
+            // same signal the combat music rides) carries that gate there.
+            const recentCombat = performance.now() - this.lastCombatEventAt < 6000;
+            if (!p.dead && !p.inCombat && !recentCombat) this.renderer.vistaPan();
           }
           this.lastZoneId = currentZone.id;
           this.prewarmMapBg(currentZone.id); // get the new zone's map bg ready before the player opens it
@@ -7699,6 +7713,9 @@ export class Hud {
     if (slowHud && this.deedsWindow.isOpen) this.deedsWindow.refreshIfChanged();
     if (slowHud) this.refreshOpenProfessionSurfacesIfChanged();
     if (slowHud && this.professionsWindow.isOpen) this.professionsWindow.refreshIfChanged();
+    // The gossip dialog's intro hint row watches the same online cprof edge:
+    // attunement retires it, and no quest event fires for that flip.
+    if (slowHud) this.questDialog.refreshIfChanged();
     // The deed tracker is always-on chrome (not gated on a window): watched
     // progress climbs from normal play, and earned deeds drop off.
     if (slowHud) this.updateDeedTracker();
@@ -8894,8 +8911,14 @@ export class Hud {
               }),
               '#ff8877',
             );
-            // player-hit SFX is spatial now (see playEventSfx). Keep the Fiesta kick.
+            // player-hit SFX is spatial now (see playEventSfx). Keep the Fiesta kick;
+            // in the open world only a HEAVY hit kicks the camera (a tenth of
+            // max HP in one blow, or any crit), so routine chip damage stays
+            // still. addShake is a reduced-motion no-op.
             if (this.inFiesta()) this.renderer.addShake(ev.crit ? 0.34 : 0.14);
+            else if (tgt && (ev.crit || ev.amount >= tgt.maxHp * 0.1)) {
+              this.renderer.addShake(ev.crit ? 0.26 : 0.16);
+            }
           }
           break;
         }
@@ -9056,7 +9079,7 @@ export class Hud {
             this.log(t('hudChrome.crafting.craftedToast', { name }), '#7fdc4f');
             audio.lootItem();
           } else if (!ev.ok) {
-            // station_required (Phase 8) names WHICH station: no station field
+            // station_required names WHICH station: no station field
             // rides the event, the type resolves from the recipe content
             // (identical in both worlds). An unresolvable recipe id (cannot
             // happen from a well-formed server) falls through to the generic
@@ -9082,11 +9105,11 @@ export class Hud {
               '#ff6b6b',
             );
           }
-          if ($('#crafting-window').style.display === 'block') this.renderCrafting();
+          if ($('#crafting-window').style.display === 'flex') this.renderCrafting();
           break;
         }
         case 'trainResult': {
-          // Recipe training outcome (Professions 2.0 Phase 9). The event is
+          // Recipe training outcome (Professions 2.0). The event is
           // text-free: the recipe name, craft, and tier threshold all derive
           // from recipeId plus static content, identical in both worlds. ONE
           // chat line either way: no toast and no sound cue on success (the
@@ -9129,11 +9152,11 @@ export class Hud {
           // known recipes) without waiting for a manual reopen.
           if (this.openTrainNpcId !== null && $('#train-window').style.display === 'block')
             this.renderTrain();
-          if ($('#crafting-window').style.display === 'block') this.renderCrafting();
+          if ($('#crafting-window').style.display === 'flex') this.renderCrafting();
           break;
         }
         case 'unbindResult': {
-          // Maker's Bond unbind outcome (Professions 2.0 Phase 14b). The
+          // Maker's Bond unbind outcome (Professions 2.0). The
           // event is text-free: the item name derives from itemId plus static
           // content and the fee formats locally, identical in both worlds.
           // ONE chat line either way (the trainResult single-surface rule:
@@ -9172,7 +9195,7 @@ export class Hud {
           break;
         }
         case 'masterwork': {
-          // Personal masterwork proc (Professions 2.0 Phase 6). The grant hub
+          // Personal masterwork proc (Professions 2.0). The grant hub
           // already printed the loot line + cue and the craftResult arm above
           // already logged craftedToast + lootItem, so this arm re-logs no
           // grant and re-cues no lootItem: it only feeds the drain-end
@@ -9200,18 +9223,18 @@ export class Hud {
         case 'profTierTutorial':
         case 'attuned':
         case 'attunedZone':
-          // The four Professions 2.0 Phase 14 text-free events, rendered
+          // The four Professions 2.0 text-free events, rendered
           // through the profession_event_lines plan (chat line / banner /
           // tutorial panel). Thin: the plan owns every decision, this arm only
           // executes it.
           this.handleProfessionEvent(ev);
           break;
         case 'gatherResult': {
-          // Harvest feedback line (Professions 2.0 Phase 4), colored by rolled
+          // Harvest feedback line (Professions 2.0), colored by rolled
           // material rarity. Identical on every graphics tier (player feedback
           // is never profile-gated). The grant hub's own 'loot' event already
           // prints the "You receive:" line and plays the loot cue, so this
-          // line uses distinct gather wording; the strike cue (Phase 12b) is
+          // line uses distinct gather wording; the strike cue is
           // the physical pick/axe/sickle impact of the completed gather cast,
           // not a second loot notification, with a rare variant for a rare+
           // material or a rare-event roll.
@@ -9237,7 +9260,7 @@ export class Hud {
           break;
         }
         case 'gatherDenied': {
-          // Tool-tier denial (Professions 2.0 Phase 12): an error toast ONLY.
+          // Tool-tier denial (Professions 2.0): an error toast ONLY.
           // No loot line, no cue, no other state (the grant-hub double-log
           // trap); the sim event is text-free, so the pure core resolves the
           // key off surface + professionId and requiredTier interpolates.
@@ -9249,7 +9272,7 @@ export class Hud {
           break;
         }
         case 'gatherDowngrade': {
-          // Full-bag signed-grant downgrade (Professions 2.0 Phase 12d): a
+          // Full-bag signed-grant downgrade (Professions 2.0): a
           // toast ONLY, the gatherDenied pattern above. No loot line, no cue,
           // no other state (the grant-hub double-log trap); the sim event is
           // text-free, so the pure core resolves the key off the lost arm.
@@ -9257,7 +9280,7 @@ export class Hud {
           break;
         }
         case 'disenchantResult': {
-          // Enchanting disenchant outcome (Professions 2.0 Phase 13): text-free,
+          // Enchanting disenchant outcome (Professions 2.0): text-free,
           // so enchanting_view.ts maps the event to its key + sink and the item
           // name interpolates. The grant hub's own 'loot' events already print
           // the material yield lines, so success is a distinct action line (the
@@ -9270,7 +9293,7 @@ export class Hud {
           break;
         }
         case 'salvageResult': {
-          // Enchanting salvage outcome (Professions 2.0 Phase 13): same shape as
+          // Enchanting salvage outcome (Professions 2.0): same shape as
           // disenchantResult above.
           const toast = salvageResultToast(ev);
           const item = ITEMS[ev.itemId];
@@ -9280,7 +9303,7 @@ export class Hud {
           break;
         }
         case 'enchantResult': {
-          // Apply-enchant outcome (Professions 2.0 Phase 13): the success line
+          // Apply-enchant outcome (Professions 2.0): the success line
           // names the item AND the enchant (enchantName.<id>, its first render
           // sink); every deny is an error toast.
           const toast = applyEnchantResultToast(ev);
@@ -9299,11 +9322,11 @@ export class Hud {
           break;
         }
         case 'fishingResult': {
-          // Reel-in feedback line (Professions 2.0 Phase 11), colored by the
+          // Reel-in feedback line (Professions 2.0), colored by the
           // caught item's quality. Identical on every graphics tier (player
           // feedback is never profile-gated). The grant hub's own 'loot' event
           // already prints the "You receive:" line and plays the loot cue, so
-          // this line uses distinct reel-in wording; the reel cue (Phase 12b)
+          // this line uses distinct reel-in wording; the reel cue
           // is the splash-and-crank of the landed reel itself, not a second
           // loot notification.
           const item = ITEMS[ev.itemId];
@@ -9315,7 +9338,7 @@ export class Hud {
           break;
         }
         case 'fishingBite': {
-          // The hidden seeded bite fired (Professions 2.0 Phase 12b). The cue
+          // The hidden seeded bite fired (Professions 2.0). The cue
           // rides the ALWAYS-AUDIBLE play() arm (timing/affordance: the reel
           // window is running, so it must never be silenced by the feedback
           // toggle), the bobber flips into its bite state via the renderer's
@@ -9326,7 +9349,7 @@ export class Hud {
           break;
         }
         case 'fishingGotAway': {
-          // The reel window closed unanswered (Professions 2.0 Phase 12b): a
+          // The reel window closed unanswered (Professions 2.0): a
           // localized line only, NO cue (a miss costs nothing and a cue every
           // missed bite would spam an AFK-adjacent moment); the bobber sinks
           // out on its own as the cast ends.
@@ -9334,7 +9357,7 @@ export class Hud {
           break;
         }
         case 'gatherRareEvent': {
-          // Soft zone broadcast (Professions 2.0 Phase 4): every recipient in
+          // Soft zone broadcast (Professions 2.0): every recipient in
           // the zone logs the localized flavor line; only the finder also gets
           // the celebratory cue. The finder name splices verbatim.
           this.log(
@@ -10263,7 +10286,7 @@ export class Hud {
           break;
         case 'castStart':
           // cast-loop SFX is spatial now (see playEventSfx); the profession
-          // casts (Professions 2.0 Phase 12b) add a personal placeholder cue
+          // casts (Professions 2.0) add a personal placeholder cue
           // at cast start, feedback-gated like other notification cues.
           if (ev.entityId === sim.playerId) {
             if (ev.ability === GATHER_CAST_ID) audio.gatherCast();
@@ -10375,7 +10398,7 @@ export class Hud {
     if (plan.playSound) audio.achievement();
   }
 
-  // The four Professions 2.0 Phase 14 text-free events, rendered through the
+  // The four Professions 2.0 text-free events, rendered through the
   // pure plan (profession_event_lines.ts). Thin consumer: the plan decides which
   // chat line / banner / panel; this only resolves the localized archetype title
   // and master/celebrant names and paints. The banner arm reuses the
@@ -10414,7 +10437,7 @@ export class Hud {
         const text = t('hudChrome.crafting.attunedBanner', {
           title: archetypeTitleText(plan.pairId),
         });
-        // Phase 15 deed hook: a per-archetype deed unlock will fire from this
+        // Deed hook: a per-archetype deed unlock will fire from this
         // same attunement moment; today it is a pure celebration banner.
         this.showBanner(text, plan.motion);
         this.combatAnnouncer.push(text, performance.now());
@@ -10423,12 +10446,13 @@ export class Hud {
         // so refresh immediately. If online cprof lands later, the slow-band
         // signature above catches that second edge and converges then.
         this.refreshOpenProfessionSurfacesIfChanged();
+        this.questDialog.refreshIfChanged();
         break;
       }
     }
   }
 
-  // The one-time first-tier tutorial modal (Phase 14): fired by profTierTutorial
+  // The one-time first-tier tutorial modal: fired by profTierTutorial
   // (the sim guarantees once-ever). Reuses the confirm-dialog modal family via
   // the profession_tutorial_window painter; the Hud owns the focus trap and the
   // z-index floor above the mobile sheet, the confirmDialog precedent.
@@ -10440,7 +10464,7 @@ export class Hud {
     });
     this.bringWindowToFront(el);
     // Above the mobile sheet (z-95) and the armory inspect overlay (z-90): the
-    // Phase 13 scoped-popup floor, so the one-shot never opens buried.
+    // scoped-popup floor, so the one-shot never opens buried.
     el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 96));
     this.professionTutorialTrap = this.focusManager.open({ root: () => el });
     el.querySelector<HTMLElement>('.cd-ok')?.focus();
@@ -10996,8 +11020,13 @@ export class Hud {
   }
 
   private localizeLootText(text: string): string {
-    let match = /^You receive: (.+)\.$/.exec(text);
-    if (match) return t('hud.logs.lootReceiveItem', { item: itemDisplayNameFromSource(match[1]) });
+    // The optional xN suffix (multi-unit grants, both grant hubs emit it)
+    // routes through itemStackDisplayName so the item NAME still localizes;
+    // a greedy single capture would feed "Copper Ore x3" to the exact-name
+    // lookup and silently degrade to raw English.
+    let match = /^You receive: (.+?)( x\d+)?\.$/.exec(text);
+    if (match)
+      return t('hud.logs.lootReceiveItem', { item: itemStackDisplayName(match[1], match[2]) });
     match = /^You receive (.+)\.$/.exec(text);
     if (match) return t('hud.logs.lootReceiveMoney', { money: this.localizeSimMoney(match[1]) });
     match = /^You loot (.+)\.$/.exec(text);
@@ -11012,6 +11041,13 @@ export class Hud {
       return t(n === 1 ? 'hud.logs.soldJunkOne' : 'hud.logs.soldJunkMany', {
         count: formatNumber(n, { maximumFractionDigits: 0 }),
         money: this.localizeSimMoney(match[2]),
+      });
+    }
+    match = /^Kept (\d+) bound cop(?:y|ies)\.$/.exec(text);
+    if (match) {
+      const n = Number(match[1]);
+      return t(n === 1 ? 'hud.logs.keptBoundOne' : 'hud.logs.keptBoundMany', {
+        count: formatNumber(n, { maximumFractionDigits: 0 }),
       });
     }
     match = /^(.+) assigned (.+) to (.+)\.$/.exec(text);
@@ -11299,16 +11335,10 @@ export class Hud {
     if (this.openVendorNpcId === null) return;
     const npc = this.sim.entities.get(this.openVendorNpcId);
     if (!npc) return;
-    const junk = this.sim.inventory.filter((slot) => {
-      const item = ITEMS[slot.itemId];
-      return (
-        !!item &&
-        item.quality === 'poor' &&
-        item.kind !== 'quest' &&
-        !item.noVendorSell &&
-        slot.count > 0
-      );
-    });
+    // The ONE sweep-eligibility rule, shared with the sim's sellAllJunk: the
+    // preview and the sweep must agree on soulbound defs and bound copies or
+    // the button can promise coin the sweep will not pay.
+    const junk = this.sim.inventory.filter((slot) => junkSellableSlot(ITEMS[slot.itemId], slot));
     const junkProceeds = junk.reduce(
       (sum, slot) => sum + ITEMS[slot.itemId]?.sellValue * slot.count,
       0,
@@ -11407,7 +11437,7 @@ export class Hud {
   }
 
   // -------------------------------------------------------------------------
-  // Recipe training (Professions 2.0 Phase 9): a station master teaches
+  // Recipe training (Professions 2.0): a station master teaches
   // trainer-acquisition recipes for a tier-priced copper fee. Opens ONLY from
   // the master's gossip dialog (no side-rail button; the rail is at
   // capacity). The window is advisory: the server re-validates every gate on
@@ -11454,7 +11484,7 @@ export class Hud {
   }
 
   // -------------------------------------------------------------------------
-  // Maker's Bond unbind service (Professions 2.0 Phase 14b): the station
+  // Maker's Bond unbind service (Professions 2.0): the station
   // master's second gossip service beside training, same standalone
   // trapping-window family. The fee confirm rides the ONE confirmDialog
   // family (keyboard activation included); the sim re-validates everything.
@@ -11579,7 +11609,7 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   toggleCrafting(): void {
-    if ($('#crafting-window').style.display === 'block') {
+    if ($('#crafting-window').style.display === 'flex') {
       this.closeCrafting();
       return;
     }
@@ -11592,7 +11622,7 @@ export class Hud {
   }
 
   private renderCrafting(): void {
-    // Station range for Phase 8 station-bound rows: the same pure in-range
+    // Station range for station-bound rows: the same pure in-range
     // set the sim's station_required deny composes (physical stations plus
     // the own active mobile station), computed once per repaint, so the row
     // disable mirrors the deny exactly. The server re-validates on craft.
@@ -11601,7 +11631,7 @@ export class Hud {
       this.sim.activeMobileStationCraft,
     );
     this.lastCraftingStationSig = stationTypesSignature(inRangeStations);
-    // Phase 9: the window lists only KNOWN recipes, so an unlearned trainer
+    // The window lists only KNOWN recipes, so an unlearned trainer
     // recipe never renders as a craftable row (it surfaces in the Train
     // ladder instead). The SAME viewer-side predicate the ladder's known
     // state uses (train_view.ts isRecipeKnownForViewer), so the two windows
@@ -11624,7 +11654,7 @@ export class Hud {
         ...this.presentationBag,
         hideTooltip: () => this.hideTooltip(),
         onCraft: (recipeId) => {
-          // Commission opt-in (Phase 14b): per-craft semantics, the checkbox
+          // Commission opt-in: per-craft semantics, the checkbox
           // arms exactly ONE craft. Consume the opt-in before sending so the
           // repaint below renders it cleared; the server re-validates
           // eligibility either way.
@@ -11639,6 +11669,19 @@ export class Hud {
           if (on) this.craftCommissionOptIn.add(recipeId);
           else this.craftCommissionOptIn.delete(recipeId);
         },
+        selectedCraft: () => this.selectedCraftTab,
+        onSelectCraft: (professionId) => {
+          this.selectedCraftTab = professionId;
+          this.renderCrafting();
+          // A fresh tab starts at the top of its recipe list, not wherever
+          // the previous craft's scroll happened to rest.
+          const scroller = $('#crafting-window').querySelector('.crafting-body');
+          if (scroller) scroller.scrollTop = 0;
+          // The repaint destroyed the tab button the keyboard just activated;
+          // refocus its successor so focus never falls out of the window onto
+          // body (where the next Tab would hit the game's target key).
+          ($('#crafting-window').querySelector('.crafting-tab.sel') as HTMLElement | null)?.focus();
+        },
       },
       buildProfessionIdentityView(this.sim.craftingIdentity),
       // Per-section "learnable at a master" hints: crafts with unlearned
@@ -11652,8 +11695,9 @@ export class Hud {
     this.hideTooltip();
     // Commission opt-ins are per-session-of-the-window: closing it drops any
     // armed-but-uncrafted checkboxes, so reopening always starts clean (the
-    // off-by-default rule).
+    // off-by-default rule). The selected tab resets with them.
     this.craftCommissionOptIn.clear();
+    this.selectedCraftTab = null;
   }
   // -------------------------------------------------------------------------
   // The World Market — the Merchant's auction house
@@ -11909,7 +11953,7 @@ export class Hud {
     if (sig === this.lastProfessionSurfaceSig) return;
     this.lastProfessionSurfaceSig = sig;
     this.charWindow.renderIfOpen();
-    if ($('#crafting-window').style.display === 'block') this.renderCrafting();
+    if ($('#crafting-window').style.display === 'flex') this.renderCrafting();
   }
 
   renderBags(): void {

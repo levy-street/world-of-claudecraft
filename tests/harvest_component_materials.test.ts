@@ -1,4 +1,4 @@
-// Phase 10: dedicated corpse-harvest materials close the v0.21.0 collision
+// Dedicated corpse-harvest materials close the v0.21.0 collision
 // gap. Before this change hide/silk/venomSac mapped to kind:'quest' items
 // (boar_hide/webwood_silk/widow_venom_sac), so harvesting ANY tagged corpse
 // granted quest-collect credit (a wolf hide advanced the boar quest). Now a
@@ -73,7 +73,7 @@ function questDropRate(
   return hits / n;
 }
 
-describe('the Phase 10 harvest map (pinned)', () => {
+describe('the dedicated harvest-material map (pinned)', () => {
   it('every component tag maps to its dedicated material; fang stays wolf_fang', () => {
     expect({ ...HARVEST_COMPONENT_ITEMS }).toEqual({
       hide: 'rough_hide',
@@ -103,7 +103,7 @@ describe('harvesting no longer grants quest credit (the collision fix)', () => {
     const { sim, internals, pid } = setup();
     const meta = internals.players.get(pid)!;
     activateQuest(meta, 'q_boars');
-    // forest_wolf is hide-tagged but is NOT a boar: before Phase 10 this
+    // forest_wolf is hide-tagged but is NOT a boar: before this change the
     // harvest granted boar_hide and advanced the boar quest.
     const mob = corpse(internals, 'forest_wolf', 9999);
     sim.harvestCorpse(mob.id, ['hide'], pid);

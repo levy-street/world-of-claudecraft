@@ -69,7 +69,7 @@ describe('material rarity roll (#1122)', () => {
     expect(denied.rareEvent).toBeUndefined();
     expect(draws).toBe(0);
     // The same rng then serves the granted path with exactly TWO draws (the
-    // Phase 4 pinned contract: draw #1 rollMaterialRarity, draw #2
+    // pinned draw-order contract: draw #1 rollMaterialRarity, draw #2
     // rollGatherRareEvent; see tests/gather_rare_events.test.ts for the
     // order pin).
     const granted = resolveHarvest(meta, node, 1000, rng);

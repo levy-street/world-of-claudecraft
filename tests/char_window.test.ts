@@ -259,12 +259,12 @@ describe('archetypeTitleText (#1130, pair-named): id-to-key view model', () => {
     'alchemy+cooking': 'Apothecary',
     'cooking+leatherworking': 'Trapper',
     'leatherworking+tailoring': 'Outfitter',
-    'tailoring+inscription': 'Mageweaver',
+    'tailoring+inscription': 'Inkweaver',
     'inscription+enchanting': 'Arcanist',
     'enchanting+jewelcrafting': 'Gembinder',
     'jewelcrafting+weaponcrafting': 'Bladewright',
     'weaponcrafting+armorcrafting': 'Smith',
-    'armorcrafting+engineering': 'Cogsmith',
+    'armorcrafting+engineering': 'Gearwright',
   };
 
   it('has exactly one expected title per selectable pair (test table stays in sync)', () => {
@@ -342,7 +342,7 @@ describe('hobbyCraftText (#1294): id-to-key view model', () => {
   });
 });
 
-describe('char_window: own-paperdoll per-copy tooltip threading (Phase 6)', () => {
+describe('char_window: own-paperdoll per-copy tooltip threading', () => {
   it('resolves the worn instance from the self entity mirror inside the tooltip closure', () => {
     // Both worlds mirror the own worn set on the self entity
     // (equippedInstances), so the paperdoll tooltip must read it per slot at

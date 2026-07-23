@@ -1,4 +1,4 @@
-// Fishing bobber visual (Professions 2.0 Phase 12b): a small procedural float
+// Fishing bobber visual (Professions 2.0): a small procedural float
 // on the water ahead of any entity whose castingAbility is the fishing
 // sentinel, so bystanders see who is fishing. The renderer composes one
 // instance and drives it per frame; the personal fishingBite SimEvent flips

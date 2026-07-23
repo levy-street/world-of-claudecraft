@@ -80,7 +80,7 @@ describe('craft quest objectives', () => {
 
     sim.addItem('linen_scrap', 1, pid);
     sim.addItem('spider_leg', 1, pid);
-    sim.addItem('silverleaf_herb', 2, pid); // Phase 15 reagent addition
+    sim.addItem('silverleaf_herb', 2, pid); // the reworked recipe's herb reagent
     sim.craftItem('recipe_minor_healing_potion', false, pid);
 
     expect(sim.meta(pid)!.lastCraftResult?.ok).toBe(true);
@@ -89,7 +89,7 @@ describe('craft quest objectives', () => {
   });
 });
 
-// Phase 12b: harvestNode STARTS a gather cast; quest credit lands at
+// harvestNode STARTS a gather cast; quest credit lands at
 // completion. Mirror the lifecycle completion arm synchronously (the
 // gather_rare_events.test.ts completeCastNow idiom) so these seed-stable
 // drives stay free of world-tick noise. Only called after a GRANTED start

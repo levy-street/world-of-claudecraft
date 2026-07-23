@@ -1,4 +1,4 @@
-// Phase 9 station stocking: the six premium (tier 4/5) station-recipe
+// Station stocking: the six premium (tier 4/5) station-recipe
 // reagents move within reach of their stations. tinker_gizzel (toolworks)
 // stocks all six; the forge/loom/tannery masters each gained exactly
 // thorium_ore (their own station recipe's premium reagent); the kitchens and
@@ -25,7 +25,7 @@ function stockOf(npcs: Record<string, { vendorItems?: readonly string[] }>, id: 
   return [...npc.vendorItems];
 }
 
-describe('Phase 9 master vendor stocking', () => {
+describe('master vendor stocking', () => {
   it('tinker_gizzel stocks exactly the six premium reagents appended after its prior stock', () => {
     const stock = stockOf(ZONE1_NPCS, 'tinker_gizzel');
     expect(stock.slice(-6)).toEqual(PREMIUM_REAGENTS);
@@ -65,7 +65,7 @@ describe('Phase 9 master vendor stocking', () => {
     }
   });
 
-  it('quartermaster_bree keeps all six premium reagents (the pre-Phase-9 source)', () => {
+  it('quartermaster_bree keeps all six premium reagents (the pre-existing source)', () => {
     const stock = stockOf(ZONE3_NPCS, 'quartermaster_bree');
     for (const reagent of PREMIUM_REAGENTS) {
       expect(stock, reagent).toContain(reagent);

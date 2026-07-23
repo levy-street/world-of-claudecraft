@@ -53,7 +53,7 @@
     min-height: 40px;
     font-size: 13px;
     background: #1a1410;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 3px;
     color: #c9b27a;
     cursor: pointer;
@@ -79,7 +79,7 @@
     padding: 6px 10px;
     font-size: 13px;
     background: #1a1410;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 3px;
     color: var(--gold);
     cursor: default;
@@ -111,7 +111,7 @@
     display: flex;
     gap: 4px;
     margin-bottom: 10px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
   }
   #delve-board .delve-tab {
     flex: 1;
@@ -145,7 +145,7 @@
     gap: 8px;
     padding: 6px;
     background: #1a1410;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 3px;
   }
   #delve-board .delve-shop-row.locked {
@@ -184,7 +184,7 @@
   }
   #delve-board .delve-shop-buy:disabled {
     color: #6b5e3a;
-    border-color: #463a1c;
+    border-color: var(--color-border-showcase);
     cursor: not-allowed;
   }
   #delve-board .delve-shop-buy:focus-visible {
@@ -248,7 +248,7 @@
     min-height: 48px;
     padding: 8px 12px;
     background: #1a1410;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     color: var(--gold);
     cursor: pointer;
@@ -374,7 +374,7 @@
     height: 170px;
     box-sizing: content-box;
     background: linear-gradient(#0d0a07, #161009);
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 5px;
   }
   #lockpick-panel .lp-track {
@@ -485,7 +485,7 @@
     min-width: 40px;
     padding: 6px 2px;
     background: #1a1410;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     color: var(--gold);
     cursor: pointer;
@@ -1173,7 +1173,7 @@
     min-width: 0;
     padding: 8px 12px 10px;
     background: rgba(0, 0, 0, 0.24);
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 7px;
   }
   .sp-title {
@@ -1183,7 +1183,7 @@
     font-size: 13px;
     padding-bottom: 4px;
     margin-bottom: 6px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
   }
   /* Offense/Defense rows: label left, value right, no trailing colon (dropped by
      the painter's colon-free stat cell). */
@@ -1222,7 +1222,7 @@
     letter-spacing: 0.08em;
     color: var(--color-text-muted);
     background: rgba(0, 0, 0, 0.24);
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 7px;
   }
   .attrs-tiles .stat-cell b {
@@ -1401,7 +1401,7 @@
   }
   .ql-list {
     width: 220px;
-    border-right: 1px solid #463a1c;
+    border-right: 1px solid var(--color-border-showcase);
     padding-right: 8px;
   }
   .ql-item {
@@ -1465,7 +1465,7 @@
     margin-top: 10px;
     padding: 8px 12px 10px;
     background: rgba(0, 0, 0, 0.24);
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 7px;
   }
   .cp-title {
@@ -1546,7 +1546,7 @@
     display: flex;
     gap: 2px;
     padding: 0 12px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
   }
   .woc-store-tabs button {
     min-height: 42px;
@@ -2348,7 +2348,7 @@
     font-size: 12px;
     color: #cabb8c;
     background: #ffffff08;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 3px;
     cursor: pointer;
   }
@@ -2369,7 +2369,7 @@
     font-size: 11px;
     letter-spacing: 0.3px;
     background: none;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
   }
   .lb-rank {
     text-align: center;
@@ -2406,7 +2406,7 @@
     position: sticky;
     bottom: 0;
     margin-top: 6px;
-    border-top: 1px solid #463a1c;
+    border-top: 1px solid var(--color-border-showcase);
     background: #160f08;
     padding-top: 4px;
   }
@@ -2465,7 +2465,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
     padding: 8px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     background: #ffffff08;
     border-radius: 4px;
   }
@@ -2562,7 +2562,7 @@
     gap: 10px;
     align-items: center;
     padding: 8px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     background: #120d08;
   }
@@ -3007,7 +3007,7 @@
   .cl-spinner {
     width: 18px;
     height: 18px;
-    border: 2px solid #463a1c;
+    border: 2px solid var(--color-border-showcase);
     border-top-color: #ffe27a;
     border-radius: 50%;
     animation: cl-spin 900ms linear infinite;
@@ -3132,7 +3132,7 @@
   .cl-rails {
     display: flex;
     gap: 2px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
   }
   .cl-rail {
     position: relative;
@@ -3325,7 +3325,7 @@
     align-items: center;
     gap: 8px;
     padding: 8px 10px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     background: #ffffff08;
   }
@@ -3392,7 +3392,7 @@
     gap: 12px;
     min-height: 48px;
     padding: 0 12px 0 16px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
     color: var(--gold);
     font-family: var(--title-font);
     font-size: 14px;
@@ -3457,7 +3457,7 @@
     font-family: var(--title-font);
     color: var(--color-text-muted);
     background: #1c1609;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     cursor: var(--cursor-point);
   }
@@ -3637,7 +3637,7 @@
     display: flex;
     flex-direction: column;
     padding: 14px 12px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 8px;
     background: #1a1409;
     cursor: var(--cursor-point);
@@ -3777,7 +3777,7 @@
     color: #c8b888;
     margin: 0 0 8px;
     padding: 6px 8px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     background: #14100a;
   }
@@ -3860,7 +3860,7 @@
     position: relative;
     flex: 1;
     padding: 8px 6px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 6px;
     background: #1a1409;
     cursor: var(--cursor-point);
@@ -3945,7 +3945,7 @@
     color: #c8b888;
     margin: 4px 2px 6px;
     padding: 6px 8px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     background: #14100a;
   }
@@ -3966,7 +3966,7 @@
     display: flex;
     justify-content: flex-start;
     margin-top: 10px;
-    border-top: 1px solid #463a1c;
+    border-top: 1px solid var(--color-border-showcase);
     padding-top: 8px;
   }
   .tal-loadout-btn {
@@ -4086,7 +4086,7 @@
   .tal-lo-sep {
     height: 1px;
     margin: 4px 6px;
-    background: #463a1c;
+    background: var(--color-border-showcase);
   }
   .tal-lo-empty {
     padding: 6px 9px;
@@ -4628,7 +4628,7 @@
     font-size: 12.5px;
     color: var(--gold);
     background: #120d07;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 5px;
     font-family: var(--ui-font);
   }
@@ -4825,6 +4825,12 @@
     opacity: 0.45;
     cursor: default;
   }
+  /* An unaffordable fee (train and unbind rows emit .unaffordable) tints
+     like an unsatisfied cost everywhere else in the language; the row's
+     disabled opacity alone left the reason invisible. */
+  .vendor-item .vi-price.unaffordable {
+    color: var(--color-text-error);
+  }
   .vendor-item:disabled:hover {
     background: transparent;
   }
@@ -4858,21 +4864,126 @@
   .vendor-section-title {
     margin-top: 8px;
     padding-top: 7px;
-    border-top: 1px solid #463a1c;
+    border-top: 1px solid var(--color-border-showcase);
     color: var(--gold);
     font-family: var(--title-font);
     font-size: 12px;
+  }
+  /* Crafting window shell: a wide showcase-format window (the char/inspect
+     740px generation; 760px matches the spellbook). Column flex with the
+     title, identity card, and tab strip pinned while .crafting-body scrolls
+     (the mailbox inner-scroll model); the painter opens it with
+     display: flex, so the base .window overflow never fights the body pane. */
+  #crafting-window {
+    width: 760px;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  /* relative, not sticky: the shell no longer scrolls (the body pane does),
+     and the absolutely pinned close button needs its containing block to stay
+     the title bar. */
+  #crafting-window > .panel-title {
+    position: relative;
+    top: 0;
+    flex: none;
+    margin-bottom: 0;
+  }
+  /* The craft tab strip (the mail-tabs family, one tab per craft with known
+     recipes): art icon, craft name, and a muted recipe count. Selected state
+     is gold text over a gold underline; the strip wraps on narrow widths. */
+  .crafting-tabs {
+    flex: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 10px 0 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--color-border-showcase);
+  }
+  .crafting-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
+    font-size: 12px;
+    cursor: var(--cursor-point);
+  }
+  .crafting-tab:hover {
+    background: #ffffff0e;
+    color: var(--color-text-light);
+  }
+  .crafting-tab:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .crafting-tab.sel {
+    border-color: var(--color-border-showcase);
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--gold);
+    box-shadow: inset 0 -2px 0 #cc9a3c;
+  }
+  .crafting-tab-icon {
+    flex: 0 0 22px;
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    filter: drop-shadow(var(--art-shadow-sm));
+  }
+  .crafting-tab-count {
+    padding: 1px 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.3);
+    font-family: var(--ui-font);
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+  }
+  .crafting-tab.sel .crafting-tab-count {
+    color: var(--color-text-light);
+  }
+  /* The scrolling recipe pane: the selected craft's header, learn hint, and
+     recipe cards, breathing on an 8px rhythm. */
+  .crafting-body {
+    flex: 1 1 auto;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    padding: 10px 2px 2px 0;
+  }
+  /* A scroll pane's children must never flex-shrink: once the recipe list
+     overflows, a default-shrink card compresses below its content height and
+     its overflow:hidden clips the footer (the commission chip lost its
+     bottom half this way). Overflow belongs to the pane's scrollbar. */
+  .crafting-body > * {
+    flex-shrink: 0;
+  }
+  .crafting-body > .vendor-section-title {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
   }
   .crafting-section-title {
     display: flex;
     align-items: center;
     gap: 7px;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    font-variant: small-caps;
   }
   .crafting-section-icon {
     flex: 0 0 28px;
     width: 28px;
     height: 28px;
     object-fit: contain;
+    filter: drop-shadow(var(--art-shadow-sm));
   }
   .qd-profession-choice {
     display: grid;
@@ -4909,18 +5020,39 @@
   .qd-profession-preview-copy {
     min-width: 0;
   }
+  /* The crafting identity card, restyled to the showcase inset-card idiom
+     (char-window stat panels): dark inset fill, gold-brown hairline, 7px
+     radius. Two columns beside each other (narrative left, skill table
+     right) so the card reads as a compact hero, not a tall stack. */
   .profession-identity-card {
-    margin: 8px 0 10px;
-    padding: 10px;
-    border: 1px solid var(--color-border-default);
-    border-radius: 4px;
-    background: var(--color-bg-input);
+    flex: none;
+    display: flex;
+    gap: 16px;
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: rgba(0, 0, 0, 0.24);
+  }
+  .profession-identity-main {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .profession-identity-card .profession-skill-list {
+    flex: 1 1 0;
+    min-width: 0;
+    align-self: start;
   }
   .profession-identity-card h3 {
     margin: 0 0 8px;
     color: var(--gold);
     font-family: var(--title-font);
     font-size: 13px;
+    letter-spacing: 0.06em;
+    font-variant: small-caps;
+  }
+  .profession-archetype-crest {
+    filter: drop-shadow(var(--art-shadow-lg));
   }
   .profession-identity-heading {
     display: flex;
@@ -4991,26 +5123,114 @@
     font-size: 10px;
     line-height: 1.35;
   }
+  /* One recipe card (the showcase inset-card idiom): the whole first row stays
+     the Craft button (big target), with a quality-glow socket, a wrapping
+     display-font name, the reagent and skill lines, and the gold Craft chip
+     at the right; combo/station reasons and the commission opt-in dock under
+     it inside the same card. */
   .crafting-recipe-item {
     flex-wrap: wrap;
+    gap: 0;
+    padding: 0;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: rgba(0, 0, 0, 0.24);
+    overflow: hidden;
+  }
+  /* The recipe card rides .vendor-item for its base metrics, so the family's
+     .vendor-item:hover wash would REPLACE the card's inset fill on any hover
+     over the card (the pseudo-class rule outranks the single-class fill).
+     The card itself is not interactive (the Craft and commission chips carry
+     the affordances), so hover restates the fill with no wash. */
+  .vendor-item.crafting-recipe-item:hover {
+    background: rgba(0, 0, 0, 0.24);
   }
   .crafting-recipe-item > .vendor-item {
     flex: 1 0 100%;
+    gap: 10px;
+    padding: 9px 10px;
+    align-items: center;
+    border-radius: 0;
+  }
+  .crafting-recipe-socket {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    background: var(--color-bg-input);
+  }
+  .crafting-recipe-socket .item-icon {
+    width: 38px;
+    height: 38px;
+  }
+  .crafting-recipe-name {
+    display: block;
+    margin-bottom: 2px;
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: var(--color-text-light);
+    overflow-wrap: anywhere;
+  }
+  .crafting-reagent-line {
+    line-height: 1.4;
+  }
+  /* Unsatisfied reagents tint toward the error red; the have/required counts
+     in the text are the actual signal (the tint is a redundant hint). */
+  .crafting-reagent.unsat {
+    color: var(--color-text-error);
+  }
+  /* The Craft affordance chip: the gold-gradient primary the mailbox send
+     button established. It is decoration inside the row-button (the whole row
+     is the target); disabled rows desaturate it through the button opacity. */
+  .crafting-craft-chip {
+    flex: none;
+    align-self: center;
+    padding: 7px 16px;
+    border: 1px solid #6a5320;
+    border-radius: 5px;
+    background: linear-gradient(180deg, #e9c064, #b98a2e);
+    color: #1c1206;
+    font-family: var(--title-font);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .crafting-recipe-btn:hover:not(:disabled) .crafting-craft-chip {
+    filter: brightness(1.1);
+  }
+  .crafting-recipe-btn:disabled .crafting-craft-chip {
+    filter: grayscale(0.7);
   }
   .crafting-recipe-item > .crafting-combo-requirement {
     flex: 1 0 100%;
-    margin-top: 3px;
+    margin: 0;
+    padding: 4px 10px 7px;
     color: var(--color-text-muted);
-    font-size: 10px;
+    font-size: 10.5px;
     line-height: 1.35;
   }
-  /* Phase 6 legibility: the skill-req / difficulty / station line inside the
-     recipe button. The difficulty tint is set inline from the shared quality
-     palette (icons.ts) with its text label always adjacent, so the info is
-     never color-only; no new tap targets (the whole row stays the button). */
+  /* Legibility: the skill-req / difficulty / station line inside the
+     recipe button. The difficulty tint comes from the --color-craft-* tokens
+     via the data attribute (never an inline color) with its text label always
+     adjacent, so the info is never color-only; no new tap targets (the whole
+     row stays the button). */
   .crafting-skill-line {
     display: block;
     margin-top: 2px;
+  }
+  .crafting-difficulty[data-difficulty="full"] {
+    color: var(--color-craft-full);
+  }
+  .crafting-difficulty[data-difficulty="reduced"] {
+    color: var(--color-craft-reduced);
+  }
+  .crafting-difficulty[data-difficulty="minimal"] {
+    color: var(--color-craft-minimal);
+  }
+  .crafting-difficulty[data-difficulty="none"] {
+    color: var(--color-craft-none);
   }
   .crafting-station-badge {
     display: inline-block;
@@ -5026,7 +5246,7 @@
   .crafting-station-badge.out-of-range {
     border-style: dashed;
   }
-  /* Phase 14 discoverability: the per-section "learnable at a master" hint,
+  /* Discoverability: the per-section "learnable at a master" hint,
      shown under a craft section when the viewer has unlearned trainer recipes
      for that craft. Muted guidance text, informational only (no tap target),
      identical on every graphics preset. */
@@ -5045,11 +5265,11 @@
     font-size: 11px;
     color: #c8b888;
     margin-top: 8px;
-    border-top: 1px solid #463a1c;
+    border-top: 1px solid var(--color-border-showcase);
     padding-top: 6px;
   }
 
-  /* ---------- profession first-tier tutorial (Phase 14) ---------- */
+  /* ---------- profession first-tier tutorial ---------- */
   /* The once-ever explainer modal (profession_tutorial_window.ts), reusing the
      confirm-dialog modal family (.window.panel shell, .cd-body/.cd-actions). A
      bounded, centered modal; body-appended (see the layout.css --window-scale:1
@@ -5081,17 +5301,88 @@
   }
 
   /* ---------- train window ---------- */
-  /* Recipe training (Professions 2.0 Phase 9): the station master's teaching
-     ladder. Rows reuse the vendor family classes (.vendor-item, .vi-name,
-     .vi-price, .vi-sub, .vendor-section-title); only the tri-state additions
-     live here, styled from existing tokens (no new tokens, no new hex). */
+  /* Recipe training: the station master's teaching ladder. Rows keep the
+     vendor family's anatomy classes but ride the showcase inset-card idiom
+     of the crafting recipe cards (card fill and hairline per row, a
+     quality-glow socket, the tri-state pill, and the gold-gradient fee chip
+     on an affordable teachable row; an unaffordable fee keeps the plain
+     error-tint price so the block stays readable under the disabled
+     opacity). The unbind service below shares every card rule. */
   #train-window {
     width: 400px;
   }
+  /* The craft section headers follow the crafting window's small-caps
+     treatment so the two teaching surfaces read as one family. */
+  #train-window .vendor-section-title {
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    font-variant: small-caps;
+  }
+  .train-row,
+  .unbind-row {
+    margin: 0 0 8px;
+    padding: 9px 10px;
+    gap: 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: rgba(0, 0, 0, 0.24);
+  }
+  /* The vendor family's hover rules predate the card migration: on the old
+     transparent rows they were a light wash or a no-op, but on a card they
+     REPLACE the inset fill (blanking it via .vendor-item:disabled:hover, or
+     swapping it via .vendor-item:hover), so the card restates its fill at
+     matching specificity, layering the hover wash over it on live rows. */
+  .train-row:hover:not(:disabled),
+  .unbind-row:hover:not(:disabled) {
+    background: linear-gradient(0deg, #ffffff10, #ffffff10), rgba(0, 0, 0, 0.24);
+  }
+  .train-row:disabled:hover,
+  .unbind-row:disabled:hover {
+    background: rgba(0, 0, 0, 0.24);
+  }
+  /* The shared quality-glow socket, sized down for the narrower service
+     windows (the crafting book's 44px socket crowds a 400px card). */
+  #train-window .crafting-recipe-socket,
+  #unbind-window .crafting-recipe-socket {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+  }
+  #train-window .crafting-recipe-socket .item-icon,
+  #unbind-window .crafting-recipe-socket .item-icon {
+    width: 30px;
+    height: 30px;
+  }
+  /* The gold-gradient action chip on an affordable service fee (the Craft
+     chip family): decoration inside the row button, the whole card stays
+     the target. */
+  .vi-price-chip {
+    flex: none;
+    align-self: center;
+    padding: 6px 12px;
+    border: 1px solid #6a5320;
+    border-radius: 5px;
+    background: linear-gradient(180deg, #e9c064, #b98a2e);
+    color: #1c1206;
+    font-family: var(--title-font);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .train-row:hover:not(:disabled) .vi-price-chip,
+  .unbind-row:hover:not(:disabled) .vi-price-chip {
+    filter: brightness(1.1);
+  }
+  /* The tri-state label rides the shared pill-chip idiom. */
   .train-state {
     font-family: var(--title-font);
     font-size: 10px;
     color: var(--gold);
+    padding: 2px 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
   }
   /* Locked rows stay VISIBLE (the teaching ladder): grayed like a disabled
      vendor row, with the named requirement on the .vi-sub line. The known
@@ -5100,35 +5391,76 @@
     opacity: 0.45;
   }
 
-  /* ---------- Maker's Bond unbind window (Professions 2.0 Phase 14b) ---------- */
-  /* The station master's unbind service: same vendor-family row classes as the
-     train window above; only the intro line lives here, styled from existing
-     tokens (no new tokens, no new hex). */
+  /* ---------- Maker's Bond unbind window (Professions 2.0) ---------- */
+  /* The station master's unbind service: shares the train window's card rules
+     above (.unbind-row rides the same inset-card, socket, and fee-chip
+     treatment); only the intro line lives here. */
   #unbind-window {
     width: 400px;
   }
   .unbind-intro {
     display: block;
     padding: 4px 6px 6px;
+    color: var(--color-text-muted);
+    font-size: 10.5px;
+    line-height: 1.4;
   }
 
-  /* Commission opt-in row in the crafting window (Professions 2.0 Phase 14b):
-     a per-recipe label-wrapped checkbox under the Craft button, reusing the
-     combo-note footprint so the recipe card keeps its rhythm. */
+  /* Commission opt-in in the crafting window: a per-recipe pill toggle-chip
+     (aria-pressed) in the card's chip language, right-aligned in the card
+     footer so it stacks under the gold Craft chip as one action column. The
+     quieter white-alpha interior hairline is deliberate (softer than the
+     card's outer keyline). The state pip doubles the pressed signal so the
+     armed state is never colour-only (aria-pressed carries it for AT). */
   .crafting-commission-row {
+    flex: 1 0 100%;
     display: flex;
+    justify-content: flex-end;
+    padding: 6px 10px 8px;
+    border-top: 1px solid #ffffff0d;
+  }
+  .crafting-commission-chip {
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 2px 6px 4px;
+    gap: 7px;
+    min-height: 26px;
+    padding: 4px 12px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
     font-size: 11px;
+    cursor: var(--cursor-point);
+  }
+  .crafting-commission-chip:hover {
     color: var(--gold);
-    cursor: pointer;
+    border-color: var(--gold-dim);
+  }
+  .crafting-commission-pip {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-input);
+  }
+  .crafting-commission-chip[aria-pressed="true"] {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    background: rgb(200 163 74 / 12%);
+  }
+  .crafting-commission-chip[aria-pressed="true"] .crafting-commission-pip {
+    border-color: var(--gold-dim);
+    background: var(--gold);
   }
   .train-row.train-known {
     cursor: default;
   }
   .train-row.train-known:hover {
-    background: transparent;
+    /* Keep the card fill, no hover wash: the known row is informational and
+       must not imply interactivity (transparent here would blank the card). */
+    background: rgba(0, 0, 0, 0.24);
   }
   .train-row.train-known .train-state {
     opacity: 0.7;
@@ -5310,7 +5642,7 @@
       0 0 3px #000;
     pointer-events: none;
   }
-  /* Instanced-copy marker (Professions 2.0 Phase 12d): a static gold corner
+  /* Instanced-copy marker (Professions 2.0): a static gold corner
      tab on every per-copy (signed/enchanted/masterwork) stack, always visible
      on the cell itself on desktop and touch (information-add, identical on
      every graphics preset, so no --fx-* gate). Top-left, clear of the
@@ -5572,7 +5904,7 @@
     margin: 0 0 6px;
     padding: 4px 7px;
     border-radius: 4px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     background: #1c1812;
     color: var(--gold-dim);
     font-family: var(--ui-font);
@@ -5668,7 +6000,7 @@
     flex: none;
     margin-top: 8px;
     padding-top: 7px;
-    border-top: 1px solid #463a1c;
+    border-top: 1px solid var(--color-border-showcase);
     display: flex;
     justify-content: center;
   }
@@ -5945,8 +6277,8 @@
     gap: 8px;
     align-items: flex-start;
     padding: 7px;
-    border: 1px solid #4a3d26;
-    border-radius: 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
     background: linear-gradient(160deg, #17130c, #0c0a07);
   }
   .deed-card.earned {
@@ -5992,7 +6324,7 @@
   .deed-chip {
     font-size: 10.5px;
     padding: 1px 7px;
-    border-radius: 8px;
+    border-radius: 999px;
     font-family: var(--title-font);
     border: 1px solid #56472a;
     color: #d8c489;
@@ -6180,10 +6512,13 @@
      gathering rows) over IWorldProfessions. Bar widths and ring node
      positions are build-time inline writes; ring strokes carry
      vector-effect="non-scaling-stroke" so these pixel widths survive the
-     unit-circle viewBox; every colour in this section is a token. */
+     unit-circle viewBox. Semantic colours come from tokens; the showcase
+     hairline is the shared --color-border-showcase token, and the remaining
+     inset-card cosmetics (rgba card fills, the ring stage haze) are
+     deliberate literals shared with the char-window showcase family. */
   #professions-window {
-    width: 560px;
-    max-height: calc(var(--app-vh, 100vh) * 0.78 / var(--window-scale) - 24px);
+    width: 720px;
+    max-height: calc(var(--app-vh, 100vh) * 0.85 / var(--window-scale) - 24px);
     flex-direction: column;
   }
   #professions-window .panel-title {
@@ -6200,18 +6535,24 @@
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     min-height: 120px;
     overflow-y: auto;
     padding-right: 2px;
   }
   .prof-section-header {
     margin: 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--color-border-showcase);
     font-family: var(--title-font);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
-    color: var(--gold-dim);
+    letter-spacing: 0.06em;
+    font-variant: small-caps;
+    color: var(--gold);
   }
+  /* Every section rides the showcase inset-card idiom (the char-window stat
+     panels): dark inset fill, gold-brown hairline, 7px radius. */
   .prof-identity,
   .prof-crafts,
   .prof-perks,
@@ -6219,7 +6560,36 @@
   .prof-cta {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
+    padding: 10px 14px 12px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: rgba(0, 0, 0, 0.24);
+  }
+  /* The hero band: the identity card beside the wheel on its stage. */
+  .prof-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 264px;
+    gap: 12px;
+    align-items: stretch;
+  }
+  /* The wheel's stage: the char-window model-panel treatment (keyline, inner
+     vignette, warm radial haze, ground shadow), purely decorative around the
+     role="img" ring. */
+  .prof-ring-stage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 240px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background:
+      radial-gradient(ellipse 62% 46% at 50% 58%, rgba(216, 166, 69, 0.1), transparent 70%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.34));
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.55),
+      inset 0 0 40px rgba(0, 0, 0, 0.35);
   }
   .prof-pair-title {
     font-family: var(--title-font);
@@ -6309,7 +6679,6 @@
   .prof-ring-node.role-dormant {
     opacity: 0.55;
   }
-  .prof-list,
   .prof-perk-list,
   .prof-nudges {
     list-style: none;
@@ -6317,34 +6686,59 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 7px;
+  }
+  /* The craft (and gathering) rows lay out as a two-column grid on the wide
+     window, five rows tall instead of ten; minmax(0, 1fr) keeps long
+     localized names truncation-safe. */
+  .prof-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 16px;
   }
   .prof-craft-row,
   .prof-gather-row {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 5px;
+    background: #ffffff05;
   }
   .prof-craft-icon {
     flex: none;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border: 1px solid var(--color-border-default);
-    border-radius: 4px;
+    border-radius: 5px;
   }
   .prof-craft-main {
     flex: 1 1 auto;
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 5px;
   }
+  /* The name line carries ONLY the name and the right-aligned value; chips
+     live on their own line below (the text-squish fix). */
   .prof-craft-head {
     display: flex;
     align-items: baseline;
     gap: 6px;
+    font-size: 13px;
+  }
+  .prof-craft-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .prof-craft-chips {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     flex-wrap: wrap;
-    font-size: 12px;
   }
   .prof-craft-name {
     font-family: var(--title-font);
@@ -6355,11 +6749,14 @@
   }
   .prof-role-badge,
   .prof-ceiling {
-    font-size: 11px;
+    font-size: 10px;
+    line-height: 1;
     color: var(--color-text-muted);
-    border: 1px solid var(--color-border-default);
-    border-radius: 8px;
-    padding: 0 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    padding: 4px 9px;
+    background: rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
   }
   .role-major .prof-role-badge {
     color: var(--gold);
@@ -6370,36 +6767,40 @@
   }
   .prof-skill-value {
     margin-left: auto;
+    flex: none;
     font-size: 11px;
+    font-variant-numeric: tabular-nums;
     color: var(--color-text-light);
   }
   .prof-bar-wrap {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
   .prof-bar {
     display: inline-block;
     flex: 1 1 auto;
-    height: 8px;
+    height: 9px;
     border: 1px solid var(--color-border-default);
     border-radius: 4px;
     background: var(--color-bg-input);
     overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
   }
   .prof-bar-fill {
     display: block;
     height: 100%;
-    background: var(--gold-dim);
+    background: linear-gradient(180deg, var(--gold), var(--gold-dim) 85%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
   }
   .prof-pips {
     display: inline-flex;
     flex: none;
-    gap: 2px;
+    gap: 4px;
   }
   .prof-pip {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     border: 1px solid var(--color-border-default);
     background: var(--color-bg-input);
@@ -6557,7 +6958,7 @@
     color: var(--color-text-muted);
     cursor: var(--cursor-point);
     background: #1a1410;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     text-align: center;
   }
@@ -6773,7 +7174,7 @@
   .soc-add input {
     flex: 1;
     background: #120f0c;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     color: #f0ead8;
     padding: 5px 7px;
@@ -6865,7 +7266,7 @@
     font-family: var(--title-font);
     color: var(--color-text-muted);
     background: #1a1410;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     cursor: var(--cursor-point);
   }
@@ -7489,7 +7890,7 @@
     color: var(--gold);
     font-size: 12px;
     margin: 12px 0 5px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
     padding-bottom: 3px;
   }
   .arena-rank {
@@ -7749,7 +8150,7 @@
     color: var(--gold);
     font-size: 12px;
     margin: 12px 0 5px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
     padding-bottom: 3px;
   }
   .vcup-note {
@@ -8481,7 +8882,7 @@
   .vcupb-header {
     text-align: center;
     padding: 16px 18px 14px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
     background: linear-gradient(#2a1f0e, #1a130a 70%, #140e07);
     border-radius: 12px 12px 0 0;
   }
@@ -8581,7 +8982,7 @@
     font-size: 13px;
     font-weight: normal;
     color: var(--gold);
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
     padding-bottom: 5px;
   }
   .vcupb-roster {
@@ -9433,7 +9834,7 @@
     color: var(--color-text-muted);
     cursor: var(--cursor-point);
     background: #1a1410;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
     text-align: center;
   }
@@ -9487,7 +9888,7 @@
     letter-spacing: 0.5px;
     text-transform: uppercase;
     margin: 8px 0 4px;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
     padding-bottom: 4px;
   }
   .kb-row {
@@ -10179,7 +10580,7 @@
   }
   .emote-editor-item {
     min-height: 58px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 6px;
     background: #15110a;
     color: var(--color-text-muted);
@@ -11315,7 +11716,7 @@
     font-size: 13px;
     border-radius: 5px;
     padding: 8px 14px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     background: #1a1410;
     color: #e9dcb6;
     cursor: var(--cursor-point);
@@ -11453,7 +11854,7 @@
     color: #6a5c34;
   }
   .dc-section {
-    border-top: 1px solid #463a1c;
+    border-top: 1px solid var(--color-border-showcase);
     padding-top: 10px;
   }
   .dc-h3 {
@@ -11621,7 +12022,7 @@
   .dc-widget-frame {
     width: 100%;
     height: 300px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 6px;
     margin-top: 10px;
     background: #1a1410;

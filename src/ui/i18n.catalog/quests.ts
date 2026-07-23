@@ -35,8 +35,8 @@ const questStringsEn = {
       readyQuestAria: 'Quest ready to turn in: {name}',
       discussQuest: 'Discuss {name}.',
       discussQuestAria: 'Discuss quest: {name}',
-      // The profession masters' locked-quest hint row (Phase 15 QA directed
-      // fix). Deliberately terse: both {placeholders} resolve to already
+      // The profession masters' locked-quest hint row. Deliberately terse:
+      // both {placeholders} resolve to already
       // localized leaves (the giver NPC's name, the intro quest's title), and
       // the template itself carries no 4-letter lowercase run, so it stays
       // under the M16 untranslated-English bar while its locale fills are

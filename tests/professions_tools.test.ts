@@ -98,13 +98,13 @@ describe('gathering tool tier gating (#1123)', () => {
   });
 });
 
-// Sim-level access gating (Professions 2.0 Phase 12): the gather-node system
+// Sim-level access gating (Professions 2.0): the gather-node system
 // is live, so the old "using a tool is a safe no-op" placeholder pin retired
 // into real outcome tests here (its useItem-no-op half re-homed in
 // tests/professions_fishing.test.ts beside the rod-cast arm). Owned-best
 // resolution scans bags (meta.inventory), no equip slot; bare hands floor to
 // tier 1, so only the NEW tier-2+ veins ever gate.
-describe('sim-level node access gating (Professions 2.0 Phase 12)', () => {
+describe('sim-level node access gating (Professions 2.0)', () => {
   const T2_ORE = 'ore_mirefen_t2';
   const T3_ORE = 'ore_thornpeak_t3';
   const T2_WOOD = 'wood_thornpeak_t2';
@@ -123,7 +123,7 @@ describe('sim-level node access gating (Professions 2.0 Phase 12)', () => {
     return { sim, pid };
   }
 
-  // Phase 12b: harvestNode starts a gather cast. The unlock arms tick the
+  // harvestNode starts a gather cast. The unlock arms tick the
   // REAL loop through to the grant (mobs despawned first: mob damage cancels
   // a gather cast), and every deny arm pins that the denial is rng-free AND
   // starts no cast (deny-is-rng-free holds at cast START).
@@ -176,11 +176,11 @@ describe('sim-level node access gating (Professions 2.0 Phase 12)', () => {
       sim.rng.setObserver(null);
     }
     // The gate is rng-free, sits before both harvest draws, and never
-    // starts the Phase 12b gather cast.
+    // starts the gather cast.
     expect(draws).toBe(0);
     expect(sim.entities.get(pid)?.castingAbility ?? null).toBe(null);
     // Exact field shape: text-free, personal, professionId present on the
-    // node surface (the fixed Phase 12 interface contract).
+    // node surface (the fixed interface contract).
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([
       { type: 'gatherDenied', pid, surface: 'node', professionId: 'mining', requiredTier: 2 },
     ]);
@@ -379,14 +379,14 @@ describe('crafted higher-tier base tools and monster-material gating (#1135)', (
   });
 
   it('a crafted tier-4/5 tool gates monster materials the same way a vendor tier-1/2/3 tool gates nodes', () => {
-    const thorium = gatherToolTier(ITEMS.thorium_mining_pick, 'mining') ?? -1;
-    const arcanite = gatherToolTier(ITEMS.arcanite_mining_pick, 'mining') ?? -1;
-    expect(thorium).toBe(4);
-    expect(arcanite).toBe(5);
-    expect(canHarvestMonsterMaterial(thorium, 3)).toBe(true);
-    expect(canHarvestMonsterMaterial(thorium, 4)).toBe(true);
-    expect(canHarvestMonsterMaterial(thorium, 5)).toBe(false);
-    expect(canHarvestMonsterMaterial(arcanite, 5)).toBe(true);
+    const osmiumPick = gatherToolTier(ITEMS.thorium_mining_pick, 'mining') ?? -1;
+    const glyphsteelPick = gatherToolTier(ITEMS.arcanite_mining_pick, 'mining') ?? -1;
+    expect(osmiumPick).toBe(4);
+    expect(glyphsteelPick).toBe(5);
+    expect(canHarvestMonsterMaterial(osmiumPick, 3)).toBe(true);
+    expect(canHarvestMonsterMaterial(osmiumPick, 4)).toBe(true);
+    expect(canHarvestMonsterMaterial(osmiumPick, 5)).toBe(false);
+    expect(canHarvestMonsterMaterial(glyphsteelPick, 5)).toBe(true);
   });
 
   it('infinite durability holds for crafted tiers too, not just vendor tiers', () => {

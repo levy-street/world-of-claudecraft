@@ -246,7 +246,7 @@ describe('tryNearbyInteraction', () => {
     expect(r.calls).toEqual(['error:nothing']);
   });
 
-  it('threads nodeToolGateFor to the picked node and surfaces the unmet line (Phase 12)', () => {
+  it('threads nodeToolGateFor to the picked node and surfaces the unmet line', () => {
     const lockedNode = {
       id: 'ore_t2',
       zoneId: 'zone',
@@ -298,11 +298,11 @@ describe('tryNearbyInteraction', () => {
   });
 });
 
-// Phase 12d unified corpse press: the interact key selects by canOpen (either
+// Unified corpse press: the interact key selects by canOpen (either
 // half remaining makes the corpse a target) and dispatches each half gated by
 // the availability predicate, harvest strictly before loot. The halves are
 // separate commands: a denied harvest never blocks the loot half.
-describe('tryNearbyInteraction unified corpse press (Phase 12d)', () => {
+describe('tryNearbyInteraction unified corpse press', () => {
   function wolfCorpse(overrides: Partial<Entity> = {}): Entity {
     return entity({
       id: 2,

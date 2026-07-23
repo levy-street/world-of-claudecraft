@@ -19,7 +19,7 @@ function filterIds(ids: readonly string[], over: Partial<MarketQuery> = {}): str
 }
 
 describe('World Market filters', () => {
-  // Phase 15: wolf_fang became a crafting reagent (common, white), so the
+  // wolf_fang became a crafting reagent (common, white), so the
   // poor-quality exemplar here is mudfin_scale.
   const items = [
     'mudfin_scale',

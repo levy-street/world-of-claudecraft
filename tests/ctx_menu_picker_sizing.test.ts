@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-// Guard for the Apply Enchant picker sizing (Phase 13 QA, maintainer direction).
+// Guard for the Apply Enchant picker sizing.
 //
 // The picker states of the shared #ctx-menu popup (the enchant list and the
 // target list) take a wider, height-capped, scrolling box through the
@@ -28,7 +28,7 @@ function block(css: string, selectorPattern: RegExp): string {
   return match[0];
 }
 
-describe('#ctx-menu picker sizing (Apply Enchant picker, Phase 13 QA)', () => {
+describe('#ctx-menu picker sizing (Apply Enchant picker)', () => {
   it('the desktop picker modifier block is wider, height-capped, and scrolls', () => {
     const picker = block(HUD_CSS, /#ctx-menu\.ctx-menu-picker\s*\{[^}]*\}/);
     const minWidth = picker.match(/min-width:\s*(\d+)px/);

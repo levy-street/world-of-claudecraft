@@ -241,7 +241,7 @@ describe('QuestDialogController', () => {
   });
 
   it('previews and dispatches the selected profession attunement target', () => {
-    // Phase 14: each wave-one attune quest pins one pair, so the Smith acceptance
+    // Each wave-one attune quest pins one pair, so the Smith acceptance
     // quest at Forgemistress Darva narrows the selector to exactly its pair.
     const darva = npc(32, 'forgemistress_darva');
     darva.questIds = ['q_prof_attune_smith'];
@@ -265,7 +265,7 @@ describe('QuestDialogController', () => {
     select.value = 'weaponcrafting+armorcrafting';
     select.dispatchEvent(new Event('change'));
     // The preview names the pair title, both major crafts, and the make-amends
-    // return cost (Phase 14 preview completeness).
+    // return cost (preview completeness).
     expect(preview?.textContent).toContain('Smith');
     expect(preview?.textContent).toContain('Weaponcrafting');
     expect(preview?.textContent).toContain('Armorcrafting');
@@ -329,7 +329,7 @@ describe('QuestDialogController', () => {
   });
 
   it('keeps the accept action disabled when a profession quest has no target', () => {
-    // Phase 14: the make-amends return quest at Forgemistress Darva is only
+    // The make-amends return quest at Forgemistress Darva is only
     // legal for a pair the character has held before, so an unattuned player
     // (no history) sees zero targets and a disabled accept.
     const darva = npc(34, 'forgemistress_darva');
@@ -386,7 +386,7 @@ describe('QuestDialogController', () => {
     expect(cardMaster.openCardDuel).toHaveBeenCalledTimes(1);
   });
 
-  it('a station master offers the Train option and routes it to openTrain (Phase 9)', () => {
+  it('a station master offers the Train option and routes it to openTrain', () => {
     // Every STATIONS masterNpcId renders the [data-train] gossip option; the
     // click routes the NPC ENTITY id (not the template id) to deps.openTrain.
     const master = harness(npc(46, STATIONS[0].masterNpcId));
@@ -399,7 +399,7 @@ describe('QuestDialogController', () => {
     expect(master.release).toHaveBeenCalledWith(false);
   });
 
-  it('a non-master NPC renders no Train option (Phase 9)', () => {
+  it('a non-master NPC renders no Train option', () => {
     const masters = new Set(STATIONS.map((station) => station.masterNpcId));
     const plainId = Object.values(NPCS).find(
       (definition) => !definition.banker && !masters.has(definition.id),
@@ -410,7 +410,7 @@ describe('QuestDialogController', () => {
     expect(plain.element.querySelector('[data-train]')).toBeNull();
   });
 
-  it('a station master offers the Unbind service and routes it to openUnbind (Phase 14b)', () => {
+  it('a station master offers the Unbind service and routes it to openUnbind', () => {
     // Every station master offers the Maker's Bond unbind service beside
     // training (the same isStationMasterNpc gate); the click routes the NPC
     // ENTITY id to deps.openUnbind and releases the dialog.
@@ -424,7 +424,7 @@ describe('QuestDialogController', () => {
     expect(master.release).toHaveBeenCalledWith(false);
   });
 
-  it('a non-master NPC renders no Unbind option (Phase 14b)', () => {
+  it('a non-master NPC renders no Unbind option', () => {
     const masters = new Set(STATIONS.map((station) => station.masterNpcId));
     const plainId = Object.values(NPCS).find(
       (definition) => !definition.banker && !masters.has(definition.id),
@@ -444,5 +444,36 @@ describe('QuestDialogController', () => {
 
     expect(test.element.style.display).toBe('none');
     expect(test.release).toHaveBeenCalledTimes(1);
+  });
+
+  it('refreshIfChanged retires a lingering intro hint when attunement lands under the open dialog', () => {
+    // The online edge: the cprof identity mirror replaces craftingIdentity
+    // AFTER the gossip dialog opened, and no quest event fires for it. The
+    // stale hint self-healed only on reopen before the staleness probe.
+    const haldren = npc(51, 'smith_haldren');
+    const test = harness(haldren, 'available');
+    test.controller.open(haldren.id);
+    expect(test.element.querySelector('[data-prof-intro-hint]')).not.toBeNull();
+
+    (test.world.craftingIdentity.attunedPairs as string[]).push('weaponcrafting+armorcrafting');
+    test.controller.refreshIfChanged();
+
+    expect(test.element.querySelector('[data-prof-intro-hint]')).toBeNull();
+    expect(test.element.style.display).toBe('block');
+  });
+
+  it('refreshIfChanged never rebuilds the dialog DOM while the hint state is unchanged', () => {
+    // The dialog holds focus-trapped buttons: an unconditional slow-band
+    // rebuild would drop keyboard focus every second, so node identity must
+    // survive a no-change probe.
+    const haldren = npc(52, 'smith_haldren');
+    const test = harness(haldren, 'available');
+    test.controller.open(haldren.id);
+    const hintNode = test.element.querySelector('[data-prof-intro-hint]');
+    expect(hintNode).not.toBeNull();
+
+    test.controller.refreshIfChanged();
+
+    expect(test.element.querySelector('[data-prof-intro-hint]')).toBe(hintNode);
   });
 });

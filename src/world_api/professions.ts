@@ -24,7 +24,7 @@ export interface CraftingIdentityView {
   switchCount: number;
   amendsProgress: number;
   amendsRequired: number;
-  // Recipe training (Professions 2.0 Phase 9): the recipe ids this character
+  // Recipe training (Professions 2.0): the recipe ids this character
   // has LEARNED via an acquisition source (trainer/drop/quest), SORTED for
   // stable signatures (the server's cprof delta diffs the JSON form).
   // Grandfathered recipes (no acquisition list) are known to everyone WITHOUT
@@ -32,13 +32,13 @@ export interface CraftingIdentityView {
   // of src/sim/professions/crafting.ts isRecipeKnown over static content.
   knownRecipes: readonly string[];
   // Repeatable work orders currently inside their cooldown window (Professions
-  // 2.0 Phase 14), SORTED so the JSON form is a stable cprof signature. The
+  // 2.0), SORTED so the JSON form is a stable cprof signature. The
   // SERVER computes this against ITS tickCount (the activeMobileStationCraft
   // precedent: tick-domain state is resolved server-side, never predicted by the
   // client) and it rides the existing cprof delta; the online client feeds it
   // into computeQuestState so a work order on cooldown shows unavailable there
   // too. Offline the Sim ignores this field and re-derives the set from live
-  // PlayerMeta.questCadence. Absent on a pre-Phase-14 server payload.
+  // PlayerMeta.questCadence. Absent on an older server payload.
   cadenceBlockedQuests?: readonly string[];
 }
 
@@ -65,20 +65,20 @@ export interface CraftResultView {
     | 'combo_requirement_unmet'
     | 'recipe_not_learned'
     | 'throttled'
-    // Phase 8 (supersedes #1297's not_at_hub): denied because the recipe is
+    // Supersedes #1297's not_at_hub: denied because the recipe is
     // station-bound and the player is neither at a station of its type nor
     // holding an ACTIVE mobile station for that craft (the mobile arm checks
     // activity and type, never distance). The ui resolves
     // WHICH station from recipeById(recipeId)?.stationType (static content,
     // identical in both worlds): no station field rides the event.
     | 'station_required';
-  // Professions 2.0 Phase 2: true only when the masterwork effect applied to
+  // Professions 2.0: true only when the masterwork effect applied to
   // this craft's output. `quality` now reports the output def's static
   // quality (outputs are deterministic; the quality roll is retired).
   masterwork?: boolean;
 }
 
-// Masterwork proc surface (Professions 2.0 Phase 2): the local viewer's most
+// Masterwork proc surface (Professions 2.0): the local viewer's most
 // recent masterwork proc, mirrored from the server's `masterwork` event the
 // same way CraftResultView mirrors `craftResult`. Ids only, string-free per
 // the IWorld seam rule; `crafter` is the crafting player's entity id. `null`
@@ -89,7 +89,7 @@ export interface MasterworkView {
   crafter: number;
 }
 
-// Salvage-result surface (Professions 2.0 Phase 13): the outcome of one
+// Salvage-result surface (Professions 2.0): the outcome of one
 // salvageItem command, mirrored from the server's `salvageResult` event (and
 // the `salv` self-delta) so the client renders a toast/log without deciding the
 // outcome itself. Ids + values only, string-free per the seam rule. Shape
@@ -103,7 +103,7 @@ export interface SalvageResultView {
   reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled';
 }
 
-// Disenchant-result surface (Professions 2.0 Phase 13): mirrors
+// Disenchant-result surface (Professions 2.0): mirrors
 // src/sim/professions/enchanting.ts DisenchantResult, including the typed
 // bind-on-trade secondary a rare-or-better disenchant also yields
 // (secondaryItemId/secondaryCount, absent on every sub-rare success and on a
@@ -119,7 +119,7 @@ export interface DisenchantResultView {
   reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled';
 }
 
-// Apply-enchant-result surface (Professions 2.0 Phase 13): mirrors
+// Apply-enchant-result surface (Professions 2.0): mirrors
 // src/sim/professions/enchanting.ts ApplyEnchantResult. `null` until the first
 // apply-enchant attempt of the session.
 export interface ApplyEnchantResultView {
@@ -149,9 +149,11 @@ export interface ApplyEnchantResultView {
 // a player can craft a common-tier recipe if they have required materials.
 //
 // `craftingIdentity` is the atomic craft-skill and attunement read surface used
-// by both offline Sim and online ClientWorld. The legacy scalar properties and
-// transition methods remain for API compatibility, while live transitions are
-// authoritative quest completion effects rather than client commands.
+// by both offline Sim and online ClientWorld; the scalar identity reads that
+// once mirrored it member-by-member are retired in its favor. The two derived
+// scalars below (`archetypeTitle`, `hobbyCraft`) remain: the character-window
+// title rows consume them. Live transitions are authoritative quest completion
+// effects rather than client commands.
 export interface IWorldProfessions {
   professionsState: PlayerProfessionsView;
   nodeHarvestableByMe(nodeId: string): boolean;
@@ -159,7 +161,7 @@ export interface IWorldProfessions {
   recipeList: readonly RecipeDef[];
   lastCraftResult: CraftResultView | null;
   lastMasterwork: MasterworkView | null;
-  // `commission` (Professions 2.0 Phase 14b): the per-craft Maker's Bond
+  // `commission` (Professions 2.0): the per-craft Maker's Bond
   // opt-in. A boolean flag ONLY (the standing wire invariant: no command
   // ingests a client-supplied ItemInstancePayload; the bindOnTrade arm and
   // the boundTo stamp are minted server-side). Honored solely for the
@@ -168,16 +170,8 @@ export interface IWorldProfessions {
   // a wire message byte-identical to the pre-phase form.
   craftItem(recipeId: string, commission?: boolean): void;
   craftingIdentity: CraftingIdentityView;
-  // Active archetype identity (#1129). null before the acceptance quest.
-  activeArchetype: string | null;
-  // Total successful switches this character has ever made.
-  archetypeSwitchCount: number;
-  // Progress accrued toward the CURRENT switch's amends requirement, and that
-  // requirement itself (scales with archetypeSwitchCount; see archetype.ts).
-  archetypeAmendsProgress: number;
-  archetypeAmendsRequired: number;
   // The title granted by the CURRENTLY-ACTIVE pair attunement (#1130, pair-named
-  // under Professions 2.0 Phase 1): the CANONICAL PAIR ID (see
+  // under Professions 2.0): the CANONICAL PAIR ID (see
   // src/sim/professions/archetype.ts archetypePairId / ARCHETYPE_PAIR_TARGETS)
   // whose named archetype title the player has earned, or null before the
   // acceptance quest has ever been completed (no "Jack of All Trades" fallback
@@ -193,20 +187,13 @@ export interface IWorldProfessions {
   // craft display name lives in src/ui/i18n.catalog/hud_chrome.ts
   // (`craftName.<craftId>`, the per-craft display-name table).
   hobbyCraft: string | null;
-  // Legacy direct transition entry points kept for compatibility. Online
-  // ClientWorld does not send these as commands; live changes use quests.
-  acceptArchetypeQuest(craftId: string): void;
-  advanceAmendsProgress(): void;
-  // Attempt to switch the active archetype; blocked unless enough amends
-  // progress has accrued for the current switchCount.
-  switchArchetype(craftId: string): void;
-  // Mobile crafting station (Professions 2.0 Phase 8, wiring the inert #1134
+  // Mobile crafting station (Professions 2.0, wiring the inert #1134
   // mechanic): place the viewer's own temporary station for `craftId`.
   // Specialization-gated server-side (mobile_station.ts
   // placeMobileCraftingStation); Sim validates and stores on PlayerMeta,
   // ClientWorld sends the place_mobile_station command.
   placeMobileStation(craftId: string): void;
-  // Recipe training (Professions 2.0 Phase 9): learn `recipeId` from the
+  // Recipe training (Professions 2.0): learn `recipeId` from the
   // resident master at its craft's STATIC station (a mobile station never
   // satisfies training). Server-authoritative: Sim validates via
   // src/sim/professions/training.ts resolveTrain (already known, trainer
@@ -222,7 +209,7 @@ export interface IWorldProfessions {
   // client never predicts placement or reasons about tick domains). The slot
   // is transient either way: never serialized into the character save.
   activeMobileStationCraft: string | null;
-  // Enchanting profession commands (Professions 2.0 Phase 13): disenchant a held
+  // Enchanting profession commands (Professions 2.0): disenchant a held
   // eligible weapon/armor piece into arcane materials, apply an enchant to a held
   // copy, or salvage a held piece into generic materials. Server-authoritative:
   // Sim re-validates ownership/eligibility/throttle inside the resolvers
@@ -232,7 +219,7 @@ export interface IWorldProfessions {
   disenchantItem(itemId: string): void;
   applyEnchant(itemId: string, enchantId: string): void;
   salvageItem(itemId: string): void;
-  // Maker's Bond unbind service (Professions 2.0 Phase 14b): clear the
+  // Maker's Bond unbind service (Professions 2.0): clear the
   // boundTo lock on ONE held bound copy of `itemId`, for the tier-scaled
   // gold fee, while standing at any static crafting station (every station
   // master offers the service). Server-authoritative: Sim validates via

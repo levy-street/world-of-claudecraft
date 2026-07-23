@@ -207,7 +207,7 @@ describe('deposit rules', () => {
     });
   });
 
-  it('a deposit merges into an existing byte-equal bank stack and a withdraw merges back (Phase 12d)', () => {
+  it('a deposit merges into an existing byte-equal bank stack and a withdraw merges back', () => {
     const sim = makeSim();
     const m = meta(sim);
     // Seed the bank with a signed stack of 2, then deposit another byte-equal copy.
@@ -514,7 +514,7 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     expect(dst[1]).toEqual({ itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana' } });
   });
 
-  it('merges an instanced move into a byte-equal destination stack (Phase 12d)', () => {
+  it('merges an instanced move into a byte-equal destination stack', () => {
     const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, instance: { signer: 'Ana' } }];
     const dst: InvSlot[] = [
       { itemId: 'wolf_fang', count: 5 },
@@ -968,7 +968,7 @@ describe('sanitizeBankState', () => {
     expect(out[2]).toEqual({ itemId: 'worn_sword', count: 1, instance: { signer: 'Ana' } });
   });
 
-  it('preserves a counted instanced stack (Phase 12d) while still flooring and capping garbage', () => {
+  it('preserves a counted instanced stack while still flooring and capping garbage', () => {
     const raw = {
       inventory: [
         // A legitimate identical-payload stack: count survives the load intact.

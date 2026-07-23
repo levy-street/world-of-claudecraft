@@ -34,8 +34,8 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 425,
-      "state": "745ee46c",
-      "events": "9bdb1cce",
+      "state": "b2d9e2ac",
+      "events": "b093c2b0",
       "rng": {
         "draws": 4,
         "digest": "9c74b095"
@@ -57,7 +57,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 352
+            "damageTaken": 1759
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -517,13 +517,13 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fiveSecondRule": 99.05,
-          "hp": 1062,
+          "hp": 50000,
           "id": 415,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1062,
+          "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -535,7 +535,7 @@
             "z": -1160
           },
           "potionCooldownUntil": -1,
-          "resource": 19.36,
+          "resource": 96.745,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -567,12 +567,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
-          "hp": 418,
+          "hp": 50000,
           "id": 416,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -615,12 +615,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
-          "hp": 418,
+          "hp": 50000,
           "id": 417,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -663,12 +663,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
-          "hp": 418,
+          "hp": 50000,
           "id": 418,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -711,12 +711,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.05,
-          "hp": 418,
+          "hp": 50000,
           "id": 419,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -760,13 +760,15 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 60000,
+          "hp": 120000,
           "id": 420,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 60000,
+          "maxHp": 120000,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10.5,
           "nythraxis": {
             "deathlessTimer": 45,
@@ -802,8 +804,8 @@
             ]
           ],
           "weapon": {
-            "max": 507,
-            "min": 325,
+            "max": 2537,
+            "min": 1624,
             "speed": 2.6
           }
         }
@@ -813,7 +815,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 425,
-      "state": "c3a3bbc6",
+      "state": "9d877be0",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -824,7 +826,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 425,
-      "state": "0ce892d0",
+      "state": "bc270ea6",
       "events": "d25ba3b3",
       "rng": {
         "draws": 4,
@@ -835,8 +837,8 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 425,
-      "state": "9f3b4aa0",
-      "events": "ddfaecb0",
+      "state": "3bd45147",
+      "events": "b89b22be",
       "rng": {
         "draws": 5,
         "digest": "8541dce9"
@@ -846,7 +848,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 425,
-      "state": "05a5d8a2",
+      "state": "b84bf993",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -857,7 +859,7 @@
       "tick": 42,
       "time": 2.1,
       "nextId": 427,
-      "state": "28fdb7e3",
+      "state": "caa9fca2",
       "events": "a47b3d27",
       "rng": {
         "draws": 11,
@@ -880,7 +882,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 681
+            "damageTaken": 3406
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -1341,13 +1343,13 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fiveSecondRule": 101.1,
-          "hp": 1062,
+          "hp": 50000,
           "id": 415,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1062,
+          "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -1359,7 +1361,7 @@
             "z": -1160
           },
           "potionCooldownUntil": -1,
-          "resource": 37.455,
+          "resource": 100,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1391,12 +1393,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 101.1,
-          "hp": 418,
+          "hp": 50000,
           "id": 416,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -1439,12 +1441,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 101.1,
-          "hp": 418,
+          "hp": 50000,
           "id": 417,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -1487,12 +1489,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 101.1,
-          "hp": 418,
+          "hp": 50000,
           "id": 418,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -1535,12 +1537,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 101.1,
-          "hp": 418,
+          "hp": 50000,
           "id": 419,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -1585,13 +1587,15 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 60000,
+          "hp": 120000,
           "id": 420,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 60000,
+          "maxHp": 120000,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10.5,
           "nythraxis": {
             "deathlessTimer": 45,
@@ -1632,8 +1636,8 @@
             ]
           ],
           "weapon": {
-            "max": 507,
-            "min": 325,
+            "max": 2537,
+            "min": 1624,
             "speed": 2.6
           }
         },
@@ -1648,7 +1652,7 @@
           "facing": 2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 1569,
+          "hp": 3137,
           "id": 425,
           "inCombat": true,
           "kind": "mob",
@@ -1658,7 +1662,9 @@
           },
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1683,8 +1689,8 @@
             ]
           ],
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },
@@ -1699,7 +1705,7 @@
           "facing": -2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 1569,
+          "hp": 3137,
           "id": 426,
           "inCombat": true,
           "kind": "mob",
@@ -1709,7 +1715,9 @@
           },
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -1734,8 +1742,8 @@
             ]
           ],
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         }
@@ -1745,7 +1753,7 @@
       "tick": 43,
       "time": 2.15,
       "nextId": 428,
-      "state": "85bafa1f",
+      "state": "98f6037e",
       "events": "e5643833",
       "rng": {
         "draws": 15,
@@ -1768,7 +1776,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 681
+            "damageTaken": 3406
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -2239,13 +2247,13 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fiveSecondRule": 101.15,
-          "hp": 1062,
+          "hp": 50000,
           "id": 415,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1062,
+          "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -2257,7 +2265,7 @@
             "z": -1160
           },
           "potionCooldownUntil": -1,
-          "resource": 37.455,
+          "resource": 100,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -2301,12 +2309,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 101.15,
-          "hp": 418,
+          "hp": 50000,
           "id": 416,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -2361,12 +2369,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 101.15,
-          "hp": 418,
+          "hp": 50000,
           "id": 417,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -2421,12 +2429,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 101.15,
-          "hp": 418,
+          "hp": 50000,
           "id": 418,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -2481,12 +2489,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 101.15,
-          "hp": 418,
+          "hp": 50000,
           "id": 419,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -2542,13 +2550,15 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 41400,
+          "hp": 82800,
           "id": 420,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 60000,
+          "maxHp": 120000,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10.5,
           "nythraxis": {
             "deathlessTimer": 45,
@@ -2591,8 +2601,8 @@
             ]
           ],
           "weapon": {
-            "max": 507,
-            "min": 325,
+            "max": 2537,
+            "min": 1624,
             "speed": 2.6
           }
         },
@@ -2766,7 +2776,7 @@
           "facing": 2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 1569,
+          "hp": 3137,
           "id": 425,
           "inCombat": true,
           "kind": "mob",
@@ -2776,7 +2786,9 @@
           },
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2801,8 +2813,8 @@
             ]
           ],
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },
@@ -2829,7 +2841,7 @@
           "facing": -2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 1569,
+          "hp": 3137,
           "id": 426,
           "inCombat": true,
           "kind": "mob",
@@ -2839,7 +2851,9 @@
           },
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -2864,8 +2878,8 @@
             ]
           ],
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },
@@ -2913,7 +2927,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 428,
-      "state": "f9c00c8e",
+      "state": "5ac6b347",
       "events": "741638a5",
       "rng": {
         "draws": 37,
@@ -2924,7 +2938,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 428,
-      "state": "8cace924",
+      "state": "53d710e5",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -2935,7 +2949,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 428,
-      "state": "f636baac",
+      "state": "d5363359",
       "events": "741638a5",
       "rng": {
         "draws": 113,
@@ -2946,8 +2960,8 @@
       "tick": 80,
       "time": 4,
       "nextId": 428,
-      "state": "b1e80596",
-      "events": "a345168f",
+      "state": "8a562477",
+      "events": "2e5fec79",
       "rng": {
         "draws": 166,
         "digest": "8e452b5f"
@@ -2957,7 +2971,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 428,
-      "state": "f1dd6570",
+      "state": "afac1e97",
       "events": "b0ac8dd8",
       "rng": {
         "draws": 226,
@@ -2968,7 +2982,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 428,
-      "state": "bfbb0b82",
+      "state": "d4396af7",
       "events": "741638a5",
       "rng": {
         "draws": 285,
@@ -2979,7 +2993,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 428,
-      "state": "ca2be4ab",
+      "state": "02c76744",
       "events": "741638a5",
       "rng": {
         "draws": 338,
@@ -2990,7 +3004,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 428,
-      "state": "57fe2dfb",
+      "state": "f425c40a",
       "events": "741638a5",
       "rng": {
         "draws": 388,
@@ -3001,8 +3015,8 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 428,
-      "state": "4c007a8e",
-      "events": "12375b2d",
+      "state": "4704ff9a",
+      "events": "a6180268",
       "rng": {
         "draws": 447,
         "digest": "4fd1ba22"
@@ -3012,8 +3026,8 @@
       "tick": 140,
       "time": 7,
       "nextId": 428,
-      "state": "b3932dd7",
-      "events": "69a169bc",
+      "state": "76cb4fdd",
+      "events": "d6fb4d70",
       "rng": {
         "draws": 513,
         "digest": "7c3686f7"
@@ -3023,7 +3037,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 428,
-      "state": "8fc2f633",
+      "state": "3e58c0c5",
       "events": "741638a5",
       "rng": {
         "draws": 552,
@@ -3034,7 +3048,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 428,
-      "state": "1ee0ed20",
+      "state": "eab23120",
       "events": "741638a5",
       "rng": {
         "draws": 610,
@@ -3045,7 +3059,7 @@
       "tick": 170,
       "time": 8.5,
       "nextId": 428,
-      "state": "d9a6a4ce",
+      "state": "71cddf9a",
       "events": "55761966",
       "rng": {
         "draws": 682,
@@ -3056,8 +3070,8 @@
       "tick": 180,
       "time": 9,
       "nextId": 428,
-      "state": "9b58446a",
-      "events": "326be908",
+      "state": "1a1138e0",
+      "events": "d2e5f171",
       "rng": {
         "draws": 785,
         "digest": "d4618c5a"
@@ -3067,8 +3081,8 @@
       "tick": 190,
       "time": 9.5,
       "nextId": 428,
-      "state": "dee59505",
-      "events": "343b8c44",
+      "state": "2101fc53",
+      "events": "69155187",
       "rng": {
         "draws": 863,
         "digest": "9f41ba53"
@@ -3078,7 +3092,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 428,
-      "state": "a92f9ecf",
+      "state": "13ef1b07",
       "events": "741638a5",
       "rng": {
         "draws": 926,
@@ -3089,7 +3103,7 @@
       "tick": 203,
       "time": 10.15,
       "nextId": 428,
-      "state": "d42ced3c",
+      "state": "f242bc7c",
       "events": "741638a5",
       "rng": {
         "draws": 938,
@@ -3112,7 +3126,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 2562
+            "damageTaken": 12842
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -3582,13 +3596,13 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fiveSecondRule": 109.15,
-          "hp": 1062,
+          "hp": 50000,
           "id": 415,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1062,
+          "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -3643,12 +3657,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 109.15,
-          "hp": 418,
+          "hp": 50000,
           "id": 416,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -3702,12 +3716,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 109.15,
-          "hp": 418,
+          "hp": 50000,
           "id": 417,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -3750,12 +3764,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 109.15,
-          "hp": 418,
+          "hp": 50000,
           "id": 418,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -3809,12 +3823,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 109.15,
-          "hp": 418,
+          "hp": 50000,
           "id": 419,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -3859,13 +3873,15 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 41400,
+          "hp": 82800,
           "id": 420,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 60000,
+          "maxHp": 120000,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10.5,
           "nythraxis": {
             "deathlessTimer": 999,
@@ -3922,8 +3938,8 @@
             ]
           ],
           "weapon": {
-            "max": 507,
-            "min": 325,
+            "max": 2537,
+            "min": 1624,
             "speed": 2.6
           }
         },
@@ -4085,7 +4101,7 @@
           "facing": 2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 1569,
+          "hp": 3137,
           "id": 425,
           "inCombat": true,
           "kind": "mob",
@@ -4095,7 +4111,9 @@
           },
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -4121,8 +4139,8 @@
             ]
           ],
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },
@@ -4137,7 +4155,7 @@
           "facing": -2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 1569,
+          "hp": 3137,
           "id": 426,
           "inCombat": true,
           "kind": "mob",
@@ -4147,7 +4165,9 @@
           },
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -4173,8 +4193,8 @@
             ]
           ],
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },
@@ -4222,7 +4242,7 @@
       "tick": 204,
       "time": 10.2,
       "nextId": 428,
-      "state": "9d986cfd",
+      "state": "3c6d4c87",
       "events": "5b56469a",
       "rng": {
         "draws": 943,
@@ -4245,7 +4265,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 2562
+            "damageTaken": 12842
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -4715,13 +4735,13 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fiveSecondRule": 109.2,
-          "hp": 1062,
+          "hp": 50000,
           "id": 415,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1062,
+          "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -4776,12 +4796,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 109.2,
-          "hp": 418,
+          "hp": 50000,
           "id": 416,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -4835,12 +4855,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 109.2,
-          "hp": 418,
+          "hp": 50000,
           "id": 417,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -4894,12 +4914,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 109.2,
-          "hp": 418,
+          "hp": 50000,
           "id": 418,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -4953,12 +4973,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 109.2,
-          "hp": 418,
+          "hp": 50000,
           "id": 419,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -5003,13 +5023,15 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 41400,
+          "hp": 82800,
           "id": 420,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 60000,
+          "maxHp": 120000,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10.5,
           "nythraxis": {
             "deathlessTimer": 998.95,
@@ -5066,8 +5088,8 @@
             ]
           ],
           "weapon": {
-            "max": 507,
-            "min": 325,
+            "max": 2537,
+            "min": 1624,
             "speed": 2.6
           }
         },
@@ -5229,7 +5251,7 @@
           "facing": 2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 1569,
+          "hp": 3137,
           "id": 425,
           "inCombat": true,
           "kind": "mob",
@@ -5239,7 +5261,9 @@
           },
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -5265,8 +5289,8 @@
             ]
           ],
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },
@@ -5281,7 +5305,7 @@
           "facing": -2.642246,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 1569,
+          "hp": 3137,
           "id": 426,
           "inCombat": true,
           "kind": "mob",
@@ -5291,7 +5315,9 @@
           },
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -5317,8 +5343,8 @@
             ]
           ],
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },
@@ -5366,7 +5392,7 @@
       "tick": 210,
       "time": 10.5,
       "nextId": 428,
-      "state": "793ef04f",
+      "state": "5623f13b",
       "events": "741638a5",
       "rng": {
         "draws": 959,
@@ -5377,8 +5403,8 @@
       "tick": 220,
       "time": 11,
       "nextId": 428,
-      "state": "daa9631a",
-      "events": "a3e073b6",
+      "state": "825650c4",
+      "events": "bcbcf817",
       "rng": {
         "draws": 1015,
         "digest": "78f3ed25"
@@ -5388,7 +5414,7 @@
       "tick": 230,
       "time": 11.5,
       "nextId": 428,
-      "state": "81b63c13",
+      "state": "44603f8c",
       "events": "741638a5",
       "rng": {
         "draws": 1057,
@@ -5399,7 +5425,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 428,
-      "state": "4b733974",
+      "state": "6d1d30d3",
       "events": "79bbd80b",
       "rng": {
         "draws": 1106,
@@ -5410,7 +5436,7 @@
       "tick": 250,
       "time": 12.5,
       "nextId": 428,
-      "state": "d7039919",
+      "state": "595830d8",
       "events": "741638a5",
       "rng": {
         "draws": 1146,
@@ -5421,7 +5447,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 428,
-      "state": "08a265c8",
+      "state": "238668e9",
       "events": "741638a5",
       "rng": {
         "draws": 1196,
@@ -5432,8 +5458,8 @@
       "tick": 270,
       "time": 13.5,
       "nextId": 428,
-      "state": "84600d97",
-      "events": "141aa000",
+      "state": "f66de917",
+      "events": "c008d5b1",
       "rng": {
         "draws": 1240,
         "digest": "6d07c849"
@@ -5443,7 +5469,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 428,
-      "state": "85cdf3f7",
+      "state": "1a9c4195",
       "events": "741638a5",
       "rng": {
         "draws": 1300,
@@ -5454,8 +5480,8 @@
       "tick": 290,
       "time": 14.5,
       "nextId": 428,
-      "state": "49ee6e7a",
-      "events": "f9357431",
+      "state": "bbc27d9e",
+      "events": "2fb0c8e4",
       "rng": {
         "draws": 1349,
         "digest": "89123ade"
@@ -5465,7 +5491,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 428,
-      "state": "c8855b61",
+      "state": "0482213d",
       "events": "741638a5",
       "rng": {
         "draws": 1393,
@@ -5476,8 +5502,8 @@
       "tick": 310,
       "time": 15.5,
       "nextId": 428,
-      "state": "577f642e",
-      "events": "4f3d9e30",
+      "state": "fec6676f",
+      "events": "3a2f6ecf",
       "rng": {
         "draws": 1455,
         "digest": "ad5b2043"
@@ -5487,7 +5513,7 @@
       "tick": 320,
       "time": 16,
       "nextId": 428,
-      "state": "7179c977",
+      "state": "269fef78",
       "events": "741638a5",
       "rng": {
         "draws": 1502,
@@ -5498,7 +5524,7 @@
       "tick": 330,
       "time": 16.5,
       "nextId": 428,
-      "state": "3fe3aac0",
+      "state": "9acb4fe7",
       "events": "1f984f0b",
       "rng": {
         "draws": 1557,
@@ -5509,8 +5535,8 @@
       "tick": 340,
       "time": 17,
       "nextId": 428,
-      "state": "e9f628ae",
-      "events": "55f1c694",
+      "state": "123aaaac",
+      "events": "7fcf0a8c",
       "rng": {
         "draws": 1601,
         "digest": "962299ea"
@@ -5520,7 +5546,7 @@
       "tick": 350,
       "time": 17.5,
       "nextId": 428,
-      "state": "712d3586",
+      "state": "7f124e47",
       "events": "741638a5",
       "rng": {
         "draws": 1650,
@@ -5531,8 +5557,8 @@
       "tick": 360,
       "time": 18,
       "nextId": 428,
-      "state": "e14b0c13",
-      "events": "b0c8c5c9",
+      "state": "acc58b98",
+      "events": "997bbeb5",
       "rng": {
         "draws": 1697,
         "digest": "2c420b65"
@@ -5542,8 +5568,8 @@
       "tick": 370,
       "time": 18.5,
       "nextId": 428,
-      "state": "29b1a551",
-      "events": "f34e0a21",
+      "state": "a5e2a368",
+      "events": "c2d3f719",
       "rng": {
         "draws": 1742,
         "digest": "fbcbd9b8"
@@ -5553,7 +5579,7 @@
       "tick": 380,
       "time": 19,
       "nextId": 428,
-      "state": "23045828",
+      "state": "2d86240f",
       "events": "741638a5",
       "rng": {
         "draws": 1785,
@@ -5564,8 +5590,8 @@
       "tick": 386,
       "time": 19.3,
       "nextId": 428,
-      "state": "18ad7b0c",
-      "events": "47281941",
+      "state": "6f961e9b",
+      "events": "e8f055bd",
       "rng": {
         "draws": 1812,
         "digest": "a1b236a0"
@@ -5587,8 +5613,8 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 3140,
-            "damageTaken": 5105,
+            "damageDealt": 6276,
+            "damageTaken": 25578,
             "kills": 2,
             "xpGained": 166
           },
@@ -5596,7 +5622,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 3140,
+              "damageDealt": 6276,
               "kills": 2,
               "partiesJoined": 1
             },
@@ -5783,7 +5809,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
+            "damageTaken": 16667,
             "xpGained": 166
           },
           "craftSkills": {},
@@ -5875,7 +5901,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
+            "damageTaken": 16667,
             "xpGained": 166
           },
           "craftSkills": {},
@@ -5967,7 +5993,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
+            "damageTaken": 16667,
             "xpGained": 166
           },
           "craftSkills": {},
@@ -6068,13 +6094,13 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fiveSecondRule": 118.3,
-          "hp": 1062,
+          "hp": 50000,
           "id": 415,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1062,
+          "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -6118,12 +6144,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 118.3,
-          "hp": 418,
+          "hp": 50000,
           "id": 416,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -6166,13 +6192,13 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 118.3,
-          "hp": 418,
+          "hp": 50000,
           "id": 417,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -6215,13 +6241,13 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 118.3,
-          "hp": 418,
+          "hp": 50000,
           "id": 418,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -6264,13 +6290,13 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 118.3,
-          "hp": 418,
+          "hp": 50000,
           "id": 419,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -6318,13 +6344,15 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 41400,
+          "hp": 82800,
           "id": 420,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 60000,
+          "maxHp": 120000,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10.5,
           "nythraxis": {
             "deathlessCastRemaining": 10,
@@ -6383,8 +6411,8 @@
             ]
           ],
           "weapon": {
-            "max": 507,
-            "min": 325,
+            "max": 2537,
+            "min": 1624,
             "speed": 2.6
           }
         },
@@ -6562,7 +6590,9 @@
             418,
             419
           ],
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -6584,8 +6614,8 @@
           "tappedById": 415,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },
@@ -6616,7 +6646,9 @@
             418,
             419
           ],
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -6638,8 +6670,8 @@
           "tappedById": 415,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },
@@ -6687,7 +6719,7 @@
       "tick": 390,
       "time": 19.5,
       "nextId": 428,
-      "state": "1a6e2c3d",
+      "state": "bfd36662",
       "events": "9ee00894",
       "rng": {
         "draws": 1832,
@@ -6698,7 +6730,7 @@
       "tick": 400,
       "time": 20,
       "nextId": 428,
-      "state": "9f96dcc1",
+      "state": "6f7b0f84",
       "events": "59aacef7",
       "rng": {
         "draws": 1891,
@@ -6709,7 +6741,7 @@
       "tick": 410,
       "time": 20.5,
       "nextId": 428,
-      "state": "a7dda1ce",
+      "state": "11ab37d7",
       "events": "59aacef7",
       "rng": {
         "draws": 1949,
@@ -6720,7 +6752,7 @@
       "tick": 420,
       "time": 21,
       "nextId": 428,
-      "state": "09d1a52e",
+      "state": "0ae241c5",
       "events": "59aacef7",
       "rng": {
         "draws": 2003,
@@ -6731,7 +6763,7 @@
       "tick": 430,
       "time": 21.5,
       "nextId": 428,
-      "state": "2344f8dc",
+      "state": "92e1ef2b",
       "events": "59aacef7",
       "rng": {
         "draws": 2053,
@@ -6742,7 +6774,7 @@
       "tick": 440,
       "time": 22,
       "nextId": 428,
-      "state": "18589c40",
+      "state": "5d6d81b9",
       "events": "59aacef7",
       "rng": {
         "draws": 2105,
@@ -6753,7 +6785,7 @@
       "tick": 450,
       "time": 22.5,
       "nextId": 428,
-      "state": "3e2a1a2e",
+      "state": "0b098367",
       "events": "59aacef7",
       "rng": {
         "draws": 2146,
@@ -6764,7 +6796,7 @@
       "tick": 460,
       "time": 23,
       "nextId": 428,
-      "state": "cd1c18f6",
+      "state": "0789a739",
       "events": "59aacef7",
       "rng": {
         "draws": 2191,
@@ -6775,7 +6807,7 @@
       "tick": 470,
       "time": 23.5,
       "nextId": 428,
-      "state": "7485a99f",
+      "state": "70e90c44",
       "events": "59aacef7",
       "rng": {
         "draws": 2250,
@@ -6786,7 +6818,7 @@
       "tick": 480,
       "time": 24,
       "nextId": 428,
-      "state": "5ec10f6f",
+      "state": "248722aa",
       "events": "59aacef7",
       "rng": {
         "draws": 2284,
@@ -6797,7 +6829,7 @@
       "tick": 490,
       "time": 24.5,
       "nextId": 428,
-      "state": "a68f205a",
+      "state": "d158d2bb",
       "events": "89d01f58",
       "rng": {
         "draws": 2328,
@@ -6808,7 +6840,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 428,
-      "state": "9f2fb5e3",
+      "state": "c6b04dae",
       "events": "741638a5",
       "rng": {
         "draws": 2389,
@@ -6819,7 +6851,7 @@
       "tick": 506,
       "time": 25.3,
       "nextId": 428,
-      "state": "4f0acfdc",
+      "state": "88bbac45",
       "events": "741638a5",
       "rng": {
         "draws": 2413,
@@ -6842,8 +6874,8 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 3140,
-            "damageTaken": 5105,
+            "damageDealt": 6276,
+            "damageTaken": 25578,
             "kills": 2,
             "xpGained": 166
           },
@@ -6851,7 +6883,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 3140,
+              "damageDealt": 6276,
               "kills": 2,
               "partiesJoined": 1
             },
@@ -7038,7 +7070,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
+            "damageTaken": 16667,
             "xpGained": 166
           },
           "craftSkills": {},
@@ -7130,7 +7162,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
+            "damageTaken": 16667,
             "xpGained": 166
           },
           "craftSkills": {},
@@ -7222,7 +7254,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
+            "damageTaken": 16667,
             "xpGained": 166
           },
           "craftSkills": {},
@@ -7323,13 +7355,13 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fiveSecondRule": 124.3,
-          "hp": 1062,
+          "hp": 50000,
           "id": 415,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1062,
+          "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -7374,12 +7406,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 124.3,
-          "hp": 418,
+          "hp": 50000,
           "id": 416,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -7423,12 +7455,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 124.3,
-          "hp": 418,
+          "hp": 50000,
           "id": 417,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -7472,12 +7504,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 124.3,
-          "hp": 418,
+          "hp": 50000,
           "id": 418,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -7520,12 +7552,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 124.3,
-          "hp": 418,
+          "hp": 50000,
           "id": 419,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -7581,13 +7613,15 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 41400,
+          "hp": 82800,
           "id": 420,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 60000,
+          "maxHp": 120000,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10.5,
           "nythraxis": {
             "deathlessStunRemaining": 4.05,
@@ -7649,8 +7683,8 @@
             ]
           ],
           "weapon": {
-            "max": 507,
-            "min": 325,
+            "max": 2537,
+            "min": 1624,
             "speed": 2.6
           }
         },
@@ -7828,7 +7862,9 @@
             418,
             419
           ],
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -7850,8 +7886,8 @@
           "tappedById": 415,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },
@@ -7882,7 +7918,9 @@
             418,
             419
           ],
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -7904,8 +7942,8 @@
           "tappedById": 415,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },
@@ -7953,7 +7991,7 @@
       "tick": 510,
       "time": 25.5,
       "nextId": 428,
-      "state": "0d4aed33",
+      "state": "c21a741a",
       "events": "741638a5",
       "rng": {
         "draws": 2428,
@@ -7964,7 +8002,7 @@
       "tick": 520,
       "time": 26,
       "nextId": 428,
-      "state": "05994c5e",
+      "state": "a39b286b",
       "events": "741638a5",
       "rng": {
         "draws": 2466,
@@ -7975,7 +8013,7 @@
       "tick": 530,
       "time": 26.5,
       "nextId": 428,
-      "state": "24630f80",
+      "state": "33b98b5d",
       "events": "741638a5",
       "rng": {
         "draws": 2512,
@@ -7986,7 +8024,7 @@
       "tick": 540,
       "time": 27,
       "nextId": 428,
-      "state": "ba59265d",
+      "state": "b0eb7c9c",
       "events": "741638a5",
       "rng": {
         "draws": 2549,
@@ -7997,7 +8035,7 @@
       "tick": 550,
       "time": 27.5,
       "nextId": 428,
-      "state": "b79bf9d9",
+      "state": "f3aac49c",
       "events": "741638a5",
       "rng": {
         "draws": 2588,
@@ -8008,7 +8046,7 @@
       "tick": 560,
       "time": 28,
       "nextId": 428,
-      "state": "7125c150",
+      "state": "ac6a5fd1",
       "events": "741638a5",
       "rng": {
         "draws": 2640,
@@ -8019,7 +8057,7 @@
       "tick": 570,
       "time": 28.5,
       "nextId": 428,
-      "state": "97e46ccc",
+      "state": "488daf69",
       "events": "741638a5",
       "rng": {
         "draws": 2684,
@@ -8030,7 +8068,7 @@
       "tick": 580,
       "time": 29,
       "nextId": 428,
-      "state": "3e34df03",
+      "state": "d0c7bd96",
       "events": "741638a5",
       "rng": {
         "draws": 2735,
@@ -8041,7 +8079,7 @@
       "tick": 590,
       "time": 29.5,
       "nextId": 428,
-      "state": "8d754989",
+      "state": "4979f82a",
       "events": "aad79240",
       "rng": {
         "draws": 2786,
@@ -8052,8 +8090,8 @@
       "tick": 600,
       "time": 30,
       "nextId": 428,
-      "state": "804d6641",
-      "events": "f61ed32d",
+      "state": "8ff31b86",
+      "events": "cec188b2",
       "rng": {
         "draws": 2836,
         "digest": "5a53c578"
@@ -8063,7 +8101,7 @@
       "tick": 610,
       "time": 30.5,
       "nextId": 428,
-      "state": "d10a3b5e",
+      "state": "838be44d",
       "events": "741638a5",
       "rng": {
         "draws": 2897,
@@ -8074,7 +8112,7 @@
       "tick": 620,
       "time": 31,
       "nextId": 428,
-      "state": "9204d111",
+      "state": "cfe5cf14",
       "events": "741638a5",
       "rng": {
         "draws": 2959,
@@ -8085,7 +8123,7 @@
       "tick": 627,
       "time": 31.35,
       "nextId": 428,
-      "state": "3d9f9bb3",
+      "state": "2c9422bf",
       "events": "51248d9b",
       "rng": {
         "draws": 2986,
@@ -8108,8 +8146,8 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 3140,
-            "damageTaken": 5402,
+            "damageDealt": 6276,
+            "damageTaken": 27060,
             "kills": 2,
             "xpGained": 166
           },
@@ -8117,7 +8155,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 3140,
+              "damageDealt": 6276,
               "kills": 2,
               "partiesJoined": 1
             },
@@ -8304,7 +8342,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
+            "damageTaken": 16667,
             "xpGained": 166
           },
           "craftSkills": {},
@@ -8396,7 +8434,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
+            "damageTaken": 16667,
             "xpGained": 166
           },
           "craftSkills": {},
@@ -8488,7 +8526,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
+            "damageTaken": 16667,
             "xpGained": 166
           },
           "craftSkills": {},
@@ -8589,13 +8627,13 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fiveSecondRule": 130.35,
-          "hp": 1062,
+          "hp": 50000,
           "id": 415,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1062,
+          "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -8640,12 +8678,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 130.35,
-          "hp": 418,
+          "hp": 50000,
           "id": 416,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -8689,12 +8727,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 130.35,
-          "hp": 418,
+          "hp": 50000,
           "id": 417,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -8738,12 +8776,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 130.35,
-          "hp": 418,
+          "hp": 50000,
           "id": 418,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -8786,12 +8824,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 130.35,
-          "hp": 418,
+          "hp": 50000,
           "id": 419,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -8849,13 +8887,15 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 2400,
+          "hp": 4800,
           "id": 420,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 60000,
+          "maxHp": 120000,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10.5,
           "nythraxis": {
             "deathlessTimer": 43.05,
@@ -8917,8 +8957,8 @@
             ]
           ],
           "weapon": {
-            "max": 507,
-            "min": 325,
+            "max": 2537,
+            "min": 1624,
             "speed": 2.6
           }
         },
@@ -9096,7 +9136,9 @@
             418,
             419
           ],
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -9118,8 +9160,8 @@
           "tappedById": 415,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },
@@ -9150,7 +9192,9 @@
             418,
             419
           ],
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -9172,8 +9216,8 @@
           "tappedById": 415,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },
@@ -9221,8 +9265,8 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 428,
-      "state": "4f644566",
-      "events": "0625d00c",
+      "state": "780ac1de",
+      "events": "90b86b6a",
       "rng": {
         "draws": 2995,
         "digest": "8c3bfd15"
@@ -9244,8 +9288,8 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 5540,
-            "damageTaken": 5402,
+            "damageDealt": 11076,
+            "damageTaken": 27060,
             "kills": 3,
             "xpGained": 249
           },
@@ -9253,7 +9297,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 5540,
+              "damageDealt": 11076,
               "dungeonFinalBossKills": 1,
               "kills": 3,
               "partiesJoined": 1
@@ -9482,7 +9526,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
+            "damageTaken": 16667,
             "xpGained": 249
           },
           "craftSkills": {},
@@ -9595,7 +9639,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
+            "damageTaken": 16667,
             "xpGained": 249
           },
           "craftSkills": {},
@@ -9708,7 +9752,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
+            "damageTaken": 16667,
             "xpGained": 249
           },
           "craftSkills": {},
@@ -9830,13 +9874,13 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fiveSecondRule": 130.4,
-          "hp": 1062,
+          "hp": 50000,
           "id": 415,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1062,
+          "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -9881,12 +9925,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 130.4,
-          "hp": 418,
+          "hp": 50000,
           "id": 416,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -9930,12 +9974,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 130.4,
-          "hp": 418,
+          "hp": 50000,
           "id": 417,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -9979,12 +10023,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 130.4,
-          "hp": 418,
+          "hp": 50000,
           "id": 418,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -10027,12 +10071,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 130.4,
-          "hp": 418,
+          "hp": 50000,
           "id": 419,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -10116,7 +10160,9 @@
             419
           ],
           "lootable": true,
-          "maxHp": 60000,
+          "maxHp": 120000,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10.5,
           "nythraxis": {
             "deathSpoken": true,
@@ -10175,8 +10221,8 @@
           "tappedById": 415,
           "templateId": "nythraxis_scourge_of_thornpeak",
           "weapon": {
-            "max": 507,
-            "min": 325,
+            "max": 2537,
+            "min": 1624,
             "speed": 2.6
           }
         },
@@ -10354,7 +10400,9 @@
             418,
             419
           ],
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -10376,8 +10424,8 @@
           "tappedById": 415,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },
@@ -10408,7 +10456,9 @@
             418,
             419
           ],
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -10430,8 +10480,8 @@
           "tappedById": 415,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },
@@ -10479,7 +10529,7 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 428,
-      "state": "1e8cc286",
+      "state": "951de6d4",
       "events": "741638a5",
       "rng": {
         "draws": 3001,
@@ -10490,7 +10540,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 428,
-      "state": "bc462f9c",
+      "state": "8e6c7574",
       "events": "741638a5",
       "rng": {
         "draws": 3055,
@@ -10501,7 +10551,7 @@
       "tick": 650,
       "time": 32.5,
       "nextId": 428,
-      "state": "21995170",
+      "state": "65119e18",
       "events": "741638a5",
       "rng": {
         "draws": 3092,
@@ -10512,7 +10562,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 428,
-      "state": "6e53a25e",
+      "state": "9b4764ec",
       "events": "741638a5",
       "rng": {
         "draws": 3144,
@@ -10523,7 +10573,7 @@
       "tick": 670,
       "time": 33.5,
       "nextId": 428,
-      "state": "f17d4a2a",
+      "state": "1c503414",
       "events": "741638a5",
       "rng": {
         "draws": 3189,
@@ -10534,7 +10584,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 428,
-      "state": "162bcbc8",
+      "state": "ab222f20",
       "events": "741638a5",
       "rng": {
         "draws": 3242,
@@ -10545,7 +10595,7 @@
       "tick": 688,
       "time": 34.4,
       "nextId": 428,
-      "state": "53dea5e6",
+      "state": "e2efe9ae",
       "events": "e3560676",
       "rng": {
         "draws": 3282,
@@ -10568,8 +10618,8 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 5540,
-            "damageTaken": 5402,
+            "damageDealt": 11076,
+            "damageTaken": 27060,
             "kills": 3,
             "xpGained": 249
           },
@@ -10577,7 +10627,7 @@
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 5540,
+              "damageDealt": 11076,
               "dungeonFinalBossKills": 1,
               "kills": 3,
               "partiesJoined": 1
@@ -10806,7 +10856,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
+            "damageTaken": 16667,
             "xpGained": 249
           },
           "craftSkills": {},
@@ -10919,7 +10969,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
+            "damageTaken": 16667,
             "xpGained": 249
           },
           "craftSkills": {},
@@ -11032,7 +11082,7 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 140,
+            "damageTaken": 16667,
             "xpGained": 249
           },
           "craftSkills": {},
@@ -11154,13 +11204,13 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "fiveSecondRule": 133.4,
-          "hp": 1062,
+          "hp": 50000,
           "id": 415,
           "inCombat": true,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 1062,
+          "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -11205,12 +11255,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 133.4,
-          "hp": 418,
+          "hp": 50000,
           "id": 416,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -11254,12 +11304,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 133.4,
-          "hp": 418,
+          "hp": 50000,
           "id": 417,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -11303,12 +11353,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 133.4,
-          "hp": 418,
+          "hp": 50000,
           "id": 418,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -11351,12 +11401,12 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
           "fiveSecondRule": 133.4,
-          "hp": 418,
+          "hp": 50000,
           "id": 419,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
-          "maxHp": 418,
+          "maxHp": 50000,
           "maxResource": 1506,
           "moveSpeed": 7,
           "onGround": true,
@@ -11440,7 +11490,9 @@
             419
           ],
           "lootable": true,
-          "maxHp": 60000,
+          "maxHp": 120000,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10.5,
           "nythraxis": {
             "deathSpoken": true,
@@ -11499,8 +11551,8 @@
           "tappedById": 415,
           "templateId": "nythraxis_scourge_of_thornpeak",
           "weapon": {
-            "max": 507,
-            "min": 325,
+            "max": 2537,
+            "min": 1624,
             "speed": 2.6
           }
         },
@@ -11678,7 +11730,9 @@
             418,
             419
           ],
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -11700,8 +11754,8 @@
           "tappedById": 415,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },
@@ -11732,7 +11786,9 @@
             418,
             419
           ],
-          "maxHp": 1569,
+          "maxHp": 3137,
+          "mechanicDamageMult": 5,
+          "mechanicHealMult": 2,
           "moveSpeed": 10,
           "onGround": true,
           "overpowerUntil": -1,
@@ -11754,8 +11810,8 @@
           "tappedById": 415,
           "templateId": "nythraxis_skeleton_warrior",
           "weapon": {
-            "max": 248,
-            "min": 159,
+            "max": 1241,
+            "min": 794,
             "speed": 2.2
           }
         },

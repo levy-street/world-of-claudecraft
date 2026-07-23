@@ -1,4 +1,4 @@
-// Repeatable craft work orders (Professions 2.0 Phase 14): the six masters each
+// Repeatable craft work orders (Professions 2.0): the six masters each
 // take a stack of their craft's staple material for coin on a fixed cadence
 // (WORK_ORDER_CADENCE_TICKS). This suite pins the economics as a deliberate,
 // live-data-derived contract so a later material sell-value retune or a count
@@ -11,10 +11,13 @@
 //   - xpReward is the make-amends repeatable band (100).
 import { describe, expect, it } from 'vitest';
 import { ITEMS, QUESTS } from '../src/sim/data';
-import { WORK_ORDER_CADENCE_TICKS } from '../src/sim/professions/cadence';
+import {
+  WORK_ORDER_CADENCE_TICKS,
+  WORK_ORDER_PAYOUT_FRACTION,
+} from '../src/sim/professions/cadence';
 import { Sim } from '../src/sim/sim';
 
-// questId -> the seated master who gives and takes it (content, Phase 14). The
+// questId -> the seated master who gives and takes it (content). The
 // material id, count, and reward are all read from LIVE data below, never
 // duplicated here, so this table only records the routing the content defines.
 const WORK_ORDERS: { questId: string; master: string }[] = [
@@ -49,8 +52,10 @@ function collectObjective(questId: string): { itemId: string; count: number } {
   return { itemId: obj.itemId, count: obj.count };
 }
 
-/** floor(0.5 * summed vendor sell value of every collect objective's materials),
- *  computed from LIVE item data so a sell-value retune reds the reward pin. */
+/** floor(WORK_ORDER_PAYOUT_FRACTION * summed vendor sell value of every collect
+ *  objective's materials), computed from LIVE item data so a sell-value retune
+ *  reds the reward pin. The fraction itself is literal-pinned in the economics
+ *  suite below, so this derivation is never self-referential. */
 function expectedReward(questId: string): number {
   let sum = 0;
   for (const obj of QUESTS[questId].objectives) {
@@ -58,7 +63,7 @@ function expectedReward(questId: string): number {
       sum += obj.count * (ITEMS[obj.itemId].sellValue ?? 0);
     }
   }
-  return Math.floor(0.5 * sum);
+  return Math.floor(WORK_ORDER_PAYOUT_FRACTION * sum);
 }
 
 /** The vendor sell value of the full requested material stack (what a player
@@ -87,9 +92,10 @@ function turnIn(sim: Sim, questId: string, master: string, itemId: string, provi
   sim.turnInQuest(questId);
 }
 
-describe.each(WORK_ORDERS)('$questId economics (Phase 14, live data)', ({ questId }) => {
+describe.each(WORK_ORDERS)('$questId economics (live data)', ({ questId }) => {
   it('pays floor(0.5 * summed material sell value), from live item data', () => {
     const quest = QUESTS[questId];
+    expect(WORK_ORDER_PAYOUT_FRACTION).toBe(0.5);
     expect(quest.copperReward).toBe(expectedReward(questId));
   });
 
@@ -97,7 +103,7 @@ describe.each(WORK_ORDERS)('$questId economics (Phase 14, live data)', ({ questI
     const quest = QUESTS[questId];
     expect(quest.xpReward).toBe(100);
     expect(quest.repeatable).toBe(true);
-    // Phase 15 pin-coverage audit: the cadence itself is a literal contract
+    // The cadence itself is a literal contract
     // (36000 ticks = 30 minutes at 20 Hz), not just a derived comparison.
     expect(WORK_ORDER_CADENCE_TICKS).toBe(36000);
     expect(quest.repeatCadenceTicks).toBe(WORK_ORDER_CADENCE_TICKS);
@@ -112,7 +118,7 @@ describe.each(WORK_ORDERS)('$questId economics (Phase 14, live data)', ({ questI
   });
 });
 
-describe.each(WORK_ORDERS)('$questId turn-in behavior (Phase 14, Sim)', ({ questId, master }) => {
+describe.each(WORK_ORDERS)('$questId turn-in behavior (Sim)', ({ questId, master }) => {
   it('consumes exactly the required materials and pays the coin once', () => {
     const sim = makeSim();
     const { itemId, count } = collectObjective(questId);

@@ -1,4 +1,4 @@
-// Paired suite for src/sim/professions/masterwork.ts (Professions 2.0 Phase 2):
+// Paired suite for src/sim/professions/masterwork.ts (Professions 2.0):
 // the pure masterwork proc-chance and bonus-baking primitives, the raid-floor
 // acceptance bound over the real recipe content, and the draw-order
 // determinism contract over a real Sim (one rng draw per successful craft,
@@ -43,7 +43,7 @@ const statSum = (stats: Partial<CoreStats> | null | undefined): number => {
   return PRIMARY_STATS.reduce((a, k) => a + (stats[k] ?? 0), 0);
 };
 
-describe('masterworkProcChance (Phase 2 tuning)', () => {
+describe('masterworkProcChance (locked tuning)', () => {
   it('pins the locked tuning constants', () => {
     // Load-bearing tuning literals (same convention as the
     // MATERIAL_RARITY_MAX_PROFICIENCY pin in professions_rarity_roll.test.ts):
@@ -110,7 +110,7 @@ describe('masterworkProcChance (Phase 2 tuning)', () => {
     ).toBe(0.03);
   });
 
-  it('materialTierBonus (the Phase 10 hook) defaults to 0 and is a real additive summand', () => {
+  it('materialTierBonus defaults to 0 and is a real additive summand', () => {
     const omitted = masterworkProcChance({
       tiersAboveRecipe: 0,
       signedReagent: false,
@@ -276,7 +276,7 @@ describe('masterworkBonusStats (the baked tier-delta budget)', () => {
   });
 });
 
-// The Phase 2 acceptance bound: a masterworked crafted output must stay
+// The masterwork acceptance bound: a masterworked crafted output must stay
 // STRICTLY below the raid-loot band. Derivation (src/sim/item_level.ts, no
 // invented constants): a raid drop from band-level B content reads item level
 // B + QUALITY_ILVL_BONUS[quality] + RAID_ILVL_BONUS (itemLevel(): raid loot
@@ -391,7 +391,7 @@ describe('masterwork stays strictly below the raid-loot band (acceptance bound)'
   });
 });
 
-describe('draw-order determinism over a real Sim (Phase 2)', () => {
+describe('draw-order determinism over a real Sim', () => {
   // Scenario: tailoring as the active archetype (unlimited empowerment
   // ceiling), skill 200 (tier-8 capability, past the specialization
   // threshold), so each successful vestments craft rolls the proc at
@@ -408,7 +408,7 @@ describe('draw-order determinism over a real Sim (Phase 2)', () => {
     meta.craftSkills.tailoring = 200;
     for (let i = 0; i < 12; i++) sim.addItem('linen_scrap', 1, pid);
     for (let i = 0; i < 6; i++) sim.addItem('spider_leg', 1, pid);
-    // Phase 15 burn-down: the vestments recipe gained cloth and thread volume.
+    // Economy rework: the vestments recipe gained cloth and thread volume.
     for (let i = 0; i < 9; i++) sim.addItem('homespun_cloth', 1, pid);
     for (let i = 0; i < 15; i++) sim.addItem('spool_of_thread', 1, pid);
     sim.drainEvents();
@@ -617,7 +617,7 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
   });
 });
 
-describe('material-tier masterwork feed (Phase 10, material_tier.ts)', () => {
+describe('material-tier masterwork feed (material_tier.ts)', () => {
   it('pins the tier table and the per-tier chance step literally', () => {
     // Load-bearing tuning literals, same convention as the proc-chance
     // constant pins above: the step rides the masterwork bonus scale
@@ -654,7 +654,7 @@ describe('material-tier masterwork feed (Phase 10, material_tier.ts)', () => {
     ).toBe(0);
     expect(materialTierBonusForReagents([])).toBe(0);
     // The two recipes the parity golden crafts consume only tier-0 reagents,
-    // so their proc chance is byte-identical to pre-Phase-10: this pin is the
+    // so their proc chance is unchanged by the tier feed: this pin is the
     // tripwire against any table growth that would touch a golden scenario.
     expect(materialTierBonusForReagents(recipeById('recipe_minor_healing_potion')!.reagents)).toBe(
       0,

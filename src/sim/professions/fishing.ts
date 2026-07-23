@@ -1,5 +1,5 @@
 // Fishing profession command logic, behind the SimContext seam (Professions
-// 2.0 Phase 11; the Phase 12b bite minigame). startFishing begins the fishing
+// 2.0; the bite minigame). startFishing begins the fishing
 // session (the fishing-pole item use routes here via SimContext,
 // src/sim/items.ts) and draws ONE hidden seeded bite delay; the cast
 // lifecycle (src/sim/combat/casting_lifecycle.ts) fires the bite and the
@@ -10,7 +10,7 @@
 // proficiency grant on the tick path like any other gathering harvest, and
 // the accrued proficiency selects a catch rarity band (fishingBandFor) whose
 // per-zone table shifts weight out of junk/empty-hook rows and into food fish
-// as skill rises. Draw contract (Phase 12b): a normal session draws one rng
+// as skill rises. Draw contract: a normal session draws one rng
 // value at cast start (the bite delay) and one more at a landed reel (the
 // table); a miss stays at one; the codfather reel draws nothing (early
 // return); a bags-full reel still draws the table (capacity gates after the
@@ -31,22 +31,22 @@ import { PROFICIENCY_BAND_THRESHOLDS, proficiencyBandFor } from './proficiency_b
 import { bestOwnedGatherToolTier, canGatherTier } from './tools';
 
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
-// Facing-forward sample ring the fishable-water check walks. Exported since
-// Phase 12b: the bobber visual (src/render/fishing_bobber_core.ts) anchors on
+// Facing-forward sample ring the fishable-water check walks. Exported so
+// the bobber visual (src/render/fishing_bobber_core.ts) anchors on
 // the FIRST accepted sample, so it must walk the exact same ring.
 export const FISHING_SAMPLE_DISTANCES = [4, 8, 12, 16, 20, 24];
 const DEEPFEN_FISHING_SHORE_MARGIN = 10;
 const THE_CODFATHER_ITEM_ID = 'the_codfather';
 const THE_CODFATHER_QUEST_ID = 'q_the_codfather';
 
-// Catch rarity ladder band boundaries (Professions 2.0 Phase 11): the minimum
-// fishing proficiency for each of the three catch tables. Since Phase 12b the
+// Catch rarity ladder band boundaries (Professions 2.0): the minimum
+// fishing proficiency for each of the three catch tables. The
 // ladder itself lives in proficiency_bands.ts (gathering.ts shares it for the
 // gather-cast duration); these exports delegate so every existing import and
 // test pin keeps resolving with identical values.
 export const FISHING_BAND_THRESHOLDS = PROFICIENCY_BAND_THRESHOLDS;
 
-// Bite minigame timing (Professions 2.0 Phase 12b), all in seconds. The
+// Bite minigame timing (Professions 2.0), all in seconds. The
 // hidden bite delay is ONE seeded draw in [MIN, effMax]; a better rod (tier
 // above 1) pulls effMax down by ROD_REDUCTION per tier and never moves MIN
 // (tier 2 covers [3, 6.5], tier 3 covers [3, 5]). The reel window opens at
@@ -64,7 +64,7 @@ export const FISH_REEL_WINDOW_ROD_BONUS_SEC = 0.75;
 // to band 0 (see proficiencyBandFor).
 export const fishingBandFor = proficiencyBandFor;
 
-// Per-catch proficiency gain schedule (Professions 2.0 Phase 12c): fishing has
+// Per-catch proficiency gain schedule (Professions 2.0): fishing has
 // no per-node tier to score against, so its gain is proficiency-relative by
 // design. The effective fishing band is min(profBand, rodBand), so a
 // band-appropriate catch always reduces to a function of proficiency alone;
@@ -135,7 +135,7 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
     return;
   }
   if (p.castingAbility || isConsuming(p)) {
-    // The reel (Phase 12b): re-pressing the pole during one's own fishing
+    // The reel: re-pressing the pole during one's own fishing
     // session, inside the armed server-authoritative reaction window, lands
     // the catch. The re-press reaches here through the same useItem fishing
     // arms as the original cast (items.ts routes them to startFishing BEFORE
@@ -204,13 +204,13 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   // state, resolved before the single rng draw below, so the draw order never
   // depends on it. Fall back to the Vale table for any spot without its own
   // (e.g. fishable water inside a dungeon zone), per band.
-  // Phase 12 rod gating: catch band b requires tool tier b + 1 (the shared
+  // Rod gating: catch band b requires tool tier b + 1 (the shared
   // canGatherTier comparator), so band 0, the shipped table, is always
   // reachable: the simple pole and bare hands both resolve to effective tier 1
   // via bestOwnedGatherToolTier's bare-hands floor. Effective band =
   // min(proficiency band, best band the owned rod tier covers). The cap is
   // SILENT by design: no event and no denial, the cast still lands a
-  // band-capped catch (Phase 12b adds the rod-synergy UX). All of this is pure
+  // band-capped catch. All of this is pure
   // state resolved before the single rng draw below, so the one-draw-per-catch
   // contract and every existing seed's catch sequence are untouched.
   const rodTier = bestOwnedGatherToolTier(meta.inventory, 'fishing', ITEMS);
@@ -249,7 +249,7 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
     });
   }
   ctx.addItem(caught, 1, meta.entityId);
-  // Catch feedback event (Professions 2.0 Phase 11): personal (pid = the
+  // Catch feedback event (Professions 2.0): personal (pid = the
   // angler), text-free on purpose (the gatherResult idiom): the client logs
   // its own localized reel-in line colored by the caught item's quality.
   // Emitted ONLY here on the landed-catch path (never on the no-bite null
@@ -264,7 +264,7 @@ export function completeFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): v
   // Book of Deeds: a real fish (never weeds or boots) from this zone's
   // waters feeds the per-zone first-cast mark.
   onFishCaughtForDeeds(ctx, meta, zoneAt(p.pos.z).id, caught);
-  // Fishing proficiency: a landed catch accrues the Phase 12c fractional
+  // Fishing proficiency: a landed catch accrues the fractional
   // schedule amount (fishingCatchGain above, junk cut off past band 0) through
   // the shared gathering-grant queue, draining on the tick path exactly like a
   // world-node harvest. The gain is pure state computed AFTER the single table

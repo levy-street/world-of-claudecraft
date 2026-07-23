@@ -1,4 +1,4 @@
-// Pure-core tests for the enchanting result toasts (Professions 2.0 Phase 13):
+// Pure-core tests for the enchanting result toasts (Professions 2.0):
 // every event x reason maps to the exact i18n key and sink (a success chat line
 // vs an error toast). The throttled arm is pinned to its OWN action key (never
 // the crafting-busy line), the 12c cross-action-throttle nuance.

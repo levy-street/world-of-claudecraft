@@ -64,6 +64,11 @@
     --color-bg-dark: #08080d;
     --color-bg-input: #0a0a0f;
     --color-border-default: #4e3d1d;
+    /* The showcase hairline: the gold-brown 1px keyline the char-window stat
+       panels established and the inset-card family repeats (section cards,
+       recipe cards, pill chips, panel dividers). One token for every site so
+       the family cannot drift shade by shade. */
+    --color-border-showcase: #463a1c;
     --color-border-focus: #c8a838;
     --color-border-invalid: #ff8f85;
     --color-border-valid: #48e060;
@@ -85,6 +90,18 @@
        as the fallback when QUALITY_COLOR has no entry, so the painter carries no
        raw hex). Exact pre-existing value. */
     --color-quality-default: #fff;
+
+    /* Crafting skill-gain difficulty tints (consumer: components.css
+       .crafting-difficulty[data-difficulty], painted by crafting_window.ts as
+       a data attribute, never an inline color). The classic four-color recipe
+       intuition (Professions 2.0): full/minimal/none reuse the item-quality
+       palette literals (icons.ts QUALITY_COLOR legendary/uncommon/poor, a
+       classic-fidelity anchor), reduced is the house gold. The tint is always
+       a redundant hint beside the text label (fairness). */
+    --color-craft-full: #ff8000;
+    --color-craft-reduced: var(--gold);
+    --color-craft-minimal: #1eff00;
+    --color-craft-none: #9d9d9d;
 
     /* Empty paperdoll slot greys (char_window.ts uses these so the painter carries
        no raw hex): the muted "Empty" label and the dimmed placeholder-icon border.
@@ -153,7 +170,7 @@
     --color-minimap-gather-ready: #3ef07a;
     --color-minimap-gather-cooldown: #5a5f57;
     --color-minimap-station: #d98e4a;
-    /* Tool-tier locked gather node (Professions 2.0 Phase 12): a dark rust
+    /* Tool-tier locked gather node (Professions 2.0): a dark rust
        clearly apart from the ready green, the cooldown olive-gray, and the
        bright mob red, so the lock reads at minimap marker size. */
     --color-minimap-node-locked: #8a4a3a;

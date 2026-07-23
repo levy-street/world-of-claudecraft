@@ -29,7 +29,7 @@ import { isStunned, isUnbreakableControlAura } from '../combat/cc';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
 import * as deedsMod from '../deeds';
 import { createMob, createNpc } from '../entity';
-import { applyHeroicMobTuning, mobTemplateForDungeonDifficulty } from '../instances/difficulty';
+import { applyDungeonMobTuning, mobTemplateForDungeonDifficulty } from '../instances/difficulty';
 import { heroicLockoutId, instanceLockoutMetas } from '../instances/dungeons';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -734,7 +734,7 @@ export function spawnNythraxisAdds(ctx: SimContext, boss: Entity): void {
   const victim = victimId !== null ? ctx.entities.get(victimId) : null;
   for (const pos of spawnPoints) {
     const add = createMob(ctx.nextId++, spawnTemplate, spawnTemplate.maxLevel, pos);
-    applyHeroicMobTuning(add, inst?.dungeonId ?? '', difficulty);
+    applyDungeonMobTuning(add, inst?.dungeonId ?? '', difficulty);
     add.spawnPos = { ...boss.spawnPos };
     add.tappedById = boss.tappedById;
     ctx.addEntity(add);
@@ -803,7 +803,7 @@ export function spawnNythraxisHeroicAdds(ctx: SimContext, boss: Entity): void {
       inst?.difficulty ?? 'heroic',
     );
     const add = createMob(ctx.nextId++, spawnTemplate, spawnTemplate.maxLevel, spawnPoints[index]);
-    applyHeroicMobTuning(add, inst?.dungeonId ?? '', inst?.difficulty ?? 'heroic');
+    applyDungeonMobTuning(add, inst?.dungeonId ?? '', inst?.difficulty ?? 'heroic');
     add.spawnPos = { ...boss.spawnPos };
     add.tappedById = boss.tappedById;
     ctx.addEntity(add);

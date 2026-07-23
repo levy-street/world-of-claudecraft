@@ -1331,7 +1331,7 @@ describe('kill-credit negatives (onMobKillCreditForDeeds)', () => {
 
 describe('station-bound craft counter (prog_tools_of_the_trade)', () => {
   // The station-bound tool recipe (toolworks) and a free-field common recipe
-  // (recipes.ts). Phase 8: the gate is per-type station POSITION only; the
+  // (recipes.ts). The gate is per-type station POSITION only; the
   // old level-20 hub arm is retired.
   const STATION_RECIPE = 'recipe_thorium_mining_pick';
   const FIELD_RECIPE = 'recipe_eastbrook_arming_sword';
@@ -1380,7 +1380,7 @@ describe('station-bound craft counter (prog_tools_of_the_trade)', () => {
   });
 
   it('the retired level arm: an under-20 crafter AT the station succeeds and counts', () => {
-    // Phase 8 inversion of the old level-20 hub gate (2026-07-17 maintainer
+    // Inversion of the old level-20 hub gate (2026-07-17 maintainer
     // ruling): the same on-the-spot craft that used to deny with not_at_hub
     // one level under now resolves, counts, and grants.
     const sim = makeSim();
@@ -1395,7 +1395,7 @@ describe('station-bound craft counter (prog_tools_of_the_trade)', () => {
   it('an ordinary field recipe crafted while standing at the station never counts', () => {
     const sim = makeSim();
     const meta = stationCrafter(sim);
-    // Phase 15 QA directed burn-down reagents for the field sword.
+    // Reagents for the field sword.
     sim.ctx.addItem('wolf_fang', 2, meta.entityId);
     sim.ctx.addItem('bone_fragments', 4, meta.entityId);
     sim.ctx.addItem('smithing_flux', 6, meta.entityId);
@@ -1418,7 +1418,7 @@ describe('enchanting skill-gain sites', () => {
   // addItem marks the player dirty on FIRST discovery of an item id, which
   // would mask a missing site mark (a veteran who long since discovered the
   // dust gets no discovery mark from the disenchant yield).
-  // Phase 12c re-pin: enchanting gains are quality-tiered now, so a common
+  // Re-pin: enchanting gains are quality-tiered now, so a common
   // sword/dust action at capability 2 (skill 50-74.75) grants the green 0.25
   // (min(common 0, pre-archetype ceiling 2) = 0, two tiers below), not the
   // retired flat 1. Staging at 74.75 keeps the threshold crossing exact:

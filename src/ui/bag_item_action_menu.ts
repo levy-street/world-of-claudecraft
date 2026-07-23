@@ -1,9 +1,9 @@
-// Thin DOM consumer for the bag-item action menu (Professions 2.0 Phase 13).
+// Thin DOM consumer for the bag-item action menu (Professions 2.0).
 // Composes the shared #ctx-menu popup family (the same element, .ctx-item rows,
 // placement, and bindContextMenuActions the player context menu uses; never a
-// second bespoke menu pattern) to surface the Phase 13 actions on a bag stack:
+// second bespoke menu pattern) to surface the enchanting actions on a bag stack:
 //
-//   - Right-click / touch tap on an item with a Phase 13 action opens the menu.
+//   - Right-click / touch tap on an item with an enchanting action opens the menu.
 //     Row one is the classic left-click action (so that binding survives), then
 //     Disenchant / Salvage / Apply Enchant as eligible.
 //   - Disenchant and Salvage route through the ONE canonical destroy-confirm
@@ -149,17 +149,23 @@ export class BagItemActionMenu {
       return;
     }
     const rows = picks.map((pick) => {
-      const reagents = pick.reagents
-        .map((reagent) =>
-          t('hudChrome.crafting.reagentLine', {
-            name: itemDisplayName(ITEMS[reagent.itemId]),
-            have: reagent.have,
-            required: reagent.required,
-          }),
+      // Each unsatisfied reagent carries a class the CSS tints (the crafting
+      // window's reagent-line idiom): redundant beside the have/required
+      // counts the text already carries, so the color is a hint, never the
+      // only signal (fairness).
+      const reagentsHtml = pick.reagents
+        .map(
+          (reagent) =>
+            `<span class="ctx-reagent${reagent.have >= reagent.required ? '' : ' unsat'}">${esc(
+              t('hudChrome.crafting.reagentLine', {
+                name: itemDisplayName(ITEMS[reagent.itemId]),
+                have: reagent.have,
+                required: reagent.required,
+              }),
+            )}</span>`,
         )
         .join(', ');
-      const meta = `${this.deps.slotName(pick.itemSlot as ItemSlot)}: ${reagents}`;
-      const html = `${esc(t(enchantNameKey(pick.enchantId)))}<span class="ctx-item-meta">${esc(meta)}</span>`;
+      const html = `${esc(t(enchantNameKey(pick.enchantId)))}<span class="ctx-item-meta">${esc(this.deps.slotName(pick.itemSlot as ItemSlot))}: ${reagentsHtml}</span>`;
       return pick.affordable
         ? { act: `enchant:${pick.enchantId}`, html }
         : { html, disabled: true };

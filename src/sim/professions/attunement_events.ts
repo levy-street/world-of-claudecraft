@@ -1,4 +1,4 @@
-// Attunement celebration events (Professions 2.0 Phase 14): when a quest-
+// Attunement celebration events (Professions 2.0): when a quest-
 // validated pair attunement lands (new OR return: returning to a held pair is
 // also a celebration), the celebrant gets a personal `attuned` event and every
 // overworld player in their zone gets a soft `attunedZone` broadcast. Sim-pure
@@ -26,7 +26,7 @@ import { emitToZonePlayers } from './gather_events';
  *  masterworkZone rule). Draws NO rng, so its position in the turn-in path cannot
  *  fork the deterministic draw order.
  *
- *  Phase 15 hook (live): every quest-validated attunement (new or return) bumps
+ *  Lifetime-counter hook: every quest-validated attunement (new or return) bumps
  *  the attunementsCompleted lifetime counter behind prog_guildsworn. The bump
  *  sits before the instance-space early return below (a celebrant attuning from
  *  instance space still attuned) and draws nothing. Veterans whose once-ever

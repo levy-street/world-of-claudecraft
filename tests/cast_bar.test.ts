@@ -64,7 +64,7 @@ describe('overhead cast bar', () => {
     expect(unknown.label).toBe('made_up_spell');
   });
 
-  it('renders fishing as a CONSTANT full waiting bar and the gather cast as a normal fill (Phase 12b)', () => {
+  it('renders fishing as a CONSTANT full waiting bar and the gather cast as a normal fill', () => {
     // The fishing fill is pinned at 1 REGARDLESS of the broadcast decay: the
     // bar must carry no session-progress information (the bite is the bobber
     // plus the cue). castRemaining 7.5 of 15 would fill 0.5 on the generic

@@ -1,4 +1,4 @@
-// Phase 9 recipe training over the live GameServer wire: the train_recipe
+// Recipe training over the live GameServer wire: the train_recipe
 // dispatch case must reach Sim.trainRecipe, and the outcome must come back as
 // the pid-scoped trainResult event routed to ONLY the owning session (deny
 // and success arms both; the #2033 stub-trap class of regression: a dropped

@@ -92,13 +92,13 @@ export const CAST_COMPLETE_EPS = 1e-9;
 export const CAST_QUEUE_WINDOW_SEC = 0.4;
 export const FISHING_CAST_ID = 'fishing';
 export const FISHING_CAST_NAME = 'Fishing';
-// The constant castTotal/castRemaining of a fishing session (Professions 2.0
-// Phase 12b, retiring the fixed FISHING_CAST_TIME cast): a generous cap that
+// The constant castTotal/castRemaining of a fishing session (Professions 2.0,
+// retiring the fixed FISHING_CAST_TIME cast): a generous cap that
 // carries ZERO information about the hidden bite (max bite delay plus max
 // reel window end every real session well before it), so the broadcast cast
 // fields can never leak the bite timing to a modified client.
 export const FISHING_SESSION_CAP_SEC = 15;
-// The gather-cast sentinel riding castingAbility (Professions 2.0 Phase 12b),
+// The gather-cast sentinel riding castingAbility (Professions 2.0),
 // beside FISHING_CAST_ID above: an activity marker, never an ability id.
 export const GATHER_CAST_ID = 'gathering';
 // The non-spell casts: castingAbility sentinels that are activities, not
@@ -900,7 +900,7 @@ export interface ItemInstancePayload {
   /** Remaining charges for a per-effect-limited item, keyed by effect id. */
   charges?: Record<string, number>;
   /** Quality/stat values baked into this specific copy at creation time.
-   *  `quality` is legacy-only under the Phase 2 masterwork model: crafted
+   *  `quality` is legacy-only under the masterwork model: crafted
    *  outputs are deterministic and new crafts never write it (persisted
    *  payloads that carry it keep loading and reading as before). `masterwork`
    *  marks a masterwork proc copy (professions/masterwork.ts) whose `stats`
@@ -917,8 +917,8 @@ export interface ItemInstancePayload {
   /** Arms the bind-on-trade lock: a copy carrying this binds to the recipient
    *  (boundTo set) the first time it changes hands in a player trade
    *  (social/trade.ts grantOffer), after which it can never be traded again.
-   *  Generic (Phase 13 disenchant secondaries are its first consumer; Phase 14b
-   *  commissioned gear reuses it); the trade arm keys only on this flag and
+   *  Generic (disenchant secondaries are its first consumer; commissioned
+   *  gear reuses it); the trade arm keys only on this flag and
    *  boundTo, nothing item-specific. Additive and JSONB-safe: an absent flag is
    *  an ordinary freely-tradeable instance. */
   bindOnTrade?: boolean;
@@ -1266,6 +1266,22 @@ export interface MobTemplate {
     duration: number;
     min?: number;
     max?: number;
+    name: string;
+    school?: string;
+  };
+  // Anti-kite gap closer ("Charge"): an Onrush-style dash, the melee analogue of
+  // the aoeSlow snare. HEROIC-ONLY at runtime: the template field is inert until
+  // applyDungeonMobTuning stamps Entity.chargeEnabled on a heroic spawn, so a
+  // normal spawn of the same template never charges. When the mob is engaged and
+  // its aggro target sits between minRange and maxRange, it stuns the target for
+  // stunDuration (immediately, same tick, like the player Onrush; no diminishing
+  // returns, matching stomp) and dashes to melee at 3x move speed (mob/charge.ts).
+  // Draws no rng in any branch, so it cannot perturb the parity gate.
+  charge?: {
+    minRange: number;
+    maxRange: number;
+    cooldown: number;
+    stunDuration: number;
     name: string;
     school?: string;
   };
@@ -2324,7 +2340,7 @@ export interface GroundObjectDef {
 // issue is content plus visibility only, no harvest logic (see G3).
 export type GatherNodeType = 'ore' | 'wood' | 'herb';
 
-// Rare gather event flavors (Professions 2.0 Phase 4), one per node family:
+// Rare gather event flavors (Professions 2.0), one per node family:
 // ore rolls pristine_vein, wood rolls ancient_heartwood, herb rolls
 // moonlit_bloom (professions/gather_events.ts gatherRareEventFlavor).
 export type GatherRareEventFlavor = 'pristine_vein' | 'ancient_heartwood' | 'moonlit_bloom';
@@ -2338,7 +2354,7 @@ export interface GatherNodeDef {
   // (professions/profession_xp.ts gatherActionXp), snapshotted at authoring
   // time from the node's zone levelRange midpoint rather than looked up live.
   level: number;
-  // Access tier (Professions 2.0 Phase 12), 1 = bare-hands: gated via
+  // Access tier (Professions 2.0), 1 = bare-hands: gated via
   // canGatherTier against the player's best owned matching tool
   // (professions/tools.ts bestOwnedGatherToolTier). Pure access gating, never
   // a speed mechanic; every pre-phase node is tier 1.
@@ -2496,17 +2512,17 @@ export interface QuestDef {
   // Repeatable quests remain in questsDone as history but become available
   // again when they are not active.
   repeatable?: boolean;
-  // Repeatable-quest cooldown window in TICKS (Professions 2.0 Phase 14): after a
+  // Repeatable-quest cooldown window in TICKS (Professions 2.0): after a
   // successful turn-in the quest is unavailable for this many ticks (work orders
   // use professions/cadence.ts WORK_ORDER_CADENCE_TICKS). Only meaningful with
   // `repeatable`; absent means no cooldown (available again immediately).
   repeatCadenceTicks?: number;
   // Typed, server-authoritative profession transition applied only by the
   // validated turn-in path. The selected target is persisted on QuestProgress.
-  // `pairId` (Professions 2.0 Phase 14): a per-pair attune quest pins its ONE
+  // `pairId` (Professions 2.0): a per-pair attune quest pins its ONE
   // canonical pair id (archetype.ts archetypePairId / ARCHETYPE_PAIR_TARGETS), so
   // the quest offers and validates only that pair; absent means the quest offers
-  // every mode-legal pair (the pre-Phase-14 single-quest behavior). Typed `string`
+  // every mode-legal pair (the legacy single-quest behavior). Typed `string`
   // (the pair id vocabulary is CRAFT_RING-derived at runtime, not a literal union).
   completionEffect?:
     | { type: 'attunePair'; mode: 'new' | 'return'; pairId?: string }
@@ -2761,7 +2777,7 @@ export interface Entity {
   // aimed at, captured (server-clamped to range) when the cast begins and read by
   // its area effects when it resolves. null for normal entity/self casts.
   castAim: Vec3 | null;
-  // Hidden per-cast state (Professions 2.0 Phase 12b). All three are
+  // Hidden per-cast state (Professions 2.0). All three are
   // transient: initialized inert ('' / 0) at entity creation, nonzero ONLY
   // between a real cast start and its end, and cleared on EVERY end path
   // (completion, reel, miss, cancelCast). Parity contract: while inert they
@@ -2869,7 +2885,7 @@ export interface Entity {
   firedSummons: number; // summonAdds thresholds already triggered
   summonedIds: number[]; // live adds this boss summoned; despawned on reset
   enraged: boolean; // enrage mechanic active
-  // Heroic-instance mechanic scaling (instances/difficulty.ts applyHeroicMobTuning).
+  // Heroic-instance mechanic scaling (instances/difficulty.ts applyDungeonMobTuning).
   // Mechanic numbers (aoePulse/bigCast/stomp damage; mendAlly/wardAllies/stoneskin
   // amounts) are read from the base MOBS table at fire time, so the fire sites
   // multiply by these AFTER the rng draw. undefined = 1 (normal difficulty).
@@ -2878,10 +2894,19 @@ export interface Entity {
   // Entity-level CC/snare immunity, the per-spawn twin of the MobTemplate
   // ccImmune/slowImmune flags (which are read from the base MOBS table, so a
   // spawn-time template transform cannot grant them). Heroic instances set
-  // both on boss-flagged mobs (applyHeroicMobTuning); the applyAura gates and
+  // both on boss-flagged mobs (applyDungeonMobTuning); the applyAura gates and
   // the polymorph cast gate check template OR entity.
   ccImmune?: boolean;
   slowImmune?: boolean;
+  // Heroic anti-kite charge (mob/charge.ts). chargeEnabled is stamped by
+  // applyDungeonMobTuning on heroic spawns of charge-bearing templates only;
+  // normal spawns of the same template never charge. The cooldown deliberately
+  // starts absent/0 (ready), unlike the telegraphed pulse timers: a heroic
+  // warrior mob opens the pull with its charge, that is the anti-kite design.
+  chargeEnabled?: boolean;
+  mobChargeCooldown?: number; // seconds until the next charge may fire (undefined = ready)
+  mobChargeTimeLeft?: number; // seconds left in the in-flight dash (undefined/0 = not dashing)
+  mobChargeTargetId?: number | null; // dash victim; null/undefined = not dashing
   healedThisPull: boolean; // desperation self-heal already used this pull
   nythraxis?: NythraxisEncounterState; // sim-only state for the Nythraxis raid encounter
   spawnPos: Vec3;
@@ -2979,7 +3004,7 @@ export interface Entity {
   // a plain (unenchanted) piece, or nothing equipped, has no entry. Recomputed in
   // recalcPlayerStats alongside equippedItems and synced in identity fields
   // (terse `eqi`, players only, only when non-empty, like `eq`) so the inspect
-  // window shows another player's masterwork/enchant payloads (Phase 6); the sim
+  // window shows another player's masterwork/enchant payloads; the sim
   // reads the SOURCE (PlayerMeta.equipmentInstance) for the actual stat bonus,
   // never this mirror.
   equippedInstances: Partial<Record<EquipSlot, ItemInstancePayload>>;
@@ -3595,7 +3620,7 @@ export type SimEvent = { pid?: number } & (
       recipeId: string;
       itemId?: string;
       count?: number;
-      // Phase 2: the OUTPUT DEF quality (outputs are deterministic; the
+      // The OUTPUT DEF quality (outputs are deterministic; the
       // quality roll is retired). `masterwork` mirrors CraftResult.masterwork
       // so the online client's lastCraftResult mirror stays field-complete.
       quality?: ItemDef['quality'];
@@ -3608,7 +3633,7 @@ export type SimEvent = { pid?: number } & (
         | 'throttled'
         | 'station_required';
     }
-  // Enchanting profession outcomes (Professions 2.0 Phase 13): mirror
+  // Enchanting profession outcomes (Professions 2.0): mirror
   // src/sim/professions/enchanting.ts DisenchantResult / ApplyEnchantResult and
   // src/sim/professions/salvage.ts SalvageResult so the online client can reflect
   // the local result of a disenchant_item / apply_enchant / salvage_item command
@@ -3651,7 +3676,7 @@ export type SimEvent = { pid?: number } & (
       count?: number;
       reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled';
     }
-  // Recipe-training outcome (Professions 2.0 Phase 9): mirrors
+  // Recipe-training outcome (Professions 2.0): mirrors
   // professions/training.ts TrainResult so the online client can reflect the
   // local result of a train_recipe command without deciding it itself.
   // Personal (emitted with pid = the trainee's entity id). Text-free on
@@ -3670,7 +3695,7 @@ export type SimEvent = { pid?: number } & (
         | 'train_tier_unmet'
         | 'train_cannot_afford';
     }
-  // Maker's Bond unbind outcome (Professions 2.0 Phase 14b): mirrors
+  // Maker's Bond unbind outcome (Professions 2.0): mirrors
   // professions/commission.ts UnbindResult so the online client can reflect
   // the local result of an unbind_item command without deciding it itself.
   // Personal (emitted with pid = the holder's entity id). Text-free on
@@ -3691,13 +3716,13 @@ export type SimEvent = { pid?: number } & (
         | 'unbind_cannot_afford';
       fee: number;
     }
-  // Masterwork proc (Professions 2.0 Phase 2): a successful craft's single
+  // Masterwork proc (Professions 2.0): a successful craft's single
   // output-side rng draw procced, minting a masterwork instance with baked
   // bonus stats. Personal (emitted with pid = the crafter's entity id, which
   // `crafter` repeats as payload). Ids only, text-free on purpose (like
   // craftResult above): the client renders its own localized copy.
   | { type: 'masterwork'; recipeId: string; itemId: string; crafter: number }
-  // Masterwork zone broadcast (Professions 2.0 Phase 6): the soft zone-wide
+  // Masterwork zone broadcast (Professions 2.0): the soft zone-wide
   // copy of a masterwork proc, one per overworld player currently in the
   // crafter's zone INCLUDING the crafter, `pid` being the RECIPIENT (the
   // gatherRareEvent/chat fanout idiom); crafterPid/crafterName identify the
@@ -3732,13 +3757,13 @@ export type SimEvent = { pid?: number } & (
       professionId: GatheringProfessionId;
       itemId: string;
       rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-      // Units actually granted (Professions 2.0 Phase 4): the qtyByRarity
+      // Units actually granted (Professions 2.0): the qtyByRarity
       // yield, multiplied by GATHER_RARE_EVENT_YIELD_MULT on a rare event.
       qty: number;
       // The rare event this harvest rolled (resolveHarvest draw #2), or null.
       rareEvent: GatherRareEventFlavor | null;
     }
-  // Gathering tool-gate denial (Professions 2.0 Phase 12): the player lacks a
+  // Gathering tool-gate denial (Professions 2.0): the player lacks a
   // matching tool of at least `requiredTier` for a node harvest, or for a
   // corpse harvest's premium (signed/specimen) arm. Personal (pid = the
   // gatherer) and text-free on purpose (like gatherResult above): the client
@@ -3753,7 +3778,7 @@ export type SimEvent = { pid?: number } & (
       requiredTier: number;
       professionId?: GatheringProfessionId;
     }
-  // Full-bag signed-grant downgrade (Professions 2.0 Phase 12d): a signed
+  // Full-bag signed-grant downgrade (Professions 2.0): a signed
   // yield could not land in its signed form, so either the units arrived as a
   // plain unsigned top-up (lost 'mark': the yield survived, the gatherer's
   // mark did not) or a pure-extra specimen jackpot was dropped outright (lost
@@ -3767,7 +3792,7 @@ export type SimEvent = { pid?: number } & (
       surface: 'node' | 'corpse';
       lost: 'mark' | 'find';
     }
-  // Fishing catch outcome (Professions 2.0 Phase 11): a landed catch emits
+  // Fishing catch outcome (Professions 2.0): a landed catch emits
   // this so the client can log the reel-in feedback line for the acting
   // player. Personal (carries pid = the angler), emitted only on the
   // landed-catch path (never on the no-bite, bags-full, or codfather quest
@@ -3782,7 +3807,7 @@ export type SimEvent = { pid?: number } & (
       itemId: string;
       quality: NonNullable<ItemDef['quality']>;
     }
-  // Fishing bite (Professions 2.0 Phase 12b): the hidden seeded bite fired
+  // Fishing bite (Professions 2.0): the hidden seeded bite fired
   // for this angler's running fishing session. Personal (pid = the angler)
   // and text-free on purpose (the fishingResult idiom): the client drives
   // the bobber bite state and the always-audible cue off it, so no
@@ -3790,20 +3815,20 @@ export type SimEvent = { pid?: number } & (
   // session, at the seeded bite tick; carries no timing payload, so the
   // wire never reveals the delay distribution.
   | { type: 'fishingBite'; pid: number }
-  // Fishing miss (Professions 2.0 Phase 12b): the reel window closed with no
+  // Fishing miss (Professions 2.0): the reel window closed with no
   // re-press ("it got away"), or a session defensively timed out. Personal
   // and text-free like fishingBite: the client renders its own localized
   // got-away line. Costs nothing but the ended cast; recast immediately.
   | { type: 'fishingGotAway'; pid: number }
-  // Rare gather event (Professions 2.0 Phase 4): a harvest struck a pristine
+  // Rare gather event (Professions 2.0): a harvest struck a pristine
   // vein / ancient heartwood / moonlit bloom. Soft zone broadcast: one copy is
   // emitted per player currently in the node's zone, `pid` being the RECIPIENT
   // (the chat fanout idiom); finderPid/finderName identify the harvester. Ids
   // plus values only, text-free on purpose: the client renders its own
   // localized line off `flavor` (the gatherEvent.* keys). The HUD reads only
   // flavor/finderName/finderPid today; zoneId/nodeType/itemId are forward
-  // payload for the Phase 15 per-family deeds/tuning consumers (asserted by
-  // the Phase 4 tests so the shape is already load-bearing on the wire).
+  // payload for the per-family deeds/tuning consumers (asserted by the
+  // gather rare-event tests so the shape is already load-bearing on the wire).
   | {
       type: 'gatherRareEvent';
       pid: number;
@@ -3814,7 +3839,7 @@ export type SimEvent = { pid?: number } & (
       nodeType: GatherNodeType;
       itemId: string;
     }
-  // Trend nudge (Professions 2.0 Phase 14): a soft, at-most-once-per-window
+  // Trend nudge (Professions 2.0): a soft, at-most-once-per-window
   // reminder that an unattuned crafter's skills are leaning toward an adjacent
   // pair (professions/prof_nudges.ts). Personal (pid = the crafter) and
   // text-free on purpose (the gatherDenied idiom): the client renders its own
@@ -3822,18 +3847,18 @@ export type SimEvent = { pid?: number } & (
   // voice follow-up at the crossing threshold stays the Guild trend letter; this
   // is the lighter in-world hint that can fire below that threshold.
   | { type: 'profTrendNudge'; pid: number; pairId: string }
-  // First-tier tutorial (Professions 2.0 Phase 14): fired exactly once per
+  // First-tier tutorial (Professions 2.0): fired exactly once per
   // character, the first time ANY craft skill crosses tier 1
   // (professions/prof_nudges.ts). Personal (pid = the crafter) and text-free:
   // the client renders its own one-shot tier-up explainer. Carries no ids beyond
   // the recipient; the persisted one-shot flag guarantees it never re-fires.
   | { type: 'profTierTutorial'; pid: number }
-  // Attunement celebration, personal copy (Professions 2.0 Phase 14): a
+  // Attunement celebration, personal copy (Professions 2.0): a
   // quest-validated pair attunement (new OR return) landed for this player
   // (professions/attunement_events.ts). Personal (pid = the celebrant) and
   // text-free: the client renders its own localized line off `pairId`.
   | { type: 'attuned'; pid: number; pairId: string }
-  // Attunement celebration, zone broadcast (Professions 2.0 Phase 14): the soft
+  // Attunement celebration, zone broadcast (Professions 2.0): the soft
   // zone-wide copy of an attunement, one per overworld player currently in the
   // celebrant's zone INCLUDING the celebrant, `pid` being the RECIPIENT (the
   // masterworkZone/gatherRareEvent fanout idiom); celebrantPid/celebrantName

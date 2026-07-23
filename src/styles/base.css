@@ -501,7 +501,7 @@
     font-size: 15px;
     letter-spacing: 0.5px;
     text-shadow: 1px 1px 2px #000;
-    border-bottom: 1px solid #463a1c;
+    border-bottom: 1px solid var(--color-border-showcase);
     padding-bottom: 6px;
     margin-bottom: 8px;
     display: flex;
@@ -525,7 +525,7 @@
     cursor: var(--cursor-point);
     font-size: 14px;
     padding: 0 4px;
-    border: 1px solid #463a1c;
+    border: 1px solid var(--color-border-showcase);
     border-radius: 3px;
     background: #1a1410;
     font-family: var(--ui-font);
@@ -539,6 +539,7 @@
   .chat-tab:focus-visible,
   .micro-btn:focus-visible,
   .mobile-btn:focus-visible,
+  .crafting-commission-chip:focus-visible,
   .vendor-item:focus-visible,
   .vendor-sell-junk:focus-visible,
   .bag-item:focus-visible,

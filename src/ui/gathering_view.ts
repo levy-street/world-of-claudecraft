@@ -35,7 +35,7 @@ export function classifyGatherNode(world: IWorld, nodeId: string): GatherNodeSta
 }
 
 /** The viewer's best owned gatherTool tier for one gathering profession
- *  (Professions 2.0 Phase 12), resolved from the same IWorld bags read the
+ *  (Professions 2.0), resolved from the same IWorld bags read the
  *  bags window renders (IWorldInventory#inventory). Bare hands floor to
  *  tier 1, so every tier-1 node reads as unlocked with no tool at all. */
 export function viewerBestToolTier(world: IWorld, professionId: GatheringProfessionId): number {
@@ -56,7 +56,7 @@ export function isNodeToolLockedFor(
 }
 
 /** One nearby gather node, classified for the local viewer. `locked` is the
- *  tool-tier access dimension (Phase 12); `state` stays the respawn dimension. */
+ *  tool-tier access dimension; `state` stays the respawn dimension. */
 export interface NearbyGatherNode {
   id: string;
   type: GatherNodeDef['type'];
@@ -90,7 +90,7 @@ export function buildNearbyGatherNodes(world: IWorld, radiusYd: number): NearbyG
   return out;
 }
 
-/** Everything the gather-node hover tooltip renders (Phase 12), resolved for
+/** Everything the gather-node hover tooltip renders, resolved for
  *  the local viewer: name by node family, the access-tier requirement, whether
  *  the viewer's owned-best tool meets it, and the respawn state. Null for an
  *  unknown node id (a stale pick after a content change). */
@@ -133,7 +133,7 @@ export function gatherDeniedLineKey(
   return 'hudChrome.gathering.toolTierUnmetCorpse';
 }
 
-/** The i18n key the gatherDowngrade SimEvent's toast resolves (Phase 12d; the
+/** The i18n key the gatherDowngrade SimEvent's toast resolves (the
  *  sim is text-free): 'mark' means the yield arrived as a plain unsigned
  *  top-up, 'find' means a pure-extra specimen jackpot was dropped outright. */
 export function gatherDowngradeLineKey(lost: 'mark' | 'find'): TranslationKey {

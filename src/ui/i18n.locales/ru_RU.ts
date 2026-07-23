@@ -20,6 +20,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.afkTag': 'AFK',
   'hudChrome.discord.roleTag.legend': 'ЛЕГЕНДА',
   'hudChrome.discord.roleTag.shill': 'ГЛАШАТАЙ',
+  'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.fish.pctFmt': '{pct}%',
+  'questUi.dialog.profIntroHint': 'Обратитесь к {name} за заданием «{quest}».',
   'entities.items.eastbrook_greatsword.name': 'Истврукский двуручный меч',
   'entities.items.highwatch_greatsword.name': 'Двуручный меч Хайвотча',
   'entities.items.highwatch_wallshield.name': 'Стенной щит Хайвотча',
@@ -2014,6 +2017,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.logs.soldItem': 'Вы продали {item} за {money}.',
   'hud.logs.soldJunkOne': 'Вы продали {count} серый предмет за {money}.',
   'hud.logs.soldJunkMany': 'Вы продали серые предметы ({count}) за {money}.',
+  'hud.logs.keptBoundOne': 'Оставлена {count} привязанная копия.',
+  'hud.logs.keptBoundMany': 'Оставлены привязанные копии ({count}).',
   'hud.logs.friendOnline': '{name} вошел в игру.',
   'hud.logs.friendOffline': '{name} вышел из игры.',
   'hud.markers.names.star': 'Звезда',
@@ -3046,7 +3051,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.eastbrook_warded_leggings.name': 'Заговорённые поножи Иствбрука',
   'entities.items.wardweave_cowl.name': 'Капюшон Стражеткани',
   'entities.items.duskhide_wraps.name': 'Обмотки Сумеречной шкуры',
-  'entities.items.sootscale_mantle.name': 'Мантия Пепельной чешуи',
+  'entities.items.sootscale_mantle.name': 'Мантия печной чешуи',
   'entities.items.gravecaller_blade.name': 'Широкий клинок Могильного Зова',
   'entities.items.widowfang_dirk.name': 'Кортик Вдовьего Клыка',
   'entities.items.gravecaller_staff.name': 'Посох Пустоты',
@@ -3075,9 +3080,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.tallow_candle.name': 'Жирный кусок сала',
   'entities.items.spider_leg.name': 'Дергающаяся нога паука',
   'entities.items.bone_fragments.name': 'Фрагменты костей',
-  'entities.items.arcane_dust.name': 'Тайная пыль',
-  'entities.items.arcane_essence.name': 'Тайная эссенция',
-  'entities.items.arcane_shard.name': 'Тайный осколок',
+  'entities.items.arcane_dust.name': 'Пыль перезвона',
+  'entities.items.arcane_essence.name': 'Эссенция перезвона',
+  'entities.items.arcane_shard.name': 'Осколок перезвона',
   'entities.items.linen_scrap.name': 'Лоскут льна',
   'entities.items.fen_muster_order.name': 'Приказ о сборе в Фенбридже',
   'entities.items.mire_prowler_pelt.name': 'Шкура болотного хищника',
@@ -3179,7 +3184,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.icevein_dirk.name': 'Кортик Ледяной Жилы',
   'entities.items.highwatch_breastplate.name': 'Кираса Хайвотча',
   'entities.items.peakwool_robe.name': 'Роба из горной шерсти',
-  'entities.items.stalkerhide_jerkin.name': 'Куртка из шкуры охотника',
+  'entities.items.stalkerhide_jerkin.name': 'Куртка из шкуры хищника',
   'entities.items.cragwalker_boots.name': 'Сапоги Камнехода',
   'entities.items.windguard_leggings.name': 'Поножи Ветростража',
   'entities.items.ogre_toe_ring.name': 'Кольцо на палец огра',
@@ -3713,7 +3718,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_stalkers.completion':
     'На двенадцать теней меньше на хребте. Патрули вздохнут сегодня ночью.',
   'entities.quests.q_stalkers.objectives.0.label': 'Хребтовый охотник: убито',
-  'entities.quests.q_stalker_pelts.title': 'Зима идет в Хайвотч',
+  'entities.quests.q_stalker_pelts.title': 'Первые заморозки в Хайвотче',
   'entities.quests.q_stalker_pelts.text':
     'Зима на этой горе не стучит, {playerName}, а вышибает дверь. 8 шкур хребтовых охотников утеплят плащи для стены.',
   'entities.quests.q_stalker_pelts.completion':
@@ -4140,7 +4145,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread.name': 'Сотворённая овсяная лепёшка',
   'entities.items.conjured_bread2.name': 'Сотворённый чёрный каравай',
   'entities.items.conjured_bread3.name': 'Сотворённый медовый пряник',
-  'entities.items.glimmerfin_koi.name': 'Карп кои с мерцающими плавниками',
+  'entities.items.glimmerfin_koi.name': 'Кои солнечного блика',
   'entities.items.ironreel_fishing_rod.name': 'Удочка с железной катушкой',
   'entities.items.silverstream_fishing_rod.name': 'Удочка серебряного ручья',
   'entities.items.raw_bog_eel.name': 'Сырой болотный угорь',
@@ -4186,29 +4191,29 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.monarch_crown_helm.name': 'Корона Монарха',
   'entities.items.copper_mining_pick.name': 'Медная кирка',
   'entities.items.iron_mining_pick.name': 'Железная кирка',
-  'entities.items.mithril_mining_pick.name': 'Мифриловая кирка',
+  'entities.items.mithril_mining_pick.name': 'Небосеребряная кирка',
   'entities.items.handaxe.name': 'Топорик',
   'entities.items.felling_axe.name': 'Лесорубный топор',
   'entities.items.ironbark_axe.name': 'Топор из железной коры',
   'entities.items.gathering_sickle.name': 'Серп для сбора',
   'entities.items.bronze_sickle.name': 'Бронзовый серп',
-  'entities.items.silverleaf_sickle.name': 'Серебролистный серп',
-  'entities.items.thorium_mining_pick.name': 'Ториевая кирка',
-  'entities.items.arcanite_mining_pick.name': 'Арканитовая кирка',
+  'entities.items.silverleaf_sickle.name': 'Глянцелистный серп',
+  'entities.items.thorium_mining_pick.name': 'Осмиевая кирка',
+  'entities.items.arcanite_mining_pick.name': 'Глифостальная кирка',
   'entities.items.ashwood_axe.name': 'Ясеневый топор',
-  'entities.items.elderwood_axe.name': 'Топор из древнего дерева',
+  'entities.items.elderwood_axe.name': 'Топор из горной сосны',
   'entities.items.goldleaf_sickle.name': 'Золотолистный серп',
   'entities.items.sunpetal_sickle.name': 'Солнцелепестковый серп',
-  'entities.items.thorium_ore.name': 'Ториевая руда',
-  'entities.items.arcanite_bar.name': 'Слиток аркана',
+  'entities.items.thorium_ore.name': 'Осмиевая руда',
+  'entities.items.arcanite_bar.name': 'Слиток глифостали',
   'entities.items.ashwood_log.name': 'Бревно пепельного дерева',
-  'entities.items.elderwood_log.name': 'Бревно древней бузины',
+  'entities.items.elderwood_log.name': 'Бревно горной сосны',
   'entities.items.goldleaf_herb.name': 'Трава золотолист',
   'entities.items.sunpetal_herb.name': 'Трава солнцелепест',
   'entities.items.copper_ore.name': 'Медная руда',
   'entities.items.iron_ore.name': 'Железная руда',
   'entities.items.ironbark_log.name': 'Бревно железнокорого дерева',
-  'entities.items.silverleaf_herb.name': 'Трава серебролист',
+  'entities.items.silverleaf_herb.name': 'Трава глянцелист',
   'hud.core.chatChannels.add': 'Добавить канал чата',
   'hud.core.chatChannels.addTitle': 'Добавить канал',
   'hud.core.chatChannels.close': 'Закрыть вкладку {channel}',
@@ -7342,7 +7347,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.archetypePair.alchemy+cooking': 'Аптекарь',
   'hudChrome.archetypePair.cooking+leatherworking': 'Зверолов',
   'hudChrome.archetypePair.leatherworking+tailoring': 'Экипировщик',
-  'hudChrome.archetypePair.tailoring+inscription': 'Чароткач',
+  'hudChrome.archetypePair.tailoring+inscription': 'Чернилоткач',
   'hudChrome.archetypePair.inscription+enchanting': 'Чародей',
   'hudChrome.archetypePair.enchanting+jewelcrafting': 'Камневяз',
   'hudChrome.archetypePair.jewelcrafting+weaponcrafting': 'Клинкодел',
@@ -7391,7 +7396,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.throttled':
     'Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.',
   'hudChrome.crafting.recipeNotLearned': 'Вы еще не изучили этот рецепт.',
-  // Professions 2.0 Phase 14 (M16 non-Latin fills).
+  // Professions 2.0 (M16 non-Latin fills).
   'hudChrome.crafting.attunementReturnCost':
     'Если вы покинете эту пару, возвращение к ней позже обойдётся в {cost} заданий искупления.',
   'hudChrome.crafting.learnMoreAtStation':
@@ -8399,6 +8404,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.ctaHeader': 'Следующий шаг',
   'hudChrome.professions.ctaRaise':
     'Продолжайте развивать {craft}: до следующего ранга {points} навыка.',
+  'hudChrome.professions.ctaRaiseSpecialized':
+    'Продолжайте развивать {craft}: до специализации {points} навыка, расход материалов снизится.',
   'hudChrome.professions.ctaStart':
     'Чтобы начать, создайте предмет или соберите ресурсы любой профессией.',
   'hudChrome.professions.unattunedIdentity':
@@ -8470,23 +8477,23 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.ironedge_longsword.name': 'Железнокромочный длинный меч',
   'entities.items.ironshod_maul.name': 'Окованный железом молот',
   'entities.items.whetted_iron_dirk.name': 'Отточенный железный кинжал',
-  'entities.items.thorium_warblade.name': 'Ториевый боевой клинок',
-  'entities.items.arcanite_war_axe.name': 'Арканитовый боевой топор',
-  'entities.items.elderwood_battle_staff.name': 'Боевой посох из древней бузины',
+  'entities.items.thorium_warblade.name': 'Осмиевый боевой клинок',
+  'entities.items.arcanite_war_axe.name': 'Глифостальной боевой топор',
+  'entities.items.elderwood_battle_staff.name': 'Боевой посох из горной сосны',
   'entities.items.riveted_copper_girdle.name': 'Клепаный медный пояс',
   'entities.items.coppermail_sabatons.name': 'Медные кольчужные сабатоны',
   'entities.items.coppermail_gauntlets.name': 'Медные кольчужные рукавицы',
   'entities.items.ironlink_hauberk.name': 'Железная кольчуга',
   'entities.items.ironlink_legguards.name': 'Железные кольчужные поножи',
   'entities.items.ironlink_spaulders.name': 'Железные кольчужные наплечники',
-  'entities.items.thoriumscale_greathelm.name': 'Ториевый чешуйчатый большой шлем',
-  'entities.items.thoriumscale_cuirass.name': 'Ториевая чешуйчатая кираса',
-  'entities.items.thoriumscale_leggings.name': 'Ториевые чешуйчатые ноговицы',
+  'entities.items.thoriumscale_greathelm.name': 'Осмиевый чешуйчатый большой шлем',
+  'entities.items.thoriumscale_cuirass.name': 'Осмиевая чешуйчатая кираса',
+  'entities.items.thoriumscale_leggings.name': 'Осмиевые чешуйчатые ноговицы',
   'entities.items.homespun_hood.name': 'Домотканый капюшон',
   'entities.items.homespun_mitts.name': 'Домотканые рукавицы',
-  'entities.items.silverthread_slippers.name': 'Туфли из серебряной нити',
-  'entities.items.goldweave_robe.name': 'Златотканое одеяние',
-  'entities.items.goldweave_leggings.name': 'Златотканые поножи',
+  'entities.items.silverthread_slippers.name': 'Туфли из бледной нити',
+  'entities.items.goldweave_robe.name': 'Золочёное одеяние',
+  'entities.items.goldweave_leggings.name': 'Золочёные поножи',
   'entities.items.silkspun_satchel.name': 'Шёлкопряденая сумка',
   'entities.items.silkbinders_raiment.name': 'Облачение шёлкоткача',
   'entities.items.sunweave_mantle.name': 'Солнцетканая мантия',
@@ -8509,12 +8516,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.silvered_carp_supper.name': 'Ужин из серебристого карпа',
   'entities.items.anglers_feast_platter.name': 'Пиршественное блюдо рыболова',
   'entities.items.marlows_grand_roast.name': 'Роскошное жаркое Марлоу',
-  'entities.items.silverleaf_healing_draught.name': 'Целебный настой серебролиста',
-  'entities.items.silverleaf_mana_draught.name': 'Настой маны серебролиста',
+  'entities.items.silverleaf_healing_draught.name': 'Целебный настой глянцелиста',
+  'entities.items.silverleaf_mana_draught.name': 'Настой маны глянцелиста',
   'entities.items.elixir_of_the_boar.name': 'Эликсир вепря',
   'entities.items.goldleaf_healing_draught.name': 'Целебный настой золотолиста',
   'entities.items.goldleaf_mana_draught.name': 'Настой маны золотолиста',
-  'entities.items.venomfire_elixir.name': 'Эликсир ядопламени',
+  'entities.items.venomfire_elixir.name': 'Эликсир гадючьего жара',
   'entities.items.sunpetal_healing_draught.name': 'Целебный настой солнцелепеста',
   'entities.items.sunpetal_mana_draught.name': 'Настой маны солнцелепеста',
   'entities.items.elixir_of_the_serpent.name': 'Эликсир змея',
@@ -8605,7 +8612,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_legs_greater_stamina': 'Зачарование поножей - Высшая выносливость',
   'hudChrome.enchantName.enchant_gloves_greater_agility': 'Зачарование перчаток - Высшая ловкость',
   'hudChrome.enchantName.enchant_weapon_runed_edge': 'Зачарование оружия - Рунная кромка',
-  'hudChrome.enchantName.enchant_weapon_runed_focus': 'Зачарование оружия - Рунное средоточие',
+  'hudChrome.enchantName.enchant_weapon_runed_focus': 'Зачарование оружия - Рунная печать',
   'hudChrome.enchantName.enchant_chest_runeweave': 'Зачарование нагрудника - Рунное плетение',
   'hudChrome.enchantName.enchant_legs_runed_hide': 'Зачарование поножей - Рунная шкура',
   'hudChrome.enchantName.enchant_helmet_runed_links': 'Зачарование шлема - Рунные звенья',
@@ -8643,7 +8650,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.targetTitle': 'Выберите предмет для зачарования',
   'hudChrome.enchanting.noEnchants': 'Нет чар, использующих этот реагент.',
   'hudChrome.enchanting.noTargets': 'Нет подходящего предмета для зачарования.',
-  // Professions 2.0 Phase 14 attunement quests + master tier letters (ru_RU M16 fills).
+  // Professions 2.0 attunement quests + master tier letters (ru_RU M16 fills).
   'entities.quests.q_prof_attune_smith.title': 'Обещание кузнеца',
   'entities.quests.q_prof_attune_smith.text':
     'Сталь не прощает блуждающей руки, потому скажу прямо, прежде чем ты дашь клятву. Скрепи себя с моей кузней, и оружейное дело с бронным делом станут твоими двумя основными ремёслами, единственными, что ты сможешь вести дальше работы редкого качества. Ремесло напротив них по кругу осядет как твоё увлечение, доведённое до редкого качества и не выше. Остальные твои ремёсла не сгорают, {playerName}: они просто затихают, дремлют, пока ты не позовёшь их обратно. И знай ещё до того, как падёт молот: бросишь эту пару ради другой, и возвращаться придётся честным трудом, пять врагов повержены в первый раз по возвращении, восемь в следующий, одиннадцать после, и всё больше с каждым уходом. Всё ещё стоишь тут? Тогда принеси мне три рудные жилы, добытые в Долине собственными руками, и будем считать обещание скреплённым.',
@@ -8794,7 +8801,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.letters.prof_tier_engineering_alchemy_5.subject': 'МАСТЕРСТВО, бабах',
   'entities.letters.prof_tier_engineering_alchemy_5.body':
     'Одно из твоих основных ремёсел достигло мастерства, самой ВЕРХУШКИ, бабах, вся лестница, готово. Я не раздаю похвалу, я раздаю фитили, но вот, бери и то и другое: ты блистателен и слегка пугающ. Иди, заставь горы понервничать.',
-  // Professions 2.0 Phase 14 master tier-letter senders (localized NPC names).
+  // Professions 2.0 master tier-letter senders (localized NPC names).
   'entities.letters.prof_tier_weaponcrafting_armorcrafting_1.sender': 'Мастерица кузни Дарва',
   'entities.letters.prof_tier_weaponcrafting_armorcrafting_2.sender': 'Мастерица кузни Дарва',
   'entities.letters.prof_tier_weaponcrafting_armorcrafting_3.sender': 'Мастерица кузни Дарва',
@@ -8815,7 +8822,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.letters.prof_tier_engineering_alchemy_3.sender': 'Механик Гиззел',
   'entities.letters.prof_tier_engineering_alchemy_4.sender': 'Механик Гиззел',
   'entities.letters.prof_tier_engineering_alchemy_5.sender': 'Механик Гиззел',
-  // Commissions and the Maker's Bond (Professions 2.0 Phase 14b).
+  // Commissions and the Maker's Bond (Professions 2.0).
   'hudChrome.crafting.commissionToggle': 'Изделие на заказ',
   'hudChrome.crafting.commissionToggleHint':
     'Привязывается к первому персонажу, получившему его при обмене.',
@@ -8839,7 +8846,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.notBound': 'Этот предмет не привязан.',
   'hudChrome.unbind.cannotAfford': 'Вам не хватает денег на снятие привязки.',
   'hudChrome.unbind.outOfRange': 'Для снятия привязки нужно стоять у мастерской.',
-  // Professions 2.0 Phase 15 wiki arm: the professions hub rewrite and the
+  // Professions 2.0 wiki arm: the professions hub rewrite and the
   // /wiki/professions detail pages (M16 non-Latin fills, added with the keys).
   'guide.professions.ringHeading': 'Кольцо ремесел',
   'guide.professions.ringBody':
@@ -8899,11 +8906,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.colNodeTier': 'Уровень залежи',
   'guide.profPages.colToolNeeded': 'Нужен инструмент',
   'guide.profPages.craftIntro.weaponcrafting':
-    'Оружейное дело кует топоры, булавы, клинки и посохи в кузнице Иствердья: от медных новичковых образцов до редких ториевых и арканитовых работ.',
+    'Оружейное дело кует топоры, булавы, клинки, копья и даже посохи заклинателей в кузнице Иствердья: от медных новичковых образцов до редких осмиевых и глифостальных работ. Оружие, это самый ощутимый апгрейд, который может купить уровень, так что оружейник, это друг, которого все помнят завести.',
   'guide.profPages.craftIntro.armorcrafting':
-    'Бронное дело кует кольчужные доспехи в кузнице Иствердья: от клепаной меди до редкой ториевой чешуи.',
+    'Бронное дело кует кольчужные доспехи в кузнице Иствердья: от клепаной меди до редкой осмиевой чешуи.',
   'guide.profPages.craftIntro.tailoring':
-    'Портняжное дело ткет ткань для заклинателей и вместительную сумку у станка Иствердья: от домотканых основ до редкого солнечного плетения.',
+    'Портняжное дело ткет ткань для заклинателей и вместительную сумку у станка Иствердья: от домотканых основ через набор золочёного плетения до редкого солнечного плетения.',
   'guide.profPages.craftIntro.leatherworking':
     'Кожевничество выделывает ловкие кожаные доспехи в дубильне Фенбриджа: от простых шкур до редких изделий стража топей.',
   'guide.profPages.craftIntro.cooking':
@@ -8934,7 +8941,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Достигнув навыка {at}, вы специализируетесь в этом ремесле, и материалы рецептов дешевеют на {pct}%.',
   'guide.profPages.ench.disenchantHeading': 'Распыление',
   'guide.profPages.ench.disenchantNote':
-    'Распыление дробит ненужное оружие или доспех в чародейные материалы согласно качеству.',
+    'Распыление берет любое оружие или доспех обычного качества и выше и уничтожает одну копию, никогда уже зачарованную. Обычные и необычные вещи дробятся в горсть пыли перезвона, чуть богаче для более редких и высокоуровневых вещей; от редкого и выше выход меняет форму: ровно одна эссенция перезвона из редкой вещи или один осколок перезвона из эпической или легендарной, плюс типовой дополнительный материал, привязанный к тому, из чего была сделана вещь.',
   'guide.profPages.ench.typedHeading': 'Типовые побочные материалы',
   'guide.profPages.ench.typedNote':
     'Вещи редкого качества и выше дают еще и типовой побочный материал с привязкой при передаче: {rare} с редкой вещи, от {epicMin} до {epicMax} с эпической или легендарной.',
@@ -8943,7 +8950,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.ench.timberWeapons': 'Посохи, жезлы, луки и арбалеты',
   'guide.profPages.ench.enchantsHeading': 'Чары',
   'guide.profPages.ench.enchantsNote':
-    'Каждые чары, их слот, реагенты и точный бонус; только рунная ступень расходует типовые побочные материалы.',
+    'Чары делятся на три уровня. Базовый уровень работает на пыли перезвона (с небольшим добавлением эссенции на высоком конце) и покрывает слот оружия плюс каждый слот доспеха кроме второй руки, с достаточным выбором по осям характеристик, чтобы каждая сборка нашла что-то для каждого слота. Высший уровень стоит один осколок перезвона плюс эссенцию и единственное применение осколков: более сильные бонусы для слотов с наибольшим влиянием.\n\nМежду ними пять рунных зачарований, по одному на каждый типовой дополнительный материал, так что ничто из того, что вы дробите, не становится тупиком: Runed Edge (оружие, Сила, расходует Resonant Steel), Runed Sigil (оружие, Интеллект, Resonant Timber), Runed Weave (нагрудник, Дух, Resonant Thread), Runed Hide (поножи, Ловкость, Resonant Hide) и Runed Links (шлем, Стойкость, Resonant Links). Каждое также берет две эссенции перезвона; там, где слот и характеристика имеют и базовое, и высшее зачарование, рунный бонус располагается между ними, тогда как Runed Weave, это самое сильное зачарование нагрудника на Дух вообще, а Runed Hide, это единственное зачарование поножей на Ловкость вовсе. Точные бонусы все в таблице ниже.',
   'guide.profPages.ench.colEnchant': 'Чары',
   'guide.profPages.ench.colSlot': 'Слот',
   'guide.profPages.ench.colTier': 'Ступень',
@@ -8956,11 +8963,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Любой может разобрать оружие или доспех на обычные материалы согласно качеству; навык наложения чар не нужен.',
   'guide.profPages.ench.bonusFmt': '+{value} к {stat}',
   'guide.profPages.gatherIntro.mining':
-    'Горное дело добывает руду из жил во всех трех зонах, кормит кузнечные ремесла и ограничено 100.',
+    'Горное дело добывает руду прямо из камня мира: медь в Eastbrook Vale, железо в Mirefen Marsh и осмиевую руду в Thornpeak Heights, кормит кузнечные ремесла. Открыто для всех с 1 уровня, никаких ворот, ведется на собственном счетчике до предела в 100.',
   'guide.profPages.gatherIntro.logging':
-    'Лесозаготовка валит лес во всех трех зонах, идет на древки и инструменты и ограничена 100.',
+    'Лесозаготовка валит лес с деревьев во всех трех зонах: ironbark в Eastbrook Vale, ashwood в Mirefen Marsh и бревна горной сосны в Thornpeak Heights, сырье для древков, посохов и стола инженера. Открыта для всех с 1 уровня, ведется на собственном счетчике до предела в 100.',
   'guide.profPages.gatherIntro.herbalism':
-    'Травничество собирает травы во всех трех зонах, кормит алхимию и кулинарию и ограничено 100.',
+    'Травничество собирает дикорастущее: трава глянцелист в Eastbrook Vale, goldleaf в Mirefen Marsh и sunpetal в Thornpeak Heights, лист и стебель, что поддерживает варение аптечных ремесел. Открыто для всех с 1 уровня, ведется на собственном счетчике до предела в 100.',
   'guide.profPages.gatherIntro.fishing':
     'Рыбная ловля тянет улов из открытой воды каждой зоны в ритме поклевки и подсечки и ограничена 200.',
   'guide.profPages.rhythmHeading': 'Ритм сбора',
@@ -9063,7 +9070,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'У каждого изделия есть небольшой шанс (от 3% до предела 15%) выйти на ступень качества выше, но никогда выше рейдового порога.',
   'guide.profPages.faq.q6': 'Что значит подпись мастера на вещи?',
   'guide.profPages.faq.a6':
-    'Девять общих полевых рецептов и рецепты инструментов известны каждому с самого начала, как и три привязанных к станции высших рецепта (Мантия Пепельной чешуи, Капюшон Стражеткани и Обмотки Сумеречной шкуры): им не нужен наставник, нужна только их станция. Всему остальному учат мастера при своих станциях в трёх узловых городах: большинство находится в Истбруке, кожевник держит дубильню в Фенбридже, а алхимик держит аптеку в Хайвотче.\n\nРецепты наставников идут ступенями на уровнях навыка 0, 25 и 50 и стоят единовременно бесплатно, 25 серебра и 1 золото. Мастер обучает рецепту, как только ваш разряд в этом ремесле достигает разряда самого рецепта, и учиться нужно стоя у его станции: передвижная станция не считается.',
+    'Девять общих полевых рецептов и рецепты инструментов известны каждому с самого начала, как и три привязанных к станции высших рецепта (Мантия печной чешуи, Капюшон Стражеткани и Обмотки Сумеречной шкуры): им не нужен наставник, нужна только их станция. Всему остальному учат мастера при своих станциях в трёх узловых городах: большинство находится в Истбруке, кожевник держит дубильню в Фенбридже, а алхимик держит аптеку в Хайвотче.\n\nРецепты наставников идут ступенями на уровнях навыка 0, 25 и 50 и стоят единовременно бесплатно, 25 серебра и 1 золото. Мастер обучает рецепту, как только ваш разряд в этом ремесле достигает разряда самого рецепта, и учиться нужно стоя у его станции: передвижная станция не считается.',
   'guide.profPages.faq.q7': 'Что такое Узы мастера?',
   'guide.profPages.faq.a7':
     'Изделие на заказ привязывается к тому, кто получит его в обмене, и любой мастер у станка снимет привязку за ступенчатую плату.',
@@ -9075,59 +9082,59 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Профессии составляют трудовую жизнь мира: четыре собирательских ремесла, что добывают сырье прямо из земли, и кольцо из десяти ремесел, которые превращают его в снаряжение, еду, зелья и инструменты. Здесь все питает что-то другое. Добытая руда становится клинком, клинок принимает чары, а для чар нужна пыль, разобранная из старого снаряжения, так что собиратель, ремесленник и мастеровой оказываются звеньями одной цепи.\n\nНад числом профессий мучиться не нужно. Любой персонаж может поднимать все восемь ремесел, у которых сегодня есть содержание, и все четыре собирательских профессии разом; единственный исключающий выбор, это ваш архетип, призвание, которому вы в итоге присягнете, хотя после настройки ремесла, ушедшие в спячку, перестают расти. Навык никогда не падает, и ничто из выученного у вас не отнимается.',
   'guide.professions.deedsHeading': 'Деяния, что хранят память о пути',
   'guide.professions.deedsBody':
-    'Книга деяний идет рядом с каждым шагом. Первая настройка приносит Guildsworn, а первый шедевр, Masterwright, и оба носятся как титулы. Каждое из восьми зарабатываемых ремесел отмечает рубежное деяние на 50 навыке и венчает свой предел титулом Grandmaster, а Fishing дает Old Salt на 100 мастерства и титул Master Angler на 200.\n\nЕсть и более тихие страницы: деяния за первый сбор и первое изделие, за редкие находки, что удача подбрасывает в поле, и за то, что вы взялись за утилизацию. Все это чисто косметическое, только титулы и Известность. Деяние никогда не дает силы; оно лишь свидетельствует, что вы там были.',
+    'Книга деяний идет рядом с каждым шагом. Первая настройка приносит титул Присягнувшего ремеслу, а первый шедевр, Мастера-шедевральника, и оба носятся как титулы. Каждое из восьми зарабатываемых ремесел отмечает рубежное деяние на 50 навыке и венчает свой предел титулом Grandmaster, а Fishing дает Old Salt на 100 мастерства и титул Master Angler на 200.\n\nЕсть и более тихие страницы: деяния за первый сбор и первое изделие, за редкие находки, что удача подбрасывает в поле, и за то, что вы взялись за утилизацию. Все это чисто косметическое, только титулы и Известность. Деяние никогда не дает силы; оно лишь свидетельствует, что вы там были.',
   'guide.professions.startHeading': 'С чего начать',
   'guide.professions.startBody':
     'Только с дороги в Eastbrook? Найдите Foreman Odell и возьмите A Trade for Every Hand: он укажет вам на рудные жилы вокруг Copper Dig к юго-западу от города и набьет вам первые мозоли. С этого момента собирайте каждую жилу, лесопосадку и грядку трав, что встречаете в странствиях; мастерство приходит к путешественникам само собой.\n\nВ городе нажмите T, чтобы открыть окно ремесла и работать над общими рецептами, которые каждый персонаж знает с самого начала. Загляните к мастерам у forge, kitchens, loom и toolworks, посмотрите, чему они учат, и берите их рабочие заказы ради устойчивого дохода. К тому времени, как вас найдет письмо Гильдии, вы уже будете знать, какая пара ощущается домом.',
   'guide.profPages.craftProse.weaponcrafting.identityHeading':
     'Клинок, за которым идет каждый боец',
   'guide.profPages.craftProse.weaponcrafting.identityBody':
-    'Работа этого ремесла нужна кому-нибудь в любой группе, ведь одна лишь редкая ступень покрывает все три аппетита: Thorium Warblade для силового ближнего боя, Arcanite War Axe для ловких бойцов и Elderwood Battle Staff, посох на Интеллект и Дух для носителей мантий.\n\nНа кольце ремесел оно стоит между Armorcrafting и Jewelcrafting. Его живое лицо, это Smith, пара Weaponcrafting и Armorcrafting, присягаемая перед Forgemistress Darva у горна работой над тремя рудными жилами собственными руками; пара Bladewright с Jewelcrafting тоже названа на кольце, но присягнуть ей пока нельзя, ведь Jewelcrafting не даст рецептов до расширения зон в будущем.',
+    'Работа этого ремесла нужна кому-нибудь в любой группе, ведь одна лишь редкая ступень покрывает все три аппетита: Osmium Warblade для силового ближнего боя, Glyphsteel War Axe для ловких бойцов и Highpine Battle Staff, посох на Интеллект и Дух для носителей мантий.\n\nНа кольце ремесел оно стоит между Armorcrafting и Jewelcrafting. Его живое лицо, это Smith, пара Weaponcrafting и Armorcrafting, присягаемая перед Forgemistress Darva у горна работой над тремя рудными жилами собственными руками; пара Bladewright с Jewelcrafting тоже названа на кольце, но присягнуть ей пока нельзя, ведь Jewelcrafting не даст рецептов до расширения зон в будущем.',
   'guide.profPages.craftProse.weaponcrafting.materialsHeading': 'Чем поят горн',
   'guide.profPages.craftProse.weaponcrafting.materialsBody':
-    'Mining, это костяк. Copper ore добывается с жил 1-го уровня Eastbrook Vale, iron ore в Mirefen Marsh, а thorium ore в Thornpeak Heights, и каждая ступень лестницы шагает так же. Logging важнее, чем можно подумать: ironbark идет на древко boar spear, ashwood держит maul, а одно бревно elderwood образует battle staff.\n\nОстальное приходит с охоты и из-за прилавка. Rough hide для рукоятей снимается прямо с туш волков и вепрей, bone fragments падают с обычных убийств, а лестница горна жжет Smithing Flux, 20 меди за банку у самой Darva. Если ваша добыча отстает, Darva продает thorium ore у горна, а Tinker Gizzel держит arcanite bars в toolworks по цене, на фоне которой друзья-собиратели кажутся дешевыми.',
+    'Mining, это костяк. Copper ore добывается с жил 1-го уровня Eastbrook Vale, iron ore в Mirefen Marsh, а osmium ore в Thornpeak Heights, и каждая ступень лестницы шагает так же. Logging важнее, чем можно подумать: ironbark идет на древко boar spear, ashwood держит maul, а одно бревно горной сосны образует battle staff.\n\nОстальное приходит с охоты и из-за прилавка. Rough hide для рукоятей снимается прямо с туш волков и вепрей, bone fragments падают с обычных убийств, а лестница горна жжет Smithing Flux, 20 меди за банку у самой Darva. Если ваша добыча отстает, Darva продает osmium ore у горна, а Tinker Gizzel держит слитки глифостали в toolworks по цене, на фоне которой друзья-собиратели кажутся дешевыми.',
   'guide.profPages.craftProse.weaponcrafting.ladderHeading': 'Лестница, ступень за ступенью',
   'guide.profPages.craftProse.weaponcrafting.ladderBody':
-    'Один полевой рецепт, Eastbrook Arming Sword, известен всем с самого начала и куется где угодно из охотничьих трофеев (пара wolf fangs и bone fragments) плюс шесть Smithing Flux с прилавка forge. Настоящая лестница, это девять рецептов у тренера в трех ступенях, все привязаны к forge: медная ступень (bearded axe, flanged mace, boar spear) учится бесплатно на 0 навыке, железная ступень (longsword, maul, dirk) открывается на 25 навыке по 25 серебра за рецепт, а ториевая ступень (warblade, war axe, battle staff) открывается на 50 навыке по 1 золоту каждый. Darva учит рецепту, как только ваш разряд в ремесле достигает его собственного, так что каждая ступень открывается ровно с началом своей полосы навыка.\n\nЕще один рецепт едет с парой: Gravewyrm Gauntlets, комбинированная вещь от тренера, над которой может работать только настроенный Smith с Weaponcrafting и Armorcrafting на 25 навыке, и станок ей вовсе не нужен.',
+    'Один полевой рецепт, Eastbrook Arming Sword, известен всем с самого начала и куется где угодно из охотничьих трофеев (пара wolf fangs и bone fragments) плюс шесть Smithing Flux с прилавка forge. Настоящая лестница, это девять рецептов у тренера в трех ступенях, все привязаны к forge: медная ступень (bearded axe, flanged mace, boar spear) учится бесплатно на 0 навыке, железная ступень (longsword, maul, dirk) открывается на 25 навыке по 25 серебра за рецепт, а осмиевая ступень (warblade, war axe, battle staff) открывается на 50 навыке по 1 золоту каждый. Darva учит рецепту, как только ваш разряд в ремесле достигает его собственного, так что каждая ступень открывается ровно с началом своей полосы навыка.\n\nЕще один рецепт едет с парой: Gravewyrm Gauntlets, комбинированная вещь от тренера, над которой может работать только настроенный Smith с Weaponcrafting и Armorcrafting на 25 навыке, и станок ей вовсе не нужен.',
   'guide.profPages.craftProse.weaponcrafting.routeHeading': 'Шедевры и рабочий путь к 125',
   'guide.profPages.craftProse.weaponcrafting.routeBody':
-    'Любая вещь с настоящей строкой характеристик, а на этой лестнице это железная ступень и выше, может сойти с наковальни шедевром; безхарактерные медные обычки не срабатывают никогда, ведь улучшать в них нечего. Iron считается материалом 1-го уровня для бонуса шедевра, elderwood и arcanite, 2-го, так что верхняя ступень срабатывает чуть чаще.\n\nПрокатитесь на медной ступени до 25, обучите железную в день ее открытия и катитесь до 50, затем ториевую до 75. За 75 пока нет ничего выше, так что ториевые рецепты гаснут до половины, а потом до четверти отдачи: заложите около 150 изделий до предела в 125 и помните об общем пределе в десять действий ремесла в минуту, когда садитесь за партию.\n\nФинансируйте подъем по ходу: рабочий заказ горна Darva забирает у вас восемь copper ore каждые 30 минут за немного монет и опыта, а железная и ториевая ступени честно продаются растущим воинам ближнего боя. Книга деяний отмечает Edge and Temper на 50 навыке и венчает Grandmaster Weaponcrafting на 125.',
+    'Любая вещь с настоящей строкой характеристик, а на этой лестнице это железная ступень и выше, может сойти с наковальни шедевром; безхарактерные медные обычки не срабатывают никогда, ведь улучшать в них нечего. Iron считается материалом 1-го уровня для бонуса шедевра, горная сосна и глифосталь, 2-го, так что верхняя ступень срабатывает чуть чаще.\n\nПрокатитесь на медной ступени до 25, обучите железную в день ее открытия и катитесь до 50, затем осмиевую до 75. За 75 пока нет ничего выше, так что осмиевые рецепты гаснут до половины, а потом до четверти отдачи: заложите около 150 изделий до предела в 125 и помните об общем пределе в десять действий ремесла в минуту, когда садитесь за партию.\n\nФинансируйте подъем по ходу: рабочий заказ горна Darva забирает у вас восемь copper ore каждые 30 минут за немного монет и опыта, а железная и осмиевая ступени честно продаются растущим воинам ближнего боя. Книга деяний отмечает Edge and Temper на 50 навыке и венчает Grandmaster Weaponcrafting на 125.',
   'guide.profPages.craftProse.armorcrafting.identityHeading': 'Кольчуга для передовой',
   'guide.profPages.craftProse.armorcrafting.identityBody':
-    'Лестница Armorcrafting читается как карьера солдата: простой клепаный медный girdle, sabatons и gauntlets для начала, ironlink hauberk, legguards и spaulders с первыми настоящими характеристиками, и редкие thoriumscale greathelm, cuirass и leggings, вещи на Силу и Стойкость с самыми большими показателями брони, что может сделать ремесленник.\n\nЕсть у него и более тихая сторона: Eastbrook Warded Leggings, полевой обычок с характеристиками заклинателя, и Sootscale Mantle, редкое наплечье кольчуги на Интеллект и Дух на 75 навыке, держат в списке клиентов и носителей кольчуги, склонных к магии. На кольце оно стоит между Weaponcrafting и Engineering; пара Smith с Weaponcrafting присягается перед Forgemistress Darva, а пара Cogsmith с Engineering названа, но пока не имеет задания клятвы.',
+    'Лестница Armorcrafting читается как карьера солдата: простой клепаный медный girdle, sabatons и gauntlets для начала, ironlink hauberk, legguards и spaulders с первыми настоящими характеристиками, и редкие osmiumscale greathelm, cuirass и leggings, вещи на Силу и Стойкость с самыми большими показателями брони, что может сделать ремесленник.\n\nЕсть у него и более тихая сторона: Eastbrook Warded Leggings, полевой обычок с характеристиками заклинателя, и Мантия печной чешуи, редкое наплечье кольчуги на Интеллект и Дух на 75 навыке, держат в списке клиентов и носителей кольчуги, склонных к магии. На кольце оно стоит между Weaponcrafting и Engineering; пара Smith с Weaponcrafting присягается перед Forgemistress Darva, а пара Шестерёнщика с Engineering названа, но пока не имеет задания клятвы.',
   'guide.profPages.craftProse.armorcrafting.materialsHeading': 'Руда мешками',
   'guide.profPages.craftProse.armorcrafting.materialsBody':
-    'Ни одно ремесло не ест руду быстрее. Один только ironlink hauberk берет пять iron ore, а каждая thoriumscale вещь хочет три-четыре thorium плюс arcanite bar, так что серьезный armorcrafter добывает в Mirefen Marsh и Thornpeak Heights или платит тому, кто добывает. Copper кормит первую ступень, прямо с жил у Copper Dig.\n\nВокруг металла идут мягкие части: rough hide, снятая с туш волков и вепрей, bone fragments и linen scraps с обычной охоты, и банка Smithing Flux (20 меди у горна) почти в каждом рецепте. Darva продает thorium ore через прилавок для нетерпеливых.',
+    'Ни одно ремесло не ест руду быстрее. Один только ironlink hauberk берет пять iron ore, а каждая osmiumscale вещь хочет три-четыре osmium плюс слиток глифостали, так что серьезный armorcrafter добывает в Mirefen Marsh и Thornpeak Heights или платит тому, кто добывает. Copper кормит первую ступень, прямо с жил у Copper Dig.\n\nВокруг металла идут мягкие части: rough hide, снятая с туш волков и вепрей, bone fragments и linen scraps с обычной охоты, и банка Smithing Flux (20 меди у горна) почти в каждом рецепте. Darva продает osmium ore через прилавок для нетерпеливых.',
   'guide.profPages.craftProse.armorcrafting.ladderHeading': 'Обучение у горна Darva',
   'guide.profPages.craftProse.armorcrafting.ladderBody':
-    'Два полевых обычка, Eastbrook Chainmail Vest и Warded Leggings, известны с начала и куются где угодно. Лестница тренера, это девять рецептов в трех ступенях у горна Eastbrook: медная ступень бесплатна на 0 навыке, ступень ironlink стоит 25 серебра за рецепт на 25 навыке, а ступень thoriumscale стоит 1 золото каждый на 50 навыке, и каждая ступень доступна к обучению, как только ваш разряд ее достигает.\n\nЗа лестницей сидят два особых. Boundstone Helm, это комбинированный рецепт Smith, учится у тренера, не требует станка и работается только настроенным Smith с обоими ремеслами на 25 навыке. Sootscale Mantle не нужен учитель вовсе: ее знают все, но на 75 навыке и привязанная к forge, она венчает 3-й уровень ремесла.',
+    'Два полевых обычка, Eastbrook Chainmail Vest и Warded Leggings, известны с начала и куются где угодно. Лестница тренера, это девять рецептов в трех ступенях у горна Eastbrook: медная ступень бесплатна на 0 навыке, ступень ironlink стоит 25 серебра за рецепт на 25 навыке, а ступень osmiumscale стоит 1 золото каждый на 50 навыке, и каждая ступень доступна к обучению, как только ваш разряд ее достигает.\n\nЗа лестницей сидят два особых. Boundstone Helm, это комбинированный рецепт Smith, учится у тренера, не требует станка и работается только настроенным Smith с обоими ремеслами на 25 навыке. Мантии печной чешуи не нужен учитель вовсе: ее знают все, но на 75 навыке и привязанная к forge, она венчает 3-й уровень ремесла.',
   'guide.profPages.craftProse.armorcrafting.routeHeading': 'Шедевры и рабочий путь к 125',
   'guide.profPages.craftProse.armorcrafting.routeBody':
-    'От ступени ironlink и выше каждое изделие катит шанс шедевра; медные обычки, что только для брони, сработать не могут, ведь шедевр улучшает характеристики, а их у них нет. Iron считается материалом 1-го уровня для срабатывания, а arcanite, 2-го.\n\nПодъем, это стандартная трехступенчатая поездка: copper до 25, ironlink до 50, thoriumscale до 75, обучая каждую ступень в день ее открытия. Где Armorcrafting везет, так это на отрезке после 75: Sootscale Mantle, это рецепт 3-го уровня, так что он платит полную отдачу до 99 и половину после, а значит последние пятьдесят очков берут около 75 изделий вместо 150, что нужны ремеслу без венца. Каждая mantle стоит семь thorium ore и пять Smithing Flux, так что запаситесь в Thornpeak и у прилавка forge перед забегом.\n\nРабочий заказ Darva покупает восемь copper ore каждые 30 минут за монеты и опыт, приятный сток для низкой руды, из которой вы вырастаете. Книга деяний отмечает Hammer and Plate на 50 навыке, а Grandmaster Armorcrafting ждет на пределе в 125.',
+    'От ступени ironlink и выше каждое изделие катит шанс шедевра; медные обычки, что только для брони, сработать не могут, ведь шедевр улучшает характеристики, а их у них нет. Iron считается материалом 1-го уровня для срабатывания, а глифосталь, 2-го.\n\nПодъем, это стандартная трехступенчатая поездка: copper до 25, ironlink до 50, osmiumscale до 75, обучая каждую ступень в день ее открытия. Где Armorcrafting везет, так это на отрезке после 75: Мантия печной чешуи, это рецепт 3-го уровня, так что он платит полную отдачу до 99 и половину после, а значит последние пятьдесят очков берут около 75 изделий вместо 150, что нужны ремеслу без венца. Каждая мантия стоит семь osmium ore и пять Smithing Flux, так что запаситесь в Thornpeak и у прилавка forge перед забегом.\n\nРабочий заказ Darva покупает восемь copper ore каждые 30 минут за монеты и опыт, приятный сток для низкой руды, из которой вы вырастаете. Книга деяний отмечает Hammer and Plate на 50 навыке, а Grandmaster Armorcrafting ждет на пределе в 125.',
   'guide.profPages.craftProse.tailoring.identityHeading': 'Ткань для заклинателей, сумки для всех',
   'guide.profPages.craftProse.tailoring.identityBody':
-    "Лестница поднимается от домотканых основ через набор goldweave к редкой ступени: Silkbinder's Raiment и вещи sunweave. Ее второе ремесло всеобще: Silkspun Satchel, это сумка на десять ячеек, и нет класса, специализации или уровня, что не хотел бы больше места в сумках.\n\nНа кольце Tailoring сидит между Leatherworking и Inscription. Ее живая пара, это Outfitter, Leatherworking и Tailoring вместе, присягаемая перед Weaver Ottilie у loom Eastbrook после выбраковки четырех webwood spiders ради их шелка; пара Mageweaver с Inscription названа на кольце, но ждет первых рецептов Inscription, прежде чем ей можно будет присягнуть.",
+    "Лестница поднимается от домотканых основ через набор золочёного плетения к редкой ступени: Silkbinder's Raiment и вещи sunweave. Ее второе ремесло всеобще: Silkspun Satchel, это сумка на десять ячеек, и нет класса, специализации или уровня, что не хотел бы больше места в сумках.\n\nНа кольце Tailoring сидит между Leatherworking и Inscription. Ее живая пара, это Outfitter, Leatherworking и Tailoring вместе, присягаемая перед Weaver Ottilie у loom Eastbrook после выбраковки четырех webwood spiders ради их шелка; пара Inkweaver с Inscription названа на кольце, но ждет первых рецептов Inscription, прежде чем ей можно будет присягнуть.",
   'guide.profPages.craftProse.tailoring.materialsHeading': 'Нить, шелк и, да, травы',
   'guide.profPages.craftProse.tailoring.materialsBody':
-    "Loom работает на том, что роняет охота и растят поля. Linen scraps и homespun cloth снимаются с гуманоидных убийств, spider silk собирается с туш пауков, а центральная часть редкой ступени, Silkbinder's Raiment, хочет Pristine Silk, подписанный образец, что подбрасывает удачный сбор с туши.\n\nHerbalism кормит tailoring больше любого другого ремесла снаряжения: silverleaf отделывает тапочки, goldleaf красит набор goldweave, а sunpetal прошивает всю редкую ступень, так что портной, что собирает свои травы, стабильно экономит. Spool of Thread стоит 12 меди у Ottilie, а loom не просит ни капли металла: даже капстоун Wardweave Cowl соткан из премиальных трав, Pristine Silk, spider silk и нити.",
+    "Loom работает на том, что роняет охота и растят поля. Linen scraps и homespun cloth снимаются с гуманоидных убийств, spider silk собирается с туш пауков, а центральная часть редкой ступени, Silkbinder's Raiment, хочет Pristine Silk, подписанный образец, что подбрасывает удачный сбор с туши.\n\nHerbalism кормит tailoring больше любого другого ремесла снаряжения: трава глянцелист отделывает тапочки, goldleaf красит набор золочёного плетения, а sunpetal прошивает всю редкую ступень, так что портной, что собирает свои травы, стабильно экономит. Spool of Thread стоит 12 меди у Ottilie, а loom не просит ни капли металла: даже капстоун Wardweave Cowl соткан из премиальных трав, Pristine Silk, spider silk и нити.",
   'guide.profPages.craftProse.tailoring.ladderHeading': 'Обучение у loom Ottilie',
   'guide.profPages.craftProse.tailoring.ladderBody':
-    'Два полевых обычка, Eastbrook Wool Trousers и Ritual Vestments, известны с начала и куются где угодно. Лестница тренера идет у loom к югу от колодца Eastbrook: ступень homespun (hood, mitts, slippers) бесплатна на 0 навыке, ступень goldweave (robe, leggings и Silkspun Satchel) стоит 25 серебра за рецепт на 25 навыке, а редкая ступень (raiment, mantle, treads) стоит 1 золото каждый на 50 навыке.\n\nWardweave Cowl не нужен тренер: ее знают все, но она сидит на 75 навыке, привязанная к loom, как венец 3-го уровня ремесла. Как и везде, Ottilie учит рецепту, как только ваш разряд в Tailoring достигает разряда самого рецепта.',
+    'Два полевых обычка, Eastbrook Wool Trousers и Ritual Vestments, известны с начала и куются где угодно. Лестница тренера идет у loom к югу от колодца Eastbrook: ступень homespun (hood, mitts, slippers) бесплатна на 0 навыке, ступень gildenweave (robe, leggings и Silkspun Satchel) стоит 25 серебра за рецепт на 25 навыке, а редкая ступень (raiment, mantle, treads) стоит 1 золото каждый на 50 навыке.\n\nWardweave Cowl не нужен тренер: ее знают все, но она сидит на 75 навыке, привязанная к loom, как венец 3-го уровня ремесла. Как и везде, Ottilie учит рецепту, как только ваш разряд в Tailoring достигает разряда самого рецепта.',
   'guide.profPages.craftProse.tailoring.routeHeading': 'Шедевры и рабочий путь к 125',
   'guide.profPages.craftProse.tailoring.routeBody':
-    'Pristine Silk в raiment сам по себе покрывает бонус шедевра за подписанный реагент, а goldleaf и sunpetal считаются материалами 1-го и 2-го уровня для срабатывания, так что редкая ступень, это где шансы на пике. Простая безхарактерная работа вроде satchel не срабатывает никогда: шедевр улучшает характеристики, а у сумки их нет.\n\nШейте ступень homespun до 25, обучите goldweave в день ее открытия и катитесь до 50, затем редкую ступень до 75. С 75 бразды берет Wardweave Cowl: рецепт 3-го уровня, полная отдача до 99 и половина за ним, примерно 75 изделий на последние пятьдесят очков, каждое ценой два Pristine Silk, четыре spider silk, по паре трав sunpetal и goldleaf и две нити.\n\nПусть подъем окупается: satchels продаются буквально всем, а рабочий заказ loom Ottilie покупает шесть spider silk каждые 30 минут. Книга деяний отмечает A Fine Seam на 50 навыке, а Grandmaster Tailoring ждет на пределе в 125.',
+    'Pristine Silk в raiment сам по себе покрывает бонус шедевра за подписанный реагент, а goldleaf и sunpetal считаются материалами 1-го и 2-го уровня для срабатывания, так что редкая ступень, это где шансы на пике. Простая безхарактерная работа вроде satchel не срабатывает никогда: шедевр улучшает характеристики, а у сумки их нет.\n\nШейте ступень homespun до 25, обучите gildenweave в день ее открытия и катитесь до 50, затем редкую ступень до 75. С 75 бразды берет Wardweave Cowl: рецепт 3-го уровня, полная отдача до 99 и половина за ним, примерно 75 изделий на последние пятьдесят очков, каждое ценой два Pristine Silk, четыре spider silk, по паре трав sunpetal и goldleaf и две нити.\n\nПусть подъем окупается: satchels продаются буквально всем, а рабочий заказ loom Ottilie покупает шесть spider silk каждые 30 минут. Книга деяний отмечает A Fine Seam на 50 навыке, а Grandmaster Tailoring ждет на пределе в 125.',
   'guide.profPages.craftProse.leatherworking.identityHeading': 'Кожа для быстрых',
   'guide.profPages.craftProse.leatherworking.identityBody':
     "Лестница поднимается от простых Fenbridge hide leggings, boots и belt через необычные marshstalker jerkin, hood и spaulders к редкому набору mirewarden, лучшей коже, что может выкроить ремесленник. Две вещи заклинателя ее дополняют: полевой обычок Eastbrook Druid's Hide и Duskhide Wraps на 75 навыке.\n\nНа кольце оно сидит между Cooking и Tailoring. Его живая пара, это Outfitter, Leatherworking и Tailoring, присягаемая перед Weaver Ottilie в Eastbrook; пара Trapper с Cooking названа на кольце, но пока не имеет задания клятвы.",
   'guide.profPages.craftProse.leatherworking.materialsHeading': 'Охота, это и есть добыча',
   'guide.profPages.craftProse.leatherworking.materialsBody':
-    'Leatherworking, это ремесло, где ваш маршрут прокачки и линия снабжения, это одно и то же: rough hide снимается прямо с туш, несущих шкуру, прежде всего волков и вепрей, и каждая туша служит лишь одному сборщику, кто первый, того и добыча. Редкий или лучше бросок сбора также дает Pristine Hide, подписанный образец, что зовет Mirewarden Jerkin, так что берегите каждый, что найдете.\n\nВспомогательный состав невелик: spider legs и silk, homespun cloth с гуманоидов, одна thorium ore в каждой редкой вещи mirewarden (шесть в капстоуне Duskhide Wraps) и Tanning Agent за 16 меди у прилавка tannery. Tanner Hesk продает thorium ore тоже, если вы предпочитаете не добывать.',
+    'Leatherworking, это ремесло, где ваш маршрут прокачки и линия снабжения, это одно и то же: rough hide снимается прямо с туш, несущих шкуру, прежде всего волков и вепрей, и каждая туша служит лишь одному сборщику, кто первый, того и добыча. Редкий или лучше бросок сбора также дает Pristine Hide, подписанный образец, что зовет Mirewarden Jerkin, так что берегите каждый, что найдете.\n\nВспомогательный состав невелик: spider legs и silk, homespun cloth с гуманоидов, одна osmium ore в каждой редкой вещи mirewarden (шесть в капстоуне Duskhide Wraps) и Tanning Agent за 16 меди у прилавка tannery. Tanner Hesk продает osmium ore тоже, если вы предпочитаете не добывать.',
   'guide.profPages.craftProse.leatherworking.ladderHeading': 'Обучение в Fenbridge',
   'guide.profPages.craftProse.leatherworking.ladderBody':
     "Вот загвоздка: tannery стоит в Fenbridge, на дороге Mirefen Marsh, что делает Leatherworking единственным глубоким ремеслом, которому учат за пределами Eastbrook. Tanner Hesk учит лестнице у своих чанов: ступень Fenbridge hide бесплатна на 0 навыке, ступень marshstalker по 25 серебра за рецепт с 25 навыка, а ступень mirewarden по 1 золоту каждый с 50 навыка, и каждая ступень открывается, как только ваш разряд ее достигает.\n\nДва рецепта минуют тренера: полевые обычки (Tanned Leather Jerkin и Druid's Hide) куются где угодно с начала, а Duskhide Wraps известны всем, но сидят на 75 навыке, привязанные к tannery. Заметьте, что сама клятва Outfitter приносится обратно в Eastbrook у Ottilie; только обучение происходит на болоте.",
   'guide.profPages.craftProse.leatherworking.routeHeading': 'Шедевры и рабочий путь к 125',
   'guide.profPages.craftProse.leatherworking.routeBody':
-    "От ступени marshstalker и выше каждое изделие катит шанс шедевра, а Pristine Hide в Mirewarden Jerkin дает бонус за подписанный реагент автоматически; thorium считается материалом 1-го уровня для срабатывания. Безхарактерные обычки из hide сработать не могут.\n\nПрокачивайте естественным путем: собирайте с каждого волка и вепря, которых убиваете с первого уровня, куйте ступень hide до 25 где стоите, затем учитесь в Fenbridge, ведь задания все равно тянут вас на болото. Marshstalker несет вас до 50, а mirewarden до 75; за этим Duskhide Wraps, рецепт 3-го уровня ценой шесть thorium ore, три Pristine Hide, два rough hide и Tanning Agent, платит полную отдачу до 99 и половину после, около 75 изделий на последние пятьдесят очков до предела в 125.\n\nМобильная tannery значит для этого ремесла больше, чем для любого другого: специализируйтесь на 75, и седельная сумка шкур становится готовым снаряжением у костра вместо похода обратно в Fenbridge. Рабочий заказ tannery Hesk покупает восемь rough hides каждые 30 минут, ладный доход со шкур, что вы и так собирали, а Книга деяний отмечает Tanner's Trade на 50 навыке и Grandmaster Leatherworking на пределе.",
+    "От ступени marshstalker и выше каждое изделие катит шанс шедевра, а Pristine Hide в Mirewarden Jerkin дает бонус за подписанный реагент автоматически; osmium считается материалом 1-го уровня для срабатывания. Безхарактерные обычки из hide сработать не могут.\n\nПрокачивайте естественным путем: собирайте с каждого волка и вепря, которых убиваете с первого уровня, куйте ступень hide до 25 где стоите, затем учитесь в Fenbridge, ведь задания все равно тянут вас на болото. Marshstalker несет вас до 50, а mirewarden до 75; за этим Duskhide Wraps, рецепт 3-го уровня ценой шесть osmium ore, три Pristine Hide, два rough hide и Tanning Agent, платит полную отдачу до 99 и половину после, около 75 изделий на последние пятьдесят очков до предела в 125.\n\nМобильная tannery значит для этого ремесла больше, чем для любого другого: специализируйтесь на 75, и седельная сумка шкур становится готовым снаряжением у костра вместо похода обратно в Fenbridge. Рабочий заказ tannery Hesk покупает восемь rough hides каждые 30 минут, ладный доход со шкур, что вы и так собирали, а Книга деяний отмечает Tanner's Trade на 50 навыке и Grandmaster Leatherworking на пределе.",
   'guide.profPages.craftProse.cooking.identityHeading': 'Котел, что кормит группу',
   'guide.profPages.craftProse.cooking.identityBody':
     "Съешьте приготовленное блюдо, и оно лечит вас за 18 секунд отдыха, что между заходами, это самое дешевое лечение в игре. Лестница идет от Pan-Seared River Perch на 90 здоровья до самого Marlow's Grand Roast на 980, крупнейшего сидячего лечения, что существует.\n\nНа кольце Cooking сидит между Alchemy и Leatherworking. Его живая пара, это Apothecary, Alchemy и Cooking, присягаемая перед Cook Marlow у кухонь Eastbrook после охоты на четырех диких вепрей для котла; пара Trapper с Leatherworking названа на кольце, но пока не имеет задания клятвы.",
@@ -9145,19 +9152,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ремесло работается у apothecary в Highwatch, доме Alchemist Verane, Master of the Apothecary, что учит лестнице рецептов, продает Glass Vials по 12 меди и платит монетой за травы через свой рабочий заказ.\n\nНа кольце ремесел Alchemy сидит с ремеслами проб и ошибок, рядом с Engineering с одной стороны и Cooking с другой. Это дает ему два лица пары: Bombardier (Engineering и Alchemy, берется перед Tinker Gizzel в Eastbrook) и Apothecary (Alchemy и Cooking, присягаемая перед Cook Marlow). Настройтесь на любую пару, чтобы сделать Alchemy основным и открыть навык до самого предела; до тех пор оно работает до редкого уровня, как любое необъявленное ремесло.',
   'guide.profPages.craftProse.alchemy.materialsHeading': 'Травы, железы и стекло',
   'guide.profPages.craftProse.alchemy.materialsBody':
-    'Каждый draught хочет Glass Vial плюс травы под свою ступень: silverleaf растет в Eastbrook Vale, goldleaf в Mirefen Marsh, а sunpetal в Thornpeak Heights, по одной траве на зону, так что ваши бутылки взбираются по миру вместе с вами. Herbalism, это естественный напарник, хотя покупка у собирателей или на рынке работает ровно так же; более глубокие зоны держат грядки высших уровней, что просят лучший sickle, так что держите инструмент актуальным, если собираете сами.\n\nЛиния elixir добавляет охотничий ингредиент: Venom Glands, снятые с ядовитых туш, а верхний elixir просит Pristine Venom Gland, подписанный редкий образец, что подбрасывает удачный сбор с туши. Если вы не собираете сами, это ровно те товары, что стоит попросить принести друга-охотника.',
+    'Каждый draught хочет Glass Vial плюс травы под свою ступень: трава глянцелист растет в Eastbrook Vale, goldleaf в Mirefen Marsh, а sunpetal в Thornpeak Heights, по одной траве на зону, так что ваши бутылки взбираются по миру вместе с вами. Herbalism, это естественный напарник, хотя покупка у собирателей или на рынке работает ровно так же; более глубокие зоны держат грядки высших уровней, что просят лучший sickle, так что держите инструмент актуальным, если собираете сами.\n\nЛиния elixir добавляет охотничий ингредиент: Venom Glands, снятые с ядовитых туш, а верхний elixir просит Pristine Venom Gland, подписанный редкий образец, что подбрасывает удачный сбор с туши. Если вы не собираете сами, это ровно те товары, что стоит попросить принести друга-охотника.',
   'guide.profPages.craftProse.alchemy.ladderHeading': 'Лестница рецептов',
   'guide.profPages.craftProse.alchemy.ladderBody':
-    'Каждый знает Minor Healing Potion с начала и может смешать ее где угодно, без станка. Настоящая лестница, это девять рецептов, которым учит Verane у apothecary, три на каждой ступени: рецепты на 0 навыке бесплатны, ступень на 25 навыке стоит 25 серебра за рецепт, а ступень на 50 навыке, 1 золото за рецепт. Каждая ступень, это исцеляющий draught, draught маны и elixir стойкости, шагая от обычных бутылок silverleaf (120 здоровья, 160 маны) через необычные goldleaf (200 здоровья, 260 маны) к редким sunpetal (280 здоровья, 360 маны).\n\nElixirs взбираются так же: Elixir of the Boar дает 6 Стойкости на 10 минут, Venomfire Elixir, 9 на 15 минут, а Elixir of the Serpent, 12 на 15 минут, варя по две бутылки за готовку. Еще один рецепт сидит в стороне: Elixir of the Bear, комбинированное варево, которому Verane учит за 25 серебра, как только ваш Alchemy достигает 25, смешиваемое где угодно, но только настроенным Bombardier с Alchemy и Engineering на 25.',
+    'Каждый знает Minor Healing Potion с начала и может смешать ее где угодно, без станка. Настоящая лестница, это девять рецептов, которым учит Verane у apothecary, три на каждой ступени: рецепты на 0 навыке бесплатны, ступень на 25 навыке стоит 25 серебра за рецепт, а ступень на 50 навыке, 1 золото за рецепт. Каждая ступень, это исцеляющий draught, draught маны и elixir стойкости, шагая от обычных бутылок с травой глянцелист (120 здоровья, 160 маны) через необычные goldleaf (200 здоровья, 260 маны) к редким sunpetal (280 здоровья, 360 маны).\n\nElixirs взбираются так же: Elixir of the Boar дает 6 Стойкости на 10 минут, Vipersear Elixir, 9 на 15 минут, а Elixir of the Serpent, 12 на 15 минут, варя по две бутылки за готовку. Еще один рецепт сидит в стороне: Elixir of the Bear, комбинированное варево, которому Verane учит за 25 серебра, как только ваш Alchemy достигает 25, смешиваемое где угодно, но только настроенным Bombardier с Alchemy и Engineering на 25.',
   'guide.profPages.craftProse.alchemy.routeHeading': 'Путь пивовара к 125',
   'guide.profPages.craftProse.alchemy.routeBody':
-    'Draughts и elixirs не катят шедевры никогда; это срабатывание принадлежит снаряжению с характеристиками. Ваше имя все же путешествует: редкие draughts sunpetal варятся по одной бутылке за раз и приходят с подписью мастера, тогда как двойная партия Elixir of the Serpent остается простой. На 75 навыке вы специализируетесь, и каждый рецепт Alchemy стоит на 20 процентов меньше материалов с этого момента.\n\nВозьмите Herbalism рано и собирайте по мере прокачки: silverleaf повсюду в Vale, и как только вы доберетесь до стола Verane, бесплатная ступень чисто донесет вас до 25 навыка на травах, что вы и так бы собрали. Выучите ступень 25 в тот миг, как она включится, перенесите сбор на болото за goldleaf и пусть рабочий заказ Verane (шесть Goldleaf Herbs за 45 меди, повторяемый каждые 30 минут) возвращает немного монет по ходу.\n\nС 50 варите draughts sunpetal и партии Serpent из трав Thornpeak. Последний отрезок с 100 до 125, это намеренный ручеек, так что варите то, что реально продается, а не жгите травы ради числа, и помните, что расходники, это единственный крафтовый товар, который каждый перекупает вечно. Книга деяний отмечает Strange Brews на 50 навыке и Grandmaster Alchemy на пределе.',
+    'Draughts и elixirs не катят шедевры никогда; это срабатывание принадлежит снаряжению с характеристиками. Ваше имя все же путешествует: редкие draughts sunpetal варятся по одной бутылке за раз и приходят с подписью мастера, тогда как двойная партия Elixir of the Serpent остается простой. На 75 навыке вы специализируетесь, и каждый рецепт Alchemy стоит на 20 процентов меньше материалов с этого момента.\n\nВозьмите Herbalism рано и собирайте по мере прокачки: трава глянцелист повсюду в Vale, и как только вы доберетесь до стола Verane, бесплатная ступень чисто донесет вас до 25 навыка на травах, что вы и так бы собрали. Выучите ступень 25 в тот миг, как она включится, перенесите сбор на болото за goldleaf и пусть рабочий заказ Verane (шесть Goldleaf Herbs за 45 меди, повторяемый каждые 30 минут) возвращает немного монет по ходу.\n\nС 50 варите draughts sunpetal и партии Serpent из трав Thornpeak. Последний отрезок с 100 до 125, это намеренный ручеек, так что варите то, что реально продается, а не жгите травы ради числа, и помните, что расходники, это единственный крафтовый товар, который каждый перекупает вечно. Книга деяний отмечает Strange Brews на 50 навыке и Grandmaster Alchemy на пределе.',
   'guide.profPages.craftProse.engineering.identityHeading': 'Монополия мастера инструментов',
   'guide.profPages.craftProse.engineering.identityBody':
-    'Ремесло работается в toolworks в юго-восточном углу Eastbrook Square, доме Tinker Gizzel, Master of the Toolworks. Уровни с 1 по 3 каждой линии инструментов, это обычный товар торговца; уровни 4 и 5 существуют только через инженера.\n\nНа кольце оно сидит с ремеслами проб и ошибок, рядом с Alchemy и Armorcrafting, давая ему два лица пары: Bombardier (Engineering и Alchemy, берется перед самим Gizzel) и Cogsmith (Armorcrafting и Engineering, названа, но пока не присягаема). Одно предупреждение важнее здесь, чем где-либо: обе ступени рецептов Engineering сидят выше потолка редкого уровня, под которым работают хобби и необъявленные ремесленники, так что число навыка движется только у ремесленника, чьи основные включают Engineering, а сегодня это Bombardier. Строить инструменты может любой; ненастроенный ремесленник просто ничему не учится, делая их.',
+    'Ремесло работается в toolworks в юго-восточном углу Eastbrook Square, доме Tinker Gizzel, Master of the Toolworks. Уровни с 1 по 3 каждой линии инструментов, это обычный товар торговца; уровни 4 и 5 существуют только через инженера.\n\nНа кольце оно сидит с ремеслами проб и ошибок, рядом с Alchemy и Armorcrafting, давая ему два лица пары: Bombardier (Engineering и Alchemy, берется перед самим Gizzel) и Шестерёнщик (Armorcrafting и Engineering, названа, но пока не присягаема). Одно предупреждение важнее здесь, чем где-либо: обе ступени рецептов Engineering сидят выше потолка редкого уровня, под которым работают хобби и необъявленные ремесленники, так что число навыка движется только у ремесленника, чьи основные включают Engineering, а сегодня это Bombardier. Строить инструменты может любой; ненастроенный ремесленник просто ничему не учится, делая их.',
   'guide.profPages.craftProse.engineering.materialsHeading': 'Реагенты и прежние инструменты',
   'guide.profPages.craftProse.engineering.materialsBody':
-    'Каждый рецепт инструмента потребляет инструмент на уровень ниже плюс премиальный материал: четыре Thorium Ore и Mithril Mining Pick становятся Thorium Mining Pick, затем два Arcanite Bars и та ториевая кирка становятся Arcanite Mining Pick, а линии axe и sickle повторяют ту же форму с Ashwood и Elderwood Logs, Goldleaf и Sunpetal Herbs.\n\nGizzel держит все шесть премиальных реагентов в toolworks, если вам нужна скорость вместо маржи, но руда, бревна и травы все добываются в Mirefen Marsh и Thornpeak Heights, и именно в добытом запасе живет прибыль. Единственное исключение, это Arcanite Bar, что только у торговца, так что каждый инструмент уровня arcanite несет фиксированный монетный пол, встроенный в его цену.',
+    'Каждый рецепт инструмента потребляет инструмент на уровень ниже плюс премиальный материал: четыре Osmium Ore и Небосеребряная кирка становятся Osmium Mining Pick, затем два слитка глифостали и та осмиевая кирка становятся Glyphsteel Mining Pick, а линии axe и sickle повторяют ту же форму с Ashwood и бревнами горной сосны, Goldleaf и Sunpetal Herbs.\n\nGizzel держит все шесть премиальных реагентов в toolworks, если вам нужна скорость вместо маржи, но руда, бревна и травы все добываются в Mirefen Marsh и Thornpeak Heights, и именно в добытом запасе живет прибыль. Единственное исключение, это слиток глифостали, что только у торговца, так что каждый инструмент уровня glyphsteel несет фиксированный монетный пол, встроенный в его цену.',
   'guide.profPages.craftProse.engineering.ladderHeading': 'Лестница инструментов',
   'guide.profPages.craftProse.engineering.ladderBody':
     'Вся лестница, это шесть рецептов, все привязаны к станку toolworks и все известны автоматически, никакой платы тренеру: инструменты 4-го уровня pick, axe и sickle на 75 навыке, а версии 5-го уровня на 150 навыке. Это второе число не опечатка, и оно сидит выше нынешнего предела в 125 нарочно: требования навыка здесь никогда не запирают ремесло, они лишь формируют его прирост, так что вы можете построить инструмент 5-го уровня в тот день, как держите его реагенты и его предшественника 4-го уровня.\n\nКаждый готовый инструмент редкого или эпического качества и выходит подписанным, так что ваше имя катается по зонам на поясах других игроков. Engineering также держит половину одного комбинированного рецепта: Elixir of the Bear, который варит настроенный Bombardier с Engineering и Alchemy на 25.',
@@ -9185,13 +9192,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.gatherDeeds.herbalism':
     'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Herbalism вписывает Master of the Meadow. Достижение 100 в любых трех из Mining, Logging, Herbalism и Fishing добавляет Master Gatherer при 25 Известности, а moonlit bloom записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.',
   'guide.profPages.gatherDeeds.fishing':
-    'Рубеж в 100 вписывает Old Salt, а 200 вписывает Master Angler с его титулом, самую вершину искусства рыбака; Fishing также засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах. Первая рыба из вод каждой зоны заполняет свою страницу, а Glimmerfin Koi записывает Glimmer of Hope, так что путники с удочкой в котомке заполняют книгу быстрее, чем ожидают.',
+    'Рубеж в 100 вписывает Old Salt, а 200 вписывает Master Angler с его титулом, самую вершину искусства рыбака; Fishing также засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах. Первая рыба из вод каждой зоны заполняет свою страницу, а Кои солнечного блика записывает Glimmer of Hope, так что путники с удочкой в котомке заполняют книгу быстрее, чем ожидают.',
   'guide.profPages.fish.startHeading': 'С чего начать',
   'guide.profPages.fish.startBody':
     'Simple Fishing Pole стоит 20 меди у Fisherman Brandt в Eastbrook (ищите Old Salt, что зыркает на Mirror Lake с восточной окраины города); Tinker Gizzel, Provisioner Hale в Fenbridge и Quartermaster Bree в Highwatch тоже держат удочки. Используйте удочку лицом к воде, достаточно глубокой, чтобы держать рыбу, примерно до 24 ярдов перед вами, и ваш поплавок улетает.\n\nНельзя забрасывать в бою, вплавь или мертвым: заброс с берега, это задуманная поза, и любая рыбная вода годится, в каждой зоне.',
-  'guide.profPages.fish.koiHeading': 'Glimmerfin Koi',
+  'guide.profPages.fish.koiHeading': 'Кои солнечного блика',
   'guide.profPages.fish.koiBody':
-    'Каждый водоем в игре прячет один и тот же приз: Glimmerfin Koi, необычный проблеск на леске стоимостью 75 меди для торговца и куда больше для вашей гордости. Его шансы, это ровные 3 процента за пойманный улов (4 процента в холодной воде Thornpeak) на каждой полосе, и поимка одного записывает Glimmer of Hope в вашу Книгу деяний, коллекционную отметку с нулевой Известностью. Когда это случается, журнал позаботится, чтобы вы узнали.',
+    'Каждый водоем в игре прячет один и тот же приз: Кои солнечного блика, необычный проблеск на леске стоимостью 75 меди для торговца и куда больше для вашей гордости. Его шансы, это ровные 3 процента за пойманный улов (4 процента в холодной воде Thornpeak) на каждой полосе, и поимка одного записывает Glimmer of Hope в вашу Книгу деяний, коллекционную отметку с нулевой Известностью. Когда это случается, журнал позаботится, чтобы вы узнали.',
   'guide.profPages.econ.sellsHeading': 'Что продается и почему',
   'guide.profPages.econ.sellsBody':
     'Самый стабильный бизнес, это расходники, ведь их тратят и покупают снова. Зелья, приготовленная еда и чары все исчезают с использованием: боец, что купил меч однажды, будет покупать исцеляющие зелья вечно, а каждая свежая вещь снаряжения, это свежий шанс продать чары.\n\nВещи-шедевры, это премиальный край. Их нельзя сделать на заказ, так что одна желанная вещь берет реальную наценку, а ваша подпись на ней, это ходячая реклама. Реагенты, это третий столп: арканные материалы с разбора, типизированные вторичные Resonant, что текут прямо от ломателя к enchanter, и подписанные добытые материалы, за которые ремесленники, гонящиеся за срабатыванием шедевра, платят сверх меры.',

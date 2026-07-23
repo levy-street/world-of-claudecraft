@@ -87,7 +87,7 @@ describe('stack sizes and stacking math', () => {
     ]);
   });
 
-  it('an instanced add merges into a byte-equal slot and never into a plain one (Phase 12d)', () => {
+  it('an instanced add merges into a byte-equal slot and never into a plain one', () => {
     const inv: InvSlot[] = [
       { itemId: 'baked_bread', count: 5, instance: { signer: 'Ana' } },
       { itemId: 'baked_bread', count: 5 },

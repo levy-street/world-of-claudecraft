@@ -33,13 +33,13 @@ function makeWorld(opts: {
   const proficiency = opts.proficiency ?? {};
   return {
     player: { pos: opts.pos ?? { x: NODE.pos.x, z: NODE.pos.z } },
-    // Phase 12: buildNearbyGatherNodes resolves the locked dimension from the
+    // buildNearbyGatherNodes resolves the locked dimension from the
     // viewer's bags; an empty bag reads as the bare-hands tier-1 floor.
     inventory: opts.inventory ?? [],
     nodeHarvestableByMe: opts.harvestable ?? (() => true),
     professionsState: {
-      // The rows carry the RESOLVED per-profession content caps (Phase 12c:
-      // 100 gathering, 200 fishing), matching what both worlds now emit.
+      // The rows carry the RESOLVED per-profession content caps
+      // (100 gathering, 200 fishing), matching what both worlds now emit.
       skills: Object.entries(proficiency).map(([professionId, skill]) => ({
         professionId,
         skill,
@@ -101,12 +101,12 @@ describe('buildNearbyGatherNodes', () => {
   });
 });
 
-// Phase 12: the tool-tier access dimension. `locked` is SEPARATE from the
+// The tool-tier access dimension. `locked` is SEPARATE from the
 // ready/cooldown respawn state so the minimap can compose both; the lock
 // resolves through the sim's own canGatherTier comparator against the
 // viewer's owned-best bag scan (bare hands floor to tier 1).
-describe('tool-tier lock dimension (Phase 12)', () => {
-  // A literal NEW tier-2 vein (the Phase 12 ramp); GATHER_NODES[0] stays the
+describe('tool-tier lock dimension', () => {
+  // A literal NEW tier-2 vein; GATHER_NODES[0] stays the
   // tier-1 arm.
   const T2 = GATHER_NODES.find((n) => n.id === 'ore_mirefen_t2');
   if (!T2) throw new Error('missing ore_mirefen_t2');
@@ -175,7 +175,7 @@ describe('tool-tier lock dimension (Phase 12)', () => {
     expect(gatherDeniedLineKey('node')).toBe('hudChrome.gathering.toolTierUnmetCorpse');
   });
 
-  it('gatherDowngradeLineKey maps each lost arm to its exact key (Phase 12d)', () => {
+  it('gatherDowngradeLineKey maps each lost arm to its exact key', () => {
     expect(gatherDowngradeLineKey('mark')).toBe('hudChrome.gathering.downgradeMark');
     expect(gatherDowngradeLineKey('find')).toBe('hudChrome.gathering.downgradeFind');
   });

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-// Mock the db layer so no Postgres is needed for the Phase 12 online-routing
+// Mock the db layer so no Postgres is needed for the online-routing
 // suite at the bottom (the corpse_harvest_sim.test.ts idiom); the offline
 // suites above it never touch the server.
 vi.mock('../server/db', () => ({
@@ -71,7 +71,7 @@ function teleportOntoNode(sim: Sim, pid: number, nodeId: string) {
   p.prevPos = { ...p.pos };
 }
 
-// Phase 12b: a harvest is a short cast, not an instant grant. These helpers
+// A harvest is a short cast, not an instant grant. These helpers
 // drive both shapes: castAndComplete runs the REAL loop (harvestNode starts
 // the cast, the tick path routes completion), with mobs despawned first
 // because mob damage cancels a gather cast mid-drive; completeCastNow mirrors
@@ -111,7 +111,7 @@ function completeCastNow(sim: Sim, pid: number) {
 
 const NODE_ID = GATHER_NODES[0].id;
 
-// Which material this node grants since Phase 4 (zone x type matrix): the
+// Which material this node grants (zone x type matrix): the
 // harvest tuning row (NODE_HARVEST_TABLE) no longer carries an itemId.
 const NODE_MATERIAL = nodeMaterialFor(GATHER_NODES[0].type, GATHER_NODES[0].zoneId);
 
@@ -352,8 +352,8 @@ describe('gather node harvest (#1121)', () => {
     // The harvest rolls pull from the SHARED sim rng, so a draw on a denial
     // would advance the whole sim's stream and desync every downstream roll.
     // harvestNode dispatches synchronously and nothing ticks inside this
-    // bracket, so every counted draw belongs to the harvest path. Phase 12b
-    // moved the Phase 4 pair to cast COMPLETION: the cast start is draw-free,
+    // bracket, so every counted draw belongs to the harvest path. The harvest
+    // pair resolves at cast COMPLETION: the cast start is draw-free,
     // and completion spends exactly TWO draws, draw #1 the rarity roll
     // (#1122), draw #2 the rare-event roll (gather_events.ts), regardless of
     // the outcome of either.
@@ -408,7 +408,7 @@ describe('gather-completion event for audio (#1729)', () => {
     // A proficiency-0 harvest always rolls common (the rarity ladder puts all
     // weight on common at proficiency 0), so this exact value is seed-independent.
     expect(gather.rarity).toBe('common');
-    // Phase 4 payload fields: seed 42's rare-event draw misses here, so the
+    // Payload fields: seed 42's rare-event draw misses here, so the
     // yield is the common row's single unit and the event says so explicitly.
     expect(gather.rareEvent).toBeNull();
     expect(gather.qty).toBe(1);
@@ -476,12 +476,12 @@ describe('gather-completion event for audio (#1729)', () => {
   });
 });
 
-// The Phase 12 prime directive: every node def that shipped BEFORE the tool
+// The prime directive: every node def that shipped BEFORE the tool
 // tier ramp keeps tier 1 and stays harvestable with no tool at all. The id
 // list is LITERAL, never derived from GATHER_NODES (the FIELD_RECIPES
 // tautology lesson): a future tier edit on any shipped node reds this pin
 // decisively instead of silently re-deriving.
-describe('lockout prevention: pre-phase nodes stay bare-hands harvestable (Phase 12)', () => {
+describe('lockout prevention: pre-phase nodes stay bare-hands harvestable', () => {
   const PRE_PHASE_NODE_IDS = [
     'ore_eastbrook_1',
     'ore_eastbrook_2',
@@ -525,7 +525,7 @@ describe('lockout prevention: pre-phase nodes stay bare-hands harvestable (Phase
         sim.drainEvents().some((e) => e.type === 'gatherDenied'),
         id,
       ).toBe(false);
-      // Phase 12b: a successful interaction STARTS a cast; drop it so the
+      // A successful interaction STARTS a cast; drop it so the
       // next node's attempt is not denied as busy (this lockout pin is about
       // access, not grants).
       const p = mustEntity(sim, pid);
@@ -553,10 +553,10 @@ describe('lockout prevention: pre-phase nodes stay bare-hands harvestable (Phase
   });
 });
 
-// Deny ORDER pins (Phase 12): dead -> unknown node -> too far -> respawn ->
+// Deny ORDER pins: dead -> unknown node -> too far -> respawn ->
 // tool gate -> bags full. Each case constructs the two competing denials at
 // once, so the winning arm proves the order.
-describe('node tool gate ordering (Phase 12)', () => {
+describe('node tool gate ordering', () => {
   const T2 = 'ore_mirefen_t2';
 
   it('the respawn deny fires before the tool gate: a cooling node never emits gatherDenied', () => {
@@ -565,7 +565,7 @@ describe('node tool gate ordering (Phase 12)', () => {
     teleportOntoNode(sim, pid, T2);
     sim.addItem('iron_mining_pick', 1, pid);
     expect(sim.harvestNode(T2, pid)).toBe(true);
-    // Complete the cast: Phase 12b consumes the respawn timer at completion
+    // Complete the cast: the respawn timer is consumed at completion
     // (inside resolveHarvest), never at the cast start.
     completeCastNow(sim, pid);
     // Drop the pick: the second attempt is both cooling AND tool-short.
@@ -618,12 +618,12 @@ describe('node tool gate ordering (Phase 12)', () => {
   });
 });
 
-// Same-seed determinism across every NEW Phase 12 path in one drive: a denied
+// Same-seed determinism across every new gated path in one drive: a denied
 // bare-hands attempt, a granted tier-2 harvest, a corpse harvest, and a
 // tool-capped fishing catch. The observable is the full event stream plus the
 // settled post-state, so an extra/removed rng draw or a reordered emit on any
 // of these paths breaks the pin.
-describe('Phase 12 determinism (same seed, same drive)', () => {
+describe('gated-path determinism (same seed, same drive)', () => {
   it('two Sims produce identical event streams and post-state through the gated paths', () => {
     const run = () => {
       const sim = new Sim({ seed: 4242, playerClass: 'warrior', noPlayer: true });
@@ -681,7 +681,7 @@ describe('Phase 12 determinism (same seed, same drive)', () => {
   });
 });
 
-// --- Online routing (Phase 12): the live GameServer router + snapshot
+// --- Online routing: the live GameServer router + snapshot
 // pipeline, the professions_fishing pin-8 / corpse_harvest_sim idiom. The
 // gatherDenied event is personal (routed generically by ev.pid, no server
 // change), and a granted harvest still mirrors the per-player cooldown over
@@ -764,7 +764,7 @@ function bareClient(pid: number): ClientWorld {
   return c;
 }
 
-describe('node tool gating over the live server (Phase 12)', () => {
+describe('node tool gating over the live server', () => {
   it('gatherDenied reaches the attempting session only; a granted harvest still mirrors ncd', () => {
     const server = new GameServer();
     const fcA = fakeWs();

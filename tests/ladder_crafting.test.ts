@@ -1,4 +1,4 @@
-// Phase 10 QA: the 54 LADDER_RECIPES execute end to end through the real
+// The 54 LADDER_RECIPES execute end to end through the real
 // craft path (station gate satisfied, reagents consumed, output produced),
 // the four specimen consumers consume their always-signed instance reagent,
 // Sim.trainRecipe charges the real ladder rungs (free rung 0, exactly 10000
@@ -134,11 +134,11 @@ describe('Sim.trainRecipe on real ladder rungs', () => {
 
 describe('crafted elixir defs and the live use path', () => {
   // Literal def pins: a typo'd value, duration, aura name, or kind in any of
-  // the three Phase 10 elixirs would otherwise ship silently (the elixir
+  // the three crafted elixirs would otherwise ship silently (the elixir
   // MECHANISM is pinned via elixir_of_the_bear in tests/elixir.test.ts).
   const EXPECTED: Record<string, { aura: string; value: number; duration: number }> = {
     elixir_of_the_boar: { aura: 'Might of the Boar', value: 6, duration: 600 },
-    venomfire_elixir: { aura: 'Venomfire Vigor', value: 9, duration: 900 },
+    venomfire_elixir: { aura: 'Vipersear Vigor', value: 9, duration: 900 },
     elixir_of_the_serpent: { aura: 'Might of the Serpent', value: 12, duration: 900 },
   };
 

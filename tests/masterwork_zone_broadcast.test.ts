@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-// Masterwork zone broadcast (Professions 2.0 Phase 6): a masterwork proc in
+// Masterwork zone broadcast (Professions 2.0): a masterwork proc in
 // the overworld emits one pid-scoped `masterworkZone` copy per player in the
 // crafter's zone, the crafter included, next to (never instead of) the
 // personal `masterwork` event. Instanced players never receive the copy, and
@@ -218,7 +218,7 @@ describe('online ClientWorld host', () => {
   });
 });
 
-// Live GameServer wire routing (Phase 6 QA): the emit suite above pins the
+// Live GameServer wire routing: the emit suite above pins the
 // craft -> announceMasterworkZone integration (hunted seed) and the parity
 // golden pins the crafter's own copy, but nothing pinned that each pid-scoped
 // zone copy actually reaches ITS session, and only that session, over the
@@ -249,14 +249,16 @@ function joinServer(
 }
 
 describe('masterworkZone over the live GameServer wire (session routing)', () => {
-  it('routes each pid-scoped copy to its own session only: nearby yes, other zone no', () => {
+  it('routes each pid-scoped copy to its own session only: nearby yes, other zone no, instanced never', () => {
     const server = new GameServer();
     const fcCrafter = fakeWs();
     const fcNearby = fakeWs();
     const fcFar = fakeWs();
+    const fcDelver = fakeWs();
     const sc = joinServer(server, fcCrafter, 91, 'Crafter');
     const sn = joinServer(server, fcNearby, 92, 'Nearby');
     const sf = joinServer(server, fcFar, 93, 'Farhand');
+    const sd = joinServer(server, fcDelver, 94, 'Delver');
     const entities = (server.sim as unknown as { entities: Map<number, Entity> }).entities;
     const crafterE = entities.get(sc.pid)!;
     const zoneId = zoneAt(crafterE.pos.z).id;
@@ -273,6 +275,14 @@ describe('masterworkZone over the live GameServer wire (session routing)', () =>
     expect(zoneAt(z).id).not.toBe(zoneId);
     farE.pos.z = z;
     farE.prevPos = { ...farE.prevPos, z };
+    // Park the delver in instance space (same overworld z as the crafter, so
+    // ONLY the x-arm of the emitToZonePlayers exclusion keeps them out): the
+    // exclusion was previously proven at the unit level only, never over the
+    // live wire.
+    const delverE = entities.get(sd.pid)!;
+    delverE.pos.x = DUNGEON_X_THRESHOLD + 100;
+    delverE.prevPos = { ...delverE.prevPos, x: delverE.pos.x };
+    expect(zoneAt(delverE.pos.z).id).toBe(zoneId);
 
     // Fan out on the LIVE server sim (the craft trigger itself is pinned by the
     // emit suite; this suite owns the wire routing), then run the real pump.
@@ -300,11 +310,12 @@ describe('masterworkZone over the live GameServer wire (session routing)', () =>
       zoneId,
     });
     // Each in-zone session got exactly ITS copy (recipient pid, not the
-    // crafter's), the other-zone session got nothing, and the payload is the
-    // exact text-free key set.
+    // crafter's), the other-zone session got nothing, the instance-space
+    // session got nothing, and the payload is the exact text-free key set.
     expect(zoneEvsOf(fcCrafter.sent)).toEqual([copyFor(sc.pid)]);
     expect(zoneEvsOf(fcNearby.sent)).toEqual([copyFor(sn.pid)]);
     expect(zoneEvsOf(fcFar.sent)).toEqual([]);
+    expect(zoneEvsOf(fcDelver.sent)).toEqual([]);
   });
 });
 

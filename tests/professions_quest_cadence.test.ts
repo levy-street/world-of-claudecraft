@@ -12,7 +12,7 @@ import {
 } from '../src/sim/professions/cadence';
 import { computeQuestState, Sim } from '../src/sim/sim';
 
-// A repeatable work order with a real cooldown (content, Phase 14): turned in at
+// A repeatable work order with a real cooldown (content): turned in at
 // the forge master, on a 30-minute window.
 const WORK_ORDER = 'q_prof_workorder_forge';
 const FORGE_MASTER = 'forgemistress_darva';
@@ -107,7 +107,7 @@ describe('cadence.ts pure helpers', () => {
     expect(clamped.get('atCap')).toBe(100 + WORK_ORDER_CADENCE_TICKS);
   });
 
-  it('isCadenceElapsed is the shared inclusive-at-now boundary (Phase 15 QA directed fix)', () => {
+  it('isCadenceElapsed is the shared inclusive-at-now boundary', () => {
     // The ONE predicate both clampCadenceOnLoad and serializeCadence sit on:
     // a window lapsing exactly at `now` is already available, hence elapsed.
     expect(isCadenceElapsed(100, 99)).toBe(false); // still live
@@ -178,7 +178,7 @@ describe('computeQuestState cadence gating', () => {
   });
 });
 
-describe('work-order turn-in arms the cooldown (Sim, Phase 14)', () => {
+describe('work-order turn-in arms the cooldown (Sim)', () => {
   it('turn-in arms the window, blocks re-accept inside it, and reopens after it lapses', () => {
     const sim = makeSim();
     expect(sim.questState(WORK_ORDER)).toBe('available');
@@ -252,7 +252,7 @@ describe('work-order turn-in arms the cooldown (Sim, Phase 14)', () => {
     expect(saved && 'questCadence' in saved).toBe(false);
   });
 
-  it('an elapsed key is pruned at serialize while a live one survives unchanged (Phase 15 QA directed fix)', () => {
+  it('an elapsed key is pruned at serialize while a live one survives unchanged', () => {
     const sim = makeSim();
     turnInWorkOrder(sim);
     const meta = sim.players.get(sim.playerId)!;

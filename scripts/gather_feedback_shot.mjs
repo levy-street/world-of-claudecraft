@@ -1,4 +1,4 @@
-// Visual proof of the Phase 4 gather feedback (Professions 2.0): the
+// Visual proof of the gather feedback (Professions 2.0): the
 // rarity-colored "You gather:" line the gatherResult event renders next to the
 // grant hub's "You receive:" loot line, and the pristine-vein zone broadcast
 // with its five-fold signed yield. Boots the offline game, teleports next to a

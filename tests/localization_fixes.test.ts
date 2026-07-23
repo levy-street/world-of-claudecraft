@@ -911,7 +911,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // #1121: per-player node harvest command denials (dead gate, unknown node,
     // range, respawn timer, bag-full pre-check).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/gathering.ts'), 'utf8'),
-    // Professions 2.0 Phase 11: the fishing command bodies moved out of sim.ts.
+    // Professions 2.0: the fishing command bodies moved out of sim.ts.
     // Three literals have their ONLY emitter occurrences here ("No fish are
     // biting.", "A rare catch! Something gleams on your line.", "You need to
     // face fishable water."); they are byte-identical after the move so their
@@ -920,20 +920,20 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // (bags-full, dead/in-combat/swimming/busy) are byte-identical to literals
     // in already-scanned files.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/fishing.ts'), 'utf8'),
-    // Professions 2.0 Phase 12c: the one-time mastery reset module. It emits
+    // Professions 2.0: the one-time mastery reset module. It emits
     // no inline player text itself today (the notice is an authored letter in
     // content/letters.ts, localized by letterId through entity i18n), but
     // every new sim module joins the scan list in the same change so any
     // future emit added here lands under the drift guard from day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/mastery_reset.ts'), 'utf8'),
-    // Professions 2.0 Phase 12c: the shared action-throttle module (the
+    // Professions 2.0: the shared action-throttle module (the
     // crafting window logic extracted from crafting.ts). It emits no player
     // text itself (the throttled denial is a reason code its callers
     // localize), but every new sim module joins the scan list in the same
     // change so any future emit added here lands under the drift guard from
     // day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/action_throttle.ts'), 'utf8'),
-    // Professions 2.0 Phase 13: the typed disenchant-secondary mapper. It emits
+    // Professions 2.0: the typed disenchant-secondary mapper. It emits
     // no player text itself (a pure def -> material-id mapping consumed by
     // enchanting.ts), but every new sim module joins the scan list in the same
     // change so any future emit added here lands under the drift guard from
@@ -942,40 +942,40 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       path.resolve(process.cwd(), 'src/sim/professions/disenchant_reagents.ts'),
       'utf8',
     ),
-    // Professions 2.0 Phase 12d: the identical-payload stack-merge predicate.
+    // Professions 2.0: the identical-payload stack-merge predicate.
     // It emits no player text itself (pure stacking bookkeeping consumed by
     // bags/bank/trade/sim), but every new sim module joins the scan list in
     // the same change so any future emit added here lands under the drift
     // guard from day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/item_instance_merge.ts'), 'utf8'),
-    // Professions 2.0 Phase 12d: the force-rename instance-signer sweep. It
+    // Professions 2.0: the force-rename instance-signer sweep. It
     // emits no player text itself (pure signer bookkeeping the rename handler
     // consumes), but every new sim module joins the scan list in the same
     // change so any future emit added here lands under the drift guard from
     // day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/character_rename.ts'), 'utf8'),
-    // Professions 2.0 Phase 14: the ticks-based cadence primitive. Pure timing
+    // Professions 2.0: the ticks-based cadence primitive. Pure timing
     // helpers (no SimContext, no emits), but every new sim module joins the scan
     // list in the same change so any future emit lands under the drift guard.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/cadence.ts'), 'utf8'),
-    // Professions 2.0 Phase 14: the tier-crossing master mail sweep. It emits no
+    // Professions 2.0: the tier-crossing master mail sweep. It emits no
     // inline player text (the congratulation is an authored letter in
     // content/letters.ts, localized by letterId through entity i18n), but every
     // new sim module joins the scan list in the same change.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/tier_mail.ts'), 'utf8'),
-    // Professions 2.0 Phase 14: the trend-nudge / first-tier-tutorial sweep. It
+    // Professions 2.0: the trend-nudge / first-tier-tutorial sweep. It
     // emits only TEXT-FREE personal events (profTrendNudge/profTierTutorial); the
     // client renders the localized lines. Scanned so any future inline emit lands
     // under the drift guard from day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/prof_nudges.ts'), 'utf8'),
-    // Professions 2.0 Phase 14: the attunement celebration events. Emits only
+    // Professions 2.0: the attunement celebration events. Emits only
     // TEXT-FREE personal + zone events (attuned/attunedZone); the client renders
     // the localized lines. Scanned so any future inline emit lands under the guard.
     fs.readFileSync(
       path.resolve(process.cwd(), 'src/sim/professions/attunement_events.ts'),
       'utf8',
     ),
-    // Professions 2.0 Phase 14b: Commissions and the Maker's Bond (the
+    // Professions 2.0: Commissions and the Maker's Bond (the
     // commission eligibility rule, the unbind fee ladder, and the unbind
     // service resolver). It emits only the TEXT-FREE personal unbindResult
     // event (via the Sim facade); the client renders the localized lines.
@@ -992,6 +992,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Bank system: the pooled bank deposit/withdraw/buy-slots command bodies
     // emit the quest-item/full/afford/max-slots refusals + the purchase notice.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/bank.ts'), 'utf8'),
+    // Heroic anti-kite mob charge: the "unleashes" announce line (the mechanic
+    // name doubles as the mob_charge_stun debuff, localized via AURA_NAME_KEY's
+    // 'Charge' row like the other boss mechanics).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/charge.ts'), 'utf8'),
     socialSrc,
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The
@@ -1295,5 +1299,49 @@ describe('S3 meta-guard: quest_commands.ts stays on the simSrc scan list', () =>
       listBlock.includes(`'${entry}'`),
       `${entry} must stay in the S3 simSrc scan list (the PR 2039 blind-spot fix)`,
     ).toBe(true);
+  });
+});
+
+// --- Elixir aura names must round-trip the AURA_NAME_KEY reverse map. The
+// aura string is authored twice (the item def's elixir.aura and the sim_i18n
+// map row); a rename that touches only one side silently un-localizes the
+// buff-bar aura for every non-English player, with no other gate noticing. ---
+describe('elixir aura names stay wired to the sim aura matcher', () => {
+  it('every authored elixir aura resolves through localizeSimAuraName', async () => {
+    const { ITEMS } = await import('../src/sim/data');
+    const auras = Object.values(ITEMS)
+      .map((item) => (item as { elixir?: { aura?: string } }).elixir?.aura)
+      .filter((aura): aura is string => typeof aura === 'string');
+    expect(auras.length).toBeGreaterThanOrEqual(4);
+    setLanguage('en');
+    for (const aura of auras) {
+      // Identity round-trip, not just non-null: the EN DICT value must equal
+      // the item def's aura string, or the matcher resolves a stale name.
+      expect(localizeSimAuraName(aura), `aura "${aura}" out of sync with AURA_NAME_KEY`).toBe(aura);
+    }
+  });
+
+  it('the renamed Vipersear Vigor aura localizes on every non-Latin surface', async () => {
+    const expected: Record<string, string> = {
+      zh_CN: '蝰灼之力',
+      zh_TW: '蝰灼之力',
+      ko_KR: '살무사 작열의 활력',
+      ja_JP: '蝮灼の活力',
+      ru_RU: 'Мощь Гадючьего Жара',
+    };
+    try {
+      for (const [locale, value] of Object.entries(expected)) {
+        await ensureLocaleLoaded(locale as Parameters<typeof ensureLocaleLoaded>[0]);
+        setLanguage(locale as Parameters<typeof setLanguage>[0]);
+        expect(localizeSimAuraName('Vipersear Vigor'), locale).toBe(value);
+      }
+    } finally {
+      setLanguage('en');
+    }
+  });
+
+  it('the pre-rename aura string keeps a legacy alias for the deploy window', () => {
+    setLanguage('en');
+    expect(localizeSimAuraName('Venomfire Vigor')).toBe('Vipersear Vigor');
   });
 });

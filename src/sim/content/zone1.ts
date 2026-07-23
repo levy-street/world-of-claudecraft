@@ -703,9 +703,9 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     greeting:
       'Every deed worth doing is worth writing down twice, $N: once for the ledger and once for the fireside.',
   },
-  // Crafting-station masters (Professions 2.0 Phase 8): each stands 1 to 3
+  // Crafting-station masters (Professions 2.0): each stands 1 to 3
   // units beside their station (content/professions.ts STATIONS) with a
-  // guard-safe camp margin (the placement math is in the Phase 8 notes).
+  // guard-safe camp margin (pinned in tests/professions_station_placement.test.ts).
   forgemistress_darva: {
     id: 'forgemistress_darva',
     name: 'Forgemistress Darva',
@@ -714,11 +714,11 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     pos: { x: 5, z: 15 },
     facing: -2.4,
     color: 0xb5541c,
-    // Professions 2.0 Phase 14: the Smith pair's anchor master. Attunement and
+    // Professions 2.0: the Smith pair's anchor master. Attunement and
     // its escalating make-amends return live here now (moved off Smith Haldren),
     // plus the repeatable forge work order.
     questIds: ['q_prof_attune_smith', 'q_prof_amends_smith', 'q_prof_workorder_forge'],
-    // Phase 9 station stocking: thorium_ore is the premium reagent the forge
+    // Station stocking: thorium_ore is the premium reagent the forge
     // station's own recipe (recipe_sootscale_mantle) consumes, so the master
     // sells it alongside quartermaster_bree (zone3).
     vendorItems: [
@@ -738,7 +738,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     pos: { x: -12.5, z: 3 },
     facing: Math.PI / 2,
     color: 0xc98a4b,
-    // Professions 2.0 Phase 14: the Apothecary pair's (alchemy + cooking) anchor
+    // Professions 2.0: the Apothecary pair's (alchemy + cooking) anchor
     // master. Attunement, make-amends return, and the repeatable kitchens work
     // order live here.
     questIds: ['q_prof_attune_apothecary', 'q_prof_amends_apothecary', 'q_prof_workorder_kitchens'],
@@ -760,15 +760,15 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     pos: { x: -4, z: -9 },
     facing: 0.8,
     color: 0x7161a8,
-    // Professions 2.0 Phase 14: the Outfitter pair's (leatherworking + tailoring)
+    // Professions 2.0: the Outfitter pair's (leatherworking + tailoring)
     // anchor master. Attunement, make-amends return, and the repeatable loom work
     // order live here.
     questIds: ['q_prof_attune_outfitter', 'q_prof_amends_outfitter', 'q_prof_workorder_loom'],
-    // Phase 9 station stocking: thorium_ore was stocked as the premium
-    // reagent of the loom's own recipe. The Phase 15 QA directed burn-down
-    // moved recipe_wardweave_cowl off thorium (silk plus premium herbs now),
+    // Station stocking: thorium_ore was stocked as the premium
+    // reagent of the loom's own recipe. An input rework later
+    // moved recipe_wardweave_cowl off osmium (silk plus premium herbs now),
     // but the stock stays: removing a shipped vendor row is out of that
-    // change's input-rework scope, and loom customers still buy it for the
+    // rework's scope, and loom customers still buy it for the
     // forge crafts next door.
     vendorItems: [
       'linen_pouch',
@@ -787,7 +787,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     pos: { x: 9.5, z: -14 },
     facing: -0.8,
     color: 0xb08d57,
-    // Professions 2.0 Phase 14: the Bombardier pair's (engineering + alchemy)
+    // Professions 2.0: the Bombardier pair's (engineering + alchemy)
     // anchor master. Attunement, make-amends return, and the repeatable toolworks
     // work order live here.
     questIds: [
@@ -795,7 +795,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'q_prof_amends_bombardier',
       'q_prof_workorder_toolworks',
     ],
-    // Phase 9 station stocking: the six premium reagents the toolworks
+    // Station stocking: the six premium reagents the toolworks
     // recipes (TOOL_RECIPES) consume, previously sold only by
     // quartermaster_bree (zone3).
     vendorItems: [
@@ -1154,7 +1154,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     minLevel: 6,
     suggestedPlayers: 3,
   },
-  // Profession attunement (Professions 2.0 Phase 14): each of the four wave-one
+  // Profession attunement (Professions 2.0): each of the four wave-one
   // archetype pairs has its own anchor master and its own fixed-pair acceptance
   // quest, so the masters are independent entry points (no q_prof_intro gate).
   // The chosen pair is carried on the quest's completionEffect.pairId; the
@@ -1225,7 +1225,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     shareable: false,
     completionEffect: { type: 'attunePair', mode: 'new', pairId: 'engineering+alchemy' },
   },
-  // Make-amends returns (Professions 2.0 Phase 14): repeatable, one per anchor
+  // Make-amends returns (Professions 2.0): repeatable, one per anchor
   // master, taken only for a pair the character has held before. The first
   // objective's count is resolved at accept time from the character's return
   // history (resolvedObjectiveCounts 'archetypeAmends' -> 5 + 3 * switchCount),
@@ -1309,7 +1309,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     resolvedObjectiveCounts: 'archetypeAmends',
     completionEffect: { type: 'attunePair', mode: 'return', pairId: 'engineering+alchemy' },
   },
-  // Repeatable craft work orders (Professions 2.0 Phase 14): a master takes a
+  // Repeatable craft work orders (Professions 2.0): a master takes a
   // stack of their craft's staple material off your hands for coin, a light
   // economy sink on a fixed cadence (repeatCadenceTicks WORK_ORDER_CADENCE_TICKS).
   // The collect turn-in consumes the materials (turnInQuestCore removeItem).
@@ -1399,7 +1399,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     completionText:
       'A lighter choice, but a useful one. Follow that curiosity as far as rare work will take it.',
     objectives: [{ type: 'gather', nodeType: 'herb', count: 3, label: 'Herb patch harvested' }],
-    // Phase 12c: 0 XP on purpose. The hobby switch is a repeatable identity
+    // 0 XP on purpose. The hobby switch is a repeatable identity
     // toggle; any XP on it becomes a farmable trickle, so it pays nothing.
     xpReward: 0,
     copperReward: 0,

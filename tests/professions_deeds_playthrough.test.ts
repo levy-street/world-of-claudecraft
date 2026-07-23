@@ -1,4 +1,4 @@
-// Professions 2.0 Phase 15: ONE real Sim scripted through the packet's deed
+// Professions 2.0: ONE real Sim scripted through the deed
 // beats end to end, with NO direct grantDeed shortcuts anywhere: every unlock
 // below lands through its live site (the craft command, the quest-validated
 // attunement, a real masterwork proc, the queued-grant proficiency drain, the
@@ -72,13 +72,13 @@ function marqueeBar(deedId: string): boolean {
   return def.renown >= 25 || def.reward !== undefined;
 }
 
-describe('Phase 15 scripted playthrough (one sim, live sites only)', () => {
+describe('scripted playthrough (one sim, live sites only)', () => {
   it('beat 1: the first successful craft lands Made By Hand through the craft command', () => {
     sim.tick(); // settle spawn
     expect(meta.deedsEarned.has('prog_first_craft')).toBe(false);
     sim.addItem('linen_scrap', 3, pid);
     sim.addItem('spider_leg', 1, pid);
-    // Phase 15 burn-down: the vestments recipe gained cloth and thread volume.
+    // The vestments recipe gained cloth and thread volume.
     sim.addItem('homespun_cloth', 3, pid);
     sim.addItem('spool_of_thread', 5, pid);
     sim.craftItem(VESTMENTS_RECIPE, false, pid);
@@ -92,7 +92,7 @@ describe('Phase 15 scripted playthrough (one sim, live sites only)', () => {
     expect(deedEvents(evs).some((ev) => ev.deedId === 'prog_first_craft')).toBe(true);
   });
 
-  it('beat 2: the quest-validated attunement is the Guildsworn moment (marquee, titled)', () => {
+  it('beat 2: the quest-validated attunement is the Craftsworn moment (marquee, titled)', () => {
     const renownBefore = meta.renown;
     moveToNpc(SMITH_MASTER);
     sim.acceptQuest('q_prof_attune_smith', PAIR);
@@ -111,7 +111,7 @@ describe('Phase 15 scripted playthrough (one sim, live sites only)', () => {
     expect(ev?.pid).toBe(pid);
     expect(ev?.retro).toBeUndefined(); // a live grant, not the veteran heal
     expect(meta.renown).toBe(renownBefore + 25);
-    expect(DEEDS.prog_guildsworn.reward).toEqual({ kind: 'title', text: 'Guildsworn' });
+    expect(DEEDS.prog_guildsworn.reward).toEqual({ kind: 'title', text: 'Craftsworn' });
     expect(marqueeBar('prog_guildsworn')).toBe(true);
     // The title reward is immediately selectable (the nameplate surface).
     sim.setActiveTitle('prog_guildsworn', pid);
@@ -378,7 +378,7 @@ describe('Phase 15 scripted playthrough (one sim, live sites only)', () => {
     sim.entities.delete(mob.id);
   });
 
-  it('epilogue: the whole playthrough earned every Phase 15 beat deed exactly once', () => {
+  it('epilogue: the whole playthrough earned every beat deed exactly once', () => {
     const earned = [
       'prog_first_craft',
       'prog_guildsworn',

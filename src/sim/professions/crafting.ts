@@ -1,13 +1,13 @@
 // Common-tier crafting resolution (issue #1127). Behind the SimContext seam:
 // checks a player has every reagent a recipe requires, consumes them (denying
 // and consuming NOTHING if any reagent is short), grants the recipe's declared
-// output deterministically (Professions 2.0 Phase 2 retired the output quality
+// output deterministically (Professions 2.0 retired the output quality
 // roll: the only output-side rng is the single masterwork proc draw below, at
 // the same draw position the old roll occupied), and grants a flat point of
 // craft skill (see wheel.ts: additive-only, free-floor). A proc mints a
 // masterwork instance whose bonus stats are baked from the item budget
 // (professions/masterwork.ts): add-only, never a downgrade. Input-side rng
-// (gathering.ts rollMaterialRarity) is untouched by the Phase 2 model.
+// (gathering.ts rollMaterialRarity) is untouched by the deterministic-output model.
 //
 // Scope: originally the common-tier path only; the module now also resolves
 // the higher-tier content that landed on it (content/recipes.ts TOOL_RECIPES
@@ -20,7 +20,7 @@
 //
 // #1149 (Battlefield Experience) attribution: a crafted output whose DEF
 // quality is rare-or-better is stamped with its crafter's name via
-// ctx.addItemInstance (under Phase 2 the signing threshold reads the static
+// ctx.addItemInstance (the signing threshold reads the static
 // def quality, since outputs no longer roll one), same signable-rarity
 // threshold and same {signer} shape gathering.ts's harvestCorpse already uses
 // for monster materials (#1145). Below that threshold the output stays a
@@ -95,7 +95,7 @@ import {
   tierForSkill,
 } from './wheel';
 
-// The BASE craft-skill amount per successful craft, scaled by the Phase 12c
+// The BASE craft-skill amount per successful craft, scaled by the
 // four-state mastery curve at the gain site below (CRAFT_SKILL_GAIN *
 // craftSkillGainMultiplier): full 1, reduced 0.5, minimal 0.25, gray 0. The
 // old tier-0 free-floor GAIN rule (skill always accrues on the cheapest
@@ -107,13 +107,13 @@ export interface CraftResult {
   ok: boolean;
   recipeId: string;
   // Present only when ok: the granted item id/count and the OUTPUT DEF quality
-  // (Phase 2: outputs are deterministic, so quality is a static fact of the
+  // (outputs are deterministic, so quality is a static fact of the
   // result item's def, normalized onto the MaterialRarity ladder; the rolled
   // quality is retired).
   itemId?: string;
   count?: number;
   quality?: MaterialRarity;
-  // Phase 2 masterwork model: true only when the masterwork effect applied to
+  // Masterwork model: true only when the masterwork effect applied to
   // this craft's output (a proc hit AND the effect gates passed). Absent
   // otherwise, including on every plain deterministic success.
   masterwork?: boolean;
@@ -121,7 +121,7 @@ export interface CraftResult {
   // instance (signer === the crafting player's own name) counted toward it,
   // reducing that reagent's required quantity by one for this craft.
   selfSignedBonusApplied?: boolean;
-  // Commissions (Professions 2.0 Phase 14b): true only when the opt-in flag
+  // Commissions (Professions 2.0): true only when the opt-in flag
   // was honored, i.e. the output is an eligible equipment kind and every
   // granted copy was minted armed with bindOnTrade (commission.ts). Absent
   // when the flag was not set AND when it was silently ignored for an
@@ -183,7 +183,7 @@ export function acquireRecipe(
  *  separately from `acquireRecipe` (mirroring the resolveCraft /
  *  resolveCraftForRecipe split above) so tests can exercise the success and
  *  wrong_source arms against a synthetic gated recipe, independent of the
- *  real acquisition-gated content (since Professions 2.0 Phase 9 the three
+ *  real acquisition-gated content (since Professions 2.0 the three
  *  COMBO_RECIPES in `content/recipes.ts` are trainer-gated; see
  *  ./training.ts for the training flow that feeds this the 'trainer'
  *  source). */
@@ -297,7 +297,7 @@ export function meetsComboRequirement(
  *  consumption never happens. On success, consumes every reagent (each
  *  discounted per the crafter's #1145 self-signed reduction composed with
  *  their #1134 specialization discount), draws the single masterwork proc
- *  roll (Phase 2: the one and only output-side rng draw; the old quality
+ *  roll (the one and only output-side rng draw; the old quality
  *  roll is retired and outputs are deterministic), grants the recipe's
  *  declared output (signing a rare-or-better-DEF single-copy output for
  *  #1149 Battlefield Experience attribution; a masterwork proc mints a
@@ -315,7 +315,7 @@ export function resolveCraftForRecipe(
   commission = false,
 ): CraftResult {
   const meta = ctx.players.get(pid);
-  // Phase 8 station gate (supersedes #1297's hub gate; the level arm retired
+  // Station gate (supersedes #1297's hub gate; the level arm retired
   // with it): a station-bound recipe requires the player to stand at a
   // station of the recipe's type, OR to have their own ACTIVE mobile station
   // (mobile_station.ts) whose craft maps to that type. Checked before every
@@ -349,7 +349,7 @@ export function resolveCraftForRecipe(
   if (!hasRecipeMaterials(ctx, recipe, pid)) {
     return { ok: false, recipeId: recipe.id, reason: 'insufficient_materials' };
   }
-  // #1301 output throttle, Phase 12c shared: one action window paced across
+  // #1301 output throttle, shared: one action window paced across
   // crafting, disenchant, enchant-apply, and salvage (action_throttle.ts),
   // checked (never side-effected on denial beyond the window's own natural
   // rollover) before any reagent is consumed.
@@ -381,7 +381,7 @@ export function resolveCraftForRecipe(
     if (meta && hasSignedInstance(meta, reagent.itemId)) signedReagentUsed = true;
     ctx.removeItem(reagent.itemId, required.count, pid);
   }
-  // Masterwork proc draw (Phase 2): the single output-side rng draw, at the
+  // Masterwork proc draw: the single output-side rng draw, at the
   // exact position the retired quality roll occupied so the world's draw
   // order and the one-draw-per-successful-craft contract are preserved. The
   // draw is UNCONDITIONAL on the success path: it happens even when the
@@ -420,15 +420,15 @@ export function resolveCraftForRecipe(
       tierCapability(craftSkills, recipe.professionId) - tierForSkill(recipe.skillReq),
     signedReagent: signedReagentUsed,
     specialized: isSpecialized(craftSkills, recipe.professionId),
-    // Phase 10: higher-tier materials raise the proc odds. Pure def-level
+    // Higher-tier materials raise the proc odds. Pure def-level
     // lookup over the recipe's declared reagent list (material_tier.ts), so
     // it draws nothing and cannot move the single procRoll draw above.
     materialTierBonus: materialTierBonusForReagents(recipe.reagents),
   });
   // Effect gate (gates the EFFECT, never the draw): the def must bake a
   // non-null bonus record, and the bumped quality tier must not exceed the
-  // archetype ceiling (the Phase 1 invariant that a dormant or hobby craft's
-  // output never exceeds its ceiling tier, re-expressed for Phase 2). When
+  // archetype ceiling (the invariant that a dormant or hobby craft's
+  // output never exceeds its ceiling tier). When
   // gated off, the craft still succeeds as a plain deterministic craft.
   const masterwork =
     !!meta &&
@@ -437,8 +437,8 @@ export function resolveCraftForRecipe(
     bumped !== null &&
     bumped.tier <= ceilingTier;
   const outputQuality = defOutputQuality(def);
-  // Commissions (Professions 2.0 Phase 14b): the opt-in flag arms every
-  // granted copy with the Phase 13 bind-on-trade primitive, but ONLY for the
+  // Commissions (Professions 2.0): the opt-in flag arms every
+  // granted copy with the bind-on-trade primitive, but ONLY for the
   // ruled-in equipment kinds (commission.ts isCommissionEligible). For any
   // other output kind the flag is silently ignored (server authority: a
   // tampered flag can never arm a potion), and a non-commission craft is
@@ -525,7 +525,7 @@ export function resolveCraftForRecipe(
  *  and signs against: the result item def's own static quality, normalized
  *  onto the MaterialRarity ladder ('poor' or absent read as 'common', the
  *  same normalization the budget math applies; no recipe outputs a poor def
- *  today). Phase 2: the rolled output quality is retired, so quality is a
+ *  today). The rolled output quality is retired, so quality is a
  *  fact of the def, identical for every craft of the same recipe. */
 function defOutputQuality(def: ItemDef | undefined): MaterialRarity {
   const quality = def?.quality;
@@ -554,7 +554,7 @@ export function resolveCraft(
 // hudChrome.crafting.* catalog keys; this must not also emit a ctx.error
 // toast, or a denied craft prints twice and the second copy is unlocalized.
 // Runs on the deterministic tick the wire command arrives on, never off-tick.
-// `commission` (Phase 14b) is the opt-in boolean off the craft command; the
+// `commission` is the opt-in boolean off the craft command; the
 // resolve honors it only for eligible equipment outputs (commission.ts).
 export function craftItem(
   ctx: SimContext,
@@ -570,11 +570,11 @@ export function craftItem(
     // A station-bound success already proved station presence in the
     // resolve's station gate, so stationType alone identifies one. The
     // persisted stat key stays 'hubCraftsPerformed' for save back-compat: it
-    // now means station-bound crafts (Phase 8 renamed the gate, not the key).
+    // now means station-bound crafts (the gate was renamed, not the key).
     if (recipeById(recipeId)?.stationType) {
       ctx.bumpDeedStat(r.meta, 'hubCraftsPerformed', 1);
     }
-    // Phase 15: a masterwork proc feeds the Masterwright counter
+    // A masterwork proc feeds the Masterwright counter
     // (prog_masterwright). Resolved strictly AFTER the resolve's single
     // output-side proc draw; this bump draws nothing. Deliberately NO retro
     // arm: masterworking is repeatable, so a veteran whose procs predate the

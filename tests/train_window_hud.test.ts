@@ -1,4 +1,4 @@
-// Source pins over the Hud's Phase 9 training integration (the
+// Source pins over the Hud's recipe-training integration (the
 // craft_celebration/log_event_route source-scan style: the wiring lives in
 // the hud.ts coordinator, so these pin the load-bearing snippets instead of
 // booting the whole Hud):
@@ -18,7 +18,7 @@ const hudSource = readFileSync(resolve(__dirname, '../src/ui/hud.ts'), 'utf8');
 
 function trainResultArm(): string {
   const start = hudSource.indexOf("case 'trainResult': {");
-  // Phase 14b inserted the unbindResult arm between trainResult and
+  // The unbindResult arm sits between trainResult and
   // masterwork; the slice ends at the NEXT case so the single-surface pins
   // below stay scoped to the trainResult arm alone.
   const end = hudSource.indexOf("case 'unbindResult': {", start);
@@ -92,13 +92,13 @@ describe('hud.ts trainResult event arm (source pins)', () => {
     const arm = trainResultArm();
     expect(arm).toContain('this.renderTrain();');
     expect(arm).toContain('this.renderCrafting();');
-    expect(arm).toContain("$('#crafting-window').style.display === 'block'");
+    expect(arm).toContain("$('#crafting-window').style.display === 'flex'");
   });
 });
 
 describe('hud.ts crafting known-filter (source pins)', () => {
   it('filters the recipe list through the SHARED viewer predicate before the view build', () => {
-    // Deliberate re-pin (Phase 9 QA): the filter must delegate to the one
+    // Deliberate re-pin: the filter must delegate to the one
     // isRecipeKnownForViewer helper the train ladder also uses, never an
     // inline restatement the two windows could let drift apart.
     expect(hudSource).toContain('const knownRecipes = this.sim.recipeList.filter((recipe) =>');

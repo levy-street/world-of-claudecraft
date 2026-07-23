@@ -1,5 +1,5 @@
-// Thin DOM consumer for the first-tier tutorial panel (Professions 2.0 Phase
-// 14): paints the once-ever explainer fired by the `profTierTutorial` event.
+// Thin DOM consumer for the first-tier tutorial panel (Professions 2.0):
+// paints the once-ever explainer fired by the `profTierTutorial` event.
 //
 // Reuses the shared confirm-dialog modal family (the .window.panel shell plus
 // the .cd-body / .cd-actions chrome, so no new styles) rather than bespoke

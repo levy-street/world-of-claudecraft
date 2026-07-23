@@ -22,7 +22,7 @@ function teleportOntoNode(sim: Sim, pid: number, nodeId: string) {
   p.prevPos = { ...p.pos };
 }
 
-// Phase 12b: harvestNode STARTS a gather cast; quest credit lands at
+// harvestNode STARTS a gather cast; quest credit lands at
 // completion. Mirror the lifecycle completion arm synchronously (the
 // gather_rare_events.test.ts completeCastNow idiom) so these seed-stable
 // drives stay free of world-tick noise. Only called after a GRANTED start

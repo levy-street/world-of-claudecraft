@@ -10,7 +10,7 @@
 // account-owned :id route in the registry actually MOUNTS an account-scoped owner
 // loader that DENIES a non-owned / absent id with a 404 (deny-by-default), before
 // the handler's success body is ever produced. It is the load-bearing BOLA
-// coverage test the packet leans on: a route that carried the marker but forgot to
+// coverage test: a route that carried the marker but forgot to
 // mount requireOwnedCharacter would ship a cross-account read hole that the
 // metadata check waves through; this sweep turns that into a red test.
 //

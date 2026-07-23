@@ -105,8 +105,8 @@ export interface GuideDeed {
 }
 
 // ---------------------------------------------------------------- professions
-// Professions 2.0 reference data (Phase 15 wiki arm). TRANSPARENCY POLICY,
-// maintainer-resolved: the professions sections publish EXACT numbers (skill
+// Professions 2.0 reference data (wiki arm). TRANSPARENCY POLICY:
+// the professions sections publish EXACT numbers (skill
 // requirements, gain boundaries, band thresholds, caps, fees, odds, vendor
 // prices), all derived from the sim source; tests/guide.test.ts guards every
 // row against the live defs. Display names are baked English proper nouns
@@ -3650,7 +3650,7 @@ export const GUIDE_DEEDS: GuideDeed[] = [
   },
   {
     "id": "exp_first_ore",
-    "name": "Strike the Earth",
+    "name": "Pick Meets Stone",
     "category": "exploration",
     "renown": 5,
     "feat": false,
@@ -3753,11 +3753,11 @@ export const GUIDE_DEEDS: GuideDeed[] = [
   },
   {
     "id": "prog_guildsworn",
-    "name": "Guildsworn",
+    "name": "Craftsworn",
     "category": "progression",
     "renown": 25,
     "feat": false,
-    "rewardTitle": "Guildsworn",
+    "rewardTitle": "Craftsworn",
     "crest": "/ui/deeds/prog_guildsworn.webp"
   },
   {
@@ -4139,7 +4139,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
     "recipes": [
       {
         "id": "recipe_thorium_mining_pick",
-        "name": "Thorium Mining Pick",
+        "name": "Osmium Mining Pick",
         "skillReq": 75,
         "tier": 3,
         "station": "toolworks",
@@ -4147,16 +4147,16 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Thorium Ore",
+            "name": "Osmium Ore",
             "count": 4
           },
           {
-            "name": "Mithril Mining Pick",
+            "name": "Skysilver Mining Pick",
             "count": 1
           }
         ],
         "output": {
-          "name": "Thorium Mining Pick",
+          "name": "Osmium Mining Pick",
           "count": 1,
           "quality": "rare"
         },
@@ -4169,7 +4169,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       },
       {
         "id": "recipe_arcanite_mining_pick",
-        "name": "Arcanite Mining Pick",
+        "name": "Glyphsteel Mining Pick",
         "skillReq": 150,
         "tier": 6,
         "station": "toolworks",
@@ -4177,16 +4177,16 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Arcanite Bar",
+            "name": "Glyphsteel Bar",
             "count": 2
           },
           {
-            "name": "Thorium Mining Pick",
+            "name": "Osmium Mining Pick",
             "count": 1
           }
         ],
         "output": {
-          "name": "Arcanite Mining Pick",
+          "name": "Glyphsteel Mining Pick",
           "count": 1,
           "quality": "epic"
         },
@@ -4229,7 +4229,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       },
       {
         "id": "recipe_elderwood_axe",
-        "name": "Elderwood Axe",
+        "name": "Highpine Axe",
         "skillReq": 150,
         "tier": 6,
         "station": "toolworks",
@@ -4237,7 +4237,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Elderwood Log",
+            "name": "Highpine Log",
             "count": 2
           },
           {
@@ -4246,7 +4246,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Elderwood Axe",
+          "name": "Highpine Axe",
           "count": 1,
           "quality": "epic"
         },
@@ -4271,7 +4271,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 4
           },
           {
-            "name": "Silverleaf Sickle",
+            "name": "Sheenleaf Sickle",
             "count": 1
           }
         ],
@@ -4355,7 +4355,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 1
           },
           {
-            "name": "Silverleaf Herb",
+            "name": "Sheenleaf Herb",
             "count": 2
           }
         ],
@@ -4417,7 +4417,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       },
       {
         "id": "recipe_silverleaf_healing_draught",
-        "name": "Silverleaf Healing Draught",
+        "name": "Sheenleaf Healing Draught",
         "skillReq": 0,
         "tier": 0,
         "station": "apothecary",
@@ -4425,7 +4425,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Silverleaf Herb",
+            "name": "Sheenleaf Herb",
             "count": 4
           },
           {
@@ -4434,7 +4434,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Silverleaf Healing Draught",
+          "name": "Sheenleaf Healing Draught",
           "count": 1,
           "quality": "common"
         },
@@ -4447,7 +4447,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       },
       {
         "id": "recipe_silverleaf_mana_draught",
-        "name": "Silverleaf Mana Draught",
+        "name": "Sheenleaf Mana Draught",
         "skillReq": 0,
         "tier": 0,
         "station": "apothecary",
@@ -4455,7 +4455,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Silverleaf Herb",
+            "name": "Sheenleaf Herb",
             "count": 3
           },
           {
@@ -4464,7 +4464,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Silverleaf Mana Draught",
+          "name": "Sheenleaf Mana Draught",
           "count": 1,
           "quality": "common"
         },
@@ -4489,7 +4489,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 2
           },
           {
-            "name": "Silverleaf Herb",
+            "name": "Sheenleaf Herb",
             "count": 2
           },
           {
@@ -4523,7 +4523,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 2
           },
           {
-            "name": "Silverleaf Herb",
+            "name": "Sheenleaf Herb",
             "count": 2
           },
           {
@@ -4575,7 +4575,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       },
       {
         "id": "recipe_venomfire_elixir",
-        "name": "Venomfire Elixir",
+        "name": "Vipersear Elixir",
         "skillReq": 25,
         "tier": 1,
         "station": "apothecary",
@@ -4596,7 +4596,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Venomfire Elixir",
+          "name": "Vipersear Elixir",
           "count": 1,
           "quality": "uncommon"
         },
@@ -4621,7 +4621,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 2
           },
           {
-            "name": "Silverleaf Herb",
+            "name": "Sheenleaf Herb",
             "count": 3
           },
           {
@@ -4833,7 +4833,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 2
           },
           {
-            "name": "Silverleaf Herb",
+            "name": "Sheenleaf Herb",
             "count": 1
           },
           {
@@ -4935,7 +4935,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 2
           },
           {
-            "name": "Silverleaf Herb",
+            "name": "Sheenleaf Herb",
             "count": 2
           },
           {
@@ -5167,7 +5167,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Thorium Ore",
+            "name": "Osmium Ore",
             "count": 6
           },
           {
@@ -5413,7 +5413,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 4
           },
           {
-            "name": "Thorium Ore",
+            "name": "Osmium Ore",
             "count": 1
           },
           {
@@ -5447,7 +5447,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 5
           },
           {
-            "name": "Thorium Ore",
+            "name": "Osmium Ore",
             "count": 1
           },
           {
@@ -5485,7 +5485,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 2
           },
           {
-            "name": "Thorium Ore",
+            "name": "Osmium Ore",
             "count": 1
           }
         ],
@@ -5697,7 +5697,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       },
       {
         "id": "recipe_silverthread_slippers",
-        "name": "Silverthread Slippers",
+        "name": "Palethread Slippers",
         "skillReq": 0,
         "tier": 0,
         "station": "loom",
@@ -5709,7 +5709,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 3
           },
           {
-            "name": "Silverleaf Herb",
+            "name": "Sheenleaf Herb",
             "count": 2
           },
           {
@@ -5718,7 +5718,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Silverthread Slippers",
+          "name": "Palethread Slippers",
           "count": 1,
           "quality": "common"
         },
@@ -5731,7 +5731,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       },
       {
         "id": "recipe_goldweave_robe",
-        "name": "Goldweave Robe",
+        "name": "Gildenweave Robe",
         "skillReq": 25,
         "tier": 1,
         "station": "loom",
@@ -5752,7 +5752,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Goldweave Robe",
+          "name": "Gildenweave Robe",
           "count": 1,
           "quality": "uncommon"
         },
@@ -5765,7 +5765,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       },
       {
         "id": "recipe_goldweave_leggings",
-        "name": "Goldweave Leggings",
+        "name": "Gildenweave Leggings",
         "skillReq": 25,
         "tier": 1,
         "station": "loom",
@@ -5786,7 +5786,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Goldweave Leggings",
+          "name": "Gildenweave Leggings",
           "count": 1,
           "quality": "uncommon"
         },
@@ -6018,7 +6018,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
-            "name": "Thorium Ore",
+            "name": "Osmium Ore",
             "count": 6
           },
           {
@@ -6254,7 +6254,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       },
       {
         "id": "recipe_thorium_warblade",
-        "name": "Thorium Warblade",
+        "name": "Osmium Warblade",
         "skillReq": 50,
         "tier": 2,
         "station": "forge",
@@ -6262,7 +6262,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
-            "name": "Thorium Ore",
+            "name": "Osmium Ore",
             "count": 4
           },
           {
@@ -6275,7 +6275,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Thorium Warblade",
+          "name": "Osmium Warblade",
           "count": 1,
           "quality": "rare"
         },
@@ -6288,7 +6288,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       },
       {
         "id": "recipe_arcanite_war_axe",
-        "name": "Arcanite War Axe",
+        "name": "Glyphsteel War Axe",
         "skillReq": 50,
         "tier": 2,
         "station": "forge",
@@ -6296,11 +6296,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
-            "name": "Arcanite Bar",
+            "name": "Glyphsteel Bar",
             "count": 1
           },
           {
-            "name": "Thorium Ore",
+            "name": "Osmium Ore",
             "count": 2
           },
           {
@@ -6313,7 +6313,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Arcanite War Axe",
+          "name": "Glyphsteel War Axe",
           "count": 1,
           "quality": "rare"
         },
@@ -6326,7 +6326,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       },
       {
         "id": "recipe_elderwood_battle_staff",
-        "name": "Elderwood Battle Staff",
+        "name": "Highpine Battle Staff",
         "skillReq": 50,
         "tier": 2,
         "station": "forge",
@@ -6334,11 +6334,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
-            "name": "Elderwood Log",
+            "name": "Highpine Log",
             "count": 1
           },
           {
-            "name": "Thorium Ore",
+            "name": "Osmium Ore",
             "count": 2
           },
           {
@@ -6351,7 +6351,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Elderwood Battle Staff",
+          "name": "Highpine Battle Staff",
           "count": 1,
           "quality": "rare"
         },
@@ -6448,7 +6448,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       },
       {
         "id": "recipe_sootscale_mantle",
-        "name": "Sootscale Mantle",
+        "name": "Kilnscale Mantle",
         "skillReq": 75,
         "tier": 3,
         "station": "forge",
@@ -6456,7 +6456,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
-            "name": "Thorium Ore",
+            "name": "Osmium Ore",
             "count": 7
           },
           {
@@ -6465,7 +6465,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Sootscale Mantle",
+          "name": "Kilnscale Mantle",
           "count": 1,
           "quality": "rare"
         },
@@ -6486,11 +6486,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
-            "name": "Arcanite Bar",
+            "name": "Glyphsteel Bar",
             "count": 1
           },
           {
-            "name": "Thorium Ore",
+            "name": "Osmium Ore",
             "count": 5
           },
           {
@@ -6726,7 +6726,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       },
       {
         "id": "recipe_thoriumscale_greathelm",
-        "name": "Thoriumscale Greathelm",
+        "name": "Osmiumscale Greathelm",
         "skillReq": 50,
         "tier": 2,
         "station": "forge",
@@ -6734,11 +6734,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
-            "name": "Thorium Ore",
+            "name": "Osmium Ore",
             "count": 3
           },
           {
-            "name": "Arcanite Bar",
+            "name": "Glyphsteel Bar",
             "count": 1
           },
           {
@@ -6751,7 +6751,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Thoriumscale Greathelm",
+          "name": "Osmiumscale Greathelm",
           "count": 1,
           "quality": "rare"
         },
@@ -6764,7 +6764,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       },
       {
         "id": "recipe_thoriumscale_cuirass",
-        "name": "Thoriumscale Cuirass",
+        "name": "Osmiumscale Cuirass",
         "skillReq": 50,
         "tier": 2,
         "station": "forge",
@@ -6772,11 +6772,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
-            "name": "Thorium Ore",
+            "name": "Osmium Ore",
             "count": 4
           },
           {
-            "name": "Arcanite Bar",
+            "name": "Glyphsteel Bar",
             "count": 1
           },
           {
@@ -6789,7 +6789,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Thoriumscale Cuirass",
+          "name": "Osmiumscale Cuirass",
           "count": 1,
           "quality": "rare"
         },
@@ -6802,7 +6802,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
       },
       {
         "id": "recipe_thoriumscale_leggings",
-        "name": "Thoriumscale Leggings",
+        "name": "Osmiumscale Leggings",
         "skillReq": 50,
         "tier": 2,
         "station": "forge",
@@ -6810,11 +6810,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
-            "name": "Thorium Ore",
+            "name": "Osmium Ore",
             "count": 3
           },
           {
-            "name": "Arcanite Bar",
+            "name": "Glyphsteel Bar",
             "count": 1
           },
           {
@@ -6827,7 +6827,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           }
         ],
         "output": {
-          "name": "Thoriumscale Leggings",
+          "name": "Osmiumscale Leggings",
           "count": 1,
           "quality": "rare"
         },
@@ -6886,7 +6886,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         ]
       },
       {
-        "name": "Mithril Mining Pick",
+        "name": "Skysilver Mining Pick",
         "tier": 3,
         "quality": "uncommon",
         "priceCopper": 150,
@@ -6902,7 +6902,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         ]
       },
       {
-        "name": "Thorium Mining Pick",
+        "name": "Osmium Mining Pick",
         "tier": 4,
         "quality": "rare",
         "priceCopper": null,
@@ -6910,7 +6910,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "craftedBy": "engineering"
       },
       {
-        "name": "Arcanite Mining Pick",
+        "name": "Glyphsteel Mining Pick",
         "tier": 5,
         "quality": "epic",
         "priceCopper": null,
@@ -6945,21 +6945,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "tier": 1,
         "toolTier": 1,
         "count": 2,
-        "material": "Thorium Ore"
+        "material": "Osmium Ore"
       },
       {
         "zone": "Thornpeak Heights",
         "tier": 2,
         "toolTier": 2,
         "count": 1,
-        "material": "Thorium Ore"
+        "material": "Osmium Ore"
       },
       {
         "zone": "Thornpeak Heights",
         "tier": 3,
         "toolTier": 3,
         "count": 1,
-        "material": "Thorium Ore"
+        "material": "Osmium Ore"
       }
     ],
     "respawnSeconds": 120
@@ -7031,7 +7031,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "craftedBy": "engineering"
       },
       {
-        "name": "Elderwood Axe",
+        "name": "Highpine Axe",
         "tier": 5,
         "quality": "epic",
         "priceCopper": null,
@@ -7066,21 +7066,21 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "tier": 1,
         "toolTier": 1,
         "count": 2,
-        "material": "Elderwood Log"
+        "material": "Highpine Log"
       },
       {
         "zone": "Thornpeak Heights",
         "tier": 2,
         "toolTier": 2,
         "count": 1,
-        "material": "Elderwood Log"
+        "material": "Highpine Log"
       },
       {
         "zone": "Thornpeak Heights",
         "tier": 3,
         "toolTier": 3,
         "count": 1,
-        "material": "Elderwood Log"
+        "material": "Highpine Log"
       }
     ],
     "respawnSeconds": 120
@@ -7128,7 +7128,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         ]
       },
       {
-        "name": "Silverleaf Sickle",
+        "name": "Sheenleaf Sickle",
         "tier": 3,
         "quality": "uncommon",
         "priceCopper": 150,
@@ -7166,7 +7166,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "tier": 1,
         "toolTier": 1,
         "count": 3,
-        "material": "Silverleaf Herb"
+        "material": "Sheenleaf Herb"
       },
       {
         "zone": "Mirefen Marsh",
@@ -7291,7 +7291,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         }
       ],
       "junkCutoff": 100,
-      "rareCatch": "Glimmerfin Koi",
+      "rareCatch": "Sunglint Koi",
       "bandTables": [
         {
           "band": 0,
@@ -7317,7 +7317,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                   "quality": "poor"
                 },
                 {
-                  "name": "Glimmerfin Koi",
+                  "name": "Sunglint Koi",
                   "pct": 3,
                   "quality": "uncommon"
                 },
@@ -7352,7 +7352,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                   "quality": "poor"
                 },
                 {
-                  "name": "Glimmerfin Koi",
+                  "name": "Sunglint Koi",
                   "pct": 3,
                   "quality": "uncommon"
                 },
@@ -7382,7 +7382,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                   "quality": "poor"
                 },
                 {
-                  "name": "Glimmerfin Koi",
+                  "name": "Sunglint Koi",
                   "pct": 4,
                   "quality": "uncommon"
                 },
@@ -7419,7 +7419,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                   "quality": "poor"
                 },
                 {
-                  "name": "Glimmerfin Koi",
+                  "name": "Sunglint Koi",
                   "pct": 3,
                   "quality": "uncommon"
                 },
@@ -7454,7 +7454,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                   "quality": "poor"
                 },
                 {
-                  "name": "Glimmerfin Koi",
+                  "name": "Sunglint Koi",
                   "pct": 3,
                   "quality": "uncommon"
                 },
@@ -7484,7 +7484,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                   "quality": "poor"
                 },
                 {
-                  "name": "Glimmerfin Koi",
+                  "name": "Sunglint Koi",
                   "pct": 4,
                   "quality": "uncommon"
                 },
@@ -7521,7 +7521,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                   "quality": "poor"
                 },
                 {
-                  "name": "Glimmerfin Koi",
+                  "name": "Sunglint Koi",
                   "pct": 3,
                   "quality": "uncommon"
                 },
@@ -7556,7 +7556,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                   "quality": "poor"
                 },
                 {
-                  "name": "Glimmerfin Koi",
+                  "name": "Sunglint Koi",
                   "pct": 3,
                   "quality": "uncommon"
                 },
@@ -7586,7 +7586,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
                   "quality": "poor"
                 },
                 {
-                  "name": "Glimmerfin Koi",
+                  "name": "Sunglint Koi",
                   "pct": 4,
                   "quality": "uncommon"
                 },
@@ -7640,23 +7640,23 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
   "disenchantByQuality": [
     {
       "quality": "common",
-      "material": "Arcane Dust"
+      "material": "Chime Dust"
     },
     {
       "quality": "uncommon",
-      "material": "Arcane Dust"
+      "material": "Chime Dust"
     },
     {
       "quality": "rare",
-      "material": "Arcane Essence"
+      "material": "Chime Essence"
     },
     {
       "quality": "epic",
-      "material": "Arcane Shard"
+      "material": "Chime Shard"
     },
     {
       "quality": "legendary",
-      "material": "Arcane Shard"
+      "material": "Chime Shard"
     }
   ],
   "typedSecondaries": {
@@ -7698,14 +7698,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 5
         }
       ],
       "bonus": [
         {
           "stat": "str",
-          "value": 5
+          "value": 2
         }
       ]
     },
@@ -7716,14 +7716,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 5
         }
       ],
       "bonus": [
         {
           "stat": "int",
-          "value": 5
+          "value": 2
         }
       ]
     },
@@ -7734,14 +7734,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 5
         }
       ],
       "bonus": [
         {
           "stat": "sta",
-          "value": 8
+          "value": 3
         }
       ]
     },
@@ -7752,14 +7752,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         }
       ],
       "bonus": [
         {
           "stat": "spi",
-          "value": 5
+          "value": 3
         }
       ]
     },
@@ -7770,14 +7770,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 5
         }
       ],
       "bonus": [
         {
           "stat": "agi",
-          "value": 5
+          "value": 2
         }
       ]
     },
@@ -7788,18 +7788,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         },
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 2
         }
       ],
       "bonus": [
         {
           "stat": "sta",
-          "value": 10
+          "value": 4
         }
       ]
     },
@@ -7810,14 +7810,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 5
         }
       ],
       "bonus": [
         {
           "stat": "sta",
-          "value": 6
+          "value": 3
         }
       ]
     },
@@ -7828,18 +7828,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         },
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 2
         }
       ],
       "bonus": [
         {
           "stat": "sta",
-          "value": 8
+          "value": 3
         }
       ]
     },
@@ -7850,14 +7850,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 5
         }
       ],
       "bonus": [
         {
           "stat": "agi",
-          "value": 6
+          "value": 3
         }
       ]
     },
@@ -7868,14 +7868,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 5
         }
       ],
       "bonus": [
         {
           "stat": "int",
-          "value": 6
+          "value": 3
         }
       ]
     },
@@ -7886,14 +7886,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         }
       ],
       "bonus": [
         {
           "stat": "agi",
-          "value": 4
+          "value": 2
         }
       ]
     },
@@ -7904,14 +7904,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         }
       ],
       "bonus": [
         {
           "stat": "spi",
-          "value": 4
+          "value": 2
         }
       ]
     },
@@ -7922,14 +7922,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 5
         }
       ],
       "bonus": [
         {
           "stat": "agi",
-          "value": 5
+          "value": 2
         }
       ]
     },
@@ -7940,18 +7940,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         },
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 2
         }
       ],
       "bonus": [
         {
           "stat": "int",
-          "value": 8
+          "value": 4
         }
       ]
     },
@@ -7962,18 +7962,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         },
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 1
         }
       ],
       "bonus": [
         {
           "stat": "armor",
-          "value": 30
+          "value": 15
         }
       ]
     },
@@ -7984,14 +7984,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         }
       ],
       "bonus": [
         {
           "stat": "int",
-          "value": 5
+          "value": 2
         }
       ]
     },
@@ -8002,14 +8002,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         }
       ],
       "bonus": [
         {
           "stat": "agi",
-          "value": 5
+          "value": 2
         }
       ]
     },
@@ -8020,14 +8020,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 5
         }
       ],
       "bonus": [
         {
           "stat": "str",
-          "value": 5
+          "value": 2
         }
       ]
     },
@@ -8038,14 +8038,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 5
         }
       ],
       "bonus": [
         {
           "stat": "int",
-          "value": 5
+          "value": 2
         }
       ]
     },
@@ -8056,18 +8056,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         },
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 2
         }
       ],
       "bonus": [
         {
           "stat": "spi",
-          "value": 8
+          "value": 4
         }
       ]
     },
@@ -8078,18 +8078,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         },
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 2
         }
       ],
       "bonus": [
         {
           "stat": "armor",
-          "value": 40
+          "value": 20
         }
       ]
     },
@@ -8100,14 +8100,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 5
         }
       ],
       "bonus": [
         {
           "stat": "str",
-          "value": 6
+          "value": 3
         }
       ]
     },
@@ -8118,14 +8118,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 5
         }
       ],
       "bonus": [
         {
           "stat": "agi",
-          "value": 6
+          "value": 3
         }
       ]
     },
@@ -8136,18 +8136,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         },
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 2
         }
       ],
       "bonus": [
         {
           "stat": "int",
-          "value": 8
+          "value": 4
         }
       ]
     },
@@ -8158,14 +8158,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 5
         }
       ],
       "bonus": [
         {
           "stat": "str",
-          "value": 6
+          "value": 3
         }
       ]
     },
@@ -8176,14 +8176,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         }
       ],
       "bonus": [
         {
           "stat": "str",
-          "value": 4
+          "value": 2
         }
       ]
     },
@@ -8194,14 +8194,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         }
       ],
       "bonus": [
         {
           "stat": "sta",
-          "value": 5
+          "value": 2
         }
       ]
     },
@@ -8212,14 +8212,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         }
       ],
       "bonus": [
         {
           "stat": "str",
-          "value": 4
+          "value": 2
         }
       ]
     },
@@ -8230,14 +8230,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         }
       ],
       "bonus": [
         {
           "stat": "agi",
-          "value": 4
+          "value": 2
         }
       ]
     },
@@ -8248,14 +8248,14 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "base",
       "reagents": [
         {
-          "name": "Arcane Dust",
+          "name": "Chime Dust",
           "count": 3
         }
       ],
       "bonus": [
         {
           "stat": "int",
-          "value": 4
+          "value": 2
         }
       ]
     },
@@ -8266,18 +8266,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "greater",
       "reagents": [
         {
-          "name": "Arcane Shard",
+          "name": "Chime Shard",
           "count": 1
         },
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 2
         }
       ],
       "bonus": [
         {
           "stat": "str",
-          "value": 8
+          "value": 5
         }
       ]
     },
@@ -8288,18 +8288,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "greater",
       "reagents": [
         {
-          "name": "Arcane Shard",
+          "name": "Chime Shard",
           "count": 1
         },
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 2
         }
       ],
       "bonus": [
         {
           "stat": "int",
-          "value": 8
+          "value": 5
         }
       ]
     },
@@ -8310,18 +8310,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "greater",
       "reagents": [
         {
-          "name": "Arcane Shard",
+          "name": "Chime Shard",
           "count": 1
         },
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 2
         }
       ],
       "bonus": [
         {
           "stat": "sta",
-          "value": 12
+          "value": 6
         }
       ]
     },
@@ -8332,18 +8332,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "greater",
       "reagents": [
         {
-          "name": "Arcane Shard",
+          "name": "Chime Shard",
           "count": 1
         },
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 3
         }
       ],
       "bonus": [
         {
           "stat": "sta",
-          "value": 14
+          "value": 7
         }
       ]
     },
@@ -8354,18 +8354,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "greater",
       "reagents": [
         {
-          "name": "Arcane Shard",
+          "name": "Chime Shard",
           "count": 1
         },
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 3
         }
       ],
       "bonus": [
         {
           "stat": "sta",
-          "value": 12
+          "value": 6
         }
       ]
     },
@@ -8376,18 +8376,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "greater",
       "reagents": [
         {
-          "name": "Arcane Shard",
+          "name": "Chime Shard",
           "count": 1
         },
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 2
         }
       ],
       "bonus": [
         {
           "stat": "agi",
-          "value": 9
+          "value": 6
         }
       ]
     },
@@ -8398,7 +8398,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "runed",
       "reagents": [
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 2
         },
         {
@@ -8409,18 +8409,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "bonus": [
         {
           "stat": "str",
-          "value": 6
+          "value": 3
         }
       ]
     },
     {
       "id": "enchant_weapon_runed_focus",
-      "name": "Enchant Weapon - Runed Focus",
+      "name": "Enchant Weapon - Runed Sigil",
       "slot": "mainhand",
       "tier": "runed",
       "reagents": [
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 2
         },
         {
@@ -8431,18 +8431,18 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "bonus": [
         {
           "stat": "int",
-          "value": 6
+          "value": 3
         }
       ]
     },
     {
       "id": "enchant_chest_runeweave",
-      "name": "Enchant Chest - Runeweave",
+      "name": "Enchant Chest - Runed Weave",
       "slot": "chest",
       "tier": "runed",
       "reagents": [
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 2
         },
         {
@@ -8453,7 +8453,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "bonus": [
         {
           "stat": "spi",
-          "value": 10
+          "value": 5
         }
       ]
     },
@@ -8464,7 +8464,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "runed",
       "reagents": [
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 2
         },
         {
@@ -8475,7 +8475,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "bonus": [
         {
           "stat": "agi",
-          "value": 8
+          "value": 4
         }
       ]
     },
@@ -8486,7 +8486,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "tier": "runed",
       "reagents": [
         {
-          "name": "Arcane Essence",
+          "name": "Chime Essence",
           "count": 2
         },
         {
@@ -8497,7 +8497,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "bonus": [
         {
           "stat": "sta",
-          "value": 10
+          "value": 5
         }
       ]
     }

@@ -18,7 +18,7 @@ const PAIR = 'weaponcrafting+armorcrafting';
 const DORMANT = 'cooking';
 // The Smith pair's hobby (the craft opposite a major on the ring).
 const HOBBY = 'leatherworking';
-// A pre-Phase-14 non-wave-one pair: attunable only via the retired un-narrowed
+// A legacy non-wave-one pair: attunable only via the retired un-narrowed
 // acceptance quest, a valid adjacent ring pair with NO seated master, so
 // MASTER_TIER_LETTERS carries no entry for it.
 const NON_WAVE_ONE_PRIMARY = 'tailoring';
@@ -52,13 +52,13 @@ function recordingCtx(): { ctx: SimContext; booked: LetterDef[] } {
   return { ctx, booked };
 }
 
-describe('tier-crossing master mail (Professions 2.0 Phase 14)', () => {
+describe('tier-crossing master mail (Professions 2.0)', () => {
   it('baselines an already-attuned character silently (deploy migration, no retroactive spam)', () => {
     const sim = makeSim();
     const meta = attunedMeta(sim);
     meta.craftSkills[PRIMARY] = tierSkill(3);
     meta.craftSkills[SECONDARY] = tierSkill(1);
-    expect(meta.tierMailSent.size).toBe(0); // a loaded pre-Phase-14 save
+    expect(meta.tierMailSent.size).toBe(0); // a loaded legacy save
 
     const { ctx, booked } = recordingCtx();
     expect(updateTierMailFor(meta, ctx)).toBe(false);
@@ -134,8 +134,8 @@ describe('tier-crossing master mail (Professions 2.0 Phase 14)', () => {
     expect(meta.tierMailSent.get(PRIMARY)).toBe(4);
   });
 
-  it('baseline-arms a pre-phase non-wave-one active pair without mailing or crashing', () => {
-    // A character attuned before Phase 14 (via the retired un-narrowed acceptance
+  it('baseline-arms a legacy non-wave-one active pair without mailing or crashing', () => {
+    // A legacy character attuned via the retired un-narrowed acceptance
     // quest) can hold any of the ten ring pairs; the four seated masters cover
     // only the wave-one pairs, so this pair has no MASTER_TIER_LETTERS entry.
     const sim = makeSim();
@@ -281,7 +281,7 @@ describe('tier-crossing master mail (Professions 2.0 Phase 14)', () => {
         [DORMANT]: Number.NaN,
         [HOBBY]: -1,
         alchemy: Infinity,
-        // Phase 15 QA directed fix: a VALID tier on an id not on the shipped
+        // A VALID tier on an id not on the shipped
         // ring (a retired craft, a corrupt save) drops instead of being kept
         // forever, so the record self-heals on load.
         goldsmithing: 2,
@@ -292,7 +292,7 @@ describe('tier-crossing master mail (Professions 2.0 Phase 14)', () => {
     ]);
   });
 
-  it('drops an unknown craft id on load while known keys survive the round trip (Phase 15 QA directed fix)', () => {
+  it('drops an unknown craft id on load while known keys survive the round trip', () => {
     const sim = makeSim();
     const meta = attunedMeta(sim);
     meta.craftSkills[PRIMARY] = tierSkill(2);

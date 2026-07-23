@@ -53,7 +53,7 @@ export function renderProfessionIdentityCard(
     identity.state === 'unattuned' || !summary.majors
       ? `<p>${esc(t('hudChrome.crafting.identity.unattuned'))}</p>`
       : `<dl class="profession-identity-summary"><dt>${esc(t('hudChrome.crafting.identity.titleLabel'))}</dt><dd>${esc(archetypeTitleText(summary.pairId))}</dd><dt>${esc(t('hudChrome.crafting.identity.majorsLabel'))}</dt><dd>${esc(summary.majors.map(craftNameText).join(' + '))}</dd><dt>${esc(t('hudChrome.crafting.identity.hobbyLabel'))}</dt><dd>${esc(craftNameText(summary.hobbyCraft))}</dd><dt>${esc(t('hudChrome.crafting.identity.historyLabel'))}</dt><dd>${esc(t('hudChrome.crafting.identity.history', { pairs: formatNumber(summary.attunedPairCount, { maximumFractionDigits: 0 }), returns: formatNumber(summary.returnCount, { maximumFractionDigits: 0 }) }))}</dd></dl>`;
-  // The make-amends return cost (Phase 14, closing the 2039 preview gap): shown
+  // The make-amends return cost (closing the 2039 preview gap): shown
   // only while attuned, the same requiredAmendsProgress figure the quest
   // attunement preview and the professions window's switch-cost line render.
   const returnCostHtml = attuned
@@ -92,6 +92,10 @@ export function renderProfessionIdentityCard(
     )
     .join('');
 
-  card.innerHTML = `${headingHtml}${summaryHtml}${returnCostHtml}${tutorial}<ul class="profession-skill-list" role="list">${skillHeader}${skillRows}</ul>${nudges ? `<ul class="profession-identity-nudges" role="list">${nudges}</ul>` : ''}`;
+  // Two-column card: the narrative half (heading, summary, return cost,
+  // tutorial, nudges) beside the skill table, so the card reads as a compact
+  // hero instead of a tall stack (the wrapper is layout-only; every child
+  // keeps its class and semantics).
+  card.innerHTML = `<div class="profession-identity-main">${headingHtml}${summaryHtml}${returnCostHtml}${tutorial}${nudges ? `<ul class="profession-identity-nudges" role="list">${nudges}</ul>` : ''}</div><ul class="profession-skill-list" role="list">${skillHeader}${skillRows}</ul>`;
   parent.appendChild(card);
 }

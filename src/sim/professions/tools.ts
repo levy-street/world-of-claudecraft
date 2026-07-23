@@ -65,7 +65,7 @@ export function canHarvestMonsterMaterial(toolTier: number, materialTier: number
   return toolTierCovers(toolTier, materialTier);
 }
 
-// Owned-best tool resolution (Professions 2.0 Phase 12). Bare hands resolve to
+// Owned-best tool resolution (Professions 2.0). Bare hands resolve to
 // effective tool tier 1: every tier-1 node/material (all pre-phase content)
 // stays gatherable with no tool at all, only tiers 2+ actually gate. `items`
 // is passed as a parameter (never imported) so this module stays a pure leaf.

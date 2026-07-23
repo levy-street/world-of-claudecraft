@@ -2156,7 +2156,7 @@ export const zh_CN: EnTranslations = {
       "alchemy+cooking": "药剂师",
       "cooking+leatherworking": "捕兽人",
       "leatherworking+tailoring": "制装师",
-      "tailoring+inscription": "织法师",
+      "tailoring+inscription": "织墨师",
       "inscription+enchanting": "秘法师",
       "enchanting+jewelcrafting": "缚晶师",
       "jewelcrafting+weaponcrafting": "铸刃师",
@@ -2213,7 +2213,7 @@ export const zh_CN: EnTranslations = {
       "enchant_legs_greater_stamina": "腿甲附魔 - 强效耐力",
       "enchant_gloves_greater_agility": "护手附魔 - 强效敏捷",
       "enchant_weapon_runed_edge": "武器附魔 - 符文利刃",
-      "enchant_weapon_runed_focus": "武器附魔 - 符文聚能",
+      "enchant_weapon_runed_focus": "武器附魔 - 符文印记",
       "enchant_chest_runeweave": "胸甲附魔 - 符文织纹",
       "enchant_legs_runed_hide": "腿甲附魔 - 符文兽皮",
       "enchant_helmet_runed_links": "头盔附魔 - 符文锁环"
@@ -2245,6 +2245,7 @@ export const zh_CN: EnTranslations = {
       "tutorialLine": "将任意一门技艺提升到技能 {target}，即可解锁你的第一个阶级。",
       "ctaHeader": "下一步",
       "ctaRaise": "继续提升{craft}：距离下一阶级还差 {points} 点。",
+      "ctaRaiseSpecialized": "继续提升{craft}：距离专精还差 {points} 点，材料消耗将降低。",
       "ctaStart": "使用任意专业进行制作或采集，即可开始。",
       "unattunedIdentity": "你尚未调谐任何原型。提升你的技艺并完成一次调谐，以选择你的组合。",
       "nudgeNearTier": "{craft}：距离下一阶级还差 {points} 点",
@@ -3643,7 +3644,7 @@ export const zh_CN: EnTranslations = {
       "stationsHeading": "工位与大师",
       "stationsBody": "三座主城中共设六座分类工位，常驻大师在此传授配方并发布工作订单。",
       "deedsHeading": "铭记旅程的功业",
-      "deedsBody": "功业之书伴随这一切：首次调谐获得Guildsworn，首次杰作获得Masterwright，均可作为头衔佩戴。八种可修行业各在技能50设有里程碑功业，并在上限125加冕Grandmaster头衔；钓鱼在100熟练获得Old Salt，200获得Master Angler头衔。此外还有首次采集、首次制作、野外奇遇与拆解回收的功业。这一切皆为装饰：只有头衔与声望，功业永不赋予力量。",
+      "deedsBody": "功业之书伴随这一切：首次调谐获得Craftsworn，首次杰作获得Masterwright，均可作为头衔佩戴。八种可修行业各在技能50设有里程碑功业，并在上限125加冕Grandmaster头衔；钓鱼在100熟练获得Old Salt，200获得Master Angler头衔。\n\n此外还有更静默的篇章：首次采集与首次制作的功业、野外奇遇中的意外收获，以及拾起拆解之路的印记。这一切皆为装饰，只有头衔与声望。功业永不赋予力量，它只证明你曾在场。",
       "startHeading": "从哪里开始",
       "startBody": "初到Eastbrook？找Foreman Odell接下A Trade for Every Hand，他会指给你镇西南Copper Dig一带的矿脉。此后旅途中经过的每处矿脉、树木与草药都值得采集。回到镇上按T打开制作窗口，先做人人都会的普通配方，再去锻造坊、厨房、织机与工坊拜访诸位大师，顺便接下他们的工作订单换取稳定的铜板。等公会的信找到你时，你早已知道哪一对行业才是归宿。",
       "colStation": "工位",
@@ -3684,9 +3685,9 @@ export const zh_CN: EnTranslations = {
       "colNodeTier": "节点阶级",
       "colToolNeeded": "所需工具",
       "craftIntro": {
-        "weaponcrafting": "武器锻造在东溪的锻造坊打造斧、锤、刃与法杖，从铜制入门武器一路到精良的钍金与奥金之作。",
-        "armorcrafting": "护甲锻造在东溪的锻造坊打造锁甲，从铆接铜甲到精良的钍鳞重甲。",
-        "tailoring": "裁缝在东溪的织机旁织造施法者布甲与一只宽敞的背包，从家纺基础款到精良的日织系列。",
+        "weaponcrafting": "武器锻造是东溪锻造坊的兵器台：斧、锤、刃、矛，乃至法师的法杖，从铜制入门武器一路到精良的锇金与铭钢之作。武器是每个等级段最有感的单件升级，所以武器锻造者是人人都记得结交的朋友。",
+        "armorcrafting": "护甲锻造锤出锁甲，那是工匠能打造的最重护甲，从铆接铜甲基础款到精良的锇鳞套装，旁边还有两件法系属性件。它的客户是那些站在挨打最前线的人。",
+        "tailoring": "裁缝织就施法者赖以生存的智力与精神布甲，从家纺基础款经鎏金织套装爬到精良的日织系列，并缝制Silkspun Satchel，一只十格背包，没有人会拒绝。",
         "leatherworking": "制皮在芬桥的制革坊鞣制灵巧的皮甲，从兽皮基础款到精良的泽守系列。",
         "cooking": "烹饪在东溪的厨房把鱼、野味和草药做成坐下享用的餐食，最高可达精良的盛宴佳肴。",
         "alchemy": "炼金术在高望的药坊调配治疗与法力药剂，以及耐力合剂。",
@@ -3696,43 +3697,43 @@ export const zh_CN: EnTranslations = {
       "craftProse": {
         "weaponcrafting": {
           "identityHeading": "人人都要买的锋刃",
-          "identityBody": "精良一档就覆盖三种胃口：力量近战的Thorium Warblade、敏捷战士的Arcanite War Axe，以及施法者的智力精神法杖Elderwood Battle Staff。在制作之轮上它位于护甲锻造与珠宝加工之间；铁匠（武器锻造与护甲锻造）可在Forgemistress Darva处宣誓，与珠宝加工组成的Bladewright则要等后者的配方随未来区域到来。",
+          "identityBody": "精良一档就覆盖三种胃口：力量近战的Osmium Warblade、敏捷战士的Glyphsteel War Axe，以及施法者的智力精神法杖Highpine Battle Staff。\n\n在制作之轮上它位于护甲锻造与珠宝加工之间。现役命途是铁匠（武器锻造与护甲锻造），可在锻造坊的锻造宗师Darva处宣誓，以自己双手挖掘三处矿脉方可；刃匠（与珠宝加工的搭档）也标注在制作之轮上，但要等珠宝加工随未来区域带来第一批配方，方可宣誓。",
           "materialsHeading": "锻炉吞噬什么",
-          "materialsBody": "采矿是根基：铜矿出自Eastbrook Vale，铁矿出自Mirefen Marsh，钍矿出自Thornpeak Heights。伐木也很重要：铁皮木做矛杆，梣木做锤柄，一根古木成杖。粗皮从狼和野猪尸体上剥取，碎骨来自日常猎杀，梯子上的配方要烧Smithing Flux（Darva处20铜一罐）。Darva卖钍矿，Tinker Gizzel在工坊卖奥金锭，价格不菲。",
+          "materialsBody": "采矿是根基。铜矿出自Eastbrook Vale的一级矿脉，铁矿出自Mirefen Marsh，锇矿出自Thornpeak Heights，每一档梯子都如此升级。伐木的重要性超出预期：铁皮木做野猪矛的矛杆，梣木扛起锤柄，一根高松原木成就那根战棍。\n\n其余材料来自猎获与柜台：粗皮直接从狼和野猪尸体上剥取，碎骨来自日常猎杀，锻造梯子要烧Smithing Flux（Darva处20铜一罐）。若自己采矿跟不上，Darva在锻造坊柜台卖锇矿，Tinker Gizzel在工坊备有铭钢锭，价格之高让人觉得还是交几个采矿朋友合算。",
           "ladderHeading": "一级一级的梯子",
-          "ladderBody": "野外配方Eastbrook Arming Sword人人都会、随处可做。真正的梯子是三档九个训练师配方，全部绑定锻造坊：铜档技能0免费，铁档技能25每个25银，钍档技能50每个1金；你的层级一到，Darva就会教。另有一件组合配方Gravewyrm Gauntlets：只有武器锻造与护甲锻造都到25的调谐铁匠能做，且不需要任何工位。",
+          "ladderBody": "野外配方Eastbrook Arming Sword人人初始即会，可在任何地方用猎获材料（几根狼牙与碎骨）加六罐Smithing Flux打造，无需工位。真正的梯子是三档九个训练师配方，全部绑定锻造坊：铜档技能0免费，铁档技能25每个25银，锇档技能50每个1金。Darva在你该行业的档位达到其门槛的那一刻便会传授，所以每档正好在自身技能段开启时解锁。\n\n命途之外还有一件配方：Gravewyrm Gauntlets，由训练师传授的组合件，只有武器锻造与护甲锻造都达到技能25的调谐铁匠才能制作，且完全不需要任何工位。",
           "routeHeading": "杰作与通往125之路",
-          "routeBody": "有属性的成品（铁档及以上）才可能出杰作；无属性的铜档普通件永远不会触发。铁算一级材料（加成1%），古木与奥金算二级（2%）。路线：铜档到25，铁档到50，钍档到75；此后暂无更高配方，钍档衰减为半速再到四分之一，到125上限约需再做150次，注意每分钟十次的共享节流。Darva的工作订单每30分钟收八块铜矿。功业之书在技能50记下Edge and Temper，125加冕Grandmaster Weaponcrafting。"
+          "routeBody": "梯子上有真实属性加成的成品（即铁档及以上）才有机会出杰作；无属性的铜档普通件永远不会触发，因为杰作是对属性的提升，而它们没有属性。铁算一级材料，高松与铭钢算二级，所以顶档触发率略高。\n\n铜档做到25，铁档一开即练并做到50，再做锇档到75。75之后暂无更高配方，锇档配方收益先降至半速再降至四分之一：预计约需150次才能到达125上限，批量制作时记住每分钟十次制作的共享节流。\n\n边练边回本：Darva的锻造工作订单每30分钟收八块铜矿，换来一点铜钱与经验；铁档与锇档的成品也卖得过练级的近战。功业之书在技能50记下Edge and Temper，125加冕Grandmaster Weaponcrafting。"
         },
         "armorcrafting": {
           "identityHeading": "前线的锁甲",
-          "identityBody": "梯子如同士兵的履历：铆接铜甲起步，ironlink一档有了真正的属性，精良的thoriumscale头盔、胸甲与护腿则是工匠能敲出的最大护甲数值。还有安静的一面：野外普通件Eastbrook Warded Leggings与技能75的Sootscale Mantle（智力精神锁甲肩）留住法系锁甲客户。它位于武器锻造与工程学之间；铁匠对可在Darva处宣誓，Cogsmith暂无誓约任务。",
+          "identityBody": "梯子如同士兵的履历：铆接铜甲起步，ironlink一档有了真正的属性，精良的osmiumscale头盔、胸甲与护腿则是工匠能敲出的最大护甲数值。\n\n还有安静的一面：野外普通件Eastbrook Warded Leggings与技能75的Kilnscale Mantle（智力精神锁甲肩）留住法系锁甲客户。它位于武器锻造与工程学之间；铁匠可在Darva处宣誓，齿轮匠（与工程学搭档）已标注在制作之轮上，但尚无誓约任务。",
           "materialsHeading": "成袋的矿石",
-          "materialsBody": "没有哪个行业吃矿更快：ironlink hauberk一件就要五块铁矿，每件thoriumscale要三到四块钍矿外加一块奥金锭，认真的甲匠要么自己挖遍Mirefen Marsh和Thornpeak Heights，要么花钱请人。金属之外还有软料：粗皮、碎骨与亚麻碎布，几乎每个配方都要一罐Smithing Flux（锻造坊20铜）。急用时Darva柜台就卖钍矿。",
+          "materialsBody": "没有哪个行业吃矿更快：ironlink hauberk一件就要五块铁矿，每件osmiumscale要三到四块锇矿外加一块铭钢锭，认真的甲匠要么自己挖遍Mirefen Marsh和Thornpeak Heights，要么花钱请人。铜矿从矿坑旁的铜矿脉出发供给第一档。\n\n金属之外还有软料：粗皮从狼和野猪尸体上剥取，碎骨与亚麻碎布来自日常猎杀，几乎每个配方都要一罐Smithing Flux（锻造坊20铜）。急用时Darva柜台就卖锇矿。",
           "ladderHeading": "在Darva的锻炉学艺",
-          "ladderBody": "两件野外普通件（Eastbrook Chainmail Vest与Warded Leggings）人人都会、随处可做。训练师梯子是Eastbrook锻造坊的三档九个配方：铜档技能0免费，ironlink档25技能每个25银，thoriumscale档50技能每个1金。梯子之外有两件特例：Boundstone Helm是铁匠组合配方（需调谐且双技能25，不占工位）；Sootscale Mantle无需老师，但要技能75且绑定锻造坊，是本行业的三层压轴。",
+          "ladderBody": "两件野外普通件（Eastbrook Chainmail Vest与Warded Leggings）人人都会、随处可做。训练师梯子是Eastbrook锻造坊的三档九个配方：铜档技能0免费，ironlink档25技能每个25银，osmiumscale档50技能每个1金，各档在你达到其门槛的那一刻即可学习。\n\n梯子之外有两件特例：Boundstone Helm是铁匠组合配方，由训练师传授，无需工位，但只有武器锻造与护甲锻造双技能25的调谐铁匠才能制作；Kilnscale Mantle无需任何训练师，人人都会，但要技能75且绑定锻造坊，是本行业的三层压轴。",
           "routeHeading": "杰作与通往125之路",
-          "routeBody": "ironlink档及以上都掷杰作；只有护甲值的铜档普通件不会触发。铁算一级材料，奥金算二级。路线照常：铜到25，ironlink到50，thoriumscale到75。75之后的运气在于Sootscale Mantle：三层配方，到99全速、之后半速，最后五十点约75次而非150次；每件要七块钍矿五份Smithing Flux，先在Thornpeak和锻造坊柜台备货。Darva的订单每30分钟收八块铜矿。技能50记下Hammer and Plate，125等着Grandmaster Armorcrafting。"
+          "routeBody": "ironlink档及以上都掷杰作；只有护甲值的铜档普通件不会触发，因为杰作是对属性的提升，而它们没有属性。铁算一级材料，铭钢算二级。\n\n路线照常三档：铜到25，ironlink到50，osmiumscale到75，每档一开即学。护甲锻造的运气在于75之后：Kilnscale Mantle是三层配方，到99全速、之后半速，最后五十点约75次而非其他行业没有压轴配方时所需的150次。每件要七块锇矿五份Smithing Flux，先在Thornpeak和锻造坊柜台备货再开跑。\n\nDarva的订单每30分钟收八块铜矿，换来铜钱与经验，是消化低级矿的好去处。功业之书在技能50记下Hammer and Plate，125等着Grandmaster Armorcrafting。"
         },
         "tailoring": {
           "identityHeading": "施法者的布衣，所有人的背包",
-          "identityBody": "梯子从homespun基础布装经goldweave套装爬到精良档：Silkbinder's Raiment与sunweave件。第二门生意人人需要：Silkspun Satchel是十格背包，没有哪个职业或等级嫌包多。裁缝位于制皮与铭文之间；制装师（制皮与裁缝）在Eastbrook织机旁的Weaver Ottilie处宣誓（先猎四只webwood蜘蛛取丝），与铭文组成的Mageweaver要等铭文的第一批配方。",
+          "identityBody": "梯子从homespun基础布装经鎏金织套装爬到精良档：Silkbinder's Raiment与sunweave件。第二门生意人人需要：Silkspun Satchel是十格背包，没有哪个职业或等级嫌包多。\n\n裁缝位于制皮与铭文之间。现役命途是制装师（制皮与裁缝），在Eastbrook织机旁的Weaver Ottilie处宣誓，先猎四只webwood蜘蛛取丝；与铭文组成的Inkweaver也标注在制作之轮上，但要等铭文的第一批配方到来方可宣誓。",
           "materialsHeading": "线、丝，还有草药",
-          "materialsBody": "织机靠猎获与田野运转：亚麻碎布与家纺布来自人形生物，蜘蛛丝从蛛尸上采取，精良档的核心Silkbinder's Raiment要一块Pristine Silk（尸体采集的署名标本）。草药喂养裁缝胜过任何装备行业：银叶镶拖鞋，金叶染goldweave，日瓣草贯穿整个精良档。Spool of Thread在Ottilie处12铜一轴，织机根本不用金属，连Wardweave Cowl顶阶也是用高级草药、Pristine Silk、蛛丝与线织成。",
+          "materialsBody": "织机靠猎获与田野运转：亚麻碎布与家纺布来自人形生物，蜘蛛丝从蛛尸上采取，精良档的核心Silkbinder's Raiment要一块Pristine Silk（尸体采集的署名标本）。\n\n草药喂养裁缝胜过任何装备行业：润光叶镶拖鞋，金叶染鎏金织，日瓣草贯穿整个精良档，所以自己采药的裁缝能持续节省材料。Spool of Thread在Ottilie处12铜一轴，织机根本不用金属，连Wardweave Cowl顶阶也是用高级草药、Pristine Silk、蛛丝与线织成。",
           "ladderHeading": "在Ottilie的织机学艺",
-          "ladderBody": "两件野外普通件（Eastbrook Wool Trousers与Ritual Vestments）随处可做。训练师梯子在Eastbrook水井南侧的织机：homespun档技能0免费，goldweave档（含Silkspun Satchel）技能25每个25银，精良档技能50每个1金。Wardweave Cowl无需训练师：人人都会，但要技能75且绑定织机，是本行业的三层压轴。",
+          "ladderBody": "两件野外普通件（Eastbrook Wool Trousers与Ritual Vestments）随处可做。训练师梯子在Eastbrook水井南侧的织机：homespun档技能0免费，鎏金织档（含Silkspun Satchel）技能25每个25银，精良档技能50每个1金。\n\nWardweave Cowl无需训练师：人人都会，但要技能75且绑定织机，是本行业的三层压轴。如同其他行业，Ottilie在你的裁缝档位达到配方档位的那一刻便会传授。",
           "routeHeading": "杰作与通往125之路",
-          "routeBody": "长袍里的Pristine Silk本身就补足署名材料加成，金叶与日瓣草分别算一、二级材料，精良档因此触发率最高；背包之类无属性的成品永不触发。路线：homespun到25，goldweave到50，精良档到75；75之后靠Wardweave Cowl（三层配方，到99全速、之后半速），最后五十点约75次，每次两块Pristine Silk、四束蛛丝、日瓣草与金叶各两、两份线。背包卖给所有人，Ottilie的订单每30分钟收六束蛛丝。技能50记下A Fine Seam，125等着Grandmaster Tailoring。"
+          "routeBody": "长袍里的Pristine Silk本身就补足署名材料加成，金叶与日瓣草分别算一、二级材料，精良档因此触发率最高；背包之类无属性的成品永不触发，因为杰作是对属性的提升，而背包没有属性。\n\n路线：homespun到25，鎏金织一开即练并做到50，再做精良档到75；75之后靠Wardweave Cowl（三层配方，到99全速、之后半速），最后五十点约75次，每次两块Pristine Silk、四束蛛丝、日瓣草与金叶各两、两份线。\n\n让攀升自给自足：背包卖给所有人，Ottilie的织机订单每30分钟收六束蛛丝。功业之书在技能50记下A Fine Seam，125等着Grandmaster Tailoring。"
         },
         "leatherworking": {
           "identityHeading": "迅捷者的皮甲",
           "identityBody": "梯子从朴素的Fenbridge硬皮件经优秀的marshstalker件爬到精良的mirewarden套装，工匠能裁出的最好皮甲。两件法系皮件补全阵容：野外普通件Eastbrook Druid's Hide与技能75的Duskhide Wraps。制皮位于烹饪与裁缝之间；制装师在Eastbrook的Weaver Ottilie处宣誓，与烹饪组成的Trapper暂无誓约任务。",
           "materialsHeading": "狩猎即收获",
-          "materialsBody": "在制皮这里，练级路线与供应线是同一条：粗皮直接从带皮尸体上剥取（狼和野猪最多），每具尸体只服务先到的一人。精良及以上的采集还会给出Pristine Hide，Mirewarden Jerkin正需要这种署名标本，见一块存一块。配角不多：蛛腿与蛛丝、人形生物的家纺布、每件mirewarden精良品一块钍矿（Duskhide Wraps顶阶要六块），以及制革坊柜台16铜的Tanning Agent。不想挖矿的话Tanner Hesk也卖钍矿。",
+          "materialsBody": "在制皮这里，练级路线与供应线是同一条：粗皮直接从带皮尸体上剥取（狼和野猪最多），每具尸体只服务先到的一人。精良及以上的采集还会给出Pristine Hide，Mirewarden Jerkin正需要这种署名标本，见一块存一块。\n\n配角不多：蛛腿与蛛丝、人形生物的家纺布、每件mirewarden精良品一块锇矿（Duskhide Wraps顶阶要六块），以及制革坊柜台16铜的Tanning Agent。不想挖矿的话Tanner Hesk也卖锇矿。",
           "ladderHeading": "在Fenbridge受训",
           "ladderBody": "特别之处：制革坊在Mirefen Marsh路上的Fenbridge，这是唯一在Eastbrook之外受训的深度行业。Tanner Hesk在他的鞣池边授课：硬皮档技能0免费，marshstalker档技能25每个25银，mirewarden档技能50每个1金。两件配方跳过训练师：野外普通件（Tanned Leather Jerkin与Druid's Hide）随处可做，Duskhide Wraps人人都会但要技能75且绑定制革坊。注意制装师誓约本身在Eastbrook的Ottilie处宣誓，只有授课在沼泽。",
           "routeHeading": "杰作与通往125之路",
-          "routeBody": "marshstalker档及以上都掷杰作，Mirewarden Jerkin里的Pristine Hide自动提供署名材料加成；钍矿算一级材料。无属性的硬皮普通件不会触发。自然而然地练：从一级起剥下每只狼和野猪，硬皮档随地做到25，随任务进沼泽时顺路受训；marshstalker到50，mirewarden到75，此后Duskhide Wraps（三层配方，六块钍矿、三块Pristine Hide、两块粗皮、一份Tanning Agent）带你走完最后五十点（约75次）。75专精后移动制革坊尤其宝贵：营火边就能把一袋皮子变成成品。Hesk的订单每30分钟收八张粗皮。技能50记下Tanner's Trade，上限处是Grandmaster Leatherworking。"
+          "routeBody": "marshstalker档及以上都掷杰作，Mirewarden Jerkin里的Pristine Hide自动提供署名材料加成；锇矿算一级材料。无属性的硬皮普通件不会触发。\n\n自然而然地练：从一级起剥下每只狼和野猪，硬皮档随地做到25，随任务进沼泽时顺路受训；marshstalker到50，mirewarden到75，此后Duskhide Wraps（三层配方，六块锇矿、三块Pristine Hide、两块粗皮、一份Tanning Agent）到99全速、之后半速，最后五十点约75次。75专精后移动制革坊尤其宝贵：营火边就能把一袋皮子变成成品。Hesk的订单每30分钟收八张粗皮。技能50记下Tanner's Trade，上限处是Grandmaster Leatherworking。"
         },
         "cooking": {
           "identityHeading": "喂饱队伍的锅",
@@ -3748,17 +3749,17 @@ export const zh_CN: EnTranslations = {
           "identityHeading": "赢下战斗的瓶子",
           "identityBody": "这门手艺在Highwatch的药坊操持，主人是Alchemist Verane：教配方、卖12铜的Glass Vial、以工作订单收草药。炼金术位于工程学与烹饪之间，因此有两条命途：爆破师（工程学与炼金术，在Eastbrook的Tinker Gizzel处受誓）与药剂师（炼金术与烹饪，在Cook Marlow处宣誓）。调谐任一对即可让炼金成为主修直至上限；此前它像所有未宣誓行业一样练到精良层。",
           "materialsHeading": "草药、毒腺与玻璃",
-          "materialsBody": "每瓶药剂要一个Glass Vial外加对应档位的草药：银叶生于Eastbrook Vale，金叶生于Mirefen Marsh，日瓣草生于Thornpeak Heights，一区一药，瓶子随世界一起攀升。草药学是天然的伙伴技能；深区的高阶草丛需要更好的镰刀。强化药剂一线另需猎手的材料：从带毒尸体采集的Venom Gland，顶级药剂还要一块Pristine Venom Gland（署名标本）。",
+          "materialsBody": "每瓶药剂要一个Glass Vial外加对应档位的草药：润光叶生于Eastbrook Vale，金叶生于Mirefen Marsh，日瓣草生于Thornpeak Heights，一区一药，瓶子随世界一起攀升。草药学是天然的伙伴技能，不过从采集者或市场购买同样奏效；深区的高阶草丛需要更好的镰刀，所以若自己采药，记得及时更新工具。\n\n强化药剂一线另需猎手的材料：从带毒尸体采集的Venom Gland，顶级药剂还要一块Pristine Venom Gland（署名稀有标本）。若不自己采集，这正是值得托猎手朋友顺路带回的好物。",
           "ladderHeading": "配方阶梯",
-          "ladderBody": "Minor Healing Potion人人初始即会、随处可调。真正的梯子是Verane在药坊教的九个配方，每档三个：技能0免费，25档每个25银，50档每个1金；每档都是治疗药剂、法力药剂与耐力强化剂，从普通银叶瓶（120生命、160法力）经优秀金叶（200、260）到精良日瓣（280、360）。强化剂同样攀升：Elixir of the Boar给6耐力10分钟，Venomfire Elixir给9耐力15分钟，Elixir of the Serpent给12耐力15分钟且一次两瓶。旁边还有组合配方Elixir of the Bear：炼金25时Verane以25银传授，随处可调，但只有双技能25的调谐爆破师能做。",
+          "ladderBody": "Minor Healing Potion人人初始即会、随处可调，无需工位。真正的梯子是Verane在药坊教的九个配方，每档三个：技能0免费，25档每个25银，50档每个1金；每档都是治疗药剂、法力药剂与耐力强化剂，从普通润光叶瓶（120生命、160法力）经优秀金叶（200、260）到精良日瓣（280、360）。\n\n强化剂同样攀升：Elixir of the Boar给6耐力10分钟，Vipersear Elixir给9耐力15分钟，Elixir of the Serpent给12耐力15分钟且一次两瓶。旁边还有一个组合配方Elixir of the Bear：炼金达到25时Verane以25银传授，随处可调，但只有炼金术与工程学双技能25的调谐爆破师才能调制。",
           "routeHeading": "酿药师的125之路",
-          "routeBody": "药剂永不出杰作，那属于有属性的装备；但名字仍会流传：精良的日瓣药剂单瓶酿造、出瓶即署名，双瓶的Elixir of the Serpent则是无名的。75专精后每个配方省20%材料。早学草药边练边采：银叶遍布山谷，到了Verane的工作台，免费档就能靠顺手采的草药干净地推到25；25档一开就学，采药转往沼泽，Verane的订单（六株Goldleaf Herb换45铜，每30分钟一次）顺路回本。50以后用Thornpeak的草药酿日瓣与蛇药；100到125是刻意的涓流，酿能卖的，别为数字烧草。技能50记下Strange Brews，上限处是Grandmaster Alchemy。"
+          "routeBody": "药剂与强化剂永不出杰作，那属于有属性的装备。你的名字仍会流传：精良的日瓣药剂单瓶酿造、出瓶即署名，而双瓶的Elixir of the Serpent则是无名的。75专精后每个配方省20%材料。\n\n早学草药、边练边采：润光叶遍布山谷，到了Verane的工作台，免费档就能靠顺手采的草药干净地推到25。25档一开即学，采药转往沼泽采金叶，Verane的订单（六株金叶草换45铜，每30分钟一次）顺路回本。\n\n50以后用Thornpeak的草药酿日瓣与蛇药批次。100到125是刻意的涓流，酿能卖的东西，别为追数字烧草药，记住消耗品是唯一人人反复购买的制作品。功业之书在技能50记下Strange Brews，上限处是Grandmaster Alchemy。"
         },
         "engineering": {
           "identityHeading": "工具匠的独门生意",
-          "identityBody": "这门手艺在Eastbrook广场东南角的工坊操持，主人是Tinker Gizzel。每条工具线的1到3级都是寻常商店货，4级与5级只出自工程师之手。它位于炼金术与护甲锻造之间，两条命途是爆破师（工程学与炼金术）与Cogsmith（尚不可宣誓）。最要紧的警告：工程学的两档配方都高于爱好与未宣誓者的精良层上限，技能只为主修包含工程学的人（今天即爆破师）增长；谁都能做这些工具，未调谐者只是学不到东西。",
+          "identityBody": "这门手艺在Eastbrook广场东南角的工坊操持，主人是Tinker Gizzel，工坊宗师。每条工具线的1到3级都是寻常商店货；4级与5级只出自工程师之手。\n\n在制作之轮上它与炼金术及护甲锻造相邻，由此形成两条命途：爆破师（工程学与炼金术，向Gizzel本人宣誓）和齿轮匠（护甲锻造与工程学，已标注但尚无誓约任务）。这里有一条比其他任何行业都更要紧的警告：工程学的两档配方都高于爱好与未宣誓者的精良层上限，因此技能只为主修包含工程学的人（如今即爆破师）增长。任何人都能制作这些工具，未调谐者只是学不到东西。",
           "materialsHeading": "材料与前置工具",
-          "materialsBody": "每个工具配方都吞掉低一级的工具外加高级材料：四块Thorium Ore加一把Mithril Mining Pick成为Thorium Mining Pick，再用两块Arcanite Bar加钍镐成为Arcanite Mining Pick；斧与镰两条线以Ashwood与Elderwood Log、Goldleaf与Sunpetal Herb如法炮制。Gizzel在工坊备齐全部六种高级材料，但矿、木、草都能在Mirefen Marsh与Thornpeak Heights自采，自采才有利润；唯一例外是仅商店有售的Arcanite Bar，给每件奥金级工具垫了固定的成本底价。",
+          "materialsBody": "每个工具配方都吞掉低一级的工具外加高级材料：四块锇矿加一把天银采矿镐成为锇金采矿镐，再用两块铭钢锭加锇金镐成为铭钢采矿镐；斧与镰两条线以梣木与高松原木、金叶与日瓣草如法炮制。\n\nGizzel在工坊备齐全部六种高级材料，但矿石、原木与草药都能在Mirefen Marsh与Thornpeak Heights自采，自采才是利润所在；唯一例外是仅商店有售的铭钢锭，给每件铭钢级工具垫了固定的成本底价。",
           "ladderHeading": "工具阶梯",
           "ladderBody": "整条梯子只有六个配方，全部绑定工坊且自动学会、永不收费：技能75的4级镐、斧、镰，与技能150的5级版本。150不是笔误，故意高于当前125上限：技能需求从不阻止制作，只影响成长，材料与前置工具到手当天就能做出5级工具。每件成品都是精良或史诗品质且出厂署名。工程学还撑起一件组合配方的一半：Elixir of the Bear，由双技能25的调谐爆破师调制。",
           "routeHeading": "工程师的125之路",
@@ -3787,14 +3788,14 @@ export const zh_CN: EnTranslations = {
       "specializationBody": "技能达到{at}即在本行业专精，配方材料消耗减少{pct}%。",
       "ench": {
         "disenchantHeading": "分解",
-        "disenchantNote": "分解会按品质把不需要的武器或护甲拆成奥术材料。",
+        "disenchantNote": "分解会消耗一件普通品质或更高的武器或护甲，但已附魔的物品不会被分解。普通与优秀品质的物品磨碎后产出数量不等的铃音之尘，稀有度越高或等级越高的物品产量越丰；从精良品质起，产出形态不同：精良件恰好给出一个铃音精华，史诗或传说件恰好给出一个铃音碎片，此外还附带一种与物品材质相关的定向副产物。",
         "typedHeading": "定向副产物",
         "typedNote": "精良及以上的装备还会产出一种定向的、交易绑定的副产物：精良装备产出{rare}件，史诗或传说产出{epicMin}到{epicMax}件。",
         "colSource": "拆解来源",
         "meleeWeapons": "近战武器",
         "timberWeapons": "法杖、魔杖、弓与弩",
         "enchantsHeading": "附魔",
-        "enchantsNote": "每种附魔的目标部位、材料与确切加成；符文层级是定向副产物的唯一去处。",
+        "enchantsNote": "附魔分三个层级。基础层级消耗铃音之尘（高端配方还需少量铃音精华），覆盖武器槽与除副手以外的全部护甲槽，属性轴选项之丰令每种配装都能在每个槽位找到合适的附魔。进阶层级每件消耗一个铃音碎片加若干铃音精华，也是碎片的唯一用途：对影响最大的槽位给出更强的加成。\n\n夹在两者之间的是五种符文附魔，各对应一种定向副产物，确保你磨出的任何材料都不会白费：符文锋刃（武器，力量，消耗共鸣钢片），符文印记（武器，智力，共鸣木片），符文织纹（胸甲，精神，共鸣线段），符文皮甲（护腿，敏捷，共鸣皮料），符文锁链（头盔，耐力，共鸣链片）。每件还各需两个铃音精华；对于同时拥有基础与进阶附魔的槽位和属性，符文附魔的加成介于两者之间，唯有符文织纹是迄今最强的胸甲精神附魔，符文皮甲则是唯一的护腿敏捷附魔。确切加成详见下方表格。",
         "colEnchant": "附魔",
         "colSlot": "部位",
         "colTier": "层级",
@@ -3809,9 +3810,9 @@ export const zh_CN: EnTranslations = {
         "bonusFmt": "+{value}{stat}"
       },
       "gatherIntro": {
-        "mining": "采矿在三大区域的矿脉中开采矿石，供给锻造类行业，上限为100。",
-        "logging": "伐木在三大区域的林地中砍伐木材，供给武器柄材与工具，上限为100。",
-        "herbalism": "草药学在三大区域采集草药，供给炼金术与烹饪，上限为100。",
+        "mining": "采矿从世界的岩层中直接提取矿石：Eastbrook Vale产铜矿，Mirefen Marsh产铁矿，Thornpeak Heights产锇矿，为锻造类行业供料。从1级起向所有人开放，无任何门槛，以独立计数器追踪，上限为100。",
+        "logging": "伐木在三大区域的林地中砍伐木材：Eastbrook Vale产铁皮木，Mirefen Marsh产梣木，Thornpeak Heights产高松，为武器柄材、法杖与工程学工作台供料。从1级起向所有人开放，以独立计数器追踪，上限为100。",
+        "herbalism": "草药学采集野生植物：Eastbrook Vale产润光叶，Mirefen Marsh产金叶，Thornpeak Heights产日瓣草，为药坊类行业持续供应叶茎原料。从1级起向所有人开放，以独立计数器追踪，上限为100。",
         "fishing": "钓鱼通过咬钩与收线的节奏，在每个区域的开阔水面垂钓，上限为200。"
       },
       "rhythmHeading": "采集节奏",
@@ -3840,7 +3841,7 @@ export const zh_CN: EnTranslations = {
         "mining": "任意行业的第一次采集获得Fruits of the Field，采矿100上限铭刻Ore in the Blood。采矿、伐木、草药学与钓鱼中任意三项达到100可得Master Gatherer（25声望），凿开纯净矿脉另有收藏印记。功业只有头衔与声望，永不赋予力量。",
         "logging": "任意行业的第一次采集获得Fruits of the Field，伐木100上限铭刻Heartwood Hewer。四种采集行业中任意三项达到100可得Master Gatherer（25声望），劈出远古心材另有收藏印记。功业只有头衔与声望，永不赋予力量。",
         "herbalism": "任意行业的第一次采集获得Fruits of the Field，草药学100上限铭刻Master of the Meadow。四种采集行业中任意三项达到100可得Master Gatherer（25声望），采下月光绽放另有收藏印记。功业只有头衔与声望，永不赋予力量。",
-        "fishing": "钓鱼100熟练铭刻Old Salt，200铭刻Master Angler及其头衔，垂钓技艺的顶点；钓鱼同样计入Master Gatherer（任意三项采集达到100）。在每个区域的水域钓起第一条鱼各有其页，钓起Glimmerfin Koi则记下Glimmer of Hope。"
+        "fishing": "钓鱼100熟练铭刻Old Salt，200铭刻Master Angler及其头衔，那是垂钓技艺的顶点；钓鱼同样计入Master Gatherer（任意三项采集达到100）。在每个区域的水域钓起第一条鱼各有其页，钓起日辉锦鲤则记下Glimmer of Hope，所以包里常备鱼竿的旅人往往比预想中更快填满功业之书。"
       },
       "fish": {
         "startHeading": "入门",
@@ -3859,8 +3860,8 @@ export const zh_CN: EnTranslations = {
         "colOdds": "几率",
         "pctFmt": "{pct}%",
         "emptyHook": "无鱼上钩",
-        "koiHeading": "Glimmerfin Koi",
-        "koiBody": "全世界的每片水域都藏着同一份大奖：Glimmerfin Koi，一尾优秀品质的闪光锦鲤，卖给商人值75铜，对你的自豪感则远不止此。它的几率固定为每次起竿3%（Thornpeak的冷水中为4%），不随技能变化，因此码头上的新手与Master Angler机会均等。钓起它会在功业之书记下Glimmer of Hope（零声望的收藏印记）。"
+        "koiHeading": "日辉锦鲤",
+        "koiBody": "全世界的每片水域都藏着同一份大奖：日辉锦鲤，一尾优秀品质的闪光锦鲤，卖给商人值75铜，对你的自豪感则远不止此。它的几率固定为每次起竿3%（Thornpeak的冷水中为4%），不随等级段变化，因此码头上的新手与Master Angler机会均等。钓起它会在功业之书记下Glimmer of Hope（零声望的收藏印记）。当那一刻来临，战斗日志会让你知道。"
       },
       "econ": {
         "title": "制作经济",
@@ -3914,7 +3915,7 @@ export const zh_CN: EnTranslations = {
         "q5": "什么是杰作？",
         "a5": "每次制作都有一个小几率（3%起，上限15%）产出品质高一层的成品，但绝不会超过团队副本的底线。",
         "q6": "“由某某制作”是什么意思？",
-        "a6": "九种通用的野外配方与工具配方人人从一开始便已知晓，三种绑定作业台的上级配方（灰鳞披肩、织卫兜帽、暮影裹手）也是如此，它们无需训练师，只需对应的作业台。其余一切都由三座枢纽城镇中各作业台旁的常驻师傅传授：多数在东溪，制革师守着芬桥的制革场，炼金师守着高望的药房。\n\n训练师配方分为技能0、25、50三档，作为一次性费用分别是免费、25银和1金。当你在该行业的档位达到配方自身的档位时，师傅便会传授，而且学习时你必须站在其作业台旁：移动作业台不算数。",
+        "a6": "九种通用的野外配方与工具配方人人从一开始便已知晓，三种绑定作业台的三层压轴配方（Kilnscale Mantle、Wardweave Cowl与Duskhide Wraps）也是如此，它们无需训练师，只需对应的作业台。其余一切都由三座枢纽城镇中各作业台旁的常驻师傅传授：多数在东溪，制革师守着芬桥的制革场，炼金师守着高望的药房。\n\n训练师配方分为技能0、25、50三档，作为一次性费用分别是免费、25银和1金。当你在该行业的档位达到配方自身的档位时，师傅便会传授，而且学习时你必须站在其作业台旁：移动作业台不算数。",
         "q7": "什么是制作者之约？",
         "a7": "委托制品会绑定给交易中收到它的人，而任意工位大师都可按层级费用为其解绑。",
         "q8": "我能更换命途吗？",
@@ -6134,6 +6135,8 @@ export const zh_CN: EnTranslations = {
       "soldItem": "你以 {money} 卖出 {item}。",
       "soldJunkOne": "你以 {money} 卖出 {count} 件杂物。",
       "soldJunkMany": "你以 {money} 卖出 {count} 件杂物。",
+      "keptBoundOne": "已保留 {count} 件绑定物品。",
+      "keptBoundMany": "已保留 {count} 件绑定物品。",
       "friendOnline": "{name} 上线了。",
       "friendOffline": "{name} 下线了。"
     },
@@ -6402,7 +6405,7 @@ export const zh_CN: EnTranslations = {
       "readyQuestAria": "可交付任务：{name}",
       "discussQuest": "谈论{name}。",
       "discussQuestAria": "谈论任务：{name}",
-      "profIntroHint": "See {name} for \"{quest}\".",
+      "profIntroHint": "请找{name}接取《{quest}》。",
       "nythraxisDeathlessKingWarning": "三件遗物讲述着同一个故事：奥德伦为守护国王而战，马尔里克打破了死亡的界限，沃斯试图阻止随后发生的一切。封印正在减弱，废弃墓穴就是通往地下的道路。",
       "browseGoods": "让我看看你的货物。",
       "browseGoodsAria": "查看 {name} 的货物",
@@ -8016,7 +8019,7 @@ export const zh_CN: EnTranslations = {
         "name": "暮影裹手"
       },
       "sootscale_mantle": {
-        "name": "灰鳞披肩"
+        "name": "窑鳞披肩"
       },
       "gravecaller_blade": {
         "name": "唤墓者宽刃剑"
@@ -8091,13 +8094,13 @@ export const zh_CN: EnTranslations = {
         "name": "亚麻碎布"
       },
       "arcane_dust": {
-        "name": "奥术之尘"
+        "name": "铃音之尘"
       },
       "arcane_essence": {
-        "name": "奥术精华"
+        "name": "铃音精华"
       },
       "arcane_shard": {
-        "name": "奥术碎片"
+        "name": "铃音碎片"
       },
       "fen_muster_order": {
         "name": "芬桥集结令"
@@ -8346,7 +8349,7 @@ export const zh_CN: EnTranslations = {
         "name": "峰羊毛长袍"
       },
       "stalkerhide_jerkin": {
-        "name": "潜猎者皮甲"
+        "name": "巡猎皮甲"
       },
       "cragwalker_boots": {
         "name": "岩行者长靴"
@@ -8487,7 +8490,7 @@ export const zh_CN: EnTranslations = {
         "name": "铁制采矿镐"
       },
       "mithril_mining_pick": {
-        "name": "秘银采矿镐"
+        "name": "天银采矿镐"
       },
       "handaxe": {
         "name": "手斧"
@@ -8505,19 +8508,19 @@ export const zh_CN: EnTranslations = {
         "name": "青铜镰刀"
       },
       "silverleaf_sickle": {
-        "name": "银叶镰刀"
+        "name": "润光叶镰刀"
       },
       "thorium_mining_pick": {
-        "name": "钍矿采矿镐"
+        "name": "锇金采矿镐"
       },
       "arcanite_mining_pick": {
-        "name": "秘法采矿镐"
+        "name": "铭钢采矿镐"
       },
       "ashwood_axe": {
         "name": "白蜡木斧"
       },
       "elderwood_axe": {
-        "name": "古木斧"
+        "name": "高松斧"
       },
       "goldleaf_sickle": {
         "name": "金叶镰刀"
@@ -8526,16 +8529,16 @@ export const zh_CN: EnTranslations = {
         "name": "阳瓣镰刀"
       },
       "thorium_ore": {
-        "name": "瑟银矿石"
+        "name": "锇矿石"
       },
       "arcanite_bar": {
-        "name": "秘银锭"
+        "name": "铭钢锭"
       },
       "ashwood_log": {
         "name": "灰木原木"
       },
       "elderwood_log": {
-        "name": "古老接骨木原木"
+        "name": "高松原木"
       },
       "goldleaf_herb": {
         "name": "金叶草"
@@ -8673,7 +8676,7 @@ export const zh_CN: EnTranslations = {
         "name": "铁皮木原木"
       },
       "silverleaf_herb": {
-        "name": "银叶草"
+        "name": "润光叶草"
       },
       "rough_hide": {
         "name": "粗糙的兽皮"
@@ -8736,13 +8739,13 @@ export const zh_CN: EnTranslations = {
         "name": "磨利铁匕首"
       },
       "thorium_warblade": {
-        "name": "瑟银战刃"
+        "name": "锇金战刃"
       },
       "arcanite_war_axe": {
-        "name": "秘银战斧"
+        "name": "铭钢战斧"
       },
       "elderwood_battle_staff": {
-        "name": "古老接骨木战棍"
+        "name": "高松战棍"
       },
       "riveted_copper_girdle": {
         "name": "铆钉铜腰带"
@@ -8763,13 +8766,13 @@ export const zh_CN: EnTranslations = {
         "name": "铁链肩甲"
       },
       "thoriumscale_greathelm": {
-        "name": "瑟银鳞巨盔"
+        "name": "锇鳞巨盔"
       },
       "thoriumscale_cuirass": {
-        "name": "瑟银鳞胸甲"
+        "name": "锇鳞胸甲"
       },
       "thoriumscale_leggings": {
-        "name": "瑟银鳞腿甲"
+        "name": "锇鳞腿甲"
       },
       "homespun_hood": {
         "name": "手织兜帽"
@@ -8778,13 +8781,13 @@ export const zh_CN: EnTranslations = {
         "name": "手织连指手套"
       },
       "silverthread_slippers": {
-        "name": "银线便鞋"
+        "name": "素线便鞋"
       },
       "goldweave_robe": {
-        "name": "金织长袍"
+        "name": "鎏金织长袍"
       },
       "goldweave_leggings": {
-        "name": "金织护腿"
+        "name": "鎏金织护腿"
       },
       "silkspun_satchel": {
         "name": "丝纺挎包"
@@ -8853,10 +8856,10 @@ export const zh_CN: EnTranslations = {
         "name": "马洛的盛大烤肉"
       },
       "silverleaf_healing_draught": {
-        "name": "银叶治疗药水"
+        "name": "润光叶治疗药水"
       },
       "silverleaf_mana_draught": {
-        "name": "银叶法力药水"
+        "name": "润光叶法力药水"
       },
       "elixir_of_the_boar": {
         "name": "野猪药剂"
@@ -8868,7 +8871,7 @@ export const zh_CN: EnTranslations = {
         "name": "金叶法力药水"
       },
       "venomfire_elixir": {
-        "name": "毒火药剂"
+        "name": "蝰灼药剂"
       },
       "sunpetal_healing_draught": {
         "name": "阳瓣治疗药水"
@@ -9171,7 +9174,7 @@ export const zh_CN: EnTranslations = {
         "name": "夜牙足垫"
       },
       "glimmerfin_koi": {
-        "name": "微光鳍锦鲤"
+        "name": "日辉锦鲤"
       },
       "raw_bog_eel": {
         "name": "生沼泽鳗鱼"
@@ -10753,7 +10756,7 @@ export const zh_CN: EnTranslations = {
         }
       },
       "q_stalker_pelts": {
-        "title": "冬日将至高望",
+        "title": "初霜降临高望",
         "text": "{playerName}，这座山的冬天不会敲门，它会踹门。8张山脊潜猎者皮能为守墙披风加衬。",
         "completion": "厚得像我的手臂。今年守望者不会冻死。",
         "objectives": {

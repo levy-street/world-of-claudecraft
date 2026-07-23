@@ -1,4 +1,4 @@
-// Pure-core tests for the bag-item context menu (Professions 2.0 Phase 13):
+// Pure-core tests for the bag-item context menu (Professions 2.0):
 // action eligibility (which items get Disenchant / Salvage / Apply Enchant), the
 // first-row classic-default guarantee, and the stronger-warning confirm predicate
 // (which copy a destructive action would actually consume, and whether it is

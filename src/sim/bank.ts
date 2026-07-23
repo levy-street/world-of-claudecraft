@@ -76,7 +76,7 @@ export interface MoveResult {
  *  - `count` undefined = the whole stack.
  *  - An instanced slot (#1165 per-instance payload) moves as ONE indivisible unit
  *    regardless of count (its units can never be split from their payload).
- *    Identical-payload stacking (Phase 12d): the units merge into a byte-equal
+ *    Identical-payload stacking: the units merge into a byte-equal
  *    mergeable dest stack with room and otherwise land in a fresh deep-cloned
  *    dest slot (countFit/addStacked carry the payload), refusing 'no_fit' only
  *    when the whole count cannot land.

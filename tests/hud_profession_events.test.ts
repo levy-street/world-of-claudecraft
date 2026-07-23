@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-// The HUD render sink for the four Professions 2.0 Phase 14 text-free
+// The HUD render sink for the four Professions 2.0 text-free
 // SimEvents (profTrendNudge, profTierTutorial, attuned, attunedZone). The sim
 // emits ids and names only; handleProfessionEvent must resolve the LOCALIZED
 // archetype title and master name (never leak the raw pairId, whose '+'
@@ -42,6 +42,7 @@ interface ProfessionEventHarness {
   charWindow: { renderIfOpen: ReturnType<typeof vi.fn> };
   renderCrafting: ReturnType<typeof vi.fn>;
   openProfessionTutorial: ReturnType<typeof vi.fn>;
+  questDialog: { refreshIfChanged: ReturnType<typeof vi.fn> };
   handleProfessionEvent(ev: ProfessionEventInput): void;
 }
 
@@ -68,6 +69,10 @@ function makeHud(): ProfessionEventHarness {
   };
   hud.charWindow = { renderIfOpen: vi.fn() };
   hud.renderCrafting = vi.fn();
+  // The attuned arm also probes the gossip dialog's intro-hint staleness
+  // (attunement retires the hint); the dialog's own behavior is pinned in
+  // quest_dialog_controller.test.ts, this harness only has to ROUTE there.
+  hud.questDialog = { refreshIfChanged: vi.fn() };
   document.getElementById('crafting-window')?.remove();
   const craftingWindow = document.createElement('div');
   craftingWindow.id = 'crafting-window';
@@ -172,13 +177,18 @@ describe('Hud.handleProfessionEvent', () => {
     expect(hud.log).not.toHaveBeenCalled();
     expect(hud.charWindow.renderIfOpen).toHaveBeenCalledTimes(1);
     expect(hud.renderCrafting).not.toHaveBeenCalled();
+    // The gossip intro hint retires on attunement, so the arm probes the
+    // dialog's staleness signature alongside the profession surfaces.
+    expect(hud.questDialog.refreshIfChanged).toHaveBeenCalledTimes(1);
   });
 
   it('attuned repaints an OPEN Crafting window through the probe, then elides the repeat', () => {
     vi.spyOn(audio, 'achievement').mockImplementation(() => {});
     const hud = makeHud();
     const craftingWindow = document.getElementById('crafting-window') as HTMLElement;
-    craftingWindow.style.display = 'block';
+    // 'flex' is the painter's open state (the column-flex shell); the repaint
+    // gate tests display === 'flex', so staging anything else reads closed.
+    craftingWindow.style.display = 'flex';
 
     hud.handleProfessionEvent({ type: 'attuned', pairId: 'leatherworking+tailoring' });
     expect(hud.charWindow.renderIfOpen).toHaveBeenCalledTimes(1);
@@ -216,7 +226,7 @@ describe('Hud.handleProfessionEvent', () => {
 
 // No test instantiates the full Hud event loop, so the sim-event switch wiring
 // is held by a source pin (the craft_celebration_view.test.ts precedent): all
-// four Phase 14 event types must fall through to the ONE handler above, so a
+// four profession event types must fall through to the ONE handler above, so a
 // new arm cannot silently drop one of them.
 describe('sim-event switch routing (source pin)', () => {
   // join(process.cwd()) rather than import.meta.url: under jsdom the module

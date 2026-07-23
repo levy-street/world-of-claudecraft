@@ -90,7 +90,7 @@ export function usedBagSlots(inventory: readonly InvSlot[]): number {
  *  to their stackSize, then each free slot holds one fresh stack. `instance`
  *  is the payload of the copies being added (absent for a plain fungible
  *  add). A slot offers top-up room only when its payload matches under
- *  canStackInstancePayloads (identical-payload stacking, Phase 12d): a plain
+ *  canStackInstancePayloads (identical-payload stacking): a plain
  *  add never tops up an instanced slot (#1165) and an instanced add never
  *  tops up a plain slot or a differently-instanced one; a non-matching slot
  *  still occupies a slot in the `inventory.length` used count. */
@@ -118,7 +118,7 @@ export function countFit(
 }
 
 /** True when ONE copy of an instanced grant fits: room in a byte-equal
- *  mergeable stack (identical-payload stacking, Phase 12d) OR a free slot.
+ *  mergeable stack (identical-payload stacking) OR a free slot.
  *  The signed-grant guards (corpse focus-harvest, node harvest) consume this
  *  so a slot-full bag holding a same-payload stack with room keeps the
  *  signature instead of downgrading to the plain fungible fallback (#2139:
@@ -161,8 +161,8 @@ export function fitsAll(
 /** Stack-aware add: top up existing stacks to their stackSize, then append
  *  fresh stacks. `instance` is the payload the added copies carry (absent for
  *  a plain fungible add). A stack is a top-up target only when its payload
- *  matches under canStackInstancePayloads (identical-payload stacking, Phase
- *  12d; before it, #1165 kept every signer/charges/rolled/boundTo copy in its
+ *  matches under canStackInstancePayloads (identical-payload stacking;
+ *  before it, #1165 kept every signer/charges/rolled/boundTo copy in its
  *  own slot): a plain add never merges into an instanced slot and an
  *  instanced add never merges into a plain or differently-instanced one.
  *  Applies NO capacity cap (capacity is a pre-check concern); callers on a

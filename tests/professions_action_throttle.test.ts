@@ -1,4 +1,4 @@
-// The Phase 12c shared action throttle (src/sim/professions/action_throttle.ts):
+// The shared action throttle (src/sim/professions/action_throttle.ts):
 // crafting, disenchant, enchant-apply, and salvage all draw from ONE
 // 10-per-60s pacing budget (the historical PlayerMeta.craftThrottle field, its
 // name kept to spare save/wire/pin churn), so mixing action kinds can never
@@ -69,7 +69,7 @@ function salvageOnce(sim: Sim) {
   return resolveSalvage(sim.ctx, sim.playerId, 'recruit_tunic');
 }
 
-describe('shared action throttle (Phase 12c)', () => {
+describe('shared action throttle', () => {
   it('pins the shared budget constants via the throttle module', () => {
     // Pinned to literals so a re-tune of either constant cannot pass
     // silently; read THROUGH action_throttle.ts so the re-export itself is

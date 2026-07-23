@@ -252,7 +252,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       return;
     }
   }
-  // Fishing bite minigame (Phase 12b): the hidden seeded bite and the
+  // Fishing bite minigame: the hidden seeded bite and the
   // server-authoritative reel deadline, resolved in sim ticks (the lockpick
   // stepDeadlineTick precedent; the client never reports a timeout). The
   // bite arm falls THROUGH to the generic decrement below, so a
@@ -332,7 +332,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     const castId = p.castingAbility;
     p.castingAbility = null;
     p.castRemaining = 0;
-    // Defensive fishing end (Phase 12b): the session cap is unreachable in
+    // Defensive fishing end: the session cap is unreachable in
     // real flow (max bite delay plus max reel window end every session well
     // before FISHING_SESSION_CAP_SEC), and a direct-assigned drive that
     // ticks a fishing cast out simply gets away, same shape as the miss arm
@@ -345,7 +345,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       return;
     }
     ctx.emit({ type: 'castStop', entityId: p.id, success: true });
-    // Gather cast completion (Phase 12b): route to the gathering module and
+    // Gather cast completion: route to the gathering module and
     // return before fireQueuedCast, like fishing above (a press can never
     // queue against a non-spell cast, see castAbility's queue exemption).
     // NOTE castStop success reflects the CAST finishing, not the grant: a
@@ -448,7 +448,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   // an interrupted cast never completed, so its queued follow-up is dropped too
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
-  // Phase 12b hidden per-cast state: unconditional inert writes (all three
+  // Hidden per-cast fishing/gather state: unconditional inert writes (all three
   // are already '' / 0 on every non-fishing/gather cancel path), so every
   // existing cancel stays byte-identical while a cancelled gather or fishing
   // cast can never leak a stale node id or bite deadline into a later cast.

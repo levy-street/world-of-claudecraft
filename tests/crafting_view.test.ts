@@ -195,8 +195,8 @@ describe('buildCraftingView combo-recipe gate (#1132 review)', () => {
   });
 });
 
-// Phase 6 (#2037): skill-req line, skill-gain difficulty, and the station
-// gate (per-type since Phase 8) on the rows model.
+// #2037: skill-req line, skill-gain difficulty, and the station
+// gate (per-type) on the rows model.
 describe('buildCraftingView difficulty and skillReq', () => {
   // Identity where the recipe's craft (cooking) is a MAJOR: the archetype
   // ceiling is Infinity, isolating the ordinary tier curve.
@@ -236,7 +236,7 @@ describe('buildCraftingView difficulty and skillReq', () => {
     expect(difficultyFor(100, { cooking: 50 })).toBe('full');
   });
 
-  it('reduced one tier below, minimal two below, none three or more below (Phase 12c)', () => {
+  it('reduced one tier below, minimal two below, none three or more below', () => {
     expect(difficultyFor(75, { cooking: 100 })).toBe('reduced');
     // Two below is the green minimal state (MINIMAL_TIER_MULTIPLIER), its own
     // four-state label since the Stage 5 split (was bucketed into 'reduced').
@@ -244,7 +244,7 @@ describe('buildCraftingView difficulty and skillReq', () => {
     expect(difficultyFor(25, { cooking: 100 })).toBe('none');
   });
 
-  it('the tier-0 free floor is retired (Phase 12c): common recipes ride the curve', () => {
+  it('the tier-0 free floor is retired: common recipes ride the curve', () => {
     expect(difficultyFor(0, { cooking: 0 })).toBe('full');
     expect(difficultyFor(0, { cooking: 25 })).toBe('reduced');
     expect(difficultyFor(0, { cooking: 50 })).toBe('minimal');
@@ -303,7 +303,7 @@ describe('buildCraftingView difficulty and skillReq', () => {
     // There is NO skillReq admission gate on crafting (crafting.ts documents
     // that resolveCraft does not read skillReq); difficulty is informational.
     // skillReq 25 (tier 1) at cooking 100 (tier-4 capability) is three tiers
-    // below: gray on the Phase 12c curve, so the row reads 'none'.
+    // below: gray on the curve, so the row reads 'none'.
     const items = table(item('bone_fragments'), item('recipe_none_result'));
     const view = buildCraftingView(
       [{ ...recipe('recipe_none', [{ itemId: 'bone_fragments', count: 1 }]), skillReq: 25 }],
@@ -338,13 +338,13 @@ describe('buildCraftingView difficulty and skillReq', () => {
       { skillReq: 100, skills: { cooking: 100 }, identity: majorIdentity, expected: 'full' },
       // One below capability.
       { skillReq: 75, skills: { cooking: 100 }, identity: majorIdentity, expected: 'reduced' },
-      // Two below capability: the Phase 12c green minimal state
+      // Two below capability: the green minimal state
       // (MINIMAL_TIER_MULTIPLIER), its own label since the Stage 5 split.
       { skillReq: 50, skills: { cooking: 100 }, identity: majorIdentity, expected: 'minimal' },
       // Recipe above raw capability: the ordinary climb, full.
       { skillReq: 100, skills: { cooking: 25 }, identity: majorIdentity, expected: 'full' },
       // Recipe tier 0 at a towering capability: the free floor is retired
-      // (Phase 12c), so this is gray (was 'full' pre-12c).
+      // so this is gray (was 'full' before the retire).
       { skillReq: 0, skills: { cooking: 300 }, identity: majorIdentity, expected: 'none' },
       // Ceiling-clamped: curve alone would say full, common ceiling zeroes it.
       { skillReq: 25, skills: { cooking: 25 }, identity: otherIdentity, expected: 'none' },
@@ -413,7 +413,7 @@ describe('buildCraftingView difficulty and skillReq', () => {
   });
 });
 
-describe('buildCraftingView station gate (Phase 8, formerly the #1297 hub boolean)', () => {
+describe('buildCraftingView station gate (formerly the #1297 hub boolean)', () => {
   function stationRecipe(id: string, reagents: { itemId: string; count: number }[]): RecipeDefLike {
     // The base recipe helper is professionId 'cooking': kitchens is its craft's
     // own station type (STATION_TYPE_BY_CRAFT).
@@ -491,7 +491,7 @@ describe('buildCraftingView station gate (Phase 8, formerly the #1297 hub boolea
   });
 
   it('the in-range set defaults to EMPTY (out of range) when omitted', () => {
-    // Phase 8 re-pin: the old boolean defaulted to true; the set default is
+    // Re-pin: the old boolean defaulted to true; the set default is
     // deliberately conservative, so a caller that forgets to pass it renders
     // a disabled station row rather than a falsely-enabled one.
     const items = table(item('recipe_st_result'));
@@ -529,7 +529,7 @@ describe('buildCraftingView station gate (Phase 8, formerly the #1297 hub boolea
   });
 });
 
-describe('craftLearnHints (Phase 14 discoverability)', () => {
+describe('craftLearnHints (discoverability)', () => {
   const trainerRecipeIdsFor = (craft: string): string[] =>
     ALL_RECIPES.filter((r) => r.professionId === craft && r.acquisition?.includes('trainer')).map(
       (r) => r.id,

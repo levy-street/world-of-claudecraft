@@ -191,7 +191,7 @@ export const TARGETS = [
     label: 'Inventory / bags',
     when: ['ui/bags', 'ui/inventory', 'ui/item', 'ui/vendor', 'ui/loot', 'sim/content/items'],
     // Fill the bags with a spread so the window has content, then open it and clip to #bags.
-    // The desktop and mobile variants share the recipe: the Phase 12d instanced-slot
+    // The desktop and mobile variants share the recipe: the instanced-slot
     // marker must be visible on both (the acceptance's mobile arm).
     variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page) {
@@ -212,8 +212,8 @@ export const TARGETS = [
             sim?.addItem(id, 1);
           } catch {}
         }
-        // Phase 12d: two same-signer copies grant through the real hub; on the
-        // 12d tree they MERGE into one counted instanced stack (marker + count
+        // Two same-signer copies grant through the real hub; on the
+        // instanced tree they MERGE into one counted instanced stack (marker + count
         // badge in one cell), while the same recipe on the base tree honestly
         // shows two separate unmarked slots.
         try {
@@ -232,7 +232,7 @@ export const TARGETS = [
   },
   {
     key: 'corpse-unified-press',
-    label: 'Unified corpse press: one interact loots AND harvests (Professions 2.0 Phase 12d)',
+    label: 'Unified corpse press: one interact loots AND harvests (Professions 2.0)',
     when: [
       'loot_window_controller',
       'corpse_harvest_window',
@@ -247,7 +247,7 @@ export const TARGETS = [
     variants: [
       { key: 'chat-outcome' },
       { key: 'picker-preselected', picker: true },
-      // The centered mobile-touch layout of the same picker window (the 12d QA
+      // The centered mobile-touch layout of the same picker window (the
       // legibility pass renamed the corpse arm's button and added the footer
       // hint, both of which render on mobile too).
       { key: 'picker-preselected-mobile', picker: true, mobile: true },
@@ -351,18 +351,20 @@ export const TARGETS = [
     key: 'crafting',
     label: 'Crafting window',
     when: ['ui/crafting_view', 'ui/crafting_window', 'sim/content/recipes', 'sim/professions'],
-    // Desktop and mobile variants: the Phase 6 legibility rows (skill line,
+    // Desktop and mobile variants: the legibility rows (skill line,
     // difficulty label, station badge, combo reason) are actionable info and
-    // must read on both form factors. The four-states variant stages a
-    // mid-skill unattuned character so one window shows the whole 12c
-    // difficulty ladder at once: commons two tiers below (minimal, green),
-    // a known rung-25 recipe one below (reduced, yellow), a known rung-50
-    // recipe at capability (full, orange), and the armorcrafting 75 row
-    // above the pre-attunement ceiling (none, gray).
+    // must read on both form factors. The window shows one craft per tab, so
+    // the difficulty ladder splits across two framings: four-states
+    // stages a mid-skill unattuned character whose weaponcrafting tab shows
+    // the gain ladder (commons two tiers below = minimal green, a known
+    // rung-25 recipe = reduced yellow, a known rung-50 recipe = full orange),
+    // and ceiling-state switches to the armorcrafting tab where the 75 row
+    // sits above the pre-attunement ceiling (none, gray).
     variants: [
       { key: 'desktop' },
       { key: 'mobile', mobile: true },
       { key: 'desktop-four-states', fourStates: true },
+      { key: 'desktop-ceiling-state', fourStates: true, selectTab: 'armorcrafting' },
     ],
     // Grant a spread of reagents across a few professions so several recipes read
     // craftable, force-hide then toggle so the open is deterministic, and clip to
@@ -394,6 +396,30 @@ export const TARGETS = [
       // bags/map windows do (getBoundingClientRect can report 0x0 for 2-4s), so
       // poll for a real size instead of guessing a fixed wait.
       const open = await pollForSize(page, '#crafting-window');
+      if (open && variant?.fourStates) {
+        // Staging mid-tier craft skills trips the once-ever first-tier
+        // explainer modal over the window, on a drain-window delay rather
+        // than synchronously; poll-dismiss it so the shot frames the recipe
+        // pane, not the tutorial.
+        for (let i = 0; i < 10; i++) {
+          const dismissed = await page.evaluate(() => {
+            const ok = document.querySelector('#profession-tutorial .cd-ok');
+            if (ok) ok.click();
+            return Boolean(ok);
+          });
+          if (dismissed) break;
+          await wait(300);
+        }
+        await wait(200);
+      }
+      if (open && variant?.selectTab) {
+        // The window shows one craft per tab; a variant that frames another
+        // craft clicks its tab (the real control, not a state poke).
+        await page.evaluate((craft) => {
+          document.querySelector(`#crafting-window .crafting-tab[data-craft="${craft}"]`)?.click();
+        }, variant.selectTab);
+        await wait(300);
+      }
       if (open && (variant?.mobile || variant?.fourStates)) {
         // The identity card fills the top of the window (all of it on the short
         // landscape viewport); scroll the first recipe section into view so the
@@ -417,14 +443,14 @@ export const TARGETS = [
     // Grant a signed masterwork copy, open bags, hover its slot: the tooltip's
     // per-copy lines (gold seal, green baked bonus stats, Crafted by) all read
     // in one frame. Full-frame shot: the tooltip renders beside the window and
-    // the single-selector clip cannot union the two rects. The Phase 12d
+    // the single-selector clip cannot union the two rects. The
     // gathered variant hovers a signed harvest material instead: the same
     // signer line reads Gathered by there (Crafted by on the base tree, the
     // honest before side).
     variants: [
       { key: 'crafted' },
       { key: 'gathered', gathered: true },
-      // Phase 14b: a commissioned copy bound to its recipient, so the gold
+      // A commissioned copy bound to its recipient, so the gold
       // Maker's Bond line reads beside the maker's mark.
       { key: 'commission-bound', commission: true },
     ],
@@ -438,7 +464,7 @@ export const TARGETS = [
             if (mode === 'gathered') {
               game?.sim?.addItemInstance('pristine_hide', { signer: 'Thorgar' });
             } else if (mode === 'commission') {
-              // Phase 14b: a commissioned (bindOnTrade) copy already bound to
+              // A commissioned (bindOnTrade) copy already bound to
               // its recipient; the tooltip composes the bound line with the
               // maker's mark.
               game?.sim?.addItemInstance('gravewyrm_gauntlets', {
@@ -686,8 +712,8 @@ export const TARGETS = [
     when: ['ui/char_window', 'ui/char_view'],
     // Desktop and mobile, each in two framings: the default top framing, plus
     // the gathering panel scrolled into view (it sits below the fold and is
-    // per-player progression info a player reads on both form factors; Phase
-    // 11 added its fishing row).
+    // per-player progression info a player reads on both form factors,
+    // including the fishing row).
     variants: [
       { key: 'desktop' },
       { key: 'mobile', mobile: true },
@@ -1218,10 +1244,10 @@ export const TARGETS = [
   },
   {
     key: 'gather-node',
-    label: 'Gather node (click/tap-to-harvest #1866; tool tier gating, Professions 2.0 Phase 12)',
+    label: 'Gather node (click/tap-to-harvest #1866; tool tier gating, Professions 2.0)',
     when: ['gather_node', 'gather_nodes', 'gathering_view', 'professions/tools'],
-    // The Phase 12 variants stand at the mirefen tier-2 ore vein (falling back
-    // to the nearest pre-phase mirefen vein when the id does not exist, so the
+    // The variants stand at the mirefen tier-2 ore vein (falling back
+    // to the nearest base-tree mirefen vein when the id does not exist, so the
     // SAME recipe shoots the before side on the base tree): bare hands for the
     // locked tooltip + minimap lock tint, an iron pick for the unlocked
     // contrast, and a mobile tap-harvest whose outcome line is the denial
@@ -1244,8 +1270,8 @@ export const TARGETS = [
           const game = window.__game;
           const meshes = game?.renderer?.gatherNodeMeshes ?? [];
           const byId = (id) => meshes.find((m) => m.userData?.gatherNodeId === id);
-          // ore_mirefen_t2 exists only on the Phase 12 tree; ore_mirefen_1 is the
-          // pre-phase vein 12 yd away, the honest before-side stand-in.
+          // ore_mirefen_t2 exists only on the reworked tree; ore_mirefen_1 is the
+          // base-tree vein 12 yd away, the honest before-side stand-in.
           const mesh = byId('ore_mirefen_t2') ?? byId('ore_mirefen_1') ?? meshes[0];
           const p = game?.world?.player;
           if (!mesh || !p) return;
@@ -1424,7 +1450,7 @@ export const TARGETS = [
       { key: 'desktop-simplified', charClass: 'mage', charName: 'Newhand', simplified: true },
       { key: 'mobile', charClass: 'warrior', charName: 'Anvilmar', mobile: true },
       // The gathering section sits below the craft-skill fold; a fourth
-      // framing scrolls it into view (Phase 11 added its fishing row).
+      // framing scrolls it into view.
       {
         key: 'desktop-gathering',
         charClass: 'warrior',
@@ -1453,7 +1479,7 @@ export const TARGETS = [
             version: 1,
             synced: true,
             craftSkills: {
-              // Post-12c-legal staging (Phase 12c QA): 125 is the enforced
+              // Cap-legal staging: 125 is the enforced
               // craft cap, staging the mastered state honestly; a live
               // character can never exceed it, so the stub must not either.
               weaponcrafting: 125,
@@ -1481,7 +1507,7 @@ export const TARGETS = [
             configurable: true,
           });
           const gathering = {
-            // Post-12c-legal staging (Phase 12c QA): the enforced caps are
+            // Cap-legal staging: the enforced caps are
             // 100/100/100/200 (content/professions.ts maxSkill) and skills
             // can never exceed them; herbalism stages a mastered row at cap.
             skills: [
@@ -1491,9 +1517,11 @@ export const TARGETS = [
               { professionId: 'fishing', skill: 68, maxSkill: 200 },
             ],
           };
-          const stateIsFn = typeof game.world.professionsState === 'function';
+          // professionsState is a data read on BOTH world shapes (a getter on
+          // Sim, a field on ClientWorld), so typeof never yields 'function'
+          // and a plain-object value shadows either shape correctly.
           Object.defineProperty(game.world, 'professionsState', {
-            value: stateIsFn ? () => gathering : gathering,
+            value: gathering,
             configurable: true,
           });
         }
@@ -1584,6 +1612,19 @@ export const TARGETS = [
       if (!setup.ok) throw new Error(`train-window setup failed: ${setup.reason}`);
       const open = await pollForSize(page, '#train-window');
       if (!open) throw new Error('train window did not open');
+      // Staging tier-1 weaponcrafting trips the once-ever first-tier explainer
+      // modal on a drain-window delay rather than synchronously (the crafting
+      // target's trap); poll-dismiss it so the frame carries the ladder.
+      for (let i = 0; i < 10; i++) {
+        const dismissed = await page.evaluate(() => {
+          const ok = document.querySelector('#profession-tutorial .cd-ok');
+          if (ok) ok.click();
+          return Boolean(ok);
+        });
+        if (dismissed) break;
+        await wait(300);
+      }
+      await wait(200);
       // Verify the ladder rendered all three states (the whole point of the shot).
       const states = await page.evaluate(() => ({
         known: document.querySelectorAll('#train-window .train-known').length,
@@ -1616,7 +1657,7 @@ export const TARGETS = [
       'ui/profession_tutorial_window',
       'ui/profession_identity_view.ts',
     ],
-    // The Phase 14 legibility rule: the full pre-commit picture (majors, hobby,
+    // The legibility rule: the full pre-commit picture (majors, hobby,
     // dormancy, and the escalating make-amends return cost) must be visible in
     // the lore-quest dialog BEFORE the player commits, and the one-time tier
     // tutorial must fire at the first tier-1 crossing. The quest variants shoot
@@ -2030,8 +2071,7 @@ export const TARGETS = [
   },
   {
     key: 'gathering-rhythm',
-    label:
-      'Gathering rhythm: gather cast bar + fishing bobber and bite (Professions 2.0 Phase 12b)',
+    label: 'Gathering rhythm: gather cast bar + fishing bobber and bite (Professions 2.0)',
     when: [
       'professions/fishing',
       'professions/gathering',
@@ -2039,7 +2079,7 @@ export const TARGETS = [
       'render/fishing_bobber',
       'render/cast_bar',
     ],
-    // Phase 12b turns the instant harvest into a short visible cast and the
+    // The gather rework turns the instant harvest into a short visible cast and the
     // fixed 5 s fishing cast into a bite minigame. The gather variants shoot
     // mid-cast at the eastbrook ore vein (the base tree grants instantly, so
     // the SAME recipe degrades honestly to the post-harvest frame). The
@@ -2295,8 +2335,8 @@ export const TARGETS = [
     key: 'p13-bag-actions',
     label: 'Bag item action menu (disenchant / salvage / apply enchant)',
     when: ['bag_item_context_menu', 'bag_item_action_menu', 'enchant_apply_view'],
-    // Four states of the Phase 13 surface: the desktop right-click menu, the same
-    // menu from a mobile tap (the phase acceptance's mobile arm), the stronger
+    // Four states of the bag-action surface: the desktop right-click menu, the same
+    // menu from a mobile tap (the mobile arm), the stronger
     // destruction warning (the only held copy is signed masterwork), and the
     // Apply Enchant picker (the first render sink for enchant names). The recipe
     // branches on variant.key; menu opening goes through the REAL bound events
@@ -2324,7 +2364,7 @@ export const TARGETS = [
             // affordability lines show a mix of ready and short rows.
             sim.addItem('arcane_dust', 6);
             sim.addItem('arcane_essence', 1);
-            return { ok: true, itemName: 'Arcane Dust' };
+            return { ok: true, itemName: 'Chime Dust' };
           }
           if (wantsConfirm) {
             // The ONLY held copy is a signed masterwork instance, so the confirm
@@ -2385,7 +2425,7 @@ export const TARGETS = [
         return { clip: '#ui' };
       }
       if (variant?.picker) {
-        // Click the Apply Enchant row (the staged reagent's only Phase 13 action).
+        // Click the Apply Enchant row (the staged reagent's only action).
         await page.evaluate(() => {
           const rows = [...document.querySelectorAll('#ctx-menu .ctx-item')];
           rows[rows.length - 1]?.click();

@@ -1,4 +1,4 @@
-// Professions 2.0 Phase 7: the Guild letter. Covers the pure leading-pair
+// Professions 2.0: the Guild letter. Covers the pure leading-pair
 // classifier (src/sim/professions/trend.ts), the one-shot Guild-letter
 // delivery through the real Sim (mail.test.ts driving pattern), and the
 // GUILD_TREND_LETTERS content completeness pins. Guild letters are counted by
@@ -263,7 +263,7 @@ describe('the Guild letter through the real Sim', () => {
       const seedPid = seedWorld.addPlayer('warrior', 'Seed');
       const state = seedWorld.serializeCharacter(seedPid);
       if (!state) throw new Error('expected a serialized character state');
-      // A pre-Phase-7 save carries no guildLetterSent field at all.
+      // A save predating the guild letter carries no guildLetterSent field at all.
       delete state.guildLetterSent;
       state.craftSkills = { ...state.craftSkills, engineering: 30, alchemy: 10 };
 

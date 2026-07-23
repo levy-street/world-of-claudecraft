@@ -114,7 +114,7 @@ describe('the real catalog', () => {
       (id) => DEEDS[id].renown === 0 && DEEDS[id].feat !== true,
     ).sort();
     expect(zeroNonFeat).toEqual([
-      // Phase 15 deliberate growth: the four luck-based rare-find deeds
+      // Deliberate growth: the four luck-based rare-find deeds
       // (pristine vein, ancient heartwood, moonlit bloom, perfect specimen)
       // join the zero-renown class per rule 2 (luck earns no Renown).
       'col_ancient_heartwood',

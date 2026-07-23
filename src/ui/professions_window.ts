@@ -53,7 +53,7 @@ const CEILING_LABEL_KEYS: Record<EmpowermentCeiling, TranslationKey> = {
 
 // Gathering display-name keys (the char-window gathering section family).
 // Every GATHERING_PROFESSION_IDS id adds its id here alongside its catalog
-// key (fishing landed with Phase 11); an id with no key renders no row (the
+// key; an id with no key renders no row (the
 // view core passes every row through).
 const GATHERING_NAME_KEYS: Record<string, TranslationKey> = {
   mining: 'hudChrome.gathering.mining',
@@ -190,12 +190,21 @@ export class ProfessionsWindow {
       model.identity.state === 'syncing'
         ? t('hudChrome.professions.syncing')
         : t('hudChrome.professions.unattunedIdentity');
+    // The specialized-corner copy call: when the next milestone ahead of
+    // the trending craft is the
+    // specialization threshold rather than a plain tier, the CTA names what
+    // the crossing actually unlocks instead of "the next tier".
     const cta =
       simplified.cta.kind === 'raise'
-        ? t('hudChrome.professions.ctaRaise', {
-            craft: craftNameText(simplified.cta.craftId),
-            points: this.fmt(simplified.cta.points),
-          })
+        ? t(
+            simplified.nextUnlock.kind === 'specialized'
+              ? 'hudChrome.professions.ctaRaiseSpecialized'
+              : 'hudChrome.professions.ctaRaise',
+            {
+              craft: craftNameText(simplified.cta.craftId),
+              points: this.fmt(simplified.cta.points),
+            },
+          )
         : t('hudChrome.professions.ctaStart');
     const tutorial = simplified.tutorial
       ? `<p class="prof-tutorial">${esc(
@@ -216,9 +225,10 @@ export class ProfessionsWindow {
   // -------------------------------------------------------------------------
 
   private fullHtml(model: ProfessionsViewModel): string {
+    // The hero band pairs the identity card with the ring on its stage; the
+    // craft grid, perks, nudges, and gathering follow as section cards.
     return (
-      this.identityHtml(model) +
-      this.ringHtml(model) +
+      `<div class="prof-hero">${this.identityHtml(model)}${this.ringHtml(model)}</div>` +
       this.craftsHtml(model) +
       this.perksHtml(model) +
       this.nudgesHtml(model) +
@@ -250,9 +260,16 @@ export class ProfessionsWindow {
             t('hudChrome.professions.returnsLabel', { count: this.fmt(summary.returnCount) }),
           )}</div></div></div>`
         : `<p class="prof-identity-paragraph">${esc(t('hudChrome.professions.unattunedIdentity'))}</p>`;
-    const switchCost = `<div class="prof-switch-cost">${esc(
-      t('hudChrome.professions.switchCost', { cost: this.fmt(model.switchCost.nextSwitchCost) }),
-    )}</div>`;
+    // The switch-cost line renders only once the player has ever attuned
+    // (model.switchCost.show, the maintainer copy call): before that there is
+    // no archetype to switch from and the line is noise.
+    const switchCost = model.switchCost.show
+      ? `<div class="prof-switch-cost">${esc(
+          t('hudChrome.professions.switchCost', {
+            cost: this.fmt(model.switchCost.nextSwitchCost),
+          }),
+        )}</div>`
+      : '';
     return `<section class="prof-identity"><h3 class="prof-section-header">${esc(t('hudChrome.professions.identityHeader'))}</h3>${lines}${switchCost}</section>`;
   }
 
@@ -289,9 +306,13 @@ export class ProfessionsWindow {
         return `<span class="prof-ring-node role-${role}" style="left:${left}%;top:${top}%"><img src="${professionIconUrl(`prof_${node.craftId}`, RING_ICON_SIZE)}" alt="" draggable="false"></span>`;
       })
       .join('');
+    // The stage is the showcase treatment (the char-window model panel
+    // lineage): an inset card with a warm haze behind the wheel, purely
+    // decorative chrome around the same role="img" ring.
     return (
+      `<div class="prof-ring-stage">` +
       `<div class="prof-ring" role="img" aria-label="${esc(t('hudChrome.professions.ringAria'))}">` +
-      `<svg class="prof-ring-svg" viewBox="-1.25 -1.25 2.5 2.5" aria-hidden="true" focusable="false">${svgParts.join('')}</svg>${nodes}</div>`
+      `<svg class="prof-ring-svg" viewBox="-1.25 -1.25 2.5 2.5" aria-hidden="true" focusable="false">${svgParts.join('')}</svg>${nodes}</div></div>`
     );
   }
 
@@ -315,19 +336,23 @@ export class ProfessionsWindow {
     for (let i = 0; i < row.bar.pipSlots; i++) {
       pips += `<span class="prof-pip${i < row.bar.filledPips ? ' filled' : ''}"></span>`;
     }
+    // Row anatomy (the text-squish fix): the name line carries ONLY the name
+    // and the right-aligned skill value; the role and ceiling chips get their
+    // own line below, so long localized names and wide chips can never fight
+    // for one baseline.
     return (
       `<li class="prof-craft-row role-${row.identity.role}">` +
       `<img class="prof-craft-icon" src="${professionIconUrl(`prof_${row.identity.craftId}`, ROW_ICON_SIZE)}" alt="" draggable="false">` +
       `<div class="prof-craft-main">` +
       `<div class="prof-craft-head"><span class="prof-craft-name">${esc(name)}</span>` +
-      `<span class="prof-role-badge">${esc(t(ROLE_LABEL_KEYS[row.identity.role]))}</span>` +
-      `<span class="prof-ceiling">${esc(t(CEILING_LABEL_KEYS[row.identity.ceiling]))}</span>` +
       `<span class="prof-skill-value">${esc(
         t('hudChrome.professions.skillValue', {
           skill: this.fmt(row.bar.skill),
           max: this.fmt(row.bar.maxSkill),
         }),
       )}</span></div>` +
+      `<div class="prof-craft-chips"><span class="prof-role-badge">${esc(t(ROLE_LABEL_KEYS[row.identity.role]))}</span>` +
+      `<span class="prof-ceiling">${esc(t(CEILING_LABEL_KEYS[row.identity.ceiling]))}</span></div>` +
       `<div class="prof-bar-wrap"><span class="prof-bar"><span class="prof-bar-fill" style="width:${pct}%"></span></span>` +
       `<span class="prof-pips" role="img" aria-label="${esc(
         t('hudChrome.professions.tierPipAria', { tier: this.fmt(row.bar.tierIndex) }),

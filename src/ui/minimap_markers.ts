@@ -92,7 +92,7 @@ export type MinimapMarker =
   // harvestable-for-THIS-viewer from on-cooldown-for-this-viewer (per-player,
   // see IWorldProfessions#nodeHarvestableByMe; two viewers can see opposite
   // states for the same node id). `locked` is the SEPARATE tool-tier access
-  // dimension (Professions 2.0 Phase 12, per-viewer owned-best bag scan):
+  // dimension (Professions 2.0, per-viewer owned-best bag scan):
   // the painter composes both, keeping the ready/cooldown silhouette while a
   // locked tint replaces the state color. Actionable info on every graphics
   // tier (fairness invariant: never preset-gated).
@@ -245,7 +245,7 @@ export function createMinimapMarkers(): MinimapMarkers {
 
       // Gatherable world nodes (issue 1124): static content positions (never entities), each
       // classified ready/cooldown for THIS viewer only via nodeHarvestableByMe.
-      // `locked` (Phase 12) memoizes the owned-best bag scan per profession,
+      // `locked` memoizes the owned-best bag scan per profession,
       // lazily on the first in-rim node: the common no-nearby-node frame
       // skips the scan entirely at the minimap's 10Hz cadence. The memo is a
       // per-build temporary (like the membership Sets above), so a tool

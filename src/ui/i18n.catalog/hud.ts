@@ -400,6 +400,8 @@ const hudStringsEn = {
       soldItem: 'Sold {item} for {money}.',
       soldJunkOne: 'Sold {count} junk item for {money}.',
       soldJunkMany: 'Sold {count} junk items for {money}.',
+      keptBoundOne: 'Kept {count} bound copy.',
+      keptBoundMany: 'Kept {count} bound copies.',
       friendOnline: '{name} has come online.',
       friendOffline: '{name} has gone offline.',
     },

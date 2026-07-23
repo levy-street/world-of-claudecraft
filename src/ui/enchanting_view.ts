@@ -1,5 +1,5 @@
 // Pure, host-agnostic core for the enchanting-action result toasts (Professions
-// 2.0 Phase 13). The three commands (disenchant / apply-enchant / salvage) each
+// 2.0). The three commands (disenchant / apply-enchant / salvage) each
 // mirror back a text-free personal SimEvent; this maps one event to the i18n key
 // it renders and the sink it renders through (a success chat line vs an error
 // toast), the gathering_view.ts gatherDeniedLineKey pattern (event -> t() key).

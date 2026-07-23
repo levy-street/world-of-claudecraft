@@ -436,20 +436,20 @@ export const COMMAND_NAMES = [
   // Append-only protocol addition for the canonical Talents V2 row mutation.
   'selectTalentRow',
   'resurrect_respond',
-  // Recipe training (Professions 2.0 Phase 9): learn a trainer-taught recipe
+  // Recipe training (Professions 2.0): learn a trainer-taught recipe
   // at its craft's station (Sim.trainRecipe via professions/training.ts).
   'train_recipe',
   // Per-character action-bar layout persistence: the owning client uploads its
   // full arranged layout (debounced) so it restores at login on any device.
   'save_hotbar_layout',
-  // Enchanting profession actions (Professions 2.0 Phase 13): disenchant a held
+  // Enchanting profession actions (Professions 2.0): disenchant a held
   // piece into arcane materials, apply an enchant to a held copy, or salvage a
   // held piece into generic materials (Sim.disenchantItem/applyEnchant/salvageItem
   // via src/sim/professions/enchanting.ts and salvage.ts).
   'disenchant_item',
   'apply_enchant',
   'salvage_item',
-  // Maker's Bond unbind service (Professions 2.0 Phase 14b): clear the
+  // Maker's Bond unbind service (Professions 2.0): clear the
   // boundTo trade lock on one held bound commission piece for the
   // tier-scaled gold fee (Sim.unbindItem via src/sim/professions/
   // commission.ts).

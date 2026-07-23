@@ -1,20 +1,25 @@
-// Thin DOM consumer for the recipe-training window (Professions 2.0 Phase 9).
+// Thin DOM consumer for the recipe-training window (Professions 2.0).
 //
 // The consumer half of the pure-core + thin-consumer split (reference
 // vendor_window.ts): paints the station master's teaching ladder from the
 // structured TrainView and reports train/close clicks back through the
-// injected callbacks. Reuses the vendor window's CSS classes (.vendor-item,
-// .vi-name, .vi-price, .vi-sub, .vendor-section-title) so the trainer reads
-// as the same window family. It owns no state. Locked rows always render
-// (grayed, with their named requirement): the visible ladder is a deliberate
-// decision, never hidden.
+// injected callbacks. Keeps the vendor family's row classes (.vendor-item,
+// .vi-name, .vi-price, .vi-sub, .vendor-section-title) for anatomy, while
+// the rows themselves ride the showcase inset-card idiom of the crafting
+// recipe cards (card fill and hairline, quality-glow socket, and the
+// gold-gradient fee chip on an affordable teachable row) so the two
+// teaching surfaces read as one book. It owns no state. Locked rows always
+// render (grayed, with their named requirement): the visible ladder is a
+// deliberate decision, never hidden.
 
 import { craftNameText } from '../../char_window';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { formatMoney, formatNumber, t } from '../../i18n';
+import { QUALITY_COLOR } from '../../icons';
 import type { PainterHostPresentation } from '../../painter_host';
+import { qualityGlowShadow } from '../../quality_glow';
 import { svgIcon } from '../../ui_icons';
 import type { TrainRow, TrainView } from './train_view';
 
@@ -76,7 +81,10 @@ export function renderTrainWindow(
     const name = rowName(row);
     const stateLabel = t(STATE_LABEL_KEY[row.state]);
     const stateHtml = `<span class="train-state">${esc(stateLabel)}</span>`;
-    const iconHtml = row.item ? deps.itemIcon(row.item) : '';
+    // The result icon sits in the crafting card's quality-glow socket (the
+    // shared .crafting-recipe-socket family, size-varied by the window CSS).
+    const glow = row.item?.quality ? qualityGlowShadow(QUALITY_COLOR[row.item.quality]) : '';
+    const iconHtml = `<span class="crafting-recipe-socket"${glow ? ` style="box-shadow:${glow}"` : ''}>${row.item ? deps.itemIcon(row.item) : ''}</span>`;
 
     let node: HTMLElement;
     if (row.state === 'teachable') {
@@ -86,7 +94,13 @@ export function renderTrainWindow(
       button.disabled = !row.affordable;
       const fee = feeLabel(row);
       button.setAttribute('aria-label', t('hudChrome.training.trainAria', { name, fee }));
-      button.innerHTML = `${iconHtml}<span class="vi-name">${esc(name)}</span>${stateHtml}<span class="vi-price${row.affordable ? '' : ' unaffordable'}">${esc(fee)}</span>`;
+      // An affordable fee renders as the gold-gradient action chip; an
+      // unaffordable one keeps the plain error-tint price so the block stays
+      // readable under the disabled opacity (never a desaturated gold chip).
+      const feeHtml = row.affordable
+        ? `<span class="vi-price-chip">${esc(fee)}</span>`
+        : `<span class="vi-price unaffordable">${esc(fee)}</span>`;
+      button.innerHTML = `${iconHtml}<span class="vi-name">${esc(name)}</span>${stateHtml}${feeHtml}`;
       button.addEventListener('click', () => deps.onTrain(row.recipeId));
       node = button;
     } else if (row.state === 'locked') {

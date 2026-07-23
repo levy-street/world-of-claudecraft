@@ -7,7 +7,7 @@ import { tryNearbyInteraction } from '../src/game/nearby_interaction';
 import { MOBS } from '../src/sim/data';
 import { type Entity, INTERACT_RANGE } from '../src/sim/types';
 
-// Phase 4 open-gate flip: the hcb wire mirror (PR 2087) made online corpse
+// The open-gate flip: the hcb wire mirror (PR 2087) made online corpse
 // harvest-claim state reliable, so the helper arms main.ts calls now run with
 // harvestStateReliable = TRUE by DEFAULT (no `online === null` override). A
 // harvest-only corpse (componentTags, no regular loot) therefore OPENS online
@@ -167,7 +167,7 @@ describe('tryNearbyInteraction default arm', () => {
     expect(lootCorpse).toHaveBeenCalledWith(2);
   });
 
-  it('a harvest-only corpse now captures the interact key (unified press, Phase 12d)', () => {
+  it('a harvest-only corpse now captures the interact key (unified press)', () => {
     // The nearby-interact corpse pick keys off canOpen since the unified
     // press: a harvest-only corpse is a target, and only its harvest half is
     // dispatched (no loot command, so no denial toast on an empty table).

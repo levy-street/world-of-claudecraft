@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { renderCraftingWindow } from '../src/ui/crafting_window';
-import { GOLD_ACCENT_COLOR } from '../src/ui/icons';
+import { QUALITY_COLOR } from '../src/ui/icons';
 import { renderProfessionIdentityCard } from '../src/ui/profession_identity_card';
 import { buildProfessionIdentityView } from '../src/ui/profession_identity_view';
 
@@ -46,7 +46,7 @@ describe('profession identity card painter contract', () => {
     // armorcrafting is the Smith pair); the skill rows render craft names.
     expect(card?.textContent).toContain('Smith');
     expect(card?.textContent).toContain('Armorcrafting');
-    // Phase 14: the attuned card surfaces the make-amends return cost
+    // The attuned card surfaces the make-amends return cost
     // (requiredAmendsProgress(1) = 8, the switch-cost-at-rest figure).
     const returnCost = card?.querySelector('.profession-identity-returncost');
     expect(returnCost?.textContent).toContain('make-amends');
@@ -137,6 +137,8 @@ describe('profession identity card painter contract', () => {
         attachTooltip,
         commissionChecked: () => false,
         onToggleCommission: vi.fn(),
+        selectedCraft: () => null as string | null,
+        onSelectCraft: vi.fn(),
       },
     );
 
@@ -162,7 +164,7 @@ describe('profession identity card painter contract', () => {
     expect(button?.contains(note ?? null)).toBe(false);
     expect(note?.parentElement?.classList.contains('crafting-recipe-item')).toBe(true);
 
-    // Phase 6 legibility on the same row: the skill-req line and the
+    // Legibility on the same row: the skill-req line and the
     // difficulty LABEL render inside the button, and the difficulty is never
     // color-only (the tinted span carries the localized text, and the aria
     // name repeats both).
@@ -208,6 +210,8 @@ describe('profession identity card painter contract', () => {
         attachTooltip: vi.fn(),
         commissionChecked: () => false,
         onToggleCommission: vi.fn(),
+        selectedCraft: () => null as string | null,
+        onSelectCraft: vi.fn(),
       },
     );
 
@@ -219,7 +223,7 @@ describe('profession identity card painter contract', () => {
     expect(badge?.classList.contains('out-of-range')).toBe(true);
     // Never a bare disabled button: the reason text sits ADJACENT, outside the
     // button's :disabled opacity (the combo-note pattern), and the aria name
-    // carries the same sentence for non-visual users. Phase 8 re-pin: the
+    // carries the same sentence for non-visual users. The
     // note now NAMES the station type (stationOutOfRangeNamed + stationName).
     expect(stationNote?.textContent).toBe('Move to the Toolworks to craft this.');
     expect(button?.contains(stationNote ?? null)).toBe(false);
@@ -228,7 +232,7 @@ describe('profession identity card painter contract', () => {
     expect(button?.querySelector('.crafting-difficulty')?.textContent).toBe('Full skill gain');
   });
 
-  it('renders the Phase 14 learn-at-master hint under a hinted craft section only', () => {
+  it('renders the learn-at-master hint under a hinted craft section only', () => {
     const parent = document.createElement('div');
     renderCraftingWindow(
       parent,
@@ -270,6 +274,8 @@ describe('profession identity card painter contract', () => {
         attachTooltip: vi.fn(),
         commissionChecked: () => false,
         onToggleCommission: vi.fn(),
+        selectedCraft: () => null as string | null,
+        onSelectCraft: vi.fn(),
       },
       undefined,
       // Only weaponcrafting is hinted; armorcrafting is not in the map.
@@ -320,7 +326,7 @@ describe('profession identity card painter contract', () => {
   });
 });
 
-describe('crafting window Phase 6 QA pins', () => {
+describe('crafting window pins', () => {
   const deps = () => ({
     hideTooltip: vi.fn(),
     onCraft: vi.fn(),
@@ -331,6 +337,8 @@ describe('crafting window Phase 6 QA pins', () => {
     attachTooltip: vi.fn(),
     commissionChecked: () => false,
     onToggleCommission: vi.fn(),
+    selectedCraft: () => null as string | null,
+    onSelectCraft: vi.fn(),
   });
   const comboRow = (unmetCrafts: string[]) => ({
     recipes: [
@@ -410,17 +418,33 @@ describe('crafting window Phase 6 QA pins', () => {
     expect(difficulty?.textContent).toBe('No skill gain');
   });
 
-  it('maps the four difficulty states to the classic tints with their labels (Phase 12c)', () => {
+  it('maps the four difficulty states to the classic tints with their labels', () => {
     // The classic four-color read: orange (QUALITY_COLOR.legendary), the
     // house gold yellow (--gold in styles/tokens.css, the masterwork seal
     // idiom), green (QUALITY_COLOR.uncommon), gray (QUALITY_COLOR.poor).
+    // The tint moved off the inline style onto the --color-craft-* tokens
+    // (DESIGN.md token discipline): the painter stamps data-difficulty, the
+    // stylesheet colors it, and this pin holds the whole chain: attribute,
+    // label, CSS rule, and token value.
     const rows = [
-      { difficulty: 'full' as const, tint: '#ff8000', label: 'Full skill gain' },
-      { difficulty: 'reduced' as const, tint: '#ffd100', label: 'Reduced skill gain' },
-      { difficulty: 'minimal' as const, tint: '#1eff00', label: 'Minimal skill gain' },
-      { difficulty: 'none' as const, tint: '#9d9d9d', label: 'No skill gain' },
+      { difficulty: 'full' as const, token: '--color-craft-full', label: 'Full skill gain' },
+      {
+        difficulty: 'reduced' as const,
+        token: '--color-craft-reduced',
+        label: 'Reduced skill gain',
+      },
+      {
+        difficulty: 'minimal' as const,
+        token: '--color-craft-minimal',
+        label: 'Minimal skill gain',
+      },
+      { difficulty: 'none' as const, token: '--color-craft-none', label: 'No skill gain' },
     ];
-    for (const { difficulty, tint, label } of rows) {
+    const componentsCss = readFileSync(
+      path.resolve(process.cwd(), 'src/styles/components.css'),
+      'utf8',
+    );
+    for (const { difficulty, token, label } of rows) {
       const parent = document.createElement('div');
       renderCraftingWindow(
         parent,
@@ -444,7 +468,12 @@ describe('crafting window Phase 6 QA pins', () => {
       );
       const el = parent.querySelector<HTMLElement>('.crafting-difficulty');
       expect(el?.getAttribute('data-difficulty'), difficulty).toBe(difficulty);
-      expect(el?.getAttribute('style'), difficulty).toContain(tint);
+      // No inline color: the tint flows from the stylesheet rule keyed on the
+      // data attribute, so a theme retune is a one-file change.
+      expect(el?.getAttribute('style'), difficulty).toBeNull();
+      expect(componentsCss).toContain(
+        `.crafting-difficulty[data-difficulty="${difficulty}"] {\n    color: var(${token});\n  }`,
+      );
       // Never color-only: the localized label rides inside the tinted span.
       expect(el?.textContent, difficulty).toBe(label);
     }
@@ -514,19 +543,22 @@ describe('crafting window Phase 6 QA pins', () => {
   });
 });
 
-describe('GOLD_ACCENT_COLOR lockstep (Phase 12c QA)', () => {
-  it('the TS twin, the CSS --gold token, and the literal agree', () => {
-    // icons.ts GOLD_ACCENT_COLOR exists because inline-styling painters cannot
-    // read the CSS custom property; the comment promises lockstep with --gold
-    // in src/styles/tokens.css. This pin is the promise's teeth: a retheme
-    // that moves either side without the other reds here. The literal arm
-    // keeps the pair from drifting together unnoticed (the reduced-difficulty
-    // tint pin above expects the same hex).
+describe('crafting difficulty token lockstep (retuned to tokens)', () => {
+  it('the --color-craft-* tokens carry the classic palette and the house gold', () => {
+    // The successor to the retired GOLD_ACCENT_COLOR TS twin: the difficulty
+    // tints live as semantic tokens in tokens.css. full/minimal/none must
+    // stay in lockstep with the QUALITY_COLOR classic-fidelity anchors
+    // (legendary/uncommon/poor), reduced must reference the house gold BY
+    // NAME (var(--gold), the masterwork seal idiom), and --gold itself stays
+    // the shipped #ffd100. A retheme that moves any side alone reds here.
     const tokens = readFileSync(path.resolve(process.cwd(), 'src/styles/tokens.css'), 'utf8');
+    expect(tokens).toContain(`--color-craft-full: ${QUALITY_COLOR.legendary};`);
+    expect(tokens).toContain('--color-craft-reduced: var(--gold);');
+    expect(tokens).toContain(`--color-craft-minimal: ${QUALITY_COLOR.uncommon};`);
+    expect(tokens).toContain(`--color-craft-none: ${QUALITY_COLOR.poor};`);
     const match = tokens.match(/--gold:\s*(#[0-9a-fA-F]{6})\s*;/);
     expect(match, 'tokens.css should declare --gold as a 6-digit hex').not.toBeNull();
-    expect(match?.[1]).toBe(GOLD_ACCENT_COLOR);
-    expect(GOLD_ACCENT_COLOR).toBe('#ffd100');
+    expect(match?.[1]).toBe('#ffd100');
   });
 });
 
@@ -538,7 +570,7 @@ describe('crafting window station-range repaint liveness (source pins)', () => {
     // appearing/expiring) must refresh the cold painter's rows (out-of-range
     // note, disabled state) without a per-frame repaint: the slow band
     // compares the live set's signature against the last painted one.
-    expect(hud).toContain("$('#crafting-window').style.display === 'block' &&");
+    expect(hud).toContain("$('#crafting-window').style.display === 'flex' &&");
     expect(hud).toMatch(
       /stationTypesSignature\(inRangeStationTypes\(sim\.player\.pos, sim\.activeMobileStationCraft\)\) !==\s*this\.lastCraftingStationSig/,
     );

@@ -266,7 +266,7 @@ const LETTER_IDS = [
   'letter_q_greyjaw',
   'letter_q_hollow',
   'heroic_marks_reward',
-  // Guild trend letters (Professions 2.0 Phase 7), one per canonical adjacent
+  // Guild trend letters (Professions 2.0), one per canonical adjacent
   // pair in CRAFT_RING order (GUILD_TREND_LETTERS in src/sim/content/letters.ts).
   'guild_trend_engineering_alchemy',
   'guild_trend_alchemy_cooking',
@@ -278,10 +278,10 @@ const LETTER_IDS = [
   'guild_trend_jewelcrafting_weaponcrafting',
   'guild_trend_weaponcrafting_armorcrafting',
   'guild_trend_armorcrafting_engineering',
-  // The one-time mastery reset notice (Professions 2.0 Phase 12c,
+  // The one-time mastery reset notice (Professions 2.0,
   // MASTERY_RESET_LETTER in src/sim/content/letters.ts).
   'mastery_reset_notice',
-  // Master tier-milestone letters (Professions 2.0 Phase 14), one per anchor
+  // Master tier-milestone letters (Professions 2.0), one per anchor
   // master per tier 1..5 (MASTER_TIER_LETTERS in src/sim/content/letters.ts).
   'prof_tier_weaponcrafting_armorcrafting_1',
   'prof_tier_weaponcrafting_armorcrafting_2',

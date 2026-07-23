@@ -1,5 +1,5 @@
 // Pure, host-agnostic view model for the recipe-training window
-// (Professions 2.0 Phase 9).
+// (Professions 2.0).
 //
 // The pure-core half of the pure-core + thin-consumer split (reference
 // vendor_view.ts): it decides which recipes a station master lists and in

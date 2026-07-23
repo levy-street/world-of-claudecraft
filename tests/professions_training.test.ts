@@ -1,4 +1,4 @@
-// Recipe training (Professions 2.0 Phase 9): the resolveTrain deny order,
+// Recipe training (Professions 2.0): the resolveTrain deny order,
 // the tiered fee table, the locked teach-tier predicate, and the Sim-level
 // trainRecipe command (fee charged exactly once, grant, trainResult event,
 // lastTrainResult probe, single-surface denials). The grandfather/persistence
@@ -63,7 +63,7 @@ function trainResultsOf(events: SimEvent[]): SimEvent[] {
 describe('TRAINING_FEE_BY_TIER and trainingFeeFor', () => {
   it('is literally [0, 2500, 10000, 40000, 160000] copper and frozen', () => {
     // Literal expectation on purpose (never a derived comparison): common is
-    // free, uncommon 25 silver, rare 1 gold, then the Phase 15 resolved 4x
+    // free, uncommon 25 silver, rare 1 gold, then the 4x
     // geometric step (tier 3 is 4 gold, tier 4 is 16 gold).
     expect(TRAINING_FEE_BY_TIER).toEqual([0, 2500, 10000, 40000, 160000]);
     expect(Object.isFrozen(TRAINING_FEE_BY_TIER)).toBe(true);
@@ -74,7 +74,7 @@ describe('TRAINING_FEE_BY_TIER and trainingFeeFor', () => {
     expect(trainingFeeFor({ ...base, skillReq: 0 })).toBe(0); // tier 0
     expect(trainingFeeFor({ ...base, skillReq: 25 })).toBe(2500); // tier 1
     expect(trainingFeeFor({ ...base, skillReq: 50 })).toBe(10000); // tier 2
-    // Deliberate Phase 15 re-pin: the resolved 4x geometric extension prices
+    // Deliberate re-pin: the 4x geometric extension prices
     // tier 3 at 40000 and tier 4 at 160000; tiers past the table (skillReq
     // 125+, tier 5 and up) clamp to the 160000 last entry.
     expect(trainingFeeFor({ ...base, skillReq: 75 })).toBe(40000); // tier 3
@@ -156,7 +156,7 @@ describe('resolveTrain deny order (replay safety)', () => {
     // order via a combo id temporarily NOT known: the arm after already_known
     // reads recipe.acquisition, so a trainer recipe passes it and lands on
     // the RANGE arm instead. The decisive assertion: an unknown trainer-less
-    // recipe id can only surface once Phase 10 content adds one, and the
+    // recipe id can only surface once content adds one, and the
     // combo (trainer-taught, unknown, away from the station) falls through
     // to train_out_of_range, proving the taught-here arm sits between.
     const sim = makeSim();
@@ -371,11 +371,11 @@ describe('Sim.trainRecipe (fee exactly once, grant, event, probe)', () => {
   });
 });
 
-describe('knowing vs crafting stay orthogonal (Phase 9 does not use-gate)', () => {
+describe('knowing vs crafting stay orthogonal (no use-gate)', () => {
   it('a KNOWN recipe is never use-gated by skill: skill 0 crafts a skillReq-75 tool at the toolworks', () => {
     // The no-admission-gate pin vs the new teach predicate: skillReq still
     // scales outcomes only (crafting.ts), it never denies a KNOWN recipe, so
-    // Phase 9 must not have leaked teachTierMet into craft admission.
+    // teachTierMet must not leak into craft admission.
     const sim = makeSim();
     const pid = sim.playerId;
     const meta = metaOf(sim, pid);

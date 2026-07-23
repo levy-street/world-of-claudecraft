@@ -1,4 +1,4 @@
-// THE PHASE 12c ONE-TIME SKILL RESET, with the keep ledger. A character
+// THE ONE-TIME MASTERY SKILL RESET, with the keep ledger. A character
 // loaded WITHOUT the CharacterState masteryResetApplied flag has craftSkills
 // and gatheringProficiency zeroed exactly once at load-time normalize
 // (professions/mastery_reset.ts), then the flag serializes as literal true
@@ -275,18 +275,18 @@ describe('one-shot: the flag serializes literal true and never re-fires', () => 
   });
 
   it('ROLLBACK CAVEAT pinned: a flag-stripping round trip re-fires the reset', () => {
-    // Pre-12c serialize knows no masteryResetApplied key, so a rollback
+    // Pre-reset serialize knows no masteryResetApplied key, so a rollback
     // window strips it and the re-upgrade re-fires the reset, zeroing the
     // skills regained during the window. This is the ACCEPTED destructive
     // arm of the mailWelcomed flag class (release-notes item); this pin
-    // makes the acceptance conscious, per the Phase 9 rollback-pin
+    // makes the acceptance conscious, per the rollback-pin
     // precedent.
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Rolled', { state: resetSave() });
     const blob = sim.serializeCharacter(pid);
     if (!blob) throw new Error('serializeCharacter returned null');
     blob.craftSkills = { ...blob.craftSkills, armorcrafting: 40 };
-    // biome-ignore lint/performance/noDelete: modeling the pre-12c blob shape
+    // biome-ignore lint/performance/noDelete: modeling the pre-reset blob shape
     delete blob.masteryResetApplied;
     const sim2 = makeSim(43);
     const pid2 = sim2.addPlayer('warrior', 'Rolled', { state: blob });
@@ -337,7 +337,7 @@ describe('the mail-phase notice letter', () => {
 });
 
 describe('re-crossing the 75/100 thresholds after the reset', () => {
-  it('no duplicate deed grant, no renown change beyond the NEW Phase 15 rung, no second guild trend letter', () => {
+  it('no duplicate deed grant, no renown change beyond the NEW mid-ladder rung, no second guild trend letter', () => {
     // No archetype (so the guild trend sweep is live for this character) but
     // guildLetterSent already true, both threshold deeds already earned.
     const s = resetSave();
@@ -357,7 +357,7 @@ describe('re-crossing the 75/100 thresholds after the reset', () => {
     for (let i = 0; i < 45; i++) sim.tick(); // deed eval + the 1 Hz mail sweeps
     expect(meta.deedsEarned.get('prog_craft_specialist')).toBe('2026-01-01');
     expect(meta.deedsEarned.get('prog_mining_100')).toBe('2026-01-02');
-    // The Phase 15 mid-ladder rung (prog_armorcrafting_50) did not exist when
+    // The newer mid-ladder rung (prog_armorcrafting_50) did not exist when
     // this pre-curve save was frozen, so the re-climb legitimately earns it
     // FRESH here (renown 5): the reset zeroed the skills BEFORE the join retro
     // sweep, so no join-time grant fired either (the arm two tests up). The
@@ -368,7 +368,7 @@ describe('re-crossing the 75/100 thresholds after the reset', () => {
     expect(sim.mailUnreadFor(pid)).toBe(unreadBefore);
   });
 
-  it('re-climbing to the Phase 15 mastery cap (125) after the reset double-grants NOTHING', () => {
+  it('re-climbing to the raised mastery cap (125) after the reset double-grants NOTHING', () => {
     // A save that already earned the full armorcrafting deed ladder (the 50
     // rung, the Specialist, and the Grandmaster cap deed) loses the SKILLS to
     // the one-time reset but keeps the deeds; re-climbing to 125 must leave

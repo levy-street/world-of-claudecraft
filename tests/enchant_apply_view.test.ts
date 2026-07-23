@@ -1,4 +1,4 @@
-// Pure-core tests for the Apply Enchant picker (Professions 2.0 Phase 13):
+// Pure-core tests for the Apply Enchant picker (Professions 2.0):
 // the enchants a reagent unlocks with their per-reagent affordability, the
 // eligible-target list (slot match, already-enchanted exclusion, the
 // masterwork-still-enchantable case, grouping by item id), and the enchant
@@ -39,6 +39,12 @@ describe('enchant_apply_view: enchantNameKey', () => {
     }
     for (const key of Object.keys(table)) {
       expect(ENCHANTS[key], `orphaned enchantName row ${key}`).toBeDefined();
+    }
+    // The catalog English and the table's own name field are two copies of one
+    // string (the UI renders the catalog; the table name feeds the wiki
+    // generator), so a rename touching only one side must fail loudly here.
+    for (const id of Object.keys(ENCHANTS)) {
+      expect(table[id], `catalog/table name drift for ${id}`).toBe(ENCHANTS[id].name);
     }
   });
 });

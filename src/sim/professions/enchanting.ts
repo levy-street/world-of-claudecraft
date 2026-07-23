@@ -27,7 +27,7 @@
 // output-quality ceiling crafting.ts's craftItem enforces is NOT wired in
 // here yet (this action has no rollable output quality to clamp), matching
 // how salvage.ts also does not participate in that half of the wheel. Wired
-// through the full stack in Professions 2.0 Phase 13: the disenchant_item /
+// through the full stack in Professions 2.0: the disenchant_item /
 // apply_enchant WS commands, the IWorldProfessions + ClientWorld
 // disenchantItem / applyEnchant members, and the src/ui bag-item action menu
 // plus Apply Enchant picker (bag_item_action_menu.ts), the way craft_item /
@@ -51,14 +51,14 @@ import { gainCraftSkill } from './wheel';
 // #1712 round-3 review: neither action previously called gainCraftSkill, so
 // craftSkills.enchanting stayed 0 forever, permanently locking the
 // specialization recharge discount (professions/tools.ts) and the Enchanter
-// archetype's own craft out of any progression. Phase 12c: this is now the
+// archetype's own craft out of any progression. This is now the
 // BASE gain, multiplied by enchantingGainMultiplier (archetype.ts): the
 // input's quality tier, soft-clamped to the archetype ceiling, run through
 // the four-state mastery curve, same shape as crafting.ts's
 // CRAFT_SKILL_GAIN * craftSkillGainMultiplier.
 export const ENCHANTING_SKILL_GAIN = 1;
 
-// The gain tier each ItemQuality maps to (Phase 12c quality-tiered
+// The gain tier each ItemQuality maps to (quality-tiered
 // enchanting gains): the input's rarity IS its difficulty, on the same
 // tier-index ladder the archetype ceilings use (common=0, uncommon=1,
 // rare=2, epic=3, legendary=4; poor has nothing arcane about it and scores
@@ -102,7 +102,7 @@ export const DISENCHANT_MATERIAL_BY_QUALITY: Readonly<Record<string, string>> = 
 /** The authoritative already-enchanted read for one instance payload: the
  *  explicit `enchant` marker (written by resolveApplyEnchant below), or, for
  *  legacy enchanted copies that predate the marker, bare rolled.stats WITHOUT
- *  rolled.masterwork (before the Phase 2 masterwork model, applyEnchant was
+ *  rolled.masterwork (before the masterwork model, applyEnchant was
  *  the ONLY writer of rolled.stats, so bare stats meant enchanted; a
  *  masterwork copy carries rolled.stats without being enchanted and must stay
  *  enchantable exactly like a plain copy). This is what the
@@ -186,7 +186,7 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
   if (!isDisenchantable(def)) return { ok: false, itemId, reason: 'not_disenchantable' };
   if (ctx.countEnchantableItem(itemId, pid) < 1) return { ok: false, itemId, reason: 'not_held' };
   const meta = ctx.players.get(pid);
-  // Phase 12c shared action throttle (action_throttle.ts): disenchant draws
+  // Shared action throttle (action_throttle.ts): disenchant draws
   // from the same 10-per-60s budget as crafting, checked (no side effect
   // beyond the window's own natural rollover) before anything is consumed.
   if (meta && !withinActionThrottle(meta, ctx.time)) {
@@ -195,7 +195,7 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
   ctx.removeEnchantableItem(itemId, 1, pid);
   const quality = def.quality ?? 'common';
   const materialItemId = DISENCHANT_MATERIAL_BY_QUALITY[quality] ?? 'arcane_dust';
-  // Yield model (Phase 13): sub-rare (common/uncommon) stays byte-identical to
+  // Yield model: sub-rare (common/uncommon) stays byte-identical to
   // today, a single rng draw (disenchantYield's +0/+1 bonus) over a rolled
   // count of the universal ladder material, and NO secondary. Rare+ shifts to a
   // FIXED single primary plus a typed, bind-on-trade secondary
@@ -225,7 +225,7 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
     }
   }
   if (meta) {
-    // Phase 12c quality-tiered gain: the disenchanted item's def quality is
+    // Quality-tiered gain: the disenchanted item's def quality is
     // the input tier, soft-clamped to the archetype ceiling and run through
     // the four-state curve. A zero (gray) gain never blocks the action.
     const inputTier = ENCHANTING_GAIN_TIER_BY_QUALITY[quality];
@@ -290,7 +290,7 @@ export interface ApplyEnchantResult {
  *  enchant's stat bonus (ctx.addItemInstance): equipping THAT copy is what
  *  carries the bonus into recalcPlayerStats (see items.ts equipItem). If the
  *  consumed copy was itself instanced (a crafted rare+ piece carrying a
- *  signer payload, a Phase 2 masterwork copy carrying baked bonus stats, or a
+ *  signer payload, a masterwork copy carrying baked bonus stats, or a
  *  legacy rolled.quality copy), that payload is merged into the new instance
  *  rather than dropped (stats sum ADDITIVELY), so enchanting a crafted or
  *  masterwork item does not erase its crafter attribution
@@ -318,7 +318,7 @@ export function resolveApplyEnchant(
     }
   }
   const meta = ctx.players.get(pid);
-  // Phase 12c shared action throttle (action_throttle.ts): enchant-apply
+  // Shared action throttle (action_throttle.ts): enchant-apply
   // draws from the same 10-per-60s budget as crafting, checked (no side
   // effect beyond the window's own natural rollover) before anything is
   // consumed.
@@ -330,7 +330,7 @@ export function resolveApplyEnchant(
   const merged: ItemInstancePayload = consumed
     ? cloneItemInstancePayload(consumed)
     : ({} as ItemInstancePayload);
-  // ADDITIVE stat merge (Phase 2): a masterwork copy's baked bonus
+  // ADDITIVE stat merge: a masterwork copy's baked bonus
   // (rolled.stats alongside rolled.masterwork) and the enchant's bonus must
   // BOTH survive on the enchanted copy, so the enchant sums into any existing
   // record instead of replacing it. signer, rolled.masterwork, and legacy
@@ -349,7 +349,7 @@ export function resolveApplyEnchant(
   merged.enchant = enchant.id;
   ctx.addItemInstance(itemId, merged, pid);
   if (meta) {
-    // Phase 12c quality-tiered gain: the applied enchant's reagent-derived
+    // Quality-tiered gain: the applied enchant's reagent-derived
     // tier (enchantGainTier above) is the input tier, soft-clamped to the
     // archetype ceiling and run through the four-state curve. A zero (gray)
     // gain never blocks the action.

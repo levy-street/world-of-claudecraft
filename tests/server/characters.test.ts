@@ -819,7 +819,7 @@ describe('rename handler', () => {
   });
 
   it("sweeps the renamed character's own instance signers and persists the swept blob", async () => {
-    // Phase 12d: the RETURNING row carries the persisted blob; the handler
+    // The RETURNING row carries the persisted blob; the handler
     // rewrites ONLY the character's own old-name signers across bags, bank,
     // and the equipped-instance map, leaves foreign-signed copies alone,
     // keeps a count-3 same-signer stack as one slot at count 3, and saves

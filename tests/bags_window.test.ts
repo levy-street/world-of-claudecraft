@@ -300,7 +300,7 @@ describe('bags_window: styles for the drag affordances', () => {
   });
 });
 
-describe('bags_window: per-copy instance tooltip forwarding (Professions 2.0 Phase 6)', () => {
+describe('bags_window: per-copy instance tooltip forwarding (Professions 2.0)', () => {
   it("forwards the slot's instance payload into the widened itemTooltip dep", () => {
     // The bank arm has a model-level pin (bank_view.test.ts BankSlotModel
     // .instance passthrough); the bags arm is a direct painter call, so the

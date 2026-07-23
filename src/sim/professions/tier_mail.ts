@@ -1,4 +1,4 @@
-// Tier-crossing master mail (Professions 2.0 Phase 14): when an ATTUNED
+// Tier-crossing master mail (Professions 2.0): when an ATTUNED
 // character's ACTIVE pair advances one of its two major crafts to a new tier,
 // the pair's resident master writes them a congratulatory Ravenpost letter. A
 // 1 Hz sweep beside the Guild trend letter sweep (professions/guild_letter.ts),
@@ -33,8 +33,8 @@ const KNOWN_CRAFT_IDS: ReadonlySet<string> = new Set(CRAFT_RING.map((craft) => c
  *  keeping only KNOWN ring craft ids with valid finite non-negative tiers; a
  *  craft dropped here (or absent from the save) re-baselines silently on the
  *  next sweep. An id not on the shipped ring (a retired craft, a corrupt save)
- *  drops on load and self-heals out of the record (Phase 15 QA directed fix:
- *  previously any finite non-negative key persisted forever). Keeps the sim.ts
+ *  drops on load and self-heals out of the record (previously any finite
+ *  non-negative key persisted forever). Keeps the sim.ts
  *  load arm thin and consistent with cadence.ts clampCadenceOnLoad. */
 export function normalizeTierMailOnLoad(
   saved: Record<string, number> | undefined | null,

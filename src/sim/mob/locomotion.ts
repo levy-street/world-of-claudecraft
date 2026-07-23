@@ -52,6 +52,12 @@ import {
   type Vec3,
 } from '../types';
 import { groundHeight, waterLevelAt } from '../world';
+import {
+  cancelMobChargeDash,
+  resetMobCharge,
+  tryStartMobCharge,
+  updateMobChargeDash,
+} from './charge';
 import { updateMobCombatProfile } from './combat_profile';
 import { rallyFleeingAllies } from './social_aggro';
 import { isTrivialTo, retargetMob, tickForcedTarget } from './targeting';
@@ -237,6 +243,10 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
 
   if (ctx.isStunned(mob)) {
+    // A total lockout (stun/stasis/incapacitate/polymorph) breaks an in-flight
+    // charge dash. This branch is the only mob code that runs while locked, so
+    // the dash cancel must live here: the dash step itself is never reached.
+    cancelMobChargeDash(mob);
     // A taunt/growl window is real-time: keep it counting down even while the mob
     // is stunned, since the stun path skips updateMobTarget where it normally ticks.
     tickForcedTarget(mob);
@@ -350,11 +360,18 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     }
     case 'chase':
     case 'attack': {
+      // A heroic charge dash in flight owns the mob's movement for the tick
+      // (mirrors the player's updateChargeMovement early return); it also ticks
+      // the charge cooldown, so this runs before the combat-profile runner on
+      // every engaged tick. Zero rng in every branch: inert for normal spawns.
+      if (updateMobChargeDash(ctx, mob)) break;
       const result = updateMobCombatProfile(ctx, mob, () => {
-        // The anti-kite snare and loud battle cries fire once per engaged tick,
-        // from either engaged state (mid-chase is the kite case they exist for).
+        // The anti-kite snare, loud battle cries, and the heroic charge trigger
+        // fire once per engaged tick, from either engaged state (mid-chase is
+        // the kite case they exist for).
         pulseAntiKiteSnare(ctx, mob);
         pulseLoudYell(ctx, mob);
+        tryStartMobCharge(ctx, mob);
       });
       if (result === 'runAttackMechanics') runMobAttackMechanics(ctx, mob);
       break;
@@ -685,6 +702,8 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.healedThisPull = false;
   mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
+  // Charge resets READY (cooldown 0), not telegraphed: the next pull opens with it.
+  resetMobCharge(mob);
   mob.aoeSlowTimer = MOBS[mob.templateId]?.aoeSlow?.every ?? 0;
   mob.loudYellTimer = MOBS[mob.templateId]?.battleYells?.every ?? 0;
   mob.loudYellIndex = 0;

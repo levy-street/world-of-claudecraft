@@ -569,7 +569,7 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   'summonPet',
   'dismissPet',
   'summonDemon',
-  // Maker's Bond unbind (Professions 2.0 Phase 14b): a successful unbind can
+  // Maker's Bond unbind (Professions 2.0): a successful unbind can
   // clear boundTo IN PLACE (the single-copy arm emits no loot event), so the
   // result event itself must re-diff the heavy self keys or the holder's inv
   // mirror goes stale until the staggered refresh. Also refreshes the purse
@@ -881,12 +881,12 @@ function identityFields(e: Entity): Record<string, unknown> {
       break;
     }
     // Per-slot ItemInstancePayloads of the worn set (masterwork/enchant rolls),
-    // for the inspect window (Professions 2.0 Phase 6). Same sparse rule as
+    // for the inspect window (Professions 2.0). Same sparse rule as
     // `eq` above: players only, only when at least one worn piece carries a
     // payload, riding the identity record (wireCacheFor diffs the identity
     // JSON, so an equip/unequip of an instanced piece re-emits automatically).
     // Data minimization: only the cosmetic inspect fields (signer, enchant,
-    // rolled) leave the server; boundTo, charges, and the Phase 13 bindOnTrade
+    // rolled) leave the server; boundTo, charges, and the bindOnTrade
     // arm are gameplay state no inspecting client needs and never ride this key.
     // The pub allowlist below (signer/enchant/rolled ONLY) is what enforces this,
     // so a new non-cosmetic ItemInstancePayload field is excluded by construction;
@@ -4163,13 +4163,13 @@ export class GameServer {
         );
         break;
       case 'craft_item':
-        // `commission` (Professions 2.0 Phase 14b): a strict boolean-true
+        // `commission` (Professions 2.0): a strict boolean-true
         // check (the dispatch type-guard rule); anything else reads as false.
         // The sim honors it only for eligible equipment outputs and mints the
         // bindOnTrade arm itself, so nothing here trusts client data.
         if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, msg.commission === true, pid);
         break;
-      // Enchanting profession commands (Professions 2.0 Phase 13): the sim
+      // Enchanting profession commands (Professions 2.0): the sim
       // resolvers re-validate ownership/eligibility/throttle (nothing trusted
       // from the client); the outcome reaches this client as the pid-scoped
       // disenchantResult/enchantResult/salvageResult event plus the denc/ench/salv
@@ -4187,7 +4187,7 @@ export class GameServer {
         if (typeof msg.item === 'string') sim.salvageItem(msg.item, pid);
         break;
       case 'unbind_item':
-        // Maker's Bond unbind service (Professions 2.0 Phase 14b): the sim
+        // Maker's Bond unbind service (Professions 2.0): the sim
         // resolver re-validates eligibility/bound-ness/station range/fee
         // (nothing trusted from the client); the outcome reaches this client
         // as the pid-scoped text-free unbindResult event, a HEAVY_SELF_EVENTS
@@ -4199,7 +4199,7 @@ export class GameServer {
         if (typeof msg.craft === 'string') sim.placeMobileStation(msg.craft, pid);
         break;
       case 'train_recipe':
-        // Professions 2.0 Phase 9: fee + grant resolve inside the sim
+        // Professions 2.0: fee + grant resolve inside the sim
         // (Sim.trainRecipe -> professions/training.ts resolveTrain); the
         // outcome reaches this client as the pid-scoped trainResult event and
         // the learned set rides the per-tick cprof diff (knownRecipes is part
@@ -5783,13 +5783,13 @@ export class GameServer {
     // evaluates a recipe against a pair from one tick and skills from another.
     maybe('cprof', this.sim.craftingIdentityFor(anchorSession.pid));
     // The viewer's own active mobile crafting station craft id (Professions
-    // 2.0 Phase 8), or null. Expiry resolves server-side (Sim.
+    // 2.0), or null. Expiry resolves server-side (Sim.
     // activeMobileStationCraftFor checks its own tickCount), so the delta
     // naturally flips to null the tick a station lapses and the client never
     // reasons about tick domains. Small scalar, diffed per tick like atitle.
     maybe('mst', this.sim.activeMobileStationCraftFor(anchorSession.pid));
-    // The viewer's own most recent enchanting-action outcomes (Professions 2.0
-    // Phase 13), or null. Small per-player reads diffed per tick like the other
+    // The viewer's own most recent enchanting-action outcomes (Professions
+    // 2.0), or null. Small per-player reads diffed per tick like the other
     // scalars above (a successful action already refreshed the self inventory via
     // its loot event); the convergence arm for lastDisenchantResult/lastEnchantResult/
     // lastSalvageResult, alongside the pid-scoped disenchantResult/enchantResult/
