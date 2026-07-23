@@ -16,8 +16,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 680,
-      "state": "057e3788",
+      "nextId": 719,
+      "state": "a37308ae",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -55,7 +55,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 679,
+          "entityId": 718,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -92,7 +92,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 679
+              "sourceId": 718
             }
           ],
           "blockChance": 0.05,
@@ -105,7 +105,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 679,
+          "id": 718,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -149,9 +149,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 681,
-      "state": "3f03f199",
-      "events": "f9eee101",
+      "nextId": 720,
+      "state": "bd0fd47f",
+      "events": "3ae24aa7",
       "rng": {
         "draws": 7,
         "digest": "61b86a1b"
@@ -160,8 +160,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 681,
-      "state": "cb3fc37d",
+      "nextId": 720,
+      "state": "b88f0d6b",
       "events": "741638a5",
       "rng": {
         "draws": 7,
@@ -171,9 +171,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 681,
-      "state": "7c5c93b8",
-      "events": "172a38d7",
+      "nextId": 720,
+      "state": "9feb1ddc",
+      "events": "d1ef8da9",
       "rng": {
         "draws": 157,
         "digest": "90b218a4"
@@ -182,9 +182,9 @@
     {
       "tick": 72,
       "time": 3.6,
-      "nextId": 681,
-      "state": "450972c5",
-      "events": "761ac5c8",
+      "nextId": 720,
+      "state": "71565a11",
+      "events": "1b164a82",
       "rng": {
         "draws": 239,
         "digest": "6189d9f4"
@@ -245,7 +245,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 679,
+          "entityId": 718,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -284,7 +284,7 @@
               "name": "Battle Stance",
               "remaining": 3596.4,
               "school": "physical",
-              "sourceId": 679
+              "sourceId": 718
             }
           ],
           "blockChance": 0.05,
@@ -297,7 +297,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
           "hp": 442,
-          "id": 679,
+          "id": 718,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -332,7 +332,7 @@
             "str": 41
           },
           "swingTimer": 0.45,
-          "targetId": 680,
+          "targetId": 719,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -352,7 +352,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 680,
+          "id": 719,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -366,7 +366,7 @@
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            679
+            718
           ],
           "lootable": true,
           "maxHp": 6000,
@@ -390,8 +390,8 @@
             "armor": 10
           },
           "swingTimer": 0.45,
-          "tappedById": 679,
-          "targetId": 679,
+          "tappedById": 718,
+          "targetId": 718,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,
@@ -404,9 +404,9 @@
     {
       "tick": 76,
       "time": 3.8,
-      "nextId": 681,
-      "state": "940c1aca",
-      "events": "60adaa8a",
+      "nextId": 720,
+      "state": "e305b386",
+      "events": "fa211150",
       "rng": {
         "draws": 278,
         "digest": "f98144df"
@@ -471,7 +471,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 679,
+          "entityId": 718,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -510,7 +510,7 @@
               "name": "Battle Stance",
               "remaining": 3596.2,
               "school": "physical",
-              "sourceId": 679
+              "sourceId": 718
             }
           ],
           "blockChance": 0.05,
@@ -524,7 +524,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 102.8,
           "hp": 442,
-          "id": 679,
+          "id": 718,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -559,7 +559,7 @@
             "str": 41
           },
           "swingTimer": 0.25,
-          "targetId": 680,
+          "targetId": 719,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -579,7 +579,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 680,
+          "id": 719,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -593,7 +593,7 @@
           },
           "lootFfaTimer": 59.8,
           "lootRecipientIds": [
-            679
+            718
           ],
           "lootable": true,
           "maxHp": 6000,
@@ -617,8 +617,8 @@
             "armor": 10
           },
           "swingTimer": 0.45,
-          "tappedById": 679,
-          "targetId": 679,
+          "tappedById": 718,
+          "targetId": 718,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,
