@@ -165,6 +165,31 @@ describe('per-tab row models', () => {
     expect(guildView({ ...SOCIAL, guild: null }, 'Me').guild).toBeNull();
   });
 
+  it('passes the billboard through and resolves canEditMotd per rank', () => {
+    const withMotd = (rank: 'leader' | 'officer' | 'member'): SocialInfo => ({
+      ...SOCIAL,
+      guild: {
+        ...(SOCIAL.guild as GuildInfo),
+        rank,
+        motd: 'Raid night Friday. Discord: discord.gg/example',
+        motdSetBy: 'Gizzelda',
+      },
+    });
+    const asLeader = guildView(withMotd('leader'), 'Me').guild!;
+    expect(asLeader.motd).toBe('Raid night Friday. Discord: discord.gg/example');
+    expect(asLeader.motdSetBy).toBe('Gizzelda');
+    expect(asLeader.canEditMotd).toBe(true);
+    expect(guildView(withMotd('officer'), 'Off').guild!.canEditMotd).toBe(true);
+    expect(guildView(withMotd('member'), 'Grunt').guild!.canEditMotd).toBe(false);
+  });
+
+  it('defaults missing billboard fields to empty strings (older-server frames)', () => {
+    // SOCIAL.guild is cast and carries no motd fields, the pre-billboard shape.
+    const v = guildView(SOCIAL, 'Me').guild!;
+    expect(v.motd).toBe('');
+    expect(v.motdSetBy).toBe('');
+  });
+
   it('passes each row activeTitle through as a DEED ID (null untitled), both tabs', () => {
     const social: SocialInfo = {
       ...SOCIAL,

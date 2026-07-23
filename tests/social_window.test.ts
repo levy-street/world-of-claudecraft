@@ -192,3 +192,48 @@ describe('social_window: Book of Deeds title spans (both roster surfaces)', () =
     );
   });
 });
+
+describe('social_window: guild billboard', () => {
+  // The billboard is player-controlled text on a phishing/XSS surface, so the
+  // render arm is pinned: the message goes through esc() as plain text, never
+  // through any linkifier or raw-HTML path (deliberate; do not "improve" it).
+  it('renders the message + attribution through esc() only (plain escaped text)', () => {
+    expect(painter).toContain('${esc(g.motd)}');
+    const section = painter.slice(
+      painter.indexOf('private billboardHtml'),
+      painter.indexOf('private guildMemberRowHtml'),
+    );
+    expect(section.length).toBeGreaterThan(0);
+    expect(section).not.toContain('<a ');
+    expect(section).not.toContain('innerHTML');
+  });
+
+  it('disables the edit input for non-editors and gates the save button on canEditMotd', () => {
+    expect(painter).toContain(`g.canEditMotd ? '' : ' disabled'`);
+    expect(painter).toContain('data-act="gmotd-save"');
+    // the save dispatch re-checks disabled, so a member cannot save via devtools
+    // un-hiding (UX only either way: the server enforces the real rank gate)
+    expect(painter).toContain('if (!input || input.disabled) return;');
+  });
+
+  it('names the input cap after the server clamp instead of a bare literal', () => {
+    expect(painter).toContain('const GUILD_MOTD_MAX = 240;');
+    expect(painter).toContain('maxlength="${GUILD_MOTD_MAX}"');
+  });
+
+  it('preserves an in-progress draft across the refreshList innerHTML swap', () => {
+    // The panel repaints on the slow-HUD divider whenever any social/party
+    // content changes; the draft capture keys off defaultValue (the motd
+    // rendered at the last paint) so an untouched input takes server updates
+    // while a touched or focused one survives the swap.
+    expect(painter).toContain('prevMotd.value !== prevMotd.defaultValue');
+    expect(painter).toContain('document.activeElement === prevMotd');
+    expect(painter).toContain('next.setSelectionRange(draft.selStart, draft.selEnd)');
+  });
+
+  it('dispatches the save through the delegated body handlers (click + Enter), no per-row handler', () => {
+    expect(painter).toContain("if (node.dataset.act === 'gmotd-save') {");
+    expect(painter).toContain(`input[data-field="gmotd"]`);
+    expect(painter).toContain('this.saveBillboard()');
+  });
+});

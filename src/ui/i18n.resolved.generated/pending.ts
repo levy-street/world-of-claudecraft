@@ -9,25 +9,160 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
+  ],
+  "es_ES": [
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
+  ],
+  "fr_FR": [
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
+  ],
+  "fr_CA": [
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
+  ],
+  "de_DE": [
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
+  ],
+  "nl_NL": [
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
+  ],
+  "pl_PL": [
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
+  ],
+  "id_ID": [
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
+  ],
+  "tr_TR": [
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
+  ],
+  "sv_SE": [
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
+  ],
+  "vi_VN": [
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
+  ],
+  "da_DK": [
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
+  ]
 };
