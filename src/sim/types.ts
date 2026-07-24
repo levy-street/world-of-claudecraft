@@ -3097,6 +3097,20 @@ export interface Entity {
   slowImmune?: boolean;
   healedThisPull: boolean; // desperation self-heal already used this pull
   nythraxis?: NythraxisEncounterState; // sim-only state for the Nythraxis raid encounter
+  // Last Bell squad actors (src/sim/squad/squad.ts). Sparse: set only on
+  // spawned actor entities, so existing parity goldens never move.
+  /** Which named actor this entity is (e.g. 'coalfast'); the inert arm in
+   *  mob/locomotion.ts keys on it (the squad brain owns all behavior). */
+  squadActorId?: string;
+  /** The owning story-instance claim (InstanceSlot.exitId). */
+  squadClaimId?: number;
+  /** Story-critical floor: lethal damage clamps to 1 hp and downs the actor
+   *  instead of killing it (combat/damage.ts). */
+  squadFloor?: boolean;
+  /** Downed at the floor: stops acting until a player relieves it. */
+  squadDowned?: boolean;
+  /** Outgoing-damage multiplier from group scaling at spawn. */
+  squadDamageMult?: number;
   spawnPos: Vec3;
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   evadeStall: number; // seconds an evading mob has failed to get closer to home; snaps it home if it can't path back (e.g. across water)

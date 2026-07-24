@@ -43,6 +43,7 @@ import type { CardDuelMatch } from './social/card_duel';
 import type { FinderFormationUnit } from './social/party';
 import type { VcState } from './social/vale_cup';
 import type { SpatialGrid } from './spatial';
+import type { SquadRun } from './squad/squad';
 import type {
   AbilityDef,
   Aura,
@@ -183,6 +184,9 @@ export interface SimContextPrimitives {
   // Escort quest runs keyed by EscortDef id (src/sim/escort.ts owns every
   // mutation; the backing map stays on Sim). Live view.
   readonly escortRuns: Map<string, EscortRunState>;
+  // Last Bell squad rosters keyed by story-instance claim id; owned by
+  // src/sim/squad/squad.ts, state lives on Sim as a live view.
+  readonly squadRuns: Map<number, SquadRun>;
   // I2a delve runs: the live run pool (seeded in the Sim ctor, never reassigned) and
   // the transient pet stash both stay Sim-owned (the disconnect path + serializePet
   // poke them); exposed here as live views the run module reads/mutates in place.
@@ -1089,6 +1093,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get escortRuns() {
       return host.escortRuns;
+    },
+    get squadRuns() {
+      return host.squadRuns;
     },
     get nextArenaMatchId() {
       return host.nextArenaMatchId;

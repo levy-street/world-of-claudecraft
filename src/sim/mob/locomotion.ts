@@ -192,6 +192,15 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     return;
   }
 
+  // Last Bell squad actors are driven entirely by the squad brain
+  // (src/sim/squad/squad.ts, its own tick phase): the generic mob AI must
+  // never wander, aggro, or re-hostile them. Same inert contract as the
+  // escortees below, keyed on the sparse squadActorId field.
+  if (mob.squadActorId !== undefined) {
+    mob.hostile = false;
+    return;
+  }
+
   // Escort-run escortees are inert walkers: moved only by the escort driver
   // (src/sim/escort.ts), no aggro, no wander, no evade-home, and the
   // leaked-mob safety net below must not re-hostile them. Ambush mobs damage

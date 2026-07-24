@@ -129,6 +129,7 @@ import {
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import { LAST_BELL_DUNGEON_DEFS } from './content/last_bell';
+import { LAST_BELL_SQUAD_MOBS } from './content/last_bell_squad';
 import { MAGE_PET_MOBS } from './content/mage_pets';
 import {
   NIGHTBLOOM_CAMPS,
@@ -373,6 +374,9 @@ export const MOBS: Record<string, MobTemplate> = {
   ...EVERGARDEN_MOBS,
   ...GALECREST_MOBS,
   ...FARSHORE_MOBS,
+  // Last Bell squad encounter actors (spawned only by src/sim/squad/squad.ts
+  // inside story instances, never camp-spawned).
+  ...LAST_BELL_SQUAD_MOBS,
   // The Vale Cup boarball: an inert, non-hostile ball entity (never camp-spawned;
   // the match driver in social/vale_cup.ts spawns and despawns it).
   [VALE_CUP_BALL_TEMPLATE_ID]: VALE_CUP_BALL_MOB,

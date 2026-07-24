@@ -152,6 +152,13 @@ export function dealDamage(
     amount = target.maxHp * 1000 + 1_000_000;
   }
 
+  // Last Bell squad group scaling: an actor's outgoing damage share falls as
+  // human players join (set at spawn, src/sim/squad/squad.ts). Sparse field,
+  // so every other source is byte-identical.
+  if (source?.squadDamageMult !== undefined) {
+    amount = Math.round(amount * source.squadDamageMult);
+  }
+
   // Master Armorer is a live equipment condition, not a stat baked at talent
   // recompute time. It applies to every school while the Arms warrior's current
   // mainhand is two-handed. Redirected already-final damage skips source output
@@ -502,6 +509,35 @@ export function dealDamage(
       ctx.endDuel(duel, sourcePlayer.id);
       return amount;
     }
+  }
+
+  // Last Bell squad scripted floor: a story-critical actor cannot be killed
+  // by ambient damage. Lethal damage clamps to the 1 hp floor and DOWNS the
+  // actor (it stops acting until a player relieves it: the squad brain owns
+  // recovery). The duel clamp above is the pattern; sparse field, so every
+  // other target is byte-identical.
+  if (
+    guardianWardRestore === 0 &&
+    target.squadFloor &&
+    !target.squadDowned &&
+    target.hp - amount < 1
+  ) {
+    amount = Math.max(0, target.hp - 1);
+    target.hp = 1;
+    target.squadDowned = true;
+    ctx.emit({
+      type: 'damage',
+      sourceId: source?.id ?? -1,
+      targetId: target.id,
+      amount,
+      crit,
+      school,
+      ability,
+      kind,
+      absorbed: totalAbsorbed || undefined,
+      ...attackAnimation,
+    });
+    return amount;
   }
 
   // Fiesta takedowns score a point and put the victim on a (growing) respawn

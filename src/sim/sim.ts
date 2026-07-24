@@ -384,6 +384,8 @@ import {
   revivePlayerAt,
   spawnOverworldSpiritHealers,
 } from './spirit';
+import type { SquadRun } from './squad/squad';
+import * as squadMod from './squad/squad';
 import { repairTalentLoadouts } from './talent_loadouts';
 import {
   CURRENT_CHARACTER_CONTENT_REVISION,
@@ -1645,6 +1647,9 @@ export class Sim {
   // Escort quest runs (src/sim/escort.ts), keyed by EscortDef id. Live
   // SimContext view; the module owns every mutation.
   escortRuns = new Map<string, EscortRunState>();
+  // Last Bell squad rosters, keyed by story-instance claim id (exitId).
+  // State stays on Sim (multi-Sim isolation); behavior in src/sim/squad/.
+  squadRuns = new Map<number, SquadRun>();
   // delve instances (separate slot pool from dungeons)
   delveRuns: DelveRun[] = [];
   private delvePetStash = new Map<number, PetState>();
@@ -3959,6 +3964,9 @@ export class Sim {
       get escortRuns() {
         return sim.escortRuns;
       },
+      get squadRuns() {
+        return sim.squadRuns;
+      },
       get nextArenaMatchId() {
         return sim.nextArenaMatchId;
       },
@@ -4819,6 +4827,10 @@ export class Sim {
     if (this.cfg.riftPortals) updateRiftPortalsImpl(this.ctx);
     // Escort runs walk their NPC + watch ambush waves (rng-free; src/sim/escort.ts).
     updateEscortsImpl(this.ctx);
+    // Last Bell squad actors (src/sim/squad/squad.ts): zero work and zero rng
+    // while no squad is live, so the shared draw order never moves for the
+    // existing world; a live squad's draws happen only inside new content.
+    squadMod.updateSquads(this.ctx);
     lap?.('instances');
     this.updateDelveRuns();
     lap?.('delves');
@@ -7748,6 +7760,12 @@ export class Sim {
     // owns the predicate). Players can never attack it because isHostileTo
     // resolves an ownerless mob to its hostile flag, false here.
     if (target.kind === 'mob' && escortMod.isActiveEscortee(this.ctx, target)) {
+      return this.pvpController(caster) !== null;
+    }
+    // A Last Bell squad actor is heal/shield-targetable by any player or
+    // player-owned pet; players can never attack one (isHostileTo resolves
+    // an ownerless mob to its hostile flag, false for actors).
+    if (target.kind === 'mob' && squadMod.isSquadActor(target)) {
       return this.pvpController(caster) !== null;
     }
     if (target.kind === 'mob' && target.ownerId !== null) {
