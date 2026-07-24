@@ -49,6 +49,7 @@ import {
 } from './delve_marsh_dressing';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { sharedUniforms } from './gfx';
+import { buildLastBellStoryInterior } from './last_bell_props';
 import { buildOrkadiaFieldInterior } from './orkadia_props';
 import { buildInfernalDecor, ensureInfernalDecorAssets } from './rift_decor';
 import { radialGlowTexture } from './textures';
@@ -705,6 +706,11 @@ export class DungeonInteriors {
       // base kits. `style.kit` picks the wall/floor/prop mesh mix; `style.torch`
       // overrides the torch/light colours. Undefined for authored dungeons/delves.
       style?: InteriorStyle;
+      // Last Bell story spaces share one interior kind ('farshore_story') but
+      // each area keys on its DUNGEON id (the colliders.ts pattern); mirror
+      // areas also need the world seed to re-sample the island's terrain.
+      dungeonId?: string;
+      seed?: number;
     },
   ): Promise<THREE.Group> {
     await ensureDungeonAssets();
@@ -725,6 +731,21 @@ export class DungeonInteriors {
     }
     if (interior === 'wildheart') {
       const group = buildWildheartFieldInterior({
+        lowGfx: this.lowGfx,
+        flames: this.flames,
+        fireLights: this.fireLights,
+      });
+      group.position.set(ox, 0, oz);
+      this.scene.add(group);
+      return group;
+    }
+    // Last Bell story spaces: one open-air interior kind, nine areas keyed by
+    // dungeon id (src/sim/last_bell_field.ts drives ground, walls, and props
+    // for render, sim terrain, and collision alike).
+    if (interior === 'farshore_story') {
+      const group = buildLastBellStoryInterior({
+        dungeonId: opts?.dungeonId ?? '',
+        seed: opts?.seed ?? 0,
         lowGfx: this.lowGfx,
         flames: this.flames,
         fireLights: this.fireLights,

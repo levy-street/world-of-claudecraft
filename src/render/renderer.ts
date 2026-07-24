@@ -141,6 +141,7 @@ import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './imp
 import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
+import { LAST_BELL_MOOD_AMBIENCE, type LastBellMood, lastBellMood } from './last_bell_props';
 import { LightPulses } from './light_pulses';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import {
@@ -5325,7 +5326,11 @@ export class Renderer {
     | 'rift'
     | 'practice'
     | 'orkadiaField'
-    | 'wildheartField' = 'outdoor';
+    | 'wildheartField'
+    | 'farshoreStory' = 'outdoor';
+  // Applied Last Bell story mood, keyed like riftFogKey: two story instances
+  // can differ in mood without the fogState passing through 'outdoor'.
+  private farshoreMoodKey: LastBellMood | null = null;
 
   /** Drop a retired interior's scene nodes and prune its lights/flames out of
    * the per-frame registries. See riftInteriorGroups for why nothing here
@@ -5642,7 +5647,13 @@ export class Renderer {
           const o = instanceOrigin(dungeon.index, i);
           if (Math.abs(px - o.x) < 200 && Math.abs(this.sim.player.pos.z - o.z) < 250) {
             this.builtInteriors.add(key);
-            this.buildInterior(dungeon.interior, o.x, o.z);
+            // The story interiors key their area on the dungeon id and mirror
+            // the island terrain off the world seed; the other interiors
+            // ignore both.
+            this.buildInterior(dungeon.interior, o.x, o.z, {
+              dungeonId: dungeon.id,
+              seed: this.sim.cfg.seed,
+            });
           }
         }
       }
@@ -5651,14 +5662,17 @@ export class Renderer {
     // crypt's near-black, so its flooded halls feel underwater, not just dark
     const inDelve = inside && isDelvePos(px);
     const inYumiMaze = inside && isYumiMazePos(px);
-    const interior =
-      inside && !inDelve && !inYumiMaze && !isArenaPos(px) ? dungeonAt(px)?.interior : null;
+    const dungeonHere = inside && !inDelve && !inYumiMaze && !isArenaPos(px) ? dungeonAt(px) : null;
+    const interior = dungeonHere?.interior ?? null;
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
     // Orkadia is an OPEN-AIR war-camp, not a closed room: it keeps the sky dome
     // and the daylight rig and only swaps in its own ashen field haze.
     const inOrkadiaField = interior === 'orkadia';
     const inWildheartField = interior === 'wildheart';
+    // Last Bell story spaces: fog + rig follow the AREA's mood, so the state
+    // is resolved below (after the rift branch), keyed by the dungeon id.
+    const inFarshoreStory = interior === 'farshore_story';
     const desired = inPractice
       ? 'practice'
       : inDelve
@@ -5673,11 +5687,13 @@ export class Renderer {
                 ? 'orkadiaField'
                 : inWildheartField
                   ? 'wildheartField'
-                  : inside
-                    ? 'dungeon'
-                    : camY < waterLevelAt(px, pz) - 0.05
-                      ? 'underwater'
-                      : 'outdoor';
+                  : inFarshoreStory
+                    ? 'farshoreStory'
+                    : inside
+                      ? 'dungeon'
+                      : camY < waterLevelAt(px, pz) - 0.05
+                        ? 'underwater'
+                        : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -5709,6 +5725,31 @@ export class Renderer {
       return;
     }
     this.riftFogKey = null;
+    // Last Bell story instances: fog + light rig keyed by the area's MOOD (one
+    // interior kind, nine areas), re-applied like the rift palette so moving
+    // between two story moods refreshes without passing through 'outdoor'.
+    if (desired === 'farshoreStory') {
+      const mood = lastBellMood(dungeonHere?.id ?? '') ?? 'night';
+      if (this.fogState !== 'farshoreStory' || this.farshoreMoodKey !== mood) {
+        this.fogState = 'farshoreStory';
+        this.farshoreMoodKey = mood;
+        const grade = LAST_BELL_MOOD_AMBIENCE[mood];
+        fog.color.setHex(grade.fog.color);
+        fog.near = grade.fog.near;
+        fog.far = grade.fog.far;
+        if (!this.lowGfx) {
+          this.sun.intensity = grade.sun;
+          this.hemi.intensity = grade.hemi;
+          this.scene.environmentIntensity = grade.env;
+          sharedUniforms.uRimBoost.value = grade.rim;
+          this.sun.color.setHex(grade.sunColor);
+          this.hemi.color.setHex(grade.hemiSky);
+          this.hemi.groundColor.setHex(grade.hemiGround);
+        }
+      }
+      return;
+    }
+    this.farshoreMoodKey = null;
     if (desired !== this.fogState) {
       this.fogState = desired;
       if (desired === 'dungeon') {
