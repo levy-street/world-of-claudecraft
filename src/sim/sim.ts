@@ -5307,6 +5307,7 @@ export class Sim {
         crit: false,
         ability: aura.name,
         abilityId: aura.id,
+        cueOnly: true,
       });
     }
     const source = this.entities.get(aura.sourceId);

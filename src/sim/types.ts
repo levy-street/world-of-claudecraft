@@ -3449,6 +3449,13 @@ export type SimEvent = { pid?: number } & (
       // one-shot application emit (Sim.applyAura) so the client can except one
       // specific HoT (Frenzied Regeneration) from the tick-silencing above.
       abilityId?: string;
+      // True ONLY on the one-shot application emit (Sim.applyAura): this event
+      // carries no real healing (amount is always 0) and exists purely to
+      // drive the client-side sound cue. Non-audio consumers (combat meters,
+      // combat log, FCT, heal-glow VFX) must ignore it rather than infer the
+      // same thing from amount === 0, since a genuine direct heal (applyHeal)
+      // can also legitimately land at amount 0 (full HP, fully absorbed).
+      cueOnly?: boolean;
     }
   // visual-only cue for the renderer: spell projectiles, channel beams, dot
   // ticks, aoe novas, and the ranged-mob windup telegraph ('windup' fires at
