@@ -11658,12 +11658,12 @@ export const en: EnTranslations = {
     "itemSets": {
       "boundstone_vanguard": {
         "name": "Boundstone Vanguard",
-        "bonus3": "Increases attack and casting speed by 15%."
+        "bonus3": "Increases attack and casting speed by 7.5%."
       },
       "crownforged": {
         "name": "Bonewrought Regalia",
         "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15, Stamina by 15, and attack and casting speed by 15%.",
+        "bonus3": "Increases Strength by 15, Stamina by 15, and attack and casting speed by 7.5%.",
         "bonus4": "Increases Hit by 6%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "deathlord": {
@@ -11674,7 +11674,7 @@ export const en: EnTranslations = {
       },
       "greyjaw_stalker": {
         "name": "Greyjaw Stalker's Kit",
-        "bonus3": "Increases attack and casting speed by 15%."
+        "bonus3": "Increases attack and casting speed by 7.5%."
       },
       "necromancers": {
         "name": "Mournweave Raiment",
@@ -11685,29 +11685,29 @@ export const en: EnTranslations = {
       "nighttalon": {
         "name": "Direfang Pelt",
         "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15, critical strike chance by 2%, and attack and casting speed by 15%.",
+        "bonus3": "Increases Agility by 15, critical strike chance by 1%, and attack and casting speed by 7.5%.",
         "bonus4": "Increases Hit by 6%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "soulflame": {
         "name": "Wraithfire Regalia",
         "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
-        "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%.",
+        "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 7.5%.",
         "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },
       "stormcallers": {
         "name": "Galecall Vestments",
         "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
-        "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%.",
+        "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 7.5%.",
         "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },
       "vale_arcanist": {
         "name": "Vale Arcanist's Regalia",
-        "bonus3": "Increases attack and casting speed by 15%."
+        "bonus3": "Increases attack and casting speed by 7.5%."
       },
       "wyrmshadow": {
         "name": "Nightfang Vestments",
         "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%.",
+        "bonus3": "Increases Agility by 15 and critical strike chance by 1%.",
         "bonus4": "Your weapon critical strikes have a 50% chance to grant Fangrush, increasing attack speed by 25% for 8 sec."
       }
     }

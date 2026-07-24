@@ -61,7 +61,7 @@ differentiates the ilvl tiers.
 - **crit and haste ratings already exist on items.** `BaseItemDef.critRating` /
   `hasteRating` (`types.ts:386`), summed per piece in `recalcPlayerStats`
   (`entity.ts:229`), converted via `CRIT_RATING_PER_PCT = HASTE_RATING_PER_PCT = 20`
-  (`types.ts:40`; `critFractionFromRating`/`hasteFractionFromRating`). Also on
+  (`types.ts:55-56`; `critFractionFromRating`/`hasteFractionFromRating`). Also on
   `SetBonusEffect` (`types.ts:473`). **No individual item populates them; only set
   bonuses do.** So crit/haste on gear is a content-only change.
 - **Hit rating does NOT exist** on any item, set, or entity, and nothing subtracts
