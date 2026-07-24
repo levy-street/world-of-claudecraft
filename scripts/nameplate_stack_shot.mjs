@@ -86,7 +86,10 @@ async function shoot(label, viewport, emulateTouch) {
     });
     window.__packIds = mobs.map((e) => e.id);
     document.querySelector('.camera-prompt-confirm')?.click();
-    document.querySelector('#gfx-warning-dismiss')?.click();
+    // headless swiftshader raises the software-rendering notice; it is not part
+    // of the change under review, so keep it out of the frame
+    document.querySelector('#gpu-notice button')?.click();
+    document.querySelector('#gpu-notice')?.setAttribute('hidden', '');
     return mobs.length;
   }`;
   const placed = await page.evaluate(`(${stage})(${JSON.stringify(PACK)})`);
