@@ -46,6 +46,7 @@
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
 //                                            rarity + the account-Renown leaderboard reads
+//   scenes.ts           IWorldScenes         Last Bell scene skip + dialogue-choice answer
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -81,6 +82,7 @@ import type { IWorldPet } from './world_api/pet';
 import type { IWorldProfessions } from './world_api/professions';
 import type { IWorldProgressionXp } from './world_api/progression_xp';
 import type { IWorldQuests } from './world_api/quests';
+import type { IWorldScenes } from './world_api/scenes';
 import type { IWorldSocialGraph } from './world_api/social_graph';
 import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
@@ -106,6 +108,11 @@ export type {
   DeedStats,
   OverheadEmoteId,
 } from './sim/types';
+
+// Wire cap for Last Bell scene choice/option ids: authored ids are short slugs,
+// so anything longer is malformed. Shared by the ClientWorld send guard and the
+// server dispatch validation so the two can never disagree.
+export const SCENE_ID_MAX_LENGTH = 64;
 
 // Snapshot timer wire capability shared by the browser mirror and authoritative
 // server. Keep the version exact so rolling deploys can negotiate fail-closed.
@@ -241,7 +248,8 @@ export interface IWorld
     IWorldValeCup,
     IWorldDungeonFinder,
     IWorldDeeds,
-    IWorldMounts {}
+    IWorldMounts,
+    IWorldScenes {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -448,6 +456,9 @@ export const COMMAND_NAMES = [
   // Recipe training (Professions 2.0 Phase 9): learn a trainer-taught recipe
   // at its craft's station (Sim.trainRecipe via professions/training.ts).
   'train_recipe',
+  // Last Bell scenes: skip request + leader dialogue-choice answer.
+  'scene_skip',
+  'scene_choice',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -524,7 +535,8 @@ export type WorldFacet =
   | 'IWorldValeCup'
   | 'IWorldDungeonFinder'
   | 'IWorldDeeds'
-  | 'IWorldMounts';
+  | 'IWorldMounts'
+  | 'IWorldScenes';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -732,4 +744,8 @@ export const COMMAND_FACETS = {
   // design). deedsEarned/deedStats/renown/activeTitle are snapshot reads (no
   // send, untagged).
   deed_set_title: 'IWorldDeeds',
+  // IWorldScenes: Last Bell scene skip + leader dialogue-choice answer (all
+  // scene state arrives as personal SimEvents, so these are the only sends).
+  scene_skip: 'IWorldScenes',
+  scene_choice: 'IWorldScenes',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

@@ -214,6 +214,7 @@ import * as interaction from './interaction';
 import { meetsLevelRequirement } from './item_level_req';
 import * as items from './items';
 import type { JailState } from './jail';
+import { initLastBellCampaign as initLastBellCampaignImpl } from './last_bell/campaign';
 import {
   type DeedsLeaderboardPage,
   type DevLeaderboardPage,
@@ -2106,6 +2107,9 @@ export class Sim {
     // no rng and only consume trailing entity ids, so every id and rng draw
     // above stays byte-identical to a world without escorts.
     initEscortsImpl(this.ctx);
+    // Last Bell campaign fixtures (ferry landings, scenario doors): rng-free,
+    // consumes entity ids (goldens re-minted with this world shift).
+    initLastBellCampaignImpl(this.ctx);
   }
 
   private lockoutNowMs(): number {
@@ -8860,6 +8864,13 @@ export class Sim {
 
   requestSceneSkip(pid?: number): boolean {
     return scenesMod.requestSceneSkip(this.ctx, pid);
+  }
+
+  // IWorldScenes facet adapter: the local player's skip request. Omitting the
+  // pid resolves the primary player (ctx.resolve), matching how the other
+  // facet commands resolve the offline player.
+  sceneSkip(): void {
+    scenesMod.requestSceneSkip(this.ctx);
   }
 
   answerSceneChoice(choiceId: string, optionId: string, pid?: number): boolean {

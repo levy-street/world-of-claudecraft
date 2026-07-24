@@ -115,6 +115,7 @@ import {
   type RaidLockout,
   type RecipeDef,
   type RiftFloorView,
+  SCENE_ID_MAX_LENGTH,
   type SocialInfo,
   type TradeInfo,
   type VcSharedCupInfo,
@@ -3784,6 +3785,17 @@ export class ClientWorld implements IWorld {
   // sim validator accepts, so a rejected send leaves the client untouched. ---
   setActiveTitle(deedId: string | null): void {
     this.cmd({ cmd: 'deed_set_title', deedId });
+  }
+  // --- IWorldScenes: Last Bell scene commands. Fire-and-forget: the sim
+  // answers with the 'scene' end op / 'sceneChoiceResult' event, never an
+  // outcome frame. The id caps mirror the server-side validation, so an
+  // oversized id is dropped before it ever hits the wire. ---
+  sceneSkip(): void {
+    this.cmd({ cmd: 'scene_skip' });
+  }
+  answerSceneChoice(choiceId: string, optionId: string): void {
+    if (choiceId.length > SCENE_ID_MAX_LENGTH || optionId.length > SCENE_ID_MAX_LENGTH) return;
+    this.cmd({ cmd: 'scene_choice', choiceId, optionId });
   }
   // The global rarity aggregate: a lazy anonymous REST read (the daily-rewards
   // async-read variant), resolving the endpoint payload verbatim or null on

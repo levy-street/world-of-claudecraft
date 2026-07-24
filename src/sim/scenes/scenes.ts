@@ -70,6 +70,9 @@ export interface ScenePlayback {
   /** Index-aligned with the def's ops (sorted by `at` at registration). */
   emitted: boolean[];
   skipRequested: Set<number>;
+  /** Personal shared-world playback: the audience is exactly this player,
+   * camera points are world coords, and actor ops are unavailable. */
+  audiencePid?: number;
 }
 
 const SCENES: Record<string, SceneDef> = {};
@@ -88,6 +91,10 @@ export function sceneActiveFor(ctx: SimContext, claimId: number): boolean {
 }
 
 function participants(ctx: SimContext, playback: ScenePlayback): Entity[] {
+  if (playback.audiencePid !== undefined) {
+    const p = ctx.entities.get(playback.audiencePid);
+    return p ? [p] : [];
+  }
   const inst = ctx.instances.find(
     (i) => i.dungeonId === playback.dungeonId && i.exitId === playback.claimId,
   );
@@ -103,10 +110,33 @@ function participants(ctx: SimContext, playback: ScenePlayback): Entity[] {
 }
 
 function claimOrigin(ctx: SimContext, playback: ScenePlayback): { x: number; z: number } | null {
+  if (playback.audiencePid !== undefined) return null; // world coords verbatim
   const inst = ctx.instances.find(
     (i) => i.dungeonId === playback.dungeonId && i.exitId === playback.claimId,
   );
   return inst ? ctx.instanceOriginOf(inst) : null;
+}
+
+// A personal shared-world scene (the ferry arrival): audience of one, no
+// claim, camera points are world coords, keyed by -pid so claim playbacks
+// (positive entity-id keys) never collide.
+export function playSceneForPlayer(ctx: SimContext, pid: number, sceneId: string): boolean {
+  const def = SCENES[sceneId];
+  if (!def || !ctx.entities.has(pid)) return false;
+  const key = -pid;
+  if (ctx.scenePlaybacks.has(key)) return false;
+  const playback: ScenePlayback = {
+    sceneId,
+    claimId: key,
+    dungeonId: '',
+    startedAt: ctx.time,
+    emitted: def.ops.map(() => false),
+    skipRequested: new Set(),
+    audiencePid: pid,
+  };
+  ctx.scenePlaybacks.set(key, playback);
+  emitToAudience(ctx, playback, { kind: 'start', duration: def.duration });
+  return true;
 }
 
 export function playScene(ctx: SimContext, claimId: number, sceneId: string): boolean {
@@ -254,10 +284,13 @@ export function updateScenes(ctx: SimContext): void {
       ctx.scenePlaybacks.delete(playback.claimId);
       continue;
     }
-    // A recycled claim tears its scene down silently.
-    const claimAlive = ctx.instances.some(
-      (i) => i.dungeonId === playback.dungeonId && i.exitId === playback.claimId,
-    );
+    // A recycled claim tears its scene down silently (personal playbacks
+    // have no claim and run to completion or skip).
+    const claimAlive =
+      playback.audiencePid !== undefined ||
+      ctx.instances.some(
+        (i) => i.dungeonId === playback.dungeonId && i.exitId === playback.claimId,
+      );
     if (!claimAlive) {
       ctx.scenePlaybacks.delete(playback.claimId);
       continue;

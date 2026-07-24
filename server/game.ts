@@ -84,6 +84,7 @@ import {
   type CommandName,
   type DungeonFinderBoard,
   isOverheadEmoteId,
+  SCENE_ID_MAX_LENGTH,
   STABLE_TIMER_WIRE_VERSION,
   type StableTimerWireVersion,
   type VcSharedCupInfo,
@@ -409,6 +410,7 @@ type ClientMessage = Record<string, unknown> & {
   bracket?: number;
   catalog?: string;
   choice?: 'need' | 'greed' | 'pass';
+  choiceId?: unknown;
   chroma?: string;
   cmd?: string;
   companionId?: string;
@@ -4095,6 +4097,22 @@ export class GameServer {
         break;
       case 'interact':
         sim.interact(pid);
+        break;
+      // Last Bell scenes: both verbs are cheap and fully re-validated in the
+      // sim (participant membership for the skip; leader identity, active
+      // choice, and option validity for the answer).
+      case 'scene_skip':
+        sim.requestSceneSkip(pid);
+        break;
+      case 'scene_choice':
+        if (
+          typeof msg.choiceId === 'string' &&
+          msg.choiceId.length <= SCENE_ID_MAX_LENGTH &&
+          typeof msg.optionId === 'string' &&
+          msg.optionId.length <= SCENE_ID_MAX_LENGTH
+        ) {
+          sim.answerSceneChoice(msg.choiceId, msg.optionId, pid);
+        }
         break;
       case 'loot':
         this.sendCommandOutcome(

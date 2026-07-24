@@ -66,6 +66,7 @@ import type { IWorldPet } from '../src/world_api/pet';
 import type { IWorldProfessions } from '../src/world_api/professions';
 import type { IWorldProgressionXp } from '../src/world_api/progression_xp';
 import type { IWorldQuests } from '../src/world_api/quests';
+import type { IWorldScenes } from '../src/world_api/scenes';
 import type { IWorldSocialGraph } from '../src/world_api/social_graph';
 import type { IWorldTalents } from '../src/world_api/talents';
 import type { IWorldTargeting } from '../src/world_api/targeting';
@@ -376,6 +377,9 @@ export const IWORLD_MEMBERS = [
   { name: 'setActiveTitle', kind: 'method' },
   { name: 'deedsRarity', kind: 'method' },
   { name: 'deedsLeaderboard', kind: 'method' },
+  // --- Last Bell scenes (IWorldScenes): skip + leader dialogue-choice answer ---
+  { name: 'sceneSkip', kind: 'method' },
+  { name: 'answerSceneChoice', kind: 'method' },
 ] as const satisfies readonly IWorldMember[];
 
 const DATA_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'data');
@@ -482,9 +486,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // plus the release's Card Duel facet, the Professions 2.0 identity
     // surface, and Phase 8's mobile-station pair (placeMobileStation +
     // activeMobileStationCraft).
-    expect(IWORLD_MEMBERS.length).toBe(271);
+    expect(IWORLD_MEMBERS.length).toBe(273);
     expect(DATA_MEMBERS.length).toBe(71);
-    expect(METHOD_MEMBERS.length).toBe(200);
+    expect(METHOD_MEMBERS.length).toBe(202);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -510,6 +514,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeTemporalHourglasses',
       'activeTitle',
       'advanceAmendsProgress',
+      'answerSceneChoice',
       'applyTalents',
       'archetypeAmendsProgress',
       'archetypeAmendsRequired',
@@ -710,6 +715,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'riftFloor',
       'salvageItem',
       'saveLoadout',
+      'sceneSkip',
       'searchCharacters',
       'selectMount',
       'selectTalentRow',
@@ -855,6 +861,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'accountFlair',
       'activeLootRolls',
       'advanceAmendsProgress',
+      'answerSceneChoice',
       'applyTalents',
       'arenaAugmentPick',
       'arenaQueueJoin',
@@ -1000,6 +1007,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'riftBossDeathZones',
       'salvageItem',
       'saveLoadout',
+      'sceneSkip',
       'searchCharacters',
       'selectMount',
       'selectTalentRow',
@@ -1501,6 +1509,12 @@ type _ExhaustProfessions = AssertNever<
   Exclude<keyof IWorldProfessions, (typeof FACET_PROFESSIONS)[number]>
 >;
 
+const FACET_SCENES = [
+  'sceneSkip',
+  'answerSceneChoice',
+] as const satisfies readonly (keyof IWorldScenes)[];
+type _ExhaustScenes = AssertNever<Exclude<keyof IWorldScenes, (typeof FACET_SCENES)[number]>>;
+
 const FACET_DEEDS = [
   'deedsEarned',
   'deedStats',
@@ -1543,11 +1557,12 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   mounts: FACET_MOUNTS,
   dungeonFinder: FACET_DUNGEON_FINDER,
   deeds: FACET_DEEDS,
+  scenes: FACET_SCENES,
 };
 
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
   it('pins the facet count', () => {
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(29);
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(30);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
@@ -1575,8 +1590,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(271);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(271);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(273);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(273);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

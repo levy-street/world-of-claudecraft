@@ -3111,6 +3111,8 @@ export interface Entity {
   squadDowned?: boolean;
   /** Outgoing-damage multiplier from group scaling at spawn. */
   squadDamageMult?: number;
+  /** Last Bell scenario-entry door: interacting starts this scenario. */
+  scenarioId?: string;
   spawnPos: Vec3;
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   evadeStall: number; // seconds an evading mob has failed to get closer to home; snaps it home if it can't path back (e.g. across water)

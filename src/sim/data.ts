@@ -129,6 +129,11 @@ import {
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import { LAST_BELL_DUNGEON_DEFS } from './content/last_bell';
+import {
+  LAST_BELL_CAMPAIGN_MOBS,
+  LAST_BELL_CAMPAIGN_NPCS,
+  LAST_BELL_CAMPAIGN_QUESTS,
+} from './content/last_bell_campaign';
 import { LAST_BELL_SQUAD_MOBS } from './content/last_bell_squad';
 import { MAGE_PET_MOBS } from './content/mage_pets';
 import {
@@ -377,6 +382,8 @@ export const MOBS: Record<string, MobTemplate> = {
   // Last Bell squad encounter actors (spawned only by src/sim/squad/squad.ts
   // inside story instances, never camp-spawned).
   ...LAST_BELL_SQUAD_MOBS,
+  // Last Bell campaign encounter mobs (scenario-spawned only).
+  ...LAST_BELL_CAMPAIGN_MOBS,
   // The Vale Cup boarball: an inert, non-hostile ball entity (never camp-spawned;
   // the match driver in social/vale_cup.ts spawns and despawns it).
   [VALE_CUP_BALL_TEMPLATE_ID]: VALE_CUP_BALL_MOB,
@@ -390,6 +397,7 @@ Object.assign(ITEMS, buildHeroicVariants(ITEMS, MOBS));
 // Realm NPCs are appended after brother_halven: NPCs spawn in insertion order
 // before camps, so existing entity ids stay stable (determinism).
 export const NPCS: Record<string, NpcDef> = {
+  ...LAST_BELL_CAMPAIGN_NPCS,
   ...ZONE1_NPCS,
   ...ZONE2_NPCS,
   ...ZONE3_NPCS,
@@ -419,6 +427,7 @@ export const NPCS: Record<string, NpcDef> = {
 export { type GraveyardDef, OVERWORLD_GRAVEYARDS, SPIRIT_HEALER, SPIRIT_HEALER_NPC_ID };
 
 export const QUESTS: Record<string, QuestDef> = {
+  ...LAST_BELL_CAMPAIGN_QUESTS,
   ...ZONE1_QUESTS,
   ...ZONE2_QUESTS,
   ...ZONE3_QUESTS,

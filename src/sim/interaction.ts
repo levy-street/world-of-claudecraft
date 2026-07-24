@@ -34,6 +34,7 @@ import {
 } from './encounters/nythraxis';
 import { tryStartEscort } from './escort';
 import { isInRaidInstance } from './instances/dungeons';
+import { tryLastBellInteract } from './last_bell/campaign';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -513,6 +514,10 @@ export function interact(ctx: SimContext, pid?: number): void {
           ctx.emit({ type: 'mailbox', pid: p.id });
           return;
         }
+        // Last Bell campaign fixtures: the ferry crossing and scenario doors.
+        if (target.templateId?.startsWith('lb_') && tryLastBellInteract(ctx, target, p.id)) {
+          return;
+        }
         if (tryStartNythraxisWardChannel(ctx, target, p)) return;
         pickUpObject(ctx, target.id, p.id);
         return;
@@ -592,6 +597,8 @@ export function interact(ctx: SimContext, pid?: number): void {
       ctx.emit({ type: 'mailbox', pid: p.id });
       return;
     }
+    // Last Bell campaign fixtures: the ferry crossing and scenario doors.
+    if (obj.templateId?.startsWith('lb_') && tryLastBellInteract(ctx, obj, p.id)) return;
     if (tryStartNythraxisWardChannel(ctx, obj, p)) return;
     pickUpObject(ctx, obj.id, p.id);
     return;

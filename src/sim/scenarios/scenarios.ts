@@ -72,12 +72,21 @@ export interface ScenarioStageDef {
   id: string;
   objective: ScenarioStageObjective;
   spawns?: readonly ScenarioSpawnDef[];
+  /** Waves firing mid-stage, `at` seconds after the stage arms (the
+   * Tidemill Stalker calling its add waves). Re-armed with the stage on a
+   * wipe retry. */
+  timedSpawns?: readonly { at: number; spawns: readonly ScenarioSpawnDef[] }[];
   objects?: readonly ScenarioObjectDef[];
   directives?: readonly { actorId: string; directive: SquadDirective }[];
   /** Scene script to play at stage start (scene system, src/sim/scenes/). */
   sceneId?: string;
   /** Dialogue choice to cue at stage start (scenes/choices.ts). */
   choiceId?: string;
+  /** Spawn the squad (or additional actors) when THIS stage arms, for
+   * actors who arrive mid-story (Q0's doorway). Anchored at the stage's
+   * squadAnchor (instance-local) or the def entry. */
+  spawnSquad?: { actorIds: readonly string[]; floorEnabled?: boolean };
+  squadAnchor?: { x: number; z: number };
   /** Combat stages retry from stage start on a wipe (the default for any
    * stage that spawns); set false for stages that must never re-arm. */
   retryOnWipe?: boolean;
@@ -100,6 +109,8 @@ export interface ScenarioRun {
   stageIndex: number;
   /** Entity ids spawned by the CURRENT stage (cleared on advance/retry). */
   stageSpawnIds: number[];
+  /** Index-aligned fired flags for the current stage's timedSpawns. */
+  timedFired: boolean[];
   stageObjectIds: number[];
   /** Sim-time the current stage armed (survive/scene timers). */
   stageStartedAt: number;
@@ -159,6 +170,7 @@ export function startScenario(ctx: SimContext, scenarioId: string, pid?: number)
     dungeonId: def.dungeonId,
     stageIndex: 0,
     stageSpawnIds: [],
+    timedFired: [],
     stageObjectIds: [],
     stageStartedAt: ctx.time,
     stageArmed: false,
@@ -198,19 +210,20 @@ function playersInClaim(ctx: SimContext, run: ScenarioRun): Entity[] {
   return out;
 }
 
-function armStage(ctx: SimContext, def: ScenarioDef, run: ScenarioRun): void {
-  const stage = def.stages[run.stageIndex];
-  const origin = runOrigin(ctx, run);
-  if (!stage || !origin) return;
-  run.stageArmed = true;
-  run.stageStartedAt = ctx.time;
+// Ring spawns at fixed levels (rng-free; the escort ambush pattern), used
+// by stage arming and by mid-stage timed waves.
+function fireSpawns(
+  ctx: SimContext,
+  run: ScenarioRun,
+  origin: { x: number; z: number },
+  spawns: readonly ScenarioSpawnDef[],
+): void {
   const players = playersInClaim(ctx, run);
-  for (const spawn of stage.spawns ?? []) {
+  for (const spawn of spawns) {
     const template = MOBS[spawn.mobId];
     if (!template) continue;
     const radius = spawn.radius ?? 5;
     for (let i = 0; i < spawn.count; i++) {
-      // Evenly spaced ring, rng-free (escort ambush pattern).
       const angle = (i / spawn.count) * Math.PI * 2;
       const pos = ctx.groundPos(
         origin.x + spawn.x + Math.sin(angle) * radius,
@@ -232,6 +245,28 @@ function armStage(ctx: SimContext, def: ScenarioDef, run: ScenarioRun): void {
       }
     }
   }
+}
+
+function armStage(ctx: SimContext, def: ScenarioDef, run: ScenarioRun): void {
+  const stage = def.stages[run.stageIndex];
+  const origin = runOrigin(ctx, run);
+  if (!stage || !origin) return;
+  run.stageArmed = true;
+  run.stageStartedAt = ctx.time;
+  run.timedFired = (stage.timedSpawns ?? []).map(() => false);
+  if (stage.spawnSquad && !ctx.squadRuns.has(run.claimId)) {
+    const dungeon = DUNGEONS[run.dungeonId];
+    const anchor = stage.squadAnchor ?? dungeon.entry;
+    spawnSquad(ctx, {
+      claimId: run.claimId,
+      dungeonId: run.dungeonId,
+      anchor: { x: origin.x + anchor.x, z: origin.z + anchor.z },
+      actorIds: stage.spawnSquad.actorIds,
+      humanCount: playersInClaim(ctx, run).length || 1,
+      floorEnabled: stage.spawnSquad.floorEnabled,
+    });
+  }
+  fireSpawns(ctx, run, origin, stage.spawns ?? []);
   for (const objDef of stage.objects ?? []) {
     const obj = createGroundObject(
       ctx.nextId++,
@@ -333,6 +368,14 @@ function updateRun(ctx: SimContext, run: ScenarioRun): void {
     run.done = true;
     return;
   }
+  // Mid-stage timed waves fire relative to the stage arming.
+  const waves = stage.timedSpawns ?? [];
+  for (let i = 0; i < waves.length; i++) {
+    if (run.timedFired[i] || ctx.time - run.stageStartedAt < waves[i].at) continue;
+    run.timedFired[i] = true;
+    const origin = runOrigin(ctx, run);
+    if (origin) fireSpawns(ctx, run, origin, waves[i].spawns);
+  }
   const anyAlive = players.some((p) => !p.dead);
   if (!anyAlive && (stage.retryOnWipe ?? (stage.spawns?.length ?? 0) > 0)) {
     clearStageEntities(ctx, run);
@@ -340,7 +383,13 @@ function updateRun(ctx: SimContext, run: ScenarioRun): void {
     return;
   }
   if (!stageComplete(ctx, def, run, players)) return;
-  // Stage done: leave corpses where they fell, drop leftover objects, move on.
+  // Stage done: corpses stay where they fell for looting, but anything still
+  // ALIVE from this stage leaves with it (a pending add wave must not linger
+  // into the next beat), and leftover objects drop.
+  for (const id of run.stageSpawnIds) {
+    const e = ctx.entities.get(id);
+    if (e && !e.dead) ctx.dropEntity(id);
+  }
   run.stageSpawnIds = [];
   for (const id of run.stageObjectIds) {
     if (ctx.entities.has(id)) ctx.dropEntity(id);
