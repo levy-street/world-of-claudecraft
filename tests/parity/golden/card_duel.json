@@ -14,7 +14,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 818,
+      "nextId": 823,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -28,9 +28,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 820,
-      "state": "147088f6",
-      "events": "c8a887cf",
+      "nextId": 825,
+      "state": "808fee50",
+      "events": "406fd7ab",
       "rng": {
         "draws": 38,
         "digest": "05990f09"
@@ -39,8 +39,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 820,
-      "state": "2688e595",
+      "nextId": 825,
+      "state": "facca34b",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -50,8 +50,8 @@
     {
       "tick": 15,
       "time": 0.75,
-      "nextId": 820,
-      "state": "7db402fb",
+      "nextId": 825,
+      "state": "c0a855f9",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -61,9 +61,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 820,
-      "state": "0ec79eb4",
-      "events": "b815cc7a",
+      "nextId": 825,
+      "state": "46a4ed26",
+      "events": "56f16714",
       "rng": {
         "draws": 38,
         "digest": "05990f09"
@@ -72,8 +72,8 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 820,
-      "state": "c0fe5043",
+      "nextId": 825,
+      "state": "77418b71",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -83,8 +83,8 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 820,
-      "state": "82e0116a",
+      "nextId": 825,
+      "state": "1a797324",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -94,8 +94,8 @@
     {
       "tick": 35,
       "time": 1.75,
-      "nextId": 820,
-      "state": "d304fca6",
+      "nextId": 825,
+      "state": "b810c228",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -105,8 +105,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 820,
-      "state": "2d58654f",
+      "nextId": 825,
+      "state": "65076b5d",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -116,8 +116,8 @@
     {
       "tick": 41,
       "time": 2.05,
-      "nextId": 820,
-      "state": "f23824e2",
+      "nextId": 825,
+      "state": "bc183a34",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -157,7 +157,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 818,
+          "entityId": 823,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -213,7 +213,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 819,
+          "entityId": 824,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -253,7 +253,7 @@
               "name": "Battle Stance",
               "remaining": 3597.95,
               "school": "physical",
-              "sourceId": 818
+              "sourceId": 823
             }
           ],
           "blockChance": 0.05,
@@ -266,7 +266,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 101.05,
           "hp": 100,
-          "id": 818,
+          "id": 823,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -316,7 +316,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 101.05,
           "hp": 54,
-          "id": 819,
+          "id": 824,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
