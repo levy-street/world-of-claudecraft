@@ -22,11 +22,10 @@
 
 import type { ItemSet, SetBonusEffect, SetBonusTier, SetProc } from '../types';
 
-// Haste granted by a 3-piece bonus (fraction). The one knob for every haste
-// source: 0.15 makes swings 15% faster and casts/channels 15% shorter.
-export const SET_HASTE_3PC = 0.15;
-export const SET_HASTE_3PC_RATING = 150; // -> 15% haste at 10 rating = 1%
-export const SET_CRIT_3PC_RATING = 20; // -> +2% crit at 10 rating = 1%
+// Haste granted by a 3-piece bonus after the global combat-rating conversion.
+export const SET_HASTE_3PC = 0.075;
+export const SET_HASTE_3PC_RATING = 150; // -> 7.5% haste at 20 rating = 1%
+export const SET_CRIT_3PC_RATING = 20; // -> +1% crit at 20 rating = 1%
 // The two T2 4-piece bleeds (Bonesplinter, Ragged Gash) are marginal on their own
 // (roughly their 2-piece's flat 40 AP). They now also grant Hit rating so completing
 // the set is worth chasing for Heroic (+3 above-level), where the bleed alone was not.

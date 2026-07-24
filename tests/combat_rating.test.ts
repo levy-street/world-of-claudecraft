@@ -7,9 +7,9 @@ import { Sim } from '../src/sim/sim';
 import type { Entity, ItemDef } from '../src/sim/types';
 import {
   CRIT_RATING_PER_PCT,
+  critFractionFromRating,
   HASTE_RATING_PER_PCT,
   HIT_RATING_PER_PCT,
-  critFractionFromRating,
   hasteFractionFromRating,
   hitFractionFromRating,
   meleeMissChance,
