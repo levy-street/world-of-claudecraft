@@ -1,4 +1,4 @@
-// Profession nudges (Professions 2.0 Phase 14, completing the #1295 nudge arm):
+// Profession nudges (Professions 2.0, completing the #1295 nudge arm):
 // two soft, text-free personal reminders emitted on a 1 Hz sweep beside the
 // Guild trend letter sweep (professions/guild_letter.ts). Draws NO rng; it only
 // emits events (ctx.emit draws nothing), so its position in the mail phase tail

@@ -1,5 +1,5 @@
-// Pure placement core for the crafting-station scenery (Professions 2.0
-// Phase 9). Maps each STATIONS record (src/sim/content/professions.ts, via
+// Pure placement core for the crafting-station scenery (Professions 2.0).
+// Maps each STATIONS record (src/sim/content/professions.ts, via
 // the sim/data barrel) to the world-space prop cluster the Three half
 // (stations.ts) places at it: one thematic anchor prop on the station pos
 // plus a little fixed clutter beside it. Hand-authored offsets, not

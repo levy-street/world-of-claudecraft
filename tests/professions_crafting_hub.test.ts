@@ -1,4 +1,4 @@
-// Professions 2.0 Phase 8: crafting stations and the hands-vs-stations split
+// Professions 2.0: crafting stations and the hands-vs-stations split
 // (this file previously pinned the retired #1297 level-20 crafting hub; the
 // name is kept so the deed-sourcing anchors in src/sim/content/deeds.ts stay
 // valid). Pins the station CONTENT (STATIONS / STATION_TYPE_BY_CRAFT /
@@ -55,7 +55,7 @@ const tannery = stationsOfType('tannery')[0];
 // A spot guaranteed outside EVERY station circle (far off the playfield).
 const NOWHERE = { x: 5000, z: 5000 };
 
-describe('station content (Phase 8)', () => {
+describe('station content', () => {
   it('pins the six stations: id, type, zone, and resident master', () => {
     expect(
       STATIONS.map((s) => ({ id: s.id, type: s.type, zoneId: s.zoneId, master: s.masterNpcId })),
@@ -179,7 +179,7 @@ describe('isAtStation geometry (squared-distance, per type)', () => {
   });
 });
 
-describe('resolveCraft station gate (Phase 8: position-only, per type)', () => {
+describe('resolveCraft station gate (position-only, per type)', () => {
   const recipeId = 'recipe_thorium_mining_pick'; // engineering -> toolworks
 
   function grantPickReagents(sim: Sim, pid: number) {
@@ -217,8 +217,8 @@ describe('resolveCraft station gate (Phase 8: position-only, per type)', () => {
   it('succeeds at the matching station with NO level requirement (the level arm retired)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
-    // Deliberately level 1: the old hub gate denied under level 20; Phase 8
-    // has no level arm at all.
+    // Deliberately level 1: the old hub gate denied under level 20; the
+    // station gate has no level arm at all.
     placeAt(sim, pid, toolworks.pos);
     grantPickReagents(sim, pid);
 
@@ -432,7 +432,7 @@ describe('station reagent sourcing (prog_tools_of_the_trade completability)', ()
     expect(sim.countItem('thorium_ore', pid)).toBe(4);
     expect(meta.copper).toBe(0); // both price literals held
 
-    // Phase 8: the craft happens at the recipe's own station (the Eastbrook
+    // The craft happens at the recipe's own station (the Eastbrook
     // toolworks), not at Bree's counter; a walk, never another purchase.
     placeAt(sim, pid, toolworks.pos);
     const result = craftItem(anySim.ctx, 'recipe_thorium_mining_pick', false, pid);

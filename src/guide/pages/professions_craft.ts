@@ -4,7 +4,7 @@
 // t() keys; item/recipe/NPC names are baked English proper nouns (the
 // GUIDE_DEEDS precedent) and craft/station/slot/stat/quality labels localize
 // through their existing catalog keys. TRANSPARENCY POLICY
-// (maintainer-resolved): professions pages publish EXACT numbers; the mirrored
+// professions pages publish EXACT numbers; the mirrored
 // accuracy guards live in tests/guide.test.ts.
 //
 // Enchanting rides this module as one of its routes rather than a bespoke
@@ -140,7 +140,7 @@ function factsHtml(c: GuideProfCraft): string {
 // ------------------------------------------------ per-craft prose sections
 // Craft-specific narrative (identity, materials, ladder, route; enchanting:
 // identity, leveling, market) from guide.profPages.craftProse.<craftId>.*,
-// the Phase 15 wiki-arm prose the shared sections cannot carry.
+// the craft-specific prose the shared sections cannot carry.
 function proseSection(craftId: string, slot: string, sectionId: string): string {
   return `<section class="guide-block" id="${esc(sectionId)}">
       <h2>${esc(t(`guide.profPages.craftProse.${craftId}.${slot}Heading` as TranslationKey))}</h2>

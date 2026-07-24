@@ -102,4 +102,33 @@ describe('mobile swing/cast bar anchoring (issue 1577 (6))', () => {
       /hud-mobile-compact #castbar,[\s\S]{0,80}hud-mobile-compact #swingbar \{/.test(mobileCss),
     ).toBe(true);
   });
+
+  it('mirrors the compact-tier frame nudge to the right in left-handed mode', () => {
+    // Left-handed mode mirrors Jump (and the whole action ring) to the left side,
+    // so the frame's Jump-dodging nudge must flip sign too, or it drifts into the
+    // mirrored Jump crescent instead of away from it.
+    expect(
+      /hud-mobile-compact\.mobile-left-handed #player-frame \{\s*left: calc\(50% \+ 15px\);/.test(
+        mobileCss,
+      ),
+    ).toBe(true);
+    expect(
+      /hud-mobile-compact\.mobile-left-handed #castbar,\s*body\.mobile-touch\.hud-mobile-compact\.mobile-left-handed #swingbar \{\s*left: calc\(50% \+ 15px\);/.test(
+        mobileCss,
+      ),
+    ).toBe(true);
+  });
+
+  it('mirrors the narrow landscape-gated frame nudge to the right in left-handed mode', () => {
+    const landscapeStart = mobileCss.indexOf('max-width: 800px) and (orientation: landscape)');
+    expect(landscapeStart).toBeGreaterThan(-1);
+    const landscapeEnd = mobileCss.indexOf('/* Tablet:', landscapeStart);
+    expect(landscapeEnd).toBeGreaterThan(landscapeStart);
+    const landscapeBlock = mobileCss.slice(landscapeStart, landscapeEnd);
+    expect(
+      /hud-mobile-compact\.mobile-left-handed #player-frame,\s*body\.mobile-touch\.hud-mobile-compact\.mobile-left-handed #castbar,\s*body\.mobile-touch\.hud-mobile-compact\.mobile-left-handed #swingbar \{\s*left: calc\(50% \+ 44px\);/.test(
+        landscapeBlock,
+      ),
+    ).toBe(true);
+  });
 });

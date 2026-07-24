@@ -1,4 +1,4 @@
-// Combo-gating liveness parity (Professions 2.0 Phase 3): the crafting view's
+// Combo-gating liveness parity (Professions 2.0): the crafting view's
 // combo gate must consume the shared combo_eligibility result identically and
 // LIVELY for Sim-shaped and ClientWorld-shaped inputs. This guards the #2033
 // stub trap: a ClientWorld member that exists (so the type checks and a
@@ -43,7 +43,7 @@ import type { InvSlot } from '../src/sim/types';
 import { buildCraftingView, type CraftingRecipeRow } from '../src/ui/crafting_view';
 
 // The armorcrafting+weaponcrafting minTier-1 combo recipe (content pinned by
-// tests/professions_contracts.test.ts; Phase 15 QA directed burn-down
+// tests/professions_contracts.test.ts; re-priced
 // reagents: arcanite_bar x1, thorium_ore x5, wolf_fang x4, smithing_flux x2).
 const RECIPE = COMBO_RECIPES.find((entry) => entry.id === 'recipe_ironbound_warplate_helm')!;
 

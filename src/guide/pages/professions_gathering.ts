@@ -3,7 +3,7 @@
 // precedent). Renders entirely from GUIDE_PROF_* generated data plus guide.*
 // t() keys; item/vendor names are baked English proper nouns and
 // profession/quality labels localize via their existing catalog keys.
-// TRANSPARENCY POLICY (maintainer-resolved): professions pages publish EXACT
+// TRANSPARENCY POLICY: professions pages publish EXACT
 // numbers (cast timing, band thresholds, odds, prices); the mirrored accuracy
 // guards live in tests/guide.test.ts.
 
@@ -69,11 +69,7 @@ function nodesSection(g: GuideProfGathering): string {
         <td>${esc(n.zone)}</td>
         <td>${esc(formatNumber(n.count))}</td>
         <td>${esc(formatNumber(n.tier))}</td>
-        <td>${esc(
-          n.toolTier > 1
-            ? t('guide.profPages.toolTierReq', { tier: formatNumber(n.toolTier) })
-            : t('guide.profPages.bareHands'),
-        )}</td>
+        <td>${esc(t('guide.profPages.toolTierReq', { tier: formatNumber(n.toolTier) }))}</td>
         <td>${esc(n.material)}</td>
       </tr>`,
     )

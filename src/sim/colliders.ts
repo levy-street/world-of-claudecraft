@@ -80,6 +80,23 @@ function rotY(lx: number, lz: number, rot: number): { x: number; z: number } {
   return { x: lx * c + lz * s, z: -lx * s + lz * c };
 }
 
+// default backward offset/radius for a mine's spoil mound behind the timber portal,
+// shared with the renderer (src/render/props.ts) so the two can't drift apart
+export const MINE_MOUND_DEFAULT_OFFSET = 3.4;
+export const MINE_MOUND_DEFAULT_RADIUS = 5;
+
+export function mineMoundFootprint(m: {
+  x: number;
+  z: number;
+  rot: number;
+  moundOffset?: number;
+  moundRadius?: number;
+}): { x: number; z: number; r: number } {
+  const r = m.moundRadius ?? MINE_MOUND_DEFAULT_RADIUS;
+  const mound = rotY(0, -(m.moundOffset ?? MINE_MOUND_DEFAULT_OFFSET), m.rot);
+  return { x: m.x + mound.x, z: m.z + mound.z, r };
+}
+
 // ---------------------------------------------------------------------------
 // Collider sets
 // ---------------------------------------------------------------------------
@@ -126,10 +143,7 @@ function staticWorldColliders(seed: number): Collider[] {
 
   // mines: mound behind the timber portal
   for (const m of PROPS.mines) {
-    const r = m.moundRadius ?? 5;
-    const mound = rotY(0, -(m.moundOffset ?? 3.4), m.rot);
-    const x = m.x + mound.x,
-      z = m.z + mound.z;
+    const { x, z, r } = mineMoundFootprint(m);
     out.push({ type: 'circle', x, z, r, cameraTopY: topY(seed, x, z, r + 0.2), camGhost: true });
   }
 

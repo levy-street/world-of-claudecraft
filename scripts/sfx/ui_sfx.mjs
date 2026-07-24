@@ -138,7 +138,7 @@ export const UI_SFX_SPECS = [
     tone(523, 0, 0.16, 0.19, { wave: 'triangle', endFrequency: 784 }),
     tone(784, 0.08, 0.25, 0.17, { wave: 'triangle' }),
   ]),
-  // Gathering rhythm placeholders (Professions 2.0 Phase 12b, issue #2208):
+  // Gathering rhythm placeholders (Professions 2.0, issue #2208):
   // deterministic synth stand-ins until real recordings land. Kept short,
   // distinct, and quiet-friendly; ui_fish_bite alone is tuned to grab
   // attention (it opens the live reel window) without being harsh.

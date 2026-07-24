@@ -67,13 +67,13 @@ const entrySource = `
     MASTERWORK_SPECIALIZATION_CHANCE, MASTERWORK_CHANCE_CAP,
   } from './src/sim/professions/masterwork.ts';
   export { UNBIND_FEE_BY_QUALITY_TIER } from './src/sim/professions/commission.ts';
-  export { WORK_ORDER_CADENCE_TICKS } from './src/sim/professions/cadence.ts';
+  export { WORK_ORDER_CADENCE_TICKS, WORK_ORDER_PAYOUT_FRACTION } from './src/sim/professions/cadence.ts';
   export { DISENCHANT_MATERIAL_BY_QUALITY } from './src/sim/professions/enchanting.ts';
   export {
     ARMOR_SECONDARY_BY_TYPE, TIMBER_WEAPON_TYPES,
   } from './src/sim/professions/disenchant_reagents.ts';
   export { SALVAGE_MATERIAL_BY_QUALITY } from './src/sim/professions/salvage.ts';
-  export { MARKET_CUT } from './src/sim/market.ts';
+  export { MARKET_CUT, MARKET_LISTING_DEPOSIT_COPPER } from './src/sim/market.ts';
   export { ARCHETYPE_PAIR_TARGETS } from './src/sim/professions/archetype.ts';
 `;
 
@@ -166,11 +166,13 @@ const {
   MASTERWORK_CHANCE_CAP,
   UNBIND_FEE_BY_QUALITY_TIER,
   WORK_ORDER_CADENCE_TICKS,
+  WORK_ORDER_PAYOUT_FRACTION,
   DISENCHANT_MATERIAL_BY_QUALITY,
   ARMOR_SECONDARY_BY_TYPE,
   TIMBER_WEAPON_TYPES,
   SALVAGE_MATERIAL_BY_QUALITY,
   MARKET_CUT,
+  MARKET_LISTING_DEPOSIT_COPPER,
   ARCHETYPE_PAIR_TARGETS,
 } = await import(dataUrl);
 
@@ -465,7 +467,7 @@ const deeds = DEED_ORDER.map((id) => DEEDS[id])
   }));
 
 // ---------------------------------------------------------------- professions
-// Professions 2.0 (Phase 15 wiki arm). TRANSPARENCY POLICY, maintainer-resolved:
+// Professions 2.0 (wiki arm). TRANSPARENCY POLICY:
 // unlike the delve/bestiary sections above, the professions sections publish
 // EXACT numbers (skill requirements, gain-state boundaries, band thresholds,
 // caps, fees, rare-event odds, vendor prices). Every value below is derived
@@ -624,7 +626,8 @@ const toolRow = (itemId, tier) => {
 const toolLadderFor = (professionId) => {
   const rows = [];
   // The simple pole is the fishing ladder's tier-1 rung (use type 'fishing'
-  // resolves to the bare-hands tier-1 floor, professions/tools.ts).
+  // resolves to effective tier 1 and satisfies the #2343 implement gate,
+  // professions/tools.ts).
   if (professionId === 'fishing') rows.push(toolRow('simple_fishing_pole', 1));
   for (const [id, def] of Object.entries(ITEMS)) {
     if (def.use?.type === 'gatherTool' && def.use.professionId === professionId) {
@@ -635,7 +638,8 @@ const toolLadderFor = (professionId) => {
 };
 
 // Node lists per zone: count, node tier (which IS the required tool tier;
-// tier 1 is the bare-hands floor), and the zone's material.
+// every tier requires its tool, tier 1 included, #2343), and the zone's
+// material.
 const nodeRowsFor = (professionId) => {
   const byKey = new Map();
   for (const node of GATHER_NODES) {
@@ -826,7 +830,7 @@ const profEconomy = {
     maxActions: CRAFT_THROTTLE_MAX_PER_WINDOW,
   },
   marketCutPct: pct(MARKET_CUT),
-  listingDepositCopper: 0,
+  listingDepositCopper: MARKET_LISTING_DEPOSIT_COPPER,
   trainingFeeCopperByTier: [...TRAINING_FEE_BY_TIER],
   unbindFeeCopper: {
     uncommon: UNBIND_FEE_BY_QUALITY_TIER[0],
@@ -835,7 +839,7 @@ const profEconomy = {
   },
   workOrders: {
     cadenceMinutes: WORK_ORDER_CADENCE_TICKS / 20 / 60,
-    payoutPctOfVendorValue: 50,
+    payoutPctOfVendorValue: pct(WORK_ORDER_PAYOUT_FRACTION),
     orders: workOrders,
   },
 };
@@ -959,8 +963,8 @@ export interface GuideDeed {
 }
 
 // ---------------------------------------------------------------- professions
-// Professions 2.0 reference data (Phase 15 wiki arm). TRANSPARENCY POLICY,
-// maintainer-resolved: the professions sections publish EXACT numbers (skill
+// Professions 2.0 reference data (wiki arm). TRANSPARENCY POLICY:
+// the professions sections publish EXACT numbers (skill
 // requirements, gain boundaries, band thresholds, caps, fees, odds, vendor
 // prices), all derived from the sim source; tests/guide.test.ts guards every
 // row against the live defs. Display names are baked English proper nouns

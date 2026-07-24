@@ -11,8 +11,12 @@
 // Sim (PlayerMeta.bags); Sim keeps thin same-named delegates.
 //
 // Capacity is enforced at the command boundaries (buy, loot, pick up, fish,
-// conjure, market collect, trade accept, quest turn-in, unequip) via
-// canAddItem/fitsAll pre-checks. Grant paths a player cannot re-try (winning a
+// conjure, market collect, trade accept, quest turn-in, unequip, and the
+// profession transforms: craft, salvage, disenchant, enchant apply, and the
+// unbind stack split, #2350) via canAddItem/fitsAll/countFit pre-checks; a
+// transform command models the post-consumption inventory on a scratch copy
+// (removeStacked/consumeOneScratch below) so consuming the inputs can free
+// the room the output needs. Grant paths a player cannot re-try (winning a
 // need/greed roll, master loot, delve end-of-run rewards, dev gives) skip the
 // check on purpose: an over-capacity inventory is tolerated (pre-bag saves may
 // load overflowing too) and simply blocks new pickups until space is freed.
@@ -90,7 +94,7 @@ export function usedBagSlots(inventory: readonly InvSlot[]): number {
  *  to their stackSize, then each free slot holds one fresh stack. `instance`
  *  is the payload of the copies being added (absent for a plain fungible
  *  add). A slot offers top-up room only when its payload matches under
- *  canStackInstancePayloads (identical-payload stacking, Phase 12d): a plain
+ *  canStackInstancePayloads (identical-payload stacking): a plain
  *  add never tops up an instanced slot (#1165) and an instanced add never
  *  tops up a plain slot or a differently-instanced one; a non-matching slot
  *  still occupies a slot in the `inventory.length` used count. */
@@ -118,7 +122,7 @@ export function countFit(
 }
 
 /** True when ONE copy of an instanced grant fits: room in a byte-equal
- *  mergeable stack (identical-payload stacking, Phase 12d) OR a free slot.
+ *  mergeable stack (identical-payload stacking) OR a free slot.
  *  The signed-grant guards (corpse focus-harvest, node harvest) consume this
  *  so a slot-full bag holding a same-payload stack with room keeps the
  *  signature instead of downgrading to the plain fungible fallback (#2139:
@@ -161,8 +165,8 @@ export function fitsAll(
 /** Stack-aware add: top up existing stacks to their stackSize, then append
  *  fresh stacks. `instance` is the payload the added copies carry (absent for
  *  a plain fungible add). A stack is a top-up target only when its payload
- *  matches under canStackInstancePayloads (identical-payload stacking, Phase
- *  12d; before it, #1165 kept every signer/charges/rolled/boundTo copy in its
+ *  matches under canStackInstancePayloads (identical-payload stacking;
+ *  before it, #1165 kept every signer/charges/rolled/boundTo copy in its
  *  own slot): a plain add never merges into an instanced slot and an
  *  instanced add never merges into a plain or differently-instanced one.
  *  Applies NO capacity cap (capacity is a pre-check concern); callers on a
@@ -212,6 +216,46 @@ export function removeStacked(inventory: InvSlot[], itemId: string, count: numbe
     remaining -= take;
     if (s.count <= 0) inventory.splice(i, 1);
   }
+}
+
+/** Scratch mirror of the sim's preferential single-copy removers, for
+ *  capacity simulations (#2350): removes ONE unit of `itemId` from a scratch
+ *  inventory, choosing the victim slot exactly like the live removers do: a
+ *  plain fungible slot first (highest index, removeFungibleItem's walk), then
+ *  an instanced slot `excludeInstance` does not match (highest index,
+ *  removeEnchantableItem's second pass), and only then an excluded instanced
+ *  slot (highest index: with no preferred copy left, the live paths fall back
+ *  to the plain removeItem walk, where only excluded slots remain). With no
+ *  `excludeInstance` it models items.ts removePreferFungible (salvage); with
+ *  professions/enchanting.ts isEnchantedInstance it models the
+ *  countEnchantableItem >= 1 ? removeEnchantableItem : removeItem split
+ *  (disenchant) and removeEnchantableItem alone (apply-enchant, whose
+ *  not_held gate already guarantees an unexcluded copy exists). Returns the
+ *  victim slot's payload (undefined for a plain victim or no victim at all)
+ *  so a transform command can model the grant it mints FROM the consumed
+ *  copy. A capacity pre-check must model the removal identically to the
+ *  remover it gates, or the guard re-opens the overflow class (#2139). */
+export function consumeOneScratch(
+  scratch: InvSlot[],
+  itemId: string,
+  excludeInstance?: (instance: ItemInstancePayload) => boolean,
+): ItemInstancePayload | undefined {
+  const passes: ((s: InvSlot) => boolean)[] = [
+    (s) => !s.instance,
+    (s) => !!s.instance && !excludeInstance?.(s.instance),
+    (s) => !!s.instance,
+  ];
+  for (const eligible of passes) {
+    for (let i = scratch.length - 1; i >= 0; i--) {
+      const s = scratch[i];
+      if (s.itemId !== itemId || !eligible(s)) continue;
+      const instance = s.instance;
+      s.count -= 1;
+      if (s.count <= 0) scratch.splice(i, 1);
+      return instance;
+    }
+  }
+  return undefined;
 }
 
 /** The standard full-bags rejection, shared by every capacity-gated command. */

@@ -1,5 +1,5 @@
-// Screenshot harness for the Phase 10 QA crafted-consumable icon change.
-// Renders the eleven Phase 10 crafted potions/elixirs (plus the curated
+// Screenshot harness for the crafted-consumable icon change.
+// Renders the eleven Professions 2.0 crafted potions/elixirs (plus the curated
 // elixir_of_the_bear for reference) as a labeled grid of procedural item
 // icons. Pure-icon render, no game boot needed. Run once per code state
 // (SHOT_STATE=before|after) around a temporary checkout of the old
@@ -54,7 +54,7 @@ await page.evaluate(
     document.body.appendChild(root);
 
     const title = document.createElement('h1');
-    title.textContent = `Phase 10 crafted draughts and elixirs (${state})`;
+    title.textContent = `Crafted draughts and elixirs (${state})`;
     title.style.cssText = 'font:700 22px Georgia,serif;color:#d4af37;margin:0 0 16px';
     root.appendChild(title);
 

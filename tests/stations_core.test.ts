@@ -1,4 +1,4 @@
-// Render pure core for the Phase 9 crafting-station scenery: every STATIONS
+// Render pure core for the crafting-station scenery: every STATIONS
 // record gets a prop cluster, every cluster's anchor sits EXACTLY on the
 // station pos (the spot the proximity gate measures from is the spot the
 // player sees), every prop kind resolves to a real preloadable asset, and

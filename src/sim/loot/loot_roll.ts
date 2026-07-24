@@ -58,7 +58,7 @@ const LOOT_ROLL_TIMEOUT = 60;
 // refreshes the roll to a fresh LOOT_ROLL_TIMEOUT need/greed window.
 const MASTER_LOOT_TIMEOUT = 300;
 
-// Phase 12d lifecycle decoupling: how long (seconds) a corpse stays open for
+// Lifecycle decoupling: how long (seconds) a corpse stays open for
 // its remaining half once one half is consumed, an unclaimed harvest after the
 // loot empties (pruneCorpseLoot) or leftover loot after the harvest claim is
 // spent (harvestCorpse). Shorter than the full decay window, longer than the
@@ -806,7 +806,7 @@ export function pruneCorpseLoot(ctx: SimContext, mob: Entity): void {
       return;
     }
     mob.loot = null;
-    // Phase 12d: an emptied corpse that still owes an unclaimed harvest stays
+    // An emptied corpse that still owes an unclaimed harvest stays
     // open for a short grace window (empty loot rows plus the picker; the
     // respawn gate in mob/locomotion.ts collapses it at corpseTimer 0). Only
     // a corpse with both halves consumed, or no harvest half at all, takes

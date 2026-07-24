@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { GATHERING_PROFESSION_IDS } from '../src/sim/content/professions';
 import { hasTranslation, t } from '../src/ui/i18n';
 
-// Phase 4 gather-event localization: the sim emits ids plus values only
+// Gather-event localization: the sim emits ids plus values only
 // (gatherResult / gatherRareEvent are text-free, the craftResult/skinEvent
 // precedent), so no sim/server matcher rule exists; the client renders the
 // gatherEvent.* zone-broadcast lines and the hudChrome.gathering.* gather
@@ -46,7 +46,7 @@ describe('hudChrome.gathering gather lines', () => {
     // plays the loot cue for every harvest grant; the gatherResult line exists
     // ON TOP of it as the rarity-colored gather summary. Rewording it back to
     // the loot family would print two near-identical lines per harvest (the
-    // Phase 4 review regression this pin guards).
+    // double-log regression this pin guards).
     expect(t('hudChrome.gathering.gatherLine', { name: 'X' }).startsWith('You receive')).toBe(
       false,
     );
@@ -72,6 +72,21 @@ describe('hud event switch stays wired to the ids', () => {
     ]) {
       expect(source.includes(key), key).toBe(true);
     }
+  });
+
+  it('the receive matcher accepts the xN batch suffix and still localizes the name', () => {
+    // Both grant hubs emit "You receive: X xN." for a multi-unit grant (the
+    // batched windfall). A greedy single-capture arm would feed "Copper Ore
+    // x5" to the exact-name lookup and silently render the item name in raw
+    // English for every non-English locale.
+    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    const armStart = source.indexOf('/^You receive: (.+?)( x\\d+)?\\.$/');
+    expect(armStart).toBeGreaterThan(-1);
+    const arm = source.slice(
+      armStart,
+      source.indexOf(';', source.indexOf('lootReceiveItem', armStart)),
+    );
+    expect(arm).toContain('itemStackDisplayName(match[1], match[2])');
   });
 
   it('each flavor maps to its own broadcast key in the hud switch', () => {
@@ -135,18 +150,18 @@ describe('hud event switch stays wired to the ids', () => {
   });
 });
 
-describe('hudChrome.gathering catch line (Professions 2.0 Phase 11)', () => {
+describe('hudChrome.gathering catch line (Professions 2.0)', () => {
   // The fishingResult SimEvent is text-free like gatherResult, so the client
   // catch line carries the same duties as the gather line above: exist,
   // splice, diverge from BOTH the loot family and the gather family (the
   // grant hub still prints "You receive:" for the same catch), stay wired in
-  // the hud switch, and color by item quality. Since Phase 12b the arm plays
+  // the hud switch, and color by item quality. The arm plays
   // exactly the reel cue (the landed-reel splash/crank), never the loot
   // notification the grant hub already owns (the double-log trap).
   it('the catch-line key exists and splices the name', () => {
     expect(hasTranslation('hudChrome.gathering.catchLine')).toBe(true);
-    expect(t('hudChrome.gathering.catchLine', { name: 'Glimmerfin Koi' })).toBe(
-      'You reel in: Glimmerfin Koi',
+    expect(t('hudChrome.gathering.catchLine', { name: 'Sunglint Koi' })).toBe(
+      'You reel in: Sunglint Koi',
     );
   });
 
@@ -163,8 +178,8 @@ describe('hudChrome.gathering catch line (Professions 2.0 Phase 11)', () => {
     const block = source.slice(caseStart, source.indexOf('break;', caseStart));
     expect(block.includes('hudChrome.gathering.catchLine')).toBe(true);
     expect(block.includes('QUALITY_COLOR[ev.quality]')).toBe(true);
-    // Phase 12b: the reel cue rides this arm and it is the ONLY cue there
-    // (the pre-12b pin excluded every cue; the exact-set form keeps the
+    // The reel cue rides this arm and it is the ONLY cue there
+    // (the earlier pin excluded every cue; the exact-set form keeps the
     // same third-cue protection while mandating the reel).
     const cueCalls = [...block.matchAll(/audio\.(\w+)\(/g)].map((m) => m[1]);
     expect(cueCalls).toEqual(['fishReel']);

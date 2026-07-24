@@ -2,7 +2,7 @@
 // sinks, throttles, work orders, and the Maker's Bond commission rules.
 // Renders entirely from GUIDE_PROF_ECONOMY plus guide.* t() keys; NPC and
 // material names are baked English proper nouns. TRANSPARENCY POLICY
-// (maintainer-resolved): this page publishes EXACT numbers; the mirrored
+// this page publishes EXACT numbers; the mirrored
 // accuracy guards live in tests/guide.test.ts. Distinct from the general
 // /wiki/economy page, which stays at systems-and-direction altitude.
 

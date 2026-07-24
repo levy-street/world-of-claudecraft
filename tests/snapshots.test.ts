@@ -974,7 +974,7 @@ describe('delta snapshots', () => {
   });
 
   it('instance payloads (masterwork and legacy quality) ride the inv snapshot verbatim', () => {
-    // Phase 2 back-compat over the wire: the server sends the live
+    // Back-compat over the wire: the server sends the live
     // meta.inventory wholesale, so a masterwork copy's full payload (signer,
     // enchant marker, rolled.masterwork plus baked stats) and a legacy copy's
     // rolled.quality must both arrive on the client mirror byte-identical.
@@ -1004,7 +1004,7 @@ describe('delta snapshots', () => {
     expect(client.inventory.find((s) => s.itemId === 'apprentice_staff')?.instance).toEqual(legacy);
   });
 
-  it('a counted identical-payload stack (Phase 12d) rides the inv snapshot as one slot', () => {
+  it('a counted identical-payload stack rides the inv snapshot as one slot', () => {
     // Three byte-equal signed grants merge server-side into a single count-3
     // slot; the wire sends the inventory wholesale, so the client mirror must
     // show the same one slot with the count AND the payload intact (a mirror
@@ -2578,7 +2578,7 @@ describe('weapon skin wire (weaponSkinId)', () => {
 });
 
 // Worn per-slot instance payloads ride the identity wire (terse key `eqi`,
-// Professions 2.0 Phase 6) so the inspect window shows another player's
+// Professions 2.0) so the inspect window shows another player's
 // masterwork/enchant rolls. Sparse exactly like `eq`: players only, present
 // only while at least one worn piece carries a payload, absent otherwise (the
 // no-bloat tooth: an instance-less player's identity record is byte-unchanged).
@@ -2626,7 +2626,7 @@ describe('equipped instance wire (eqi)', () => {
     sim.equipItem('eastbrook_ritual_vestments', pid);
     const wired = wireEntity(e).eqi as Record<string, Record<string, unknown>>;
     // Only the cosmetic inspect fields (signer, enchant, rolled) leave the
-    // server; boundTo, charges, and the Phase 13 bindOnTrade arm are gameplay
+    // server; boundTo, charges, and the bindOnTrade arm are gameplay
     // state no inspecting client needs and must never ride the identity wire.
     expect(wired.chest.signer).toBe('Aldric');
     expect(wired.chest.rolled).toEqual({ masterwork: true, stats: { int: 3 } });
@@ -3120,7 +3120,7 @@ function dirtyEveryDeltaField(): {
     switchCount: 2,
     amendsProgress: 4,
   };
-  // An ACTIVE mobile crafting station (Phase 8, `mst`): set directly on the
+  // An ACTIVE mobile crafting station (`mst`): set directly on the
   // meta slot (the placement command's specialization gate is pinned in
   // tests/professions_crafting_hub.test.ts; this suite pins the WIRE mirror),
   // far from expiry so the server-side liveness check reads it active.
@@ -3203,7 +3203,7 @@ function dirtyEveryDeltaField(): {
     choices: new Map(),
   });
 
-  // Enchanting-action outcomes (Professions 2.0 Phase 13): poke the exact
+  // Enchanting-action outcomes (Professions 2.0): poke the exact
   // PlayerMeta fields the denc/ench/salv encoders read
   // (lastDisenchantResultFor/lastEnchantResultFor/lastSalvageResultFor), each a
   // distinguishable non-null value so the round-trip and first-snapshot pins are
@@ -3249,14 +3249,14 @@ describe('full self-state snapshot delta fixture', () => {
       switchCount: 0,
       amendsProgress: 0,
     };
-    // Phase 15 QA directed burn-down reagents for the warplate helm.
+    // Reagents for the warplate helm.
     meta.inventory = [
       { itemId: 'arcanite_bar', count: 1 },
       { itemId: 'thorium_ore', count: 5 },
       { itemId: 'wolf_fang', count: 4 },
       { itemId: 'smithing_flux', count: 2 },
     ];
-    // Phase 9 acquisition switch: combo recipes are trainer-taught now, so a
+    // Acquisition switch: combo recipes are trainer-taught now, so a
     // fresh test player must learn this one explicitly before crafting it.
     meta.knownRecipes.add('recipe_ironbound_warplate_helm');
 
@@ -3426,7 +3426,7 @@ describe('full self-state snapshot delta fixture', () => {
     // untouched node (never in the map) still reads ready.
     expect(client.nodeHarvestableByMe(GATHER_NODES[0].id)).toBe(false);
     expect(client.nodeHarvestableByMe('not_a_real_node')).toBe(true);
-    // Phase 12c stage 2 appendix re-pin: the enforced per-profession caps
+    // Re-pin: the enforced per-profession caps
     // (mining/logging/herbalism 100, fishing 200) replace the old uniform 300.
     expect(client.professionsState).toEqual({
       skills: [
@@ -3448,7 +3448,7 @@ describe('full self-state snapshot delta fixture', () => {
       amendsRequired: 11,
     }); // cprof -> craftingIdentity
     // The pair-named archetype title derives LIVE from the mirrored
-    // craftingIdentity (Professions 2.0 Phase 1): the canonical pair id, not a
+    // craftingIdentity (Professions 2.0): the canonical pair id, not a
     // craft id, and it must reflect the cprof delta just applied.
     expect(client.archetypeTitle).toBe('weaponcrafting+armorcrafting');
     expect(client.craftSkills).toMatchObject({ armorcrafting: 31, weaponcrafting: 29 });
@@ -3456,7 +3456,7 @@ describe('full self-state snapshot delta fixture', () => {
     // (expiry resolved server-side against the sim's own tickCount).
     expect(client.activeMobileStationCraft).toBe('armorcrafting');
     // denc/ench/salv -> lastDisenchantResult/lastEnchantResult/lastSalvageResult
-    // (Professions 2.0 Phase 13): the delta arm mirrors the exact stash. JSON drops
+    // (Professions 2.0): the delta arm mirrors the exact stash. JSON drops
     // undefined fields, so each decoded object carries no undefined keys; the
     // disenchant secondary and the enchant deny reason both survive.
     expect(client.lastDisenchantResult).toEqual({

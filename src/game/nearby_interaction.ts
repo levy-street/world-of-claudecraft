@@ -8,7 +8,7 @@ export interface NearbyInteractionWorld {
   playerId?: number;
   entities: ReadonlyMap<number, Entity>;
   lootCorpse(id: number): InteractionOutcome;
-  // Fire-and-forget half of the unified corpse press (Phase 12d); omitting the
+  // Fire-and-forget half of the unified corpse press; omitting the
   // components argument selects the caller's town-focus default server-side.
   harvestCorpse(id: number): void;
   delveInteract(id: number): InteractionOutcome;
@@ -30,7 +30,7 @@ export interface NearbyInteractionHud {
 type NearbyGatherNode = Pick<GatherNodeDef, 'id' | 'pos' | 'type' | 'tier'>;
 
 /** Find and dispatch one eligible nearby interaction in stable priority order.
- *  `nodeToolGateFor` (Professions 2.0 Phase 12) resolves the tool-tier access
+ *  `nodeToolGateFor` (Professions 2.0) resolves the tool-tier access
  *  gate + localized denial line for the node about to be harvested; it sits
  *  with the node list (not trailing) so the live call site (main.ts
  *  interactKey) still closes on the nothing-to-interact string, as pinned by
@@ -109,7 +109,7 @@ export function tryNearbyInteraction(
   if (bestCorpse !== null) {
     const corpse = world.entities.get(bestCorpse);
     if (!corpse) return false;
-    // Unified press (Phase 12d): harvest first, then loot, as two separate
+    // Unified press: harvest first, then loot, as two separate
     // commands (processed in receipt order in the same server tick batch).
     // Each half is gated on the availability predicate so a claimed or
     // emptied half is never dispatched (no denial-toast spam); the server

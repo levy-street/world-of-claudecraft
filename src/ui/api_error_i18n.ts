@@ -316,6 +316,12 @@ export function userFacingApiError(err: unknown): string {
   // WebSocket disconnect reasons surfaced through the fatal overlay (net/online.ts).
   if (normalized === 'connection to the server was lost.') return t('loading.connectionLost');
   if (normalized === 'rejected by server') return t('loading.connectionRejected');
+  // The inbound flood kick. 'message rate exceeded' is a byte-exact wire contract
+  // with server/msg_rate_limit.ts (MSG_RATE_KICK_REASON), passed by both limiter
+  // kick arms in server/game.ts and deliberately session-fatal: reconnect_policy
+  // has no transient arm for it, since an immediately reconnecting flooder
+  // re-floods (lockstep pinned by tests/localization_fixes.test.ts).
+  if (normalized === 'message rate exceeded') return t('loading.messageRateExceeded');
   // The realm admission cap refused a fresh join. 'realm is full' is a byte-exact
   // wire contract with server/ws_auth.ts (WS_AUTH_ERROR).
   if (normalized === 'realm is full') return t('loading.realmFull');

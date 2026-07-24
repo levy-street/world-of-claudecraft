@@ -16,7 +16,10 @@ import { isSoftwareRendererName } from './software_renderer';
 //      anything unrecognized -> medium), so the 3D tier matches the medium data-fx-level fallback
 
 export type GfxTier = 'low' | 'medium' | 'high' | 'ultra';
-export const GFX_CONFIG_VERSION = 17;
+// v18: composer-tier draw counts became real (draw_stats_core accumulator);
+// fleet dashboards segment the rendererCalls/rendererTriangles semantics
+// change on this version (packet 0 ruling R2).
+export const GFX_CONFIG_VERSION = 18;
 
 export const GFX_BUCKET_IDS = [
   'resolution',

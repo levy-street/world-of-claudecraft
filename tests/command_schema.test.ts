@@ -27,10 +27,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // mage line's pickRowTalent) plus the mage line's empowered-cast release and pet
 // Water Jet commands, on top of Season 1 Armory skin, ignore_add/ignore_remove,
 // stow_weapon, Dungeon Finder, inv_move, the release's Card Duel minigame
-// (card_queue_join/leave, play_card, card_forfeit), Professions 2.0
-// Phase 8's place_mobile_station and Phase 9's train_recipe, Phase 13's three
-// enchanting actions (disenchant_item, apply_enchant, salvage_item), and Phase
-// 14b's unbind_item (the Maker's Bond unbind service).
+// (card_queue_join/leave, play_card, card_forfeit), and Professions 2.0's
+// place_mobile_station, train_recipe, the three enchanting actions
+// (disenchant_item, apply_enchant, salvage_item), and unbind_item (the
+// Maker's Bond unbind service).
 const EXPECTED_SEND_COUNT = 163;
 const EXPECTED_DISPATCH_COUNT = 172;
 const EXPECTED_DISPATCH_ONLY_COUNT = 9;

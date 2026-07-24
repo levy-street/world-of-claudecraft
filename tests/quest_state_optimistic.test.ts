@@ -59,13 +59,13 @@ describe('optimisticQuestState (issue 1667)', () => {
   });
 });
 
-// Phase 14: the optional `withinCadence` param is the online client's mirror of
+// The optional `withinCadence` param is the online client's mirror of
 // the server-computed work-order cooldown set (cprof), and the attunePair busy
 // gate (one pending identity transition at a time) flows through the same
 // shared computeQuestState. Both are pinned here at the optimistic seam because
 // this is the exact function the gossip dialog re-queries between a click and
 // the next snapshot.
-describe('optimisticQuestState (Phase 14: cadence + attunement busy gate)', () => {
+describe('optimisticQuestState (cadence + attunement busy gate)', () => {
   const noPending = () => new Map<string, 'accept' | 'turnin'>();
 
   it('reports a repeatable work order inside its mirrored cadence window as unavailable', () => {
@@ -132,7 +132,7 @@ describe('optimisticQuestState (Phase 14: cadence + attunement busy gate)', () =
   });
 
   it('gates a second attunePair quest while another attunement is active in the mirrored log', () => {
-    // One pending identity transition at a time (Phase 14 QA fix): an active
+    // One pending identity transition at a time: an active
     // smith attunement makes the outfitter offer unavailable even though the
     // unattuned profession state would otherwise make it a legal target.
     const questLog = new Map<string, QuestProgress>([

@@ -3,7 +3,7 @@
 // comment on src/sim/professions/archetype.ts). This pins the reachable-ceiling
 // math that makes it matter (archetypeCeilingFor/craftCeiling) plus its
 // composition into crafting.ts's tier-progress multiplier, masterwork-effect
-// gate (Professions 2.0 Phase 2: outputs are deterministic at the def quality,
+// gate (Professions 2.0: outputs are deterministic at the def quality,
 // so the ceiling binds craft outputs by gating the masterwork bump), and
 // combo-recipe gate.
 
@@ -251,8 +251,8 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
     expect(meta.craftSkills[OUTSIDE]).toBe(20); // frozen at 20: the climb itself is denied
   });
 
-  it('a common-tier (recipeTier 0) craft in a dormant craft rides the mastery curve, never the ceiling (Phase 12c)', () => {
-    // Pre-12c this pinned the tier-0 free floor (100 -> 101 even when
+  it('a common-tier (recipeTier 0) craft in a dormant craft rides the mastery curve, never the ceiling', () => {
+    // This once pinned the tier-0 free floor (100 -> 101 even when
     // dormant). The floor is retired: a common recipe now scores against raw
     // capability like every other tier, while the common CEILING still never
     // blocks it (recipeTier 0 is never above ceiling 0), so what stops the
@@ -433,8 +433,8 @@ describe('resolveCraftForRecipe reads the archetype-gated ceiling for skill-gain
   });
 });
 
-describe('archetype ceilings gate the masterwork effect (Phase 2: ceilings bind craft outputs)', () => {
-  // Professions 2.0 Phase 2 retired the rolled output quality: a craft's
+describe('archetype ceilings gate the masterwork effect (ceilings bind craft outputs)', () => {
+  // Professions 2.0 retired the rolled output quality: a craft's
   // output is its recipe's declared item at the DEF quality, and the only way
   // an output can exceed that tier is the masterwork bump (def quality + 1 on
   // the ladder). The empowerment ceiling therefore binds craft outputs by
@@ -619,14 +619,14 @@ describe('archetype ceilings gate the masterwork effect (Phase 2: ceilings bind 
   });
 });
 
-// Phase 12c appendix row: crafting keeps the HARD above-ceiling zero
+// Crafting keeps the HARD above-ceiling zero
 // (craftSkillGainMultiplier unchanged), while enchanting gets the GAINS arms
 // of the min(): above-ceiling INPUT degrades to the ceiling tier instead of
 // zeroing, because an input item is whatever the world dropped, not a chosen
 // recipe target.
-describe('enchantingGainMultiplier: the SOFT archetype ceiling (Phase 12c)', () => {
+describe('enchantingGainMultiplier: the SOFT archetype ceiling', () => {
   it('an epic input under the pre-archetype rare ceiling grants the rare-tier gain, never zero', () => {
-    // The crafting contrast arm (the appendix row's "unchanged for crafting"):
+    // The crafting contrast arm ("unchanged for crafting"):
     // a tier-3 recipe (skillReq 75) above the pre-archetype rare (2) ceiling
     // hard-zeroes.
     expect(craftSkillGainMultiplier(emptyCraftSkills(), null, null, 'enchanting', null, 75)).toBe(

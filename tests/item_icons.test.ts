@@ -268,7 +268,7 @@ describe('item webp icons', () => {
       .map((entry) => entry.itemId)
       .sort();
     const manifest = JSON.parse(
-      readFileSync(path.join(repoRoot, 'docs/professions-2/asset-manifest.json'), 'utf8'),
+      readFileSync(path.join(repoRoot, 'docs/design/professions-asset-manifest.json'), 'utf8'),
     ) as {
       categories: {
         name: string;

@@ -1,4 +1,4 @@
-// Crafting-station scenery (Professions 2.0 Phase 9): static props anchored
+// Crafting-station scenery (Professions 2.0): static props anchored
 // at each STATIONS record (src/sim/content/professions.ts) so the six
 // stations read as physical places in their towns. Purely cosmetic,
 // render-only: no collision, no interaction, no sim/IWorld state, and

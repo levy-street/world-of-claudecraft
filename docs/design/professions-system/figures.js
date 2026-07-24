@@ -37,7 +37,7 @@
   })();
 
   // Interactive explorer. majors=[i,(i+1)%N], hobbies=[opp(i),opp(i+1)], opp(i)=(i+5)%N.
-  const NAMES = ["Bombardier", "Apothecary", "Trapper", "Outfitter", "Mageweaver", "Arcanist", "Gembinder", "Bladewright", "Smith", "Cogsmith"];
+  const NAMES = ["Bombardier", "Apothecary", "Trapper", "Outfitter", "Inkweaver", "Arcanist", "Gembinder", "Bladewright", "Smith", "Gearwright"];
   const ARCH = NAMES.map((nm, i) => ({ name: nm, majors: [i, (i + 1) % N], hobbies: [(i + 5) % N, (i + 6) % N] }));
   const TIERS = ["common", "uncommon", "rare", "epic", "legendary"], RINGS = 5;
   let cur = 8, hob = 0; // default Smith

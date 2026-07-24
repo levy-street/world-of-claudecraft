@@ -1,7 +1,7 @@
 {
   "license": "World of ClaudeCraft original art (project-owned) unless an entry carries its own \"license\" field, which overrides this file-level default.",
   "iconSize": 128,
-  "note": "Profession, gathering, archetype, and masterwork icons for Professions 2.0. Ids follow docs/professions-2/asset-manifest.json. WebP only; add art with `npm run assets:professions`, which regenerates PROFESSION_IMAGE_IDS, then add its exact provenance here.",
+  "note": "Profession, gathering, archetype, and masterwork icons for Professions 2.0. Ids follow docs/design/professions-asset-manifest.json. WebP only; add art with `npm run assets:professions`, which regenerates PROFESSION_IMAGE_IDS, then add its exact provenance here.",
   "entries": [
     {
       "id": "archetype_apothecary",
@@ -41,7 +41,7 @@
     },
     {
       "id": "archetype_cogsmith",
-      "name": "The Cogsmith",
+      "name": "The Gearwright",
       "batch": "batch-4",
       "acceptedVersion": "v2",
       "source": "batch-4/masters/archetype_cogsmith.png",
@@ -59,7 +59,7 @@
     },
     {
       "id": "archetype_mageweaver",
-      "name": "The Mageweaver",
+      "name": "The Inkweaver",
       "batch": "batch-4",
       "acceptedVersion": "v3",
       "source": "batch-4/masters/archetype_mageweaver.png",

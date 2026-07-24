@@ -2565,6 +2565,34 @@
     max-height: none;
     overflow: hidden;
   }
+  /* Crafting window on touch: the mailbox "tall list window" shape. The sheet
+     shell stops scrolling (overflow hidden) so the inner .crafting-body pane
+     keeps the touch scroll without the two fighting; the identity card
+     stacks its two columns; the tab strip becomes one horizontally scrolling
+     row of 40px-floor tabs. */
+  body.mobile-touch #crafting-window {
+    height: auto;
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    overflow: hidden;
+  }
+  body.mobile-touch .profession-identity-card {
+    flex-direction: column;
+    gap: 8px;
+    /* The stacked card would otherwise eat the short landscape viewport and
+       starve the recipe pane; cap it and let it scroll internally (every row
+       stays reachable, the tab strip and recipes keep the screen). */
+    max-height: calc(var(--app-vh) * 0.34 / var(--ui-scale, 1));
+    overflow-y: auto;
+  }
+  body.mobile-touch .crafting-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  body.mobile-touch .crafting-tab {
+    min-height: 40px;
+    white-space: nowrap;
+  }
   /* The LIST owns the tracks (rows subgrid into it, see components.css), so the
      tighter mobile template lands on the list; the cap column wraps below. */
   body.mobile-touch .profession-skill-list {
@@ -3361,17 +3389,17 @@
   body.mobile-touch #unbind-window {
     overflow-y: auto;
   }
-  /* Commission opt-in row (Professions 2.0 Phase 14b): the label is the tap
-     target and the desktop 11px/2px-padding footprint sits far under the
-     40x40 touch floor (src/ui/CLAUDE.md), so on touch the whole row grows to
-     the floor and the native checkbox itself gets a finger-sized box. */
-  body.mobile-touch .crafting-commission-row {
+  /* Commission opt-in chip: the pill toggle IS the whole control, so on
+     touch it grows to the 40px tap floor (src/ui/CLAUDE.md) with a
+     finger-sized state pip. */
+  body.mobile-touch .crafting-commission-chip {
     min-height: 40px;
+    padding: 8px 16px;
     font-size: 13px;
   }
-  body.mobile-touch .crafting-commission-row input[type="checkbox"] {
-    width: 22px;
-    height: 22px;
+  body.mobile-touch .crafting-commission-pip {
+    width: 10px;
+    height: 10px;
   }
   /* Narrower size group: spellbook rows and the options form controls read fine
      at a tighter width, so these stay a compact centered card rather than
@@ -3667,6 +3695,18 @@
   body.mobile-touch #professions-window .prof-ring {
     width: 180px;
     height: 180px;
+  }
+  /* The hero band and the craft grid stack to one column on touch: the
+     landscape phone viewport has no room for side-by-side identity and
+     wheel, and single-column rows keep their full tap width. */
+  body.mobile-touch #professions-window .prof-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body.mobile-touch #professions-window .prof-ring-stage {
+    min-height: 200px;
+  }
+  body.mobile-touch #professions-window .prof-list {
+    grid-template-columns: minmax(0, 1fr);
   }
   /* On touch, stack the categories back into a single column so the large
      touch targets keep their full width. */
@@ -4015,14 +4055,14 @@
     font-size: 16px;
   }
   /* The mobile window sheet forces z-index 95 (see the managed-window override
-     above), which buries the base #ctx-menu at 90: a Phase 13 bag-item action
+     above), which buries the base #ctx-menu at 90: a bag-item action
      menu opened from inside the fullscreen Bags sheet rendered BEHIND it. The
      popup is transient and always the active interaction, so on touch it sits
      one step above the sheet. Desktop keeps the base 90 untouched. */
   body.mobile-touch #ctx-menu {
     z-index: 96;
   }
-  /* An Apply Enchant picker row (Professions 2.0 Phase 13) carries a dim meta
+  /* An Apply Enchant picker row (Professions 2.0) carries a dim meta
      sub-line; the flex row above would seat it inline beside the enchant name
      on a narrow menu, so a meta-bearing row stacks instead. */
   body.mobile-touch #ctx-menu .ctx-item:has(.ctx-item-meta) {
@@ -4036,7 +4076,7 @@
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
   }
-  /* Apply Enchant picker sizing on touch (Phase 13 QA, maintainer direction):
+  /* Apply Enchant picker sizing on touch:
      the base cap above only stops OVERFLOW, so the full-list picker still
      filled essentially the whole screen. The picker states take a tighter cap
      (landscape play is the ~390px-tall class of viewport, so a fraction of the
@@ -4995,6 +5035,15 @@
   body.mobile-touch.hud-mobile-compact #swingbar {
     left: calc(50% - 15px);
   }
+  /* Left-handed mirrors Jump (and the ring) to the left, so mirror this nudge
+     right by the same magnitude, matching the #mobile-action-ring mirror above. */
+  body.mobile-touch.hud-mobile-compact.mobile-left-handed #player-frame {
+    left: calc(50% + 15px);
+  }
+  body.mobile-touch.hud-mobile-compact.mobile-left-handed #castbar,
+  body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar {
+    left: calc(50% + 15px);
+  }
   /* Narrowest compact phones (galaxy-s8-class 740px and below): at that width the
      centred frame's right tail (right edge ~445) runs into Jump's ring crescent
      (its circle centre sits only ~82px right of viewport centre on so narrow a
@@ -5014,6 +5063,12 @@
     body.mobile-touch.hud-mobile-compact #castbar,
     body.mobile-touch.hud-mobile-compact #swingbar {
       left: calc(50% - 44px);
+    }
+    /* Left-handed mirror of the nudge above, same magnitude, opposite side. */
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed #player-frame,
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed #castbar,
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar {
+      left: calc(50% + 44px);
     }
   }
   /* Tablet: a large viewport can afford a bigger, easier-to-hit cluster than

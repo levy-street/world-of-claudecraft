@@ -42,7 +42,22 @@ import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import { buildArtisanRowProps } from './artisan_row_props';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { type BirdsView, buildBirds } from './birds';
+import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
 import { type CameraOcclusionState, stepCameraOcclusion } from './camera_collision';
+import {
+  cancelCameraDirective,
+  createCameraDirector,
+  startDeathDrift,
+  startVista,
+  stepCameraDirector,
+} from './camera_director_core';
+import {
+  cameraFovOffset,
+  createCameraFeel,
+  punchCameraFov,
+  stepCameraFeel,
+  stepLandingDetector,
+} from './camera_feel_core';
 import {
   characterRecklessnessActive,
   characterSanguineAuraActive,
@@ -70,12 +85,17 @@ import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_poli
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { trackWebGLContext } from './context_release';
-import { buildCritters, type CritterField } from './critters';
 import { animatesEveryFrame, crowdLodScaleSq, midAnimCadence } from './crowd_lod';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { buildDoorBody } from './door_portal';
+import {
+  createDrawStatsAccumulator,
+  type DrawStatsAccumulator,
+  type DrawStatsCounters,
+  governorDrawSignal,
+} from './draw_stats_core';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { objectDisplayName } from './entity_labels';
 import { resolveEnvironmentPrefilterPlan } from './env_prefilter_core';
@@ -936,6 +956,25 @@ export class Renderer {
     lensT: 1,
     fov: CAMERA_BASE_FOV,
   };
+  // AAA camera-feel layers (all display-only; see the three *_core modules):
+  // spring-arm pivot lag, look-ahead + FOV kicks + landing thump, and the
+  // directed moves (zone vista, death drift). Gated by reducedMotion().
+  private readonly camBoom = createCameraBoom();
+  private readonly camFeel = createCameraFeel();
+  private readonly camDirector = createCameraDirector();
+  // Player-pose mirror from last frame: any change while a directive runs is
+  // manual camera input (or the follow system), which cancels the directive.
+  private readonly camMirror = { yaw: Number.NaN, pitch: Number.NaN, dist: Number.NaN };
+  // Death-drift arming: only an alive-to-dead EDGE of the SAME viewed entity
+  // arms one drift (a spectate switch onto a corpse never does), and a
+  // cancelled drift stays cancelled for that death.
+  private camSelfId = -1;
+  private camSelfWasDead = false;
+  private deathDriftArmed = false;
+  // settings-backed in-game "Reduce motion" switch; OR-ed with the OS
+  // prefers-reduced-motion query in reducedMotion(). Initialized from Settings
+  // and kept live by main.ts's applySetting dispatcher (mirrors showDevBadges).
+  reduceMotionSetting = false;
   showNameplates = true;
   // settings-backed developer-badge display toggle (nameplate glyph + outline);
   // initialized from Settings and kept live by main.ts's applySetting dispatcher.
@@ -963,6 +1002,13 @@ export class Renderer {
   private entityViewCreateRangeSq = ENTITY_VIEW_CREATE_RANGE_SQ;
   private entityViewDestroyRangeSq = ENTITY_VIEW_DESTROY_RANGE_SQ;
   private renderBudgetGovernor!: RenderBudgetGovernor;
+  // Composer tiers only (packet 0 R1): with info.autoReset off, this turns the
+  // monotonic WebGL counters into per-frame deltas; null on every other profile
+  // (low/medium, native-iOS high/ultra, advanced with effects shed), which keep
+  // three's per-render auto-reset and their live reads bit-identical to before.
+  private drawStats: DrawStatsAccumulator | null = null;
+  // Last completed frame's draw delta (what perfStats serves on composer tiers).
+  private drawStatsFrame: DrawStatsCounters = { calls: 0, triangles: 0, points: 0, lines: 0 };
   private baseExposure = 1.12; // tone-mapping exposure at brightness 1.0
   private tmpV = new THREE.Vector3();
   private viewCandidates: ViewCandidate[] = [];
@@ -1046,7 +1092,6 @@ export class Renderer {
   private placedAssetsView: PlacedAssetsView | null = null;
   private foliage: FoliageView;
   private fish: FishView;
-  private critters: CritterField;
   private motes: MotesView;
   private birds: BirdsView;
   private impactSite: ImpactSiteView;
@@ -1225,6 +1270,16 @@ export class Renderer {
       this.captureGlIdentity();
     });
     initGfxTier(this.webgl); // software-GL autodetect needs the live context
+    if (GFX.composer) {
+      // three r165's render() resets info per pass (after the shadow pass, see
+      // draw_stats_core.ts header), so with the composer's multiple passes every
+      // post-frame reader saw only the final fullscreen pass (1 call/1 triangle).
+      // Accumulate manually instead: counters run monotonically and sync() takes
+      // per-frame deltas. Non-composer profiles keep the auto-reset so their
+      // governor input and telemetry stay bit-identical (packet 0 R1).
+      this.webgl.info.autoReset = false;
+      this.drawStats = createDrawStatsAccumulator();
+    }
     // The lightweight material path does not preload HDR sky/water assets.
     // Keep the renderer's HDR/IBL branch aligned with that preload decision.
     this.lowGfx = !GFX.standardMaterials;
@@ -1482,8 +1537,6 @@ export class Renderer {
     this.fish = buildFish(this.sim.cfg.seed);
     setRenderCategory(this.fish.group, 'fish');
     this.scene.add(this.fish.group);
-    this.critters = buildCritters(this.sim.cfg.seed);
-    this.scene.add(this.critters.group);
     this.motes = buildMotes(this.sim.cfg.seed);
     this.scene.add(this.motes.group);
     this.birds = buildBirds(this.sim.cfg.seed);
@@ -2009,8 +2062,10 @@ export class Renderer {
       pixelRatio: this.webgl.getPixelRatio(),
       width: this.viewport.width,
       height: this.viewport.height,
-      calls: info.render.calls,
-      triangles: info.render.triangles,
+      // Composer tiers serve the accumulated per-frame delta (the live counter
+      // is monotonic there); other profiles keep the live post-frame read.
+      calls: this.drawStats ? this.drawStatsFrame.calls : info.render.calls,
+      triangles: this.drawStats ? this.drawStatsFrame.triangles : info.render.triangles,
       geometries: info.memory.geometries,
       textures: info.memory.textures,
       programs: info.programs?.length ?? 0,
@@ -2248,13 +2303,21 @@ export class Renderer {
     // signal it is trying to fix. Manual render-scale changes still apply via
     // setRenderScale(); the automatic governor keeps to grass/VFX budgets here.
     const lockedRenderScale = this.effectiveRenderScale;
+    // Composer tiers route through governorDrawSignal, which pins the frozen
+    // legacy constant (1 call/1 triangle, the pre-accumulator post-frame read)
+    // so the governor's draw arm stays exactly as dead as before (packet 0 R1).
+    // Every other profile (including non-composer high/ultra: native iOS,
+    // advanced with effects shed) keeps the live read below, bit-identical.
+    const drawSignal = this.drawStats
+      ? governorDrawSignal(GFX.tier, this.drawStatsFrame)
+      : info.render;
     const state = this.renderBudgetGovernor.update({
       dt,
       frameMs,
       totalMs: previousTotalMs,
       submitMs: previousSubmitMs,
-      calls: info.render.calls,
-      triangles: info.render.triangles,
+      calls: drawSignal.calls,
+      triangles: drawSignal.triangles,
       grassVisibleTufts: this.lastFrameStats.foliage.grassVisibleTufts,
       grassVisibleChunks: this.lastFrameStats.foliage.grassVisibleChunks,
       activeViews: this.lastFrameStats.activeViews,
@@ -2840,10 +2903,21 @@ export class Renderer {
     return Math.max(0, this.webgl.info.memory.textures - before);
   }
 
+  // Composer tiers only: drop an out-of-band render (prewarm pass, screenshot)
+  // from the draw-stats accumulator and zero the WebGL counters so the next
+  // sync() delta covers in-band work only. No-op on every other profile, where
+  // three's per-render auto-reset already isolates passes.
+  private discardOutOfBandDraws(): void {
+    if (!this.drawStats) return;
+    this.drawStats.noteOutOfBand(this.webgl.info.render);
+    this.webgl.info.reset();
+  }
+
   private renderPrewarmPass(dt: number): void {
     this.prewarmWorldFrame(dt);
     if (this.post) this.post.render();
     else this.webgl.render(this.scene, this.camera);
+    this.discardOutOfBandDraws();
   }
 
   private diagnosticsBaselineForPrewarm(): RendererPrewarmDiagnosticsBaselineStats | null {
@@ -3611,6 +3685,8 @@ export class Renderer {
       }
       case 'levelup':
         this.vfx.levelUpPillar(this.sim.playerId);
+        // A brief FOV widen sells the surge (no-op under reduced motion).
+        this.punchFov(3);
         break;
       case 'deedUnlocked': {
         // Book of Deeds earned moment: one festival-gold shell just above the
@@ -3635,7 +3711,7 @@ export class Renderer {
         this.prebuildDelveInteriors(ev.delveId);
         break;
       case 'fishingBite': {
-        // Personal bite signal (Professions 2.0 Phase 12b): only the angler's
+        // Personal bite signal (Professions 2.0): only the angler's
         // own client receives it, so flipping their bobber into the bite
         // state here is correct (bystanders keep the idle float).
         this.fishingBobbers.bite(ev.pid);
@@ -3809,9 +3885,25 @@ export class Renderer {
   // ---- 2v2 Fiesta juice (driven by the HUD's event handler) --------------
 
   // Add camera trauma (0..1). Squared on apply, so small adds barely register
-  // and big hits (kills, ring closes) really kick.
+  // and big hits (kills, ring closes) really kick. A no-op for
+  // reduced-motion players (OS query or the in-game switch).
   addShake(amount: number): void {
+    if (this.reducedMotion()) return;
     this.shakeTrauma = Math.min(1, this.shakeTrauma + amount);
+  }
+
+  // Zone-entry vista sweep (hud.ts fires it on the zone-banner edge): the
+  // camera eases up and out and pans slowly over the new zone, then settles
+  // home. Any manual camera input cancels it; reduced motion skips it.
+  vistaPan(): void {
+    if (this.reducedMotion()) return;
+    startVista(this.camDirector);
+  }
+
+  // Transient FOV impulse in degrees (negative = a dip); decays on its own.
+  punchFov(degrees: number): void {
+    if (this.reducedMotion()) return;
+    punchCameraFov(this.camFeel, degrees);
   }
 
   // A golden pillar bursts up off a fighter who just locked in an augment.
@@ -4922,6 +5014,11 @@ export class Renderer {
       return t;
     };
 
+    // Composer tiers: snapshot the previous frame's accumulated draw counters
+    // (all composer + shadow passes) and re-arm the baseline BEFORE the governor
+    // reads its draw signal below. The WebGL counters themselves stay monotonic
+    // (autoReset is off); out-of-band renders reset them via discardOutOfBandDraws.
+    if (this.drawStats) this.drawStatsFrame = this.drawStats.beginFrame(this.webgl.info.render);
     this.updateAdaptiveResolution(dt, intentionalFramePacing, pacedTargetFps, previousFrameWorkMs);
     this.viewportPollTimer += dt;
     if (this.viewportPollTimer >= 0.25) {
@@ -5788,7 +5885,6 @@ export class Renderer {
     );
     worldStart = markWorldPhase('foliage', worldStart);
     this.fish.update(p.pos.x, p.pos.z, dt);
-    this.critters.update(p.pos.x, p.pos.z, dt);
     this.motes.update(p.pos.x, p.pos.z, dt);
     this.birds.update(p.pos.x, p.pos.z, dt);
     this.impactSite.update(p.pos.x, p.pos.z, dt);
@@ -5953,7 +6049,7 @@ export class Renderer {
   }
 
   private reducedMotion(): boolean {
-    return this.reduceMotionMql?.matches ?? false;
+    return this.reduceMotionSetting || (this.reduceMotionMql?.matches ?? false);
   }
 
   // Grab a JPEG screenshot of the live scene for a bug report. The main
@@ -5978,6 +6074,10 @@ export class Renderer {
       return out.toDataURL('image/jpeg', quality);
     } catch {
       return null;
+    } finally {
+      // The extra render above must not count toward the next frame's draw
+      // stats on composer tiers (covers the throw path too).
+      this.discardOutOfBandDraws();
     }
   }
 
@@ -6279,13 +6379,96 @@ export class Renderer {
     }
     const p = this.sim.player;
     const seed = this.sim.cfg.seed;
-    const px = selfPos.x;
-    const py = selfPos.y;
-    const pz = selfPos.z;
+    const reduce = this.reducedMotion();
+
+    // Spring-arm lag: the look pivot trails the avatar on a critically damped
+    // spring (vertical softer), so runs, jumps, mantles, and landings carry
+    // weight. Reduced motion stiffens it to near-rigid instead of branching.
+    stepCameraBoom(this.camBoom, selfPos.x, selfPos.y, selfPos.z, dt, reduce ? 4 : 1);
+
+    // Landing thump, detected from the display trajectory alone (works in
+    // both hosts): a short FOV dip plus a touch of trauma, scaled by fall
+    // speed. addShake/punchFov are reduced-motion no-ops already.
+    const thump = stepLandingDetector(this.camFeel, selfPos.y, dt);
+    if (thump > 0) {
+      this.punchFov(-3.5 * thump);
+      this.addShake(0.1 + 0.3 * thump);
+    }
+
+    // Look-ahead lead + speed FOV, fed by the horizontal display velocity.
+    let velX = 0;
+    let velZ = 0;
+    if (this.lastLocalPos && dt > 1e-4) {
+      velX = (selfPos.x - this.lastLocalPos.x) / dt;
+      velZ = (selfPos.z - this.lastLocalPos.z) / dt;
+      // A teleport is not velocity.
+      if (velX * velX + velZ * velZ > 30 * 30) {
+        velX = 0;
+        velZ = 0;
+      }
+    }
+    stepCameraFeel(this.camFeel, velX, velZ, dt, !reduce);
+
+    // Flipping reduce motion on mid-directive blends any running move out.
+    if (reduce) cancelCameraDirective(this.camDirector);
+
+    // Death drift: one slow elevated drift per death while the body lies
+    // unreleased. Armed only on the alive-to-dead EDGE of the SAME viewed
+    // entity, so a spectate switch onto an already-dead target never drifts;
+    // the edge releases a running vista first and the drift starts once the
+    // director is free. Releasing/resurrecting (or camera input) blends out.
+    const deadBody = p.dead && !p.ghost;
+    if (p.id !== this.camSelfId) {
+      this.camSelfId = p.id;
+      this.deathDriftArmed = false;
+      cancelCameraDirective(this.camDirector);
+    } else if (deadBody && !this.camSelfWasDead) {
+      this.deathDriftArmed = true;
+      cancelCameraDirective(this.camDirector);
+    }
+    this.camSelfWasDead = deadBody;
+    if (!deadBody) {
+      this.deathDriftArmed = false;
+      if (this.camDirector.kind === 'deathDrift') cancelCameraDirective(this.camDirector);
+    } else if (this.deathDriftArmed && !reduce && this.camDirector.kind === null) {
+      startDeathDrift(this.camDirector);
+      this.deathDriftArmed = false;
+    }
+
+    // Directed moves blend OVER the live player pose; any change to that pose
+    // since last frame is manual input (or the follow system) and cancels.
+    const mirror = this.camMirror;
+    const disturbed =
+      this.camDirector.kind !== null &&
+      !Number.isNaN(mirror.yaw) &&
+      (Math.abs(this.camYaw - mirror.yaw) > 1e-4 ||
+        Math.abs(this.camPitch - mirror.pitch) > 1e-4 ||
+        Math.abs(this.camDist - mirror.dist) > 1e-4);
+    const pose = stepCameraDirector(
+      this.camDirector,
+      { yaw: this.camYaw, pitch: this.camPitch, dist: this.camDist },
+      dt,
+      disturbed,
+    );
+    mirror.yaw = this.camYaw;
+    mirror.pitch = this.camPitch;
+    mirror.dist = this.camDist;
+
+    // The camera ORBITS the lagged/led pivot, but the occlusion ray and the
+    // pull-in anchor stay on the AVATAR's eye: the avatar is collision
+    // resolved so the ray origin can never sit inside a collider's pad
+    // (which would blind the sweep and let the camera see through the wall),
+    // and the min-distance clamp stays avatar-relative.
+    const px = this.camBoom.x + this.camFeel.leadX;
+    const py = this.camBoom.y;
+    const pz = this.camBoom.z + this.camFeel.leadZ;
     const eyeY = py + 2.0;
-    let cx = px - Math.sin(this.camYaw) * Math.cos(this.camPitch) * this.camDist;
-    let cy = eyeY + Math.sin(this.camPitch) * this.camDist;
-    let cz = pz - Math.cos(this.camYaw) * Math.cos(this.camPitch) * this.camDist;
+    const ax = selfPos.x;
+    const ay = selfPos.y + 2.0;
+    const az = selfPos.z;
+    let cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
+    let cy = eyeY + Math.sin(pose.pitch) * pose.dist;
+    let cz = pz - Math.cos(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
     if (isArenaPos(p.pos.x)) {
       // Arena walls hide from the camera like buildings, so the chase camera
       // stays at the player's requested zoom instead of clamping inside the pit.
@@ -6298,19 +6481,19 @@ export class Renderer {
       // Thread the active run's module chain so camera collision matches the
       // delve's actual (possibly Heroic/varied) layout, not just the default.
       const delveMods = this.sim.delveRun?.modules;
-      let hardT = cameraOcclusion(seed, px, eyeY, pz, cx, cy, cz, CAMERA_COLLIDER_PAD, delveMods);
+      let hardT = cameraOcclusion(seed, ax, ay, az, cx, cy, cz, CAMERA_COLLIDER_PAD, delveMods);
       let softT = cameraOcclusion(
         seed,
-        px,
-        eyeY,
-        pz,
+        ax,
+        ay,
+        az,
         cx,
         cy,
         cz,
         CAMERA_SOFT_COLLIDER_PAD,
         delveMods,
       );
-      const segLen = Math.hypot(cx - px, cy - eyeY, cz - pz);
+      const segLen = Math.hypot(cx - ax, cy - ay, cz - az);
       if (segLen > 1e-3) {
         const minT = CAMERA_MIN_DIST / segLen;
         hardT = Math.min(1, Math.max(hardT, minT));
@@ -6328,14 +6511,22 @@ export class Renderer {
         CAMERA_MAX_COMP_FOV,
       );
     }
+    // Pull-in slides along the swept avatar-eye ray, so the resolved point is
+    // exactly what the occlusion pass certified clear.
     const ct = this.camOcclusion.pullT;
-    cx = px + (cx - px) * ct;
-    cy = eyeY + (cy - eyeY) * ct;
-    cz = pz + (cz - pz) * ct;
+    cx = ax + (cx - ax) * ct;
+    cy = ay + (cy - ay) * ct;
+    cz = az + (cz - az) * ct;
     const groundY = groundHeight(cx, cz, seed) + 0.6;
     this.camera.position.set(cx, Math.max(cy, groundY), cz);
-    if (Math.abs(this.camera.fov - this.camOcclusion.fov) > 0.01) {
-      this.camera.fov = this.camOcclusion.fov;
+    // Occlusion-compensated FOV plus the feel kicks (speed widen, landing
+    // dip, level-up punch); the offset is 0 under reduced motion.
+    const fovTarget = Math.min(
+      100,
+      Math.max(50, this.camOcclusion.fov + cameraFovOffset(this.camFeel)),
+    );
+    if (Math.abs(this.camera.fov - fovTarget) > 0.01) {
+      this.camera.fov = fovTarget;
       this.camera.updateProjectionMatrix();
     }
     this.cameraLookAt.set(px, eyeY, pz);

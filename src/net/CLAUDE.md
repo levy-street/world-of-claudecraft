@@ -45,9 +45,11 @@ See `server/CLAUDE.md` for server conventions; read `server/game.ts` directly fo
   `social` sets `socialInfo` and flips `socialDirty`; `censor` live-updates the
   soft-profanity word list; an `error` frame ends the session (subject to
   `reconnect_policy.ts`).
-- **Client to server**: `auth` (`buildWebSocketAuthMessage`), `input` (20 Hz move
-  intent via `sendInput`, `setInterval` 50 ms), `cmd` (every IWorld action via the
-  private `cmd()` helper).
+- **Client to server**: `auth` (`buildWebSocketAuthMessage`), `input` (move intent via
+  `sendInput`: an unconditional interval timer plus a changed-only gated flush; the
+  cadence constants and gate predicate live in `input_send_cadence.ts`, kept in
+  lockstep with the server contract by `tests/input_cadence_model.test.ts`), `cmd`
+  (every IWorld action via the private `cmd()` helper).
 - **Snapshot decode** (`applySnapshot`): `snap.ents` (others) + `snap.self`
   (extended state) go through `applyWire`; `snap.keep` = ids alive-but-unchanged,
   protected from the prune at the end. Encoder is server `wireEntity`; fields are
@@ -138,6 +140,11 @@ failure, kept as stable English that `main.ts` re-localizes.
   `'Connection to the server was lost.'` (retries exhausted) and `'rejected by server'`
   (the `error`-frame fallback), flow through `onDisconnect(reason)` and map in
   `userFacingApiError` to `t('loading.connectionLost')`/`t('loading.connectionRejected')`.
+  The server's flood-kick reason `'message rate exceeded'` (`MSG_RATE_KICK_REASON` in
+  `server/msg_rate_limit.ts`) rides the same `error`-frame path verbatim and maps to
+  `t('loading.messageRateExceeded')`; it is deliberately session-fatal (no
+  `reconnect_policy.ts` transient arm: an immediately reconnecting flooder re-floods), and
+  its server-to-matcher lockstep is source-pinned by `tests/localization_fixes.test.ts`.
   Keep these literals byte-identical here AND in those match arms in the SAME change (the
   compare is on the lowercased raw literal, not the rendered `t()` value).
 - Server `error`-frame text (`msg.error`) and REST `data.error` pass through verbatim and

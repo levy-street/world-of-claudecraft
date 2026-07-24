@@ -188,13 +188,12 @@ the root `CLAUDE.md` content rule points here.
   strictly per-character and `server/deeds_records.ts` is observer-only; an
   account-level grant lane must exist first.
 - **`prog_ringwright`**: jewelcrafting and inscription have zero recipes
-  today, and enchanting (which ships an enchant table and gains skill from
-  disenchant and apply-enchant in the sim) has no player-facing wiring on
-  any host yet, so the ten-craft ring cannot complete and the deed would be
-  visible yet unearnable.
-- **The salvage pair** (`soc_first_salvage`, `soc_salvage_50`): salvage has
-  no player-facing wiring on any host yet (no `IWorld` member, no UI caller,
-  no wire or server command).
+  today (their depth arrives with the post-level-20 zone expansion, per
+  `docs/design/professions.md`), so the ten-craft ring cannot complete and
+  the deed would be visible yet unearnable. Their per-craft milestone and
+  Grandmaster deeds stay deferred with it. Enchanting is no longer a
+  blocker: it is player-wired (disenchant, apply-enchant, salvage) and its
+  deeds shipped.
 - **`pvp_vcup_bet_flex`**: cut; no betting-adjacent deeds ship, even at 0
   Renown.
 

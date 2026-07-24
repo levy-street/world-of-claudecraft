@@ -29,9 +29,9 @@ describe('decideGatherNodeAction', () => {
     expect(decideGatherNodeAction(playerPos, nodePos, true)).toBe('harvest');
   });
 
-  // Phase 12: the tool-tier access gate, mirroring the sim's own harvestNode
+  // The tool-tier access gate, mirroring the sim's own harvestNode
   // deny order (range, then tool tier, then readiness).
-  describe('tool_tier verdict (Phase 12)', () => {
+  describe('tool_tier verdict', () => {
     const inRange = { x: 100, y: 0, z: 200 + 1 };
     const unmet = { nodeTier: 2, viewerToolTier: 1 };
     const met = { nodeTier: 2, viewerToolTier: 2 };
@@ -139,7 +139,7 @@ describe('handleGatherNodeInteract', () => {
     expect(errors).toEqual([notReadyText]);
   });
 
-  it('shows the pre-resolved unmet line and never sends harvestNode on a locked node (Phase 12)', () => {
+  it('shows the pre-resolved unmet line and never sends harvestNode on a locked node', () => {
     // ready=false too: the lock must win over the not-ready feedback, exactly
     // like the sim's own deny order.
     const { world, calls } = fakeWorld(false);
@@ -166,7 +166,7 @@ describe('handleGatherNodeInteract', () => {
     expect(errors).toEqual(['needs a tier 2 pick']);
   });
 
-  it('a met toolGate leaves the harvest path untouched (Phase 12)', () => {
+  it('a met toolGate leaves the harvest path untouched', () => {
     const { world, calls } = fakeWorld(true);
     const { hud, errors } = fakeHud();
     expect(
@@ -216,15 +216,18 @@ describe('handleGatherNodeInteract', () => {
   });
 });
 
-// Phase 12b: the sim command behind the interact helper starts a gather CAST
+// The sim command behind the interact helper starts a gather CAST
 // and still returns true (starting the cast IS the successful interaction for
 // the #1982 autorun-stop contract the helper relies on). The pure decision
 // helpers above are cast-agnostic by design; this arm pins the seam they sit
 // on against the real Sim.
-describe('the real harvestNode behind the helper (Phase 12b cast start)', () => {
+describe('the real harvestNode behind the helper (cast start)', () => {
   it('a successful interact starts the gather cast and returns true before any grant', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Interactor');
+    // #2343: bare hands never gather, so the fixture carries the tier-1 pick
+    // (addItem draws no rng).
+    sim.addItem('copper_mining_pick', 1, pid);
     const node = GATHER_NODES[0];
     const p = sim.entities.get(pid);
     if (!p) throw new Error('missing entity');
@@ -234,7 +237,8 @@ describe('the real harvestNode behind the helper (Phase 12b cast start)', () => 
     p.prevPos = { ...p.pos };
     expect(sim.harvestNode(node.id, pid)).toBe(true);
     expect(p.castingAbility).toBe(GATHER_CAST_ID);
-    // Fresh player, bare hands, band 0, tier-1 node: the 2.5 s base literal.
+    // Band 0, tier-1 node: a tier-1 pick at a tier-1 node still casts the
+    // 2.5s base (only a tool tier ABOVE the node shortens it).
     expect(p.castTotal).toBe(2.5);
     // The grant has NOT landed yet: it belongs to cast completion.
     expect(sim.countItem(nodeMaterialFor(node.type, node.zoneId).itemId, pid)).toBe(0);

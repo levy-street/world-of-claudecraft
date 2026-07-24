@@ -118,7 +118,7 @@ describe('LootWindowController', () => {
 
     const takeLoot = test.element.querySelector<HTMLButtonElement>('.btn:not(.corpse-harvest-btn)');
     const harvest = test.element.querySelector<HTMLButtonElement>('.corpse-harvest-btn');
-    // Phase 12d QA legibility fix: the corpse arm's button is "Take Loot" (the
+    // Legibility fix: the corpse arm's button is "Take Loot" (the
     // old "Take All" label promised the harvest too); native title attributes
     // stay empty so touch players are never without the tooltip.
     expect(takeLoot?.textContent).toBe('Take Loot');
@@ -181,7 +181,7 @@ describe('LootWindowController', () => {
     expect(test.element.style.display).toBe('none');
   });
 
-  it('pre-checks the town-focus components in the harvest picker (Phase 12d)', () => {
+  it('pre-checks the town-focus components in the harvest picker', () => {
     const tags = Object.values(MOBS).find((mob) => mob.componentTags?.length)!.componentTags!;
     expect(tags.length).toBeGreaterThanOrEqual(2); // a strict focused subset must be expressible
     const mob = entity(13, { kind: 'mob', templateId: harvestMobId, loot: null });

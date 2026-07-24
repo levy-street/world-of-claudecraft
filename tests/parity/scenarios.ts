@@ -2918,19 +2918,30 @@ function nythraxisFullPull(): Scenario {
 
       // Tank in melee in front of the throne; four mages stacked tightly behind him
       // (within Soul Rend's 5yd stack range so a triple mark splits the damage three
-      // ways and nobody is one-shot).
+      // ways and nobody is one-shot; Soul Rend scales with maxHp, so the ROOM_HP
+      // pool below does not cover an unsplit mark, only the stack split does).
       floorTeleport(tank, boss.pos.x, boss.pos.z - 6, boss.pos.y);
       const dps = dpsPids.map((pid) => sim.entities.get(pid) as AnyEntity);
       dps.forEach((e, i) => {
         floorTeleport(e, boss.spawnPos.x + (i - 1.5), boss.spawnPos.z - 20, boss.pos.y);
       });
       const room = [tank, ...dps];
+      // The parity fixture pins draw order: deaths skip an entity's rng draws and
+      // derail the recorded stream, and the retuned normal boss one-shots the
+      // ungeared starter-kit fixture tank. Give the whole room a non-lethal hp
+      // pool so no single tick's damage can kill anyone. The pool is re-applied
+      // in topUp (not set once) because recalcPlayerStats reverts maxHp on any
+      // player aura expiry. Soul Rend and Deathless Rage scale with maxHp, so
+      // their relative behavior is unchanged.
+      const ROOM_HP = 50_000;
       const topUp = () => {
         for (const e of room) {
-          e.hp = e.maxHp;
+          e.maxHp = ROOM_HP;
+          e.hp = ROOM_HP;
           e.dead = false;
         }
       };
+      topUp(); // arm the hp pool before the first tick
       // Tick n times, restoring every room player to full after each tick so the
       // room is never empty at the next updateNythraxisEncounter wipe check.
       const step = (n: number) => {
@@ -2948,8 +2959,9 @@ function nythraxisFullPull(): Scenario {
       step(1); // init the encounter (intro yells)
       rec.snapshot('engage');
 
-      // ----- Phase 1: Gravebreaker (rng.range) + a forced Raise Fallen add wave -----
-      step(20 * 2); // ~2s: gravebreakerTimer (1.5) elapses -> rng.range draw + front cone
+      // ----- Phase 1: Gravebreaker (charged auto-attack) + a forced Raise Fallen add wave -----
+      (boss.nythraxis as any).gravebreakerTimer = DT; // arm the charge next tick...
+      step(20 * 2); // ...and release it on the next LANDED swing (front-cone splash)
       (boss.nythraxis as any).raiseFallenTimer = DT; // fire the add wave next tick
       step(1);
       const adds = [...sim.entities.values()].filter(
@@ -4257,7 +4269,7 @@ function cardDuel(): Scenario {
   };
 }
 
-// Professions 2.0 craft path (Phase 2 masterwork model). The parity net had ZERO
+// Professions 2.0 craft path (the masterwork model). The parity net had ZERO
 // craft coverage (grep craft: no hits before this), so the whole craft
 // rng/draw-order/event contract was invisible to the goldens. This scenario pins
 // it permanently in one deterministic sequence with a snapshot after each craft:
@@ -4301,15 +4313,15 @@ function professionsCraft(seed = 21): Scenario {
       const meta = sim.players.get(pid) as any;
       rec.notes.pid = pid;
 
-      // Phase 1: DENIAL. No materials held -> insufficient_materials; the denial
+      // Step 1: DENIAL. No materials held -> insufficient_materials; the denial
       // path returns before the proc draw, so it draws zero rng.
       sim.craftItem('recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-denied');
 
-      // Phase 2: plain deterministic craft. The single proc draw happens on the
+      // Step 2: plain deterministic craft. The single proc draw happens on the
       // success path, but a consumable (potion) def can never masterwork, so the
       // effect is gated off; the output is the def quality (common).
-      // Phase 15 QA directed burn-down: the potion now also consumes
+      // Economy rework: the potion now also consumes
       // silverleaf_herb x2 (addItem draws no rng, so the draw stream and its
       // digest are unchanged; the golden state moves only via the new grants).
       sim.addItem('linen_scrap', 1, pid);
@@ -4318,7 +4330,7 @@ function professionsCraft(seed = 21): Scenario {
       sim.craftItem('recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-plain');
 
-      // Phase 3: masterwork PROC. Tailoring as the active archetype (a MAJOR craft,
+      // Step 3: masterwork PROC. Tailoring as the active archetype (a MAJOR craft,
       // unlimited empowerment ceiling) at skill 200 (tier 8, far above the recipe's
       // tier 0) plus the self-signed consumed reagent push the proc chance to the
       // capped 0.15; the equippable uncommon int/spi vestments pass the effect gate
@@ -4333,14 +4345,14 @@ function professionsCraft(seed = 21): Scenario {
       // qualifies), mirroring the crafting suite's proc test.
       sim.addItemInstance('linen_scrap', { signer: meta.name }, pid);
       sim.addItem('spider_leg', 1, pid);
-      // Phase 15 QA directed burn-down: the vestments recipe gained cloth and
+      // Economy rework: the vestments recipe gained cloth and
       // thread volume (grants draw no rng; only golden state rows move).
       sim.addItem('homespun_cloth', 3, pid);
       sim.addItem('spool_of_thread', 5, pid);
       sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
       rec.snapshot('craft-masterwork');
 
-      // Phase 4: one more plain craft so the golden shows the draw stream continuing
+      // Step 4: one more plain craft so the golden shows the draw stream continuing
       // normally (one draw) after the proc.
       sim.addItem('linen_scrap', 1, pid);
       sim.addItem('spider_leg', 1, pid);
@@ -4351,7 +4363,7 @@ function professionsCraft(seed = 21): Scenario {
   };
 }
 
-// Gathering (Professions 2.0 Phase 4, re-shaped for the Phase 12b gather
+// Gathering (Professions 2.0, re-shaped for the gather
 // cast): the zone-material harvest path. harvestNode now STARTS a cast
 // (draw-free) and the draws, grant, and events land at completion on the
 // tick path, so every harvest ticks the cast out with the exact duration
@@ -4369,14 +4381,17 @@ function professionsCraft(seed = 21): Scenario {
 // the recorded run with all 102 casts resolving: no bags-full denial and no
 // cast-cancelling interference; only the found literal is pinned here.
 function professionsGather(seed = 1): Scenario {
-  // Worst-case gather cast: tier-1 node, bare hands, band 0. Shorter casts
-  // (band reductions as proficiency accrues) still complete inside this
-  // fixed window; surplus ticks are plain world ticks.
+  // Worst-case gather cast: tier-1 node, tier-1 tool, band 0 (#2343: every
+  // harvest needs the matching tool; a tier-1 tool at a tier-1 node keeps
+  // the full base duration). Shorter casts (band reductions as proficiency
+  // accrues) still complete inside this fixed window; surplus ticks are
+  // plain world ticks.
   const castTicks = Math.ceil(gatherCastDurationSec(1, 1, 0) / DT) + 1;
   return {
     name: 'professions_gather',
     coverage: [
       'class:warrior (gatherer)',
+      'tier-1 tools in bags satisfy the #2343 always-require-tool gate',
       'gather cast start: harvestNode begins the cast draw-free',
       'granted harvest at cast completion: exactly two rng draws (rarity roll then rare-event roll)',
       'cooldown denial: zero rng draws, no cast',
@@ -4406,7 +4421,14 @@ function professionsGather(seed = 1): Scenario {
         e.inCombat = false;
       }
 
-      // Phase 1: proficiency-0 ore harvest (common, fungible grant, resolved
+      // The three tier-1 tools (#2343: every node harvest needs its
+      // profession's tool in bags). addItem draws no rng, so the grant is
+      // digest-invisible beyond the sampled inventory contents.
+      sim.addItem('copper_mining_pick', 1, pid);
+      sim.addItem('handaxe', 1, pid);
+      sim.addItem('gathering_sickle', 1, pid);
+
+      // Step 1: proficiency-0 ore harvest (common, fungible grant, resolved
       // at cast completion on the tick path) plus a post-completion second
       // attempt denied by the player's own cooldown, which must add ZERO
       // draws to the digest.
@@ -4417,7 +4439,7 @@ function professionsGather(seed = 1): Scenario {
       rec.snapshot('harvest-ore-common-and-denial');
       rec.tick(2);
 
-      // Phase 2: max-proficiency wood harvest: the rarity roll runs at the
+      // Step 2: max-proficiency wood harvest: the rarity roll runs at the
       // proficiency ceiling (zero common weight), so the rolled tier plus the
       // signed-or-fungible grant shape land in the state sample.
       meta.gatheringProficiency.logging = 100;
@@ -4427,24 +4449,29 @@ function professionsGather(seed = 1): Scenario {
       rec.snapshot('harvest-wood-max-proficiency');
       rec.tick(2);
 
-      // Phase 3: the rare-event window. Repeated herb casts with the
+      // Step 3: the rare-event window. Repeated herb casts with the
       // per-player cooldown cleared advance the shared stream exactly two
       // draws per completed harvest. Two per-iteration resets keep the
       // 100-cast window from ever hitting the bags-full deny at a cast
       // start (which would skip a harvest and shift the stream): the
-      // proficiency reset pins the window at band 0 (the pre-12b window ran
+      // proficiency reset pins the window at band 0 (the pre-gather-cast window ran
       // at an undrained proficiency 0 anyway), and the retention filter
       // sheds the accumulating common stacks while keeping the NEWEST eight
       // signed instances, so a hunted hit's forced-signed x5 yield (all
-      // moonlit-bloom silverleaf) survives into the final inventory sample
+      // moonlit-bloom sheenleaf) survives into the final inventory sample
       // even when the window hits more than once. The hunted seed's FIRST
       // rare event lands inside this window (gatherRareEvent + x5 yield).
       teleport(sim, p, -86, 90); // herb_eastbrook_1
       for (let i = 0; i < 100; i++) {
         meta.gatheringProficiency.herbalism = 0;
-        meta.inventory = meta.inventory
-          .filter((s: any) => s.instance?.signer !== undefined)
-          .slice(-8);
+        // The retention filter keeps the three tools (ahead of the gate,
+        // #2343) plus the newest eight signed instances, shedding the
+        // accumulating common stacks exactly as before.
+        const TOOL_IDS = ['copper_mining_pick', 'handaxe', 'gathering_sickle'];
+        meta.inventory = [
+          ...meta.inventory.filter((s: any) => TOOL_IDS.includes(s.itemId)),
+          ...meta.inventory.filter((s: any) => s.instance?.signer !== undefined).slice(-8),
+        ];
         delete meta.nodeHarvestReadyAt.herb_eastbrook_1;
         sim.harvestNode('herb_eastbrook_1', pid);
         rec.tick(castTicks);

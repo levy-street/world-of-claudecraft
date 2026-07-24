@@ -1,4 +1,4 @@
-// Phase 12d force-rename instance-signer sweep (src/sim/character_rename.ts):
+// Force-rename instance-signer sweep (src/sim/character_rename.ts):
 // the rewrite matrix over carried inventory, bank inventory, and the
 // equipped-instance map, the never-merges guarantee for slots the sweep
 // leaves byte-equal, and the behavior-follows pins: the #1145 self-signed
@@ -23,7 +23,7 @@ function st(partial: Record<string, unknown>): CharacterState {
   return partial as unknown as CharacterState;
 }
 
-describe('rekeyInstanceSigner (Phase 12d force-rename sweep)', () => {
+describe('rekeyInstanceSigner (force-rename sweep)', () => {
   it('rewrites the old-name signer across bags, bank, and the equipped-instance map, nothing else', () => {
     const state = st({
       inventory: [
@@ -99,7 +99,7 @@ describe('rekeyInstanceSigner (Phase 12d force-rename sweep)', () => {
   it('never merges: two slots left byte-equal by the sweep stay separate slots', () => {
     // Slot A is old-signed, slot B already carries the new name with an
     // otherwise identical payload; the sweep makes them byte-equal but MUST
-    // leave them as two slots. The Phase 12d merge points (bags/bank/trade
+    // leave them as two slots. The merge points (bags/bank/trade
     // adds) unify byte-equal stacks on a future add; the sweep never does.
     const state = st({
       inventory: [

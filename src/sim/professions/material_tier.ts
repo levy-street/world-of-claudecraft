@@ -1,7 +1,7 @@
-// Material-tier masterwork feed (Professions 2.0 Phase 10): the def-level
+// Material-tier masterwork feed (Professions 2.0): the def-level
 // material tier a recipe's reagents carry, and the additive masterwork proc
 // chance that tier feeds into masterworkProcChance's materialTierBonus input
-// (the hook Phase 2 reserved). Pure leaf module, same contract as
+// (the reserved hook on that input). Pure leaf module, same contract as
 // masterwork.ts: no Sim/SimContext import, no content-table import, no rng,
 // explicit arguments only, so a Vitest imports it directly.
 //
@@ -13,7 +13,7 @@
 //   eastbrook_vale starter yields (copper_ore, ironbark_log,
 //   silverleaf_herb), plus every non-material item a recipe consumes
 //   (crafted tool inputs and the like). Zero here is load-bearing: it keeps
-//   every pre-Phase-10 pinned scenario and the parity goldens byte-identical
+//   every tier-0-only pinned scenario and the parity goldens byte-identical
 //   (both golden recipes consume only tier-0 reagents).
 // - tier 1: the mid band: the mirefen_marsh yields (iron_ore, ashwood_log,
 //   goldleaf_herb) plus thorium_ore, which rides the same 15/60-copper
@@ -26,7 +26,7 @@
 // Keying is by ITEM DEF, never by consumed-instance payload: the crafting.ts
 // call site resolves reagents by itemId and ctx.removeItem consumes
 // end-backward without reporting WHICH instance went, so a rolled-rarity
-// instance feed would need a consumption-order change (out of Phase 10's
+// instance feed would need a consumption-order change (out of this module's
 // scope; the def-level table is the implemented model).
 import type { ProfessionReagent } from './types';
 
@@ -58,7 +58,7 @@ export function materialTierForItem(itemId: string): number {
  *  material tier across the recipe's reagent list (never the sum, so a
  *  multi-reagent premium recipe stays on the same scale as the other
  *  masterwork bonuses) times MASTERWORK_MATERIAL_TIER_CHANCE. A tier-0-only
- *  list (every pre-Phase-10 common recipe) resolves to exactly 0. */
+ *  list (every baseline common recipe) resolves to exactly 0. */
 export function materialTierBonusForReagents(
   reagents: readonly Pick<ProfessionReagent, 'itemId'>[],
 ): number {

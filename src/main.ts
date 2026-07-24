@@ -37,18 +37,15 @@ import {
   readEntryProbeRaw,
 } from './game/entry_crash_guard';
 import {
-  FRAME_PACER_CALIBRATION_CALLBACKS,
-  FramePacer,
-  MOBILE_FRAME_RATE_CEILING_FPS,
-} from './game/frame_pacer';
-import {
   checkpointActiveEntryDiagnostics,
   createEntryDiagnosticsController,
   stopActiveEntryDiagnostics,
 } from './game/entry_diagnostics';
+import { calibrateFramePacer, FramePacer, MOBILE_FRAME_RATE_CEILING_FPS } from './game/frame_pacer';
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
+import { gatherToolProfessionFor, nearestGatherNodeForProfession } from './game/gather_tool_use';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import { stopAutorunForInteraction } from './game/interaction_autorun';
@@ -82,6 +79,7 @@ import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
 import { createPerfMonitor } from './game/perf';
+import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import {
@@ -103,6 +101,7 @@ import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
+import { telemetryZoneId } from './game/world_telemetry';
 import {
   CHAR_SORT_MODES,
   type CharSortMode,
@@ -235,6 +234,7 @@ import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import { attachGatherNodeHoverTooltip, gatherNodeToolGateFor } from './ui/gather_node_tooltip';
+import { gatherToolNoNodeKey } from './ui/gathering_view';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
 import { chatInputSize } from './ui/hud/chat/chat_input_autosize';
@@ -1881,7 +1881,11 @@ async function startGame(
     if (key === 'reduceMotion') {
       // body.reduce-motion stays the CSS hook it already is; the applier folds the
       // same flag into the graphics-tier effect profile so the two never fight.
-      document.body.classList.toggle('reduce-motion', settings.set('reduceMotion', !!value));
+      // The renderer mirror gates the 3D camera-motion layer too (spring lag
+      // snaps tight, shake/FOV kicks/vista pans no-op).
+      const on = settings.set('reduceMotion', !!value);
+      document.body.classList.toggle('reduce-motion', on);
+      renderer.reduceMotionSetting = on;
       uiEffectsApplier.applyNow();
       return;
     }
@@ -3033,7 +3037,7 @@ async function startGame(
     }
   }
 
-  // Desktop-only gather-node hover tooltip (Professions 2.0 Phase 12): the
+  // Desktop-only gather-node hover tooltip (Professions 2.0): the
   // module owns the listener/throttle/paint; this is thin wiring only.
   attachGatherNodeHoverTooltip(
     canvas,
@@ -3043,6 +3047,37 @@ async function startGame(
     (x, y) => renderer.pick(x, y),
     () => input.isDragging() || hud.isModalOpen(),
   );
+
+  // Gathering-tool item use (#2343): a bags click or hotbar press on a
+  // pick/axe/sickle works the nearest matching node like an interact press,
+  // through the same handleGatherNodeInteract error surface and the #1982
+  // autorun stop. Returns false for non-tools and fishing implements, which
+  // fall back to the plain useItem command (fishing routes to startFishing
+  // at the sim boundary).
+  hud.setGatherToolUseHook((item) => {
+    const professionId = gatherToolProfessionFor(item);
+    if (professionId === null) return false;
+    const node = nearestGatherNodeForProfession(world, professionId);
+    if (node === null) {
+      hud.showError(t(gatherToolNoNodeKey(professionId)));
+      return true;
+    }
+    stopAutorunForInteraction(
+      handleGatherNodeInteract(
+        world,
+        hud,
+        world.player.pos,
+        node.id,
+        node.pos,
+        t('questUi.errors.tooFar'),
+        t('hudChrome.gathering.notReady'),
+        gatherNodeToolGateFor(world, node),
+      ),
+      input,
+      mobileControls,
+    );
+    return true;
+  });
 
   function renderFacingOverride(): number | null {
     // A ghost (dead && ghost) is not movement-frozen and keeps camera-driven
@@ -3320,6 +3355,14 @@ async function startGame(
       lastSnapAge: net.lastSnapAt > 0 ? Math.round(performance.now() - net.lastSnapAt) : -1,
       alpha: Math.round(alpha * 100) / 100,
     });
+    // Always-on net-pipeline counters (net_pipeline_stats.ts): fold the
+    // snapshots-applied-since-last-frame count, then publish the stats source
+    // UNGATED (ruling R9), unlike the overlay-gated setNetwork above; the
+    // allocating summary() is drawn lazily at the 1 Hz snapshot, never per
+    // frame. main.ts is the src/net to src/game junction (ruling R8).
+    const netPipeline = net.netPipeline();
+    netPipeline.onAnimationFrame(now);
+    perf.setNetPipelineSource(netPipeline);
     // Display-only self extrapolation (src/render/self_motion.ts). Off while
     // spectating, corpse-frozen, or CC'd (playerImmobilized covers stun/root/
     // incapacitate/polymorph, and fear is a fear_incap incapacitate aura; the
@@ -3538,8 +3581,8 @@ async function startGame(
   await nextPaint();
   // Cut to the game only after an accepted frame has completed and reached paint.
   loadingHandoff.start(() => {
-    entryDiagnostics.checkpoint('first-paint');
     hideLoadingScreen();
+    entryDiagnostics.checkpoint('first-paint');
     // Start the intro clock as the loading screen begins to fade: the camera
     // holds the opening pose until now, so the fade doubles as the cut in.
     if (intro) intro.startedAt = performance.now();
@@ -3551,7 +3594,15 @@ async function startGame(
         settings,
         tokenProvider: () => api.token,
         characterIdProvider: () => online?.characterId ?? null,
+        worldTelemetryProvider: () => ({
+          zoneId: telemetryZoneId(world.player.pos.x, world.player.pos.z),
+          simEntities: world.entities.size,
+        }),
+        desktopShell: DESKTOP_APP,
       });
+      // One-time machine-local performance nudge (packet 0 rulings R14-R16):
+      // the assembler polls the same PerfMonitor the reporter reads.
+      initPerfNudge({ perf, desktopShell: DESKTOP_APP });
       // Warm the procedural icon cache during idle time so the first
       // bags/vendor/loot open never pays the compose burst synchronously
       // (icon_prewarm.ts). Re-entry is a fast no-op: the cache is module-global.
@@ -3585,17 +3636,19 @@ async function startGame(
     }, LOADING_FADE_MS);
   }, hideLoadingScreen);
   if (NATIVE_APP) {
-    for (let i = 0; i < FRAME_PACER_CALIBRATION_CALLBACKS; i++) {
-      await new Promise<void>((resolve) => {
-        requestAnimationFrame((timestamp) => {
-          framePacer.observe(timestamp);
-          resolve();
-        });
-      });
-      if (framePacer.snapshot().estimatedRefreshFps > 0) break;
-    }
+    await calibrateFramePacer(framePacer, {
+      now: () => performance.now(),
+      requestAnimationFrame: (callback) => requestAnimationFrame(callback),
+      cancelAnimationFrame: (handle) => cancelAnimationFrame(handle),
+      setTimeout: (callback, delayMs) => window.setTimeout(callback, delayMs),
+      clearTimeout: (handle) => window.clearTimeout(handle),
+    });
   }
   last = performance.now();
+  // A hidden tab pauses rAF while snapshots keep arriving; reset the pending
+  // snapshots-per-rAF count on visibility flips so the first foreground frame
+  // does not fold the backlog into the 3plus histogram bucket (ruling R9).
+  document.addEventListener('visibilitychange', () => online?.netPipeline().noteVisibilityChange());
   requestAnimationFrame(frame);
   // Now in-game: fade the home-page theme out (it kept playing through loading).
   fadeOutHomepageMusic();

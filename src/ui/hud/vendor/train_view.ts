@@ -1,5 +1,5 @@
 // Pure, host-agnostic view model for the recipe-training window
-// (Professions 2.0 Phase 9).
+// (Professions 2.0).
 //
 // The pure-core half of the pure-core + thin-consumer split (reference
 // vendor_view.ts): it decides which recipes a station master lists and in
@@ -35,6 +35,10 @@ export interface TrainRow {
   /** The recipe's flat skill requirement (the ladder sort key). */
   skillReq: number;
   state: TrainRowState;
+  /** Present only on a teachable row whose learn is in flight
+   *  (TrainViewDeps.pendingRecipes): the painter disables the button so a
+   *  second activation never re-sends the command (issue #2342). */
+  pending?: boolean;
   /** Training fee in copper (professions/training.ts TRAINING_FEE_BY_TIER). */
   feeCopper: number;
   /** Advisory only; the authoritative train path recharges the balance check. */
@@ -58,6 +62,15 @@ export interface TrainViewDeps {
   /** The viewer's copper balance, for the advisory affordability flag. */
   copper: number;
   items: Record<string, ItemDef>;
+  /** Recipe ids with a learn currently in flight (the HUD's
+   *  TrainLearnTracker, issue #2342): a teachable row in this set renders
+   *  pending (disabled, statePending label). Absent means none. */
+  pendingRecipes?: ReadonlySet<string>;
+  /** Server-confirmed learns (trainResult ok) the mirrored knownRecipes set
+   *  may not carry yet: unioned into the known set so the row flips to Known
+   *  the moment the result lands, never a repaint behind the cprof mirror.
+   *  Absent means none. */
+  confirmedRecipes?: ReadonlySet<string>;
 }
 
 /** True when a station master with `masterNpcId` exists (the gossip dialog's
@@ -112,6 +125,9 @@ export function buildTrainView(masterNpcId: string, deps: TrainViewDeps): TrainV
     ),
   );
   const known = new Set(deps.knownRecipes);
+  // Confirmed-but-unmirrored learns read Known immediately: knownness wins
+  // over any stale pending flag for the same id (resolve() cleared it anyway).
+  if (deps.confirmedRecipes) for (const id of deps.confirmedRecipes) known.add(id);
   const rows: TrainRow[] = [];
   for (const recipe of ALL_RECIPES) {
     if (!crafts.has(recipe.professionId)) continue;
@@ -125,6 +141,7 @@ export function buildTrainView(masterNpcId: string, deps: TrainViewDeps): TrainV
       item: deps.items[recipe.resultItemId],
       skillReq: recipe.skillReq,
       state,
+      ...(state === 'teachable' && deps.pendingRecipes?.has(recipe.id) ? { pending: true } : {}),
       feeCopper,
       affordable: deps.copper >= feeCopper,
       ...(state === 'locked'

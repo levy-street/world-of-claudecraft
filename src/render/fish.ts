@@ -9,7 +9,7 @@ import { GFX } from './gfx';
 // Ambient leaping fish — a RENDER-ONLY decoration, no sim/IWorld/server state.
 //
 // Mirrors the player-centred-pool contract that foliage's grass ring,
-// critters and motes use: a fixed pool of fish that recycle (we never grow
+// motes use: a fixed pool of fish that recycle (we never grow
 // the pool), each idling beneath the surface until it arcs out of the water,
 // splashes, and re-enters. Fish only ever break water that is genuinely deep
 // enough: we sample the SAME deterministic `terrainHeight`/`waterLevel()` the
@@ -164,7 +164,7 @@ export function buildFish(seed: number): FishView {
   const buildBody = (): THREE.Object3D => {
     if (loadedFishGltf) {
       // Not Box3-normalized: assumes the fish GLB is authored at world scale
-      // with its body centered at the origin, same assumption as critters.ts.
+      // with its body centered at the origin.
       // A re-export at a different scale or origin will silently sink or
       // oversize the fish.
       const inst = loadedFishGltf.clone(true);

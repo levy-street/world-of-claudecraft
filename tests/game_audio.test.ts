@@ -108,7 +108,7 @@ describe('sampled GameAudio facade', () => {
     expect(audio.feedbackEnabled).toBe(false);
 
     // The interface/feedback cues fall silent (loot, level, quest, whisper,
-    // etc.), including five of the six Phase 12b gathering-rhythm cues.
+    // etc.), including five of the six gathering-rhythm cues.
     const feedback = [
       'coin',
       'levelUp',
@@ -193,7 +193,7 @@ describe('sampled GameAudio facade', () => {
 
 describe('deterministic UI SFX catalog', () => {
   it('adds 20 unique UI cues to the authoritative studio inventory', () => {
-    // 14 pre-12b cues plus the six Phase 12b gathering-rhythm placeholders
+    // 14 prior cues plus the six gathering-rhythm placeholders
     // (ui_gather_cast/strike/rare, ui_fish_cast/bite/reel), issue #2208.
     const keys = UI_SFX_CATALOG.map((cue: { key: string }) => cue.key);
     const fullCatalogKeys = new Set(SFX.map((cue: { key: string }) => cue.key));

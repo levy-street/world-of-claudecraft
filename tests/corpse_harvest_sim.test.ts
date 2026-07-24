@@ -28,6 +28,7 @@ import { ClientWorld } from '../src/net/online';
 import { bagCapacity, stackSizeOf } from '../src/sim/bags';
 import {
   HARVEST_COMPONENT_ITEMS,
+  HARVEST_COMPONENT_SPECIMENS,
   MONSTER_MATERIAL_TIERS,
   monsterMaterialTierFor,
 } from '../src/sim/content/professions';
@@ -145,7 +146,7 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     sim.harvestCorpse(mob.id, undefined, a);
     sim.harvestCorpse(mob.id, undefined, b);
     // forest_wolf's componentTags (#1140) include 'hide', mapped to the
-    // dedicated rough_hide material (Phase 10). #1142's focus-harvest tier
+    // dedicated rough_hide material. #1142's focus-harvest tier
     // roll can grant more than one per tier, so the winner gets AT LEAST one,
     // never the loser.
     expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
@@ -283,22 +284,22 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
   });
 });
 
-// #1145 + Phase 10 Pristine specimens: a rare-or-better rarity roll on a
+// #1145 Pristine specimens: a rare-or-better rarity roll on a
 // family with a specimen (HARVEST_COMPONENT_SPECIMENS) grants the specimen as
 // a SIGNED instance IN ADDITION to the plain component; the regular component
 // always grants plain, and below the rarity floor no specimen exists at all.
-// A family WITHOUT a specimen (fang) keeps the pre-Phase-10 behavior: the
+// A family WITHOUT a specimen (fang) keeps the original behavior: the
 // component itself grants signed at rare-or-better. Each case focuses on a
 // single component so the harvest draws exactly one tier roll and one rarity
 // roll, keeping the seed choice legible. Seeds below are pre-verified against
 // this exact setup() shape (two players, seeded before the harvest's rolls)
 // to land on each side of the rarity floor.
-describe('signed Pristine specimens (#1145, Phase 10)', () => {
+describe('signed Pristine specimens (#1145)', () => {
   it('a rare-or-better harvest grants the signed specimen PLUS the plain component (seed 5)', () => {
     const { sim, internals, a, mob } = setup(5);
     sim.drainEvents();
     sim.harvestCorpse(mob.id, ['hide'], a);
-    // The signed jackpot landed signed: no downgrade notice fires (Phase 12d).
+    // The signed jackpot landed signed: no downgrade notice fires.
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
     const meta = internals.players.get(a)!;
     // The regular component grants plain (fungible, unsigned), at its rolled
@@ -419,8 +420,8 @@ describe('signed Pristine specimens (#1145, Phase 10)', () => {
     // sequence (proven by the unfixed code overflowing here), so the count
     // above the seeded 1 proves the plain fallback delivered the yield.
     expect(sim.countItem('wolf_fang', a)).toBeGreaterThan(1);
-    // Phase 12d: the unsigned fallback tells the player, exactly once, with
-    // the mark-lost arm (the yield survived, the signature did not).
+    // Downgrade notice: the unsigned fallback tells the player, exactly once,
+    // with the mark-lost arm (the yield survived, the signature did not).
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toEqual([
       { type: 'gatherDowngrade', pid: a, surface: 'corpse', lost: 'mark' },
     ]);
@@ -442,8 +443,8 @@ describe('signed Pristine specimens (#1145, Phase 10)', () => {
     expect(m.inventory.length).toBeLessThanOrEqual(cap);
     expect(m.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(false);
     expect(sim.countItem('rough_hide', a)).toBeGreaterThan(1);
-    // Phase 12d: the dropped jackpot tells the player, exactly once, with the
-    // find-lost arm (the plain yield survived, the pure extra did not).
+    // Downgrade notice: the dropped jackpot tells the player, exactly once,
+    // with the find-lost arm (the plain yield survived, the pure extra did not).
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toEqual([
       { type: 'gatherDowngrade', pid: a, surface: 'corpse', lost: 'find' },
     ]);
@@ -496,14 +497,14 @@ describe('signed Pristine specimens (#1145, Phase 10)', () => {
   });
 });
 
-// Phase 10 QA: a mob carrying TWO specimen families (wild_boar: hide -> and
+// Grant order: a mob carrying TWO specimen families (wild_boar: hide -> and
 // meat -> are both in HARVEST_COMPONENT_SPECIMENS, tusk maps to nothing) is
 // where the grant ORDER matters: the pre-gate reserves room for the plain
 // component stacks only, so a signed jackpot granted mid-loop could consume
 // the slot reserved for a LATER family's plain stack and push the uncapped
 // plain grant past capacity. Plain yields must all land before any signed
 // instance; the jackpot is the extra that truncates, never the plain yield.
-describe('two-specimen-family harvest capacity contract (Phase 10 QA)', () => {
+describe('two-specimen-family harvest capacity contract', () => {
   function addBoarCorpse(internals: SimInternals, id = 8888) {
     const template = MOBS.wild_boar;
     expect(template.componentTags).toEqual(['hide', 'tusk', 'meat']);
@@ -554,16 +555,34 @@ describe('two-specimen-family harvest capacity contract (Phase 10 QA)', () => {
   });
 });
 
-// #2139 companion (Phase 12d): the filed crossing case (zero free slots, a
+// #2139 companion: the filed crossing case (zero free slots, a
 // partial PLAIN stack of the harvested component, a rare-plus roll on the
-// specimen-less fang family) predates the Phase 10 QA grant-order fix, so the
+// specimen-less fang family) predates the grant-order fix above, so the
 // first pin below is the issue's acceptance case verified against the shipped
 // grant order. The rest pin the merge-aware signed guards: after
 // identical-payload stacking (stage 1) a slot-full bag holding a byte-equal
 // same-signer stack WITH room must keep the signature (the grant merges,
 // canGrantItemInstance), and only a bag with NEITHER merge room NOR a free
 // slot downgrades to the plain fallback and its gatherDowngrade notice.
-describe('corpse signed-guard capacity vs merge room (#2139, Phase 12d)', () => {
+describe('corpse signed-guard capacity vs merge room (#2139)', () => {
+  it('no corpse tags two specimen-less harvest families together (the capacity pre-gate premise)', () => {
+    // The fitsAll pre-gate reserves plain-stack room only, and a specimen-less
+    // family's signed grant falls back to an UNCAPPED plain top-up when the
+    // signed unit does not fit. With at most ONE specimen-less family per
+    // corpse that fallback always lands inside its own reservation; a second
+    // such family on one corpse could have its reservation consumed by the
+    // first family's signed land and push one slot past capacity. This guard
+    // makes that content shape a loud failure instead of a silent overflow.
+    const specimenless = new Set(
+      Object.keys(HARVEST_COMPONENT_ITEMS).filter((tag) => !(tag in HARVEST_COMPONENT_SPECIMENS)),
+    );
+    expect(specimenless.size).toBeGreaterThan(0);
+    for (const mob of Object.values(MOBS)) {
+      const tags = (mob.componentTags ?? []).filter((tag) => specimenless.has(tag));
+      expect(tags.length, `${mob.id} tags ${tags.join('+')}`).toBeLessThanOrEqual(1);
+    }
+  });
+
   it('the filed crossing case: zero free slots + a partial plain stack tops up, never overflows', () => {
     // Hunted seed, the dedupe-pin idiom: probe on roomy bags proves the fang
     // roll clears the signable floor, then a FRESH same-seed world reproduces
@@ -670,13 +689,13 @@ describe('corpse signed-guard capacity vs merge room (#2139, Phase 12d)', () => 
   });
 });
 
-// Corpse premium-arm tool gating (Professions 2.0 Phase 12): the plain
+// Corpse premium-arm tool gating (Professions 2.0): the plain
 // component grant is NEVER gated (the bare-hands floor); only the
 // signed/specimen upgrade of a signable rarity roll checks the best owned
 // gathering tool of ANY profession against MONSTER_MATERIAL_TIERS. Every
 // wave-one family ships at tier 1, so the deny arm is unreachable through
 // shipped content; the mutation seam below is documented on the test.
-describe('corpse premium-arm tool gating (Professions 2.0 Phase 12)', () => {
+describe('corpse premium-arm tool gating (Professions 2.0)', () => {
   // A ONE-player rig (distinct from setup()'s two players): the deny/dedupe
   // seeds below were hunted against exactly this construction order, and the
   // second addPlayer would shift the world's draw positions.
@@ -1105,12 +1124,12 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
   });
 });
 
-// The omitted-components town-focus default (Phase 12d) depends on an ABSENT
+// The omitted-components town-focus default depends on an ABSENT
 // wire field surviving the whole trip: ClientWorld.harvestCorpse(id) serializes
 // NO components key (JSON.stringify drops undefined), and the server dispatch
 // normalizes a missing or malformed field to undefined, never [], so
 // sim.harvestCorpse sees the omission and derives the town-focus pick.
-describe('harvestCorpse omitted components over the wire (Phase 12d)', () => {
+describe('harvestCorpse omitted components over the wire', () => {
   function wireSetup() {
     const server = new GameServer();
     const fc = fakeWs();

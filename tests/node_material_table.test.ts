@@ -31,7 +31,7 @@ const EXPECTED_MATRIX: Record<GatherNodeType, Record<(typeof ZONES)[number], str
   },
 };
 
-describe('NODE_MATERIAL_TABLE (Professions 2.0 Phase 4)', () => {
+describe('NODE_MATERIAL_TABLE (Professions 2.0)', () => {
   it('pins the full zone x type item matrix', () => {
     for (const type of GATHER_NODE_TYPES) {
       for (const zone of ZONES) {
@@ -142,7 +142,7 @@ describe('retired placeholder junk grants (bone_fragments/linen_scrap/spider_leg
   });
 
   it('the three ItemDefs survive unchanged (recipes consume them, players hold them)', () => {
-    // Exact-field pins: only the NODE SOURCE went away in Phase 4; the defs
+    // Exact-field pins: only the NODE SOURCE went away; the defs
     // themselves are load-bearing (crafting reagents + existing inventories).
     expect(ITEMS.bone_fragments).toEqual({
       id: 'bone_fragments',
@@ -168,7 +168,7 @@ describe('retired placeholder junk grants (bone_fragments/linen_scrap/spider_leg
   });
 });
 
-describe('the four new material defs (Phase 4)', () => {
+describe('the four new material defs', () => {
   it('are pinned exactly: tier reads from sellValue, and none is vendor-stocked', () => {
     // Exact toEqual pins mirroring the retired-junk pins above: the sellValue
     // IS the tier signal (items.ts house rule) and the deliberate absence of
@@ -196,7 +196,7 @@ describe('the four new material defs (Phase 4)', () => {
     });
     expect(ITEMS.silverleaf_herb).toEqual({
       id: 'silverleaf_herb',
-      name: 'Silverleaf Herb',
+      name: 'Sheenleaf Herb',
       kind: 'junk',
       quality: 'common',
       sellValue: 4,

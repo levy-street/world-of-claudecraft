@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  calibrateFramePacer,
   FRAME_PACER_CALIBRATION_CALLBACKS,
+  FRAME_PACER_CALIBRATION_MAX_WAIT_MS,
   FramePacer,
   MOBILE_FRAME_RATE_CEILING_FPS,
   pacedFrameRateFor,
@@ -96,6 +98,73 @@ function steadyCallbackGaps(
 describe('mobile frame pacer', () => {
   it('keeps the loading calibration window bounded', () => {
     expect(FRAME_PACER_CALIBRATION_CALLBACKS).toBe(13);
+    expect(FRAME_PACER_CALIBRATION_MAX_WAIT_MS).toBe(500);
+  });
+
+  it('caps the configured mobile pacing policy at exactly 60 fps', () => {
+    expect(MOBILE_FRAME_RATE_CEILING_FPS).toBe(60);
+  });
+
+  it('reuses one decision record across animation callbacks', () => {
+    const pacer = new FramePacer({ enabled: false, maxFps: 60 });
+
+    const first = pacer.step(0);
+    const second = pacer.step(1000 / 60);
+
+    expect(second).toBe(first);
+    expect(second).toEqual({
+      shouldRun: true,
+      estimatedRefreshFps: 0,
+      targetFps: 60,
+      intentionallyPaced: false,
+    });
+  });
+
+  it('cancels calibration at the wall-clock deadline when animation callbacks stop', async () => {
+    const pacer = new FramePacer({ enabled: true, maxFps: 60 });
+    const animationCallbacks = new Map<number, (timestamp: number) => void>();
+    const timeoutCallbacks = new Map<number, () => void>();
+    const cancelledFrames: number[] = [];
+    const clearedTimeouts: number[] = [];
+    const timeoutDelays: number[] = [];
+    let nowMs = 100;
+    let nextFrameId = 1;
+    let nextTimeoutId = 1;
+
+    const calibration = calibrateFramePacer(pacer, {
+      now: () => nowMs,
+      requestAnimationFrame: (callback) => {
+        const id = nextFrameId++;
+        animationCallbacks.set(id, callback);
+        return id;
+      },
+      cancelAnimationFrame: (id) => {
+        cancelledFrames.push(id);
+        animationCallbacks.delete(id);
+      },
+      setTimeout: (callback, delayMs) => {
+        const id = nextTimeoutId++;
+        timeoutCallbacks.set(id, callback);
+        timeoutDelays.push(delayMs);
+        return id;
+      },
+      clearTimeout: (id) => {
+        clearedTimeouts.push(id);
+        timeoutCallbacks.delete(id);
+      },
+    });
+
+    expect(animationCallbacks.size).toBe(1);
+    expect(timeoutDelays).toEqual([FRAME_PACER_CALIBRATION_MAX_WAIT_MS]);
+
+    nowMs += FRAME_PACER_CALIBRATION_MAX_WAIT_MS;
+    timeoutCallbacks.get(1)?.();
+    await calibration;
+
+    expect(cancelledFrames).toEqual([1]);
+    expect(clearedTimeouts).toEqual([]);
+    expect(animationCallbacks.size).toBe(0);
+    expect(pacer.snapshot().estimatedRefreshFps).toBe(0);
   });
 
   it('selects the highest panel divisor at or below the frame-rate ceiling', () => {

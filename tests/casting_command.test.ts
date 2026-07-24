@@ -56,7 +56,7 @@ describe('/casting command', () => {
     e.castTotal = 15.0;
     e.castRemaining = 3.1;
     e.channeling = false;
-    // Phase 12b: the fixed-cast countdown died with the bite minigame; the
+    // The fixed-cast countdown died with the bite minigame; the
     // readout names the waiting state and deliberately prints NO seconds
     // (a countdown would leak session timing). The old grandfathered em dash
     // died with the reword (repo no-dash rule).

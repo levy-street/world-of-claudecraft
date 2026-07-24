@@ -96,6 +96,26 @@ describe('loading handoff', () => {
     expect(harness.clearedWatchdogs).toEqual([2]);
   });
 
+  it('hands off once when the completion watchdog beats the queued paint', () => {
+    const harness = handoffHarness();
+    const onHandoff = vi.fn();
+    const onWatchdog = vi.fn();
+
+    harness.handoff.start(onHandoff, onWatchdog);
+    harness.handoff.markFirstRenderedFrame();
+    harness.watchdogCallbacks.get(1)?.();
+
+    expect(onWatchdog).toHaveBeenCalledTimes(1);
+    expect(harness.animationCallbacks).toHaveLength(1);
+
+    harness.watchdogCallbacks.get(2)?.();
+    expect(onHandoff).toHaveBeenCalledTimes(1);
+
+    harness.animationCallbacks.shift()?.();
+
+    expect(onHandoff).toHaveBeenCalledTimes(1);
+  });
+
   it('finishes startup even when animation callbacks never resume', () => {
     const harness = handoffHarness();
     const onHandoff = vi.fn();

@@ -1,5 +1,5 @@
-// Pure-core pins for the fishing bobber anchor selection (Professions 2.0
-// Phase 12b): the bobber must land on the FIRST facing-forward sample of the
+// Pure-core pins for the fishing bobber anchor selection (Professions 2.0):
+// the bobber must land on the FIRST facing-forward sample of the
 // sim's own FISHING_SAMPLE_DISTANCES ring that clears the sim's fishable-depth
 // rule, so the visual always agrees with where startFishing validated the
 // cast. Node-only (RENDER_PURE_CORES): no Three, no DOM.
@@ -38,7 +38,7 @@ function lakeShoreSpot(): { x: number; z: number; facing: number } {
   throw new Error('no fishable Mirror Lake shore spot at the test seed');
 }
 
-describe('fishing bobber anchor core (Phase 12b)', () => {
+describe('fishing bobber anchor core', () => {
   it('anchors on the FIRST fishable sample of the sim ring, on the water line', () => {
     const spot = lakeShoreSpot();
     const out: BobberAnchor = { x: 0, y: 0, z: 0 };

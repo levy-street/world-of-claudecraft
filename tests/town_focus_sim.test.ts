@@ -78,7 +78,7 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
         const mob = spawnHideWolf(internals, 10000 + i, ZONE1.hub);
         // Explicit [] = spread on both arms: this test isolates the focus
         // yield bonus (an omitted pick would ALSO narrow the selection to
-        // the focused tags via the Phase 12d town-focus default).
+        // the focused tags via the town-focus default).
         sim.harvestCorpse(mob.id, [], a);
         total = sim.countItem('rough_hide', a);
       }
@@ -121,7 +121,7 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
     const { sim, internals, a } = setup();
     // spend the whole budget on 'fang'; 'hide' stays unfocused throughout.
     // Explicit [] = spread on both arms: an omitted pick would narrow the
-    // focused run to fang alone (the Phase 12d town-focus default) and
+    // focused run to fang alone (the town-focus default) and
     // never harvest hide at all.
     sim.setTownFocus({ fang: 10 }, a);
     const mob = spawnHideWolf(internals, 20000, ZONE1.hub);
@@ -139,12 +139,12 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
   });
 });
 
-// Phase 12d: an OMITTED components argument derives the pick from the caller's
+// An OMITTED components argument derives the pick from the caller's
 // persistent town focus (the corpse tags holding points); an EXPLICIT array,
 // empty or not, keeps its #1142 meaning untouched. Each equivalence below runs
 // the counterpart pick on a fresh same-seed world so the rng stream and the
 // focus bonuses are identical; only the selection semantics differ.
-describe('harvestCorpse omitted-components town-focus default (Phase 12d)', () => {
+describe('harvestCorpse omitted-components town-focus default', () => {
   function harvestWith(
     focus: Record<string, number> | null,
     components: string[] | undefined,

@@ -323,7 +323,7 @@ export const V07_SLASH = [
   'You are Aki.',
   'You are airborne and rising — Akiyd above the ground.',
   'You are falling — Akiyd above the ground.Aki',
-  // Phase 12b rewords: the fishing readout dropped its countdown (no bite
+  // Gather-cast rewords: the fishing readout dropped its countdown (no bite
   // leak) and the gather cast readout joined the same /cast backstop surface.
   'You are fishing. Waiting for a bite.',
   'You are gathering: Akis of Akis remaining.',

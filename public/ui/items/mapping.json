@@ -47,7 +47,7 @@
     },
     {
       "itemId": "arcane_dust",
-      "name": "Arcane Dust",
+      "name": "Chime Dust",
       "sourcePack": "woc_professions_art",
       "sourceFile": "batch-11/masters/arcane_dust.png (accepted v2)",
       "confidence": "high",
@@ -55,7 +55,7 @@
     },
     {
       "itemId": "arcane_essence",
-      "name": "Arcane Essence",
+      "name": "Chime Essence",
       "sourcePack": "woc_professions_art",
       "sourceFile": "batch-11/masters/arcane_essence.png (accepted v3)",
       "confidence": "high",
@@ -63,7 +63,7 @@
     },
     {
       "itemId": "arcane_shard",
-      "name": "Arcane Shard",
+      "name": "Chime Shard",
       "sourcePack": "woc_professions_art",
       "sourceFile": "batch-11/masters/arcane_shard.png (accepted v1)",
       "confidence": "high",
@@ -71,7 +71,7 @@
     },
     {
       "itemId": "arcanite_bar",
-      "name": "Arcanite Bar",
+      "name": "Glyphsteel Bar",
       "sourcePack": "woc_professions_art",
       "sourceFile": "batch-6/masters/arcanite_bar.png (accepted v2)",
       "confidence": "high",
@@ -545,7 +545,7 @@
     },
     {
       "itemId": "elderwood_log",
-      "name": "Elderwood Log",
+      "name": "Highpine Log",
       "sourcePack": "woc_professions_art",
       "sourceFile": "batch-7/masters/elderwood_log.png (accepted v1)",
       "confidence": "high",
@@ -674,7 +674,7 @@
     },
     {
       "itemId": "glimmerfin_koi",
-      "name": "Glimmerfin Koi",
+      "name": "Sunglint Koi",
       "sourcePack": "fishing",
       "sourceFile": "12.png",
       "confidence": "high"
@@ -1109,7 +1109,7 @@
     },
     {
       "itemId": "mithril_mining_pick",
-      "name": "Mithril Mining Pick",
+      "name": "Skysilver Mining Pick",
       "sourcePack": "farming",
       "sourceFile": "9.png",
       "confidence": "high"
@@ -1637,7 +1637,7 @@
     },
     {
       "itemId": "silverleaf_herb",
-      "name": "Silverleaf Herb",
+      "name": "Sheenleaf Herb",
       "sourcePack": "woc_professions_art",
       "sourceFile": "batch-7/masters/silverleaf_herb.png (accepted v1)",
       "confidence": "high",
@@ -1645,7 +1645,7 @@
     },
     {
       "itemId": "silverleaf_sickle",
-      "name": "Silverleaf Sickle",
+      "name": "Sheenleaf Sickle",
       "sourcePack": "farming",
       "sourceFile": "5.png",
       "confidence": "high"
@@ -1761,7 +1761,7 @@
     },
     {
       "itemId": "stalkerhide_jerkin",
-      "name": "Stalkerhide Jerkin",
+      "name": "Prowlhide Jerkin",
       "sourcePack": "armor",
       "sourceFile": "20.png",
       "confidence": "medium"
@@ -1861,7 +1861,7 @@
     },
     {
       "itemId": "thorium_ore",
-      "name": "Thorium Ore",
+      "name": "Osmium Ore",
       "sourcePack": "woc_professions_art",
       "sourceFile": "batch-6/masters/thorium_ore.png (accepted v3)",
       "confidence": "high",

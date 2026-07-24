@@ -97,7 +97,7 @@ describe('tier capability mapping and progress curve (#1128)', () => {
     expect(tierCapability(skills, 'alchemy')).toBe(0);
   });
 
-  // Phase 12c: the four-state mastery curve (orange/yellow/green/gray)
+  // The four-state mastery curve (orange/yellow/green/gray)
   // replaces the three-state curve and its tier-0 free floor. The tier-0 rows
   // changed value BY DESIGN: tierProgressMultiplier(5, 0) was 1 (free floor)
   // and is now 0 (gray); (3, 1) was 0 and is now 0.25 (green).

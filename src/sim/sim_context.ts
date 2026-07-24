@@ -631,7 +631,12 @@ export interface SimContextCallbacks {
   // instance payload (signer/charges/rolled/boundTo, #1165), never merged into a
   // plain fungible stack. Used by corpse harvest to stamp a rare+ monster
   // material with the harvester's name.
-  addItemInstance(itemId: string, instance: ItemInstancePayload, pid?: number): void;
+  addItemInstance(
+    itemId: string,
+    instance: ItemInstancePayload,
+    pid?: number,
+    count?: number,
+  ): void;
   // L2 World Market escrow (marketList) also consumes removeItem; it is declared once
   // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.
   spawnBossAdds(boss: Entity, mobId: string, count: number): void;
@@ -665,7 +670,7 @@ export interface SimContextCallbacks {
   startAutoAttack(pid?: number): void;
   revivePet(pid?: number): void;
   completeFishing(p: Entity, meta: PlayerMeta): void;
-  // Gather cast completion (Professions 2.0 Phase 12b): updateCasting routes a
+  // Gather cast completion (Professions 2.0): updateCasting routes a
   // finished GATHER_CAST_ID cast here, exactly like completeFishing above.
   completeGatherCast(p: Entity, meta: PlayerMeta): void;
   applyDemonHealTick(owner: Entity): void;
@@ -751,7 +756,7 @@ export interface SimContextCallbacks {
   // dispatches to. W2 owns these declarations; each is a thin late-bound delegate,
   // to a still-on-Sim method or (for fishing) to the professions module.
   // startFishing now routes to the fishing module (src/sim/professions/fishing.ts,
-  // Professions 2.0 Phase 11), called with the live ctx the same way runEffects is;
+  // Professions 2.0), called with the live ctx the same way runEffects is;
   // its body no longer lives on Sim (completeFishing, declared above, moved with it).
   // unlockMechChromaFromItem / openSkinSelect are cosmetics internals (facet W7);
   // isSwimming is a shared terrain predicate. unlockMechChromaFromItem's return value

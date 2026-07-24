@@ -76,5 +76,9 @@ export function prestige(ctx: SimContext, pid?: number): boolean {
     text: `You have prestiged! Prestige Rank ${r.meta.prestigeRank}.`,
     color: '#ffd100',
   });
+  // Dedicated, text-free signal (distinct from the chat 'log' line above) so
+  // the client can repaint an already-open character sheet's prestige rank
+  // immediately, instead of waiting on an unrelated repaint trigger.
+  ctx.emit({ type: 'prestige', pid: r.e.id, rank: r.meta.prestigeRank });
   return true;
 }

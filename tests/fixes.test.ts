@@ -317,6 +317,32 @@ describe('terrain wall standoff', () => {
       }
     }
     expect(closest).toBeLessThan(2.0);
+    // Upper bound: the door-clear fix must not become an excuse to push the
+    // mound arbitrarily far back. The forward rock anchors nearest the portal
+    // (src/render/props.ts abandonedCrypt mound, local (1.75, -1.2) r 1.1 and
+    // (-1.7, -1.25) r 1.15) must stay solid, so a future offset bump can't
+    // silently turn the visible rubble into walk-through air.
+    expect(isBlocked(SEED, -153.2, 608.25, PLAYER_BODY_RADIUS)).toBe(true);
+    expect(isBlocked(SEED, -153.25, 611.7, PLAYER_BODY_RADIUS)).toBe(true);
+  });
+
+  it('keeps the OTHER mine mounds on the generic 3.4/5 default (moundOffset/moundRadius fallback)', () => {
+    // Only the Abandoned Crypt entry overrides moundOffset/moundRadius; this
+    // pins the `?? 3.4` / `?? 5` fallback arm of src/sim/colliders.ts so an
+    // edit to either default (or to the mound's rotY math) regresses these
+    // two entries silently while the crypt-only assertions above stay green.
+    const mineMoundFar = (x: number, z: number, rot: number) => ({
+      x: x - 15 * Math.sin(rot),
+      z: z - 15 * Math.cos(rot),
+    });
+    // Deeprock Burrows (88, 612, rot -2.0):
+    expect(isBlocked(SEED, 91.09, 613.41, PLAYER_BODY_RADIUS)).toBe(true); // mound center
+    const deeprockFar = mineMoundFar(88, 612, -2.0);
+    expect(isBlocked(SEED, deeprockFar.x, deeprockFar.z, PLAYER_BODY_RADIUS)).toBe(false); // far past the 5yd mound radius
+    // zone1 mine (-88, -68, rot 0.8):
+    expect(isBlocked(SEED, -90.44, -70.37, PLAYER_BODY_RADIUS)).toBe(true); // mound center
+    const zone1Far = mineMoundFar(-88, -68, 0.8);
+    expect(isBlocked(SEED, zone1Far.x, zone1Far.z, PLAYER_BODY_RADIUS)).toBe(false); // far past the 5yd mound radius
   });
 
   it('keeps the Abandoned Crypt mound collider matched to its visible rock pile', () => {
@@ -1112,7 +1138,7 @@ describe('boss loot and encounter resets', () => {
     sim.lootCorpse(mob.id, b);
     expect(sim.countItem('boar_hide', b)).toBe(1);
     expect(mob.loot).toBeNull();
-    // Phase 12d: the emptied boar corpse stays lootable through its
+    // The emptied boar corpse stays lootable through its
     // unclaimed-harvest grace window instead of collapsing immediately.
     expect(mob.lootable).toBe(true);
   });

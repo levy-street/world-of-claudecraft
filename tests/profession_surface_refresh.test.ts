@@ -29,6 +29,7 @@ function gathering(values: Partial<Record<string, number>> = {}): GatheringProfi
   return GATHERING_PROFESSION_IDS.map((professionId) => ({
     professionId,
     value: values[professionId] ?? 0,
+    displayValue: Math.floor(values[professionId] ?? 0),
   }));
 }
 
@@ -122,7 +123,7 @@ describe('Hud profession-surface convergence wiring', () => {
         '    )',
     );
     expect(method).toContain('this.charWindow.renderIfOpen()');
-    expect(method).toContain("$('#crafting-window').style.display === 'block'");
+    expect(method).toContain("$('#crafting-window').style.display === 'flex'");
     expect(method).toContain('this.renderCrafting()');
   });
 
@@ -133,5 +134,15 @@ describe('Hud profession-surface convergence wiring', () => {
     const bystander = hud.slice(bystanderStart, hud.indexOf('break;', bystanderStart));
     expect(personal).toContain('this.refreshOpenProfessionSurfacesIfChanged()');
     expect(bystander).not.toContain('this.refreshOpenProfessionSurfacesIfChanged()');
+  });
+
+  it('watches the gossip intro hint on the same slow band and attunement probe', () => {
+    // The open gossip dialog's intro hint row is the one identity-driven quest
+    // surface: the online cprof mirror can land after it opened, so it rides
+    // the same two convergence edges as the profession windows.
+    expect(hud).toContain('if (slowHud) this.questDialog.refreshIfChanged();');
+    const personalStart = hud.indexOf("case 'attunement': {");
+    const personal = hud.slice(personalStart, hud.indexOf('\n      }', personalStart));
+    expect(personal).toContain('this.questDialog.refreshIfChanged()');
   });
 });

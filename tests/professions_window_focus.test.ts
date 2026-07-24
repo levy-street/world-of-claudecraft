@@ -111,6 +111,25 @@ describe('ProfessionsWindow: focus and scroll survive rebuilds', () => {
     expect(document.activeElement).toBe(el.querySelector('[data-close]'));
   });
 
+  it('re-opening while open re-renders in place without re-running the open bookkeeping', () => {
+    const captureFocus = vi.fn(() => null);
+    const closeOthers = vi.fn();
+    const { w, el } = makeWindow(baseState(), { captureFocus, closeOthers });
+    expect(captureFocus).toHaveBeenCalledTimes(1);
+    expect(closeOthers).toHaveBeenCalledTimes(1);
+
+    w.open();
+
+    // Still open and rendered, but the original opener-focus capture and the
+    // close-others sweep did not re-run: re-running would clobber the focus
+    // restore target with an element inside the window itself.
+    expect(w.isOpen).toBe(true);
+    expect(el.style.display).toBe('flex');
+    expect(el.querySelector('[data-close]')).not.toBeNull();
+    expect(captureFocus).toHaveBeenCalledTimes(1);
+    expect(closeOthers).toHaveBeenCalledTimes(1);
+  });
+
   it('rebuilds on a data change and restores focus to the fresh Close button', () => {
     const state = baseState();
     const { w, el } = makeWindow(state);
@@ -193,7 +212,7 @@ describe('ProfessionsWindow: mode and row gating', () => {
   });
 
   it('renders no gathering row for an unknown profession id', () => {
-    // Fishing joined GATHERING_NAME_KEYS with Professions 2.0 Phase 11, so
+    // Fishing joined GATHERING_NAME_KEYS with Professions 2.0, so
     // the unknown-id example is skinning (documented in gathering.ts as
     // deliberately NOT a gathering profession): an id with no
     // GATHERING_NAME_KEYS entry renders no row BY DESIGN, while the known

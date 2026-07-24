@@ -36,7 +36,7 @@ import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { canGatherTier } from '../sim/professions/tools';
 import { isQuestTurnInNpc } from '../sim/types';
 import type { IWorld } from '../world_api';
-import { viewerBestToolTier } from './gathering_view';
+import { viewerOwnedToolTier } from './gathering_view';
 
 // Markers beyond (S/2 - RIM_INSET) from the centre are culled (entities) or pinned to
 // that rim as an arrow (party). Byte-faithful to the inline `S/2 - 7`.
@@ -92,7 +92,7 @@ export type MinimapMarker =
   // harvestable-for-THIS-viewer from on-cooldown-for-this-viewer (per-player,
   // see IWorldProfessions#nodeHarvestableByMe; two viewers can see opposite
   // states for the same node id). `locked` is the SEPARATE tool-tier access
-  // dimension (Professions 2.0 Phase 12, per-viewer owned-best bag scan):
+  // dimension (Professions 2.0, per-viewer owned-best bag scan):
   // the painter composes both, keeping the ready/cooldown silhouette while a
   // locked tint replaces the state color. Actionable info on every graphics
   // tier (fairness invariant: never preset-gated).
@@ -245,7 +245,7 @@ export function createMinimapMarkers(): MinimapMarkers {
 
       // Gatherable world nodes (issue 1124): static content positions (never entities), each
       // classified ready/cooldown for THIS viewer only via nodeHarvestableByMe.
-      // `locked` (Phase 12) memoizes the owned-best bag scan per profession,
+      // `locked` memoizes the owned-best bag scan per profession,
       // lazily on the first in-rim node: the common no-nearby-node frame
       // skips the scan entirely at the minimap's 10Hz cadence. The memo is a
       // per-build temporary (like the membership Sets above), so a tool
@@ -259,7 +259,7 @@ export function createMinimapMarkers(): MinimapMarkers {
         const professionId = NODE_HARVEST_TABLE[node.type].professionId;
         let best = bestToolTiers.get(professionId);
         if (best === undefined) {
-          best = viewerBestToolTier(world, professionId);
+          best = viewerOwnedToolTier(world, professionId);
           bestToolTiers.set(professionId, best);
         }
         markers.push({

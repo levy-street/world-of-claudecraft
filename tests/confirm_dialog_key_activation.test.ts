@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 //
-// Phase 13 QA finding, fixed test-first: keyboard activation inside the
+// Fixed test-first: keyboard activation inside the
 // #confirm-dialog family. The game input layer listens for keydown on window
 // (bubble): Enter is the chat-open edge action, which focuses the chat
 // composer mid-keydown and (in Chromium) suppresses the focused button's

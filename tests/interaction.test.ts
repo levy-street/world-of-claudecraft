@@ -248,7 +248,7 @@ describe('interaction.interact dispatch', () => {
     expect(mob.loot).toBeNull();
   });
 
-  it('nearest-scan: one press both harvests and loots an eligible corpse (Phase 12d)', () => {
+  it('nearest-scan: one press both harvests and loots an eligible corpse', () => {
     const { sim, a } = twoPlayers();
     const mob = corpse(sim, 20, 21, a, [{ itemId: 'worn_sword', count: 1 }]);
     mob.corpseTimer = 60;
@@ -264,7 +264,7 @@ describe('interaction.interact dispatch', () => {
     expect(mob.corpseTimer).toBe(4);
   });
 
-  it('target-path: one press both harvests and loots a targeted eligible corpse (Phase 12d)', () => {
+  it('target-path: one press both harvests and loots a targeted eligible corpse', () => {
     // The targeted arm must compose exactly like the proximity-scan arm above:
     // a player who TARGETS the corpse before pressing interact gets the same
     // unified press, not the pre-12d loot-only routing.
@@ -281,7 +281,7 @@ describe('interaction.interact dispatch', () => {
     expect(mob.corpseTimer).toBe(4);
   });
 
-  it('nearest-scan: a capacity-denied harvest still delivers the loot half (Phase 12d QA)', () => {
+  it('nearest-scan: a capacity-denied harvest still delivers the loot half', () => {
     const { sim, a } = twoPlayers();
     fillBags(sim, a);
     const mob = corpse(sim, 20, 21, a, []);
@@ -302,7 +302,7 @@ describe('interaction.interact dispatch', () => {
     expect(mob.corpseTimer).toBe(CORPSE_INTERACT_GRACE_SECONDS);
   });
 
-  it('target-path: a capacity-denied harvest still delivers the loot half (Phase 12d QA)', () => {
+  it('target-path: a capacity-denied harvest still delivers the loot half', () => {
     const { sim, a } = twoPlayers();
     fillBags(sim, a);
     const mob = corpse(sim, 20, 21, a, []);

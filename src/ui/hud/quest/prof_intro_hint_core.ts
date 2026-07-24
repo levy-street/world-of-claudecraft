@@ -1,5 +1,5 @@
 // Pure decision for the profession-introduction hint row in the NPC gossip
-// dialog (Phase 15 QA directed fix, the letter-to-Haldren dead end): an
+// dialog (the letter-to-Haldren dead end): an
 // unattuned player who follows the Guild trend letter to Smith Haldren before
 // completing q_prof_intro used to see only greeting plus vendor, because
 // Haldren's one quest (q_prof_hobby_switch) is gated behind the intro. The
@@ -15,7 +15,7 @@
 // UNLESS the viewer already holds any archetype attunement: an attuned
 // veteran who leveled past (or skipped) the intro has provably found the
 // guild, and a permanent "go meet the guild" line on every master would read
-// as a bug (the Phase 15 review's veteran refinement). Completion or
+// as a bug (a veteran refinement). Completion or
 // attunement retires it; nothing else does.
 
 import type { QuestState } from '../../../sim/types';

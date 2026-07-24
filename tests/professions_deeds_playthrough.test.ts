@@ -1,4 +1,4 @@
-// Professions 2.0 Phase 15: ONE real Sim scripted through the packet's deed
+// Professions 2.0: ONE real Sim scripted through the deed
 // beats end to end, with NO direct grantDeed shortcuts anywhere: every unlock
 // below lands through its live site (the craft command, the quest-validated
 // attunement, a real masterwork proc, the queued-grant proficiency drain, the
@@ -72,13 +72,13 @@ function marqueeBar(deedId: string): boolean {
   return def.renown >= 25 || def.reward !== undefined;
 }
 
-describe('Phase 15 scripted playthrough (one sim, live sites only)', () => {
+describe('scripted playthrough (one sim, live sites only)', () => {
   it('beat 1: the first successful craft lands Made By Hand through the craft command', () => {
     sim.tick(); // settle spawn
     expect(meta.deedsEarned.has('prog_first_craft')).toBe(false);
     sim.addItem('linen_scrap', 3, pid);
     sim.addItem('spider_leg', 1, pid);
-    // Phase 15 burn-down: the vestments recipe gained cloth and thread volume.
+    // The vestments recipe gained cloth and thread volume.
     sim.addItem('homespun_cloth', 3, pid);
     sim.addItem('spool_of_thread', 5, pid);
     sim.craftItem(VESTMENTS_RECIPE, false, pid);
@@ -92,7 +92,7 @@ describe('Phase 15 scripted playthrough (one sim, live sites only)', () => {
     expect(deedEvents(evs).some((ev) => ev.deedId === 'prog_first_craft')).toBe(true);
   });
 
-  it('beat 2: the quest-validated attunement is the Guildsworn moment (marquee, titled)', () => {
+  it('beat 2: the quest-validated attunement is the Craftsworn moment (marquee, titled)', () => {
     const renownBefore = meta.renown;
     moveToNpc(SMITH_MASTER);
     sim.acceptQuest('q_prof_attune_smith', PAIR);
@@ -111,7 +111,7 @@ describe('Phase 15 scripted playthrough (one sim, live sites only)', () => {
     expect(ev?.pid).toBe(pid);
     expect(ev?.retro).toBeUndefined(); // a live grant, not the veteran heal
     expect(meta.renown).toBe(renownBefore + 25);
-    expect(DEEDS.prog_guildsworn.reward).toEqual({ kind: 'title', text: 'Guildsworn' });
+    expect(DEEDS.prog_guildsworn.reward).toEqual({ kind: 'title', text: 'Craftsworn' });
     expect(marqueeBar('prog_guildsworn')).toBe(true);
     // The title reward is immediately selectable (the nameplate surface).
     sim.setActiveTitle('prog_guildsworn', pid);
@@ -218,6 +218,11 @@ describe('Phase 15 scripted playthrough (one sim, live sites only)', () => {
     // no table draw, nothing granted).
     teleportTo(LAKE.x, LAKE.z - LAKE.radius - 2);
     player.facing = 0; // due north, into the lake
+    // #2343: casting a line needs tackle in bags. The simple pole satisfies
+    // the implement gate and is mechanically identical to bare hands after it
+    // (effective tier 1), so the hunted session literals below are untouched
+    // (addItem draws no rng).
+    sim.addItem('simple_fishing_pole', 1, pid);
     // Stagecraft, not the contract under test: this seed's shoreline murloc
     // pack mauls a level-1 angler mid-session (fishing refuses in combat and
     // a dead player cannot cast), so the LOCAL pack is laid to rest first,
@@ -253,7 +258,13 @@ describe('Phase 15 scripted playthrough (one sim, live sites only)', () => {
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false);
   });
 
-  it('beat 11: the koi lands through the REAL bite-and-reel loop and the deed fires on the catch', () => {
+  // Raised timeout (the climb_slope idiom): this beat drives thousands of
+  // REAL world ticks (17 bite-and-reel sessions plus bounded combat waits),
+  // which overruns the 5s default under CI/core contention; every loop is
+  // guard-bounded, so a genuine hang still terminates into a failed pin.
+  it('beat 11: the koi lands through the REAL bite-and-reel loop and the deed fires on the catch', {
+    timeout: 60000,
+  }, () => {
     let koiSession = -1;
     let sawBiteOnKoiSession = false;
     for (let s = 0; s < 120 && koiSession < 0; s++) {
@@ -296,6 +307,12 @@ describe('Phase 15 scripted playthrough (one sim, live sites only)', () => {
     // Bank the run's loot: the hunts need free bags for the x5 windfalls, and
     // no later beat reads the inventory. Pure state cleanup, zero draws.
     meta.inventory.length = 0;
+    // #2343: each hunt's harvest needs its profession's tool in bags. The
+    // tier-1 tools ride the whole beat (purgeItem never touches them) and
+    // addItem draws no rng, so the hunted hitAt literals hold.
+    sim.addItem('copper_mining_pick', 1, pid);
+    sim.addItem('handaxe', 1, pid);
+    sim.addItem('gathering_sickle', 1, pid);
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
@@ -378,7 +395,7 @@ describe('Phase 15 scripted playthrough (one sim, live sites only)', () => {
     sim.entities.delete(mob.id);
   });
 
-  it('epilogue: the whole playthrough earned every Phase 15 beat deed exactly once', () => {
+  it('epilogue: the whole playthrough earned every beat deed exactly once', () => {
     const earned = [
       'prog_first_craft',
       'prog_guildsworn',

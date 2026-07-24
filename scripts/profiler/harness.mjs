@@ -60,6 +60,13 @@ window.__prof = {
     for (const pr of progs) if (pr && pr.cacheKey) variants.add(pr.cacheKey);
     const render = info.render || {};
     const mem = info.memory || {};
+    // draws/tris come from the perfStats surface: on composer tiers the raw
+    // info counters are monotonic (autoReset is off; the renderer accumulates
+    // per-frame deltas), so reading info.render directly would print
+    // ever-growing totals there. points/lines stay raw (no perfStats field);
+    // treat them as monotonic on high/ultra.
+    let ps = null;
+    try { ps = g.renderer && g.renderer.perfStats ? g.renderer.perfStats() : null; } catch {}
     return {
       entityCount: ents ? ents.size : 0,
       entitiesByKind: byKind,
@@ -70,7 +77,7 @@ window.__prof = {
       shaderVariants: variants.size,
       textures: mem.textures || 0,
       geometries: mem.geometries || 0,
-      render: { calls: render.calls || 0, triangles: render.triangles || 0, points: render.points || 0, lines: render.lines || 0 },
+      render: { calls: (ps ? ps.calls : render.calls) || 0, triangles: (ps ? ps.triangles : render.triangles) || 0, points: render.points || 0, lines: render.lines || 0 },
     };
   },
   _rolling() {

@@ -1,4 +1,4 @@
-// Inspect extension (Professions 2.0 Phase 6): equipped ItemInstancePayloads
+// Inspect extension (Professions 2.0): equipped ItemInstancePayloads
 // ride the IDENTITY lane (terse key `eqi`, next to `eq`) so the inspect window
 // shows another player's masterwork/enchant rolls. This suite is the liveness
 // half (the #2033 class: value, not shape): a REAL GameServer broadcast into a

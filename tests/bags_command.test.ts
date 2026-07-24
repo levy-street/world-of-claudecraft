@@ -31,9 +31,9 @@ describe('/bags command', () => {
     sim.players.get(pid)!.copper = 12 * 10000 + 4 * 100 + 5; // 12g 4s 5c
     sim.players.get(pid)!.inventory.length = 0; // shed the starter rations
 
-    // Added out of quality order to prove the readout sorts them. Phase 15:
-    // wolf_fang is a crafting reagent now (common), so the gray exemplar here
-    // is mudfin_scale.
+    // Added out of quality order to prove the readout sorts them. wolf_fang
+    // is a crafting reagent (common), so the gray exemplar here is
+    // mudfin_scale.
     sim.addItem('mudfin_scale', 5, pid); // poor
     sim.addItem('fen_reaver_glaive', 1, pid); // rare
     sim.addItem('minor_healing_potion', 3, pid); // common

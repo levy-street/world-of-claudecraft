@@ -20,6 +20,7 @@ const REFRESH_CALIBRATION_SAMPLES = 8;
 const REFRESH_CALIBRATION_SLACK_CALLBACKS = 4;
 export const FRAME_PACER_CALIBRATION_CALLBACKS =
   REFRESH_CALIBRATION_SAMPLES + REFRESH_CALIBRATION_SLACK_CALLBACKS + 1;
+export const FRAME_PACER_CALIBRATION_MAX_WAIT_MS = 500;
 const MIN_REFRESH_INTERVAL_MS = 1;
 const MAX_REFRESH_INTERVAL_MS = 50;
 const SUSPEND_GAP_MS = 250;
@@ -33,11 +34,12 @@ const TARGET_DIVISOR_RELATIVE_TOLERANCE = 0.01;
 const REFRESH_CHANGE_CONFIRMATION_SAMPLES = 6;
 const WORKLOAD_HEADROOM_CONFIRMATION_SAMPLES = 8;
 const WORKLOAD_HEADROOM_RATIO = 0.75;
+const compareNumbers = (a: number, b: number): number => a - b;
 
 function median(values: readonly number[], scratch: number[]): number {
   scratch.length = values.length;
   for (let i = 0; i < values.length; i++) scratch[i] = values[i];
-  scratch.sort((a, b) => a - b);
+  scratch.sort(compareNumbers);
   const middle = Math.floor(scratch.length / 2);
   return scratch.length % 2 === 0 ? (scratch[middle - 1] + scratch[middle]) / 2 : scratch[middle];
 }
@@ -81,11 +83,18 @@ export class FramePacer {
   private estimatedRefreshFps = 0;
   private targetFps: number;
   private intentionallyPaced = false;
+  private readonly stepDecision: FramePacerDecision;
 
   constructor(options: FramePacerOptions) {
     this.enabled = options.enabled;
     this.maxFps = Number.isFinite(options.maxFps) && options.maxFps > 0 ? options.maxFps : 60;
     this.targetFps = this.maxFps;
+    this.stepDecision = {
+      shouldRun: true,
+      estimatedRefreshFps: 0,
+      targetFps: this.targetFps,
+      intentionallyPaced: false,
+    };
   }
 
   snapshot(): FramePacerSnapshot {
@@ -184,12 +193,11 @@ export class FramePacer {
   }
 
   private decision(shouldRun: boolean): FramePacerDecision {
-    return {
-      shouldRun,
-      estimatedRefreshFps: this.estimatedRefreshFps,
-      targetFps: this.targetFps,
-      intentionallyPaced: this.intentionallyPaced,
-    };
+    this.stepDecision.shouldRun = shouldRun;
+    this.stepDecision.estimatedRefreshFps = this.estimatedRefreshFps;
+    this.stepDecision.targetFps = this.targetFps;
+    this.stepDecision.intentionallyPaced = this.intentionallyPaced;
+    return this.stepDecision;
   }
 
   private captureCallbackInterval(nowMs: number): number | null {
@@ -325,5 +333,48 @@ export class FramePacer {
       this.intentionallyPaced,
     );
     this.intentionallyPaced = this.enabled && this.targetFps < this.estimatedRefreshFps - 0.5;
+  }
+}
+
+export interface FramePacerCalibrationOptions<AnimationFrameHandle, TimeoutHandle> {
+  now: () => number;
+  requestAnimationFrame: (callback: (timestamp: number) => void) => AnimationFrameHandle;
+  cancelAnimationFrame: (handle: AnimationFrameHandle) => void;
+  setTimeout: (callback: () => void, delayMs: number) => TimeoutHandle;
+  clearTimeout: (handle: TimeoutHandle) => void;
+  maxWaitMs?: number;
+}
+
+export async function calibrateFramePacer<AnimationFrameHandle, TimeoutHandle>(
+  framePacer: Pick<FramePacer, 'observe' | 'snapshot'>,
+  options: FramePacerCalibrationOptions<AnimationFrameHandle, TimeoutHandle>,
+): Promise<void> {
+  const deadlineMs = options.now() + (options.maxWaitMs ?? FRAME_PACER_CALIBRATION_MAX_WAIT_MS);
+
+  for (let i = 0; i < FRAME_PACER_CALIBRATION_CALLBACKS; i++) {
+    const remainingWaitMs = deadlineMs - options.now();
+    if (remainingWaitMs <= 0) break;
+
+    const observedFrame = await new Promise<boolean>((resolve) => {
+      let settled = false;
+      let frameHandle: AnimationFrameHandle | undefined;
+      const timeoutHandle = options.setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        if (frameHandle !== undefined) {
+          options.cancelAnimationFrame(frameHandle);
+        }
+        resolve(false);
+      }, remainingWaitMs);
+      frameHandle = options.requestAnimationFrame((timestamp) => {
+        if (settled) return;
+        settled = true;
+        options.clearTimeout(timeoutHandle);
+        framePacer.observe(timestamp);
+        resolve(true);
+      });
+    });
+
+    if (!observedFrame || framePacer.snapshot().estimatedRefreshFps > 0) break;
   }
 }

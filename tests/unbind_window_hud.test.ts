@@ -1,4 +1,4 @@
-// Source pins over the Hud's Phase 14b Maker's Bond integration (the
+// Source pins over the Hud's Maker's Bond integration (the
 // train_window_hud.test.ts style: the wiring lives in the hud.ts coordinator,
 // so these pin the load-bearing snippets instead of booting the whole Hud):
 //  - the unbindResult event arm logs exactly one localized line per outcome,
@@ -36,11 +36,17 @@ describe('hud.ts unbindResult event arm (source pins)', () => {
       'hudChrome.unbind.notEligible',
       'hudChrome.unbind.notBound',
       'hudChrome.unbind.cannotAfford',
+      'hudChrome.unbind.noSpace',
       'hudChrome.unbind.outOfRange',
     ]) {
       expect(arm, key).toContain(key);
     }
-    for (const reason of ['unbind_not_eligible', 'unbind_not_bound', 'unbind_cannot_afford']) {
+    for (const reason of [
+      'unbind_not_eligible',
+      'unbind_not_bound',
+      'unbind_cannot_afford',
+      'unbind_no_space',
+    ]) {
       expect(arm, reason).toContain(reason);
     }
   });
@@ -49,12 +55,13 @@ describe('hud.ts unbindResult event arm (source pins)', () => {
     // Presence pins alone cannot catch two keys swapped inside the ternary
     // chain, so pin each reason-to-key pairing. unbind_out_of_range is
     // deliberately the fallback arm (its literal never appears in hud.ts), so
-    // its pairing is pinned as the else branch of the cannotAfford arm.
+    // its pairing is pinned as the else branch of the unbind_no_space arm.
     const arm = unbindResultArm();
     expect(arm).toMatch(/'unbind_not_eligible'\s*\?\s*'hudChrome\.unbind\.notEligible'/);
     expect(arm).toMatch(/'unbind_not_bound'\s*\?\s*'hudChrome\.unbind\.notBound'/);
+    expect(arm).toMatch(/'unbind_cannot_afford'\s*\?\s*'hudChrome\.unbind\.cannotAfford'/);
     expect(arm).toMatch(
-      /'unbind_cannot_afford'\s*\?\s*'hudChrome\.unbind\.cannotAfford'\s*:\s*'hudChrome\.unbind\.outOfRange'/,
+      /'unbind_no_space'\s*\?\s*'hudChrome\.unbind\.noSpace'\s*:\s*'hudChrome\.unbind\.outOfRange'/,
     );
   });
 

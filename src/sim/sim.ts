@@ -88,6 +88,7 @@ import { rewindHealAmount } from './combat/rewind';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isSpellResisted } from './combat/spell_resist';
+import { isCritImmuneTank } from './combat/tank_crit_immunity';
 import { warriorMeleeDefense } from './combat/warrior_hit_table';
 import { ensureWarriorStance } from './combat/warrior_stances';
 // A3: the augment/power-up content helpers used by the Fiesta match logic
@@ -331,6 +332,7 @@ import {
   placeMobileStationForPlayer,
 } from './professions/mobile_station';
 import { updateProfNudges } from './professions/prof_nudges';
+import { healDisplayRoundedProficiency } from './professions/proficiency_display_heal';
 import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
 import { normalizeTierMailOnLoad, updateTierMail } from './professions/tier_mail';
 import { grandfatherKnownRecipes, resolveTrain, type TrainResult } from './professions/training';
@@ -390,7 +392,7 @@ export type { MailSave } from './mail/post_office';
 export type { MarketSave } from './market';
 
 import {
-  applyHeroicMobTuning,
+  applyDungeonMobTuning,
   mobLevelForDungeonDifficulty,
   mobTemplateForDungeonDifficulty,
 } from './instances/difficulty';
@@ -469,6 +471,7 @@ import { isStunDrCategory } from './stun_dr';
 import { Targeting } from './targeting';
 import {
   addThreat,
+  SUMMONED_ADD_THREAT_SEED,
   TAUNT_FORCE_SECONDS,
   threatEntries,
   threatModifier,
@@ -1023,13 +1026,13 @@ export interface PlayerMeta {
   // toast/log line off, without deciding the outcome itself. Null until the
   // player's first craft attempt.
   lastCraftResult: CraftResult | null;
-  // Outcome of this player's most recent trainRecipe command (Professions 2.0
-  // Phase 9), same session-only probe shape as lastCraftResult above: never
+  // Outcome of this player's most recent trainRecipe command (Professions 2.0),
+  // same session-only probe shape as lastCraftResult above: never
   // persisted, null until the player's first train attempt. Denials are
   // recorded here too (the single-surface doctrine: the trainResult event and
   // this probe, never a ctx.error toast).
   lastTrainResult: TrainResult | null;
-  // This player's most recent masterwork proc (Professions 2.0 Phase 2), same
+  // This player's most recent masterwork proc (Professions 2.0), same
   // session-only shape as lastCraftResult above: never persisted into
   // CharacterState. Null until the player's first masterwork proc this
   // session. Backs the IWorld lastMasterwork read surface.
@@ -1141,8 +1144,8 @@ export interface PlayerMeta {
   // grandfathered (see professions/crafting.ts isRecipeKnown) and never needs
   // to appear here. Persisted in CharacterState as a plain string array.
   knownRecipes: Set<string>;
-  // One-time Phase 9 grandfather normalize already applied (the mailWelcomed
-  // idiom): true from creation for new characters; a loaded pre-Phase-9 save
+  // One-time grandfather normalize already applied (the mailWelcomed
+  // idiom): true from creation for new characters; a loaded older save
   // (flag absent/false) gets PRE_TRAINING_RECIPE_IDS unioned into
   // knownRecipes exactly once (professions/training.ts
   // grandfatherKnownRecipes), then persists true. Persisted in CharacterState.
@@ -1152,7 +1155,7 @@ export interface PlayerMeta {
   // persisted: a fresh login gets a fresh window rather than carrying a
   // logout-time cooldown across sessions.
   craftThrottle: { windowStart: number; count: number };
-  // One-time mastery reset notice pending (Professions 2.0 Phase 12c): set by
+  // One-time mastery reset notice pending (Professions 2.0): set by
   // the load-time masteryResetApplied branch, consumed by the tick mail phase
   // (professions/mastery_reset.ts updateMasteryResetNotices). TRANSIENT:
   // never serialized, and false is inert in the parity sampler, so no golden
@@ -1160,7 +1163,7 @@ export interface PlayerMeta {
   // (masteryResetApplied), never here, so the sampler sees zero new fields.
   pendingMasteryResetNotice: boolean;
   // The player's own placed mobile crafting station (#1134, wired live in
-  // Professions 2.0 Phase 8: see professions/mobile_station.ts). TRANSIENT:
+  // Professions 2.0: see professions/mobile_station.ts). TRANSIENT:
   // never serialized to the character save (CharacterState has no field for
   // it and serializeCharacter never writes one), and defaults to null at
   // construction AND on load, because its expiry is tick-domain
@@ -1172,29 +1175,29 @@ export interface PlayerMeta {
   // One-time Ravenpost welcome letter sent (persisted in CharacterState, so
   // existing characters get the service announcement exactly once).
   mailWelcomed: boolean;
-  // One-time Guild trend letter sent (Professions 2.0 Phase 7): flipped when
+  // One-time Guild trend letter sent (Professions 2.0): flipped when
   // the craft-trend sweep books the letter (professions/guild_letter.ts).
   // Persisted in CharacterState so no later load can re-send it.
   guildLetterSent: boolean;
-  // Repeatable work-order cooldowns (Professions 2.0 Phase 14): quest id -> the
+  // Repeatable work-order cooldowns (Professions 2.0): quest id -> the
   // tick at/after which it is available again (professions/cadence.ts). A Map so
   // an empty default canonicalizes to an inert `[]` in the parity sampler (no
   // golden churn). Persisted in CharacterState with zero-default omission; loaded
   // through clampCadenceOnLoad so a tick-counter reset can never brick a quest.
   questCadence: CadenceMap;
-  // Per-major acknowledged craft tier (Professions 2.0 Phase 14): craft id -> the
+  // Per-major acknowledged craft tier (Professions 2.0): craft id -> the
   // highest tier the tier-crossing mail sweep has already congratulated
   // (professions/tier_mail.ts). A Map (empty -> inert `[]`, no golden churn),
   // persisted with zero-default omission. Only the active pair's two majors are
   // ever recorded; baseline arming keeps deploy migration and fresh attunement
   // silent.
   tierMailSent: Map<string, number>;
-  // One-time first-tier tutorial sent (Professions 2.0 Phase 14): flipped when a
+  // One-time first-tier tutorial sent (Professions 2.0): flipped when a
   // character's first craft skill crosses tier 1 (professions/prof_nudges.ts).
   // Persisted in CharacterState so no later load can re-fire it (the
   // guildLetterSent idiom).
   profTierTutorialSent: boolean;
-  // In-memory trend-nudge cadence (Professions 2.0 Phase 14). TRANSIENT: never
+  // In-memory trend-nudge cadence (Professions 2.0). TRANSIENT: never
   // serialized (a restart reopens the window, deliberately: the nudge is a hint,
   // not an award), and empty at construction and on load, so the parity sampler
   // sees an inert `[]`. Keyed by professions/prof_nudges.ts TREND_NUDGE_KEY.
@@ -1370,20 +1373,20 @@ export interface CharacterState {
   // Ravenpost welcome letter already sent (optional so pre-mail saves load
   // cleanly and receive the announcement letter once on their next login).
   mailWelcomed?: boolean;
-  // Guild trend letter already sent (optional so pre-phase-7 saves load
+  // Guild trend letter already sent (optional so older saves load
   // cleanly and receive at most one letter when their crafts qualify).
   guildLetterSent?: boolean;
-  // Repeatable work-order cooldowns (Professions 2.0 Phase 14; JSONB, quest id ->
+  // Repeatable work-order cooldowns (Professions 2.0; JSONB, quest id ->
   // availableAt tick). Written only when non-empty (zero-default omission), so
-  // pre-Phase-14 and no-work-order saves stay byte-equal; loaded through
+  // older and no-work-order saves stay byte-equal; loaded through
   // clampCadenceOnLoad (tick-reset safe).
   questCadence?: Record<string, number>;
-  // Per-major acknowledged craft tier (Professions 2.0 Phase 14; JSONB, craft id
+  // Per-major acknowledged craft tier (Professions 2.0; JSONB, craft id
   // -> tier). Written only when non-empty (zero-default omission), so
-  // pre-Phase-14 and unattuned saves stay byte-equal.
+  // older and unattuned saves stay byte-equal.
   tierMailSent?: Record<string, number>;
-  // First-tier tutorial already sent (Professions 2.0 Phase 14; JSONB, optional
-  // so pre-Phase-14 saves load cleanly and fire it once when they first qualify).
+  // First-tier tutorial already sent (Professions 2.0; JSONB, optional
+  // so older saves load cleanly and fire it once when they first qualify).
   // Written only when true (zero-default omission).
   profTierTutorialSent?: boolean;
   // World-boss loot lockouts now ride `raidLockouts` (keyed worldboss:<mobId>). The
@@ -1400,17 +1403,26 @@ export interface CharacterState {
   // Recipe acquisition (#1299; JSONB, additive back-compat: absent on older
   // saves loads as an empty set, i.e. no learned non-grandfathered recipes).
   knownRecipes?: string[];
-  // Phase 9 grandfather normalize already applied (JSONB, additive
-  // back-compat, the mailWelcomed idiom): absent/false on a pre-Phase-9 save
+  // Grandfather normalize already applied (JSONB, additive
+  // back-compat, the mailWelcomed idiom): absent/false on an older save
   // triggers the one-time PRE_TRAINING_RECIPE_IDS union on load, then true
   // is persisted so it never re-runs (it is idempotent anyway).
   recipesGrandfathered?: boolean;
-  // Phase 12c mastery reset already applied (JSONB, the recipesGrandfathered
+  // Mastery reset already applied (JSONB, the recipesGrandfathered
   // idiom): absent/false on a pre-curve save triggers the one-time
   // applyMasteryReset on load (professions/mastery_reset.ts), then LITERAL
   // true is serialized unconditionally (any blob written by curve-era code
   // has the reset applied), so it can never re-fire.
   masteryResetApplied?: boolean;
+  // Proficiency display heal already applied (issue 2339; JSONB, the
+  // masteryResetApplied idiom): absent/false on a save written while the
+  // character sheet still ROUNDED its Gathering rows triggers the one-time
+  // healDisplayRoundedProficiency on load (a value the old sheet displayed
+  // as a crossed band threshold, 99.5 to 99.99 reading "100", bumps to that
+  // threshold so the join retro pass grants the stranded 100/200 gathering
+  // deeds), then LITERAL true is serialized unconditionally so it can never
+  // re-fire on the floored post-fix display.
+  proficiencyDisplayHealApplied?: boolean;
   townFocus?: Record<string, number>;
   // Active-archetype state (#1129, superseded scope; JSONB, back-compat: absent on
   // older saves loads as emptyArchetypeState, see normalizeArchetypeState).
@@ -2190,7 +2202,7 @@ export class Sim {
       marketFilter: '',
       craftSkills: emptyCraftSkills(),
       knownRecipes: new Set(),
-      // A NEW character is born past the Phase 9 grandfather cut: it learns
+      // A NEW character is born past the grandfather cut: it learns
       // trainer-taught recipes the normal way, never via the load-time union
       // (a saved character's real flag is restored below).
       recipesGrandfathered: true,
@@ -2301,7 +2313,7 @@ export class Sim {
       meta.bank = sanitizeBankState(s.bank);
       for (const q of s.questLog) {
         // Prune unknown quest ids at load (normalize on load, never crash): a save
-        // mid a since-deleted quest (e.g. the Phase 14 retirement of
+        // mid a since-deleted quest (e.g. the retirement of
         // q_archetype_acceptance / q_prof_make_amends) must not leave a live
         // questLog entry whose id is absent from QUESTS, or the next quest-touching
         // tick op dereferences QUESTS[qp.questId].objectives and TypeErrors inside
@@ -2335,8 +2347,8 @@ export class Sim {
       }
       meta.craftSkills = normalizeCraftSkills(s.craftSkills);
       if (s.knownRecipes) meta.knownRecipes = new Set(s.knownRecipes);
-      // Phase 9 grandfather normalize (one shared load path for offline saves
-      // AND server-persisted state): a pre-Phase-9 save (flag absent/false)
+      // Grandfather normalize (one shared load path for offline saves
+      // AND server-persisted state): an older save (flag absent/false)
       // gets the pre-training recipe ids unioned in exactly once, then the
       // returned true persists via serializeCharacter. Deterministic and
       // idempotent (professions/training.ts).
@@ -2345,7 +2357,7 @@ export class Sim {
         s.recipesGrandfathered === true,
       );
       meta.archetype = normalizeArchetypeState(s.archetype, meta.craftSkills);
-      // The one-time mastery reset (Professions 2.0 Phase 12c, the curve
+      // The one-time mastery reset (Professions 2.0, the curve
       // deploy): a save written before the curve (flag absent/false) has its
       // craft skills and gathering proficiencies zeroed exactly once, AFTER
       // both normalizers above populated meta (and after the archetype
@@ -2360,9 +2372,20 @@ export class Sim {
         applyMasteryReset(meta.craftSkills, meta.gatheringProficiency);
         meta.pendingMasteryResetNotice = true;
       }
+      // The one-time proficiency display heal (issue 2339), after the
+      // mastery-reset branch so it sees the values this character actually
+      // keeps: a save written while the character sheet rounded its
+      // Gathering rows can hold a proficiency the old readout showed as a
+      // crossed band threshold (99.5 to 99.99 read "100") while the
+      // threshold deeds, comparing the raw value with >=, stayed locked.
+      // Bump exactly those values to the threshold once; the deed retro
+      // pass below then grants the stranded deeds on this same join.
+      if (s.proficiencyDisplayHealApplied !== true) {
+        healDisplayRoundedProficiency(meta.gatheringProficiency);
+      }
       meta.mailWelcomed = s.mailWelcomed === true;
       meta.guildLetterSent = s.guildLetterSent === true;
-      // Phase 14 work-order cooldowns: clamp every stored availableAt to
+      // Work-order cooldowns: clamp every stored availableAt to
       // tickCount + WORK_ORDER_CADENCE_TICKS so a tick-counter reset (fresh
       // offline Sim, server restart) can never leave a quest bricked; past-due
       // keys drop out (the record shrinks back to empty and re-omits from saves).
@@ -2371,7 +2394,7 @@ export class Sim {
         this.tickCount,
         WORK_ORDER_CADENCE_TICKS,
       );
-      // Phase 14 acknowledged tiers: valid finite non-negative entries only; a
+      // Acknowledged tiers: valid finite non-negative entries only; a
       // missing craft re-baselines silently on the next tier-mail sweep.
       meta.tierMailSent = normalizeTierMailOnLoad(s.tierMailSent);
       meta.profTierTutorialSent = s.profTierTutorialSent === true;
@@ -3025,6 +3048,11 @@ export class Sim {
       // serializes unconditionally. There is deliberately NO PlayerMeta
       // mirror: the parity sampler must see zero new fields.
       masteryResetApplied: true,
+      // LITERAL true for the same reason: any blob written by post-fix code
+      // was loaded through the heal branch (or born past the cut), and the
+      // floored display makes the heal unrepeatable by design. No PlayerMeta
+      // mirror here either.
+      proficiencyDisplayHealApplied: true,
       archetype: { ...meta.archetype, attunedPairs: [...meta.archetype.attunedPairs] },
       delveMarks: meta.delveMarks,
       delveClears: { ...meta.delveClears },
@@ -3038,11 +3066,11 @@ export class Sim {
       heroicDaily: { date: meta.heroicDaily.date, marked: [...meta.heroicDaily.marked] },
       mailWelcomed: meta.mailWelcomed,
       guildLetterSent: meta.guildLetterSent,
-      // Phase 14: all three written only when non-empty/true (zero-default
+      // All three written only when non-empty/true (zero-default
       // omission), so a character with no work orders, no attunement, and no
-      // tutorial serializes byte-identically to a pre-Phase-14 save.
+      // tutorial serializes byte-identically to an older save.
       ...(() => {
-        // Phase 15 QA directed fix (load hygiene): prune windows that have
+        // Load hygiene: prune windows that have
         // already elapsed at serialize time too, not only at load, so a
         // long-running session's autosave stops carrying past-due keys
         // forward. Live windows serialize byte-identically, the field still
@@ -3410,6 +3438,7 @@ export class Sim {
   dailyRewards(): Promise<DailyRewardStatus> {
     const day = '1970-01-01';
     return Promise.resolve({
+      enabled: true,
       day,
       resetAt: '1970-01-02T00:00:00.000Z',
       prizePoolUsd: 0,
@@ -4053,7 +4082,8 @@ export class Sim {
       partyMembersForKey: (key) => sim.partyMembersForKey(key),
       grantXp: (amount, meta, opts) => sim.grantXp(amount, meta, opts),
       addItem: (itemId, count, pid) => sim.addItem(itemId, count, pid),
-      addItemInstance: (itemId, instance, pid) => sim.addItemInstance(itemId, instance, pid),
+      addItemInstance: (itemId, instance, pid, count) =>
+        sim.addItemInstance(itemId, instance, pid, count),
       // L2's World Market escrow (marketList) also consumes removeItem; it is bound once
       // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.
       spawnBossAdds: (boss, mobId, count) => sim.spawnBossAdds(boss, mobId, count),
@@ -4096,7 +4126,7 @@ export class Sim {
       startAutoAttack: sim.startAutoAttack.bind(sim),
       revivePet: sim.revivePet.bind(sim),
       completeFishing: (p, meta) => fishing.completeFishing(sim.ctx, p, meta),
-      // Gather cast completion (Phase 12b): module-bound with the live ctx,
+      // Gather cast completion: module-bound with the live ctx,
       // exactly like completeFishing above; no Sim method exists for it.
       completeGatherCast: (p, meta) => completeGatherCastImpl(sim.ctx, p, meta),
       applyDemonHealTick: sim.applyDemonHealTick.bind(sim),
@@ -4136,7 +4166,7 @@ export class Sim {
       // Late-bound arrows (looked up at call time, not `.bind`d at ctor) so they preserve
       // the pre-move `this.X` dynamic-dispatch semantics, including tests that reassign a
       // Sim method post-construction. startFishing/completeFishing flip points-at to the
-      // fishing module (Professions 2.0 Phase 11), called with the live ctx the same way
+      // fishing module (Professions 2.0), called with the live ctx the same way
       // runEffects is above; no Sim fishing method remains. unlockMechChromaFromItem /
       // openSkinSelect are private on Sim; isSwimming is public. The owning facets stay TBD.
       startFishing: (p, meta) => fishing.startFishing(sim.ctx, p, meta),
@@ -4556,23 +4586,23 @@ export class Sim {
     this.market.update();
     lap?.('market');
     this.postOffice.update();
-    // The Guild trend letter sweep (Professions 2.0 Phase 7): the single 1 Hz
+    // The Guild trend letter sweep (Professions 2.0): the single 1 Hz
     // chokepoint that watches every craft-skill mutation path plus the load
     // backfill case. Draws ZERO rng and emits nothing itself (it only books a
     // letter via ctx.mailAuthoredLetter), so appending it inside the mail
     // phase cannot fork the draw order.
     updateGuildTrendLetters(this.ctx);
-    // The tier-crossing master mail sweep (Professions 2.0 Phase 14): books a
+    // The tier-crossing master mail sweep (Professions 2.0): books a
     // congratulatory letter when an attuned character's active-pair major
     // crosses a tier. Draws ZERO rng and emits nothing itself (books a letter
     // via ctx.mailAuthoredLetter), so its mail-phase position cannot fork the
     // draw order.
     updateTierMail(this.ctx);
-    // The profession nudge sweep (Professions 2.0 Phase 14): the trend nudge and
+    // The profession nudge sweep (Professions 2.0): the trend nudge and
     // first-tier tutorial personal events. Draws ZERO rng (it only emits events,
     // which draw nothing), so its mail-phase position cannot fork the draw order.
     updateProfNudges(this.ctx);
-    // The one-time mastery reset notice (Professions 2.0 Phase 12c): drains
+    // The one-time mastery reset notice (Professions 2.0): drains
     // the transient pendingMasteryResetNotice flag the load-time reset branch
     // set. Draws ZERO rng and emits nothing itself (it only books a letter
     // via ctx.mailAuthoredLetter), so appending it inside the mail phase
@@ -5996,7 +6026,10 @@ export class Sim {
     let dmg =
       this.rng.range(mob.weapon.min, mob.weapon.max) +
       (this.effectiveAttackPower(mob) / 14) * mob.weapon.speed;
-    const crit = this.rng.chance(0.05);
+    // Tank crit immunity: the 5% roll is still DRAWN (stream position), a
+    // committed tank just never suffers it (combat/tank_crit_immunity.ts).
+    const critRoll = this.rng.chance(0.05);
+    const crit = critRoll && !isCritImmuneTank(target, this.players.get(target.id));
     if (crit) dmg *= 2;
     const enrage = MOBS[mob.templateId]?.enrage;
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
@@ -6581,7 +6614,7 @@ export class Sim {
       );
       const level = mobLevelForDungeonDifficulty(inst?.dungeonId ?? '', difficulty, rolledLevel);
       const add = createMob(this.nextId++, addTemplate, level, pos);
-      applyHeroicMobTuning(add, inst?.dungeonId ?? '', difficulty, { summonedAdd: true });
+      applyDungeonMobTuning(add, inst?.dungeonId ?? '', difficulty, { summonedAdd: true });
       // The add is anchored where it ERUPTED (createMob already set spawnPos to the
       // spawn point beside the boss): a boss kited far from HIS original spawn must
       // not hatch adds that are instantly past their own leash and evade home without
@@ -6599,7 +6632,12 @@ export class Sim {
         // Same seeding aggroMob does on a normal pull: the leash measures from the
         // eruption point until a hostile player action refreshes it.
         add.leashAnchor = { ...add.pos };
-        addThreat(add, victim.id, 1);
+        // A REAL tank lead, not a token point: healing threat on the tank splits
+        // to every mob aware of him, so a 1-point seed sent every summon wave at
+        // the healer (one add swing one-shots a cloth pool). 750 covers roughly
+        // ten seconds of normal healing; sustained DPS focus can still rip an
+        // add loose, and taunt or tank threat answers it.
+        addThreat(add, victim.id, SUMMONED_ADD_THREAT_SEED);
       }
       // Book of Deeds kill-order tasks track every add this attempt summoned.
       deedsMod.onBossAddsSummonedForDeeds(this.ctx, boss, [add.id]);
@@ -6687,30 +6725,46 @@ export class Sim {
     }
   }
 
-  // Grant a single non-fungible copy of `itemId` carrying an instance payload
-  // (#1165: signer/charges/rolled/boundTo). Identical-payload stacking (Phase
-  // 12d): the copy merges into an existing slot whose payload is byte-equal
+  // Grant `count` non-fungible copies of `itemId` carrying an instance payload
+  // (#1165: signer/charges/rolled/boundTo). Identical-payload stacking: each
+  // copy merges into an existing slot whose payload is byte-equal
   // under canStackInstancePayloads (so a charge-bearing payload stays
   // one-per-slot) with stack room; otherwise it takes its own slot entry. It
-  // never merges with a plain or differently-instanced stack.
-  addItemInstance(itemId: string, instance: ItemInstancePayload, pid?: number): void {
+  // never merges with a plain or differently-instanced stack. A multi-unit
+  // grant (a rare-event windfall) emits ONE loot line with the xN suffix
+  // instead of one line and cue per unit; discovery and quest hooks fire once
+  // per grant, matching addItem's per-call semantics.
+  addItemInstance(itemId: string, instance: ItemInstancePayload, pid?: number, count = 1): void {
     const r = this.resolve(pid);
     if (!r) return;
+    if (count < 1) return;
     const { meta } = r;
     const def = ITEMS[itemId];
     const stack = stackSizeOf(def);
-    const mergeTarget = meta.inventory.find(
-      (s) =>
-        s.itemId === itemId && s.count < stack && canStackInstancePayloads(s.instance, instance),
-    );
-    if (mergeTarget) mergeTarget.count += 1;
-    else meta.inventory.push({ itemId, count: 1, instance });
+    for (let i = 0; i < count; i++) {
+      const mergeTarget = meta.inventory.find(
+        (s) =>
+          s.itemId === itemId && s.count < stack && canStackInstancePayloads(s.instance, instance),
+      );
+      if (mergeTarget) mergeTarget.count += 1;
+      // The first pushed slot holds the caller's payload object (the shipped
+      // single-unit contract); any further slot a stack-cap crossing forces
+      // gets its own clone, so two slots never share one mutable payload
+      // (charges mutate in place, unbind clears boundTo on one slot).
+      else
+        meta.inventory.push({
+          itemId,
+          count: 1,
+          instance: i === 0 ? instance : cloneItemInstancePayload(instance),
+        });
+    }
     // Discovery ledger: the instance's rolled quality (gathered rares) beats
     // the static def quality for the quality-first marks.
     deedsMod.markItemDiscovered(this.ctx, meta, itemId, instance.rolled?.quality);
     this.emit({
       type: 'loot',
-      text: `You receive: ${def?.name ?? itemId}.`,
+      // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
+      text: `You receive: ${def?.name ?? itemId}${count > 1 ? ' x' + count : ''}.`,
       pid: meta.entityId,
     });
     this.ctx.onInventoryChangedForQuests(meta);
@@ -6771,14 +6825,16 @@ export class Sim {
 
   // Enchanting-eligible count for `itemId` (#1712 review): a plain fungible
   // stack counts, and so does an instanced copy that is not itself already
-  // enchanted (e.g. crafting.ts's single-copy rare+ grant or a Phase 2
+  // enchanted (e.g. crafting.ts's single-copy rare+ grant or a
   // masterwork copy, whose rolled.stats are its baked bonus, NOT an enchant).
   // Only an already-enchanted copy (professions/enchanting.ts
   // isEnchantedInstance: the explicit `enchant` marker, or legacy bare
-  // rolled.stats without rolled.masterwork) is excluded, so disenchant/
-  // apply-enchant never consumes an already-enchanted copy but DOES accept
+  // rolled.stats without rolled.masterwork) is excluded, so apply-enchant
+  // never consumes (overwrites) an already-enchanted copy but DOES accept
   // crafted and masterwork gear, unlike the fungible-only gate this replaces
-  // for enchanting.ts specifically.
+  // for enchanting.ts specifically. Disenchant uses this pair only as its
+  // PREFERENCE tier: it gates on countItem and falls back to removeItem when
+  // every held copy is enchanted (issue #2340; see resolveDisenchant).
   countEnchantableItem(itemId: string, pid?: number): number {
     const r = this.resolve(pid);
     if (!r) return 0;
@@ -6931,8 +6987,8 @@ export class Sim {
   // src/sim/professions/crafting.ts, resolved on the deterministic tick the
   // command arrives on, same as harvestNode/buyItem/useItem above. Stashes
   // the outcome on the resolved player's PlayerMeta so the IWorld
-  // lastCraftResult read surface (below) reflects it. `commission` (Phase
-  // 14b) is the boolean opt-in off the craft command; the resolve honors it
+  // lastCraftResult read surface (below) reflects it. `commission` is the
+  // boolean opt-in off the craft command; the resolve honors it
   // only for eligible equipment outputs and mints the bindOnTrade arm
   // server-side (professions/commission.ts), never off client data.
   craftItem(recipeId: string, commission?: boolean, pid?: number): void {
@@ -6950,7 +7006,7 @@ export class Sim {
       reason: result.reason,
       pid: meta?.entityId,
     });
-    // Masterwork proc surface (Professions 2.0 Phase 2): stash the per-player
+    // Masterwork proc surface (Professions 2.0): stash the per-player
     // view (session-only, like lastCraftResult above) and emit the personal
     // masterwork event, in addition to the craftResult emit.
     if (result.masterwork && result.itemId && meta) {
@@ -6961,7 +7017,7 @@ export class Sim {
       };
       meta.lastMasterwork = proc;
       this.emit({ type: 'masterwork', ...proc, pid: meta.entityId });
-      // Zone-wide celebration copy (Phase 6): the professions module owns the
+      // Zone-wide celebration copy: the professions module owns the
       // fanout and the instance-space exclusion; draws no rng, runs after the
       // personal emit.
       announceMasterworkZone(this.ctx, meta.entityId, meta.name, proc);
@@ -6974,13 +7030,13 @@ export class Sim {
     return this.players.get(this.primaryId)?.lastCraftResult ?? null;
   }
 
-  // IWorld read surface (IWorldProfessions, Phase 2): the local viewer's most
+  // IWorld read surface (IWorldProfessions): the local viewer's most
   // recent masterwork proc, or null before their first proc this session.
   get lastMasterwork(): MasterworkProc | null {
     return this.players.get(this.primaryId)?.lastMasterwork ?? null;
   }
 
-  // Mobile crafting station command (Professions 2.0 Phase 8, wiring #1134):
+  // Mobile crafting station command (Professions 2.0, wiring #1134):
   // a thin delegate onto professions/mobile_station.ts, resolved on the
   // deterministic tick the command arrives on, same shape as craftItem
   // above. Specialization-gated inside the impl; a failed placement is a
@@ -6990,7 +7046,7 @@ export class Sim {
     placeMobileStationForPlayer(this.ctx, craftId, pid);
   }
 
-  // Recipe-training command (Professions 2.0 Phase 9): a thin entry beside
+  // Recipe-training command (Professions 2.0): a thin entry beside
   // craftItem/placeMobileStation above. resolveTrain
   // (professions/training.ts) is the pure validator; on ok the fee is charged
   // EXACTLY once (a pure gold sink against the same meta.copper purse the
@@ -7017,7 +7073,7 @@ export class Sim {
     });
   }
 
-  // Maker's Bond unbind command (Professions 2.0 Phase 14b): a thin entry
+  // Maker's Bond unbind command (Professions 2.0): a thin entry
   // beside trainRecipe above. professions/commission.ts owns the resolve
   // (the resolveTrain deny-order doctrine: a duplicate command resolves
   // unbind_not_bound before any charging arm, so it never re-charges) AND
@@ -7040,7 +7096,7 @@ export class Sim {
     });
   }
 
-  // IWorld read surface (IWorldProfessions, Phase 8): the craft id of the
+  // IWorld read surface (IWorldProfessions): the craft id of the
   // local viewer's own ACTIVE mobile station, or null when none is placed or
   // the placed one has expired (tick-domain expiry, checked live).
   get activeMobileStationCraft(): string | null {
@@ -7079,7 +7135,7 @@ export class Sim {
     const result = salvageItemImpl(this.ctx, itemId, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastSalvageResult = result;
-    // Emit the pid-scoped, text-free outcome (Phase 13), same immediacy arm as
+    // Emit the pid-scoped, text-free outcome, same immediacy arm as
     // craftItem's craftResult: the online client mirrors it into lastSalvageResult
     // for a toast/log without deciding the result. Single-surface doctrine: NO
     // ctx.error from the resolver, or a deny would print twice.
@@ -7094,7 +7150,7 @@ export class Sim {
     });
   }
 
-  // IWorld read surface (IWorldProfessions, Phase 13): the local viewer's most
+  // IWorld read surface (IWorldProfessions): the local viewer's most
   // recent salvage-result, or null before their first salvage attempt this
   // session. `lastSalvageResultFor` is the per-player form the server's `salv`
   // self-delta reads (server/game.ts), modeled on activeMobileStationCraftFor.
@@ -7106,7 +7162,7 @@ export class Sim {
     return this.players.get(pid)?.lastSalvageResult ?? null;
   }
 
-  // Enchanting profession commands (IWorldProfessions, Phase 13): same thin-
+  // Enchanting profession commands (IWorldProfessions): same thin-
   // delegate/stash-result/emit shape as salvageItem/craftItem above.
   disenchantItem(itemId: string, pid?: number): void {
     const result = disenchantItemImpl(this.ctx, itemId, pid);
@@ -9211,8 +9267,8 @@ export class Sim {
       // cprof delta diff (server/game.ts maybe()) re-emits exactly when the
       // set actually changes, never on Set iteration order.
       knownRecipes: [...(this.players.get(pid)?.knownRecipes ?? [])].sort(),
-      // Work orders on cooldown, resolved against THIS host's tickCount (Phase
-      // 14). Sorted, so the cprof diff re-emits only on arm/expiry, and the
+      // Work orders on cooldown, resolved against THIS host's tickCount.
+      // Sorted, so the cprof diff re-emits only on arm/expiry, and the
       // online client feeds it into its local computeQuestState.
       cadenceBlockedQuests: cadenceBlockedKeys(
         this.players.get(pid)?.questCadence ?? new Map(),

@@ -1,16 +1,18 @@
-// Phase 10 recipe economy + ladder-shape gate (Professions 2.0). Phase 10 landed
-// LADDER_RECIPES (54 trainer recipes across six crafts at skillReq 0/25/50) plus
-// the new materials/specimens/vendor reagents in content/profession_items.ts.
+// Recipe economy + ladder-shape gate (Professions 2.0): LADDER_RECIPES (54
+// trainer recipes across six crafts at skillReq 0/25/50) plus the
+// materials/specimens/vendor reagents in content/profession_items.ts.
 // The locked economy decision: no recipe vendors above its input value. Several
-// PRE-Phase-10 recipes were grossly gold-positive, so the invariant carries a
+// PRE-LADDER recipes were grossly gold-positive, so the invariant carries a
 // FROZEN legacy exception list (never an escape hatch for new content). The
-// Phase 15 QA directed burn-down reworked the reagent lists of 10 of the 14
-// members gold-negative; the 4 residual members whose outputs cannot be
-// covered by sane, accessible inputs remain frozen below.
+// economy rework turned the reagent lists of 10 of the 14
+// members gold-negative; the last 4 (jerkin, vestments, druids hide, warded
+// leggings) closed through the maintainer-approved paired arm (input rework
+// plus an output sellValue re-price), so the frozen list below is EMPTY.
 import { describe, expect, it } from 'vitest';
 import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
 import { ALL_RECIPES, COMBO_RECIPES, LADDER_RECIPES, recipeById } from '../src/sim/content/recipes';
 import { ITEMS, NPCS } from '../src/sim/data';
+import { requiredReagentCountFor } from '../src/sim/professions/crafting';
 import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { stationsOfType, stationTypeForCraft } from '../src/sim/professions/stations';
 import { PRE_TRAINING_RECIPE_IDS } from '../src/sim/professions/training';
@@ -38,8 +40,8 @@ function outputValue(recipe: ProfessionRecipeRecord): number {
   return def.sellValue * recipe.resultCount;
 }
 
-// The legacy gold-positive exception list is EMPTY as of the Phase 15 QA
-// directed burn-down (maintainer-approved 2026-07-22): 10 of the original 14
+// The legacy gold-positive exception list is EMPTY as of the economy rework
+// (maintainer-approved 2026-07-22): 10 of the original 14
 // members were reworked gold-negative through INPUT-only reagent reworks, and
 // the last 4 (jerkin, vestments, druids hide, warded leggings) through the
 // approved paired arm: a zone-1-legal thematic input rework PLUS an output
@@ -70,15 +72,90 @@ describe('THE ECONOMY INVARIANT', () => {
       ).toBeLessThan(inputValue(recipe));
     }
     // Guard the enumeration is real (not an empty sweep): all recipes minus the
-    // frozen legacy ids (zero members since the Phase 15 burn-down completed).
+    // frozen legacy ids (zero members since the economy rework completed).
     expect(checked).toBe(ALL_RECIPES.length - LEGACY_GOLD_POSITIVE_RECIPE_IDS.size);
     expect(checked).toBeGreaterThan(0);
+  });
+
+  // --- the discount-aware vendor-loop arm --------------------------------
+  // The listed-count arm above prices the NAIVE craft. A specialized crafter
+  // (skill at the craft's perk threshold, automatic for anyone deep in a
+  // craft) consumes DISCOUNTED counts, and a held self-signed instance
+  // shaves one more before the discount (requiredReagentCountFor, the same
+  // function the sim charges). For a recipe whose every reagent is
+  // NPC-vendor-stocked the whole loop is pure gold with infinite supply, so
+  // the output must vendor strictly below the CHEAPEST achievable input or
+  // the loop is gold-positive (the Kilnscale Mantle sat exactly
+  // here: listed 520 vs output 470, but specialized consumption is 5 ore +
+  // 4 flux = 380, and with a self-signed ore 4 + 3 = 300). Self-signed is
+  // assumed held for EVERY reagent: stricter than reality for unsignable
+  // vendor staples, which is the safe direction for an invariant.
+  function vendorStockedIds(): ReadonlySet<string> {
+    const stocked = new Set<string>();
+    for (const npc of Object.values(NPCS)) {
+      for (const id of npc.vendorItems ?? []) stocked.add(id);
+    }
+    return stocked;
+  }
+  function minAchievableInputValue(recipe: ProfessionRecipeRecord): number {
+    // Specialized in the recipe's own craft (cap skill clears any threshold).
+    const specialized = { [recipe.professionId]: 125 };
+    let total = 0;
+    for (const reagent of recipe.reagents) {
+      const { count } = requiredReagentCountFor(true, reagent, specialized, recipe.professionId);
+      total += count * reagentUnitValue(reagent.itemId);
+    }
+    return total;
+  }
+
+  it('every fully-vendor-fed recipe vendors strictly below its cheapest achievable input', () => {
+    const stocked = vendorStockedIds();
+    // Copper-loop membership needs BOTH facts: stocked by some NPC AND
+    // carrying a copper buyValue (the FURY honor vendor's priceHonor stock
+    // is in NPCS too; honor-priced goods have no copper basis and must
+    // never classify a recipe into this arm).
+    const vendorFed = ALL_RECIPES.filter((recipe) =>
+      recipe.reagents.every((reagent) => {
+        const def = ITEMS[reagent.itemId];
+        return (
+          stocked.has(reagent.itemId) &&
+          !!def &&
+          typeof def.buyValue === 'number' &&
+          def.buyValue > 0
+        );
+      }),
+    );
+    // Membership pin: the vendor-fed set is exactly these six loops. A new
+    // recipe (or a new vendor row) that makes another recipe fully
+    // vendor-fed must be added HERE deliberately, and it then rides the
+    // cheapest-achievable-input bound below.
+    expect(vendorFed.map((recipe) => recipe.id).sort()).toEqual([
+      'recipe_ashwood_axe',
+      'recipe_goldleaf_mana_draught',
+      'recipe_goldleaf_sickle',
+      'recipe_sootscale_mantle',
+      'recipe_sunpetal_mana_draught',
+      'recipe_thorium_mining_pick',
+    ]);
+    for (const recipe of vendorFed) {
+      expect(
+        outputValue(recipe),
+        `${recipe.id}: output ${outputValue(recipe)} must be below the cheapest achievable ` +
+          `input ${minAchievableInputValue(recipe)} (specialized + self-signed)`,
+      ).toBeLessThan(minAchievableInputValue(recipe));
+    }
+    // Pin the mantle's tight bound to its literal: the protective threshold
+    // depends on the specialization discount actually firing inside
+    // requiredReagentCountFor. Self-sign alone would give 6*60 + 4*20 = 440,
+    // so without this pin a discount regression would silently widen the
+    // bound and let a 300-to-440 re-price slip through green.
+    expect(minAchievableInputValue(recipeById('recipe_sootscale_mantle')!)).toBe(300);
   });
 
   it('(a) every legacy member predates trainer acquisition (in PRE_TRAINING_RECIPE_IDS)', () => {
     const preTraining = new Set(PRE_TRAINING_RECIPE_IDS);
     for (const id of LEGACY_GOLD_POSITIVE_RECIPE_IDS) {
-      expect(preTraining.has(id), `${id} must be a pre-Phase-9 recipe`).toBe(true);
+      expect(preTraining.has(id), `${id} must be a pre-training-era recipe`).toBe(true);
     }
   });
 
@@ -217,7 +294,7 @@ describe('MATERIAL DEMAND COVERAGE', () => {
     expect([...liveYields].sort()).toEqual([...NODE_YIELDS].sort());
   });
 
-  it('every Phase 4 + Phase 10 material is consumed by at least one recipe', () => {
+  it('every material, specimen, and vendor reagent is consumed by at least one recipe', () => {
     for (const id of [...NODE_YIELDS, ...HARVEST_MATERIALS, ...SPECIMENS, ...VENDOR_REAGENTS]) {
       expect(allReagentIds.has(id), `${id} is never consumed by any recipe`).toBe(true);
     }
@@ -246,10 +323,10 @@ describe('LADDER SHAPE PINS', () => {
   ];
   const QUALITY_BY_RUNG: Record<number, string> = { 0: 'common', 25: 'uncommon', 50: 'rare' };
 
-  // Material bands (Phase 10 ladder design): a rung-50 (rare) recipe must not be
+  // Material bands (ladder design): a rung-50 (rare) recipe must not be
   // craftable from ONLY the top rare-band inputs; it must still consume something
   // below that tier so the low/mid gathering economy keeps its demand. The
-  // rare-band is the tier-3 gathered materials, the arcanite bar, and the rare
+  // rare-band is the tier-3 gathered materials, the glyphsteel bar, and the rare
   // specimens. NOTE the check is phrased as "not solely rare-band" rather than
   // "contains a low/mid material": recipe_anglers_feast_platter (a shipped rung-50
   // cooking recipe) consumes only mid-tier fish, sunpetal_herb, and cooking_salt,

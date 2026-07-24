@@ -13,11 +13,19 @@
 //   node scripts/crowd_fps_bench.mjs
 //
 // Env: CROWD_BATCHES=10,20,30,40 (cumulative crowd sizes), CROWD_W/H, CROWD_DPR,
-//      CROWD_SETTLE_MS, GAME_URL, SERVER_URL, BROWSER_PATH.
+//      CROWD_SETTLE_MS, GAME_URL, SERVER_URL, BROWSER_PATH, CROWD_MIN_FPS (per-sample
+//      fps floor, unset = no floor), CROWD_JSON_OUT (evidence JSON path).
+//
+// This is a GATE, not just a probe (scripts/lib/bench_gate.mjs): every crowd batch
+// must join EXACTLY (actual sockets, bots.length, never attempts; partial joins fail,
+// with no escape hatch: lower CROWD_BATCHES for exploratory runs), a missing or
+// non-finite metric fails as missing evidence, and the verdict drives the exit code.
 import fs from 'node:fs';
+import path from 'node:path';
 import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
+import { evaluateCrowdRun, parseCeilingEnv } from './lib/bench_gate.mjs';
 
 // Stream every sampled row to a file immediately, so a kill/timeout (the render
 // client + dozens of bots can outrun a foreground budget) never loses results.
@@ -41,6 +49,8 @@ const H = Number(process.env.CROWD_H ?? 1080);
 const DPR = Number(process.env.CROWD_DPR ?? 1);
 const SETTLE_MS = Number(process.env.CROWD_SETTLE_MS ?? 3500);
 const CLUSTER_R = Number(process.env.CROWD_R ?? 9);
+const MIN_FPS = parseCeilingEnv('CROWD_MIN_FPS', process.env.CROWD_MIN_FPS);
+const JSON_OUT = process.env.CROWD_JSON_OUT ?? 'tmp/crowd-fps-latest.json';
 
 const CLASSES = [
   'warrior',
@@ -115,7 +125,11 @@ class Bot {
         `char create failed for ${this.i}: ${JSON.stringify(char.body).slice(0, 120)}`,
       );
     await new Promise((resolve, reject) => {
-      this.ws = new WebSocket(`${WS_BASE}/ws`);
+      // Same per-bot XFF on the WS upgrade as on REST: the per-IP hard WS cap
+      // (MAX_WS_PER_IP_HARD, default 20) would otherwise refuse every socket past
+      // 20 and cap the crowd, surfacing as join timeouts. Loopback-trusted, the
+      // same trick server_load_jitter.mjs uses for its fleet.
+      this.ws = new WebSocket(`${WS_BASE}/ws`, { headers: { 'X-Forwarded-For': xff } });
       const to = setTimeout(() => reject(new Error('join timeout')), 12000);
       this.ws.on('open', () =>
         this.ws.send(JSON.stringify({ t: 'auth', token: this.token, character: this.charId })),
@@ -330,7 +344,13 @@ async function main() {
       // keep them in the cluster + a few strafing so idle/locomotion anims both run
       for (const b of bots) b.place(center.x, center.z);
       await sleep(SETTLE_MS);
-      results.push(await sample(page, `crowd-${target}`));
+      const crowdSample = await sample(page, `crowd-${target}`);
+      // ACTUAL join accounting: bots.length only counts sockets that completed the
+      // whole register/create/auth handshake, never attempts. The gate enforces
+      // exact equality with the batch target.
+      crowdSample.expectedJoined = target;
+      crowdSample.actualJoined = bots.length;
+      results.push(crowdSample);
       record(`  ${row(results.at(-1))}`);
       try {
         await page.screenshot({ path: `tmp/crowd-${target}.png` });
@@ -348,12 +368,28 @@ async function main() {
         strafeRight: false,
       }),
     );
-    results.push(await sample(page, `run-through`));
+    const runSample = await sample(page, `run-through`);
+    runSample.expectedJoined = spawned;
+    runSample.actualJoined = bots.length;
+    results.push(runSample);
     record(`  ${row(results.at(-1))}`);
     await page.evaluate(() => window.__game.input.clearTouchMove());
 
     console.log('\n========== CROWD FPS SUMMARY ==========');
     for (const s of results) record(row(s));
+
+    const verdict = evaluateCrowdRun({ samples: results, minFps: MIN_FPS });
+    for (const f of verdict.failures) record(`  GATE FAIL: ${f}`);
+    record(`verdict: ${verdict.ok ? 'PASS' : 'FAIL'}`);
+    // Evidence lands on disk BEFORE the exit code is decided, so a failing gate
+    // still leaves the full run readable for triage.
+    fs.mkdirSync(path.dirname(JSON_OUT) || '.', { recursive: true });
+    fs.writeFileSync(
+      JSON_OUT,
+      `${JSON.stringify({ batches: BATCHES, minFps: MIN_FPS, results, verdict }, null, 2)}\n`,
+    );
+    console.log(`wrote ${JSON_OUT}`);
+    process.exitCode = verdict.ok ? 0 : 1;
   } finally {
     for (const b of bots) b.close();
     await browser.close();

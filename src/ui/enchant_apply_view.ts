@@ -1,5 +1,5 @@
-// Pure, host-agnostic core for the Apply Enchant picker (Professions 2.0
-// Phase 13). Two steps, both DOM-free: (1) the enchants that consume a chosen
+// Pure, host-agnostic core for the Apply Enchant picker (Professions 2.0).
+// Two steps, both DOM-free: (1) the enchants that consume a chosen
 // reagent, each with its per-reagent affordability read from the viewer's
 // inventory and its target slot, and (2) the held items eligible as the enchant
 // target (def slot matches the enchant, and a NON-already-enchanted copy is

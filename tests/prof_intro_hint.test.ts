@@ -11,7 +11,7 @@ import {
 } from '../src/ui/hud/quest/prof_intro_hint_core';
 import { questStrings } from '../src/ui/i18n.catalog/quests';
 
-// The letter-to-Haldren dead-end hint row (Phase 15 QA directed fix): a
+// The letter-to-Haldren dead-end hint row: a
 // profession master's gossip dialog shows one non-interactive line pointing at
 // the q_prof_intro giver until the viewer has completed the intro. These arms
 // pin the surface (Haldren plus the six station masters), the gating semantics

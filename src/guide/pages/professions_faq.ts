@@ -1,6 +1,6 @@
 // Professions FAQ (/wiki/professions/faq): the recurring crafter questions,
 // answered with the exact numbers the other professions pages publish (the
-// maintainer-resolved transparency policy). Mirrors the sitewide FAQ page's
+// transparency policy). Mirrors the sitewide FAQ page's
 // details/summary structure; questions and answers are guide.profPages.faq.*
 // t() keys, English-only at PR tier.
 

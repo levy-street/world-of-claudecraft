@@ -63,7 +63,7 @@ describe('disenchant', () => {
   });
 
   it('yield scales with rarity: the qualityIdx AND derived-tier terms make an epic strictly outyield a common with the same rng draw', () => {
-    // Phase 13 scope note: this pins the disenchantYield HELPER, which since
+    // Scope note: this pins the disenchantYield HELPER, which since
     // the typed-reagent amendment is the SUB-RARE arm only (resolveDisenchant
     // grants fixed counts at rare+; the resolve-level per-quality counts are
     // pinned in professions_typed_reagents.test.ts). The helper keeps both
@@ -121,6 +121,112 @@ describe('disenchant', () => {
     const result = resolveDisenchant(sim.ctx, pid, 'moggers_copper_cudgel');
     expect(result.ok).toBe(true);
     expect(sim.countItem('moggers_copper_cudgel', pid)).toBe(0);
+  });
+});
+
+// Regression for issue #2340: the bag menu offers Disenchant on the item DEF,
+// but the resolver gated on countEnchantableItem, which excludes every
+// already-enchanted copy. A player whose ONLY copy was enchanted was denied
+// not_held ("You do not have that item") for an item sitting in their bags,
+// and an enchanted piece could never be broken back into materials. The
+// resolver now gates on countItem (any held copy), keeps the old preference
+// order (plain fungible first, then an unenchanted instanced copy), and only
+// when every held copy is enchanted consumes one of those, destroying the
+// piece enchant and all. Apply-enchant keeps the enchanted-copy exclusion.
+describe('disenchanting an enchanted copy (issue #2340)', () => {
+  const SWORD = 'eastbrook_arming_sword';
+
+  // Build the bug's exact setup via the real apply flow: after this, the only
+  // copy of SWORD in bags is the freshly-enchanted instanced copy.
+  function simWithEnchantedSwordOnly() {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.addItem(SWORD, 1, pid);
+    sim.addItem('arcane_dust', 5, pid);
+    expect(resolveApplyEnchant(sim.ctx, pid, SWORD, 'enchant_weapon_might').ok).toBe(true);
+    expect(sim.countItem('arcane_dust', pid)).toBe(0);
+    expect(sim.ctx.countEnchantableItem(SWORD, pid)).toBe(0);
+    return { sim, pid };
+  }
+
+  it('succeeds when the only held copy is enchanted: consumes it and grants the arcane yield', () => {
+    const { sim, pid } = simWithEnchantedSwordOnly();
+    const result = resolveDisenchant(sim.ctx, pid, SWORD);
+    expect(result.ok).toBe(true);
+    expect(result.materialItemId).toBe('arcane_dust');
+    expect(result.count).toBeGreaterThan(0);
+    expect(sim.countItem(SWORD, pid)).toBe(0);
+    expect(sim.countItem('arcane_dust', pid)).toBe(result.count);
+  });
+
+  it('a legacy enchanted copy (bare rolled.stats, no marker) disenchants the same way', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.ctx.addItemInstance(SWORD, { rolled: { stats: { str: 5 } } }, pid);
+    expect(sim.ctx.countEnchantableItem(SWORD, pid)).toBe(0);
+    const result = resolveDisenchant(sim.ctx, pid, SWORD);
+    expect(result.ok).toBe(true);
+    expect(sim.countItem(SWORD, pid)).toBe(0);
+  });
+
+  it('still prefers the plain copy when both a plain and an enchanted copy are held', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    // Two plain copies + dust; the apply consumes one plain copy and appends
+    // the enchanted instance at the HIGHEST inventory index, so a regression
+    // to plain removeItem (highest-index-first, any kind) would consume the
+    // enchanted copy and leave the fungible one, failing below.
+    sim.addItem(SWORD, 2, pid);
+    sim.addItem('arcane_dust', 5, pid);
+    expect(resolveApplyEnchant(sim.ctx, pid, SWORD, 'enchant_weapon_might').ok).toBe(true);
+    expect(sim.ctx.countFungibleItem(SWORD, pid)).toBe(1);
+
+    const result = resolveDisenchant(sim.ctx, pid, SWORD);
+    expect(result.ok).toBe(true);
+    expect(sim.countItem(SWORD, pid)).toBe(1);
+    // The plain copy died; the survivor is the enchanted instance.
+    expect(sim.ctx.countFungibleItem(SWORD, pid)).toBe(0);
+    const slot = sim.ctx.resolve(pid)?.meta.inventory.find((s) => s.itemId === SWORD);
+    expect(slot?.instance?.enchant).toBe('enchant_weapon_might');
+  });
+
+  it('prefers an unenchanted instanced copy (crafted) over the enchanted one', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    // Crafted-style unenchanted instance FIRST (lowest index), then the
+    // enchanted instance lands at the highest index via the real apply flow,
+    // so index order alone cannot pass this: the resolver must actively skip
+    // the enchanted copy while an unenchanted one remains.
+    sim.ctx.addItemInstance(SWORD, { signer: 'Tester', rolled: { quality: 'rare' } }, pid);
+    sim.addItem(SWORD, 1, pid);
+    sim.addItem('arcane_dust', 5, pid);
+    expect(resolveApplyEnchant(sim.ctx, pid, SWORD, 'enchant_weapon_might').ok).toBe(true);
+
+    const result = resolveDisenchant(sim.ctx, pid, SWORD);
+    expect(result.ok).toBe(true);
+    expect(sim.countItem(SWORD, pid)).toBe(1);
+    const slot = sim.ctx.resolve(pid)?.meta.inventory.find((s) => s.itemId === SWORD);
+    // The crafted copy was the victim; the enchanted copy survived.
+    expect(slot?.instance?.enchant).toBe('enchant_weapon_might');
+    expect(slot?.instance?.signer).toBeUndefined();
+  });
+
+  it('the not_held deny is reserved for genuinely not holding the item', () => {
+    const { sim, pid } = simWithEnchantedSwordOnly();
+    expect(resolveDisenchant(sim.ctx, pid, SWORD).ok).toBe(true);
+    // Bags now hold zero copies of any kind: the deny is accurate again.
+    const denied = resolveDisenchant(sim.ctx, pid, SWORD);
+    expect(denied.ok).toBe(false);
+    expect(denied.reason).toBe('not_held');
+  });
+
+  it('apply-enchant still refuses the enchanted-only copy (no silent overwrite)', () => {
+    const { sim, pid } = simWithEnchantedSwordOnly();
+    sim.addItem('arcane_dust', 5, pid);
+    const second = resolveApplyEnchant(sim.ctx, pid, SWORD, 'enchant_weapon_might');
+    expect(second.ok).toBe(false);
+    expect(second.reason).toBe('not_held');
+    expect(sim.countItem(SWORD, pid)).toBe(1);
   });
 });
 
@@ -197,13 +303,13 @@ describe('applyEnchant', () => {
     expect(applied.ok).toBe(true);
 
     // Pin the enchant's own magnitude to a literal ONCE here, so the
-    // assertions below compare against baseStr + 5 directly rather than
+    // assertions below compare against baseStr + 2 directly rather than
     // reading the bonus back out of the same ENCHANTS constant the resolver
     // consumed (which would leave the magnitude itself unprotected).
-    expect(ENCHANTS.enchant_weapon_might.statBonus.str).toBe(5);
+    expect(ENCHANTS.enchant_weapon_might.statBonus.str).toBe(2);
 
     sim.equipItem('eastbrook_arming_sword');
-    expect(sim.player.stats.str).toBe(baseStr + 5);
+    expect(sim.player.stats.str).toBe(baseStr + 2);
 
     expect(sim.unequipItem('mainhand')).toBe(true);
     // The enchant bonus is gone once unequipped...
@@ -214,7 +320,7 @@ describe('applyEnchant', () => {
     // Re-equipping the same (still-enchanted) copy restores the bonus, proving
     // the enchant round-trips through bags rather than being a one-shot buff.
     sim.equipItem('eastbrook_arming_sword');
-    expect(sim.player.stats.str).toBe(baseStr + 5);
+    expect(sim.player.stats.str).toBe(baseStr + 2);
   });
 
   it('swapping in a plain (unenchanted) replacement drops the enchant bonus, and the enchanted piece returns to bags intact', () => {
@@ -306,7 +412,7 @@ describe('applyEnchant', () => {
     const slot = meta?.inventory.find((s) => s.itemId === 'moggers_copper_cudgel');
     expect(slot?.instance?.signer).toBe('Tester');
     expect(slot?.instance?.rolled?.quality).toBe('rare');
-    expect(slot?.instance?.rolled?.stats).toEqual({ str: 5 });
+    expect(slot?.instance?.rolled?.stats).toEqual({ str: 2 });
   });
 
   it('the applyEnchant command entry point resolves the caller and stashes the result', () => {
@@ -342,13 +448,13 @@ describe('applyEnchant', () => {
     const meta = sim.meta(pid)!;
     const levelBefore = sim.player.level;
     const baseStrBeforeLevel = characterDerivedStats(meta.cls, levelBefore, {}).stats.str;
-    expect(sim.player.stats.str).toBe(baseStrBeforeLevel + 5);
+    expect(sim.player.stats.str).toBe(baseStrBeforeLevel + 2);
 
     sim.grantXp(xpForLevel(levelBefore));
     expect(sim.player.level).toBe(levelBefore + 1);
 
     const baseStrAfterLevel = characterDerivedStats(meta.cls, sim.player.level, {}).stats.str;
-    expect(sim.player.stats.str).toBe(baseStrAfterLevel + 5);
+    expect(sim.player.stats.str).toBe(baseStrAfterLevel + 2);
   });
 
   it('an equipped enchant bonus survives a save/reload round-trip (the "permanent" claim)', () => {
@@ -371,13 +477,13 @@ describe('applyEnchant', () => {
 
     const state = sim.serializeCharacter(pid);
     expect(state).not.toBeNull();
-    expect(state!.equipmentInstance?.mainhand?.rolled?.stats?.str).toBe(5);
+    expect(state!.equipmentInstance?.mainhand?.rolled?.stats?.str).toBe(2);
 
     const reloadedSim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
     const reloadedPid = reloadedSim.addPlayer('warrior', 'Reload', { state: state! });
     const reloadedMeta = reloadedSim.meta(reloadedPid)!;
     const reloadedEntity = reloadedSim.entities.get(reloadedPid)!;
-    expect(reloadedMeta.equipmentInstance.mainhand?.rolled?.stats?.str).toBe(5);
+    expect(reloadedMeta.equipmentInstance.mainhand?.rolled?.stats?.str).toBe(2);
     expect(reloadedEntity.stats.str).toBe(boostedStr);
   });
 
@@ -438,13 +544,13 @@ describe('applyEnchant', () => {
   });
 });
 
-// Phase 2 (Professions 2.0 masterwork model): a masterwork proc copy carries
+// Professions 2.0 masterwork model: a masterwork proc copy carries
 // rolled.masterwork + baked rolled.stats WITHOUT an enchant, so the old
 // bare-stats-presence guard would have wrongly locked it out of enchanting.
 // The authoritative predicate is now isEnchantedInstance (the explicit
 // `enchant` marker, or the legacy bare-stats arm), the enchant merges stats
 // ADDITIVELY, and double-enchant stays blocked for old and new copies alike.
-describe('isEnchantedInstance (the Phase 2 guard predicate)', () => {
+describe('isEnchantedInstance (the masterwork guard predicate)', () => {
   it('distinguishes enchanted copies from masterwork and plain crafted copies', () => {
     // Marker-carrying (new) enchanted copy.
     expect(isEnchantedInstance({ enchant: 'enchant_weapon_might' })).toBe(true);
@@ -462,7 +568,7 @@ describe('isEnchantedInstance (the Phase 2 guard predicate)', () => {
   });
 });
 
-describe('applyEnchant on a Phase 2 masterwork copy', () => {
+describe('applyEnchant on a masterwork copy', () => {
   // The exact crafting.ts masterwork grant shape: signer + rolled.masterwork +
   // baked bonus stats, no rolled.quality, no enchant marker.
   const MASTERWORK_PAYLOAD = {
@@ -485,15 +591,15 @@ describe('applyEnchant on a Phase 2 masterwork copy', () => {
     expect(result.ok).toBe(true);
     const meta = sim.ctx.resolve(pid)?.meta;
     const slot = meta?.inventory.find((s) => s.itemId === 'moggers_copper_cudgel');
-    // enchant_weapon_might is +5 str (pinned to a literal earlier in this
-    // file): the baked str 2 and the enchant str 5 SUM, and the baked sta 1
+    // enchant_weapon_might is +2 str (pinned to a literal earlier in this
+    // file): the baked str 2 and the enchant str 2 SUM, and the baked sta 1
     // (untouched by the enchant) rides along, not overwritten.
-    expect(slot?.instance?.rolled?.stats).toEqual({ str: 7, sta: 1 });
+    expect(slot?.instance?.rolled?.stats).toEqual({ str: 4, sta: 1 });
     expect(slot?.instance?.rolled?.masterwork).toBe(true);
     expect(slot?.instance?.signer).toBe('Tester');
     expect(slot?.instance?.enchant).toBe('enchant_weapon_might');
     // The masterwork copy never carried rolled.quality and the enchant must
-    // not invent one (Phase 2 retired rolled.quality for new writes).
+    // not invent one (the masterwork model retired rolled.quality for new writes).
     expect(slot?.instance?.rolled?.quality).toBeUndefined();
   });
 
@@ -538,8 +644,8 @@ describe('applyEnchant on a Phase 2 masterwork copy', () => {
     // honest against a content re-tune.
     expect(ITEMS.moggers_copper_cudgel.stats).toEqual({ str: 3, sta: 2 });
     sim.equipItem('moggers_copper_cudgel');
-    // str: def 3 + baked masterwork 2 + enchant 5; sta: def 2 + baked 1.
-    expect(sim.player.stats.str).toBe(baseStr + 10);
+    // str: def 3 + baked masterwork 2 + enchant 2; sta: def 2 + baked 1.
+    expect(sim.player.stats.str).toBe(baseStr + 7);
     expect(sim.player.stats.sta).toBe(baseSta + 3);
   });
 
@@ -640,19 +746,19 @@ describe('ENCHANTS table integrity', () => {
     expect(sim.countItem('arcane_shard', pid)).toBe(0);
     expect(sim.countItem('arcane_essence', pid)).toBe(0);
     // Pin the Greater magnitude to a literal once, then verify equipping applies it.
-    expect(ENCHANTS.enchant_weapon_greater_might.statBonus.str).toBe(8);
+    expect(ENCHANTS.enchant_weapon_greater_might.statBonus.str).toBe(5);
     sim.equipItem('eastbrook_arming_sword');
-    expect(sim.player.stats.str).toBe(baseStr + 8);
+    expect(sim.player.stats.str).toBe(baseStr + 5);
   });
 });
 
-// Phase 12c: enchanting gains are quality-tiered under the SOFT archetype
+// Enchanting gains are quality-tiered under the SOFT archetype
 // ceiling (archetype.ts enchantingGainMultiplier). The flat-1-per-action rule
 // is retired: ENCHANTING_SKILL_GAIN stays 1 but is now the BASE, multiplied
 // by the four-state curve over min(input tier, archetype ceiling). The pure
 // min()/curve arms live in archetype_ceiling.test.ts; these pin the resolver
 // wiring and the content maps.
-describe('quality-tiered enchanting gains (Phase 12c)', () => {
+describe('quality-tiered enchanting gains', () => {
   it('pins the base gain and the quality-to-tier map to literals', () => {
     expect(ENCHANTING_SKILL_GAIN).toBe(1);
     expect(ENCHANTING_GAIN_TIER_BY_QUALITY).toEqual({

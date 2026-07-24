@@ -9,7 +9,7 @@
 // types.ts, from #1164) with the display metadata (name/icon/description)
 // the `/dev gather` chat cheat and a future UI need; category/maxSkill are
 // the fields later profession issues (#1120/#1125/#1126/#1140) read against.
-// maxSkill (Professions 2.0 Phase 12c) is an ENFORCED per-profession cap over
+// maxSkill (Professions 2.0) is an ENFORCED per-profession cap over
 // the classic skill scale: it ends where shipped content ends and rises with
 // future zones by data edit alone. Enforcement lives at the four gain/load
 // arms (wheel.ts gainCraftSkill/normalizeCraftSkills, gathering.ts
@@ -67,7 +67,7 @@ export const GATHERING_PROFESSIONS: Record<GatheringProfessionId, GatheringProfe
 
 // Stable iteration order, used for defaulting/normalizing a per-player
 // proficiency record. Keep in sync with GATHERING_PROFESSIONS above. Fishing is
-// appended LAST (Professions 2.0 Phase 11) so the pre-existing iteration order
+// appended LAST (Professions 2.0) so the pre-existing iteration order
 // of the starter three is preserved for every consumer that walks this list.
 export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = [
   'mining',
@@ -92,7 +92,7 @@ export const GATHERING_PROFESSION_IDS: GatheringProfessionId[] = [
 // item wired up so far are listed here; a mob whose componentTags don't map to any
 // of these still becomes single-use claimed, it just yields no item yet (future
 // profession-harvest issues wire up the rest).
-// Phase 10 closed the v0.21.0 collision gap: hide/silk/venomSac now yield the
+// The v0.21.0 collision gap is closed: hide/silk/venomSac now yield the
 // dedicated profession materials (content/profession_items.ts), so a harvest
 // never grants quest-collect credit. The old quest items (boar_hide via
 // q_boars kill loot, webwood_silk via q_spiders, widow_venom_sac via q_widows)
@@ -106,12 +106,12 @@ export const HARVEST_COMPONENT_ITEMS: Readonly<Record<string, string>> = {
   cloth: 'homespun_cloth',
 };
 
-// Monster material access tiers (Professions 2.0 Phase 12): which tool tier
+// Monster material access tiers (Professions 2.0): which tool tier
 // the corpse-harvest premium (signed/specimen) arm requires per component
 // family, checked against the player's best owned gathering tool of ANY
 // profession (professions/tools.ts bestOwnedAnyGatherToolTier). EVERY
 // HARVEST_COMPONENT_ITEMS key is listed explicitly, ALL at 1 in wave one
-// (the Phase 12 prime directive: all pre-phase content stays bare-hands
+// (the prime directive: all pre-existing content stays bare-hands
 // harvestable); future corpse families may ship higher.
 export const MONSTER_MATERIAL_TIERS: Readonly<Record<string, number>> = {
   hide: 1,
@@ -129,12 +129,12 @@ export function monsterMaterialTierFor(component: string): number {
   return MONSTER_MATERIAL_TIERS[component] ?? 1;
 }
 
-// Perfect specimens (Phase 10): the signed jackpot family. When a corpse
+// Perfect specimens: the signed jackpot family. When a corpse
 // harvest's rarity roll clears the signable floor (rare-or-better,
 // isSignableMaterialRarity), the harvester is granted the component family's
 // specimen as a SIGNED instance in addition to the plain component grant
 // (src/sim/interaction.ts harvestCorpse). Families without a specimen keep
-// the pre-Phase-10 behavior (the regular component itself grants signed).
+// the fallback behavior (the regular component itself grants signed).
 export const HARVEST_COMPONENT_SPECIMENS: Readonly<Record<string, string>> = {
   hide: 'pristine_hide',
   silk: 'pristine_silk',
@@ -195,7 +195,7 @@ export const TOOL_EFFECTS: Record<ToolEffectId, ToolEffectDef> = {
   },
   quickening_charm: {
     id: 'quickening_charm',
-    name: 'Quickening Charm',
+    name: 'Springback Charm',
     icon: 'quickening_charm',
     description: 'Slotted onto a gathering tool: shortens the node respawn timer it triggers.',
     kind: 'respawnSpeed',
@@ -216,7 +216,7 @@ export const TOOL_EFFECT_IDS: ToolEffectId[] = [
 // and the adjacency/opposite lookups derived from it. See issue #1125.
 //
 // Design-doc note (#1148 tuning pass, reorder adopted in the Professions 2.0
-// Phase 1 blueprint): the canonical ring order lives at
+// blueprint): the canonical ring order lives at
 // https://woc.nervemart.com/docs/professions-system, and CRAFT_RING below now
 // matches the doc's ring text craft for craft ("Engineering, Alchemy, Cooking,
 // Leatherworking, Tailoring, Inscription, Enchanting, Jewelcrafting,
@@ -238,7 +238,7 @@ export interface CraftDef {
   id: string;
   name: string;
   pole: CraftPole;
-  /** Enforced skill cap for this craft (Phase 12c): where shipped content
+  /** Enforced skill cap for this craft: where shipped content
    *  ends. Enforced at wheel.ts gainCraftSkill and normalizeCraftSkills;
    *  at cap, crafts still resolve and proc, only skill gain stops. */
   maxSkill: number;
@@ -292,7 +292,7 @@ export function craftById(craftId: string): CraftDef {
   return CRAFT_RING[indexOf(craftId)];
 }
 
-/** The enforced skill cap for one craft (Phase 12c), read off its CRAFT_RING
+/** The enforced skill cap for one craft, read off its CRAFT_RING
  *  record. Throws on an unknown craft id, same as craftById. */
 export function craftMaxSkillFor(craftId: string): number {
   return craftById(craftId).maxSkill;
@@ -350,7 +350,7 @@ export const PERK_THRESHOLDS: Record<string, PerkThresholdDef> = Object.fromEntr
 
 // Mobile crafting station (#1134): how long a placed station stays usable
 // before it expires. See ../professions/mobile_station.ts for the placement
-// mechanic; since Phase 8 an active mobile station satisfies the station
+// mechanic; an active mobile station satisfies the station
 // gate (../professions/crafting.ts) for recipes whose stationType matches
 // the placing craft (STATION_TYPE_BY_CRAFT below).
 export const MOBILE_CRAFTING_STATION_DURATION_TICKS = 20 * 60 * 10; // 10 minutes
@@ -372,7 +372,7 @@ export const CRAFT_GOLD_SINK_COPPER_PER_BUDGET = 2;
 export const CRAFT_THROTTLE_WINDOW_SECONDS = 60;
 export const CRAFT_THROTTLE_MAX_PER_WINDOW = 10;
 
-// Crafting stations and masters (Professions 2.0 Phase 8): the content half
+// Crafting stations and masters (Professions 2.0): the content half
 // of ../professions/stations.ts. The old single level-20 crafting hub
 // (#1297's CRAFTING_HUB_* constants and its Highwatch circle) is retired
 // with its level gate (2026-07-17 maintainer ruling: the level arm goes
@@ -400,7 +400,7 @@ export const STATION_TYPE_BY_CRAFT: Readonly<Record<string, StationType>> = {
 // sits inside its hosting hub circle, its master NPC stands 1 to 3 units
 // beside it, and every spot clears the strictest camp-safety margin any
 // pre-existing town NPC satisfies (about 11.2 units beyond camp radius plus
-// aggro radius; see the Phase 8 placement math in the phase notes). The
+// aggro radius; the bar is pinned in tests/professions_station_placement.test.ts). The
 // zone-1 forge shares smith_haldren's forge. `masterNpcId` values name the
 // resident master each station belongs to (NpcDefs in the zone modules).
 export const STATIONS: readonly StationDef[] = [

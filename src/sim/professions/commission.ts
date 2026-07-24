@@ -1,6 +1,6 @@
-// Commissions and the Maker's Bond (Professions 2.0 Phase 14b, issue #2207).
+// Commissions and the Maker's Bond (Professions 2.0, issue #2207).
 //
-// An opt-in commission craft arms its output with the Phase 13 bind-on-trade
+// An opt-in commission craft arms its output with the bind-on-trade
 // primitive (ItemInstancePayload.bindOnTrade; boundTo IS the lock, stamped by
 // trade.ts grantOffer on first trade), so a piece made FOR someone binds to
 // its recipient the moment it changes hands and the existing trade gate
@@ -31,6 +31,7 @@
 // net imports, no randomness at all (commissions draw nothing), no Sim
 // import (PlayerMeta arrives type-only, the crafting.ts/training.ts idiom).
 
+import { bagCapacity, countFit } from '../bags';
 import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -73,6 +74,7 @@ export type UnbindDenyReason =
   | 'unbind_not_eligible'
   | 'unbind_not_bound'
   | 'unbind_out_of_range'
+  | 'unbind_no_space'
   | 'unbind_cannot_afford';
 
 export interface UnbindResult {
@@ -114,8 +116,14 @@ function firstBoundSlotIndex(meta: PlayerMeta, itemId: string): number {
  * 4. not within STATION_RADIUS of ANY static station (stations.ts
  *    isAtAnyStation; every station master offers the service, and a mobile
  *    station NEVER satisfies it, the training precedent): unbind_out_of_range;
- * 5. fee unaffordable (meta.copper below unbindFeeFor): unbind_cannot_afford;
- * 6. otherwise ok, with the fee to charge.
+ * 5. the bound slot holds several copies and the unbound copy the split arm
+ *    peels off (unbindItem below) cannot fit anywhere (#2350: the split
+ *    re-grants through the uncapped hub, so the boundary owns the check;
+ *    modeled with the exact freed payload so an unbound armed stack with
+ *    room still counts, and never checked for the count-1 in-place clear,
+ *    which needs no room): unbind_no_space;
+ * 6. fee unaffordable (meta.copper below unbindFeeFor): unbind_cannot_afford;
+ * 7. otherwise ok, with the fee to charge.
  */
 export function resolveUnbind(
   meta: PlayerMeta | undefined,
@@ -128,11 +136,22 @@ export function resolveUnbind(
   if (!isCommissionEligible(def)) {
     return { ok: false, itemId, reason: 'unbind_not_eligible', fee };
   }
-  if (!meta || firstBoundSlotIndex(meta, itemId) === -1) {
+  const boundIdx = meta ? firstBoundSlotIndex(meta, itemId) : -1;
+  if (!meta || boundIdx === -1) {
     return { ok: false, itemId, reason: 'unbind_not_bound', fee };
   }
   if (!pos || !isAtAnyStation(pos)) {
     return { ok: false, itemId, reason: 'unbind_out_of_range', fee };
+  }
+  const boundSlot = meta.inventory[boundIdx];
+  if (boundSlot.count > 1 && boundSlot.instance) {
+    const scratch = meta.inventory.map((s) => ({ ...s }));
+    scratch[boundIdx] = { ...scratch[boundIdx], count: scratch[boundIdx].count - 1 };
+    const freed = cloneItemInstancePayload(boundSlot.instance);
+    delete freed.boundTo;
+    if (countFit(scratch, bagCapacity(meta.bags), itemId, 1, freed) < 1) {
+      return { ok: false, itemId, reason: 'unbind_no_space', fee };
+    }
   }
   if (meta.copper < fee) {
     return { ok: false, itemId, reason: 'unbind_cannot_afford', fee };
@@ -145,7 +164,7 @@ export function resolveUnbind(
  * caller's own player entity, validates via resolveUnbind, and on ok charges
  * the fee exactly once and clears boundTo on EXACTLY ONE copy (the earliest
  * bound slot). A bound stack holding several byte-equal copies (identical-
- * payload stacking, Phase 12d) is split, never blanket-cleared: one copy is
+ * payload stacking) is split, never blanket-cleared: one copy is
  * peeled off and re-granted through ctx.addItemInstance with the bond
  * removed (so it merges with any existing unbound armed stack), and the
  * remaining copies stay bound at full price each. A single-copy slot is

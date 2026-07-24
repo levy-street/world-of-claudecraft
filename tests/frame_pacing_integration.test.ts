@@ -65,7 +65,7 @@ describe('main-loop frame pacing contract', () => {
     );
   });
 
-  it('collects trusted native panel samples under the loading screen', () => {
+  it('delegates bounded native panel calibration under the loading screen', () => {
     const calibrationStart = mainTs.indexOf(
       'if (NATIVE_APP) {',
       mainTs.indexOf('await renderer.prewarmInitialScene()'),
@@ -75,11 +75,14 @@ describe('main-loop frame pacing contract', () => {
 
     expect(calibrationStart).toBeGreaterThan(-1);
     expect(loopStart).toBeGreaterThan(calibrationStart);
-    expect(calibrationBlock).toContain('FRAME_PACER_CALIBRATION_CALLBACKS');
-    expect(calibrationBlock).toContain('framePacer.observe(timestamp);');
-    expect(calibrationBlock).toMatch(
-      /for \(let i = 0; i < FRAME_PACER_CALIBRATION_CALLBACKS; i\+\+\) \{[\s\S]*?await new Promise<void>[\s\S]*?framePacer\.observe\(timestamp\);[\s\S]*?if \(framePacer\.snapshot\(\)\.estimatedRefreshFps > 0\) break;/,
+    expect(calibrationBlock).toContain('await calibrateFramePacer(framePacer, {');
+    expect(calibrationBlock).toContain(
+      'requestAnimationFrame: (callback) => requestAnimationFrame(callback)',
     );
+    expect(calibrationBlock).toContain(
+      'cancelAnimationFrame: (handle) => cancelAnimationFrame(handle)',
+    );
+    expect(calibrationBlock).toContain('setTimeout: (callback, delayMs)');
   });
 
   it('arms the tested loading handoff before native calibration can stall', () => {
@@ -93,7 +96,7 @@ describe('main-loop frame pacing contract', () => {
     expect(launchEnd).toBeGreaterThan(launchStart);
     expect(frameLoop.match(/loadingHandoff\.markFirstRenderedFrame\(\);/g)).toHaveLength(2);
     expect(launchBlock).toMatch(
-      /loadingHandoff\.start\(\s*\(\) => \{\s*entryDiagnostics\.checkpoint\('first-paint'\);\s*hideLoadingScreen\(\);[\s\S]*?intro\.startedAt = performance\.now\(\);[\s\S]*?},\s*hideLoadingScreen,?\s*\);/,
+      /loadingHandoff\.start\(\s*\(\) => \{\s*hideLoadingScreen\(\);\s*entryDiagnostics\.checkpoint\('first-paint'\);[\s\S]*?intro\.startedAt = performance\.now\(\);[\s\S]*?},\s*hideLoadingScreen,?\s*\);/,
     );
     expect(calibrationStart).toBeGreaterThan(-1);
     expect(frameRequest).toBeGreaterThan(calibrationStart);

@@ -1,5 +1,5 @@
 // Pure, host-agnostic view model for the Maker's Bond unbind window
-// (Professions 2.0 Phase 14b).
+// (Professions 2.0).
 //
 // The pure-core half of the pure-core + thin-consumer split (reference
 // train_view.ts): it decides which of the viewer's held copies a station
@@ -12,7 +12,7 @@
 // stable cross-session identities) of a commission-eligible equipment kind.
 // The fee is the sim's own unbindFeeFor over the item DEF, so the listed
 // price can never drift from what the resolver charges. Bound copies of
-// ineligible kinds (the Phase 13 disenchant reagents) are deliberately
+// ineligible kinds (the disenchant reagents) are deliberately
 // omitted: the service refuses them (unbind_not_eligible) and an unlisted
 // row is the honest rendering. The service is master-independent (any
 // station master offers every row), so the view needs no masterNpcId input.

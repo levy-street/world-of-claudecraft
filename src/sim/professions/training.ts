@@ -1,22 +1,23 @@
-// Recipe training (Professions 2.0 Phase 9): learning a trainer-taught recipe
+// Recipe training (Professions 2.0): learning a trainer-taught recipe
 // from the resident master at its craft's station. Pure validation only: the
 // side effects (charging the fee, acquireRecipe, the trainResult event) live
 // with the caller (Sim.trainRecipe), so `resolveTrain` can be exercised
 // directly by tests the way crafting.ts's resolve* functions are.
 //
-// The locked general predicate (state.md, Phase 9): a master teaches a recipe
+// The locked general predicate: a master teaches a recipe
 // when the student's tier IN THAT CRAFT has reached the recipe's own tier
 // (`teachTierMet` below; tierForSkill on both sides, NO other condition).
 // Training happens only within STATION_RADIUS of a STATIC station of the
 // recipe's craft (stations.ts isAtStation); a mobile station NEVER satisfies
 // training, unlike crafting's station gate.
 //
-// Grandfathering: every recipe that existed before Phase 9
+// Grandfathering: every recipe that existed before trainer-taught acquisition
 // (PRE_TRAINING_RECIPE_IDS) stays known to existing characters via
 // `grandfatherKnownRecipes`, a one-time idempotent union run on load and
 // recorded by the persisted `recipesGrandfathered` flag (the mailWelcomed
-// idiom; see PlayerMeta/CharacterState in sim.ts). Recipes authored after
-// Phase 9 MUST carry a non-empty `acquisition` list (see the field doc in
+// idiom; see PlayerMeta/CharacterState in sim.ts). Recipes authored since
+// trainer-taught acquisition MUST carry a non-empty `acquisition` list (see
+// the field doc in
 // ./types.ts), so they are never silently known to everyone.
 //
 // This module is `src/sim`-pure (see src/sim/CLAUDE.md): no DOM/render/ui/
@@ -32,8 +33,8 @@ import { type CraftSkills, tierForSkill } from './wheel';
 
 // Flat training fee per recipe TIER (tierForSkill(recipe.skillReq)), in
 // copper: common (tier 0) is free, uncommon (tier 1) is 25 silver, rare
-// (tier 2) is 1 gold, then a 4x geometric step per tier (Phase 15 resolved
-// tuning): tier 3 is 4 gold, tier 4 is 16 gold. Tiers beyond the table still
+// (tier 2) is 1 gold, then a 4x geometric step per tier: tier 3 is 4 gold,
+// tier 4 is 16 gold. Tiers beyond the table still
 // clamp to the last entry. Behavior-neutral for shipped wave-one content: no
 // trainer-taught recipe sits above tier 2 (the skillReq 75/150 recipes are
 // all grandfathered pre-training entries with no 'trainer' acquisition).
@@ -49,7 +50,7 @@ export function trainingFeeFor(recipe: ProfessionRecipeRecord): number {
   return TRAINING_FEE_BY_TIER[tier];
 }
 
-/** The locked teach-tier predicate (state.md, Phase 9): the student's tier in
+/** The locked teach-tier predicate: the student's tier in
  *  the recipe's OWN craft has reached the recipe's tier. Exactly
  *  tierForSkill(craftSkills[recipe.professionId] ?? 0) >=
  *  tierForSkill(recipe.skillReq), and deliberately NO other condition (no
@@ -124,8 +125,8 @@ export function resolveTrain(
   return { ok: true, recipeId, fee };
 }
 
-// Every recipe id that existed BEFORE Phase 9 introduced trainer-taught
-// acquisition: the 9 COMMON_RECIPES, 6 TOOL_RECIPES, 3 CASTER_HUB_RECIPES,
+// Every recipe id that existed BEFORE trainer-taught acquisition was
+// introduced: the 9 COMMON_RECIPES, 6 TOOL_RECIPES, 3 CASTER_HUB_RECIPES,
 // and 3 COMBO_RECIPES (content/recipes.ts). Frozen literals on purpose: this
 // is a historical record of the pre-training world, and must NOT grow when a
 // new recipe is authored (new recipes carry their own acquisition list; see
@@ -152,7 +153,7 @@ export const PRE_TRAINING_RECIPE_IDS: readonly string[] = Object.freeze([
   'recipe_wardweave_cowl',
   'recipe_duskhide_wraps',
   'recipe_sootscale_mantle',
-  // COMBO_RECIPES (trainer-taught for NEW characters as of Phase 9; existing
+  // COMBO_RECIPES (trainer-taught for NEW characters; existing
   // characters keep them via this grandfather list)
   'recipe_ironbound_warplate_helm',
   'recipe_forgeguard_bulwark_gauntlets',
@@ -161,7 +162,7 @@ export const PRE_TRAINING_RECIPE_IDS: readonly string[] = Object.freeze([
 
 /**
  * One-time grandfather normalize (the mailWelcomed idiom): when a loaded
- * character's save has not yet been through Phase 9 (`alreadyApplied` false),
+ * character's save has not yet been grandfathered (`alreadyApplied` false),
  * union every PRE_TRAINING_RECIPE_IDS entry into their known set, so a
  * character who could craft the combo recipes before they became
  * trainer-taught never loses them. Always returns true (the value the caller

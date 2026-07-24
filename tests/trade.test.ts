@@ -224,7 +224,7 @@ describe('trade module (direct, no Sim)', () => {
         inv.push({ itemId, count });
       },
       // Merge-aware like the real Sim.addItemInstance (identical-payload
-      // stacking, Phase 12d): byte-equal mergeable payloads share a stack up
+      // stacking): byte-equal mergeable payloads share a stack up
       // to the default cap of 20; everything else takes its own slot.
       addItemInstance: (itemId: string, inst: any, pid?: number) => {
         const inv = players.get(pid!).inventory;
@@ -235,7 +235,7 @@ describe('trade module (direct, no Sim)', () => {
         if (target) target.count += 1;
         else inv.push({ itemId, count: 1, instance: inst });
       },
-      // Per-unit payload returns like the real Sim.removeItem (Phase 12d):
+      // Per-unit payload returns like the real Sim.removeItem:
       // one entry per unit consumed, cloned while the slot survives.
       removeItem: (itemId: string, count: number, pid?: number) => {
         const inv = players.get(pid!).inventory;
@@ -340,13 +340,13 @@ describe('trade module (direct, no Sim)', () => {
   });
 
   it('keeps full payloads (signer/charges/rolled/enchant) for instances in both directions', () => {
-    // The phase acceptance criterion end to end: side A's offer mixes a plain
+    // The acceptance criterion end to end: side A's offer mixes a plain
     // copy with a fully-loaded instanced copy while side B offers a different
     // instanced item in the SAME trade, so tradeConfirm's second offer leg
     // (offerB, b to a) moves an instance too, and every payload field
-    // (signer, charges, rolled incl. the Phase 2 masterwork marker, the enchant
+    // (signer, charges, rolled incl. the masterwork marker, the enchant
     // marker) must land intact on the right receiver's granted item. boundTo is
-    // deliberately NOT set here: Professions 2.0 Phase 13 made boundTo the
+    // deliberately NOT set here: Professions 2.0 made boundTo the
     // trade-lock marker, so a copy carrying it can no longer be offered at all
     // (that behavior lives in professions_typed_reagents.test.ts's bind-on-trade
     // suite); a freely tradeable instance never carries boundTo.
@@ -493,7 +493,7 @@ describe('trade module (direct, no Sim)', () => {
     expect(players.get(2).inventory).toEqual(snap2);
   });
 
-  it('trades partial counted stacks both directions with payload survival and conservation (Phase 12d)', () => {
+  it('trades partial counted stacks both directions with payload survival and conservation', () => {
     // Side A offers 4 wolf_fang covered by 2 plain units plus 2 units of a
     // count-3 signed stack; side B offers a count-2 signed bread stack. Every
     // unit must land with its payload and the per-item unit totals conserve.
@@ -550,8 +550,8 @@ describe('trade module (direct, no Sim)', () => {
 
   it('accepts a trade that fits only by merging into a byte-equal receiver stack', () => {
     // The receiver is slot-full, but one slot is a byte-equal signed stack
-    // with room: the Phase 12d capacity gate must model the merge and accept
-    // (the pre-12d one-fresh-slot-per-instanced-unit model refused this).
+    // with room: the capacity gate must model the merge and accept
+    // (the older one-fresh-slot-per-instanced-unit model refused this).
     const { ctx, players, events } = makeInstancedTradeCtx(
       [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Ayla' } }],
       [

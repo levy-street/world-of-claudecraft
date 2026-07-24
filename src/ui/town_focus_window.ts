@@ -29,7 +29,7 @@ export function renderTownFocusWindow(
   hint.textContent = t('hudChrome.townFocus.hint');
   el.appendChild(hint);
 
-  // Legibility hints (Phase 12d): the tier-shift rule and the town-only rule,
+  // Legibility hints: the tier-shift rule and the town-only rule,
   // parameterized off the real focus constants so the copy cannot rot.
   const tierHint = document.createElement('div');
   tierHint.className = 'town-focus-hint';

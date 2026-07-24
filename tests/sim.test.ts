@@ -542,7 +542,7 @@ describe('combat', () => {
     facePlayerAt(sim, wolf);
     for (let i = 0; i < 20 * 30 && !wolf.dead; i++) sim.tick();
     expect(wolf.dead).toBe(true);
-    // Phase 12d: consume BOTH halves (harvest then loot); a tagged corpse with
+    // Consume BOTH halves (harvest then loot); a tagged corpse with
     // an unclaimed harvest would otherwise hold its 30s grace window and defer
     // the respawn past this loop.
     sim.harvestCorpse(wolf.id);
@@ -1083,7 +1083,7 @@ describe('food, drink, vendor', () => {
     const wilkes = [...sim.entities.values()].find((e) => e.templateId === 'trader_wilkes')!;
     teleportTo(sim, wilkes.pos.x + 2, wilkes.pos.z);
     sim.copper = 0;
-    // Phase 15: wolf_fang is a crafting reagent now (quality common, never
+    // wolf_fang is a crafting reagent now (quality common, never
     // swept), so this sweep uses mudfin_scale as its gray fodder.
     sim.addItem('mudfin_scale', 2); // poor (gray), sellValue 5 -> 10
     sim.addItem('bandit_bandana', 1); // poor (gray), sellValue 6
@@ -1177,7 +1177,7 @@ describe('food, drink, vendor', () => {
     sim.player.facing = spot.facing;
     sim.addItem('simple_fishing_pole', 1);
     sim.events = [];
-    // Phase 12b: the cast start draws EXACTLY the one hidden bite delay; the
+    // The cast start draws EXACTLY the one hidden bite delay; the
     // visible timer is the constant session cap and leaks nothing.
     let draws = 0;
     sim.rng.setObserver(() => draws++);

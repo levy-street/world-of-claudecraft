@@ -34,6 +34,7 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 | `game.ts` | `GameServer`: owns the `Sim`, the 50 ms loop, interest-scoped snapshots, command dispatch, chat. **Largest file; extract beside it, never grow it** (Module-first above) |
 | `ws_auth.ts` | the whole WS auth handshake behind an injected deps bag (`createWsAuth`): first-frame `{t:'auth'}` check, moderation/character checks, per-IP cap, the realm admission cap (`MAX_PLAYERS_PER_REALM`, default 5000, explicit 0 disables; checked with an in-flight admission counter so racing handshakes cannot admit past it; resumes and admins exempt), lease acquire, `game.join`. Unit-testable without a DB or HTTP server. Its rejection literals are wire contract the client matches verbatim (`src/ui/api_error_i18n.ts`): change one and the matcher in the SAME commit. Every refusal sends an `{t:'error'}` frame before closing (never a bare close code): the client classifies the literal, so a frameless refusal turns into a silent retry loop |
 | `ws_buffer.ts` | buffers in-flight WS frames during the async auth handshake, then replays them |
+| `msg_rate_limit.ts` / `msg_lanes.ts` / `list_read_guard.ts` | the inbound WS flood defense: the pre-parse gate (frame + byte buckets and the shared abuse window that kicks), the post-parse per-class lanes, and the ignore/block list-readout meter (see "Inbound WS flood defense") |
 | `linkdead.ts` | pure session-lifecycle decision core: `planJoin` (resume/reject/join) + `LINKDEAD_GRACE_MS` (see Persistence) |
 | `keepalive_sweep.ts` | pure self-clocked keepalive-sweep decision (`keepaliveSweepDelayed`, `KEEPALIVE_STALL_FACTOR`): a sweep that fires late (an event-loop stall) re-arms every session instead of terminating them, so one stall can never mass-disconnect the realm; a genuinely dead socket still reaps one clean interval later |
 | `db.ts` | `pg` pool, core `SCHEMA` DDL + `ensureSchema`, character/account/token/world-state queries. Owns the timeout ladder (connect < statement default < the `runWithStatementTimeout` heavy allowance < the driver-side `query_timeout` backstop; constants + rationale at the top, relation pinned by `tests/server/tunables.test.ts`): wrap a known-long read in `runWithStatementTimeout`, never lift the session default, and remember `SET LOCAL` cannot lift the driver backstop. Boot DDL runs on a dedicated non-pool `Client` so schema setup is never capped |
@@ -164,6 +165,38 @@ Three seams keep it flat; use them, never re-invent them.
   Refactors here prove byte-identity with pinned tests (`tests/bandwidth.test.ts`,
   `tests/snapshots.test.ts`); cadence gates use a `>=` dueness tracker, never
   `tickCount % N` (catch-up ticks stride past a modulo and stall the gate).
+
+## Inbound WS flood defense (`msg_rate_limit.ts`, `msg_lanes.ts`, `list_read_guard.ts`)
+Three pure metering modules (injected `nowSec`, no `Date.now`; unit-tested without a
+server) verdict every inbound frame; `game.ts` is a thin consumer. The design record is
+`docs/design/player-performance/packet-3-input-cadence.md`.
+- **Order and placement are load-bearing.** The pre-parse gate (frame ceiling + byte
+  budget, sized against the real client cadence model in `src/net/input_send_cadence.ts`)
+  verdicts ABOVE `JSON.parse`, so a flooder buys token math, never parse CPU. The
+  per-class lanes (movement / command / chat) are post-parse at the dispatch switch, so
+  one class can never starve another. Every verdict is allow-or-DROP, never queue or
+  defer: deferred delivery shifts receive time and poisons the bot detector's timing
+  strategies.
+- **Detector placement contract:** movement drops before `observeInput` (a dropped frame
+  reaches neither sim nor detector), command drops after `observeCommand`
+  (observe-then-drop, the detector keeps seeing traffic shape). Keep these when touching
+  the dispatch arms.
+- **One shared abuse window.** Drops of every cause feed `tallyDrop` on the session's
+  one window; sustained abuse kicks. Allowed frames never reset it: a counter that
+  resets on any allow is dead code against interleaved refill (the retired
+  consecutive-violations ladder was exactly that).
+- **Every client-triggerable per-call DB read on this path must sit behind a meter** (a
+  lane, a dedicated guard bucket, a ladder token, or a cached read). An ALLOWED
+  under-ceiling frame books no drop, so an unmetered read is sustainable at the full
+  frame ceiling and the abuse window can structurally never kick it. That is a defect,
+  not a style choice; `list_read_guard.ts` exists because review found exactly this on
+  the ignore/block readouts.
+- **Closed vocabularies, pinned lockstep.** Drop causes are the fixed `WS_DROP_CAUSES`
+  set on the game-signals seam (a new shed mechanism adds its cause there, never a
+  per-player label). The kick literal (`MSG_RATE_KICK_REASON`) is byte-exact wire
+  contract with the client matcher, and `tests/localization_fixes.test.ts` counts the
+  `kickSession` sites passing it: a NEW kick arm must consciously join that pin, the
+  matcher, and the frame pins together.
 
 ## Realms / auth / limits
 - **One process = one realm.** Characters/friends/guilds/presence are scoped to

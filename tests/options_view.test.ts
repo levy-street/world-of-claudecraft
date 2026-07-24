@@ -14,6 +14,7 @@ import {
   interfaceControlsForTab,
   type OptionsControl,
   type OptionsSettingsSource,
+  optionsControlKeys,
   sliderDispatchValue,
   toggleIsOn,
   toggleNextValue,
@@ -258,6 +259,49 @@ describe('options_view: controller dispatch matrix (cluster 5)', () => {
       control: 'slider',
       fmt: 'oneDecimal',
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// optionsControlKeys: scopes a sub-view's "Reset to Defaults" to only the
+// setting keys it actually renders (issue 2341: resetting Audio must not wipe
+// Graphics/Controller/Interface too).
+// ---------------------------------------------------------------------------
+describe('options_view: optionsControlKeys (issue 2341 scoped reset)', () => {
+  it('extracts the setting key from every keyed control, in order, deduped', () => {
+    const controls = buildControllerControls(makeSource());
+    expect(optionsControlKeys(controls)).toEqual([
+      'gamepadEnabled',
+      'gamepadInvertY',
+      'gamepadStickDeadzone',
+      'gamepadCameraSpeed',
+      'gamepadVibration',
+    ]);
+  });
+
+  it('drops NoteControl and MusicToggleControl, which carry no setting key', () => {
+    const controls = buildAudioControls(makeSource());
+    // buildAudioControls includes the bespoke musicToggle marker alongside the
+    // real setting-backed sliders/toggles.
+    expect(controls.some((c) => c.control === 'musicToggle')).toBe(true);
+    const keys = optionsControlKeys(controls);
+    expect(keys).not.toContain('musicToggle');
+    expect(keys).toEqual([
+      'sfxVolume',
+      'musicVolume',
+      'voiceVolume',
+      'voiceEnabled',
+      'footstepSfx',
+      'interfaceSfx',
+      'clickFeedback',
+    ]);
+
+    const graphics = buildGraphicsControls(makeSource(), { touch: false, nativeShell: false });
+    expect(graphics.some((c) => c.control === 'note')).toBe(true);
+    expect(optionsControlKeys(graphics)).not.toContain(undefined);
+    expect(optionsControlKeys(graphics).length).toBe(
+      graphics.filter((c) => c.control !== 'note').length,
+    );
   });
 });
 

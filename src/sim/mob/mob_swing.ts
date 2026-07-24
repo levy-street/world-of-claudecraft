@@ -23,6 +23,7 @@ import { isDisarmed } from '../combat/cc';
 import { applyThornsReaction } from '../combat/thorns_charge';
 import { MOBS } from '../data';
 import * as deedsMod from '../deeds';
+import { nythraxisGravebreakerOnMobSwing } from '../encounters/nythraxis';
 import type { SimContext } from '../sim_context';
 import { type Aura, armorReduction, dist2d, type Entity, type MobTemplate } from '../types';
 
@@ -124,6 +125,14 @@ export function runMobSwingAffixes(
       // cleave path stays cheap.
       deedsMod.onBossSplashHitForDeeds(ctx, mob);
     }
+  }
+  // Gravebreaker (Nythraxis): a CHARGED auto-attack. The encounter's 12s
+  // cadence arms the boss (updateNythraxisGravebreaker); the charge releases
+  // on this landed swing as a frontal-arc splash on everyone but the swing
+  // target. Draws no rng (splashes off this swing's own roll), so the affix
+  // cascade's fixed-order draws below are untouched.
+  if (mob.nythraxis?.gravebreakerCharged && mob.hostile && !mob.dead) {
+    nythraxisGravebreakerOnMobSwing(ctx, mob, target, rawDmg, crit);
   }
   // venom: a landed swing may inflict a refreshing poison DoT (hostile mobs only,
   // never a friendly pet — mobSwing is also the pet attack path).

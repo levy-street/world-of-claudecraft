@@ -212,7 +212,7 @@ export function autoLootForParty(ctx: SimContext, mobId: number, triggerPid: num
  * professions/gathering.ts for the race-freedom argument.
  *
  * `components` (#1142) is the player's per-corpse focus pick: which tagged
- * component(s) to extract. OMITTED (undefined, Phase 12d) resolves to the
+ * component(s) to extract. OMITTED (undefined) resolves to the
  * player's persistent town focus: the corpse tags holding allocation points
  * (none focused falls through to the spread). An EXPLICIT array keeps the
  * #1142 semantics: empty or covering every tagged component spreads across
@@ -261,7 +261,7 @@ export function harvestCorpse(
   // persistent town focus per component, fit cumulatively): a gate on less
   // could pass on a nearly-full stack and let the uncapped addItem spill past
   // capacity.
-  // Phase 12d omitted-components default: no explicit pick means the player's
+  // Omitted-components default: no explicit pick means the player's
   // persistent town focus IS the pick (the focused subset of this corpse's
   // tags; nothing focused spreads, exactly like an explicit empty pick). The
   // derivation is rng-free, so a refused command below still draws nothing.
@@ -281,13 +281,13 @@ export function harvestCorpse(
     return;
   }
   mob.harvestClaimedBy = claim.claimedBy;
-  // Phase 12 tool gate for the PREMIUM arm only: the plain component grant is
+  // Tool gate for the PREMIUM arm only: the plain component grant is
   // never gated (the bare-hands floor), but a signable rarity roll's
   // signed/specimen upgrade needs the player's best owned gathering tool of
   // ANY profession to cover the component family's material tier. Resolved
   // once, rng-free, before the per-yield loop. Every wave-one family is tier 1
   // (content/professions.ts MONSTER_MATERIAL_TIERS, the prime directive), so
-  // in shipped content this gate never fires: it is the Phase 12 seam future
+  // in shipped content this gate never fires: it is the seam future
   // higher-tier corpse families compose with.
   const bestAny = bestOwnedAnyGatherToolTier(meta.inventory, ITEMS);
   let toolDeniedEmitted = false;
@@ -297,12 +297,12 @@ export function harvestCorpse(
   // yielded component, same one-draw-per-yield convention as
   // resolveCorpseFocusHarvest's own tier roll.
   const yields = resolveCorpseFocusHarvest(componentTags ?? [], chosen, ctx.rng);
-  // #1145 + Phase 10: one rarity roll per yielded component, independent of
+  // #1145: one rarity roll per yielded component, independent of
   // the component's tier roll/bonus. For a family with a Pristine specimen
   // (HARVEST_COMPONENT_SPECIMENS), a rare-or-better roll grants the specimen
   // as the SIGNED jackpot IN ADDITION to the plain component; the regular
   // component always grants plain. A family without a specimen keeps the
-  // pre-Phase-10 behavior: the component itself grants signed at rare+.
+  // pre-specimen behavior: the component itself grants signed at rare+.
   //
   // Grant ORDER is load-bearing: the pre-gate above reserves room for the
   // plain component stacks ONLY, so every plain yield must land before any
@@ -325,7 +325,7 @@ export function harvestCorpse(
     const rarity = rollCorpseMaterialRarity(ctx.rng);
     // The rarity roll above MUST stay exactly where it is (one roll per yield,
     // in yield order: the draw sequence is pinned by the parity goldens). The
-    // Phase 12 premium-arm denial below happens strictly AFTER the roll and
+    // premium-arm denial below happens strictly AFTER the roll and
     // draws no rng: a denied family downgrades to the plain fungible grant it
     // gets on a common roll today (a specimen family keeps its plain component
     // and only loses the jackpot push; a non-specimen family loses the
@@ -362,7 +362,7 @@ export function harvestCorpse(
   // Signed-family components first: their plain FALLBACK still owns
   // pre-gate-reserved stack room, so they outrank the specimens, which are
   // pure extras. A signed instance merges into a byte-equal same-signer stack
-  // (identical-payload stacking, Phase 12d; never a plain stack, #1165), so
+  // (identical-payload stacking; never a plain stack, #1165), so
   // this gate accepts same-signer stack room OR a genuinely free slot
   // (canGrantItemInstance, the countFit model harvestNode's signed grants
   // share, #2139); with neither the signed-family grant falls back to the
@@ -391,7 +391,7 @@ export function harvestCorpse(
     const payload = { signer: meta.name };
     if (canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), grant.itemId, payload)) {
       ctx.addItemInstance(grant.itemId, payload, meta.entityId);
-      // Phase 15: the perfect-specimen find mark (col_perfect_specimen), on
+      // The perfect-specimen find mark (col_perfect_specimen), on
       // the LANDED jackpot only (a truncated find got away, like a fish with
       // no bag room). Every rarity draw happened in the roll loop above, so
       // this mark write cannot perturb the pinned draw sequence.
@@ -401,7 +401,7 @@ export function harvestCorpse(
       ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'corpse', lost: 'find' });
     }
   }
-  // Phase 12d lifecycle decoupling, the harvested half: with the claim spent
+  // Lifecycle decoupling, the harvested half: with the claim spent
   // the corpse owes nobody a harvest window anymore, so exhausted loot
   // collapses it on the prune's fast arm while remaining loot keeps only a
   // short owner window instead of the full decay. A pending need-greed roll
@@ -530,7 +530,7 @@ export function interact(ctx: SimContext, pid?: number): void {
     const target = ctx.entities.get(p.targetId);
     if (target && dist2d(p.pos, target.pos) <= INTERACT_RANGE + 2) {
       if (target.kind === 'mob' && target.lootable) {
-        // Phase 12d unified press, targeted arm: same composition as the
+        // Unified press, targeted arm: same composition as the
         // proximity-scan arm below (harvest while the corpse still owes its
         // unclaimed half, omitted components = the town focus default, then
         // loot; separate calls so neither refusal blocks the other).
@@ -597,7 +597,7 @@ export function interact(ctx: SimContext, pid?: number): void {
   const obj = bestObj as Entity | null;
   const questEntity = bestQuestEntity as Entity | null;
   if (corpse) {
-    // Phase 12d unified press: one interact both harvests (while the corpse
+    // Unified press: one interact both harvests (while the corpse
     // still owes its unclaimed harvest half; omitted components = the town
     // focus default) and loots. Two separate calls on purpose: a harvest
     // refusal never blocks the loot half, and vice versa.
