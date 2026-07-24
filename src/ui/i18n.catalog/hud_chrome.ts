@@ -70,6 +70,14 @@ export const hudChromeStrings = {
     busy: 'Finish your current action before using Unstuck.',
     unavailable: 'Unstuck is unavailable in your current state.',
   },
+  // Last Bell scene overlay + dialogue-choice window. Generic scene UI only:
+  // scene CONTENT keys (prompts, options, dialogue lines, speakers) arrive on
+  // the wire with the campaign content and are rendered via t(key) directly.
+  scene: {
+    skipHint: 'Skip scene (Esc)',
+    waitingFor: 'Waiting for {name}',
+    timer: '{seconds}s',
+  },
   // Floating combat text self-notes (proc consume labels, absorb readout).
   fct: {
     absorbed: 'Absorbed {amount}',

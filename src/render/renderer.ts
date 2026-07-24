@@ -1034,6 +1034,11 @@ export class Renderer {
   camYaw = Math.PI;
   camPitch = 0.32;
   camDist = 12;
+  // Last Bell scene camera: when set (by main.ts's sceneCameraTick, from the
+  // SceneDirector pose), the chase camera anchors on this world point instead
+  // of the player, so a scene shot frames its focus actor. Presentation only;
+  // null whenever no scene shot is live.
+  sceneCameraFocus: { x: number; y: number; z: number } | null = null;
   // Map-editor 3D mode: when set, the camera uses this free-cam pose instead of
   // chasing the player (updateCamera honors it and returns early). Editor-only;
   // always null in the shipped game.
@@ -7706,9 +7711,12 @@ export class Renderer {
     }
     const p = this.sim.player;
     const seed = this.sim.cfg.seed;
-    const px = selfPos.x;
-    const py = selfPos.y;
-    const pz = selfPos.z;
+    // A live scene shot re-anchors the whole chase path (orbit origin, occlusion
+    // ray, ground clamp, lookAt) on the shot's focus point instead of the player.
+    const sceneFocus = this.sceneCameraFocus;
+    const px = sceneFocus ? sceneFocus.x : selfPos.x;
+    const py = sceneFocus ? sceneFocus.y : selfPos.y;
+    const pz = sceneFocus ? sceneFocus.z : selfPos.z;
     const eyeY = py + 2.0;
     let cx = px - Math.sin(this.camYaw) * Math.cos(this.camPitch) * this.camDist;
     let cy = eyeY + Math.sin(this.camPitch) * this.camDist;

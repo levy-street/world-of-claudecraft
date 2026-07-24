@@ -35,6 +35,7 @@ import type { SimContext } from '../sim_context';
 import { despawnSquad, type SquadDirective, setSquadDirective, spawnSquad } from '../squad/squad';
 import { addThreat } from '../threat';
 import { dist2d, type Entity, questObjectiveRequired } from '../types';
+import { scenarioById as scenarioByIdImpl } from './registry';
 
 export interface ScenarioSpawnDef {
   mobId: string;
@@ -118,17 +119,11 @@ export interface ScenarioRun {
   done: boolean;
 }
 
-// Content registry: scenario defs register at module load (content modules
-// call registerScenario). Kept as a plain module table like ESCORTS/QUESTS.
-const SCENARIOS: Record<string, ScenarioDef> = {};
-
-export function registerScenario(def: ScenarioDef): void {
-  SCENARIOS[def.id] = def;
-}
-
-export function scenarioById(id: string): ScenarioDef | undefined {
-  return SCENARIOS[id];
-}
+// Content registry: scenario defs register at module load through the
+// dependency-free leaf (registry.ts) so content modules never hit this
+// module mid-evaluation (see the leaf's header for the cycle it breaks).
+// Re-exported here so consumers keep one import site.
+export { registerScenario, scenarioById } from './registry';
 
 export function scenarioRunFor(ctx: SimContext, claimId: number): ScenarioRun | undefined {
   return ctx.scenarioRuns.get(claimId);
@@ -143,7 +138,7 @@ function claimFor(ctx: SimContext, dungeonId: string, pid: number): InstanceSlot
 // the claim. Re-entry into a live run is a plain teleport (disconnect-resume
 // rides the claim exactly like dungeons). Returns false when ineligible.
 export function startScenario(ctx: SimContext, scenarioId: string, pid?: number): boolean {
-  const def = SCENARIOS[scenarioId];
+  const def = scenarioByIdImpl(scenarioId);
   const r = ctx.resolve(pid);
   if (!def || !r) return false;
   const quest = QUESTS[def.questId];
@@ -354,7 +349,7 @@ function stageComplete(
 // Advance one run one tick. Wipe rule: with the stage armed, a claim whose
 // players are all dead or gone re-arms the stage (retry from stage start).
 function updateRun(ctx: SimContext, run: ScenarioRun): void {
-  const def = SCENARIOS[run.scenarioId];
+  const def = scenarioByIdImpl(run.scenarioId);
   if (!def || run.done) return;
   const players = playersInClaim(ctx, run);
   if (!run.stageArmed) {

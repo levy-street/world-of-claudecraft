@@ -72,6 +72,7 @@ import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { createPerfMonitor } from './game/perf';
 import { startPerfReporter } from './game/perf_reporter';
+import { SceneDirector } from './game/scene_director';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import {
   type GameSettings,
@@ -1435,10 +1436,13 @@ async function startGame(
 
   // One keyboard/gamepad action gate for every blocking client surface. The
   // camera prompt lives outside Hud, so it reports its open state explicitly.
+  // The Last Bell scene input lock joins here so ability/UI keys are
+  // suppressed the same way the other blocking surfaces suppress them.
   const gameplayInputBlocked = () =>
     hud.isModalOpen() ||
     hud.promptModalOpen() ||
     cameraPromptOpen() ||
+    sceneDirector.inputLocked() ||
     chatInput.style.display === 'block';
 
   const input = new Input(
@@ -1540,6 +1544,12 @@ async function startGame(
             openChat();
             break;
           case 'escape':
+            // While a scene plays, Escape is the skip gesture (the sim ends
+            // the scene once every living participant asked), never the menu.
+            if (sceneDirector.sceneActive()) {
+              world.sceneSkip();
+              break;
+            }
             if (hud.cancelGroundAim()) break;
             // close the topmost panel; if nothing was open, open the game menu
             if (!hud.closeAll()) hud.toggleOptionsMenu();
@@ -1554,6 +1564,13 @@ async function startGame(
     keybinds,
   );
   input.camYaw = world.player.facing;
+  // Last Bell scene director (camera shots, input lock, music directives).
+  // Presentation only: skips and choice answers go back through IWorld.
+  const sceneDirector = new SceneDirector({
+    world: () => world,
+    nowSec: () => performance.now() / 1000,
+    musicSilence: (on) => music.setSceneSilence(on),
+  });
   perf.setInputDebugProvider(() => ({
     ...input.debugState(),
     canUseGameKeys: !gameplayInputBlocked(),
@@ -1639,6 +1656,11 @@ async function startGame(
   const canUseGameKeysNow = () => !gameplayInputBlocked();
   function dispatchGamepadAction(id: string): void {
     if (id === 'escape') {
+      // Same order as the keyboard path: a live scene turns Escape into skip.
+      if (sceneDirector.sceneActive()) {
+        world.sceneSkip();
+        return;
+      }
       if (dismissCameraPrompt()) return;
       if (hud.cancelGroundAim()) return;
       if (!hud.closeAll()) hud.toggleOptionsMenu();
@@ -3156,6 +3178,10 @@ async function startGame(
         hud.isModalOpen() ||
         cameraPromptOpen() ||
         intro !== null ||
+        // Last Bell scene input lock: presentation-side movement freeze, the
+        // same mechanism the intro cinematic uses (server combat authority is
+        // untouched either way).
+        sceneDirector.inputLocked() ||
         raceMovementLocked,
     );
     const playerDead = world.player.dead;
@@ -3225,6 +3251,7 @@ async function startGame(
         const events = perf.time('sim', () =>
           perf.trace('sim.tick', () => offlineSim.tick(), { mode: 'offline' }),
         );
+        sceneDirector.handleEvents(events);
         perf.time('events', () =>
           perf.trace('hud.handleEvents', () => hud.handleEvents(events), {
             mode: 'offline',
@@ -3247,6 +3274,7 @@ async function startGame(
         },
       );
       introCameraTick(now);
+      sceneCameraTick();
       renderer.camYaw = input.camYaw;
       renderer.camPitch = input.camPitch;
       renderer.camDist = input.camDist;
@@ -3338,6 +3366,7 @@ async function startGame(
     }
     net.pendingFacingDelta = 0; // superseded by the interpolated follow below
     const drainedEvents = net.drainEvents();
+    sceneDirector.handleEvents(drainedEvents);
     const selfAuthoritativeDiscontinuity = hasAuthoritativeSelfPositionDiscontinuity(
       drainedEvents,
       net.playerId,
@@ -3397,6 +3426,7 @@ async function startGame(
       lastSnapAge: net.lastSnapAt > 0 ? performance.now() - net.lastSnapAt : -1,
     });
     introCameraTick(now);
+    sceneCameraTick();
     renderer.camYaw = input.camYaw;
     renderer.camPitch = input.camPitch;
     renderer.camDist = input.camDist;
@@ -3521,6 +3551,30 @@ async function startGame(
     input.camDist = pose.dist;
     introLogo.tick(elapsed, intro.cinematic.durationSec);
     if (pose.done) finishIntro(false);
+  };
+  // Last Bell scene camera: same frame slot as introCameraTick (after the
+  // follow-camera update, before the renderer reads the pose), so an authored
+  // shot wins over mouse/follow input while it runs. A shot with an entity
+  // focus re-reads the entity's live mirrored position via IWorld every frame
+  // (inside sceneDirector.cameraPose); the focus point rides to the renderer
+  // on sceneCameraFocus, re-anchoring the chase camera off the player.
+  const sceneCameraTick = (): void => {
+    const pose = sceneDirector.cameraPose({
+      yaw: input.camYaw,
+      pitch: input.camPitch,
+      dist: input.camDist,
+      playerX: world.player.pos.x,
+      playerY: world.player.pos.y,
+      playerZ: world.player.pos.z,
+    });
+    if (!pose) {
+      renderer.sceneCameraFocus = null;
+      return;
+    }
+    input.camYaw = pose.yaw;
+    input.camPitch = pose.pitch;
+    input.camDist = pose.dist;
+    renderer.sceneCameraFocus = { x: pose.focusX, y: pose.focusY, z: pose.focusZ };
   };
   // "Reduce motion" is the EFFECTIVE flag (the OS prefers-reduced-motion query OR the
   // in-game switch, the ui_effects_profile model): the intro is exactly the kind of

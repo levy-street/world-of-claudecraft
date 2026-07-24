@@ -309,6 +309,7 @@ import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
+import { SceneHudController } from './hud/scene/scene_controller';
 import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
 import { renderHeroicVendorWindow } from './hud/vendor/heroic_vendor_window';
 import { buildTrainView, isRecipeKnownForViewer } from './hud/vendor/train_view';
@@ -1328,6 +1329,10 @@ export class Hud {
   private readonly delveTracker: DelveTrackerController;
   private readonly lockpickController: LockpickController;
   private readonly riteController: RiteController;
+  // Last Bell scene presentation (letterbox/subtitles/fade/skip + the
+  // dialogue-choice window); camera/input-lock/music are game-side
+  // (src/game/scene_director.ts).
+  private readonly sceneController: SceneHudController;
   private readonly questTracker: QuestTrackerController;
   private readonly questDialog: QuestDialogController;
   // swing timer: the period is captured from the reset edge (swingTimer jumping
@@ -1536,6 +1541,15 @@ export class Hud {
       showBanner: (text) => this.showBanner(text),
       log: (text, color) => this.log(text, color),
       hideTooltip: () => this.hideTooltip(),
+    });
+    this.sceneController = new SceneHudController({
+      document,
+      container: $('#ui'),
+      world: () => this.sim,
+      now: () => performance.now(),
+      writers: this.writerFacet,
+      openFocusTrap: (root) => this.focusManager.open({ root: () => root }),
+      skip: () => this.sim.sceneSkip(),
     });
     this.fiesta = new FiestaController({
       document,
@@ -7014,6 +7028,7 @@ export class Hud {
     this.mountRaceStrip.repaintIfChanged();
     this.mountRaceControls.update();
     this.lockpickController.repaintIfChanged();
+    this.sceneController.update();
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.lootRolls.update(now);
     if (slowHud) this.updateRaidLockoutBadge();
@@ -9230,6 +9245,12 @@ export class Hud {
           deedUnlocks.push(ev);
           break;
         }
+        // Last Bell scenes: the overlay/choice controller owns all three.
+        case 'scene':
+        case 'sceneChoice':
+        case 'sceneChoiceResult':
+          this.sceneController.onEvent(ev);
+          break;
         case 'learnAbility':
           // A newly granted ability (level-up or spec signature) must appear in
           // an open spellbook right away, not on the next manual reopen.

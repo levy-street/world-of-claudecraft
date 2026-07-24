@@ -10,7 +10,7 @@
 // solo-always story space, and Coalfast and Tam walk into the doorway as
 // the stalker dies.
 
-import { registerScenario } from '../scenarios/scenarios';
+import { registerScenario } from '../scenarios/registry';
 import { registerScene } from '../scenes/scenes';
 import type { MobTemplate, NpcDef, QuestDef } from '../types';
 
@@ -136,14 +136,14 @@ registerScene({
       kind: 'camera',
       shot: { kind: 'focus', x: 296, z: 84, dist: 26, pitch: 0.42, yaw: 2.6, dur: 5 },
     },
-    { at: 1.0, kind: 'line', speaker: 'lb.speaker.narrator', key: 'lb.q0.scene.harbor', dur: 4.5 },
+    { at: 1.0, kind: 'line', speaker: '', key: 'lb.q0.scene.harbor', dur: 4.5 },
     // The statue above the harbor steps, close: the plinth and its names.
     {
       at: 6.0,
       kind: 'camera',
       shot: { kind: 'focus', x: 303, z: 72, dist: 6, pitch: 0.18, yaw: -0.6, dur: 4 },
     },
-    { at: 6.5, kind: 'line', speaker: 'lb.speaker.narrator', key: 'lb.q0.scene.plinth', dur: 4.5 },
+    { at: 6.5, kind: 'line', speaker: '', key: 'lb.q0.scene.plinth', dur: 4.5 },
     // The bell tolls once; the street stops, counts, exhales.
     { at: 11.5, kind: 'music', directive: 'lb_bell_toll_one' },
     {
@@ -151,7 +151,7 @@ registerScene({
       kind: 'camera',
       shot: { kind: 'focus', x: 305, z: 70, dist: 14, pitch: 0.3, yaw: 0.8, dur: 5 },
     },
-    { at: 12.2, kind: 'line', speaker: 'lb.speaker.narrator', key: 'lb.q0.scene.toll', dur: 5 },
+    { at: 12.2, kind: 'line', speaker: '', key: 'lb.q0.scene.toll', dur: 5 },
     { at: 17.5, kind: 'camera', shot: { kind: 'release' } },
     { at: 18.4, kind: 'letterbox', on: false },
     { at: 18.4, kind: 'inputLock', on: false },
@@ -177,7 +177,7 @@ registerScene({
       key: 'lb.q0.tam.stretchers',
       dur: 5,
     },
-    { at: 9.5, kind: 'line', speaker: 'lb.speaker.narrator', key: 'lb.q0.coalfast.look', dur: 2.4 },
+    { at: 9.5, kind: 'line', speaker: '', key: 'lb.q0.coalfast.look', dur: 2.4 },
   ],
 });
 

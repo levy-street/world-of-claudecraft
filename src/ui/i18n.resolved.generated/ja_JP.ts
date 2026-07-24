@@ -349,6 +349,11 @@ export const ja_JP: EnTranslations = {
       "busy": "現在の行動を終えてからスタック解除を使用してください。",
       "unavailable": "現在の状態ではスタック解除を使用できません。"
     },
+    "scene": {
+      "skipHint": "シーンをスキップ（Esc）",
+      "waitingFor": "{name}を待っています",
+      "timer": "{seconds}s"
+    },
     "fct": {
       "absorbed": "{amount} 吸収",
       "cheap": "低コスト!"
@@ -2502,6 +2507,28 @@ export const ja_JP: EnTranslations = {
       "lbEmpty": "ランク入りした年代記作家はまだいません。",
       "broadcastsLabel": "功績の達成をギルドとフレンドに共有する",
       "titledName": "{name}【{title}】"
+    }
+  },
+  "lb": {
+    "speaker": {
+      "tam": "鐘守タム",
+      "coalfast": "守り手コールファスト",
+      "ollun": "裂け目見のオルン",
+      "edda": "兵站係エッダ",
+      "saul": "癒し手ソール"
+    },
+    "q0": {
+      "scene": {
+        "harbor": "働く港。網が干され、星硝子のサルベージ箱には本土の買い手の刻印がある。",
+        "plinth": "港の石段の上で、青銅の守り手が内陸を向いて立つ。台座の最も新しい名は百年前のもの。「守り手ヘイル」。その下には、まだ余白がある。",
+        "toll": "鐘がひとつ鳴る。通りの誰もが足を止め、数える。続く音はなく、通り全体が一斉に息を吐いた。"
+      },
+      "tam": {
+        "stretchers": "ああいうのが前に出たときは、見張り全員の午前と担架二台が犠牲になった。"
+      },
+      "coalfast": {
+        "look": "灰色の男は倒れた獣を見て、それからお前を、わずかに長く見た。そして崖の方へ歩き去った。"
+      }
     }
   },
   "gatherEvent": {

@@ -5264,6 +5264,165 @@
     pointer-events: none;
     filter: drop-shadow(0 2px 14px #000a);
   }
+  /* ---------- Last Bell scene overlay ---------- */
+  /* Cinematic presentation layers (src/ui/hud/scene/): letterbox bars slide in
+     via a compositor-only transform transition (class-toggled by the painter);
+     the fade layer's opacity is driven per frame through the elided writers.
+     Everything except the skip button and the choice options is decorative and
+     never intercepts input. The fade sits above the letterbox and subtitle so
+     a fade-to-black covers the whole cinematic frame. */
+  .scene-letterbox {
+    position: fixed;
+    left: 0;
+    right: 0;
+    height: 12vh;
+    background: #000;
+    transform: scaleY(0);
+    transition: transform 0.6s ease;
+    pointer-events: none;
+    z-index: 38;
+  }
+  .scene-letterbox-top {
+    top: 0;
+    transform-origin: top;
+  }
+  .scene-letterbox-bottom {
+    bottom: 0;
+    transform-origin: bottom;
+  }
+  .scene-letterbox.on {
+    transform: scaleY(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scene-letterbox {
+      transition: none;
+    }
+  }
+  body.reduce-motion .scene-letterbox {
+    transition: none;
+  }
+  .scene-fade {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 42;
+    display: none;
+  }
+  .scene-subtitle {
+    position: fixed;
+    left: 50%;
+    bottom: calc(12vh + 18px);
+    transform: translateX(-50%);
+    width: min(720px, 86vw);
+    text-align: center;
+    z-index: 39;
+    pointer-events: none;
+    color: var(--color-text-light);
+    font: 500 17px/1.45 var(--ui-font);
+    text-shadow:
+      0 1px 3px #000,
+      0 0 12px #000c;
+    display: none;
+  }
+  .scene-subtitle-speaker {
+    display: block;
+    color: var(--color-gold);
+    font-family: var(--title-font);
+    font-size: 14px;
+    letter-spacing: 0.6px;
+    margin-bottom: 3px;
+  }
+  .scene-skip {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 39;
+    min-height: 40px;
+    padding: 8px 14px;
+    background: rgba(10, 10, 16, 0.78);
+    border: 1px solid var(--color-border-default);
+    border-radius: 6px;
+    color: var(--color-text-muted);
+    font: 500 13px var(--ui-font);
+    cursor: pointer;
+  }
+  .scene-skip:hover {
+    color: var(--color-text-light);
+    border-color: var(--color-border-focus);
+  }
+  .scene-skip:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  /* Touch layouts keep the minimap in the top-right corner, so the skip button
+     centers along the top edge instead of stacking under it. */
+  @media (pointer: coarse) {
+    .scene-skip {
+      top: 10px;
+      right: auto;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+  .scene-choice {
+    position: fixed;
+    left: 50%;
+    bottom: calc(12vh + 72px);
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: min(480px, calc(100vw - 24px));
+    z-index: 39;
+    padding: 14px 16px;
+    background: rgba(10, 10, 16, 0.92);
+    border: 1px solid var(--color-border-default);
+    border-radius: 8px;
+    box-shadow: 0 6px 24px #000a;
+  }
+  .scene-choice-prompt {
+    text-align: center;
+    color: var(--color-text-light);
+    font: 500 16px/1.4 var(--ui-font);
+    margin-bottom: 10px;
+  }
+  .scene-choice-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .scene-choice-option {
+    min-height: 40px;
+    padding: 8px 12px;
+    background: rgba(24, 22, 14, 0.9);
+    border: 1px solid var(--color-border-default);
+    border-radius: 6px;
+    color: var(--color-text-light);
+    font: 500 14px/1.3 var(--ui-font);
+    cursor: pointer;
+    text-align: center;
+  }
+  .scene-choice-option:hover {
+    border-color: var(--color-border-focus);
+    background: rgba(40, 34, 18, 0.95);
+  }
+  .scene-choice-option:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .scene-choice-waiting {
+    text-align: center;
+    color: var(--color-text-muted);
+    font: 500 14px/1.4 var(--ui-font);
+  }
+  .scene-choice-timer {
+    text-align: center;
+    color: var(--color-gold);
+    font: 600 13px var(--ui-font);
+    font-variant-numeric: tabular-nums;
+    margin-top: 8px;
+    min-height: 1.2em;
+  }
 }
 
 /* ------------------------------------------------------------------------ */

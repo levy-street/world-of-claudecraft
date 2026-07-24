@@ -13,6 +13,7 @@ import { guideStrings } from './guide';
 import { hudStrings } from './hud';
 import { hudChromeStrings } from './hud_chrome';
 import { itemNames, itemStrings } from './items';
+import { lastBellStrings } from './last_bell';
 import { mergeEntities, mergeExtra, mergeStrings } from './merge';
 import { questStrings } from './quests';
 import { shellStrings } from './shell';
@@ -40,6 +41,7 @@ export { guideStrings } from './guide';
 export { hudStrings } from './hud';
 export { hudChromeStrings } from './hud_chrome';
 export { itemNames, itemStrings } from './items';
+export { lastBellStrings } from './last_bell';
 export { mergeEntities, mergeExtra, mergeStrings } from './merge';
 export { questStrings } from './quests';
 // Re-export the catalog public surface (every name the old i18n.en.ts exported).
@@ -201,6 +203,9 @@ export const en = {
   },
   game: gameStrings,
   hudChrome: hudChromeStrings,
+  // The Last Bell campaign text (scene lines, speakers, prompts): lb.* keys
+  // emitted by the sim and rendered via t(key).
+  lb: lastBellStrings,
   // Rare gather events (Professions 2.0 Phase 4): the zone-broadcast lines
   // rendered from the id-based gatherRareEvent SimEvent; {finder} is the
   // harvester's player name and splices verbatim.

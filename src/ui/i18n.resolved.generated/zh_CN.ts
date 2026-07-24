@@ -349,6 +349,11 @@ export const zh_CN: EnTranslations = {
       "busy": "请先完成当前动作再使用脱困。",
       "unavailable": "当前状态下无法使用脱困。"
     },
+    "scene": {
+      "skipHint": "跳过场景（Esc）",
+      "waitingFor": "等待{name}",
+      "timer": "{seconds}s"
+    },
     "fct": {
       "absorbed": "吸收 {amount}",
       "cheap": "费用降低!"
@@ -2502,6 +2507,28 @@ export const zh_CN: EnTranslations = {
       "lbEmpty": "暂无上榜的编年史家。",
       "broadcastsLabel": "与公会和好友分享功绩达成",
       "titledName": "{name}【{title}】"
+    }
+  },
+  "lb": {
+    "speaker": {
+      "tam": "钟守塔姆",
+      "coalfast": "守望者科尔法斯特",
+      "ollun": "裂隙观察者奥伦",
+      "edda": "军需官艾达",
+      "saul": "医者扫罗"
+    },
+    "q0": {
+      "scene": {
+        "harbor": "一座劳作中的港口：渔网晾晒着，星璃打捞箱上印着大陆买家的戳记。",
+        "plinth": "港口石阶之上，青铜守望者面向内陆。基座上最新的名字已有百年：守望者黑尔。名字下面，还留着空位。",
+        "toll": "钟声响了一下。街上所有人都停下脚步，数着。没有后续，整条街同时松了口气。"
+      },
+      "tam": {
+        "stretchers": "上次出这么一个，搭进去全体守望一个上午，外加两副担架。"
+      },
+      "coalfast": {
+        "look": "灰发男人看了看死去的怪物，又看了看你，目光略久。然后他朝崖边走了回去。"
+      }
     }
   },
   "gatherEvent": {

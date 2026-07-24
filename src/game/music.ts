@@ -4842,6 +4842,9 @@ export class MusicDirector {
   })();
   private _vol = 1; // 0..1 volume, set from the settings menu
   private _menuPaused = false; // temporary mute while the game menu is open
+  // Last Bell scene 'silence' directive: a HARD cut (no fade), released by the
+  // scene's 'resume' directive or unconditionally at scene end.
+  private _sceneSilenced = false;
   // Boss-fight override: a looped file track routed through the same AudioContext
   // that user gestures already unlock for the procedural soundtrack.
   private bossActive = false;
@@ -4862,9 +4865,35 @@ export class MusicDirector {
   // master gain target given the enabled flag and volume (base level 0.15).
   // The dedicated Nythraxis track owns the mix while active.
   private masterTarget(): number {
-    if (!this._enabled || this._menuPaused || this.bossActive || this.sowfieldTrack !== null)
+    if (
+      !this._enabled ||
+      this._menuPaused ||
+      this._sceneSilenced ||
+      this.bossActive ||
+      this.sowfieldTrack !== null
+    )
       return 0;
     return 0.15 * this._vol;
+  }
+
+  /** Scene music directive seam (SceneDirector): 'silence' hard-stops the whole
+   *  mix immediately (a cut, not a fade; the boss/sowfield file tracks pause
+   *  too), 'resume' restores it with a short ramp. Does not touch the player's
+   *  music toggle. */
+  setSceneSilence(on: boolean): void {
+    if (this._sceneSilenced === on) return;
+    this._sceneSilenced = on;
+    if (this.ctx && this.master) {
+      const gain = this.master.gain;
+      gain.cancelScheduledValues(this.ctx.currentTime);
+      if (on) {
+        gain.value = 0; // hard cut
+      } else {
+        gain.setTargetAtTime(this.masterTarget(), this.ctx.currentTime, 0.35);
+      }
+    }
+    this.applyBossPlayback();
+    this.applySowfield();
   }
 
   /** Engage/disengage the dedicated boss-fight loop. Idempotent; called every
@@ -4906,7 +4935,10 @@ export class MusicDirector {
 
   private applyBossPlayback(): void {
     if (!this.ctx || !this.bossGain) return;
-    const target = this.bossActive && this._enabled && !this._menuPaused ? 0.6 * this._vol : 0;
+    const target =
+      this.bossActive && this._enabled && !this._menuPaused && !this._sceneSilenced
+        ? 0.6 * this._vol
+        : 0;
     this.bossGain.gain.setTargetAtTime(target, this.ctx.currentTime, target > 0 ? 0.25 : 0.12);
     if (target > 0) {
       void this.ctx.resume?.();
@@ -5019,7 +5051,8 @@ export class MusicDirector {
 
   private applySowfield(): void {
     if (!this.ctx) return;
-    const active = this.sowfieldTrack !== null && this._enabled && !this._menuPaused;
+    const active =
+      this.sowfieldTrack !== null && this._enabled && !this._menuPaused && !this._sceneSilenced;
     const level = 0.5 * this._vol;
     if (active) {
       void this.ctx.resume?.();

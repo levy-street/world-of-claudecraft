@@ -135,3 +135,16 @@ budget. Q10/Q11 have zero cutscenes on purpose: the ending is played.
   objective completes, and owns spawns (rng-free rings), squad directives,
   scene hooks, wipe-retry, and stage credit. This avoids a parallel
   objective system entirely.
+- Scenario sequencer (cc60d770d), scene system (3bd47860d, timed key-based
+  scripts over personal 'scene' events, all-living-participants skip),
+  dialogue choices (db4543f7d, leader answers, campaignFlags persisted).
+- Q0 Ashore complete end to end (9a620e618): ferry crossing auto-accepts,
+  arrival scene, Marsh report, meadow cull, solo Tidemill scenario with
+  timed add waves, the doorway stage (stage-level squad arrival), turn-in
+  recruitment. Goldens re-minted for the fixture/NPC world shift
+  (c47a5fa14). Pinned by tests/last_bell_q0.test.ts.
+- PAUSE POINT (owner decision 2026-07-24): STOP after the ferry arrival is
+  playable and hand over for manual testing. Remaining before handoff: the
+  client scene presentation (director/letterbox/subtitles/choice window,
+  in flight), the lb.* i18n catalog entries for Q0's scene lines, and
+  npm run dev. Q1 onward (tasks 8 to 14) intentionally NOT started.

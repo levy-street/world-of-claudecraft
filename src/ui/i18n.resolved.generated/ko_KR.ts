@@ -349,6 +349,11 @@ export const ko_KR: EnTranslations = {
       "busy": "현재 행동을 끝낸 뒤 갇힘 탈출을 사용하세요.",
       "unavailable": "현재 상태에서는 갇힘 탈출을 사용할 수 없습니다."
     },
+    "scene": {
+      "skipHint": "장면 건너뛰기 (Esc)",
+      "waitingFor": "{name} 대기 중",
+      "timer": "{seconds}s"
+    },
     "fct": {
       "absorbed": "{amount} 흡수",
       "cheap": "비용 감소!"
@@ -2502,6 +2507,28 @@ export const ko_KR: EnTranslations = {
       "lbEmpty": "아직 순위에 오른 연대기 작가가 없습니다.",
       "broadcastsLabel": "업적 달성을 길드와 친구에게 공유",
       "titledName": "{name} [{title}]"
+    }
+  },
+  "lb": {
+    "speaker": {
+      "tam": "종지기 탐",
+      "coalfast": "수호자 콜패스트",
+      "ollun": "균열감시자 올룬",
+      "edda": "보급관 에다",
+      "saul": "치유사 사울"
+    },
+    "q0": {
+      "scene": {
+        "harbor": "일하는 항구. 그물이 마르고, 별유리 인양 상자에는 본토 구매자의 인장이 찍혀 있다.",
+        "plinth": "항구 계단 위에서 청동 수호자가 내륙을 바라본다. 대좌의 가장 새로운 이름은 백 년 전의 것. 수호자 헤일. 그 아래에는 아직 자리가 남아 있다.",
+        "toll": "종이 한 번 울린다. 거리의 모두가 걸음을 멈추고 센다. 뒤따르는 소리는 없고, 거리 전체가 한꺼번에 숨을 내쉰다."
+      },
+      "tam": {
+        "stretchers": "지난번 저런 놈 하나에 경비대 전원의 오전과 들것 두 개가 들었지."
+      },
+      "coalfast": {
+        "look": "잿빛 사내는 쓰러진 짐승을 보고, 그다음 당신을 조금 더 오래 바라보았다. 그리고 절벽 쪽으로 걸어갔다."
+      }
     }
   },
   "gatherEvent": {

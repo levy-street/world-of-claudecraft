@@ -139,6 +139,8 @@ const UI_PURE_CORES = [
   'src/ui/coords.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud/delve/delve_map.ts',
+  'src/ui/hud/scene/scene_overlay_view.ts',
+  'src/ui/hud/scene/scene_choice_view.ts',
   'src/ui/raid_lockout_view.ts',
   'src/ui/stat_tooltip_view.ts',
   'src/ui/target_portrait_view.ts',
@@ -225,6 +227,10 @@ const UI_PURE_CORES = [
   'src/ui/reconnect_status_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
+  // Last Bell scene playback core: lives in src/game (its consumer is the
+  // frame loop, not the HUD) but holds the same pure-core contract, like the
+  // two src/game entries above.
+  'src/game/scene_director_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Pure logic cores that live in src/render (the painter half is Three-side):
