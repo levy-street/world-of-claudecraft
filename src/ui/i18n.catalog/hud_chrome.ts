@@ -2100,8 +2100,8 @@ export const hudChromeStrings = {
   // visible while sale proceeds or returned items wait at the Merchant.
   // (Wordy, M16: the five non-Latin fills land in this same change.)
   marketIndicator: {
-    aria: 'World Market proceeds waiting',
-    tip: 'Proceeds are waiting for you at the Merchant.',
+    aria: 'World Market collection waiting',
+    tip: 'Gold or items are waiting for you at the Merchant.',
   },
   // The bank window (the Gilded Strongbox): a pooled deposit box shown while standing
   // at a banker NPC. Plain click withdraws a stack; shift-click withdraws a partial

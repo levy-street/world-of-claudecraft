@@ -1992,8 +1992,8 @@ export const zh_TW: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "世界市場收益待領取",
-      "tip": "你的收益正在商人處等待領取。"
+      "aria": "世界市場待領取物品",
+      "tip": "有金幣或物品正在商人處等待你領取。"
     },
     "bank": {
       "title": "銀行",

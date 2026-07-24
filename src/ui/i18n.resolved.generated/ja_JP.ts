@@ -1992,8 +1992,8 @@ export const ja_JP: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "世界市場の売上金が受け取り待ちです",
-      "tip": "売上金が商人のもとで受け取りを待っています。"
+      "aria": "世界市場の受け取り待ち",
+      "tip": "ゴールドやアイテムが商人のもとで受け取りを待っています。"
     },
     "bank": {
       "title": "銀行",

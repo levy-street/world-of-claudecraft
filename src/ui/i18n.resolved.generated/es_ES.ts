@@ -1992,8 +1992,8 @@ export const es_ES: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "World Market proceeds waiting",
-      "tip": "Proceeds are waiting for you at the Merchant."
+      "aria": "World Market collection waiting",
+      "tip": "Gold or items are waiting for you at the Merchant."
     },
     "bank": {
       "title": "Banco",

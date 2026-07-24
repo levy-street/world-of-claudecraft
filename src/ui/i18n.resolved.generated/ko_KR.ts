@@ -1992,8 +1992,8 @@ export const ko_KR: EnTranslations = {
       }
     },
     "marketIndicator": {
-      "aria": "세계 시장 판매 대금 수령 대기",
-      "tip": "판매 대금이 상인에게서 수령을 기다리고 있습니다."
+      "aria": "세계 시장 수령 대기",
+      "tip": "골드나 아이템이 상인에게서 수령을 기다리고 있습니다."
     },
     "bank": {
       "title": "은행",
