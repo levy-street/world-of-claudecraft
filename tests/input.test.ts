@@ -3,6 +3,16 @@ import { Input } from '../src/game/input';
 import { stopAutorunForInteraction } from '../src/game/interaction_autorun';
 import { Keybinds } from '../src/game/keybinds';
 
+// The pointer lock is deferred until the cursor reaches the viewport edge band
+// (pointer_lock_edge.ts), so every pointer-lock test states where the pointer
+// is: EDGE is inside the band (the lock is wanted there), CENTER is nowhere
+// near it (an ordinary look, which must stay unlocked so the browser never
+// paints its "press Esc to show your cursor" notice).
+const VIEWPORT_W = 1920;
+const VIEWPORT_H = 1080;
+const EDGE = { clientX: 6, clientY: 540 };
+const CENTER = { clientX: 960, clientY: 540 };
+
 function installStorage(): void {
   const map = new Map<string, string>();
   (globalThis as any).localStorage = {
@@ -36,6 +46,8 @@ function makeInput(userAgent?: string) {
     requestPointerLock,
   };
   (globalThis as any).window = {
+    innerWidth: VIEWPORT_W,
+    innerHeight: VIEWPORT_H,
     addEventListener: vi.fn((type: string, cb: (event: any) => void) => {
       windowListeners.set(type, cb);
     }),
@@ -345,6 +357,95 @@ describe('Input click-to-move marker pulses', () => {
 });
 
 describe('Input pointer lock', () => {
+  it('does not request pointer lock for a camera drag that stays away from the viewport edge (#2372)', () => {
+    // The reported bug: every right-drag look made the browser paint its own
+    // "press Esc to show your cursor" capture notice over the game. The lock is
+    // only needed at the viewport edge, so an ordinary look in the middle of
+    // the window must take no lock at all, while still rotating normally.
+    const { canvas, input, canvasListeners, windowListeners } = makeInput();
+    const yaw = input.camYaw;
+
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    windowListeners.get('mousemove')!({ movementX: 20, movementY: 0, clientX: 980, clientY: 540 });
+
+    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+    expect(input.isCameraDragActive()).toBe(true);
+    expect(input.camYaw).toBeCloseTo(yaw - 20 * 0.0045);
+  });
+
+  it('engages the lock mid-drag as soon as the cursor reaches the viewport edge (camera must not freeze there)', () => {
+    const { canvas, canvasListeners, windowListeners } = makeInput();
+
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+
+    windowListeners.get('mousemove')!({ movementX: 40, movementY: 0, ...EDGE });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+
+    // Still one lock per drag: continuing into the band must not re-request
+    // (that would re-show the browser notice mid-drag).
+    windowListeners.get('mousemove')!({ movementX: 5, movementY: 0, clientX: 2, clientY: 540 });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('engages the lock at the bottom and right edges too, not just the left', () => {
+    const bottom = makeInput();
+    bottom.canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    bottom.windowListeners.get('mousemove')!({ movementX: 0, movementY: 25, ...CENTER });
+    bottom.windowListeners.get('mousemove')!({
+      movementX: 0,
+      movementY: 30,
+      clientX: 960,
+      clientY: VIEWPORT_H - 4,
+    });
+    expect(bottom.canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+
+    const right = makeInput();
+    right.canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    right.windowListeners.get('mousemove')!({ movementX: 25, movementY: 0, ...CENTER });
+    right.windowListeners.get('mousemove')!({
+      movementX: 30,
+      movementY: 0,
+      clientX: VIEWPORT_W - 4,
+      clientY: 540,
+    });
+    expect(right.canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
+  it('on Firefox, takes no synchronous mousedown lock when the press starts away from the edge', () => {
+    // Gecko can only lock from the gesture handler itself, so its edge test is
+    // applied to where the press starts: a look begun mid-window shows no
+    // Firefox pointer-capture notice either.
+    const { canvas, canvasListeners, windowListeners } = makeInput(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0',
+    );
+
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+
+    expect(canvas.requestPointerLock).not.toHaveBeenCalled();
+  });
+
+  it('re-arms per drag: a locked edge drag does not make the next mid-window drag lock', () => {
+    const { canvas, canvasListeners, windowListeners } = makeInput();
+
+    canvasListeners.get('mousedown')!({ button: 2, ...EDGE, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...EDGE });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...EDGE });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+    windowListeners.get('mouseup')!({ button: 2, ...EDGE, target: canvas });
+
+    canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+    windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+    windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+    expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
+  });
+
   it('does not request pointer lock for a plain right click', () => {
     const { canvas, canvasListeners } = makeInput();
 
@@ -363,8 +464,7 @@ describe('Input pointer lock', () => {
     // drag, so the browser pointer-capture banner is never shown.
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     now += 30;
@@ -378,7 +478,7 @@ describe('Input pointer lock', () => {
   it('requests pointer lock the instant a press becomes an active drag (before any rotation)', () => {
     const { canvas, canvasListeners, windowListeners } = makeInput();
 
-    canvasListeners.get('mousedown')!({ button: 2, clientX: 100, clientY: 100 });
+    canvasListeners.get('mousedown')!({ button: 2, ...EDGE });
     windowListeners.get('mousemove')!({ movementX: 10, movementY: 5 });
     expect(canvas.requestPointerLock).not.toHaveBeenCalled();
     // This move crosses the drag threshold: lock must engage on the SAME frame so
@@ -397,8 +497,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 0,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     windowListeners.get('mousemove')!({ movementX: 10, movementY: 5 });
@@ -411,7 +510,7 @@ describe('Input pointer lock', () => {
     const { canvas, input, canvasListeners, windowListeners } = makeInput();
     input.setLockCursorOnRotate(false);
 
-    canvasListeners.get('mousedown')!({ button: 2, clientX: 100, clientY: 100 });
+    canvasListeners.get('mousedown')!({ button: 2, ...EDGE });
     windowListeners.get('mousemove')!({ movementX: 10, movementY: 5 });
     windowListeners.get('mousemove')!({ movementX: 4, movementY: 0 });
     windowListeners.get('mousemove')!({ movementX: 2, movementY: 0 });
@@ -424,7 +523,7 @@ describe('Input pointer lock', () => {
     (globalThis as any).document.fullscreenElement =
       (globalThis as any).document.documentElement ?? canvas;
 
-    canvasListeners.get('mousedown')!({ button: 2, clientX: 100, clientY: 100 });
+    canvasListeners.get('mousedown')!({ button: 2, ...EDGE });
     windowListeners.get('mousemove')!({ movementX: 19, movementY: 0 });
     windowListeners.get('mousemove')!({ movementX: 1, movementY: 0 });
 
@@ -441,8 +540,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -457,8 +555,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 0,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -475,8 +572,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 0,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -491,8 +587,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 0,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -507,8 +602,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -523,8 +617,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -547,8 +640,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
@@ -558,8 +650,7 @@ describe('Input pointer lock', () => {
     now += 200;
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
@@ -572,8 +663,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -592,13 +682,12 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     expect(canvas.requestPointerLock).toHaveBeenCalledTimes(1);
 
-    windowListeners.get('mouseup')!({ button: 2, clientX: 100, clientY: 100, target: canvas });
+    windowListeners.get('mouseup')!({ button: 2, ...EDGE, target: canvas });
     expect((globalThis as any).document.exitPointerLock).not.toHaveBeenCalled();
 
     (globalThis as any).document.pointerLockElement = canvas;
@@ -614,8 +703,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
 
@@ -657,8 +745,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     windowListeners.get('mousemove')!({ movementX: 10, movementY: 5 });
@@ -682,8 +769,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     now += 150;
@@ -727,8 +813,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     now += 281;
@@ -753,8 +838,7 @@ describe('Input pointer lock', () => {
 
     canvasListeners.get('mousedown')!({
       button: 2,
-      clientX: 100,
-      clientY: 100,
+      ...EDGE,
       preventDefault: vi.fn(),
     });
     windowListeners.get('mousemove')!({ movementX: 19, movementY: 0 });
