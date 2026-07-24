@@ -371,6 +371,8 @@ import * as honorMod from './pvp';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
+import type { ScenarioRun } from './scenarios/scenarios';
+import * as scenarioMod from './scenarios/scenarios';
 import { persistedResource } from './serialize_resource';
 import { createSimContext, type SimContext, type SimContextHost } from './sim_context';
 import * as chatMod from './social/chat';
@@ -1650,6 +1652,8 @@ export class Sim {
   // Last Bell squad rosters, keyed by story-instance claim id (exitId).
   // State stays on Sim (multi-Sim isolation); behavior in src/sim/squad/.
   squadRuns = new Map<number, SquadRun>();
+  // Last Bell scenario runs, keyed by story-instance claim id (exitId).
+  scenarioRuns = new Map<number, ScenarioRun>();
   // delve instances (separate slot pool from dungeons)
   delveRuns: DelveRun[] = [];
   private delvePetStash = new Map<number, PetState>();
@@ -3967,6 +3971,9 @@ export class Sim {
       get squadRuns() {
         return sim.squadRuns;
       },
+      get scenarioRuns() {
+        return sim.scenarioRuns;
+      },
       get nextArenaMatchId() {
         return sim.nextArenaMatchId;
       },
@@ -4201,6 +4208,7 @@ export class Sim {
       enterDungeon: sim.enterDungeon.bind(sim),
       leaveDungeon: sim.leaveDungeon.bind(sim),
       enterStoryInstance: sim.enterStoryInstance.bind(sim),
+      playScene: sim.playScene.bind(sim),
       enterRift: sim.enterRift.bind(sim),
       leaveRift: sim.leaveRift.bind(sim),
       riftOpenTreasure: sim.riftOpenTreasure.bind(sim),
@@ -4831,6 +4839,9 @@ export class Sim {
     // while no squad is live, so the shared draw order never moves for the
     // existing world; a live squad's draws happen only inside new content.
     squadMod.updateSquads(this.ctx);
+    // Last Bell scenario stages advance after their actors act (same zero-work,
+    // zero-rng idle contract).
+    scenarioMod.updateScenarios(this.ctx);
     lap?.('instances');
     this.updateDelveRuns();
     lap?.('delves');
@@ -8816,6 +8827,11 @@ export class Sim {
   enterStoryInstance(dungeonId: string, pid?: number): boolean {
     return enterStoryInstanceImpl(this.ctx, dungeonId, pid);
   }
+
+  // Scene playback stub: the scene system (src/sim/scenes/) replaces this
+  // binding when it lands; until then a cued scene is a silent no-op so the
+  // scenario sequencer can ship first.
+  playScene(_claimId: number, _sceneId: string): void {}
 
   resetDungeonInstances(pid?: number): void {
     resetDungeonInstancesImpl(this.ctx, pid);

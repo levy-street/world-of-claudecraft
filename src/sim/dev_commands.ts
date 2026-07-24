@@ -10,6 +10,7 @@ import { placeMobileStationForPlayer } from './professions/mobile_station';
 import { completeAllQuestsForDev } from './quests/dev_quest_commands';
 import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
 import { generateRiftPlan, isSetPieceSeed } from './rift/rift_gen';
+import { scenarioById, startScenario } from './scenarios/scenarios';
 import type { SentChat } from './sim';
 import type { SimContext } from './sim_context';
 import { revivePlayerAt } from './spirit';
@@ -394,6 +395,24 @@ export function handleDevChat(
     }
     enterStoryInstance(ctx, storyId, pid);
     emitDevLog(ctx, pid, `[dev] Entering story instance ${storyId}.`);
+    return null;
+  }
+
+  // [dev] Start a Last Bell scenario by id, entering its story space and
+  // arming the run (the quest gate still applies; grant the quest first via
+  // /dev quest accept or play up to it).
+  const scenarioMatch = /^\/(?:dev\s+scenario|devscenario)\s+(\S+)\s*$/i.exec(raw);
+  if (scenarioMatch) {
+    const scenarioId = scenarioMatch[1];
+    if (!scenarioById(scenarioId)) {
+      ctx.error(pid, `[dev] Unknown scenario '${scenarioId}'.`);
+      return null;
+    }
+    if (startScenario(ctx, scenarioId, pid)) {
+      emitDevLog(ctx, pid, `[dev] Scenario ${scenarioId} started.`);
+    } else {
+      ctx.error(pid, `[dev] Scenario ${scenarioId} refused to start (quest gate?).`);
+    }
     return null;
   }
 

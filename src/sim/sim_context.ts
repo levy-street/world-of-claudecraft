@@ -24,6 +24,7 @@ import type { PendingProjectile } from './projectile_travel';
 import type { NaturalRiftPortal } from './rift/portals';
 import type { RiftEvent, RiftInstance } from './rift/types';
 import type { Rng } from './rng';
+import type { ScenarioRun } from './scenarios/scenarios';
 import type {
   ArenaMatch,
   ArenaQueueUnit,
@@ -187,6 +188,9 @@ export interface SimContextPrimitives {
   // Last Bell squad rosters keyed by story-instance claim id; owned by
   // src/sim/squad/squad.ts, state lives on Sim as a live view.
   readonly squadRuns: Map<number, SquadRun>;
+  // Last Bell scenario runs keyed by story-instance claim id; owned by
+  // src/sim/scenarios/scenarios.ts, state lives on Sim as a live view.
+  readonly scenarioRuns: Map<number, ScenarioRun>;
   // I2a delve runs: the live run pool (seeded in the Sim ctor, never reassigned) and
   // the transient pet stash both stay Sim-owned (the disconnect path + serializePet
   // poke them); exposed here as live views the run module reads/mutates in place.
@@ -308,6 +312,10 @@ export interface SimContextCallbacks {
   // areas). Exposed so quest interactions, the scenario sequencer, and the
   // dev command reach it through the seam; leaving reuses leaveDungeon.
   enterStoryInstance(dungeonId: string, pid?: number): boolean;
+  // Last Bell scene playback (src/sim/scenes/): the scenario sequencer cues
+  // a scene script for a claim's audience. Bound to a no-op until the scene
+  // system lands; owned by scenes once it does.
+  playScene(claimId: number, sceneId: string): void;
   // Procedural Rift entry/exit (dev command + interaction click path). The per-tick
   // drivers (updateRiftTriggers/updateRiftInstances) are called directly from tick();
   // these two are on the seam so foreign callers reach them through ctx.
@@ -1097,6 +1105,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     get squadRuns() {
       return host.squadRuns;
     },
+    get scenarioRuns() {
+      return host.scenarioRuns;
+    },
     get nextArenaMatchId() {
       return host.nextArenaMatchId;
     },
@@ -1179,6 +1190,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     enterDungeon: host.enterDungeon,
     leaveDungeon: host.leaveDungeon,
     enterStoryInstance: host.enterStoryInstance,
+    playScene: host.playScene,
     enterRift: host.enterRift,
     leaveRift: host.leaveRift,
     riftOpenTreasure: host.riftOpenTreasure,

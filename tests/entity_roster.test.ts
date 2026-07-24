@@ -217,6 +217,8 @@ function makeCtx() {
     leaveDungeon: vi.fn(),
     enterStoryInstance: vi.fn(),
     squadRuns: new Map(),
+    scenarioRuns: new Map(),
+    playScene: vi.fn(),
     enterRift: vi.fn(),
     leaveRift: vi.fn(),
     riftOpenTreasure: vi.fn(),

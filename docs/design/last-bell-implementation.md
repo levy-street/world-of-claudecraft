@@ -115,4 +115,23 @@ budget. Q10/Q11 have zero cutscenes on purpose: the ending is played.
 
 ## Build log
 
-- Branch created, base verified green, plan committed. (this commit)
+- Branch created, base verified green, plan committed.
+- Story instances (de5e6a06e): nine 'farshore_story' spaces on the dungeon
+  pool, terrain-mirror + authored heightfields, per-area colliders, solo
+  claims, /dev story. Parity fix that mattered: DUNGEON_DOORS skips
+  overworldDoor:false defs (a doorPos-only anchor must not displace camps).
+  Goldens untouched. Wiki generator excludes story spaces.
+- Squad roster (e22896297): src/sim/squad/, five named actors, follow /
+  hold / station directives, healer duty, ranged bolts, scripted 1 hp floor
+  + player relief in combat/damage.ts, group damage scaling. Sparse Entity
+  fields; zero-rng idle tick phase; parity green with no re-mint.
+- Render story interiors (73617b73e): one builder for all nine areas,
+  ground displaced from the same heights the sim stands on, walls as
+  timber/stone or boulder ridges, props sized to collider specs, per-mood
+  sky/fog/lights through the renderer ambience swap.
+- Sequencer design decision: the QUEST pipeline stays the source of truth
+  for objective progress (kills, collects, interacts already credit inside
+  instances); a scenario advances its stage when the tracked quest
+  objective completes, and owns spawns (rng-free rings), squad directives,
+  scene hooks, wipe-retry, and stage credit. This avoids a parallel
+  objective system entirely.
