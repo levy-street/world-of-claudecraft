@@ -18,24 +18,30 @@
 //  - PLATES CLOSEST TO THE CAMERA WIN. The rest are placed bottom-most first
 //    (descending sy, which is descending screen depth for entities standing on
 //    the same ground), so foreground plates keep their natural position and
-//    background ones ride up above them.
+//    background ones ride up above them. The sy ordering key is QUANTIZED
+//    (STACK_ORDER_QUANTUM_PX) so two plates drifting past each other keep a
+//    stable id order instead of trading rows every frame.
 //  - SEPARATION FOLLOWS THE REAL PLATE HEIGHT. Plates are bottom-anchored, so
 //    each occupies `[sy - height, sy]`; a tall player plate (guild tag, deed
 //    title, cast bar) therefore pushes the plate above it further than a bare
 //    mob plate does. `height` comes from nameplate_extent_core.
-//  - THE COLUMN IS BOUNDED. Total lift is capped (MAX_STACK_LIFT_PX) so a dense
-//    crowd cannot build a tower of labels running off the top of the screen.
+//  - A CROWDED COLUMN COMPRESSES INSTEAD OF EXPLODING. Full-height separation
+//    for 30 plates would run labels off the top of the screen, so a column's
+//    step shrinks (never below MIN_STACK_STEP_PX) once its population cannot fit
+//    in MAX_STACK_LIFT_PX. Plates then fan out and clip each other slightly, but
+//    every one keeps a distinct row, which a hard cap-and-pile does not.
 //
-// Determinism: the placement order is fully determined by (pinned, sy, id), so
-// the same frame always produces the same stack regardless of the order the
-// painter iterated its view map in.
+// Determinism: the placement order is fully determined by (pinned, quantized sy,
+// id), so the same frame always produces the same stack regardless of the order
+// the painter iterated its view map in.
 //
 // This runs for EVERY visible plate on EVERY rendered frame, so the hot path
-// (`declutterNameplatesInPlace`) keeps its scratch at high-water capacity and
-// only tests each plate against the already-placed plates that share its screen
-// column, via a reusable bucket index, rather than against every other plate.
+// (`declutterNameplatesInPlace`) keeps its scratch at high-water capacity, tests
+// each plate only against the already-placed plates in its own screen column and
+// the two neighbouring ones, and keeps each of those columns sorted by screen y
+// so the scan can binary-search into the collision window and break out of it.
 
-import { NAMEPLATE_MIN_HEIGHT_PX } from './nameplate_extent_core';
+import { NAMEPLATE_BASE_HEIGHT_PX, NAMEPLATE_MAX_HEIGHT_PX } from './nameplate_extent_core';
 
 export interface NameplateAnchor {
   id: number;
@@ -54,8 +60,8 @@ export interface NameplateAnchor {
 export interface NameplateDeclutterMetrics {
   /** Placed-plate visits during collision resolution, not total operations. */
   candidateChecks: number;
-  /** Plates that hit the lift cap and were left stacked at it (still overlapping). */
-  cappedPlates: number;
+  /** Plates placed in a column crowded enough that its step had to compress. */
+  compressedPlates: number;
 }
 
 // Anchors within this horizontal distance share a screen column: nameplate
@@ -65,16 +71,24 @@ export interface NameplateDeclutterMetrics {
 export const OVERLAP_THRESHOLD_X_PX = 80;
 // Breathing room between two stacked plates, on top of the lower plate's height.
 export const STACK_GAP_PX = 2;
-// Height assumed for an anchor that does not carry one.
-export const DEFAULT_PLATE_HEIGHT_PX = 26;
-// A plate is lifted at most this far above its own head before the pass gives
-// up and lets it overlap: an unbounded column in a 30-mob pull would run labels
-// off the top of the viewport, far from the entities they name.
-export const MAX_STACK_LIFT_PX = 160;
+// Height assumed for an anchor that does not carry one: a plain mob plate.
+export const DEFAULT_PLATE_HEIGHT_PX = NAMEPLATE_BASE_HEIGHT_PX;
+// How far a column may run above its bottom plate before its step compresses.
+export const MAX_STACK_LIFT_PX = 200;
+// The compressed step floor: below this the names stop being separable at all,
+// so a truly enormous column overshoots MAX_STACK_LIFT_PX rather than pile up.
+export const MIN_STACK_STEP_PX = 12;
+// Ordering hysteresis: sy differences smaller than this do not reorder the
+// stack (the id tiebreak decides), so plates at nearly equal depth do not swap
+// rows every frame as the camera drifts.
+export const STACK_ORDER_QUANTUM_PX = 8;
 // Defensive bound on the resolve loop. Each iteration moves the plate strictly
 // above every plate it currently collides with, so it can only run once per
 // distinct occupied band; this just keeps a pathological input finite.
 const MAX_RESOLVE_ITERATIONS = 64;
+// The widest separation any single plate can demand, used to bound the scan
+// window into a column's sorted placed list.
+const MAX_SEPARATION_PX = NAMEPLATE_MAX_HEIGHT_PX + STACK_GAP_PX;
 
 // ---------------------------------------------------------------------------
 // Reusable workspace. The painter calls this once per frame on one thread, so a
@@ -82,14 +96,18 @@ const MAX_RESOLVE_ITERATIONS = 64;
 // capacity instead of reallocating every frame.
 // ---------------------------------------------------------------------------
 const placeOrder: number[] = [];
-/** column index -> indices of the plates already placed in that column */
+/** column index -> indices of the plates already placed there, sorted by descending sy */
 const columns = new Map<number, number[]>();
+/** column index -> how many plates want that column this frame (drives the step) */
+const columnPop = new Map<number, number>();
+/** the columns this frame touched, so the two maps above reset without churning keys.
+ *  Bounded by the viewport width over OVERLAP_THRESHOLD_X_PX, so it never grows unbounded. */
 const usedColumns: number[] = [];
 
 function plateHeight(anchor: NameplateAnchor): number {
   const h = anchor.height;
   if (typeof h !== 'number' || !Number.isFinite(h) || h <= 0) return DEFAULT_PLATE_HEIGHT_PX;
-  return Math.max(NAMEPLATE_MIN_HEIGHT_PX, h);
+  return Math.min(NAMEPLATE_MAX_HEIGHT_PX, h);
 }
 
 function columnFor(sx: number): number {
@@ -100,16 +118,41 @@ function columnFor(sx: number): number {
   return Number.isSafeInteger(c) ? c : 0;
 }
 
-function bucket(column: number): number[] {
-  let list = columns.get(column);
-  if (!list) {
-    list = [];
-    columns.set(column, list);
+/** How far apart two plates in a column of `pop` plates must sit, at most. */
+function stepCapFor(pop: number): number {
+  if (pop < 2) return Number.POSITIVE_INFINITY;
+  return Math.max(MIN_STACK_STEP_PX, MAX_STACK_LIFT_PX / (pop - 1));
+}
+
+/** Clearance a plate must leave above `anchor` (its height, compressed if crowded). */
+function separationAbove(anchor: NameplateAnchor, stepCap: number): number {
+  return Math.min(plateHeight(anchor) + STACK_GAP_PX, stepCap);
+}
+
+/** Insert `index` into a column list kept sorted by DESCENDING sy. */
+function insertPlaced(list: number[], index: number, anchors: NameplateAnchor[]): void {
+  const y = anchors[index].sy;
+  let lo = 0;
+  let hi = list.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if (anchors[list[mid]].sy > y) lo = mid + 1;
+    else hi = mid;
   }
-  // Every bucket() call is followed by a push, so an empty list is always one
-  // this frame has not touched yet: no membership scan needed.
-  if (list.length === 0) usedColumns.push(column);
-  return list;
+  list.splice(lo, 0, index);
+}
+
+/** First index in a descending-sy list whose plate can still reach up to `y`. */
+function scanStart(list: number[], anchors: NameplateAnchor[], y: number): number {
+  const ceiling = y + MAX_SEPARATION_PX;
+  let lo = 0;
+  let hi = list.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if (anchors[list[mid]].sy >= ceiling) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo;
 }
 
 /**
@@ -126,13 +169,14 @@ export function declutterNameplatesInPlace(
   const n = Math.min(count, anchors.length);
   if (metrics) {
     metrics.candidateChecks = 0;
-    metrics.cappedPlates = 0;
+    metrics.compressedPlates = 0;
   }
   if (n < 2) return anchors;
 
   for (const column of usedColumns) {
     const list = columns.get(column);
     if (list) list.length = 0;
+    columnPop.set(column, 0);
   }
   usedColumns.length = 0;
 
@@ -142,12 +186,24 @@ export function declutterNameplatesInPlace(
     // stacked meaningfully; leave it exactly where the painter put it.
     if (!Number.isFinite(anchors[i].sx) || !Number.isFinite(anchors[i].sy)) continue;
     placeOrder.push(i);
+    const column = columnFor(anchors[i].sx);
+    const pop = columnPop.get(column);
+    if (pop === undefined) {
+      if (!columns.has(column)) columns.set(column, []);
+      usedColumns.push(column);
+      columnPop.set(column, 1);
+    } else {
+      if (pop === 0) usedColumns.push(column);
+      columnPop.set(column, pop + 1);
+    }
   }
   placeOrder.sort((a, b) => {
     const pinnedDelta = (anchors[b].pinned === true ? 1 : 0) - (anchors[a].pinned === true ? 1 : 0);
     if (pinnedDelta !== 0) return pinnedDelta;
-    // bottom-most (nearest) first, so foreground plates keep their own spot
-    const syDelta = anchors[b].sy - anchors[a].sy;
+    // bottom-most (nearest) first, quantized so near-equal depths keep id order
+    const syDelta =
+      Math.round(anchors[b].sy / STACK_ORDER_QUANTUM_PX) -
+      Math.round(anchors[a].sy / STACK_ORDER_QUANTUM_PX);
     if (syDelta !== 0) return syDelta;
     return anchors[a].id - anchors[b].id;
   });
@@ -155,44 +211,56 @@ export function declutterNameplatesInPlace(
   for (let k = 0; k < placeOrder.length; k++) {
     const index = placeOrder[k];
     const anchor = anchors[index];
-    const height = plateHeight(anchor);
     const column = columnFor(anchor.sx);
+    // One step for the whole neighbourhood: a plate straddling a dense column
+    // and a sparse one must compress with the crowd, or the two would demand
+    // different clearances from the same pair of plates.
+    const stepCap = stepCapFor(
+      Math.max(
+        columnPop.get(column - 1) ?? 0,
+        columnPop.get(column) ?? 1,
+        columnPop.get(column + 1) ?? 0,
+      ),
+    );
+    if (metrics && Number.isFinite(stepCap) && stepCap < plateHeight(anchor) + STACK_GAP_PX) {
+      metrics.compressedPlates++;
+    }
     let y = anchor.sy;
 
     if (anchor.pinned !== true) {
-      const floorY = anchor.sy - MAX_STACK_LIFT_PX;
+      const ownSeparation = separationAbove(anchor, stepCap);
       for (let iteration = 0; iteration < MAX_RESOLVE_ITERATIONS; iteration++) {
-        // Top edge of the lowest plate this one currently collides with: moving
-        // just above it clears every collision found this iteration at once.
         let clearY = Number.POSITIVE_INFINITY;
         for (let dc = -1; dc <= 1; dc++) {
           const list = columns.get(column + dc);
-          if (!list) continue;
-          for (const j of list) {
+          if (!list || list.length === 0) continue;
+          // Walk the whole contiguous run of plates this one would collide with,
+          // carrying the frontier up as it goes: a packed column resolves in ONE
+          // pass instead of one hop (and one full rescan) per plate above.
+          let frontier = y;
+          for (let p = scanStart(list, anchors, y); p < list.length; p++) {
+            const other = anchors[list[p]];
+            // Sorted descending: once a placed plate sits far enough above the
+            // frontier, so does every plate after it in the list.
+            if (other.sy <= frontier - ownSeparation) break;
             if (metrics) metrics.candidateChecks++;
-            const other = anchors[j];
             if (Math.abs(other.sx - anchor.sx) > OVERLAP_THRESHOLD_X_PX) continue;
-            const otherTop = other.sy - plateHeight(other);
-            // No vertical overlap: this plate sits entirely above or below it.
-            if (y <= otherTop - STACK_GAP_PX || y - height >= other.sy + STACK_GAP_PX) continue;
-            if (otherTop < clearY) clearY = otherTop;
+            const clear = other.sy - separationAbove(other, stepCap);
+            if (frontier <= clear) continue;
+            frontier = clear;
           }
+          if (frontier < clearY) clearY = frontier;
         }
-        if (clearY === Number.POSITIVE_INFINITY) break;
-        const nextY = clearY - STACK_GAP_PX;
-        if (nextY < floorY) {
-          // The column is full: park the plate at the cap and accept the
-          // overlap rather than sending the label off the top of the screen.
-          y = floorY;
-          if (metrics) metrics.cappedPlates++;
-          break;
-        }
-        y = nextY;
+        // The columns interleave, so a frontier raised by one of them can collide
+        // with another's plates; that is what the outer iteration is for.
+        if (clearY >= y) break;
+        y = clearY;
       }
     }
 
     anchor.sy = y;
-    bucket(column).push(index);
+    const list = columns.get(column);
+    if (list) insertPlaced(list, index, anchors);
   }
 
   return anchors;

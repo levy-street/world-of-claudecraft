@@ -1,5 +1,5 @@
-// Pure vertical-extent core for the overhead nameplates: how TALL a plate
-// renders, in screen px, given which of its optional rows are showing.
+// Pure vertical-extent core for the overhead nameplates: which rows a plate
+// renders and how TALL that makes it, in screen px.
 //
 // The stacking pass (nameplate_declutter.ts) needs this because plates are
 // bottom-anchored (`translate(-50%, -100%)`, see nameplate_projection.ts): a
@@ -9,51 +9,122 @@
 // of a bare mob plate, and a single fixed offset left the tall ones overlapping.
 //
 // The numbers below mirror the .np-* rules in src/styles/hud.css (each row's
-// content box plus its margins/borders). They are an ESTIMATE on purpose: the
-// alternative is reading offsetHeight per plate per frame, which forces a layout
-// flush in the hot path. Erring a pixel or two high only spaces the stack
-// slightly more generously, it never re-introduces an overlap.
+// border box plus its margins). They are an ESTIMATE on purpose: the alternative
+// is reading offsetHeight per plate per frame, which forces a layout flush in the
+// hot path. Every constant therefore rounds UP where the CSS varies (the hp bar
+// uses the thick boss border, the name line uses the tall level glyph): erring
+// high only spaces the stack slightly more generously, while erring low
+// re-introduces the overlap this whole pass exists to remove.
+// `tests/nameplate_extent_core.test.ts` re-derives each one from hud.css so a CSS
+// edit cannot silently invalidate the model.
 //
 // Three/DOM/i18n-free (RENDER_PURE_CORES) and allocation-free: the painter calls
-// it for every visible plate every frame, so the rows arrive as positional flags
-// rather than an options object that would be per-plate garbage.
+// this for every visible plate every frame, so rows arrive as a bit mask rather
+// than an options object that would be per-plate garbage.
 
-/** The always-present name line (name + inline level/badges), .np-name/.np-level. */
+import type { Entity } from '../sim/types';
+
+/** Optional rows, as bits for `nameplateHeightPx`. The name and marker rows are
+ *  always counted (see NAMEPLATE_BASE_HEIGHT_PX) and have no bit. */
+export const NP_ROW_HP_BAR = 1 << 0;
+export const NP_ROW_GUILD = 1 << 1;
+export const NP_ROW_TITLE = 1 << 2;
+export const NP_ROW_CAST_BAR = 1 << 3;
+export const NP_ROW_COMBO = 1 << 4;
+export const NP_ROW_EMOTE = 1 << 5;
+export const NP_ROW_RAID_MARK = 1 << 6;
+
+/** .np-name / .np-level: the name line, sized by the 19px level glyph. */
 export const NAMEPLATE_NAME_ROW_PX = 20;
-/** .np-hpbar: 4px bar + 1px top margin. */
-export const NAMEPLATE_HP_BAR_ROW_PX = 5;
+/**
+ * .np-marker: the quest-bang / lootable-coin / elite-diamond slot. ALWAYS in the
+ * layout (the renderer appends the div unconditionally and the painter only ever
+ * writes its text and class, never `display:none`), so its 26px reserves space
+ * on every plate even when the glyph is empty.
+ */
+export const NAMEPLATE_MARKER_ROW_PX = 26;
+/** .np-hpbar: 4px content box, content-box sizing, plus the 2px boss border and 1px top margin. */
+export const NAMEPLATE_HP_BAR_ROW_PX = 9;
 /** .np-guild: an 11px line under the name. */
 export const NAMEPLATE_GUILD_ROW_PX = 13;
 /** .np-title: the 10px italic deed-title line. */
 export const NAMEPLATE_TITLE_ROW_PX = 12;
-/** .np-castbar: 8px bar + 1px borders + 1px top margin. */
+/** .np-castbar: 8px content box + 1px borders + 1px top margin. */
 export const NAMEPLATE_CAST_BAR_ROW_PX = 11;
 /** .np-combo: a 7px pip row + 2px bottom margin. */
 export const NAMEPLATE_COMBO_ROW_PX = 9;
-/** .np-emote: the 42px overhead emote bubble + 5px bottom margin + borders. */
+/** .np-emote: the 42px overhead emote bubble + 2px borders + 5px bottom margin. */
 export const NAMEPLATE_EMOTE_ROW_PX = 51;
+/** .np-raidmark: the 30px party marker icon + 1px bottom margin. */
+export const NAMEPLATE_RAID_MARK_ROW_PX = 31;
 
-/** A bare plate: just the name line. The floor every plate is at least as tall as. */
-export const NAMEPLATE_MIN_HEIGHT_PX = NAMEPLATE_NAME_ROW_PX;
+/** The rows every plate pays for: the name line plus the always-laid-out marker slot. */
+export const NAMEPLATE_BASE_HEIGHT_PX = NAMEPLATE_NAME_ROW_PX + NAMEPLATE_MARKER_ROW_PX;
+
+/** Every optional row at once: the tallest a plate can render. */
+export const NAMEPLATE_MAX_HEIGHT_PX =
+  NAMEPLATE_BASE_HEIGHT_PX +
+  NAMEPLATE_HP_BAR_ROW_PX +
+  NAMEPLATE_GUILD_ROW_PX +
+  NAMEPLATE_TITLE_ROW_PX +
+  NAMEPLATE_CAST_BAR_ROW_PX +
+  NAMEPLATE_COMBO_ROW_PX +
+  NAMEPLATE_EMOTE_ROW_PX +
+  NAMEPLATE_RAID_MARK_ROW_PX;
+
+/** Estimated rendered height (px) of one nameplate from its row bit mask. */
+export function nameplateHeightPx(rows: number): number {
+  let height = NAMEPLATE_BASE_HEIGHT_PX;
+  if (rows & NP_ROW_HP_BAR) height += NAMEPLATE_HP_BAR_ROW_PX;
+  if (rows & NP_ROW_GUILD) height += NAMEPLATE_GUILD_ROW_PX;
+  if (rows & NP_ROW_TITLE) height += NAMEPLATE_TITLE_ROW_PX;
+  if (rows & NP_ROW_CAST_BAR) height += NAMEPLATE_CAST_BAR_ROW_PX;
+  if (rows & NP_ROW_COMBO) height += NAMEPLATE_COMBO_ROW_PX;
+  if (rows & NP_ROW_EMOTE) height += NAMEPLATE_EMOTE_ROW_PX;
+  if (rows & NP_ROW_RAID_MARK) height += NAMEPLATE_RAID_MARK_ROW_PX;
+  return height;
+}
 
 /**
- * Estimated rendered height (px) of one nameplate, from the rows it is showing.
- * The name line is always counted; every other row is opt-in.
+ * Which of the painter's four content branches an entity takes. Extracted here
+ * so the row model and the painter's branch chain cannot disagree about what a
+ * plate renders: the painter switches on this, and the row mask below reads it.
  */
-export function nameplateHeightPx(
-  hpBar: boolean,
-  guild: boolean,
-  title: boolean,
+export type NameplatePlateKind = 'object' | 'player' | 'npc' | 'mob';
+
+export function nameplatePlateKind(e: Entity): NameplatePlateKind {
+  if (e.kind === 'object') return 'object';
+  if (e.kind === 'player') return 'player';
+  // a friendly quest-giving "mob" reads as an NPC plate (name only, no hp bar)
+  if (e.kind === 'npc' || (!e.hostile && e.questIds.length > 0)) return 'npc';
+  return 'mob';
+}
+
+/**
+ * The rows `e`'s plate is showing, as a bit mask. `suppressSelf` is the hidden
+ * own-plate case (name, hp, guild and title all collapse); the remaining inputs
+ * are the painter's per-frame facts the entity does not carry (the plan's combo
+ * pips and overhead emote, the party raid marker, the live cast bar).
+ */
+export function nameplateRowMask(
+  e: Entity,
+  kind: NameplatePlateKind,
+  suppressSelf: boolean,
   castBar: boolean,
-  combo: boolean,
+  comboPips: number,
   emote: boolean,
+  raidMark: boolean,
 ): number {
-  let height = NAMEPLATE_NAME_ROW_PX;
-  if (hpBar) height += NAMEPLATE_HP_BAR_ROW_PX;
-  if (guild) height += NAMEPLATE_GUILD_ROW_PX;
-  if (title) height += NAMEPLATE_TITLE_ROW_PX;
-  if (castBar) height += NAMEPLATE_CAST_BAR_ROW_PX;
-  if (combo) height += NAMEPLATE_COMBO_ROW_PX;
-  if (emote) height += NAMEPLATE_EMOTE_ROW_PX;
-  return height;
+  let rows = 0;
+  // objects and NPC-style plates never carry an hp bar; dead entities lose theirs
+  if (!e.dead && (kind === 'mob' || (kind === 'player' && !suppressSelf))) rows |= NP_ROW_HP_BAR;
+  if (kind === 'player' && !suppressSelf) {
+    if (e.guild) rows |= NP_ROW_GUILD;
+    if (e.title) rows |= NP_ROW_TITLE;
+  }
+  if (castBar) rows |= NP_ROW_CAST_BAR;
+  if (comboPips > 0) rows |= NP_ROW_COMBO;
+  if (emote) rows |= NP_ROW_EMOTE;
+  if (raidMark) rows |= NP_ROW_RAID_MARK;
+  return rows;
 }

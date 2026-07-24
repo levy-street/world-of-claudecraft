@@ -3,17 +3,18 @@ import {
   DEFAULT_PLATE_HEIGHT_PX,
   declutterNameplates,
   declutterNameplatesInPlace,
-  MAX_STACK_LIFT_PX,
+  MIN_STACK_STEP_PX,
   type NameplateAnchor,
   type NameplateDeclutterMetrics,
   OVERLAP_THRESHOLD_X_PX,
   STACK_GAP_PX,
+  STACK_ORDER_QUANTUM_PX,
 } from '../src/render/nameplate_declutter';
 
 const ROW = DEFAULT_PLATE_HEIGHT_PX + STACK_GAP_PX;
 
 function newMetrics(): NameplateDeclutterMetrics {
-  return { candidateChecks: 0, cappedPlates: 0 };
+  return { candidateChecks: 0, compressedPlates: 0 };
 }
 
 function heightOf(a: NameplateAnchor): number {
@@ -78,7 +79,7 @@ describe('nameplate vertical stacking', () => {
           id: i + 1,
           sx: Math.round(rng() * 300),
           sy: Math.round(rng() * 120),
-          height: 20 + Math.round(rng() * 40),
+          height: 20 + Math.round(rng() * 20),
         });
       }
       const before = anchors.map((a) => a.sy);
@@ -206,20 +207,50 @@ describe('nameplate vertical stacking', () => {
     expect(overlappingPairs(out)).toEqual([]);
   });
 
-  it('bounds the column: a big pull never sends labels off the top of the screen', () => {
+  it('compresses a crowded column instead of piling its overflow on one line', () => {
     const anchors: NameplateAnchor[] = [];
     for (let i = 0; i < 30; i++) anchors.push({ id: i + 1, sx: 500, sy: 400 });
     const metrics = newMetrics();
 
     declutterNameplatesInPlace(anchors, anchors.length, metrics);
 
-    for (const a of anchors) {
-      expect(a.sy).toBeLessThanOrEqual(400);
-      expect(a.sy).toBeGreaterThanOrEqual(400 - MAX_STACK_LIFT_PX);
+    const ys = anchors.map((a) => a.sy).sort((x, y) => y - x);
+    expect(ys[0]).toBe(400); // the bottom plate still owns its own anchor
+    for (let i = 1; i < ys.length; i++) {
+      // every plate keeps a DISTINCT row, at the compressed step
+      expect(ys[i - 1] - ys[i]).toBe(MIN_STACK_STEP_PX);
     }
-    // the first MAX_STACK_LIFT_PX/ROW plates fit; the overflow is parked at the cap
-    expect(metrics.cappedPlates).toBeGreaterThan(0);
-    expect(metrics.cappedPlates).toBe(30 - (Math.floor(MAX_STACK_LIFT_PX / ROW) + 1));
+    expect(metrics.compressedPlates).toBe(30);
+  });
+
+  it('does not compress a column that fits at full plate height', () => {
+    const anchors: NameplateAnchor[] = [];
+    for (let i = 0; i < 4; i++) anchors.push({ id: i + 1, sx: 500, sy: 400 });
+    const metrics = newMetrics();
+
+    declutterNameplatesInPlace(anchors, anchors.length, metrics);
+
+    const ys = anchors.map((a) => a.sy).sort((x, y) => y - x);
+    for (let i = 1; i < ys.length; i++) expect(ys[i - 1] - ys[i]).toBe(ROW);
+    expect(metrics.compressedPlates).toBe(0);
+    expect(overlappingPairs(anchors)).toEqual([]);
+  });
+
+  it('keeps the stack order stable when two plates drift past each other', () => {
+    // sub-pixel depth jitter must not trade rows frame to frame: the ordering
+    // key is quantized, so the id tiebreak holds the two plates in place.
+    const seen = new Set<string>();
+    for (let step = 0; step <= 6; step++) {
+      const drift = (step - 3) * (STACK_ORDER_QUANTUM_PX / 8);
+      const frame: NameplateAnchor[] = [
+        { id: 1, sx: 300, sy: 300 },
+        { id: 2, sx: 300, sy: 300 + drift },
+      ];
+      const out = declutterNameplates(frame);
+      const lower = (out[0].sy > out[1].sy ? out[0] : out[1]).id;
+      seen.add(String(lower));
+    }
+    expect([...seen]).toEqual(['1']);
   });
 
   it('honours the live prefix so a pooled scratch array never leaks stale anchors', () => {
@@ -272,7 +303,38 @@ describe('nameplate vertical stacking: hot path', () => {
     declutterNameplatesInPlace(anchors, anchors.length, metrics);
 
     expect(metrics.candidateChecks).toBe(0);
-    expect(metrics.cappedPlates).toBe(0);
+    expect(metrics.compressedPlates).toBe(0);
+  });
+
+  it('stays near-linear on a realistic screen-wide crowd', () => {
+    // 150 plates spread over a 1280px viewport: the per-frame case that matters.
+    const anchors: NameplateAnchor[] = [];
+    for (let i = 0; i < 150; i++) {
+      anchors.push({ id: i + 1, sx: (i * 137) % 1280, sy: 200 + ((i * 91) % 400), height: 46 });
+    }
+    const metrics = newMetrics();
+
+    declutterNameplatesInPlace(anchors, anchors.length, metrics);
+
+    expect(metrics.candidateChecks).toBeLessThan(anchors.length * 40);
+  });
+
+  it('resolves a packed column in one pass per plate, not one hop per plate above it', () => {
+    // Every plate lands in the same column: the frontier walk must clear the
+    // whole run at once. A regression to hop-and-rescan multiplies this by the
+    // column depth (and silently truncates at MAX_RESOLVE_ITERATIONS).
+    const anchors: NameplateAnchor[] = [];
+    for (let i = 0; i < 160; i++) anchors.push({ id: i + 1, sx: 400, sy: 300, height: 46 });
+    const metrics = newMetrics();
+
+    declutterNameplatesInPlace(anchors, anchors.length, metrics);
+
+    expect(metrics.candidateChecks).toBeLessThan(anchors.length * 120);
+    // and no plate is left sharing a row with another, however deep the column
+    const ys = anchors.map((a) => a.sy).sort((x, y) => y - x);
+    for (let i = 1; i < ys.length; i++) {
+      expect(ys[i - 1] - ys[i]).toBeGreaterThanOrEqual(MIN_STACK_STEP_PX);
+    }
   });
 
   it('keeps a long single-row chain linear in the number of plates', () => {
@@ -305,8 +367,10 @@ describe('nameplate vertical stacking: hot path', () => {
       expect(Object.is(anchors[i].sx, invalidBefore[i].sx)).toBe(true);
       expect(Object.is(anchors[i].sy, invalidBefore[i].sy)).toBe(true);
     }
-    expect(anchors[7].sy).toBe(101);
-    expect(anchors[6].sy).toBe(101 - ROW);
+    // ids 7 and 8 sit within the ordering quantum, so the id tiebreak (not the
+    // 1px depth difference) decides which one keeps its projected spot
+    expect(anchors[6].sy).toBe(100);
+    expect(anchors[7].sy).toBe(100 - ROW);
   });
 
   it('falls back to the default height for a missing or nonsensical height', () => {
@@ -343,8 +407,8 @@ describe('nameplate vertical stacking: hot path', () => {
 
     declutterNameplatesInPlace(anchors);
 
-    expect(anchors[1].sy).toBe(101);
-    expect(anchors[0].sy).toBe(101 - ROW);
+    expect(anchors[0].sy).toBe(100);
+    expect(anchors[1].sy).toBe(100 - ROW);
   });
 
   it('is reusable across calls of shrinking size (stale scratch never leaks)', () => {

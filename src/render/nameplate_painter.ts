@@ -40,11 +40,11 @@ import { formatNumber, getLanguage, t } from '../ui/i18n';
 import { raidMarkerDataUrl } from '../ui/icons';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 
-import { castBarState } from './cast_bar';
+import { castBarState, castBarVisible } from './cast_bar';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { declutterNameplatesInPlace, type NameplateAnchor } from './nameplate_declutter';
-import { nameplateHeightPx } from './nameplate_extent_core';
+import { nameplateHeightPx, nameplatePlateKind, nameplateRowMask } from './nameplate_extent_core';
 import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
@@ -163,18 +163,29 @@ export class NameplatePainter {
       // The self plate is normally suppressed; with "Show My Nameplate" on it
       // renders (and stacks) exactly like any other player's.
       const suppressSelf = isSelf && !showOwnNameplate;
+      // Which content branch this plate takes, resolved ONCE: the branch chain
+      // below switches on it and the row model reads the same value, so the
+      // stacked height can never disagree with the rows actually rendered.
+      const plateKind = nameplatePlateKind(e);
+      // party raid/target marker (only mobs are markable, so this is null
+      // elsewhere); read every pass because it is one of the plate's rows
+      const raidMark = world.markerFor(e.id);
       // How tall this plate renders, so the stacking pass spaces a tall player
       // plate (guild tag + deed title + cast bar) further than a bare mob plate.
       // Derived from the entity, NOT from the DOM: reading offsetHeight here
-      // would force a layout flush for every plate, every frame. It also has to
-      // hold on a throttled pass, where the content branch below never runs.
+      // would force a layout flush for every plate, every frame. It runs on
+      // throttled passes too, where the content branch below never does, so the
+      // stack keeps tracking the camera at the tier's reduced content cadence.
       const height = nameplateHeightPx(
-        !e.dead && !suppressSelf && (e.kind === 'player' || e.kind === 'mob'),
-        e.kind === 'player' && !suppressSelf && !!e.guild,
-        e.kind === 'player' && !suppressSelf && !!e.title,
-        castBarState(e).visible,
-        plan.comboPips > 0,
-        plan.hasOverheadEmote,
+        nameplateRowMask(
+          e,
+          plateKind,
+          suppressSelf,
+          castBarVisible(e),
+          plan.comboPips,
+          plan.hasOverheadEmote,
+          raidMark !== null,
+        ),
       );
       // Record the anchor; the transform is written once, after the stacking
       // pass has had its say, so a plate never builds two transform strings per
@@ -206,7 +217,6 @@ export class NameplatePainter {
       if (!fullPass && !plan.urgent) continue;
       v.nameplate.classList.toggle('has-emote', plan.hasOverheadEmote);
 
-      // party raid/target marker (only mobs are markable, so this is null elsewhere)
       const emote = e.overheadEmoteId
         ? OVERHEAD_EMOTES.find((x) => x.id === e.overheadEmoteId)
         : null;
@@ -221,7 +231,6 @@ export class NameplatePainter {
       }
       v.nameEl.style.display = '';
 
-      const raidMark = world.markerFor(e.id);
       if (raidMark !== null) {
         v.raidMarkEl.style.backgroundImage = `url(${raidMarkerDataUrl(raidMark)})`;
         v.raidMarkEl.style.display = '';
@@ -232,7 +241,7 @@ export class NameplatePainter {
       // combo points the local player has built on this entity (rogue/druid)
       this.setNameplateCombo(v, plan.comboPips);
 
-      if (e.kind === 'object') {
+      if (plateKind === 'object') {
         // dungeon doorways announce themselves
         const objName = objectDisplayName(e);
         this.setNameplateStatic(
@@ -246,7 +255,7 @@ export class NameplatePainter {
           '1',
         );
         this.setNameplateLevel(v, '', '');
-      } else if (e.kind === 'player') {
+      } else if (plateKind === 'player') {
         // Players: friendly blue with an hp bar; <Guild> tag under the name. Your
         // OWN plate is normally suppressed (suppressSelf, computed above), but with
         // the "Show My Nameplate" option on it renders exactly like another player's,
@@ -302,7 +311,7 @@ export class NameplatePainter {
         this.setNameplateTitle(v, suppressSelf ? undefined : e.title);
         this.setNameplateHp(v, e);
         this.setNameplateLevel(v, '', '');
-      } else if (e.kind === 'npc' || (!e.hostile && e.questIds.length > 0)) {
+      } else if (plateKind === 'npc') {
         const npcName =
           e.kind === 'npc'
             ? npcDisplayName(e.templateId)
