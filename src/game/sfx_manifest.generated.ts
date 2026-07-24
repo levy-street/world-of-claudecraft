@@ -4747,59 +4747,89 @@ export const SFX_CLIPS =
     ]
   },
   "ui_fish_bite": {
-    "url": "/audio/sfx/ui_fish_bite.mp3?v=e35376cdc03d",
+    "url": "/audio/sfx/ui_fish_bite_1.mp3?v=6b099db300dc",
     "loop": false,
     "category": "ui",
     "preload": "startup",
     "spatial": false,
     "gain": 1,
     "playbackRate": 1,
-    "bytes": 18224,
-    "hash": "e35376cdc03d",
+    "bytes": 12581,
+    "hash": "6b099db300dc",
     "variants": [
       {
-        "id": "main",
-        "url": "/audio/sfx/ui_fish_bite.mp3?v=e35376cdc03d",
-        "bytes": 18224,
-        "sha256": "e35376cdc03d4cd41a9377c600b12caff2ec56523e92a6f7dde059baea5d2dce"
+        "id": "1",
+        "url": "/audio/sfx/ui_fish_bite_1.mp3?v=6b099db300dc",
+        "bytes": 12581,
+        "sha256": "6b099db300dc8a3b9bff3dca997f1742bb450fac575926d519e27e2e9ad95b40"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/ui_fish_bite_2.mp3?v=71af59aba0ec",
+        "bytes": 14462,
+        "sha256": "71af59aba0ec0f26a6c04ee5cd002e41a859da7e980ab52cff4d5fdccd8c1902"
+      },
+      {
+        "id": "3",
+        "url": "/audio/sfx/ui_fish_bite_3.mp3?v=ff14bde0705f",
+        "bytes": 15089,
+        "sha256": "ff14bde0705f3e79290dc4d2f161b30725af68cb933ba163680c456158f1279d"
       }
     ]
   },
   "ui_fish_cast": {
-    "url": "/audio/sfx/ui_fish_cast.mp3?v=93c009333ef2",
+    "url": "/audio/sfx/ui_fish_cast_1.mp3?v=e30ada933dc8",
     "loop": false,
     "category": "ui",
     "preload": "startup",
     "spatial": false,
     "gain": 1,
     "playbackRate": 1,
-    "bytes": 15716,
-    "hash": "93c009333ef2",
+    "bytes": 13835,
+    "hash": "e30ada933dc8",
     "variants": [
       {
-        "id": "main",
-        "url": "/audio/sfx/ui_fish_cast.mp3?v=93c009333ef2",
-        "bytes": 15716,
-        "sha256": "93c009333ef2e01a11c7f73b0e654a23b6d3726e6105fa584d0ea4a23bd6e5cd"
+        "id": "1",
+        "url": "/audio/sfx/ui_fish_cast_1.mp3?v=e30ada933dc8",
+        "bytes": 13835,
+        "sha256": "e30ada933dc83b7e7dcbb409c82c34ac31f35b27d7fff80336435a7939126297"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/ui_fish_cast_2.mp3?v=3277bf79a5a0",
+        "bytes": 13835,
+        "sha256": "3277bf79a5a07c80b29b7d44d6e2a825afc9b7f34487f775130c7469a9940a13"
       }
     ]
   },
   "ui_fish_reel": {
-    "url": "/audio/sfx/ui_fish_reel.mp3?v=132ca07893df",
+    "url": "/audio/sfx/ui_fish_reel_1.mp3?v=396624f7c9db",
     "loop": false,
     "category": "ui",
     "preload": "startup",
     "spatial": false,
     "gain": 1,
     "playbackRate": 1,
-    "bytes": 18224,
-    "hash": "132ca07893df",
+    "bytes": 32643,
+    "hash": "396624f7c9db",
     "variants": [
       {
-        "id": "main",
-        "url": "/audio/sfx/ui_fish_reel.mp3?v=132ca07893df",
-        "bytes": 18224,
-        "sha256": "132ca07893dfd39a0fb2bd74f241a9752b0d4701d66d79a597b9af70a52d64fd"
+        "id": "1",
+        "url": "/audio/sfx/ui_fish_reel_1.mp3?v=396624f7c9db",
+        "bytes": 32643,
+        "sha256": "396624f7c9db774ae5320675bb168e479e7dd8fe1a91df9cbe0589b9715132f3"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/ui_fish_reel_2.mp3?v=4f008b285318",
+        "bytes": 31390,
+        "sha256": "4f008b2853189a72e3e3fd6daa6c756aa95d3b78868adfb485388a5a99954449"
+      },
+      {
+        "id": "3",
+        "url": "/audio/sfx/ui_fish_reel_3.mp3?v=996c2799519d",
+        "bytes": 33270,
+        "sha256": "996c2799519d42913e850da609471474495355c285235f9978241dd51ee98bfe"
       }
     ]
   },
