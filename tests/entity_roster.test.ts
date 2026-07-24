@@ -219,6 +219,7 @@ function makeCtx() {
     squadRuns: new Map(),
     scenarioRuns: new Map(),
     scenePlaybacks: new Map(),
+    activeChoices: new Map(),
     playScene: vi.fn(),
     enterRift: vi.fn(),
     leaveRift: vi.fn(),

@@ -29,6 +29,7 @@ import { DUNGEONS, MOBS, QUESTS } from '../data';
 import { createGroundObject, createMob } from '../entity';
 import { instanceOriginOf } from '../instances/dungeons';
 import { enterStoryInstance, storyInstanceKeyFor } from '../instances/story_instances';
+import { startChoice } from '../scenes/choices';
 import type { InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
 import { despawnSquad, type SquadDirective, setSquadDirective, spawnSquad } from '../squad/squad';
@@ -63,7 +64,9 @@ export type ScenarioStageObjective =
   | { kind: 'survive'; seconds: number }
   // Completes when the stage's cued scene finishes (or was skipped); a
   // stage without a live playback completes immediately.
-  | { kind: 'scene' };
+  | { kind: 'scene' }
+  // Completes when the stage's cued dialogue choice resolves.
+  | { kind: 'choice' };
 
 export interface ScenarioStageDef {
   id: string;
@@ -73,6 +76,8 @@ export interface ScenarioStageDef {
   directives?: readonly { actorId: string; directive: SquadDirective }[];
   /** Scene script to play at stage start (scene system, src/sim/scenes/). */
   sceneId?: string;
+  /** Dialogue choice to cue at stage start (scenes/choices.ts). */
+  choiceId?: string;
   /** Combat stages retry from stage start on a wipe (the default for any
    * stage that spawns); set false for stages that must never re-arm. */
   retryOnWipe?: boolean;
@@ -249,6 +254,7 @@ function armStage(ctx: SimContext, def: ScenarioDef, run: ScenarioRun): void {
     setSquadDirective(ctx, run.claimId, d.actorId, directive);
   }
   if (stage.sceneId) ctx.playScene(run.claimId, stage.sceneId);
+  if (stage.choiceId) startChoice(ctx, run.claimId, stage.choiceId);
 }
 
 function clearStageEntities(ctx: SimContext, run: ScenarioRun): void {
@@ -305,6 +311,8 @@ function stageComplete(
       return ctx.time - run.stageStartedAt >= objective.seconds;
     case 'scene':
       return !ctx.scenePlaybacks.has(run.claimId);
+    case 'choice':
+      return !ctx.activeChoices.has(run.claimId);
   }
 }
 

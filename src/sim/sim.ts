@@ -373,6 +373,8 @@ import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
 import type { ScenarioRun } from './scenarios/scenarios';
 import * as scenarioMod from './scenarios/scenarios';
+import type { ActiveChoice } from './scenes/choices';
+import * as choicesMod from './scenes/choices';
 import type { ScenePlayback } from './scenes/scenes';
 import * as scenesMod from './scenes/scenes';
 import { persistedResource } from './serialize_resource';
@@ -1140,6 +1142,10 @@ export interface PlayerMeta {
   known: ResolvedAbility[];
   questLog: Map<string, QuestProgress>;
   questsDone: Set<string>;
+  // Last Bell campaign flags: small per-character story records written by
+  // dialogue choices (for example lastBellVote: 'for' | 'against'); later
+  // scenes read them to pick variant lines. Choices color, never branch.
+  campaignFlags: Map<string, string>;
   counters: RewardCounters;
   autoEquip: boolean;
   // sim.time when this character entered the world; powers /played. Session-only
@@ -1368,6 +1374,8 @@ export interface CharacterState {
   vendorBuyback?: InvSlot[];
   questLog: QuestProgress[];
   questsDone: string[];
+  // Optional so pre-campaign saves load cleanly (additive JSONB).
+  campaignFlags?: [string, string][];
   // Legacy arenaRating/Wins/Losses are treated as 1v1 data. The explicit
   // 1v1 fields are written by new saves, while old saves fall back cleanly.
   arenaRating?: number;
@@ -1658,6 +1666,8 @@ export class Sim {
   scenarioRuns = new Map<number, ScenarioRun>();
   // Last Bell scene playbacks, keyed by story-instance claim id (exitId).
   scenePlaybacks = new Map<number, ScenePlayback>();
+  // Last Bell active dialogue choices, keyed by claim id.
+  activeChoices = new Map<number, ActiveChoice>();
   // delve instances (separate slot pool from dungeons)
   delveRuns: DelveRun[] = [];
   private delvePetStash = new Map<number, PetState>();
@@ -2313,6 +2323,7 @@ export class Sim {
       known: [],
       questLog: new Map(),
       questsDone: new Set(),
+      campaignFlags: new Map(),
       counters: freshCounters(),
       autoEquip: opts?.autoEquip ?? false,
       joinedAt: this.time,
@@ -2467,6 +2478,7 @@ export class Sim {
           });
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
+      for (const [flag, value] of s.campaignFlags ?? []) meta.campaignFlags.set(flag, value);
       if (s.talents)
         // Revalidate the persisted build against the current rules + level budget
         // before it is baked into the flat mods below. A stored allocation replays
@@ -3113,6 +3125,7 @@ export class Sim {
         ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
       })),
       questsDone: [...meta.questsDone],
+      campaignFlags: [...meta.campaignFlags],
       arenaRating: meta.arenaRating,
       arenaWins: meta.arenaWins,
       arenaLosses: meta.arenaLosses,
@@ -3980,6 +3993,9 @@ export class Sim {
       },
       get scenePlaybacks() {
         return sim.scenePlaybacks;
+      },
+      get activeChoices() {
+        return sim.activeChoices;
       },
       get nextArenaMatchId() {
         return sim.nextArenaMatchId;
@@ -4851,6 +4867,7 @@ export class Sim {
     scenarioMod.updateScenarios(this.ctx);
     // Scene op emission runs after the stage that cued it (same idle contract).
     scenesMod.updateScenes(this.ctx);
+    choicesMod.updateChoices(this.ctx);
     lap?.('instances');
     this.updateDelveRuns();
     lap?.('delves');
@@ -8843,6 +8860,10 @@ export class Sim {
 
   requestSceneSkip(pid?: number): boolean {
     return scenesMod.requestSceneSkip(this.ctx, pid);
+  }
+
+  answerSceneChoice(choiceId: string, optionId: string, pid?: number): boolean {
+    return choicesMod.answerSceneChoice(this.ctx, choiceId, optionId, pid);
   }
 
   resetDungeonInstances(pid?: number): void {

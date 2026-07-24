@@ -3588,6 +3588,23 @@ export type SimEvent = { pid?: number } & (
   // Last Bell scene op (src/sim/scenes/): personal, one per participant.
   // The client's scene director interprets it; dialogue carries stable keys.
   | { type: 'scene'; sceneId: string; op: SceneWireOp }
+  // Last Bell dialogue choice prompt + resolution (src/sim/scenes/choices.ts).
+  | {
+      type: 'sceneChoice';
+      choiceId: string;
+      promptKey: string;
+      options: { id: string; key: string }[];
+      windowSeconds: number;
+      defaultOptionId: string;
+      leaderPid: number;
+    }
+  | {
+      type: 'sceneChoiceResult';
+      choiceId: string;
+      optionId: string;
+      replyKey?: string;
+      replySpeaker?: string;
+    }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   | { type: 'loot'; text: string }
   | {
