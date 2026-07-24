@@ -7,12 +7,7 @@
 // tests/bank_view.test.ts. Mirrors the bags_view / mailbox_view pure-core split.
 
 import { BANK_EXPANSION_SLOTS, moveBetweenContainers } from '../sim/bank';
-import {
-  cloneInvSlot,
-  type InvSlot,
-  type ItemDef,
-  type ItemInstancePayload,
-} from '../sim/types';
+import { cloneInvSlot, type InvSlot, type ItemDef, type ItemInstancePayload } from '../sim/types';
 import type { BankInfo } from '../world_api';
 import { type ItemLookup, matchesCategory } from './bag_filter';
 import { bagQualityKey } from './bags_view';

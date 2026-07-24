@@ -33,10 +33,7 @@ import {
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
 import { isInRaidInstance } from './instances/dungeons';
-import {
-  canFitExactLootSlot,
-  grantExactLootSlot,
-} from './loot/exact_item_grant';
+import { canFitExactLootSlot, grantExactLootSlot } from './loot/exact_item_grant';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
