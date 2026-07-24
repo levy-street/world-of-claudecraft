@@ -25,9 +25,13 @@ Everything else is a sibling module in one of these families:
 - **The nameplate suite** (below) owns all overhead text and badges.
 - **Pure logic cores** (below) hold Node-tested per-frame decisions.
 - **Perf governors:** `render_budget.ts` (adaptive frame budget, see
-  Performance) and `crowd_lod.ts` (pure crowd policy: pulls character
-  shadow/anim cadence in as rig counts climb; cosmetic-only, exempts what a
-  player reacts to).
+  Performance) and `crowd_lod.ts` (pure character LOD policy: the band plan
+  `characterLodBands` returns, which pulls shadow/anim cadence in as rig counts
+  climb and holds an animated far band, articulated rig at a low cadence, before
+  the frozen single-draw far mesh takes over. Its extension eases out on the
+  crowd knee, the per-tier `GFX.farCharacterAnimScale` ceiling, and live budget
+  pressure; cosmetic-only, and `showsStaticFarMesh` keeps anything a player
+  reacts to out of the frozen mesh inside the uncrowded base range).
 - `view_create_retry.ts`: bounded cooldown state for fail-soft character builds
   in per-frame paths, including required targets, form swaps, and visual-key
   swaps (`tests/view_create_retry.test.ts`).

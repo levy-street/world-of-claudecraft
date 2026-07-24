@@ -79,9 +79,14 @@ live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
   frame (swimming/sitting derived there, sim is unaware), calls `update(dt, s,
   animate)`, fires `playAttack()`/`playHit()` from sim events, and toggles live
   held items and effects. Don't drive visuals elsewhere.
-- **Crowd scaling:** the renderer consults `src/render/crowd_lod.ts` (pure,
-  unit-tested) for shadow/anim-cadence ranges as rig counts climb; the policy
-  is cosmetic-only and exempts anything a player reacts to.
+- **Crowd scaling / LOD bands:** the renderer consults `src/render/crowd_lod.ts`
+  (pure, unit-tested) for the shadow/anim-cadence ranges as rig counts climb,
+  and for where `setFar` swaps the rig for the baked idle-pose mesh. Between the
+  articulated band and that swap sits the animated far band: the rig keeps its
+  clips at a low cadence (the mixer integrates the skipped time via `pendingDt`,
+  so the clip plays at its real speed, just at fewer pose updates) instead of
+  freezing. The policy is cosmetic-only and exempts anything a player reacts to
+  from BOTH the cadence and the frozen mesh.
 - Death/revive are **edge-triggered locally** from `s.dead` (clamped one-shot);
   `flourish` plays on respawn. One-shots clamp on the last frame, see the
   T-pose-pop comment in `playOneShot`.

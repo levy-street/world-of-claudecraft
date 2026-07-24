@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { NAMEPLATE_INTERVAL_LOW_SEC, nameplateIntervalSec } from '../src/game/ui_tier_knobs';
+import { FAR_ANIM_RANGE_SCALE_MAX } from '../src/render/crowd_lod';
 import {
   classifyGpuRenderer,
   configureMaskedDoubleSidedVegetationMaterial,
@@ -707,5 +708,39 @@ describe('graphics tier resolution', () => {
     expect(mat.forceSinglePass).toBe(true);
     expect(mat.depthTest).toBe(true);
     expect(mat.depthWrite).toBe(true);
+  });
+});
+
+// The animated far character band (crowd_lod.ts) is skinning + draw-call cost, so
+// its per-tier ceiling opts out exactly where extra rigs are unaffordable. A tier
+// that silently regained the extension would push articulated rigs out to ~75yd on
+// software GL and phone WebKit, which is the profile the frozen far mesh exists for.
+describe('animated far character band: per-tier ceiling', () => {
+  it('opts the low tier and software GL out (straight-to-frozen far LOD)', () => {
+    expect(gfxInternalsForTest.settingsFor('low', desktop).farCharacterAnimScale).toBe(1);
+  });
+
+  it('extends the band on the desktop tiers', () => {
+    for (const tier of ['medium', 'high', 'ultra'] as const) {
+      const scale = gfxInternalsForTest.settingsFor(tier, desktop).farCharacterAnimScale;
+      expect(scale).toBe(FAR_ANIM_RANGE_SCALE_MAX);
+      expect(scale).toBeGreaterThan(1);
+    }
+  });
+
+  it('opts the phone memory profiles out on every tier', () => {
+    const nativeIos: GfxRuntimeHints = {
+      search: '',
+      maxTouchPoints: 5,
+      coarsePointer: true,
+      narrowViewport: true,
+      nativeApp: true,
+      platform: 'ios',
+    };
+    const constrained: GfxRuntimeHints = { ...nativeIos, nativeApp: false, deviceMemory: 2 };
+    for (const tier of ['medium', 'high', 'ultra'] as const) {
+      expect(gfxInternalsForTest.settingsFor(tier, nativeIos).farCharacterAnimScale).toBe(1);
+      expect(gfxInternalsForTest.settingsFor(tier, constrained).farCharacterAnimScale).toBe(1);
+    }
   });
 });

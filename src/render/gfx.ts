@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { NATIVE_APP } from '../client_origin';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
+import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
 import { isSoftwareRendererName } from './software_renderer';
 
 // Quality tiers: every tier-dependent knob keys off this module instead of
@@ -108,6 +109,15 @@ export interface GfxSettings {
   readonly nativeIosMemoryProfile: boolean;
   /** Global cap for inactive skinned character rigs retained for reuse. */
   readonly maxPooledCharacterVisuals: number;
+  /**
+   * Linear range multiplier for the animated far character band (`crowd_lod.ts`):
+   * how much further than the articulated band a rig keeps animating at a low
+   * cadence before it collapses to the frozen single-draw far mesh. 1 keeps the
+   * pre-existing straight-to-frozen behaviour, which is what phone-class and
+   * software profiles want; the crowd knee and the frame-budget pressure ease it
+   * back to 1 on their own, so this is only the per-tier ceiling.
+   */
+  readonly farCharacterAnimScale: number;
 }
 
 export interface GfxRuntimeBudget {
@@ -739,6 +749,11 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     constrainedMemory,
     nativeIosMemoryProfile,
     maxPooledCharacterVisuals: nativeIosMemoryProfile ? 6 : Number.POSITIVE_INFINITY,
+    // Extra articulated rigs are skinning + draw-call cost, so the phone-class
+    // memory profiles and the low tier (which includes software GL) opt out and
+    // keep the straight-to-frozen far LOD.
+    farCharacterAnimScale:
+      tier === 'low' || constrainedMemory || nativeIosMemoryProfile ? 1 : FAR_ANIM_RANGE_SCALE_MAX,
   };
   if (hints?.graphicsPreset === PRESET_ADVANCED) {
     if ((hints.terrainDetail ?? 1) < 0.5) settings = { ...settings, terrainSplat: false };
