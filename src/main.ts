@@ -274,6 +274,7 @@ import { PerfOverlay } from './ui/perf_overlay';
 import { type PerfOverlayConfig, PerfOverlayConfigStore } from './ui/perf_overlay_config';
 import { buildPerfOverlayView, FrameMeter } from './ui/perf_overlay_model';
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
+import { installItemDetailModifier } from './ui/procedural_item_details';
 import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overlay';
 import { createSpectateBadge } from './ui/spectate_badge';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
@@ -329,6 +330,7 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.quer
 document.body.classList.toggle('native-app', NATIVE_APP);
 document.body.classList.toggle('desktop-app', DESKTOP_APP);
 if (NATIVE_APP) document.body.classList.add('mobile-touch');
+installItemDetailModifier(document, window);
 // Electron shell integration: push t()-localized crash-dialog strings to the
 // main process and render the auto-update toast (no-op without the bridge).
 if (DESKTOP_APP) initDesktopShellIntegration();

@@ -11,6 +11,12 @@ afterEach(() => {
     configurable: true,
     value: originalNavigator,
   });
+  if (typeof document !== 'undefined') {
+    document.body?.classList.remove('gamepad-pointer-mode');
+    document.querySelector?.('.gamepad-cursor')?.remove();
+  }
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
 function gamepadWithPressed(...pressed: number[]): Gamepad {
@@ -63,6 +69,87 @@ describe('GamepadManager', () => {
     manager.poll(1 / 60);
 
     expect(onInputEdge).toHaveBeenCalledTimes(2);
+  });
+
+  it('synthesizes hover in pointer mode and exposes controller advanced details', () => {
+    const classes = new Set<string>();
+    const listeners = new Map<string, Set<(event: { type: string }) => void>>();
+    const target = {
+      addEventListener(type: string, listener: (event: { type: string }) => void) {
+        const bucket = listeners.get(type) ?? new Set();
+        bucket.add(listener);
+        listeners.set(type, bucket);
+      },
+      dispatchEvent(event: { type: string }) {
+        for (const listener of listeners.get(event.type) ?? []) listener(event);
+        return true;
+      },
+    };
+    const cursor = {
+      className: '',
+      style: { display: '', left: '', top: '' },
+      setAttribute: vi.fn(),
+    };
+    const fakeDocument = {
+      hasFocus: () => true,
+      createElement: () => cursor,
+      elementFromPoint: () => target,
+      querySelector: () => null,
+      body: {
+        appendChild: vi.fn(),
+        classList: {
+          add: (name: string) => classes.add(name),
+          remove: (name: string) => classes.delete(name),
+          contains: (name: string) => classes.has(name),
+        },
+      },
+    };
+    class FakeMouseEvent {
+      constructor(
+        readonly type: string,
+        readonly init: MouseEventInit = {},
+      ) {}
+    }
+    vi.stubGlobal('window', { innerWidth: 1280, innerHeight: 720 });
+    vi.stubGlobal('document', fakeDocument);
+    vi.stubGlobal('MouseEvent', FakeMouseEvent);
+
+    const enter = vi.fn();
+    const move = vi.fn();
+    const leave = vi.fn();
+    target.addEventListener('mouseenter', enter as (event: { type: string }) => void);
+    target.addEventListener('mousemove', move as (event: { type: string }) => void);
+    target.addEventListener('mouseleave', leave as (event: { type: string }) => void);
+
+    let pad = gamepadWithPressed();
+    let pointerMode = true;
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: { getGamepads: () => [pad] },
+    });
+    const input = {
+      applyGamepadLook: vi.fn(),
+      setGamepadMove: vi.fn(),
+      clearGamepadMove: vi.fn(),
+      triggerGamepadJump: vi.fn(),
+    } as unknown as Input;
+    const manager = new GamepadManager(input, new GamepadBindings(), {
+      onAction: vi.fn(),
+      onInputEdge: vi.fn(),
+      isPointerMode: () => pointerMode,
+    });
+    (manager as unknown as { index: number | null }).index = 0;
+
+    manager.poll(1 / 60);
+    expect(classes.has('gamepad-pointer-mode')).toBe(true);
+    expect(enter).toHaveBeenCalledTimes(1);
+    expect(move).toHaveBeenCalledTimes(1);
+
+    pad = gamepadWithPressed();
+    pointerMode = false;
+    manager.poll(1 / 60);
+    expect(classes.has('gamepad-pointer-mode')).toBe(false);
+    expect(leave).toHaveBeenCalledTimes(1);
   });
 });
 

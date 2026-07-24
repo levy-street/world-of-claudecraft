@@ -17,6 +17,7 @@ export type ItemWeaponType = WeaponSkinType | 'polearm';
 
 export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   // Swords
+  iron_broadsword: 'sword',
   worn_sword: 'sword',
   ironedge_longsword: 'sword',
   thorium_warblade: 'sword',
@@ -96,6 +97,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   drogmars_skullcleaver: 'axe',
   gravewyrm_cleaver: 'axe',
   // Staves
+  ashwood_staff: 'staff',
   gnarled_staff: 'staff',
   elderwood_battle_staff: 'staff',
   apprentice_staff: 'staff',

@@ -42,8 +42,8 @@ export function itemNumber(value: number, fractionDigits = 0): string {
   });
 }
 
-/** The WORN-slot tooltip payload (Professions 2.0): exactly the
- *  fields the public eqi wire carries (signer/enchant/rolled, the
+/** The WORN-slot tooltip payload (Professions 2.0 + procedural loot): exactly the
+ *  fields the public eqi wire carries (signer/enchant/rolled/procedural, the
  *  worn-identity trim), so the offline paperdoll and the online mirror
  *  render identical worn tooltips. Online, equippedInstances is decoded from
  *  the stripped eqi allowlist and never carries bindOnTrade/boundTo/charges;
@@ -59,6 +59,7 @@ export function wornTooltipInstance(
   if (instance.signer !== undefined) worn.signer = instance.signer;
   if (instance.enchant !== undefined) worn.enchant = instance.enchant;
   if (instance.rolled !== undefined) worn.rolled = instance.rolled;
+  if (instance.procedural !== undefined) worn.procedural = instance.procedural;
   return worn;
 }
 

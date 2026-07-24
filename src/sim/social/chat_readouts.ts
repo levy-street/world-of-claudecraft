@@ -32,6 +32,7 @@ import {
 import { formatMoney } from '../format_money';
 import { MARKET_MAX_LISTINGS } from '../market';
 import * as petCommands from '../pet/pet_commands';
+import { itemVendorSellValue } from '../procedural_vendor_value';
 import { FALL_SAFE_DISTANCE, type PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { threatEntries } from '../threat';
@@ -136,7 +137,7 @@ export function buybackReadout(meta: PlayerMeta): string {
   const parts = slots.map((s) => {
     const def = ITEMS[s.itemId];
     const qty = s.count > 1 ? ` x${s.count}` : '';
-    return `${def.name}${qty} (${formatMoney(def.sellValue)} each)`;
+    return `${def.name}${qty} (${formatMoney(itemVendorSellValue(def, s.instance))} each)`;
   });
   return `Vendor buyback (${slots.length}): ${parts.join(', ')}. Repurchase at any merchant.`;
 }

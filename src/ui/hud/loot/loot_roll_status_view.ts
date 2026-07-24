@@ -20,6 +20,7 @@ export interface LootRollStatusRow {
   itemId: string;
   itemName: string;
   quality: LootRollGroupStatus['quality'];
+  instance?: LootRollGroupStatus['instance'];
   expiresAt: number;
   // true while the local player's need/greed/pass prompt for this roll is still
   // on screen (the strip rides the prompt row); false renders the watch-only row.
@@ -47,6 +48,7 @@ export function computeLootRollStatusRows(
     itemId: status.itemId,
     itemName: status.itemName,
     quality: status.quality,
+    ...(status.instance && { instance: status.instance }),
     expiresAt: status.expiresAt,
     hasPrompt: shown.has(status.rollId),
     answered: status.entries.filter((entry) => entry.choice !== null).length,

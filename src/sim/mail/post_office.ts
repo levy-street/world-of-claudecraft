@@ -16,6 +16,8 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now (enforced by tests/architecture.test.ts). The post draws NO rng.
 
+import type { MailAttachmentRequest } from '../../world_api';
+import { bagCapacity, canGrantItemInstance, instancedCountCap } from '../bags';
 import {
   HEROIC_MARK_LETTER,
   type LetterDef,
@@ -23,9 +25,25 @@ import {
   WELCOME_LETTER,
 } from '../content/letters';
 import { ITEMS } from '../data';
+import { removeExactItemInstance } from '../items';
+import { publicItemInstanceView } from '../procedural_item_public';
+import { duplicateProceduralItemUids } from '../procedural_item_validation';
+import {
+  assertUniqueProceduralItemUids,
+  sanitizePersistedItemInstance,
+} from '../procedural_persistence';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { dist2d, type Entity, INTERACT_RANGE, type InvSlot, type MailResultCode } from '../types';
+import {
+  cloneInvSlot,
+  cloneItemInstancePayload,
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  type InvSlot,
+  type ItemInstancePayload,
+  type MailResultCode,
+} from '../types';
 
 const MAIL_RANGE = INTERACT_RANGE + 2; // you must stand at a raven pillar to tend your post
 export const MAIL_POSTAGE = 30; // copper per letter
@@ -304,7 +322,7 @@ export class PostOffice {
     subject: string,
     body: string,
     copper: number,
-    items: InvSlot[],
+    items: MailAttachmentRequest[],
     pid?: number,
   ): void {
     const r = this.ctx.resolve(pid);
@@ -343,7 +361,7 @@ export class PostOffice {
     subject: string,
     body: string,
     copper: number,
-    items: InvSlot[],
+    items: readonly MailAttachmentRequest[],
     pid?: number,
   ): void {
     const r = this.ctx.resolve(pid);
@@ -362,26 +380,93 @@ export class PostOffice {
       this.result(meta.entityId, 'tooManyParcels', { value: MAIL_MAX_ATTACHMENTS });
       return;
     }
-    const wanted = new Map<string, number>();
-    for (const s of items) {
-      const def = ITEMS[s.itemId];
-      const count = Math.floor(s.count);
-      if (!def || !Number.isFinite(count) || count < 1) return;
+
+    const wantedFungible = new Map<string, number>();
+    const seenUids = new Set<string>();
+    const escrowItems: InvSlot[] = [];
+    for (const request of items) {
+      if (!request || typeof request.itemId !== 'string' || !Number.isFinite(request.count)) {
+        return;
+      }
+      const def = ITEMS[request.itemId];
+      if (!def) return;
+      const hasUid = request.instanceUid !== undefined;
+      if (
+        hasUid &&
+        (typeof request.instanceUid !== 'string' ||
+          request.instanceUid.length === 0 ||
+          request.instanceUid.length > 96 ||
+          Math.floor(request.count) !== 1)
+      ) {
+        this.result(meta.entityId, 'notEnoughItems');
+        return;
+      }
       if (def.soulbound) {
         this.result(meta.entityId, 'noMailSoulbound');
         return;
       }
-      if (def.kind === 'quest' || def.noMarketList) {
+      if (def.kind === 'quest') {
         this.result(meta.entityId, 'noMailQuestItems');
         return;
       }
-      wanted.set(s.itemId, (wanted.get(s.itemId) ?? 0) + count);
+      if (hasUid) {
+        const uid = request.instanceUid as string;
+        if (seenUids.has(uid)) {
+          this.result(meta.entityId, 'notEnoughItems');
+          return;
+        }
+        seenUids.add(uid);
+        const held = meta.inventory.find(
+          (slot) =>
+            slot.itemId === request.itemId &&
+            slot.count > 0 &&
+            slot.instance?.procedural?.uid === uid,
+        );
+        if (!held?.instance) {
+          this.result(meta.entityId, 'notEnoughItems');
+          return;
+        }
+        if (held.instance.boundTo !== undefined) {
+          this.result(meta.entityId, 'noMailSoulbound');
+          return;
+        }
+        // noMarketList blocks the World Market, not direct Ravenpost transfer
+        // of an explicitly selected procedural copy.
+        if (def.noMarketList && !held.instance.procedural) {
+          this.result(meta.entityId, 'noMailQuestItems');
+          return;
+        }
+        // A UID already escrowed elsewhere indicates corrupted/replayed state.
+        if (
+          this.mail.some((letter) =>
+            letter.items.some((slot) => slot.instance?.procedural?.uid === uid),
+          ) ||
+          [...this.ctx.players.values()].some(
+            (player) =>
+              player.entityId !== meta.entityId &&
+              player.inventory.some((slot) => slot.instance?.procedural?.uid === uid),
+          )
+        ) {
+          this.result(meta.entityId, 'notEnoughItems');
+          return;
+        }
+        escrowItems.push({
+          itemId: request.itemId,
+          count: 1,
+          instance: cloneItemInstancePayload(held.instance),
+        });
+        continue;
+      }
+      const count = Math.floor(request.count);
+      if (count < 1) return;
+      if (def.noMarketList) {
+        this.result(meta.entityId, 'noMailQuestItems');
+        return;
+      }
+      wantedFungible.set(request.itemId, (wantedFungible.get(request.itemId) ?? 0) + count);
+      escrowItems.push({ itemId: request.itemId, count });
     }
-    for (const [itemId, count] of wanted) {
-      // Count only the fungible stock (#1165): an instanced copy (signer/charges/
-      // rolled/boundTo) is never swept into a letter, exactly as the World Market
-      // validates against countFungibleItem. A player whose only copies are
-      // instanced gets notEnoughItems, just like on the market.
+    for (const [itemId, count] of wantedFungible) {
       if (this.ctx.countFungibleItem(itemId, meta.entityId) < count) {
         this.result(meta.entityId, 'notEnoughItems');
         return;
@@ -395,13 +480,18 @@ export class PostOffice {
       this.result(meta.entityId, 'recipientBoxFull');
       return;
     }
-    // Escrow: coin and goods leave the sender now, ride with the raven. Remove
-    // the fungible stock only (#1165), matching the countFungibleItem check above
-    // so an instanced copy can never be consumed as a plain stack member and come
-    // back later as a generic copy.
+
+    // All validation is complete before the first mutation. The command is
+    // synchronous, so these exact slots cannot change between validation and
+    // escrow removal.
     meta.copper -= coin + MAIL_POSTAGE;
-    for (const s of items)
-      this.ctx.removeFungibleItem(s.itemId, Math.floor(s.count), meta.entityId);
+    for (const request of items) {
+      if (request.instanceUid) {
+        removeExactItemInstance(this.ctx, request.itemId, request.instanceUid, meta.entityId);
+      } else {
+        this.ctx.removeFungibleItem(request.itemId, Math.floor(request.count), meta.entityId);
+      }
+    }
     this.book({
       recipientKey: recipient.key,
       recipientName: recipient.name,
@@ -410,12 +500,13 @@ export class PostOffice {
       subject: cleanSubject,
       body: cleanBody,
       copper: coin,
-      items: items.map((s) => ({ itemId: s.itemId, count: Math.floor(s.count) })),
+      items: escrowItems,
       delaySeconds: MAIL_DELIVERY_SECONDS,
     });
     this.result(meta.entityId, 'sent', { name: recipient.name, value: MAIL_POSTAGE });
-    // Only a letter carrying coin or parcels counts; a bare note does not.
-    if (coin > 0 || items.length > 0) this.ctx.bumpDeedStat(meta, 'mailAttachmentsSent', 1);
+    if (coin > 0 || escrowItems.length > 0) {
+      this.ctx.bumpDeedStat(meta, 'mailAttachmentsSent', 1);
+    }
   }
 
   // Take everything attached to one letter: coin into the purse, parcels into
@@ -435,6 +526,29 @@ export class PostOffice {
       return;
     }
     const hadAttachments = m.copper > 0 || m.items.length > 0;
+    // Prepare the authoritative arrival payloads before the first mutation.
+    // Bind-on-trade is a transfer primitive, not a trade-window special case:
+    // an armed mailed copy locks to the recipient when collected.
+    const arrivals = m.items.map((slot) => {
+      const arrival = cloneInvSlot(slot);
+      if (arrival.instance?.bindOnTrade === true && arrival.instance.boundTo === undefined) {
+        arrival.instance.boundTo = meta.entityId;
+      }
+      return arrival;
+    });
+    // A replayed/corrupt UID may already exist in any character-owned
+    // container. Reject the whole take before coin or an earlier parcel moves,
+    // so addItemInstance can never throw halfway through collection.
+    const duplicateUids = duplicateProceduralItemUids({
+      inventory: [...meta.inventory, ...arrivals.filter((slot) => slot.instance)],
+      bank: meta.bank.inventory,
+      buyback: meta.vendorBuyback,
+      equipmentInstance: meta.equipmentInstance,
+    });
+    if (duplicateUids.length > 0) {
+      this.result(meta.entityId, 'notEnoughItems');
+      return;
+    }
     // Coin is never capacity-gated: it always lands in the purse.
     if (m.copper > 0) {
       meta.copper += m.copper;
@@ -446,11 +560,21 @@ export class PostOffice {
     // and never force-added past the bag budget. canAddItem is checked per stack
     // against the live inventory, so cumulative capacity is honoured.
     const kept: InvSlot[] = [];
-    for (const s of m.items) {
-      if (this.ctx.canAddItem(s.itemId, s.count, meta.entityId)) {
+    for (let index = 0; index < arrivals.length; index++) {
+      const s = arrivals[index];
+      if (s.instance) {
+        const fits = canGrantItemInstance(
+          meta.inventory,
+          bagCapacity(meta.bags),
+          s.itemId,
+          s.instance,
+        );
+        if (fits) this.ctx.addItemInstance(s.itemId, s.instance, meta.entityId);
+        else kept.push(m.items[index]);
+      } else if (this.ctx.canAddItem(s.itemId, s.count, meta.entityId)) {
         this.ctx.addItem(s.itemId, s.count, meta.entityId);
       } else {
-        kept.push(s);
+        kept.push(m.items[index]);
       }
     }
     m.items = kept;
@@ -587,7 +711,7 @@ export class PostOffice {
       subject: opts.subject,
       body: opts.body,
       copper: opts.copper,
-      items: opts.items,
+      items: opts.items.map(cloneInvSlot),
       deliverAt: this.ctx.time + Math.max(0, opts.delaySeconds),
       expiresAt,
       read: false,
@@ -615,7 +739,13 @@ export class PostOffice {
         subject: m.subject,
         body: m.body,
         copper: m.copper,
-        items: m.items.map((s) => ({ ...s })),
+        items: m.items.map((s) => ({
+          itemId: s.itemId,
+          count: s.count,
+          ...(s.instance && {
+            instance: publicItemInstanceView(s.instance) as ItemInstancePayload,
+          }),
+        })),
         read: m.read,
       })),
       totalCount: mine.length,
@@ -665,7 +795,7 @@ export class PostOffice {
         subject: m.subject,
         body: m.body,
         copper: m.copper,
-        items: m.items.map((s) => ({ ...s })),
+        items: m.items.map(cloneInvSlot),
         deliverIn: Math.max(0, Math.round(m.deliverAt - now)),
         secondsLeft: Number.isFinite(m.expiresAt) ? Math.max(0, Math.round(m.expiresAt - now)) : -1,
         read: m.read,
@@ -677,6 +807,10 @@ export class PostOffice {
 
   loadMail(save: MailSave | null | undefined): void {
     if (!save) return;
+    // Deserialize into isolated candidates. No live mail, counters, or derived
+    // indices change until every payload has sanitized and global UID
+    // uniqueness has passed.
+    const loadedMail: MailMessage[] = [];
     const returnedParcels: {
       recipientKey: string;
       recipientName: string;
@@ -694,7 +828,17 @@ export class PostOffice {
       // edit): dormant, recoverable data, exactly like market listings.
       const items = (m.items ?? [])
         .filter((s) => s && typeof s.itemId === 'string')
-        .map((s) => ({ itemId: s.itemId, count: Math.max(1, s.count | 0) }));
+        .map((s, index) => {
+          const instance =
+            s.instance && typeof s.instance === 'object'
+              ? sanitizePersistedItemInstance(s.instance, s.itemId, `mail[${m.id}].items[${index}]`)
+              : undefined;
+          const count = Math.min(
+            instancedCountCap(ITEMS[s.itemId], instance),
+            Math.max(1, Math.floor(Number(s.count)) || 1),
+          );
+          return instance ? { itemId: s.itemId, count, instance } : { itemId: s.itemId, count };
+        });
       const kind: MailKind = m.kind === 'player' || m.kind === 'npc' ? m.kind : 'system';
       const recipientName = String(m.recipientName ?? m.recipientKey);
       const senderName = String(m.senderName ?? '?');
@@ -709,8 +853,7 @@ export class PostOffice {
       // Migration for player parcels sent before an item became soulbound. The
       // persisted model has no stable sender key, so return only the newly bound
       // stacks to the senderName-keyed mailbox. Mark the return as system mail so
-      // a serialize/load round trip never returns it again. Ordinary items and
-      // attached coin remain on the original letter.
+      // a serialize/load round trip never returns it again.
       if (returnedItems.length > 0) {
         returnedParcels.push({
           recipientKey: senderName,
@@ -730,9 +873,6 @@ export class PostOffice {
         m.secondsLeft === -1 || !Number.isFinite(m.secondsLeft)
           ? Infinity
           : this.ctx.time + Math.max(0, m.secondsLeft);
-      // Deploy clock: a save written before the attachment window existed
-      // persisted player parcels with the never sentinel. Their window starts
-      // at this load, never retroactively. System/npc parcels keep Infinity.
       const expiresAt =
         returnedItems.length > 0 && retainedItems.length === 0 && copper <= 0
           ? Math.min(persistedExpiresAt, this.ctx.time + MAIL_EXPIRY_SECONDS)
@@ -741,7 +881,7 @@ export class PostOffice {
               !Number.isFinite(persistedExpiresAt)
             ? this.ctx.time + MAIL_ATTACHMENT_EXPIRY_SECONDS
             : persistedExpiresAt;
-      this.mail.push({
+      loadedMail.push({
         id: m.id,
         recipientKey: m.recipientKey,
         recipientName,
@@ -756,15 +896,46 @@ export class PostOffice {
         expiresAt,
         read: m.read === true,
         returned: m.returned === true,
-        // Already-delivered letters never re-toast after a restart.
         announced: deliverIn <= 0,
       });
     }
-    const maxId = this.mail.reduce((mx, m) => Math.max(mx, m.id + 1), 1);
-    this.nextMailId = Math.max(this.nextMailId, save.nextMailId ?? 1, maxId);
-    for (const parcel of returnedParcels) this.book(parcel);
-    // The unread index is derived state, never persisted: rebuild it from the
-    // freshly loaded book.
+
+    const maxId = loadedMail.reduce(
+      (mx, message) => (Number.isFinite(message.id) ? Math.max(mx, message.id + 1) : mx),
+      1,
+    );
+    let candidateNextMailId = Math.max(
+      this.nextMailId,
+      Number.isFinite(save.nextMailId) ? Math.max(1, Math.floor(save.nextMailId)) : 1,
+      maxId,
+    );
+    const returnedMessages = returnedParcels.map((parcel): MailMessage => {
+      const hasAttachments = parcel.copper > 0 || parcel.items.length > 0;
+      return {
+        id: candidateNextMailId++,
+        recipientKey: parcel.recipientKey,
+        recipientName: parcel.recipientName,
+        senderName: parcel.senderName,
+        kind: parcel.kind,
+        subject: parcel.subject,
+        body: parcel.body,
+        copper: parcel.copper,
+        items: parcel.items.map(cloneInvSlot),
+        deliverAt: this.ctx.time + Math.max(0, parcel.delaySeconds),
+        expiresAt: hasAttachments ? Infinity : this.ctx.time + MAIL_EXPIRY_SECONDS,
+        read: false,
+        announced: false,
+      };
+    });
+    const candidateMail = [...loadedMail, ...returnedMessages];
+    assertUniqueProceduralItemUids(
+      { mail: candidateMail.flatMap((letter) => letter.items) },
+      'mail state',
+    );
+
+    // Commit the validated snapshot atomically, then derive runtime-only state.
+    this.mail = candidateMail;
+    this.nextMailId = candidateNextMailId;
     this.rebuildUnreadIndex();
   }
 }

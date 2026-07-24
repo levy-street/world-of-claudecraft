@@ -49,7 +49,7 @@ import type { ItemDef, ItemInstancePayload } from '../sim/types';
  */
 export interface PainterHostPresentation {
   /** `<img>` markup for an item's procedural icon. */
-  itemIcon(item: ItemDef): string;
+  itemIcon(item: ItemDef, instance?: ItemInstancePayload): string;
   /** Localized coin markup (gold/silver/copper) for a copper amount. */
   moneyHtml(copper: number): string;
   /** Full item tooltip markup (name, stats, compare). The optional per-copy

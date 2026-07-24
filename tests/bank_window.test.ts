@@ -42,6 +42,12 @@ describe('bank_window: no magic values', () => {
       /\.bank-item:focus-visible,\s*\.bank-buy-btn:focus-visible \{\s*outline: 2px solid var\(--color-border-focus\);/,
     );
   });
+
+  it('marks procedural cells for non-color fallback styling and keeps the rune icon-local', () => {
+    expect(painter).toContain('cell.dataset.proceduralRarity = procedural.rarity');
+    expect(painter).toContain("legendaryPowerRuneSvg('bank-power-rune')");
+    expect(painter).toContain('this.deps.itemIcon(item, slot.instance)');
+  });
 });
 
 describe('bank_window: load-bearing behaviors preserved', () => {
@@ -458,12 +464,11 @@ describe('bank_window: mobile pairing (hud.mobile.css)', () => {
     // #ui's zoom multiplies author lengths, so a raw 50vw split only tiles at
     // uiScale 1 (halves gap above 1, overlap below 1; the 2026-07-07 QA finding).
     // The split must divide the shared --app-vw box by the live scale.
-    const split = 'calc(var(--app-vw) / var(--ui-scale, 1) / 2)';
-    expect(mobileCss).toContain(
-      `body.mobile-touch.bank-open #bank-window {\n    left: max(10px, env(safe-area-inset-left));\n    right: ${split};`,
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch\.bank-open #bank-window \{\s*left: max\(10px, env\(safe-area-inset-left\)\);\s*right: calc\(var\(--app-vw\) \/ var\(--ui-scale, 1\) \/ 2\);/,
     );
-    expect(mobileCss).toContain(
-      `body.mobile-touch.bank-open #bags {\n    left: ${split};\n    right: max(10px, env(safe-area-inset-right));`,
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch\.bank-open #bags \{\s*left: calc\(var\(--app-vw\) \/ var\(--ui-scale, 1\) \/ 2\);\s*right: max\(10px, env\(safe-area-inset-right\)\);/,
     );
   });
 

@@ -9,7 +9,8 @@
 //
 // DOM-free and i18n-free so tests/vendor_view.test.ts can drive it directly.
 
-import type { InvSlot, ItemDef } from '../../../sim/types';
+import { itemVendorSellValue } from '../../../sim/procedural_vendor_value';
+import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import { vendorStackSize } from '../../../sim/vendor_stack';
 
 export interface VendorGoodsRow {
@@ -39,6 +40,8 @@ export interface VendorBuybackRow {
   itemId: string;
   item: ItemDef;
   count: number;
+  /** Exact copy held by buyback; procedural identity must survive the round trip. */
+  instance?: ItemInstancePayload;
   /** Copper the player pays to buy the item back (the vendor sell value). */
   price: number;
 }
@@ -86,7 +89,13 @@ export function buildVendorView(
   for (const slot of buybackSlots) {
     const item = items[slot.itemId];
     if (!item || slot.count <= 0) continue;
-    buyback.push({ itemId: slot.itemId, item, count: slot.count, price: item.sellValue });
+    buyback.push({
+      itemId: slot.itemId,
+      item,
+      count: slot.count,
+      ...(slot.instance && { instance: slot.instance }),
+      price: itemVendorSellValue(item, slot.instance),
+    });
   }
   return {
     goods,

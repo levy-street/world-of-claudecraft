@@ -186,6 +186,11 @@ export function onCastCompleted(
   // Elemental Convergence (mage choice row): school-alternation memory, kept
   // here because every completed cast funnels through this hook. Draws no rng.
   convergenceOnCast(ctx, player, abilityId);
+  ctx.triggerEquipmentEffects(player, {
+    kind: 'ability_cast',
+    abilityId,
+    targetId: target?.id,
+  });
   if (wasEmpowered) return;
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;

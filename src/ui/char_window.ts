@@ -34,6 +34,8 @@ import type { ItemDragState } from './item_drag_state';
 import { wornTooltipInstance } from './item_instance_tooltip';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import { itemPresentationName, itemPresentationQuality } from './procedural_item_presentation';
+import { legendaryPowerRuneSvg } from './procedural_loot_icons';
 import { archetypeImageUrl, professionImageUrl } from './profession_art';
 import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
@@ -121,6 +123,7 @@ export interface CharWindowDeps extends PainterHostPresentation {
   closeOthers(): void;
   hideTooltip(): void;
   captureFocus(): HTMLElement | null;
+  focusFirstInteractive(root: HTMLElement, preferredSelector?: string): void;
   restoreFocus(target: HTMLElement | null): void;
   slotName(slot: EquipSlot): string;
   statCellHtml(stat: StatId): string;
@@ -182,6 +185,13 @@ export class CharWindow {
     this.deps.closeOthers();
     this.render();
     this.deps.root().style.display = 'block';
+    // The shared focus trap only cycles once focus is inside the dialog. Explicitly
+    // enter the freshly rendered sheet so opening it from a keybind/controller never
+    // leaves focus on the obscured world/minimap opener.
+    this.deps.focusFirstInteractive(
+      this.deps.root(),
+      '.equip-unequip, [data-act="share-card"], .char-skin-row button',
+    );
   }
 
   close(): void {
@@ -302,14 +312,29 @@ export class CharWindow {
     // the touch hit test (item_drop_hit_test.ts), which has no drop event to read.
     row.dataset.equipSlot = slot;
     this.bindEquipDropTarget(row, slot);
+    const world = this.deps.world();
+    const instance = item
+      ? wornTooltipInstance(world.entities.get(world.playerId)?.equippedInstances?.[slot])
+      : undefined;
+    const presentationQuality = item ? itemPresentationQuality(item, instance) : 'common';
     const qColor = !item
       ? SLOT_EMPTY_TEXT_COLOR
-      : (QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR);
-    const icon = item
-      ? this.deps.itemIcon(item)
+      : (QUALITY_COLOR[presentationQuality] ?? QUALITY_DEFAULT_COLOR);
+    const itemName = item
+      ? itemPresentationName({ name: itemDisplayName(item) }, instance)
+      : t('itemUi.equipment.empty');
+    const iconMarkup = item
+      ? this.deps.itemIcon(item, instance)
       : `<img class="item-icon" style="border-color:${SLOT_EMPTY_BORDER_COLOR}" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`;
-    row.innerHTML = `${icon}
-        <div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item" style="color:${qColor}">${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
+    const powerRune =
+      item && instance?.procedural?.legendaryPowerId
+        ? legendaryPowerRuneSvg('equip-power-rune')
+        : '';
+    if (item) row.classList.add(`q-${presentationQuality}`);
+    if (instance?.procedural) row.dataset.proceduralRarity = instance.procedural.rarity;
+    if (item) row.style.setProperty('--item-power-rarity', qColor);
+    row.innerHTML = `<span class="equip-icon-wrap">${iconMarkup}${powerRune}</span>
+        <div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item" style="color:${qColor}">${esc(itemName)}</div></div>`;
     if (item) {
       // Soft glow in the item's quality color (derived, no getComputedStyle).
       const iconEl = row.querySelector<HTMLImageElement>('.item-icon');
@@ -319,12 +344,12 @@ export class CharWindow {
         // the self entity mirror carries equippedInstances in both worlds.
         // Projected through wornTooltipInstance so the offline
         // full payload renders exactly what the online eqi-trimmed mirror
-        // does: worn identity is signer/enchant/rolled, never the bond.
-        const world = this.deps.world();
-        const instance = wornTooltipInstance(
-          world.entities.get(world.playerId)?.equippedInstances?.[slot],
+        // does: worn identity includes procedural rolls, never the bond.
+        const liveWorld = this.deps.world();
+        const liveInstance = wornTooltipInstance(
+          liveWorld.entities.get(liveWorld.playerId)?.equippedInstances?.[slot],
         );
-        return `${this.deps.itemTooltip(item, instance)}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`;
+        return `${this.deps.itemTooltip(item, liveInstance)}<div class="tt-sub">${esc(t('hudChrome.paperdoll.unequipHint'))}</div>`;
       });
       // Corner x: a styled glyph control (not an in-game icon), revealed on
       // hover/focus and always shown on touch where right-click is unavailable.
@@ -332,10 +357,7 @@ export class CharWindow {
       unequip.type = 'button';
       unequip.className = 'equip-unequip-btn';
       unequip.textContent = '×';
-      unequip.setAttribute(
-        'aria-label',
-        t('hudChrome.paperdoll.unequipAria', { item: itemDisplayName(item) }),
-      );
+      unequip.setAttribute('aria-label', t('hudChrome.paperdoll.unequipAria', { item: itemName }));
       unequip.addEventListener('click', (ev) => {
         ev.stopPropagation();
         this.doUnequip(slot, true);
@@ -365,7 +387,7 @@ export class CharWindow {
    *  here). The refusals are pre-empted client-side with the sim's OWN wording
    *  (tSim), so no doomed command is sent and the toast reads identically to the
    *  authoritative one the server would emit; the sim re-validates regardless. */
-  dropOnEquipSlot(itemId: string, slot: EquipSlot): void {
+  dropOnEquipSlot(itemId: string, slot: EquipSlot, instanceUid?: string): void {
     const item = ITEMS[itemId];
     if (!item) return;
     const world = this.deps.world();
@@ -386,7 +408,7 @@ export class CharWindow {
         );
         return;
       case 'equip':
-        world.equipItemToSlot(itemId, slot);
+        world.equipItemToSlot(itemId, slot, instanceUid);
         audio.click();
         this.deps.hideTooltip();
         this.deps.renderBags();
@@ -446,7 +468,7 @@ export class CharWindow {
       e.preventDefault();
       this.deps.dragState.end();
       this.markDropTargets(null);
-      this.dropOnEquipSlot(drag.itemId, slot);
+      this.dropOnEquipSlot(drag.itemId, slot, drag.instanceUid);
     });
   }
 

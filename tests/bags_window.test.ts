@@ -238,15 +238,22 @@ describe('bags_window: touch peek + bank-cluster close', () => {
     // right-click without a live DOM harness.
     const start = painter.indexOf('private runBagAction(');
     const body = painter.slice(start, painter.indexOf('\n  }\n', start));
-    expect(body).toMatch(/case 'trade':\s*this\.deps\.addItemToTrade\(s\.itemId\);/);
-    expect(body).toMatch(/case 'mailAttach':\s*this\.deps\.stageMailParcel\(s\.itemId\);/);
+    expect(body).toMatch(
+      /case 'trade':\s*this\.deps\.addItemToTrade\(s\.itemId, s\.instance\?\.procedural\?\.uid\);/,
+    );
+    expect(body).toMatch(
+      /case 'mailAttach':\s*this\.deps\.stageMailParcel\(s\.itemId, s\.instance\?\.procedural\?\.uid\);/,
+    );
     expect(body).toMatch(/case 'marketSell':\s*this\.deps\.stageMarketSell\(s\.itemId\);/);
     expect(body).toMatch(/case 'bankDeposit': \{/);
     expect(body).toMatch(/case 'petFeed':\s*this\.deps\.world\(\)\.feedPet\(s\.itemId\);/);
-    // The 'use' case tries the gathering-tool routing first (#2343) and only
-    // falls back to the plain useItem command when the hook declines.
+    // Equipment targets the exact procedural UID. Non-equipment still tries the
+    // gathering-tool route first and falls back to plain useItem.
     expect(body).toMatch(
-      /case 'use': \{[\s\S]{0,400}?if \(!item \|\| !this\.deps\.useGatherTool\(item\)\) this\.deps\.world\(\)\.useItem\(s\.itemId\);/,
+      /case 'use': \{[\s\S]{0,500}?equipItem\(s\.itemId, s\.instance\?\.procedural\?\.uid\);/,
+    );
+    expect(body).toMatch(
+      /else if \(!item \|\| !this\.deps\.useGatherTool\(item\)\) \{[\s\S]{0,100}?useItem\(s\.itemId\);/,
     );
   });
 });
@@ -278,7 +285,9 @@ describe('bags_window: right-click uses, dragging destroys/equips', () => {
   });
 
   it('the world drop opens the destroy prompt and honors the noDiscard refusal', () => {
-    expect(painter).toContain('promptDestroy(itemId: string, count: number): void');
+    expect(painter).toContain(
+      'promptDestroy(itemId: string, count: number, instanceUid?: string): void',
+    );
     expect(painter).toContain('destroyAction(itemId: string): BagDestroyAction');
     expect(painter).toContain("t('hudChrome.bags.cannotDestroy')");
     // The HUD installs the canvas as the world drop target with exactly those seams.

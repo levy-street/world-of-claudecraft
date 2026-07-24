@@ -71,6 +71,20 @@ const rollEvent = (rollId = 7): Extract<SimEvent, { type: 'lootRoll' }> => ({
   ...prompt(rollId),
 });
 
+const legendaryInstance: NonNullable<LootRollPrompt['instance']> = {
+  procedural: {
+    version: 1,
+    baseId: 'iron_broadsword',
+    itemLevel: 20,
+    rarity: 'legendary',
+    affixes: [],
+    legendaryPowerId: 'greyjaws_edge',
+    powerRevision: 1,
+    legendaryRolls: { potencyPct: 20 },
+    generatedName: { baseId: 'iron_broadsword' },
+  },
+};
+
 function harness() {
   const document = new LootDocument();
   const ui = document.element('ui');
@@ -130,6 +144,29 @@ function harness() {
 }
 
 describe('LootRollController', () => {
+  it('renders a keyboard-inspectable legendary roll with a local rune anchor', () => {
+    const test = harness();
+    test.controller.showRoll({
+      type: 'lootRoll',
+      rollId: 88,
+      itemId: 'iron_broadsword',
+      itemName: 'Iron Broadsword',
+      quality: 'legendary',
+      instance: legendaryInstance,
+      expiresAt: 60_000,
+    });
+
+    const row = test.root.querySelector<HTMLElement>('.loot-roll') as unknown as LootElement | null;
+    expect(row?.dataset.proceduralRarity).toBe('legendary');
+    expect(row?.style.getPropertyValue('--loot-roll-quality')).toBe('#ff8000');
+    expect(row?.innerHTML).toContain('class="loot-roll-icon-wrap"');
+    expect(row?.innerHTML).toContain('class="item-power-rune loot-roll-power-rune"');
+    expect(row?.innerHTML).toContain('tabindex="0"');
+    expect(row?.innerHTML).toContain(
+      'aria-label="Greyjaw&#39;s Edge, Legendary, item level 20, quantity 1"',
+    );
+  });
+
   it('recovers a missed event from the authoritative mirror and retires it after resolution', () => {
     const test = harness();
     test.setOpen([prompt()]);

@@ -9,6 +9,14 @@ import type { InvSlot } from '../sim/types';
 
 export type MailKindView = 'player' | 'system' | 'npc';
 
+/** UID-only attachment request. The server resolves instanceUid against the
+ * sender's authoritative bags; no client payload is accepted. */
+export interface MailAttachmentRequest {
+  itemId: string;
+  count: number;
+  instanceUid?: string;
+}
+
 export interface MailMessageView {
   id: number;
   senderName: string;
@@ -37,7 +45,13 @@ export interface IWorldMail {
   mailInfo: MailInfo | null;
   // Delivered-and-unread count, always available (the HUD envelope indicator).
   mailUnread: number;
-  mailSend(to: string, subject: string, body: string, copper: number, items: InvSlot[]): void;
+  mailSend(
+    to: string,
+    subject: string,
+    body: string,
+    copper: number,
+    items: MailAttachmentRequest[],
+  ): void;
   mailTake(mailId: number): void;
   mailDelete(mailId: number): void;
   mailMarkRead(mailId: number): void;

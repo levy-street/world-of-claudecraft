@@ -355,6 +355,14 @@ export function rangedSwing(
       true,
       !ranged.wand,
     );
+    if (!ranged.wand && atk.kind === 'player') {
+      ctx.triggerEquipmentEffects(atk, {
+        kind: 'weapon_hit',
+        targetId: tgt.id,
+        critical: crit,
+        amount: Math.max(1, Math.round(dmg)),
+      });
+    }
     // 4-piece set procs keyed to weapon crits (ranged arm). Gated on setProcs
     // inside applySetProcs, so proc-less players draw no rng.
     if (crit && atk.kind === 'player') ctx.applySetProcs(atk, tgt, 'weaponCrit');
@@ -478,6 +486,14 @@ export function meleeSwing(
     flat: opts.threatFlat ?? 0,
     mult: opts.threatMult ?? 1,
   });
+  if (attacker.kind === 'player') {
+    ctx.triggerEquipmentEffects(attacker, {
+      kind: 'weapon_hit',
+      targetId: target.id,
+      critical: crit,
+      amount: dealtAmount,
+    });
+  }
   opts.onDealt?.(dealtAmount);
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND
   // the weaponStrike ability path, which resolves through this shell). Gated on

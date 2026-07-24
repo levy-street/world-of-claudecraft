@@ -13,8 +13,8 @@
 
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
-import type { InvSlot } from '../sim/types';
-import type { IWorld } from '../world_api';
+import type { ItemInstancePayload } from '../sim/types';
+import type { IWorld, MailAttachmentRequest } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
@@ -33,6 +33,11 @@ import {
   wrappedSuggestionIndex,
 } from './mailbox_view';
 import type { PainterHostPresentation } from './painter_host';
+import {
+  itemPresentationName,
+  itemPresentationQuality,
+  proceduralRarityLabel,
+} from './procedural_item_presentation';
 import { svgIcon } from './ui_icons';
 
 const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
@@ -48,6 +53,11 @@ const RECIPIENT_SUGGEST_DEBOUNCE_MS = 160;
 const RECIPIENT_SUGGEST_BLUR_CLEAR_MS = 150;
 // Maximum number of autocomplete suggestions shown.
 const RECIPIENT_SUGGEST_MAX = 8;
+
+interface StagedMailAttachment extends MailAttachmentRequest {
+  /** Authoritative local copy used only to paint the staged chip. Never sent. */
+  instance?: ItemInstancePayload;
+}
 
 export interface MailboxWindowDeps extends PainterHostPresentation {
   root(): HTMLElement;
@@ -65,7 +75,7 @@ export class MailboxWindow {
   private opened = false;
   private tab: MailTab = 'inbox';
   private openedId: number | null = null;
-  private attachments: InvSlot[] = [];
+  private attachments: StagedMailAttachment[] = [];
   private lastSig = '';
   private openerFocus: HTMLElement | null = null;
   private openedAt = 0;
@@ -119,7 +129,7 @@ export class MailboxWindow {
   }
 
   /** Stage a bag stack as a parcel (called by the bags window on click). */
-  stageParcel(itemId: string): void {
+  stageParcel(itemId: string, instanceUid?: string): void {
     if (!this.isSendTab) return;
     const info = this.deps.world().mailInfo;
     const max = info?.maxAttachments ?? 3;
@@ -131,19 +141,26 @@ export class MailboxWindow {
       );
       return;
     }
-    if (this.attachments.some((s) => s.itemId === itemId)) return;
-    const count = this.ownedCountFor(itemId);
-    if (count < 1) return;
-    this.attachments.push({ itemId, count });
+    const duplicate = this.attachments.some(
+      (slot) => slot.itemId === itemId && slot.instanceUid === instanceUid,
+    );
+    if (duplicate) return;
+    if (instanceUid) {
+      const held = this.deps
+        .world()
+        .inventory.find(
+          (slot) => slot.itemId === itemId && slot.instance?.procedural?.uid === instanceUid,
+        );
+      if (!held?.instance) return;
+      this.attachments.push({ itemId, count: 1, instanceUid, instance: held.instance });
+    } else {
+      const count = this.ownedCountFor(itemId);
+      if (count < 1) return;
+      this.attachments.push({ itemId, count });
+    }
     audio.click();
-    // Targeted repaint, NOT this.render(): the full render rebuilds the send
-    // form via innerHTML with empty inputs, wiping the typed recipient,
-    // subject, body, and coin amounts the moment a parcel was attached. The
-    // stepper and remove paths already repaint this way (#1695); attach was
-    // the one parcel mutation still running the full rebuild.
     this.renderParcels();
   }
-
   /**
    * Total owned across all bag slots of one item id (the stepper's ceiling).
    * Mirrors the sim's fungible-only stock check (countFungibleItem in
@@ -159,7 +176,7 @@ export class MailboxWindow {
 
   /** Nudge a staged parcel's quantity from the +/- stepper (#1444). */
   private adjustParcelQty(itemId: string, delta: number): void {
-    const slot = this.attachments.find((s) => s.itemId === itemId);
+    const slot = this.attachments.find((s) => s.itemId === itemId && !s.instanceUid);
     if (!slot) return;
     const next = clampParcelQty(slot.count, delta, this.ownedCountFor(itemId));
     if (next === slot.count) return;
@@ -172,7 +189,7 @@ export class MailboxWindow {
    *  repaints, even when the count is unchanged, so a normalized-away entry
    *  ("007", "", "999" over stock) snaps the field back to the real value. */
   private setParcelQty(itemId: string, raw: string): void {
-    const slot = this.attachments.find((s) => s.itemId === itemId);
+    const slot = this.attachments.find((s) => s.itemId === itemId && !s.instanceUid);
     if (!slot) return;
     const next = parseParcelQty(raw, this.ownedCountFor(itemId), slot.count);
     if (next !== slot.count) {
@@ -371,11 +388,13 @@ export class MailboxWindow {
         const chip = document.createElement('span');
         chip.className = 'mail-attachment-item';
         if (item) {
-          const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
+          const quality = itemPresentationQuality(item, slot.instance);
+          const qColor = QUALITY_COLOR[quality] ?? QUALITY_DEFAULT_COLOR;
+          const displayName = itemPresentationName({ name: itemDisplayName(item) }, slot.instance);
           const stack =
             slot.count > 1 ? ` x${formatNumber(slot.count, { maximumFractionDigits: 0 })}` : '';
-          chip.innerHTML = `${this.deps.itemIcon(item)}<span style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span>`;
-          this.deps.attachTooltip(chip, () => this.deps.itemTooltip(item));
+          chip.innerHTML = `${this.deps.itemIcon(item, slot.instance)}<span style="color:${qColor}">${esc(displayName)}${esc(stack)}</span>`;
+          this.deps.attachTooltip(chip, () => this.deps.itemTooltip(item, slot.instance));
         } else {
           chip.textContent = slot.itemId;
         }
@@ -623,9 +642,6 @@ export class MailboxWindow {
   private renderParcels(): void {
     const parcels = this.deps.root().querySelector<HTMLElement>('#mail-parcels');
     if (!parcels) return;
-    // A +/- click rebuilds this whole container, which would otherwise drop
-    // keyboard focus to <body>; remember which control (by item + role) had
-    // it so the rebuilt equivalent can reclaim it below.
     const focusedEl = document.activeElement as HTMLElement | null;
     const focusKey =
       focusedEl && parcels.contains(focusedEl) ? (focusedEl.dataset.focusKey ?? null) : null;
@@ -637,37 +653,46 @@ export class MailboxWindow {
       parcels.appendChild(hint);
       return;
     }
-    const itemControls = new Map<
-      string,
-      {
-        minus?: HTMLButtonElement;
-        plus?: HTMLButtonElement;
-        qty?: HTMLInputElement;
-        remove?: HTMLButtonElement;
-      }
-    >();
+    type Controls = {
+      minus?: HTMLButtonElement;
+      plus?: HTMLButtonElement;
+      qty?: HTMLInputElement;
+      remove?: HTMLButtonElement;
+    };
+    const itemControls = new Map<string, Controls>();
     for (const slot of this.attachments) {
       const item = ITEMS[slot.itemId];
       if (!item) continue;
-      const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? QUALITY_DEFAULT_COLOR;
+      const rowKey = slot.instanceUid ?? `plain:${slot.itemId}`;
+      const focusPrefix = encodeURIComponent(rowKey);
+      const quality = itemPresentationQuality(item, slot.instance);
+      const qColor = QUALITY_COLOR[quality] ?? QUALITY_DEFAULT_COLOR;
+      const displayName = itemPresentationName({ name: itemDisplayName(item) }, slot.instance);
       const chip = document.createElement('span');
-      chip.className = 'mail-parcel-chip';
+      chip.className = `mail-parcel-chip q-${quality}`;
+      if (slot.instanceUid) chip.dataset.instanceUid = slot.instanceUid;
       const name = document.createElement('span');
       name.className = 'mail-parcel-name';
-      // Keyboard-focusable so Tab can reach it: attachTooltip's keyboard path
-      // is a focusin listener on this exact element.
       name.tabIndex = 0;
-      name.innerHTML = `${this.deps.itemIcon(item)}<span style="color:${qColor}">${esc(itemDisplayName(item))}</span>`;
-      this.deps.attachTooltip(name, () => this.deps.itemTooltip(item));
+      name.innerHTML = `${this.deps.itemIcon(item, slot.instance)}<span style="color:${qColor}">${esc(displayName)}</span>`;
+      name.setAttribute(
+        'aria-label',
+        slot.instance?.procedural
+          ? t('hudChrome.bags.itemAriaProcedural', {
+              item: displayName,
+              rarity: proceduralRarityLabel(slot.instance) ?? slot.instance.procedural.rarity,
+              level: formatNumber(slot.instance.procedural.itemLevel, {
+                maximumFractionDigits: 0,
+              }),
+              count: formatNumber(1, { maximumFractionDigits: 0 }),
+            })
+          : displayName,
+      );
+      this.deps.attachTooltip(name, () => this.deps.itemTooltip(item, slot.instance));
       chip.appendChild(name);
-      const owned = this.ownedCountFor(slot.itemId);
-      const controls: {
-        minus?: HTMLButtonElement;
-        plus?: HTMLButtonElement;
-        qty?: HTMLInputElement;
-        remove?: HTMLButtonElement;
-      } = {};
-      if (owned > 1) {
+      const controls: Controls = {};
+      const owned = slot.instanceUid ? 1 : this.ownedCountFor(slot.itemId);
+      if (!slot.instanceUid && owned > 1) {
         const step = document.createElement('span');
         step.className = 'mail-parcel-qty';
         const minus = document.createElement('button');
@@ -675,16 +700,12 @@ export class MailboxWindow {
         minus.className = 'mail-parcel-step';
         minus.textContent = '−';
         minus.disabled = slot.count <= 1;
-        minus.dataset.focusKey = `${slot.itemId}:minus`;
+        minus.dataset.focusKey = `${focusPrefix}:minus`;
         minus.setAttribute(
           'aria-label',
-          t('hudChrome.mailbox.parcelQtyDecreaseAria', { item: itemDisplayName(item) }),
+          t('hudChrome.mailbox.parcelQtyDecreaseAria', { item: displayName }),
         );
         minus.addEventListener('click', () => this.adjustParcelQty(slot.itemId, -1));
-        // Typeable quantity (was a read-only span): validated on change/blur,
-        // never per keystroke, so typing is not interrupted by the repaint.
-        // Purely client UX: the sim's post office re-validates every send
-        // (floors counts, rejects < 1, checks fungible stock) authoritatively.
         const qty = document.createElement('input');
         qty.type = 'number';
         qty.min = '1';
@@ -692,26 +713,17 @@ export class MailboxWindow {
         qty.inputMode = 'numeric';
         qty.className = 'mail-parcel-qty-input';
         qty.value = String(slot.count);
-        qty.dataset.focusKey = `${slot.itemId}:qty`;
-        // Still a live region even as an input: a +/- stepper click changes
-        // this value while focus sits on the BUTTON, and without aria-live a
-        // screen reader hears nothing about the new count.
+        qty.dataset.focusKey = `${focusPrefix}:qty`;
         qty.setAttribute('aria-live', 'polite');
-        qty.setAttribute(
-          'aria-label',
-          t('hudChrome.mailbox.parcelQtyAria', { item: itemDisplayName(item) }),
-        );
-        // The coin-input focus contract: select the value so typing replaces it
-        // (clicking into "2" and typing 5 must mean 5, not 25); the once-only
-        // mouseup swallow keeps click-to-focus from collapsing the selection.
+        qty.setAttribute('aria-label', t('hudChrome.mailbox.parcelQtyAria', { item: displayName }));
         qty.addEventListener('focus', () => {
           qty.select();
-          qty.addEventListener('mouseup', (e) => e.preventDefault(), { once: true });
+          qty.addEventListener('mouseup', (event) => event.preventDefault(), { once: true });
         });
         qty.addEventListener('change', () => this.setParcelQty(slot.itemId, qty.value));
-        qty.addEventListener('keydown', (ke) => {
-          if (ke.key === 'Enter') {
-            ke.preventDefault();
+        qty.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
             qty.blur();
           }
         });
@@ -720,10 +732,10 @@ export class MailboxWindow {
         plus.className = 'mail-parcel-step';
         plus.textContent = '+';
         plus.disabled = slot.count >= owned;
-        plus.dataset.focusKey = `${slot.itemId}:plus`;
+        plus.dataset.focusKey = `${focusPrefix}:plus`;
         plus.setAttribute(
           'aria-label',
-          t('hudChrome.mailbox.parcelQtyIncreaseAria', { item: itemDisplayName(item) }),
+          t('hudChrome.mailbox.parcelQtyIncreaseAria', { item: displayName }),
         );
         plus.addEventListener('click', () => this.adjustParcelQty(slot.itemId, 1));
         step.append(minus, qty, plus);
@@ -736,28 +748,29 @@ export class MailboxWindow {
       remove.type = 'button';
       remove.className = 'mail-parcel-remove-btn';
       remove.innerHTML = svgIcon('close', { cls: 'mail-parcel-remove' });
-      remove.dataset.focusKey = `${slot.itemId}:remove`;
+      remove.dataset.focusKey = `${focusPrefix}:remove`;
       remove.setAttribute(
         'aria-label',
-        t('hudChrome.mailbox.removeParcelAria', { item: itemDisplayName(item) }),
+        t('hudChrome.mailbox.removeParcelAria', { item: displayName }),
       );
       remove.addEventListener('click', () => {
-        this.attachments = this.attachments.filter((s) => s.itemId !== slot.itemId);
+        this.attachments = this.attachments.filter(
+          (candidate) =>
+            !(candidate.itemId === slot.itemId && candidate.instanceUid === slot.instanceUid),
+        );
         audio.click();
         this.renderParcels();
       });
       chip.appendChild(remove);
       controls.remove = remove;
-      itemControls.set(slot.itemId, controls);
+      itemControls.set(rowKey, controls);
       parcels.appendChild(chip);
     }
     if (focusKey) {
-      const [itemId, role] = focusKey.split(':');
-      const controls = itemControls.get(itemId);
-      // The qty input matters most here: a number input's arrow keys fire
-      // `change` WITHOUT blurring, so the repaint runs while the input is
-      // focused; falling through to Remove would turn the player's next
-      // Enter/Space into removing the parcel mid-adjustment.
+      const separator = focusKey.lastIndexOf(':');
+      const rowKey = decodeURIComponent(focusKey.slice(0, separator));
+      const role = focusKey.slice(separator + 1);
+      const controls = itemControls.get(rowKey);
       const preferred = controls
         ? role === 'minus'
           ? controls.minus
@@ -767,9 +780,6 @@ export class MailboxWindow {
               ? controls.qty
               : controls.remove
         : undefined;
-      // The just-activated control (or its whole item) can vanish on rebuild
-      // (disabled at a bound, or the stepper dropped once owned <= 1): fall
-      // back to the nearest still-focusable control for the same item.
       let target: HTMLButtonElement | HTMLInputElement | undefined;
       if (preferred && !preferred.disabled) target = preferred;
       else if (controls?.qty) target = controls.qty;

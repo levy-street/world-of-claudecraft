@@ -1537,6 +1537,9 @@ export const hudChromeStrings = {
     // Accessible-name sibling for the authored masterwork seal. Keep the whole
     // phrase in one key so punctuation and status placement remain localizable.
     itemAriaMasterwork: '{item}, quantity {count}, masterwork',
+    // One atomic announcement for a unique copy. Rarity and level are not
+    // encoded in color or the decorative rune, so assistive tech gets both.
+    itemAriaProcedural: '{item}, {rarity}, item level {level}, quantity {count}',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',

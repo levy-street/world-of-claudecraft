@@ -49,6 +49,11 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
+import {
+  ownerItemInstanceView,
+  publicItemInstanceView,
+  publicProceduralItemView,
+} from '../src/sim/procedural_item_public';
 import type { PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import type { VcMatch } from '../src/sim/social/vale_cup';
@@ -452,6 +457,14 @@ type ClientMessage = Record<string, unknown> & {
   x?: number;
   z?: number;
 };
+
+/** Parse an optional exact-instance selector without ever downgrading a
+ * present malformed value into the generic base-item command path. */
+function optionalInstanceUid(value: unknown): string | undefined | null {
+  if (value === undefined) return undefined;
+  if (typeof value === 'string' && value.length > 0 && value.length <= 96) return value;
+  return null;
+}
 
 function isPickAction(value: unknown): value is PickAction {
   return typeof value === 'string' && LOCKPICK_ACTIONS.has(value as PickAction);
@@ -898,6 +911,7 @@ function identityFields(e: Entity): Record<string, unknown> {
       if (inst.signer !== undefined) pub.signer = inst.signer;
       if (inst.enchant !== undefined) pub.enchant = inst.enchant;
       if (inst.rolled !== undefined) pub.rolled = inst.rolled;
+      if (inst.procedural !== undefined) pub.procedural = publicProceduralItemView(inst.procedural);
       for (const _ in pub) {
         if (eqi === undefined) eqi = {};
         eqi[slot] = pub;
@@ -4111,8 +4125,10 @@ export class GameServer {
             (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
               ? (msg.slot as EquipSlot)
               : undefined;
-          if (aimed) sim.equipItemToSlot(msg.item, aimed, pid);
-          else sim.equipItem(msg.item, pid);
+          const uid = optionalInstanceUid(msg.uid);
+          if (uid === null) break;
+          if (aimed) sim.equipItemToSlot(msg.item, aimed, pid, uid);
+          else sim.equipItem(msg.item, pid, uid);
         }
         break;
       case 'inv_move':
@@ -4140,7 +4156,14 @@ export class GameServer {
         break;
       case 'discard':
         if (typeof msg.item === 'string') {
-          sim.discardItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid);
+          const uid = optionalInstanceUid(msg.uid);
+          if (uid === null) break;
+          sim.discardItem(
+            msg.item,
+            typeof msg.count === 'number' ? msg.count : undefined,
+            pid,
+            uid,
+          );
         }
         break;
       case 'buy':
@@ -4149,11 +4172,17 @@ export class GameServer {
         break;
       case 'sell':
         if (typeof msg.item === 'string') {
-          sim.sellItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid);
+          const uid = optionalInstanceUid(msg.uid);
+          if (uid === null) break;
+          sim.sellItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid, uid);
         }
         break;
       case 'buyback':
-        if (typeof msg.item === 'string') sim.buyBackItem(msg.item, pid);
+        if (typeof msg.item === 'string') {
+          const uid = optionalInstanceUid(msg.uid);
+          if (uid === null) break;
+          sim.buyBackItem(msg.item, pid, uid);
+        }
         break;
       case 'harvest_node':
         this.sendCommandOutcome(
@@ -4819,10 +4848,14 @@ export class GameServer {
           msg.items.length > 3 // MAIL_MAX_ATTACHMENTS; the Sim re-validates
         )
           break;
-        const items: { itemId: string; count: number }[] = [];
+        const items: { itemId: string; count: number; instanceUid?: string }[] = [];
         let itemsOk = true;
         for (const raw of msg.items as unknown[]) {
-          const slot = raw as { itemId?: unknown; count?: unknown } | null;
+          const slot = raw as {
+            itemId?: unknown;
+            count?: unknown;
+            instanceUid?: unknown;
+          } | null;
           if (
             !slot ||
             typeof slot.itemId !== 'string' ||
@@ -4832,7 +4865,26 @@ export class GameServer {
             itemsOk = false;
             break;
           }
-          items.push({ itemId: slot.itemId, count: Math.floor(slot.count) });
+          const instanceUid =
+            typeof slot.instanceUid === 'string' &&
+            slot.instanceUid.length > 0 &&
+            slot.instanceUid.length <= 96
+              ? slot.instanceUid
+              : undefined;
+          if (slot.instanceUid !== undefined && !instanceUid) {
+            itemsOk = false;
+            break;
+          }
+          const count = Math.floor(slot.count);
+          if (instanceUid && count !== 1) {
+            itemsOk = false;
+            break;
+          }
+          items.push({
+            itemId: slot.itemId,
+            count,
+            ...(instanceUid && { instanceUid }),
+          });
         }
         if (!itemsOk) break;
         // Player-written subject/body flow through the same gates as chat
@@ -5951,11 +6003,23 @@ export class GameServer {
     const mine = t.a === pid;
     const otherPid = mine ? t.b : t.a;
     const other = this.sim.meta(otherPid);
+    const wireOffer = (offer: typeof t.offerA, owner: boolean) => ({
+      copper: offer.copper,
+      items: offer.items.map((slot) => ({
+        itemId: slot.itemId,
+        count: slot.count,
+        ...(slot.instance && {
+          instance: owner
+            ? ownerItemInstanceView(slot.instance)
+            : publicItemInstanceView(slot.instance),
+        }),
+      })),
+    });
     return {
       otherPid,
       otherName: other?.name ?? '?',
-      myOffer: mine ? t.offerA : t.offerB,
-      theirOffer: mine ? t.offerB : t.offerA,
+      myOffer: wireOffer(mine ? t.offerA : t.offerB, true),
+      theirOffer: wireOffer(mine ? t.offerB : t.offerA, false),
       myAccepted: mine ? t.acceptedA : t.acceptedB,
       theirAccepted: mine ? t.acceptedB : t.acceptedA,
     };

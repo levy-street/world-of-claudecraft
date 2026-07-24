@@ -11,6 +11,7 @@ import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from '../../i18n';
 import type { PainterHostPresentation } from '../../painter_host';
+import { itemPresentationName, itemPresentationQuality } from '../../procedural_item_presentation';
 import { svgIcon } from '../../ui_icons';
 import type { VendorGoodsRow, VendorPrice, VendorView } from './vendor_view';
 
@@ -24,7 +25,7 @@ import type { VendorGoodsRow, VendorPrice, VendorView } from './vendor_view';
 export interface VendorWindowDeps extends PainterHostPresentation {
   hideTooltip(): void;
   onBuy(itemId: string): void;
-  onBuyBack(itemId: string): void;
+  onBuyBack(itemId: string, instanceUid?: string): void;
   onSellJunk(): void;
   onClose(): void;
   sellJunk: {
@@ -141,19 +142,22 @@ export function renderVendorWindow(
   }
   const buybackGrid = document.createElement('div');
   buybackGrid.className = 'vendor-goods-grid';
-  for (const { itemId, item, count, price: priceCopper } of view.buyback) {
+  for (const { itemId, item, count, instance, price: priceCopper } of view.buyback) {
     const row = document.createElement('button');
     row.type = 'button';
-    row.className = 'vendor-item';
+    const quality = itemPresentationQuality(item, instance);
+    row.className = `vendor-item q-${quality}`;
     const price = formatLocalizedMoney(priceCopper);
-    const itemName = itemDisplayName(item);
+    const itemName = itemPresentationName({ name: itemDisplayName(item) }, instance);
+    const instanceUid = instance?.procedural?.uid;
+    if (instanceUid) row.dataset.instanceUid = instanceUid;
     row.setAttribute('aria-label', t('itemUi.vendor.buybackAria', { item: itemName, price }));
-    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) }))}` : ''}</span><span class="vi-price">${deps.moneyHtml(priceCopper)}</span>`;
-    row.addEventListener('click', () => deps.onBuyBack(itemId));
+    row.innerHTML = `${deps.itemIcon(item, instance)}<span class="vi-name">${esc(itemName)}${count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) }))}` : ''}</span><span class="vi-price">${deps.moneyHtml(priceCopper)}</span>`;
+    row.addEventListener('click', () => deps.onBuyBack(itemId, instanceUid));
     deps.attachTooltip(
       row,
       () =>
-        `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuyback'))}</div>`,
+        `${deps.itemTooltip(item, instance)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuyback'))}</div>`,
     );
     buybackGrid.appendChild(row);
   }

@@ -739,7 +739,7 @@
       "tick": 410,
       "time": 20.5,
       "nextId": 449,
-      "state": "58d55875",
+      "state": "f46a8e45",
       "events": "077a83da",
       "rng": {
         "draws": 2024,
@@ -750,7 +750,7 @@
       "tick": 420,
       "time": 21,
       "nextId": 449,
-      "state": "1a406f81",
+      "state": "be8c83f1",
       "events": "0d0af5a0",
       "rng": {
         "draws": 2088,
@@ -761,7 +761,7 @@
       "tick": 430,
       "time": 21.5,
       "nextId": 449,
-      "state": "412a5838",
+      "state": "7f6b582a",
       "events": "15f527af",
       "rng": {
         "draws": 2133,
@@ -772,7 +772,7 @@
       "tick": 440,
       "time": 22,
       "nextId": 449,
-      "state": "a9158762",
+      "state": "eb176654",
       "events": "f398378a",
       "rng": {
         "draws": 2190,
@@ -783,7 +783,7 @@
       "tick": 450,
       "time": 22.5,
       "nextId": 449,
-      "state": "fabcbb73",
+      "state": "db390e53",
       "events": "6efb0f6a",
       "rng": {
         "draws": 2221,
@@ -794,7 +794,7 @@
       "tick": 460,
       "time": 23,
       "nextId": 449,
-      "state": "066b4268",
+      "state": "566c10ae",
       "events": "6efb0f6a",
       "rng": {
         "draws": 2273,
@@ -805,7 +805,7 @@
       "tick": 470,
       "time": 23.5,
       "nextId": 449,
-      "state": "4eb8f1c3",
+      "state": "2f6b1ba3",
       "events": "7a232164",
       "rng": {
         "draws": 2315,
@@ -816,7 +816,7 @@
       "tick": 480,
       "time": 24,
       "nextId": 449,
-      "state": "a6ae8651",
+      "state": "859a5391",
       "events": "15f010fc",
       "rng": {
         "draws": 2370,
@@ -827,7 +827,7 @@
       "tick": 490,
       "time": 24.5,
       "nextId": 449,
-      "state": "8b2d5b67",
+      "state": "3358d7f7",
       "events": "ae67468d",
       "rng": {
         "draws": 2424,
@@ -838,7 +838,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 449,
-      "state": "4010afc9",
+      "state": "4745be69",
       "events": "c7185058",
       "rng": {
         "draws": 2491,
@@ -849,7 +849,7 @@
       "tick": 505,
       "time": 25.25,
       "nextId": 449,
-      "state": "641d42a2",
+      "state": "39ee15e4",
       "events": "6efb0f6a",
       "rng": {
         "draws": 2511,
@@ -1026,7 +1026,128 @@
           },
           "level": 17,
           "loot": {
-            "copper": 240
+            "copper": 240,
+            "items": [
+              {
+                "count": 1,
+                "instance": {
+                  "procedural": {
+                    "affixes": [
+                      {
+                        "affixId": "stalwart",
+                        "budget": 9,
+                        "family": "primary.stamina",
+                        "position": "prefix",
+                        "ranges": {
+                          "sta": {
+                            "max": 10,
+                            "min": 7
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 4,
+                        "values": {
+                          "sta": 9
+                        }
+                      },
+                      {
+                        "affixId": "alacrity",
+                        "budget": 4.2,
+                        "family": "rating.haste",
+                        "position": "suffix",
+                        "ranges": {
+                          "hasteRating": {
+                            "max": 19,
+                            "min": 13
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 4,
+                        "values": {
+                          "hasteRating": 15
+                        }
+                      },
+                      {
+                        "affixId": "deft",
+                        "budget": 3,
+                        "family": "primary.agility",
+                        "position": "prefix",
+                        "ranges": {
+                          "agi": {
+                            "max": 4,
+                            "min": 2
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 2,
+                        "values": {
+                          "agi": 3
+                        }
+                      },
+                      {
+                        "affixId": "mighty",
+                        "budget": 2,
+                        "family": "primary.strength",
+                        "position": "prefix",
+                        "ranges": {
+                          "str": {
+                            "max": 2,
+                            "min": 1
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 1,
+                        "values": {
+                          "str": 2
+                        }
+                      },
+                      {
+                        "affixId": "striking",
+                        "budget": 4.25,
+                        "family": "rating.crit",
+                        "position": "suffix",
+                        "ranges": {
+                          "critRating": {
+                            "max": 20,
+                            "min": 14
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 4,
+                        "values": {
+                          "critRating": 17
+                        }
+                      }
+                    ],
+                    "baseId": "iron_broadsword",
+                    "dropContext": {
+                      "source": "delve",
+                      "sourceEntityId": 435,
+                      "sourceTags": [
+                        "undead",
+                        "delve",
+                        "elite",
+                        "boss"
+                      ],
+                      "sourceTemplateId": "sister_nhalia_drowned_canticle"
+                    },
+                    "generatedName": {
+                      "baseId": "iron_broadsword",
+                      "rareWordIds": [
+                        "procedural.rare.thorn",
+                        "procedural.rare.whisper"
+                      ]
+                    },
+                    "itemLevel": 19,
+                    "rarity": "epic",
+                    "seed": 2585906492,
+                    "uid": "pi1:offline_3131:1",
+                    "version": 1
+                  }
+                },
+                "itemId": "iron_broadsword"
+              }
+            ]
           },
           "lootFfaTimer": 55.2,
           "lootRecipientIds": [
@@ -1078,7 +1199,7 @@
       "tick": 507,
       "time": 25.35,
       "nextId": 449,
-      "state": "49555d5a",
+      "state": "cb04c6b4",
       "events": "741638a5",
       "rng": {
         "draws": 2521,
@@ -1255,7 +1376,128 @@
           },
           "level": 17,
           "loot": {
-            "copper": 240
+            "copper": 240,
+            "items": [
+              {
+                "count": 1,
+                "instance": {
+                  "procedural": {
+                    "affixes": [
+                      {
+                        "affixId": "stalwart",
+                        "budget": 9,
+                        "family": "primary.stamina",
+                        "position": "prefix",
+                        "ranges": {
+                          "sta": {
+                            "max": 10,
+                            "min": 7
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 4,
+                        "values": {
+                          "sta": 9
+                        }
+                      },
+                      {
+                        "affixId": "alacrity",
+                        "budget": 4.2,
+                        "family": "rating.haste",
+                        "position": "suffix",
+                        "ranges": {
+                          "hasteRating": {
+                            "max": 19,
+                            "min": 13
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 4,
+                        "values": {
+                          "hasteRating": 15
+                        }
+                      },
+                      {
+                        "affixId": "deft",
+                        "budget": 3,
+                        "family": "primary.agility",
+                        "position": "prefix",
+                        "ranges": {
+                          "agi": {
+                            "max": 4,
+                            "min": 2
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 2,
+                        "values": {
+                          "agi": 3
+                        }
+                      },
+                      {
+                        "affixId": "mighty",
+                        "budget": 2,
+                        "family": "primary.strength",
+                        "position": "prefix",
+                        "ranges": {
+                          "str": {
+                            "max": 2,
+                            "min": 1
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 1,
+                        "values": {
+                          "str": 2
+                        }
+                      },
+                      {
+                        "affixId": "striking",
+                        "budget": 4.25,
+                        "family": "rating.crit",
+                        "position": "suffix",
+                        "ranges": {
+                          "critRating": {
+                            "max": 20,
+                            "min": 14
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 4,
+                        "values": {
+                          "critRating": 17
+                        }
+                      }
+                    ],
+                    "baseId": "iron_broadsword",
+                    "dropContext": {
+                      "source": "delve",
+                      "sourceEntityId": 435,
+                      "sourceTags": [
+                        "undead",
+                        "delve",
+                        "elite",
+                        "boss"
+                      ],
+                      "sourceTemplateId": "sister_nhalia_drowned_canticle"
+                    },
+                    "generatedName": {
+                      "baseId": "iron_broadsword",
+                      "rareWordIds": [
+                        "procedural.rare.thorn",
+                        "procedural.rare.whisper"
+                      ]
+                    },
+                    "itemLevel": 19,
+                    "rarity": "epic",
+                    "seed": 2585906492,
+                    "uid": "pi1:offline_3131:1",
+                    "version": 1
+                  }
+                },
+                "itemId": "iron_broadsword"
+              }
+            ]
           },
           "lootFfaTimer": 55.1,
           "lootRecipientIds": [

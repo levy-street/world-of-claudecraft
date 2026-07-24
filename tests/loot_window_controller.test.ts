@@ -3,7 +3,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { ITEMS, MOBS } from '../src/sim/data';
-import type { Entity } from '../src/sim/types';
+import type { Entity, ItemInstancePayload } from '../src/sim/types';
 import { LootWindowController } from '../src/ui/hud/loot/loot_window_controller';
 import type { IWorld } from '../src/world_api';
 
@@ -11,6 +11,22 @@ const itemIds = Object.keys(ITEMS);
 const harvestMobId = Object.values(MOBS).find((mob) => mob.componentTags?.length)?.id;
 if (itemIds.length < 2) throw new Error('loot item fixtures not found');
 if (!harvestMobId) throw new Error('harvestable mob fixture not found');
+
+const legendaryInstance: ItemInstancePayload = {
+  procedural: {
+    version: 1,
+    uid: 'pi1:test:corpse',
+    baseId: 'iron_broadsword',
+    itemLevel: 20,
+    rarity: 'legendary',
+    affixes: [],
+    legendaryPowerId: 'greyjaws_edge',
+    powerRevision: 1,
+    legendaryRolls: { potencyPct: 20 },
+    generatedName: { baseId: 'iron_broadsword' },
+    seed: 11,
+  },
+};
 
 function entity(
   id: number,
@@ -89,6 +105,33 @@ describe('LootWindowController', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
     document.body.className = '';
+  });
+
+  it('renders a keyboard-inspectable legendary corpse row with a local rune anchor', () => {
+    const mob = entity(9, {
+      kind: 'mob',
+      templateId: harvestMobId,
+      loot: {
+        copper: 0,
+        items: [{ itemId: 'iron_broadsword', count: 1, instance: legendaryInstance }],
+      },
+    });
+    const test = harness([mob]);
+
+    test.controller.openCorpse(9, 400, 300);
+
+    const row = test.element.querySelector<HTMLElement>('[data-loot-index="0"]');
+    expect(row?.classList.contains('q-legendary')).toBe(true);
+    expect(row?.dataset.proceduralRarity).toBe('legendary');
+    expect(row?.style.getPropertyValue('--loot-slot-quality')).toBe('#ff8000');
+    expect(row?.tabIndex).toBe(0);
+    expect(row?.getAttribute('aria-label')).toBe(
+      "Greyjaw's Edge, Legendary, item level 20, quantity 1",
+    );
+    expect(row?.querySelector('.loot-icon-wrap [data-icon="iron_broadsword"]')).not.toBeNull();
+    const rune = row?.querySelector('.loot-icon-wrap .loot-power-rune');
+    expect(rune?.getAttribute('aria-hidden')).toBe('true');
+    expect(rune?.getAttribute('focusable')).toBe('false');
   });
 
   it('renders only authoritative personal corpse loot and delegates Take Loot', () => {
@@ -182,7 +225,8 @@ describe('LootWindowController', () => {
   });
 
   it('pre-checks the town-focus components in the harvest picker', () => {
-    const tags = Object.values(MOBS).find((mob) => mob.componentTags?.length)!.componentTags!;
+    const tags = Object.values(MOBS).find((mob) => mob.componentTags?.length)?.componentTags;
+    if (!tags) throw new Error('harvest component fixtures not found');
     expect(tags.length).toBeGreaterThanOrEqual(2); // a strict focused subset must be expressible
     const mob = entity(13, { kind: 'mob', templateId: harvestMobId, loot: null });
     const test = harness([mob], (entry) => corpseLootAvailability(entry, 7), { [tags[0]]: 5 });
@@ -196,7 +240,8 @@ describe('LootWindowController', () => {
   });
 
   it('deselecting every pre-checked box still submits an explicit empty pick (spread)', () => {
-    const tags = Object.values(MOBS).find((mob) => mob.componentTags?.length)!.componentTags!;
+    const tags = Object.values(MOBS).find((mob) => mob.componentTags?.length)?.componentTags;
+    if (!tags) throw new Error('harvest component fixtures not found');
     const mob = entity(14, { kind: 'mob', templateId: harvestMobId, loot: null });
     const test = harness([mob], (entry) => corpseLootAvailability(entry, 7), { [tags[0]]: 5 });
 

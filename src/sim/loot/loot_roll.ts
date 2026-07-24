@@ -23,18 +23,22 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { bagCapacity } from '../bags';
 import { HEROIC_BOSS_LOOT } from '../content/heroic_loot';
 import { heroicVariantId } from '../content/heroic_variants';
 import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
 import { itemLevel } from '../item_level';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
+import { proceduralQuality } from '../procedural_item';
+import { publicItemInstanceView } from '../procedural_item_public';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type {
   CurrencyLootStrategy,
   Entity,
   ItemDef,
+  ItemInstancePayload,
   ItemLootStrategy,
   LootEntry,
   LootRollChoice,
@@ -45,7 +49,13 @@ import type {
   MasterLootThreshold,
 } from '../types';
 import { dist2d, PARTY_XP_RANGE } from '../types';
+import {
+  canFitExactLootSlot,
+  grantExactLootSlot,
+  returnExactLootSlotToCorpse,
+} from './exact_item_grant';
 import { LOOT_FFA_DELAY } from './loot_ffa';
+import { generateLiveProceduralDrop } from './procedural/live_drop';
 
 // How long (seconds) a need-greed roll stays open before it auto-resolves. Sole
 // users are startNeedGreedRoll + pruneCorpseLoot, so the constant lives with them.
@@ -72,6 +82,8 @@ export interface PendingLootRoll {
   id: number;
   mobId: number;
   itemId: string;
+  count: 1;
+  instance?: ItemInstancePayload;
   itemName: string;
   quality: ItemDef['quality'];
   candidates: number[];
@@ -130,8 +142,21 @@ function effectiveCurrencyLootStrategy(ctx: SimContext, mob: Entity): CurrencyLo
   return partyLootStrategiesForMob(ctx, mob)?.currency ?? 'looter-takes-all';
 }
 
-function effectiveItemLootStrategy(ctx: SimContext, itemId: string, mob: Entity): ItemLootStrategy {
-  const q = ITEMS[itemId]?.quality ?? 'common';
+function exactItemQuality(
+  itemId: string,
+  instance: ItemInstancePayload | undefined,
+): ItemDef['quality'] {
+  const rolled = instance?.procedural ? proceduralQuality(instance.procedural.rarity) : null;
+  return rolled ?? ITEMS[itemId]?.quality;
+}
+
+function effectiveItemLootStrategy(
+  ctx: SimContext,
+  itemId: string,
+  mob: Entity,
+  instance?: ItemInstancePayload,
+): ItemLootStrategy {
+  const q = exactItemQuality(itemId, instance) ?? 'common';
   const strategies = partyLootStrategiesForMob(ctx, mob);
   if (!strategies) return 'looter-takes-all';
   return q === 'poor' || q === 'common' ? strategies.commonItems : strategies.premiumItems;
@@ -303,12 +328,55 @@ export function rollLoot(
       }
     }
   }
+  appendLiveProceduralDrop(ctx, mob, template, items);
   if (copper > 0 || items.length > 0) {
     mob.loot = { copper, items };
     mob.lootable = true;
     // start the owner-lock countdown: after LOOT_FFA_DELAY the tap opens to all.
     mob.lootFfaTimer = LOOT_FFA_DELAY;
   }
+}
+
+export function proceduralLootSourceEligible(
+  ctx: SimContext,
+  mob: Entity,
+  template = MOBS[mob.templateId],
+): boolean {
+  return Boolean(
+    template &&
+      ctx.isProceduralLootSource(mob) &&
+      mob.ownerId === null &&
+      mob.devSpawnOwnerId === undefined &&
+      !mob.affixSpawned &&
+      !template.worldBoss &&
+      !template.dummy,
+  );
+}
+
+export function appendLiveProceduralDrop(
+  ctx: SimContext,
+  mob: Entity,
+  template: (typeof MOBS)[string],
+  items: LootSlot[],
+): void {
+  if (!proceduralLootSourceEligible(ctx, mob, template)) return;
+  const sourceFacts = {
+    inDungeon: ctx.instances.some(
+      (instance) => instance.partyKey !== null && instance.mobIds.includes(mob.id),
+    ),
+    inDelve: ctx.delveRunForMob(mob.id) !== null,
+  };
+  const drop = generateLiveProceduralDrop({
+    worldSeed: ctx.cfg.seed,
+    sourceEntityId: mob.id,
+    sourceSpawnSequence: ctx.nextProceduralLootSourceSequence(mob),
+    lootSlotIndex: 0,
+    sourceItemLevel: mob.level,
+    sourceTemplate: template,
+    sourceFacts,
+    uid: () => ctx.allocateProceduralItemUid(),
+  });
+  if (drop) items.push({ itemId: drop.itemId, count: 1, instance: drop.instance });
 }
 
 function grantLootCopper(ctx: SimContext, meta: PlayerMeta, amount: number): void {
@@ -350,11 +418,29 @@ export function distributeLootCopper(ctx: SimContext, mob: Entity, looter: Playe
   mob.loot.copper = 0;
 }
 
-function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boolean {
-  if (effectiveItemLootStrategy(ctx, itemId, mob) !== 'need-greed') return false;
+type ExactLootAward = Pick<LootSlot, 'itemId' | 'count' | 'instance'>;
+
+function exactLootAward(input: string | ExactLootAward): ExactLootAward {
+  if (typeof input === 'string') return { itemId: input, count: 1 };
+  return {
+    itemId: input.itemId,
+    count: 1,
+    ...(input.instance && { instance: structuredClone(input.instance) }),
+  };
+}
+
+function startNeedGreedRoll(
+  ctx: SimContext,
+  itemOrSlot: string | ExactLootAward,
+  mob: Entity,
+): boolean {
+  const slot = exactLootAward(itemOrSlot);
+  const { itemId } = slot;
+  if (effectiveItemLootStrategy(ctx, itemId, mob, slot.instance) !== 'need-greed') return false;
   const candidates = partyLootCandidatesForMob(ctx, mob);
   if (candidates.length <= 1) return false;
   const def = ITEMS[itemId];
+  const quality = exactItemQuality(itemId, slot.instance);
   const itemName = def?.name ?? itemId;
   const party = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
   const partyMembers = party ? [...party.members] : candidates.map((cand) => cand.entityId);
@@ -362,8 +448,10 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
     id: ctx.nextLootRollId++,
     mobId: mob.id,
     itemId,
+    count: 1,
+    ...(slot.instance && { instance: slot.instance }),
     itemName,
-    quality: def?.quality,
+    quality,
     candidates: candidates.map((candidate) => candidate.entityId),
     candidateNames: new Map(candidates.map((candidate) => [candidate.entityId, candidate.name])),
     partyMembers,
@@ -379,6 +467,7 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
       itemId,
       itemName,
       quality: roll.quality,
+      ...(roll.instance && { instance: publicItemInstanceView(roll.instance) }),
       expiresAt: roll.expiresAt,
       pid: candidate.entityId,
     });
@@ -392,11 +481,18 @@ function startNeedGreedRoll(ctx: SimContext, itemId: string, mob: Entity): boole
 // the drop is at/above the configured threshold. Returns false (so the caller
 // falls through to need/greed or looter-takes-all) when master loot does not
 // apply: disabled, below threshold, a solo looter, or no resolvable looter.
-function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): boolean {
+function startMasterLootRoll(
+  ctx: SimContext,
+  itemOrSlot: string | ExactLootAward,
+  mob: Entity,
+): boolean {
+  const slot = exactLootAward(itemOrSlot);
+  const { itemId } = slot;
   const strategies = partyLootStrategiesForMob(ctx, mob);
   if (!strategies || !strategies.master.enabled) return false;
   const def = ITEMS[itemId];
-  if (!meetsMasterThreshold(def?.quality, strategies.master.threshold)) return false;
+  const quality = exactItemQuality(itemId, slot.instance);
+  if (!meetsMasterThreshold(quality, strategies.master.threshold)) return false;
   const candidates = partyLootCandidatesForMob(ctx, mob);
   if (candidates.length <= 1) return false;
   const party = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
@@ -408,8 +504,10 @@ function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): bool
     id: ctx.nextLootRollId++,
     mobId: mob.id,
     itemId,
+    count: 1,
+    ...(slot.instance && { instance: slot.instance }),
     itemName,
-    quality: def?.quality,
+    quality,
     candidates: candidates.map((candidate) => candidate.entityId),
     candidateNames: new Map(candidates.map((candidate) => [candidate.entityId, candidate.name])),
     partyMembers: [...party.members],
@@ -426,6 +524,7 @@ function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): bool
     itemId,
     itemName,
     quality: roll.quality,
+    ...(roll.instance && { instance: publicItemInstanceView(roll.instance) }),
     expiresAt: roll.expiresAt,
     candidates: candidates.map((candidate) => ({ pid: candidate.entityId, name: candidate.name })),
     pid: looterPid,
@@ -438,15 +537,21 @@ function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): bool
 // loot-time in-range set: that is the fairness point. Mirrors
 // tryAwardCopperByFairSplit's shape (strategy check, candidate-count guard,
 // party lookup) but advances a per-party cursor instead of a Fisher-Yates split.
-function tryAwardItemByRoundRobin(ctx: SimContext, itemId: string, mob: Entity): boolean {
-  if (effectiveItemLootStrategy(ctx, itemId, mob) !== 'round-robin') return false;
+function tryAwardItemByRoundRobin(
+  ctx: SimContext,
+  itemOrSlot: string | ExactLootAward,
+  mob: Entity,
+): boolean {
+  const slot = exactLootAward(itemOrSlot);
+  if (effectiveItemLootStrategy(ctx, slot.itemId, mob, slot.instance) !== 'round-robin')
+    return false;
   const candidates = partyLootCandidatesForMob(ctx, mob);
   if (candidates.length <= 1) return false;
   const party = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
   if (!party) return false;
   const winner = candidates[party.lootTurn % candidates.length];
   party.lootTurn++;
-  ctx.addItem(itemId, 1, winner.entityId);
+  grantExactLootSlot(ctx, slot, winner.entityId);
   return true;
 }
 
@@ -458,15 +563,16 @@ function tryAwardItemByRoundRobin(ctx: SimContext, itemId: string, mob: Entity):
 // looter cannot free space on the winner's behalf).
 export function awardSharedLootItem(
   ctx: SimContext,
-  itemId: string,
+  itemOrSlot: string | ExactLootAward,
   mob: Entity,
   looter: PlayerMeta,
 ): boolean {
-  if (startMasterLootRoll(ctx, itemId, mob)) return true;
-  if (startNeedGreedRoll(ctx, itemId, mob)) return true;
-  if (tryAwardItemByRoundRobin(ctx, itemId, mob)) return true;
-  if (!ctx.canAddItem(itemId, 1, looter.entityId)) return false;
-  ctx.addItem(itemId, 1, looter.entityId);
+  const slot = exactLootAward(itemOrSlot);
+  if (startMasterLootRoll(ctx, slot, mob)) return true;
+  if (startNeedGreedRoll(ctx, slot, mob)) return true;
+  if (tryAwardItemByRoundRobin(ctx, slot, mob)) return true;
+  if (!canFitExactLootSlot(looter.inventory, bagCapacity(looter.bags), slot)) return false;
+  grantExactLootSlot(ctx, slot, looter.entityId);
   return true;
 }
 
@@ -487,6 +593,7 @@ export function activeLootRolls(ctx: SimContext, pid: number): LootRollPrompt[] 
       itemId: roll.itemId,
       itemName: roll.itemName,
       quality: roll.quality,
+      ...(roll.instance && { instance: publicItemInstanceView(roll.instance) }),
       expiresAt: roll.expiresAt,
     });
   }
@@ -510,6 +617,7 @@ export function lootRollGroupStatus(ctx: SimContext, pid: number): LootRollGroup
       itemId: roll.itemId,
       itemName: roll.itemName,
       quality: roll.quality,
+      ...(roll.instance && { instance: publicItemInstanceView(roll.instance) }),
       expiresAt: roll.expiresAt,
       entries: roll.candidates.map((candidate) => ({
         pid: candidate,
@@ -615,7 +723,7 @@ export function assignMasterLoot(
         text: `${r.meta.name} assigned [[i:${roll.itemId}]] to ${targetName}.`,
         pid,
       });
-    ctx.addItem(roll.itemId, 1, targets[0]);
+    grantExactLootSlot(ctx, roll, targets[0]);
     return;
   }
   convertMasterRollToNeedGreed(ctx, roll, targets);
@@ -643,6 +751,7 @@ function convertMasterRollToNeedGreed(
       itemId: roll.itemId,
       itemName: roll.itemName,
       quality: roll.quality,
+      ...(roll.instance && { instance: publicItemInstanceView(roll.instance) }),
       expiresAt: roll.expiresAt,
       pid,
     });
@@ -761,7 +870,7 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
       });
     return;
   }
-  ctx.addItem(roll.itemId, 1, winner.pid);
+  grantExactLootSlot(ctx, roll, winner.pid);
 }
 
 // Whether `pid` is a currently-connected player the loot hub's addItem/resolve
@@ -777,11 +886,7 @@ function returnLootRollItemToCorpse(ctx: SimContext, roll: PendingLootRoll): voi
   const mob = ctx.entities.get(roll.mobId);
   if (!mob?.dead) return;
   if (!mob.loot) mob.loot = { copper: 0, items: [] };
-  const existing = mob.loot.items.find(
-    (slot) => slot.openToAll && slot.itemId === roll.itemId && !slot.personalFor,
-  );
-  if (existing) existing.count += 1;
-  else mob.loot.items.push({ itemId: roll.itemId, count: 1, openToAll: true });
+  returnExactLootSlotToCorpse(mob.loot.items, roll);
   mob.lootable = true;
 }
 

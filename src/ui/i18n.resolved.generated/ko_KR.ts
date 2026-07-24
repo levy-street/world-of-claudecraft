@@ -1530,6 +1530,7 @@ export const ko_KR: EnTranslations = {
       "reorderNeedsRecent": "가방을 정리하려면 필터를 해제하고 최근 순으로 정렬하세요",
       "itemAriaInstanced": "{item}, 수량 {count}, 제작자 표식이 있는 사본",
       "itemAriaMasterwork": "{item}, 수량 {count}, 걸작",
+      "itemAriaProcedural": "{item}, {rarity}, item level {level}, quantity {count}",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
       "filterWeapon": "무기",
@@ -6545,7 +6546,108 @@ export const ko_KR: EnTranslations = {
       "dps": "초당 피해",
       "critChance": "치명타율",
       "dodge": "회피",
-      "parry": "무기 막기"
+      "parry": "무기 막기",
+      "weaponMin": "Minimum weapon damage",
+      "weaponMax": "Maximum weapon damage",
+      "weaponDps": "Weapon damage per second",
+      "healthOnKill": "Health on kill",
+      "manaOnKill": "Mana on kill",
+      "blockValue": "Block value"
+    },
+    "procedural": {
+      "rollRangeAria": "Possible roll from {min} to {max}",
+      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
+      "legendaryPower": "Legendary power",
+      "rarity": {
+        "common": "Common",
+        "magic": "Magic",
+        "rare": "Rare",
+        "epic": "Epic",
+        "legendary": "Legendary",
+        "mythic": "Mythic"
+      },
+      "nameFragment": {
+        "mighty": "Mighty",
+        "deft": "Deft",
+        "stalwart": "Stalwart",
+        "sages": "Sage's",
+        "spiritual": "Spiritual",
+        "of_focus": "of Focus",
+        "of_striking": "of Striking",
+        "of_alacrity": "of Alacrity",
+        "of_precision": "of Precision",
+        "warded": "Warded",
+        "of_reaping": "of Reaping",
+        "of_remembrance": "of Remembrance"
+      },
+      "rareWord": {
+        "ashen": "Ashen",
+        "blackfen": "Blackfen",
+        "doom": "Doom",
+        "grave": "Grave",
+        "mire": "Mire",
+        "storm": "Storm",
+        "thorn": "Thorn",
+        "wyrm": "Wyrm",
+        "bite": "Bite",
+        "brand": "Brand",
+        "promise": "Promise",
+        "thread": "Thread",
+        "vigil": "Vigil",
+        "ward": "Ward",
+        "whisper": "Whisper",
+        "oath": "Oath"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "Crown of the Last Pyre",
+          "description": "Every third Cinderbolt scorches enemies near the target."
+        },
+        "greyjaws_edge": {
+          "name": "Greyjaw's Edge",
+          "description": "Every third weapon hit bleeds the target and restores a little resource."
+        },
+        "hushwood_longbow": {
+          "name": "Hushwood Longbow",
+          "description": "Long Draw or Fell Shot can briefly silence its target."
+        },
+        "nightglass_fang": {
+          "name": "Nightglass Fang",
+          "description": "A kill grants a short burst of haste."
+        },
+        "ysoleis_vigil": {
+          "name": "Ysolei's Vigil",
+          "description": "Critical healing creates a brief restorative ground area."
+        },
+        "stormwake_idol": {
+          "name": "Stormwake Idol",
+          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+        },
+        "ashbinders_seal": {
+          "name": "Ashbinder's Seal",
+          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+        },
+        "dawnward_signet": {
+          "name": "Dawnward Signet",
+          "description": "Mending Light shields its recipient for a portion of the heal."
+        },
+        "feral_moonclasp": {
+          "name": "Feral Moonclasp",
+          "description": "Every third Lunar Tempest restores primary resource."
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "Bell of the Ninth Peal",
+          "description": "Every second damaging spell tolls around the target."
+        },
+        "mantle_of_borrowed_time": {
+          "name": "Mantle of Stolen Hours",
+          "description": "Falling below 35% health grants a brief defensive ward."
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "Boots of the Unbroken Road",
+          "description": "Moving 15 yards grants a short movement-speed burst."
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",

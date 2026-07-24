@@ -261,6 +261,7 @@ import {
   handleCardUpload,
 } from './player_card';
 import { prunePlayerActivityDailyBatch } from './player_metrics_db';
+import { reserveProceduralItemUidBlock } from './procedural_item_uid_db';
 import { handleAvatar, handleCharacterSitemap, handleProfilePage } from './profile_page';
 import { recordUsageCacheEvent, recordUsageMetric, setUsageCacheSize } from './provider_usage';
 import {
@@ -2829,8 +2830,10 @@ export async function startServer(): Promise<http.Server> {
     }
   }
   await ensureSchema();
+  const proceduralItemUidLease = await reserveProceduralItemUidBlock(pool, REALM);
   await seedOAuthClients();
   const game = liveGame();
+  game.sim.configureProceduralItemUidLease(proceduralItemUidLease);
   // Inject the game-session methods the ported admin routes (server/admin.ts) call
   // for their live reads + side effects (adminStats/liveSessions/disconnectAccount/
   // muteAccountChat/reloadChatFilter/reloadBlockedIps/disconnectByIp/...), and the

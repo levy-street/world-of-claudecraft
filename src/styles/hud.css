@@ -294,6 +294,65 @@
     color: var(--gold);
     font-size: 14px;
   }
+  /* One corpse owns all of its loot slots, so procedural drops use a single
+     privacy-filtered marker keyed to the highest rarity visible to this player. */
+  .np-marker.loot.procedural-loot {
+    --procedural-loot-color: #fff;
+    position: relative;
+    min-width: 52px;
+    width: max-content;
+    padding: 0 3px;
+    color: var(--procedural-loot-color);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    line-height: 14px;
+    text-align: center;
+    text-transform: uppercase;
+    text-shadow:
+      0 0 5px var(--procedural-loot-color),
+      1px 1px 2px #000;
+  }
+  .np-marker.loot.procedural-loot.q-uncommon {
+    --procedural-loot-color: #1eff00;
+  }
+  .np-marker.loot.procedural-loot.q-rare {
+    --procedural-loot-color: #0070dd;
+  }
+  .np-marker.loot.procedural-loot.q-epic {
+    --procedural-loot-color: #a335ee;
+  }
+  .np-marker.loot.procedural-loot.q-legendary {
+    --procedural-loot-color: #ff8000;
+  }
+  .np-marker.loot.procedural-loot::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 13px;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 36px;
+    background: linear-gradient(transparent, var(--procedural-loot-color));
+    box-shadow: 0 0 5px var(--procedural-loot-color);
+  }
+  .np-marker.loot.procedural-loot::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -1px;
+    width: 12px;
+    transform: translateX(-50%);
+    height: 5px;
+    border: 1px solid var(--procedural-loot-color);
+    border-radius: 50%;
+    box-shadow: 0 0 5px var(--procedural-loot-color);
+  }
+  @media (forced-colors: active) {
+    .np-marker.loot.procedural-loot {
+      --procedural-loot-color: CanvasText;
+    }
+  }
   /* party raid/target marker, floats above the name; display toggled in JS so
      it reserves no vertical space when absent. Drop-shadow adds a dark halo on
      top of the icon's baked outline for legibility against the bright world. */
@@ -3404,6 +3463,50 @@
   #tooltip .tt-red {
     color: #ff5040;
     font-size: 11.5px;
+  }
+  #tooltip .tt-roll-range {
+    display: none;
+    color: var(--color-text-muted);
+    font-size: 0.92em;
+  }
+  body.item-details-advanced #tooltip .tt-roll-range,
+  body.mobile-touch #tooltip .tt-roll-range,
+  body.gamepad-pointer-mode #tooltip .tt-roll-range {
+    display: inline;
+  }
+  body.item-details-advanced #tooltip .tt-advanced-detail-hint,
+  body.mobile-touch #tooltip .tt-advanced-detail-hint,
+  body.gamepad-pointer-mode #tooltip .tt-advanced-detail-hint {
+    display: none;
+  }
+  #tooltip .tt-advanced-detail-hint {
+    margin-top: 3px;
+  }
+  #tooltip .tt-legendary-power {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px solid color-mix(in srgb, var(--gold) 42%, transparent);
+    color: var(--gold);
+    font-size: 11.5px;
+  }
+  #tooltip .tt-legendary-rune {
+    flex: 0 0 14px;
+    width: 14px;
+    height: 14px;
+    margin-top: 2px;
+  }
+  #tooltip .tt-legendary-rune .item-power-rune {
+    width: 14px;
+    height: 14px;
+  }
+  @media (forced-colors: active) {
+    #tooltip .tt-legendary-power {
+      border-top-color: CanvasText;
+      color: CanvasText;
+    }
   }
   /* stat-tooltip prose (what a stat does) + the "From your N {stat}:" breakdown head */
   #tooltip .tt-body {

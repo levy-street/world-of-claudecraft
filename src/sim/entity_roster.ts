@@ -50,6 +50,14 @@ export type GroundAoE = {
   tickTimer: number;
   school: string;
   ability: string;
+  equipmentPowerId?: string;
+  equipmentProcDepth?: number;
+  equipmentAllyHeal?: {
+    amount: number;
+    maxTargets?: number;
+    powerId: string;
+    procDepth: number;
+  };
   // Spell Power added per tick, snapshotted at cast time (caster ground AoEs).
   spBonus?: number;
   // Rune of Power (mage choice row): a FRIENDLY zone. When set, each pulse

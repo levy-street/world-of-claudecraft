@@ -12,6 +12,7 @@
 // game/net/DOM/Three, no `Math.random`/`Date.now`), so it runs unchanged in Node,
 // the browser, and the headless RL env (enforced by tests/architecture.test.ts).
 
+import type { EquipmentEffectTriggerEvent } from './combat/equipment_effects';
 import type { FrozenOrbState } from './combat/frozen_orb';
 import type { LetterDef } from './content/letters';
 import type { TalentModifiers } from './content/talents';
@@ -135,7 +136,9 @@ export interface SimContextPrimitives {
   readonly cardDuels: Map<number, CardDuelMatch>;
   // `world` stays optional (custom play-test map, else undefined; perfLap is the
   // temporary host-owned tick profiler probe); the rest defaulted.
-  readonly cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap'>> &
+  readonly cfg: Required<
+    Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'proceduralItemUidLease'>
+  > &
     Pick<SimConfig, 'world' | 'perfLap'>;
   // A2 duel + arena state. Live views: the backing fields stay on Sim (mutated in
   // place / reassigned), like E1's delayedEvents. The three queues are REASSIGNED by
@@ -297,8 +300,9 @@ export interface SimContextCallbacks {
     // the Chronomancy Temporal Echo conversion; area Arcane damage heals the
     // marked ally at a reduced rate. Defaults false.
     aoe?: boolean,
+    equipmentProcDepth?: number,
   ): void;
-  handleDeath(entity: Entity, killer: Entity | null): void;
+  handleDeath(entity: Entity, killer: Entity | null, equipmentProcDepth?: number): void;
   cancelCast(entity: Entity): void;
   pushbackCast(entity: Entity): void;
   refreshMobLeashFromAction(source: Entity | null, target: Entity): void;
@@ -356,6 +360,10 @@ export interface SimContextCallbacks {
     attackAnimationStarted?: boolean,
   ): void;
   cleanupYumiMatch(match: ArenaMatch): void;
+  allocateProceduralItemUid(): string;
+  registerProceduralLootSource(mob: Entity): void;
+  isProceduralLootSource(mob: Entity): boolean;
+  nextProceduralLootSourceSequence(mob: Entity): number;
   rollLoot(
     mob: Entity,
     meta: PlayerMeta,
@@ -377,7 +385,11 @@ export interface SimContextCallbacks {
     abilityId?: string | null,
     canCrit?: boolean,
     canTriggerWeaponProcs?: boolean,
+    equipmentProcDepth?: number,
   ): number;
+  triggerEquipmentEffects(actor: Entity, event: EquipmentEffectTriggerEvent): void;
+  refreshEquipmentEffectPower(pid: number): void;
+  clearEquipmentEffectState(pid: number): void;
   // Spell crit chance from intellect. STAYS on Sim (shared: the casting/ability
   // paths read it too); exposed here so the extracted heal core can draw its crit.
   spellCrit(p: Entity): number;
@@ -1100,9 +1112,16 @@ export function createSimContext(host: SimContextHost): SimContext {
     yumiPlayerDown: host.yumiPlayerDown,
     yumiCatDamaged: host.yumiCatDamaged,
     cleanupYumiMatch: host.cleanupYumiMatch,
+    allocateProceduralItemUid: host.allocateProceduralItemUid,
+    registerProceduralLootSource: host.registerProceduralLootSource,
+    isProceduralLootSource: host.isProceduralLootSource,
+    nextProceduralLootSourceSequence: host.nextProceduralLootSourceSequence,
     rollLoot: host.rollLoot,
     rollWorldBossLoot: host.rollWorldBossLoot,
     applyHeal: host.applyHeal,
+    triggerEquipmentEffects: host.triggerEquipmentEffects,
+    refreshEquipmentEffectPower: host.refreshEquipmentEffectPower,
+    clearEquipmentEffectState: host.clearEquipmentEffectState,
     spellCrit: host.spellCrit,
     applyAura: host.applyAura,
     isControlAura: host.isControlAura,

@@ -23,7 +23,7 @@ export interface WorldDropTargetDeps {
    *  means the drop is inert, e.g. a vendor/trade window owns the item). */
   destroyAction(itemId: string): 'discard' | 'discardBlocked' | 'none';
   /** Open the destroy prompt for the dropped stack (confirm + quantity). */
-  promptDestroy(itemId: string, count: number): void;
+  promptDestroy(itemId: string, count: number, instanceUid?: string): void;
   /** Refusal toast for a protected (noDiscard) item. */
   showBlocked(): void;
 }
@@ -53,7 +53,7 @@ export function installWorldDropTarget(deps: WorldDropTargetDeps): void {
       deps.showBlocked();
       return;
     }
-    deps.promptDestroy(drag.itemId, drag.count);
+    deps.promptDestroy(drag.itemId, drag.count, drag.instanceUid);
   });
 }
 
@@ -64,6 +64,7 @@ export function dropOnWorld(
   deps: Pick<WorldDropTargetDeps, 'destroyAction' | 'promptDestroy' | 'showBlocked'>,
   itemId: string,
   count: number,
+  instanceUid?: string,
 ): void {
   const action = deps.destroyAction(itemId);
   if (action === 'none') return;
@@ -71,5 +72,5 @@ export function dropOnWorld(
     deps.showBlocked();
     return;
   }
-  deps.promptDestroy(itemId, count);
+  deps.promptDestroy(itemId, count, instanceUid);
 }

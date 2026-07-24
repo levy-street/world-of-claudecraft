@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import { SimEvent } from '../src/sim/types';
+import type { ItemInstancePayload, SimEvent } from '../src/sim/types';
 
 function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
@@ -37,6 +37,32 @@ describe('/buyback command', () => {
     sim.chat('/buyback', a);
     expect(errorText(sim.tick(), a)).toBe(
       'Vendor buyback (2): Cracked Wolf Fang x3 (4c each), Pitted Shortsword (10c each). Repurchase at any merchant.',
+    );
+  });
+
+  it('reports the exact procedural repurchase price', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'Aleph');
+    const meta = sim.players.get(a);
+    if (!meta) throw new Error('test player metadata is missing');
+    const instance: ItemInstancePayload = {
+      procedural: {
+        version: 1,
+        uid: 'pi1:buyback-readout:1',
+        baseId: 'gravecaller_ring',
+        itemLevel: 40,
+        rarity: 'common',
+        affixes: [],
+        generatedName: { baseId: 'gravecaller_ring' },
+        seed: 1,
+      },
+    };
+    meta.vendorBuyback = [{ itemId: 'gravecaller_ring', count: 1, instance }];
+    sim.tick();
+
+    sim.chat('/buyback', a);
+    expect(errorText(sim.tick(), a)).toBe(
+      'Vendor buyback (1): Gravecaller Ring (2s 24c each). Repurchase at any merchant.',
     );
   });
 

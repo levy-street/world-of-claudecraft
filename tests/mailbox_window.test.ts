@@ -146,9 +146,14 @@ describe('mailbox_window: parcel quantity stepper (#1444, PR #1695 review)', () 
 
   it('rebuilding the parcel list restores focus to the equivalent control by item + role', () => {
     expect(painter).toContain('focusKey');
-    expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:minus`/);
-    expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:plus`/);
-    expect(painter).toMatch(/dataset\.focusKey = `\$\{slot\.itemId\}:remove`/);
+    // Exact rows use their UID and plain rows use their item id. Encoding the
+    // row key keeps the role delimiter unambiguous even when a UID contains ':'.
+    expect(painter).toMatch(/const rowKey = slot\.instanceUid \?\? `plain:\$\{slot\.itemId\}`;/);
+    expect(painter).toContain('const focusPrefix = encodeURIComponent(rowKey);');
+    expect(painter).toMatch(/dataset\.focusKey = `\$\{focusPrefix\}:minus`/);
+    expect(painter).toMatch(/dataset\.focusKey = `\$\{focusPrefix\}:plus`/);
+    expect(painter).toMatch(/dataset\.focusKey = `\$\{focusPrefix\}:remove`/);
+    expect(painter).toContain('decodeURIComponent(focusKey.slice(0, separator))');
   });
 });
 

@@ -174,7 +174,12 @@ export type {
 } from './world_api/dungeon_finder';
 export type { RaidLockout } from './world_api/dungeons';
 export type { WorldInteractionOutcome } from './world_api/interaction';
-export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
+export type {
+  MailAttachmentRequest,
+  MailInfo,
+  MailKindView,
+  MailMessageView,
+} from './world_api/mail';
 export type { MarketInfo, MarketListingView } from './world_api/market';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
 export type {
@@ -199,7 +204,7 @@ export type {
   PresenceStatus,
   SocialInfo,
 } from './world_api/social_graph';
-export type { TradeInfo, TradeOffer } from './world_api/trade';
+export type { TradeInfo, TradeOffer, TradeOfferRequestItem } from './world_api/trade';
 export type {
   CupInfo,
   VcBetInfo,

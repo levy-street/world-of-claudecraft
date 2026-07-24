@@ -36,6 +36,7 @@ import {
   PLAYER_METRICS_SCHEMA,
   recordCharacterCreation,
 } from './player_metrics_db';
+import { PROCEDURAL_ITEM_UID_SCHEMA } from './procedural_item_uid_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM } from './realm';
 import { chooseArchiveName } from './reclaim_name';
@@ -1036,6 +1037,7 @@ export async function ensureSchema(): Promise<void> {
     await client.query('SET LOCAL statement_timeout = 0');
     await client.query('SELECT pg_advisory_xact_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
     await client.query(SCHEMA);
+    await client.query(PROCEDURAL_ITEM_UID_SCHEMA);
     // Compact player analytics facts depend on accounts, characters, and
     // play_sessions from the core schema. The tables start empty and collect
     // lifecycle facts prospectively, so boot never runs a production backfill.

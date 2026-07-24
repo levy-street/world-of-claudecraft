@@ -33,6 +33,10 @@ import {
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
 import { isInRaidInstance } from './instances/dungeons';
+import {
+  canFitExactLootSlot,
+  grantExactLootSlot,
+} from './loot/exact_item_grant';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -129,8 +133,9 @@ export function lootCorpse(
   for (const s of [...mob.loot.items]) {
     if (!lootSlotVisibleTo(s, meta.entityId)) continue;
     if (s.openToAll) {
-      while (s.count > 0 && ctx.canAddItem(s.itemId, 1, meta.entityId)) {
-        ctx.addItem(s.itemId, 1, meta.entityId);
+      const one = { itemId: s.itemId, count: 1, ...(s.instance && { instance: s.instance }) };
+      while (s.count > 0 && canFitExactLootSlot(meta.inventory, bagCapacity(meta.bags), one)) {
+        grantExactLootSlot(ctx, one, meta.entityId);
         s.count--;
         didLoot = true;
       }
@@ -138,18 +143,30 @@ export function lootCorpse(
       continue;
     }
     if (s.personalFor) {
-      if (!ctx.canAddItem(s.itemId, 1, meta.entityId)) {
+      if (s.instance?.procedural && s.personalFor.length !== 1) {
+        throw new Error('A procedural personal-loot slot must have exactly one recipient');
+      }
+      const one = { itemId: s.itemId, count: 1, ...(s.instance && { instance: s.instance }) };
+      if (!canFitExactLootSlot(meta.inventory, bagCapacity(meta.bags), one)) {
         bagsFull = true;
         continue;
       }
-      ctx.addItem(s.itemId, 1, meta.entityId);
+      grantExactLootSlot(ctx, one, meta.entityId);
       s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
       tookPersonal = true;
       didLoot = true;
       continue;
     }
     if (!rights.shared) continue;
-    while (s.count > 0 && awardSharedLootItem(ctx, s.itemId, mob, meta)) {
+    while (
+      s.count > 0 &&
+      awardSharedLootItem(
+        ctx,
+        { itemId: s.itemId, count: 1, ...(s.instance && { instance: s.instance }) },
+        mob,
+        meta,
+      )
+    ) {
       s.count--;
       didLoot = true;
     }

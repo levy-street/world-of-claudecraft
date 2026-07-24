@@ -45,6 +45,11 @@ describe('char_window: no magic values', () => {
 });
 
 describe('char_window: WCAG 2.2 AA', () => {
+  it('moves focus into the first meaningful control when opened', () => {
+    expect(painter).toContain('focusFirstInteractive');
+    expect(painter).toContain('\'.equip-unequip, [data-act="share-card"], .char-skin-row button\'');
+  });
+
   it('returns focus to the opener on close', () => {
     expect(painter).toContain('captureFocus');
     expect(painter).toContain('restoreFocus');
@@ -116,6 +121,7 @@ describe('char_window: profession art placements', () => {
       closeOthers: vi.fn(),
       hideTooltip: vi.fn(),
       captureFocus: () => null,
+      focusFirstInteractive: vi.fn(),
       restoreFocus: vi.fn(),
       slotName: (slot) => slot,
       statCellHtml: () => '',
@@ -214,6 +220,7 @@ describe('char_window: profession art placements', () => {
       closeOthers: vi.fn(),
       hideTooltip: vi.fn(),
       captureFocus: () => null,
+      focusFirstInteractive: vi.fn(),
       restoreFocus: vi.fn(),
       slotName: (slot) => slot,
       statCellHtml: () => '',
@@ -418,6 +425,9 @@ describe('char_window: own-paperdoll per-copy tooltip threading', () => {
     // reverts the own paperdoll to def-only tooltips while every pure-core
     // suite stays green.
     expect(painter).toContain('world.entities.get(world.playerId)?.equippedInstances?.[slot]');
-    expect(painter).toContain('this.deps.itemTooltip(item, instance)');
+    expect(painter).toContain('this.deps.itemTooltip(item, liveInstance)');
+    expect(painter).toContain('itemPresentationName({ name: itemDisplayName(item) }, instance)');
+    expect(painter).toContain('itemPresentationQuality(item, instance)');
+    expect(painter).toContain("legendaryPowerRuneSvg('equip-power-rune')");
   });
 });

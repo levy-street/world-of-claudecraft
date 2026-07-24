@@ -68,6 +68,13 @@ describe('inspect_window: thin painter, deps-only Hud access', () => {
     expect(painter).toContain('buildInspectRemoteView(');
   });
 
+  it('keeps procedural inspected gear keyboard reachable with a stable rarity hook and rune', () => {
+    expect(painter).toContain('row.dataset.proceduralRarity = instance.procedural.rarity');
+    expect(painter).toContain("row.style.setProperty('--item-power-rarity', qColor)");
+    expect(painter).toContain('row.tabIndex = 0');
+    expect(painter).toContain("legendaryPowerRuneSvg('inspect-power-rune')");
+  });
+
   it('carries no raw color literal (quality/class colors come from data + helpers)', () => {
     const hex = painter.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];
     expect(hex, `hex colors must move to data/CSS: ${hex.join(', ')}`).toEqual([]);

@@ -1530,6 +1530,7 @@ export const en_XA: EnTranslations = {
       "reorderNeedsRecent": "[Çļéáŕ ţĥé ƒíļţéŕ áñð šóŕţ ƀý Ŕéçéñţ ţó ŕéáŕŕáñĝé ýóúŕ ƀáĝš]",
       "itemAriaInstanced": "[{item}, ɋúáñţíţý {count}, ɱáķéŕ-ɱáŕķéð çóþý]",
       "itemAriaMasterwork": "[{item}, ɋúáñţíţý {count}, ɱášţéŕŵóŕķ]",
+      "itemAriaProcedural": "[{item}, {rarity}, íţéɱ ļéʋéļ {level}, ɋúáñţíţý {count}]",
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",
       "filterAll": "[Áļļ]",
       "filterWeapon": "[Ŵéáþóñš]",
@@ -6545,7 +6546,108 @@ export const en_XA: EnTranslations = {
       "dps": "[Ðáɱáĝé/šéç]",
       "critChance": "[Çŕíţ Çĥáñçé]",
       "dodge": "[Ðóðĝé]",
-      "parry": "[Þáŕŕý]"
+      "parry": "[Þáŕŕý]",
+      "weaponMin": "[Ɱíñíɱúɱ ŵéáþóñ ðáɱáĝé]",
+      "weaponMax": "[Ɱáẋíɱúɱ ŵéáþóñ ðáɱáĝé]",
+      "weaponDps": "[Ŵéáþóñ ðáɱáĝé þéŕ šéçóñð]",
+      "healthOnKill": "[Ĥéáļţĥ óñ ķíļļ]",
+      "manaOnKill": "[Ɱáñá óñ ķíļļ]",
+      "blockValue": "[Ɓļóçķ ʋáļúé]"
+    },
+    "procedural": {
+      "rollRangeAria": "[Þóššíƀļé ŕóļļ ƒŕóɱ {min} ţó {max}]",
+      "advancedDetailsHint": "[Ĥóļð {key} ţó šĥóŵ þóššíƀļé ŕóļļ ŕáñĝéš.]",
+      "legendaryPower": "[Ļéĝéñðáŕý þóŵéŕ]",
+      "rarity": {
+        "common": "[Çóɱɱóñ]",
+        "magic": "[Ɱáĝíç]",
+        "rare": "[Ŕáŕé]",
+        "epic": "[Éþíç]",
+        "legendary": "[Ļéĝéñðáŕý]",
+        "mythic": "[Ɱýţĥíç]"
+      },
+      "nameFragment": {
+        "mighty": "[Ɱíĝĥţý]",
+        "deft": "[Ðéƒţ]",
+        "stalwart": "[Šţáļŵáŕţ]",
+        "sages": "[Šáĝé'š]",
+        "spiritual": "[Šþíŕíţúáļ]",
+        "of_focus": "[óƒ Ƒóçúš]",
+        "of_striking": "[óƒ Šţŕíķíñĝ]",
+        "of_alacrity": "[óƒ Áļáçŕíţý]",
+        "of_precision": "[óƒ Þŕéçíšíóñ]",
+        "warded": "[Ŵáŕðéð]",
+        "of_reaping": "[óƒ Ŕéáþíñĝ]",
+        "of_remembrance": "[óƒ Ŕéɱéɱƀŕáñçé]"
+      },
+      "rareWord": {
+        "ashen": "[Ášĥéñ]",
+        "blackfen": "[Ɓļáçķƒéñ]",
+        "doom": "[Ðóóɱ]",
+        "grave": "[Ĝŕáʋé]",
+        "mire": "[Ɱíŕé]",
+        "storm": "[Šţóŕɱ]",
+        "thorn": "[Ţĥóŕñ]",
+        "wyrm": "[Ŵýŕɱ]",
+        "bite": "[Ɓíţé]",
+        "brand": "[Ɓŕáñð]",
+        "promise": "[Þŕóɱíšé]",
+        "thread": "[Ţĥŕéáð]",
+        "vigil": "[Ʋíĝíļ]",
+        "ward": "[Ŵáŕð]",
+        "whisper": "[Ŵĥíšþéŕ]",
+        "oath": "[Óáţĥ]"
+      },
+      "legendary": {
+        "crown_last_pyre": {
+          "name": "[Çŕóŵñ óƒ ţĥé Ļášţ Þýŕé]",
+          "description": "[Éʋéŕý ţĥíŕð Çíñðéŕƀóļţ šçóŕçĥéš éñéɱíéš ñéáŕ ţĥé ţáŕĝéţ.]"
+        },
+        "greyjaws_edge": {
+          "name": "[Ĝŕéýĵáŵ'š Éðĝé]",
+          "description": "[Éʋéŕý ţĥíŕð ŵéáþóñ ĥíţ ƀļééðš ţĥé ţáŕĝéţ áñð ŕéšţóŕéš á ļíţţļé ŕéšóúŕçé.]"
+        },
+        "hushwood_longbow": {
+          "name": "[Ĥúšĥŵóóð Ļóñĝƀóŵ]",
+          "description": "[Ļóñĝ Ðŕáŵ óŕ Ƒéļļ Šĥóţ çáñ ƀŕíéƒļý šíļéñçé íţš ţáŕĝéţ.]"
+        },
+        "nightglass_fang": {
+          "name": "[Ñíĝĥţĝļášš Ƒáñĝ]",
+          "description": "[Á ķíļļ ĝŕáñţš á šĥóŕţ ƀúŕšţ óƒ ĥášţé.]"
+        },
+        "ysoleis_vigil": {
+          "name": "[Ýšóļéí'š Ʋíĝíļ]",
+          "description": "[Çŕíţíçáļ ĥéáļíñĝ çŕéáţéš á ƀŕíéƒ ŕéšţóŕáţíʋé ĝŕóúñð áŕéá.]"
+        },
+        "stormwake_idol": {
+          "name": "[Šţóŕɱŵáķé Íðóļ]",
+          "description": "[Éʋéŕý ƒóúŕţĥ Áŕç Ɓóļţ áŕçš ţó ñéáŕƀý éñéɱíéš.]"
+        },
+        "ashbinders_seal": {
+          "name": "[Ášĥƀíñðéŕ'š Šéáļ]",
+          "description": "[Éʋéŕý ƒóúŕţĥ Ĝļóóɱ Ɓóļţ ɱáŕķš íţš ţáŕĝéţ ƒóŕ áððéð Šĥáðóŵ ðáɱáĝé.]"
+        },
+        "dawnward_signet": {
+          "name": "[Ðáŵñŵáŕð Šíĝñéţ]",
+          "description": "[Ɱéñðíñĝ Ļíĝĥţ šĥíéļðš íţš ŕéçíþíéñţ ƒóŕ á þóŕţíóñ óƒ ţĥé ĥéáļ.]"
+        },
+        "feral_moonclasp": {
+          "name": "[Ƒéŕáļ Ɱóóñçļášþ]",
+          "description": "[Éʋéŕý ţĥíŕð Ļúñáŕ Ţéɱþéšţ ŕéšţóŕéš þŕíɱáŕý ŕéšóúŕçé.]"
+        },
+        "bell_of_the_ninth_peal": {
+          "name": "[Ɓéļļ óƒ ţĥé Ñíñţĥ Þéáļ]",
+          "description": "[Éʋéŕý šéçóñð ðáɱáĝíñĝ šþéļļ ţóļļš áŕóúñð ţĥé ţáŕĝéţ.]"
+        },
+        "mantle_of_borrowed_time": {
+          "name": "[Ɱáñţļé óƒ Šţóļéñ Ĥóúŕš]",
+          "description": "[Ƒáļļíñĝ ƀéļóŵ 35% ĥéáļţĥ ĝŕáñţš á ƀŕíéƒ ðéƒéñšíʋé ŵáŕð.]"
+        },
+        "boots_of_the_unbroken_road": {
+          "name": "[Ɓóóţš óƒ ţĥé Úñƀŕóķéñ Ŕóáð]",
+          "description": "[Ɱóʋíñĝ 15 ýáŕðš ĝŕáñţš á šĥóŕţ ɱóʋéɱéñţ-šþééð ƀúŕšţ.]"
+        }
+      }
     },
     "tooltip": {
       "qualityKind": "[{quality} {kind}]",

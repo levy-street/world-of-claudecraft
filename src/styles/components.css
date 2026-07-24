@@ -838,6 +838,13 @@
     align-items: center;
     gap: 8px;
   }
+  .loot-roll-icon-wrap {
+    position: relative;
+    display: block;
+    width: 28px;
+    height: 28px;
+    flex: none;
+  }
   .loot-roll-copy {
     min-width: 0;
   }
@@ -1087,6 +1094,63 @@
     flex: 0 0 44px;
     border-width: 2px;
     border-radius: 7px;
+  }
+  /* The paperdoll icon wrapper reserves an icon-local coordinate system for the
+     legendary rune without changing the balanced 6/6 row geometry. */
+  .equip-icon-wrap {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    display: block;
+  }
+  .item-power-rune {
+    display: block;
+    pointer-events: none;
+  }
+  .equip-power-rune,
+  .inspect-power-rune {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    color: var(--item-power-rarity, var(--gold));
+    filter: drop-shadow(0 0 1px var(--color-bg-dark));
+    z-index: 1;
+  }
+  .loot-icon-wrap {
+    position: relative;
+    display: block;
+    width: 28px;
+    height: 28px;
+    flex: none;
+  }
+  .loot-power-rune,
+  .loot-roll-power-rune {
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    width: 11px;
+    height: 11px;
+    filter: drop-shadow(0 0 1px var(--color-bg-dark));
+    z-index: 1;
+  }
+  .loot-power-rune {
+    color: var(--loot-slot-quality, var(--gold));
+  }
+  .loot-roll-power-rune {
+    color: var(--loot-roll-quality, var(--gold));
+  }
+  .bank-power-rune {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 13px;
+    height: 13px;
+    color: var(--bank-slot-quality, var(--gold));
+    filter: drop-shadow(0 0 1px var(--color-bg-dark));
+    z-index: 1;
   }
   .equip-slot .slot-name {
     font-size: 9px;
@@ -5666,6 +5730,39 @@
     object-fit: contain;
     pointer-events: none;
     filter: drop-shadow(var(--art-shadow-sm));
+  }
+  /* A static hollow rune is the legendary power's non-color cue. It stays at
+     the top-right, clear of the instance/masterwork mark and stack count. */
+  .bag-item .bi-power-rune {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 13px;
+    height: 13px;
+    color: var(--bag-slot-quality, var(--gold));
+    filter: drop-shadow(0 0 1px var(--color-bg-dark));
+    z-index: 1;
+  }
+  @media (forced-colors: active) {
+    .item-power-rune {
+      color: CanvasText;
+      filter: none;
+      forced-color-adjust: auto;
+    }
+    .bag-item[data-procedural-rarity],
+    .bank-item[data-procedural-rarity],
+    .loot-item[data-procedural-rarity],
+    .loot-roll[data-procedural-rarity],
+    .equip-slot[data-procedural-rarity] .item-icon {
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .item-power-rune {
+      animation: none !important;
+      transition: none !important;
+    }
   }
   .bag-item.empty {
     cursor: default;

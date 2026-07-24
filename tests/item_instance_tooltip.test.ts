@@ -190,6 +190,27 @@ describe('wornTooltipInstance (the eqi-mirror worn projection)', () => {
     ).toBe('');
   });
 
+  it('retains procedural identity while omitting private worn-state fields', () => {
+    const projected = wornTooltipInstance({
+      procedural: {
+        version: 1,
+        uid: 'pi1:worn:1',
+        baseId: 'ironedge_longsword',
+        itemLevel: 20,
+        rarity: 'rare',
+        affixes: [],
+        generatedName: {
+          baseId: 'ironedge_longsword',
+          rareWordIds: ['procedural.rare.storm', 'procedural.rare.vigil'],
+        },
+        seed: 7,
+      },
+      boundTo: 7,
+    });
+    expect(projected?.procedural?.uid).toBe('pi1:worn:1');
+    expect(projected).not.toHaveProperty('boundTo');
+  });
+
   it('char_window routes the paperdoll tooltip through the projection (source pin)', () => {
     const charWindow = readFileSync(new URL('../src/ui/char_window.ts', import.meta.url), 'utf8');
     expect(charWindow).toContain('wornTooltipInstance(');
@@ -249,11 +270,11 @@ import { readFileSync } from 'node:fs';
 describe('hud.itemTooltip composition order (source pins)', () => {
   const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
   const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
-  const badges = hud.indexOf('instanceBadgeLines(instance)');
-  const bonus = hud.indexOf('instanceBonusStatLines(instance)');
+  const badges = hud.indexOf('instanceBadgeLines(resolverInstance)');
+  const bonus = hud.indexOf('instanceBonusStatLines(resolverInstance)');
   // The mark line takes the def's kind too: the gathered-vs-crafted
   // wording split resolves from item.kind at the one composition site.
-  const mark = hud.indexOf('instanceMakersMarkLine(instance, item.kind)');
+  const mark = hud.indexOf('instanceMakersMarkLine(resolverInstance, item.kind)');
   const soulbound = hud.indexOf("t('hudChrome.itemSoulbound')");
   const setBlock = hud.indexOf('this.itemSetBlock(item)');
 
@@ -261,8 +282,8 @@ describe('hud.itemTooltip composition order (source pins)', () => {
     expect(badges).toBeGreaterThan(-1);
     expect(bonus).toBeGreaterThan(-1);
     expect(mark).toBeGreaterThan(-1);
-    expect(hud.indexOf('instanceBadgeLines(instance)', badges + 1)).toBe(-1);
-    expect(hud.indexOf('instanceBonusStatLines(instance)', bonus + 1)).toBe(-1);
+    expect(hud.indexOf('instanceBadgeLines(resolverInstance)', badges + 1)).toBe(-1);
+    expect(hud.indexOf('instanceBonusStatLines(resolverInstance)', bonus + 1)).toBe(-1);
     expect(hud.indexOf('instanceMakersMarkLine(', mark + 1)).toBe(-1);
   });
 

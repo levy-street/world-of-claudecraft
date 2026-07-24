@@ -50,6 +50,8 @@ import { FOCUSABLE_SELECTOR } from './focus_manager';
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import type { PainterHostPresentation } from './painter_host';
+import { itemPresentationName, proceduralRarityLabel } from './procedural_item_presentation';
+import { legendaryPowerRuneSvg } from './procedural_loot_icons';
 import { svgIcon } from './ui_icons';
 
 // The unranked quality fallback as a CSS custom property. The shared QUALITY_COLOR
@@ -411,12 +413,25 @@ export class BankWindow {
       cell.className = `bank-item q-${slot.qualityKey}`;
       const qColor = QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR;
       cell.style.setProperty('--bank-slot-quality', qColor);
-      const itemName = itemDisplayName(item);
+      const itemName = itemPresentationName({ name: itemDisplayName(item) }, slot.instance);
+      const procedural = slot.instance?.procedural;
+      const count = this.fmt(slot.count);
+      if (procedural) cell.dataset.proceduralRarity = procedural.rarity;
       cell.setAttribute(
         'aria-label',
-        t('itemUi.bags.itemAria', { item: itemName, count: this.fmt(slot.count) }),
+        procedural
+          ? t('hudChrome.bags.itemAriaProcedural', {
+              item: itemName,
+              rarity: proceduralRarityLabel(slot.instance) ?? procedural.rarity,
+              level: this.fmt(procedural.itemLevel),
+              count,
+            })
+          : t('itemUi.bags.itemAria', { item: itemName, count }),
       );
-      cell.innerHTML = `${this.deps.itemIcon(item)}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: this.fmt(slot.count) })) : ''}</span>`;
+      const powerRune = procedural?.legendaryPowerId
+        ? legendaryPowerRuneSvg('bank-power-rune')
+        : '';
+      cell.innerHTML = `${this.deps.itemIcon(item, slot.instance)}${powerRune}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count })) : ''}</span>`;
       cell.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the slot (its
         // tooltip is already shown) instead of withdrawing: the release dismisses

@@ -41,6 +41,13 @@ get written permission.
   party, and it does not transfer to forks. Treat CraftPix's own terms at
   https://craftpix.net/file-licenses/ as controlling, and buy your own licence
   if you want to ship these icons.
+- **The CraftPix generic item icons** (`public/ui/items/*.webp`, except entries
+  whose `license` field in `public/ui/items/mapping.json` explicitly overrides
+  the collection licence). These were purchased by the same Levy Street
+  account under the same non-transferable CraftPix premium licence. Procedural
+  equipment reuses these stable base silhouettes; that reuse does not broaden
+  redistribution rights. Remove or replace them in a redistributable fork, or
+  acquire your own CraftPix licence.
 - **Commercial and prestige art owned by the project.** The Season 1 Armory
   weapon models and storefront renders, the Claudium visual asset set, the
   legacy Claudium prototype weapons, the Book of Deeds achievement icons, the
@@ -119,6 +126,7 @@ than free, so ask before you rely on it.
 | Bag icons (`public/ui/items/{backpack,linen_pouch,travelers_knapsack,wolfhide_satchel,gravewoven_bag,mistcallers_duffel}.webp`, encoded to 128px WebP via `scripts/convert_item_icons_webp.mjs`) | World of ClaudeCraft | Project art created for this game; provenance per icon in `public/ui/items/mapping.json` | Project asset | With the project only |
 | Professions 2.0 art set (`public/ui/professions/*.webp`, the `woc_professions_art` material icons recorded in `public/ui/items/mapping.json`, and the inline maker's-mark glyph in `src/ui/ui_icons.ts`) | World of ClaudeCraft | Maintainer-commissioned original art created for this game and normalized through the profession/item pipelines; provenance per raster in the corresponding mapping file | Project asset, rights reserved | **No, permission required** |
 | Class ability icons (`public/ui/skills/<class>/*.webp`, re-encoded from the source-pack PNGs to WebP via `scripts/convert_skill_icons_webp.mjs`; all 9 classes: paladin, hunter, priest, warlock, rogue, warrior, mage, druid, shaman; source packs paladin/archer/priest/warlock/thief/warrior/berserker/demon/druid/pyromancer/cryomancer/aeromancer/lightning-mage/earth-magician/100-rpg-skill-icons/100-skill-icons-pack-for-rpg + per-ability fill sets) | CraftPix | https://craftpix.net | CraftPix premium (royalty-free commercial), purchased by Levy Street account (callum@levystreet.com) | **No, permission required** |
+| Generic item icons (`public/ui/items/*.webp`, excluding entries with an explicit project-owned or other licence override in `public/ui/items/mapping.json`; includes the stable armor silhouettes reused by procedural equipment) | CraftPix | https://craftpix.net; exact pack provenance per icon in `public/ui/items/mapping.json` | CraftPix premium (royalty-free commercial), purchased by Levy Street account (callum@levystreet.com) | **No, permission required** |
 | Collective Reversal and Hourglass of Suspension ability icons (`public/ui/skills/mage/collective_reversal.webp`, `public/ui/skills/mage/temporal_hourglass.webp`) | World of ClaudeCraft project owner | Owner-provided original artwork | Used with permission (Levy Street) | **No, permission required** |
 | Season 1 Armory weapon models, source images, generated store thumbnails, and promotional card (Guildmark, Emberwrought, Hoarfrost, and Fallen Star collections, in `public/models/weapons/`, `public/ui/weapons/`, and `public/ui/store/`) | World of ClaudeCraft | Project-generated via `scripts/asset_pipeline` (Tripo AI 3D); storefront renders composited locally, with the text-free promo background derived through OpenAI image editing | Project asset, rights reserved | **No, permission required** |
 | Claudium visual asset set (`public/claudium/`: coin, UI icons, and denomination stacks; excludes the two payment-rail brand icons noted under Brand marks) | World of ClaudeCraft | Project-generated via the Higgsfield MCP connector (Recraft V4.1 stills), composited and web-optimized locally; owned under the Higgsfield paid-plan license | Project asset, rights reserved | **No, permission required** |

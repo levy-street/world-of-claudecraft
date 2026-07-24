@@ -19,6 +19,7 @@ import type { BankInfo } from '../world_api';
 import { addStacked, bagCapacity, bagsFullError, countFit, instancedCountCap } from './bags';
 import { ITEMS } from './data';
 import * as deedsMod from './deeds';
+import { sanitizePersistedItemInstance } from './procedural_persistence';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, dist2d, type Entity, INTERACT_RANGE, type InvSlot } from './types';
 
@@ -297,22 +298,22 @@ export function sanitizeBankState(raw: unknown): BankState {
   const r = raw as { inventory?: unknown; purchasedSlots?: unknown; bonusSlots?: unknown };
   const inventory: InvSlot[] = [];
   if (Array.isArray(r.inventory)) {
-    for (const entry of r.inventory) {
+    for (const [index, entry] of r.inventory.entries()) {
       if (!entry || typeof entry !== 'object') continue;
       const e = entry as { itemId?: unknown; count?: unknown; instance?: unknown };
       if (typeof e.itemId !== 'string' || e.itemId === '') continue;
       const hasInstance = !!e.instance && typeof e.instance === 'object';
+      const instance = hasInstance
+        ? sanitizePersistedItemInstance(e.instance, e.itemId, `bank.inventory[${index}]`)
+        : undefined;
       // The shared tamper ceiling (bags.ts instancedCountCap, also applied to
       // the carried-inventory hydration in Sim.addPlayer): merge-legal stack
       // cap for a counted instanced slot, 1 for a charge-bearing payload, and
       // an unknown item def stays dormant uncapped data like the plain arm.
-      const instanceCap = instancedCountCap(
-        ITEMS[e.itemId],
-        hasInstance ? (e.instance as InvSlot['instance']) : undefined,
-      );
+      const instanceCap = instancedCountCap(ITEMS[e.itemId], instance);
       const count = Math.min(instanceCap, Math.max(1, Math.floor(Number(e.count)) || 1));
-      const slot: InvSlot = hasInstance
-        ? { itemId: e.itemId, count, instance: e.instance as InvSlot['instance'] }
+      const slot: InvSlot = instance
+        ? { itemId: e.itemId, count, instance }
         : { itemId: e.itemId, count };
       inventory.push(cloneInvSlot(slot));
     }

@@ -16,7 +16,13 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). This region draws NO rng.
 
-import { addStacked, bagCapacity, bagsFullError, equipBag as equipBagCmd } from './bags';
+import {
+  addStacked,
+  bagCapacity,
+  bagsFullError,
+  canGrantItemInstance,
+  equipBag as equipBagCmd,
+} from './bags';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import {
@@ -30,7 +36,12 @@ import {
 } from './equipment_rules';
 import { formatMoney } from './format_money';
 import { moveStackToCell } from './inventory_order';
-import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
+import { requiredLevelFor } from './item_level_req';
+import {
+  meetsItemInstanceLevelRequirement,
+  requiredLevelForItemInstance,
+} from './procedural_item_level';
+import { itemVendorSellValue } from './procedural_vendor_value';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import { useGatherToolItem } from './professions/gathering';
 import type { ItemUseResult, PlayerMeta } from './sim';
@@ -142,20 +153,39 @@ export function removePreferFungible(
   return consumed;
 }
 
-export function discardItem(ctx: SimContext, itemId: string, count = 1, pid?: number): void {
+export function discardItem(
+  ctx: SimContext,
+  itemId: string,
+  count = 1,
+  pid?: number,
+  instanceUid?: string,
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta } = r;
   const def = ITEMS[itemId];
-  const available = ctx.countItem(itemId, meta.entityId);
+  const selectedIndex =
+    instanceUid === undefined ? -1 : selectedInventoryIndex(meta, itemId, instanceUid);
+  const available =
+    instanceUid === undefined ? ctx.countItem(itemId, meta.entityId) : selectedIndex >= 0 ? 1 : 0;
   if (!def || available <= 0) {
     ctx.error(meta.entityId, "You don't have that item.");
     return;
   }
   if (def.noDiscard) return;
-  const discardCount = Number.isFinite(count) ? Math.min(Math.floor(count), available) : 0;
+  const discardCount =
+    instanceUid === undefined
+      ? Number.isFinite(count)
+        ? Math.min(Math.floor(count), available)
+        : 0
+      : 1;
   if (discardCount <= 0) return;
-  removePreferFungible(ctx, itemId, discardCount, meta.entityId);
+  if (instanceUid === undefined) {
+    removePreferFungible(ctx, itemId, discardCount, meta.entityId);
+  } else {
+    removeInventoryUnitAt(meta, selectedIndex);
+    ctx.onInventoryChangedForQuests(meta);
+  }
   ctx.emit({
     type: 'log',
     // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
@@ -178,6 +208,44 @@ export function moveInventoryItem(ctx: SimContext, from: number, to: number, pid
   moveStackToCell(meta.inventory, from, to, bagCapacity(meta.bags));
 }
 
+function selectedInventoryIndex(meta: PlayerMeta, itemId: string, instanceUid?: string): number {
+  for (let index = meta.inventory.length - 1; index >= 0; index--) {
+    const slot = meta.inventory[index];
+    if (slot.itemId !== itemId) continue;
+    if (instanceUid !== undefined && slot.instance?.procedural?.uid !== instanceUid) continue;
+    return index;
+  }
+  return -1;
+}
+
+function removeInventoryUnitAt(meta: PlayerMeta, index: number): ItemInstancePayload | undefined {
+  const slot = meta.inventory[index];
+  if (!slot || slot.count <= 0) return undefined;
+  const instance =
+    slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
+  slot.count -= 1;
+  if (slot.count <= 0) meta.inventory.splice(index, 1);
+  return instance;
+}
+
+/** Remove exactly one generated copy selected by its server-issued UID.
+ * The UID is an opaque selector only: the returned payload always comes from
+ * authoritative inventory, never from a client request. */
+export function removeExactItemInstance(
+  ctx: SimContext,
+  itemId: string,
+  instanceUid: string,
+  pid?: number,
+): ItemInstancePayload | undefined {
+  const r = ctx.resolve(pid);
+  if (!r) return undefined;
+  const index = selectedInventoryIndex(r.meta, itemId, instanceUid);
+  if (index < 0) return undefined;
+  const instance = removeInventoryUnitAt(r.meta, index);
+  if (instance) ctx.onInventoryChangedForQuests(r.meta);
+  return instance;
+}
+
 // `targetSlot` names the exact equipment key the player aimed at (the paperdoll
 // drop target). It is a REQUEST, never a bypass: the sim re-validates it against
 // the item's declared slot (slotAcceptsItem), so a hand-crafted packet cannot put
@@ -187,6 +255,7 @@ export function equipItem(
   itemId: string,
   pid?: number,
   targetSlot?: EquipSlot,
+  instanceUid?: string,
 ): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -194,7 +263,12 @@ export function equipItem(
   const def = ITEMS[itemId];
   if (!def?.slot || (def.kind !== 'weapon' && def.kind !== 'armor' && def.kind !== 'held_offhand'))
     return;
-  if (ctx.countItem(itemId, meta.entityId) <= 0) return;
+  const incomingIndex = selectedInventoryIndex(meta, itemId, instanceUid);
+  if (incomingIndex < 0) {
+    if (instanceUid !== undefined) ctx.error(meta.entityId, 'That item is no longer in your bags.');
+    return;
+  }
+  const incomingInstance = meta.inventory[incomingIndex].instance;
   if (targetSlot && !slotAcceptsItem(def, targetSlot)) {
     ctx.error(meta.entityId, 'That does not go in that slot.');
     return;
@@ -203,8 +277,11 @@ export function equipItem(
     ctx.error(meta.entityId, 'You cannot equip that.');
     return;
   }
-  if (!meetsLevelRequirement(p.level, def)) {
-    ctx.error(meta.entityId, `You must be level ${requiredLevelFor(def)} to equip that.`);
+  if (!meetsItemInstanceLevelRequirement(p.level, def, incomingInstance)) {
+    ctx.error(
+      meta.entityId,
+      `You must be level ${requiredLevelForItemInstance(def, incomingInstance)} to equip that.`,
+    );
     return;
   }
   // Rings declare slot 'ring'; with no aimed slot the resolver picks ring1/ring2
@@ -248,15 +325,8 @@ export function equipItem(
     delete meta.equipment[displacedSlot];
     if (meta.equipmentInstance) delete meta.equipmentInstance[displacedSlot];
   }
-  // removeItem scans from the highest inventory index down (sim.ts), so a
-  // freshly-enchanted copy (pushed onto the end by addItemInstance,
-  // src/sim/professions/enchanting.ts applyEnchant) is what this picks up first
-  // when both a plain and an enchanted copy of the same item exist and nothing
-  // else has been looted since. That only holds while the enchanted copy stays
-  // the highest-index match: loot another plain copy afterward and the plain
-  // one gets equipped instead. Deterministic, acceptable for v1, but a future
-  // picker UI should not assume the enchanted copy is always favored.
-  const consumed = ctx.removeItem(itemId, 1, meta.entityId);
+  const consumedInstance = removeInventoryUnitAt(meta, incomingIndex);
+  ctx.onInventoryChangedForQuests(meta);
   if (old) {
     // Return the piece that was worn: if it carried an enchant, give it back
     // its own instanced slot (never merged into a plain stack, which would
@@ -274,15 +344,16 @@ export function equipItem(
     }
   }
   meta.equipment[slot] = itemId;
-  if (consumed[0]) {
+  if (consumedInstance) {
     meta.equipmentInstance ??= {};
-    meta.equipmentInstance[slot] = consumed[0];
+    meta.equipmentInstance[slot] = consumedInstance;
   } else if (meta.equipmentInstance) {
     delete meta.equipmentInstance[slot];
   }
   // The all-slots deed reads equipment, so re-check this player's triggers.
   ctx.markDeedsDirty(meta.entityId);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+  ctx.refreshEquipmentEffectPower(meta.entityId);
   ctx.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
 }
 
@@ -306,6 +377,7 @@ export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
   else addItemSilent(offhandId, 1, meta);
   ctx.markDeedsDirty(meta.entityId);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+  ctx.refreshEquipmentEffectPower(meta.entityId);
   ctx.emit({
     type: 'log',
     text: `Unequipped ${def.name}.`,
@@ -340,6 +412,7 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
   if (instance) meta.inventory.push({ itemId, count: 1, instance });
   else addItemSilent(itemId, 1, meta);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+  ctx.refreshEquipmentEffectPower(meta.entityId);
   const def = ITEMS[itemId];
   ctx.emit({
     type: 'log',
@@ -566,24 +639,51 @@ function vendorInRange(ctx: SimContext, p: Entity): boolean {
   );
 }
 
-function recordVendorBuyback(meta: PlayerMeta, itemId: string, count: number): void {
-  const existingIndex = meta.vendorBuyback.findIndex((s) => s.itemId === itemId);
-  if (existingIndex >= 0) {
-    const [existing] = meta.vendorBuyback.splice(existingIndex, 1);
-    existing.count += count;
-    meta.vendorBuyback.unshift(existing);
-  } else {
-    meta.vendorBuyback.unshift({ itemId, count });
+function recordVendorBuyback(
+  meta: PlayerMeta,
+  itemId: string,
+  count: number,
+  instances: readonly ItemInstancePayload[] = [],
+): void {
+  const plainCount = count - instances.length;
+  if (plainCount < 0) throw new Error('vendor buyback instance count exceeds sold count');
+  if (plainCount > 0) {
+    const existingIndex = meta.vendorBuyback.findIndex(
+      (slot) => slot.itemId === itemId && !slot.instance,
+    );
+    if (existingIndex >= 0) {
+      const [existing] = meta.vendorBuyback.splice(existingIndex, 1);
+      existing.count += plainCount;
+      meta.vendorBuyback.unshift(existing);
+    } else {
+      meta.vendorBuyback.unshift({ itemId, count: plainCount });
+    }
+  }
+  for (let index = instances.length - 1; index >= 0; index--) {
+    meta.vendorBuyback.unshift({
+      itemId,
+      count: 1,
+      instance: cloneItemInstancePayload(instances[index]),
+    });
   }
   while (meta.vendorBuyback.length > VENDOR_BUYBACK_LIMIT) meta.vendorBuyback.pop();
 }
 
-export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: number): void {
+export function sellItem(
+  ctx: SimContext,
+  itemId: string,
+  count = 1,
+  pid?: number,
+  instanceUid?: string,
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
-  const available = ctx.countItem(itemId, meta.entityId);
+  const selectedIndex =
+    instanceUid === undefined ? -1 : selectedInventoryIndex(meta, itemId, instanceUid);
+  const available =
+    instanceUid === undefined ? ctx.countItem(itemId, meta.entityId) : selectedIndex >= 0 ? 1 : 0;
   if (!def || available <= 0) {
     ctx.error(meta.entityId, "You don't have that item.");
     return;
@@ -620,7 +720,13 @@ export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: numbe
   for (const s of meta.inventory ?? []) {
     if (s.itemId === itemId && s.instance?.boundTo !== undefined) boundHeld += s.count;
   }
-  const sellableCount = Math.min(sellCount, available - boundHeld);
+  const selectedBound =
+    instanceUid !== undefined && meta.inventory[selectedIndex]?.instance?.boundTo !== undefined;
+  const sellableCount = selectedBound
+    ? 0
+    : instanceUid === undefined
+      ? Math.min(sellCount, available - boundHeld)
+      : 1;
   if (sellableCount <= 0) {
     ctx.error(meta.entityId, 'That item is bound and cannot be sold.');
     return;
@@ -629,15 +735,24 @@ export function sellItem(ctx: SimContext, itemId: string, count = 1, pid?: numbe
   // above already guarantees enough unbound copies, but removePreferFungible's
   // highest-index-first instanced walk must still spare a bound copy sitting
   // above an unbound instanced one.
-  removePreferFungible(
-    ctx,
-    itemId,
-    sellableCount,
-    meta.entityId,
-    (instance) => instance.boundTo !== undefined,
-  );
-  recordVendorBuyback(meta, itemId, sellableCount);
-  const payout = def.sellValue * sellableCount;
+  const soldInstances =
+    instanceUid === undefined
+      ? removePreferFungible(
+          ctx,
+          itemId,
+          sellableCount,
+          meta.entityId,
+          (instance) => instance.boundTo !== undefined,
+        )
+      : [removeInventoryUnitAt(meta, selectedIndex)].filter(
+          (instance): instance is ItemInstancePayload => instance !== undefined,
+        );
+  if (instanceUid !== undefined) ctx.onInventoryChangedForQuests(meta);
+  recordVendorBuyback(meta, itemId, sellableCount, soldInstances);
+  const plainCount = sellableCount - soldInstances.length;
+  const payout =
+    itemVendorSellValue(def) * plainCount +
+    soldInstances.reduce((total, instance) => total + itemVendorSellValue(def, instance), 0);
   meta.copper += payout;
   ctx.emit({ type: 'vendor', action: 'sell', itemId, pid: meta.entityId });
   ctx.emit({
@@ -709,14 +824,14 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
     const def = ITEMS[itemId]!;
     // Skip-aware removal: a spared bound slot sharing this itemId must never
     // be the slot the removal walk consumes (plain removeItem cannot skip).
-    removePreferFungible(
+    const soldInstances = removePreferFungible(
       ctx,
       itemId,
       count,
       meta.entityId,
       (instance) => instance.boundTo !== undefined,
     );
-    recordVendorBuyback(meta, itemId, count);
+    recordVendorBuyback(meta, itemId, count, soldInstances);
     total += def.sellValue * count;
     soldCount += count;
   }
@@ -729,12 +844,21 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
   });
 }
 
-export function buyBackItem(ctx: SimContext, itemId: string, pid?: number): void {
+export function buyBackItem(
+  ctx: SimContext,
+  itemId: string,
+  pid?: number,
+  instanceUid?: string,
+): void {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
-  const slot = meta.vendorBuyback.find((s) => s.itemId === itemId);
+  const slot = meta.vendorBuyback.find(
+    (entry) =>
+      entry.itemId === itemId &&
+      (instanceUid === undefined || entry.instance?.procedural?.uid === instanceUid),
+  );
   if (!def || !slot || slot.count <= 0) {
     ctx.error(meta.entityId, 'That item is not available for buyback.');
     return;
@@ -747,18 +871,24 @@ export function buyBackItem(ctx: SimContext, itemId: string, pid?: number): void
     ctx.error(meta.entityId, 'There is no merchant nearby.');
     return;
   }
-  if (meta.copper < def.sellValue) {
+  const buybackPrice = itemVendorSellValue(def, slot.instance);
+  if (meta.copper < buybackPrice) {
     ctx.error(meta.entityId, 'Not enough money.');
     return;
   }
-  if (!ctx.canAddItem(itemId, 1, meta.entityId)) {
+  const returningInstance =
+    slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
+  const fits = returningInstance
+    ? canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), itemId, returningInstance)
+    : ctx.canAddItem(itemId, 1, meta.entityId);
+  if (!fits) {
     bagsFullError(ctx, meta.entityId);
     return;
   }
-  meta.copper -= def.sellValue;
+  meta.copper -= buybackPrice;
   slot.count -= 1;
   if (slot.count <= 0) meta.vendorBuyback = meta.vendorBuyback.filter((s) => s !== slot);
-  addItemSilent(itemId, 1, meta);
+  addItemSilent(itemId, 1, meta, returningInstance);
   // The silent add bypasses the inventory hub, so credit the discovery
   // ledger here (an acquisition like any other; the mark is idempotent).
   ctx.markItemDiscovered(meta, itemId);
@@ -766,11 +896,16 @@ export function buyBackItem(ctx: SimContext, itemId: string, pid?: number): void
   ctx.emit({ type: 'vendor', action: 'buyback', itemId, pid: meta.entityId });
   ctx.emit({
     type: 'loot',
-    text: `Bought back ${def.name} for ${formatMoney(def.sellValue)}.`,
+    text: `Bought back ${def.name} for ${formatMoney(buybackPrice)}.`,
     pid: meta.entityId,
   });
 }
 
-function addItemSilent(itemId: string, count: number, meta: PlayerMeta): void {
-  addStacked(meta.inventory, itemId, count);
+function addItemSilent(
+  itemId: string,
+  count: number,
+  meta: PlayerMeta,
+  instance?: ItemInstancePayload,
+): void {
+  addStacked(meta.inventory, itemId, count, instance);
 }

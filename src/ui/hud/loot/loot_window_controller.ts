@@ -1,10 +1,17 @@
 import type { corpseLootAvailability } from '../../../game/corpse_loot_availability';
 import { ITEMS } from '../../../sim/data';
-import { dist2d, type Entity, type ItemDef } from '../../../sim/types';
+import { dist2d, type Entity, type ItemDef, type ItemInstancePayload } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
+import { QUALITY_COLOR } from '../../icons';
+import {
+  itemPresentationName,
+  itemPresentationQuality,
+  proceduralRarityLabel,
+} from '../../procedural_item_presentation';
+import { legendaryPowerRuneSvg } from '../../procedural_loot_icons';
 import { svgIcon } from '../../ui_icons';
 import { corpseHarvestView } from './corpse_harvest_view';
 import { renderCorpseHarvestPicker } from './corpse_harvest_window';
@@ -12,6 +19,7 @@ import { renderCorpseHarvestPicker } from './corpse_harvest_window';
 export interface LootWindowItemStack {
   itemId: string;
   count: number;
+  instance?: ItemInstancePayload;
 }
 
 export interface LootWindowControllerDeps {
@@ -24,8 +32,8 @@ export interface LootWindowControllerDeps {
   entityName(entity: Entity): string;
   money(copper: number): string;
   coinIconUrl(): string;
-  itemIcon(item: ItemDef): string;
-  itemTooltip(item: ItemDef): string;
+  itemIcon(item: ItemDef, instance?: ItemInstancePayload): string;
+  itemTooltip(item: ItemDef, instance?: ItemInstancePayload): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
   centerPopup(element: HTMLElement): void;
   placePopup(
@@ -65,9 +73,9 @@ export class LootWindowController {
     if (mob.loot && mob.loot.copper > 0) {
       html += `<div class="loot-item"><img class="item-icon q-common" src="${this.deps.coinIconUrl()}" alt="" draggable="false"><span>${this.deps.money(mob.loot.copper)}</span></div>`;
     }
-    html += visibleItems.map((stack) => this.itemRowHtml(stack)).join('');
+    html += visibleItems.map((stack, index) => this.itemRowHtml(stack, index)).join('');
     this.deps.element.innerHTML = html;
-    this.attachItemTooltips();
+    this.attachItemTooltips(visibleItems);
 
     if (hasLoot) {
       // "Take Loot", not "Take All": the old label promised the harvest too.
@@ -116,8 +124,8 @@ export class LootWindowController {
     const chest = this.deps.world().entities.get(chestId);
     this.deps.element.innerHTML =
       this.titleHtml(chest ? this.deps.entityName(chest) : t('hudChrome.loot.chestTitle')) +
-      items.map((stack) => this.itemRowHtml(stack)).join('');
-    this.attachItemTooltips();
+      items.map((stack, index) => this.itemRowHtml(stack, index)).join('');
+    this.attachItemTooltips(items);
     this.appendTakeButton(t('itemUi.loot.takeAll'), () => {
       this.deps.world().collectDelveChestLoot(chestId);
       this.close();
@@ -154,19 +162,36 @@ export class LootWindowController {
     return `<div class="panel-title"><span>${esc(title)}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.loot.close'))}">${svgIcon('close')}</button></div>`;
   }
 
-  private itemRowHtml(stack: LootWindowItemStack): string {
+  private itemRowHtml(stack: LootWindowItemStack, index: number): string {
     const item = ITEMS[stack.itemId];
+    const formattedCount = formatNumber(stack.count, { maximumFractionDigits: 0 });
     const count =
-      stack.count > 1
-        ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(stack.count, { maximumFractionDigits: 0 }) }))}`
-        : '';
-    return `<div class="loot-item" data-item="${stack.itemId}">${this.deps.itemIcon(item)}<span style="font-size:12px">${esc(itemDisplayName(item))}${count}</span></div>`;
+      stack.count > 1 ? ` ${esc(t('itemUi.bags.stackCount', { count: formattedCount }))}` : '';
+    const quality = itemPresentationQuality(item, stack.instance);
+    const name = itemPresentationName({ name: itemDisplayName(item) }, stack.instance);
+    const qColor = QUALITY_COLOR[quality] ?? '#fff';
+    const procedural = stack.instance?.procedural;
+    const rune = stack.instance?.procedural?.legendaryPowerId
+      ? legendaryPowerRuneSvg('loot-power-rune')
+      : '';
+    const proceduralAttr = procedural ? ` data-procedural-rarity="${procedural.rarity}"` : '';
+    const ariaLabel = procedural
+      ? t('hudChrome.bags.itemAriaProcedural', {
+          item: name,
+          rarity: proceduralRarityLabel(stack.instance) ?? procedural.rarity,
+          level: formatNumber(procedural.itemLevel, { maximumFractionDigits: 0 }),
+          count: formattedCount,
+        })
+      : t('itemUi.bags.itemAria', { item: name, count: formattedCount });
+    return `<div class="loot-item q-${quality}" data-item="${stack.itemId}" data-loot-index="${index}"${proceduralAttr} style="--loot-slot-quality:${qColor}" tabindex="0" aria-label="${esc(ariaLabel)}"><span class="loot-icon-wrap">${this.deps.itemIcon(item, stack.instance)}${rune}</span><span style="font-size:12px;color:${qColor}">${esc(name)}${count}</span></div>`;
   }
 
-  private attachItemTooltips(): void {
-    this.deps.element.querySelectorAll<HTMLElement>('[data-item]').forEach((row) => {
-      const itemId = row.dataset.item ?? '';
-      this.deps.attachTooltip(row, () => this.deps.itemTooltip(ITEMS[itemId]));
+  private attachItemTooltips(items: readonly LootWindowItemStack[]): void {
+    this.deps.element.querySelectorAll<HTMLElement>('[data-loot-index]').forEach((row) => {
+      const stack = items[Number(row.dataset.lootIndex)];
+      const item = stack ? ITEMS[stack.itemId] : undefined;
+      if (stack && item)
+        this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, stack.instance));
     });
   }
 

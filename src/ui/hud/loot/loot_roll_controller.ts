@@ -1,4 +1,5 @@
 import { ITEMS } from '../../../sim/data';
+import type { PublicItemInstanceView } from '../../../sim/procedural_item_public';
 import type { ItemDef, LootRollChoice, SimEvent } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { itemDisplayName } from '../../entity_i18n';
@@ -6,6 +7,12 @@ import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { iconDataUrl, QUALITY_COLOR } from '../../icons';
 import type { PainterHostWriters } from '../../painter_host';
+import {
+  itemPresentationName,
+  itemPresentationQuality,
+  proceduralRarityLabel,
+} from '../../procedural_item_presentation';
+import { legendaryPowerRuneSvg } from '../../procedural_loot_icons';
 import { reconcileLootRolls } from './loot_roll_reconcile';
 import {
   computeLootRollStatusRows,
@@ -27,8 +34,8 @@ export interface LootRollControllerDeps {
   world(): LootRollWorld;
   now(): number;
   isMobileLayout(): boolean;
-  itemIcon(item: ItemDef): string;
-  itemTooltip(item: ItemDef): string;
+  itemIcon(item: ItemDef, instance?: PublicItemInstanceView): string;
+  itemTooltip(item: ItemDef, instance?: PublicItemInstanceView): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
   writers: Pick<PainterHostWriters, 'setStyleProp'>;
 }
@@ -246,6 +253,43 @@ export class LootRollController {
     </div>`;
   }
 
+  private rollIconHtml(
+    item: ItemDef | undefined,
+    itemId: string,
+    quality: NonNullable<ItemDef['quality']>,
+    instance?: PublicItemInstanceView,
+  ): string {
+    const icon = item
+      ? this.deps.itemIcon(item, instance)
+      : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', itemId)}" alt="" draggable="false">`;
+    const rune = instance?.procedural?.legendaryPowerId
+      ? legendaryPowerRuneSvg('loot-roll-power-rune')
+      : '';
+    return `<span class="loot-roll-icon-wrap">${icon}${rune}</span>`;
+  }
+
+  private markProceduralRow(
+    row: HTMLElement,
+    quality: NonNullable<ItemDef['quality']>,
+    instance?: PublicItemInstanceView,
+  ): void {
+    row.style.setProperty('--loot-roll-quality', QUALITY_COLOR[quality] ?? '#fff');
+    if (instance?.procedural) row.dataset.proceduralRarity = instance.procedural.rarity;
+  }
+
+  private rollItemAriaLabel(itemName: string, instance?: PublicItemInstanceView): string {
+    const procedural = instance?.procedural;
+    const label = procedural
+      ? t('hudChrome.bags.itemAriaProcedural', {
+          item: itemName,
+          rarity: proceduralRarityLabel(instance) ?? procedural.rarity,
+          level: formatNumber(procedural.itemLevel, { maximumFractionDigits: 0 }),
+          count: formatNumber(1, { maximumFractionDigits: 0 }),
+        })
+      : itemName;
+    return esc(label);
+  }
+
   private render(): void {
     const root = this.root();
     if (
@@ -266,16 +310,21 @@ export class LootRollController {
     for (const [rollId, roll] of this.activeRolls) {
       const event = roll.event;
       const item = ITEMS[event.itemId];
-      const itemName = item ? itemDisplayName(item) : event.itemName;
-      const quality = item?.quality ?? event.quality ?? 'common';
+      const itemName = item
+        ? itemPresentationName({ name: itemDisplayName(item) }, event.instance)
+        : event.itemName;
+      const quality = item
+        ? itemPresentationQuality(item, event.instance)
+        : (event.quality ?? 'common');
       const status = statusByRoll.get(rollId);
       const row = this.deps.document.createElement('div');
       row.className = 'loot-roll panel';
       row.dataset.rollId = String(rollId);
+      this.markProceduralRow(row, quality, event.instance);
       this.deps.writers.setStyleProp(row, '--loot-roll-frac', '1.000');
       row.innerHTML = `
-        <div class="loot-roll-item">
-          ${item ? this.deps.itemIcon(item) : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', event.itemId)}" alt="" draggable="false">`}
+        <div class="loot-roll-item" tabindex="0" aria-label="${this.rollItemAriaLabel(itemName, event.instance)}">
+          ${this.rollIconHtml(item, event.itemId, quality, event.instance)}
           <div class="loot-roll-copy">
             <div class="loot-roll-title">${esc(t('itemUi.lootRoll.title'))}</div>
             <div class="loot-roll-name" style="color:${QUALITY_COLOR[quality] ?? '#fff'}">${esc(itemName)}</div>
@@ -290,7 +339,7 @@ export class LootRollController {
         </div>`;
       const itemElement = row.querySelector<HTMLElement>('.loot-roll-item');
       if (item && itemElement) {
-        this.deps.attachTooltip(itemElement, () => this.deps.itemTooltip(item));
+        this.deps.attachTooltip(itemElement, () => this.deps.itemTooltip(item, event.instance));
       }
       row.querySelectorAll<HTMLButtonElement>('[data-choice]').forEach((button) => {
         const choice = button.dataset.choice as LootRollChoice;
@@ -303,16 +352,21 @@ export class LootRollController {
       if (this.activeRolls.has(status.rollId) || this.activeMasterRolls.has(status.rollId))
         continue;
       const item = ITEMS[status.itemId];
-      const itemName = item ? itemDisplayName(item) : status.itemName;
-      const quality = item?.quality ?? status.quality ?? 'common';
+      const itemName = item
+        ? itemPresentationName({ name: itemDisplayName(item) }, status.instance)
+        : status.itemName;
+      const quality = item
+        ? itemPresentationQuality(item, status.instance)
+        : (status.quality ?? 'common');
       const row = this.deps.document.createElement('div');
       row.className = 'loot-roll panel watch';
       row.dataset.rollId = String(status.rollId);
       row.dataset.watch = '1';
+      this.markProceduralRow(row, quality, status.instance);
       this.deps.writers.setStyleProp(row, '--loot-roll-frac', '1.000');
       row.innerHTML = `
-        <div class="loot-roll-item">
-          ${item ? this.deps.itemIcon(item) : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', status.itemId)}" alt="" draggable="false">`}
+        <div class="loot-roll-item" tabindex="0" aria-label="${this.rollItemAriaLabel(itemName, status.instance)}">
+          ${this.rollIconHtml(item, status.itemId, quality, status.instance)}
           <div class="loot-roll-copy">
             <div class="loot-roll-title">${esc(t('itemUi.lootRoll.title'))}</div>
             <div class="loot-roll-name" style="color:${QUALITY_COLOR[quality] ?? '#fff'}">${esc(itemName)}</div>
@@ -322,7 +376,7 @@ export class LootRollController {
         ${this.votesHtml(status)}`;
       const itemElement = row.querySelector<HTMLElement>('.loot-roll-item');
       if (item && itemElement) {
-        this.deps.attachTooltip(itemElement, () => this.deps.itemTooltip(item));
+        this.deps.attachTooltip(itemElement, () => this.deps.itemTooltip(item, status.instance));
       }
       root.appendChild(row);
     }
@@ -330,12 +384,17 @@ export class LootRollController {
 
   private renderMasterRow(root: HTMLElement, rollId: number, event: MasterLootEvent): void {
     const item = ITEMS[event.itemId];
-    const itemName = item ? itemDisplayName(item) : event.itemName;
-    const quality = item?.quality ?? event.quality ?? 'common';
+    const itemName = item
+      ? itemPresentationName({ name: itemDisplayName(item) }, event.instance)
+      : event.itemName;
+    const quality = item
+      ? itemPresentationQuality(item, event.instance)
+      : (event.quality ?? 'common');
     const row = this.deps.document.createElement('div');
     row.className = 'loot-roll panel master';
     row.dataset.rollId = String(rollId);
     row.dataset.master = '1';
+    this.markProceduralRow(row, quality, event.instance);
     this.deps.writers.setStyleProp(row, '--loot-roll-frac', '1.000');
     const picks = event.candidates
       .map(
@@ -344,8 +403,8 @@ export class LootRollController {
       )
       .join('');
     row.innerHTML = `
-      <div class="loot-roll-item">
-        ${item ? this.deps.itemIcon(item) : `<img class="item-icon q-${quality}" src="${iconDataUrl('item', event.itemId)}" alt="" draggable="false">`}
+      <div class="loot-roll-item" tabindex="0" aria-label="${this.rollItemAriaLabel(itemName, event.instance)}">
+        ${this.rollIconHtml(item, event.itemId, quality, event.instance)}
         <div class="loot-roll-copy">
           <div class="loot-roll-title">${esc(t('hudChrome.masterLoot.assignPrompt', { item: itemName }))}</div>
           <div class="loot-roll-name" style="color:${QUALITY_COLOR[quality] ?? '#fff'}">${esc(itemName)}</div>
@@ -359,7 +418,7 @@ export class LootRollController {
       <div class="loot-roll-actions"><button type="button" class="loot-roll-btn assign ml-roll" disabled>${esc(t('hudChrome.masterLoot.rollButton'))}</button></div>`;
     const itemElement = row.querySelector<HTMLElement>('.loot-roll-item');
     if (item && itemElement) {
-      this.deps.attachTooltip(itemElement, () => this.deps.itemTooltip(item));
+      this.deps.attachTooltip(itemElement, () => this.deps.itemTooltip(item, event.instance));
     }
     const selectAll = row.querySelector<HTMLInputElement>('.ml-all');
     const pickElements = [...row.querySelectorAll<HTMLInputElement>('.ml-pick')];

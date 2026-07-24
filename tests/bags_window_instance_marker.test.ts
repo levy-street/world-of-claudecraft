@@ -103,6 +103,40 @@ describe('bags grid instanced-slot marker', () => {
     expect(cell?.querySelector('.bi-instance')).not.toBeNull();
     expect(cell?.querySelector('.bi-count')?.textContent).toContain('3');
   });
+  it('uses exact legendary identity, frame, level announcement, and rune', () => {
+    const root = windowFor([
+      {
+        itemId: 'ironedge_longsword',
+        count: 1,
+        instance: {
+          procedural: {
+            version: 1,
+            uid: 'pi1:bag:legendary',
+            baseId: 'ironedge_longsword',
+            itemLevel: 20,
+            rarity: 'legendary',
+            affixes: [],
+            legendaryPowerId: 'greyjaws_edge',
+            powerRevision: 1,
+            legendaryRolls: { potencyPct: 20 },
+            generatedName: { baseId: 'ironedge_longsword' },
+            seed: 11,
+          },
+        },
+      },
+    ]);
+    const cell = root.querySelector('button.bag-item');
+    expect(cell?.classList.contains('q-legendary')).toBe(true);
+    expect(cell?.getAttribute('data-procedural-rarity')).toBe('legendary');
+    expect(cell?.getAttribute('aria-label')).toBe(
+      "Greyjaw's Edge, Legendary, item level 20, quantity 1",
+    );
+    expect(cell?.querySelector('.bi-instance')).toBeNull();
+    const rune = cell?.querySelector('.bi-power-rune');
+    expect(rune).not.toBeNull();
+    expect(rune?.getAttribute('aria-hidden')).toBe('true');
+    expect(rune?.getAttribute('focusable')).toBe('false');
+  });
 
   it('a masterwork uses the authored seal instead of the generic marker, never both', () => {
     const root = windowFor([
@@ -152,6 +186,9 @@ describe('marker stylesheet contract (source pins)', () => {
   const start = components.indexOf('.bag-item .bi-instance');
   const block = components.slice(start, components.indexOf('}', start));
   const sealStart = components.indexOf('.bag-item .bi-masterwork-seal');
+  const powerRuneStart = components.indexOf('.bag-item .bi-power-rune');
+  const powerRuneBlock = components.slice(powerRuneStart, components.indexOf('}', powerRuneStart));
+  const powerRuneContract = components.slice(powerRuneStart, powerRuneStart + 1200);
   const sealBlock = components.slice(sealStart, components.indexOf('}', sealStart));
 
   it('is styled once, from a static color token, never an --fx-* tier knob', () => {
@@ -171,5 +208,21 @@ describe('marker stylesheet contract (source pins)', () => {
     expect(sealBlock).toContain('object-fit: contain');
     expect(sealBlock).not.toContain('--fx-');
     expect(components).not.toContain('.bag-item:hover .bi-masterwork-seal');
+  });
+
+  it('keeps the legendary rune static, tier-neutral, and forced-colors legible', () => {
+    expect(powerRuneStart).toBeGreaterThan(-1);
+    expect(powerRuneBlock).toContain('width: 13px');
+    expect(powerRuneBlock).toContain('height: 13px');
+    expect(powerRuneBlock).toContain('top: 2px');
+    expect(powerRuneBlock).toContain('right: 2px');
+    expect(powerRuneBlock).toContain('var(--bag-slot-quality');
+    expect(powerRuneBlock).not.toContain('--fx-');
+    expect(powerRuneContract).toMatch(
+      /@media \(forced-colors: active\)[\s\S]*?\.item-power-rune[\s\S]*?color: CanvasText/,
+    );
+    expect(powerRuneContract).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.item-power-rune[\s\S]*?animation: none/,
+    );
   });
 });

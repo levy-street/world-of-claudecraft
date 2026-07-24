@@ -262,6 +262,7 @@ function spawnBaptistryWave(
       mob.maxHp = Math.round(mob.maxHp * 1.1);
       mob.hp = mob.maxHp;
     }
+    ctx.registerProceduralLootSource(mob);
     ctx.addEntity(mob);
     run.mobIds.push(mob.id);
   }

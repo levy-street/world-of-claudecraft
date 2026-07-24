@@ -118,6 +118,7 @@ export function dealDamage(
   // Arcane damage converts to healing at a reduced rate. Defaults false, so
   // every single-target caller is unchanged and byte-identical.
   aoe = false,
+  equipmentProcDepth = 0,
 ): void {
   if (target.dead) return;
   if (target.gm || target.devGod) return; // GMs and /dev god are invulnerable (every damage path funnels here)
@@ -605,7 +606,7 @@ export function dealDamage(
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
-      handleDeath(ctx, target, source);
+      handleDeath(ctx, target, source, equipmentProcDepth);
       const loserTeam = ctx.arenaTeamOf(match, target.id);
       if (loserTeam && ctx.isArenaTeamWiped(match, loserTeam)) {
         ctx.endArenaMatch(match, loserTeam === 'A' ? 'B' : 'A', 'defeat');
@@ -700,6 +701,45 @@ export function dealDamage(
   // above (duel/fiesta/arena) intentionally skip conversion (PRD 13.9 defers PvP
   // tuning to a later phase).
   chronomancyConvertArcaneDamage(ctx, source, preHp - target.hp, school, aoe);
+
+  const effectiveDamage = preHp - target.hp;
+  // Equipment-created damage is terminal unless a future power explicitly opts
+  // into chaining. This keeps one proc from advancing its own cadence (or a
+  // different equipped trigger) through the normal combat event bridge.
+  const canTriggerEquipmentEffects = equipmentProcDepth === 0;
+  if (
+    canTriggerEquipmentEffects &&
+    effectiveDamage > 0 &&
+    source?.kind === 'player' &&
+    school !== 'physical'
+  ) {
+    ctx.triggerEquipmentEffects(source, {
+      kind: 'spell_damage',
+      targetId: target.id,
+      abilityId: abilityId ?? undefined,
+      critical: crit,
+      amount: effectiveDamage,
+      procDepth: equipmentProcDepth,
+    });
+  }
+  if (canTriggerEquipmentEffects && effectiveDamage > 0 && target.kind === 'player') {
+    ctx.triggerEquipmentEffects(target, {
+      kind: 'damage_taken',
+      targetId: source?.id,
+      abilityId: abilityId ?? undefined,
+      critical: crit,
+      amount: effectiveDamage,
+      procDepth: equipmentProcDepth,
+    });
+    ctx.triggerEquipmentEffects(target, {
+      kind: 'health_changed',
+      targetId: target.id,
+      healthBefore: preHp,
+      healthAfter: target.hp,
+      maxHealth: target.maxHp,
+      procDepth: equipmentProcDepth,
+    });
+  }
 
   if (amount > 0) {
     if (target.kind === 'mob' && DAMAGE_IDLE_DESPAWN_MOB_IDS.has(target.templateId)) {
@@ -914,7 +954,7 @@ export function dealDamage(
       // the permanent death + graveyard flow.
       ctx.yumiPlayerDown(fmatch, target, null);
     } else {
-      handleDeath(ctx, target, source);
+      handleDeath(ctx, target, source, equipmentProcDepth);
     }
   }
 }
@@ -1003,7 +1043,12 @@ function reflectSpellWard(
   );
 }
 
-export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): void {
+export function handleDeath(
+  ctx: SimContext,
+  e: Entity,
+  killer: Entity | null,
+  equipmentProcDepth = 0,
+): void {
   resetProcState(e);
   e.dead = true;
   e.hp = 0;
@@ -1046,6 +1091,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   }
 
   if (e.kind === 'player') {
+    ctx.clearEquipmentEffectState(e.id);
     // Chronomancy: a dead mage feeds no more Arcane damage, so drop any Temporal
     // Echo marks it placed on living allies (a mark on a dying ally is already
     // shed by aurasSurvivingDeath above). Keyed by sourceId, so marks THIS player
@@ -1083,7 +1129,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // Route it through handleDeath so the owned-mob branch below applies: warlock
     // demons unravel, a hunter's beast leaves a revivable corpse (Revive Pet).
     const pet = ctx.petOf(e.id);
-    if (pet) handleDeath(ctx, pet, killer);
+    if (pet) handleDeath(ctx, pet, killer, equipmentProcDepth);
     return;
   }
 
@@ -1154,6 +1200,19 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
       // a slain summoned demon lingers only briefly, then unravels (updateMob)
       if (MOBS[e.templateId]?.family === 'demon') e.corpseTimer = 3;
       return; // owned pets drop no loot/credit; demons unravel, hunters revive or abandon
+    }
+    const killerPlayer =
+      killer?.kind === 'player'
+        ? killer
+        : killer?.ownerId !== null && killer?.ownerId !== undefined
+          ? (ctx.entities.get(killer.ownerId) ?? null)
+          : null;
+    if (equipmentProcDepth === 0 && killerPlayer?.kind === 'player' && !killerPlayer.dead) {
+      ctx.triggerEquipmentEffects(killerPlayer, {
+        kind: 'kill',
+        targetId: e.id,
+        procDepth: equipmentProcDepth,
+      });
     }
     ctx.frenzyPackmates(e); // wild packmates fly into a frenzy when one falls
     ctx.armDeathThroes(e); // volatile corpses begin to destabilize, then burst

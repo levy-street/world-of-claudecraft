@@ -10,6 +10,7 @@
 // variety; art is limited so daggers/maces still share a model across a few items.
 export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   // ---- swords (sword_a..g + the adv set; legendary/epic kept distinct) --------
+  iron_broadsword: 'sword_b',
   worn_sword: 'sword_a',
   eastbrook_arming_sword: 'sword_b',
   ironedge_longsword: 'sword_b', // crafted (weaponcrafting tier 2)
@@ -63,6 +64,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   mistcallers_fang: 'adv_dagger', // EPIC: Heroic Vael dagger
 
   // ---- staves (staff_a..d + adv_staff + adv_druid_staff) ----------------------
+  ashwood_staff: 'staff_b',
   gnarled_staff: 'staff_a',
   hickory_shortstaff: 'staff_a',
   fenreed_staff: 'staff_a',

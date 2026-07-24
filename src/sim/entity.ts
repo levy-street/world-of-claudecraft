@@ -2,8 +2,9 @@ import { BATTLE_STANCE, buildStanceAura } from './combat/warrior_stances';
 import type { TalentModifiers } from './content/talents';
 import { resolveActiveWeaponSkin } from './content/weapon_skin_rules';
 import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
+import { resolvedItemStats } from './equipment/resolved_item';
 import { canDualWield, isShieldItem } from './equipment_rules';
-import { meetsLevelRequirement } from './item_level_req';
+import { meetsItemInstanceLevelRequirement } from './procedural_item_level';
 import { pvpFractionsFromRatings } from './pvp';
 import type {
   Entity,
@@ -284,38 +285,22 @@ export function recalcPlayerStats(
     // armor, spell power, or set pieces until the character reaches its required
     // level. This only arises for a character loaded wearing gear equipped before
     // the level gate existed; the equip path blocks equipping over-level gear.
-    if (!meetsLevelRequirement(lvl, item)) continue;
+    const instance = equipmentInstance?.[slot];
+    if (!meetsItemInstanceLevelRequirement(lvl, item, instance)) continue;
+    const resolved = resolvedItemStats(item, instance);
     if (item.set) setCounts.set(item.set, (setCounts.get(item.set) ?? 0) + 1);
-    bonusSp += item.spellPower ?? 0;
-    bonusCritRating += item.critRating ?? 0;
-    bonusHasteRating += item.hasteRating ?? 0;
-    bonusHitRating += item.hitRating ?? 0;
-    bonusPvpOffenseRating += item.pvpOffenseRating ?? 0;
-    bonusPvpDefenseRating += item.pvpDefenseRating ?? 0;
-    if (item.stats) {
-      s.str += item.stats.str ?? 0;
-      s.agi += item.stats.agi ?? 0;
-      s.sta += item.stats.sta ?? 0;
-      s.int += item.stats.int ?? 0;
-      s.spi += item.stats.spi ?? 0;
-      s.armor += item.stats.armor ?? 0;
-    }
-    // Instance stat bonus: additive on top of the item's own base stats, from
-    // this specific instance's rolled.stats: an enchant's bonus
-    // (src/sim/professions/enchanting.ts applyEnchant), a masterwork
-    // copy's baked tier-delta bonus (src/sim/professions/masterwork.ts), or
-    // both merged. The equip path carries the consumed inventory instance into
-    // equipmentInstance (items.ts equipItem), so either applies on equip. A
-    // plain piece has no entry here, so this is a no-op for the common case.
-    const enchantStats = equipmentInstance?.[slot]?.rolled?.stats;
-    if (enchantStats) {
-      s.str += enchantStats.str ?? 0;
-      s.agi += enchantStats.agi ?? 0;
-      s.sta += enchantStats.sta ?? 0;
-      s.int += enchantStats.int ?? 0;
-      s.spi += enchantStats.spi ?? 0;
-      s.armor += enchantStats.armor ?? 0;
-    }
+    bonusSp += resolved.spellPower;
+    bonusCritRating += resolved.critRating;
+    bonusHasteRating += resolved.hasteRating;
+    bonusHitRating += resolved.hitRating;
+    bonusPvpOffenseRating += resolved.pvpOffenseRating;
+    bonusPvpDefenseRating += resolved.pvpDefenseRating;
+    s.str += resolved.stats.str;
+    s.agi += resolved.stats.agi;
+    s.sta += resolved.stats.sta;
+    s.int += resolved.stats.int;
+    s.spi += resolved.stats.spi;
+    s.armor += resolved.stats.armor;
   }
   // Item-set bonuses from equipped pieces. Flat primary stats join the gear
   // totals so they feed every derivation below; AP/crit/pushback fold in at
@@ -471,17 +456,24 @@ export function recalcPlayerStats(
   // until the wearer is high enough level. The mainhand still stays worn (see
   // e.mainhandItemId below) so the weapon model keeps rendering.
   const mainhand = equipment.mainhand ? ITEMS[equipment.mainhand] : undefined;
+  const mainhandInstance = equipmentInstance?.mainhand;
+  const mainhandResolved = mainhand ? resolvedItemStats(mainhand, mainhandInstance) : undefined;
   const weapon =
-    mainhand?.weapon && meetsLevelRequirement(lvl, mainhand)
-      ? mainhand.weapon
+    mainhandResolved?.weapon &&
+    mainhand &&
+    meetsItemInstanceLevelRequirement(lvl, mainhand, mainhandInstance)
+      ? mainhandResolved.weapon
       : { min: 1, max: 2, speed: 2 };
   e.weapon = weapon;
   const offhand = equipment.offhand ? ITEMS[equipment.offhand] : undefined;
+  const offhandInstance = equipmentInstance?.offhand;
+  const offhandResolved = offhand ? resolvedItemStats(offhand, offhandInstance) : undefined;
   const offhandWeapon =
     canDualWield(cls, mods?.spec) &&
     offhand?.kind === 'weapon' &&
-    meetsLevelRequirement(lvl, offhand)
-      ? offhand.weapon
+    offhandResolved?.weapon &&
+    meetsItemInstanceLevelRequirement(lvl, offhand, offhandInstance)
+      ? offhandResolved.weapon
       : null;
   e.offhandWeapon = offhandWeapon;
   e.dualWielding = offhandWeapon !== null;
@@ -495,12 +487,14 @@ export function recalcPlayerStats(
     offhandWeapon !== null &&
     ((mainhand?.kind === 'weapon' &&
       mainhand.hand === 'twohand' &&
-      meetsLevelRequirement(lvl, mainhand)) ||
+      meetsItemInstanceLevelRequirement(lvl, mainhand, mainhandInstance)) ||
       (offhand?.kind === 'weapon' && offhand.hand === 'twohand'));
   const activeShield =
-    cls === 'warrior' && isShieldItem(offhand) && meetsLevelRequirement(lvl, offhand);
+    cls === 'warrior' &&
+    isShieldItem(offhand) &&
+    meetsItemInstanceLevelRequirement(lvl, offhand, offhandInstance);
   e.blockChance = activeShield ? SHIELD_BLOCK_BASE : 0;
-  e.blockValue = activeShield ? (offhand.blockValue ?? 0) : 0;
+  e.blockValue = activeShield ? (offhandResolved?.blockValue ?? 0) : 0;
   // The equipped mainhand item id: drives the held weapon model on the client
   // (mapped via ITEM_WEAPON_VARIANTS) AND legendary weapon procs in combat
   // (combat/equip_procs.ts, which re-applies the level gate above so an inert

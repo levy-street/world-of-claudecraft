@@ -299,6 +299,17 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS rate_limits');
   });
 
+  it('applies the procedural item UID counter schema under the advisory lock', async () => {
+    await ensureSchema();
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('pg_advisory_xact_lock');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS procedural_item_uid_sequences');
+    expect(applied).toContain('realm TEXT PRIMARY KEY');
+    expect(applied).toContain('next_serial BIGINT NOT NULL CHECK (next_serial >= 1)');
+    expect(applied).not.toContain('CREATE INDEX IF NOT EXISTS procedural_item_uid');
+  });
+
   it('applies the compact player-metrics schema without a boot backfill', async () => {
     await ensureSchema();
     const applied = h.calls.join('\n');

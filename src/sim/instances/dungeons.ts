@@ -530,6 +530,7 @@ function claimInstance(
     applyDungeonMobTuning(mob, inst.dungeonId, difficulty);
     mob.facing = Math.PI; // face the entrance
     mob.prevFacing = mob.facing;
+    ctx.registerProceduralLootSource(mob);
     ctx.addEntity(mob);
     inst.mobIds.push(mob.id);
   }

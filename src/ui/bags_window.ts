@@ -58,6 +58,12 @@ import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { BagItemDrag, ItemDragState } from './item_drag_state';
 import { resolveDropTargetAt } from './item_drop_hit_test';
 import type { PainterHostPresentation } from './painter_host';
+import {
+  itemPresentationName,
+  itemPresentationQuality,
+  proceduralRarityLabel,
+} from './procedural_item_presentation';
+import { legendaryPowerRuneSvg } from './procedural_loot_icons';
 import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
@@ -154,11 +160,11 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  closing the bank; dropping the docking class lets the mobile standalone
    *  full-screen rule take over instead of leaving a half-width orphan). */
   onClosed(): void;
-  addItemToTrade(itemId: string): void;
+  addItemToTrade(itemId: string, instanceUid?: string): void;
   /** Stage a bag item for a Market listing (selects it + repaints the market). */
   stageMarketSell(itemId: string): void;
   /** Stage a bag stack as a mail parcel (repaints the mailbox Send tab). */
-  stageMailParcel(itemId: string): void;
+  stageMailParcel(itemId: string, instanceUid?: string): void;
   /** Shift-click: insert a readable item link into the chat input. */
   insertItemChatLink(itemId: string): void;
   showError(text: string): void;
@@ -183,7 +189,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   /** Equip a touch-dragged stack into the socket it was released on. The character
    *  window owns the paperdoll drop (and its refusals); this is the touch arm's way
    *  in, since a finger release has no drop event to land on that window. */
-  dropOnEquipSlot(itemId: string, slot: EquipSlot): void;
+  dropOnEquipSlot(itemId: string, slot: EquipSlot, instanceUid?: string): void;
   /** Open the bag-item action menu (Disenchant / Salvage / Apply Enchant)
    *  for a stack at a viewport point. `runDefault` runs the exact classic
    *  left-click action for the clicked slot, so the menu's first row stays
@@ -512,41 +518,54 @@ export class BagsWindow {
     {
       const row = document.createElement('button');
       row.type = 'button';
-      row.className = `bag-item q-${bagQualityKey(item)}`;
+      const presentationQuality = itemPresentationQuality(item, s.instance);
+      row.className = `bag-item q-${presentationQuality}`;
       // The stack's live inventory INDEX, resolved by REFERENCE (duplicate stacks and
       // instanced copies share an itemId): that is what the move command sends as `from`.
       const index = bagStackIndex(world.inventory, s);
       if (cell !== null) row.dataset.bagIndex = String(cell);
       this.bindBagCellDrop(row, cell);
-      const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
-      const itemName = itemDisplayName(item);
+      const qColor = QUALITY_COLOR[presentationQuality] ?? QUALITY_DEFAULT_COLOR;
+      const itemName = itemPresentationName({ name: itemDisplayName(item) }, s.instance);
+      const procedural = s.instance?.procedural;
+      const rarityLabel = proceduralRarityLabel(s.instance);
       const isMasterwork = s.instance?.rolled?.masterwork === true;
+      const hasLegendaryPower = procedural?.legendaryPowerId !== undefined;
       row.style.setProperty('--bag-slot-quality', qColor);
+      if (procedural) row.dataset.proceduralRarity = procedural.rarity;
       // An instanced stack's accessible name carries the per-copy flag the
       // aria-hidden corner marker shows sighted players (the review's a11y
       // arm); plain stacks keep the plain label.
-      const itemAriaKey = isMasterwork
-        ? 'hudChrome.bags.itemAriaMasterwork'
-        : s.instance
-          ? 'hudChrome.bags.itemAriaInstanced'
-          : 'itemUi.bags.itemAria';
-      row.setAttribute(
-        'aria-label',
-        t(itemAriaKey, {
-          item: itemName,
-          count: formatNumber(s.count, { maximumFractionDigits: 0 }),
-        }),
-      );
+      const count = formatNumber(s.count, { maximumFractionDigits: 0 });
+      const itemAria = procedural
+        ? t('hudChrome.bags.itemAriaProcedural', {
+            item: itemName,
+            rarity: rarityLabel ?? procedural.rarity,
+            level: formatNumber(procedural.itemLevel, { maximumFractionDigits: 0 }),
+            count,
+          })
+        : t(
+            isMasterwork
+              ? 'hudChrome.bags.itemAriaMasterwork'
+              : s.instance
+                ? 'hudChrome.bags.itemAriaInstanced'
+                : 'itemUi.bags.itemAria',
+            { item: itemName, count },
+          );
+      row.setAttribute('aria-label', itemAria);
       // The instanced-slot corner marker (Professions 2.0): a plain
       // signed/enchanted copy keeps the static tab, while a masterwork replaces
       // it with the authored seal (never both). Either treatment composes with
       // the count badge and stays visible without hover on desktop and touch.
       const instanceMark =
-        s.instance && !isMasterwork ? '<span class="bi-instance" aria-hidden="true"></span>' : '';
+        s.instance && !isMasterwork && !hasLegendaryPower
+          ? '<span class="bi-instance" aria-hidden="true"></span>'
+          : '';
       const masterworkSeal = isMasterwork
         ? `<img class="bi-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`
         : '';
-      row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      const powerRune = hasLegendaryPower ? legendaryPowerRuneSvg('bi-power-rune') : '';
+      row.innerHTML = `${this.deps.itemIcon(item, s.instance)}${instanceMark}${masterworkSeal}${powerRune}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       row.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the stack (its
         // tooltip is already shown) instead of running its action (use / sell /
@@ -625,6 +644,7 @@ export class BagsWindow {
           itemId: s.itemId,
           count: Math.max(1, Math.floor(s.count)),
           index: index >= 0 ? index : null,
+          ...(s.instance?.procedural?.uid && { instanceUid: s.instance.procedural.uid }),
         };
         this.deps.dragState.begin(drag);
         if (this.deps.isHotbarItemId(s.itemId)) {
@@ -662,8 +682,9 @@ export class BagsWindow {
                 itemId: s.itemId,
                 count: Math.max(1, Math.floor(s.count)),
                 index: index >= 0 ? index : null,
+                ...(s.instance?.procedural?.uid && { instanceUid: s.instance.procedural.uid }),
               },
-        ghostHtml: () => this.deps.itemIcon(item),
+        ghostHtml: () => this.deps.itemIcon(item, s.instance),
         onStart: () => {
           this.deps.hideTooltip();
           this.deps.markEquipDropTargets(s.itemId);
@@ -679,10 +700,12 @@ export class BagsWindow {
           // The paperdoll drop belongs to the character window (it owns the sockets
           // and the equip refusals); the world drop belongs here, where the destroy
           // prompt lives. Releasing anywhere else is a plain cancel.
-          if (target.kind === 'equip') this.deps.dropOnEquipSlot(s.itemId, target.slot);
+          if (target.kind === 'equip')
+            this.deps.dropOnEquipSlot(s.itemId, target.slot, s.instance?.procedural?.uid);
           else if (target.kind === 'bagCell')
             this.dropOnBagCell(index >= 0 ? index : null, target.index);
-          else if (target.kind === 'world') this.dropOnWorldToDestroy(s.itemId, count);
+          else if (target.kind === 'world')
+            this.dropOnWorldToDestroy(s.itemId, count, s.instance?.procedural?.uid);
         },
         onEnd: () => {
           this.deps.markEquipDropTargets(null);
@@ -755,8 +778,8 @@ export class BagsWindow {
   /** Open the destroy prompt for a stack dropped on the world. Public so the HUD's
    *  world-canvas drop target (the desktop arm of the same gesture) shares this one
    *  entry point with the touch arm above. */
-  promptDestroy(itemId: string, count: number): void {
-    this.showDiscardItemPrompt(itemId, Math.max(1, Math.floor(count)));
+  promptDestroy(itemId: string, count: number, instanceUid?: string): void {
+    this.showDiscardItemPrompt(itemId, Math.max(1, Math.floor(count)), instanceUid);
   }
 
   /** What dropping `itemId` on the world does right now (pure decision, shared with
@@ -772,15 +795,16 @@ export class BagsWindow {
     this.deps.showError(t('hudChrome.bags.cannotDestroy'));
   }
 
-  private dropOnWorldToDestroy(itemId: string, count: number): void {
+  private dropOnWorldToDestroy(itemId: string, count: number, instanceUid?: string): void {
     dropOnWorld(
       {
         destroyAction: (id) => this.destroyAction(id),
-        promptDestroy: (id, n) => this.promptDestroy(id, n),
+        promptDestroy: (id, n) => this.promptDestroy(id, n, instanceUid),
         showBlocked: () => this.showDestroyBlocked(),
       },
       itemId,
       count,
+      instanceUid,
     );
   }
 
@@ -794,13 +818,13 @@ export class BagsWindow {
         this.deps.showError(t('hudChrome.itemSoulbound'));
         return;
       case 'trade':
-        this.deps.addItemToTrade(s.itemId);
+        this.deps.addItemToTrade(s.itemId, s.instance?.procedural?.uid);
         break;
       case 'mailAttachBlocked':
         this.deps.showError(t('hudChrome.mailbox.cannotMail'));
         return;
       case 'mailAttach':
-        this.deps.stageMailParcel(s.itemId);
+        this.deps.stageMailParcel(s.itemId, s.instance?.procedural?.uid);
         break;
       case 'marketSellBlockedQuest':
         this.deps.showError(t('itemUi.errors.noQuestItems'));
@@ -849,7 +873,11 @@ export class BagsWindow {
         this.render();
         break;
       case 'discardQuest':
-        this.showDiscardItemPrompt(s.itemId, Math.max(1, Math.floor(s.count)));
+        this.showDiscardItemPrompt(
+          s.itemId,
+          Math.max(1, Math.floor(s.count)),
+          s.instance?.procedural?.uid,
+        );
         break;
       case 'equipBag':
         this.deps.world().equipBag(s.itemId);
@@ -861,7 +889,14 @@ export class BagsWindow {
         // (nearest matching node + autorun stop) when main.ts has wired it;
         // everything else, and any unwired host, keeps the plain useItem.
         const item = ITEMS[s.itemId];
-        if (!item || !this.deps.useGatherTool(item)) this.deps.world().useItem(s.itemId);
+        if (
+          item &&
+          (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'held_offhand')
+        ) {
+          this.deps.world().equipItem(s.itemId, s.instance?.procedural?.uid);
+        } else if (!item || !this.deps.useGatherTool(item)) {
+          this.deps.world().useItem(s.itemId);
+        }
         this.render();
         this.deps.renderCharIfOpen();
         break;
@@ -954,7 +989,10 @@ export class BagsWindow {
 
   private sellBagItem(slot: InvSlot, ev: MouseEvent): void {
     const count = Math.max(1, Math.floor(slot.count));
-    if (ev.ctrlKey || ev.metaKey) {
+    const instanceUid = slot.instance?.procedural?.uid;
+    if (instanceUid) {
+      this.deps.world().sellItem(slot.itemId, 1, instanceUid);
+    } else if (ev.ctrlKey || ev.metaKey) {
       this.deps.world().sellItem(slot.itemId, count);
     } else if (ev.shiftKey && count > 1) {
       this.showSellQuantityPrompt(slot.itemId, count);
@@ -1056,7 +1094,7 @@ export class BagsWindow {
     return { dismiss, dismissAndReturn };
   }
 
-  private showDiscardItemPrompt(itemId: string, maxCount: number): void {
+  private showDiscardItemPrompt(itemId: string, maxCount: number, instanceUid?: string): void {
     document.querySelectorAll('.discard-item-prompt').forEach((el) => {
       el.remove();
     });
@@ -1092,7 +1130,7 @@ export class BagsWindow {
       const count = input
         ? Math.max(1, Math.min(maxCount, Math.floor(Number(input.value) || 0)))
         : 1;
-      this.deps.world().discardItem(itemId, count);
+      this.deps.world().discardItem(itemId, instanceUid ? 1 : count, instanceUid);
       dismiss();
       this.deps.hideTooltip();
       this.render();

@@ -9256,7 +9256,7 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 428,
-      "state": "5464e636",
+      "state": "6c3da5ce",
       "events": "90b86b6a",
       "rng": {
         "draws": 3027,
@@ -10139,6 +10139,71 @@
               {
                 "count": 1,
                 "itemId": "nighttalon_crown"
+              },
+              {
+                "count": 1,
+                "instance": {
+                  "procedural": {
+                    "affixes": [
+                      {
+                        "affixId": "stalwart",
+                        "budget": 5,
+                        "family": "primary.stamina",
+                        "position": "prefix",
+                        "ranges": {
+                          "sta": {
+                            "max": 7,
+                            "min": 4
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 3,
+                        "values": {
+                          "sta": 5
+                        }
+                      },
+                      {
+                        "affixId": "striking",
+                        "budget": 3.25,
+                        "family": "rating.crit",
+                        "position": "suffix",
+                        "ranges": {
+                          "critRating": {
+                            "max": 14,
+                            "min": 8
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 3,
+                        "values": {
+                          "critRating": 13
+                        }
+                      }
+                    ],
+                    "baseId": "thornpeak_mail_chest",
+                    "dropContext": {
+                      "source": "dungeon",
+                      "sourceEntityId": 420,
+                      "sourceTags": [
+                        "undead",
+                        "dungeon",
+                        "elite",
+                        "boss"
+                      ],
+                      "sourceTemplateId": "nythraxis_scourge_of_thornpeak"
+                    },
+                    "generatedName": {
+                      "baseId": "thornpeak_mail_chest",
+                      "prefixId": "procedural.name.stalwart"
+                    },
+                    "itemLevel": 21,
+                    "rarity": "magic",
+                    "seed": 953634688,
+                    "uid": "pi1:offline_1031:1",
+                    "version": 1
+                  }
+                },
+                "itemId": "thornpeak_mail_chest"
               }
             ]
           },
@@ -10520,7 +10585,7 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 428,
-      "state": "fa709958",
+      "state": "a3e451c0",
       "events": "741638a5",
       "rng": {
         "draws": 3040,
@@ -10531,7 +10596,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 428,
-      "state": "ba3993c8",
+      "state": "00e19d80",
       "events": "741638a5",
       "rng": {
         "draws": 3082,
@@ -10542,7 +10607,7 @@
       "tick": 650,
       "time": 32.5,
       "nextId": 428,
-      "state": "335b01e4",
+      "state": "483ca04c",
       "events": "741638a5",
       "rng": {
         "draws": 3134,
@@ -10553,7 +10618,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 428,
-      "state": "79d3c7b0",
+      "state": "07db5ff8",
       "events": "741638a5",
       "rng": {
         "draws": 3177,
@@ -10564,7 +10629,7 @@
       "tick": 670,
       "time": 33.5,
       "nextId": 428,
-      "state": "66077d58",
+      "state": "783748c0",
       "events": "741638a5",
       "rng": {
         "draws": 3231,
@@ -10575,7 +10640,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 428,
-      "state": "21d55208",
+      "state": "bbcf8440",
       "events": "741638a5",
       "rng": {
         "draws": 3281,
@@ -10586,7 +10651,7 @@
       "tick": 688,
       "time": 34.4,
       "nextId": 428,
-      "state": "1224c02e",
+      "state": "8b79abc6",
       "events": "e3560676",
       "rng": {
         "draws": 3303,
@@ -11469,6 +11534,71 @@
               {
                 "count": 1,
                 "itemId": "nighttalon_crown"
+              },
+              {
+                "count": 1,
+                "instance": {
+                  "procedural": {
+                    "affixes": [
+                      {
+                        "affixId": "stalwart",
+                        "budget": 5,
+                        "family": "primary.stamina",
+                        "position": "prefix",
+                        "ranges": {
+                          "sta": {
+                            "max": 7,
+                            "min": 4
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 3,
+                        "values": {
+                          "sta": 5
+                        }
+                      },
+                      {
+                        "affixId": "striking",
+                        "budget": 3.25,
+                        "family": "rating.crit",
+                        "position": "suffix",
+                        "ranges": {
+                          "critRating": {
+                            "max": 14,
+                            "min": 8
+                          }
+                        },
+                        "revision": 1,
+                        "tier": 3,
+                        "values": {
+                          "critRating": 13
+                        }
+                      }
+                    ],
+                    "baseId": "thornpeak_mail_chest",
+                    "dropContext": {
+                      "source": "dungeon",
+                      "sourceEntityId": 420,
+                      "sourceTags": [
+                        "undead",
+                        "dungeon",
+                        "elite",
+                        "boss"
+                      ],
+                      "sourceTemplateId": "nythraxis_scourge_of_thornpeak"
+                    },
+                    "generatedName": {
+                      "baseId": "thornpeak_mail_chest",
+                      "prefixId": "procedural.name.stalwart"
+                    },
+                    "itemLevel": 21,
+                    "rarity": "magic",
+                    "seed": 953634688,
+                    "uid": "pi1:offline_1031:1",
+                    "version": 1
+                  }
+                },
+                "itemId": "thornpeak_mail_chest"
               }
             ]
           },

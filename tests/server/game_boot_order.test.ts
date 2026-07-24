@@ -36,6 +36,22 @@ describe('deferred GameServer construction (liveGame)', () => {
 describe('startServer wires the game loop into /livez liveness (source pin)', () => {
   const mainSrc = readFileSync('server/main.ts', 'utf8');
 
+  it('reserves and installs a procedural UID lease before the game starts', () => {
+    const schema = mainSrc.indexOf('await ensureSchema();');
+    const reserve = mainSrc.indexOf('await reserveProceduralItemUidBlock(pool, REALM)');
+    const construct = mainSrc.indexOf('const game = liveGame();', reserve);
+    const configure = mainSrc.indexOf(
+      'game.sim.configureProceduralItemUidLease(proceduralItemUidLease);',
+      construct,
+    );
+    const start = mainSrc.indexOf('game.start();', configure);
+    expect(schema).toBeGreaterThan(-1);
+    expect(reserve).toBeGreaterThan(schema);
+    expect(construct).toBeGreaterThan(reserve);
+    expect(configure).toBeGreaterThan(construct);
+    expect(start).toBeGreaterThan(configure);
+  });
+
   it('registers the live game source with the liveness slot, as an ACTIVE call', () => {
     // The `^\s*` anchor requires the statement at a line start after only whitespace, so a
     // `// registerLivenessSource(gameStateSource);` (or a block-commented line) does NOT
