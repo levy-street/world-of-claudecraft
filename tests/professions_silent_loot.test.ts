@@ -63,6 +63,13 @@ describe('professions grants suppress the generic loot audio cue, not the text',
   it('a gather harvest emits a silent loot event (text still prints)', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Miner');
+    // Bare-handed harvesting is denied even on a tier-1 node (the starting
+    // kit carries no gathering tool); grant the matching tier-1 tool
+    // (ore_eastbrook_1 is 'ore', see tests/gather_node_harvest.test.ts's
+    // TIER1_TOOL_BY_NODE_TYPE for the full id mapping).
+    const meta = sim.players.get(pid);
+    if (!meta) throw new Error('missing player meta');
+    meta.inventory.push({ itemId: 'copper_mining_pick', count: 1 });
     teleportOntoNode(sim, pid, NODE_ID);
     despawnMobs(sim);
 
