@@ -185,6 +185,7 @@ export class NameplatePainter {
           plan.comboPips,
           plan.hasOverheadEmote,
           raidMark !== null,
+          MOBS[e.templateId]?.elite === true,
         ),
       );
       // Record the anchor; the transform is written once, after the stacking
@@ -399,7 +400,9 @@ export class NameplatePainter {
     // plates above the nearer ones and leaving the current target where it
     // projected. A no-op for the common case where nothing overlapped. This is
     // also where EVERY visible plate gets its one transform write of the frame.
-    declutterNameplatesInPlace(this.anchorScratch, this.anchorCount);
+    // 0 is the viewport top: a plate is never lifted off screen, because an
+    // invisible nameplate is information the player acts on.
+    declutterNameplatesInPlace(this.anchorScratch, this.anchorCount, undefined, 0);
     for (let i = 0; i < this.anchorCount; i++) {
       const anchor = this.anchorScratch[i];
       const v = this.views.get(anchor.id);

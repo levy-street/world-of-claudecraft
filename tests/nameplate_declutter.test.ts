@@ -217,10 +217,30 @@ describe('nameplate vertical stacking', () => {
     const ys = anchors.map((a) => a.sy).sort((x, y) => y - x);
     expect(ys[0]).toBe(400); // the bottom plate still owns its own anchor
     for (let i = 1; i < ys.length; i++) {
-      // every plate keeps a DISTINCT row, at the compressed step
-      expect(ys[i - 1] - ys[i]).toBe(MIN_STACK_STEP_PX);
+      // every plate keeps a DISTINCT row, at or above the compressed floor
+      expect(ys[i - 1] - ys[i]).toBeGreaterThanOrEqual(MIN_STACK_STEP_PX);
+      expect(ys[i - 1] - ys[i]).toBeLessThan(ROW);
     }
-    expect(metrics.compressedPlates).toBe(30);
+    expect(metrics.compressedPlates).toBeGreaterThan(0);
+  });
+
+  it('does not compress a populous column whose plates sit at different depths', () => {
+    // Eight plates share one screen column but are spread over 600px: only the
+    // first pair collides, so nobody may be compressed on a column head count.
+    const anchors: NameplateAnchor[] = [];
+    const depths = [100, 130, 200, 300, 400, 500, 600, 700];
+    for (const [i, sy] of depths.entries()) anchors.push({ id: i + 1, sx: 500, sy, height: 46 });
+    const metrics = newMetrics();
+
+    declutterNameplatesInPlace(anchors, anchors.length, metrics);
+
+    expect(metrics.compressedPlates).toBe(0);
+    expect(overlappingPairs(anchors)).toEqual([]);
+    // the colliding pair separates by the full plate height, not a compressed step
+    expect(anchors[1].sy).toBe(130);
+    expect(anchors[0].sy).toBe(130 - 46 - STACK_GAP_PX);
+    // every other plate keeps its projected spot
+    expect(anchors.slice(2).map((a) => a.sy)).toEqual(depths.slice(2));
   });
 
   it('does not compress a column that fits at full plate height', () => {
@@ -329,7 +349,10 @@ describe('nameplate vertical stacking: hot path', () => {
 
     declutterNameplatesInPlace(anchors, anchors.length, metrics);
 
-    expect(metrics.candidateChecks).toBeLessThan(anchors.length * 120);
+    // two resolve passes per plate (full separation, then the compressed retry),
+    // each walking the colliding run once: a regression to hop-and-rescan was
+    // ~700 checks per plate here
+    expect(metrics.candidateChecks).toBeLessThan(anchors.length * 200);
     // and no plate is left sharing a row with another, however deep the column
     const ys = anchors.map((a) => a.sy).sort((x, y) => y - x);
     for (let i = 1; i < ys.length; i++) {
