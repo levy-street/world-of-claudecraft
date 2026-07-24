@@ -3725,6 +3725,8 @@ export class ClientWorld implements IWorld {
       q: query.search,
       itemType: query.itemType,
       subtype: query.subtype,
+      armorClass: query.armorClass,
+      primaryStat: query.primaryStat,
       rarity: query.rarity,
       page: query.page,
     });

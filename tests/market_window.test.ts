@@ -148,6 +148,16 @@ describe('market_window: behavior preserved through the core', () => {
     );
   });
 
+  it('renders armor class and dominant primary-stat menus and sends both in the query', () => {
+    expect(painter).toContain('MARKET_ARMOR_CLASS_FILTERS');
+    expect(painter).toContain('MARKET_PRIMARY_STAT_FILTERS');
+    expect(painter).toMatch(/this\.renderMarketFilterMenu\(\s*'armorClass'/);
+    expect(painter).toMatch(/this\.renderMarketFilterMenu\(\s*'primaryStat'/);
+    expect(painter).toContain('armorClass: this.armorClassFilter');
+    expect(painter).toContain('primaryStat: this.primaryStatFilter');
+    expect(painter).toContain("t('itemUi.market.filterValueAria', { label, value: current })");
+  });
+
   it('preserves the buy / list / cancel / collect dispatch and money formatting', () => {
     expect(painter).toContain('.marketBuy(l.id)');
     expect(painter).toContain('.marketCancel(l.id)');

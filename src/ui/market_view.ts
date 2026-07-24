@@ -114,11 +114,13 @@ export interface MarketViewInput {
   sellHave: number;
 }
 
-/** True when any of the type/subtype/rarity dropdowns is narrowing the browse. */
+/** True when any dropdown is narrowing the browse. */
 function filtersActive(filters: MarketFilters): boolean {
   return (
     filters.itemType !== 'all' ||
     (filters.subtype !== undefined && filters.subtype !== 'all') ||
+    (filters.armorClass !== undefined && filters.armorClass !== 'all') ||
+    (filters.primaryStat !== undefined && filters.primaryStat !== 'all') ||
     filters.rarity !== 'all'
   );
 }

@@ -10,7 +10,16 @@ function makeWorld() {
 
 // A full browse query with sensible defaults; tests vary only what they care about.
 function q(search = '', extra: Partial<MarketQuery> = {}): MarketQuery {
-  return { search, itemType: 'all', subtype: 'all', rarity: 'all', page: 0, ...extra };
+  return {
+    search,
+    itemType: 'all',
+    subtype: 'all',
+    armorClass: 'all',
+    primaryStat: 'all',
+    rarity: 'all',
+    page: 0,
+    ...extra,
+  };
 }
 
 function merchant(sim: Sim): Entity {
@@ -93,6 +102,45 @@ describe('the World Market — the Merchant', () => {
     // Clearing the filter restores the full, unfiltered view.
     sim.marketSearch(q(''), seller);
     expect(sim.marketInfoFor(seller)!.totalCount).toBe(all.totalCount);
+  });
+
+  it('applies armor class and dominant primary stat to the authoritative browse result', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+    for (const [id, itemId] of [
+      [1, 'eastbrook_warded_leggings'],
+      [2, 'sootscale_mantle'],
+      [3, 'drowned_prayer_leggings'],
+      [4, 'ironlink_legguards'],
+    ] as const) {
+      book.push({
+        id,
+        sellerKey: 'house',
+        sellerName: 'Merchant',
+        itemId,
+        count: 1,
+        price: 100,
+        expiresAt: Number.POSITIVE_INFINITY,
+        house: true,
+      });
+    }
+
+    sim.marketSearch(
+      q('', {
+        itemType: 'armor',
+        subtype: 'legs',
+        armorClass: 'mail',
+        primaryStat: 'int',
+      }),
+      viewer,
+    );
+
+    expect(sim.marketInfoFor(viewer)?.listings.map((listing) => listing.itemId)).toEqual([
+      'eastbrook_warded_leggings',
+    ]);
   });
 
   it('paginates other sellers server-side, keeping the viewer own listings on every page', () => {

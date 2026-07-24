@@ -4782,6 +4782,8 @@ export class GameServer {
             search: typeof msg.q === 'string' ? msg.q : '',
             itemType: msg.itemType,
             subtype: msg.subtype,
+            armorClass: msg.armorClass,
+            primaryStat: msg.primaryStat,
             rarity: msg.rarity,
             page: typeof msg.page === 'number' ? msg.page : 0,
           }),

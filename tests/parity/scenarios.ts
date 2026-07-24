@@ -3866,12 +3866,28 @@ function marketRoundTrip(): Scenario {
 
       // 2) browse filter narrows to the wolf_fang listing, then clears.
       sim.marketSearch(
-        { search: 'wolf', itemType: 'all', subtype: 'all', rarity: 'all', page: 0 },
+        {
+          search: 'wolf',
+          itemType: 'all',
+          subtype: 'all',
+          armorClass: 'all',
+          primaryStat: 'all',
+          rarity: 'all',
+          page: 0,
+        },
         seller,
       );
       rec.snapshot('searched');
       sim.marketSearch(
-        { search: '', itemType: 'all', subtype: 'all', rarity: 'all', page: 0 },
+        {
+          search: '',
+          itemType: 'all',
+          subtype: 'all',
+          armorClass: 'all',
+          primaryStat: 'all',
+          rarity: 'all',
+          page: 0,
+        },
         seller,
       );
       rec.snapshot('search-cleared');

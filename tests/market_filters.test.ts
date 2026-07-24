@@ -1,15 +1,26 @@
 import { describe, expect, it } from 'vitest';
 import { type MarketQuery, marketItemMatches, sanitizeMarketQuery } from '../src/sim/market_query';
 import {
+  MARKET_ARMOR_CLASS_FILTERS,
   MARKET_ARMOR_TYPE_FILTERS,
   MARKET_ITEM_TYPE_FILTERS,
+  MARKET_PRIMARY_STAT_FILTERS,
   MARKET_RARITY_FILTERS,
   MARKET_WEAPON_TYPE_FILTERS,
 } from '../src/ui/market_filters';
 
 // A full browse query with sensible defaults; a case varies only what it cares about.
 function q(over: Partial<MarketQuery> = {}): MarketQuery {
-  return { search: '', itemType: 'all', subtype: 'all', rarity: 'all', page: 0, ...over };
+  return {
+    search: '',
+    itemType: 'all',
+    subtype: 'all',
+    armorClass: 'all',
+    primaryStat: 'all',
+    rarity: 'all',
+    page: 0,
+    ...over,
+  };
 }
 
 // Filter a list of item ids through the shared predicate the SERVER filters with
@@ -63,6 +74,8 @@ describe('World Market filters', () => {
       'axe',
       'other',
     ]);
+    expect(MARKET_ARMOR_CLASS_FILTERS).toEqual(['all', 'cloth', 'leather', 'mail']);
+    expect(MARKET_PRIMARY_STAT_FILTERS).toEqual(['all', 'str', 'agi', 'int']);
     expect(MARKET_RARITY_FILTERS).toEqual([
       'all',
       'poor',
@@ -146,6 +159,53 @@ describe('World Market filters', () => {
     expect(filterIds(armor, { itemType: 'armor', subtype: 'chest' })).toEqual(['recruit_tunic']);
   });
 
+  it('narrows armor by cloth, leather, or mail independently of its slot', () => {
+    const armor = ['woven_robe', 'shadow_jerkin', 'boundstone_helm', 'valefire_lantern'];
+    expect(filterIds(armor, { itemType: 'armor', armorClass: 'cloth' })).toEqual(['woven_robe']);
+    expect(filterIds(armor, { itemType: 'armor', armorClass: 'leather' })).toEqual([
+      'shadow_jerkin',
+    ]);
+    expect(filterIds(armor, { itemType: 'armor', armorClass: 'mail' })).toEqual([
+      'boundstone_helm',
+    ]);
+  });
+
+  it('combines armor class, slot, and dominant primary stat filters', () => {
+    const armor = [
+      'eastbrook_warded_leggings',
+      'sootscale_mantle',
+      'drowned_prayer_leggings',
+      'ironlink_legguards',
+    ];
+    expect(
+      filterIds(armor, {
+        itemType: 'armor',
+        subtype: 'legs',
+        armorClass: 'mail',
+        primaryStat: 'int',
+      }),
+    ).toEqual(['eastbrook_warded_leggings']);
+  });
+
+  it('matches only a positive dominant Strength, Agility, or Intellect value', () => {
+    const gear = [
+      'boundstone_helm',
+      'shadow_jerkin',
+      'woven_robe',
+      'recruit_tunic',
+      'kingsbane_last_oath',
+    ];
+    expect(filterIds(gear, { itemType: 'armor', primaryStat: 'str' })).toEqual(['boundstone_helm']);
+    expect(filterIds(gear, { itemType: 'armor', primaryStat: 'agi' })).toEqual(['shadow_jerkin']);
+    expect(filterIds(gear, { itemType: 'armor', primaryStat: 'int' })).toEqual(['woven_robe']);
+    expect(filterIds(gear, { itemType: 'weapon', primaryStat: 'str' })).toEqual([
+      'kingsbane_last_oath',
+    ]);
+    expect(filterIds(gear, { itemType: 'weapon', primaryStat: 'agi' })).toEqual([
+      'kingsbane_last_oath',
+    ]);
+  });
+
   it('narrows armor filters to the jewelry slots (neck and ring)', () => {
     // Jewelry is kind 'armor' with slot 'ring'/'neck' (heroic vendor exemplars), so the
     // shared slot predicate must sub-filter it like any other wearable slot.
@@ -177,6 +237,16 @@ describe('World Market filters', () => {
     expect(sanitizeMarketQuery({ itemType: 'armor', subtype: 'ring' }).subtype).toBe('ring');
     expect(sanitizeMarketQuery({ itemType: 'armor', subtype: 'neck' }).subtype).toBe('neck');
     expect(sanitizeMarketQuery({ itemType: 'armor', subtype: 'bogus' }).subtype).toBe('all');
+  });
+
+  it('sanitizes armor class and primary stat wire filters', () => {
+    const valid = sanitizeMarketQuery({ armorClass: 'leather', primaryStat: 'int' });
+    expect(valid.armorClass).toBe('leather');
+    expect(valid.primaryStat).toBe('int');
+
+    const invalid = sanitizeMarketQuery({ armorClass: 'plate', primaryStat: 'stamina' });
+    expect(invalid.armorClass).toBe('all');
+    expect(invalid.primaryStat).toBe('all');
   });
 
   it('narrows weapon filters by weapon family', () => {

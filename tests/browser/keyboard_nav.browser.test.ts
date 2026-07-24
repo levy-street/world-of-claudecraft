@@ -13,6 +13,7 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { TalentAllocation, TalentRowLevel } from '../../src/sim/content/talents';
+import type { MarketQuery } from '../../src/sim/market_query';
 import { FocusManager } from '../../src/ui/focus_manager';
 import { MarketWindow } from '../../src/ui/market_window';
 import { TalentsWindow } from '../../src/ui/talents_window';
@@ -271,7 +272,7 @@ describe('keyboard-nav: Talents V2 authoritative choices', () => {
 // focus to the trigger. The filter chrome renders on the browse tab regardless of marketInfo,
 // so a null-merchant fixture is enough to exercise the menus.
 describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () => {
-  function openMarket(): HTMLElement {
+  function openMarket(queries: MarketQuery[] = []): HTMLElement {
     const root = host('market-window');
     root.style.display = 'none';
     const win = new MarketWindow(
@@ -281,7 +282,7 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
           ({
             marketInfo: null,
             copper: 0,
-            marketSearch: () => undefined,
+            marketSearch: (query: MarketQuery) => queries.push(query),
             inventory: [],
           }) as never,
         closeOthers: () => undefined,
@@ -325,6 +326,71 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
       reSelect.querySelector('[aria-selected="true"]')?.getAttribute('data-market-filter-option'),
     ).toBe(committed);
     expect(document.activeElement).toBe(reSelect.querySelector('.mkt-select-btn'));
+  });
+
+  it('reveals armor class and primary-stat menus for armor and commits their options', () => {
+    const queries: MarketQuery[] = [];
+    const root = openMarket(queries);
+    req(
+      itemTypeMenu(root).querySelector<HTMLButtonElement>('[data-market-filter-option="armor"]'),
+      'armor item type option',
+    ).click();
+
+    const armorClass = req(
+      root.querySelector<HTMLElement>('[data-market-filter-menu="armorClass"]'),
+      'armor class filter menu',
+    );
+    expect(
+      Array.from(armorClass.querySelectorAll<HTMLElement>('[data-market-filter-option]')).map(
+        (option) => option.dataset.marketFilterOption,
+      ),
+    ).toEqual(['all', 'cloth', 'leather', 'mail']);
+    req(
+      armorClass.querySelector<HTMLButtonElement>('[data-market-filter-option="mail"]'),
+      'mail option',
+    ).click();
+
+    const primaryStat = req(
+      root.querySelector<HTMLElement>('[data-market-filter-menu="primaryStat"]'),
+      'primary stat filter menu',
+    );
+    expect(
+      Array.from(primaryStat.querySelectorAll<HTMLElement>('[data-market-filter-option]')).map(
+        (option) => option.dataset.marketFilterOption,
+      ),
+    ).toEqual(['all', 'str', 'agi', 'int']);
+    req(
+      primaryStat.querySelector<HTMLButtonElement>('[data-market-filter-option="int"]'),
+      'intellect option',
+    ).click();
+
+    expect(
+      root
+        .querySelector('[data-market-filter-menu="armorClass"] [aria-selected="true"]')
+        ?.getAttribute('data-market-filter-option'),
+    ).toBe('mail');
+    expect(
+      root
+        .querySelector('[data-market-filter-menu="primaryStat"] [aria-selected="true"]')
+        ?.getAttribute('data-market-filter-option'),
+    ).toBe('int');
+    expect(queries.at(-1)).toMatchObject({
+      itemType: 'armor',
+      armorClass: 'mail',
+      primaryStat: 'int',
+    });
+
+    req(
+      itemTypeMenu(root).querySelector<HTMLButtonElement>('[data-market-filter-option="weapon"]'),
+      'weapon item type option',
+    ).click();
+    expect(root.querySelector('[data-market-filter-menu="armorClass"]')).toBeNull();
+    expect(root.querySelector('[data-market-filter-menu="primaryStat"]')).toBeTruthy();
+    expect(queries.at(-1)).toMatchObject({
+      itemType: 'weapon',
+      armorClass: 'all',
+      primaryStat: 'all',
+    });
   });
 
   it('Escape closes the listbox and returns focus to the trigger', () => {

@@ -1857,6 +1857,8 @@ describe('client HTML shell', () => {
     expect(marketWindowTs).toContain('data-market-filter-menu="${menu}"');
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'itemType'/);
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'subtype'/);
+    expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'armorClass'/);
+    expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'primaryStat'/);
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'rarity'/);
     expect(marketWindowTs).not.toContain('<select data-market-filter=');
     // The load-bearing claim of the landscape refactor: `.mkt-controls` (search +

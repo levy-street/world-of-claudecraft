@@ -41,7 +41,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "itemUi.market.armorCloth",
+    "itemUi.market.armorLeather",
+    "itemUi.market.armorMail",
+    "itemUi.market.filterArmorClassAll",
+    "itemUi.market.filterArmorSlot",
+    "itemUi.market.filterPrimaryStat",
+    "itemUi.market.filterPrimaryStatAll",
+    "itemUi.market.filterValueAria"
   ],
   "es_ES": [
     "hudChrome.crafting.noBagSpace",
@@ -75,7 +83,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "itemUi.market.armorCloth",
+    "itemUi.market.armorLeather",
+    "itemUi.market.armorMail",
+    "itemUi.market.filterArmorClassAll",
+    "itemUi.market.filterArmorSlot",
+    "itemUi.market.filterPrimaryStat",
+    "itemUi.market.filterPrimaryStatAll",
+    "itemUi.market.filterValueAria"
   ],
   "fr_FR": [
     "hudChrome.crafting.noBagSpace",
@@ -109,7 +125,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "itemUi.market.armorCloth",
+    "itemUi.market.armorLeather",
+    "itemUi.market.armorMail",
+    "itemUi.market.filterArmorClassAll",
+    "itemUi.market.filterArmorSlot",
+    "itemUi.market.filterPrimaryStat",
+    "itemUi.market.filterPrimaryStatAll",
+    "itemUi.market.filterValueAria"
   ],
   "fr_CA": [
     "hudChrome.crafting.noBagSpace",
@@ -143,7 +167,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "itemUi.market.armorCloth",
+    "itemUi.market.armorLeather",
+    "itemUi.market.armorMail",
+    "itemUi.market.filterArmorClassAll",
+    "itemUi.market.filterArmorSlot",
+    "itemUi.market.filterPrimaryStat",
+    "itemUi.market.filterPrimaryStatAll",
+    "itemUi.market.filterValueAria"
   ],
   "en_CA": [],
   "it_IT": [
@@ -178,7 +210,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "itemUi.market.armorCloth",
+    "itemUi.market.armorLeather",
+    "itemUi.market.armorMail",
+    "itemUi.market.filterArmorClassAll",
+    "itemUi.market.filterArmorSlot",
+    "itemUi.market.filterPrimaryStat",
+    "itemUi.market.filterPrimaryStatAll",
+    "itemUi.market.filterValueAria"
   ],
   "de_DE": [
     "hudChrome.crafting.noBagSpace",
@@ -212,7 +252,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "itemUi.market.armorCloth",
+    "itemUi.market.armorLeather",
+    "itemUi.market.armorMail",
+    "itemUi.market.filterArmorClassAll",
+    "itemUi.market.filterArmorSlot",
+    "itemUi.market.filterPrimaryStat",
+    "itemUi.market.filterPrimaryStatAll",
+    "itemUi.market.filterValueAria"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -250,7 +298,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "itemUi.market.armorCloth",
+    "itemUi.market.armorLeather",
+    "itemUi.market.armorMail",
+    "itemUi.market.filterArmorClassAll",
+    "itemUi.market.filterArmorSlot",
+    "itemUi.market.filterPrimaryStat",
+    "itemUi.market.filterPrimaryStatAll",
+    "itemUi.market.filterValueAria"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -285,7 +341,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "itemUi.market.armorCloth",
+    "itemUi.market.armorLeather",
+    "itemUi.market.armorMail",
+    "itemUi.market.filterArmorClassAll",
+    "itemUi.market.filterArmorSlot",
+    "itemUi.market.filterPrimaryStat",
+    "itemUi.market.filterPrimaryStatAll",
+    "itemUi.market.filterValueAria"
   ],
   "nl_NL": [
     "hudChrome.crafting.noBagSpace",
@@ -319,7 +383,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "itemUi.market.armorCloth",
+    "itemUi.market.armorLeather",
+    "itemUi.market.armorMail",
+    "itemUi.market.filterArmorClassAll",
+    "itemUi.market.filterArmorSlot",
+    "itemUi.market.filterPrimaryStat",
+    "itemUi.market.filterPrimaryStatAll",
+    "itemUi.market.filterValueAria"
   ],
   "pl_PL": [
     "hudChrome.crafting.noBagSpace",
@@ -353,7 +425,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "itemUi.market.armorCloth",
+    "itemUi.market.armorLeather",
+    "itemUi.market.armorMail",
+    "itemUi.market.filterArmorClassAll",
+    "itemUi.market.filterArmorSlot",
+    "itemUi.market.filterPrimaryStat",
+    "itemUi.market.filterPrimaryStatAll",
+    "itemUi.market.filterValueAria"
   ],
   "id_ID": [
     "hudChrome.crafting.noBagSpace",
@@ -387,7 +467,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "itemUi.market.armorCloth",
+    "itemUi.market.armorLeather",
+    "itemUi.market.armorMail",
+    "itemUi.market.filterArmorClassAll",
+    "itemUi.market.filterArmorSlot",
+    "itemUi.market.filterPrimaryStat",
+    "itemUi.market.filterPrimaryStatAll",
+    "itemUi.market.filterValueAria"
   ],
   "tr_TR": [
     "hudChrome.crafting.noBagSpace",
@@ -421,7 +509,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "itemUi.market.armorCloth",
+    "itemUi.market.armorLeather",
+    "itemUi.market.armorMail",
+    "itemUi.market.filterArmorClassAll",
+    "itemUi.market.filterArmorSlot",
+    "itemUi.market.filterPrimaryStat",
+    "itemUi.market.filterPrimaryStatAll",
+    "itemUi.market.filterValueAria"
   ],
   "sv_SE": [
     "hudChrome.crafting.noBagSpace",
@@ -455,7 +551,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "itemUi.market.armorCloth",
+    "itemUi.market.armorLeather",
+    "itemUi.market.armorMail",
+    "itemUi.market.filterArmorClassAll",
+    "itemUi.market.filterArmorSlot",
+    "itemUi.market.filterPrimaryStat",
+    "itemUi.market.filterPrimaryStatAll",
+    "itemUi.market.filterValueAria"
   ],
   "vi_VN": [
     "hudChrome.crafting.noBagSpace",
@@ -489,7 +593,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "itemUi.market.armorCloth",
+    "itemUi.market.armorLeather",
+    "itemUi.market.armorMail",
+    "itemUi.market.filterArmorClassAll",
+    "itemUi.market.filterArmorSlot",
+    "itemUi.market.filterPrimaryStat",
+    "itemUi.market.filterPrimaryStatAll",
+    "itemUi.market.filterValueAria"
   ],
   "da_DK": [
     "hudChrome.crafting.noBagSpace",
@@ -523,6 +635,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.gathering.toolTooltip.use.mining",
     "hudChrome.training.pendingAria",
     "hudChrome.training.statePending",
-    "hudChrome.unbind.noSpace"
+    "hudChrome.unbind.noSpace",
+    "itemUi.market.armorCloth",
+    "itemUi.market.armorLeather",
+    "itemUi.market.armorMail",
+    "itemUi.market.filterArmorClassAll",
+    "itemUi.market.filterArmorSlot",
+    "itemUi.market.filterPrimaryStat",
+    "itemUi.market.filterPrimaryStatAll",
+    "itemUi.market.filterValueAria"
   ]
 };

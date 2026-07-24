@@ -127,6 +127,14 @@ describe('market_view: browse states', () => {
         reason: 'filtered',
       },
     );
+    expect(buildMarketBrowse(info({ listings: [] }), { ...ALL, armorClass: 'mail' })).toEqual({
+      state: 'empty',
+      reason: 'filtered',
+    });
+    expect(buildMarketBrowse(info({ listings: [] }), { ...ALL, primaryStat: 'int' })).toEqual({
+      state: 'empty',
+      reason: 'filtered',
+    });
   });
 
   it('renders the server page rows and drops listings whose item is unknown', () => {
