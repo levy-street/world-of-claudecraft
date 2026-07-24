@@ -1,0 +1,1673 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Last Bell: Campaign Browser</title>
+<style>
+:root {
+  --paper: #f3f4f2;
+  --ink: #22302f;
+  --verdigris: #3e7268;
+  --bronze: #9a7b2e;
+  --mist: #dce1de;
+  --dim: #5c6b68;
+  --tint: #eaf0ed;
+  --water: #dbe7e4;
+  --danger: #8c4a3f;
+  --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { font-size: 16px; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  line-height: 1.6;
+  margin: 0;
+}
+a { color: var(--verdigris); }
+
+header.masthead {
+  border-bottom: 4px double var(--verdigris);
+  padding: 1.2rem 1.5rem 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  background: var(--paper);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+header .bell { color: var(--verdigris); flex: none; }
+header h1 { font-size: 1.25rem; margin: 0; font-weight: 700; }
+header .sub {
+  font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--dim); margin: 0.1rem 0 0;
+}
+nav.tabs { margin-left: auto; display: flex; gap: 0.35rem; flex-wrap: wrap; }
+nav.tabs button {
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--dim);
+  background: none; border: 1px solid var(--mist); border-radius: 3px;
+  padding: 0.42rem 0.7rem; cursor: pointer;
+}
+nav.tabs button:hover { color: var(--verdigris); border-color: var(--verdigris); }
+nav.tabs button.active { background: var(--verdigris); border-color: var(--verdigris); color: #fff; }
+
+main { max-width: 72rem; margin: 0 auto; padding: 1.4rem 1.5rem 5rem; }
+section.view { display: none; }
+section.view.active { display: block; }
+
+h2 { font-size: 1.35rem; margin: 1.6rem 0 0.7rem; font-weight: 600; }
+h3 { font-size: 1.05rem; font-weight: 700; color: var(--verdigris); margin: 1.6rem 0 0.5rem; }
+p { margin: 0.7rem 0; max-width: 70ch; }
+.label {
+  font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--dim); margin: 1.4rem 0 0.4rem;
+}
+
+.chip {
+  display: inline-block; font-family: var(--mono); font-size: 0.66rem;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  border: 1px solid var(--verdigris); color: var(--verdigris);
+  border-radius: 10px; padding: 0.1rem 0.55rem; margin: 0 0.3rem 0.3rem 0;
+  white-space: nowrap;
+}
+.chip.shared { border-color: var(--bronze); color: var(--bronze); }
+.chip.dungeon { border-color: var(--danger); color: var(--danger); }
+.chip.solid { background: var(--verdigris); color: #fff; }
+.chip.flag { border-color: var(--danger); color: var(--danger); }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 2rem; }
+@media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
+
+/* quest browser layout */
+.quests-layout { display: grid; grid-template-columns: 15.5rem 1fr; gap: 1.6rem; align-items: start; }
+@media (max-width: 860px) { .quests-layout { grid-template-columns: 1fr; } }
+.quest-list { position: sticky; top: 5.2rem; max-height: calc(100vh - 6.5rem); overflow-y: auto; padding-right: 0.4rem; }
+.quest-list .act {
+  font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--dim); margin: 0.9rem 0 0.3rem;
+}
+.quest-list button {
+  display: flex; align-items: baseline; gap: 0.5rem; width: 100%;
+  text-align: left; background: none; border: 1px solid transparent;
+  border-radius: 3px; padding: 0.32rem 0.5rem; cursor: pointer;
+  font-family: var(--serif); font-size: 0.9rem; color: var(--ink);
+}
+.quest-list button:hover { border-color: var(--mist); background: var(--tint); }
+.quest-list button.active { background: var(--verdigris); color: #fff; }
+.quest-list button.active .qcode { color: #fff; }
+.qcode { font-family: var(--mono); font-size: 0.66rem; color: var(--bronze); flex: none; min-width: 1.9rem; }
+
+.quest-card {
+  border: 1px solid var(--verdigris);
+  border-left-width: 4px;
+  background: var(--tint);
+  border-radius: 3px;
+  padding: 0.85rem 1.15rem;
+  margin: 1.1rem 0;
+  font-size: 0.93rem;
+}
+.quest-card .qc-title {
+  font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.11em;
+  text-transform: uppercase; color: var(--verdigris); margin: 0 0 0.35rem;
+}
+.quest-card .giver { color: var(--dim); font-style: italic; margin: 0 0 0.4rem; }
+.quest-card ul { list-style: none; padding-left: 0.15rem; margin: 0.45rem 0; }
+.quest-card ul li { margin: 0.26rem 0; }
+.quest-card ul li::before {
+  content: ""; display: inline-block; width: 0.55em; height: 0.55em;
+  border: 1.5px solid var(--verdigris); border-radius: 1px; margin-right: 0.55em;
+}
+.quest-card .upd { color: var(--dim); font-style: italic; }
+.quest-card .rewards { color: var(--dim); font-style: italic; margin: 0.4rem 0 0; }
+
+blockquote.dlg {
+  margin: 0.9rem 0 0.9rem 0.3rem; padding: 0.55rem 1rem;
+  border-left: 2px solid var(--bronze);
+  background: rgba(154, 123, 46, 0.06); font-size: 0.94rem;
+}
+blockquote.dlg p { margin: 0.4rem 0; max-width: 62ch; }
+.note {
+  border: 1px dashed var(--verdigris); border-radius: 3px;
+  background: var(--tint); padding: 0.55rem 0.9rem; margin: 0.9rem 0;
+  font-size: 0.88rem; color: var(--dim); max-width: 66ch;
+}
+.flagged {
+  border: 1px solid var(--danger); border-left-width: 4px; border-radius: 3px;
+  background: rgba(140, 74, 63, 0.05); padding: 0.55rem 0.9rem; margin: 0.9rem 0;
+  font-size: 0.88rem; max-width: 66ch;
+}
+.flagged .label { color: var(--danger); margin: 0 0 0.3rem; }
+
+.kv { margin: 0.25rem 0; font-size: 0.94rem; max-width: 70ch; }
+.kv b { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); font-weight: 600; display: inline-block; min-width: 7.5rem; }
+
+/* cast */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); gap: 1rem; }
+.card {
+  border: 1px solid var(--mist); border-radius: 4px; background: #fff;
+  padding: 1rem 1.1rem;
+}
+.card .who { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.5rem; }
+.card .sigil {
+  flex: none; width: 2.4rem; height: 2.4rem; border-radius: 50%;
+  border: 2px solid var(--verdigris); color: var(--verdigris);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1.05rem;
+}
+.card.dead .sigil { border-color: var(--bronze); color: var(--bronze); }
+.card h4 { margin: 0; font-size: 1.02rem; }
+.card .epithet { font-size: 0.8rem; color: var(--dim); font-style: italic; }
+.card p { font-size: 0.88rem; margin: 0.4rem 0; }
+.card .kv b { min-width: 5.6rem; }
+
+/* timeline */
+.timeline { border-left: 3px solid var(--verdigris); margin-left: 0.6rem; padding-left: 1.4rem; }
+.timeline .tl-act {
+  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--bronze); margin: 1.6rem 0 0.5rem;
+  position: relative;
+}
+.timeline .tl-act::before {
+  content: ""; position: absolute; left: -1.72rem; top: 0.25rem;
+  width: 0.65rem; height: 0.65rem; background: var(--bronze); border-radius: 1px;
+}
+.tl-quest { position: relative; margin: 0.55rem 0; cursor: pointer; max-width: 62ch; }
+.tl-quest::before {
+  content: ""; position: absolute; left: -1.63rem; top: 0.45rem;
+  width: 0.48rem; height: 0.48rem; background: var(--paper);
+  border: 2px solid var(--verdigris); border-radius: 50%;
+}
+.tl-quest:hover .tl-title { text-decoration: underline; color: var(--verdigris); }
+.tl-title { font-weight: 700; }
+.tl-sum { font-size: 0.88rem; color: var(--dim); }
+
+/* map */
+.map-wrap { overflow-x: auto; border: 1px solid var(--mist); border-radius: 4px; background: var(--water); }
+svg.map text { font-family: var(--serif); fill: var(--ink); }
+svg.map .zone-label { font-size: 15px; font-weight: 700; }
+svg.map .place-label { font-size: 11.5px; font-style: italic; fill: var(--dim); }
+svg.map .marker { cursor: pointer; }
+svg.map .marker circle { fill: var(--verdigris); stroke: #fff; stroke-width: 1.5; }
+svg.map .marker text { fill: #fff; font-family: var(--mono); font-size: 9.5px; font-weight: 700; }
+svg.map .marker:hover circle { fill: var(--bronze); }
+.legend { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 0.15rem 1.4rem; margin-top: 1rem; font-size: 0.88rem; }
+.legend span { cursor: pointer; }
+.legend span:hover { color: var(--verdigris); text-decoration: underline; }
+.legend .qcode { min-width: 2.1rem; display: inline-block; }
+
+/* scenes table */
+.tw { overflow-x: auto; }
+table { border-collapse: collapse; font-size: 0.89rem; min-width: 44rem; }
+th, td { text-align: left; padding: 0.42rem 0.9rem 0.42rem 0; border-bottom: 1px solid var(--mist); vertical-align: top; }
+th { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); font-weight: 600; }
+td.center { text-align: center; }
+
+details { margin: 0.7rem 0; }
+summary { cursor: pointer; color: var(--verdigris); font-weight: 700; }
+.backtotop { font-family: var(--mono); font-size: 0.7rem; }
+hr { border: 0; border-top: 1px solid var(--mist); margin: 2rem 0; }
+
+/* cast dialogue modal */
+.card.speaker { cursor: pointer; }
+.card.speaker:hover { border-color: var(--verdigris); box-shadow: 0 1px 6px rgba(62,114,104,0.18); }
+#modal {
+  position: fixed; inset: 0; background: rgba(34,48,47,0.45); z-index: 60;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 3rem 1rem; overflow-y: auto;
+}
+#modal[hidden] { display: none; }
+.modal-box {
+  background: var(--paper); border: 1px solid var(--verdigris); border-radius: 6px;
+  max-width: 46rem; width: 100%; padding: 1.3rem 1.6rem 2rem; margin-bottom: 3rem;
+}
+.modal-box .close {
+  float: right; background: none; border: 1px solid var(--mist); border-radius: 3px;
+  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--dim); padding: 0.3rem 0.6rem; cursor: pointer;
+}
+.modal-box .close:hover { color: var(--verdigris); border-color: var(--verdigris); }
+.modal-box h3 { margin-top: 1.2rem; }
+.modal-box h3 a { text-decoration: none; }
+.modal-box h3 a:hover { text-decoration: underline; }
+.dlg p.hit { background: rgba(62,114,104,0.13); border-radius: 3px; padding: 0.12rem 0.35rem; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <svg class="bell" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+    <path d="M4 16.5 C4 9.5 6.5 5 12 5 s8 4.5 8 11.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    <line x1="2.2" y1="16.5" x2="21.8" y2="16.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    <circle cx="12" cy="19.4" r="1.7" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  </svg>
+  <div>
+    <h1>The Last Bell of Gullhaven</h1>
+    <p class="sub">Campaign browser: quests, map, cast, scenes, timeline</p>
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+</header>
+
+<main>
+
+<!-- ============ OVERVIEW ============ -->
+<section class="view" id="view-overview">
+  <h2>Overview</h2>
+  <p>This is the working source of truth for The Last Bell of Gullhaven, the
+  game's first story campaign: one self-contained file, no build step, opens in
+  any browser. Share it by sending the file. The earlier documents
+  (<a href="farshore-last-bell-spec.md"><code>farshore-last-bell-spec.md</code></a>,
+  <a href="farshore-last-bell-playthrough.md"><code>farshore-last-bell-playthrough.md</code></a>
+  and their rendered exports) are superseded records; where they disagree with
+  this page, this page wins. The spec's technical sections (the story-scenario
+  layer, multiplayer model, build order) remain the engineering reference until
+  they move.</p>
+
+  <p class="label">How to read this document</p>
+  <p><b>1. Quick read.</b> The whole campaign in about three minutes, one line
+  per idea, in the same order as the bible. Start here if you want the shape
+  before the prose, or whenever the bible feels heavy.</p>
+  <p><b>2. Story bible.</b> The full telling, written like a book, top to
+  bottom. It is written in experience order: reveals land where the player
+  meets them, so it reads the way the campaign plays. It is the source
+  material; everything else in this document is that story cut into playable
+  pieces, and when they disagree, the story bible wins.</p>
+  <p><b>3. Map.</b> The island, with every quest pinned where it happens. Click
+  a marker to open its beat sheet.</p>
+  <p><b>4. Beat sheets.</b> One per quest, in play order: purpose, route, the
+  quest card the player sees, the story beats, and the scenes each quest
+  contains. This is the campaign as it plays.</p>
+  <p><b>5. Voice bible.</b> The cast: bios, arcs, and for every speaking
+  character the voice rules and the never list. All dialogue is written to
+  these rules; click a card to read every line that character currently
+  has.</p>
+  <p><b>6. Script.</b> The working surface: every authored line in play order
+  with honest status, the known holes, the bark sheets still to write, and the
+  cutscene budget. This is where the remaining work lives.</p>
+
+  <p class="label">Reading the chips</p>
+  <p><span class="chip shared">Shared world</span> open-world content, all
+  players present.<br>
+  <span class="chip">Story instance</span> a private copy per party; the
+  decisive beats happen here.<br>
+  <span class="chip dungeon">Dungeon</span> the repeatable post-campaign
+  five-player dungeon.<br>
+  <span class="chip shared">draft</span> written, not final.
+  <span class="chip flag">missing</span> not written yet.</p>
+
+  <p class="label">At a glance</p>
+  <p>Campaign roughly 3 to 4 hours; optional Willowfen epilogue 20 to 30
+  minutes; separate repeatable five-player aftermath dungeon. Solo or a party
+  of up to five. Completion rewards memorialize, never pay out grief: a title,
+  the squad's banner, Renown, and Tam's bell-striker as a keepsake; gear
+  progression comes from the dungeon. The pillars: 1. The story is the reward.
+  2. The player should genuinely cry. 3. The squad fights beside you.
+  4. Everything new is reusable.</p>
+
+  <details>
+    <summary>The promise (full spoilers, by design)</summary>
+    <p>Gullhaven can be saved for another century, but the people who seal its
+    great breach will not come home. Nobody knows that, including them. The plan
+    is to walk in, set the charge, and walk out together: Ollun believes the
+    Bellheart and Edda's charges have engineered past the old price on Hale's
+    statue. Then the old price returns (the ward must be held by a living hand
+    until the fire: one stays), and then the wound answers (it divides into four
+    wards and kills the fuse: five stay). The player is forced out because the
+    seal needs one final hand on the outside.</p>
+  </details>
+
+  <details>
+    <summary>Emotional guardrails (binding, full spoilers)</summary>
+    <ul>
+      <li>The squad enters the breach expecting to walk out together: the inside plan genuinely engineers past Hale's price, and Ollun believes it. Twist one restores the old price (the ward must be held: one). Twist two raises it (four wards and a dead fuse: five).</li>
+      <li>Both twists land mechanically and visibly, never as narration: the player watches the ward drift when hands leave it, and watches the fuse die.</li>
+      <li>The campaign baits one false last stand (the breakwater stair in Q6) and gives him back; it never fakes the real sacrifice afterward.</li>
+      <li>The interior precedent is public knowledge (Warden Hale). Coalfast's private certainty is only that the carrier will be him.</li>
+      <li>The reinforcements die because of a defensible collective decision (the vote) followed by a defensible battlefield call (Edda's flare).</li>
+      <li>The player contributes to the victory: they kill enemies, carry the Bellheart out, and physically close the breach.</li>
+      <li>Nobody is secretly alive afterward. Choices color the story; they never branch it; no choice can avert the sacrifice.</li>
+      <li>The squad reads as elite at all times. Their fear measures the enemy's scale, never their own frailty.</li>
+      <li>The ending is allowed to remain quiet.</li>
+    </ul>
+  </details>
+</section>
+
+<!-- ============ QUICK READ ============ -->
+<section class="view" id="view-quick">
+  <h2>The quick read</h2>
+  <p>The whole campaign in about three minutes: the same story in the same
+  order as the story bible, stripped to one line per idea. It spoils exactly
+  as fast as you read it. When something grabs you, go read that part of the
+  bible properly.</p>
+
+  <h3>The world</h3>
+  <ul style="max-width:70ch">
+    <li>There are two worlds: ours (solid, finished) and the Sleeping World (a
+    nightmare place, never finished).</li>
+    <li>A barrier called the Loom kept them apart. It shattered: the Night of
+    Glass. The sky over the Farshore never healed.</li>
+    <li>Rifts are nightmares leaking through the cuts. Small ones open
+    constantly (the island's weather); a huge one, the great breach, opens
+    about once a century.</li>
+    <li>Star-glass is fallen pieces of the broken barrier, and the only
+    material rifts respond to: it can hear them, seal them, or burn them.</li>
+    <li>The Vigil is the order that seals rifts. Its method, the rite, is old,
+    boring, and reliable: star-glass wards placed and tuned around a wound
+    until it closes.</li>
+  </ul>
+
+  <h3>The island</h3>
+  <ul style="max-width:70ch">
+    <li>Gullhaven has kept this watch for 1,200 years, forgotten by its parent
+    order.</li>
+    <li>Its founders' treasure, the Bellheart, vibrates before a rift opens.
+    The island's whole bell-warning code grew from it.</li>
+    <li>Generations ago the bell tower collapsed into the sea and took the
+    Bellheart with it.</li>
+    <li>100 years ago the great breach opened, the rite failed without the
+    Bellheart, and Warden Hale carried the seal inside alone. He never came
+    out. Nobody knows why the ones who go in stay.</li>
+    <li>Now the breach is due again, and every sign says this one is the worst
+    ever recorded.</li>
+  </ul>
+
+  <h3>The people</h3>
+  <ul style="max-width:70ch">
+    <li><b>You:</b> a newcomer who proves too capable to ignore.</li>
+    <li><b>Coalfast:</b> the commander. Decided long ago, privately, that if
+    someone must go in, it is him.</li>
+    <li><b>Ollun:</b> the scholar. Reads breaches the way a physician reads a
+    chest. Never talks about his own future.</li>
+    <li><b>Edda:</b> the engineer. Builds the charges, names her machines,
+    jokes hardest when scared.</li>
+    <li><b>Saul:</b> the healer. Treats every patient by name.</li>
+    <li><b>Tam:</b> the bellkeeper. Claims the rites are nonsense, performs
+    them perfectly. His silence is the alarm.</li>
+    <li><b>Bren:</b> the squad's scout. Died weeks before you arrive; his
+    chair stays empty. His daughter Nell runs the bell messages.</li>
+  </ul>
+
+  <h3>The story, beat by beat</h3>
+  <ol style="max-width:70ch">
+    <li>You arrive, the bell rings, and you kill something the militia could
+    not. The squad, short a scout, recruits you.</li>
+    <li>One night of patrol breaks twelve centuries of rift records. Something
+    very big is coming.</li>
+    <li>The squad raises the Bellheart from the drowned tower. It comes up
+    cracked: it can still hear rifts, but it cannot ring.</li>
+    <li>The council votes (you included) to call the mainland for relief:
+    extra hands, so the town can be evacuated while the seal is raised.</li>
+    <li>The breach surges early and the fleet is called in at night. A
+    creature called the Riftjaw is waiting. The fleet dies in full view, and
+    the Riftjaw swallows the sailors' souls. The wound feeds on them.</li>
+    <li>The squad salvages the dead fleet's star-glass: it builds the seal's
+    wards, and at Edda's forge it rebuilds the Bellheart's voice. Reforged,
+    the bell speaks at full strength for the first time in generations.</li>
+    <li>The outer seal is raised by the book and nearly works, then fails:
+    this wound's heart is not in our world, so it cannot be closed from
+    outside. Exactly what happened in Hale's year.</li>
+    <li>New plan: carry the seal inside. Set charges at the heart, hold the
+    wound shut, burn the heart out, walk out together, and lock the scar from
+    outside with the Bellheart. Everyone believes nobody has to die this
+    time.</li>
+    <li>Inside, they learn the truth about Hale: the ward will not hold unless
+    a living mind keeps holding it, until the fire. Someone has to stay.
+    Coalfast takes it without a word.</li>
+    <li>The wound fights back: it splits the ward into four and kills the
+    fuse. It has learned the rite, and the fleet's souls made it strong
+    enough to answer it. Five stations, one for each of them. Nobody
+    hesitates.</li>
+    <li>You are ordered out, because the lock must be turned from outside and
+    only you are left to turn it. The charge fires; you strike the Bellheart;
+    the breach closes. The five do not come home. Gullhaven is safe for
+    another century.</li>
+    <li>Afterward: you close the watch alone, Nell takes over the bell, and
+    the Bellheart goes to the parent order, so the next great breach,
+    anywhere, will be heard coming.</li>
+  </ol>
+
+  <h3>Still open</h3>
+  <ul style="max-width:70ch">
+    <li>The wounded Riftjaw survives beneath the wreck fields, still holding
+    the swallowed souls: the post-campaign dungeon. Killing it frees them; it
+    resurrects no one.</li>
+    <li>Something on the far side learned the rite. That thread is left for a
+    future arc.</li>
+  </ul>
+</section>
+
+<!-- ============ STORY ============ -->
+<section class="view" id="view-story">
+  <h2>The story</h2>
+  <p>The campaign start to finish, independent of any quest. This is the source
+  material: the beat sheets, dialogue, and scenes are this story cut into
+  playable pieces, and when they disagree, this page wins. It is written in
+  experience order, so read it like a book; the spoiled summary lives on the
+  Overview tab, marked.</p>
+
+  <h3>The Night of Glass</h3>
+  <p>There are two worlds. Ours is the waking world, and it is finished: solid,
+  settled, it stays the way you leave it. The other is the Sleeping World, and
+  it is not a gentle place. It is where the Dreamer sleeps, and at the shallow
+  edge of that sleep the nightmares form: rooms with no way out, tides that
+  pull without water, half-made things hungry to be finished. Between the two
+  worlds hung the Loom, a barrier woven before any record began. It kept the
+  nightmares where they belong.</p>
+  <p>On the Night of Glass, the Loom broke. Nobody living knows why. Its shards
+  crossed the night sky burning; over a few places they passed low, and there
+  the sky was cut and never healed. The Farshore, a fishing island east of
+  Eastbrook Vale, lies beneath the widest of those scars.</p>
+  <p>A rift is a nightmare pressing through one of those cuts: a room of the
+  Sleeping World forcing its way into ours, and everything that lives in it,
+  Riftspawn and stalkers and worse, comes spilling through with it. But the
+  creatures are the loud danger. The quiet one is dream-matter itself, because
+  anything it touches that nobody is holding, it slowly rewrites: a coiled
+  rope re-ties itself wrong, a machine forgets its instructions along with its
+  shape. The only thing that can stop it is a living mind, someone present and
+  paying attention, forcing the world to stay itself. Remember that, because
+  the whole story ends on it.</p>
+  <p>Small rifts blow in under the wounded sky the way squalls blow in off the
+  sea: often, unannounced, and usually gone by morning, and the islanders meet
+  them the same way, with watchfulness rather than panic. But beneath the
+  eastern fields, roughly once a century, the pressure gathers into something
+  no one rides out: the great breach, a wound the size of a battlefield. The
+  hundred-year storm.</p>
+
+  <h3>Star-glass</h3>
+  <p>The wounded sky sheds. After storms, shards of hard, faintly ringing glass
+  wash up on the Farshore tidelines and nowhere else: star-glass, the broken
+  border's own material, and the only thing a rift answers to. Shaped and
+  tuned, it hears the Sleeping World pressing in before anything opens. Set in
+  a pattern, it anchors a wound shut. Packed and fired, it burns. One material
+  is the island's warning system, its weapon, and its economy: the mainland's
+  wards and beacons are all cut from Farshore glass, and the salvage trade is
+  why a town lives on a wounded island on purpose. The danger is priced in;
+  the living is good.</p>
+
+  <h3>The Vigil and the rite</h3>
+  <p>After the Night of Glass an order was founded to watch the sky's wounds:
+  the Vigil. Not an army; a profession, closer to lighthouse-keeping than war,
+  with two duties: hear them coming, seal them shut. Its craft is the rite,
+  and the rite is procedure, not sorcery: star-glass wards set around a wound
+  and tuned (verses, counter-notes, timed strokes) until the wound is anchored
+  shut, and an anchored wound knits closed. A small form for the daily rifts;
+  a great form for the century breach: four wards around the rim, tuned in
+  sequence, and nobody goes in. Twelve centuries old, boring, tested, and it
+  works. That matters.</p>
+
+  <h3>Gullhaven, the daughter-house</h3>
+  <p>Twelve centuries ago the Vigil's mother-house at the Old Beacon sent
+  founders to the Farshore, to keep the watch over fisherfolk who would not
+  leave the richest shoals in the region. They carried one founding gift: the
+  Bellheart, shaped star-glass closed around a splinter of the broken Loom
+  itself, made so the Vigil may hear the night coming. A bell was the safest
+  way to make such a thing speak, so it hung at the heart of a great bell
+  above the harbor.</p>
+  <p>The Bellheart vibrates before a rift opens: it hears them coming. From
+  that grew the bell code, the island's warning language: one toll, danger in
+  the fields; two tolls, danger at the cliffs; three tolls, the enemy is
+  within the walls. Children learn to count strokes before they learn to read.
+  Somewhere in the centuries the thread home frayed: the Old Beacon forgot its
+  daughter-house, and Gullhaven kept the watch anyway. The Vigil survives here
+  as job titles and a rite-book worn soft. The habit outlived the institution.
+  The habit still works.</p>
+
+  <h3>The lost heart, and Hale's year</h3>
+  <p>Generations ago the original bell tower collapsed into the tidal vault
+  beneath the Sundered Cliffs and took the Bellheart down with it. The town
+  hung an ordinary iron bell, and it serves: a faint echo of the drowned
+  instrument carries up through the old stonework, enough for the daily code.
+  Nobody alive has needed better.</p>
+  <p>Then the great breach came due, one hundred years ago, and for the first
+  time since the founding the outer rite was raised without the founders'
+  instrument. It did not take. When the outer rite fails there is one recourse,
+  old as the order: a warden carries the seal inside, to the wound's heart,
+  and raises the ward there. Warden Hale went in with the rite and his two
+  hands, and did not come out. The breach closed. His statue stands above the
+  harbor steps; the plinth carries one name for every warden who ever went
+  inside, with room for more. Why the ones who go in stay, nobody living can
+  say: none of them came back to write it down. And one thing went unreckoned
+  for a century: the failure had a cause. Hale's rite failed because the
+  Bellheart was already at the bottom of the sea. Exactly one person will ever
+  connect those two facts, and he will be right.</p>
+
+  <h3>The present</h3>
+  <p>The present squad is the best the island has produced: Coalfast, who
+  commands; Ollun, who listens to breaches the way physicians listen to
+  chests; Edda, who builds and names her machines; Saul, who heals people by
+  their names; Tam, who keeps the bell and claims not to believe in the rites
+  he performs perfectly. Six chairs; Outrider Bren died weeks ago on a routine
+  sealing run, so one is empty, and his daughter Nell runs the bell messages
+  because somebody must. And the breach is due. For a year the signs have run
+  wrong: rifts more often, spawn bigger and stranger, counts that fit no
+  breach in the records. There has never been a year like this one.</p>
+
+  <h3>The Last Bell</h3>
+  <p>A newcomer walks into Gullhaven the day the street stops to count a bell
+  stroke, and proves within hours that they outclass the island's defenses:
+  when a stalker digs into the Tidemill and the militia fold, the newcomer
+  goes in alone and comes out alive. The wardens, walking home from cliff
+  work, walk into the noise. Short a scout in the worst season on record,
+  Coalfast recruits a proven hand.</p>
+  <p>One night on the rift-line beside him is the night the counts break
+  twelve centuries of records. So Ollun goes after the one instrument that can
+  hear what is coming and power a seal at its scale, and says why in one
+  sentence: the last time this island raised the rite without the Bellheart,
+  it cost Hale. The squad brings the founders' instrument up out of the
+  drowned tower, and it comes up broken: the Loom splinter at its core is
+  whole, but the shaped glass around it cracked in the tower's fall. When Tam
+  strikes it in daylight it gives out a flawed murmur, and every open rift on
+  the island still answers, faintly. Twelve centuries under the sea, and it
+  still hears. It just cannot speak.</p>
+  <p>The council never debates how to close the breach; everyone knows how. It
+  debates calling the mainland for relief: hands to hold walls and empty the
+  town while the rite is raised. Coalfast argues no: the crossing is exposed,
+  and a signal that loud may be heard by more than the mainland. He loses the
+  vote and carries out the decision as his own. The newcomer votes too, and
+  owns a share of what follows.</p>
+  <p>The fleet comes; the breach surges hours early; the flare goes up on a
+  defensible call: night water, or ships anchored off a beach nobody holds.
+  The Riftjaw is waiting in the marked channel. The fleet dies in full view,
+  and the creature swallows the sailors' souls, points of light pulled under
+  in rows. The wound feeds.</p>
+  <p>What is left of the fleet becomes the seal. The squad salvages its wards
+  and instruments for star-glass (they came to hold the line; now they will),
+  Ollun rewrites a rite meant for a house of wardens to fit six pairs of
+  hands, and at Edda's forge the Bellheart is reforged, its cracked voice
+  rebuilt course by course from the dead fleet's glass. When Tam strikes it
+  this time, the note comes out whole, and every open rift on the island
+  answers at full voice. The newcomer helped raise it from the sea and helped
+  rebuild it at the bench. Before the end, they will strike it.</p>
+  <p>The outer seal is raised by the book, with the Bellheart, and it nearly
+  takes. Then it fails, for a reason no record holds: this wound's heart is
+  not inside the waking world, and nothing anchored outside can hold a wound
+  whose middle is somewhere else. Recognition, not panic: Hale's year. But
+  Ollun contradicts the precedent: Hale had the rite and his two hands; they
+  have the Bellheart and every charge Edda could build. Hold the wound shut
+  from inside. Burn out the heart. Set the scar from the healthy side, the
+  Bellheart struck outside at the instant of fire. Walk in, set it, walk out,
+  all of us. Coalfast, who has read Hale's account more times than anyone
+  alive, says nothing.</p>
+  <p>Inside, the plan works for ten seconds. Then hands leave the seated
+  Bellheart and the ward drifts, and the squad learns what Hale learned
+  standing where he stood: seated is not held. A living mind must correct the
+  ward until the fire; the one who holds becomes the seal. The old price is
+  back, and Coalfast's hand is already on the collar. One stays.</p>
+  <p>Then the wound answers. It divides, ward after ward, and it kills the
+  fuse: anything not held by a mind, it rewrites. It has learned the rite,
+  and fed on a fleet, it is strong enough to answer it. Four wards and a
+  trigger that needs a hand: five stations. It counted them. One at a time,
+  without a speech among them, they take their places: Tam, who alone hears
+  the counter-note; Ollun, who alone reads the drifting north; Saul, who
+  holds the holders; Edda, whose charge needs its maker. The last order is
+  one word the newcomer has heard since their first night: positions.</p>
+  <p>The newcomer is ordered out, and it is not mercy: the scar must be set
+  from the healthy side, and every hand inside has a job only it can do. So
+  does theirs. The charge fires. The strike lands. The breach collapses like
+  a held breath let out; Gullhaven is bought another century. The music
+  stops.</p>
+
+  <h3>After the bell</h3>
+  <p>The newcomer closes the watch alone: night rounds through an empty
+  redoubt, one end-of-watch duty for each of the five, five names written into
+  the watch log. The iron clapper goes back into the bell, and Nell takes the
+  post: the bell only ever asks one question, who will come, and for twelve
+  hundred years the answer was them, and now it is her. The Bellheart, its
+  voice carried in the dead fleet's glass, travels with Ollun's record to the
+  Old Beacon, where the keepers learn their forgotten daughter-house kept the
+  Vigil for twelve centuries without relief.
+  Set beside the beacon, the heart rings once with no bell around it: the next
+  great breach, anywhere, will be heard coming.</p>
+  <p>Two threads stay live. Beneath the Wreckfields the wounded Riftjaw still
+  holds the souls it swallowed; killing it frees them into the Dreamer's deep
+  sleep, the one place the nightmares cannot follow. It is justice, not
+  resurrection. And the thing that learned the rite is still on the far side
+  of the scar. That is another story.</p>
+</section>
+
+<!-- ============ MAP ============ -->
+<section class="view" id="view-map">
+  <h2>The Farshore</h2>
+  <p>You arrive from the sea, and every act pulls you inland and upward, toward the
+  wound. Click a numbered marker to open its quest.</p>
+  <div class="map-wrap">
+  <svg class="map" viewBox="0 0 860 640" width="100%" aria-label="Map of the Farshore island">
+    <!-- sea -->
+    <rect x="0" y="0" width="860" height="640" fill="#cfdeda"/>
+    <!-- island body -->
+    <path d="M 210 160
+             C 260 70, 420 40, 520 70
+             C 620 95, 700 150, 720 240
+             C 740 330, 730 420, 680 480
+             C 640 530, 560 560, 480 555
+             C 420 552, 380 530, 330 520
+             C 260 505, 200 460, 180 380
+             C 165 300, 170 220, 210 160 Z"
+          fill="#e9ece5" stroke="#b9c6c0" stroke-width="2"/>
+    <!-- Riftfields scar -->
+    <ellipse cx="440" cy="160" rx="130" ry="62" fill="#ddd3d8" stroke="#c2aeb8" stroke-width="1.5"/>
+    <path d="M 400 150 l 25 -18 l 12 22 l 28 -12 l 10 20" fill="none" stroke="#8c4a3f" stroke-width="2"/>
+    <text class="zone-label" x="440" y="130" text-anchor="middle">RIFTFIELDS</text>
+    <text class="place-label" x="440" y="196" text-anchor="middle">the great breach</text>
+
+    <!-- Watch Meadow -->
+    <ellipse cx="440" cy="330" rx="120" ry="70" fill="#e2ead8" stroke="#c6d2b8" stroke-width="1.5"/>
+    <text class="zone-label" x="440" y="318" text-anchor="middle">WATCH MEADOW</text>
+    <text class="place-label" x="372" y="352" text-anchor="middle">the Tidemill</text>
+    <text class="place-label" x="474" y="285" text-anchor="middle">signal mast</text>
+
+    <!-- Sundered Cliffs -->
+    <path d="M 700 190 L 728 250 L 716 310 L 736 370 L 706 430" fill="none" stroke="#9aa8a2" stroke-width="7" stroke-linecap="round"/>
+    <text class="zone-label" x="672" y="250" text-anchor="end">SUNDERED</text>
+    <text class="zone-label" x="672" y="270" text-anchor="end">CLIFFS</text>
+    <text class="place-label" x="668" y="292" text-anchor="end">first redoubt, in the vault below</text>
+
+    <!-- Gullhaven bay -->
+    <path d="M 560 545 C 590 505, 640 500, 665 528 C 640 552, 590 560, 560 545 Z" fill="#cfdeda" stroke="#b9c6c0" stroke-width="1.5"/>
+    <text class="zone-label" x="596" y="470" text-anchor="middle">GULLHAVEN</text>
+    <text class="place-label" x="596" y="488" text-anchor="middle">harbor, bell tower, Hale's statue</text>
+    <text class="place-label" x="668" y="452" text-anchor="middle">the redoubt</text>
+
+    <!-- The Landing -->
+    <path d="M 182 260 C 168 310, 168 370, 186 420" fill="none" stroke="#e6d9ae" stroke-width="10" stroke-linecap="round"/>
+    <text class="zone-label" x="205" y="300">THE</text>
+    <text class="zone-label" x="205" y="320">LANDING</text>
+    <text class="place-label" x="205" y="340">guide fires, breakwater stair</text>
+
+    <!-- Wreckfields -->
+    <g stroke="#a9bab4" stroke-width="1.5">
+      <line x1="90" y1="480" x2="150" y2="470"/>
+      <line x1="110" y1="510" x2="180" y2="498"/>
+      <line x1="95" y1="545" x2="170" y2="532"/>
+      <line x1="130" y1="575" x2="205" y2="560"/>
+    </g>
+    <text class="zone-label" x="150" y="450" text-anchor="middle">WRECKFIELDS</text>
+    <text class="place-label" x="150" y="595" text-anchor="middle">shoal flats, walkable at low tide</text>
+
+    <!-- compass + offshore note -->
+    <text class="place-label" x="430" y="30" text-anchor="middle">N</text>
+    <line x1="430" y1="38" x2="430" y2="58" stroke="#5c6b68" stroke-width="1.5"/>
+    <text class="place-label" x="800" y="620" text-anchor="end">to Galecrest and the Old Beacon: over the sea, southeast</text>
+
+    <!-- quest markers (populated by script) -->
+    <g id="map-markers"></g>
+  </svg>
+  </div>
+  <div class="legend" id="map-legend"></div>
+</section>
+
+<!-- ============ QUESTS ============ -->
+<section class="view" id="view-quests">
+  <div class="quests-layout">
+    <nav class="quest-list" id="quest-list"></nav>
+    <article id="quest-detail"></article>
+  </div>
+</section>
+
+<!-- ============ CAST ============ -->
+<section class="view" id="view-cast">
+  <h2>The squad</h2>
+  <p>The most decorated unit the island has produced in a generation. Six chairs,
+  one empty. Their affection is expressed through competence, arguments and
+  insults, not speeches about friendship.</p>
+  <div class="cards" id="cast-squad"></div>
+  <h2>The island</h2>
+  <div class="cards" id="cast-npcs"></div>
+  <h2>The enemy</h2>
+  <div class="cards" id="cast-enemies"></div>
+</section>
+
+<!-- ============ SCRIPT ============ -->
+<section class="view" id="view-script">
+  <h2>The script</h2>
+  <p>Every authored line in play order, collected automatically from the quest
+  data: the single working surface for dialogue. Status is honest: nothing here
+  is final yet, and the red cards are known holes. The bark sheets at the bottom
+  are the ambient volume layer that does not exist at all yet. Write everything
+  to the rules on the Voice bible tab; if a line could be said by two different
+  squad members, it is not finished.</p>
+  <div id="script-summary"></div>
+  <div id="script-scenes"></div>
+  <h3>Bark sheets (to write)</h3>
+  <p>The short-line volume layer that makes the island feel written: combat
+  calls, greetings that change with campaign stage, idle lines at the posts.
+  Counts are targets, not limits.</p>
+  <div class="tw"><table id="bark-table"></table></div>
+
+  <h3>Cutscene budget</h3>
+  <p><b>The rule: at most one cutscene per quest, and a cutscene exists only
+  where the camera itself is the point.</b> Everything else is played: staged
+  dialogue inside gameplay, playable walks, interactions. Total locked camera
+  across the campaign stays under roughly eight minutes. Every cutscene is
+  skippable and replayable from the story journal. Choices color the story and
+  never branch it.</p>
+  <div id="scenes-reel"></div>
+  <h3>Played, not shown</h3>
+  <p>Every other authored beat, deliberately kept inside gameplay.</p>
+  <div class="tw"><table id="scenes-table"></table></div>
+</section>
+
+<div id="modal" hidden><div class="modal-box" id="modal-box"></div></div>
+
+</main>
+
+<script>
+"use strict";
+
+/* ============================ DATA ============================ */
+
+const ACTS = {
+  1: "Act I: Learn their rhythm",
+  2: "Act II: Hope and responsibility",
+  3: "Act III: The plan fails",
+  4: "Act IV: Five to hold, one to close",
+  5: "Endings",
+  6: "Afterward"
+};
+
+/* beat item shapes:
+   {p: "paragraph"}                       prose
+   {d: [{s:"Speaker", l:"line"}, ...]}    dialogue block
+   {note: "design note"}                  bracketed design note
+   {choice: {name, options:[{pick, reply}]}} dialogue choice
+*/
+
+const QUESTS = [
+{
+  id: "q0", code: "Q0", title: "Ashore", act: 1,
+  space: ["Shared world", "Solo instance climax"],
+  squad: "None until the final scene (Coalfast and Tam arrive at the end)",
+  location: "Gullhaven, Watch Meadow, the Tidemill", map: {x: 372, y: 362},
+  route: "Off the ferry at the harbor, up the harbor steps past the statue, then inland along the Watch Meadow road to the Tidemill at the meadow's western edge.",
+  purpose: "Show that the player outclasses the island's ordinary defenses, and earn the squad's attention. The squad recruits a proven hand, not a stray.",
+  giver: "Begins automatically, stepping off the ferry",
+  objectives: ["Follow the militia to the Watch Meadow", "Slay Riftspawn (0/12)", {u: 1, t: "Put down whatever is in the Tidemill"}],
+  rewards: "Experience, 60 copper",
+  boss: "The Tidemill Stalker (burrows and resurfaces, calls two add waves of 6, webs the exits)",
+  beats: [
+    {p: "You step off the boat into a working harbor: nets drying, star-glass salvage crates stenciled for mainland buyers. Above the harbor steps stands a bronze statue of a man in warden's kit, green with age, facing inland toward the fields. The plinth carries a short column of names. The newest is a century old: WARDEN HALE. There is room below it for more."},
+    {p: "Then a bell tolls, once. Everyone in the street stops walking. They count. Nothing follows the first toll, and the whole street exhales at once and resumes mid-sentence. Nobody explains it to you. You have just learned the bell matters before anyone said a word."},
+    {p: "In the meadow you fight beside farmers and militia. Your twelve Riftspawn die fast; theirs do not. The gap is the tutorial, and Sergeant Marsh clocks it from two fields away. Between waves he plants his spear and looks you over, once."},
+    {d: [{s: "Marsh", l: "Trained?"}]},
+    {p: "However you answer, he nods at whatever he already saw."},
+    {d: [{s: "Marsh", l: "Then here is how tonight works. My line holds the road. If the rift coughs up something we cannot put down, I point at you."}]},
+    {p: "A larger spawn erupts and digs into the Tidemill, and the militia line folds back around it. The wardens are committed at the cliffs; there is nobody else to point at. Marsh points."},
+    {d: [{s: "Marsh", l: "There it is. The mill is yours. We hold the road at your back: nothing follows you in, nothing gets past us to town. Go."}]},
+    {note: "Solo instance, always, even in a party: each character clears their own copy. The recruitment must be earned personally."},
+    {p: "When the stalker dies, two people are standing in the doorway who were not there before: an older soldier with a bell-tuner's hammer on his belt, and a broad grey man whose kit has been repaired so many times it has become a different kit. The two-toll work at the cliffs ended within the hour, and the wardens' road home runs past the mill: they walked into the noise, not past it."},
+    {d: [{s: "Tam", l: "The last one of those cost the whole watch a morning and two stretchers."}]},
+    {p: "The grey man says nothing. He looks at the dead stalker, then at you, slightly longer. Then he walks back toward the cliffs."}
+  ],
+  scenes: [
+    {name: "Ashore", type: "Cutscene", locked: true, dur: "20s", why: "The opening shot: a street that stops to count a bell. The island taught in one image.", desc: "The bell tolls once as you step off the ferry; everyone stops, counts, exhales, resumes."},
+    {name: "Two in the doorway", type: "Staged", locked: false, desc: "Coalfast and Tam walk in as the stalker dies. You keep control; Tam's line lands while you catch your breath."}
+  ]
+},
+{
+  id: "q1", code: "Q1", title: "One Toll for the Fields", act: 1,
+  space: ["Shared world intro", "Story instance climax"],
+  squad: "Coalfast, Tam",
+  location: "The redoubt gate, then the Watch Meadow at dusk", map: {x: 470, y: 372},
+  route: "Up to the redoubt gate on the headland, then the rift-line at dusk: the meadow gate, the lower fields, the mill road, back to the meadow gate at dawn.",
+  purpose: "The night patrol that proves the breach: walk the rift-line, seal what opens, and break Ollun's counts. First fight beside the squad; pass Coalfast's test.",
+  giver: "Warden Coalfast, at the redoubt gate: \"I am short a scout and long on fields. Walk the line with us tonight.\"",
+  objectives: ["Walk the rift-line with Coalfast and Tam", "Seal the night's rifts (0/4)", "Slay what comes through (0/25)", "Hold the east hedge", "Ring the all-clear with Tam"],
+  rewards: "Experience, 85 copper",
+  flags: ["Bell teaching is redesigned as usage: Tam rings the field code at each sealed rift and the town answers, so the player learns the language by hearing it worked, not from a lecture. The old teaching line is retired. The actual ring-and-answer bark lines still need writing."],
+  beats: [
+    {p: "Coalfast names the mill kill when he recruits you and, without ceremony, the fact that the squad is down a scout. On the walk up you pass the practice yard, where a set of scout's gear hangs on a rack, clean, oiled, and unused."},
+    {p: "The patrol is not a wall to stand on; it is a line to walk. Rifts open along the meadow and the lower fields tonight, and the squad's work is to be at each one before it finishes opening: Tam reads the tower bell's echo, Coalfast picks the route, you seal and kill on the move. At each sealed rift, Tam rings the field code back toward town, and the tower answers with one soft stroke: heard. You learn the bell by hearing it used."},
+    {note: "This quest is also the plot: tonight is the night the rift count breaks twelve centuries of records, and the player is present for every data point. Q3 and Q4 both spend what this night proves."},
+    {p: "The fourth rift is wrong. It opens wide instead of small, and it spits a surge at the meadow gate. Coalfast gives you an order that is also a test:"},
+    {d: [{s: "Coalfast", l: "Hold the east hedge. I will take the gate."}]},
+    {choice: {name: "The gate is visibly the worse position", options: [
+      {pick: "\"Understood.\"", reply: "Coalfast: \"Good.\""},
+      {pick: "\"The gate is worse.\"", reply: "Coalfast: \"Yes. That is why it is mine.\""},
+      {pick: "\"Let me take the gate.\"", reply: "Coalfast: \"No. Hold the hedge. If you are still alive at the end, you may argue with me.\""}
+    ]}},
+    {p: "The tactic never changes. You hold the hedge; he holds the gate; the gate would have killed you, and it does not come close to killing him. Whatever these people are, it is not militia."},
+    {p: "At dawn, Ollun is waiting at the meadow gate with his ledger. He takes Tam's tally of the night, reads it twice, and does not say anything at all. You have seen Tam go quiet before. This is the first time you see Ollun do it."},
+    {p: "You ring the all-clear with Tam, one long soft stroke, and the farmers come back out with lanterns. As you leave, Coalfast says to Tam, not quietly enough:"},
+    {d: [{s: "Coalfast", l: "Keep this one."}]}
+  ],
+  scenes: [
+    {name: "Bell by usage", type: "Staged", locked: false, desc: "Tam's ring-and-answer at each sealed rift; the language taught by work. (Bark lines to write.)"},
+    {name: "The hedge order", type: "Staged", locked: false, desc: "The test: follow an order while frightened. Response colors, tactic never changes."},
+    {name: "The all-clear", type: "Interaction", locked: false, desc: "You ring it with Tam, one long soft stroke. \"Keep this one.\" is an overheard bark as you leave, not a scene."}
+  ]
+},
+{
+  id: "q2", code: "Q2", title: "Steel, Salt and Names", act: 1,
+  space: ["Shared world"],
+  squad: "Edda, Saul (home forms, fixed posts); Tam at the tower",
+  location: "Three posts around Gullhaven", map: {x: 596, y: 505},
+  route: "Edda's forge in the redoubt yard, Saul's infirmary by the harbor, Tam's bell tower above town.",
+  purpose: "The squad's preparation day, and the hour of ordinary affection that makes the finale cost something. Every shift is real war-work: casings for the seal, the rift-line's wounded, the bell that will carry the defense. Each shift is also a quiet rehearsal of a finale mechanic.",
+  giver: "Quartermaster Edda, at the forge: \"The redoubt has a list. The list has your name on it now.\"",
+  objectives: ["Work Edda's forge shift: proof the charge casings (0/3)", "Work Saul's infirmary shift: treat the Gull's Wage crew, by name (0/4)", "Work Tam's tower shift: ring the changes (0/3)"],
+  rewards: "Experience, 1 silver 20 copper",
+  beats: [
+    {d: [{s: "Edda", l: "Hand me the third spanner. Not that one. Grandmother bites people who bring her the wrong spanner."}]},
+    {p: "Grandmother is the redoubt's ballista. Your shift is the seal charges: three empty casings, clamped, seated, struck to test the tone. Edda listens to each one the way Saul listens to a chest."},
+    {d: [{s: "Edda", l: "Empty, they are ironmongery. Full, they are the last argument this island gets to make. Proof them like it."}]},
+    {note: "The casings come back in Q10: the hands that proof them here shield them there. The same bench work reforges the Bellheart in Q7."},
+    {p: "At the end of her bench, a weapons rack, fully maintained, no initials on the tags. If you reach for it:"},
+    {d: [{s: "Edda", l: "That rack is Bren's. (Then, without looking up:) Was. Is. Pick whichever keeps you from touching it."}]},
+    {p: "On her desk, an unfinished letter to a mainland supplier lies on a drawer full of others like it. She sees you see it, and closes the drawer."},
+    {p: "At the infirmary, Saul is treating the night's wounded: two militia off the rift-line you walked, and the crew of the Gull's Wage, swamped running dark water past the cliffs. A wave event grinds at the door; other blades answer it. Your shift is his method: four patients, each treated by name or not at all. Petter. Corla. Ames. Old Sef. The interaction asks for the name before it gives you the bandage."},
+    {d: [{s: "Saul", l: "Use the name. Wounds close faster in people who are still people."}]},
+    {p: "A girl arrives at a dead run with a message from the cliffs and is gone before the door swings shut."},
+    {d: [{s: "Saul", l: "Nell. Bren's daughter. She runs the bell messages now. Slower runners last longer. She will not hear it from me."}]},
+    {p: "At the tower, Tam has filed the season's inventory wrong on purpose, so the mainland auditor has something to find and no reason to keep looking. The rite-book on the shelf falls open to pages worn soft."},
+    {d: [{s: "Tam", l: "The rites are nonsense. Wind and rope and old men humming. (He re-ties a perfect knot.) You will want the third verse by heart. For the nonsense."}]},
+    {p: "Then he puts the striker in your hand, and your shift is the changes: the field code, the cliff code, the all-clear, timed strokes on the practice bell until he stops wincing."},
+    {d: [{s: "Tam", l: "Again. The bell does not forgive early, and it does not forgive late."}]},
+    {note: "The changes are the same timed-strike interaction as the campaign's final objective (Q11). The finale never has to teach its last verb."},
+    {p: "By evening, Ollun has posted the survey order on the redoubt board: the tide gives four hours at the vault tomorrow. He wants the founders' instrument. The night you walked broke his counts, and this is what he does about it."},
+    {p: "Optional from here: the island histories, one short quest per zone (the statue-keeper, the collapsed first tower survey, the founders' inscription, the salvagers' ledger). None required; a player who does them enters the finale knowing exactly what the squad is walking into."}
+  ],
+  scenes: [
+    {name: "Post shifts", type: "Interaction", locked: false, desc: "Proofing, naming, timed strokes: three playable work loops. Zero scenes on purpose."}
+  ]
+},
+{
+  id: "q3", code: "Q3", title: "The Bell Below", act: 1,
+  space: ["Story instance (interior, delve-like)"],
+  squad: "Tam, Ollun",
+  location: "The drowned first redoubt, beneath the Sundered Cliffs", map: {x: 690, y: 300},
+  route: "East along the cliff road, a rope descent into the tidal vault, down through the fallen first redoubt to the founding bell chamber, and a fighting climb back out.",
+  purpose: "Ollun's counts are broken; he needs the founders' instrument. The last rite raised without the Bellheart was Hale's, and it failed: recovering it is fixing the known cause of the last failure, not a fetch. The heart comes up cracked: it still hears, but it cannot speak until it is reforged (Q7). And see Ollun's fear up close.",
+  giver: "Riftwatch Ollun, at the cliff head: \"Last night broke my counts. The original Bellheart is still down there. The last time this island raised the rite without it was Hale's year, and I will not repeat the experiment. The tide gives us four hours.\"",
+  objectives: ["Descend into the tidal vault", "Slay Void Stalkers (0/15)", "Recover the Bellheart", "Climb out ahead of the rising tide"],
+  rewards: "Experience, 2 silver",
+  beats: [
+    {p: "The descent passes a tide-line of dead barnacles higher than your head. The old redoubt lies where it fell, whole rooms on their sides. Void Stalkers nest in it, and Ollun reads the walls as you clear them. In what used to be a chapel, he says the thing he has not said at council:"},
+    {d: [{s: "Ollun", l: "I rounded down at council. (He does not stop reading the wall.) The records go back twelve hundred years. There is no breach in them the size of what is coming."}]},
+    {choice: {name: "Ollun's admission", options: [
+      {pick: "Press him for numbers.", reply: "Ollun: \"I wanted a number too. Here is the only one that matters: bigger than the rite has ever closed.\""},
+      {pick: "Reassure him.", reply: "Ollun: \"I have done the sum with hope in it. The answer does not change.\""},
+      {pick: "Say nothing.", reply: "He keeps walking. So do you."}
+    ]}},
+    {p: "In the founding chamber, the great bell lies split, and inside the split sits the Bellheart: a fist of star-glass, heavier to look at than to lift, and it did not fall whole. The Loom splinter at its core is intact, but the shaped glass around it is cracked through. It still vibrates before the chamber's guardians wake, so you are ready when they do: twelve centuries underwater, and it still hears things coming before they arrive. Around its base, the founding inscription: \"Set from the Old Beacon's light, for the daughter-house at Gullhaven, that the Vigil may hear the night coming.\""},
+    {note: "Canon: the tower fell decades before Hale's breach; his outer rite was raised on the echo-bell and did not take, and that is why he carried it in. The failure is attributable to the missing Bellheart, and Ollun knows it. This is what makes the squad's confidence in Q8 rational, and Q8 failing anyway the proof that this breach is different in kind."},
+    {p: "The climb out is a running fight, not a stand: the tide is coming in below you, and you kill what stands between you and daylight while it rises. Ankle-deep at the bell chamber, knee-deep on the drowned stair, chest-deep in the gallery; the last thing you kill, you kill wading."},
+    {p: "At the top, in daylight, Tam strikes the Bellheart once to test it. What comes out is a flawed murmur, a note with the crack running through it, and every open Rift on the island still answers, faintly: one low sound from everywhere at once, felt in the teeth. Tam does not make a joke. It is the first time you have seen that."},
+    {d: [{s: "Tam", l: "Twelve centuries under the sea and it still hears. It cannot speak. Not yet."}]},
+    {note: "The recovered heart is broken on purpose: it can listen (the warning layer keeps working) but not ring (no seal power) until the reforging that closes Q7. The island-wide full-voice answer lands there, not here."}
+  ],
+  scenes: [
+    {name: "The chapel admission", type: "Staged", locked: false, desc: "Ollun's confession, mid-delve, with choice."},
+    {name: "Raising the Bellheart", type: "Cutscene", locked: true, dur: "40s", why: "The object's one introduction: reflections showing rooms that do not exist yet need the camera.", desc: "The split bell, the cracked heart, the inscription, the lift. The guardians wake as it ends."},
+    {name: "The island answers, faintly", type: "Ambient", locked: false, desc: "Tam's cracked test strike; a faint answer from everywhere at once. The full-voice answer waits for the reforging (Q7)."}
+  ]
+},
+{
+  id: "q4", code: "Q4", title: "A Question of Reinforcements", act: 1,
+  space: ["Story instance (council room, mast, mess)"],
+  squad: "All five",
+  location: "The redoubt, then the Watch Meadow mast", map: {x: 660, y: 440},
+  route: "The redoubt council room, then the Watch Meadow mast, then back to the redoubt mess.",
+  purpose: "The decision that owns everything after. The player votes.",
+  giver: "Warden Coalfast, at the redoubt: \"The breach opens within the month. The council decides tonight whether to signal the mainland. You have held our fields and been under our stone. You vote.\"",
+  objectives: ["Attend the council", "Cast your vote", "Raise the signal at the Watch Meadow mast", "Sit for the evening meal (leave when you choose)"],
+  rewards: "",
+  beats: [
+    {p: "The council plays as a short cutscene. Coalfast argues against the signal, and he is not being stubborn: the relief route is exposed across open water; a signal that loud may attract whatever intelligence is moving inside the Rift; an untrained relief force may add bodies without adding time."},
+    {p: "The other four are not asking for an army; they are asking for relief. Five people are doing the work of six against the worst breach in the records. The town must be evacuated while the rite is raised. Every night the squad spends holding walls is a night nobody spends on the seal, and the seal is not whole yet: the heart is up from the vault, but its voice is still Edda's to rebuild. And the sixth chair at this table is empty, and everyone keeps not looking at it."},
+    {choice: {name: "The vote (real, really counted)", options: [
+      {pick: "For the signal.", reply: "It passes five to one. Coalfast is alone."},
+      {pick: "Against the signal.", reply: "It passes four to two. You and Coalfast lose together."}
+    ]}},
+    {p: "Either way the signal is sent, and either way you own a share of what follows. Your vote is recorded, and it comes back in Q7."},
+    {p: "Coalfast honours the vote and assigns the signal watches himself. You climb the mast with Tam and raise the great storm-signal arm over arm: an interaction, not a cutscene."},
+    {p: "The quiet meal. Playable and unhurried: sit, eat, talk to each of them in any order, leave when you choose. Everyone has a plan for after:"},
+    {d: [
+      {s: "Edda", l: "When this is done I am sailing to the mainland to shout at a supplier in person. Twelve years of letters. He believes I am an invention of the postal service."},
+      {s: "Saul", l: "A season in which nobody new learns my name. That is the entire plan. It is a good plan."},
+      {s: "Tam", l: "I am going to teach Nell the changes properly, and then be old somewhere with a view of the tower instead of the inside of it."},
+      {s: "Coalfast", l: "There is a boat at the Landing with my name against a debt. I intend to repaint her and owe nothing to anyone."}
+    ]},
+    {p: "If you ask Ollun about his plan:"},
+    {d: [{s: "Ollun", l: "The northern harmonic drifted a quarter-tone this morning. Someone should write that down."}]},
+    {note: "Replay detail: across the whole campaign, Ollun never once describes his own future."}
+  ],
+  scenes: [
+    {name: "The council", type: "Cutscene", locked: true, dur: "90s", why: "The campaign's one talking scene: six chairs, one empty, the argument that owns everything after. It ends by handing you the vote.", desc: "Coalfast against, four for, then the choice UI. The vote itself is yours, not the camera's."},
+    {name: "Raising the signal", type: "Interaction", locked: false, desc: "The mast, arm over arm, with Tam."},
+    {name: "The quiet meal", type: "Playable", locked: false, desc: "Free-roam; talk in any order; leave when you choose."}
+  ]
+},
+{
+  id: "q5", code: "Q5", title: "Lights on the Water", act: 2,
+  space: ["Shared world"],
+  squad: "Home forms, repositioned to the Landing",
+  location: "The Landing", map: {x: 195, y: 305},
+  route: "West across the island to the Landing, then north to south along the beach, fire to fire.",
+  purpose: "The harbor cannot take warships, so the fleet lands on the Landing beach at first light. Tonight it anchors beyond the shoals; nobody runs shoal water in the dark. Your fires mark the safe channel and prove the beach is cleared.",
+  giver: "Warden Coalfast, at the Landing: \"They land at first light. They need a clear beach and a marked channel. Give them both.\"",
+  objectives: ["Clear the Landing beach of Riftspawn (0/20)", "Light the guide fires (0/5)", "Report to Coalfast at the last fire"],
+  rewards: "Experience, 2 silver 50 copper",
+  beats: [
+    {p: "The relief force appears at dusk as lights on the water, a long line of them holding station beyond the shoals. You clear the beach and light the fires one by one, and at each one there is a small human moment: militia straightening their kit, a fisherman explaining to his son which light is which."},
+    {p: "At the last fire the squad has gathered, and for the first time in the campaign they let themselves believe that everyone might live. Tam starts a joke:"},
+    {d: [
+      {s: "Tam", l: "A mainland soldier walks into a tavern with a gull on his shoulder, and the barman says..."},
+      {s: "Coalfast", l: "Save the end for when they land. Positions for morning."}
+    ]},
+    {p: "He does not get to finish it. Remember that."}
+  ],
+  scenes: [
+    {name: "The last fire", type: "Staged", locked: false, desc: "The unfinished gull joke, standing in the firelight with them. No camera."}
+  ]
+},
+{
+  id: "q6", code: "Q6", title: "The Sundered Arrival", act: 2,
+  space: ["Story instance (outdoor, water edge)"],
+  squad: "All five (first full deployment)",
+  location: "The Landing beach and the tidal flats", map: {x: 175, y: 400},
+  route: "The Landing beach and, when it goes wrong, out onto the knee-deep tidal flats among the wrecks.",
+  purpose: "Hold the landing zone until dawn. The breach has other plans.",
+  giver: "Begins at the Landing, before dawn",
+  objectives: ["Hold the landing zone until first light (0/6 waves)", {u: 1, t: "Rescue survivors (0/20)"}, {u: 1, t: "Put down what the tide left (0/4)"}],
+  rewards: "",
+  boss: "The Riftjaw (takes the fleet; wounded, escapes beneath the Wreckfields)",
+  beats: [
+    {p: "The breach surges hours early. Two tolls sound from Gullhaven behind you, danger at the cliffs, and the code you learned in the fields does its real job. The waves come bigger than anything Ollun predicted, and for the first time you watch this elite unit get pushed backward, step by step, not because they are failing but because arithmetic is arithmetic."},
+    {p: "By the fourth wave the line is visibly going. Then the breakwater stair, the one strongpoint on the whole beach, goes quiet in the wrong way, and Coalfast shoulders his shield."},
+    {d: [{s: "Coalfast", l: "Nobody follows me onto the stair. If I am not out by the next wave: Tam commands, and you ring three."}]},
+    {p: "Ring three. So this is it, you think; this is what the night has been building toward. The wave comes, and breaks, and he is not out. Then he is: slower, bleeding above one eye, dragging his shield instead of carrying it."},
+    {d: [
+      {s: "Tam", l: "One day that stair is going to win."},
+      {s: "Coalfast", l: "Not tonight. Positions."}
+    ]},
+    {note: "The bait is deliberate. The campaign shows you a last stand, lets you believe it, and gives him back. When the real one comes, you will remember that this one ended."},
+    {p: "The line steadies, and still it will not last the night. Mid-fight:"},
+    {d: [
+      {s: "Edda", l: "The line will not hold to first light. They are anchored behind the shoals waiting for dawn. The flare is rigged and they know what it means. I can bring them in now."},
+      {s: "Coalfast", l: "Night water, on this coast."},
+      {s: "Edda", l: "Night water, or they anchor off a beach we no longer hold."},
+      {s: "Coalfast", l: "Send it up."}
+    ]},
+    {p: "Edda pulls the lanyard herself, in front of you, and the flare climbs and blooms red over the shoals. A defensible call, made under pressure, by the people who will have to live with it. The ships weigh anchor and turn in through the marked channel, and the Riftjaw is waiting in that channel."},
+    {p: "There is no cutscene yet, and that is the cruelty of it: waves five and six arrive while it happens. You fight with your back to the water and see it in pieces between strokes: a guide fire eclipsed, a mast folding sideways, a sound rolling in off the shoals that nobody on the beach has a name for. The line cannot be left, so you hold it, and you watch."},
+    {p: "Only when the sixth wave breaks does the scene take the camera, and it is short and it is the worst thing in the campaign: the last ships going down in full view, the sailors' souls drawn out of the water and swallowed, points of light pulled under in rows, like a net hauled the wrong way."},
+    {p: "Then you are on the flats. The objective is honest: Rescue survivors (0/20). You fight across knee-deep water and sand, among wreck debris, pulling people out as they wash in. The counter asks for twenty. The sea gives you seven."},
+    {p: "The pulse ebbs. The trough leaves a scatter of strandlings on the flats: broken, half-rewritten things dragging themselves in the shallows. They are not a threat. They are work. The squad walks the tideline beside you and puts them down one at a time, nobody talking."},
+    {d: [{s: "Ollun", l: "It took the light down with it. A wound fed like that does not close."}]},
+    {p: "First light is not a cutscene. You walk the tideline yourself, past the rows of sailcloth. Saul is with the seven survivors by a fire; approach, and he keeps working:"},
+    {d: [{s: "Saul", l: "Seven."}]},
+    {p: "Tam sits on the breakwater stair saying nothing at all, which is how you know how bad it is. Edda stands at the waterline, and as you reach her, Coalfast is already walking down to turn her away from it:"},
+    {d: [
+      {s: "Coalfast", l: "Edda. Look at me, not at the water."},
+      {s: "Edda", l: "You needed a quartermaster an hour ago."},
+      {s: "Coalfast", l: "I need one now. The seal still needs its charges, and the charges need their maker."}
+    ]}
+  ],
+  scenes: [
+    {name: "The fleet dies", type: "Cutscene", locked: true, dur: "45s", why: "The worst thing in the campaign must be watched whole: the camera is the point.", desc: "Taken only after the sixth wave breaks. Ships down in full view; souls pulled under in rows."},
+    {name: "The stair and the flare", type: "Staged", locked: false, desc: "Not scenes: the false final stand and Edda's call are combat dialogue, played inside the fight."},
+    {name: "First light", type: "Playable", locked: false, desc: "Walk the tideline; go to each of them in any order."}
+  ]
+},
+{
+  id: "q7", code: "Q7", title: "On Our Own", act: 2,
+  space: ["Shared world"],
+  squad: "Home forms",
+  location: "The Landing surf line, then Gullhaven post to post", map: {x: 230, y: 440},
+  route: "The Landing surf line at low water, then back through Gullhaven, post to post, ending at Edda's forge.",
+  purpose: "Pick up the pieces, and turn the wreck into the seal. The relief force's deaths are the engine of everything after: their star-glass builds the wards and rebuilds the Bellheart's voice, their absence is why the rite runs thin, and guilt is distributed honestly, including to the player. The quest ends at the forge, on the reforging.",
+  giver: "Mender Saul, at the Landing",
+  objectives: ["Recover the relief banner", "Bring the recovered name-tags to Saul (0/12)", "Salvage star-glass from the wrecks with Edda (0/8)", "Reforge the Bellheart at Edda's forge"],
+  rewards: "Experience, 3 silver",
+  beats: [
+    {p: "You pull the banner out of the surf, heavy with water. Saul takes the name-tags one at a time and writes each name in his book before he sets the tag down. Every one."},
+    {p: "The salvage is not scavenging; it is the plan. Star-glass is the sky-wound's own glass, and a rift answers to nothing else; the outer seal needs more of it than the island has refined, and the fleet's instruments and wards carry it. Edda works the wrecks with you, and says the point of the quest out loud, once:"},
+    {d: [{s: "Edda", l: "They came to hold the line. Now they will."}]},
+    {p: "And the rite itself has to shrink to fit what is left. Ollun spends the quest rewriting twelve centuries of procedure for the hands he actually has:"},
+    {d: [{s: "Ollun", l: "The rite was written for a house of wardens. I have rewritten it for six."}]},
+    {p: "At the posts, the responsibility scenes play. Nobody says \"we killed them.\" Nobody is allowed to drown in it alone, either:"},
+    {d: [
+      {s: "Edda", l: "You told us not to call them."},
+      {s: "Coalfast", l: "I told you what I thought. Then we made the call together."},
+      {s: "Edda", l: "They came because we asked."},
+      {s: "Coalfast", l: "I know. This is not yours to carry alone."}
+    ]},
+    {d: [
+      {s: "Ollun", l: "I gave them the approach."},
+      {s: "Coalfast", l: "I approved it."},
+      {s: "Ollun", l: "You voted against it."},
+      {s: "Coalfast", l: "Then I lost the vote. After that, it was my order."}
+    ]},
+    {p: "And Edda's guilt is specific, because her hand pulled the lanyard:"},
+    {d: [
+      {s: "Edda", l: "I sent the flare up."},
+      {s: "Tam", l: "From a mortar I rigged, off a beach I promised we would hold. Keep going; there is plenty."}
+    ]},
+    {p: "Variant lines, by your vote in Q4. Same scene. Different wound."},
+    {d: [{s: "Edda", l: "(If you voted for the signal, unprompted:) You voted with me. Remember that I asked you to."}]},
+    {d: [{s: "Tam", l: "(If you voted against:) You and the Warden were right. I would vote the same way again anyway."}]},
+    {d: [{s: "Saul", l: "Have you read the names above the harbor steps? Read them tonight."}]},
+    {p: "The quest ends at the forge, and the salvage on the bench is not ironmongery tonight. Edda shapes the fleet's star-glass around the Loom splinter, course by course; Tam tunes each course by ear; and your shift is the bench work you learned proofing casings: clamp, seat, strike the test tone, listen. Nobody calls it what it is. Everybody works like they know."},
+    {d: [{s: "Edda", l: "Steady hands. This one has to ring for a hundred years."}]},
+    {p: "When the last course seats, Tam strikes it once, and the note comes out whole: the loudest sound the island has heard in a century, and every open Rift on the Farshore answers it at full voice, one low note from everywhere at once, felt in the teeth. Every player on the island hears it. Tam puts the striker down and looks at the bell for a long moment."},
+    {d: [{s: "Tam", l: "Now it speaks."}]},
+    {note: "The reforging is the act-out of the grief act: the broken inheritance rebuilt from the dead fleet's glass, by the hands that will strike it at the end. The island-wide full-voice answer lands here, moved from Q3 (where the cracked strike draws only a faint one)."}
+  ],
+  scenes: [
+    {name: "The responsibility scenes", type: "Staged", locked: false, desc: "At the posts, vote-variant lines. Ordinary quest dialogue on purpose: grief at post, not on stage."},
+    {name: "The reforging", type: "Interaction", locked: false, desc: "Bench work at the forge: shape, tune, test. Ends on the full-voice answer, heard by every player on the island."}
+  ]
+},
+{
+  id: "q8", code: "Q8", title: "The Outer Seal", act: 3,
+  space: ["Story instance (private outdoor copy of the Riftfields approach)"],
+  squad: "All five",
+  location: "The Riftfields", map: {x: 420, y: 218},
+  route: "Up from the meadow into the Riftfields, then a wide arc around the breach, ward site to ward site, closing inward.",
+  purpose: "Raise the rite that has closed this breach for twelve centuries, with the Bellheart restored: this time they have what Hale lacked, and the confidence is rational. When it fails anyway, the inside plan is born: walk in, set the charge, walk out together.",
+  giver: "Riftwatch Ollun, at the Riftfields edge: \"Four wards of the fleet's star-glass, tuned in sequence, and the wound closes from outside. It has worked for twelve hundred years, and this time we have what Hale did not. Walk with us.\"",
+  objectives: ["Escort Edda between the ward sites", "Raise the first ward (defend the tuning, 3 waves)", "Raise the second ward (hold the counter-note while Tam re-tunes)", "Raise the third ward (keep Edda alive)", "Raise the fourth ward", "Hold the line while the seal takes", {u: 1, t: "Enter the breach"}],
+  rewards: "",
+  beats: [
+    {p: "The operation is the squad at its best, and playing it feels like being inside a machine that has run for a thousand years: Edda places, Tam tunes, you and Coalfast hold, Saul keeps everyone standing, Ollun calls the pattern from the center like weather. But the breach is not a machine, and no two wards go up the same way:"},
+    {p: "The first ward raises the way the rite-book says it should: three waves break against you and Coalfast, and the chord takes. At the second ward, the tuning misfires: Tam has to begin the verse again, and he puts the striker in your hand without looking up; you hold the counter-note while the line gets thinner around you. At the third ward, no wave comes: the breach sends one thing, fast and deliberate, straight for Edda's hands (\"On Edda!\"). At the fourth ward, nothing comes at all, and the silence is worse than the waves. The ward goes up without a drop of blood, and nobody trusts it."},
+    {note: "The second ward's counter-note is the same stage-object work the finale asks for at Tam's station. Taught here, spent there."},
+    {p: "And it works. The breach contracts. The creatures weaken mid-wave, visibly. The wards sing one clean chord, and Ollun, who hedges everything, allows himself four words:"},
+    {d: [{s: "Ollun", l: "We have it."}]},
+    {p: "Then the light inside the breach changes, and the chord goes sour. The wards pull apart, not because anything is attacking them, but because they are anchoring a wound whose centre is not inside the waking world at all."},
+    {d: [{s: "Ollun", l: "The seal will not take. Its heart is inside."}]},
+    {p: "You expect panic. What you get is recognition. These people grew up beneath the statue; you are the only one present who did not."},
+    {d: [
+      {s: "Tam", l: "Hale's year."},
+      {s: "Ollun", l: "No. (The only flat contradiction he offers anyone in the campaign.) Hale went in with the rite and his two hands. We have the Bellheart and every charge Edda could build. We set the charges at the heart, seat the Bellheart, run the fuse, and walk out. All of us. It closes behind us."},
+      {s: "Saul", l: "You cannot stitch a wound whose middle is somewhere else."},
+      {s: "Ollun", l: "Exactly. So it is held shut from the inside, the heart is burned out, and the scar is set from the healthy side."},
+      {s: "Coalfast", l: "And the lock?"},
+      {s: "Ollun", l: "Turned from outside, after the fire. One hand. (He looks at you.)"}
+    ]},
+    {p: "Coalfast is quiet for a long moment. He has read Hale's account more times than anyone alive, and whatever he is thinking, he does not say it. Then he nods, and the squad starts dividing the charges."},
+    {note: "The double twist, stage zero: the squad walks in expecting nobody to die. The statue is a price they believe they have engineered past. Coalfast's silence here is the only foreshadowing, and it explains nothing."},
+    {choice: {name: "Your read on the plan", options: [
+      {pick: "\"It sounds too clean.\"", reply: "Coalfast: \"It does.\""},
+      {pick: "\"Hale did not have this.\"", reply: "Ollun: \"No. That is the point.\""},
+      {pick: "Say nothing.", reply: "Edda, passing you a charge: \"Carry that. Worry quietly.\""}
+    ]}}
+  ],
+  scenes: [
+    {name: "The seal fails", type: "Cutscene", locked: true, dur: "40s", why: "The reversal is visual: 'We have it,' then the chord goes sour and the light inside the breach changes.", desc: "Ends on Ollun: 'The seal will not take. Its heart is inside.'"},
+    {name: "The inside plan", type: "Staged", locked: false, desc: "Briefed in-world over the charge crates. Walk in, set it, walk out together. Coalfast says nothing."}
+  ]
+},
+{
+  id: "q9", code: "Q9", title: "The Inside Plan", act: 4,
+  space: ["Story instance (breach interior; continuous with Q10 and Q11)"],
+  squad: "All five",
+  location: "Inside the breach", map: {x: 428, y: 150},
+  route: "Through the breach into one vast hollow of dream-stone, the heart at its centre, open ground all the way to it. Nothing about the space is a maze; the wrongness is in the light and the sky, not the navigation.",
+  purpose: "Walk in, set the charge, walk out together. That is the plan. The breach has two answers.",
+  giver: "",
+  objectives: ["Escort the charge to the heart", "Slay the heart's defenders (0/20)", {u: 1, t: "Take positions"}],
+  rewards: "",
+  beats: [
+    {p: "The escort fight crosses the hollow, the squad in formation around the charge sled, composed, professional, expecting to walk every one of themselves and you back out. The mood is close to light. It is the last light thing in the campaign."},
+    {p: "At the heart it works the way Ollun said it would. Edda sets her charges around the collar of dream-stone. Tam seats the Bellheart, and the ward stands: one clean chord, the wound held shut around its own death. Ollun runs the fuse line back toward the exit. For about ten seconds, the plan is a good plan."},
+    {p: "Then Ollun's hands leave the Bellheart, and the ward begins to drift. Seated is not held: the moment no living mind corrects it, the dream-matter starts rewriting the rite from underneath. Twist one lands mechanically, in front of you, not in narration: you watch the chord bend."},
+    {d: [
+      {s: "Ollun", l: "It will not stand alone. It has to be held. Corrected, continuously, by a hand and a mind, until the fire."},
+      {s: "Tam", l: "Hale."},
+      {s: "Saul", l: "That is why he stayed. He found out standing where we are standing."}
+    ]},
+    {p: "Coalfast's hand is already on the collar. No speech. He has been ready for this since the harbor steps."},
+    {d: [
+      {s: "Coalfast", l: "Set the fuse and go."},
+      {s: "You", l: "How do you get back out?"},
+      {s: "Coalfast", l: "I do not."}
+    ]},
+    {choice: {name: "Your follow-up (his ground never moves)", options: [
+      {pick: "Accusatory / Pleading / Silence", reply: "Coalfast: \"I knew it might come to this. I hoped it would not.\""}
+    ]}},
+    {note: "The old price, restored: one. The statue was never decoration. Let it sit for a beat as the squad begins, quietly, to obey him."},
+    {p: "The wound answers him. Not with defenders. It divides. Where there was one ward there are two, straining against each other; the pattern starts to slide apart between them. Tam is moving before anyone has spoken."},
+    {d: [
+      {s: "Coalfast", l: "Tam."},
+      {s: "Tam", l: "You cannot hear the counter-note from there. I can hear it from here. Mind your own ward."}
+    ]},
+    {p: "It divides again. Three. Ollun stands very still, listening to the way the northern ward drifts, and says the quiet part exactly once; nobody answers it:"},
+    {d: [{s: "Ollun", l: "Wounds do not divide themselves. It has learned the rite, and it has the strength to answer it. We watched it feed. (Then, quietly:) The north one moves. Nobody else can read it."}]},
+    {p: "He walks to it. It divides once more, and Saul is at the fourth before it has finished forming, calm the way he is calm about everything."},
+    {d: [{s: "Saul", l: "Somebody has to hold the holders."}]},
+    {p: "Four wards. And then Edda, at the exit end of the fuse line, stops laughing before she starts:"},
+    {d: [
+      {s: "Edda", l: "The fuse is dead. It did not just split the ward. It cut the line."},
+      {s: "Ollun", l: "Rewritten. Anything not held by a mind, it rewrites."},
+      {s: "Edda", l: "So the charge wants a hand on the trigger. (She laughs the way she laughs when she is terrified.) Four wards and a trigger. It counted us."}
+    ]},
+    {note: "Twist two: the enemy raises the price. Four wards that must each be held, and a detonation that is now manual. Five stations, five of them. Both mechanics were shown, not told: a drift you watched, a fuse you watched die."},
+    {p: "That is the reveal, and nobody announces it. The wound asked one at a time, and one at a time, without hesitating, they answered. Coalfast looks at each of them at their stations, the argument lost before it could be had. You have heard his next word all campaign: at the meadow gate, at the guide fires, at the bottom of a breakwater stair he walked back out of. It has never cost this much."},
+    {d: [{s: "Coalfast", l: "Positions."}]}
+  ],
+  scenes: [
+    {name: "The wound divides", type: "Cutscene", locked: true, dur: "100s", why: "The campaign's reveal earns the camera: seated-not-held, the divisions, the dead fuse, 'Positions.'", desc: "From the ward's first drift to 'Positions.' Control returns at the stations."}
+  ]
+},
+{
+  id: "q10", code: "Q10", title: "The Last Bell", act: 4,
+  space: ["Story instance (breach interior)"],
+  squad: "All five, at their anchors",
+  location: "The five stations, a pentagon around the charge", map: {x: 400, y: 130},
+  route: "",
+  purpose: "Keep them alive until the charge is armed. Then do the hardest thing in the campaign: leave.",
+  giver: "",
+  objectives: ["Answer the slips as Ollun calls them (relieve the stations)", "Keep every ward holder standing", {u: 1, t: "Take the Bellheart and go"}],
+  rewards: "",
+  beats: [
+    {p: "Each squad member performs a task only they can perform; you are the free hand. Saul calls the squad's status like a heartbeat: \"Five standing.\" Edda reports the arming as the scenario clock. Five rotations, authored, rising, and no two ask the same thing of you:"},
+    {p: "1. South slips: the loop as taught, the one rotation that goes the way it is supposed to. (\"Two tenths.\") 2. The counter-note bends: you hold it with the striker while Tam corrects, the second ward's work again at full stakes. (\"Four tenths.\") 3. Something wears Saul's shape: a priority target at the life ward while the real Saul keeps cleansing. (\"Six tenths.\") 4. All five slip at once: Ollun's voice cracks for the only time in the campaign (\"All of them. All five.\"). You can answer one. You listen to the other four hold themselves, and then Saul, after the longest three seconds in the campaign: \"...Five standing.\" You cannot hold everything. That is the lesson, minutes before it matters. (\"Eight tenths.\") 5. Everything converges on the charge: shield Edda; the casings you proofed at her bench are under your hands again. (\"Nine tenths.\")"},
+    {p: "When the charge is armed, Coalfast orders you out with the Bellheart. You are allowed to argue. It is scripted, and it matters that you say it:"},
+    {d: [
+      {s: "You", l: "I can take a station."},
+      {s: "Ollun", l: "No. The outside lock must be turned after the charge fires."},
+      {s: "You", l: "Send one of you."},
+      {s: "Coalfast", l: "Every person in here has a job only they can do. So do you."},
+      {s: "You", l: "You expect me to leave you?"},
+      {s: "Coalfast", l: "I expect you to close the breach. This is our post. Yours is outside. You held the east hedge when I asked. Hold this one. Go."}
+    ]},
+    {p: "The retreat is played, not shown. You run the exit path with the Bellheart burning cold in your hands, and behind you the squad's communication goes clipped and professional, fading with distance. Nobody performs a final monologue. Nobody says goodbye."},
+    {d: [
+      {s: "Edda", l: "Charge at nine tenths."},
+      {s: "Ollun", l: "North drifting. Correcting."},
+      {s: "Tam", l: "Counter-note holds."},
+      {s: "Saul", l: "Five standing."}
+    ]},
+    {p: "You cross the threshold into the waking world. Behind you, only then:"},
+    {d: [{s: "Coalfast", l: "Edda. Now."}]}
+  ],
+  scenes: [
+    {name: "The exit argument", type: "Staged", locked: false, desc: "Scripted mid-combat; you are allowed to argue, and it matters that you say it."},
+    {name: "The retreat", type: "Playable", locked: false, desc: "Run the exit path; their voices fade behind you. Played, never shown."}
+  ]
+},
+{
+  id: "q11", code: "Q11", title: "Close the Door", act: 4,
+  space: ["Story instance (breach exterior)"],
+  squad: "None. That is the point.",
+  location: "The watchstone, outside the breach", map: {x: 456, y: 130},
+  route: "",
+  purpose: "The seal needs one hand on the outside. Yours.",
+  giver: "",
+  objectives: ["Place the Bellheart in the watchstone", "Strike it at the moment of detonation"],
+  rewards: "",
+  beats: [
+    {p: "You come out into ordinary night air, alone, and the silence out here is obscene. You place the Bellheart, the heart you helped raise from the sea and rebuild at Edda's bench, into the watchstone the squad prepared."},
+    {p: "Then you wait, hand on the striker, and the Bellheart begins to vibrate: faint, then building, a cue readable through your hands without a line of UI text. The timing is generous but real, and your hands already know the job: it is the same timed stroke Tam drilled into you on the practice bell. There is no tutorial here. There does not need to be."},
+    {p: "Miss it, and the sequence holds at the brink and the cue comes again; the game will wait, because the sacrifice cannot land until you close the door. You do not survive a cutscene here. You do the last job."},
+    {p: "You strike. The Bellheart rings once, the loudest sound in the campaign, and the breach collapses like a held breath let out. Gullhaven is safe for roughly one hundred years."},
+    {p: "The music stops. Not a fade. It stops."}
+  ],
+  scenes: [
+    {name: "The strike", type: "Interaction", locked: false, desc: "Timed, cued by vibration, readable without UI text. Taught in Q2. You do not survive a cutscene here."},
+    {name: "The music stops", type: "Ambient", locked: false, desc: "Not a fade. An authored event in the music engine."}
+  ]
+},
+{
+  id: "lw", code: "END", title: "The Last Watch", act: 5,
+  space: ["Story instance (solo, always, even for a full party)"],
+  squad: "Nobody. The redoubt is clean and empty.",
+  location: "The quiet redoubt, then the sea road to the Old Beacon", map: {x: 640, y: 425},
+  route: "The warden's night rounds through the empty redoubt, post to post, then across the sea to the Old Beacon in Galecrest.",
+  purpose: "Someone has to close the watch, and you are the only person left who served with them. Each duty is something you learned or saw in Act I.",
+  giver: "",
+  objectives: ["Perform the end-of-watch duties (0/5)", "Write the names in the watch log", "Carry the Bellheart and Ollun's record to the Old Beacon"],
+  rewards: "None. That is deliberate.",
+  beats: [
+    {p: "No music. No markers beyond the duties. The civilians have come back, and the redoubt is clean and empty."},
+    {p: "Bank Edda's forge: it is found cold; Grandmother sleeps under canvas; the drawer of unsent letters is empty; someone posted them. Close Saul's book of names: it lies open to the relief force's pages, every name written in full. Weight Ollun's papers: the calculations end in the middle of a sentence (\"if the fifth harmonic is answered in kind, then\"). Secure Tam's tower ropes, and give the bell back its voice: his ordinary iron clapper waits on the bench, cleaned and tagged in his hand, for whoever closes the watch; you hang it, and you ring the all-clear, one long soft stroke, the only note in an ending without music. Turn Coalfast's chair to face the door, the way he left it every night: it is found facing the sea, and at the Landing below, a small boat waits with fresh paint stacked beside it, unopened."},
+    {p: "Each duty plays one memory line. The rounds end at the watch log, where you write five names in your own hand."},
+    {p: "Then the delivery: across the sea to the Old Beacon. Its keepers read the founding mark and go very quiet; their forgotten daughter-house kept the Vigil for twelve centuries without relief or recognition. When the Bellheart is set beside the Old Beacon, it rings once, with no bell around it. The squad bought a century for Gullhaven and a warning for everyone else."}
+  ],
+  scenes: [
+    {name: "The duties", type: "Interaction", locked: false, desc: "Five silent duties, one memory line each. No music."},
+    {name: "The Old Beacon", type: "Cutscene", locked: true, dur: "30s", why: "The ring with no bell around it: one still, wide shot.", desc: "The keepers read the founding mark and go very quiet."}
+  ]
+},
+{
+  id: "wf", code: "EPI", title: "Names Without Graves", act: 5,
+  space: ["Story instance (Willowfen)"],
+  squad: "Nell asks; you go alone",
+  location: "Willowweep, in the Willowfen (off-island)", map: null,
+  route: "",
+  purpose: "Nell's request. Her father has a grave. The five do not. Optional, 20 to 30 minutes.",
+  giver: "Nell, at the bell tower",
+  objectives: ["Carry the name-stones to Willowweep", "Plant the name-stones (0/5)"],
+  rewards: "A quiet deed.",
+  beats: [
+    {p: "You plant the stones beneath the willow, one at a time, and speak the names: Warden Coalfast. Riftwatch Ollun. Quartermaster Edda. Mender Saul. Bellkeeper Tam."},
+    {p: "After each name, a distant bell note sounds. After Coalfast's name, the insects and the frogs go silent. Five lights settle beneath the willow and fade."},
+    {d: [{s: "Nell", l: "The bell only ever asks one question: who will come? For twelve hundred years the answer was them. Now it is me."}]},
+    {p: "There is no boss, no fanfare, no joke to release the pressure. You are allowed to leave in silence."}
+  ],
+  scenes: [
+    {name: "Five lights", type: "Cutscene", locked: true, dur: "45s", why: "The insects going silent after Coalfast's name is a held frame.", desc: "After the fifth stone. Ends in silence; you are allowed to leave."}
+  ]
+},
+{
+  id: "att", code: "ATT", title: "Attunement: The Lights Under the Flats + A Key of Star-glass", act: 6,
+  space: ["Shared world chain (per character)"],
+  squad: "Nell passes the word",
+  location: "The Wreckfields at low tide", map: {x: 150, y: 505},
+  route: "The flats at low water, the flagship wreckage, the redoubt stores, the mouth of the wreck-maze.",
+  purpose: "The Drowned Relief is per-character attuned, classic style: finishing the campaign is necessary but not sufficient. The unlock is diegetic.",
+  giver: "Nell, at the bell tower: \"The salvagers have stopped going out. They say there are lights under the flats at low tide. Lights that move.\"",
+  objectives: ["Speak with the Wreckfield salvagers", "Recover the fleet's sailing logs from the flagship wreckage (0/4)", "Bring the logs to the harbormaster", "Collect Edda's spare resonance shard from the redoubt stores", "Set the shard at the mouth of the wreck-maze"],
+  rewards: "Attunement: the Drowned Relief is open.",
+  beats: [
+    {p: "You walk the flats at low water and see them yourself: points of light, under the sand and the hulls, moving. They crowd thickest around the flagship wreckage, and her chart room still holds the fleet's logs. The rumor and the proof are the same walk."},
+    {p: "The logs show course corrections beginning days before landfall. Something shadowed the relief force from the moment the signal went up, exactly what Coalfast warned the council about. The squad never learned this. You do."},
+    {p: "The Riftjaw's pocket sits half inside dream-matter; only star-glass opens the way. Edda's outer-seal work left finished spares in the redoubt stores, tagged in her handwriting. You carry her work down to the Wreckfields and set it at the mouth of the maze, and the way opens. Each party member runs the chain once and carries their own shard."}
+  ],
+  scenes: []
+},
+{
+  id: "dr", code: "DGN", title: "The Drowned Relief", act: 6,
+  space: ["Dungeon (five-player, repeatable)"],
+  squad: "None. Player party of five.",
+  location: "A fused maze of ships and Rift architecture beneath the Wreckfields", map: {x: 120, y: 545},
+  route: "",
+  purpose: "Justice and release, not reversing the sacrifice. The Riftjaw still holds the souls it took.",
+  giver: "",
+  objectives: ["Enter the fused relief flagship", "Fight the dream-echoes wearing the sailors' memories", "Recover the relief banner and final dispatches", "Kill the Riftjaw", "Return the recovered names to the mainland"],
+  rewards: "Gear progression comes from here, because it never comes from the grief.",
+  boss: "The Riftjaw. Its death releases the souls it holds: lights rise out of the wreck-maze and disperse, the same imagery as the willow.",
+  beats: [
+    {p: "Nobody comes back. Nothing is walked back. The dungeon must not resurrect the squad, reveal that they escaped, or turn their deaths into a fake-out."}
+  ],
+  scenes: []
+}
+];
+
+const SQUAD = [
+  {name: "Warden Coalfast", epithet: "the commander", sigil: "C", speaker: "Coalfast", fate: "Falls in the breach",
+   combat: "Shield-bearing front line and battlefield commands.",
+   voice: "Short sentences, orders phrased as facts, praise that sounds like logistics.",
+   rules: "Short declaratives. Orders phrased as facts, not requests. Praise sounds like logistics (\"You held the east line. Good. Hold it again.\"). Affection is shown by assignment: who he trusts with what, never stated in words.",
+   never: "Explains an order twice. Apologises for a command decision. Makes a speech.",
+   arc: "The man who planned to die alone learns, in the last hour, that his squad never intended to let him.",
+   notes: "Warm when he has time to be and frighteningly decisive when he does not. Opposed the signal; honoured the vote. His word is \"Positions.\""},
+  {name: "Riftwatch Ollun", epithet: "the scholar", sigil: "O", speaker: "Ollun", fate: "Falls in the breach",
+   combat: "Interrupts Rift effects and reads the changing anchor pattern.",
+   voice: "Precise, hedged, allergic to false comfort.",
+   rules: "Precise and hedged; numbers over adjectives. Corrects false comfort even when kindness would be easier (\"I have done the sum with hope in it. The answer does not change.\"). Deflects personal questions into observations about the breach.",
+   never: "Promises an outcome. Says it will be fine. Describes his own future.",
+   arc: "The one who suspected first, and said nothing, because hope was also a calculation.",
+   notes: "Replay detail: across the whole campaign, Ollun never once describes his own future."},
+  {name: "Quartermaster Edda", epithet: "the engineer", sigil: "E", speaker: "Edda", fate: "Falls in the breach",
+   combat: "Heavy ranged damage, demolitions and charge placement.",
+   voice: "Insults as endearments; the more scared she is, the funnier she gets.",
+   rules: "Insults as endearments, aimed only at what she loves. The more scared she is, the funnier she gets; calm Edda is blunt Edda. Machines get names and personalities (\"Grandmother bites people who bring her the wrong spanner.\"). Trade vocabulary, never poetry.",
+   never: "Says a sentimental thing straight. Asks for comfort. Leaves a job half done.",
+   arc: "Guilt over the relief force, answered not by absolution but by work. She stays to finish a job, not to be punished.",
+   notes: "Voted for the signal; her hand pulled the flare lanyard. Names her equipment: Grandmother, the Ox, the Liar. Her hands rebuild the Bellheart's voice from the dead fleet's glass (Q7)."},
+  {name: "Mender Saul", epithet: "the conscience", sigil: "S", speaker: "Saul", fate: "Falls in the breach",
+   combat: "Healing, cleansing dream-corruption, keeping the anchor holders alive until detonation.",
+   voice: "Quiet, unhurried, asks questions instead of arguing.",
+   rules: "Quiet and unhurried; asks questions instead of arguing. Names people before treating them (\"Use the name. Wounds close faster in people who are still people.\"). Understatement carries the weight: one word where others would use ten (\"Seven.\").",
+   never: "Raises his voice. Argues. Softens a hard truth someone needs whole.",
+   arc: "The one who knew the cost first and made peace with it first.",
+   notes: "Treats every patient by name. Sends the player to read the statue's plinth (Q7)."},
+  {name: "Bellkeeper Tam", epithet: "the old soldier", sigil: "T", speaker: "Tam", fate: "Falls in the breach",
+   combat: "Protective wards, crowd control, maintaining the Bellheart's counter-note.",
+   voice: "Jokes with perfect timing, sincerity only when it counts. His silence is the alarm.",
+   rules: "Jokes with perfect timing; sincerity strictly rationed so that it lands when spent. Claims not to believe in the rites while performing them perfectly (\"The rites are nonsense. You will want the third verse by heart. For the nonsense.\"). When it is truly bad he goes quiet: his silence is the alarm.",
+   never: "Explains a joke. Admits fear in words. Wastes a sincere sentence.",
+   arc: "The unbeliever who performs the rite perfectly at the end.",
+   notes: "Coalfast's oldest friend. Claims the rites are nonsense; knows every word. Only one who can read the Bellheart."}
+];
+
+const NPCS = [
+  {name: "Outrider Bren", epithet: "the empty chair", sigil: "B", dead: true, fate: "Dead weeks before the campaign",
+   notes: "The squad's scout and vanguard, killed on a routine rift-sealing run. His gear is maintained on Edda's bench; his bunk unclaimed. His death is why the squad is undermanned, why the council happens, and why a proven newcomer gets recruited. Bren has a grave in Gullhaven. The five who go inside will not."},
+  {name: "Nell", epithet: "the bell-runner", sigil: "N", speaker: "Nell", fate: "Survives; takes over the bell",
+   rules: "Message first, feelings never; short, breathless, already leaving. Courage phrased as logistics (routes, timings), not bravery.",
+   never: "Talks about her father unprompted. Admits she is afraid while on duty.",
+   notes: "Bren's daughter. Carries messages between the posts and the tower, terrified of the work, does it anyway. Helps evacuate Gullhaven. Asks for the Willowfen errand, and passes the salvagers' word that starts the attunement."},
+  {name: "Sergeant Marsh", epithet: "town militia", sigil: "M", speaker: "Marsh", fate: "Survives",
+   rules: "Operational assessments, not compliments (\"Trained?\"). Speaks in what his line can and cannot kill; everything else is somebody else's business.",
+   never: "Flatters. Panics in front of his line.",
+   notes: "Runs the militia line at the Watch Meadow. Marks the player mid-event and points them at the Tidemill. Operational, unsentimental, knows exactly what his line can and cannot kill."},
+  {name: "Warden Hale", epithet: "the statue", sigil: "H", dead: true, fate: "Died inside the breach, one hundred years ago",
+   notes: "The most recent warden to carry the seal inside alone. His statue stands above the harbor steps; the plinth carries one name for every warden who went in, with room for more. \"Hale's year\" is how the squad names the precedent."},
+  {name: "The Gull's Wage crew", epithet: "Petter, Corla, Ames, Old Sef", sigil: "G", fate: "Survive",
+   notes: "Fishermen treated during Saul's infirmary shift, each by name or not at all."},
+  {name: "The statue-keeper, the harbormaster, the salvagers", epithet: "island histories", sigil: "I", fate: "Survive",
+   notes: "Optional lore layer, one quest per zone: Hale's story, the founders' inscription and the star-glass trade, the collapsed first tower, the salvagers' ledger of what the tides have taken."},
+  {name: "The keepers of the Old Beacon", epithet: "Galecrest", sigil: "K", fate: "Receive the record",
+   notes: "Recognise the founding mark. The combined record gives the surviving Vigil a way to hear the next great breach coming."}
+];
+
+const ENEMIES = [
+  {name: "Riftspawn", epithet: "the daily work", sigil: "R",
+   notes: "Ordinary spawn of the small rifts; the militia can handle the strays, mostly. Public bell events."},
+  {name: "Void Stalkers and dream-things", epithet: "the vault and the waves", sigil: "V",
+   notes: "Nest in the drowned first redoubt; larger dream-things walk behind the Q6 waves, far past Ollun's counts."},
+  {name: "The Tidemill Stalker", epithet: "Q0 boss", sigil: "T",
+   notes: "Digs into the mill wearing the miller's roof. Burrows, calls adds, webs the exits. Tuned to demonstrate the gap between the player and the militia, not to be a wall."},
+  {name: "The Riftjaw", epithet: "the thing in the channel", sigil: "J",
+   notes: "Waits in the shoal channel and takes the fleet in full view, swallowing the sailors' souls. Wounded, it retreats beneath the Wreckfields; expelled into the waking world when the breach closes. The Drowned Relief's final boss. Killing it releases the souls it holds."},
+  {name: "The intelligence inside the breach", epithet: "the open thread", sigil: "?",
+   notes: "Named exactly once, in Q9: wounds do not divide themselves; something has learned the rite and split the wound to defeat it. The division is paid for: it answers the rite with strength it took from the fleet. It counted the squad. Deliberately unexplained; a future arc's problem."},
+  {name: "Dream-echoes", epithet: "the taken, given shape", sigil: "D",
+   notes: "The Drowned Relief's population: the swallowed sailors' memories, worn as shapes by the Riftjaw."}
+];
+
+const SCRIPT_GAPS = {
+  q0: ["Militia barks during the meadow event: holding the road, reacting to the player's work (4 to 6 lines)."],
+  q1: ["The ring-and-answer set: Tam's field-code ring at each sealed rift and the tower's answer. Operational register: names over categories; orders as assignment + geography + verb; poetry stays fenced off in ritual. 4 to 6 paired lines."],
+  q2: ["Shift chatter: three or four ambient work lines per post (Edda proofing, Saul between patients, Tam between strokes) so the shifts breathe between the authored lines."],
+  q5: ["The small human moments at each guide fire: one or two lines each for the militia straightening kit and the fisherman explaining the lights to his son."],
+  q7: ["Reforging bench exchanges: Edda shaping course by course, Tam tuning by ear, two or three short exchanges between the authored lines before the full-voice strike."],
+  q6: ["Wave-by-wave combat calls for all five squad members: the line failing must be audible in the barks before it is visible on screen."],
+  q8: ["Ward-site work loops: placement, tuning, and pattern calls, varied per site (the four sites escalate by variation; the barks must too)."],
+  q10: ["Station pressure lines between the authored rotation calls: each holder under strain, in voice, no farewells."]
+};
+
+const BARK_SHEETS = [
+  {who: "Coalfast", need: "Combat orders (8); rally and recovery calls (4); stage-aware greetings at the redoubt gate (6); idle post lines (4)"},
+  {who: "Ollun", need: "Rift-reading calls in combat (8); count and pattern mutters (4); stage-aware greetings (6); idle (4)"},
+  {who: "Edda", need: "Demolition and placement calls (8); equipment endearments and insults (6); stage-aware greetings at the forge (6); idle (4)"},
+  {who: "Saul", need: "Triage and status calls (8); patient-name lines (4); stage-aware greetings at the infirmary (6); idle (4)"},
+  {who: "Tam", need: "Ward and counter-note calls (8); jokes under pressure (6); stage-aware greetings at the tower (6); idle (4)"},
+  {who: "Nell", need: "Message-delivery arrivals (6); post-campaign bell-post greetings (4)"},
+  {who: "Sergeant Marsh", need: "Militia line-holding calls during public events (6); assessments of the player (3)"},
+  {who: "Gullhaven ambient", need: "Street reactions to the bell code, one, two and three tolls (6); harbor and market chatter tied to campaign stage (8)"}
+];
+
+/* ============================ RENDER ============================ */
+
+const $ = (sel) => document.querySelector(sel);
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+const VIEWS = [
+  {id: "overview", label: "Overview"},
+  {id: "quick", label: "Quick read"},
+  {id: "story", label: "Story bible"},
+  {id: "map", label: "Map"},
+  {id: "quests", label: "Beat sheets"},
+  {id: "cast", label: "Voice bible"},
+  {id: "script", label: "Script"}
+];
+
+function showView(id) {
+  document.querySelectorAll("section.view").forEach(s => s.classList.remove("active"));
+  $("#view-" + id).classList.add("active");
+  document.querySelectorAll("nav.tabs button").forEach(b => b.classList.toggle("active", b.dataset.view === id));
+  window.scrollTo(0, 0);
+}
+
+function openQuest(qid) {
+  showView("quests");
+  renderQuestDetail(qid);
+  document.querySelectorAll(".quest-list button").forEach(b => b.classList.toggle("active", b.dataset.qid === qid));
+  location.hash = "quest:" + qid;
+}
+
+function spaceChip(s) {
+  const cls = /shared/i.test(s) ? "shared" : (/dungeon/i.test(s) ? "dungeon" : "");
+  return `<span class="chip ${cls}">${esc(s)}</span>`;
+}
+
+function renderBeat(b) {
+  if (b.p) return `<p>${esc(b.p)}</p>`;
+  if (b.note) return `<div class="note">Design note: ${esc(b.note)}</div>`;
+  if (b.d) return `<blockquote class="dlg">` + b.d.map(x => `<p><strong>${esc(x.s)}:</strong> &quot;${esc(x.l)}&quot;</p>`).join("") + `</blockquote>`;
+  if (b.choice) {
+    return `<div class="note"><b>Choice: ${esc(b.choice.name)}.</b><br>` +
+      b.choice.options.map(o => `${esc(o.pick)} &rarr; ${esc(o.reply)}`).join("<br>") + `</div>`;
+  }
+  return "";
+}
+
+function renderQuestDetail(qid) {
+  const q = QUESTS.find(x => x.id === qid) || QUESTS[0];
+  let h = `<p class="label">${esc(ACTS[q.act])}</p>`;
+  h += `<h2 style="margin-top:0.2rem">${esc(q.code)}. ${esc(q.title)}</h2>`;
+  h += `<p>` + q.space.map(spaceChip).join("") + `</p>`;
+  if (q.purpose) h += `<div class="kv"><b>Purpose</b> ${esc(q.purpose)}</div>`;
+  if (q.squad) h += `<div class="kv"><b>Squad present</b> ${esc(q.squad)}</div>`;
+  if (q.location) h += `<div class="kv"><b>Location</b> ${esc(q.location)}</div>`;
+  if (q.route) h += `<div class="kv"><b>Where you walk</b> ${esc(q.route)}</div>`;
+  if (q.boss) h += `<div class="kv"><b>Boss</b> ${esc(q.boss)}</div>`;
+
+  h += `<div class="quest-card"><p class="qc-title">Quest card</p>`;
+  if (q.giver) h += `<p class="giver">${esc(q.giver)}</p>`;
+  h += `<ul>` + q.objectives.map(o => {
+    if (typeof o === "string") return `<li>${esc(o)}</li>`;
+    return `<li><span class="upd">(updated)</span> ${esc(o.t)}</li>`;
+  }).join("") + `</ul>`;
+  if (q.rewards) h += `<p class="rewards">Rewards: ${esc(q.rewards)}</p>`;
+  h += `</div>`;
+
+  if (q.flags && q.flags.length) {
+    h += q.flags.map(f => `<div class="flagged"><p class="label">Flagged for rework</p><p>${esc(f)}</p></div>`).join("");
+  }
+
+  h += `<p class="label">Story and dialogue</p>`;
+  h += q.beats.map(renderBeat).join("");
+
+  if (q.scenes && q.scenes.length) {
+    h += `<p class="label">Scenes in this quest</p><ul>`;
+    h += q.scenes.map(s =>
+      `<li><b>${esc(s.name)}</b> <span class="chip ${s.locked ? "" : "shared"}">${esc(s.type)}</span>${s.dur ? ` <span class="chip solid">${esc(s.dur)}</span>` : ""} ${esc(s.desc)}${s.why ? ` <i>(Why the camera: ${esc(s.why)})</i>` : ""}</li>`
+    ).join("");
+    h += `</ul>`;
+  }
+  $("#quest-detail").innerHTML = h;
+}
+
+function renderQuestList() {
+  let h = "", act = 0;
+  for (const q of QUESTS) {
+    if (q.act !== act) { act = q.act; h += `<div class="act">${esc(ACTS[act])}</div>`; }
+    h += `<button data-qid="${q.id}"><span class="qcode">${esc(q.code)}</span> ${esc(q.title)}</button>`;
+  }
+  $("#quest-list").innerHTML = h;
+  document.querySelectorAll(".quest-list button").forEach(b =>
+    b.addEventListener("click", () => openQuest(b.dataset.qid)));
+}
+
+function renderMap() {
+  const markers = QUESTS.filter(q => q.map);
+  const g = $("#map-markers");
+  g.innerHTML = markers.map(q => `
+    <g class="marker" data-qid="${q.id}">
+      <circle cx="${q.map.x}" cy="${q.map.y}" r="11"></circle>
+      <text x="${q.map.x}" y="${q.map.y + 3.5}" text-anchor="middle">${esc(q.code.replace("Q", ""))}</text>
+      <title>${esc(q.code)}. ${esc(q.title)}</title>
+    </g>`).join("");
+  g.querySelectorAll(".marker").forEach(m =>
+    m.addEventListener("click", () => openQuest(m.dataset.qid)));
+  $("#map-legend").innerHTML = markers.map(q =>
+    `<span data-qid="${q.id}"><span class="qcode">${esc(q.code)}</span> ${esc(q.title)}</span>`).join("") +
+    `<span data-qid="wf"><span class="qcode">EPI</span> Names Without Graves (Willowfen, off-island)</span>`;
+  document.querySelectorAll("#map-legend span[data-qid]").forEach(el =>
+    el.addEventListener("click", () => openQuest(el.dataset.qid)));
+}
+
+function linesFor(speaker) {
+  const groups = [];
+  for (const q of QUESTS) {
+    const blocks = [];
+    for (const b of q.beats) {
+      if (b.d && b.d.some(x => x.s === speaker)) blocks.push(b.d);
+      if (b.choice) {
+        for (const o of b.choice.options) {
+          const m = o.reply.match(/^([A-Za-z]+)([^:"]*):\s*"(.*)"$/);
+          if (m && m[1] === speaker) {
+            blocks.push([{s: speaker, l: m[3], ctx: "(reply to: " + o.pick + ")"}]);
+          }
+        }
+      }
+    }
+    if (blocks.length) groups.push({q, blocks});
+  }
+  return groups;
+}
+
+function countLines(speaker) {
+  return linesFor(speaker).reduce((a, g) =>
+    a + g.blocks.reduce((x, blk) => x + blk.filter(l => l.s === speaker).length, 0), 0);
+}
+
+function openCastModal(c) {
+  const groups = linesFor(c.speaker);
+  const count = countLines(c.speaker);
+  let h = `<button class="close" id="modal-close">Close</button>`;
+  h += `<h2 style="margin-top:0">${esc(c.name)}</h2>`;
+  h += `<p class="label" style="margin-top:0.2rem">${count} lines across ${groups.length} quests. Exchanges shown whole; their lines highlighted.</p>`;
+  for (const g of groups) {
+    h += `<h3><a href="#" data-qid="${g.q.id}" class="modal-quest">${esc(g.q.code)}. ${esc(g.q.title)}</a></h3>`;
+    for (const blk of g.blocks) {
+      h += `<blockquote class="dlg">` + blk.map(x =>
+        `<p class="${x.s === c.speaker ? "hit" : ""}"><strong>${esc(x.s)}:</strong> &quot;${esc(x.l)}&quot;${x.ctx ? ` <i>${esc(x.ctx)}</i>` : ""}</p>`).join("") + `</blockquote>`;
+    }
+  }
+  if (!groups.length) h += `<p>No indexed lines yet.</p>`;
+  $("#modal-box").innerHTML = h;
+  $("#modal").hidden = false;
+  $("#modal-close").addEventListener("click", closeModal);
+  document.querySelectorAll(".modal-quest").forEach(a =>
+    a.addEventListener("click", (e) => { e.preventDefault(); closeModal(); openQuest(a.dataset.qid); }));
+}
+
+function closeModal() { $("#modal").hidden = true; }
+
+function castCard(c, group, i) {
+  const n = c.speaker ? countLines(c.speaker) : 0;
+  const clickable = c.speaker && n > 0;
+  return `<div class="card ${c.dead ? "dead" : ""} ${clickable ? "speaker" : ""}" data-group="${group}" data-i="${i}">
+    <div class="who"><div class="sigil">${esc(c.sigil)}</div>
+      <div><h4>${esc(c.name)}</h4><div class="epithet">${esc(c.epithet)}</div></div></div>
+    ${clickable ? `<div class="kv"><span class="chip solid">${n} lines: click to read</span></div>` : ""}
+    ${c.fate ? `<div class="kv"><b>Fate</b> ${esc(c.fate)}</div>` : ""}
+    ${c.combat ? `<div class="kv"><b>Combat</b> ${esc(c.combat)}</div>` : ""}
+    ${c.voice ? `<div class="kv"><b>Voice</b> ${esc(c.voice)}</div>` : ""}
+    ${c.rules ? `<div class="kv"><b>Rules</b> ${esc(c.rules)}</div>` : ""}
+    ${c.never ? `<div class="kv"><b>Never</b> ${esc(c.never)}</div>` : ""}
+    ${c.arc ? `<div class="kv"><b>Arc</b> ${esc(c.arc)}</div>` : ""}
+    ${c.notes ? `<p>${esc(c.notes)}</p>` : ""}
+  </div>`;
+}
+
+const CAST_GROUPS = {squad: SQUAD, npcs: NPCS, enemies: ENEMIES};
+
+function renderCast() {
+  $("#cast-squad").innerHTML = SQUAD.map((c, i) => castCard(c, "squad", i)).join("");
+  $("#cast-npcs").innerHTML = NPCS.map((c, i) => castCard(c, "npcs", i)).join("");
+  $("#cast-enemies").innerHTML = ENEMIES.map((c, i) => castCard(c, "enemies", i)).join("");
+  document.querySelectorAll("#view-cast .card.speaker").forEach(el =>
+    el.addEventListener("click", () =>
+      openCastModal(CAST_GROUPS[el.dataset.group][Number(el.dataset.i)])));
+}
+
+function renderScenes() {
+  const reel = [], rest = [];
+  for (const q of QUESTS) for (const s of (q.scenes || [])) {
+    (s.type === "Cutscene" ? reel : rest).push({q, s});
+  }
+  const total = reel.reduce((a, r) => a + (parseInt(r.s.dur, 10) || 0), 0);
+  const mins = Math.floor(total / 60), secs = total % 60;
+  let h = `<div class="tw"><table><thead><tr>
+    <th>Quest</th><th>Cutscene</th><th>Target</th><th>Why the camera</th><th>What happens</th>
+    </tr></thead><tbody>`;
+  h += reel.map(r => `<tr>
+    <td><a href="#" data-qid="${r.q.id}" class="scene-link">${esc(r.q.code)}. ${esc(r.q.title)}</a></td>
+    <td><b>${esc(r.s.name)}</b></td>
+    <td>${esc(r.s.dur || "")}</td>
+    <td>${esc(r.s.why || "")}</td>
+    <td>${esc(r.s.desc)}</td></tr>`).join("");
+  h += `</tbody></table></div>
+    <p><b>${reel.length} cutscenes, about ${mins} minutes ${secs} seconds of locked camera.</b>
+    Budget: under eight minutes. One per quest, maximum. The finale quests Q10 and Q11
+    have zero on purpose: the ending is played.</p>`;
+  $("#scenes-reel").innerHTML = h;
+
+  const rows = rest.map(r => `<tr>
+    <td><a href="#" data-qid="${r.q.id}" class="scene-link">${esc(r.q.code)}. ${esc(r.q.title)}</a></td>
+    <td>${esc(r.s.name)}</td>
+    <td>${esc(r.s.type)}</td>
+    <td>${esc(r.s.desc)}</td></tr>`).join("");
+  $("#scenes-table").innerHTML = `<thead><tr>
+    <th>Quest</th><th>Beat</th><th>Type</th><th>Notes</th>
+    </tr></thead><tbody>${rows}</tbody>`;
+  document.querySelectorAll(".scene-link").forEach(a =>
+    a.addEventListener("click", (e) => { e.preventDefault(); openQuest(a.dataset.qid); }));
+}
+
+function renderScript() {
+  let h = "", lineCount = 0, choiceCount = 0, gapCount = 0, questCount = 0;
+  for (const q of QUESTS) {
+    const gaps = SCRIPT_GAPS[q.id] || [];
+    const blocks = q.beats.filter(b => b.d || b.choice);
+    if (!blocks.length && !gaps.length) continue;
+    questCount++;
+    h += `<h3><a href="#" class="script-link" data-qid="${q.id}">${esc(q.code)}. ${esc(q.title)}</a></h3>`;
+    for (const b of q.beats) {
+      if (b.d) {
+        lineCount += b.d.length;
+        h += `<blockquote class="dlg"><span class="chip shared">draft</span>` +
+          b.d.map(x => `<p><strong>${esc(x.s)}:</strong> &quot;${esc(x.l)}&quot;</p>`).join("") +
+          `</blockquote>`;
+      } else if (b.choice) {
+        choiceCount++;
+        h += `<div class="note"><span class="chip shared">draft</span> <b>Choice: ${esc(b.choice.name)}.</b><br>` +
+          b.choice.options.map(o => `${esc(o.pick)} &rarr; ${esc(o.reply)}`).join("<br>") + `</div>`;
+      }
+    }
+    for (const g of gaps) {
+      gapCount++;
+      h += `<div class="flagged"><p class="label">Missing</p><p>${esc(g)}</p></div>`;
+    }
+  }
+  $("#script-scenes").innerHTML = h;
+  $("#script-summary").innerHTML =
+    `<p><b>${lineCount} lines and ${choiceCount} choices across ${questCount} quests, all draft. ` +
+    `${gapCount} known holes flagged below, plus the bark sheets.</b></p>`;
+  document.querySelectorAll(".script-link").forEach(a =>
+    a.addEventListener("click", (e) => { e.preventDefault(); openQuest(a.dataset.qid); }));
+
+  $("#bark-table").innerHTML = `<thead><tr>
+    <th>Character</th><th>Lines to write</th><th>Status</th>
+    </tr></thead><tbody>` +
+    BARK_SHEETS.map(b => `<tr><td><b>${esc(b.who)}</b></td><td>${esc(b.need)}</td>
+      <td><span class="chip flag">missing</span></td></tr>`).join("") +
+    `</tbody>`;
+}
+
+/* ============================ BOOT ============================ */
+
+$("#tabs").innerHTML = VIEWS.map(v =>
+  `<button data-view="${v.id}">${esc(v.label)}</button>`).join("");
+document.querySelectorAll("nav.tabs button").forEach(b =>
+  b.addEventListener("click", () => { showView(b.dataset.view); location.hash = b.dataset.view; }));
+
+renderQuestList();
+renderMap();
+renderCast();
+renderScenes();
+renderScript();
+renderQuestDetail("q0");
+
+$("#modal").addEventListener("click", (e) => { if (e.target.id === "modal") closeModal(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+const h = location.hash.replace("#", "");
+if (h.startsWith("quest:")) { openQuest(h.slice(6)); }
+else if (VIEWS.some(v => v.id === h)) { showView(h); }
+else { showView("overview"); }
+</script>
+</body>
+</html>
