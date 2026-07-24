@@ -44,6 +44,7 @@ import { castBarState } from './cast_bar';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { declutterNameplatesInPlace, type NameplateAnchor } from './nameplate_declutter';
+import { nameplateHeightPx } from './nameplate_extent_core';
 import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
@@ -93,12 +94,14 @@ export class NameplatePainter {
   private readonly tmpV2 = new THREE.Vector3();
   // one plan, rewritten per entity by the pure core (allocation-light hot path).
   private readonly plan: NameplatePlan = newNameplatePlan();
-  // This frame's projected anchors, fed through the declutter pass below so
-  // overlapping nameplates (e.g. two nearby same-named mobs) stack apart
-  // instead of rendering on top of each other. The anchor OBJECTS are pooled
-  // too, not just the array: at crowd size this loop runs for every visible
-  // plate every frame, and a fresh {id,sx,sy} per plate was steady GC churn
-  // proportional to the player count. `anchorCount` is the live prefix length.
+  // This frame's projected anchors, fed through the vertical stacking pass
+  // below so overlapping nameplates (e.g. two nearby same-named mobs) form a
+  // column instead of rendering on top of each other. Each anchor carries its
+  // plate height and whether it is pinned (the current target), which is what
+  // the pass stacks against. The anchor OBJECTS are pooled too, not just the
+  // array: at crowd size this loop runs for every visible plate every frame,
+  // and a fresh object per plate was steady GC churn proportional to the player
+  // count. `anchorCount` is the live prefix length.
   private readonly anchorScratch: NameplateAnchor[] = [];
   private anchorCount = 0;
 
@@ -155,22 +158,43 @@ export class NameplatePainter {
       }
       const sx = (this.tmpV.x * 0.5 + 0.5) * w;
       const sy = (-this.tmpV.y * 0.5 + 0.5) * h;
-      // Record the anchor; the transform is written once, after declutter has
-      // had its say, so a plate never builds two transform strings per frame.
+      const isCurrentTarget = id === p.targetId;
+      const isSelf = id === p.id;
+      // The self plate is normally suppressed; with "Show My Nameplate" on it
+      // renders (and stacks) exactly like any other player's.
+      const suppressSelf = isSelf && !showOwnNameplate;
+      // How tall this plate renders, so the stacking pass spaces a tall player
+      // plate (guild tag + deed title + cast bar) further than a bare mob plate.
+      // Derived from the entity, NOT from the DOM: reading offsetHeight here
+      // would force a layout flush for every plate, every frame. It also has to
+      // hold on a throttled pass, where the content branch below never runs.
+      const height = nameplateHeightPx(
+        !e.dead && !suppressSelf && (e.kind === 'player' || e.kind === 'mob'),
+        e.kind === 'player' && !suppressSelf && !!e.guild,
+        e.kind === 'player' && !suppressSelf && !!e.title,
+        castBarState(e).visible,
+        plan.comboPips > 0,
+        plan.hasOverheadEmote,
+      );
+      // Record the anchor; the transform is written once, after the stacking
+      // pass has had its say, so a plate never builds two transform strings per
+      // frame. The current target is pinned: it keeps its projected position and
+      // the rest of the stack flows around it.
       const slot = this.anchorScratch[this.anchorCount];
       if (slot) {
         slot.id = id;
         slot.sx = sx;
         slot.sy = sy;
+        slot.height = height;
+        slot.pinned = isCurrentTarget;
       } else {
-        this.anchorScratch.push({ id, sx, sy });
+        this.anchorScratch.push({ id, sx, sy, height, pinned: isCurrentTarget });
       }
       this.anchorCount++;
       if (v.nameplateDisplay !== '') {
         v.nameplate.style.display = '';
         v.nameplateDisplay = '';
       }
-      const isCurrentTarget = id === p.targetId;
       const deadEnemy = e.dead && (e.hostile || (e.kind === 'player' && this.isHostilePlayer(e)));
       let stateMask = 0;
       if (isCurrentTarget) stateMask |= STATE_CURRENT_TARGET;
@@ -180,7 +204,6 @@ export class NameplatePainter {
       if (e.aggroTargetId === p.id) stateMask |= STATE_AGGROED_ON_ME;
       this.setNameplateState(v, stateMask);
       if (!fullPass && !plan.urgent) continue;
-      const isSelf = id === p.id;
       v.nameplate.classList.toggle('has-emote', plan.hasOverheadEmote);
 
       // party raid/target marker (only mobs are markable, so this is null elsewhere)
@@ -225,10 +248,9 @@ export class NameplatePainter {
         this.setNameplateLevel(v, '', '');
       } else if (e.kind === 'player') {
         // Players: friendly blue with an hp bar; <Guild> tag under the name. Your
-        // OWN plate is normally suppressed (suppressSelf), but with the "Show My
-        // Nameplate" option on it renders exactly like another player's, so you can
-        // see your name / level / hp / guild and all your flair the way others do.
-        const suppressSelf = isSelf && !showOwnNameplate;
+        // OWN plate is normally suppressed (suppressSelf, computed above), but with
+        // the "Show My Nameplate" option on it renders exactly like another player's,
+        // so you can see your name / level / hp / guild and all your flair as others do.
         const opacity = e.auras.some((a) => a.kind === 'stealth') ? '0.55' : '1';
         const nameDisplay = suppressSelf ? 'none' : '';
         const hpDisplay = e.dead || suppressSelf ? 'none' : '';
@@ -363,11 +385,11 @@ export class NameplatePainter {
       this.updateCastBar(v, e);
     }
 
-    // Second pass: re-anchor any nameplates that collided during projection
-    // (e.g. two nearby same-named mobs) so they stack apart instead of
-    // rendering fully on top of each other. A no-op for the common case
-    // where nothing overlapped. This is also where EVERY visible plate gets
-    // its one transform write of the frame.
+    // Second pass: stack any nameplates that collided during projection (e.g.
+    // two nearby same-named mobs) into a vertical column, lifting the farther
+    // plates above the nearer ones and leaving the current target where it
+    // projected. A no-op for the common case where nothing overlapped. This is
+    // also where EVERY visible plate gets its one transform write of the frame.
     declutterNameplatesInPlace(this.anchorScratch, this.anchorCount);
     for (let i = 0; i < this.anchorCount; i++) {
       const anchor = this.anchorScratch[i];

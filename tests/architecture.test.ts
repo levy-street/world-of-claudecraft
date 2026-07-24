@@ -255,6 +255,7 @@ const RENDER_PURE_CORES = [
   'src/render/stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
   'src/render/env_prefilter_core.ts',
+  'src/render/nameplate_extent_core.ts',
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
   'src/render/prewarm_policy.ts',
