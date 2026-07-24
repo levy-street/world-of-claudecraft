@@ -61,7 +61,9 @@ export type ScenarioStageObjective =
   | { kind: 'killSpawned' }
   | { kind: 'reach'; x: number; z: number; radius: number }
   | { kind: 'survive'; seconds: number }
-  | { kind: 'scene'; seconds: number };
+  // Completes when the stage's cued scene finishes (or was skipped); a
+  // stage without a live playback completes immediately.
+  | { kind: 'scene' };
 
 export interface ScenarioStageDef {
   id: string;
@@ -300,8 +302,9 @@ function stageComplete(
       );
     }
     case 'survive':
-    case 'scene':
       return ctx.time - run.stageStartedAt >= objective.seconds;
+    case 'scene':
+      return !ctx.scenePlaybacks.has(run.claimId);
   }
 }
 

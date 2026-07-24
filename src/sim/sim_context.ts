@@ -25,6 +25,7 @@ import type { NaturalRiftPortal } from './rift/portals';
 import type { RiftEvent, RiftInstance } from './rift/types';
 import type { Rng } from './rng';
 import type { ScenarioRun } from './scenarios/scenarios';
+import type { ScenePlayback } from './scenes/scenes';
 import type {
   ArenaMatch,
   ArenaQueueUnit,
@@ -191,6 +192,8 @@ export interface SimContextPrimitives {
   // Last Bell scenario runs keyed by story-instance claim id; owned by
   // src/sim/scenarios/scenarios.ts, state lives on Sim as a live view.
   readonly scenarioRuns: Map<number, ScenarioRun>;
+  // Last Bell scene playbacks keyed by claim id; owned by src/sim/scenes/.
+  readonly scenePlaybacks: Map<number, ScenePlayback>;
   // I2a delve runs: the live run pool (seeded in the Sim ctor, never reassigned) and
   // the transient pet stash both stay Sim-owned (the disconnect path + serializePet
   // poke them); exposed here as live views the run module reads/mutates in place.
@@ -1107,6 +1110,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get scenarioRuns() {
       return host.scenarioRuns;
+    },
+    get scenePlaybacks() {
+      return host.scenePlaybacks;
     },
     get nextArenaMatchId() {
       return host.nextArenaMatchId;

@@ -373,6 +373,8 @@ import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
 import type { ScenarioRun } from './scenarios/scenarios';
 import * as scenarioMod from './scenarios/scenarios';
+import type { ScenePlayback } from './scenes/scenes';
+import * as scenesMod from './scenes/scenes';
 import { persistedResource } from './serialize_resource';
 import { createSimContext, type SimContext, type SimContextHost } from './sim_context';
 import * as chatMod from './social/chat';
@@ -1654,6 +1656,8 @@ export class Sim {
   squadRuns = new Map<number, SquadRun>();
   // Last Bell scenario runs, keyed by story-instance claim id (exitId).
   scenarioRuns = new Map<number, ScenarioRun>();
+  // Last Bell scene playbacks, keyed by story-instance claim id (exitId).
+  scenePlaybacks = new Map<number, ScenePlayback>();
   // delve instances (separate slot pool from dungeons)
   delveRuns: DelveRun[] = [];
   private delvePetStash = new Map<number, PetState>();
@@ -3974,6 +3978,9 @@ export class Sim {
       get scenarioRuns() {
         return sim.scenarioRuns;
       },
+      get scenePlaybacks() {
+        return sim.scenePlaybacks;
+      },
       get nextArenaMatchId() {
         return sim.nextArenaMatchId;
       },
@@ -4842,6 +4849,8 @@ export class Sim {
     // Last Bell scenario stages advance after their actors act (same zero-work,
     // zero-rng idle contract).
     scenarioMod.updateScenarios(this.ctx);
+    // Scene op emission runs after the stage that cued it (same idle contract).
+    scenesMod.updateScenes(this.ctx);
     lap?.('instances');
     this.updateDelveRuns();
     lap?.('delves');
@@ -8828,10 +8837,13 @@ export class Sim {
     return enterStoryInstanceImpl(this.ctx, dungeonId, pid);
   }
 
-  // Scene playback stub: the scene system (src/sim/scenes/) replaces this
-  // binding when it lands; until then a cued scene is a silent no-op so the
-  // scenario sequencer can ship first.
-  playScene(_claimId: number, _sceneId: string): void {}
+  playScene(claimId: number, sceneId: string): void {
+    scenesMod.playScene(this.ctx, claimId, sceneId);
+  }
+
+  requestSceneSkip(pid?: number): boolean {
+    return scenesMod.requestSceneSkip(this.ctx, pid);
+  }
 
   resetDungeonInstances(pid?: number): void {
     resetDungeonInstancesImpl(this.ctx, pid);

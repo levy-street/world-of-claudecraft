@@ -3527,6 +3527,36 @@ export interface PendingResurrection {
 
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
+// Wire shape of one Last Bell scene op (sim resolves actor ids to entity
+// ids and instance-local coords to world coords before emitting; the client
+// scene director consumes these verbatim). Dialogue `key` and `speaker` are
+// stable i18n keys, never English prose (S3).
+export type SceneWireOp =
+  | { kind: 'start'; duration: number }
+  | { kind: 'end' }
+  | { kind: 'line'; speaker: string; speakerEntityId: number | null; key: string; dur: number }
+  | {
+      kind: 'camera';
+      shot:
+        | {
+            kind: 'focus';
+            entityId: number | null;
+            x: number;
+            y: number;
+            z: number;
+            dist: number;
+            pitch: number;
+            yaw: number;
+            dur: number;
+          }
+        | { kind: 'release' };
+    }
+  | { kind: 'letterbox'; on: boolean }
+  | { kind: 'inputLock'; on: boolean }
+  | { kind: 'fade'; to: 'black' | 'clear'; dur: number }
+  | { kind: 'music'; directive: string }
+  | { kind: 'anim'; entityId: number; anim: string };
+
 export type SimEvent = { pid?: number } & (
   | {
       type: 'damage';
@@ -3555,6 +3585,9 @@ export type SimEvent = { pid?: number } & (
   // ID only, never English text; `retro` marks the on-join back-credit pass so
   // the client can batch those into one summary line instead of banner spam.
   | { type: 'deedUnlocked'; deedId: string; retro?: boolean }
+  // Last Bell scene op (src/sim/scenes/): personal, one per participant.
+  // The client's scene director interprets it; dialogue carries stable keys.
+  | { type: 'scene'; sceneId: string; op: SceneWireOp }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   | { type: 'loot'; text: string }
   | {
