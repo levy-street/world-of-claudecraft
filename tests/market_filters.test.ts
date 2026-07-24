@@ -206,6 +206,15 @@ describe('World Market filters', () => {
     ]);
   });
 
+  it('ignores advanced filters outside their matching item type', () => {
+    expect(filterIds(['worn_sword'], { itemType: 'weapon', armorClass: 'mail' })).toEqual([
+      'worn_sword',
+    ]);
+    expect(filterIds(['minor_healing_potion'], { itemType: 'all', primaryStat: 'str' })).toEqual([
+      'minor_healing_potion',
+    ]);
+  });
+
   it('narrows armor filters to the jewelry slots (neck and ring)', () => {
     // Jewelry is kind 'armor' with slot 'ring'/'neck' (heroic vendor exemplars), so the
     // shared slot predicate must sub-filter it like any other wearable slot.

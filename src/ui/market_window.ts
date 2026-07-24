@@ -813,7 +813,6 @@ export class MarketWindow {
   private renderMarketFilters(): string {
     if (this.tab !== 'browse') return '';
     const hasSubtype = this.itemTypeFilter === 'armor' || this.itemTypeFilter === 'weapon';
-    const hasPrimaryStat = this.itemTypeFilter === 'armor' || this.itemTypeFilter === 'weapon';
     return (
       `<div class="mkt-filters" role="group" aria-label="${esc(t('itemUi.market.filters'))}">` +
       this.renderMarketFilterMenu(
@@ -841,7 +840,7 @@ export class MarketWindow {
             (filter) => this.marketArmorClassLabel(filter as MarketArmorClassFilter),
           )
         : '') +
-      (hasPrimaryStat
+      (hasSubtype
         ? this.renderMarketFilterMenu(
             'primaryStat',
             t('itemUi.market.filterPrimaryStat'),
