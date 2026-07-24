@@ -179,7 +179,10 @@ const dungeonBand = (def) => {
   return min === Infinity ? { min: null, max: null } : { min, max };
 };
 const dungeons = Object.values(DUNGEONS)
-  .filter((d) => (d.suggestedPlayers ?? 0) >= 5)
+  // Last Bell story spaces ride the dungeon pool but are campaign story
+  // content, not queueable dungeons: the guide must not list them (its
+  // campaign coverage stays at spoiler-safe prose altitude).
+  .filter((d) => (d.suggestedPlayers ?? 0) >= 5 && d.interior !== 'farshore_story')
   .map((d) => {
     const isRaid = (d.suggestedPlayers ?? 0) >= 10;
     const band = dungeonBand(d);

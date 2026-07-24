@@ -427,6 +427,7 @@ import {
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
 import { buyHeroicVendorItem as buyHeroicVendorItemImpl } from './instances/heroic_vendor';
+import { enterStoryInstance as enterStoryInstanceImpl } from './instances/story_instances';
 import { updatePortalTriggers } from './portals';
 import * as questCommands from './quests/quest_commands';
 import {
@@ -4191,6 +4192,7 @@ export class Sim {
       instanceClaimIdAt: sim.instanceClaimIdAt.bind(sim),
       enterDungeon: sim.enterDungeon.bind(sim),
       leaveDungeon: sim.leaveDungeon.bind(sim),
+      enterStoryInstance: sim.enterStoryInstance.bind(sim),
       enterRift: sim.enterRift.bind(sim),
       leaveRift: sim.leaveRift.bind(sim),
       riftOpenTreasure: sim.riftOpenTreasure.bind(sim),
@@ -8791,6 +8793,10 @@ export class Sim {
 
   leaveDungeon(pid?: number): boolean {
     return leaveDungeonImpl(this.ctx, pid);
+  }
+
+  enterStoryInstance(dungeonId: string, pid?: number): boolean {
+    return enterStoryInstanceImpl(this.ctx, dungeonId, pid);
   }
 
   resetDungeonInstances(pid?: number): void {

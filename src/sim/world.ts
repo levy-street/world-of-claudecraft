@@ -22,6 +22,7 @@ import {
   ZONES,
 } from './data';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
+import { LAST_BELL_AREAS } from './last_bell_field';
 import { orkadiaFieldHeight } from './orkadia_field';
 import { fbm2, hash2, noise2 } from './rng';
 import type { BiomeId, HeightStamp, ZoneDef } from './types';
@@ -2676,6 +2677,21 @@ export function groundHeight(x: number, z: number, seed: number): number {
     if (dungeon?.interior === 'wildheart') {
       const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
       return DUNGEON_FLOOR_Y + wildheartFieldHeight(x - origin.x, z - origin.z);
+    }
+    if (dungeon?.interior === 'farshore_story') {
+      // Last Bell story instances: a MIRROR area re-samples the island's own
+      // terrain at its source anchor, so a private Riftfields/Landing/redoubt
+      // copy stands on ground identical to the shared island; an AUTHORED
+      // area displaces the flat instance plane like Orkadia does.
+      const area = LAST_BELL_AREAS[dungeon.id];
+      if (area) {
+        const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
+        const lx = x - origin.x;
+        const lz = z - origin.z;
+        if (area.mirror) return terrainHeight(area.mirror.srcX + lx, area.mirror.srcZ + lz, seed);
+        if (area.height) return DUNGEON_FLOOR_Y + area.height(lx, lz);
+      }
+      return DUNGEON_FLOOR_Y;
     }
     return DUNGEON_FLOOR_Y;
   }

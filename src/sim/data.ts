@@ -128,6 +128,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
+import { LAST_BELL_DUNGEON_DEFS } from './content/last_bell';
 import { MAGE_PET_MOBS } from './content/mage_pets';
 import {
   NIGHTBLOOM_CAMPS,
@@ -853,6 +854,7 @@ export const DUNGEONS: Record<string, DungeonDef> = {
   ...TEMPLE_DUNGEON_DEFS,
   ...ORKADIA_DUNGEON_DEFS,
   ...WILDHEART_DUNGEON_DEFS,
+  ...LAST_BELL_DUNGEON_DEFS,
 };
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);

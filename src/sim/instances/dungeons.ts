@@ -501,7 +501,10 @@ export function leaveCrypt(ctx: SimContext, pid?: number): void {
   leaveDungeon(ctx, pid);
 }
 
-function claimInstance(
+// Exported for instances/story_instances.ts, which claims story spaces on
+// this same pool with its own key rules (solo-always areas) and no
+// door/difficulty/lockout surface.
+export function claimInstance(
   ctx: SimContext,
   inst: InstanceSlot,
   key: string,

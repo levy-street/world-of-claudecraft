@@ -299,6 +299,11 @@ export interface SimContextCallbacks {
   leaveDungeon(pid?: number): boolean;
   resetDungeonInstances(pid?: number): void;
   inheritDungeonResetLocks(pid: number): void;
+  // Last Bell story spaces (instances/story_instances.ts): claims a private
+  // story copy on the shared pool (durable-character key for solo-always
+  // areas). Exposed so quest interactions, the scenario sequencer, and the
+  // dev command reach it through the seam; leaving reuses leaveDungeon.
+  enterStoryInstance(dungeonId: string, pid?: number): boolean;
   // Procedural Rift entry/exit (dev command + interaction click path). The per-tick
   // drivers (updateRiftTriggers/updateRiftInstances) are called directly from tick();
   // these two are on the seam so foreign callers reach them through ctx.
@@ -1166,6 +1171,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     instanceClaimIdAt: host.instanceClaimIdAt,
     enterDungeon: host.enterDungeon,
     leaveDungeon: host.leaveDungeon,
+    enterStoryInstance: host.enterStoryInstance,
     enterRift: host.enterRift,
     leaveRift: host.leaveRift,
     riftOpenTreasure: host.riftOpenTreasure,

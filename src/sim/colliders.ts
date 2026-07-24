@@ -27,6 +27,7 @@ import {
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
 } from './dungeon_layout';
+import { LAST_BELL_AREAS } from './last_bell_field';
 import { ORKADIA_FIELD_COLLIDER_SPECS, ORKADIA_FIELD_WALLS } from './orkadia_field';
 import type { BuildingDef, WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
@@ -372,6 +373,30 @@ const WILDHEART_COLLIDERS: Collider[] = [
   ),
 ];
 
+// Last Bell story spaces share one interior kind ('farshore_story') but each
+// area has its own walls and props, so their collider sets key on the
+// DUNGEON id and are consulted by interiorColliders() below.
+const LAST_BELL_COLLIDERS: Record<string, Collider[]> = Object.fromEntries(
+  Object.values(LAST_BELL_AREAS).map((area) => [
+    area.dungeonId,
+    [
+      ...area.walls.map(
+        (w): Collider => ({ type: 'obb', x: w.x, z: w.z, hw: w.hw, hd: w.hd, rot: 0 }),
+      ),
+      ...area.props.map(
+        (p): Collider => ({
+          type: 'circle',
+          x: p.x,
+          z: p.z,
+          r: p.r,
+          cameraTopY: p.h,
+          camGhost: true,
+        }),
+      ),
+    ],
+  ]),
+);
+
 // Interior collider sets keyed by DungeonDef.interior.
 const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
   crypt: CRYPT_COLLIDERS,
@@ -381,6 +406,16 @@ const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
   orkadia: ORKADIA_COLLIDERS,
   wildheart: WILDHEART_COLLIDERS,
 };
+
+// One lookup for every instance-band resolution site: story interiors pick
+// their per-area set by dungeon id; everything else keys on the interior
+// kind (crypt fallback preserved for unknown interiors).
+function interiorColliders(interior: string, dungeonId: string | null): Collider[] {
+  if (interior === 'farshore_story' && dungeonId) {
+    return LAST_BELL_COLLIDERS[dungeonId] ?? [];
+  }
+  return INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS;
+}
 
 // ---------------------------------------------------------------------------
 // Spatial grid + movement resolution
@@ -635,7 +670,10 @@ function riftRegionAt(token: number, x: number, z: number): RiftRegion | null {
   return null;
 }
 
-function instanceLocal(x: number, z: number): { ox: number; oz: number; interior: string } {
+function instanceLocal(
+  x: number,
+  z: number,
+): { ox: number; oz: number; interior: string; dungeonId: string | null } {
   const dungeon = dungeonAt(x);
   const index = dungeon?.index ?? 0;
   let best = 0,
@@ -649,7 +687,12 @@ function instanceLocal(x: number, z: number): { ox: number; oz: number; interior
     }
   }
   const o = instanceOrigin(index, best);
-  return { ox: o.x, oz: o.z, interior: dungeon?.interior ?? 'crypt' };
+  return {
+    ox: o.x,
+    oz: o.z,
+    interior: dungeon?.interior ?? 'crypt',
+    dungeonId: dungeon?.id ?? null,
+  };
 }
 
 // Resolve a movement destination against all static geometry. Movers slide
@@ -688,8 +731,8 @@ export function resolvePosition(
     return { x: local.x + region.ox, z: local.z + region.oz };
   }
   if (x > DUNGEON_X_THRESHOLD) {
-    const { ox, oz, interior } = instanceLocal(x, z);
-    const colliders = INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS;
+    const { ox, oz, interior, dungeonId } = instanceLocal(x, z);
+    const colliders = interiorColliders(interior, dungeonId);
     const local = resolveAgainst(colliders, x - ox, z - oz, r, ignoreFences);
     return { x: local.x + ox, z: local.z + oz };
   }
@@ -1025,8 +1068,8 @@ export function cameraOcclusion(
     );
   }
   if (ax > DUNGEON_X_THRESHOLD) {
-    const { ox, oz, interior } = instanceLocal(ax, az);
-    const colliders = INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS;
+    const { ox, oz, interior, dungeonId } = instanceLocal(ax, az);
+    const colliders = interiorColliders(interior, dungeonId);
     return sweepColliders(colliders, ax - ox, ay, az - oz, bx - ox, by, bz - oz, pad, true);
   }
   const grid = gridFor(seed);
@@ -1097,8 +1140,8 @@ function sightBlockedAt(
     return region ? overlapsAny(region.colliders, x - region.ox, z - region.oz, false) : false;
   }
   if (x > DUNGEON_X_THRESHOLD) {
-    const { ox, oz, interior } = instanceLocal(x, z);
-    return overlapsAny(INTERIOR_COLLIDERS[interior] ?? CRYPT_COLLIDERS, x - ox, z - oz, false);
+    const { ox, oz, interior, dungeonId } = instanceLocal(x, z);
+    return overlapsAny(interiorColliders(interior, dungeonId), x - ox, z - oz, false);
   }
   const grid = gridFor(seed);
   const list = collidersInCell(grid, seed, Math.floor(x / GRID_CELL), Math.floor(z / GRID_CELL));

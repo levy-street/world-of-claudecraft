@@ -3,6 +3,7 @@ import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
 import { createGroundObject, createMob } from './entity';
 import { enterDungeon } from './instances/dungeons';
+import { enterStoryInstance, isStoryDungeonId } from './instances/story_instances';
 import { mountItemId, mountOwned } from './mounts';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
 import { placeMobileStationForPlayer } from './professions/mobile_station';
@@ -377,6 +378,22 @@ export function handleDevChat(
     ctx.setDungeonDifficulty(difficulty, pid);
     enterDungeon(ctx, dungeonId, pid, true);
     emitDevLog(ctx, pid, `[dev] Entering ${dungeonId} (${difficulty}).`);
+    return null;
+  }
+
+  // [dev] Enter a Last Bell story instance directly (lb_tidemill, lb_riftline,
+  // lb_vault, lb_council, lb_landing, lb_riftfields, lb_breach, lb_lastwatch,
+  // lb_willowfen), bypassing the quest gate. Solo-always areas still claim per
+  // durable character, so this exercises the real claim path.
+  const storyMatch = /^\/(?:dev\s+story|devstory)\s+(\S+)\s*$/i.exec(raw);
+  if (storyMatch) {
+    const storyId = storyMatch[1];
+    if (!isStoryDungeonId(storyId)) {
+      ctx.error(pid, `[dev] Unknown story instance '${storyId}'.`);
+      return null;
+    }
+    enterStoryInstance(ctx, storyId, pid);
+    emitDevLog(ctx, pid, `[dev] Entering story instance ${storyId}.`);
     return null;
   }
 
