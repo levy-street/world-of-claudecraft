@@ -52,12 +52,13 @@ const UI_CUES = {
   cardReveal: 'ui_card_reveal',
   cardRoundPush: 'ui_card_round_push',
   cardShuffle: 'ui_card_shuffle',
-  // Gathering rhythm (Professions 2.0 Phase 12b, issue #2208): gatherCast
-  // stays a synth placeholder (the cast-start affordance, unrelated to this
-  // change); fishCast/fishBite/fishReel are real, shipped fishing cues,
-  // untouched here. fishBite is the one gameplay-timing cue of the family
-  // (the reel window opens with it), so it rides the ungated play() arm; the
-  // rest are feedback notifications.
+  // Gathering rhythm (Professions 2.0 Phase 12b, issue #2208): fishCast/
+  // fishBite/fishReel are real, shipped fishing cues. gatherCast branches by
+  // node type (gatherCastByNodeType below); this flat cue is only the
+  // fallback for the rare case gatherCast() is called with no type known.
+  // fishBite is the one gameplay-timing cue of the family (the reel window
+  // opens with it), so it rides the ungated play() arm; the rest are
+  // feedback notifications.
   gatherCast: 'ui_gather_cast',
   fishCast: 'ui_fish_cast',
   fishBite: 'ui_fish_bite',
@@ -68,6 +69,14 @@ const UI_CUES = {
     ore: 'ui_gather_ore',
     wood: 'ui_gather_wood',
     herb: 'ui_gather_herb',
+  },
+  // The gather-cast "pulling a tool out" affordance, one recording per node
+  // type (mirrors gatherByNodeType above): a pickaxe for ore, an axe for
+  // wood, a knife/pouch for herb.
+  gatherCastByNodeType: {
+    ore: 'ui_gather_cast_ore',
+    wood: 'ui_gather_cast_wood',
+    herb: 'ui_gather_cast_herb',
   },
   // Rare-or-better gather stinger: layers alongside the gatherByNodeType cue
   // above, never a replacement for it, one tier per rolled MaterialRarity
@@ -108,6 +117,7 @@ type UiCue =
   | Exclude<(typeof UI_CUES)[keyof typeof UI_CUES], readonly string[] | Record<string, string>>
   | (typeof UI_CUES.fiestaWords)[number]
   | (typeof UI_CUES.gatherByNodeType)[keyof typeof UI_CUES.gatherByNodeType]
+  | (typeof UI_CUES.gatherCastByNodeType)[keyof typeof UI_CUES.gatherCastByNodeType]
   | (typeof UI_CUES.gatherRareTier)[keyof typeof UI_CUES.gatherRareTier]
   | (typeof UI_CUES.craftByFamily)[keyof typeof UI_CUES.craftByFamily];
 
@@ -313,8 +323,8 @@ export class GameAudio {
   // feedback notifications EXCEPT fishBite: the bite opens the live reel
   // window, so it is a gameplay-timing cue (the ready-check/duel-countdown
   // category) and deliberately ignores the Interface & Feedback toggle.
-  gatherCast(): void {
-    this.playFeedback(UI_CUES.gatherCast);
+  gatherCast(nodeType?: GatherNodeType): void {
+    this.playFeedback(nodeType ? UI_CUES.gatherCastByNodeType[nodeType] : UI_CUES.gatherCast);
   }
 
   fishCast(): void {

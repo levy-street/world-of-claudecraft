@@ -10410,10 +10410,12 @@ export class Hud {
           break;
         case 'castStart':
           // cast-loop SFX is spatial now (see playEventSfx); the profession
-          // casts (Professions 2.0) add a personal placeholder cue
-          // at cast start, feedback-gated like other notification cues.
+          // casts (Professions 2.0) add a personal cue at cast start,
+          // feedback-gated like other notification cues. Gathering's cue
+          // branches by node type (a pickaxe/axe/knife tool-out sound);
+          // ev.gatherNodeType is only set on a gather cast (see gathering.ts).
           if (ev.entityId === sim.playerId) {
-            if (ev.ability === GATHER_CAST_ID) audio.gatherCast();
+            if (ev.ability === GATHER_CAST_ID) audio.gatherCast(ev.gatherNodeType);
             else if (ev.ability === FISHING_CAST_ID) audio.fishCast();
           }
           break;

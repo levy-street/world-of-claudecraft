@@ -27,9 +27,6 @@ const MASTER_GAINS_DB = {
   ui_fiesta_down: 6.66,
   ui_fiesta_revive: 4.01,
   ui_gather_cast: 0,
-  ui_fish_cast: 0,
-  ui_fish_bite: 2.5,
-  ui_fish_reel: 0,
 };
 
 function tone(frequency, start, duration, gain, options = {}) {
@@ -136,34 +133,16 @@ export const UI_SFX_SPECS = [
     tone(523, 0, 0.16, 0.19, { wave: 'triangle', endFrequency: 784 }),
     tone(784, 0.08, 0.25, 0.17, { wave: 'triangle' }),
   ]),
-  // Gathering-cast and fishing-rhythm placeholders (Professions 2.0 Phase
-  // 12b, issue #2208): deterministic synth stand-ins until real recordings
-  // land. Kept short, distinct, and quiet-friendly; ui_fish_bite alone is
-  // tuned to grab attention (it opens the live reel window) without being
-  // harsh. The gather-strike/rare placeholders that used to live here were
-  // retired when real per-node-type + rarity-tier recordings replaced them
-  // (src/game/audio.ts gather()/gatherRareTier()).
+  // Gathering-cast placeholder (Professions 2.0 Phase 12b, issue #2208):
+  // deterministic synth stand-in, the flat fallback for when no node type is
+  // known (see gatherCastByNodeType in src/game/audio.ts for the real,
+  // per-type recordings that otherwise take over). The fishing-rhythm
+  // placeholders that used to live here (ui_fish_cast/bite/reel) were
+  // retired once real recordings replaced them, same as the gather-strike/
+  // rare placeholders before them.
   cue('ui_gather_cast', 0.5, 'Soft low woody wind-up thump as a gathering swing begins.', [
     tone(180, 0, 0.22, 0.16, { wave: 'triangle', endFrequency: 130 }),
     noise('brown', 0, 0.16, 0.08, { lowpass: 500 }),
-  ]),
-  cue('ui_fish_cast', 0.6, 'Quick airy line whoosh ending in a soft water plop.', [
-    noise('white', 0, 0.22, 0.05, { highpass: 900, lowpass: 5200 }),
-    tone(300, 0.24, 0.16, 0.16, { wave: 'sine', endFrequency: 120 }),
-    noise('brown', 0.24, 0.2, 0.06, { lowpass: 700 }),
-  ]),
-  cue('ui_fish_bite', 0.7, 'Bright double water bloop, urgent but round: a fish takes the bait.', [
-    tone(620, 0, 0.14, 0.24, { wave: 'sine', endFrequency: 340 }),
-    tone(740, 0.16, 0.18, 0.26, { wave: 'sine', endFrequency: 380 }),
-    tone(1480, 0.16, 0.12, 0.08, { wave: 'triangle' }),
-    noise('white', 0.14, 0.24, 0.035, { highpass: 1800, lowpass: 6000 }),
-  ]),
-  cue('ui_fish_reel', 0.7, 'Fast reel crank clicks under a small landing splash.', [
-    tone(980, 0, 0.05, 0.12, { wave: 'square' }),
-    tone(980, 0.09, 0.05, 0.12, { wave: 'square' }),
-    tone(980, 0.18, 0.05, 0.12, { wave: 'square' }),
-    tone(1180, 0.27, 0.05, 0.1, { wave: 'square' }),
-    noise('white', 0.3, 0.32, 0.06, { highpass: 1000, lowpass: 5500 }),
   ]),
 ].map((spec) => ({ ...spec, masterGainDb: MASTER_GAINS_DB[spec.key] }));
 

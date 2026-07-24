@@ -24,6 +24,18 @@ describe('gatherResult audio wiring', () => {
   });
 });
 
+describe('gather-cast tool-out audio wiring', () => {
+  it('plays a node-type-keyed cue on a gather cast start, not the flat fallback', () => {
+    // hud.ts has two 'castStart' cases (a spatial cast-loop handler, and this
+    // personal-cue one); anchor on GATHER_CAST_ID, unique to the latter.
+    const start = hud.indexOf('ev.ability === GATHER_CAST_ID');
+    expect(start).toBeGreaterThan(-1);
+    const end = hud.indexOf('break;', start);
+    const body = hud.slice(start, end);
+    expect(body).toContain('audio.gatherCast(ev.gatherNodeType)');
+  });
+});
+
 describe('craftResult audio wiring', () => {
   it('resolves the recipe to its craft family instead of always playing the loot ding', () => {
     const start = hud.indexOf("case 'craftResult':");

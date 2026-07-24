@@ -387,7 +387,13 @@ export function harvestNode(ctx: SimContext, nodeId: string, pid?: number): bool
   p.castTargetId = null;
   p.channeling = false;
   p.gatherCastNodeId = node.id;
-  ctx.emit({ type: 'castStart', entityId: p.id, ability: GATHER_CAST_ID, time: duration });
+  ctx.emit({
+    type: 'castStart',
+    entityId: p.id,
+    ability: GATHER_CAST_ID,
+    time: duration,
+    gatherNodeType: node.type,
+  });
   return true;
 }
 
