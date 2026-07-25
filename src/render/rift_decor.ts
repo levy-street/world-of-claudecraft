@@ -27,6 +27,16 @@ const DECOR_MODELS: Record<string, { url: string; height: number }> = {
   infernal_statue: { url: '/models/props/infernal_statue.glb', height: 2.6 },
   slag_cauldron: { url: '/models/props/slag_cauldron.glb', height: 1.3 },
   bone_throne: { url: '/models/props/bone_throne.glb', height: 2.2 },
+  // The Demon Tower's arena dressing (content/rift/demon_tower.ts). Heights are
+  // the world-unit values each prop was generated and QA'd at.
+  tower_pact_brazier: { url: '/models/props/tower_pact_brazier.glb', height: 1.7 },
+  tower_ring_fin: { url: '/models/props/tower_ring_fin.glb', height: 4.2 },
+  tower_gargoyle_perch: { url: '/models/props/tower_gargoyle_perch.glb', height: 2.2 },
+  tower_bone_banner: { url: '/models/props/tower_bone_banner.glb', height: 3.2 },
+  tower_obelisk: { url: '/models/props/tower_obelisk.glb', height: 3.8 },
+  tower_skull_totem: { url: '/models/props/tower_skull_totem.glb', height: 2.4 },
+  tower_iron_cage: { url: '/models/props/tower_iron_cage.glb', height: 2.4 },
+  tower_ascent_arch: { url: '/models/props/tower_ascent_arch.glb', height: 4.6 },
 };
 
 /** The arcane flame the rune pylons already use, re-tinted for the citadel's

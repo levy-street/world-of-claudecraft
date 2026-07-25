@@ -24,6 +24,7 @@
 // from the descriptor, never the live sim rng, so both hosts build an identical
 // tower.
 
+import type { AuthoredDecor } from '../../dungeon_layout';
 import type { StyleSource } from '../../rift/style';
 import { buildStyle, mixSeed } from '../../rift/style';
 import {
@@ -135,6 +136,96 @@ function demonTowerHazards(floorIndex: number): DelveHazardZone[] {
   return pools;
 }
 
+/** Collision radii for the tower's decor, INSCRIBED from the built GLB bounds
+ * (min(width, depth) / 2), so a prop never blocks more ground than it visibly
+ * covers. Measured with `pipeline.mjs inspect`; see CREDITS.md for the assets.
+ * The ascent arch is deliberately absent: it is a gateway the raid walks
+ * THROUGH, so it carries no collider at all. */
+const DECOR_RADIUS: Readonly<Record<string, number>> = {
+  tower_ring_fin: 1.59,
+  tower_gargoyle_perch: 0.6,
+  tower_pact_brazier: 0.49,
+  tower_bone_banner: 0.58,
+  tower_obelisk: 1.03,
+  tower_skull_totem: 0.34,
+  tower_iron_cage: 1.14,
+};
+
+/** Half-width of the southern arc kept clear of decor, in radians: the raid
+ * arrives there, and a brazier on the doorstep is a body-block on entry. */
+const ENTRY_CLEAR_ARC = 0.45;
+
+function facingInward(angle: number): number {
+  // Props are authored facing +Z; turn each to look back at the core.
+  return angle + Math.PI;
+}
+
+/** True when `angle` (0 = due north) falls in the arc the entry needs clear. */
+function inEntryArc(angle: number): boolean {
+  const fromSouth = Math.abs(Math.atan2(Math.sin(angle - Math.PI), Math.cos(angle - Math.PI)));
+  return fromSouth < ENTRY_CLEAR_ARC;
+}
+
+/** A ring of one prop key, evenly spaced, skipping the entry arc. */
+function decorRing(
+  key: string,
+  count: number,
+  radiusFrac: number,
+  arenaRadius: number,
+  phase: number,
+): AuthoredDecor[] {
+  const out: AuthoredDecor[] = [];
+  for (let i = 0; i < count; i++) {
+    const angle = phase + (i / count) * Math.PI * 2;
+    if (inEntryArc(angle)) continue;
+    const r = arenaRadius * radiusFrac;
+    out.push({
+      key,
+      x: Math.round(Math.sin(angle) * r * 1000) / 1000,
+      z: Math.round(Math.cos(angle) * r * 1000) / 1000,
+      yaw: Math.round(facingInward(angle) * 1000) / 1000,
+      ...(DECOR_RADIUS[key] === undefined ? {} : { r: DECOR_RADIUS[key] }),
+    });
+  }
+  return out;
+}
+
+/**
+ * The arena dressing for one floor. Deterministic in `floorIndex` alone (no rng),
+ * and laid out in bands so nothing lands where the fight happens: everything sits
+ * at 0.84 of the arena radius or further out, while the wave ring stands at 0.62
+ * and the core occupies the middle. The southern arc stays clear for the entry.
+ *
+ * The tower gets visibly more furnished as you climb, which is the cheapest way
+ * to make ten arenas of the same shape read as ten different places.
+ */
+export function demonTowerDecor(floorIndex: number): AuthoredDecor[] {
+  const k = clampTowerFloorIndex(floorIndex);
+  const R = demonTowerArenaRadius(k);
+  const out: AuthoredDecor[] = [];
+  // Always: firelight around the rim and fins breaking up the wall line.
+  out.push(...decorRing('tower_pact_brazier', 8, 0.86, R, 0));
+  out.push(...decorRing('tower_ring_fin', 6, 0.95, R, Math.PI / 6));
+  // The tower furnishes itself as it climbs.
+  if (k >= 1) out.push(...decorRing('tower_skull_totem', 5, 0.9, R, Math.PI / 5));
+  if (k >= 2) out.push(...decorRing('tower_gargoyle_perch', 4, 0.92, R, Math.PI / 4));
+  if (k >= 3) out.push(...decorRing('tower_bone_banner', 6, 0.88, R, Math.PI / 3));
+  if (k >= 5) out.push(...decorRing('tower_obelisk', 4, 0.84, R, Math.PI / 8));
+  if (k >= 6) out.push(...decorRing('tower_iron_cage', 4, 0.93, R, Math.PI / 2));
+  return out;
+}
+
+/** Colliders for the decor that has a measured footprint, in the `obstacles`
+ * form layoutColliders emits. Derived from the SAME records the renderer draws,
+ * so what you bump into is what you see. */
+export function demonTowerDecorObstacles(
+  floorIndex: number,
+): Array<{ x: number; z: number; r: number }> {
+  return demonTowerDecor(floorIndex)
+    .filter((d): d is AuthoredDecor & { r: number } => typeof d.r === 'number')
+    .map((d) => ({ x: d.x, z: d.z, r: d.r }));
+}
+
 /** Where the raid arrives: just inside the south wall, clear of the wave ring. */
 export function demonTowerEntry(floorIndex: number): { x: number; z: number } {
   return { x: 0, z: -(demonTowerArenaRadius(floorIndex) - 3.5) };
@@ -172,13 +263,14 @@ export function buildDemonTowerFloor(
     // could walk through is exactly the phantom-wall problem the rift already
     // fixed once. `obstacles` backs it with its measured footprint.
     dais: { x: 0, z: 0, r: DEMON_TOWER_CORE_RADIUS },
-    obstacles: [{ x: 0, z: 0, r: DEMON_TOWER_CORE_RADIUS }],
+    obstacles: [{ x: 0, z: 0, r: DEMON_TOWER_CORE_RADIUS }, ...demonTowerDecorObstacles(k)],
     wallX,
     endWallHw: wallX,
     floorHalfX: wallX,
     doorZ: -Math.ceil(radius),
     shellPolygon: polygon,
     shellPole: { x: 0, z: 0 },
+    decor: demonTowerDecor(k),
     illusionWalls: [],
   };
 

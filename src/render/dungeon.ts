@@ -766,6 +766,16 @@ export class DungeonInteriors {
     // screen for the whole run.
     if (layout.obstacles?.length) await ensureDemonTowerAssets();
 
+    // A shellPolygon floor with authored decor (the Demon Tower arenas) draws its
+    // props through the SAME builder the citadel uses; only the wall/floor shell
+    // differs, so there is no second decor path to keep in sync.
+    if (!layout.rooms && layout.decor?.length) {
+      await ensureInfernalDecorAssets();
+      buildInfernalDecor(group, layout.decor, torch, (x, z, color, y, scale) =>
+        this.addInfernalLight(group, x, z, color, y, scale),
+      );
+    }
+
     if (layout.rooms) {
       await ensureInfernalDecorAssets();
       this.placeAuthoredFloor(p, layout, variant);

@@ -6,6 +6,7 @@
 // the whole plan must be a pure function of the floor index.
 
 import { describe, expect, it } from 'vitest';
+import { demonTowerDecor, demonTowerDecorObstacles } from '../src/sim/content/rift/demon_tower';
 import {
   DEMON_TOWER_CORE_RADIUS,
   DEMON_TOWER_FLOOR_COUNT,
@@ -139,5 +140,51 @@ describe('demon tower waves', () => {
     demonTowerWavePlan(9);
     demonTowerWavePlan(0);
     expect(demonTowerWavePlan(3)).toEqual(a);
+  });
+});
+
+// The arena dressing has to stay OUT of the fight. A prop that lands on the wave
+// ring bodyblocks a spawning demon; one on the entry arc bodyblocks the raid as
+// it walks in; one past the wall is floating outside the room.
+describe('demon tower decor', () => {
+  it('keeps every prop out of the wave ring, off the core, and inside the wall', () => {
+    for (const k of FLOORS) {
+      const arena = demonTowerArenaRadius(k);
+      const ring = demonTowerRingRadius(k);
+      for (const d of demonTowerDecor(k)) {
+        const r = Math.hypot(d.x, d.z);
+        expect(r, `floor ${k + 1} ${d.key} sits on the wave ring`).toBeGreaterThan(ring + 2);
+        expect(r, `floor ${k + 1} ${d.key} escaped the wall`).toBeLessThan(arena);
+      }
+    }
+  });
+
+  it('leaves the entry arc clear so the raid is not bodyblocked walking in', () => {
+    for (const k of FLOORS) {
+      const entryZ = -(demonTowerArenaRadius(k) - 3.5);
+      for (const d of demonTowerDecor(k)) {
+        expect(
+          Math.hypot(d.x - 0, d.z - entryZ),
+          `floor ${k + 1} ${d.key} blocks the arrival point`,
+        ).toBeGreaterThan(4);
+      }
+    }
+  });
+
+  it('furnishes the tower more as it climbs, and every collider is measured', () => {
+    expect(demonTowerDecor(9).length).toBeGreaterThan(demonTowerDecor(0).length);
+    const obstacles = demonTowerDecorObstacles(5);
+    expect(obstacles.length).toBeGreaterThan(0);
+    for (const o of obstacles) expect(o.r).toBeGreaterThan(0);
+    // The ascent arch is a gateway the raid walks through: no collider, ever.
+    for (const k of FLOORS) {
+      for (const d of demonTowerDecor(k)) {
+        if (d.key === 'tower_ascent_arch') expect(d.r).toBeUndefined();
+      }
+    }
+  });
+
+  it('is a pure function of the floor index', () => {
+    for (const k of FLOORS) expect(demonTowerDecor(k)).toEqual(demonTowerDecor(k));
   });
 });
