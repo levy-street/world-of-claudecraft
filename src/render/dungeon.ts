@@ -33,7 +33,7 @@ import {
   type WallStub,
 } from '../sim/dungeon_layout';
 import { polygonContainsPoint, polygonXAtZ } from '../sim/geometry2d';
-import { arenaWaterBands } from './arena_water_band_core';
+import { ARENA_WATER_NAVE_HALF_X, arenaWaterBands } from './arena_water_band_core';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import {
@@ -151,6 +151,18 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
 // applied to a clone of the shared pack material, never the source itself.
 const MARSH_WALL_TINT = 0x5a6a52;
 const MARSH_FLOOR_TINT = 0x3c3830;
+
+// The Drowned Court (arena_drowned) uses the same clone-and-tint trick to
+// read as a moonlit flooded ruin instead of a recolored Coliseum: cold
+// blue-slate walls and colonnades over dark waterlogged flagstones, so the
+// pit's identity shows at EVERY graphics tier (tints are plain material
+// colors, unlike the glow decals the low tier sheds).
+// Tuned against max-preset captures: dark enough to kill the Coliseum's warm
+// beige read, light enough that fighters and cover still stand out on the
+// nave (the mood comes from the moonfire lights and the flood, not from
+// crushing the stone albedo).
+const DROWNED_WALL_TINT = 0x8b9cb8;
+const DROWNED_FLOOR_TINT = 0x93a2b4;
 
 // The Drowned Temple is flooded — a translucent, self-animating water sheet
 // (driven by the shared uTime so it needs no per-frame plumbing) with cheap
@@ -614,6 +626,9 @@ export class DungeonInteriors {
   // instance draws (see marshMaterial). Never touched by any other variant.
   private marshWallMats = new Map<Pack, THREE.Material>();
   private marshFloorMats = new Map<Pack, THREE.Material>();
+  // Drowned Court wall/pillar and floor tints, same lifecycle as the marsh maps.
+  private drownedWallMats = new Map<Pack, THREE.Material>();
+  private drownedFloorMats = new Map<Pack, THREE.Material>();
   private waterMat: THREE.ShaderMaterial | null = null;
   private arenaHideables: ArenaHideable[] = [];
 
@@ -722,7 +737,14 @@ export class DungeonInteriors {
       this.placeFloodwater(group, layout);
       this.placeAquaticDressing(group, layout);
     }
-    if (variant === 'arena_drowned') this.placeArenaWaterBands(group, layout);
+    if (variant === 'arena_drowned') {
+      this.placeArenaWaterBands(group, layout);
+      // kelp climbing the colonnades and lily pads drifting on the flooded
+      // aisles: the temple's aquatic dressing reads straight off the layout,
+      // and its placement ranges (pads |x| 9..18, kelp |x| 13..20) land
+      // entirely inside the flooded aisles here.
+      this.placeAquaticDressing(group, layout);
+    }
     if (opts?.hazards?.length) {
       if (variant === 'delve_marsh' || variant === 'delve_marsh_apse') {
         placeMarshBlackwaterPools(group, opts.hazards, (x, z, color, y, scale) =>
@@ -743,7 +765,7 @@ export class DungeonInteriors {
 
     this.emit(group, p, variant);
     if (arenaWalls) {
-      for (const wall of arenaWalls.all) this.emitArenaHideable(group, wall);
+      for (const wall of arenaWalls.all) this.emitArenaHideable(group, wall, variant);
     }
     group.position.set(ox, 0, oz);
     this.scene.add(group);
@@ -787,18 +809,28 @@ export class DungeonInteriors {
     return this.waterMat;
   }
 
-  // The Drowned Court's water: cosmetic ankle-deep bands hugging the walls,
-  // sized by the pure core (arena_water_band_core.ts) and sharing the temple's
-  // self-animating water material, so there is no new shader and no new
-  // per-frame plumbing. The fighting lanes stay dry and the sheets carry no
-  // collision: arena floors are gameplay-flat by contract.
+  // The Drowned Court's water: both aisles flood ankle-deep (the colonnades
+  // and reliquaries rise out of the water) while the processional nave stays
+  // dry, sized by the pure core (arena_water_band_core.ts) and sharing the
+  // temple's self-animating water material, so there is no new shader and no
+  // new per-frame plumbing. The sheets carry no collision: arena floors are
+  // gameplay-flat by contract. Bioluminescent pools breathe along each
+  // flooded aisle (skipped on the low tier like every glow decal).
   private placeArenaWaterBands(group: THREE.Group, layout: DungeonLayout): void {
     for (const b of arenaWaterBands(layout)) {
+      if (b.width <= 0 || b.depth <= 0) continue;
       const geo = new THREE.PlaneGeometry(b.width, b.depth).rotateX(-Math.PI / 2);
-      geo.translate(b.x, 0.08, b.z);
+      geo.translate(b.x, 0.14, b.z);
       const sheet = new THREE.Mesh(geo, this.templeWaterMaterial());
       sheet.renderOrder = 1; // floats over the floor tiles
       group.add(sheet);
+    }
+    const aisleX =
+      ARENA_WATER_NAVE_HALF_X + (DUNGEON_WALL_X - DUNGEON_WALL_HW - ARENA_WATER_NAVE_HALF_X) / 2;
+    for (let z = layout.zMin + 10; z < layout.zMax - 8; z += 16) {
+      for (const side of [-1, 1]) {
+        this.addTorchGlow(group, side * aisleX, z, 0x37e6cf, 0.22, 1.3);
+      }
     }
   }
 
@@ -975,16 +1007,35 @@ export class DungeonInteriors {
   // Cached per pack + surface (wall vs floor), built once per DungeonInteriors
   // instance and reused for every marsh room, never cloned per room or mesh.
   private marshMaterial(pack: Pack, surface: 'wall' | 'floor'): THREE.Material {
-    const cache = surface === 'wall' ? this.marshWallMats : this.marshFloorMats;
+    return this.tintedMaterial(
+      surface === 'wall' ? this.marshWallMats : this.marshFloorMats,
+      pack,
+      surface === 'wall' ? MARSH_WALL_TINT : MARSH_FLOOR_TINT,
+    );
+  }
+
+  private drownedMaterial(pack: Pack, surface: 'wall' | 'floor'): THREE.Material {
+    return this.tintedMaterial(
+      surface === 'wall' ? this.drownedWallMats : this.drownedFloorMats,
+      pack,
+      surface === 'wall' ? DROWNED_WALL_TINT : DROWNED_FLOOR_TINT,
+    );
+  }
+
+  private tintedMaterial(
+    cache: Map<Pack, THREE.Material>,
+    pack: Pack,
+    tint: number,
+  ): THREE.Material {
     let mat = cache.get(pack);
     if (mat) return mat;
     // this.material(pack) is itself already a clone of the immutable GLB cache
-    // source (see material() above); clone again so the marsh tint never
-    // mutates the shared pack material every other variant instances from.
+    // source (see material() above); clone again so the tint never mutates the
+    // shared pack material every other variant instances from.
     const base = this.material(pack).clone() as
       | THREE.MeshLambertMaterial
       | THREE.MeshStandardMaterial;
-    base.color.multiply(new THREE.Color(surface === 'wall' ? MARSH_WALL_TINT : MARSH_FLOOR_TINT));
+    base.color.multiply(new THREE.Color(tint));
     if (base instanceof THREE.MeshStandardMaterial) base.roughness = Math.max(base.roughness, 0.92);
     mat = base;
     cache.set(pack, mat);
@@ -1006,6 +1057,10 @@ export class DungeonInteriors {
       let mat = this.material(asset.pack);
       if (isMarsh && WALL_PILLAR_KINDS.has(kind)) mat = this.marshMaterial(asset.pack, 'wall');
       else if (isMarsh && RECEIVER_KINDS.has(kind)) mat = this.marshMaterial(asset.pack, 'floor');
+      else if (variant === 'arena_drowned' && WALL_PILLAR_KINDS.has(kind))
+        mat = this.drownedMaterial(asset.pack, 'wall');
+      else if (variant === 'arena_drowned' && RECEIVER_KINDS.has(kind))
+        mat = this.drownedMaterial(asset.pack, 'floor');
       const mesh = new THREE.InstancedMesh(asset.geo, mat, mats.length);
       for (let i = 0; i < mats.length; i++) mesh.setMatrixAt(i, mats[i]);
       mesh.instanceMatrix.needsUpdate = true;
@@ -1049,7 +1104,7 @@ export class DungeonInteriors {
     };
   }
 
-  private emitArenaHideable(group: THREE.Group, pending: PendingArenaWall): void {
+  private emitArenaHideable(group: THREE.Group, pending: PendingArenaWall, variant: Variant): void {
     const wallGroup = new THREE.Group();
     const mats: ToggleMat[] = [];
     for (const [kind, matrices] of pending.placements.byKind) {
@@ -1059,6 +1114,14 @@ export class DungeonInteriors {
         continue;
       }
       const material = this.material(asset.pack).clone();
+      // Hideable walls bypass emit(), so the Drowned Court's wet-stone tint is
+      // applied to this per-wall clone directly (structural stone only: the
+      // banners keep their true colors, same scoping as the marsh tint).
+      if (variant === 'arena_drowned' && WALL_PILLAR_KINDS.has(kind)) {
+        (material as THREE.MeshLambertMaterial | THREE.MeshStandardMaterial).color.multiply(
+          new THREE.Color(DROWNED_WALL_TINT),
+        );
+      }
       mats.push({ mat: material, depthWrite: material.depthWrite });
       const mesh = new THREE.InstancedMesh(asset.geo, material, matrices.length);
       for (let i = 0; i < matrices.length; i++) mesh.setMatrixAt(i, matrices[i]);

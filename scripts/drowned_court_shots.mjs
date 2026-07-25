@@ -83,11 +83,38 @@ async function shoot(page, name) {
   console.log(`shot ${name}`);
 }
 
+// Force the max graphics preset before the app boots and reads woc_settings
+// (the tutorial_maxgfx recipe): the default preset 2 sheds the glow decals
+// and shadow work that carry each map's mood, which is not what the PR
+// comparison should judge.
+async function forceMaxGfx(page) {
+  await page.evaluateOnNewDocument(() => {
+    // guarded: the hook also fires on about:blank, where localStorage throws
+    try {
+      localStorage.setItem(
+        'woc_settings',
+        JSON.stringify({
+          graphicsPreset: 5,
+          terrainDetail: 1,
+          foliageDensity: 1,
+          effectsQuality: 1,
+          shadowQuality: 1,
+          renderScale: 1,
+          browserEffects: 1,
+        }),
+      );
+    } catch {
+      /* about:blank or a sandboxed frame: the real origin gets the next call */
+    }
+  });
+}
+
 // ---- desktop: Drowned Court (odd slot) ----
 const page = await browser.newPage();
 page.on('pageerror', (e) => errors.push(`[desktop] ${e.message}`));
 await page.setViewport({ width: 1600, height: 900 });
 await suppressGpuNotice(page);
+await forceMaxGfx(page);
 await page.goto(URL, { waitUntil: 'networkidle0', timeout: 60000 });
 if (!(await enterOfflineGame(page, { charClass: 'warrior', charName: 'Gladiator' })))
   throw new Error('offline world did not boot');
@@ -108,6 +135,7 @@ const page2 = await browser.newPage();
 page2.on('pageerror', (e) => errors.push(`[coliseum] ${e.message}`));
 await page2.setViewport({ width: 1600, height: 900 });
 await suppressGpuNotice(page2);
+await forceMaxGfx(page2);
 await page2.goto(URL, { waitUntil: 'networkidle0', timeout: 60000 });
 if (!(await enterOfflineGame(page2, { charClass: 'warrior', charName: 'Gladiator' })))
   throw new Error('offline world did not boot');
@@ -121,6 +149,7 @@ try {
   const mobile = await browser.newPage();
   mobile.on('pageerror', (e) => errors.push(`[mobile] ${e.message}`));
   await suppressGpuNotice(mobile);
+  await forceMaxGfx(mobile);
   await mobile.emulate({
     viewport: { width: 844, height: 390, isMobile: true, hasTouch: true, deviceScaleFactor: 2 },
     userAgent:
