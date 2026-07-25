@@ -108,6 +108,73 @@ export function updateFiestaBots(sim: Sim): void {
   for (const pid of sim.fiestaBotPids) driveFiestaBot(sim, pid);
 }
 
+// Straight-at-target steering wedges on the coliseum's cover: a bot that
+// re-aims at a target behind a pillar or approach screen every tick converges
+// to a zero-progress equilibrium against the obstacle. Track per-bot progress
+// and, when a forward-moving bot stops making any, detour perpendicular for a
+// beat; the detour side alternates so successive attempts sweep both ways
+// around wider cover. Pure position/tick bookkeeping, no rng. The state is
+// session-only and keyed per Sim instance so concurrent sims (tests) never
+// share it; it deliberately lives HERE and not on PlayerMeta/Entity, which the
+// parity harness samples.
+interface BotSteer {
+  x: number;
+  z: number;
+  stuck: number;
+  free: number;
+  detour: number;
+  attempts: number;
+  sign: 1 | -1;
+}
+const botSteerBySim = new WeakMap<Sim, Map<number, BotSteer>>();
+const BOT_STUCK_EPSILON = 0.05; // yd/tick; an unblocked bot covers ~0.3
+const BOT_STUCK_TICKS = 10; // half a second of no progress means wedged
+const BOT_DETOUR_TICKS = 20; // base sideways leg: one second
+const BOT_DETOUR_MAX_LEGS = 6; // escalation cap (a 6s leg out-walks any cover run)
+const BOT_FREE_TICKS = 20; // a second of unblocked pursuit resets escalation
+
+// Call after `facing` aims at the goal and forward movement is requested;
+// bends the facing sideways while a detour is active. Fixed-length alternating
+// detours can limit-cycle over a gap (each leg retraces the last), so
+// consecutive failed attempts alternate sides with ESCALATING leg lengths; the
+// growing sweep clears any cover pocket in the pit, and a sustained stretch of
+// free pursuit resets the escalation.
+function steerAroundCover(sim: Sim, pid: number, e: Entity): void {
+  let perSim = botSteerBySim.get(sim);
+  if (!perSim) {
+    perSim = new Map();
+    botSteerBySim.set(sim, perSim);
+  }
+  let st = perSim.get(pid);
+  if (!st) {
+    st = { x: e.pos.x, z: e.pos.z, stuck: 0, free: 0, detour: 0, attempts: 0, sign: 1 };
+    perSim.set(pid, st);
+  }
+  const moved = Math.hypot(e.pos.x - st.x, e.pos.z - st.z);
+  st.x = e.pos.x;
+  st.z = e.pos.z;
+  if (st.detour > 0) {
+    st.detour--;
+    e.facing += st.sign * (Math.PI / 2);
+    return;
+  }
+  if (moved < BOT_STUCK_EPSILON) {
+    st.free = 0;
+    st.stuck++;
+    if (st.stuck >= BOT_STUCK_TICKS) {
+      st.stuck = 0;
+      st.attempts = Math.min(st.attempts + 1, BOT_DETOUR_MAX_LEGS);
+      st.detour = BOT_DETOUR_TICKS * st.attempts;
+      st.sign = st.sign === 1 ? -1 : 1;
+      e.facing += st.sign * (Math.PI / 2);
+    }
+  } else {
+    st.stuck = 0;
+    st.free++;
+    if (st.free >= BOT_FREE_TICKS) st.attempts = 0;
+  }
+}
+
 function driveFiestaBot(sim: Sim, pid: number): void {
   const e = sim.entities.get(pid);
   const meta = sim.players.get(pid);
@@ -143,6 +210,7 @@ function driveFiestaBot(sim: Sim, pid: number): void {
   if (distCenter > match.fiesta.ringRadius - 2.5) {
     e.facing = angleTo(e.pos, { x: cx, y: 0, z: cz });
     meta.moveInput.forward = true;
+    steerAroundCover(sim, pid, e);
     return;
   }
   if (!target) return;
@@ -151,7 +219,14 @@ function driveFiestaBot(sim: Sim, pid: number): void {
   // Form-aware (rangedAutoProfile): bots never shapeshift today, but if one
   // ever does, a wandless form correctly collapses its standoff to melee.
   const engageRange = rangedAutoProfile(e, meta.cls) ? 22 : MELEE_RANGE * 0.9;
-  if (best > engageRange) meta.moveInput.forward = true;
+  // Close in when out of range, and ALSO when nominally in range but cover
+  // blocks the shot: two bots parked on opposite faces of a pillar are within
+  // melee reach yet no attack can land, so keep pushing (the detour steering
+  // rounds the pillar) until the target is actually hittable.
+  if (best > engageRange || !sim.ctx.hasLineOfSight(e, target)) {
+    meta.moveInput.forward = true;
+    steerAroundCover(sim, pid, e);
+  }
   e.targetId = target.id;
   if (!e.autoAttack) sim.startAutoAttack(pid);
   // Fire an offensive ability now and then (staggered per bot by pid). A press that

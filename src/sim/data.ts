@@ -459,7 +459,7 @@ export const ARENA_X = 4200; // arena instances share this x; slots stack along 
 export const ARENA_X_MIN = ARENA_X - (DUNGEON_WALL_X + DUNGEON_WALL_HW + 1);
 export const ARENA_SLOT_COUNT = 4; // concurrent 1v1 matches the world can host
 const ARENA_Z0 = -1250;
-const ARENA_SLOT_SPACING = 120; // > the pit footprint (~44yd) so slots never overlap
+const ARENA_SLOT_SPACING = 120; // > the pit footprint (~52yd) so slots never overlap
 
 export function arenaOrigin(slot: number): { x: number; z: number } {
   return { x: ARENA_X, z: ARENA_Z0 + slot * ARENA_SLOT_SPACING };

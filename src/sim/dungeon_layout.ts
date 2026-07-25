@@ -164,53 +164,68 @@ export const TEMPLE_LAYOUT: DungeonLayout = (() => {
   };
 })();
 
-// The Ashen Coliseum (interior 'arena'): a compact, fully-enclosed square pit
-// — no door, no aisle (combatants are teleported in by matchmaking). Side
-// walls at |x|=23 like the crypt so the KayKit wall modules fit unchanged;
-// four corner pillars carry the arena's warm torches. The dais marker only
-// drives the central floor glow (the renderer skips its platform for the
-// arena), so it stays a flat, obstacle-free fighting ring.
+// The Ashen Coliseum (interior 'arena'): a fully-enclosed pit, no door, no
+// aisle (combatants are teleported in by matchmaking). Side walls stay at
+// |x|=23 like the crypt so the KayKit wall modules fit unchanged; the pit
+// grows along z only, tuned for 1v1/2v2 (deliberately NOT large). The dais
+// marker only drives the central floor glow (the renderer skips its platform
+// for the arena), so the ring itself stays flat.
+// Cover intent: an approach screen in front of each spawn breaks line of
+// sight for caster openers, the centre diamond gives fighters a post to
+// orbit around mid-bout, and the side-lane walls cover flanking runs. Every
+// obstacle is mirror-symmetric about BOTH x=0 and z=2 so neither side is
+// favoured; each approach screen's outer end is capped by a mid-field post
+// (the sub-player gap between them is sealed, they read as one L-shaped
+// cover piece).
 export const ARENA_LAYOUT: DungeonLayout = {
-  zMin: -20,
-  zMax: 24,
+  zMin: -24,
+  zMax: 28,
   sideWallZ: 2,
-  sideWallHd: 23,
+  sideWallHd: 26,
   pillars: [
-    { x: -14, z: -10 },
-    { x: 14, z: -10 },
-    { x: -14, z: 14 },
-    { x: 14, z: 14 },
-    // Cover/parkour posts, mirrored about the centre line (z=2) so neither side
-    // is favoured. They give the Fiesta something to juke around (and ranked a
-    // little cover too) without crowding the spawns at z=-14 / z=18.
+    // corner pillars carrying the arena's warm torches
+    { x: -14, z: -14 },
+    { x: 14, z: -14 },
+    { x: -14, z: 18 },
+    { x: 14, z: 18 },
+    // mid-field posts capping the approach screens' outer ends
+    { x: -9, z: -8 },
+    { x: 9, z: -8 },
+    { x: -9, z: 12 },
+    { x: 9, z: 12 },
+    // centre diamond around the dais glow, for centre orbiting
     { x: 0, z: -4 },
     { x: 0, z: 8 },
-    { x: -9, z: -10 },
-    { x: 9, z: -10 },
-    { x: -9, z: 14 },
-    { x: 9, z: 14 },
+    { x: -6, z: 2 },
+    { x: 6, z: 2 },
   ],
   tombs: [],
-  // Narrow flanking cover walls along the side lanes, mirrored about z=2.
   stubs: [
-    { x: -11, z: 2, hw: 0.6, hd: 4 },
-    { x: 11, z: 2, hw: 0.6, hd: 4 },
+    // narrow flanking cover walls along the side lanes, mirrored about z=2
+    { x: -11, z: 2, hw: 0.6, hd: 5 },
+    { x: 11, z: 2, hw: 0.6, hd: 5 },
+    // approach screens: LoS breakers between each spawn and the centre
+    { x: -5, z: -10, hw: 3, hd: 0.6 },
+    { x: 5, z: -10, hw: 3, hd: 0.6 },
+    { x: -5, z: 14, hw: 3, hd: 0.6 },
+    { x: 5, z: 14, hw: 3, hd: 0.6 },
   ],
   dais: { x: 0, z: 2, r: 8 },
 };
 
-// Combatant spawn points (instance-local), at opposite ends facing each other.
-export const ARENA_SPAWN_A = { x: 0, z: -14, facing: 0 }; // faces +z toward B
-export const ARENA_SPAWN_B = { x: 0, z: 18, facing: Math.PI }; // faces -z toward A
+// Combatant spawn points (instance-local), at opposite ends facing each other,
+// each behind its team's approach screen with a clear zone around it.
+export const ARENA_SPAWN_A = { x: 0, z: -18, facing: 0 }; // faces +z toward B
+export const ARENA_SPAWN_B = { x: 0, z: 22, facing: Math.PI }; // faces -z toward A
 
 // 2v2: two fighters per side, spread along x.
 export const ARENA_SPAWNS_A_2v2 = [
-  { x: -7, z: -14, facing: 0 },
-  { x: 7, z: -14, facing: 0 },
+  { x: -7, z: -18, facing: 0 },
+  { x: 7, z: -18, facing: 0 },
 ];
 export const ARENA_SPAWNS_B_2v2 = [
-  { x: -7, z: 18, facing: Math.PI },
-  { x: 7, z: 18, facing: Math.PI },
+  { x: -7, z: 22, facing: Math.PI },
+  { x: 7, z: 22, facing: Math.PI },
 ];
 
 /** Interior collision set for a layout, in instance-local coordinates. */
