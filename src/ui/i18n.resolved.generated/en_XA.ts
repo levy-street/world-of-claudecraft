@@ -10832,6 +10832,36 @@ export const en_XA: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "[Ážĝóŕáţĥ, Ļóŕð óƒ ţĥé Þíţ]"
       },
+      "tower_imp": {
+        "name": "[Çíñðéŕ Ŵĥéļþ]"
+      },
+      "tower_hellhound": {
+        "name": "[Ĥéļļĥóúñð]"
+      },
+      "tower_pact_reaver": {
+        "name": "[Þáçţ Ŕéáʋéŕ]"
+      },
+      "tower_brimstone_zealot": {
+        "name": "[Ɓŕíɱšţóñé Žéáļóţ]"
+      },
+      "tower_soulbinder": {
+        "name": "[Šóúļƀíñðéŕ]"
+      },
+      "tower_iron_defiler": {
+        "name": "[Íŕóñ Ðéƒíļéŕ]"
+      },
+      "tower_abyss_knight": {
+        "name": "[Áƀýšš Ķñíĝĥţ]"
+      },
+      "tower_dread_harbinger": {
+        "name": "[Ðŕéáð Ĥáŕƀíñĝéŕ]"
+      },
+      "tower_boss_gatekeeper": {
+        "name": "[Ʋášķáŕ, ţĥé Ĝáţé'š Ŵáŕðéñ]"
+      },
+      "tower_boss_demon_lord": {
+        "name": "[Ɱáļĝŕáţĥ, ţĥé Ţóŵéŕ Úñƀóúñð]"
+      },
       "orkadia_grunt": {
         "name": "[Ɓļóóðţúšķ Ĝŕúñţ]"
       },

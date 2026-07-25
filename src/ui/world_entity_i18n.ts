@@ -210,6 +210,18 @@ const MOB_IDS = [
   'rift_pact_acolyte',
   'rift_boss_ritualist',
   'rift_boss_pitlord',
+  // The Demon Tower (src/sim/content/rift/tower_mobs.ts): the eight wave demons
+  // plus the two bosses.
+  'tower_imp',
+  'tower_hellhound',
+  'tower_pact_reaver',
+  'tower_brimstone_zealot',
+  'tower_soulbinder',
+  'tower_iron_defiler',
+  'tower_abyss_knight',
+  'tower_dread_harbinger',
+  'tower_boss_gatekeeper',
+  'tower_boss_demon_lord',
   // The Orkadia orc war-camp dungeon (src/sim/content/orkadia.ts).
   'orkadia_grunt',
   'orkadia_marauder',

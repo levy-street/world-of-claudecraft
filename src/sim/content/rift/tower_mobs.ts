@@ -10,7 +10,7 @@
 // stat lines below ascend in lockstep with that order and each tier adds one
 // readable threat on top of the previous:
 //
-//   imp            fast, fragile, arrives in numbers
+//   cinder whelp   fast, fragile, arrives in numbers
 //   hellhound      pack rusher, bleeds on hit
 //   pact reaver    cleaver, punishes stacking
 //   brimstone zeal. brands its target so the rest of the wave hits harder
@@ -44,7 +44,7 @@ const demonLoot = (copper: number): LootEntry[] => [
 const WAVE_DEMONS: Record<string, MobTemplate> = {
   tower_imp: {
     id: 'tower_imp',
-    name: 'Rift Imp',
+    name: 'Cinder Whelp',
     minLevel: MIN_LEVEL,
     maxLevel: MAX_LEVEL,
     family: 'demon',

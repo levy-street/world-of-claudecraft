@@ -10832,6 +10832,36 @@ export const cs_CZ: EnTranslations = {
       "rift_boss_pitlord": {
         "name": "Azgorath, Lord of the Pit"
       },
+      "tower_imp": {
+        "name": "Cinder Whelp"
+      },
+      "tower_hellhound": {
+        "name": "Hellhound"
+      },
+      "tower_pact_reaver": {
+        "name": "Pact Reaver"
+      },
+      "tower_brimstone_zealot": {
+        "name": "Brimstone Zealot"
+      },
+      "tower_soulbinder": {
+        "name": "Soulbinder"
+      },
+      "tower_iron_defiler": {
+        "name": "Iron Defiler"
+      },
+      "tower_abyss_knight": {
+        "name": "Abyss Knight"
+      },
+      "tower_dread_harbinger": {
+        "name": "Dread Harbinger"
+      },
+      "tower_boss_gatekeeper": {
+        "name": "Vaskar, the Gate's Warden"
+      },
+      "tower_boss_demon_lord": {
+        "name": "Malgrath, the Tower Unbound"
+      },
       "orkadia_grunt": {
         "name": "Bloodtusk Grunt"
       },
