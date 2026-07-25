@@ -7,7 +7,7 @@
 // player page through and filter the WHOLE market, not just the first wire window.
 
 import { ITEMS } from './data';
-import type { ItemDef } from './types';
+import type { ArmorType, ItemDef } from './types';
 
 export const MARKET_ITEM_TYPE_FILTERS = [
   'all',
@@ -40,7 +40,19 @@ export const MARKET_WEAPON_TYPE_FILTERS = [
   'axe',
   'other',
 ] as const;
-export const MARKET_ARMOR_CLASS_FILTERS = ['all', 'cloth', 'leather', 'mail'] as const;
+// Bound to the content union both ways on purpose: `satisfies` rejects an option that is not
+// a real ArmorType, and the Exclude assertion below reddens tsc if ArmorType ever gains a class
+// with no option here (which would silently make that whole armor class unbrowsable).
+export const MARKET_ARMOR_CLASS_FILTERS = [
+  'all',
+  'cloth',
+  'leather',
+  'mail',
+] as const satisfies readonly ('all' | ArmorType)[];
+type AssertNever<T extends never> = T;
+type _EveryArmorTypeIsFilterable = AssertNever<
+  Exclude<ArmorType, (typeof MARKET_ARMOR_CLASS_FILTERS)[number]>
+>;
 export const MARKET_PRIMARY_STAT_FILTERS = ['all', 'str', 'agi', 'int'] as const;
 export const MARKET_RARITY_FILTERS = [
   'all',
