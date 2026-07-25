@@ -2114,7 +2114,19 @@ export const ko_KR: EnTranslations = {
       "onlineHeader": "온라인 ({n})",
       "offlineHeader": "오프라인 ({n})",
       "hideOffline": "오프라인 숨기기",
-      "hideOfflineTitle": "오프라인 길드원 숨기기"
+      "hideOfflineTitle": "오프라인 길드원 숨기기",
+      "billboard": {
+        "label": "길드 게시판",
+        "empty": "게시판에 아직 아무 내용도 없습니다.",
+        "setBy": "{name} 설정",
+        "save": "저장",
+        "placeholder": "길드에 전할 메시지를 작성하세요",
+        "inputLabel": "길드 게시판 메시지",
+        "result": {
+          "set": "길드 게시판이 업데이트되었습니다.",
+          "notOfficer": "게시판은 임원과 길드 마스터만 수정할 수 있습니다."
+        }
+      }
     },
     "gathering": {
       "title": "채집",

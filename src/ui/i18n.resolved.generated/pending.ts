@@ -11,28 +11,76 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.enchanting.wornTag",
-    "hudChrome.options.stickyTarget"
+    "hudChrome.options.stickyTarget",
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
   ],
   "es_ES": [
     "hudChrome.enchanting.wornTag",
-    "hudChrome.options.stickyTarget"
+    "hudChrome.options.stickyTarget",
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
   ],
   "fr_FR": [
     "hudChrome.enchanting.wornTag",
-    "hudChrome.options.stickyTarget"
+    "hudChrome.options.stickyTarget",
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
   ],
   "fr_CA": [
     "hudChrome.enchanting.wornTag",
-    "hudChrome.options.stickyTarget"
+    "hudChrome.options.stickyTarget",
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.enchanting.wornTag",
-    "hudChrome.options.stickyTarget"
+    "hudChrome.options.stickyTarget",
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
   ],
   "de_DE": [
     "hudChrome.enchanting.wornTag",
-    "hudChrome.options.stickyTarget"
+    "hudChrome.options.stickyTarget",
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
   ],
   "zh_CN": [
     "hudChrome.enchanting.wornTag"
@@ -48,41 +96,113 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pt_BR": [
     "hudChrome.enchanting.wornTag",
-    "hudChrome.options.stickyTarget"
+    "hudChrome.options.stickyTarget",
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
   ],
   "ru_RU": [
     "hudChrome.enchanting.wornTag"
   ],
   "cs_CZ": [
     "hudChrome.enchanting.wornTag",
-    "hudChrome.options.stickyTarget"
+    "hudChrome.options.stickyTarget",
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
   ],
   "nl_NL": [
     "hudChrome.enchanting.wornTag",
-    "hudChrome.options.stickyTarget"
+    "hudChrome.options.stickyTarget",
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
   ],
   "pl_PL": [
     "hudChrome.enchanting.wornTag",
-    "hudChrome.options.stickyTarget"
+    "hudChrome.options.stickyTarget",
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
   ],
   "id_ID": [
     "hudChrome.enchanting.wornTag",
-    "hudChrome.options.stickyTarget"
+    "hudChrome.options.stickyTarget",
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
   ],
   "tr_TR": [
     "hudChrome.enchanting.wornTag",
-    "hudChrome.options.stickyTarget"
+    "hudChrome.options.stickyTarget",
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
   ],
   "sv_SE": [
     "hudChrome.enchanting.wornTag",
-    "hudChrome.options.stickyTarget"
+    "hudChrome.options.stickyTarget",
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
   ],
   "vi_VN": [
     "hudChrome.enchanting.wornTag",
-    "hudChrome.options.stickyTarget"
+    "hudChrome.options.stickyTarget",
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
   ],
   "da_DK": [
     "hudChrome.enchanting.wornTag",
-    "hudChrome.options.stickyTarget"
+    "hudChrome.options.stickyTarget",
+    "hudChrome.social.billboard.empty",
+    "hudChrome.social.billboard.inputLabel",
+    "hudChrome.social.billboard.label",
+    "hudChrome.social.billboard.placeholder",
+    "hudChrome.social.billboard.result.notOfficer",
+    "hudChrome.social.billboard.result.set",
+    "hudChrome.social.billboard.save",
+    "hudChrome.social.billboard.setBy"
   ]
 };

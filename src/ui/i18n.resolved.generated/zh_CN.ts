@@ -2114,7 +2114,19 @@ export const zh_CN: EnTranslations = {
       "onlineHeader": "在线 ({n})",
       "offlineHeader": "离线 ({n})",
       "hideOffline": "隐藏离线",
-      "hideOfflineTitle": "隐藏离线公会成员"
+      "hideOfflineTitle": "隐藏离线公会成员",
+      "billboard": {
+        "label": "公会公告板",
+        "empty": "公告板上还没有内容。",
+        "setBy": "由 {name} 设置",
+        "save": "保存",
+        "placeholder": "给公会写一条消息",
+        "inputLabel": "公会公告板消息",
+        "result": {
+          "set": "公会公告板已更新。",
+          "notOfficer": "只有官员和会长可以编辑公告板。"
+        }
+      }
     },
     "gathering": {
       "title": "采集",

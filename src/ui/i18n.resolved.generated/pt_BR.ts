@@ -2114,7 +2114,19 @@ export const pt_BR: EnTranslations = {
       "onlineHeader": "Online ({n})",
       "offlineHeader": "Offline ({n})",
       "hideOffline": "Ocultar offline",
-      "hideOfflineTitle": "Ocultar membros da guilda offline"
+      "hideOfflineTitle": "Ocultar membros da guilda offline",
+      "billboard": {
+        "label": "Guild Billboard",
+        "empty": "Nothing on the billboard yet.",
+        "setBy": "Set by {name}",
+        "save": "Save",
+        "placeholder": "Write a message for the guild",
+        "inputLabel": "Guild billboard message",
+        "result": {
+          "set": "The guild billboard was updated.",
+          "notOfficer": "Only officers and the Guild Master may edit the billboard."
+        }
+      }
     },
     "gathering": {
       "title": "Coleta",

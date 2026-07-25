@@ -70,12 +70,20 @@ describe('resolvePlayerSocialFlags online (the server graph is the source of tru
 
   it('resolves guild-invite permission from rank', () => {
     const asMember = social({
-      guild: { id: 1, name: 'G', rank: 'member', members: [], events: [] },
+      guild: { id: 1, name: 'G', rank: 'member', motd: '', motdSetBy: '', members: [], events: [] },
     });
     expect(resolvePlayerSocialFlags('Bob', asMember, new Set()).canGuildInvite).toBe(false);
 
     const asOfficer = social({
-      guild: { id: 1, name: 'G', rank: 'officer', members: [], events: [] },
+      guild: {
+        id: 1,
+        name: 'G',
+        rank: 'officer',
+        motd: '',
+        motdSetBy: '',
+        members: [],
+        events: [],
+      },
     });
     expect(resolvePlayerSocialFlags('Bob', asOfficer, new Set()).canGuildInvite).toBe(true);
   });

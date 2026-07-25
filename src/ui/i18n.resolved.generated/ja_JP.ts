@@ -2114,7 +2114,19 @@ export const ja_JP: EnTranslations = {
       "onlineHeader": "オンライン ({n})",
       "offlineHeader": "オフライン ({n})",
       "hideOffline": "オフラインを非表示",
-      "hideOfflineTitle": "オフラインのギルドメンバーを非表示"
+      "hideOfflineTitle": "オフラインのギルドメンバーを非表示",
+      "billboard": {
+        "label": "ギルド掲示板",
+        "empty": "掲示板にはまだ何もありません。",
+        "setBy": "{name}が設定",
+        "save": "保存",
+        "placeholder": "ギルドへのメッセージを書く",
+        "inputLabel": "ギルド掲示板メッセージ",
+        "result": {
+          "set": "ギルド掲示板を更新しました。",
+          "notOfficer": "掲示板を編集できるのは幹部とギルドマスターだけです。"
+        }
+      }
     },
     "gathering": {
       "title": "採集",

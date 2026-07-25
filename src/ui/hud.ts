@@ -76,6 +76,7 @@ import type {
   ItemInstancePayload,
   ItemSlot,
   MailResultCode,
+  MotdResultCode,
   PetMode,
   PlayerClass,
   ResourceType,
@@ -768,6 +769,12 @@ const CALENDAR_RESULT_KEYS: Record<CalendarResultCode, TranslationKey> = {
   badInput: 'hudChrome.calendar.result.badInput',
   calendarFull: 'hudChrome.calendar.result.calendarFull',
   eventGone: 'hudChrome.calendar.result.eventGone',
+};
+// Guild billboard outcome lines (`set` is the chat-log success).
+const MOTD_RESULT_KEYS: Record<MotdResultCode, TranslationKey> = {
+  set: 'hudChrome.social.billboard.result.set',
+  notInGuild: 'hudChrome.calendar.result.notInGuild',
+  notOfficer: 'hudChrome.social.billboard.result.notOfficer',
 };
 const HONOR_REASON_KEYS: Record<HonorReason, TranslationKey> = {
   arena_win: 'hudChrome.warfare.reasons.arenaWin',
@@ -9470,6 +9477,14 @@ export class Hud {
             this.showError(t(CALENDAR_RESULT_KEYS[ev.code]));
           }
           this.calendarWindow.onCalendarResult(ev.code);
+          break;
+        }
+        case 'motdResult': {
+          if (ev.code === 'set') {
+            this.log(t(MOTD_RESULT_KEYS[ev.code]), '#c8f7c5');
+          } else {
+            this.showError(t(MOTD_RESULT_KEYS[ev.code]));
+          }
           break;
         }
         case 'deedBroadcast': {

@@ -2114,7 +2114,19 @@ export const id_ID: EnTranslations = {
       "onlineHeader": "Daring ({n})",
       "offlineHeader": "Luring ({n})",
       "hideOffline": "Sembunyikan yang luring",
-      "hideOfflineTitle": "Sembunyikan anggota serikat yang sedang luring"
+      "hideOfflineTitle": "Sembunyikan anggota serikat yang sedang luring",
+      "billboard": {
+        "label": "Guild Billboard",
+        "empty": "Nothing on the billboard yet.",
+        "setBy": "Set by {name}",
+        "save": "Save",
+        "placeholder": "Write a message for the guild",
+        "inputLabel": "Guild billboard message",
+        "result": {
+          "set": "The guild billboard was updated.",
+          "notOfficer": "Only officers and the Guild Master may edit the billboard."
+        }
+      }
     },
     "gathering": {
       "title": "Pengumpulan",

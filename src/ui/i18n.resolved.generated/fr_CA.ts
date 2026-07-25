@@ -2114,7 +2114,19 @@ export const fr_CA: EnTranslations = {
       "onlineHeader": "En ligne ({n})",
       "offlineHeader": "Hors ligne ({n})",
       "hideOffline": "Masquer les hors ligne",
-      "hideOfflineTitle": "Masquer les membres de guilde hors ligne"
+      "hideOfflineTitle": "Masquer les membres de guilde hors ligne",
+      "billboard": {
+        "label": "Guild Billboard",
+        "empty": "Nothing on the billboard yet.",
+        "setBy": "Set by {name}",
+        "save": "Save",
+        "placeholder": "Write a message for the guild",
+        "inputLabel": "Guild billboard message",
+        "result": {
+          "set": "The guild billboard was updated.",
+          "notOfficer": "Only officers and the Guild Master may edit the billboard."
+        }
+      }
     },
     "gathering": {
       "title": "Récolte",

@@ -2114,7 +2114,19 @@ export const vi_VN: EnTranslations = {
       "onlineHeader": "Trực Tuyến ({n})",
       "offlineHeader": "Ngoại Tuyến ({n})",
       "hideOffline": "Ẩn ngoại tuyến",
-      "hideOfflineTitle": "Ẩn thành viên bang hội ngoại tuyến"
+      "hideOfflineTitle": "Ẩn thành viên bang hội ngoại tuyến",
+      "billboard": {
+        "label": "Guild Billboard",
+        "empty": "Nothing on the billboard yet.",
+        "setBy": "Set by {name}",
+        "save": "Save",
+        "placeholder": "Write a message for the guild",
+        "inputLabel": "Guild billboard message",
+        "result": {
+          "set": "The guild billboard was updated.",
+          "notOfficer": "Only officers and the Guild Master may edit the billboard."
+        }
+      }
     },
     "gathering": {
       "title": "Thu thập",

@@ -2246,6 +2246,22 @@ export const hudChromeStrings = {
     offlineHeader: 'Offline ({n})',
     hideOffline: 'Hide offline',
     hideOfflineTitle: 'Hide offline guild members',
+    // The guild billboard: a short officer-set message (announcements, Discord
+    // links) pinned atop the Guild tab. Rendered as plain escaped text only,
+    // deliberately (player-controlled; never linkified). {name} in setBy is the
+    // setter's character name, spliced verbatim.
+    billboard: {
+      label: 'Guild Billboard',
+      empty: 'Nothing on the billboard yet.',
+      setBy: 'Set by {name}',
+      save: 'Save',
+      placeholder: 'Write a message for the guild',
+      inputLabel: 'Guild billboard message',
+      result: {
+        set: 'The guild billboard was updated.',
+        notOfficer: 'Only officers and the Guild Master may edit the billboard.',
+      },
+    },
   },
   // Gathering proficiency section on the character sheet (#1124). Profession
   // display names mirror src/sim/content/professions.ts (GatheringProfessionId).

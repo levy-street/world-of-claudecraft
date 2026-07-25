@@ -2114,7 +2114,19 @@ export const en_XA: EnTranslations = {
       "onlineHeader": "[Óñļíñé ({n})]",
       "offlineHeader": "[Óƒƒļíñé ({n})]",
       "hideOffline": "[Ĥíðé óƒƒļíñé]",
-      "hideOfflineTitle": "[Ĥíðé óƒƒļíñé ĝúíļð ɱéɱƀéŕš]"
+      "hideOfflineTitle": "[Ĥíðé óƒƒļíñé ĝúíļð ɱéɱƀéŕš]",
+      "billboard": {
+        "label": "[Ĝúíļð Ɓíļļƀóáŕð]",
+        "empty": "[Ñóţĥíñĝ óñ ţĥé ƀíļļƀóáŕð ýéţ.]",
+        "setBy": "[Šéţ ƀý {name}]",
+        "save": "[Šáʋé]",
+        "placeholder": "[Ŵŕíţé á ɱéššáĝé ƒóŕ ţĥé ĝúíļð]",
+        "inputLabel": "[Ĝúíļð ƀíļļƀóáŕð ɱéššáĝé]",
+        "result": {
+          "set": "[Ţĥé ĝúíļð ƀíļļƀóáŕð ŵáš úþðáţéð.]",
+          "notOfficer": "[Óñļý óƒƒíçéŕš áñð ţĥé Ĝúíļð Ɱášţéŕ ɱáý éðíţ ţĥé ƀíļļƀóáŕð.]"
+        }
+      }
     },
     "gathering": {
       "title": "[Ĝáţĥéŕíñĝ]",
