@@ -339,6 +339,42 @@ const STORE_KEY = 'woc_settings';
 const NUMERIC_KEYS = Object.keys(SETTING_RANGES) as NumericSettingKey[];
 const BOOL_KEYS = Object.keys(BOOL_SETTINGS) as BoolSettingKey[];
 
+// Two action-bar preferences that a player wants set per CHARACTER, not device-
+// wide: a mage that drops the Attack button and turns off attack-on-cast should
+// not force those choices on a paladin (issue: character-level combat settings).
+// These keep the same names/defs in BOOL_SETTINGS above (so the options UI and
+// every get/set call site are untouched), but once a character context is known
+// (Settings.setCharacter, wired from startGame) they resolve to a per-character
+// localStorage entry keyed like the per-character action bar (actionBarSlotMapKey:
+// `woc_hotbar_${playerClass}_${playerName}`), migrating the player's existing
+// GLOBAL value in on first read so nobody's setup visibly changes on upgrade.
+export const PER_CHARACTER_BOOL_KEYS = [
+  'showAttackButton',
+  'startAttackOnAbilityUse',
+] as const satisfies readonly BoolSettingKey[];
+
+type PerCharacterBoolKey = (typeof PER_CHARACTER_BOOL_KEYS)[number];
+const PER_CHARACTER_BOOL_SET: ReadonlySet<string> = new Set(PER_CHARACTER_BOOL_KEYS);
+
+function isPerCharacterBoolKey(key: string): key is PerCharacterBoolKey {
+  return PER_CHARACTER_BOOL_SET.has(key);
+}
+
+// Mirrors action_bar_layout_sync.actionBarSlotMapKey's `woc_hotbar_${cls}_${name}`
+// convention so a character's per-slot settings sit alongside its per-slot bar.
+export function perCharacterSettingKey(
+  key: PerCharacterBoolKey,
+  playerClass: string,
+  playerName: string,
+): string {
+  return `woc_setting_${key}_${playerClass}_${playerName}`;
+}
+
+export interface CharacterContext {
+  playerClass: string;
+  playerName: string;
+}
+
 function clampNumeric(key: NumericSettingKey, v: number): number {
   const r = SETTING_RANGES[key];
   if (!Number.isFinite(v)) return r.def;
@@ -357,6 +393,11 @@ export function clickMoveButtonLabel(value: number): string {
 
 export class Settings {
   private values: GameSettings;
+  // The character these per-character keys resolve against, or null on the
+  // character-select / landing screens (and for the many standalone
+  // `new Settings()` reads of purely-global keys), where they fall back to the
+  // global blob exactly as before.
+  private character: CharacterContext | null = null;
 
   constructor() {
     this.values = this.load();
@@ -384,13 +425,94 @@ export class Settings {
 
   private save(): void {
     try {
-      localStorage.setItem(STORE_KEY, JSON.stringify(this.values));
+      // Never let the active character's per-character values overwrite the
+      // global blob: that blob is the migration SEED for characters logging in
+      // for the first time, and clobbering it would leak one character's Attack
+      // preferences onto every not-yet-migrated character. Once a character is
+      // bound we preserve whatever the blob already stored for those keys.
+      const toStore = this.character
+        ? { ...this.values, ...this.storedGlobalPerCharacterKeys() }
+        : this.values;
+      localStorage.setItem(STORE_KEY, JSON.stringify(toStore));
+    } catch {
+      /* storage unavailable */
+    }
+  }
+
+  /** The values the global blob currently holds for the per-character keys (the
+   *  original seed), used to keep save() from overwriting them once a character
+   *  is bound. Falls back to the def when the blob has no explicit value. */
+  private storedGlobalPerCharacterKeys(): Partial<Record<PerCharacterBoolKey, boolean>> {
+    let stored: unknown = null;
+    try {
+      stored = JSON.parse(localStorage.getItem(STORE_KEY) ?? 'null');
+    } catch {
+      /* corrupt */
+    }
+    const raw = stored && typeof stored === 'object' ? (stored as Record<string, unknown>) : {};
+    const out: Partial<Record<PerCharacterBoolKey, boolean>> = {};
+    for (const key of PER_CHARACTER_BOOL_KEYS) {
+      out[key] = typeof raw[key] === 'boolean' ? (raw[key] as boolean) : BOOL_SETTINGS[key].def;
+    }
+    return out;
+  }
+
+  /**
+   * Bind this Settings to a character so the per-character keys (Attack button /
+   * attack-on-cast) resolve to that character's own entry. Called once per world
+   * entry from startGame. On first read for a character with nothing stored the
+   * getter migrates in the value the global blob currently holds, so a returning
+   * player keeps whatever they had before the split.
+   */
+  setCharacter(playerClass: string, playerName: string): void {
+    this.character = { playerClass, playerName };
+    // Fold the resolved per-character values into the in-memory snapshot so
+    // all()/get() reflect this character immediately (and migrate-on-first-read
+    // is persisted right away).
+    for (const key of PER_CHARACTER_BOOL_KEYS) {
+      this.values[key] = this.readPerCharacterBool(key);
+    }
+  }
+
+  /** Read a per-character bool from storage, migrating the global value in the
+   *  first time nothing is stored for this character. Requires this.character. */
+  private readPerCharacterBool(key: PerCharacterBoolKey): boolean {
+    const ctx = this.character;
+    if (!ctx) return this.values[key];
+    const storeKey = perCharacterSettingKey(key, ctx.playerClass, ctx.playerName);
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem(storeKey);
+    } catch {
+      /* storage unavailable */
+    }
+    if (stored === 'true') return true;
+    if (stored === 'false') return false;
+    // No per-character value yet: seed from the player's current GLOBAL value
+    // (this.values already holds it from load()) and persist so the choice is
+    // now this character's own going forward.
+    const migrated = this.values[key];
+    this.writePerCharacterBool(key, migrated);
+    return migrated;
+  }
+
+  private writePerCharacterBool(key: PerCharacterBoolKey, value: boolean): void {
+    const ctx = this.character;
+    if (!ctx) return;
+    try {
+      localStorage.setItem(
+        perCharacterSettingKey(key, ctx.playerClass, ctx.playerName),
+        value ? 'true' : 'false',
+      );
     } catch {
       /* storage unavailable */
     }
   }
 
   get<K extends keyof GameSettings>(key: K): GameSettings[K] {
+    if (this.character && isPerCharacterBoolKey(key)) {
+      return this.readPerCharacterBool(key) as GameSettings[K];
+    }
     return this.values[key];
   }
 
@@ -405,6 +527,13 @@ export class Settings {
     if ((BOOL_KEYS as readonly string[]).includes(key)) {
       const v = !!value;
       (this.values as Record<string, unknown>)[key] = v;
+      // Per-character keys with a bound character persist to that character's
+      // own entry (the global blob is left as the migration seed only); without
+      // a character they fall through to the global save() below unchanged.
+      if (this.character && isPerCharacterBoolKey(key)) {
+        this.writePerCharacterBool(key, v);
+        return v as GameSettings[K];
+      }
       this.save();
       return v as GameSettings[K];
     }
@@ -424,11 +553,24 @@ export class Settings {
       for (const key of NUMERIC_KEYS) this.values[key] = SETTING_RANGES[key].def;
       for (const key of BOOL_KEYS) this.values[key] = BOOL_SETTINGS[key].def;
       this.save();
+      // A bound character's per-character keys reset to their def in that
+      // character's own entry too, so "Reset to Defaults" is honored there.
+      if (this.character) {
+        for (const key of PER_CHARACTER_BOOL_KEYS) {
+          this.writePerCharacterBool(key, BOOL_SETTINGS[key].def);
+        }
+      }
       return;
     }
     for (const key of keys) {
       if ((BOOL_KEYS as readonly string[]).includes(key as string)) {
         this.values[key as BoolSettingKey] = BOOL_SETTINGS[key as BoolSettingKey].def;
+        if (this.character && isPerCharacterBoolKey(key as string)) {
+          this.writePerCharacterBool(
+            key as PerCharacterBoolKey,
+            BOOL_SETTINGS[key as BoolSettingKey].def,
+          );
+        }
       } else if ((NUMERIC_KEYS as readonly string[]).includes(key as string)) {
         this.values[key as NumericSettingKey] = SETTING_RANGES[key as NumericSettingKey].def;
       }

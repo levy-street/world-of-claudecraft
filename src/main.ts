@@ -993,6 +993,13 @@ async function startGame(
 
   const keybinds = new Keybinds(keybindScope);
   const settings = new Settings();
+  // Bind the per-character settings (Attack button / attack-on-cast) to THIS
+  // character so a mage and a paladin keep independent choices; keyed by
+  // class+name like the per-character action bar. First read for a character
+  // migrates in the player's existing global value, so nothing changes on
+  // upgrade. Must run before applySetting fans the stored values out below and
+  // before the HUD reads them.
+  settings.setCharacter(world.cfg.playerClass, world.player.name);
   // First-run graphics default: until a device default has been applied (the dedicated
   // graphicsDefaultApplied marker, NOT the graphicsPreset key, which save() def-fills the moment
   // any unrelated setting is stored), probe the device (GPU name, memory, cores, touch) and
