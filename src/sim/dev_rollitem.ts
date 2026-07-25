@@ -1,3 +1,8 @@
+import {
+  PROCEDURAL_LEGENDARY_POWER_IDS,
+  PROCEDURAL_LEGENDARY_POWERS,
+  proceduralLegendaryPowerCompatibleWithBase,
+} from './content/procedural_legendary_powers';
 import { PROCEDURAL_ITEM_BASES, PROCEDURAL_RARITIES } from './content/procedural_loot';
 import { deriveProceduralItemSeed, generateProceduralItem, hash32Parts } from './loot/procedural';
 import type { ItemDropContext, ProceduralRarity } from './procedural_item';
@@ -57,6 +62,18 @@ export function grantDevRolledItem(
     (!Number.isInteger(request.seed) || request.seed < 1 || request.seed > 0xffffffff)
   )
     return { ok: false, error: 'Seed must be an integer from 1 to 4294967295.' };
+
+  if (
+    rarity === 'legendary' &&
+    !PROCEDURAL_LEGENDARY_POWER_IDS.some((powerId) =>
+      proceduralLegendaryPowerCompatibleWithBase(PROCEDURAL_LEGENDARY_POWERS[powerId], base),
+    )
+  ) {
+    return {
+      ok: false,
+      error: `Procedural base '${base.id}' has no compatible legendary power.`,
+    };
+  }
 
   const uid = ctx.allocateProceduralItemUid();
   const sourceSequence = hash32Parts('dev-rollitem-source-v1', uid);

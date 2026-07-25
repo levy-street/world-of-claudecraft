@@ -11,6 +11,7 @@ function sourceWeapon(base: ProceduralItemBase): WeaponInfo | undefined {
     min: Math.max(1, Math.round(average * (1 - base.baseWeapon.damageSpread))),
     max: Math.max(1, Math.round(average * (1 + base.baseWeapon.damageSpread))),
     speed: base.baseWeapon.speed,
+    ...(base.dagger && { dagger: true }),
   };
 }
 
@@ -43,6 +44,19 @@ function itemDefinition(base: ProceduralItemBase): ItemDef {
   }
   if (base.slot === 'ring' || base.slot === 'neck') {
     return { ...shared, kind: 'armor', slot: base.slot };
+  }
+  if (base.shield) {
+    if (base.slot !== 'offhand' || !base.armorType || base.baseBlockValue === undefined)
+      throw new Error(`procedural shield base ${base.id} has invalid shield data`);
+    return {
+      ...shared,
+      kind: 'armor',
+      slot: 'offhand',
+      armorType: base.armorType,
+      shield: true,
+      blockValue: base.baseBlockValue,
+      ...(base.baseArmor !== undefined && { stats: { armor: base.baseArmor } }),
+    };
   }
   if (
     base.slot === 'mainhand' ||

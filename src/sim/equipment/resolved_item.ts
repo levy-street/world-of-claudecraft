@@ -46,13 +46,19 @@ function proceduralWeapon(itemLevel: number, baseId: string): WeaponInfo | undef
     min: Math.max(1, Math.round(averageDamage * (1 - spread))),
     max: Math.max(1, Math.round(averageDamage * (1 + spread))),
     speed: base.baseWeapon.speed,
+    ...(base.dagger && { dagger: true }),
   };
 }
 
-function proceduralArmor(itemLevel: number, baseId: string): number | undefined {
+function scaledProceduralBaseValue(
+  itemLevel: number,
+  baseId: string,
+  value: 'baseArmor' | 'baseBlockValue',
+): number | undefined {
   const base = PROCEDURAL_ITEM_BASES[baseId];
-  if (!base || base.baseArmor === undefined) return undefined;
-  return Math.max(0, Math.round((base.baseArmor * itemLevel) / base.sourceLevel));
+  const sourceValue = base?.[value];
+  if (!base || sourceValue === undefined) return undefined;
+  return Math.max(0, Math.round((sourceValue * itemLevel) / base.sourceLevel));
 }
 
 function addProceduralValue(out: ResolvedItemStats, stat: string, value: number): void {
@@ -97,8 +103,14 @@ export function resolvedItemStats(
     throw new Error(
       `procedural base ${procedural.baseId} does not match item definition ${definition.id}`,
     );
-  const baseArmor = proceduralArmor(procedural.itemLevel, procedural.baseId);
+  const baseArmor = scaledProceduralBaseValue(procedural.itemLevel, procedural.baseId, 'baseArmor');
   if (baseArmor !== undefined) out.stats.armor = baseArmor;
+  const baseBlockValue = scaledProceduralBaseValue(
+    procedural.itemLevel,
+    procedural.baseId,
+    'baseBlockValue',
+  );
+  if (baseBlockValue !== undefined) out.blockValue = baseBlockValue;
   const weapon = proceduralWeapon(procedural.itemLevel, procedural.baseId);
   if (weapon) out.weapon = weapon;
   for (const affix of allProceduralAffixes(procedural)) {

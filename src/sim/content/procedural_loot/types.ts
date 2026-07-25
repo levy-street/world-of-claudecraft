@@ -2,6 +2,16 @@ import type { ItemTag, ProceduralAffixPosition, ProceduralRarity } from '../../p
 import type { ArmorType, ItemSlot, PlayerClass, WeaponHand } from '../../types';
 
 export type ProceduralBaseKind = 'weapon' | 'armor' | 'held_offhand';
+export type ProceduralWeaponType =
+  | 'sword'
+  | 'axe'
+  | 'mace'
+  | 'dagger'
+  | 'staff'
+  | 'wand'
+  | 'polearm'
+  | 'bow'
+  | 'crossbow';
 
 export interface ProceduralBaseWeapon {
   speed: number;
@@ -18,12 +28,17 @@ export interface ProceduralItemBase {
   requiredClass?: PlayerClass[];
   sourceLevel: number;
   baseArmor?: number;
+  baseBlockValue?: number;
   baseWeapon?: ProceduralBaseWeapon;
+  weaponType?: ProceduralWeaponType;
+  dagger?: boolean;
+  shield?: boolean;
   tags: ItemTag[];
   implicitIds?: string[];
   visualItemId: string;
   weaponVisualId?: string;
   slotMultiplier: number;
+  dropWeight: number;
 }
 
 export interface NumericRoll {

@@ -1,4 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import {
+  PROCEDURAL_LEGENDARY_POWER_IDS,
+  PROCEDURAL_LEGENDARY_POWERS,
+  proceduralLegendaryPowerCompatibleWithBase,
+} from '../src/sim/content/procedural_legendary_powers';
 import { PROCEDURAL_ITEM_BASES } from '../src/sim/content/procedural_loot';
 import type { ProceduralRarity } from '../src/sim/procedural_item';
 import { sanitizeProceduralItemInstance } from '../src/sim/procedural_item_validation';
@@ -49,9 +54,13 @@ describe('/dev rollitem', () => {
     expect(sanitizeProceduralItemInstance(item, item.baseId)).toEqual({ ok: true, value: item });
   });
 
-  it('checks 150 deterministic base, rarity, and seed grants', () => {
+  it('checks deterministic base, rarity, and seed grants and rejections', () => {
     let scenarios = 0;
     for (const baseId of BASE_IDS) {
+      const base = PROCEDURAL_ITEM_BASES[baseId];
+      const supportsLegendary = PROCEDURAL_LEGENDARY_POWER_IDS.some((powerId) =>
+        proceduralLegendaryPowerCompatibleWithBase(PROCEDURAL_LEGENDARY_POWERS[powerId], base),
+      );
       for (const rarity of RARITIES) {
         for (let seed = 1; seed <= 5; seed++) {
           const first = devSim(90210);
@@ -62,8 +71,14 @@ describe('/dev rollitem', () => {
           const [a] = proceduralItems(first);
           const [b] = proceduralItems(second);
 
-          expect(a, `${baseId}:${rarity}:${seed}`).toBeDefined();
+          if (rarity === 'legendary' && !supportsLegendary) {
+            expect(a, `${baseId}:${rarity}:${seed}`).toBeUndefined();
+            expect(b).toBeUndefined();
+            scenarios++;
+            continue;
+          }
           expect(b).toEqual(a);
+          expect(a, `${baseId}:${rarity}:${seed}`).toBeDefined();
           expect(a.baseId).toBe(baseId);
           expect(a.rarity).toBe(rarity);
           expect(a.itemLevel).toBe(20);
@@ -82,8 +97,8 @@ describe('/dev rollitem', () => {
         }
       }
     }
-    expect(scenarios).toBe(150);
-  });
+    expect(scenarios).toBe(BASE_IDS.length * RARITIES.length * 5);
+  }, 60_000);
 
   it('does not consume the authoritative simulation RNG', () => {
     const sim = devSim();
@@ -114,6 +129,7 @@ describe('/dev rollitem', () => {
 
   it.each([
     '/dev rollitem missing rare 20 1',
+    '/dev rollitem mirefen_leather_gloves legendary 20 1',
     '/dev rollitem iron_broadsword mythic 20 1',
     '/dev rollitem iron_broadsword rare 0 1',
     '/dev rollitem iron_broadsword rare 41 1',

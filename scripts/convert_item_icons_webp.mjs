@@ -48,16 +48,24 @@ const webpOptions = { quality, alphaQuality: 100, smartSubsample: true, effort: 
 
 const rel = (p) => path.relative(itemsDir, p).split(path.sep).join('/');
 
+function sourceImages(dir) {
+  const sources = [];
+  for (const ent of readdirSync(dir, { withFileTypes: true })) {
+    const candidate = path.join(dir, ent.name);
+    if (ent.isDirectory()) sources.push(...sourceImages(candidate));
+    else if (ent.isFile() && SOURCE_EXTS.has(path.extname(ent.name).toLowerCase()))
+      sources.push(candidate);
+  }
+  return sources;
+}
+
 async function main() {
   if (!existsSync(itemsDir)) {
     console.error(`[assets:items] no items dir at ${path.relative(root, itemsDir)}`);
     process.exit(1);
   }
 
-  const sources = readdirSync(itemsDir, { withFileTypes: true })
-    .filter((ent) => ent.isFile() && SOURCE_EXTS.has(path.extname(ent.name).toLowerCase()))
-    .map((ent) => path.join(itemsDir, ent.name))
-    .sort();
+  const sources = sourceImages(itemsDir).sort();
 
   if (sources.length === 0) {
     console.log('[assets:items] no non-webp images found; tree is already webp-only (no-op)');

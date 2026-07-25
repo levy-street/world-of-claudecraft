@@ -91,10 +91,7 @@ describe('procedural legendary power content', () => {
       proceduralLegendaryPowerCompatibleWithBase(bell, PROCEDURAL_ITEM_BASES.ashwood_staff),
     ).toBe(true);
     expect(
-      proceduralLegendaryPowerCompatibleWithBase(
-        bell,
-        PROCEDURAL_ITEM_BASES.gravecaller_cloth_hood,
-      ),
+      proceduralLegendaryPowerCompatibleWithBase(bell, PROCEDURAL_ITEM_BASES.gravecaller_focus),
     ).toBe(true);
     expect(
       proceduralLegendaryPowerCompatibleWithBase(bell, PROCEDURAL_ITEM_BASES.gravecaller_ring),
@@ -104,6 +101,69 @@ describe('procedural legendary power content', () => {
     ).toBe(false);
   });
 
+  it('pins every one of the 408 power and base compatibility decisions', () => {
+    const expectedByPower = {
+      crown_last_pyre: ['gravecaller_cloth_hood'],
+      greyjaws_edge: [
+        'iron_broadsword',
+        'thornpeak_war_axe',
+        'iron_flanged_mace',
+        'thornpeak_polearm',
+      ],
+      hushwood_longbow: ['mirefen_hunting_bow'],
+      nightglass_fang: ['mirefen_dirk'],
+      ysoleis_vigil: ['ashwood_staff', 'gravecaller_focus'],
+      stormwake_idol: ['gravecaller_focus'],
+      ashbinders_seal: ['gravecaller_ring'],
+      dawnward_signet: ['gravecaller_ring'],
+      feral_moonclasp: ['gravecaller_pendant'],
+      bell_of_the_ninth_peal: ['ashwood_staff', 'gravecaller_focus'],
+      mantle_of_borrowed_time: [
+        'gravecaller_cloth_mantle',
+        'mirefen_leather_shoulderguards',
+        'thornpeak_mail_pauldrons',
+      ],
+      boots_of_the_unbroken_road: [
+        'gravecaller_cloth_slippers',
+        'mirefen_leather_boots',
+        'thornpeak_mail_sabatons',
+      ],
+    } as const;
+
+    let compatiblePairs = 0;
+    for (const powerId of PROCEDURAL_LEGENDARY_POWER_IDS) {
+      const expected = new Set<string>(expectedByPower[powerId]);
+      for (const base of Object.values(PROCEDURAL_ITEM_BASES)) {
+        const compatible = proceduralLegendaryPowerCompatibleWithBase(
+          PROCEDURAL_LEGENDARY_POWERS[powerId],
+          base,
+        );
+        expect(compatible, powerId + ' x ' + base.id).toBe(expected.has(base.id));
+        if (compatible) compatiblePairs++;
+      }
+    }
+
+    expect(compatiblePairs).toBe(21);
+  });
+
+  it('keeps equipment nouns aligned with compatible slots and weapon types', () => {
+    const base = (id: string) => PROCEDURAL_ITEM_BASES[id];
+    expect(base('gravecaller_cloth_hood').slot).toBe('helmet');
+    expect(base('mirefen_hunting_bow').weaponType).toBe('bow');
+    expect(base('mirefen_dirk').weaponType).toBe('dagger');
+    expect(base('gravecaller_ring').slot).toBe('ring');
+    expect(base('gravecaller_pendant').slot).toBe('neck');
+
+    for (const id of PROCEDURAL_LEGENDARY_POWERS.mantle_of_borrowed_time.compatibleBaseIds) {
+      expect(base(id).slot, id).toBe('shoulder');
+    }
+    for (const id of PROCEDURAL_LEGENDARY_POWERS.boots_of_the_unbroken_road.compatibleBaseIds) {
+      expect(base(id).slot, id).toBe('feet');
+    }
+    for (const id of PROCEDURAL_LEGENDARY_POWERS.greyjaws_edge.compatibleBaseIds) {
+      expect(['sword', 'axe', 'mace', 'polearm'], id).toContain(base(id).weaponType);
+    }
+  });
   it('returns undefined instead of accepting an unknown power ID', () => {
     expect(proceduralLegendaryPower('not_a_power')).toBeUndefined();
   });

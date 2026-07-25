@@ -5,6 +5,7 @@ export type ProceduralRarity = 'common' | 'magic' | 'rare' | 'epic' | 'legendary
 export type ItemTag =
   | 'weapon'
   | 'armor'
+  | 'held_offhand'
   | 'jewelry'
   | 'shield'
   | 'caster'

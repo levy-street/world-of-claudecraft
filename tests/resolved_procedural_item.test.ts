@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { PROCEDURAL_BASE_ITEMS } from '../src/sim/content/procedural_loot';
 import { resolvedItemStats, resolvedWeaponDps } from '../src/sim/equipment/resolved_item';
 import { TWOHAND_DPS_MULT, weaponDpsBudget } from '../src/sim/item_budget';
 import type { ProceduralItemInstance } from '../src/sim/procedural_item';
@@ -171,5 +172,22 @@ describe('resolved procedural item stats', () => {
         procedural: procedural('iron_broadsword', 20, { str: 5 }),
       }),
     ).toThrow(/does not match item definition/);
+  });
+  it('scales procedural shield armor and block value from instance item level', () => {
+    const shield = PROCEDURAL_BASE_ITEMS.thornpeak_bulwark;
+    const resolved = resolvedItemStats(shield, {
+      procedural: {
+        version: 1,
+        uid: 'pi1:shield:1',
+        baseId: 'thornpeak_bulwark',
+        itemLevel: 28,
+        rarity: 'rare',
+        affixes: [],
+        generatedName: { baseId: 'thornpeak_bulwark' },
+        seed: 1,
+      },
+    });
+    expect(resolved.stats.armor).toBe(288);
+    expect(resolved.blockValue).toBe(20);
   });
 });

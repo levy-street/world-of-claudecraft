@@ -15,15 +15,27 @@ describe('procedural loot content', () => {
     expect(validateProceduralLootContent()).toEqual([]);
   });
 
-  it('ships the six-base first slice', () => {
-    expect(Object.keys(PROCEDURAL_ITEM_BASES).sort()).toEqual([
-      'ashwood_staff',
-      'gravecaller_cloth_hood',
-      'gravecaller_ring',
-      'iron_broadsword',
-      'mirefen_leather_gloves',
-      'thornpeak_mail_chest',
-    ]);
+  it('ships the complete 34-family launch taxonomy', () => {
+    const bases = Object.values(PROCEDURAL_ITEM_BASES);
+    expect(bases).toHaveLength(34);
+    expect(bases.filter((base) => base.kind === 'weapon')).toHaveLength(9);
+    expect(bases.filter((base) => base.kind === 'held_offhand')).toHaveLength(1);
+    expect(bases.filter((base) => base.armorType === 'cloth')).toHaveLength(7);
+    expect(bases.filter((base) => base.armorType === 'leather')).toHaveLength(7);
+    expect(bases.filter((base) => base.armorType === 'mail' && !base.shield)).toHaveLength(7);
+    expect(bases.filter((base) => base.slot === 'ring' || base.slot === 'neck')).toHaveLength(2);
+    expect(bases.filter((base) => base.shield)).toHaveLength(1);
+
+    const armorSlots = ['helmet', 'shoulder', 'chest', 'waist', 'legs', 'gloves', 'feet'];
+    for (const armorType of ['cloth', 'leather', 'mail'] as const) {
+      expect(
+        bases
+          .filter((base) => base.armorType === armorType && !base.shield)
+          .map((base) => base.slot)
+          .sort(),
+        armorType,
+      ).toEqual([...armorSlots].sort());
+    }
   });
 
   it('ships all twelve initial affix families', () => {

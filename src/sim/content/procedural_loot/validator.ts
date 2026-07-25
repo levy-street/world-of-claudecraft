@@ -20,11 +20,47 @@ export function validateProceduralLootContent(): string[] {
       errors.push(`base ${id} has invalid sourceLevel`);
     if (!Number.isFinite(base.slotMultiplier) || base.slotMultiplier <= 0)
       errors.push(`base ${id} has invalid slotMultiplier`);
+    if (!Number.isFinite(base.dropWeight) || base.dropWeight <= 0)
+      errors.push(`base ${id} has invalid dropWeight`);
     if (base.tags.length === 0) errors.push(`base ${id} has no tags`);
+    if (!base.visualItemId) errors.push(`base ${id} has no visualItemId`);
     if (base.kind === 'weapon' && !base.baseWeapon)
       errors.push(`weapon base ${id} has no baseWeapon`);
+    if (base.kind === 'weapon' && !base.weaponType)
+      errors.push(`weapon base ${id} has no weaponType`);
     if (base.kind !== 'weapon' && base.baseWeapon)
       errors.push(`non-weapon base ${id} has baseWeapon`);
+    if (base.kind !== 'weapon' && (base.weaponType || base.dagger))
+      errors.push(`non-weapon base ${id} has weapon metadata`);
+    if ((base.dagger === true) !== (base.weaponType === 'dagger'))
+      errors.push(`base ${id} dagger flag does not match weaponType`);
+    if (base.shield && (base.kind !== 'armor' || base.slot !== 'offhand'))
+      errors.push(`shield base ${id} must be offhand armor`);
+    if (base.shield && (!base.armorType || base.baseBlockValue === undefined))
+      errors.push(`shield base ${id} has incomplete shield data`);
+    if (!base.shield && base.baseBlockValue !== undefined)
+      errors.push(`non-shield base ${id} has baseBlockValue`);
+    if (base.kind === 'held_offhand' && !base.tags.includes('held_offhand'))
+      errors.push(`held offhand base ${id} has no held_offhand tag`);
+  }
+
+  const visualIds = Object.values(PROCEDURAL_ITEM_BASES).map((base) => base.visualItemId);
+  if (new Set(visualIds).size !== visualIds.length)
+    errors.push('procedural bases must use unique visualItemIds');
+
+  for (const base of Object.values(PROCEDURAL_ITEM_BASES)) {
+    const eligibleFamilies = new Set(
+      Object.values(PROCEDURAL_AFFIXES)
+        .filter(
+          (affix) =>
+            affix.minItemLevel <= 40 &&
+            (affix.maxItemLevel === undefined || affix.maxItemLevel >= 40) &&
+            baseEligibleForAffix(base, affix),
+        )
+        .map((affix) => affix.family),
+    );
+    if (eligibleFamilies.size < 5)
+      errors.push(`base ${base.id} has only ${eligibleFamilies.size} endgame affix families`);
   }
 
   for (const [id, affix] of Object.entries(PROCEDURAL_AFFIXES)) {

@@ -1,5 +1,7 @@
 import type { EquipmentPowerDefinition } from '../equipment/equipment_effect_types';
+import { canEquipItem } from '../equipment_rules';
 import type { PlayerClass } from '../types';
+import { PROCEDURAL_BASE_ITEMS } from './procedural_loot/item_defs';
 import type { ProceduralItemBase } from './procedural_loot/types';
 
 const HEALING_PERCENT_ROLL = { min: 14, max: 20, step: 1 } as const;
@@ -11,6 +13,7 @@ export const PROCEDURAL_LEGENDARY_POWERS = {
     name: 'Crown of the Last Pyre',
     description: 'Every third Cinderbolt scorches enemies near the target.',
     requiredClass: 'mage',
+    compatibleBaseIds: ['gravecaller_cloth_hood'],
     trigger: { event: 'ability_cast', abilityIds: ['fireball'], every: 3 },
     rolls: { potencyPct: { min: 29, max: 34, step: 1 } },
     effects: [
@@ -30,6 +33,12 @@ export const PROCEDURAL_LEGENDARY_POWERS = {
     name: "Greyjaw's Edge",
     description: 'Every third weapon hit bleeds the target and restores a little resource.',
     requiredClass: 'warrior',
+    compatibleBaseIds: [
+      'iron_broadsword',
+      'thornpeak_war_axe',
+      'iron_flanged_mace',
+      'thornpeak_polearm',
+    ],
     trigger: { event: 'weapon_hit', every: 3 },
     rolls: { potencyPct: { min: 38, max: 40, step: 1 } },
     effects: [
@@ -55,6 +64,7 @@ export const PROCEDURAL_LEGENDARY_POWERS = {
     name: 'Hushwood Longbow',
     description: 'Long Draw or Fell Shot can briefly silence its target.',
     requiredClass: 'hunter',
+    compatibleBaseIds: ['mirefen_hunting_bow'],
     trigger: {
       event: 'ability_cast',
       abilityIds: ['aimed_shot', 'arcane_shot'],
@@ -78,6 +88,7 @@ export const PROCEDURAL_LEGENDARY_POWERS = {
     name: 'Nightglass Fang',
     description: 'A kill grants a short burst of haste.',
     requiredClass: 'rogue',
+    compatibleBaseIds: ['mirefen_dirk'],
     trigger: { event: 'kill', internalCooldownMs: 8000 },
     rolls: { potencyPct: { min: 10, max: 14, step: 1 } },
     effects: [
@@ -96,6 +107,7 @@ export const PROCEDURAL_LEGENDARY_POWERS = {
     name: "Ysolei's Vigil",
     description: 'Critical healing creates a brief restorative ground area.',
     requiredClass: 'priest',
+    compatibleBaseIds: ['ashwood_staff', 'gravecaller_focus'],
     trigger: { event: 'heal', criticalOnly: true, internalCooldownMs: 8000 },
     rolls: { potencyPct: HEALING_PERCENT_ROLL },
     effects: [
@@ -117,6 +129,7 @@ export const PROCEDURAL_LEGENDARY_POWERS = {
     name: 'Stormwake Idol',
     description: 'Every fourth Arc Bolt arcs to nearby enemies.',
     requiredClass: 'shaman',
+    compatibleBaseIds: ['gravecaller_focus'],
     trigger: { event: 'ability_cast', abilityIds: ['lightning_bolt'], every: 4 },
     rolls: { potencyPct: { min: 22, max: 30, step: 1 } },
     effects: [
@@ -135,6 +148,7 @@ export const PROCEDURAL_LEGENDARY_POWERS = {
     name: "Ashbinder's Seal",
     description: 'Every fourth Gloom Bolt marks its target for added Shadow damage.',
     requiredClass: 'warlock',
+    compatibleBaseIds: ['gravecaller_ring'],
     trigger: { event: 'ability_cast', abilityIds: ['shadow_bolt'], every: 4 },
     rolls: { potencyPct: { min: 15, max: 20, step: 1 } },
     effects: [
@@ -153,6 +167,7 @@ export const PROCEDURAL_LEGENDARY_POWERS = {
     name: 'Dawnward Signet',
     description: 'Mending Light shields its recipient for a portion of the heal.',
     requiredClass: 'paladin',
+    compatibleBaseIds: ['gravecaller_ring'],
     trigger: { event: 'ability_cast', abilityIds: ['holy_light'], internalCooldownMs: 6000 },
     rolls: { potencyPct: { min: 16, max: 22, step: 1 } },
     effects: [
@@ -171,6 +186,7 @@ export const PROCEDURAL_LEGENDARY_POWERS = {
     name: 'Feral Moonclasp',
     description: 'Every third Lunar Tempest restores primary resource.',
     requiredClass: 'druid',
+    compatibleBaseIds: ['gravecaller_pendant'],
     trigger: { event: 'ability_cast', abilityIds: ['moonfire'], every: 3 },
     rolls: { resource: { min: 4, max: 7, step: 1 } },
     effects: [
@@ -187,7 +203,7 @@ export const PROCEDURAL_LEGENDARY_POWERS = {
     revision: 1,
     name: 'Bell of the Ninth Peal',
     description: 'Every second damaging spell tolls around the target.',
-    compatibleBaseIds: ['ashwood_staff', 'gravecaller_cloth_hood'],
+    compatibleBaseIds: ['ashwood_staff', 'gravecaller_focus'],
     trigger: { event: 'spell_damage', every: 2 },
     rolls: { potencyPct: { min: 25, max: 29, step: 1 } },
     effects: [
@@ -205,6 +221,11 @@ export const PROCEDURAL_LEGENDARY_POWERS = {
     id: 'mantle_of_borrowed_time',
     revision: 1,
     name: 'Mantle of Stolen Hours',
+    compatibleBaseIds: [
+      'gravecaller_cloth_mantle',
+      'mirefen_leather_shoulderguards',
+      'thornpeak_mail_pauldrons',
+    ],
     description: 'Falling below 35% health grants a brief defensive ward.',
     trigger: {
       event: 'health_changed',
@@ -226,6 +247,11 @@ export const PROCEDURAL_LEGENDARY_POWERS = {
     id: 'boots_of_the_unbroken_road',
     revision: 1,
     name: 'Boots of the Unbroken Road',
+    compatibleBaseIds: [
+      'gravecaller_cloth_slippers',
+      'mirefen_leather_boots',
+      'thornpeak_mail_sabatons',
+    ],
     description: 'Moving 15 yards grants a short movement-speed burst.',
     trigger: {
       event: 'movement',
@@ -263,5 +289,6 @@ export function proceduralLegendaryPowerCompatibleWithBase(
   if (power.compatibleBaseIds && !power.compatibleBaseIds.includes(base.id)) return false;
   if (!power.requiredClass) return true;
   if (personalLootClass && power.requiredClass !== personalLootClass) return false;
-  return !base.requiredClass || base.requiredClass.includes(power.requiredClass);
+  const definition = PROCEDURAL_BASE_ITEMS[base.id];
+  return definition !== undefined && canEquipItem(power.requiredClass, definition);
 }

@@ -1,6 +1,81 @@
 {
   "license": "CraftPix premium (royalty-free commercial). Icons purchased by Levy Street account - callum@levystreet.com",
   "iconSize": 128,
+  "proceduralSets": [
+    {
+      "version": 1,
+      "root": "procedural/v1",
+      "baseIds": [
+        "ashwood_staff",
+        "gravecaller_cloth_handwraps",
+        "gravecaller_cloth_hood",
+        "gravecaller_cloth_leggings",
+        "gravecaller_cloth_mantle",
+        "gravecaller_cloth_raiment",
+        "gravecaller_cloth_sash",
+        "gravecaller_cloth_slippers",
+        "gravecaller_focus",
+        "gravecaller_pendant",
+        "gravecaller_ring",
+        "gravecaller_wand",
+        "iron_broadsword",
+        "iron_flanged_mace",
+        "mirefen_dirk",
+        "mirefen_hunting_bow",
+        "mirefen_leather_belt",
+        "mirefen_leather_boots",
+        "mirefen_leather_gloves",
+        "mirefen_leather_hood",
+        "mirefen_leather_jerkin",
+        "mirefen_leather_leggings",
+        "mirefen_leather_shoulderguards",
+        "thornpeak_bulwark",
+        "thornpeak_crossbow",
+        "thornpeak_mail_chest",
+        "thornpeak_mail_gauntlets",
+        "thornpeak_mail_girdle",
+        "thornpeak_mail_helm",
+        "thornpeak_mail_legguards",
+        "thornpeak_mail_pauldrons",
+        "thornpeak_mail_sabatons",
+        "thornpeak_polearm",
+        "thornpeak_war_axe"
+      ],
+      "rarityFallbacks": [
+        { "rarity": "common", "path": "common.webp" },
+        { "rarity": "magic", "path": "magic.webp" },
+        { "rarity": "rare", "path": "rare.webp" },
+        { "rarity": "epic", "path": "epic.webp" },
+        { "rarity": "legendary", "path": "legendary/_fallback.webp" }
+      ],
+      "legendaryPowers": [
+        { "baseId": "ashwood_staff", "powerId": "bell_of_the_ninth_peal", "revision": 1 },
+        { "baseId": "ashwood_staff", "powerId": "ysoleis_vigil", "revision": 1 },
+        { "baseId": "gravecaller_cloth_hood", "powerId": "crown_last_pyre", "revision": 1 },
+        { "baseId": "gravecaller_cloth_mantle", "powerId": "mantle_of_borrowed_time", "revision": 1 },
+        { "baseId": "gravecaller_cloth_slippers", "powerId": "boots_of_the_unbroken_road", "revision": 1 },
+        { "baseId": "gravecaller_focus", "powerId": "bell_of_the_ninth_peal", "revision": 1 },
+        { "baseId": "gravecaller_focus", "powerId": "stormwake_idol", "revision": 1 },
+        { "baseId": "gravecaller_focus", "powerId": "ysoleis_vigil", "revision": 1 },
+        { "baseId": "gravecaller_pendant", "powerId": "feral_moonclasp", "revision": 1 },
+        { "baseId": "gravecaller_ring", "powerId": "ashbinders_seal", "revision": 1 },
+        { "baseId": "gravecaller_ring", "powerId": "dawnward_signet", "revision": 1 },
+        { "baseId": "iron_broadsword", "powerId": "greyjaws_edge", "revision": 1 },
+        { "baseId": "iron_flanged_mace", "powerId": "greyjaws_edge", "revision": 1 },
+        { "baseId": "mirefen_dirk", "powerId": "nightglass_fang", "revision": 1 },
+        { "baseId": "mirefen_hunting_bow", "powerId": "hushwood_longbow", "revision": 1 },
+        { "baseId": "mirefen_leather_boots", "powerId": "boots_of_the_unbroken_road", "revision": 1 },
+        { "baseId": "mirefen_leather_shoulderguards", "powerId": "mantle_of_borrowed_time", "revision": 1 },
+        { "baseId": "thornpeak_mail_pauldrons", "powerId": "mantle_of_borrowed_time", "revision": 1 },
+        { "baseId": "thornpeak_mail_sabatons", "powerId": "boots_of_the_unbroken_road", "revision": 1 },
+        { "baseId": "thornpeak_polearm", "powerId": "greyjaws_edge", "revision": 1 },
+        { "baseId": "thornpeak_war_axe", "powerId": "greyjaws_edge", "revision": 1 }
+      ],
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24; accepted base art and derived rarity/power variants normalized through scripts/convert_item_icons_webp.mjs",
+      "license": "World of ClaudeCraft original art (project-owned, AI-assisted, created for this game)"
+    }
+  ],
   "note": "Item icons (resources, consumables, quest items, armor equipment, and bags), curated + verified from CraftPix packs unless the entry carries its own \"license\" field, which overrides the pack license above. WebP only; add art with `npm run assets:items`.",
   "entries": [
     {
@@ -84,6 +159,14 @@
       "sourceFile": "batch-7/masters/ashwood_log.png (accepted v1)",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "ashwood_staff",
+      "name": "Ashwood Staff",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
     },
     {
       "itemId": "backpack",
@@ -716,11 +799,99 @@
       "confidence": "medium"
     },
     {
+      "itemId": "gravecaller_cloth_handwraps",
+      "name": "Gravecaller Cloth Handwraps",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "gravecaller_cloth_hood",
+      "name": "Gravecaller Cloth Hood",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "gravecaller_cloth_leggings",
+      "name": "Gravecaller Cloth Leggings",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "gravecaller_cloth_mantle",
+      "name": "Gravecaller Cloth Mantle",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "gravecaller_cloth_raiment",
+      "name": "Gravecaller Cloth Raiment",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "gravecaller_cloth_sash",
+      "name": "Gravecaller Cloth Sash",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "gravecaller_cloth_slippers",
+      "name": "Gravecaller Cloth Slippers",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "gravecaller_focus",
+      "name": "Gravecaller Focus",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "gravecaller_pendant",
+      "name": "Gravecaller Pendant",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "gravecaller_ring",
+      "name": "Gravecaller Ring",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
       "itemId": "gravecaller_sigil",
       "name": "Gravecaller's Sigil",
       "sourcePack": "generic100c",
       "sourceFile": "skill 81.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "gravecaller_wand",
+      "name": "Gravecaller Wand",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
     },
     {
       "itemId": "gravepath_treads",
@@ -893,6 +1064,22 @@
       "confidence": "medium"
     },
     {
+      "itemId": "iron_broadsword",
+      "name": "Iron Broadsword",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "iron_flanged_mace",
+      "name": "Iron Flanged Mace",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
       "itemId": "iron_mining_pick",
       "name": "Iron Mining Pick",
       "sourcePack": "farming",
@@ -976,14 +1163,6 @@
       "name": "Linen Pouch",
       "sourcePack": "woc_bags",
       "sourceFile": "WoC_Bag_03.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "silkspun_satchel",
-      "name": "Silkspun Satchel",
-      "sourcePack": "woc_bags",
-      "sourceFile": "WoC_Bag_03.png (hue-shifted silk recolor of the linen_pouch conversion; dedicated art welcome)",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
@@ -1077,6 +1256,78 @@
       "sourcePack": "hunting",
       "sourceFile": "36.png",
       "confidence": "high"
+    },
+    {
+      "itemId": "mirefen_dirk",
+      "name": "Mirefen Dirk",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "mirefen_hunting_bow",
+      "name": "Mirefen Hunting Bow",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "mirefen_leather_belt",
+      "name": "Mirefen Leather Belt",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "mirefen_leather_boots",
+      "name": "Mirefen Leather Boots",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "mirefen_leather_gloves",
+      "name": "Mirefen Leather Gloves",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "mirefen_leather_hood",
+      "name": "Mirefen Leather Hood",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "mirefen_leather_jerkin",
+      "name": "Mirefen Leather Jerkin",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "mirefen_leather_leggings",
+      "name": "Mirefen Leather Leggings",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "mirefen_leather_shoulderguards",
+      "name": "Mirefen Leather Shoulderguards",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
     },
     {
       "itemId": "mirejaw_scale_vest",
@@ -1636,6 +1887,14 @@
       "confidence": "medium"
     },
     {
+      "itemId": "silkspun_satchel",
+      "name": "Silkspun Satchel",
+      "sourcePack": "woc_bags",
+      "sourceFile": "WoC_Bag_03.png (hue-shifted silk recolor of the linen_pouch conversion; dedicated art welcome)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "silverleaf_herb",
       "name": "Sheenleaf Herb",
       "sourcePack": "woc_professions_art",
@@ -1866,6 +2125,94 @@
       "sourceFile": "batch-6/masters/thorium_ore.png (accepted v3)",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "thornpeak_bulwark",
+      "name": "Thornpeak Bulwark",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "thornpeak_crossbow",
+      "name": "Thornpeak Crossbow",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "thornpeak_mail_chest",
+      "name": "Thornpeak Mail Chest",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "thornpeak_mail_gauntlets",
+      "name": "Thornpeak Mail Gauntlets",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "thornpeak_mail_girdle",
+      "name": "Thornpeak Mail Girdle",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "thornpeak_mail_helm",
+      "name": "Thornpeak Mail Helm",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "thornpeak_mail_legguards",
+      "name": "Thornpeak Mail Legguards",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "thornpeak_mail_pauldrons",
+      "name": "Thornpeak Mail Pauldrons",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "thornpeak_mail_sabatons",
+      "name": "Thornpeak Mail Sabatons",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "thornpeak_polearm",
+      "name": "Thornpeak Polearm",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
+    },
+    {
+      "itemId": "thornpeak_war_axe",
+      "name": "Thornpeak War Axe",
+      "sourcePack": "woc_procedural_loot_art",
+      "sourceFile": "OpenAI image generation, 2026-07-24 (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (AI-assisted, created for this game)"
     },
     {
       "itemId": "tideguard_greaves",

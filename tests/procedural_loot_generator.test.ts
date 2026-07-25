@@ -15,6 +15,7 @@ import {
   generateProceduralItem,
 } from '../src/sim/loot/procedural';
 import type { ItemDropContext } from '../src/sim/procedural_item';
+import { sanitizeItemInstancePayload } from '../src/sim/procedural_item_validation';
 import type { PlayerClass } from '../src/sim/types';
 
 const BASE_IDS = Object.keys(PROCEDURAL_ITEM_BASES);
@@ -30,6 +31,17 @@ const CLASSES: PlayerClass[] = [
   'warlock',
   'druid',
 ];
+const LEGENDARY_BASE_BY_CLASS: Record<PlayerClass, string> = {
+  warrior: 'iron_broadsword',
+  paladin: 'gravecaller_ring',
+  hunter: 'mirefen_hunting_bow',
+  rogue: 'mirefen_dirk',
+  priest: 'ashwood_staff',
+  shaman: 'gravecaller_focus',
+  mage: 'gravecaller_cloth_hood',
+  warlock: 'gravecaller_ring',
+  druid: 'gravecaller_pendant',
+};
 
 function context(seed: number, recipientId?: number): ItemDropContext {
   return {
@@ -70,7 +82,7 @@ function generate(
 }
 
 describe('procedural item generator', () => {
-  it('checks 1,152 deterministic base, rarity, and seed scenarios', () => {
+  it('checks every deterministic base, rarity, and seed scenario', () => {
     let scenarios = 0;
     for (const baseId of BASE_IDS) {
       for (const rarity of RARITIES) {
@@ -113,8 +125,8 @@ describe('procedural item generator', () => {
         }
       }
     }
-    expect(scenarios).toBe(1152);
-  });
+    expect(scenarios).toBe(BASE_IDS.length * RARITIES.length * 64);
+  }, 30_000);
 
   it('produces useful variation over different seeds', () => {
     const fingerprints = new Set<string>();
@@ -137,7 +149,7 @@ describe('procedural item generator', () => {
           basePoolId: 'initial_all',
           rarityTableId: 'initial_dungeon_boss',
           sourceItemLevel: 20,
-          forcedBaseId: 'gravecaller_ring',
+          forcedBaseId: LEGENDARY_BASE_BY_CLASS[cls],
           forcedRarity: 'legendary',
           personalLootClass: cls,
         }).instance.procedural;
@@ -286,6 +298,37 @@ describe('procedural item generator', () => {
     }
   });
 
+  it('rejects invalid seeds and persists both positive uint32 boundaries', () => {
+    const input = {
+      uid: 'pi1:seed-contract:1',
+      context: context(1),
+      basePoolId: 'initial_all',
+      rarityTableId: 'initial_world',
+      sourceItemLevel: 20,
+      forcedBaseId: 'gravecaller_ring',
+      forcedRarity: 'rare' as const,
+    };
+
+    for (const seed of [0, -1, 1.5, 0x1_0000_0000]) {
+      expect(() => generateProceduralItem({ ...input, seed }), String(seed)).toThrow(
+        'procedural item seed must be an integer from 1 to 4294967295',
+      );
+    }
+
+    for (const seed of [1, 0xffffffff]) {
+      const drop = generateProceduralItem({
+        ...input,
+        seed,
+        uid: `pi1:seed-contract:${seed}`,
+        context: context(seed),
+      });
+      expect(drop.instance.procedural.seed).toBe(seed);
+      expect(sanitizeItemInstancePayload(drop.instance, 'gravecaller_ring'), String(seed)).toEqual({
+        ok: true,
+        value: drop.instance,
+      });
+    }
+  });
   it('rejects unknown pools, tables, and forced bases', () => {
     const baseInput = {
       seed: 1,

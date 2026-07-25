@@ -47,7 +47,8 @@ describe('procedural loot distribution', () => {
         personalLootClass,
       });
       expect(report.classUsableRate, personalLootClass).toBeGreaterThan(0.5);
-      expect(report.classUsableRate, personalLootClass).toBeLessThan(0.92);
+      // Shaman spans mail, caster, and melee families, but still keeps over 7% off-class drops.
+      expect(report.classUsableRate, personalLootClass).toBeLessThan(0.93);
     }
   });
 
@@ -87,7 +88,7 @@ describe('procedural loot distribution', () => {
           "4": 171,
           "5": 27,
         },
-        "averageItemAffixBudget": 2.031967,
+        "averageItemAffixBudget": 2.088633,
         "itemLevelCounts": {
           "17": 3266,
           "18": 3309,
@@ -95,7 +96,7 @@ describe('procedural loot distribution', () => {
           "20": 27,
           "21": 1,
         },
-        "maximumItemAffixBudget": 32.88,
+        "maximumItemAffixBudget": 36.42,
         "rarityCounts": {
           "common": 7048,
           "epic": 58,

@@ -3,6 +3,7 @@ import { handleDeath } from '../src/sim/combat/damage';
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import type { ProceduralLegendaryPowerId } from '../src/sim/content/procedural_legendary_powers';
 import { PROCEDURAL_LEGENDARY_POWERS } from '../src/sim/content/procedural_legendary_powers';
+import { PROCEDURAL_ITEM_BASES } from '../src/sim/content/procedural_loot';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { generateProceduralItem } from '../src/sim/loot/procedural';
@@ -19,8 +20,9 @@ function makeSim(cls: PlayerClass): Sim {
 
 function powerPayload(
   powerId: ProceduralLegendaryPowerId,
-  baseId = 'gravecaller_ring',
+  baseId: string | undefined = PROCEDURAL_LEGENDARY_POWERS[powerId].compatibleBaseIds?.[0],
 ): ItemInstancePayload {
+  if (!baseId) throw new Error(`legendary power ${powerId} has no compatible base`);
   const definition = PROCEDURAL_LEGENDARY_POWERS[powerId];
   const uid = `pi1:equipment-integration:${++uidSequence}`;
   const generated = generateProceduralItem({
@@ -52,15 +54,22 @@ function powerPayload(
 function equipPower(
   sim: Sim,
   powerId: ProceduralLegendaryPowerId,
-  slot: EquipSlot = 'ring1',
-  baseId = 'gravecaller_ring',
+  slot?: EquipSlot,
+  baseId?: string,
 ): ItemInstancePayload {
-  const payload = powerPayload(powerId, baseId);
+  const resolvedBaseId = baseId ?? PROCEDURAL_LEGENDARY_POWERS[powerId].compatibleBaseIds?.[0];
+  if (!resolvedBaseId) throw new Error(`legendary power ${powerId} has no compatible base`);
+  const base = PROCEDURAL_ITEM_BASES[resolvedBaseId];
+  if (!base)
+    throw new Error(`legendary power ${powerId} references unknown base ${resolvedBaseId}`);
+  const resolvedSlot: EquipSlot =
+    slot ?? (base.slot === 'ring' ? 'ring1' : (base.slot as EquipSlot));
+  const payload = powerPayload(powerId, resolvedBaseId);
   if (!payload.procedural) throw new Error('legendary fixture lost procedural payload');
   const uid = payload.procedural.uid;
-  sim.addItemInstance(baseId, payload, sim.playerId);
-  sim.equipItemToSlot(baseId, slot, sim.playerId, uid);
-  expect(sim.players.get(sim.playerId)?.equipmentInstance[slot]?.procedural?.uid).toBe(uid);
+  sim.addItemInstance(resolvedBaseId, payload, sim.playerId);
+  sim.equipItemToSlot(resolvedBaseId, resolvedSlot, sim.playerId, uid);
+  expect(sim.players.get(sim.playerId)?.equipmentInstance[resolvedSlot]?.procedural?.uid).toBe(uid);
   return payload;
 }
 
@@ -213,7 +222,7 @@ describe('legendary equipment integration', () => {
   it('rejects multiple equipped powers and resets cadence on real unequip', () => {
     const invalid = makeSim('mage');
     equipPower(invalid, 'bell_of_the_ninth_peal', 'mainhand', 'ashwood_staff');
-    equipPower(invalid, 'boots_of_the_unbroken_road', 'ring2');
+    equipPower(invalid, 'boots_of_the_unbroken_road');
     invalid.ctx.triggerEquipmentEffects(invalid.player, { kind: 'movement', movementDistance: 20 });
     expect(invalid.player.auras.some((a) => a.kind === 'buff_speed')).toBe(false);
 
@@ -222,10 +231,10 @@ describe('legendary equipment integration', () => {
     const target = hostile(reset, 2);
     onCastCompleted(reset.ctx, reset.player, 'fireball', target);
     onCastCompleted(reset.ctx, reset.player, 'fireball', target);
-    expect(reset.unequipItem('ring1')).toBe(true);
+    expect(reset.unequipItem('helmet')).toBe(true);
     const resetUid = payload.procedural?.uid;
     if (!resetUid) throw new Error('legendary fixture lost procedural UID');
-    reset.equipItemToSlot('gravecaller_ring', 'ring1', reset.playerId, resetUid);
+    reset.equipItemToSlot('gravecaller_cloth_hood', 'helmet', reset.playerId, resetUid);
     onCastCompleted(reset.ctx, reset.player, 'fireball', target);
     expect(target.hp).toBe(target.maxHp);
   });

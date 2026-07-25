@@ -439,7 +439,7 @@ import {
   frostOverlayCharges,
   procOverlayState,
 } from './proc_overlay_view';
-import { proceduralItemVisualId } from './procedural_item_art';
+import { resolveProceduralItemIcon } from './procedural_item_art';
 import {
   type ItemPresentationInstance,
   itemPresentationName,
@@ -4233,8 +4233,8 @@ export class Hud {
 
   private itemIcon(item: ItemDef, instance?: ItemPresentationInstance): string {
     const q = itemPresentationQuality(item, instance);
-    const visualId = proceduralItemVisualId(item.id);
-    return `<img class="item-icon q-${q}" src="${iconDataUrl('item', visualId)}" alt="" draggable="false">`;
+    const src = resolveProceduralItemIcon(item.id, instance)?.url ?? iconDataUrl('item', item.id);
+    return `<img class="item-icon q-${q}" src="${src}" alt="" draggable="false">`;
   }
 
   moneyHtml(copper: number): string {

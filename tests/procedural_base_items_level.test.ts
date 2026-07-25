@@ -48,6 +48,25 @@ describe('procedural base item definitions and level gates', () => {
     }
   });
 
+  it('materializes dagger, shield, and caster-offhand gameplay metadata', () => {
+    const dagger = PROCEDURAL_BASE_ITEMS.mirefen_dirk;
+    expect(dagger.kind).toBe('weapon');
+    if (dagger.kind !== 'weapon') throw new Error('mirefen dirk must be a weapon');
+    expect(dagger.weapon.dagger).toBe(true);
+
+    const shield = PROCEDURAL_BASE_ITEMS.thornpeak_bulwark;
+    expect(shield.kind).toBe('armor');
+    if (shield.kind !== 'armor' || shield.slot !== 'offhand')
+      throw new Error('thornpeak bulwark must be offhand armor');
+    expect(shield.slot).toBe('offhand');
+    expect(shield.shield).toBe(true);
+    expect(shield.blockValue).toBe(10);
+    expect(shield.stats?.armor).toBe(144);
+
+    const focus = PROCEDURAL_BASE_ITEMS.gravecaller_focus;
+    expect(focus.kind).toBe('held_offhand');
+    expect(focus.slot).toBe('offhand');
+  });
   it.each([
     ['common', 18, 18],
     ['magic', 18, 17],

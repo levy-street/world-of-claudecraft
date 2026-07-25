@@ -119,6 +119,8 @@ describe('weapon type classification', () => {
       if (/^(adv_)?axe/.test(variant)) return 'axe';
       if (/^(adv_)?wand/.test(variant)) return 'wand';
       if (/^spear|^scythe/.test(variant)) return 'polearm';
+      if (/bow/.test(variant) && !/crossbow/.test(variant)) return 'bow';
+      if (/crossbow/.test(variant)) return 'crossbow';
       return null;
     };
     for (const id of weaponIds) {

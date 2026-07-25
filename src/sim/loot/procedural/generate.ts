@@ -83,7 +83,24 @@ function rarityFromTable(rng: Rng, table: RarityTable): ActiveRarity {
   ][0];
 }
 
-function chooseBase(rng: Rng, input: GenerateProceduralItemInput): ProceduralItemBase {
+function baseHasCompatibleLegendary(
+  base: ProceduralItemBase,
+  personalLootClass: PlayerClass | undefined,
+): boolean {
+  return PROCEDURAL_LEGENDARY_POWER_IDS.some((id) =>
+    proceduralLegendaryPowerCompatibleWithBase(
+      PROCEDURAL_LEGENDARY_POWERS[id],
+      base,
+      personalLootClass,
+    ),
+  );
+}
+
+function chooseBase(
+  rng: Rng,
+  input: GenerateProceduralItemInput,
+  rarity: ActiveRarity,
+): ProceduralItemBase {
   const pool = PROCEDURAL_BASE_POOLS[input.basePoolId];
   if (!pool) throw new Error(`unknown procedural base pool ${input.basePoolId}`);
   const poolBases = pool.baseIds.map((id) => PROCEDURAL_ITEM_BASES[id]);
@@ -91,22 +108,35 @@ function chooseBase(rng: Rng, input: GenerateProceduralItemInput): ProceduralIte
     throw new Error(`procedural base pool ${input.basePoolId} contains an unknown base`);
   const bases = input.forcedBaseId
     ? poolBases
-    : poolBases.filter((base) => base.sourceLevel <= input.sourceItemLevel);
+    : poolBases.filter(
+        (base) =>
+          base.sourceLevel <= input.sourceItemLevel &&
+          (rarity !== 'legendary' || baseHasCompatibleLegendary(base, input.personalLootClass)),
+      );
   if (bases.length === 0)
     throw new Error(
       `procedural base pool ${input.basePoolId} has no base at source level ${input.sourceItemLevel}`,
     );
   const classTags = input.personalLootClass ? CLASS_TAG_BIAS[input.personalLootClass] : [];
   const weights = bases.map((base) => {
-    if (input.personalLootClass && base.requiredClass?.includes(input.personalLootClass)) return 3;
-    if (classTags.some((tag) => base.tags.includes(tag))) return 2;
-    return 1;
+    const classMultiplier =
+      input.personalLootClass && base.requiredClass?.includes(input.personalLootClass)
+        ? 3
+        : classTags.some((tag) => base.tags.includes(tag))
+          ? 2
+          : 1;
+    return base.dropWeight * classMultiplier;
   });
   const selected = bases[weightedIndex(rng, weights)];
   if (!input.forcedBaseId) return selected;
   const forced = PROCEDURAL_ITEM_BASES[input.forcedBaseId];
   if (!forced || !pool.baseIds.includes(forced.id))
     throw new Error(`forced base ${input.forcedBaseId} is not in pool ${input.basePoolId}`);
+  if (rarity === 'legendary' && !baseHasCompatibleLegendary(forced, input.personalLootClass))
+    throw new Error(
+      `forced base ${input.forcedBaseId} has no compatible legendary power` +
+        (input.personalLootClass ? ` for ${input.personalLootClass}` : ''),
+    );
   return forced;
 }
 
@@ -290,6 +320,10 @@ export function calculateProceduralBudget(
 export function generateProceduralItem(
   input: GenerateProceduralItemInput,
 ): GeneratedProceduralDrop {
+  if (!Number.isInteger(input.seed) || input.seed < 1 || input.seed > 0xffffffff) {
+    throw new Error('procedural item seed must be an integer from 1 to 4294967295');
+  }
+
   const rng = new Rng(input.seed);
 
   // Fixed draw order:
@@ -301,7 +335,7 @@ export function generateProceduralItem(
   if (!rarityTable) throw new Error(`unknown rarity table ${input.rarityTableId}`);
   const rolledRarity = rarityFromTable(rng, rarityTable);
   const rarity = input.forcedRarity ?? rolledRarity;
-  const base = chooseBase(rng, input);
+  const base = chooseBase(rng, input, rarity);
   const itemLevel = forcedItemLevel(
     input.forcedItemLevel,
     itemLevelFromSource(rng, input.sourceItemLevel, rarity),

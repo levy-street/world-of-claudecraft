@@ -165,28 +165,29 @@ describe('procedural item validation', () => {
 
   it('rejects non-finite, out-of-range, and non-quantized legendary rolls', () => {
     const durationPower = PROCEDURAL_LEGENDARY_POWERS.hushwood_longbow;
-    const fixture = validLegendaryPayload();
+    const baseId = 'mirefen_hunting_bow';
+    const fixture = validLegendaryPayload(baseId);
     fixture.procedural.legendaryPowerId = durationPower.id;
     fixture.procedural.powerRevision = durationPower.revision;
     fixture.procedural.generatedName.legendaryNameId = durationPower.id;
 
     const nonFinite = structuredClone(fixture);
     nonFinite.procedural.legendaryRolls = { durationMs: Number.NaN };
-    expect(sanitizeItemInstancePayload(nonFinite, 'gravecaller_ring')).toEqual({
+    expect(sanitizeItemInstancePayload(nonFinite, baseId)).toEqual({
       ok: false,
       error: 'invalid legendary roll durationMs',
     });
 
     const outOfRange = structuredClone(fixture);
     outOfRange.procedural.legendaryRolls = { durationMs: 1300 };
-    expect(sanitizeItemInstancePayload(outOfRange, 'gravecaller_ring')).toEqual({
+    expect(sanitizeItemInstancePayload(outOfRange, baseId)).toEqual({
       ok: false,
       error: 'invalid legendary roll durationMs',
     });
 
     const nonQuantized = structuredClone(fixture);
     nonQuantized.procedural.legendaryRolls = { durationMs: 850 };
-    expect(sanitizeItemInstancePayload(nonQuantized, 'gravecaller_ring')).toEqual({
+    expect(sanitizeItemInstancePayload(nonQuantized, baseId)).toEqual({
       ok: false,
       error: 'legendary roll durationMs is not quantized',
     });

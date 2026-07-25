@@ -86,7 +86,7 @@ export const PROCEDURAL_AFFIXES: Record<string, AffixDefinition> = {
     position: 'prefix',
     displayName: 'Stalwart',
     nameFragmentId: 'procedural.name.stalwart',
-    tags: ['armor', 'weapon', 'jewelry'],
+    tags: ['armor', 'weapon', 'held_offhand', 'jewelry'],
     minItemLevel: 1,
     weight: 1.2,
     tiers: tiers('sta', [
@@ -150,7 +150,7 @@ export const PROCEDURAL_AFFIXES: Record<string, AffixDefinition> = {
     position: 'suffix',
     displayName: 'of Striking',
     nameFragmentId: 'procedural.name.of_striking',
-    tags: ['armor', 'weapon', 'jewelry'],
+    tags: ['armor', 'weapon', 'held_offhand', 'jewelry'],
     minItemLevel: 4,
     weight: 0.8,
     tiers: tiers('critRating', [
@@ -166,7 +166,7 @@ export const PROCEDURAL_AFFIXES: Record<string, AffixDefinition> = {
     position: 'suffix',
     displayName: 'of Alacrity',
     nameFragmentId: 'procedural.name.of_alacrity',
-    tags: ['armor', 'weapon', 'jewelry'],
+    tags: ['armor', 'weapon', 'held_offhand', 'jewelry'],
     minItemLevel: 6,
     weight: 0.75,
     tiers: tiers('hasteRating', [
@@ -182,7 +182,7 @@ export const PROCEDURAL_AFFIXES: Record<string, AffixDefinition> = {
     position: 'suffix',
     displayName: 'of Precision',
     nameFragmentId: 'procedural.name.of_precision',
-    tags: ['armor', 'weapon', 'jewelry'],
+    tags: ['armor', 'weapon', 'held_offhand', 'jewelry'],
     minItemLevel: 10,
     weight: 0.65,
     tiers: tiers('hitRating', [
