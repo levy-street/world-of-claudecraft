@@ -100,6 +100,23 @@ export interface PropCellRuntime {
 }
 
 /**
+ * Per-frame entry: computes the mode inline (no per-cell allocation on the
+ * frame path) and applies it. `propCellMode` stays exported for tests and
+ * callers that want the decision alone.
+ */
+export function updatePropCell(
+  cell: PropCellRuntime & { bounds: PropCellBounds },
+  camX: number,
+  camZ: number,
+  fogFar: number,
+  swapDistance = PROP_FAR_SWAP_DISTANCE,
+): void {
+  const dist = propCellBoxDistance(cell.bounds, camX, camZ);
+  const farMode = dist >= swapDistance;
+  applyPropCellModeFlags(cell, farMode, farMode && dist < fogFar);
+}
+
+/**
  * Apply a computed mode to a cell, edge-triggered: bake visibility follows
  * (near mode keeps the bake visible for its shadow-only role; far mode hides
  * it past the fog), and on a mode flip the bake count gate, the members'
@@ -108,18 +125,26 @@ export interface PropCellRuntime {
  * the cell swaps back).
  */
 export function applyPropCellMode(cell: PropCellRuntime, mode: PropCellMode): void {
-  const visible = mode.farMode ? mode.showMerged : true;
+  applyPropCellModeFlags(cell, mode.farMode, mode.showMerged);
+}
+
+function applyPropCellModeFlags(
+  cell: PropCellRuntime,
+  farMode: boolean,
+  showMerged: boolean,
+): void {
+  const visible = farMode ? showMerged : true;
   if (visible !== cell.visible) {
     cell.visible = visible;
     for (const m of cell.meshes) m.visible = visible;
   }
-  if (mode.farMode === cell.farMode) return;
-  cell.farMode = mode.farMode;
-  for (const m of cell.meshes) m.count = mode.farMode ? 1 : 0;
+  if (farMode === cell.farMode) return;
+  cell.farMode = farMode;
+  for (const m of cell.meshes) m.count = farMode ? 1 : 0;
   for (const h of cell.hideables) {
-    h.suppressed = mode.farMode;
-    for (const b of h.bakeMeshes) b.mesh.visible = !mode.farMode;
-    if (mode.farMode && h.hidden) {
+    h.suppressed = farMode;
+    for (const b of h.bakeMeshes) b.mesh.visible = !farMode;
+    if (farMode && h.hidden) {
       h.hidden = false;
       for (const m of h.mats) {
         m.mat.colorWrite = true;

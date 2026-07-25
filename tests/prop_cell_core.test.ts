@@ -21,9 +21,13 @@ describe('propCellKey', () => {
 
   it('pins the cell size and swap distance the props dual representation uses', () => {
     expect(PROP_FAR_CELL_SIZE).toBe(120);
-    // Must stay comfortably above the ghost reach: one camera boom (~14u)
-    // plus the largest footprint radius (~6u).
+    // Must stay above the ghost reach or the chase camera can sit inside an
+    // opaque building: the max camera boom is 22 (src/game/input.ts camDist
+    // clamp; the director's vista/drift caps stay below it) plus the largest
+    // structure footprint radius (~8). Raising the zoom clamp past this
+    // margin requires raising the swap distance with it.
     expect(PROP_FAR_SWAP_DISTANCE).toBe(40);
+    expect(PROP_FAR_SWAP_DISTANCE).toBeGreaterThanOrEqual(22 + 8 + 8);
   });
 });
 

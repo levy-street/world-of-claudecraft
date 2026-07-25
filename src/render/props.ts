@@ -21,12 +21,7 @@ import {
   isEastbrookRebuildWell,
 } from './eastbrook_town';
 import { GFX, sharedUniforms, surfaceMat } from './gfx';
-import {
-  applyPropCellMode,
-  type PropCellBounds,
-  propCellKey,
-  propCellMode,
-} from './prop_cell_core';
+import { type PropCellBounds, propCellKey, updatePropCell } from './prop_cell_core';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -692,6 +687,7 @@ function buildDelveEmbers(
 export function buildProps(seed: number, delveLabel?: (delveId: string) => string): PropsResult {
   const group = new THREE.Group();
   const flames: THREE.Mesh[] = [];
+  const flameSet = new Set<THREE.Mesh>(); // membership mirror for the bake-eligibility scan
   const fireLights: THREE.PointLight[] = [];
   const activeContent = getActiveWorldContent();
   const builtInWorld = activeContent === BUILTIN_WORLD;
@@ -721,7 +717,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       // Animated flames and transparent meshes stay live in both modes (the
       // bake would freeze the flicker or break blend ordering).
       const srcMat = mesh.material as THREE.Material;
-      if (!flames.includes(mesh) && srcMat.transparent !== true) {
+      if (!flameSet.has(mesh) && srcMat.transparent !== true) {
         bakeMeshes.push({ mesh, srcMat });
       }
       if (lowProps) return;
@@ -997,6 +993,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     flame.scale.setScalar(1.15);
     g.add(flame);
     flames.push(flame);
+    flameSet.add(flame);
     noShadow.add(flame);
     const light = new THREE.PointLight(0xff8830, 12, 16, 2);
     light.position.y = 1.2;
@@ -1452,6 +1449,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       flame.scale.setScalar(0.72);
       bg.add(flame);
       flames.push(flame);
+      flameSet.add(flame);
       noShadow.add(flame);
       const light = new THREE.PointLight(0xff8a3a, 9, 13, 2);
       light.position.y = postH + 0.55;
@@ -1574,7 +1572,11 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // Far-cell merged bakes for the hideables (dual representation): identical
   // world-baked geometry on the SHARED pre-clone materials, one mesh per
   // (cell, material, castShadow). The per-frame swap lives in update().
-  const farCells = buildFarPropCells(group, hideables);
+  // Constrained-memory profiles (phone WebKit, native iOS) skip the bake:
+  // duplicating the prop geometry at world entry is exactly the allocation
+  // spike the v0.27.2 memory hotfix class guards against, and the draw-call
+  // win matters most on the desktop tiers.
+  const farCells = GFX.constrainedMemory ? [] : buildFarPropCells(group, hideables);
 
   return {
     group,
@@ -1597,7 +1599,7 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       // (where the ghost fade can fire) draw the individuals while the bake
       // stays as the shadow-only caster. Pixel-identical both ways.
       for (const cell of farCells) {
-        applyPropCellMode(cell, propCellMode(cell.bounds, camX, camZ, fogFar));
+        updatePropCell(cell, camX, camZ, fogFar);
       }
       for (const h of hideables) {
         const dx = camX - h.x,
@@ -1877,6 +1879,7 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
   interface CellBucket {
     material: THREE.Material;
     castShadow: boolean;
+    receiveShadow: boolean;
     geoms: THREE.BufferGeometry[];
   }
   interface CellBuild {
@@ -1904,10 +1907,15 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
     }
     cell.hideables.push(h);
     for (const { mesh, srcMat } of h.bakeMeshes) {
-      const key = `${srcMat.uuid}:${mesh.castShadow ? 1 : 0}`;
+      const key = `${srcMat.uuid}:${mesh.castShadow ? 1 : 0}:${mesh.receiveShadow ? 1 : 0}`;
       let bucket = cell.buckets.get(key);
       if (!bucket) {
-        bucket = { material: srcMat, castShadow: mesh.castShadow, geoms: [] };
+        bucket = {
+          material: srcMat,
+          castShadow: mesh.castShadow,
+          receiveShadow: mesh.receiveShadow,
+          geoms: [],
+        };
         cell.buckets.set(key, bucket);
       }
       const geo = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
@@ -1952,7 +1960,7 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
       mesh.boundingBox = geo.boundingBox ? geo.boundingBox.clone() : null;
       mesh.boundingSphere = geo.boundingSphere ? geo.boundingSphere.clone() : null;
       mesh.castShadow = bucket.castShadow;
-      mesh.receiveShadow = true;
+      mesh.receiveShadow = bucket.receiveShadow;
       // Near mode: shadow draw only. The hooks restore the instance for the
       // shadow pass and drop it again so the color pass skips the bake while
       // the individuals draw; far mode leaves the instance up for both.
