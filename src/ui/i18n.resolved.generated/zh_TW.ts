@@ -6387,6 +6387,11 @@ export const zh_TW: EnTranslations = {
       "playerLevelClassTitle": "{name} - {level} 級 {className}",
       "noChallengers": "還沒有已排名的挑戰者 - 成為第一個。",
       "matchInProgress": "正在對戰 {name}。",
+      "mapName": "地圖：{name}",
+      "map": {
+        "coliseum": "灰燼競技場",
+        "drownedCourt": "沉沒王庭"
+      },
       "leaveQueue": "離開佇列",
       "searching": "正在尋找對手...（佇列中 {count} 人）",
       "enterQueue": "加入佇列",

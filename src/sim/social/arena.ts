@@ -19,12 +19,7 @@
 
 import { ARENA_SLOT_COUNT, arenaOrigin, DUNGEON_X_THRESHOLD } from '../data';
 import * as deedsMod from '../deeds';
-import {
-  ARENA_SPAWN_A,
-  ARENA_SPAWN_B,
-  ARENA_SPAWNS_A_2v2,
-  ARENA_SPAWNS_B_2v2,
-} from '../dungeon_layout';
+import { arenaMapForSlot } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
 import { awardFiestaCompletionHonor, awardRankedArenaWinHonor, honorTeamIdentity } from '../pvp';
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools, PlayerMeta } from '../sim';
@@ -409,7 +404,26 @@ export function arenaDequeue(ctx: SimContext, pid: number): boolean {
   return false;
 }
 
-export function freeArenaSlot(ctx: SimContext): number | null {
+// Arena slots host fixed maps by parity (EVEN = Ashen Coliseum, ODD = The
+// Drowned Court; ARENA_MAPS in dungeon_layout.ts). Slot choice is fully
+// deterministic and rng-free:
+// - Ranked (1v1/2v2) rotates maps by preferring the parity of the id the next
+//   match will take (nextArenaMatchId % 2), falling back to any free slot when
+//   the preferred parity is fully busy.
+// - Fiesta is HARD-pinned to even (Coliseum) slots: its ring tuning never
+//   meets the Drowned Court. When every even slot is busy the bout waits for
+//   one rather than spilling onto an odd slot.
+export function freeArenaSlot(ctx: SimContext, format?: ArenaFormat): number | null {
+  if (format === 'fiesta') {
+    for (let i = 0; i < ARENA_SLOT_COUNT; i += 2) {
+      if (!ctx.arenaBusySlots.has(i)) return i;
+    }
+    return null;
+  }
+  const preferred = ((ctx.nextArenaMatchId % 2) + 2) % 2;
+  for (let i = preferred; i < ARENA_SLOT_COUNT; i += 2) {
+    if (!ctx.arenaBusySlots.has(i)) return i;
+  }
   for (let i = 0; i < ARENA_SLOT_COUNT; i++) {
     if (!ctx.arenaBusySlots.has(i)) return i;
   }
@@ -672,7 +686,7 @@ export function matchmakeTeamFormat(ctx: SimContext, fmt: '2v2' | 'fiesta'): voi
   let guard = ARENA_SLOT_COUNT + 1;
   while (guard-- > 0) {
     pruneTeamQueue(ctx, fmt);
-    if (freeArenaSlot(ctx) === null) return;
+    if (freeArenaSlot(ctx, fmt) === null) return;
     const queue = fmt === 'fiesta' ? ctx.arenaQueueFiesta : ctx.arenaQueue2v2;
 
     const premades = queue.filter((u) => u.pids.length === 2);
@@ -747,7 +761,7 @@ export function startArenaMatch(
   teamA: number[],
   teamB: number[],
 ): void {
-  const slot = freeArenaSlot(ctx);
+  const slot = freeArenaSlot(ctx, format);
   const allPids = [...teamA, ...teamB];
   const entities = allPids.map((pid) => ctx.entities.get(pid));
   const metas = allPids.map((pid) => ctx.players.get(pid));
@@ -799,12 +813,14 @@ export function startArenaMatch(
   };
   for (const pid of allPids) ctx.arenaMatches.set(pid, match);
   const origin = arenaOrigin(slot);
+  // Spawns come from the slot's fixed map (parity-selected, never rng).
+  const map = arenaMapForSlot(slot);
   if (format === '1v1') {
-    placeInArena(ctx, entities[0]!, origin, ARENA_SPAWN_A);
-    placeInArena(ctx, entities[1]!, origin, ARENA_SPAWN_B);
+    placeInArena(ctx, entities[0]!, origin, map.spawnA);
+    placeInArena(ctx, entities[1]!, origin, map.spawnB);
   } else {
-    placeTeamInArena(ctx, teamA, origin, ARENA_SPAWNS_A_2v2);
-    placeTeamInArena(ctx, teamB, origin, ARENA_SPAWNS_B_2v2);
+    placeTeamInArena(ctx, teamA, origin, map.spawnsA2v2);
+    placeTeamInArena(ctx, teamB, origin, map.spawnsB2v2);
   }
   // Fiesta: everyone fights at a balanced level 20 — standardize before the
   // clean-slate reset so countdown stats/abilities already reflect it.

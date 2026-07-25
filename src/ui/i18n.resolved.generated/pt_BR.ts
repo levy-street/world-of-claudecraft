@@ -6387,6 +6387,11 @@ export const pt_BR: EnTranslations = {
       "playerLevelClassTitle": "{name} - Nv {level} {className}",
       "noChallengers": "Nenhum desafiante ranqueado ainda - seja o primeiro.",
       "matchInProgress": "Partida em andamento contra {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Sair da fila",
       "searching": "Procurando oponente... ({count} na fila)",
       "enterQueue": "Entrar na fila",

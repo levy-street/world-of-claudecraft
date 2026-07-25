@@ -6387,6 +6387,11 @@ export const ru_RU: EnTranslations = {
       "playerLevelClassTitle": "{name} - ур. {level} {className}",
       "noChallengers": "Рейтинговых претендентов пока нет - станьте первым.",
       "matchInProgress": "Бой идет против {name}.",
+      "mapName": "Карта: {name}",
+      "map": {
+        "coliseum": "Пепельный Колизей",
+        "drownedCourt": "Затонувший Двор"
+      },
       "leaveQueue": "Покинуть очередь",
       "searching": "Поиск соперника... ({count} в очереди)",
       "enterQueue": "Встать в очередь",

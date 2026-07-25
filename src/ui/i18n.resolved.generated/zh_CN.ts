@@ -6387,6 +6387,11 @@ export const zh_CN: EnTranslations = {
       "playerLevelClassTitle": "{name} - {level} 级 {className}",
       "noChallengers": "还没有已排名的挑战者 - 成为第一个。",
       "matchInProgress": "正在对战 {name}。",
+      "mapName": "地图：{name}",
+      "map": {
+        "coliseum": "灰烬斗技场",
+        "drownedCourt": "沉没王庭"
+      },
       "leaveQueue": "离开队列",
       "searching": "正在寻找对手...（队列中 {count} 人）",
       "enterQueue": "加入队列",

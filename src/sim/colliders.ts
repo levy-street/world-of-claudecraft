@@ -23,6 +23,7 @@ import { isLitanyModuleId, litanyModuleLosColliders } from './delve_litany_layou
 import {
   ARENA_LAYOUT,
   CRYPT_LAYOUT,
+  DROWNED_COURT_LAYOUT,
   layoutColliders,
   NYTHRAXIS_LAYOUT,
   SANCTUM_LAYOUT,
@@ -343,7 +344,16 @@ const CRYPT_COLLIDERS: Collider[] = layoutColliders(CRYPT_LAYOUT);
 const SANCTUM_COLLIDERS: Collider[] = layoutColliders(SANCTUM_LAYOUT);
 const TEMPLE_COLLIDERS: Collider[] = layoutColliders(TEMPLE_LAYOUT);
 const ARENA_COLLIDERS: Collider[] = layoutColliders(ARENA_LAYOUT);
+const DROWNED_COURT_COLLIDERS: Collider[] = layoutColliders(DROWNED_COURT_LAYOUT);
 const NYTHRAXIS_COLLIDERS: Collider[] = layoutColliders(NYTHRAXIS_LAYOUT);
+
+// Arena slots host fixed maps by slot parity (EVEN = Coliseum, ODD = Drowned
+// Court; see ARENA_MAPS in dungeon_layout.ts). Both sets are built once at
+// module load, so per-slot collision stays fully static. Exported for the
+// per-slot layout pin tests.
+export function arenaCollidersForSlot(slot: number): Collider[] {
+  return ((slot % 2) + 2) % 2 === 1 ? DROWNED_COURT_COLLIDERS : ARENA_COLLIDERS;
+}
 
 // Interior collider sets keyed by DungeonDef.interior.
 const INTERIOR_COLLIDERS: Record<string, Collider[]> = {
@@ -523,7 +533,7 @@ export function resolvePosition(
   }
   if (isArenaPos(x)) {
     const o = arenaOriginAt(z);
-    const local = resolveAgainst(ARENA_COLLIDERS, x - o.x, z - o.z, r, ignoreFences);
+    const local = resolveAgainst(arenaCollidersForSlot(o.slot), x - o.x, z - o.z, r, ignoreFences);
     return { x: local.x + o.x, z: local.z + o.z };
   }
   if (x > DUNGEON_X_THRESHOLD) {
@@ -792,7 +802,7 @@ export function cameraOcclusion(
   if (isArenaPos(ax)) {
     const o = arenaOriginAt(az);
     return sweepColliders(
-      ARENA_COLLIDERS,
+      arenaCollidersForSlot(o.slot),
       ax - o.x,
       ay,
       az - o.z,
@@ -861,7 +871,7 @@ function sightBlockedAt(seed: number, x: number, z: number, r: number, sightY: n
   }
   if (isArenaPos(x)) {
     const o = arenaOriginAt(z);
-    return overlapsAny(ARENA_COLLIDERS, x - o.x, z - o.z, false);
+    return overlapsAny(arenaCollidersForSlot(o.slot), x - o.x, z - o.z, false);
   }
   if (x > DUNGEON_X_THRESHOLD) {
     const { ox, oz, interior } = instanceLocal(x, z);

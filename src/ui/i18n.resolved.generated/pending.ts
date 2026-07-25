@@ -10,6 +10,9 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hud.arena.map.coliseum",
+    "hud.arena.map.drownedCourt",
+    "hud.arena.mapName",
     "hudChrome.bags.itemAriaBound",
     "hudChrome.bags.itemAriaEnchanted",
     "hudChrome.enchanting.tier.base",
@@ -41,6 +44,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "es_ES": [
+    "hud.arena.map.coliseum",
+    "hud.arena.map.drownedCourt",
+    "hud.arena.mapName",
     "hudChrome.bags.itemAriaBound",
     "hudChrome.bags.itemAriaEnchanted",
     "hudChrome.enchanting.tier.base",
@@ -72,6 +78,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "fr_FR": [
+    "hud.arena.map.coliseum",
+    "hud.arena.map.drownedCourt",
+    "hud.arena.mapName",
     "hudChrome.bags.itemAriaBound",
     "hudChrome.bags.itemAriaEnchanted",
     "hudChrome.enchanting.tier.base",
@@ -103,6 +112,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "fr_CA": [
+    "hud.arena.map.coliseum",
+    "hud.arena.map.drownedCourt",
+    "hud.arena.mapName",
     "hudChrome.bags.itemAriaBound",
     "hudChrome.bags.itemAriaEnchanted",
     "hudChrome.enchanting.tier.base",
@@ -135,6 +147,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "hud.arena.map.coliseum",
+    "hud.arena.map.drownedCourt",
+    "hud.arena.mapName",
     "hudChrome.bags.itemAriaBound",
     "hudChrome.bags.itemAriaEnchanted",
     "hudChrome.enchanting.tier.base",
@@ -166,6 +181,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "de_DE": [
+    "hud.arena.map.coliseum",
+    "hud.arena.map.drownedCourt",
+    "hud.arena.mapName",
     "hudChrome.bags.itemAriaBound",
     "hudChrome.bags.itemAriaEnchanted",
     "hudChrome.enchanting.tier.base",
@@ -201,6 +219,9 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hud.arena.map.coliseum",
+    "hud.arena.map.drownedCourt",
+    "hud.arena.mapName",
     "hudChrome.bags.itemAriaBound",
     "hudChrome.bags.itemAriaEnchanted",
     "hudChrome.enchanting.tier.base",
@@ -233,6 +254,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "hud.arena.map.coliseum",
+    "hud.arena.map.drownedCourt",
+    "hud.arena.mapName",
     "hudChrome.bags.itemAriaBound",
     "hudChrome.bags.itemAriaEnchanted",
     "hudChrome.enchanting.tier.base",
@@ -264,6 +288,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "nl_NL": [
+    "hud.arena.map.coliseum",
+    "hud.arena.map.drownedCourt",
+    "hud.arena.mapName",
     "hudChrome.bags.itemAriaBound",
     "hudChrome.bags.itemAriaEnchanted",
     "hudChrome.enchanting.tier.base",
@@ -295,6 +322,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "pl_PL": [
+    "hud.arena.map.coliseum",
+    "hud.arena.map.drownedCourt",
+    "hud.arena.mapName",
     "hudChrome.bags.itemAriaBound",
     "hudChrome.bags.itemAriaEnchanted",
     "hudChrome.enchanting.tier.base",
@@ -326,6 +356,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "id_ID": [
+    "hud.arena.map.coliseum",
+    "hud.arena.map.drownedCourt",
+    "hud.arena.mapName",
     "hudChrome.bags.itemAriaBound",
     "hudChrome.bags.itemAriaEnchanted",
     "hudChrome.enchanting.tier.base",
@@ -357,6 +390,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "tr_TR": [
+    "hud.arena.map.coliseum",
+    "hud.arena.map.drownedCourt",
+    "hud.arena.mapName",
     "hudChrome.bags.itemAriaBound",
     "hudChrome.bags.itemAriaEnchanted",
     "hudChrome.enchanting.tier.base",
@@ -388,6 +424,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "sv_SE": [
+    "hud.arena.map.coliseum",
+    "hud.arena.map.drownedCourt",
+    "hud.arena.mapName",
     "hudChrome.bags.itemAriaBound",
     "hudChrome.bags.itemAriaEnchanted",
     "hudChrome.enchanting.tier.base",
@@ -419,6 +458,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "vi_VN": [
+    "hud.arena.map.coliseum",
+    "hud.arena.map.drownedCourt",
+    "hud.arena.mapName",
     "hudChrome.bags.itemAriaBound",
     "hudChrome.bags.itemAriaEnchanted",
     "hudChrome.enchanting.tier.base",
@@ -450,6 +492,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.social.billboard.setBy"
   ],
   "da_DK": [
+    "hud.arena.map.coliseum",
+    "hud.arena.map.drownedCourt",
+    "hud.arena.mapName",
     "hudChrome.bags.itemAriaBound",
     "hudChrome.bags.itemAriaEnchanted",
     "hudChrome.enchanting.tier.base",

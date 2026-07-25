@@ -6387,6 +6387,11 @@ export const tr_TR: EnTranslations = {
       "playerLevelClassTitle": "{name} - Sv {level} {className}",
       "noChallengers": "Henüz sıralanmış meydan okuyan yok - ilk sen ol.",
       "matchInProgress": "{name} ile maç sürüyor.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Sıradan Çık",
       "searching": "Bir rakip aranıyor... (sırada {count})",
       "enterQueue": "Sıraya Gir",

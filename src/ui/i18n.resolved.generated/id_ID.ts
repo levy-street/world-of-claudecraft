@@ -6387,6 +6387,11 @@ export const id_ID: EnTranslations = {
       "playerLevelClassTitle": "{name} - Lv {level} {className}",
       "noChallengers": "Belum ada penantang berperingkat - jadilah yang pertama.",
       "matchInProgress": "Pertandingan berlangsung melawan {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Tinggalkan Antrean",
       "searching": "Mencari lawan... ({count} dalam antrean)",
       "enterQueue": "Masuk Antrean",

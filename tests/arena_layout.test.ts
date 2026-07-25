@@ -5,7 +5,7 @@
 // spawn clear zones, walkable path widths between cover, and the Fiesta hazard
 // ring covering the whole pit at bout start.
 import { describe, expect, it } from 'vitest';
-import { type Collider, lineOfSightClear } from '../src/sim/colliders';
+import { arenaCollidersForSlot, type Collider, lineOfSightClear } from '../src/sim/colliders';
 import { arenaOrigin } from '../src/sim/data';
 import {
   ARENA_LAYOUT,
@@ -13,10 +13,15 @@ import {
   ARENA_SPAWN_B,
   ARENA_SPAWNS_A_2v2,
   ARENA_SPAWNS_B_2v2,
+  arenaMapForSlot,
+  DROWNED_COURT_LAYOUT,
   DUNGEON_WALL_HW,
   DUNGEON_WALL_X,
+  type DungeonLayout,
   layoutColliders,
   PILLAR_COLLIDER_R,
+  TOMB_HD,
+  TOMB_HW,
 } from '../src/sim/dungeon_layout';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { FIESTA_RING_CX, FIESTA_RING_CZ, FIESTA_RING_START } from '../src/sim/social/fiesta';
@@ -47,15 +52,18 @@ function obstacleGap(a: Collider, b: Collider): number {
   return Math.hypot(gx, gz);
 }
 
-// Interior cover only (pillars + stubs), as colliders, straight from the
-// layout record so the test cannot drift from what layoutColliders derives.
-function coverColliders(): Collider[] {
+// Interior cover only (pillars + stubs + tombs), as colliders, straight from
+// the layout record so the test cannot drift from what layoutColliders derives.
+function coverColliders(layout: DungeonLayout = ARENA_LAYOUT): Collider[] {
   return [
-    ...ARENA_LAYOUT.pillars.map(
+    ...layout.pillars.map(
       (p): Collider => ({ type: 'circle', x: p.x, z: p.z, r: PILLAR_COLLIDER_R }),
     ),
-    ...ARENA_LAYOUT.stubs.map(
+    ...layout.stubs.map(
       (s): Collider => ({ type: 'obb', x: s.x, z: s.z, hw: s.hw, hd: s.hd, rot: 0 }),
+    ),
+    ...layout.tombs.map(
+      (t): Collider => ({ type: 'obb', x: t.x, z: t.z, hw: TOMB_HW, hd: TOMB_HD, rot: 0 }),
     ),
   ];
 }
@@ -209,21 +217,175 @@ describe('arena layout: cover intent (line of sight)', () => {
     expect(lineOfSightClear(SEED, at({ x: 16, z: -6 }), at({ x: 16, z: 6 }))).toBe(true);
   });
 
-  it('keeps the wall-sweep test lanes clear of interior cover', () => {
-    // tests/arena.test.ts sweeps the walls along the z=-6 row and the x=18
-    // column; pin those lanes obstacle-free with body-radius margin so a
-    // future cover nudge fails HERE with a readable message, not in a
-    // confusing wall-sweep assertion.
-    for (const c of coverColliders()) {
-      const rx = c.type === 'circle' ? c.r : c.hw;
-      const rz = c.type === 'circle' ? c.r : c.hd;
-      expect(Math.abs(c.z - -6) - rz).toBeGreaterThan(PLAYER_BODY_RADIUS);
-      expect(Math.abs(c.x - 18) - rx).toBeGreaterThan(PLAYER_BODY_RADIUS);
+  it('keeps the wall-sweep test lanes clear of interior cover on BOTH maps', () => {
+    // tests/arena.test.ts sweeps the walls along a per-map z row (Coliseum
+    // z=-6, Drowned Court z=-2) and the shared x=19 column; pin those lanes
+    // obstacle-free with body-radius margin so a future cover nudge fails
+    // HERE with a readable message, not in a confusing wall-sweep assertion.
+    const lanes: Array<{ layout: DungeonLayout; rowZ: number }> = [
+      { layout: ARENA_LAYOUT, rowZ: -6 },
+      { layout: DROWNED_COURT_LAYOUT, rowZ: -2 },
+    ];
+    for (const { layout, rowZ } of lanes) {
+      for (const c of coverColliders(layout)) {
+        const rx = c.type === 'circle' ? c.r : c.hw;
+        const rz = c.type === 'circle' ? c.r : c.hd;
+        expect(Math.abs(c.z - rowZ) - rz).toBeGreaterThan(PLAYER_BODY_RADIUS);
+        expect(Math.abs(c.x - 19) - rx).toBeGreaterThan(PLAYER_BODY_RADIUS);
+      }
     }
   });
 
   it('arena slots are spaced wider than the pit footprint', () => {
     const spacing = arenaOrigin(1).z - arenaOrigin(0).z;
     expect(spacing).toBeGreaterThan(ARENA_LAYOUT.zMax - ARENA_LAYOUT.zMin);
+    expect(spacing).toBeGreaterThan(DROWNED_COURT_LAYOUT.zMax - DROWNED_COURT_LAYOUT.zMin);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The Drowned Court (odd slots): colonnade nave-and-aisle grammar.
+// ---------------------------------------------------------------------------
+
+const DC = DROWNED_COURT_LAYOUT;
+const DC_MAP = arenaMapForSlot(1);
+const DC_SPAWNS = [DC_MAP.spawnA, DC_MAP.spawnB, ...DC_MAP.spawnsA2v2, ...DC_MAP.spawnsB2v2];
+
+describe('drowned court layout: bounds and symmetry', () => {
+  const pointKey = (x: number, z: number) => `${x},${z}`;
+
+  it('shares the exact pit bounds and wall contract with the Coliseum', () => {
+    expect(DC.zMin).toBe(ARENA_LAYOUT.zMin);
+    expect(DC.zMax).toBe(ARENA_LAYOUT.zMax);
+    expect(DC.sideWallZ).toBe(ARENA_LAYOUT.sideWallZ);
+    expect(DC.sideWallHd).toBe(ARENA_LAYOUT.sideWallHd);
+    expect(DC.wallX).toBeUndefined();
+    expect(DC.stubs).toHaveLength(0);
+    expect(DC.dais).toEqual({ x: 0, z: 2, r: 6 });
+  });
+
+  it('pillars and reliquaries are symmetric about x=0 and about z=sideWallZ', () => {
+    for (const list of [DC.pillars, DC.tombs]) {
+      const set = new Set(list.map((p) => pointKey(p.x, p.z)));
+      expect(set.size).toBe(list.length);
+      for (const p of list) {
+        expect(set.has(pointKey(-p.x, p.z))).toBe(true);
+        expect(set.has(pointKey(p.x, MIRROR_Z - p.z))).toBe(true);
+      }
+    }
+    // the approved colonnade grammar: two rows of five at |x|=8
+    expect(DC.pillars).toHaveLength(10);
+    expect(new Set(DC.pillars.map((p) => Math.abs(p.x)))).toEqual(new Set([8]));
+    expect(DC.tombs).toHaveLength(4);
+  });
+
+  it('spawn B mirrors spawn A through the centre line (1v1 and 2v2)', () => {
+    expect(DC_MAP.spawnB.x + DC_MAP.spawnA.x).toBe(0);
+    expect(DC_MAP.spawnB.z).toBe(MIRROR_Z - DC_MAP.spawnA.z);
+    expect(DC_MAP.spawnA.facing).toBe(0);
+    expect(DC_MAP.spawnB.facing).toBe(Math.PI);
+    const bKeys = new Set(DC_MAP.spawnsB2v2.map((s) => pointKey(s.x, s.z)));
+    for (const s of DC_MAP.spawnsA2v2) {
+      expect(bKeys.has(pointKey(s.x, MIRROR_Z - s.z))).toBe(true);
+      expect(bKeys.has(pointKey(-s.x, MIRROR_Z - s.z))).toBe(true);
+    }
+  });
+});
+
+describe('drowned court layout: clear zones and walkable lanes', () => {
+  it('every spawn sits inside the pit with no collider within 4yd', () => {
+    const colliders = layoutColliders(DC);
+    for (const s of DC_SPAWNS) {
+      expect(Math.abs(s.x)).toBeLessThan(DUNGEON_WALL_X - DUNGEON_WALL_HW);
+      expect(s.z).toBeGreaterThan(DC.zMin + DUNGEON_WALL_HW);
+      expect(s.z).toBeLessThan(DC.zMax - DUNGEON_WALL_HW);
+      for (const c of colliders) {
+        expect(surfaceDistance(c, s.x, s.z)).toBeGreaterThanOrEqual(4);
+      }
+    }
+  });
+
+  it('every gap between cover pieces is walkable (>=3yd), nothing sealed', () => {
+    const cover = coverColliders(DC);
+    for (let i = 0; i < cover.length; i++) {
+      for (let j = i + 1; j < cover.length; j++) {
+        expect(obstacleGap(cover[i], cover[j])).toBeGreaterThanOrEqual(3);
+      }
+    }
+  });
+
+  it('nave and aisles hold their designed widths, and walls keep a 3yd lane', () => {
+    // centre nave between the colonnades' inner faces
+    expect(2 * (8 - PILLAR_COLLIDER_R)).toBeGreaterThanOrEqual(3);
+    // aisle between a colonnade's outer face and the wall's inner face
+    const innerX = DUNGEON_WALL_X - DUNGEON_WALL_HW;
+    expect(innerX - (8 + PILLAR_COLLIDER_R)).toBeGreaterThanOrEqual(3);
+    const innerZMin = DC.zMin + DUNGEON_WALL_HW;
+    const innerZMax = DC.zMax - DUNGEON_WALL_HW;
+    for (const c of coverColliders(DC)) {
+      const rx = c.type === 'circle' ? c.r : c.hw;
+      const rz = c.type === 'circle' ? c.r : c.hd;
+      expect(innerX - (Math.abs(c.x) + rx)).toBeGreaterThanOrEqual(3);
+      expect(c.z - rz - innerZMin).toBeGreaterThanOrEqual(3);
+      expect(innerZMax - (c.z + rz)).toBeGreaterThanOrEqual(3);
+    }
+  });
+});
+
+describe('drowned court: line-of-sight grammar', () => {
+  const SEED = 1;
+  const odd = arenaOrigin(1);
+  const at = (o: { x: number; z: number }, p: { x: number; z: number }) => ({
+    x: o.x + p.x,
+    z: o.z + p.z,
+  });
+
+  it('the nave is an open sightline: the 1v1 spawns SEE each other', () => {
+    // deliberately opposite to the Coliseum's screened opener
+    expect(lineOfSightClear(SEED, at(odd, DC_MAP.spawnA), at(odd, DC_MAP.spawnB))).toBe(true);
+  });
+
+  it('a colonnade pillar breaks cross-aisle sight, a reliquary breaks the aisle', () => {
+    // across the west colonnade pillar at (-8,-6)
+    expect(lineOfSightClear(SEED, at(odd, { x: -12, z: -6 }), at(odd, { x: -4, z: -6 }))).toBe(
+      false,
+    );
+    // along the east aisle across the reliquary at (16,-8)
+    expect(lineOfSightClear(SEED, at(odd, { x: 16, z: -13 }), at(odd, { x: 16, z: -3 }))).toBe(
+      false,
+    );
+    // the same aisle run is open where there is no reliquary (z 2 band)
+    expect(lineOfSightClear(SEED, at(odd, { x: 20, z: -13 }), at(odd, { x: 20, z: -3 }))).toBe(
+      true,
+    );
+  });
+});
+
+describe('arena slot parity: per-slot colliders', () => {
+  it('even slots derive Coliseum colliders, odd slots Drowned Court', () => {
+    expect(arenaCollidersForSlot(0)).toEqual(layoutColliders(ARENA_LAYOUT));
+    expect(arenaCollidersForSlot(2)).toEqual(layoutColliders(ARENA_LAYOUT));
+    expect(arenaCollidersForSlot(1)).toEqual(layoutColliders(DROWNED_COURT_LAYOUT));
+    expect(arenaCollidersForSlot(3)).toEqual(layoutColliders(DROWNED_COURT_LAYOUT));
+    // one representative per map: the Coliseum's centre-diamond post exists
+    // only on even slots, the Drowned Court's colonnade only on odd ones
+    const diamond = (c: Collider) => c.type === 'circle' && c.x === 0 && c.z === -4;
+    const colonnade = (c: Collider) => c.type === 'circle' && c.x === 8 && c.z === -6;
+    expect(arenaCollidersForSlot(0).some(diamond)).toBe(true);
+    expect(arenaCollidersForSlot(0).some(colonnade)).toBe(false);
+    expect(arenaCollidersForSlot(1).some(diamond)).toBe(false);
+    expect(arenaCollidersForSlot(1).some(colonnade)).toBe(true);
+  });
+
+  it('the world-level collision band resolves per slot (LoS proof)', () => {
+    // (0,-8) to (0,2) crosses the Coliseum diamond post at (0,-4) on an even
+    // slot; the Drowned Court's nave is open on the same local segment.
+    const SEED = 1;
+    const seg = (o: { x: number; z: number }) =>
+      lineOfSightClear(SEED, { x: o.x, z: o.z - 8 }, { x: o.x, z: o.z + 2 });
+    expect(seg(arenaOrigin(0))).toBe(false);
+    expect(seg(arenaOrigin(2))).toBe(false);
+    expect(seg(arenaOrigin(1))).toBe(true);
+    expect(seg(arenaOrigin(3))).toBe(true);
   });
 });

@@ -220,6 +220,32 @@ export const ARENA_LAYOUT: DungeonLayout = {
   dais: { x: 0, z: 2, r: 8 },
 };
 
+// The Drowned Court (interior 'arena', ODD slots): the second arena map, a
+// flooded-temple counterpart to the Coliseum. Identical bounds and the same
+// frozen |x|=23 walls, but a completely different cover grammar: two straight
+// colonnades of five pillars each form a centre nave and two side aisles
+// (lane-and-LoS chess, deliberately distinct from the Coliseum's scattered
+// screens), with a reliquary block midway along each aisle as the only extra
+// cover. No stubs; the dais is a smaller moonlit glow. Mirror-symmetric about
+// BOTH x=0 and z=2, like the Coliseum.
+export const DROWNED_COURT_LAYOUT: DungeonLayout = {
+  zMin: -24,
+  zMax: 28,
+  sideWallZ: 2,
+  sideWallHd: 26,
+  // two colonnades at x=-8/8, z stepped by 8 and centred on the z=2 mirror
+  pillars: grid(-14, 18, 8, [-8, 8]),
+  // reliquary altars midway along each aisle, mirrored about both axes
+  tombs: [
+    { x: -16, z: -8 },
+    { x: 16, z: -8 },
+    { x: -16, z: 12 },
+    { x: 16, z: 12 },
+  ],
+  stubs: [],
+  dais: { x: 0, z: 2, r: 6 },
+};
+
 // Combatant spawn points (instance-local), at opposite ends facing each other,
 // each behind its team's approach screen with a clear zone around it.
 export const ARENA_SPAWN_A = { x: 0, z: -18, facing: 0 }; // faces +z toward B
@@ -234,6 +260,65 @@ export const ARENA_SPAWNS_B_2v2 = [
   { x: -7, z: 22, facing: Math.PI },
   { x: 7, z: 22, facing: Math.PI },
 ];
+
+// ---------------------------------------------------------------------------
+// Arena maps: each world arena slot hosts one FIXED map, selected by slot
+// parity (EVEN slots = Ashen Coliseum, ODD slots = The Drowned Court). The
+// mapping is static at boot: colliders and render geometry per slot never
+// change, and no selection here ever touches rng. Spawns are plumbed per map
+// (not shared constants) so future maps can place them differently.
+// ---------------------------------------------------------------------------
+
+export type ArenaMapId = 'coliseum' | 'drowned_court';
+
+export interface ArenaSpawnPoint {
+  x: number;
+  z: number;
+  facing: number;
+}
+
+export interface ArenaMapDef {
+  id: ArenaMapId;
+  layout: DungeonLayout;
+  spawnA: ArenaSpawnPoint;
+  spawnB: ArenaSpawnPoint;
+  spawnsA2v2: ArenaSpawnPoint[];
+  spawnsB2v2: ArenaSpawnPoint[];
+}
+
+// The Drowned Court's 2v2 spread is +-5 (narrower than the Coliseum's +-7):
+// the colonnade pillars at (+-8, -14/18) sit closer to the spawn line, and
+// +-5 keeps the 4yd spawn clear zone the layout tests pin.
+const DROWNED_COURT_MAP: ArenaMapDef = {
+  id: 'drowned_court',
+  layout: DROWNED_COURT_LAYOUT,
+  spawnA: { x: 0, z: -18, facing: 0 },
+  spawnB: { x: 0, z: 22, facing: Math.PI },
+  spawnsA2v2: [
+    { x: -5, z: -18, facing: 0 },
+    { x: 5, z: -18, facing: 0 },
+  ],
+  spawnsB2v2: [
+    { x: -5, z: 22, facing: Math.PI },
+    { x: 5, z: 22, facing: Math.PI },
+  ],
+};
+
+const COLISEUM_MAP: ArenaMapDef = {
+  id: 'coliseum',
+  layout: ARENA_LAYOUT,
+  spawnA: ARENA_SPAWN_A,
+  spawnB: ARENA_SPAWN_B,
+  spawnsA2v2: ARENA_SPAWNS_A_2v2,
+  spawnsB2v2: ARENA_SPAWNS_B_2v2,
+};
+
+/** index = slot parity: even slots Coliseum, odd slots Drowned Court. */
+export const ARENA_MAPS: readonly [ArenaMapDef, ArenaMapDef] = [COLISEUM_MAP, DROWNED_COURT_MAP];
+
+export function arenaMapForSlot(slot: number): ArenaMapDef {
+  return ARENA_MAPS[((slot % 2) + 2) % 2];
+}
 
 /** Interior collision set for a layout, in instance-local coordinates. */
 export function layoutColliders(layout: DungeonLayout): Collider[] {

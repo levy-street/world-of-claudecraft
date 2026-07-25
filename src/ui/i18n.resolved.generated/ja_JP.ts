@@ -6387,6 +6387,11 @@ export const ja_JP: EnTranslations = {
       "playerLevelClassTitle": "{name} - レベル{level} {className}",
       "noChallengers": "まだランク入りした挑戦者はいません - 最初になりましょう。",
       "matchInProgress": "{name}との試合中。",
+      "mapName": "マップ: {name}",
+      "map": {
+        "coliseum": "灰の闘技場",
+        "drownedCourt": "水没の宮廷"
+      },
       "leaveQueue": "キューを離れる",
       "searching": "対戦相手を検索中...（キュー内 {count}）",
       "enterQueue": "キューに入る",

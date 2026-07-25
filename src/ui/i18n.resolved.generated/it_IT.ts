@@ -6387,6 +6387,11 @@ export const it_IT: EnTranslations = {
       "playerLevelClassTitle": "{name} - Liv {level} {className}",
       "noChallengers": "Nessun contendente in classifica - sii il primo.",
       "matchInProgress": "Incontro in corso contro {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Lascia coda",
       "searching": "Ricerca avversario... ({count} in coda)",
       "enterQueue": "Entra in coda",

@@ -17,6 +17,7 @@
 // skipping the DOM rebuild when the content signature is unchanged.
 
 import { audio } from '../game/audio';
+import type { ArenaMapId } from '../sim/dungeon_layout';
 import type { PlayerClass } from '../sim/types';
 import type { ArenaFormat, IWorld } from '../world_api';
 import {
@@ -240,7 +241,7 @@ export class ArenaWindow {
       bracketTabs +
       rank +
       this.partyHtml(view.party) +
-      this.actionHtml(view.action, view.bracket) +
+      this.actionHtml(view.action, view.bracket, view.matchMap) +
       practice +
       `<div class="arena-sub">${esc(t('hud.arena.ladderOnline'))}</div>` +
       this.ladderHtml(view.ladder) +
@@ -277,9 +278,25 @@ export class ArenaWindow {
     return '';
   }
 
-  private actionHtml(action: ArenaAction, bracket: ArenaFormat): string {
+  private actionHtml(
+    action: ArenaAction,
+    bracket: ArenaFormat,
+    matchMap: ArenaMapId | null,
+  ): string {
     if (action.kind === 'in-match') {
-      return `<div class="arena-queue-status">${svgIcon('arena')} ${esc(t('hud.arena.matchInProgress', { name: action.oppName }))}</div>`;
+      // the bout's fixed map (slot-parity selected), shown from queue pop on
+      const mapRow = matchMap
+        ? `<div class="arena-note arena-map">${esc(
+            t('hud.arena.mapName', {
+              name: t(
+                matchMap === 'drowned_court'
+                  ? 'hud.arena.map.drownedCourt'
+                  : 'hud.arena.map.coliseum',
+              ),
+            }),
+          )}</div>`
+        : '';
+      return `<div class="arena-queue-status">${svgIcon('arena')} ${esc(t('hud.arena.matchInProgress', { name: action.oppName }))}</div>${mapRow}`;
     }
     if (action.kind === 'queued') {
       return (

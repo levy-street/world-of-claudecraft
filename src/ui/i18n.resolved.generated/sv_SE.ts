@@ -6387,6 +6387,11 @@ export const sv_SE: EnTranslations = {
       "playerLevelClassTitle": "{name} - Nivå {level} {className}",
       "noChallengers": "Inga utmanare rankade än - var den första.",
       "matchInProgress": "Match pågår mot {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Lämna kön",
       "searching": "Söker efter en motståndare... ({count} i kön)",
       "enterQueue": "Gå med i kön",

@@ -6387,6 +6387,11 @@ export const nl_NL: EnTranslations = {
       "playerLevelClassTitle": "{name} - Nv {level} {className}",
       "noChallengers": "Nog geen uitdagers gerangschikt - wees de eerste.",
       "matchInProgress": "Wedstrijd bezig tegen {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Wachtrij Verlaten",
       "searching": "Op zoek naar een tegenstander... ({count} in wachtrij)",
       "enterQueue": "Sluit je aan in de Wachtrij",

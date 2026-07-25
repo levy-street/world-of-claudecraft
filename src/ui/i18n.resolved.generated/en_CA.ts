@@ -6387,6 +6387,11 @@ export const en_CA: EnTranslations = {
       "playerLevelClassTitle": "{name} - Lv {level} {className}",
       "noChallengers": "No challengers ranked yet - be the first.",
       "matchInProgress": "Match in progress vs {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Leave Queue",
       "searching": "Searching for an opponent... ({count} in queue)",
       "enterQueue": "Enter the Queue",

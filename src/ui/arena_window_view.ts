@@ -18,6 +18,7 @@
 // resolved display name.
 
 import { CLASSES } from '../sim/data';
+import type { ArenaMapId } from '../sim/dungeon_layout';
 import type { PlayerClass } from '../sim/types';
 import type { ArenaFormat, ArenaInfo, ArenaStanding, PartyInfo } from '../world_api';
 
@@ -103,6 +104,9 @@ export type ArenaView =
       action: ArenaAction;
       /** The offline Fiesta-vs-bots practice affordance is available + applicable. */
       practice: boolean;
+      /** The fixed map of the live bout's slot; null outside a match and for
+       *  the Protect Yumi brackets (their maze band has no arena map). */
+      matchMap: ArenaMapId | null;
       ladder: ArenaLadderRow[];
       allTime: ArenaAllTimeRow[] | null;
       /** Identity of the rendered content; the painter skips a rebuild when equal. */
@@ -197,6 +201,15 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
 
   const practice = bracket === 'fiesta' && input.practiceAvailable && !inMatch;
 
+  // The bout's map, shown from queue pop (countdown) through the aftermath;
+  // yumi brackets play in their own maze band, so no map row for them. The
+  // `?? null` guards a mirrored snapshot from an older server without the
+  // field (the row simply stays hidden).
+  const matchMap =
+    a.match && a.match.format !== 'yumi3' && a.match.format !== 'yumi5'
+      ? (a.match.map ?? null)
+      : null;
+
   const allTimeRows = allTime[bracket] ?? null;
   const allTimeView: ArenaAllTimeRow[] | null = allTimeRows
     ? allTimeRows.map((r, i) => ({
@@ -219,6 +232,7 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
     a.queued,
     a.queueSize,
     inMatch,
+    matchMap,
     ladderRows,
     allTimeRows,
     bracket,
@@ -237,6 +251,7 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
     party: partySection,
     action,
     practice,
+    matchMap,
     ladder,
     allTime: allTimeView,
     sig,

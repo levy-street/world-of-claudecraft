@@ -6387,6 +6387,11 @@ export const ko_KR: EnTranslations = {
       "playerLevelClassTitle": "{name} - {level}레벨 {className}",
       "noChallengers": "아직 순위에 오른 도전자가 없습니다 - 첫 번째가 되세요.",
       "matchInProgress": "{name}님과 경기 진행 중.",
+      "mapName": "맵: {name}",
+      "map": {
+        "coliseum": "잿빛 원형경기장",
+        "drownedCourt": "수몰된 궁정"
+      },
       "leaveQueue": "대기열 나가기",
       "searching": "상대 찾는 중... (대기열 {count}명)",
       "enterQueue": "대기열 참가",

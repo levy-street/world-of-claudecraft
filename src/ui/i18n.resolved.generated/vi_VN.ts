@@ -6387,6 +6387,11 @@ export const vi_VN: EnTranslations = {
       "playerLevelClassTitle": "{name} - Cấp {level} {className}",
       "noChallengers": "Chưa có ai được xếp hạng - hãy là người đầu tiên.",
       "matchInProgress": "Trận đấu đang diễn ra với {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Rời Hàng Chờ",
       "searching": "Đang tìm đối thủ... ({count} người trong hàng chờ)",
       "enterQueue": "Vào Hàng Chờ",

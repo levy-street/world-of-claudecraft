@@ -778,28 +778,31 @@ describe('arena: enclosing walls', () => {
       const xLimit = DUNGEON_WALL_X - DUNGEON_WALL_HW - PLAYER_BODY_RADIUS;
       const zMinLimit = ARENA_LAYOUT.zMin + DUNGEON_WALL_HW + PLAYER_BODY_RADIUS;
       const zMaxLimit = ARENA_LAYOUT.zMax - DUNGEON_WALL_HW - PLAYER_BODY_RADIUS;
-      // Sweep lanes are obstacle-free rows/columns of the layout (z-6 dodges
-      // the approach screens and posts; x+18 runs outside every pillar/stub)
-      // so each sweep exercises the WALL collider, not interior cover.
+      // Sweep lanes are obstacle-free rows/columns of the SLOT'S map (even
+      // slots Coliseum, odd slots Drowned Court): the z row dodges each map's
+      // cover (screens/posts vs colonnades) and the x+19 column runs outside
+      // every pillar, stub, and reliquary, so each sweep exercises the WALL
+      // collider, not interior cover (pinned in tests/arena_layout.test.ts).
+      const rowZ = slot % 2 === 1 ? -2 : -6;
       const cases = [
         {
-          from: { x: o.x, z: o.z - 6 },
-          to: { x: o.x - DUNGEON_WALL_X - 10, z: o.z - 6 },
+          from: { x: o.x, z: o.z + rowZ },
+          to: { x: o.x - DUNGEON_WALL_X - 10, z: o.z + rowZ },
           inside: (x: number, _z: number) => x >= o.x - xLimit - 1e-6,
         },
         {
-          from: { x: o.x, z: o.z - 6 },
-          to: { x: o.x + DUNGEON_WALL_X + 10, z: o.z - 6 },
+          from: { x: o.x, z: o.z + rowZ },
+          to: { x: o.x + DUNGEON_WALL_X + 10, z: o.z + rowZ },
           inside: (x: number, _z: number) => x <= o.x + xLimit + 1e-6,
         },
         {
-          from: { x: o.x + 18, z: o.z + 2 },
-          to: { x: o.x + 18, z: o.z + ARENA_LAYOUT.zMin - 10 },
+          from: { x: o.x + 19, z: o.z + 2 },
+          to: { x: o.x + 19, z: o.z + ARENA_LAYOUT.zMin - 10 },
           inside: (_x: number, z: number) => z >= o.z + zMinLimit - 1e-6,
         },
         {
-          from: { x: o.x + 18, z: o.z + 2 },
-          to: { x: o.x + 18, z: o.z + ARENA_LAYOUT.zMax + 10 },
+          from: { x: o.x + 19, z: o.z + 2 },
+          to: { x: o.x + 19, z: o.z + ARENA_LAYOUT.zMax + 10 },
           inside: (_x: number, z: number) => z <= o.z + zMaxLimit + 1e-6,
         },
       ];
@@ -866,10 +869,15 @@ describe('arena: enclosing walls', () => {
   });
 
   it('melee auto-attack cannot land through an approach screen', () => {
-    const { sim, a, b } = queueDuo();
+    // The screens are Coliseum cover: force the rotation's preferred parity
+    // even (before matchmaking runs) so the bout seats on a Coliseum slot.
+    const { sim, a, b } = queueDuo('warrior', 'mage', (world) => {
+      world.ctx.nextArenaMatchId = 2;
+    });
     startBout(sim);
     const target = sim.entities.get(b)!;
     const slot = sim.arenaMatchFor(a)!.slot ?? 0;
+    expect(slot % 2).toBe(0);
     const o = arenaOrigin(slot);
     // fighters on opposite faces of the west spawn-A approach screen, within
     // MELEE_RANGE of each other but with the screen's full height between.

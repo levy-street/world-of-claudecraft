@@ -38,7 +38,7 @@ import {
 } from '../content/talents';
 import { abilitiesKnownAt, arenaOrigin } from '../data';
 import * as deedsMod from '../deeds';
-import { ARENA_SPAWNS_A_2v2, ARENA_SPAWNS_B_2v2 } from '../dungeon_layout';
+import { arenaMapForSlot } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
 import { awardFiestaKillHonor } from '../pvp';
 import { Rng } from '../rng';
@@ -415,7 +415,10 @@ export function fiestaRevive(ctx: SimContext, match: ArenaMatch, e: Entity): voi
   const team = ctx.arenaTeamOf(match, e.id);
   if (!team) return;
   const origin = arenaOrigin(match.slot);
-  const spawns = team === 'A' ? ARENA_SPAWNS_A_2v2 : ARENA_SPAWNS_B_2v2;
+  // Fiesta is pinned to even (Coliseum) slots, so this always resolves the
+  // Coliseum spawns; the per-slot lookup keeps it correct regardless.
+  const map = arenaMapForSlot(match.slot);
+  const spawns = team === 'A' ? map.spawnsA2v2 : map.spawnsB2v2;
   const teamPids = team === 'A' ? match.teamA : match.teamB;
   const idx = Math.max(0, teamPids.indexOf(e.id));
   arenaMod.placeInArena(ctx, e, origin, spawns[idx] ?? spawns[0]);

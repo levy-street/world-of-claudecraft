@@ -6387,6 +6387,11 @@ export const da_DK: EnTranslations = {
       "playerLevelClassTitle": "{name} - Niv {level} {className}",
       "noChallengers": "Ingen udfordrere rangeret endnu - vær den første.",
       "matchInProgress": "Kamp i gang mod {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Forlad Køen",
       "searching": "Søger efter en modstander... ({count} i kø)",
       "enterQueue": "Stil dig i Køen",

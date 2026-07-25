@@ -6387,6 +6387,11 @@ export const cs_CZ: EnTranslations = {
       "playerLevelClassTitle": "{name} - úr. {level} {className}",
       "noChallengers": "Zatím není v žebříčku žádný vyzyvatel - buď první.",
       "matchInProgress": "Probíhá zápas proti {name}.",
+      "mapName": "Map: {name}",
+      "map": {
+        "coliseum": "Ashen Coliseum",
+        "drownedCourt": "The Drowned Court"
+      },
       "leaveQueue": "Opustit frontu",
       "searching": "Hledá se protivník... ({count} ve frontě)",
       "enterQueue": "Vstoupit do fronty",

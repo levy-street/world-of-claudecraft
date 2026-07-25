@@ -6387,6 +6387,11 @@ export const en_XA: EnTranslations = {
       "playerLevelClassTitle": "[{name} - Ļʋ {level} {className}]",
       "noChallengers": "[Ñó çĥáļļéñĝéŕš ŕáñķéð ýéţ - ƀé ţĥé ƒíŕšţ.]",
       "matchInProgress": "[Ɱáţçĥ íñ þŕóĝŕéšš ʋš {name}.]",
+      "mapName": "[Ɱáþ: {name}]",
+      "map": {
+        "coliseum": "[Ášĥéñ Çóļíšéúɱ]",
+        "drownedCourt": "[Ţĥé Ðŕóŵñéð Çóúŕţ]"
+      },
       "leaveQueue": "[Ļéáʋé Ɋúéúé]",
       "searching": "[Šéáŕçĥíñĝ ƒóŕ áñ óþþóñéñţ... ({count} íñ ɋúéúé)]",
       "enterQueue": "[Éñţéŕ ţĥé Ɋúéúé]",
