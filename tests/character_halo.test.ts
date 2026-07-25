@@ -95,6 +95,20 @@ describe('class halo geometry', () => {
     visual.setGhost(false);
     expect(halo.material).toBe(originalMat);
 
+    // a swap DURING an active overlay must not capture the overlay clone as
+    // the halo's "original" (Shadowform is the priest's everyday overlay:
+    // equip something while shadowformed, then drop the form)
+    visual.setShadowform(true);
+    expect(halo.material).not.toBe(originalMat);
+    visual.setWeapon('cinderglass_wand');
+    visual.setShadowform(false);
+    expect(halo.material).toBe(originalMat);
+    // same via the body-skin swap path, mid-ghost
+    visual.setGhost(true);
+    visual.setSkin(1);
+    visual.setGhost(false);
+    expect(halo.material).toBe(originalMat);
+
     vi.doUnmock('../src/render/assets/loader');
     vi.resetModules();
   });

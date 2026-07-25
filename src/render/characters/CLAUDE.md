@@ -34,7 +34,8 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
 - `halo.ts`: the class halo (the priest's Light): `buildHalo(color, upOffset,
   radius)`, driven by `VisualDef.halo` plus the optional
   `haloUpOffset`/`haloRadius` placement overrides (defaults live here; the
-  priest overrides both for hat clearance). Texture, per-color materials, and
+  priest overrides only the lift, for hat clearance). Texture, per-color
+  materials, and
   per-radius geometries are shared never-disposed caches; radii must come from
   static `VisualDef` values so the cache keys stay bounded. `visual.ts` parents
   the mesh to the head bone and keeps it out of the shadow-caster sweeps
