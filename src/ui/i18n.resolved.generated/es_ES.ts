@@ -6219,6 +6219,7 @@ export const es_ES: EnTranslations = {
       "arenaJoin": "Te unes a la cola del Coliseo Cinéreo. Espera a un oponente digno...",
       "arenaLeave": "Sales de la cola del Coliseo Cinéreo.",
       "arenaSands": "Pisas las arenas del Coliseo Cinéreo.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "Has solicitado comerciar con {name}.",
       "tradeOpened": "Ventana de comercio abierta.",
       "tradeComplete": "Comercio completado.",

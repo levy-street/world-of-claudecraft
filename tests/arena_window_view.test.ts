@@ -277,4 +277,19 @@ describe('buildArenaView: match map fact (slot-parity arena maps)', () => {
     const b = live(buildArenaView(input({ info: inMatch({ map: 'drowned_court' }) }))).sig;
     expect(a).not.toBe(b);
   });
+
+  it('reads identically from a ClientWorld-mirror-shaped snapshot', () => {
+    // map is precisely a mirrored field (server -> s.arena -> ClientWorld),
+    // so the client shape is the one that matters for the fact
+    const clientInfo = (over: object) =>
+      makeArenaInfo('client', {
+        match: { format: '1v1', state: 'active', oppName: 'Foe', map: 'coliseum', ...over },
+      } as Partial<ArenaInfo>);
+    expect(
+      live(buildArenaView(input({ info: clientInfo({ map: 'drowned_court' }) }))).matchMap,
+    ).toBe('drowned_court');
+    expect(
+      live(buildArenaView(input({ info: clientInfo({ map: undefined }) }))).matchMap,
+    ).toBeNull();
+  });
 });

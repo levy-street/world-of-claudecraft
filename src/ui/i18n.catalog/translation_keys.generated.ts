@@ -4670,6 +4670,7 @@ export type TranslationKeyFlat =
   | 'hud.logs.arenaJoin'
   | 'hud.logs.arenaLeave'
   | 'hud.logs.arenaSands'
+  | 'hud.logs.arenaSandsDrowned'
   | 'hud.logs.duelBegun'
   | 'hud.logs.duelChallengeSent'
   | 'hud.logs.duelDecline'

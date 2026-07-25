@@ -1912,6 +1912,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.logs.arenaJoin': '你加入了灰燼競技場佇列。等待一位值得一戰的對手...',
   'hud.logs.arenaLeave': '你離開了灰燼競技場佇列。',
   'hud.logs.arenaSands': '你踏上了灰燼競技場的沙地。',
+  'hud.logs.arenaSandsDrowned': '你踏上了沉沒王庭的水淹石地。',
   'hud.logs.tradeRequestSent': '你已請求與 {name} 交易。',
   'hud.logs.tradeOpened': '交易視窗已開啟。',
   'hud.logs.tradeComplete': '交易完成。',

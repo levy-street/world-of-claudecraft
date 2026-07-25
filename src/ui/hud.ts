@@ -11020,6 +11020,7 @@ export class Hud {
       'You join the Ashen Coliseum queue. Stand by for a worthy opponent…': 'hud.logs.arenaJoin',
       'You leave the Ashen Coliseum queue.': 'hud.logs.arenaLeave',
       'You step onto the sands of the Ashen Coliseum.': 'hud.logs.arenaSands',
+      'You step onto the flooded stones of the Drowned Court.': 'hud.logs.arenaSandsDrowned',
       'Fight!': 'hud.system.arenaStart',
       'Trade window opened.': 'hud.logs.tradeOpened',
       'Trade complete.': 'hud.logs.tradeComplete',

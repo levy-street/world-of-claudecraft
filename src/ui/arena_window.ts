@@ -39,6 +39,13 @@ import { svgIcon } from './ui_icons';
 // Best-effort all-time ladder pull is throttled per bracket to this interval.
 const LEADERBOARD_REFETCH_MS = 15000;
 
+// Exhaustive by construction: adding a third ArenaMapId reds tsc here instead
+// of silently rendering the wrong map name.
+const ARENA_MAP_KEY: Record<ArenaMapId, 'hud.arena.map.coliseum' | 'hud.arena.map.drownedCourt'> = {
+  coliseum: 'hud.arena.map.coliseum',
+  drowned_court: 'hud.arena.map.drownedCourt',
+};
+
 // Render-skip sentinel for the offline panel: once-per-open guard so the static offline
 // note is not rebuilt every ~250ms mediumHud tick. The live signature is always
 // `JSON.stringify([...])` (it starts with '['), so this plain token (which never starts with
@@ -287,13 +294,7 @@ export class ArenaWindow {
       // the bout's fixed map (slot-parity selected), shown from queue pop on
       const mapRow = matchMap
         ? `<div class="arena-note arena-map">${esc(
-            t('hud.arena.mapName', {
-              name: t(
-                matchMap === 'drowned_court'
-                  ? 'hud.arena.map.drownedCourt'
-                  : 'hud.arena.map.coliseum',
-              ),
-            }),
+            t('hud.arena.mapName', { name: t(ARENA_MAP_KEY[matchMap]) }),
           )}</div>`
         : '';
       return `<div class="arena-queue-status">${svgIcon('arena')} ${esc(t('hud.arena.matchInProgress', { name: action.oppName }))}</div>${mapRow}`;

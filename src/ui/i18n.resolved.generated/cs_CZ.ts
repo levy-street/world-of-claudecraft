@@ -6219,6 +6219,7 @@ export const cs_CZ: EnTranslations = {
       "arenaJoin": "Připojuješ se do fronty Popelavého kolosea. Vyčkej na důstojného protivníka...",
       "arenaLeave": "Opouštíš frontu Popelavého kolosea.",
       "arenaSands": "Vstupuješ do písku Popelavého kolosea.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "Požádal(a) jsi {name} o obchod.",
       "tradeOpened": "Obchodní okno otevřeno.",
       "tradeComplete": "Obchod dokončen.",

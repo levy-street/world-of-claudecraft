@@ -6219,6 +6219,7 @@ export const en: EnTranslations = {
       "arenaJoin": "You join the Ashen Coliseum queue. Stand by for a worthy opponent...",
       "arenaLeave": "You leave the Ashen Coliseum queue.",
       "arenaSands": "You step onto the sands of the Ashen Coliseum.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "You have requested to trade with {name}.",
       "tradeOpened": "Trade window opened.",
       "tradeComplete": "Trade complete.",

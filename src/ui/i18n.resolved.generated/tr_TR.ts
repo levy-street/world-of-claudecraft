@@ -6219,6 +6219,7 @@ export const tr_TR: EnTranslations = {
       "arenaJoin": "Kül Koliseumu sırasına katıldın. Layık bir rakip için bekle...",
       "arenaLeave": "Kül Koliseumu sırasından ayrıldın.",
       "arenaSands": "Kül Koliseumu'nun kumlarına adım atıyorsun.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "{name} ile takas yapmak için istek gönderdin.",
       "tradeOpened": "Takas penceresi açıldı.",
       "tradeComplete": "Takas tamamlandı.",

@@ -6219,6 +6219,7 @@ export const vi_VN: EnTranslations = {
       "arenaJoin": "Bạn gia nhập hàng đợi Ashen Coliseum. Hãy chờ một đối thủ xứng tầm...",
       "arenaLeave": "Bạn rời khỏi hàng đợi Ashen Coliseum.",
       "arenaSands": "Bạn bước lên bãi cát của Ashen Coliseum.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "Bạn đã yêu cầu giao dịch với {name}.",
       "tradeOpened": "Đã mở cửa sổ giao dịch.",
       "tradeComplete": "Giao dịch hoàn tất.",

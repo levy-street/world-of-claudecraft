@@ -2001,6 +2001,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.logs.arenaJoin': '灰の闘技場のキューに入りました。ふさわしい相手を待ちます...',
   'hud.logs.arenaLeave': '灰の闘技場のキューを離れました。',
   'hud.logs.arenaSands': '灰の闘技場の砂地に足を踏み入れました。',
+  'hud.logs.arenaSandsDrowned': '水没の宮廷の水に沈んだ石畳に足を踏み入れた。',
   'hud.logs.tradeRequestSent': '{name}に取引を申し込みました。',
   'hud.logs.tradeOpened': '取引ウィンドウが開きました。',
   'hud.logs.tradeComplete': '取引完了。',

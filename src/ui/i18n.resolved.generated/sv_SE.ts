@@ -6219,6 +6219,7 @@ export const sv_SE: EnTranslations = {
       "arenaJoin": "Du går med i kön till Askgrå kolosseum. Vänta på en värdig motståndare...",
       "arenaLeave": "Du lämnar kön till Askgrå kolosseum.",
       "arenaSands": "Du kliver ut på sanden i Askgrå kolosseum.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "Du har begärt att handla med {name}.",
       "tradeOpened": "Handelsfönster öppnat.",
       "tradeComplete": "Handeln slutförd.",

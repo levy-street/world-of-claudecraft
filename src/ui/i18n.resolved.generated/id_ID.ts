@@ -6219,6 +6219,7 @@ export const id_ID: EnTranslations = {
       "arenaJoin": "Kamu bergabung ke antrean Ashen Coliseum. Bersiaplah untuk lawan yang setara...",
       "arenaLeave": "Kamu meninggalkan antrean Ashen Coliseum.",
       "arenaSands": "Kamu melangkah ke atas pasir Ashen Coliseum.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "Kamu telah meminta untuk berdagang dengan {name}.",
       "tradeOpened": "Jendela perdagangan dibuka.",
       "tradeComplete": "Perdagangan selesai.",

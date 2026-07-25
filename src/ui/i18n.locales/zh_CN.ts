@@ -1910,6 +1910,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.logs.arenaJoin': '你加入了灰烬斗技场队列。等待一位值得一战的对手...',
   'hud.logs.arenaLeave': '你离开了灰烬斗技场队列。',
   'hud.logs.arenaSands': '你踏上了灰烬斗技场的沙地。',
+  'hud.logs.arenaSandsDrowned': '你踏上了沉没王庭的水淹石地。',
   'hud.logs.tradeRequestSent': '你已请求与 {name} 交易。',
   'hud.logs.tradeOpened': '交易窗口已打开。',
   'hud.logs.tradeComplete': '交易完成。',

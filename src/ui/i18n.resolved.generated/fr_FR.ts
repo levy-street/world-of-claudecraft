@@ -6219,6 +6219,7 @@ export const fr_FR: EnTranslations = {
       "arenaJoin": "Vous rejoignez la file du Colisée cendré. Attendez un adversaire digne...",
       "arenaLeave": "Vous quittez la file du Colisée cendré.",
       "arenaSands": "Vous foulez le sable du Colisée cendré.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "Vous avez demandé un échange avec {name}.",
       "tradeOpened": "Fenêtre d'échange ouverte.",
       "tradeComplete": "Échange terminé.",

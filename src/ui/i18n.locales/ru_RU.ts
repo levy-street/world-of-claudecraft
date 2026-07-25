@@ -2024,6 +2024,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы вступаете в очередь Пепельного Колизея. Ожидайте достойного соперника...',
   'hud.logs.arenaLeave': 'Вы покидаете очередь Пепельного Колизея.',
   'hud.logs.arenaSands': 'Вы выходите на песок Пепельного Колизея.',
+  'hud.logs.arenaSandsDrowned': 'Вы ступаете на затопленные камни Затонувшего Двора.',
   'hud.logs.tradeRequestSent': 'Вы запросили обмен с {name}.',
   'hud.logs.tradeOpened': 'Окно обмена открыто.',
   'hud.logs.tradeComplete': 'Обмен завершен.',

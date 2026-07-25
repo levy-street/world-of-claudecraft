@@ -934,9 +934,12 @@ export class DungeonInteriors {
   // (instanceOrigin in sim/data.ts: 900 + index*600) says which dungeon.
   private variantFor(interior: string, ox: number, oz: number): Variant {
     // Arena slots host fixed maps by parity (EVEN = Coliseum, ODD = Drowned
-    // Court), mirroring arenaCollidersForSlot so look and collision agree.
+    // Court). The map id comes from the SAME arenaMapForSlot the sim's
+    // colliders use, so look and collision cannot disagree on parity.
     if (interior === 'arena') {
-      return arenaOriginAt(oz).slot % 2 === 1 ? 'arena_drowned' : 'arena';
+      return arenaMapForSlot(arenaOriginAt(oz).slot).id === 'drowned_court'
+        ? 'arena_drowned'
+        : 'arena';
     }
     if (interior === 'nythraxis') return 'nythraxis';
     if (interior === 'sanctum') return 'sanctum';

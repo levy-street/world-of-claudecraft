@@ -630,7 +630,7 @@ export function matchmakeArena1v1(ctx: SimContext): void {
       // x-band test the queue-join guard uses.
       return !!e && !e.dead && !ctx.arenaMatches.has(id) && e.pos.x <= DUNGEON_X_THRESHOLD;
     });
-    if (ctx.arenaQueue1v1.length < 2 || freeArenaSlot(ctx) === null) return;
+    if (ctx.arenaQueue1v1.length < 2 || freeArenaSlot(ctx, '1v1') === null) return;
     const aPid = ctx.arenaQueue1v1[0];
     const aRating = arenaRatingForPid(ctx, aPid, '1v1');
     let bPid = -1,
@@ -833,9 +833,13 @@ export function startArenaMatch(
   }
   for (const e of entities) resetForArena(ctx, e!);
   emitArenaFound(ctx, match);
+  // Each map gets its own bout-start line (both literals stay verbatim here
+  // so the client's exact-match localizer keeps re-localizing them).
   const stepText = isFiesta
     ? 'Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!'
-    : 'You step onto the sands of the Ashen Coliseum.';
+    : map.id === 'drowned_court'
+      ? 'You step onto the flooded stones of the Drowned Court.'
+      : 'You step onto the sands of the Ashen Coliseum.';
   for (const mPid of allPids) {
     ctx.emit({ type: 'arenaCountdown', seconds: countdown, pid: mPid });
     ctx.emit({

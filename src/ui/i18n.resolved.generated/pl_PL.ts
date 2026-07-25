@@ -6219,6 +6219,7 @@ export const pl_PL: EnTranslations = {
       "arenaJoin": "Dołączasz do kolejki Popielnego Koloseum. Czekaj na godnego przeciwnika...",
       "arenaLeave": "Opuszczasz kolejkę Popielnego Koloseum.",
       "arenaSands": "Wkraczasz na piaski Popielnego Koloseum.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "Poprosiłeś {name} o wymianę.",
       "tradeOpened": "Otwarto okno wymiany.",
       "tradeComplete": "Wymiana zakończona.",

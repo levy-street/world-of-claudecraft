@@ -6219,6 +6219,7 @@ export const nl_NL: EnTranslations = {
       "arenaJoin": "Je sluit je aan bij de wachtrij van het Ashen Coliseum. Wacht op een waardige tegenstander...",
       "arenaLeave": "Je verlaat de wachtrij van het Ashen Coliseum.",
       "arenaSands": "Je betreedt het zand van het Ashen Coliseum.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "Je hebt verzocht om met {name} te ruilen.",
       "tradeOpened": "Ruilvenster geopend.",
       "tradeComplete": "Ruil voltooid.",

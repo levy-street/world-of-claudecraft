@@ -32,8 +32,20 @@ export function arenaWaterBands(
     // side strips run the full pit length along each side wall
     { x: -(innerX - bandWidth / 2), z: (zMin + zMax) / 2, width: bandWidth, depth: zMax - zMin },
     { x: innerX - bandWidth / 2, z: (zMin + zMax) / 2, width: bandWidth, depth: zMax - zMin },
-    // end strips span exactly between the side strips
-    { x: 0, z: zMin + bandWidth / 2, width: 2 * (innerX - bandWidth), depth: bandWidth },
-    { x: 0, z: zMax - bandWidth / 2, width: 2 * (innerX - bandWidth), depth: bandWidth },
+    // end strips span exactly between the side strips (clamped so a
+    // hypothetical band wider than the half-room degenerates to nothing
+    // instead of a negative-width plane)
+    {
+      x: 0,
+      z: zMin + bandWidth / 2,
+      width: Math.max(0, 2 * (innerX - bandWidth)),
+      depth: bandWidth,
+    },
+    {
+      x: 0,
+      z: zMax - bandWidth / 2,
+      width: Math.max(0, 2 * (innerX - bandWidth)),
+      depth: bandWidth,
+    },
   ];
 }

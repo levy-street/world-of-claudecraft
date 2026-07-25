@@ -129,4 +129,22 @@ describe('arena rotation: yumi isolation', () => {
       expect(isArenaPos(yumiMazeOrigin(slot).x)).toBe(false);
     }
   });
+
+  it('a yumi bout on an ODD maze slot still reports map coliseum', () => {
+    // Yumi match.slot numbers come from the MAZE pool, whose values collide
+    // with pit slot numbers; the arenaInfo map fact must not read maze-slot
+    // parity as a Drowned Court assignment.
+    const sim = makeWorld();
+    sim.ctx.yumiBusySlots.add(0); // force the bout onto maze slot 1
+    const pids: number[] = [];
+    for (let i = 0; i < 6; i++) pids.push(addFighter(sim, i % 2 ? 'mage' : 'warrior', `Y${i}`));
+    for (const pid of pids) sim.arenaQueueJoin(pid, 'yumi3');
+    sim.tick();
+    const m = sim.arenaMatchFor(pids[0])!;
+    expect(m).not.toBeNull();
+    expect(m.yumi).toBeTruthy();
+    expect(m.slot).toBe(1);
+    const info = sim.arenaInfoFor(pids[0])!;
+    expect(info.match?.map).toBe('coliseum');
+  });
 });

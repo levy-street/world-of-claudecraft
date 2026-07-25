@@ -6219,6 +6219,7 @@ export const ko_KR: EnTranslations = {
       "arenaJoin": "잿빛 원형경기장 대기열에 들어갔습니다. 훌륭한 상대를 기다리세요...",
       "arenaLeave": "잿빛 원형경기장 대기열에서 나왔습니다.",
       "arenaSands": "잿빛 원형경기장의 모래 위에 섰습니다.",
+      "arenaSandsDrowned": "수몰된 궁정의 물에 잠긴 돌바닥에 들어섰습니다.",
       "tradeRequestSent": "{name}님에게 거래를 요청했습니다.",
       "tradeOpened": "거래 창이 열렸습니다.",
       "tradeComplete": "거래 완료.",

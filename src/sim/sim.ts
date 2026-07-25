@@ -8388,7 +8388,10 @@ export class Sim {
           matchInfo = {
             format: match.format,
             state: match.state,
-            map: arenaMapForSlot(match.slot).id,
+            // Yumi bouts hold a MAZE slot (a different pool whose numbers
+            // collide with pit slots), so parity would be meaningless there:
+            // they report the documented default instead.
+            map: match.yumi ? 'coliseum' : arenaMapForSlot(match.slot).id,
             oppName: enemies.map((e) => e.name).join(' & '),
             oppClass: primary.cls,
             oppLevel: primary.level,

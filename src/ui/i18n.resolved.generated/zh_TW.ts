@@ -6219,6 +6219,7 @@ export const zh_TW: EnTranslations = {
       "arenaJoin": "你加入了灰燼競技場佇列。等待一位值得一戰的對手...",
       "arenaLeave": "你離開了灰燼競技場佇列。",
       "arenaSands": "你踏上了灰燼競技場的沙地。",
+      "arenaSandsDrowned": "你踏上了沉沒王庭的水淹石地。",
       "tradeRequestSent": "你已請求與 {name} 交易。",
       "tradeOpened": "交易視窗已開啟。",
       "tradeComplete": "交易完成。",

@@ -6219,6 +6219,7 @@ export const de_DE: EnTranslations = {
       "arenaJoin": "Ihr tretet der Warteschlange des Aschenen Kolosseums bei. Wartet auf einen würdigen Gegner...",
       "arenaLeave": "Ihr verlasst die Warteschlange des Aschenen Kolosseums.",
       "arenaSands": "Ihr betretet den Sand des Aschenen Kolosseums.",
+      "arenaSandsDrowned": "You step onto the flooded stones of the Drowned Court.",
       "tradeRequestSent": "Ihr habt {name} um Handel gebeten.",
       "tradeOpened": "Handelsfenster geöffnet.",
       "tradeComplete": "Handel abgeschlossen.",
