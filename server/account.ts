@@ -97,6 +97,17 @@ export interface AccountGameHooks {
   disconnectAccount(accountId: number, reason: string): void;
 }
 
+// The narrower hook a credential-change handler needs: just the live-WS
+// teardown, not the online-character check the deactivate flow uses.
+type DisconnectHook = Pick<AccountGameHooks, 'disconnectAccount'>;
+
+// Disconnect reason for the live-WS kick a password change/reset forces. Byte-
+// identical to admin.ts's IP_BLOCK_KICK_MESSAGE, which the client already
+// localizes (api_error_i18n.ts): reusing the exact literal needs no new i18n
+// work and matches the same "credentials changed, an open socket is no longer
+// trustworthy" posture as the admin-initiated reset-password handlers.
+const CREDENTIAL_CHANGE_KICK_MESSAGE = 'Connection to the server was lost.';
+
 // GET /api/account: whoami; re-validates a stored token on reload + feeds the
 // portal header. characterCount is account-wide (every realm), matching the
 // account-wide nature of this self-service portal.
@@ -124,12 +135,16 @@ export async function handleAccountWhoami(
 // POST /api/account/password: re-verify current, then revoke every OTHER token
 // so a password change signs out other devices while keeping this one alive.
 // callerToken is resolved by main.ts; it must never be null here (validated up
-// the stack) so the revoke below can never accidentally nuke this session.
+// the stack) so the revoke below can never accidentally nuke this session. Token
+// revocation alone does not close an already-open WS (an attacker who is
+// already in-world stays connected), so we also force-disconnect any live
+// session for the account, mirroring handleAccountDeactivate below.
 export async function handleAccountChangePassword(
   req: http.IncomingMessage,
   res: http.ServerResponse,
   accountId: number,
   callerToken: string,
+  hooks: DisconnectHook,
 ): Promise<void> {
   if (!rateLimited(req).allowed) return json(res, 429, { error: 'too many attempts, slow down' });
   const body = await readBody(req);
@@ -160,6 +175,7 @@ export async function handleAccountChangePassword(
   }
   await updatePasswordHash(accountId, await hashPassword(next));
   await revokeTokensExcept(accountId, callerToken);
+  hooks.disconnectAccount(accountId, CREDENTIAL_CHANGE_KICK_MESSAGE);
   // Best-effort security notice; never blocks the password change on mail state.
   emailPasswordChanged(acct);
   return json(res, 200, { ok: true });
@@ -198,10 +214,15 @@ export async function handleAccountPasswordForgot(
 // Unauthenticated: complete a reset with the emailed token + a new password. The
 // token is validated, the new password applied, and every session revoked, all in
 // one atomic DB call. Invalid and expired tokens return the same 400 so neither a
-// bad guess nor an old link reveals anything.
+// bad guess nor an old link reveals anything. Revoking tokens alone does not close
+// an already-open WS (this reset exists precisely because the account may be
+// recovering from a compromise, and a compromised session may already be
+// in-world), so we also force-disconnect any live session for the account right
+// after the reset lands, mirroring handleAccountDeactivate below.
 export async function handleAccountPasswordReset(
   req: http.IncomingMessage,
   res: http.ServerResponse,
+  hooks: DisconnectHook,
 ): Promise<void> {
   if (!rateLimited(req).allowed) return json(res, 429, { error: 'too many attempts, slow down' });
   const body = await readBody(req);
@@ -216,6 +237,7 @@ export async function handleAccountPasswordReset(
   }
   const applied = await consumePasswordResetRequest(hashEmailToken(raw), await hashPassword(next));
   if (!applied) return json(res, 400, { error: 'invalid or expired link' });
+  hooks.disconnectAccount(applied.accountId, CREDENTIAL_CHANGE_KICK_MESSAGE);
   // Best-effort "your password changed" notice; never blocks the reset on mail state.
   const target = await accountMailTarget(applied.accountId);
   if (target) emailPasswordChanged(target);
@@ -727,7 +749,13 @@ async function passwordHandler(ctx: Ctx): Promise<void> {
     json(ctx.res, 401, NOT_AUTHENTICATED);
     return;
   }
-  return handleAccountChangePassword(ctx.req, ctx.res, ctxAccountId(ctx), callerToken);
+  return handleAccountChangePassword(
+    ctx.req,
+    ctx.res,
+    ctxAccountId(ctx),
+    callerToken,
+    useRuntime(),
+  );
 }
 
 /** POST /api/account/logout: revoke this device's bearer token. */

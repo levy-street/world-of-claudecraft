@@ -2014,7 +2014,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const callerToken = bearerToken(req);
       if (!callerToken)
         return json(res, 401, { error: 'not authenticated', code: 'auth.required' });
-      return handleAccountChangePassword(req, res, accountId, callerToken);
+      return handleAccountChangePassword(req, res, accountId, callerToken, {
+        disconnectAccount: (id, reason) => liveGame().disconnectAccount(id, reason),
+      });
     }
     // Password reset is for users who are locked out, so both routes are
     // unauthenticated (rate-limited + web-login guarded above, and each handler is
@@ -2023,7 +2025,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       return handleAccountPasswordForgot(req, res);
     }
     if (req.method === 'POST' && url === '/api/account/password/reset') {
-      return handleAccountPasswordReset(req, res);
+      return handleAccountPasswordReset(req, res, {
+        disconnectAccount: (id, reason) => liveGame().disconnectAccount(id, reason),
+      });
     }
     if (req.method === 'POST' && url === '/api/account/logout') {
       const callerToken = bearerToken(req);
