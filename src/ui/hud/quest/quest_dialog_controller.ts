@@ -261,6 +261,7 @@ export class QuestDialogController {
       npc.templateId,
       world.questState(PROF_INTRO_QUEST_ID),
       world.craftingIdentity.attunedPairs.length > 0,
+      world.stationPlacements,
     );
   }
 
@@ -289,7 +290,7 @@ export class QuestDialogController {
     const hasVendor = npc.vendorItems.length > 0;
     // Station master (Professions 2.0): the resident master of a
     // crafting station (stations content masterNpcId) offers recipe training.
-    const hasTraining = isStationMasterNpc(npc.templateId);
+    const hasTraining = isStationMasterNpc(npc.templateId, world.stationPlacements);
     const hasMarket = !!definition?.market;
     const hasHeroicVendor = !!definition?.heroicVendor;
     const hasDelveBoard = Object.values(DELVES).some(

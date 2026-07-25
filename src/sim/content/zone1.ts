@@ -2,6 +2,8 @@
 // wolves and boars, the bandit camp, and Brother Aldric's Gravecaller chain
 // leading to the Hollow Crypt.
 
+import { EASTBROOK_GRAND_ARMOURY } from '../building_layout';
+import { EASTBROOK_LAYOUT, EASTBROOK_NPC_PLACEMENTS_BY_ID } from '../eastbrook_layout';
 import { WORK_ORDER_CADENCE_TICKS } from '../professions/cadence';
 import type {
   CampDef,
@@ -14,7 +16,7 @@ import type {
 } from '../types';
 
 export const TOWN_RADIUS = 26;
-export const GRAVEYARD_POS = { x: -12, z: -14 };
+export const GRAVEYARD_POS = { ...EASTBROOK_LAYOUT.services.graveyard.legacyReleasePoint };
 // Basin carved into the heightfield. Pushed to the far northeast so its
 // shoreline meets the fishing dock and the murloc camp instead of drowning them.
 export const LAKE = { x: -92, z: 88, radius: 30 };
@@ -519,9 +521,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'the_merchant',
     name: 'The Merchant',
     title: 'Keeper of the World Market',
-    // centerpiece of the square, just north of the well, facing the approach
-    pos: { x: 0, z: 9.5 },
-    facing: Math.PI,
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.the_merchant.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.the_merchant.facing,
     color: 0xd4af37,
     questIds: [],
     market: true,
@@ -532,8 +533,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'marshal_redbrook',
     name: 'Marshal Redbrook',
     title: 'Town Marshal',
-    pos: { x: 4, z: 6 },
-    facing: Math.PI,
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.marshal_redbrook.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.marshal_redbrook.facing,
     color: 0xb7950b,
     questIds: ['q_wolves', 'q_greyjaw', 'q_bandits', 'q_ringleader', 'q_mogger'],
     greeting: 'Keep your blade close, $C. The Vale is not what it was.',
@@ -542,8 +543,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'trader_wilkes',
     name: 'Trader Wilkes',
     title: 'Provisioner',
-    pos: { x: -7, z: 3 },
-    facing: Math.PI / 2,
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.trader_wilkes.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.trader_wilkes.facing,
     color: 0x1e8449,
     questIds: ['q_boars', 'q_supplies'],
     vendorItems: [
@@ -573,8 +574,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'apothecary_lin',
     name: 'Apothecary Lin',
     title: 'Herbalist',
-    pos: { x: 11, z: -3 },
-    facing: -Math.PI / 2,
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.apothecary_lin.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.apothecary_lin.facing,
     color: 0x7d3c98,
     questIds: ['q_spiders'],
     greeting: 'Careful where you step in the eastern woods, friend.',
@@ -583,8 +584,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'brother_aldric',
     name: 'Brother Aldric',
     title: 'Priest of the Vale',
-    pos: { x: -14, z: -10 },
-    facing: 0.8,
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.brother_aldric.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.brother_aldric.facing,
     color: 0xf7f9f9,
     questIds: [
       'q_bones',
@@ -603,8 +604,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'smith_haldren',
     name: 'Smith Haldren',
     title: 'Armorer & Weaponsmith',
-    pos: { x: 7, z: 16.5 },
-    facing: -2.7,
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.smith_haldren.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.smith_haldren.facing,
     color: 0x707b7c,
     questIds: ['q_prof_hobby_switch'],
     vendorItems: [
@@ -626,11 +627,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'fisherman_brandt',
     name: 'Fisherman Brandt',
     title: 'Old Salt',
-    // in town (east edge, glaring out at Mirror Lake) — his old spot by the
-    // dock sat inside the Mudfin spawn radius and new players got ambushed
-    // walking up to a quest giver
-    pos: { x: -16, z: 6 },
-    facing: -0.75,
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.fisherman_brandt.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.fisherman_brandt.facing,
     color: 0x2471a3,
     questIds: ['q_murlocs'],
     vendorItems: ['simple_fishing_pole'],
@@ -640,10 +638,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'foreman_odell',
     name: 'Foreman Odell',
     title: 'Mine Foreman',
-    // in town (south edge, scowling toward his overrun dig) — his old spot
-    // sat inside the Tunnel Rat spawn radius
-    pos: { x: -4, z: -14 },
-    facing: -2.14,
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.foreman_odell.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.foreman_odell.facing,
     color: 0xa04000,
     questIds: ['q_prof_intro', 'q_mine'],
     greeting: "Whole dig's crawling with those dirt-caked vermin!",
@@ -652,9 +648,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'bursar_fernando',
     name: 'Bursar Fernando',
     title: 'The Gilded Strongbox',
-    // east side of the square, facing the approach toward the well and Merchant
-    pos: { x: 13, z: 8 },
-    facing: -Math.PI / 2,
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.bursar_fernando.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.bursar_fernando.facing,
     color: 0xc9a227,
     questIds: [],
     banker: true,
@@ -664,9 +659,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'card_master',
     name: 'Card Master',
     title: 'Dealer of Chance',
-    // Across the square from the bank, out of the way of the well/Merchant traffic.
-    pos: { x: 13, z: 2 },
-    facing: -Math.PI / 2,
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.card_master.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.card_master.facing,
     color: 0x7a2f8f,
     questIds: [],
     cardMaster: true,
@@ -692,12 +686,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'chronicler_saul',
     name: 'Saul the Chronicler',
     title: 'The Vale Chronicle',
-    // Southeast corner of the square, on the quiet side away from the well
-    // cluster and the player start, looking back northwest across the square
-    // (nearest authored neighbor ~13 units; he had been shoulder to shoulder
-    // with the well crowd).
-    pos: { x: 15, z: -16 },
-    facing: 2.4,
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.chronicler_saul.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.chronicler_saul.facing,
     color: 0xd08a2e, // warm amber: the chronicler tint is his identity (shared mage visual)
     questIds: [],
     greeting:
@@ -710,9 +700,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'forgemistress_darva',
     name: 'Forgemistress Darva',
     title: 'Master of the Forge',
-    // Across the anvil from Smith Haldren, at the Eastbrook forge.
-    pos: { x: 5, z: 15 },
-    facing: -2.4,
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.forgemistress_darva.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.forgemistress_darva.facing,
     color: 0xb5541c,
     // Professions 2.0: the Smith pair's anchor master. Attunement and
     // its escalating make-amends return live here now (moved off Smith Haldren),
@@ -734,9 +723,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'cook_marlow',
     name: 'Cook Marlow',
     title: 'Master of the Kitchens',
-    // West side of the square, beside the kitchens station.
-    pos: { x: -12.5, z: 3 },
-    facing: Math.PI / 2,
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.cook_marlow.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.cook_marlow.facing,
     color: 0xc98a4b,
     // Professions 2.0: the Apothecary pair's (alchemy + cooking) anchor
     // master. Attunement, make-amends return, and the repeatable kitchens work
@@ -756,9 +744,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'weaver_ottilie',
     name: 'Weaver Ottilie',
     title: 'Master of the Loom',
-    // South of the well, beside the loom station.
-    pos: { x: -4, z: -9 },
-    facing: 0.8,
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.weaver_ottilie.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.weaver_ottilie.facing,
     color: 0x7161a8,
     // Professions 2.0: the Outfitter pair's (leatherworking + tailoring)
     // anchor master. Attunement, make-amends return, and the repeatable loom work
@@ -783,9 +770,8 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'tinker_gizzel',
     name: 'Tinker Gizzel',
     title: 'Master of the Toolworks',
-    // Southeast corner of the square, beside the toolworks station.
-    pos: { x: 9.5, z: -14 },
-    facing: -0.8,
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.tinker_gizzel.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.tinker_gizzel.facing,
     color: 0xb08d57,
     // Professions 2.0: the Bombardier pair's (engineering + alchemy)
     // anchor master. Attunement, make-amends return, and the repeatable toolworks
@@ -1527,41 +1513,12 @@ export const ZONE1_OBJECTS: GroundObjectDef[] = [
 // Roads from town toward each hub — used for terrain painting and the map.
 // Roads from town toward each hub — used for terrain painting and the map.
 export const ZONE1_ROADS: { x: number; z: number }[][] = [
-  [
-    { x: 0, z: 8 },
-    { x: -8, z: 30 },
-    { x: -15, z: 55 },
-    { x: -2, z: 78 },
-  ], // north to wolves
-  [
-    { x: 8, z: 2 },
-    { x: 30, z: 8 },
-    { x: 55, z: 12 },
-  ], // east to boars
-  [
-    { x: 6, z: -6 },
-    { x: 30, z: -30 },
-    { x: 50, z: -50 },
-    { x: 65, z: -65 },
-  ], // southeast to bandits
-  [
-    { x: -8, z: 6 },
-    { x: -35, z: 25 },
-    { x: -58, z: 48 },
-    { x: -66, z: 58 },
-  ], // northwest to lake
-  [
-    { x: -6, z: -6 },
-    { x: -30, z: -28 },
-    { x: -55, z: -45 },
-    { x: -70, z: -55 },
-  ], // southwest to mine
-  [
-    { x: 6, z: 8 },
-    { x: 35, z: 35 },
-    { x: 60, z: 60 },
-    { x: 78, z: 74 },
-  ], // northeast to ruins
+  [...EASTBROOK_LAYOUT.roads[0].points, { x: -8, z: 30 }, { x: -15, z: 55 }, { x: -2, z: 78 }], // north to wolves
+  [...EASTBROOK_LAYOUT.roads[1].points, { x: 30, z: 8 }, { x: 55, z: 12 }], // east to boars
+  [...EASTBROOK_LAYOUT.roads[2].points, { x: 30, z: -30 }, { x: 50, z: -50 }, { x: 65, z: -65 }], // southeast to bandits
+  [...EASTBROOK_LAYOUT.roads[3].points, { x: -35, z: 25 }, { x: -58, z: 48 }, { x: -66, z: 58 }], // northwest to lake
+  [...EASTBROOK_LAYOUT.roads[4].points, { x: -30, z: -28 }, { x: -55, z: -45 }, { x: -70, z: -55 }], // southwest to mine
+  [...EASTBROOK_LAYOUT.roads[5].points, { x: 35, z: 35 }, { x: 60, z: 60 }, { x: 78, z: 74 }], // northeast to ruins
 ];
 
 // ---------------------------------------------------------------------------
@@ -1570,17 +1527,50 @@ export const ZONE1_ROADS: { x: number; z: number }[][] = [
 
 export const ZONE1_PROPS: ZonePropsDef = {
   buildings: [
-    { kind: 'house', x: 10, z: 12, w: 7, d: 6, rot: -0.4 },
-    { kind: 'house', x: -10, z: 10, w: 6, d: 5, rot: 0.5 },
-    { kind: 'inn', x: 12, z: -6, w: 6, d: 7, rot: 2.4 },
-    { kind: 'chapel', x: -16, z: -8, w: 5, d: 7, rot: 0.9 },
+    {
+      id: EASTBROOK_LAYOUT.preservedBuildings[0].id,
+      assetId: EASTBROOK_LAYOUT.preservedBuildings[0].assetId,
+      kind: EASTBROOK_LAYOUT.preservedBuildings[0].kind,
+      landmark: EASTBROOK_GRAND_ARMOURY.landmark,
+      ...EASTBROOK_GRAND_ARMOURY.lot,
+      height: EASTBROOK_GRAND_ARMOURY.aboveGradeHeight,
+    },
+    ...EASTBROOK_LAYOUT.buildings.map((building) => ({
+      id: building.id,
+      assetId: building.assetId,
+      kind: building.kind,
+      x: building.position.x,
+      z: building.position.z,
+      w: building.nativeDimensions.width,
+      d: building.nativeDimensions.depth,
+      rot: building.rotation,
+      height: building.nativeDimensions.height,
+    })),
   ],
-  wells: [{ x: 0, z: 2, r: 1.5 }],
-  stalls: [
-    { x: -8.5, z: 3, rot: Math.PI / 2, r: 1.7 },
-    { x: 9.5, z: 17.5, rot: -2.7, r: 1.7, smithy: true }, // Smith Haldren's stall
-    { x: 0, z: 11.5, rot: Math.PI, r: 1.8 }, // The Merchant's World Market stall
+  wells: [
+    {
+      id: EASTBROOK_LAYOUT.civic.wellBeacon.id,
+      assetId: EASTBROOK_LAYOUT.civic.wellBeacon.assetId,
+      x: EASTBROOK_LAYOUT.civic.wellBeacon.position.x,
+      z: EASTBROOK_LAYOUT.civic.wellBeacon.position.z,
+      r: EASTBROOK_LAYOUT.civic.wellBeacon.radius,
+      height: EASTBROOK_LAYOUT.civic.wellBeacon.height,
+      camGhost: false,
+    },
   ],
+  stalls: EASTBROOK_LAYOUT.market.stalls.map((stall) => ({
+    id: stall.id,
+    assetId: stall.assetId,
+    x: stall.position.x,
+    z: stall.position.z,
+    rot: stall.rotation,
+    r: Math.hypot(stall.width / 2, stall.depth / 2),
+    w: stall.width,
+    d: stall.depth,
+    height: stall.height,
+    canopyVariant: stall.canopyVariant,
+    camGhost: false,
+  })),
   mines: [{ x: -88, z: -68, rot: 0.8 }],
   docks: [{ x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } }],
   tents: [
@@ -1597,7 +1587,6 @@ export const ZONE1_PROPS: ZonePropsDef = {
     [70, -72],
   ],
   campfires: [
-    [3, -4],
     [65, -65],
     [90, -90],
     [-80, -60],
@@ -1612,13 +1601,38 @@ export const ZONE1_PROPS: ZonePropsDef = {
     { x: 80, z: 78, ringR: 7, columns: 7 },
     { x: -5, z: -60, ringR: 8, columns: 6 },
   ],
-  fences: [
-    { x1: 16, z1: 16, x2: 22, z2: 4 },
-    { x1: -16, z1: 14, x2: -20, z2: 2 },
-  ],
-  graveyards: [
-    { x: -14, z: -14 },
-    { x: 4, z: -56 },
-  ],
+  fences: EASTBROOK_LAYOUT.fences.map((fence) => ({
+    id: fence.id,
+    assetId: fence.assetId,
+    x1: fence.start.x,
+    z1: fence.start.z,
+    x2: fence.end.x,
+    z2: fence.end.z,
+    width: fence.width,
+    height: fence.height,
+  })),
+  benches: EASTBROOK_LAYOUT.civic.benches.map((bench) => ({
+    id: bench.id,
+    assetId: bench.assetId,
+    x: bench.position.x,
+    z: bench.position.z,
+    w: bench.width,
+    d: bench.depth,
+    rot: bench.rotation,
+    height: 1,
+    camGhost: false,
+  })),
+  walls: EASTBROOK_LAYOUT.wall.segments.map((segment) => ({
+    id: segment.id,
+    assetId: segment.assetId,
+    x: segment.footprint.center.x,
+    z: segment.footprint.center.z,
+    w: segment.footprint.halfWidth * 2,
+    d: segment.footprint.halfDepth * 2,
+    rot: segment.footprint.rotation,
+    height: segment.height,
+    camGhost: false,
+  })),
+  graveyards: [{ ...EASTBROOK_LAYOUT.services.graveyard.position }, { x: 4, z: -56 }],
   delveMarkers: [{ x: -5, z: -52, delveId: 'collapsed_reliquary' }],
 };

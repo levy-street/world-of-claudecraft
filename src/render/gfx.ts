@@ -17,7 +17,10 @@ import { isSoftwareRendererName } from './software_renderer';
 //      anything unrecognized -> medium), so the 3D tier matches the medium data-fx-level fallback
 
 export type GfxTier = 'low' | 'medium' | 'high' | 'ultra';
-export const GFX_CONFIG_VERSION = 17;
+// v18: composer-tier draw counts became real (draw_stats_core accumulator);
+// fleet dashboards segment the rendererCalls/rendererTriangles semantics
+// change on this version (packet 0 ruling R2).
+export const GFX_CONFIG_VERSION = 18;
 
 export const GFX_BUCKET_IDS = [
   'resolution',
@@ -1132,6 +1135,7 @@ export const SUN_DIR = SUN_ANCHOR.clone().normalize();
 export interface SurfaceMatOpts {
   color?: number;
   map?: THREE.Texture;
+  vertexColors?: boolean;
   normalMap?: THREE.Texture;
   /** PBR roughness map (high/ultra only; ignored on the Lambert tier) */
   roughnessMap?: THREE.Texture;
@@ -1188,6 +1192,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
     ? new THREE.MeshStandardMaterial({
         color: opts.color ?? 0xffffff,
         map: opts.map ?? null,
+        vertexColors: opts.vertexColors ?? false,
         normalMap: opts.normalMap ?? null,
         roughnessMap: opts.roughnessMap ?? null,
         aoMap: opts.aoMap ?? null,
@@ -1201,6 +1206,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
     : new THREE.MeshLambertMaterial({
         color: opts.color ?? 0xffffff,
         map: opts.map ?? null,
+        vertexColors: opts.vertexColors ?? false,
         flatShading: opts.flatShading ?? false,
         emissive: opts.emissive ?? 0x000000,
         emissiveIntensity: opts.emissiveIntensity ?? 1,

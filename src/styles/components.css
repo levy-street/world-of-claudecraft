@@ -4342,6 +4342,11 @@
     line-height: 1.55;
     color: var(--color-text-light);
     margin: 10px 0;
+    /* The body is escaped plain text, so a multi-line body (the disenchant
+       confirm's expected-yield preview) needs its newlines honored; pre-line
+       still collapses runs of spaces, so every existing single-line body
+       renders byte-identically. */
+    white-space: pre-line;
   }
   #confirm-dialog .cd-actions {
     display: flex;
@@ -5643,10 +5648,10 @@
     pointer-events: none;
   }
   /* Instanced-copy marker (Professions 2.0): a static gold corner
-     tab on every per-copy (signed/enchanted/masterwork) stack, always visible
-     on the cell itself on desktop and touch (information-add, identical on
-     every graphics preset, so no --fx-* gate). Top-left, clear of the
-     bottom-right count badge. */
+     tab, now the FALLBACK for an instanced stack whose payload matches none of
+     the named kinds below. Always visible on the cell itself on desktop and
+     touch (information-add, identical on every graphics preset, so no --fx-*
+     gate). Top-left, clear of the bottom-right count badge. */
   .bag-item .bi-instance {
     position: absolute;
     top: 1px;
@@ -5656,6 +5661,36 @@
     clip-path: polygon(0 0, 100% 0, 0 100%);
     background: var(--color-accent);
     pointer-events: none;
+  }
+  /* Per-kind corner glyphs: the enchanted / signed / bound copies each get their
+     own procedural chrome glyph in the same top-left corner, so the marker says
+     WHICH kind of special copy this is instead of only that it is one. Same
+     always-on, preset-independent contract as .bi-instance above (no --fx-*
+     gate, no hover reveal); the tooltip carries the semantics, the glyph is
+     aria-hidden. Colors come from tokens, never a literal in the painter. */
+  .bag-item .bi-glyph {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 12px;
+    height: 12px;
+    display: block;
+    pointer-events: none;
+    filter: drop-shadow(0 1px 1px #000);
+  }
+  .bag-item .bi-glyph .ui-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .bag-item .bi-glyph-enchanted {
+    color: var(--color-bag-glyph-enchanted);
+  }
+  .bag-item .bi-glyph-signed {
+    color: var(--color-bag-glyph-signed);
+  }
+  .bag-item .bi-glyph-bound {
+    color: var(--color-bag-glyph-bound);
   }
   .bag-item .bi-masterwork-seal {
     position: absolute;
@@ -7248,6 +7283,60 @@
   }
   .soc-guild-head .gm {
     color: var(--color-text-muted);
+    font-size: 11px;
+  }
+  /* Guild billboard: the officer-set message pinned between the guild head and
+     the roster. Plain escaped text only (player-controlled, never linkified).
+     Raw hex matches the surrounding .soc-* palette; tokenizing that palette is
+     deferred (see the .soc-sugg-item note above). */
+  .soc-billboard {
+    grid-column: 1 / -1;
+    margin: 0 4px 6px;
+    padding: 7px 9px;
+    background: #1a1410;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+  }
+  .soc-billboard-label {
+    font-family: var(--title-font);
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-bottom: 3px;
+  }
+  .soc-billboard-msg {
+    font-size: 12px;
+    color: #f0ead8;
+    overflow-wrap: anywhere;
+  }
+  .soc-billboard-msg.empty {
+    color: #887c5c;
+  }
+  .soc-billboard-by {
+    margin-top: 3px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .soc-billboard-edit {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .soc-billboard-edit input {
+    flex: 1;
+    min-width: 0;
+    background: #120f0c;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    color: #f0ead8;
+    padding: 5px 7px;
+    font-size: 12px;
+  }
+  .soc-billboard-edit input:disabled {
+    color: #887c5c;
+  }
+  .soc-billboard-edit .btn {
+    margin: 0;
+    padding: 5px 12px;
     font-size: 11px;
   }
   /* Guild roster: the persisted "hide offline" toggle (an aria-pressed button with a

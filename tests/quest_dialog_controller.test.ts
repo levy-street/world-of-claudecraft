@@ -48,6 +48,7 @@ function harness(entity = npc(10, ordinaryNpcId()), questState = 'available') {
     player: { name: 'Ari', pos: { x: 0, y: 0, z: 0 } },
     questLog: new Map(),
     partyInfo: null,
+    stationPlacements: STATIONS,
     craftingIdentity: {
       version: 1,
       synced: true,
@@ -433,6 +434,16 @@ describe('QuestDialogController', () => {
     const plain = harness(npc(49, plainId));
     plain.controller.open(49);
     expect(plain.element.querySelector('[data-unbind]')).toBeNull();
+  });
+
+  it('does not leak Train or Unbind into a world with no authored stations', () => {
+    const master = harness(npc(50, STATIONS[0].masterNpcId));
+    (master.world as unknown as { stationPlacements: typeof STATIONS }).stationPlacements = [];
+
+    master.controller.open(50);
+
+    expect(master.element.querySelector('[data-train]')).toBeNull();
+    expect(master.element.querySelector('[data-unbind]')).toBeNull();
   });
 
   it('closes stale gossip when the authoritative NPC disappears', () => {

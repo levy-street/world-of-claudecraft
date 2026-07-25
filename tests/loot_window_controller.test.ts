@@ -152,6 +152,7 @@ describe('LootWindowController', () => {
       componentTags: undefined,
       harvestable: false,
       visibleItems: [],
+      visibleCopper: 0,
       hasLoot: false,
       canOpen: false,
     }));
@@ -162,6 +163,34 @@ describe('LootWindowController', () => {
     expect(corpseAvailability).toHaveBeenCalledWith(mob);
     expect(test.closeTransient).not.toHaveBeenCalled();
     expect(test.element.style.display).not.toBe('block');
+  });
+
+  it("hides a stranger's owner-locked copper and shared items, listing only my personal drop", () => {
+    // Tapped by 9, owner-lock still counting: viewer 7 has no shared rights, so
+    // the coin row and the plain slot must not be advertised (the take would
+    // deny them); only the personal slot naming 7 renders.
+    const mob = entity(15, {
+      kind: 'mob',
+      templateId: harvestMobId,
+      tappedById: 9,
+      lootFfaTimer: 60,
+      harvestClaimedBy: 9,
+      loot: {
+        copper: 25,
+        items: [
+          { itemId: itemIds[0], count: 1 },
+          { itemId: itemIds[1], count: 1, personalFor: [7] },
+        ],
+      },
+    });
+    const test = harness([mob]);
+
+    test.controller.openCorpse(15, 400, 300);
+
+    expect(test.element.style.display).toBe('block');
+    expect(test.element.innerHTML).not.toContain('money:25');
+    expect(test.element.innerHTML).not.toContain(`data-item="${itemIds[0]}"`);
+    expect(test.element.innerHTML).toContain(`data-item="${itemIds[1]}"`);
   });
 
   it('passes the selected harvest components through the IWorld seam', () => {

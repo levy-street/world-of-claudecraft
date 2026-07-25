@@ -41,6 +41,7 @@ import {
   jailGateTeleport,
 } from '../src/sim/jail';
 import type { PickAction } from '../src/sim/lockpick';
+import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import { sanitizeMarketQuery } from '../src/sim/market_query';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import {
@@ -79,6 +80,7 @@ import {
 import { isAtSowfield } from '../src/sim/vale_cup_layout';
 import {
   type BankBonusSource,
+  COMMAND_NAMES,
   type CommandName,
   type DungeonFinderBoard,
   isOverheadEmoteId,
@@ -152,12 +154,17 @@ import { assembleEventsFrame, serializeEventFragments } from './event_frame';
 import { mergedPrsForLogin } from './github_contributors';
 import { githubForAccount } from './github_db';
 import { forEachGuarded, runGuarded } from './guarded_iter';
-import { gameMetricsCounters } from './http/game_signals';
+import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
 import { buildSharedInterestCandidates } from './interest_candidates';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { keepaliveSweepDelayed } from './keepalive_sweep';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
+import {
+  consumeListReadToken,
+  createListReadGuard,
+  type ListReadGuardState,
+} from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
 import { trackReachedLevel5 } from './meta_capi';
 import {
@@ -176,7 +183,21 @@ import {
   type ModerationHost,
   ModerationService,
 } from './moderation_service';
-import { consumeMsgToken, createMsgRateBucket, type MsgRateBucketState } from './msg_rate_limit';
+import {
+  classifyMsgLane,
+  consumeLaneToken,
+  createMsgLanes,
+  type MsgLane,
+  type MsgLaneState,
+} from './msg_lanes';
+import {
+  consumeInboundFrame,
+  createMsgRateBucket,
+  MSG_RATE_KICK_REASON,
+  MSG_SEQ_GAP_SANITY,
+  type MsgRateBucketState,
+  tallyDrop,
+} from './msg_rate_limit';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { nextRaidResetMs } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
@@ -489,6 +510,19 @@ const HEAVY_SELF_REFRESH_TICKS = 40; // ~2 s backstop; staggered per session so 
 // duel. The dungeon/delve entries are door-proximity-gated anyway (a prisoner
 // can never stand at a door), listed here as explicit policy. Leave/abort
 // commands stay allowed.
+// Runtime membership for the dispatched command vocabulary (the CommandName
+// union as data). The command-lane check consults it so a KNOWN command draws
+// its lane token before the switch, while an unknown cmd draws in the default
+// arm AFTER its protocol-anomaly observation (R5: lane drops must never mute
+// the anomaly channel).
+const KNOWN_COMMANDS: ReadonlySet<string> = new Set(COMMAND_NAMES);
+// Lane-drop cause labels (R8): the map keeps the counter's cause vocabulary
+// closed at the seam's fixed WS_DROP_CAUSES set, never a raw lane string.
+const LANE_DROP_CAUSE = {
+  movement: 'lane_movement',
+  command: 'lane_command',
+  chat: 'lane_chat',
+} as const satisfies Record<MsgLane, WsDropCause>;
 const JAILED_BLOCKED_COMMANDS = new Set<string>([
   'arena_queue',
   'vcup_queue',
@@ -630,10 +664,20 @@ export interface ClientSession {
   chatLastRateError: number;
   chatRateViolations: number;
   chatCooldownUntil: number;
-  // Global inbound-message token bucket (#978): covers every frame (input,
-  // cast, cmd, ...), separate from the chat-only bucket above, so a client
-  // flooding non-chat frames is throttled/kicked instead of processed unconditionally.
+  // Pre-parse inbound gate state (#978): the frame and byte token buckets
+  // plus the windowed abuse score, covering every frame (input, cast, cmd,
+  // ...), separate from the chat-only bucket above, so a client flooding
+  // non-chat frames is throttled/kicked instead of processed unconditionally.
   msgRate: MsgRateBucketState;
+  // Post-parse per-class lanes (movement / command / chat) beside the global
+  // bucket above, so one class can never starve another; lane drops tally
+  // into msgRate's abuse window (R6).
+  msgLanes: MsgLaneState;
+  // The ignore/block list-readout bucket (the phase 06 maintainer ruling):
+  // the readouts stay chat-token-free per R5 but are per-call DB reads, so
+  // refusals above the far-above-human budget drop and tally into the same
+  // abuse window.
+  listReadGuard: ListReadGuardState;
   chatMutedUntil: number | null;
   chatMuteReason: string;
   // Hard-word enforcement strike count driving the mute ladder. Account-scoped:
@@ -1034,6 +1078,11 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   // corpse harvest claim (single-use, first-come): the online corpse picker
   // must stop offering a corpse another player already harvested
   if (e.harvestClaimedBy !== null) out.hcb = e.harvestClaimedBy;
+  // loot owner-lock lapse (FFA): the online corpse picker must offer a
+  // stranger's aged-out corpse again for a deliberate manual loot, the same
+  // reliability contract hcb gives harvest claims. Flips once per corpse, so
+  // the per-entity dyn cache re-serializes exactly one changed record.
+  if (e.kind === 'mob' && e.lootable && lootHasGoneFfa(e.lootFfaTimer)) out.ffa = 1;
   if (e.ownerId !== null) out.own = e.ownerId;
   if (e.overheadEmoteId) {
     out.emo = e.overheadEmoteId;
@@ -2743,6 +2792,8 @@ export class GameServer {
       chatRateViolations: 0,
       chatCooldownUntil: 0,
       msgRate: createMsgRateBucket(Date.now() / 1000),
+      msgLanes: createMsgLanes(Date.now() / 1000),
+      listReadGuard: createListReadGuard(Date.now() / 1000),
       chatMutedUntil: meta.mutedUntil ? new Date(meta.mutedUntil).getTime() : null,
       chatMuteReason: meta.reason ?? '',
       chatStrikes: meta.chatStrikes ?? 0,
@@ -3832,12 +3883,17 @@ export class GameServer {
     if (session.left || this.clients.get(session.pid) !== session) return;
     gameMetricsCounters().wsMessage('in');
     const receivedAtMs = Date.now();
-    const verdict = consumeMsgToken(session.msgRate, receivedAtMs / 1000);
-    if (verdict === 'kick') {
-      void this.kickSession(session, 'rejected by server', 'moderation action');
+    const gate = consumeInboundFrame(session.msgRate, receivedAtMs / 1000, raw.length);
+    if (gate.verdict !== 'allow') {
+      // R8: the loss is visible by cause. A kick verdict is the crossing drop
+      // plus the kick, so it counts under both counters.
+      gameMetricsCounters().wsMessageDropped(gate.cause);
+      if (gate.verdict === 'kick') {
+        gameMetricsCounters().wsRateKick();
+        void this.kickSession(session, MSG_RATE_KICK_REASON, 'message flood');
+      }
       return;
     }
-    if (verdict === 'drop') return;
     let msg: unknown;
     try {
       msg = JSON.parse(raw);
@@ -3865,6 +3921,36 @@ export class GameServer {
     return String(record.cmd ?? record.t ?? 'unknown');
   }
 
+  /** Draw a post-parse lane token (R5). On a drop the frame is discarded,
+   *  never queued, and the drop tallies into the same per-second abuse window
+   *  as the pre-parse gate (R6), so a sustained lane flood reaches the kick
+   *  verdict through the identical path. Returns whether to keep processing. */
+  private consumeLane(session: ClientSession, lane: MsgLane, nowSec: number): boolean {
+    if (consumeLaneToken(session.msgLanes, lane, nowSec) === 'allow') return true;
+    gameMetricsCounters().wsMessageDropped(LANE_DROP_CAUSE[lane]);
+    if (tallyDrop(session.msgRate, nowSec) === 'kick') {
+      gameMetricsCounters().wsRateKick();
+      void this.kickSession(session, MSG_RATE_KICK_REASON, 'message flood');
+    }
+    return false;
+  }
+
+  /** Draw a list-read guard token (the phase 06 maintainer ruling): the
+   *  ignore/block list readouts stay chat-token-free per R5, but each is a
+   *  live DB read, so a refusal above the far-above-human budget drops the
+   *  readout and tallies into the same abuse window as every other shed
+   *  frame, making a sustained read flood kickable. Returns whether to run
+   *  the readout. */
+  private consumeListRead(session: ClientSession, nowSec: number): boolean {
+    if (consumeListReadToken(session.listReadGuard, nowSec)) return true;
+    gameMetricsCounters().wsMessageDropped('list_read');
+    if (tallyDrop(session.msgRate, nowSec) === 'kick') {
+      gameMetricsCounters().wsRateKick();
+      void this.kickSession(session, MSG_RATE_KICK_REASON, 'message flood');
+    }
+    return false;
+  }
+
   private dispatchMessage(
     session: ClientSession,
     rawMsg: unknown,
@@ -3881,6 +3967,9 @@ export class GameServer {
         raw,
         receivedAtMs,
       );
+      // Garbage draws a command-lane token AFTER its anomaly observation (R5):
+      // the lane bounds sub-ceiling garbage without muting the anomaly channel.
+      this.consumeLane(session, 'command', receivedAtMs / 1000);
       return;
     }
     const msg = rawMsg as ClientMessage;
@@ -3894,6 +3983,11 @@ export class GameServer {
       return;
     }
     if (msg.t === 'input') {
+      // The movement lane verdicts at the top of the arm, before the sim
+      // moveInput assignment and before observeInput (R5): a dropped movement
+      // frame reaches neither the sim nor the detector, which is FP-safe
+      // because input_absence only counts input frames toward ACTIVE time.
+      if (!this.consumeLane(session, 'movement', receivedAtMs / 1000)) return;
       if (session.spectating) return;
       const meta = sim.meta(pid);
       const e = sim.entities.get(pid);
@@ -3902,7 +3996,19 @@ export class GameServer {
       Object.assign(meta.moveInput, frame.moveInput);
       session.lastInputAt = sim.time;
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
-        session.lastInputSeq = Math.max(session.lastInputSeq, Math.floor(msg.seq));
+        const seq = Math.floor(msg.seq);
+        // R9: the client seq is a per-send increment on an ordered socket, so
+        // a forward jump past lastInputSeq + 1 proves the missing seqs were
+        // sent and never processed (the input-frame-attributed share of the
+        // server's own drops). Guarded to a positive high-water because resume
+        // zeroes it while the client restarts its counter on reconnect, and
+        // capped so a reset mismatch never books a giant gap.
+        if (session.lastInputSeq > 0 && seq > session.lastInputSeq + 1) {
+          gameMetricsCounters().wsInputSeqGap(
+            Math.min(seq - session.lastInputSeq - 1, MSG_SEQ_GAP_SANITY),
+          );
+        }
+        session.lastInputSeq = Math.max(session.lastInputSeq, seq);
       }
       // A released spirit turns with the camera like the living; only a corpse that
       // has not yet released (dead and not a ghost) keeps its facing frozen. Without
@@ -3920,6 +4026,8 @@ export class GameServer {
         raw,
         receivedAtMs,
       );
+      // Same rule as non_object above: anomaly first, then the command lane.
+      this.consumeLane(session, 'command', receivedAtMs / 1000);
       return;
     }
     if (session.spectating) {
@@ -3938,6 +4046,21 @@ export class GameServer {
       receivedAtMs,
       msg,
     );
+    // The command lane verdicts AFTER observeCommand (R5, observe-then-drop):
+    // the detector keeps seeing the traffic shape even when the handler never
+    // runs. Chat draws from its own lane beside consumeChatToken; telemetry
+    // and challengeResponse are exempt; an unknown cmd draws in the default
+    // arm below, after its protocol-anomaly observation. It also verdicts
+    // BEFORE the jailed notice and the HEAVY_SELF_CMDS dirty flag below: a
+    // lane-dropped frame must neither send a jailed notice nor force a heavy
+    // self re-diff (drops are drops).
+    if (
+      classifyMsgLane(msg) === 'command' &&
+      KNOWN_COMMANDS.has(String(msg.cmd)) &&
+      !this.consumeLane(session, 'command', receivedAtMs / 1000)
+    ) {
+      return;
+    }
     // W0b command-schema lockstep: cast the untyped wire token to the shared
     // CommandName union so tsc proves every `case` label below is a member of
     // COMMAND_NAMES (a typo or out-of-table token is a compile error) and that
@@ -4300,9 +4423,16 @@ export class GameServer {
         // their own lists, and a list readout must not burn a chat token toward
         // the rate-limit cooldown. Deliberately AFTER the moderation router, so
         // the ADMIN "/mute" is always claimed as the account silence and can
-        // never be shadowed by a player command.
-        if (this.handleChatFilterCommand(session, text)) break;
+        // never be shadowed by a player command. The two list READOUTS carry
+        // their own DB-read guard inside (the phase 06 maintainer ruling).
+        if (this.handleChatFilterCommand(session, text, receivedAtMs / 1000)) break;
         if (this.isChatMuted(session)) break;
+        // The chat lane is a pre-guard CO-LOCATED with the ladder, not at the
+        // case entry (R5): the moderation router and the ignore/block/filter
+        // management above stay unthrottled, and because the lane is more
+        // generous than the ladder, the ladder's cooldown messaging still
+        // fires on the subset the lane passes.
+        if (!this.consumeLane(session, 'chat', receivedAtMs / 1000)) break;
         if (!this.consumeChatToken(session)) break;
         const whoMatch = /^\/who(?:\s+([\s\S]+))?$/i.exec(text);
         if (whoMatch) {
@@ -4597,6 +4727,17 @@ export class GameServer {
       case 'guild_event_remove':
         if (typeof msg.id === 'number')
           void this.social.guildEventRemove(this.actorFor(session), msg.id).catch(logSocialErr);
+        break;
+      case 'guild_set_motd':
+        // Guild billboard: player text, so it flows through the same mute +
+        // rate + hard-word gates as chat (the guild_event_create stack) before
+        // the service applies its own officer/clamp validation.
+        if (typeof msg.text === 'string') {
+          if (this.isChatMuted(session)) break;
+          if (!this.consumeChatToken(session)) break;
+          if (this.enforceChatPolicy(session, msg.text)) break;
+          void this.social.guildSetMotd(this.actorFor(session), msg.text).catch(logSocialErr);
+        }
         break;
       // arena (Ashen Coliseum queue)
       case 'arena_queue': {
@@ -5143,6 +5284,9 @@ export class GameServer {
           raw,
           receivedAtMs,
         );
+        // Unknown cmds draw their command-lane token here, AFTER the anomaly
+        // observation (R5), so the lane never mutes the anomaly channel.
+        this.consumeLane(session, 'command', receivedAtMs / 1000);
       }
     }
   }
@@ -5749,6 +5893,9 @@ export class GameServer {
     // market info is null unless the player is standing at the Merchant, so it
     // only rides the wire for players actually browsing the World Market
     maybe('market', this.sim.marketInfoFor(anchorSession.pid));
+    // the lightweight collect-indicator bit streams ALWAYS (the mailU pattern),
+    // so the minimap badge lights anywhere while proceeds/items wait
+    maybe('mktU', this.sim.marketCollectPendingFor(anchorSession.pid) ? 1 : 0);
     maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
     maybe('mailU', this.sim.mailUnreadFor(anchorSession.pid));
     // bank info is null unless the player is standing at a banker, so it only
@@ -6393,14 +6540,16 @@ export class GameServer {
   // of them and has been handled, so the caller stops before the chat pipeline
   // treats it as something to broadcast. The ADMIN /mute is a different command
   // entirely and is claimed earlier, by the moderation router.
-  private handleChatFilterCommand(session: ClientSession, text: string): boolean {
+  private handleChatFilterCommand(session: ClientSession, text: string, nowSec: number): boolean {
     const parsed = parseChatFilterCommand(text);
     if (!parsed) return false;
     const actor = this.actorFor(session);
 
-    // The two list commands are reads and stay free: they must work even for a
-    // GM-silenced player, and echoing your own list back must never burn a token
-    // toward the chat cooldown. The four WRITE commands each cost a chat token:
+    // The two list commands are reads and stay chat-token-free: they must work
+    // even for a GM-silenced player, and echoing your own list back must never
+    // burn a token toward the chat cooldown. Each readout is a live DB read
+    // though, so it draws from the dedicated list-read guard below (the phase
+    // 06 maintainer ruling). The four WRITE commands each cost a chat token:
     // they INSERT/DELETE and then push a full social snapshot, so they are the
     // most expensive thing on the chat path and must not be the one thing on it
     // that is unmetered.
@@ -6412,10 +6561,10 @@ export class GameServer {
     // as phantom wire commands and fail the gate.
     const logErr = (err: unknown) => console.error('ignore/block command failed:', err);
     const kind = parsed.kind;
-    if (kind === 'ignoreList') {
-      void this.social.ignoreList(actor).catch(logErr);
-    } else if (kind === 'blockList') {
-      void this.social.blockList(actor).catch(logErr);
+    if (kind === 'ignoreList' || kind === 'blockList') {
+      if (!this.consumeListRead(session, nowSec)) return true;
+      if (kind === 'ignoreList') void this.social.ignoreList(actor).catch(logErr);
+      else void this.social.blockList(actor).catch(logErr);
     } else if (kind === 'ignore') {
       if (!parsed.name) this.sendChatNotice(session, IGNORE_USAGE);
       else void this.social.ignoreAdd(actor, parsed.name).catch(logErr);

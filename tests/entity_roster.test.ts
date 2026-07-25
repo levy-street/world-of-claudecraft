@@ -104,6 +104,7 @@ function makeCtx() {
     get players() {
       return players;
     },
+    stationPlacements: [],
     get cfg() {
       return cfg;
     },

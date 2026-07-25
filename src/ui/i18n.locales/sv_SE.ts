@@ -240,11 +240,11 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Bärgning är vanliga människans kusin till avförtrollning: samma vapen och rustning, ingen skicklighet krävs och ingen vinns, och returnerar vanligt hantverksskrot efter kvalitet i stället för något arkaniskt. Vem som helst kan göra det, förtrollare eller ej. När du håller en pjäs värd att bryta är valet enkelt: från sällsynt och uppåt är avförtrollning strikt det bättre alternativet, medan båda avkastningarna vid vanlig säljer för ungefär det samma till handlare, så bryt mot det material du faktiskt behöver.',
   'guide.profPages.ench.bonusFmt': '+{value} {stat}',
   'guide.profPages.gatherIntro.mining':
-    'Gruvdrift bryter malm direkt ur världens berg: koppar i Östbäcksdalen, järn i Mirefenkärret och osmium uppe i Törntoppens höjder, mat till smedjeyrken. Öppet för alla från nivå 1, ingen som helst spärr, spårat på en egen räknare till ett tak på 100.',
+    'Gruvdrift bryter malm direkt ur världens berg: koppar i Östbäcksdalen, järn i Dykärrsträsket och osmium uppe i Törntoppshöjderna, mat till smedjeyrken. Öppet för alla från nivå 1: allt som krävs är en gruvhacka i väskorna, 20 koppar i vilken huvudort som helst. Spårat på en egen räknare till ett tak på 100.',
   'guide.profPages.gatherIntro.logging':
-    'Skogsavverkning fäller timmer från trädbestånd i alla tre zoner: järnbark i Östbäcksdalen, askved i Mirefenkärret och högtall i Törntoppens höjder, råvaran till skaft, stavar och ingenjörsbänken. Öppet för alla från nivå 1, spårat på en egen räknare till ett tak på 100.',
+    'Skogsavverkning fäller timmer från trädbestånd i alla tre zoner: järnbark i Östbäcksdalen, askved i Dykärrsträsket och högtall i Törntoppshöjderna, råvaran till skaft, stavar och ingenjörsbänken. Öppet för alla från nivå 1 med en skogsavverkningsyxa i väskorna (20 koppar i vilken huvudort som helst), spårat på en egen räknare till ett tak på 100.',
   'guide.profPages.gatherIntro.herbalism':
-    'Örtkunskap samlar det som växer vilt: skimmerblad i Östbäcksdalen, guldblad i Mirefenkärret och solkronblad i Törntoppens höjder, blad och stjälk som håller apotekyrkena bubblande. Öppet för alla från nivå 1, spårat på en egen räknare till ett tak på 100.',
+    'Örtkunskap samlar det som växer vilt: skimmerblad i Östbäcksdalen, guldblad i Dykärrsträsket och solkronblad i Törntoppshöjderna, blad och stjälk som håller apotekyrkena bubblande. Öppet för alla från nivå 1 med en örtinsamlingsskära i väskorna (20 koppar i vilken huvudort som helst), spårat på en egen räknare till ett tak på 100.',
   'guide.profPages.gatherIntro.fishing':
     'Fiske är det udda av insamlingsyrkena, och det djupaste: ett riktigt napp-och-rulle-minispel, egna fångsttabeller i varje zon, och ett skicklighetstak på 200, dubbelt mot de andra. Köp ett spö, vett mot öppet vatten och kasta.',
   'guide.profPages.rhythmHeading': 'Insamlingsrytmen',
@@ -257,7 +257,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Var noderna finns, deras nivå, vilket verktyg de behöver och vad de ger. Varje nod återspawnar för dig {respawn} sekunder efter din egen skörd, och den timern är din ensam: en annan skördare som arbetar samma nod fördröjer aldrig din, så det finns ingen nodkapplöpning och ingen campning. Varje zon uppåt i stegen ger ett bättre material från tuffare mark.',
   'guide.profPages.toolsHeading': 'Verktyg',
   'guide.profPages.toolsNote':
-    'Bara händerna räknas som ett nivå 1-verktyg, så varje nivå 1-nod i spelet behöver inget verktyg alls. Handlarens stege täcker nivå 1 till 3; ett verktyg behöver bara vara i dina väskor, det finns ingen utrustningsplats och ingen hållbarhet, så vart och ett är ett engångsköp. Bara nivån spelar roll för spärren: ett verktygs sällsynthetsfärg är kosmetisk.\n\nÖver handlarstegen sitter två tillverkade verktyg, nivå 4 och nivå 5, tillverkade vid verkstaden av ingenjörer och aldrig sålda av någon NPC. Ingen nod idag kräver mer än nivå 3, så deras värde just nu är hastighet: ett toppverktyg låser kastet vid sitt golv på lägre noder, och det blir entrébiljetten när mark av högre nivå anländer.',
+    'Varje nod kräver sitt yrkes verktyg i dina väskor, nivå 1 inräknat: ingen hacka, ingen malm, och inget spö, ingen fisk. Handlarens stege täcker nivå 1 till 3 och finns i lager i varje huvudort; ett verktyg behöver bara vara i dina väskor, det finns ingen utrustningsplats och ingen hållbarhet, så vart och ett är ett engångsköp. Bara nivån spelar roll för spärren: ett verktygs sällsynthetsfärg är kosmetisk.\n\nÖver handlarstegen sitter två tillverkade verktyg, nivå 4 och nivå 5, tillverkade vid verkstaden av ingenjörer och aldrig sålda av någon NPC. Ingen nod idag kräver mer än nivå 3, så deras värde just nu är hastighet: ett toppverktyg låser kastet vid sitt golv på lägre noder, och det blir entrébiljetten när mark av högre nivå anländer.',
   'guide.profPages.toolCrafted': 'Tillverkad ({craft})',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Säljs inte',
@@ -414,56 +414,56 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_surge.name': 'Etersvall',
   'entities.abilities.blizzard.description':
     'Kallar en isstorm över målområdet i 6 sek, orsakar {damage} Frost-skada varje sekund och saktar ner fiender med 40%. Varje träffad fiende minskar Frozen Orbs nedkylning med 0,5 sek, upp till 3 sek per kast. (Frost)',
-  'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.blizzard.name': 'Snöstorm',
+  'entities.abilities.brain_freeze.name': 'Hjärnfrys',
   'entities.abilities.dragons_breath.description':
     'Håll intryckt för att samla en vidgande flammande andedräkt, släpp sedan för en kon. Längre laddningar når längre och gör mer skada. Träffade fiender desorienteras och skada bryter effekten; maximal laddning är alltid ett kritiskt slag och räknas en gång mot Het svit. (Eld)',
-  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.dragons_breath.name': 'Drakens andedräkt',
   'entities.abilities.fingers_of_frost.description':
     'Rimlans har 15% chans att ge Fingers of Frost, upp till 2 laddningar: nästa Ice Lance behandlar målet som fryst. (Frost)',
-  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fingers_of_frost.name': 'Frostens fingrar',
   'entities.abilities.fireball_form.description':
     'Förvandlas till en glödande glöd och ökar rörelsehastigheten med {buff}%. Du kan inte attackera eller kasta besvärjelser under förvandlingen. Kasta om för att återgå till normal form.',
-  'entities.abilities.fireball_form.name': 'Ember Form',
-  'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.fireball_form.name': 'Glödform',
+  'entities.abilities.flurry.name': 'Vinterpiska',
+  'entities.abilities.frozen_orb.name': 'Fruset klot',
   'entities.abilities.glacial_front.description':
     'Håll intryckt för att samla en vidgande frostfront, släpp sedan för en kon. Längre laddningar når längre och gör mer skada. Alla träffade fiender saktas ner med 50% i 4 sek; maximal laddning rotar dem också i 1 sek. (Frost)',
-  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_front.name': 'Glaciärfront',
   'entities.abilities.glacial_spike.description':
     'Frammanar en massiv istagge och förbrukar 5 Istappar för att orsaka {damage} Frost-skada och frysa målet på plats i 4 sek. (Frost)',
-  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.glacial_spike.name': 'Glaciärtagg',
   'entities.abilities.ice_lance.description':
     'Kastar en isbit som orsakar {damage} Frost-skada, trefaldigt mot ett fryst mål. Förbrukar Fingers of Frost, eller en laddning av Vinterkyla, för att behandla målet som fryst. (Frost)',
-  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.ice_lance.name': 'Islans',
   'entities.abilities.perfect_moment.description':
     'Grip ditt perfekta ögonblick: vinn genast 4 Arkanska Laddningar, och under 10 sek förbrukar Eterpilar dem inte. (Kronomantik)',
-  'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.perfect_moment.name': 'Perfekt ögonblick',
+  'entities.abilities.shatter.name': 'Sprött fördärv',
   'entities.abilities.temporal_acceleration.description':
     'Accelererar tidens flöde för din grupp eller raid, ökar attack-, kast- och kanalisationshastighet med 30% i 15 sek. Allierade som nyligen påverkats av Temporal Acceleration eller Krigstrummor är för utmattade för att dra nytta av det. (Kronomantik)',
-  'entities.abilities.temporal_acceleration.name': 'Temporal Acceleration',
+  'entities.abilities.temporal_acceleration.name': 'Tidsacceleration',
   'entities.abilities.temporal_barrier.description':
     'Förskjuter målet ett hjärtslag ur nuet; ett temporalt skal absorberar {damage} skada i 10 sek innan tidslinjen snäpper tillbaka.',
-  'entities.abilities.temporal_barrier.name': 'Temporal Barrier',
+  'entities.abilities.temporal_barrier.name': 'Tidsbarriär',
   'entities.abilities.temporal_cascade.description':
     'Skickar ett eko kaskaderande genom din grupp: målet och upp till fyra av deras närmaste allierade läks på en gång och märks var och en i {duration} sek, och drar en del av den Arkan skada du ger tillbaka genom deras ekon för att läka dem. (Kronomantik)',
-  'entities.abilities.temporal_cascade.name': 'Temporal Cascade',
+  'entities.abilities.temporal_cascade.name': 'Tidskaskad',
   'entities.abilities.temporal_echo.description':
     'Märker en allierad med ett eko av ett friskare ögonblick och läker {damage} hälsa på en gång. Under {duration} sek dras en del av den Arkan skada du gör tillbaka genom ekoet för att läka dem.',
-  'entities.abilities.temporal_echo.name': 'Temporal Echo',
+  'entities.abilities.temporal_echo.name': 'Tidseko',
   'entities.abilities.temporal_hourglass.description':
     'Placerar ett temporalt timglas på vald plats. Under en fiende suspenderar det dem i {hostilePveDuration} sek i PvE eller {hostilePvpDuration} sek i PvP och hindrar alla handlingar; skada bryter effekten. Vid dina fötter eller under en gruppallierad ger det stasis i {duration} sek, förhindrar skada och handlingar, återställer {healing}% av maximala hälsan och låter nedkylningar återhämta sig {selfCooldownRecovery}% snabbare för dig eller {allyCooldownRecovery}% snabbare för en allierad. På tom mark väntar timglaset i {groundDuration} sek och påverkar den första giltiga enheten som kliver på det. Den gynnsamma auran kan avlägsnas manuellt.',
-  'entities.abilities.temporal_hourglass.name': 'Hourglass of Suspension',
+  'entities.abilities.temporal_hourglass.name': 'Uppehållets timglas',
   'entities.abilities.temporal_mend.description':
     'Drar en allierad ett ögonblick framåt i tid och läker {damage} hälsa när kroppen slår sig till ro i sitt friskare framtida jag. (Kronomantik-signatur)',
-  'entities.abilities.temporal_mend.name': 'Temporal Mend',
+  'entities.abilities.temporal_mend.name': 'Tidsläkning',
   'entities.abilities.temporal_reversal.description':
     'Spolar tillbaka en fallen allierades tidslinje och återupplivar dem vid kroppen med en del av deras hälsa och mana, även mitt i strid. (Kronomantik)',
-  'entities.abilities.temporal_reversal.name': 'Temporal Reversal',
+  'entities.abilities.temporal_reversal.name': 'Tidsåtergång',
   'entities.abilities.temporal_rewind.description':
     'Skickar en arkan våg genom din grupp eller raid och spolar tillbaka tiden för att återställa 30% av skadan varje allierad inom 40 yards tog under de senaste 5 sekunderna (upp till 35% av deras maximala hälsa). Kan inte vara ett kritiskt slag. (Kronomantik)',
-  'entities.abilities.temporal_rewind.name': 'Rewind',
+  'entities.abilities.temporal_rewind.name': 'Tillbakaspolning',
   'entities.items.sootscale_mantle.name': 'Sotskalets mantel',
   'entities.items.arcane_dust.name': 'Arkandamm',
   'entities.items.arcane_essence.name': 'Arkanessens',
@@ -2706,7 +2706,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.garrote.name': 'Strupvajer',
   'entities.abilities.ghost_wolf.description':
     'Förvandlar dig till en Shadewolf och ökar förflyttningshastigheten med 40 % i 10 min.',
-  'entities.abilities.ghost_wolf.name': 'Shadewolf',
+  'entities.abilities.ghost_wolf.name': 'Skuggvarg',
   'entities.abilities.gouge.description':
     'Slår till målet för {damage} skada och gör det stridsodugligt i 4 sek. All skada bryter effekten. Ger 1 kombopoäng.',
   'entities.abilities.gouge.name': 'Ögonstöt',
@@ -2765,7 +2765,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lightning_shield.name': 'Åskvärn',
   'entities.abilities.mark_of_the_wild.description':
     'Placerar Wildward på ett vänligt mål och ökar rustningen med {buff} i 30 min.',
-  'entities.abilities.mark_of_the_wild.name': 'Wildward',
+  'entities.abilities.mark_of_the_wild.name': 'Vildvärn',
   'entities.abilities.maul.description':
     'Ett mörbultande anfall som ökar närstridsskadan med {damage} och vållar en stor mängd hot. Aktiveras vid ditt nästa hugg. Endast i Bruinform.',
   'entities.abilities.maul.name': 'Benkross',
@@ -2881,7 +2881,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.name': 'Himlafall',
   'entities.abilities.stealth.description':
     'Döljer dig i skuggorna: fiender lägger knappt märke till dig, men du rör dig 50 % långsammare. Att anfalla eller ta skada bryter Duskveil. Kasta igen för att kliva fram.',
-  'entities.abilities.stealth.name': 'Duskveil',
+  'entities.abilities.stealth.name': 'Skymningsslöja',
   'entities.abilities.stormstrike.description':
     'Kanaliserar stormen genom ditt vapen och hugger omedelbart för vapenskada plus {damage}.',
   'entities.abilities.stormstrike.name': 'Anfäders hugg',
@@ -8922,7 +8922,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyMinimal': 'Minimal skicklighetsvinst',
   'hudChrome.crafting.difficultyNone': 'Ingen färdighetsvinst',
   'hudChrome.crafting.difficultyReduced': 'Minskad färdighetsvinst',
-  'hudChrome.crafting.enchantedLine': 'Förtrollad',
   'hudChrome.crafting.gatheredBy': 'Samlat av {name}',
   'hudChrome.crafting.learnMoreAtStation':
     '{master} vid {station} kan lära dig fler {craft}-recept.',
@@ -9152,4 +9151,58 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.title': 'Upplösning: {name}',
   'hudChrome.unbind.unbindAria': 'Lös upp {name} för {fee}',
   'hudChrome.unbind.unbound': 'Löste upp {name} för {fee}. Det binds igen vid nästa handel.',
+  'hud.combat.auraGainOther': '{target} får {name}.',
+  'hudChrome.corpseHarvest.components.cloth': 'Tyg',
+  'hudChrome.corpseHarvest.components.meat': 'Kött',
+  'hudChrome.crafting.noBagSpace': 'Du har inte plats för det tillverkade föremålet.',
+  'hudChrome.enchanting.disenchantNoSpace': 'Du har inte plats för de arkana materialen.',
+  'hudChrome.enchanting.enchantNoSpace': 'Du har inte plats för det förtrollade föremålet.',
+  'hudChrome.enchanting.salvageNoSpace': 'Du har inte plats för de bärgade materialen.',
+  'hudChrome.gathering.noNodeNearby.herbalism': 'Det finns ingen örtfläck inom räckhåll.',
+  'hudChrome.gathering.noNodeNearby.logging': 'Det finns inget timmerbestånd inom räckhåll.',
+  'hudChrome.gathering.noNodeNearby.mining': 'Det finns ingen malmåder inom räckhåll.',
+  'hudChrome.gathering.requiresTool.herbalism': 'Kräver en örtinsamlingsskära',
+  'hudChrome.gathering.requiresTool.logging': 'Kräver en skogsavverkningsyxa',
+  'hudChrome.gathering.requiresTool.mining': 'Kräver en gruvhacka',
+  'hudChrome.gathering.toolRequired.fishing': 'Du behöver ett metspö för att kasta ut linan.',
+  'hudChrome.gathering.toolRequired.herbalism':
+    'Du behöver en örtinsamlingsskära för att samla den här fläcken.',
+  'hudChrome.gathering.toolRequired.logging':
+    'Du behöver en skogsavverkningsyxa för att fälla det här beståndet.',
+  'hudChrome.gathering.toolRequired.mining': 'Du behöver en gruvhacka för att bryta den här ådern.',
+  'hudChrome.gathering.toolTooltip.kind.fishing': 'Fiskespö (tier {tier})',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': 'Örtinsamlingsverktyg (tier {tier})',
+  'hudChrome.gathering.toolTooltip.kind.logging': 'Skogsavverkningsverktyg (tier {tier})',
+  'hudChrome.gathering.toolTooltip.kind.mining': 'Gruvverktyg (tier {tier})',
+  'hudChrome.gathering.toolTooltip.rodBand':
+    'Låser upp rikare fångster vid fiskeskicklighet {skill} och uppåt.',
+  'hudChrome.gathering.toolTooltip.rodBite': 'Fisken nappar upp till {seconds}s tidigare.',
+  'hudChrome.gathering.toolTooltip.rodReel': 'Förlänger indragningsfönstret med {seconds}s.',
+  'hudChrome.gathering.toolTooltip.rodRequired': 'Krävs för att fiska.',
+  'hudChrome.gathering.toolTooltip.speed': 'Samlar snabbare vid noder under tier {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism':
+    'Krävs för att samla örtfläckar upp till tier {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.logging':
+    'Krävs för att fälla timmerbestånd upp till tier {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.mining':
+    'Krävs för att bryta malmådror upp till tier {tier}.',
+  'hudChrome.gathering.toolTooltip.use.herbalism': 'Använd: Samla från en örtfläck i närheten.',
+  'hudChrome.gathering.toolTooltip.use.logging': 'Använd: Fäll ett timmerbestånd i närheten.',
+  'hudChrome.gathering.toolTooltip.use.mining': 'Använd: Bryt en malmåder i närheten.',
+  'hudChrome.noticeboard.empty': 'Inget verkar vara uppsatt.',
+  'hudChrome.training.pendingAria': '{name} lärs in',
+  'hudChrome.training.statePending': 'Lärs in',
+  'hudChrome.unbind.noSpace': 'Du har inte plats för den obundna kopian.',
+  'loading.incompatibleWorldVersion':
+    'Spelets och serverns versioner är inkompatibla. Läs om sidan eller uppdatera spelet, och försök sedan igen.',
+  'loading.messageRateExceeded':
+    'Du kopplades från för att du skickade handlingar för snabbt. Vänta en stund och logga in igen.',
+  'perfNudge.dismiss': 'Stäng',
+  'perfNudge.hardwareAccelerationDesktop':
+    'Spelet körs utan GPU-acceleration, vilket gör det mycket långsamt. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Hög prestanda under Inställningar > System > Skärm > Grafik.',
+  'perfNudge.hardwareAccelerationWeb':
+    'Spelet körs utan GPU-acceleration, vilket gör det mycket långsamt. Aktivera hårdvaruacceleration i din webbläsares inställningar, uppdatera dina grafikdrivrutiner och starta sedan om din webbläsare.',
+  'perfNudge.integratedGpu':
+    'Spelet körs på den integrerade (strömsnåla) grafikprocessorn. Om datorn även har ett grafikkort för spel anger du webbläsaren till Hög prestanda under Inställningar > System > Skärm > Grafik i Windows och startar sedan om webbläsaren. Skrivbordsappen väljer spelgrafikkortet automatiskt.',
+  'worldContent.noticeboardName': 'Anslagstavla',
 };

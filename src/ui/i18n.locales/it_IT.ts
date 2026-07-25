@@ -257,11 +257,11 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Lo smantellamento e il cugino per tutti del disincanto: le stesse armi e armature, nessuna competenza richiesta e nessuna guadagnata, che restituisce rottami artigianali semplici in base alla qualita invece di qualcosa di arcano. Chiunque puo farlo, incantatore o no. Quando tieni un pezzo che vale la pena smontare, la scelta e semplice: dal raro in su, il disincanto e nettamente l'affare migliore, mentre al comune i due valori si vendono all'incirca allo stesso prezzo al venditore, quindi smonta verso il materiale di cui hai effettivamente bisogno.",
   'guide.profPages.ench.bonusFmt': '+{value} {stat}',
   'guide.profPages.gatherIntro.mining':
-    'La Mineria estrae il minerale direttamente dalla roccia del mondo: rame a Eastbrook Vale, ferro nel Mirefen Marsh e osmio su a Thornpeak Heights, per alimentare i mestieri della forgia. Aperta a tutti dal livello 1, senza alcun requisito, tracciata sul proprio contatore fino a un massimo di 100.',
+    'La Mineria estrae il minerale direttamente dalla roccia del mondo: rame nella Valle di Eastbrook, ferro nella Palude di Mirefen e osmio sulle Alture di Thornpeak, per alimentare i mestieri della forgia. Aperta a tutti dal livello 1: basta un piccone da estrazione nelle borse, 20 rame in qualsiasi hub di zona. Tracciata sul proprio contatore fino a un massimo di 100.',
   'guide.profPages.gatherIntro.logging':
-    "La Boscaiolia abbatte il legname dai boschi in tutte e tre le zone: corteccia di ferro a Eastbrook Vale, frassino nel Mirefen Marsh e altopino a Thornpeak Heights, la materia prima per manici, bastoni e il banco dell'ingegnere. Aperta a tutti dal livello 1, tracciata sul proprio contatore fino a un massimo di 100.",
+    "La Boscaiolia abbatte il legname dai boschi in tutte e tre le zone: corteccia di ferro nella Valle di Eastbrook, frassino nella Palude di Mirefen e altopino sulle Alture di Thornpeak, la materia prima per manici, bastoni e il banco dell'ingegnere. Aperta a tutti dal livello 1 con un'ascia da taglio nelle borse (20 rame in qualsiasi hub di zona), tracciata sul proprio contatore fino a un massimo di 100.",
   'guide.profPages.gatherIntro.herbalism':
-    "L'Erboristeria raccoglie cio che cresce selvatico: foglialucente a Eastbrook Vale, fogliadoro nel Mirefen Marsh, e petalo solare a Thornpeak Heights, la foglia e il gambo che tengono in produzione i mestieri dell'apotecario. Aperta a tutti dal livello 1, tracciata sul proprio contatore fino a un massimo di 100.",
+    "L'Erboristeria raccoglie ciò che cresce selvatico: foglialucente nella Valle di Eastbrook, fogliadoro nella Palude di Mirefen e petalo solare sulle Alture di Thornpeak, la foglia e il gambo che tengono in produzione i mestieri dell'apotecario. Aperta a tutti dal livello 1 con una falce da erbalismo nelle borse (20 rame in qualsiasi hub di zona), tracciata sul proprio contatore fino a un massimo di 100.",
   'guide.profPages.gatherIntro.fishing':
     "La Pesca e l'eccezione tra le professioni di raccolta, e la piu profonda: un vero minigioco di lenza e mulinello, con le proprie tabelle di catture in ogni zona e un massimo di competenza di 200, il doppio delle altre. Compra una canna, rivolgiti verso l'acqua aperta e lancia.",
   'guide.profPages.rhythmHeading': 'Il ritmo del raccolto',
@@ -274,7 +274,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Dove si trovano i nodi, il loro livello, lo strumento necessario e cio che producono. Ogni nodo rispawna per te {respawn} secondi dopo il tuo raccolto, e quel timer e solo tuo: un altro raccoglitore che lavora lo stesso nodo non ritarda mai il tuo, quindi non c'e gara per i nodi e nessuno li presidia. Ogni zona piu avanzata offre un materiale migliore estratto da terreno piu duro.",
   'guide.profPages.toolsHeading': 'Strumenti',
   'guide.profPages.toolsNote':
-    "Le mani nude contano come strumento di livello 1, quindi ogni nodo di livello 1 nel gioco non richiede alcuno strumento. La scala dei venditori copre i livelli da 1 a 3; uno strumento deve solo essere nella borsa, non c'e slot di equipaggiamento ne durabilita, quindi ognuno e un acquisto unico. Solo il livello conta per il requisito: il colore rarita di uno strumento e cosmetico.\n\nSopra la scala dei venditori si trovano due strumenti fabbricati, livello 4 e livello 5, realizzati nell'officina dagli ingegneri e mai venduti da alcun PNG. Nessun nodo oggi richiede piu del livello 3, quindi il loro valore ora e la velocita: uno strumento di punta blocca il lancio al suo minimo sui nodi inferiori, e sara il biglietto d'ingresso quando arriveranno terreni di livello superiore.",
+    "Ogni nodo richiede nelle borse lo strumento del suo mestiere, livello 1 compreso: senza piccone niente minerale, senza canna niente pesce. La scala dei venditori copre i livelli da 1 a 3, rifornita in ogni hub di zona; uno strumento deve solo essere nelle borse, non c'è slot di equipaggiamento né durabilità, quindi ognuno è un acquisto unico. Solo il livello conta per il requisito: il colore di rarità di uno strumento è cosmetico.\n\nSopra la scala dei venditori si trovano due strumenti fabbricati, livello 4 e livello 5, realizzati nell'officina dagli ingegneri e mai venduti da alcun PNG. Nessun nodo oggi richiede più del livello 3, quindi il loro valore ora è la velocità: uno strumento di punta blocca il lancio al suo minimo sui nodi inferiori, e sarà il biglietto d'ingresso quando arriveranno terreni di livello superiore.",
   'guide.profPages.toolCrafted': 'Fabbricato ({craft})',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Non in vendita',
@@ -433,32 +433,32 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_surge.name': "Potere d'Etere",
   'entities.abilities.blizzard.description':
     "Scatena una tempesta di ghiaccio sull'area bersaglio per 6 secondi, infliggendo {damage} danni da Gelo al secondo e rallentando i nemici del 40%. Ogni nemico colpito riduce di 0,5 secondi il recupero di Frozen Orb, fino a 3 secondi per lancio. (Gelo)",
-  'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.blizzard.name': 'Bufera di Neve',
+  'entities.abilities.brain_freeze.name': 'Gelo Mentale',
   'entities.abilities.dragons_breath.description':
     "Tieni premuto per raccogliere un soffio di fiamma sempre più ampio, poi rilascialo a cono. Cariche più lunghe raggiungono più lontano e infliggono più danni. I nemici colpiti vengono disorientati e i danni interrompono l'effetto; la carica massima colpisce sempre criticamente e conta una volta verso Vampata. (Fuoco)",
-  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.dragons_breath.name': 'Soffio del Drago',
   'entities.abilities.fingers_of_frost.description':
     'Lancia di Brina ha il 15% di probabilità di concedere Fingers of Frost, fino a 2 cariche: la prossima Ice Lance tratta il bersaglio come se fosse congelato. (Gelo)',
-  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fingers_of_frost.name': 'Dita di Gelo',
   'entities.abilities.fireball_form.description':
     'Ti trasformi in una brace ardente, aumentando la velocità di movimento del {buff}%. Non puoi attaccare né lanciare incantesimi mentre sei trasformato. Rilancia per tornare alla tua forma normale.',
   'entities.abilities.fireball_form.name': 'Forma Brace',
-  'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.flurry.name': "Sferza d'Inverno",
+  'entities.abilities.frozen_orb.name': 'Sfera Congelata',
   'entities.abilities.glacial_front.description':
     'Tieni premuto per raccogliere un fronte di gelo sempre più ampio, poi rilascialo a cono. Cariche più lunghe raggiungono più lontano e infliggono più danni. Tutti i nemici colpiti vengono rallentati del 50% per 4 secondi; la carica massima li radica anche per 1 secondo. (Gelo)',
-  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_front.name': 'Fronte Glaciale',
   'entities.abilities.glacial_spike.description':
     "Evoca un'enorme stalattite di ghiaccio, consumando 5 Stalattiti per infliggere {damage} danni da Gelo e congelare il bersaglio sul posto per 4 secondi. (Gelo)",
-  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.glacial_spike.name': 'Spuntone Glaciale',
   'entities.abilities.ice_lance.description':
     'Scaglia un frammento di ghiaccio infliggendo {damage} danni da Gelo, triplicati contro un bersaglio congelato. Spende Fingers of Frost oppure una carica di Gelo Invernale per trattare il bersaglio come congelato. (Gelo)',
-  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.ice_lance.name': 'Lancia di Ghiaccio',
   'entities.abilities.perfect_moment.description':
     "Cogli il tuo momento perfetto: guadagni istantaneamente 4 Cariche Arcane e per 10 secondi Dardi d'Etere non le consuma. (Cronomanzia)",
-  'entities.abilities.perfect_moment.name': 'Perfect Moment',
-  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.perfect_moment.name': 'Momento Perfetto',
+  'entities.abilities.shatter.name': 'Rovina Fragile',
   'entities.abilities.temporal_acceleration.description':
     'Accelera il flusso del tempo per il tuo gruppo o incursione, aumentando la velocità di attacco, lancio e canalizzazione del 30% per 15 secondi. Gli alleati colpiti di recente da Accelerazione Temporale o Tamburi di Guerra sono troppo esausti per beneficiarne. (Cronomanzia)',
   'entities.abilities.temporal_acceleration.name': 'Accelerazione Temporale',
@@ -4006,7 +4006,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ambush.name': "Colpo dell'Agguato",
   'entities.abilities.ambush.description':
     "Tende un agguato al bersaglio per il 250% dei danni dell'arma più {damage}. Devi essere furtivo e dietro al bersaglio. Richiede un pugnale. Conferisce 1 punto combo.",
-  'entities.abilities.stealth.name': 'Duskveil',
+  'entities.abilities.stealth.name': 'Velo Crepuscolare',
   'entities.abilities.stealth.description':
     'Ti nasconde nelle ombre: i nemici ti notano appena, ma ti muovi il 50% più lentamente. Attaccare o subire danni interrompe Duskveil. Lanciala di nuovo per uscire.',
   'entities.abilities.adrenaline_rush.name': 'Sangue Impetuoso',
@@ -4049,7 +4049,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.holy_light.description': 'Cura un bersaglio alleato di {damage}.',
   'entities.abilities.devotion_aura.name': 'Aura Incrollabile',
   'entities.abilities.devotion_aura.description': 'Aumenta la tua armatura di {buff} per 30 min.',
-  'entities.abilities.judgement.name': 'Verdict',
+  'entities.abilities.judgement.name': 'Verdetto',
   'entities.abilities.judgement.description':
     'Scatena il tuo Sigillo attivo sul nemico, consumandolo per infliggere i suoi danni Sacri accumulati.',
   'entities.abilities.blessing_of_might.name': 'Giuramento di Ferro',
@@ -4170,7 +4170,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbrand_weapon.name': 'Arma Legabrina',
   'entities.abilities.frostbrand_weapon.description':
     'Imbeve la tua arma con gelo pungente: ogni colpo infligge {damage} danni aggiuntivi per 5 min.',
-  'entities.abilities.ghost_wolf.name': 'Shadewolf',
+  'entities.abilities.ghost_wolf.name': "Lupo d'Ombra",
   'entities.abilities.ghost_wolf.description':
     'Ti trasforma in un Shadewolf, aumentando la velocità di movimento del 40% per 10 min.',
   'entities.abilities.stormstrike.name': 'Colpo Ancestrale',
@@ -4210,7 +4210,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Scaglia un dardo di energia naturale per {damage} danni da Natura.',
   'entities.abilities.healing_touch.name': 'Rammendo Selvaggio',
   'entities.abilities.healing_touch.description': 'Cura un bersaglio alleato di {damage}.',
-  'entities.abilities.mark_of_the_wild.name': 'Wildward',
+  'entities.abilities.mark_of_the_wild.name': 'Custodia Selvaggia',
   'entities.abilities.mark_of_the_wild.description':
     "Pone il Wildward su un bersaglio alleato, aumentando l'armatura di {buff} per 30 min.",
   'entities.abilities.moonfire.name': 'Tempesta Lunare',
@@ -8632,7 +8632,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Scaglia uno scudo forgiato all'alba che infligge {damage} danni Sacri, silenzia il bersaglio principale per 2 sec. e rimbalza su un massimo di 2 nemici aggiuntivi entro 10 metri, infliggendo il 75% dei danni per rimbalzo. (talento del Paladino)",
   'entities.abilities.aspect_of_the_wild.description':
     'Infondi forza selvaggia negli alleati entro 30 m, aumentando la loro potenza d’attacco di 45 e la velocità d’attacco del 5% per 5 min. (talento del Cacciatore)',
-  'entities.abilities.avatar.name': 'Avatar',
+  'entities.abilities.avatar.name': 'Incarnazione',
   'entities.abilities.avatar.description':
     'Ti trasformi in un colosso per 20 s, liberandoti da tutti gli effetti di controllo e aumentando del 20% i danni inflitti.',
   'entities.abilities.avenging_wrath.description':
@@ -9180,7 +9180,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Guadagno completo di abilità',
   'hudChrome.crafting.difficultyNone': 'Nessun guadagno di abilità',
   'hudChrome.crafting.difficultyReduced': 'Guadagno di abilità ridotto',
-  'hudChrome.crafting.enchantedLine': 'Incantato',
   'hudChrome.crafting.makersMark': 'Realizzato da {name}',
   'hudChrome.crafting.masterworkSeal': 'Capolavoro',
   'hudChrome.crafting.masterworkToast': 'Capolavoro! {name}',
@@ -9306,4 +9305,62 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.title': 'Scioglimento: {name}',
   'hudChrome.unbind.unbindAria': 'Sciogli {name} per {fee}',
   'hudChrome.unbind.unbound': 'Sciolto {name} per {fee}. Si leghera di nuovo al prossimo scambio.',
+  'hud.combat.auraGainOther': '{target} ottiene {name}.',
+  'hudChrome.corpseHarvest.components.cloth': 'Stoffa',
+  'hudChrome.corpseHarvest.components.meat': 'Carne',
+  'hudChrome.crafting.noBagSpace': "Non hai spazio per l'oggetto realizzato.",
+  'hudChrome.enchanting.disenchantNoSpace': 'Non hai spazio per i materiali arcani.',
+  'hudChrome.enchanting.enchantNoSpace': "Non hai spazio per l'oggetto incantato.",
+  'hudChrome.enchanting.salvageNoSpace': 'Non hai spazio per i materiali dello smantellamento.',
+  'hudChrome.gathering.noNodeNearby.herbalism': "Non c'è nessuna aiuola d'erbe a portata.",
+  'hudChrome.gathering.noNodeNearby.logging': "Non c'è nessun boschetto di alberi a portata.",
+  'hudChrome.gathering.noNodeNearby.mining': "Non c'è nessun filone di minerale a portata.",
+  'hudChrome.gathering.requiresTool.herbalism': 'Richiede una falce da erbalismo',
+  'hudChrome.gathering.requiresTool.logging': "Richiede un'ascia da taglio",
+  'hudChrome.gathering.requiresTool.mining': 'Richiede un piccone da estrazione',
+  'hudChrome.gathering.toolRequired.fishing':
+    'Hai bisogno di una canna da pesca per lanciare la lenza.',
+  'hudChrome.gathering.toolRequired.herbalism':
+    "Hai bisogno di una falce da erbalismo per raccogliere quest'aiuola.",
+  'hudChrome.gathering.toolRequired.logging':
+    "Hai bisogno di un'ascia da taglio per abbattere questo boschetto.",
+  'hudChrome.gathering.toolRequired.mining':
+    'Hai bisogno di un piccone da estrazione per raccogliere questo filone.',
+  'hudChrome.gathering.toolTooltip.kind.fishing': 'Canna da pesca (livello {tier})',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': 'Strumento da erbalismo (livello {tier})',
+  'hudChrome.gathering.toolTooltip.kind.logging': 'Strumento da taglio (livello {tier})',
+  'hudChrome.gathering.toolTooltip.kind.mining': 'Strumento da estrazione (livello {tier})',
+  'hudChrome.gathering.toolTooltip.rodBand':
+    'Sblocca tabelle di catture più ricche con abilità di Pesca {skill} o superiore.',
+  'hudChrome.gathering.toolTooltip.rodBite': 'I pesci abboccano fino a {seconds} s prima.',
+  'hudChrome.gathering.toolTooltip.rodReel':
+    'Allunga di {seconds} s la finestra per recuperare la lenza.',
+  'hudChrome.gathering.toolTooltip.rodRequired': 'Necessaria per pescare.',
+  'hudChrome.gathering.toolTooltip.speed':
+    'Raccoglie più in fretta sui nodi di livello inferiore a {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism':
+    "Necessaria per raccogliere le aiuole d'erbe fino al livello {tier}.",
+  'hudChrome.gathering.toolTooltip.unlocks.logging':
+    'Necessaria per abbattere i boschetti di alberi fino al livello {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.mining':
+    'Necessario per estrarre dai filoni di minerale fino al livello {tier}.',
+  'hudChrome.gathering.toolTooltip.use.herbalism': "Uso: raccogli da un'aiuola d'erbe vicina.",
+  'hudChrome.gathering.toolTooltip.use.logging': 'Uso: abbatti un boschetto di alberi vicino.',
+  'hudChrome.gathering.toolTooltip.use.mining': 'Uso: estrai da un filone di minerale vicino.',
+  'hudChrome.noticeboard.empty': 'Non sembra esserci nulla di affisso.',
+  'hudChrome.training.pendingAria': 'Apprendimento di {name}',
+  'hudChrome.training.statePending': 'In apprendimento',
+  'hudChrome.unbind.noSpace': 'Non hai spazio per la copia sciolta.',
+  'loading.incompatibleWorldVersion':
+    'Le versioni del gioco e del server non sono compatibili. Ricarica o aggiorna, poi riprova.',
+  'loading.messageRateExceeded':
+    'Sei stato disconnesso per aver inviato azioni troppo velocemente. Attendi un momento e accedi di nuovo.',
+  'perfNudge.dismiss': 'Ignora',
+  'perfNudge.hardwareAccelerationDesktop':
+    'Il gioco sta girando senza accelerazione GPU, il che lo rende molto lento. Aggiorna i driver grafici, poi riavvia il gioco. Su Windows, imposta anche il gioco su Prestazioni elevate in Impostazioni > Sistema > Schermo > Grafica.',
+  'perfNudge.hardwareAccelerationWeb':
+    "Il gioco sta girando senza accelerazione GPU, il che lo rende molto lento. Abilita l'accelerazione hardware nelle impostazioni del browser, aggiorna i driver grafici, poi riavvia il browser.",
+  'perfNudge.integratedGpu':
+    "Il gioco sta girando sulla GPU integrata (a basso consumo). Se questo computer ha anche una GPU da gioco, su Windows imposta il browser su Prestazioni elevate in Impostazioni > Sistema > Schermo > Grafica, poi riavvia il browser. L'app desktop sceglie automaticamente la GPU da gioco.",
+  'worldContent.noticeboardName': 'Bacheca degli annunci',
 };

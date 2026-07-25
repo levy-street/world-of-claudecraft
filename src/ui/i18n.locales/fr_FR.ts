@@ -257,11 +257,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "La récupération est la cousine accessible du désenchantement : les mêmes armes et armures, sans compétence requise et sans gain, retournant du matériau de fabrication ordinaire par qualité plutôt que quoi que ce soit d'arcaniste. N'importe qui peut le faire, enchanteur ou non. Quand vous tenez une pièce à briser, le choix est simple : à partir du rare, le désenchantement est strictement le meilleur marché, tandis qu'au commun les deux rendements se revendent à peu près au même prix chez un marchand, donc brisez vers le matériau dont vous avez réellement besoin.",
   'guide.profPages.ench.bonusFmt': '+{value} {stat}',
   'guide.profPages.gatherIntro.mining':
-    "Le Minage extrait le minerai directement de la roche du monde : le cuivre dans le Val d'Eastbrook, le fer dans le Marais de Mirefen, et l'osmium dans les Hauteurs de Thornpeak, pour alimenter les métiers de forge. Accessible à tous dès le niveau 1, sans aucune condition, suivi sur son propre compteur jusqu'à un plafond de 100.",
+    "Le Minage extrait le minerai directement de la roche du monde : le cuivre dans le Val d'Eastbrook, le fer dans le Marais de Mirefen, et l'osmium dans les Hauteurs de Thornpeak, pour alimenter les métiers de forge. Accessible à tous dès le niveau 1 : il suffit d'avoir un pic de mineur dans vos sacs, 20 pièces de cuivre dans la ville principale de n'importe quelle zone. Suivi sur son propre compteur jusqu'à un plafond de 100.",
   'guide.profPages.gatherIntro.logging':
-    "Le Bûcheronnage abat du bois dans les bosquets des trois zones : l'écorceferme dans le Val d'Eastbrook, le bois de frêne dans le Marais de Mirefen, et le pin des cimes dans les Hauteurs de Thornpeak, le stock brut pour les manches, les bâtons et le banc d'ingénieur. Accessible à tous dès le niveau 1, suivi sur son propre compteur jusqu'à un plafond de 100.",
+    "Le Bûcheronnage abat du bois dans les bosquets des trois zones : l'écorceferme dans le Val d'Eastbrook, le bois de frêne dans le Marais de Mirefen, et le pin des cimes dans les Hauteurs de Thornpeak, le stock brut pour les manches, les bâtons et le banc d'ingénieur. Accessible à tous dès le niveau 1 avec une hache de bûcheron dans vos sacs (20 pièces de cuivre dans la ville principale de n'importe quelle zone), suivi sur son propre compteur jusqu'à un plafond de 100.",
   'guide.profPages.gatherIntro.herbalism':
-    "L'Herboristerie cueille ce qui pousse à l'état sauvage : la feuilleclat dans le Val d'Eastbrook, la feuille-d'or dans le Marais de Mirefen, et le pétale-de-soleil dans les Hauteurs de Thornpeak, la feuille et la tige qui alimentent les métiers apothicaires. Accessible à tous dès le niveau 1, suivie sur son propre compteur jusqu'à un plafond de 100.",
+    "L'Herboristerie cueille ce qui pousse à l'état sauvage : la feuilleclat dans le Val d'Eastbrook, la feuille-d'or dans le Marais de Mirefen, et le pétale-de-soleil dans les Hauteurs de Thornpeak, la feuille et la tige qui alimentent les métiers apothicaires. Accessible à tous dès le niveau 1 avec une serpe d'herboristerie dans vos sacs (20 pièces de cuivre dans la ville principale de n'importe quelle zone), suivie sur son propre compteur jusqu'à un plafond de 100.",
   'guide.profPages.gatherIntro.fishing':
     'La Pêche est le métier à part parmi les métiers de récolte, et le plus profond : un vrai mini-jeu de touche et de moulinage, ses propres tables de prises dans chaque zone, et un plafond de maîtrise de 200, soit le double des autres. Achetez une canne, faites face à une eau libre, et lancez.',
   'guide.profPages.rhythmHeading': 'Le rythme de la récolte',
@@ -274,7 +274,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Où se trouvent les noeuds, leur palier, l'outil dont ils ont besoin et ce qu'ils rapportent. Chaque noeud réapparaît pour vous {respawn} secondes après votre propre récolte, et ce minuteur vous appartient exclusivement : un autre récolteur travaillant le même noeud ne retarde jamais le vôtre, donc il n'y a pas de course aux noeuds ni de camping. Chaque zone plus haut dans la progression fournit un matériau supérieur extrait d'un terrain plus difficile.",
   'guide.profPages.toolsHeading': 'Outils',
   'guide.profPages.toolsNote':
-    "Les mains nues comptent comme un outil de palier 1, donc chaque noeud de palier 1 du jeu ne nécessite aucun outil. L'échelle des marchands couvre les paliers 1 à 3 ; un outil doit simplement se trouver dans vos sacs, il n'y a pas d'emplacement d'équipement ni de durabilité, donc chacun est un achat unique. Seul le palier importe pour la condition : la couleur de rareté d'un outil est purement cosmétique.\n\nAu-dessus de l'échelle des marchands se trouvent deux outils artisanaux, de palier 4 et de palier 5, fabriqués à l'outillage par les ingénieurs et jamais vendus par aucun PNJ. Aucun noeud aujourd'hui n'a besoin de plus du palier 3, donc leur valeur actuelle est la vitesse : un outil du sommet fixe le lancer à son plancher sur les noeuds inférieurs, et il sera le ticket d'entrée quand des terrains de palier supérieur arriveront.",
+    "Chaque nœud exige l'outil de son métier dans vos sacs, palier 1 compris : pas de pic, pas de minerai ; pas de canne, pas de poisson. L'échelle des marchands couvre les paliers 1 à 3, en stock dans la ville principale de chaque zone ; un outil doit simplement se trouver dans vos sacs, il n'y a pas d'emplacement d'équipement ni de durabilité, donc chacun est un achat unique. Seul le palier importe pour la condition : la couleur de rareté d'un outil est purement cosmétique.\n\nAu-dessus de l'échelle des marchands se trouvent deux outils artisanaux, de palier 4 et de palier 5, fabriqués à l'outillage par les ingénieurs et jamais vendus par aucun PNJ. Aucun nœud aujourd'hui n'a besoin de plus du palier 3, donc leur valeur actuelle est la vitesse : un outil du sommet fixe le lancer à son plancher sur les nœuds inférieurs, et il sera le ticket d'entrée quand des terrains de palier supérieur arriveront.",
   'guide.profPages.toolCrafted': 'Fabriqué ({craft})',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Non vendu',
@@ -430,35 +430,35 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'cardDuel.yourTurn': 'Jouez une carte',
   'entities.abilities.arcane_surge.description':
     "Envoie une déferlante d'éther brut à travers l'ennemi pour {damage} points de dégâts. Chaque incantation laisse une Charge d'arcane qui augmente les dégâts et la vitesse d'incantation de votre prochain Aether Surge (5 % plus rapide chacune) mais en relève fortement le coût en mana, cumulant jusqu'à 4 fois ; Traits d'Aether dépense les charges. Chaque incantation peut également armer l'Élan d'Aether, rendant votre prochain Aether Surge gratuit et deux fois plus rapide à lancer.",
-  'entities.abilities.arcane_surge.name': 'Aether Surge',
+  'entities.abilities.arcane_surge.name': "Déferlante d'Aether",
   'entities.abilities.blizzard.description':
     "Déchaîne une tempête de glace sur la zone ciblée pendant 6 s, infligeant {damage} points de dégâts de Givre par seconde et ralentissant les ennemis de 40 %. Chaque ennemi touché réduit le temps de recharge de Frozen Orb de 0,5 s, jusqu'à 3 s par incantation. (Givre)",
-  'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.blizzard.name': 'Tempête de neige',
+  'entities.abilities.brain_freeze.name': 'Gel cérébral',
   'entities.abilities.dragons_breath.description':
     "Maintenez pour accumuler un souffle de flammes de plus en plus large, puis relâchez-le en cône. Plus la charge est longue, plus la portée et les dégâts augmentent. Les ennemis touchés sont désorientés et les dégâts brisent l'effet ; une charge maximale critique toujours et compte une fois pour Bonne série. (Feu)",
-  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.dragons_breath.name': 'Souffle du dragon',
   'entities.abilities.fingers_of_frost.description':
     "Rimelance a 15 % de chances d'accorder Fingers of Frost, jusqu'à 2 charges : votre prochain Ice Lance traite sa cible comme gelée. (Givre)",
-  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fingers_of_frost.name': 'Doigts de givre',
   'entities.abilities.fireball_form.description':
     'Vous vous transformez en braise ardente, augmentant votre vitesse de déplacement de {buff} %. Vous ne pouvez pas attaquer ni lancer de sorts sous cette forme. Réactivez pour reprendre votre forme normale.',
   'entities.abilities.fireball_form.name': 'Forme de braise',
-  'entities.abilities.flurry.name': 'Winterlash',
-  'entities.abilities.frozen_orb.name': 'Frozen Orb',
+  'entities.abilities.flurry.name': "Fouet de l'hiver",
+  'entities.abilities.frozen_orb.name': 'Orbe gelé',
   'entities.abilities.glacial_front.description':
     'Maintenez pour accumuler un front de givre de plus en plus large, puis relâchez-le en cône. Plus la charge est longue, plus la portée et les dégâts augmentent. Tous les ennemis touchés sont ralentis de 50 % pendant 4 s ; une charge maximale les immobilise également pendant 1 s. (Givre)',
-  'entities.abilities.glacial_front.name': 'Glacial Front',
+  'entities.abilities.glacial_front.name': 'Front glaciaire',
   'entities.abilities.glacial_spike.description':
     'Conjurez un pic de glace massif en consumant 5 glaçons pour infliger {damage} points de dégâts de Givre et geler la cible sur place pendant 4 s. (Givre)',
-  'entities.abilities.glacial_spike.name': 'Glacial Spike',
+  'entities.abilities.glacial_spike.name': 'Pointe glaciale',
   'entities.abilities.ice_lance.description':
     "Lancez un éclat de glace infligeant {damage} points de dégâts de Givre, triplés contre une cible gelée. Dépense Fingers of Frost ou une charge de Morsure de l'hiver pour traiter la cible comme gelée. (Givre)",
-  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.ice_lance.name': 'Lance de glace',
   'entities.abilities.perfect_moment.description':
     "Saisissez votre moment parfait : gagnez instantanément 4 Charges d'arcane, et pendant 10 s Traits d'Aether ne les consomme pas. (Chromancie)",
   'entities.abilities.perfect_moment.name': 'Moment parfait',
-  'entities.abilities.shatter.name': 'Brittle Ruin',
+  'entities.abilities.shatter.name': 'Ruine fragile',
   'entities.abilities.temporal_acceleration.description':
     "Accélère le flux du temps pour votre groupe ou raid, augmentant la vitesse d'attaque, d'incantation et de canalisation de 30 % pendant 15 s. Les alliés récemment affectés par Accélération temporelle ou Tambours de guerre sont trop épuisés pour en bénéficier. (Chromancie)",
   'entities.abilities.temporal_acceleration.name': 'Accélération temporelle',
@@ -4302,7 +4302,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.battle_shout.name': 'Beuglement de fer',
   'entities.abilities.battle_shout.description':
     "Un cri qui augmente de {buff}% la puissance d'attaque de tous les membres du groupe pendant 30 min.",
-  'entities.abilities.demoralizing_shout.name': 'Direhowl',
+  'entities.abilities.demoralizing_shout.name': 'Hurlement sinistre',
   'entities.abilities.demoralizing_shout.description':
     'Pousse un cri terrifiant qui réduit de {buff}% les dégâts infligés par tous les ennemis proches pendant 20 s.',
   'entities.abilities.charge.name': 'Ruée',
@@ -4316,7 +4316,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Mutile l'ennemi pour {damage} points de dégâts et réduit sa vitesse de déplacement de 50% pendant 15 s.",
   'entities.abilities.bloodrage.name': 'Tribut de sang',
   'entities.abilities.bloodrage.description': 'Génère 10 rage au prix de vos points de vie.',
-  'entities.abilities.overpower.name': 'Redhand',
+  'entities.abilities.overpower.name': 'Main rouge',
   'entities.abilities.overpower.description':
     "Attaque instantanée infligeant les dégâts de l'arme plus {damage}. Utilisable seulement après une esquive de la cible. Ne peut pas être esquivée.",
   'entities.abilities.execute.name': 'Tombe précoce',
@@ -4335,7 +4335,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.taunt.name': 'Aiguillon',
   'entities.abilities.taunt.description':
     'Provoque la cible: votre menace rejoint celle de son ennemi le plus haï et elle est forcée de vous attaquer pendant 3 s.',
-  'entities.abilities.fireball.name': 'Cinderbolt',
+  'entities.abilities.fireball.name': 'Trait de braises',
   'entities.abilities.rain_of_fire.name': 'Pluie de feu',
   'entities.abilities.rain_of_fire.description':
     'Fait pleuvoir du feu sur la zone visée pendant 4 s, brûlant les ennemis pour {damage} points de dégâts de Feu chaque seconde.',
@@ -4359,7 +4359,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_intellect.name': "Intelligence de l'Aether",
   'entities.abilities.arcane_intellect.description':
     "Augmente l'Intelligence de {buff} pendant 30 min.",
-  'entities.abilities.frostbolt.name': 'Rimelance',
+  'entities.abilities.frostbolt.name': 'Lance de givre',
   'entities.abilities.frostbolt.description':
     'Lance un éclair de givre, inflige {damage} points de dégâts de Givre et ralentit le déplacement de 40%.',
   'entities.abilities.blazing_barrier.name': 'Barrière flamboyante',
@@ -4377,7 +4377,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_floes.name': 'Floes de glace',
   'entities.abilities.ice_floes.description':
     "Vos deux prochains sorts avec un temps d'incantation peuvent être lancés en vous déplaçant. Dure 15 s. (Talent de mage)",
-  'entities.abilities.ignition.name': 'Ignition',
+  'entities.abilities.ignition.name': 'Embrasement',
   'entities.abilities.ignition.description':
     'Passif : les coups critiques de vos sorts brûlent la cible et infligent 40% des dégâts causés en 6 s, avec cumul. (Maîtrise du Feu)',
   'entities.abilities.mass_barrier.name': 'Barrière de masse',
@@ -4398,13 +4398,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_water_elemental.name': "Invocation d'un élémentaire d'eau",
   'entities.abilities.summon_water_elemental.description':
     "Invoque un élémentaire d'eau qui combat à vos côtés, lance des Traits d'eau sur votre cible et canalise Jet d'eau. (Givre)",
-  'entities.abilities.conjure_water.name': 'Waterbind',
+  'entities.abilities.conjure_water.name': "Lien d'eau",
   'entities.abilities.conjure_water.description':
     "Invoque 2 bouteilles d'eau qui restaurent du mana une fois bues. Les rangs supérieurs invoquent une eau plus pure.",
-  'entities.abilities.conjure_food.name': 'Breadbind',
+  'entities.abilities.conjure_food.name': 'Lien de pain',
   'entities.abilities.conjure_food.description':
     'Invoque 2 portions de pain qui restaurent de la vie une fois mangées. Les rangs supérieurs invoquent une nourriture plus consistante.',
-  'entities.abilities.fire_blast.name': 'Cinderfall',
+  'entities.abilities.fire_blast.name': 'Pluie de braises',
   'entities.abilities.fire_blast.description':
     "Frappe l'ennemi pour {damage} points de dégâts de Feu. Instantané.",
   'entities.abilities.arcane_missiles.name': "Traits d'Aether",
@@ -4413,16 +4413,16 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.polymorph.name': 'Ensorcellement',
   'entities.abilities.polymorph.description':
     "Transforme l'ennemi en crapaud pendant un maximum de {duration} s. Le crapaud erre et récupère rapidement. Tout dégât interrompt l'effet. Bêtes et humanoïdes uniquement.",
-  'entities.abilities.frost_nova.name': 'Icebind',
+  'entities.abilities.frost_nova.name': 'Entrave de glace',
   'entities.abilities.frost_nova.description':
     'Gèle tous les ennemis proches sur place pendant un maximum de 8 s et inflige {damage} points de dégâts de Givre. L’immobilisation prend fin après avoir subi un total de dégâts égal à 15 % des points de vie maximum de la cible, avec un minimum de 20 et un maximum de 60 points de dégâts.',
-  'entities.abilities.arcane_explosion.name': 'Aetherburst',
+  'entities.abilities.arcane_explosion.name': "Explosion d'Aether",
   'entities.abilities.arcane_explosion.description':
     "Une explosion d'énergie des Arcanes touche tous les ennemis proches pour {damage} points de dégâts des Arcanes.",
   'entities.abilities.scorch.name': 'Ébouillanter',
   'entities.abilities.scorch.description':
     "Brûle l'ennemi pour {damage} points de dégâts de Feu. Incantation rapide.",
-  'entities.abilities.pyroblast.name': 'Pyrelance',
+  'entities.abilities.pyroblast.name': 'Lance de flammes',
   'entities.abilities.pyroblast.description':
     'Projette un immense rocher enflammé qui inflige {damage} points de dégâts de Feu plus des dégâts supplémentaires sur la durée.',
   'entities.abilities.ice_barrier.name': 'Voile de givre',
@@ -4439,7 +4439,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.gouge.name': "Coup à l'œil",
   'entities.abilities.gouge.description':
     "Frappe la cible pour {damage} points de dégâts et l'incapacite pendant 4 s. Tout dégât interrompt l'effet. Confère 1 point de combo.",
-  'entities.abilities.evasion.name': 'Ghostfoot',
+  'entities.abilities.evasion.name': 'Pied spectral',
   'entities.abilities.evasion.description': "Augmente vos chances d'esquiver de 50% pendant 15 s.",
   'entities.abilities.slice_and_dice.name': 'Tempo du coupe-gorge',
   'entities.abilities.slice_and_dice.description':
@@ -4453,7 +4453,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ambush.name': 'Frappe du rôdeur',
   'entities.abilities.ambush.description':
     "Prend la cible en embuscade pour 250% des dégâts de l'arme plus {damage}. Vous devez être camouflé et derrière la cible. Requiert une dague. Confère 1 point de combo.",
-  'entities.abilities.stealth.name': 'Duskveil',
+  'entities.abilities.stealth.name': 'Voile du crépuscule',
   'entities.abilities.stealth.description':
     'Vous dissimule dans les ombres : les ennemis vous remarquent à peine, mais vous vous déplacez 50% plus lentement. Attaquer ou subir des dégâts interrompt Duskveil. Relancez pour sortir.',
   'entities.abilities.adrenaline_rush.name': 'Sang vif',
@@ -4477,7 +4477,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rupture.name': 'Hémorragie',
   'entities.abilities.rupture.description':
     'Coup de grâce qui blesse la cible, la faisant saigner de {damage} pendant 16 s.',
-  'entities.abilities.vanish.name': 'Smokestep',
+  'entities.abilities.vanish.name': 'Pas de fumée',
   'entities.abilities.vanish.description':
     "Vous disparaissez et entrez en Duskveil, même en plein combat. Vous vous déplacez 50% plus lentement tant que vous êtes dissimulé. Dure jusqu'à 10 s.",
   'entities.abilities.instant_poison.name': 'Morsure de vipère',
@@ -4489,7 +4489,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.blind.name': 'Jet de terre',
   'entities.abilities.blind.description':
     "Aveugle la cible, la faisant errer désorientée pendant 8 s. Le moindre dégât rompt l'effet.",
-  'entities.abilities.seal_of_righteousness.name': 'Oathbrand',
+  'entities.abilities.seal_of_righteousness.name': 'Marque du serment',
   'entities.abilities.seal_of_righteousness.description':
     'Vous remplit de puissance Sacrée pendant 30 s, faisant infliger {damage} points de dégâts Sacrés supplémentaires à chacune de vos frappes de mêlée. Libérez-le avec Verdict.',
   'entities.abilities.holy_light.name': 'Lumière guérisseuse',
@@ -4510,7 +4510,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.lay_on_hands.name': 'Dernier sacrement',
   'entities.abilities.lay_on_hands.description':
     'Une vague de soins massive: rend {damage} points de vie. Temps de recharge de 10 min.',
-  'entities.abilities.flash_of_light.name': 'Lightmend',
+  'entities.abilities.flash_of_light.name': 'Soin de lumière',
   'entities.abilities.flash_of_light.description':
     'Un éclat de Lumière rapide et efficace qui rend {damage} points de vie à une cible alliée.',
   'entities.abilities.exorcism.name': "Rite d'expulsion",
@@ -4525,7 +4525,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.retribution_aura.name': 'Aura de représailles',
   'entities.abilities.retribution_aura.description':
     "Vous entoure d'énergie sacrée pendant 30 min, infligeant 5 points de dégâts Sacrés à tout ennemi qui vous frappe en mêlée.",
-  'entities.abilities.tame_beast.name': 'Wildbond',
+  'entities.abilities.tame_beast.name': 'Lien sauvage',
   'entities.abilities.tame_beast.description':
     "Commence à apprivoiser une bête pour en faire votre compagnon. Elle doit être de votre niveau ou moins et ne pas être élite. Votre familier vous suit, attaque vos ennemis et génère sa propre menace. Vous ne pouvez avoir qu'un familier à la fois.",
   'entities.abilities.dismiss_pet.name': 'Renvoyer le compagnon',
@@ -4545,7 +4545,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.concussive_shot.name': 'Tir déstabilisant',
   'entities.abilities.concussive_shot.description':
     'Hébète la cible pour {damage} points de dégâts et ralentit son déplacement de 50% pendant 4 s.',
-  'entities.abilities.mongoose_bite.name': 'Counterfang',
+  'entities.abilities.mongoose_bite.name': 'Contre-croc',
   'entities.abilities.mongoose_bite.description':
     "Contre-attaque après une esquive de la cible, infligeant les dégâts de l'arme plus {damage}. Ne peut pas être esquivée.",
   'entities.abilities.wing_clip.name': 'Taillade entravante',
@@ -4578,7 +4578,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Protège la cible et absorbe {damage} points de dégâts pendant 30 s.',
   'entities.abilities.renew.name': 'Grâce persistante',
   'entities.abilities.renew.description': 'Rend {damage} points de vie à la cible en 15 s.',
-  'entities.abilities.mind_blast.name': 'Mindfracture',
+  'entities.abilities.mind_blast.name': 'Fracture mentale',
   'entities.abilities.mind_blast.description':
     "Frappe l'esprit de la cible pour {damage} points de dégâts d'Ombre.",
   'entities.abilities.heal.name': 'Prière solennelle',
@@ -4616,7 +4616,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.frostbrand_weapon.name': 'Arme Rimebound',
   'entities.abilities.frostbrand_weapon.description':
     "Imprègne votre arme d'un givre mordant: chaque frappe inflige {damage} points de dégâts supplémentaires pendant 5 min.",
-  'entities.abilities.ghost_wolf.name': 'Shadewolf',
+  'entities.abilities.ghost_wolf.name': "Loup d'ombre",
   'entities.abilities.ghost_wolf.description':
     'Vous transforme en Shadewolf et augmente votre vitesse de déplacement de 40% pendant 10 min.',
   'entities.abilities.stormstrike.name': 'Frappe ancestrale',
@@ -4625,13 +4625,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadow_bolt.name': 'Trait de pénombre',
   'entities.abilities.shadow_bolt.description':
     "Envoie un trait ténébreux sur l'ennemi pour {damage} points de dégâts d'Ombre.",
-  'entities.abilities.demon_skin.name': 'Fiendhide',
+  'entities.abilities.demon_skin.name': 'Peau de démon',
   'entities.abilities.demon_skin.description':
     'Une peau démoniaque augmente votre armure de {buff} pendant 30 min.',
   'entities.abilities.immolate.name': 'Pacte brûlant',
   'entities.abilities.immolate.description':
     "Brûle l'ennemi pour {damage} points de dégâts de Feu et {overTime} points supplémentaires en 15 s.",
-  'entities.abilities.corruption.name': 'Blackrot',
+  'entities.abilities.corruption.name': 'Pourriture noire',
   'entities.abilities.corruption.description':
     "Corrompt la cible et inflige {damage} points de dégâts d'Ombre en 18 s.",
   'entities.abilities.life_tap.name': 'Marché brutal',
@@ -4651,20 +4651,20 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.shadowburn.name': 'Feu du crépuscule',
   'entities.abilities.shadowburn.description':
     "Frappe instantanément la cible d'une ombre brûlante pour {damage} points de dégâts d'Ombre.",
-  'entities.abilities.wrath.name': 'Wildbolt',
+  'entities.abilities.wrath.name': 'Trait sauvage',
   'entities.abilities.wrath.description':
     "Lance un trait d'énergie naturelle qui inflige {damage} points de dégâts de Nature.",
-  'entities.abilities.healing_touch.name': 'Wildmend',
+  'entities.abilities.healing_touch.name': 'Soin sauvage',
   'entities.abilities.healing_touch.description': 'Rend {damage} points de vie à une cible alliée.',
-  'entities.abilities.mark_of_the_wild.name': 'Wildward',
+  'entities.abilities.mark_of_the_wild.name': 'Garde sauvage',
   'entities.abilities.mark_of_the_wild.description':
     'Place le Wildward sur une cible alliée et augmente son armure de {buff} pendant 30 min.',
   'entities.abilities.moonfire.name': 'Tempête lunaire',
   'entities.abilities.moonfire.description':
     "Brûle l'ennemi par un feu lunaire pour {damage} points de dégâts des Arcanes plus des dégâts sur la durée.",
-  'entities.abilities.rejuvenation.name': 'Wildbloom',
+  'entities.abilities.rejuvenation.name': 'Floraison sauvage',
   'entities.abilities.rejuvenation.description': 'Rend {damage} points de vie à la cible en 12 s.',
-  'entities.abilities.thorns.name': 'Briarguard',
+  'entities.abilities.thorns.name': 'Garde de ronces',
   'entities.abilities.thorns.description':
     'Des épines jaillissent de la cible: les assaillants en mêlée subissent {buff} points de dégâts de Nature.',
   'entities.abilities.entangling_roots.name': 'Racines agrippantes',
@@ -4673,10 +4673,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bear_form.name': 'Forme de Bruin',
   'entities.abilities.bear_form.description':
     "Vous change en ours: armure +130%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur.",
-  'entities.abilities.maul.name': 'Bonecrush',
+  'entities.abilities.maul.name': 'Brise-os',
   'entities.abilities.maul.description':
     "Attaque dévastatrice qui augmente les dégâts de mêlée de {damage} et génère beaucoup de menace. S'active lors de votre prochaine frappe. Forme de Bruin uniquement.",
-  'entities.abilities.growl.name': 'Menace',
+  'entities.abilities.growl.name': 'Menacer',
   'entities.abilities.growl.description':
     'Gronde la cible : votre menace rejoint celle de son ennemi le plus haï et elle est forcée de vous attaquer pendant 3 s. Forme de Bruin uniquement.',
   'entities.abilities.cat_form.name': 'Forme de loup',
@@ -4685,7 +4685,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.claw.name': 'Griffe',
   'entities.abilities.claw.description':
     "Griffe l'ennemi pour les dégâts de l'arme plus {damage}. Confère 1 point de combo. Forme de loup uniquement.",
-  'entities.abilities.ferocious_bite.name': 'Gorebite',
+  'entities.abilities.ferocious_bite.name': 'Morsure sanglante',
   'entities.abilities.ferocious_bite.description':
     'Coup de grâce qui inflige {damage}. Forme de loup uniquement.',
   'entities.abilities.swipe.name': 'Griffes balayantes',
@@ -4697,7 +4697,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.barkskin.name': 'Peau de chêne',
   'entities.abilities.barkskin.description':
     "Votre peau durcit comme de l'écorce et augmente l'armure de 150 pendant 15 s.",
-  'entities.abilities.starfire.name': 'Skyfall',
+  'entities.abilities.starfire.name': 'Chute céleste',
   'entities.abilities.starfire.description':
     'Fait tomber un trait de feu stellaire qui inflige {damage} points de dégâts des Arcanes.',
   'entities.abilities.travel_form.name': 'Forme de Fleet',
@@ -4709,7 +4709,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bash.name': 'Commotion',
   'entities.abilities.bash.description':
     'Étourdit la cible pendant 2 s. Forme de Bruin uniquement.',
-  'entities.abilities.faerie_fire.name': 'Witchlight',
+  'entities.abilities.faerie_fire.name': 'Lumière de sorcière',
   'entities.abilities.faerie_fire.description':
     "Diminue l'armure de la cible de {damage}% pendant 40 s. Ne se cumule pas avec Cisaillement d'armure.",
   'entities.abilities.hibernate.name': 'Sommeil',
@@ -4718,13 +4718,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.dash.name': 'Sprint',
   'entities.abilities.dash.description':
     'Bondit en avant, augmentant la vitesse de déplacement de 50% pendant 15 s. Forme de loup uniquement.',
-  'entities.abilities.pounce.name': 'Slinkstrike',
+  'entities.abilities.pounce.name': 'Frappe furtive',
   'entities.abilities.pounce.description':
     'Ouverture furtive qui étourdit la cible pendant 2 s. Confère 1 point de combo. Forme de loup uniquement.',
   'entities.abilities.insect_swarm.name': 'Nuée cinglante',
   'entities.abilities.insect_swarm.description':
     "L'ennemi est assailli par une nuée d'insectes, subissant {damage} points de dégâts de Nature sur 12 s.",
-  'entities.abilities.tigers_fury.name': 'Wolfsblood',
+  'entities.abilities.tigers_fury.name': 'Sang de loup',
   'entities.abilities.tigers_fury.description':
     "Augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de loup uniquement.",
   'entities.abilities.rip.name': 'Lacération',
@@ -4736,7 +4736,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodthirst.name': 'Saignée',
   'entities.abilities.bloodthirst.description':
     "Attaque instantanément dans une frénésie sanguinaire pour 60% des dégâts de l'arme plus {damage}. (signature Fureur)",
-  'entities.abilities.shield_slam.name': 'Shieldcrack',
+  'entities.abilities.shield_slam.name': 'Brise-bouclier',
   'entities.abilities.shield_slam.description':
     "Heurte la cible avec votre bouclier pour 50% des dégâts de l'arme plus {damage} et génère une menace énorme. (signature Protection)",
   'entities.abilities.whirlwind.name': 'Tournoiement de lames',
@@ -8728,7 +8728,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Projette un bouclier forgé à l'aube qui inflige {damage} dégâts sacrés, réduit la cible principale au silence pendant 2 s, puis rebondit sur jusqu'à 2 ennemis supplémentaires à moins de 10 m, infligeant 75 % des dégâts par rebond. (talent de Paladin)",
   'entities.abilities.aspect_of_the_wild.description':
     "Insuffle une force sauvage aux alliés à moins de 30 m, augmentant leur puissance d'attaque de 45 et leur vitesse d'attaque de 5 % pendant 5 min. (talent de Chasseur)",
-  'entities.abilities.avatar.name': 'Avatar',
+  'entities.abilities.avatar.name': 'Incarnation',
   'entities.abilities.avatar.description':
     'Vous vous transformez en colosse pendant 20 s, ce qui dissipe tous les effets de contrôle vous affectant et augmente de 20% les dégâts que vous infligez.',
   'entities.abilities.avenging_wrath.description':
@@ -9284,7 +9284,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Gain de compétence complet',
   'hudChrome.crafting.difficultyNone': 'Aucun gain de compétence',
   'hudChrome.crafting.difficultyReduced': 'Gain de compétences réduit',
-  'hudChrome.crafting.enchantedLine': 'Enchanté',
   'hudChrome.crafting.makersMark': 'Fabriqué par {name}',
   'hudChrome.crafting.masterworkSeal': "Chef-d'œuvre",
   'hudChrome.crafting.masterworkToast': "Chef-d'œuvre ! {name}",
@@ -9389,4 +9388,65 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unbind.unbindAria': 'Délier {name} pour {fee}',
   'hudChrome.unbind.unbound':
     '{name} délié pour {fee}. Il se liera à nouveau lors de son prochain échange.',
+  'hud.combat.auraGainOther': '{target} gagne {name}.',
+  'hudChrome.corpseHarvest.components.cloth': 'Tissu',
+  'hudChrome.corpseHarvest.components.meat': 'Viande',
+  'hudChrome.crafting.noBagSpace': "Vous n'avez pas de place pour l'objet fabriqué.",
+  'hudChrome.enchanting.disenchantNoSpace':
+    "Vous n'avez pas de place pour les matériaux arcaniques.",
+  'hudChrome.enchanting.enchantNoSpace': "Vous n'avez pas de place pour l'objet enchanté.",
+  'hudChrome.enchanting.salvageNoSpace': "Vous n'avez pas de place pour les matériaux récupérés.",
+  'hudChrome.gathering.noNodeNearby.herbalism': 'Aucune parcelle de plantes à portée.',
+  'hudChrome.gathering.noNodeNearby.logging': 'Aucun bosquet de bois à portée.',
+  'hudChrome.gathering.noNodeNearby.mining': 'Aucun filon de minerai à portée.',
+  'hudChrome.gathering.requiresTool.herbalism': "Nécessite une serpe d'herboristerie",
+  'hudChrome.gathering.requiresTool.logging': 'Nécessite une hache de bûcheron',
+  'hudChrome.gathering.requiresTool.mining': 'Nécessite un pic de mineur',
+  'hudChrome.gathering.toolRequired.fishing':
+    "Vous avez besoin d'une canne à pêche pour lancer votre ligne.",
+  'hudChrome.gathering.toolRequired.herbalism':
+    "Vous avez besoin d'une serpe d'herboristerie pour collecter cette parcelle.",
+  'hudChrome.gathering.toolRequired.logging':
+    "Vous avez besoin d'une hache de bûcheron pour abattre ce bosquet.",
+  'hudChrome.gathering.toolRequired.mining':
+    "Vous avez besoin d'un pic de mineur pour exploiter ce filon.",
+  'hudChrome.gathering.toolTooltip.kind.fishing': 'Canne à pêche (palier {tier})',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': "Outil d'herboristerie (palier {tier})",
+  'hudChrome.gathering.toolTooltip.kind.logging': 'Outil de bûcheronnage (palier {tier})',
+  'hudChrome.gathering.toolTooltip.kind.mining': 'Outil de minage (palier {tier})',
+  'hudChrome.gathering.toolTooltip.rodBand':
+    'Débloque des tables de prises plus riches à partir de {skill} en compétence de pêche.',
+  'hudChrome.gathering.toolTooltip.rodBite': "Le poisson mord jusqu'à {seconds}s plus tôt.",
+  'hudChrome.gathering.toolTooltip.rodReel': 'Prolonge la fenêtre de remontée de {seconds}s.',
+  'hudChrome.gathering.toolTooltip.rodRequired': 'Nécessaire pour pêcher.',
+  'hudChrome.gathering.toolTooltip.speed':
+    'Collecte plus vite sur les nœuds de palier inférieur à {tier}.',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism':
+    "Nécessaire pour collecter les parcelles de plantes jusqu'au palier {tier}.",
+  'hudChrome.gathering.toolTooltip.unlocks.logging':
+    "Nécessaire pour abattre les bosquets de bois jusqu'au palier {tier}.",
+  'hudChrome.gathering.toolTooltip.unlocks.mining':
+    "Nécessaire pour exploiter les filons de minerai jusqu'au palier {tier}.",
+  'hudChrome.gathering.toolTooltip.use.herbalism':
+    'Utilisation : collecter une parcelle de plantes à proximité.',
+  'hudChrome.gathering.toolTooltip.use.logging':
+    'Utilisation : abattre un bosquet de bois à proximité.',
+  'hudChrome.gathering.toolTooltip.use.mining':
+    'Utilisation : exploiter un filon de minerai à proximité.',
+  'hudChrome.noticeboard.empty': 'Rien ne semble affiché.',
+  'hudChrome.training.pendingAria': 'Apprentissage de {name}',
+  'hudChrome.training.statePending': 'En apprentissage',
+  'hudChrome.unbind.noSpace': "Vous n'avez pas de place pour l'exemplaire délié.",
+  'loading.incompatibleWorldVersion':
+    'Les versions du jeu et du serveur sont incompatibles. Rechargez ou mettez à jour, puis réessayez.',
+  'loading.messageRateExceeded':
+    'Vous avez été déconnecté pour avoir envoyé des actions trop rapidement. Patientez un instant, puis reconnectez-vous.',
+  'perfNudge.dismiss': 'Ignorer',
+  'perfNudge.hardwareAccelerationDesktop':
+    'Le jeu fonctionne sans accélération GPU, ce qui le rend très lent. Mettez à jour vos pilotes graphiques, puis redémarrez le jeu. Sous Windows, définissez également le jeu sur Performances élevées dans Paramètres > Système > Affichage > Graphiques.',
+  'perfNudge.hardwareAccelerationWeb':
+    "Le jeu fonctionne sans accélération GPU, ce qui le rend très lent. Activez l'accélération matérielle dans les paramètres de votre navigateur, mettez à jour vos pilotes graphiques, puis redémarrez votre navigateur.",
+  'perfNudge.integratedGpu':
+    "Le jeu fonctionne sur le GPU intégré (économie d'énergie). Si cet ordinateur possède aussi un GPU de jeu, définissez votre navigateur sur Performances élevées dans Paramètres > Système > Affichage > Graphiques sous Windows, puis redémarrez le navigateur. L'application de bureau choisit automatiquement le GPU de jeu.",
+  'worldContent.noticeboardName': "Panneau d'affichage",
 };

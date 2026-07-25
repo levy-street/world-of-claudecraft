@@ -151,6 +151,7 @@ describe('prof intro hint veteran refinement, online host', () => {
         'smith_haldren',
         'available',
         client.craftingIdentity.attunedPairs.length > 0,
+        client.stationPlacements,
       ),
     ).toBe(false);
   });
@@ -171,6 +172,7 @@ describe('prof intro hint veteran refinement, online host', () => {
         'smith_haldren',
         'available',
         client.craftingIdentity.attunedPairs.length > 0,
+        client.stationPlacements,
       ),
     ).toBe(true);
   });

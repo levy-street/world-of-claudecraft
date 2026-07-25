@@ -145,6 +145,60 @@ describe('tryNearbyInteraction', () => {
   });
 
   it.each([
+    ['inside', 3.99, true, ['pickup:2']],
+    ['exactly at', 4, true, ['pickup:2']],
+    ['outside', 4.01, false, ['error:nothing']],
+  ] as const)(
+    'uses the authored noticeboard radius when the board is %s the boundary',
+    (_position, distance, expectedOutcome, expectedCalls) => {
+      const board = entity({
+        id: 2,
+        kind: 'object',
+        templateId: 'noticeboard_eastbrook',
+        lootable: true,
+        pos: { x: distance, y: 0, z: 0 },
+      });
+      const r = rig([board]);
+
+      expect(interact(r)).toBe(expectedOutcome);
+      expect(r.calls).toEqual(expectedCalls);
+    },
+  );
+
+  it('does not let an out-of-range noticeboard mask a closer valid NPC', () => {
+    const board = entity({
+      id: 2,
+      kind: 'object',
+      templateId: 'noticeboard_eastbrook',
+      lootable: true,
+      pos: { x: 4.5, y: 0, z: 0 },
+    });
+    const npc = entity({
+      id: 3,
+      kind: 'npc',
+      templateId: 'elder_maren',
+      pos: { x: 2, y: 0, z: 0 },
+    });
+    const r = rig([board, npc]);
+
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['quest:3']);
+  });
+
+  it('preserves the generic five-yard object interaction range', () => {
+    const object = entity({
+      id: 2,
+      kind: 'object',
+      lootable: true,
+      pos: { x: 4.5, y: 0, z: 0 },
+    });
+    const r = rig([object]);
+
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['pickup:2']);
+  });
+
+  it.each([
     ['quest', 'elder_maren', 'quest:2'],
     ['delve board', 'brother_halven_marsh', 'board:2'],
   ])('opens the nearby %s interaction', (_name, templateId, expected) => {

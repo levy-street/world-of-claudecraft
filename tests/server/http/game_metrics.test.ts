@@ -17,14 +17,18 @@ import {
   WOC_ACCOUNTS_ONLINE,
   WOC_CHARACTERS_CREATED_TOTAL,
   WOC_CHAT_MESSAGES_TOTAL,
+  WOC_INPUT_FRAMES_MISSED_TOTAL,
   WOC_PLAYERS_ONLINE,
   WOC_SIM_ENTITIES,
   WOC_SIM_TICK_HZ,
   WOC_SIM_TICK_PHASE_SECONDS,
   WOC_TICK_PHASES,
   WOC_WS_CONNECTIONS,
+  WOC_WS_MESSAGES_DROPPED_TOTAL,
   WOC_WS_MESSAGES_TOTAL,
+  WOC_WS_RATE_KICKS_TOTAL,
 } from '../../../server/http/game_metrics';
+import { WS_DROP_CAUSES } from '../../../server/http/game_signals';
 
 /** A GameStateSource returning fixed values; override any field per test. */
 function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
@@ -184,6 +188,117 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(sampleValue(text, /^woc_ws_messages_total\{direction="out"\} (\d+)$/m)).toBe('1');
     expect(sampleValue(text, /^woc_chat_messages_total (\d+)$/m)).toBe('1');
     expect(sampleValue(text, /^woc_characters_created_total (\d+)$/m)).toBe('3');
+  });
+
+  it('pre-registers every drop cause series and the kick and missed counters at zero', async () => {
+    const registry = new Registry();
+    registerGameStateMetrics(registry, stubSource());
+    // Scrape BEFORE any sink call: prom counters cannot backfill a scrape, so a
+    // dashboard must see every series from boot. Every WS_DROP_CAUSES series
+    // and the two unlabeled counters all expose an explicit 0.
+    const text = await registry.metrics();
+
+    expect(WOC_WS_MESSAGES_DROPPED_TOTAL).toBe('woc_ws_messages_dropped_total');
+    expect(WOC_WS_RATE_KICKS_TOTAL).toBe('woc_ws_rate_kicks_total');
+    expect(WOC_INPUT_FRAMES_MISSED_TOTAL).toBe('woc_input_frames_missed_total');
+    for (const name of [
+      WOC_WS_MESSAGES_DROPPED_TOTAL,
+      WOC_WS_RATE_KICKS_TOTAL,
+      WOC_INPUT_FRAMES_MISSED_TOTAL,
+    ]) {
+      expect(text).toContain(`# TYPE ${name} counter`);
+    }
+
+    expect(WS_DROP_CAUSES).toEqual([
+      'rate',
+      'bytes',
+      'lane_movement',
+      'lane_command',
+      'lane_chat',
+      'list_read',
+    ]);
+    for (const cause of WS_DROP_CAUSES) {
+      expect(
+        sampleValue(
+          text,
+          new RegExp(`^woc_ws_messages_dropped_total\\{cause="${cause}"\\} (\\d+)$`, 'm'),
+        ),
+      ).toBe('0');
+    }
+    expect(sampleValue(text, /^woc_ws_rate_kicks_total (\d+)$/m)).toBe('0');
+    expect(sampleValue(text, /^woc_input_frames_missed_total (\d+)$/m)).toBe('0');
+  });
+
+  it('increments the drop, kick, and seq-gap counters through the sink', async () => {
+    const registry = new Registry();
+    const counters = registerGameStateMetrics(registry, stubSource());
+
+    counters.wsMessageDropped('rate');
+    counters.wsMessageDropped('rate');
+    counters.wsMessageDropped('bytes');
+    counters.wsMessageDropped('lane_movement');
+    counters.wsMessageDropped('lane_chat');
+    counters.wsMessageDropped('list_read');
+    counters.wsRateKick();
+    // The seq-gap sink adds the whole observed gap, not one per call.
+    counters.wsInputSeqGap(7);
+    counters.wsInputSeqGap(2);
+
+    const text = await registry.metrics();
+    expect(sampleValue(text, /^woc_ws_messages_dropped_total\{cause="rate"\} (\d+)$/m)).toBe('2');
+    expect(sampleValue(text, /^woc_ws_messages_dropped_total\{cause="bytes"\} (\d+)$/m)).toBe('1');
+    expect(
+      sampleValue(text, /^woc_ws_messages_dropped_total\{cause="lane_movement"\} (\d+)$/m),
+    ).toBe('1');
+    expect(
+      sampleValue(text, /^woc_ws_messages_dropped_total\{cause="lane_command"\} (\d+)$/m),
+    ).toBe('0');
+    expect(sampleValue(text, /^woc_ws_messages_dropped_total\{cause="lane_chat"\} (\d+)$/m)).toBe(
+      '1',
+    );
+    expect(sampleValue(text, /^woc_ws_messages_dropped_total\{cause="list_read"\} (\d+)$/m)).toBe(
+      '1',
+    );
+    expect(sampleValue(text, /^woc_ws_rate_kicks_total (\d+)$/m)).toBe('1');
+    expect(sampleValue(text, /^woc_input_frames_missed_total (\d+)$/m)).toBe('9');
+  });
+
+  it('keeps the cause label bounded to the fixed six values', async () => {
+    const registry = new Registry();
+    const counters = registerGameStateMetrics(registry, stubSource());
+    counters.wsMessageDropped('rate');
+    counters.wsMessageDropped('lane_command');
+    const text = await registry.metrics();
+    expect(labelValues(text, 'cause')).toEqual(new Set(WS_DROP_CAUSES));
+  });
+
+  it('swallows a throwing counter in every sink method and never propagates', () => {
+    const registry = new Registry();
+    const counters = registerGameStateMetrics(registry, stubSource());
+
+    // The seam's stated contract: an observability write must never break the
+    // path it measures. Force each underlying prom counter's inc to throw and
+    // prove every sink method swallows it.
+    for (const name of [
+      WOC_WS_MESSAGES_TOTAL,
+      WOC_WS_MESSAGES_DROPPED_TOTAL,
+      WOC_WS_RATE_KICKS_TOTAL,
+      WOC_INPUT_FRAMES_MISSED_TOTAL,
+      WOC_CHAT_MESSAGES_TOTAL,
+      WOC_CHARACTERS_CREATED_TOTAL,
+    ]) {
+      const metric = registry.getSingleMetric(name) as unknown as { inc: () => never };
+      metric.inc = () => {
+        throw new Error('prom exploded');
+      };
+    }
+
+    expect(() => counters.wsMessage('in')).not.toThrow();
+    expect(() => counters.wsMessageDropped('rate')).not.toThrow();
+    expect(() => counters.wsRateKick()).not.toThrow();
+    expect(() => counters.wsInputSeqGap(3)).not.toThrow();
+    expect(() => counters.chatMessage()).not.toThrow();
+    expect(() => counters.characterCreated()).not.toThrow();
   });
 
   it('bounds the ws direction label to in/out and emits no per-player label anywhere', async () => {

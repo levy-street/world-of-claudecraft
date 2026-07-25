@@ -241,11 +241,11 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Rozebrání je lidový bratranec rozzačarování: stejné zbraně a zbroje, žádná dovednost nevyžadována ani nezískaná, vracející běžný řemeslný odpad podle kvality místo čehokoli arkanového. Může to dělat kdokoli, okouzlovatel i laik. Když držíš kus vhodný k rozebrání, volba je jednoduchá: od vzácné výše je rozzačarování striktně lepší obchod, zatímco u běžné kvality se výnosy prodají prodejci přibližně za stejnou cenu, takže rozeber to, co ze suroviny skutečně potřebuješ.',
   'guide.profPages.ench.bonusFmt': '+{value} {stat}',
   'guide.profPages.gatherIntro.mining':
-    'Těžba vytahuje rudu přímo ze světového kamene: měď v Eastbrookském údolí, železo v Mirefenském močálu a osmium nahoře v Thornpeakských výšinách, zásobující kovářské živnosti. Přístupné všem od úrovně 1, bez jakékoli podmínky, sledované na vlastním počítadle s limitem 100.',
+    'Těžba vytahuje rudu přímo ze světového kamene: měď v Eastbrookském údolí, železo v Mirefenském močálu a osmium nahoře v Thornpeakských výšinách, zásobující kovářské živnosti. Přístupné všem od úrovně 1: stačí mít v brašnách hornický krumpáč, k mání za 20 mědi v centru kterékoli zóny. Sledované na vlastním počítadle s limitem 100.',
   'guide.profPages.gatherIntro.logging':
-    'Dřevorubectví kácí dřevo ze skupin stromů ve všech třech zónách: železová kůra v Eastbrookském údolí, jasanové dřevo v Mirefenském močálu a vysokoborové dřevo v Thornpeakských výšinách, hrubý materiál pro topůrka, hole a inženýrský stůl. Přístupné všem od úrovně 1, sledované na vlastním počítadle s limitem 100.',
+    'Dřevorubectví kácí dřevo ze skupin stromů ve všech třech zónách: železová kůra v Eastbrookském údolí, jasanové dřevo v Mirefenském močálu a vysokoborové dřevo v Thornpeakských výšinách, hrubý materiál pro topůrka, hole a inženýrský stůl. Přístupné všem od úrovně 1, pokud máš v brašnách dřevorubeckou sekeru (20 mědi v centru kterékoli zóny), sledované na vlastním počítadle s limitem 100.',
   'guide.profPages.gatherIntro.herbalism':
-    'Bylinkářství sbírá, co roste divoce: stříbrolist v Eastbrookském údolí, zlatolist v Mirefenském močálu a sluncokvět v Thornpeakských výšinách, list a stonek, které zásobují lékárenské živnosti. Přístupné všem od úrovně 1, sledované na vlastním počítadle s limitem 100.',
+    'Bylinkářství sbírá, co roste divoce: stříbrolist v Eastbrookském údolí, zlatolist v Mirefenském močálu a sluncokvět v Thornpeakských výšinách, list a stonek, které zásobují lékárenské živnosti. Přístupné všem od úrovně 1, pokud máš v brašnách bylinkářský srp (20 mědi v centru kterékoli zóny), sledované na vlastním počítadle s limitem 100.',
   'guide.profPages.gatherIntro.fishing':
     'Rybaření je výjimkou mezi sběratelskými živnostmi a zároveň tou nejhlubší: skutečná minihra s pokusem o záběr a navíjením, vlastní tabulky úlovků v každé zóně a limit dovednosti 200, dvojnásobek ostatních. Kup prut, obraťte se k otevřené vodě a zahoď.',
   'guide.profPages.rhythmHeading': 'Rytmus sběru',
@@ -258,7 +258,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Kde naleziště jsou, jejich úroveň, jaký nástroj potřebují a co přinášejí. Každé naleziště se ti obnoví {respawn} sekund po tvé vlastní sklizni a ten časovač je jen tvůj: jiný sběrač pracující na stejném nalezišti tvůj nikdy nezdržuje, takže neexistují závody o naleziště ani jejich číhání. Každá zóna výše na žebříčku přináší lepší materiál z náročnějšího terénu.',
   'guide.profPages.toolsHeading': 'Nástroje',
   'guide.profPages.toolsNote':
-    'Holé ruce se počítají jako nástroj 1. úrovně, takže každé naleziště 1. úrovně ve hře nepotřebuje žádný nástroj. Prodejní žebříček pokrývá úrovně 1 až 3; nástroj stačí mít v brašně, žádný slot na vybavení ani trvanlivost neexistuje, takže každý je jednorázovým nákupem. Důležitá je jen úroveň: vzácnostní barva nástroje je kosmetická.\n\nNad prodejním žebříčkem stojí dva vyráběné nástroje, 4. a 5. úrovně, vyrobené v dílně inženýry a žádným NPC neprodávané. Žádné dnešní naleziště nepotřebuje víc než 3. úroveň, takže jejich hodnota nyní spočívá v rychlosti: špičkový nástroj udrží sesílání na spodním limitu u nižších nalezišť a bude vstupní vstupenkou, až přijde terén vyšší úrovně.',
+    'Každé naleziště vyžaduje nástroj svého řemesla v brašnách, včetně 1. úrovně: bez krumpáče není ruda a bez prutu nejsou ryby. Prodejní žebříček pokrývá úrovně 1 až 3 a najdeš ho v centru každé zóny; nástroj stačí mít v brašně, žádný slot na vybavení ani trvanlivost neexistuje, takže každý je jednorázovým nákupem. Důležitá je jen úroveň: vzácnostní barva nástroje je kosmetická.\n\nNad prodejním žebříčkem stojí dva vyráběné nástroje, 4. a 5. úrovně, vyrobené v dílně inženýry a žádným NPC neprodávané. Žádné dnešní naleziště nepotřebuje víc než 3. úroveň, takže jejich hodnota nyní spočívá v rychlosti: špičkový nástroj udrží sesílání na spodním limitu u nižších nalezišť a bude vstupenkou, až přijde terén vyšší úrovně.',
   'guide.profPages.toolCrafted': 'Vyrobený ({craft})',
   'guide.profPages.toolVendor': '{name} ({hub})',
   'guide.profPages.toolUnavailable': 'Neprodáváno',
@@ -414,18 +414,18 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.arcane_surge.name': 'Příval éteru',
   'entities.abilities.blizzard.description':
     'Přivolá ledovou bouři na cílovou plochu po dobu 6 s, působí {damage} mrazivého poškození každou sekundu a zpomaluje nepřátele o 40 %. Každý zasažený nepřítel zkrátí cooldown Zmrzlé sféry o 0,5 s, nejvýše o 3 s za seslání. (Mráz)',
-  'entities.abilities.blizzard.name': 'Blizzard',
-  'entities.abilities.brain_freeze.name': 'Brain Freeze',
+  'entities.abilities.blizzard.name': 'Vánice',
+  'entities.abilities.brain_freeze.name': 'Zmrazení mozku',
   'entities.abilities.dragons_breath.description':
     'Podrž pro nabití rozšiřujícího se ohnivého dechu, pak ho pusť v kuželi. Delší nabití zasáhne dál a způsobí více poškození. Zasažení nepřátelé jsou dezorientováni; poškození efekt přeruší. Maximální nabití vždy kriticky zasáhne a počítá se jednou pro Žhavou sérii. (Oheň)',
-  'entities.abilities.dragons_breath.name': "Dragon's Breath",
+  'entities.abilities.dragons_breath.name': 'Dračí dech',
   'entities.abilities.fingers_of_frost.description':
     'Kopí jinovatky má 15% šanci udělit Zmrzlé prsty, až 2 nabití: tvoje příští Ice Lance považuje cíl za zmrazený. (Mráz)',
-  'entities.abilities.fingers_of_frost.name': 'Fingers of Frost',
+  'entities.abilities.fingers_of_frost.name': 'Mrazivé prsty',
   'entities.abilities.fireball_form.description':
     'Přeměníš se v planoucí žar a zvýšíš rychlost pohybu o {buff} %. V přeměněné podobě nemůžeš útočit ani sesílat kouzla. Seslej znovu pro návrat do normální podoby.',
   'entities.abilities.fireball_form.name': 'Žárová podoba',
-  'entities.abilities.flurry.name': 'Winterlash',
+  'entities.abilities.flurry.name': 'Zimní bič',
   'entities.abilities.frozen_orb.name': 'Zmrzlá sféra',
   'entities.abilities.glacial_front.description':
     'Podrž pro nabití rozšiřující se mrazivé fronty, pak ji pusť v kuželi. Delší nabití zasáhne dál a způsobí více poškození. Všichni zasažení nepřátelé jsou zpomaleni o 50 % na 4 s; maximální nabití je také ukotvuje na 1 s. (Mráz)',
@@ -435,7 +435,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.glacial_spike.name': 'Ledový hrot',
   'entities.abilities.ice_lance.description':
     'Vrhneš střep ledu, způsobíš {damage} mrazivého poškození, trojnásobný proti zmrazenému cíli. Spotřebuje Zmrzlé prsty nebo nabití Zimního chladu, aby byl cíl považován za zmrazený. (Mráz)',
-  'entities.abilities.ice_lance.name': 'Ice Lance',
+  'entities.abilities.ice_lance.name': 'Ledové kopí',
   'entities.abilities.perfect_moment.description':
     'Popadneš svůj dokonalý okamžik: okamžitě získáš 4 Éterické náboje a po dobu 10 s Éterické šipky je nespotřebovávají. (Chronomagie)',
   'entities.abilities.perfect_moment.name': 'Dokonalý okamžik',
@@ -5564,7 +5564,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.wolfhide_satchel.name': 'Brašna z vlčí kůže',
   'entities.abilities.aspect_of_the_wild.description':
     'Povzbudí spojence do 30 m divokou silou a na 5 min. jim zvýší útočnou sílu o 45 a rychlost útoku o 5 %. (lovecký talent)',
-  'entities.abilities.avatar.name': 'Avatar',
+  'entities.abilities.avatar.name': 'Avatár',
   'entities.abilities.avatar.description':
     'Na 20 s se proměníš v kolosa, zrušíš všechny ovládací efekty a zvýšíš své způsobené poškození o 20 %.',
   'entities.abilities.avenging_wrath.description':
@@ -8913,7 +8913,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Plný zisk dovedností',
   'hudChrome.crafting.difficultyNone': 'Žádný zisk dovedností',
   'hudChrome.crafting.difficultyReduced': 'Snížený zisk dovedností',
-  'hudChrome.crafting.enchantedLine': 'Okouzlený',
   'hudChrome.crafting.makersMark': 'Vytvořil {name}',
   'hudChrome.crafting.masterworkSeal': 'Mistrovské dílo',
   'hudChrome.crafting.masterworkToast': 'Mistrovské dílo! {name}',
@@ -9085,4 +9084,58 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.training.tierUnmet': 'K naučení tohoto receptu potřebuješ {craft} {skill}.',
   'hudChrome.training.title': 'Školení: {name}',
   'hudChrome.training.trainAria': 'Naučit se {name} za {fee}',
+  'hud.combat.auraGainOther': '{target} získává {name}.',
+  'hudChrome.corpseHarvest.components.cloth': 'Látka',
+  'hudChrome.corpseHarvest.components.meat': 'Maso',
+  'hudChrome.crafting.noBagSpace': 'Nemáš místo pro vyrobený předmět.',
+  'hudChrome.enchanting.disenchantNoSpace': 'Nemáš místo pro arkánní materiály.',
+  'hudChrome.enchanting.enchantNoSpace': 'Nemáš místo pro okouzlený předmět.',
+  'hudChrome.enchanting.salvageNoSpace': 'Nemáš místo pro materiály z rozebrání.',
+  'hudChrome.gathering.noNodeNearby.herbalism': 'V dosahu není žádný porost bylin.',
+  'hudChrome.gathering.noNodeNearby.logging': 'V dosahu není žádná skupina stromů.',
+  'hudChrome.gathering.noNodeNearby.mining': 'V dosahu není žádná rudná žíla.',
+  'hudChrome.gathering.requiresTool.herbalism': 'Vyžaduje bylinkářský srp',
+  'hudChrome.gathering.requiresTool.logging': 'Vyžaduje dřevorubeckou sekeru',
+  'hudChrome.gathering.requiresTool.mining': 'Vyžaduje hornický krumpáč',
+  'hudChrome.gathering.toolRequired.fishing': 'K nahození udice potřebuješ rybářský prut.',
+  'hudChrome.gathering.toolRequired.herbalism':
+    'Ke sběru tohoto porostu bylin potřebuješ bylinkářský srp.',
+  'hudChrome.gathering.toolRequired.logging':
+    'Ke skácení této skupiny stromů potřebuješ dřevorubeckou sekeru.',
+  'hudChrome.gathering.toolRequired.mining': 'K vytěžení této žíly potřebuješ hornický krumpáč.',
+  'hudChrome.gathering.toolTooltip.kind.fishing': 'Rybářský prut ({tier}. úroveň)',
+  'hudChrome.gathering.toolTooltip.kind.herbalism': 'Bylinkářský nástroj ({tier}. úroveň)',
+  'hudChrome.gathering.toolTooltip.kind.logging': 'Dřevorubecký nástroj ({tier}. úroveň)',
+  'hudChrome.gathering.toolTooltip.kind.mining': 'Hornický nástroj ({tier}. úroveň)',
+  'hudChrome.gathering.toolTooltip.rodBand':
+    'Od rybářské dovednosti {skill} výše odemyká bohatší úlovky.',
+  'hudChrome.gathering.toolTooltip.rodBite': 'Ryby zabírají až o {seconds} s dříve.',
+  'hudChrome.gathering.toolTooltip.rodReel': 'Prodlužuje čas na navíjení o {seconds} s.',
+  'hudChrome.gathering.toolTooltip.rodRequired': 'Nutný k rybaření.',
+  'hudChrome.gathering.toolTooltip.speed': 'Rychleji sbírá na nalezištích pod {tier}. úrovní.',
+  'hudChrome.gathering.toolTooltip.unlocks.herbalism':
+    'Nutný ke sběru porostů bylin až do {tier}. úrovně.',
+  'hudChrome.gathering.toolTooltip.unlocks.logging':
+    'Nutná ke kácení skupin stromů až do {tier}. úrovně.',
+  'hudChrome.gathering.toolTooltip.unlocks.mining':
+    'Nutný k těžbě rudných žil až do {tier}. úrovně.',
+  'hudChrome.gathering.toolTooltip.use.herbalism': 'Použití: Sesbírá blízký porost bylin.',
+  'hudChrome.gathering.toolTooltip.use.logging': 'Použití: Pokácí blízkou skupinu stromů.',
+  'hudChrome.gathering.toolTooltip.use.mining': 'Použití: Vytěží blízkou rudnou žílu.',
+  'hudChrome.noticeboard.empty': 'Zdá se, že tu nic nevisí.',
+  'hudChrome.training.pendingAria': 'Učí se {name}',
+  'hudChrome.training.statePending': 'Učí se',
+  'hudChrome.unbind.noSpace': 'Nemáš místo pro odpoutaný předmět.',
+  'loading.incompatibleWorldVersion':
+    'Verze hry a serveru nejsou kompatibilní. Obnov stránku nebo aktualizuj hru a zkus to znovu.',
+  'loading.messageRateExceeded':
+    'Spojení bylo přerušeno kvůli příliš rychlému odesílání akcí. Chvíli počkej a přihlas se znovu.',
+  'perfNudge.dismiss': 'Zavřít',
+  'perfNudge.hardwareAccelerationDesktop':
+    'Hra běží bez akcelerace GPU, a proto je velmi pomalá. Aktualizuj ovladače grafické karty a restartuj hru. Ve Windows navíc nastav hru na „Vysoký výkon“ v Nastavení > Systém > Obrazovka > Grafika.',
+  'perfNudge.hardwareAccelerationWeb':
+    'Hra běží bez akcelerace GPU, a proto je velmi pomalá. Zapni v nastavení prohlížeče hardwarovou akceleraci, aktualizuj ovladače grafické karty a restartuj prohlížeč.',
+  'perfNudge.integratedGpu':
+    'Hra běží na integrované (úsporné) grafické kartě. Pokud má tento počítač i herní grafickou kartu, nastav ve Windows prohlížeč na „Vysoký výkon“ v Nastavení > Systém > Obrazovka > Grafika a prohlížeč restartuj. Desktopová aplikace si herní grafickou kartu vybere automaticky.',
+  'worldContent.noticeboardName': 'Vývěska',
 };

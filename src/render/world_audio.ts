@@ -1,7 +1,7 @@
 // Pure world-to-audio routing. Static prop data determines footstep surfaces
 // and positional ambience anchors without adding presentation-only sim events.
 
-import { DUNGEON_X_THRESHOLD, getActiveWorldContent, PROPS } from '../sim/data';
+import { DUNGEON_X_THRESHOLD, getActiveWorldContent } from '../sim/data';
 import { dockSectionAt } from '../sim/dock_layout';
 import { isAtSowfield } from '../sim/vale_cup_layout';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
@@ -42,8 +42,9 @@ export function crowdAmbienceAt(
 
 export function buildWorldAmbientSources(seed: number): AmbientPointSource[] {
   const sources: AmbientPointSource[] = [];
-  for (let i = 0; i < PROPS.campfires.length; i++) {
-    const [x, z] = PROPS.campfires[i];
+  const props = getActiveWorldContent().props;
+  for (let i = 0; i < props.campfires.length; i++) {
+    const [x, z] = props.campfires[i];
     sources.push({
       id: `world:campfire:${x}:${z}`,
       kind: 'campfire',
@@ -52,8 +53,19 @@ export function buildWorldAmbientSources(seed: number): AmbientPointSource[] {
       z,
     });
   }
-  for (let i = 0; i < PROPS.stalls.length; i++) {
-    const stall = PROPS.stalls[i];
+  for (let i = 0; i < props.buildings.length; i++) {
+    const building = props.buildings[i];
+    if (building.id !== 'eastbrook_smithy') continue;
+    sources.push({
+      id: `world:forge:${building.x}:${building.z}`,
+      kind: 'forge',
+      x: building.x,
+      y: groundHeight(building.x, building.z, seed) + 1,
+      z: building.z,
+    });
+  }
+  for (let i = 0; i < props.stalls.length; i++) {
+    const stall = props.stalls[i];
     if (!stall.smithy) continue;
     sources.push({
       id: `world:forge:${stall.x}:${stall.z}`,

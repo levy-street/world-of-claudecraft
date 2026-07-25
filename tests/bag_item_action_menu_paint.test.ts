@@ -9,20 +9,37 @@
 // capturing what place() receives.
 
 import { describe, expect, it } from 'vitest';
+import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
+import { isDisenchantable } from '../src/sim/professions/enchanting';
+import type { InvSlot, ItemDef } from '../src/sim/types';
 import { BagItemActionMenu, CTX_MENU_PICKER_CLASS } from '../src/ui/bag_item_action_menu';
+import { disenchantYieldLines } from '../src/ui/disenchant_yield_view';
+import { enchantSectionsForReagent } from '../src/ui/enchant_apply_view';
 import type { IWorld } from '../src/world_api';
 
 const DUST = 'arcane_dust';
+const ESSENCE = 'arcane_essence';
 
-function harness(innerHeight: number) {
+/** A live disenchantable def of the requested quality, so the confirm's yield
+ *  preview is exercised against real content. */
+function defFor(quality: NonNullable<ItemDef['quality']>): ItemDef {
+  const found = Object.values(ITEMS).find(
+    (def) => isDisenchantable(def) && def.quality === quality,
+  );
+  if (!found) throw new Error(`no disenchantable ${quality} def`);
+  return found;
+}
+
+function harness(innerHeight: number, inventory: InvSlot[] = [{ itemId: DUST, count: 99 }]) {
   Object.defineProperty(window, 'innerHeight', { value: innerHeight, configurable: true });
   const el = document.createElement('div');
   document.body.append(el);
   const placed: { reserveRight: number; reserveBottom: number }[] = [];
+  const confirms: { title: string; body: string; ok: string }[] = [];
   let activate: ((act: string) => void) | null = null;
   const menu = new BagItemActionMenu({
-    world: () => ({ inventory: [{ itemId: DUST, count: 99 }] }) as unknown as IWorld,
+    world: () => ({ inventory }) as unknown as IWorld,
     ctxMenu: {
       element: () => el,
       place: (_el, _x, _y, reserveRight, reserveBottom) => {
@@ -32,18 +49,26 @@ function harness(innerHeight: number) {
         activate = onActivate;
       },
     },
-    confirmDialog: () => {},
+    confirmDialog: (title, body, ok) => {
+      confirms.push({ title, body, ok });
+    },
     slotName: (slot) => slot,
     isMobileLayout: () => false,
     afterAction: () => {},
   });
-  const openPlain = () => menu.open(ITEMS[DUST], DUST, 10, 10, () => {});
-  const openPicker = () => {
-    openPlain();
+  const openFor = (itemId: string) => menu.open(ITEMS[itemId], itemId, 10, 10, () => {});
+  const openPlain = () => openFor(DUST);
+  const openPicker = (reagentId = DUST) => {
+    openFor(reagentId);
     if (!activate) throw new Error('bind never called');
     activate('applyEnchant');
   };
-  return { el, placed, openPlain, openPicker };
+  const runAction = (itemId: string, act: string) => {
+    openFor(itemId);
+    if (!activate) throw new Error('bind never called');
+    activate(act);
+  };
+  return { el, placed, confirms, openPlain, openPicker, runAction };
 }
 
 describe('BagItemActionMenu.paint placement reserves', () => {
@@ -112,5 +137,134 @@ describe('BagItemActionMenu.paint placement reserves', () => {
       const short = Number(m?.[1]) < Number(m?.[2]);
       expect(span.classList.contains('unsat'), span.textContent ?? '').toBe(short);
     }
+  });
+});
+
+describe('Apply Enchant picker: tier sections and effect lines', () => {
+  it('paints one presentational header per tier, in the core-supplied ladder order', () => {
+    const h = harness(768, [{ itemId: ESSENCE, count: 99 }]);
+    h.openPicker(ESSENCE);
+    const headers = [...h.el.querySelectorAll('.ctx-section')];
+    // Essence is the one reagent that reaches all three tiers (the motivating
+    // wall this grouping exists for).
+    expect(headers.map((el) => el.textContent)).toEqual([
+      'Base Enchants',
+      'Runed Enchants',
+      'Greater Enchants',
+    ]);
+    // A caption is not an action: it carries no data-act, so it is never a
+    // focus stop (bindContextMenuActions promotes only .ctx-item to role=button).
+    for (const header of headers) {
+      expect(header.getAttribute('data-act')).toBeNull();
+    }
+    expect(h.el.querySelectorAll('.ctx-section[data-act]').length).toBe(0);
+  });
+
+  it('names each tier group for assistive tech, so the ladder is not sighted-only', () => {
+    const h = harness(768, [{ itemId: ESSENCE, count: 99 }]);
+    h.openPicker(ESSENCE);
+    const groups = [...h.el.querySelectorAll('.ctx-group')];
+    expect(groups.length).toBe(3);
+    const ids = new Set();
+    for (const group of groups) {
+      expect(group.getAttribute('role')).toBe('group');
+      const labelledBy = group.getAttribute('aria-labelledby');
+      expect(labelledBy).toBeTruthy();
+      // The label target must exist, be unique, and be this group's own caption.
+      expect(ids.has(labelledBy)).toBe(false);
+      ids.add(labelledBy);
+      // Resolve the label target INSIDE the group (this fixture keeps several
+      // detached menus alive in one document, so a document-wide id lookup would
+      // read another test's markup): the group's name must be its own caption.
+      const caption = group.querySelector('.ctx-section');
+      expect(caption).not.toBeNull();
+      expect(caption?.id).toBe(labelledBy);
+      // Every row of the tier sits inside its own group.
+      expect(group.querySelectorAll('.ctx-item').length).toBeGreaterThan(0);
+    }
+    // No row escapes a group, so no enchant is left tier-less.
+    const grouped = [...h.el.querySelectorAll('.ctx-group .ctx-item')].length;
+    expect(grouped).toBe(h.el.querySelectorAll('.ctx-item').length);
+  });
+
+  it('a plain action menu grows no groups or captions', () => {
+    const h = harness(768);
+    h.openPlain();
+    expect(h.el.querySelectorAll('.ctx-group').length).toBe(0);
+    expect(h.el.querySelectorAll('.ctx-section').length).toBe(0);
+  });
+
+  it('paints every row the core grouped, in the core-supplied order', () => {
+    const h = harness(768, [{ itemId: ESSENCE, count: 99 }]);
+    h.openPicker(ESSENCE);
+    const expected = enchantSectionsForReagent([{ itemId: ESSENCE, count: 99 }], ESSENCE).flatMap(
+      (section) => section.rows.map((row) => ENCHANTS[row.enchantId].name),
+    );
+    const painted = [...h.el.querySelectorAll('.ctx-item')].map(
+      (el) => el.firstChild?.textContent ?? '',
+    );
+    expect(painted).toEqual(expected);
+    expect(painted.length).toBeGreaterThan(1);
+  });
+
+  it('renders each enchant effect inline, not hover-only, using the tooltip stat wording', () => {
+    const h = harness(768, [{ itemId: DUST, count: 99 }]);
+    h.openPicker();
+    const rows = [...h.el.querySelectorAll('.ctx-item')];
+    // Every row states what its enchant does, on the row itself.
+    for (const row of rows) {
+      const effect = row.querySelector('.ctx-item-effect');
+      expect(effect, row.textContent ?? '').not.toBeNull();
+      expect((effect?.textContent ?? '').length).toBeGreaterThan(0);
+    }
+    const texts = rows.map((row) => row.querySelector('.ctx-item-effect')?.textContent);
+    // Helmet Fortitude grants sta 3 in content/enchants.ts.
+    expect(texts).toContain('+3 Stamina');
+    // The armor-axis enchants read their own axis, not a primary stat.
+    expect(texts.some((textContent) => textContent?.includes('Armor'))).toBe(true);
+  });
+
+  it('keeps an unaffordable enchant visible but unselectable, effect line and all', () => {
+    // No essence held, so the essence-consuming base enchants cannot be bought.
+    const h = harness(768, [{ itemId: DUST, count: 99 }]);
+    h.openPicker();
+    const disabled = [...h.el.querySelectorAll('.ctx-item[aria-disabled="true"]')];
+    expect(disabled.length).toBeGreaterThan(0);
+    for (const row of disabled) {
+      expect(row.getAttribute('data-act')).toBeNull();
+      expect(row.querySelector('.ctx-item-effect')).not.toBeNull();
+    }
+  });
+});
+
+describe('disenchant confirm: expected-yield preview', () => {
+  it('appends the sim-derived yield lines under the destroy warning', () => {
+    const def = defFor('rare');
+    const h = harness(768, [{ itemId: def.id, count: 1 }]);
+    h.runAction(def.id, 'disenchant');
+    expect(h.confirms).toHaveLength(1);
+    const lines = h.confirms[0].body.split('\n');
+    // The pre-existing warning stays line one, unchanged.
+    expect(lines[0]).toContain('This destroys');
+    expect(lines[0]).toContain('cannot be undone');
+    // Then exactly the core's lines, in order.
+    expect(lines.slice(1)).toEqual(disenchantYieldLines(def));
+    expect(lines.slice(1)[0]).toBe('Expected materials:');
+  });
+
+  it('previews a range for a sub-rare piece', () => {
+    const def = defFor('common');
+    const h = harness(768, [{ itemId: def.id, count: 1 }]);
+    h.runAction(def.id, 'disenchant');
+    expect(h.confirms[0].body).toMatch(/\d+ to \d+ Chime Dust/);
+  });
+
+  it('leaves the salvage confirm untouched: no yield preview, still one line', () => {
+    const def = defFor('rare');
+    const h = harness(768, [{ itemId: def.id, count: 1 }]);
+    h.runAction(def.id, 'salvage');
+    expect(h.confirms).toHaveLength(1);
+    expect(h.confirms[0].body).not.toContain('\n');
+    expect(h.confirms[0].body).not.toContain('Expected materials');
   });
 });

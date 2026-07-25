@@ -1,5 +1,6 @@
 import type { MaterialRarity } from '../sim/professions/gathering';
 import type { PlayerProfessionSkill, ProfessionRecipeRecord } from '../sim/professions/types';
+import type { StationDef } from '../sim/types';
 import type { WorldInteractionOutcome } from './interaction';
 
 // Render-safe projection of a player's professions standing. Stub as of
@@ -160,6 +161,8 @@ export interface ApplyEnchantResultView {
 // effects rather than client commands.
 export interface IWorldProfessions {
   professionsState: PlayerProfessionsView;
+  /** Static station anchors for the active world, shared by map and renderer consumers. */
+  readonly stationPlacements: readonly StationDef[];
   nodeHarvestableByMe(nodeId: string): boolean;
   harvestNode(nodeId: string): WorldInteractionOutcome;
   recipeList: readonly RecipeDef[];

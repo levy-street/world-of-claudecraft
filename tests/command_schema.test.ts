@@ -31,8 +31,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // place_mobile_station, train_recipe, the three enchanting actions
 // (disenchant_item, apply_enchant, salvage_item), and unbind_item (the
 // Maker's Bond unbind service).
-const EXPECTED_SEND_COUNT = 163;
-const EXPECTED_DISPATCH_COUNT = 172;
+const EXPECTED_SEND_COUNT = 164;
+const EXPECTED_DISPATCH_COUNT = 173;
 const EXPECTED_DISPATCH_ONLY_COUNT = 9;
 
 // The chat sub-channel routing switch (server/game.ts `switch
