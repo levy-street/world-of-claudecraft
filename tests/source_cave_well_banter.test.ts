@@ -98,7 +98,7 @@ describe('source cave well: banter gate', () => {
     const events = sim.drainEvents() as { type: string; text?: string }[];
     expect(
       events.some(
-        (e) => e.type === 'error' && e.text === 'You must reach level 20 to enter The Source Cave.',
+        (e) => e.type === 'error' && e.text === 'You must reach level 20 to enter The Open Source.',
       ),
     ).toBe(true);
   });

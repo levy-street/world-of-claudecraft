@@ -90,11 +90,11 @@ export interface SourceCaveRuntime {
 /** The reserved runtime def. */
 export const SOURCE_CAVE_DEF: SourceCaveRuntimeDef = {
   id: SOURCE_CAVE_DUNGEON_ID,
-  name: 'The Source Cave',
+  name: 'The Open Source',
   doorPos: SOURCE_CAVE_DOOR_POS,
   suggestedPlayers: 10,
-  enterText: 'You step into the Source Cave.',
-  leaveText: 'You leave the Source Cave.',
+  enterText: 'You step into The Open Source.',
+  leaveText: 'You leave The Open Source.',
   minLevel: 20,
 };
 

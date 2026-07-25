@@ -5581,11 +5581,11 @@ export const es_ES: EnTranslations = {
     },
     "sourceCave": {
       "locked": "You are locked out of {name}.",
-      "enter": "You step into the Source Cave.",
-      "leave": "You leave the Source Cave.",
+      "enter": "You step into The Open Source.",
+      "leave": "You leave The Open Source.",
       "rebootConfirm": "Are you sure you want to proceed? Ensure you gather your resources before you push.",
-      "killProgress": "{name} has fallen. ({killed} of {total} defeated in the Source Cave)",
-      "cleared": "The Source Cave has been cleared.",
+      "killProgress": "{name} has fallen. ({killed} of {total} defeated in The Open Source)",
+      "cleared": "The Open Source has been cleared.",
       "accessDenied": "Access denied.",
       "wellBanter1": "It's a well. It holds water. Move along.",
       "wellBanter2": "Why are you looking at my bricks like that?",
@@ -14594,9 +14594,9 @@ export const es_ES: EnTranslations = {
         "leaveText": "Cierras tras de ti la puerta de la fortaleza y vuelves al viento de los Drakelands."
       },
       "source_cave": {
-        "name": "The Source Cave",
-        "enterText": "You step into the Source Cave.",
-        "leaveText": "You leave the Source Cave."
+        "name": "The Open Source",
+        "enterText": "You step into The Open Source.",
+        "leaveText": "You leave The Open Source."
       },
       "drowned_temple": {
         "name": "El Templo Ahogado",

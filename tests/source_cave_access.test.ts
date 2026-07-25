@@ -50,7 +50,7 @@ describe('source cave: level gate', () => {
     const events = sim.drainEvents() as { type: string; text?: string }[];
     expect(
       events.some(
-        (e) => e.type === 'error' && e.text === 'You must reach level 20 to enter The Source Cave.',
+        (e) => e.type === 'error' && e.text === 'You must reach level 20 to enter The Open Source.',
       ),
     ).toBe(true);
     expect(claimedCave(sim)).toBeUndefined();
@@ -113,7 +113,7 @@ describe('source cave: daily lockout', () => {
     expect(claimedCave(sim)).toBeUndefined();
     const events = sim.drainEvents() as { type: string; text?: string }[];
     expect(
-      events.some((e) => e.type === 'error' && e.text === 'You are locked out of The Source Cave.'),
+      events.some((e) => e.type === 'error' && e.text === 'You are locked out of The Open Source.'),
     ).toBe(true);
   });
 

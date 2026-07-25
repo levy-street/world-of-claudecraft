@@ -41,10 +41,9 @@ describe('entity_labels: objectDisplayName', () => {
     );
   });
 
-  it('the Source Cave overworld entrance shows its own well landmark name, not the dungeon name', () => {
+  it('the overworld entrance labels through the well landmark key', () => {
     const label = objectDisplayName(obj({ templateId: 'dungeon_door', dungeonId: 'source_cave' }));
     expect(label).toBe(t('worldContent.sourceCaveWellName'));
-    expect(label).not.toBe(t('entities.dungeons.source_cave.name'));
   });
 
   it('the Source Cave interior exit labels the seal denial (its only visible state)', () => {

@@ -479,10 +479,10 @@ describe('source cave clear: kill-progress SimEvents', () => {
       const killed = i + 1;
       const progress = lines.find((l) => l.includes('has fallen.'));
       expect(progress, `progress line for kill ${killed}`).toBe(
-        `${mob.name} has fallen. (${killed} of ${total} defeated in the Source Cave)`,
+        `${mob.name} has fallen. (${killed} of ${total} defeated in The Open Source)`,
       );
       // The distinct clear line appears only on the final kill.
-      const cleared = lines.includes('The Source Cave has been cleared.');
+      const cleared = lines.includes('The Open Source has been cleared.');
       expect(cleared).toBe(killed === total);
     }
   });
@@ -502,7 +502,7 @@ describe('source cave clear: kill-progress SimEvents', () => {
     expect(
       lines.some(
         (l) =>
-          l === `${login} has fallen. (1 of ${inst.mobIds.length} defeated in the Source Cave)`,
+          l === `${login} has fallen. (1 of ${inst.mobIds.length} defeated in The Open Source)`,
       ),
     ).toBe(true);
   });

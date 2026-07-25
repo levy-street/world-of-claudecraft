@@ -134,6 +134,25 @@ numbers rot faster than anyone updates them.
   positional, applied as an overlay, never a property of a tier: a tier-level flag would
   mint one boss per top-tier contributor and break the single-boss contract.
 
+## Naming
+
+The player-facing name is **The Open Source**, the same name its entrance well already
+carried, so the well and the dungeon read as one place. Every internal id stays
+`source_cave` (the dungeon id, the `SOURCE_CAVE_*` constants, the deed ids, the clear
+key): ids are frozen, only display strings changed.
+
+One consequence to know: `worldContent.sourceCaveWellName` and
+`entities.dungeons.source_cave.name` now hold the SAME English value, so the separate
+well-name key no longer distinguishes anything in English. It is kept because it is
+already translated and because the two remain conceptually distinct surfaces.
+
+**Locale debt from the rename**: seven keys inline the dungeon name in their translated
+value (`entities.dungeons.source_cave.{name,enterText,leaveText}` and
+`sim.sourceCave.{enter,leave,cleared,killProgress}`). Their non-English overlays still say
+"Source Cave" and are now stale in all 20 non-English locales. Contributors never edit
+`src/ui/i18n.locales/`, so this is a release-time refill (the `i18n-locale-fill` skill).
+It will NOT be caught by the pending-row check: the rows are populated, just wrong.
+
 ## Open items
 
 - **O2 (themed rare name)**: `source_cave_mantle` ships as "Mantle of the Source", a

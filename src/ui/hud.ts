@@ -16716,7 +16716,7 @@ function delveText(delveId: string, field: 'enterText' | 'leaveText'): string {
 }
 
 function dungeonDisplayNameFromSource(name: string): string {
-  if (name === 'The Source Cave') return dungeonDisplayName('source_cave');
+  if (name === 'The Open Source') return dungeonDisplayName('source_cave');
   const dungeon = DUNGEON_LIST.find((candidate) => candidate.name === name);
   return dungeon ? dungeonDisplayName(dungeon.id) : name;
 }

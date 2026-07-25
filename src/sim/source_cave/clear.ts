@@ -234,7 +234,7 @@ export function onSourceCaveMobKilled(ctx: SimContext, mob: Entity): void {
   for (const meta of recipients) {
     ctx.emit({
       type: 'log',
-      text: `${mob.name} has fallen. (${killedCount} of ${totalCount} defeated in the Source Cave)`,
+      text: `${mob.name} has fallen. (${killedCount} of ${totalCount} defeated in The Open Source)`,
       color: '#b9f',
       pid: meta.entityId,
     });
@@ -248,7 +248,7 @@ function emitSourceCaveCleared(ctx: SimContext, inst: InstanceSlot): void {
   for (const meta of playersInSourceCaveInstance(ctx, inst)) {
     ctx.emit({
       type: 'log',
-      text: 'The Source Cave has been cleared.',
+      text: 'The Open Source has been cleared.',
       color: '#fd6',
       pid: meta.entityId,
     });

@@ -792,15 +792,15 @@ export const en = {
     // arm (worldContent.dungeonInstanceBusy), so it needs no key here.
     sourceCave: {
       locked: 'You are locked out of {name}.',
-      enter: 'You step into the Source Cave.',
-      leave: 'You leave the Source Cave.',
+      enter: 'You step into The Open Source.',
+      leave: 'You leave The Open Source.',
       rebootConfirm:
         'Are you sure you want to proceed? Ensure you gather your resources before you push.',
       // {name} is a contributor login, spliced verbatim (D7); {killed}/{total} count
       // the cave's cleared mobs. Emitted on every cave-mob kill; the clear line follows
       // on the last one.
-      killProgress: '{name} has fallen. ({killed} of {total} defeated in the Source Cave)',
-      cleared: 'The Source Cave has been cleared.',
+      killProgress: '{name} has fallen. ({killed} of {total} defeated in The Open Source)',
+      cleared: 'The Open Source has been cleared.',
       // The always-present reward chest denies interaction until the clear
       // (source_cave/clear.ts trySourceCaveChestDeny), EXACT-matched in sim_i18n.ts.
       accessDenied: 'Access denied.',

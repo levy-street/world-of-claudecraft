@@ -8006,7 +8006,7 @@ function locDelve(name: string): string {
   return id ? tEntity({ kind: 'delve', id, field: 'name' }) : name;
 }
 function locDungeon(name: string): string {
-  if (name === 'The Source Cave') return dungeonDisplayName('source_cave');
+  if (name === 'The Open Source') return dungeonDisplayName('source_cave');
   const dungeon = Object.values(DUNGEONS).find((entry) => entry.name === name);
   return dungeon ? dungeonDisplayName(dungeon.id) : name;
 }
@@ -10025,8 +10025,8 @@ const RULES: Rule[] = [
     re: /^You are locked out of (.+)\.$/,
     build: (m) => t('sim.sourceCave.locked', { name: locDungeon(m[1]) }),
   },
-  { re: /^You step into the Source Cave\.$/, build: () => t('sim.sourceCave.enter') },
-  { re: /^You leave the Source Cave\.$/, build: () => t('sim.sourceCave.leave') },
+  { re: /^You step into The Open Source\.$/, build: () => t('sim.sourceCave.enter') },
+  { re: /^You leave The Open Source\.$/, build: () => t('sim.sourceCave.leave') },
   {
     re: /^Are you sure you want to proceed\? Ensure you gather your resources before you push\.$/,
     build: () => t('sim.sourceCave.rebootConfirm'),
@@ -10035,10 +10035,10 @@ const RULES: Rule[] = [
   // {name} is a contributor login, spliced verbatim (partyLeaves precedent: m[1]
   // directly, never through locMob).
   {
-    re: /^(.+) has fallen\. \((\d+) of (\d+) defeated in the Source Cave\)$/,
+    re: /^(.+) has fallen\. \((\d+) of (\d+) defeated in The Open Source\)$/,
     build: (m) => t('sim.sourceCave.killProgress', { name: m[1], killed: m[2], total: m[3] }),
   },
-  { re: /^The Source Cave has been cleared\.$/, build: () => t('sim.sourceCave.cleared') },
+  { re: /^The Open Source has been cleared\.$/, build: () => t('sim.sourceCave.cleared') },
   // The sealed reward chest's interaction deny (source_cave/clear.ts).
   { re: /^Access denied\.$/, build: () => t('sim.sourceCave.accessDenied') },
   // The well's banter gate (source_cave/well_banter.ts): emitted via ctx.emit with

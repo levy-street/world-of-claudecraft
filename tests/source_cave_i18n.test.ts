@@ -24,8 +24,8 @@ const M16_LOCALES = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const;
 describe('source_cave dungeon name resolves through the entity dictionary (Phase 6)', () => {
   it('is the real English name, not the raw id, at the tEntity/dungeonDisplayName seam', () => {
     setLanguage('en');
-    expect(tEntity({ kind: 'dungeon', id: 'source_cave', field: 'name' })).toBe('The Source Cave');
-    expect(dungeonDisplayName('source_cave')).toBe('The Source Cave');
+    expect(tEntity({ kind: 'dungeon', id: 'source_cave', field: 'name' })).toBe('The Open Source');
+    expect(dungeonDisplayName('source_cave')).toBe('The Open Source');
   });
 
   it('resolves (never the raw id) in every translated locale, once loaded', async () => {
@@ -52,7 +52,7 @@ describe('source_cave dungeon name resolves through the entity dictionary (Phase
       await ensureLocaleLoaded(lang);
       setLanguage(lang);
       const out = dungeonDisplayName('source_cave');
-      expect(out, `${lang}: cave name must not stay English`).not.toBe('The Source Cave');
+      expect(out, `${lang}: cave name must not stay English`).not.toBe('The Open Source');
     }
     setLanguage('en');
   });
@@ -61,18 +61,18 @@ describe('source_cave dungeon name resolves through the entity dictionary (Phase
 describe('Source Cave Phase 3/4 catalog keys are still resolvable (confirmed, not re-added)', () => {
   it('sim.sourceCave.* keys exist and are non-empty in English', () => {
     setLanguage('en');
-    expect(t('sim.sourceCave.locked', { name: 'The Source Cave' })).toContain('The Source Cave');
-    expect(t('sim.sourceCave.enter')).toBe('You step into the Source Cave.');
-    expect(t('sim.sourceCave.leave')).toBe('You leave the Source Cave.');
+    expect(t('sim.sourceCave.locked', { name: 'The Open Source' })).toContain('The Open Source');
+    expect(t('sim.sourceCave.enter')).toBe('You step into The Open Source.');
+    expect(t('sim.sourceCave.leave')).toBe('You leave The Open Source.');
     expect(
       t('sim.sourceCave.killProgress', { name: 'octocat', killed: '3', total: '8' }),
     ).toContain('octocat');
-    expect(t('sim.sourceCave.cleared')).toBe('The Source Cave has been cleared.');
+    expect(t('sim.sourceCave.cleared')).toBe('The Open Source has been cleared.');
   });
 
   it('sim.dungeon.levelRequired (the generic level-gate matcher) still resolves', () => {
     setLanguage('en');
-    expect(t('sim.dungeon.levelRequired', { level: '20', name: 'The Source Cave' })).toContain(
+    expect(t('sim.dungeon.levelRequired', { level: '20', name: 'The Open Source' })).toContain(
       '20',
     );
   });
@@ -82,9 +82,9 @@ describe('Source Cave Phase 3/4 catalog keys are still resolvable (confirmed, no
       await ensureLocaleLoaded(lang);
       setLanguage(lang);
       const localizedName = dungeonDisplayName('source_cave');
-      const out = localizeSimText('You must reach level 20 to enter The Source Cave.');
+      const out = localizeSimText('You must reach level 20 to enter The Open Source.');
       expect(out, `${lang}: localized level gate`).toContain(localizedName);
-      expect(out, `${lang}: no English dungeon-name leak`).not.toContain('The Source Cave');
+      expect(out, `${lang}: no English dungeon-name leak`).not.toContain('The Open Source');
     }
     setLanguage('en');
   });

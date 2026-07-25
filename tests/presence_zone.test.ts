@@ -77,7 +77,7 @@ describe('presenceOf zone resolution', () => {
     entity.pos.x = origin.x;
     entity.pos.z = origin.z;
     const presence = server.presenceOf(session);
-    expect(presence.zone).toBe('The Source Cave');
+    expect(presence.zone).toBe('The Open Source');
     expect(presence.status).toBe('dungeon');
   });
 
