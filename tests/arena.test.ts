@@ -864,4 +864,24 @@ describe('arena: enclosing walls', () => {
     // stays toggled on (mirrors the ranged LOS gate) but never lands a swing
     expect(target.hp).toBe(startHp);
   });
+
+  it('melee auto-attack cannot land through an approach screen', () => {
+    const { sim, a, b } = queueDuo();
+    startBout(sim);
+    const target = sim.entities.get(b)!;
+    const slot = sim.arenaMatchFor(a)!.slot ?? 0;
+    const o = arenaOrigin(slot);
+    // fighters on opposite faces of the west spawn-A approach screen, within
+    // MELEE_RANGE of each other but with the screen's full height between.
+    const screen = ARENA_LAYOUT.stubs.find((s) => s.x === -5 && s.z === -10)!;
+    expect(screen).toBeTruthy();
+    teleport(sim, a, o.x + screen.x, o.z + screen.z - screen.hd - 1.2);
+    teleport(sim, b, o.x + screen.x, o.z + screen.z + screen.hd + 1.2);
+    face(sim, a, b);
+    sim.targetEntity(b, a);
+    sim.startAutoAttack(a);
+    const startHp = target.hp;
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+    expect(target.hp).toBe(startHp);
+  });
 });

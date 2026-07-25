@@ -5,7 +5,8 @@
 // spawn clear zones, walkable path widths between cover, and the Fiesta hazard
 // ring covering the whole pit at bout start.
 import { describe, expect, it } from 'vitest';
-import type { Collider } from '../src/sim/colliders';
+import { type Collider, lineOfSightClear } from '../src/sim/colliders';
+import { arenaOrigin } from '../src/sim/data';
 import {
   ARENA_LAYOUT,
   ARENA_SPAWN_A,
@@ -169,7 +170,10 @@ describe('arena layout: walkable paths', () => {
 });
 
 describe('arena layout: fiesta hazard ring', () => {
-  it('is centred on the pit centre and covers the full pit at bout start', () => {
+  it('is centred on the pit centre and covers the full z extent at bout start', () => {
+    // The ring covers both axial z extents exactly; the pit CORNERS sit
+    // outside it (they always have), so this deliberately pins the z reach
+    // and the spawn margins, not corner coverage.
     expect(FIESTA_RING_CX).toBe(0);
     expect(FIESTA_RING_CZ).toBe(ARENA_LAYOUT.sideWallZ);
     expect(FIESTA_RING_START).toBeGreaterThanOrEqual(ARENA_LAYOUT.zMax - FIESTA_RING_CZ);
@@ -181,5 +185,45 @@ describe('arena layout: fiesta hazard ring', () => {
       const d = Math.hypot(s.x - FIESTA_RING_CX, s.z - FIESTA_RING_CZ);
       expect(FIESTA_RING_START - d).toBeGreaterThanOrEqual(4);
     }
+  });
+});
+
+describe('arena layout: cover intent (line of sight)', () => {
+  // The arena band's colliders are static and the ground is flat, so any
+  // seed selects the same geometry for lineOfSightClear.
+  const SEED = 1;
+  const o = arenaOrigin(0);
+  const at = (p: { x: number; z: number }) => ({ x: o.x + p.x, z: o.z + p.z });
+
+  it('the 1v1 spawns have no clear sightline to each other', () => {
+    expect(lineOfSightClear(SEED, at(ARENA_SPAWN_A), at(ARENA_SPAWN_B))).toBe(false);
+  });
+
+  it('every 2v2 spawn is screened from the dais centre', () => {
+    const centre = at({ x: ARENA_LAYOUT.dais.x, z: ARENA_LAYOUT.dais.z });
+    for (const s of [...ARENA_SPAWNS_A_2v2, ...ARENA_SPAWNS_B_2v2]) {
+      expect(lineOfSightClear(SEED, at(s), centre)).toBe(false);
+    }
+    // decisive negative arm: an open lane east of all cover IS clear, so the
+    // blocked results above come from the cover, not from the checker
+    expect(lineOfSightClear(SEED, at({ x: 16, z: -6 }), at({ x: 16, z: 6 }))).toBe(true);
+  });
+
+  it('keeps the wall-sweep test lanes clear of interior cover', () => {
+    // tests/arena.test.ts sweeps the walls along the z=-6 row and the x=18
+    // column; pin those lanes obstacle-free with body-radius margin so a
+    // future cover nudge fails HERE with a readable message, not in a
+    // confusing wall-sweep assertion.
+    for (const c of coverColliders()) {
+      const rx = c.type === 'circle' ? c.r : c.hw;
+      const rz = c.type === 'circle' ? c.r : c.hd;
+      expect(Math.abs(c.z - -6) - rz).toBeGreaterThan(PLAYER_BODY_RADIUS);
+      expect(Math.abs(c.x - 18) - rx).toBeGreaterThan(PLAYER_BODY_RADIUS);
+    }
+  });
+
+  it('arena slots are spaced wider than the pit footprint', () => {
+    const spacing = arenaOrigin(1).z - arenaOrigin(0).z;
+    expect(spacing).toBeGreaterThan(ARENA_LAYOUT.zMax - ARENA_LAYOUT.zMin);
   });
 });

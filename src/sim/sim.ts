@@ -8200,6 +8200,10 @@ export class Sim {
   // -------------------------------------------------------------------------
 
   fiestaBotPids: number[] = [];
+  // Per-bot stuck-recovery steering state (fiesta_bots.ts advanceBotSteer):
+  // session-only, never serialized, cleared by stopFiestaPractice and on any
+  // tick a bot is not actively fighting.
+  fiestaBotSteer = new Map<number, fiestaBotsMod.BotSteer>();
 
   fiestaPracticeActive(): boolean {
     return fiestaBotsMod.fiestaPracticeActive(this);

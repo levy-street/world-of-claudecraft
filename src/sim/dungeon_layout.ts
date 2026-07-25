@@ -183,7 +183,7 @@ export const ARENA_LAYOUT: DungeonLayout = {
   sideWallZ: 2,
   sideWallHd: 26,
   pillars: [
-    // corner pillars carrying the arena's warm torches
+    // corner pillars anchoring the four quadrants (every pillar mounts a torch)
     { x: -14, z: -14 },
     { x: 14, z: -14 },
     { x: -14, z: 18 },
