@@ -53,17 +53,18 @@ export function ensureDemonTowerAssets(): Promise<void> {
   return corePending;
 }
 
-/** Scale a loaded GLB so its tallest axis matches `height`, base on the ground. */
-function fitted(gltf: Gltf, height: number): THREE.Object3D {
-  const root = gltf.scene.clone(true);
-  const box = new THREE.Box3().setFromObject(root);
-  const size = new THREE.Vector3();
-  box.getSize(size);
-  const tall = Math.max(size.y, 1e-4);
-  const scale = height / tall;
-  root.scale.setScalar(scale);
-  root.position.y = -box.min.y * scale;
-  return root;
+/**
+ * The prop lane already ships a normalized GLB: base at y=0, centred on the
+ * origin, scaled to the world-unit height it was generated at (CORE_HEIGHT).
+ * So this is a plain clone, deliberately. An earlier version re-fitted it from a
+ * measured Box3 and shipped an INVISIBLE core, because Box3.setFromObject reads
+ * world matrices a freshly cloned scene has not computed yet: the measurement
+ * came back degenerate and scaled the model to nothing. Do not reintroduce a
+ * refit here; if a future model needs one, update its world matrices first and
+ * verify it on screen, not just in a unit test.
+ */
+function corePrefab(gltf: Gltf): THREE.Object3D {
+  return gltf.scene.clone(true);
 }
 
 /** The procedural stand-in: a flared trunk under a bulbous pod, matching the
@@ -105,7 +106,7 @@ export function buildDemonTowerCore(lowGfx: boolean): {
   const body = new THREE.Group();
   void ensureDemonTowerAssets();
 
-  body.add(coreGltf ? fitted(coreGltf, CORE_HEIGHT) : proceduralCore());
+  body.add(coreGltf ? corePrefab(coreGltf) : proceduralCore());
 
   if (lowGfx) return { body };
 

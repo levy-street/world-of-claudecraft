@@ -47,6 +47,7 @@ import {
   placeMarshTombs,
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
+import { ensureDemonTowerAssets } from './demon_tower';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { sharedUniforms } from './gfx';
 import { buildOrkadiaFieldInterior } from './orkadia_props';
@@ -758,6 +759,13 @@ export class DungeonInteriors {
     // Authored room-graph floor (the set-piece citadel): its rooms/doors/decor
     // replace the single-room shell entirely. Walls come from the SAME segment
     // helper the sim derives collision from, so they cannot drift apart.
+    // The Demon Tower's arena is a shellPolygon floor, not a room graph, so it
+    // does not take the authored branch below. Its centrepiece still has to be
+    // resident BEFORE the floor's views are built: the core's view is created
+    // once, so a model that arrives later would leave the procedural stand-in on
+    // screen for the whole run.
+    if (layout.obstacles?.length) await ensureDemonTowerAssets();
+
     if (layout.rooms) {
       await ensureInfernalDecorAssets();
       this.placeAuthoredFloor(p, layout, variant);
