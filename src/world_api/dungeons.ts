@@ -40,6 +40,42 @@ export interface RiftBossDeathZoneView {
   remaining: number;
 }
 
+// One Source Cave mob as shown in the cave's roster display: the contributor login
+// (spliced verbatim, D7) plus its rank flags. Not the wire Entity, just the static
+// roster projection.
+export interface SourceCaveMobDisplay {
+  login: string;
+  elite: boolean;
+  boss: boolean;
+  /** Whether this visible contributor participates in the current encounter budget. */
+  combatant: boolean;
+}
+
+export type SourceCaveSealState = 'idle' | 'active' | 'breached' | 'cleared';
+
+// The Source Cave HUD view: the full visible roster (`mobs`) plus the fixed combat total
+// and viewer progress (`totalMobs` / `killed`), with `cleared` from the active lockout.
+export interface SourceCaveInfo {
+  moduleCount: number;
+  // Ordered module-type keys (delve module ids, e.g. 'reliquary_sunken_ossuary')
+  // that assemble the cave, index-aligned with SourceCaveMobDisplay.moduleIndex
+  // would be if that field existed on the wire. Render needs the actual sequence,
+  // not just moduleCount, because delveModuleZOffset stacks modules by their real
+  // per-type footprint (trash module types are not uniform length). Static for the
+  // cave's lifetime, same length as moduleCount.
+  modules: string[];
+  mobs: SourceCaveMobDisplay[];
+  totalMobs: number;
+  killed: number;
+  cleared: boolean;
+  /** Centre-floor presentation state, always authoritative from the owning Sim. */
+  sealState: SourceCaveSealState;
+  playersInsideSeal: number;
+  playersInInstance: number;
+  activeWave: number;
+  totalWaves: number;
+}
+
 export interface IWorldDungeons {
   enterDungeon(dungeonId: string): WorldInteractionOutcome;
   leaveDungeon(): WorldInteractionOutcome;
@@ -69,6 +105,9 @@ export interface IWorldDungeons {
   // call, like raidLockouts(), so the HUD "closes in" countdown ticks locally
   // without a snapshot round trip.
   riftEventMsRemaining(): number | null;
+  // The Source Cave roster + the local player's progress, driving the cave HUD.
+  // Null when no cave exists.
+  sourceCaveInfo(): SourceCaveInfo | null;
   dungeonDifficulty(): DungeonDifficulty;
   setDungeonDifficulty(difficulty: DungeonDifficulty): void;
   // Buy one Heroic Quartermaster offer (src/sim/content/heroic_vendor.ts),

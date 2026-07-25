@@ -340,6 +340,7 @@ export const IWORLD_MEMBERS = [
   { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
   { name: 'riftEventMsRemaining', kind: 'method' }, // ms until the rift event stops admitting parties
+  { name: 'sourceCaveInfo', kind: 'method' }, // read-returning
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
   { name: 'setDungeonDifficulty', kind: 'method' },
   { name: 'buyHeroicVendorItem', kind: 'method' },
@@ -528,10 +529,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // IWorldGuildBank members (guildBankInfo, one data read, plus five
     // commands), leaving 287. The guild bank ACTIVITY LOG adds one read member
     // (guildBankLog, a method because reading it is what requests the cold
-    // payload on demand: it has no snapshot key), leaving 288.
-    expect(IWORLD_MEMBERS.length).toBe(289);
+    // payload on demand: it has no snapshot key), leaving 288. This branch's
+    // sourceCaveInfo read (dungeons facet, a read-returning method) makes 289.
+    expect(IWORLD_MEMBERS.length).toBe(290);
     expect(DATA_MEMBERS.length).toBe(74);
-    expect(METHOD_MEMBERS.length).toBe(215);
+    expect(METHOD_MEMBERS.length).toBe(216);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -789,6 +791,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'slotToolEffect',
       'socialInfo',
       'socketRiftGem',
+      'sourceCaveInfo',
       'spinDailyReward',
       'startAutoAttack',
       'stationPlacements',
@@ -1098,6 +1101,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setTownFocus',
       'slotToolEffect',
       'socketRiftGem',
+      'sourceCaveInfo',
       'spinDailyReward',
       'startAutoAttack',
       'stopAutoAttack',
@@ -1492,6 +1496,7 @@ const FACET_DUNGEONS = [
   'riftCollisionToken',
   'riftBossDeathZones',
   'riftEventMsRemaining',
+  'sourceCaveInfo',
   'dungeonDifficulty',
   'setDungeonDifficulty',
   'buyHeroicVendorItem',
@@ -1690,8 +1695,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(289);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(289);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(290);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(290);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
