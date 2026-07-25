@@ -1529,6 +1529,8 @@ export const zh_CN: EnTranslations = {
       "dragDestroyHint": "拖出到世界中以销毁",
       "reorderNeedsRecent": "清除筛选并按“最近”排序即可整理背包",
       "itemAriaInstanced": "{item}，数量 {count}，带工匠印记的物品",
+      "itemAriaEnchanted": "{item}，数量 {count}，已附魔的副本",
+      "itemAriaBound": "{item}，数量 {count}，已绑定的副本",
       "itemAriaMasterwork": "{item}，数量 {count}，杰作",
       "filterGroupAria": "按类别筛选背包",
       "filterAll": "全部",
@@ -1754,7 +1756,8 @@ export const zh_CN: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "需要等级 {level}",
-      "statEnchanted": "+{value} {stat}（附魔）"
+      "statEnchanted": "+{value} {stat}（附魔）",
+      "enchantedFallback": "已附魔"
     },
     "materialHint": {
       "arcaneDust": "附魔材料。分解普通和优秀品质的装备可得。",

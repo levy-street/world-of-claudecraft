@@ -258,9 +258,8 @@ export class BagItemActionMenu {
   // Build the #ctx-menu popup: an optional title, then the rows. A row with an
   // `act` is a selectable .ctx-item[data-act]; a `disabled` row is inert
   // (bindContextMenuActions ignores rows without data-act); a `header` row is a
-  // non-interactive tier label (role=presentation: it is a visual grouping
-  // caption, and the rows under it already name their own enchant). Reuses the
-  // shared placement + action binding, never a bespoke menu.
+  // non-interactive tier caption that also NAMES the group of rows under it.
+  // Reuses the shared placement + action binding, never a bespoke menu.
   private paint(
     rows: PickerRow[],
     x: number,
@@ -272,11 +271,23 @@ export class BagItemActionMenu {
     const el = this.deps.ctxMenu.element();
     el.classList.toggle(CTX_MENU_PICKER_CLASS, picker);
     let html = titleHtml ? `<div class="ctx-title">${titleHtml}</div>` : '';
+    // A tier caption opens a labelled GROUP around the rows beneath it, so the
+    // ladder reaches assistive tech too: the rows are role=button stops
+    // (bindContextMenuActions), and without the group a keyboard user would step
+    // row to row never learning which tier they are in. The caption itself stays
+    // unfocusable; it is the group's accessible name, not a menu item.
+    let openGroup = false;
+    let sectionSeq = 0;
     for (const row of rows) {
-      if (row.header) html += `<div class="ctx-section" role="presentation">${row.html}</div>`;
-      else if (row.act) html += `<div class="ctx-item" data-act="${row.act}">${row.html}</div>`;
+      if (row.header) {
+        if (openGroup) html += '</div>';
+        const id = `ctx-section-${sectionSeq++}`;
+        html += `<div class="ctx-group" role="group" aria-labelledby="${id}"><div class="ctx-section" id="${id}">${row.html}</div>`;
+        openGroup = true;
+      } else if (row.act) html += `<div class="ctx-item" data-act="${row.act}">${row.html}</div>`;
       else html += `<div class="ctx-item" aria-disabled="true">${row.html}</div>`;
     }
+    if (openGroup) html += '</div>';
     el.innerHTML = html;
     el.style.display = 'block';
     const naturalReserve = 80 + rows.length * (this.deps.isMobileLayout() ? 48 : 32);

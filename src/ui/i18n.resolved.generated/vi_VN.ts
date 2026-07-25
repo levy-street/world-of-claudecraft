@@ -1529,6 +1529,8 @@ export const vi_VN: EnTranslations = {
       "dragDestroyHint": "Kéo ra ngoài thế giới để hủy bỏ",
       "reorderNeedsRecent": "Xóa bộ lọc và sắp xếp theo Gần Đây để sắp xếp lại túi đồ",
       "itemAriaInstanced": "{item}, số lượng {count}, bản có dấu thợ",
+      "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
+      "itemAriaBound": "{item}, quantity {count}, bound copy",
       "itemAriaMasterwork": "{item}, số lượng {count}, kiệt tác",
       "filterGroupAria": "Lọc túi đồ theo danh mục",
       "filterAll": "Tất cả",
@@ -1754,7 +1756,8 @@ export const vi_VN: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Yêu cầu Cấp {level}",
-      "statEnchanted": "+{value} {stat} (Enchanted)"
+      "statEnchanted": "+{value} {stat} (Enchanted)",
+      "enchantedFallback": "Enchanted"
     },
     "materialHint": {
       "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",

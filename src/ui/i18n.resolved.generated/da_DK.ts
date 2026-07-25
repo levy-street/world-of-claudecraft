@@ -1529,6 +1529,8 @@ export const da_DK: EnTranslations = {
       "dragDestroyHint": "Træk ud i verden for at ødelægge",
       "reorderNeedsRecent": "Ryd filteret og sortér efter Seneste for at omarrangere dine tasker",
       "itemAriaInstanced": "{item}, antal {count}, signeret kopi",
+      "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
+      "itemAriaBound": "{item}, quantity {count}, bound copy",
       "itemAriaMasterwork": "{item}, antal {count}, mesterværk",
       "filterGroupAria": "Filtrér tasker efter kategori",
       "filterAll": "Alle",
@@ -1754,7 +1756,8 @@ export const da_DK: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Kræver niveau {level}",
-      "statEnchanted": "+{value} {stat} (Enchanted)"
+      "statEnchanted": "+{value} {stat} (Enchanted)",
+      "enchantedFallback": "Enchanted"
     },
     "materialHint": {
       "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",

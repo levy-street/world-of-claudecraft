@@ -9097,4 +9097,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldHeader': '예상 재료:',
   'hudChrome.enchanting.yieldLineExact': '{item} {count}개',
   'hudChrome.enchanting.yieldLineRange': '{item} {min}~{max}개',
+  'hudChrome.bags.itemAriaEnchanted': '{item}, 수량 {count}, 마법부여된 사본',
+  'hudChrome.bags.itemAriaBound': '{item}, 수량 {count}, 귀속된 사본',
+  'hudChrome.itemTooltip.enchantedFallback': '마법부여됨',
 };

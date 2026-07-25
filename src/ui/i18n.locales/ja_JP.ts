@@ -9111,4 +9111,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldHeader': '獲得予定の材料:',
   'hudChrome.enchanting.yieldLineExact': '{item} {count}個',
   'hudChrome.enchanting.yieldLineRange': '{item} {min}から{max}個',
+  'hudChrome.bags.itemAriaEnchanted': '{item}、数量 {count}、エンチャント済みの品',
+  'hudChrome.bags.itemAriaBound': '{item}、数量 {count}、バインド済みの品',
+  'hudChrome.itemTooltip.enchantedFallback': 'エンチャント済み',
 };

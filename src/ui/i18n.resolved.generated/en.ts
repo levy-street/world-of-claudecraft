@@ -1529,6 +1529,8 @@ export const en: EnTranslations = {
       "dragDestroyHint": "Drag out into the world to destroy",
       "reorderNeedsRecent": "Clear the filter and sort by Recent to rearrange your bags",
       "itemAriaInstanced": "{item}, quantity {count}, maker-marked copy",
+      "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
+      "itemAriaBound": "{item}, quantity {count}, bound copy",
       "itemAriaMasterwork": "{item}, quantity {count}, masterwork",
       "filterGroupAria": "Filter bags by category",
       "filterAll": "All",
@@ -1754,7 +1756,8 @@ export const en: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Requires Level {level}",
-      "statEnchanted": "+{value} {stat} (Enchanted)"
+      "statEnchanted": "+{value} {stat} (Enchanted)",
+      "enchantedFallback": "Enchanted"
     },
     "materialHint": {
       "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",

@@ -69,8 +69,15 @@ describe('item_instance_tooltip', () => {
     expect(html).toContain(itemStatName('sta'));
   });
 
-  it('zero-valued baked stats are skipped', () => {
-    expect(instanceBonusStatLines({ rolled: { stats: { str: 0 } } })).toBe('');
+  it('zero-valued baked stats render no stat line', () => {
+    // A zero-stat masterwork copy is silent, exactly as before. A zero-stat
+    // bare-stats copy still reads as enchanted to the sim (isEnchantedInstance),
+    // and its bag corner paints the enchant glyph, so the fallback keeps the
+    // tooltip saying so rather than going blank.
+    expect(instanceBonusStatLines({ rolled: { masterwork: true, stats: { str: 0 } } })).toBe('');
+    const bare = instanceBonusStatLines({ rolled: { stats: { str: 0 } } });
+    expect(bare).not.toContain('tt-instance-bonus');
+    expect(bare).toContain('Enchanted');
   });
 
   // The attribution matrix: which bonus stat lines carry the "(Enchanted)"
@@ -138,7 +145,11 @@ describe('item_instance_tooltip', () => {
       expect(html).toContain(`+${itemNumber(1)} ${itemStatName('sta')}<`);
     });
 
-    it('an unknown enchant id falls back to plain lines rather than dropping them', () => {
+    it('an unknown enchant id keeps its stat line plain but still states the enchant', () => {
+      // Reachable mid-rollout: an older client resolving an id its own ENCHANTS
+      // table lacks. The share is unknowable, so the stat stays unattributed,
+      // but the copy must not go silent about being enchanted (its bag corner
+      // already paints the enchant glyph).
       const html = instanceBonusStatLines({
         enchant: 'not_a_real_enchant',
         rolled: { stats: { sta: 4 } },
@@ -146,6 +157,38 @@ describe('item_instance_tooltip', () => {
       expect((html.match(/tt-instance-bonus/g) ?? []).length).toBe(1);
       expect(html).toContain(`+${itemNumber(4)} ${itemStatName('sta')}<`);
       expect(html).not.toContain('(Enchanted)');
+      expect(html).toContain('Enchanted');
+    });
+
+    it('a marker copy with no baked stats at all still states the enchant', () => {
+      const html = instanceBonusStatLines({ enchant: ENCHANT_ID });
+      expect(html).toContain('Enchanted');
+      expect(html).not.toContain('tt-instance-bonus');
+    });
+
+    it('the fallback never doubles up beside an attributed line', () => {
+      const html = instanceBonusStatLines({
+        enchant: ENCHANT_ID,
+        rolled: { stats: { sta: SHARE } },
+      });
+      expect((html.match(/Enchanted/g) ?? []).length).toBe(1);
+    });
+
+    it('a masterwork-only copy never triggers the enchanted fallback', () => {
+      const html = instanceBonusStatLines({ rolled: { masterwork: true, stats: { str: 2 } } });
+      expect(html).not.toContain('Enchanted');
+    });
+
+    it('a share larger than the baked stat never renders a negative remainder', () => {
+      // Guards a later ENCHANTS retune against an already-minted copy: the
+      // remainder is clamped away rather than rendered as "+-2 Stamina".
+      const html = instanceBonusStatLines({
+        enchant: ENCHANT_ID,
+        rolled: { stats: { sta: 1 } },
+      });
+      expect(html).not.toContain('+-');
+      expect((html.match(/tt-instance-bonus/g) ?? []).length).toBe(1);
+      expect(html).toContain(`+${itemNumber(1)} ${itemStatName('sta')} (Enchanted)`);
     });
   });
 

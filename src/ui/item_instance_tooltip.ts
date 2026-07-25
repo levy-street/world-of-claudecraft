@@ -120,21 +120,41 @@ function statLine(key: TranslationKey, value: number, stat: string): string {
  *  The suffix is its own key with its own fills, never concatenated onto the
  *  plain line's output. */
 export function instanceBonusStatLines(instance?: ItemInstancePayload): string {
-  const bonusStats = instance?.rolled?.stats;
-  if (!bonusStats || !instance) return '';
+  if (!instance) return '';
+  const bonusStats = instance.rolled?.stats;
   const enchantShare = instance.enchant ? ENCHANTS[instance.enchant]?.statBonus : undefined;
   const legacyEnchanted = instance.enchant === undefined && isEnchantedInstance(instance);
   let html = '';
-  for (const [stat, value] of Object.entries(bonusStats)) {
+  let attributed = false;
+  for (const [stat, value] of Object.entries(bonusStats ?? {})) {
     if (!value) continue;
     if (legacyEnchanted) {
       html += statLine('hudChrome.itemTooltip.statEnchanted', value, stat);
+      attributed = true;
       continue;
     }
-    const share = enchantShare?.[stat as keyof typeof enchantShare] ?? 0;
-    if (share !== 0) html += statLine('hudChrome.itemTooltip.statEnchanted', share, stat);
+    // Clamp the attributed share into what this copy actually carries. The
+    // magnitudes are frozen once applied (resolveApplyEnchant bakes them), but a
+    // later ENCHANTS retune would otherwise make an old copy render a NEGATIVE
+    // remainder ("+-2 Stamina") beside its suffixed line.
+    const raw = enchantShare?.[stat as keyof typeof enchantShare] ?? 0;
+    const share = value > 0 ? Math.min(Math.max(raw, 0), value) : 0;
+    if (share !== 0) {
+      html += statLine('hudChrome.itemTooltip.statEnchanted', share, stat);
+      attributed = true;
+    }
     const remainder = value - share;
     if (remainder !== 0) html += statLine('itemUi.tooltip.stat', remainder, stat);
+  }
+  // Safety net: attribution can only speak through a stat line, so a copy that
+  // IS enchanted but produced none (an enchant id this client cannot resolve, or
+  // a payload carrying the marker without rolled.stats) still states the fact.
+  // Its bag corner already paints the enchant glyph, so silence here would be a
+  // real information loss, not just a missing flourish.
+  if (!attributed && isEnchantedInstance(instance)) {
+    html += `<div class="tt-sub" style="color:${QUALITY_COLOR.uncommon}">${esc(
+      t('hudChrome.itemTooltip.enchantedFallback'),
+    )}</div>`;
   }
   return html;
 }

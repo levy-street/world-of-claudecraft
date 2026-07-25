@@ -9281,4 +9281,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldHeader': 'Ожидаемые материалы:',
   'hudChrome.enchanting.yieldLineExact': '{item}: {count}',
   'hudChrome.enchanting.yieldLineRange': '{item}: {min}-{max}',
+  'hudChrome.bags.itemAriaEnchanted': '{item}, количество {count}, зачарованный экземпляр',
+  'hudChrome.bags.itemAriaBound': '{item}, количество {count}, привязанный экземпляр',
+  'hudChrome.itemTooltip.enchantedFallback': 'Зачаровано',
 };

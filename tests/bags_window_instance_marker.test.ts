@@ -147,6 +147,32 @@ describe('bags grid instanced-slot marker', () => {
     expect(cells[1].getAttribute('aria-label')).not.toContain('maker-marked copy');
   });
 
+  it('every glyph kind gives the CELL its own accessible name, never one label for all', () => {
+    // The glyph is aria-hidden, so the cell name is the only channel AT gets:
+    // three distinguishable glyphs must not collapse into one wording.
+    const root = windowFor([
+      { itemId: 'copper_ore', count: 1, instance: { enchant: 'enchant_chest_stamina' } },
+      { itemId: 'copper_ore', count: 1, instance: { signer: 'Anna' } },
+      { itemId: 'copper_ore', count: 1, instance: { bindOnTrade: true } },
+      {
+        itemId: 'copper_ore',
+        count: 1,
+        instance: { rolled: { masterwork: true, stats: { sta: 1 } } },
+      },
+      { itemId: 'copper_ore', count: 1 },
+    ]);
+    const names = [...root.querySelectorAll('button.bag-item')].map((c) =>
+      c.getAttribute('aria-label'),
+    );
+    expect(names[0]).toBe('Copper Ore, quantity 1, enchanted copy');
+    expect(names[1]).toBe('Copper Ore, quantity 1, maker-marked copy');
+    expect(names[2]).toBe('Copper Ore, quantity 1, bound copy');
+    expect(names[3]).toBe('Copper Ore, quantity 1, masterwork');
+    expect(names[4]).toBe('Copper Ore, quantity 1');
+    // The four marked kinds are all distinct from each other.
+    expect(new Set(names.slice(0, 4)).size).toBe(4);
+  });
+
   it('each kind paints its own distinct glyph, exactly one per cell', () => {
     const root = windowFor([
       { itemId: 'copper_ore', count: 1, instance: { enchant: 'enchant_chest_stamina' } },

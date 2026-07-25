@@ -8684,4 +8684,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.yieldHeader': '预计产出材料：',
   'hudChrome.enchanting.yieldLineExact': '{item} {count} 个',
   'hudChrome.enchanting.yieldLineRange': '{item} {min} 至 {max} 个',
+  'hudChrome.bags.itemAriaEnchanted': '{item}，数量 {count}，已附魔的副本',
+  'hudChrome.bags.itemAriaBound': '{item}，数量 {count}，已绑定的副本',
+  'hudChrome.itemTooltip.enchantedFallback': '已附魔',
 };

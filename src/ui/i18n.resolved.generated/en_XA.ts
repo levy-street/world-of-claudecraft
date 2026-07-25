@@ -1529,6 +1529,8 @@ export const en_XA: EnTranslations = {
       "dragDestroyHint": "[Ðŕáĝ óúţ íñţó ţĥé ŵóŕļð ţó ðéšţŕóý]",
       "reorderNeedsRecent": "[Çļéáŕ ţĥé ƒíļţéŕ áñð šóŕţ ƀý Ŕéçéñţ ţó ŕéáŕŕáñĝé ýóúŕ ƀáĝš]",
       "itemAriaInstanced": "[{item}, ɋúáñţíţý {count}, ɱáķéŕ-ɱáŕķéð çóþý]",
+      "itemAriaEnchanted": "[{item}, ɋúáñţíţý {count}, éñçĥáñţéð çóþý]",
+      "itemAriaBound": "[{item}, ɋúáñţíţý {count}, ƀóúñð çóþý]",
       "itemAriaMasterwork": "[{item}, ɋúáñţíţý {count}, ɱášţéŕŵóŕķ]",
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",
       "filterAll": "[Áļļ]",
@@ -1754,7 +1756,8 @@ export const en_XA: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]",
-      "statEnchanted": "[+{value} {stat} (Éñçĥáñţéð)]"
+      "statEnchanted": "[+{value} {stat} (Éñçĥáñţéð)]",
+      "enchantedFallback": "[Éñçĥáñţéð]"
     },
     "materialHint": {
       "arcaneDust": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ çóɱɱóñ áñð úñçóɱɱóñ ĝéáŕ.]",

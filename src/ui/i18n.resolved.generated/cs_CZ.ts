@@ -1529,6 +1529,8 @@ export const cs_CZ: EnTranslations = {
       "dragDestroyHint": "Přetáhni do světa a předmět bude zničen",
       "reorderNeedsRecent": "Zruš filtr a seřaď podle Nedávných, chceš-li přeuspořádat batohy",
       "itemAriaInstanced": "{item}, množství {count}, kopie s výrobcovou značkou",
+      "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
+      "itemAriaBound": "{item}, quantity {count}, bound copy",
       "itemAriaMasterwork": "{item}, množství {count}, mistrovské dílo",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
@@ -1754,7 +1756,8 @@ export const cs_CZ: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Vyžaduje úroveň {level}",
-      "statEnchanted": "+{value} {stat} (Enchanted)"
+      "statEnchanted": "+{value} {stat} (Enchanted)",
+      "enchantedFallback": "Enchanted"
     },
     "materialHint": {
       "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",

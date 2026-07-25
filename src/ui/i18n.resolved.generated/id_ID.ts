@@ -1529,6 +1529,8 @@ export const id_ID: EnTranslations = {
       "dragDestroyHint": "Seret ke dunia untuk menghancurkan",
       "reorderNeedsRecent": "Hapus filter dan urutkan berdasarkan Terbaru untuk mengatur ulang tasmu",
       "itemAriaInstanced": "{item}, jumlah {count}, salinan bermerek pembuat",
+      "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
+      "itemAriaBound": "{item}, quantity {count}, bound copy",
       "itemAriaMasterwork": "{item}, jumlah {count}, karya master",
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
@@ -1754,7 +1756,8 @@ export const id_ID: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Membutuhkan Level {level}",
-      "statEnchanted": "+{value} {stat} (Enchanted)"
+      "statEnchanted": "+{value} {stat} (Enchanted)",
+      "enchantedFallback": "Enchanted"
     },
     "materialHint": {
       "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",

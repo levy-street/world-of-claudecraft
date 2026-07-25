@@ -1529,6 +1529,8 @@ export const ru_RU: EnTranslations = {
       "dragDestroyHint": "Перетащите в мир, чтобы уничтожить",
       "reorderNeedsRecent": "Сбросьте фильтр и выберите сортировку «Недавние», чтобы менять порядок в сумках",
       "itemAriaInstanced": "{item}, количество {count}, копия с клеймом мастера",
+      "itemAriaEnchanted": "{item}, количество {count}, зачарованный экземпляр",
+      "itemAriaBound": "{item}, количество {count}, привязанный экземпляр",
       "itemAriaMasterwork": "{item}, количество {count}, шедевр",
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",
@@ -1754,7 +1756,8 @@ export const ru_RU: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Требуется уровень {level}",
-      "statEnchanted": "+{value} {stat} (зачаровано)"
+      "statEnchanted": "+{value} {stat} (зачаровано)",
+      "enchantedFallback": "Зачаровано"
     },
     "materialHint": {
       "arcaneDust": "Реагент для наложения чар. Выпадает при распылении обычного и необычного снаряжения.",

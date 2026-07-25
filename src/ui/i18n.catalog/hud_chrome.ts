@@ -1534,6 +1534,15 @@ export const hudChromeStrings = {
     // visual tab is aria-hidden, so the per-copy flag rides the cell's label
     // (the tooltip on focus stays the detail surface).
     itemAriaInstanced: '{item}, quantity {count}, maker-marked copy',
+    // Per-kind accessible names for the bag corner glyphs
+    // (src/ui/bag_instance_glyph_view.ts decides the kind). The glyph itself is
+    // aria-hidden, so the CELL's name is what carries the fact: without these
+    // an enchanted or bound copy announced as "maker-marked copy", which is
+    // both a mislabel and less than the three distinguishable glyphs a sighted
+    // player gets. A signed copy keeps itemAriaInstanced above (that wording is
+    // accurate for it), as does an instanced copy of no recognized kind.
+    itemAriaEnchanted: '{item}, quantity {count}, enchanted copy',
+    itemAriaBound: '{item}, quantity {count}, bound copy',
     // Accessible-name sibling for the authored masterwork seal. Keep the whole
     // phrase in one key so punctuation and status placement remain localizable.
     itemAriaMasterwork: '{item}, quantity {count}, masterwork',
@@ -1846,6 +1855,14 @@ export const hudChromeStrings = {
     // enchant paid for instead of only that one exists. Its own key with its
     // own fills: the suffix is never concatenated onto the plain stat line.
     statEnchanted: '+{value} {stat} (Enchanted)',
+    // The safety net behind statEnchanted: attribution can only speak through a
+    // bonus stat line, so a copy whose enchant grants no readable line (an
+    // enchant id this client's ENCHANTS table does not know, e.g. mid-rollout
+    // against a newer server, or a payload carrying the marker without
+    // rolled.stats) would otherwise say nothing at all about being enchanted,
+    // while its bag corner still paints the enchant glyph. Rendered ONLY in
+    // that case, never beside an attributed line.
+    enchantedFallback: 'Enchanted',
   },
   // Purpose hints for the eight enchanting materials
   // (src/ui/material_hint_view.ts), keyed by item id there. Each says what the

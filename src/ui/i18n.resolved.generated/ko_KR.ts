@@ -1529,6 +1529,8 @@ export const ko_KR: EnTranslations = {
       "dragDestroyHint": "세계로 끌어내어 파괴",
       "reorderNeedsRecent": "가방을 정리하려면 필터를 해제하고 최근 순으로 정렬하세요",
       "itemAriaInstanced": "{item}, 수량 {count}, 제작자 표식이 있는 사본",
+      "itemAriaEnchanted": "{item}, 수량 {count}, 마법부여된 사본",
+      "itemAriaBound": "{item}, 수량 {count}, 귀속된 사본",
       "itemAriaMasterwork": "{item}, 수량 {count}, 걸작",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
@@ -1754,7 +1756,8 @@ export const ko_KR: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "필요 레벨 {level}",
-      "statEnchanted": "+{value} {stat} (마법부여)"
+      "statEnchanted": "+{value} {stat} (마법부여)",
+      "enchantedFallback": "마법부여됨"
     },
     "materialHint": {
       "arcaneDust": "마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.",

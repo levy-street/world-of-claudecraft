@@ -1529,6 +1529,8 @@ export const nl_NL: EnTranslations = {
       "dragDestroyHint": "Sleep naar buiten in de wereld om te vernietigen",
       "reorderNeedsRecent": "Verwijder het filter en sorteer op Recent om je tassen opnieuw te rangschikken",
       "itemAriaInstanced": "{item}, aantal {count}, door maker gemerkt exemplaar",
+      "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
+      "itemAriaBound": "{item}, quantity {count}, bound copy",
       "itemAriaMasterwork": "{item}, hoeveelheid {count}, meesterwerk",
       "filterGroupAria": "Tassen filteren op categorie",
       "filterAll": "Alle",
@@ -1754,7 +1756,8 @@ export const nl_NL: EnTranslations = {
     },
     "itemTooltip": {
       "requiresLevel": "Vereist niveau {level}",
-      "statEnchanted": "+{value} {stat} (Enchanted)"
+      "statEnchanted": "+{value} {stat} (Enchanted)",
+      "enchantedFallback": "Enchanted"
     },
     "materialHint": {
       "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",

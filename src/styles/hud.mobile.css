@@ -4069,6 +4069,17 @@
     flex-direction: column;
     align-items: flex-start;
   }
+  /* The Apply Enchant picker's tier captions and per-row effect lines scale up
+     with the rest of the touch menu: the base sizes are tuned for the desktop
+     popup and read as fine print at arm's length. A caption is not tappable, so
+     it takes no 40px floor (unlike .ctx-item above); it only has to be legible. */
+  body.mobile-touch #ctx-menu .ctx-section {
+    font-size: 13px;
+    padding: 9px 10px 3px;
+  }
+  body.mobile-touch #ctx-menu .ctx-item-effect {
+    font-size: 14px;
+  }
   body.mobile-touch #ctx-menu {
     box-sizing: border-box;
     max-height: calc(var(--app-vh, 100vh) / var(--ui-scale, 1) - 20px);

@@ -234,15 +234,18 @@ describe('enchant_apply_view: enchantSectionsForReagent', () => {
     expect(enchantSectionsForReagent([], 'bone_fragments')).toEqual([]);
   });
 
-  it('pins an English header row for every tier', () => {
+  it('pins the English header wording for every tier', () => {
     const headers = hudChromeStrings.enchanting.tier as Record<string, string>;
-    for (const tier of ENCHANT_TIER_ORDER) {
-      expect(typeof headers[tier], `header for ${tier}`).toBe('string');
-      expect(headers[tier].length).toBeGreaterThan(0);
-    }
-    expect(Object.keys(headers).slice().sort()).toEqual(
-      [...ENCHANT_TIER_ORDER].slice().sort() as string[],
-    );
+    // Literal English, not a length check: the headers ARE the ladder the
+    // player reads, so a reword has to be a deliberate edit here.
+    expect(headers).toEqual({
+      base: 'Base Enchants',
+      runed: 'Runed Enchants',
+      greater: 'Greater Enchants',
+    });
+    // And every tier the core can return has a row, so a fourth tier cannot
+    // ship header-less.
+    for (const tier of ENCHANT_TIER_ORDER) expect(headers[tier]).toBeTruthy();
   });
 });
 

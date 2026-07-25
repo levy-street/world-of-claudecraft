@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { QUALITY_COLOR } from '../src/ui/icons';
 
 // Guard for the Apply Enchant picker sizing.
 //
@@ -93,7 +94,14 @@ describe('#ctx-menu picker sizing (Apply Enchant picker)', () => {
     // own gain lines use), never a literal in CSS or the painter.
     expect(effect).toMatch(/display:\s*block/);
     expect(effect).toMatch(/var\(--color-stat-bonus\)/);
-    expect(read('../src/styles/tokens.css')).toContain('--color-stat-bonus:');
+    // The token's whole point is agreeing with the item tooltip's own bonus
+    // lines, so pin the VALUE against that source of truth, not just presence.
+    const token = read('../src/styles/tokens.css').match(/--color-stat-bonus:\s*([^;]+);/);
+    expect(token).not.toBeNull();
+    expect(token?.[1].trim()).toBe(QUALITY_COLOR.uncommon);
+    expect(read('../src/styles/hud.css')).toContain(
+      `#tooltip .tt-green {\n    color: ${QUALITY_COLOR.uncommon};`,
+    );
     expect(PAINTER_TS).not.toMatch(/ctx-item-effect[^`]*style=/);
     // Always-on: neither is gated behind a graphics tier.
     expect(section).not.toContain('--fx-');

@@ -33,7 +33,7 @@ import {
   parseBagFilter,
   serializeBagFilter,
 } from './bag_filter';
-import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
+import { type BagInstanceGlyphKind, bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { bagItemHasContextActions } from './bag_item_context_menu';
 import {
   type BagDestroyAction,
@@ -97,6 +97,19 @@ const BAG_GLYPH_ICONS: Readonly<Record<'enchanted' | 'signed' | 'bound', UiIconN
   enchanted: 'enchant-rune',
   signed: 'makers-mark',
   bound: 'bond-link',
+};
+
+// The accessible name each corner kind gives its CELL. The glyph is aria-hidden,
+// so this is the ONLY channel carrying the per-copy fact to assistive tech: the
+// three visual kinds must not collapse back into one label. 'signed' and the
+// unclassified 'generic' both keep the pre-existing maker-marked wording, which
+// is accurate for a signer payload and is the status quo for the rest.
+const BAG_GLYPH_ARIA_KEYS: Readonly<Record<NonNullable<BagInstanceGlyphKind>, TranslationKey>> = {
+  masterwork: 'hudChrome.bags.itemAriaMasterwork',
+  enchanted: 'hudChrome.bags.itemAriaEnchanted',
+  signed: 'hudChrome.bags.itemAriaInstanced',
+  bound: 'hudChrome.bags.itemAriaBound',
+  generic: 'hudChrome.bags.itemAriaInstanced',
 };
 
 const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
@@ -579,13 +592,10 @@ export class BagsWindow {
       const isMasterwork = glyphKind === 'masterwork';
       row.style.setProperty('--bag-slot-quality', qColor);
       // An instanced stack's accessible name carries the per-copy flag the
-      // aria-hidden corner marker shows sighted players (the review's a11y
-      // arm); plain stacks keep the plain label.
-      const itemAriaKey = isMasterwork
-        ? 'hudChrome.bags.itemAriaMasterwork'
-        : s.instance
-          ? 'hudChrome.bags.itemAriaInstanced'
-          : 'itemUi.bags.itemAria';
+      // aria-hidden corner glyph shows sighted players (the review's a11y arm),
+      // now per KIND so the two channels agree; plain stacks keep the plain
+      // label.
+      const itemAriaKey = glyphKind ? BAG_GLYPH_ARIA_KEYS[glyphKind] : 'itemUi.bags.itemAria';
       row.setAttribute(
         'aria-label',
         t(itemAriaKey, {

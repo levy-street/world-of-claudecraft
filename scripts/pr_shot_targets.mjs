@@ -2614,11 +2614,14 @@ export const TARGETS = [
           const sim = game?.sim;
           if (!game || !sim?.player) return { ok: false, reason: 'offline world unavailable' };
           if (wantsPicker) {
-            // Enough dust to afford the base weapon enchants, so the picker's
-            // affordability lines show a mix of ready and short rows.
+            // Chime Essence is the one reagent that reaches ALL THREE tiers, so
+            // the picker opened on it is the motivating case for the tier
+            // grouping. Held counts leave a mix of ready and short rows, so the
+            // affordability lines stay exercised too.
+            sim.addItem('arcane_essence', 4);
             sim.addItem('arcane_dust', 6);
-            sim.addItem('arcane_essence', 1);
-            return { ok: true, itemName: 'Chime Dust' };
+            sim.addItem('resonant_steel', 1);
+            return { ok: true, itemName: 'Chime Essence' };
           }
           if (wantsConfirm) {
             // The ONLY held copy is a signed masterwork instance, so the confirm
@@ -2693,7 +2696,133 @@ export const TARGETS = [
       return { clip: '#ui' };
     },
   },
+  {
+    key: 'p14-instance-tooltip',
+    label: 'Bag tooltip: enchant attribution on the per-copy bonus stat lines',
+    when: ['item_instance_tooltip'],
+    // The two shapes the attribution has to get right: a plain enchanted copy
+    // (the whole bonus is the enchant's) and an enchanted MASTERWORK copy (the
+    // bonus splits between the enchant and the masterwork bake). Both stage one
+    // copy per page and read the tooltip through the real focus path.
+    variants: [
+      {
+        key: 'enchanted',
+        instance: { enchant: 'enchant_chest_stamina', rolled: { stats: { sta: 4 } } },
+      },
+      {
+        key: 'enchanted-masterwork',
+        instance: {
+          signer: 'Aldric',
+          enchant: 'enchant_chest_stamina',
+          rolled: { masterwork: true, stats: { sta: 7 } },
+        },
+      },
+    ],
+    async capture(page, variant) {
+      await openBagsWithInstance(page, 'militia_vest', variant.instance);
+      await focusBagCell(page, 'Militia Vest');
+      await pollForSize(page, '#tooltip');
+      await wait(300);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'p14-material-hint',
+    label: 'Bag tooltip: purpose hint on an enchanting material',
+    when: ['material_hint_view'],
+    // One arcane tier and one typed resonant, so both hint wordings (quality
+    // band vs armor/weapon material) are visible.
+    variants: [
+      { key: 'dust', itemId: 'arcane_dust', name: 'Chime Dust' },
+      { key: 'timber', itemId: 'resonant_timber', name: 'Resonant Timber' },
+    ],
+    async capture(page, variant) {
+      await openBagsWithInstance(page, variant.itemId, null);
+      await focusBagCell(page, variant.name);
+      await pollForSize(page, '#tooltip');
+      await wait(300);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'p14-bag-glyphs',
+    label: 'Bag grid: per-kind instance corner glyphs',
+    when: ['bag_instance_glyph_view'],
+    // One stack of every marker kind side by side, which is the only way to see
+    // whether the corner actually distinguishes them: signed, enchanted,
+    // bind-on-trade, masterwork, and a plain copy for the baseline.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        const sim = window.__game?.sim;
+        if (!sim?.player) throw new Error('offline world unavailable');
+        sim.addItemInstance('copper_ore', { signer: 'Aldric' }, undefined, 4);
+        sim.addItemInstance('militia_vest', {
+          enchant: 'enchant_chest_stamina',
+          rolled: { stats: { sta: 4 } },
+        });
+        sim.addItemInstance('resonant_steel', { bindOnTrade: true }, undefined, 2);
+        sim.addItemInstance('worn_sword', {
+          signer: 'Aldric',
+          rolled: { masterwork: true, stats: { str: 2 } },
+        });
+        sim.addItem('arcane_dust', 7);
+        const game = window.__game;
+        if (!document.querySelector('#bags')?.checkVisibility?.()) game.hud.toggleBags();
+      });
+      if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+      await wait(500);
+      return { clip: '#bags' };
+    },
+  },
 ];
+
+// Grant one staged stack (a plain count, or a specific ItemInstancePayload) and
+// open the bags window on it. Shared by the tooltip targets above, which each
+// stage exactly ONE copy per page so the cell lookup by display name is
+// unambiguous.
+async function openBagsWithInstance(page, itemId, instance) {
+  await page.evaluate(
+    (id, payload) => {
+      document.querySelector('.camera-prompt-confirm')?.click();
+      document.querySelector('.tut-skip')?.click();
+      document.querySelector('.gpu-notice-dismiss')?.click();
+      document.querySelector('#gpu-notice')?.remove();
+      const sim = window.__game?.sim;
+      if (!sim?.player) throw new Error('offline world unavailable');
+      if (payload) sim.addItemInstance(id, payload);
+      else sim.addItem(id, 3);
+      const game = window.__game;
+      if (!document.querySelector('#bags')?.checkVisibility?.()) game.hud.toggleBags();
+    },
+    itemId,
+    instance,
+  );
+  if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+}
+
+// Focus the bag cell whose accessible name carries `name`. Real focus fires
+// attachTooltip's focusin arm (the keyboard-nav path), a sturdier tooltip
+// trigger under headless than a synthetic mouseenter.
+async function focusBagCell(page, name) {
+  const found = await page.evaluate((wanted) => {
+    document.querySelector('.camera-prompt-confirm')?.click();
+    const banner = document.querySelector('#banner');
+    if (banner) banner.style.opacity = '0';
+    const cell = [...document.querySelectorAll('#bags .bag-item:not(.empty)')].find((b) =>
+      (b.getAttribute('aria-label') ?? '').includes(wanted),
+    );
+    if (!cell) return false;
+    cell.scrollIntoView({ block: 'center' });
+    cell.focus();
+    return true;
+  }, name);
+  if (!found) throw new Error(`no bag cell named ${name}`);
+}
 
 // Map a list of changed file paths to the targets they imply (deduped, registry order).
 export function resolveTargets(changedFiles) {

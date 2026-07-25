@@ -152,13 +152,46 @@ describe('Apply Enchant picker: tier sections and effect lines', () => {
       'Runed Enchants',
       'Greater Enchants',
     ]);
-    // A caption is not an action: it carries no data-act and is not announced
-    // as a menu item.
+    // A caption is not an action: it carries no data-act, so it is never a
+    // focus stop (bindContextMenuActions promotes only .ctx-item to role=button).
     for (const header of headers) {
       expect(header.getAttribute('data-act')).toBeNull();
-      expect(header.getAttribute('role')).toBe('presentation');
     }
     expect(h.el.querySelectorAll('.ctx-section[data-act]').length).toBe(0);
+  });
+
+  it('names each tier group for assistive tech, so the ladder is not sighted-only', () => {
+    const h = harness(768, [{ itemId: ESSENCE, count: 99 }]);
+    h.openPicker(ESSENCE);
+    const groups = [...h.el.querySelectorAll('.ctx-group')];
+    expect(groups.length).toBe(3);
+    const ids = new Set();
+    for (const group of groups) {
+      expect(group.getAttribute('role')).toBe('group');
+      const labelledBy = group.getAttribute('aria-labelledby');
+      expect(labelledBy).toBeTruthy();
+      // The label target must exist, be unique, and be this group's own caption.
+      expect(ids.has(labelledBy)).toBe(false);
+      ids.add(labelledBy);
+      // Resolve the label target INSIDE the group (this fixture keeps several
+      // detached menus alive in one document, so a document-wide id lookup would
+      // read another test's markup): the group's name must be its own caption.
+      const caption = group.querySelector('.ctx-section');
+      expect(caption).not.toBeNull();
+      expect(caption?.id).toBe(labelledBy);
+      // Every row of the tier sits inside its own group.
+      expect(group.querySelectorAll('.ctx-item').length).toBeGreaterThan(0);
+    }
+    // No row escapes a group, so no enchant is left tier-less.
+    const grouped = [...h.el.querySelectorAll('.ctx-group .ctx-item')].length;
+    expect(grouped).toBe(h.el.querySelectorAll('.ctx-item').length);
+  });
+
+  it('a plain action menu grows no groups or captions', () => {
+    const h = harness(768);
+    h.openPlain();
+    expect(h.el.querySelectorAll('.ctx-group').length).toBe(0);
+    expect(h.el.querySelectorAll('.ctx-section').length).toBe(0);
   });
 
   it('paints every row the core grouped, in the core-supplied order', () => {
