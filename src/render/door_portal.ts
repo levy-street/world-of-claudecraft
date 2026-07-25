@@ -3,6 +3,7 @@ import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { buildDemonTowerCore } from './demon_tower';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 // GLB-backed arch body (Tripo-generated, see public/models/props), with a
@@ -832,6 +833,10 @@ export function buildRiftPuzzleProp(
       body.add(ring);
       return { body };
     }
+    case 'rift_tower_core':
+      // The Demon Tower centrepiece lives in its own module (render/demon_tower.ts);
+      // this is a delegation, not a case block grown inside this file.
+      return buildDemonTowerCore(_lowGfx);
     case 'rift_infernal_orb':
     case 'rift_infernal_orb_active': {
       // The Blood Orb on the citadel's sacrificial altar: a dark sphere hovering

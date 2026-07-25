@@ -113,6 +113,7 @@ import {
 import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
+import { DEMON_TOWER_CORE_RENDER_HEIGHT } from './demon_tower';
 import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
 import { DungeonInteriors, dungeonDaisHasRaisedPlatform, ensureDungeonAssets } from './dungeon';
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
@@ -4991,6 +4992,7 @@ export class Renderer {
         e.templateId === 'rift_switch' ||
         e.templateId === 'rift_switch_on' ||
         e.templateId === 'rift_infernal_orb' ||
+        e.templateId === 'rift_tower_core' ||
         e.templateId === 'rift_infernal_orb_active')
     ) {
       // In-rift puzzle props (procedural; glowing ones spin via `portal`, the
@@ -4999,15 +5001,18 @@ export class Renderer {
       body = built.body;
       portal = built.portal;
       height =
-        e.templateId === 'rift_pylon' || e.templateId === 'rift_pylon_lit'
-          ? 4.0
-          : e.templateId === 'rift_gate' || e.templateId === 'rift_gate_open'
-            ? 5.6
-            : e.templateId === 'rift_roller'
-              ? 3.0
-              : e.templateId === 'rift_infernal_orb' || e.templateId === 'rift_infernal_orb_active'
-                ? 2.2
-                : 2.4;
+        e.templateId === 'rift_tower_core'
+          ? DEMON_TOWER_CORE_RENDER_HEIGHT
+          : e.templateId === 'rift_pylon' || e.templateId === 'rift_pylon_lit'
+            ? 4.0
+            : e.templateId === 'rift_gate' || e.templateId === 'rift_gate_open'
+              ? 5.6
+              : e.templateId === 'rift_roller'
+                ? 3.0
+                : e.templateId === 'rift_infernal_orb' ||
+                    e.templateId === 'rift_infernal_orb_active'
+                  ? 2.2
+                  : 2.4;
       objectMesh = body!;
     } else if (e.kind === 'object' && e.templateId === 'mailbox') {
       // Ravenpost pillar: bespoke procedural prop (no sparkle; the unread-mail
