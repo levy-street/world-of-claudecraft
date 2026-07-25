@@ -1995,6 +1995,10 @@ export const zh_CN: EnTranslations = {
         "takeParcelsFirst": "请先取出包裹再丢弃信件。"
       }
     },
+    "marketIndicator": {
+      "aria": "世界市场待领取物品",
+      "tip": "有金币或物品正在商人处等待你领取。"
+    },
     "noticeboard": {
       "empty": "看起来没有张贴任何内容。"
     },

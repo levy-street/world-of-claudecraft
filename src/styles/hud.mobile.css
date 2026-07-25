@@ -2045,6 +2045,25 @@
     font-size: 11px;
     line-height: 16px;
   }
+  /* The Merchant's coin continues the same disc-control row, left of the envelope. */
+  body.mobile-touch #market-indicator {
+    right: calc(100% + 138px);
+    top: 156px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 999px;
+    border-width: 2px;
+    transform: scale(1.25);
+    transform-origin: right top;
+  }
+  body.mobile-touch #market-indicator .ui-icon {
+    width: 22px;
+    height: 22px;
+  }
   body.mobile-touch #minimap-zoom {
     display: none;
   }
@@ -4844,7 +4863,8 @@
       transform: scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
     }
     body.mobile-touch #raid-lockout,
-    body.mobile-touch #mail-indicator {
+    body.mobile-touch #mail-indicator,
+    body.mobile-touch #market-indicator {
       top: 94px;
       transform: scale(1.27);
     }

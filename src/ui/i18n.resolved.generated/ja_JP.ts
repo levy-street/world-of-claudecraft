@@ -1995,6 +1995,10 @@ export const ja_JP: EnTranslations = {
         "takeParcelsFirst": "手紙を捨てる前に小包を取り出してください。"
       }
     },
+    "marketIndicator": {
+      "aria": "世界市場の受け取り待ち",
+      "tip": "ゴールドやアイテムが商人のもとで受け取りを待っています。"
+    },
     "noticeboard": {
       "empty": "何も貼られていないようだ。"
     },

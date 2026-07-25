@@ -1995,6 +1995,10 @@ export const sv_SE: EnTranslations = {
         "takeParcelsFirst": "Ta ut paketen innan du kastar brevet."
       }
     },
+    "marketIndicator": {
+      "aria": "World Market collection waiting",
+      "tip": "Gold or items are waiting for you at the Merchant."
+    },
     "noticeboard": {
       "empty": "Inget verkar vara uppsatt."
     },

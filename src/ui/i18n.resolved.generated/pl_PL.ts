@@ -1995,6 +1995,10 @@ export const pl_PL: EnTranslations = {
         "takeParcelsFirst": "Wyjmij paczki, zanim wyrzucisz list."
       }
     },
+    "marketIndicator": {
+      "aria": "World Market collection waiting",
+      "tip": "Gold or items are waiting for you at the Merchant."
+    },
     "noticeboard": {
       "empty": "Wygląda na to, że nic tu nie wywieszono."
     },

@@ -1995,6 +1995,10 @@ export const vi_VN: EnTranslations = {
         "takeParcelsFirst": "Hãy lấy bưu kiện ra trước khi bỏ lá thư."
       }
     },
+    "marketIndicator": {
+      "aria": "World Market collection waiting",
+      "tip": "Gold or items are waiting for you at the Merchant."
+    },
     "noticeboard": {
       "empty": "Có vẻ như chưa có gì được dán lên."
     },

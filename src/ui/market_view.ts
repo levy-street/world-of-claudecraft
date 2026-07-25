@@ -233,3 +233,17 @@ export function marketCollectBadgeCount(info: MarketInfo | null): number {
   if (!info) return 0;
   return (info.collectionCopper > 0 ? 1 : 0) + info.collectionItems.length;
 }
+
+/** The minimap-corner collect indicator (the mailIndicatorView pattern). */
+export interface MarketCollectIndicatorView {
+  visible: boolean;
+}
+
+/**
+ * Driven by the always-streamed IWorld.marketCollectPending bit, NOT by
+ * marketInfo (null away from the Merchant), so the badge lights anywhere in
+ * the world while sale proceeds or returned items wait.
+ */
+export function marketCollectIndicatorView(pending: boolean): MarketCollectIndicatorView {
+  return { visible: pending === true };
+}

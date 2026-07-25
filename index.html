@@ -289,6 +289,10 @@
         <!-- Ravenpost envelope: visible while unread letters wait; opens the mailbox
              window, which explains when the player is too far from a mailbox. -->
         <button id="mail-indicator" type="button" hidden data-icon="mail" aria-live="polite"><span class="mail-indicator-count">0</span></button>
+        <!-- World Market coin: visible while sale proceeds or returned items wait at
+             the Merchant; opens the market window when standing at the Merchant, and
+             is informational only (the tooltip) anywhere else. -->
+        <button id="market-indicator" type="button" hidden data-icon="market" aria-live="polite" data-i18n-title="hudChrome.marketIndicator.tip" data-i18n-aria="hudChrome.marketIndicator.aria" title="Gold or items are waiting for you at the Merchant." aria-label="World Market collection waiting"></button>
       </div>
       <div id="minimap-clock" data-i18n-title="hudChrome.widgets.clockTitle" title="Local time — click to toggle 12/24-hour">--:--</div>
       <div id="minimap-coords" role="status" data-i18n-title="hudChrome.widgets.worldCoordinates" data-i18n-aria="hudChrome.widgets.coordinates" title="Your current world coordinates" aria-label="Coordinates">0, 0</div>

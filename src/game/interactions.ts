@@ -8,7 +8,7 @@ import {
 import { t } from '../ui/i18n';
 import { tSim } from '../ui/sim_i18n';
 import type { IWorld } from '../world_api';
-import { corpseLootAvailability } from './corpse_loot_availability';
+import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import type { HoverCursorKind } from './cursors';
 import type { InteractionOutcome } from './interaction_autorun';
 
@@ -18,6 +18,9 @@ export interface PickInteractionWorld {
   entities: IWorld['entities'];
   duelInfo?: IWorld['duelInfo'];
   arenaInfo?: IWorld['arenaInfo'];
+  // Local party roster for the corpse rights check; optional so party-less
+  // fixtures stay valid.
+  partyInfo?: IWorld['partyInfo'];
   targetEntity(id: number | null): void;
   enterDungeon(dungeonId: string): InteractionOutcome;
   leaveDungeon(): InteractionOutcome;
@@ -132,6 +135,7 @@ export function shouldApproachPickedEntity(
   entity: Entity,
   didInteract: boolean,
   harvestStateReliable = true,
+  partyMemberIds: readonly number[] | null = null,
 ): boolean {
   if (didInteract || player.dead || entity.id === player.id) return false;
   const d = dist2d(player.pos, entity.pos);
@@ -140,7 +144,7 @@ export function shouldApproachPickedEntity(
       entity.kind === 'mob' &&
       entity.lootable &&
       d > INTERACT_RANGE + 1 &&
-      corpseLootAvailability(entity, player.id, harvestStateReliable).canOpen
+      corpseLootAvailability(entity, player.id, harvestStateReliable, partyMemberIds).canOpen
     );
   }
   if (entity.kind === 'object') return d > objectInteractionRange(entity);
@@ -190,8 +194,12 @@ export function handlePickedEntity(
       }
       if (d <= INTERACT_RANGE + 1) {
         if (
-          !corpseLootAvailability(e, world.playerId ?? world.player.id, harvestStateReliable)
-            .canOpen
+          !corpseLootAvailability(
+            e,
+            world.playerId ?? world.player.id,
+            harvestStateReliable,
+            localPartyMemberIds(world.partyInfo),
+          ).canOpen
         )
           return false;
         hud.openLoot(id, screenX, screenY);
@@ -260,8 +268,12 @@ export function handlePickedEntity(
       const d = dist2d(world.player.pos, e.pos);
       if (d <= INTERACT_RANGE + 1) {
         if (
-          !corpseLootAvailability(e, world.playerId ?? world.player.id, harvestStateReliable)
-            .canOpen
+          !corpseLootAvailability(
+            e,
+            world.playerId ?? world.player.id,
+            harvestStateReliable,
+            localPartyMemberIds(world.partyInfo),
+          ).canOpen
         )
           return false;
         hud.openLoot(id, screenX, screenY);

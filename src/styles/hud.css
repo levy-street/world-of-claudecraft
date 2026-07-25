@@ -5490,6 +5490,44 @@
     font: 700 11px var(--title-font);
     letter-spacing: 0.4px;
   }
+  /* ---------- World Market collect indicator ---------- */
+  /* The Merchant's coin: sale proceeds or returned items wait for collection.
+     Same rim-satellite family as the envelope; claims the top-RIGHT corner
+     (raid-lockout owns bottom-left, the envelope bottom-right; guarded by
+     tests/minimap_rim_badges.test.ts). */
+  #market-indicator {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 7px;
+    background: #12100acc;
+    border: 1px solid #cc9a3c88;
+    border-radius: 12px;
+    color: var(--gold);
+    appearance: none;
+    cursor: pointer;
+    font: inherit;
+    pointer-events: auto;
+  }
+  #market-indicator[hidden] {
+    display: none;
+  }
+  #market-indicator:hover,
+  #market-indicator:focus-visible {
+    color: #d8c89a;
+    border-color: #c9a86a;
+    outline: none;
+  }
+  #market-indicator:focus-visible {
+    box-shadow: 0 0 0 2px var(--gold);
+  }
+  #market-indicator .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
   /* ---------- intro logo overlay ---------- */
   /* Wordmark shown fading in/hold/out over the opening of the first-spawn intro
      cinematic (spawn_cinematic.ts): intro_logo_overlay.ts drives opacity/display

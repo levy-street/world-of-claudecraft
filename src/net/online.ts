@@ -1082,6 +1082,15 @@ const INCOMPATIBLE_WORLD_VERSION_ERROR = ONLINE_WORLD_INCOMPATIBLE_MESSAGE;
 // DESPAWN_GRACE_MS before vanishing — acceptable, since you can only see a
 // stealthed unit at that range when far out-leveling it.
 const DESPAWN_GRACE_MIN_DIST_SQ = 70 * 70;
+// How many self snapshots a pending target echo may hold the optimistic value
+// before the server's value wins regardless (the reconcile valve: a server
+// REFUSAL, an invalid, dead, or out-of-interest target, must still win). Self
+// snapshots broadcast once per 50 ms server loop callback, so 3 spans ~150 ms,
+// comfortably past the typical command round trip; on a slower link the worst
+// case degrades to the pre-fix one-snapshot blink, never a stuck target. A
+// snapshot COUNT rather than wall-clock keeps the valve deterministic in tests
+// (and needs no clock at all in the decode path).
+const TARGET_ECHO_SNAPSHOT_BUDGET = 3;
 
 function blankEntity(id: number): Entity {
   return {
@@ -1361,8 +1370,10 @@ export class ClientWorld implements IWorld {
   // the write rule. NON-IWorld mirror: the seam exposes only `accountFlair`.
   private playerFlair = new Map<string, PlayerFlair>();
   // --- IWorldMarket: World Market view, mirrored from the snapshot self
-  // (`s.market`, delta-omitted). ---
+  // (`s.market`, delta-omitted). `s.mktU` is the always-streamed collect
+  // indicator bit (the mailU pattern; the minimap badge). ---
   marketInfo: MarketInfo | null = null;
+  marketCollectPending = false;
   // --- IWorldMail: Ravenpost mailbox view + unread badge, mirrored from the
   // snapshot self (`s.mail` / `s.mailU`, delta-omitted). ---
   mailInfo: MailInfo | null = null;
@@ -1570,6 +1581,17 @@ export class ClientWorld implements IWorld {
   profanityWords: string[] = [];
   private profanityDirty = false;
   private pendingQuestCommands = new Map<string, 'accept' | 'turnin'>();
+  // Pending-target echo protection, the same sanctioned display-only-optimism
+  // idiom as pendingQuestCommands / quest_state_optimistic.ts. targetEntity
+  // writes the optimistic targetId locally, but a snapshot the server generated
+  // BEFORE processing the 'target' command is nearly always already in flight
+  // and still carries the OLD target; applying it blanks the target frame for
+  // one snapshot (and re-toggles the party-frames below-target push), the
+  // select flicker. While set, every self targetId write routes through
+  // applySelfTargetFromServer, which keeps displaying the optimistic id until
+  // the server echoes it or the snapshot budget runs out (server authority is
+  // untouched: a refusal still wins via that valve).
+  private pendingTargetEcho: { id: number | null; snapshotsLeft: number } | null = null;
   private nextCommandOutcomeId = 1;
   private pendingCommandOutcomes = new Map<
     number,
@@ -1962,6 +1984,9 @@ export class ClientWorld implements IWorld {
         this.inputEchoSamples = [];
         this.missingSince.clear();
         this.lastSnapAt = 0;
+        // any in-flight target echo died with the old transport; the resent
+        // world's value must apply from the first snapshot
+        this.pendingTargetEcho = null;
         this.netPipeline().noteReset();
         // the server exits spectate at grace start, so undo the whole client
         // spectate swap too (playerId is already restored from this hello)
@@ -1979,6 +2004,9 @@ export class ClientWorld implements IWorld {
       this.spectating = typeof msg.name === 'string' ? msg.name : null;
       this.spectateFacingPending = true;
       this.pendingSpectateFacing = null;
+      // the spectate swap changes whose record the self-decode writes; a hold
+      // armed for the previous identity must not shadow the new one's target
+      this.pendingTargetEcho = null;
       this.pendingInputSeqSentAt.clear();
       this.inputEchoSamples = [];
       if (typeof this.spectating !== 'string') {
@@ -2487,12 +2515,21 @@ export class ClientWorld implements IWorld {
       e.aggroTargetId = w.aggro ?? null;
       // Another entity's selected target (players/bots; mobs use aggro above). Powers
       // the target-of-target frame for a player target. For the SELF record this is
-      // re-set authoritatively from `s.target` in the self-decode below (same value).
-      e.targetId = w.tgt ?? null;
+      // re-set authoritatively from `s.target` in the self-decode below (same value),
+      // and both writes route through the pending-target echo guard (countStale
+      // false here: the self-decode owns the budget decrement).
+      if (w.id === this.playerId) this.applySelfTargetFromServer(e, w.tgt ?? null, false);
+      else e.targetId = w.tgt ?? null;
       e.tappedById = w.tap ?? null;
       // corpse harvest claim: unconditional so a record without hcb (unclaimed,
       // or a respawn that cleared the claim) resets any stale mirrored pid
       e.harvestClaimedBy = typeof w.hcb === 'number' ? w.hcb : null;
+      // loot owner-lock lapse: flag present means lapsed (mirror as already
+      // counted down), absent means the lock still holds or never started;
+      // unconditional so a respawned record resets any stale lapse (same
+      // contract as hcb above). The server owns the countdown; the client only
+      // ever needs the boolean.
+      e.lootFfaTimer = w.ffa ? 0 : Infinity;
       e.ownerId = w.own ?? null;
       e.petMode = w.pm ?? 'defensive';
       e.petTauntTimer = w.pt ?? 0;
@@ -2730,7 +2767,11 @@ export class ClientWorld implements IWorld {
       e.gcdRemaining = s.gcd ?? 0;
       e.potionCdRemaining = s.pcd ?? 0;
       e.comboPoints = s.combo ?? 0;
-      e.targetId = s.target ?? null;
+      // Routed through the pending-target echo guard: a stale in-flight
+      // snapshot must not clobber an optimistic targetEntity write (the target
+      // frame + party-frames select flicker). This is the counting site: one
+      // budget decrement per self snapshot.
+      this.applySelfTargetFromServer(e, s.target ?? null, true);
       e.autoAttack = !!s.auto;
       e.swingTimer = s.swing ?? e.swingTimer;
       e.queuedOnSwing = s.queued ?? null;
@@ -2863,6 +2904,7 @@ export class ClientWorld implements IWorld {
       if (s.vcupb !== undefined) this.lastVcupShared = s.vcupb as VcSharedCupInfo | null;
       if (s.vcup !== undefined || s.vcupb !== undefined) this.recomputeCupInfo();
       if (s.market !== undefined) this.marketInfo = s.market;
+      if (s.mktU !== undefined) this.marketCollectPending = !!s.mktU;
       if (s.mail !== undefined) this.mailInfo = s.mail;
       if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
       // `bank` is delta-omitted when unchanged (an omitted key means unchanged, NOT
@@ -3140,26 +3182,84 @@ export class ClientWorld implements IWorld {
     this.cmd({ cmd: 'resurrect_respond', accept });
   }
 
+  // The single write path for the LOCAL player's mirrored targetId from server
+  // state. Two snapshot sites assign it (the wireEntity `tgt` decode in
+  // applyWire and the precise `target` self-decode, same server-side value per
+  // server/game.ts selfWireJson) and both must apply the same echo protection,
+  // else the unguarded one re-introduces the clobber. `countStale` is true only
+  // for the self-decode, so one snapshot never burns two units of the budget.
+  private applySelfTargetFromServer(
+    e: Entity,
+    serverTarget: number | null,
+    countStale: boolean,
+  ): void {
+    const pending = this.pendingTargetEcho;
+    if (!pending) {
+      e.targetId = serverTarget;
+      return;
+    }
+    if (serverTarget === pending.id) {
+      // The echo landed: the server agrees, resume normal mirroring so a LATER
+      // server-initiated change (target death, out of interest) applies again.
+      this.pendingTargetEcho = null;
+      e.targetId = serverTarget;
+      return;
+    }
+    if (countStale) {
+      pending.snapshotsLeft -= 1;
+      if (pending.snapshotsLeft <= 0) {
+        // Reconciliation valve: the server never echoed the command (it refused
+        // an invalid, dead, or out-of-interest target). Server authority wins.
+        this.pendingTargetEcho = null;
+        e.targetId = serverTarget;
+        return;
+      }
+    }
+    // A stale pre-command snapshot: keep displaying the optimistic value.
+    // Assigned (not merely skipped) so the applyWire write earlier in the same
+    // snapshot pass cannot leave the clobbered value behind.
+    e.targetId = pending.id;
+  }
+
   // --- IWorldTargeting: target selection + tab cycling ---
   targetEntity(id: number | null): void {
-    // optimistic local update for snappy UI
+    // optimistic local update for snappy UI, plus the pending echo record that
+    // shields it from in-flight stale snapshots (applySelfTargetFromServer).
+    // Armed only when the optimistic write actually happened, and never while
+    // spectating: cmd() drops non-chat commands in spectate, so no echo would
+    // ever arrive to release the hold on the spectated player's mirror.
     const p = this.entities.get(this.playerId);
     if (p) {
-      if (id === null) p.targetId = null;
-      else {
+      if (id === null) {
+        p.targetId = null;
+        if (typeof this.spectating !== 'string') {
+          // last write wins: a newer call replaces any older pending record
+          this.pendingTargetEcho = { id: null, snapshotsLeft: TARGET_ECHO_SNAPSHOT_BUDGET };
+        }
+      } else {
         const e = this.entities.get(id);
-        if (e && (!e.dead || deadTargetSelectable(e, this.playerId))) p.targetId = id;
+        if (e && (!e.dead || deadTargetSelectable(e, this.playerId))) {
+          p.targetId = id;
+          if (typeof this.spectating !== 'string') {
+            this.pendingTargetEcho = { id, snapshotsLeft: TARGET_ECHO_SNAPSHOT_BUDGET };
+          }
+        }
       }
     }
     this.cmd({ cmd: 'target', id });
   }
   tabTarget(): void {
+    // Server-resolved retarget: its result must apply from the very next
+    // snapshot, so drop any in-flight click echo hold before sending.
+    this.pendingTargetEcho = null;
     this.cmd({ cmd: 'tab' });
   }
   targetNearestFriendly(): void {
+    this.pendingTargetEcho = null; // server-resolved retarget, as tabTarget
     this.cmd({ cmd: 'targetNearestFriendly' });
   }
   friendlyTabTarget(): void {
+    this.pendingTargetEcho = null; // server-resolved retarget, as tabTarget
     this.cmd({ cmd: 'tabFriendly' });
   }
 

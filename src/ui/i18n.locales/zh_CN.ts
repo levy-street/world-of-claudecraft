@@ -6730,6 +6730,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.arrivedLog': '你收到了来自 {name} 的新邮件。',
   'hudChrome.mailbox.indicatorAria': '未读邮件：{count}',
   'hudChrome.mailbox.indicatorTip': '你有 {count} 封未读信件。请前往邮箱阅读。',
+  'hudChrome.marketIndicator.aria': '世界市场待领取物品',
+  'hudChrome.marketIndicator.tip': '有金币或物品正在商人处等待你领取。',
   'hudChrome.mailbox.clickAttach': '点击以附到信件上。',
   'hudChrome.mailbox.cannotMail': '该物品无法邮寄。',
   'hudChrome.mailbox.result.sent': '渡鸦带着你给 {name} 的信起飞了（邮资 {postage}）。',

@@ -1995,6 +1995,10 @@ export const ko_KR: EnTranslations = {
         "takeParcelsFirst": "편지를 버리기 전에 소포를 먼저 꺼내세요."
       }
     },
+    "marketIndicator": {
+      "aria": "세계 시장 수령 대기",
+      "tip": "골드나 아이템이 상인에게서 수령을 기다리고 있습니다."
+    },
     "noticeboard": {
       "empty": "게시된 내용이 없는 것 같습니다."
     },

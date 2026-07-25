@@ -1995,6 +1995,10 @@ export const it_IT: EnTranslations = {
         "takeParcelsFirst": "Ritira i pacchi prima di scartare la lettera."
       }
     },
+    "marketIndicator": {
+      "aria": "World Market collection waiting",
+      "tip": "Gold or items are waiting for you at the Merchant."
+    },
     "noticeboard": {
       "empty": "Non sembra esserci nulla di affisso."
     },

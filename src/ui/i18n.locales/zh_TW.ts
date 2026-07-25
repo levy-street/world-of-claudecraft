@@ -6731,6 +6731,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.arrivedLog': '你收到了來自 {name} 的新郵件。',
   'hudChrome.mailbox.indicatorAria': '未讀郵件：{count}',
   'hudChrome.mailbox.indicatorTip': '你有 {count} 封未讀信件。請前往郵箱閱讀。',
+  'hudChrome.marketIndicator.aria': '世界市場待領取物品',
+  'hudChrome.marketIndicator.tip': '有金幣或物品正在商人處等待你領取。',
   'hudChrome.mailbox.clickAttach': '點擊以附到信件上。',
   'hudChrome.mailbox.cannotMail': '該物品無法郵寄。',
   'hudChrome.mailbox.result.sent': '渡鴉帶著你給 {name} 的信起飛了（郵資 {postage}）。',

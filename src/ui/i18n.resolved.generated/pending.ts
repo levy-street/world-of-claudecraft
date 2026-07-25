@@ -11,6 +11,8 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.enchanting.wornTag",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -23,6 +25,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "es_ES": [
     "hudChrome.enchanting.wornTag",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -35,6 +39,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_FR": [
     "hudChrome.enchanting.wornTag",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -47,6 +53,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "fr_CA": [
     "hudChrome.enchanting.wornTag",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -60,6 +68,8 @@ export const pending: Record<string, readonly string[]> = {
   "en_CA": [],
   "it_IT": [
     "hudChrome.enchanting.wornTag",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -72,6 +82,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "de_DE": [
     "hudChrome.enchanting.wornTag",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -96,6 +108,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pt_BR": [
     "hudChrome.enchanting.wornTag",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -111,6 +125,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "cs_CZ": [
     "hudChrome.enchanting.wornTag",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -123,6 +139,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "nl_NL": [
     "hudChrome.enchanting.wornTag",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -135,6 +153,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pl_PL": [
     "hudChrome.enchanting.wornTag",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -147,6 +167,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "id_ID": [
     "hudChrome.enchanting.wornTag",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -159,6 +181,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "tr_TR": [
     "hudChrome.enchanting.wornTag",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -171,6 +195,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "sv_SE": [
     "hudChrome.enchanting.wornTag",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -183,6 +209,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "vi_VN": [
     "hudChrome.enchanting.wornTag",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",
@@ -195,6 +223,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "da_DK": [
     "hudChrome.enchanting.wornTag",
+    "hudChrome.marketIndicator.aria",
+    "hudChrome.marketIndicator.tip",
     "hudChrome.options.stickyTarget",
     "hudChrome.social.billboard.empty",
     "hudChrome.social.billboard.inputLabel",

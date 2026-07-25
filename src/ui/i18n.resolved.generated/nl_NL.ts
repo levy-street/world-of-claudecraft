@@ -1995,6 +1995,10 @@ export const nl_NL: EnTranslations = {
         "takeParcelsFirst": "Haal de pakketten eruit voordat je de brief weggooit."
       }
     },
+    "marketIndicator": {
+      "aria": "World Market collection waiting",
+      "tip": "Gold or items are waiting for you at the Merchant."
+    },
     "noticeboard": {
       "empty": "Er lijkt niets opgehangen te zijn."
     },

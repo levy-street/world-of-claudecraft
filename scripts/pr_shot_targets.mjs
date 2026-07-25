@@ -804,6 +804,32 @@ export const TARGETS = [
     },
   },
   {
+    key: 'market-collect-indicator',
+    label: 'World Market collect indicator (minimap rim badge)',
+    // Keyed on the feature's own test path (the tank-defensive-cds pattern), so a
+    // broad ui/hud.ts or styles diff does not drag this focused shot along.
+    when: ['tests/market_collect_indicator.test.ts'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    // Credit the primary player's market collection directly (TS-private fields
+    // are plain properties at runtime), so the always-on badge lights without
+    // staging a full sale; the slow HUD band repaints it within a beat. Desktop
+    // clips to the minimap cluster; mobile keeps the full frame because the
+    // badge row sits left of (outside) #minimap-wrap's box.
+    async capture(page, shot) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        if (!sim) return;
+        sim.market.marketCollections.set(String(sim.playerId), {
+          copper: 9500,
+          items: [{ itemId: 'wolf_fang', count: 1 }],
+        });
+      });
+      const lit = await pollForSize(page, '#market-indicator');
+      if (!lit) throw new Error('#market-indicator did not light');
+      return shot?.mobile ? {} : { clip: '#minimap-wrap' };
+    },
+  },
+  {
     key: 'card-duel',
     label: 'Card Duel window (Card Master)',
     when: [
