@@ -4795,8 +4795,7 @@ export class Renderer {
       }
     } else if (inside && isArenaPos(px)) {
       void ensureDungeonAssets().catch(() => undefined);
-      // build the arena pit the player was matched into (the slot's parity
-      // picks the map: even Ashen Coliseum, odd The Drowned Court)
+      // build the Ashen Coliseum copy the player was matched into
       for (let i = 0; i < ARENA_SLOT_COUNT; i++) {
         const key = `arena:${i}`;
         if (this.builtInteriors.has(key)) continue;
