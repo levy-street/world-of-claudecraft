@@ -167,9 +167,12 @@ export function buildDemonTowerFloor(
     pillars: [],
     tombs: [],
     stubs: [],
-    // The core stands where a normal rift floor would put its boss dais. Walkable
-    // by the same contract: the raid fights around it, never blocked by it.
+    // The core stands where a normal rift floor would put its boss dais, but it
+    // is a SOLID centrepiece rather than a walkable platform: a 5-yard trunk you
+    // could walk through is exactly the phantom-wall problem the rift already
+    // fixed once. `obstacles` backs it with its measured footprint.
     dais: { x: 0, z: 0, r: DEMON_TOWER_CORE_RADIUS },
+    obstacles: [{ x: 0, z: 0, r: DEMON_TOWER_CORE_RADIUS }],
     wallX,
     endWallHw: wallX,
     floorHalfX: wallX,

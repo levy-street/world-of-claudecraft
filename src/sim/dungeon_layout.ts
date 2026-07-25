@@ -63,6 +63,11 @@ export interface DungeonLayout {
   doorZ?: number;
   /** floor scatter positions, renderer places props here AND collision circles back them */
   clutter?: GridPoint[];
+  /** Authored obstacles with a MEASURED radius, for centrepieces whose footprint
+   * the fixed-radius `clutter`/`pillars` circles cannot express (the Demon
+   * Tower's core is 2.7 yards across). Collision and the renderer read the same
+   * record, so what you bump into is what you see. */
+  obstacles?: Array<{ x: number; z: number; r: number }>;
   /** Illusion (fake) walls: rendered as solid wall panels but NOT backed by a
    * collider (deliberately excluded from layoutColliders), so the player walks
    * THROUGH them into a hidden pocket. Used by rifts to conceal off-path treasure. */
@@ -338,5 +343,7 @@ export function layoutColliders(layout: DungeonLayout): Collider[] {
     out.push({ type: 'obb', x: t.x, z: t.z, hw: TOMB_HW, hd: TOMB_HD, rot: 0 });
   // floor clutter props (small circle per scatter point; renderer places matching props)
   for (const c of layout.clutter ?? []) out.push({ type: 'circle', x: c.x, z: c.z, r: 0.8 });
+  // authored centrepieces, at their measured footprint
+  for (const o of layout.obstacles ?? []) out.push({ type: 'circle', x: o.x, z: o.z, r: o.r });
   return out;
 }

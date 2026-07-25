@@ -90,9 +90,10 @@ export function isDemonTowerBossFloor(floorIndex: number): boolean {
 }
 
 /** Collision radius of the Demon Core standing at the centre of every arena.
- * Measured from the built GLB by the asset pipeline's prop lane, so what the
- * raid bumps into is what it sees; the wave ring is placed clear of it. */
-export const DEMON_TOWER_CORE_RADIUS = 3.4;
+ * MEASURED from the built GLB by the asset pipeline's prop lane (job
+ * `demon_core`, footprint r 2.74 at its shipped 6-yard height), so what the raid
+ * bumps into is what it sees; the wave ring is placed clear of it. */
+export const DEMON_TOWER_CORE_RADIUS = 2.74;
 
 /** The arena TIGHTENS as you climb (34 yards at the base, 22 at the summit), so
  * the same pack size reads as more pressure without needing more demons. Pure so

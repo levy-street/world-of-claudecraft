@@ -266,6 +266,9 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated prop model (wildheart_giant_fern) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (wildheart_ancestor_ruin) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (wildheart_jungle_canopy_tree) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (demon_core) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (tower_ring_fin) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
+| Generated prop model (tower_gargoyle_perch) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not
 committed.
