@@ -1049,6 +1049,7 @@ export const ko_KR: EnTranslations = {
       "walkByAutoloot": "지나가며 자동 획득",
       "groundReticle": "지면 조준 표시기",
       "mouseoverCast": "파티 창에서 마우스오버 시전",
+      "stickyTarget": "지면 클릭 시 대상 유지",
       "showItemLevel": "아이템 레벨 표시",
       "itemLevelLine": "아이템 레벨 {level}",
       "itemScoreLine": "점수 {score}",

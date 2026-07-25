@@ -1049,6 +1049,7 @@ export const pt_BR: EnTranslations = {
       "walkByAutoloot": "Saque Automático ao Passar",
       "groundReticle": "Retícula de mira no chão",
       "mouseoverCast": "Conjuração ao Apontar nos Quadros do Grupo",
+      "stickyTarget": "Keep Target on Ground Click",
       "showItemLevel": "Mostrar nível do item",
       "itemLevelLine": "Nível do item {level}",
       "itemScoreLine": "Pontuação {score}",

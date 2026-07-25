@@ -11,28 +11,34 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.marketIndicator.aria",
-    "hudChrome.marketIndicator.tip"
+    "hudChrome.marketIndicator.tip",
+    "hudChrome.options.stickyTarget"
   ],
   "es_ES": [
     "hudChrome.marketIndicator.aria",
-    "hudChrome.marketIndicator.tip"
+    "hudChrome.marketIndicator.tip",
+    "hudChrome.options.stickyTarget"
   ],
   "fr_FR": [
     "hudChrome.marketIndicator.aria",
-    "hudChrome.marketIndicator.tip"
+    "hudChrome.marketIndicator.tip",
+    "hudChrome.options.stickyTarget"
   ],
   "fr_CA": [
     "hudChrome.marketIndicator.aria",
-    "hudChrome.marketIndicator.tip"
+    "hudChrome.marketIndicator.tip",
+    "hudChrome.options.stickyTarget"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.marketIndicator.aria",
-    "hudChrome.marketIndicator.tip"
+    "hudChrome.marketIndicator.tip",
+    "hudChrome.options.stickyTarget"
   ],
   "de_DE": [
     "hudChrome.marketIndicator.aria",
-    "hudChrome.marketIndicator.tip"
+    "hudChrome.marketIndicator.tip",
+    "hudChrome.options.stickyTarget"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -40,39 +46,48 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "hudChrome.marketIndicator.aria",
-    "hudChrome.marketIndicator.tip"
+    "hudChrome.marketIndicator.tip",
+    "hudChrome.options.stickyTarget"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "hudChrome.marketIndicator.aria",
-    "hudChrome.marketIndicator.tip"
+    "hudChrome.marketIndicator.tip",
+    "hudChrome.options.stickyTarget"
   ],
   "nl_NL": [
     "hudChrome.marketIndicator.aria",
-    "hudChrome.marketIndicator.tip"
+    "hudChrome.marketIndicator.tip",
+    "hudChrome.options.stickyTarget"
   ],
   "pl_PL": [
     "hudChrome.marketIndicator.aria",
-    "hudChrome.marketIndicator.tip"
+    "hudChrome.marketIndicator.tip",
+    "hudChrome.options.stickyTarget"
   ],
   "id_ID": [
     "hudChrome.marketIndicator.aria",
-    "hudChrome.marketIndicator.tip"
+    "hudChrome.marketIndicator.tip",
+    "hudChrome.options.stickyTarget"
   ],
   "tr_TR": [
     "hudChrome.marketIndicator.aria",
-    "hudChrome.marketIndicator.tip"
+    "hudChrome.marketIndicator.tip",
+    "hudChrome.options.stickyTarget"
   ],
   "sv_SE": [
     "hudChrome.marketIndicator.aria",
-    "hudChrome.marketIndicator.tip"
+    "hudChrome.marketIndicator.tip",
+    "hudChrome.options.stickyTarget"
   ],
   "vi_VN": [
     "hudChrome.marketIndicator.aria",
-    "hudChrome.marketIndicator.tip"
+    "hudChrome.marketIndicator.tip",
+    "hudChrome.options.stickyTarget"
   ],
   "da_DK": [
     "hudChrome.marketIndicator.aria",
-    "hudChrome.marketIndicator.tip"
+    "hudChrome.marketIndicator.tip",
+    "hudChrome.options.stickyTarget"
   ]
 };

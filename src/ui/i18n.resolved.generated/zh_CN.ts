@@ -1049,6 +1049,7 @@ export const zh_CN: EnTranslations = {
       "walkByAutoloot": "路过自动拾取",
       "groundReticle": "地面瞄准指示圈",
       "mouseoverCast": "队伍头像上鼠标悬停施法",
+      "stickyTarget": "点击地面时保留目标",
       "showItemLevel": "显示物品等级",
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",

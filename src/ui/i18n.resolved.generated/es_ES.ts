@@ -1049,6 +1049,7 @@ export const es_ES: EnTranslations = {
       "walkByAutoloot": "Saqueo automático al pasar",
       "groundReticle": "Retícula de objetivo terrestre",
       "mouseoverCast": "Lanzar al pasar el ratón sobre los marcos de grupo",
+      "stickyTarget": "Keep Target on Ground Click",
       "showItemLevel": "Mostrar nivel de objeto",
       "itemLevelLine": "Nivel de objeto {level}",
       "itemScoreLine": "Puntuación {score}",
