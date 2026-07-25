@@ -7081,6 +7081,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.arrivedLog': '{name}から新しい手紙が届きました。',
   'hudChrome.mailbox.indicatorAria': '未読の手紙：{count}',
   'hudChrome.mailbox.indicatorTip': '未読の手紙が{count}通あります。メールボックスで読めます。',
+  'hudChrome.marketIndicator.aria': '世界市場の受け取り待ち',
+  'hudChrome.marketIndicator.tip': 'ゴールドやアイテムが商人のもとで受け取りを待っています。',
   'hudChrome.mailbox.clickAttach': 'クリックで手紙に添付します。',
   'hudChrome.mailbox.cannotMail': 'これは郵送できません。',
   'hudChrome.mailbox.result.sent':

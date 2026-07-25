@@ -6115,6 +6115,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.mailbox.toPlaceholder'
   | 'hudChrome.mailbox.truncated'
   | 'hudChrome.mailbox.unreadBadge'
+  | 'hudChrome.marketIndicator.aria'
+  | 'hudChrome.marketIndicator.tip'
   | 'hudChrome.masterLoot.assignAria'
   | 'hudChrome.masterLoot.assignPrompt'
   | 'hudChrome.masterLoot.assigned'
