@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import { type MarketQuery, marketItemMatches, sanitizeMarketQuery } from '../src/sim/market_query';
 import {
   MARKET_ARMOR_CLASS_FILTERS,
@@ -170,6 +171,27 @@ describe('World Market filters', () => {
     ]);
   });
 
+  it('keeps the armor-class filter meaningful for every armor record', () => {
+    // The 'armor' item type deliberately admits held offhands (orbs, lanterns), which the
+    // class predicate then rejects via its `kind === 'armor'` clause. That clause is only
+    // inert while no held offhand carries an armorType, so pin the content assumption: the
+    // day one does, this reddens and someone revisits itemMatchesArmorClass.
+    const offhands = Object.values(ITEMS).filter((item) => item.kind === 'held_offhand');
+    expect(offhands.length).toBeGreaterThan(0);
+    expect(offhands.every((item) => item.armorType === undefined)).toBe(true);
+    // And every armorType in the catalog is an option the browse can actually select, so a
+    // new armor class can never be silently unfilterable.
+    const classes = new Set(
+      Object.values(ITEMS)
+        .map((item) => item.armorType)
+        .filter((armorType): armorType is NonNullable<typeof armorType> => armorType !== undefined),
+    );
+    expect([...classes].sort()).toEqual(['cloth', 'leather', 'mail']);
+    for (const armorClass of classes) {
+      expect(MARKET_ARMOR_CLASS_FILTERS).toContain(armorClass);
+    }
+  });
+
   it('combines armor class, slot, and dominant primary stat filters', () => {
     const armor = [
       'eastbrook_warded_leggings',
@@ -204,6 +226,36 @@ describe('World Market filters', () => {
     expect(filterIds(gear, { itemType: 'weapon', primaryStat: 'agi' })).toEqual([
       'kingsbane_last_oath',
     ]);
+  });
+
+  it('narrows WEAPONS by dominant primary stat too, not only armor', () => {
+    // The armor cases above cannot prove the weapon half of the itemType guard: the only
+    // weapon in that fixture is the one tied str/agi piece, so it matches whether or not
+    // the filter runs. These weapons each have a DIFFERENT dominant stat, so making the
+    // primary-stat filter a no-op for weapons reddens all three lines.
+    const weapons = [
+      'bonewrought_greatsword', // str 14
+      'direfang_greatblade', // agi 14
+      'drownedmoon_scepter', // int 10
+      'worn_sword', // no stats at all
+    ];
+    expect(filterIds(weapons, { itemType: 'weapon', primaryStat: 'str' })).toEqual([
+      'bonewrought_greatsword',
+    ]);
+    expect(filterIds(weapons, { itemType: 'weapon', primaryStat: 'agi' })).toEqual([
+      'direfang_greatblade',
+    ]);
+    expect(filterIds(weapons, { itemType: 'weapon', primaryStat: 'int' })).toEqual([
+      'drownedmoon_scepter',
+    ]);
+    // Dominance, not mere presence: the greatstaff carries agi 4 under str 5, so it is a
+    // Strength weapon only.
+    expect(filterIds(['cragthorn_greatstaff'], { itemType: 'weapon', primaryStat: 'str' })).toEqual(
+      ['cragthorn_greatstaff'],
+    );
+    expect(filterIds(['cragthorn_greatstaff'], { itemType: 'weapon', primaryStat: 'agi' })).toEqual(
+      [],
+    );
   });
 
   it('ignores advanced filters outside their matching item type', () => {

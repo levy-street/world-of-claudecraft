@@ -249,7 +249,12 @@ describe('market_window: behavior preserved through the core', () => {
     );
   });
 
-  it('renders armor class and dominant primary-stat menus and sends both in the query', () => {
+  // Source discipline only: the RENDERED menus, their labels, the committed values and the
+  // emitted query are asserted for real in tests/browser/keyboard_nav.browser.test.ts. The
+  // aria-label grep below is not redundant with it: reverting to a hand-built
+  // `${label}: ${current}` produces a byte-identical English string, so the DOM assertion
+  // cannot see that regression and this source pin is the only guard against it.
+  it('wires the advanced filters through the shared constants and the i18n aria pattern', () => {
     expect(painter).toContain('MARKET_ARMOR_CLASS_FILTERS');
     expect(painter).toContain('MARKET_PRIMARY_STAT_FILTERS');
     expect(painter).toMatch(/this\.renderMarketFilterMenu\(\s*'armorClass'/);

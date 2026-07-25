@@ -299,6 +299,22 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
       root.querySelector<HTMLElement>('[data-market-filter-menu="itemType"]'),
       'itemType filter menu',
     );
+  // The visible caption sitting above a dropdown (the `.mkt-filter > span`).
+  const filterLabel = (root: HTMLElement, menu: string) =>
+    req(
+      root
+        .querySelector<HTMLElement>(`[data-market-filter-menu="${menu}"]`)
+        ?.closest('.mkt-filter')
+        ?.querySelector<HTMLElement>('span'),
+      `${menu} filter label`,
+    ).textContent;
+  const optionLabels = (menu: HTMLElement) =>
+    Array.from(menu.querySelectorAll<HTMLElement>('.mkt-select-option')).map((o) => o.textContent);
+  const pickItemType = (root: HTMLElement, value: string) =>
+    req(
+      itemTypeMenu(root).querySelector<HTMLButtonElement>(`[data-market-filter-option="${value}"]`),
+      `${value} item type option`,
+    ).click();
 
   it('opens by keyboard, roves with arrows, and commits the focused filter with Enter', () => {
     const root = openMarket();
@@ -331,10 +347,10 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
   it('reveals armor class and primary-stat menus for armor and commits their options', () => {
     const queries: MarketQuery[] = [];
     const root = openMarket(queries);
-    req(
-      itemTypeMenu(root).querySelector<HTMLButtonElement>('[data-market-filter-option="armor"]'),
-      'armor item type option',
-    ).click();
+    // Both advanced menus are gated: neither exists on the default 'all' browse.
+    expect(root.querySelector('[data-market-filter-menu="armorClass"]')).toBeNull();
+    expect(root.querySelector('[data-market-filter-menu="primaryStat"]')).toBeNull();
+    pickItemType(root, 'armor');
 
     const armorClass = req(
       root.querySelector<HTMLElement>('[data-market-filter-menu="armorClass"]'),
@@ -345,6 +361,11 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
         (option) => option.dataset.marketFilterOption,
       ),
     ).toEqual(['all', 'cloth', 'leather', 'mail']);
+    // The rendered copy, not just the option keys: the whole point of the new
+    // filterArmorSlot key is that the two armor dropdowns no longer BOTH read "Armor type".
+    expect(optionLabels(armorClass)).toEqual(['All armor types', 'Cloth', 'Leather', 'Mail']);
+    expect(filterLabel(root, 'subtype')).toBe('Armor slot');
+    expect(filterLabel(root, 'armorClass')).toBe('Armor type');
     req(
       armorClass.querySelector<HTMLButtonElement>('[data-market-filter-option="mail"]'),
       'mail option',
@@ -359,6 +380,13 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
         (option) => option.dataset.marketFilterOption,
       ),
     ).toEqual(['all', 'str', 'agi', 'int']);
+    expect(optionLabels(primaryStat)).toEqual([
+      'Any primary stat',
+      'Strength',
+      'Agility',
+      'Intellect',
+    ]);
+    expect(filterLabel(root, 'primaryStat')).toBe('Primary stat');
     req(
       primaryStat.querySelector<HTMLButtonElement>('[data-market-filter-option="int"]'),
       'intellect option',
@@ -374,23 +402,42 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
         .querySelector('[data-market-filter-menu="primaryStat"] [aria-selected="true"]')
         ?.getAttribute('data-market-filter-option'),
     ).toBe('int');
-    expect(queries.at(-1)).toMatchObject({
+    // The trigger's accessible name is the localized "{label}: {value}" pattern, not a
+    // hand-concatenated string, and it reflects the committed value.
+    expect(
+      req(
+        root.querySelector<HTMLElement>('[data-market-filter-menu="primaryStat"] .mkt-select-btn'),
+        'primaryStat trigger',
+      ).getAttribute('aria-label'),
+    ).toBe('Primary stat: Intellect');
+    // toEqual, not toMatchObject: a dropped or stray sibling field must redden here too.
+    expect(queries.at(-1)).toEqual({
+      search: '',
       itemType: 'armor',
+      subtype: 'all',
       armorClass: 'mail',
       primaryStat: 'int',
+      rarity: 'all',
+      page: 0,
     });
 
-    req(
-      itemTypeMenu(root).querySelector<HTMLButtonElement>('[data-market-filter-option="weapon"]'),
-      'weapon item type option',
-    ).click();
+    pickItemType(root, 'weapon');
     expect(root.querySelector('[data-market-filter-menu="armorClass"]')).toBeNull();
     expect(root.querySelector('[data-market-filter-menu="primaryStat"]')).toBeTruthy();
-    expect(queries.at(-1)).toMatchObject({
+    expect(queries.at(-1)).toEqual({
+      search: '',
       itemType: 'weapon',
+      subtype: 'all',
       armorClass: 'all',
       primaryStat: 'all',
+      rarity: 'all',
+      page: 0,
     });
+
+    // ...and both advanced menus disappear again for a type that has neither.
+    pickItemType(root, 'consumable');
+    expect(root.querySelector('[data-market-filter-menu="armorClass"]')).toBeNull();
+    expect(root.querySelector('[data-market-filter-menu="primaryStat"]')).toBeNull();
   });
 
   it('Escape closes the listbox and returns focus to the trigger', () => {
