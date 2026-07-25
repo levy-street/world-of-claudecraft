@@ -183,6 +183,33 @@ describe('same-stat elixirs are exclusive, last drunk wins', () => {
     }
   });
 
+  it('displacing a different-name elixir emits its fade event alongside the gain', () => {
+    const { sim, pid } = playerWorld();
+    drink(sim, pid, 'elixir_of_the_bear');
+    sim.drainEvents();
+    drink(sim, pid, 'elixir_of_the_serpent');
+    const evs = sim.drainEvents();
+    expect(
+      evs.some((e) => e.type === 'aura' && e.name === 'Might of the Bear' && e.gained === false),
+      'the displaced Bear aura fades visibly in the event stream',
+    ).toBe(true);
+    expect(
+      evs.some((e) => e.type === 'aura' && e.name === 'Might of the Serpent' && e.gained === true),
+    ).toBe(true);
+  });
+
+  it('a same-item refresh emits no fade event (same name stays silent)', () => {
+    const { sim, pid } = playerWorld();
+    drink(sim, pid, 'elixir_of_the_bear');
+    sim.drainEvents();
+    drink(sim, pid, 'elixir_of_the_bear');
+    const evs = sim.drainEvents();
+    expect(evs.some((e) => e.type === 'aura' && e.gained === false)).toBe(false);
+    expect(
+      evs.some((e) => e.type === 'aura' && e.name === 'Might of the Bear' && e.gained === true),
+    ).toBe(true);
+  });
+
   it('every elixir item in the catalog maps to the shared per-kind aura id', () => {
     // Content-shape pin: a future fifth stamina elixir lands in this loop
     // automatically and cannot silently reintroduce per-item stacking.

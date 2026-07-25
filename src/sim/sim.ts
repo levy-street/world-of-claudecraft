@@ -5367,8 +5367,15 @@ export class Sim {
     )
       return;
     for (const existing of replacementConflicts) {
-      this.applyNonPlayerStatAura(target, target.auras[existing], -1);
+      const displaced = target.auras[existing];
+      this.applyNonPlayerStatAura(target, displaced, -1);
       target.auras.splice(existing, 1);
+      // A same-id replacement that swaps in a DIFFERENT display name (a
+      // same-stat elixir overwriting another brand) would otherwise vanish
+      // from the buff bar with no combat-log trace: emit the fade the client
+      // cannot infer. Same-name refreshes stay silent, exactly as before.
+      if (displaced.name !== aura.name)
+        this.emit({ type: 'aura', targetId: target.id, name: displaced.name, gained: false });
     }
     target.auras.push(aura);
     if (aura.kind === 'stealth') target.stealthed = true; // keep the cache live without waiting for updateAuras
