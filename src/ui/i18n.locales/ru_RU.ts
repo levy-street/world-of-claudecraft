@@ -9236,7 +9236,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'sim.sourceCave.leave': 'Вы покидаете Открытый Исток.',
   'sim.sourceCave.rebootConfirm':
     'Вы уверены, что хотите продолжить? Прежде чем нажать, убедитесь, что собрали все необходимые ресурсы.',
-  'sim.sourceCave.killProgress': '{name} повержен. (Побеждено {killed} из {total} в Открытом Истоке)',
+  'sim.sourceCave.killProgress':
+    '{name} повержен. (Побеждено {killed} из {total} в Открытом Истоке)',
   'sim.sourceCave.cleared': 'Открытый Исток зачищен.',
   'sim.sourceCave.accessDenied': 'Доступ запрещен.',
   'sim.sourceCave.wellBanter1': 'Это просто колодец. В нём хранится вода. Иди своей дорогой.',

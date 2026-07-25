@@ -146,12 +146,21 @@ One consequence to know: `worldContent.sourceCaveWellName` and
 well-name key no longer distinguishes anything in English. It is kept because it is
 already translated and because the two remain conceptually distinct surfaces.
 
-**Locale debt from the rename**: seven keys inline the dungeon name in their translated
-value (`entities.dungeons.source_cave.{name,enterText,leaveText}` and
-`sim.sourceCave.{enter,leave,cleared,killProgress}`). Their non-English overlays still say
-"Source Cave" and are now stale in all 20 non-English locales. Contributors never edit
-`src/ui/i18n.locales/`, so this is a release-time refill (the `i18n-locale-fill` skill).
-It will NOT be caught by the pending-row check: the rows are populated, just wrong.
+**Locale debt from the rename**: seven keys spell the dungeon name out inside their
+translated value (`entities.dungeons.source_cave.{name,enterText,leaveText}` and
+`sim.sourceCave.{enter,leave,cleared,killProgress}`), so renaming it invalidated every
+non-English value they held.
+
+The five M16 locales were refilled in the same change, reusing the rendering already
+approved for the entrance well so the place reads the same everywhere. Russian needed the
+accusative and prepositional forms declined and the clear line re-agreed, the new name
+being masculine where the old one was feminine. The other fifteen locales were never
+filled for these keys and remain `pending`, which the release gate reports correctly.
+
+Worth knowing if this happens again: **nothing would have caught the five**. The staleness
+machinery is scaffolded but not live, because `scripts/i18n_scan.mjs` recomputes `srcHash`
+from the current English on every run, so a filled row never flips back to `pending` on a
+reword. Any future rename has to refill them by hand, as this one did.
 
 ## Open items
 
