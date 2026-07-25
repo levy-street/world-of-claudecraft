@@ -269,7 +269,7 @@ export class CharacterVisual {
     // swaps restore it like any other mesh.
     if (this.def.halo !== undefined) {
       const head = this.model.getObjectByName('head');
-      head?.add(buildHalo(this.def.halo));
+      head?.add(buildHalo(this.def.halo, this.def.haloUpOffset, this.def.haloRadius));
     }
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;
