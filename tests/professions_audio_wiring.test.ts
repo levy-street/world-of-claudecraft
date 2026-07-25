@@ -90,3 +90,31 @@ describe('disenchantResult audio wiring', () => {
     expect(body.indexOf('audio.disenchant();')).toBeLessThan(body.indexOf('else'));
   });
 });
+
+describe('salvageResult audio wiring', () => {
+  // salvageItem is called from the bag item action menu, same shape as
+  // disenchantResult above.
+  it('plays the salvage cue on a successful salvage, not on a denial', () => {
+    const start = hud.indexOf("case 'salvageResult':");
+    expect(start).toBeGreaterThan(-1);
+    const end = hud.indexOf('break;', start);
+    const body = hud.slice(start, end);
+    expect(body).toContain("if (toast.sink === 'log') {");
+    expect(body).toContain('audio.salvage();');
+    expect(body.indexOf('audio.salvage();')).toBeLessThan(body.indexOf('else'));
+  });
+});
+
+describe('enchantResult audio wiring', () => {
+  // applyEnchant is called from the bag item action menu, same shape as
+  // disenchantResult above.
+  it('plays the enchant cue on a successful apply-enchant, not on a denial', () => {
+    const start = hud.indexOf("case 'enchantResult':");
+    expect(start).toBeGreaterThan(-1);
+    const end = hud.indexOf('break;', start);
+    const body = hud.slice(start, end);
+    expect(body).toContain("if (toast.sink === 'log') {");
+    expect(body).toContain('audio.enchant();');
+    expect(body.indexOf('audio.enchant();')).toBeLessThan(body.indexOf('else'));
+  });
+});
