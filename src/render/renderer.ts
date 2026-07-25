@@ -7099,6 +7099,12 @@ export class Renderer {
     this.raycaster.setFromCamera(ndc, this.camera);
     const hits = this.raycaster.intersectObjects(this.gatherNodeMeshes, true);
     for (const hit of hits) {
+      // Instanced node batches resolve through the hit's instanceId.
+      const ids = hit.object.userData.gatherNodeIds as string[] | undefined;
+      if (Array.isArray(ids) && typeof hit.instanceId === 'number') {
+        const id = ids[hit.instanceId];
+        if (typeof id === 'string') return id;
+      }
       let o: THREE.Object3D | null = hit.object;
       while (o) {
         if (typeof o.userData.gatherNodeId === 'string') return o.userData.gatherNodeId as string;

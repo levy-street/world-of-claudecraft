@@ -21,6 +21,7 @@ import {
   isEastbrookRebuildWell,
 } from './eastbrook_town';
 import { GFX, sharedUniforms, surfaceMat } from './gfx';
+import { type PropCellBounds, propCellKey, propCellMode } from './prop_cell_core';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -701,14 +702,23 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   /**
    * Mark `g` un-mergeable and register it as hide-when-camera-crossed. Each
    * mesh's material is cloned so flipping colour/depth writes hides only this
-   * structure (and leaves the shadow pass untouched).
+   * structure (and leaves the shadow pass untouched). The pre-clone shared
+   * material is recorded per mesh so the far-cell bake (buildFarPropCells)
+   * can merge distant copies of these structures on the SHARED materials.
    */
   function registerHideable(g: THREE.Group, fp: Footprint): void {
     const matMap = new Map<THREE.Material, ToggleMat>();
+    const bakeMeshes: HideableBakeMesh[] = [];
     g.traverse((o) => {
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh) return;
       keepFromMerge.add(mesh);
+      // Animated flames and transparent meshes stay live in both modes (the
+      // bake would freeze the flicker or break blend ordering).
+      const srcMat = mesh.material as THREE.Material;
+      if (!flames.includes(mesh) && srcMat.transparent !== true) {
+        bakeMeshes.push({ mesh, srcMat });
+      }
       if (lowProps) return;
       const src = mesh.material as THREE.Material;
       let tm = matMap.get(src);
@@ -719,7 +729,15 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       }
       mesh.material = tm.mat;
     });
-    hideables.push({ group: g, mats: [...matMap.values()], hidden: false, ...fp });
+    hideables.push({
+      group: g,
+      mats: [...matMap.values()],
+      hidden: false,
+      cellKey: propCellKey(fp.x, fp.z),
+      bakeMeshes,
+      suppressed: false,
+      ...fp,
+    });
   }
 
   // live small materials (decals / glow) — shared, never per-instance
@@ -790,7 +808,10 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     if (typeof scale === 'number') tmpScale.setScalar(scale);
     else tmpScale.set(scale[0], scale[1], scale[2]);
     const band = Math.floor((z - WORLD_MIN_Z) / MERGE_BAND_DEPTH);
-    const bucketKey = `${key}:${band}`;
+    // Split bands into x-halves (the foliage bucket pattern): a world-wide
+    // band's bounding sphere always intersects the shadow frustum, so it
+    // re-submits into the shadow map every frame; half-bands cull.
+    const bucketKey = `${key}:${x < 0 ? 'w' : 'e'}:${band}`;
     let bucket = instanceBatches.get(bucketKey);
     if (!bucket) {
       bucket = { key, mats: [] };
@@ -1545,6 +1566,11 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     if (bounds) cullables.push(bounds);
   }
 
+  // Far-cell merged bakes for the hideables (dual representation): identical
+  // world-baked geometry on the SHARED pre-clone materials, one mesh per
+  // (cell, material, castShadow). The per-frame swap lives in update().
+  const farCells = buildFarPropCells(group, hideables);
+
   return {
     group,
     flames,
@@ -1561,6 +1587,38 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       for (const c of cullables) {
         c.obj.visible = cullableVisible(c, camX, camZ, fogFar);
       }
+      // Far-cell swap first (prop_cell_core): distant cells draw their merged
+      // bake and suppress the members' individual baked meshes; near cells
+      // (where the ghost fade can fire) draw the individuals while the bake
+      // stays as the shadow-only caster. Pixel-identical both ways.
+      for (const cell of farCells) {
+        const mode = propCellMode(cell.bounds, camX, camZ, fogFar);
+        // Near cells stay visible for the shadow pass (count-gated out of the
+        // color pass); far cells hide entirely past the fog.
+        const visible = mode.farMode ? mode.showMerged : true;
+        if (visible !== cell.visible) {
+          cell.visible = visible;
+          for (const m of cell.meshes) m.visible = visible;
+        }
+        if (mode.farMode !== cell.farMode) {
+          cell.farMode = mode.farMode;
+          for (const m of cell.meshes) m.count = mode.farMode ? 1 : 0;
+          for (const h of cell.hideables) {
+            h.suppressed = mode.farMode;
+            for (const b of h.bakeMeshes) b.mesh.visible = !mode.farMode;
+            // A stale ghost fade (camera teleport) must not survive into far
+            // mode, or the merged bake would double-draw over a solid twin
+            // when the cell swaps back.
+            if (mode.farMode && h.hidden) {
+              h.hidden = false;
+              for (const m of h.mats) {
+                m.mat.colorWrite = true;
+                m.mat.depthWrite = m.depthWrite;
+              }
+            }
+          }
+        }
+      }
       for (const h of hideables) {
         const dx = camX - h.x,
           dz = camZ - h.z;
@@ -1568,6 +1626,10 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
           h.group.visible = false; // fully fogged: drop it (shadow is out of range too)
           continue;
         }
+        h.group.visible = true;
+        // Far mode: the merged cell bake draws instead; flames/transparent
+        // members stay live on the group, and the ghost fade cannot fire.
+        if (h.suppressed) continue;
         // Hide from the camera while still casting a shadow: disable colour +
         // depth writes, not the object.
         const hide = cameraSegmentHitsFootprint(h, eyeX, eyeY, eyeZ, camX, camY, camZ);
@@ -1576,7 +1638,6 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
           h.group.visible = !hide;
           continue;
         }
-        h.group.visible = true;
         if (hide !== h.hidden) {
           h.hidden = hide;
           for (const m of h.mats) {
@@ -1595,15 +1656,29 @@ interface ToggleMat {
   depthWrite: boolean;
 }
 
+// One mesh of a hideable structure plus its pre-clone SHARED material, the
+// pair the far-cell bake merges on (see buildFarPropCells).
+interface HideableBakeMesh {
+  mesh: THREE.Mesh;
+  srcMat: THREE.Material;
+}
+
 // A prop that the camera ghosts through and the renderer hides whenever the
 // eye-to-camera segment crosses its footprint (below `topY`). Either a circle
 // (`r`) or an OBB (`hw`/`hd`/`rot`), matching the collider it mirrors. "Hidden"
 // disables colour/depth writes rather than `visible = false`, so the structure
 // stays in the shadow pass and keeps casting its shadow.
+//
+// Dual representation: while the camera is far from the structure's cell (the
+// ghost fade can never fire there), its baked meshes are suppressed and the
+// cell's merged bake draws instead (prop_cell_core.ts).
 interface Hideable {
   group: THREE.Group;
   mats: ToggleMat[]; // cloned per-structure so the toggle is local
   hidden: boolean;
+  cellKey: string; // far-cell membership (prop_cell_core)
+  bakeMeshes: HideableBakeMesh[]; // meshes swapped out in far mode
+  suppressed: boolean; // far mode: baked meshes hidden, merged cell draws
   x: number; // footprint centre (world XZ)
   z: number;
   topY: number; // roof height; a camera above this never hides the structure
@@ -1614,7 +1689,25 @@ interface Hideable {
   rot?: number;
 }
 
-type Footprint = Omit<Hideable, 'group' | 'mats' | 'hidden'>;
+// One far cell: the merged bakes for every hideable structure whose footprint
+// falls in the cell, plus the members to swap against (prop_cell_core.ts).
+// The bakes are single-instance InstancedMeshes so the near-mode shadow-only
+// gate (count 0 in the color pass, 1 for the shadow draw) can make the bake
+// the cell's ONLY shadow caster in both modes: the individuals never cast,
+// and their union IS the bake, so the shadows are pixel-identical while the
+// per-structure shadow submissions collapse to one per (material, cell).
+interface FarPropCell {
+  bounds: PropCellBounds;
+  meshes: THREE.InstancedMesh[];
+  hideables: Hideable[];
+  farMode: boolean;
+  visible: boolean;
+}
+
+type Footprint = Omit<
+  Hideable,
+  'group' | 'mats' | 'hidden' | 'cellKey' | 'bakeMeshes' | 'suppressed'
+>;
 
 function circleFootprint(x: number, z: number, r: number, topY: number, cull = r): Footprint {
   return { x, z, r, topY, cull };
@@ -1789,6 +1882,110 @@ function cullableVisible(c: PropCullable, camX: number, camZ: number, fogFar: nu
   return Math.hypot(c.cx - camX, c.cz - camZ) - c.r < fogFar;
 }
 
+// Far-cell merged bakes for the camera-ghost hideables (dual representation,
+// see prop_cell_core.ts). Every bakeable mesh of every hideable is baked into
+// world space and merged per (cell, SHARED material, castShadow); the merged
+// meshes start invisible and update() swaps them against the individual
+// structures per cell. Geometry is cloned/de-indexed exactly like
+// mergeStaticMeshes below, so the swap is pixel-identical.
+function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCell[] {
+  group.updateMatrixWorld(true);
+  interface CellBucket {
+    material: THREE.Material;
+    castShadow: boolean;
+    geoms: THREE.BufferGeometry[];
+  }
+  interface CellBuild {
+    buckets: Map<string, CellBucket>;
+    bounds: PropCellBounds;
+    hideables: Hideable[];
+  }
+  const cells = new Map<string, CellBuild>();
+  const box = new THREE.Box3();
+  for (const h of hideables) {
+    if (h.bakeMeshes.length === 0) continue;
+    let cell = cells.get(h.cellKey);
+    if (!cell) {
+      cell = {
+        buckets: new Map(),
+        bounds: {
+          minX: Infinity,
+          maxX: -Infinity,
+          minZ: Infinity,
+          maxZ: -Infinity,
+        },
+        hideables: [],
+      };
+      cells.set(h.cellKey, cell);
+    }
+    cell.hideables.push(h);
+    for (const { mesh, srcMat } of h.bakeMeshes) {
+      const key = `${srcMat.uuid}:${mesh.castShadow ? 1 : 0}`;
+      let bucket = cell.buckets.get(key);
+      if (!bucket) {
+        bucket = { material: srcMat, castShadow: mesh.castShadow, geoms: [] };
+        cell.buckets.set(key, bucket);
+      }
+      const geo = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
+      geo.applyMatrix4(mesh.matrixWorld);
+      geo.computeBoundingBox();
+      if (geo.boundingBox) {
+        box.copy(geo.boundingBox);
+        cell.bounds.minX = Math.min(cell.bounds.minX, box.min.x);
+        cell.bounds.maxX = Math.max(cell.bounds.maxX, box.max.x);
+        cell.bounds.minZ = Math.min(cell.bounds.minZ, box.min.z);
+        cell.bounds.maxZ = Math.max(cell.bounds.maxZ, box.max.z);
+      }
+      bucket.geoms.push(geo);
+    }
+  }
+  const out: FarPropCell[] = [];
+  for (const cellBuild of cells.values()) {
+    const meshes: THREE.InstancedMesh[] = [];
+    const cell: FarPropCell = {
+      bounds: cellBuild.bounds,
+      meshes,
+      hideables: cellBuild.hideables,
+      farMode: false,
+      visible: true,
+    };
+    for (const bucket of cellBuild.buckets.values()) {
+      const geo = mergeGeometries(bucket.geoms, false);
+      if (!geo) continue;
+      geo.computeBoundingBox();
+      geo.computeBoundingSphere();
+      // Single-instance so the count gate below can skip the color pass
+      // per frame without touching visibility (three's instanced draw path
+      // is a free no-op at count 0).
+      const mesh = new THREE.InstancedMesh(geo, bucket.material, 1);
+      mesh.setMatrixAt(0, new THREE.Matrix4());
+      mesh.instanceMatrix.needsUpdate = true;
+      mesh.castShadow = bucket.castShadow;
+      mesh.receiveShadow = true;
+      // Near mode: shadow draw only. The hooks restore the instance for the
+      // shadow pass and drop it again so the color pass skips the bake while
+      // the individuals draw; far mode leaves the instance up for both.
+      mesh.count = 0;
+      (mesh as { onBeforeShadow: unknown }).onBeforeShadow = () => {
+        mesh.count = 1;
+      };
+      (mesh as { onAfterShadow: unknown }).onAfterShadow = () => {
+        if (!cell.farMode) mesh.count = 0;
+      };
+      group.add(mesh);
+      meshes.push(mesh);
+    }
+    // The individuals never cast: the bake carries the cell's shadows in
+    // both modes (identical union geometry). Flames/transparent meshes are
+    // not in the bake and keep their own flags.
+    for (const h of cellBuild.hideables) {
+      for (const b of h.bakeMeshes) b.mesh.castShadow = false;
+    }
+    out.push(cell);
+  }
+  return out;
+}
+
 // Bake every static prop mesh into world space and merge per
 // (material, castShadow, z-band). Flames (animated) and InstancedMeshes
 // survive untouched, as do the PointLights (not meshes). The merged meshes
@@ -1808,9 +2005,12 @@ function mergeStaticMeshes(group: THREE.Group, keep: Set<THREE.Object3D>): THREE
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh || keep.has(mesh) || (mesh as THREE.InstancedMesh).isInstancedMesh) return;
     const material = mesh.material as THREE.Material;
+    const worldX = mesh.matrixWorld.elements[12];
     const worldZ = mesh.matrixWorld.elements[14];
     const band = Math.floor((worldZ - WORLD_MIN_Z) / MERGE_BAND_DEPTH);
-    const key = `${material.uuid}:${mesh.castShadow ? 1 : 0}:${band}`;
+    // x-halved like the instance batches above: world-wide merged bands
+    // defeat shadow-frustum culling (their bounds always intersect it).
+    const key = `${material.uuid}:${mesh.castShadow ? 1 : 0}:${worldX < 0 ? 'w' : 'e'}:${band}`;
     let bucket = buckets.get(key);
     if (!bucket) {
       bucket = { material, castShadow: mesh.castShadow, geoms: [] };

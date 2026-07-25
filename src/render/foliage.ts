@@ -29,6 +29,7 @@ import {
   insideGrassHubExclusion,
 } from './foliage_core';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
+import { attachShadowPassOnlyGate } from './shadow_pass_gate_core';
 import { grassTuftTexture } from './textures';
 
 // Vegetation: trees, rocks, ground dressing and the grass ring.
@@ -859,6 +860,9 @@ function placeSpecies(
           const shadow = cloneInstancedTo(im, part.geometry, makeShadowOnlyMaterial(part.material));
           shadow.castShadow = true;
           shadow.receiveShadow = false;
+          // Shadow-pass only: without the gate every clone also costs a
+          // colorWrite-off draw in the color pass (one per casting bucket).
+          attachShadowPassOnlyGate(shadow);
           parent.add(shadow);
           register(shadow, 'shadow', undefined, maxDist === Infinity ? undefined : maxDist);
         }
