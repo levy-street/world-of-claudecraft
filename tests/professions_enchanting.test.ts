@@ -922,6 +922,20 @@ describe('apply enchant to WORN gear (in place)', () => {
     expect(sim.player.stats.str).toBe(strBefore + 2);
   });
 
+  it('draws ZERO rng, so it cannot shift the shared stream (determinism)', () => {
+    // The worn arm is rng-free by construction: no roll, no capacity model.
+    // Pinned mechanically, because a future "enchant can fail" roll here would
+    // silently move every downstream draw in the same tick, and nothing else in
+    // the suite would go red. Two sims on the SAME seed: one applies the worn
+    // enchant, one does not; the next draw off each rng must be identical.
+    const a = wearing('mainhand', WORN_SWORD, { dust: 5 });
+    const b = wearing('mainhand', WORN_SWORD, { dust: 5 });
+    expect(resolveApplyEnchant(a.sim.ctx, a.pid, WORN_SWORD, WORN_ENCHANT, 'mainhand').ok).toBe(
+      true,
+    );
+    expect(a.sim.ctx.rng.next()).toBe(b.sim.ctx.rng.next());
+  });
+
   it('denies an already-enchanted worn copy with no side effect (double-enchant blocked)', () => {
     const { sim, pid, meta } = wearing('mainhand', WORN_SWORD, {
       dust: 10,

@@ -879,6 +879,57 @@ export const TARGETS = [
     },
   },
   {
+    key: 'worn-enchant-tooltip',
+    label: 'Paperdoll tooltip after enchanting the WORN piece in place',
+    when: ['professions/enchanting', 'ui/enchant_apply_view'],
+    // Equip a plain sword, apply an enchant to it IN PLACE (the worn arm), then
+    // hover its paperdoll row: the enchanted marker and the green bonus stat line
+    // read off equippedInstances without the piece ever leaving the slot. Full
+    // frame, since the tooltip renders beside the window and one selector cannot
+    // union the two rects.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      const staged = await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const sim = window.__game?.sim;
+        if (!sim?.player) return { ok: false, reason: 'offline world unavailable' };
+        sim.addItem('eastbrook_arming_sword', 1);
+        sim.equipItemToSlot('eastbrook_arming_sword', 'mainhand');
+        sim.addItem('arcane_dust', 5);
+        // The command entry point, exactly what the picker's worn row dispatches
+        // (never a hand-written payload): item id, enchant id, worn slot.
+        sim.applyEnchant('eastbrook_arming_sword', 'enchant_weapon_might', 'mainhand');
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      await page.evaluate(() => {
+        const el = document.querySelector('#char-window');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleChar?.();
+      });
+      if (!(await pollForSize(page, '#char-window')))
+        throw new Error('character window did not open');
+      const shown = await page.evaluate(() => {
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+        // Real focus fires attachTooltip's focusin arm, the sturdier headless
+        // trigger (the masterwork-tooltip target's precedent).
+        const row = [...document.querySelectorAll('#char-window [data-equip-slot]')].find(
+          (r) => r.getAttribute('data-equip-slot') === 'mainhand',
+        );
+        if (!row) return false;
+        row.focus?.();
+        row.dispatchEvent(new MouseEvent('mouseenter', { bubbles: false }));
+        return true;
+      });
+      if (!shown) throw new Error('no mainhand paperdoll row to hover');
+      await wait(500);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'social-window',
     label: 'Social window (Friends tab, landscape layout)',
     when: ['ui/social_window'],
@@ -2601,6 +2652,14 @@ export const TARGETS = [
       { key: 'confirm-special', confirm: true },
       { key: 'picker', picker: true },
       { key: 'picker-mobile', picker: true, mobile: true },
+      // The TARGET step (step two of the picker): worn gear is enchanted in
+      // place, so an equipped copy lists there beside the bagged ones, tagged
+      // with its equipment slot. The dual-wield variant is a rogue with the SAME
+      // sword in both hands, the case the slot discriminator exists for: two
+      // identical item ids, two separate rows.
+      { key: 'targets', targets: true },
+      { key: 'targets-mobile', targets: true, mobile: true },
+      { key: 'targets-dualwield', targets: true, dualWield: true, charClass: 'rogue' },
     ],
     async capture(page, variant) {
       await page.evaluate(() => {
@@ -2609,10 +2668,25 @@ export const TARGETS = [
         document.querySelector('.gpu-notice-dismiss')?.click();
       });
       const staged = await page.evaluate(
-        (wantsConfirm, wantsPicker) => {
+        (wantsConfirm, wantsPicker, wantsTargets, wantsDualWield) => {
           const game = window.__game;
           const sim = game?.sim;
           if (!game || !sim?.player) return { ok: false, reason: 'offline world unavailable' };
+          if (wantsTargets) {
+            // One sword WORN (the in-place target) and one in the bags (the
+            // classic target), so the target step shows both families at once.
+            // The dual-wield scene aims BOTH hands explicitly.
+            sim.addItem('eastbrook_arming_sword', 1);
+            sim.equipItemToSlot('eastbrook_arming_sword', 'mainhand');
+            if (wantsDualWield) {
+              sim.addItem('eastbrook_arming_sword', 1);
+              sim.equipItemToSlot('eastbrook_arming_sword', 'offhand');
+            }
+            sim.addItem('eastbrook_arming_sword', 1);
+            sim.addItem('arcane_dust', 6);
+            sim.addItem('arcane_essence', 1);
+            return { ok: true, itemName: 'Chime Dust' };
+          }
           if (wantsPicker) {
             // Enough dust to afford the base weapon enchants, so the picker's
             // affordability lines show a mix of ready and short rows.
@@ -2634,6 +2708,8 @@ export const TARGETS = [
         },
         Boolean(variant?.confirm),
         Boolean(variant?.picker),
+        Boolean(variant?.targets),
+        Boolean(variant?.dualWield),
       );
       if (!staged.ok) throw new Error(staged.reason);
       await page.evaluate(() => {
@@ -2678,7 +2754,7 @@ export const TARGETS = [
         await wait(300);
         return { clip: '#ui' };
       }
-      if (variant?.picker) {
+      if (variant?.picker || variant?.targets) {
         // Click the Apply Enchant row (the staged reagent's only action).
         await page.evaluate(() => {
           const rows = [...document.querySelectorAll('#ctx-menu .ctx-item')];
@@ -2686,6 +2762,22 @@ export const TARGETS = [
         });
         await wait(500);
         if (!(await pollForSize(page, '#ctx-menu'))) throw new Error('enchant picker did not open');
+        if (variant?.targets) {
+          // Drill one step further into the TARGET list by clicking the weapon
+          // enchant's own row (matched by its localized name, so a reordered
+          // enchant table cannot silently shoot the wrong step).
+          const drilled = await page.evaluate(() => {
+            const rows = [...document.querySelectorAll('#ctx-menu .ctx-item[data-act]')];
+            const row = rows.find((r) => (r.textContent ?? '').includes('Might')) ?? rows[0];
+            if (!row) return false;
+            row.click();
+            return true;
+          });
+          if (!drilled) throw new Error('no affordable enchant row to drill into');
+          await wait(500);
+          if (!(await pollForSize(page, '#ctx-menu')))
+            throw new Error('enchant target step did not open');
+        }
         await wait(300);
         return { clip: '#ui' };
       }

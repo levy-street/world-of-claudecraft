@@ -608,6 +608,15 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   // mirror goes stale until the staggered refresh. Also refreshes the purse
   // for the fee debit.
   'unbindResult',
+  // Apply-enchant, for the same reason as unbindResult above: the WORN arm
+  // (src/sim/professions/enchanting.ts resolveApplyEnchantWorn) enchants in
+  // place, so it only REMOVES reagents and emits no loot event. Without this the
+  // enchant itself would show at once (it rides the `eqi` identity diff, which
+  // recalcPlayerStats rebuilds) while the spent reagents lingered in the bag
+  // mirror until the staggered refresh, and re-opening the picker could still
+  // offer an enchant the player can no longer afford. The bagged arm's loot
+  // event already covered it; this makes both arms explicit.
+  'enchantResult',
 ]);
 
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
@@ -4290,9 +4299,12 @@ export class GameServer {
       // resolvers re-validate ownership/eligibility/throttle (nothing trusted
       // from the client); the outcome reaches this client as the pid-scoped
       // disenchantResult/enchantResult/salvageResult event plus the denc/ench/salv
-      // self-delta. A successful action emits a `loot` event (a HEAVY_SELF_EVENTS
-      // member) via the inventory hub, so the self inventory refreshes exactly like
-      // a craft; no explicit dirty-marking is needed here.
+      // self-delta. A successful disenchant/salvage, and a bagged apply, emit a
+      // `loot` event (a HEAVY_SELF_EVENTS member) via the inventory hub, so the self
+      // inventory refreshes exactly like a craft; no explicit dirty-marking is needed
+      // here. The WORN apply arm mints nothing and so emits no loot event, which is
+      // why `enchantResult` is itself a HEAVY_SELF_EVENTS member (the unbindResult
+      // precedent): otherwise the spent reagents would linger in the bag mirror.
       case 'disenchant_item':
         if (typeof msg.item === 'string') sim.disenchantItem(msg.item, pid);
         break;

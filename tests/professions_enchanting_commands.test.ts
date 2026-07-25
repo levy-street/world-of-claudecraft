@@ -54,6 +54,10 @@ const WEAPON_ENCHANT = 'enchant_weapon_might';
 // A helmet enchant, used to exercise the wrong_slot deny on the weapon above.
 const HELMET_ENCHANT = 'enchant_helmet_fortitude';
 const DUST = 'arcane_dust';
+// A second common one-hand weapon (def slot 'mainhand', so the same Might enchant
+// applies), used as the WORN target when a copy of COMMON_WEAPON is already
+// enchanted and sitting in the bags.
+const WORN_WEAPON = 'bronzework_mace';
 
 const makeSim = (seed = 7): Sim => new Sim({ seed, playerClass: 'warrior', autoEquip: false });
 
@@ -495,6 +499,100 @@ describe('enchanting commands over the live GameServer wire (event + delta routi
     const client = bareClient(watch.pid);
     (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(snap);
     expect(client.entities.get(st.pid)?.equippedInstances.mainhand?.enchant).toBe(WEAPON_ENCHANT);
+  });
+
+  it('the worn arm re-diffs the self inv mirror: the spent reagents leave the bag at once', () => {
+    // The worn arm mints NOTHING, so it emits no loot event: without
+    // 'enchantResult' in HEAVY_SELF_EVENTS the enchant itself would still show
+    // immediately (it rides the eqi identity diff) while the spent reagents
+    // lingered in the bag mirror for up to HEAVY_SELF_REFRESH_TICKS. Same shape as
+    // the unbindResult pin in tests/professions_commissions.test.ts.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const st = joinServer(server, fc, 440, 'Fresh');
+    placeAt(server, st.pid, FIELD_POS);
+    // A BAGGED apply first, purely to burn the one-off first-enchant deed grant:
+    // a deed grant bumps meta.wireRev, which is an INDEPENDENT heavy-self trigger
+    // (server/game.ts heavyDue) and would otherwise mask what this test pins.
+    server.sim.addItem(COMMON_WEAPON, 1, st.pid);
+    server.sim.addItem(DUST, 5, st.pid);
+    cmd(server, st, { cmd: 'apply_enchant', item: COMMON_WEAPON, enchant: WEAPON_ENCHANT });
+    routeTick(server);
+    expect(server.sim.lastEnchantResultFor(st.pid)?.ok).toBe(true);
+
+    // Now the real subject: a plain WORN piece plus fresh reagents.
+    server.sim.addItem(WORN_WEAPON, 1, st.pid);
+    server.sim.equipItemToSlot(WORN_WEAPON, 'mainhand', st.pid);
+    server.sim.addItem(DUST, 5, st.pid);
+    routeTick(server);
+
+    const lastInvFrom = (fromIdx: number) => {
+      for (let i = fc.sent.length - 1; i >= fromIdx; i--) {
+        const m = fc.sent[i] as { t: string; self?: Record<string, unknown> };
+        if (m.t === 'snap' && m.self && 'inv' in m.self) {
+          return m.self.inv as { itemId: string; count: number }[];
+        }
+      }
+      return null;
+    };
+
+    // Flush the heavy self mirror: this broadcast establishes a lastSent inv that
+    // still carries all 5 dust.
+    broadcast(server);
+    const flushed = lastInvFrom(0);
+    expect(flushed).not.toBeNull();
+    expect(flushed?.find((s) => s.itemId === DUST)?.count).toBe(5);
+    // Negative control: with the dirty flag flushed, wireRev settled, and the
+    // stagger not due, a further broadcast re-sends no inv at all. So the ONLY
+    // thing that can re-diff inv below is enchantResult's HEAVY_SELF_EVENTS
+    // membership.
+    let controlFrom = fc.sent.length;
+    broadcast(server);
+    if (lastInvFrom(controlFrom) !== null) {
+      // The staggered safety refresh happened to land on that tick; step past it.
+      broadcast(server);
+      controlFrom = fc.sent.length;
+      broadcast(server);
+    }
+    expect(lastInvFrom(controlFrom), 'negative control: no dirty, no inv re-send').toBeNull();
+
+    const beforeCmd = fc.sent.length;
+    cmd(server, st, {
+      cmd: 'apply_enchant',
+      item: WORN_WEAPON,
+      enchant: WEAPON_ENCHANT,
+      slot: 'mainhand',
+    });
+    routeTick(server);
+    const ench = eventsFor(fc.sent, 'enchantResult').slice(-1);
+    if (ench[0]?.type !== 'enchantResult') throw new Error('expected enchantResult');
+    expect(ench[0].ok).toBe(true);
+    // Nothing entered the bags, so no loot event fired on this arm.
+    expect(
+      fc.sent
+        .slice(beforeCmd)
+        .filter((m) => m.t === 'events')
+        .flatMap((m) => m.list ?? [])
+        .filter((ev) => ev.type === 'loot'),
+    ).toEqual([]);
+
+    // Neutralize the two OTHER heavy-self triggers so this pin measures exactly
+    // one thing. meta.wireRev is bumped by any deed grant the skill gain unlocks,
+    // which is incidental (a veteran enchanter with every enchanting deed already
+    // earned gets no bump, and that is the player this fix is for); the staggered
+    // safety refresh is the ~2s backstop the fix exists to beat. With both pinned
+    // aside, only enchantResult's HEAVY_SELF_EVENTS membership can re-send inv.
+    const session = st as unknown as { lastWireRev: number };
+    session.lastWireRev = metaOf(server, st.pid).wireRev;
+    // 40 = server/game.ts HEAVY_SELF_REFRESH_TICKS (not exported); pinned as a
+    // literal so a change to the backstop cadence surfaces here.
+    expect((server.sim.tickCount + st.pid) % 40).not.toBe(0);
+    const afterFrom = fc.sent.length;
+    broadcast(server);
+    const lastInv = lastInvFrom(afterFrom);
+    expect(lastInv, 'enchantResult re-diffed the heavy inv mirror').not.toBeNull();
+    // The dust is gone from the WIRE copy, not just from the server's own state.
+    expect(lastInv?.find((s) => s.itemId === DUST)).toBeUndefined();
   });
 
   it('a garbage slot value falls back to the bagged arm: no throw, no worn write', () => {
