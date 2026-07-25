@@ -33,6 +33,12 @@ export interface ShadowPassGatedMesh {
  * Make an instanced shadow proxy draw ONLY in the shadow pass. Call after the
  * mesh's final instance count is set; the count is captured once (foliage
  * bucket counts are fixed at build time).
+ *
+ * CALLER CONTRACT: compute (or pin) the mesh's bounding volumes BEFORE
+ * attaching the gate. three's frustum test lazily computes an
+ * InstancedMesh's bounding sphere from its CURRENT count exactly once; at
+ * the gated count of 0 that caches an empty sphere and culls the mesh, and
+ * its shadow, forever.
  */
 export function attachShadowPassOnlyGate(mesh: ShadowPassGatedMesh): void {
   const fullCount = mesh.count;

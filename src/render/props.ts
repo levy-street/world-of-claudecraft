@@ -1944,6 +1944,13 @@ function buildFarPropCells(group: THREE.Group, hideables: Hideable[]): FarPropCe
       const mesh = new THREE.InstancedMesh(geo, bucket.material, 1);
       mesh.setMatrixAt(0, new THREE.Matrix4());
       mesh.instanceMatrix.needsUpdate = true;
+      // Pin the object bounds to the world-baked geometry bounds NOW: the
+      // frustum test lazily computes an InstancedMesh's bounding sphere from
+      // its CURRENT count, and this mesh spends near mode at count 0, which
+      // would cache an empty sphere and cull the bake (and its shadow)
+      // forever. The single identity instance makes geometry bounds exact.
+      mesh.boundingBox = geo.boundingBox ? geo.boundingBox.clone() : null;
+      mesh.boundingSphere = geo.boundingSphere ? geo.boundingSphere.clone() : null;
       mesh.castShadow = bucket.castShadow;
       mesh.receiveShadow = true;
       // Near mode: shadow draw only. The hooks restore the instance for the

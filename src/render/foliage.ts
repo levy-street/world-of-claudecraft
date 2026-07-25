@@ -864,6 +864,12 @@ function placeSpecies(
           const shadow = cloneInstancedTo(im, part.geometry, makeShadowOnlyMaterial(part.material));
           shadow.castShadow = true;
           shadow.receiveShadow = false;
+          // ORDER MATTERS: compute the instance-aware bounds while the count
+          // is still full; the gate below zeroes the count, and a lazily
+          // computed sphere at count 0 would cache empty and cull the
+          // clone's shadow forever.
+          shadow.computeBoundingSphere();
+          shadow.computeBoundingBox();
           // Shadow-pass only: without the gate every clone also costs a
           // colorWrite-off draw in the color pass (one per casting bucket).
           attachShadowPassOnlyGate(shadow);
