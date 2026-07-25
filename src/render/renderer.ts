@@ -337,6 +337,7 @@ import {
 } from './sky';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { SourceCaveInteriors } from './source_cave_interior';
+import { SourceCaveMains } from './source_cave_mains';
 import { buildSourceCaveRebootButton } from './source_cave_reboot';
 import { freezeStaticMatrices, freezeStaticSubtreeMatrices } from './static_matrix';
 import { buildStationProps } from './stations';
@@ -613,20 +614,10 @@ const DAY_HEMI_GROUND_WARMTH = 0.13;
 const SUN_TRAVEL_DISTANCE = SUN_ANCHOR.length();
 // character rim glow scales up underground so silhouettes split from the murk
 const DUNGEON_RIM_BOOST = 2.4;
-// The Source Cave server hall (updateSourceCaveMains): fully lit off the mains
-// until the reboot button is pressed, then a torch-carried backup gloom. The
-// fog baseline pair below mirrors updateAmbience's 'delve' arm; keep them in
-// sync if that arm is retuned.
+// The delve ambience baseline, shared by updateAmbience's 'delve' arm and the
+// Source Cave mains blend that departs from it.
 const DELVE_FOG_COLOR = 0x0e0705;
 const DELVE_FOG_FAR = 74;
-const SOURCE_CAVE_MAINS_HEMI = 0.85;
-const SOURCE_CAVE_MAINS_ENV = 0.35;
-const SOURCE_CAVE_MAINS_FOG_COLOR = 0x2a241c;
-const SOURCE_CAVE_MAINS_FOG_FAR = 200;
-const SOURCE_CAVE_BACKUP_HEMI = 0.1;
-const SOURCE_CAVE_BACKUP_ENV = 0.02;
-const SOURCE_CAVE_BACKUP_FOG_COLOR = 0x070302;
-const SOURCE_CAVE_BACKUP_FOG_FAR = 58;
 // The Protect Yumi maze is a torch-lit NIGHT ARENA, not a crypt: a moon-key
 // plus a healthy hemisphere keep the whole competitive space readable, with
 // the braziers/torches adding warmth rather than carrying the scene alone.
@@ -1522,9 +1513,7 @@ export class Renderer {
   private fixedLowDayBiome: BiomeId | null = null;
   private dnColorScratch = new THREE.Color();
   private dnMoonScratch = new THREE.Color();
-  // scratch pair for the Source Cave mains blend (updateSourceCaveMains)
-  private tmpColor = new THREE.Color();
-  private tmpColor2 = new THREE.Color();
+  private caveMains = new SourceCaveMains();
   private flames: THREE.Mesh[];
   private flamePerceptualStates = new WeakMap<THREE.Mesh, FlamePerceptualState>();
   private windmillFans: THREE.Object3D[] = [];
@@ -7921,9 +7910,9 @@ export class Renderer {
         // the collapsed reliquary breathes a warm ember murk, dried-blood
         // charcoal, tighter than the overworld crypt's cold near-black, so the
         // delve reads as its own claustrophobic place under the red torches
-        fog.color.setHex(0x0e0705);
+        fog.color.setHex(DELVE_FOG_COLOR);
         fog.near = 14;
-        fog.far = 74;
+        fog.far = DELVE_FOG_FAR;
       } else if (desired === 'yumiMaze') {
         // the Protect Yumi maze is a COMPETITIVE arena: a lighter night-blue
         // murk pushed well past the ~90yd footprint, so the torches + team
@@ -8112,89 +8101,20 @@ export class Renderer {
       this.hemi.intensity +=
         (hemiOutdoorIntensity() * g.lightScale * (light.hemiScale ?? 1) - this.hemi.intensity) * k;
     }
-    if (desired === 'delve') this.updateSourceCaveMains(px, dt, fog);
-  }
-
-  // The Source Cave server hall runs fully lit off the mains until the reboot
-  // button is pressed; then the room drops to torch-lit backup power. Applied as
-  // a per-frame blend over the shared delve ambience (hemi / env / fog): `mix`
-  // eases toward 1 only while the player stands in the cave's own band (a real
-  // delve keeps the plain baseline as mix returns to 0), and `power` tracks the
-  // live button state (a fast fall, a slower recovery, so the cut reads as a
-  // breaker snapping). Cosmetic only: the sim never reads any of this.
-  private caveMainsMix = 0;
-  private caveMainsPower = 1;
-  // Cached reboot-button entity id so the per-frame power check is a map get,
-  // not an entity scan; re-scanned only when the cached id stops resolving
-  // (fresh claim, interest churn online).
-  private caveRebootButtonId: number | null = null;
-
-  private updateSourceCaveMains(px: number, dt: number, fog: THREE.Fog): void {
-    const inCave = isSourceCavePos(px);
-    if (!inCave && this.caveMainsMix < 0.01) {
-      if (this.caveMainsMix !== 0) {
-        this.caveMainsMix = 0;
-        this.caveMainsPower = 1;
-      }
-      return;
+    if (desired === 'delve') {
+      this.caveMains.update(
+        this.sim,
+        px,
+        dt,
+        {
+          hemi: DUNGEON_HEMI_INTENSITY,
+          env: DUNGEON_ENV_INTENSITY,
+          fogFar: DELVE_FOG_FAR,
+          fogColorHex: DELVE_FOG_COLOR,
+        },
+        { hemi: this.hemi, scene: this.scene, fog, lowGfx: this.lowGfx },
+      );
     }
-    if (inCave) {
-      let button =
-        this.caveRebootButtonId !== null
-          ? this.sim.entities.get(this.caveRebootButtonId)
-          : undefined;
-      if (!button || button.templateId !== SOURCE_CAVE_REBOOT_TEMPLATE) {
-        button = undefined;
-        this.caveRebootButtonId = null;
-        for (const e of this.sim.entities.values()) {
-          if (e.kind === 'object' && e.templateId === SOURCE_CAVE_REBOOT_TEMPLATE) {
-            button = e;
-            this.caveRebootButtonId = e.id;
-            break;
-          }
-        }
-      }
-      // No button resolved (an online snapshot gap): keep the hall lit rather
-      // than flickering to backup on missing data.
-      const powered = button ? button.lootable : true;
-      const kPower = 1 - Math.exp(-dt * (powered ? 2.2 : 9));
-      this.caveMainsPower += ((powered ? 1 : 0) - this.caveMainsPower) * kPower;
-    }
-    const kMix = 1 - Math.exp(-dt * 3);
-    this.caveMainsMix += ((inCave ? 1 : 0) - this.caveMainsMix) * kMix;
-
-    const mix = this.caveMainsMix;
-    const power = this.caveMainsPower;
-    // Anchors: the shared delve baseline (updateAmbience's 'delve' arm), the lit
-    // server hall, and the near-dark backup state (torches carry the room).
-    const hemi =
-      DUNGEON_HEMI_INTENSITY +
-      (SOURCE_CAVE_BACKUP_HEMI +
-        (SOURCE_CAVE_MAINS_HEMI - SOURCE_CAVE_BACKUP_HEMI) * power -
-        DUNGEON_HEMI_INTENSITY) *
-        mix;
-    const env =
-      DUNGEON_ENV_INTENSITY +
-      (SOURCE_CAVE_BACKUP_ENV +
-        (SOURCE_CAVE_MAINS_ENV - SOURCE_CAVE_BACKUP_ENV) * power -
-        DUNGEON_ENV_INTENSITY) *
-        mix;
-    if (!this.lowGfx) {
-      this.hemi.intensity = hemi;
-      this.scene.environmentIntensity = env;
-    }
-    const fogFar =
-      DELVE_FOG_FAR +
-      (SOURCE_CAVE_BACKUP_FOG_FAR +
-        (SOURCE_CAVE_MAINS_FOG_FAR - SOURCE_CAVE_BACKUP_FOG_FAR) * power -
-        DELVE_FOG_FAR) *
-        mix;
-    fog.far = fogFar;
-    this.fogScratch.setHex(DELVE_FOG_COLOR);
-    this.tmpColor
-      .setHex(SOURCE_CAVE_BACKUP_FOG_COLOR)
-      .lerp(this.tmpColor2.setHex(SOURCE_CAVE_MAINS_FOG_COLOR), power);
-    fog.color.copy(this.fogScratch.lerp(this.tmpColor, mix));
   }
 
   // Hand the prefiltered environment map to the dominant eased sky biome.
