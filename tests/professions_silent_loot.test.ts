@@ -8,13 +8,14 @@ import { terrainHeight } from '../src/sim/world';
 // Every grant in the game flows through the one shared inventory hub
 // (Sim.addItem/addItemInstance), which unconditionally emitted a 'loot'
 // event that hud.ts's case 'loot' turns into audio.lootItem()/coin() -
-// BEFORE this change, that meant every gather/craft/disenchant grant played
-// the generic loot ding stacked on top of its own new dedicated cue
-// (audio.gather/craftSuccess/disenchant). This pins that the professions
-// grant sites now pass { silent: true } so the loot event's TEXT still
-// prints (no missing feedback) but the generic AUDIO CUE is suppressed,
-// while every OTHER grant path (quest reward, vendor, mail, trade, corpse
-// loot, enchant apply) is completely unaffected and stays loud.
+// BEFORE this change, that meant every gather/craft/disenchant/salvage/
+// enchant-apply grant played the generic loot ding stacked on top of its
+// own new dedicated cue (audio.gather/craftSuccess/disenchant/salvage/
+// enchant). This pins that all five professions grant sites now pass
+// { silent: true } so the loot event's TEXT still prints (no missing
+// feedback) but the generic AUDIO CUE is suppressed, while every OTHER
+// grant path (quest reward, vendor, mail, trade, corpse loot) is completely
+// unaffected and stays loud.
 
 function mustEntity(sim: Sim, pid: number): Entity {
   const entity = sim.entities.get(pid);
@@ -127,6 +128,19 @@ describe('professions grants suppress the generic loot audio cue, not the text',
     sim.tick(); // drain the (loud) sword grant before isolating the disenchant
     sim.disenchantItem('eastbrook_arming_sword', pid);
     expect(sim.lastDisenchantResult?.ok).toBe(true);
+    const events = lootEvents(sim.tick());
+    expect(events.length).toBe(1);
+    expect(events[0].silent).toBe(true);
+  });
+
+  it('an apply-enchant emits a silent loot event for the enchanted copy', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    sim.addItem('eastbrook_arming_sword', 1, pid);
+    sim.addItem('arcane_dust', 5, pid);
+    sim.tick(); // drain the (loud) sword + reagent grants before isolating the enchant
+    sim.applyEnchant('eastbrook_arming_sword', 'enchant_weapon_might');
+    expect(sim.lastEnchantResult?.ok).toBe(true);
     const events = lootEvents(sim.tick());
     expect(events.length).toBe(1);
     expect(events[0].silent).toBe(true);

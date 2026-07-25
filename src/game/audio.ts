@@ -355,8 +355,7 @@ export class GameAudio {
 
   // recipeFamily is the recipe's professionId (a CRAFT_RING id); an unknown
   // id (should never happen, every recipe's professionId is one of the ten)
-  // is a silent no-op rather than a throw, matching the "missing clip is a
-  // silent no-op" contract sfx.ts documents.
+  // falls back to the generic loot ding rather than throwing.
   craftSuccess(recipeFamily: string): void {
     const key = (UI_CUES.craftByFamily as Record<string, string>)[recipeFamily];
     this.playFeedback((key ?? UI_CUES.lootItem) as UiCue);

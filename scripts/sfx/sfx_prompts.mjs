@@ -782,9 +782,8 @@ export const SFX = [
   // Disenchant proc (custom recording): the enchanting profession's own
   // action, separate from the craftByFamily set above since disenchant does
   // not go through the recipe/craftResult path (src/sim/professions/
-  // enchanting.ts disenchantItem). No client UI calls disenchantItem() yet
-  // as of 2026-07-18; the sound is wired and ready for whenever that trigger
-  // gets built.
+  // enchanting.ts disenchantItem). Triggered from the bag item action menu
+  // (src/ui/bag_item_action_menu.ts).
   { key: 'ui_craft_disenchant', custom: true },
 
   // Salvage proc (custom recording): the enchanting profession's ungated
