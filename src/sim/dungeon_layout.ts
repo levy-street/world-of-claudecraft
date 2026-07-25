@@ -36,8 +36,13 @@ export interface DungeonLayout {
   zMin: number;
   /** back wall centreline (boss end) */
   zMax: number;
-  /** side-wall collider slab (matches the legacy hand-authored extents) */
+  /** side-wall collider slab: z CENTRELINE of the slab's run (matches the
+   *  legacy hand-authored extents) */
   sideWallZ: number;
+  /** side-wall collider slab: z half-DEPTH of the slab's run. Despite the
+   *  similar name this is a z extent, not an x one: the slab's |x| position
+   *  comes from wallX / DUNGEON_WALL_X. A room can grow its sideWallHd (a
+   *  longer wall) while its wallX stays frozen. */
   sideWallHd: number;
   /** centre-aisle pillar obstacles; torches mount on these */
   pillars: GridPoint[];
@@ -181,6 +186,8 @@ export const ARENA_LAYOUT: DungeonLayout = {
   zMin: -24,
   zMax: 28,
   sideWallZ: 2,
+  // z half-DEPTH of the side-wall slabs (26 spans zMin..zMax exactly); their
+  // |x| stays the frozen DUNGEON_WALL_X = 23, a different axis entirely.
   sideWallHd: 26,
   pillars: [
     // corner pillars anchoring the four quadrants (every pillar mounts a torch)
