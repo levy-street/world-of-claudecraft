@@ -222,17 +222,30 @@ describe('entry HTMLs', () => {
     expect(chrome).toMatch(/deeds: 'Deeds',/);
   });
 
-  it('ships the side-menu Deeds button in BOTH game entries, under the quest log', () => {
+  it('ships the side-menu Deeds button in BOTH game entries, in the character section', () => {
     for (const html of [indexHtml, playHtml]) {
       expect(html).toMatch(/id="mm-deeds"[^>]*data-icon="book"/);
       expect(html).toMatch(/id="mm-deeds"[^>]*data-i18n-title="hudChrome\.deeds\.title"/);
-      // Dock order: quest log, then deeds, then map.
-      const quest = html.indexOf('id="mm-quest"');
-      const deeds = html.indexOf('id="mm-deeds"');
-      const map = html.indexOf('id="mm-map"');
-      expect(quest).toBeGreaterThan(-1);
-      expect(deeds).toBeGreaterThan(quest);
-      expect(map).toBeGreaterThan(deeds);
+      // The rail is grouped into positional sections (tests/micromenu_groups.test.ts
+      // pins the full membership). Deeds is a record of what THIS character has
+      // done, so it sits in the "you" section next to Professions, above the
+      // "world" section that holds the quest log and the map. That is why it is
+      // no longer between them: this reads as a regression only if you expect
+      // the old flat rail.
+      const section = (group: string): string => {
+        const start = html.indexOf(`data-group="${group}"`);
+        expect(start, `missing the "${group}" section`).toBeGreaterThan(-1);
+        return html.slice(start, html.indexOf('</div>', start));
+      };
+      expect(section('you')).toContain('id="mm-deeds"');
+      const you = section('you');
+      expect(you.indexOf('id="mm-deeds"')).toBeLessThan(you.indexOf('id="mm-professions"'));
+      // Quest log and map stay together, in that order, in the world section.
+      const world = section('world');
+      expect(world).toContain('id="mm-quest"');
+      expect(world.indexOf('id="mm-quest"')).toBeLessThan(world.indexOf('id="mm-map"'));
+      // ...and the character section still comes before the world section.
+      expect(html.indexOf('data-group="you"')).toBeLessThan(html.indexOf('data-group="world"'));
     }
     // hud.ts binds the click and repaints the keycap from the live binding.
     expect(hud).toContain("$('#mm-deeds').addEventListener('click', () => this.toggleDeeds());");
