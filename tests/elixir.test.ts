@@ -191,6 +191,8 @@ describe('same-stat elixirs are exclusive, last drunk wins', () => {
       .filter((d) => d.elixir?.kind === 'buff_sta')
       .map((d) => d.id)
       .sort();
+    // A new stamina elixir must be added here DELIBERATELY: it inherits the
+    // shared exclusivity id automatically via the loop below.
     expect(staElixirIds).toEqual([
       'elixir_of_the_bear',
       'elixir_of_the_boar',

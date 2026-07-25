@@ -477,7 +477,10 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     // elixir of one stat shares one id and the same-id replacement in applyAura
     // makes same-stat elixirs exclusive: last drunk wins (classic overwrite,
     // weaker included). Different-kind elixirs coexist; class buffs
-    // (buff_sta_pct) and negative buff_sta debuffs ride their own ids.
+    // (buff_sta_pct) and negative buff_sta debuffs ride their own ids. This
+    // assumes one stat kind equals one exclusivity slot: if a guardian elixir
+    // family that should stack with battle elixirs ever lands, the id needs a
+    // family component (elixir_battle_...), not just the kind.
     const elx = def.elixir;
     if (!elx) return;
     ctx.removeItem(itemId, 1, meta.entityId);
