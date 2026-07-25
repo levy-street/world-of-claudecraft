@@ -2421,7 +2421,8 @@ export const zh_TW: EnTranslations = {
       "pickerTitle": "施加附魔",
       "targetTitle": "選擇要附魔的物品",
       "noEnchants": "沒有附魔會用到此材料。",
-      "noTargets": "沒有可附魔的合適物品。"
+      "noTargets": "沒有可附魔的合適物品。",
+      "wornTag": "Worn ({slot})"
     },
     "training": {
       "title": "訓練：{name}",

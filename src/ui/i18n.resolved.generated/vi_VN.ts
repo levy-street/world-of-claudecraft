@@ -2421,7 +2421,8 @@ export const vi_VN: EnTranslations = {
       "pickerTitle": "Áp Dụng Pháp Khắc",
       "targetTitle": "Chọn vật phẩm để pháp khắc",
       "noEnchants": "Không có phép khắc nào dùng nguyên liệu này.",
-      "noTargets": "Không có vật phẩm nào hợp lệ để pháp khắc."
+      "noTargets": "Không có vật phẩm nào hợp lệ để pháp khắc.",
+      "wornTag": "Worn ({slot})"
     },
     "training": {
       "title": "Đào tạo: {name}",

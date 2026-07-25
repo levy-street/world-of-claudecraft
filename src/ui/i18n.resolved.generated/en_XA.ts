@@ -2421,7 +2421,8 @@ export const en_XA: EnTranslations = {
       "pickerTitle": "[Áþþļý Éñçĥáñţ]",
       "targetTitle": "[Çĥóóšé áñ íţéɱ ţó éñçĥáñţ]",
       "noEnchants": "[Ñó éñçĥáñţ úšéš ţĥíš ŕéáĝéñţ.]",
-      "noTargets": "[Ñó éļíĝíƀļé íţéɱ ţó éñçĥáñţ.]"
+      "noTargets": "[Ñó éļíĝíƀļé íţéɱ ţó éñçĥáñţ.]",
+      "wornTag": "[Ŵóŕñ ({slot})]"
     },
     "training": {
       "title": "[Ţŕáíñíñĝ: {name}]",

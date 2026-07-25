@@ -2421,7 +2421,8 @@ export const ja_JP: EnTranslations = {
       "pickerTitle": "エンチャントを付与",
       "targetTitle": "エンチャントするアイテムを選択",
       "noEnchants": "この素材を使うエンチャントはありません。",
-      "noTargets": "エンチャントできるアイテムがありません。"
+      "noTargets": "エンチャントできるアイテムがありません。",
+      "wornTag": "Worn ({slot})"
     },
     "training": {
       "title": "訓練：{name}",

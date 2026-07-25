@@ -9,25 +9,65 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "es_ES": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "fr_FR": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "fr_CA": [
+    "hudChrome.enchanting.wornTag"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "de_DE": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "zh_CN": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "zh_TW": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "ko_KR": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "ja_JP": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "pt_BR": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "ru_RU": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "cs_CZ": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "nl_NL": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "pl_PL": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "id_ID": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "tr_TR": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "sv_SE": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "vi_VN": [
+    "hudChrome.enchanting.wornTag"
+  ],
+  "da_DK": [
+    "hudChrome.enchanting.wornTag"
+  ]
 };

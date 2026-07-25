@@ -1,6 +1,6 @@
 import type { MaterialRarity } from '../sim/professions/gathering';
 import type { PlayerProfessionSkill, ProfessionRecipeRecord } from '../sim/professions/types';
-import type { StationDef } from '../sim/types';
+import type { EquipSlot, StationDef } from '../sim/types';
 import type { WorldInteractionOutcome } from './interaction';
 
 // Render-safe projection of a player's professions standing. Stub as of
@@ -224,7 +224,14 @@ export interface IWorldProfessions {
   // the client; ClientWorld sends the disenchant_item/apply_enchant/salvage_item
   // wire command and never decides the outcome.
   disenchantItem(itemId: string): void;
-  applyEnchant(itemId: string, enchantId: string): void;
+  // `slot` targets the copy WORN in that equipment slot, enchanting it in place
+  // (no unequip / enchant / re-equip round trip). Omitted, the enchant applies to
+  // a bagged copy exactly as before. It is a SLOT and not an item id because
+  // ring1/ring2 and mainhand/offhand can each wear an identical copy of one item
+  // id, and only the slot says which the player aimed at. A REQUEST, never a
+  // bypass: the server re-validates it against ALL_EQUIP_SLOTS and the sim then
+  // re-validates what is actually worn there.
+  applyEnchant(itemId: string, enchantId: string, slot?: EquipSlot): void;
   salvageItem(itemId: string): void;
   // Maker's Bond unbind service (Professions 2.0): clear the
   // boundTo lock on ONE held bound copy of `itemId`, for the tier-scaled

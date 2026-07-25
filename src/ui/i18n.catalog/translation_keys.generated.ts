@@ -5843,6 +5843,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.enchanting.salvageThrottled'
   | 'hudChrome.enchanting.salvagedLine'
   | 'hudChrome.enchanting.targetTitle'
+  | 'hudChrome.enchanting.wornTag'
   | 'hudChrome.fct.absorbed'
   | 'hudChrome.fct.cheap'
   | 'hudChrome.finder.accept'

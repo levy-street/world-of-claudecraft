@@ -8,7 +8,12 @@ import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
 import type { InvSlot, ItemSlot } from '../src/sim/types';
-import { enchantNameKey, enchantsForReagent, enchantTargets } from '../src/ui/enchant_apply_view';
+import {
+  enchantNameKey,
+  enchantsForReagent,
+  enchantTargets,
+  wornEnchantTargets,
+} from '../src/ui/enchant_apply_view';
 import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 
 // A real item id for a slot, taken from live content so the def.slot match is
@@ -120,5 +125,68 @@ describe('enchant_apply_view: enchantTargets', () => {
 
   it('returns nothing for an unknown enchant id', () => {
     expect(enchantTargets([{ itemId: chestId, count: 1 }], 'not_a_real_enchant')).toEqual([]);
+  });
+});
+
+describe('enchant_apply_view: wornEnchantTargets', () => {
+  const SWORD = 'eastbrook_arming_sword'; // def slot 'mainhand'
+  const WEAPON_ENCHANT = 'enchant_weapon_might';
+  const RING = 'seal_of_the_nine_oaths'; // def slot 'ring', covers ring1 AND ring2
+  const RING_ENCHANT = 'enchant_ring_spirit';
+
+  it('lists the worn copy whose def slot matches, and skips every other slot', () => {
+    const rows = wornEnchantTargets(
+      { mainhand: SWORD, helmet: itemForSlot('helmet'), chest: itemForSlot('chest') },
+      {},
+      WEAPON_ENCHANT,
+    );
+    expect(rows).toEqual([{ itemId: SWORD, slot: 'mainhand' }]);
+  });
+
+  it('lists BOTH hands separately when each wears an eligible copy of one item id', () => {
+    // The dual-wield case the slot discriminator exists for: the item id alone
+    // cannot say which hand the player aimed at.
+    const rows = wornEnchantTargets({ mainhand: SWORD, offhand: SWORD }, {}, WEAPON_ENCHANT);
+    expect(rows).toEqual([
+      { itemId: SWORD, slot: 'mainhand' },
+      { itemId: SWORD, slot: 'offhand' },
+    ]);
+  });
+
+  it('lists BOTH rings separately: an item declaring slot "ring" matches ring1 and ring2', () => {
+    const rows = wornEnchantTargets({ ring1: RING, ring2: RING }, {}, RING_ENCHANT);
+    expect(rows).toEqual([
+      { itemId: RING, slot: 'ring1' },
+      { itemId: RING, slot: 'ring2' },
+    ]);
+  });
+
+  it('excludes an already-enchanted worn copy but keeps its unenchanted twin', () => {
+    const rows = wornEnchantTargets(
+      { mainhand: SWORD, offhand: SWORD },
+      { mainhand: { enchant: WEAPON_ENCHANT, rolled: { stats: { str: 2 } } } },
+      WEAPON_ENCHANT,
+    );
+    expect(rows).toEqual([{ itemId: SWORD, slot: 'offhand' }]);
+  });
+
+  it('keeps a signed or masterwork worn copy: neither reads as already enchanted', () => {
+    const rows = wornEnchantTargets(
+      { mainhand: SWORD, offhand: SWORD },
+      {
+        mainhand: { signer: 'Tester' },
+        offhand: { rolled: { masterwork: true, stats: { str: 3 } } },
+      },
+      WEAPON_ENCHANT,
+    );
+    expect(rows).toEqual([
+      { itemId: SWORD, slot: 'mainhand' },
+      { itemId: SWORD, slot: 'offhand' },
+    ]);
+  });
+
+  it('returns nothing for an empty paperdoll or an unknown enchant id', () => {
+    expect(wornEnchantTargets({}, {}, WEAPON_ENCHANT)).toEqual([]);
+    expect(wornEnchantTargets({ mainhand: SWORD }, {}, 'not_a_real_enchant')).toEqual([]);
   });
 });

@@ -2421,7 +2421,8 @@ export const da_DK: EnTranslations = {
       "pickerTitle": "Anvend fortryllelse",
       "targetTitle": "Vælg en genstand at fortryle",
       "noEnchants": "Ingen fortryllelse bruger dette reagens.",
-      "noTargets": "Ingen berettiget genstand at fortryle."
+      "noTargets": "Ingen berettiget genstand at fortryle.",
+      "wornTag": "Worn ({slot})"
     },
     "training": {
       "title": "Træning: {name}",

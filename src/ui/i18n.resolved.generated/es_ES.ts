@@ -2421,7 +2421,8 @@ export const es_ES: EnTranslations = {
       "pickerTitle": "Aplicar encantamiento",
       "targetTitle": "Elige un objeto para encantar",
       "noEnchants": "Ningún encantamiento usa este reactivo.",
-      "noTargets": "No hay ningún objeto elegible para encantar."
+      "noTargets": "No hay ningún objeto elegible para encantar.",
+      "wornTag": "Worn ({slot})"
     },
     "training": {
       "title": "Formación: {name}",

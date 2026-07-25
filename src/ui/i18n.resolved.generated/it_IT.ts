@@ -2421,7 +2421,8 @@ export const it_IT: EnTranslations = {
       "pickerTitle": "Applica Incantesimo",
       "targetTitle": "Scegli un oggetto da incantare",
       "noEnchants": "Nessun incantesimo utilizza questo reagente.",
-      "noTargets": "Nessun oggetto idoneo da incantare."
+      "noTargets": "Nessun oggetto idoneo da incantare.",
+      "wornTag": "Worn ({slot})"
     },
     "training": {
       "title": "Formazione: {name}",

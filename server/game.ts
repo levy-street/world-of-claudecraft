@@ -4297,8 +4297,20 @@ export class GameServer {
         if (typeof msg.item === 'string') sim.disenchantItem(msg.item, pid);
         break;
       case 'apply_enchant':
-        if (typeof msg.item === 'string' && typeof msg.enchant === 'string')
-          sim.applyEnchant(msg.item, msg.enchant, pid);
+        if (typeof msg.item === 'string' && typeof msg.enchant === 'string') {
+          // The optional worn target (the in-place enchant arm) is accepted only
+          // when it names a real equipment key, the same untrusted-input rule the
+          // 'equip' case above applies to its aimed slot; anything else falls back
+          // to undefined, which is the bagged arm. The sim then re-validates that
+          // the named slot is actually wearing this item id and that the worn copy
+          // is not already enchanted.
+          const worn =
+            typeof msg.slot === 'string' &&
+            (ALL_EQUIP_SLOTS as readonly string[]).includes(msg.slot)
+              ? (msg.slot as EquipSlot)
+              : undefined;
+          sim.applyEnchant(msg.item, msg.enchant, worn, pid);
+        }
         break;
       case 'salvage_item':
         if (typeof msg.item === 'string') sim.salvageItem(msg.item, pid);

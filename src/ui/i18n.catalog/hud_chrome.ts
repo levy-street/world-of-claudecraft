@@ -2700,6 +2700,13 @@ export const hudChromeStrings = {
     targetTitle: 'Choose an item to enchant',
     noEnchants: 'No enchant uses this reagent.',
     noTargets: 'No eligible item to enchant.',
+    // The tag on a WORN target row in the Apply Enchant picker: worn gear is
+    // enchanted in place, so it lists alongside the bagged copies and needs to
+    // say which equipment slot it is on ({slot} resolves through the shared
+    // itemUi.slots labels, so Main Hand and Off Hand separate a dual-wielded
+    // pair). Both rings share the one "Finger" label there, which is fine: two
+    // eligible identical rings take the same enchant either way.
+    wornTag: 'Worn ({slot})',
   },
   // Recipe training window (Professions 2.0): a station master
   // teaches trainer-acquisition recipes for a tier-priced copper fee

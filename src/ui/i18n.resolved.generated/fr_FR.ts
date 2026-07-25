@@ -2421,7 +2421,8 @@ export const fr_FR: EnTranslations = {
       "pickerTitle": "Appliquer un enchantement",
       "targetTitle": "Choisissez un objet à enchanter",
       "noEnchants": "Aucun enchantement n'utilise ce réactif.",
-      "noTargets": "Aucun objet éligible à enchanter."
+      "noTargets": "Aucun objet éligible à enchanter.",
+      "wornTag": "Worn ({slot})"
     },
     "training": {
       "title": "Formation : {name}",

@@ -2421,7 +2421,8 @@ export const id_ID: EnTranslations = {
       "pickerTitle": "Terapkan Mantrai",
       "targetTitle": "Pilih barang untuk dimantrai",
       "noEnchants": "Tidak ada mantrai yang menggunakan reagen ini.",
-      "noTargets": "Tidak ada barang yang memenuhi syarat untuk dimantrai."
+      "noTargets": "Tidak ada barang yang memenuhi syarat untuk dimantrai.",
+      "wornTag": "Worn ({slot})"
     },
     "training": {
       "title": "Pelatihan: {name}",

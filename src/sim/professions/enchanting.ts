@@ -1,7 +1,9 @@
 // Enchanting profession: disenchant an eligible weapon/armor piece into arcane
 // materials, then spend those materials to apply a permanent stat bonus to a
-// SPECIFIC held copy of an item (not the character, not the item id in the
-// abstract). An enchanted piece is a fresh, non-stacking instanced copy
+// SPECIFIC copy of an item (not the character, not the item id in the
+// abstract): a bagged copy, or, with a slot named, the copy WORN in that
+// equipment slot, enchanted in place. An enchanted piece is a non-stacking
+// instanced copy
 // (types.ts ItemInstancePayload.rolled.stats), so it survives equip/unequip
 // (src/sim/items.ts) and stays a distinct good, separate from a plain copy of
 // the same item id. sellItem/discardItem/trade's drop arm now prefer a
@@ -40,11 +42,16 @@
 import { bagCapacity, consumeOneScratch, countFit, fitsAll, removeStacked } from '../bags';
 import { ENCHANTS, type EnchantDef } from '../content/enchants';
 import { ITEMS } from '../data';
+import { recalcPlayerStats } from '../entity';
 import { requiredLevelFor } from '../item_level_req';
 import type { Rng } from '../rng';
+// Type-only import (the crafting.ts/commission.ts idiom): PlayerMeta is a
+// shape, never the Sim class, so this module stays host-agnostic.
+import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
   cloneItemInstancePayload,
+  type EquipSlot,
   type InvSlot,
   type ItemDef,
   type ItemInstancePayload,
@@ -175,6 +182,31 @@ export function enchantGainTier(enchant: EnchantDef): number {
   return tier;
 }
 
+/** The shared post-success bookkeeping every enchanting action performs, in one
+ *  place because all three arms (disenchant, apply-to-bagged, apply-to-worn) do
+ *  exactly this and only the input tier differs: the quality-tiered
+ *  'enchanting' skill gain (soft-clamped to the archetype ceiling and run
+ *  through the four-state mastery curve; a zero gray gain never blocks the
+ *  action), the shared action-throttle stamp, and the deed re-check the skill
+ *  gain's craftSkill triggers need (the crafting.ts craftItem contract: the
+ *  gaining site marks the player dirty itself). */
+function grantEnchantingSkill(ctx: SimContext, meta: PlayerMeta, inputTier: number): void {
+  gainCraftSkill(
+    meta.craftSkills,
+    'enchanting',
+    ENCHANTING_SKILL_GAIN *
+      enchantingGainMultiplier(
+        meta.craftSkills,
+        meta.archetype.activeArchetype,
+        meta.archetype.pairedMajor,
+        meta.archetype.hobbyCraft,
+        inputTier,
+      ),
+  );
+  recordAction(meta);
+  ctx.markDeedsDirty(meta.entityId);
+}
+
 export interface DisenchantResult {
   ok: boolean;
   itemId: string;
@@ -279,28 +311,8 @@ export function resolveDisenchant(ctx: SimContext, pid: number, itemId: string):
       ctx.addItemInstance(secondaryItemId, { bindOnTrade: true }, pid);
     }
   }
-  if (meta) {
-    // Quality-tiered gain: the disenchanted item's def quality is
-    // the input tier, soft-clamped to the archetype ceiling and run through
-    // the four-state curve. A zero (gray) gain never blocks the action.
-    const inputTier = ENCHANTING_GAIN_TIER_BY_QUALITY[quality];
-    gainCraftSkill(
-      meta.craftSkills,
-      'enchanting',
-      ENCHANTING_SKILL_GAIN *
-        enchantingGainMultiplier(
-          meta.craftSkills,
-          meta.archetype.activeArchetype,
-          meta.archetype.pairedMajor,
-          meta.archetype.hobbyCraft,
-          inputTier,
-        ),
-    );
-    recordAction(meta);
-    // The skill gain feeds the craftSkill deed triggers, so the site marks
-    // the player dirty itself (the crafting.ts craftItem contract).
-    ctx.markDeedsDirty(meta.entityId);
-  }
+  // Quality-tiered gain: the disenchanted item's def quality is the input tier.
+  if (meta) grantEnchantingSkill(ctx, meta, ENCHANTING_GAIN_TIER_BY_QUALITY[quality]);
   const result: DisenchantResult = { ok: true, itemId, materialItemId, count };
   if (secondaryItemId && secondaryCount) {
     result.secondaryItemId = secondaryItemId;
@@ -362,6 +374,76 @@ export function enchantedPayloadFor(
   return merged;
 }
 
+/** Resolve one apply-enchant attempt against the copy WORN in `slot`, enchanting
+ *  it in place (the classic behavior: no unequip / enchant / re-equip dance).
+ *  Every gate mirrors the bagged arm below one for one: the enchant must target
+ *  this item's slot (checked by the shared caller), the named slot must actually
+ *  be wearing this exact item id, the worn copy must NOT already be enchanted,
+ *  every reagent must be held IN THE BAGS (all-or-nothing), and the shared
+ *  action throttle applies. On success the merged payload (the SAME
+ *  enchantedPayloadFor the bagged arm mints, so signer / masterwork / legacy
+ *  rolled.quality survival is one contract, not two) is written straight onto
+ *  PlayerMeta.equipmentInstance[slot] and the stats are re-baked.
+ *
+ *  The discriminator is a SLOT, deliberately, and not an item id: ring1/ring2
+ *  and mainhand/offhand can each be wearing an identical copy of one item id,
+ *  and only the slot says which of the two the player aimed at. */
+function resolveApplyEnchantWorn(
+  ctx: SimContext,
+  pid: number,
+  itemId: string,
+  enchant: EnchantDef,
+  slot: EquipSlot,
+): ApplyEnchantResult {
+  const enchantId = enchant.id;
+  const r = ctx.resolve(pid);
+  if (!r) return { ok: false, itemId, enchantId, reason: 'not_held' };
+  const { meta, e: p } = r;
+  // An empty slot, or a slot wearing something else, denies with the same
+  // not_held answer the bagged arm gives when no eligible copy is held.
+  // Untrusted input: the client names a slot, the sim decides what is in it.
+  if (meta.equipment[slot] !== itemId) {
+    return { ok: false, itemId, enchantId, reason: 'not_held' };
+  }
+  // An ABSENT payload is a plain worn copy, which is enchantable (exactly like
+  // a plain fungible bagged copy). A payload that isEnchantedInstance reads as
+  // already enchanted and denies, so double-enchant stays blocked identically on
+  // both arms; a signed or masterwork payload is neither, and stays eligible.
+  const worn = meta.equipmentInstance?.[slot];
+  if (worn && isEnchantedInstance(worn)) {
+    return { ok: false, itemId, enchantId, reason: 'not_held' };
+  }
+  for (const reagent of enchant.reagents) {
+    if (ctx.countItem(reagent.itemId, pid) < reagent.count) {
+      return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
+    }
+  }
+  // Shared action throttle (action_throttle.ts), the same 10-per-60s budget the
+  // bagged arm and crafting draw from, checked before anything is consumed.
+  if (!withinActionThrottle(meta, ctx.time)) {
+    return { ok: false, itemId, enchantId, reason: 'throttled' };
+  }
+  // NO #2350 bag-capacity gate on this arm, deliberately: nothing enters the
+  // bags. The enchanted copy is rewritten in place on the worn slot and the
+  // reagents only leave, so this action can never need a free bag slot. The
+  // capacity gate belongs to the bagged arm alone, where the mint really does
+  // land in the inventory.
+  for (const reagent of enchant.reagents) ctx.removeItem(reagent.itemId, reagent.count, pid);
+  meta.equipmentInstance ??= {};
+  meta.equipmentInstance[slot] = enchantedPayloadFor(worn, enchant);
+  // Make the stat pipeline see it: recalcPlayerStats reads the per-slot
+  // rolled.stats off equipmentInstance (entity.ts), which is the same read
+  // items.ts equipItem re-bakes after moving a payload into that map, so an
+  // in-place enchant has to re-bake exactly the same way. That call also rebuilds
+  // the render mirror e.equippedInstances, which is what the server's `eqi`
+  // identity-diff (server/game.ts identityFields + the cache.idJson compare)
+  // picks up on the next snapshot: no extra dirty-marking is needed.
+  recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+  // Same skill gain as the bagged arm: the applied enchant's reagent-derived tier.
+  grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
+  return { ok: true, itemId, enchantId };
+}
+
 /** Resolve one apply-enchant attempt against a HELD (bagged, not currently
  *  equipped) eligible copy of `itemId`: a plain fungible copy, or an
  *  instanced copy that has NOT itself been enchanted yet (crafted rare+ gear;
@@ -380,20 +462,30 @@ export function enchantedPayloadFor(
  *  rather than dropped (stats sum ADDITIVELY), so enchanting a crafted or
  *  masterwork item does not erase its crafter attribution
  *  (battlefield_xp.ts), its masterwork bonus, or legacy rolled.quality
- *  (#1712 round-3 review). */
+ *  (#1712 round-3 review).
+ *
+ *  `slot` selects the WORN arm instead (resolveApplyEnchantWorn above): the copy
+ *  equipped in that exact equipment slot is enchanted in place, so worn gear
+ *  needs no unequip / enchant / re-equip round trip. Omitted, this resolves
+ *  against the bags exactly as before. */
 export function resolveApplyEnchant(
   ctx: SimContext,
   pid: number,
   itemId: string,
   enchantId: string,
+  slot?: EquipSlot,
 ): ApplyEnchantResult {
   const itemDef = ITEMS[itemId];
   if (!itemDef) return { ok: false, itemId, enchantId, reason: 'unknown_item' };
   const enchant = ENCHANTS[enchantId];
   if (!enchant) return { ok: false, itemId, enchantId, reason: 'unknown_enchant' };
+  // The slot-kind gate is shared by both arms: an item declares its slot KIND
+  // ('ring' for either finger, 'mainhand' for a one-hand weapon worn in either
+  // hand), which is what an enchant's itemSlot names.
   if (itemDef.slot !== enchant.itemSlot) {
     return { ok: false, itemId, enchantId, reason: 'wrong_slot' };
   }
+  if (slot) return resolveApplyEnchantWorn(ctx, pid, itemId, enchant, slot);
   if (ctx.countEnchantableItem(itemId, pid) < 1) {
     return { ok: false, itemId, enchantId, reason: 'not_held' };
   }
@@ -435,39 +527,21 @@ export function resolveApplyEnchant(
   // capacity gate).
   const merged = enchantedPayloadFor(consumed, enchant);
   ctx.addItemInstance(itemId, merged, pid);
-  if (meta) {
-    // Quality-tiered gain: the applied enchant's reagent-derived
-    // tier (enchantGainTier above) is the input tier, soft-clamped to the
-    // archetype ceiling and run through the four-state curve. A zero (gray)
-    // gain never blocks the action.
-    gainCraftSkill(
-      meta.craftSkills,
-      'enchanting',
-      ENCHANTING_SKILL_GAIN *
-        enchantingGainMultiplier(
-          meta.craftSkills,
-          meta.archetype.activeArchetype,
-          meta.archetype.pairedMajor,
-          meta.archetype.hobbyCraft,
-          enchantGainTier(enchant),
-        ),
-    );
-    recordAction(meta);
-    // The skill gain feeds the craftSkill deed triggers, so the site marks
-    // the player dirty itself (the crafting.ts craftItem contract).
-    ctx.markDeedsDirty(meta.entityId);
-  }
+  // Quality-tiered gain: the applied enchant's reagent-derived tier.
+  if (meta) grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));
   return { ok: true, itemId, enchantId };
 }
 
-/** Command entry point, same shape as disenchantItem/salvageItem above. */
+/** Command entry point, same shape as disenchantItem/salvageItem above.
+ *  `slot`, when present, names the WORN equipment slot to enchant in place. */
 export function applyEnchant(
   ctx: SimContext,
   itemId: string,
   enchantId: string,
   pid?: number,
+  slot?: EquipSlot,
 ): ApplyEnchantResult {
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, enchantId, reason: 'unknown_item' };
-  return resolveApplyEnchant(ctx, r.meta.entityId, itemId, enchantId);
+  return resolveApplyEnchant(ctx, r.meta.entityId, itemId, enchantId, slot);
 }

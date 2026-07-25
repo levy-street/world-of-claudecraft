@@ -2421,7 +2421,8 @@ export const tr_TR: EnTranslations = {
       "pickerTitle": "Büyü Uygula",
       "targetTitle": "Büyülenecek eşya seçin",
       "noEnchants": "Hiçbir büyü bu malzemeyi kullanmıyor.",
-      "noTargets": "Büyülenecek uygun eşya yok."
+      "noTargets": "Büyülenecek uygun eşya yok.",
+      "wornTag": "Worn ({slot})"
     },
     "training": {
       "title": "Eğitim: {name}",

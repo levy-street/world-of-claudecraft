@@ -2421,7 +2421,8 @@ export const cs_CZ: EnTranslations = {
       "pickerTitle": "Aplikovat okouzlení",
       "targetTitle": "Vybrat předmět",
       "noEnchants": "Žádné okouzlení nepoužívá tuto reagencii.",
-      "noTargets": "Žádný způsobilý předmět k okouzlení."
+      "noTargets": "Žádný způsobilý předmět k okouzlení.",
+      "wornTag": "Worn ({slot})"
     },
     "training": {
       "title": "Školení: {name}",

@@ -12,21 +12,26 @@
 //     enchanted): bag_item_context_menu.ts decides that predicate.
 //   - Apply Enchant opens a two-step picker (also on #ctx-menu): the enchants
 //     that consume the reagent, each with affordability + target slot, then the
-//     held eligible targets, then world.applyEnchant. enchant_apply_view.ts
-//     models both steps.
+//     eligible targets (the held copies AND the WORN ones, which enchant in
+//     place), then world.applyEnchant. enchant_apply_view.ts models both steps.
 //
 // The pure decisions live in the two view cores; this owns only DOM + dispatch,
 // talks to the world exclusively through IWorld, and never decides an outcome.
 
 import { ITEMS } from '../sim/data';
-import type { ItemDef, ItemSlot } from '../sim/types';
+import type { EquipSlot, ItemDef, ItemSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   type BagItemContextActionId,
   bagItemContextActions,
   destroyConsumesSpecialCopy,
 } from './bag_item_context_menu';
-import { enchantNameKey, enchantsForReagent, enchantTargets } from './enchant_apply_view';
+import {
+  enchantNameKey,
+  enchantsForReagent,
+  enchantTargets,
+  wornEnchantTargets,
+} from './enchant_apply_view';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { t } from './i18n';
@@ -180,13 +185,25 @@ export class BagItemActionMenu {
     );
   }
 
-  // Step two: the held items eligible as the enchant target (def slot matches,
-  // a non-already-enchanted copy is held), then world.applyEnchant.
+  // Step two: every eligible enchant target, then world.applyEnchant. Two
+  // families, in one list: the bagged copies (def slot matches, a
+  // non-already-enchanted copy is held) and the WORN copies (the same match
+  // against the equipped set), since worn gear is enchanted in place and needs no
+  // unequip / re-equip round trip. A worn row carries its equipment slot both in
+  // its label and in its dispatch, which is what separates a dual-wielded pair or
+  // two rings holding identical copies.
   private openTargetPicker(enchantId: string, x: number, y: number): void {
     const world = this.deps.world();
     const targets = enchantTargets(world.inventory, enchantId);
+    // The self entity mirror carries equippedInstances in BOTH worlds (offline
+    // Sim and online ClientWorld), the same read the paperdoll tooltip uses.
+    const worn = wornEnchantTargets(
+      world.equipment,
+      world.entities.get(world.playerId)?.equippedInstances ?? {},
+      enchantId,
+    );
     const title = esc(t('hudChrome.enchanting.targetTitle'));
-    if (targets.length === 0) {
+    if (targets.length === 0 && worn.length === 0) {
       this.paint(
         [{ html: esc(t('hudChrome.enchanting.noTargets')), disabled: true }],
         x,
@@ -197,19 +214,34 @@ export class BagItemActionMenu {
       );
       return;
     }
-    const rows = targets.map((target) => {
-      const def = ITEMS[target.itemId];
-      return {
+    const nameOf = (itemId: string): string => {
+      const def = ITEMS[itemId];
+      return esc(def ? itemDisplayName(def) : itemId);
+    };
+    const rows = [
+      ...worn.map((target) => ({
+        act: `worn:${target.slot}`,
+        html: `${nameOf(target.itemId)}<span class="ctx-item-meta">${esc(
+          t('hudChrome.enchanting.wornTag', { slot: this.deps.slotName(target.slot) }),
+        )}</span>`,
+      })),
+      ...targets.map((target) => ({
         act: `target:${target.itemId}`,
-        html: esc(def ? itemDisplayName(def) : target.itemId),
-      };
-    });
+        html: nameOf(target.itemId),
+      })),
+    ];
     this.paint(
       rows,
       x,
       y,
       (act) => {
-        world.applyEnchant(act.slice('target:'.length), enchantId);
+        if (act.startsWith('worn:')) {
+          const slot = act.slice('worn:'.length) as EquipSlot;
+          const target = worn.find((row) => row.slot === slot);
+          if (target) world.applyEnchant(target.itemId, enchantId, slot);
+        } else {
+          world.applyEnchant(act.slice('target:'.length), enchantId);
+        }
         this.deps.afterAction();
       },
       title,

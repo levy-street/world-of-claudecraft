@@ -2421,7 +2421,8 @@ export const en_CA: EnTranslations = {
       "pickerTitle": "Apply Enchant",
       "targetTitle": "Choose an item to enchant",
       "noEnchants": "No enchant uses this reagent.",
-      "noTargets": "No eligible item to enchant."
+      "noTargets": "No eligible item to enchant.",
+      "wornTag": "Worn ({slot})"
     },
     "training": {
       "title": "Training: {name}",

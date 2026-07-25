@@ -2421,7 +2421,8 @@ export const de_DE: EnTranslations = {
       "pickerTitle": "Verzauberung anwenden",
       "targetTitle": "Wähle einen Gegenstand zum Verzaubern",
       "noEnchants": "Keine Verzauberung verwendet dieses Reagenz.",
-      "noTargets": "Kein geeigneter Gegenstand zum Verzaubern."
+      "noTargets": "Kein geeigneter Gegenstand zum Verzaubern.",
+      "wornTag": "Worn ({slot})"
     },
     "training": {
       "title": "Ausbildung: {name}",

@@ -138,7 +138,7 @@ describe('offline Sim enchanting commands: stash + single pid-scoped emit', () =
     sim.addItem(COMMON_WEAPON, 1, pid);
     sim.addItem(DUST, 5, pid);
     sim.drainEvents();
-    sim.applyEnchant(COMMON_WEAPON, WEAPON_ENCHANT, pid);
+    sim.applyEnchant(COMMON_WEAPON, WEAPON_ENCHANT, undefined, pid);
     const ench = eventsOfType(sim.drainEvents(), 'enchantResult');
     expect(ench).toHaveLength(1);
     if (ench[0].type !== 'enchantResult') throw new Error('expected enchantResult');
@@ -171,7 +171,7 @@ describe('offline Sim enchanting commands: stash + single pid-scoped emit', () =
     sim.addItem(COMMON_WEAPON, 1, pid);
     sim.addItem(DUST, 5, pid);
     sim.drainEvents();
-    sim.applyEnchant(COMMON_WEAPON, HELMET_ENCHANT, pid);
+    sim.applyEnchant(COMMON_WEAPON, HELMET_ENCHANT, undefined, pid);
     const wrongSlot = eventsOfType(sim.drainEvents(), 'enchantResult')[0];
     if (wrongSlot?.type !== 'enchantResult') throw new Error('expected enchantResult');
     expect(wrongSlot.ok).toBe(false);
@@ -186,7 +186,7 @@ describe('offline Sim enchanting commands: stash + single pid-scoped emit', () =
     const pid2 = sim2.playerId;
     sim2.addItem(COMMON_WEAPON, 1, pid2);
     sim2.drainEvents();
-    sim2.applyEnchant(COMMON_WEAPON, WEAPON_ENCHANT, pid2);
+    sim2.applyEnchant(COMMON_WEAPON, WEAPON_ENCHANT, undefined, pid2);
     const shortMats = eventsOfType(sim2.drainEvents(), 'enchantResult')[0];
     if (shortMats?.type !== 'enchantResult') throw new Error('expected enchantResult');
     expect(shortMats.reason).toBe('insufficient_materials');
@@ -208,7 +208,7 @@ describe('offline Sim enchanting commands: replay + throttle safety', () => {
       const run = () => {
         if (kind === 'salvage') sim.salvageItem(COMMON_WEAPON, pid);
         else if (kind === 'disenchant') sim.disenchantItem(COMMON_WEAPON, pid);
-        else sim.applyEnchant(COMMON_WEAPON, WEAPON_ENCHANT, pid);
+        else sim.applyEnchant(COMMON_WEAPON, WEAPON_ENCHANT, undefined, pid);
       };
 
       run();
@@ -448,6 +448,119 @@ describe('enchanting commands over the live GameServer wire (event + delta routi
     expect(client.lastEnchantResult).toEqual(stash);
   });
 
+  it('apply_enchant with a worn slot enchants in place and the eqi mirror carries it', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const fcWatch = fakeWs();
+    const st = joinServer(server, fc, 407, 'Wearer');
+    const watch = joinServer(server, fcWatch, 408, 'Watcher');
+    placeAt(server, st.pid, FIELD_POS);
+    placeAt(server, watch.pid, FIELD_POS);
+    server.sim.addItem(COMMON_WEAPON, 1, st.pid);
+    server.sim.equipItemToSlot(COMMON_WEAPON, 'mainhand', st.pid);
+    server.sim.addItem(DUST, 5, st.pid);
+    const strBefore = server.sim.entities.get(st.pid)!.stats.str;
+
+    cmd(server, st, {
+      cmd: 'apply_enchant',
+      item: COMMON_WEAPON,
+      enchant: WEAPON_ENCHANT,
+      slot: 'mainhand',
+    });
+    routeTick(server);
+
+    const ench = eventsFor(fc.sent, 'enchantResult');
+    expect(ench).toHaveLength(1);
+    if (ench[0].type !== 'enchantResult') throw new Error('expected enchantResult');
+    expect(ench[0].ok).toBe(true);
+    // In PLACE: the piece never left the slot, nothing entered the bags, and the
+    // reagents were spent. enchant_weapon_might is str +2.
+    const meta = metaOf(server, st.pid);
+    expect(meta.equipment.mainhand).toBe(COMMON_WEAPON);
+    expect(meta.equipmentInstance.mainhand?.enchant).toBe(WEAPON_ENCHANT);
+    expect(server.sim.countItem(COMMON_WEAPON, st.pid)).toBe(0);
+    expect(server.sim.countItem(DUST, st.pid)).toBe(0);
+    expect(server.sim.entities.get(st.pid)!.stats.str).toBe(strBefore + 2);
+
+    // The eqi identity key re-diffs off the rebuilt render mirror, so the next
+    // broadcast carries the new payload to an onlooker with no extra dirtying.
+    fcWatch.sent.length = 0;
+    broadcast(server);
+    const snap = lastSnap(fcWatch.sent) as unknown as { ents: Record<string, any>[] } | null;
+    if (!snap) throw new Error('no snapshot');
+    const record = snap.ents.find((r) => r.id === st.pid);
+    expect(record?.eqi).toEqual({
+      mainhand: { enchant: WEAPON_ENCHANT, rolled: { stats: { str: 2 } } },
+    });
+    const client = bareClient(watch.pid);
+    (client as unknown as { applySnapshot(s: unknown): void }).applySnapshot(snap);
+    expect(client.entities.get(st.pid)?.equippedInstances.mainhand?.enchant).toBe(WEAPON_ENCHANT);
+  });
+
+  it('a garbage slot value falls back to the bagged arm: no throw, no worn write', () => {
+    for (const [i, bogus] of [42, 'not_a_slot', { slot: 'mainhand' }, null].entries()) {
+      const server = new GameServer();
+      const fc = fakeWs();
+      const st = joinServer(server, fc, 420 + i, `Fuzz${i}`);
+      placeAt(server, st.pid, FIELD_POS);
+      // The copy lives in the BAGS, and nothing of this id is worn.
+      server.sim.addItem(COMMON_WEAPON, 1, st.pid);
+      server.sim.addItem(DUST, 5, st.pid);
+      const meta = metaOf(server, st.pid);
+      expect(meta.equipment.mainhand).not.toBe(COMMON_WEAPON);
+
+      cmd(server, st, {
+        cmd: 'apply_enchant',
+        item: COMMON_WEAPON,
+        enchant: WEAPON_ENCHANT,
+        slot: bogus,
+      });
+      routeTick(server);
+
+      // Anything that is not a real equipment key reads as undefined, which IS
+      // the bagged arm: the mint landed in the inventory and no worn slot was
+      // written. Nothing threw.
+      const ench = eventsFor(fc.sent, 'enchantResult');
+      expect(ench, String(bogus)).toHaveLength(1);
+      if (ench[0].type !== 'enchantResult') throw new Error('expected enchantResult');
+      expect(ench[0].ok, String(bogus)).toBe(true);
+      expect(meta.equipmentInstance.mainhand?.enchant, String(bogus)).toBeUndefined();
+      const minted = meta.inventory.find(
+        (s) => s.itemId === COMMON_WEAPON && s.instance?.enchant === WEAPON_ENCHANT,
+      );
+      expect(minted, String(bogus)).toBeDefined();
+    }
+  });
+
+  it('a real slot the client does not actually wear that item in is refused (server authority)', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const st = joinServer(server, fc, 430, 'Liar');
+    placeAt(server, st.pid, FIELD_POS);
+    server.sim.addItem(COMMON_WEAPON, 1, st.pid); // bagged, NOT worn
+    server.sim.addItem(DUST, 5, st.pid);
+
+    cmd(server, st, {
+      cmd: 'apply_enchant',
+      item: COMMON_WEAPON,
+      enchant: WEAPON_ENCHANT,
+      slot: 'offhand',
+    });
+    routeTick(server);
+
+    const ench = eventsFor(fc.sent, 'enchantResult');
+    expect(ench).toHaveLength(1);
+    if (ench[0].type !== 'enchantResult') throw new Error('expected enchantResult');
+    expect(ench[0].ok).toBe(false);
+    expect(ench[0].reason).toBe('not_held');
+    // Nothing was consumed and no payload was invented for the empty slot: the
+    // named slot is a request, never a claim the sim trusts.
+    const meta = metaOf(server, st.pid);
+    expect(meta.equipmentInstance.offhand).toBeUndefined();
+    expect(server.sim.countItem(DUST, st.pid)).toBe(5);
+    expect(server.sim.countItem(COMMON_WEAPON, st.pid)).toBe(1);
+  });
+
   it('salvage_item routes the salvageResult event AND the salv delta into a ClientWorld', () => {
     const server = new GameServer();
     const fc = fakeWs();
@@ -546,10 +659,15 @@ describe('ClientWorld enchanting members are live (send + event mirror)', () => 
       const client = c as ClientWorld;
       client.disenchantItem('sword_x');
       client.applyEnchant('sword_x', 'ench_y');
+      client.applyEnchant('sword_x', 'ench_y', 'offhand');
       client.salvageItem('sword_z');
       expect(sent).toEqual([
         { t: 'cmd', cmd: 'disenchant_item', item: 'sword_x' },
+        // No slot given: an undefined field drops out of the JSON entirely, so a
+        // bagged apply stays byte-identical to the pre-feature wire form.
         { t: 'cmd', cmd: 'apply_enchant', item: 'sword_x', enchant: 'ench_y' },
+        // The worn arm rides the SAME command with the optional slot appended.
+        { t: 'cmd', cmd: 'apply_enchant', item: 'sword_x', enchant: 'ench_y', slot: 'offhand' },
         { t: 'cmd', cmd: 'salvage_item', item: 'sword_z' },
       ]);
     } finally {

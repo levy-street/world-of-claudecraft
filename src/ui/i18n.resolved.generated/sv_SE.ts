@@ -2421,7 +2421,8 @@ export const sv_SE: EnTranslations = {
       "pickerTitle": "Applicera förtrollning",
       "targetTitle": "Välj ett föremål att förtrylla",
       "noEnchants": "Inget förtrollning använder det reagnset.",
-      "noTargets": "Inget behörigt föremål att förtrylla."
+      "noTargets": "Inget behörigt föremål att förtrylla.",
+      "wornTag": "Worn ({slot})"
     },
     "training": {
       "title": "Utbildning: {name}",
