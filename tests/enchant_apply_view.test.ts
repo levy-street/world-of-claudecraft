@@ -153,6 +153,46 @@ describe('enchant_apply_view: tier classification', () => {
   it('an unknown enchant id falls back to Base rather than throwing', () => {
     expect(enchantTier('not_a_real_enchant')).toBe('base');
   });
+
+  // Review nit (#2404): the tier is inferred from reagent ids rather than an
+  // explicit EnchantDef field, so a future reagent that follows neither
+  // convention would silently read as Base. Pin the reagent UNIVERSE instead of
+  // trusting the convention: adding a reagent that is neither the shard, a
+  // resonant, nor a known base material fails HERE, loudly, at the point where
+  // the classification would have gone quietly wrong. Extend the list only
+  // together with the enchantTier arm that classifies the new material.
+  it('every enchant reagent is a material the tier rules actually recognize', () => {
+    const KNOWN_BASE_REAGENTS = new Set(['arcane_dust', 'arcane_essence']);
+    const unclassifiable: string[] = [];
+    for (const enchant of Object.values(ENCHANTS)) {
+      for (const { itemId } of enchant.reagents) {
+        if (itemId === 'arcane_shard') continue;
+        if (itemId.startsWith('resonant_')) continue;
+        if (KNOWN_BASE_REAGENTS.has(itemId)) continue;
+        unclassifiable.push(`${enchant.id} -> ${itemId}`);
+      }
+    }
+    expect(
+      unclassifiable,
+      'these reagents match no tier rule and would silently classify as Base:\n' +
+        `${unclassifiable.join('\n')}\n` +
+        'Add the material to enchantTier (src/ui/enchant_apply_view.ts) and to this list.',
+    ).toEqual([]);
+  });
+
+  it('the two tier-marker reagents are still real, distinct items', () => {
+    // The rules key on these ids, so a rename in content must not leave the
+    // classification pointing at nothing.
+    expect(ITEMS.arcane_shard).toBeDefined();
+    const resonants = Object.keys(ITEMS).filter((id) => id.startsWith('resonant_'));
+    expect(resonants.length).toBeGreaterThan(0);
+    // And each tier is actually POPULATED, so a rename that silently emptied a
+    // tier (every row falling through to Base) fails here too.
+    const tiers = Object.keys(ENCHANTS).map(enchantTier);
+    expect(tiers).toContain('greater');
+    expect(tiers).toContain('runed');
+    expect(tiers).toContain('base');
+  });
 });
 
 describe('enchant_apply_view: enchantSectionsForReagent', () => {
