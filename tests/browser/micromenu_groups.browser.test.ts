@@ -132,6 +132,43 @@ describe('micro-menu section keylines, as the engine actually resolves them', ()
     expect(borderTopPx(stuff), 'a real section is still above it').toBe(KEYLINE_PX);
   });
 
+  it('keeps a uniform button pitch, so two columns of different shape still line up', () => {
+    // The rail is two side-by-side columns whose buttons read as aligned ROWS.
+    // The sections do not divide those columns at the same offsets (col-a has
+    // 3, col-b has 4), so a divider that added height would shift one column
+    // relative to the other and break the rows. The keyline is drawn inside
+    // the column gap with a compensating negative margin for exactly that
+    // reason; this measures that it worked.
+    const colA = buildColumn([
+      { group: 'you', buttons: ['mm-char', 'mm-spell', 'mm-talents'] },
+      { group: 'world', buttons: ['mm-quest', 'mm-map'] },
+      { group: 'stuff', buttons: ['mm-bag', 'mm-crafting'] },
+    ]);
+    const colB = buildColumn([
+      { group: 'activities', buttons: ['mm-arena', 'mm-dfinder'] },
+      { group: 'people', buttons: ['mm-social', 'mm-emote'] },
+      { group: 'system', buttons: ['mm-music', 'mm-options'] },
+    ]);
+
+    const pitches = (col: HTMLElement): number[] => {
+      const tops = [...col.querySelectorAll<HTMLElement>('.micro-btn')].map(
+        (b) => b.getBoundingClientRect().top,
+      );
+      return tops.slice(1).map((t, i) => Math.round(t - tops[i]));
+    };
+
+    const a = pitches(colA);
+    const b = pitches(colB);
+    expect(a.length).toBeGreaterThan(2);
+    expect(b.length).toBeGreaterThan(2);
+    // One distinct step within each column: crossing a section boundary costs
+    // exactly the same as staying inside one.
+    expect(new Set(a).size, `col-a pitches ${a.join(',')} are not uniform`).toBe(1);
+    expect(new Set(b).size, `col-b pitches ${b.join(',')} are not uniform`).toBe(1);
+    // ...and the same step in both, which is what makes the rows line up.
+    expect(a[0]).toBe(b[0]);
+  });
+
   it('renders no rail at all, and so no keylines, on mobile', () => {
     const col = buildColumn([
       { group: 'rewards', buttons: ['daily-rewards-button'] },

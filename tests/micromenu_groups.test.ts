@@ -130,15 +130,24 @@ describe('micro-menu sections: the keyline and its hidden-section rule', () => {
   const NEUTRALIZER_RULE =
     /\.micro-group\[data-group=["']rewards["']\]:not\(:has\(> :not\(\[hidden\]\)\)\) \+ \.micro-group \{([^}]*)\}/;
 
-  it('draws the divider in the shared showcase keyline token, no new color', () => {
+  it('draws the divider in the low-alpha gold this file already uses, no new color', () => {
     const rule = DIVIDER_RULE.exec(hudCss)?.[1];
     expect(rule, 'missing the section-divider rule in src/styles/hud.css').toBeTruthy();
-    expect(rule).toMatch(/border-top:\s*1px solid var\(--color-border-showcase\)/);
+    // Same color-mix-over---gold idiom as the other divider rule in hud.css,
+    // rather than a fresh hex. Kept clearly visible against the button chrome:
+    // the earlier --color-border-showcase hairline read as almost nothing at
+    // the rail's size.
+    const mix =
+      /border-top:\s*1px solid color-mix\(in srgb, var\(--gold\) (\d+)%, transparent\)/.exec(
+        rule ?? '',
+      );
+    expect(mix, 'divider must use the color-mix gold keyline').not.toBeNull();
+    expect(Number(mix?.[1])).toBeGreaterThanOrEqual(30);
     // A border on `.micro-group` itself would rule every section, including
     // the first one in a column.
     expect(block('.micro-group')).not.toMatch(/border/);
     // The token has to exist upstream in tokens.css rather than be invented here.
-    expect(read('../src/styles/tokens.css')).toMatch(/--color-border-showcase:\s*#[0-9a-f]{6};/);
+    expect(read('../src/styles/tokens.css')).toMatch(/--gold:\s*#[0-9a-f]{6};/);
   });
 
   it('stacks the divider perpendicular to the column axis', () => {

@@ -118,14 +118,13 @@ describe('side rail height budget', () => {
   // The Daily Rewards chest block (button plus its margin), which now lives
   // at the top of col-b only, from the reviewer's offline measurement.
   const DAILY_CHEST_BLOCK_PX = 128;
-  // Each column is now split into .micro-group sections, and every boundary
-  // between two VISIBLE sections costs the keyline plus its breathing room
-  // (margin-top: 3px + padding-top: 3px + a 1px border). Counted
-  // separately from the per-button arithmetic so adding a section shows up in
-  // this budget instead of hiding inside it. Deliberately NOT compacted by the
-  // max-height rescue: at a 1px in-section gap it is the only thing left
-  // telling the sections apart.
-  const SECTION_SEPARATOR_PX = 7;
+  // What each boundary between two VISIBLE sections costs in height:
+  // ZERO, and asserted below rather than assumed: the section keyline is drawn
+  // inside the column gap with a compensating negative margin, so it costs no
+  // height. That is what keeps col-a and col-b on a shared button pitch even
+  // though they hold different numbers of sections; a divider with height
+  // would push the columns out of step and break the rail's aligned rows.
+  const SECTION_SEPARATOR_PX = 0;
 
   function wrapperMarkup(html: string): string {
     const start = html.indexOf('<div id="side-buttons">');
@@ -204,6 +203,40 @@ describe('side rail height budget', () => {
     // between sections never becomes smaller than the one between buttons.
     const colRule = /\n {2}\.side-buttons-col \{([^}]*)\}/.exec(hudCss)?.[1] ?? '';
     expect(Number(/gap:\s*(\d+)px/.exec(colRule)?.[1])).toBe(UNCOMPACTED_GAP_PX);
+  });
+
+  it('keeps the section keyline zero-height, so the two columns share a button pitch', () => {
+    // The alignment invariant, and the reason SECTION_SEPARATOR_PX is 0.
+    // col-a holds 3 sections and col-b holds 4, at different offsets, so any
+    // height the divider adds lands at different y positions per column and
+    // the rail stops reading as aligned rows. Sum the divider's own box model
+    // out of the CSS in BOTH regimes instead of trusting the constant.
+    const sumBoxModel = (rule: string): number => {
+      const num = (prop: string) =>
+        Number(new RegExp(`${prop}:\\s*(-?\\d+)px`).exec(rule)?.[1] ?? '0');
+      const borderPx = /border-top:\s*(\d+)px/.exec(rule);
+      return num('margin-top') + num('padding-top') + Number(borderPx?.[1] ?? '0');
+    };
+
+    const uncompacted = /\n {2}\.micro-group \+ \.micro-group \{([^}]*)\}/.exec(hudCss)?.[1] ?? '';
+    expect(uncompacted, 'missing the divider rule').not.toBe('');
+    expect(sumBoxModel(uncompacted), 'uncompacted keyline must add no height').toBe(0);
+
+    // The compacted override only restates margin/padding, so it inherits the
+    // 1px border from the rule above.
+    const compactedBlock =
+      /@media \(max-height: 600px\) \{([\s\S]*?)\n {2}\}/.exec(hudCss)?.[1] ?? '';
+    const compactedDivider =
+      /\.micro-group \+ \.micro-group \{([^}]*)\}/.exec(compactedBlock)?.[1] ?? '';
+    expect(compactedDivider, 'missing the compacted divider override').not.toBe('');
+    expect(sumBoxModel(`${compactedDivider} border-top: 1px`)).toBe(0);
+
+    // The neutralizer has to stay height-neutral for the same reason: a
+    // collapsed section must not shift the surviving buttons either.
+    const neutralizer =
+      /\.micro-group\[data-group=["']rewards["']\][^{]*\{([^}]*)\}/.exec(hudCss)?.[1] ?? '';
+    expect(neutralizer, 'missing the keyline neutralizer').not.toBe('');
+    expect(sumBoxModel(neutralizer), 'neutralized keyline must add no height').toBe(0);
   });
 
   it('lays the two columns out close together, not spread across the HUD', () => {

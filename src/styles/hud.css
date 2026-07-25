@@ -1851,13 +1851,22 @@
   .micro-group:not(:has(> :not([hidden]))) {
     display: none;
   }
-  /* The section keyline, in the panel-divider language: the shared gold-brown
-     showcase hairline, perpendicular to the column's stacking axis. Every
-     section after the first carries it. */
+  /* The section keyline: the low-alpha gold this file already uses for a
+     divider rule, perpendicular to the column's stacking axis. Every section
+     after the first carries it.
+     It costs ZERO net height, which is load-bearing rather than a nicety: the
+     two columns hold different numbers of sections at different offsets, so a
+     divider that added height would push them out of step and the rail would
+     stop reading as aligned rows (col-a and col-b line up button for button,
+     and that is the rail's visual grammar). The negative margin hands the rule
+     and its breathing room back to the 4px column gap it is drawn inside, so
+     the button pitch is identical with a divider and without one:
+     -2 + 1 (border) + 1 (padding) = 0. The neutralizer below zeroes all three
+     for the same reason, so a collapsed section shifts nothing either. */
   .micro-group + .micro-group {
-    margin-top: 3px;
-    padding-top: 3px;
-    border-top: 1px solid var(--color-border-showcase);
+    margin-top: -2px;
+    padding-top: 1px;
+    border-top: 1px solid color-mix(in srgb, var(--gold) 38%, transparent);
   }
   /* Hidden-section hygiene, second half: collapsing a section with display:none
      does NOT take it out of the sibling chain, so the rule above still matches
@@ -2004,14 +2013,21 @@
        .micro-group sections the column gap only separates SECTIONS, and it is
        the section gap that sets the spacing between individual buttons.
        Compacting one without the other would leave the rescue barely shrinking
-       the rail at all. The section keyline keeps its own 3px breathing room so
-       the sections stay tellable apart at the tighter button spacing. */
+       the rail at all. */
     .side-buttons-col,
     .micro-group {
       gap: 1px;
     }
     #side-buttons .micro-btn {
       height: 24px;
+    }
+    /* The keyline stays zero-height here too, so the columns keep their shared
+       button pitch under compaction: it now has only a 1px gap to sit in, so
+       the rule takes the whole gap instead of being inset inside it.
+       -1 + 1 (border) + 0 = 0. */
+    .micro-group + .micro-group {
+      margin-top: -1px;
+      padding-top: 0;
     }
   }
 
