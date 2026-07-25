@@ -160,13 +160,26 @@ It will NOT be caught by the pending-row check: the rows are populated, just wro
   `gravewyrm_mantle`, the level-20 Gravewyrm Sanctum rare, so no balance number was
   invented; only the id and name differ. If the name changes, update the entity catalog
   entry plus its five non-Latin fills and re-run `npm run i18n:gen`.
-- **O4 (guide page)**: `src/guide/` has no Source Cave content and no `guide.*` prose keys
-  for it. The root `CLAUDE.md` requires player-facing content to feed the `/wiki` guide.
-- **O-deeds**: the Book of Deeds shipped in v0.25.0 and the repo rule is that every new
-  piece of conquerable content authors its deed records in the SAME change
-  (`src/sim/CLAUDE.md`, recipe in `docs/design/deeds.md`). The cave predates the system and
-  `src/sim/content/deeds.ts` still contains no cave records: no clear deed, no wave or seal
-  marks. Author them before calling the feature complete, or flag the gap in the PR body.
+
+## Resolved since
+
+- **O4 (guide page)**: closed as a deliberate NO. The dungeon is a secret, reached through
+  a well rather than advertised, so it gets no `/wiki` page and no `guide.*` prose. The
+  generator already excludes it for free: the cave is a runtime dungeon and never enters
+  the frozen `DUNGEONS` table the wiki walks. Its deeds are authored `hidden`, which strips
+  them structurally from the wiki catalog, the rarity endpoint, and third-party sheets
+  (rule 8 of `docs/design/deeds.md`).
+- **O-deeds**: authored. Three hidden deeds in `src/sim/content/deeds.ts`:
+  `hid_source_cave_cleared` (the clear, 25 Renown, grants the title "Conflictmaker"),
+  `hid_source_cave_unbroken` (clear with the seal never breached, 25, `manual`), and
+  `hid_source_cave_arsenal` (collect the three dev weapons, 0 Renown since they drop on a
+  roll). Credit runs through `onSourceCaveClearedForDeeds` in `src/sim/deeds.ts`, called
+  from the cave's own clear pass.
+  **Why not the shared dungeon-boss helper**: `FINAL_BOSS_DUNGEONS` is pinned as of v1 and
+  also feeds `dungeonFinalBossKills`, which `dgn_boss_clears_50` already reads. Joining it
+  would widen an earnable requirement and move every player's mid-progress fraction, which
+  rule 9 forbids. The cave writes its own clear key and nothing else;
+  `tests/source_cave_deeds.test.ts` pins that the shared counter never moves.
 
 ### The well banter gate
 

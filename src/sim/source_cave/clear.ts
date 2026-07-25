@@ -38,6 +38,7 @@
 // this module can never cross-credit a neighboring instance even if the arena is resized
 // later), currently inert since the real stack end sits far under it.
 
+import { onSourceCaveClearedForDeeds } from '../deeds';
 import { createGroundObject } from '../entity';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -177,6 +178,7 @@ export function updateSourceCaveClear(ctx: SimContext, inst: InstanceSlot): void
   if (recipients.length === 0) return;
   armSourceCaveChest(ctx, chest, recipients);
   grantSourceCaveLockout(ctx, recipients);
+  onSourceCaveClearedForDeeds(ctx, recipients, inst.sourceCaveEncounter?.breached ?? false);
 }
 
 // Arm the sealed chest with a classic shared drop: the group's own loot method

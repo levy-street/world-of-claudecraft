@@ -135,6 +135,11 @@ const FINAL_BOSS_DUNGEONS: Record<string, string> = {
   wildheart_high_priest: 'wildheart_basin',
 };
 
+// The Source Cave's clear key. Held as a literal here, like every id in
+// FINAL_BOSS_DUNGEONS above, so this file keeps no import edge into the cave
+// module; tests/source_cave_deeds.test.ts pins it against SOURCE_CAVE_DUNGEON_ID.
+const SOURCE_CAVE_CLEAR_KEY = 'source_cave';
+
 // Perfection tasks: zero player deaths inside the boss's heroic instance
 // while the boss is engaged. Tainted by onPlayerDeathForDeeds; the window
 // re-arms on evade/reset/respawn (resetDeedEncounter).
@@ -1352,6 +1357,26 @@ export function onDungeonFinalBossKilledForDeeds(
     ctx.time - inst.claimedAt <= SANCTUM_SPEED_SECONDS
   ) {
     for (const meta of recipients) grantDeed(ctx, meta, SANCTUM_SPEED_DEED);
+  }
+}
+
+/** Source Cave clear credit, called from the cave's own 1 Hz clear pass with the
+ *  same recipient set that takes the chest and the daily lockout.
+ *
+ *  Must not route through onDungeonFinalBossKilledForDeeds: that path also bumps
+ *  dungeonFinalBossKills, which dgn_boss_clears_50 already reads, and widening an
+ *  earnable requirement is forbidden (rule 9, docs/design/deeds.md). */
+export function onSourceCaveClearedForDeeds(
+  ctx: SimContext,
+  recipients: PlayerMeta[],
+  breached: boolean,
+): void {
+  for (const meta of recipients) {
+    const clears = meta.deedStats.dungeonClears;
+    clears[SOURCE_CAVE_CLEAR_KEY] = (clears[SOURCE_CAVE_CLEAR_KEY] ?? 0) + 1;
+    // The clear record bypasses bumpDeedStat, so its readers need their own mark.
+    markDeedDirtyKey(ctx, meta.entityId, 'dungeonClears');
+    if (!breached) grantDeed(ctx, meta, 'hid_source_cave_unbroken');
   }
 }
 

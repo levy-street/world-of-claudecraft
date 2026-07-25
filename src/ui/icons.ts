@@ -4542,6 +4542,11 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // the deed_cat_chronicle crest until their commissioned art lands.
   'chr_drakemaw_broodlord',
   'chr_maw_matriarch',
+  // The Open Source's three hidden deeds: 'hidden' has no painted crest of its own
+  // either, so all three fall back to their procedural category crest until art lands.
+  'hid_source_cave_cleared',
+  'hid_source_cave_unbroken',
+  'hid_source_cave_arsenal',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

@@ -42,6 +42,7 @@ import {
 } from '../src/sim/deeds';
 import { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from '../src/sim/rift/rift_gen';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
+import { SOURCE_CAVE_DUNGEON_ID } from '../src/sim/source_cave/runtime';
 import { DEED_STAT_KEYS, type DeedCategory, MILESTONES } from '../src/sim/types';
 
 const ALL = DEED_ORDER.map((id) => DEEDS[id]);
@@ -61,9 +62,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 234 deeds worth 2815 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(234);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2815);
+  it('ships exactly 237 deeds worth 2865 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(237);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2865);
   });
 
   it('ships the audited per-category counts', () => {
@@ -80,7 +81,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       social: 18,
       exploration: 9,
       feat: 3,
-      hidden: 9,
+      hidden: 12,
     });
   });
 
@@ -150,6 +151,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // shipped capstone the first reckoning never credited.
       'chr_drakemaw_broodlord',
       'chr_maw_matriarch',
+      'hid_source_cave_cleared',
+      'hid_source_cave_unbroken',
+      'hid_source_cave_arsenal',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -335,14 +339,14 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(DEEDS.prog_ringwright).toBeUndefined();
   });
 
-  it('ships exactly 30 titles and 3 borders', () => {
+  it('ships exactly 31 titles and 3 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
-    expect(titles.length).toBe(30);
+    expect(titles.length).toBe(31);
     expect(borders.length).toBe(3);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(30);
+    expect(new Set(titleTexts).size).toBe(31);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual(['curators_gilt', 'deepward', 'prestige_laurels']);
   });
@@ -397,7 +401,13 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // standing broodlord rares) and chr_maw_matriarch (quest-trigger credit for
   // the shipped Cindraleth capstone). Both parents appended only, so no
   // shipped trigger or renown changed on either side.
-  const FROZEN_CATALOG_SHA256 = '4421793493830ebbde6691ea8af7f18a99d6917281c94f0b069bb66c1c82e9b1';
+  // Re-baselined again on this branch: the catalog appends The Open Source's
+  // three hidden deeds (the clear, the unbroken-seal task, and the weapon
+  // collection) after the upstream records above. No shipped trigger or renown
+  // changed; the cave deliberately writes its own dungeonClears key instead of
+  // joining the pinned FINAL_BOSS_DUNGEONS map, so no existing deed's
+  // requirement moved.
+  const FROZEN_CATALOG_SHA256 = '4a0f6849c64e2afbc58910df27174fa7f0210a64e234128e506c51edce816452';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -586,12 +596,12 @@ describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and the farshore
-    // first-cast closes the tail, and either moving would signal a reorder
+    // literals: prog_first_steps opens the catalog and hid_source_cave_arsenal
+    // closes the tail, and either moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_maw_matriarch');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('hid_source_cave_arsenal');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -652,6 +662,11 @@ describe('trigger references resolve against the real content tables', () => {
           for (const q of t.questIds) expect(QUESTS[q], `${def.id}: ${q}`).toBeDefined();
           break;
         case 'dungeonClears':
+          // The Source Cave is a RUNTIME dungeon: it is generated at Sim
+          // construction and deliberately never added to the frozen DUNGEONS
+          // table, so it resolves against its own id constant instead. Still
+          // decisive: a typo in the trigger satisfies neither arm.
+          if (t.dungeonId === SOURCE_CAVE_DUNGEON_ID) break;
           expect(DUNGEONS[t.dungeonId], `${def.id}: ${t.dungeonId}`).toBeDefined();
           break;
         case 'delveClears':

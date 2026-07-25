@@ -2399,6 +2399,39 @@ export const DEEDS: Record<string, DeedDef> = {
     // already finished the chain), so the boss template needs no rare flag.
     trigger: { kind: 'quest', questId: 'q_dk_matriarch_of_the_maw' },
   },
+  // Hidden because the dungeon is a secret: rule 8's structural strip keeps
+  // these out of the wiki catalog, the rarity endpoint, and third-party sheets.
+  hid_source_cave_cleared: {
+    id: 'hid_source_cave_cleared',
+    name: 'Merged at Last',
+    desc: 'Push the button, then put down every contributor it wakes.',
+    category: 'hidden',
+    renown: 25,
+    trigger: { kind: 'dungeonClears', dungeonId: 'source_cave', count: 1 },
+    reward: { kind: 'title', text: 'Conflictmaker' },
+    hidden: true,
+  },
+  hid_source_cave_unbroken: {
+    id: 'hid_source_cave_unbroken',
+    name: 'Nobody Broke the Build',
+    desc: 'Clear The Open Source without anyone stepping off the seal and waking the room.',
+    category: 'hidden',
+    renown: 25,
+    trigger: { kind: 'manual' },
+    hidden: true,
+  },
+  hid_source_cave_arsenal: {
+    id: 'hid_source_cave_arsenal',
+    name: 'Full Toolchain',
+    desc: 'Collect all three tools of the trade from The Open Source.',
+    category: 'hidden',
+    renown: 0,
+    trigger: {
+      kind: 'collectItems',
+      itemIds: ['commit_blade', 'bug_squasher', 'mech_keyboard'],
+    },
+    hidden: true,
+  },
 };
 
 for (const def of Object.values(DEEDS)) {
