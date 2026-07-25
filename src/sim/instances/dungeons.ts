@@ -29,6 +29,14 @@ import { cancelProfessionSessionOnDisplacement } from '../professions/session_te
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { arenaQueueLeave } from '../social/arena';
+import {
+  enterSourceCave,
+  leaveSourceCave,
+  SOURCE_CAVE_DUNGEON_ID,
+  sourceCaveInstanceOccupied,
+  sourceCaveOrigin,
+  updateSourceCaveClear,
+} from '../source_cave';
 import { resurrectOnInstanceReentry } from '../spirit';
 import { dropThreat } from '../threat';
 import {
@@ -147,6 +155,11 @@ export function inheritDungeonResetLocks(ctx: SimContext, pid: number): void {
   if (!party) return;
   const partyKey = `party:${party.id}`;
   for (const inst of ctx.instances) {
+    // The runtime Source Cave shares the instance pool but has its own
+    // lockout/reset lifecycle (source_cave/dungeon.ts); a reset-lock inherit
+    // keyed on it would be meaningless, and resetting it would send
+    // claimInstance to DUNGEONS['source_cave'].spawns, which throws.
+    if (inst.dungeonId === SOURCE_CAVE_DUNGEON_ID) continue;
     if (RAID_ALLOWED_DUNGEON_IDS.has(inst.dungeonId)) continue;
     const claimLock =
       inst.partyKey === partyKey && inst.resetAvailableAt > ctx.time && inst.exitId !== null
@@ -169,6 +182,11 @@ export function inheritDungeonResetLocks(ctx: SimContext, pid: number): void {
 }
 
 export function instanceOriginOf(inst: InstanceSlot): { x: number; z: number } {
+  // The runtime Source Cave is not in the frozen DUNGEONS record; its origin is a
+  // pure function of a reserved delve-band index (see source_cave/runtime.ts). Every
+  // origin-based consumer here (enter/leave/updateInstances/instanceInfoAt) routes
+  // through this one seam, so this single branch teaches all of them the cave.
+  if (inst.dungeonId === SOURCE_CAVE_DUNGEON_ID) return sourceCaveOrigin(inst.slot);
   return instanceOrigin(DUNGEONS[inst.dungeonId].index, inst.slot);
 }
 
@@ -249,7 +267,14 @@ export function updateDoorTriggers(ctx: SimContext, p: Entity): void {
   }
   for (const doorId of ctx.dungeonDoorIds) {
     const door = ctx.entities.get(doorId);
-    if (door?.dungeonId && dist2d(p.pos, door.pos) < DOOR_TRIGGER_RADIUS) {
+    if (!door?.dungeonId) continue;
+    // The Source Cave's well requires an explicit interact (its banter gate,
+    // source_cave/well_banter.ts, wired through interaction.ts), never a
+    // walk-in teleport like every other dungeon door. Exception: a ghost
+    // walking back to corpse-run should not have to sit through the banter
+    // again just to reach its own corpse, so ghosts keep the normal walk-in.
+    if (door.dungeonId === SOURCE_CAVE_DUNGEON_ID && !p.ghost) continue;
+    if (dist2d(p.pos, door.pos) < DOOR_TRIGGER_RADIUS) {
       enterDungeon(ctx, door.dungeonId, p.id);
       return;
     }
@@ -265,6 +290,12 @@ export function enterDungeon(
   // raid LOCKOUT is deliberately NOT bypassed (use /dev raid reset for that).
   devBypass = false,
 ): boolean {
+  // The runtime Source Cave enters through its own controller (its mobs are
+  // roster-synthesized, not DUNGEONS[id].spawns + MOBS[id]); access rules come in
+  // Phase 3. Keeps the raid/heroic branches below untouched by the runtime dungeon.
+  if (dungeonId === SOURCE_CAVE_DUNGEON_ID) {
+    return enterSourceCave(ctx, pid);
+  }
   const r = ctx.resolve(pid);
   const dungeon = DUNGEONS[dungeonId];
   if (!r || !dungeon) return false;
@@ -519,10 +550,20 @@ function defeatedNythraxisCorpseRunClaim(
 
 export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
   const r = ctx.resolve(pid);
-  // A fresh corpse cannot move, but a released ghost crossing the nested Nythraxis
-  // approach must be able to backtrack outside if its arena claim becomes unavailable.
+  // A fresh corpse cannot move, but a released ghost may leave. Static dungeons
+  // resurrect a re-entering ghost at the door so none exists inside them; the two
+  // nested interiors that admit ghosts must let them walk back out. The Source Cave
+  // runs an interior corpse run: a ghost whose corpse is unreachable (a freed copy
+  // after a disconnect) must still reach the overworld Spirit Healer. The nested
+  // Nythraxis approach must let a released ghost backtrack outside if its arena claim
+  // becomes unavailable. Same predicate as entry.
   if (!r || (r.e.dead && !r.e.ghost)) return false;
   const p = r.e;
+  // The runtime Source Cave is invisible to dungeonAt (not in DUNGEON_LIST), so
+  // resolve it by the slot the player physically occupies and route to its own exit.
+  if (instanceInfoAt(ctx, p.pos)?.dungeonId === SOURCE_CAVE_DUNGEON_ID) {
+    return leaveSourceCave(ctx, r);
+  }
   // not inside any instance: nothing to leave (no DUNGEON_LIST[0] fallback —
   // that silently teleported outdoor callers to the Hollow Crypt door)
   const dungeon = dungeonAt(p.pos.x);
@@ -713,6 +754,7 @@ function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
   inst.exitId = null;
   inst.bossExitId = null; // the entity itself was dropped with objectIds
   inst.emptyFor = 0;
+  inst.sourceCaveEncounter = undefined;
   inst.resetAvailableAt = 0;
   inst.claimedAt = undefined;
   inst.clearedBy = new Set();
@@ -736,7 +778,11 @@ export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
 
   const key = instanceKeyFor(ctx, r.meta.entityId);
   const owned = ctx.instances.filter(
-    (inst) => inst.partyKey === key && !RAID_ALLOWED_DUNGEON_IDS.has(inst.dungeonId),
+    (inst) =>
+      inst.partyKey === key &&
+      // Same Source Cave carve-out as inheritDungeonResetLocks above.
+      inst.dungeonId !== SOURCE_CAVE_DUNGEON_ID &&
+      !RAID_ALLOWED_DUNGEON_IDS.has(inst.dungeonId),
   );
   if (owned.length === 0) {
     ctx.error(r.meta.entityId, 'You have no instances to reset.');
@@ -933,6 +979,20 @@ export function updateInstances(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 0) return; // once a second
   for (const inst of ctx.instances) {
     if (inst.partyKey === null) continue;
+    // The runtime Source Cave detects its own clear (reward chest + daily lockout) and
+    // uses its own deep-layout occupancy test: the generic claim box below cannot reach
+    // the cave's finale (the boss/chest sit at z-relative ~255..340), so it would both
+    // miss the clearing party AND free the instance mid-fight. See source_cave/clear.ts.
+    if (inst.dungeonId === SOURCE_CAVE_DUNGEON_ID) {
+      updateSourceCaveClear(ctx, inst);
+      if (sourceCaveInstanceOccupied(ctx, inst)) {
+        inst.emptyFor = 0;
+      } else {
+        inst.emptyFor += 1;
+        if (inst.emptyFor >= INSTANCE_EMPTY_TIMEOUT) freeInstance(ctx, inst);
+      }
+      continue;
+    }
     let occupied = false;
     for (const meta of ctx.players.values()) {
       const e = ctx.entities.get(meta.entityId);

@@ -206,6 +206,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     corpseInstanceId: null,
     scale: 1,
     color: 0xffffff,
+    visualKey: null,
     skinCatalog: 'class',
     skin: 0,
     mountKey: '',
@@ -706,9 +707,10 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   e.name = template.name;
   e.level = level;
   e.hostile = true;
-  // Elite scaling, classic-style: ~2.3x health, ~1.5x damage.
-  const hpMult = template.elite ? 2.3 : 1;
-  const dmgMult = template.elite ? 1.5 : 1;
+  // Elite scaling, classic-style: ~2.3x health, ~1.5x damage. Synthesized
+  // templates can pin explicit multipliers while ordinary mobs keep this path.
+  const hpMult = template.hpMult ?? (template.elite ? 2.3 : 1);
+  const dmgMult = template.dmgMult ?? (template.elite ? 1.5 : 1);
   e.maxHp = Math.round((template.hpBase + template.hpPerLevel * (level - 1)) * hpMult);
   e.hp = e.maxHp;
   const dmg = (template.dmgBase + template.dmgPerLevel * (level - 1)) * dmgMult;
@@ -723,6 +725,9 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   e.moveSpeed = template.moveSpeed;
   e.scale = template.scale;
   e.color = template.color;
+  e.visualKey = template.visualKey ?? null;
+  e.skin = template.skin ?? 0;
+  e.mainhandItemId = template.mainhandItemId ?? null;
   e.swingTimer = 0;
   // Telegraph the first War Stomp: delay it one full interval after engage.
   if (template.stomp) e.stompTimer = template.stomp.every;

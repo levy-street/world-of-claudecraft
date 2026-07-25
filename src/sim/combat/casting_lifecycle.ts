@@ -38,6 +38,7 @@ import { bestOwnedGatherToolFor } from '../professions/tools';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
+import { wakeSourceCaveGuardian } from '../source_cave';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
 import { hasEscapeStealth } from '../threat';
 import type { AbilityDef, AbilityEffect, Entity, Vec3 } from '../types';
@@ -1370,6 +1371,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
       if (eff.type !== 'aoeDamage') continue;
       for (const m of ctx.hostilesInRadius(p, center, eff.radius)) {
         if (!ctx.hasLineOfSight(p, m)) continue;
+        if (m.kind === 'mob') wakeSourceCaveGuardian(ctx, m, p);
         let dmg = ctx.rng.range(eff.min, eff.max) + channelSp;
         // physical channels (Volley) are mitigated by armor; spell-school rain is not,
         // mirroring the instant aoeDamage path in effect_dispatch.

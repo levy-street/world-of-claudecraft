@@ -44,6 +44,11 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   hoarfrost_edge: 'sword',
   wildheart_tuskblade: 'sword',
   greatfang_of_the_basin: 'sword',
+  // Source Cave epics (source_cave/loot.ts): sword / fast blade / heavy mace,
+  // matching their generated models (weapon_variants.ts).
+  commit_blade: 'sword',
+  mech_keyboard: 'sword',
+  bug_squasher: 'mace',
   // Daggers
   rusty_dagger: 'dagger',
   whetted_iron_dirk: 'dagger',

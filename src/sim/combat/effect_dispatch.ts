@@ -16,14 +16,16 @@
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
 import { isDebuffAura, isDispellableAura, isPlayerRemovableAura } from '../aura_classify';
-import { ABILITIES, isDelvePos, MOBS } from '../data';
+import { ABILITIES, isDelvePos } from '../data';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../mob/healer_channel';
+import { mobTemplateOf } from '../mob/mob_template';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
+import { wakeSourceCaveGuardian } from '../source_cave';
 import {
   abilityScalingPower,
   absorbBonus,
@@ -240,6 +242,8 @@ export function runEffects(
   res: ResolvedAbility,
   attackAnimationStarted = false,
 ): void {
+  // A deliberate targeted effect pulls one overflow guardian into the fight.
+  if (target?.kind === 'mob') wakeSourceCaveGuardian(ctx, target, p);
   const ability = res.def;
   const isSpell = ability.school !== 'physical';
   const mods = ctx.playerMods(meta);
@@ -1509,6 +1513,7 @@ export function runEffects(
             const facingDiff = Math.abs(normAngle(angleTo(p.pos, m.pos) - p.facing));
             if (facingDiff > MELEE_ARC) continue;
           }
+          if (m.kind === 'mob') wakeSourceCaveGuardian(ctx, m, p);
           aoeTargets.push(m);
         }
         // Classic AoE soft cap (Revenge): above `softCap` targets, hold the TOTAL
@@ -1797,6 +1802,7 @@ export function runEffects(
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (m.dead) continue;
           if (!ctx.hasLineOfSight(p, m)) continue;
+          if (m.kind === 'mob') wakeSourceCaveGuardian(ctx, m, p);
           ctx.applyAura(m, {
             id: `${ability.id}_as`,
             name: ability.name,
@@ -1813,6 +1819,7 @@ export function runEffects(
       case 'aoeAttackPower': {
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (m.dead) continue;
+          if (m.kind === 'mob') wakeSourceCaveGuardian(ctx, m, p);
           // pct form (Direhowl rework): a NEGATIVE buff_dmg_done aura cuts a
           // fraction of ALL damage the victim deals (the dealDamage amp fold
           // handles the negative side); the legacy amount form stays the flat
@@ -1861,6 +1868,7 @@ export function runEffects(
         for (const m of ctx.hostilesInRadius(p, p.pos, eff.radius)) {
           if (m.dead) continue;
           if (!ctx.hasLineOfSight(p, m)) continue;
+          if (m.kind === 'mob') wakeSourceCaveGuardian(ctx, m, p);
           ctx.applyAura(m, {
             id: `${ability.id}_slow`,
             name: ability.name,
@@ -2226,6 +2234,7 @@ export function runEffects(
           : 0;
         for (const m of ctx.hostilesInRadius(p, center, eff.radius)) {
           if (!ctx.hasLineOfSight(p, m)) continue;
+          if (m.kind === 'mob') wakeSourceCaveGuardian(ctx, m, p);
           if (dealsDamage) {
             const dmg = ctx.rng.range(eff.min, eff.max) + aoeRootSp;
             ctx.dealDamage(
@@ -2354,7 +2363,7 @@ export function runEffects(
             // case.
             if (aura.sourceId === p.id) continue;
             const source = ctx.entities.get(aura.sourceId);
-            if (source && MOBS[source.templateId]?.boss) continue;
+            if (source?.kind === 'mob' && mobTemplateOf(ctx, source)?.boss) continue;
             p.auras.splice(i, 1);
             ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
           }

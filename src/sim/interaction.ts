@@ -68,6 +68,16 @@ import {
 } from './professions/wield_gate';
 import type { SimContext } from './sim_context';
 import {
+  activateSourceCaveReboot,
+  interactWithSourceCaveWell,
+  isSourceCaveBanterTarget,
+  SOURCE_CAVE_CHEST_SEALED_TEMPLATE,
+  SOURCE_CAVE_CHEST_TEMPLATE,
+  SOURCE_CAVE_REBOOT_TEMPLATE,
+  sourceCaveMobBanter,
+  trySourceCaveChestDeny,
+} from './source_cave';
+import {
   cloneItemInstancePayload,
   dist2d,
   type Entity,
@@ -815,11 +825,48 @@ export function interact(
   const p = r.e;
   if (p.dead) {
     // A dead player or released spirit cannot interact with the world: no
-    // looting, object pickup, mailbox, or quest talk. The one exception is the
-    // Spirit Healer (talking to the angel is how a ghost reaches the healer
-    // resurrection), so route a nearby angel through the normal quest-NPC talk
-    // and refuse everything else. A ghost still re-enters its instance via the
-    // proximity door trigger (updateDoorTriggers), which never comes through here.
+    // looting, object pickup, mailbox, or quest talk. Two exceptions. First, a
+    // released spirit may use dungeon portals: a door re-enters its instance
+    // (the corpse run under the instance death model; enterDungeon revives a
+    // static-dungeon ghost at the entry, the Source Cave keeps the ghost for
+    // its interior run and skips the well banter, same as the walk-in trigger),
+    // and an exit walks back out (leaveDungeon admits ghosts and enforces the
+    // encounter seal itself). Without this, the Source Cave well, an
+    // interact-only entrance, strands a corpse-running ghost outside.
+    if (p.ghost) {
+      const isPortal = (e: Entity) =>
+        e.kind === 'object' &&
+        (e.templateId === 'dungeon_exit' || (e.templateId === 'dungeon_door' && !!e.dungeonId));
+      let bestPortal: Entity | null = null;
+      if (p.targetId !== null) {
+        const target = ctx.entities.get(p.targetId);
+        if (target && isPortal(target) && dist2d(p.pos, target.pos) <= INTERACT_RANGE + 2) {
+          bestPortal = target;
+        }
+      }
+      if (!bestPortal) {
+        let bestPortalD2 = INTERACT_RANGE * INTERACT_RANGE;
+        ctx.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
+          if (isPortal(e) && d2 < bestPortalD2) {
+            bestPortal = e;
+            bestPortalD2 = d2;
+          }
+        });
+      }
+      // re-read through a wider type: TS cannot see the closure assignment above
+      const portal = bestPortal as Entity | null;
+      if (portal?.templateId === 'dungeon_door' && portal.dungeonId) {
+        ctx.enterDungeon(portal.dungeonId, p.id);
+        return;
+      }
+      if (portal?.templateId === 'dungeon_exit') {
+        ctx.leaveDungeon(p.id);
+        return;
+      }
+    }
+    // Second, the Spirit Healer (talking to the angel is how a ghost reaches
+    // the healer resurrection): route a nearby angel through the normal
+    // quest-NPC talk and refuse everything else.
     let bestHealer: Entity | null = null;
     let bestHealerD2 = INTERACT_RANGE * INTERACT_RANGE;
     ctx.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
@@ -854,7 +901,20 @@ export function interact(
           return;
         }
       }
+      // A friendly (pre-reboot) Source Cave contributor answers a random
+      // banter line when spoken to (source_cave/mob_banter.ts).
+      if (target.kind === 'mob' && isSourceCaveBanterTarget(target)) {
+        sourceCaveMobBanter(ctx, target, p.id);
+        return;
+      }
       if (target.kind === 'object' && target.lootable) {
+        // The Source Cave's well banters through several interactions before it
+        // opens (source_cave/well_banter.ts); every other dungeon door still
+        // enters immediately.
+        if (target.templateId === 'dungeon_door' && target.dungeonId === 'source_cave') {
+          interactWithSourceCaveWell(ctx, p.id);
+          return;
+        }
         if (target.templateId === 'dungeon_door' && target.dungeonId) {
           ctx.enterDungeon(target.dungeonId, p.id);
           return;
@@ -888,6 +948,22 @@ export function interact(
           ctx.emit({ type: 'mailbox', pid: p.id });
           return;
         }
+        // The Source Cave reward chest stands in the room from claim time but
+        // stays sealed ("Access denied." toast) until the instance is cleared;
+        // once armed it carries shared multi-item loot, so it loots like a
+        // corpse (group-loot machinery), never pickUpObject (needs objectItemId).
+        if (
+          target.templateId === SOURCE_CAVE_CHEST_TEMPLATE ||
+          target.templateId === SOURCE_CAVE_CHEST_SEALED_TEMPLATE
+        ) {
+          if (trySourceCaveChestDeny(ctx, target, p.id)) return;
+          lootCorpse(ctx, target.id, p.id);
+          return;
+        }
+        if (target.templateId === SOURCE_CAVE_REBOOT_TEMPLATE) {
+          activateSourceCaveReboot(ctx, target, p.id);
+          return;
+        }
         if (tryStartNythraxisWardChannel(ctx, target, p)) return;
         pickUpObject(ctx, target.id, p.id, noticeboardDefinitions);
         return;
@@ -913,6 +989,8 @@ export function interact(
   let bestObjD2 = INTERACT_RANGE * INTERACT_RANGE;
   let bestQuestEntity: Entity | null = null;
   let bestQuestD2 = INTERACT_RANGE * INTERACT_RANGE;
+  let bestBanterMob: Entity | null = null;
+  let bestBanterD2 = INTERACT_RANGE * INTERACT_RANGE;
   ctx.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
     if (
       e.kind === 'mob' &&
@@ -922,6 +1000,10 @@ export function interact(
     ) {
       bestCorpse = e;
       bestCorpseD2 = d2;
+    }
+    if (e.kind === 'mob' && isSourceCaveBanterTarget(e) && d2 < bestBanterD2) {
+      bestBanterMob = e;
+      bestBanterD2 = d2;
     }
     if (e.kind === 'object' && e.lootable && d2 < bestObjD2) {
       const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, e.id);
@@ -939,6 +1021,7 @@ export function interact(
   const corpse = bestCorpse as Entity | null;
   const obj = bestObj as Entity | null;
   const questEntity = bestQuestEntity as Entity | null;
+  const banterMob = bestBanterMob as Entity | null;
   if (corpse) {
     // Unified press: one interact both harvests (while the corpse
     // still owes its unclaimed harvest half; omitted components = the town
@@ -951,6 +1034,10 @@ export function interact(
     return;
   }
   if (obj) {
+    if (obj.templateId === 'dungeon_door' && obj.dungeonId === 'source_cave') {
+      interactWithSourceCaveWell(ctx, p.id);
+      return;
+    }
     if (obj.templateId === 'dungeon_door' && obj.dungeonId) {
       ctx.enterDungeon(obj.dungeonId, p.id);
       return;
@@ -982,6 +1069,20 @@ export function interact(
       ctx.emit({ type: 'mailbox', pid: p.id });
       return;
     }
+    // Source Cave reward chest: sealed until the clear, then shared multi-item
+    // loot (see the current-target branch above), never single-item pickUpObject.
+    if (
+      obj.templateId === SOURCE_CAVE_CHEST_TEMPLATE ||
+      obj.templateId === SOURCE_CAVE_CHEST_SEALED_TEMPLATE
+    ) {
+      if (trySourceCaveChestDeny(ctx, obj, p.id)) return;
+      lootCorpse(ctx, obj.id, p.id);
+      return;
+    }
+    if (obj.templateId === SOURCE_CAVE_REBOOT_TEMPLATE) {
+      activateSourceCaveReboot(ctx, obj, p.id);
+      return;
+    }
     if (tryStartNythraxisWardChannel(ctx, obj, p)) return;
     pickUpObject(ctx, obj.id, p.id, noticeboardDefinitions);
     return;
@@ -992,5 +1093,11 @@ export function interact(
     ctx.emit({ type: 'bank', pid: p.id });
     return;
   }
-  if (questEntity) ctx.talkToNpc(questEntity.id, p.id);
+  if (questEntity) {
+    ctx.talkToNpc(questEntity.id, p.id);
+    return;
+  }
+  // Friendly Source Cave contributors chat back (lowest priority: never
+  // shadows a corpse, an object, or a quest NPC standing in the same spot).
+  if (banterMob) sourceCaveMobBanter(ctx, banterMob, p.id);
 }

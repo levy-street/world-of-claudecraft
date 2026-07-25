@@ -350,6 +350,12 @@ const UI_PURE_CORES = [
   'src/ui/hud/loot/corpse_harvest_view.ts',
   'src/ui/town_focus_view.ts',
   'src/ui/mount_race_view.ts',
+  'src/ui/source_cave_mob_core.ts',
+  'src/ui/source_cave_progress_view.ts',
+  // Note: no separate source_cave_progress_painter.ts. The banner reuses the
+  // EXISTING generic QuestProgressBanner instance (this.questBanner), an
+  // already instance-parameterized family member (root CLAUDE.md "reuse a
+  // family before bespoke"), so this pure core has no dedicated painter file.
   'src/ui/pet_action_icons.ts',
   'src/ui/loading_slow_hint_core.ts',
   'src/ui/reconnect_status_core.ts',

@@ -20,6 +20,20 @@ describe('Sim.raidLockouts', () => {
     const out = sim.raidLockouts();
     expect(out).toEqual([{ id: 'nythraxis_boss_arena', msRemaining: 5 * HOUR }]);
   });
+
+  // Phase 6: the Source Cave's daily lockout key is the plain dungeon id
+  // 'source_cave' (docs/the-source-cave/state.md), granted into the SAME generic
+  // raidLockouts map as every other dungeon/raid -- no per-dungeon-id allowlist
+  // exists to update, so this only needs coverage, not a code change.
+  it("covers the Source Cave's 'source_cave' lockout key with no special-casing", () => {
+    const sim = new Sim({ seed: 1, playerClass: 'warrior' });
+    const now = Math.floor(sim.time * 1000);
+    const meta = (sim as any).primary;
+    meta.raidLockouts.set('source_cave', now + 2 * HOUR);
+
+    const out = sim.raidLockouts();
+    expect(out).toEqual([{ id: 'source_cave', msRemaining: 2 * HOUR }]);
+  });
 });
 
 // Kept bespoke on purpose (issue #2088): the second case below needs the truly
@@ -42,5 +56,14 @@ describe('ClientWorld.raidLockouts', () => {
   it('is empty (no throw) before any snapshot has set the lockout map', () => {
     const client: ClientWorld = Object.create(ClientWorld.prototype);
     expect(client.raidLockouts()).toEqual([]);
+  });
+
+  it("covers the Source Cave's 'source_cave' lockout key online too (generic map key, not an allowlist)", () => {
+    const client: ClientWorld = Object.create(ClientWorld.prototype);
+    const now = Date.now();
+    (client as any).selfLockouts = { source_cave: now + 4 * HOUR };
+    const out = client.raidLockouts();
+    expect(out.map((l) => l.id)).toEqual(['source_cave']);
+    expect(out[0].msRemaining).toBeGreaterThan(4 * HOUR - 2000);
   });
 });

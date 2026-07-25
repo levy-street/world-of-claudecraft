@@ -15,6 +15,9 @@ export type DelveModuleId =
   | 'reliquary_bell_niche'
   | 'reliquary_saintless_hall'
   | 'reliquary_finale'
+  // The Source Cave (delve index 5, see src/sim/source_cave/): one square arena
+  // room, not a stacked module chain. See SOURCE_CAVE_ARENA_LAYOUT below.
+  | 'source_cave_arena'
   // The Drowned Litany (Mirefen Marsh, delve index 1). Each module is an
   // irregular marsh-ruin shape carved from the shared rectangular footprint by
   // interior obstacles only (stubs/pillars/tombs/clutter): crescent,
@@ -154,6 +157,61 @@ export const RELIQUARY_FINALE_LAYOUT: DungeonLayout = {
   clutter: FINALE_CLUTTER,
 };
 
+/** Evenly spaced points on a circle of `radius`, for decorative ring dressing. */
+function ring(radius: number, count: number, phase = 0): GridPoint[] {
+  const out: GridPoint[] = [];
+  for (let i = 0; i < count; i++) {
+    const theta = phase + (i * 2 * Math.PI) / count;
+    out.push({ x: radius * Math.cos(theta), z: radius * Math.sin(theta) });
+  }
+  return out;
+}
+
+// The Source Cave arena: one square room, boss at dead centre. Contributor mobs
+// are NOT part of this static layout - src/sim/source_cave/spec.ts places them in
+// concentric rings around (0, 0) at runtime, from the roster. The entrance and
+// exit are WALL-ANCHORED (sourceCaveEntryZ/ExitZ are fixed insets from zMin,
+// user decision: the door hugs the wall, no roster-scaled empty walk-in).
+//
+// This layout's size is the SMALLEST value provably safe for the worst-case
+// roster, since the walls are one static shape shared by every instance: at
+// roster 60 (59 non-boss, SOURCE_CAVE_ROSTER_MAX in server/main.ts), the ring
+// math (spec.ts: RING_INNER_RADIUS 14, RING_RADIAL_STEP/RING_ARC_SPACING 8)
+// fills rings at radius 14/22/30/38 (capacity 10/17/23/29, cumulative
+// 10/27/50/79), so the outermost ring sits at radius 38 and needs
+// `sourceCaveArenaUsableRadius` (half minus the 5u wall clearance) >= 38, hence
+// half >= 43. The south side adds the wall-anchored spawn inset (6): half 48
+// leaves a 4u gap between the spawn and the worst-case outer ring.
+// `buildSourceCaveSpec` asserts that gap at spec-build time (throws rather
+// than silently clipping) so a future change to any of these constants fails
+// loudly, not silently. Shrunk from 70 when the empty entry buffer was removed.
+// Square: wallX matches the zMin..zMax half-span (unlike every other
+// DungeonLayout here, which is a long nave).
+const SOURCE_CAVE_ARENA_HALF = 48;
+export const SOURCE_CAVE_ARENA_LAYOUT: DungeonLayout = {
+  zMin: -SOURCE_CAVE_ARENA_HALF,
+  zMax: SOURCE_CAVE_ARENA_HALF,
+  sideWallZ: 0,
+  sideWallHd: SOURCE_CAVE_ARENA_HALF,
+  wallX: SOURCE_CAVE_ARENA_HALF,
+  endWallHw: SOURCE_CAVE_ARENA_HALF + 1,
+  floorHalfX: SOURCE_CAVE_ARENA_HALF - 2,
+  doorZ: -SOURCE_CAVE_ARENA_HALF + 2,
+  // Purely decorative pillar rings (torches mount on these, per the pillars doc
+  // comment on DungeonLayout); they do not correlate with mob placement. The
+  // phases keep every pillar OFF the x=0 door lane (the old phases put one
+  // pillar dead-centre in front of the entrance): the inner ring's
+  // southernmost pair flanks at x ~ +-9, the outer ring's at x ~ +-13.
+  pillars: [...ring(24, 8, Math.PI / 8), ...ring(42, 10)],
+  tombs: [],
+  stubs: [],
+  // The boss's own fighting dais at dead centre, same radius as the old reliquary
+  // finale room's dais (RELIQUARY_FINALE_LAYOUT.dais.r) - contributor mobs ring
+  // outward from here.
+  dais: { x: 0, z: 0, r: 12 },
+  clutter: [],
+};
+
 // ---------------------------------------------------------------------------
 // The Drowned Litany (Mirefen Marsh): compatibility layouts only.
 // Real room shape lives in delve_litany_layout.ts.
@@ -178,6 +236,7 @@ export const DELVE_MODULE_LAYOUTS: Record<DelveModuleId, DungeonLayout> = {
   reliquary_bell_niche: RELIQUARY_BELL_NICHE_LAYOUT,
   reliquary_saintless_hall: RELIQUARY_SAINTLESS_HALL_LAYOUT,
   reliquary_finale: RELIQUARY_FINALE_LAYOUT,
+  source_cave_arena: SOURCE_CAVE_ARENA_LAYOUT,
   // The Drowned Litany (Mirefen Marsh): distinct irregular marsh-ruin shapes.
   litany_sluice: LITANY_SLUICE_LAYOUT, // crescent: curved banked channel
   litany_ledger: LITANY_LEDGER_LAYOUT, // island_cluster: scattered ledges + channels

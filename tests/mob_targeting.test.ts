@@ -19,7 +19,7 @@ import {
   updateMobTarget,
 } from '../src/sim/mob/targeting';
 import type { SimContext } from '../src/sim/sim_context';
-import { type Entity, MELEE_RANGE } from '../src/sim/types';
+import { type Entity, MELEE_RANGE, type MobTemplate } from '../src/sim/types';
 
 // Minimal Entity carrying only the fields the four functions touch.
 function ent(id: number, over: Partial<Entity> = {}): Entity {
@@ -433,21 +433,63 @@ describe('mob/targeting: retargetMob', () => {
 describe('mob/targeting: isTrivialTo', () => {
   it('a plain wild mob 10+ levels below the player is trivial', () => {
     expect(MOBS.forest_wolf.elite || MOBS.forest_wolf.rare || MOBS.forest_wolf.boss).toBeFalsy();
+    const ctx = fakeCtx(new Map());
     const mob = ent(10, { templateId: 'forest_wolf', level: 2 });
     const player = ent(1, { level: 12 });
-    expect(isTrivialTo(mob, player)).toBe(true); // gap 10 >= 10
+    expect(isTrivialTo(ctx, mob, player)).toBe(true); // gap 10 >= 10
   });
 
   it('a gap under 10 is not trivial', () => {
+    const ctx = fakeCtx(new Map());
     const mob = ent(10, { templateId: 'forest_wolf', level: 2 });
     const player = ent(1, { level: 11 });
-    expect(isTrivialTo(mob, player)).toBe(false); // gap 9 < 10
+    expect(isTrivialTo(ctx, mob, player)).toBe(false); // gap 9 < 10
   });
 
   it('a boss is never trivial regardless of the level gap', () => {
     expect(MOBS.deacon_varric.boss).toBe(true);
+    const ctx = fakeCtx(new Map());
     const mob = ent(10, { templateId: 'deacon_varric', level: 2 });
     const player = ent(1, { level: 60 });
-    expect(isTrivialTo(mob, player)).toBe(false);
+    expect(isTrivialTo(ctx, mob, player)).toBe(false);
+  });
+
+  it('a Source Cave mob resolves elite/boss via the cave runtime, not MOBS', () => {
+    const caveTemplate: MobTemplate = {
+      id: 'source_cave_octocat',
+      name: 'octocat',
+      family: 'humanoid',
+      hpBase: 1,
+      hpPerLevel: 1,
+      dmgBase: 1,
+      dmgPerLevel: 1,
+      attackSpeed: 1,
+      armorPerLevel: 1,
+      moveSpeed: 1,
+      aggroRadius: 12,
+      scale: 1,
+      color: 0,
+      minLevel: 20,
+      maxLevel: 20,
+      elite: true,
+      boss: false,
+      loot: [],
+    };
+    const ctx = {
+      ...fakeCtx(new Map()),
+      sourceCave: { templates: [caveTemplate] },
+    } as unknown as SimContext;
+    const mob = ent(10, { templateId: 'source_cave_octocat', level: 20 });
+    const player = ent(1, { level: 60 });
+    // Elite: never trivial regardless of the level gap, even though the
+    // templateId is absent from the static MOBS table (state.md D2).
+    expect(isTrivialTo(ctx, mob, player)).toBe(false);
+  });
+
+  it('an unresolvable templateId (neither MOBS nor the cave roster) is not trivial', () => {
+    const ctx = fakeCtx(new Map());
+    const mob = ent(10, { templateId: 'nonexistent_ghost_template', level: 2 });
+    const player = ent(1, { level: 60 });
+    expect(isTrivialTo(ctx, mob, player)).toBe(false);
   });
 });

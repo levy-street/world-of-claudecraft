@@ -5,6 +5,7 @@ import type { MountKey } from './content/mounts';
 import type { GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { HarvestYield } from './professions/harvest_yields';
+import type { SourceCaveRosterEntry } from './source_cave/types';
 
 export const TICK_RATE = 20; // sim ticks per second
 export const DT = 1 / TICK_RATE;
@@ -1217,6 +1218,15 @@ export interface MobTemplate {
   loot: LootEntry[];
   scale: number; // render hint
   color: number; // render hint
+  // Render hint: overrides visualKeyFor's normal MOB_KEYS/FAMILY_KEYS dispatch with
+  // this exact visual manifest key. For a per-Sim synthesized template whose id is
+  // never in the static MOBS table (e.g. Source Cave contributor mobs), that static
+  // dispatch has nothing to key off; this field lets the template pin its own model.
+  // Undefined for every ordinary content-authored mob (dispatch falls through as before).
+  visualKey?: string;
+  // Render hints for per-Sim cosmetic mob overrides. Ordinary mobs leave these absent.
+  skin?: number;
+  mainhandItemId?: string;
   // Profession harvesting: the skinning/salvage component types this mob's corpse
   // can yield (e.g. 'hide', 'horn', 'venomSac', 'gills', 'fang', 'claw', 'feather').
   // Consumed by the corpse-harvest command (src/sim/interaction.ts harvestCorpse)
@@ -1236,6 +1246,10 @@ export interface MobTemplate {
   quietMechanics?: boolean;
   // Elite scaling, classic-style: ~2.3x health, ~1.5x damage, double XP.
   elite?: boolean;
+  // Optional explicit stat multipliers for synthesized templates. When absent,
+  // createMob falls back to the classic elite-vs-normal scaling above.
+  hpMult?: number;
+  dmgMult?: number;
   // Kill-XP multiplier (default 1). 0 marks a puzzle-object mob (e.g. the 1 HP
   // spider egg-sac) that must not pay full kill XP for a single hit.
   xpMult?: number;
@@ -2731,6 +2745,7 @@ export interface DungeonDef {
   suggestedPlayers: number;
   enterText: string;
   leaveText: string;
+  minLevel?: number; // gates entry at the door; unset means no level gate
 }
 
 export type BiomeId =
@@ -3831,6 +3846,10 @@ export interface Entity extends ClientMirroredEntityFields {
   corpseInstanceId: number | null;
   scale: number;
   color: number;
+  // Render-only: mirrors MobTemplate.visualKey (null for everyone else, including
+  // ordinary content-authored mobs). Lets visualKeyFor skip its normal templateId
+  // dispatch for a per-Sim synthesized mob (Source Cave) that has no static MOBS entry.
+  visualKey: string | null;
   skinCatalog: SkinCatalog; // player appearance catalog: class texture set or cosmetic body.
   skin: number; // player appearance: index into SKINS[visualKey]; 0 = default. synced in identity fields.
   // Active rideable ground mount ('' = dismounted; players only). Unlike the
@@ -5585,6 +5604,11 @@ export interface SimConfig {
   // bet on). Server + offline game enable it; tests/goldens leave it off so the
   // idle timer never perturbs a deterministic scenario.
   valeCupShowcase?: boolean;
+  // Ranked contributor roster the Source Cave dungeon is generated from. The live
+  // server fetches it (top GitHub contributors) and injects it here; offline and
+  // headless omit it and fall back to SOURCE_CAVE_PLACEHOLDER_ROSTER. Construction
+  // input only (the cave spec is built once in the ctor), never persisted.
+  sourceCaveRoster?: SourceCaveRosterEntry[];
 }
 
 export function emptyMoveInput(): MoveInput {

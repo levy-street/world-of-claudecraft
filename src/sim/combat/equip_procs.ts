@@ -16,6 +16,7 @@
 import { ITEMS } from '../data';
 import { meetsLevelRequirement } from '../item_level_req';
 import type { SimContext } from '../sim_context';
+import { wakeSourceCaveGuardian } from '../source_cave';
 import type { Entity, WeaponProc, WeaponProcEffect, WeaponProcTrigger } from '../types';
 
 // Roll every proc on the wielder's equipped mainhand that matches `trigger`, and
@@ -28,6 +29,7 @@ export function runWeaponProcs(
   trigger: WeaponProcTrigger,
 ): void {
   if (target.dead) return;
+  if (wielder.kind !== 'player') return;
   // Entity.mainhandItemId stays populated for a worn OVER-LEVEL weapon (so the
   // model keeps rendering) while recalcPlayerStats treats that weapon as inert.
   // Mirror the level gate here so an inert weapon's procs are inert too (the
@@ -84,6 +86,7 @@ function fireEffect(
       for (const m of ctx.hostilesInRadius(wielder, target.pos, eff.radius)) {
         if (hops >= eff.jumps) break;
         if (m.id === target.id || m.dead) continue;
+        if (m.kind === 'mob') wakeSourceCaveGuardian(ctx, m, wielder);
         dmg *= eff.falloff;
         ctx.emit({
           type: 'spellfx',

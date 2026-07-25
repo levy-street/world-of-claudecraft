@@ -15,6 +15,7 @@ import type {
   LockpickView,
   MountRaceView,
   PlayerProfessionsView,
+  SourceCaveInfo,
   ToolEffectSlotView,
 } from '../world_api';
 import * as bagsMod from './bags';
@@ -279,6 +280,7 @@ import { wanderPause } from './mob/idle_rng';
 import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
+import { mobTemplateOf } from './mob/mob_template';
 import { findNearbyAllies } from './mob/nearby_allies';
 import {
   createMobScanCounters,
@@ -540,6 +542,21 @@ import {
   updateRiftTriggers as updateRiftTriggersImpl,
 } from './rift/runs';
 import type { RiftEvent, RiftInstance } from './rift/types';
+import {
+  buildSourceCaveRuntime,
+  isSourceCavePos,
+  SOURCE_CAVE_DEF,
+  SOURCE_CAVE_DOOR_ID,
+  SOURCE_CAVE_DUNGEON_ID,
+  SOURCE_CAVE_PLACEHOLDER_ROSTER,
+  SOURCE_CAVE_SLOT_COUNT,
+  type SourceCaveEncounterState,
+  type SourceCaveRuntime,
+  sourceCaveInfoWire,
+  tryWakeSourceCaveWave,
+  updateSourceCaveEncounters,
+  wakeSourceCaveGuardian,
+} from './source_cave';
 
 // computeQuestState (the pure quest-state fn) moved to quests/quest_commands.ts (W4);
 // re-export it here so ClientWorld's `import { computeQuestState } from '../sim/sim'`
@@ -1020,6 +1037,8 @@ export interface InstanceSlot {
   // boss's death (also present in objectIds, which owns its teardown).
   bossExitId: number | null;
   emptyFor: number;
+  /** Runtime-only Source Cave wave/seal state; absent on every static dungeon slot. */
+  sourceCaveEncounter?: SourceCaveEncounterState;
   // Sim-time until this live claim may be manually replaced again. Claim-owned
   // authority prevents party roster or leadership churn from rotating away the
   // reset cooldown; cleared whenever the slot returns to the free pool.
@@ -1287,6 +1306,12 @@ export interface PlayerMeta {
   // Runtime-only local recovery attempt. The owning system lives in unstuck.ts;
   // only its anti-relog cooldown is persisted through Entity.cooldowns.
   pendingUnstuck: unstuckMod.PendingUnstuck | null;
+  // The Source Cave well's banter gate (source_cave/well_banter.ts): how many
+  // times this player has interacted with the well this session. Session-only,
+  // never persisted (a fresh login always gets the full banter sequence again);
+  // once it reaches SOURCE_CAVE_WELL_BANTER_LINES.length the well opens on every
+  // subsequent interaction instead of bantering further.
+  sourceCaveWellTaps: number;
   // Ashen Coliseum standings. Legacy arenaRating/Wins/Losses are the 1v1
   // bracket; 2v2 is fully independent and persisted alongside them.
   arenaRating: number;
@@ -1769,7 +1794,9 @@ const OFFLINE_GUILD_BANK_LOG: import('../world_api').GuildBankLogView = Object.f
 export class Sim {
   // `world` stays optional (a custom map for play-test, else undefined for the
   // built-in world); everything else is defaulted to a concrete value below.
-  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
+  cfg: Required<
+    Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds' | 'sourceCaveRoster'>
+  > &
     Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
   /**
    * The authored world this simulation owns. The active registry is a host/render
@@ -1878,6 +1905,10 @@ export class Sim {
   private channelSubs = new Map<number, Set<JoinableChannel>>();
   // dungeon instances
   instances: InstanceSlot[] = [];
+  // The runtime Source Cave (Phase 2): built once in the ctor from the injected
+  // roster (or the placeholder). Its spec/templates/def back the cave engine and the
+  // delve-style collider resolution. Never null after construction.
+  sourceCave: SourceCaveRuntime | null = null;
   dungeonResetLocks = new Map<string, { availableAt: number; claimId: number }>();
   // procedural rift instances (separate slot pool + coordinate band from dungeons)
   riftInstances: RiftInstance[] = [];
@@ -2400,6 +2431,54 @@ export class Sim {
       this.addEntity(board);
     }
 
+    // The Source Cave (Phase 2): a RUNTIME dungeon built once here without mutating
+    // the frozen DUNGEONS / DUNGEON_LIST. buildSourceCaveSpec draws only from a salted
+    // Rng, so this perturbs neither the ctor rng draw order nor the parity-pinned
+    // entity-id sequence. Its overworld door uses a RESERVED id (Vale Cup precedent,
+    // SOURCE_CAVE_DOOR_ID) so the shared draw order stays put; its instance slots
+    // append to the pool unclaimed, so the tick loops skip them until a party enters.
+    this.sourceCave = buildSourceCaveRuntime(
+      cfg.sourceCaveRoster ?? SOURCE_CAVE_PLACEHOLDER_ROSTER,
+      cfg.seed,
+    );
+    // Fail closed on a reserved-id clash, like the noticeboard loop above. This
+    // used to skip silently when the id was taken, which is exactly how the cave
+    // door vanished for a whole release once SOURCE_CAVE_DOOR_ID collided with
+    // FURY_ENTITY_ID: no error, no door, only a play test to notice. The id set is
+    // pinned distinct by tests/source_cave_sim.test.ts.
+    if (this.entities.has(SOURCE_CAVE_DOOR_ID)) {
+      throw new Error(`Duplicate Source Cave door entity id: ${SOURCE_CAVE_DOOR_ID}`);
+    }
+    const doorPos = this.sourceCave.def.doorPos;
+    const safe = this.findSafePos(doorPos.x, doorPos.z, waterLevel() + 0.6);
+    const door = createGroundObject(
+      SOURCE_CAVE_DOOR_ID,
+      '',
+      this.sourceCave.def.name,
+      this.groundPos(safe.x, safe.z),
+    );
+    door.templateId = 'dungeon_door';
+    door.dungeonId = SOURCE_CAVE_DUNGEON_ID;
+    door.objectItemId = null;
+    door.lootable = true; // interactable
+    this.addEntity(door);
+    for (let i = 0; i < SOURCE_CAVE_SLOT_COUNT; i++) {
+      this.instances.push({
+        dungeonId: SOURCE_CAVE_DUNGEON_ID,
+        difficulty: 'normal',
+        slot: i,
+        partyKey: null,
+        mobIds: [],
+        objectIds: [],
+        exitId: null,
+        bossExitId: null,
+        emptyFor: 0,
+        resetAvailableAt: 0,
+        clearedBy: new Set(),
+        enteredBy: new Set(),
+      });
+    }
+
     if (cfg.noPlayer && this.devCommands) this.spawnHealerPracticeDummy();
 
     if (!cfg.noPlayer) {
@@ -2580,7 +2659,13 @@ export class Sim {
         legacyInstanceExit = true;
       }
     }
-    if (savedPos && isDelvePos(savedPos.x)) {
+    if (savedPos && isSourceCavePos(savedPos.x)) {
+      // The Source Cave shares the delve x-band but delveAt() returns null for it, so
+      // it MUST be handled before the isDelvePos branch (which would otherwise eject to
+      // DELVE_LIST[0]'s door). Eject to the cave's own overworld door.
+      const doorPos = SOURCE_CAVE_DEF.doorPos;
+      savedPos = { x: doorPos.x, z: doorPos.z - 4 };
+    } else if (savedPos && isDelvePos(savedPos.x)) {
       const delve = delveAt(savedPos.x) ?? DELVE_LIST[0];
       savedPos = { x: delve.doorPos.x, z: delve.doorPos.z - 4 };
     } else if (savedPos && savedPos.x > DUNGEON_X_THRESHOLD) {
@@ -2661,6 +2746,7 @@ export class Sim {
       totalPlayedSeconds: Math.max(0, savedState?.totalPlayedSeconds ?? 0),
       lastActiveTick: this.tickCount,
       pendingUnstuck: null,
+      sourceCaveWellTaps: 0,
       arenaRating: savedArena1v1.rating,
       arenaWins: savedArena1v1.wins,
       arenaLosses: savedArena1v1.losses,
@@ -3231,7 +3317,11 @@ export class Sim {
       // binding, while a stale or reset claim correctly resolves to null.
       player.corpseInstanceId = player.corpsePos ? this.instanceClaimIdAt(player.corpsePos) : null;
       player.hp = player.maxHp;
-    } else if (savedState?.dead && !isArenaPos(savedState.pos.x) && !isDelvePos(savedState.pos.x)) {
+    } else if (
+      savedState?.dead &&
+      !isArenaPos(savedState.pos.x) &&
+      !(isDelvePos(savedState.pos.x) && !isSourceCavePos(savedState.pos.x))
+    ) {
       // Auto-release-on-logout: a character saved dead but UNRELEASED resumes as
       // a released ghost rather than reviving in place at 1 hp (logging out must
       // not bypass the death loop). Put the body back at the death spot, then run
@@ -3239,7 +3329,11 @@ export class Sim {
       // (including the instance rule: a dungeon corpse releases to the outdoor
       // graveyard nearest the door) cannot drift from spirit.ts. Delve, arena,
       // and fiesta deaths keep their own bounded respawn rules and never enter
-      // the ghost loop, so those positions load exactly as before.
+      // the ghost loop, so those positions load exactly as before. The Source
+      // Cave shares the delve x-band but is a dungeon (see spirit.ts's
+      // releasePlayerSpirit/ghostGraveyard), so it is carved OUT of the delve
+      // exclusion here too: a dead-in-cave logout still auto-releases instead
+      // of reviving in place at the cave door savedPos was ejected to above.
       player.pos = this.groundPos(savedState.pos.x, savedState.pos.z);
       player.prevPos = { ...player.pos };
       this.rebucket(player);
@@ -4656,6 +4750,9 @@ export class Sim {
       set riftPortalIds(v) {
         sim.riftPortalIds = v;
       },
+      get sourceCave() {
+        return sim.sourceCave;
+      },
       get dungeonResetLocks() {
         return sim.dungeonResetLocks;
       },
@@ -5522,6 +5619,9 @@ export class Sim {
       lap?.('p.auras');
     }
 
+    updateSourceCaveEncounters(this.ctx);
+    lap?.('sourceCave');
+
     for (const e of this.entities.values()) {
       if (e.kind === 'mob') {
         if (this.shouldSkipIdleMobTick(e)) continue;
@@ -5874,9 +5974,10 @@ export class Sim {
     }
     // Enrage frenzy: an enraged mob swings faster (mirrors the inline dmgMult
     // applied in mobSwing). Joins the same additive bucket; identical when it
-    // is the mob's only haste, which it always is today.
+    // is the mob's only haste, which it always is today. Resolved through
+    // mobTemplateOf so a Source Cave synthetic template's enrage works.
     if (e.enraged) {
-      const h = MOBS[e.templateId]?.enrage?.hasteMult;
+      const h = mobTemplateOf(this.ctx, e)?.enrage?.hasteMult;
       if (h && h > 0) haste += h - 1;
     }
     return slow / (1 + Math.max(0, haste));
@@ -6160,6 +6261,7 @@ export class Sim {
     let zoneStruck = 0;
     for (const target of this.hostilesInRadius(source, effect.pos, effect.radius)) {
       if (!this.hasLineOfSight(source, target)) continue;
+      if (target.kind === 'mob') wakeSourceCaveGuardian(this.ctx, target, source);
       zoneStruck++;
       const isSpell = effect.school !== 'physical';
       const rawDmg = this.rng.range(effect.min, effect.max) + (effect.spBonus ?? 0);
@@ -6241,12 +6343,15 @@ export class Sim {
       this.delveRunForMob(target.id) ??
       this.delveRunForPlayer(source.id) ??
       this.delveRunForPlayer(target.id);
+    // Cave combat resolves LoS against the cave's module walls (it is not a DelveRun).
+    const caveModules =
+      this.sourceCaveModulesForPos(source.pos.x) ?? this.sourceCaveModulesForPos(target.pos.x);
     return lineOfSightClear(
       this.cfg.seed,
       source.pos,
       target.pos,
       0.05,
-      run?.modules,
+      caveModules ?? run?.modules,
       this.riftCollisionToken,
     );
   }
@@ -6647,6 +6752,7 @@ export class Sim {
   // Taunt/Growl, classic semantics: never misses, lifts the caster's threat to
   // the top of the table, and forces the mob onto the caster for 3 seconds.
   private applyTaunt(p: Entity, mob: Entity): void {
+    wakeSourceCaveGuardian(this.ctx, mob, p);
     const top = topThreatValue(mob);
     const mine = mob.threat.get(p.id) ?? 0;
     mob.threat.set(p.id, Math.max(mine, top, 1));
@@ -7042,6 +7148,7 @@ export class Sim {
       mob.aiState === 'flee'
     )
       return;
+    if (tryWakeSourceCaveWave(this.ctx, mob)) return;
     mob.aiState = 'chase';
     mob.aggroTargetId = target.id;
     mob.inCombat = true;
@@ -7193,7 +7300,7 @@ export class Sim {
     const critRoll = this.rng.chance(0.05);
     const crit = critRoll && !isCritImmuneTank(target, this.players.get(target.id));
     if (crit) dmg *= 2;
-    const enrage = MOBS[mob.templateId]?.enrage;
+    const enrage = mobTemplateOf(this.ctx, mob)?.enrage;
     if (mob.enraged && enrage) dmg *= enrage.dmgMult;
     dmg *= this.petDamageMult(mob);
     const rawDmg = dmg; // pre-armor, post-crit/enrage — basis for cleave splash
@@ -7422,7 +7529,9 @@ export class Sim {
   // and reset on evade/respawn.
   private updateBossMechanics(mob: Entity): void {
     if (mob.dead || mob.hp <= 0) return;
-    const tmpl = MOBS[mob.templateId];
+    // mobTemplateOf, not MOBS: Source Cave synthetic templates carry the boss
+    // enrage since the affix pass, and their threshold must fire too.
+    const tmpl = mobTemplateOf(this.ctx, mob);
     if (
       !tmpl ||
       (!tmpl.summonAdds &&
@@ -10433,6 +10542,15 @@ export class Sim {
     return runsMod.delveRunForEntity(this.ctx, e);
   }
 
+  // The Source Cave shares the delve x-band and the delve module collider path, but
+  // is not a DelveRun. When either endpoint of a move is in the cave, feed the pure
+  // resolver the cave's module chain (its colliders ARE the interior walls) so it
+  // resolves the cave interior; null everywhere else, so non-cave movement is
+  // byte-identical to before.
+  private sourceCaveModulesForPos(x: number): readonly string[] | null {
+    return this.sourceCave && isSourceCavePos(x) ? this.sourceCave.spec.modules : null;
+  }
+
   // Swept move resolution for players, keeps v0.10.0's segment-based
   // resolveMovement (no tunnelling through thin walls) and layers the delve
   // module colliders + portcullis doors on top when inside a delve.
@@ -10445,12 +10563,26 @@ export class Sim {
     e: Entity,
     ignoreFences = false,
   ): { x: number; z: number } {
-    const run = isDelvePos(nx) || isDelvePos(e.pos.x) ? this.delveRunForEntity(e) : undefined;
     // Parkour heights are a PLAYER traversal mechanic: only players pass over
     // low prop tops. Mobs/pets/NPCs keep full-height collision (their y rides
     // the terrain every tick, so a height-gated pass would let them clip
     // through protruding rock bodies and jitter at buried-rock rims).
     const mover = e.kind === 'player' ? moverHeight(e) : undefined;
+    const caveModules = this.sourceCaveModulesForPos(nx) ?? this.sourceCaveModulesForPos(e.pos.x);
+    if (caveModules) {
+      return resolveMovement(
+        this.cfg.seed,
+        fromX,
+        fromZ,
+        nx,
+        nz,
+        r,
+        ignoreFences,
+        caveModules,
+        mover,
+      );
+    }
+    const run = isDelvePos(nx) || isDelvePos(e.pos.x) ? this.delveRunForEntity(e) : undefined;
     const res = resolveMovement(
       this.cfg.seed,
       fromX,
@@ -10470,8 +10602,12 @@ export class Sim {
 
   // Point resolution for mob wander / blocked checks, with the same delve layering.
   private resolveMovePoint(nx: number, nz: number, r: number, e: Entity): { x: number; z: number } {
-    const run = isDelvePos(nx) || isDelvePos(e.pos.x) ? this.delveRunForEntity(e) : undefined;
     const mover = e.kind === 'player' ? moverHeight(e) : undefined;
+    const caveModules = this.sourceCaveModulesForPos(nx) ?? this.sourceCaveModulesForPos(e.pos.x);
+    if (caveModules) {
+      return resolvePosition(this.cfg.seed, nx, nz, r, false, caveModules, mover);
+    }
+    const run = isDelvePos(nx) || isDelvePos(e.pos.x) ? this.delveRunForEntity(e) : undefined;
     const res = resolvePosition(
       this.cfg.seed,
       nx,
@@ -10836,6 +10972,14 @@ export class Sim {
 
   delveRunWire(pid: number): object | null {
     return runsMod.delveRunWire(this.ctx, pid);
+  }
+
+  sourceCaveInfoWire(pid: number): object | null {
+    return sourceCaveInfoWire(this.ctx, pid);
+  }
+
+  sourceCaveInfo(): SourceCaveInfo | null {
+    return this.sourceCaveInfoWire(this.primaryId) as SourceCaveInfo | null;
   }
 
   delveMarksFor(pid: number): number {

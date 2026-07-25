@@ -37,6 +37,7 @@ import { aurasSurvivingDeath } from '../resurrection';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { vcupBothSeated } from '../social/vale_cup';
+import { onSourceCaveMobKilled, wakeSourceCaveGuardian } from '../source_cave';
 import { addThreat, canDetectStealthedTarget, clearThreat } from '../threat';
 import type { DamageEventKind, Entity } from '../types';
 import {
@@ -161,6 +162,7 @@ export function dealDamage(
     }
     return 0;
   }
+  if (target.kind === 'mob') wakeSourceCaveGuardian(ctx, target, source);
   // Ice Block (Cold Coffin): while encased in stasis the mage is FULLY immune to
   // damage (owner 2026-07-13), so nothing gets through until it is cancelled or
   // expires. Every damage path funnels here, so this covers melee, spells, and DoTs.
@@ -1257,6 +1259,9 @@ export function handleDeath(
         mobId: 'reliquary_bonewalker',
       });
     }
+    // Source Cave: instant kill-progress feedback (per-contributor line, plus a clear
+    // line on the last mob) to everyone in the instance. Cheap no-op for non-cave mobs.
+    onSourceCaveMobKilled(ctx, e);
     e.aiState = 'dead';
     e.corpseTimer = CORPSE_DURATION;
     // Respawn cadence is the zone's, not one flat world timer: the policy leaf

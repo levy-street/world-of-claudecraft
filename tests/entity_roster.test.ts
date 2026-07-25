@@ -107,6 +107,7 @@ function makeCtx() {
     instances: [],
     riftInstances: [],
     riftPortalIds: null,
+    sourceCave: null,
     dungeonResetLocks: new Map(),
     get arenaMatches() {
       return arenaMatches;

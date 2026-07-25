@@ -15,6 +15,7 @@ vi.mock('../server/db', () => ({
 
 import { GameServer } from '../server/game';
 import { delveOrigin, instanceOrigin } from '../src/sim/data';
+import { sourceCaveOrigin } from '../src/sim/source_cave';
 
 function makeServerWithPlayer(): { server: any; session: any; entity: any } {
   const server: any = new GameServer();
@@ -63,6 +64,20 @@ describe('presenceOf zone resolution', () => {
     entity.pos.z = origin.z;
     const presence = server.presenceOf(session);
     expect(presence.zone).toBe('The Collapsed Reliquary');
+    expect(presence.status).toBe('dungeon');
+  });
+
+  it('names the source cave (not the overworld) at a cave instance position', () => {
+    const { server, session, entity } = makeServerWithPlayer();
+    entity.dungeonId = null;
+    // The cave shares the delve x-band (isDelvePos is also true here); this is the
+    // exact position family instanceZoneName must resolve to the cave BEFORE the
+    // generic isDelvePos branch, or it would wrongly report a delve name instead.
+    const origin = sourceCaveOrigin(0);
+    entity.pos.x = origin.x;
+    entity.pos.z = origin.z;
+    const presence = server.presenceOf(session);
+    expect(presence.zone).toBe('The Source Cave');
     expect(presence.status).toBe('dungeon');
   });
 
