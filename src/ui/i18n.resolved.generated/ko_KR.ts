@@ -5581,11 +5581,11 @@ export const ko_KR: EnTranslations = {
     },
     "sourceCave": {
       "locked": "{name}에 대한 입장이 잠겨 있습니다.",
-      "enter": "당신은 근원의 동굴로 발을 들입니다.",
-      "leave": "당신은 근원의 동굴을 떠납니다.",
+      "enter": "당신은 열린 근원으로 발을 들입니다.",
+      "leave": "당신은 열린 근원을 떠납니다.",
       "rebootConfirm": "정말 계속하시겠습니까? 누르기 전에 필요한 자원을 모두 모아 두세요.",
-      "killProgress": "{name}이(가) 쓰러졌습니다. (근원의 동굴에서 {total}명 중 {killed}명 처치)",
-      "cleared": "근원의 동굴을 정복했습니다.",
+      "killProgress": "{name}이(가) 쓰러졌습니다. (열린 근원에서 {total}명 중 {killed}명 처치)",
+      "cleared": "열린 근원을 정복했습니다.",
       "accessDenied": "접근이 거부되었습니다.",
       "wellBanter1": "그냥 우물이야. 물을 담아두는 곳이지. 가던 길이나 가.",
       "wellBanter2": "왜 그렇게 내 벽돌을 쳐다보는 거야?",
@@ -14594,9 +14594,9 @@ export const ko_KR: EnTranslations = {
         "leaveText": "요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다."
       },
       "source_cave": {
-        "name": "근원의 동굴",
-        "enterText": "당신은 근원의 동굴로 발을 들입니다.",
-        "leaveText": "당신은 근원의 동굴을 떠납니다."
+        "name": "열린 근원",
+        "enterText": "당신은 열린 근원으로 발을 들입니다.",
+        "leaveText": "당신은 열린 근원을 떠납니다."
       },
       "drowned_temple": {
         "name": "익사한 신전",

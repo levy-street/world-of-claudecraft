@@ -5581,11 +5581,11 @@ export const zh_TW: EnTranslations = {
     },
     "sourceCave": {
       "locked": "你已被鎖定，無法進入{name}。",
-      "enter": "你走進源初洞穴。",
-      "leave": "你離開了源初洞穴。",
+      "enter": "你走進開放之源。",
+      "leave": "你離開了開放之源。",
       "rebootConfirm": "你確定要繼續嗎？按下之前，確保你已集結好所需的資源。",
-      "killProgress": "{name}倒下了。（已在源初洞穴擊敗 {killed}/{total}）",
-      "cleared": "源初洞穴已被清空。",
+      "killProgress": "{name}倒下了。（已在開放之源擊敗 {killed}/{total}）",
+      "cleared": "開放之源已被清空。",
       "accessDenied": "存取被拒絕。",
       "wellBanter1": "這只是一口井，裝水用的。走吧走吧。",
       "wellBanter2": "你幹嘛這樣盯著我的磚頭看？",
@@ -14594,9 +14594,9 @@ export const zh_TW: EnTranslations = {
         "leaveText": "你帶上堡門，重新走進龍裔荒原的寒風中。"
       },
       "source_cave": {
-        "name": "源初洞穴",
-        "enterText": "你走進源初洞穴。",
-        "leaveText": "你離開了源初洞穴。"
+        "name": "開放之源",
+        "enterText": "你走進開放之源。",
+        "leaveText": "你離開了開放之源。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

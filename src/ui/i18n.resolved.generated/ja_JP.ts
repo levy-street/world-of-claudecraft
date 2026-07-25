@@ -5581,11 +5581,11 @@ export const ja_JP: EnTranslations = {
     },
     "sourceCave": {
       "locked": "{name}への立ち入りがロックされている。",
-      "enter": "あなたは源初の洞窟に足を踏み入れる。",
-      "leave": "あなたは源初の洞窟を後にする。",
+      "enter": "あなたは開かれた源に足を踏み入れる。",
+      "leave": "あなたは開かれた源を後にする。",
       "rebootConfirm": "本当に続行しますか？押す前に、必要なリソースを集めておいてください。",
-      "killProgress": "{name}が倒れた。（源初の洞窟で{total}体中{killed}体を撃破）",
-      "cleared": "源初の洞窟を制圧した。",
+      "killProgress": "{name}が倒れた。（開かれた源で{total}体中{killed}体を撃破）",
+      "cleared": "開かれた源を制圧した。",
       "accessDenied": "アクセスが拒否されました。",
       "wellBanter1": "ただの井戸だよ。水を溜めてるだけ。行きな。",
       "wellBanter2": "なんでそんな目でレンガを見てるんだ？",
@@ -14594,9 +14594,9 @@ export const ja_JP: EnTranslations = {
         "leaveText": "砦の扉を閉め、ドレイクランドの風の中へ戻った。"
       },
       "source_cave": {
-        "name": "源初の洞窟",
-        "enterText": "あなたは源初の洞窟に足を踏み入れる。",
-        "leaveText": "あなたは源初の洞窟を後にする。"
+        "name": "開かれた源",
+        "enterText": "あなたは開かれた源に足を踏み入れる。",
+        "leaveText": "あなたは開かれた源を後にする。"
       },
       "drowned_temple": {
         "name": "溺れし神殿",
