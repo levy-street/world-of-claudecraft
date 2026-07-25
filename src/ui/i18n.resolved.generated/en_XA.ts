@@ -1530,6 +1530,8 @@ export const en_XA: EnTranslations = {
       "dragDestroyHint": "[Ðŕáĝ óúţ íñţó ţĥé ŵóŕļð ţó ðéšţŕóý]",
       "reorderNeedsRecent": "[Çļéáŕ ţĥé ƒíļţéŕ áñð šóŕţ ƀý Ŕéçéñţ ţó ŕéáŕŕáñĝé ýóúŕ ƀáĝš]",
       "itemAriaInstanced": "[{item}, ɋúáñţíţý {count}, ɱáķéŕ-ɱáŕķéð çóþý]",
+      "itemAriaEnchanted": "[{item}, ɋúáñţíţý {count}, éñçĥáñţéð çóþý]",
+      "itemAriaBound": "[{item}, ɋúáñţíţý {count}, ƀóúñð çóþý]",
       "itemAriaMasterwork": "[{item}, ɋúáñţíţý {count}, ɱášţéŕŵóŕķ]",
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",
       "filterAll": "[Áļļ]",
@@ -1754,7 +1756,19 @@ export const en_XA: EnTranslations = {
       "label": "[Ŕéšéţ Ƒŕáɱé Þóšíţíóñš]"
     },
     "itemTooltip": {
-      "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]"
+      "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]",
+      "statEnchanted": "[+{value} {stat} (Éñçĥáñţéð)]",
+      "enchantedFallback": "[Éñçĥáñţéð]"
+    },
+    "materialHint": {
+      "arcaneDust": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ çóɱɱóñ áñð úñçóɱɱóñ ĝéáŕ.]",
+      "arcaneEssence": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé ĝéáŕ.]",
+      "arcaneShard": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ éþíç áñð ļéĝéñðáŕý ĝéáŕ.]",
+      "resonantThread": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé áñð ƀéţţéŕ çļóţĥ áŕɱóŕ.]",
+      "resonantHide": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé áñð ƀéţţéŕ ļéáţĥéŕ áŕɱóŕ.]",
+      "resonantLinks": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé áñð ƀéţţéŕ ɱáíļ áŕɱóŕ.]",
+      "resonantSteel": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé áñð ƀéţţéŕ ɱéļéé ŵéáþóñš.]",
+      "resonantTimber": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé áñð ƀéţţéŕ šţáʋéš, ŵáñðš, ƀóŵš, áñð çŕóššƀóŵš.]"
     },
     "discord": {
       "title": "[Ðíšçóŕð]",
@@ -2400,7 +2414,6 @@ export const en_XA: EnTranslations = {
       "makersMark": "[Çŕáƒţéð ƀý {name}]",
       "gatheredBy": "[Ĝáţĥéŕéð ƀý {name}]",
       "masterworkSeal": "[Ɱášţéŕŵóŕķ]",
-      "enchantedLine": "[Éñçĥáñţéð]",
       "commissionToggle": "[Çóɱɱíššíóñ þíéçé]",
       "commissionToggleHint": "[Ɓíñðš ţó ţĥé ƒíŕšţ çĥáŕáçţéŕ ţó ŕéçéíʋé íţ íñ á ţŕáðé.]",
       "commissionUnbound": "[Çóɱɱíššíóñ þíéçé: ƀíñðš ţó ţĥé ƒíŕšţ ŕéçíþíéñţ]",
@@ -2439,7 +2452,15 @@ export const en_XA: EnTranslations = {
       "targetTitle": "[Çĥóóšé áñ íţéɱ ţó éñçĥáñţ]",
       "noEnchants": "[Ñó éñçĥáñţ úšéš ţĥíš ŕéáĝéñţ.]",
       "noTargets": "[Ñó éļíĝíƀļé íţéɱ ţó éñçĥáñţ.]",
-      "wornTag": "[Ŵóŕñ ({slot})]"
+      "wornTag": "[Ŵóŕñ ({slot})]",
+      "tier": {
+        "base": "[Ɓášé Éñçĥáñţš]",
+        "runed": "[Ŕúñéð Éñçĥáñţš]",
+        "greater": "[Ĝŕéáţéŕ Éñçĥáñţš]"
+      },
+      "yieldHeader": "[Éẋþéçţéð ɱáţéŕíáļš:]",
+      "yieldLineExact": "[{count} {item}]",
+      "yieldLineRange": "[{min} ţó {max} {item}]"
     },
     "training": {
       "title": "[Ţŕáíñíñĝ: {name}]",

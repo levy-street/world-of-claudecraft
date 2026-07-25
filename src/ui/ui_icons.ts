@@ -65,7 +65,9 @@ export type UiIconName =
   | 'cards'
   | 'trash'
   | 'crafting'
-  | 'makers-mark';
+  | 'makers-mark'
+  | 'enchant-rune'
+  | 'bond-link';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -186,6 +188,17 @@ const ICONS: Record<UiIconName, string> = {
   // chrome glyphs above, this mark is intentionally an open currentColor line.
   'makers-mark':
     '<path d="M82 390C126 341 151 273 157 204C162 156 213 139 249 168C284 196 274 247 236 262C204 274 177 253 178 220C204 276 258 326 323 340C364 349 397 329 426 296C393 365 315 400 231 382C171 369 122 363 82 390" fill="none" stroke="currentColor" stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/>',
+  // hand-authored enchant rune (the bag grid's enchanted-copy corner glyph): a
+  // four-point arcane spark with a small orbiting mote, so it reads as "magic
+  // was worked on this" at the ~12px corner size and stays tellable apart from
+  // the maker's-mark stroke and the bond links beside it.
+  'enchant-rune':
+    '<path d="M256 40 300 190 450 234 300 278 256 428 212 278 62 234 212 190Z"/><path d="M404 60a34 34 0 1 0 0 68 34 34 0 0 0 0-68z"/>',
+  // hand-authored bond links (the bind-on-trade / bound corner glyph): two
+  // interlocked chain rings, the classic "this is bound to someone" read,
+  // hollowed with evenodd so the links stay legible at corner size.
+  'bond-link':
+    '<path fill-rule="evenodd" d="M186 148a108 108 0 1 0 0 216 108 108 0 0 0 0-216zm0 56a52 52 0 1 1 0 104 52 52 0 0 1 0-104zM326 148a108 108 0 1 0 0 216 108 108 0 0 0 0-216zm0 56a52 52 0 1 1 0 104 52 52 0 0 1 0-104z"/>',
 };
 
 export function hasUiIcon(name: string): name is UiIconName {

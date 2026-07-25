@@ -7363,7 +7363,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemAriaMasterwork': '{item}、数量 {count}、傑作',
   'hudChrome.crafting.gatheredBy': '採集者：{name}',
   'hudChrome.crafting.masterworkSeal': '傑作',
-  'hudChrome.crafting.enchantedLine': 'エンチャント済み',
   'hudChrome.crafting.stationRequired': 'それを製作するには{station}にいる必要があります。',
   'hudChrome.crafting.stationOutOfRangeNamed': '{station}に移動して製作してください。',
   'hudChrome.crafting.stationName.forge': '鍛冶場',
@@ -9102,4 +9101,29 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.enchanting.marketBody':
     '付与は鞄の中の未装備の一品と素材を消費し、別個の付与済みの品を返します。装備すれば効果は永遠にその品に付き従います。一品にひとつ。付与済みの品は再付与も分解もできず、売却、破棄、分解はどれも無印の品を先に選ぶので、完成品がうっかり食われることはありません。同一の付与品同士は重ねられます。傑作とエンチャントは友人です。傑作は問題なく付与でき、効果は傑作ボーナスにも署名にも触れず上乗せされます。全部を積んだ署名入り傑作のGreater付与が工芸品の頂点で、それでも設計上レイド戦利品の下に座ります。世界市場は無印の品しか扱わないため、付与済みや署名入りは取引ウィンドウで直接手渡し。市場に出せる半分は素材の方です。粉、エッセンス、シャードは自由に出品でき、出品無料、手数料は成立時の5%だけです。',
   'hudChrome.corpseHarvest.components.meat': '肉',
+  'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（エンチャント）',
+  'hudChrome.materialHint.arcaneDust':
+    'エンチャントの材料。一般と良質の装備を魔力分解して得られる。',
+  'hudChrome.materialHint.arcaneEssence': 'エンチャントの材料。レアの装備を魔力分解して得られる。',
+  'hudChrome.materialHint.arcaneShard':
+    'エンチャントの材料。エピックと伝説の装備を魔力分解して得られる。',
+  'hudChrome.materialHint.resonantThread':
+    'エンチャントの材料。レア以上の布防具を魔力分解して得られる。',
+  'hudChrome.materialHint.resonantHide':
+    'エンチャントの材料。レア以上の革防具を魔力分解して得られる。',
+  'hudChrome.materialHint.resonantLinks':
+    'エンチャントの材料。レア以上の鎖防具を魔力分解して得られる。',
+  'hudChrome.materialHint.resonantSteel':
+    'エンチャントの材料。レア以上の近接武器を魔力分解して得られる。',
+  'hudChrome.materialHint.resonantTimber':
+    'エンチャントの材料。レア以上の杖、ワンド、弓、クロスボウを魔力分解して得られる。',
+  'hudChrome.enchanting.tier.base': '基本エンチャント',
+  'hudChrome.enchanting.tier.runed': 'ルーンエンチャント',
+  'hudChrome.enchanting.tier.greater': '上級エンチャント',
+  'hudChrome.enchanting.yieldHeader': '獲得予定の材料:',
+  'hudChrome.enchanting.yieldLineExact': '{item} {count}個',
+  'hudChrome.enchanting.yieldLineRange': '{item} {min}から{max}個',
+  'hudChrome.bags.itemAriaEnchanted': '{item}、数量 {count}、エンチャント済みの品',
+  'hudChrome.bags.itemAriaBound': '{item}、数量 {count}、バインド済みの品',
+  'hudChrome.itemTooltip.enchantedFallback': 'エンチャント済み',
 };

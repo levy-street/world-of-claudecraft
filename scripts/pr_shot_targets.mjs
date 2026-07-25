@@ -2283,6 +2283,118 @@ export const TARGETS = [
     },
   },
   {
+    key: 'target-of-target',
+    label: 'Target-of-target mini-frame beside the target frame, clear of the aura strip',
+    when: ['totarget', 'ui/target_of_target'],
+    variants: [
+      { key: 'desktop', charClass: 'warrior', charName: 'Marksman' },
+      // Slider maximum: the mini zoom compounds --target-frame-scale, so the
+      // 18px gap and the top-aligned anchor must hold at the largest frame.
+      { key: 'desktop-scale-max', charClass: 'warrior', charName: 'Marksman', frameScale: 1.15 },
+      // Move mode: the unlocked frame grows a dashed outline and the corner
+      // button lights gold; the mini must stay clear of both.
+      { key: 'desktop-unlocked', charClass: 'warrior', charName: 'Marksman', unlockFrame: true },
+      // Party pushed below the target: the painter measures frame + strip only,
+      // so the beside-the-frame mini must no longer interact with the pushed rows.
+      { key: 'desktop-party', charClass: 'paladin', charName: 'Marksman', party: true },
+      // Boss rank: the move button moves to right: -30px and the dragon emblem
+      // overhangs the portrait side, so the mini takes the widened boss gap.
+      { key: 'desktop-boss', charClass: 'warrior', charName: 'Marksman', boss: true },
+      { key: 'mobile', charClass: 'mage', charName: 'Marksman', mobile: true },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(
+        ({ withParty, asBoss }) => {
+          const game = window.__game;
+          const sim = game.sim;
+          const me = sim.primaryId;
+          const p = sim.player;
+          if (withParty) {
+            // Party state lives on the PartyMachine (sim.party); assemble the
+            // struct directly (offline invites queue stale cards).
+            const pm = sim.party;
+            const roster = [
+              ['Brightoak', 'druid'],
+              ['Stormcaller', 'shaman'],
+              ['Nightblade', 'rogue'],
+              ['Emberlyn', 'mage'],
+            ];
+            const pids = roster.map(([name, cls], i) => {
+              const pid = sim.addPlayer(cls, name);
+              const e = sim.entities.get(pid);
+              if (e) {
+                e.pos = { x: p.pos.x + (i % 4) * 2 - 3, y: p.pos.y, z: p.pos.z + 2 };
+                e.prevPos = { ...e.pos };
+              }
+              return pid;
+            });
+            const party = {
+              id: pm.nextPartyId++,
+              leader: me,
+              members: [me, ...pids],
+              raid: false,
+              raidGroups: new Map(),
+              lootStrategies: {},
+            };
+            pm.parties.set(party.id, party);
+            pm.partyByPid.set(me, party.id);
+            for (const q of pids) pm.partyByPid.set(q, party.id);
+          }
+          // Target a nearby mob, make it target US (a mob's target-of-target is
+          // its aggro target), and load the strip so its first wrapped row
+          // reaches the frame's right edge, the old collision band.
+          let mob = null;
+          for (const e of sim.entities.values()) {
+            if (e.kind === 'mob' && e.ownerId === null && !e.dead) {
+              mob = e;
+              break;
+            }
+          }
+          if (!mob) return;
+          // Boss variant: re-template the mob to a boss record so the HUD's
+          // rank resolution (MOBS[templateId].boss) applies the .boss chrome.
+          if (asBoss) mob.templateId = 'mirefen_broodmother';
+          mob.pos = { x: p.pos.x + 2, y: p.pos.y, z: p.pos.z + 8 };
+          mob.prevPos = { ...mob.pos };
+          sim.rebucket(mob);
+          sim.targetEntity(mob.id);
+          mob.aggroTargetId = me;
+          // The same call the options row lands on (applySetting delegates here).
+          game.hud.setShowTargetOfTarget(true);
+          for (let i = 0; i < 9; i++) {
+            sim.applyAura(mob, {
+              id: `tot_probe_${i}`,
+              name: `Probe ${i}`,
+              kind: 'dot',
+              value: 1,
+              remaining: 600,
+              duration: 600,
+              sourceId: me,
+              school: 'shadow',
+            });
+          }
+        },
+        { withParty: !!variant.party, asBoss: !!variant.boss },
+      );
+      if (variant.frameScale) {
+        await page.evaluate((scale) => {
+          document.documentElement.style.setProperty('--target-frame-scale', String(scale));
+        }, variant.frameScale);
+      }
+      await wait(1200);
+      if (variant.party) {
+        // Becoming leader auto-opens Loot Settings on the frame the HUD notices
+        // the new party; close it AFTER that frame so the scene stays clean.
+        await page.evaluate(() => window.__game.hud.closeLootSettings?.());
+      }
+      if (variant.unlockFrame) {
+        await page.evaluate(() => document.querySelector('#target-frame > .tf-move-btn')?.click());
+      }
+      await wait(600);
+      return {};
+    },
+  },
+  {
     key: 'confirm-gates',
     label: 'Confirm dialogs: spirit-healer revive + marks purchases',
     when: ['ui/hud/delve/delve_board_controller', 'tests/hud_confirm_gates'],
@@ -2805,11 +2917,14 @@ export const TARGETS = [
             return { ok: true, itemName: 'Chime Dust' };
           }
           if (wantsPicker) {
-            // Enough dust to afford the base weapon enchants, so the picker's
-            // affordability lines show a mix of ready and short rows.
+            // Chime Essence is the one reagent that reaches ALL THREE tiers, so
+            // the picker opened on it is the motivating case for the tier
+            // grouping. Held counts leave a mix of ready and short rows, so the
+            // affordability lines stay exercised too.
+            sim.addItem('arcane_essence', 4);
             sim.addItem('arcane_dust', 6);
-            sim.addItem('arcane_essence', 1);
-            return { ok: true, itemName: 'Chime Dust' };
+            sim.addItem('resonant_steel', 1);
+            return { ok: true, itemName: 'Chime Essence' };
           }
           if (wantsConfirm) {
             // The ONLY held copy is a signed masterwork instance, so the confirm
@@ -2902,7 +3017,139 @@ export const TARGETS = [
       return { clip: '#ui' };
     },
   },
+  {
+    key: 'p14-instance-tooltip',
+    label: 'Bag tooltip: enchant attribution on the per-copy bonus stat lines',
+    when: ['item_instance_tooltip'],
+    // The two shapes the attribution has to get right: a plain enchanted copy
+    // (the whole bonus is the enchant's) and an enchanted MASTERWORK copy (the
+    // bonus splits between the enchant and the masterwork bake). Both stage one
+    // copy per page and read the tooltip through the real focus path.
+    variants: [
+      {
+        key: 'enchanted',
+        instance: { enchant: 'enchant_chest_stamina', rolled: { stats: { sta: 4 } } },
+      },
+      {
+        key: 'enchanted-masterwork',
+        instance: {
+          signer: 'Aldric',
+          enchant: 'enchant_chest_stamina',
+          rolled: { masterwork: true, stats: { sta: 7 } },
+        },
+      },
+    ],
+    async capture(page, variant) {
+      // The DEF name, not the id-shaped guess: militia_vest displays as
+      // "Militia Chainvest", and the cell lookup keys on the accessible name.
+      await openBagsWithInstance(page, 'militia_vest', variant.instance);
+      await focusBagCell(page, 'Militia Chainvest');
+      await pollForSize(page, '#tooltip');
+      await wait(300);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'p14-material-hint',
+    label: 'Bag tooltip: purpose hint on an enchanting material',
+    when: ['material_hint_view'],
+    // One arcane tier and one typed resonant, so both hint wordings (quality
+    // band vs armor/weapon material) are visible.
+    variants: [
+      { key: 'dust', itemId: 'arcane_dust', name: 'Chime Dust' },
+      { key: 'timber', itemId: 'resonant_timber', name: 'Resonant Timber' },
+    ],
+    async capture(page, variant) {
+      await openBagsWithInstance(page, variant.itemId, null);
+      await focusBagCell(page, variant.name);
+      await pollForSize(page, '#tooltip');
+      await wait(300);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'p14-bag-glyphs',
+    label: 'Bag grid: per-kind instance corner glyphs',
+    when: ['bag_instance_glyph_view'],
+    // One stack of every marker kind side by side, which is the only way to see
+    // whether the corner actually distinguishes them: signed, enchanted,
+    // bind-on-trade, masterwork, and a plain copy for the baseline.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        const sim = window.__game?.sim;
+        if (!sim?.player) throw new Error('offline world unavailable');
+        sim.addItemInstance('copper_ore', { signer: 'Aldric' }, undefined, 4);
+        sim.addItemInstance('militia_vest', {
+          enchant: 'enchant_chest_stamina',
+          rolled: { stats: { sta: 4 } },
+        });
+        sim.addItemInstance('resonant_steel', { bindOnTrade: true }, undefined, 2);
+        sim.addItemInstance('worn_sword', {
+          signer: 'Aldric',
+          rolled: { masterwork: true, stats: { str: 2 } },
+        });
+        sim.addItem('arcane_dust', 7);
+        const game = window.__game;
+        if (!document.querySelector('#bags')?.checkVisibility?.()) game.hud.toggleBags();
+      });
+      if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+      await wait(500);
+      return { clip: '#bags' };
+    },
+  },
 ];
+
+// Grant one staged stack (a plain count, or a specific ItemInstancePayload) and
+// open the bags window on it. Shared by the tooltip targets above, which each
+// stage exactly ONE copy per page so the cell lookup by display name is
+// unambiguous.
+async function openBagsWithInstance(page, itemId, instance) {
+  await page.evaluate(
+    (id, payload) => {
+      document.querySelector('.camera-prompt-confirm')?.click();
+      document.querySelector('.tut-skip')?.click();
+      document.querySelector('.gpu-notice-dismiss')?.click();
+      document.querySelector('#gpu-notice')?.remove();
+      const sim = window.__game?.sim;
+      if (!sim?.player) throw new Error('offline world unavailable');
+      if (payload) sim.addItemInstance(id, payload);
+      else sim.addItem(id, 3);
+      const game = window.__game;
+      if (!document.querySelector('#bags')?.checkVisibility?.()) game.hud.toggleBags();
+    },
+    itemId,
+    instance,
+  );
+  if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+}
+
+// Focus the bag cell whose accessible name carries `name`. Real focus fires
+// attachTooltip's focusin arm (the keyboard-nav path), a sturdier tooltip
+// trigger under headless than a synthetic mouseenter.
+async function focusBagCell(page, name) {
+  const found = await page.evaluate((wanted) => {
+    document.querySelector('.camera-prompt-confirm')?.click();
+    const banner = document.querySelector('#banner');
+    if (banner) banner.style.opacity = '0';
+    const cells = [...document.querySelectorAll('#bags .bag-item:not(.empty)')];
+    // Match on the accessible name, but fall back to the LAST occupied square:
+    // the staged stack is the most recently granted one, so a display-name
+    // rename cannot silently turn this target into a no-shot.
+    const cell =
+      cells.find((b) => (b.getAttribute('aria-label') ?? '').includes(wanted)) ??
+      cells[cells.length - 1];
+    if (!cell) return false;
+    cell.scrollIntoView({ block: 'center' });
+    cell.focus();
+    return true;
+  }, name);
+  if (!found) throw new Error(`no occupied bag cell to focus (wanted ${name})`);
+}
 
 // Map a list of changed file paths to the targets they imply (deduped, registry order).
 export function resolveTargets(changedFiles) {

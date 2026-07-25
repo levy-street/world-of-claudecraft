@@ -1530,6 +1530,8 @@ export const zh_TW: EnTranslations = {
       "dragDestroyHint": "拖曳到世界中以銷毀",
       "reorderNeedsRecent": "清除篩選並按「最近」排序即可整理背包",
       "itemAriaInstanced": "{item}，數量 {count}，帶工匠印記的物品",
+      "itemAriaEnchanted": "{item}，數量 {count}，已附魔的副本",
+      "itemAriaBound": "{item}，數量 {count}，已綁定的副本",
       "itemAriaMasterwork": "{item}，數量 {count}，傑作",
       "filterGroupAria": "依類別篩選背包",
       "filterAll": "全部",
@@ -1754,7 +1756,19 @@ export const zh_TW: EnTranslations = {
       "label": "重置框體位置"
     },
     "itemTooltip": {
-      "requiresLevel": "需要等級 {level}"
+      "requiresLevel": "需要等級 {level}",
+      "statEnchanted": "+{value} {stat}（附魔）",
+      "enchantedFallback": "已附魔"
+    },
+    "materialHint": {
+      "arcaneDust": "附魔材料。分解普通和優秀品質的裝備可得。",
+      "arcaneEssence": "附魔材料。分解精良品質的裝備可得。",
+      "arcaneShard": "附魔材料。分解史詩和傳說品質的裝備可得。",
+      "resonantThread": "附魔材料。分解精良及以上品質的布甲可得。",
+      "resonantHide": "附魔材料。分解精良及以上品質的皮甲可得。",
+      "resonantLinks": "附魔材料。分解精良及以上品質的鎖甲可得。",
+      "resonantSteel": "附魔材料。分解精良及以上品質的近戰武器可得。",
+      "resonantTimber": "附魔材料。分解精良及以上品質的法杖、魔杖、弓和弩可得。"
     },
     "discord": {
       "title": "Discord",
@@ -2400,7 +2414,6 @@ export const zh_TW: EnTranslations = {
       "makersMark": "製作者：{name}",
       "gatheredBy": "採集者：{name}",
       "masterworkSeal": "傑作",
-      "enchantedLine": "已附魔",
       "commissionToggle": "委託製品",
       "commissionToggleHint": "將綁定給交易中第一個收到它的角色。",
       "commissionUnbound": "委託製品：將綁定給第一位收貨人",
@@ -2439,7 +2452,15 @@ export const zh_TW: EnTranslations = {
       "targetTitle": "選擇要附魔的物品",
       "noEnchants": "沒有附魔會用到此材料。",
       "noTargets": "沒有可附魔的合適物品。",
-      "wornTag": "Worn ({slot})"
+      "wornTag": "Worn ({slot})",
+      "tier": {
+        "base": "基礎附魔",
+        "runed": "符文附魔",
+        "greater": "強效附魔"
+      },
+      "yieldHeader": "預計產出材料：",
+      "yieldLineExact": "{item} {count} 個",
+      "yieldLineRange": "{item} {min} 至 {max} 個"
     },
     "training": {
       "title": "訓練：{name}",

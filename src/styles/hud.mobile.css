@@ -1709,6 +1709,18 @@
     transform: scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
     transform-origin: left top;
   }
+  /* Target of Target on mobile: a DELIBERATE placement, not fallthrough.
+     showTargetOfTarget is a user-chosen HUD option (reachable from the mobile
+     options sheet; graphics-settings fairness does not apply to user options),
+     so the mini stays visible and keeps the desktop beside-the-frame anchor,
+     inheriting the target frame's 0.82 mobile transform. Verified at 844x390
+     landscape: the band right of the target frame is free (the chip row ends
+     above it, the aura strip wraps below the frame, party frames stack under
+     the strip), so the mini fits without contesting any touch surface. */
+  body.mobile-touch #target-frame > #totarget-frame {
+    left: calc(100% + 18px / (0.74 * var(--target-frame-scale, 1)));
+    top: 0;
+  }
   /* Issue 1577 (1): party frames used to stack in a single column no matter the
      size, so a full party ate more vertical space than a landscape phone can
      spare. The adaptive double-stack now lives on the .party-rows WRAPPER (below),
@@ -4089,6 +4101,17 @@
     flex-direction: column;
     align-items: flex-start;
   }
+  /* The Apply Enchant picker's tier captions and per-row effect lines scale up
+     with the rest of the touch menu: the base sizes are tuned for the desktop
+     popup and read as fine print at arm's length. A caption is not tappable, so
+     it takes no 40px floor (unlike .ctx-item above); it only has to be legible. */
+  body.mobile-touch #ctx-menu .ctx-section {
+    font-size: 13px;
+    padding: 9px 10px 3px;
+  }
+  body.mobile-touch #ctx-menu .ctx-item-effect {
+    font-size: 14px;
+  }
   body.mobile-touch #ctx-menu {
     box-sizing: border-box;
     max-height: calc(var(--app-vh, 100vh) / var(--ui-scale, 1) - 20px);
@@ -4103,7 +4126,12 @@
      app viewport, scaled like the base rule) and a bounded width; the box
      scrolls within it. */
   body.mobile-touch #ctx-menu.ctx-menu-picker {
-    max-height: calc(var(--app-vh, 100vh) / var(--ui-scale, 1) * 0.6);
+    /* 0.72, raised from 0.6: a picker row carries three lines now (name, effect,
+       slot + reagents), so the original fraction showed barely two and a half
+       rows on a landscape phone. Still a genuine fraction of the viewport, well
+       short of the full-height box this cap exists to prevent, and the list
+       still scrolls. */
+    max-height: calc(var(--app-vh, 100vh) / var(--ui-scale, 1) * 0.72);
     min-width: 280px;
     max-width: min(420px, 86vw);
     overflow-y: auto;

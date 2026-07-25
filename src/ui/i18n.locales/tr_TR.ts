@@ -8942,7 +8942,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyFull': 'Tam beceri kazanımı',
   'hudChrome.crafting.difficultyNone': 'Beceri kazanımı yok',
   'hudChrome.crafting.difficultyReduced': 'Azaltılmış beceri kazanımı',
-  'hudChrome.crafting.enchantedLine': 'Büyülü',
   'hudChrome.crafting.makersMark': '{name} tarafından hazırlanmıştır',
   'hudChrome.crafting.masterworkSeal': 'Şaheser',
   'hudChrome.crafting.masterworkToast': 'Şaheser! {name}',

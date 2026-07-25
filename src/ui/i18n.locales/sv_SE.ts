@@ -8922,7 +8922,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.difficultyMinimal': 'Minimal skicklighetsvinst',
   'hudChrome.crafting.difficultyNone': 'Ingen färdighetsvinst',
   'hudChrome.crafting.difficultyReduced': 'Minskad färdighetsvinst',
-  'hudChrome.crafting.enchantedLine': 'Förtrollad',
   'hudChrome.crafting.gatheredBy': 'Samlat av {name}',
   'hudChrome.crafting.learnMoreAtStation':
     '{master} vid {station} kan lära dig fler {craft}-recept.',

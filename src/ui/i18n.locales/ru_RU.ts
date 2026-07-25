@@ -7485,7 +7485,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemAriaMasterwork': '{item}, количество {count}, шедевр',
   'hudChrome.crafting.gatheredBy': 'Сборщик: {name}',
   'hudChrome.crafting.masterworkSeal': 'Шедевр',
-  'hudChrome.crafting.enchantedLine': 'Зачаровано',
   'hudChrome.crafting.stationRequired': 'Для изготовления нужно находиться у станции "{station}".',
   'hudChrome.crafting.stationOutOfRangeNamed':
     'Подойдите к станции "{station}", чтобы изготовить это.',
@@ -9271,4 +9270,30 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsBody':
     'Торговцы слепы к происхождению: подписанная вещь продается NPC ровно по своей простой цене. Наценка за подпись существует только между игроками, что как раз и делает ее интересной: стопка руды-находки, подписанная знаменитым собирателем, Prime Cut с удачного сбора, шедевральный клинок с именем ремесленника, что с тех пор ушел на покой, все стоят столько, сколько говорит чья-то память.\n\nКнига деяний играет на том же инстинкте: Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen и Glimmer of Hope, это коллекционные отметки с нулевой Известностью, что существуют лишь ради доказательства, что миг случился с вами. Сохраните вещь, что заработала деяние, и вы держите расписку. Ничто из этого не сила; происхождение не покупает характеристик и не выигрывает боев, это бумажный след хороших дней игры.',
   'hudChrome.corpseHarvest.components.meat': 'Мясо',
+  'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (зачаровано)',
+  'hudChrome.materialHint.arcaneDust':
+    'Реагент для наложения чар. Выпадает при распылении обычного и необычного снаряжения.',
+  'hudChrome.materialHint.arcaneEssence':
+    'Реагент для наложения чар. Выпадает при распылении редкого снаряжения.',
+  'hudChrome.materialHint.arcaneShard':
+    'Реагент для наложения чар. Выпадает при распылении эпического и легендарного снаряжения.',
+  'hudChrome.materialHint.resonantThread':
+    'Реагент для наложения чар. Выпадает при распылении тканевой брони редкого качества и выше.',
+  'hudChrome.materialHint.resonantHide':
+    'Реагент для наложения чар. Выпадает при распылении кожаной брони редкого качества и выше.',
+  'hudChrome.materialHint.resonantLinks':
+    'Реагент для наложения чар. Выпадает при распылении кольчужной брони редкого качества и выше.',
+  'hudChrome.materialHint.resonantSteel':
+    'Реагент для наложения чар. Выпадает при распылении оружия ближнего боя редкого качества и выше.',
+  'hudChrome.materialHint.resonantTimber':
+    'Реагент для наложения чар. Выпадает при распылении посохов, жезлов, луков и арбалетов редкого качества и выше.',
+  'hudChrome.enchanting.tier.base': 'Базовые чары',
+  'hudChrome.enchanting.tier.runed': 'Рунные чары',
+  'hudChrome.enchanting.tier.greater': 'Высшие чары',
+  'hudChrome.enchanting.yieldHeader': 'Ожидаемые материалы:',
+  'hudChrome.enchanting.yieldLineExact': '{item}: {count}',
+  'hudChrome.enchanting.yieldLineRange': '{item}: {min}-{max}',
+  'hudChrome.bags.itemAriaEnchanted': '{item}, количество {count}, зачарованный экземпляр',
+  'hudChrome.bags.itemAriaBound': '{item}, количество {count}, привязанный экземпляр',
+  'hudChrome.itemTooltip.enchantedFallback': 'Зачаровано',
 };
