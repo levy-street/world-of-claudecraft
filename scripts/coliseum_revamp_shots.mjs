@@ -86,6 +86,42 @@ async function shoot(page, name) {
   console.log(`shot ${PREFIX}-${name}`);
 }
 
+// ---- fiesta bout start (hazard ring visual), SHOT_FIESTA=1 only ----
+if (process.env.SHOT_FIESTA) {
+  const f = await browser.newPage();
+  f.on('pageerror', (e) => errors.push(`[fiesta] ${e.message}`));
+  await f.setViewport({ width: 1600, height: 900 });
+  await suppressGpuNotice(f);
+  await f.goto(URL, { waitUntil: 'networkidle0', timeout: 60000 });
+  const ok = await enterOfflineGame(f, { charClass: 'warrior', charName: 'Gladiator' });
+  if (!ok) throw new Error('offline world did not boot');
+  await f.evaluate(() => window.__game.world.startFiestaPractice());
+  await f.waitForFunction(() => window.__game.world.player.pos.x > 2800, {
+    timeout: 30000,
+    polling: 200,
+  });
+  await sleep(1500);
+  await f.evaluate(() => {
+    const w = window.__game.world;
+    const fighters = [...w.entities.values()].filter((e) => e.kind === 'player' && e.pos.x > 2800);
+    const cx = fighters.reduce((s, e) => s + e.pos.x, 0) / fighters.length;
+    const cz = fighters.reduce((s, e) => s + e.pos.z, 0) / fighters.length;
+    const me = w.entities.get(w.playerId);
+    me.pos.x = cx;
+    me.pos.z = cz;
+    me.prevPos = { ...me.pos };
+    const input = window.__game.input;
+    input.camDist = 38;
+    input.camPitch = 1.32;
+    input.camYaw = Math.PI;
+  });
+  await shoot(f, 'fiesta-start-desktop');
+  await f.close();
+  console.log(errors.length ? `PAGE ERRORS:\n${errors.join('\n')}` : 'no page errors');
+  await browser.close();
+  process.exit(0);
+}
+
 // ---- desktop ----
 const page = await browser.newPage();
 page.on('pageerror', (e) => errors.push(`[desktop] ${e.message}`));
