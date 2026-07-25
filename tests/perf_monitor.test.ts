@@ -229,6 +229,28 @@ describe('perf monitor scene census wiring', () => {
     expect(snap.hitches?.byCause['shader-compile']).toBe(1);
   });
 
+  it('drops the one self-inflicted frame sample after a census run', () => {
+    installBrowserGlobals('?perf');
+    const perf = new PerfMonitor(fakeRenderer() as unknown as Renderer);
+    perf.frame(0.016, 1000);
+    perf.runSceneCensus();
+    // The burst inflates the next rAF gap; that sample must not be recorded.
+    perf.frame(0.2, 1300);
+    perf.frame(0.016, 1316);
+    const snap = perf.snapshot(2000);
+    expect(snap.frames).toBe(2);
+    expect(snap.frameMs.max).toBeLessThan(50);
+  });
+
+  it('clears the stored census on reset', () => {
+    installBrowserGlobals('?perf');
+    const perf = new PerfMonitor(fakeRenderer() as unknown as Renderer);
+    perf.runSceneCensus();
+    expect(perf.snapshot(1000).census).toBeDefined();
+    perf.reset();
+    expect(perf.snapshot(2000).census).toBeUndefined();
+  });
+
   it('returns null before a renderer exists and omits the optional fields', () => {
     const perf = new PerfMonitor(null);
     expect(perf.runSceneCensus()).toBeNull();

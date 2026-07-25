@@ -1050,6 +1050,9 @@ export class Renderer {
     textures: 0,
     createdViews: 0,
   };
+  // The census burst inflates the following frame's dt; skip that one sample
+  // so the tracker never charges the census to the scene.
+  private hitchSkipNextFrame = false;
   private baseExposure = 1.12; // tone-mapping exposure at brightness 1.0
   private tmpV = new THREE.Vector3();
   private viewCandidates: ViewCandidate[] = [];
@@ -2221,16 +2224,20 @@ export class Renderer {
       discardOutOfBand: () => this.discardOutOfBandDraws(),
     };
     const p = this.sim.player;
-    return captureSceneCensus(host, {
-      atMs: performance.now(),
-      tier: GFX.tier,
-      playerPosition: { x: roundMs(p.pos.x), y: roundMs(p.pos.y), z: roundMs(p.pos.z) },
-      cameraPosition: {
-        x: roundMs(this.camera.position.x),
-        y: roundMs(this.camera.position.y),
-        z: roundMs(this.camera.position.z),
-      },
-    });
+    try {
+      return captureSceneCensus(host, {
+        atMs: performance.now(),
+        tier: GFX.tier,
+        playerPosition: { x: roundMs(p.pos.x), y: roundMs(p.pos.y), z: roundMs(p.pos.z) },
+        cameraPosition: {
+          x: roundMs(this.camera.position.x),
+          y: roundMs(this.camera.position.y),
+          z: roundMs(this.camera.position.z),
+        },
+      });
+    } finally {
+      this.hitchSkipNextFrame = true;
+    }
   }
 
   private recordRendererPhase(phase: RendererPhase, ms: number): void {
@@ -6443,7 +6450,9 @@ export class Renderer {
       activeViews: this.views.size,
       visibleViews,
     };
-    if (this.hitchLogEnabled) {
+    if (this.hitchLogEnabled && this.hitchSkipNextFrame) {
+      this.hitchSkipNextFrame = false;
+    } else if (this.hitchLogEnabled) {
       const sample = this.hitchFrameScratch;
       sample.atMs = afterSubmit;
       sample.frameMs = Math.min(250, Math.max(0, dt * 1000));

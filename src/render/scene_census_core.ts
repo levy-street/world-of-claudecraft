@@ -208,8 +208,14 @@ export function captureSceneCensus(
     host.setCountersAutoReset(savedAutoReset);
     // One trailing render with everything restored: the burst runs inside a
     // single task, so without this the frame the browser presents would be
-    // the last bucket-hidden pass until the next live sync().
-    host.render();
+    // the last bucket-hidden pass until the next live sync(). Fail-soft: a
+    // throw here (context loss mid-census) must neither mask the original
+    // error nor skip the counter discard below.
+    try {
+      host.render();
+    } catch {
+      // presentation-only pass; the discard below still runs
+    }
     host.discardOutOfBand();
   }
 }
@@ -294,6 +300,10 @@ export interface HitchTracker {
   reset(): void;
 }
 
+// Absolute threshold tuned for the 60 fps target the budgets are written
+// against (two missed vsyncs). On a 30 fps-capped profile or 30 Hz panel
+// nearly every frame crosses it, so callers on such targets should pass
+// their own hitchFrameMs; the counts stay comparable only per-target.
 export const HITCH_FRAME_MS = 33;
 const HITCH_RECENT_LIMIT = 20;
 

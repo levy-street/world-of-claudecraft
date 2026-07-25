@@ -231,6 +231,18 @@ describe('captureSceneCensus', () => {
     expect(state.shadowAuto()).toBe(true);
     expect(state.discards()).toBe(1);
   });
+
+  it('still discards and reports normally when only the trailing restore render throws', () => {
+    const children = worldChildren();
+    // render 6 is the presentation-only restore render after the 5
+    // measurements; its throw must be swallowed and the discard still run.
+    const { host, state } = makeHost(children, { postCalls: 4, throwOnRender: 6 });
+    const report = captureSceneCensus(host, META);
+    expect(report.baseline.calls).toBe(51);
+    expect(report.renders).toBe(5);
+    expect(state.discards()).toBe(1);
+    expect(children.map((c) => c.visible)).toEqual([true, true, false, true]);
+  });
 });
 
 describe('censusTableLines', () => {

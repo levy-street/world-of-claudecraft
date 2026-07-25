@@ -119,6 +119,9 @@ rules, all CI-enforced:
   so it covers your module.
 
 ## i18n: overhead labels are the only string surface here
+One deliberate exception: `scene_census_core.ts`'s table/format helpers feed the
+`?perf` overlay, a dev diagnostic that stays English by the `src/game/CLAUDE.md`
+perf-overlay carve-out; never reuse them in player-facing chrome.
 The renderer is geometry/shaders; the overhead-text surface is
 `nameplate_painter.ts` (owns `t`/`tEntity`/`formatNumber`) plus
 `entity_labels.ts` (localized display-name helpers, lifted out of `renderer.ts`

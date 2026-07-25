@@ -371,6 +371,9 @@ export class PerfMonitor {
   private lastCensus: SceneCensusReport | null = null;
   // Rendered once per census run, not on every 1 Hz overlay repaint.
   private lastCensusLines: string[] = [];
+  // The census burst runs inside one task, so the following rAF gap is a
+  // self-inflicted long frame; drop that one sample from the statistics.
+  private skipNextFrameSample = false;
   private startedAt = performance.now();
   private lastOverlayAt = 0;
   private frames = 0;
@@ -435,6 +438,10 @@ export class PerfMonitor {
   }
 
   frame(dt: number, now = performance.now()): void {
+    if (this.skipNextFrameSample) {
+      this.skipNextFrameSample = false;
+      return;
+    }
     this.frames++;
     const ms = Math.min(250, Math.max(0, dt * 1000));
     this.lastFrameMs = ms;
@@ -869,6 +876,7 @@ export class PerfMonitor {
     const report = this.renderer.captureSceneCensus();
     this.lastCensus = report;
     this.lastCensusLines = censusTableLines(report);
+    this.skipNextFrameSample = true;
     console.info('World of Claudecraft scene census:', JSON.stringify(report, null, 2));
     if (this.enabled) this.renderOverlay(this.lastSnapshot ?? this.snapshot());
     return report;
@@ -900,6 +908,9 @@ export class PerfMonitor {
     this.frames = 0;
     this.frameMs = [];
     this.frameWindow = [];
+    this.lastCensus = null;
+    this.lastCensusLines = [];
+    this.skipNextFrameSample = false;
     this.buckets = { renderer: [], hud: [], events: [], sim: [] };
     this.lastSnapshot = null;
     this.netPipelineSource = null;
