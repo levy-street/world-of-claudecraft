@@ -69,6 +69,12 @@ import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { RAID_MAX } from '../src/sim/social/party';
 import type { VcMatch } from '../src/sim/social/vale_cup';
 import {
+  isSourceCavePos,
+  SOURCE_CAVE_DEF,
+  SOURCE_CAVE_DUNGEON_ID,
+  type SourceCaveRosterEntry,
+} from '../src/sim/source_cave';
+import {
   parseTalentAllocation,
   parseTalentLoadoutIndex,
   parseTalentOptionId,
@@ -424,6 +430,7 @@ export const SIM_LAP_PHASES = [
   'p.autoAtk',
   'p.regen',
   'p.auras',
+  'sourceCave',
   'mob.update',
   'mob.auras',
   'ent.misc',
@@ -1163,6 +1170,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.objectItemId) out.obj = e.objectItemId;
   if (e.scale !== 1) out.sc = e.scale;
   if (e.color !== 0xffffff) out.c = e.color;
+  if (e.visualKey) out.vk = e.visualKey; // per-Sim mob model override (render-only)
   return out;
 }
 
@@ -1513,6 +1521,25 @@ const GUILD_CREATION_FEE_GOLD = ((): number => {
   return gold;
 })();
 
+// The live GitHub-contributor roster the Source Cave is built from, INJECTED at
+// boot (server/main.ts awaits topContributors() and calls configureSourceCaveRuntime
+// before the first liveGame() touch), matching the configure<Domain>Runtime idiom
+// used for the contributor-stats reader. Left undefined here so any pre-boot / test
+// construction falls back to SOURCE_CAVE_PLACEHOLDER_ROSTER inside the Sim ctor.
+let sourceCaveRoster: SourceCaveRosterEntry[] | undefined;
+
+/** Inject the real Source Cave roster. Called once at boot from server/main.ts. */
+export function configureSourceCaveRuntime(roster: SourceCaveRosterEntry[] | undefined): void {
+  sourceCaveRoster = roster;
+}
+
+export interface GameServerOptions {
+  // Explicit Source Cave roster, for a test that needs a fixed one. Omitted, the
+  // constructor falls back to the module-local injected at boot, and an undefined
+  // roster falls back to SOURCE_CAVE_PLACEHOLDER_ROSTER inside the Sim ctor.
+  readonly caveRoster?: SourceCaveRosterEntry[];
+}
+
 export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
@@ -1737,11 +1764,17 @@ export class GameServer {
   private readonly riftUpgrader: RiftUpgradeCoordinator;
   private readonly riftAssets: RiftAssetCoordinator;
 
-  constructor() {
+  constructor(options: GameServerOptions = {}) {
+    // The Source Cave roster defaults to the module-local injected at boot
+    // (configureSourceCaveRuntime), so the singleton `new GameServer()` in liveGame()
+    // picks up the real GitHub contributors; a test may pass an explicit roster.
+    // Undefined falls back to SOURCE_CAVE_PLACEHOLDER_ROSTER inside the Sim ctor.
+    const caveRoster = options.caveRoster ?? sourceCaveRoster;
     this.sim = new Sim({
       seed: WORLD_SEED,
       playerClass: 'warrior',
       noPlayer: true,
+      sourceCaveRoster: caveRoster,
       devCommands: process.env.ALLOW_DEV_COMMANDS === '1',
       // Thunzharr is up as soon as the realm boots; subsequent rises keep the
       // normal interval cadence (see src/sim/world_boss.ts).
@@ -2118,6 +2151,11 @@ export class GameServer {
   // moderator reports where they really are, not the limbo they were parked in.
   private instanceZoneName(e: Entity, pos: { x: number; z: number } = e.pos): string | null {
     if (e.dungeonId) return DUNGEONS[e.dungeonId]?.name ?? e.dungeonId;
+    // The runtime Source Cave lives in the delve x-band but is not a real delve, so
+    // delveAt() returns null for it. Resolve its display name BEFORE the delve check
+    // (a cave position is also isDelvePos-true), so presence / /who / self-zone read
+    // "The Source Cave" instead of falling through to the overworld zone.
+    if (isSourceCavePos(pos.x)) return SOURCE_CAVE_DEF.name;
     if (isDelvePos(pos.x)) return delveAt(pos.x)?.name ?? null;
     if (pos.x > DUNGEON_X_THRESHOLD) return dungeonAt(pos.x)?.name ?? null;
     return null;
@@ -7309,6 +7347,8 @@ export class GameServer {
           !!door &&
           Math.hypot(e.pos.x - door.pos.x, e.pos.z - door.pos.z) < 8 &&
           sim.enterDungeon(dungeonId, pid);
+        // Only the Source Cave carries heavy `scave` self state; force it fresh.
+        if (succeeded && dungeonId === SOURCE_CAVE_DUNGEON_ID) this.resyncSourceCave(session);
         this.sendCommandOutcome(session, msg, succeeded);
         break;
       }
@@ -7322,7 +7362,10 @@ export class GameServer {
                 Math.hypot(e.pos.x - x.pos.x, e.pos.z - x.pos.z) < 8,
             )
           : null;
-        this.sendCommandOutcome(session, msg, !!exit && sim.leaveDungeon(pid));
+        const succeeded = !!exit && sim.leaveDungeon(pid);
+        // Resync only for the cave's own exit, not any generic dungeon exit.
+        if (succeeded && exit?.dungeonId === SOURCE_CAVE_DUNGEON_ID) this.resyncSourceCave(session);
+        this.sendCommandOutcome(session, msg, succeeded);
         break;
       }
       case 'set_dungeon_difficulty': {
@@ -8095,6 +8138,12 @@ export class GameServer {
     // like lroll, and like lroll it costs one pendingLootRolls scan per session.
     maybe('mloot', this.sim.activeMasterLootRolls(anchorSession.pid));
     maybe('drun', this.sim.delveRunWire(anchorSession.pid));
+    // The Source Cave (a runtime dungeon in the delve band) ships its spec summary +
+    // per-player clear progress self-scoped and delta-guarded, like `drun`. The spec
+    // (module count + mob roster) is STATIC and shared, so this is non-null for every
+    // player once the cave exists (null only when no cave is built at all); `killed`
+    // and `cleared` are the per-player parts that change and drive the delta resend.
+    maybe('scave', this.sim.sourceCaveInfoWire(anchorSession.pid));
     maybe('dcompanion', this.sim.delveCompanionWire(anchorSession.pid));
     maybe('dmarks', this.sim.delveMarksFor(anchorSession.pid));
     maybe('dcomp', this.sim.companionUpgradesFor(anchorSession.pid));
@@ -9393,6 +9442,14 @@ export class GameServer {
     delete session.lastSent.dcomp;
     delete session.lastSent.dclears;
     delete session.lastSent.delveDaily;
+  }
+
+  // Force the heavy `scave` self field to resend on the next snapshot, so entering
+  // or leaving the Source Cave immediately re-mirrors the player's cave progress
+  // rather than waiting for the delta guard to notice a killed/cleared change. Fired
+  // only on the cave's own enter/leave, never on a generic dungeon (dispatch cases).
+  private resyncSourceCave(session: ClientSession): void {
+    delete session.lastSent.scave;
   }
 
   private send(session: ClientSession, obj: unknown): void {

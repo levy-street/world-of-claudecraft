@@ -195,7 +195,7 @@ import {
 import { pruneDiscordOAuthStates, pruneDiscordPendingLogins } from './discord_db';
 import { emailAccountCreated } from './email';
 import { stopEpicMirror } from './epic/mirror';
-import { GameServer } from './game';
+import { configureSourceCaveRuntime, GameServer } from './game';
 import {
   handleGitHubCallback,
   handleGitHubStart,
@@ -307,6 +307,11 @@ import { BUG_REPORT_MAX_BODY_BYTES, configureReportsRuntime } from './reports';
 import { createRetentionSweep, RETENTION_SWEEP_BATCH_SIZE } from './retention_sweep';
 import { resolveSfxOverlayFile } from './sfx_overlay';
 import { handleSitePresenceHeartbeat } from './site_presence';
+import {
+  classifySourceCaveRoster,
+  SOURCE_CAVE_BOOT_TIMEOUT_MS,
+  withBootTimeout,
+} from './source_cave_boot';
 import { adminRolesForAccount } from './staff_db';
 import {
   cacheControlFor,
@@ -2917,6 +2922,32 @@ export async function startServer(): Promise<http.Server> {
   }
   await ensureSchema();
   await seedOAuthClients();
+  // Seed the Source Cave from the live GitHub contributor roster BEFORE the first
+  // liveGame() touch below constructs the Sim (D3): topContributors() never throws
+  // (it falls back to an empty/cached snapshot on a fetch failure), so an empty list
+  // here means "no roster available" and classifySourceCaveRoster returns undefined
+  // so the Sim ctor falls back to SOURCE_CAVE_PLACEHOLDER_ROSTER. withBootTimeout
+  // bounds how long BOOT specifically waits on the (individually-page-timeout-capped
+  // but otherwise unbounded) GitHub fetch; see server/source_cave_boot.ts.
+  const timed = await withBootTimeout(topContributors(), SOURCE_CAVE_BOOT_TIMEOUT_MS);
+  if (timed.timedOut) {
+    console.error(
+      `source cave: contributor fetch exceeded ${SOURCE_CAVE_BOOT_TIMEOUT_MS}ms at boot, ` +
+        'continuing with the placeholder roster',
+    );
+  }
+  const outcome = classifySourceCaveRoster(timed.timedOut ? [] : timed.value);
+  if (outcome.kind === 'placeholder') {
+    console.log('source cave: no contributors available, using placeholder roster');
+  } else if (outcome.kind === 'capped') {
+    console.error(
+      `source cave: ${outcome.totalAvailable} contributors exceeds cap ${outcome.max}, ` +
+        `capping to the top ${outcome.max} by rank`,
+    );
+  } else {
+    console.log(`source cave: seeded ${outcome.roster.length} GitHub contributors`);
+  }
+  configureSourceCaveRuntime(outcome.roster);
   const game = liveGame();
   // Inject the game-session methods the ported admin routes (server/admin.ts) call
   // for their live reads + side effects (adminStats/liveSessions/disconnectAccount/
