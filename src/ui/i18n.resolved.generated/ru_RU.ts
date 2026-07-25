@@ -1049,6 +1049,7 @@ export const ru_RU: EnTranslations = {
       "walkByAutoloot": "Автосбор добычи при проходе",
       "groundReticle": "Прицел наземного наведения",
       "mouseoverCast": "Применение по наведению на рамки группы",
+      "stickyTarget": "Сохранять цель при клике по земле",
       "showItemLevel": "Показывать уровень предмета",
       "itemLevelLine": "Уровень предмета {level}",
       "itemScoreLine": "Оценка {score}",

@@ -7860,6 +7860,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.combat.parried': '你的{ability}被{target}招架了。',
   'hudChrome.options.mouseoverCast': '對隊伍框架滑鼠指向施法',
   'hudChrome.options.showTargetOfTarget': '顯示目標的目標',
+  'hudChrome.options.stickyTarget': '點擊地面時保留目標',
   'hudChrome.unitFrame.targetOfTargetLabel': '目標的目標',
   'hudChrome.mobile.professions': '專業',
   'hudChrome.professions.title': '專業',

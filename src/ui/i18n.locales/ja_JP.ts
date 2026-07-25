@@ -8263,6 +8263,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.combat.parried': '{target}は{ability}を受け流しました。',
   'hudChrome.options.mouseoverCast': 'パーティフレームでマウスオーバーキャスト',
   'hudChrome.options.showTargetOfTarget': 'ターゲットのターゲットを表示',
+  'hudChrome.options.stickyTarget': '地面クリックでターゲットを維持',
   'hudChrome.unitFrame.targetOfTargetLabel': 'ターゲットのターゲット',
   'hudChrome.mobile.professions': '専門技能',
   'hudChrome.professions.title': '専門技能',

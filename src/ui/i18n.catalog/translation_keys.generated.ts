@@ -6206,6 +6206,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.options.showWalletOnCharacterScreen'
   | 'hudChrome.options.showWalletOnPlayerCard'
   | 'hudChrome.options.startAttackOnAbility'
+  | 'hudChrome.options.stickyTarget'
   | 'hudChrome.options.targetFrameScale'
   | 'hudChrome.options.uiScale'
   | 'hudChrome.options.version'

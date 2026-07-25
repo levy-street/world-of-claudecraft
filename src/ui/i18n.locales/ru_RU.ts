@@ -8418,6 +8418,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.combat.parried': '{target} парирует ваш {ability}.',
   'hudChrome.options.mouseoverCast': 'Применение по наведению на рамки группы',
   'hudChrome.options.showTargetOfTarget': 'Показывать цель цели',
+  'hudChrome.options.stickyTarget': 'Сохранять цель при клике по земле',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Цель цели',
   'hudChrome.mobile.professions': 'Профессии',
   'hudChrome.professions.title': 'Профессии',

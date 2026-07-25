@@ -8248,6 +8248,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.parried': '{target}이 당신의 {ability}을 무기로 막았습니다.',
   'hudChrome.options.mouseoverCast': '파티 창에서 마우스오버 시전',
   'hudChrome.options.showTargetOfTarget': '대상의 대상 표시',
+  'hudChrome.options.stickyTarget': '지면 클릭 시 대상 유지',
   'hudChrome.unitFrame.targetOfTargetLabel': '대상의 대상',
   'hudChrome.mobile.professions': '전문 기술',
   'hudChrome.professions.title': '전문 기술',

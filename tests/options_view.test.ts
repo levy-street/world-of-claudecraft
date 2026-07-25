@@ -350,6 +350,7 @@ const COMBAT_KEYS = [
   'walkByAutoloot',
   'groundReticle',
   'mouseoverCast',
+  'stickyTarget',
   'fctScale',
   'showSecondaryActionBar',
   'showThirdActionBar',
@@ -381,6 +382,13 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       ],
     });
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });
+    // The sticky-target opt-in renders in the Combat tab with its label key, so
+    // the toggle cannot silently drop out of the options window.
+    expect(find(controls, 'stickyTarget')).toMatchObject({
+      control: 'boolToggle',
+      category: 'combat',
+      labelKey: 'hudChrome.options.stickyTarget',
+    });
   });
 
   it('enables the third action-bar toggle only while the secondary row is visible', () => {

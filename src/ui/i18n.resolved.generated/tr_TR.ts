@@ -1049,6 +1049,7 @@ export const tr_TR: EnTranslations = {
       "walkByAutoloot": "Yanından Geçerken Otomatik Yağma",
       "groundReticle": "Yer hedefleme halkası",
       "mouseoverCast": "Grup Çerçevelerinde İmleçle Büyü Yapma",
+      "stickyTarget": "Keep Target on Ground Click",
       "showItemLevel": "Eşya Seviyesini Göster",
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",

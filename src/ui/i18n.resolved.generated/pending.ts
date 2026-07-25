@@ -10,23 +10,29 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hudChrome.enchanting.wornTag"
+    "hudChrome.enchanting.wornTag",
+    "hudChrome.options.stickyTarget"
   ],
   "es_ES": [
-    "hudChrome.enchanting.wornTag"
+    "hudChrome.enchanting.wornTag",
+    "hudChrome.options.stickyTarget"
   ],
   "fr_FR": [
-    "hudChrome.enchanting.wornTag"
+    "hudChrome.enchanting.wornTag",
+    "hudChrome.options.stickyTarget"
   ],
   "fr_CA": [
-    "hudChrome.enchanting.wornTag"
+    "hudChrome.enchanting.wornTag",
+    "hudChrome.options.stickyTarget"
   ],
   "en_CA": [],
   "it_IT": [
-    "hudChrome.enchanting.wornTag"
+    "hudChrome.enchanting.wornTag",
+    "hudChrome.options.stickyTarget"
   ],
   "de_DE": [
-    "hudChrome.enchanting.wornTag"
+    "hudChrome.enchanting.wornTag",
+    "hudChrome.options.stickyTarget"
   ],
   "zh_CN": [
     "hudChrome.enchanting.wornTag"
@@ -41,33 +47,42 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.enchanting.wornTag"
   ],
   "pt_BR": [
-    "hudChrome.enchanting.wornTag"
+    "hudChrome.enchanting.wornTag",
+    "hudChrome.options.stickyTarget"
   ],
   "ru_RU": [
     "hudChrome.enchanting.wornTag"
   ],
   "cs_CZ": [
-    "hudChrome.enchanting.wornTag"
+    "hudChrome.enchanting.wornTag",
+    "hudChrome.options.stickyTarget"
   ],
   "nl_NL": [
-    "hudChrome.enchanting.wornTag"
+    "hudChrome.enchanting.wornTag",
+    "hudChrome.options.stickyTarget"
   ],
   "pl_PL": [
-    "hudChrome.enchanting.wornTag"
+    "hudChrome.enchanting.wornTag",
+    "hudChrome.options.stickyTarget"
   ],
   "id_ID": [
-    "hudChrome.enchanting.wornTag"
+    "hudChrome.enchanting.wornTag",
+    "hudChrome.options.stickyTarget"
   ],
   "tr_TR": [
-    "hudChrome.enchanting.wornTag"
+    "hudChrome.enchanting.wornTag",
+    "hudChrome.options.stickyTarget"
   ],
   "sv_SE": [
-    "hudChrome.enchanting.wornTag"
+    "hudChrome.enchanting.wornTag",
+    "hudChrome.options.stickyTarget"
   ],
   "vi_VN": [
-    "hudChrome.enchanting.wornTag"
+    "hudChrome.enchanting.wornTag",
+    "hudChrome.options.stickyTarget"
   ],
   "da_DK": [
-    "hudChrome.enchanting.wornTag"
+    "hudChrome.enchanting.wornTag",
+    "hudChrome.options.stickyTarget"
   ]
 };
