@@ -1350,7 +1350,12 @@
      of #mobile-extra-grid) instead, so the whole #side-buttons rail (every
      .micro-btn on it is already hidden below) and the standalone chest button
      are hidden on mobile; the desktop rail and #daily-rewards-window are
-     untouched. */
+     untouched.
+     This is also the mobile answer for the rail's .micro-group sections and
+     their keylines (hud.css): the whole rail is display:none here, so the
+     grouping never renders on mobile and there is nothing to neutralize. The
+     mobile launchers are the More tray (#mobile-extra-grid), which is a
+     separate surface with its own layout and tap-target floors. */
   body.mobile-touch #side-buttons {
     display: none;
   }

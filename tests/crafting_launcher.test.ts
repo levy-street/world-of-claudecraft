@@ -114,6 +114,12 @@ describe('side rail height budget', () => {
   // The Daily Rewards chest block (button plus its margin), which now lives
   // at the top of col-b only, from the reviewer's offline measurement.
   const DAILY_CHEST_BLOCK_PX = 128;
+  // Each column is now split into .micro-group sections, and every boundary
+  // between two VISIBLE sections costs the keyline plus its breathing room
+  // (.micro-group + .micro-group { margin-top: 3px; padding-top: 3px;
+  // border-top: 1px }). Counted separately from the per-button arithmetic so
+  // adding a section is visible in this budget instead of hiding inside it.
+  const SECTION_SEPARATOR_PX = 7;
 
   function wrapperMarkup(html: string): string {
     const start = html.indexOf('<div id="side-buttons">');
@@ -131,13 +137,33 @@ describe('side rail height budget', () => {
   // #mm-discord ships `hidden` in markup but client_shell.test.ts pins it
   // un-hidden at boot on any Discord-enabled build, so it counts as visible
   // for the real-world budget even though the static markup hides it.
+  function isVisibleButton(tag: string): boolean {
+    if (/id="mm-discord"/.test(tag)) return true;
+    return !/display:\s*none/.test(tag) && !/\shidden(?=[\s>=])/.test(tag);
+  }
+
   function countVisibleMicroBtns(markup: string): number {
     const buttons = markup.match(/<button[^>]*class="micro-btn"[^>]*>/g) ?? [];
-    return buttons.filter((b) => {
-      if (/id="mm-discord"/.test(b)) return true;
-      return !/display:\s*none/.test(b) && !/\shidden(?=[\s>=])/.test(b);
-    }).length;
+    return buttons.filter(isVisibleButton).length;
   }
+
+  // A .micro-group section only costs a keyline when it still has something
+  // visible in it (hud.css hides a section with nothing but hidden children),
+  // and only BETWEEN sections, so n visible sections cost n-1 separators. The
+  // separator is deliberately NOT compacted by the max-height rescue: at a
+  // 1px in-section gap it is the only thing left telling the sections apart.
+  function countVisibleSections(markup: string): number {
+    return markup
+      .split('<div class="micro-group"')
+      .slice(1)
+      .filter((section) => {
+        const body = section.slice(0, section.indexOf('</div>'));
+        return (body.match(/<button[^>]*>/g) ?? []).some(isVisibleButton);
+      }).length;
+  }
+
+  const separatorsPx = (markup: string): number =>
+    Math.max(0, countVisibleSections(markup) - 1) * SECTION_SEPARATOR_PX;
 
   // The rail's real footprint: two 34px .side-buttons-col columns plus the
   // #side-buttons row gap between them.
@@ -204,9 +230,11 @@ describe('side rail height budget', () => {
       const colAVisible = countVisibleMicroBtns(colA);
       const colBVisible = countVisibleMicroBtns(colB);
 
-      const colAPx = colAVisible * (UNCOMPACTED_MICRO_PX + UNCOMPACTED_GAP_PX);
+      const colAPx = colAVisible * (UNCOMPACTED_MICRO_PX + UNCOMPACTED_GAP_PX) + separatorsPx(colA);
       const colBPx =
-        DAILY_CHEST_BLOCK_PX + colBVisible * (UNCOMPACTED_MICRO_PX + UNCOMPACTED_GAP_PX);
+        DAILY_CHEST_BLOCK_PX +
+        colBVisible * (UNCOMPACTED_MICRO_PX + UNCOMPACTED_GAP_PX) +
+        separatorsPx(colB);
 
       expect(
         colAPx + BOTTOM_ANCHOR_PX,
@@ -228,8 +256,11 @@ describe('side rail height budget', () => {
       const colAVisible = countVisibleMicroBtns(colA);
       const colBVisible = countVisibleMicroBtns(colB);
 
-      const colAPx = colAVisible * (COMPACT_MICRO_PX + COMPACT_GAP_PX);
-      const colBPx = DAILY_CHEST_BLOCK_PX + colBVisible * (COMPACT_MICRO_PX + COMPACT_GAP_PX);
+      const colAPx = colAVisible * (COMPACT_MICRO_PX + COMPACT_GAP_PX) + separatorsPx(colA);
+      const colBPx =
+        DAILY_CHEST_BLOCK_PX +
+        colBVisible * (COMPACT_MICRO_PX + COMPACT_GAP_PX) +
+        separatorsPx(colB);
 
       expect(
         colAPx + BOTTOM_ANCHOR_PX,

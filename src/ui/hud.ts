@@ -7124,7 +7124,11 @@ export class Hud {
     if (slowHud) {
       const inTown = this.isInTown();
       const townFocusBtn = document.getElementById('mm-town-focus');
-      if (townFocusBtn) townFocusBtn.style.display = inTown ? '' : 'none';
+      // `hidden`, not an inline display: the rail's sections hide themselves
+      // when nothing visible is left in them (.micro-group in hud.css), and
+      // that rule can only see one hidden mechanism. Every conditional rail
+      // entry (this one, #mm-discord, #daily-rewards-button) uses `hidden`.
+      if (townFocusBtn) townFocusBtn.hidden = !inTown;
       if (this.townFocusOpen) this.renderTownFocus();
       // Crafting window staleness: the
       // window is a cold painter, so an open window repaints only when the

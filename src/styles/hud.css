@@ -1824,6 +1824,41 @@
     position: relative;
     z-index: 1;
   }
+  /* Sections: each column's launchers are grouped by what they are for (col-a:
+     you / world / stuff, col-b: rewards / activities / people / system) so
+     finding one entry is a scan of a 2-to-5 icon block instead of the whole
+     rail. Positional only, no labels and no aria role: the grouping is a
+     reading aid, and an unlabeled role="group" would add screen-reader noise
+     without adding meaning.
+     .micro-group MUST stay a plain flow box (no position, z-index, opacity,
+     transform or filter). Any of those opens a stacking context, which would
+     trap the .micro-btn::before hover flyout (z-index: -1) inside its own
+     section and re-break the cross-column clipping #side-buttons-col-b above
+     exists to fix. */
+  .micro-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  /* The section keyline, in the panel-divider language: the shared gold-brown
+     showcase hairline, perpendicular to the column's stacking axis. Drawn on
+     the LATER sibling so the topmost section never carries a stray rule. */
+  .micro-group + .micro-group {
+    margin-top: 3px;
+    padding-top: 3px;
+    border-top: 1px solid var(--color-border-showcase);
+  }
+  /* Hidden-section hygiene: three rail entries are conditional (#mm-town-focus
+     only in a town hub, #mm-discord only on a Discord-enabled build, and the
+     whole rewards section is a lone #daily-rewards-button that hides when
+     daily rewards are off). A section with nothing visible left in it must
+     vanish whole, or its keyline and gap would paint as a divider with no
+     content under it. Every conditional entry on the rail uses the `hidden`
+     attribute, so one structural rule covers all three. */
+  .micro-group:not(:has(> :not([hidden]))) {
+    display: none;
+  }
   .micro-btn {
     width: 34px;
     height: 30px;
