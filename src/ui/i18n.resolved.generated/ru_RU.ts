@@ -1461,7 +1461,7 @@ export const ru_RU: EnTranslations = {
         "claw": "Коготь",
         "horn": "Рог",
         "tusk": "Бивень",
-        "meat": "Meat",
+        "meat": "Мясо",
         "cloth": "Ткань"
       }
     },
@@ -1530,7 +1530,7 @@ export const ru_RU: EnTranslations = {
       "reorderNeedsRecent": "Сбросьте фильтр и выберите сортировку «Недавние», чтобы менять порядок в сумках",
       "itemAriaInstanced": "{item}, количество {count}, копия с клеймом мастера",
       "itemAriaMasterwork": "{item}, количество {count}, шедевр",
-      "itemAriaProcedural": "{item}, {rarity}, item level {level}, quantity {count}",
+      "itemAriaProcedural": "{item}, {rarity}, уровень предмета {level}, количество {count}",
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",
       "filterWeapon": "Оружие",
@@ -1994,6 +1994,9 @@ export const ru_RU: EnTranslations = {
         "letterGone": "Этого письма больше нет в вашем ящике.",
         "takeParcelsFirst": "Сначала заберите посылки, затем удаляйте письмо."
       }
+    },
+    "noticeboard": {
+      "empty": "Похоже, здесь ничего не опубликовано."
     },
     "bank": {
       "title": "Банк",
@@ -3856,9 +3859,9 @@ export const ru_RU: EnTranslations = {
         "bonusFmt": "+{value} к {stat}"
       },
       "gatherIntro": {
-        "mining": "Горное дело добывает руду прямо из камня мира: медь в Eastbrook Vale, железо в Mirefen Marsh и осмиевую руду в Thornpeak Heights, кормит кузнечные ремесла. Открыто для всех с 1 уровня, никаких ворот, ведется на собственном счетчике до предела в 100.",
-        "logging": "Лесозаготовка валит лес с деревьев во всех трех зонах: ironbark в Eastbrook Vale, ashwood в Mirefen Marsh и бревна горной сосны в Thornpeak Heights, сырье для древков, посохов и стола инженера. Открыта для всех с 1 уровня, ведется на собственном счетчике до предела в 100.",
-        "herbalism": "Травничество собирает дикорастущее: трава глянцелист в Eastbrook Vale, goldleaf в Mirefen Marsh и sunpetal в Thornpeak Heights, лист и стебель, что поддерживает варение аптечных ремесел. Открыто для всех с 1 уровня, ведется на собственном счетчике до предела в 100.",
+        "mining": "Горное дело добывает руду прямо из камня мира: медь в Истврукской долине, железо в Мирефенской топи и осмий на Терновых высотах, питая кузнечные ремёсла. Открыто для всех с 1 уровня: нужна лишь кирка в сумках, 20 меди в любом узловом городе. Ведётся на собственном счётчике до предела в 100.",
+        "logging": "Лесозаготовка валит лес в рощах всех трёх зон: железнокорое дерево в Истврукской долине, пепельное дерево в Мирефенской топи и горную сосну на Терновых высотах, сырьё для древков, посохов и стола инженера. Открыта для всех с 1 уровня, нужен лишь лесорубный топор в сумках (20 меди в любом узловом городе), ведётся на собственном счётчике до предела в 100.",
+        "herbalism": "Травничество собирает дикорастущее: глянцелист в Истврукской долине, золотолист в Мирефенской топи и солнцелепест на Терновых высотах, лист и стебель, на которых держатся аптечные ремёсла. Открыто для всех с 1 уровня, нужен лишь серп травника в сумках (20 меди в любом узловом городе), ведётся на собственном счётчике до предела в 100.",
         "fishing": "Рыбная ловля тянет улов из открытой воды каждой зоны в ритме поклевки и подсечки и ограничена 200."
       },
       "rhythmHeading": "Ритм сбора",
@@ -3867,7 +3870,7 @@ export const ru_RU: EnTranslations = {
       "nodesHeading": "Залежи по зонам",
       "nodesNote": "Где лежат залежи, их уровень, нужный инструмент и добыча; каждая залежь возрождается лично для вас через {respawn} секунд после вашего сбора.",
       "toolsHeading": "Инструменты",
-      "toolsNote": "Лестница инструментов с точными ценами торговцев; инструменты 4 и 5 уровня только создаются и не продаются.",
+      "toolsNote": "Для любой залежи нужен инструмент своего ремесла в сумках, в том числе для залежей 1 уровня: без кирки нет руды, без удочки нет рыбы. У торговцев есть инструменты с 1 по 3 уровень, и их держат в каждом узловом городе; инструменту достаточно лежать в сумках, ячейки экипировки и прочности у него нет, так что покупка разовая. Для проверки важен только уровень инструмента: цвет редкости чисто декоративный.\n\nВыше торговой лестницы стоят два создаваемых инструмента, 4 и 5 уровня: их делают инженеры в мастерской, и ни один NPC их не продаёт. Сегодня ни одной залежи не нужно больше 3 уровня, поэтому их ценность сейчас в скорости: лучший инструмент удерживает время сбора на минимуме на низких залежах и станет пропуском, когда появятся угодья более высоких уровней.",
       "toolCrafted": "Создается ({craft})",
       "toolVendor": "{name} ({hub})",
       "toolUnavailable": "Не продается",
@@ -5572,8 +5575,10 @@ export const ru_RU: EnTranslations = {
     "reconnectingNow": "Соединение потеряно. Повторное подключение сейчас... (попытка {attempt}/{maxAttempts})",
     "slowConnection": "Загрузка занимает больше времени, чем обычно. Проверьте подключение к интернету.",
     "connectionRejected": "Сервер закрыл соединение.",
+    "incompatibleWorldVersion": "Версии игры и сервера несовместимы. Перезагрузите или обновите игру, затем повторите попытку.",
     "realmFull": "Этот мир сейчас переполнен. Пожалуйста, попробуйте снова через несколько минут.",
     "tooManyConnections": "Из вашей сети открыто слишком много подключений к этому миру. Пожалуйста, закройте лишние игровые окна или попробуйте снова через несколько минут.",
+    "messageRateExceeded": "Вы были отключены за слишком быструю отправку действий. Пожалуйста, подождите немного и войдите снова.",
     "tips": {
       "classes": "Совет: все 9 классов играются по-разному. Попробуйте несколько, прежде чем выбрать один.",
       "talents": "Совет: вы можете сбросить таланты в любое время вне боя, так что ранний выбор никогда не станет ловушкой.",
@@ -5641,6 +5646,12 @@ export const ru_RU: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Игра работает без GPU-ускорения и будет сильно тормозить. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.",
     "bodyWeb": "Игра работает без GPU-ускорения и будет сильно тормозить. Включите аппаратное ускорение в настройках браузера, обновите драйверы видеокарты и перезапустите браузер.",
+    "dismiss": "Закрыть"
+  },
+  "perfNudge": {
+    "integratedGpu": "Игра работает на встроенном (энергосберегающем) графическом процессоре. Если в этом компьютере есть и игровая видеокарта, выберите для браузера режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика в Windows, затем перезапустите браузер. Настольная версия выбирает игровую видеокарту автоматически.",
+    "hardwareAccelerationDesktop": "Игра работает без GPU-ускорения и поэтому сильно тормозит. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.",
+    "hardwareAccelerationWeb": "Игра работает без GPU-ускорения и поэтому сильно тормозит. Включите аппаратное ускорение в настройках браузера, обновите драйверы видеокарты и перезапустите браузер.",
     "dismiss": "Закрыть"
   },
   "realm": {
@@ -6547,105 +6558,105 @@ export const ru_RU: EnTranslations = {
       "critChance": "Шанс крита",
       "dodge": "Уклонение",
       "parry": "Парирование",
-      "weaponMin": "Minimum weapon damage",
-      "weaponMax": "Maximum weapon damage",
-      "weaponDps": "Weapon damage per second",
-      "healthOnKill": "Health on kill",
-      "manaOnKill": "Mana on kill",
-      "blockValue": "Block value"
+      "weaponMin": "Минимальный урон оружия",
+      "weaponMax": "Максимальный урон оружия",
+      "weaponDps": "Урон оружия в секунду",
+      "healthOnKill": "Здоровье за убийство",
+      "manaOnKill": "Мана за убийство",
+      "blockValue": "Сила блока"
     },
     "procedural": {
-      "rollRangeAria": "Possible roll from {min} to {max}",
-      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
-      "legendaryPower": "Legendary power",
+      "rollRangeAria": "Возможное значение от {min} до {max}",
+      "advancedDetailsHint": "Удерживайте {key}, чтобы показать диапазоны возможных значений.",
+      "legendaryPower": "Легендарное свойство",
       "rarity": {
-        "common": "Common",
-        "magic": "Magic",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary",
-        "mythic": "Mythic"
+        "common": "Обычный",
+        "magic": "Магический",
+        "rare": "Редкий",
+        "epic": "Эпический",
+        "legendary": "Легендарный",
+        "mythic": "Мифический"
       },
       "nameFragment": {
-        "mighty": "Mighty",
-        "deft": "Deft",
-        "stalwart": "Stalwart",
-        "sages": "Sage's",
-        "spiritual": "Spiritual",
-        "of_focus": "of Focus",
-        "of_striking": "of Striking",
-        "of_alacrity": "of Alacrity",
-        "of_precision": "of Precision",
-        "warded": "Warded",
-        "of_reaping": "of Reaping",
-        "of_remembrance": "of Remembrance"
+        "mighty": "Могучий",
+        "deft": "Ловкий",
+        "stalwart": "Стойкий",
+        "sages": "Мудреца",
+        "spiritual": "Духовный",
+        "of_focus": "сосредоточения",
+        "of_striking": "удара",
+        "of_alacrity": "проворства",
+        "of_precision": "точности",
+        "warded": "Оберегаемый",
+        "of_reaping": "жатвы",
+        "of_remembrance": "памяти"
       },
       "rareWord": {
-        "ashen": "Ashen",
-        "blackfen": "Blackfen",
-        "doom": "Doom",
-        "grave": "Grave",
-        "mire": "Mire",
-        "storm": "Storm",
-        "thorn": "Thorn",
-        "wyrm": "Wyrm",
-        "bite": "Bite",
-        "brand": "Brand",
-        "promise": "Promise",
-        "thread": "Thread",
-        "vigil": "Vigil",
-        "ward": "Ward",
-        "whisper": "Whisper",
-        "oath": "Oath"
+        "ashen": "Пепельный",
+        "blackfen": "Чернотопь",
+        "doom": "Рок",
+        "grave": "Могила",
+        "mire": "Трясина",
+        "storm": "Буря",
+        "thorn": "Шип",
+        "wyrm": "Змей",
+        "bite": "Укус",
+        "brand": "Клеймо",
+        "promise": "Обещание",
+        "thread": "Нить",
+        "vigil": "Дозор",
+        "ward": "Оберег",
+        "whisper": "Шёпот",
+        "oath": "Клятва"
       },
       "legendary": {
         "crown_last_pyre": {
-          "name": "Crown of the Last Pyre",
-          "description": "Every third Cinderbolt scorches enemies near the target."
+          "name": "Корона последнего костра",
+          "description": "Каждый третий Cinderbolt обжигает врагов рядом с целью."
         },
         "greyjaws_edge": {
-          "name": "Greyjaw's Edge",
-          "description": "Every third weapon hit bleeds the target and restores a little resource."
+          "name": "Кромка Серой Челюсти",
+          "description": "Каждый третий удар оружием вызывает кровотечение у цели и восстанавливает немного основного ресурса."
         },
         "hushwood_longbow": {
-          "name": "Hushwood Longbow",
-          "description": "Long Draw or Fell Shot can briefly silence its target."
+          "name": "Длинный лук Тихолесья",
+          "description": "Long Draw или Fell Shot может ненадолго лишить цель возможности произносить заклинания."
         },
         "nightglass_fang": {
-          "name": "Nightglass Fang",
-          "description": "A kill grants a short burst of haste."
+          "name": "Клык ночного стекла",
+          "description": "Убийство ненадолго повышает скорость."
         },
         "ysoleis_vigil": {
-          "name": "Ysolei's Vigil",
-          "description": "Critical healing creates a brief restorative ground area."
+          "name": "Дозор Исолеи",
+          "description": "Критическое исцеление ненадолго создает восстанавливающую область."
         },
         "stormwake_idol": {
-          "name": "Stormwake Idol",
-          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+          "name": "Идол следа бури",
+          "description": "Каждый четвертый Arc Bolt переходит на ближайших врагов."
         },
         "ashbinders_seal": {
-          "name": "Ashbinder's Seal",
-          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+          "name": "Печать Связующего Пепел",
+          "description": "Каждый четвертый Gloom Bolt отмечает цель для дополнительного урона от Тьмы."
         },
         "dawnward_signet": {
-          "name": "Dawnward Signet",
-          "description": "Mending Light shields its recipient for a portion of the heal."
+          "name": "Перстень Рассветного Стража",
+          "description": "Mending Light создает на цели щит на часть объема исцеления."
         },
         "feral_moonclasp": {
-          "name": "Feral Moonclasp",
-          "description": "Every third Lunar Tempest restores primary resource."
+          "name": "Лунная застежка зверя",
+          "description": "Каждый третий Lunar Tempest восстанавливает основной ресурс."
         },
         "bell_of_the_ninth_peal": {
-          "name": "Bell of the Ninth Peal",
-          "description": "Every second damaging spell tolls around the target."
+          "name": "Колокол девятого звона",
+          "description": "Каждое второе наносящее урон заклинание звонит вокруг цели."
         },
         "mantle_of_borrowed_time": {
-          "name": "Mantle of Stolen Hours",
-          "description": "Falling below 35% health grants a brief defensive ward."
+          "name": "Мантия украденных часов",
+          "description": "При падении здоровья ниже 35% ненадолго дает защитный оберег."
         },
         "boots_of_the_unbroken_road": {
-          "name": "Boots of the Unbroken Road",
-          "description": "Moving 15 yards grants a short movement-speed burst."
+          "name": "Сапоги неразрывной дороги",
+          "description": "После перемещения на 15 ярдов ненадолго повышает скорость передвижения."
         }
       }
     },
@@ -9166,6 +9177,108 @@ export const ru_RU: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Резонирующая древесина"
+      },
+      "ashwood_staff": {
+        "name": "Ясеневый посох"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Матерчатые обмотки Могильного призывателя"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Матерчатый капюшон Могильного призывателя"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Матерчатые поножи Могильного призывателя"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Матерчатое наплечье Могильного призывателя"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Матерчатое облачение Могильного призывателя"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Матерчатый кушак Могильного призывателя"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Матерчатые туфли Могильного призывателя"
+      },
+      "gravecaller_focus": {
+        "name": "Фокус Могильного призывателя"
+      },
+      "gravecaller_pendant": {
+        "name": "Подвеска Могильного призывателя"
+      },
+      "gravecaller_ring": {
+        "name": "Кольцо Могильного призывателя"
+      },
+      "gravecaller_wand": {
+        "name": "Жезл Могильного призывателя"
+      },
+      "iron_broadsword": {
+        "name": "Железный палаш"
+      },
+      "iron_flanged_mace": {
+        "name": "Железная фланцевая булава"
+      },
+      "mirefen_dirk": {
+        "name": "Кортик Топей"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Охотничий лук Топей"
+      },
+      "mirefen_leather_belt": {
+        "name": "Кожаный пояс Топей"
+      },
+      "mirefen_leather_boots": {
+        "name": "Кожаные сапоги Топей"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Кожаные перчатки Топей"
+      },
+      "mirefen_leather_hood": {
+        "name": "Кожаный капюшон Топей"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Кожаный колет Топей"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Кожаные поножи Топей"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Кожаные наплечники Топей"
+      },
+      "thornpeak_bulwark": {
+        "name": "Оплот Шипастого пика"
+      },
+      "thornpeak_crossbow": {
+        "name": "Арбалет Шипастого пика"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Кольчужный нагрудник Шипастого пика"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Кольчужные рукавицы Шипастого пика"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Кольчужный пояс Шипастого пика"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Кольчужный шлем Шипастого пика"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Кольчужные набедренники Шипастого пика"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Кольчужные наплечники Шипастого пика"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Кольчужные сабатоны Шипастого пика"
+      },
+      "thornpeak_polearm": {
+        "name": "Древковое оружие Шипастого пика"
+      },
+      "thornpeak_war_axe": {
+        "name": "Боевой топор Шипастого пика"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
@@ -11876,6 +11989,7 @@ export const ru_RU: EnTranslations = {
     "delveRiteShrineCandleInteract": "Святилище свечи: нажмите F, чтобы коснуться",
     "delveRiteShrineReedInteract": "Святилище тростника: нажмите F, чтобы коснуться",
     "delveRiteShrineSkullInteract": "Святилище черепа: нажмите F, чтобы коснуться",
-    "mailboxName": "Почтовый ящик"
+    "mailboxName": "Почтовый ящик",
+    "noticeboardName": "Доска объявлений"
   }
 };

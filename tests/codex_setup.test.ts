@@ -230,6 +230,7 @@ describe('Codex skills', () => {
       'woc-extract-and-test',
       'woc-feature-plan',
       'woc-file-issue',
+      'woc-image-to-glb',
       'woc-qa',
       'woc-release-malware-audit',
       'woc-release-merge-audit',

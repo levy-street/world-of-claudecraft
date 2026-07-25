@@ -15,6 +15,7 @@ import puppeteer from 'puppeteer-core';
 import WebSocket from 'ws';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { suppressGpuNotice } from './lib/gpu_notice_suppress.mjs';
+import { worldAuthMessage } from './lib/world_auth.mjs';
 
 const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5190';
 const SERVER_URL = process.env.SERVER_URL ?? 'http://localhost:8790';
@@ -63,7 +64,7 @@ class AltBot {
       this.ws = new WebSocket(`${WS_BASE}/ws`);
       const to = setTimeout(() => reject(new Error('timeout')), 20000);
       this.ws.on('open', () => {
-        this.ws.send(JSON.stringify({ t: 'auth', token: reg.body.token, character: char.body.id }));
+        this.ws.send(JSON.stringify(worldAuthMessage(reg.body.token, char.body.id)));
       });
       this.ws.on('message', (data) => {
         const msg = JSON.parse(String(data));

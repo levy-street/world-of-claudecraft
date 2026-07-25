@@ -1461,8 +1461,8 @@ export const da_DK: EnTranslations = {
         "claw": "Klo",
         "horn": "Horn",
         "tusk": "Stødtand",
-        "meat": "Meat",
-        "cloth": "Cloth"
+        "meat": "Kød",
+        "cloth": "Stof"
       }
     },
     "townFocus": {
@@ -1995,6 +1995,9 @@ export const da_DK: EnTranslations = {
         "takeParcelsFirst": "Tag pakkerne ud, før du kasserer brevet."
       }
     },
+    "noticeboard": {
+      "empty": "Der ser ikke ud til at være slået noget op."
+    },
     "bank": {
       "title": "Bank",
       "subtitle": "Det Forgyldte Pengeskrin",
@@ -2136,9 +2139,9 @@ export const da_DK: EnTranslations = {
         "herbalism": "Kræver en niveau {tier} urtesegl"
       },
       "requiresTool": {
-        "mining": "Requires a mining pick",
-        "logging": "Requires a logging axe",
-        "herbalism": "Requires a herbalism sickle"
+        "mining": "Kræver en minehakke",
+        "logging": "Kræver en skovhuggeøkse",
+        "herbalism": "Kræver en urtesegl"
       },
       "toolTierUnmet": {
         "mining": "Du har brug for en niveau {tier} mineøkse for at høste denne åre.",
@@ -2146,39 +2149,39 @@ export const da_DK: EnTranslations = {
         "herbalism": "Du har brug for en niveau {tier} urtesegl for at samle denne plette."
       },
       "toolRequired": {
-        "mining": "You need a mining pick to harvest this vein.",
-        "logging": "You need a logging axe to fell this stand.",
-        "herbalism": "You need a herbalism sickle to gather this patch.",
-        "fishing": "You need a fishing pole to cast a line."
+        "mining": "Du har brug for en minehakke for at høste denne åre.",
+        "logging": "Du har brug for en skovhuggeøkse for at fælde denne lund.",
+        "herbalism": "Du har brug for en urtesegl for at samle denne plette.",
+        "fishing": "Du har brug for en fiskestang for at kaste linen ud."
       },
       "noNodeNearby": {
-        "mining": "There is no ore vein within reach.",
-        "logging": "There is no timber stand within reach.",
-        "herbalism": "There is no herb patch within reach."
+        "mining": "Der er ingen malmåre inden for rækkevidde.",
+        "logging": "Der er ingen tømmerlund inden for rækkevidde.",
+        "herbalism": "Der er ingen urteplette inden for rækkevidde."
       },
       "toolTierUnmetCorpse": "Du har brug for et niveau {tier} indsamlingsværktøj for at genvinde de fineste materialer.",
       "toolTooltip": {
         "kind": {
-          "mining": "Mining tool (tier {tier})",
-          "logging": "Logging tool (tier {tier})",
-          "herbalism": "Herbalism tool (tier {tier})",
-          "fishing": "Fishing rod (tier {tier})"
+          "mining": "Minedriftsværktøj (niveau {tier})",
+          "logging": "Skovhugstværktøj (niveau {tier})",
+          "herbalism": "Urtekundskabsværktøj (niveau {tier})",
+          "fishing": "Fiskestang (niveau {tier})"
         },
         "unlocks": {
-          "mining": "Required to mine ore veins up to tier {tier}.",
-          "logging": "Required to fell timber stands up to tier {tier}.",
-          "herbalism": "Required to gather herb patches up to tier {tier}."
+          "mining": "Kræves for at høste malmårer op til niveau {tier}.",
+          "logging": "Kræves for at fælde tømmerlunde op til niveau {tier}.",
+          "herbalism": "Kræves for at samle urtepletter op til niveau {tier}."
         },
         "use": {
-          "mining": "Use: Mine a nearby ore vein.",
-          "logging": "Use: Fell a nearby timber stand.",
-          "herbalism": "Use: Gather from a nearby herb patch."
+          "mining": "Brug: Høst en nærliggende malmåre.",
+          "logging": "Brug: Fæld en nærliggende tømmerlund.",
+          "herbalism": "Brug: Saml fra en nærliggende urteplette."
         },
-        "speed": "Gathers faster at nodes below tier {tier}.",
-        "rodRequired": "Required to fish.",
-        "rodBite": "Fish bite up to {seconds}s sooner.",
-        "rodReel": "Extends the reel window by {seconds}s.",
-        "rodBand": "Unlocks richer catch tables at fishing skill {skill} and above."
+        "speed": "Indsamler hurtigere ved ressourcekilder under niveau {tier}.",
+        "rodRequired": "Kræves for at fiske.",
+        "rodBite": "Fisk bider op til {seconds}s tidligere.",
+        "rodReel": "Forlænger indhivningsvinduet med {seconds}s.",
+        "rodBand": "Låser op for rigere fangsttabeller ved fiskerifærdighed {skill} og derover."
       },
       "downgradeMark": "Tasker fyldte: fundet blev gemt uden indsamlerens mærke.",
       "downgradeFind": "Tasker fyldte: et pristint fund slap væk.",
@@ -2355,7 +2358,7 @@ export const da_DK: EnTranslations = {
       },
       "throttled": "Du laver ting for hurtigt. Vent et øjeblik, og prøv igen.",
       "recipeNotLearned": "Du har ikke lært den opskrift endnu.",
-      "noBagSpace": "You do not have room for the crafted item.",
+      "noBagSpace": "Du har ikke plads til den fremstillede genstand.",
       "skillReqLine": "Kræver {craft} {skill}",
       "difficultyFull": "Fuld færdighedsforøgelse",
       "difficultyReduced": "Reduceret færdighedsforøgelse",
@@ -2407,9 +2410,9 @@ export const da_DK: EnTranslations = {
       "enchantWrongSlot": "Den fortryllelse kan ikke anvendes på den genstand.",
       "enchantUnknown": "Den fortryllelse eksisterer ikke.",
       "enchantInsufficient": "Du har ikke materialerne til den fortryllelse.",
-      "disenchantNoSpace": "You do not have room for the arcane materials.",
-      "salvageNoSpace": "You do not have room for the salvaged materials.",
-      "enchantNoSpace": "You do not have room for the enchanted item.",
+      "disenchantNoSpace": "Du har ikke plads til de arkane materialer.",
+      "salvageNoSpace": "Du har ikke plads til de bjærgede materialer.",
+      "enchantNoSpace": "Du har ikke plads til den fortryllede genstand.",
       "disenchantConfirmTitle": "Affortrylle {item}?",
       "disenchantConfirmBody": "Dette ødelægger {item} og giver arkan materiale. Dette kan ikke fortrydes.",
       "disenchantConfirmBodySpecial": "Dette ødelægger et særligt eksemplar af {item} (signeret, mesterværk eller fortryllet) og giver arkan materiale. Dette kan ikke fortrydes.",
@@ -2429,10 +2432,10 @@ export const da_DK: EnTranslations = {
       "stateKnown": "Kendt",
       "stateTeachable": "Tilgængelig",
       "stateLocked": "Låst",
-      "statePending": "Learning",
+      "statePending": "Læres",
       "requirement": "Undervist på {craft} {skill}",
       "trainAria": "Lær {name} for {fee}",
-      "pendingAria": "Learning {name}",
+      "pendingAria": "{name} læres",
       "dialogOption": "Uddannelse",
       "dialogOptionAria": "Gennemse træning fra {name}",
       "learned": "Opskrift lært: {recipe}",
@@ -2460,7 +2463,7 @@ export const da_DK: EnTranslations = {
       "notBound": "Den genstand er ikke bundet.",
       "cannotAfford": "Du har ikke råd til aflæsningsgebyret.",
       "outOfRange": "Du skal være ved en håndværksstation for at aflæse.",
-      "noSpace": "You do not have room for the unbound copy."
+      "noSpace": "Du har ikke plads til det aflæste eksemplar."
     },
     "finder": {
       "title": "Fangekældersfinder",
@@ -3856,9 +3859,9 @@ export const da_DK: EnTranslations = {
         "bonusFmt": "+{value} {stat}"
       },
       "gatherIntro": {
-        "mining": "Minedrift trækker malm direkte ud af verdens klipper: kobber i Østbæk Dal, jern i Mirefen Mose og osmium i Tornetop-Højderne, der fodrer smedehåndværkene. Åbent for alle fra niveau 1, ingen som helst adgangsbetingelse, spores på sin egen tæller op til en grænse på 100.",
-        "logging": "Skovhugst fælder tømmer fra skovstande i alle tre zoner: jernbark i Østbæk Dal, asketræ i Mirefen Mose og højfyrre i Tornetop-Højderne, råmaterialerne til skafter, stave og ingeniørens bænk. Åbent for alle fra niveau 1, spores på sin egen tæller op til en grænse på 100.",
-        "herbalism": "Urtekundskab indsamler det, der vokser vildt: glansbladet i Østbæk Dal, guldblad i Mirefen Mose og solkrone i Tornetop-Højderne, blade og stilke der holder apotekerhandelen i gang. Åbent for alle fra niveau 1, spores på sin egen tæller op til en grænse på 100.",
+        "mining": "Minedrift trækker malm direkte ud af verdens klipper: kobber i Østbæk Dal, jern i Mirefen Mose og osmium i Tornetop-Højderne, der fodrer smedehåndværkene. Åbent for alle fra niveau 1: der skal blot en minehakke i dine tasker, 20 kobber i enhver hub-by. Spores på sin egen tæller op til en grænse på 100.",
+        "logging": "Skovhugst fælder tømmer fra skovstande i alle tre zoner: jernbark i Østbæk Dal, asketræ i Mirefen Mose og højfyrre i Tornetop-Højderne, råmaterialerne til skafter, stave og ingeniørens bænk. Åbent for alle fra niveau 1 med en skovhuggeøkse i dine tasker (20 kobber i enhver hub-by), spores på sin egen tæller op til en grænse på 100.",
+        "herbalism": "Urtekundskab indsamler det, der vokser vildt: glansbladet i Østbæk Dal, guldblad i Mirefen Mose og solkrone i Tornetop-Højderne, blade og stilke der holder apotekerhandelen i gang. Åbent for alle fra niveau 1 med en urtesegl i dine tasker (20 kobber i enhver hub-by), spores på sin egen tæller op til en grænse på 100.",
         "fishing": "Fiskeri er det anderledes fag blandt indsamlingsfagene, og det dybeste: et rigtigt bid-og-hiv-minispil, sine egne fangsttabeller i hver zone, og en færdighedsgrænse på 200, det dobbelte af de andre. Køb en stang, vend dig mod åbent vand, og kast."
       },
       "rhythmHeading": "Indsamlingsrytmen",
@@ -3867,7 +3870,7 @@ export const da_DK: EnTranslations = {
       "nodesHeading": "Ressourcekilder pr. zone",
       "nodesNote": "Hvor ressourcekilderne er, deres niveau, det værktøj de kræver, og hvad de giver. Enhver ressourcekilde genskabes for dig {respawn} sekunder efter din egen høst, og den timer er kun din: en anden indsamler, der arbejder den samme ressourcekilde, forsinker aldrig din, så der er ingen kappestrid om ressourcekilder og ingen lejrsidderi. Hver zone højere på stigen giver et bedre materiale fra hårdere terræn.",
       "toolsHeading": "Værktøjer",
-      "toolsNote": "Bare hænder tæller som et niveau 1-værktøj, så enhver niveau 1-ressourcekilde i spillet kræver slet intet værktøj. Forhandlerstigen dækker niveau 1 til 3; et værktøj skal blot være i dine tasker, der er ingen udstyringsplads og ingen holdbarhed, så hvert er et engangskøb. Kun niveau'et betyder noget for adgangsbetingelsen: et værktøjs sjældenhedsfarve er kosmetisk.\n\nOver forhandlerstigen sidder to fremstillede værktøjer, niveau 4 og niveau 5, lavet på værkstedet af ingeniører og aldrig solgt af nogen NPC. Ingen ressourcekilde i dag kræver mere end niveau 3, så deres værdi lige nu er fart: et topværktøj fastholder kastet ved dets gulv på lavere ressourcekilder, og det vil være adgangskortet, når terræn af højere niveau ankommer.",
+      "toolsNote": "Enhver ressourcekilde kræver sit fags værktøj i dine tasker, også niveau 1: ingen hakke, ingen malm, og ingen stang, ingen fisk. Forhandlerstigen dækker niveau 1 til 3 og føres i enhver hub-by; et værktøj skal blot være i dine tasker, der er ingen udstyringsplads og ingen holdbarhed, så hvert er et engangskøb. Kun niveauet betyder noget for adgangsbetingelsen: et værktøjs sjældenhedsfarve er kosmetisk.\n\nOver forhandlerstigen sidder to fremstillede værktøjer, niveau 4 og niveau 5, lavet på værkstedet af ingeniører og aldrig solgt af nogen NPC. Ingen ressourcekilde i dag kræver mere end niveau 3, så deres værdi lige nu er fart: et topværktøj fastholder kastet ved dets gulv på lavere ressourcekilder, og det vil være adgangskortet, når terræn af højere niveau ankommer.",
       "toolCrafted": "Fremstillet ({craft})",
       "toolVendor": "{name} ({hub})",
       "toolUnavailable": "Sælges ikke",
@@ -5572,8 +5575,10 @@ export const da_DK: EnTranslations = {
     "reconnectingNow": "Forbindelse mistet. Genopretter forbindelse nu... (forsøg {attempt}/{maxAttempts})",
     "slowConnection": "Dette tager længere tid end normalt. Tjek din internetforbindelse.",
     "connectionRejected": "Serveren lukkede forbindelsen.",
+    "incompatibleWorldVersion": "Spillets og serverens versioner er ikke kompatible. Genindlæs eller opdater, og prøv derefter igen.",
     "realmFull": "Denne verden er fuld i øjeblikket. Prøv igen om et par minutter.",
     "tooManyConnections": "Der kommer for mange forbindelser til denne verden fra dit netværk. Luk ekstra spilvinduer, eller prøv igen om et par minutter.",
+    "messageRateExceeded": "Forbindelsen blev afbrudt, fordi du sendte handlinger for hurtigt. Vent et øjeblik, og log ind igen.",
     "tips": {
       "classes": "Tip: Hver af de 9 klasser spilles forskelligt. Prøv nogle stykker, før du vælger én.",
       "talents": "Tip: Du kan nulstille dine talenter, når du er ude af kamp, så et tidligt valg er aldrig en fælde.",
@@ -5641,6 +5646,12 @@ export const da_DK: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Spillet kører uden GPU-acceleration og vil være langsomt. Opdater dine grafikdrivere og genstart derefter spillet. På Windows skal du også indstille spillet til Høj ydeevne under Indstillinger, System, Skærm, Grafik.",
     "bodyWeb": "Spillet kører uden GPU-acceleration og vil være langsomt. Aktiver hardwareacceleration i din browsers indstillinger, opdater dine grafikdrivere og genstart derefter din browser.",
+    "dismiss": "Afvis"
+  },
+  "perfNudge": {
+    "integratedGpu": "Spillet kører på den integrerede (strømbesparende) GPU. Hvis denne computer også har en gaming-GPU, skal du på Windows indstille din browser til Høj ydeevne under Indstillinger, System, Skærm, Grafik og derefter genstarte browseren. Skrivebordsappen vælger selv gaming-GPU'en.",
+    "hardwareAccelerationDesktop": "Spillet kører uden GPU-acceleration, hvilket gør det meget langsomt. Opdater dine grafikdrivere og genstart derefter spillet. På Windows skal du også indstille spillet til Høj ydeevne under Indstillinger, System, Skærm, Grafik.",
+    "hardwareAccelerationWeb": "Spillet kører uden GPU-acceleration, hvilket gør det meget langsomt. Aktiver hardwareacceleration i din browsers indstillinger, opdater dine grafikdrivere og genstart derefter din browser.",
     "dismiss": "Afvis"
   },
   "realm": {
@@ -6068,7 +6079,7 @@ export const da_DK: EnTranslations = {
       "auraGain": "Du får {name}.",
       "auraFade": "{name} svinder bort fra dig.",
       "auraAfflicted": "{target} er ramt af {name}.",
-      "auraGainOther": "{target} gains {name}."
+      "auraGainOther": "{target} får {name}."
     },
     "system": {
       "playerDeath": "Du er død.",
@@ -6941,7 +6952,7 @@ export const da_DK: EnTranslations = {
         "description": "Slynger en flammende kugle, der volder {damage} ildskade plus yderligere skade over tid."
       },
       "fireball_form": {
-        "name": "Ember Form",
+        "name": "Glødform",
         "description": "Forvandl dig til en brændende glød og forøg bevægelseshastighed med {buff}%. Du kan ikke angribe eller kaste trolddom, mens du er forvandlet. Genudkast for at vende tilbage til din normale form."
       },
       "frost_armor": {
@@ -7005,43 +7016,43 @@ export const da_DK: EnTranslations = {
         "description": "Hidkald en vandelementar, der kæmper ved din side, slynger Vandprojektiler mod dit mål og kanaliserer Vandstråle. (Frost)"
       },
       "ice_lance": {
-        "name": "Ice Lance",
+        "name": "Islanse",
         "description": "Kast en isskarv og gør {damage} Frost-skade, tredoblet mod et frosset mål. Bruger Fingers of Frost eller en ladning af Vinterkulden til at behandle målet som frosset. (Frost)"
       },
       "flurry": {
-        "name": "Winterlash",
+        "name": "Vinterpisk",
         "description": "Affyr tre iskolde projektiler, der hver giver {damage} frostskade, og påfør målet Vinterkulde: de næste 2 kompatible besværgelser mod det behandler det som frossent. Brain Freeze gør Winterlash øjeblikkelig og springer dens nedkøling over. (Frost)"
       },
       "frozen_orb": {
-        "name": "Frozen Orb",
+        "name": "Frossen Kugle",
         "description": "Slip en kule af hvirvlende frost, der driver fremad i 8 sekunder, og giver {damage} frostskade hvert sekund til nærliggende fjender og bremser dem med 30%. Hver slående puls genererer en istap. (Frost)"
       },
       "blizzard": {
-        "name": "Blizzard",
+        "name": "Snestorm",
         "description": "Kalder en isstorm ned over målområdet i 6 sek., gør {damage} Frost-skade hvert sekund og sætter fjenders hast ned med 40%. Hver fjende ramt reducerer Frozen Orb med 0,5 sek., op til 3 sek. pr. kast. (Frost)"
       },
       "glacial_spike": {
-        "name": "Glacial Spike",
+        "name": "Gletsjerspyd",
         "description": "Fremkald en massiv isspids og forbrug 5 Istapper for at gøre {damage} Frost-skade og fryse målet på stedet i 4 sek. (Frost)"
       },
       "glacial_front": {
-        "name": "Glacial Front",
+        "name": "Gletsjerfront",
         "description": "Hold for at samle en stadig bredere front af frost, og slip den derefter i en kegle. Længere opladning rækker længere og gør mere skade. Alle fjender ramt sættes ned med 50% i 4 sek.; maksimal opladning rodfæster dem også i 1 sek. (Frost)"
       },
       "dragons_breath": {
-        "name": "Dragon's Breath",
+        "name": "Drageånde",
         "description": "Hold for at samle et stadig bredere åndedrag af flammer, og slip det derefter i en kegle. Længere opladning rækker længere og gør mere skade. Fjender ramt bliver desorienterede og skade afbryder effekten; maksimal opladning rammer altid kritisk og tæller én gang mod Hed Stime. (Ild)"
       },
       "fingers_of_frost": {
-        "name": "Fingers of Frost",
+        "name": "Frostens Fingre",
         "description": "Rimlanse har 15% chance for at give Fingers of Frost, op til 2 ladninger: din næste Ice Lance behandler målet som frosset. (Frost)"
       },
       "brain_freeze": {
-        "name": "Brain Freeze",
+        "name": "Hjernefrys",
         "description": "Rimlanse har 20 % chance for at gøre din næste Winterlash øjeblikkelig og fri for dens nedkøling. (Frost)"
       },
       "shatter": {
-        "name": "Brittle Ruin",
+        "name": "Skrøbelig Undergang",
         "description": "Dine besværgelser får 50 % chance for kritiske træffere mod frosne mål. Fingers of Frost og Vinterkulde tæller som frosne. (Frost)"
       },
       "conjure_water": {
@@ -7121,7 +7132,7 @@ export const da_DK: EnTranslations = {
         "description": "Læg baghold mod målet for 250% våbenskade plus {damage}. Skal være sneget og bag målet. Kræver en dolk. Giver 1 kombopoint."
       },
       "stealth": {
-        "name": "Duskveil",
+        "name": "Skumringsslør",
         "description": "Skjuler dig i skyggerne: fjender lægger knap mærke til dig, men du bevæger dig 50 % langsommere. Angreb eller skade bryder Duskveil. Kast igen for at træde frem."
       },
       "adrenaline_rush": {
@@ -7353,7 +7364,7 @@ export const da_DK: EnTranslations = {
         "description": "Gennemtrænger dit våben med bidende frost: hvert hug volder {damage} ekstra skade i 5 min."
       },
       "ghost_wolf": {
-        "name": "Shadewolf",
+        "name": "Skyggeulv",
         "description": "Forvandler dig til en Shadewolf og øger bevægelseshastigheden med 40% i 10 min."
       },
       "stormstrike": {
@@ -7409,7 +7420,7 @@ export const da_DK: EnTranslations = {
         "description": "Helbreder et venligt mål for {damage}."
       },
       "mark_of_the_wild": {
-        "name": "Wildward",
+        "name": "Vildværn",
         "description": "Anbringer Wildward på et venligt mål og øger rustningen med {buff} i 30 min."
       },
       "moonfire": {
@@ -7809,7 +7820,7 @@ export const da_DK: EnTranslations = {
         "description": "Kaster lyn mod målområdet og giver {damage} skade til fjender i nærheden. (shamantalent)"
       },
       "chaos_bolt": {
-        "name": "Ruinbolt",
+        "name": "Undergangslyn",
         "description": "Kaster en kaotisk ildkugle, der giver {damage} Ildskade. (troldmandstalent)"
       },
       "cleansing_verdict": {
@@ -7917,23 +7928,23 @@ export const da_DK: EnTranslations = {
         "description": "Nedkalder en meteor på målområdet og giver {damage} Ildskade. Derefter brændes fjender i området for 12 til 18 Ildskade hvert 2. sek. i 6 sek. (magikertalent)"
       },
       "temporal_mend": {
-        "name": "Temporal Mend",
+        "name": "Tidsheling",
         "description": "Trækker en alliert et øjeblik fremad i tiden og gendanner {damage} helbred, mens kroppen falder til ro i sin sundere fremtidige form. (Kronomantik-signatur)"
       },
       "temporal_barrier": {
-        "name": "Temporal Barrier",
+        "name": "Tidsbarriere",
         "description": "Forskydes målet et hjerteslag ud af nutiden, og et tidsskjold absorberer {damage} skade i 10 sek. inden tidslinjen snapper tilbage."
       },
       "temporal_echo": {
-        "name": "Temporal Echo",
+        "name": "Tidsekko",
         "description": "Mærker en alliert med et ekko af et sundere øjeblik og gendanner {damage} helbred øjeblikkeligt. I {duration} sek. trækkes en del af den Arkane skade du gør tilbage gennem ekkoet for at helbrede dem."
       },
       "temporal_cascade": {
-        "name": "Temporal Cascade",
+        "name": "Tidskaskade",
         "description": "Sender et ekko kaskadevejende gennem din gruppe: målet og op til fire af deres nærmeste allierede helbredes øjeblikkeligt og markeres hver i {duration} sek., og trækker en del af den Arkane skade du gør tilbage gennem deres ekkooer for at helbrede dem. (Kronomantik)"
       },
       "temporal_reversal": {
-        "name": "Temporal Reversal",
+        "name": "Tidsvending",
         "description": "Tilbagespoler en falden allieredes tidslinje og bringer dem tilbage til livet ved deres krop med en del af deres helbred og mana, selv midt i kamp. (Kronomantik)"
       },
       "collective_reversal": {
@@ -7941,23 +7952,23 @@ export const da_DK: EnTranslations = {
         "description": "Spoler tidslinjen tilbage for hvert faldet medlem af din gruppe eller dit raid og genopliver dem ved deres krop med 30% helbred og mana. Kan ikke kastes i kamp. (Kronomanti)"
       },
       "temporal_rewind": {
-        "name": "Rewind",
+        "name": "Tilbagespoling",
         "description": "Sender en arkan bølge gennem din gruppe eller raid og tilbagespoler tiden for at gendanne 30% af den skade, hver alliert inden for 40 yards tog de seneste 5 sekunder (op til 35% af deres maksimale helbred). Kan ikke være en kritisk effekt. (Kronomantik)"
       },
       "temporal_hourglass": {
-        "name": "Hourglass of Suspension",
+        "name": "Standsningens Timeglas",
         "description": "Placer et tidssandur på det valgte sted. Under en fjende suspenderer det dem i {hostilePveDuration} sek. i PvE eller {hostilePvpDuration} sek. i PvP og forhindrer alle handlinger; skade bryder effekten. Ved dine fødder eller under en gruppealliert giver det stasis i {duration} sek., forhindrer skade og handlinger, gendanner {healing}% af maksimalt helbred og får nedkølingerne til at gendannes {selfCooldownRecovery}% hurtigere for dig eller {allyCooldownRecovery}% hurtigere for en alliert. På tomt terræn venter sandurret i {groundDuration} sek. og påvirker den første gyldige enhed, der træder på det. Den gavnlige aura kan fjernes manuelt."
       },
       "temporal_acceleration": {
-        "name": "Temporal Acceleration",
+        "name": "Tidsacceleration",
         "description": "Fremskynder tidens gang for din gruppe eller raid og øger angrebshastighed, kastetempo og kanaliseringstempo med 30% i 15 sek. Allierede der for nylig blev påvirkede af Temporal Acceleration eller Krigstrommer er for udmattede til at have gavn af det. (Kronomantik)"
       },
       "perfect_moment": {
-        "name": "Perfect Moment",
+        "name": "Perfekt Øjeblik",
         "description": "Grib dit perfekte øjeblik: få øjeblikkeligt 4 Arkane Ladninger, og i 10 sek. bruger Æterpile dem ikke. (Kronomantik)"
       },
       "arcane_surge": {
-        "name": "Aether Surge",
+        "name": "Arkan kraft",
         "description": "Leder en bølge af rå æter gennem fjenden og påfører {damage} skade. Hvert kast efterlader en Arkan Ladning, der øger din næste Aether Surges skade og kastetempo (5% hurtigere for hvert) men øger manakostningen kraftigt, stablet op til 4; Æterpile bruger ladningerne. Hvert kast kan også udløse Æterrus, der gør din næste Aether Surge gratis og dobbelt så hurtig at kaste."
       },
       "mind_sear": {
@@ -9166,6 +9177,108 @@ export const da_DK: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Resonant Tømmer"
+      },
+      "ashwood_staff": {
+        "name": "Asketræsstav"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Gravkalderens stofhåndvikler"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Gravkalderens stofhætte"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Gravkalderens stofbenklæder"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Gravkalderens stofkappe"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Gravkalderens stofdragt"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Gravkalderens stofskærf"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Gravkalderens stoffutter"
+      },
+      "gravecaller_focus": {
+        "name": "Gravkalderens fokus"
+      },
+      "gravecaller_pendant": {
+        "name": "Gravkalderens vedhæng"
+      },
+      "gravecaller_ring": {
+        "name": "Gravkalderens ring"
+      },
+      "gravecaller_wand": {
+        "name": "Gravkalderens tryllestav"
+      },
+      "iron_broadsword": {
+        "name": "Jernbredsværd"
+      },
+      "iron_flanged_mace": {
+        "name": "Jernflangekølle"
+      },
+      "mirefen_dirk": {
+        "name": "Mirefen-dolk"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Mirefen-jagtbue"
+      },
+      "mirefen_leather_belt": {
+        "name": "Mirefen-læderbælte"
+      },
+      "mirefen_leather_boots": {
+        "name": "Mirefen-læderstøvler"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Mirefen-læderhandsker"
+      },
+      "mirefen_leather_hood": {
+        "name": "Mirefen-læderhætte"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Mirefen-lædervams"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Mirefen-læderbenklæder"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Mirefen-læderskulderværn"
+      },
+      "thornpeak_bulwark": {
+        "name": "Thornpeak-bolværk"
+      },
+      "thornpeak_crossbow": {
+        "name": "Thornpeak-armbrøst"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Thornpeak-ringbrynje"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Thornpeak-ringhandsker"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Thornpeak-ringbælte"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Thornpeak-ringhjelm"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Thornpeak-ringbenværn"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Thornpeak-ringskulderplader"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Thornpeak-ringsabatons"
+      },
+      "thornpeak_polearm": {
+        "name": "Thornpeak-stangvåben"
+      },
+      "thornpeak_war_axe": {
+        "name": "Thornpeak-krigsøkse"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
@@ -11876,6 +11989,7 @@ export const da_DK: EnTranslations = {
     "delveRiteShrineCandleInteract": "Kerteskrin: Tryk på F for at røre det",
     "delveRiteShrineReedInteract": "Sivskrin: Tryk på F for at røre det",
     "delveRiteShrineSkullInteract": "Kranieskrin: Tryk på F for at røre det",
-    "mailboxName": "Postkasse"
+    "mailboxName": "Postkasse",
+    "noticeboardName": "Opslagstavle"
   }
 };

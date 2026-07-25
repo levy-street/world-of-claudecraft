@@ -236,7 +236,9 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             // mob's leash anchor, so a DoT-kited mob still leashes home.
             false,
             false,
-            false,
+            // Banks copied from resolved damage (Ignite) skip the source-output
+            // multipliers so the payout equals what was banked, once.
+            a.finalDamage === true,
             null,
             false,
             a.equipmentProcDepth ?? 0,

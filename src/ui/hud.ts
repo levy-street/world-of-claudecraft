@@ -176,7 +176,7 @@ import {
   type CraftTierUp,
   observeCraftSkillsForTierUps,
 } from './craft_celebration_view';
-import { buildCraftingView, craftLearnHints } from './crafting_view';
+import { buildCraftingView, craftingReagentSig, craftLearnHints } from './crafting_view';
 import { renderCraftingWindow, stationNameText } from './crafting_window';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
@@ -1320,6 +1320,13 @@ export class Hud {
   // (walking into/out of a station, or the own mobile station expiring); the
   // server re-validates the gate on every craft anyway.
   private lastCraftingStationSig = '';
+  // Signature of the bag as of the last crafting-window paint (#2375). The
+  // Craft gate is inventory-derived, so an open window goes stale on ANY bag
+  // change (a vendor buy, loot, mail, trade, bank withdraw, quest reward);
+  // refreshOpenCraftingIfReagentsChanged diffs the live bag against this and
+  // repaints only on a real move. Same cold-painter posture as the station
+  // signature above: never a per-frame repaint.
+  private lastCraftingReagentSig = '';
   // Character and Crafting are cold painters. Diff the local crafting
   // identity plus the gathering proficiency rows on the slow band so a late
   // online cprof or professions snapshot replaces stale archetype art/title
@@ -7199,10 +7206,16 @@ export class Hud {
       // craft regardless.
       if (
         $('#crafting-window').style.display === 'flex' &&
-        stationTypesSignature(inRangeStationTypes(sim.player.pos, sim.activeMobileStationCraft)) !==
-          this.lastCraftingStationSig
+        stationTypesSignature(
+          inRangeStationTypes(sim.stationPlacements, sim.player.pos, sim.activeMobileStationCraft),
+        ) !== this.lastCraftingStationSig
       )
         this.renderCrafting();
+      // Bag staleness (#2375): the same cold-painter treatment for the other
+      // half of the Craft gate. This is the ONE edge that covers every bag
+      // source in BOTH hosts (loot, mail, trade, bank, quest reward), so the
+      // window can never sit disabled on reagents the player is holding.
+      this.refreshOpenCraftingIfReagentsChanged();
     }
 
     // player frame: the first instance of the unit_frame family. Build a
@@ -7793,6 +7806,12 @@ export class Hud {
     if (slowHud && this.mailboxWindow.isOpen) this.mailboxWindow.refreshIfChanged();
     // The bank closes itself when the bank mirror goes null (left the banker).
     if (slowHud && this.bankWindow.isOpen) this.bankWindow.refreshIfChanged();
+    // The bag money row is a cold painter, and several copper credits reach no bags
+    // arm in EITHER host (a trainer fee, a settled Vale Cup bet, delve and lockpick
+    // copper), so this is the backstop that converges them all (#2373). Online the
+    // ClientWorld purse diff gets there first via onInventoryChanged. The window owns
+    // the latch and repaints only its .money footer, never the whole grid.
+    if (slowHud) this.bagsWindow.refreshIfChanged();
     if (slowHud && this.deedsWindow.isOpen) this.deedsWindow.refreshIfChanged();
     if (slowHud) this.refreshOpenProfessionSurfacesIfChanged();
     if (slowHud && this.professionsWindow.isOpen) this.professionsWindow.refreshIfChanged();
@@ -9471,6 +9490,18 @@ export class Hud {
         case 'bank':
           // Keyboard/sim interact at a banker NPC: open the bank window.
           this.openBank();
+          break;
+        case 'noticeboard':
+          // The board has no posted content yet. The structured private event
+          // keeps this feedback localized and identical offline and online.
+          // Mobile keeps the chat log collapsed during normal play, so mirror
+          // the durable/live-announced log line into the shared transient
+          // banner instead of making a successful interaction look inert.
+          {
+            const message = t('hudChrome.noticeboard.empty');
+            this.showBanner(message);
+            this.log(message, '#c8b98f');
+          }
           break;
         case 'mailArrived': {
           // Player names splice verbatim; authored letters carry their
@@ -11442,6 +11473,10 @@ export class Hud {
       buy();
       if ($('#bags').style.display !== 'none') this.renderBags();
       this.renderVendor();
+      // The issue #2375 repro: buying the last reagent with the crafting
+      // window open must enable the row on the click, not on the next slow
+      // tick (offline has no authoritative-delta hook to ride).
+      this.refreshOpenCraftingIfReagentsChanged();
     };
     renderVendorWindow(
       $('#vendor-window'),
@@ -11556,6 +11591,7 @@ export class Hud {
       $('#train-window'),
       entityDisplayName(npc),
       buildTrainView(npc.templateId, {
+        stations: this.sim.stationPlacements,
         knownRecipes: identity.knownRecipes,
         craftSkills: identity.craftSkills,
         copper: this.sim.copper,
@@ -11737,10 +11773,14 @@ export class Hud {
     // the own active mobile station), computed once per repaint, so the row
     // disable mirrors the deny exactly. The server re-validates on craft.
     const inRangeStations = inRangeStationTypes(
+      this.sim.stationPlacements,
       this.sim.player.pos,
       this.sim.activeMobileStationCraft,
     );
     this.lastCraftingStationSig = stationTypesSignature(inRangeStations);
+    // Re-arm the bag diff on EVERY paint, whatever caused it, so a repaint
+    // from one edge never leaves another edge owing a second one (#2375).
+    this.lastCraftingReagentSig = craftingReagentSig(this.sim.inventory, this.sim.player.name);
     // The window lists only KNOWN recipes, so an unlearned trainer
     // recipe never renders as a craftable row (it surfaces in the Train
     // ladder instead). The SAME viewer-side predicate the ladder's known
@@ -11797,7 +11837,7 @@ export class Hud {
       buildProfessionIdentityView(this.sim.craftingIdentity),
       // Per-section "learnable at a master" hints: crafts with unlearned
       // trainer recipes, off the same mirrored knownRecipes set (both hosts).
-      craftLearnHints(this.sim.craftingIdentity.knownRecipes),
+      craftLearnHints(this.sim.craftingIdentity.knownRecipes, this.sim.stationPlacements),
     );
   }
 
@@ -12035,9 +12075,33 @@ export class Hud {
   // Called when an authoritative inventory delta lands (online snapshots
   // carry inventory separately from the event frames that normally redraw).
   onInventoryChanged(): void {
-    if ($('#bags').style.display !== 'none') this.renderBags();
+    // Cold-load-safe gate (#1538): a never-opened window's inline display is '', which
+    // the raw `!== 'none'` form reads as shown. That mattered little while only
+    // inventory deltas landed here, but every money-only credit now routes through
+    // this hook (#2373), so a hidden window would be rebuilt on each one.
+    if (bagsWindowShown($('#bags').style.display)) this.renderBags();
     if (this.openVendorNpcId !== null) this.renderVendor();
     this.renderCharIfOpen();
+    // The crafting window rides this hook too (#2375): it is the online
+    // host's instant edge for an authoritative delta, and offline it is what
+    // the bank window raises on a withdraw. Every other offline bag source
+    // converges on the slow band instead.
+    this.refreshOpenCraftingIfReagentsChanged();
+  }
+
+  /**
+   * Repaint an OPEN crafting window when the bag facts behind its Craft gate
+   * actually moved (issue #2375). Cheap enough for the slow band and for every
+   * inventory delta: the window has to be open before the signature is built
+   * at all, and an unchanged bag never reaches the painter.
+   */
+  private refreshOpenCraftingIfReagentsChanged(): void {
+    if ($('#crafting-window').style.display !== 'flex') return;
+    if (
+      craftingReagentSig(this.sim.inventory, this.sim.player.name) === this.lastCraftingReagentSig
+    )
+      return;
+    this.renderCrafting();
   }
 
   onCosmeticsChanged(): void {

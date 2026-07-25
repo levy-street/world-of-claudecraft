@@ -1461,7 +1461,7 @@ export const ja_JP: EnTranslations = {
         "claw": "爪",
         "horn": "角",
         "tusk": "牙",
-        "meat": "Meat",
+        "meat": "肉",
         "cloth": "布"
       }
     },
@@ -1530,7 +1530,7 @@ export const ja_JP: EnTranslations = {
       "reorderNeedsRecent": "絞り込みを解除し並び順を「最近」にすると持ち物を並べ替えられます",
       "itemAriaInstanced": "{item}、数量 {count}、銘入りの品",
       "itemAriaMasterwork": "{item}、数量 {count}、傑作",
-      "itemAriaProcedural": "{item}, {rarity}, item level {level}, quantity {count}",
+      "itemAriaProcedural": "{item}、{rarity}、アイテムレベル {level}、数量 {count}",
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
       "filterWeapon": "武器",
@@ -1994,6 +1994,9 @@ export const ja_JP: EnTranslations = {
         "letterGone": "その手紙はもうメールボックスにありません。",
         "takeParcelsFirst": "手紙を捨てる前に小包を取り出してください。"
       }
+    },
+    "noticeboard": {
+      "empty": "何も貼られていないようだ。"
     },
     "bank": {
       "title": "銀行",
@@ -3856,9 +3859,9 @@ export const ja_JP: EnTranslations = {
         "bonusFmt": "+{value} {stat}"
       },
       "gatherIntro": {
-        "mining": "採掘は三つのゾーンの鉱脈から鉱石を掘り出し、鍛冶系の職に素材を供給します。銅鉱石はEastbrook Vale、鉄鉱石はMirefen Marsh、オスミウム鉱石はThornpeak Heightsから。上限は100です。",
-        "logging": "伐採は三つのゾーンの林から木材を切り出し、武器の柄や道具に素材を供給します。ironbarkはEastbrook Vale、ashwoodはMirefen Marsh、高嶺松はThornpeak Heightsから。上限は100です。",
-        "herbalism": "薬草学は三つのゾーンで薬草を摘み、錬金術と料理に素材を供給します。艶葉草はEastbrook Vale、goldleafはMirefen Marsh、sunpetalはThornpeak Heightsに育ちます。上限は100です。",
+        "mining": "採掘は三つのゾーンの鉱脈から鉱石を掘り出し、鍛冶系の職に素材を供給します。銅鉱石はイーストブルック渓谷、鉄鉱石はマイアフェン湿地、オスミウム鉱石はソーンピーク高地から。レベル1から誰でも始められ、必要なのはバッグに入れた採掘ピッケルだけです。どのゾーンの拠点でも銅貨20枚で手に入ります。専用のカウンターで記録され、上限は100です。",
+        "logging": "伐採は三つのゾーンの林から木材を切り出し、武器の柄や杖、そして工作の作業台の素材を供給します。鉄樹皮はイーストブルック渓谷、トネリコ材はマイアフェン湿地、高嶺松はソーンピーク高地から。レベル1から誰でも始められ、バッグに伐採斧（どのゾーンの拠点でも銅貨20枚）があれば伐り出せます。専用のカウンターで記録され、上限は100です。",
+        "herbalism": "薬草学は三つのゾーンで薬草を摘み、調合系の職に素材を供給します。艶葉草はイーストブルック渓谷、金葉草はマイアフェン湿地、陽花草はソーンピーク高地に育ちます。レベル1から誰でも始められ、バッグに薬草鎌（どのゾーンの拠点でも銅貨20枚）があれば摘み取れます。専用のカウンターで記録され、上限は100です。",
         "fishing": "釣りはアタリとリールの呼吸で各ゾーンの開けた水辺から獲物を釣り上げます。上限は200です。"
       },
       "rhythmHeading": "採集のリズム",
@@ -3867,7 +3870,7 @@ export const ja_JP: EnTranslations = {
       "nodesHeading": "ゾーン別ノード",
       "nodesNote": "ノードの場所・ティア・必要な道具・産出の一覧です。各ノードはあなたの採集から{respawn}秒後に、あなた専用に再出現します。",
       "toolsHeading": "道具",
-      "toolsNote": "道具の段階と正確な商人価格の一覧です。ティア4と5の道具は製作のみで、販売されません。",
+      "toolsNote": "どのノードにも、その職の道具をバッグに入れておくことが必要です。ティア1も例外ではありません。ピッケルがなければ鉱石は掘れず、竿がなければ魚も釣れません。商人が扱うのはティア1から3までで、どのゾーンの拠点にも並んでいます。道具はバッグにあればよく、装備枠も耐久度もないため、購入は一度きりです。採集の可否を決めるのはティアだけで、道具のレアリティの色は見た目だけのものです。\n\n商人の品揃えの上には、製作でしか手に入らない道具がティア4と5の二つあります。工作場で工作の職人が作るもので、NPCは決して売りません。今のところティア3を超える道具を求めるノードはないため、その価値は速さにあります。最上位の道具は低いティアのノードでの採集詠唱を最短の秒数に固定し、より高いティアの土地が現れたときには入場券にもなります。",
       "toolCrafted": "製作品（{craft}）",
       "toolVendor": "{name}（{hub}）",
       "toolUnavailable": "非売品",
@@ -5572,8 +5575,10 @@ export const ja_JP: EnTranslations = {
     "reconnectingNow": "サーバーとの接続が切断されました。今すぐ再接続しています...（試行 {attempt}/{maxAttempts}）",
     "slowConnection": "読み込みに時間がかかっています。インターネット接続を確認してください。",
     "connectionRejected": "サーバーが接続を閉じました。",
+    "incompatibleWorldVersion": "ゲームとサーバーのバージョンに互換性がありません。再読み込みまたはアップデートしてから、もう一度お試しください。",
     "realmFull": "このワールドは現在満員です。数分後にもう一度お試しください。",
     "tooManyConnections": "お使いのネットワークからこのワールドへの接続が多すぎます。余分なゲームウィンドウを閉じるか、数分後にもう一度お試しください。",
+    "messageRateExceeded": "操作の送信が速すぎたため、切断されました。しばらく待ってから再度ログインしてください。",
     "tips": {
       "classes": "ヒント：9つのクラスはそれぞれ遊び方が異なります。決める前にいくつか試してみましょう。",
       "talents": "ヒント：非戦闘中ならいつでも特性をリセットできるので、最初の選択が失敗になることはありません。",
@@ -5641,6 +5646,12 @@ export const ja_JP: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。",
     "bodyWeb": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。ブラウザーの設定でハードウェアアクセラレーションを有効にし、グラフィックドライバーを更新してから、ブラウザーを再起動してください。",
+    "dismiss": "閉じる"
+  },
+  "perfNudge": {
+    "integratedGpu": "ゲームは内蔵（省電力）GPUで動作しています。このパソコンにゲーミングGPUも搭載されている場合は、Windowsの 設定 > システム > ディスプレイ > グラフィック でブラウザーを「高パフォーマンス」に設定し、ブラウザーを再起動してください。デスクトップ版は自動的にゲーミングGPUを選択します。",
+    "hardwareAccelerationDesktop": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなっています。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。",
+    "hardwareAccelerationWeb": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなっています。ブラウザーの設定でハードウェアアクセラレーションを有効にし、グラフィックドライバーを更新してから、ブラウザーを再起動してください。",
     "dismiss": "閉じる"
   },
   "realm": {
@@ -6547,105 +6558,105 @@ export const ja_JP: EnTranslations = {
       "critChance": "クリティカル率",
       "dodge": "回避",
       "parry": "受け流し",
-      "weaponMin": "Minimum weapon damage",
-      "weaponMax": "Maximum weapon damage",
-      "weaponDps": "Weapon damage per second",
-      "healthOnKill": "Health on kill",
-      "manaOnKill": "Mana on kill",
-      "blockValue": "Block value"
+      "weaponMin": "武器の最小ダメージ",
+      "weaponMax": "武器の最大ダメージ",
+      "weaponDps": "武器の秒間ダメージ",
+      "healthOnKill": "撃破時に体力回復",
+      "manaOnKill": "撃破時にマナ回復",
+      "blockValue": "ブロック値"
     },
     "procedural": {
-      "rollRangeAria": "Possible roll from {min} to {max}",
-      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
-      "legendaryPower": "Legendary power",
+      "rollRangeAria": "変動範囲：{min}から{max}",
+      "advancedDetailsHint": "{key} を押している間、変動範囲を表示します。",
+      "legendaryPower": "レジェンダリーパワー",
       "rarity": {
-        "common": "Common",
-        "magic": "Magic",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary",
-        "mythic": "Mythic"
+        "common": "コモン",
+        "magic": "マジック",
+        "rare": "レア",
+        "epic": "エピック",
+        "legendary": "レジェンダリー",
+        "mythic": "ミシック"
       },
       "nameFragment": {
-        "mighty": "Mighty",
-        "deft": "Deft",
-        "stalwart": "Stalwart",
-        "sages": "Sage's",
-        "spiritual": "Spiritual",
-        "of_focus": "of Focus",
-        "of_striking": "of Striking",
-        "of_alacrity": "of Alacrity",
-        "of_precision": "of Precision",
-        "warded": "Warded",
-        "of_reaping": "of Reaping",
-        "of_remembrance": "of Remembrance"
+        "mighty": "強力な",
+        "deft": "巧みな",
+        "stalwart": "堅牢な",
+        "sages": "賢者の",
+        "spiritual": "霊妙な",
+        "of_focus": "集中",
+        "of_striking": "強打",
+        "of_alacrity": "迅速",
+        "of_precision": "精密",
+        "warded": "守護された",
+        "of_reaping": "刈り取り",
+        "of_remembrance": "追憶"
       },
       "rareWord": {
-        "ashen": "Ashen",
-        "blackfen": "Blackfen",
-        "doom": "Doom",
-        "grave": "Grave",
-        "mire": "Mire",
-        "storm": "Storm",
-        "thorn": "Thorn",
-        "wyrm": "Wyrm",
-        "bite": "Bite",
-        "brand": "Brand",
-        "promise": "Promise",
-        "thread": "Thread",
-        "vigil": "Vigil",
-        "ward": "Ward",
-        "whisper": "Whisper",
-        "oath": "Oath"
+        "ashen": "灰燼",
+        "blackfen": "黒沼",
+        "doom": "破滅",
+        "grave": "墓",
+        "mire": "沼",
+        "storm": "嵐",
+        "thorn": "棘",
+        "wyrm": "竜",
+        "bite": "牙痕",
+        "brand": "烙印",
+        "promise": "約束",
+        "thread": "糸",
+        "vigil": "見張り",
+        "ward": "護符",
+        "whisper": "囁き",
+        "oath": "誓い"
       },
       "legendary": {
         "crown_last_pyre": {
-          "name": "Crown of the Last Pyre",
-          "description": "Every third Cinderbolt scorches enemies near the target."
+          "name": "最後の葬火の冠",
+          "description": "ファイアボールを3回使用するごとに、対象の周囲の敵を焼きます。"
         },
         "greyjaws_edge": {
-          "name": "Greyjaw's Edge",
-          "description": "Every third weapon hit bleeds the target and restores a little resource."
+          "name": "灰顎の刃",
+          "description": "武器攻撃が3回命中するごとに、対象を出血させ、主リソースを少量回復します。"
         },
         "hushwood_longbow": {
-          "name": "Hushwood Longbow",
-          "description": "Long Draw or Fell Shot can briefly silence its target."
+          "name": "静寂の森の長弓",
+          "description": "エイムショットまたはアーケインショットは、対象を短時間沈黙させることがあります。"
         },
         "nightglass_fang": {
-          "name": "Nightglass Fang",
-          "description": "A kill grants a short burst of haste."
+          "name": "夜硝子の牙",
+          "description": "敵を倒すと、短時間ヘイストが上昇します。"
         },
         "ysoleis_vigil": {
-          "name": "Ysolei's Vigil",
-          "description": "Critical healing creates a brief restorative ground area."
+          "name": "イソレイの見張り",
+          "description": "クリティカル回復が発生すると、短時間持続する回復エリアを作り出します。"
         },
         "stormwake_idol": {
-          "name": "Stormwake Idol",
-          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+          "name": "嵐呼びの偶像",
+          "description": "ライトニングボルトを4回使用するごとに、近くの敵へ連鎖します。"
         },
         "ashbinders_seal": {
-          "name": "Ashbinder's Seal",
-          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+          "name": "灰縛りの印章",
+          "description": "シャドウボルトを4回使用するごとに対象へ印を付け、追加の暗黒ダメージを与えます。"
         },
         "dawnward_signet": {
-          "name": "Dawnward Signet",
-          "description": "Mending Light shields its recipient for a portion of the heal."
+          "name": "暁守りの印章",
+          "description": "ホーリーライトは、回復量の一部に相当するシールドを対象に付与します。"
         },
         "feral_moonclasp": {
-          "name": "Feral Moonclasp",
-          "description": "Every third Lunar Tempest restores primary resource."
+          "name": "野生の月留め",
+          "description": "ムーンファイアを3回使用するごとに、主リソースを回復します。"
         },
         "bell_of_the_ninth_peal": {
-          "name": "Bell of the Ninth Peal",
-          "description": "Every second damaging spell tolls around the target."
+          "name": "九度目の鐘",
+          "description": "ダメージ呪文を2回使うごとに、対象の周囲で鐘が鳴ります。"
         },
         "mantle_of_borrowed_time": {
-          "name": "Mantle of Stolen Hours",
-          "description": "Falling below 35% health grants a brief defensive ward."
+          "name": "奪われた時のマント",
+          "description": "体力が35%未満になると、短時間持続する防護の結界を得ます。"
         },
         "boots_of_the_unbroken_road": {
-          "name": "Boots of the Unbroken Road",
-          "description": "Moving 15 yards grants a short movement-speed burst."
+          "name": "果てなき道のブーツ",
+          "description": "15ヤード移動すると、移動速度が短時間上昇します。"
         }
       }
     },
@@ -9166,6 +9177,108 @@ export const ja_JP: EnTranslations = {
       },
       "resonant_timber": {
         "name": "共鳴の木材"
+      },
+      "ashwood_staff": {
+        "name": "トネリコの杖"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "墓呼びの布手袋"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "墓呼びの布頭巾"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "墓呼びの布脚衣"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "墓呼びの布肩衣"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "墓呼びの布装束"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "墓呼びの布帯"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "墓呼びの布靴"
+      },
+      "gravecaller_focus": {
+        "name": "墓呼びの焦点具"
+      },
+      "gravecaller_pendant": {
+        "name": "墓呼びの首飾り"
+      },
+      "gravecaller_ring": {
+        "name": "墓呼びの指輪"
+      },
+      "gravecaller_wand": {
+        "name": "墓呼びの魔杖"
+      },
+      "iron_broadsword": {
+        "name": "鉄の大剣"
+      },
+      "iron_flanged_mace": {
+        "name": "鉄のフランジメイス"
+      },
+      "mirefen_dirk": {
+        "name": "泥沼の短剣"
+      },
+      "mirefen_hunting_bow": {
+        "name": "泥沼の狩猟弓"
+      },
+      "mirefen_leather_belt": {
+        "name": "泥沼の革帯"
+      },
+      "mirefen_leather_boots": {
+        "name": "泥沼の革ブーツ"
+      },
+      "mirefen_leather_gloves": {
+        "name": "泥沼の革手袋"
+      },
+      "mirefen_leather_hood": {
+        "name": "泥沼の革頭巾"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "泥沼の革胴衣"
+      },
+      "mirefen_leather_leggings": {
+        "name": "泥沼の革脚衣"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "泥沼の革肩当て"
+      },
+      "thornpeak_bulwark": {
+        "name": "茨峰の防壁"
+      },
+      "thornpeak_crossbow": {
+        "name": "茨峰のクロスボウ"
+      },
+      "thornpeak_mail_chest": {
+        "name": "茨峰の鎖帷子"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "茨峰の鎖籠手"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "茨峰の鎖帯"
+      },
+      "thornpeak_mail_helm": {
+        "name": "茨峰の鎖兜"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "茨峰の鎖脚甲"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "茨峰の鎖肩当て"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "茨峰の鎖鉄靴"
+      },
+      "thornpeak_polearm": {
+        "name": "茨峰の長柄武器"
+      },
+      "thornpeak_war_axe": {
+        "name": "茨峰の戦斧"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"
@@ -11876,6 +11989,7 @@ export const ja_JP: EnTranslations = {
     "delveRiteShrineCandleInteract": "蝋燭の祠：Fで触れる",
     "delveRiteShrineReedInteract": "葦の祠：Fで触れる",
     "delveRiteShrineSkullInteract": "髑髏の祠：Fで触れる",
-    "mailboxName": "メールボックス"
+    "mailboxName": "メールボックス",
+    "noticeboardName": "掲示板"
   }
 };

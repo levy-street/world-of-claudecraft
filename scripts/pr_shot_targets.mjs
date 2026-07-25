@@ -371,6 +371,15 @@ export const TARGETS = [
       { key: 'desktop-ceiling-state', fourStates: true, selectTab: 'armorcrafting' },
       { key: 'desktop-discount', discount: true, selectTab: 'armorcrafting' },
       { key: 'mobile-discount', discount: true, mobile: true, selectTab: 'armorcrafting' },
+      // Issue #2375, the bag-freshness scene, and the one variant whose point
+      // is WHEN the window repaints rather than how it looks: the default
+      // grant leaves the minor healing potion at 2 of its 3 reagents, so the
+      // window opens with that row disabled, and the missing silverleaf is
+      // granted AFTERWARDS (the shopkeeper handing it over). The shot is taken
+      // a slow band later. Before the fix the row is still disabled and the
+      // reagent still reads 0/2; after it, the row is live.
+      { key: 'desktop-bag-freshness', bagFreshness: true, selectTab: 'alchemy' },
+      { key: 'mobile-bag-freshness', bagFreshness: true, mobile: true, selectTab: 'alchemy' },
     ],
     // Grant a spread of reagents across a few professions so several recipes read
     // craftable, force-hide then toggle so the open is deterministic, and clip to
@@ -440,7 +449,23 @@ export const TARGETS = [
         }, variant.selectTab);
         await wait(300);
       }
-      if (open && (variant?.mobile || variant?.fourStates || variant?.discount)) {
+      if (open && variant?.bagFreshness) {
+        // The whole point of the scene: the bag changes while the window is
+        // already open and the player never touches it. Grant the missing
+        // reagent through the sim (the same mutation a vendor buy, a loot, or
+        // a trade lands) and wait past the 500ms slow band, so the shot shows
+        // what the window says a moment after the reagent arrived.
+        await page.evaluate(() => {
+          try {
+            window.__game?.sim?.addItem('silverleaf_herb', 2);
+          } catch {}
+        });
+        await wait(900);
+      }
+      if (
+        open &&
+        (variant?.mobile || variant?.fourStates || variant?.discount || variant?.bagFreshness)
+      ) {
         // The identity card fills the top of the window (all of it on the short
         // landscape viewport); scroll the first recipe section into view so the
         // legibility rows, and for four-states the whole difficulty ladder
@@ -1340,6 +1365,42 @@ export const TARGETS = [
       }, Boolean(variant?.desktopShell));
       const open = await pollForSize(page, '#gpu-notice');
       return open ? { clip: '#gpu-notice' } : {};
+    },
+  },
+  {
+    key: 'perf-nudge',
+    label: 'Performance nudge toast (perf-doctor machine-local causes)',
+    when: ['ui/perf_nudge', 'game/perf_nudge'],
+    variants: [
+      { key: 'web-integrated', ids: ['integrated-gpu'], desktopShell: false },
+      { key: 'web-software', ids: ['hardware-acceleration'], desktopShell: false },
+      { key: 'desktop-shell-software', ids: ['hardware-acceleration'], desktopShell: true },
+      { key: 'web-mobile-integrated', ids: ['integrated-gpu'], desktopShell: false, mobile: true },
+    ],
+    // The nudge fires only when the live perf-doctor finds a machine-local cause
+    // (software GL, or a hybrid laptop pinned to its integrated GPU), which a
+    // healthy capture machine never produces; import the module directly (Vite
+    // serves /src in dev) and force the id set, exactly what src/game/perf_nudge.ts
+    // would pass on an affected box. Clearing the persisted dismissal and any prior
+    // element keeps the recipe rerunnable; removing #gpu-notice keeps the sibling
+    // toast slot out of the clip.
+    async capture(page, variant) {
+      await page.evaluate(
+        async (opts) => {
+          localStorage.removeItem('woc_perf_nudge_dismissed');
+          document.querySelector('#perf-nudge')?.remove();
+          document.querySelector('#gpu-notice')?.remove();
+          const mod = await import('/src/ui/perf_nudge_toast.ts');
+          mod.initPerfNudgeToast({
+            suggestionIds: opts.ids,
+            softwareNoticeAlreadyShown: false,
+            desktopShell: opts.desktopShell,
+          });
+        },
+        { ids: variant?.ids ?? ['integrated-gpu'], desktopShell: Boolean(variant?.desktopShell) },
+      );
+      const open = await pollForSize(page, '#perf-nudge');
+      return open ? { clip: '#perf-nudge' } : {};
     },
   },
   {

@@ -35,7 +35,7 @@ import { bagCapacity, countFit } from '../bags';
 import { ITEMS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { cloneItemInstancePayload, type ItemDef } from '../types';
+import { cloneItemInstancePayload, type ItemDef, type StationDef } from '../types';
 import { MASTERWORK_QUALITY_LADDER } from './masterwork';
 import { isAtAnyStation } from './stations';
 
@@ -126,6 +126,7 @@ function firstBoundSlotIndex(meta: PlayerMeta, itemId: string): number {
  * 7. otherwise ok, with the fee to charge.
  */
 export function resolveUnbind(
+  stations: readonly StationDef[],
   meta: PlayerMeta | undefined,
   pos: { x: number; z: number } | undefined,
   itemId: string,
@@ -140,7 +141,7 @@ export function resolveUnbind(
   if (!meta || boundIdx === -1) {
     return { ok: false, itemId, reason: 'unbind_not_bound', fee };
   }
-  if (!pos || !isAtAnyStation(pos)) {
+  if (!pos || !isAtAnyStation(stations, pos)) {
     return { ok: false, itemId, reason: 'unbind_out_of_range', fee };
   }
   const boundSlot = meta.inventory[boundIdx];
@@ -176,7 +177,7 @@ export function unbindItem(ctx: SimContext, itemId: string, pid?: number): Unbin
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, fee: 0 };
   const meta = r.meta;
-  const result = resolveUnbind(meta, r.e.pos, itemId);
+  const result = resolveUnbind(ctx.stationPlacements, meta, r.e.pos, itemId);
   if (!result.ok) return result;
   const slotIdx = firstBoundSlotIndex(meta, itemId);
   const slot = meta.inventory[slotIdx];

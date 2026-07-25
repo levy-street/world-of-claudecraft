@@ -1,4 +1,10 @@
-import { dist2d, type Entity, INTERACT_RANGE } from '../sim/types';
+import {
+  dist2d,
+  EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS,
+  EASTBROOK_NOTICEBOARD_TEMPLATE_ID,
+  type Entity,
+  INTERACT_RANGE,
+} from '../sim/types';
 import { t } from '../ui/i18n';
 import { tSim } from '../ui/sim_i18n';
 import type { IWorld } from '../world_api';
@@ -113,6 +119,13 @@ export function isActivePvpOpponent(world: PickInteractionWorld, e: Entity): boo
   );
 }
 
+/** Resolve the client-side range for a lootable object before dispatch or approach. */
+export function objectInteractionRange(entity: Pick<Entity, 'templateId'>): number {
+  return entity.templateId === EASTBROOK_NOTICEBOARD_TEMPLATE_ID
+    ? EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS
+    : INTERACT_RANGE;
+}
+
 /** Whether an otherwise incomplete entity click represents a useful movement intent. */
 export function shouldApproachPickedEntity(
   player: Entity,
@@ -130,7 +143,7 @@ export function shouldApproachPickedEntity(
       corpseLootAvailability(entity, player.id, harvestStateReliable).canOpen
     );
   }
-  if (entity.kind === 'object') return d > INTERACT_RANGE;
+  if (entity.kind === 'object') return d > objectInteractionRange(entity);
   if (entity.kind === 'npc') return d > INTERACT_RANGE + 2;
   return true;
 }
@@ -159,7 +172,7 @@ export function handlePickedEntity(
         hud.showError(tSim('error.cantWhileDead'));
         return false;
       }
-      if (d > INTERACT_RANGE) {
+      if (d > objectInteractionRange(e)) {
         hud.showError(t('questUi.errors.tooFar'));
         return false;
       }
@@ -231,7 +244,7 @@ export function handlePickedEntity(
         return false;
       }
       const d = dist2d(world.player.pos, e.pos);
-      if (d > INTERACT_RANGE) return false;
+      if (d > objectInteractionRange(e)) return false;
       if (e.templateId === 'dungeon_door' && e.dungeonId) return world.enterDungeon(e.dungeonId);
       if (e.templateId === 'dungeon_exit') return world.leaveDungeon();
       if (e.templateId === 'mailbox') {

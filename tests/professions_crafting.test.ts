@@ -8,6 +8,7 @@ import {
   recipeById,
   TOOL_RECIPES,
 } from '../src/sim/content/recipes';
+import { STATIONS } from '../src/sim/data';
 import {
   hasRecipeMaterials,
   meetsComboRequirement,
@@ -34,7 +35,7 @@ function grantItem(sim: Sim, itemId: string, count: number, pid: number) {
 function placeAtStationFor(sim: Sim, pid: number, recipeId: string) {
   const stationType = recipeById(recipeId)?.stationType;
   if (!stationType) throw new Error(`${recipeId} is not station-bound`);
-  const station = stationsOfType(stationType)[0];
+  const station = stationsOfType(STATIONS, stationType)[0];
   const entity = (sim as any).entities.get(pid);
   entity.pos.x = station.pos.x;
   entity.pos.z = station.pos.z;

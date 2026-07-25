@@ -1461,8 +1461,8 @@ export const cs_CZ: EnTranslations = {
         "claw": "Dráp",
         "horn": "Roh",
         "tusk": "Kly",
-        "meat": "Meat",
-        "cloth": "Cloth"
+        "meat": "Maso",
+        "cloth": "Látka"
       }
     },
     "townFocus": {
@@ -1995,6 +1995,9 @@ export const cs_CZ: EnTranslations = {
         "takeParcelsFirst": "Před zahozením dopisu nejdřív vyzvedni balíky."
       }
     },
+    "noticeboard": {
+      "empty": "Zdá se, že tu nic nevisí."
+    },
     "bank": {
       "title": "Banka",
       "subtitle": "Pozlacená truhlice",
@@ -2136,9 +2139,9 @@ export const cs_CZ: EnTranslations = {
         "herbalism": "Vyžaduje bylinkářství úrovně {tier}."
       },
       "requiresTool": {
-        "mining": "Requires a mining pick",
-        "logging": "Requires a logging axe",
-        "herbalism": "Requires a herbalism sickle"
+        "mining": "Vyžaduje hornický krumpáč",
+        "logging": "Vyžaduje dřevorubeckou sekeru",
+        "herbalism": "Vyžaduje bylinkářský srp"
       },
       "toolTierUnmet": {
         "mining": "K vytěžení této žíly potřebuješ krumpáč úrovně {tier}.",
@@ -2146,39 +2149,39 @@ export const cs_CZ: EnTranslations = {
         "herbalism": "K sesbírání tohoto záhonu potřebuješ bylinkářský srp úrovně {tier}."
       },
       "toolRequired": {
-        "mining": "You need a mining pick to harvest this vein.",
-        "logging": "You need a logging axe to fell this stand.",
-        "herbalism": "You need a herbalism sickle to gather this patch.",
-        "fishing": "You need a fishing pole to cast a line."
+        "mining": "K vytěžení této žíly potřebuješ hornický krumpáč.",
+        "logging": "Ke skácení této skupiny stromů potřebuješ dřevorubeckou sekeru.",
+        "herbalism": "Ke sběru tohoto porostu bylin potřebuješ bylinkářský srp.",
+        "fishing": "K nahození udice potřebuješ rybářský prut."
       },
       "noNodeNearby": {
-        "mining": "There is no ore vein within reach.",
-        "logging": "There is no timber stand within reach.",
-        "herbalism": "There is no herb patch within reach."
+        "mining": "V dosahu není žádná rudná žíla.",
+        "logging": "V dosahu není žádná skupina stromů.",
+        "herbalism": "V dosahu není žádný porost bylin."
       },
       "toolTierUnmetCorpse": "K získání nejjemnějších materiálů potřebuješ sběračský nástroj úrovně {tier}.",
       "toolTooltip": {
         "kind": {
-          "mining": "Mining tool (tier {tier})",
-          "logging": "Logging tool (tier {tier})",
-          "herbalism": "Herbalism tool (tier {tier})",
-          "fishing": "Fishing rod (tier {tier})"
+          "mining": "Hornický nástroj ({tier}. úroveň)",
+          "logging": "Dřevorubecký nástroj ({tier}. úroveň)",
+          "herbalism": "Bylinkářský nástroj ({tier}. úroveň)",
+          "fishing": "Rybářský prut ({tier}. úroveň)"
         },
         "unlocks": {
-          "mining": "Required to mine ore veins up to tier {tier}.",
-          "logging": "Required to fell timber stands up to tier {tier}.",
-          "herbalism": "Required to gather herb patches up to tier {tier}."
+          "mining": "Nutný k těžbě rudných žil až do {tier}. úrovně.",
+          "logging": "Nutná ke kácení skupin stromů až do {tier}. úrovně.",
+          "herbalism": "Nutný ke sběru porostů bylin až do {tier}. úrovně."
         },
         "use": {
-          "mining": "Use: Mine a nearby ore vein.",
-          "logging": "Use: Fell a nearby timber stand.",
-          "herbalism": "Use: Gather from a nearby herb patch."
+          "mining": "Použití: Vytěží blízkou rudnou žílu.",
+          "logging": "Použití: Pokácí blízkou skupinu stromů.",
+          "herbalism": "Použití: Sesbírá blízký porost bylin."
         },
-        "speed": "Gathers faster at nodes below tier {tier}.",
-        "rodRequired": "Required to fish.",
-        "rodBite": "Fish bite up to {seconds}s sooner.",
-        "rodReel": "Extends the reel window by {seconds}s.",
-        "rodBand": "Unlocks richer catch tables at fishing skill {skill} and above."
+        "speed": "Rychleji sbírá na nalezištích pod {tier}. úrovní.",
+        "rodRequired": "Nutný k rybaření.",
+        "rodBite": "Ryby zabírají až o {seconds} s dříve.",
+        "rodReel": "Prodlužuje čas na navíjení o {seconds} s.",
+        "rodBand": "Od rybářské dovednosti {skill} výše odemyká bohatší úlovky."
       },
       "downgradeMark": "Plné brašny: nález byl uložen bez značky sběrače.",
       "downgradeFind": "Plné brašny: vzácný nález ti proklouzl.",
@@ -2355,7 +2358,7 @@ export const cs_CZ: EnTranslations = {
       },
       "throttled": "Vyrábíš příliš rychle. Chvíli počkej a zkus to znovu.",
       "recipeNotLearned": "Tento recept ses ještě nenaučil.",
-      "noBagSpace": "You do not have room for the crafted item.",
+      "noBagSpace": "Nemáš místo pro vyrobený předmět.",
       "skillReqLine": "Vyžaduje {craft} {skill}",
       "difficultyFull": "Plný zisk dovedností",
       "difficultyReduced": "Snížený zisk dovedností",
@@ -2407,9 +2410,9 @@ export const cs_CZ: EnTranslations = {
       "enchantWrongSlot": "Toto okouzlení nelze aplikovat na tento předmět.",
       "enchantUnknown": "Toto okouzlení neexistuje.",
       "enchantInsufficient": "Na toto okouzlení nemáš materiály.",
-      "disenchantNoSpace": "You do not have room for the arcane materials.",
-      "salvageNoSpace": "You do not have room for the salvaged materials.",
-      "enchantNoSpace": "You do not have room for the enchanted item.",
+      "disenchantNoSpace": "Nemáš místo pro arkánní materiály.",
+      "salvageNoSpace": "Nemáš místo pro materiály z rozebrání.",
+      "enchantNoSpace": "Nemáš místo pro okouzlený předmět.",
       "disenchantConfirmTitle": "Rozzačarovat {item}?",
       "disenchantConfirmBody": "Tímto se {item} zničí a získáš arcanové materiály. Tuto akci nelze vrátit.",
       "disenchantConfirmBodySpecial": "Tímto se zvláštní kopie {item} (podepsaná, mistrovská nebo okouzlená) zničí a získáš arcanové materiály. Tuto akci nelze vrátit.",
@@ -2429,10 +2432,10 @@ export const cs_CZ: EnTranslations = {
       "stateKnown": "Známé",
       "stateTeachable": "K dispozici",
       "stateLocked": "Zamčeno",
-      "statePending": "Learning",
+      "statePending": "Učí se",
       "requirement": "Vyučováno na {craft} {skill}",
       "trainAria": "Naučit se {name} za {fee}",
-      "pendingAria": "Learning {name}",
+      "pendingAria": "Učí se {name}",
       "dialogOption": "Výcvik",
       "dialogOptionAria": "Prohlédnout výcvik u {name}",
       "learned": "Naučen recept: {recipe}",
@@ -2460,7 +2463,7 @@ export const cs_CZ: EnTranslations = {
       "notBound": "Tento předmět není vázaný.",
       "cannotAfford": "Na odpoutání nemáš dostatek prostředků.",
       "outOfRange": "Pro odpoutání musíš být u příslušného mistra.",
-      "noSpace": "You do not have room for the unbound copy."
+      "noSpace": "Nemáš místo pro odpoutaný předmět."
     },
     "finder": {
       "title": "Hledač dungeonů",
@@ -3856,9 +3859,9 @@ export const cs_CZ: EnTranslations = {
         "bonusFmt": "+{value} {stat}"
       },
       "gatherIntro": {
-        "mining": "Těžba vytahuje rudu přímo ze světového kamene: měď v Eastbrookském údolí, železo v Mirefenském močálu a osmium nahoře v Thornpeakských výšinách, zásobující kovářské živnosti. Přístupné všem od úrovně 1, bez jakékoli podmínky, sledované na vlastním počítadle s limitem 100.",
-        "logging": "Dřevorubectví kácí dřevo ze skupin stromů ve všech třech zónách: železová kůra v Eastbrookském údolí, jasanové dřevo v Mirefenském močálu a vysokoborové dřevo v Thornpeakských výšinách, hrubý materiál pro topůrka, hole a inženýrský stůl. Přístupné všem od úrovně 1, sledované na vlastním počítadle s limitem 100.",
-        "herbalism": "Bylinkářství sbírá, co roste divoce: stříbrolist v Eastbrookském údolí, zlatolist v Mirefenském močálu a sluncokvět v Thornpeakských výšinách, list a stonek, které zásobují lékárenské živnosti. Přístupné všem od úrovně 1, sledované na vlastním počítadle s limitem 100.",
+        "mining": "Těžba vytahuje rudu přímo ze světového kamene: měď v Eastbrookském údolí, železo v Mirefenském močálu a osmium nahoře v Thornpeakských výšinách, zásobující kovářské živnosti. Přístupné všem od úrovně 1: stačí mít v brašnách hornický krumpáč, k mání za 20 mědi v centru kterékoli zóny. Sledované na vlastním počítadle s limitem 100.",
+        "logging": "Dřevorubectví kácí dřevo ze skupin stromů ve všech třech zónách: železová kůra v Eastbrookském údolí, jasanové dřevo v Mirefenském močálu a vysokoborové dřevo v Thornpeakských výšinách, hrubý materiál pro topůrka, hole a inženýrský stůl. Přístupné všem od úrovně 1, pokud máš v brašnách dřevorubeckou sekeru (20 mědi v centru kterékoli zóny), sledované na vlastním počítadle s limitem 100.",
+        "herbalism": "Bylinkářství sbírá, co roste divoce: stříbrolist v Eastbrookském údolí, zlatolist v Mirefenském močálu a sluncokvět v Thornpeakských výšinách, list a stonek, které zásobují lékárenské živnosti. Přístupné všem od úrovně 1, pokud máš v brašnách bylinkářský srp (20 mědi v centru kterékoli zóny), sledované na vlastním počítadle s limitem 100.",
         "fishing": "Rybaření je výjimkou mezi sběratelskými živnostmi a zároveň tou nejhlubší: skutečná minihra s pokusem o záběr a navíjením, vlastní tabulky úlovků v každé zóně a limit dovednosti 200, dvojnásobek ostatních. Kup prut, obraťte se k otevřené vodě a zahoď."
       },
       "rhythmHeading": "Rytmus sběru",
@@ -3867,7 +3870,7 @@ export const cs_CZ: EnTranslations = {
       "nodesHeading": "Naleziště podle zóny",
       "nodesNote": "Kde naleziště jsou, jejich úroveň, jaký nástroj potřebují a co přinášejí. Každé naleziště se ti obnoví {respawn} sekund po tvé vlastní sklizni a ten časovač je jen tvůj: jiný sběrač pracující na stejném nalezišti tvůj nikdy nezdržuje, takže neexistují závody o naleziště ani jejich číhání. Každá zóna výše na žebříčku přináší lepší materiál z náročnějšího terénu.",
       "toolsHeading": "Nástroje",
-      "toolsNote": "Holé ruce se počítají jako nástroj 1. úrovně, takže každé naleziště 1. úrovně ve hře nepotřebuje žádný nástroj. Prodejní žebříček pokrývá úrovně 1 až 3; nástroj stačí mít v brašně, žádný slot na vybavení ani trvanlivost neexistuje, takže každý je jednorázovým nákupem. Důležitá je jen úroveň: vzácnostní barva nástroje je kosmetická.\n\nNad prodejním žebříčkem stojí dva vyráběné nástroje, 4. a 5. úrovně, vyrobené v dílně inženýry a žádným NPC neprodávané. Žádné dnešní naleziště nepotřebuje víc než 3. úroveň, takže jejich hodnota nyní spočívá v rychlosti: špičkový nástroj udrží sesílání na spodním limitu u nižších nalezišť a bude vstupní vstupenkou, až přijde terén vyšší úrovně.",
+      "toolsNote": "Každé naleziště vyžaduje nástroj svého řemesla v brašnách, včetně 1. úrovně: bez krumpáče není ruda a bez prutu nejsou ryby. Prodejní žebříček pokrývá úrovně 1 až 3 a najdeš ho v centru každé zóny; nástroj stačí mít v brašně, žádný slot na vybavení ani trvanlivost neexistuje, takže každý je jednorázovým nákupem. Důležitá je jen úroveň: vzácnostní barva nástroje je kosmetická.\n\nNad prodejním žebříčkem stojí dva vyráběné nástroje, 4. a 5. úrovně, vyrobené v dílně inženýry a žádným NPC neprodávané. Žádné dnešní naleziště nepotřebuje víc než 3. úroveň, takže jejich hodnota nyní spočívá v rychlosti: špičkový nástroj udrží sesílání na spodním limitu u nižších nalezišť a bude vstupenkou, až přijde terén vyšší úrovně.",
       "toolCrafted": "Vyrobený ({craft})",
       "toolVendor": "{name} ({hub})",
       "toolUnavailable": "Neprodáváno",
@@ -5572,8 +5575,10 @@ export const cs_CZ: EnTranslations = {
     "reconnectingNow": "Spojení ztraceno. Nyní se znovu připojuje... (pokus {attempt}/{maxAttempts})",
     "slowConnection": "Trvá to déle než obvykle. Zkontrolujte připojení k internetu.",
     "connectionRejected": "Server ukončil připojení.",
+    "incompatibleWorldVersion": "Verze hry a serveru nejsou kompatibilní. Obnov stránku nebo aktualizuj hru a zkus to znovu.",
     "realmFull": "Tento svět je momentálně plný. Zkus to prosím znovu za několik minut.",
     "tooManyConnections": "Z tvé sítě se k tomuto světu připojuje příliš mnoho spojení. Zavři nadbytečná herní okna nebo to zkus znovu za několik minut.",
+    "messageRateExceeded": "Spojení bylo přerušeno kvůli příliš rychlému odesílání akcí. Chvíli počkej a přihlas se znovu.",
     "tips": {
       "classes": "Tip: každá z 9 tříd se hraje jinak. Než se pro jednu rozhodneš, několik jich vyzkoušej.",
       "talents": "Tip: kdykoli nejsi v boji, můžeš resetovat své talenty, takže časná volba nikdy není past.",
@@ -5641,6 +5646,12 @@ export const cs_CZ: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "Hra běží bez grafické akcelerace a bude pomalá. Aktualizuj ovladače grafiky a restartuj hru. Ve Windows nastav hru na Vysoký výkon v Nastavení, Systém, Displej, Grafika.",
     "bodyWeb": "Hra běží bez grafické akcelerace a bude pomalá. Povol hardwarovou akceleraci v nastavení prohlížeče, aktualizuj ovladače grafiky a restartuj prohlížeč.",
+    "dismiss": "Zavřít"
+  },
+  "perfNudge": {
+    "integratedGpu": "Hra běží na integrované (úsporné) grafické kartě. Pokud má tento počítač i herní grafickou kartu, nastav ve Windows prohlížeč na „Vysoký výkon“ v Nastavení > Systém > Obrazovka > Grafika a prohlížeč restartuj. Desktopová aplikace si herní grafickou kartu vybere automaticky.",
+    "hardwareAccelerationDesktop": "Hra běží bez akcelerace GPU, a proto je velmi pomalá. Aktualizuj ovladače grafické karty a restartuj hru. Ve Windows navíc nastav hru na „Vysoký výkon“ v Nastavení > Systém > Obrazovka > Grafika.",
+    "hardwareAccelerationWeb": "Hra běží bez akcelerace GPU, a proto je velmi pomalá. Zapni v nastavení prohlížeče hardwarovou akceleraci, aktualizuj ovladače grafické karty a restartuj prohlížeč.",
     "dismiss": "Zavřít"
   },
   "realm": {
@@ -6068,7 +6079,7 @@ export const cs_CZ: EnTranslations = {
       "auraGain": "Získáváš {name}.",
       "auraFade": "{name} z tebe mizí.",
       "auraAfflicted": "{target} je zasažen(a) efektem {name}.",
-      "auraGainOther": "{target} gains {name}."
+      "auraGainOther": "{target} získává {name}."
     },
     "system": {
       "playerDeath": "Zemřel(a) jsi.",
@@ -7005,11 +7016,11 @@ export const cs_CZ: EnTranslations = {
         "description": "Vyvolá vodního elementála, který bojuje po tvém boku, vrhá na tvůj cíl Vodní střely a usměrňuje Vodní proud. (Mráz)"
       },
       "ice_lance": {
-        "name": "Ice Lance",
+        "name": "Ledové kopí",
         "description": "Vrhneš střep ledu, způsobíš {damage} mrazivého poškození, trojnásobný proti zmrazenému cíli. Spotřebuje Zmrzlé prsty nebo nabití Zimního chladu, aby byl cíl považován za zmrazený. (Mráz)"
       },
       "flurry": {
-        "name": "Winterlash",
+        "name": "Zimní bič",
         "description": "Vypustíš tři ledové střely, z nichž každá způsobí {damage} mrazivého poškození, a uvalíš na cíl Zimní chlad: další 2 kompatibilní kouzla jej považují za zmrazený. Brain Freeze učiní Winterlash okamžitým a obejde jeho dobu obnovení. (Mráz)"
       },
       "frozen_orb": {
@@ -7017,7 +7028,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Vypustíš kouli vířícího mrazu, která se 8 s pohybuje vpřed, každou sekundu způsobí okolním nepřátelům {damage} mrazivého poškození a zpomalí je o 30 %. Každý zásah vytvoří jeden rampouch. (Mráz)"
       },
       "blizzard": {
-        "name": "Blizzard",
+        "name": "Vánice",
         "description": "Přivolá ledovou bouři na cílovou plochu po dobu 6 s, působí {damage} mrazivého poškození každou sekundu a zpomaluje nepřátele o 40 %. Každý zasažený nepřítel zkrátí cooldown Zmrzlé sféry o 0,5 s, nejvýše o 3 s za seslání. (Mráz)"
       },
       "glacial_spike": {
@@ -7029,15 +7040,15 @@ export const cs_CZ: EnTranslations = {
         "description": "Podrž pro nabití rozšiřující se mrazivé fronty, pak ji pusť v kuželi. Delší nabití zasáhne dál a způsobí více poškození. Všichni zasažení nepřátelé jsou zpomaleni o 50 % na 4 s; maximální nabití je také ukotvuje na 1 s. (Mráz)"
       },
       "dragons_breath": {
-        "name": "Dragon's Breath",
+        "name": "Dračí dech",
         "description": "Podrž pro nabití rozšiřujícího se ohnivého dechu, pak ho pusť v kuželi. Delší nabití zasáhne dál a způsobí více poškození. Zasažení nepřátelé jsou dezorientováni; poškození efekt přeruší. Maximální nabití vždy kriticky zasáhne a počítá se jednou pro Žhavou sérii. (Oheň)"
       },
       "fingers_of_frost": {
-        "name": "Fingers of Frost",
+        "name": "Mrazivé prsty",
         "description": "Kopí jinovatky má 15% šanci udělit Zmrzlé prsty, až 2 nabití: tvoje příští Ice Lance považuje cíl za zmrazený. (Mráz)"
       },
       "brain_freeze": {
-        "name": "Brain Freeze",
+        "name": "Zmrazení mozku",
         "description": "Kopí jinovatky má 20% šanci, že tvůj příští Winterlash bude okamžitý a obejde dobu obnovení. (Mráz)"
       },
       "shatter": {
@@ -7781,7 +7792,7 @@ export const cs_CZ: EnTranslations = {
         "description": "Povzbudí spojence do 30 m divokou silou a na 5 min. jim zvýší útočnou sílu o 45 a rychlost útoku o 5 %. (lovecký talent)"
       },
       "avatar": {
-        "name": "Avatar",
+        "name": "Avatár",
         "description": "Na 20 s se proměníš v kolosa, zrušíš všechny ovládací efekty a zvýšíš své způsobené poškození o 20 %."
       },
       "avenging_wrath": {
@@ -9166,6 +9177,108 @@ export const cs_CZ: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Rezonující dřevo"
+      },
+      "ashwood_staff": {
+        "name": "Jasanová hůl"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Látkové oviny Hrobaře"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Látková kápě Hrobaře"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Látkové nohavice Hrobaře"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Látkový plášť Hrobaře"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Látkové roucho Hrobaře"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Látková šerpa Hrobaře"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Látkové střevíce Hrobaře"
+      },
+      "gravecaller_focus": {
+        "name": "Fokus Hrobaře"
+      },
+      "gravecaller_pendant": {
+        "name": "Přívěsek Hrobaře"
+      },
+      "gravecaller_ring": {
+        "name": "Prsten Hrobaře"
+      },
+      "gravecaller_wand": {
+        "name": "Hůlka Hrobaře"
+      },
+      "iron_broadsword": {
+        "name": "Železný široký meč"
+      },
+      "iron_flanged_mace": {
+        "name": "Železný přírubový palcát"
+      },
+      "mirefen_dirk": {
+        "name": "Dýka z Mirefenu"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Lovecký luk z Mirefenu"
+      },
+      "mirefen_leather_belt": {
+        "name": "Kožený opasek z Mirefenu"
+      },
+      "mirefen_leather_boots": {
+        "name": "Kožené boty z Mirefenu"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Kožené rukavice z Mirefenu"
+      },
+      "mirefen_leather_hood": {
+        "name": "Kožená kápě z Mirefenu"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Kožený kabátec z Mirefenu"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Kožené nohavice z Mirefenu"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Kožené nárameníky z Mirefenu"
+      },
+      "thornpeak_bulwark": {
+        "name": "Bašta Thornpeaku"
+      },
+      "thornpeak_crossbow": {
+        "name": "Kuše Thornpeaku"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Kroužkový hrudní plát Thornpeaku"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Kroužkové rukavice Thornpeaku"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Kroužkový pás Thornpeaku"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Kroužková přilba Thornpeaku"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Kroužkové chrániče nohou Thornpeaku"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Kroužkové nárameníky Thornpeaku"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Kroužkové sabatony Thornpeaku"
+      },
+      "thornpeak_polearm": {
+        "name": "Dřevcová zbraň Thornpeaku"
+      },
+      "thornpeak_war_axe": {
+        "name": "Válečná sekera Thornpeaku"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
@@ -11876,6 +11989,7 @@ export const cs_CZ: EnTranslations = {
     "delveRiteShrineCandleInteract": "Svíčková svatyně: stiskni F a dotkni se jí",
     "delveRiteShrineReedInteract": "Rákosová svatyně: stiskni F a dotkni se jí",
     "delveRiteShrineSkullInteract": "Lebková svatyně: stiskni F a dotkni se jí",
-    "mailboxName": "Poštovní schránka"
+    "mailboxName": "Poštovní schránka",
+    "noticeboardName": "Vývěska"
   }
 };

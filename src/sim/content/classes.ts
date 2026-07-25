@@ -1802,7 +1802,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 5,
     cost: 40,
     castTime: 0,
-    cooldown: 8,
+    // Balance 2026-07-25 (live raid parses + class designer round): the full
+    // three-charge bank STAYS (dumping it inside Phoenix Trance for the free
+    // Pyrelance chain is the fire fantasy, designer call), but each charge
+    // recharges in 30s (was 8s, playtest 2026-07-13). The burst window keeps
+    // its whole payoff; the slow refill is what makes fire fall off after the
+    // window and come back for the next Trance (~110s), so FIGHT-LONG damage
+    // lands at parity: with the Ignite fold fix this measures 1.03x-1.17x the
+    // talented frost comparator at 60s/120s/300s (was 2.2x-2.9x live). Pinned
+    // by tests/fire_short_fight_tuning.test.ts.
+    cooldown: 30,
     range: 20,
     school: 'fire',
     requiresTarget: true,
@@ -1811,7 +1820,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Owner rule (round five): fully off the GCD, like Phoenix Trance: castable
     // during one and it never arms one for the other abilities.
     offGcd: true,
-    // Owner playtest 2026-07-13: three stored charges (was two), back to back if banked.
+    // Owner playtest 2026-07-13: three stored charges, back to back if banked.
     maxCharges: 3,
     // Owner playtest round four: no bolt, the embers bite the moment you press.
     projectile: false,
@@ -5479,7 +5488,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // same day: the Phoenix Trance window is meant to chain free Pyroblasts).
     effects: [{ type: 'selfBuff', kind: 'combustion', value: 0, duration: 10 }],
     description:
-      'Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These crits build Hot Streak like any other. (Fire signature)',
+      'Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These crits build Hot Streak like any other, and casting it finishes the Cinderfall charge currently recharging. (Fire signature)',
   },
   cone_of_cold: {
     id: 'cone_of_cold',

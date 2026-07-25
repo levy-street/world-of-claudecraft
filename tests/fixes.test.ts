@@ -21,6 +21,7 @@ import {
   zoneAt,
   zoneWelcomeText,
 } from '../src/sim/data';
+import { EASTBROOK_BUILDINGS_BY_ID, localToWorld } from '../src/sim/eastbrook_layout';
 import { createMob } from '../src/sim/entity';
 import { ACTIONS, encodeObs } from '../src/sim/obs';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
@@ -137,13 +138,19 @@ describe('collision & terrain', () => {
   it('players cannot walk through town buildings', () => {
     const sim = makeSim();
     const p = sim.player;
-    // approach the house at (10,12) from the south and hold forward
-    teleportTo(sim, 10, 6);
-    p.facing = 0; // +z, straight at the building
+    const bank = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank;
+    const approach = localToWorld(
+      bank.position,
+      bank.rotation,
+      0,
+      bank.nativeDimensions.depth / 2 + 3,
+    );
+    teleportTo(sim, approach.x, approach.z);
+    p.facing = bank.rotation + Math.PI;
     sim.moveInput.forward = true;
     for (let i = 0; i < 120; i++) sim.tick();
     // blocked at the wall: never reaches the interior
-    expect(dist2d(p.pos, { x: 10, y: 0, z: 12 })).toBeGreaterThan(2.2);
+    expect(dist2d(p.pos, { ...bank.position, y: 0 })).toBeGreaterThan(2.2);
   });
 
   it('steep rims are walls, not ramps', () => {
@@ -179,8 +186,9 @@ describe('collision & terrain', () => {
   });
 
   it('resolvePosition pushes points out of colliders', () => {
-    const inside = resolvePosition(SEED, 10, 12, 0.5); // house centre
-    expect(Math.abs(inside.x - 10) + Math.abs(inside.z - 12)).toBeGreaterThan(0.5);
+    const center = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank.position;
+    const inside = resolvePosition(SEED, center.x, center.z, 0.5);
+    expect(Math.abs(inside.x - center.x) + Math.abs(inside.z - center.z)).toBeGreaterThan(0.5);
     const open = resolvePosition(SEED, 0, -40, 0.5); // open road
     expect(open.x).toBe(0);
     expect(open.z).toBe(-40);
@@ -191,35 +199,69 @@ describe('collision & terrain', () => {
   });
 
   it('camera ghosts through village buildings (hidden instead of pulling in)', () => {
-    const groundY = groundHeight(10, 4, SEED);
+    const bank = EASTBROOK_BUILDINGS_BY_ID.eastbrook_bank;
+    const front = localToWorld(
+      bank.position,
+      bank.rotation,
+      0,
+      bank.nativeDimensions.depth / 2 + 4,
+    );
+    const rear = localToWorld(
+      bank.position,
+      bank.rotation,
+      0,
+      -bank.nativeDimensions.depth / 2 - 4,
+    );
+    const groundY = groundHeight(front.x, front.z, SEED);
     const eyeY = groundY + 2;
 
-    // ray sweeps straight through the house at (10,12): buildings are camGhost,
+    // The ray sweeps through the replacement bank: buildings are camGhost,
     // so the chase cam no longer pulls in for them — the renderer hides them.
-    const through = cameraOcclusion(SEED, 10, eyeY, 4, 10, eyeY + 1.5, 20, 0.35);
+    const through = cameraOcclusion(SEED, front.x, eyeY, front.z, rear.x, eyeY + 1.5, rear.z, 0.35);
     expect(through).toBe(1);
-    // but movement still collides with that same house (camGhost is camera-only)
-    const blocked = resolvePosition(SEED, 10, 12, 0.5);
-    expect(Math.abs(blocked.x - 10) + Math.abs(blocked.z - 12)).toBeGreaterThan(0.5);
+    // but movement still collides with that same bank (camGhost is camera-only)
+    const blocked = resolvePosition(SEED, bank.position.x, bank.position.z, 0.5);
+    expect(
+      Math.abs(blocked.x - bank.position.x) + Math.abs(blocked.z - bank.position.z),
+    ).toBeGreaterThan(0.5);
 
     const clear = cameraOcclusion(SEED, 0, eyeY, -40, 0, eyeY + 1.5, -48, 0.35);
     expect(clear).toBe(1);
 
-    const overhead = cameraOcclusion(SEED, 10, eyeY, 4, 10, eyeY + 24, 20, 0.35);
+    const overhead = cameraOcclusion(SEED, front.x, eyeY, front.z, rear.x, eyeY + 24, rear.z, 0.35);
     expect(overhead).toBe(1);
   });
 
   it('camera ghosts through campfires while movement still collides', () => {
-    const groundY = groundHeight(3, -4, SEED);
+    const [cx, cz] = PROPS.campfires[0];
+    const groundY = groundHeight(cx, cz, SEED);
 
-    const eyeHeightRay = cameraOcclusion(SEED, 3, groundY + 2.0, -12, 3, groundY + 2.2, 4, 0.35);
+    const eyeHeightRay = cameraOcclusion(
+      SEED,
+      cx,
+      groundY + 2.0,
+      cz - 8,
+      cx,
+      groundY + 2.2,
+      cz + 8,
+      0.35,
+    );
     expect(eyeHeightRay).toBe(1);
 
-    const lowRay = cameraOcclusion(SEED, 3, groundY + 0.8, -12, 3, groundY + 0.9, 4, 0.35);
+    const lowRay = cameraOcclusion(
+      SEED,
+      cx,
+      groundY + 0.8,
+      cz - 8,
+      cx,
+      groundY + 0.9,
+      cz + 8,
+      0.35,
+    );
     expect(lowRay).toBe(1);
 
-    const blocked = resolvePosition(SEED, 3, -4, 0.5);
-    expect(Math.abs(blocked.x - 3) + Math.abs(blocked.z + 4)).toBeGreaterThan(0.5);
+    const blocked = resolvePosition(SEED, cx, cz, 0.5);
+    expect(Math.abs(blocked.x - cx) + Math.abs(blocked.z - cz)).toBeGreaterThan(0.5);
   });
 
   it('camera ghosts through trees while movement still collides', () => {

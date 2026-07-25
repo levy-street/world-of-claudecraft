@@ -1,11 +1,15 @@
-// Gravewyrm Sanctum NORMAL retune (economy fix): soloable normal runs were
-// printing up to 6 gold per clear, so normal Sanctum doubles every mob's
-// health and raises melee so a swing lands for at least 300 (trash) / 600
-// (bosses) on the maximum-mitigation reference warrior, with boss mechanics
-// scaled by the same per-mob factor. Heroic reads the same base templates on
-// its OWN calibration (tests/heroic_difficulty_floors.test.ts), so this file
-// also pins the heroic transform literals: a base-template edit cannot slip
-// through either difficulty unnoticed.
+// Gravewyrm Sanctum NORMAL retune: the v0.29 economy floors (200 trash / 420
+// bosses / 150 adds) made normal Sanctum unclearable for its actual audience,
+// freshly-capped groups: bosses landed 41-54% of a fresh tank's pool PER
+// SWING and the Monte Carlo survival bench
+// (scripts/sanctum_fresh_montecarlo.ts) recorded a tank death in every run,
+// even against lone bosses with a healer. v0.30 keeps the DOUBLED health (the
+// anti-solo economy lever is clear time) and re-floors damage for the fresh
+// group instead, with boss mechanics scaled by the same per-mob factor.
+// Heroic reads the same base templates on its OWN calibration
+// (tests/heroic_difficulty_floors.test.ts), so this file also pins the heroic
+// transform literals: a base-template edit cannot slip through either
+// difficulty unnoticed.
 //
 // Reference warrior (the "fully geared" mitigation ceiling): level-20 prot
 // warrior in the max-armor kit (full heroic plate + shield, prot mastery),
@@ -31,15 +35,22 @@ import { armorReduction } from '../src/sim/types';
 const SANCTUM = 'gravewyrm_sanctum';
 const REF_ARMOR = 2861; // max-armor BiS prot warrior, level 20 (see header)
 const DEFENSIVE_STANCE_TAKEN = 0.9; // dealDamage: Defensive Stance takes 10% less
-// 2026-07 fresh-group retune: normal Sanctum serves freshly-capped groups in
-// quest greens/blues (a 1433-armor / 1692-hp tank), for whom the old 300/600
-// floors meant 25% and 50% of the pool per swing. Trash 200, bosses 420, and
-// Velkhar's summoned bonewalkers 150; the DOUBLED health stays (the economy
-// lever is clear time), and the solo ceiling holds: the strongest solo
-// archetype self-heals ~140 hps against a 420-floor boss's ~350+ dtps.
-const TRASH_FLOOR = 200;
-const BOSS_FLOOR = 420;
-const ADD_FLOOR = 150;
+// v0.30 fresh-group retune: normal Sanctum serves freshly-capped groups in
+// quest greens/blues (1371-1752 hp / 1439-2361 armor across the three
+// committed tanks), for whom even the 200/420 floors meant 21-24% (trash) and
+// 41-54% (bosses) of the pool per swing. Trash 90; bosses 200 (Korgath and
+// Korzul land ~245, an average swing of ~25% of the fresh pool, the same
+// audience-pool share the heroic and Nythraxis boss calibrations use; tanks
+// are crit-immune since v0.29.1 so there is no spike tail above the 1.25x
+// roll cap. Velkhar sits at the 200 line, ~20.5%, because he swings at 2.0s
+// and layers his bonewalker waves on top); and the summoned bonewalkers 50
+// (three spawn at once: wave pressure, not extra bosses). The DOUBLED health
+// stays. Accepted trade (2026-07-25): a best-in-slot self-healing tank can
+// out-heal these bosses again, so clear TIME, not lethality, is what keeps
+// solo farming unprofitable.
+const TRASH_FLOOR = 90;
+const BOSS_FLOOR = 200;
+const ADD_FLOOR = 50;
 
 // The dungeon's five spawn-list templates plus Velkhar's summoned add.
 const TRASH_IDS = ['sanctum_boneguard', 'sanctum_drakonid'] as const;
@@ -87,12 +98,12 @@ describe('normal Gravewyrm Sanctum tuning data', () => {
     const tuning = sanctumTuning();
     expect(tuning.healthMultiplier).toBe(2.0);
     expect(tuning.damageMultiplierByMob).toEqual({
-      sanctum_boneguard: 7.5,
-      sanctum_drakonid: 7.25,
-      raised_bonewalker: 11.25,
-      korgath_the_bound: 13.5,
-      grand_necromancer_velkhar: 14,
-      korzul_the_gravewyrm: 13,
+      sanctum_boneguard: 3.4,
+      sanctum_drakonid: 3.3,
+      raised_bonewalker: 3.75,
+      korgath_the_bound: 7.75,
+      grand_necromancer_velkhar: 6.6,
+      korzul_the_gravewyrm: 7.5,
     });
   });
 });
@@ -110,7 +121,7 @@ describe('normal Gravewyrm Sanctum health', () => {
 });
 
 describe('normal Gravewyrm Sanctum melee floors vs the reference warrior', () => {
-  it('every summoned bonewalker swing lands for at least the 150 add floor', () => {
+  it('every summoned bonewalker swing lands for at least the 50 add floor', () => {
     for (const id of ADD_IDS) {
       const { minLevel, maxLevel } = MOBS[id];
       for (let level = minLevel; level <= maxLevel; level++) {
@@ -121,7 +132,7 @@ describe('normal Gravewyrm Sanctum melee floors vs the reference warrior', () =>
     }
   });
 
-  it('every trash swing lands for at least 200 at every spawnable level', () => {
+  it('every trash swing lands for at least 90 at every spawnable level', () => {
     for (const id of TRASH_IDS) {
       const { minLevel, maxLevel } = MOBS[id];
       for (let level = minLevel; level <= maxLevel; level++) {
@@ -133,7 +144,7 @@ describe('normal Gravewyrm Sanctum melee floors vs the reference warrior', () =>
     }
   });
 
-  it('every boss swing lands for at least 420 at every spawnable level', () => {
+  it('every boss swing lands for at least 200 at every spawnable level', () => {
     for (const id of BOSS_IDS) {
       const { minLevel, maxLevel } = MOBS[id];
       for (let level = minLevel; level <= maxLevel; level++) {
@@ -169,10 +180,10 @@ describe('normal Gravewyrm Sanctum mechanic scaling', () => {
     // Raw (unmitigated) mechanic damage after the per-mob multiplier: the
     // FOURTH (largest) inferno pulse on normal, and the stomp band.
     const mult = tuning.damageMultiplierByMob.korzul_the_gravewyrm;
-    expect(inferno.min * inferno.pulses * mult).toBe(364);
-    expect(inferno.max * inferno.pulses * mult).toBe(468);
-    expect(korgathStomp.min * tuning.damageMultiplierByMob.korgath_the_bound).toBe(270);
-    expect(korgathStomp.max * tuning.damageMultiplierByMob.korgath_the_bound).toBe(405);
+    expect(inferno.min * inferno.pulses * mult).toBe(210);
+    expect(inferno.max * inferno.pulses * mult).toBe(270);
+    expect(korgathStomp.min * tuning.damageMultiplierByMob.korgath_the_bound).toBe(155);
+    expect(korgathStomp.max * tuning.damageMultiplierByMob.korgath_the_bound).toBe(232.5);
   });
 
   it('leaves untuned normal dungeons untouched', () => {
@@ -186,7 +197,7 @@ describe('normal Gravewyrm Sanctum mechanic scaling', () => {
 
 describe('heroic Gravewyrm Sanctum transform stays on its own calibration', () => {
   // Deliberate heroic literals: base template x heroic tuning (health 4.0,
-  // trash damage 15.5, bosses 19 via damageMultiplierByMob, adds 29, armor
+  // trash damage 15.5, bosses 19 via damageMultiplierByMob, adds 8.55, armor
   // 1.2, level 22; see tests/heroic_difficulty_floors.test.ts for the
   // floors). If a base template is edited instead of a tuning table, these
   // redden.
@@ -255,8 +266,8 @@ describe('heroic Gravewyrm Sanctum transform stays on its own calibration', () =
     const add = mobTemplateForDungeonDifficulty(MOBS.raised_bonewalker, SANCTUM, 'heroic', {
       summonedAdd: true,
     });
-    expect(add.dmgBase).toBeCloseTo(128.25, 10);
-    expect(add.dmgPerLevel).toBeCloseTo(31.35, 10);
+    expect(add.dmgBase).toBeCloseTo(76.95, 10);
+    expect(add.dmgPerLevel).toBeCloseTo(18.81, 10);
     expect(add.hpBase).toBeCloseTo(168, 10);
     expect(add.hpPerLevel).toBeCloseTo(60, 10);
     expect(add.armorPerLevel).toBeCloseTo(14.4, 10);

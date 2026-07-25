@@ -10,6 +10,7 @@
 import { describe, expect, it } from 'vitest';
 import { craftMaxSkillFor } from '../src/sim/content/professions';
 import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
+import { STATIONS } from '../src/sim/data';
 import { craftSkillGainMultiplier } from '../src/sim/professions/archetype';
 import { resolveCraft, resolveCraftForRecipe } from '../src/sim/professions/crafting';
 import { stationsOfType } from '../src/sim/professions/stations';
@@ -35,7 +36,7 @@ function mustMeta(sim: Sim, pid: number): PlayerMeta {
 // recipe's station (same harness idiom as professions_crafting.test.ts).
 function placeAtStationFor(sim: Sim, pid: number, recipe: ProfessionRecipeRecord) {
   if (!recipe.stationType) return;
-  const station = stationsOfType(recipe.stationType)[0];
+  const station = stationsOfType(STATIONS, recipe.stationType)[0];
   const entity = (sim as any).entities.get(pid);
   entity.pos.x = station.pos.x;
   entity.pos.z = station.pos.z;

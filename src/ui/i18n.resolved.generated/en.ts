@@ -1213,8 +1213,8 @@ export const en: EnTranslations = {
         "dps": "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
         "critChance": "Your chance for an attack to strike critically, dealing double damage.",
         "dodge": "Your chance to completely avoid an incoming melee attack, taking no damage.",
-        "critRating": "Crit rating from your gear and set bonuses, raising the critical strike chance of both your attacks and your spells. Every 10 rating grants exactly 1% crit.",
-        "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. Every 10 rating grants exactly 1% haste.",
+        "critRating": "Crit rating from your gear and set bonuses, raising the critical strike chance of both your attacks and your spells. Every 20 rating grants exactly 1% crit.",
+        "hasteRating": "Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. Every 20 rating grants exactly 1% haste.",
         "parry": "Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried.",
         "hitRating": "Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. Every 10 rating grants exactly 1% hit.",
         "warfare": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%."
@@ -1994,6 +1994,9 @@ export const en: EnTranslations = {
         "letterGone": "That letter is no longer in your box.",
         "takeParcelsFirst": "Take the parcels out before discarding the letter."
       }
+    },
+    "noticeboard": {
+      "empty": "Nothing seems posted."
     },
     "bank": {
       "title": "Bank",
@@ -5572,8 +5575,10 @@ export const en: EnTranslations = {
     "reconnectingNow": "Connection lost. Reconnecting now... (attempt {attempt}/{maxAttempts})",
     "slowConnection": "This is taking longer than usual. Check your internet connection.",
     "connectionRejected": "The server closed the connection.",
+    "incompatibleWorldVersion": "Game and server versions are incompatible. Reload or update, then try again.",
     "realmFull": "This world is full right now. Please try again in a few minutes.",
     "tooManyConnections": "Too many connections to this world are coming from your network. Please close extra game windows or try again in a few minutes.",
+    "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
     "tips": {
       "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
       "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",
@@ -5641,6 +5646,12 @@ export const en: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
     "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
+    "dismiss": "Dismiss"
+  },
+  "perfNudge": {
+    "integratedGpu": "The game is running on the integrated (power-saving) GPU. If this computer also has a gaming GPU, set your browser to High performance under Settings > System > Display > Graphics on Windows, then restart the browser. The desktop app picks the gaming GPU automatically.",
+    "hardwareAccelerationDesktop": "The game is running without GPU acceleration, which makes it very slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "hardwareAccelerationWeb": "The game is running without GPU acceleration, which makes it very slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
     "dismiss": "Dismiss"
   },
   "realm": {
@@ -7578,7 +7589,7 @@ export const en: EnTranslations = {
       },
       "combustion": {
         "name": "Phoenix Trance",
-        "description": "Combust: for 10 sec your Fire spells always critically strike. These guaranteed crits do not build Hot Streak. (Fire signature)"
+        "description": "Combust: for 10 sec your Fire spells always critically strike, including bolts already in flight. Off the global cooldown. These crits build Hot Streak like any other, and casting it finishes the Cinderfall charge currently recharging. (Fire signature)"
       },
       "icy_veins": {
         "name": "Icy Veins",
@@ -9166,6 +9177,108 @@ export const en: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Resonant Timber"
+      },
+      "ashwood_staff": {
+        "name": "Ashwood Staff"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Gravecaller Cloth Handwraps"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Gravecaller Cloth Hood"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Gravecaller Cloth Leggings"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Gravecaller Cloth Mantle"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Gravecaller Cloth Raiment"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Gravecaller Cloth Sash"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Gravecaller Cloth Slippers"
+      },
+      "gravecaller_focus": {
+        "name": "Gravecaller Focus"
+      },
+      "gravecaller_pendant": {
+        "name": "Gravecaller Pendant"
+      },
+      "gravecaller_ring": {
+        "name": "Gravecaller Ring"
+      },
+      "gravecaller_wand": {
+        "name": "Gravecaller Wand"
+      },
+      "iron_broadsword": {
+        "name": "Iron Broadsword"
+      },
+      "iron_flanged_mace": {
+        "name": "Iron Flanged Mace"
+      },
+      "mirefen_dirk": {
+        "name": "Mirefen Dirk"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Mirefen Hunting Bow"
+      },
+      "mirefen_leather_belt": {
+        "name": "Mirefen Leather Belt"
+      },
+      "mirefen_leather_boots": {
+        "name": "Mirefen Leather Boots"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Mirefen Leather Gloves"
+      },
+      "mirefen_leather_hood": {
+        "name": "Mirefen Leather Hood"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Mirefen Leather Jerkin"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Mirefen Leather Leggings"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Mirefen Leather Shoulderguards"
+      },
+      "thornpeak_bulwark": {
+        "name": "Thornpeak Bulwark"
+      },
+      "thornpeak_crossbow": {
+        "name": "Thornpeak Crossbow"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Thornpeak Mail Chest"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Thornpeak Mail Gauntlets"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Thornpeak Mail Girdle"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Thornpeak Mail Helm"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Thornpeak Mail Legguards"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Thornpeak Mail Pauldrons"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Thornpeak Mail Sabatons"
+      },
+      "thornpeak_polearm": {
+        "name": "Thornpeak Polearm"
+      },
+      "thornpeak_war_axe": {
+        "name": "Thornpeak War Axe"
       },
       "conjured_water4": {
         "name": "Conjured Springwater"
@@ -11809,12 +11922,12 @@ export const en: EnTranslations = {
     "itemSets": {
       "boundstone_vanguard": {
         "name": "Boundstone Vanguard",
-        "bonus3": "Increases attack and casting speed by 15%."
+        "bonus3": "Increases attack and casting speed by 7.5%."
       },
       "crownforged": {
         "name": "Bonewrought Regalia",
         "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Strength by 15, Stamina by 15, and attack and casting speed by 15%.",
+        "bonus3": "Increases Strength by 15, Stamina by 15, and attack and casting speed by 7.5%.",
         "bonus4": "Increases Hit by 6%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "deathlord": {
@@ -11825,7 +11938,7 @@ export const en: EnTranslations = {
       },
       "greyjaw_stalker": {
         "name": "Greyjaw Stalker's Kit",
-        "bonus3": "Increases attack and casting speed by 15%."
+        "bonus3": "Increases attack and casting speed by 7.5%."
       },
       "necromancers": {
         "name": "Mournweave Raiment",
@@ -11836,29 +11949,29 @@ export const en: EnTranslations = {
       "nighttalon": {
         "name": "Direfang Pelt",
         "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15, critical strike chance by 2%, and attack and casting speed by 15%.",
+        "bonus3": "Increases Agility by 15, critical strike chance by 1%, and attack and casting speed by 7.5%.",
         "bonus4": "Increases Hit by 6%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
       "soulflame": {
         "name": "Wraithfire Regalia",
         "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
-        "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%.",
+        "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 7.5%.",
         "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },
       "stormcallers": {
         "name": "Galecall Vestments",
         "bonus2": "Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).",
-        "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 15%.",
+        "bonus3": "Increases Intellect by 15, Spirit by 15, and attack and casting speed by 7.5%.",
         "bonus4": "Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec."
       },
       "vale_arcanist": {
         "name": "Vale Arcanist's Regalia",
-        "bonus3": "Increases attack and casting speed by 15%."
+        "bonus3": "Increases attack and casting speed by 7.5%."
       },
       "wyrmshadow": {
         "name": "Nightfang Vestments",
         "bonus2": "Increases attack power by 40.",
-        "bonus3": "Increases Agility by 15 and critical strike chance by 2%.",
+        "bonus3": "Increases Agility by 15 and critical strike chance by 1%.",
         "bonus4": "Your weapon critical strikes have a 50% chance to grant Fangrush, increasing attack speed by 25% for 8 sec."
       }
     }
@@ -11876,6 +11989,7 @@ export const en: EnTranslations = {
     "delveRiteShrineCandleInteract": "Candle Shrine: Press F to touch it",
     "delveRiteShrineReedInteract": "Reed Shrine: Press F to touch it",
     "delveRiteShrineSkullInteract": "Skull Shrine: Press F to touch it",
-    "mailboxName": "Mailbox"
+    "mailboxName": "Mailbox",
+    "noticeboardName": "Notice Board"
   }
 };

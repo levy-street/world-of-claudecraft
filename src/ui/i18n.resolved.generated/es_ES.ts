@@ -1461,8 +1461,8 @@ export const es_ES: EnTranslations = {
         "claw": "Garra",
         "horn": "Cuerno",
         "tusk": "Colmillo",
-        "meat": "Meat",
-        "cloth": "Cloth"
+        "meat": "Carne",
+        "cloth": "Tela"
       }
     },
     "townFocus": {
@@ -1995,6 +1995,9 @@ export const es_ES: EnTranslations = {
         "takeParcelsFirst": "Saca los paquetes antes de desechar la carta."
       }
     },
+    "noticeboard": {
+      "empty": "Parece que no hay nada publicado."
+    },
     "bank": {
       "title": "Banco",
       "subtitle": "El Arca Dorada",
@@ -2136,9 +2139,9 @@ export const es_ES: EnTranslations = {
         "herbalism": "Requiere una hoz de herboristería de nivel {tier}"
       },
       "requiresTool": {
-        "mining": "Requires a mining pick",
-        "logging": "Requires a logging axe",
-        "herbalism": "Requires a herbalism sickle"
+        "mining": "Requiere un pico de minero",
+        "logging": "Requiere un hacha de leñador",
+        "herbalism": "Requiere una hoz de herborista"
       },
       "toolTierUnmet": {
         "mining": "Necesitas un pico de minería de nivel {tier} para extraer esta veta.",
@@ -2146,39 +2149,39 @@ export const es_ES: EnTranslations = {
         "herbalism": "Necesitas una hoz de herboristería de nivel {tier} para recolectar esta parcela."
       },
       "toolRequired": {
-        "mining": "You need a mining pick to harvest this vein.",
-        "logging": "You need a logging axe to fell this stand.",
-        "herbalism": "You need a herbalism sickle to gather this patch.",
-        "fishing": "You need a fishing pole to cast a line."
+        "mining": "Necesitas un pico de minero para explotar esta veta.",
+        "logging": "Necesitas un hacha de leñador para talar esta arboleda.",
+        "herbalism": "Necesitas una hoz de herborista para recoger esta mata.",
+        "fishing": "Necesitas una caña de pescar para lanzar el sedal."
       },
       "noNodeNearby": {
-        "mining": "There is no ore vein within reach.",
-        "logging": "There is no timber stand within reach.",
-        "herbalism": "There is no herb patch within reach."
+        "mining": "No hay ninguna veta de mineral a tu alcance.",
+        "logging": "No hay ninguna arboleda a tu alcance.",
+        "herbalism": "No hay ninguna mata de hierbas a tu alcance."
       },
       "toolTierUnmetCorpse": "Necesitas una herramienta de recolección de nivel {tier} para recuperar los mejores materiales.",
       "toolTooltip": {
         "kind": {
-          "mining": "Mining tool (tier {tier})",
-          "logging": "Logging tool (tier {tier})",
-          "herbalism": "Herbalism tool (tier {tier})",
-          "fishing": "Fishing rod (tier {tier})"
+          "mining": "Herramienta de minería (nivel {tier})",
+          "logging": "Herramienta de tala (nivel {tier})",
+          "herbalism": "Herramienta de herboristería (nivel {tier})",
+          "fishing": "Caña de pescar (nivel {tier})"
         },
         "unlocks": {
-          "mining": "Required to mine ore veins up to tier {tier}.",
-          "logging": "Required to fell timber stands up to tier {tier}.",
-          "herbalism": "Required to gather herb patches up to tier {tier}."
+          "mining": "Necesaria para extraer vetas de mineral hasta el nivel {tier}.",
+          "logging": "Necesaria para talar arboledas hasta el nivel {tier}.",
+          "herbalism": "Necesaria para recoger matas de hierbas hasta el nivel {tier}."
         },
         "use": {
-          "mining": "Use: Mine a nearby ore vein.",
-          "logging": "Use: Fell a nearby timber stand.",
-          "herbalism": "Use: Gather from a nearby herb patch."
+          "mining": "Uso: extraer una veta de mineral cercana.",
+          "logging": "Uso: talar una arboleda cercana.",
+          "herbalism": "Uso: recoger de una mata de hierbas cercana."
         },
-        "speed": "Gathers faster at nodes below tier {tier}.",
-        "rodRequired": "Required to fish.",
-        "rodBite": "Fish bite up to {seconds}s sooner.",
-        "rodReel": "Extends the reel window by {seconds}s.",
-        "rodBand": "Unlocks richer catch tables at fishing skill {skill} and above."
+        "speed": "Recolecta más rápido en nodos por debajo del nivel {tier}.",
+        "rodRequired": "Necesaria para pescar.",
+        "rodBite": "Los peces pican hasta {seconds} s antes.",
+        "rodReel": "Amplía la ventana de recogida en {seconds} s.",
+        "rodBand": "Desbloquea capturas más ricas con habilidad de pesca {skill} o superior."
       },
       "downgradeMark": "Bolsas llenas: el hallazgo se guardó sin la marca del recolector.",
       "downgradeFind": "Bolsas llenas: se perdió un hallazgo prístino.",
@@ -2355,7 +2358,7 @@ export const es_ES: EnTranslations = {
       },
       "throttled": "Estás elaborando demasiado rápido. Espera un momento e inténtalo de nuevo.",
       "recipeNotLearned": "Aún no has aprendido esa receta.",
-      "noBagSpace": "You do not have room for the crafted item.",
+      "noBagSpace": "No tienes espacio para el objeto elaborado.",
       "skillReqLine": "Requiere {craft} {skill}",
       "difficultyFull": "Ganancia total de habilidad",
       "difficultyReduced": "Ganancia de habilidad reducida",
@@ -2407,9 +2410,9 @@ export const es_ES: EnTranslations = {
       "enchantWrongSlot": "Ese encantamiento no se puede aplicar a ese objeto.",
       "enchantUnknown": "Ese encantamiento no existe.",
       "enchantInsufficient": "No tienes los materiales para ese encantamiento.",
-      "disenchantNoSpace": "You do not have room for the arcane materials.",
-      "salvageNoSpace": "You do not have room for the salvaged materials.",
-      "enchantNoSpace": "You do not have room for the enchanted item.",
+      "disenchantNoSpace": "No tienes espacio para los materiales arcanos.",
+      "salvageNoSpace": "No tienes espacio para los materiales del desguace.",
+      "enchantNoSpace": "No tienes espacio para el objeto encantado.",
       "disenchantConfirmTitle": "¿Desencatar {item}?",
       "disenchantConfirmBody": "Esto destruye {item} y produce materiales arcanos. No se puede deshacer.",
       "disenchantConfirmBodySpecial": "Esto destruye una copia especial de {item} (firmada, obra maestra o encantada) y produce materiales arcanos. No se puede deshacer.",
@@ -2429,10 +2432,10 @@ export const es_ES: EnTranslations = {
       "stateKnown": "conocido",
       "stateTeachable": "Disponible",
       "stateLocked": "bloqueado",
-      "statePending": "Learning",
+      "statePending": "Aprendiendo",
       "requirement": "Impartido en {craft} {skill}",
       "trainAria": "Aprenda {name} para {fee}",
-      "pendingAria": "Learning {name}",
+      "pendingAria": "Aprendiendo {name}",
       "dialogOption": "Entrenamiento",
       "dialogOptionAria": "Explore la capacitación de {name}",
       "learned": "Receta aprendida: {recipe}",
@@ -2460,7 +2463,7 @@ export const es_ES: EnTranslations = {
       "notBound": "Ese objeto no está vinculado.",
       "cannotAfford": "No puedes permitirte la tarifa de desvinculación.",
       "outOfRange": "Debes estar en una estación artesanal para desvincular.",
-      "noSpace": "You do not have room for the unbound copy."
+      "noSpace": "No tienes espacio para la copia desvinculada."
     },
     "finder": {
       "title": "Buscador de Mazmorras",
@@ -3856,9 +3859,9 @@ export const es_ES: EnTranslations = {
         "bonusFmt": "+{value} {stat}"
       },
       "gatherIntro": {
-        "mining": "La Minería extrae mineral directamente de la roca del mundo: cobre en el Valle de Eastbrook, hierro en el Pantano de Mirefen y osmio en las Alturas de Thornpeak, que alimenta los oficios de la forja. Disponible para todos desde el nivel 1, sin ningún requisito, con su propio contador hasta un tope de 100.",
-        "logging": "La Tala derriba madera de arboledas en las tres zonas: corteza de hierro en el Valle de Eastbrook, madera de ceniza en el Pantano de Mirefen y pino cumbre en las Alturas de Thornpeak, el material bruto para mangos, bastones y el banco del ingeniero. Disponible para todos desde el nivel 1, con su propio contador hasta un tope de 100.",
-        "herbalism": "La Herboristería recoge lo que crece silvestre: hoja de brillo en el Valle de Eastbrook, hoja dorada en el Pantano de Mirefen y pétalo de sol en las Alturas de Thornpeak, la hoja y el tallo que mantienen activos los oficios del boticario. Disponible para todos desde el nivel 1, con su propio contador hasta un tope de 100.",
+        "mining": "La Minería extrae mineral directamente de la roca del mundo: cobre en el Valle de Eastbrook, hierro en el Pantano de Mirefen y osmio en las Alturas de Thornpeak, que alimenta los oficios de la forja. Disponible para todos desde el nivel 1: solo hace falta un pico de minero en la mochila, 20 de cobre en cualquier pueblo principal. Se registra en su propio contador hasta un tope de 100.",
+        "logging": "La Tala derriba madera de arboledas en las tres zonas: corteza de hierro en el Valle de Eastbrook, madera de ceniza en el Pantano de Mirefen y pino cumbre en las Alturas de Thornpeak, el material bruto para mangos, bastones y el banco del ingeniero. Disponible para todos desde el nivel 1 con un hacha de leñador en la mochila (20 de cobre en cualquier pueblo principal), con su propio contador hasta un tope de 100.",
+        "herbalism": "La Herboristería recoge lo que crece silvestre: hoja de brillo en el Valle de Eastbrook, hoja dorada en el Pantano de Mirefen y pétalo de sol en las Alturas de Thornpeak, la hoja y el tallo que mantienen activos los oficios del boticario. Disponible para todos desde el nivel 1 con una hoz de herborista en la mochila (20 de cobre en cualquier pueblo principal), con su propio contador hasta un tope de 100.",
         "fishing": "La Pesca es la diferente entre los oficios de recolección, y la más profunda: un minijuego real de picar y cobrar, con sus propias tablas de captura en cada zona y un tope de pericia de 200, el doble que los demás. Compra una caña, mira hacia aguas abiertas y lanza."
       },
       "rhythmHeading": "El ritmo de recolección",
@@ -3867,7 +3870,7 @@ export const es_ES: EnTranslations = {
       "nodesHeading": "Nodos por zona",
       "nodesNote": "Dónde están los nodos, su nivel, la herramienta que necesitan y qué producen. Cada nodo reaparece para ti {respawn} segundos después de tu propia cosecha, y ese temporizador es solo tuyo: otro recolector trabajando el mismo nodo nunca retrasa el tuyo, así que no hay carreras por nodos ni campamentos. Cada zona que subes en la escalera trae un material mejor de un terreno más exigente.",
       "toolsHeading": "Herramientas",
-      "toolsNote": "Las manos vacías cuentan como herramienta de nivel 1, así que todos los nodos de nivel 1 del juego no necesitan herramienta alguna. La escalera de vendedores cubre los niveles 1 a 3; la herramienta solo tiene que estar en tu mochila, no hay ranura de equipamiento ni durabilidad, así que cada una es una compra de una sola vez. Solo importa el nivel para el acceso: el color de rareza de una herramienta es cosmético.\n\nPor encima de la escalera de vendedores hay dos herramientas elaboradas, de nivel 4 y nivel 5, fabricadas en el taller de herramientas por ingenieros y que ningún NPC vende. Ningún nodo actual necesita más de nivel 3, así que su valor ahora mismo es la velocidad: una herramienta de primer nivel reduce el lanzamiento a su piso en los nodos inferiores, y será el boleto de entrada cuando lleguen terrenos de nivel más alto.",
+      "toolsNote": "Cada nodo necesita la herramienta de su oficio en tu mochila, incluido el nivel 1: sin pico no hay mineral, y sin caña no hay peces. La escalera de vendedores cubre los niveles 1 a 3, a la venta en todos los pueblos principales; la herramienta solo tiene que estar en tu mochila, no hay ranura de equipamiento ni durabilidad, así que cada una es una compra de una sola vez. Solo importa el nivel para el acceso: el color de rareza de una herramienta es cosmético.\n\nPor encima de la escalera de vendedores hay dos herramientas elaboradas, de nivel 4 y nivel 5, fabricadas en el taller de herramientas por ingenieros y que ningún NPC vende. Ningún nodo actual necesita más de nivel 3, así que su valor ahora mismo es la velocidad: una herramienta del nivel más alto fija el tiempo de lanzamiento en su mínimo en los nodos inferiores, y será el boleto de entrada cuando lleguen terrenos de nivel más alto.",
       "toolCrafted": "Elaborada ({craft})",
       "toolVendor": "{name} ({hub})",
       "toolUnavailable": "No se vende",
@@ -5572,8 +5575,10 @@ export const es_ES: EnTranslations = {
     "reconnectingNow": "Conexión perdida. Reconectando ahora... (intento {attempt}/{maxAttempts})",
     "slowConnection": "Esto está tardando más de lo habitual. Verifique su conexión a Internet.",
     "connectionRejected": "El servidor cerró la conexión.",
+    "incompatibleWorldVersion": "Las versiones del juego y del servidor no son compatibles. Recarga o actualiza y vuelve a intentarlo.",
     "realmFull": "Este mundo esta lleno en este momento. Por favor, intentalo de nuevo en unos minutos.",
     "tooManyConnections": "Hay demasiadas conexiones a este mundo desde tu red. Cierra ventanas adicionales del juego o intentalo de nuevo en unos minutos.",
+    "messageRateExceeded": "Se te desconectó por enviar acciones demasiado rápido. Espera un momento y vuelve a iniciar sesión.",
     "tips": {
       "classes": "Consejo: cada una de las 9 clases se juega de forma distinta. Prueba varias antes de decidirte por una.",
       "talents": "Consejo: puedes restablecer tus talentos cuando estés fuera de combate, así que una elección temprana nunca es definitiva.",
@@ -5642,6 +5647,12 @@ export const es_ES: EnTranslations = {
     "bodyDesktop": "El juego se ejecuta sin aceleración de GPU y será lento. Actualiza los controladores de gráficos y reinicia el juego. En Windows, establece también el juego como Alto rendimiento en Configuración > Sistema > Pantalla > Gráficos.",
     "bodyWeb": "El juego se ejecuta sin aceleración de GPU y será lento. Activa la aceleración de hardware en los ajustes del navegador, actualiza los controladores de gráficos y reinicia el navegador.",
     "dismiss": "Cerrar"
+  },
+  "perfNudge": {
+    "integratedGpu": "El juego se está ejecutando en la GPU integrada (de ahorro de energía). Si esta computadora también tiene una GPU para juegos, en Windows configura tu navegador como «Alto rendimiento» en Configuración > Sistema > Pantalla > Gráficos y luego reinicia el navegador. La aplicación de escritorio elige la GPU para juegos automáticamente.",
+    "hardwareAccelerationDesktop": "El juego se está ejecutando sin aceleración por GPU, lo que lo vuelve muy lento. Actualiza los controladores de tu tarjeta gráfica y reinicia el juego. En Windows, además configura el juego como «Alto rendimiento» en Configuración > Sistema > Pantalla > Gráficos.",
+    "hardwareAccelerationWeb": "El juego se está ejecutando sin aceleración por GPU, lo que lo vuelve muy lento. Activa la aceleración por hardware en la configuración de tu navegador, actualiza los controladores de tu tarjeta gráfica y reinicia el navegador.",
+    "dismiss": "Descartar"
   },
   "realm": {
     "noRealms": "No hay mundos disponibles.",
@@ -6068,7 +6079,7 @@ export const es_ES: EnTranslations = {
       "auraGain": "Obtienes {name}.",
       "auraFade": "{name} se desvanece de ti.",
       "auraAfflicted": "{target} queda afectado por {name}.",
-      "auraGainOther": "{target} gains {name}."
+      "auraGainOther": "{target} gana {name}."
     },
     "system": {
       "playerDeath": "Has muerto.",
@@ -7005,19 +7016,19 @@ export const es_ES: EnTranslations = {
         "description": "Invoca a un elemental de agua que combate junto a ti, dispara Descargas de Agua contra tu objetivo y canaliza Chorro de Agua. (Escarcha)"
       },
       "ice_lance": {
-        "name": "Ice Lance",
+        "name": "Lanza de Hielo",
         "description": "Lanza un fragmento de hielo que causa {damage} de daño de Escarcha, triplicado contra un objetivo congelado. Gasta Fingers of Frost o una carga de Frío Invernal para tratar al objetivo como congelado. (Escarcha)"
       },
       "flurry": {
-        "name": "Winterlash",
+        "name": "Látigo Invernal",
         "description": "Suelta tres rayos helados para causar daño de escarcha a {damage} cada uno y coloca Winter's Chill en el objetivo: sus siguientes 2 hechizos compatibles entrantes lo tratan como congelado. Brain Freeze hace que Winterlash sea instantáneo y omite su tiempo de reutilización. (Helada)"
       },
       "frozen_orb": {
-        "name": "Frozen Orb",
+        "name": "Orbe Congelado",
         "description": "Libera un orbe de escarcha arremolinado que avanza durante 8 s, lo que inflige {damage} daño de escarcha cada segundo a los enemigos cercanos y los ralentiza en un 30 %. Cada pulso sorprendente genera un carámbano. (Helada)"
       },
       "blizzard": {
-        "name": "Blizzard",
+        "name": "Ventisca",
         "description": "Desata una tormenta de hielo sobre el área objetivo durante 6 s, causando {damage} de daño de Escarcha por segundo y ralentizando a los enemigos un 40%. Cada enemigo golpeado reduce en 0,5 s el tiempo restante del Orbe Helado, hasta un máximo de 3 s por lanzamiento. (Escarcha)"
       },
       "glacial_spike": {
@@ -7029,15 +7040,15 @@ export const es_ES: EnTranslations = {
         "description": "Mantén pulsado para concentrar un frente de escarcha cada vez más amplio, luego suéltalo en un cono. Las concentraciones más largas alcanzan más lejos e infligen más daño. Cada enemigo golpeado queda ralentizado un 50% durante 4 s; la concentración máxima también los inmoviliza durante 1 s. (Escarcha)"
       },
       "dragons_breath": {
-        "name": "Dragon's Breath",
+        "name": "Aliento de Dragón",
         "description": "Mantén pulsado para concentrar un aliento de llamas cada vez más amplio, luego suéltalo en un cono. Las concentraciones más largas alcanzan más lejos e infligen más daño. Los enemigos golpeados quedan desorientados y el daño rompe el efecto; la concentración máxima siempre es un golpe crítico y cuenta una vez hacia Buena Racha. (Fuego)"
       },
       "fingers_of_frost": {
-        "name": "Fingers of Frost",
+        "name": "Dedos de Escarcha",
         "description": "Lanza de Escarcha tiene un 15% de probabilidad de otorgar Fingers of Frost, hasta 2 cargas: tu siguiente Lanza de Hielo trata al objetivo como si estuviera congelado. (Escarcha)"
       },
       "brain_freeze": {
-        "name": "Brain Freeze",
+        "name": "Congelación Mental",
         "description": "Rimelance tiene un 20% de probabilidad de hacer que tu próximo Winterlash sea instantáneo y libre de su tiempo de reutilización. (Helada)"
       },
       "shatter": {
@@ -7121,7 +7132,7 @@ export const es_ES: EnTranslations = {
         "description": "Embosca al objetivo por un 250% de daño de arma más {damage}. Debes estar en sigilo y detrás del objetivo. Requiere una daga. Otorga 1 punto de combo."
       },
       "stealth": {
-        "name": "Duskveil",
+        "name": "Velo Crepuscular",
         "description": "Te oculta en las sombras: los enemigos apenas te detectan, pero te mueves un 50% más lento. Atacar o recibir daño rompe Duskveil. Lánzalo de nuevo para salir."
       },
       "adrenaline_rush": {
@@ -7181,7 +7192,7 @@ export const es_ES: EnTranslations = {
         "description": "Aumenta tu armadura en {buff} durante 30 min."
       },
       "judgement": {
-        "name": "Verdict",
+        "name": "Veredicto",
         "description": "Desata tu Sello activo sobre el enemigo, lo consume y causa su daño Sagrado acumulado."
       },
       "blessing_of_might": {
@@ -7353,7 +7364,7 @@ export const es_ES: EnTranslations = {
         "description": "Imbuye tu arma con escarcha mordiente: cada golpe inflige {damage} de daño adicional durante 5 min."
       },
       "ghost_wolf": {
-        "name": "Shadewolf",
+        "name": "Lobo Sombrío",
         "description": "Te transforma en Shadewolf y aumenta tu velocidad de movimiento un 40% durante 10 min."
       },
       "stormstrike": {
@@ -7409,7 +7420,7 @@ export const es_ES: EnTranslations = {
         "description": "Sana a un objetivo amistoso por {damage}."
       },
       "mark_of_the_wild": {
-        "name": "Wildward",
+        "name": "Resguardo Silvestre",
         "description": "Coloca la Wildward sobre un objetivo amistoso y aumenta su armadura en {buff} durante 30 min."
       },
       "moonfire": {
@@ -7781,7 +7792,7 @@ export const es_ES: EnTranslations = {
         "description": "Inspira a los aliados en un radio de 30 m con fuerza salvaje, aumentando su poder de ataque en 45 y su velocidad de ataque un 5% durante 5 min. (talento de Cazador)"
       },
       "avatar": {
-        "name": "Avatar",
+        "name": "Avatar de Guerra",
         "description": "Te transforma en un coloso durante 20 s, elimina todos los efectos de control sobre ti y aumenta un 20% el daño que infliges."
       },
       "avenging_wrath": {
@@ -7941,7 +7952,7 @@ export const es_ES: EnTranslations = {
         "description": "Rebobina a todos los miembros muertos de tu grupo o banda y los devuelve a la vida junto a sus cuerpos con un 30% de salud y maná. No se puede lanzar en combate. (Cronomancia)"
       },
       "temporal_rewind": {
-        "name": "Rewind",
+        "name": "Rebobinar",
         "description": "Envía una onda arcana por tu grupo o banda, rebobinando el tiempo para restaurar el 30% del daño que cada aliado en un radio de 40 yardas sufrió durante los últimos 5 segundos (hasta el 35% de su salud máxima). No puede ser un efecto crítico. (Cronomancia)"
       },
       "temporal_hourglass": {
@@ -9166,6 +9177,108 @@ export const es_ES: EnTranslations = {
       },
       "resonant_timber": {
         "name": "Madera resonante"
+      },
+      "ashwood_staff": {
+        "name": "Bastón de fresno"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "Vendas de tela de Gravecaller"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "Capucha de tela de Gravecaller"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "Leotardos de tela de Gravecaller"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "Manto de tela de Gravecaller"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "Vestiduras de tela de Gravecaller"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "Fajín de tela de Gravecaller"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "Zapatillas de tela de Gravecaller"
+      },
+      "gravecaller_focus": {
+        "name": "Foco de Gravecaller"
+      },
+      "gravecaller_pendant": {
+        "name": "Colgante de Gravecaller"
+      },
+      "gravecaller_ring": {
+        "name": "Anillo de Gravecaller"
+      },
+      "gravecaller_wand": {
+        "name": "Varita de Gravecaller"
+      },
+      "iron_broadsword": {
+        "name": "Mandoble de hierro"
+      },
+      "iron_flanged_mace": {
+        "name": "Maza de hierro con rebordes"
+      },
+      "mirefen_dirk": {
+        "name": "Daga de Mirefen"
+      },
+      "mirefen_hunting_bow": {
+        "name": "Arco de caza de Mirefen"
+      },
+      "mirefen_leather_belt": {
+        "name": "Cinturón de cuero de Mirefen"
+      },
+      "mirefen_leather_boots": {
+        "name": "Botas de cuero de Mirefen"
+      },
+      "mirefen_leather_gloves": {
+        "name": "Guantes de cuero de Mirefen"
+      },
+      "mirefen_leather_hood": {
+        "name": "Capucha de cuero de Mirefen"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "Jubón de cuero de Mirefen"
+      },
+      "mirefen_leather_leggings": {
+        "name": "Leotardos de cuero de Mirefen"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "Hombreras de cuero de Mirefen"
+      },
+      "thornpeak_bulwark": {
+        "name": "Baluarte de Thornpeak"
+      },
+      "thornpeak_crossbow": {
+        "name": "Ballesta de Thornpeak"
+      },
+      "thornpeak_mail_chest": {
+        "name": "Coraza de malla de Thornpeak"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "Guanteletes de malla de Thornpeak"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "Faja de malla de Thornpeak"
+      },
+      "thornpeak_mail_helm": {
+        "name": "Yelmo de malla de Thornpeak"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "Guardapiernas de malla de Thornpeak"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "Espaldares de malla de Thornpeak"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "Escarpes de malla de Thornpeak"
+      },
+      "thornpeak_polearm": {
+        "name": "Arma de asta de Thornpeak"
+      },
+      "thornpeak_war_axe": {
+        "name": "Hacha de guerra de Thornpeak"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"
@@ -11876,6 +11989,7 @@ export const es_ES: EnTranslations = {
     "delveRiteShrineCandleInteract": "Santuario de la Vela: pulsa F para tocarlo",
     "delveRiteShrineReedInteract": "Santuario del Junco: pulsa F para tocarlo",
     "delveRiteShrineSkullInteract": "Santuario de la Calavera: pulsa F para tocarlo",
-    "mailboxName": "Buzón"
+    "mailboxName": "Buzón",
+    "noticeboardName": "Tablón de anuncios"
   }
 };

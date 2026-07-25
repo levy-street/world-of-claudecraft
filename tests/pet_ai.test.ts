@@ -117,7 +117,10 @@ describe('pet_ai module (P1a) — direct unit tests', () => {
     pet.petMode = 'passive'; // petPickTarget returns null -> the heel arm runs
     pet.aggroTargetId = null;
     isolate(sim, [pid, pet.id]);
-    place(owner, 0, 0);
+    // Keep this direct heel assertion on an obstacle-free lane. The Eastbrook
+    // landmark lot covers the old (20, 0) fixture, where correct A* routing can
+    // initially step away from the owner while going around the building.
+    place(owner, 0, 30);
     place(pet, owner.pos.x + 20, owner.pos.z);
     sim.rebucket(pet);
     const d0 = dist2d(pet.pos, owner.pos);

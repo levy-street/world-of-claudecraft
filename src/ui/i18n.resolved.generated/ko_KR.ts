@@ -1461,7 +1461,7 @@ export const ko_KR: EnTranslations = {
         "claw": "발톱",
         "horn": "뿔",
         "tusk": "엄니",
-        "meat": "Meat",
+        "meat": "고기",
         "cloth": "천"
       }
     },
@@ -1530,7 +1530,7 @@ export const ko_KR: EnTranslations = {
       "reorderNeedsRecent": "가방을 정리하려면 필터를 해제하고 최근 순으로 정렬하세요",
       "itemAriaInstanced": "{item}, 수량 {count}, 제작자 표식이 있는 사본",
       "itemAriaMasterwork": "{item}, 수량 {count}, 걸작",
-      "itemAriaProcedural": "{item}, {rarity}, item level {level}, quantity {count}",
+      "itemAriaProcedural": "{item}, {rarity}, 아이템 레벨 {level}, 수량 {count}",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
       "filterWeapon": "무기",
@@ -1994,6 +1994,9 @@ export const ko_KR: EnTranslations = {
         "letterGone": "그 편지는 더 이상 우편함에 없습니다.",
         "takeParcelsFirst": "편지를 버리기 전에 소포를 먼저 꺼내세요."
       }
+    },
+    "noticeboard": {
+      "empty": "게시된 내용이 없는 것 같습니다."
     },
     "bank": {
       "title": "은행",
@@ -3856,9 +3859,9 @@ export const ko_KR: EnTranslations = {
         "bonusFmt": "+{value} {stat}"
       },
       "gatherIntro": {
-        "mining": "채광은 세 지역의 광맥에서 광석을 캐어 대장간 계열 전문직에 공급하며, 상한은 100이다.",
-        "logging": "벌목은 세 지역의 숲에서 목재를 베어 무기 자루와 도구에 공급하며, 상한은 100이다.",
-        "herbalism": "약초학은 세 지역에서 약초를 캐어 연금술과 요리에 공급하며, 상한은 100이다.",
+        "mining": "채광은 세상의 바위에서 광석을 곧바로 캐낸다. 이스트브룩 골짜기의 구리, 마이어펜 습지의 철, 쏜피크 고지의 오스뮴이 대장간 계열 전문직에 공급된다. 레벨 1부터 누구나 할 수 있고, 필요한 것은 가방 속 채광 곡괭이 하나뿐이다. 어느 거점 마을에서나 20동이면 산다. 자체 수치로 기록되며 상한은 100이다.",
+        "logging": "벌목은 세 지역의 나무숲에서 목재를 베어 낸다. 이스트브룩 골짜기의 무쇠껍질나무, 마이어펜 습지의 물푸레나무, 쏜피크 고지의 고산소나무가 무기 자루와 지팡이, 그리고 기술자의 작업대에 들어가는 원자재다. 레벨 1부터 누구나 할 수 있고, 가방에 벌목 도끼(어느 거점 마을에서나 20동)만 있으면 된다. 자체 수치로 기록되며 상한은 100이다.",
+        "herbalism": "약초학은 야생에서 자라는 것을 캔다. 이스트브룩 골짜기의 윤기잎, 마이어펜 습지의 금빛잎, 쏜피크 고지의 태양꽃잎, 연금술 계열 전문직의 조제를 이어 주는 잎과 줄기다. 레벨 1부터 누구나 할 수 있고, 가방에 약초 낫(어느 거점 마을에서나 20동)만 있으면 된다. 자체 수치로 기록되며 상한은 100이다.",
         "fishing": "낚시는 입질과 릴 감기의 흐름으로 모든 지역의 트인 물가에서 어획물을 낚으며, 상한은 200이다."
       },
       "rhythmHeading": "채집의 리듬",
@@ -3867,7 +3870,7 @@ export const ko_KR: EnTranslations = {
       "nodesHeading": "지역별 채집물",
       "nodesNote": "채집물의 위치, 티어, 필요한 도구, 산출물. 각 채집물은 내가 채집한 뒤 {respawn}초가 지나야 나에게 다시 생겨난다.",
       "toolsHeading": "도구",
-      "toolsNote": "정확한 상인 가격이 담긴 도구 사다리. 4티어와 5티어 도구는 제작으로만 얻고 팔지 않는다.",
+      "toolsNote": "모든 채집지에는 그 전문직의 도구가 가방에 있어야 하며, 1티어도 예외가 아니다. 곡괭이가 없으면 광석도 없고, 낚싯대가 없으면 물고기도 없다. 상인 사다리는 1티어부터 3티어까지를 다루며 모든 거점 마을에 재고가 있다. 도구는 가방에 들어 있기만 하면 되고, 장착 칸도 내구도도 없어서 한 번만 사면 된다. 조건을 가르는 것은 티어뿐이며, 도구의 희귀도 색은 겉모습일 뿐이다.\n\n상인 사다리 위에는 제작 도구 두 가지, 4티어와 5티어가 있다. 기술자가 도구 공방에서 만들며 어떤 NPC도 팔지 않는다. 현재 3티어를 넘는 채집지는 없으므로 지금 이들의 가치는 속도다. 최상급 도구는 낮은 등급 채집지에서 시전 시간을 최소치로 고정하며, 더 높은 티어의 땅이 열리면 그때의 입장권이 된다.",
       "toolCrafted": "제작({craft})",
       "toolVendor": "{name}({hub})",
       "toolUnavailable": "판매 없음",
@@ -5572,8 +5575,10 @@ export const ko_KR: EnTranslations = {
     "reconnectingNow": "연결이 끊어졌습니다. 지금 다시 연결하는 중...(시도 {attempt}/{maxAttempts})",
     "slowConnection": "로딩이 평소보다 오래 걸리고 있습니다. 인터넷 연결을 확인하세요.",
     "connectionRejected": "서버가 연결을 종료했습니다.",
+    "incompatibleWorldVersion": "게임과 서버 버전이 호환되지 않습니다. 새로고침하거나 업데이트한 후 다시 시도하세요.",
     "realmFull": "이 월드는 현재 포화 상태입니다. 몇 분 후에 다시 시도해 주세요.",
     "tooManyConnections": "사용 중인 네트워크에서 이 월드로 연결이 너무 많습니다. 추가 게임 창을 닫거나 몇 분 후에 다시 시도해 주세요.",
+    "messageRateExceeded": "행동을 너무 빠르게 전송하여 연결이 끊어졌습니다. 잠시 기다렸다가 다시 로그인해 주세요.",
     "tips": {
       "classes": "팁: 9개 클래스는 저마다 플레이 방식이 다릅니다. 정하기 전에 몇 가지를 직접 해보세요.",
       "talents": "팁: 비전투 상태라면 언제든 특성을 초기화할 수 있어, 처음 선택도 절대 돌이킬 수 없는 것이 아닙니다.",
@@ -5641,6 +5646,12 @@ export const ko_KR: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 \"고성능\"으로 설정하세요.",
     "bodyWeb": "게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 브라우저 설정에서 하드웨어 가속을 켜고 그래픽 드라이버를 업데이트한 뒤 브라우저를 다시 시작하세요.",
+    "dismiss": "닫기"
+  },
+  "perfNudge": {
+    "integratedGpu": "게임이 내장(절전형) GPU에서 실행되고 있습니다. 이 컴퓨터에 게이밍 GPU도 있다면, Windows의 설정 > 시스템 > 디스플레이 > 그래픽에서 브라우저를 \"고성능\"으로 설정한 뒤 브라우저를 다시 시작하세요. 데스크톱 앱은 게이밍 GPU를 자동으로 선택합니다.",
+    "hardwareAccelerationDesktop": "게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 \"고성능\"으로 설정하세요.",
+    "hardwareAccelerationWeb": "게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 브라우저 설정에서 하드웨어 가속을 켜고 그래픽 드라이버를 업데이트한 뒤 브라우저를 다시 시작하세요.",
     "dismiss": "닫기"
   },
   "realm": {
@@ -6547,105 +6558,105 @@ export const ko_KR: EnTranslations = {
       "critChance": "치명타율",
       "dodge": "회피",
       "parry": "무기 막기",
-      "weaponMin": "Minimum weapon damage",
-      "weaponMax": "Maximum weapon damage",
-      "weaponDps": "Weapon damage per second",
-      "healthOnKill": "Health on kill",
-      "manaOnKill": "Mana on kill",
-      "blockValue": "Block value"
+      "weaponMin": "최소 무기 피해",
+      "weaponMax": "최대 무기 피해",
+      "weaponDps": "초당 무기 피해",
+      "healthOnKill": "처치 시 생명력",
+      "manaOnKill": "처치 시 마나",
+      "blockValue": "방패 막기 수치"
     },
     "procedural": {
-      "rollRangeAria": "Possible roll from {min} to {max}",
-      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
-      "legendaryPower": "Legendary power",
+      "rollRangeAria": "가능한 수치 범위: {min}~{max}",
+      "advancedDetailsHint": "가능한 수치 범위를 보려면 {key} 키를 누르세요.",
+      "legendaryPower": "전설 능력",
       "rarity": {
-        "common": "Common",
-        "magic": "Magic",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary",
-        "mythic": "Mythic"
+        "common": "일반",
+        "magic": "마법",
+        "rare": "희귀",
+        "epic": "영웅",
+        "legendary": "전설",
+        "mythic": "신화"
       },
       "nameFragment": {
-        "mighty": "Mighty",
-        "deft": "Deft",
-        "stalwart": "Stalwart",
-        "sages": "Sage's",
-        "spiritual": "Spiritual",
-        "of_focus": "of Focus",
-        "of_striking": "of Striking",
-        "of_alacrity": "of Alacrity",
-        "of_precision": "of Precision",
-        "warded": "Warded",
-        "of_reaping": "of Reaping",
-        "of_remembrance": "of Remembrance"
+        "mighty": "강력한",
+        "deft": "날렵한",
+        "stalwart": "굳건한",
+        "sages": "현자의",
+        "spiritual": "영적인",
+        "of_focus": "집중의",
+        "of_striking": "일격의",
+        "of_alacrity": "기민함의",
+        "of_precision": "정밀함의",
+        "warded": "수호받는",
+        "of_reaping": "수확의",
+        "of_remembrance": "기억의"
       },
       "rareWord": {
-        "ashen": "Ashen",
-        "blackfen": "Blackfen",
-        "doom": "Doom",
-        "grave": "Grave",
-        "mire": "Mire",
-        "storm": "Storm",
-        "thorn": "Thorn",
-        "wyrm": "Wyrm",
-        "bite": "Bite",
-        "brand": "Brand",
-        "promise": "Promise",
-        "thread": "Thread",
-        "vigil": "Vigil",
-        "ward": "Ward",
-        "whisper": "Whisper",
-        "oath": "Oath"
+        "ashen": "잿빛",
+        "blackfen": "검은늪",
+        "doom": "파멸",
+        "grave": "무덤",
+        "mire": "수렁",
+        "storm": "폭풍",
+        "thorn": "가시",
+        "wyrm": "용",
+        "bite": "송곳니",
+        "brand": "낙인",
+        "promise": "약속",
+        "thread": "실",
+        "vigil": "파수",
+        "ward": "수호",
+        "whisper": "속삭임",
+        "oath": "서약"
       },
       "legendary": {
         "crown_last_pyre": {
-          "name": "Crown of the Last Pyre",
-          "description": "Every third Cinderbolt scorches enemies near the target."
+          "name": "최후 장작불의 왕관",
+          "description": "세 번째 Cinderbolt마다 대상 주변의 적들을 불태웁니다."
         },
         "greyjaws_edge": {
-          "name": "Greyjaw's Edge",
-          "description": "Every third weapon hit bleeds the target and restores a little resource."
+          "name": "회색턱의 칼날",
+          "description": "세 번째 무기 공격마다 대상에게 출혈을 일으키고 주 자원을 조금 회복합니다."
         },
         "hushwood_longbow": {
-          "name": "Hushwood Longbow",
-          "description": "Long Draw or Fell Shot can briefly silence its target."
+          "name": "침묵숲 장궁",
+          "description": "Long Draw 또는 Fell Shot이 대상을 잠시 침묵시킬 수 있습니다."
         },
         "nightglass_fang": {
-          "name": "Nightglass Fang",
-          "description": "A kill grants a short burst of haste."
+          "name": "밤유리 송곳니",
+          "description": "적을 처치하면 잠시 가속이 증가합니다."
         },
         "ysoleis_vigil": {
-          "name": "Ysolei's Vigil",
-          "description": "Critical healing creates a brief restorative ground area."
+          "name": "이솔레이의 파수",
+          "description": "치유가 치명타로 적중하면 잠시 회복의 지대를 만듭니다."
         },
         "stormwake_idol": {
-          "name": "Stormwake Idol",
-          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+          "name": "폭풍의 여운 우상",
+          "description": "네 번째 Arc Bolt마다 주변 적들에게 연쇄됩니다."
         },
         "ashbinders_seal": {
-          "name": "Ashbinder's Seal",
-          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+          "name": "잿불결속자의 인장",
+          "description": "네 번째 Gloom Bolt마다 대상에게 추가 암흑 피해를 받는 징표를 남깁니다."
         },
         "dawnward_signet": {
-          "name": "Dawnward Signet",
-          "description": "Mending Light shields its recipient for a portion of the heal."
+          "name": "새벽수호 인장",
+          "description": "Mending Light가 치유량의 일부만큼 대상을 보호막으로 감쌉니다."
         },
         "feral_moonclasp": {
-          "name": "Feral Moonclasp",
-          "description": "Every third Lunar Tempest restores primary resource."
+          "name": "야성의 달고리",
+          "description": "세 번째 Lunar Tempest마다 주 자원을 회복합니다."
         },
         "bell_of_the_ninth_peal": {
-          "name": "Bell of the Ninth Peal",
-          "description": "Every second damaging spell tolls around the target."
+          "name": "아홉 번째 울림의 종",
+          "description": "두 번째 공격 주문마다 대상 주변에 종소리가 울립니다."
         },
         "mantle_of_borrowed_time": {
-          "name": "Mantle of Stolen Hours",
-          "description": "Falling below 35% health grants a brief defensive ward."
+          "name": "훔친 시간의 어깨망토",
+          "description": "생명력이 35% 아래로 떨어지면 잠시 방어 수호막을 얻습니다."
         },
         "boots_of_the_unbroken_road": {
-          "name": "Boots of the Unbroken Road",
-          "description": "Moving 15 yards grants a short movement-speed burst."
+          "name": "끊이지 않는 길의 장화",
+          "description": "15야드를 이동하면 잠시 이동 속도가 증가합니다."
         }
       }
     },
@@ -9166,6 +9177,108 @@ export const ko_KR: EnTranslations = {
       },
       "resonant_timber": {
         "name": "공명의 목재"
+      },
+      "ashwood_staff": {
+        "name": "물푸레나무 지팡이"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "무덤소환사 천 손목싸개"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "무덤소환사 천 두건"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "무덤소환사 천 다리보호구"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "무덤소환사 천 어깨덧옷"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "무덤소환사 천 예복"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "무덤소환사 천 허리띠"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "무덤소환사 천 덧신"
+      },
+      "gravecaller_focus": {
+        "name": "무덤소환사 마력집중기"
+      },
+      "gravecaller_pendant": {
+        "name": "무덤소환사 목걸이"
+      },
+      "gravecaller_ring": {
+        "name": "무덤소환사 반지"
+      },
+      "gravecaller_wand": {
+        "name": "무덤소환사 마법봉"
+      },
+      "iron_broadsword": {
+        "name": "철제 대검"
+      },
+      "iron_flanged_mace": {
+        "name": "철제 플랜지 철퇴"
+      },
+      "mirefen_dirk": {
+        "name": "수렁늪 단검"
+      },
+      "mirefen_hunting_bow": {
+        "name": "수렁늪 사냥활"
+      },
+      "mirefen_leather_belt": {
+        "name": "수렁늪 가죽 허리띠"
+      },
+      "mirefen_leather_boots": {
+        "name": "수렁늪 가죽 장화"
+      },
+      "mirefen_leather_gloves": {
+        "name": "수렁늪 가죽 장갑"
+      },
+      "mirefen_leather_hood": {
+        "name": "수렁늪 가죽 두건"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "수렁늪 가죽 조끼"
+      },
+      "mirefen_leather_leggings": {
+        "name": "수렁늪 가죽 다리보호구"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "수렁늪 가죽 어깨보호대"
+      },
+      "thornpeak_bulwark": {
+        "name": "가시봉우리 방벽"
+      },
+      "thornpeak_crossbow": {
+        "name": "가시봉우리 석궁"
+      },
+      "thornpeak_mail_chest": {
+        "name": "가시봉우리 사슬 흉갑"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "가시봉우리 사슬 건틀릿"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "가시봉우리 사슬 허리띠"
+      },
+      "thornpeak_mail_helm": {
+        "name": "가시봉우리 사슬 투구"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "가시봉우리 사슬 다리보호대"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "가시봉우리 사슬 견갑"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "가시봉우리 사슬 철갑장화"
+      },
+      "thornpeak_polearm": {
+        "name": "가시봉우리 장창"
+      },
+      "thornpeak_war_axe": {
+        "name": "가시봉우리 전투도끼"
       },
       "conjured_water4": {
         "name": "창조된 샘물"
@@ -11876,6 +11989,7 @@ export const ko_KR: EnTranslations = {
     "delveRiteShrineCandleInteract": "촛불 제단: F를 눌러 만지기",
     "delveRiteShrineReedInteract": "갈대 제단: F를 눌러 만지기",
     "delveRiteShrineSkullInteract": "해골 제단: F를 눌러 만지기",
-    "mailboxName": "우편함"
+    "mailboxName": "우편함",
+    "noticeboardName": "게시판"
   }
 };

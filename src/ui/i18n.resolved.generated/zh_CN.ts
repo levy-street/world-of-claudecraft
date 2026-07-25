@@ -1461,7 +1461,7 @@ export const zh_CN: EnTranslations = {
         "claw": "爪",
         "horn": "角",
         "tusk": "獠牙",
-        "meat": "Meat",
+        "meat": "兽肉",
         "cloth": "布"
       }
     },
@@ -1530,7 +1530,7 @@ export const zh_CN: EnTranslations = {
       "reorderNeedsRecent": "清除筛选并按“最近”排序即可整理背包",
       "itemAriaInstanced": "{item}，数量 {count}，带工匠印记的物品",
       "itemAriaMasterwork": "{item}，数量 {count}，杰作",
-      "itemAriaProcedural": "{item}, {rarity}, item level {level}, quantity {count}",
+      "itemAriaProcedural": "{item}，{rarity}，物品等级 {level}，数量 {count}",
       "filterGroupAria": "按类别筛选背包",
       "filterAll": "全部",
       "filterWeapon": "武器",
@@ -1994,6 +1994,9 @@ export const zh_CN: EnTranslations = {
         "letterGone": "那封信已不在你的邮箱里。",
         "takeParcelsFirst": "请先取出包裹再丢弃信件。"
       }
+    },
+    "noticeboard": {
+      "empty": "看起来没有张贴任何内容。"
     },
     "bank": {
       "title": "银行",
@@ -3856,9 +3859,9 @@ export const zh_CN: EnTranslations = {
         "bonusFmt": "+{value}{stat}"
       },
       "gatherIntro": {
-        "mining": "采矿从世界的岩层中直接提取矿石：Eastbrook Vale产铜矿，Mirefen Marsh产铁矿，Thornpeak Heights产锇矿，为锻造类行业供料。从1级起向所有人开放，无任何门槛，以独立计数器追踪，上限为100。",
-        "logging": "伐木在三大区域的林地中砍伐木材：Eastbrook Vale产铁皮木，Mirefen Marsh产梣木，Thornpeak Heights产高松，为武器柄材、法杖与工程学工作台供料。从1级起向所有人开放，以独立计数器追踪，上限为100。",
-        "herbalism": "草药学采集野生植物：Eastbrook Vale产润光叶，Mirefen Marsh产金叶，Thornpeak Heights产日瓣草，为药坊类行业持续供应叶茎原料。从1级起向所有人开放，以独立计数器追踪，上限为100。",
+        "mining": "采矿从世界的岩层中直接提取矿石：东溪谷产铜矿，泥沼湿地产铁矿，荆峰高地产锇矿，为锻造类行业供料。从1级起向所有人开放：只需背包里备有一把采矿镐，任意主城均售20铜。以独立计数器追踪，上限为100。",
+        "logging": "伐木在三大区域的林地中砍伐木材：东溪谷产铁皮木，泥沼湿地产梣木，荆峰高地产高松，为武器柄材、法杖与工程学工作台供料。从1级起向所有人开放，只需背包里备有一把伐木斧（任意主城20铜），以独立计数器追踪，上限为100。",
+        "herbalism": "草药学采集野生植物：东溪谷产润光叶，泥沼湿地产金叶，荆峰高地产日瓣草，为药坊类行业持续供应叶茎原料。从1级起向所有人开放，只需背包里备有一把草药镰（任意主城20铜），以独立计数器追踪，上限为100。",
         "fishing": "钓鱼通过咬钩与收线的节奏，在每个区域的开阔水面垂钓，上限为200。"
       },
       "rhythmHeading": "采集节奏",
@@ -3867,7 +3870,7 @@ export const zh_CN: EnTranslations = {
       "nodesHeading": "各区域节点",
       "nodesNote": "节点的位置、阶级、所需工具与产出；每个节点在你采集后{respawn}秒才会为你本人刷新。",
       "toolsHeading": "工具",
-      "toolsNote": "工具阶梯与确切的商人售价；4阶与5阶工具只能制作，无法购买。",
+      "toolsNote": "每一处节点都需要背包里备有对应行业的工具，1阶节点也不例外：没有采矿镐就采不到矿石，没有鱼竿就钓不上鱼。商人阶梯覆盖1到3阶，各主城均有备货；工具只需放在背包里即可，没有装备栏位，也没有耐久，因此每件都是一次性购置。门槛只看阶级：工具的品质颜色纯属外观。\n\n商人阶梯之上还有两件制作工具，4阶与5阶，由工程师在工坊打造，任何NPC都不出售。目前没有任何节点需要3阶以上的工具，因此它们眼下的价值在于速度：顶级工具能把低阶节点的采集读条压到时间下限；等更高阶的地界开放时，它们便是入场券。",
       "toolCrafted": "制作获得（{craft}）",
       "toolVendor": "{name}（{hub}）",
       "toolUnavailable": "无出售",
@@ -5572,8 +5575,10 @@ export const zh_CN: EnTranslations = {
     "reconnectingNow": "连接已断开，正在立即重新连接...（第 {attempt}/{maxAttempts} 次尝试）",
     "slowConnection": "加载时间比平时长。请检查您的网络连接。",
     "connectionRejected": "服务器关闭了连接。",
+    "incompatibleWorldVersion": "游戏与服务器版本不兼容。请刷新或更新后重试。",
     "realmFull": "当前服务器已满，请稍后几分钟再试。",
     "tooManyConnections": "您的网络向该服务器发起的连接过多。请关闭多余的游戏窗口，或稍后几分钟再试。",
+    "messageRateExceeded": "由于发送操作过快，您已断开连接。请稍等片刻后重新登录。",
     "tips": {
       "classes": "提示：9 个职业玩法各不相同，投入之前不妨都试一试。",
       "talents": "提示：你可以在任意脱离战斗的时候重置天赋，因此早期的选择永远不会成为陷阱。",
@@ -5641,6 +5646,12 @@ export const zh_CN: EnTranslations = {
   "gpuNotice": {
     "bodyDesktop": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。",
     "bodyWeb": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。",
+    "dismiss": "关闭"
+  },
+  "perfNudge": {
+    "integratedGpu": "游戏正在集成（节能）显卡上运行。如果这台电脑还配有独立游戏显卡，请在 Windows 的 设置 > 系统 > 显示 > 显示卡 中将浏览器设为“高性能”，然后重启浏览器。桌面版会自动选择游戏显卡。",
+    "hardwareAccelerationDesktop": "游戏正在没有 GPU 加速的情况下运行，因此非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。",
+    "hardwareAccelerationWeb": "游戏正在没有 GPU 加速的情况下运行，因此非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。",
     "dismiss": "关闭"
   },
   "realm": {
@@ -6547,105 +6558,105 @@ export const zh_CN: EnTranslations = {
       "critChance": "暴击几率",
       "dodge": "躲闪",
       "parry": "招架",
-      "weaponMin": "Minimum weapon damage",
-      "weaponMax": "Maximum weapon damage",
-      "weaponDps": "Weapon damage per second",
-      "healthOnKill": "Health on kill",
-      "manaOnKill": "Mana on kill",
-      "blockValue": "Block value"
+      "weaponMin": "最低武器伤害",
+      "weaponMax": "最高武器伤害",
+      "weaponDps": "武器每秒伤害",
+      "healthOnKill": "击杀回复生命",
+      "manaOnKill": "击杀回复法力",
+      "blockValue": "格挡值"
     },
     "procedural": {
-      "rollRangeAria": "Possible roll from {min} to {max}",
-      "advancedDetailsHint": "Hold {key} to show possible roll ranges.",
-      "legendaryPower": "Legendary power",
+      "rollRangeAria": "可能的数值范围：{min} 至 {max}",
+      "advancedDetailsHint": "按住 {key} 显示可能的数值范围。",
+      "legendaryPower": "传奇威能",
       "rarity": {
-        "common": "Common",
-        "magic": "Magic",
-        "rare": "Rare",
-        "epic": "Epic",
-        "legendary": "Legendary",
-        "mythic": "Mythic"
+        "common": "普通",
+        "magic": "魔法",
+        "rare": "稀有",
+        "epic": "史诗",
+        "legendary": "传奇",
+        "mythic": "神话"
       },
       "nameFragment": {
-        "mighty": "Mighty",
-        "deft": "Deft",
-        "stalwart": "Stalwart",
-        "sages": "Sage's",
-        "spiritual": "Spiritual",
-        "of_focus": "of Focus",
-        "of_striking": "of Striking",
-        "of_alacrity": "of Alacrity",
-        "of_precision": "of Precision",
-        "warded": "Warded",
-        "of_reaping": "of Reaping",
-        "of_remembrance": "of Remembrance"
+        "mighty": "强力",
+        "deft": "灵巧",
+        "stalwart": "坚毅",
+        "sages": "贤者之",
+        "spiritual": "灵性",
+        "of_focus": "专注",
+        "of_striking": "猛击",
+        "of_alacrity": "迅捷",
+        "of_precision": "精准",
+        "warded": "守护",
+        "of_reaping": "收割",
+        "of_remembrance": "追忆"
       },
       "rareWord": {
-        "ashen": "Ashen",
-        "blackfen": "Blackfen",
-        "doom": "Doom",
-        "grave": "Grave",
-        "mire": "Mire",
-        "storm": "Storm",
-        "thorn": "Thorn",
-        "wyrm": "Wyrm",
-        "bite": "Bite",
-        "brand": "Brand",
-        "promise": "Promise",
-        "thread": "Thread",
-        "vigil": "Vigil",
-        "ward": "Ward",
-        "whisper": "Whisper",
-        "oath": "Oath"
+        "ashen": "灰烬",
+        "blackfen": "黑沼",
+        "doom": "厄运",
+        "grave": "墓冢",
+        "mire": "泥沼",
+        "storm": "风暴",
+        "thorn": "荆棘",
+        "wyrm": "巨龙",
+        "bite": "噬痕",
+        "brand": "烙印",
+        "promise": "诺言",
+        "thread": "丝缕",
+        "vigil": "守望",
+        "ward": "护符",
+        "whisper": "低语",
+        "oath": "誓言"
       },
       "legendary": {
         "crown_last_pyre": {
-          "name": "Crown of the Last Pyre",
-          "description": "Every third Cinderbolt scorches enemies near the target."
+          "name": "末焰之冠",
+          "description": "每第三次施放火球术会灼烧目标附近的敌人。"
         },
         "greyjaws_edge": {
-          "name": "Greyjaw's Edge",
-          "description": "Every third weapon hit bleeds the target and restores a little resource."
+          "name": "灰颚之刃",
+          "description": "每第三次武器命中会使目标流血，并恢复少量主要资源。"
         },
         "hushwood_longbow": {
-          "name": "Hushwood Longbow",
-          "description": "Long Draw or Fell Shot can briefly silence its target."
+          "name": "寂林长弓",
+          "description": "瞄准射击或奥术射击可使目标短暂沉默。"
         },
         "nightglass_fang": {
-          "name": "Nightglass Fang",
-          "description": "A kill grants a short burst of haste."
+          "name": "夜晶之牙",
+          "description": "击杀敌人会短暂提高急速。"
         },
         "ysoleis_vigil": {
-          "name": "Ysolei's Vigil",
-          "description": "Critical healing creates a brief restorative ground area."
+          "name": "伊索蕾的守望",
+          "description": "暴击治疗会短暂生成一片恢复区域。"
         },
         "stormwake_idol": {
-          "name": "Stormwake Idol",
-          "description": "Every fourth Arc Bolt arcs to nearby enemies."
+          "name": "唤风神像",
+          "description": "每第四次闪电箭会弹射至附近的敌人。"
         },
         "ashbinders_seal": {
-          "name": "Ashbinder's Seal",
-          "description": "Every fourth Gloom Bolt marks its target for added Shadow damage."
+          "name": "缚灰者之印",
+          "description": "每第四次暗影箭会标记目标，使其受到额外暗影伤害。"
         },
         "dawnward_signet": {
-          "name": "Dawnward Signet",
-          "description": "Mending Light shields its recipient for a portion of the heal."
+          "name": "晨卫玺戒",
+          "description": "圣光术会为目标施加护盾，吸收相当于部分治疗量的伤害。"
         },
         "feral_moonclasp": {
-          "name": "Feral Moonclasp",
-          "description": "Every third Lunar Tempest restores primary resource."
+          "name": "野性月扣",
+          "description": "每第三次月火术会恢复主要资源。"
         },
         "bell_of_the_ninth_peal": {
-          "name": "Bell of the Ninth Peal",
-          "description": "Every second damaging spell tolls around the target."
+          "name": "九鸣之钟",
+          "description": "每第二次伤害法术都会在目标周围敲响钟声。"
         },
         "mantle_of_borrowed_time": {
-          "name": "Mantle of Stolen Hours",
-          "description": "Falling below 35% health grants a brief defensive ward."
+          "name": "窃时披肩",
+          "description": "生命值降至 35% 以下时，会获得一道短暂的防护结界。"
         },
         "boots_of_the_unbroken_road": {
-          "name": "Boots of the Unbroken Road",
-          "description": "Moving 15 yards grants a short movement-speed burst."
+          "name": "不息之路长靴",
+          "description": "移动 15 码后，移动速度会短暂提高。"
         }
       }
     },
@@ -9166,6 +9177,108 @@ export const zh_CN: EnTranslations = {
       },
       "resonant_timber": {
         "name": "共鸣木材"
+      },
+      "ashwood_staff": {
+        "name": "灰木法杖"
+      },
+      "gravecaller_cloth_handwraps": {
+        "name": "唤墓者布质裹手"
+      },
+      "gravecaller_cloth_hood": {
+        "name": "唤墓者布帽"
+      },
+      "gravecaller_cloth_leggings": {
+        "name": "唤墓者布质护腿"
+      },
+      "gravecaller_cloth_mantle": {
+        "name": "唤墓者布质披肩"
+      },
+      "gravecaller_cloth_raiment": {
+        "name": "唤墓者布袍"
+      },
+      "gravecaller_cloth_sash": {
+        "name": "唤墓者布质腰带"
+      },
+      "gravecaller_cloth_slippers": {
+        "name": "唤墓者布鞋"
+      },
+      "gravecaller_focus": {
+        "name": "唤墓者法器"
+      },
+      "gravecaller_pendant": {
+        "name": "唤墓者吊坠"
+      },
+      "gravecaller_ring": {
+        "name": "唤墓者指环"
+      },
+      "gravecaller_wand": {
+        "name": "唤墓者魔杖"
+      },
+      "iron_broadsword": {
+        "name": "铁制阔剑"
+      },
+      "iron_flanged_mace": {
+        "name": "铁制凸缘钉锤"
+      },
+      "mirefen_dirk": {
+        "name": "泥沼短匕"
+      },
+      "mirefen_hunting_bow": {
+        "name": "泥沼猎弓"
+      },
+      "mirefen_leather_belt": {
+        "name": "泥沼皮带"
+      },
+      "mirefen_leather_boots": {
+        "name": "泥沼皮靴"
+      },
+      "mirefen_leather_gloves": {
+        "name": "泥沼皮手套"
+      },
+      "mirefen_leather_hood": {
+        "name": "泥沼皮帽"
+      },
+      "mirefen_leather_jerkin": {
+        "name": "泥沼皮甲"
+      },
+      "mirefen_leather_leggings": {
+        "name": "泥沼皮护腿"
+      },
+      "mirefen_leather_shoulderguards": {
+        "name": "泥沼皮护肩"
+      },
+      "thornpeak_bulwark": {
+        "name": "荆峰壁垒"
+      },
+      "thornpeak_crossbow": {
+        "name": "荆峰弩"
+      },
+      "thornpeak_mail_chest": {
+        "name": "荆峰锁甲胸铠"
+      },
+      "thornpeak_mail_gauntlets": {
+        "name": "荆峰锁甲手铠"
+      },
+      "thornpeak_mail_girdle": {
+        "name": "荆峰锁甲腰带"
+      },
+      "thornpeak_mail_helm": {
+        "name": "荆峰锁甲头盔"
+      },
+      "thornpeak_mail_legguards": {
+        "name": "荆峰锁甲护腿"
+      },
+      "thornpeak_mail_pauldrons": {
+        "name": "荆峰锁甲肩铠"
+      },
+      "thornpeak_mail_sabatons": {
+        "name": "荆峰锁甲战靴"
+      },
+      "thornpeak_polearm": {
+        "name": "荆峰长柄武器"
+      },
+      "thornpeak_war_axe": {
+        "name": "荆峰战斧"
       },
       "conjured_water4": {
         "name": "魔法泉水"
@@ -11876,6 +11989,7 @@ export const zh_CN: EnTranslations = {
     "delveRiteShrineCandleInteract": "烛火神龛：按 F 触碰",
     "delveRiteShrineReedInteract": "芦苇神龛：按 F 触碰",
     "delveRiteShrineSkullInteract": "骷髅神龛：按 F 触碰",
-    "mailboxName": "邮箱"
+    "mailboxName": "邮箱",
+    "noticeboardName": "告示板"
   }
 };

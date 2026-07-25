@@ -361,7 +361,10 @@ export function resolveCraftForRecipe(
       !!meta?.mobileStation &&
       isStationActive(meta.mobileStation, ctx.tickCount) &&
       stationTypeForCraft(meta.mobileStation.craftId) === recipe.stationType;
-    if (!entity || (!isAtStation(entity.pos, recipe.stationType) && !mobileSatisfies)) {
+    if (
+      !entity ||
+      (!isAtStation(ctx.stationPlacements, entity.pos, recipe.stationType) && !mobileSatisfies)
+    ) {
       return { ok: false, recipeId: recipe.id, reason: 'station_required' };
     }
   }

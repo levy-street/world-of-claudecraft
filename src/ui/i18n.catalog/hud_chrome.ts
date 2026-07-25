@@ -1099,9 +1099,9 @@ export const hudChromeStrings = {
       critChance: 'Your chance for an attack to strike critically, dealing double damage.',
       dodge: 'Your chance to completely avoid an incoming melee attack, taking no damage.',
       critRating:
-        'Crit rating from your gear and set bonuses, raising the critical strike chance of both your attacks and your spells. Every 10 rating grants exactly 1% crit.',
+        'Crit rating from your gear and set bonuses, raising the critical strike chance of both your attacks and your spells. Every 20 rating grants exactly 1% crit.',
       hasteRating:
-        'Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. Every 10 rating grants exactly 1% haste.',
+        'Haste rating from your gear and set bonuses, speeding up your attacks and spellcasting. Every 20 rating grants exactly 1% haste.',
       parry:
         'Your chance to fully parry a frontal melee attack, taking no damage. A blow from behind cannot be parried.',
       hitRating:
@@ -2102,6 +2102,9 @@ export const hudChromeStrings = {
       letterGone: 'That letter is no longer in your box.',
       takeParcelsFirst: 'Take the parcels out before discarding the letter.',
     },
+  },
+  noticeboard: {
+    empty: 'Nothing seems posted.',
   },
   // The bank window (the Gilded Strongbox): a pooled deposit box shown while standing
   // at a banker NPC. Plain click withdraws a stack; shift-click withdraws a partial

@@ -100,7 +100,6 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // moved to social/fiesta.ts with that logic; sim.ts keeps only the type used by
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
-import { MAILBOXES } from './content/mailboxes';
 import type { GatheringProfessionId } from './content/professions';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
@@ -161,7 +160,6 @@ import {
   isArenaPos,
   isDelvePos,
   MOBS,
-  NPCS,
   QUESTS,
   SPIRIT_HEALER_NPC_ID,
   zoneAt,
@@ -502,6 +500,7 @@ import {
   type AuraKind,
   angleTo,
   armorReduction,
+  assertCanonicalEastbrookNoticeboardDef,
   type CrowdControlDrCategory,
   type CrowdControlDrState,
   cloneInvSlot,
@@ -537,6 +536,7 @@ import {
   MELEE_RANGE,
   type MobFamily,
   type MoveInput,
+  type NoticeboardDef,
   type OverheadEmoteId,
   PARTY_XP_RANGE,
   type PendingResurrection,
@@ -565,6 +565,7 @@ import {
   virtualLevel,
   type WeaponSkinLoadout,
   type WeaponSkinType,
+  type WorldContent,
   xpToReachLevel,
 } from './types';
 import * as weaponStowMod from './weapon_stow';
@@ -1507,6 +1508,14 @@ export class Sim {
   // built-in world); everything else is defaulted to a concrete value below.
   cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'proceduralItemUidLease'>> &
     Pick<SimConfig, 'world' | 'perfLap'>;
+  /**
+   * The authored world this simulation owns. The active registry is a host/render
+   * seam and may be swapped by an editor after construction; gameplay services,
+   * future joins, and spirit release must remain bound to this Sim's world.
+   */
+  private readonly worldContent: WorldContent;
+  /** Validated active-world noticeboards captured for this Sim at construction. */
+  readonly noticeboardDefinitions: readonly NoticeboardDef[];
   rng: Rng;
   time = 0;
   tickCount = 0;
@@ -1746,6 +1755,13 @@ export class Sim {
       perfLap: cfg.perfLap,
       idleMobTickRadius: cfg.idleMobTickRadius ?? 0,
     };
+    const activeWorldContent = getActiveWorldContent();
+    this.worldContent = cfg.world ?? activeWorldContent;
+    const activeNoticeboardDefinitions = activeWorldContent.services?.noticeboards ?? [];
+    for (const definition of activeNoticeboardDefinitions) {
+      assertCanonicalEastbrookNoticeboardDef(definition);
+    }
+    this.noticeboardDefinitions = Object.freeze([...activeNoticeboardDefinitions]);
     this.rng = new Rng(cfg.seed);
     // Live server opt-in (worldBossAtBoot): the first world-boss rise is due
     // immediately instead of one interval out, so a freshly (re)started realm
@@ -1803,7 +1819,7 @@ export class Sim {
     // fields (zones, camps, roads, terrainEdits, biomePaint, waterLevel) are
     // identical, or spawns and geometry silently fork. Placements MAY differ
     // (render-only ownership; the editor viewport strips them from cfg.world).
-    const worldContent = this.cfg.world ?? getActiveWorldContent();
+    const worldContent = this.worldContent;
 
     // NPCs — nudged out of buildings and deep water if their data position is bad
     for (const npcDef of Object.values(worldContent.npcs)) {
@@ -1882,7 +1898,7 @@ export class Sim {
 
     // Ravenpost mailboxes: one interactable raven pillar per town (draws no
     // rng; findSafePos is deterministic, so the camp draws above are unmoved).
-    for (const boxDef of MAILBOXES) {
+    for (const boxDef of worldContent.services?.mailboxes ?? []) {
       const safe = this.findSafePos(boxDef.x, boxDef.z, waterLevel() + 0.6);
       const box = createGroundObject(this.nextId++, '', 'Mailbox', this.groundPos(safe.x, safe.z));
       box.templateId = 'mailbox';
@@ -1944,7 +1960,7 @@ export class Sim {
     // Spirit Healers (the angels): one hovering at every overworld graveyard.
     // Per-instance dungeon/raid healers spawn on claim (instances/dungeons.ts).
     // createNpc draws no rng, so world-gen determinism is preserved.
-    spawnOverworldSpiritHealers(this.ctx);
+    spawnOverworldSpiritHealers(this.ctx, worldContent.services?.graveyards ?? []);
 
     // Groundskeeper Bram at the Sowfield gate (Vale Cup). Placed through the
     // SAME findSafePos path as the generic NPC loop above, but under a RESERVED
@@ -1952,10 +1968,10 @@ export class Sim {
     // loop), so world-gen determinism AND the parity goldens' pinned id
     // sequence are both preserved. See social/vale_cup.ts VALE_CUP_BRAM_ID.
     {
-      const bramDef = NPCS.groundskeeper_bram;
+      const bramDef = worldContent.npcs.groundskeeper_bram;
       if (bramDef) {
         const safe = this.findSafePos(bramDef.pos.x, bramDef.pos.z, waterLevel() + 0.6);
-        valeCupMod.spawnGroundskeeper(this.ctx, safe);
+        valeCupMod.spawnGroundskeeper(this.ctx, bramDef, safe);
       }
     }
 
@@ -2003,6 +2019,29 @@ export class Sim {
           lockpick: null,
         });
       }
+    }
+
+    // Noticeboard collision reads the active WorldContent registry, so spawn
+    // must use that same authority even when cfg.world differs. This prevents
+    // a cfg-only board entity without its active static collider, or the reverse.
+    // Authored high-range ids consume neither nextId nor rng, preserving the
+    // established roster and every prior deterministic draw.
+    for (const boardDef of this.noticeboardDefinitions) {
+      if (this.entities.has(boardDef.entityId)) {
+        throw new Error(`Duplicate noticeboard entity id: ${boardDef.entityId}`);
+      }
+      const board = createGroundObject(
+        boardDef.entityId,
+        '',
+        boardDef.name,
+        this.groundPos(boardDef.x, boardDef.z),
+      );
+      board.templateId = boardDef.templateId;
+      board.objectItemId = null;
+      board.lootable = true;
+      board.facing = boardDef.rotation;
+      board.prevFacing = boardDef.rotation;
+      this.addEntity(board);
     }
 
     if (!cfg.noPlayer) {
@@ -2160,8 +2199,15 @@ export class Sim {
     } else if (savedPos && savedPos.x > DUNGEON_X_THRESHOLD) {
       const dungeon = dungeonAt(savedPos.x) ?? DUNGEON_LIST[0];
       savedPos = { x: dungeon.doorPos.x, z: dungeon.doorPos.z - 4 };
+    } else if (savedPos) {
+      // Authored towns can grow across release boundaries. A living character
+      // saved on what used to be open overworld ground must not resume trapped
+      // inside a newly added solid prop. Preserve valid shoreline and swimming
+      // saves: migration is collision-only and uses the real player body radius,
+      // while instance/delve exits above retain their established behavior.
+      savedPos = this.findSafePos(savedPos.x, savedPos.z, -Infinity, PLAYER_BODY_RADIUS);
     }
-    const playerStart = (this.cfg.world ?? getActiveWorldContent()).playerStart;
+    const playerStart = this.worldContent.playerStart;
     const startPos = savedPos
       ? this.groundPos(savedPos.x, savedPos.z)
       : this.groundPos(playerStart.x, playerStart.z);
@@ -2605,7 +2651,12 @@ export class Sim {
       player.prevPos = { ...player.pos };
       this.rebucket(player);
       player.dead = true;
-      releasePlayerSpirit(this.ctx, player.id);
+      releasePlayerSpirit(
+        this.ctx,
+        player.id,
+        this.worldContent.services?.graveyards ?? [],
+        this.worldContent.playerStart,
+      );
     }
     if (savedState?.pet) this.restorePet(player, savedState.pet);
     // One-time Ravenpost welcome (doubles as the service announcement for
@@ -3658,11 +3709,11 @@ export class Sim {
 
   // Deterministic outward spiral to the nearest spot that is on dry-enough
   // ground and not inside a building/prop. Keeps NPCs out of houses and lakes.
-  findSafePos(x: number, z: number, minHeight: number): { x: number; z: number } {
+  findSafePos(x: number, z: number, minHeight: number, bodyRadius = 0.6): { x: number; z: number } {
     const seed = this.cfg.seed;
     const ok = (px: number, pz: number): boolean => {
       if (groundHeight(px, pz, seed) < minHeight) return false;
-      const res = resolvePosition(seed, px, pz, 0.6);
+      const res = resolvePosition(seed, px, pz, bodyRadius);
       return Math.abs(res.x - px) < 1e-4 && Math.abs(res.z - pz) < 1e-4;
     };
     if (ok(x, z)) return { x, z };
@@ -3718,6 +3769,9 @@ export class Sim {
       },
       get players() {
         return sim.players;
+      },
+      get stationPlacements() {
+        return sim.stationPlacements;
       },
       get primaryId() {
         return sim.primaryId;
@@ -4577,7 +4631,7 @@ export class Sim {
         // positive transition needs a dirty mark (a resting player must not
         // stay perpetually dirty for the tick-tail evaluator).
         const wasUnrested = meta.restedXp === 0;
-        updateRested(p, meta);
+        updateRested(p, meta, this.worldContent.props.buildings);
         if (wasUnrested && meta.restedXp > 0) deedsMod.markDeedsDirty(this.ctx, p.id);
         if (meta.pendingGatherGrants.length > 0) {
           drainGatheringGrants(meta);
@@ -7167,6 +7221,11 @@ export class Sim {
     return ALL_RECIPES;
   }
 
+  /** Static crafting-station anchors from this Sim's authored world bundle. */
+  get stationPlacements() {
+    return this.worldContent.services?.stations ?? [];
+  }
+
   // Common-tier crafting command (#1127): a thin delegate onto
   // src/sim/professions/crafting.ts, resolved on the deterministic tick the
   // command arrives on, same as harvestNode/buyItem/useItem above. Stashes
@@ -7242,7 +7301,7 @@ export class Sim {
   trainRecipe(recipeId: string, pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
-    const result = resolveTrain(r.meta, r.e.pos, recipeId);
+    const result = resolveTrain(this.stationPlacements, r.meta, r.e.pos, recipeId);
     if (result.ok) {
       r.meta.copper -= result.fee;
       acquireRecipeImpl(this.ctx, r.meta.entityId, recipeId, 'trainer');
@@ -7447,7 +7506,7 @@ export class Sim {
   }
 
   pickUpObject(objId: number, pid?: number): boolean {
-    return interaction.pickUpObject(this.ctx, objId, pid);
+    return interaction.pickUpObject(this.ctx, objId, pid, this.noticeboardDefinitions);
   }
 
   townFocusFor(pid: number): Record<string, number> {
@@ -7485,7 +7544,7 @@ export class Sim {
   }
 
   interact(pid?: number): void {
-    interaction.interact(this.ctx, pid);
+    interaction.interact(this.ctx, pid, this.noticeboardDefinitions);
   }
 
   private isQuestInteractionEntity(e: Entity): boolean {
@@ -7617,7 +7676,12 @@ export class Sim {
   // Player death/respawn lives in entity_roster.ts (E1, merged E2). Thin delegate
   // keeps the public IWorld surface (`sim.releaseSpirit`) resolving unchanged.
   releaseSpirit(pid?: number): void {
-    releasePlayerSpirit(this.ctx, pid);
+    releasePlayerSpirit(
+      this.ctx,
+      pid,
+      this.worldContent.services?.graveyards ?? [],
+      this.worldContent.playerStart,
+    );
   }
 
   // Ghost resurrection (src/sim/spirit.ts): run the spirit back to its corpse to

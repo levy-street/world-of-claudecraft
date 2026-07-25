@@ -17,7 +17,7 @@ export type { ProcDef, ProcResponse, ProcTrigger } from '../content/talents';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { convergenceOnCast } from './convergence';
-import { PERSONAL_BARRIER_IDS } from './fire_mage';
+import { combustionRestokesCinderfall, PERSONAL_BARRIER_IDS } from './fire_mage';
 
 function state(player: Entity): NonNullable<Entity['procState']> {
   if (!player.procState) player.procState = { counters: {}, icds: {} };
@@ -186,7 +186,10 @@ export function onCastCompleted(
   // Elemental Convergence (mage choice row): school-alternation memory, kept
   // here because every completed cast funnels through this hook. Draws no rng.
   convergenceOnCast(ctx, player, abilityId);
-  ctx.triggerEquipmentEffects(player, {
+  // Phoenix Trance restokes one Cinderfall charge (designer rule 2026-07-25);
+  // same reasoning: the one seam every completed cast passes. Draws no rng.
+  combustionRestokesCinderfall(ctx, player, abilityId);
+  ctx.triggerEquipmentEffects?.(player, {
     kind: 'ability_cast',
     abilityId,
     targetId: target?.id,

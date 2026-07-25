@@ -77,6 +77,7 @@ import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
 import { createPerfMonitor } from './game/perf';
+import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import {
@@ -98,6 +99,7 @@ import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
+import { telemetryZoneId } from './game/world_telemetry';
 import {
   CHAR_SORT_MODES,
   type CharSortMode,
@@ -3328,6 +3330,14 @@ async function startGame(
       lastSnapAge: net.lastSnapAt > 0 ? Math.round(performance.now() - net.lastSnapAt) : -1,
       alpha: Math.round(alpha * 100) / 100,
     });
+    // Always-on net-pipeline counters (net_pipeline_stats.ts): fold the
+    // snapshots-applied-since-last-frame count, then publish the stats source
+    // UNGATED (ruling R9), unlike the overlay-gated setNetwork above; the
+    // allocating summary() is drawn lazily at the 1 Hz snapshot, never per
+    // frame. main.ts is the src/net to src/game junction (ruling R8).
+    const netPipeline = net.netPipeline();
+    netPipeline.onAnimationFrame(now);
+    perf.setNetPipelineSource(netPipeline);
     // Display-only self extrapolation (src/render/self_motion.ts). Off while
     // spectating, corpse-frozen, or CC'd (playerImmobilized covers stun/root/
     // incapacitate/polymorph, and fear is a fear_incap incapacitate aura; the
@@ -3549,6 +3559,10 @@ async function startGame(
   }
   await nextPaint();
   last = performance.now();
+  // A hidden tab pauses rAF while snapshots keep arriving; reset the pending
+  // snapshots-per-rAF count on visibility flips so the first foreground frame
+  // does not fold the backlog into the 3plus histogram bucket (ruling R9).
+  document.addEventListener('visibilitychange', () => online?.netPipeline().noteVisibilityChange());
   requestAnimationFrame(frame);
   // cut to the game only once the first frame is actually on screen
   requestAnimationFrame(() =>
@@ -3566,7 +3580,15 @@ async function startGame(
           settings,
           tokenProvider: () => api.token,
           characterIdProvider: () => online?.characterId ?? null,
+          worldTelemetryProvider: () => ({
+            zoneId: telemetryZoneId(world.player.pos.x, world.player.pos.z),
+            simEntities: world.entities.size,
+          }),
+          desktopShell: DESKTOP_APP,
         });
+        // One-time machine-local performance nudge (packet 0 rulings R14-R16):
+        // the assembler polls the same PerfMonitor the reporter reads.
+        initPerfNudge({ perf, desktopShell: DESKTOP_APP });
         // Warm the procedural icon cache during idle time so the first
         // bags/vendor/loot open never pays the compose burst synchronously
         // (icon_prewarm.ts). Re-entry is a fast no-op: the cache is module-global.

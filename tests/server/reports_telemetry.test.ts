@@ -206,6 +206,29 @@ describe('POST /api/perf-report (public perf beacon)', () => {
     expect(routeFor('POST', '/api/perf-report').middleware).toBeUndefined();
   });
 
+  it('sanitizes suggestion ids on the RouteDef arm before they reach storage', async () => {
+    // Phase 05 (ruling R14): the allowlist/dedupe/cap sanitizer must hold on
+    // the ROUTE path, not just in the handler unit suite, so a hostile beacon
+    // through the registered route stores only known, deduped ids.
+    const r = await runRoute('POST', '/api/perf-report', {
+      body: {
+        sessionId: 's-suggestions',
+        suggestionIds: [
+          'integrated-gpu',
+          'bogus; DROP TABLE accounts',
+          'integrated-gpu',
+          42,
+          'hardware-acceleration',
+        ],
+      },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ ok: true });
+    expect(vi.mocked(insertClientPerfReport)).toHaveBeenCalledWith(
+      expect.objectContaining({ suggestionIds: ['integrated-gpu', 'hardware-acceleration'] }),
+    );
+  });
+
   it('swallows a repeat beacon with a 200 (throttle never 429s), inserting once', async () => {
     // Two POSTs with the SAME sessionId: the first stores (200 { ok: true }, one
     // insert); the second, inside the per-session throttle window, is swallowed by
