@@ -207,6 +207,73 @@ describe('arena: a full bout', () => {
     expect(sim.entities.get(a)!.targetId).toBe(b);
   });
 
+  it('keeps an opponent targeted during the countdown across the fight-start reset', () => {
+    const { sim, a, b } = queueDuo();
+    expect(sim.arenaMatchFor(a)!.state).toBe('countdown');
+    sim.targetEntity(b, a);
+    expect(sim.entities.get(a)!.targetId).toBe(b);
+
+    startBout(sim);
+
+    expect(sim.arenaMatchFor(a)!.state).toBe('active');
+    expect(sim.entities.get(a)!.targetId).toBe(b);
+    // only the selection persists: auto-attack still starts off at the gates
+    expect(sim.entities.get(a)!.autoAttack).toBe(false);
+  });
+
+  it('resets a target pointing outside the match to null at fight start', () => {
+    const { sim, a } = queueDuo();
+    const outsider = sim.addPlayer('rogue', 'Gimel');
+    expect(sim.arenaMatchFor(a)!.state).toBe('countdown');
+    sim.entities.get(a)!.targetId = outsider;
+
+    startBout(sim);
+
+    expect(sim.arenaMatchFor(a)!.state).toBe('active');
+    expect(sim.entities.get(a)!.targetId).toBe(null);
+  });
+
+  it('a fighter with no target during the countdown still starts the fight untargeted', () => {
+    const { sim, a } = queueDuo();
+    expect(sim.entities.get(a)!.targetId).toBe(null);
+
+    startBout(sim);
+
+    expect(sim.arenaMatchFor(a)!.state).toBe('active');
+    expect(sim.entities.get(a)!.targetId).toBe(null);
+  });
+
+  it('the match-creation reset still clears a target carried into the arena', () => {
+    const { sim, a } = queueDuo('warrior', 'mage', (sim, a, b) => {
+      sim.entities.get(a)!.targetId = b;
+    });
+    expect(sim.arenaMatchFor(a)!.state).toBe('countdown');
+    expect(sim.entities.get(a)!.targetId).toBe(null);
+  });
+
+  it('a 2v2 teammate target survives the fight-start reset', () => {
+    const sim = makeWorld();
+    const classes: PlayerClass[] = ['warrior', 'mage', 'rogue', 'priest'];
+    const names = ['Aleph', 'Bet', 'Gimel', 'Dalet'];
+    const pids = classes.map((cls, i) => sim.addPlayer(cls, names[i]));
+    pids.forEach((pid, i) => {
+      teleport(sim, pid, i * 3, -40);
+    });
+    for (const pid of pids) sim.arenaQueueJoin(pid, '2v2');
+    sim.tick(); // matchmake seats the four solos into one 2v2 match
+    const match = sim.arenaMatchFor(pids[0])!;
+    expect(match.format).toBe('2v2');
+    expect(match.state).toBe('countdown');
+    const [me, mate] = match.teamA;
+    sim.targetEntity(mate, me);
+    expect(sim.entities.get(me)!.targetId).toBe(mate);
+
+    startBout(sim);
+
+    expect(match.state).toBe('active');
+    expect(sim.entities.get(me)!.targetId).toBe(mate);
+  });
+
   it('does not cancel auto-attack when retargeting an active arena opponent', () => {
     const { sim, a, b } = queueDuo();
     startBout(sim);
