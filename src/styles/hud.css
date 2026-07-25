@@ -1841,23 +1841,29 @@
     align-items: flex-end;
     gap: 4px;
   }
-  /* The section keyline, in the panel-divider language: the shared gold-brown
-     showcase hairline, perpendicular to the column's stacking axis. Drawn on
-     the LATER sibling so the topmost section never carries a stray rule. */
-  .micro-group + .micro-group {
-    margin-top: 3px;
-    padding-top: 3px;
-    border-top: 1px solid var(--color-border-showcase);
-  }
-  /* Hidden-section hygiene: three rail entries are conditional (#mm-town-focus
-     only in a town hub, #mm-discord only on a Discord-enabled build, and the
-     whole rewards section is a lone #daily-rewards-button that hides when
-     daily rewards are off). A section with nothing visible left in it must
-     vanish whole, or its keyline and gap would paint as a divider with no
-     content under it. Every conditional entry on the rail uses the `hidden`
+  /* Hidden-section hygiene, first half: three rail entries are conditional
+     (#mm-town-focus only in a town hub, #mm-discord only on a Discord-enabled
+     build, and the whole rewards section is a lone #daily-rewards-button that
+     hides when daily rewards are off). A section with nothing visible left in
+     it collapses entirely, so the column gap does not reserve dead space
+     around it. Every conditional entry on the rail uses the `hidden`
      attribute, so one structural rule covers all three. */
   .micro-group:not(:has(> :not([hidden]))) {
     display: none;
+  }
+  /* The section keyline, in the panel-divider language: the shared gold-brown
+     showcase hairline, perpendicular to the column's stacking axis.
+     Hidden-section hygiene, second half, and the reason this is a BOTTOM rule
+     on the earlier section rather than a top rule on the later one: display:
+     none does NOT take a collapsed section out of the sibling chain, so
+     `.micro-group + .micro-group` would still paint a keyline above the first
+     surviving section with nothing over it (visible whenever the lone-chest
+     rewards section hides). Drawing on a section that still has a VISIBLE
+     section after it leaves no orphan at either end of the column. */
+  .micro-group:has(> :not([hidden])):has(~ .micro-group:has(> :not([hidden]))) {
+    margin-bottom: 3px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--color-border-showcase);
   }
   .micro-btn {
     width: 34px;
@@ -1978,7 +1984,14 @@
      fits the 660px maximized-1366x768 budget, so the rescue only needs to
      fire below that. */
   @media (max-height: 600px) {
-    .side-buttons-col {
+    /* Both gaps, not just the column's: since the rail was split into
+       .micro-group sections the column gap only separates SECTIONS, and it is
+       the section gap that sets the spacing between individual buttons.
+       Compacting one without the other would leave the rescue barely shrinking
+       the rail at all. The section keyline keeps its own 3px breathing room so
+       the sections stay tellable apart at the tighter button spacing. */
+    .side-buttons-col,
+    .micro-group {
       gap: 1px;
     }
     #side-buttons .micro-btn {

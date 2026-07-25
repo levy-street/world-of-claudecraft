@@ -108,17 +108,23 @@ describe('side rail height budget', () => {
   const COMPACT_BUDGET_PX = 600; // the @media (max-height: 600px) rescue threshold itself
   const BOTTOM_ANCHOR_PX = 74; // #side-buttons { bottom: 74px }
   const UNCOMPACTED_MICRO_PX = 30; // .micro-btn height at full size (hud.css:1758)
-  const UNCOMPACTED_GAP_PX = 4; // .side-buttons-col gap at full size (hud.css:1754)
+  // The gap BETWEEN BUTTONS comes from .micro-group, not .side-buttons-col:
+  // since the rail was split into sections the column gap only separates
+  // sections. Both are asserted equal against the real CSS below, so a change
+  // to either one cannot drift this arithmetic silently.
+  const UNCOMPACTED_GAP_PX = 4; // .micro-group gap at full size
   const COMPACT_MICRO_PX = 24; // .micro-btn height under @media (max-height: 600px)
-  const COMPACT_GAP_PX = 1; // column gap under the same media query
+  const COMPACT_GAP_PX = 1; // .micro-group gap under the same media query
   // The Daily Rewards chest block (button plus its margin), which now lives
   // at the top of col-b only, from the reviewer's offline measurement.
   const DAILY_CHEST_BLOCK_PX = 128;
   // Each column is now split into .micro-group sections, and every boundary
   // between two VISIBLE sections costs the keyline plus its breathing room
-  // (.micro-group + .micro-group { margin-top: 3px; padding-top: 3px;
-  // border-top: 1px }). Counted separately from the per-button arithmetic so
-  // adding a section is visible in this budget instead of hiding inside it.
+  // (margin-bottom: 3px + padding-bottom: 3px + a 1px border). Counted
+  // separately from the per-button arithmetic so adding a section shows up in
+  // this budget instead of hiding inside it. Deliberately NOT compacted by the
+  // max-height rescue: at a 1px in-section gap it is the only thing left
+  // telling the sections apart.
   const SECTION_SEPARATOR_PX = 7;
 
   function wrapperMarkup(html: string): string {
@@ -148,10 +154,10 @@ describe('side rail height budget', () => {
   }
 
   // A .micro-group section only costs a keyline when it still has something
-  // visible in it (hud.css hides a section with nothing but hidden children),
-  // and only BETWEEN sections, so n visible sections cost n-1 separators. The
-  // separator is deliberately NOT compacted by the max-height rescue: at a
-  // 1px in-section gap it is the only thing left telling the sections apart.
+  // visible in it (hud.css collapses a section with nothing but hidden
+  // children, and the keyline is drawn only on a visible section that still
+  // has a visible section after it), so n visible sections cost n-1
+  // separators, with no orphan at either end of the column.
   function countVisibleSections(markup: string): number {
     return markup
       .split('<div class="micro-group"')
@@ -175,8 +181,29 @@ describe('side rail height budget', () => {
     expect(hudCss).toMatch(
       /@media \(max-height: 600px\)[\s\S]*?#side-buttons \.micro-btn \{\s*height: 24px;/,
     );
-    expect(hudCss).toMatch(/@media \(max-height: 600px\)[\s\S]*?\.side-buttons-col \{\s*gap: 1px;/);
+    // BOTH gaps have to compact. The gap between individual buttons now comes
+    // from .micro-group; compacting only .side-buttons-col would shrink the
+    // spacing between SECTIONS (3 boundaries in col-b) and leave every
+    // button-to-button gap at full size, quietly gutting the rescue.
+    expect(hudCss).toMatch(
+      /@media \(max-height: 600px\)[\s\S]*?\.side-buttons-col,\s*\.micro-group \{\s*gap: 1px;/,
+    );
     expect(hudCss).toMatch(/#side-buttons \{[^}]*bottom: 74px;/);
+  });
+
+  it('derives the per-button gap from the rule that actually sets it', () => {
+    // The budget arithmetic above uses UNCOMPACTED_GAP_PX / COMPACT_GAP_PX for
+    // the space between two buttons. That space is .micro-group's gap, so read
+    // it back out of the CSS: a change to either rule that leaves the other
+    // behind fails here instead of drifting the budget by a few px per button.
+    const groupRule = /\n {2}\.micro-group \{([^}]*)\}/.exec(hudCss)?.[1] ?? '';
+    expect(Number(/gap:\s*(\d+)px/.exec(groupRule)?.[1])).toBe(UNCOMPACTED_GAP_PX);
+    const compacted = /@media \(max-height: 600px\) \{([\s\S]*?)\n {2}\}/.exec(hudCss)?.[1] ?? '';
+    expect(Number(/gap:\s*(\d+)px/.exec(compacted)?.[1])).toBe(COMPACT_GAP_PX);
+    // The column gap and the section gap are set together, so the separation
+    // between sections never becomes smaller than the one between buttons.
+    const colRule = /\n {2}\.side-buttons-col \{([^}]*)\}/.exec(hudCss)?.[1] ?? '';
+    expect(Number(/gap:\s*(\d+)px/.exec(colRule)?.[1])).toBe(UNCOMPACTED_GAP_PX);
   });
 
   it('lays the two columns out close together, not spread across the HUD', () => {
