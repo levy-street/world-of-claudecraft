@@ -3695,6 +3695,9 @@ export class ClientWorld implements IWorld {
   guildEventRemove(eventId: number): void {
     this.cmd({ cmd: 'guild_event_remove', id: eventId });
   }
+  guildSetMotd(text: string): void {
+    this.cmd({ cmd: 'guild_set_motd', text });
+  }
   async searchCharacters(query: string): Promise<CharacterSearchResult[]> {
     const q = query.trim();
     if (!q) return [];

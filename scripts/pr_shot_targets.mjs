@@ -1039,6 +1039,97 @@ export const TARGETS = [
     },
   },
   {
+    key: 'guild-billboard',
+    label: 'Social window: Guild tab billboard (officer edit vs member read-only)',
+    // Match the SOURCE files (`.ts` suffix, same reason as guild-roster above).
+    when: ['ui/social_window.ts', 'ui/social_view.ts'],
+    // Same sanctioned offline-staging fallback as guild-roster: inject a guild
+    // fixture (now carrying motd/motdSetBy) through the debug hook and open the
+    // Guild tab. The officer variant shows the enabled edit input + save button;
+    // the member variant shows the disabled input with no save.
+    variants: [
+      { key: 'desktop-officer', charName: 'Rueweaver', charClass: 'paladin', rank: 'officer' },
+      { key: 'desktop-member', charName: 'Rueweaver', charClass: 'paladin', rank: 'member' },
+      { key: 'mobile', charName: 'Rueweaver', charClass: 'paladin', rank: 'officer', mobile: true },
+    ],
+    async capture(page, variant) {
+      const staged = await page.evaluate((rank) => {
+        const sim = window.__game?.sim;
+        if (!sim || !sim.player) return { ok: false, reason: 'offline world is unavailable' };
+        const me = sim.player.name;
+        const m = (over) => ({
+          id: over.id,
+          name: over.name,
+          cls: over.cls,
+          level: over.level,
+          realm: 'Aurora',
+          online: over.online,
+          status: over.status,
+          zone: over.zone,
+          rank: over.rank ?? 'member',
+          lastLogin: over.lastLogin ?? null,
+          activeTitle: over.activeTitle ?? null,
+        });
+        sim.socialInfo = {
+          friends: [],
+          blocks: [],
+          ignores: [],
+          guild: {
+            id: 1,
+            name: 'The Loud Ones',
+            rank,
+            motd: 'Raid night Friday, 8pm server. Bring flasks. Discord: discord.gg/example',
+            motdSetBy: 'Gizzelda',
+            members: [
+              m({
+                id: 1,
+                name: me,
+                cls: 'paladin',
+                level: 60,
+                online: true,
+                status: 'online',
+                zone: 'zone:stormwind',
+                rank,
+              }),
+              m({
+                id: 2,
+                name: 'Gizzelda',
+                cls: 'mage',
+                level: 60,
+                online: true,
+                status: 'dungeon',
+                zone: 'zone:deadmines',
+                rank: 'leader',
+              }),
+              m({
+                id: 3,
+                name: 'Bramble',
+                cls: 'druid',
+                level: 41,
+                online: false,
+                rank: 'member',
+                lastLogin: '2026-07-15T09:30:00.000Z',
+              }),
+            ],
+            events: [],
+          },
+        };
+        const el = document.querySelector('#social-window');
+        if (el) el.classList.remove('open');
+        window.__game?.hud?.toggleSocial?.();
+        return { ok: true };
+      }, variant?.rank ?? 'officer');
+      if (!staged.ok) throw new Error(staged.reason);
+      const open = await pollForSize(page, '#social-window');
+      if (!open) return {};
+      await page.evaluate(() => {
+        document.querySelector('.soc-tab[data-tab="guild"]')?.click();
+      });
+      await wait(400);
+      return { clip: '#social-window' };
+    },
+  },
+  {
     key: 'chat-general-tab',
     label: 'Chat window: General/Chat tab',
     when: ['log_event_route'],
